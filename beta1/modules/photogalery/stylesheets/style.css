@@ -1,0 +1,19 @@
+@CHARSET "UTF-8";
+.galery_box {
+	padding: 10px;
+	text-align: center;
+}
+
+.galery_box div.galery_text {
+	text-align: justify;
+}
+
+
+.smallPhotoBox {
+	width: 33%;
+	text-align: center;
+}
+
+.photo_buttons_edit {
+	padding: 0 30px;
+}
