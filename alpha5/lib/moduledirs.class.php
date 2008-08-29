@@ -1,0 +1,175 @@
+<?php
+/**
+ * Třída pro obsluhu adresářů modulu
+ */
+class ModuleDirs {
+	/**
+	 * Adresář se složkami modulu
+	 * @var string
+	 */
+	const MODULES_MAIN_DIR = 'modules';
+
+	/**
+	 * Adresář s modely
+	 * @var string
+	 */
+	const MODELS_DIR = 'models';
+
+	/**
+	 * Adresář s šablonami
+	 * @var string
+	 */
+	const TEMPLATES_DIR = 'templates';
+
+	/**
+	 * Zařazení z pohledu index.tpl
+	 * @var string
+	 */
+	const TEMPLATES_INDEX_DIR = '.';
+	
+	/**
+	 * Adresář se styly
+	 * @var string
+	 */
+	const STYLESHEETS_DIR = 'stylesheets';
+
+	/**
+	 * Adresář s javascripty
+	 * @var string
+	 */
+	const JAVASCRIPTS_DIR = 'javascripts';
+	
+	/**
+	 * oddělovač adresářů
+	 * @var string
+	 */
+	const DIR_SEPARATOR = '/';
+	
+	/**
+	 * Adresář webu (static)
+	 * @var string
+	 */
+	private static $mainWebDir;
+
+	/**
+	 * Adresář se všemi daty
+	 */
+	private static $mainDataDir;
+	
+	/**
+	 * Adresář modulu ve filesystému (jeho název)
+	 * @var string
+	 */
+	private $moduleDir = null;
+	
+	/**
+	 * Proměná s datovým adresářem modulu
+	 * @var string
+	 */
+	private $moduleDataDir = null;
+
+	/*
+	 * ============ METODY
+	 */
+	
+	
+	/**
+	 * Konstruktor vytvoří základní adresářovou strukturu
+	 *
+	 * @param string -- adresář modulu (název)
+	 * @param string -- datový adresář modulu
+	 */
+	function __construct($moduleDir, $moduleDataDir) {
+		$this->moduleDir = $moduleDir;
+		$this->moduleDataDir = $moduleDataDir;
+	}
+
+	/**
+	 * Statická metoda nastaví hlavní adresář webu
+	 *
+	 * @param string -- adresář webu
+	 */
+	public static function setWebDir($webDir) {
+		ModuleDirs::$mainWebDir = $webDir;
+	}
+
+	/**
+	 * Statická metoda vrací hlavní adresář webu
+	 *
+	 * @return string -- adresář webu
+	 */
+	private static function getWebDir() {
+		return ModuleDirs::$mainWebDir;
+	}
+
+	/**
+	 * Statická metoda nastaví hlavní datový adresář webu
+	 *
+	 * @param string -- datový adresář webu
+	 */
+	public static function setWebDataDir($dataDir) {
+		ModuleDirs::$mainDataDir = $dataDir;
+	}
+	
+	/**
+	 * Statická metoda vrací hlavní datový adresář webu
+	 *
+	 * @return string -- datový adresář webu
+	 */
+	private static function getWebDataDir() {
+		return ModuleDirs::$mainDataDir;
+	}
+
+	/**
+	 * Metoda vrací adresář k modulu
+	 */
+	public function getMainDir() {
+		return ModuleDirs::getWebDir().self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir.self::DIR_SEPARATOR;
+	}
+
+	/**
+	 * Metoda vrací adresář s modely
+	 */
+	public function getModelsDir() {
+		return $this->getMainDir().self::MODELS_DIR.self::DIR_SEPARATOR;
+	}
+
+	/**
+	 * Metoda vrací cestu k datovému adresáři modulu
+	 * @return string -- cesta k adresáři 
+	 */
+	public function getDataDir() {
+		if($this->moduleDataDir == null){
+			return false;
+		} else {
+			return self::getWebDir().self::getWebDataDir().self::DIR_SEPARATOR.$this->moduleDataDir.self::DIR_SEPARATOR;
+		}
+	}
+	
+	/**
+	 * Metody vrací cestu k adresáři css souborů modulu
+	 * @return string -- cesta k css souborům
+	 */
+	public function getStylesheetsDir() {
+		return $this->getMainDir().self::STYLESHEETS_DIR.self::DIR_SEPARATOR;
+	}
+	
+	/**
+	 * Metoda vrací adresář k javascript souborům modulu
+	 * @return string -- cesta k adresáři s javascripty
+	 */
+	public function getJavaScriptsDir() {
+		return $this->getMainDir().self::JAVASCRIPTS_DIR.self::DIR_SEPARATOR;
+	}
+	
+	/**
+	 * Metoda vrací adresář k šablonám modulu
+	 * @return string -- adresář k šablonám modulu
+	 */
+	public function getTemplatesDir() {
+		return self::TEMPLATES_INDEX_DIR.$this->getMainDir().self::TEMPLATES_DIR.self::DIR_SEPARATOR;
+	}
+	
+}
+
+?>
