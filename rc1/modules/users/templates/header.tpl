@@ -1,0 +1,1 @@
+<h1>{html_image file='./images/icons/users.png'}{$VARS.USER_PAGE_NAME}</h1>
