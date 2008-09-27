@@ -76,6 +76,12 @@ abstract class Controller {
 	private $viewTemplate = null;
 	
 	/**
+	 * Objek kontejneru pro přenos dat do viewru
+	 * @var Container
+	 */
+	private $container = null;
+	
+	/**
 	 * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
 	 *
 	 * @param Module -- objekt modulu
@@ -91,7 +97,7 @@ abstract class Controller {
 		$this->infomsg = $messages;
 		$this->errmsg = $errors;
 		$this->article = $article;
-		
+		$this->container = new Container();
 	}
 	
 	/**
@@ -165,6 +171,15 @@ abstract class Controller {
 	 */
 	final public function errMsg() {
 		return $this->errmsg;
+	}
+	
+	/**
+	 * Metoda vrací objekt kontaineru pro přenos dat mezi controlerem a viewrem
+	 * 
+	 * @return Container -- objekt kontaineru
+	 */
+	final public function container() {
+		return $this->container;
 	}
 	
 	
@@ -284,7 +299,7 @@ abstract class Controller {
 //			}
 
 			//					Vytvoření objektu pohledu
-			$view = new $viewClassName($this->getModule(), $this->getRights(), $this->viewTemplate);
+			$view = new $viewClassName($this->getModule(), $this->getRights(), $this->viewTemplate, $this->container());
 
 			//	Zvolení překladu na modul
 //			textdomain($module->getName());

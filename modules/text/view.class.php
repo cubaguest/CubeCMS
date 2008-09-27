@@ -7,21 +7,20 @@
 class TextView extends View {
 	public function mainView() {
 		
-		
 		if($this->getRights()->isWritable()){
 			$this->template()->addTpl('editButton.tpl');
 			
 			$this->template()->addVar('WRITABLE', true);
 			
 			$this->template()->addVar('LINK_TO_EDIT_TEXT_NAME', _("Upravit"));
-//			$this->template()->addVar('LINK_TO_EDIT_TEXT',$this->getModel()->link);
+			$this->template()->addVar('LINK_TO_EDIT_TEXT',$this->container()->getLink('link_edit'));
 			
 			
 		}
 		
 		$this->template()->addTpl("text.tpl");
 		
-//		$this->template()->addVar('TEXT', $this->getModel()->text);
+		$this->template()->addVar('TEXT', $this->container()->getData('text'));
 
 	}
 	

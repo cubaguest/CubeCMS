@@ -41,14 +41,21 @@ abstract class View {
 	private $rights = null;
 	
 	/**
+	 * Objekt kontaineru ve který obsahuje data z kontroleru
+	 * @var Container
+	 */
+	private $container = null;
+	
+	/**
 	 * Konstruktor Viewu
 	 *
 	 * @param Model -- použitý model
 	 */
-	function __construct(Module $module, Rights $rights, Template &$template) {
+	function __construct(Module $module, Rights $rights, Template &$template, Container $container) {
 		$this->rights = $rights;
 		$this->module = $module;
 		$this->template = $template;
+		$this->container = $container;
 		
 //		inicializace viewru
 		$this->init();
@@ -108,6 +115,16 @@ abstract class View {
 	final public function getRights() {
 		return $this->rights;
 	}
+	
+	/**
+	 * Metoda vrací objekt kontaineru. který slouží pro přenos dat z kontroleru do viewru
+	 * 
+	 * @return Container -- objekt s daty
+	 */
+	final public function container() {
+		return $this->container;
+	}
+	
 }
 
 ?>

@@ -78,7 +78,7 @@ class Eplugin {
 	{
 		$this->module = $module;
 //		$this->dbConnector = $dbConnector;
-		$this->dbConnector = AppCore::$dbConnector;
+		$this->dbConnector = AppCore::getDbConnector();
 		$this->rights = $rights;
 		
 		$this->errMsg = $errors;

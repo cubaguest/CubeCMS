@@ -34,18 +34,21 @@ class TextController extends Controller {
 	 * Kontroler pro zobrazení textu
 	 */
 	public function mainController() {
-//		echo strpos(strtolower('TextDetailModel'), 'model')."<br>";
-//		echo $str = substr(strtolower('TextDetailModel'), 0, strpos(strtolower('TextDetailModel'), 'model'));
-//		echo '<br>.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . AppCore::getSelectedModule()->getName() . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $str . '.php';
+//		Kontrola práv
+		$this->checkReadableRights();
+
+//		Model pro načtení textu
 		$model = new TextDetailModel();
+		$this->container()->addData('text', $model->getText());
 		
-		//		Kontrola práv
-//		$this->checkReadableRights();
-//		
-//		$this->createModel("textDetail");
-//		
-//		if($this->getRights()->isWritable())
-//		$this->getModel()->link=$this->getLink()->action($this->getAction()->actionEdittext());
+
+//		pokud má uživatel právo zápisu vytvoříme odkaz pro editaci
+		if($this->getRights()->isWritable()){
+			$this->container()->addLink('link_edit', $this->getLink()->action($this->getAction()->actionEdittext()));
+		}
+		
+		
+		
 //		
 //		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), array(
 //			self::COLUM_TEXT_IMAG =>"IFNULL(".self::COLUM_TEXT_LANG_PRFIX.Locale::getLang().",

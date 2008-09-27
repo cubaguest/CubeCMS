@@ -38,11 +38,11 @@
 	<script src="{$jscript}" type="text/javascript"></script>
 {/foreach}
 {literal}
-<script language="javascript" type="text/javascript">
-tinyMCE.init({
-	document_base_url : "http://localhost/vve/"
-});
-</script>
+<!--<SCRIPT LANGUAGE="JAVASCRIPT" TYPE="TEXT/JAVASCRIPT">-->
+<!--TINYMCE.INIT({-->
+<!--	DOCUMENT_BASE_URL : "HTTP://LOCALHOST/VVE/"-->
+<!--});-->
+<!--</SCRIPT>-->
 {/literal}
 </head>
 
