@@ -444,7 +444,7 @@ class AppCore {
     /**
      * Metoda vrací objekt aktuálního modulu
      * 
-     * @return DbConnector -- objekt db konektoru
+     * @return Module -- objekt vybraného modulu
      */
 	public static function getSelectedModule() {
 		return self::$selectedModule;
@@ -998,7 +998,8 @@ class AppCore {
 					bindtextdomain($module->getName(), '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$module->getName().DIRECTORY_SEPARATOR."locale");
 					
 //					Zvolení překladu na modul
-					textdomain($module->getName()); 
+//					textdomain($module->getName());
+					Locale::switchToModuleTexts($module->getName()); 
 					//			zvolení akce kontroleru
 					$defaultAction = false;
 					
@@ -1014,7 +1015,7 @@ class AppCore {
 						$defaultAction = true;
 						if(!method_exists($controller, $controllerAction)){
 							//	Vrácení překladu na engine
-							textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
+							Locale::switchToEngineTexts();
 							new CoreException(_("Action Controller ").$controllerAction._(" v modulu ") . $module->getName()._(" nebyl nalezen"), 11);
 						}
 					}
@@ -1023,6 +1024,7 @@ class AppCore {
 					if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
 						require '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
 					} else {
+						Locale::switchToEngineTexts();
 						new CoreException(_("Nepodařilo se nahrát viewer modulu ") . $module->getName(), 7);
 					}
 					
@@ -1038,7 +1040,8 @@ class AppCore {
 
 					
 					//	Vrácení překladu na engine
-					textdomain(self::GETTEXT_DEFAULT_DOMAIN);
+//					textdomain(self::GETTEXT_DEFAULT_DOMAIN);
+					Locale::switchToEngineTexts();
 					unset($controller);
 					$isModuleControlerRun = true;
 				} else {
@@ -1046,7 +1049,8 @@ class AppCore {
 				}
 				
 //				Vrácení překladu na engine pro jistotu
-				textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
+				Locale::switchToEngineTexts();
+//				textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
 
 				
 

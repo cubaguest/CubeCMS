@@ -155,6 +155,28 @@ class Locale {
 		return self::$selectLang;
 	}
 	
+	/**
+	 * Metoda přenastaví lokalizační texty na engine
+	 */
+	public static function switchToEngineTexts() {
+		textdomain(AppCore::GETTEXT_DEFAULT_DOMAIN);
+	}
+
+	/**
+	 * Metoda přenastaví lokalizační texty na engine
+	 * 
+	 * @param string -- název modulu, na který se mají texty přnastavit (option)\ 
+	 * 					 pokud je prázdná použije se zvolený modul enginu
+	 */
+	public static function switchToModuleTexts($moduleName = null){
+		if($moduleName == null AND AppCore::getSelectedModule() != null){		
+			textdomain(AppCore::getSelectedModule()->getName());
+		} else if($moduleName != null){
+			textdomain($moduleName);
+		}
+	}
+	
+	
 	
 }
 
