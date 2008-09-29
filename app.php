@@ -53,6 +53,12 @@ class AppCore {
 	const ENGINE_JSPLUINS_DIR = 'JsPlugins';
 	
 	/**
+	 * Adresář s helpery
+	 * @var string
+	 */
+	const ENGINE_HELPERS_DIR = 'helpers';
+	
+	/**
 	 * Adresář s Modely enginu
 	 * @var string
 	 */
@@ -584,6 +590,7 @@ class AppCore {
 		 * @param string -- název třídy
 		 */
 		function __autoload($className){
+			//TODO dodělat kontroly, tak ať to vyhazuje přesnější chbové hlášky
 			//		Zmenšení na malá písmena
 			$className = strtolower($className);
 			//je načítána hlavní knihovna
@@ -601,6 +608,10 @@ class AppCore {
 //			Ja-li načítán model
 			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
 				require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
+			} 
+//			Ja-li načítán helper
+			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_HELPERS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
+				require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_HELPERS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
 			} 
 //			Je-li načítan model modulu
 			else if(AppCore::getSelectedModule() != null AND strpos($className, 'model') !== false){
@@ -812,6 +823,9 @@ class AppCore {
 		if (self::$debugLevel > 1){
 			$this->coreTpl->addVar("DEBUG_MODE", true);
 		}
+		
+//		Přiřazení jazykového pole
+		$this->coreTpl->addVar("APP_LANGS_NAMES", Locale::getAppLangsNames());		
 	}
 
 	/**
@@ -994,8 +1008,9 @@ class AppCore {
 //					Nastevní viewru v kontroleru
 					$controller->setView($viewAction);
 					
-					//				Příprava a nastavení použití překladu
-					bindtextdomain($module->getName(), '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$module->getName().DIRECTORY_SEPARATOR."locale");
+//					Příprava a nastavení použití překladu
+//					bindtextdomain($module->getName(), '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$module->getName().DIRECTORY_SEPARATOR."locale");
+					Locale::bindTextDomain($module->getName());
 					
 //					Zvolení překladu na modul
 //					textdomain($module->getName());
@@ -1157,7 +1172,7 @@ class AppCore {
 		$categoryTable = self::sysConfig()->getOptionValue("category_table", "db_tables");
 		
 //		Načtení panelů u db
-		$sqlSCelect = $this->dbConnector->select()
+		$sqlSCelect = self::getDbConnector()->select()
 						   ->from(array("panel" => $panelsTable), "label")
 						   ->join(array("items" => $itemsTable), "items.id_item=panel.id_item", null)
 						   ->join(array("cat" => $categoryTable), "cat.id_category=items.id_category", null, "urlkey")
@@ -1167,16 +1182,13 @@ class AppCore {
 						   ->where("panel.enable = ".(int)true, "and")
 						   ->order("panel.priority", "desc");
 						   
-//						   fdsf
-		$panelData = $this->dbConnector->fetchObjectArray($sqlSCelect);
+		$panelData = self::getDbConnector()->fetchObjectArray($sqlSCelect);
 		
 //		echo "<pre>";
 //		print_r($panelData);
 //		echo "</pre>";
 		
 		if(!empty($panelData)){
-//			$this->assignVarToTpl("MODULES_".$panelSideUpper."_PANEL", true);
-				
 			$panelTemplate = new Template();
 			
 			foreach ($panelData as $panel) {
@@ -1189,7 +1201,8 @@ class AppCore {
 				}
 				//			while (array_key_exists(self::MODULE_DBTABLES_PREFIX.$tableIndex, $item) AND ($item[self::MODULE_DBTABLES_PREFIX.$tableIndex] != null)) {
 				$panelModule = new Module($panel, $moduleDbTables);
-					
+				self::$selectedModule = clone $panelModule;	
+				
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
 					include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
 				} else {
@@ -1210,7 +1223,8 @@ class AppCore {
 				
 				
 				//				Příprava a nastavení použití překladu
-				bindtextdomain($panelModule->getName(), '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$panelModule->getName().DIRECTORY_SEPARATOR."locale");
+//				Locale::switchToModuleTexts();
+//				bindtextdomain($panelModule->getName(), '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$panelModule->getName().DIRECTORY_SEPARATOR."locale");
 				
 				
 				if(class_exists($panelClassName)){
@@ -1226,22 +1240,22 @@ class AppCore {
 					
 
 
-					$panel = new $panelClassName($panelModule, $this->dbConnector, $category, $this->messages, $this->userErrors, $panelTemplate, $panelRights);
+					$panel = new $panelClassName($category, $this->messages, $this->userErrors, $panelTemplate, $panelRights);
 
 //					spuštění controleru
 					if(method_exists($panel, self::MODULE_PANEL_CONTROLLER)){
-						textdomain($panelModule->getName()); //jazykové nastavení na modul
+						Locale::switchToModuleTexts(); //jazykové nastavení na modul
 						$panel->{self::MODULE_PANEL_CONTROLLER}();
-						textdomain(self::GETTEXT_DEFAULT_DOMAIN); //jazykové nastavení na engine
+						Locale::switchToEngineTexts(); //jazykové nastavení na engine
 					} else {
 						new CoreException(_("Neexistuje controler panelu ").$panelModule->getName().".",17);
 					}
 
 //					spuštění viewru
 					if(method_exists($panel, self::MODULE_PANEL_VIEWER)){
-						textdomain($panelModule->getName()); //jazykové nastavení na modul
+						Locale::switchToModuleTexts(); //jazykové nastavení na modul
 						$panel->{self::MODULE_PANEL_VIEWER}();
-						textdomain(self::GETTEXT_DEFAULT_DOMAIN); //jazykové nastavení na engine
+						Locale::switchToEngineTexts(); //jazykové nastavení na engine
 					} else {
 						new CoreException(_("Neexistuje viewer panelu ").$panelModule->getName().".",18);
 					}
