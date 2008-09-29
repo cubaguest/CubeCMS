@@ -4,9 +4,36 @@ class NewsView extends View {
 		if($this->getRights()->isWritable()){
 			$this->template()->addTpl('addNewsButton.tpl');
 			$this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _("Přidat novinku"));
-			$this->template()->addVar('LINK_TO_ADD_NEWS', $this->getModel()->linkToAdd);
+			$this->template()->addVar('LINK_TO_ADD_NEWS', $this->container()->getLink('add_new'));
+		}
+		
+		$this->template()->addTpl("list.tpl");
+		
+		$this->template()->addVar("NEWS_LIST_ARRAY", $this->container()->getData('news_list'));
+		$this->template()->addVar("NEWS_LIST_NAME", _("Novinky"));
+		$this->template()->addCss("style.css");
+		
+		//TODO korektní cestu
+		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
+		$this->container()->getEplugin('scroll')->assignToTpl($this->template());
+
+		$this->template()->addVar('NUM_NEWS', $this->container()->getData('num_news'));
+		$this->template()->addVar('NUM_NEWS_ALL', $this->container()->getLink('all_news'));
+		$this->template()->addVar('NUM_NEWS_ALL_NAME', _('Vše'));
+		$this->template()->addVar('NUM_NEWS_SHOW', _('Zobrazit novinek'));
+	}
+
+	public function showView()
+	{
+		if($this->getRights()->isWritable()){
+			$this->template()->addTpl('addNewsButton.tpl');
+			$this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _("Přidat novinku"));
+			$this->template()->addVar('LINK_TO_ADD_NEWS', $this->container()->getLink('add_new'));
 			
 			$this->template()->addVar('LINK_TO_EDIT_NEWS_NAME', _("Upravit"));
+			$this->template()->addVar("NEWS_EDIT", $this->container()->getData('editable'));
+			$this->template()->addVar('LINK_TO_EDIT_NEWS', $this->container()->getLink('edit_link'));
+			
 			$this->template()->addVar('LINK_TO_DELETE_NEWS_NAME', _("Smazat"));
 			$this->template()->addVar('DELETE_CONFIRM_MESSAGE', _("Smazat novinku"));
 			
@@ -15,38 +42,14 @@ class NewsView extends View {
 			$this->template()->addJsPlugin($submitForm);
 		}
 		
-		$this->template()->addTpl("list.tpl");
-//		$this->template()->addTpl("scroll.tpl");
-//		$this->template()->addCss("pokus.css");
-//		$this->template()->addJS("pokus.js");
-//		
-		$this->template()->addVar("NEWS_LIST_ARRAY", $this->getModel()->allNewsArray);
-		$this->template()->addVar("NEWS_LIST_NAME", _("Novinky"));
+		$this->template()->addTpl("newDetail.tpl");
 		$this->template()->addCss("style.css");
 		
-		//TODO korektní cestu
-		$this->template()->addTpl($this->getModel()->scroll->getTpl(), true);
-		$this->getModel()->scroll->assignToTpl($this->template());
-//		$this->getModel()->scroll->getTpl();
-
-		$this->template()->addVar('NEWS_TEXT_LANGUAGE', _('Jazyk'));
-		$this->template()->addVar('NEWS_TEXT_AUTHOR', _('Autor'));
-		$this->template()->addVar('NEWS_TEXT_LABEL', _('Popis'));
-		$this->template()->addVar('NEWS_TEXT_NAME', _('Text'));
+		$this->template()->addVar("NEWS_DETAIL", $this->container()->getData('new'));
 		
-		//JS Plugins
-//		$tinymce = new TinyMce();
-//		$this->template()->addJsPlugin($tinymce);
+		$this->template()->setTplSubLabel($this->container()->getData('new_name'));
 		
-//		echo "<pre>";
-//		print_r($tinymce);
-//		echo "</pre>";
-		
-	}
-
-	public function showView()
-	{
-		;
+		$this->assignButtonBack();
 	}
 	
 	/**
@@ -55,15 +58,26 @@ class NewsView extends View {
 	public function addView() {
 		$this->template()->addTpl('editNews.tpl');
 		$this->template()->addCss("style.css");
-		$this->template()->addVar('NEWS_EDIT_ARRAY', $this->getModel()->newsArray);
+		$this->template()->addVar('NEWS_EDIT_ARRAY', $this->container()->getData('new_data'));
 
 		$this->template()->setTplSubLabel(_('Přidání novinky'));
 		
-//		$this->template()->addVar('PAGE_NAME', _('Přidání novinky'));
-		$this->template()->addVar('LINK_TO_BACK', $this->getModel()->linkToBack);
-		$this->template()->addVar('LINK_TO_BACK_NAME', _('Zpět'));
+		$this->assignButtonBack();
 		
 		$this->assignLabels();
+		
+		$tabcontent = new TabContent();
+		$this->template()->addJsPlugin($tabcontent);
+	}
+	
+	/**
+	 * Metoda přiřadí tlačítko zpět
+	 *
+	 */
+	private function assignButtonBack() {
+		$this->template()->addTpl("linkBack.tpl");
+		$this->template()->addVar('LINK_TO_BACK', $this->container()->getLink('link_back'));
+		$this->template()->addVar('LINK_TO_BACK_NAME', _('Zpět'));;
 	}
 	
 	/**
@@ -82,23 +96,18 @@ class NewsView extends View {
 	 */
 	public function editView() {
 		$this->template()->addTpl('editNews.tpl');
-		$this->template()->addVar('NEWS_EDIT_ARRAY', $this->getModel()->newsArray);
+		$this->template()->addCss("style.css");
+		$this->template()->addVar('NEWS_EDIT_ARRAY', $this->container()->getData('new_data'));
 		
-		$this->template()->addVar('SELECTED_ID_NEWS', $this->getModel()->idNews);
-		$this->template()->addVar('LINK_TO_BACK', $this->getModel()->linkToBack);
-		$this->template()->addVar('LINK_TO_BACK_NAME', _('Zpět'));
+		$this->template()->setTplSubLabel(_("Úprava novinky").' - '.$this->container()->getData('news_label'));
 		
-		$this->template()->setTplSubLabel(_("Úprava novinky").' - '.$this->getModel()->newsDefaultLabel);
+		$this->assignButtonBack();
 		
 		$this->assignLabels();
+		
+		$tabcontent = new TabContent();
+		$this->template()->addJsPlugin($tabcontent);
 	}
-	
-	
-//	public function testView() {
-//		echo "pokus test";
-//	}
-	
-	
 }
 
 ?>

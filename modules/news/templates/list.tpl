@@ -1,25 +1,18 @@
 {foreach from=$VARS.NEWS_LIST_ARRAY item="new"}
 <div>
-{$VARS.NEWS_TEXT_LANGUAGE}: {html_image file=$MAIN_LANG_IMAGES_PATH|cat:$new.lang|cat:'.png'}<br />
-{$VARS.NEWS_TEXT_AUTHOR}: {$new.username}<br />
-{$VARS.NEWS_TEXT_LABEL}: {$new.label}<br />
-{$VARS.NEWS_TEXT_NAME}: <br />
+<h2><a href="{$new.showlink}" title="{$new.label}">{$new.label}</a></h2>
+{$new.username}<br />
 {$new.text}
-{if $new.editable eq true}
-<div class="form_buttons form_buttons_inline">
-	<form action="{$new.editlink}" method="post">
-		<input type="hidden" name="news_id" value="{$new.id_new}" />
-		<input type="submit" name="news_edit" value="{$VARS.LINK_TO_EDIT_NEWS_NAME}"/>
-	</form>
-	<form class="delete_form" action="{$THIS_PAGE_LINK}" method="post" onsubmit="return Confirm('{$VARS.DELETE_CONFIRM_MESSAGE} - {$new.label}')">
-		<input type="hidden" name="news_id" value="{$new.id_new}" />
-		<input type="submit" name="news_delete" value="{$VARS.LINK_TO_DELETE_NEWS_NAME}"/>
-	</form>
-</div>
-{/if}
-<div>
-
-</div>
-
 </div>
 {/foreach}
+<div>
+{$VARS.NUM_NEWS_SHOW}:
+{foreach from=$VARS.NUM_NEWS item='LINK' key='NUM'}
+{if $LINK neq null}
+<a href="{$LINK}" title="{$NUM}">{$NUM}</a>
+{else}
+<span>{$NUM}</span>
+{/if}
+{/foreach}
+<a href="{$VARS.NUM_NEWS_ALL}" title="{$VARS.NUM_NEWS_ALL_NAME}">{$VARS.NUM_NEWS_ALL_NAME}</a>
+</div>
