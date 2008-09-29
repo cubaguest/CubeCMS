@@ -10,6 +10,9 @@
  * @abstract 	Třída JsPluginu LightBox
  * @see 		http://www.dynamicdrive.com/dynamicindex4/lightbox2/index.htm
  */
+
+require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'JsPlugins'. DIRECTORY_SEPARATOR . 'jsplugin.calss.php');
+
 class LightBox extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu

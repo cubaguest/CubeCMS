@@ -9,6 +9,10 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída JsPluginu TinyMce
  */
+
+require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'JsPlugins'. DIRECTORY_SEPARATOR . 'jsplugin.calss.php');
+
+
 class TinyMce extends JsPlugin {
 	/**
 	 * Konstanta s názvem adresáře s pluginem

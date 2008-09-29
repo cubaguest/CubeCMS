@@ -304,7 +304,7 @@ abstract class Controller {
 			//	Zvolení překladu na modul
 //			textdomain($module->getName());
 
-			if(($this->action->haveAction() OR $this->actionViewer != null) AND method_exists($view, $this->actionViewer)){//TODO doladit jesli se správně dělají akce
+			if(($this->getAction()->haveAction() OR $this->actionViewer != null) AND method_exists($view, $this->actionViewer)){//TODO doladit jesli se správně dělají akce
 			//					if(method_exists($controller, $controllerAction)){
 				$view->{$this->actionViewer}();
 			}
@@ -316,7 +316,7 @@ abstract class Controller {
 				if(!method_exists($view, $this->actionViewer)){
 					//				přepnutí překladu na engine
 					textdomain(AppCore::GETTEXT_DEFAULT_DOMAIN);
-					new CoreException(_("Action Viewer ").$viewAction._(" v modulu ") . $module->getName(). _(" nebyl nalezen"), 11);
+					new CoreException(_("Action Viewer ").$viewAction._(" v modulu ") . $this->getModule()->getName(). _(" nebyl nalezen"), 11);
 				}
 			}
 //			 else {
@@ -328,7 +328,7 @@ abstract class Controller {
 //			}
 
 		} else {
-			new CoreException(_("Nepodařilo se vytvořit objekt view modulu ") . $module->getName(), 8);
+			new CoreException(_("Nepodařilo se vytvořit objekt view modulu ") . $this->getModule()->getName(), 8);
 		};
 	}
 }

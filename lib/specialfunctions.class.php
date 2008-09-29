@@ -8,6 +8,7 @@
  * @version    	$Id: specialfunctions.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída se speciálními funkcemi
+ * @deprecated 	nehrtazuje helper textctrlhelper
  */
 class SpecialFunctions {
 	/**

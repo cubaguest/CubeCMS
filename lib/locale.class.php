@@ -23,12 +23,25 @@ class Locale {
 	const URL_PARAM_WITH_LANG = 'lang';
 	
 	/**
+	 * Název adresáře s locales
+	 * @var string
+	 */
+	const LOCALES_DIR = 'locale';
+	
+	/**
 	 * Pole se všemi locales
 	 * @var array
 	 */
 	private static $locales = array("cs" => "cs_CZ.UTF-8",
 									"en" => "en_US",
 									"de" => "de_DE");
+	
+	/**
+	 * Pole se všemi názvy jazyků
+	 *
+	 * @var array
+	 */
+	private static $localesNames = array();
 	
 	/**
 	 * počet jazyků v aplikaci
@@ -73,6 +86,39 @@ class Locale {
 				self::$selectLang = self::$defaultLang;
 			}
 		}
+		
+		self::_setLangTranslations();
+	}
+	
+	/**
+	 * Metoda vrací pole s názvy jazyků
+	 * 
+	 * @return array -- pole s názvy jazyků
+	 */
+	public static function getAppLangsNames() {
+		$returnArray = array();
+		
+//		echo "<pre>";
+//		print_r(self::getAppLangs());
+//		echo "</pre>";
+		
+		foreach (self::getAppLangs() as $langKey => $lang) {
+//			array_push($returnArray, self::$localesNames[$lang]);
+			$returnArray[$lang] = self::$localesNames[$lang];
+		}
+		
+		return $returnArray;
+	}
+	
+		/**
+	 * Metoda nastaví názvy jazyků jayzyky
+	 * 
+	 * //TODO dořešit při více jazyků
+	 */
+	private static function _setLangTranslations(){
+		self::$localesNames = array("cs" => _('Česky'),
+									"en" => _('Anglicky'),
+									"de" => _('Německy'));
 	}
 	
 	/**
@@ -176,6 +222,20 @@ class Locale {
 		}
 	}
 	
+	/**
+	 * Metoda přidá textovou doménu pro překlad
+	 * 
+	 * @param string -- název modulu pro kterou se má překlad přidat (Option)
+	 */
+	public static function bindTextDomain($moduleName = null) {
+		if($moduleName == null AND AppCore::getSelectedModule() != null){
+			bindtextdomain(AppCore::getSelectedModule()->getName(), '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR 
+			. DIRECTORY_SEPARATOR . AppCore::getSelectedModule()->getName() . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+		} else if($moduleName != null){
+			bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR 
+			. DIRECTORY_SEPARATOR . $moduleName . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+		}
+	}
 	
 	
 }

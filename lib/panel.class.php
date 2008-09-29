@@ -80,11 +80,11 @@ abstract class Panel{
 	/**
 	 * Konstruktor
 	 */
-	function __construct(Module $module, DbInterface $db, $category, Messages &$messages, Messages &$errors, Template &$template, Rights $rights) {
+	function __construct($category, Messages &$messages, Messages &$errors, Template &$template, Rights $rights) {
 		$this->_link = new Links(true);
-		$this->_db = $db;
+		$this->_db = AppCore::getDbConnector();
 		$this->_category = $category;
-		$this->_module = $module;
+		$this->_module = AppCore::getSelectedModule();
 		$this->_template = $template;
 		$this->_article = new Article();
 		$this->_rights = $rights;

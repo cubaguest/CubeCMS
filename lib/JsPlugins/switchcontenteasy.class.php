@@ -9,6 +9,9 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída JsPluginu pro rozbalovací box
  */
+
+require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'JsPlugins'. DIRECTORY_SEPARATOR . 'jsplugin.calss.php');
+
 class SwitchContentEasy extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu
