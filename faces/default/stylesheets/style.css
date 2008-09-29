@@ -583,3 +583,13 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover  {
 	width: 100%;
 	border: 1px solid #0f6572;
 }
+
+/* Tabulkový obsah */
+.tabcontent {
+	border: 1px solid black;
+	padding: 5px;
+}
+.tabsContent {
+	
+	/*padding-top: 20px;*/
+}
