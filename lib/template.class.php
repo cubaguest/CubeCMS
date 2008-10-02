@@ -64,7 +64,7 @@ class Template {
 	 * @var string
 	 */
 	const TEMPLATE_MODULE_SUBLABEL = 'SUBLABEL';
-	
+
 	/**
 	 * Název proměné s popisem Modulu
 	 * @var string
@@ -88,6 +88,12 @@ class Template {
 	 * @var array
 	 */
 	private $templates = array();
+	
+	/**
+	 * Proměná s názvem titulku okna
+	 * @var string
+	 */
+	private $pageTitle = null;
 	
 	/**
 	 * Statické pole s css styly
@@ -331,6 +337,28 @@ class Template {
 			
 		}
 	}
+	
+	/**
+	 * Metoda nastaví podtitulek modulu, který bude vypsán ve jménu okna
+	 * @param string -- podnázev
+	 * @param boolena -- (option) jesli se má název přidat za stávající nebo přepsat
+	 */
+	public function setSubTitle($name, $merge = false) {
+		if($merge){
+				$this->pageTitle.=$name;
+			} else {
+				$this->pageTitle=$name;
+			}
+	}
+	
+	/**
+	 * Metoda vrací přiřazený název titulku okna
+	 * @return string -- titulek okna
+	 */
+	public function getSubTitle() {
+		return $this->pageTitle;
+	}
+	
 	
 	/**
 	 * Metoda nastaví popis (alt) modulu, který bude vypsán na začátku

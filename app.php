@@ -695,9 +695,9 @@ class AppCore {
 		} else {
 			foreach ($templateObject->getTemplatesArray() as $key => $value) {
 				$this->assignVarToTpl($key, $value);
-			}
-			
+			}	
 		}
+		$this->assignVarToTpl('MAIN_MODULE_TITLE', $templateObject->getSubTitle());
 	}
 	
 	/**
@@ -790,7 +790,7 @@ class AppCore {
 		//adresa k rootu webu
 //		$this->template->assign("MAIN_ROOT_DIR", self::getAppWebDir());
 		$this->coreTpl->addVar("MAIN_ROOT_DIR", self::getAppWebDir());
-		
+
 		$link = new Links();
 //		$link->getMainWebDir();
 //		$this->template->assign("MAIN_WEB_DIR", $link->getMainWebDir());
@@ -1005,7 +1005,7 @@ class AppCore {
 					$controllerAction = $routes->getRoute().$actionCtrl.self::MODULE_CONTROLLER_SUFIX;
 					$viewAction = $routes->getRoute().$actionCtrl.self::MODULE_VIEWER_SUFIX;
 
-//					Nastevní viewru v kontroleru
+//					Nastevní viewru v kontroleru//					$this->coreTpl->addVar("MAIN_MODULE_TITLE", $template->);
 					$controller->setView($viewAction);
 					
 //					Příprava a nastavení použití překladu
@@ -1051,6 +1051,10 @@ class AppCore {
 					
 					//				Uložení šablona a proměných do hlavní šablony
 					$this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
+					
+					//		Titulek okna
+//					$this->coreTpl->addVar("MAIN_MODULE_TITLE", $template->);
+					
 					unset($template);
 
 					

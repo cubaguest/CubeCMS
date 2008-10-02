@@ -7,7 +7,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="pragma" content="no-cache" />
 	<meta http-equiv="expires" content="{$smarty.now+600|date_format:'%a %d %b %Y %T'}" />
-	<title>{$MAIN_PAGE_TITLE} - {$MAIN_CATEGORY_TITLE}</title>
+	<title>{$MAIN_PAGE_TITLE} - {$MAIN_CATEGORY_TITLE} - {$MAIN_MODULE_TITLE}</title>
 
 	<base href="{$MAIN_WEB_DIR}" />
 
