@@ -291,12 +291,18 @@ abstract class Controller {
 		if(class_exists($viewClassName)){
 
 //			//				Volba pohledu
+//			$this->actionViewer.= AppCore::MODULE_VIEWER_SUFIX;
 //			if($changedView == null){
 //				$viewAction = $routes->getRoute().$actionCtrl.AppCore::MODULE_VIEWER_SUFIX;
 //			} else {
 //				//TODO dořešit při zapnuté cestě
 //				$viewAction = $routes->getRoute().$changedView.AppCore::MODULE_VIEWER_SUFIX;
 //			}
+
+//			Doplnění sufixu View
+			if (strpos($this->actionViewer, AppCore::MODULE_VIEWER_SUFIX) === false) {
+				$this->actionViewer .= AppCore::MODULE_VIEWER_SUFIX;
+			}
 
 			//					Vytvoření objektu pohledu
 			$view = new $viewClassName($this->getModule(), $this->getRights(), $this->viewTemplate, $this->container());
@@ -308,15 +314,15 @@ abstract class Controller {
 			//					if(method_exists($controller, $controllerAction)){
 				$view->{$this->actionViewer}();
 			}
-//			else if(!$action->isAction() AND $article->isArticle() AND method_exists($view, $viewAction)){
-//				$view->$viewAction();
-//			}
+			else if(!$this->getAction()->isAction() AND $this->getArticle()->isArticle() AND method_exists($view, $this->actionViewer)){
+				$view->{$this->actionViewer}();
+			}
 			else {
 				$view->mainView();
 				if(!method_exists($view, $this->actionViewer)){
 					//				přepnutí překladu na engine
 					textdomain(AppCore::GETTEXT_DEFAULT_DOMAIN);
-					new CoreException(_("Action Viewer ").$viewAction._(" v modulu ") . $this->getModule()->getName(). _(" nebyl nalezen"), 11);
+					new CoreException(_("Action Viewer ").$this->actionViewer._(" v modulu ") . $this->getModule()->getName(). _(" nebyl nalezen"), 11);
 				}
 			}
 //			 else {

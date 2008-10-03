@@ -326,11 +326,17 @@ class Template {
 	 * Metoda nastaví podnázev modulu, který bude vypsán na začátku
 	 * @param string -- podnázev
 	 * @param boolena -- (option) jesli se má název přidat za stávající nebo přepsat
+	 * @param string -- (option) oddělovač mezi více nadpisy (default '-')
 	 */
-	public function setTplSubLabel($name, $merge = false) {
+	public function setTplSubLabel($name, $merge = false, $separator = '-') {
 		if($this->getModule() != null){
 			if($merge){
-				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL].=$name;
+				if($this->pageTitle != null){
+					$separator = ' '.$separator.' ';
+				} else {
+					$separator = null;
+				}
+				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL].=$separator.$name;
 			} else {
 				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL]=$name;
 			}
@@ -342,10 +348,17 @@ class Template {
 	 * Metoda nastaví podtitulek modulu, který bude vypsán ve jménu okna
 	 * @param string -- podnázev
 	 * @param boolena -- (option) jesli se má název přidat za stávající nebo přepsat
+	 * @param string -- (option) oddělovač mezi více nadpisy (default '-')
 	 */
-	public function setSubTitle($name, $merge = false) {
+	public function setSubTitle($name, $merge = false, $separator = '-') {
 		if($merge){
-				$this->pageTitle.=$name;
+				if($this->pageTitle != null){
+					$separator = ' '.$separator.' ';
+				} else {
+					$separator = null;
+				}
+			
+				$this->pageTitle.=$separator.$name;
 			} else {
 				$this->pageTitle=$name;
 			}

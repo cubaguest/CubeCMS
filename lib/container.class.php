@@ -55,7 +55,11 @@ class Container {
 	 * @return mixed -- uložená data
 	 */
 	public function getData($index) {
-		return $this->data[$index];
+		if(isset($this->data[$index])){
+			return $this->data[$index];
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -97,7 +101,11 @@ class Container {
 	 * @return Links -- uložený link
 	 */
 	public function getLink($index) {
-		return $this->links[$index];
+		if(isset($this->links[$index])){
+			return $this->links[$index];
+		} else {
+			return null;
+		}
 	}
 	
 	
