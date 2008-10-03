@@ -1,5 +1,6 @@
 <div>
 <h2>{$VARS.NEWS_DETAIL.label}</h2>
+{$VARS.NEWS_DETAIL.time|date_format:"%x %X"}<br />
 {$VARS.NEWS_DETAIL.username}<br />
 {$VARS.NEWS_DETAIL.text}
 {if $VARS.NEWS_EDIT eq true}

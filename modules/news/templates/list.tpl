@@ -1,6 +1,7 @@
 {foreach from=$VARS.NEWS_LIST_ARRAY item="new"}
 <div>
 <h2><a href="{$new.showlink}" title="{$new.label}">{$new.label}</a></h2>
+{$new.time|date_format:"%x %X"}<br />
 {$new.username}<br />
 {$new.text}
 </div>

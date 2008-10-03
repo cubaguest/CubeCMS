@@ -22,8 +22,8 @@ class NewsDetailModel extends DbModel {
 	 * Sloupce u tabulky uživatelů
 	 * @var string
 	 */
-//	const COLUMN_USER_NAME = 'username';
-	
+	const COLUMN_USER_NAME = 'username';
+	const COLUMN_ISER_ID =	 'id_user';	
 	
 	/**
 	 * Speciální imaginární sloupce
@@ -77,12 +77,13 @@ class NewsDetailModel extends DbModel {
 	 */
 	public function getNewsDetailByUrlkeySelLang($urlkey) {
 		//		načtení novinky z db
-		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang().",".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
+		$sqlSelect = $this->getDb()->select()->from(array('news' => $this->getModule()->getDbTable()), array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang().",".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
 							self::COLUMN_NEWS_TEXT =>"IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang().",".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
 							self::COLUMN_NEWS_TIME, self::COLUMN_NEWS_URLKEY, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_ID_USER))
-									 ->where(self::COLUMN_NEWS_ID_ITEM." = ".$this->getModule()->getId())
-									 ->where(self::COLUMN_NEWS_URLKEY." = '".$urlkey."'")
-									 ->where(self::COLUMN_NEWS_DELETED.' = '.(int)false);
+									 ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
+									 ->where('news.'.self::COLUMN_NEWS_ID_ITEM." = ".$this->getModule()->getId())
+									 ->where('news.'.self::COLUMN_NEWS_URLKEY." = '".$urlkey."'")
+									 ->where('news.'.self::COLUMN_NEWS_DELETED.' = '.(int)false);
 									 
 		$news = $this->getDb()->fetchAssoc($sqlSelect, true);
 
@@ -142,6 +143,13 @@ class NewsDetailModel extends DbModel {
 		} else {
 			return false;
 		};
+	}
+	
+	
+	private function getUserTable() {
+		$tableUsers = AppCore::sysConfig()->getOptionValue(Auth::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES);
+		
+		return $tableUsers;
 	}
 	
 }

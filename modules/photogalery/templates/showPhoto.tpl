@@ -8,6 +8,9 @@
 <a href="{$VARS.DIR_TO_PHOTO}{$VARS.PHOTO.file}" rel="lightbox"  title="{$VARS.PHOTO.photolabel}">
 <img src="{$VARS.DIR_TO_MEDIUM_PHOTO}{$VARS.PHOTO.file}" title="{$VARS.PHOTO.photolabel}"/>
 </a>
+
+
+
 {if $VARS.WRITABLE eq true}
 <div class="photo_buttons_edit">
 	<form class="delete_form right_float" action="{$THIS_PAGE_LINK}" method="post" onsubmit="return Confirm('{$VARS.DELETE_CONFIRM_MESSAGE} - {$VARS.PHOTO.photolabel}')">

@@ -1,4 +1,23 @@
 @CHARSET "UTF-8";
+.galeryBoxContainer {
+	display: inline;
+}
+
+.galeryBox {
+	position: relative;
+	width: 150px;
+}
+
+.smallPhotoBox {
+	position: relative;
+	height: 130px;
+}
+
+.smallPhotoBox a {
+	vertical-align: middle;
+}
+
+
 .galery_box {
 	padding: 10px;
 	text-align: center;
