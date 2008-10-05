@@ -25,7 +25,7 @@
 		<default_group_name>guest</default_group_name>
 		<default_user_name>anonym</default_user_name></users>
 	<web_name>Vepřové Výpečky</web_name>
-	<engine_version>3.0beta1</engine_version>
+	<engine_version>3.1beta1</engine_version>
 	<data_dir>data</data_dir>
 	<session_name>vypecky_session</session_name>
 	<langs>cs;en</langs>
