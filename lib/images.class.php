@@ -199,8 +199,11 @@ class Images {
 	 * @param int -- výška výsledného obrázku
 	 * @param string -- nový název obrázku
 	 * @param int -- typ výsledného obrázku (constant IMAGETYPE_XXX)
+	 * 
+	 * @return boolean -- true pokud se obrázek podařilo uložit
 	 */
 	public function saveImage($dstDir, $width = null, $heigh = null, $newName = null, $imageType = null) {
+		$saved = false;
 		$tmpImage = $this->createTempImage();
 		
 		if($width == null){
@@ -232,9 +235,11 @@ class Images {
 			$dstDir = $files->checkDirPath($dstDir);
 			unset($files);
 			
-			$this->saveNewImage($newImage, $imageType, $dstDir.$newName);
+			$saved = $this->saveNewImage($newImage, $imageType, $dstDir.$newName);
 			imagedestroy($newImage);
 		}
+		
+		return $saved;
 	}	
 	
 	/**
@@ -365,27 +370,33 @@ class Images {
 	/**
 	 * Metoda uloží obrázek do souboru
 	 * 
+	 * @param image -- obrázek který se má uložit
+	 * @param IMAGE_TYPE -- typ obrázku
+	 * @param string -- cílový soubor pro uložení
+	 * 
+	 * @return boolean -- true pokud se obrázek podařilo uložit
 	 */
 	private function saveNewImage($newImage, $type, $destFile) {
 		switch ($type) {
 			case IMAGETYPE_GIF:
-				imagegif($newImage, $destFile);
+				$saved = imagegif($newImage, $destFile);
 				break;
 			case IMAGETYPE_JPEG:
-				imagejpeg($newImage, $destFile, $this->jpegQuality);
+				$saved = imagejpeg($newImage, $destFile, $this->jpegQuality);
 				break;
 			case IMAGETYPE_PNG:
-				imagepng($newImage, $destFile, $this->pngQuality);
+				$saved = imagepng($newImage, $destFile, $this->pngQuality);
 				break;
 			case IMAGETYPE_WBMP:
-				imagewbmp($newImage, $destFile);
+				$saved = imagewbmp($newImage, $destFile);
 				break;
 			case IMAGETYPE_JPEG2000:
-				imagejpeg($newImage, $destFile, $this->jpegQuality); //jen výstup do jpegu
+				$saved = imagejpeg($newImage, $destFile, $this->jpegQuality); //jen výstup do jpegu
 				break;
 			default:
 				$newImageType = false;
-		};
+		}
+		return $saved;
 	}
 	
 	/**

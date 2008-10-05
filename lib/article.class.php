@@ -107,6 +107,14 @@ class Article {
 		return $this->isRoute;
 	}
 	
+	/**
+	 * Metoda vrací jestli je article použito s cestou
+	 * @return boolean -- true pokud je article použito s cestou
+	 */
+	public function isRoute() {
+		return $this->isRoute;
+	}
+	
 }
 
 ?>
