@@ -247,7 +247,7 @@ class NewsController extends Controller {
 			}
 		}
 		
-		$newArray = $localeHelper->generateArray(array(self::FORM_INPUT_LABEL, self::FORM_INPUT_TEXT), $new, $sendArray);
+		$newArray = $localeHelper->generateArray(array(self::FORM_INPUT_LABEL, self::FORM_INPUT_TEXT), $sendArray, $new);
 		$this->container()->addData('new_data', $newArray);
 		
 		//		Odkaz zpět

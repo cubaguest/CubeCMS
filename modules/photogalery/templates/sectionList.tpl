@@ -8,9 +8,11 @@
 <div class="galeryBox left_float">
 <a href="{$GALERY.galeryshowlink}" title="{$GALERY.galerylabel}">{$GALERY.galerylabel}</a><br />
 <div class="smallPhotoBox">
+{if $GALERY.file neq null}
 <a href="{$GALERY.galeryshowlink}" title="{$GALERY.galerylabel}">
 {html_image file=$VARS.IMAGES_DIR|cat:$GALERY.file width=130}
 </a>
+{/if}
 </div>
 {$VARS.ADD_TEXT}: <br />{$GALERY.time|date_format:'%x %X'}<br />
 {$VARS.NUM_PHOTOS}: {$GALERY.num_photos}<br />

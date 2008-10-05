@@ -20,7 +20,7 @@ class PhotoDetailModel extends DbModel {
 	 * @var string
 	 */
 	const COLUMN_PHOTOS_ID 					= 'id_photo';
-//	const COLUMN_PHOTOS_ID_USER 				= 'id_user';
+	const COLUMN_PHOTOS_ID_USER 			= 'id_user';
 	const COLUMN_PHOTOS_ID_GALERY 			= 'id_galery';
 	const COLUMN_PHOTOS_LABEL_LANG_PREFIX 	= 'label_';
 	const COLUMN_PHOTOS_TEXT_LANG_PREFIX 	= 'text_';
@@ -107,7 +107,46 @@ class PhotoDetailModel extends DbModel {
 		return $this->selectPhoto;
 	}
 	
-	
+	/**
+	 * Metoda uloží novou fotografii
+	 *
+	 * @param array -- pole s parametry galerie
+	 * @param integer -- id galerie
+	 * @param integer -- časové razítko kdy byla fotka vytvořena
+	 * @param integer -- id uživatele, který fotku přidal
+	 */
+	public function saveNewPhoto($photoArray, $idGalery, $fileName, $time = null, $idUser = 0) {
+			
+			//Vygenerování sloupců do kterých se bude zapisovat
+			$columsArray = array_keys($photoArray);
+			$valuesArray = array_values($photoArray);
+			array_push($columsArray, self::COLUMN_PHOTOS_ID_GALERY);
+			array_push($valuesArray, $idGalery);
+			array_push($columsArray, self::COLUMN_PHOTOS_FILE);
+			array_push($valuesArray, $fileName);
+			
+			array_push($columsArray, self::COLUMN_PHOTOS_TIME);
+			if($time == null){
+				array_push($valuesArray, time());
+			} else {
+				array_push($valuesArray, $time);
+			}
+			
+			array_push($columsArray, self::COLUMN_PHOTOS_ID_USER);
+			array_push($valuesArray, $idUser);
+			
+
+			$sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable(1))
+					->colums($columsArray)
+					->values($valuesArray);
+				
+		//		Vložení do db
+		if($this->getDb()->query($sqlInsert)){
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 ?>

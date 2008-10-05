@@ -92,6 +92,12 @@ class GaleryDetailModel extends DbModel {
 	private $idGalery = 0;
 	
 	/**
+	 * Id poslední přidané galerie, pokud byla přidána
+	 * @var integer
+	 */
+	private $idLastInsertedGalery = null;
+	
+	/**
 	 * Metoda načte detail galerie
 	 *
 	 * @param string -- url klíč galerie
@@ -117,6 +123,25 @@ class GaleryDetailModel extends DbModel {
 		return $this->galeryDetail;
 		
 	}
+	
+	
+	/**
+	 * Metoda načte detail galerie se všemi jazykovými mutacemi
+	 *
+	 * @param string -- url klíč galerie
+	 */
+	public function getGaleryDetailAllLangs($urlKey) {
+			$sqlSelectGaleries = $this->getDb()->select()->from($this->getModule()->getDbTable(2))
+											->where(self::COLUMN_GALERY_URLKEY.' = \''.$urlKey.'\'');
+		
+			$galeryDetail = $this->getDb()->fetchAssoc($sqlSelectGaleries, true);
+			
+
+		return $galeryDetail;
+		
+	}
+	
+	
 	
 	/**
 	 * Metoda vrátí tabulku uživatelů
@@ -177,7 +202,85 @@ class GaleryDetailModel extends DbModel {
 		return $this->idGalery;
 	}
 	
+	/**
+	 * Metoda uloží novou galerii
+	 *
+	 * @param array -- pole s parametry galerie
+	 * @param integer -- id sekce pro galerii
+	 * @param string -- hlavní popis galerie
+	 * @param integer -- časové razítko kdy byla galerie vytvořena
+	 * @param integer -- id uživatele, který galerii přidal
+	 */
+	public function saveNewGalery($galeryArray, $idSection, $mainLabel, $time = null, $idUser = 0) {
+//			vygenerování url klíče	
+			$dbHelper = new DbCtrlHelper();
+			$urlKey = $dbHelper->generateDatabaseUrlKey($mainLabel, $this->getModule()->getDbTable(2), self::COLUMN_GALERY_URLKEY);
+			
+			//Vygenerování sloupců do kterých se bude zapisovat
+			$columsArray = array_keys($galeryArray);
+			$valuesArray = array_values($galeryArray);
+			array_push($columsArray, self::COLUMN_GALERY_ID_SECTION);
+			array_push($valuesArray, $idSection);
+			array_push($columsArray, self::COLUMN_GALERY_URLKEY);
+			array_push($valuesArray, $urlKey);
+			
+			array_push($columsArray, self::COLUMN_GALERY_TIME);
+			if($time == null){
+				array_push($valuesArray, time());
+			} else {
+				array_push($valuesArray, $time);
+			}
+			
+			array_push($columsArray, self::COLUMN_GALERY_ID_USER);
+			array_push($valuesArray, $idUser);
+			
+
+			$sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable(2))
+					->colums($columsArray)
+					->values($valuesArray);
+				
+			$this->idLastInsertedGalery = $this->getDb()->getLastInsertedId();		
+					
+		//		Vložení do db
+		if($this->getDb()->query($sqlInsert)){
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
+	/**
+	 * Metoda vrací id poslední vložené galerie
+	 * @return integer -- id galerie
+	 */
+	public function gelLastInsertedGaleryId() {
+		return $this->idLastInsertedGalery;
+	}
+	
+
+	/**
+	 * Metoda uloží upravenou galerii do db
+	 *
+	 * @param array -- pole s detaily galerie
+	 */
+	public function saveEditGalery($galeryArray, $urlkey, $idGalery = null) {
+		//TODO dodělat generování nového url klíče
+
+		$sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable(2))
+											 ->set($galeryArray)
+											 ->where(self::COLUMN_GALERY_URLKEY." = '".$urlkey."'");
+
+		if($idGalery != null){
+			$sqlInsert = $sqlInsert->where(self::COLUMN_GALERY_ID." = ".$idGalery);
+		}
+
+		// vložení do db
+		if($this->getDb()->query($sqlInsert)){
+			return true;
+		} else {
+			return false;
+		};
+	}	
 }
 
 ?>

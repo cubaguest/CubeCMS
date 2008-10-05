@@ -17,6 +17,8 @@
 	
 	{/foreach}
 	<br />
+	{$VARS.DATE_SELECT_NAME}:<br />
+	{html_select_date field_array='galery_date' field_order='DMY' start_year=+1 end_year=-10 time=$VARS.DATE_SELECT}<br />
 	{$VARS.SECTIONS_SELECT_NAME}:
 	{html_options name=galery_section_id options=$VARS.SECTIONS selected=$VARS.SECTION_SELECT}<br />
 	

@@ -93,7 +93,8 @@ class SectionListModel extends DbModel {
 													 self::COLUMN_SECTION_ID, self::COLUMN_SECTION_URLKEY_IMAG=>self::COLUMN_SECTION_URLKEY))
 													 ->join(array('gals' => $this->getModule()->getDbTable(2)), 'gals.'.self::COLUMN_GALERY_ID_SECTION.' = secs.'.self::COLUMN_SECTION_ID, 'LEFT', array(self::COLUMN_SECTION_NUM_GALERIES => 'COUNT(gals.'.self::COLUMN_GALERY_ID.')'))
 													 ->where('secs.'.self::COLUMN_SECTION_ID_ITEM.' = '.$this->getModule()->getId())
-													 ->group('secs.'.self::COLUMN_SECTION_ID);
+													 ->group('secs.'.self::COLUMN_SECTION_ID)
+													 ->order(self::COLUMN_SECTION_LABEL_IMAG);
 			
 			$this->sectionList = $this->getDb()->fetchAssoc($sqlSelectSections);
 		}
