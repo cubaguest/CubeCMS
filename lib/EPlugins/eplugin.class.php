@@ -94,9 +94,9 @@ class Eplugin {
 	 *
 	 * @return Links -- objekt odkazů
 	 */
-	protected function getLinks()
+	protected function getLinks($clear = false)
 	{
-		return new Links();
+		return new Links($clear);
 	}
 	
 	/**
@@ -207,6 +207,14 @@ class Eplugin {
 	 */
 	public function userimages() {
 		return new UserImages($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+	}
+	
+	/**
+	 * Metoda vrací objekt epluginu progressbar
+	 * @return ProgressBar -- objekt epluginu progressbar
+	 */
+	public function progressbar() {
+		return new ProgressBar($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
 	}
 	
 	
