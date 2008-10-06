@@ -89,6 +89,12 @@ class AppCore {
 	const TEMPLATES_STYLESHEETS_DIR = 'stylesheets';
 	
 	/**
+	 * Konstanta s názvem adresáře se specielními soubory (helpy, atd)
+	 * @var string
+	 */
+	const SPECIALITEMS_DIR = 'specialitems';
+	
+	/**
 	 * prefix názvu sloupců s tabulkami u modulu (dbtable1, dbtable2, atd.)
 	 * @var string
 	 */
