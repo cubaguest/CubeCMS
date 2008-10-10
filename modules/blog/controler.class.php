@@ -95,45 +95,45 @@ class BlogController extends Controller {
 		$this->checkReadableRights();
 		
 		//		Scrolovátka
-		$scroll = $this->eplugin()->scroll();
-		
-		//		Načtení všech blogů ze všech sekcí
-		$sqlSelectBlogs = $this->getDb()->select()->from(array('blog' => $this->getModule()->getDbTable()))
-												  ->join(array('section' => $this->getModule()->getDbTable(2)), 'blog.'.self::COLUM_ID_SECTION.' = section.'.self::COLUM_SECTION_ID, null, null)
-												  ->where('section.'.self::COLUM_SECTION_ID_ITEM.' = '.$this->getModule()->getId());
-		
-			  										 
-//	  	Výpočet scrolovátek									 
-	  	$scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
-		
-	  	$sqlCount = clone $sqlSelectBlogs;
-	  	$sqlCount = $sqlCount->from(array('blog' => $this->getModule()->getDbTable()), array("count"=>"COUNT(*)"));
-		
-
-//	  	Pokud je vybrána sekce je omezen výběr pouze na tuto sekci
-		if($this->selectedSectionKey != null){
-			$sqlSelect->where('sec.'.self::COLUM_SECTION_URLKEY." = '$this->selectedSectionKey'");
-			$sqlCount->where('sec.'.self::COLUM_SECTION_URLKEY." = '$this->selectedSectionKey'");
-		}
-
-//		Zjištění počtu záznamů									
-		//		echo $sqlCount;
-		$count = $this->getDb()->fetchObject($sqlCount);
-		$scroll->setCountAllRecords($count->count);				
-	  	
-	  	
-//	  	$scroll->setCountAllRecords($this->getDb()->count($this->getModule()->getDbTable()));									 
-
-//		načtení je potřebných záznamů
-	  	$sqlSelectBlogs->limit($scroll->getStartRecord(), $scroll->getCountRecords());												  
-												  
-												  
-		$this->errMsg()->addMessage($sqlCount);
-
-		if($this->getRights()->isWritable()){
-			$this->getModel()->linkToAddBlog = $this->getLink()->action($this->getAction()->actionAddblog());
-			$this->getModel()->linkToAddSection = $this->getLink()->action($this->getAction()->actionAddsection());
-		}
+//		$scroll = $this->eplugin()->scroll();
+//		
+//		//		Načtení všech blogů ze všech sekcí
+//		$sqlSelectBlogs = $this->getDb()->select()->from(array('blog' => $this->getModule()->getDbTable()))
+//												  ->join(array('section' => $this->getModule()->getDbTable(2)), 'blog.'.self::COLUM_ID_SECTION.' = section.'.self::COLUM_SECTION_ID, null, null)
+//												  ->where('section.'.self::COLUM_SECTION_ID_ITEM.' = '.$this->getModule()->getId());
+//		
+//			  										 
+////	  	Výpočet scrolovátek									 
+//	  	$scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
+//		
+//	  	$sqlCount = clone $sqlSelectBlogs;
+//	  	$sqlCount = $sqlCount->from(array('blog' => $this->getModule()->getDbTable()), array("count"=>"COUNT(*)"));
+//		
+//
+////	  	Pokud je vybrána sekce je omezen výběr pouze na tuto sekci
+//		if($this->selectedSectionKey != null){
+//			$sqlSelect->where('sec.'.self::COLUM_SECTION_URLKEY." = '$this->selectedSectionKey'");
+//			$sqlCount->where('sec.'.self::COLUM_SECTION_URLKEY." = '$this->selectedSectionKey'");
+//		}
+//
+////		Zjištění počtu záznamů									
+//		//		echo $sqlCount;
+//		$count = $this->getDb()->fetchObject($sqlCount);
+//		$scroll->setCountAllRecords($count->count);				
+//	  	
+//	  	
+////	  	$scroll->setCountAllRecords($this->getDb()->count($this->getModule()->getDbTable()));									 
+//
+////		načtení je potřebných záznamů
+//	  	$sqlSelectBlogs->limit($scroll->getStartRecord(), $scroll->getCountRecords());												  
+//												  
+//												  
+//		$this->errMsg()->addMessage($sqlCount);
+//
+//		if($this->getRights()->isWritable()){
+//			$this->getModel()->linkToAddBlog = $this->getLink()->action($this->getAction()->actionAddblog());
+//			$this->getModel()->linkToAddSection = $this->getLink()->action($this->getAction()->actionAddsection());
+//		}
 		
 	}
 	
