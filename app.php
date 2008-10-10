@@ -647,8 +647,8 @@ class AppCore {
 	private function _initMessagesAndErrors()
 	{
 		//		Vytvoření objektu pro práci se zprávami
-		$this->messages = new Messages(null, 'session', 'mmessages');
-		$this->userErrors = new Messages();
+		$this->messages = new Messages('session', 'mmessages', true);
+		$this->userErrors = new Messages('session', 'merror');
 	}
 	
 	/**
