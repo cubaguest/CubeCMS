@@ -256,7 +256,9 @@ class Files {
 			}
 			return rmdir($filepath);
 		}
-		return unlink($filepath);
+		if(file_exists($filepath)){
+			return unlink($filepath);
+		}
 	}
 	
 	/**

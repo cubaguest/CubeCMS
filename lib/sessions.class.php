@@ -69,8 +69,11 @@ class Sessions {
 	 */
 	public function get($name){
 		//TODO dodělat ověřování atd
-		
-		return $_SESSION[$name];
+		if(isset($_SESSION[$name])){
+			return $_SESSION[$name];
+		} else {
+			return null;
+		}
 	}
 	
 	
@@ -99,6 +102,13 @@ class Sessions {
 		}
 	}
 	
+	/**
+	 * Metoda uloží session a znovu ji načte
+	 */
+	public function commit() {
+		session_commit();
+		session_start();
+	}
 	
 	
 }

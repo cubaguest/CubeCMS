@@ -23,7 +23,7 @@ class Messages {
 	 * Pole s uloženými zprávami
 	 * @var array
 	 */
-	private $savedMessages = array();
+	private $messagesSaved = array();
 	
 	/**
 	 * Pole se zprávami, které se uloží
@@ -32,16 +32,10 @@ class Messages {
 	private $messagesForSave = array();
 	
 	/**
-	 * Prefix pro zprávy, které se budou vypisovat
-	 * @var string
-	 */
-	private $messagePrefixForPrint = null;
-	
-	/**
 	 * Jestli se má zpráva ukládat a zobrazovat po obnovení stránky
 	 * @var boolean
 	 */
-	private $saveMessage = false;
+	private $defaultSaveMessages = false;
 	
 	/**
 	 * Kam se mají zprávy ukládat (pro zobrazení zprávy po obnovení stránky)
@@ -57,30 +51,50 @@ class Messages {
 	private $saveTargetName = null;
 
 	/**
+	 * Objetk se session
+	 * @var Sessions
+	 */
+	private $session = null;
+	
+	/**
 	 * Konstruktor tridy
 	 *
 	 * @param string -- prefix pro výpis zpráv (option)
 	 * @param boolean -- jestli se zpráva má ukládat a zobrazovat po obnovení stránky
 	 */
-	function __construct($messagePrefix = null, $saveTarget = null, $saveTargetName = null){
-		$this->messagePrefixForPrint = $messagePrefix;
-		
-//		Nastavení ukládání zpráv		
-		if($saveTarget != null AND $saveTargetName != null){
-			$this->setSaveTarget($saveTarget, $saveTargetName);
-			$this->saveMessage = true;
-			$this->getSavedMessages();
+	function __construct($saveTarget = 'session', $saveTargetName = 'message', $saveDefault = false){
+		if($saveTarget == 'session'){	
+			$this->session = new Sessions();
 		}
+//		Nastavení ukládání zpráv		
+		$this->setSaveTarget($saveTarget, $saveTargetName);
+		$this->defaultSaveMessages = $saveDefault;
+		$this->getSavedMessages();
 	}
 
+	/**
+	 * Destruktor - uloží zprávy pro uložení
+	 *
+	 */
+	function __destruct() {
+		$this->saveMessages();
+	}
+	
+	
 	/**
 	 * Metoda vrací uložené zprávy
 	 */
 	private function getSavedMessages() {
 		
-		if($this->saveTarget == "session" AND isset($_SESSION[$this->saveTargetName])){
-			$this->savedMessages = $_SESSION[$this->saveTargetName];
-			$_SESSION[$this->saveTargetName] = null;
+		if($this->saveTarget == "session"){
+			$this->messagesSaved = $this->session->get($this->saveTargetName);
+			$this->session->remove($this->saveTargetName); 
+		}
+		
+		if(!empty($this->messagesSaved)){
+			foreach ($this->messagesSaved as $msg){
+				array_push($this->messages, $msg);
+			}
 		}
 	}
 	
@@ -92,10 +106,8 @@ class Messages {
 	 * @param boolean -- jesli se má zpráva uložit
 	 */
 	function addMessage($messageText, $save = false){
-		if ($save OR $this->saveMessage){
+		if($this->defaultSaveMessages OR $save){
 			array_push($this->messagesForSave, $messageText);
-			
-			$this->saveMessagesToSession();
 		} else {
 			array_push($this->messages, $messageText);
 		}
@@ -126,11 +138,7 @@ class Messages {
 		/**
 		 * Sloučení uložených a zobrazovaných zpráv
 		 */
-		if($this->saveMessage AND !empty($this->savedMessages)){
-			foreach ($this->savedMessages as $msg){
-				array_push($messages, $msg);
-			}
-		}
+		
 		return $messages;
 	}
 
@@ -149,19 +157,19 @@ class Messages {
 	 *
 	 * @param string -- prefix chybove zpravy (napr.: CHYBA: )
 	 */
-	function setMesagePrefixForPrint($messagePrefix){
-		$this->messagePrefixForPrint = $messagePrefix;
-	}
-
-	/**
-	 * Funkce vraci prefix, ktery je vypisoven pri vystupu
-	 * pred chybovou zpravu
-	 *
-	 * @return string -- prefix chybove zpravy
-	 */
-	function getMesagePrefixForPrint(){
-		return $this->messagePrefixForPrint;
-	}
+//	function setMesagePrefixForPrint($messagePrefix){
+//		$this->messagePrefixForPrint = $messagePrefix;
+//	}
+//
+//	/**
+//	 * Funkce vraci prefix, ktery je vypisoven pri vystupu
+//	 * pred chybovou zpravu
+//	 *
+//	 * @return string -- prefix chybove zpravy
+//	 */
+//	function getMesagePrefixForPrint(){
+//		return $this->messagePrefixForPrint;
+//	}
 
 	/**
 	 * Funkce ulozi pole se spravami do session¨,
@@ -169,12 +177,10 @@ class Messages {
 	 *
 	 * @param string -- nazev session
 	 */
-	private function saveMessagesToSession()
+	private function saveMessages()
 	{
-		if(isset($_SESSION)){
-			$_SESSION[$this->saveTargetName] = $this->messagesForSave;
-		} else {
-			new CoreException(_("Session pro ukládání zpráv není připravena"), 1);
+		if($this->saveTarget == "session"){
+			$this->session->add($this->saveTargetName, $this->messagesForSave);
 		}
 	}
 

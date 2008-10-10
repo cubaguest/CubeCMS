@@ -56,7 +56,13 @@ class DbCtrlHelper extends CtrlHelper {
 		
 		$urlkeysArray = $this->db->fetchAssoc($sqlSelecturlKey);
 
-		$urlKey = $this->createDatabaseKey($textForGenerate, $urlkeysArray, $minLenght, $maxLenght);
+		$newUrlKeys = array();
+		foreach ($urlkeysArray as $urlKey) {
+			array_push($newUrlKeys, $urlKey[$urlKeyColum]);
+		}
+		
+		
+		$urlKey = $this->createDatabaseKey($textForGenerate, $newUrlKeys, $minLenght, $maxLenght);
 		
 		return $urlKey;
 	}
@@ -90,7 +96,7 @@ class DbCtrlHelper extends CtrlHelper {
 
 			while ($uniqueKey != true) {
 				if(!in_array($newUniqueKey, $keysArray)){
-					$uniqueKey = true;
+					$uniqueKey = true;			
 				} else {
 					$newUniqueKey=$newKey."-".$step++;
 				}

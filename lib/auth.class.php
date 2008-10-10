@@ -139,7 +139,7 @@ class Auth {
 	 */
 	private function _userIslogIn() {
 		if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
-			$this->login = true;;
+			$this->login = true;
 		} else {
 			$this->login = false;
 		}

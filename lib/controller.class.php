@@ -245,7 +245,7 @@ abstract class Controller {
 	 */
 	final public function checkReadableRights() {
 		if(!$this->getRights()->isReadable()){
-			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"));
+			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->getLink(true)->reload();
 		}
 	}
@@ -254,7 +254,7 @@ abstract class Controller {
 	 */
 	final public function checkWritebleRights() {
 		if(!$this->getRights()->isWritable()){
-			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"));
+			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->getLink(true)->reload();
 		}
 	}
@@ -263,7 +263,7 @@ abstract class Controller {
 	 */
 	final public function checkControllRights() {
 		if(!$this->getRights()->isControll()){
-			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"));
+			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->getLink(true)->reload();
 		}
 	}
