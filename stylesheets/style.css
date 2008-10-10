@@ -204,7 +204,7 @@ a:hover {
 }
 
 /* formulařové prvky */
-input {
+input, button {
 	border: 1px solid #0f6572;
 	background-color: #e1ebec;
 	font-size: 10pt;
@@ -215,7 +215,7 @@ input[type="image"] {
 	border: 0;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, button[type="submit"]:hover {
 	background-color: #007070;
 	color: white;
 }
@@ -225,7 +225,7 @@ input[type="button"]:hover {
 	color: white;
 }
 
-input[type="reset"]:hover, .delete_form input[type="submit"]:hover  {
+input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_button button[type="submit"]:hover  {
 	background-color: #c1272d;
 	color: white;
 }
@@ -258,7 +258,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover  {
 	width: 20px;
 	height: 20px;
 	border: 0;
-	cursor: pointer; cursor: hand
+	cursor: pointer; cursor: hand;
 }
 
 .form_buttons {
@@ -268,9 +268,10 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover  {
 .form_buttons_inline form {
 	display: inline;
 }
-
-.files_delete_form {
+.files_delete_form, .form_buttons_inline {
 	text-align: right;
+	margin-right: 10px;
+	margin-bottom: 10px;
 }
 
 .button_back {
