@@ -170,6 +170,19 @@ class SectionDetailModel extends DbModel {
 			return false;
 		};
 	}
+	
+	/**
+	 * Metoda vymaže sekci z db
+	 * 
+	 * @param integer -- id sekce
+	 */
+	public function deleteSection($id) {
+		//		Končný výmaz z db
+		$sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable(3))
+											 ->where(self::COLUMN_SECTION_ID.' = '.$id);
+			
+		return $this->getDb()->query($sqlDelete);	
+	}
 }
 
 ?>

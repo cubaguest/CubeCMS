@@ -1,4 +1,5 @@
 <div>
+<!--<iframe id="addPhotoStatus" src="{$VARS.PROGRESSBAR_LINK}" width="300" height="50" frameborder="0"></iframe>-->
 <form action="{$THIS_PAGE_LINK}" method="post" enctype="multipart/form-data">
 	<fieldset>
 	<legend>{$VARS.ADD_TO_GALERY}</legend>
@@ -26,7 +27,8 @@
 	</fieldset>
 	
 	<input name="photo_reset" type="reset" value="{$VARS.BUTTON_RESET}" />
-	<input name="photo_send" type="submit" value="{$VARS.BUTTON_SEND}" />
+<!--	<input name="photo_send" type="submit" value="{$VARS.BUTTON_SEND}" onclick="document.getElementById('addPhotoStatus').style.display='block'"/>-->
+	<input name="photo_send" type="submit" value="{$VARS.BUTTON_SEND}" onclick="openProgress('{$VARS.PROGRESSBAR_LINK}')"/>
 
 <fieldset>
 	<legend>{$VARS.ADD_NEW_SECTION_OR_GALERY}</legend>

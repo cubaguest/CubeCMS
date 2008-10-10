@@ -14,7 +14,7 @@
 </a>
 {/if}
 </div>
-{$VARS.ADD_TEXT}: <br />{$GALERY.time|date_format:'%x %X'}<br />
+{$VARS.ADD_TEXT}: {$GALERY.time|date_format:'%x'}<br />
 {$VARS.NUM_PHOTOS}: {$GALERY.num_photos}<br />
 <!--<a href="{$VARS.GALERIES_DIR_TO_MEDIUM_PHOTOS}{$IMAGE.file}" rel="lightbox[roadtrip{$smarty.foreach.galery.index}]" title="{$IMAGE.photolabel}">-->
 <!--<img src="{$VARS.GALERIES_DIR_TO_SMALL_PHOTOS}{$IMAGE.file}" title="{$IMAGE.photolabel}"/>-->

@@ -85,7 +85,7 @@ class GaleriesListModel extends DbModel {
 											self::COLUMN_PHOTOS_FILE => '('.$sqlRandPhoto.')'))			
 											->join(array('users' => $this->getUserTable()), 'users.'.self::COLUMN_USER_ID.'=gals.'.self::COLUMN_GALERY_ID_USER, null, self::COLUMN_USER_NAME)
 											->join(array('photos'=>$this->getModule()->getDbTable()), 'photos.'.self::COLUMN_PHOTOS_ID_GALERY.'=gals.'.self::COLUMN_GALERY_ID, 'LEFT', array(self::COLUMN_PHOTOS_COUNT => 'COUNT(photos.'.self::COLUMN_PHOTOS_ID_GALERY.')'))
-											->group('photos.'.self::COLUMN_PHOTOS_ID_GALERY)
+											->group('gals.'.self::COLUMN_PHOTOS_ID_GALERY)
 											->order('gals.'.self::COLUMN_GALERY_TIME, 'DESC');
 		
 		if($idSection != null){
@@ -95,7 +95,6 @@ class GaleriesListModel extends DbModel {
 		if($numGals != null){
 			$sqlSelectGaleries = $sqlSelectGaleries->limit(0, $numGals);									
 		}
-											
 		$galsArray = $this->getDb()->fetchAssoc($sqlSelectGaleries);
 		
 		return $galsArray;

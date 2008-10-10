@@ -5,7 +5,17 @@
 
 .galeryBox {
 	position: relative;
-	width: 150px;
+	width: 146px;
+	margin: 2px;
+	text-align: center;
+	border: 1px solid black;
+	padding: 2px;
+}
+
+.galeryBox p {
+	text-align: left;
+	display: block;
+	margin-bottom: 3px;
 }
 
 .smallPhotoBox {
@@ -18,10 +28,6 @@
 }
 
 
-.galery_box {
-	padding: 10px;
-	text-align: center;
-}
 
 .galery_box div.galery_text {
 	text-align: justify;
@@ -29,10 +35,15 @@
 
 
 .smallPhotoBox {
-	width: 33%;
 	text-align: center;
 }
 
 .photo_buttons_edit {
-	padding: 0 30px;
+	padding: 0 0px;
+}
+
+.photo_small_image {
+	height: 150px;
+	margin: 5px;
+	margin-top: 50px;
 }

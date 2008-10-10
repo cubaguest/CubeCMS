@@ -39,13 +39,13 @@ class PhotogaleryController extends Controller {
 	 * Názvy sloupců v databázi pro tabulku s fotkami
 	 * @var string
 	 */
-//	const COLUMN_PHOTOS_ID 					= 'id_photo';
+	const COLUMN_PHOTOS_ID 					= 'id_photo';
 //	const COLUMN_PHOTOS_ID_USER 				= 'id_user';
 //	const COLUMN_PHOTOS_ID_GALERY 			= 'id_galery';
 	const COLUMN_PHOTOS_LABEL_LANG_PREFIX 	= 'label_';
 //	const COLUMN_PHOTOS_TEXT_LANG_PREFIX 	= 'text_';
 //	const COLUMN_PHOTOS_TIME 				= 'time';
-//	const COLUMN_PHOTOS_FILE 				= 'file';
+	const COLUMN_PHOTOS_FILE 				= 'file';
 
 	/**
 	 * Názvy sloupců v databázi pro tabulku se sekcemi
@@ -119,6 +119,7 @@ class PhotogaleryController extends Controller {
 	const FORM_PHOTO_TEXT_PREFIX = 'text_';
 	const FORM_PHOTO_FILE = 'file';
 	const FORM_PHOTO_ID = 'id';
+	const FORM_PHOTO_IS_EDIT = 'is_edit';
 	const FORM_PHOTO_GALERY_ID = 'galery_id';
 	
 	const FORM_BUTTON_SEND = 'send';
@@ -182,31 +183,17 @@ class PhotogaleryController extends Controller {
 	 * Kontroler pro zobrazení fotogalerii
 	 */
 	public function mainController() {
-	
 //		Kontrola práv
 		$this->checkReadableRights();
-		
-//		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_DELETE])){
-//			$this->deleteNews();
-//		}
-
 //		Objekt se seznamem sekcí
 		$sectionsObj = new SectionListModel();
-		
 //		Načtení sekcí
 		$sections = $sectionsObj->getSectionList();
-
-//		echo("<pre>");
-//		print_r($sections);
-//		echo("</pre>");
-		
 //		Objekt se seznamem galerií
 		$galeryObj = new GaleriesListModel();
-		
 //		procházení sekcí a načítání galerií
 		foreach ($sections as $sectionKey => $section) {
 			$galeries = $galeryObj->getGaleryList($section[self::COLUMN_SECTION_ID], self::NUM_OF_GALERIES_IN_SECTION_LIST);
-			
 			if(!empty($galeries)){
 //				Odkazy pro zobrazení galerie
 				foreach ($galeries as $galKey => $gal) {
@@ -218,138 +205,19 @@ class PhotogaleryController extends Controller {
 			}
 //			Odkaz pro zobrazení sekce
 			$sections[$sectionKey][self::SECTION_SHOW_LINK]=$this->getLink()->article(self::ROUTE_SHOW_SECTION.Routes::ROUTE_SEPARATOR.$section[self::COLUMN_SECTION_URLKEY_IMAG])->params();
-			
-//			Editace sekce - link
-//			if($this->getRights()->isWritable()){
-//				
-//			}
 		}
-		
 		$this->container()->addData('sections', $sections);
-		
 //		Adresář s obrázky
 		$this->container()->addData('small_images_dir', $this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR);
-		
 		if($this->getRights()->isWritable()){
 //			vytvoření linků pro přidávání
 			$this->container()->addLink('add_photo', $this->getLink()->action($this->getAction()->actionAddphotos()));
 			$this->container()->addLink('add_galery', $this->getLink()->action($this->getAction()->actionAddgalery()));
 			$this->container()->addLink('add_section', $this->getLink()->action($this->getAction()->actionAddsection()));
 		}
-		
-//		$galeryList = new GaleryListModel();
-		
-		
-//		$gals = $galeryList->getGaleryList();
-		
-		
-//		echo("<pre>");
-//		print_r($sections);
-//		echo("</pre>");
-		
-		
-		
-		
-		
-		
-//		$this->createModel("galeryList");
-////		print_r($this->getModel());
-//
-//		
-////		Scrolovátka
-//		$scroll = $this->eplugin()->scroll();
-//		
-//		$tableUsers = $this->getSysConfig()->getOptionValue(Auth::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES);
-//		
-//		
-////		Generování dotazu pro výběr fotek
-//		$sqlPhotoColums = array();
-//		$this->getModel()->countOfPhotos = $countOfTopPhotos = $this->getModule()->getSelectParam("photosingalerylist");
-//		for($i=0; $i < $countOfTopPhotos; $i++){
-//			$sqlSelectPhotosFile = $this->getDb()->select()->from(array('photo' =>$this->getModule()->getDbTable()), self::COLUMN_PHOTOS_FILE) 
-//											 	 ->where('gal.'.self::COLUMN_GALERY_ID.' = photo.'.self::COLUMN_PHOTOS_ID_GALERY)
-//											 	 ->limit($i, 1);
-//			$sqlPhotoColums[self::COLUMN_PHOTOS_FILE_PREFIX_IMAG.$i] = '('.(string)$sqlSelectPhotosFile.')';								 	 
-//			$sqlSelectPhotosLabel = $this->getDb()->select()->from(array('photo' =>$this->getModule()->getDbTable()), 
-//						array(self::COLUMN_PHOTOS_LABEL_IMAG => "IFNULL(".self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getLang().",
-//						".self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")")) 
-//											 	 ->where('gal.'.self::COLUMN_GALERY_ID.' = photo.'.self::COLUMN_PHOTOS_ID_GALERY)
-//											 	 ->limit($i, 1);
-//			$sqlPhotoColums[self::COLUMN_PHOTOS_LABEL_PREFIX_IMAG.$i] = '('.(string)$sqlSelectPhotosLabel.')';								 	 
-//		}
-//		
-////		echo "<pre>tady";
-////		print_r($sqlPhotoColums);
-////		echo "</pre>";
-//		
-////	SQL dotaz
-//
-//		$sqlGaleryColums = array(self::COLUMN_GALERY_ID_USER, self::COLUMN_GALERY_TIME, self::COLUMN_GALERY_URLKEY_IMAG => self::COLUMN_GALERY_URLKEY,
-//								 self::COLUMN_GALERY_LABEL_IMAG => "IFNULL(gal.".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getLang().", gal.".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
-//								 self::COLUMN_GALERY_TEXT_IMAG => "IFNULL(gal.".self::COLUMN_GALERY_TEXT_LANG_PREFIX.Locale::getLang().", gal.".self::COLUMN_GALERY_TEXT_LANG_PREFIX.Locale::getDefaultLang().")");
-//	  	
-//		$sqlColums = array_merge($sqlPhotoColums, $sqlGaleryColums);						 
-//								 
-//		$sqlSelect = $this->getDb()->select()->from(array('gal' => $this->getModule()->getDbTable(2)), $sqlColums)
-//	  										 ->order('gal.'.self::COLUMN_GALERY_TIME, 'desc')
-//	  										 ->join(array('sec' => $this->getModule()->getDbTable(3)), 'sec.'.self::COLUMN_SECTION_ID.' = gal.'.self::COLUMN_GALERY_ID_SECTION, null,
-//	  										 array(self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(sec.".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang().", sec.".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
-//	  										 self::COLUMN_SECTION_URLKEY_IMAG => self::COLUMN_SECTION_URLKEY))
-//	  										 ->where('sec.'.self::COLUMN_SECTION_ID_ITEM.' = '.$this->getModule()->getId());
-//		
-//	  										 
-////	  	Výpočet scrolovátek									 
-//	  	$scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
-//		
-//	  	$sqlCount = $this->getDb()->select()->from(array('gal' => $this->getModule()->getDbTable(2)), array("count"=>"COUNT(*)"))
-//											->join(array('sec' => $this->getModule()->getDbTable(3)), 'sec.'.self::COLUMN_SECTION_ID.' = gal.'.self::COLUMN_GALERY_ID_SECTION, null, null)
-//											->where('sec.'.self::COLUMN_SECTION_ID_ITEM.' = '.$this->getModule()->getId());
-//		
-//
-////	  	Pokud je vybrána sekce je omezen výběr pouze na tuto sekci
-//		if($this->selectedSectionKey != null){
-//			$sqlSelect->where('sec.'.self::COLUMN_SECTION_URLKEY." = '$this->selectedSectionKey'");
-//			$sqlCount->where('sec.'.self::COLUMN_SECTION_URLKEY." = '$this->selectedSectionKey'");
-//		}
-//
-////		Zjištění počtu záznamů									
-//		//		echo $sqlCount;
-//		$count = $this->getDb()->fetchAssoc($sqlCount, true);
-//		$scroll->setCountAllRecords($count["count"]);				
-//	  	
-//	  	
-////	  	$scroll->setCountAllRecords($this->getDb()->count($this->getModule()->getDbTable()));									 
-//
-////		načtení je potřebných záznamů
-//	  	$sqlSelect->limit($scroll->getStartRecord(), $scroll->getCountRecords());
-//	  	
-//	  	
-////	  	echo $sqlSelect;									 
-//	  	$this->getModel()->allGaleryArray=$this->getDb()->fetchAssoc($sqlSelect);
-//		
-//		foreach ($this->getModel()->allGaleryArray as $key => $galery) {
-//			$this->getModel()->allGaleryArray[$key][self::COLUMN_GALERY_SHOW_LINK]=$this->getLink()->article($galery[self::COLUMN_GALERY_URLKEY_IMAG]);
-//			$this->getModel()->allGaleryArray[$key][self::COLUMN_SECTION_SHOW_LINK]=$this->getLink()->article(self::ROUTE_SHOW_SECTION.Routes::ROUTE_SEPARATOR.$galery[self::COLUMN_SECTION_URLKEY_IMAG])->params();
-//		}
-//		
-//		
-//		//Doplnění pole s novinkami do modelu
-//		$this->getModel()->scroll = $scroll;
-//		
-////		link pro přidání novinky
-//		$this->getModel()->linkToAddPhotos = $this->getLink()->action($this->getAction()->actionAddphotos());
-//		$this->getModel()->linkToAddGalery = $this->getLink()->action($this->getAction()->actionAddgalery());
-//		$this->getModel()->linkToAddSection = $this->getLink()->action($this->getAction()->actionAddsection());
-//		
-//		//Adresář s obrázky
-//		$this->getModel()->dirToImages = $this->getModule()->getDir()->getDataDir();
-//		$this->getModel()->dirToMediumImages = $this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR;
-//		$this->getModel()->dirToSmallImages = $this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR;
-		
 //		Vynulování session s odkazem zpět
 		$session = new Sessions();
 		$session->remove(self::LINK_BACK_SESSION);
-		
 	}
 
 	/**
@@ -357,31 +225,62 @@ class PhotogaleryController extends Controller {
 	 */
 	public function sectionShowController() {
 		$this->checkReadableRights();
-		
+//		Mazání sekce
+		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_DELETE]) AND $this->getRights()->isWritable()){
+			$idSection = (int)htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID], ENT_QUOTES);
+			if(!is_numeric($idSection)){
+				new CoreException(_('Sekci se nepodařilo smazat, bylo zadáno nekorektní id'),1);
+			} else {
+				$galeryObj = new GaleriesListModel();
+				$galeryDetailObj = new GaleryDetailModel();				
+				$photoObj = new PhotoDetailModel();
+				$sectionObj = new  SectionDetailModel();
+//				načtení galerií
+				$galeries = $galeryObj->getGaleryList($idSection);
+				$allOk = true;
+//				Mazání galeríí
+				foreach ($galeries as $gal) {
+					$photos = $galeryDetailObj->getPhotosList($gal[self::COLUMN_GALERY_ID]);
+//					Vymazání fotek
+					foreach ($photos as $photo) {
+						if(!$this->deletePhotoFile($photo[self::COLUMN_PHOTOS_FILE])){
+							new CoreException(_('Soubor fotky se nepodařilo vymazat'));
+							$allOk = false;
+						} else if(!$photoObj->deletePhoto($photo[self::COLUMN_PHOTOS_ID])) {
+							new CoreException(_('Soubor fotky se nepodařilo vymazat'));
+							$allOk = false;
+						}
+					}
+//					Výmaz galerie
+					if ($allOk AND !$galeryDetailObj->deleteGalery($gal[self::COLUMN_GALERY_ID])){
+						new CoreException(_('Galerii se nepodařilo vymazat'));
+						$allOk = false;
+					}
+				}
+//				Mazání sekce
+				if($allOk AND !$sectionObj->deleteSection($idSection)){
+					new CoreException(_('Sekci se nepodařilo vymazat'));
+				} else {
+					$this->infoMsg()->addMessage(_('Sekce byla vymazána'));
+					$this->getLink()->action()->article()->reload();
+				}
+			}
+		}
 //		Načtení vybrané sekce
 		$sectionObj = new SectionDetailModel();
-
 		$section = $sectionObj->getSectionByUrlkey($this->getArticle());
-		
 //		načtení galerií ze sekcí
 		$galeryListObj = new GaleriesListModel();
-		
 		$galeries = $galeryListObj->getGaleryList($section[self::COLUMN_SECTION_ID]);
-		
 		foreach ($galeries as $galKey => $gal) {
 			$galeries[$galKey][self::GALERY_SHOW_LINK] = $this->getLink()->article($gal[self::COLUMN_GALERY_URLKEY_IMAG]);
 		}
-		
-		
 		$this->container()->addData('section', $section);
 		$this->container()->addData('section_label', $section[self::COLUMN_SECTION_LABEL_IMAG]);
 		$this->container()->addData('section_id', $section[self::COLUMN_SECTION_ID]);
 		$this->container()->addData('galeries', $galeries);
 		//		Adresář s obrázky
 		$this->container()->addData('small_images_dir', $this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR);
-		
-
-		
 		if($this->getRights()->isWritable()){
 //			link pro editaci
 			$this->container()->addLink('edit_section', $this->getLink()->action($this->getAction()->actionEditsection())->params());
@@ -389,57 +288,12 @@ class PhotogaleryController extends Controller {
 			$this->container()->addLink('add_photo', $this->getLink()->action($this->getAction()->actionAddphotos()));
 			$this->container()->addLink('add_galery', $this->getLink()->action($this->getAction()->actionAddgalery()));
 		}
-		
-//		echo "<pre>";
-//		print_r($galeries);
-//		echo "</pre>";
-		
-//		Mazání sekce
-//		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_DELETE])){
-//			$idSection = (int)htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID], ENT_QUOTES);
-//			
-//			if(!is_numeric($idSection)){
-//				new CoreException(_('Sekci se nepodařilo smazat, bylo zadáno nekorektní id'),1);
-//			} else {
-//				
-//				if($this->deleteGaleries($idSection, true)){
-//					$this->infoMsg()->addMessage(_('Sekce byla smazána'));
-//						
-//					$this->getLink()->params()->article()->reload();
-//				} else {
-//					new CoreException(_('Sekci se nepodařilo smazat. Zřejmně nemáte dostatečná oprávnění pro mazání'),2);
-//				}
-//			}
-//		}
-		
-//		$this->selectedSectionKey = $this->getArticle()->getArticle();
-		
-//		Spuštění kontroleru s listem galeríí
-//		$this->mainController();
-
-//		Načttení názvu zvolené sekce
-//		$sqlSelectSection = $this->getDb()->select()->from($this->getModule()->getDbTable(3), array(self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang().",
-//						".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getDefaultLang().")", self::COLUMN_SECTION_ID))
-//						->where(self::COLUMN_SECTION_URLKEY." = '".$this->getArticle()."'");
-//		
-//		$this->getModel()->sectionName = $this->getDb()->fetchObject($sqlSelectSection);
-//		$this->getModel()->sectionId = $this->getModel()->sectionName->{self::COLUMN_SECTION_ID};
-//		$this->getModel()->sectionName = $this->getModel()->sectionName->{self::COLUMN_SECTION_LABEL_IMAG};
-//		
-//		
-//		
-//
-//		if($this->getRights()->isWritable()){
-//			$this->getModel()->linkToEdit = $this->getLink()->action($this->getAction()->actionEditsection())->params();
-//		}
-//		
-////		Odkaz zpět se zobrazené galerie
+//		Odkaz zpět se zobrazené galerie
 		$this->container()->addLink('link_back', $this->getLink()->article()->action()->params());
 		$session = new Sessions();
 		$session->add(self::LINK_BACK_SESSION, $this->getLink());
 //		
 		$this->container()->addData('in_section',true);
-		
 	}
 	
 	/**
@@ -447,28 +301,19 @@ class PhotogaleryController extends Controller {
 	 */
 	public function addsectionController() {
 		$this->checkWritebleRights();
-		
 //		Helpre pro práci s jazykovými poli
 		$localeHelper = new LocaleCtrlHelper();
-		
 //		Odeslané pole
 		$sendArray = array();
-		
 		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_SEND])){
-			
 			$sendArray = $localeHelper->postsToArray(array(self::FORM_SECTION_LABEL_PREFIX), self::FORM_SECTION_PREFIX);
-			
 			if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_LABEL_PREFIX.Locale::getDefaultLang()] == null){
 			   	$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje'));
 			} else {
-				
 				$mainLang = Locale::getDefaultLang();
 				$mainLabel = $sendArray[self::FORM_SECTION_LABEL_PREFIX.$mainLang];
-				
 				$sectionDetail = new SectionDetailModel();
-				
 				$saved = $sectionDetail->saveNewSection($sendArray, $mainLabel, $this->getRights()->getAuth()->getUserId());
-				
 //				uložení
 				if($saved){
 					$this->infoMsg()->addMessage(_('Sekce byla uložena'));
@@ -478,12 +323,9 @@ class PhotogaleryController extends Controller {
 				}
 			}
 		}
-
 		$lArray = $localeHelper->generateArray(array(self::FORM_SECTION_LABEL),$sendArray);
-
 //		Sekce do viewru
 		$this->container()->addData('section', $lArray);
-		
 //		Odkaz zpět
 		$this->container()->addLink('link_back', $this->getLink()->action());
 	}
@@ -493,39 +335,28 @@ class PhotogaleryController extends Controller {
 	 */
 	public function sectionEditsectionController() {
 		$this->checkWritebleRights();		
-				
 		$sectionObj = new SectionDetailModel();
-		
 		$section = $sectionObj->getSectionByUrlkeyAllLangs($this->getArticle()->getArticle());
-		
 		if(empty($section)){
 			new CoreException(_('Požadovaná sekce neexistuje'), 2);
 			return false;
 		}
-		
 //		Zvolení názvu sekce
 		if($section[self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang()] != null){
 			$this->container()->addData('section_label', $section[self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang()]);
 		} else {
 			$this->container()->addData('section_label', $section[self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getDefaultLang()]);
 		}
-		
 //		Helpre pro práci s jazykovými poli
 		$localeHelper = new LocaleCtrlHelper();
-		
 		$sendArray = array();
-		
 //		pokud byla sekce odeslána
 		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_SEND])){
-			
 			$sendArray = $localeHelper->postsToArray(array(self::FORM_SECTION_LABEL_PREFIX), self::FORM_SECTION_PREFIX);
-			
 			if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_LABEL_PREFIX.Locale::getDefaultLang()] == null){
 				$this->errMsg()->addMessage(_('Nebyly zadány všechny povinné údaje'));
 			} else {
-				
 				$updated = $sectionObj->saveEditSection($sendArray, $this->getArticle()->getArticle());
-				
 				if($updated){
 					$this->infoMsg()->addMessage(_("Sekce byla upravena"));
 					$this->getLink()->action()->reload();
@@ -534,141 +365,44 @@ class PhotogaleryController extends Controller {
 				}
 			}
 		}
-
 		$lArray = $localeHelper->generateArray(array(self::FORM_SECTION_LABEL), $sendArray, $section);
-
 //		Sekce do viewru
 		$this->container()->addData('section', $lArray);
-		
 //		Odkaz zpět			
 		$this->container()->addLink('link_back', $this->getLink()->action());
 	}
-		
-	/**
-	 * Metoda ukládá sekci do db
-	 * 
-	 * @return Db -- objekt sql dotazu pro vložení sekce
-	 */
-//	private function saveNewSection() {
-//		$newSectionName =  htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()], ENT_QUOTES);
-//
-//		//				načtení všech klíču sekcí z db
-//		$sqlSectionSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(3), self::COLUMN_SECTION_URLKEY);
-//
-//		$sFunction = new SpecialFunctions();
-//		$newUrlkKey = $sFunction->createDatabaseKey($newSectionName, $this->getDb()->fetchAssoc($sqlSectionSelect));
-//
-//		unset($sFunction);
-//
-//		//Vygenerování sloupců do kterých se bude zapisovat
-//		$columsArrayNames = array();
-//		$columsArrayValues = array();
-//		array_push($columsArrayNames, self::COLUMN_SECTION_URLKEY);
-//		array_push($columsArrayValues, $newUrlkKey);
-//		array_push($columsArrayNames, self::COLUMN_SECTION_ID_ITEM);
-//		array_push($columsArrayValues, $this->getModule()->getId());
-//		array_push($columsArrayNames, self::COLUMN_SECTION_ID_USER);
-//		array_push($columsArrayValues, $this->getRights()->getAuth()->getUserId());
-//		array_push($columsArrayNames, self::COLUMN_SECTION_TIME);
-//		array_push($columsArrayValues, time());
-//		foreach (Locale::getAppLangs() as $lang) {
-//			array_push($columsArrayNames, self::COLUMN_SECTION_LABEL_LANG_PREFIX.$lang);
-//			array_push($columsArrayValues, htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.$lang], ENT_QUOTES));
-//		}
-//
-//		return $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable(3))
-//										  ->colums($columsArrayNames)
-//										  ->values($columsArrayValues);
-//
-//
-//	}
-	
-	/**
-	 * Metoda uloží novou galerii
-	 * 
-	 * @param integer -- id sekce 
-	 * @return db -- objekt pro vložení do databáze
-	 */
-//	private function saveNewGalery($idSection) {
-//		//				Uložení galerie do db
-//				$newGaleryName =  htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()], ENT_QUOTES);
-//
-//				//				načtení všech klíču sekcí z db
-//				$sqlGalerySelect = $this->getDb()->select()->from($this->getModule()->getDbTable(2), self::COLUMN_GALERY_URLKEY);
-//
-//				$sFunction = new SpecialFunctions();
-//				$newUrlkKey = $sFunction->createDatabaseKey($newGaleryName, $this->getDb()->fetchAssoc($sqlGalerySelect));
-//
-//				unset($sFunction);
-//
-//				//Vygenerování sloupců do kterých se bude zapisovat
-//				$columsArrayNames = array();
-//				$columsArrayValues = array();
-//				array_push($columsArrayNames, self::COLUMN_GALERY_URLKEY);
-//				array_push($columsArrayValues, $newUrlkKey);
-//				array_push($columsArrayNames, self::COLUMN_GALERY_ID_SECTION);
-//				array_push($columsArrayValues, $idSection);
-//				array_push($columsArrayNames, self::COLUMN_GALERY_ID_USER);
-//				array_push($columsArrayValues, $this->getRights()->getAuth()->getUserId());
-//				array_push($columsArrayNames, self::COLUMN_GALERY_TIME);
-//				array_push($columsArrayValues, time());
-//				foreach (Locale::getAppLangs() as $lang) {
-//					array_push($columsArrayNames, self::COLUMN_GALERY_LABEL_LANG_PREFIX.$lang);
-//					array_push($columsArrayValues, htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.$lang], ENT_QUOTES));
-//					array_push($columsArrayNames, self::COLUMN_GALERY_TEXT_LANG_PREFIX.$lang);
-//					array_push($columsArrayValues, htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_TEXT_PREFIX.$lang], ENT_QUOTES));
-//				}
-//
-//				return $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable(2))
-//							->colums($columsArrayNames)
-//							->values($columsArrayValues);;
-//	}
 		
 	/**
 	 * Kontroler pro přidání galerie
 	 */
 	public function addgaleryController($idSelSection = null) {
 		$this->checkWritebleRights();
-		
-		//		Helpre pro práci s jazykovými poli
+//		Helpre pro práci s jazykovými poli
 		$localeHelper = new LocaleCtrlHelper();
-		
 //		Pokud je již vybrána sekce
 		if($idSelSection != null){
 			$this->container()->addData('section_select', $idSelSection);
 		}
-		
 //		Odeslané pole
 		$sendTextsArray = array();
-		
 		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_BUTTON_SEND])){
-			
 			//				Vygenerování datumu
 			$dateHelp = new DateTimeCtrlHelper();
 			$dateStamp = $dateHelp->createStampSmartyPost(self::FORM_GALERY_PREFIX.self::FORM_GALERY_DATE);
 			$this->container()->addData('date_select', $dateStamp);
-			
 			$sendTextsArray = $localeHelper->postsToArray(array(self::FORM_GALERY_LABEL_PREFIX, self::FORM_GALERY_TEXT_PREFIX), self::FORM_GALERY_PREFIX);
-			
 //			Přiřazení vybrané sekce
 			$this->container()->addData('section_select', htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID_SECTION]));
-			
 			if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] == null){
 			   	$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje'));
 			} else {
 				//vytvoření hlavního názvu
 				$mainLang = Locale::getDefaultLang();
 				$mainLabel = $sendTextsArray[self::FORM_GALERY_LABEL_PREFIX.$mainLang];
-				
 				$galeryDetail = new GaleryDetailModel();
-				
 //				Vygenerování id sekce
 				$idSection = (int)$_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID_SECTION];
-				
-
-				
 				$saved = $galeryDetail->saveNewGalery($sendTextsArray, $idSection, $mainLabel, $dateStamp, $this->getRights()->getAuth()->getUserId());
-				
 //				uložení
 				if($saved){
 					$this->infoMsg()->addMessage(_('Galerie byla uložena'));
@@ -678,79 +412,13 @@ class PhotogaleryController extends Controller {
 				}
 			}
 		}
-
 		$lArray = $localeHelper->generateArray(array(self::FORM_GALERY_LABEL, self::FORM_GALERY_TEXT),$sendTextsArray);
-
 //		galerie do viewru
 		$this->container()->addData('galery', $lArray);
-
 //		Načtení sekcí
 		$sectionsObj = new SectionListModel();
 		$sections = $sectionsObj->getSectionList();
 		$this->container()->addData('sections', $sections);
-		
-//		Odkaz zpět
-		$this->container()->addLink('link_back', $this->getLink()->action());
-		
-		
-		
-//		$this->createModel('addGalery');
-
-
-//		Podle počtu jazyků inicializujeme pole pro přidání novinky
-//		foreach (Locale::getAppLangs() as $lang) {
-//			$this->getModel()->newSectionArray[$lang] = null;
-//			$this->getModel()->newGaleryArray[$lang] = array();			
-//		}
-
-//		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_BUTTON_SEND])){
-//			if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] == null){
-//				$this->errMsg()->addMessage(_('Nebyl zadán povinný název galerie'));
-//				
-//				foreach (Locale::getAppLangs() as $lang) {
-//					$this->getModel()->newGaleryArray[$lang][self::COLUMN_GALERY_LABEL_IMAG] = htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.$lang], ENT_QUOTES);
-//					$this->getModel()->newGaleryArray[$lang][self::COLUMN_GALERY_TEXT_IMAG] = htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_TEXT_PREFIX.$lang], ENT_QUOTES);
-//					$this->getModel()->newSectionArray[$lang] = htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.$lang], ENT_QUOTES);
-//				}
-//			} else {
-//				$sectionId = null;
-//				
-////				Je zadána nová sekce
-//				if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()] != null){
-//					$sqlInsert = $this->saveNewSection();
-//
-//				//				Vložení do db
-//					if($this->getDb()->query($sqlInsert)){
-//						$sectionId = $this->getDb()->getLastInsertedId();
-//					} else {
-//						new CoreException(_('Sekci se nepodařilo uložit, chyba při ukládání do db'), 5);
-//					}
-//				} else {
-//					$sectionId = (int)htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID], ENT_QUOTES);
-//				}
-//				
-//				$sqlGaleryInsert = $this->saveNewGalery($sectionId);
-//				
-//							
-//				//				Vložení do db
-//				if($this->getDb()->query($sqlGaleryInsert) AND $sectionId != null){
-//					$this->infoMsg()->addMessage(_('Galerie byla uložena'));
-//					$this->getLink()->article()->action()->reload();
-//				} else {
-//					new CoreException(_('Galerii nebo novou sekci se nepodařilo uložit, chyba při ukládání do db'), 6);
-//				}			
-//			}
-//			
-//		}
-//		
-//		//		načtení sekcí
-//		$sqlSelectSection = $this->getDb()->select()->from($this->getModule()->getDbTable(3), 
-//						array(self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang().",
-//						".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getDefaultLang().")", self::COLUMN_SECTION_ID))
-//						->where(self::COLUMN_SECTION_ID_ITEM.' = '.$this->getModule()->getId());
-//													
-//		$this->getModel()->sectionArray = $this->getDb()->fetchAssoc($sqlSelectSection);
-//		
 //		Odkaz zpět
 		$this->container()->addLink('link_back', $this->getLink()->action());
 	}
@@ -760,7 +428,6 @@ class PhotogaleryController extends Controller {
 	 */
 	public function addphotosController() {
 		$this->checkWritebleRights();
-
 //		Nastavení zvolené galerie jsme li v galerii
 		if($this->getArticle()->isArticle() AND !$this->getArticle()->isRoute()){
 			$galObj = new GaleryDetailModel();
@@ -769,30 +436,25 @@ class PhotogaleryController extends Controller {
 			unset($galObj);
 			$this->container()->addData('galery_sel', $idSelGalery);
 		}
-		
-		
 //		Helper pro práci s jazykovými poli
 		$localeHelper = new LocaleCtrlHelper();
-		
 //		Odeslané pole
 		$sendPhotoArray = array();
 		$sendGaleryArray = array();
-		
+//		Objetk progressBaru
+		$progressBar = $this->eplugin()->progressbar();
+		$this->container()->addEplugin('progressbar', $progressBar);
+		$progressBar->setMessage(_('Inicializace'));
 //		Odesílá se ----------------------------------------------------
 //		Uložení nových fotek
 		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_SEND])){
-			
 			$noErrors = true;
-			
 //			Pomocí helperu extrahování názvů a popisů
 			$sendPhotoArray = $localeHelper->postsToArray(array(self::FORM_PHOTO_LABEL, self::FORM_PHOTO_TEXT), self::FORM_PHOTO_PREFIX);
 			$sendGaleryArray = $localeHelper->postsToArray(array(self::FORM_GALERY_LABEL, self::FORM_GALERY_TEXT), self::FORM_GALERY_PREFIX);
-			
 //			Načtení id galerie, kde se ukládá fotka
 			$idGalery = (int)htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_GALERY_ID]);
 			$idSection = (int)htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_GALERY_ID_SECTION]);
-			
-			
 //			Projití pole o galerii jestli byla přidána
 			$sendNewGalery = false;
 			foreach ($sendGaleryArray as $gal) {
@@ -801,60 +463,45 @@ class PhotogaleryController extends Controller {
 					break;
 				}
 			}
-			
 //			Ukládá se nová galerie
+			$reloadWithArticle = true;
 			if($sendNewGalery){
 //				Kontrola jestli byly zadány všechny potřebné údaje při vytváření galerii
 				if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] == null){
 					$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje pro vytvoření galerie'));
+					$progressBar->close();
 					$noErrors=false;
 				} else {
 					// vytvoření hlavního názvu
-					//				$mainLang = Locale::getDefaultLang();
 					$mainLabel = $sendGaleryArray[self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()];
-
 					//				Vygenerování datumu
 					$dateHelp = new DateTimeCtrlHelper();
 					$dateStamp = $dateHelp->createStampSmartyPost(self::FORM_GALERY_PREFIX.self::FORM_GALERY_DATE);
 					$this->container()->addData('date_select', $dateStamp);
 					unset($dateHelp);
-
 					$galeryObj = new GaleryDetailModel();
-
 					$galerySaved = $galeryObj->saveNewGalery($sendGaleryArray, $idSection, $mainLabel, $dateStamp, $this->getRights()->getAuth()->getUserId());
-
 					$idGalery = $galeryObj->gelLastInsertedGaleryId();
-
 					//				uložení
 					if($galerySaved){
 						$this->infoMsg()->addMessage(_('Galerie byla uložena'));
-						//					$this->getLink()->article()->action()->params()->reload();
+						$reloadWithArticle = false;
 					} else {
 						$noErrors = false;
+						$progressBar->close();
 						new CoreException(_('Galerii se nepodařilo uložit, chyba při ukládání'), 1);
 					}
-
 				}
 			}
-			
-			
-//			$saveToDb = false;
-			
+//			Nastavení progressbaru
+			$progressBar->setSteps(2);
+			$progressBar->setMessage(_('Nahrání souboru'));			
 			$uploadFile = new UploadFiles($this->errMsg());
-			
 			$uploadFile->upload(self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_FILE);
-			
+			if($uploadFile->isUploadError()){
+				$progressBar->close();
+			}
 			if($uploadFile->isUploaded() AND $noErrors){
-				//				Pole názvů sloupců a hodnot obrázků
-//				$insertDbColums = array();
-//				$insertDbValues = array();
-
-				//					Příprava sloupců s hodnotami
-//				foreach (Locale::getAppLangs() as $lang) {
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.$lang);
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang);
-//				}
-//				array_push($insertDbColums, self::COLUMN_PHOTOS_FILE);
 				//			Projití pole o galerii jestli byla přidána
 				$sendPhotosLabel = false;
 				foreach ($sendPhotoArray as $photo) {
@@ -863,83 +510,84 @@ class PhotogaleryController extends Controller {
 						break;
 					}
 				}
-				
 //				Objekt pro práci s fotkama
 				$photoObj = new PhotoDetailModel();
-				
 //				Pokud byl vlože zip soubor
 				if($uploadFile->isZipFile()){
 					$files = new Files();
 //============================= ZMĚNA DOBY PROVÁDĚNÍ SCRIPTU ===========================
 //900 sekund
-					set_time_limit(900);
+					set_time_limit(3600);
 //======================================================================================
-					
 //					Rozbalení archívu
+					$progressBar->setMessage(_('Rozbalení archivu'));
 					$files->unZip($uploadFile->getTmpName(), $this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR, false);
-					
 //					Objekt pro ukládání fotek
 					$photoObj = new PhotoDetailModel();
-					
+					$countFiles=0;
+					$handle=opendir($this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR);
+					while (false!==($file = readdir($handle))) {
+						if ($file == "." OR $file == ".." OR is_dir($file)) continue;
+						$countFiles++;
+					}
+//					Nastavení progressbaru
+					$progressBar->setSteps(($countFiles*4));
 //					Otevření adresáře s rozbaleným archívem
 					$handle=opendir($this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR);
 					while (false!==($file = readdir($handle))) {
     					if ($file == "." OR $file == ".." OR is_dir($file)) continue;
-    					
     					$imageFromZip = new Images($this->errMsg(), $this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR.$file, false);
-
 //    					Pokud je obrázek tak vytvoříme miniatury a uložíme
     					if($imageFromZip->isImage()){
     						$insertDbValue = array();
-    						
-    						$imageFromZip->setImageName($file);
-    						$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir(), self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
-    						$imageFromZip->setCrop(true);
-    						$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, self::IMAGE_SMALL_WIDTH, self::IMAGE_SMALL_HEIGHT);
-    						$imageFromZip->setCrop(false);
-    						$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, self::IMAGE_MEDIUM_WIDTH, self::IMAGE_MEDIUM_HEIGHT);
-    					
-    						
+    						$saved = true;
+    						//TODO optimalizovat, tak aby byl nejlépe if jenom jeden
+    						if($saved){
+    							$progressBar->setMessage(_('Vytváření velkého obrázku'));
+    							$imageFromZip->setImageName($file);
+    							$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir(), self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
+    						}
+    						$imageName = $imageFromZip->getNewImageName();
+    						if($saved){
+    							$progressBar->setMessage(_('Vytváření malého obrázku'));
+    							$imageFromZip->setCrop(true);
+    							$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, self::IMAGE_SMALL_WIDTH, self::IMAGE_SMALL_HEIGHT);
+    						}
+    						if($saved){
+    							$progressBar->setMessage(_('Vytváření středního obrázku'));
+    							$imageFromZip->setCrop(false);
+    							$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, self::IMAGE_MEDIUM_WIDTH, self::IMAGE_MEDIUM_HEIGHT);
+    						}
+//							Pokd není název tak jej doplníme z názvu souboru
+    						if(!$sendPhotosLabel){
+    							$sendPhotoArray[self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getDefaultLang()] = $imageName;
+    						}
 //    						uložení fotky
-							$photoObj->saveNewPhoto($sendPhotoArray, $idGalery);
-    						
-    						
-////    						Vytvoření pole pro zápis do db
-//    						foreach (Locale::getAppLangs() as $lang) {
-//    							
-//    							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang] != null ?
-//									array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang], ENT_QUOTES)):
-//									array_push($insertDbValue, $imageFromZip->getNewImageName());
-////    							array_push($insertDbColums, self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.Locale::getDefaultLang());
-//    							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang] != null ?
-//    								array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang], ENT_QUOTES)):
-//    								array_push($insertDbValue, null);
-//    						}
-//    						array_push($insertDbValue, $imageFromZip->getNewImageName());
-//    						//Kvůli možnosti vkládání více řádků (obrázků)
-//							array_push($insertDbValues, $insertDbValue);
-							
+    						if($saved){
+    							$progressBar->setMessage(_('Ukládání do databáze'));
+    							$saved = $photoObj->saveNewPhoto($sendPhotoArray, $idGalery, $imageName);
+    							sleep(1);
+    						}
     					}
-
 					}
 //					smažeme dočasný adresář i s bordelem
+    				$progressBar->setMessage(_('Odstranění dočasných souborů'));
 					$files->rmDir($this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR);
-					
-//					$saveToDb = true;
+					$progressBar->close();
 				} 
-//				Jakýkoliv jiný soubor
+//				Jakýkoliv jiný soubor s obrázkem
 				else {
+					$progressBar->setSteps(4);
 					$image = new Images($this->errMsg(), $uploadFile->getTmpName());
 					if($image->isImage()){
-
-//						$insertDbValue = array();
 						$saved = true;
-						
 						if($saved){
+							$progressBar->setMessage(_('Vytváření velkého obrázku'));
 							$image->setImageName($uploadFile->getOriginalName());
 							$saved = $image->saveImage($this->getModule()->getDir()->getDataDir(), self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
 						}
 						if($saved){
+							$progressBar->setMessage(_('Vytváření malého obrázku'));
     						$image->setCrop(true);
 							$saved = $image->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, self::IMAGE_SMALL_WIDTH, self::IMAGE_SMALL_HEIGHT);
 						}
@@ -947,389 +595,53 @@ class PhotogaleryController extends Controller {
 							$image->setCrop(false);
 							$saved = $image->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, self::IMAGE_MEDIUM_WIDTH, self::IMAGE_MEDIUM_HEIGHT);
 						}
-						
 						$imageName = $image->getNewImageName();
-
 //						Pokd není název tak jej doplníme z názvu souboru
 						if(!$sendPhotosLabel){
+							$progressBar->setMessage(_('Vytváření středního obrázku'));
 							$sendPhotoArray[self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getDefaultLang()] = $imageName;
 						}
-						
-						
 //    					uložení fotky
 						if($saved){
+							$progressBar->setMessage(_('Ukládání do databáze'));
 							$saved = $photoObj->saveNewPhoto($sendPhotoArray, $idGalery, $imageName);
 						}
-						
-//						uložení
-						if($saved){
-							$this->infoMsg()->addMessage(_('Fotografie byla uložena'));
-							$this->getLink()->article()->action()->params()->reload();
-						} else {
-							$noErrors = false;
-							new CoreException(_('Fotografii se nepodařilo uložit, chyba při ukládání'), 1);
-						}
-						
-//						foreach (Locale::getAppLangs() as $lang) {
-////							array_push($insertDbColums, self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.$lang);
-//							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang] != null ?
-//							array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang], ENT_QUOTES)):
-//							array_push($insertDbValue, $imageName);
-//
-////							array_push($insertDbColums, self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang);
-//							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang] != null ?
-//							array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang], ENT_QUOTES)):
-//							array_push($insertDbValue, null);
-//						}
-//						
-//						array_push($insertDbValue, $imageName);
-//							
-//						$saveToDb = true;
-//							
-//						//Kvůli možnosti vkládání více řádků (obrázků)
-//						array_push($insertDbValues, $insertDbValue);
 					}
 				}
+//				zjištění zda vše proběhlo v pořádku
+				if($saved){
+					$this->infoMsg()->addMessage(_('Fotografie byly uloženy'));
+					$link =	$this->getLink()->action()->params();
+					
+//					Při přidávání galerie přnést na sezna galerií
+					if(!$reloadWithArticle AND !$this->getArticle()->isRoute()){
+						$link = $link->article();
+					}
+					$link->reload();
+				} else {
+					$noErrors = false;
+					new CoreException(_('Fotografie se nepodařilo uložit, chyba při ukládání'), 1);
+				}
 			}
-			
-//			echo "<pre>";
-//			print_r($insertDbValues);
-//			print_r($insertDbColums);
-//			echo "</pre>";
-			
-//			if($saveToDb AND $noErrors){
-//				$sectionId = null;
-////				Pokud je vytvářena nová sekce
-//				if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()] != null){
-//					$sqlInsSection = $this->saveNewSection();
-//
-//				//				Vložení do db
-//					if($this->getDb()->query($sqlInsSection)){
-//						$sectionId = $this->getDb()->getLastInsertedId();
-//					} else {
-//						new CoreException(_('Sekci se nepodařilo uložit, chyba při ukládání do db'), 7);
-//					}
-//					
-//				} else {
-//					$sectionId = htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID], ENT_QUOTES);
-//				}
-//
-////				Je ukládána nová galerie
-//				$idInsertedGalery = null;
-//				if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] != null){
-//
-//					$sqlGaleryInsert = $this->saveNewGalery($sectionId);
-//						
-//					//				Vložení do db
-//					if($this->getDb()->query($sqlGaleryInsert) AND $sectionId != null){
-//						$idInsertedGalery = $this->getDb()->getLastInsertedId();	
-//					} else {
-//						new CoreException(_('Galerii nebo novou sekci se nepodařilo uložit, chyba při ukládání do db'), 8);
-//					}
-//				} else {
-//					$idInsertedGalery = $_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID];
-//				}
-//				
-//								
-////				Vložení fotek do db
-//				if($idInsertedGalery != null){
-//					
-////					Doplnění ostatních sloupců s id uživatele a id galerie
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_ID_GALERY);
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_ID_USER);
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_TIME);		
-//					
-//					$sqlInsertPhoto = $this->getDb()->insert()->into($this->getModule()->getDbTable())
-//													->colums($insertDbColums);
-//													
-////					doplnění hodnot
-//					foreach ($insertDbValues as $value) {
-////						doplnění hodnot ostatních sloupců
-//						array_push($value, $idInsertedGalery);
-//						array_push($value, $this->getRights()->getAuth()->getUserId());
-//						array_push($value, time());	
-//						
-//						$sqlInsertPhoto->values($value);
-//					}
-//													
-//					
-//					if($this->getDb()->query($sqlInsertPhoto)){
-//						$this->infoMsg()->addMessage(_('Fotky byla/byly uloženy'));
-//						$this->getLink()->action()->reload();	
-//					} else {
-//						new CoreException(_('Fotku se nepodařilo uložit, chyba při ukládání do db'), 9);
-//					}
-//				}
-//			}
+			unset($progressBar);
 		}
-		
 //		Generování výchozího obsahu -----------------------------------
 		$pArray = $localeHelper->generateArray(array(self::FORM_PHOTO_LABEL_PREFIX, self::FORM_PHOTO_TEXT_PREFIX),$sendPhotoArray);
 		$gArray = $localeHelper->generateArray(array(self::FORM_PHOTO_LABEL_PREFIX, self::FORM_PHOTO_TEXT_PREFIX),$sendGaleryArray);
-
 //		fotka do viewru
 		$this->container()->addData('photo', $pArray);
 //		galerie do viewru
 		$this->container()->addData('galery', $gArray);
-		
-		
 //		Načtení sekcí
 		$sectionsObj = new SectionListModel();
 		$sections = $sectionsObj->getSectionList();
 		$this->container()->addData('sections', $sections);
 		unset($sectionsObj);
-		
 //		Načtení galerií
 		$galeryObj = new GaleriesListModel();
 		$galeries = $galeryObj->getGaleriesListWithSections();
 		$this->container()->addData('galeries', $galeries);
 		unset($galeryObj);
-		
-//		echo("<pre>");
-//		print_r($galeries);
-//		echo("</pre>");
-		
-		
-//		$this->createModel('addPhoto');
-//		
-////		Podle počtu jazyků inicializujeme pole pro přidání novinky
-//		foreach (Locale::getAppLangs() as $lang) {
-//			$this->getModel()->newSectionArray[$lang] = null;
-//			$this->getModel()->newGaleryArray[$lang] = array();			
-//			$this->getModel()->photoArray[$lang] = array();			
-//		}
-//		
-////		Uložení nových fotek
-//		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_SEND])){
-//			$noErrors = true;
-//			
-////			Kontrola jestli byly zadány všechny potřebné údaje při vytváření sekce nabo galerii
-//			if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()] != null AND
-//			   $_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] == null){
-//			   $this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje pro vytvoření sekce a galerie'));
-//			   $noErrors=false;	
-//			}
-//			
-//			
-//			$saveToDb = false;
-//			
-//			$uploadFile = new UploadFiles($this->errMsg());
-//			
-//			$uploadFile->upload(self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_FILE);
-//			
-//			if($uploadFile->isUploaded() AND $noErrors){
-//				//				Pole názvů sloupců a hodnot obrázků
-//				$insertDbColums = array();
-//				$insertDbValues = array();
-//
-//				//					Příprava sloupců s hodnotami
-//				foreach (Locale::getAppLangs() as $lang) {
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.$lang);
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang);
-//				}
-//				array_push($insertDbColums, self::COLUMN_PHOTOS_FILE);
-//
-////				Pokud byl vlože zip soubor
-//				if($uploadFile->isZipFile()){
-//					$files = new Files();
-//
-////					Rozbalení archívu
-//					$files->unZip($uploadFile->getTmpName(), $this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR, false);
-//				
-////============================= ZMĚNA DOBY PROVÁDĚNÍ SCRIPTU ===========================
-////600 sekund
-//					set_time_limit(900);
-////======================================================================================
-//					
-////					Otevření adresáře s rozbaleným archívem
-//					$handle=opendir($this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR);
-//					while (false!==($file = readdir($handle))) {
-//    					if ($file == "." OR $file == ".." OR is_dir($file)) continue;
-//    					
-//    					$imageFromZip = new Images($this->errMsg(), $this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR.$file, false);
-//
-////    					Pokud je obrázek tak vytvoříme miniatury a uložíme
-//    					if($imageFromZip->isImage()){
-//    						$insertDbValue = array();
-//    						
-//    						$imageFromZip->setImageName($file);
-//    						$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir(), self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
-//    						$imageFromZip->setCrop(true);
-//    						$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, self::IMAGE_SMALL_WIDTH, self::IMAGE_SMALL_HEIGHT);
-//    						$imageFromZip->setCrop(false);
-//    						$imageFromZip->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, self::IMAGE_MEDIUM_WIDTH, self::IMAGE_MEDIUM_HEIGHT);
-//    					
-////    						Vytvoření pole pro zápis do db
-//    						foreach (Locale::getAppLangs() as $lang) {
-//    							
-//    							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang] != null ?
-//									array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang], ENT_QUOTES)):
-//									array_push($insertDbValue, $imageFromZip->getNewImageName());
-////    							array_push($insertDbColums, self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.Locale::getDefaultLang());
-//    							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang] != null ?
-//    								array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang], ENT_QUOTES)):
-//    								array_push($insertDbValue, null);
-//    						}
-//    						array_push($insertDbValue, $imageFromZip->getNewImageName());
-//    						//Kvůli možnosti vkládání více řádků (obrázků)
-//							array_push($insertDbValues, $insertDbValue);
-//							
-//    					}
-//
-//					}
-////					smažeme dočasný adresář i s bordelem
-//					$files->rmDir($this->getModule()->getDir()->getDataDir().self::IMAGES_TEMP_DIR);
-//					
-//					$saveToDb = true;
-//				} 
-////				Jakýkoliv jiný soubor
-//				else {
-//					$image = new Images($this->errMsg(), $uploadFile->getTmpName());
-//					if($image->isImage()){
-//						$insertDbValue = array();
-//						$image->setImageName($uploadFile->getOriginalName());
-//						$image->saveImage($this->getModule()->getDir()->getDataDir(), self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
-//    					$image->setCrop(true);
-//						$image->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, self::IMAGE_SMALL_WIDTH, self::IMAGE_SMALL_HEIGHT);
-//						$image->setCrop(false);
-//						$image->saveImage($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, self::IMAGE_MEDIUM_WIDTH, self::IMAGE_MEDIUM_HEIGHT);
-//						$imageName = $image->getNewImageName();
-//
-//						foreach (Locale::getAppLangs() as $lang) {
-////							array_push($insertDbColums, self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.$lang);
-//							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang] != null ?
-//							array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang], ENT_QUOTES)):
-//							array_push($insertDbValue, $imageName);
-//
-////							array_push($insertDbColums, self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang);
-//							$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang] != null ?
-//							array_push($insertDbValue, htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang], ENT_QUOTES)):
-//							array_push($insertDbValue, null);
-//						}
-//						
-//						array_push($insertDbValue, $imageName);
-//							
-//						$saveToDb = true;
-//							
-//						//Kvůli možnosti vkládání více řádků (obrázků)
-//						array_push($insertDbValues, $insertDbValue);
-//					}
-//				}
-//			}
-//			
-////			echo "<pre>";
-////			print_r($insertDbValues);
-////			print_r($insertDbColums);
-////			echo "</pre>";
-//			
-//			if($saveToDb AND $noErrors){
-//				$sectionId = null;
-////				Pokud je vytvářena nová sekce
-//				if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()] != null){
-//					$sqlInsSection = $this->saveNewSection();
-//
-//				//				Vložení do db
-//					if($this->getDb()->query($sqlInsSection)){
-//						$sectionId = $this->getDb()->getLastInsertedId();
-//					} else {
-//						new CoreException(_('Sekci se nepodařilo uložit, chyba při ukládání do db'), 7);
-//					}
-//					
-//				} else {
-//					$sectionId = htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID], ENT_QUOTES);
-//				}
-//
-////				Je ukládána nová galerie
-//				$idInsertedGalery = null;
-//				if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] != null){
-//
-//					$sqlGaleryInsert = $this->saveNewGalery($sectionId);
-//						
-//					//				Vložení do db
-//					if($this->getDb()->query($sqlGaleryInsert) AND $sectionId != null){
-//						$idInsertedGalery = $this->getDb()->getLastInsertedId();	
-//					} else {
-//						new CoreException(_('Galerii nebo novou sekci se nepodařilo uložit, chyba při ukládání do db'), 8);
-//					}
-//				} else {
-//					$idInsertedGalery = $_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID];
-//				}
-//				
-//								
-////				Vložení fotek do db
-//				if($idInsertedGalery != null){
-//					
-////					Doplnění ostatních sloupců s id uživatele a id galerie
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_ID_GALERY);
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_ID_USER);
-//					array_push($insertDbColums, self::COLUMN_PHOTOS_TIME);		
-//					
-//					$sqlInsertPhoto = $this->getDb()->insert()->into($this->getModule()->getDbTable())
-//													->colums($insertDbColums);
-//													
-////					doplnění hodnot
-//					foreach ($insertDbValues as $value) {
-////						doplnění hodnot ostatních sloupců
-//						array_push($value, $idInsertedGalery);
-//						array_push($value, $this->getRights()->getAuth()->getUserId());
-//						array_push($value, time());	
-//						
-//						$sqlInsertPhoto->values($value);
-//					}
-//													
-//					
-//					if($this->getDb()->query($sqlInsertPhoto)){
-//						$this->infoMsg()->addMessage(_('Fotky byla/byly uloženy'));
-//						$this->getLink()->action()->reload();	
-//					} else {
-//						new CoreException(_('Fotku se nepodařilo uložit, chyba při ukládání do db'), 9);
-//					}
-//				}
-//			}
-//		}
-//		
-//		
-//		//		načtení sekcí
-//		$sqlSelectSection = $this->getDb()->select()->from($this->getModule()->getDbTable(3), 
-//						array(self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang().",
-//						".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getDefaultLang().")", self::COLUMN_SECTION_ID))
-//						->where(self::COLUMN_SECTION_ID_ITEM.' = '.$this->getModule()->getId());
-//													
-//		$this->getModel()->sectionArray = $this->getDb()->fetchAssoc($sqlSelectSection);
-//		
-//		//		načtení galerií
-//		$sqlSelectSection = $this->getDb()->select()->from(array('gal' =>$this->getModule()->getDbTable(2)), 
-//						array(self::COLUMN_GALERY_LABEL_IMAG => "IFNULL(gal.".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getLang().",
-//						gal.".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getDefaultLang().")", self::COLUMN_GALERY_ID, self::COLUMN_GALERY_URLKEY))
-//						->join(array('sec' => $this->getModule()->getDbTable(3)), 'sec.'.self::COLUMN_SECTION_ID.' = gal.'.self::COLUMN_GALERY_ID_SECTION, null, 
-//						array(self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(sec.".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getLang().",
-//						sec.".self::COLUMN_SECTION_LABEL_LANG_PREFIX.Locale::getDefaultLang().")"))
-//						->where('sec.'.self::COLUMN_SECTION_ID_ITEM.' = '.$this->getModule()->getId())
-//						->order('sec.'.self::COLUMN_SECTION_ID);
-//													
-//		$this->getModel()->galeryArray = $this->getDb()->fetchAssoc($sqlSelectSection);
-//		
-//		if($this->getArticle()->isArticle() AND !$this->getArticle()->withRoute()){
-//			reset($this->getModel()->galeryArray);
-//	
-//			while($this->getModel()->idSelectedGalery == null){
-//				$currentGalery = current($this->getModel()->galeryArray);
-//				if($currentGalery[self::COLUMN_GALERY_URLKEY] == $this->getArticle()->getArticle()){
-//					$this->getModel()->idSelectedGalery = $currentGalery[self::COLUMN_GALERY_ID];
-//				}
-//				next($this->getModel()->galeryArray);
-//			}
-//			reset($this->getModel()->galeryArray);
-//		}
-//		
-//		//				Doplnění nastavených hodnot
-//		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID])){
-//			$this->getModel()->idSelectedGalery = $_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID];
-//		}
-//		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID])){
-//			$this->getModel()->idSelectedSection = $_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_ID];
-//		}
-		
 		$this->container()->addLink('link_back', $this->getLink()->action());
 	}
 	
@@ -1338,19 +650,10 @@ class PhotogaleryController extends Controller {
 	 */
 	public function sectionAddgaleryController() {
 		$this->checkWritebleRights();
-		
 		$sectionObj = new SectionDetailModel();
 		$section = $sectionObj->getSectionByUrlkey($this->getArticle()->getArticle());
-		
 		$isSelSection = $section[self::COLUMN_SECTION_ID];
-		
 		$this->addgaleryController($isSelSection);
-		
-//		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(3))
-//											 ->where(self::COLUMN_SECTION_URLKEY." = '".$this->getArticle()->getArticle()."'");	
-//		
-//		$this->getModel()->idSelectedSection = $this->getDb()->fetchObject($sqlSelect);
-//		$this->getModel()->idSelectedSection = $this->getModel()->idSelectedSection->{self::COLUMN_SECTION_ID};
 	}
 
 	/**
@@ -1358,14 +661,7 @@ class PhotogaleryController extends Controller {
 	 */
 	public function sectionAddphotosController() {
 		$this->checkWritebleRights();
-		
 		$this->addphotosController();
-		
-//		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(3))
-//											 ->where(self::COLUMN_SECTION_URLKEY." = '".$this->getArticle()->getArticle()."'");	
-//		
-//		$this->getModel()->idSelectedSection = $this->getDb()->fetchObject($sqlSelect);
-//		$this->getModel()->idSelectedSection = $this->getModel()->idSelectedSection->{self::COLUMN_SECTION_ID};
 	}
 	
 	/**
@@ -1374,60 +670,73 @@ class PhotogaleryController extends Controller {
 	public function showController()
 	{
 //		Mazání zvolené fotky
-//		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_DELETE])){
-//			if(!is_numeric($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID])){
-//				new CoreException(_('Fotku se nepodařilo smazat, bylo zadáno nekorektní id'),10);
-//			} else {
-//				if($this->deletePhotos((int)$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID])){
-//					$this->infoMsg()->addMessage(_('Fotka byla smazána'));
-//					
-//					$this->getLink()->params()->reload();
-//				} else {
-//					new CoreException(_('Fotku se nepodařilo smazat. Zřejmně nemáte dostatečná oprávnění pro mazání'),11);
-//				}
-//			}
-//			
-//		}
+		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_DELETE]) AND $this->getRights()->isWritable()){
+			if(!is_numeric($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID])){
+				new CoreException(_('Fotku se nepodařilo smazat, bylo zadáno nekorektní id'),10);
+			} else {
+				$idPhoto = (int)$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID];
+				$photoObj = new PhotoDetailModel();
+				$photo = $photoObj->getPhotoById($idPhoto);
+				if(!empty($photo) AND $this->deletePhotoFile($photo[self::COLUMN_PHOTOS_FILE])){
+//					Vymazání z db
+					if($photoObj->deletePhoto($idPhoto)){
+						$this->infoMsg()->addMessage(_('Fotka byla smazána'));
+						$this->getLink()->params()->reload();
+					} else {
+						new CoreException(_('Fotku se nepodařilo smazat. Chyba při mazání'),11);
+					}
+				}
+				unset($photoObj);
+			}
+		}
 		
 //		Mazání zvolené galerie
-//		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_BUTTON_DELETE])){
-//			$idGalery = (int)htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID], ENT_QUOTES);
-//			
-//			if($this->deleteGaleries($idGalery)){
-//				$this->infoMsg()->addMessage(_('Galeire byla smazána'));
-//				$this->getLink()->action()->article()->params()->reload();
-//			} else {
-//				new CoreException(_('Galerii se nepodařilo smazat'), 12);
-//			}
-//		}
-//		
+		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_BUTTON_DELETE]) AND $this->getRights()->isWritable()){
+			$idGalery = (int)htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID], ENT_QUOTES);
+			$galeryObj = new GaleryDetailModel();
+			$photoObj = new PhotoDetailModel();
+			$photos = $galeryObj->getPhotosList($idGalery);
+			$deleted = true;
+//			Vymazání všech fotek
+			foreach ($photos as $pkey => $photo) {
+				if($this->deletePhotoFile($photo[self::COLUMN_PHOTOS_FILE])){
+					if(!$photoObj->deletePhoto($photo[self::COLUMN_PHOTOS_ID])){
+						$deleted = false;
+					}
+				} else {
+					$deleted = false;
+				}
+			}
+			if($deleted){
+				if($galeryObj->deleteGalery($idGalery)){
+					$this->infoMsg()->addMessage(_('Galeire byla smazána'));
+					$this->getLink()->action()->article()->params()->reload();
+				} else {
+					new CoreException(_('Galerii se nepodařilo smazat'), 12);
+				}
+			} else {
+				new CoreException(_('Nepodařilo se smazat fotky z galerie.'), 12);
+			}
+		}
 		
-//		Pokud se neprohlíží jednotlivé fotky
+//		Pokud se zobrazuje celá galerie
 		if(!isset($_GET[self::PHOTOS_SCROLL_URL_PARAM])){
 			$galeryObj = new GaleryDetailModel();
-			
 			$galery = $galeryObj->getGaleryDetail($this->getArticle()->getArticle());
-			
 			$this->container()->addData('galery', $galery);
 			$this->container()->addLink('edit_galery', $this->getLink()->action($this->getAction()->actionEditgalery()));
-			
 			$photos = $galeryObj->getPhotosList($galery[self::COLUMN_GALERY_ID]);
-			
 			$photoNumber = 1;
 			foreach ($photos as $photoKey => $photo) {
 				$photos[$photoKey][self::COLUMN_PHOTOS_SHOW_LINK]=$this->getLink()->param(self::PHOTOS_SCROLL_URL_PARAM, $photoNumber);
 				$photos[$photoKey][self::COLUMN_PHOTOS_EDIT_LINK_IMAG]=$this->getLink()->action($this->getAction()->actionEditphoto());
 				$photoNumber++;
 			}
-			
 			$this->container()->addData('photos', $photos);
 			$this->container()->addData('small_images_dir', $this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR);
-			
-//			echo "<pre>";
-//			print_r($galery);
-//			print_r($photos);
-//			echo "</pre>";
-			
+			if($this->getRights()->isWritable()){
+				$this->container()->addLink('edit_photos', $this->getLink()->action($this->getAction()->actionEditphotos()));
+			}
 //			//Odkaz zpět
 			$session = new Sessions();
 			if(!$session->isEmpty(self::LINK_BACK_SESSION)){
@@ -1435,7 +744,6 @@ class PhotogaleryController extends Controller {
 			} else {
 				$this->container()->addLink('link_back', $this->getLink()->action()->article());
 			}
-			
 //			Odkaz pro přidání fotky
 			$this->container()->addLink('add_photo', $this->getLink()->action($this->getAction()->actionAddphotos()));
 		}
@@ -1444,66 +752,47 @@ class PhotogaleryController extends Controller {
 //			Kontroler pro zobrazení fotografie
 			$this->showPhotoControllerPrivate();
 		}
-		
-//Adresář s obrázky
-//		$this->getModel()->dirToImages = $this->getModule()->getDir()->getDataDir();
-
-//		echo "<pre>";
-//		print_r($this->getModel()->photoDetailArray);
-//		echo "</pre>";
 	}
 	
 	private function showPhotoControllerPrivate() {
-		//			Změna viewru na zobrazení fotky
+//			Změna viewru na zobrazení fotky
 			$this->changeActionView('showPhoto');
-			
 			$galeryObj = new GaleryDetailModel();
-			
 			$galery = $galeryObj->getGaleryDetail($this->getArticle()->getArticle());
-			
 			$photoObj = new PhotoDetailModel();
-			
 			$scroll = $this->eplugin()->scroll();
 			$scroll->setUrlParam(self::PHOTOS_SCROLL_URL_PARAM);
-
 //		  	Výpočet scrolovátek									 
 	  		$scroll->setCountRecordsOnPage(1);
 	  		$scroll->setCountAllRecords($galeryObj->getNumPhotos($galeryObj->getIdGalery()));
-	  		
 //	  		Přiřazení scrolovátek
 	  		$this->container()->addEplugin('scroll', $scroll);
-	  		
 //	  		Načtení fotky
 	  		$photo = $photoObj->getPhoto($galeryObj->getIdGalery(), $scroll->getStartRecord(), $scroll->getCountRecords());
 			$this->container()->addData('photo', $photo);
-	  		
 			$this->container()->addData('photo_label', $photo[self::COLUMN_PHOTOS_LABEL_IMAG]);
 			$this->container()->addData('galery_label', $galery[self::COLUMN_GALERY_LABEL_IMAG]);
-	  		
+			if($this->getRights()->isWritable()){
+				$this->container()->addLink('link_edit', $this->getLink()->action($this->getAction()->actionEditphoto()));
+			}
 //			Adresář s obrázky
 			$this->container()->addData('images_dir', $this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR);
 			$this->container()->addData('images_big_dir', $this->getModule()->getDir()->getDataDir());
-			
 //			Odkaz zpět
-			$this->container()->addLink('link_back', $this->getLink()->withoutParam(self::PHOTOS_SCROLL_URL_PARAM));;
+			$this->container()->addLink('link_back', $this->getLink()->withoutParam(self::PHOTOS_SCROLL_URL_PARAM));
 	}
-	
 
 	/**
 	 * Kontroler pro editaci galerie
 	 */
 	public function editgaleryController() {
 		$this->checkWritebleRights();
-		
 		$galeryObj = new GaleryDetailModel();
-		
 		$galery = $galeryObj->getGaleryDetailAllLangs($this->getArticle()->getArticle());
-		
 		if(empty($galery)){
 			new CoreException(_('Požadovaná galerie neexistuje'), 2);
 			return false;
 		}
-		
 //		Čas vytvoření galerie
 		$this->container()->addData('date_select', $galery[self::COLUMN_GALERY_TIME]);
 		
@@ -1513,41 +802,30 @@ class PhotogaleryController extends Controller {
 		} else {
 			$this->container()->addData('galery_label', $galery[self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getDefaultLang()]);
 		}
-		
 //		Načtení sekcí
 		$sectionsObj = new SectionListModel();
 		$sections = $sectionsObj->getSectionList();
 		$this->container()->addData('sections', $sections);
 		$this->container()->addData('section_select', $galery[self::COLUMN_GALERY_ID_SECTION]);
-		
 //		Helpre pro práci s jazykovými poli
 		$localeHelper = new LocaleCtrlHelper();
-		
 		$sendArray = array();
-		
 //		pokud byla galerie odeslána
 		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_BUTTON_SEND])){
-			
 //			Vygenerování datumu
 			$dateHelp = new DateTimeCtrlHelper();
 			$dateStamp = $dateHelp->createStampSmartyPost(self::FORM_GALERY_PREFIX.self::FORM_GALERY_DATE);
 			$this->container()->addData('date_select', $dateStamp);
-			
 //			Vybraná sekce
 			$idSelSection = (int)htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID_SECTION]);
 			$this->container()->addData('section_select', $idSelSection);
-			
 			$sendArray = $localeHelper->postsToArray(array(self::FORM_GALERY_LABEL_PREFIX, self::FORM_GALERY_TEXT_PREFIX), self::FORM_GALERY_PREFIX);
-			
 			if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] == null){
 				$this->errMsg()->addMessage(_('Nebyly zadány všechny povinné údaje'));
 			} else {
-				
 				$sendArray[self::COLUMN_GALERY_ID_SECTION] = $idSelSection;
 				$sendArray[self::COLUMN_GALERY_TIME] = $dateStamp;
-				
 				$updated = $galeryObj->saveEditGalery($sendArray, $this->getArticle()->getArticle());
-				
 				if($updated){
 					$this->infoMsg()->addMessage(_("Galerie byla upravena"));
 					$this->getLink()->action()->reload();
@@ -1556,87 +834,11 @@ class PhotogaleryController extends Controller {
 				}
 			}
 		}
-
-
-		
 		$lArray = $localeHelper->generateArray(array(self::FORM_GALERY_LABEL, self::FORM_GALERY_TEXT), $sendArray,$galery);
-		
-//		echo("<pre>");
-//		print_r($lArray);
-//		echo("</pre>");
-		
 //		Sekce do viewru
 		$this->container()->addData('galery', $lArray);
-		
 //		Odkaz zpět			
 		$this->container()->addLink('link_back', $this->getLink()->action());
-		
-//		$this->createModel('editGalery');
-
-//		$idGalery = (int)htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_ID], ENT_QUOTES);
-//		$this->getModel()->idGalery = $idGalery;
-		
-//		Podle počtu jazyků inicializujeme pole pro přidání novinky
-//		foreach (Locale::getAppLangs() as $lang) {
-//			$this->getModel()->galeryArray[$lang] = array();			
-//		}
-
-//		if(isset($_POST[self::FORM_GALERY_PREFIX.self::FORM_BUTTON_SEND])){
-//			if($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.Locale::getDefaultLang()] == null){
-//				$this->errMsg()->addMessage(_('Nebyl zadán povinný název galerie'));
-//				
-//				foreach (Locale::getAppLangs() as $lang) {
-//					$this->getModel()->galeryArray[$lang][self::COLUMN_GALERY_LABEL_IMAG] = htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.$lang], ENT_QUOTES);
-//					$this->getModel()->galeryArray[$lang][self::COLUMN_GALERY_TEXT_IMAG] = htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_TEXT_PREFIX.$lang], ENT_QUOTES);
-//				}
-//			} else {
-////				Pole pro úpravu
-//				$updateArray = array();
-//				foreach (Locale::getAppLangs() as $lang) {
-//					$_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.$lang] != null ? $label = htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_LABEL_PREFIX.$lang], ENT_QUOTES) 
-//																				   : $label = null;
-//					$_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_TEXT_PREFIX.$lang] != null ? $text = htmlspecialchars($_POST[self::FORM_GALERY_PREFIX.self::FORM_GALERY_TEXT_PREFIX.$lang], ENT_QUOTES) 
-//																				   : $text = null;
-//					
-//					$updateArray[self::COLUMN_GALERY_LABEL_LANG_PREFIX.$lang] = $label;
-//					$updateArray[self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang] = $text;
-//				}
-//				
-////				Vložení do db
-//				$sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable(2))
-//													 ->set($updateArray)
-//													 ->where(self::COLUMN_GALERY_URLKEY." = '".$this->getArticle()->getArticle()."'")
-//													 ->where(self::COLUMN_GALERY_ID." = ".$idGalery);
-//				
-//				//				Vložení do db
-//				if($this->getDb()->query($sqlInsert)){
-//					$this->infoMsg()->addMessage(_('Galerie byla upravena'));
-//					$this->getLink()->action()->reload();
-//				} else {
-//					new CoreException(_('Galerii se nepodařilo uložit, chyba při ukládání do db'), 13);
-//				}			
-//			}
-//			
-//		}
-	
-//		načtení galerie
-//		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(2), array(self::COLUMN_GALERY_LABEL_IMAG => "IFNULL(".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getDefaultLang().")", '*'))
-//					->where(self::COLUMN_GALERY_URLKEY." = '".$this->getArticle()->getArticle()."'")
-//					->where(self::COLUMN_GALERY_ID.' = '.$idGalery);
-//			
-//		$galery = $this->getDb()->fetchObject($sqlSelect);
-//		$this->getModel()->idGalery = $galery->{self::COLUMN_GALERY_ID};
-//		$this->getModel()->nameGalery = $galery->{self::COLUMN_GALERY_LABEL_IMAG};
-//		
-//		
-//		if(empty($this->getModel()->galeryArray[Locale::getDefaultLang()])){
-//			foreach (Locale::getAppLangs() as $lang) {
-//				$this->getModel()->galeryArray[$lang][self::COLUMN_GALERY_LABEL_IMAG] = $galery->{self::COLUMN_GALERY_LABEL_LANG_PREFIX.$lang};
-//				$this->getModel()->galeryArray[$lang][self::COLUMN_GALERY_TEXT_IMAG] = $galery->{self::COLUMN_GALERY_TEXT_LANG_PREFIX.$lang};
-//			}
-//		}
-//		
-//		$this->container()->addLink('link_back', $this->getLink()->action());
 	}
 		
 	/**
@@ -1644,253 +846,179 @@ class PhotogaleryController extends Controller {
 	 */
 	public function editphotoController() {
 		$this->checkWritebleRights();
-		
-		$this->createModel('photoEditDetail');
-			
+		if(!isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID])){
+			new CoreException(_('Žádné id fotografie nebylo přeneseno'), 2);
+			return false;
+		}
+		if(!is_numeric($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID])){
+			new CoreException(_('Špatně zadané id fotografie'), 2);
+			return false;
+		}
 		$idPhoto = (int)$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID];
-
+		$photoObj = new PhotoDetailModel();
+		$photo = $photoObj->getPhotoById($idPhoto);
+		if(empty($photo)){
+			new CoreException(_('Požadovaná fotka neexistuje'), 2);
+			return false;
+		}
+		
+//		Zvolení názvu fotky
+		if($photo[self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getLang()] != null){
+			$this->container()->addData('photo_label', $photo[self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getLang()]);
+		} else {
+			$this->container()->addData('photo_label', $photo[self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getDefaultLang()]);
+		}
+		$this->container()->addData('photo_id', $photo[self::COLUMN_PHOTOS_ID]);
+		
+//		Helpre pro práci s jazykovými poli
+		$localeHelper = new LocaleCtrlHelper();
+		$sendArray = array();
+		
+//		pokud byla galerie odeslána
 		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_SEND])){
+			$sendArray = $localeHelper->postsToArray(array(self::FORM_PHOTO_LABEL_PREFIX, self::FORM_PHOTO_TEXT_PREFIX), self::FORM_PHOTO_PREFIX);
 			if($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.Locale::getDefaultLang()] == null){
-				$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje'));
-				
-				foreach (Locale::getAppLangs() as $lang) {
-					$this->getModel()->photoArray[$lang][self::COLUMN_PHOTOS_LABEL_IMAG] = htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang], ENT_QUOTES);
-					$this->getModel()->photoArray[$lang][self::COLUMN_PHOTOS_TEXT_LANG_PREFIX] = htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX .$lang], ENT_QUOTES);
-			   	}
+				$this->errMsg()->addMessage(_('Nebyly zadány všechny povinné údaje'));
 			} else {
-//				Pole pro vložení
-				$updateArray = array();
-				foreach (Locale::getAppLangs() as $lang) {
-					$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang] != null ? $label = htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_LABEL_PREFIX.$lang], ENT_QUOTES) 
-																				   : $label = null;
-					$_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang] != null ? $text = htmlspecialchars($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_TEXT_PREFIX.$lang], ENT_QUOTES) 
-																				   : $text = null;
-					
-					$updateArray[self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.$lang] = $label;
-					$updateArray[self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang] = $text;
-				}
 				
-//				Vložení do db
-				$sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
-													 ->set($updateArray)
-													 ->where(self::COLUMN_PHOTOS_ID." = ".$idPhoto);
-				
-													 
-				if($this->getDb()->query($sqlInsert)){
+				$updated = $photoObj->saveEditPhoto($sendArray, $idPhoto);
+				if($updated){
 					$this->infoMsg()->addMessage(_("Fotka byla upravena"));
-					
 					$this->getLink()->action()->reload();
 				} else {
-					new CoreException(_("Nepodařilo se upravit fotku v db"),14);
+					new CoreException(_("Nepodařilo se upravit fotku"),4);
 				}
-				
-				
 			}
-			
 		}
-		
-//			načtení fotky z d
-		$sqlSelect = $this->getDb()->select()->from(array('photo' => $this->getModule()->getDbTable()))
-				->join(array('galery' => $this->getModule()->getDbTable(2)), 'photo.'.self::COLUMN_PHOTOS_ID_GALERY.' = galery.'.self::COLUMN_GALERY_ID, null, array(self::COLUMN_GALERY_LABEL_IMAG => "IFNULL(galery.".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getLang().", galery.".self::COLUMN_GALERY_LABEL_LANG_PREFIX.Locale::getDefaultLang().")"))
-				->where('galery.'.self::COLUMN_GALERY_URLKEY." = '".$this->getArticle()."'")
-				->where('photo.'.self::COLUMN_PHOTOS_ID." = ".$idPhoto);
-//				->limit($scroll->getStartRecord(), $scroll->getCountRecords());
-
-		$photoDetail = $this->getDb()->fetchObject($sqlSelect);
-
-		if($photoDetail == null){
-			new CoreException(_('Fotku se nepodařilo načíst, zřejmně šaptně zadané id'), 15);
+		$lArray = $localeHelper->generateArray(array(self::FORM_PHOTO_LABEL_PREFIX, self::FORM_PHOTO_TEXT_PREFIX), $sendArray,$photo);
+//		Sekce do viewru
+		$this->container()->addData('photo', $lArray);
+//		Odkaz zpět			
+		$this->container()->addLink('link_back', $this->getLink()->action());
+	}
+	
+	/**
+	 * Kontroler pro úpravu více fotografií
+	 */
+	public function editphotosController() {
+		$this->checkWritebleRights();
+		//		Odkaz zpět			
+		$this->container()->addLink('link_back', $this->getLink()->action());
+		if(!isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID]) AND !isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_SEND])){
+			$this->errMsg()->addMessage(_('Nebyla vybrána žádná fotografie'), true);
+			$this->getLink()->action()->reload();
+		}
+		$idPhotos = array();
+		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID])){
+			$idPhotos = $_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_ID];
 		} else {
-
-			if(empty($this->getModel()->photoArray)){
-				//		Podle počtu jazyků inicializujeme pole pro editaci fotky
-				foreach (Locale::getAppLangs() as $lang) {
-					$this->getModel()->photoArray[$lang][self::COLUMN_PHOTOS_LABEL_IMAG] = $photoDetail->{self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.$lang};
-					$this->getModel()->photoArray[$lang][self::COLUMN_PHOTOS_TEXT_IMAG] = $photoDetail->{self::COLUMN_PHOTOS_TEXT_LANG_PREFIX.$lang};
-				}
-			}
-			//			Doplnění ostatních záznamů
-			$this->getModel()->idPhoto = $photoDetail->{self::COLUMN_PHOTOS_ID};
-			$this->getModel()->photoFile = $photoDetail->{self::COLUMN_PHOTOS_FILE};
-			
-			if($photoDetail->{self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getLang()} != null){
-				$this->getModel()->photoName = $photoDetail->{self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getLang()};
-			} else {
-				$this->getModel()->photoName = $photoDetail->{self::COLUMN_PHOTOS_LABEL_LANG_PREFIX.Locale::getDefaultLang()};
-			}
+			$this->errMsg()->addMessage(_('Nekorektně odeslaná id fotek'), true);
+			$this->getLink()->action()->reload();
 		}
-			
-		//			Adresář s obrázky
-		$this->getModel()->dirToSmallImages = $this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR;
-
-		$session = new Sessions();
-//		if($session->isEmpty(self::LINK_BACK_SESSION)){
-			$this->getModel()->linkToBack = $this->getLink()->action();
-//		} else {
-//			$this->getModel()->linkToBack = $session->get(self::LINK_BACK_SESSION);
-//		}
-		
-	}
-	
-	/**
-	 * Metoda pro mazání fotky/fotek
-	 * 
-	 * @param integer -- id fotky nebo id galerie
-	 * @param boolean -- jestli se má mazat podle id galerie
-	 * 
-	 * @return boolean -- true pokud byla fotka/fotky smazány
-	 */
-	private function deletePhotos($id, $allPhotosFromGalery = false ) {
-		if(!$allPhotosFromGalery){
-
-			//		načtení fotky z d
-			$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable())
-			->where(self::COLUMN_PHOTOS_ID.' = '.$id);
-
-			$photoDetail = $this->getDb()->fetchObject($sqlSelect);
-
-			//		Vymazání souborů fotek
-			$files = new Files();
-			$allFilesDeleted = true;
-
-			if($files->exist($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR.$photoDetail->{self::COLUMN_PHOTOS_FILE}) AND
-				!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-				$allFilesDeleted = false;
+		$sendArray = array();
+//		Co se s fotkama provádí
+//		Je-li mazáno
+		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_IS_EDIT]) 
+			AND $_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_IS_EDIT] == 0 
+			AND isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_DELETE])){
+			$photoObj = new PhotoDetailModel();
+			$photos = $photoObj->getPhotosById($idPhotos);
+			foreach ($photos as $photo) {
+				if(!$this->deletePhotoFile($photo[self::COLUMN_PHOTOS_FILE])){
+					new CoreException(_('Chyba při mazání souborů fotek'), 2);
+				} else if(!$photoObj->deletePhoto($photo[self::COLUMN_PHOTOS_ID])){
+					new CoreException(_('Chyba při mazání fotek z databáze'), 2);
+				}
 			}
-			if($files->exist($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR.$photoDetail->{self::COLUMN_PHOTOS_FILE}) AND
-				!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-				$allFilesDeleted = false;
-			}
-			if($files->exist($this->getModule()->getDir()->getDataDir().$photoDetail->{self::COLUMN_PHOTOS_FILE}) AND
-				!$files->deleteFile($this->getModule()->getDir()->getDataDir(), $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-				$allFilesDeleted = false;
-			}
-
-			//		if(!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE})
-			//		   OR !$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE})
-			//		   OR !$files->deleteFile($this->getModule()->getDir()->getDataDir(), $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-			//			$allFilesDeleted = false;
-			//
-			//		}
-
-			//		Končný výmaz z db
-			$sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable())
-			->where(self::COLUMN_PHOTOS_ID.' = '.$id);
-
-			if($allFilesDeleted AND $this->getDb()->query($sqlDelete)){
-				return true;
-			} else {
-				return false;
-			}
+			$this->infoMsg()->addMessage(_('Fotky byly vymazány'));
+			$this->getLink()->action()->reload();	
+			return false;	
 		}
-//		Maže se celá galerie
-		else {
-		//		načtení fotek z db
-			$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable())
-										->where(self::COLUMN_PHOTOS_ID_GALERY.' = '.$id);
-
-			$photosDetail = $this->getDb()->fetchObjectArray($sqlSelect);
-
-			
-			
-			//		Vymazání souborů fotek
-			$files = new Files();
-			$allFilesDeleted = true;
-			foreach ($photosDetail as $photoDetail) {
-				
-				if(!$files->exist($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE}) AND
-					!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-					$allFilesDeleted = false;
-					echo("exist");
-					
-				}
-				if(!$files->exist($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE}) AND
-					!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-					$allFilesDeleted = false;
-				}
-				if(!$files->exist($this->getModule()->getDir()->getDataDir(), $photoDetail->{self::COLUMN_PHOTOS_FILE}) AND
-					!$files->deleteFile($this->getModule()->getDir()->getDataDir(), $photoDetail->{self::COLUMN_PHOTOS_FILE})){
-					$allFilesDeleted = false;
-				}
-
-				//		Končný výmaz z db
-				if(!$allFilesDeleted){
-					break;
+//		Jsou editovány
+		else if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_IS_EDIT]) 
+			AND $_POST[self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_IS_EDIT] == 1 
+			AND isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_EDIT])) {
+		}		
+		//		Helpre pro práci s jazykovými poli
+		$localeHelper = new LocaleCtrlHelper();
+		$photosObj = new PhotoDetailModel();
+//		pokud byly fotky odeslány
+		if(isset($_POST[self::FORM_PHOTO_PREFIX.self::FORM_BUTTON_SEND])){
+//			Převedení entit na html entity
+			function htmlEncode(&$item, $key) {
+				$item = htmlspecialchars($item, ENT_QUOTES);
+			}
+			$saveArray = array();
+			$allOk = true;
+			foreach ($_POST[self::FORM_PHOTO_PREFIX] as $idPhoto => $photo) {
+				array_push($idPhotos, $idPhoto);
+//				Převedení entit na html entity
+				array_walk($photo, 'htmlEncode');
+				array_push($sendArray, $photo);
+				$saveArray[$idPhoto] = $photo;
+//				Kontrola jastli byli zadány všechny údaje
+				if($photo[self::FORM_PHOTO_LABEL_PREFIX.Locale::getDefaultLang()] == null){
+					$allOk = false;
+					$this->errMsg()->addMessage(_('Nebyly zadány všechny povinné údaje'));
 				}
 			}
-			
-			$sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable())
-								->where(self::COLUMN_PHOTOS_ID_GALERY.' = '.$id);
-
-			if($allFilesDeleted AND $this->getDb()->query($sqlDelete)){
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-	}
-	
-	/**
-	 * Metoda vymeže zadanou galerii/galerie
-	 * 
-	 * @param integer -- id galerie nebo id sekce
-	 * @param boolean -- jestli se maže sekce nebo galerie
-	 * 
-	 * @return boolean -- true pokud se galerie podařilo smazat
-	 */
-	private function deleteGaleries($id, $deleteAllFromSection = false) {
-		if(!$deleteAllFromSection){
-			if($this->deletePhotos($id,true)){
-//				Samotné vymazání galerie
-				$sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable(2))
-													 ->where(self::COLUMN_GALERY_ID.' = '.$id);
-
-				if($this->getDb()->query($sqlDelete)){
-					return true;
+//			Uložení do db		
+			if($allOk){
+				$allSaved = true;
+				foreach ($saveArray as $idPhoto => $photo) {
+					if(!$photosObj->saveEditPhoto($photo, $idPhoto)){
+						$allSaved = false;
+					}
+				}
+				if($allSaved){
+					$this->infoMsg()->addMessage(_("Fotografie byly upraveny"));
+					$this->getLink()->action()->reload();
 				} else {
-					return false;
+					new CoreException(_("Nepodařilo se upravit fotografii"),4);
 				}
-			} else {
-				return false;				
 			}
 		}
-//		jsou mazány všechny galerie ze sekce
-		else {
-//			Načtení všech galerií v sekci
-			$sqlSectionSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(2))
-														->where(self::COLUMN_GALERY_ID_SECTION.' = '.$id);
-														
-			$galeries = $this->getDb()->fetchObjectArray($sqlSectionSelect);
-
-			$deletedAll = true;
-			foreach ($galeries as $galery) {
-				if(!$this->deletePhotos($galery->{self::COLUMN_GALERY_ID},true)){
-					$deletedAll = false;
-					break;
-				}
+		$photos = $photosObj->getPhotosById($idPhotos);
+		$allPhotosArray = array();
+		$tmpArray = array();
+		foreach ($photos as $key => $photo) {
+			if(!isset($sendArray[$key])){
+				$sendArray[$key]=null;
 			}
-
-//			Smazání galerií
-			$sqlDeleteGaleries = $this->getDb()->delete()->from($this->getModule()->getDbTable(2))
-														 ->where(self::COLUMN_GALERY_ID_SECTION.' = '.$id);
-														 
-			if($deletedAll AND $this->getDb()->query($sqlDeleteGaleries)){
-				$sqlDeleteSection = $this->getDb()->delete()->from($this->getModule()->getDbTable(3))
-															->where(self::COLUMN_SECTION_ID.' = '.$id);
-															
-				if($this->getDb()->query($sqlDeleteGaleries)){
-					return true;	
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
-			
+			$lArray = $localeHelper->generateArray(array(self::FORM_PHOTO_LABEL_PREFIX, self::FORM_PHOTO_TEXT_PREFIX), $sendArray[$key],$photo);
+			$tmpArray[self::COLUMN_PHOTOS_LABEL_IMAG] = $lArray;
+			$tmpArray[self::COLUMN_PHOTOS_FILE] = $photo[self::COLUMN_PHOTOS_FILE];
+			$tmpArray[self::COLUMN_PHOTOS_ID] = $photo[self::COLUMN_PHOTOS_ID];
+			array_push($allPhotosArray, $tmpArray);
 		}
+//		Fotky do viewru
+		$this->container()->addData('photos', $allPhotosArray);
+		$this->container()->addData('photos_dir', $this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR);
 	}
-	
+
+	/**
+	 * Metoda vymaže soubory zadané fotky
+	 * 
+	 * @param string -- název souboru
+	 */
+	private function deletePhotoFile($file) {
+//		Vymazání souborů fotek
+		$files = new Files();
+		$allFilesDeleted = true;
+		if($files->exist($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR.$file) AND
+			!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_THUMBNAILS_DIR, $file)){
+			$allFilesDeleted = false;
+		}
+		if($files->exist($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR.$file) AND
+			!$files->deleteFile($this->getModule()->getDir()->getDataDir().self::IMAGES_MEDIUM_THUMBNAILS_DIR, $file)){
+			$allFilesDeleted = false;
+		}
+		if($files->exist($this->getModule()->getDir()->getDataDir().$file) AND
+			!$files->deleteFile($this->getModule()->getDir()->getDataDir(), $file)){
+			$allFilesDeleted = false;
+		};
+		unset($files);
+		return $allFilesDeleted;
+	}
 }
-
 ?>

@@ -4,8 +4,6 @@
  *
  */
 class ModuleAction extends Action {
-	
-
 	public function actions(){
 		$this->addAction("addsection", "as");
 		$this->addAction("addgalery", "ag");
@@ -13,6 +11,7 @@ class ModuleAction extends Action {
 		
 		$this->addAction("editsection", "es");
 		$this->addAction("editphoto", "ep");
+		$this->addAction("editphotos", "eps");
 		$this->addAction("editgalery", "eg");
 	}
 	

@@ -239,10 +239,9 @@ class GaleryDetailModel extends DbModel {
 					->colums($columsArray)
 					->values($valuesArray);
 				
-			$this->idLastInsertedGalery = $this->getDb()->getLastInsertedId();		
-					
 		//		Vložení do db
 		if($this->getDb()->query($sqlInsert)){
+			$this->idLastInsertedGalery = $this->getDb()->getLastInsertedId();
 			return true;
 		} else {
 			return false;
@@ -280,7 +279,21 @@ class GaleryDetailModel extends DbModel {
 		} else {
 			return false;
 		};
-	}	
+	}
+
+	/**
+	 * Metoda vymaže galerie z db
+	 * 
+	 * @param integer -- id galerie
+	 */
+	public function deleteGalery($id) {
+		//		Končný výmaz z db
+		$sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable(2))
+											 ->where(self::COLUMN_GALERY_ID.' = '.$id);
+			
+		return $this->getDb()->query($sqlDelete);	
+			
+	}
 }
 
 ?>

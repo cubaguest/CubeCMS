@@ -147,6 +147,74 @@ class PhotoDetailModel extends DbModel {
 			return false;
 		}
 	}
+	
+	/**
+	 * Metoda vrátí detail fotky podle zadaného id
+	 * @param integer -- id fotky
+	 */
+	public function getPhotoById($id) {
+		//			načtení fotky z db
+			$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable())
+				->where(self::COLUMN_PHOTOS_ID." = '".$id."'");
+												 
+			return $this->getDb()->fetchAssoc($sqlSelect, true);	
+	}
+	
+	
+	/**
+	 * Metoda vymaže fotku z db
+	 * 
+	 * @param integer -- id fotky
+	 */
+	public function deletePhoto($idPhoto) {
+		//		Končný výmaz z db
+		$sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable())
+											 ->where(self::COLUMN_PHOTOS_ID.' = '.$idPhoto);
+			
+		return $this->getDb()->query($sqlDelete);	
+			
+	}
+	
+	/**
+	 * Metoda vrátí detaily fotek podle zadaných id
+	 * @param array/imteger -- id fotky
+	 */
+	public function getPhotosById($id) {
+		//			načtení fotek z db
+		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable());
+
+		if(is_array($id)){
+			foreach ($id as $idSelected) {
+				$sqlSelect = $sqlSelect->where(self::COLUMN_PHOTOS_ID." = '".$idSelected."'", 'OR');
+			}
+		} else {
+			$sqlSelect = $sqlSelect->where(self::COLUMN_PHOTOS_ID." = '".$idSelected."'");
+		}	
+
+		return $this->getDb()->fetchAssoc($sqlSelect);	
+	}
+	
+	/**
+	 * Metoda uloží upravenou fotografii do db
+	 *
+	 * @param array -- pole s detaily fotografie
+	 * @param integer -- id fotky
+	 */
+	public function saveEditPhoto($photoArray,$idPhoto = null) {
+		//TODO dodělat generování nového url klíče
+
+		$sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
+											 ->set($photoArray)
+											 ->where(self::COLUMN_PHOTOS_ID." = '".$idPhoto."'");
+
+		// vložení do db
+		if($this->getDb()->query($sqlInsert)){
+			return true;
+		} else {
+			return false;
+		};
+	}
+	
 }
 
 ?>

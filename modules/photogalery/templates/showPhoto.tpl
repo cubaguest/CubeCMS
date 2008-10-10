@@ -11,13 +11,13 @@
 
 
 
-{if $VARS.WRITABLE eq true}
+{if $VARS.PHOTO_EDIT eq true}
 <div class="photo_buttons_edit">
 	<form class="delete_form right_float" action="{$THIS_PAGE_LINK}" method="post" onsubmit="return Confirm('{$VARS.DELETE_CONFIRM_MESSAGE} - {$VARS.PHOTO.photolabel}')">
 		<input type="hidden" name="photo_id" value="{$VARS.PHOTO.id_photo}" />
 		<input type="submit" name="photo_delete" value="{$VARS.BUTTON_DELETE}"/>
 	</form>
-	<form action="{$VARS.PHOTO.editlink}" method="post" class="right_float">
+	<form action="{$VARS.EDIT_LINK}" method="post" class="right_float">
 		<input type="hidden" name="photo_id" value="{$VARS.PHOTO.id_photo}" />
 		<input type="submit" name="photo_edit" value="{$VARS.BUTTON_EDIT}"/>
 	</form>

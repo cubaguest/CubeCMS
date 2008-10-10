@@ -38,8 +38,6 @@ class PhotogaleryView extends View {
 		if($this->getRights()->isWritable()){
 			$this->template()->addVar('WRITABLE', true);
 			
-//			$this->template()->addVar('IN_SECTION', $this->getModel()->inSection);
-			
 			$this->template()->addTpl('addSectionButton.tpl');
 			$this->template()->addVar('LINK_TO_ADD_SECTION_NAME', _("Přidat sekci"));
 			$this->template()->addVar('LINK_TO_ADD_SECTION', $this->container()->getLink('add_section'));
@@ -66,63 +64,21 @@ class PhotogaleryView extends View {
 	 *
 	 */
 	private function assignGaleryList() {
-
-//		převedení obrázků z galerie na zvláštní pole
-//		foreach ($this->getModel()->allGaleryArray as $key => $galery) {
-//			for ($i=0; $i < $this->getModel()->countOfPhotos; $i++){
-//				if($galery[self::COLUM_PHOTOS_FILE_PREFIX_IMAG.$i] != null){
-//					$this->getModel()->allGaleryArray[$key][self::COLUM_SMALL_IMAGES][] =
-//						array(self::COLUM_PHOTOS_FILE => $galery[self::COLUM_PHOTOS_FILE_PREFIX_IMAG.$i],
-//							  self::COLUM_PHOTOS_LABEL_IMAG => $galery[self::COLUM_PHOTOS_LABEL_PREFIX_IMAG.$i]);
-//				}
-//			}
-//		}
-		
-//		echo "<pre>";
-//		print_r($this->getModel()->allGaleryArray);
-//		echo "</pre>";
-		
-//		$this->template()->addVar("GALERIES_LIST_ARRAY", $this->getModel()->allGaleryArray);
-//		$this->template()->addVar("GALERIES_COUNT_PHOTOS", $this->getModel()->countOfPhotos);
-//		$this->template()->addVar("GALERIES_DIR_TO_PHOTOS", $this->getModel()->dirToImages);
-//		$this->template()->addVar("GALERIES_DIR_TO_MEDIUM_PHOTOS", $this->getModel()->dirToMediumImages);
-//		$this->template()->addVar("GALERIES_DIR_TO_SMALL_PHOTOS", $this->getModel()->dirToSmallImages);
-
 		$this->template()->addVar("ADD_TEXT", _("Přidáno"));
 		$this->template()->addVar('NUM_PHOTOS', _('Počet fotek'));
 		$this->template()->addVar('NOT_ANY_GALERY', _('Žádná galerie nebyla přidána'));
 		$this->template()->addVar('IMAGES_DIR', $this->container()->getData('small_images_dir'));
 		
 		
-		
-//		$this->template()->addVar("NOT_ANY_IMAGE", _("Není uložen žádný obrázek"));
-
-//		$this->template()->addVar("DATE_FORMAT", _("%d.%m.%Y "));
-		
-//		$this->template()->addVar("GALERIES_LIST_NAME", _("Galerie"));
-		
 		//TODO scrolovátka
 //		$this->template()->addTpl($this->getModel()->scroll->getTpl(), true);
 //		$this->getModel()->scroll->assignToTpl($this->template());
-		
-//		$this->template()->addTpl('buttonBack.tpl');
-		
-
-//		$this->template()->addVar('GALERY_TEXT_AUTHOR', _('Autor'));
-//		$this->template()->addVar('GALERY_TEXT_LABEL', _('Popis'));
-//		$this->template()->addVar('GALERY_TEXT_NAME', _('Text'));
-		
-		//		Js plugin pro zobrazení velké fotky
-//		$lightbox = new LightBox();
-//		$this->template()->addJsPlugin($lightbox);
 	}
 	
 	
 	public function sectionShowView() {
 		if($this->getRights()->isWritable()){
 			$this->template()->addVar('SECTION_EDIT', true);
-			
-//			$this->template()->addVar('IN_SECTION', $this->getModel()->inSection);
 						
 			$this->template()->addTpl('addGaleryButton.tpl');
 			$this->template()->addVar('LINK_TO_ADD_GALERY_NAME', _("Přidat galerii"));
@@ -140,7 +96,6 @@ class PhotogaleryView extends View {
 		}
 		
 		$this->template()->addVar('SECTION', $this->container()->getData('section'));
-//		$section = $this->container()->getData('section');
 		$this->template()->setSubTitle($this->container()->getData('section_label'), true);
 		$this->template()->setTplSubLabel($this->container()->getData('section_label'));
 		
@@ -284,55 +239,13 @@ class PhotogaleryView extends View {
 		
 //		Ostatní
 		$this->template()->setTplSubLabel(_('Přidání fotek'));
-		
-		
+		$this->container()->getEplugin('progressbar')->assignToTpl($this->template());
+				
 		$this->assignSendFormButtons();
 		
 //		Záložky s jazyky
 		$tabcontent = new TabContent();
 		$this->template()->addJsPlugin($tabcontent);
-		
-		
-		/**
-		 * @deprecated 
-		 */
-
-//		
-//		$newSectionArray = array();
-//		
-//		foreach ($this->getModel()->sectionArray as $section) {
-//			$newSectionArray[$section[self::COLUM_SECTION_ID]] = $section[self::COLUM_SECTION_LABEL_IMAG];
-//		}
-//		$this->getModel()->sectionArray = $newSectionArray;		
-
-		
-//		$this->template()->addVar('SELECT_SECTION', $this->getModel()->sectionArray);
-//		$this->template()->addVar('CREATE_NEW_SECTION', $this->getModel()->newSectionArray);
-//		$this->template()->addVar('CREATE_NEW_SECTION_NAME', _('Vytvoření nové sekce'));
-//		$this->template()->addVar('ADD_TO_EXIST_SECTION', _('Přidání do existující sekce'));
-//		$this->template()->addVar('SECTION_LABEL_NAME', _('Název'));
-//
-////		$this->template()->addVar('CREATE_NEW_GALERY', $this->getModel()->newGaleryArray);
-
-//		
-//		
-//		$this->template()->addVar('GALERY_NEW_NAME', _('Výběr galerie'));
-//		
-//		$this->template()->addVar('SELECT_GALERY_NAME', _('Výběr galerie'));
-//		
-//		$galeryArray = array();
-//		
-//		
-//		
-////		$this->template()->addVar('SELECT_GALERY', $this->getModel()->galeryArray);
-////		$this->template()->addVar('SELECTED_GALERY_ID', $this->getModel()->idSelectedGalery);
-//		
-
-////		$this->template()->addVar('PHOTO_ARRAY', $this->getModel()->photoArray);
-//
-//		
-//		$this->template()->addVar('BUTTON_SEND', _('Odeslat'));		
-//		$this->template()->addVar('BUTTON_RESET', _('Obnovit'));		
 		
 		$this->assignButtonBack();
 	}
@@ -342,8 +255,6 @@ class PhotogaleryView extends View {
 	 */
 	public function sectionAddgaleryView(){
 		$this->addgaleryView();
-		
-//		$this->template()->addVar('SELECTED_SECTION', $this->getModel()->idSelectedSection);
 	}
 
 	/**
@@ -351,8 +262,6 @@ class PhotogaleryView extends View {
 	 */
 	public function sectionAddphotosView(){
 		$this->addphotosView();
-		
-//		$this->template()->addVar('SELECTED_SECTION', $this->getModel()->idSelectedSection);
 	}
 	
 	/**
@@ -362,17 +271,22 @@ class PhotogaleryView extends View {
 		
 		if($this->getRights()->isWritable()){
 			$this->template()->addVar('GALERY_EDIT', true);
+			$this->template()->addVar('PHOTO_EDIT', true);
 			
 			$this->template()->addTpl('addPhotosButton.tpl');
 			$this->template()->addVar('LINK_TO_ADD_PHOTOS_NAME', _("Přidat fotky"));
 			$this->template()->addVar('LINK_TO_ADD_PHOTOS', $this->container()->getLink('add_photo'));
 			
 			$this->template()->addVar('LINK_TO_EDIT_GALERY', $this->container()->getLink('edit_galery'));
-//			$this->template()->addVar('GALERY_ID', $this->getModel()->galeryInfo[self::COLUM_GALERY_ID]);
 			
+//			Editace fotek
+			$this->template()->addVar('LINK_TO_EDIT_PHOTOS', $this->container()->getLink('edit_photos'));
+			$this->template()->addVar('DELETE_SELECTED_PHOTOS', _('vybrané fogorafie'));
+			$this->template()->addVar('NOT_ANY_PHOTO_CHECKED', _('Nebyla vybrána žádná fotka'));
+			$this->template()->addJS('function.js');
 			
-//			$this->template()->addVar('GALERY_LABEL', $this->getModel()->galeryInfo[self::COLUM_GALERY_LABEL_IMAG]);
-//			$this->template()->addVar('DELETE_GALERY_CONFIRM_MESSAGE', _('Opravdu smazat galerii'));
+			$this->template()->addVar('CHECK_ALL_CHECKBOXS', _('Zaškrtnout vše'));
+			$this->template()->addVar('UNCHECK_ALL_CHECKBOXS', _('Odškrtnout vše'));
 			
 			$this->assignEditFormButtons();
 		}
@@ -391,33 +305,23 @@ class PhotogaleryView extends View {
 
 		$this->assignGaleryList();
 		
-//		$this->template()->addVar("GALERY_DIR_TO_PHOTOS", $this->getModel()->dirToImages);
-//		$this->template()->addVar("GALERY_DIR_TO_SMALL_PHOTOS", $this->getModel()->dirToSmallImages);
-//		$this->template()->addVar("GALERY_TEXT", $this->getModel()->galeryInfo[self::COLUM_GALERY_TEXT_IMAG]);
-
-//		$this->template()->addVar("LINK_TO_BACK", $this->getModel()->linkToBack);
-//		$this->template()->addVar("LINK_TO_BACK_NAME", _('Zpět'));
-
 		$this->assignButtonBack();
-		
-//		$this->template()->setTplSubLabel($app-admin/eselect-newsthis->getModel()->galeryInfo[self::COLUM_GALERY_LABEL_IMAG]);
 	}
 	
 	/**
 	 * Viewer pro zobrazení fotky
 	 */
 	public function showPhotoView() {
-//		$this->template()->setTplSubLabel($this->getModel()->photoDetailArray[self::COLUM_GALERY_LABEL_IMAG].' - '.$this->getModel()->photoDetailArray[self::COLUM_PHOTOS_LABEL_IMAG]);
-		
 		if($this->getRights()->isWritable()){
-			$this->template()->addVar('WRITABLE', true);
+			$this->template()->addVar('PHOTO_EDIT', true);
 			
 			$this->template()->addVar('BUTTON_EDIT', _('Upravit'));
 			$this->template()->addVar('BUTTON_DELETE', _('Smazat'));
 			$this->template()->addVar('DELETE_CONFIRM_MESSAGE', _('Opravdu smazat fotku'));
+
+			$this->template()->addVar('EDIT_LINK', $this->container()->getLink('link_edit'));
 			
 			$this->template()->addJsPlugin(new SubmitForm());
-			
 		}
 		
 		//scrolovátka
@@ -428,7 +332,7 @@ class PhotogaleryView extends View {
 		$this->template()->addTpl('showPhoto.tpl');
 
 		$this->template()->setTplSubLabel($this->container()->getData('galery_label'));
-		$this->template()->setTplSubLabel($this->container()->getData('photo_label'), true);
+		$this->template()->setTplSubLabel(' - '.$this->container()->getData('photo_label'), true);
 		$this->template()->setSubTitle($this->container()->getData('galery_label'));
 		$this->template()->setSubTitle($this->container()->getData('photo_label'), true);
 
@@ -486,20 +390,15 @@ class PhotogaleryView extends View {
 	 * Viewer pro úpravu fotky
 	 */
 	public function editphotoView() {
-		$this->template()->addTpl('buttonBack.tpl');
 		
-		$this->template()->setTplSubLabel(_('Úprava fotky ').' - '.$this->getModel()->photoName);
+		$this->template()->setTplSubLabel(_('Úprava fotky ').' - '.$this->container()->getData('photo_label'));
+		$this->template()->setSubTitle(_('Úprava fotky ').' - '.$this->container()->getData('photo_label'));
 		
 		
 		$this->template()->addTpl('editPhoto.tpl');
-		$this->template()->addVar("DIR_TO_SMALL_PHOTO", $this->getModel()->dirToSmallImages);
-		
-		
-		
-		$this->template()->addVar('PHOTO_ARRAY', $this->getModel()->photoArray);
-		$this->template()->addVar('PHOTO_FILE', $this->getModel()->photoFile);
-		$this->template()->addVar('PHOTO_NAME', $this->getModel()->photoName);
-		$this->template()->addVar('PHOTO_ID', $this->getModel()->idPhoto);
+
+		$this->template()->addVar("PHOTO_A", $this->container()->getData('photo'));
+		$this->template()->addVar("PHOTO_ID", $this->container()->getData('photo_id'));
 		
 		$this->template()->addVar('PHOTO_LABEL_NAME', _('Název fotky'));
 		$this->template()->addVar('PHOTO_TEXT_NAME', _('Text fotky'));
@@ -507,11 +406,33 @@ class PhotogaleryView extends View {
 		$this->template()->addVar('BUTTON_SEND', _('Odeslat'));		
 		$this->template()->addVar('BUTTON_RESET', _('Obnovit'));
 
-		$this->template()->addTpl('buttonBack.tpl');
-		$this->template()->addVar('LINK_TO_BACK', $this->getModel()->linkToBack);
-		$this->template()->addVar('LINK_TO_BACK_NAME', _('Zpět'));
+		$this->assignButtonBack();
+		
+		$tabcontent = new TabContent();
+		$this->template()->addJsPlugin($tabcontent);
 	}
 
+	/**
+	 * Viewer pro editaci více fotek
+	 */
+	public function editphotosView() {
+//		Fotky
+		$this->template()->addVar('PHOTOS', $this->container()->getData('photos'));
+		$this->template()->addVar('PHOTOS_DIR', $this->container()->getData('photos_dir'));
+		$this->template()->addTpl('editPhotoList.tpl');
+		$this->template()->setTplSubLabel(_('Úprava fotek'));
+		
+		$this->template()->addVar('PHOTO_LABEL_NAME', _('Název fotky'));
+		$this->template()->addVar('PHOTO_TEXT_NAME', _('Text fotky'));
+		
+		$this->assignButtonBack();
+		$this->assignSendFormButtons();
+		
+		$tabcontent = new TabContent();
+		$this->template()->addJsPlugin($tabcontent);
+	}
+	
+	
 	/**
 	 * Metoda pro vygenerování odkazu zpět
 	 */
