@@ -48,6 +48,7 @@ class NewsView extends View {
 		$this->template()->addVar("NEWS_DETAIL", $this->container()->getData('new'));
 		
 		$this->template()->setTplSubLabel($this->container()->getData('new_name'));
+		$this->template()->setSubTitle($this->container()->getData('new_name'), true);
 		
 		$this->assignButtonBack();
 	}
@@ -61,6 +62,7 @@ class NewsView extends View {
 		$this->template()->addVar('NEWS_EDIT_ARRAY', $this->container()->getData('new_data'));
 
 		$this->template()->setTplSubLabel(_('Přidání novinky'));
+		$this->template()->setSubTitle(_('Přidání novinky'), true);
 		
 		$this->assignButtonBack();
 		
@@ -100,6 +102,7 @@ class NewsView extends View {
 		$this->template()->addVar('NEWS_EDIT_ARRAY', $this->container()->getData('new_data'));
 		
 		$this->template()->setTplSubLabel(_("Úprava novinky").' - '.$this->container()->getData('news_label'));
+		$this->template()->setSubTitle(_("Úprava novinky").' - '.$this->container()->getData('news_label'), true);
 		
 		$this->assignButtonBack();
 		
