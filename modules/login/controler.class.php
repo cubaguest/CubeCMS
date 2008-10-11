@@ -19,11 +19,11 @@ class LoginController extends Controller {
 	 * KOnstanty s názvy prvků formulářů
 	 * @var atring
 	 */
-	const FOMR_PREFIX 				= 'passwd_';
-	const FOMR_PASSWD_OLD 			= 'old';
-	const FOMR_PASSWD_NEW 			= 'new';
-	const FOMR_PASSWD_NEW_CONFIRM 	= 'new_confirm';
-	const FOMR_BUTTON_CHANGE 		= 'change';
+	const FORM_PREFIX 				= 'passwd_';
+	const FORM_PASSWD_OLD 			= 'old';
+	const FORM_PASSWD_NEW 			= 'new';
+	const FORM_PASSWD_NEW_CONFIRM 	= 'new_confirm';
+	const FORM_BUTTON_CHANGE 		= 'change';
 	
 	/**
 	 * minimální délka hesla
@@ -34,10 +34,7 @@ class LoginController extends Controller {
 	
 	public function mainController() {
 		if($this->getRights()->isWritable()){
-			$this->createModel("detail");
-			
-			$this->getModel()->linkToEditPasswd = $this->getLink()->action($this->getAction()->actionEditpasswd());
-			
+			$this->container()->addLink('edit_passwd', $this->getLink()->action($this->getAction()->actionEditpasswd()));
 		}
 	}
 	
@@ -59,46 +56,47 @@ class LoginController extends Controller {
 	 * Metoda pro úpravu hesla
 	 */
 	public function editpasswdController() {
-		if(!$this->getRights()->isWritable()){
-			$this->getLink()->category()->action()->article()->reload();
-		}
+		$this->checkWritebleRights();
 		
-		
-		if(isset($_POST[self::FOMR_PREFIX.self::FOMR_BUTTON_CHANGE])){
+		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_CHANGE])){
 //			načtení strého hesla z db
-			$sqlSelPasswd = $this->getDb()->select()->from(array("user"=>$this->getModule()->getDbTable()), self::COLUM_USER_PASSWORD)
-													->where(self::COLUM_ID." = ".$this->getRights()->getAuth()->getUserId());
-													
-			$oldPasswd = $this->getDb()->fetchAssoc($sqlSelPasswd, true);
+			$userObj = new UserDetailModel();													
+			$oldPasswd = $userObj->getPasswd($this->getRights()->getAuth()->getUserId());
 			
-			if($_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_OLD] == null OR $_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_NEW] == null OR 
-				$_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_NEW_CONFIRM] == null){
+			$oPasswd = htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_PASSWD_OLD]);
+			$nPasswd = htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_PASSWD_NEW]);
+			$nPasswdConfirm = htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_PASSWD_NEW_CONFIRM]);
+			
+			if($oPasswd == null OR $nPasswd == null OR $nPasswdConfirm == null){
 				$this->errMsg()->addMessage(_("Nebyly zadány všechny potřebné parametry"));	
-			} else if(md5($_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_OLD]) != $oldPasswd[self::COLUM_USER_PASSWORD]){
-				$this->errMsg()->addMessage(_("Staré heslo bylo nesprávně zadáno"));
-			} else if($_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_NEW] != $_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_NEW_CONFIRM]){
-				$this->errMsg()->addMessage(_("Nově zadaná hesla nesouhlasí"));
-			} else if(strlen($_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_NEW]) < self::PASSWD_MIN_LENGTH) {
+			} else if($this->cryptPasswd($oPasswd) != $oldPasswd){
+				$this->errMsg()->addMessage(_("Staré heslo nebylo zadáno správně"));
+			} else if($nPasswd != $nPasswdConfirm){
+				$this->errMsg()->addMessage(_("Nově zadaná hesla se neshodují"));
+			} else if(strlen($nPasswd) < self::PASSWD_MIN_LENGTH) {
 				$this->errMsg()->addMessage(_("Nové heslo je příliš krátké"));
 			} else {
-				$sqlUpdate = $this->getDb()->update()->table($this->getModule()->getDbTable())
-													 ->set(array(self::COLUM_USER_PASSWORD=>md5(htmlspecialchars($_POST[self::FOMR_PREFIX.self::FOMR_PASSWD_NEW], ENT_QUOTES))));
-				$this->getDb()->query($sqlUpdate);
-
-				$this->infoMsg()->addMessage(_("Heslo bylo úspěšně změněno"));
-				$this->getLink()->action()->article()->reload();
+				
+				if(!$userObj->setPasswd($this->getRights()->getAuth()->getUserId(),$this->cryptPasswd($nPasswd))){
+					new CoreException(_('Heslo se nepodařilo uložit'), 1);
+				} else {
+					$this->infoMsg()->addMessage(_("Heslo bylo úspěšně změněno"));
+					$this->getLink()->action()->article()->reload();
+				}
 			}
 			
 			
 		}
-		
-		$this->createModel("detail");
-		$this->getModel()->linkToBack = $this->getLink()->action()->article();
-		
+	}
+	
+	/**
+	 * Metoda zašifruje heslo
+	 */
+	private function cryptPasswd($passwd) {
+		return md5($passwd);
 	}
 	
 	
-
 }
 
 ?>

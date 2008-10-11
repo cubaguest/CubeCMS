@@ -10,16 +10,11 @@ class LoginView extends View {
 		
 		if($this->getRights()->isWritable()){
 			$this->template()->addTpl("buttoneditpasswd.tpl");
-			$this->template()->addVar("LINK_TO_CHANGE_PASSWD", $this->getModel()->linkToEditPasswd);
-			
+			$this->template()->addVar("LINK_TO_CHANGE_PASSWD", $this->container()->getLink('edit_passwd'));
 			$this->template()->addTpl("logout.tpl");
-			
 			$this->assignLogoutLabels();
 		} else {
-//			$this->template()->addVar("LOGIN_PAGE_NAME", _("Účet"));
-			
 			$this->template()->addTpl("login.tpl");
-			
 			$this->assignLoginLabels();
 		}
 
