@@ -135,6 +135,12 @@ class AppCore {
 	 * @var string
 	 */
 	const MODULE_PANEL_VIEWER = 'panelView';
+
+	/**
+	 * Název třídy pro sitemapu -- sufix
+	 * @var string
+	 */
+	const MODULE_SITEMAP_SUFIX_CLASS = 'SiteMap';
 	
 	/**
 	 * Parametr v url, kterým se přenáší typ média pro zobrazení
@@ -336,13 +342,11 @@ class AppCore {
 
 		$this->_initDbConnector();
 		
+		//		Inicializace chybových hlášek
 		$this->_initMessagesAndErrors();
-
-//		Inicializace typu média pro zobrazení
-		$this->_initMediaType();
 		
-//		inicializace šablonovacího systému
-		$this->_initTemplate();
+		//		Inicializace typu média pro zobrazení
+		$this->_initMediaType();
 
 		//Spuštění jádra aplikace
 		$this->runApp();
@@ -661,6 +665,15 @@ class AppCore {
 		}
 	}
 	
+//	Metoda inicializuje moduly
+	private function _initModules() {
+		//		Načtení potřebných knihoven
+		$this->loadModuleLibs();
+		
+		ModuleDirs::setWebDir(self::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
+		ModuleDirs::setWebDataDir(self::sysConfig()->getOptionValue("data_dir"));;
+	}
+	
 	
 	
 	/**
@@ -832,6 +845,28 @@ class AppCore {
 		
 //		Přiřazení jazykového pole
 		$this->coreTpl->addVar("APP_LANGS_NAMES", Locale::getAppLangsNames());		
+		
+//		Vytvoření odkazů s jazyky
+		$langs = array();
+		$langNames = Locale::getAppLangsNames();
+		$link = new Links();
+		foreach (Locale::getAppLangs() as $langKey => $lang) {
+			$langArr = array();
+			$langArr['name'] = $lang;
+			$langArr['label'] = $langNames[$lang];
+			if($lang != Locale::getDefaultLang()){
+				$langArr['link'] = (string)$link->lang($lang);
+			} else {
+				$langArr['link'] = (string)$link->lang();
+			}
+			array_push($langs, $langArr);
+		}
+		unset($langNames);
+		unset($link);
+		unset($langArr);
+		
+		$this->coreTpl->addVar('APP_LANGS' ,$langs);
+		unset($langs);
 	}
 
 	/**
@@ -891,17 +926,32 @@ class AppCore {
 	}
 
 	/**
+	 * Metoda vytvoří pole tabulek modulu
+	 * 
+	 * @param SqlObject -- objekt s tabulkami
+	 * @return array -- pole s tabulkama
+	 */
+	private function getModuleTables($item) {
+		$tableIndex = 1; $moduleDbTables = array();
+//		TODO potřebuje optimalizaci a OPRAVIT
+		$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+		while (isset($item->$objectName) AND ($item->$objectName != null)){
+			$moduleDbTables[$tableIndex] = $item->$objectName;
+			$tableIndex++;
+			$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+		};
+		
+		return $moduleDbTables;
+	}
+	
+	
+	/**
 	 * Metoda spouští moduly
 	 * //TODO
 	 */
 	public function runModules() {
-//		Načtení potřebných knihoven
-		$this->loadModuleLibs();
 
-		ModuleDirs::setWebDir(self::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
-		ModuleDirs::setWebDataDir(self::sysConfig()->getOptionValue("data_dir"));
-
-		//načtení dat z db
+//načtení dat z db
 		$itemsTable = self::sysConfig()->getOptionValue("items_table", Config::SECTION_DB_TABLES);
 		$modulesTable = self::sysConfig()->getOptionValue("modules_table", Config::SECTION_DB_TABLES);
 //		$userNameGroup = $this->auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
@@ -928,18 +978,19 @@ class AppCore {
 				$template = new Template();
 				
 //				Příprava pro objekt modulu
-//				Načtení všech tabulek databáze
-				$tableIndex = 1; $moduleDbTables = array();
-//				//TODO potřebuje optimalizaci a OPRAVIT
-				$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-				while (isset($item->$objectName) AND ($item->$objectName != null)){
-					$moduleDbTables[$tableIndex] = $item->$objectName;
-					$tableIndex++;
-					$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-				}
+//				Načtení všech tabulek modulu
+//				$tableIndex = 1; $moduleDbTables = array();
+////				//TODO potřebuje optimalizaci a OPRAVIT
+//				$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+//				while (isset($item->$objectName) AND ($item->$objectName != null)){
+//					$moduleDbTables[$tableIndex] = $item->$objectName;
+//					$tableIndex++;
+//					$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+//				}
 
 //				Vytvoření objektu pro práci s modulem
-				$module = new Module($item, $moduleDbTables);
+//				$module = new Module($item, $moduleDbTables);
+				$module = new Module($item, $this->getModuleTables($item));
 //				klonování modulu do statické proměné enginu
 				self::$selectedModule = clone $module;
 				
@@ -1321,6 +1372,79 @@ class AppCore {
 
 	}
 	
+	/**
+	 * Metoda vytváří sitemapu a odesílá ji na výstup
+	 *
+	 */
+	public function runSitemap() {
+		//načtení dat z db
+		$itemsTable = self::sysConfig()->getOptionValue("items_table", Config::SECTION_DB_TABLES);
+		$modulesTable = self::sysConfig()->getOptionValue("modules_table", Config::SECTION_DB_TABLES);
+		$categoryTable = self::sysConfig()->getOptionValue("category_table", Config::SECTION_DB_TABLES);
+//		$userNameGroup = $this->auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
+		$userNameGroup = $this->auth->getGroupName();
+
+//		Vytvoření dotazu pro db
+//SELECT cat.*, module.* FROM `vypecky_categories` AS cat
+//JOIN vypecky_items AS item ON cat.id_category=item.id_category
+//LEFT JOIN vypecky_modules AS module ON item.id_module = module.id_module
+//WHERE item.group_guest = 'r--'
+//GROUP BY item.id_category
+//ORDER BY item.priority DESC, cat.priority DESC
+		
+		
+		$itemsSelect = self::$dbConnector->select()
+						   ->from(array("cat" => $categoryTable))
+						   ->join(array("item" => $itemsTable), "item.id_category=cat.id_category", null)
+						   ->join(array("module" => $modulesTable), "module.id_module=item.id_module", 'LEFT')
+						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
+						   ->group('item.id_category')
+						   ->order("cat.priority", "desc")
+						   ->order("item.priority", 'desc');
+
+
+		$items = self::$dbConnector->fetchObjectArray($itemsSelect);
+
+		
+		
+		if($items != null){
+			foreach ($items as $itemIndex => $item) {
+//				Vytvoření objektu pro práci s modulem
+				$module = new Module($item, $this->getModuleTables($item));
+//				klonování modulu do statické proměné enginu
+				self::$selectedModule = clone $module;
+
+				$link = new Links(true);
+				$link = $link->category($item->{Category::COLUM_CAT_URLKEY});
+				
+				$moduleName = ucfirst($module->getName());
+				$moduleClass = $moduleName.self::MODULE_SITEMAP_SUFIX_CLASS;
+//				Pokud existuje soubor tak jej načteme
+				if(file_exists($module->getDir()->getMainDir().strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php')){
+					include ($module->getDir()->getMainDir().strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php');
+					if(class_exists($moduleClass)){
+						$sitemap = new $moduleClass($module, $link);
+					}
+				}
+//				jinak se vytvoří výchozí
+				else {
+					$sitemap = new SiteMap($module, $link);
+				}
+				
+				$sitemap->run();
+						
+				unset($sitemap);
+				
+			}
+//			Vygenerování mapy
+//			Podle vyhledávače
+			$searchEngine = htmlspecialchars($_GET['for']);
+			echo SiteMap::generateMap($searchEngine);
+		}
+		
+	}
+	
+	
 
 	/**
 	 * Hlavní metoda provádění aplikace
@@ -1329,36 +1453,53 @@ class AppCore {
 		//autorizace přístupu
 		$this->coreAuth();
 
-		//nastavení vybrané kategorie
-		$this->selectCategory();
+//		Inicializace modulu
+		$this->_initModules();
 		
-		//vytvoření hlavního menu
-		$this->createMainMenu();
+		switch (self::media()) {
+			case 'sitemap':
+				$this->runSitemap();
+			break;
+			
+			default:
+//				Výchozí je zobrazena stránka
+//				Příprava šablony
 
-//		spuštění modulů
-		$this->runModules();
-		
-//		spuštění panelů
-//		Levý
-		if(Category::isLeftPanel()){
-			$this->runPanel('left');
+//				inicializace šablonovacího systému
+				$this->_initTemplate();
+				
+				//nastavení vybrané kategorie
+				$this->selectCategory();
+
+				//vytvoření hlavního menu
+				$this->createMainMenu();
+
+				//		spuštění modulů
+				$this->runModules();
+
+				//		spuštění panelů
+				//		Levý
+				if(Category::isLeftPanel()){
+					$this->runPanel('left');
+				}
+				//		Pravý
+				if(Category::isRightPanel()){
+					$this->runPanel('right');
+				}
+
+				//		Přiřazení proměných modulů do šablony
+				$this->assignModuleVarsToTpl();
+
+				//		přiřazení hlavních proměných
+				$this->assignMainVarsToTemplate();
+
+				//		přiřazení chbových hlášek do šablony
+				$this->assignCoreErrorsToTpl();
+
+				//		render šablony
+				$this->renderTemplate();
+			break;
 		}
-//		Pravý
-		if(Category::isRightPanel()){
-			$this->runPanel('right');
-		}
-		
-//		Přiřazení proměných modulů do šablony
-		$this->assignModuleVarsToTpl();
-
-//		přiřazení hlavních proměných
-		$this->assignMainVarsToTemplate();
-
-//		přiřazení chbových hlášek do šablony
-		$this->assignCoreErrorsToTpl();
-
-//		render šablony
-		$this->renderTemplate();
 	}
 }
 

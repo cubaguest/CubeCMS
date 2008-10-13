@@ -5,6 +5,10 @@ RewriteRule ^(.+[^/])$ /vve/$1/ [R=301]
 
 #RewriteRule ^([^/]+)/([^/]+)/([0-9]+)/([^/]+)/$ /vve/index.php?lang=$1&category=$2&article=$3&action=$4 [QSA]
 
+#sitemap
+RewriteRule ^sitemap.xml$ /vve/index.php?media=sitemap&for=google [L]
+RewriteRule ^urllist.txt$ /vve/index.php?media=sitemap&for=yahoo [L]
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^/]{3,})/([^/]{9,})/$ /vve/index.php?category=$1&article=$2 [QSA]

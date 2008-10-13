@@ -334,6 +334,21 @@ class Links {
 //		}
 		return $this;
 	}
+
+	/**
+	 * Metoda nastavuje název lokalizace
+	 * @param string -- jméno jazyka (action např. cs, en, de atd.)
+	 * 
+	 * @return Links -- objket Links
+	 */
+	public function lang($lang = null){
+//		if($action == null){
+//			$this->action = self::$selectedAction;
+//		} else {
+			$this->lang = $lang;
+//		}
+		return $this;
+	}
 	
 	/**
 	 * Metoda nastavuje prametry do url (je li jich více)
@@ -474,6 +489,18 @@ class Links {
 			return null;
 		}
 	}
+
+	/**
+	 * Metoda vrací část lang pro url
+	 * @param string -- lang
+	 */
+	private function getLang() {
+		if($this->lang != null){
+			return $this->lang.self::COOL_URL_SEPARATOR;
+		} else {
+			return null;
+		}
+	}
 	
 	/*
 	 * MAGICKÉ METODY
@@ -488,7 +515,7 @@ class Links {
     {
     	$returnString = self::getMainWebDir();
         if($this->lang != null){
-        	$returnString.=$this->lang.self::COOL_URL_SEPARATOR;
+        	$returnString.=$this->getLang();
         }
         if($this->getCategory() != null){
         	$returnString.=$this->getCategory();

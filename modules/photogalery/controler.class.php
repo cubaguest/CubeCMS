@@ -494,7 +494,7 @@ class PhotogaleryController extends Controller {
 				}
 			}
 //			Nastavení progressbaru
-			$progressBar->setSteps(2);
+			$progressBar->setSteps(3);
 			$progressBar->setMessage(_('Nahrání souboru'));			
 			$uploadFile = new UploadFiles($this->errMsg());
 			$uploadFile->upload(self::FORM_PHOTO_PREFIX.self::FORM_PHOTO_FILE);
