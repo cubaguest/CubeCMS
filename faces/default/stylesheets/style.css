@@ -72,7 +72,7 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 }
 
 #footwrap { /*background-color: #c0c0c0;*/
-	text-align: center;
+	text-align: left;
 	background-color: white;
 }
 
