@@ -252,6 +252,7 @@
 <div class="reseter">&nbsp;</div>
 
 <div id="footwrap">
+	{include file="langs.tpl"}<br />
 		{include file="login.tpl"}
 		Generated:	{$smarty.now|date_format:'%H:%M:%S %d.%m.%Y'} Powered by <a href="http://www.gentoo.org" title="Gentoo">GENTOO</a>,
 		<a href="http://www.vypecky.info" title="Vepřové Výpečky">Vypecky.info engine ver. {$ENGINE_VERSION}</a>, <a href="http://www.php.net" title="PHP">PHP</a>,
