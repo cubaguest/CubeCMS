@@ -47,20 +47,35 @@ class SiteMap {
 	private $link = null;
 	
 	/**
+	 * Frekvence změn na stránce
+	 * @var string
+	 */
+	private $changeFreq = self::SITEMAP_SITE_CHANGE_YEARLY;
+	
+	/**
+	 * Priorita stránky v mapě
+	 * @var float
+	 */
+	private $priority = self::SITEMAP_SITE_DEFAULT_PRIORITY;
+	
+	/**
 	 * Proměná obsahuje pole s položkama
 	 * @var array
 	 */
 	private static $items = array();
-	
+		
 	/**
 	 * Konstruktor -- vytvoří prostředí pro práci se sitemap
 	 *
 	 * @param Module -- objekt modulu
 	 */
-	function __construct(Module $module, Links $link) {
+	function __construct(Module $module, Links $link, $changefreq, $priority) {
 		$this->module = $module;
 		$this->db = AppCore::getDbConnector();
 		$this->link = $link;
+		
+		$this->changeFreq = $changefreq;
+		$this->priority = $priority;
 	}
 	
 	/**
@@ -82,8 +97,16 @@ class SiteMap {
 	 * @param string -- četnost změny (kostanta SITEMAP_SITE_CHANGE_...)
 	 * @param float -- priorita (0 - 1)
 	 */
-	public function addItem($url, $lastChange, $frequency,$priority = self::SITEMAP_SITE_DEFAULT_PRIORITY) {
+	public function addItem($url, $lastChange, $frequency = null ,$priority = null) {
 		$date = new DateTime(date(DATE_ISO8601,$lastChange));
+		
+		if($frequency == null){
+			$frequency = $this->changeFreq;
+		}
+		
+		if($priority == null){
+			$priority = $this->priority;
+		}
 		
 		array_push(self::$items, array('loc' => $url,
 									   'lastmod' => $date->format(DATE_ISO8601),

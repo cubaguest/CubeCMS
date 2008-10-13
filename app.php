@@ -1391,7 +1391,8 @@ class AppCore {
 //WHERE item.group_guest = 'r--'
 //GROUP BY item.id_category
 //ORDER BY item.priority DESC, cat.priority DESC
-		
+		define('SITEMAP_COLUMN_CHANGEFREQ', 'sitemap_changefreq');
+		define('SITEMAP_COLUMN_PRIORITY', 'sitemap_priority');
 		
 		$itemsSelect = self::$dbConnector->select()
 						   ->from(array("cat" => $categoryTable))
@@ -1423,12 +1424,12 @@ class AppCore {
 				if(file_exists($module->getDir()->getMainDir().strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php')){
 					include ($module->getDir()->getMainDir().strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php');
 					if(class_exists($moduleClass)){
-						$sitemap = new $moduleClass($module, $link);
+						$sitemap = new $moduleClass($module, $link, $item->{SITEMAP_COLUMN_CHANGEFREQ}, $item->{SITEMAP_COLUMN_PRIORITY});
 					}
 				}
 //				jinak se vytvoří výchozí
 				else {
-					$sitemap = new SiteMap($module, $link);
+					$sitemap = new SiteMap($module, $link, $item->{SITEMAP_COLUMN_CHANGEFREQ}, $item->{SITEMAP_COLUMN_PRIORITY});
 				}
 				
 				$sitemap->run();

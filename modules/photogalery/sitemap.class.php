@@ -14,7 +14,7 @@ class PhotogalerySiteMap extends SiteMap {
 											 
 		$lastPhoto = $this->getDb()->fetchObject($sqlSelect);									 
 
-		$this->addItem($this->getLink(), $lastPhoto->{self::COLUM_TIME}, parent::SITEMAP_SITE_CHANGE_WEEKLY, 0.5);
+		$this->addItem($this->getLink(), $lastPhoto->{self::COLUM_TIME});
 	}
 	
 }
