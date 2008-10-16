@@ -759,6 +759,7 @@ class AppCore {
 		} else {
 			new CoreException(_("Nebyl nalezen soubor pro vytvoření hlavního menu"), 1);
 		}
+		
 		if(class_exists("Menu")){
 			$menu = new Menu(self::$dbConnector, $this->auth);
 			
@@ -1040,8 +1041,6 @@ class AppCore {
 				$controllerClassName = ucfirst($module->getName()).'Controller';
 				if(class_exists($controllerClassName)){
 //					Příprava a nastavení použití překladu
-//					bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$module->getName().DIRECTORY_SEPARATOR."locales");
-//					textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
 					
 					$controller = new $controllerClassName($module, $action, $moduleRights, $this->messages, $this->userErrors, $article);
 
@@ -1062,17 +1061,15 @@ class AppCore {
 					$controllerAction = $routes->getRoute().$actionCtrl.self::MODULE_CONTROLLER_SUFIX;
 					$viewAction = $routes->getRoute().$actionCtrl.self::MODULE_VIEWER_SUFIX;
 
-//					Nastevní viewru v kontroleru//					$this->coreTpl->addVar("MAIN_MODULE_TITLE", $template->);
+//					Nastevní viewru v kontroleru
 					$controller->setView($viewAction);
 					
 //					Příprava a nastavení použití překladu
-//					bindtextdomain($module->getName(), '.'.DIRECTORY_SEPARATOR.self::MODULES_DIR.DIRECTORY_SEPARATOR.$module->getName().DIRECTORY_SEPARATOR."locale");
 					Locale::bindTextDomain($module->getName());
 					
 //					Zvolení překladu na modul
-//					textdomain($module->getName());
 					Locale::switchToModuleTexts($module->getName()); 
-					//			zvolení akce kontroleru
+//					zvolení akce kontroleru
 					$defaultAction = false;
 					
 					if($action->haveAction() AND method_exists($controller, $controllerAction)){//TODO doladit	
@@ -1106,17 +1103,13 @@ class AppCore {
 //					Spuštění viewru
 					$controller->runView($template);
 					
-					//				Uložení šablona a proměných do hlavní šablony
+//					Uložení šablona a proměných do hlavní šablony
 					$this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
-					
-					//		Titulek okna
-//					$this->coreTpl->addVar("MAIN_MODULE_TITLE", $template->);
 					
 					unset($template);
 
 					
 					//	Vrácení překladu na engine
-//					textdomain(self::GETTEXT_DEFAULT_DOMAIN);
 					Locale::switchToEngineTexts();
 					unset($controller);
 					$isModuleControlerRun = true;
@@ -1126,60 +1119,6 @@ class AppCore {
 				
 //				Vrácení překladu na engine pro jistotu
 				Locale::switchToEngineTexts();
-//				textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
-
-				
-
-				
-				
-				
-//				Vytvoření objektu viewru
-//				$viewClassName = ucfirst($module->getName()).'View';
-//				if(class_exists($viewClassName) AND $isModuleControlerRun){
-//////					přepnutí překladu na modul
-////					textdomain($module->getName()); 
-//										
-//					//				Volba pohledu
-//					if($changedView == null){
-//						$viewAction = $routes->getRoute().$actionCtrl.self::MODULE_VIEWER_SUFIX;
-//					} else {
-//						//TODO dořešit při zapnuté cestě
-//						$viewAction = $routes->getRoute().$changedView.self::MODULE_VIEWER_SUFIX;
-//					}
-//					
-////					Vytvoření objektu pohledu
-//					$view = new $viewClassName($model, $module, $moduleRights, $template);
-//
-//					//	Zvolení překladu na modul
-//					textdomain($module->getName()); 
-//					
-//					if(($action->haveAction() OR $changedView != null) AND method_exists($view, $viewAction)){//TODO doladit jesli se správně dělají akce	
-////					if(method_exists($controller, $controllerAction)){
-//						$view->$viewAction();
-//					}
-//					else if(!$action->isAction() AND $article->isArticle() AND method_exists($view, $viewAction)){ 
-//						$view->$viewAction();
-//					}  
-//					else if($defaultAction) {
-//						$view->mainView();
-//						if(!method_exists($view, $viewAction)){
-//							//				přepnutí překladu na engine
-//							textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
-//							new CoreException(_("Action Viewer ").$viewAction._(" v modulu ") . $module->getName(). _(" nebyl nalezen"), 11);
-//						}		
-//					} else {
-//						if(!method_exists($view, $viewAction)){
-//							//				přepnutí překladu na engine
-//							textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
-//							new CoreException(_("Action Viewer ").$viewAction._(" v modulu ") . $module->getName(). _(" nebyl nalezen"), 13);
-//						}
-//					}
-//
-//				} else if($isModuleControlerRun) {
-//					new CoreException(_("Nepodařilo se vytvořit objekt view modulu ") . $module->getName(), 8);
-//				} else {
-//					new CoreException(_("Objekt view modulu nebyl vytvořen, protože nebyl vytvořen objekt kontroleru ") . $module->getName(), 14);
-//				}
 
 //				přepnutí překladu na engine
 				textdomain(self::GETTEXT_DEFAULT_DOMAIN); 
@@ -1191,10 +1130,6 @@ class AppCore {
 				unset($action);
 				unset($routes);
 				unset($controller);
-//				unset($view);
-				
-
-
 			}
 		} else {
 			if(new Links() == new Links(true)){
