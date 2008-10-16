@@ -21,6 +21,7 @@
  * Examples: {html_engine_style file="style.css"}
  * Output:   <link rel="stylesheet" type="text/css" href="./stylesheet/style.css" />
  * @author Jakub Matas <jakubmatas at gmail dot com> -- for VVE (Veprove vypecky engine)
+ * @subpackage VVE engine version 3.1
  * @version  1.0
  * @param array
  * @param Smarty
@@ -67,16 +68,16 @@ function smarty_function_html_engine_style($params, &$smarty)
 
 //		zvolení vzhledu
 //		vybraný vzhled
-	if(file_exists(AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file)){
-		$path_prefix = AppCore::getTepmlateFaceDir(false).AppCore::TEMPLATES_STYLESHEETS_DIR.URL_SEPARATOR;
+	if(file_exists($smarty->template_face_dir.$smarty->template_engine_stylesheets_dir.DIRECTORY_SEPARATOR.$file)){
+		$path_prefix = $smarty->template_face_dir_rel.$smarty->template_engine_stylesheets_dir.URL_SEPARATOR;
 	} 
 //		Výchozí vzhled
-	else if(file_exists(AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file)){
-		$path_prefix = AppCore::getTepmlateDefaultFaceDir(false).AppCore::TEMPLATES_STYLESHEETS_DIR.URL_SEPARATOR;
+	else if(file_exists($smarty->template_default_face_dir.$smarty->template_engine_stylesheets_dir.DIRECTORY_SEPARATOR.$file)){
+		$path_prefix = $smarty->template_default_face_dir_rel.$smarty->template_engine_stylesheets_dir.URL_SEPARATOR;
 	} 
 //		Vzhled v engine
 	else {
-		$path_prefix = '.'.URL_SEPARATOR.AppCore::TEMPLATES_STYLESHEETS_DIR.URL_SEPARATOR;
+		$path_prefix = '.'.URL_SEPARATOR.$smarty->template_engine_stylesheets_dir.URL_SEPARATOR;
 	};
     
     return '<link rel="'.$rel.'" type="'.$type.'" href="'.$path_prefix.$file.'"  '.$extra.' />';

@@ -94,23 +94,41 @@ function smarty_function_html_engine_image($params, &$smarty)
     } else {
     	$_image_path = $file;
     }
+
+    $fileNotExist = false;
+	if(file_exists($smarty->template_face_dir.$smarty->template_engine_images_dir.DIRECTORY_SEPARATOR.$_image_path)){
+		$_image_path = $smarty->template_face_dir.$smarty->template_engine_images_dir.DIRECTORY_SEPARATOR.$_image_path;
+		$path_prefix = $smarty->template_face_dir_rel.$smarty->template_engine_images_dir.URL_SEPARATOR;
+	} 
+//		Výchozí vzhled
+	else if(file_exists($smarty->template_default_face_dir.$smarty->template_engine_images_dir.DIRECTORY_SEPARATOR.$_image_path)){
+		$_image_path = $smarty->template_default_face_dir.$smarty->template_engine_images_dir.DIRECTORY_SEPARATOR.$_image_path;
+		$path_prefix = $smarty->template_default_face_dir_rel.$smarty->template_engine_stylesheets_dir.URL_SEPARATOR;
+	} 
+//		Vzhled v engine
+	else  if(file_exists($smarty->template_dir.DIRECTORY_SEPARATOR.$_image_path)){
+		$path_prefix = '.'.URL_SEPARATOR.$smarty->template_engine_images_dir.URL_SEPARATOR;
+		$_image_path = '.'.URL_SEPARATOR.$smarty->template_engine_images_dir.URL_SEPARATOR.$_image_path;
+	} else {
+		$fileNotExist = true;    
+	}
     
 //		zvolení vzhledu
 //		vybraný vzhled
-	if(file_exists(AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path)){
-		$_image_path = AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
-		$path_prefix = AppCore::getTepmlateFaceDir(false).AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
-	} 
-//		Výchozí vzhled
-	else if(file_exists(AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path)){
-		$_image_path = AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
-		$path_prefix = AppCore::getTepmlateDefaultFaceDir(false).AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
-	} 
-//		Vzhled v engine
-	else {
-		$_image_path = '.'.DIRECTORY_SEPARATOR.AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
-		$path_prefix = '.'.URL_SEPARATOR.AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
-	};
+//	if(file_exists(AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path)){
+//		$_image_path = AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
+//		$path_prefix = AppCore::getTepmlateFaceDir(false).AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
+//	} 
+////		Výchozí vzhled
+//	else if(file_exists(AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path)){
+//		$_image_path = AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
+//		$path_prefix = AppCore::getTepmlateDefaultFaceDir(false).AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
+//	} 
+////		Vzhled v engine
+//	else {
+//		$_image_path = '.'.DIRECTORY_SEPARATOR.AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
+//		$path_prefix = '.'.URL_SEPARATOR.AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
+//	};
 	
 //    echo "TADY ---- ".$path_prefix.$file;
     
@@ -154,9 +172,11 @@ function smarty_function_html_engine_image($params, &$smarty)
         $height = round($height * $_resize);
     }
 
-//    echo "TADY ---- ".$path_prefix.$file;
-    
-    return $prefix . '<img src="'.$path_prefix.$file.'" alt="'.$alt.'" width="'.$width.'" height="'.$height.'"'.$extra.' />' . $suffix;
+    if(!$fileNotExist){
+        return $prefix . '<img src="'.$path_prefix.$file.'" alt="'.$alt.'" width="'.$width.'" height="'.$height.'"'.$extra.' />' . $suffix;
+	} else {
+		return false;
+	}
 }
 
 /* vim: set expandtab: */

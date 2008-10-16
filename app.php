@@ -589,6 +589,16 @@ class AppCore {
 		$this->templateFace = self::sysConfig()->getOptionValue('face');
 		self::$templateFaceDir = self::sysConfig()->getOptionValue('face');
 		self::$templateDefaultFaceDir = self::FACE_DEFAULT_NAME;
+		
+//		Přidání do smarty objektu proměných s cestami k adresáři s engine šablonami
+		$this->template->template_default_face_dir = self::getTepmlateDefaultFaceDir();
+		$this->template->template_default_face_dir_rel = self::getTepmlateDefaultFaceDir(false);
+		$this->template->template_face_dir = self::getTepmlateFaceDir();
+		$this->template->template_face_dir_rel = self::getTepmlateFaceDir(false);
+		$this->template->template_engine_stylesheets_dir = self::TEMPLATES_STYLESHEETS_DIR;
+		$this->template->template_engine_images_dir = self::TEMPLATES_IMAGES_DIR;
+//		$this->template->engine_dir = self::TEMPLATES_STYLESHEETS_DIR;
+		
 	}
 	
 	/**

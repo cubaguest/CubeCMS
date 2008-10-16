@@ -97,6 +97,11 @@ abstract class MainMenu {
 	 */
 	private $tablesItems = null;
 	
+	/**
+	 * Proměná s názvem skupiny uživatele
+	 * @var string
+	 */
+	private $userGroupName = 'guest';
 	
 	
 	/**
@@ -112,16 +117,15 @@ abstract class MainMenu {
 		$this->tablesSections = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
 		$this->tablesCategories = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->tablesItems = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
+		
+		$this->userGroupName = $this->auth->getGroupName();
 	}
 	
 	public function controller() {
-		$userNameGroup = $this->auth->getGroupName();
-
 		$menuSelect = $this->dbConnector->select()
 						   ->from(array("cat" => $this->tablesCategories), array(self::COLUMN_CATEGORY_URLKEY, self::COLUMN_CATEGORY_LABEL_IMAG => "IFNULL(cat.".self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getLang().", cat.".self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getDefaultLang().")", self::COLUMN_CATEGORY_ID, self::COLUMN_CATEGORY_ALT_IMAG => "IFNULL(cat.".self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getLang().", cat.".self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getDefaultLang().")"))
 						   ->join(array("s" => $this->tablesSections), "s.".self::COLUMN_SECTION_ID." = cat.".self::COLUMN_CATEGORY_ID_SECTION, null, array(self::COLUMN_SECTION_ID, self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getLang().", s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getDefaultLang().")", self::COLUMN_SECTION_ALT_IMAG => "IFNULL(s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getLang().", s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
 						   ->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
-						   ->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 						   ->where("cat.".self::COLUMN_CATEGORY_ACTIVE." = ".(int)true, "and")
 						   ->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU." = ".(int)true, "and")
 						   ->group("cat.".self::COLUMN_CATEGORY_ID)
@@ -130,13 +134,23 @@ abstract class MainMenu {
 						   ->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
 						   ->order(self::COLUMN_CATEGORY_LABEL_IMAG);
 
-
-		$this->menuArray = $this->dbConnector->fetchAssoc($menuSelect);
+		$this->loadMenu($menuSelect);
+	}
+	
+	/**
+	 * Metoda provede načtení menu a přiřadí menu do pole menu pro zpracování
+	 * @param DbInterface -- objekt s popisem jak se má menu načíst
+	 */
+	public function loadMenu($sqlSelect){
+//		Přidání výběru jen na zvolenou skupinu
+		$sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup()." LIKE \"r__\"");
+		
+		
+		$this->menuArray = $this->dbConnector->fetchAssoc($sqlSelect);
 		
 		if(empty($this->menuArray)){
 			new CoreException(_("Nepodařilo se nahrát hlavní menu z databáze"), 2);
 		}
-		
 	}
 	
 	public function view() {
@@ -169,6 +183,8 @@ abstract class MainMenu {
 	
 	/**
 	 * Metoda vrací objekt pro práci s odkazy
+	 * 
+	 * @return Links -- objekt pro prái s odkazy
 	 */
 	protected function getLink() {
 		return new Links(true);
@@ -207,6 +223,15 @@ abstract class MainMenu {
 	 */
 	public function getDb() {
 		return $this->dbConnector;
+	}
+	
+	/**
+	 * Metoda vrací název skupiny uživatele
+	 *
+	 * @return string -- nazev skupiny
+	 */
+	private function getUserGroup() {
+		return $this->userGroupName;
 	}
 	
 	
