@@ -17,6 +17,45 @@ abstract class MainMenu {
 	const TPL_ARRAY_NAME = 'MAIN_MENU';
 	
 	/**
+	 * Názva sloupců v databázi v tabulce kategorií
+	 * @var string
+	 */
+	const COLUMN_CATEGORY_ID 			= 'id_category';
+	const COLUMN_CATEGORY_ID_SECTION 	= 'id_section';
+	const COLUMN_CATEGORY_URLKEY 		= 'urlkey';
+	const COLUMN_CATEGORY_LABEL_PREFIX 	= 'label_';
+	const COLUMN_CATEGORY_LABEL_IMAG 	= 'clabel';
+	const COLUMN_CATEGORY_ALT_PREFIX 	= 'alt_';
+	const COLUMN_CATEGORY_ALT_IMAG 		= 'calt';
+	const COLUMN_CATEGORY_PROTECTED 	= 'protected';
+	const COLUMN_CATEGORY_SHOW_IN_MENU 	= 'show_in_menu';
+	const COLUMN_CATEGORY_PRIORITY 		= 'priority';
+	const COLUMN_CATEGORY_ACTIVE 		= 'active';
+	
+	/**
+	 * Názva sloupců v databázi v tabulce sekcí
+	 * @var string
+	 */
+	const COLUMN_SECTION_ID 			= 'id_section';
+	const COLUMN_SECTION_LABEL_PREFIX 	= 'label_';
+	const COLUMN_SECTION_LABEL_IMAG 	= 'clabel';
+	const COLUMN_SECTION_ALT_PREFIX 	= 'alt_';
+	const COLUMN_SECTION_ALT_IMAG 		= 'calt';
+	const COLUMN_SECTION_PRIORITY 		= 'priority';
+
+	/**
+	 * Názvy sloupců v tabulce s itemy
+	 *
+	 */
+	const COLUMN_ITEM_ID 			= 'id_item';
+	const COLUMN_ITEM_ID_CATEGORY 	= 'id_category';
+	const COLUMN_ITEM_ID_MODULE 	= 'id_module';
+	const COLUMN_ITEM_LABEL 		= 'label'; //@deprecated
+	const COLUMN_ITEM_ALT	 		= 'alt'; //@deprecated
+	const COLUMN_ITEM_SCROLL 		= 'calt';
+	const COLUMN_ITEM_PRIORITY 		= 'priority';
+	
+	/**
 	 * Objekt s databázovým kontrolerem
 	 * @var Db
 	 */
@@ -79,16 +118,16 @@ abstract class MainMenu {
 		$userNameGroup = $this->auth->getGroupName();
 
 		$menuSelect = $this->dbConnector->select()
-						   ->from(array("cat" => $this->tablesCategories), array("urlkey", "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", "alt" => "IFNULL(cat.alt_".Locale::getLang().", cat.alt_".Locale::getDefaultLang().")"))
-						   ->join(array("s" => $this->tablesSections), "s.id_section = cat.id_section", null, array("id_section", "slabel" => "IFNULL(s.label_".Locale::getLang().", s.label_".Locale::getDefaultLang().")", "salt" => "IFNULL(s.alt_".Locale::getLang().", s.alt_".Locale::getDefaultLang().")"))
-						   ->join(array("item" => $this->tablesItems), "cat.id_category = item.id_category", null, null)
+						   ->from(array("cat" => $this->tablesCategories), array(self::COLUMN_CATEGORY_URLKEY, self::COLUMN_CATEGORY_LABEL_IMAG => "IFNULL(cat.".self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getLang().", cat.".self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getDefaultLang().")", self::COLUMN_CATEGORY_ID, self::COLUMN_CATEGORY_ALT_IMAG => "IFNULL(cat.".self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getLang().", cat.".self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getDefaultLang().")"))
+						   ->join(array("s" => $this->tablesSections), "s.".self::COLUMN_SECTION_ID." = cat.".self::COLUMN_CATEGORY_ID_SECTION, null, array(self::COLUMN_SECTION_ID, self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getLang().", s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getDefaultLang().")", self::COLUMN_SECTION_ALT_IMAG => "IFNULL(s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getLang().", s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
+						   ->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
 						   ->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
-						   ->where("cat.active = 1", "and")
-						   ->group("cat.id_category")
-						   ->order("s.priority", "desc")
-						   ->order("slabel")
-						   ->order("cat.priority", "desc")
-						   ->order("clabel");
+						   ->where("cat.".self::COLUMN_CATEGORY_ACTIVE." = ".(int)true, "and")
+						   ->group("cat.".self::COLUMN_CATEGORY_ID)
+						   ->order("s.".self::COLUMN_SECTION_PRIORITY, "desc")
+						   ->order(self::COLUMN_SECTION_LABEL_IMAG)
+						   ->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
+						   ->order(self::COLUMN_CATEGORY_LABEL_IMAG);
 
 
 		$this->menuArray = $this->dbConnector->fetchAssoc($menuSelect);
