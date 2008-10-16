@@ -201,6 +201,14 @@ abstract class MainMenu {
 		return $this->tablesItems;
 	}
 	
+	/**
+	 * Metoda vrací objekt na db konektor
+	 * @return DbInterface -- objekt db konektoru
+	 */
+	public function getDb() {
+		return $this->dbConnector;
+	}
+	
 	
 }
 
