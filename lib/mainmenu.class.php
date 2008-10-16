@@ -123,6 +123,7 @@ abstract class MainMenu {
 						   ->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
 						   ->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 						   ->where("cat.".self::COLUMN_CATEGORY_ACTIVE." = ".(int)true, "and")
+						   ->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU." = ".(int)true, "and")
 						   ->group("cat.".self::COLUMN_CATEGORY_ID)
 						   ->order("s.".self::COLUMN_SECTION_PRIORITY, "desc")
 						   ->order(self::COLUMN_SECTION_LABEL_IMAG)
