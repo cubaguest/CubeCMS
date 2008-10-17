@@ -108,6 +108,23 @@ class Container {
 		}
 	}
 	
+	/**
+	 * Metoda vrací všechna uložená data v poli
+	 *
+	 * @return array -- pole s daty
+	 */
+	public function getAllData() {
+		return $this->data;
+	}
+	
+	/**
+	 * Metoda vrací všechny uložené odkazy v poli
+	 *
+	 * @return array -- pole s daty
+	 */
+	public function getAllLinks() {
+		return $this->links;
+	}
 	
 	
 }

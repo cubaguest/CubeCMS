@@ -59,8 +59,27 @@ abstract class View {
 		
 //		inicializace viewru
 		$this->init();
+		
+		$this->saveContainerToTpl();
 	}
 
+	/**
+	 * Metoda vloži data s containeru do šablony
+	 *
+	 */
+	private function saveContainerToTpl() {
+//		Uložení dat containeru do šablony
+		foreach ($this->container()->getAllData() as $key => $var) {
+			$this->template()->addVar($key, $var);
+		}
+
+//		Uložení odkazů do šablony
+		foreach ($this->container()->getAllLinks() as $key => $var) {
+			$this->template()->addVar($key, $var);
+		}
+	}
+	
+	
 	/**
 	 * Metoda, která se provede vždy
 	 */
