@@ -84,10 +84,16 @@ class Template {
 	const TEMPLATE_MODULE_STYLE_IDENT = 'IDENT';
 	
 	/**
-	 * Statické pole s šablonami a proměnými
+	 * Pole s šablonami a proměnými modulu
 	 * @var array
 	 */
 	private $templates = array();
+	
+	/**
+	 * Pole s proměnýmy madulu předaných do neginu
+	 * @var array
+	 */
+	private $engineVars = array();
 	
 	/**
 	 * Proměná s názvem titulku okna
@@ -447,8 +453,10 @@ class Template {
 		
 		if($isModuleVar AND $this->getModule() != null){
 			$this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME][$varName] = $varValue;
-		} else {
+		} else if($isModuleVar){
 			$this->templates[$varName] = $varValue;
+		} else {
+			$this->engineVars[$varName] = $varValue;
 		}
 		
 	}
@@ -474,6 +482,15 @@ class Template {
 	public function getTemplatesArray() {
 		return $this->templates;
 	}
+	
+	/**
+	 * Metoda vrací pole s proměnými předanými do enginu
+	 * @return array -- pole proměných
+	 */
+	public function getEngineVarsArray() {
+		return $this->engineVars;
+	}
+	
 	
 	
 	/**

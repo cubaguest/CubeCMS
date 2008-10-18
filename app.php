@@ -728,6 +728,11 @@ class AppCore {
 			}	
 		}
 		$this->assignVarToTpl('MAIN_MODULE_TITLE', $templateObject->getSubTitle());
+		
+		$engineVars = $templateObject->getEngineVarsArray();
+		if(!empty($engineVars)){
+			$this->assignVarToTpl('MODULE_ENGINE_VARS', $engineVars);
+		}
 	}
 	
 	/**
