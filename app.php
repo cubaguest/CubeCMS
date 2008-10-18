@@ -597,6 +597,7 @@ class AppCore {
 		$this->template->template_face_dir_rel = self::getTepmlateFaceDir(false);
 		$this->template->template_engine_stylesheets_dir = self::TEMPLATES_STYLESHEETS_DIR;
 		$this->template->template_engine_images_dir = self::TEMPLATES_IMAGES_DIR;
+		$this->template->template_modules_dir = self::MODULES_DIR;
 //		$this->template->engine_dir = self::TEMPLATES_STYLESHEETS_DIR;
 		
 	}
