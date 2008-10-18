@@ -16,25 +16,14 @@ function smarty_resource_module_source($tpl_name, &$tpl_source, &$smarty)
 {
 	$modulePath = $smarty->_tpl_vars['MODULE_TPL_FILE'];
 	$matches = array();
-	
+//	Regulérní výraz pro vytáhnutí názvu modulu
 	$reg = "/".$smarty->template_modules_dir."\/(.*)\/".$smarty->template_dir."/";
-	
 	preg_match($reg, $modulePath, $matches);
-	
 	$moduleName = $matches[1];
-	
-	
-	
-	
-	
-//	echo "<pre>";
-//	print_r($matches);
-//	print_r($smarty);
-//	echo "</pre>";
 	
 	$fileContent = null;
 	$path = null;
-	
+//	Cesta k šabloně modulu	
 	$modTplDir = DIRECTORY_SEPARATOR.$smarty->template_modules_dir.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR;
 	
 	if(file_exists($smarty->template_face_dir.$modTplDir.$tpl_name)){
@@ -53,7 +42,7 @@ function smarty_resource_module_source($tpl_name, &$tpl_source, &$smarty)
 		$fileContent = fread($file, filesize('..'.$modTplDir.$tpl_name));
 		fclose($file);
 	}
-//	
+	
 	if($fileContent != null){
 		$smarty->_plugins['resource']['module']['tpl_file_path'] = $path;
 		$tpl_source = $fileContent;

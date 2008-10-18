@@ -113,25 +113,6 @@ function smarty_function_html_engine_image($params, &$smarty)
 		$fileNotExist = true;    
 	}
     
-//		zvolení vzhledu
-//		vybraný vzhled
-//	if(file_exists(AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path)){
-//		$_image_path = AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
-//		$path_prefix = AppCore::getTepmlateFaceDir(false).AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
-//	} 
-////		Výchozí vzhled
-//	else if(file_exists(AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path)){
-//		$_image_path = AppCore::getTepmlateDefaultFaceDir().AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
-//		$path_prefix = AppCore::getTepmlateDefaultFaceDir(false).AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
-//	} 
-////		Vzhled v engine
-//	else {
-//		$_image_path = '.'.DIRECTORY_SEPARATOR.AppCore::TEMPLATES_IMAGES_DIR.DIRECTORY_SEPARATOR.$_image_path;
-//		$path_prefix = '.'.URL_SEPARATOR.AppCore::TEMPLATES_IMAGES_DIR.URL_SEPARATOR;
-//	};
-	
-//    echo "TADY ---- ".$path_prefix.$file;
-    
     if(!isset($params['width']) || !isset($params['height'])) {
         if(!$_image_data = @getimagesize($_image_path)) {
             if(!file_exists($_image_path)) {
