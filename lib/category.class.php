@@ -24,6 +24,7 @@ class Category {
 	const COLUM_CAT_LABEL 	= 'clabel';
 	const COLUM_SEC_LABEL 	= 'slabel';
 	const COLUM_CAT_ID		= 'id_category';
+	const COLUM_SEC_ID		= 'id_section';
 	const COLUM_CAT_URLKEY	= 'urlkey';
 	const COLUM_CAT_LPANEL	= 'left_panel';
 	const COLUM_CAT_RPANEL	= 'right_panel';
@@ -57,6 +58,12 @@ class Category {
 	 * @var integer
 	 */
 	private static $_categoryId = null;
+	
+	/**
+	 * Id Sekce
+	 * @var int
+	 */
+	private static $_sectionId = null;
 	
 	/**
 	 * URL klíč kategorie
@@ -101,7 +108,7 @@ class Category {
 //		$userNameGroup = self::$_auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
 		$userNameGroup = self::$_auth->getGroupName();
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(label_".Locale::getLang().", label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(label_".Locale::getLang().", label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID))
 						   ->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
 						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 						   ->where("cat.active = 1", "and")
@@ -120,6 +127,7 @@ class Category {
 		
 		self::$_categoryLabel = $catArray->{self::COLUM_CAT_LABEL};
 		self::$_categoryId = $catArray->{self::COLUM_CAT_ID};
+		self::$_sectionId = $catArray->{self::COLUM_SEC_ID};
 		self::$_categoryUrlkey = $catArray->{self::COLUM_CAT_URLKEY};
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
@@ -172,6 +180,14 @@ class Category {
 	 */
 	public static function getId() {
 		return self::$_categoryId;
+	}
+
+	/**
+	 * Metoda vrací id sekce kategorie
+	 * @return integer -- id sekce kategorie
+	 */
+	public static function getSectionId() {
+		return self::$_sectionId;
 	}
 
 	/**
