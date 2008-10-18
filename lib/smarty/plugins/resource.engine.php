@@ -48,7 +48,7 @@ function smarty_resource_engine_timestamp($tpl_name, &$tpl_timestamp, &$smarty)
 	$path = $smarty->_plugins['resource']['engine']['tpl_file_path'];
 	
 	if($path != null){
-		echo $tpl_timestamp = filectime($path.$tpl_name);
+		$tpl_timestamp = filectime($path.$tpl_name);
 		return true;
 	} else {
 		return false;
