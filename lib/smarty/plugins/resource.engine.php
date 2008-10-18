@@ -15,22 +15,27 @@
 function smarty_resource_engine_source($tpl_name, &$tpl_source, &$smarty)
 {
 	$fileContent = null;
-
+	$path = null;
+	
 	if(file_exists($smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name)){
+		$path = $smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR;
 		$file = fopen($smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name, 'r');
 		$fileContent = fread($file, filesize($smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name));
 		fclose($file);
 	} else if(file_exists($smarty->template_default_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name)){
+		$path = $smarty->template_default_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR;
 		$file = fopen($smarty->template_default_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name, 'r');
 		$fileContent = fread($file, filesize($smarty->template_default_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name));
 		fclose($file);
 	} else if(file_exists($smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name)){
+		$path = $smarty->template_dir.DIRECTORY_SEPARATOR;
 		$file = fopen($smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name, 'r');
 		$fileContent = fread($file, filesize($smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name));
 		fclose($file);
 	}
 	
 	if($fileContent != null){
+		$smarty->_plugins['resource']['engine']['tpl_file_path'] = $path;
 		$tpl_source = $fileContent;
 		return true;
 	} else {
@@ -40,8 +45,14 @@ function smarty_resource_engine_source($tpl_name, &$tpl_source, &$smarty)
 
 function smarty_resource_engine_timestamp($tpl_name, &$tpl_timestamp, &$smarty)
 {
-	$tpl_timestamp = time();
-	return true;
+	$path = $smarty->_plugins['resource']['engine']['tpl_file_path'];
+	
+	if($path != null){
+		echo $tpl_timestamp = filectime($path.$tpl_name);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function smarty_resource_engine_secure($tpl_name, &$smarty)
