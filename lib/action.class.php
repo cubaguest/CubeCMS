@@ -9,7 +9,7 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída pro obsluhu akcí
  */
-abstract class Action {
+class Action {
 	/**
 	 * Název $_GET s akcí
 	 * @var string
@@ -124,7 +124,7 @@ abstract class Action {
 	 * Metoda s uživatelskými akcemi
 	 * Je nutné ji definovat v souboru modulu
 	 */
-	abstract function actions();
+	public function actions(){}
 	
 	/**
 	 * Metoda provede přiřazení a vytvoření všech uživatelských akcí všech

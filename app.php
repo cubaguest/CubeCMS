@@ -1024,28 +1024,37 @@ class AppCore {
 				
 //				načtení souboru s akcemi modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-					require '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+					include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
 				} else {
 					new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
 				}
 				
+				
+				
 				$action = null;
-				if(class_exists("ModuleAction")){
-					$action = new ModuleAction($module, $article);
+				
+				$actionClassName = ucfirst($module->getName()).'Action';
+				if(class_exists($actionClassName)){
+					$action = new $actionClassName($module, $article);
+				} else {
+					$action = new Action($module, $article);
 				}
 				
 //				načtení souboru s cestami (routes) modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-					require '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+					include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
 				} else {
 					new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
 				}
 				
 				$routes = null;
-				if(class_exists("ModuleRoutes")){
-					$routes = new ModuleRoutes($article);
+				$routesClassName = ucfirst($module->getName()).'Routes';
+				if(class_exists($routesClassName)){
+					$routes = new $routesClassName($article);
+				} else {
+					$routes = new Routes($article);
 				}
-				
+
 //				načtení souboru s kontrolerem modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
 					require '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
@@ -1073,9 +1082,12 @@ class AppCore {
 
 //					Vygenerování typu použitého kontroleru
 					$actionCtrl == null ? $actionCtrl=strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX) : null;
-					$routes->getRoute() != null ? $actionCtrl = ucfirst($actionCtrl) : null;
-					$controllerAction = $routes->getRoute().$actionCtrl.self::MODULE_CONTROLLER_SUFIX;
-					$viewAction = $routes->getRoute().$actionCtrl.self::MODULE_VIEWER_SUFIX;
+					
+//					if($routes instanceof $routesClassName){
+						$routes->getRoute() != null ? $actionCtrl = ucfirst($actionCtrl) : null;
+						$controllerAction = $routes->getRoute().$actionCtrl.self::MODULE_CONTROLLER_SUFIX;
+						$viewAction = $routes->getRoute().$actionCtrl.self::MODULE_VIEWER_SUFIX;
+//					}
 
 //					Nastevní viewru v kontroleru
 					$controller->setView($viewAction);

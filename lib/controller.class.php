@@ -87,7 +87,7 @@ abstract class Controller {
 	 * @param Module -- objekt modulu
 	 * @param unknown_type $aplicationMainDir //TODO
 	 */
-	function __construct(Module $module, ModuleAction $action, Rights $rights, Messages &$messages, Messages &$errors, Article $article) {
+	function __construct(Module $module, Action $action, Rights $rights, Messages &$messages, Messages &$errors, Article $article) {
 		
 		//TODO
 		$this->module = $module;

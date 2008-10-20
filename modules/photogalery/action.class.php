@@ -3,7 +3,7 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class ModuleAction extends Action {
+class PhotogaleryAction extends Action {
 	public function actions(){
 		$this->addAction("addsection", "as");
 		$this->addAction("addgalery", "ag");

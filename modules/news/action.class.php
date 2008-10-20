@@ -3,7 +3,7 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class ModuleAction extends Action {
+class NewsAction extends Action {
 	
 
 	public function actions(){

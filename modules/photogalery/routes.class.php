@@ -1,5 +1,5 @@
 <?php
-class ModuleRoutes extends Routes {
+class PhotogaleryRoutes extends Routes {
 	function initRoutes() {
 		$this->addRoute("section");
 //		$this->addRoute("pokus");

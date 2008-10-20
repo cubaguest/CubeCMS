@@ -1,5 +1,5 @@
 <?php
-class ModuleRoutes extends Routes {
+class NewsRoutes extends Routes {
 	function initRoutes() {
 //		$this->addRoute("all");
 //		$this->addRoute("pokus");
