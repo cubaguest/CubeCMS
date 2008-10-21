@@ -23,3 +23,20 @@ Postup výběru šablony:
 1. Prohledání adresáře se zvoleným vzhledem /fases/your-face/
 2. Pokud nebyl soubor nalezen, je prohledán adresář s výchozím vzhledem /faces/default/
 2. Pokud ani zde nebyl soubor nalezen, je prohledán adresář v enginu (u modulu /modules/templates/)
+
+TAGY pro SMARTY templates
+
+Obrázky
+
+{html_engine_image file=''} 
+
+načítá obrázek podle zadané šablony, pokud neexistuje, je vložen výchozí obrázek, stejné jako tag {html_image}
+
+Šablony
+-engine
+{include file='engine:submenu.tpl'}
+Vkládá šablonu z hlavních šablon (podle zvolené face)
+
+-modul
+{include file='module:submenu.tpl'}
+Vkládá šablonu z práve zpracovávaného modulu

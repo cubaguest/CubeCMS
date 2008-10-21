@@ -745,7 +745,7 @@ class AppCore {
 		$merge = false;
 		
 		if($this->template->get_template_vars($varName) != null){
-			$this->template->append($varName, $value, null, true);
+			$this->template->append($varName, $value, true);
 		} else {
 			$this->template->assign($varName, $value);
 		}
@@ -1131,14 +1131,12 @@ class AppCore {
 //					Spuštění viewru
 					$controller->runView($template);
 					
-//					Uložení šablona a proměných do hlavní šablony
+//					Uložení šablony a proměných do hlavní šablony
 					$this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
-					
-					unset($template);
-
 					
 					//	Vrácení překladu na engine
 					Locale::switchToEngineTexts();
+					unset($template);
 					unset($controller);
 					$isModuleControlerRun = true;
 				} else {

@@ -16,16 +16,17 @@ function smarty_resource_module_source($tpl_name, &$tpl_source, &$smarty)
 {
 	$modulePath = $smarty->_tpl_vars['MODULE_TPL_FILE'];
 	$matches = array();
-//	Regulérní výraz pro vytáhnutí názvu modulu
+	
 	$reg = "/".$smarty->template_modules_dir."\/(.*)\/".$smarty->template_dir."/";
+	
 	preg_match($reg, $modulePath, $matches);
+	
 	$moduleName = $matches[1];
 	
 	$fileContent = null;
 	$path = null;
-//	Cesta k šabloně modulu	
-	$modTplDir = DIRECTORY_SEPARATOR.$smarty->template_modules_dir.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR;
 	
+	$modTplDir = $smarty->template_modules_dir.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR;
 	if(file_exists($smarty->template_face_dir.$modTplDir.$tpl_name)){
 		$path = $smarty->template_face_dir.$modTplDir;
 		$file = fopen($smarty->template_face_dir.$modTplDir.$tpl_name, 'r');
@@ -36,13 +37,13 @@ function smarty_resource_module_source($tpl_name, &$tpl_source, &$smarty)
 		$file = fopen($smarty->template_default_face_dir.$modTplDir.$tpl_name, 'r');
 		$fileContent = fread($file, filesize($smarty->template_default_face_dir.$modTplDir.$tpl_name));
 		fclose($file);
-	} else if(file_exists('..'.$modTplDir.$tpl_name)){
-		$path = '..'.$modTplDir.DIRECTORY_SEPARATOR;
-		$file = fopen('..'.$modTplDir.$tpl_name, 'r');
-		$fileContent = fread($file, filesize('..'.$modTplDir.$tpl_name));
+	} else if(file_exists('.'.DIRECTORY_SEPARATOR.$modTplDir.$tpl_name)){
+		$path = '.'.DIRECTORY_SEPARATOR.$modTplDir.DIRECTORY_SEPARATOR;
+		$file = fopen('.'.DIRECTORY_SEPARATOR.$modTplDir.$tpl_name, 'r');
+		$fileContent = fread($file, filesize('.'.DIRECTORY_SEPARATOR.$modTplDir.$tpl_name));
 		fclose($file);
 	}
-	
+//	
 	if($fileContent != null){
 		$smarty->_plugins['resource']['module']['tpl_file_path'] = $path;
 		$tpl_source = $fileContent;
