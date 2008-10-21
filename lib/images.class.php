@@ -207,11 +207,13 @@ class Images {
 		$tmpImage = $this->createTempImage();
 		
 		if($width == null){
-			$width = $this->newImageWidth;
+//			$width = $this->newImageWidth;
+			$width = $this->imageWidth;
 		}
 		
 		if($heigh == null){
-			$heigh = $this->newImageHeight;
+//			$heigh = $this->newImageHeight;
+			$heigh = $this->imageHeight;
 		}
 
 		if($newName == null){
