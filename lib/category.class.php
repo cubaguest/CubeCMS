@@ -79,6 +79,12 @@ class Category {
 	private static $_categoryRightPanel = false;
 
 	/**
+	 * názvem sekce
+	 * @var string
+	 */
+	private static $_sectionName = null;
+	
+	/**
 	 * konstruktor načte informace o kategorii
 	 *
 	 * @param Db object -- konektor k databázi
@@ -108,11 +114,13 @@ class Category {
 //		$userNameGroup = self::$_auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
 		$userNameGroup = self::$_auth->getGroupName();
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(label_".Locale::getLang().", label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID))
 						   ->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
+						   ->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
 						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 						   ->where("cat.active = 1", "and")
 						   ->where("cat.urlkey = '$catKey'", "and")
+						   ->order("sec.priority", "desc")
 						   ->order("cat.priority", "desc")
 						   ->order("clabel")
 						   ->limit(0,1);
@@ -131,6 +139,7 @@ class Category {
 		self::$_categoryUrlkey = $catArray->{self::COLUM_CAT_URLKEY};
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
+		self::$_sectionName = $catArray->{self::COLUM_SEC_LABEL};
 	}
 
 	/**
@@ -143,10 +152,12 @@ class Category {
 		$userNameGroup = self::$_auth->getGroupName();
 
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(label_".Locale::getLang().", label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID))
 						   ->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
+						   ->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
 						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 						   ->where("cat.active = 1", "and")
+						   ->order("sec.priority", "desc")
 						   ->order("cat.priority", "desc")
 						   ->order("clabel")
 						   ->limit(0,1);
@@ -161,9 +172,11 @@ class Category {
 		
 		self::$_categoryLabel = $catArray->{self::COLUM_CAT_LABEL};
 		self::$_categoryId = $catArray->{self::COLUM_CAT_ID};
+		self::$_sectionId = $catArray->{self::COLUM_SEC_ID};
 		self::$_categoryUrlkey = $catArray->{self::COLUM_CAT_URLKEY};
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
+		self::$_sectionName = $catArray->{self::COLUM_SEC_LABEL};
 	}
 
 	/**
@@ -188,6 +201,14 @@ class Category {
 	 */
 	public static function getSectionId() {
 		return self::$_sectionId;
+	}
+
+	/**
+	 * Metoda vrací název sekce kategorie
+	 * @return string -- název sekce kategorie
+	 */
+	public static function getSectionLabel() {
+		return self::$_sectionName;
 	}
 
 	/**
