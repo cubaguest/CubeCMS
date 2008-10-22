@@ -90,15 +90,49 @@ abstract class Panel{
 		$this->_rights = $rights;
 		
 //		Načtení souboru s akcemi modulu
-		if(class_exists("ModuleAction")){
-			$this->_action = new ModuleAction($this->getModule(), $this->_article);
-		}
+//		if(class_exists("ModuleAction")){
+//			$this->_action = new ModuleAction($this->getModule(), $this->_article);
+//		}
 		
 //		Načtení souboru s cestami (routes) modulu
-		if(class_exists("ModuleRoutes")){
-			$artcle = $this->getArticle();
-			$this->_routes = new ModuleRoutes($artcle);
+//		if(class_exists("ModuleRoutes")){
+//			$artcle = $this->getArticle();
+//			$this->_routes = new ModuleRoutes($artcle);
+//		}
+
+//				načtení souboru s akcemi modulu
+		if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+			include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+		} else {
+			new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
 		}
+
+
+
+		$action = null;
+
+		$actionClassName = ucfirst($this->getModule()->getName()).'Action';
+		if(class_exists($actionClassName)){
+			$action = new $actionClassName($this->_module, $this->_article);
+		} else {
+			$action = new Action($this->_module, $this->_article);
+		}
+
+//				načtení souboru s cestami (routes) modulu
+		if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
+			include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+		} else {
+			new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
+		}
+
+		$routes = null;
+		$routesClassName = ucfirst($this->getModule()->getName()).'Routes';
+		if(class_exists($routesClassName)){
+			$routes = new $routesClassName($this->_article);
+		} else {
+			$routes = new Routes($this->_article);
+		}
+		
 	}
 		
 	/**
