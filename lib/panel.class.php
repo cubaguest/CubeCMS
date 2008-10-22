@@ -113,9 +113,9 @@ abstract class Panel{
 
 		$actionClassName = ucfirst($this->getModule()->getName()).'Action';
 		if(class_exists($actionClassName)){
-			$action = new $actionClassName($this->_module, $this->_article);
+			$this->_action = new $actionClassName($this->_module, $this->_article);
 		} else {
-			$action = new Action($this->_module, $this->_article);
+			$this->_action = new Action($this->_module, $this->_article);
 		}
 
 //				načtení souboru s cestami (routes) modulu
@@ -128,9 +128,9 @@ abstract class Panel{
 		$routes = null;
 		$routesClassName = ucfirst($this->getModule()->getName()).'Routes';
 		if(class_exists($routesClassName)){
-			$routes = new $routesClassName($this->_article);
+			$this->_routes = new $routesClassName($this->_article);
 		} else {
-			$routes = new Routes($this->_article);
+			$this->_routes = new Routes($this->_article);
 		}
 		
 	}
