@@ -100,8 +100,11 @@ class UploadFiles {
 	 * 
 	 * @param string -- název $_POST se souborem
 	 * @param string -- adresář do kterého se má soubor zapsat
+	 * 
+	 * @return boolean -- true pokud byl soubor v pořádku nahrán
 	 */
 	public function upload($postName, $dest = null) {
+		$error = false;
 		if (is_uploaded_file($_FILES[$postName][self::POST_FILES_TMP_NAME])) {
 			$this->fileUploaded = true;
 			$this->noFileUpload = false;
@@ -113,38 +116,39 @@ class UploadFiles {
 		} else {
 			switch($_FILES[$postName][self::POST_FILES_ERROR]){
 				case 0: //no error; possible file attack!
-					$this->uploadError = true;
+					$this->uploadError = $error = true;
 					$this->addError('Problém s nahráním souboru');
 //					echo "There was a problem with your upload.";
 					break;
 				case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
-					$this->uploadError = true;
+					$this->uploadError = $error = true;
 					$this->addError('Soubor je příliš velký');
 //					echo "The file you are trying to upload is too big.";
 					break;
 				case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
-					$this->uploadError = true;
+					$this->uploadError = $error = true;
 					$this->addError('Soubor je příliš velký');
 //					echo "The file you are trying to upload is too big.";
 					break;
 				case 3: //uploaded file was only partially uploaded
 					$this->addError('Soubor byl nahrán jen částečně');
-					$this->uploadError = true;
+					$this->uploadError = $error = true;
 //					echo "The file you are trying upload was only partially uploaded.";
 					break;
 				case 4: //no file was uploaded
 					if(!$this->canEmpty){
 						$this->addError('Soubor nebyl vybrán');
-						$this->uploadError = true;
+						$this->uploadError = $error = true;
 					}
 //					echo "You must select an image for upload.";
 					break;
 				default: //a default error, just in case!  :)
-					$this->uploadError = true;
+					$this->uploadError = $error = true;
 					$this->addError('Problém s nahráním souboru');
 					break;
 			}
-		};
+		}
+		return !$error;
 	}
 	
 	/**

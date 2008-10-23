@@ -461,8 +461,7 @@ class Links {
 		if($this->category != null){
 			return $this->category.self::COOL_URL_SEPARATOR;
 		} else {
-//			return self::$selectedCategory.self::COOL_URL_SEPARATOR;
-			return null;
+			return Category::getUrlKey().self::COOL_URL_SEPARATOR;
 		}
 	}
 	
