@@ -10,6 +10,7 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro práci s lokalizačními prvky v kontroleru - helper
  * 
+ * pokusný komentář pomocí svn
  * @author $Author$
  * @copyright $Copyright$
  * @version $Revision$
