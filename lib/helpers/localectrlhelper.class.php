@@ -1,13 +1,21 @@
 <?php
+/* SVN FILE: $Id$ */
 /**
  * Ttřída lokalizačního Controll Helperu
  *
  * @category   	VVE VeproveVypeckyEnginy 
  * @package    	LocaleCtrlHelper class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: localectrlhelper.class.php 3.0.55 27.9.2008
+ * @version    	$Id$: localectrlhelper.class.php 3.0.55 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro práci s lokalizačními prvky v kontroleru - helper
+ * 
+ * @author $Author$
+ * @copyright $Copyright$
+ * @version $Revision$
+ * @lastrevision $Date$
+ * @modifiedby $LastChangedBy$
+ * @lastmodified $LastChangedDate$
  */
 
 class LocaleCtrlHelper extends CtrlHelper {
@@ -17,8 +25,26 @@ class LocaleCtrlHelper extends CtrlHelper {
 	 */
 	const ELEMENT_LANG_SEPARATOR = '_';
 	
+	/**
+	 * SpecialCharsEncode
+	 * @var string
+	 */
+	const SP_CHARS_ENCODE = 'encode'; 
 	
 	/**
+	 * SpecialCharsDecode
+	 * @var string
+	 */
+	const SP_CHARS_DECODE = 'decode'; 
+
+	/**
+	 * SpecialCharsNone
+	 * @var string
+	 */
+	const SP_CHARS_NONE = 'none'; 
+	
+	/**
+	 * Konstruktor třídy
 	 * Konstruktor třídy
 	 *
 	 */
@@ -75,8 +101,14 @@ class LocaleCtrlHelper extends CtrlHelper {
 	 * @param boolean -- jestli se mají klíče výstupního polu ukládat s prefixem
 	 * @return array -- pole upravených postů
 	 */
-	public function postsToArray($sendPostsArray, $postPrefix = null, $encodeSpecialChars = true, $decodeSpecialChars = false, $withPrefix = false){
+	public function postsToArray($sendPostsArray, $postPrefix = null, $specialChars = self::SP_CHARS_ENCODE, $withPrefix = false){
 		$returnArray = array();
+
+		if(is_array($specialChars)){
+			$specialCharsArray = true;
+		} else {
+			$specialCharsArray = false;
+		}
 		
 //		Uprava postu o doplnění znaku pro oddělení postu a jazyku
 		$postsArray = array();
@@ -90,15 +122,25 @@ class LocaleCtrlHelper extends CtrlHelper {
 		
 		
 		foreach (Locale::getAppLangs() as $lang) {
-			foreach ($postsArray as $post) {
-				$_POST[$postPrefix.$post.$lang] != null ? $sendPost = $_POST[$postPrefix.$post.$lang] : $sendPost = null;
+			foreach ($postsArray as $postKey => $post) {
+				if ($_POST[$postPrefix.$post.$lang] != null){
+					$sendPost = $_POST[$postPrefix.$post.$lang];
 
-				if($encodeSpecialChars){
-					$sendPost = htmlspecialchars($sendPost);
-				}
-					
-				if($decodeSpecialChars){
-					$sendPost = htmlspecialchars_decode($sendPost);
+					if($specialCharsArray){
+						if($specialChars[$postKey] == self::SP_CHARS_ENCODE){
+							$sendPost = htmlspecialchars($sendPost);
+						} else if($specialChars[$postKey] == self::SP_CHARS_DECODE){
+							$sendPost = htmlspecialchars_decode($sendPost);
+						}
+					} else {
+						if($specialChars == self::SP_CHARS_ENCODE){
+							$sendPost = htmlspecialchars($sendPost);
+						} else if($specialChars == self::SP_CHARS_DECODE){
+							$sendPost = htmlspecialchars_decode($sendPost);
+						}
+					}
+				}else {
+					$sendPost = null;
 				}
 				
 				if(!$withPrefix){
