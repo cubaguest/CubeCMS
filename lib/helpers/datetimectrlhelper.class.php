@@ -53,7 +53,27 @@ class DateTimeCtrlHelper extends CtrlHelper {
 		return $timestamp;
 	}
 	
-	
+	/**
+	 * Metoda vrací dané období (jaro, léto , podzim, zima)
+	 *
+	 * @param integer -- timestamp
+	 * @return integer -- číslo období (0-3)
+	 */
+	public function getSeason($timestamp){
+		$month = date("n",$timestamp);
+  		$day = date("j",$timestamp);
+  
+  		switch($month){
+    		case 1: case 2: return 3;
+    		case 3: if ($day < 21) return 3; else return 0;
+    		case 4: case 5: return 0;
+    		case 6: if ($day < 21) return 0; else return 1;  
+    		case 7: case 8: return 1;
+    		case 9: if ($day < 23) return 1; else return 2;
+    		case 10: case 11: return 2;
+    		case 12: if ($day < 21) return 2; else return 3;  
+  		}
+	}
 	
 }
 ?>
