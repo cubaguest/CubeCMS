@@ -190,6 +190,7 @@ class Action {
 			}
 		} else {
 			$this->article->setArticle((string)$get_action);
+			Links::setArticle((string)$get_action);
 		}
 
 		return $return;

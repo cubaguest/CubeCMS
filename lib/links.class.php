@@ -293,6 +293,22 @@ class Links {
 		}
 	}
 	
+	/**
+	 * Metoda nastaví článek
+	 * @param string -- článek
+	 */
+	public static function setArticle($article) {
+		self::$selectedAricle = $article;
+	}
+
+	/**
+	 * Metoda nastaví akci
+	 * @param string -- článek
+	 */
+	public static function setAction($action) {
+		self::$selectedAction = $action;
+	}
+	
 	
 	/*
 	 * VEŘEJNÉ METODY
