@@ -104,7 +104,7 @@ class DbCtrlHelper extends CtrlHelper {
 			$newKey=$newUniqueKey;
 		}
 
-		if(strlen($newKey) < 6){
+		if(strlen($newKey) < $minLenght){
 			$newKey = str_pad($newKey, $minLenght, ".", STR_PAD_BOTH);
 		}
 		
