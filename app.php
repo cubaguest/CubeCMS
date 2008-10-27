@@ -336,7 +336,7 @@ class AppCore {
 		
 //		inicializace odkazů
 		$this->_initLinks();
-		
+	
 		//inicializace lokalizace
 		$this->_initLocale();
 
@@ -975,12 +975,13 @@ class AppCore {
 
 //		Vytvoření dotazu pro db
 		$catItemsSelect = self::$dbConnector->select()
-						   ->from(array("item" => $itemsTable))
+						   ->from(array("item" => $itemsTable), array("label" => "IFNULL(item.label_".Locale::getLang().", item.label_".Locale::getDefaultLang().")", 
+						   				"alt" => "IFNULL(item.alt_".Locale::getLang().", item.alt_".Locale::getDefaultLang().")", '*'))
 						   ->join(array("module" => $modulesTable), "item.id_module=module.id_module", null)
 						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 						   ->where("item.id_category = '".Category::getId()."'", "and")
 						   ->order("item.priority", "desc")
-						   ->order("item.label");
+						   ->order("label");
 
 
 		$items = self::$dbConnector->fetchObjectArray($catItemsSelect);
@@ -1195,10 +1196,11 @@ class AppCore {
 //		Načtení panelů u db
 		$sqlSCelect = self::getDbConnector()->select()
 						   ->from(array("panel" => $panelsTable), "label")
-						   ->join(array("items" => $itemsTable), "items.id_item=panel.id_item", null)
-						   ->join(array("cat" => $categoryTable), "cat.id_category=items.id_category", null, "urlkey")
-						   ->join(array("module" => $modulesTable), "items.id_module=module.id_module", null)
-						   ->where("items.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->auth->getGroupName()." LIKE \"r__\"")
+						   ->join(array("item" => $itemsTable), "item.id_item=panel.id_item",null, array("label" => "IFNULL(item.label_".Locale::getLang().", item.label_".Locale::getDefaultLang().")", 
+						   				"alt" => "IFNULL(item.alt_".Locale::getLang().", item.alt_".Locale::getDefaultLang().")", '*'))
+						   ->join(array("cat" => $categoryTable), "cat.id_category=item.id_category", null, "urlkey")
+						   ->join(array("module" => $modulesTable), "item.id_module=module.id_module", null)
+						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->auth->getGroupName()." LIKE \"r__\"")
 						   ->where("panel.position = '".$panelSideLower."'", "and")
 						   ->where("panel.enable = ".(int)true, "and")
 						   ->order("panel.priority", "desc");
@@ -1418,7 +1420,7 @@ class AppCore {
 
 //		Inicializace modulu
 		$this->_initModules();
-		
+	
 		switch (self::media()) {
 			case 'sitemap':
 				$this->runSitemap();
