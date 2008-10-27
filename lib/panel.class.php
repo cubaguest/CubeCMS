@@ -100,33 +100,41 @@ abstract class Panel{
 //			$this->_routes = new ModuleRoutes($artcle);
 //		}
 
-//				načtení souboru s akcemi modulu
-		if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-			include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
-		} else {
-			new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
+		$action = null;
+		$actionClassName = ucfirst($this->getModule()->getName()).'Action';
+		
+//		Pokud ještě nebyla třída načtena
+		if(!class_exists($actionClassName,false)){
+//			načtení souboru s akcemi modulu
+			if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+				include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+			} else {
+				new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
+			}
 		}
 
-
-
-		$action = null;
-
-		$actionClassName = ucfirst($this->getModule()->getName()).'Action';
 		if(class_exists($actionClassName)){
 			$this->_action = new $actionClassName($this->_module, $this->_article);
 		} else {
 			$this->_action = new Action($this->_module, $this->_article);
 		}
 
-//				načtení souboru s cestami (routes) modulu
-		if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-			include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
-		} else {
-			new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
+//		Cesty
+		$routes = null;
+		$routesClassName = ucfirst($this->getModule()->getName()).'Routes';		
+		
+		
+//		Pokud ještě nebyla třída načtena
+		if(!class_exists($routesClassName, false)){		
+//			načtení souboru s cestami (routes) modulu
+			if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
+				include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+			} else {
+				new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
+			}
 		}
 
-		$routes = null;
-		$routesClassName = ucfirst($this->getModule()->getName()).'Routes';
+
 		if(class_exists($routesClassName)){
 			$this->_routes = new $routesClassName($this->_article);
 		} else {
