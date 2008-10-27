@@ -337,10 +337,11 @@ class Template {
 	public function setTplSubLabel($name, $merge = false, $separator = '-') {
 		if($this->getModule() != null){
 			if($merge){
-				if($this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL] != null){
+				if(isset($this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL]) AND $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL] != null){
 					$separator = ' '.$separator.' ';
 				} else {
 					$separator = null;
+					$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL] = null;
 				}
 				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL].=$separator.$name;
 			} else {
