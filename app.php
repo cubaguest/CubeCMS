@@ -1069,9 +1069,11 @@ class AppCore {
 					
 					$controller = new $controllerClassName($module, $action, $moduleRights, $this->messages, $this->userErrors, $article);
 
+					$actionCtrl = null;
 					//TODO není kompletí typ akce
-					$actionCtrl = $action->getAction();
-					
+					if($action->haveAction()){
+						$actionCtrl = $action->getAction();
+					}
 					/*
 					 * Pokud je zadán jenom článek a žádná akce
 					 * je použita výchozí akce (show)
@@ -1156,6 +1158,7 @@ class AppCore {
 				unset($action);
 				unset($routes);
 				unset($controller);
+				unset($actionCtrl);
 			}
 		} else {
 			if(new Links() == new Links(true)){
