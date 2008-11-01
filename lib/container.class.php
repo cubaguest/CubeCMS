@@ -80,7 +80,12 @@ class Container {
 	 * @return Eplugin -- uložený Eplugin
 	 */
 	public function getEplugin($index) {
-		return $this->ePlugins[$index];
+		if(isset($this->ePlugins[$index])){
+			return $this->ePlugins[$index];
+		} else {
+			throw new CoreException(_('Požedovaný eplugin nebyl přiřazen'));
+			return false;
+		}
 	}
 	
 	/**
