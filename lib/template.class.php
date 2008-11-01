@@ -144,7 +144,7 @@ class Template {
 	/**
 	 * metoda přidává zadanou šablonu do výstupu
 	 * 
-	 * @param string -- název šablony
+	 * @param string/array -- název šablony
 	 * @param boolean -- true pokud má být použita systémová šablona
 	 */
 	public function addTpl($tplName, $engineTpl = false, $tplId = 1){
@@ -154,14 +154,34 @@ class Template {
 		//přidání šablony do pole s šablonami modulu
 		if($this->getModule() != null){
 			if($engineTpl == false){
-				array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
+				if(!is_array($tplName)){
+					array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
 						array(self::TEMPLATE_FILE_NAME => $this->selectModuleTemplateFaceFile($tplName),
 					  	self::TEMPLATE_ID_NAME =>  $tplId));
+				} else {
+					foreach ($tplName as $tpl) {
+						array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
+							array(self::TEMPLATE_FILE_NAME => $this->selectModuleTemplateFaceFile($tpl),
+					  		self::TEMPLATE_ID_NAME =>  $tplId));
+					}
+					
+				}
 			} else {
-				array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
+				if(!is_array($tplName)){
+					array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
 //						array(self::TEMPLATE_FILE_NAME => AppCore::getAppWebDir().DIRECTORY_SEPARATOR.AppCore::TEMPLATES_DIR.DIRECTORY_SEPARATOR.$tplName,
 						array(self::TEMPLATE_FILE_NAME => $this->selectGlobalTemplateFaceFile($tplName),
 					  	self::TEMPLATE_ID_NAME =>  $tplId));
+				} else {
+					foreach ($tplName as $tpl) {
+						array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
+//						array(self::TEMPLATE_FILE_NAME => AppCore::getAppWebDir().DIRECTORY_SEPARATOR.AppCore::TEMPLATES_DIR.DIRECTORY_SEPARATOR.$tplName,
+							array(self::TEMPLATE_FILE_NAME => $this->selectGlobalTemplateFaceFile($tpl),
+					  		self::TEMPLATE_ID_NAME =>  $tplId));
+					}
+						  	
+				}
+					  	
 			}
 		}
 		
