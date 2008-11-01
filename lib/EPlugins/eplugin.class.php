@@ -216,6 +216,14 @@ class Eplugin {
 	public function progressbar() {
 		return new ProgressBar($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
 	}
+
+	/**
+	 * Metoda vrací objekt epluginu sendmail
+	 * @return SendMail -- objekt epluginu sendmail
+	 */
+	public function sendmail() {
+		return new SendMail($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+	}
 	
 	
 	/**

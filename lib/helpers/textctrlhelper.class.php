@@ -12,23 +12,6 @@
 
 class TextCtrlHelper extends CtrlHelper {
 	/**
-	 * Metoda kontroluje emailovou adresu
-	 * 
-	 * @param string -- adresa, která se má kontrolovat
-	 * @return boolean -- true pokud se jedná o email
-	 */
-	public function checkMail ($email) {
-
-		if (Eregl("^[a-z0-9_\.]+@[a-z0-9_\.]+[a-z]{2,3}$", $email)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
-	
-	/**
 	 * Metoda dekóduje znaky na entity html
 	 *
 	 * @param string -- text k dekódování
