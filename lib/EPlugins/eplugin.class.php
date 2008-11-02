@@ -224,6 +224,14 @@ class Eplugin {
 	public function sendmail() {
 		return new SendMail($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
 	}
+
+	/**
+	 * Metoda vrací objekt epluginu csvdata
+	 * @return CsvData -- objekt epluginu csvdata
+	 */
+	public function csvdata() {
+		return new CsvData($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+	}
 	
 	
 	/**
