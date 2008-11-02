@@ -68,7 +68,7 @@ class Container {
 	 * @param string/integer -- index epluginu
 	 * @param Eplugin -- objekt epluginu
 	 */
-	public function addEplugin($index, Eplugin $eplugin){
+	public function addEplugin($index, Eplugin &$eplugin){
 		//TODO dodělat kontrolu, jestli položka už není vložena
 		$this->ePlugins[$index] = $eplugin;
 	}
