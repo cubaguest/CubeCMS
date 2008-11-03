@@ -66,6 +66,12 @@ class Links {
 	const GET_ACTION = 'action';
 	
 	/**
+	 * $GET proměná s typem media (media)
+	 * @var string
+	 */
+	const GET_MEDIA = 'media';
+	
+	/**
 	 * Oddělovač prametrů hlavní url
 	 * @var string
 	 */
@@ -126,6 +132,12 @@ class Links {
 	private static $selectedParams = array();
 	
 	/**
+	 * Proměná s vybraným typem média
+	 * @var string
+	 */
+	private static $selectedMedia = null;
+	
+	/**
 	 * Adresa serveru (např. www.seznam.cz)
 	 * @var string
 	 */
@@ -168,6 +180,12 @@ class Links {
 	private $action = null;
 	
 	/**
+	 * Proměná s názvem média
+	 * @var string
+	 */
+	private $mediaType = null;
+	
+	/**
 	 * Jestli se má tvořit nový odkaz od začátku
 	 * @var boolean
 	 */
@@ -189,7 +207,7 @@ class Links {
 	 * Chráněné parametry systému
 	 * @var array
 	 */
-	private static $protectedParams = array("lang", "action", "category", "article");
+	private static $protectedParams = array("lang", "action", "category", "article", "media");
 	
 	/**
 	 * Konstruktor nastaví základní adresy a přenosový protokol
@@ -228,6 +246,11 @@ class Links {
 //		nastavení akce
 		if(isset($_GET[self::GET_ACTION])){
 			self::$selectedAction = $_GET[self::GET_ACTION];
+		}
+
+//		nastavení media
+		if(isset($_GET[self::GET_MEDIA])){
+			self::$selectedMedia = $_GET[self::GET_MEDIA];
 		}
 		
 //TODO	načtení ostatních parametrů 
@@ -309,7 +332,6 @@ class Links {
 		self::$selectedAction = $action;
 	}
 	
-	
 	/*
 	 * VEŘEJNÉ METODY
 	 */
@@ -333,6 +355,17 @@ class Links {
 	 */
 	public function article($article = null){
 		$this->article = $article;
+		return $this;
+	}
+
+	/**
+	 * Metoda nastavuje typ media
+	 * @param string -- jméno media
+	 * 
+	 * @return Links -- objket Links
+	 */
+	public function media($media = null){
+		$this->mediaType = $media;
 		return $this;
 	}
 
@@ -457,6 +490,7 @@ class Links {
 			$this->article = self::$selectedAricle;
 			$this->action = self::$selectedAction;
 			$this->paramsArray = self::$selectedParams;
+			$this->mediaType = self::$selectedMedia;
 		}
 	}
 	
@@ -516,6 +550,15 @@ class Links {
 			return null;
 		}
 	}
+
+	/**
+	 * Metoda doplní část media
+	 */
+	private function getMedia() {
+		if($this->mediaType != null){
+			$this->param(self::GET_MEDIA, $this->mediaType);
+		}
+	}
 	
 	/*
 	 * MAGICKÉ METODY
@@ -541,6 +584,8 @@ class Links {
         if($this->getAction() != null){
         	$returnString.=$this->getAction();
         }
+        
+        $this->getMedia();
         
         if(!empty($this->paramsArray)){
         	$returnString.=self::URL_SEPARATOR_LINK_PARAMS.$this->completeUrlParams();

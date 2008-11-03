@@ -671,8 +671,10 @@ class AppCore {
 	 */
 	private function _initMediaType() {
 		//TODO dodělat navázání na knihovnu Links, tak aby nebyla závislá na $_GET
-		if(isset($_GET[self::MEDIA_URL_PARAM_TYPE])){
-			AppCore::$mediaType = $_GET[self::MEDIA_URL_PARAM_TYPE];
+//		if(isset($_GET[self::MEDIA_URL_PARAM_TYPE])){
+		if(isset($_GET[Links::GET_MEDIA])){
+//			AppCore::$mediaType = $_GET[self::MEDIA_URL_PARAM_TYPE];
+			AppCore::$mediaType = $_GET[Links::GET_MEDIA];
 		}
 	}
 	
@@ -924,15 +926,29 @@ class AppCore {
 		}
 		
 //		Zvolení zobrazovaného média
-		switch (AppCore::media()) {
-			case AppCore::MEDIA_PRINT_TYPE:
-				$this->template->display($faceFilePath."index-print.tpl");
-			break;
-			
-			default:
-				$this->template->display($faceFilePath."index.tpl");
-			break;
+//		Medium pro tisk
+		if(AppCore::media() == AppCore::MEDIA_PRINT_TYPE){
+			$this->template->display($faceFilePath."index-print.tpl");
 		}
+//		Specielní media
+		else if(file_exists($faceFilePath."index-".AppCore::media().".tpl")){
+			$this->template->display($faceFilePath."index-".AppCore::media().".tpl");
+		} 
+//		Výchozí médium (www)
+		else {
+			$this->template->display($faceFilePath."index.tpl");
+		}
+		
+		
+//		switch (AppCore::media()) {
+//			case AppCore::MEDIA_PRINT_TYPE:
+//				$this->template->display($faceFilePath."index-print.tpl");
+//			break;
+//				
+//			default:
+//				$this->template->display($faceFilePath."index.tpl");
+//			break;
+//		}
 
 //		Při debug levelu vyšším jak 3 zobrazit výpis šablony
 		if(self::$debugLevel >= 3){
