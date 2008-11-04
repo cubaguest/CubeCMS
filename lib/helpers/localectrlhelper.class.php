@@ -1,22 +1,13 @@
 <?php
-/* SVN FILE: $Id$ */
 /**
  * Ttřída lokalizačního Controll Helperu
  *
  * @category   	VVE VeproveVypeckyEnginy 
  * @package    	LocaleCtrlHelper class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id$: localectrlhelper.class.php 3.0.55 27.9.2008
+ * @version    	$Id: localectrlhelper.class.php 3.0.55 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro práci s lokalizačními prvky v kontroleru - helper
- * 
- * pokusný komentář pomocí svn
- * @author $Author$
- * @copyright $Copyright$
- * @version $Revision$
- * @lastrevision $Date$
- * @modifiedby $LastChangedBy$
- * @lastmodified $LastChangedDate$
  */
 
 class LocaleCtrlHelper extends CtrlHelper {
@@ -61,6 +52,11 @@ class LocaleCtrlHelper extends CtrlHelper {
 	 */
 	public function generateArray($arrayElements, $values = null, $alternativeValues = null) {
 		$returnArray = array();
+		
+//		Test jestli je pole
+		if(!is_array($arrayElements)){
+			$arrayElements = array($arrayElements);
+		}
 		
 //		Oddělání posledního znaku určeného pro oddělení elementu a jazyku
 		$elements = array();
