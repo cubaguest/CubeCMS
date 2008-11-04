@@ -283,7 +283,11 @@ class Module {
 	 */
 	function getSelectParam($param)
 	{
-		return $this->params[$param];
+		if(isset($this->params[$param])){
+			return $this->params[$param];
+		} else {
+			return null;
+		}
 	}
 
 
