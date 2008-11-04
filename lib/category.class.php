@@ -269,6 +269,19 @@ class Category {
 		return self::$_categoryRightPanel;
 	}
 
+	/**
+	 * Metoda vrací požedovaný parametr
+	 * @param string -- index parametru
+	 * @return string -- parametr
+	 */
+	public static function getParam($param) {
+		if(isset(self::$_categoryParams[$param])){
+			return self::$_categoryParams[$param];
+		} else {
+			return null;
+		}
+	}
+	
 }
 
 ?>
