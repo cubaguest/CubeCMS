@@ -93,6 +93,11 @@ abstract class View {
 	 */
 	abstract function mainView();
 
+	/**
+	 * Metoda vrací objekt modulu
+	 *
+	 * @return Module -- objekt modulu
+	 */
 	final public function getModule() {
 		return 	$this->module;
 	}
