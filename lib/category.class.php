@@ -16,7 +16,13 @@ class Category {
 	 * @var string
 	 */
 	const GetCategoryName = Links::GET_CATEGORY;
-
+	
+	/**
+	 * Odělovač parametrů v pramaterech kategorie
+	 * @var string
+	 */
+	const CAT_PARAMS_SEPARATOR = ';';
+	
 	/**
 	 * Názvy sloupců v db tabulce
 	 * @var string
@@ -28,6 +34,7 @@ class Category {
 	const COLUM_CAT_URLKEY	= 'urlkey';
 	const COLUM_CAT_LPANEL	= 'left_panel';
 	const COLUM_CAT_RPANEL	= 'right_panel';
+	const COLUM_CAT_PARAMS	= 'params';
 	
 	
 	/**
@@ -85,6 +92,12 @@ class Category {
 	private static $_sectionName = null;
 	
 	/**
+	 * Pole s parametry kategorie
+	 * @var array
+	 */
+	private static $_categoryParams = array();
+	
+	/**
 	 * konstruktor načte informace o kategorii
 	 *
 	 * @param Db object -- konektor k databázi
@@ -114,7 +127,7 @@ class Category {
 //		$userNameGroup = self::$_auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
 		$userNameGroup = self::$_auth->getGroupName();
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
 						   ->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
 						   ->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
 						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
@@ -140,6 +153,7 @@ class Category {
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
 		self::$_sectionName = $catArray->{self::COLUM_SEC_LABEL};
+		self::parseParams($catArray->{self::COLUM_CAT_PARAMS});
 	}
 
 	/**
@@ -152,7 +166,7 @@ class Category {
 		$userNameGroup = self::$_auth->getGroupName();
 
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
 						   ->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
 						   ->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
 						   ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
@@ -177,8 +191,28 @@ class Category {
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
 		self::$_sectionName = $catArray->{self::COLUM_SEC_LABEL};
+		self::parseParams($catArray->{self::COLUM_CAT_PARAMS});
 	}
 
+	/**
+	 * Metoda parsuje parametry kategorie a uloží je do pole
+	 *
+	 * @param string -- řetězec s paramaetry
+	 */
+	private static function parseParams($params){
+		if ($params != null){
+			$arrayValues = array();
+			$arrayValues = explode(self::CAT_PARAMS_SEPARATOR, $params);
+//			print_r($arrayValues);
+
+			foreach ($arrayValues as $value) {
+				$tmpArrayValue = explode("=", $value);
+				self::$_categoryParams[$tmpArrayValue[0]]=$tmpArrayValue[1];
+			}
+		}
+		print_r(self::$_categoryParams);
+	}
+	
 	/**
 	 * Metoda vrací název kategorie
 	 * @return string -- název kategorie
