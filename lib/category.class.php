@@ -210,7 +210,7 @@ class Category {
 				self::$_categoryParams[$tmpArrayValue[0]]=$tmpArrayValue[1];
 			}
 		}
-		print_r(self::$_categoryParams);
+//		print_r(self::$_categoryParams);
 	}
 	
 	/**
