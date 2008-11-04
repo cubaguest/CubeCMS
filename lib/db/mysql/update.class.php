@@ -170,10 +170,16 @@ class Mysql_Db_Update extends Db_Update{
 		if(!empty($this->_sqlQueryParts[self::COLUMS_ARRAY])){
 			foreach ($this->_sqlQueryParts[self::COLUMS_ARRAY] as $colum => $value) {
 				if($value != null){
-					$columsString.=self::SQL_SEPARATOR."`".$colum."`= '".$value."'".self::SQL_VALUE_SEPARATOR;
+					//				Pokud je zadán expresion výraz
+					if(strpos($value, $colum) === false){
+						$columsString.=self::SQL_SEPARATOR."`".$colum."`= '".$value."'".self::SQL_VALUE_SEPARATOR;
+					} else {
+						$columsString.=self::SQL_SEPARATOR."".$colum."= ".$value."".self::SQL_VALUE_SEPARATOR;
+					}
 				} else {
 					$columsString.=self::SQL_SEPARATOR."`".$colum."`= null".self::SQL_VALUE_SEPARATOR;
 				}
+				
 			}
 //			odstranění poslední čárky
 			$columsString = substr($columsString, 0, strlen($columsString)-1);
