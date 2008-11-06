@@ -350,6 +350,24 @@ class SendMail extends Eplugin {
 		return $this->getDb()->query($sqlDel);
 	}
 	
+	/**
+	 * Metoda odešle mail na všechny přiřazené emaily
+	 */
+	public function sendMails() {
+//					vytvoření zprávy
+		$this->getMailDetails();
+
+		$mailDetail = $this->getTranslateMailDetail();
+		
+		$mailHelper = new MailCtrlHelper();
+		
+//		odeslání na registrované adresy
+		$sendMailsArr = $this->getOnlyMails();
+		foreach ($sendMailsArr as $mailTo) {
+			$mailHelper->sendMail($mailTo, $mailDetail[SendMail::COLUM_MAIL_SUBJECT], $mailDetail[SendMail::COLUM_MAIL_TEXT], $mailDetail[SendMail::COLUM_MAIL_REPLAY]);
+		}
+	}
+	
 	
 	/**
 	 * Metoda načte data z db
