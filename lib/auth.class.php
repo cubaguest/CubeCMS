@@ -92,6 +92,12 @@ class Auth {
 	 */
 	private $dbConnector = null;
 
+	/*
+	 * Proměná obsahuje jestli je uživatel přihlášen
+	 * @var boolean
+	 */
+	private static $isLogIn = false;
+	
 	/**
 	 * Konstruktor, provádí autorizaci
 	 */
@@ -140,8 +146,10 @@ class Auth {
 	private function _userIslogIn() {
 		if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
 			$this->login = true;
+			self::$isLogIn = true;
 		} else {
 			$this->login = false;
+			self::$isLogIn = false;
 		}
 
 		return $this->login;
@@ -216,6 +224,7 @@ class Auth {
 					if (md5(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->password){
 						//	Uspesne prihlaseni do systemu
 						$this->login = true;
+						self::$isLogIn = true;
 						$this->userName = $userResult->username;
 						$this->userGroupId = $userResult->id_group;
 						$this->userGroupName = $userResult->gname;
@@ -253,6 +262,7 @@ class Auth {
 			$this->session->add(self::USER_IS_LOGIN, false);
 //			$_SESSION[self::USER_IS_LOGIN] = false;
 			$this->login = false;
+			self::$isLogIn = false;
 			session_destroy();
 			$return = true;
 			
@@ -274,6 +284,15 @@ class Auth {
 	function isLogin() {
 		return $this->login;
 	}
+	
+	/**
+	 * Metoda vrací jestli je uživatel přihlášen
+	 * @return boolean -- true pokud je uživatel přihlášen
+	 */
+	public static function isLoginStatic() {
+		return self::$isLogIn;
+	}
+	
 	
 	/**
 	 * Metoda vrací název skupiny ve které je uživatel
