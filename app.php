@@ -1040,7 +1040,7 @@ class AppCore {
 				
 //				načtení souboru s akcemi modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-					include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+					include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
 				} else {
 					new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
 				}
@@ -1058,7 +1058,7 @@ class AppCore {
 				
 //				načtení souboru s cestami (routes) modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-					include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+					include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
 				} else {
 					new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
 				}
@@ -1073,7 +1073,7 @@ class AppCore {
 
 //				načtení souboru s kontrolerem modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
-					require '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
+					require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
 				} else {
 					new CoreException(_("Nepodařilo se nahrát controler modulu ") . $module->getName(), 5);
 				}
@@ -1137,7 +1137,7 @@ class AppCore {
 					
 					//			načtení souboru s viewrem modulu
 					if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
-						require '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
+						require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
 					} else {
 						Locale::switchToEngineTexts();
 						new CoreException(_("Nepodařilo se nahrát viewer modulu ") . $module->getName(), 7);
