@@ -1,9 +1,9 @@
 <?php
 /**
- * EPlugin pro kládání mailů na které se bude odesílat
+ * Třída EPluginu pro kládání mailů na které se bude odesílat.
+ * Třída slouží pro zprávu emailových adresa, na které se má například odesílat 
+ * nabídka. Obsahuje vlastní šablonu s editovatelným seznamem emailů.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	SendMail class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: sendmail.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
@@ -127,7 +127,6 @@ class SendMailEplugin extends Eplugin {
 	 *
 	 */
 	protected function init(){
-//		Načtení struktury emailu z db
 	}
 	
 	/**
@@ -167,7 +166,6 @@ class SendMailEplugin extends Eplugin {
 					new CoreException(_('E-mail se nepodařilo uložit'),1);
 //					$this->errMsg()->addMessage(_('Mail se nepodařilo uložit'));
 				}
-				
 			}
 			unset($mailHelper);
 		}
@@ -186,7 +184,6 @@ class SendMailEplugin extends Eplugin {
 					new CoreException(_('E-mail se nepodařilo smazat'), 3);
 				}
 			}
-			
 		}
 		
 //		Je ukládán nový text mailu
@@ -206,7 +203,6 @@ class SendMailEplugin extends Eplugin {
 				} else {
 					$this->errMsg()->addMessage(_('Chyba při ukládání textu e-mailu'));
 				}
-				
 			}
 		}
 	}
@@ -229,7 +225,6 @@ class SendMailEplugin extends Eplugin {
 									   ->colums(self::COLUM_ID_ITEM, self::COLUM_MAIL_SUBJECT, self::COLUM_MAIL_TEXT, self::COLUM_MAIL_REPLAY)
 									   ->values($this->getModule()->getId(), $subject, $text,$replay);
 		}
-		
 //		uložení
 		return $this->getDb()->query($sqlinsert);
 	}
@@ -258,8 +253,6 @@ class SendMailEplugin extends Eplugin {
 	 */
 	public function getMails() {
 		$this->getDataFromDb();
-		
-//		return $this->mailsArray;
 	}
 	
 	/**
@@ -269,12 +262,10 @@ class SendMailEplugin extends Eplugin {
 	 */
 	public function getOnlyMails() {
 		$this->getDataFromDb();
-		
 		$returnArray = array();
 		foreach ($this->mailsArray as $mail) {
 			array_push($returnArray, $mail[self::COLUM_MAIL]);
 		}
-		
 		return $returnArray;
 	}
 	
@@ -304,9 +295,7 @@ class SendMailEplugin extends Eplugin {
 	 */
 	public function getTranslateMailDetail() {
 		$this->getMailDetails();
-		
 		$mailDetail = $this->mailTextDetail;
-		
 		$text = &$mailDetail[self::COLUM_MAIL_TEXT];
 		
 		foreach ($this->mailTextTransTable as $translation) {
@@ -331,7 +320,6 @@ class SendMailEplugin extends Eplugin {
 			$sqlInser = $sqlInser->colums(self::COLUM_MAIL, self::COLUM_ID_ITEM)
 								->values($mail, $idItem);
 		}
-		
 //		vložení záznamu
 		return $this->getDb()->query($sqlInser);
 	}
@@ -356,9 +344,7 @@ class SendMailEplugin extends Eplugin {
 	public function sendMails() {
 //					vytvoření zprávy
 		$this->getMailDetails();
-
 		$mailDetail = $this->getTranslateMailDetail();
-		
 		$mailHelper = new MailCtrlHelper();
 		
 //		odeslání na registrované adresy
