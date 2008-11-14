@@ -1,14 +1,15 @@
 <?php
 /**
- * Pomocná třída Jspluginu pro práci s javascript soubory
+ * Pomocná třída JsPluginu.
+ * Třída slouží pro práci s javascript soubory v JsPluginu. Umožňuje 
+ * jednoduché nasatvené parametrů souboru.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	TinyMce class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: jspluginjsfile.class.php 3.0.0 beta1 29.8.2008
+ * @version    	$Id: jspluginjsfile.class.php 3.1.8 beta1 13.11.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třida zjednodušuje práci s javascript soubry JsPluginu
+ * @abstract 		Třida pro práci s javascript soubry JsPluginu
  */
+
 class JsPluginJsFile {
 	
 	/**
@@ -51,6 +52,11 @@ class JsPluginJsFile {
 		return $this->fileParams;
 	}
 	
+	/**
+	 * Metoda převede soubor na řetězec a přidá za něj parametry
+	 *
+	 * @return string -- soubor s parametry
+	 */
 	function __toString() {
 		$file = $this->jsFile;
 		

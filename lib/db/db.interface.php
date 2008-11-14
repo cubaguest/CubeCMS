@@ -1,7 +1,15 @@
 <?php
 /**
- * Interface pro třídu Db
+ * Třída obsluhuje interface pro db konektory..
+ * Třída zobrazuje prvky základní třídy dbkonektoru, které musí být použity v jednotlivých implementacích
+ * databázových konektorů.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: db.interface.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída s interfacem pro vytváření db konekorů
  */
+
 interface DbInterface{
 
 	/**

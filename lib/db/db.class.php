@@ -1,4 +1,15 @@
 <?php
+/**
+ * Třída obsluhuje db konektor k dabazázi, podle zvoleného typu vytvoří objekt 
+ *
+ * @category   	VVE VeproveVypeckyEnginy 
+ * @package    	Action class
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: db.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro vytvoření db konektoru
+ */
+
 class Db {
 	/**
 	 * statické proměné určující připojení k db

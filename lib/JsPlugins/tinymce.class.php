@@ -1,14 +1,16 @@
 <?php
 /**
- * Plugin TinyMce -- textový wisiwing editor
+ * Třída JsPluginu TinyMce.
+ * Třída slouží pro vytvoření JsPluginu TinyMce, což je wysiwing textový edtor,
+ * který se navazuje na textarea v šabloně. Třída umožňuje jednoduché nastavení 
+ * parametrů editor (volba vzhledu, jazyka, atd).
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	TinyMce class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: tinymce.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída JsPluginu TinyMce
+ * @abstract 		Třída JsPluginu TinyMce
  */
+
 class TinyMce extends JsPlugin {
 	/**
 	 * Konstanta s názvem adresáře s pluginem
@@ -73,41 +75,9 @@ class TinyMce extends JsPlugin {
 			'encoding' => 'xml',
 			'document_base_url' => null,
 			'external_image_list_url' => null,
-//			'remove_script_host' => 'false',
+			'remove_script_host' => 'false',
 //			'relative_urls' => 'false'
 			);
-
-			// Theme options
-//			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,|,preview,fullscreen",
-//			theme_advanced_buttons2 : "cut,copy,paste,pastetext,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,cleanup,code,|,inserttime,|,forecolor,backcolor",
-//			theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,image,media,|,ltr,rtl",
-//			theme_advanced_toolbar_location : "top",
-//			theme_advanced_toolbar_align : "left",
-//			theme_advanced_statusbar_location : "bottom",
-//			theme_advanced_resizing : true,
-//			save_onsave_callback : "send_text",
-//			entity_encoding : "raw",
-//			encoding : "xml",
-//			//external_image_list_url : "./cache/imageslist.js"
-//			remove_script_host : false,
-//			relative_urls : false
-		//save_enablewhendirty : true,
-
-		// Example content CSS (should be your site CSS)
-		// content_css : "css/content.css",
-
-		// Drop lists for link/image/media/template dialogs
-		//template_external_list_url : "lists/template_list.js",
-		//external_link_list_url : "lists/link_list.js",
-		//external_image_list_url : "/?eplugin=userfiles"
-		//media_external_list_url : "lists/media_list.js",
-
-		// Replace values for the template plugin
-		//template_replace_values : {
-		//	username : "Some User",
-		//	staffid : "991234"
-		//}
-//});';);
 	
 	/**
 	 * Enter description here...
@@ -122,11 +92,10 @@ class TinyMce extends JsPlugin {
 //		nastavení jazyka TinyMCE
 		$this->setParam('language', Locale::getLang());
 		$this->defaultParams['document_base_url'] = Links::getMainWebDir();
-//		$this->defaultParams['language'] = Locale::getLang();
 	}
 	
 	protected function initFiles() {
-		//		Výchozí js soubor pluginu
+//		Výchozí js soubor pluginu
 		$this->setSettingJsFile(new JsPluginJsFile("tiny_mce_default.js"));
 		
 //		Přidání js soubrů pluginu
@@ -192,11 +161,9 @@ class TinyMce extends JsPlugin {
 		}
 		
 		$this->checkImagesList($params);
-		
 		$content .= $this->generateParamsForFile($params);
-
 		$content .= $this->cfgFileFooter();
-		
+//		Odeslání souboru
 		$this->sendFileContent($content);
 	}
 	
@@ -239,17 +206,24 @@ class TinyMce extends JsPlugin {
 		$string = substr($string, 0, strlen($string)-2)."\n";
 		return $string;
 	}
-	
-	
+
+	/**
+	 * Metoda generuje hlavičku konfogiračního souboru
+	 *
+	 * @return string -- hlavička souboru
+	 */
 	private function cfgFileHeader() {
 		$header = "tinyMCE.init({\n";
-		
 		return $header;
 	}
 
+	/**
+	 * Metoda generuje patičku konfiguračního souboru
+	 *
+	 * @return string -- patička souboru
+	 */
 	private function cfgFileFooter() {
 		$footer = "});\n";
-		
 		return $footer;
 	}
 	
@@ -259,13 +233,6 @@ class TinyMce extends JsPlugin {
 	 * @param unknown_type $imagesArray
 	 */
 	public static function generateListImages($imagesArray) {
-//		var tinyMCEImageList = new Array(
-//	// Name, URL
-//	["Logo 1", "logo.jpg"],
-//	["Logo 2 Over", "logo_over.jpg"]
-//);
-//		;
-		
 		$string = "var tinyMCEImageList = new Array(\n";
 		foreach ($imagesArray as $name => $path) {
 			$string .= "[\"".$name."\", \"".$path."\"],\n";

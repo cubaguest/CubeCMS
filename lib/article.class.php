@@ -1,14 +1,16 @@
 <?php
 /**
- * Třída se stará o zvolený článek (article)
+ * Třída pro práci s článekem (article).
+ * Třída obsluhuje parametr článku, který je přenášen v URL. Umožňuje 
+ * přístup přímo k názvu článku. Je propojena s Třídou routes, protože 
+ * cesta se odvozuje od názvu článku. 
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Article class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: article.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu článku přenášeného v URL
+ * @abstract 		Třída pro obsluhu článku přenášeného v URL
  */
+
 class Article {
 	/**
 	 * $GET parametr s článkem

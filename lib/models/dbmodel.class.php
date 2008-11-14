@@ -1,23 +1,18 @@
 <?php
+require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . 'model.class.php';
+
 /**
- * Abstraktní třída pro Db Model
+ * Abstraktní třída pro Db Model.
+ * Tříta pro vytvoření modelu, přistupujícího k databázi. Umožňuje základní práce
+ * s databází.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	DbModel class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: dbmodel.class.php 3.0.55 26.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Abstraktní třída pro vytvoření modelu pro práci s databází
+ * @abstract 		Abstraktní třída pro vytvoření modelu pro práci s databází
  */
 
-require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . 'model.class.php';
-
 class DbModel extends Model {
-	/**
-	 * Objekt databáze
-	 * @var Dbinterface
-	 */
-//	private $db = null;
 	
 	/**
 	 * Konstruktor třídy

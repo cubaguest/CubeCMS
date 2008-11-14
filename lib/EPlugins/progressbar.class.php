@@ -1,15 +1,16 @@
 <?php
 /**
- * Třída Epluginu pro práci se scrolovátky a posunováním stránky
+ * Třída Epluginu pro práci s progrssbarem.
+ * Třída je určena pro práci s progressbarem, který zobrazuje stav provádění
+ * ve vlastním otevřeném okně. Je využit například při nahrávání více fotek.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Scroll class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: scroll.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída EPluginu pro práci se scrolovátky
- *
+ * @abstract 		Třída EPluginu pro práci se scrolovátky
+ * @todo 			dodělat možnost vytvářet vlastní styl okna
  */
+
 class ProgressBarEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
@@ -82,11 +83,8 @@ class ProgressBarEplugin extends Eplugin {
 	{
 //		Načtení stránky z url
 		$this->sessions = new Sessions();
-		
 		$this->progresLink = (string)$this->getLinks(true)->lang().AppCore::SPECIALITEMS_DIR.Links::COOL_URL_SEPARATOR.self::PROGRESS_DIR.Links::COOL_URL_SEPARATOR.self::PROGRESS_FILE;
-		
 		$this->setPageText();
-		
 		$this->reloadSession();
 	}
 	
@@ -98,7 +96,6 @@ class ProgressBarEplugin extends Eplugin {
 	public function setMessage($message)
 	{
 		$this->progressArray['message']	 = $message;
-		
 		$this->countPercents();
 		$this->actualStep++;
 		$this->reloadSession();
@@ -127,7 +124,8 @@ class ProgressBarEplugin extends Eplugin {
 	/**
 	 * Metoda nastavuje titulek okna
 	 *
-	 * @param int -- počet záznamů na stránce
+	 * @param string -- titulek okna
+	 * @todo implementovat nastavení titulku okna
 	 */
 	public function setWindowTitle($title)
 	{
@@ -165,7 +163,6 @@ class ProgressBarEplugin extends Eplugin {
 		$this->reloadSession();
 	}
 	
-	
 	/**
 	 * Metoda vynuluje progressbar
 	 */
@@ -185,8 +182,6 @@ class ProgressBarEplugin extends Eplugin {
 		$this->reloadSession();
 	}
 	
-	
-	
 	/**
 	 * Metoda obstarává přiřazení proměných do šablony
 	 *
@@ -197,25 +192,6 @@ class ProgressBarEplugin extends Eplugin {
 		
 		$jsPlugin = new ProgressBarJs();
 		$this->toTplJSPlugin($jsPlugin);
-//		$this->toTpl("BUTTON_NEXT", $this->isButtonNext());
-//		$this->toTpl("BUTTON_BACK", $this->isButtonBack());
-//		$this->toTpl("BUTTON_END", $this->isButtonEnd());
-//		
-////		Odkazy tlačítek
-//		$this->toTpl("SCROLL_BUTTONS_LINKS", $this->buttonsLinks);
-//
-////		Data o pozici scrolování
-//		$this->toTpl("SCROLL_SELECTED_PAGE", $this->selectPage);
-//		$this->toTpl("SCROLL_ALL_PAGES", $this->countAllPages);
-//
-////		popisky
-//		$this->toTpl("SCROLL_LABELS_ARRAY", $this->labelsArray);
-//		
-////		Sousedé u pozice
-//		$this->toTpl("SCROLL_LEFT_SIDE_DATA_ARRAY", $this->pagesLeftSideArray);
-//		$this->toTpl("SCROLL_RIGHT_SIDE_DATA_ARRAY", $this->pagesRightSideArray);
-		
 	}
-
 }
 ?>

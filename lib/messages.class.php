@@ -1,17 +1,17 @@
 <?php
 /**
- * Trida pro praci se zpravami,
- * slouzi pro jejich uchovani a vypis,
- * popripade dalsi vlastnosti
- *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Messages class
+ * Trida pro práci se zprávami.
+ * Metoda slouží pro shromažďování zpráv, jak chbových tak informačních. Tyto 
+ * zpráva jsou většinou vypisovány na výstup nebo ukládány.
+ * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: messages.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída pro obsluhu hlášek
  * //TODO refaktoring
+ * //TODO implementovat ukládání do souboru
  */
+
 class Messages {
 	/**
 	 * Pole se všemi zprávami
@@ -80,7 +80,6 @@ class Messages {
 		$this->saveMessages();
 	}
 	
-	
 	/**
 	 * Metoda vrací uložené zprávy
 	 */
@@ -97,7 +96,6 @@ class Messages {
 			}
 		}
 	}
-	
 	
 	/**
 	 * Funce pridava zpravu do pole se zpravami
@@ -134,11 +132,9 @@ class Messages {
 	function getMessages(){
 		
 		$messages = $this->messages;
-		
 		/**
 		 * Sloučení uložených a zobrazovaných zpráv
 		 */
-		
 		return $messages;
 	}
 

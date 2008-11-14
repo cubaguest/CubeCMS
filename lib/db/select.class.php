@@ -1,4 +1,15 @@
 <?php
+/**
+ * Abstraktní třída pro výběr záznamů z db.
+ * Třída zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
+ * databázových konektorů.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: select.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro výběr záznamů z db
+ */
+
 abstract class Db_Select {
 	/**
 	 * Metoda nastavuje z které tabulky se bude načítat

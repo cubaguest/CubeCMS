@@ -1,20 +1,16 @@
 <?php
 /**
- * Vypecky Engine
+ * Vypecky Engine.
+ * Hlavní třída aplikace - singleton
+ * Obsluhuje celou aplikaci a její komponenty.
  *
- * @category   VVE VeproveVypeckyEnginy
- * @package    Main Application file
  * @copyright  Copyright (c) 2008 Jakub Matas
  * @version    $Id: app.php 3.0.0 beta1 29.8.2008
- * @author Jakub Matas <jakubmatas@gmail.com>
- * @abstract Hlavní třída aplikace(Singleton)
+ * @author 	Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 	Hlavní třída aplikace(Singleton)
  *  
  */
 
-/**
- * Hlavní třída aplikace - singleton
- * Obsluhuje celou aplikaci a její komponenty
- */
 class AppCore {
 	/**
 	 * Výchozí cestak enginu

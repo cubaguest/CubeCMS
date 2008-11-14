@@ -1,15 +1,17 @@
 <?php
 /**
- * Třída Epluginu pro práci se scrolovátky a posunováním stránky
+ * Třída Epluginu pro práci se scrolováním stránek.
+ * Třída obsahuje metody pro práci s posunováním stránek. Je určena hlavně
+ * ke posunování mezi více stránkami (např. novinky). Obsahuje také vlastní šablonu,
+ * kterou lze jednoduše vložit do modulu, popřípadě si vytořit vlastní.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Scroll class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: scroll.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída EPluginu pro práci se scrolovátky
+ * @abstract 		Třída EPluginu pro práci se scrolovátky
  *
  */
+
 class ScrollEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
@@ -147,13 +149,11 @@ class ScrollEplugin extends Eplugin {
 	public function setCountAllRecords($records)
 	{
 		$this->allRecordsCount = $records;
-		
 //		Výpočet jednotlivých prvku
 		$this->countStartRecord();
 		$this->countButtons();
 		$this->countPagesButtons();
 		$this->createButtonsLinks();
-		
 	}
 	
 	/**

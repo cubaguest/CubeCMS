@@ -1,15 +1,15 @@
 <?php
 /**
- * Třída pro obsluhu konfiguračního souboru
+ * Třída pro obsluhu konfiguračního souboru.
+ * Třída slouží k získávání parametrů z konfiguračního souboru.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Config class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id:config.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu konfiguračního souboru
+ * @abstract 		Třída pro obsluhu konfiguračního souboru
  * 
  */
+
 class Config {
 	/**
 	 * Název sekce s tabulkami v databázi
@@ -29,8 +29,6 @@ class Config {
 	 */
 	private $_configArray = null;
 
-	private $_coreErrors = null;
-
 	/**
 	 * Konstruktor třídy
 	 *
@@ -38,8 +36,6 @@ class Config {
 	 */
 	function __construct($configFile, &$coreErrors) {
 		$this->_configFile = $configFile;
-		$this->_coreErrors = new Errors();
-		$this->_coreErrors = $coreErrors;
 		$this->_configArray = array();
 		$this->_initConfigFile();
 	}
@@ -52,11 +48,6 @@ class Config {
    			$xml = simplexml_load_file($this->_configFile);
 
    			$this->_configArray = $this->_objToArray($xml);
-
-//			echo "<pre>";
-//			print_r($this->_configArray);
-//			echo "</pre>";
-
 		} else {
 			throw new CoreException(_('Nepodařilo se otevšít konfigurační soubor ') . $this->_configFile, 101);
 		};
@@ -90,7 +81,6 @@ class Config {
 				return $xmlObject;
 			}
 		}
-
 		return $return;
 	}
 
@@ -104,34 +94,17 @@ class Config {
 	public function getOptionValue($option, $parentKey = null){
 		$return = null;
 		if($parentKey == null){
-//			try {
 				if(!isset($this->_configArray[$option])){
 					$error = new CoreException(_("Volba ").$option._(" není definována"), 102);
-//					$this->_coreErrors->addError($error->getException());
 				} else {
 					$return = $this->_configArray[$option];
 				}
-//				$return = $this->_configArray[$parentKey][$option];
-//			} catch (CoreException $err){
-
-//			}
-
-//			return $this->_configArray[$option];
 		} else {
-//			try {
 				if(!isset($this->_configArray[$parentKey][$option])){
 					$error = new CoreException(_("Volba ").$option._(" v sekci ").$parentKey._("není definována"), 103);
-//					$this->_coreErrors->addError($error->getException());
 				} else {
 					return $this->_configArray[$parentKey][$option];
 				}
-
-//			} catch (CoreException $err){
-//				$this->_coreErrors->addError($err->getException());
-//				echo "chyba " . $err;
-
-//			}
-//			return $this->_configArray[$parentKey][$option];
 		}
 		return $return;
 	}

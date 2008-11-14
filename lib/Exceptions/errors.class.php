@@ -1,10 +1,21 @@
 <?php
 /**
- * Třída pro obsluhu chyb
- * //TODO dodělat popisy a dokumentaci
+ * Třída slouží pro obsluhu chyb ve stránce.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: errors.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro obsluhu chyb
+ * @deprecated 
+ * @todo odstranit (popřípadě pokud se využije dodělat popisy a dokumentaci)
  */
 
 class Errors {
+	/**
+	 * Pole s chybami
+	 *
+	 * @var array
+	 */
 	private $errorsArray = array();
 
 	/**
@@ -31,10 +42,6 @@ class Errors {
 		foreach ($this->errorsArray as $index => $var) {
 			echo nl2br($var);
 		}
-
-//		echo "<pre>";
-//		print_r($this->errorsArray);
-//		echo "</pre>";
 	}
 
 	/**

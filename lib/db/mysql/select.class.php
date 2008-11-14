@@ -1,6 +1,16 @@
 <?php
 require_once './lib/db/select.class.php';
 
+/**
+ * Třída pro výběr záznamů z MySQL DB.
+ * Třída obsahuje implementaci metody select z db-interfacu.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: select.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro výběr záznamů
+ */
+
 class Mysql_Db_Select extends Db_Select {
 	/**
 	 * Konstanty pro příkazy SQL
@@ -66,11 +76,16 @@ class Mysql_Db_Select extends Db_Select {
 								 			self::ORDER_ORDER_KEY		=> array(),
 								 			self::SQL_LIMIT				=> array());
 
+	/**
+	 * Pole s částmi SQL dotazu ze kterých se bude při výstupu generovat samotná SQL dotaz
+	 *
+	 * @var array
+	 */	
 	protected $_sqlQueryParts = array();
 
 	protected $_connector = null;
 
-//	public function __construct(MySQLDb $connector) {
+	
 	public function __construct(Db $conector) {
 //		inicializace do zakladni podoby;
 		$this->_connector = $conector;

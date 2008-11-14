@@ -1,13 +1,13 @@
 <?php
 /**
- * Třída pro obsluhu autorizace určuje jestli je uživatel přihlášen a provádí operace s přihlášením
+ * Třída pro autorizaci.
+ * Třída obsluhuje přihlášení/odhlášení uživatele a práci s vlastnostmi (jméno, email, 
+ * id, skupinu, atd.) přihlášeného uživatele. 
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Auth class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: auth.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu autorizace uživatele
+ * @abstract 		Třída pro obsluhu autorizace uživatele
  */
 
 class Auth {
@@ -105,9 +105,6 @@ class Auth {
 		//Zakladni proměne
 		$this->login = false;
 
-		//konfigurační soubor
-//		$this->config = $config;
-//		chbové zprávy
 		$this->userErrors = $errors;
 //		inicializace konektoru k db
 		$this->dbConnector = $dbConnector;
@@ -204,13 +201,6 @@ class Auth {
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
 				$this->userErrors->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
-//				if (!($userResult=$loginMysql->sqlQuery("SELECT u.*, g.* FROM ".MYSQL_TABEL_PREFIX."users u 
-//					LEFT JOIN ".MYSQL_TABEL_PREFIX."groups g ON g.id_group = u.id_group 
-//					WHERE u.username ='".$_POST["login_username"]."'", true))){
-//					$error->addError(1001, "MYSQL ERROR: ".$loginMysql->getError());
-//				} 
-				
-//				$userSql = $this->dbConnector->select()->from(array("u" =>$this->config->getOptionValue("users_table", "db_tables")))
 				$userSql = $this->dbConnector->select()->from(array("u" =>AppCore::sysConfig()->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES)))
 						->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, Config::SECTION_DB_TABLES)), "g.id_group = u.id_group" , "left", array("*", "gname" => "name"))
 						->where("u.username = '".htmlentities($_POST["login_username"],ENT_QUOTES)."'");
@@ -260,7 +250,6 @@ class Auth {
 		
 		if(isset($_POST["logout_submit"])){
 			$this->session->add(self::USER_IS_LOGIN, false);
-//			$_SESSION[self::USER_IS_LOGIN] = false;
 			$this->login = false;
 			self::$isLogIn = false;
 			session_destroy();

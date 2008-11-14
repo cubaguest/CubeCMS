@@ -1,9 +1,10 @@
 <?php
 /** 
- * EPlugin práci s daty ve formátu cv
+ * Třída EPluginu práci s daty ve formátu cvs.
+ * Třída umožňuje exportovat a pracovat s daty ve formátu cvs, který se dá
+ * bezproblémově naimportovat do jakéhokoliv programu (Excel, Kmail, Thunderbid, atd).
+ * Sám obsahuje šablonu s formulářem pro stažení dat.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	CsvData class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: csvdata.class.php 3.0.0 beta1 2.11.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
@@ -79,7 +80,6 @@ class CsvDataEplugin extends Eplugin {
 	 *
 	 */
 	protected function init(){
-		
 	}
 	
 	/**
@@ -121,13 +121,11 @@ class CsvDataEplugin extends Eplugin {
 		$this->labelsArray = $labels;
 	}
 	
-	
 	/**
 	 * Metoda odešle data v csv formátu jako soubor pomocí hlaviček
-	 *
+	 * @todo ověřit a popípadě dodělat správné odesílání hlavičky
 	 */
 	public function sendData($fileName = 'data') {
-		
 		$csvData = $this->getCsvData();
 				
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
@@ -161,7 +159,6 @@ class CsvDataEplugin extends Eplugin {
 				$csvString .= $rowString."\n";
 			}
 		}
-				
 		return $csvString;
 	}
 	
@@ -181,7 +178,6 @@ class CsvDataEplugin extends Eplugin {
 		if(strpos($item, ' ') !== false OR strpos($item, $this->selectedSeparator) !== false){
 			$item = self::CSV_ENCLOSED.$item.self::CSV_ENCLOSED;
 		}
-		
 		return $item;
 	}
 	
@@ -189,7 +185,7 @@ class CsvDataEplugin extends Eplugin {
 	 * Metoda uloží csv data do zadaného souboru
 	 * 
 	 * @param string -- název souboru
-	 * //TODO není implementována
+	 * @todo implementovat ukládání do souboru na serveru (např. pro další stažení)
 	 */
 	public function saveCsvData($file) {
 		;
@@ -206,6 +202,5 @@ class CsvDataEplugin extends Eplugin {
 		
 		$this->toTpl("SEPARATORS", $this->csvDataSeparators);
 	}
-
 }
 ?>

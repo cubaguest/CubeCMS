@@ -1,4 +1,15 @@
 <?php
+/**
+ * Abstraktní třída pro aktualizaci záznamů v db.
+ * Třída zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
+ * databázových konektorů.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: update.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro aktualizaci záznamů v db
+ */
+
 abstract class Db_Update {
 	/**
 	 * Metoda nastavuje v které tabulce se bude upravovat

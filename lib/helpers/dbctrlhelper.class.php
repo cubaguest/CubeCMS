@@ -1,13 +1,13 @@
 <?php
 /**
- * Ttřída lokalizačního Controll Helperu
+ * Ttřída Controll Helperu pro zjednodušení práce s DB.
+ * Třída poskytuje metody pro jednodušší práci s prvky pro db. Například
+ * genervání unikátních db klíčů.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	LocaleCtrlHelper class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: localectrlhelper.class.php 3.0.55 27.9.2008
+ * @version    	$Id: dbctrlhelper.class.php 3.0.55 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro práci s lokalizačními prvky v kontroleru - helper
+ * @abstract 		Třída pro práci s prvky db v kontroleru(modelech) - helper
  */
 
 class DbCtrlHelper extends CtrlHelper {

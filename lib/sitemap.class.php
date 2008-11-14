@@ -1,14 +1,16 @@
 <?php
 /**
- * Třída pro vytvoření sitemapy pro vyhledávače
+ * Třída pro generování sitemapy.
+ * Třída generuje mapu webu v požadovaném formátu. Podporovány jsou formát pro 
+ * google (seznam) a yahoo. Je většinou volána zvlášť a využívá soubor sitemap.class.php 
+ * v modulech pro generování pro generování data poslední změny atd.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	SiteMap class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: sitemap.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro vytvoření sitemapy
+ * @abstract 		Třída pro tvorbu sitemap
  */
+
 class SiteMap {
 	/**
 	 * Proměné s názvy četností změn
@@ -83,9 +85,6 @@ class SiteMap {
 	 *
 	 */
 	public function run() {
-//		$date = new DateTime(date(DATE_ISO8601,filectime('./index.php')));
-//		$date->setTime(filectime('./index.php'));
-//		$date = filectime('./index.php');
 		$this->addItem($this->getLink(), filectime('./index.php'), self::SITEMAP_SITE_CHANGE_YEARLY, self::SITEMAP_SITE_DEFAULT_PRIORITY);
 	}
 	
@@ -103,7 +102,6 @@ class SiteMap {
 		if($frequency == null){
 			$frequency = $this->changeFreq;
 		}
-		
 		if($priority == null){
 			$priority = $this->priority;
 		}

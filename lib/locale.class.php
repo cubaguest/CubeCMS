@@ -1,14 +1,16 @@
 <?php
 /**
- * Třída pro práci s locale (místním nastavením)
+ * Třída pro práci s locale (místním nastavením).
+ * Třída slouží pro práci s jazykovým nastavením aplikace. Je určena k volbě 
+ * výchozího a zvoleného jazyka aplikace. Lze s ní ískat i kompletní výpis všech 
+ * jazyků, a všech použiých jazyků v aplikaci.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Locale class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: locale.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu jazykového nastavení
+ * @abstract 		Třída pro obsluhu jazykového nastavení
  */
+
 class Locale {
 	/**
 	 * Oddělovač jazyků v konfiguračním souboru
@@ -73,7 +75,6 @@ class Locale {
 	 * @param Config -- objekt systémové konfigurace
 	 */
 	public static function factory() {
-		
 		self::parseLangs();
 		
 		if (!isset($_GET[self::URL_PARAM_WITH_LANG])){
@@ -86,7 +87,6 @@ class Locale {
 				self::$selectLang = self::$defaultLang;
 			}
 		}
-		
 		self::_setLangTranslations();
 	}
 	
@@ -97,16 +97,9 @@ class Locale {
 	 */
 	public static function getAppLangsNames() {
 		$returnArray = array();
-		
-//		echo "<pre>";
-//		print_r(self::getAppLangs());
-//		echo "</pre>";
-		
 		foreach (self::getAppLangs() as $langKey => $lang) {
-//			array_push($returnArray, self::$localesNames[$lang]);
 			$returnArray[$lang] = self::$localesNames[$lang];
 		}
-		
 		return $returnArray;
 	}
 	
@@ -151,10 +144,8 @@ class Locale {
 	 */
 	private static function parseLangs() {
 		$langs = AppCore::sysConfig()->getOptionValue("langs");
-		
 		if ($langs != null){
 			self::$appLangs = explode(self::LANG_SEPARATOR, $langs);
-			
 			self::$defaultLang = self::$appLangs[0];
 		}
 	}

@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída obsluhuje práci s kategorií
+ * Třída obsluhuje práci se zvolenou kategorií.
+ * Třída umožňuje základní přístu k vlastnostem kategorie a volbu jejího 
+ * obsahu podle práv uživatele. Načítá také kategorii, která je výchozí nebo zvolená. 
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Category class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: category.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu zvolené kategorie
+ * @abstract 		Třída pro obsluhu zvolené kategorie
  */
+
 class Category {
 	/**
 	 * Název $_GET proměné s kategorií
@@ -42,11 +43,6 @@ class Category {
 	 * @var Db
 	 */
 	private static $_dbConnector = null;
-
-	/**
-	 * název kategorie
-	 * @var string
-	 */
 
 	/**
 	 * proměná a autorizací přístupu

@@ -1,13 +1,14 @@
 <?php
 /**
- * Abstraktní třída pro obsluh JavaScript Pluginů
+ * Abstraktní třída pro obsluh JavaScript Pluginů JsPlugins.
+ * Třída slouží jako základ pro tvorbu JsPluginů a jejich implementaci. Poskytuje 
+ * základní přístup k parametrům JsPlugin. Umožňuje také přímé generování souborů
+ * pro tvorbu dynamických nastavení a obsahů. Vše je ovládáno přes poheld (viewer).
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	JsPlugins class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: jsplugins.class.php 3.0.0 beta1 29.8.2008
+ * @version    	$Id: jsplugins.class.php 3.1.8 beta1 13.11.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Abstraktní třída pro práci s JsPluginy
+ * @abstract 		Abstraktní třída pro práci s JsPluginy
  */
 
 abstract class JsPlugin {

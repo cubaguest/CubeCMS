@@ -1,14 +1,16 @@
 <?php
 /**
- * Třída pro obsluhu souborů
+ * Třída pro obsluhu souborů.
+ * Základní třída pro práci se soubory. Umožňuje základní přístup k filesystému, 
+ * tj. vytváření a mazání adresářů, kopírování, mazání a přesun souborů souborů, 
+ * popřípadě zjišťování jejich existence.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Files class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: files.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu souborů
+ * @abstract 		Třída pro obsluhu souborů
  */
+
 class Files {
 	function __construct() {
 		;
@@ -117,12 +119,10 @@ class Files {
 	public function checkDir($directory) {
 		//TODO dodělat přidávání lomítek před adresář
 		
-		
 		//doplnění posledního lomítka za dest adresář
 		if($directory[strlen($directory)-1] != "/"){
 			$directory .= "/";
 		}
-		
 		
 		if(!file_exists($directory) OR !is_dir($directory)){
 			$this->createDirs($directory);
@@ -230,7 +230,6 @@ class Files {
 				$deleted = true;
 			}
 		}
-		
 		return $deleted;
 	}
 	
@@ -281,13 +280,7 @@ class Files {
 		if(($path[strlen($path)-1] != '/') AND ($path[strlen($path)-1] != '\\')){
 			$path.=DIRECTORY_SEPARATOR;
 		}
-		
 		return $path;
 	}
-	
-	
-	
 }
-
-
 ?>

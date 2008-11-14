@@ -1,22 +1,22 @@
 <?php
 require_once './lib/db/db.interface.php';
-
 require_once './lib/db/mysql/select.class.php';
 require_once './lib/db/mysql/insert.class.php';
 require_once './lib/db/mysql/delete.class.php';
 require_once './lib/db/mysql/update.class.php';
 
-class MySQLDb extends Db implements DbInterface {
-	/**
-	 * statické proměné určující připojení k db
-	 * @var string
-	 */
-//	protected $_serverName = null;
-//	protected $_userName = null;
-//	protected $_userPassword = null;
-//	protected $_dbName = null;
-//	protected $_tablePrefix = null;
+/**
+ * Třída implementující databázový objekt typu MySQL.
+ * Třída implementuje objet db konektoru k MySQL. Obsahuje implementace
+ * metod pro práci s SQL dotazy a samotné připojování k databázi.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: db.class.php 3.0.0 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro MySQL DB
+ */
 
+class MySQLDb extends Db implements DbInterface {
 	/**
 	 * statické pole se specílními SQL funkcemi
 	 * @var array
@@ -40,6 +40,12 @@ class MySQLDb extends Db implements DbInterface {
 	 * @var integer
 	 */
 	private $_numberOfAfectedRows = null;
+	
+	/**
+	 * Počet vrácených záznamů naposledy provedeným dotazem
+	 *
+	 * @var integer
+	 */
 	private $_numberOfReturnRows = null;
 
 	/**
@@ -58,33 +64,18 @@ class MySQLDb extends Db implements DbInterface {
 	 * @param string -- prefix tabulek (option)
 	 */
 	function __construct(){
-//		$this->_serverName = $serverName;
-//		$this->_userName = $userName;
-//		$this->_userPassword = $userPassword;
-//		$this->_dbName = $dbName;
-//		$this->_tablePrefix = $tablePrefix;
-
 		$this->_mysqliObject = new mysqli(parent::$_serverName, parent::$_userName, parent::$_userPassword, parent::$_dbName);
 	}
 
 	/**
 	 * Metoda provede připojení k databázi a nastaví link na spojení
+	 * @todo dodělat nastavení kódování
 	 */
 	private function _connect() {
-//		if(!($this->_mysqlLink = mysqli_connect(parent::$_serverName, parent::$_userName, parent::$_userPassword))){
-//				throw new CoreException("Cannot connect database host", 1);
-//				throw new CoreException(mysqli_error($this->_mysqlLink), 1);
-//		}
 		if (mysqli_connect_errno()) {
 			throw new CoreException(mysqli_connect_error(), 201);
 		}
-		
-//		//TODO Nastaveni kódování
 		$this->_mysqliObject->set_charset("utf8");
-
-//		if(!mysqli_select_db($this->_mysqlLink, parent::$_dbName)){
-//			throw new CoreException("Cannot select database", 2);
-//		}
 	}
 
 	/**
@@ -93,7 +84,6 @@ class MySQLDb extends Db implements DbInterface {
 	 */
 	private function _disconect() {
 		if($this->_mysqliObject != null){
-//			mysqli_close($this->_mysqlLink);
 			$this->_mysqliObject->close();
 		} else {
 			throw new CoreException("Database server not connected", 203);
@@ -126,7 +116,6 @@ class MySQLDb extends Db implements DbInterface {
 			$queryType = strtolower(substr($sqlQuery, 0, 6));
 
 			if ($queryType == "select"){
-//				$this->_numberOfReturnRows=mysqli_num_rows($result);
 				$this->_numberOfReturnRows=$result->num_rows;
 			} else if($queryType == "insert"){
 				$this->_lastInsertedId=$this->_mysqliObject->insert_id;
@@ -140,8 +129,6 @@ class MySQLDb extends Db implements DbInterface {
 			new CoreException($this->_mysqliObject->error, 204);
 			$result = false;
 		}
-
-//		$this->_disconect();
 		return $result;
 	}
 
@@ -205,7 +192,6 @@ class MySQLDb extends Db implements DbInterface {
 		}
 	}
 	
-	
 	/**
 	 * Metoda pro generování SQL dotazů typu INSERT
 	 *
@@ -235,8 +221,6 @@ class MySQLDb extends Db implements DbInterface {
 	public function update() {
 		return new Mysql_Db_Update($this);
 	}
-	
-	
 
 	/**
 	 * Metoda provede sql dotaz a výstup doplní do asociativního pole
@@ -246,7 +230,6 @@ class MySQLDb extends Db implements DbInterface {
 	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
 	 */
 	public function fetchAssoc($sqlQuery, $oneArray = false) {
-
 		$queryResult = $this->query($sqlQuery);
 
 		if($queryResult){
@@ -258,7 +241,6 @@ class MySQLDb extends Db implements DbInterface {
 			} else {
 				$resultArray = $queryResult->fetch_assoc();
 			}
-
 			return $resultArray;
 		} else {
 			return false;
@@ -272,7 +254,6 @@ class MySQLDb extends Db implements DbInterface {
 	 * @return array -- pole objektů MySQLi_Result
 	 */
 	public function fetchObjectArray($sqlQuery) {
-
 		$queryResult = $this->query($sqlQuery);
 
 		if($queryResult){
@@ -280,7 +261,6 @@ class MySQLDb extends Db implements DbInterface {
 			while ($sqlObject=$queryResult->fetch_object()) {
 				array_push($resultArray, $sqlObject);
 			}
-
 			return $resultArray;
 		} else {
 			return false;
@@ -295,14 +275,12 @@ class MySQLDb extends Db implements DbInterface {
 	public function fetchObject($sqlQuery)
 	{
 		$queryResult = $this->query($sqlQuery);
-
 		if($queryResult){
 			return $queryResult->fetch_object();
 		} else {
 			return false;
 		}
 	}
-	
 }
 
 ?>

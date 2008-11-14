@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro práci s moduly v kategorii
+ * Třída pro práci s moduly v kategorii.
+ * Třída poskytuj ezákladní přístup k parametrům modulu. Pomocí ní lze zjišťovat 
+ * např. použité databázové tabulky modulu, adresáře, a některé ostatní parametry, 
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Module class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: module.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu modulů v kategorii
+ * @abstract 		Třída pro obsluhu modulů v kategorii
  */
+
 class Module {
 	/**
 	 * Odělovač parametrů v pramaterech modulu
@@ -256,14 +257,12 @@ class Module {
 		if ($catParams != null){
 			$arrayValues = array();
 			$arrayValues = explode(self::MODULE_PARAMS_SEPARATOR, $catParams);
-//			print_r($arrayValues);
 
 			foreach ($arrayValues as $value) {
 				$tmpArrayValue = explode("=", $value);
 				$this->params[$tmpArrayValue[0]]=$tmpArrayValue[1];
 			}
 		}
-//		print_r($this->categoryParams);
 	}
 
 	/**

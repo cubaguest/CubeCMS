@@ -1,6 +1,16 @@
 <?php
 require_once './lib/db/update.class.php';
 
+/**
+ * Třída pro aktualizaci záznamů v MySQL DB.
+ * Třída obsahuje implementaci metody update z db.interfacu.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: update.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro aktualizaci záznamů
+ */
+
 class Mysql_Db_Update extends Db_Update{
 	/**
 	 * Konstanty pro příkazy SQL
@@ -45,11 +55,25 @@ class Mysql_Db_Update extends Db_Update{
 								 			self::ORDER_ORDER_KEY		=> array(),
 								 			self::SQL_LIMIT				=> array());
 
+	/**
+	 * Pole s částmi SQL dotazu ze kterých se bude při výstupu generovat samotná SQL dotaz
+	 *
+	 * @var array
+	 */							 			
 	protected $_sqlQueryParts = array();
 
+	/**
+	 * Objet Db konektoru
+	 *
+	 * @var Db
+	 */
 	protected $_connector = null;
 
-//	public function __construct(MySQLDb $connector) {
+	/**
+	 * Konstruktor třídy vytváří objet UPDATE pro update databáze
+	 *
+	 * @param Db -- objekt db konektoru
+	 */
 	public function __construct(Db $conector) {
 //		inicializace do zakladni podoby;
 		$this->_connector = $conector;
@@ -65,9 +89,7 @@ class Mysql_Db_Update extends Db_Update{
 	 * @return Db_Update -- objekt Db_Update
 	 */
 	public function table($table) {
-		
 		$this->_sqlQueryParts[ self::TABLE] = $table;
-
 		return $this;
 	}
 
@@ -84,7 +106,6 @@ class Mysql_Db_Update extends Db_Update{
 		foreach ($values as $key => $value){
 			$this->_sqlQueryParts[self::COLUMS_ARRAY][$key] = $value;
 		}
-		
 		return $this;
 	}
 	
@@ -112,9 +133,7 @@ class Mysql_Db_Update extends Db_Update{
 		if(!is_array($this->_sqlQueryParts[self::SQL_WHERE])){
 			$this->_sqlQueryParts[self::SQL_WHERE] = array();
 		}
-
 		array_push($this->_sqlQueryParts[self::SQL_WHERE], $tmpArray);
-
 		return $this;
 	}
 
@@ -130,8 +149,7 @@ class Mysql_Db_Update extends Db_Update{
 		$order = strtoupper($order);
 		if(!is_array($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
 				$this->_sqlQueryParts[self::ORDER_ORDER_KEY] = array();
-			}
-
+		}
 		$columArray = array();
 
 		if($order == self::SQL_DESC){
@@ -155,7 +173,6 @@ class Mysql_Db_Update extends Db_Update{
 	public function limit($rowCount, $offset) {
 		$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $rowCount;
 		$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY] = $offset;
-
 		return $this;
 	}
 
@@ -179,13 +196,10 @@ class Mysql_Db_Update extends Db_Update{
 				} else {
 					$columsString.=self::SQL_SEPARATOR."`".$colum."`= null".self::SQL_VALUE_SEPARATOR;
 				}
-				
 			}
 //			odstranění poslední čárky
 			$columsString = substr($columsString, 0, strlen($columsString)-1);
-
 		}
-
 		return $columsString;
 	}
 
@@ -196,7 +210,6 @@ class Mysql_Db_Update extends Db_Update{
 	private function _createTable() {
 		$fromString = null;
 		$fromString .= self::SQL_SEPARATOR . MySQLDb::$_tablePrefix . $this->_sqlQueryParts[self::TABLE];
-
 		return $fromString;
 	}
 
@@ -214,11 +227,9 @@ class Mysql_Db_Update extends Db_Update{
 				if($whereKey != 0){
 					$wheresString .= $whereCondition[self::WHERE_CONDITION_OPERATOR_KEY];
 				}
-
 				$wheresString .= self::SQL_SEPARATOR . $whereCondition[self::WHERE_CONDITION_NAME_KEY] . self::SQL_SEPARATOR;
 			}
 		}
-
 		return $wheresString;
 	}
 
@@ -233,7 +244,6 @@ class Mysql_Db_Update extends Db_Update{
 			foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
 				$orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
 			}
-
 			//			odstranění poslední čárky
 			$orderString = substr($orderString, 0, strlen($orderString)-1);
 		}
@@ -265,17 +275,12 @@ class Mysql_Db_Update extends Db_Update{
     public function __toString()
     {
         $sql = self::SQL_UPDATE;
-
         foreach ($this->_sqlQueryParts as $partKey => $partValue) {
         	$createMethod = '_create' . ucfirst($partKey);
         	if(method_exists($this, $createMethod)){
         		$sql .= $this->$createMethod();
         	}
         }
-
-//		echo "<pre>";
-//		print_r($this);
-//		echo "</pre>";
         return $sql;
     }
 }

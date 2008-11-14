@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro obsluhu adresářů modulu
+ * Třída pro obsluhu adresářů modulu.
+ * Třída slouží pro přístup k jednotlivým adresářům modulu. Pracuje jak s datovým, 
+ * tak s hlavním adresářem modulu, ale i s adresáři stylesheetu a šablon modulu.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	ModuleDirs class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: moduledirs.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu adresářů modulu
+ * @abstract 		Třída pro obsluhu adresářů modulu
  */
+
 class ModuleDirs {
 	/**
 	 * Adresář se složkami modulu

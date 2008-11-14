@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro práci s daty mezi controlerrem a viewrem
+ * Třída pro přenos daty mezi controlerrem a viewrem.
+ * Třída umožňuje přenášet data meti kontrolery a pohledy. Popřípadě 
+ * jejich přímou prezentaci do šablony modulu.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Container class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: container.class.php 3.0.5 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro obsluhu dat mezi viewrem a controlerem
  */
+
 class Container {
 	/**
 	 * Pole s uživatelskými daty

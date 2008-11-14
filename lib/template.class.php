@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro práci s šablonami modulů
+ * Třída pro práci s šablonami modulu.
+ * Třida obsahuje vrstvu mezi šablonovacím systémem a samotným pohledem (viewrem). 
+ * Umožňuje všechny základní operace při volbě a plnění šablony a jejímu zobrazení.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Template class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: template.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu šablony
+ * @abstract 		Třída pro obsluhu šablony
  */
+
 class Template {
 	/**
 	 * Název pole s moduly (items) kategorie
@@ -164,7 +165,6 @@ class Template {
 							array(self::TEMPLATE_FILE_NAME => $this->selectModuleTemplateFaceFile($tpl),
 					  		self::TEMPLATE_ID_NAME =>  $tplId));
 					}
-					
 				}
 			} else {
 				if(!is_array($tplName)){
@@ -179,12 +179,9 @@ class Template {
 							array(self::TEMPLATE_FILE_NAME => $this->selectGlobalTemplateFaceFile($tpl),
 					  		self::TEMPLATE_ID_NAME =>  $tplId));
 					}
-						  	
 				}
-					  	
 			}
 		}
-		
 	}
 	
 	/**
@@ -225,15 +222,11 @@ class Template {
 		} 
 //		Vzhled v engine
 		else {
-//			$faceFile = $this->getModule()->getDir()->getTemplatesDir().$file;
 			$faceFile = $file;
 		};
 		
 		return $faceFile;
 	}
-	
-	
-	
 	
 	/** 
 	 * Metody kontroluje vytvoření pole s moduly (items) kategorie
@@ -247,20 +240,6 @@ class Template {
 			}
 		}
 	}
-	
-	/**
-	 * Metoda kontroluje pole s šablonami pro modul
-	 */
-//	private function checkTplArray() {
-////		Kontrola hlavního pole
-//		$this->checkTemplatesArray();
-//		
-//		if($this->getModule() != null){
-//			if(!isset($this->items[$this->getModule()->getId()][self::TEMPLATE_ARRAY_NAME])){
-//				$this->items[$this->getModule()->getId()][self::TEMPLATE_ARRAY_NAME] = array();
-//			}
-//		}
-//	}
 	
 	/**
 	 * metoda přidává zadany css styl do výstupu
@@ -331,7 +310,6 @@ class Template {
 		return self::$javascripts;
 	}
 	
-	
 	/**
 	 * Metoda nastaví název modulu, který bude vypsán na začátku
 	 * @param string -- název
@@ -344,7 +322,6 @@ class Template {
 			} else {
 				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_LABEL]=$name;
 			}
-			
 		}
 	}
 
@@ -399,7 +376,6 @@ class Template {
 		return $this->pageTitle;
 	}
 	
-	
 	/**
 	 * Metoda nastaví popis (alt) modulu, který bude vypsán na začátku
 	 * @param string -- popis
@@ -430,39 +406,6 @@ class Template {
 		}
 	}
 		
-	/**
-	 * statická metoda vrací pole s šablonami modulů (items) kategorií
-	 * @return array -- pole s šablonami a proměnými modulů (items)
-	 */
-//	public static function getCategoryItems() {
-//		return self::$items;
-//	}
-	
-	/**
-	 * statická metoda vrací pole s proměnými 
-	 * @return array -- pole s proměnými
-	 */
-//	public static function getMainVars() {
-//		return self::$tplVars;
-//	}
-	
-	
-	/**
-	 * Statická metoda vloží proměnou do šablony
-	 * @param string -- název proměnné
-	 * @param string/array -- hodnota proměnné
-	 */
-//	public static function addMainVar($varName, $varValue, $arrayName = null){
-//		if($arrayName == null){
-//			self::$tplVars[$varName] = $varValue;
-//		} else {
-//			if(!isset(self::$tplVars[$arrayName])){
-//				self::$tplVars[$arrayName] = array();
-//			}
-//			self::$tplVars[$arrayName][$varName] = $varValue;
-//		}
-//	}
-	
 	/**
 	 * Metoda přiřazuje proměnné do šablony
 	 * @param string -- název proměnné
@@ -512,20 +455,13 @@ class Template {
 		return $this->engineVars;
 	}
 	
-	
-	
 	/**
 	 * Metoda nastavuje modul
 	 * @param Module -- objekt modulu
 	 */
 	public function setModule(Module $module=null) {
 		$this->module = $module;
-		
-//		echo "<pre>";
-//		print_r($this->templates);
-//		echo "</pre>";
 		$this->checkTemplatesArray();
-		
 		$this->setTplLabel($this->getModule()->getLabel());
 		$this->setTplAlt($this->getModule()->getAlt());
 		
@@ -533,7 +469,6 @@ class Template {
 		$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_STYLE_IDENT] = $this->getModule()->getName();
 		
 	}
-	
 	
 	/**
 	 * Metoda přidává zadaný JsPlugin do šablony
@@ -574,7 +509,6 @@ class Template {
 			new CoreException(_("Nebyl vložen objekt JsPluginu"), 1);
 		}
 	}
-	
 }
 
 ?>

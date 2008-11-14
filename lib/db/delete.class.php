@@ -1,4 +1,15 @@
 <?php
+/**
+ * Abstraktní třída pro mazání záznamů z db.
+ * Třída zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
+ * databázových konektorů.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: delete.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro mazání záznamů z db
+ */
+
 abstract class Db_Delete {
 	/**
 	 * Metoda nastavuje z které tabulky se bude mazat

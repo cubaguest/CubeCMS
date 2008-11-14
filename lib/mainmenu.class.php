@@ -1,14 +1,15 @@
 <?php
 /**
- * Abstraktní třída pro vytvoření hlavního menu
+ * Abstraktní třída hlavního menu.
+ * Třída slouží pro vytvoření hlavního menu aplikace z uživatelem definované 
+ * třídy pro menu, a poskytuje základní přístup k prvkům menu.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	MainMenu class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: mainmenu.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro vytvoření hlavního menu
+ * @abstract 		Třída pro vytvoření hlavního menu
  */
+
 abstract class MainMenu {
 	/**
 	 * Název pole s proměnými v šabloně
@@ -103,7 +104,6 @@ abstract class MainMenu {
 	 */
 	private $userGroupName = 'guest';
 	
-	
 	/**
 	 * Konstruktor
 	 *
@@ -144,8 +144,6 @@ abstract class MainMenu {
 	public function loadMenu($sqlSelect){
 //		Přidání výběru jen na zvolenou skupinu
 		$sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup()." LIKE \"r__\"");
-		
-		
 		$this->menuArray = $this->dbConnector->fetchAssoc($sqlSelect);
 		
 		if(empty($this->menuArray)){

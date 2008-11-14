@@ -1,6 +1,16 @@
 <?php
 require_once './lib/db/insert.class.php';
 
+/**
+ * Třída pro vkládání záznamů do MySQL DB.
+ * Třída obsahuje implementaci metody insert z db.interfacu.
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: insert.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro vkládaání záznamů do MySQL DB
+ */
+
 class Mysql_Db_Insert extends Db_Insert {
 	/**
 	 * Konstanty pro příkazy SQL
@@ -42,10 +52,19 @@ class Mysql_Db_Insert extends Db_Insert {
 	 * @var integer
 	 */
 	protected $_numberOfColums = null;
-	
+
+	/**
+	 * Objet Db konektoru
+	 *
+	 * @var Db
+	 */
 	protected $_connector = null;
 
-//	public function __construct(MySQLDb $connector) {
+	/**
+	 * Konstruktor třídy vytváří objet INSERT pro update databáze
+	 *
+	 * @param Db -- objekt db konektoru
+	 */	
 	public function __construct(Db $conector) {
 //		inicializace do zakladni podoby;
 		$this->_connector = $conector;
@@ -102,7 +121,6 @@ class Mysql_Db_Insert extends Db_Insert {
 		if(is_array($value)){
 			
 			reset($value);
-//			print_r(current($value));
 			if(!is_array(current($value))){
 				if(count($value) != $this->_numberOfColums){
 					new CoreException(_("Nesouhlasí počet zadaných sloupců a hodnot"));
@@ -118,7 +136,6 @@ class Mysql_Db_Insert extends Db_Insert {
 					}
 				}
 			}
-			
 		} else if(func_num_args() != $this->_numberOfColums){
 			new CoreException(_("Nesouhlasí počet zadaných sloupců a hodnot"));
 		}
@@ -126,7 +143,6 @@ class Mysql_Db_Insert extends Db_Insert {
 			$valuesArray = func_get_args();
 			array_push($this->_sqlQueryParts[self::VALUES_ARRAY], $valuesArray);
 		}
-		
 		return $this;
 	}
 
@@ -141,12 +157,9 @@ class Mysql_Db_Insert extends Db_Insert {
 		foreach ($this->_sqlQueryParts[self::COLUMS_ARRAY] as $colum) {
 			$columsString.=self::SQL_SEPARATOR."`".$colum."`".self::SQL_SEPARATOR.self::SQL_VALUE_SEPARATOR;
 		}
-		
 //		odstranění poslední čárky
 		$columsString = substr($columsString, 0, strlen($columsString)-1);
-		
 		$columsString.=self::SQL_PARENTHESIS_R;
-		
 		return $columsString;
 	}
 
@@ -169,7 +182,6 @@ class Mysql_Db_Insert extends Db_Insert {
 		$valuesString = null;
 		$valuesString = self::SQL_SEPARATOR.self::SQL_VALUES;
 		
-		
 		foreach ($this->_sqlQueryParts[self::VALUES_ARRAY] as $values){
 			$valuesString.=self::SQL_SEPARATOR.self::SQL_PARENTHESIS_L;
 			foreach ($values as $value){
@@ -189,7 +201,6 @@ class Mysql_Db_Insert extends Db_Insert {
 		}
 		//		odstranění poslední čárky
 		$valuesString = substr($valuesString, 0, strlen($valuesString)-1);
-		
 		return $valuesString;
 	}
 	
@@ -204,7 +215,6 @@ class Mysql_Db_Insert extends Db_Insert {
     		return false;
     	}
     }
-    
 
    /**
      * Metoda převede objekt na řetězec
@@ -214,7 +224,6 @@ class Mysql_Db_Insert extends Db_Insert {
     public function __toString()
     {
         $sql = self::SQL_INSERT;
-
         foreach ($this->_sqlQueryParts as $partKey => $partValue) {
         	$createMethod = '_create' . ucfirst($partKey);
         	if(method_exists($this, $createMethod)){
@@ -222,10 +231,6 @@ class Mysql_Db_Insert extends Db_Insert {
         	}
         	;
         }
-
-//		echo "<pre>";
-//		print_r($this);
-//		echo "</pre>";
         return $sql;
     }
 }

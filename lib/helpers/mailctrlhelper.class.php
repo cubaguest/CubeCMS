@@ -1,9 +1,8 @@
 <?php
 /**
- * Ttřída Mail Controll Helperu
+ * Ttřída Mail Controll Helperu pro zjednodušení práce s emaily.
+ * Třída slouží pro práci s emailovými adresami a emaily(odesílání, atd).
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	MailCtrlHelper class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: mailctrlhelper.class.php 3.0.55 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>

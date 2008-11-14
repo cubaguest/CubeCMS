@@ -1,15 +1,16 @@
 <?php
 /**  
- * EPlugin pro přidávání obrázků ke stránce
+ * Třída EPluginu pro práci s obrázky ve stránce.
+ * Třída slouží pro práci s obrázky v textech, jejich přidávání, mazání, zobrazování
+ * a správu. Obsahuje také svou vlastní šablonu pro jednodušší integraci k modulům.
+ * Je částečne napojena na TinyMce JsPlugin pro generování listu obrázků.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	DwFiles class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: dwfiles.class.php 3.0.0 beta1 29.8.2008
+ * @version    	$Id: userimages.class.php 3.1.8 beta1 13.11.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída Epluginu pro práci s obrázky, přikládanými do stránky
- * 
- * //TODO doělat mazání souborů z celého článku
+ * @abstract 		Třída Epluginu pro práci s obrázky, přikládanými do stránky
+ * @uses 			používá také třídu TinyMce tinymce.class.php 
+ * @todo doělat mazání souborů z celého článku
  */
 
 class UserImagesEplugin extends Eplugin {
@@ -90,12 +91,6 @@ class UserImagesEplugin extends Eplugin {
 	const GET_URL_ID_ARTICLE = 'idA';
 	const GET_URL_IMAGES_LIST_TYPE = 'type';
 	
-//	const COLUM_USER_NAME		= 'name';
-//	const COLUM_USER_SURNAME	= 'surname';
-//	const COLUM_USER_USERNAME	= 'username';
-//	const COLUM_LABEL			= 'label';
-//	const COLUM_TIME			= 'time';
-//	
 	/**
 	 * Název volby s názvem tabulky uživatelů
 	 * @var string
@@ -128,12 +123,6 @@ class UserImagesEplugin extends Eplugin {
 	private $labelsArray = array();
 	
 	/**
-	 * Pole s id modulu (items)
-	 * @var array
-	 */
-//	private $idItem = null;
-	
-	/**
 	 * ID šablony
 	 * @var integer
 	 */
@@ -151,7 +140,6 @@ class UserImagesEplugin extends Eplugin {
 	 *
 	 */
 	protected function init(){
-		
 	}
 	
 	/**
@@ -168,11 +156,8 @@ class UserImagesEplugin extends Eplugin {
 	 */
 	public function setIdArticle($idArticle){
 		$this->idArticle = $idArticle;
-		
 		$this->checkSendImages();
-		
 		$this->checkDeleteImage();
-		
 		$this->getImagesFromDb();
 	}
 	
@@ -282,22 +267,6 @@ class UserImagesEplugin extends Eplugin {
 		}
 	}
 	
-	
-	/**
-	 * Metoda vrací objekt změny s načtenými změnami u zadaných id článků
-	 * @param mixed -- array nebo integer s id článku (popřípadě podpole s id item a id článků)
-	 * @return Changes -- vrací objekt Changes (tedy sebe)
-	 */
-//	public function getChanges($idArticles = null, $idItems = null) {
-//		$this->idArticle = $idArticles;
-//		$this->idItems = $idItems;
-//		
-//		$this->getDataFromDb();
-//	
-////		return $this->changesArray;
-//		return $this;
-//	}
-	
 	/**
 	 * Metoda načte seznam obrázků
 	 * @param integer -- id item
@@ -318,10 +287,6 @@ class UserImagesEplugin extends Eplugin {
 				$returnArray[$image[self::COLUM_FILE]] = $this->getLinks()->getMainWebDir().MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$image[self::COLUM_FILE];
 			}
 		}
-//		echo("<pre>");
-//		print_r($returnArray);
-//		echo("</pre>");
-		
 		return $returnArray;
 	}
 	
@@ -332,10 +297,6 @@ class UserImagesEplugin extends Eplugin {
 		$sqlSelect = $this->getDb()->select()->from(array('images'=>self::DB_TABLE_USER_IMAGES), array(self::COLUM_FILE, 
 									self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID, self::COLUM_WIDTH, self::COLUM_HEIGHT));
 		
-//		echo "<pre>";
-//		print_r($this->idArticle);									 
-//		echo "</pre>";									 
-											 
 		if(is_string($this->idArticle) OR is_numeric($this->idArticle)){
 			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$this->idArticle)
 								   ->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
@@ -361,35 +322,17 @@ class UserImagesEplugin extends Eplugin {
 		}
 											 
 		$sqlSelect = $sqlSelect->order(self::COLUM_TIME, "DESC");
-		
-//		echo $sqlSelect;
-		
 		$this->imagesArray = $this->getDb()->fetchAssoc($sqlSelect);
-		
 		$this->getDb()->getNumRows() != null ? $this->numberOfReturnRows = $this->getDb()->getNumRows() : $this->numberOfReturnRows = 0;
 		
 		if ($this->imagesArray != null) {
 //			projití pole a dolnění odkazů
 			foreach ($this->imagesArray as $key => $file) {
 				$this->imagesArray[$key][self::COLUM_LINK_TO_SHOW] = $this->getLinks()->getMainWebDir().MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$file[self::COLUM_FILE];
-//				$this->imagesArray[$key][self::COLUM_LINK_TO_SHOW] = './'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$file[self::COLUM_FILE];
 				$this->imagesArray[$key][self::COLUM_LINK_TO_SMALL] = './'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/'.$file[self::COLUM_FILE];
 			}
 		}
-		
-//		echo "<pre>";
-//		print_r($this->imagesArray);									 
-//		echo "</pre>";	
 	}
-	
-//	/**
-//	 * Metoda nastavuje id článku
-//	 * @param integer -- id článku
-//	 */
-//	public function setIdArticle($idArticle) {
-//		$this->idArticle = $idArticle;
-//	}
-	
 	
 	/**
 	 * Metoda obstarává přiřazení proměných do šablony
@@ -406,26 +349,19 @@ class UserImagesEplugin extends Eplugin {
 		$this->toTpl("IMAGE_DIMENSIONS_HEIGHT", _("Výška"));
 		$this->toTpl("IMAGE_LINK_TO_SHOW_NAME", _("Odkaz pro zobrazení"));
 		$this->toTpl("CONFIRM_MESAGE_DELETE", _("Opravdu smazat obrázek"));
-
+		// tady je to kvůli více šablonám na stránce
 		self::$otherNumberOfReturnRows[$this->idUserImages] = $this->numberOfReturnRows;
 		$this->toTpl("USERIMAGES_NUM_ROWS", self::$otherNumberOfReturnRows);
 		$this->toTpl("USERIMAGESFILES_ID", $this->idUserImages);
-		
-//		if(!empty(self::$otherChanges)){
-//			$array = self::$otherChanges;
-//		}
-		
 		$this->toTplJSPlugin(new SubmitForm());
 		$this->toTplJSPlugin(new LightBox());
-		
 		self::$otherImagesArray[$this->idUserImages] = $this->imagesArray;
-		
 		$this->toTpl("USERIMAGES_ARRAY",self::$otherImagesArray);
 	}
 
 	/**
 	 * Metoda je spuštěna pokud se generuje soubor pro výstup (list obrázků)
-	 *
+	 * @todo dodělat generování také do jiných typů souborů
 	 */
 	public function runOnlyEplugin() {
 		$array = $this->getImagesList(rawurldecode($_GET[self::GET_URL_ID_ITEM]),rawurldecode($_GET[self::GET_URL_ID_ARTICLE]));
@@ -439,24 +375,21 @@ class UserImagesEplugin extends Eplugin {
 				echo $data;
 				exit();
 			break;
-			
 			default:
 			break;
 		}
-		
 		return false;
-		
 	}
 	
 	/**
 	 * Metoda vrací odkaz na soubor se seznamem obrázků
 	 * @param string -- typ v jakém se mají obrázky formátu vrátit
 	 * @return mixed -- seznam obrázků
+	 * @todo dodělat tak by se daly předávat i celá pole v url parametrech, a jiné druhy souborů
 	 */
 	public function getImagesListLink($type) {
 		switch ($type) {
 			case self::FILE_IMAGES_FORMAT_TINYMCE:
-				//TODO dodělat tak by se daly předávat i celá pole
 				$link = new Links(true, true, true);
 				return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')->
 						params(array(self::GET_URL_ID_ARTICLE => $this->idArticle, self::GET_URL_ID_ITEM => $this->getModule()->getId(), 
@@ -467,10 +400,7 @@ class UserImagesEplugin extends Eplugin {
 				$link = Links::getMainWebDir().'eplugin'.strtolower($this->getEpluginName()).'.js';
 			break;
 		}
-		
 		return false;
 	}
-	
-	
 }
 ?>

@@ -1,14 +1,16 @@
 <?php
 /**
- * Abstraktní třída pro práci s panely
+ * Abstraktní třída pro práci s panely.
+ * Základní třída pro tvorbu tříd panelů jednotlivých modulu. Poskytuje prvky
+ * základního přístu jak k vlastnostem modelu tak pohledu. Pomocí této třídy 
+ * se také generují šablony panelů.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Panel class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: panel.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Abstraktní třída pro práci s panely
+ * @abstract 		Abstraktní třída pro práci s panely
  */
+
 abstract class Panel{
 
 	/**
@@ -89,17 +91,6 @@ abstract class Panel{
 		$this->_article = new Article();
 		$this->_rights = $rights;
 		
-//		Načtení souboru s akcemi modulu
-//		if(class_exists("ModuleAction")){
-//			$this->_action = new ModuleAction($this->getModule(), $this->_article);
-//		}
-		
-//		Načtení souboru s cestami (routes) modulu
-//		if(class_exists("ModuleRoutes")){
-//			$artcle = $this->getArticle();
-//			$this->_routes = new ModuleRoutes($artcle);
-//		}
-
 		$action = null;
 		$actionClassName = ucfirst($this->getModule()->getName()).'Action';
 		
@@ -133,7 +124,6 @@ abstract class Panel{
 				new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
 			}
 		}
-
 
 		if(class_exists($routesClassName)){
 			$this->_routes = new $routesClassName($this->_article);

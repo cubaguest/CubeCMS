@@ -1,15 +1,16 @@
 <?php
 /**
- * Abstraktní třída pro Engine Pluginy
- * (např. scroll, comments, atd.)
+ * Abstraktní třída pro Engine Pluginy - EPlugins.
+ * Třída obsahuje základní metody pro vytváření EPluginu a práci s nimi
+ * (např. scroll, comments, atd.).
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Eplugin class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: eplugin.class.php 3.0.0 beta1 29.8.2008
+ * @version    	$Id: eplugin.class.php 3.1.8 13.11.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Abstraktní třída pro vytvoření Epluginu
+ * @abstract 		Abstraktní třída pro vytvoření Epluginu
+ * @todo 			implementovat generování názvu souborů pro zvolený eplugin
  */
+
 class Eplugin {
 	/**
 	 * Výchozí cesta s šablonama
@@ -83,26 +84,22 @@ class Eplugin {
 	function __construct(Messages $errors = null, Messages $info = null, Rights $rights = null)
 	{
 		$this->module = AppCore::getSelectedModule();
-//		$this->dbConnector = $dbConnector;
 		$this->dbConnector = AppCore::getDbConnector();
 		
 		if($rights instanceof Rights){
 			$this->rights = $rights;
 			$this->auth = $rights->getAuth();
 		}
-		
 		if($errors instanceof Messages){
 			$this->errMsg = $errors;
 		} else {
 			$this->errMsg = new Messages();
 		}
-		
 		if($info instanceof Messages){
 			$this->infoMsg = $info;
 		} else {
 			$this->infoMsg = new Messages();
 		}
-
 		$this->init();
 	}
 	
@@ -147,9 +144,7 @@ class Eplugin {
 	 * je volána při volání parametru stránky pro EPlugin
 	 *
 	 */
-	public function runOnlyEplugin(){
-		;
-	}
+	public function runOnlyEplugin(){}
 	
 	/**
 	 * Inicializační metoda EPluginu
@@ -236,13 +231,6 @@ class Eplugin {
 		return strtolower(get_class($this));
 	}
 	
-	
-	/**
-	 * Abstraktní metoda pro inicializaci epluginu
-	 *
-	 */
-//	abstract function init();
-	
 	/**
 	 * Metoda vrací název šablony
 	 * @return string -- název šablony
@@ -252,63 +240,6 @@ class Eplugin {
 //		echo $this->templateFile;
 		return $this->templateFile;
 	}
-	
-//	/**
-//	 * Metoda vrací objekt pluginu scroll
-//	 * @return Scroll -- objekt scrolleru
-//	 */
-//	public function scroll(){
-//		return new Scroll($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-//	
-//	/**
-//	 * Metoda vrací objekt epluginu changes
-//	 * @return Changes -- objekt epluginu changes
-//	 */
-//	public function changes() {
-//		return new Changes($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-//	
-//	/**
-//	 * Metoda vrací objekt epluginu userfiles
-//	 * @return UserFiles -- objekt epluginu userfiles
-//	 */
-//	public function userfiles() {
-//		return new UserFiles($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-//	
-//	/**
-//	 * Metoda vrací objekt epluginu userimages
-//	 * @return UserImages -- objekt epluginu userimages
-//	 */
-//	public function userimages() {
-//		return new UserImages($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-//	
-//	/**
-//	 * Metoda vrací objekt epluginu progressbar
-//	 * @return ProgressBar -- objekt epluginu progressbar
-//	 */
-//	public function progressbar() {
-//		return new ProgressBar($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-//
-//	/**
-//	 * Metoda vrací objekt epluginu sendmail
-//	 * @return SendMail -- objekt epluginu sendmail
-//	 */
-//	public function sendmail() {
-//		return new SendMail($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-//
-//	/**
-//	 * Metoda vrací objekt epluginu csvdata
-//	 * @return CsvData -- objekt epluginu csvdata
-//	 */
-//	public function csvdata() {
-//		return new CsvData($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-//	}
-	
 	
 	/**
 	 * Metoda zařadí proměné epluginu do šablony
@@ -329,7 +260,6 @@ class Eplugin {
 		foreach ($this->_tplJSPluginsArray as $jsPlugin) {
 			$template->addJsPlugin($jsPlugin);
 		}
-		
 	}
 	
 	/**

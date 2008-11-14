@@ -1,9 +1,8 @@
 <?php
 /**
- * Ttřída textového Controll Helperu
+ * Ttřída textového Controll Helperu pro zjednodušení práce s texty.
+ * Třída poskytuje některé funkce pro práci s textem.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	LocaleCtrlHelper class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: localectrlhelper.class.php 3.0.55 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
@@ -16,6 +15,7 @@ class TextCtrlHelper extends CtrlHelper {
 	 *
 	 * @param string -- text k dekódování
 	 * @return string -- dekódovaný text
+	 * @deprecated 
 	 */
 	public function decodeHtmlSpecialChars($text) {
 		//TODO pořešid pokud je zaplé tiny mce
@@ -25,7 +25,7 @@ class TextCtrlHelper extends CtrlHelper {
 	}
 	
 	/**
-	 * Funkce odstrani nekorektni znaky z řetězce
+	 * Metoda odstrani nekorektni znaky z řetězce
 	 *
 	 * @param string -- řetězec z kterého se odstraní znaky
 	 * @return string -- výsledný řetězec

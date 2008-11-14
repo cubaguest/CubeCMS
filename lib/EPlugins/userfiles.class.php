@@ -1,15 +1,15 @@
 <?php
 /** 
- * EPlugin pro přidávání souborů ke stránce
+ * Třída EPluginu pro přidávání souborů ke článku(stránce).
+ * Třída umožňuje přidávat, mazat a sparvovat soubory přidané ke článku. Třída
+ * teké obstarává jejich výpis pomocí vlastní šablony to článku. 
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	UserFiles class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: userfiles.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída Epluginu pro práci se soubory, přikládanými do stránky
+ * @abstract 		Třída Epluginu pro práci se soubory, přikládanými do stránky
  * 
- * //TODO doělat mazání souborů z celého článku
+ * @todo dodělat mazání souborů z celého článku
  */
 
 class UserFilesEplugin extends Eplugin {
@@ -56,13 +56,6 @@ class UserFilesEplugin extends Eplugin {
 	const FORM_USERFILE_ID = 'id';
 	const FORM_BUTTON_DELETE = 'delete';
 	
-	
-//	const COLUM_USER_NAME		= 'name';
-//	const COLUM_USER_SURNAME	= 'surname';
-//	const COLUM_USER_USERNAME	= 'username';
-//	const COLUM_LABEL			= 'label';
-//	const COLUM_TIME			= 'time';
-//	
 	/**
 	 * Název volby s názvem tabulky uživatelů
 	 * @var string
@@ -86,6 +79,12 @@ class UserFilesEplugin extends Eplugin {
 	 * @var array
 	 */
 	private $filesArray = array();
+	
+	/**
+	 * Pole se všemi soubory (obsahuje všechny soubory ze všech instancí pluginu)
+	 * @static 
+	 * @var array
+	 */
 	private static $otherFilesArray = array();
 	
 	/**
@@ -111,6 +110,12 @@ class UserFilesEplugin extends Eplugin {
 	 * @var integer
 	 */
 	private $numberOfReturnRows = 0;
+	
+	/**
+	 * Proměná obsahuje počet všech souborů ze všech ionstancí
+	 * @static 
+	 * @var integer
+	 */
 	private static $otherNumberOfReturnRows = array();
 	
 	/**
@@ -118,7 +123,6 @@ class UserFilesEplugin extends Eplugin {
 	 *
 	 */
 	protected function init(){
-		
 	}
 	
 	/**

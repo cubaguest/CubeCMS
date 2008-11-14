@@ -1,16 +1,16 @@
 <?php
 /**
- * Třída pro práci se SESSIONS
+ * Třída pro práci se $_SESSIONS.
+ * Třída umožňuje základní přístupy k Sessions, jejich vytváření, mazání, aktualizaci atd.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Sessions class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: sessions.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro práci se SESSIONS
+ * @abstract 		Třída pro práci se SESSIONS
  * 
  * //TODO dodělat! není skoro implementována
  */
+
 class Sessions {
 	/**
 	 * Proměná obsahuje jesli byly session inicializovány
@@ -18,10 +18,9 @@ class Sessions {
 	 */
 	private static $sessionInitalized = false;
 	
-	
 	/**
 	 * Statická metoda pro nastavení session
-	 *
+	 * @param string -- název session do ketré se bude ukládat
 	 */
 	public static function factory($sessionName) {
 		//Nastaveni session
@@ -44,7 +43,11 @@ class Sessions {
 	}
 	
 	
-	
+	/**
+	 * Konstruktor vytvoří objekt pro práci se session
+	 *
+	 * @param string -- název session (option)
+	 */
 	function __construct($sessionName = 'default_session') {
 		if(!self::$sessionInitalized){
 			self::factory($sessionName);

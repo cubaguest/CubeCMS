@@ -1,17 +1,14 @@
 <?php
 /**
- * Abstraktní třída pro obsluhu kontroleru modulu
+ * Abstraktní třída tvorbu kontroleru modulu.
+ * Třída slouží jako základ pro tvorbu kontroleru modulu. Poskytuje přístup 
+ * k vlastnostem modulu, práv hláškám, článku a kontaineru(přenos dat do pohledu)
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Action class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: controller.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Abstraktní třída kontroleru modulu
+ * @abstract 		Abstraktní třída kontroleru modulu
  */
-
-//třída pro práci s modelem
-//require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'model.class.php');
 
 abstract class Controller {
 
@@ -58,12 +55,6 @@ abstract class Controller {
 	private $errmsg = null;
 	
 	/**
-	 * Pole s objekty e-pluginu
-	 * @var array(objects)
-	 */
-//	private $eplugins = array();
-	
-	/**
 	 * Objekt s článkem
 	 * @var Article
 	 */
@@ -89,7 +80,7 @@ abstract class Controller {
 	 */
 	function __construct(Module $module, Action $action, Rights $rights, Messages &$messages, Messages &$errors, Article $article) {
 		
-		//TODO
+		//TODO odstranit nepotřebné věci v paramtrech konstruktoru
 		$this->module = $module;
 		$this->action = $action;
 		$this->auth = $rights->getAuth();
@@ -131,7 +122,6 @@ abstract class Controller {
 	final public function getAuth() {
 		return $this->auth;
 	}
-	
 	
 	/**
 	 * Metoda vrací objekt na akci
@@ -182,7 +172,6 @@ abstract class Controller {
 		return $this->container;
 	}
 	
-	
 	/**
 	 * Vrací objekt modulu
 	 * @return Module -- objekt modulu
@@ -195,35 +184,6 @@ abstract class Controller {
 	 */
 	abstract function mainController();
 
-	/**
-	 * Metoda vytvoří objekt engine pluginu
-	 *
-	 * @param string -- název e-pluginu
-	 * 
-	 * @return Objekt -- vytvořený objekt epluginu 
-	 */
-//	final public function addEPlugin($pluginName){
-////		První písmeno velké
-//		$className = ucfirst($pluginName);
-//			if(class_exists($className)){
-//				return new $className($this->getLink());
-//			}
-//	}
-	
-	/**
-	 * Meotda vrací objekt EPluginu
-	 * @return Eplugin -- objekt EPluginu
-	 */
-//	final public function eplugin(){
-	//		První písmeno velké
-//		$className = ucfirst($pluginName);
-//			if(class_exists($className)){
-//				return new $className($this->getLink(), $this->getDb(), $this->getModule());
-//			}
-//		return new Eplugin($this->getModule(), $this->getRights(), $this->errMsg(), $this->infoMsg());
-//		
-//	}
-	
 	/**
 	 * Metoda změní výchozí actionViewer na zadaný
 	 * @param string -- název actionViewru
@@ -289,7 +249,7 @@ abstract class Controller {
 
 		$viewClassName = ucfirst($this->getModule()->getName()).'View';
 		if(class_exists($viewClassName)){
-
+//TODO dořešit výběr pohledum popřípadě pročistit kód
 //			//				Volba pohledu
 //			$this->actionViewer.= AppCore::MODULE_VIEWER_SUFIX;
 //			if($changedView == null){

@@ -1,13 +1,14 @@
 <?php
 /**
- * Třída pro obsluhu odkazů
+ * Třída pro práci s odkazy.
+ * Třída pro tvorbu a práci s odkazy aplikace, umožňuje jejich pohodlnou 
+ * tvorbu a validaci, popřípadě změnu jednotlivých parametrů. Umožňuje také 
+ * přímé přesměrování na zvolený (vytvořený) odkaz pomocí klauzule redirect.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Links class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: links.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro práci s odkazy
+ * @abstract 		Třída pro práci s odkazy
  */
 
 class Links {
@@ -266,35 +267,28 @@ class Links {
 		if(isset($_GET[self::GET_LANG])){
 			self::$selectedlang = $_GET[self::GET_LANG];
 		}
-
 //		nastavení kategorie
 		if(isset($_GET[self::GET_CATEGORY])){
 			self::$selectedCategory = $_GET[self::GET_CATEGORY];
 		}
-
 //		nastavení článku
 		if(isset($_GET[self::GET_ARTICLE])){
 			self::$selectedAricle = $_GET[self::GET_ARTICLE];
 		}
-
 //		nastavení akce
 		if(isset($_GET[self::GET_ACTION])){
 			self::$selectedAction = $_GET[self::GET_ACTION];
 		}
-
 //		nastavení media
 		if(isset($_GET[self::GET_MEDIA])){
 			self::$selectedMedia = $_GET[self::GET_MEDIA];
 		}
 		
 //TODO	načtení ostatních parametrů 
-
 //		Název serveru
 		self::$serverName = $_SERVER["SERVER_NAME"];
-		
 //		Název scriptu
 		self::$scriptName = $_SERVER["SCRIPT_NAME"];
-
 //		nastavení adresáře webu
 		$positionLastChar=strrpos(self::$scriptName, "/");
 		self::$webUrl=substr(self::$scriptName, 0, $positionLastChar);
@@ -420,11 +414,7 @@ class Links {
 	 * @return Links -- objket Links
 	 */
 	public function action($action = null){
-//		if($action == null){
-//			$this->action = self::$selectedAction;
-//		} else {
-			$this->action = $action;
-//		}
+		$this->action = $action;
 		return $this;
 	}
 
@@ -435,11 +425,7 @@ class Links {
 	 * @return Links -- objket Links
 	 */
 	public function lang($lang = null){
-//		if($action == null){
-//			$this->action = self::$selectedAction;
-//		} else {
-			$this->lang = $lang;
-//		}
+		$this->lang = $lang;
 		return $this;
 	}
 	
@@ -457,14 +443,11 @@ class Links {
 		if($thisParamOnly OR $params == null){
 			$this->paramsArray = null;
 		}
-		
 		if($params != null){
 			foreach ($params as $param => $value) {
 				$this->param($param, $value);
 			}
 		}
-		
-
 		return $this;
 	}
 	
@@ -484,7 +467,6 @@ class Links {
 		if($param != null){
 			$this->paramsArray[$param] = $value;
 		}
-		
 		return $this;
 	}
 	
@@ -494,11 +476,9 @@ class Links {
 	 * @param string -- název parametru, který se odebere
 	 */
 	public function withoutParam($param){
-	
 		if(isset($this->paramsArray[$param])){
 			unset($this->paramsArray[$param]);
 		}
-		
 		return $this;
 	}
 	
@@ -543,7 +523,6 @@ class Links {
 	 */
 	private function completeUrlParams()
 	{
-//		return http_build_query($this->paramsArray, '', self::URL_PARAMETRES_SEPARATOR);
 		return http_build_query($this->paramsArray);
 	}
 		

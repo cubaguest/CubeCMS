@@ -1,13 +1,16 @@
 <?php
 /**
- * EPlugin pro sledování udělaných změn na internetové stránce
+ * EPlugin pro sledování změn ve stránce.
+ * Třída slouží pro sledování provedených změn ve stránce, článku, text, atd. 
+ * Změnu jsou ukládány do db, a lze s nimi dále pracovat(vyhledávat, atd.) pomocí modulu 
+ * changes. Sám využívá vlastní šablonu pro zobrazení posledních změn. Používá také 
+ * JsPlugin SwitchContentEasy pro zkrytí změn na stránce.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Changes class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: changes.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída Epluginu pro zobrazování a logování provedených změn
+ * @abstract 		Třída Epluginu pro zobrazování a logování provedených změn
+ * @todo 			implementovat možnost zobrazení změn ve vlastním novém okně
  */
 
 class ChangesEPlugin extends Eplugin {
@@ -104,7 +107,6 @@ class ChangesEPlugin extends Eplugin {
 	 *
 	 */
 	protected function init(){
-		
 	}
 	
 	/**
@@ -114,7 +116,6 @@ class ChangesEPlugin extends Eplugin {
 	public function setIdTpl($id) {
 		$this->idChanges = $id;
 	}
-	
 	
 	/**
 	 * Metoda vrací objekt změny s načtenými změnami u zadaných id článků
@@ -126,8 +127,6 @@ class ChangesEPlugin extends Eplugin {
 		$this->idItems = $idItems;
 		
 		$this->getDataFromDb();
-	
-//		return $this->changesArray;
 		return $this;
 	}
 	
@@ -163,10 +162,6 @@ class ChangesEPlugin extends Eplugin {
 											 		"changes.".self::COLUM_ID_USER." = users.".self::COLUM_ID_USER, null,
 											 array(self::COLUM_USER_NAME, self::COLUM_USER_SURNAME, self::COLUM_USER_USERNAME));
 		
-//		echo "<pre>";
-//		print_r($this->articleId);									 
-//		echo "</pre>";									 
-											 
 		if(is_string($this->articleId) OR is_numeric($this->articleId)){
 			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$this->articleId)
 								   ->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
@@ -194,29 +189,14 @@ class ChangesEPlugin extends Eplugin {
 					$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM." = ".$id, "OR");
 				}
 			}
-					
 		} else if (empty($this->articleId)){
 			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
 		}
 											 
 		$sqlSelect = $sqlSelect->order(self::COLUM_TIME, "DESC");
-		
-//		echo $sqlSelect;
-		
 		$this->changesArray = $this->getDb()->fetchAssoc($sqlSelect);
 		$this->numberOfReturnRows = $this->getDb()->getNumRows();
-		
-//		print_r($this->changesArray);
 	}
-	
-//	/**
-//	 * Metoda nastavuje id článku
-//	 * @param integer -- id článku
-//	 */
-//	public function setIdArticle($idArticle) {
-//		$this->articleId = $idArticle;
-//	}
-	
 	
 	/**
 	 * Metoda obstarává přiřazení proměných do šablony
@@ -224,10 +204,8 @@ class ChangesEPlugin extends Eplugin {
 	 */
 	protected function assignTpl(){
 		$this->toTpl("CHANGES_LABEL_NAME", _("Provedené změny"));
-
 		self::$otherNumberOfReturnRows[$this->idChanges] = $this->numberOfReturnRows;
 		$this->toTpl("CHANGES_NUM_ROWS", self::$otherNumberOfReturnRows);
-		
 		$this->toTpl("CHANGES_ID", 1);
 		
 //		if(!empty(self::$otherChanges)){
@@ -236,11 +214,7 @@ class ChangesEPlugin extends Eplugin {
 		
 		self::$otherChanges[$this->idChanges] = $this->changesArray;
 		$this->toTpl("CHANGES_ARRAY",self::$otherChanges);
-		
 		$this->toTplJSPlugin(new SwitchContentEasy());
-
-		
 	}
-
 }
 ?>

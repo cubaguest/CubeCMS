@@ -1,13 +1,13 @@
 <?php
 /**
- * Ttřída Controll Helperu pro práci s datumy a časy
+ * Ttřída Controll Helperu pro práci s datumy a časy.
+ * Třidá poskytuje metody pro práci s datumem a čase. Jejich kontrolu a prasování.
+ * Kontrolu ročního období atd.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	DateTimeCtrlHelper class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: datetimectrlhelper.class.php 3.0.55 27.9.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro práci s datumi a časi v kontroleru - helper
+ * @abstract 		Třída pro práci s datumi a časi v kontroleru - helper
  */
 
 class DateTimeCtrlHelper extends CtrlHelper {
@@ -42,6 +42,7 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	 * Metoda vrací časové razítko ze zadaného pole, vygenerovaného pomocí SMARTY
 	 *
 	 * @param string -- název $_POST pole s prvky datumu
+	 * @todo dodělat generování hodin:minut:sekund
 	 */
 	public function createStampSmartyPost($postName) {
 		$day = $month = $year = $hour = $minute = $second = null;
@@ -57,11 +58,7 @@ class DateTimeCtrlHelper extends CtrlHelper {
 		if(isset($_POST[$postName][self::POST_DATE_ARRAY_YEAR_KEY])){
 			$year = (int)$_POST[$postName][self::POST_DATE_ARRAY_YEAR_KEY];
 		}
-		
-		//TODO dodělat ještě hodiny:minuty:sekundy
-		
 		$timestamp = mktime($hour, $minute, $second, $month, $day, $year);
-		
 		return $timestamp;
 	}
 	

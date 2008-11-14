@@ -1,15 +1,15 @@
 <?php
 /**
- * Plugin LightBOX -- zobrazení obrázků v popup okně
+ * Třída JsPluginu LightBOX.
+ * Třída pro vkládání pluginu pro zobrazovaní popup oken s obrázkem.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	LightBox class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: lightbox.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída JsPluginu LightBox
- * @see 		http://www.dynamicdrive.com/dynamicindex4/lightbox2/index.htm
+ * @abstract 		Třída JsPluginu LightBox
+ * @see 			http://www.dynamicdrive.com/dynamicindex4/lightbox2/index.htm
  */
+
 class LightBox extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu

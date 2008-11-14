@@ -1,22 +1,21 @@
 <?php
 /**
- * Třidá se speciálními funkcemi
+ * Třidá se speciálními funkcemi.
+ * Obsahuje některé funkce, které zjednodušují práci s řetězci.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	SpecialFunctions class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: specialfunctions.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída se speciálními funkcemi
- * @deprecated 	nehrtazuje helper textctrlhelper
+ * @abstract 		Třída se speciálními funkcemi
+ * @deprecated 	nehrtazuje se ostatními helpery zvláště texthelperem
  */
+
 class SpecialFunctions {
 	/**
 	 * Pole obsahuje protokoly, jak začíná url adresa
 	 * @var array/string
 	 */
 	private $protocolsArray = array('http://', 'https://', 'ftp://', 'ftps://');
-	
 	
 	/**
 	 * Konstruktor objektu se specielními funkcemi
@@ -127,22 +126,6 @@ class SpecialFunctions {
 	 */
 	public function czechTypo($text)
 	{
-		//	$trans = array(" s "=>" s&nbsp;", "&nbsp;s "=>"&nbsp;s&nbsp;", " S "=>" S&nbsp;", " z "=>" z&nbsp;", "&nbsp;z "=>"&nbsp;z&nbsp;", " Z "=>" Z&nbsp;",
-		//				   " a "=>" a&nbsp;", "&nbsp;a "=>"&nbsp;a&nbsp;", " A "=>" A&nbsp;", " i "=>" i&nbsp;", "&nbsp;i "=>"&nbsp;i&nbsp;", " I "=>" I&nbsp;",
-		//				   " k "=>" k&nbsp;", "&nbsp;k "=>"&nbsp;k&nbsp;", " K "=>" K&nbsp;", " u "=>" u&nbsp;", "&nbsp;u "=>"&nbsp;u&nbsp;", " U "=>" U&nbsp;",
-		//				   " v "=>" v&nbsp;", "&nbsp;v "=>"&nbsp;v&nbsp;", " V "=>" V&nbsp;", " o "=>" o&nbsp;", "&nbsp;o "=>"&nbsp;o&nbsp;", " O "=>" O&nbsp;",
-		//				   " na "=>" na&nbsp;", "&nbsp;na "=>"&nbsp;na&nbsp;", " Na "=>" Na&nbsp;", " za "=>" za&nbsp;", "&nbsp;za "=>"&nbsp;za&nbsp;", " Za "=>" Za&nbsp;",
-		//				   " ze "=>" ze&nbsp;", "&nbsp;ze "=>"&nbsp;ze&nbsp;", " Ze "=>" Ze&nbsp;", " ke "=>" ke&nbsp;", "&nbsp;ke "=>"&nbsp;ke&nbsp;", " Ke "=>" Ke&nbsp;",
-		//				   " se "=>" se&nbsp;", "&nbsp;se "=>"&nbsp;se&nbsp;", " Se "=>" Se&nbsp;", " od "=>" od&nbsp;", "&nbsp;od "=>"&nbsp;od&nbsp;", " Od "=>" Od&nbsp;",
-		//				   " do "=>" do&nbsp;", "&nbsp;do "=>"&nbsp;do&nbsp;", " Do "=>"Do&nbsp;",
-		//				   " pod "=>" pod&nbsp;", "&nbsp;pod "=>"&nbsp;pod&nbsp;", " Pod "=>" Pod&nbsp;", " nad "=>" nad&nbsp;", "&nbsp;nad "=>"&nbsp;nad&nbsp;", " Nad "=>" Nad&nbsp;",
-		//				   " při "=>" při&nbsp;", "&nbsp;při "=>"&nbsp;při&nbsp;", " Při "=>" Při&nbsp;", " pro "=>" pro&nbsp;", "&nbsp;pro "=>"&nbsp;pro&nbsp;", " Pro "=>" Pro&nbsp;",
-		//				   " bez "=>" bez&nbsp;", "&nbsp;bez "=>"&nbsp;bez&nbsp;", " Bez "=>" Bez&nbsp;",
-		//				   " Kč"=>"&nbsp;Kč", " ˚C"=>"&nbsp;˚C", " V"=>"&nbsp;V");
-		//
-		//	$preklad = strtr($text, $trans);
-		//	$preklad = strtr($preklad, $trans);
-
 		$czechPripositions = "(k|s|v|z|a|i|o|u|ve|ke|ku|za|ze|na|do|od|se|po|pod|před|nad|bez|pro|při|Ing.|Bc.|Arch.|Mgr.)";
 
 		// překlad předložek na konci řádku

@@ -1,13 +1,12 @@
 <?php
 /**
- * Abstraktní třída pro objek viewru
+ * Abstraktní třída pro objektu viewru.
+ * Třídá slouží jako základ pro tvorbu Viewrů jednotlivých modulů. Poskytuje základní paramtery a metody k vytvoření pohledu modulu.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	View class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: view.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu pohledu
+ * @abstract 		Třída pro tvorbu a obsluhu pohledu
  */
 
 abstract class View {
@@ -72,13 +71,11 @@ abstract class View {
 		foreach ($this->container()->getAllData() as $key => $var) {
 			$this->template()->addVar($key, $var);
 		}
-
 //		Uložení odkazů do šablony
 		foreach ($this->container()->getAllLinks() as $key => $var) {
 			$this->template()->addVar($key, $var);
 		}
 	}
-	
 	
 	/**
 	 * Metoda, která se provede vždy
@@ -86,7 +83,6 @@ abstract class View {
 	public function init() {
 		
 	}
-	
 	
 	/**
 	 * Hlavní abstraktní třída pro vytvoření pohledu
@@ -101,7 +97,6 @@ abstract class View {
 	final public function getModule() {
 		return 	$this->module;
 	}
-	
 	
 	/**
 	 * Funkce vrací datový adresář modulu

@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro obsluhu přenesených souborů
+ * Třída pro obsluhu přenesených souborů.
+ * Třída poskytuje základní metody pro práci s uploadovanými soubory, 
+ * jejich kontrolu, zjišťování mime typu a ukládání do filesystému.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	UploadFiles class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: uploadfiles.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu uploadovaných souborů
+ * @abstract 		Třída pro obsluhu uploadovaných souborů
  */
+
 class UploadFiles {
 	/**
 	 * Název proměné s originálním názvem souboru
@@ -91,9 +92,7 @@ class UploadFiles {
 	function __construct(Messages $errors = null, $canEmpty = false){
 		$this->canEmpty = $canEmpty;
 		$this->errors = $errors;
-//		$this->files = new Files();
 	}
-	
 	
 	/**
 	 * Metoda přenese zadaný soubor
@@ -118,29 +117,24 @@ class UploadFiles {
 				case 0: //no error; possible file attack!
 					$this->uploadError = $error = true;
 					$this->addError('Problém s nahráním souboru');
-//					echo "There was a problem with your upload.";
 					break;
 				case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
 					$this->uploadError = $error = true;
 					$this->addError('Soubor je příliš velký');
-//					echo "The file you are trying to upload is too big.";
 					break;
 				case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
 					$this->uploadError = $error = true;
 					$this->addError('Soubor je příliš velký');
-//					echo "The file you are trying to upload is too big.";
 					break;
 				case 3: //uploaded file was only partially uploaded
 					$this->addError('Soubor byl nahrán jen částečně');
 					$this->uploadError = $error = true;
-//					echo "The file you are trying upload was only partially uploaded.";
 					break;
 				case 4: //no file was uploaded
 					if(!$this->canEmpty){
 						$this->addError('Soubor nebyl vybrán');
 						$this->uploadError = $error = true;
 					}
-//					echo "You must select an image for upload.";
 					break;
 				default: //a default error, just in case!  :)
 					$this->uploadError = $error = true;
@@ -174,10 +168,7 @@ class UploadFiles {
 	 */
 	public function copy($dstDir) {
 		$files = new Files();
-//		$files->copy();
-		
 	}
-	
 	
 	/**
 	 * Privátní metoda přiřadí chbovou hlášku
@@ -224,7 +215,6 @@ class UploadFiles {
 		}
 	}
 	
-	
 	/**
 	 * Metoda vrací mime typ souboru
 	 * //TODO nutná portace na PECL rozšíření o informací o souboru
@@ -234,6 +224,5 @@ class UploadFiles {
 	public function getMimeType() {
 		return $this->file[self::POST_FILES_TYPE];
 	}
-	
 }
 ?>

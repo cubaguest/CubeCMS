@@ -1,17 +1,15 @@
 <?php
 /**
  * Třída pro práci s obrázky
- * umožňuje:	-ukládání
- * 				-resizing
- * 				-vytváření miniatur
+ * Třída pro základní práci s obrázky. Umožňuje jejich ukládání, ořezávání, 
+ * změnu velikost a změnu formátu obrázku.
  * 
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Images class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: images.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro práci s obrázky
+ * @abstract 		Třída pro práci s obrázky
  */
+
 class Images {
 	/**
 	 * Proměná s název souboru, který se bude upravovat
@@ -128,14 +126,12 @@ class Images {
 			
 			if($this->imageType == null){
 				$this->isImage = false;
-				
 				if($this->reportErrors){
 					$this->errors->addMessage(_('Zadaný soubor není podporovaný obrázek'));
 				}
 			} else {
 				$this->isImage = true;
 			}
-			
 		} else {
 			if($this->reportErrors){
 				new CoreException(_('Soubor se zadaným obrázkem neexistuje'), 1);
@@ -207,26 +203,21 @@ class Images {
 		$tmpImage = $this->createTempImage();
 		
 		if($width == null){
-//			$width = $this->newImageWidth;
 			$width = $this->imageWidth;
 		}
-		
 		if($heigh == null){
-//			$heigh = $this->newImageHeight;
 			$heigh = $this->imageHeight;
 		}
-
 		if($newName == null){
 			$newName = $this->newImageName;
 		}
 		
 //		test jestli je zpracováván obrázek
 		if($this->isImage()){
-			//		Test názvu souboru
+//			Test názvu souboru
 			$newName = $this->checkNewImageName($dstDir, $newName);
 
 			$newImage = $this->resampleImage($tmpImage,$width,$heigh);
-			//ImageDestroy($tmpImage);
 
 			if($imageType == null){
 				$imageType = $this->imageType;
@@ -240,7 +231,6 @@ class Images {
 			$saved = $this->saveNewImage($newImage, $imageType, $dstDir.$newName);
 			imagedestroy($newImage);
 		}
-		
 		return $saved;
 	}	
 	
@@ -338,7 +328,6 @@ class Images {
 
 			$newImage = imagecreatetruecolor($width, $height);
 			ImageCopyResampled($newImage, $tempImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight);
-
 		} else {
 			//			Ořezání obrázku do jedné velikosti
 			$newImage = imagecreatetruecolor($width, $height);
@@ -354,8 +343,7 @@ class Images {
 				$imageY = 0;
 				$imageWidth = floor($newW);
 				$imageHeight = $this->imageHeight;
-			}
-			else {
+			} else {
 //				na vysku
 				$imageX = 0;
 				$imageY = floor(($this->imageHeight - $newH)/2);
@@ -365,7 +353,6 @@ class Images {
 
 			ImageCopyResampled($newImage, $tempImage, 0,0, $imageX, $imageY, $width, $height, $imageWidth,$imageHeight);	
 		}
-//		ImageDestroy($tempImage); //není potřeba
 		return $newImage;
 	}
 	
@@ -433,7 +420,6 @@ class Images {
 
 					$newImage = imagecreatetruecolor($width, $height);
 					imagecopyresampled($newImage, $tempImage, 0,0,0,0, $width, $height, $imageProperty[0], $imageProperty[1]);
-
 				} else {
 					//			Ořezání obrázku do jedné velikosti
 					$newImage = imagecreatetruecolor($width, $height);
@@ -459,9 +445,7 @@ class Images {
 
 						//					$src = array(0, floor(($imageProperty[1] - $newH)/2), $imageProperty[0], floor($newH));
 					}
-
 					ImageCopyResampled($newImage, $tempImage, 0,0, $imageX, $imageY, $width, $height, $imageWidth,$imageHeight);
-					
 				}
 
 				//			uložení obrázku
@@ -472,7 +456,6 @@ class Images {
 				} else {
 					$newImageFunction($newImage, $destFile);
 				}
-
 				ImageDestroy($newImage);
 				ImageDestroy($tempImage);
 
@@ -498,7 +481,5 @@ class Images {
 	public function getOriginalHeight() {
 		return $this->imageHeight;
 	}
-	
 }
-
 ?>

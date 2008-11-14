@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro obsluhu práv přihlášeného uživatele a jednotlivých kategorií
+ * Třída práv uživatele a jednotlivých kategorií.
+ * Třída slouží pro práci s právy uživatele na zvolené kategorii. Umožňuje zjištění,
+ * jestli je kategorie přístuppná pro čtení, zápis nebo kontrolu.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Rights class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: rights.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro zjišťování práv uživatele
+ * @abstract 		Třída pro zjišťování práv uživatele
  */
+
 class Rights {
 
 	/**
@@ -69,23 +70,9 @@ class Rights {
 	}
 	
 	/**
-	 * Metoda vrací objekt Modulu
-	 * @return Module -- objekt modulu
-	 */
-//	private function getModule() {
-//		return $this->module;
-//	}
-//	
-	
-	
-	/**
 	 * Metoda nastaví práva
 	 */
 	private function setRights() {
-//		echo "<pre>";
-//		print_r($this->groupRights);
-//		echo "</pre>";
-		
 		if (ereg("^r[cw-]{2}$", $this->groupRights[$this->getAuth()->getGroupName()])){
 			$this->read = true;
 		}

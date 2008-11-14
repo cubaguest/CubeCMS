@@ -1,10 +1,15 @@
 <?php
 require_once './lib/db/delete.class.php';
 /**
- * Třída pro odstraňování záznamů z MYSQL
- * 
+ * Třída pro odstraňování záznamů v MySQL DB.
+ * Třída obsahuje implementaci metody delete z db.interfacu.
  *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: delete.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída pro mazání záznamů
  */
+
 class Mysql_Db_Delete extends Db_Delete {
 	/**
 	 * Konstanty pro příkazy SQL
@@ -54,6 +59,11 @@ class Mysql_Db_Delete extends Db_Delete {
 	 */							 			
 	protected $_sqlQueryParts = array();
 
+	/**
+	 * Objet Db konektoru
+	 *
+	 * @var Db
+	 */	
 	protected $_connector = null;
 
 	/**
@@ -76,17 +86,7 @@ class Mysql_Db_Delete extends Db_Delete {
 	 * @return Db_Delete -- objekt Db_Delete
 	 */
 	public function from($table, $columsArray = null) {
-		
 		$this->_sqlQueryParts[self::SQL_FROM] = $table;
-
-//		Ověření jestli se mažou všechny záznamy nebo jen některé
-//		if($columsArray != null){
-//			if(!is_array($columsArray)){
-//				$columsArray = array($columsArray);
-//			}
-//			$this->_sqlQueryParts[self::COLUMS_ARRAY] = $columsArray;
-//		}
-
 		return $this;
 	}
 
@@ -97,7 +97,7 @@ class Mysql_Db_Delete extends Db_Delete {
 	 * @param string -- typ spojení podmínky (AND, OR) (výchozí je AND)
 	 * 
 	 * @return Db_Delete -- objekt Db_Delete
-	 * //TODO dodělat aby se doplňovali magické uvozovky do lauzule
+	 * @todo dodělat aby se doplňovali magické uvozovky do lauzule
 	 */
 	public function where($condition, $operator = self::SQL_AND) {
 		$tmpArray = array();
@@ -106,8 +106,6 @@ class Mysql_Db_Delete extends Db_Delete {
 			$operator = self::SQL_AND;
 			echo $operator;
 		}
-		
-		
 
 		$tmpArray[self::WHERE_CONDITION_NAME_KEY] = $condition;
 		$tmpArray[self::WHERE_CONDITION_OPERATOR_KEY] = strtoupper($operator);
@@ -116,9 +114,7 @@ class Mysql_Db_Delete extends Db_Delete {
 		if(!is_array($this->_sqlQueryParts[self::SQL_WHERE])){
 			$this->_sqlQueryParts[self::SQL_WHERE] = array();
 		}
-
 		array_push($this->_sqlQueryParts[self::SQL_WHERE], $tmpArray);
-		
 		return $this;
 	}
 	
@@ -137,7 +133,6 @@ class Mysql_Db_Delete extends Db_Delete {
 			}
 
 		$columArray = array();
-
 		if($order == self::SQL_DESC){
 			$columArray[self::ORDER_COLUM_KEY] = $colum;
 			$columArray[self::ORDER_ORDER_KEY] = self::SQL_DESC;
@@ -174,7 +169,6 @@ class Mysql_Db_Delete extends Db_Delete {
 		$fromString .= self::SQL_SEPARATOR . MySQLDb::$_tablePrefix . $this->_sqlQueryParts[self::SQL_FROM] . self::SQL_SEPARATOR;
 		return $fromString;
 	}
-	
 
 	/**
 	 * Metoda vygeneruje část SQL dotazu s klauzulí WHERE
@@ -185,16 +179,13 @@ class Mysql_Db_Delete extends Db_Delete {
 
 		if(!empty($this->_sqlQueryParts[self::SQL_WHERE])){
 			$wheresString = self::SQL_SEPARATOR . self::SQL_WHERE;
-
 			foreach ($this->_sqlQueryParts[self::SQL_WHERE] as $whereKey => $whereCondition){
 				if($whereKey != 0){
 					$wheresString .= $whereCondition[self::WHERE_CONDITION_OPERATOR_KEY];
 				}
-
 				$wheresString .= self::SQL_SEPARATOR . $whereCondition[self::WHERE_CONDITION_NAME_KEY] . self::SQL_SEPARATOR;
 			}
 		}
-
 		return $wheresString;
 	}
 
@@ -209,7 +200,6 @@ class Mysql_Db_Delete extends Db_Delete {
 			foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
 				$orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
 			}
-
 			//			odstranění poslední čárky
 			$orderString = substr($orderString, 0, strlen($orderString)-1);
 		}
@@ -232,9 +222,7 @@ class Mysql_Db_Delete extends Db_Delete {
 					$groupString .= self::SQL_SEPARATOR . self::SQL_WITH_ROLLUP;
 				}
 				$groupString .= ',';
-
 			}
-
 			//			odstranění poslední čárky
 			$groupString = substr($groupString, 0, strlen($groupString)-1);
 
@@ -257,7 +245,6 @@ class Mysql_Db_Delete extends Db_Delete {
 			return $limitString;
 		}
 	}
-	
 
    /**
      * Metoda převede objekt na řetězec
@@ -267,15 +254,12 @@ class Mysql_Db_Delete extends Db_Delete {
     public function __toString()
     {
         $sql = self::SQL_DELETE;
-
         foreach ($this->_sqlQueryParts as $partKey => $partValue) {
         	$createMethod = '_create' . ucfirst($partKey);
         	if(method_exists($this, $createMethod)){
         		$sql .= $this->$createMethod();
         	}
-        	;
         }
-
         return $sql;
     }
 }

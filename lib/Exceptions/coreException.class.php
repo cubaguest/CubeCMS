@@ -1,15 +1,14 @@
 <?php
 /**
- * Třída pro obsluhu chybových hlášek
- * Rozšiřuje třídu Exception
+ * Třída pro obsluhu vyjímek v enginu (chybových hlášek).
+ * Třída rozšiřuje třídu Exception a přidává některé další prvky. Výstupní
+ * zpráva jsou zhromažďovány a použity pro výstup v enginu.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	CoreExceptions class
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: coreexception.class.php 3.0.0 beta1 29.8.2008
+ * @version    	$Id: coreException.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro zachtáváni chyb enginu
- * //TODO not full implemented
+ * @abstract 		Třída pro zachtáváni chyb enginu
+ * @todo 			Není plně implementována a chce dodělat
  */
 
 class CoreException extends Exception {

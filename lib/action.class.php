@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída obsluhuje proměnou action, použitou při předávání parametrů akcí u modulů
+ * Třída pro obsluhu akcí.
+ * Třída obsluhuje přenášené akce v URL. Slouží také pro generování vlastních akcí 
+ * v modulu, jejich úpravu. Podle zvolené akce se volí také kontroler modulu.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Action class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: action.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 	Třída pro obsluhu akcí
+ * @abstract 		Třída pro obsluhu akcí
  */
+
 class Action {
 	/**
 	 * Název $_GET s akcí
@@ -87,7 +88,6 @@ class Action {
 	public final function __construct(Module $module, Article $article){
 //		Vytvoření uživatelských akcí
 		$this->createModuleActions();
-
 		$this->article = $article;
 		
 //		Parsování zvolené akce
@@ -113,11 +113,8 @@ class Action {
 	 * @param string -- zkratka akce (maximálně 3 znaky)
 	 */
 	final public function addAction($actionName, $actionAbbr = null){
-		
 		$actionAbbr == null ? $actionAbbr = substr($actionName, 0, self::ACTION_MAX_CHARS) : $actionAbbr = substr($actionAbbr, 0, self::ACTION_MAX_CHARS);
-	
 		$this->actionsTranslateArray[$actionName] = $actionAbbr;
-		
 	}
 	
 	/**
@@ -132,11 +129,6 @@ class Action {
 	final private function createModuleActions() {
 //		Přiřazení uživatelských akcí
 		$this->actions();
-		
-//		foreach ($this->actionsTranslateArray as $actions) {
-//			
-//		}
-				
 	}
 	
 	/**
@@ -159,11 +151,8 @@ class Action {
 			} else {
 				return $this->creatAction($this->actionsTranslateArray[$actionMetod], $params[0]);
 			}
-
 		};
 	}
-	
-	
 	
 	/**
 	 * Funkce rozparsuke akci na části akce-id
@@ -192,7 +181,6 @@ class Action {
 			$this->article->setArticle((string)$get_action);
 			Links::setArticle((string)$get_action);
 		}
-
 		return $return;
 	}
 
@@ -227,7 +215,6 @@ class Action {
 	/*
 	 * metody pro generování do url
 	 */
-	
 		
 	/**
 	 * Funkce vytvoří řetězec s akcí
@@ -292,7 +279,6 @@ class Action {
 		} else {
 			//TODO chtělo by upravit při zobrazeném článku
 			return false;
-//			if($this->)
 		}
 	}
 	
@@ -305,8 +291,6 @@ class Action {
 	{
 		return $this->defaultAction;
 	}
-	
-	
 }
 
 ?>

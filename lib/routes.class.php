@@ -1,14 +1,15 @@
 <?php
 /**
- * Třída pro obsluhu cest
+ * Třída pro obsluhu cest(routes).
+ * Třida je určena k zjišťování a volby cesty pro kontroler a viewer. 
+ * Také slouží pro generování vlastních cest jednotlivých modulů.
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @package    	Routes class
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: routes.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída pro obsluhu cest modulu
  */
+
 class Routes {
 	/**
 	 * Oddělovač mezi cestou a článkem (route-article)
@@ -58,7 +59,6 @@ class Routes {
 		return $this->article;
 	}
 	
-	
 	/**
 	 * Metoda přidává cestu do seznamu cest
 	 * @param string -- název cesty
@@ -76,14 +76,10 @@ class Routes {
 
 		if($this->getArticleObj()->getArticle() != null){
 			foreach ($this->routes as $route) {
-//				echo $route.self::ROUTE_SEPARATOR;
-//				$routeLen = strlen($route);
 				if ($this->getArticleObj()->getArticle() > $route.self::ROUTE_SEPARATOR AND
 					substr_compare($this->getArticleObj()->getArticle(), $route.self::ROUTE_SEPARATOR, 0, strlen($route)+1) == 0){
-//					if($isRoute == 0){
 						$routeName = $route;
 						break;
-//					}
 				}
 			}
 			//		Nastavení nového článku - pouze článek
@@ -95,9 +91,6 @@ class Routes {
 		}
 		return $this->route;
 	}
-	
-	
-	
 }
 
 ?>
