@@ -12,7 +12,7 @@
  * //TODO doělat mazání souborů z celého článku
  */
 
-class UserFiles extends Eplugin {
+class UserFilesEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string
@@ -120,6 +120,15 @@ class UserFiles extends Eplugin {
 	protected function init(){
 		
 	}
+	
+	/**
+	 * Metoda je spuštěna při načítání souborů
+	 *
+	 */
+	public function runOnlyEplugin() {
+		echo "jede";
+	}
+	
 	
 	/**
 	 * Metoda nastaví id šablony pro výpis

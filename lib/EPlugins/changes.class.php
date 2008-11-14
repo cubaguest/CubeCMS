@@ -10,7 +10,7 @@
  * @abstract 	Třída Epluginu pro zobrazování a logování provedených změn
  */
 
-class Changes extends Eplugin {
+class ChangesEPlugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string

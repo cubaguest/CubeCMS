@@ -614,13 +614,20 @@ class AppCore {
 			//TODO dodělat kontroly, tak ať to vyhazuje přesnější chbové hlášky
 			//		Zmenšení na malá písmena
 			$className = strtolower($className);
+			
+			$epluginFile = $className;
+			//pokud je eplugin odstraníme jej z názvu
+			if(strpos($className, 'eplugin') !== false AND $className != 'eplugin'){
+				$epluginFile = str_replace('eplugin', '', $className);
+			}
+			
 			//je načítána hlavní knihovna
 			if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. $className . '.class.php')){
 				require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. $className . '.class.php');
 			}
 			//je načítán e-plugin
-			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_EPLUINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
-				require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_EPLUINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
+			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_EPLUINS_DIR . DIRECTORY_SEPARATOR . $epluginFile . '.class.php')) {
+				require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_EPLUINS_DIR . DIRECTORY_SEPARATOR . $epluginFile . '.class.php');
 			}
 //			Je-li načítán JsPlugin
 			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_JSPLUINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
@@ -1439,7 +1446,34 @@ class AppCore {
 
 //		Inicializace modulu
 		$this->_initModules();
-	
+//		Pokud se načítá statická část epluginu
+		if(Eplugin::isEplugin()){
+			$epluginName = ucfirst(Eplugin::getSelEpluginName());
+			
+			if(class_exists($epluginName)){
+				$eplugin = new $epluginName($this->errors, $this->messages);
+				$eplugin->setAuthParam($this->auth);
+				$eplugin->runOnlyEplugin();
+				return true;
+			} else {
+				new CoreException(_('Požadovaný eplugin nebyl nalezen'), 19);
+			}
+			unset($epluginName);
+		}
+
+		if(JsPlugin::isJsplugin()){
+			$jspluginName = ucfirst(JsPlugin::getSelJspluginName());
+			if(class_exists($jspluginName)){
+				$jsplugin = new $jspluginName();
+//				$jsplugin->parseParams();
+//				$jsplugin->generateFile();
+				return true;
+			} else {
+				new CoreException(_('Požadovaný jsplugin nebyl nalezen'), 20);
+			}
+			unset($jspluginName);
+		}
+		
 		switch (self::media()) {
 			case 'sitemap':
 				$this->runSitemap();

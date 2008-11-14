@@ -38,11 +38,12 @@
 	<script src="{$jscript}" type="text/javascript"></script>
 {/foreach}
 {literal}
-<!--<SCRIPT LANGUAGE="JAVASCRIPT" TYPE="TEXT/JAVASCRIPT">-->
-<!--TINYMCE.INIT({-->
-<!--	DOCUMENT_BASE_URL : "HTTP://LOCALHOST/VVE/"-->
+<!--<script type="text/javascript">-->
+<!--tinyMCE.init({-->
+<!--mode : "textareas",-->
+<!--theme : "advanced"-->
 <!--});-->
-<!--</SCRIPT>-->
+<!--</script>-->
 {/literal}
 </head>
 

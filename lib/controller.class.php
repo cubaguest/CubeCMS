@@ -61,7 +61,7 @@ abstract class Controller {
 	 * Pole s objekty e-pluginu
 	 * @var array(objects)
 	 */
-	private $eplugins = array();
+//	private $eplugins = array();
 	
 	/**
 	 * Objekt s článkem
@@ -214,15 +214,15 @@ abstract class Controller {
 	 * Meotda vrací objekt EPluginu
 	 * @return Eplugin -- objekt EPluginu
 	 */
-	final public function eplugin(){
+//	final public function eplugin(){
 	//		První písmeno velké
 //		$className = ucfirst($pluginName);
 //			if(class_exists($className)){
 //				return new $className($this->getLink(), $this->getDb(), $this->getModule());
 //			}
-		return new Eplugin($this->getModule(), $this->getRights(), $this->errMsg(), $this->infoMsg());
-		
-	}
+//		return new Eplugin($this->getModule(), $this->getRights(), $this->errMsg(), $this->infoMsg());
+//		
+//	}
 	
 	/**
 	 * Metoda změní výchozí actionViewer na zadaný

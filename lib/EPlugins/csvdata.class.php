@@ -11,7 +11,7 @@
  * 
  */
 
-class CsvData extends Eplugin {
+class CsvDataEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string

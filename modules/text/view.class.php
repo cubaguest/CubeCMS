@@ -44,11 +44,14 @@ class TextView extends View {
 		$this->container()->getEplugin('files')->assignToTpl($this->template());
 
 		//NOTE obrázky
-		$this->template()->addTpl($this->container()->getEplugin('images')->getTpl(), true);
-		$this->container()->getEplugin('images')->assignToTpl($this->template());
+		$eplImages = $this->container()->getEplugin('images');
+		$this->template()->addTpl($eplImages->getTpl(), true);
+		$eplImages->assignToTpl($this->template());
 		
 		$this->template()->addVar('TEXT_IN_DB', $this->container()->getData('indb'));
 		$tinymce = new TinyMce();
+//		$tinymce->setTheme(TinyMce::TINY_THEME_SIMPLE);
+		$tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
 		$this->template()->addJsPlugin($tinymce);
 		
 		$tabcontent = new TabContent();

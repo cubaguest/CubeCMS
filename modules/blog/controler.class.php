@@ -22,21 +22,7 @@ class BlogController extends Controller {
 	const COLUM_SECTION_DELETED = 'deleted';
 	const COLUM_SECTION_DELETED_BY_ID_USER = 'deleted_by_id_user';
 			
-	/**
-	 * Názvy sloupců v tabulce s blogy (blog)
-	 * @var string
-	 */
-	const COLUM_LABEL = 'label';
-	const COLUM_LABEL_LANG_PREFIX = 'label_';
-	const COLUM_TEXT = 'text';
-	const COLUM_TEXT_LANG_PREFIX = 'text_';
-	const COLUM_URLKEY = 'urlkey';
-	const COLUM_TIME = 'time';
-	const COLUM_ID_USER = 'id_user';
-	const COLUM_ID = 'id_blog';
-	const COLUM_ID_SECTION = 'id_section';
-	const COLUM_DELETED = 'deleted';
-	const COLUM_DELETED_BY_ID_USER = 'deleted_by_id_user';
+
 	
 		
 	/**
@@ -74,7 +60,7 @@ class BlogController extends Controller {
 	 * Konstanta s názvem session pro link back
 	 * @var string
 	 */
-	const LINK_BACK_SESSION = 'blog_link_back';
+	const LINK_BACK_SESSION = 'link_back';
 	
 	/**
 	 * Názvy routes pro zobrazování sekcí
@@ -94,7 +80,7 @@ class BlogController extends Controller {
 	public function mainController() {
 		$this->checkReadableRights();
 		
-		//		Scrolovátka
+//		Scrolovátka
 //		$scroll = $this->eplugin()->scroll();
 //		
 //		//		Načtení všech blogů ze všech sekcí

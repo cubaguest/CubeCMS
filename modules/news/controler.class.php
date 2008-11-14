@@ -76,7 +76,7 @@ class NewsController extends Controller {
 		$listNews = new NewsListModel();
 		
 //		Scrolovátka
-		$scroll = $this->eplugin()->scroll();
+		$scroll = new Scroll($this->errMsg(), $this->infoMsg(), $this->getRights());
 		
 		if(isset($_GET[self::GET_NUM_NEWS]) AND (is_numeric($_GET[self::GET_NUM_NEWS]) OR $_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS)){
 			if(is_numeric($_GET[self::GET_NUM_NEWS])){

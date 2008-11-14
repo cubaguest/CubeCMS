@@ -9,16 +9,33 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 	Třída JsPluginu SubmitForm na potvrzení formuláře
  */
-
-require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'JsPlugins'. DIRECTORY_SEPARATOR . 'jsplugin.calss.php');
-
 class SubmitForm extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu
 		$this->setJsPluginName("SubmitForm");
 		
+
+	}
+	
+	protected function initFiles() {
+		//		Přidání js soubrů pluginu
+		$this->addJsFile(new JsPluginJsFile("submitform.js"));
+		//		Výchozí js soubor pluginu
+//		$this->setDefaultSettingJsFile(new JsPluginJsFile("tiny_mce_default.js"));
+		
 //		Přidání js soubrů pluginu
-		$this->addJsFile("submitform.js");
+//		$mainFile = new JsPluginJsFile("tiny_mce.js");
+//		$mainFile->setParam('pokus', 'test');
+//		$this->addJsFile($mainFile);;
+	}
+	
+	
+	/**
+	 * Metda vytvoří výchozí konfigurační soubor
+	 */
+	public function generateFile() {
+//		echo $_SERVER["QUERY_STRING"].'<br>';
+//		echo $_GET['theme'].'  '.$_GET['file'];
 	}
 }
 

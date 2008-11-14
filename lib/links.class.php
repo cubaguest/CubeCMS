@@ -72,6 +72,18 @@ class Links {
 	const GET_MEDIA = 'media';
 	
 	/**
+	 * $GET proměná s název epluginu
+	 * @var string
+	 */
+	const GET_EPLUGIN_NAME = 'eplugin';
+
+	/**
+	 * $GET proměná s název jspluginu
+	 * @var string
+	 */
+	const GET_JSPLUGIN_NAME = 'jsplugin';
+	
+	/**
 	 * Oddělovač prametrů hlavní url
 	 * @var string
 	 */
@@ -184,12 +196,30 @@ class Links {
 	 * @var string
 	 */
 	private $mediaType = null;
+
+	/**
+	 * Proměná s názvem souboru
+	 * @var string
+	 */
+	private $file = null;
 	
 	/**
 	 * Jestli se má tvořit nový odkaz od začátku
 	 * @var boolean
 	 */
 	private $clearLink = false;
+
+	/**
+	 * Jestli se má tvořit nový odkaz od začátku a bez kategorie
+	 * @var boolean
+	 */
+	private $trueClearLink = false;
+	
+	/**
+	 * Jesti se má vrátit relativní cesta nebo celá
+	 * @var boolean
+	 */
+	private $relativePath = false;
 	
 	/**
 	 * Pole s ostatními parametry v url
@@ -212,11 +242,15 @@ class Links {
 	/**
 	 * Konstruktor nastaví základní adresy a přenosový protokol
 	 *
-	 * @param string -- přenosový protokol (výchozí: http)
+	 * @param boolean -- true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána)
+	 * @param boolean -- true pokud má být vráce relativní cesta od kořene webu
+	 * @param boolean -- true pokud má být vráce naprosto čistý link (strjné jako Links::getMainWebDir())
+	 * 
 	 */
-	function __construct($clear = false) {
+	function __construct($clear = false, $relative = false, $onlyWebRoot = false) {
 		$this->clearLink = $clear;	
-
+		$this->trueClearLink = $onlyWebRoot;
+		$this->relativePath = $relative;
 		$this->_init();
 	}
 	
@@ -302,14 +336,13 @@ class Links {
 	private static function _infilParams()
 	{
 		$queryString = $_SERVER["QUERY_STRING"];
-		
 		if($queryString != null){
 			$tmpParamsArray = array();
 			$tmpParamsArray = explode(self::URL_PARAMETRES_SEPARATOR_IN_URL, $queryString);
 			foreach ($tmpParamsArray as $fullParam) {
 				$tmpParam = explode(self::URL_SEP_PARAM_VALUE, $fullParam);
 					
-				if(!in_array($tmpParam[0], self::$protectedParams)){
+				if(!in_array($tmpParam[0], self::$protectedParams) AND isset($tmpParam[0]) AND isset($tmpParam[1])){
 					self::$selectedParams[$tmpParam[0]] = $tmpParam[1];
 				}
 			}
@@ -366,6 +399,17 @@ class Links {
 	 */
 	public function media($media = null){
 		$this->mediaType = $media;
+		return $this;
+	}
+
+	/**
+	 * Metoda nastavuje parametr nazev epluginu
+	 * @param string -- jméno epluginu
+	 * 
+	 * @return Links -- objket Links
+	 */
+	public function file($file = null){
+		$this->file = $file;
 		return $this;
 	}
 
@@ -511,7 +555,11 @@ class Links {
 		if($this->category != null){
 			return $this->category.self::COOL_URL_SEPARATOR;
 		} else {
-			return Category::getUrlKey().self::COOL_URL_SEPARATOR;
+			if(!$this->trueClearLink){
+				return Category::getUrlKey().self::COOL_URL_SEPARATOR;
+			} else {
+				return null;
+			}
 		}
 	}
 	
@@ -559,6 +607,17 @@ class Links {
 			$this->param(self::GET_MEDIA, $this->mediaType);
 		}
 	}
+
+	/**
+	 * Metoda doplní část s názvem souboru
+	 */
+	private function getFile() {
+		if($this->file != null){
+			return $this->file;
+		} else {
+			return null;
+		}
+	}
 	
 	/*
 	 * MAGICKÉ METODY
@@ -571,8 +630,13 @@ class Links {
      */
     public function __toString()
     {
-    	$returnString = self::getMainWebDir();
-        if($this->lang != null){
+    	if(!$this->relativePath){
+    		$returnString = self::getMainWebDir();
+    	} else {
+    		$returnString = './';
+    	}
+        
+    	if($this->lang != null){
         	$returnString.=$this->getLang();
         }
         if($this->getCategory() != null){
@@ -583,6 +647,10 @@ class Links {
         }
         if($this->getAction() != null){
         	$returnString.=$this->getAction();
+        }
+        
+        if($this->getFile() != null){
+        	$returnString.=$this->getFile();
         }
         
         $this->getMedia();

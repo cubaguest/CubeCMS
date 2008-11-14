@@ -10,7 +10,7 @@
  * @abstract 	Třída EPluginu pro práci se scrolovátky
  *
  */
-class Scroll extends Eplugin {
+class ScrollEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string

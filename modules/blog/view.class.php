@@ -20,13 +20,13 @@ class BlogView extends View {
 			
 			$this->template()->addVar('WRITABLE', true);
 			
-			$this->template()->addVar('IN_SECTION', $this->getModel()->inSection);
+//			$this->template()->addVar('IN_SECTION', $this->getModel()->inSection);
 			
 			$this->template()->addVar('LINK_TO_ADD_SECTION_NAME', _("Přidat sekci"));
-			$this->template()->addVar('LINK_TO_ADD_SECTION', $this->getModel()->linkToAddSection);
+//			$this->template()->addVar('LINK_TO_ADD_SECTION', $this->getModel()->linkToAddSection);
 			
 			$this->template()->addVar('LINK_TO_ADD_BLOG_NAME', _("Přidat blog"));
-			$this->template()->addVar('LINK_TO_ADD_BLOG', $this->getModel()->linkToAddBlog);			
+//			$this->template()->addVar('LINK_TO_ADD_BLOG', $this->getModel()->linkToAddBlog);			
 			
 		}
 //		$this->assignGaleryList();

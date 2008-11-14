@@ -67,14 +67,14 @@ class TextController extends Controller {
 	public function editController() {
 		
 		$this->checkWritebleRights();
-
+		
 //		Uživatelské soubory
-		$files = $this->eplugin()->userfiles();
+		$files = new UserFilesEplugin($this->errMsg(), $this->infoMsg(), $this->getRights());
 		$files->setIdArticle($this->getModule()->getId());
 		$this->container()->addEplugin('files', $files);
 
 //		Uživatelské obrázky
-		$images = $this->eplugin()->userimages();
+		$images = new UserImagesEplugin($this->errMsg(), $this->infoMsg(), $this->getRights());
 		$images->setIdArticle($this->getModule()->getId());
 		$this->container()->addEplugin('images', $images);
 

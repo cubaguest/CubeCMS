@@ -59,6 +59,12 @@ class Eplugin {
 	private $rights = null;
 	
 	/**
+	 * Obejt s autorizačními informacemi
+	 * @var Auth
+	 */
+	private $auth = null;
+	
+	/**
 	 * Objekt pro ukládání chybových hlášek
 	 * @var Messages
 	 */
@@ -74,19 +80,81 @@ class Eplugin {
 	 * Konstruktor třídy, spouští metodu init();
 	 *
 	 */
-	function __construct(Module $module, Rights $rights, Messages $errors, Messages $info)
+	function __construct(Messages $errors = null, Messages $info = null, Rights $rights = null)
 	{
-		$this->module = $module;
+		$this->module = AppCore::getSelectedModule();
 //		$this->dbConnector = $dbConnector;
 		$this->dbConnector = AppCore::getDbConnector();
-		$this->rights = $rights;
 		
-		$this->errMsg = $errors;
-		$this->infoMsg = $info;
+		if($rights instanceof Rights){
+			$this->rights = $rights;
+			$this->auth = $rights->getAuth();
+		}
+		
+		if($errors instanceof Messages){
+			$this->errMsg = $errors;
+		} else {
+			$this->errMsg = new Messages();
+		}
+		
+		if($info instanceof Messages){
+			$this->infoMsg = $info;
+		} else {
+			$this->infoMsg = new Messages();
+		}
 
 		$this->init();
 	}
 	
+	/**
+	 * Metoda zjišťuje jestli byl nastaven index na eplugin
+	 * 
+	 * @return boolean -- true pokud se má zpracovávat eplugin
+	 */
+	public static function isEplugin() {
+		if(isset($_GET[Links::GET_EPLUGIN_NAME])){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Metoda vrací název zvoleného epluginu
+	 *
+	 * @return string -- název epluginu
+	 */
+	public static function getSelEpluginName() {
+		return rawurldecode($_GET[Links::GET_EPLUGIN_NAME]);
+	}
+		
+	/**
+	 * Metoda nastavuje knihovnu epluginu
+	 * @param Auth -- objekt autorizace
+	 */
+	public function setAuthParam(Auth $auth) {
+		$this->auth = $auth;
+	}
+
+	/**
+	 * Metoda nastavuje knihovnu epluginu je použita v epluginech
+	 */
+	public function setParams() {
+	}
+
+	/**
+	 * Metoda se využívá pro načtení proměných do stránky, 
+	 * je volána při volání parametru stránky pro EPlugin
+	 *
+	 */
+	public function runOnlyEplugin(){
+		;
+	}
+	
+	/**
+	 * Inicializační metoda EPluginu
+	 * 
+	 */
 	protected function init(){}
 	
 	/**
@@ -160,6 +228,14 @@ class Eplugin {
 		return $this->infoMsg;
 	}
 	
+	/**
+	 * Metoda vrací název epluginu
+	 * @return string -- název epluginu
+	 */
+	public final function getEpluginName() {
+		return strtolower(get_class($this));
+	}
+	
 	
 	/**
 	 * Abstraktní metoda pro inicializaci epluginu
@@ -177,61 +253,61 @@ class Eplugin {
 		return $this->templateFile;
 	}
 	
-	/**
-	 * Metoda vrací objekt pluginu scroll
-	 * @return Scroll -- objekt scrolleru
-	 */
-	public function scroll(){
-		return new Scroll($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
-	
-	/**
-	 * Metoda vrací objekt epluginu changes
-	 * @return Changes -- objekt epluginu changes
-	 */
-	public function changes() {
-		return new Changes($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
-	
-	/**
-	 * Metoda vrací objekt epluginu userfiles
-	 * @return UserFiles -- objekt epluginu userfiles
-	 */
-	public function userfiles() {
-		return new UserFiles($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
-	
-	/**
-	 * Metoda vrací objekt epluginu userimages
-	 * @return UserImages -- objekt epluginu userimages
-	 */
-	public function userimages() {
-		return new UserImages($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
-	
-	/**
-	 * Metoda vrací objekt epluginu progressbar
-	 * @return ProgressBar -- objekt epluginu progressbar
-	 */
-	public function progressbar() {
-		return new ProgressBar($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
-
-	/**
-	 * Metoda vrací objekt epluginu sendmail
-	 * @return SendMail -- objekt epluginu sendmail
-	 */
-	public function sendmail() {
-		return new SendMail($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
-
-	/**
-	 * Metoda vrací objekt epluginu csvdata
-	 * @return CsvData -- objekt epluginu csvdata
-	 */
-	public function csvdata() {
-		return new CsvData($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
-	}
+//	/**
+//	 * Metoda vrací objekt pluginu scroll
+//	 * @return Scroll -- objekt scrolleru
+//	 */
+//	public function scroll(){
+//		return new Scroll($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
+//	
+//	/**
+//	 * Metoda vrací objekt epluginu changes
+//	 * @return Changes -- objekt epluginu changes
+//	 */
+//	public function changes() {
+//		return new Changes($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
+//	
+//	/**
+//	 * Metoda vrací objekt epluginu userfiles
+//	 * @return UserFiles -- objekt epluginu userfiles
+//	 */
+//	public function userfiles() {
+//		return new UserFiles($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
+//	
+//	/**
+//	 * Metoda vrací objekt epluginu userimages
+//	 * @return UserImages -- objekt epluginu userimages
+//	 */
+//	public function userimages() {
+//		return new UserImages($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
+//	
+//	/**
+//	 * Metoda vrací objekt epluginu progressbar
+//	 * @return ProgressBar -- objekt epluginu progressbar
+//	 */
+//	public function progressbar() {
+//		return new ProgressBar($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
+//
+//	/**
+//	 * Metoda vrací objekt epluginu sendmail
+//	 * @return SendMail -- objekt epluginu sendmail
+//	 */
+//	public function sendmail() {
+//		return new SendMail($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
+//
+//	/**
+//	 * Metoda vrací objekt epluginu csvdata
+//	 * @return CsvData -- objekt epluginu csvdata
+//	 */
+//	public function csvdata() {
+//		return new CsvData($this->getModule(), $this->rights, $this->errMsg, $this->infoMsg);
+//	}
 	
 	
 	/**
@@ -281,6 +357,13 @@ class Eplugin {
 		array_push($this->_tplJSPluginsArray, $jsPlugin);
 	}
 	
+	/**
+	 * Metoda vrací odkaz na soubor epluginu
+	 * //TODO možná implementovat vracení odkazu na EPlugin file (./epluginuserimages.js)
+	 */
+//	public function getFileLink() {
+//		;
+//	}
 	
 	
 }

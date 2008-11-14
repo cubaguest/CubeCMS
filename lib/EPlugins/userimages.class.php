@@ -12,7 +12,7 @@
  * //TODO doělat mazání souborů z celého článku
  */
 
-class UserImages extends Eplugin {
+class UserImagesEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string
@@ -75,6 +75,20 @@ class UserImages extends Eplugin {
 	const FORM_USERIMAGE_ID = 'id';
 	const FORM_BUTTON_DELETE = 'delete';
 	
+	/**
+	 * Formáty pro vrácení seznamu obrázků
+	 * @var string
+	 */
+	const FILE_IMAGES_FORMAT_TINYMCE = 'tinymce';
+	const FILE_IMAGES_FORMAT_ARRAY = 'array';
+	
+	/**
+	 * $_GET parametr s id itemu a článku
+	 * @var string
+	 */
+	const GET_URL_ID_ITEM = 'idI';
+	const GET_URL_ID_ARTICLE = 'idA';
+	const GET_URL_IMAGES_LIST_TYPE = 'type';
 	
 //	const COLUM_USER_NAME		= 'name';
 //	const COLUM_USER_SURNAME	= 'surname';
@@ -117,7 +131,7 @@ class UserImages extends Eplugin {
 	 * Pole s id modulu (items)
 	 * @var array
 	 */
-	private $idItems = null;
+//	private $idItem = null;
 	
 	/**
 	 * ID šablony
@@ -285,26 +299,31 @@ class UserImages extends Eplugin {
 //	}
 	
 	/**
-	 * Metoda uloží změnu do db
-	 * @param string -- popis změny
+	 * Metoda načte seznam obrázků
+	 * @param integer -- id item
 	 * @param integer -- id článku u kterého byla změna provedena
-	 * @param integer -- (option) id item u ktré byla změna provedena
 	 */
-//	public function createChange($label, $idArticle, $idItem = null) {
-//		$sqlInser = $this->getDb()->insert()->into(self::DB_TABLE_CHANGES);
-//		
-//		if($idItem == null){
-//			$sqlInser = $sqlInser->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM, self::COLUM_ID_USER, self::COLUM_LABEL, self::COLUM_TIME)
-//								->values($idArticle, $this->getModule()->getId(), $this->getRights()->getAuth()->getUserId(), $label, time());
-//		
-//		} else {
-//			$sqlInser = $sqlInser->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM, self::COLUM_ID_USER, self::COLUM_LABEL, self::COLUM_TIME)
-//								->values($idArticle, $idItem, $this->getRights()->getAuth()->getUserId(), $label, time());
-//		}
-//		
-////		vložení záznamu
-//		$this->getDb()->query($sqlInser);
-//	}
+	public function getImagesList($idItem, $idArticle) {
+		$sqlSelect = $this->getDb()->select()->from(array('img' => self::DB_TABLE_USER_IMAGES), array(self::COLUM_FILE))
+											 ->where(self::COLUM_ID_ITEM.' = '.$idItem)
+											 ->where(self::COLUM_ID_ARTICLE.' = '.$idArticle);
+		
+//		vložení záznamu
+		$images = $this->getDb()->fetchAssoc($sqlSelect);
+		
+		$returnArray = array();
+//		Převedení na normální pole kde klíč je název souboru a hodota je cesta
+		if(!empty($images)){
+			foreach ($images as $image) {
+				$returnArray[$image[self::COLUM_FILE]] = $this->getLinks()->getMainWebDir().MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$image[self::COLUM_FILE];
+			}
+		}
+//		echo("<pre>");
+//		print_r($returnArray);
+//		echo("</pre>");
+		
+		return $returnArray;
+	}
 	
 	/**
 	 * Metoda načte data z db
@@ -402,10 +421,56 @@ class UserImages extends Eplugin {
 		self::$otherImagesArray[$this->idUserImages] = $this->imagesArray;
 		
 		$this->toTpl("USERIMAGES_ARRAY",self::$otherImagesArray);
-		
-
-		
 	}
 
+	/**
+	 * Metoda je spuštěna pokud se generuje soubor pro výstup (list obrázků)
+	 *
+	 */
+	public function runOnlyEplugin() {
+		$array = $this->getImagesList(rawurldecode($_GET[self::GET_URL_ID_ITEM]),rawurldecode($_GET[self::GET_URL_ID_ARTICLE]));
+		
+		isset($_GET[self::GET_URL_IMAGES_LIST_TYPE]) == false ? $type = null : $type = rawurldecode($_GET[self::GET_URL_IMAGES_LIST_TYPE]);
+		switch ($type) {
+			case self::FILE_IMAGES_FORMAT_TINYMCE:
+				$data = TinyMce::generateListImages($array);
+				header("Content-Length: " . strlen($data));
+				header("Content-type: application/x-javascript");
+				echo $data;
+				exit();
+			break;
+			
+			default:
+			break;
+		}
+		
+		return false;
+		
+	}
+	
+	/**
+	 * Metoda vrací odkaz na soubor se seznamem obrázků
+	 * @param string -- typ v jakém se mají obrázky formátu vrátit
+	 * @return mixed -- seznam obrázků
+	 */
+	public function getImagesListLink($type) {
+		switch ($type) {
+			case self::FILE_IMAGES_FORMAT_TINYMCE:
+				//TODO dodělat tak by se daly předávat i celá pole
+				$link = new Links(true, true, true);
+				return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')->
+						params(array(self::GET_URL_ID_ARTICLE => $this->idArticle, self::GET_URL_ID_ITEM => $this->getModule()->getId(), 
+							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE)));
+			break;
+			
+			default:
+				$link = Links::getMainWebDir().'eplugin'.strtolower($this->getEpluginName()).'.js';
+			break;
+		}
+		
+		return false;
+	}
+	
+	
 }
 ?>

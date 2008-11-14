@@ -10,7 +10,7 @@
  * @abstract 		Třída Epluginu pro práci s maily k odesílání informací
  */
 
-class SendMail extends Eplugin {
+class SendMailEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string

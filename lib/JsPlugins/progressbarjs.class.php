@@ -9,9 +9,6 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída JsPluginu ProgressBarJs pro otevření okna s progresbarem
  */
-
-require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'JsPlugins'. DIRECTORY_SEPARATOR . 'jsplugin.calss.php');
-
 class ProgressBarJs extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu

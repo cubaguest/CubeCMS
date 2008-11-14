@@ -10,7 +10,7 @@
  * @abstract 	Třída EPluginu pro práci se scrolovátky
  *
  */
-class ProgressBar extends Eplugin {
+class ProgressBarEplugin extends Eplugin {
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string

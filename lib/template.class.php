@@ -559,13 +559,13 @@ class Template {
 			}
 			
 //			Přidání JS souboru s nastavením
-			if($jsPlugin->isDefaultJsSettings() AND $jsPlugin->getSettingsJsFile() != null){
+			if($jsPlugin->isDefaultJsSettingsFile() AND $jsPlugin->getSettingsJsFile() != null){
 				$this->addJS($jsPlugin->getJsPluginDir().$jsPlugin->getSettingsJsFile(), true);
 			} else if($jsPlugin->getSettingsJsFile() != null) {
 				$this->addJS($jsPlugin->getSettingsJsFile());
 			}
 //			Přidání CSS souboru s nastavením
-			if($jsPlugin->isDefaultCssSettings() AND $jsPlugin->getSettingsCssFile() != null){
+			if($jsPlugin->isDefaultCssSettingsFile() AND $jsPlugin->getSettingsCssFile() != null){
 				$this->addCss($jsPlugin->getJsPluginDir().$jsPlugin->getSettingsCssFile(), true);
 			} else if($jsPlugin->getSettingsCssFile() != null){
 				$this->addCss($jsPlugin->getSettingsCssFile());

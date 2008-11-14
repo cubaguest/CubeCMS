@@ -9,21 +9,24 @@
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída JsPluginu pro záložkový box
  */
-
-require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'JsPlugins'. DIRECTORY_SEPARATOR . 'jsplugin.calss.php');
-
 class TabContent extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu
 		$this->setJsPluginName("TabContent");
-		//		Přidání css stylu
+	}
+	protected function initFiles() {
 		$this->addCssFile('tabcontent.css');
 		
-		
 //		Přidání js soubrů pluginu
-		$this->addJsFile("tabcontent.js");
+		$this->addJsFile(new JsPluginJsFile("tabcontent.js"));
+	}
+	
+	
+	/**
+	 * Metda vytvoří výchozí konfigurační soubor
+	 */
+	protected function generateFile() {
 		
-//		$this->setDefaultSettingJsFile('default.js');
 	}
 }
 

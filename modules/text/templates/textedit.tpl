@@ -10,7 +10,7 @@
 	{foreach from=$VARS.TEXT_EDIT_ARRAY key='LANG' item='TEXT' name='textLang'}
 	<p id="lang{$smarty.foreach.textLang.iteration}" class="tabcontent">
 		{$VARS.TEXT_NAME}{if $smarty.foreach.textLang.first}*{/if}:<br />
-		<textarea rows="5" cols="60" name="text_text_{$LANG}">{$TEXT.text}</textarea>
+		<textarea class="textarea_tinymce textarea" rows="5" cols="60" name="text_text_{$LANG}">{$TEXT.text}</textarea>
 	</p>
 	{* html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$LANG|cat:'.png' *}
 	{/foreach}
