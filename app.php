@@ -1151,6 +1151,11 @@ class AppCore {
 					
 //					Spuštění viewru
 //					Pokud proběhl kontroler v pořádku
+					//Není-li v kontroleru přiřazen výstup
+					if($ctrlResult === null){
+						$ctrlResult = true;
+					}
+					
 					if($ctrlResult){
 						$controller->runView($template);
 					} else {
