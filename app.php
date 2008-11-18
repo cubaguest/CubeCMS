@@ -1123,13 +1123,13 @@ class AppCore {
 					
 					if($action->haveAction() AND method_exists($controller, $controllerAction)){//TODO doladit	
 //					if(method_exists($controller, $controllerAction)){
-						$controller->$controllerAction();
+						$ctrlResult = $controller->$controllerAction();
 					} 
 					else if(!$action->isAction() AND $article->isArticle() AND method_exists($controller, $controllerAction)){ 
-						$controller->$controllerAction();
+						$ctrlResult = $controller->$controllerAction();
 					} 
 					else {
-						$controller->mainController();
+						$ctrlResult = $controller->mainController();
 						$defaultAction = true;
 						if(!method_exists($controller, $controllerAction)){
 							//	Vrácení překladu na engine
@@ -1150,7 +1150,12 @@ class AppCore {
 					$template->setModule($module);
 					
 //					Spuštění viewru
-					$controller->runView($template);
+//					Pokud proběhl kontroler v pořádku
+					if($ctrlResult){
+						$controller->runView($template);
+					} else {
+						new CoreException(_('Controler modulu "') . $module->getName() . _('" nebyl korektně proveden'), 21);
+					}
 					
 //					Uložení šablony a proměných do hlavní šablony
 					$this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
