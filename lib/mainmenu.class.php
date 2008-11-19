@@ -39,7 +39,7 @@ abstract class MainMenu {
 	 */
 	const COLUMN_SECTION_ID 			= 'id_section';
 	const COLUMN_SECTION_LABEL_PREFIX 	= 'label_';
-	const COLUMN_SECTION_LABEL_IMAG 	= 'clabel';
+	const COLUMN_SECTION_LABEL_IMAG 	= 'slabel';
 	const COLUMN_SECTION_ALT_PREFIX 	= 'alt_';
 	const COLUMN_SECTION_ALT_IMAG 		= 'calt';
 	const COLUMN_SECTION_PRIORITY 		= 'priority';
