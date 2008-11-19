@@ -15,6 +15,13 @@ require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::E
 class DbModel extends Model {
 	
 	/**
+	 * Objekt konektoru k databázi
+	 *
+	 * @var DbInterface
+	 */
+	private $dbConnector = null;
+	
+	/**
 	 * Konstruktor třídy
 	 *
 	 */	
