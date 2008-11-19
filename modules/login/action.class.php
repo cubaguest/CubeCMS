@@ -3,7 +3,7 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class ModuleAction extends Action {
+class LoginAction extends Action {
 	
 
 	public function actions() {
