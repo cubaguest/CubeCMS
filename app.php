@@ -796,19 +796,8 @@ class AppCore {
 		
 //		Přiřazení souboru s šablonou menu podle zvoleéhoí vzhledu
 //		vybraný vzhled šablony //TODO přesunout do třídy pro práci s menu
-		if(file_exists(self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'menu.tpl')){
-			$faceMenuFile = '.'.self::getTepmlateFaceDir(false).self::TEMPLATES_DIR.URL_SEPARATOR.'menu.tpl';
-		} 
-//		Výchozí vzhled
-		else if(file_exists(self::getTepmlateDefaultFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'menu.tpl')){
-			$faceMenuFile = self::getTepmlateDefaultFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'menu.tpl';
-		} 
-//		Vzhled v engine
-		else {
-			$faceMenuFile = 'menu.tpl';
-		}
 		
-		$this->assignVarToTpl('MAIN_MENU_TEMPLATE_FILE', $faceMenuFile);
+		$this->assignVarToTpl('MAIN_MENU_TEMPLATE_FILE', 'menu.tpl');
 	}
 
 	/**
