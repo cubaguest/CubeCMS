@@ -107,8 +107,8 @@ function smarty_function_html_engine_image($params, &$smarty)
 	} 
 //		Vzhled v engine
 	else  if(file_exists($smarty->template_dir.DIRECTORY_SEPARATOR.$_image_path)){
-		$path_prefix = '.'.URL_SEPARATOR.$smarty->template_engine_images_dir.URL_SEPARATOR;
-		$_image_path = '.'.URL_SEPARATOR.$smarty->template_engine_images_dir.URL_SEPARATOR.$_image_path;
+		$path_prefix = $smarty->template_engine_images_dir.URL_SEPARATOR;
+		$_image_path = $smarty->template_engine_images_dir.URL_SEPARATOR.$_image_path;
 	} else {
 		$fileNotExist = true;    
 	}

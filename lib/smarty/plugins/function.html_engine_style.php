@@ -77,7 +77,7 @@ function smarty_function_html_engine_style($params, &$smarty)
 	} 
 //		Vzhled v engine
 	else {
-		$path_prefix = '.'.URL_SEPARATOR.$smarty->template_engine_stylesheets_dir.URL_SEPARATOR;
+		$path_prefix = $smarty->template_engine_stylesheets_dir.URL_SEPARATOR;
 	};
     
     return '<link rel="'.$rel.'" type="'.$type.'" href="'.$path_prefix.$file.'"  '.$extra.' />';

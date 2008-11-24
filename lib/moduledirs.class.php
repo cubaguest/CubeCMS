@@ -150,13 +150,18 @@ class ModuleDirs {
 
 	/**
 	 * Metoda vrací cestu k datovému adresáři modulu
+     * @param boolean[option] -- jestli má být vrácen s označením relativní cesty
 	 * @return string -- cesta k adresáři 
 	 */
-	public function getDataDir() {
+	public function getDataDir($withRelPrefix = true) {
 		if($this->moduleDataDir == null){
 			return false;
 		} else {
-			return self::getWebDir().self::getWebDataDir().self::DIR_SEPARATOR.$this->moduleDataDir.self::DIR_SEPARATOR;
+            if($withRelPrefix){
+                return self::getWebDir().self::getWebDataDir().self::DIR_SEPARATOR.$this->moduleDataDir.self::DIR_SEPARATOR;
+            } else {
+                return self::getWebDataDir().self::DIR_SEPARATOR.$this->moduleDataDir.self::DIR_SEPARATOR;
+            }
 		}
 	}
 	
@@ -164,7 +169,7 @@ class ModuleDirs {
 	 * Metody vrací cestu k adresáři css souborů modulu
 	 * @return string -- cesta k css souborům
 	 */
-	public function getStylesheetsDir($withPrefix = true) {
+	public function getStylesheetsDir($withPrefix = false) {
 		if($withPrefix){
 			return $this->getMainDir().self::STYLESHEETS_DIR.self::DIR_SEPARATOR;
 		} else {
@@ -178,7 +183,11 @@ class ModuleDirs {
 	 * @return string -- cesta k adresáři s javascripty
 	 */
 	public function getJavaScriptsDir($withPrefix = true) {
-		return $this->getMainDir().self::JAVASCRIPTS_DIR.self::DIR_SEPARATOR;
+		if($withPrefix){
+            return $this->getMainDir().self::JAVASCRIPTS_DIR.self::DIR_SEPARATOR;
+        } else {
+            return $this->getMainDir(false).self::JAVASCRIPTS_DIR.self::DIR_SEPARATOR;
+        }
 	}
 	
 	/**

@@ -426,7 +426,7 @@ class AppCore {
 		if($fullDir){
 			return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateFaceDir.DIRECTORY_SEPARATOR;
 		} else {
-			return '.'.URL_SEPARATOR.self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
+			return self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
 		}
 	}
 
@@ -440,7 +440,7 @@ class AppCore {
 		if($fullDir){
 			return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateDefaultFaceDir.DIRECTORY_SEPARATOR;
 		} else {
-			return '.'.URL_SEPARATOR.self::FACES_DIR.URL_SEPARATOR.self::$templateDefaultFaceDir.URL_SEPARATOR;
+			return self::FACES_DIR.URL_SEPARATOR.self::$templateDefaultFaceDir.URL_SEPARATOR;
 		}
 	}
 	
@@ -1429,7 +1429,14 @@ class AppCore {
 		}
 		
 	}
-	
+
+    private function initialWebTpl() {
+        $fileName = 'initial'.ucfirst(AppCore::media()).'.php';
+        if(file_exists(self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName)){
+            require self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName;
+        }
+        
+    }
 	
 
 	/**
@@ -1483,6 +1490,9 @@ class AppCore {
 				
 				//nastavení vybrané kategorie
 				$this->selectCategory();
+
+//              Globální inicializace proměných do šablony
+                $this->initialWebTpl();
 
 				//vytvoření hlavního menu
 				$this->createMainMenu();

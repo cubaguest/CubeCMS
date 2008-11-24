@@ -7,7 +7,8 @@
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: sendmail.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída Epluginu pro práci s maily k odesílání informací
+ * @abstract 	Třída Epluginu pro práci s maily k odesílání informací
+ * @todo        Dodělat podporu pro více druhů výrazů (ne jenom %vyraz%, %vyraz[true/false]%) u zpracování
  */
 
 class SendMailEplugin extends Eplugin {
@@ -297,9 +298,25 @@ class SendMailEplugin extends Eplugin {
 		$this->getMailDetails();
 		$mailDetail = $this->mailTextDetail;
 		$text = &$mailDetail[self::COLUM_MAIL_TEXT];
-		
-		foreach ($this->mailTextTransTable as $translation) {
-			$text = str_replace($translation[self::MAIL_TPL_STRING_TRANS], $translation[self::MAIL_TPL_VALUE_TRANS], $text);
+
+        foreach ($this->mailTextTransTable as $translation) {
+//            Pokud je možnost vybírat ze dvou hodnot %vyraz[true/false]% je vygenerována hodnota
+            if(ereg('^%+[a-zA-Z_]{1,}\[+[a-zA-Z_]{1,}\/+[a-zA-Z_]{1,}\]+%+$', $translation[self::MAIL_TPL_STRING_TRANS])){
+                $array = array ();
+                preg_match('/^%+([a-zA-Z_]{1,})\[+([a-zA-Z_]{1,})\/+([a-zA-Z_]{1,})\]+%+$/', $translation[self::MAIL_TPL_STRING_TRANS], $array);
+
+                $match = '%+'.$array[1].'\[+([a-zA-Z_]{1,})\/+([a-zA-Z_]{1,})\]+%+';
+//                Podle zvolené hodnoty vypíšeme hodnotu ve výrazu
+                if($translation[self::MAIL_TPL_VALUE_TRANS] === true){
+                    $text = ereg_replace($match, '\\1', $text);
+                } else {
+                    $text = ereg_replace($match, '\\2', $text);
+                }
+            }
+//          Jedná-li se o normální výraz
+            else {
+                $text = str_replace($translation[self::MAIL_TPL_STRING_TRANS], $translation[self::MAIL_TPL_VALUE_TRANS], $text);
+            }
 		}
 		return $mailDetail;
 	}
@@ -345,13 +362,15 @@ class SendMailEplugin extends Eplugin {
 //					vytvoření zprávy
 		$this->getMailDetails();
 		$mailDetail = $this->getTranslateMailDetail();
+
 		$mailHelper = new MailCtrlHelper();
-		
+
 //		odeslání na registrované adresy
 		$sendMailsArr = $this->getOnlyMails();
 		foreach ($sendMailsArr as $mailTo) {
-			$mailHelper->sendMail($mailTo, $mailDetail[SendMail::COLUM_MAIL_SUBJECT], $mailDetail[SendMail::COLUM_MAIL_TEXT], $mailDetail[SendMail::COLUM_MAIL_REPLAY]);
+            $mailHelper->sendMail($mailTo, $mailDetail[self::COLUM_MAIL_SUBJECT], $mailDetail[self::COLUM_MAIL_TEXT], $mailDetail[self::COLUM_MAIL_REPLAY]);
 		}
+
 	}
 	
 	
