@@ -1,11 +1,11 @@
 RewriteEngine On
-RewriteRule ^config\.xml$ /vve/ [R=permanent,L] 
+RewriteRule ^config\.xml$ /vve3_2/ [R=permanent,L]
 RewriteCond %{REQUEST_URI} !\.[[:alnum:]]+$
-RewriteRule ^(.+[^/])$ /vve/$1/ [R=301]
+RewriteRule ^(.+[^/])$ /vve3_2/$1/ [R=301]
 
 #sitemap
-RewriteRule ^sitemap.xml$ /vve/index.php?media=sitemap&for=google [L]
-RewriteRule ^urllist.txt$ /vve/index.php?media=sitemap&for=yahoo [L]
+RewriteRule ^sitemap.xml$ /vve3_2/index.php?media=sitemap&for=google [L]
+RewriteRule ^urllist.txt$ /vve3_2/index.php?media=sitemap&for=yahoo [L]
 
 #eplugin soubory
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -15,29 +15,29 @@ RewriteRule ^eplugin(.*)\.(.*)\?(.*)$ ./index.php?eplugin=$1&$3 [QSA]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^/]{3,})/([^/]{9,})/$ /vve/index.php?category=$1&article=$2 [QSA]
+RewriteRule ^([^/]{3,})/([^/]{9,})/$ ./index.php?category=$1&article=$2 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^/]{3,})/([^/]{1,8})/$ /vve/index.php?category=$1&action=$2 [QSA]
+RewriteRule ^([^/]{3,})/([^/]{1,8})/$ ./index.php?category=$1&action=$2 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^/]{3,})/([^/]+)/([^/]+)/$ /vve/index.php?category=$1&article=$2&action=$3 [QSA]
+RewriteRule ^([^/]{3,})/([^/]+)/([^/]+)/$ ./index.php?category=$1&article=$2&action=$3 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^/]{3,})/$ /vve/index.php?category=$1 [QSA]
+RewriteRule ^([^/]{3,})/$ ./index.php?category=$1 [QSA]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.{2})/$ /vve/index.php?lang=$1 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.{2})/([^/]+)/([^/]{9,})/$ /vve/index.php?lang=$1&category=$2&article=$3 [QSA]
+RewriteRule ^(.{2})/([^/]+)/([^/]{9,})/$ ./index.php?lang=$1&category=$2&article=$3 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.{2})/([^/]+)/([^/]{1,8})/$ /vve/index.php?lang=$1&category=$2&action=$3 [QSA]
+RewriteRule ^(.{2})/([^/]+)/([^/]{1,8})/$ ./index.php?lang=$1&category=$2&action=$3 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^/]+)/([^/]+)/([^/]+)/([^/]+)/$ /vve/index.php?lang=$1&category=$2&article=$3&action=$4 [QSA]
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/([^/]+)/$ ./index.php?lang=$1&category=$2&article=$3&action=$4 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.{2})/([^/]+)/$ /vve/index.php?lang=$1&category=$2 [L,QSA]
+RewriteRule ^(.{2})/([^/]+)/$ ./index.php?lang=$1&category=$2 [L,QSA]

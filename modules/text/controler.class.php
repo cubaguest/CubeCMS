@@ -1,20 +1,7 @@
 <?php
-/* SVN FILE: $Id$ */
 /**
  * Třída pro obsluhu akcí a kontrolerů modulu
  *
- * @category   	VVE VeproveVypeckyEnginy 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id$: controller.class.php 3.0.55 27.9.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro obsluhu akcí a kontrolerů modulu
- * 
- * @author $Author$
- * @copyright $Copyright$
- * @version $Revision$
- * @lastrevision $Date$
- * @modifiedby $LastChangedBy$
- * @lastmodified $LastChangedDate$
  */
 
 class TextController extends Controller {
@@ -67,7 +54,7 @@ class TextController extends Controller {
 	public function editController() {
 		
 		$this->checkWritebleRights();
-		
+
 //		Uživatelské soubory
 		$files = new UserFilesEplugin($this->errMsg(), $this->infoMsg(), $this->getRights());
 		$files->setIdArticle($this->getModule()->getId());

@@ -14,9 +14,16 @@ class ProgressBarJs extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu
 		$this->setJsPluginName("ProgressBar");
-		
-//		Přidání js soubrů pluginu
-		$this->addJsFile("progress_func.js");
+	}
+
+	protected function initFiles() {
+		$file = new JsPluginJsFile("progress_func.js");
+
+		$this->addJsFile($file);
+	}
+
+	protected function generateFile() {
+		;
 	}
 }
 

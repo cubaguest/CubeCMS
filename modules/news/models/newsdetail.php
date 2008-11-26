@@ -57,6 +57,8 @@ class NewsDetailModel extends DbModel {
 			array_push($columsArray, self::COLUMN_NEWS_ID_USER);
 			array_push($valuesArray, $idUser);
 
+            
+
 			$sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable())
 					->colums($columsArray)
 					->values($valuesArray);

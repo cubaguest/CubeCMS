@@ -83,7 +83,7 @@ class ProgressBarEplugin extends Eplugin {
 	{
 //		Načtení stránky z url
 		$this->sessions = new Sessions();
-		$this->progresLink = (string)$this->getLinks(true)->lang().AppCore::SPECIALITEMS_DIR.Links::COOL_URL_SEPARATOR.self::PROGRESS_DIR.Links::COOL_URL_SEPARATOR.self::PROGRESS_FILE;
+		$this->progresLink = (string)$this->getLinks(true, false, true)->lang().AppCore::SPECIALITEMS_DIR.Links::COOL_URL_SEPARATOR.self::PROGRESS_DIR.Links::COOL_URL_SEPARATOR.self::PROGRESS_FILE;
 		$this->setPageText();
 		$this->reloadSession();
 	}

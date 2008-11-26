@@ -442,7 +442,7 @@ class PhotogaleryController extends Controller {
 		$sendPhotoArray = array();
 		$sendGaleryArray = array();
 //		Objetk progressBaru
-		$progressBar = $this->eplugin()->progressbar();
+		$progressBar = new ProgressBarEplugin();
 		$this->container()->addEplugin('progressbar', $progressBar);
 		$progressBar->setMessage(_('Inicializace'));
 //		Odesílá se ----------------------------------------------------
@@ -760,7 +760,7 @@ class PhotogaleryController extends Controller {
 			$galeryObj = new GaleryDetailModel();
 			$galery = $galeryObj->getGaleryDetail($this->getArticle()->getArticle());
 			$photoObj = new PhotoDetailModel();
-			$scroll = $this->eplugin()->scroll();
+			$scroll = new ScrollEplugin();
 			$scroll->setUrlParam(self::PHOTOS_SCROLL_URL_PARAM);
 //		  	Výpočet scrolovátek									 
 	  		$scroll->setCountRecordsOnPage(1);

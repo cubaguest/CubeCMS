@@ -157,9 +157,9 @@ class Eplugin {
 	 *
 	 * @return Links -- objekt odkazů
 	 */
-	protected function getLinks($clear = false)
+	protected function getLinks($clear = false, $relative = false, $onlyWebRoot = false)
 	{
-		return new Links($clear);
+		return new Links($clear, $relative, $onlyWebRoot);
 	}
 	
 	/**
