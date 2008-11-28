@@ -7,10 +7,10 @@
  * podle jazykového nastavení
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id$Revision$
- * @author			$Author$ $Date$ $LastChangedBy$ $LastChangedDate$
+ * @version    	$Id$ formvalidator.class.php VVE3.3.0 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro validaci formulářových prvků
- * @
  */
 class FormValidator extends Validator {
 
