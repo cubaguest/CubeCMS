@@ -7,8 +7,8 @@
  * podle jazykového nastavení
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id$Revision$ created by $Author$ $Date$ updated by $LastChangedBy$ $LastChangedDate$
- * @author			Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id$Revision$
+ * @author			$Author$ $Date$ $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro validaci formulářových prvků
  * @
  */
