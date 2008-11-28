@@ -7,9 +7,10 @@
  * podle jazykového nastavení
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: formvalidator.class.php 3.0.0 beta1 29.8.2008
+ * @version    	$Id$Revision$ created by $Author$ $Date$ updated by $LastChangedBy$ $LastChangedDate$
  * @author			Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro validaci formulářových prvků
+ * @
  */
 class FormValidator extends Validator {
 
@@ -30,8 +31,8 @@ class FormValidator extends Validator {
 	 * @var array
 	 */
 	private $formStructure = array(self::INPUT_SUBMIT => null,
-											 self::INPUT_TEXT => array(),
-											 self::INPUT_TEXTAREA => array());
+		self::INPUT_TEXT => array(),
+		self::INPUT_TEXTAREA => array());
 
 	/**
 	 * Prefix formulářových prvků
@@ -62,7 +63,7 @@ class FormValidator extends Validator {
 
 	/**
 	 * Metoda zařadí název potvrzovacího prvku (input submit)
-	 * 
+	 *
 	 * @param string $name -- název potvrzovacího submit inputu
 	 * @return FormValidator -- vrací sama sebe
 	 */
@@ -120,18 +121,49 @@ class FormValidator extends Validator {
 	 */
 	public function checkForm() {
 		if(isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT]])){
+			$this->fillinFormValues();
+
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	/**
+	 * Metoda postupně spouští funkce pro naplňování a validaci hodnot
+	 * v odeslaném formuláři
+	 */
 	private function fillinFormValues() {
+		$allItemsOk = true;
+		foreach ($this->formStructure as $itemKey => $item) {
+			//			Spuštění funkce pro validaci prvku
+			$metodName = 'fillin'.ucfirst($itemKey).'Values';
+			if(method_exists($this, $metodName)){
+				$allItemsOk = $this->{$metodName}();
+			} else {
+				new CoreException(_('Požadovaná funkce ').$metodName._(' pro parsování formuláře neexistuje. Zřejmně nebyla implementována'),1);
+			}
+		}
+	}
+
+	/**
+	 * Metoda parsuje a kontroluje prvky typu input-text
+	 */
+	private function fillinInputtextValues() {
+		
+	}
+
+	/**
+	 * Metoda parsuje a kontroluje prvek typu textarea
+	 */
+	private function fillinTextareaValues() {
 		;
 	}
 
-	private function fillinInputTextValues() {
-		;
-	}
+	/**
+	 * Metoda pracuje s prvkem input typu submit. Měla by ústat prázdná, protože
+	 * se jedná o tláčítko pro odeslání formuláře
+	 */
+	private function fillinInputsubmitValues() {}
 }
 ?>
