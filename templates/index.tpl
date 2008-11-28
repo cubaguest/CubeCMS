@@ -140,7 +140,7 @@
 		<div id="{$TEMPLATE.IDENT}Conteiner" class="{$TEMPLATE.IDENT}ContainerClass moduleBox">
 		{foreach from=$TEMPLATE.TEMPLATES item=tplfile}
 			{assign var='MODULE_TPL_FILE' value=$tplfile.FILE}{* FOR LOADING MADULE TEPLATE WITH INCLUDE *}
-			{include file=$tplfile.FILE VARS=$TEMPLATE.VARS ID=$FILE.ID}
+			{include file=$tplfile.FILE VARS=$TEMPLATE.VARS PRIVATE=$TEMPLATE.VARS ID=$FILE.ID}
 		{/foreach}
 		<hr class="reseter" />
 		</div>

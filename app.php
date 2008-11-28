@@ -53,6 +53,12 @@ class AppCore {
 	 * @var string
 	 */
 	const ENGINE_HELPERS_DIR = 'helpers';
+	/**
+	 *
+	 * Adresář s validátory
+	 * @var string
+	 */
+	const ENGINE_VALIDATORS_DIR = 'Validators';
 	
 	/**
 	 * Adresář s Modely enginu
@@ -637,6 +643,10 @@ class AppCore {
 			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_HELPERS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
 				require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_HELPERS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
 			} 
+//			Ja-li načítán validátor
+			else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_VALIDATORS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
+				require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_VALIDATORS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
+			}
 //			Je-li načítan model modulu
 			else if(AppCore::getSelectedModule() != null AND strpos($className, 'model') !== false){
 				$modelFileName = substr($className, 0, strpos($className, 'model'));
