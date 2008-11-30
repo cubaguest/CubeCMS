@@ -6,9 +6,11 @@
  * se také generují šablony panelů.
  * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: panel.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: panel.class.php 419 2008-11-28 23:21:19Z jakub $ VVE3.3.0 $Revision: 419 $
+ * @author			$Author:$ $Date: $
+ *						$LastChangedBy:$ $LastChangedDate:$
  * @abstract 		Abstraktní třída pro práci s panely
+ * @todo				Není implementována práce s chybami
  */
 
 abstract class Panel{
@@ -82,7 +84,7 @@ abstract class Panel{
 	/**
 	 * Konstruktor
 	 */
-	function __construct($category, Messages &$messages, Messages &$errors, Template &$template, Rights $rights) {
+	function __construct($category, Template &$template, Rights $rights) {
 		$this->_link = new Links(true);
 		$this->_db = AppCore::getDbConnector();
 		$this->_category = $category;

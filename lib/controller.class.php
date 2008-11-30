@@ -76,17 +76,22 @@ abstract class Controller {
 	 * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
 	 *
 	 * @param Module -- objekt modulu
-	 * @param unknown_type $aplicationMainDir //TODO
 	 */
-	function __construct(Module $module, Action $action, Rights $rights, Messages &$messages, Messages &$errors, Article $article) {
+	function __construct(Module $module, Action $action, Rights $rights, Article $article) {
 		
 		//TODO odstranit nepotřebné věci v paramtrech konstruktoru
 		$this->module = $module;
 		$this->action = $action;
 		$this->auth = $rights->getAuth();
 		$this->rights = $rights;
-		$this->infomsg = $messages;
-		$this->errmsg = $errors;
+
+		if(AppCore::getModuleMessages() instanceof Messages){
+			$this->infomsg = AppCore::getModuleMessages();
+		}
+
+		if(AppCore::getModuleErrors() instanceof Messages){
+			$this->errmsg = AppCore::getModuleErrors();
+		}
 		$this->article = $article;
 		$this->container = new Container();
 	}

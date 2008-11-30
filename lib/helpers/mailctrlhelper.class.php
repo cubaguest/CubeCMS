@@ -15,6 +15,8 @@ class MailCtrlHelper extends CtrlHelper {
 	 * 
 	 * @param string -- adresa, která se má kontrolovat
 	 * @return boolean -- true pokud se jedná o email
+	 * @deprecated -- je lepší použít UrlValidator
+	 * @todo -- odstranit (je obsažena v UrlValidator)
 	 */
 	public function checkMail ($email) {
 

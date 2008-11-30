@@ -10,6 +10,55 @@
  */
 
 class Validator {
-    
+	/**
+	 * Obejt pro informační hlášky
+	 * @var Messages
+	 */
+	private $infomsg = null;
+
+	/**
+	 * Obejt pro chybové hlášky hlášky
+	 * @var Messages
+	 */
+	private $errmsg = null;
+
+	/**
+	 * Objekt modulu
+	 * @var Module
+	 */
+	private $module = null;
+
+	/**
+	 * Konstruktor nastaví základní parametry
+	 */
+	final public function  __construct() {
+		if(AppCore::getSelectedModule() instanceof Module){
+			$this->module = AppCore::getSelectedModule();
+		}
+
+		if(AppCore::getModuleMessages() instanceof Messages){
+			$this->infomsg = AppCore::getModuleMessages();
+		}
+
+		if(AppCore::getModuleErrors() instanceof Messages){
+			$this->errmsg = AppCore::getModuleErrors();
+		}
+	}
+
+	/**
+	 * Metoda vrací objekt s informačními zprávami
+	 * @return Messages -- objekt zpráv
+	 */
+	final public function infoMsg() {
+		return $this->infomsg;
+	}
+
+	/**
+	 * Metoda vrací objekt s chybovými zprávami
+	 * @return Messages -- objekt zpráv
+	 */
+	final public function errMsg() {
+		return $this->errmsg;
+	}
 }
 ?>

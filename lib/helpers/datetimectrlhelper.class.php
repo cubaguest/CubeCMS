@@ -89,6 +89,7 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	 * @param string -- kontrolované datum
 	 * @param boolean(option) -- true pokud má být vrácen timestamp
 	 * @return string -- vrací datum v ISO podobě nebo false
+	 * @deprecated -- je implementována ve validátoru TimeValidator
 	 */
 	public function checkDate($date, $timestam = false) {
 		if (ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$date, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locale::getLang() != 'en'){
@@ -114,6 +115,7 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	 * @param string -- kontrolovaný čas
 	 * @param boolean(option) -- true pokud má být vrácen timestamp
 	 * @return string -- vrací čas v podobě HH:MM nebo false
+	 * @deprecated -- je implementována ve validátoru TimeValidator
 	 */
 	public function checkTime($time, $timestamp = false) {
 		$nums = explode(self::TIME_SEAPRATOR, $time, 2);

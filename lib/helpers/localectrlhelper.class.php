@@ -49,6 +49,7 @@ class LocaleCtrlHelper extends CtrlHelper {
 	 * @param array -- Pole s elementy (např. label, text)
 	 * @param array -- Pole s hodnotymi elemntů 
 	 * @param array -- Pole s alternativními hodnotami, pokud hodnota není ve values
+	 * @deprecated -- lepší použít přímo validítor formuláře
 	 */
 	public function generateArray($arrayElements, $values = null, $alternativeValues = null) {
 		$returnArray = array();
@@ -97,6 +98,7 @@ class LocaleCtrlHelper extends CtrlHelper {
 	 * @param boolean -- true pokud se mají zny dekódovat
 	 * @param boolean -- jestli se mají klíče výstupního polu ukládat s prefixem
 	 * @return array -- pole upravených postů
+	 * @deprecated -- lepší použít přímo validítor formuláře
 	 */
 	public function postsToArray($sendPostsArray, $postPrefix = null, $specialChars = self::SP_CHARS_ENCODE, $withPrefix = false){
 		$returnArray = array();

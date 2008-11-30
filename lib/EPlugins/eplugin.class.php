@@ -76,12 +76,18 @@ class Eplugin {
 	 * @var Messages
 	 */
 	private $infoMsg = null;
-	
+
+	/**
+	 * Proměná obsahuje jestli se spouští pouze eplugin nebo celý web
+	 * @var boolean
+	 */
+	private static $runOnly = false;
+
 	/**
 	 * Konstruktor třídy, spouští metodu init();
 	 *
 	 */
-	function __construct(Messages $errors = null, Messages $info = null, Rights $rights = null)
+	function __construct(Rights $rights = null)
 	{
 		$this->module = AppCore::getSelectedModule();
 		$this->dbConnector = AppCore::getDbConnector();
@@ -90,13 +96,14 @@ class Eplugin {
 			$this->rights = $rights;
 			$this->auth = $rights->getAuth();
 		}
-		if($errors instanceof Messages){
-			$this->errMsg = $errors;
+
+		if(AppCore::getModuleErrors() instanceof Messages){
+			$this->errMsg = AppCore::getModuleErrors();
 		} else {
 			$this->errMsg = new Messages();
 		}
-		if($info instanceof Messages){
-			$this->infoMsg = $info;
+		if(AppCore::getModuleMessages() instanceof Messages){
+			$this->infoMsg = AppCore::getModuleMessages();
 		} else {
 			$this->infoMsg = new Messages();
 		}
@@ -131,6 +138,23 @@ class Eplugin {
 	 */
 	public function setAuthParam(Auth $auth) {
 		$this->auth = $auth;
+	}
+
+	/**
+	 * Metoda nastavuje že je eplugin spouštěn samostatně nebo ne
+	 * @param boolean $value -- true pokud je eplugin spoštěn samostatně
+	 */
+	public static function setRunOnly($value){
+		self::$runOnly = $value;
+	}
+
+	/**
+	 * Metoda vrací jestli je eplugin spouštěn samostatně nebo jako
+	 * součást stránky
+	 * @return boolean -- true pokud je spuštěn samostatně
+	 */
+	public static function isRunOnly() {
+		return self::$runOnly;
 	}
 
 	/**

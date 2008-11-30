@@ -239,7 +239,9 @@ class AppCore {
 
 	/**
 	 * Objekt s chybovými hláškami modulů
-	 * @var Errors //TODO
+	 * @var Errors
+	 * @todo odstranit!! zřejmně není použita
+	 * @deprecated
 	 */
 	public $errors = null;
 
@@ -247,13 +249,13 @@ class AppCore {
 	 * Objekt s hláškami modulů
 	 * @var Messages 
 	 */
-	public $messages = null;
+	private static $messages = null;
 
 	/**
 	 * Objekt s chybovými hláškami modulů (NE VYJÍMKY!)
 	 * @var Messages
 	 */
-	public $userErrors = null;
+	private static $userErrors = null;
 
 	/**
 	 * Objekt Autorizace
@@ -477,6 +479,7 @@ class AppCore {
 	/**
 	 * Metoda pro vytvoření objektu pro obsluhu chyb jádra
 	 * (CoreErrors)
+	 * @todo -- optimalizovat pro lepší práci
 	 */
 	private function _initCoreErros() {
 		$this->coreErrors = new Errors();
@@ -675,10 +678,26 @@ class AppCore {
 	private function _initMessagesAndErrors()
 	{
 		//		Vytvoření objektu pro práci se zprávami
-		$this->messages = new Messages('session', 'mmessages', true);
-		$this->userErrors = new Messages('session', 'merror');
+		self::$messages = new Messages('session', 'mmessages', true);
+		self::$userErrors = new Messages('session', 'merror');
 	}
 	
+	/**
+	 * Metoda vrací objekt pro zprávy modulů
+	 * @return Messages -- objekt zpráv
+	 */
+	public static function &getModuleMessages() {
+		return self::$messages;
+	}
+
+	/**
+	 * Metoda vrací objekt pro chybové zprávy modulů
+	 * @return Messages -- objekt zpráv
+	 */
+	public static function &getModuleErrors() {
+		return self::$userErrors;
+	}
+
 	/**
 	 * Metoda inicializuje typ média pro zobrazení
 	 */
@@ -706,7 +725,7 @@ class AppCore {
 	 * Metoda ověřuje autorizaci přístupu
 	 */
 	private function coreAuth() {
-		$this->auth = new Auth(self::$dbConnector, $this->userErrors);
+		$this->auth = new Auth(self::$dbConnector, self::getModuleErrors());
 	}
 	
 	/**
@@ -1085,7 +1104,7 @@ class AppCore {
 				if(class_exists($controllerClassName)){
 //					Příprava a nastavení použití překladu
 					
-					$controller = new $controllerClassName($module, $action, $moduleRights, $this->messages, $this->userErrors, $article);
+					$controller = new $controllerClassName($module, $action, $moduleRights, $article);
 
 					$actionCtrl = null;
 					//TODO není kompletí typ akce
@@ -1296,7 +1315,7 @@ class AppCore {
 					
 
 
-					$panel = new $panelClassName($category, $this->messages, $this->userErrors, $panelTemplate, $panelRights);
+					$panel = new $panelClassName($category, $panelTemplate, $panelRights);
 
 //					spuštění controleru
 					if(method_exists($panel, self::MODULE_PANEL_CONTROLLER)){
@@ -1358,8 +1377,8 @@ class AppCore {
 	 * //TODO není omplementována, vytvořit načítání do šablony.
 	 */
 	public function assignModuleVarsToTpl() {
-		$this->assignVarToTpl("MESSAGES", $this->messages->getMessages());
-		$this->assignVarToTpl("ERRORS", $this->userErrors->getMessages());		
+		$this->assignVarToTpl("MESSAGES", self::getModuleMessages()->getMessages());
+		$this->assignVarToTpl("ERRORS", self::getModuleErrors()->getMessages());
 		
 //		echo "<pre>";
 //		print_r($this->messages->getMessages());
@@ -1460,10 +1479,17 @@ class AppCore {
 		$this->_initModules();
 //		Pokud se načítá statická část epluginu
 		if(Eplugin::isEplugin()){
+			Eplugin::setRunOnly(true);
 			$epluginName = ucfirst(Eplugin::getSelEpluginName());
+			$epluginWithOutEplugin = $epluginName.'Eplugin';
 			
 			if(class_exists($epluginName)){
-				$eplugin = new $epluginName($this->errors, $this->messages);
+				$eplugin = new $epluginName();
+				$eplugin->setAuthParam($this->auth);
+				$eplugin->runOnlyEplugin();
+				return true;
+			} else if(class_exists($epluginWithOutEplugin)){
+				$eplugin = new $epluginWithOutEplugin();
 				$eplugin->setAuthParam($this->auth);
 				$eplugin->runOnlyEplugin();
 				return true;

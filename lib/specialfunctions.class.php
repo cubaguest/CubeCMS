@@ -4,10 +4,11 @@
  * Obsahuje některé funkce, které zjednodušují práci s řetězci.
  * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: specialfunctions.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id:$ VVE3.3.0 $Revision:$
+ * @author			$Author:$ $Date:$
+ *						$LastChangedBy:$ $LastChangedDate:$
  * @abstract 		Třída se speciálními funkcemi
- * @deprecated 	nehrtazuje se ostatními helpery zvláště texthelperem
+ * @deprecated 	nehrtazuje se ostatními helpery a validátory zvláště texthelperem
  */
 
 class SpecialFunctions {
@@ -214,38 +215,6 @@ class SpecialFunctions {
 	}
 
 	/**
-	 * Funkce ověřuje správné zadání kontrloního obrázk
-	 * //TODO není třeba
-	 * @param string -- název postu s odesýlaným textem
-	 * @return boolean -- true pokud se data shodují
-	 */
-	public function verify_image($post_name)
-	{
-		if($_POST[$post_name] == $_SESSION["control_chars"]){
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * funkce vygeneruje náhodné znaky pro ověření obrázkem
-	 * a uloží je do session
-	 * //TODO není třeba
-	 */
-	public function generate_verify_chars()
-	{
-		$chars = "ABCDEFHJKLMNPRSTUVWXYZ1234567890";
-		$passwd = null;
-		for ($i=0; $i<5; $i++){
-			$passwd .= $chars{rand(0, strlen($chars)-1)};
-
-		}
-		//$passwd=strtoupper(substr(md5(rand()),0,5));
-		$_SESSION["control_chars"] = $passwd;
-	}
-	
-	/**
 	 * Metoda vytvoří za zadaného řetězce url adresu
 	 * 
 	 * @param string -- řeťezec s url
@@ -267,23 +236,6 @@ class SpecialFunctions {
 		
 		return $url;
 	}
-	
-	/**
-	 * Metoda kontroluje emailovou adresu
-	 * 
-	 * @param string -- adresa, která se má kontrolovat
-	 * @return boolean -- true pokud se jedná o email
-	 */
-	public function checkMail ($email) {
-
-		if (Eregl("^[a-z0-9_\.]+@[a-z0-9_\.]+[a-z]{2,3}$", $email)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
 }
 
 ?>
