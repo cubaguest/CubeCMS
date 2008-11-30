@@ -37,6 +37,7 @@ class GuestbookController extends Controller {
 	const FORM_NICK				= 'nick';
 	const FORM_EMAIL				= 'email';
 	const FORM_TEXT				= 'text';
+	const FORM_VERIFY				= 'verify';
 //	const FORM_LABEL = 'label';
 //	const FORM_LABEL_PREFIX = 'label_';
 //	const FORM_URL = 'url';
@@ -68,45 +69,20 @@ class GuestbookController extends Controller {
 
 		$form->inputSubmit(self::FORM_BUTTON_SEND)->inputText(self::FORM_TOPIC, true)
 																->inputText(self::FORM_NICK, true)
-																->inputText(self::FORM_EMAIL, true)
+																->inputText(self::FORM_EMAIL, true, false, FormValidator::VALIDATION_EMAIL)
 																->textarea(self::FORM_TEXT, true);
 
-		if($form->checkForm()){
-			
+//		Ověřovací obrázek
+		$verifyImage = new VerifyImageEplugin();
+		$this->container()->addData('VERIFY_IMAGE', $verifyImage->getImageName());
+
+//		kontrola formuláře
+		if($form->checkForm() AND $verifyImage->verifyImage(self::FORM_PREFIX.self::FORM_VERIFY)){
+			$arr = $form->getFormValues(true, true);
+		} else {
+			$this->container()->addData('TOPIC_ARRAY', $form->getFormValues(false, true));
 		}
 
-		echo '<pre>';
-		print_r($form);
-		echo '</pre>';
-		//Vymazání sponzora
-//		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_DELETE]) AND $this->getRights()->isWritable()){
-//			$this->deleteSponsor();
-//		}
-		
-//		$this->createModel("sponsorsList");
-		
-//		Načtení spozorů z db
-//		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), array(self::COLUM_SPONSOR_LABEL => "IFNULL("
-//						.self::COLUM_SPONSOR_LABEL_LANG_PREFIX.Locale::getLang().", ".self::COLUM_SPONSOR_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
-//						self::COLUM_SPONSOR_NAME => "IFNULL(".self::COLUM_SPONSOR_NAME_LANG_PREFIX.Locale::getLang().", ".self::COLUM_SPONSOR_NAME_LANG_PREFIX.Locale::getDefaultLang().")",
-//						self::COLUM_SPONSOR_ID, self::COLUM_SPONSOR_URL, self::COLUM_SPONSOR_LOGO_IMAGE, self::COLUM_SPONSOR_URLKEY))
-//											 ->where(self::COLUM_SPONSOR_ID_ITEM." = ".$this->getModule()->getId())
-//											 ->where(self::COLUM_SPONSOR_DELETED." = ".(int)false)
-//											 ->order(self::COLUM_SPONSOR_NAME);
-//
-//		$this->getModel()->allSponsorsArray = $this->getDb()->fetchAssoc($sqlSelect);
-//
-//		foreach ($this->getModel()->allSponsorsArray as $key => $sponsor){
-//			$this->getModel()->allSponsorsArray[$key][self::COLUM_SPONSOR_EDITLINK] = $this->getLink()->article($sponsor[self::COLUM_SPONSOR_URLKEY])
-//																	->action($this->getAction()->actionEdit());
-//		}
-//
-////		Link pro přidání sponzora
-//		if($this->getRights()->isWritable()){
-//			$this->getModel()->linkAddSponsor = $this->getLink()->article()->action($this->getAction()->actionAdd());
-//		}
-//
-//		$this->getModel()->dirToImages = $this->getModule()->getDir()->getDataDir().self::LOGO_BIG_DIR.'/';
 	}
 	
 	/**
