@@ -14,7 +14,9 @@
  * @todo				Dodělat další validace, implementovat ostatní prvky formulářů
  */
 class FormValidator extends Validator {
-
+	/**
+	 * Názvy parametrů formuláře
+	 */
 	const INPUT_NAME			= 'name';
 	const INPUT_VALUE			= 'value';
 	const INPUT_OBLIGATION	= 'obligation';
@@ -22,7 +24,9 @@ class FormValidator extends Validator {
 	const INPUT_CODE			= 'code';
 	const INPUT_VALIDATION	= 'validation';
 
-
+	/**
+	 * Názvy prvků ve formuláři
+	 */
 	const INPUT_SUBMIT	= 'inputsubmit';
 	const INPUT_TEXT		= 'inputtext';
 	const INPUT_TEXTAREA	= 'textarea';
@@ -40,7 +44,6 @@ class FormValidator extends Validator {
 	 * @var int
 	 */
 	const CODE_HTMLENCODE = 1;
-
 
 	/**
 	 * Způsob kódování přenesených dat
