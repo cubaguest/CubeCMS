@@ -43,6 +43,17 @@ class TextCtrlHelper extends CtrlHelper {
 		$return = StrToLower($return); //velká písmena nahradí malými.
 		return $return;
 	}
+
+	/**
+	 * Metoda odstraní všechny html tagy ze zadaného stringu
+	 *
+	 * @param string $string -- řětězec
+	 * @return string -- řetězec bez tagů
+	 */
+	public function removeHtmlTags($string) {
+		$string=ereg_replace("<[^>]+>", "", $string);
+		return $string;
+	}
 	
 }
 

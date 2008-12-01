@@ -12,15 +12,15 @@ class BlogController extends Controller {
 	 * Názvy sloupců v tabulce se sekcemi (blog_sections)
 	 * @var string
 	 */
-	const COLUM_SECTION_LABEL = 'label';
-	const COLUM_SECTION_LABEL_LANG_PREFIX = 'label_';
-	const COLUM_SECTION_URLKEY = 'urlkey';
-	const COLUM_SECTION_TIME = 'time';
-	const COLUM_SECTION_ID_USER = 'id_user';
-	const COLUM_SECTION_ID_ITEM = 'id_item';
-	const COLUM_SECTION_ID = 'id_section';
-	const COLUM_SECTION_DELETED = 'deleted';
-	const COLUM_SECTION_DELETED_BY_ID_USER = 'deleted_by_id_user';
+//	const COLUM_SECTION_LABEL = 'label';
+//	const COLUM_SECTION_LABEL_LANG_PREFIX = 'label_';
+//	const COLUM_SECTION_URLKEY = 'urlkey';
+//	const COLUM_SECTION_TIME = 'time';
+//	const COLUM_SECTION_ID_USER = 'id_user';
+//	const COLUM_SECTION_ID_ITEM = 'id_item';
+//	const COLUM_SECTION_ID = 'id_section';
+//	const COLUM_SECTION_DELETED = 'deleted';
+//	const COLUM_SECTION_DELETED_BY_ID_USER = 'deleted_by_id_user';
 			
 
 	
@@ -29,16 +29,16 @@ class BlogController extends Controller {
 	 * Sloupce u tabulky uživatelů
 	 * @var string
 	 */
-	const COLUM_USER_NAME = 'username';
+//	const COLUM_USER_NAME = 'username';
 	
 	
 	/**
 	 * Speciální imageinární sloupce
 	 * @var string
 	 */
-	const COLUM_LANG = 'lang';
-	const COLUM_EDITABLE = 'editable';
-	const COLUM_EDIT_LINK = 'editlink';
+//	const COLUM_LANG = 'lang';
+//	const COLUM_EDITABLE = 'editable';
+//	const COLUM_EDIT_LINK = 'editlink';
 	
 	/**
 	 * Názvy formůlářových prvků
@@ -60,26 +60,45 @@ class BlogController extends Controller {
 	 * Konstanta s názvem session pro link back
 	 * @var string
 	 */
-	const LINK_BACK_SESSION = 'link_back';
+//	const LINK_BACK_SESSION = 'link_back';
 	
 	/**
 	 * Názvy routes pro zobrazování sekcí
 	 * @var string
 	 */
-	const ROUTE_SHOW_SECTION = 'section';
+//	const ROUTE_SHOW_SECTION = 'section';
 	
 	/**
 	 * Proměná obsahuje klíč vybrané sekce
 	 * @var string
 	 */
-	private $selectedSectionKey = null;	
+//	private $selectedSectionKey = null;
 	
 	/**
 	 * Kontroler pro obrazení seznamu blogů
 	 */
 	public function mainController() {
 		$this->checkReadableRights();
+
+		$blogLists = new BlogsListModel();
+
+		$textHelper = new TextCtrlHelper();
+
+		$scroll = new ScrollEplugin();
+		$scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
+		$scroll->setCountAllRecords($blogLists->getNumBlogs());
 		
+		$blogs = $blogLists->getBlogList($scroll->getStartRecord(), $scroll->getCountRecords());
+
+		$link = new Links();
+		foreach ($blogs as $key => $blog) {
+			$blogs[$key][BlogDetailModel::COLUM_TEXT] = $textHelper->removeHtmlTags($blog[BlogDetailModel::COLUM_TEXT]);
+			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $link->article($blog[BlogDetailModel::COLUM_URLKEY]);
+		}
+
+		$this->container()->addData('BLOGS', $blogs);
+		$this->container()->addEplugin('scroll', $scroll);
+
 //		Scrolovátka
 //		$scroll = $this->eplugin()->scroll();
 //		

@@ -15,21 +15,24 @@ class BlogView extends View {
 	}
 	
 	public function mainView() {
-		if($this->getRights()->isWritable()){
-			$this->template()->addTpl('addButtons.tpl');
-			
-			$this->template()->addVar('WRITABLE', true);
-			
-//			$this->template()->addVar('IN_SECTION', $this->getModel()->inSection);
-			
-			$this->template()->addVar('LINK_TO_ADD_SECTION_NAME', _("Přidat sekci"));
-//			$this->template()->addVar('LINK_TO_ADD_SECTION', $this->getModel()->linkToAddSection);
-			
-			$this->template()->addVar('LINK_TO_ADD_BLOG_NAME', _("Přidat blog"));
-//			$this->template()->addVar('LINK_TO_ADD_BLOG', $this->getModel()->linkToAddBlog);			
-			
-		}
-//		$this->assignGaleryList();
+//		if($this->getRights()->isWritable()){
+//			$this->template()->addTpl('addButtons.tpl');
+//
+//			$this->template()->addVar('WRITABLE', true);
+//
+////			$this->template()->addVar('IN_SECTION', $this->getModel()->inSection);
+//
+//			$this->template()->addVar('LINK_TO_ADD_SECTION_NAME', _("Přidat sekci"));
+////			$this->template()->addVar('LINK_TO_ADD_SECTION', $this->getModel()->linkToAddSection);
+//
+//			$this->template()->addVar('LINK_TO_ADD_BLOG_NAME', _("Přidat blog"));
+////			$this->template()->addVar('LINK_TO_ADD_BLOG', $this->getModel()->linkToAddBlog);
+//
+//		}
+		$this->template()->addTpl('blogList.tpl');
+
+		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
+		$this->container()->getEplugin('scroll')->assignToTpl($this->template());
 	}
 	
 	/**
