@@ -19,13 +19,15 @@ class MailCtrlHelper extends CtrlHelper {
 	 * @todo -- odstranit (je obsažena v UrlValidator)
 	 */
 	public function checkMail ($email) {
-
-		if (eregi("^[a-z0-9_\.]+@[a-z0-9_\.]+[a-z]{2,3}$", $email)) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		$name = '[-a-z0-9!#$%&\'*+/=?^_`{|}~]'; // znaky tvořící uživatelské jméno
+		$domain = '[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])'; // jedna komponenta domény
+		return eregi("^$name+(\\.$name+)*@($domain?\\.)+$domain\$", $email);
+//		if (eregi("^[a-z0-9_\.]+@[a-z0-9_\.]+[a-z]{2,3}$", $email)) {
+//			return true;
+//		}
+//		else {
+//			return false;
+//		}
 	}
 	
 	/**

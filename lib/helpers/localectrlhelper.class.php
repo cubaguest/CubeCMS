@@ -111,11 +111,20 @@ class LocaleCtrlHelper extends CtrlHelper {
 		
 //		Uprava postu o doplnění znaku pro oddělení postu a jazyku
 		$postsArray = array();
-		foreach ($sendPostsArray as $post) {
-			if($post[strlen($post)-1] == self::ELEMENT_LANG_SEPARATOR){
-				array_push($postsArray, $post);
-			} else {
-				array_push($postsArray, $post.self::ELEMENT_LANG_SEPARATOR);
+
+		if(!is_array($sendPostsArray)){
+			$sendPArray[0]=$sendPostsArray;
+		} else {
+			$sendPArray = $sendPostsArray;
+		}
+
+		if(!empty ($sendPArray)){
+			foreach ($sendPArray as $post) {
+				if($post[strlen($post)-1] == self::ELEMENT_LANG_SEPARATOR){
+					array_push($postsArray, $post);
+				} else {
+					array_push($postsArray, $post.self::ELEMENT_LANG_SEPARATOR);
+				}
 			}
 		}
 		

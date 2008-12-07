@@ -78,7 +78,9 @@ class GuestbookController extends Controller {
 
 //		kontrola formuláře
 		if($form->checkForm() AND $verifyImage->verifyImage(self::FORM_PREFIX.self::FORM_VERIFY)){
-			$arr = $form->getFormValues(true, true);
+			echo '<pre>';
+			print_r($form->getFormValues(true, true));
+			echo '</pre>';
 		} else {
 			$this->container()->addData('TOPIC_ARRAY', $form->getFormValues(false, true));
 		}

@@ -329,7 +329,7 @@ class UserImagesEplugin extends Eplugin {
 //			projití pole a dolnění odkazů
 			foreach ($this->imagesArray as $key => $file) {
 				$this->imagesArray[$key][self::COLUM_LINK_TO_SHOW] = $this->getLinks()->getMainWebDir().MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$file[self::COLUM_FILE];
-				$this->imagesArray[$key][self::COLUM_LINK_TO_SMALL] = './'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/'.$file[self::COLUM_FILE];
+				$this->imagesArray[$key][self::COLUM_LINK_TO_SMALL] = MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/'.$file[self::COLUM_FILE];
 			}
 		}
 	}

@@ -96,6 +96,9 @@ class Eplugin {
 			$this->rights = $rights;
 			$this->auth = $rights->getAuth();
 		}
+//		else if(AppCore::getSelectedModule() instanceof Module){
+//
+//		}
 
 		if(AppCore::getModuleErrors() instanceof Messages){
 			$this->errMsg = AppCore::getModuleErrors();

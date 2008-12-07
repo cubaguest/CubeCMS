@@ -15,8 +15,10 @@ class BlogView extends View {
 	}
 	
 	public function mainView() {
-//		if($this->getRights()->isWritable()){
-//			$this->template()->addTpl('addButtons.tpl');
+		if($this->getRights()->isWritable()){
+			$this->template()->addTpl('addButtons.tpl');
+			$this->template()->addVar('LINK_TO_ADD_SECTION_NAME', _('Přidat sekci'));
+			$this->template()->addVar('LINK_TO_ADD_BLOG_NAME', _('Přidat blog'));
 //
 //			$this->template()->addVar('WRITABLE', true);
 //
@@ -28,7 +30,8 @@ class BlogView extends View {
 //			$this->template()->addVar('LINK_TO_ADD_BLOG_NAME', _("Přidat blog"));
 ////			$this->template()->addVar('LINK_TO_ADD_BLOG', $this->getModel()->linkToAddBlog);
 //
-//		}
+
+		}
 		$this->template()->addTpl('blogList.tpl');
 
 		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);

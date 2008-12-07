@@ -93,11 +93,18 @@ class BlogController extends Controller {
 		$link = new Links();
 		foreach ($blogs as $key => $blog) {
 			$blogs[$key][BlogDetailModel::COLUM_TEXT] = $textHelper->removeHtmlTags($blog[BlogDetailModel::COLUM_TEXT]);
-			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $link->article($blog[BlogDetailModel::COLUM_URLKEY]);
+			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $link->article($blog[BlogDetailModel::COLUM_URLKEY])->action($this->getAction()->actionEdit());
 		}
 
 		$this->container()->addData('BLOGS', $blogs);
 		$this->container()->addEplugin('scroll', $scroll);
+
+//		Vytvoření odkazů
+		if($this->getRights()->isWritable()){
+			$this->container()->addLink('LINK_TO_ADD_SECTION', $this->getLink()->action($this->getAction()->actionAddsection()));
+			$this->container()->addLink('LINK_TO_ADD_BLOG', $this->getLink()->action($this->getAction()->actionAddblog()));
+		}
+
 
 //		Scrolovátka
 //		$scroll = $this->eplugin()->scroll();
@@ -147,36 +154,36 @@ class BlogController extends Controller {
 	 */
 	public function addsectionController() {
 		$this->checkWritebleRights();
-		
-		$this->createModel('sectionDetail');
-		
-//		Podle počtu jazyků inicializujeme pole pro přidání novinky
-		foreach (Locale::getAppLangs() as $lang) {
-			$this->getModel()->sectionArray[$lang] = null;
-		}
-		$obligatoryLang = Locale::getDefaultLang();
-		
-		
-		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_SEND])){
-			if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()] == null){
-				$this->errMsg()->addMessage(_('Nebyl zadán povinný název sekce'));
-				
-				foreach (Locale::getAppLangs() as $lang) {
-					$this->getModel()->sectionArray[$lang] = htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.$lang], ENT_QUOTES);
-				}
-			} else {
-				$sqlInsert = $this->saveNewSection();
 
-				//				Vložení do db
-				if($this->getDb()->query($sqlInsert)){
-					$this->infoMsg()->addMessage(_('Sekce byla uložena'));
-					$this->getLink()->article()->action()->reload();
-				} else {
-					new CoreException(_('Sekci se nepodařilo uložit, chyba při ukládání do db'), 3);
-				}
-			}
-		}
-		$this->getModel()->linkToBack = $this->getLink()->action();;
+		
+
+//		Podle počtu jazyků inicializujeme pole pro přidání novinky
+//		foreach (Locale::getAppLangs() as $lang) {
+//			$this->getModel()->sectionArray[$lang] = null;
+//		}
+//		$obligatoryLang = Locale::getDefaultLang();
+//
+//
+//		if(isset($_POST[self::FORM_SECTION_PREFIX.self::FORM_BUTTON_SEND])){
+//			if($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.Locale::getDefaultLang()] == null){
+//				$this->errMsg()->addMessage(_('Nebyl zadán povinný název sekce'));
+//
+//				foreach (Locale::getAppLangs() as $lang) {
+//					$this->getModel()->sectionArray[$lang] = htmlspecialchars($_POST[self::FORM_SECTION_PREFIX.self::FORM_SECTION_NAME_PREFIX.$lang], ENT_QUOTES);
+//				}
+//			} else {
+//				$sqlInsert = $this->saveNewSection();
+//
+//				//				Vložení do db
+//				if($this->getDb()->query($sqlInsert)){
+//					$this->infoMsg()->addMessage(_('Sekce byla uložena'));
+//					$this->getLink()->article()->action()->reload();
+//				} else {
+//					new CoreException(_('Sekci se nepodařilo uložit, chyba při ukládání do db'), 3);
+//				}
+//			}
+//		}
+		$this->getModel()->linkToBack = $this->getLink()->action();
 	}
 	
 	/**

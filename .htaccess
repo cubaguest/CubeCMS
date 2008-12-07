@@ -28,7 +28,7 @@ RewriteRule ^([^/]{3,})/$ ./index.php?category=$1 [QSA]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.{2})/$ /vve/index.php?lang=$1 [QSA]
+RewriteRule ^(.{2})/$ ./index.php?lang=$1 [QSA]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.{2})/([^/]+)/([^/]{9,})/$ ./index.php?lang=$1&category=$2&article=$3 [QSA]

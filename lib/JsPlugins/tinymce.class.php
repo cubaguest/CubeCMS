@@ -76,6 +76,7 @@ class TinyMce extends JsPlugin {
 			'document_base_url' => null,
 			'external_image_list_url' => null,
 			'remove_script_host' => 'false',
+			'content_css' => null
 //			'relative_urls' => 'false'
 			);
 	
@@ -92,6 +93,11 @@ class TinyMce extends JsPlugin {
 //		nastavení jazyka TinyMCE
 		$this->setParam('language', Locale::getLang());
 		$this->defaultParams['document_base_url'] = Links::getMainWebDir();
+		
+		$cssurl = '/'.AppCore::getTepmlateFaceDir(false);
+		$cssurl = substr($cssurl, 0, strlen($cssurl)-1);
+		$this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style.css';
+
 	}
 	
 	protected function initFiles() {
