@@ -47,7 +47,7 @@
 {/literal}
 </head>
 
-<body onload="{foreach from=$MODULES_JAVASCRIPT_ONLOAD_FUNCTION item='function'}{$function}; {/foreach}">
+<body {if !empty($ON_LOAD_JS_FUNCTIONS)}onload="{foreach from=$ON_LOAD_JS_FUNCTIONS item='function'}{$function}; {/foreach}"{/if}>
 
 <div id="bodywrap">
 

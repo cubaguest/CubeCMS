@@ -521,7 +521,7 @@ class AppCore {
 	 *
 	 */
 	private function _initConfig() {
-		require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'config.class.php');
+//		require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'config.class.php');
 
 //		$this->config = new Config(self::getAppWebDir() . DIRECTORY_SEPARATOR . self::MAIN_CONFIG_FILE, $this->coreErrors);
 		self::$sysConfig = new Config(self::getAppWebDir() . DIRECTORY_SEPARATOR . self::MAIN_CONFIG_FILE, $this->coreErrors);
@@ -928,6 +928,7 @@ class AppCore {
 		//		Přiřazení javascriptů a stylů
 		$this->assignVarToTpl("STYLESHEETS", Template::getStylesheets());
 		$this->assignVarToTpl("JAVASCRIPTS", Template::getJavaScripts());
+		$this->assignVarToTpl("ON_LOAD_JS_FUNCTIONS", Template::getJsOnLoad());
 		
 //		Přiřazení proměných z hlavní šablony
 		$this->assginTplObjToTpl($this->coreTpl);

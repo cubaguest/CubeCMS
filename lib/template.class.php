@@ -120,6 +120,11 @@ class Template {
 	 */
 	private $module = null;
 
+	/**
+	 * Pole s funkcemi spoštěnými při načtení stránky
+	 * @var array
+	 */
+	private static $onLoadJsFunctions = array();
 	
 	/*
 	 * ========== METODY
@@ -508,6 +513,22 @@ class Template {
 		} else {
 			new CoreException(_("Nebyl vložen objekt JsPluginu"), 1);
 		}
+	}
+
+	/**
+	 * Metoda přidá funkci do parametru OnLoad při načtení stránky
+	 * @param string -- název funkce pro nahrání
+	 */
+	final public function addJsOnLoad($jsFunction) {
+		array_push(self::$onLoadJsFunctions, $jsFunction);
+	}
+
+	/**
+	 * Metoda vrací pole s js funkcemi určenými k načtení po nahrátí stránky
+	 * @return array -- pole s funkcemi
+	 */
+	public static function getJsOnLoad() {
+		return self::$onLoadJsFunctions;
 	}
 }
 
