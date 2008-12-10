@@ -1,0 +1,1 @@
+<p><a href="{$VARS.LINK_TO_ADD_NEWS}" title="{$VARS.LINK_TO_ADD_NEWS_NAME}">{$VARS.LINK_TO_ADD_NEWS_NAME}</a></p>
