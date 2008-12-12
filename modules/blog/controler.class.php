@@ -90,10 +90,12 @@ class BlogController extends Controller {
 		
 		$blogs = $blogLists->getBlogList($scroll->getStartRecord(), $scroll->getCountRecords());
 
-		$link = new Links();
+		
 		foreach ($blogs as $key => $blog) {
+			$link = new Links();
 			$blogs[$key][BlogDetailModel::COLUM_TEXT] = $textHelper->removeHtmlTags($blog[BlogDetailModel::COLUM_TEXT]);
-			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $link->article($blog[BlogDetailModel::COLUM_URLKEY])->action($this->getAction()->actionEdit());
+			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $link->article($blog[BlogDetailModel::COLUM_URLKEY], $blog[BlogDetailModel::COLUM_ID]);
+			unset ($link);
 		}
 
 		$this->container()->addData('BLOGS', $blogs);
@@ -148,7 +150,11 @@ class BlogController extends Controller {
 //		}
 		
 	}
-	
+
+	public function showController() {
+		echo $this->getArticle();
+	}
+
 	/**
 	 * Kontroler pro přidání sekce
 	 */

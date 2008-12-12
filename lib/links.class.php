@@ -35,7 +35,13 @@ class Links {
 	 * @var string
 	 */
 	const URL_SEP_PARAM_VALUE = '=';
-	
+
+	/**
+	 * Oddělovatč mezi názvem článku a id článku
+	 * @var char
+	 */
+	const URL_SEP_ARTICLE_ID = '-';
+
 	/**
 	 * Přenosový protokol
 	 * @var string
@@ -125,6 +131,12 @@ class Links {
 	 * @var string
 	 */
 	private static $selectedCategory = null;
+
+	/**
+	 * Proměnná s cestou
+	 * @var string
+	 */
+	private static $selectedRoute = null;
 
 	/**
 	 * Proměnná s kategorií
@@ -347,15 +359,39 @@ class Links {
 	 * Metoda nastaví článek
 	 * @param string -- článek
 	 */
-	public static function setArticle($article) {
+	public static function setUrlCategory($cat) {
+		self::$selectedCategory = $cat;
+	}
+
+	/**
+	 * Metoda nastaví článek
+	 * @param string -- článek
+	 */
+	public static function setUrlRoute($route) {
+		self::$selectedRoute = $route;
+	}
+
+	/**
+	 * Metoda nastaví článek
+	 * @param string -- článek
+	 */
+	public static function setUrlArticle($article) {
 		self::$selectedAricle = $article;
+	}
+
+	/**
+	 * Metoda nastaví článek
+	 * @param string -- článek
+	 */
+	public static function setUrlLang($lang) {
+		self::$selectedAricle = $lang;
 	}
 
 	/**
 	 * Metoda nastaví akci
 	 * @param string -- článek
 	 */
-	public static function setAction($action) {
+	public static function setUrlAction($action) {
 		self::$selectedAction = $action;
 	}
 	
@@ -380,8 +416,14 @@ class Links {
 	 * 
 	 * @return Links -- objket Links
 	 */
-	public function article($article = null){
-		$this->article = $article;
+	public function article($article = null, $idArticle = null){
+
+//		Pokud je zadáno id, je přenášen article podle id článku a né podle urlklíče
+		if($article != null AND $idArticle != null AND is_numeric($idArticle)){
+			$this->article = $this->createArticleLink($article, $idArticle);
+		} else {
+			$this->article = $article;
+		}
 		return $this;
 	}
 
@@ -597,7 +639,21 @@ class Links {
 			return null;
 		}
 	}
-	
+
+	/**
+	 * Metoda vytvoří podobu článek pro url adresu s integorovaným id
+	 * @param string $article -- název článku
+	 * @param integer $idArticle -- id článku
+	 */
+	private function createArticleLink($article, $idArticle) {
+		$textHelp = new TextCtrlHelper();
+
+		$articleAscii = $textHelp->utf2ascii($article);
+
+		$newArticle = $articleAscii.self::URL_SEP_ARTICLE_ID.$idArticle;
+		return $newArticle;
+	}
+
 	/*
 	 * MAGICKÉ METODY
 	 */

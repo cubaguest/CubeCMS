@@ -20,7 +20,7 @@ class BlogDetailModel extends DbModel {
 	const COLUM_ID_USER = 'id_user';
 	const COLUM_ID = 'id_blog';
 	const COLUM_ID_SECTION = 'id_section';
-	const COLUM_ID_ITEM = 'id_section';
+	const COLUM_ID_ITEM = 'id_item';
 	const COLUM_DELETED = 'deleted';
 	const COLUM_DELETED_BY_ID_USER = 'deleted_by_id_user';
 }

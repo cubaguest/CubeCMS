@@ -12,11 +12,47 @@
 
 class Routes {
 	/**
+	 * Prefix pro id cesty u předdefinovaných cest
+	 * @var char
+	 */
+	const PRETEFINED_ROUTES_ID_PREFIX = 'p';
+
+	/**
 	 * Oddělovač mezi cestou a článkem (route-article)
 	 * @var string
 	 */
-	const ROUTE_SEPARATOR = '_';
-	
+	const ROUTE_URL_ID_SEPARATOR = '-';
+
+	/**
+	 * Prvek s názvem cesty pro kontroler
+	 * @var string
+	 */
+	const ROUTE_NAME = 'name';
+
+	/**
+	 * Prvek s popisem cesty pro jazyky
+	 * @var string
+	 */
+	const ROUTE_LABEl = 'label';
+
+	/**
+	 * Název routy kontroleru při použití výchozí routy
+	 * @var string
+	 */
+	const ROUTE_NOTPREDEFINED_CONTROLER = 'rdefault';
+
+	/**
+	 * ID vybrané cesty
+	 * @var integer
+	 */
+	private static $currentRouteId = null;
+
+	/**
+	 * Jestli je cesta předdefinována nebo ne
+	 * @var boolean
+	 */
+	private static $currentRouteIsPredefined = false;
+
 	/**
 	 * Pole s cestami
 	 * @var array
@@ -27,22 +63,53 @@ class Routes {
 	 * Proměná se zvolenou cestou
 	 * @var string
 	 */
-	private $route = null;
-	
+//	private static $route = null;
+
+	/**
+	 * Proměná obsahuje id routy
+	 * @var integer
+	 */
+//	private static $routeId = 0;
+
+	/**
+	 * Proměné obsahuje, jesli byla nastavena cesta
+	 * @var boolean
+	 */
+//	private static $isRoute = false;
+
 	/**
 	 * Proměná s article, která se vrací zpět
 	 * @var string
 	 */
-	private $article = null;
+//	private $article = null;
 
 	/**
 	 * Konstruktor třídy
 	 *
 	 * @param Article -- objekt článku (article)
 	 */
-	function __construct(Article &$article) {
-		$this->article = $article;
+	function __construct() {
+//		$this->article = $article;
 		$this->initRoutes();
+	}
+
+	/**
+	 * Nastavuje aktuální cestu
+	 * @param string $id -- id cesty (může být s prefixem)
+	 */
+	public static function setCurrentRoute($id){
+		$matches = array();
+		$pattern = '^'.self::PRETEFINED_ROUTES_ID_PREFIX.'([0-9]+)';
+		//		Pokud je předdefinovaná cesta
+		if(eregi($pattern, $id, $matches)){
+			self::$currentRouteId = $matches[1];
+			self::$currentRouteIsPredefined = true;
+		}
+		//		je použita výchozí cesta
+		else if(eregi('([0-9]+)', $id, $matches)) {
+			self::$currentRouteId = $matches[1];
+			self::$currentRouteIsPredefined = false;
+		}
 	}
 
 	/**
@@ -55,7 +122,7 @@ class Routes {
 	 * Metoda vrací objekt k článku (article)
 	 * @return Article -- objekt článku
 	 */
-	private function getArticleObj() {
+	private function getArticle() {
 		return $this->article;
 	}
 	
@@ -63,7 +130,8 @@ class Routes {
 	 * Metoda přidává cestu do seznamu cest
 	 * @param string -- název cesty
 	 */
-	final public function addRoute($route) {
+	final public function addRoute($id, $routeName, $label) {
+		$route = array($id => array(self::ROUTE_NAME => $routeName, self::ROUTE_LABEl => $label));
 		array_push($this->routes, $route);
 	}
 	
@@ -72,25 +140,47 @@ class Routes {
 	 * @return string -- název cesty
 	 */
 	final public function getRoute() {
-		$routeName = $isRoute = null;
-
-		if($this->getArticleObj()->getArticle() != null){
-			foreach ($this->routes as $route) {
-				if ($this->getArticleObj()->getArticle() > $route.self::ROUTE_SEPARATOR AND
-					substr_compare($this->getArticleObj()->getArticle(), $route.self::ROUTE_SEPARATOR, 0, strlen($route)+1) == 0){
-						$routeName = $route;
-						break;
-				}
-			}
-			//		Nastavení nového článku - pouze článek
-			if($routeName != null AND !empty($this->routes)){
-				$this->route = $routeName;
-				$this->getArticleObj()->setArticle(substr($this->getArticleObj()->getArticle(), strlen($route)+1));
-				$this->getArticleObj()->setRoute(true);
-			}
+		if(self::$currentRouteIsPredefined){
+			return $this->routes[self::$currentRouteId][self::ROUTE_NAME];
+		} else {
+			return self::ROUTE_NOTPREDEFINED_CONTROLER;
 		}
-		return $this->route;
 	}
+
+	/**
+	 * Metoda vrací true pokud je nastaveno cesta
+	 * @return boolean -- true pokud je cesta nastavena
+	 */
+	public function isRoute() {
+		if(self::$currentRouteId != null){
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Metoda přeparsuje article a vybere z něj cestu a vrátí article bez cesty
+	 * @param string $article -- řetězec článku
+	 */
+//	public static function parseRoute($article) {
+////		Pokud je zadána routa
+//		$regs = array();
+//		if(eregi('^([a-zA-Z0-9\-]+)_([a-zA-Z0-9\-]+)$', $article, $regs)){
+//			$routesDetail = array();
+////			pokud je zadáno idčko routy
+//			if(eregi('^([a-zA-Z0-9\-]+)-([0-9]+)$', $regs[1], $routesDetail)){
+//				self::$route = $routesDetail[1];
+//				self::$routeId = $routesDetail[2];
+//			} else {
+//				self::$route = $regs[1];
+//			}
+//			$article = $regs[2];
+//			self::$isRoute = true;
+//		} else {
+//			self::$isRoute = false;
+//		}
+//		return $article;
+//	}
 }
 
 ?>

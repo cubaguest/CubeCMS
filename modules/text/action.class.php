@@ -4,11 +4,14 @@
  *
  */
 class TextAction extends Action {
-	
-
-	public function actions() {
-		$this->addAction("edittext", "ed");
+	/**
+	 * Akce pro editaci textu
+	 */
+	public function editText() {
+		$actionAbbr = 'ed';
+		$this->addAction($actionAbbr, "edittext", _('uprava-textu'));
+		return $this->createActionUrl($actionAbbr);
 	}
-	
+
 }
 ?>

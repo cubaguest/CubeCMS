@@ -17,7 +17,13 @@ class AppCore {
 	 * @var string
 	 */
 	const MAIN_ENGINE_PATH = './';
-	
+
+	/**
+	 * Obsahuje hlavní soubor aplikace
+	 * @var string
+	 */
+	const APP_MAIN_FILE = 'index.php';
+
 	/**
 	 * Název konfiguračního souboru
 	 * @var string
@@ -154,8 +160,8 @@ class AppCore {
 	 * Typy médií a jejich hodnota, kterou se předávaji
 	 * @var string
 	 */
-	const MEDIA_PRINT_TYPE = 'print';
-	const MEDIA_WWW_TYPE = 'www';
+//	const MEDIA_PRINT_TYPE = 'print';
+//	const MEDIA_WWW_TYPE = 'www';
 	
 	/**
 	 * výchozí doména pro gettext
@@ -243,7 +249,7 @@ class AppCore {
 	 * @todo odstranit!! zřejmně není použita
 	 * @deprecated
 	 */
-	public $errors = null;
+//	public $errors = null;
 
 	/**
 	 * Objekt s hláškami modulů
@@ -291,13 +297,13 @@ class AppCore {
 	 * Objekt s vybranou kategorií
 	 * @var Category
 	 */
-	public $category = null;
+//	public $category = null;
 
 	/**
 	 * Typ média na které se bude vypisovat
 	 * @var string
 	 */
-	private static $mediaType = AppCore::MEDIA_WWW_TYPE;
+//	private static $mediaType = AppCore::MEDIA_WWW_TYPE;
 	
 	/*
 	 * MAGICKÉ METODY
@@ -334,10 +340,13 @@ class AppCore {
 
 //		Definování konstanty s datovým adresářem modulů //TODO upravit tak aby se to používalo korektně např. proměná
 		define('MAIN_DATA_DIR', self::sysConfig()->getOptionValue('data_dir'));
-		
+
+//		inicializace URL
+		$this->_initUrlRequest();
+
 //		inicializace sessions
 		$this->_initSessions();
-		
+		//exit();
 //		inicializace odkazů
 		$this->_initLinks();
 	
@@ -350,7 +359,7 @@ class AppCore {
 		$this->_initMessagesAndErrors();
 		
 		//		Inicializace typu média pro zobrazení
-		$this->_initMediaType();
+//		$this->_initMediaType();
 
 		//Spuštění jádra aplikace
 		$this->runApp();
@@ -380,13 +389,12 @@ class AppCore {
 	 */
     public static function getInstance()
     {
-        if (null === self::$_coreInstance) {
-            self::$_coreInstance = new self();
-        } else {
-			throw new Exception("Aplication object have been created");
-		}
-
-        return self::$_coreInstance;
+		 if (null === self::$_coreInstance) {
+			 self::$_coreInstance = new self();
+		 } else {
+			 throw new Exception("Aplication object have been created");
+		 }
+		 return self::$_coreInstance;
     }
 
 	/**
@@ -412,9 +420,9 @@ class AppCore {
 	 * Metoda vrací o jaké médium pro tisk stránky se jedná
 	 * @return string
 	 */
-	public static function media() {
-		return AppCore::$mediaType;
-	}
+//	public static function media() {
+//		return AppCore::$mediaType;
+//	}
 	
 	/**
 	 * Metoda vrací objekt na systémovou konfiguraci
@@ -505,6 +513,13 @@ class AppCore {
 		}
 	}
 	
+	/**
+	 * Metoda inicializuje požadavky v URL
+	 */
+	private function _initUrlRequest() {
+		UrlRequest::factory();
+	}
+
 	/**
 	 * Metoda inicializuje Seesion
 	 * 
@@ -949,12 +964,12 @@ class AppCore {
 		
 //		Zvolení zobrazovaného média
 //		Medium pro tisk
-		if(AppCore::media() == AppCore::MEDIA_PRINT_TYPE){
+		if(UrlRequest::getMediaType() == UrlRequest::MEDIA_TYPE_PRINT){
 			$this->template->display($faceFilePath."index-print.tpl");
 		}
 //		Specielní media
-		else if(file_exists($faceFilePath."index-".AppCore::media().".tpl")){
-			$this->template->display($faceFilePath."index-".AppCore::media().".tpl");
+		else if(file_exists($faceFilePath."index-".UrlRequest::getMediaType().".tpl")){
+			$this->template->display($faceFilePath."index-".UrlRequest::getMediaType().".tpl");
 		} 
 //		Výchozí médium (www)
 		else {
@@ -1012,6 +1027,9 @@ class AppCore {
 		$userNameGroup = $this->auth->getGroupName();
 
 //		Vytvoření dotazu pro db
+/**
+ * @todo -- implementovat do modelu
+ */
 		$catItemsSelect = self::$dbConnector->select()
 						   ->from(array("item" => $itemsTable), array("label" => "IFNULL(item.label_".Locale::getLang().", item.label_".Locale::getDefaultLang().")", 
 						   				"alt" => "IFNULL(item.alt_".Locale::getLang().", item.alt_".Locale::getDefaultLang().")", '*'))
@@ -1024,31 +1042,17 @@ class AppCore {
 
 		$items = self::$dbConnector->fetchObjectArray($catItemsSelect);
 
+//		procházení prvků stránky
 		if($items != null){
-//			Vytvoření objektu s článkem (article) //TODO pouze pro jeden článek
-			$article = new Article();
-
 			foreach ($items as $itemIndex => $item) {
 				//			Vytvoření objektu šablony
 				$template = new Template();
 				
-//				Příprava pro objekt modulu
-//				Načtení všech tabulek modulu
-//				$tableIndex = 1; $moduleDbTables = array();
-////				//TODO potřebuje optimalizaci a OPRAVIT
-//				$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-//				while (isset($item->$objectName) AND ($item->$objectName != null)){
-//					$moduleDbTables[$tableIndex] = $item->$objectName;
-//					$tableIndex++;
-//					$objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-//				}
-
 //				Vytvoření objektu pro práci s modulem
-//				$module = new Module($item, $moduleDbTables);
 				$module = new Module($item, $this->getModuleTables($item));
 //				klonování modulu do statické proměné enginu
 				self::$selectedModule = clone $module;
-				
+
 //				vytvoření pole se skupinama a právama
 				$userRights = array();
 				foreach ($item as $collum => $value){
@@ -1066,16 +1070,14 @@ class AppCore {
 				} else {
 					new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
 				}
-				
-				
-				
+
+//				Vytvoření objektu akce
 				$action = null;
-				
 				$actionClassName = ucfirst($module->getName()).'Action';
 				if(class_exists($actionClassName)){
-					$action = new $actionClassName($module, $article);
+					$action = new $actionClassName();
 				} else {
-					$action = new Action($module, $article);
+					$action = new Action();
 				}
 				
 //				načtení souboru s cestami (routes) modulu
@@ -1084,14 +1086,18 @@ class AppCore {
 				} else {
 					new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
 				}
-				
+
+//				Vytvoření objektu cesty (routes)
 				$routes = null;
 				$routesClassName = ucfirst($module->getName()).'Routes';
 				if(class_exists($routesClassName)){
-					$routes = new $routesClassName($article);
+					$routes = new $routesClassName();
 				} else {
-					$routes = new Routes($article);
+					$routes = new Routes();
 				}
+
+				//				Vytvoření ubjektu UrlReqestu
+				$urlRequest = new UrlRequest($action, $routes);
 
 //				načtení souboru s kontrolerem modulu
 				if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
@@ -1103,60 +1109,29 @@ class AppCore {
 				//			Vytvoření objektu kontroleru
 				$controllerClassName = ucfirst($module->getName()).'Controller';
 				if(class_exists($controllerClassName)){
-//					Příprava a nastavení použití překladu
-					
-					$controller = new $controllerClassName($module, $action, $moduleRights, $article);
+//					Vytvoření objektu kontroleru
+					$controller = new $controllerClassName($action, $moduleRights);
 
-					$actionCtrl = null;
-					//TODO není kompletí typ akce
-					if($action->haveAction()){
-						$actionCtrl = $action->getAction();
-					}
-					/*
-					 * Pokud je zadán jenom článek a žádná akce
-					 * je použita výchozí akce (show)
-					 */
-					if(!$action->isAction() AND $article->isArticle()){
-						$actionCtrl = $action->getDefaultAction();
-					}
-
-//					Vygenerování typu použitého kontroleru
-					$actionCtrl == null ? $actionCtrl=strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX) : null;
-					
-//					if($routes instanceof $routesClassName){
-						$routes->getRoute() != null ? $actionCtrl = ucfirst($actionCtrl) : null;
-						$controllerAction = $routes->getRoute().$actionCtrl.self::MODULE_CONTROLLER_SUFIX;
-						$viewAction = $routes->getRoute().$actionCtrl.self::MODULE_VIEWER_SUFIX;
-//					}
-
-//					Nastevní viewru v kontroleru
-					$controller->setView($viewAction);
+//					Volba metody kontroluru podle urlrequestu
+					$requestName = $urlRequest->choseController();
+					$requestControllerName = $requestName.AppCore::MODULE_CONTROLLER_SUFIX;
 					
 //					Příprava a nastavení použití překladu
 					Locale::bindTextDomain($module->getName());
 					
 //					Zvolení překladu na modul
-					Locale::switchToModuleTexts($module->getName()); 
-//					zvolení akce kontroleru
-					$defaultAction = false;
-					
-					if($action->haveAction() AND method_exists($controller, $controllerAction)){//TODO doladit	
-//					if(method_exists($controller, $controllerAction)){
-						$ctrlResult = $controller->$controllerAction();
-					} 
-					else if(!$action->isAction() AND $article->isArticle() AND method_exists($controller, $controllerAction)){ 
-						$ctrlResult = $controller->$controllerAction();
-					} 
-					else {
+					Locale::switchToModuleTexts($module->getName());
+
+//					Spuštění kontroleru
+					if(method_exists($controller, $requestControllerName)){
+						$ctrlResult = $controller->$requestControllerName();
+					} else {
 						$ctrlResult = $controller->mainController();
-						$defaultAction = true;
-						if(!method_exists($controller, $controllerAction)){
-							//	Vrácení překladu na engine
-							Locale::switchToEngineTexts();
-							new CoreException(_("Action Controller ").$controllerAction._(" v modulu ") . $module->getName()._(" nebyl nalezen"), 11);
-						}
+						//	Vrácení překladu na engine
+						Locale::switchToEngineTexts();
+						new CoreException(_("Action Controller ").$controllerAction._(" v modulu ") . $module->getName()._(" nebyl nalezen"), 11);
 					}
-					
+
 					//			načtení souboru s viewrem modulu
 					if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
 						require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
@@ -1174,9 +1149,10 @@ class AppCore {
 					if($ctrlResult === null){
 						$ctrlResult = true;
 					}
-					
+
+//					Spuštění phledu
 					if($ctrlResult){
-						$controller->runView($template);
+						$controller->runView($template, $requestName.AppCore::MODULE_VIEWER_SUFIX);
 					} else {
 						new CoreException(_('Controler modulu "') . $module->getName() . _('" nebyl korektně proveden'), 21);
 					}
@@ -1355,10 +1331,10 @@ class AppCore {
 	 * metoda vybere, která kategorie je vybrána a uloží je di objektu kategorie
 	 */
 	public function selectCategory() {
-		require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'category.class.php');
+//		require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'category.class.php');
 		
 //		$this->category = new Category($this->dbConnector, self::sysConfig(), $this->auth);
-		Category::factory(self::$dbConnector, $this->auth);
+		Category::factory($this->auth);
 		
 		
 //		$this->assignVarToTpl("MAIN_CATEGORY_TITLE", $this->category->getLabel());
@@ -1461,7 +1437,7 @@ class AppCore {
 	}
 
     private function initialWebTpl() {
-        $fileName = 'initial'.ucfirst(AppCore::media()).'.php';
+		 $fileName = 'initial'.ucfirst(UrlRequest::getMediaType()).'.php';
         if(file_exists(self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName)){
             require self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName;
         }
@@ -1513,11 +1489,11 @@ class AppCore {
 			unset($jspluginName);
 		}
 		
-		switch (self::media()) {
-			case 'sitemap':
+		switch (UrlRequest::getMediaType()) {
+			case UrlRequest::MEDIA_TYPE_SITEMAP:
 				$this->runSitemap();
 			break;
-			
+			case UrlRequest::MEDIA_TYPE_WWW:
 			default:
 //				Výchozí je zobrazena stránka
 //				Příprava šablony

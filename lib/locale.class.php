@@ -176,7 +176,7 @@ class Locale {
 	 * Metoda nastaví vybraný jazyk
 	 * @param string -- název jazyku
 	 */
-	private static function setLang($lang) {
+	public static function setLang($lang) {
 		if(self::langExist($lang)){
 			self::$selectLang = $lang;
 		} else {

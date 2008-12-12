@@ -37,7 +37,11 @@ class BlogView extends View {
 		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
 		$this->container()->getEplugin('scroll')->assignToTpl($this->template());
 	}
-	
+
+	public function showView() {
+		;
+	}
+
 	/**
 	 * Metoda pro přiřazení listu galeríí
 	 *
