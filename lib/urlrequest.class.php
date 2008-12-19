@@ -14,7 +14,7 @@ class UrlRequest {
 	 * Název parametru s typem media
 	 * @var string
 	 */
-	const PARAM_MEDIA_TYPE = 'media';
+	const PARAM_MEDIA_TYPE_PREFIX = 'media';
 
 	/**
 	 * Typ media pro web
@@ -35,6 +35,30 @@ class UrlRequest {
 	const MEDIA_TYPE_PRINT	= 'print';
 
 	/**
+	 * Přenosový protokol
+	 * @var string
+	 */
+	const TRANSFER_PROTOCOL = 'http://';
+
+	/**
+	 * $GET proměná s název epluginu
+	 * @var string
+	 */
+	const GET_EPLUGIN_NAME = 'eplugin';
+
+	/**
+	 * $GET proměná s název jspluginu
+	 * @var string
+	 */
+	const GET_JSPLUGIN_NAME = 'jsplugin';
+
+	/**
+	 * Oddělovač prametrů hlavní url
+	 * @var string
+	 */
+	const URL_SEPARATOR = '/';
+
+	/**
 	 * Obsahuje typ media
 	 * @var array
 	 */
@@ -45,6 +69,24 @@ class UrlRequest {
 	 * @var string
 	 */
 	private static $currentUrl = null;
+
+	/**
+	 * Základní URL adresa aplikace
+	 * @var string
+	 */
+	private static $baseWebUrl = null;
+
+	/**
+	 * Adresa serveru (např. www.seznam.cz)
+	 * @var string
+	 */
+	private static $serverName = null;
+
+	/**
+	 * Jméno scriptu
+	 * @var string
+	 */
+	private static $scriptName = null;
 
 	/**
 	 * Objekt zvoleného modulu
@@ -101,8 +143,8 @@ class UrlRequest {
 
 //		Kontrola jazyka
 		if(eregi('^([a-zA-Z]{2})$', pos($urlItems), $matches)){
-			Locale::setLang($matches[2]);
-			Links::setUrlLang($matches[0]);
+			Locale::setLang($matches[1]);
+			Links::setUrlLang($matches[1]);
 			next($urlItems);
 		}
 
@@ -110,19 +152,19 @@ class UrlRequest {
 //		Kontrola jestli je zadána kategorie FORMAT: nazev-id
 		if(eregi('^([a-zA-Z0-9\-]+)-([0-9]+)$', pos($urlItems), $matches)){
 			Category::setCurrentCategory($matches[2]);
-			Links::setUrlCategory($matches[0]);
+			Links::setUrlCategory($matches[1], $matches[2]);
 			next($urlItems);
 		}
 
-		//		Načetní článku FORMAT: nazev-id
+		//		Načetní článku FORMAT: "nazev-id" a popřpadě cesty FORMAT: "nazev-id"
 		if(eregi('^([a-zA-Z0-9\-]+)-([a-z]?[0-9]+)$', pos($urlItems))){
 			//		posun prvku
-			next($urlItems);
+//			next($urlItems);
 			$matches = array();
 
 			$articleRegepx = '^([a-zA-Z0-9\-]+)'.Article::ARTICLE_URL_SEPARATOR.'([0-9]+)$';
 			//		Kontrola jesli je zadán článek (je první před routou, i když je v url dále)FORMAT: nazev-id
-			if(eregi($articleRegepx, pos($urlItems), $matches)){
+			if(next($urlItems) AND eregi($articleRegepx, pos($urlItems), $matches)){
 				//			Je zadána cesta i článek
 				//			Načtení článku
 				Article::setCurrentArticle($matches[2]);
@@ -132,15 +174,18 @@ class UrlRequest {
 				$matches = array();
 				prev($urlItems); // posun zpět na předchozí prvek
 				$regex = '^([a-zA-Z0-9\-]+)'.Routes::ROUTE_URL_ID_SEPARATOR.'([a-z]?[0-9]+)$';
-				eregi($regex, pos($urlItems), $matches);
-				Routes::setCurrentRoute($matches[2]);
-				Links::setUrlRoute($matches[0]);
+				if(eregi($regex, pos($urlItems), $matches)){
+					Routes::setCurrentRoute($matches[2]);
+					Links::setUrlRoute($matches[0]);
+				}
 			} else {
+
 				//			načtení pouze článku
-				prev($urlItems); // posun zpět na předchozí prvek
-				eregi('^([a-zA-Z0-9\-]+)-([0-9]+)$', pos($urlItems), $matches);
-				Article::setCurrentArticle($matches[2]);
-				Links::setUrlArticle($matches[0]);
+//				prev($urlItems); // posun zpět na předchozí prvek
+				if(eregi('^([a-zA-Z0-9\-]+)-([0-9]+)$', pos($urlItems), $matches)){
+					Article::setCurrentArticle($matches[2]);
+					Links::setUrlArticle($matches[0]);
+				}
 			}
 			next($urlItems);
 		}
@@ -157,7 +202,7 @@ class UrlRequest {
 
 //		Načtení typu media FORMAT: media{typ media např www,print}
 		$matches = array();
-		$expresion = '^'.self::PARAM_MEDIA_TYPE.'([a-zA-Z]+)$';
+		$expresion = '^'.self::PARAM_MEDIA_TYPE_PREFIX.'([a-zA-Z]+)$';
 		if(eregi($expresion, pos($urlItems), $matches)){
 			self::$media = $matches[1];
 			next($urlItems);
@@ -190,10 +235,24 @@ class UrlRequest {
 //		echo '</pre>';
 
 		$fullUrl = $_SERVER['REQUEST_URI'];
-		$scriptName = $_SERVER['SCRIPT_NAME'];
+		self::$scriptName = $_SERVER["SCRIPT_NAME"];
+		self::$serverName = $_SERVER["SERVER_NAME"];
 
 //		Najdeme co je cesta k aplikaci a co je předaná url
-		self::$currentUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
+		self::$currentUrl = substr($fullUrl, strpos(self::$scriptName, AppCore::APP_MAIN_FILE));
+
+//		Vytvoříme základní URL cestu k aplikaci
+		$positionLastChar=strrpos(self::$scriptName, self::URL_SEPARATOR);
+		self::$baseWebUrl=self::TRANSFER_PROTOCOL.self::$serverName.substr(self::$scriptName, 0, $positionLastChar).self::URL_SEPARATOR;
+	}
+
+
+	/**
+	 * Metoda vrací základní URL cestu k aplikaci
+	 * @return string
+	 */
+	public static function getBaseWebDir() {
+		return self::$baseWebUrl;
 	}
 
 	/**
@@ -222,7 +281,7 @@ class UrlRequest {
 				$action = strtolower(AppCore::MODULE_MAIN_CONTROLLER_PREFIX);
 			}
 		}
-//		Pokud je vybrána akces
+//		Pokud je vybrána akce
 		else {
 			$action = $this->moduleAction->getSelectedAction();
 		}
@@ -236,5 +295,48 @@ class UrlRequest {
 		return $action;
 	}
 
+	/**
+	 * Metoda zjišťuje jestli byl nastaven index na eplugin
+	 *
+	 * @return boolean -- true pokud se má zpracovávat eplugin
+	 */
+	public static function isEplugin() {
+		if(isset($_GET[self::GET_EPLUGIN_NAME])){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Metoda vrací název zvoleného epluginu
+	 *
+	 * @return string -- název epluginu
+	 */
+	public static function getSelEpluginName() {
+		return rawurldecode($_GET[self::GET_EPLUGIN_NAME]);
+	}
+
+	/**
+	 * Metoda zjišťuje jestli byl nastaven index na jsplugin
+	 *
+	 * @return boolean -- true pokud se má zpracovávat jsplugin
+	 */
+	public static function isJsplugin() {
+		if(isset($_GET[self::GET_JSPLUGIN_NAME])){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Metoda vrací název zvoleného jspluginu
+	 *
+	 * @return string -- název jspluginu
+	 */
+	public static function getSelJspluginName() {
+		return rawurldecode($_GET[self::GET_JSPLUGIN_NAME]);
+	}
 }
 ?>

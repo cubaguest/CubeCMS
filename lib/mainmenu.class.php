@@ -123,16 +123,27 @@ abstract class MainMenu {
 	
 	public function controller() {
 		$menuSelect = $this->dbConnector->select()
-						   ->from(array("cat" => $this->tablesCategories), array(self::COLUMN_CATEGORY_URLKEY, self::COLUMN_CATEGORY_LABEL_IMAG => "IFNULL(cat.".self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getLang().", cat.".self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getDefaultLang().")", self::COLUMN_CATEGORY_ID, self::COLUMN_CATEGORY_ALT_IMAG => "IFNULL(cat.".self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getLang().", cat.".self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getDefaultLang().")"))
-						   ->join(array("s" => $this->tablesSections), "s.".self::COLUMN_SECTION_ID." = cat.".self::COLUMN_CATEGORY_ID_SECTION, null, array(self::COLUMN_SECTION_ID, self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getLang().", s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getDefaultLang().")", self::COLUMN_SECTION_ALT_IMAG => "IFNULL(s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getLang().", s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
-						   ->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
-						   ->where("cat.".self::COLUMN_CATEGORY_ACTIVE." = ".(int)true, "and")
-						   ->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU." = ".(int)true, "and")
-						   ->group("cat.".self::COLUMN_CATEGORY_ID)
-						   ->order("s.".self::COLUMN_SECTION_PRIORITY, "desc")
-						   ->order(self::COLUMN_SECTION_LABEL_IMAG)
-						   ->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
-						   ->order(self::COLUMN_CATEGORY_LABEL_IMAG);
+			->from(array("cat" => $this->tablesCategories), array(self::COLUMN_CATEGORY_LABEL_IMAG => "IFNULL(cat."
+					.self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getLang().", cat."
+					.self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getDefaultLang().")",
+					self::COLUMN_CATEGORY_ID, self::COLUMN_CATEGORY_ALT_IMAG => "IFNULL(cat."
+					.self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getLang().", cat."
+					.self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getDefaultLang().")"))
+			->join(array("s" => $this->tablesSections), "s.".self::COLUMN_SECTION_ID
+				." = cat.".self::COLUMN_CATEGORY_ID_SECTION, null, array(self::COLUMN_SECTION_ID,
+				self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(s.".self::COLUMN_SECTION_LABEL_PREFIX
+				.Locale::getLang().", s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getDefaultLang().")",
+				self::COLUMN_SECTION_ALT_IMAG => "IFNULL(s.".self::COLUMN_SECTION_ALT_PREFIX
+				.Locale::getLang().", s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
+			->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID
+				." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
+			->where("cat.".self::COLUMN_CATEGORY_ACTIVE." = ".(int)true, "and")
+			->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU." = ".(int)true, "and")
+			->group("cat.".self::COLUMN_CATEGORY_ID)
+			->order("s.".self::COLUMN_SECTION_PRIORITY, "desc")
+			->order(self::COLUMN_SECTION_LABEL_IMAG)
+			->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
+			->order(self::COLUMN_CATEGORY_LABEL_IMAG);
 
 		$this->loadMenu($menuSelect);
 	}
@@ -145,7 +156,7 @@ abstract class MainMenu {
 //		Přidání výběru jen na zvolenou skupinu
 		$sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup()." LIKE \"r__\"");
 		$this->menuArray = $this->dbConnector->fetchAssoc($sqlSelect);
-		
+
 		if(empty($this->menuArray)){
 			new CoreException(_("Nepodařilo se nahrát hlavní menu z databáze"), 2);
 		}

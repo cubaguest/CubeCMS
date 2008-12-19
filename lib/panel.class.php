@@ -159,7 +159,8 @@ abstract class Panel{
 	 */
 	final public function getLink($clear = true) {
 		$link = new Links($clear);
-		return $link->category($this->_category[Category::COLUM_CAT_URLKEY]);
+		return $link->category($this->_category[Category::COLUM_CAT_LABEL],
+			$this->_category[Category::COLUM_CAT_ID]);
 	}
 	
 	/**

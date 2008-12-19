@@ -350,29 +350,6 @@ abstract class JsPlugin {
 		echo $content;
 		exit();
 	}
-	
-	/**
-	 * Metoda zjišťuje jestli byl nastaven index na jsplugin
-	 * 
-	 * @return boolean -- true pokud se má zpracovávat jsplugin
-	 */
-	public static function isJsplugin() {
-		if(isset($_GET[Links::GET_JSPLUGIN_NAME])){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	
-	/**
-	 * Metoda vrací název zvoleného jspluginu
-	 *
-	 * @return string -- název jspluginu
-	 */
-	public static function getSelJspluginName() {
-		return rawurldecode($_GET[Links::GET_JSPLUGIN_NAME]);
-	}
 }
 
 ?>

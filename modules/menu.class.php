@@ -6,7 +6,8 @@ class Menu extends MainMenu {
 		$oldIdSection = null;
 
 		foreach ($this->menuArray as $index => $item) {
-			$item["url"]=$this->getLink()->category($item["urlkey"]);
+			$item["url"]=$this->getLink()->category($item[Category::COLUM_CAT_LABEL],
+				$item[Category::COLUM_CAT_ID]);
 			if($item["id_section"] != $oldIdSection){
 				$oldIdSection = $item["id_section"];
 				$categoryArray[$oldIdSection] = array();

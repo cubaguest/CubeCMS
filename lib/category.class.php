@@ -79,12 +79,6 @@ class Category {
 	private static $_sectionId = null;
 
 	/**
-	  * URL klíč kategorie
-	  * @var string
-	  */
-	private static $_categoryUrlkey = null;
-
-	/**
 	  * Proměné jesli jsou zapnuty panely
 	  * @var boolean
 	  */
@@ -147,12 +141,17 @@ class Category {
 		//		$userNameGroup = self::$_auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
 		$userNameGroup = self::$_auth->getGroupName();
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
+			array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang()
+			.", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL,
+			self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
 		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
-		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
+		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", 
+			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
+			.Locale::getDefaultLang().")"))
 		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 		->where("cat.active = 1", "and")
-		->where("cat.urlkey = '$catKey'", "and")
+		->where("cat.".self::COLUM_CAT_ID." = '".self::$currentCategoryId."'", "and")
 		->order("sec.priority", "desc")
 		->order("cat.priority", "desc")
 		->order("clabel")
@@ -169,7 +168,6 @@ class Category {
 		self::$_categoryLabel = $catArray->{self::COLUM_CAT_LABEL};
 		self::$_categoryId = $catArray->{self::COLUM_CAT_ID};
 		self::$_sectionId = $catArray->{self::COLUM_SEC_ID};
-		self::$_categoryUrlkey = $catArray->{self::COLUM_CAT_URLKEY};
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
 		self::$_sectionName = $catArray->{self::COLUM_SEC_LABEL};
@@ -193,9 +191,14 @@ class Category {
 		$userNameGroup = self::$_auth->getGroupName();
 
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
+			array("clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_"
+			.Locale::getDefaultLang().")", self::COLUM_CAT_ID, self::COLUM_CAT_LPANEL,
+			self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
 		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
-		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
+		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", 
+			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
+			.Locale::getDefaultLang().")"))
 		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 		->where("cat.active = 1", "and")
 		->order("sec.priority", "desc")
@@ -215,7 +218,7 @@ class Category {
 		self::$_categoryLabel = $catArray->{self::COLUM_CAT_LABEL};
 		self::$_categoryId = $catArray->{self::COLUM_CAT_ID};
 		self::$_sectionId = $catArray->{self::COLUM_SEC_ID};
-		self::$_categoryUrlkey = $catArray->{self::COLUM_CAT_URLKEY};
+//		self::$_categoryUrlkey = $catArray->{self::COLUM_CAT_URLKEY};
 		self::$_categoryLeftPanel = $catArray->{self::COLUM_CAT_LPANEL};
 		self::$_categoryRightPanel = $catArray->{self::COLUM_CAT_RPANEL};
 		self::$_sectionName = $catArray->{self::COLUM_SEC_LABEL};
@@ -235,9 +238,14 @@ class Category {
 		$userNameGroup = self::$_auth->getGroupName();
 
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable), array(self::COLUM_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL, self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
+		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
+			array("clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_"
+			.Locale::getDefaultLang().")", "id_category", self::COLUM_CAT_LPANEL,
+			self::COLUM_CAT_RPANEL, self::COLUM_SEC_ID, self::COLUM_CAT_PARAMS))
 		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
-		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_".Locale::getDefaultLang().")"))
+		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", 
+			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
+			.Locale::getDefaultLang().")"))
 		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
 		->where("cat.active = 1", "and")
 		->order("sec.priority", "desc")
@@ -256,7 +264,7 @@ class Category {
 		$catArr[self::COLUM_CAT_LABEL] = $catArray->{self::COLUM_CAT_LABEL};
 		$catArr[self::COLUM_CAT_ID] = $catArray->{self::COLUM_CAT_ID};
 		$catArr[self::COLUM_SEC_ID] = $catArray->{self::COLUM_SEC_ID};
-		$catArr[self::COLUM_CAT_URLKEY] = $catArray->{self::COLUM_CAT_URLKEY};
+//		$catArr[self::COLUM_CAT_URLKEY] = $catArray->{self::COLUM_CAT_URLKEY};
 		$catArr[self::COLUM_CAT_LPANEL] = $catArray->{self::COLUM_CAT_LPANEL};
 		$catArr[self::COLUM_CAT_RPANEL] = $catArray->{self::COLUM_CAT_RPANEL};
 		$catArr[self::COLUM_SEC_LABEL] = $catArray->{self::COLUM_SEC_LABEL};

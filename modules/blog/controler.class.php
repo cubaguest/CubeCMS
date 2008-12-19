@@ -92,9 +92,8 @@ class BlogController extends Controller {
 
 		
 		foreach ($blogs as $key => $blog) {
-			$link = new Links();
 			$blogs[$key][BlogDetailModel::COLUM_TEXT] = $textHelper->removeHtmlTags($blog[BlogDetailModel::COLUM_TEXT]);
-			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $link->article($blog[BlogDetailModel::COLUM_URLKEY], $blog[BlogDetailModel::COLUM_ID]);
+			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $this->getLink()->article($blog[BlogDetailModel::COLUM_URLKEY], $blog[BlogDetailModel::COLUM_ID]);
 			unset ($link);
 		}
 
@@ -103,8 +102,8 @@ class BlogController extends Controller {
 
 //		Vytvoření odkazů
 		if($this->getRights()->isWritable()){
-			$this->container()->addLink('LINK_TO_ADD_SECTION', $this->getLink()->action($this->getAction()->actionAddsection()));
-			$this->container()->addLink('LINK_TO_ADD_BLOG', $this->getLink()->action($this->getAction()->actionAddblog()));
+			$this->container()->addLink('LINK_TO_ADD_SECTION', $this->getLink()->action($this->getAction()->addSection()));
+			$this->container()->addLink('LINK_TO_ADD_BLOG', $this->getLink()->action($this->getAction()->addBlog()));
 		}
 
 

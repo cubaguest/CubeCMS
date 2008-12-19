@@ -177,6 +177,7 @@ class Locale {
 	 * @param string -- název jazyku
 	 */
 	public static function setLang($lang) {
+//		echo "nastaven".$lang;
 		if(self::langExist($lang)){
 			self::$selectLang = $lang;
 		} else {
@@ -189,6 +190,7 @@ class Locale {
 	 * @return string -- vybraný jazyk aplikace
 	 */
 	public static function getLang() {
+//		echo "vybran".self::$selectLang;
 		return self::$selectLang;
 	}
 	

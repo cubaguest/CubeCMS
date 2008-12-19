@@ -28,7 +28,7 @@ class Article {
 	 * Id modulu ke kterému článek patří
 	 * @var integer
 	 */
-	private static $currentArticleIdItem = null;
+//	private static $currentArticleIdItem = null;
 
 	/**
 	 * Konstruktor nastaví klíč článku z url

@@ -109,7 +109,9 @@ abstract class Controller {
 	 * @return Links -- objekt pro práci s odkazy
 	 */
 	final public function getLink($clear = false) {
-		return new Links($clear);
+		$link = new Links($clear);
+		$link->category(Category::getLabel(), Category::getId());
+		return $link;
 	}
 	
 	/**

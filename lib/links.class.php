@@ -6,8 +6,9 @@
  * přímé přesměrování na zvolený (vytvořený) odkaz pomocí klauzule redirect.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: links.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.5.0 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro práci s odkazy
  */
 
@@ -41,61 +42,13 @@ class Links {
 	 * @var char
 	 */
 	const URL_SEP_ARTICLE_ID = '-';
+	/**
+	 *
+	 * Oddělovatč mezi názvem kategorie a id kateogire
+	 * @var char
+	 */
+	const URL_SEP_CAT_ID = '-';
 
-	/**
-	 * Přenosový protokol
-	 * @var string
-	 */
-	const TRANSFER_PROTOCOL = 'http://';
-	
-	/**
-	 * $GET proměná s jazykovou mutací
-	 * @var string
-	 */
-	const GET_LANG = 'lang';
-
-	/**
-	 * $GET proměná s kategorií
-	 * @var string
-	 */
-	const GET_CATEGORY = 'category';
-	
-	/**
-	 * $GET proměná s článkem (article)
-	 * @var string
-	 */
-	const GET_ARTICLE = 'article';
-	
-	/**
-	 * $GET proměná s akcí (action)
-	 * @var string
-	 */
-	const GET_ACTION = 'action';
-	
-	/**
-	 * $GET proměná s typem media (media)
-	 * @var string
-	 */
-	const GET_MEDIA = 'media';
-	
-	/**
-	 * $GET proměná s název epluginu
-	 * @var string
-	 */
-	const GET_EPLUGIN_NAME = 'eplugin';
-
-	/**
-	 * $GET proměná s název jspluginu
-	 * @var string
-	 */
-	const GET_JSPLUGIN_NAME = 'jsplugin';
-	
-	/**
-	 * Oddělovač prametrů hlavní url
-	 * @var string
-	 */
-	const COOL_URL_SEPARATOR = '/';
-	
 	/**
 	 * Názec souboru pro stahování dat
 	 * @var string
@@ -113,7 +66,19 @@ class Links {
 	 * @var string
 	 */
 	const DOWNLOAD_FILE_DIR_PARAM = 'url';
-	
+
+	/**
+	 * Název položky pole se jménem
+	 * @var string
+	 */
+	const LINK_ARRAY_ITEM_NAME = 'name';
+
+	/**
+	 * Název položky pole s idčkem
+	 * @var string
+	 */
+	const LINK_ARRAY_ITEM_ID = 'id';
+
 	/**
 	 * Proměná s typem přenosového protokolu
 	 * @var string
@@ -124,13 +89,13 @@ class Links {
 	 * Proměná s jazykovou mutací
 	 * @var string
 	 */
-	private static $selectedlang = null;
+	private static $selectedLang = null;
 	
 	/**
 	 * Proměnná s kategorií
 	 * @var string
 	 */
-	private static $selectedCategory = null;
+	private static $selectedCategory = array();
 
 	/**
 	 * Proměnná s cestou
@@ -142,7 +107,7 @@ class Links {
 	 * Proměnná s kategorií
 	 * @var string
 	 */
-	private static $selectedAricle = null;
+	private static $selectedAricle = array();
 
 	/**
 	 * Proměnná s kategorií
@@ -163,24 +128,6 @@ class Links {
 	private static $selectedMedia = null;
 	
 	/**
-	 * Adresa serveru (např. www.seznam.cz)
-	 * @var string
-	 */
-	private static $serverName = null;
-	
-	/**
-	 * Jméno scriptu
-	 * @var string
-	 */
-	private static $scriptName = null;
-	
-	/**
-	 * root Adresa webu
-	 * @var string
-	 */ 
-	private static $webUrl = null;
-	
-	/**
 	 * Proměnná s názvem jazyka
 	 * @var string
 	 */
@@ -190,13 +137,13 @@ class Links {
 	 * Proměnná s názvem kategorie
 	 * @var string
 	 */
-	private $category = null;
+	private $category = array();
 	
 	/**
 	 * Proměná s názvem článku (article key)
 	 * @var string
 	 */
-	private $article = null;
+	private $article = array();
 
 	/**
 	 * Proměná s názvem akce (action)
@@ -220,19 +167,19 @@ class Links {
 	 * Jestli se má tvořit nový odkaz od začátku
 	 * @var boolean
 	 */
-	private $clearLink = false;
+//	private $clearLink = false;
 
 	/**
-	 * Jestli se má tvořit nový odkaz od začátku a bez kategorie
+	 * Jestli se má tvořit nový odkaz k rootu webu
 	 * @var boolean
 	 */
-	private $trueClearLink = false;
+	private $onlyWebRoot = false;
 	
 	/**
 	 * Jesti se má vrátit relativní cesta nebo celá
 	 * @var boolean
 	 */
-	private $relativePath = false;
+//	private $relativePath = false;
 	
 	/**
 	 * Pole s ostatními parametry v url
@@ -244,70 +191,30 @@ class Links {
 	 * Proměná obsahuje jestli se má dané stránka načíst znova
 	 * @var boolean
 	 */
-	private $reloadPage = false;
+//	private $reloadPage = false;
 	
 	/**
 	 * Chráněné parametry systému
 	 * @var array
 	 */
-	private static $protectedParams = array("lang", "action", "category", "article", "media");
+//	private static $protectedParams = array("lang", "action", "category", "article", "media");
 	
 	/**
 	 * Konstruktor nastaví základní adresy a přenosový protokol
 	 *
-	 * @param boolean -- true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána)
-	 * @param boolean -- true pokud má být vráce relativní cesta od kořene webu
-	 * @param boolean -- true pokud má být vráce naprosto čistý link (strjné jako Links::getMainWebDir())
+	 * @param boolean -- (option)true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
+	 * @param boolean -- (option)true pokud má být vráce naprosto čistý link (web root)
 	 * 
 	 */
-	function __construct($clear = false, $relative = false, $onlyWebRoot = false) {
+	function __construct($clear = false, $onlyWebRoot = false) {
 		$this->clearLink = $clear;	
-		$this->trueClearLink = $onlyWebRoot;
-		$this->relativePath = $relative;
+		$this->onlyWebRoot = $onlyWebRoot;
 		$this->_init();
 	}
 	
 	/*
 	 * STATICKÉ METODY
 	 */
-	
-	/**
-	 * Metoda nastavuje základní proměnné
-	 */
-	public static function factory(){
-//		nastavení jazyku
-		if(isset($_GET[self::GET_LANG])){
-			self::$selectedlang = $_GET[self::GET_LANG];
-		}
-//		nastavení kategorie
-		if(isset($_GET[self::GET_CATEGORY])){
-			self::$selectedCategory = $_GET[self::GET_CATEGORY];
-		}
-//		nastavení článku
-		if(isset($_GET[self::GET_ARTICLE])){
-			self::$selectedAricle = $_GET[self::GET_ARTICLE];
-		}
-//		nastavení akce
-		if(isset($_GET[self::GET_ACTION])){
-			self::$selectedAction = $_GET[self::GET_ACTION];
-		}
-//		nastavení media
-		if(isset($_GET[self::GET_MEDIA])){
-			self::$selectedMedia = $_GET[self::GET_MEDIA];
-		}
-		
-//TODO	načtení ostatních parametrů 
-//		Název serveru
-		self::$serverName = $_SERVER["SERVER_NAME"];
-//		Název scriptu
-		self::$scriptName = $_SERVER["SCRIPT_NAME"];
-//		nastavení adresáře webu
-		$positionLastChar=strrpos(self::$scriptName, "/");
-		self::$webUrl=substr(self::$scriptName, 0, $positionLastChar);
-		
-//		načtení parametrů
-		self::_infilParams();
-	}
 	
 	/**
 	 * metoda nastavuje transportní protokol
@@ -323,7 +230,7 @@ class Links {
 	 */
 	public static function getTransferProtocol() {
 		if(self::$user_transfer_protocol == null){
-			return self::TRANSFER_PROTOCOL;
+			return UrlRequest::TRANSFER_PROTOCOL;
 		} else {
 			return self::$user_transfer_protocol;
 		}
@@ -332,35 +239,36 @@ class Links {
 	/**
 	 * Metoda vrací adresu k web aplikaci
 	 */
-	public static function getMainWebDir() {
-		return self::getTransferProtocol().self::$serverName.self::$webUrl.self::COOL_URL_SEPARATOR;
-	}
+//	public static function getMainWebDir() {
+//		return self::getTransferProtocol().self::$serverName.self::$webUrl.self::COOL_URL_SEPARATOR;
+//	}
 	
 	/**
 	 * Metoda načte parametry v url do pole
 	 */
 	private static function _infilParams()
 	{
-		$queryString = $_SERVER["QUERY_STRING"];
-		if($queryString != null){
-			$tmpParamsArray = array();
-			$tmpParamsArray = explode(self::URL_PARAMETRES_SEPARATOR_IN_URL, $queryString);
-			foreach ($tmpParamsArray as $fullParam) {
-				$tmpParam = explode(self::URL_SEP_PARAM_VALUE, $fullParam);
-					
-				if(!in_array($tmpParam[0], self::$protectedParams) AND isset($tmpParam[0]) AND isset($tmpParam[1])){
-					self::$selectedParams[$tmpParam[0]] = $tmpParam[1];
-				}
-			}
-		}
+//		$queryString = $_SERVER["QUERY_STRING"];
+//		if($queryString != null){
+//			$tmpParamsArray = array();
+//			$tmpParamsArray = explode(self::URL_PARAMETRES_SEPARATOR_IN_URL, $queryString);
+//			foreach ($tmpParamsArray as $fullParam) {
+//				$tmpParam = explode(self::URL_SEP_PARAM_VALUE, $fullParam);
+//
+//				if(!in_array($tmpParam[0], self::$protectedParams) AND isset($tmpParam[0]) AND isset($tmpParam[1])){
+//					self::$selectedParams[$tmpParam[0]] = $tmpParam[1];
+//				}
+//			}
+//		}
 	}
 	
 	/**
 	 * Metoda nastaví článek
 	 * @param string -- článek
 	 */
-	public static function setUrlCategory($cat) {
-		self::$selectedCategory = $cat;
+	public static function setUrlCategory($cat, $id) {
+		self::$selectedCategory[self::LINK_ARRAY_ITEM_NAME] = $cat;
+		self::$selectedCategory[self::LINK_ARRAY_ITEM_ID] = $id;
 	}
 
 	/**
@@ -384,7 +292,7 @@ class Links {
 	 * @param string -- článek
 	 */
 	public static function setUrlLang($lang) {
-		self::$selectedAricle = $lang;
+		self::$selectedLang = $lang;
 	}
 
 	/**
@@ -405,8 +313,11 @@ class Links {
 	 * 
 	 * @return Links -- objket Links
 	 */
-	public function category($catName = null){
-		$this->category = $catName;
+	public function category($catName = null, $catId = null){
+		if($catName != null AND $catId != null){
+			$this->category[self::LINK_ARRAY_ITEM_NAME] = $catName;
+			$this->category[self::LINK_ARRAY_ITEM_ID] = $catId;
+		}
 		return $this;
 	}
 	
@@ -500,7 +411,7 @@ class Links {
 	 *
 	 * @return Links -- objket Links
 	 */
-	public function param($param = null, $value, $thisParamOnly = false)
+	public function param($param, $value, $thisParamOnly = false)
 	{
 		//TODO dodělat ošetření nevalidních znaků
 		if($thisParamOnly OR $param == null){
@@ -550,13 +461,15 @@ class Links {
 	 */
 	private function _init()
 	{
-		$this->lang = self::$selectedlang;
-		if(!$this->clearLink){
+		if(!$this->onlyWebRoot){
+			$this->lang = self::$selectedLang;
 			$this->category = self::$selectedCategory;
-			$this->article = self::$selectedAricle;
-			$this->action = self::$selectedAction;
-			$this->paramsArray = self::$selectedParams;
-			$this->mediaType = self::$selectedMedia;
+			if(!$this->clearLink){
+				$this->article = self::$selectedAricle;
+				$this->action = self::$selectedAction;
+				$this->paramsArray = self::$selectedParams;
+				$this->mediaType = self::$selectedMedia;
+			}
 		}
 	}
 	
@@ -573,15 +486,22 @@ class Links {
 	 * @return string -- název kategorie (klíč)
 	 */
 	private function getCategory() {
-		if($this->category != null){
-			return $this->category.self::COOL_URL_SEPARATOR;
-		} else {
-			if(!$this->trueClearLink){
-				return Category::getUrlKey().self::COOL_URL_SEPARATOR;
-			} else {
-				return null;
-			}
+		if(!empty ($this->category)){
+			$categoryName = $this->category[self::LINK_ARRAY_ITEM_NAME];
+
+			$utf = new TextCtrlHelper();
+			$categoryName = $utf->utf2ascii($categoryName);
+
+			return $categoryName.self::URL_SEP_CAT_ID
+				.$this->category[self::LINK_ARRAY_ITEM_ID].UrlRequest::URL_SEPARATOR;
 		}
+//		else {
+//			if(!$this->trueClearLink){
+//				return Category::getUrlKey().UrlRequest::URL_SEPARATOR;
+//			} else {
+				return null;
+//			}
+//		}
 	}
 	
 	/**
@@ -590,7 +510,7 @@ class Links {
 	 */
 	private function getArticle() {
 		if($this->article != null){
-			return $this->article.self::COOL_URL_SEPARATOR;
+			return $this->article.UrlRequest::URL_SEPARATOR;
 		} else {
 			return null;
 		}
@@ -602,7 +522,7 @@ class Links {
 	 */
 	private function getAction() {
 		if($this->action != null){
-			return $this->action.self::COOL_URL_SEPARATOR;
+			return $this->action.UrlRequest::URL_SEPARATOR;
 		} else {
 			return null;
 		}
@@ -614,7 +534,7 @@ class Links {
 	 */
 	private function getLang() {
 		if($this->lang != null){
-			return $this->lang.self::COOL_URL_SEPARATOR;
+			return $this->lang.UrlRequest::URL_SEPARATOR;
 		} else {
 			return null;
 		}
@@ -625,7 +545,7 @@ class Links {
 	 */
 	private function getMedia() {
 		if($this->mediaType != null){
-			$this->param(self::GET_MEDIA, $this->mediaType);
+//			$this->param(self::GET_MEDIA, $this->mediaType);
 		}
 	}
 
@@ -665,11 +585,11 @@ class Links {
      */
     public function __toString()
     {
-    	if(!$this->relativePath){
-    		$returnString = self::getMainWebDir();
-    	} else {
-    		$returnString = './';
-    	}
+//    	if(!$this->relativePath){
+			$returnString = UrlRequest::getBaseWebDir();
+//    	} else {
+//    		$returnString = './';
+//    	}
         
     	if($this->lang != null){
         	$returnString.=$this->getLang();
@@ -703,7 +623,7 @@ class Links {
      * @param string -- název souboru
      */
     public function getLinkToDownloadFile($dir, $file) {
-    	$dwLink = $this->getMainWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
+		 $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
     		self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
     		self::URL_PARAMETRES_SEPARATOR.self::DOWNLOAD_FILE_FILE_PARAM.self::URL_SEP_PARAM_VALUE.
     		$file;

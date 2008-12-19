@@ -114,28 +114,6 @@ class Eplugin {
 	}
 	
 	/**
-	 * Metoda zjišťuje jestli byl nastaven index na eplugin
-	 * 
-	 * @return boolean -- true pokud se má zpracovávat eplugin
-	 */
-	public static function isEplugin() {
-		if(isset($_GET[Links::GET_EPLUGIN_NAME])){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * Metoda vrací název zvoleného epluginu
-	 *
-	 * @return string -- název epluginu
-	 */
-	public static function getSelEpluginName() {
-		return rawurldecode($_GET[Links::GET_EPLUGIN_NAME]);
-	}
-		
-	/**
 	 * Metoda nastavuje knihovnu epluginu
 	 * @param Auth -- objekt autorizace
 	 */
