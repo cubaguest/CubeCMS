@@ -190,8 +190,18 @@ class Locale {
 	 * @return string -- vybraný jazyk aplikace
 	 */
 	public static function getLang() {
-//		echo "vybran".self::$selectLang;
 		return self::$selectLang;
+	}
+
+	/**
+	 * Metoda vrací vybraný jazyk aplikace, pokud není shodný s výchozím
+	 * @return string -- vybraný jazyk aplikace
+	 */
+	public static function getLangUrlPart() {
+        if(self::getLang() != self::getDefaultLang()){
+            return self::$selectLang;
+        }
+        return null;
 	}
 	
 	/**

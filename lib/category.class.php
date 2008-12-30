@@ -47,7 +47,7 @@ class Category {
 	  * @var integer
 	  */
 	private static $currentCategoryId = null;
-	
+
 	/**
 	  * Proměná s konektorem pro připojení db
 	  * @var Db
@@ -126,10 +126,20 @@ class Category {
 	 * Nastavuje id aktuální kategorie
 	 * @param integer $id -- id aktuální kategorie
 	 */
-	public static function setCurrentCategory($id) {
+	public static function setCurrentCategoryId($id) {
 		self::$currentCategoryId = $id;
 	}
 
+    /**
+     * Metoda vrací část url adresy s kategorií
+     * @return array -- pole s částmi pro URL
+     */
+    public static function getCurrentCategory() {
+        $array = array(Links::LINK_ARRAY_ITEM_ID => self::$currentCategoryId,
+                       Links::LINK_ARRAY_ITEM_NAME => self::$currentCategoryName);
+        return $array;
+    }
+    
 	 /**
 	  * metoda načte vybranou kategorii z databáze
 	  * @param string -- klíč kategorie

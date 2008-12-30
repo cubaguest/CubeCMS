@@ -96,8 +96,11 @@ class Eplugin {
 			$this->rights = $rights;
 			$this->auth = $rights->getAuth();
 		}
+        /**
+         * @todo dodělat, tak ať se to nčítá třeba přímo z modulu nebo kategoorie, nebo jádra
+         */
 //		else if(AppCore::getSelectedModule() instanceof Module){
-//
+//            $this->rights =
 //		}
 
 		if(AppCore::getModuleErrors() instanceof Messages){
@@ -162,9 +165,15 @@ class Eplugin {
 	 *
 	 * @return Links -- objekt odkazů
 	 */
-	protected function getLinks($clear = false, $relative = false, $onlyWebRoot = false)
+	protected function getLinks($clear = false, $onlyWebRoot = false)
 	{
-		return new Links($clear, $relative, $onlyWebRoot);
+        $link = new Links($clear, $onlyWebRoot);
+        $cat = AppCore::getSellectedCategory();
+        if($cat != false){
+            $link->category($cat[Category::COLUM_CAT_LABEL], $cat[Category::COLUM_CAT_ID]);
+        }
+//        $cat = Category::getCurrentCategory();
+        return $link;
 	}
 	
 	/**
@@ -299,7 +308,6 @@ class Eplugin {
 //	public function getFileLink() {
 //		;
 //	}
-	
 	
 }
 ?>

@@ -42,21 +42,25 @@ class NewsPanel extends Panel {
 	
 	
 	public function panelController() {
-		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), array(self::COLUMN_NEWS_LABEL => "IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
-													self::COLUMN_NEWS_LANG => "IF(`".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang()."` != 'NULL', '".Locale::getLang()."', '".Locale::getDefaultLang()."')",
-													self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
-													self::COLUMN_NEWS_URLKEY))
-											 ->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId())
-											 ->where(self::COLUMN_NEWS_DELETED." = ".(int)false)
-											 ->limit(0,self::NUMBER_OF_NEWS)
-											 ->order(self::COLUMN_TIME, 'desc');
+		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), 
+            array(self::COLUMN_NEWS_LABEL => "IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX
+                .Locale::getLang().", ".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
+                self::COLUMN_NEWS_LANG => "IF(`".self::COLUMN_NEWS_LABEL_LANG_PREFIX
+                .Locale::getLang()."` != 'NULL', '".Locale::getLang()."', '".Locale::getDefaultLang()
+                ."')", self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX
+                .Locale::getLang().", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang()
+                .")", self::COLUMN_ID_NEW))
+			->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId())
+			->where(self::COLUMN_NEWS_DELETED." = ".(int)false)
+			->limit(0,self::NUMBER_OF_NEWS)
+			->order(self::COLUMN_TIME, 'desc');
 											
 		
 		$this->newsArray = $this->getDb()->fetchAssoc($sqlSelect);
 		
 //		Přidání odkazů přímo na detail novinky
 		foreach ($this->newsArray as $newKey => $new) {
-			$this->newsArray[$newKey][self::SHOW_LINK_NAME] = $this->getLink()->article($new[self::COLUMN_NEWS_URLKEY]);
+			$this->newsArray[$newKey][self::SHOW_LINK_NAME] = $this->getLink()->article($new[self::COLUMN_NEWS_LABEL], $new[self::COLUMN_ID_NEW]);
 		}
 		
 		

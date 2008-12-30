@@ -1,11 +1,14 @@
 <?php
 class NewsRoutes extends Routes {
-	function initRoutes() {
-//		$this->addRoute("all");
-//		$this->addRoute("pokus");
-//		$this->addRoute("best");
-//		$this->addRoute("top");
+//    const ROUTE_SECTIONS_ID = 1;
+
+    function initRoutes() {
+//		$this->addRoute(self::ROUTE_SECTIONS_ID, 'sections', _('sekce'));
 	}
+
+//    public function sectionsRoute(){
+//        return $this->getPredefRoute(self::ROUTE_SECTIONS_ID);
+//    }
 }
 
 ?>

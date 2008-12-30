@@ -13,6 +13,11 @@
  */
 
 class ScrollEplugin extends Eplugin {
+    /**
+     * Regulérní výraz pro parsování parametru s číslem stránky
+     */
+    const URL_PARAM_PATTERN = '([0-9]+)';
+
 	/**
 	 * Název primární šablony s posunovátky
 	 * @var string
@@ -43,8 +48,14 @@ class ScrollEplugin extends Eplugin {
 	 *
 	 * @var string
 	 */
-	private $urlParam = "page";
+	private $urlParamName = "page";
 	
+    /**
+     * Objekt url parametru s číslem stránky
+     * @var UrlParam
+     */
+    private $param = null;
+
 	/**
 	 * Proměné, které tlačítka jsou aktivní
 	 *
@@ -113,10 +124,10 @@ class ScrollEplugin extends Eplugin {
 	 *
 	 * @var boolean
 	 */
-	private $showButtonBegin = false;
-	private $showButtonBack = false;
-	private $showButtonNext = false;
-	private $showButtonEnd = false;
+//	private $showButtonBegin = false;
+//	private $showButtonBack = false;
+//	private $showButtonNext = false;
+//	private $showButtonEnd = false;
 
 	/**
 	 * Pole s linky pro tlačítka
@@ -136,9 +147,13 @@ class ScrollEplugin extends Eplugin {
 	 */
 	protected function init()
 	{
+//        nastavení objektu parametru
+        $this->param = new UrlParam($this->urlParamName, self::URL_PARAM_PATTERN);
+
 //		Načtení stránky z url
 		$this->getPageFromUrl();
 		$this->createLabels();
+
 	}
 	
 	/**
@@ -161,8 +176,10 @@ class ScrollEplugin extends Eplugin {
 	 * @param string
 	 */
 	public function setUrlParam($urlParam) {
-		$this->urlParam = $urlParam;
-		
+		$this->urlParamName = $urlParam;
+
+        $this->param = new UrlParam($this->urlParamName, self::URL_PARAM_PATTERN);
+
 //		Znovunačtení stránky z url
 		$this->getPageFromUrl();
 	}
@@ -172,8 +189,9 @@ class ScrollEplugin extends Eplugin {
 	 *
 	 */
 	private function getPageFromUrl() {
-		if(isset($_GET[$this->getGetUrlParam()])){
-			$this->selectPage = $_GET[$this->getGetUrlParam()];
+
+        if($this->param->isValue()){
+            $this->selectPage = $this->param->getValue();
 		} else {
 			$this->selectPage = self::DEFAULT_START_PAGE;
 		}
@@ -189,15 +207,15 @@ class ScrollEplugin extends Eplugin {
 		$this->countOnPage = $value;
 	}
 	
-	/**
-	 * Metoda vrací název url parametru
-	 *
-	 * @return unknown
-	 */
-	private function getGetUrlParam()
-	{
-		return $this->urlParam;
-	}
+//	/**
+//	 * Metoda vrací název url parametru
+//	 *
+//	 * @return unknown
+//	 */
+//	private function getGetUrlParam()
+//	{
+//		return $this->urlParam;
+//	}
 	
 	/**
 	 * Vnitřní metoda vypočítá startovací pozici záznamu
@@ -254,14 +272,14 @@ class ScrollEplugin extends Eplugin {
 			//    	echo $i;
 			$this->pagesLeftSideArray[$i]["name"] = $i;
 			$leftsepar = null;
-			$this->pagesLeftSideArray[$i]["link"] = $this->getLinks()->params(array($this->urlParam => $i));
+            $this->pagesLeftSideArray[$i]["link"] = $this->getLinks()->param($this->param->setValue($i));
 		}
 
 
 		for ($i = $this->selectPage + 1; $i <= min($this->selectPage  + $this->neighbourPages, $this->countAllPages); $i++ ){
 			$this->pagesRightSideArray[$i]["name"] = $i;
 			$rightsepar = null;
-			$this->pagesRightSideArray[$i]["link"] = $this->getLinks()->params(array($this->urlParam => $i));
+			$this->pagesRightSideArray[$i]["link"] = $this->getLinks()->param($this->param->setValue($i));
 		}
 
 		if (min($this->selectPage + $this->neighbourPages, $this->countAllPages) != $this->countAllPages){
@@ -274,16 +292,16 @@ class ScrollEplugin extends Eplugin {
 	 */
 	private function createButtonsLinks(){
 		if($this->isButtonBegin()){
-			$this->buttonsLinks["begin"]=$this->getLinks()->params(array($this->urlParam => 1));
+			$this->buttonsLinks["begin"]=$this->getLinks()->param($this->param->setValue(1));
 		}
 		if($this->isButtonNext()){
-			$this->buttonsLinks["next"]=$this->getLinks()->params(array($this->urlParam => $this->selectPage-1));
+			$this->buttonsLinks["next"]=$this->getLinks()->param($this->param->setValue($this->selectPage-1));
 		}
 		if($this->isButtonBack()){
-			$this->buttonsLinks["back"]=$this->getLinks()->params(array($this->urlParam => $this->selectPage+1));
+			$this->buttonsLinks["back"]=$this->getLinks()->param($this->param->setValue($this->selectPage+1));
 		}
 		if($this->isButtonEnd()){
-			$this->buttonsLinks["end"]=$this->getLinks()->params(array($this->urlParam => $this->countAllPages));
+			$this->buttonsLinks["end"]=$this->getLinks()->param($this->param->setValue($this->countAllPages));
 		}
 	}
 	

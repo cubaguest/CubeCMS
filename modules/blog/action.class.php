@@ -4,17 +4,21 @@
  *
  */
 class BlogAction extends Action {
-	
+    const ACTION_ADD_SECTION_ABBR = 'as';
+    const ACTION_ADD_BLOG_ABBR = 'ab';
+
+    protected function init() {
+		$this->addAction(self::ACTION_ADD_SECTION_ABBR, "addsection", _('pridani-sekce'));
+        $this->addAction(self::ACTION_ADD_BLOG_ABBR, "addblog", _('pridani-blogu'));
+    }
+
+
 	public function addSection() {
-		$actionAbbr = 'as';
-		$this->addAction($actionAbbr, "addsection", _('pridani-sekce'));
-		return $this->createActionUrl($actionAbbr);
+		return $this->createAction(self::ACTION_ADD_SECTION_ABBR);
 	}
 
 	public function addBlog() {
-		$actionAbbr = 'ab';
-		$this->addAction($actionAbbr, "addblog", _('pridani-blogu'));
-		return $this->createActionUrl($actionAbbr);
+		return $this->createAction(self::ACTION_ADD_BLOG_ABBR);
 	}
 //	public function actions() {
 //		$this->addAction("addsection", "as");

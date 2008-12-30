@@ -59,6 +59,12 @@ abstract class Controller {
 	 * @var Article
 	 */
 	private $article = null;
+
+	/**
+	 * Objekt s cestami
+	 * @var Routes
+	 */
+	private $routes = null;
 	
 	/**
 	 * Objekt s šablonou
@@ -77,11 +83,12 @@ abstract class Controller {
 	 *
 	 * @param Module -- objekt modulu
 	 */
-	function __construct(Action $action, Rights $rights) {
+    public final function __construct(Action $action, Routes $routes, Rights $rights) {
 		
 		//TODO odstranit nepotřebné věci v paramtrech konstruktoru
 		$this->module = AppCore::getSelectedModule();
 		$this->action = $action;
+		$this->routes = $routes;
 		$this->auth = $rights->getAuth();
 		$this->rights = $rights;
 
@@ -94,8 +101,17 @@ abstract class Controller {
 		}
 		$this->article = new Article();
 		$this->container = new Container();
+
+//        Inicializace kontroleru modulu
+        $this->init();
 	}
-	
+
+    /**
+     * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
+     * kontroleru
+     */
+    protected function init() {}
+
 	/**
 	 * Metoda vrací objekt systémové konfigurace
 	 * @return Config -- objekt systémové konfigurace
@@ -152,6 +168,14 @@ abstract class Controller {
 	 */
 	final public function getArticle() {
 		return $this->article;
+	}
+
+	/**
+	 * Metoda vrací objekt s cetsami - routes
+	 * @return Routes -- objekt Rout
+	 */
+	final public function getRoutes() {
+		return $this->routes;
 	}
 
 	/**

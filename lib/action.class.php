@@ -13,18 +13,6 @@
 
 class Action {
 	/**
-	 * Oddělovač v url mezi popisem akce a typem akce
-	 * @var char
-	 */
-	const ACTION_URL_LABEL_TYPE_SEP = '_';
-
-	/**
-	 * Oddělovač url mezi typem akce a id item
-	 * @var char
-	 */
-	const ACTION_URL_TYPE_ID_SEP = '-';
-
-	/**
 	 * Název prvku s parametrem v url
 	 * @var string
 	 */
@@ -50,10 +38,10 @@ class Action {
 
 	/**
 	 * Id Itemu pro vybranou akci
-	 * @var inteer
+	 * @var integer
 	 */
 	private static $currentActionIdItem = null;
-	
+
 	/**
 	 * Pole s definovanými akcemi
 	 * @var array
@@ -73,12 +61,6 @@ class Action {
 	private $defaultAction = null;
 	
 	/**
-	 * proměná s objektem článku
-	 * @var Article
-	 */
-	private $article = null;
-
-	/**
 	 * Konstruktor
 	 *
 	 * @param Module -- objekt modulu (nutný pro zjištění id modulu)
@@ -87,8 +69,13 @@ class Action {
 		$this->module = AppCore::getSelectedModule();
 //		Vytvoření uživatelských akcí
 		$this->createDefaultActions();
-
+        $this->init();
 	}
+
+    /**
+     * Metoda pro inicializaci akcí
+     */
+    protected function init() {}
 
 	/**
 	 * Metoda vrací objekt na modul
@@ -174,7 +161,7 @@ class Action {
 	public function edit() {
 		$actionAbbr = 'e';
 		$this->addAction($actionAbbr, "edit", _('uprava'));
-		return $this->createActionUrl($actionAbbr);
+		return $this->createAction($actionAbbr);
 	}
 	
 	/**
@@ -184,7 +171,7 @@ class Action {
 	public function add($idModule = null) {
 		$actionAbbr = 'a';
 		$this->addAction($actionAbbr, "add", _('pridani'));
-		return $this->createActionUrl($actionAbbr);
+		return $this->createAction($actionAbbr);
 	}
 	
 	/**
@@ -194,20 +181,26 @@ class Action {
 	public function show($idModule = null) {
 		$actionAbbr = 's';
 		$this->addAction($actionAbbr, "show", _('ukaz'), true);
-		return $this->createActionUrl($actionAbbr);
+		return $this->createAction($actionAbbr);
 	}
 
 	/**
-	 * Metoda vytvoří řetěuec pro danou akci
+	 * Metoda vytvoří objekt pro danou akci pro vložení do URL
 	 * @param string $actionAbbr -- identifikátor akce
-	 * @return string
+	 * @return pole obsahující název, zkratku, id item
 	 */
-	protected function createActionUrl($actionAbbr) {
+	protected function createAction($actionAbbr) {
 		$action = $this->actionsArray[$actionAbbr];
 
-		$returnString = $action[self::ACTION_LABEL_PARAM].self::ACTION_URL_LABEL_TYPE_SEP
-			.$actionAbbr.self::ACTION_URL_TYPE_ID_SEP.$this->getModule()->getId();
-		return $returnString;
+        $return = array();
+        $return[0]= $action[self::ACTION_LABEL_PARAM];
+        $return[1]= $actionAbbr;
+        $return[2]= $this->getModule()->getId();
+
+        return $return;
+//		echo $returnString = $action[self::ACTION_LABEL_PARAM].self::ACTION_URL_LABEL_TYPE_SEP
+//			.$actionAbbr.self::ACTION_URL_TYPE_ID_SEP.$this->getModule()->getId();
+//		return $returnString;
 	}
 
 	/**

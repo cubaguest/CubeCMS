@@ -32,6 +32,7 @@ class BlogView extends View {
 //
 
 		}
+		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
 		$this->template()->addTpl('blogList.tpl');
 
 		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
@@ -88,14 +89,14 @@ class BlogView extends View {
 		
 		$this->template()->addTpl('editSection.tpl');
 		
-		$this->template()->addVar('SECTION_ARRAY', $this->getModel()->sectionArray);
+//		$this->template()->addVar('SECTION_ARRAY', $this->getModel()->sectionArray);
 		
 		$this->template()->addVar('SECTION_LABEL_NAME', _('Název sekce'));
 		$this->template()->addVar('SECTION_FIELDSET_NAME', _('Název sekce'));
 		$this->template()->addVar('BUTTON_SEND', _('Odeslat'));
 		
 		$this->template()->addTpl('buttonBack.tpl');
-		$this->template()->addVar('LINK_TO_BACK', $this->getModel()->linkToBack);
+//		$this->template()->addVar('LINK_TO_BACK', $this->getModel()->linkToBack);
 		$this->template()->addVar('LINK_TO_BACK_NAME', _('Zpět'));
 	}
 	

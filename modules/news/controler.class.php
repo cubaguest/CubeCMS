@@ -4,16 +4,16 @@ class NewsController extends Controller {
 	 * Názvy sloupců v databázi
 	 * @var string
 	 */
-	const COLUMN_NEWS_LABEL = 'label';
-	const COLUMN_NEWS_LABEL_LANG_PREFIX = 'label_';
-	const COLUMN_NEWS_TEXT = 'text';
-	const COLUMN_NEWS_TEXT_LANG_PREFIX = 'text_';
-	const COLUMN_NEWS_URLKEY = 'urlkey';
-	const COLUMN_NEWS_TIME = 'time';
-	const COLUMN_NEWS_ID_USER = 'id_user';
-	const COLUMN_NEWS_ID_ITEM = 'id_item';
-	const COLUMN_NEWS_ID_NEW = 'id_new';
-	const COLUMN_NEWS_DELETED = 'deleted';
+//	const COLUMN_NEWS_LABEL = 'label';
+//	const COLUMN_NEWS_LABEL_LANG_PREFIX = 'label_';
+//	const COLUMN_NEWS_TEXT = 'text';
+//	const COLUMN_NEWS_TEXT_LANG_PREFIX = 'text_';
+//	const COLUMN_NEWS_URLKEY = 'urlkey';
+//	const COLUMN_NEWS_TIME = 'time';
+//	const COLUMN_NEWS_ID_USER = 'id_user';
+//	const COLUMN_NEWS_ID_ITEM = 'id_item';
+//	const COLUMN_NEWS_ID_NEW = 'id_new';
+//	const COLUMN_NEWS_DELETED = 'deleted';
 	
 	/**
 	 * Sloupce u tabulky uživatelů
@@ -26,10 +26,10 @@ class NewsController extends Controller {
 	 * Speciální imageinární sloupce
 	 * @var string
 	 */
-	const COLUMN_NEWS_LANG = 'lang';
-	const COLUMN_NEWS_EDITABLE = 'editable';
-	const COLUMN_NEWS_EDIT_LINK = 'editlink';
-	const COLUMN_NEWS_SHOW_LINK = 'showlink';
+	const NEWS_LANG = 'lang';
+	const NEWS_EDITABLE = 'editable';
+	const NEWS_EDIT_LINK = 'editlink';
+	const NEWS_SHOW_LINK = 'showlink';
 	
 	/**
 	 * Názvy formůlářových prvků
@@ -76,7 +76,7 @@ class NewsController extends Controller {
 		$listNews = new NewsListModel();
 		
 //		Scrolovátka
-		$scroll = new Scroll($this->errMsg(), $this->infoMsg(), $this->getRights());
+		$scroll = new ScrollEplugin();
 		
 		if(isset($_GET[self::GET_NUM_NEWS]) AND (is_numeric($_GET[self::GET_NUM_NEWS]) OR $_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS)){
 			if(is_numeric($_GET[self::GET_NUM_NEWS])){
@@ -96,14 +96,18 @@ class NewsController extends Controller {
 		
 //		Přidání linku pro editaci a jestli se dá editovat
 		foreach ($newsArray as $key => $news) {
-			if($news[self::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){ 
-				$newsArray[$key][self::COLUMN_NEWS_EDITABLE] = true;
-				$newsArray[$key][self::COLUMN_NEWS_EDIT_LINK] = $this->getLink()->article($news[self::COLUMN_NEWS_URLKEY])->action($this->getAction()->actionEdit());
+            if($news[NewsDetailModel::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){
+				$newsArray[$key][self::NEWS_EDITABLE] = true;
+				$newsArray[$key][self::NEWS_EDIT_LINK] = $this->getLink()
+                    ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],$news[NewsDetailModel::COLUMN_NEWS_ID_NEW])
+                    ->action($this->getAction()->edit());
 			} else {
-				$newsArray[$key][self::COLUMN_NEWS_EDITABLE] = false;
+				$newsArray[$key][self::NEWS_EDITABLE] = false;
 			}
 //			Link pro zobrazení
-			$newsArray[$key][self::COLUMN_NEWS_SHOW_LINK] = $this->getLink()->article($news[self::COLUMN_NEWS_URLKEY]);
+			$newsArray[$key][self::NEWS_SHOW_LINK] = $this->getLink()
+            ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],
+                $news[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
 			
 		}
 		
@@ -112,7 +116,7 @@ class NewsController extends Controller {
 		
 //		Link pro přidání
 		if($this->getRights()->isWritable()){
-			$this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->actionAdd()));
+			$this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->add()));
 		}
 		
 		$this->container()->addData('news_list', $newsArray);
@@ -121,14 +125,14 @@ class NewsController extends Controller {
 		foreach ($this->getNumShowNews as $num) {
 			$numNewsArray[$num] = null;
 			if($listNews->getCountNews() >= $num){
-				$numNewsArray[$num] = $this->getLink()->params()->param(self::GET_NUM_NEWS, $num);
+//				$numNewsArray[$num] = $this->getLink()->params()->param(self::GET_NUM_NEWS, $num);
 //				$this->container()->addLink('show_'.$num,$this->getLink()->param(self::GET_NUM_NEWS, $num));
 			};
 		}
 		
 		$this->container()->addData('num_news', $numNewsArray);
 				
-		$this->container()->addLink('all_news',$this->getLink()->params()->param(self::GET_NUM_NEWS, self::GET_ALL_NEWS));
+//		$this->container()->addLink('all_news',$this->getLink()->params()->param(self::GET_NUM_NEWS, self::GET_ALL_NEWS));
 		
 	}
 
@@ -141,15 +145,16 @@ class NewsController extends Controller {
 		
 		$newsDetail = new NewsDetailModel();
 		
-		$new = $newsDetail->getNewsDetailByUrlkeySelLang($this->getArticle()->getArticle());
+        $new = $newsDetail->getNewsDetailSelLang($this->getArticle()->getArticle());
 		
 		$this->container()->addData('new', $new);
-		$this->container()->addData('new_name', $new[self::COLUMN_NEWS_LABEL]);
+        $this->container()->addData('new_name', $new[NewsDetailModel::COLUMN_NEWS_LABEL]);
 
-		if($this->getRights()->isControll() OR $new[self::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId()){
-			$this->container()->addLink('edit_link', $this->getLink()->action($this->getAction()->actionEdit()));
+		if($this->getRights()->isControll() OR $new[NewsDetailModel::COLUMN_NEWS_ID_USER]
+            == $this->getRights()->getAuth()->getUserId()){
+			$this->container()->addLink('edit_link', $this->getLink()->action($this->getAction()->edit()));
 			$this->container()->addData('editable', true);
-			$this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->actionAdd())->article());
+			$this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->add())->article());
 		}
 		
 		$this->container()->addLink('link_back', $this->getLink()->action()->article());
@@ -162,41 +167,60 @@ class NewsController extends Controller {
 	public function addController(){
 		$this->checkWritebleRights();
 
+        $newsForm = new FormValidator();
+        $newsForm->setPrefix(self::FORM_PREFIX);
+
+        $newsForm->inputText(self::FORM_INPUT_LABEL, true, true)
+                 ->textarea(self::FORM_INPUT_TEXT, true, true)
+                 ->inputSubmit(self::FORM_BUTTON_SEND);
+
+//        Pokud byl odeslán formulář
+        if($newsForm->checkForm()){
+            echo '<pre>';
+			print_r($newsForm->getFormValues(true, true));
+			echo '</pre>';
+        
+        }
+
+        echo '<pre>';
+        print_r($newsForm->getFormValues(false, true));
+		echo '</pre>';
+
 //		Helpre pro práci s jazykovými poli
-		$localeHelper = new LocaleCtrlHelper();
+//		$localeHelper = new LocaleCtrlHelper();
 		
 //		Odeslané pole
-		$sendArray = array();
+//		$sendArray = array();
 		
-		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_SEND])){
-			
-			$sendArray = $localeHelper->postsToArray(array(self::FORM_INPUT_LABEL_PREFIX, self::FORM_INPUT_TEXT_PREFIX), self::FORM_PREFIX);
-			
-			if($_POST[self::FORM_PREFIX.self::FORM_INPUT_LABEL_PREFIX.Locale::getDefaultLang()] == null OR
-			   $_POST[self::FORM_PREFIX.self::FORM_INPUT_TEXT_PREFIX.Locale::getDefaultLang()] == null){
-			   	$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje'));
-			} else {
-				
-				$mainLang = Locale::getDefaultLang();
-				$mainLabel = $sendArray[self::FORM_INPUT_LABEL_PREFIX.$mainLang];
-				
-				$newDetail = new NewsDetailModel();
-				
-				$saved = $newDetail->saveNewNews($sendArray,$mainLabel,$this->getRights()->getAuth()->getUserId());
+//		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_SEND])){
+//
+//			$sendArray = $localeHelper->postsToArray(array(self::FORM_INPUT_LABEL_PREFIX, self::FORM_INPUT_TEXT_PREFIX), self::FORM_PREFIX);
+//
+//			if($_POST[self::FORM_PREFIX.self::FORM_INPUT_LABEL_PREFIX.Locale::getDefaultLang()] == null OR
+//			   $_POST[self::FORM_PREFIX.self::FORM_INPUT_TEXT_PREFIX.Locale::getDefaultLang()] == null){
+//			   	$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje'));
+//			} else {
+//
+//				$mainLang = Locale::getDefaultLang();
+//				$mainLabel = $sendArray[self::FORM_INPUT_LABEL_PREFIX.$mainLang];
+//
+//				$newDetail = new NewsDetailModel();
+//
+//				$saved = $newDetail->saveNewNews($sendArray,$mainLabel,$this->getRights()->getAuth()->getUserId());
+//
+////				Vložení do db
+//				if($saved){
+//					$this->infoMsg()->addMessage(_('Novinka byla uložena'));
+//					$this->getLink()->article()->action()->params()->reload();
+//				} else {
+//					new CoreException(_('Novinku se nepodařilo uložit, chyba při ukládání do db'), 1);
+//				}
+//			}
+//		}
 
-//				Vložení do db
-				if($saved){
-					$this->infoMsg()->addMessage(_('Novinka byla uložena'));
-					$this->getLink()->article()->action()->params()->reload();
-				} else {
-					new CoreException(_('Novinku se nepodařilo uložit, chyba při ukládání do db'), 1);
-				}
-			}
-		}
-
-		$lArray = $localeHelper->generateArray(array(self::FORM_INPUT_LABEL, self::FORM_INPUT_TEXT),$sendArray);
+//		$lArray = $localeHelper->generateArray(array(self::FORM_INPUT_LABEL, self::FORM_INPUT_TEXT),$sendArray);
 		
-		$this->container()->addData('new_data', $lArray);
+		$this->container()->addData('new_data', $newsForm->getFormValues(true, true));
 		
 //		Odkaz zpět
 		$this->container()->addLink('link_back', $this->getLink()->action()->article());

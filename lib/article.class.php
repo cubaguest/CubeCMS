@@ -6,9 +6,10 @@
  * cesta se odvozuje od názvu článku. 
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: article.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro obsluhu článku přenášeného v URL
+ * @version    	$Id: $ VVE3.5.0 $Revision: $
+ * @author 		$Author: $ $Date:$
+ *              $LastChangedBy: $ $LastChangedDate: $
+ * @abstract 	Třída pro obsluhu článku přenášeného v URL
  */
 
 class Article {
@@ -20,15 +21,9 @@ class Article {
 
 	/**
 	 * Proměná obsahuje id článku
-	 * @var string
-	 */
-	private static $currentArticleId = null;
-
-	/**
-	 * Id modulu ke kterému článek patří
 	 * @var integer
 	 */
-//	private static $currentArticleIdItem = null;
+	private static $currentArticleId = null;
 
 	/**
 	 * Konstruktor nastaví klíč článku z url
@@ -41,7 +36,7 @@ class Article {
 	 * Metoda nastaví id aktuálního článku
 	 * @param integer $id -- id článku
 	 */
-	public static function setCurrentArticle($id){
+	public static function setCurrentArticleId($id){
 		self::$currentArticleId = $id;
 	}
 
@@ -64,45 +59,6 @@ class Article {
 	}
 
 	/**
-	 * Metoda inicializuje objekt Article
-	 */
-//	public static function factory() {
-//		if(self::$currentArticleId != null){
-//			$articleFull = urldecode($_GET[self::GET_ARTICLE]);
-
-//			Přeparsování přes routu
-//			$article = Routes::parseRoute($articleFull);
-
-//			self::$article = self::parseArticle($article);
-//			self::$isArticle = true;
-//		}
-//	}
-
-	/**
-	 * Metoda přeparsuje článek a zjistí jestli bylo zadáno id článku
-	 * @param string $article -- id článku
-	 */
-//	private static function parseArticle($article) {
-//		$articleDet = array();
-//		if(eregi('^([a-zA-Z0-9\-]+)-([0-9]+)$', $article, $articleDet)){
-////				self::$article = $articleDet[1];
-//				$article = $articleDet[2];
-//			} else {
-////				:$article = $article;
-//			}
-//
-//		return $article;
-//	}
-
-	/**
-	 * Metoda vrací klíč článku (article urlkey)
-	 * @return string -- klíč článku
-	 */
-//	public function getArticle() {
-//		return self::$article;
-//	}
-	
-	/**
 	 * Metoda vrací true pokud je článek nastaven
 	 * @return boolean -- true při nastavení článku
 	 */
@@ -120,33 +76,6 @@ class Article {
 	public function __toString() {
 		return (string)self::$currentArticleId;
 	}
-	
-	/**
-	 * Metoda nastavuje že je použita cesta(route) u článku
-	 * 
-	 * @param boolean -- nastavení cesty
-	 */
-//	public function setRoute($value) {
-//		$this->isRoute = $value;
-//	}
-	
-	/**
-	 * Metoda vrací, jesli je nastavena cesta v článku
-	 * @return boolean -- true pokud je cesta součástí článku
-	 * @deprecated -- je obsažen ve funkci isRoute
-	 */
-//	public function withRoute() {
-//		return $this->isRoute();
-//	}
-	
-	/**
-	 * Metoda vrací jestli je article použito s cestou
-	 * @return boolean -- true pokud je article použito s cestou
-	 */
-//	public function isRoute() {
-//		return $this->isRoute;
-//	}
-	
 }
 
 ?>

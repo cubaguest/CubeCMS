@@ -41,7 +41,7 @@ class TextCtrlHelper extends CtrlHelper {
 		$return = Str_Replace(array("----","---","--"), "-", $return); //odstraní nekolik pomlcek za sebou
 		$return = Str_Replace(Array("(",")",".","!",",","\"","'"), "", $return); //odstraní ().!,"'
 		$return = StrToLower($return); //velká písmena nahradí malými.
-		return $return;
+        return $return;
 	}
 
 	/**

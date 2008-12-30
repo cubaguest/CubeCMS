@@ -95,7 +95,7 @@ abstract class JsPlugin {
 	 */
 	final public function __construct(){
 		$this->initJsPlugin();
-		if(self::isJsplugin()){
+        if(UrlRequest::isJsplugin()){
 			$this->parseParams();
 			$this->generateFile();
 		} else {

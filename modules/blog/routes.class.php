@@ -4,9 +4,15 @@
  *
  */
 class BlogRoutes extends Routes {
-	function initRoutes() {
-		$this->addRoute(1, 'sections', _('sekce'));
+    const ROUTE_SECTIONS_ID = 1;
+
+    function initRoutes() {
+		$this->addRoute(self::ROUTE_SECTIONS_ID, 'sections', _('sekce'));
 	}
+
+    public function sectionsRoute(){
+        return $this->getPredefRoute(self::ROUTE_SECTIONS_ID);
+    }
 }
 
 ?>

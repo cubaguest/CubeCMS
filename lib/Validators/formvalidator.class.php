@@ -144,10 +144,11 @@ class FormValidator extends Validator {
 	 * @param string $name -- název prvku
 	 * @param boolean $obligation(false) -- povinnost zadání prvku
 	 * @param boolean $langs(false) -- jestli se má generovat pro všechny jazykové mutace
-	 * @param int $specialValidation(self::VALIDATION_NONE) -- pokud májí být ověřvány ještě další vlastnosti
+	 * @param int $specialValidation(self::VALIDATION_NONE) -- pokud májí být
+     * ověřvány ještě další vlastnosti prvku (email, www, atd). Zadává se přes
+     * konstanty třídy a může jich být více v poli
 	 * @param int $code(self::CODE_HTMLENCODE) -- jak se má prvek překódovávat
-	 * prvku (email, www, atd). Zadává se přes konstanty třídy a může jich být více v poli
-	 *
+	 * 
 	 * @return FormValidator -- vrací sama sebe
 	 */
 	public function inputText($name, $obligation = false, $langs = false, $specialValidation = self::VALIDATION_NONE, $code = self::CODE_HTMLENCODE){
@@ -439,7 +440,7 @@ class FormValidator extends Validator {
 	}
 
 	/**
-	 * Metoda vrací hodnoty formuláře ja pole hodnot
+	 * Metoda vrací hodnoty formuláře jako pole hodnot
 	 *
 	 * @param boolean $oneArray(option) -- true pokud má být vráceno pole s jednou hloubkou,
 	 * všechny indexy podpolí budo sloučeny s hlavními indexy pomocí operátoru

@@ -1,7 +1,8 @@
 <div>
 <ul id="langstabs" class="shadetabs">
 {foreach from=$APP_LANGS_NAMES key='KEYLANG' item='LANG' name='lang'}
-<li><a href="#" rel="lang{$smarty.foreach.lang.iteration}" {if $smarty.foreach.lang.first}class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLANG|cat:'.png'}{$LANG}</a></li>
+<li><a href="#" rel="lang{$smarty.foreach.lang.iteration}" {if $smarty.foreach.lang.first}
+class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLANG|cat:'.png'}{$LANG}</a></li>
 {/foreach}
 </ul>
 <div class="tabsContent">
