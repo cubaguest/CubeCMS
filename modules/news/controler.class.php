@@ -176,13 +176,13 @@ class NewsController extends Controller {
 
 //        Pokud byl odeslán formulář
         if($newsForm->checkForm()){
-            echo '<pre>';
+            echo '<pre>odeslane';
 			print_r($newsForm->getFormValues(true, true));
 			echo '</pre>';
         
         }
 
-        echo '<pre>';
+        echo '<pre>tady';
         print_r($newsForm->getFormValues(false, true));
 		echo '</pre>';
 
@@ -220,7 +220,7 @@ class NewsController extends Controller {
 
 //		$lArray = $localeHelper->generateArray(array(self::FORM_INPUT_LABEL, self::FORM_INPUT_TEXT),$sendArray);
 		
-		$this->container()->addData('new_data', $newsForm->getFormValues(true, true));
+		$this->container()->addData('NEWS_DATA', $newsForm->getFormValues(true, true));
 		
 //		Odkaz zpět
 		$this->container()->addLink('link_back', $this->getLink()->action()->article());

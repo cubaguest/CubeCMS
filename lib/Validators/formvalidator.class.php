@@ -123,9 +123,11 @@ class FormValidator extends Validator {
 	/**
 	 * Metoda nastavuje prefix použitý ve formuláři
 	 * @param string $prefix -- prefix formulářových prvků
+     * @return FormValidator
 	 */
 	public function setPrefix($prefix) {
 		$this->formPrefix = $prefix;
+        return $this;
 	}
 
 	/**
@@ -180,7 +182,13 @@ class FormValidator extends Validator {
 		$inputArray[self::INPUT_LANGS] = $langs;
 		$inputArray[self::INPUT_CODE] = $code;
 		array_push($this->formStructure[self::INPUT_TEXTAREA], $inputArray);
-		return $this;
+
+//        echo("<pre>struct");
+//        print_r($this->formStructure);
+//        echo("</pre>");
+
+
+        return $this;
 	}
 
 	/**
@@ -190,10 +198,11 @@ class FormValidator extends Validator {
 	public function checkForm() {
 		if(isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT]])){
 			$this->fillinFormValues();
-			return !$this->someError;
-		} else {
-			return false;
+			if (!$this->someError){
+                return true;
+            }
 		}
+        return false;
 	}
 
 	/**
@@ -269,7 +278,16 @@ class FormValidator extends Validator {
 					}
 				}
 			} else {
-				$this->addFormValue($item[self::INPUT_NAME], null);
+                $val = null;
+//                pokud jsou jazyky
+                if($item[self::INPUT_LANGS]){
+                    $val = array();
+                    $tmp = Locale::getAppLangs();
+                    foreach ($tmp as $lang) {
+                        $val[$lang] = null;
+                    }
+                }
+                $this->addFormValue($item[self::INPUT_NAME], $val);
 			}
 		}
 	}
@@ -318,7 +336,16 @@ class FormValidator extends Validator {
 					}
 				}
 			} else {
-				$this->addFormValue($item[self::INPUT_NAME], null);
+                $val = null;
+//                pokud jsou jazyky
+                if($item[self::INPUT_LANGS]){
+                    $val = array();
+                    $tmp = Locale::getAppLangs();
+                    foreach ($tmp as $lang) {
+                        $val[$lang] = null;
+                    }
+                }
+                $this->addFormValue($item[self::INPUT_NAME], $val);
 //				$return = false;
 			}
 		}
@@ -448,7 +475,10 @@ class FormValidator extends Validator {
 	 * @param string $operator(option) -- oddělovací operátor mezi indexy při slučování
 	 */
 	public function getFormValues($oneArray = false, $withPrefix = false, $operator = '_') {
-		if($withPrefix){
+        if(empty ($this->formValues) OR empty ($this->formValuesWithPrefix)){
+            $this->fillinFormValues();
+        }
+        if($withPrefix){
 			$valuesArray = $this->formValuesWithPrefix;
 		} else {
 			$valuesArray = $this->formValues;

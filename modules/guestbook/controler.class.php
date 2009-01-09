@@ -68,7 +68,7 @@ class GuestbookController extends Controller {
 		$form->setPrefix(self::FORM_PREFIX);
 
 		$form->inputSubmit(self::FORM_BUTTON_SEND)->inputText(self::FORM_TOPIC, true)
-			 ->inputText(self::FORM_NICK, true)
+			 ->inputText(self::FORM_NICK, true, true)
              ->inputText(self::FORM_EMAIL, true, false, FormValidator::VALIDATION_EMAIL)
              ->textarea(self::FORM_TEXT, true);
 
@@ -84,6 +84,11 @@ class GuestbookController extends Controller {
 		} else {
 			$this->container()->addData('TOPIC_ARRAY', $form->getFormValues(false, true));
 		}
+
+
+        echo '<pre>';
+		print_r($form->getFormValues(false, true));
+		echo '</pre>';
 
 	}
 	

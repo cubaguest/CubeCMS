@@ -7,12 +7,12 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 </ul>
 <div class="tabsContent">
 <form method="post" action="{$THIS_PAGE_LINK}">
-	{foreach from=$VARS.NEWS_EDIT_ARRAY key='LANG' item='NEWS' name='newsLang'}
-	<p id="lang{$smarty.foreach.newsLang.iteration}" class="tabcontent">
+	{foreach from=$APP_LANGS_NAMES key='KEYLANG' item='LANG' name='lang'}
+	<p id="lang{$smarty.foreach.lang.iteration}" class="tabcontent">
 		{$VARS.NEWS_LABEL_NAME}{if $smarty.foreach.newsLang.first}*{/if}:<br />
-		<input type="text" size="40" maxlength="50" name="news_label_{$LANG}" value="{$NEWS.label}" /><br />
+		<input type="text" size="40" maxlength="50" name="news_label[{$KEYLANG}]" value="{$NEWS.label}" /><br />
 		{$VARS.NEWS_TEXT_NAME}{if $smarty.foreach.newsLang.first}*{/if}:<br />
-		<textarea rows="5" cols="60" name="news_text_{$LANG}">{$NEWS.text}</textarea>
+		<textarea rows="5" cols="60" name="news_text_[{$KEYLANG}]">{$NEWS.text}</textarea>
 	</p>
 	{/foreach}
 	<br />
