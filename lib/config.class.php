@@ -49,6 +49,7 @@ class Config {
 
    			$this->_configArray = $this->_objToArray($xml);
 		} else {
+         echo $this->_configFile;
 			throw new CoreException(_('Nepodařilo se otevřít konfigurační soubor ') . $this->_configFile, 101);
 		};
 	}

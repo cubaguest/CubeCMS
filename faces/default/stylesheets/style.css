@@ -234,6 +234,12 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	font-family: "Tahoma", "Arial", sans-serif;
 }
 
+
+.badItem {
+  background-color: #f08682;
+}
+
+/* ODSTRANIT */
 .edit_button_image {
 	background: url(../images/buttons/b_edit.png) 0 0 no-repeat;
 	width: 20px;
@@ -265,6 +271,68 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 .form_buttons_inline form {
 	display: inline;
 }
+
+/* EOF ODSTRANIT */
+/* Panel s editací */
+      .editbox {
+        position: absolute;
+        top: 7px;
+        right: 5px;
+        width: auto;
+        height: 12px;
+        /*visibility: hidden;*/
+        display: none;
+        /*padding-left: 30px;
+        padding-right: 30px;*/
+      }
+
+      .editbox .contentForm, .editbox .contentForm form input, .editbox .contentForm form{
+        background-color: white;
+        display: inline;
+        margin:0;
+        padding:0;
+        border:0;
+      }
+
+      .editbox .contentForm form input {
+        padding: 2px 1px 2px 1px;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+      }
+
+      .editbox .contentForm form input[type="hidden"] {
+        display:none;
+      }
+
+      .editbox .contentForm {
+        /*         border-bottom: 1px solid #9d6a05; */
+        /*border-color: #9d6a05;
+        border-style: solid;
+        border-width: 1px 0 1px 0;*/
+      }
+
+      .editbox>.upside {
+        display: inline;
+        /*         background: transparent url("toolbar_back_left4.png") top left no-repeat; */
+        background: transparent url("../images/toolbox/l_black.png") top left no-repeat;
+        /*height: 9px;*/
+        margin:0;
+        padding-left: 6px;
+        padding-top: 4px;
+      }
+      .editbox>.downside {
+        display:inline;
+        background: transparent url("../images/toolbox/r_black.png") top right no-repeat;
+        /*         background: transparent url("toolbar_back_right4.png") top right no-repeat; */
+        /*width: 9px;*/
+        /*margin:0;*/
+        padding-left: 6px;
+        padding-top: 4px;
+      }
+
+
+/* EOF Panel s editací */
+
 
 .files_delete_form {
 	text-align: right;
@@ -418,6 +486,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 /* Styl pro vnitrek boxu */
 	/* obal text */
 .moduleBox {
+  position: relative;
 	border: 1px solid #0f6572;
 	width: 100%;
 	margin-bottom: 10px;
@@ -540,6 +609,48 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	clear: both;
 	height: 0;
 }
+
+/* Jazykové taby */
+/* TABS content */
+      .ui-tabs-hide { display: none; }
+
+      .ui-tabs-selected { background-color: white; }
+
+      ul.langMenu {
+        margin-bottom:2px;
+        /*background-color: white;*/
+      }
+
+
+      ul.langMenu li {
+        display: inline;
+        border-width: 1px 1px 0 1px;
+        border-color: black;
+        border-style: solid;
+        padding: 3px;
+      }
+
+      ul.langMenu li a img {
+        padding-right: 3px;
+      }
+
+      .normal ul {
+        margin: 0;
+      }
+
+      
+      ul.ui-tabs-panel {
+        margin-bottom: 0px;
+        border-width: 1px;
+        border-color: black;
+        border-style: none;
+      }
+
+      .contentBox {
+        position: relative;
+      }
+/* EOF Jazykové taby */
+
 
 /* linky nad boxy */
 

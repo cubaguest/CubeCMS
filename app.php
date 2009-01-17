@@ -5,9 +5,11 @@
  * Obsluhuje celou aplikaci a její komponenty.
  *
  * @copyright  Copyright (c) 2008 Jakub Matas
- * @version    $Id: app.php 3.0.0 beta1 29.8.2008
- * @author      Jakub Matas <jakubmatas@gmail.com>
+ * @version    $Id: $ VVE3.5.0 $Revision: $
+ * @author     $Author: jakub $ $Date: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
+ *             $LastChangedBy: jakub $ $LastChangedDate: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
  * @abstract 	Hlavní třída aplikace(Singleton)
+ * @license    GNU General Public License v. 2 viz. Docs/license.txt
  *
  */
 
@@ -300,7 +302,10 @@ class AppCore {
         $this->_stratTime=((float)$sec + (float)$usec);
 
         //	nastavení hlavního adresáře aplikace
-        $this->setAppMainDir( realpath(dirname(__FILE__)) );
+        /*
+         * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
+         */
+        $this->setAppMainDir(realpath(dirname(__FILE__)));
 
         //	přidání adresáře pro načítání knihoven
         set_include_path('./lib/' . PATH_SEPARATOR . get_include_path());

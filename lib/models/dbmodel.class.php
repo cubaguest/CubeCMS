@@ -40,9 +40,87 @@ class DbModel extends Model {
 	final public function getDb() {
 		return AppCore::getDbConnector();
 	}
+
+//   protected function createArrayByKeys() {
+//      ;
+//   }
+
+   /**
+    * Metoda vytvoří pole s hodnotami a klíči vhodnými pro uložení do db
+    * @param string $name -- název pro sloupec
+    * @param mixed $val -- hodnota sloupce
+    */
+   protected function createValuesArray($name, $val) {
+      $separator = '_';
+      $returnArray = array();
+      if(func_num_args()%2 == 0){
+         $argv = func_get_args();
+
+//         Skáčeme po dvou, protože první je sloupec a adruhý je hodnota
+         for ($step = 0 ; $step < func_num_args() ; $step=$step+2) {
+            if(is_array($argv[$step+1])){
+               $returnArray = array_merge($returnArray, $this->createOneArray(
+                     $argv[$step+1],$argv[$step]));
+            } else {
+               $returnArray[$argv[$step]] = $argv[$step+1];
+            }
+         }
+      } else {
+         new CoreException(_('Nebyl předán potřebný počet argumentů'));
+      }
+
+      return $returnArray;
+   }
+
+
+   /**
+    * Metoda vytvoří z pole jednorozměrné pole oddělené separátorem
+    * @param array $arr -- pole hodnot
+    * @param string $prefix -- prefix klíčů
+    * @param string $separator -- oddělovač klíčů
+    */
+   private function createOneArray($arr, $prefix = null, $separator = '_') {
+      $values = array();
+
+      if($prefix != null){
+         if($prefix[strlen($prefix)-1] != $separator){
+            $prefixKey = $prefix.$separator;
+         } else {
+            $prefixKey = $prefix;
+         }
+      } else {
+         $prefixKey = null;
+      }
+
+      foreach ($arr as $key => $val) {
+         if(is_array($val)){
+            $values = array_merge($values, $this->createOneArray($val,$prefixKey.$key, $separator));
+         } else {
+            $values[$prefixKey.$key] = $val;
+         }
+      }
+      return $values;
+   }
 	
-	
-	
+   /**
+    * Metoda rozparsuje pole databáze na strukturované pole
+    * @param array $values -- pole s hodnotami
+    * @param array $values -- pole s prefixy, které se mají parsovat
+    */
+   protected function parseDbValuesToArray($values, $prefixArray, $separator = '_') {
+      $returnArr = array();
+      foreach ($values as $key => $var) {
+         $matches = array();
+         if(eregi('^([a-zA-Z0-9]*)'.$separator.'([a-zA-Z0-9]*)$', $key, $matches)
+            AND in_array($matches[1], $prefixArray)){
+               $returnArr[$matches[1]][$matches[2]]=$var;
+         } else {
+            $returnArr[$key]=$var;
+         }
+      };
+      return $returnArr;
+   }
+
 }
 
 ?>
