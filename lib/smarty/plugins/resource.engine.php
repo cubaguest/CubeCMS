@@ -61,13 +61,13 @@ function smarty_resource_engine_trusted($tpl_name, &$smarty)
  */
 function tplEngineFilePath($file_name, &$smarty) {
     $path = null;
-
+//echo $smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.$file_name;
     if(!isset ($smarty->_plugins['resource']['engine']['tpl_file_path'][$file_name])){
-        if(file_exists($smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name)){
+        if(file_exists($smarty->template_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$file_name)){
             $path = $smarty->template_face_dir.$smarty->template_dir.DIRECTORY_SEPARATOR;
-        } else if(file_exists($smarty->template_default_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name)){
+        } else if(file_exists($smarty->template_default_face_dir.DIRECTORY_SEPARATOR.$smarty->template_dir.DIRECTORY_SEPARATOR.$file_name)){
             $path = $smarty->template_default_face_dir.$smarty->template_dir.DIRECTORY_SEPARATOR;
-        } else if(file_exists($smarty->template_dir.DIRECTORY_SEPARATOR.$tpl_name)){
+        } else if(file_exists($smarty->template_dir.DIRECTORY_SEPARATOR.$file_name)){
             $path = $smarty->template_dir.DIRECTORY_SEPARATOR;
         }
         $smarty->_plugins['resource']['engine']['tpl_file_path'][$file_name] = $path;

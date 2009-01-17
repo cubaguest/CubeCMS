@@ -6,37 +6,27 @@
 
 class TextView extends View {
 	public function mainView() {
-		
 		if($this->getRights()->isWritable()){
 			$this->template()->addTpl('editButton.tpl');
-			
 			$this->template()->addVar('WRITABLE', true);
 			
 			$this->template()->addVar('LINK_TO_EDIT_TEXT_NAME', _("Upravit"));
 			$this->template()->addVar('LINK_TO_EDIT_TEXT',$this->container()->getLink('link_edit'));
 			
-			
+			// editační tlačítka
+         $jquery = new JQuery();
+         $this->template()->addJsPlugin($jquery);
 		}
-		
 		$this->template()->addTpl("text.tpl");
-		
 		$this->template()->addVar('TEXT', $this->container()->getData('text'));
-//		$this->template()->addVar('TEXT', $this->container()->text); //TODO prověřit přímý přístup k nedefinovaným proměným
-
 	}
 	/*EOF mainView*/
 	
-	public function editView() {
-		
+	public function edittextView() {
 		$this->template()->addTpl("textedit.tpl");
-		
-		$this->template()->addVar('TEXT_EDIT_ARRAY', $this->container()->getData('text'));		
-		
 		$this->template()->addVar('TEXT_NAME', _('Text'));
-		
 		$this->template()->addVar('BUTTON_TEXT_SEND', _('Odeslat'));
 		$this->template()->addVar('BUTTON_RESET', _('Obnovit'));
-		
 		$this->template()->setTplSubLabel(_('Úprava textu'));
 		
 		//NOTE soubory
@@ -48,17 +38,18 @@ class TextView extends View {
 		$this->template()->addTpl($eplImages->getTpl(), true);
 		$eplImages->assignToTpl($this->template());
 		
-		$this->template()->addVar('TEXT_IN_DB', $this->container()->getData('indb'));
 		$tinymce = new TinyMce();
 //		$tinymce->setTheme(TinyMce::TINY_THEME_SIMPLE);
 		$tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
 		$this->template()->addJsPlugin($tinymce);
-		
-		$tabcontent = new TabContent();
-		$this->template()->addJsPlugin($tabcontent);
+
+      $jquery = new JQuery();
+      $jquery->addWidgentTabs();
+      $this->template()->addJsPlugin($jquery);
+
+      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět'));;
 	}
-	/*EOF editView*/
-	
+	// EOF edittextView
 }
 
 ?>

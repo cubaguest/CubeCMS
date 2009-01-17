@@ -267,12 +267,16 @@ class Links {
       }
    }
 
+
+
     /**
      * Metoda vrací adresu k web aplikaci
+     * @return string -- adresa ke kořenu aplikace
      */
-   //	public static function getMainWebDir() {
-   //		return self::getTransferProtocol().self::$serverName.self::$webUrl.self::COOL_URL_SEPARATOR;
-   //	}
+   	public static function getMainWebDir() {
+//   		return self::getTransferProtocol().self::$serverName.self::$webUrl.self::COOL_URL_SEPARATOR;
+         return UrlRequest::getBaseWebDir();
+   	}
 
     /*
      * VEŘEJNÉ METODY
@@ -474,7 +478,13 @@ class Links {
       }
       //        Jedná se o běžně zadaný parametr
       else {
-         $this->paramsNormalArray[$name] = rawurlencode($value);
+         if(!is_array($name)){
+            $this->paramsNormalArray[$name] = rawurlencode($value);
+         } else {
+            foreach ($name as $key => $val) {
+               $this->paramsNormalArray[$key] = rawurlencode($val);
+            }
+         }
       }
       return $this;
    }

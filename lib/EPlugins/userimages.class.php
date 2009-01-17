@@ -328,7 +328,7 @@ class UserImagesEplugin extends Eplugin {
 		if ($this->imagesArray != null) {
 //			projití pole a dolnění odkazů
 			foreach ($this->imagesArray as $key => $file) {
-				$this->imagesArray[$key][self::COLUM_LINK_TO_SHOW] = $this->getLinks()->getMainWebDir().MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$file[self::COLUM_FILE];
+            $this->imagesArray[$key][self::COLUM_LINK_TO_SHOW] = Links::getMainWebDir().MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$file[self::COLUM_FILE];
 				$this->imagesArray[$key][self::COLUM_LINK_TO_SMALL] = MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/'.$file[self::COLUM_FILE];
 			}
 		}
@@ -354,7 +354,7 @@ class UserImagesEplugin extends Eplugin {
 		$this->toTpl("USERIMAGES_NUM_ROWS", self::$otherNumberOfReturnRows);
 		$this->toTpl("USERIMAGESFILES_ID", $this->idUserImages);
 		$this->toTplJSPlugin(new SubmitForm());
-		$this->toTplJSPlugin(new LightBox());
+//		$this->toTplJSPlugin(new LightBox());
 		self::$otherImagesArray[$this->idUserImages] = $this->imagesArray;
 		$this->toTpl("USERIMAGES_ARRAY",self::$otherImagesArray);
 	}
@@ -392,7 +392,7 @@ class UserImagesEplugin extends Eplugin {
 			case self::FILE_IMAGES_FORMAT_TINYMCE:
 				$link = new Links(true, true, true);
 				return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')->
-						params(array(self::GET_URL_ID_ARTICLE => $this->idArticle, self::GET_URL_ID_ITEM => $this->getModule()->getId(), 
+						param(array(self::GET_URL_ID_ARTICLE => $this->idArticle, self::GET_URL_ID_ITEM => $this->getModule()->getId(), 
 							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE)));
 			break;
 			

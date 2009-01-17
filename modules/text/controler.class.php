@@ -5,30 +5,13 @@
  */
 
 class TextController extends Controller {
-	
-	/**
-	 * Názvy sloupců v databázi
-	 * @var string
-	 */
-	const COLUM_ID = 'id_text';
-	const COLUM_ID_ITEM = 'id_item';
-	const COLUM_CHANGED_TIME = 'changed_time';
-	const COLUM_TEXT_LANG_PRFIX = 'text_';
-
-	/**
-	 * Názvy imaginárních sloupců
-	 * @var string
-	 */
-	const COLUM_TEXT_IMAG = 'text';
-	
 	/**
 	 * Názvy formůlářových prvků
 	 * @var string
 	 */
 	const FORM_PREFIX = 'text_';
 	const FORM_BUTTON_SEND = 'send';
-	const FORM_TEXT_PREFIX = 'text_';
-	const FORM_TEXT_IN_DB = 'in_db';
+	const FORM_TEXT = 'text';
 	
 	/**
 	 * Kontroler pro zobrazení textu
@@ -44,65 +27,49 @@ class TextController extends Controller {
 
 //		pokud má uživatel právo zápisu vytvoříme odkaz pro editaci
 		if($this->getRights()->isWritable()){
-			$this->container()->addLink('link_edit', $this->getLink()->action($this->getAction()->actionEdit()));
+			$this->container()->addLink('link_edit', $this->getLink()->action($this->getAction()->editText()));
 		}
 	}
 
 	/**
 	 * Kontroler pro editaci textu
 	 */
-	public function editController() {
-		
+	public function edittextController() {
 		$this->checkWritebleRights();
-
 //		Uživatelské soubory
-		$files = new UserFilesEplugin($this->errMsg(), $this->infoMsg(), $this->getRights());
+		$files = new UserFilesEplugin($this->getRights());
 		$files->setIdArticle($this->getModule()->getId());
 		$this->container()->addEplugin('files', $files);
 
 //		Uživatelské obrázky
-		$images = new UserImagesEplugin($this->errMsg(), $this->infoMsg(), $this->getRights());
+		$images = new UserImagesEplugin($this->getRights());
 		$images->setIdArticle($this->getModule()->getId());
 		$this->container()->addEplugin('images', $images);
 
-//		Pole s odeslanými prvky
-		$sendArray = array();
-		
-//		Ukládání textu
-		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_SEND])){
-			if($_POST[self::FORM_PREFIX.self::FORM_TEXT_PREFIX.Locale::getDefaultLang()] == null){
-				$this->errMsg()->addMessage(_('Nebyly zadány všechny potřebné údaje'));
-			} else {
-				$localeHelper = new LocaleCtrlHelper();
-				$sendArray = $localeHelper->postsToArray(array(self::FORM_TEXT_PREFIX), self::FORM_PREFIX, LocaleCtrlHelper::SP_CHARS_DECODE);
-				unset($localeHelper);
-				
-				$saveModel = new SaveTextsDetailModel();
-				$isSaved = false;
-				
-				//				Pokud se ukládá změněný text
-				if((bool)$_POST[self::FORM_PREFIX.self::FORM_TEXT_IN_DB]){
-					$isSaved = $saveModel->saveTextToDb($sendArray, true);
-				}
-//				Ukládá se nový text
-				else {
-					$isSaved = $saveModel->saveTextToDb($sendArray, false);
-				}
-				
-//				Vložení do db
-				if($isSaved){
-					$this->infoMsg()->addMessage(_('Text byl uložen'));
-					$this->getLink()->article()->action()->reload();
-				} else {
-					new CoreException(_('Text se nepodařilo uložit, chyba při ukládání do db'), 1);
-				}
-			}
-		}
-		
-		//		Model pro načtení textu
-		$model = new TextDetailModel();
-		$this->container()->addData('text', $model->getAllLangText($sendArray));
-		$this->container()->addData('indb', $model->inDb());
+      $form = new Form();
+      $form->setPrefix(self::FORM_PREFIX);
+
+      $form->crTextArea(self::FORM_TEXT, true, true, Form::CODE_HTMLDECODE)
+            ->crSubmit(self::FORM_BUTTON_SEND);
+
+      $text = new TextDetailModel();
+      $form->setValue(self::FORM_TEXT, $text->getAllLangText());
+
+ //        Pokud byl odeslán formulář
+      if($form->checkForm()){
+         if($text->saveEditText($form->getValue(self::FORM_TEXT))){
+            $this->infoMsg()->addMessage(_('Text byl uložen'));
+            $this->getLink()->action()->reload();
+         } else {
+            new CoreException(_('Text se nepodařilo uložit, chyba při ukládání.'), 1);
+         }
+      }
+//    Data do šablony
+      $this->container()->addData('TEXT_DATA', $form->getValues());
+      $this->container()->addData('ERROR_ITEMS', $form->getErrorItems());
+
+      //		Odkaz zpět
+      $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
 	}
 }
 

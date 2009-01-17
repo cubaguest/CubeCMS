@@ -326,7 +326,7 @@ class UserFilesEplugin extends Eplugin {
 		if ($this->filesArray != null) {
 //			projití pole a dolnění odkazů
 			foreach ($this->filesArray as $key => $file) {
-				$this->filesArray[$key][self::COLUM_LINK_TO_SHOW] = $this->getLinks()->getMainWebDir().MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
+            $this->filesArray[$key][self::COLUM_LINK_TO_SHOW] = Links::getMainWebDir().MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
 				$this->filesArray[$key][self::COLUM_LINK_TO_DOWNLOAD] = $this->getLinks()->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
 			}
 		}

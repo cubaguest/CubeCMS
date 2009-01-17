@@ -108,6 +108,10 @@ class DbModel extends Model {
     * @param array $values -- pole s prefixy, které se mají parsovat
     */
    protected function parseDbValuesToArray($values, $prefixArray, $separator = '_') {
+      if(!is_array($prefixArray)){
+         $prefixArray = array($prefixArray);
+      }
+
       $returnArr = array();
       foreach ($values as $key => $var) {
          $matches = array();

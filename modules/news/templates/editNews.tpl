@@ -32,10 +32,4 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
   });
 </script>
 {/literal}
-<script type="text/javascript">
-//var langs=new ddtabcontent("langstabs");
-//langs.setpersist(true);
-//langs.setselectedClassTarget("link"); //"link" or "linkparent"
-//langs.init();
-</script>
 </div>

@@ -7,9 +7,9 @@
 {literal}
 <script type="text/javascript">
   //$(document).ready(function(){
-  $("div.newsContainerClass").hover(
-  function(){$("div.newsContainerClass div.editbox").fadeIn(100);},
-  function(){$("div.newsContainerClass div.editbox").fadeOut(300);}
+  $("div#newsConteiner{/literal}{$TPLKEY}{literal}").hover(
+  function(){$("div#newsConteiner{/literal}{$TPLKEY}{literal} div.editbox").fadeIn(100);},
+  function(){$("div#newsConteiner{/literal}{$TPLKEY}{literal} div.editbox").fadeOut(300);}
 );
   //});
 </script>
