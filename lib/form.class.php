@@ -32,6 +32,7 @@ class Form {
    const INPUT_SUBMIT	= 'inputsubmit';
    const INPUT_TEXT		= 'inputtext';
    const INPUT_HIDDEN	= 'inputhidden';
+   const INPUT_PASSWORD	= 'inputpasswd';
    const INPUT_TEXTAREA	= 'textarea';
 
  /**
@@ -271,6 +272,36 @@ class Form {
    }
 
   /**
+   * Metody vytváří prvek typu INPUT - TEXT
+   * @param string $name -- Název prvku
+   * @param boolean $obligation -- (option) jestli se jedná o povinný prvek
+   * @param boolean $langs -- (option) jestli má prvek možnost jazykové mutace
+   * @param mixed $specialValidation -- (option) typ vylidace prvku (výchozí je
+   * žádná, odvíjí se od konstat třídy pro validaci) nebo funkci (is_string,...)
+   * @param int $code -- (option) typ kódování (výchozí je dekódování všech prvků
+   * na html entity, odvíjí se od konstatn třídy po kódovaní)
+   * @param int $maxChars -- maximální počet znaků
+   * @param int $minChars -- minimální počet znaků
+   *
+   * @return Form
+   */
+   public function crInputPassword($name, $obligation = false,
+      $specialValidation = self::VALIDATION_NONE, $code = self::CODE_HTMLENCODE,
+      $maxChars = null, $minChars = null) {
+
+      $inputArray = array ();
+      $inputArray[self::ITEM_NAME] = $name;
+      $inputArray[self::ITEM_OBLIGATION] = $obligation;
+      $inputArray[self::ITEM_CODE] = $code;
+      $inputArray[self::ITEM_VALIDATION] = $specialValidation;
+      $inputArray[self::ITEM_MAX_LENGHT] = $maxChars;
+      $inputArray[self::ITEM_MIN_LENGHT] = $minChars;
+      $this->formStructure[self::INPUT_PASSWORD][$name] = $inputArray;
+      return $this;
+   }
+
+
+  /**
    * Metody vytváří prvek typu TEXTAREA
    * @param string $name -- Název prvku
    * @param boolean $obligation -- (option) jestli se jedná o povinný prvek
@@ -484,6 +515,10 @@ class Form {
       if(isset ($this->formStructure[self::INPUT_HIDDEN])){
          $this->fillInInputHidden();
       }
+      //    vyplnění heslových polí
+      if(isset ($this->formStructure[self::INPUT_PASSWORD])){
+         $this->fillInInputPassword();
+      }
       // Vyplnění textarea
       if(isset ($this->formStructure[self::INPUT_TEXTAREA])){
          $this->fillInTextArea();
@@ -623,7 +658,58 @@ class Form {
 
          } else {
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$_POST[$this->formPrefix.$inputName], 1);
+               .$_POST[$this->formPrefix.$inputName], 2);
+         }
+      }
+   }
+
+  /**
+   * Metoda vyplní data z formuláře do pole hodnot s daty
+   */
+   private function fillInInputPassword() {
+      $inputs = $this->formStructure[self::INPUT_PASSWORD];
+
+      foreach ($inputs as $inputName => $value) {
+         //      Jestli byl prvek vůbec odeslán
+         if(isset ($_POST[$this->formPrefix.$inputName])){
+            //   SOF   Kontrola povinnosti
+            if($value[self::ITEM_OBLIGATION]){
+               if($_POST[$this->formPrefix.$inputName] == null
+                  OR $_POST[$this->formPrefix.$inputName] == ''){
+                  $this->addMissingValueError();
+                  $this->addErrorItem($inputName);
+               }
+            }
+            //  EOF  Kontrola povinnosti
+            $postValue = $_POST[$this->formPrefix.$inputName];
+
+            // SOF kódování
+            if($value[self::ITEM_CODE] != self::CODE_NONE){
+               if($value[self::ITEM_CODE] == self::CODE_HTMLENCODE){
+                  $postValue = $this->codeHtmlEncode($postValue);
+               } else if($value[self::ITEM_CODE] == self::CODE_HTMLDECODE){
+                  $postValue = $this->codeHtmlDecode($postValue);
+               }
+            }
+            // EOF kódování
+
+            // SOF Validace
+            if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
+               $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
+            }
+            // EOF Validace
+
+            // SOF délka řetězce
+            if($value[self::ITEM_MIN_LENGHT] != null OR $value[self::ITEM_MIN_LENGHT] != null){
+               $this->checkLenght($inputName, $postValue, $value[self::ITEM_MAX_LENGHT],
+                  $value[self::ITEM_MIN_LENGHT]);
+            }
+            // EOF délka řetězce
+
+            $this->formValues[$inputName] = $postValue;
+         } else {
+            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
+               .$_POST[$this->formPrefix.$inputName], 3);
          }
       }
    }
@@ -697,7 +783,7 @@ class Form {
             $this->formValues[$inputName] = $postValue;
 
          } else {
-            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ').$_POST[$this->formPrefix.$inputName], 1);
+            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ').$_POST[$this->formPrefix.$inputName], 4);
          }
       }
    }
@@ -808,14 +894,14 @@ class Form {
       if(!is_array($value)){
          // pokud je omezena maximální délka
          if($maxChars != null){
-            if(strlen($string) > $maxChars){
+            if(strlen($value) > $maxChars){
                $this->errMsg()->addMessage(_('Zadaná hodnota je příliš dlouhá'));
                $this->addErrorItem($itemName);
             }
          }
          // pokud je omezena minimální délka
          if($minChars != null){
-            if(strlen($string) <$minChars){
+            if(strlen($value) <$minChars){
                $this->errMsg()->addMessage(_('Zadaná hodnota je příliš krátká'));
                $this->addErrorItem($itemName);
             }

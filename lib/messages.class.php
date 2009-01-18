@@ -105,9 +105,13 @@ class Messages {
 	 */
 	function addMessage($messageText, $save = false){
 		if($this->defaultSaveMessages OR $save){
-			array_push($this->messagesForSave, $messageText);
+         if(!in_array($messageText, $this->messagesForSave)){
+            array_push($this->messagesForSave, $messageText);
+         }
 		} else {
-			array_push($this->messages, $messageText);
+         if(!in_array($messageText, $this->messages)){
+            array_push($this->messages, $messageText);
+         }
 		}
 	}
 
