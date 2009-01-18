@@ -6,9 +6,15 @@
 class LoginAction extends Action {
 	
 
-	public function actions() {
-		$this->addAction("editpasswd", "epw");
-		
+	const ACTION_CHANGE_PASSWD_ABBR = 'cp';
+
+    protected function init() {
+		$this->addAction(self::ACTION_CHANGE_PASSWD_ABBR, "changepasswd", _('zmena-hesla'));
+    }
+
+
+	public function changePasswd() {
+		return $this->createAction(self::ACTION_CHANGE_PASSWD_ABBR);
 	}
 	
 }

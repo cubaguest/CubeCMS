@@ -50,7 +50,7 @@ class LoginView extends View {
 	/**
 	 * Viewwer pro zobrazení změny hesla
 	 */
-	public function editpasswdView() {
+	public function changepasswdView() {
 		$this->template()->addTpl("changepsswd.tpl");
 		$this->template()->addJS("generatepswd.js");
 		
