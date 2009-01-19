@@ -11,6 +11,11 @@
  */
 
 abstract class Db_Select {
+   /**
+    * Vybrané konstanty pro SQL dotazy
+    */
+   const SQL_ASC        		= 'ASC';
+   const SQL_DESC       		= 'DESC';
 	/**
 	 * Metoda nastavuje z které tabulky se bude načítat
 	 * klauzule FROM
