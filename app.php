@@ -1138,7 +1138,7 @@ class AppCore {
                 new CoreException(_("Nepodařilo se nahrát prvky kategorie z databáze."), 9);
             } else {
                 $redir = new Links(true);
-                $redir->category()->action()->article()->params()->reload();
+                $redir->category()->action()->article()->rmParam()->reload();
             }
         }
     }
