@@ -82,7 +82,8 @@ class TextDetailModel extends DbModel {
          };
       } else {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
-            self::COLUMN_CHANGED_TIME, time());
+            self::COLUMN_CHANGED_TIME, time(),
+            self::COLUMN_ID_ITEM, $this->getModule()->getId());
          //
          $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable())
                ->colums(array_keys($textArr))
