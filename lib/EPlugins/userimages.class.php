@@ -390,7 +390,7 @@ class UserImagesEplugin extends Eplugin {
 	public function getImagesListLink($type) {
 		switch ($type) {
 			case self::FILE_IMAGES_FORMAT_TINYMCE:
-				$link = new Links(true, true, true);
+				$link = new Links(true, true);
 				return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')->
 						param(array(self::GET_URL_ID_ARTICLE => $this->idArticle, self::GET_URL_ID_ITEM => $this->getModule()->getId(), 
 							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE)));

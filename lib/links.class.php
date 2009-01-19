@@ -595,6 +595,10 @@ class Links {
    {
       //    	if(!$this->relativePath){
       $returnString = UrlRequest::getBaseWebDir();
+
+//      if($this->file != null){
+//         $returnString.=$this->file;
+//      }
       //    	} else {
       //    		$returnString = './';
       //    	}
@@ -620,17 +624,18 @@ class Links {
          $returnString.=$this->getParams();
       }
 
-      //        normálové parametry
-      if($this->getNormalParams() != null){
-         $returnString.=$this->getNormalParams();
-      }
-
         /**
          * @todo What is this? Know anybody what is this doing?
          */
       if($this->getFile() != null){
          $returnString.=$this->getFile();
       }
+
+      //        normálové parametry
+      if($this->getNormalParams() != null){
+         $returnString.=$this->getNormalParams();
+      }
+
       return $returnString;
    }
 

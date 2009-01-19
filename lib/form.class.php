@@ -33,6 +33,7 @@ class Form {
    const INPUT_TEXT		= 'inputtext';
    const INPUT_HIDDEN	= 'inputhidden';
    const INPUT_PASSWORD	= 'inputpasswd';
+   const INPUT_CHECKBOX	= 'inputcheckbox';
    const INPUT_TEXTAREA	= 'textarea';
 
  /**
@@ -94,6 +95,7 @@ class Form {
 
   /**
    * Poles chbějícími prvky
+   * @deprecated
    */
    private $errorMessages = array(self::ERROR_MISSING => false);
 
@@ -267,6 +269,19 @@ class Form {
       $this->formStructure[self::INPUT_HIDDEN][$name] = $inputArray;
 
       $this->formValues[$name] = null;
+
+      return $this;
+   }
+
+  /**
+   * Metody vytváří prvek typu INPUT - TEXT
+   * @param string $name -- Název prvku
+   *
+   * @return Form
+   */
+   public function crInputCheckboxn($name, $obligation = false) {
+      $this->formStructure[self::INPUT_CHECKBOX][$name][self::ITEM_NAME] = $name;
+      $this->formValues[$name] = false;
 
       return $this;
    }
@@ -515,6 +530,10 @@ class Form {
       if(isset ($this->formStructure[self::INPUT_HIDDEN])){
          $this->fillInInputHidden();
       }
+      //    vyplnění checkbox polí
+      if(isset ($this->formStructure[self::INPUT_CHECKBOX])){
+         $this->fillInInputCheckbox();
+      }
       //    vyplnění heslových polí
       if(isset ($this->formStructure[self::INPUT_PASSWORD])){
          $this->fillInInputPassword();
@@ -659,6 +678,28 @@ class Form {
          } else {
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
                .$_POST[$this->formPrefix.$inputName], 2);
+         }
+      }
+   }
+
+  /**
+   * Metoda vyplní data z formuláře do pole hodnot s daty
+   */
+   private function fillInInputCheckbox() {
+      $inputs = $this->formStructure[self::INPUT_CHECKBOX];
+
+      foreach ($inputs as $inputName => $value) {
+         if(isset ($_POST[$this->formPrefix.$inputName])){
+//            Je odeslán bez hodnoty
+            if($_POST[$this->formPrefix.$inputName] == 'on'){
+               $this->formValues[$inputName] = true;
+            }
+//            Je odeslán s hodnotou
+            else {
+               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
+            }
+         } else {
+            $this->formValues[$inputName] = false;
          }
       }
    }
@@ -915,10 +956,7 @@ class Form {
    * Metoda přidá chybovou hlášku o nevyplněném prvku
    */
    private function addMissingValueError() {
-      if(!$this->errorMessages[self::ERROR_MISSING]){
-         $this->errMsg()->addMessage(_('Nebyly vyplněny všechny povinné údaje'));
-         $this->errorMessages[self::ERROR_MISSING] = true;
-      }
+      $this->errMsg()->addMessage(_('Nebyly vyplněny všechny povinné údaje'));
    }
 
   /**
@@ -926,6 +964,8 @@ class Form {
    * @param string $name -- název prvku
    */
    private function addErrorItem($name, $subItem = null) {
+      
+
       if($subItem == null){
          $this->errorItems[$name] = true;
       } else {
