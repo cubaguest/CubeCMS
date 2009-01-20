@@ -42,8 +42,20 @@ class TinyMce extends JsPlugin {
 	 */
 	const TINY_THEME_SIMPLE = 'simple';
 	const TINY_THEME_ADVANCED = 'advanced';
+	const TINY_THEME_ADVANCED_SIMPLE = 'advsimple';
 	const TINY_THEME_FULL = 'full';
-	
+
+   /**
+    * Parametry pro typ theme
+    */
+   const THEME_ADVANCED = 'advanced';
+   const THEME_SIMPLE = 'simple';
+
+   /**
+    * některé parametry v konfigu
+    */
+   const PARAM_THEME = 'theme';
+
 	/**
 	 * Mody tinymce
 	 * @var atring
@@ -55,18 +67,8 @@ class TinyMce extends JsPlugin {
 	 */
 	private $defaultParams = array(
 			'mode' => 'textareas',
-			'theme' => 'advanced',
+			self::PARAM_THEME => 'advanced',
 			'language' => 'cs',
-			'plugins' => array('safari', 'style', 'table', 'save', 'advhr', 'advimage', 'advlink', 'emotions', 'iespell', 'inlinepopups',
-					'insertdatetime', 'preview', 'media', 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
-					'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras'),
-			'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
-					'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen'),
-			'theme_advanced_buttons2' => array('cut', 'copy', 'paste', 'pastetext', '|', 'search,replace', '|', 'bullist,numlist', '|', 'outdent',
-					'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
-					'forecolor', 'backcolor'),
-			'theme_advanced_buttons3' => array('tablecontrols', '|', 'hr', 'removeformat', 'visualaid', '|', 'sub', 'sup', '|', 'charmap',
-					'emotions', 'image', 'media', '|', 'ltr', 'rtl'),
 			'theme_advanced_toolbar_location' => 'top',
 			'theme_advanced_toolbar_align' => 'left',
 			'theme_advanced_statusbar_location' => 'bottom',
@@ -79,7 +81,25 @@ class TinyMce extends JsPlugin {
 			'content_css' => null
 //			'relative_urls' => 'false'
 			);
-	
+
+   private $advancedParams = array(
+         'plugins' => array('safari', 'style', 'table', 'save', 'advhr', 'advimage', 'advlink', 'emotions', 'iespell', 'inlinepopups',
+					'insertdatetime', 'preview', 'media', 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
+					'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras'),
+			'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
+					'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen'),
+			'theme_advanced_buttons2' => array('cut', 'copy', 'paste', 'pastetext', '|', 'search,replace', '|', 'bullist,numlist', '|', 'outdent',
+					'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
+					'forecolor', 'backcolor'),
+			'theme_advanced_buttons3' => array('tablecontrols', '|', 'hr', 'removeformat', 'visualaid', '|', 'sub', 'sup', '|', 'charmap',
+					'emotions', 'image', 'media', '|', 'ltr', 'rtl'));
+
+   private $advancedSimpleParams = array('plugins' => array('safari', 'inlinepopups', 'searchreplace', 'contextmenu', 'paste'),
+			'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
+					'justifyfull', '|', 'bullist,numlist', '|','search', '|', 'link', 'unlink','|', 'undo', 'redo','code'),
+			'theme_advanced_buttons2' => array(),
+			'theme_advanced_buttons3' => array());
+
 	/**
 	 * Enter description here...
 	 * @var string
@@ -117,8 +137,11 @@ class TinyMce extends JsPlugin {
 //			Který režim je zobrazen		
 			switch ($theme) {
 				case self::TINY_THEME_SIMPLE:
+               $this->generateSimpleCfgFile();
 					break;
-				
+				case self::TINY_THEME_ADVANCED_SIMPLE:
+               $this->generateAdvSimpleCfgFile();
+               break;
 				case self::TINY_THEME_ADVANCED:
 				default:
 					$this->generateAdvCfgFile();
@@ -159,14 +182,60 @@ class TinyMce extends JsPlugin {
 	private function generateAdvCfgFile() {
 		$content = $this->cfgFileHeader();
 		
-		$params = $this->defaultParams;
-		
+      $params = array_merge($this->defaultParams, $this->advancedParams);
+
 //		Nahrazení parametrů za přenesené
 		foreach ($this->getFileParams() as $param => $value) {
 			$params[$param] = $value;
 		}
+
+      $params[self::PARAM_THEME] = self::THEME_ADVANCED;
 		
 		$this->checkImagesList($params);
+		$content .= $this->generateParamsForFile($params);
+		$content .= $this->cfgFileFooter();
+//		Odeslání souboru
+		$this->sendFileContent($content);
+	}
+
+	/**
+	 * Metoda vygeneruje hlavičku souboru pro simple theme
+	 *
+	 */
+	private function generateSimpleCfgFile() {
+		$content = $this->cfgFileHeader();
+
+		$params = $this->defaultParams;
+
+//		Nahrazení parametrů za přenesené
+		foreach ($this->getFileParams() as $param => $value) {
+			$params[$param] = $value;
+		}
+
+      $params[self::PARAM_THEME] = self::THEME_SIMPLE;
+
+		$content .= $this->generateParamsForFile($params);
+		$content .= $this->cfgFileFooter();
+//		Odeslání souboru
+		$this->sendFileContent($content);
+	}
+
+	/**
+	 * Metoda vygeneruje hlavičku souboru pro simple theme
+	 *
+	 */
+	private function generateAdvSimpleCfgFile() {
+		$content = $this->cfgFileHeader();
+
+		$params = array_merge($this->defaultParams, $this->advancedSimpleParams);
+
+//		Nahrazení parametrů za přenesené
+		foreach ($this->getFileParams() as $param => $value) {
+			$params[$param] = $value;
+		}
+
+      $params[self::PARAM_THEME] = self::THEME_ADVANCED;
+      
 		$content .= $this->generateParamsForFile($params);
 		$content .= $this->cfgFileFooter();
 //		Odeslání souboru
@@ -207,7 +276,9 @@ class TinyMce extends JsPlugin {
 				$string .= "\t".$param.' : '.$value.",\n";
 			} else if($value != null){
 				$string .= "\t".$param.' : "'.$value."\",\n";
-			}
+			} else {
+            $string .= "\t".$param." : \"\",\n";
+         }
 		}
 		$string = substr($string, 0, strlen($string)-2)."\n";
 		return $string;
