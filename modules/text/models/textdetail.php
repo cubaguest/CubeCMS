@@ -98,7 +98,8 @@ class TextDetailModel extends DbModel {
    }
 
    private function isSaved() {
-      $sql = $this->getDb()->select()->from($this->getModule()->getDbTable(), array('count' => 'COUNT(*)'));
+      $sql = $this->getDb()->select()->from($this->getModule()->getDbTable(), array('count' => 'COUNT(*)'))
+      ->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId());
 
       $count = $this->getDb()->fetchObject($sql);
 
