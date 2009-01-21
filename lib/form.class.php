@@ -7,11 +7,11 @@
  * Umožňuje také generování podle jazykového nastavení
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: form.class.php 434 2008-12-30 00:35:31Z jakub $ VVE3.3.0 $Revision: 434 $
- * @author		$Author: jakub $ $Date: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
- *				$LastChangedBy: jakub $ $LastChangedDate: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
- * @abstract 	Třída pro obsluhu formulářových prvků
- * @todo		Dodělat další validace, implementovat ostatní prvky formulářů
+ * @version    	$Id:$ VVE3.5.0 $Revision: $
+ * @author        $Author: $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
+ * @abstract      Třída pro obsluhu formulářových prvků
+ * @todo          Dodělat další validace, implementovat ostatní prvky formulářů
  */
 class Form {
  /**
@@ -34,6 +34,7 @@ class Form {
    const INPUT_HIDDEN	= 'inputhidden';
    const INPUT_PASSWORD	= 'inputpasswd';
    const INPUT_CHECKBOX	= 'inputcheckbox';
+   const INPUT_FILE     = 'inputfile';
    const INPUT_TEXTAREA	= 'textarea';
 
  /**
@@ -86,6 +87,15 @@ class Form {
    */
    const ERROR_MISSING = 'missing';
 
+   /**
+	 * Název proměné s originálním názvem souboru
+	 * @var string
+	 */
+	const POST_FILES_ERROR 			= 'error';
+	const POST_FILES_ORIGINAL_NAME	= 'name';
+	const POST_FILES_SIZE 			= 'size';
+	const POST_FILES_TYPE 			= 'type';
+	const POST_FILES_TMP_NAME		= 'tmp_name';
 
   /**
    * Proměná obsahuje, jestli bylo v zadání formuláře chyba
@@ -97,11 +107,11 @@ class Form {
    * Poles chbějícími prvky
    * @deprecated
    */
-   private $errorMessages = array(self::ERROR_MISSING => false);
+//   private $errorMessages = array(self::ERROR_MISSING => false);
 
   /**
-   * Název prvku, ve kterém byla provedena chyba
-   * @var string
+   * Název prvků, ve kterých byla chyba
+   * @var array
    */
    private $errorItems = array();
 
@@ -274,14 +284,29 @@ class Form {
    }
 
   /**
-   * Metody vytváří prvek typu INPUT - TEXT
+   * Metody vytváří prvek typu INPUT - CHECKBOX
    * @param string $name -- Název prvku
    *
    * @return Form
    */
-   public function crInputCheckboxn($name, $obligation = false) {
+   public function crInputCheckboxn($name) {
       $this->formStructure[self::INPUT_CHECKBOX][$name][self::ITEM_NAME] = $name;
       $this->formValues[$name] = false;
+
+      return $this;
+   }
+
+  /**
+   * Metody vytváří prvek typu INPUT - FILE
+   * @param string $name -- Název prvku
+   * @param boolean $obligation -- jestli je zadaný prvek povinný
+   *
+   * @return Form
+   */
+   public function crInputFile($name, $obligation = false) {
+      $this->formStructure[self::INPUT_FILE][$name][self::ITEM_NAME] = $name;
+      $this->formStructure[self::INPUT_FILE][$name][self::ITEM_OBLIGATION] = $obligation;
+      $this->formValues[$name] = null;
 
       return $this;
    }
@@ -538,6 +563,10 @@ class Form {
       if(isset ($this->formStructure[self::INPUT_PASSWORD])){
          $this->fillInInputPassword();
       }
+      //    vyplnění souborových polí
+      if(isset ($this->formStructure[self::INPUT_FILE])){
+         $this->fillInInputFile();
+      }
       // Vyplnění textarea
       if(isset ($this->formStructure[self::INPUT_TEXTAREA])){
          $this->fillInTextArea();
@@ -677,7 +706,7 @@ class Form {
 
          } else {
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$_POST[$this->formPrefix.$inputName], 2);
+               .$inputName, 2);
          }
       }
    }
@@ -701,6 +730,117 @@ class Form {
          } else {
             $this->formValues[$inputName] = false;
          }
+      }
+   }
+
+  /**
+   * Metoda vyplní data z formuláře do pole hodnot s daty
+   * @todo -- impllementovat procházení polí souborů
+   */
+   private function fillInInputFile() {
+      $inputs = $this->formStructure[self::INPUT_FILE];
+      foreach ($inputs as $inputName => $value) {
+         // Jestli byl soubor vůbec odeslán
+         if(isset ($_FILES[$this->formPrefix.$inputName])){
+            // pokud byl odesláno pole souborů
+            if(is_array($_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME])){
+            } else {
+//               kontrola uploadu
+               if (is_uploaded_file($_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME])){
+                  // vytvoření objektu souboru
+                  $file = new File($_FILES[$this->formPrefix.$inputName][self::POST_FILES_ORIGINAL_NAME], null,
+                     $_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME],
+                     $_FILES[$this->formPrefix.$inputName][self::POST_FILES_TYPE],
+                     $_FILES[$this->formPrefix.$inputName][self::POST_FILES_SIZE]);
+                  $this->formValues[$inputName] = $file;
+               } else {
+                  if(!$value[self::ITEM_OBLIGATION] AND $_FILES[$this->formPrefix.$inputName][self::POST_FILES_ERROR] == 4){
+
+                  } else {
+                     $this->createUploadFileError($_FILES[$this->formPrefix.$inputName][self::POST_FILES_ERROR],
+                        $_FILES[$this->formPrefix.$inputName][self::POST_FILES_ORIGINAL_NAME]);
+                  }
+               }
+            }
+
+         } else {
+            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
+               .$inputName, 6);
+         }
+
+         //            if($value[self::ITEM_OBLIGATION]){
+         //
+         //            }
+
+         //            $this->formValues[$inputName] = $file;
+      }
+
+         //      Jestli byl prvek vůbec odeslán
+//         if(isset ($_POST[$this->formPrefix.$inputName])){
+//            //   SOF   Kontrola povinnosti
+//            if($value[self::ITEM_OBLIGATION]){
+//
+//               if(!is_array($_POST[$this->formPrefix.$inputName])){
+//                  if($_POST[$this->formPrefix.$inputName] == null
+//                     OR $_POST[$this->formPrefix.$inputName] == ''){
+//                     $this->addMissingValueError();
+//                     $this->addErrorItem($inputName);
+//                  }
+//               } else {
+//                  $isEmpty = true;
+//                  foreach ($_POST[$this->formPrefix.$inputName] as $key => $variable) {
+//                     if(empty ($variable)){
+//                        unset ($_POST[$this->formPrefix.$inputName][$key]);
+//                     } else {
+//                        $isEmpty = false;
+//                     }
+//                  }
+//               }
+//            }
+//            //  EOF  Kontrola povinnosti
+//            //        data nejsou povinná
+//            $postValue = $_POST[$this->formPrefix.$inputName];
+//
+//            // SOF Validace
+//            if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
+//               $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
+//            }
+//            // EOF Validace
+//
+//            $this->formValues[$inputName] = $postValue;
+//
+//         } else {
+//            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
+//               .$inputName, 5);
+//         }
+//      }
+   }
+
+   /**
+    * Metoda vygeneruje chbovou hlášku pro chybně odeslaný soubor
+    * @param integer $errNumber -- číslo chyby z $_FILES
+    * @param string $fileOriginalName -- původní název souboru
+    */
+   private function createUploadFileError($errNumber, $fileOriginalName) {
+      switch($errNumber){
+         case 0: //no error; possible file attack!
+            $this->errMsg()->addMessage(_('Problém s nahráním souboru ').$fileOriginalName);
+            break;
+         case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
+            $this->errMsg()->addMessage(_('Soubor je příliš ').$fileOriginalName._(' velký'));
+            break;
+         case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
+            $this->errMsg()->addMessage(_('Soubor je příliš ').$fileOriginalName._(' velký'));
+            break;
+         case 3: //uploaded file was only partially uploaded
+            $this->errMsg()->addMessage(_('Soubor ').$fileOriginalName._(' byl nahrán jen částečně'));
+            break;
+         case 4: //no file was uploaded
+            $this->errMsg()->addMessage(_('Soubor nebyl vybrán'));
+            break;
+         default: //a default error, just in case!  :)
+            $this->errMsg()->addMessage(_('Problém s nahráním souboru ').$fileOriginalName);
+            break;
       }
    }
 

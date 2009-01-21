@@ -75,6 +75,12 @@ class AppCore {
     const ENGINE_MODELS_DIR = 'models';
 
     /**
+     * Adresář s pluginy filesystému
+     * @var string
+     */
+    const ENGINE_FILESYSTEM_DIR = 'Filesystem';
+
+    /**
      * Kešovací adresář pro dočasné soubory
      * @var string
      */
@@ -628,6 +634,10 @@ class AppCore {
             //			Ja-li načítán validátor
             else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_VALIDATORS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
                 require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_VALIDATORS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
+            }
+            //			Ja-li načítán filesystem plugin
+            else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_FILESYSTEM_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
+                require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_FILESYSTEM_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
             }
             //			Je-li načítan model modulu
             else if(AppCore::getSelectedModule() != null AND strpos($className, 'model') !== false){

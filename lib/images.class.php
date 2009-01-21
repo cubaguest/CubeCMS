@@ -6,8 +6,11 @@
  * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: images.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @author        Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro práci s obrázky
+ *
+ * @deprecated -- odstranit, protože se používá třída ImageFile která pracuje
+ * i se souborem
  */
 
 class Images {
