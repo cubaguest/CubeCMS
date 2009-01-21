@@ -10,3 +10,7 @@
    - Přepracována práce z actions a routes modulů
    - nyní možnost routy a článku zároveň
    - články jsou generovány bez url klíče, pouze pomocí názvu a id
+   - sjednocení knihoven pro práci se soubory
+   - přepracování práce se soubory typu Images a Zip.
+   - integrace formulářového validátoru
+   - přidání specialního adresáře pro knihovny pracující se souborovým systémem
