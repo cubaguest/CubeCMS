@@ -5,9 +5,9 @@
  * změnu velikost a změnu formátu obrázku.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision:$
- * @author        $Author: $ $Date: $
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id: imagefile.class.php 7 2009-01-21 21:32:52Z jakub $ VVE3.5.0 $Revision: 7 $
+ * @author        $Author: jakub $ $Date: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
+ *                $LastChangedBy: jakub $ $LastChangedDate: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
  * @abstract 		Třída pro práci s obrázky
  */
 
@@ -55,12 +55,6 @@ class ImageFile extends File {
    private $newImageHeight = 0;
 
    /**
-    * Proměná obsahuje název nového obrázku
-    * @var string
-    */
-   //   private $newImageName = null;
-
-   /**
     * proměná s nastavenou kvalitou pro výstup JPEG
     * @var int
     */
@@ -80,30 +74,27 @@ class ImageFile extends File {
 
    /**
     * Konstruktor třídy
-    * @param Messages $errors -- objekt chybových hlášek
-    * @param string -- název souboru
-    * @param boolean -- jestli mají být hlášky hlášeny nebo ne
+    * @param string/File $file -- název souboru nebo objekt typu File
+    * @param string $dir -- (option) název adresáře se souborem může být uveden
+    * v názvu souboru
     */
-   function __construct($file, $dir = null, $reportErrors = true){
-
+   function __construct($file, $dir = null){
       if($file instanceof File){
          parent::__construct($file);
       } else {
          parent::__construct($file, $dir);
       }
-
-      $this->reportErrors = $reportErrors;
-
-      $this->checkIsImage();
    }
 
    /**
     * Matedoa zjišťuje, jestli je daný soubor obrázek
-    *
+    * @param boolean $reportErrors -- jestli mají být vyvolány chybové hlášky
     * @return boolean -- true pokud se jedná o obrázek se kterým umí pracovat
     */
-   public function isImage() {
+   public function isImage($reportErrors = true) {
+      $this->reportErrors = $reportErrors;
 
+      $this->checkIsImage();
       return $this->isImage;
    }
 
@@ -153,26 +144,6 @@ class ImageFile extends File {
    public function setCrop($crop) {
       $this->cropNewImage = $crop;
    }
-
-
-   /**
-    * Metoda nastaví jméno nového obrázku
-    *
-    * @param string -- název nového obrázku
-    */
-   public function setImageName($name) {
-      $this->newImageName = $name;
-   }
-
-   /**
-    * Metoda vrací název uloženého obrázku
-    *
-    * @return string -- název obrázku
-    */
-   public function getNewImageName() {
-      return $this->newImageName;
-   }
-
 
    /**
     * Metoda uloží obrázek ve stejném formátu, v jakém byl zadán
@@ -238,25 +209,6 @@ class ImageFile extends File {
    public function savePngImage($dstDir, $width = null, $heigh = null, $newName = null) {
       $this->saveImage($dstDir, $width, $heigh, $newName, IMAGETYPE_GIF);
    }
-
-   /**
-    * Metoda ověřuje, zda-li nový obrázek již není uložen, popřípadě vytváří nový název
-    *
-    * @param string -- adresář s obrázkem
-    * @param string -- název obrázku
-    */
-   //   private function checkNewImageName($dir, $file) {
-   //      $files = new Files();
-   //
-   //      //		kontrola adresáře
-   //      $files->checkDir($dir);
-   //
-   //      //		kontrola unikátnosti jména
-   //      $this->newImageName = $files->createNewFileName($file, $dir);
-   //      unset($files);
-   //      return $this->newImageName;
-   //   }
-
 
    /**
     * Metoda rozhoduje ze kterého typu obrázku se bude načítat obrázku

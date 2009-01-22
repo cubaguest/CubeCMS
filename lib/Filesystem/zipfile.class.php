@@ -9,6 +9,8 @@
  * @abstract		Třída pro práci se ZIP soubory
  */
 class ZipFile extends File {
+   const MIME_ZIP_TYPE = 'application/zip';
+
    /**
 	 * Pole s typy zip souborů
 	 * @var array
@@ -18,12 +20,26 @@ class ZipFile extends File {
 										"zip3" => 'application/x-zip');
 
    /**
+    * Konstruktor třídy
+    * @param string/File $file -- název souboru nebo objekt typu File
+    * @param string $dir -- (option) název adresáře se souborem může být uveden
+    * v názvu souboru
+    */
+   function __construct($file, $dir = null){
+      if($file instanceof File){
+         parent::__construct($file);
+      } else {
+         parent::__construct($file, $dir);
+      }
+   }
+
+   /**
 	 * Metoda zjišťuje, zdali je uploadovaný soubor zip soubor
 	 * @param string -- soubor, který se zjišťuje
 	 *
 	 */
 	public function isZipFile() {
-		if(in_array($this->getMimeType(), $this->zipExtensionsArray)){
+      if($this->getMimeType() == self::MIME_ZIP_TYPE){
 			return true;
 		} else {
 			return false;
@@ -33,29 +49,30 @@ class ZipFile extends File {
     /**
 	 * Rozbali zip soubor do cílového adresáře
 	 *
-	 * @param   string --	Cesta k zip souboru
 	 * @param   string --	Cesta, kam se zip soubor rozbalí, (false rozbalí soubor do aktuálního adresáře se zip souborem)
 	 * @param   boolean --	Jestli má být zip soubor rozbalen do adresáře se stejným jménem
 	 * @param   boolean --	Jestli mají být soubory přepsány
 	 *
 	 * @return  boolean     Succesful or not
 	 */
-	public function unZip($src_file, $dest_dir=false, $create_zip_name_dir=true, $overwrite=true)
+	public function unZip($dest_dir=false, $create_zip_name_dir=true, $overwrite=true)
 	{
 		if(function_exists("zip_open"))
 		{
-			if(!is_resource(zip_open($src_file)))
+         if(!is_resource(zip_open($this->getNameInput(true))))
 			{
-				$src_file=dirname($_SERVER['SCRIPT_FILENAME'])."/".$src_file;
+				$src_file=dirname($_SERVER['SCRIPT_FILENAME'])."/".$this->getNameInput();
 			}
-
-			if (is_resource($zip = zip_open($src_file)))
+         $zip = zip_open($this->getNameInput(true));
+			if (is_resource($zip))
 			{
 				$splitter = ($create_zip_name_dir === true) ? "." : "/";
-				if ($dest_dir === false) $dest_dir = substr($src_file, 0, strrpos($src_file, $splitter))."/";
+				if ($dest_dir === false) $dest_dir = substr($src_file, 0, strrpos($this->getNameInput(true), $splitter))."/";
 
 				// Create the directories to the destination dir if they don't already exist
-				$this->createDirs($dest_dir);
+            $dirsObj = new Dir();
+            $dirsObj->checkDir($dest_dir);
+            unset ($dirsObj);
 
 				// For every file in the zip-packet
 				while ($zip_entry = zip_read($zip))
@@ -101,7 +118,7 @@ class ZipFile extends File {
 			}
 			else
 			{
-				//        echo "No Zip Archive Found.";
+            new CoreException(_('Zip archív ').$this->getNameInput(true)._(' neexistuje'));
 				return false;
 			}
 
@@ -109,10 +126,10 @@ class ZipFile extends File {
 		}
 		else
 		{
-			if(version_compare(phpversion(), "5.2.0", "<"))
-			$infoVersion="(use PHP 5.2.0 or later)";
-
-			new CoreException(_('Je potřeba PHP zip rozšíření pro práci se zip archívy ').$infoVersion);
+			if(version_compare(phpversion(), "5.2.0", "<")){
+            $infoVersion=_(" (použijte PHP 5.2.0 nebo vyšší)");
+         }
+			new CoreException(_('Je potřeba PHP zip rozšíření pro práci se zip archívy').$infoVersion);
 		}
 	}
 }

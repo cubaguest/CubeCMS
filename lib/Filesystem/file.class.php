@@ -257,19 +257,6 @@ class File {
    }
 
    /**
-    * Metoda vrací nový název souboru pokud existuje jinak starý
-    *
-    * @return string -- název souboru
-    */
-   public function getNewName() {
-      if($this->fileNewName == null){
-         return $this->fileNameOutput;
-      } else {
-         return $this->fileNewName;
-      }
-   }
-
-   /**
     * Metoda vrací mime typ souboru
     * @todo nutná portace na PECL rozšíření o informací o souboru
     *
