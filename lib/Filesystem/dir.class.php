@@ -65,7 +65,6 @@ class Dir {
       }
 
       if(mkdir($path, 0777, true)){
-//         $return = mkdir($path, 0777, true);
          if(chmod($path, 0777)){
             return true;
          } else {

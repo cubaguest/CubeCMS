@@ -4,7 +4,7 @@
  * Třída poskytuje základní metody pro práci se soubory,
  * zjišťování mime typu, ukládání do filesystému, kopírování, mazání.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @copyright  	Copyright (c) 2009 Jakub Matas
  * @version    	$Id: $ VVE3.5.0 $Revision:$
  * @author        $Author: $ $Date: $
  *                $LastChangedBy: $ $LastChangedDate: $
@@ -297,23 +297,20 @@ class File {
     */
    public function copy($dstDir, $fileName = null) {
       // Kontrola adresáře
-      if(!file_exists($dstDir)){
-         $dirObj = new Dir();
-         $dirObj->createDirs($dstDir);
-         unset ($dirObj);
-		}
+      $dirObj = new Dir();
+      $dirObj->checkDir($dstDir);
+      unset ($dirObj);
 
-//      Kontrola jména
+      // Kontrola jména
       $newFile = $this->creatUniqueName($dstDir);
       $this->fileNewName = $newFile;
 
       if($this->exist()){
          $return = copy($this->getNameInput(true), $dstDir.$newFile);
-         chmod($dstDir.$fileName, 0666);
+         chmod($dstDir.$newFile, 0666);
       } else {
          $return = false;
       }
-
 		return $return;
    }
 
