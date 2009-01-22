@@ -165,55 +165,41 @@ class UserImagesEplugin extends Eplugin {
 	 * Metoda kontroluje, jestli byl odeslán soubor, pokud ano je soubor nahrán a uložen do db
 	 */
 	private function checkSendImages() {
-		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_SEND])){
-			$uploadFile = new UploadFiles($this->errMsg());
-			
-			$uploadFile->upload(self::FORM_PREFIX.self::FORM_NEW_FILE);
-			
-//			podařilo se soubor nahrát
-			if($uploadFile->isUploaded()){
-				$image = new Images($this->errMsg(), $uploadFile->getTmpName());
-				if($image->isImage()){
-					//				tak vytvoříme nový název
-					$file = new Files();
-					$fileName = $file->createNewFileName($uploadFile->getOriginalName(), AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/');
-					$copied = $file->copyAs($uploadFile->getTmpName(), AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/', $fileName);
+      $form = new Form(self::FORM_PREFIX);
+      $form->crSubmit(self::FORM_BUTTON_SEND)
+      ->crInputFile(self::FORM_NEW_FILE, true);
 
-					$fileSize = filesize(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$fileName);
+      if($form->checkForm()){
+         $file = $form->getValue(self::FORM_NEW_FILE);
+         $imageFile = new ImageFile($file);
 
-//					Vytvoříme miniaturu
-					$image = new Images($this->errMsg(), $uploadFile->getTmpName());
-					$image->setImageName($uploadFile->getOriginalName());
-					$image->saveImage(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/', self::THUMBNAIL_HEIGHT, self::THUMBNAIL_HEIGHT);
-					
-					$sqlInsert = $this->getDb()->insert()->into(self::DB_TABLE_USER_IMAGES)
-														->colums(self::COLUM_ID_ARTICLE,
-															self::COLUM_ID_ITEM,
-															self::COLUM_ID_USER,
-															self::COLUM_FILE,
-															self::COLUM_WIDTH,
-															self::COLUM_HEIGHT,
-															self::COLUM_SIZE,
-															self::COLUM_TIME)
-														->values($this->idArticle,
-															$this->getModule()->getId(),
-															$this->getRights()->getAuth()->getUserId(),
-															$fileName,
-															$image->getOriginalWidth(),
-															$image->getOriginalHeight(),
-															$fileSize,
-															time());
-						
-					if($copied AND $this->getDb()->query($sqlInsert)){
-						$this->infoMsg()->addMessage(_('Obrázek byl uložen'));
-						$this->getLinks()->reload();
-					} else {
-						new CoreException(_('Obrázek se nepodařilo zkopírovat nebo uložit do databáze'));
-					}
-				}
-			}
-			
-		};
+         if($imageFile->isImage()){
+            $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR
+            .DIRECTORY_SEPARATOR.self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
+
+            // kopírování originálu
+            $copy = $imageFile->copy($dir);
+            // uložení změnšeniny
+            $save = $imageFile->saveImage($dir.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR,
+               self::THUMBNAIL_WIDTH, self::THUMBNAIL_HEIGHT);
+
+            $sqlInsert = $this->getDb()->insert()->into(self::DB_TABLE_USER_IMAGES)
+						->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
+									self::COLUM_ID_USER, self::COLUM_FILE,	self::COLUM_WIDTH,
+									self::COLUM_HEIGHT, self::COLUM_SIZE, self::COLUM_TIME)
+						->values($this->idArticle,	$this->getModule()->getId(),
+                     $this->getRights()->getAuth()->getUserId(),$imageFile->getName(),
+                     $imageFile->getOriginalWidth(), $imageFile->getOriginalHeight(),
+                     $imageFile->getFileSize(), time());
+
+            if($copy AND $save AND $this->getDb()->query($sqlInsert)){
+               $this->infoMsg()->addMessage(_('Obrázek byl uložen'));
+               $this->getLinks()->reload();
+            } else {
+               new CoreException(_('Obrázek se nepodařilo uložit'),1);
+            }
+         }
+      }
 	}
 	
 	/**
@@ -229,26 +215,26 @@ class UserImagesEplugin extends Eplugin {
 		$file = $this->getDb()->fetchObject($sqlSelect);
 		
 		if($file != null){
-			$deleted = true;
-			$files = new Files();
-			if($files->exist(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.$file->{self::COLUM_FILE})){
-				$deleted = $files->deleteFile(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/', $file->{self::COLUM_FILE});
-			}
-			
-			if($files->exist(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/'.$file->{self::COLUM_FILE})){
-				$deleted = $files->deleteFile(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USERIMAGES_FILES_DIR.'/'.self::USERIMAGES_SMALL_FILES_DIR.'/', $file->{self::COLUM_FILE});
-			}
+         $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
+         $dirSmall = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR;
 
-//			vymazání z db
-			$sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_IMAGES)
+         $imageFile = new File($file->{self::COLUM_FILE}, $dir);
+         $imageFileSmall = new File($file->{self::COLUM_FILE}, $dirSmall);
+
+         if($imageFile->remove() AND $imageFileSmall->remove()){
+//            vymazání z db
+            $sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_IMAGES)
 											  ->where(self::COLUM_ID.' = '.$id);
-			
-			if($deleted AND $this->getDb()->query($sqlDel)){
-				$this->infoMsg()->addMessage(_('Obrázek byl smazán'));
-				$this->getLinks()->reload();								  
-			} else {
-				new CoreException(_('Obrázek se nepodařilo vymazaz z adresáře nebo z db'));	
-			}
+
+            if($this->getDb()->query($sqlDel)){
+               $this->infoMsg()->addMessage(_('Obrázek byl smazán'));
+               $this->getLinks()->reload();
+            } else {
+               new CoreException(_('Obrázek se nepodařilo vymazaz'), 2);
+            }
+         }
 		} else {
 			new CoreException(_('Požadovaný obrázek neexistuje'));
 		}
@@ -258,13 +244,13 @@ class UserImagesEplugin extends Eplugin {
 	 * Metoda kontroluje, jestli nebyl soubor smazán
 	 */
 	private function checkDeleteImage() {
-		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_DELETE])){
-			if(!is_numeric($_POST[self::FORM_PREFIX.self::FORM_USERIMAGE_ID])){
-				new CoreException(_('Nebylo zadáno správné ID obrázku'));
-			} else {
-				$this->deleteUserImage(htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_USERIMAGE_ID]));
-			}
-		}
+      $form = new Form(self::FORM_PREFIX);
+      $form->crInputHidden(self::FORM_USERIMAGE_ID, true)
+      ->crSubmit(self::FORM_BUTTON_DELETE);
+
+      if($form->checkForm()){
+         $this->deleteUserImage($form->getValue(self::FORM_USERIMAGE_ID));
+      }
 	}
 	
 	/**

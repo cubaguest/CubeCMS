@@ -5,8 +5,9 @@
  * teké obstarává jejich výpis pomocí vlastní šablony to článku. 
  * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: userfiles.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.5.0 $Revision:$
+ * @author        $Author: $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída Epluginu pro práci se soubory, přikládanými do stránky
  * 
  * @todo dodělat mazání souborů z celého článku
@@ -130,7 +131,7 @@ class UserFilesEplugin extends Eplugin {
 	 *
 	 */
 	public function runOnlyEplugin() {
-		echo "jede";
+		
 	}
 	
 	
@@ -160,44 +161,31 @@ class UserFilesEplugin extends Eplugin {
 	 * Metoda kontroluje, jestli byl odeslán soubor, pokud ano je soubor nahrán a uložen do db
 	 */
 	private function checkSendFile() {
-		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_SEND])){
-			$uploadFile = new UploadFiles($this->errMsg());
-			
-			$uploadFile->upload(self::FORM_PREFIX.self::FORM_NEW_FILE);
-			
-//			podařilo se soubor nahrát
-			if($uploadFile->isUploaded()){
-//				tak vytvoříme nový název
-				$file = new Files();
-				$fileName = $file->createNewFileName($uploadFile->getOriginalName(), AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/');
-				$copied = $file->copyAs($uploadFile->getTmpName(), AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $fileName);
-				
-				$fileSize = filesize(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$fileName);
-				
-				$sqlInsert = $this->getDb()->insert()->into(self::DB_TABLE_USER_FILES)
-								  ->colums(self::COLUM_ID_ARTICLE,
-								  		   self::COLUM_ID_ITEM,
-								  		   self::COLUM_ID_USER,
-								  		   self::COLUM_FILE,
-								  		   self::COLUM_SIZE,
-								  		   self::COLUM_TIME)
-								  ->values($this->idArticle,
-								  		   $this->getModule()->getId(),
-								  		   $this->getRights()->getAuth()->getUserId(),
-								  		   $fileName,
-								  		   $fileSize,
-								  		   time());
-								  		   
-				if($copied AND $this->getDb()->query($sqlInsert)){
-					$this->infoMsg()->addMessage(_('Soubor byl uložen'));
-					$this->getLinks()->reload();	
-				} else {
-					new CoreException(_('Soubor se nepodařilo zkopírovat nebo uložit do databáze'));
-				}
-				
-			}
-			
-		};
+      $sendForm = new Form(self::FORM_PREFIX);
+      $sendForm->crSubmit(self::FORM_BUTTON_SEND)
+      ->crInputFile(self::FORM_NEW_FILE, true);
+
+      if($sendForm->checkForm()){
+         $file = $sendForm->getValue(self::FORM_NEW_FILE);
+
+         if($file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/')){
+            $sqlInsert = $this->getDb()->insert()->into(self::DB_TABLE_USER_FILES)
+								  ->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
+								  		   self::COLUM_ID_USER, self::COLUM_FILE,
+								  		   self::COLUM_SIZE, self::COLUM_TIME)
+								  ->values($this->idArticle, $this->getModule()->getId(),
+								  		   $this->getRights()->getAuth()->getUserId(), $file->getName(),
+								  		   $file->getFileSize(), time());
+
+            if($this->getDb()->query($sqlInsert)){
+               $this->infoMsg()->addMessage(_('Soubor byl uložen'));
+               $this->getLinks()->reload();
+            } else {
+               new CoreException(_('Soubor se nepodařilo uložit'),1);
+            }
+         }
+
+      }
 	}
 	
 	/**
@@ -213,14 +201,14 @@ class UserFilesEplugin extends Eplugin {
 		$file = $this->getDb()->fetchObject($sqlSelect);
 		
 		if($file != null){
-			$files = new Files();
-			$deleted = $files->deleteFile(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file->{self::COLUM_FILE});
+         $dir = AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/';
+			$file = new File($file->{self::COLUM_FILE}, $dir);
 			
 //			vymazání z db
 			$sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_FILES)
 											  ->where(self::COLUM_ID.' = '.$id);
 			
-			if($deleted AND $this->getDb()->query($sqlDel)){
+         if($file->remove() AND $this->getDb()->query($sqlDel)){
 				$this->infoMsg()->addMessage(_('Soubor byl smazán'));
 				$this->getLinks()->reload();								  
 			} else {
@@ -235,13 +223,20 @@ class UserFilesEplugin extends Eplugin {
 	 * Metoda kontroluje, jestli nebyl soubor smazán
 	 */
 	private function checkDeleteFile() {
-		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_DELETE])){
-			if(!is_numeric($_POST[self::FORM_PREFIX.self::FORM_USERFILE_ID])){
-				new CoreException(_('Nebylo zadáno správné ID souboru'));
-			} else {
-				$this->deleteUserFile(htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_USERFILE_ID]));
-			}
-		}
+      $form = new Form(self::FORM_PREFIX);
+      $form->crSubmit(self::FORM_BUTTON_DELETE)
+      ->crInputHidden(self::FORM_USERFILE_ID, true);
+      if($form->checkForm()){
+         $this->deleteUserFile($form->getValue(self::FORM_USERFILE_ID));
+      }
+
+//		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_DELETE])){
+//			if(!is_numeric($_POST[self::FORM_PREFIX.self::FORM_USERFILE_ID])){
+//				new CoreException(_('Nebylo zadáno správné ID souboru'));
+//			} else {
+//				$this->deleteUserFile(htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_USERFILE_ID]));
+//			}
+//		}
 	}
 	
 	
