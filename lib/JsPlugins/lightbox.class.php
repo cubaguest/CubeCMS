@@ -30,16 +30,15 @@ class LightBox extends JsPlugin {
 	}
 	
 	protected function initFiles() {
+//      $this->addDependJsPlugin(new JQuery()); // závislost na jquery
 		//		Přidání css stylu
-		$this->addCssFile('lightbox.css');
+		$this->addCssFile('jquery.lightbox-0.5.css');
 				
 		//		Přidání js soubrů pluginu
-		$this->addJsFile(new JsPluginJsFile("prototype.js"));
-		$scriptaculous = new JsPluginJsFile("scriptaculous.js");
-		$scriptaculous->setParam('load', 'effects');
-		$this->addJsFile($scriptaculous);
-		$this->addJsFile(new JsPluginJsFile("lightbox.js"));
-		
+		$this->addJsFile(new JsPluginJsFile("jquery.lightbox-0.5.pack.js"));
+//		$this->addJsFile(new JsPluginJsFile("jquery.lightbox-0.5.js"));
+
+  
 		//		Výchozí js soubor pluginu
 //		$this->setDefaultSettingJsFile(new JsPluginJsFile("tiny_mce_default.js"));
 		

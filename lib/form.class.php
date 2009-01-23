@@ -7,9 +7,9 @@
  * Umožňuje také generování podle jazykového nastavení
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id:$ VVE3.5.0 $Revision: $
- * @author        $Author: $ $Date: $
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id: form.class.php 7 2009-01-21 21:32:52Z jakub $ VVE3.5.0 $Revision: 7 $
+ * @author        $Author: jakub $ $Date: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
+ *                $LastChangedBy: jakub $ $LastChangedDate: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
  * @abstract      Třída pro obsluhu formulářových prvků
  * @todo          Dodělat další validace, implementovat ostatní prvky formulářů
  */
@@ -744,6 +744,34 @@ class Form {
          if(isset ($_FILES[$this->formPrefix.$inputName])){
             // pokud byl odesláno pole souborů
             if(is_array($_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME])){
+               $someFile = false;
+               $filesArr = $_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME];
+               // inicializace pole
+               $this->formValues[$inputName] = array();
+               // Procházení pole souborů
+               foreach ($filesArr as $key => $fileTmpName) {
+                  // pokud byl soubor špatně odeslán
+                  if($_FILES[$this->formPrefix.$inputName][self::POST_FILES_ERROR][$key] != 0 AND
+                     $_FILES[$this->formPrefix.$inputName][self::POST_FILES_ERROR][$key] != 4){
+                     $this->createUploadFileError($_FILES[$this->formPrefix.$inputName][self::POST_FILES_ERROR][$key],
+                        $_FILES[$this->formPrefix.$inputName][self::POST_FILES_ORIGINAL_NAME][$key]);
+                  } else if($fileTmpName != null){
+                     $file = new File($_FILES[$this->formPrefix.$inputName][self::POST_FILES_ORIGINAL_NAME][$key], null,
+                        $_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME][$key],
+                        $_FILES[$this->formPrefix.$inputName][self::POST_FILES_TYPE][$key],
+                        $_FILES[$this->formPrefix.$inputName][self::POST_FILES_SIZE][$key]);
+                     // uložení do pole s hodnotami
+                     $this->formValues[$inputName][$key] = $file;
+                     $someFile = true;
+                  }
+               }
+
+               // Pokud je prvek povinný, musí být zadán alespoň jeden soubor
+               if($value[self::ITEM_OBLIGATION] AND !$someFile){
+                  $this->errMsg()->addMessage(_('Nebyl nahrán ani jeden soubor'));
+                  $this->addErrorItem($inputName);
+               }
+
             } else {
 //               kontrola uploadu
                if (is_uploaded_file($_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME])){

@@ -5,11 +5,13 @@
  * zpráva jsou většinou vypisovány na výstup nebo ukládány.
  * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: messages.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.5.0 $Revision: $
+ * @author        $Author: $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 	Třída pro obsluhu hlášek
- * //TODO refaktoring
- * //TODO implementovat ukládání do souboru
+ * 
+ * @TODO refaktoring
+ * @TODO implementovat ukládání do souboru
  */
 
 class Messages {
@@ -103,16 +105,28 @@ class Messages {
 	 * @param String -- text zpravy
 	 * @param boolean -- jesli se má zpráva uložit
 	 */
-	function addMessage($messageText, $save = false){
-		if($this->defaultSaveMessages OR $save){
+	function addMessage($messageText, $save = null){
+      if($save === true){
          if(!in_array($messageText, $this->messagesForSave)){
             array_push($this->messagesForSave, $messageText);
          }
-		} else {
+      } else if($save === false){
          if(!in_array($messageText, $this->messages)){
             array_push($this->messages, $messageText);
          }
-		}
+      } else {
+         if($this->defaultSaveMessages){
+            if(!in_array($messageText, $this->messagesForSave)){
+               array_push($this->messagesForSave, $messageText);
+            }
+         } else {
+            if(!in_array($messageText, $this->messages)){
+               array_push($this->messages, $messageText);
+            }
+         }
+      }
+
+		
 	}
 
 	/**

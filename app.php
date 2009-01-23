@@ -298,6 +298,7 @@ class AppCore {
 
     /**
      * Konstruktor objektu AppCore
+     * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
      */
     private function __construct(){
         //		Definice globálních konstant
@@ -311,7 +312,13 @@ class AppCore {
         /*
          * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
          */
-        $this->setAppMainDir(realpath(dirname(__FILE__)));
+        $direName = dirname(__FILE__);
+        $realPath = realpath($direName);
+        
+//        echo '$direName: '.$direName."<br>";
+//        echo '$realPath: '.$realPath."<br>";
+        
+        $this->setAppMainDir($realPath);
 
         //	přidání adresáře pro načítání knihoven
         set_include_path('./lib/' . PATH_SEPARATOR . get_include_path());

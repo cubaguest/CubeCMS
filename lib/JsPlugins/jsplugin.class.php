@@ -174,13 +174,22 @@ abstract class JsPlugin {
 		array_push($this->cssFilesArray, $cssFile);
 	}
 	
+   /**
+    * Metoda přidá JsPlugin do závislosti
+    * @param JsPlugin $jsplugin -- objekt JsPluginu 
+    */
+   final protected function addDependJsPlugin(JsPlugin $jsplugin) {
+      echo "<pre>";
+      print_r($jsplugin->getAllJsFiles());
+      echo "</pre>";
+   }
+
 	/**
 	 * Metoda vrací pole všech Js souborů pluginu
 	 *@return array -- pole js souborů
 	 */
 	final public function getAllJsFiles()
 	{
-		
 		return $this->jsFilesArray;
 	}
 	
