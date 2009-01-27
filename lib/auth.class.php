@@ -257,7 +257,7 @@ class Auth {
 			
 					
 			$link = new Links(true);
-			$link->category()->action()->article()->params()->reload();
+         $link->category()->action()->article()->rmParam()->reload();
 			
 		}
 		
