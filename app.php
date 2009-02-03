@@ -1299,6 +1299,7 @@ class AppCore {
     public function selectCategory() {
         Category::factory($this->auth);
         $this->assignVarToTpl("MAIN_CATEGORY_TITLE", Category::getLabel());
+        $this->assignVarToTpl("MAIN_CATEGORY_ID", Category::getId());
     }
 
     public function assignCoreErrorsToTpl() {
