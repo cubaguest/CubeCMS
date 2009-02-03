@@ -5,9 +5,9 @@
  * změnu velikost a změnu formátu obrázku.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: imagefile.class.php 7 2009-01-21 21:32:52Z jakub $ VVE3.5.0 $Revision: 7 $
- * @author        $Author: jakub $ $Date: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
- *                $LastChangedBy: jakub $ $LastChangedDate: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
+ * @version    	$Id: imagefile.class.php 15 2009-01-30 16:45:22Z jakub $ VVE3.5.0 $Revision: 15 $
+ * @author        $Author: jakub $ $Date: 2009-01-30 16:45:22 +0000 (Pá, 30 led 2009) $
+ *                $LastChangedBy: jakub $ $LastChangedDate: 2009-01-30 16:45:22 +0000 (Pá, 30 led 2009) $
  * @abstract 		Třída pro práci s obrázky
  */
 
@@ -110,8 +110,13 @@ class ImageFile extends File {
          $this->imageWidth = $imageProperty[0];
          $this->imageHeight = $imageProperty[1];
          $this->imageType = $imageProperty[2];
-
-         if($this->imageType == null){
+         /*
+          * kvůli flashi je tady vyjímka protože flash se zpracovává v flashfile
+          * a nelze mu měniti velikost ani jej resamplovat
+          *
+          * Flash má typ obrázku 4
+          */
+         if($this->imageType == null OR $this->imageType == IMAGETYPE_SWF){
             $this->isImage = false;
             if($this->reportErrors){
                $this->errMsg()->addMessage(_('Zadaný soubor není podporovaný obrázek'));

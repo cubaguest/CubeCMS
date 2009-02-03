@@ -70,7 +70,7 @@ class File {
     * Pole s MIME typy
     * @var array
     */
-   private $mimeTypes = array(
+   protected $mimeTypes = array(
 
             'txt' => 'text/plain',
             'htm' => 'text/html',
