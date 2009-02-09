@@ -33,4 +33,5 @@
 		<images>images</images>
 		<images_lang>langs</images_lang></dirs>
 	<DEBUG_LEVEL>2</DEBUG_LEVEL>
-	<face>default</face></config>
+	<face>default</face>
+</config>

@@ -312,8 +312,9 @@ class AppCore {
         /*
          * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
          */
-        $direName = dirname(__FILE__);
-        $realPath = realpath($direName);
+        //$direName = dirname(__FILE__); // OLD version + dává někdy špatný výsledek
+        //$realPath = realpath($direName); // OLD version + dává někdy špatný výsledek
+        $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
         
 //        echo '$direName: '.$direName."<br>";
 //        echo '$realPath: '.$realPath."<br>";
