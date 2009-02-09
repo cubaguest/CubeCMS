@@ -20,7 +20,7 @@ class NewsPanel extends Panel {
 	 * Počet novinek v panelu
 	 * @var integer
 	 */
-	const NUMBER_OF_NEWS = 5;
+	const PARAM_NUMBER_OF_NEWS = 'scrollpanel';
 
 	/**
 	 * Název proměné s linkem na detail
@@ -52,7 +52,7 @@ class NewsPanel extends Panel {
                 .")", self::COLUMN_ID_NEW))
 			->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId())
 			->where(self::COLUMN_NEWS_DELETED." = ".(int)false)
-			->limit(0,self::NUMBER_OF_NEWS)
+         ->limit(0,$this->getModule()->getParam(self::PARAM_NUMBER_OF_NEWS))
 			->order(self::COLUMN_TIME, 'desc');
 											
 		

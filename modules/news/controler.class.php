@@ -40,6 +40,12 @@ class NewsController extends Controller {
    */
    const GET_ALL_NEWS = 'all';
 
+   /**
+    * Parametr s počtem novinek na stránku
+    * @var string
+    */
+   const PARAM_NUM_NEWS = 'scroll';
+
   /**
    * Pole s počty zobrazených novinek
    * @var array
@@ -66,7 +72,7 @@ class NewsController extends Controller {
             $scroll->setCountRecordsOnPage($listNews->getCountNews());
          }
       } else {
-         $scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
+         $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_NEWS));
       }
 
       $scroll->setCountAllRecords($listNews->getCountNews());
