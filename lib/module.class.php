@@ -5,9 +5,10 @@
  * např. použité databázové tabulky modulu, adresáře, a některé ostatní parametry, 
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: module.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro obsluhu modulů v kategorii
+ * @version    	$Id: $ VVE3.5.0 $Revision: $
+ * @author 		$Author: $ $Date:$
+ *              $LastChangedBy: $ $LastChangedDate: $
+ * @abstract 	Třída pro obsluhu modulů v kategorii
  */
 
 class Module {
@@ -67,12 +68,6 @@ class Module {
 	private $dataDir = null;
 	
 	/**
-	 * Proměná obsahuje počet záznamů na stránce pro scrollery
-	 * @var integer
-	 */
-	private $recordsOnPage = 0;
-	
-	/**
 	 * Konstruktor třídy pro práci s modulem
 	 *
 	 * @param integer -- id modulu
@@ -91,7 +86,7 @@ class Module {
 		$this->setParams($moduleObject->params);
 		$this->setLabel($moduleObject->label);
 		$this->setAlt($moduleObject->alt);
-		$this->setRecordsOnPage($moduleObject->scroll);
+//		$this->setRecordsOnPage($moduleObject->scroll);
 	}
 
 	/**
@@ -203,26 +198,6 @@ class Module {
 	}
 
 	/**
-	 * Funkce nastavi počet záznamů na stránce
-	 *
-	 * @param integer -- počet záznamů
-	 */
-	function setRecordsOnPage($countRecords)
-	{
-		$this->recordsOnPage = $countRecords;
-	}
-
-	/**
-	 * Funkce vraci počet záznamů na stránce
-	 *
-	 * @return integer -- počet záznamů
-	 */
-	function getRecordsOnPage()
-	{
-		return $this->recordsOnPage;
-	}
-
-	/**
 	 * Funkce nastavi cestu k adresari s daty modulu
 	 *
 	 * @param String -- jmeno adresare
@@ -260,7 +235,11 @@ class Module {
 
 			foreach ($arrayValues as $value) {
 				$tmpArrayValue = explode("=", $value);
-				$this->params[$tmpArrayValue[0]]=$tmpArrayValue[1];
+                if(isset($tmpArrayValue[1]) AND $tmpArrayValue[1] != null){
+                    $this->params[$tmpArrayValue[0]]=$tmpArrayValue[1];
+                } else {
+                    $this->params[$tmpArrayValue[0]]=null;
+                }
 			}
 		}
 	}
@@ -280,7 +259,7 @@ class Module {
 	 *
 	 * @return string -- parametr
 	 */
-	function getSelectParam($param)
+	function getParam($param)
 	{
 		if(isset($this->params[$param])){
 			return $this->params[$param];
