@@ -35,6 +35,7 @@ class Form {
    const INPUT_PASSWORD	= 'inputpasswd';
    const INPUT_CHECKBOX	= 'inputcheckbox';
    const INPUT_FILE     = 'inputfile';
+   const INPUT_DATE     = 'inputdate';
    const INPUT_TEXTAREA	= 'textarea';
 
  /**
@@ -81,6 +82,26 @@ class Form {
   * @var int
   */
    const VALIDATE_TIME = 3;
+
+   /**
+   * Proměná pro zapnutí validace data a datum není omezené
+   * @var int
+   */
+   const VALIDATE_DATE_ISEVERYTIME = 'E';
+
+
+  /**
+   * Proměná pro zapnutí validace data a datum musí být v budoucnosti
+   * @var int
+   */
+   const VALIDATE_DATE_ISFUTURE = 'F';
+
+  /**
+   * Proměná pro zapnutí validace data a datum musí být v minulosti
+   * @var int
+   */
+   const VALIDATE_DATE_ISPAST = 'P';
+
 
   /**
    * Index pro chybějící zprávy
@@ -340,6 +361,27 @@ class Form {
       return $this;
    }
 
+   /**
+   * Metody vytváří prvek typu INPUT - DATE - ze smarty šablony
+   * @param string $name -- Název prvku
+   * @param int/timestamp $validateTime -- (option) jestli má být datum časově omezeno
+    * Zadává se konstanta VALIDATE_DATE_XXX nebo časové razítko
+   * @param bool $down -- (option) pokud je true datum musí být menší než zadané
+   * @return Form
+   */
+   public function crInputDate($name, $validateTime = self::VALIDATE_DATE_ISEVERYTIME, $down = false) {
+
+      $inputArray = array ();
+      $inputArray[self::ITEM_NAME] = $name;
+      $inputArray[self::ITEM_VALIDATION] = $validateTime;
+      $inputArray[self::ITEM_CODE] = $down;
+
+      $this->formStructure[self::INPUT_DATE][$name] = $inputArray;
+
+      $this->formValues[$name] = null;
+
+      return $this;
+   }
 
   /**
    * Metody vytváří prvek typu TEXTAREA
@@ -567,6 +609,10 @@ class Form {
       if(isset ($this->formStructure[self::INPUT_FILE])){
          $this->fillInInputFile();
       }
+      //    vyplnění pole s datem
+      if(isset ($this->formStructure[self::INPUT_DATE])){
+         $this->fillInInputDate();
+      }
       // Vyplnění textarea
       if(isset ($this->formStructure[self::INPUT_TEXTAREA])){
          $this->fillInTextArea();
@@ -599,7 +645,13 @@ class Form {
             if($value[self::ITEM_OBLIGATION]){
                //        pokud je více jazyků, je povinný havní jazyk aplikace
                if($value[self::ITEM_LANGS] AND is_array($_POST[$this->formPrefix.$inputName])){
+                  // Pokud bylo předáno pole prvků s jazyky
+//                  if(!isset ($_POST[$this->formPrefix.$inputName][$oblLang]) AND
+//                     is_array($_POST[$this->formPrefix.$inputName])){
+//
+//                  }
                   //          Pokud nebyla hodnota vyplněna
+//                  else
                   if($_POST[$this->formPrefix.$inputName][$oblLang] == null
                      OR $_POST[$this->formPrefix.$inputName][$oblLang] == ''){
                      $this->addMissingValueError();
@@ -706,7 +758,7 @@ class Form {
 
          } else {
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$inputName, 2);
+               .$this->formPrefix.$inputName, 2);
          }
       }
    }
@@ -793,7 +845,7 @@ class Form {
 
          } else {
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$inputName, 6);
+               .$this->formPrefix.$inputName._(' nebo nebyl odeslán formulář s parametrem "enctype"'), 6);
          }
 
          //            if($value[self::ITEM_OBLIGATION]){
@@ -842,6 +894,38 @@ class Form {
 //               .$inputName, 5);
 //         }
 //      }
+   }
+
+   /**
+   * Metoda vyplní data z formuláře do pole hodnot s datumy
+    *
+    * @todo dodělat validaci
+   */
+   private function fillInInputDate() {
+      $inputs = $this->formStructure[self::INPUT_DATE];
+      foreach ($inputs as $inputName => $value) {
+         if(isset ($_POST[$this->formPrefix.$inputName])){
+            $timestamp = mktime(0, 0, 0, $_POST[$this->formPrefix.$inputName]['Date_Day'],
+               $_POST[$this->formPrefix.$inputName]['Date_Month'],
+               $_POST[$this->formPrefix.$inputName]['Date_Year']);
+
+            // SOF Validace
+//            if($value[self::ITEM_VALIDATION] != self::VALIDATE_DATE_ISEVERYTIME){
+//               $this->validateItem($inputName, $timestamp, $value[self::ITEM_VALIDATION]);
+//            }
+            // EOF Validace
+//            Je odeslán bez hodnoty
+//            if($_POST[$this->formPrefix.$inputName] == 'on'){
+//               $this->formValues[$inputName] = true;
+//            }
+////            Je odeslán s hodnotou
+//            else {
+//               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
+//            }
+         } else {
+            $this->formValues[$inputName] = false;
+         }
+      }
    }
 
    /**
