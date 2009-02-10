@@ -284,6 +284,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
         display: none;
         /*padding-left: 30px;
         padding-right: 30px;*/
+        z-index: 100;
       }
 
       .editbox .contentForm, .editbox .contentForm form input, .editbox .contentForm form{
@@ -318,7 +319,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
         /*height: 9px;*/
         margin:0;
         padding-left: 6px;
-        padding-top: 4px;
+        padding-top: 5px;
       }
       .editbox>.downside {
         display:inline;
@@ -327,7 +328,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
         /*width: 9px;*/
         /*margin:0;*/
         padding-left: 6px;
-        padding-top: 4px;
+        padding-top: 5px;
       }
 
 
