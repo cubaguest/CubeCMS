@@ -80,12 +80,12 @@ class Mysql_Db_Select extends Db_Select {
 	 * Pole s částmi SQL dotazu ze kterých se bude při výstupu generovat samotná SQL dotaz
 	 *
 	 * @var array
-	 */	
+	 */
 	protected $_sqlQueryParts = array();
 
 	protected $_connector = null;
 
-	
+
 	public function __construct(Db $conector) {
 //		inicializace do zakladni podoby;
 		$this->_connector = $conector;
@@ -98,7 +98,7 @@ class Mysql_Db_Select extends Db_Select {
 	 *
 	 * @param string/array -- tabulka ze které se bude vybírat, u pole index označuje alias tabulky
 	 * @param string/array -- sloupce, které se mají vybrat
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
 	public function from($tableArray, $columsArray = "*") {
@@ -125,7 +125,7 @@ class Mysql_Db_Select extends Db_Select {
 	 *
 	 * @param string -- podmínka
 	 * @param string -- typ spojení podmínky (AND, OR) (výchozí je AND)
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 * //TODO dodělat aby se doplňovali magické uvozovky do lauzule
 	 */
@@ -152,12 +152,12 @@ class Mysql_Db_Select extends Db_Select {
 	/**
 	 * Metody vytvoří část pro klauzuli JOIN
 	 * U pole označuje index alias prvku. Pokud je zadáno null, nebude načten žádný sloupec
-	 * 
+	 *
 	 * @param string/array -- název tabulky (alias je generován z prvních dvou písmen) nebo pole kde index je alias tabulky
 	 * @param string -- podmínka v klauzuli ON, je třeba zadat i s aliasy
 	 * @param string -- typ JOIN operace hodnoty jsou: JOIN, LEFT, RIGHT, INNER
 	 * @param string/array -- název sloupců, které se mají vypsatm, výchozí jsou všechny ("*").
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
 	public function join($tableArray, $condition, $joinType = null, $columsArray = "*") {
@@ -219,7 +219,7 @@ class Mysql_Db_Select extends Db_Select {
 	 *
 	 * @param string -- sloupec, podle kterého se má řadit
 	 * @param string -- (option) jak se má sloupec řadit (ASC, DESC) (default: ASC)
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
 	public function order($colum, $order = self::SQL_ASC) {
@@ -246,7 +246,7 @@ class Mysql_Db_Select extends Db_Select {
 	 *
 	 * @param string -- sloupec, podle kterého se má řadit
 	 * @param string -- (option) WITH ROLLUP false(default)/true
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
 	public function group($colum, $withRollup = false) {
@@ -273,7 +273,7 @@ class Mysql_Db_Select extends Db_Select {
 	 * Metoda přidá do SQL dotazu klauzuli LIMIT
 	 * @param integer -- počet záznamů
 	 * @param integer -- záčátek
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
 	public function limit($rowCount, $offset) {
@@ -286,7 +286,7 @@ class Mysql_Db_Select extends Db_Select {
 	/**
 	 * Metoda přidává do dotazu sloupce s počem záznamů
 	 * @param string -- alias pod kterým má být vrácena hodnota
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
 	public function count($alias = null, $colum = self::SQL_ALL_VALUES)	{
@@ -295,11 +295,11 @@ class Mysql_Db_Select extends Db_Select {
 		} else {
 			$this->_sqlQueryParts[self::SQL_COUNT][$alias] = self::SQL_ALL_VALUES;
 		}
-		
+
 		return $this;
 	}
-	
-	
+
+
 	/**
 	 * Metody vytvoří část SQL dotazu se sloupcy, které se mají vybírat
 	 * @return string -- část SQL dotazu se sloupci
@@ -318,7 +318,7 @@ class Mysql_Db_Select extends Db_Select {
 							$isFunction = true;
 						}
 					}
-					
+
 					if(!$isFunction AND ($columString[0] != self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] != self::SQL_PARENTHESIS_R)){
 						if($columString != "*"){
 							$columString = '.`' . $columString . '`';
@@ -332,12 +332,12 @@ class Mysql_Db_Select extends Db_Select {
 							$colum .= self::SQL_SEPARATOR . $columsTable . '' . $columString . "" . self::SQL_SEPARATOR . self::SQL_AS .
 							self::SQL_SEPARATOR . $columAlias . ',';
 						}
-					} else if($columString[0] == self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] == self::SQL_PARENTHESIS_R){ 
+					} else if($columString[0] == self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] == self::SQL_PARENTHESIS_R){
 						$colum .= self::SQL_SEPARATOR . $columString . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
 					} else {
 						$colum .= self::SQL_SEPARATOR . $columString . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
 					}
-					
+
 
 				}
 				$columsString .= $colum;
@@ -350,20 +350,20 @@ class Mysql_Db_Select extends Db_Select {
 		} else {
 			$columsString = ' * ';
 		}
-		
+
 //		pokud je count odstranit sloupce
 //TODO dodělat čekování jestli náhodou pole neobsahuje název jednoho sloupce
-//		if(!empty($this->_sqlQueryParts[self::SQL_COUNT]) 
+//		if(!empty($this->_sqlQueryParts[self::SQL_COUNT])
 //			AND sizeof($this->_sqlQueryParts[self::COLUMS_ARRAY], true) == 2){
 //			$columsString = null;
 //		}
-		if(empty($this->_sqlQueryParts[self::GROUP_BY_KEY]) 
+		if(empty($this->_sqlQueryParts[self::GROUP_BY_KEY])
 			AND !empty($this->_sqlQueryParts[self::SQL_COUNT])){
 			$columsString = null;
 		}
-		
+
 //		echo $columsString."<br />";
-		
+
 		return $columsString;
 	}
 
@@ -393,8 +393,8 @@ class Mysql_Db_Select extends Db_Select {
 		}
 		return $counts;
 	}
-	
-	
+
+
 	/**
 	 * Metoda vytváří část dotazu sek FROM
 	 * @return string -- část SQL dotazu s částí FROM
