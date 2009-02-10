@@ -842,58 +842,11 @@ class Form {
                   }
                }
             }
-
          } else {
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
                .$this->formPrefix.$inputName._(' nebo nebyl odeslán formulář s parametrem "enctype"'), 6);
          }
-
-         //            if($value[self::ITEM_OBLIGATION]){
-         //
-         //            }
-
-         //            $this->formValues[$inputName] = $file;
       }
-
-         //      Jestli byl prvek vůbec odeslán
-//         if(isset ($_POST[$this->formPrefix.$inputName])){
-//            //   SOF   Kontrola povinnosti
-//            if($value[self::ITEM_OBLIGATION]){
-//
-//               if(!is_array($_POST[$this->formPrefix.$inputName])){
-//                  if($_POST[$this->formPrefix.$inputName] == null
-//                     OR $_POST[$this->formPrefix.$inputName] == ''){
-//                     $this->addMissingValueError();
-//                     $this->addErrorItem($inputName);
-//                  }
-//               } else {
-//                  $isEmpty = true;
-//                  foreach ($_POST[$this->formPrefix.$inputName] as $key => $variable) {
-//                     if(empty ($variable)){
-//                        unset ($_POST[$this->formPrefix.$inputName][$key]);
-//                     } else {
-//                        $isEmpty = false;
-//                     }
-//                  }
-//               }
-//            }
-//            //  EOF  Kontrola povinnosti
-//            //        data nejsou povinná
-//            $postValue = $_POST[$this->formPrefix.$inputName];
-//
-//            // SOF Validace
-//            if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
-//               $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
-//            }
-//            // EOF Validace
-//
-//            $this->formValues[$inputName] = $postValue;
-//
-//         } else {
-//            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-//               .$inputName, 5);
-//         }
-//      }
    }
 
    /**
