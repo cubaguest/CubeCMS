@@ -122,11 +122,15 @@ abstract class Controller {
 	
 	/**
 	 * Metoda vrací odkaz na objekt pro práci s odkazy
+    * @param boolean -- true pokud má byt link čistý
+    * @param boolean -- true pokud má byt link bez kategorie
 	 * @return Links -- objekt pro práci s odkazy
 	 */
-	final public function getLink($clear = false) {
-		$link = new Links($clear);
-		$link->category(Category::getLabel(), Category::getId());
+	final public function getLink($clear = false, $onlyWebRoot = false) {
+		$link = new Links($clear, $onlyWebRoot);
+      if(!$onlyWebRoot){
+         $link->category(Category::getLabel(), Category::getId());
+      }
 		return $link;
 	}
 	

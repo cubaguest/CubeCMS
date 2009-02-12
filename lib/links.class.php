@@ -294,6 +294,9 @@ class Links {
 
          $this->category[self::LINK_ARRAY_ITEM_NAME] = rawurlencode($help->utf2ascii($catName));
          $this->category[self::LINK_ARRAY_ITEM_ID] = $catId;
+      } else {
+         $this->category[self::LINK_ARRAY_ITEM_NAME] = null;
+         $this->category[self::LINK_ARRAY_ITEM_ID] = null;
       }
       return $this;
    }

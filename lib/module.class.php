@@ -83,7 +83,7 @@ class Module {
 		$this->setName($moduleObject->name);
 		$this->setDbTables($dbTables);
 		$this->setDataDir($moduleObject->datadir);
-		$this->setParams($moduleObject->params);
+      $this->setParams($moduleObject->params);
 		$this->setLabel($moduleObject->label);
 		$this->setAlt($moduleObject->alt);
 //		$this->setRecordsOnPage($moduleObject->scroll);

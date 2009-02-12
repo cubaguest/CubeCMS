@@ -63,13 +63,13 @@ class Form {
   * Parametr pro žádnou validací
   * @var int
   */
-   const VALIDATION_NONE = 0;
+   const VALIDATE_NONE = 0;
 
  /**
   * Parametr pro validaci emailu
   * @var int
   */
-   const VALIDATION_EMAIL = 1;
+   const VALIDATE_EMAIL = 1;
 
  /**
   * Proměná pro zapnutí validace data
@@ -82,6 +82,13 @@ class Form {
   * @var int
   */
    const VALIDATE_TIME = 3;
+
+
+ /**
+  * Parametr pro validaci URL
+  * @var int
+  */
+  const VALIDATE_URL = 4;
 
    /**
    * Proměná pro zapnutí validace data a datum není omezené
@@ -109,14 +116,14 @@ class Form {
    const ERROR_MISSING = 'missing';
 
    /**
-	 * Název proměné s originálním názvem souboru
-	 * @var string
-	 */
-	const POST_FILES_ERROR 			= 'error';
-	const POST_FILES_ORIGINAL_NAME	= 'name';
-	const POST_FILES_SIZE 			= 'size';
-	const POST_FILES_TYPE 			= 'type';
-	const POST_FILES_TMP_NAME		= 'tmp_name';
+    * Název proměné s originálním názvem souboru
+    * @var string
+    */
+   const POST_FILES_ERROR 			= 'error';
+   const POST_FILES_ORIGINAL_NAME	= 'name';
+   const POST_FILES_SIZE 			= 'size';
+   const POST_FILES_TYPE 			= 'type';
+   const POST_FILES_TMP_NAME		= 'tmp_name';
 
   /**
    * Proměná obsahuje, jestli bylo v zadání formuláře chyba
@@ -128,7 +135,7 @@ class Form {
    * Poles chbějícími prvky
    * @deprecated
    */
-//   private $errorMessages = array(self::ERROR_MISSING => false);
+   //   private $errorMessages = array(self::ERROR_MISSING => false);
 
   /**
    * Název prvků, ve kterých byla chyba
@@ -255,7 +262,7 @@ class Form {
    * @return Form
    */
    public function crInputText($name, $obligation = false, $langs = false,
-      $specialValidation = self::VALIDATION_NONE, $code = self::CODE_HTMLENCODE,
+      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
       $maxChars = null, $minChars = null) {
 
       $inputArray = array ();
@@ -289,7 +296,7 @@ class Form {
    * @return Form
    */
    public function crInputHidden($name, $obligation = false,
-      $specialValidation = self::VALIDATION_NONE, $code = self::CODE_HTMLENCODE) {
+      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE) {
 
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
@@ -347,7 +354,7 @@ class Form {
    * @return Form
    */
    public function crInputPassword($name, $obligation = false,
-      $specialValidation = self::VALIDATION_NONE, $code = self::CODE_HTMLENCODE,
+      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
       $maxChars = null, $minChars = null) {
 
       $inputArray = array ();
@@ -428,12 +435,12 @@ class Form {
    */
    public function checkForm() {
       //    Pokud byl formulář odeslán
-//      echo "<pre>";
-//      print_r($_POST);
-//      echo "</pre>";
+      //      echo "<pre>";
+      //      print_r($_POST);
+      //      echo "</pre>";
       if(isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT]]) OR
          isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT].'_x'])){
-         
+
          $this->fillinForm();
 
          return !$this->isError;
@@ -646,12 +653,12 @@ class Form {
                //        pokud je více jazyků, je povinný havní jazyk aplikace
                if($value[self::ITEM_LANGS] AND is_array($_POST[$this->formPrefix.$inputName])){
                   // Pokud bylo předáno pole prvků s jazyky
-//                  if(!isset ($_POST[$this->formPrefix.$inputName][$oblLang]) AND
-//                     is_array($_POST[$this->formPrefix.$inputName])){
-//
-//                  }
+                  //                  if(!isset ($_POST[$this->formPrefix.$inputName][$oblLang]) AND
+                  //                     is_array($_POST[$this->formPrefix.$inputName])){
+                  //
+                  //                  }
                   //          Pokud nebyla hodnota vyplněna
-//                  else
+                  //                  else
                   if($_POST[$this->formPrefix.$inputName][$oblLang] == null
                      OR $_POST[$this->formPrefix.$inputName][$oblLang] == ''){
                      $this->addMissingValueError();
@@ -690,7 +697,7 @@ class Form {
             // EOF kódování
 
             // SOF Validace
-            if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
+            if($value[self::ITEM_VALIDATION] != self::VALIDATE_NONE){
                $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
             }
             // EOF Validace
@@ -749,7 +756,7 @@ class Form {
             // EOF kódování
 
             // SOF Validace
-            if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
+            if($value[self::ITEM_VALIDATION] != self::VALIDATE_NONE){
                $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
             }
             // EOF Validace
@@ -771,11 +778,11 @@ class Form {
 
       foreach ($inputs as $inputName => $value) {
          if(isset ($_POST[$this->formPrefix.$inputName])){
-//            Je odeslán bez hodnoty
+            //            Je odeslán bez hodnoty
             if($_POST[$this->formPrefix.$inputName] == 'on'){
                $this->formValues[$inputName] = true;
             }
-//            Je odeslán s hodnotou
+            //            Je odeslán s hodnotou
             else {
                $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
             }
@@ -825,7 +832,7 @@ class Form {
                }
 
             } else {
-//               kontrola uploadu
+               //               kontrola uploadu
                if (is_uploaded_file($_FILES[$this->formPrefix.$inputName][self::POST_FILES_TMP_NAME])){
                   // vytvoření objektu souboru
                   $file = new File($_FILES[$this->formPrefix.$inputName][self::POST_FILES_ORIGINAL_NAME], null,
@@ -863,18 +870,18 @@ class Form {
                $_POST[$this->formPrefix.$inputName]['Date_Year']);
 
             // SOF Validace
-//            if($value[self::ITEM_VALIDATION] != self::VALIDATE_DATE_ISEVERYTIME){
-//               $this->validateItem($inputName, $timestamp, $value[self::ITEM_VALIDATION]);
-//            }
+            //            if($value[self::ITEM_VALIDATION] != self::VALIDATE_DATE_ISEVERYTIME){
+            //               $this->validateItem($inputName, $timestamp, $value[self::ITEM_VALIDATION]);
+            //            }
             // EOF Validace
-//            Je odeslán bez hodnoty
-//            if($_POST[$this->formPrefix.$inputName] == 'on'){
-//               $this->formValues[$inputName] = true;
-//            }
-////            Je odeslán s hodnotou
-//            else {
-//               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
-//            }
+            //            Je odeslán bez hodnoty
+            //            if($_POST[$this->formPrefix.$inputName] == 'on'){
+            //               $this->formValues[$inputName] = true;
+            //            }
+            ////            Je odeslán s hodnotou
+            //            else {
+            //               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
+            //            }
          } else {
             $this->formValues[$inputName] = false;
          }
@@ -940,7 +947,7 @@ class Form {
             // EOF kódování
 
             // SOF Validace
-            if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
+            if($value[self::ITEM_VALIDATION] != self::VALIDATE_NONE){
                $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
             }
             // EOF Validace
@@ -1014,7 +1021,7 @@ class Form {
             // EOF kódování
 
             // SOF Validace
-            //        if($value[self::ITEM_VALIDATION] != self::VALIDATION_NONE){
+            //        if($value[self::ITEM_VALIDATION] != self::VALIDATE_NONE){
             //          $this->validateItem($postValue, $value[self::ITEM_VALIDATION]);
             //        }
             // EOF Validace
@@ -1098,9 +1105,15 @@ class Form {
    private function validateItem($itemName, $value, $validation) {
       if(is_int($validation)){
          switch ($validation) {
-            case self::VALIDATION_EMAIL:
+            case self::VALIDATE_EMAIL:
                if(!$this->validateEMail($value)){
                   $this->errMsg()->addMessage(_('Nebyla zadána korektní e-mailová adresa'));
+                  $this->addErrorItem($itemName);
+               }
+               break;
+            case self::VALIDATE_URL:
+               if(!$this->validateURL($value)){
+                  $this->errMsg()->addMessage(_('Nebyla zadána korektní adresa'));
                   $this->addErrorItem($itemName);
                }
                break;
@@ -1125,6 +1138,15 @@ class Form {
    private function validateEMail($email) {
       $validator = new UrlValidator();
       return $validator->checkMail($email);
+   }
+
+  /**
+   * Metoda pro validaci url
+   * @param string $url -- URL adresa
+   */
+   private function validateURL($url) {
+      $validator = new UrlValidator();
+      return $validator->checkUrl($url);
    }
 
   /**
@@ -1169,7 +1191,7 @@ class Form {
    * @param string $name -- název prvku
    */
    private function addErrorItem($name, $subItem = null) {
-      
+
 
       if($subItem == null){
          $this->errorItems[$name] = true;

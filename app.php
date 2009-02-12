@@ -81,6 +81,12 @@ class AppCore {
     const ENGINE_FILESYSTEM_DIR = 'Filesystem';
 
     /**
+     * Adresář s ostatními pluginy
+     * @var string
+     */
+    const ENGINE_PLUGINS_DIR = 'Plugins';
+
+    /**
      * Kešovací adresář pro dočasné soubory
      * @var string
      */
@@ -631,21 +637,25 @@ class AppCore {
             else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_JSPLUINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
                 require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_JSPLUINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
             }
-            //			Ja-li načítán model
+            //			Je-li načítán model
             else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
                 require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
             }
-            //			Ja-li načítán helper
+            //			Je-li načítán helper
             else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_HELPERS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
                 require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_HELPERS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
             }
-            //			Ja-li načítán validátor
+            //			Je-li načítán validátor
             else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_VALIDATORS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
                 require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_VALIDATORS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
             }
-            //			Ja-li načítán filesystem plugin
+            //			Je-li načítán filesystem plugin
             else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_FILESYSTEM_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
                 require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_FILESYSTEM_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
+            }
+            //			Je-li načítán jíný plugin
+            else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_PLUGINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
+                require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_PLUGINS_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
             }
             //			Je-li načítan model modulu
             else if(AppCore::getSelectedModule() != null AND strpos($className, 'model') !== false){
