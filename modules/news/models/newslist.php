@@ -11,7 +11,6 @@ class NewsListModel extends DbModel {
 	const COLUMN_NEWS_LABEL_LANG_PREFIX = 'label_';
 	const COLUMN_NEWS_TEXT = 'text';
 	const COLUMN_NEWS_TEXT_LANG_PREFIX = 'text_';
-	const COLUMN_NEWS_URLKEY = 'urlkey';
 	const COLUMN_NEWS_TIME = 'time';
 	const COLUMN_NEWS_ID_USER = 'id_user';
 	const COLUMN_NEWS_ID_ITEM = 'id_item';
@@ -75,7 +74,7 @@ class NewsListModel extends DbModel {
 		$sqlSelect = $this->getDb()->select()->from(array("news" => $this->getModule()->getDbTable()), array(self::COLUMN_NEWS_LABEL => "IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
 //							self::COLUMN_NEWS_LANG => "IF(`".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang()."` != 'NULL', '".Locale::getLang()."', '".Locale::getDefaultLang()."')",
 							self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
-							self::COLUMN_NEWS_URLKEY, self::COLUMN_NEWS_ID_USER, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_TIME))
+							self::COLUMN_NEWS_ID_USER, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_TIME))
 						->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
 						->where("news.".self::COLUMN_NEWS_ID_ITEM." = ".$this->getModule()->getId())
 						->where("news.".self::COLUMN_NEWS_DELETED." = ".(int)false)

@@ -13,7 +13,7 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 		{$VARS.NEWS_LABEL_NAME}{if $smarty.foreach.lang.first}*{/if}:<br />
 		<input {if $VARS.ERROR_ITEMS.label.$KEYLANG eq true}class="badItem"{/if} type="text" size="40" maxlength="50" name="news_label[{$KEYLANG}]" value="{$VARS.NEWS_DATA.label.$KEYLANG}" /><br />
 		{$VARS.NEWS_TEXT_NAME}{if $smarty.foreach.lang.first}*{/if}:<br />
-		<textarea rows="5" cols="60" name="news_text[{$KEYLANG}]"class="textarea{if $VARS.ERROR_ITEMS.text.$KEYLANG eq true} badItem{/if}">{$VARS.NEWS_DATA.text.$KEYLANG}</textarea>
+		<textarea rows="5" cols="60" name="news_text[{$KEYLANG}]" class="textarea{if $VARS.ERROR_ITEMS.text.$KEYLANG eq true} badItem{/if}">{$VARS.NEWS_DATA.text.$KEYLANG}</textarea>
 	</p>
 	{/foreach}
 	<br />

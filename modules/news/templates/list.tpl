@@ -1,3 +1,4 @@
+<div>
 {foreach from=$VARS.NEWS_LIST_ARRAY item="new"}
 <div>
 <h2><a href="{$new.showlink}" title="{$new.label}">{$new.label}</a></h2>
@@ -16,4 +17,5 @@
 {/if}
 {/foreach}
 <a href="{$VARS.NUM_NEWS_ALL}" title="{$VARS.NUM_NEWS_ALL_NAME}">{$VARS.NUM_NEWS_ALL_NAME}</a>
+</div>
 </div>
