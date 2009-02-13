@@ -98,7 +98,7 @@ class BlogController extends Controller {
 		$textHelper = new TextCtrlHelper();
 
 		$scroll = new ScrollEplugin();
-		$scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
+//		$scroll->setCountRecordsOnPage($this->getModule()->getRecordsOnPage());
 		$scroll->setCountAllRecords($blogLists->getNumBlogs());
 		
 		$blogs = $blogLists->getBlogList($scroll->getStartRecord(), $scroll->getCountRecords());
