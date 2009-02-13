@@ -59,7 +59,7 @@ class NewsView extends View {
       $this->template()->setTplSubLabel($this->container()->getData('new_name'));
       $this->template()->setSubTitle($this->container()->getData('new_name'), true);
 
-      $this->assignButtonBack();
+      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
    }
 
    /**
@@ -72,23 +72,14 @@ class NewsView extends View {
       $this->template()->setTplSubLabel(_('Přidání novinky'));
       $this->template()->setSubTitle(_('Přidání novinky'), true);
 
-      $this->assignButtonBack();
+      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
       $this->assignLabels();
 
       //Tabulkové uspořádání
       $jquery = new JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
-   }
-
-   /**
-    * Metoda přiřadí tlačítko zpět
-    *
-    */
-   private function assignButtonBack() {
-      $this->template()->addTpl("linkBack.tpl");
-      $this->template()->addVar('LINK_TO_BACK', $this->container()->getLink('link_back'));
-      $this->template()->addVar('LINK_TO_BACK_NAME', _('Zpět'));;
+      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
    }
 
    /**
@@ -112,7 +103,7 @@ class NewsView extends View {
       $this->template()->setTplSubLabel(_("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
       $this->template()->setSubTitle(_("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'), true);
 
-      $this->assignButtonBack();
+      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
       $this->assignLabels();
       //Taby - uspořádání
       $jquery = new JQuery();
