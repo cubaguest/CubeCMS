@@ -21,9 +21,10 @@
          {$VARS.DATE_SELECT_NAME}:&nbsp;
          {html_select_date field_array='galery_date' field_order='DMY' start_year=+1 end_year=-10 time=$VARS.DATE_SELECT}<br />
          <br />
+         {if !empty($VARS.GALERIES_LIST)}
          <p>{$VARS.ADD_EXISTING_GALERY_NAME}:</p><br />
-         
          {html_options name=galery_exist_id options=$VARS.GALERIES_LIST selected=$VARS.GALERY_DATA.exist_id}
+         {/if}
          <br />
          {$VARS.PHOTO_FILE_LABEL}:<br />
 

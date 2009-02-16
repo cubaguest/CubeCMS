@@ -41,7 +41,7 @@ class PhotogaleryView extends View {
 		$this->template()->addVar('FORM_ADD_PHOTO_FILE_LABEL', _('Soubor'));
 		$this->template()->addVar('ADD_INPUTS_FIELDS', _('Přidat další soubor'));
 		$this->template()->addVar('ADD_NEW_GALERY_NAME', _('Přidat novou galerii'));
-		$this->template()->addVar('ADD_EXISTING_GALERY_NAME', _('Přidat existující galerii'));
+		$this->template()->addVar('ADD_EXISTING_GALERY_NAME', _('Přidat do existující galerie'));
 
 		$this->template()->addTpl('addGalery.tpl');
 
