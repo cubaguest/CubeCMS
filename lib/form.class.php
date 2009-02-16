@@ -717,8 +717,12 @@ class Form {
             //        }
 
          } else {
+            if($value[self::ITEM_OBLIGATION] == true){
             new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
                .$_POST[$this->formPrefix.$inputName], 1);
+            } else {
+               $this->formValues[$inputName] = null;
+            }
          }
       }
    }
