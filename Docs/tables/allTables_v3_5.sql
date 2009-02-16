@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 2.11.9.4
+-- version 3.1.2
 -- http://www.phpmyadmin.net
 --
 -- Počítač: localhost
--- Vygenerováno: Pondělí 09. února 2009, 01:42
--- Verze MySQL: 5.0.60
--- Verze PHP: 5.2.8-pl1-gentoo
+-- Vygenerováno: Pondělí 16. února 2009, 22:31
+-- Verze MySQL: 5.0.70
+-- Verze PHP: 5.2.8-pl2-gentoo
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_categories` (
   `alt_en` varchar(200) default NULL,
   `label_de` varchar(50) default NULL,
   `alt_de` varchar(200) default NULL,
-  `params` varchar(200) default NULL,
+  `cparams` varchar(200) default NULL,
   `protected` tinyint(1) NOT NULL default '0',
   `priority` smallint(2) NOT NULL default '0',
   `active` tinyint(1) NOT NULL default '1' COMMENT 'je-li kategorie aktivní',
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_categories` (
 -- Vypisuji data pro tabulku `vypecky_categories`
 --
 
-INSERT INTO `vypecky_categories` (`id_category`, `id_section`, `urlkey`, `label_cs`, `alt_cs`, `label_en`, `alt_en`, `label_de`, `alt_de`, `params`, `protected`, `priority`, `active`, `left_panel`, `right_panel`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`) VALUES
+INSERT INTO `vypecky_categories` (`id_category`, `id_section`, `urlkey`, `label_cs`, `alt_cs`, `label_en`, `alt_en`, `label_de`, `alt_de`, `cparams`, `protected`, `priority`, `active`, `left_panel`, `right_panel`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`) VALUES
 (1, 2, 'vypecky', 'Výpečky', 'Vepřové výpečky', NULL, NULL, NULL, NULL, '', 0, 10, 1, 1, 1, 'yearly', 0.1, 1),
 (2, 2, 'portfolio', 'Portfolio', 'Naše portfolio', NULL, NULL, NULL, NULL, '', 0, 9, 1, 0, 1, 'yearly', 0.1, 1),
 (3, 12, 'komiks', 'Komiks', 'Komiks Kuba a Kuba', 'Comics', 'Comics Kuba and Kuba', NULL, NULL, NULL, 0, 5, 1, 0, 0, 'yearly', 0.1, 1),
@@ -779,15 +779,23 @@ CREATE TABLE IF NOT EXISTS `vypecky_photogalery_galeries` (
   `time_edit` int(11) default NULL,
   PRIMARY KEY  (`id_galery`),
   KEY `id_item` (`id_item`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=29 ;
 
 --
 -- Vypisuji data pro tabulku `vypecky_photogalery_galeries`
 --
 
 INSERT INTO `vypecky_photogalery_galeries` (`id_galery`, `id_item`, `label_cs`, `text_cs`, `label_en`, `text_en`, `label_de`, `text_de`, `time_add`, `time_edit`) VALUES
-(12, 4, 'label cs', NULL, 'label en', NULL, NULL, NULL, 1234095057, NULL),
-(13, 4, 'nová galerie', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dolor nulla, rutrum ut, vestibulum quis, ornare interdum, nibh. Cras iaculis nibh eget enim. Integer eros dolor, eleifend a, cursus non, dapibus ut, pede. Quisque eget odio in nunc scelerisque ultricies. In dignissim nisl quis nisl. Proin aliquet risus at nisl. Proin magna nisi, blandit quis, facilisis ut, faucibus in, neque. Nullam venenatis adipiscing metus. In sollicitudin. Maecenas nec erat. Suspendisse leo. ', NULL, NULL, NULL, NULL, 1234128554, NULL);
+(15, 4, 'nová galerie 3', '      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();      $galeryM = new GaleryDetailModel();', NULL, NULL, NULL, NULL, 1096668000, 1234282478),
+(14, 4, 'nová galerie upravena 2', 'testetse t', 'label en', NULL, NULL, NULL, 1128204000, 1234280877),
+(16, 4, 'pokus', NULL, NULL, NULL, NULL, NULL, 1234282510, NULL),
+(17, 4, 'hgk hjkghj hj', NULL, NULL, NULL, NULL, NULL, 1254434400, NULL),
+(18, 4, 'nová galerie upravena čassssss', NULL, NULL, NULL, NULL, NULL, 1254434400, NULL),
+(24, 4, 'nová galerie 2', NULL, NULL, NULL, NULL, NULL, 1241215200, NULL),
+(20, 4, 'nová galerie upravena čassssss', NULL, NULL, NULL, NULL, NULL, 1001973600, NULL),
+(23, 4, 'nová galerie upravena 2', NULL, NULL, NULL, NULL, NULL, 1254434400, NULL),
+(22, 4, 'posledni', NULL, NULL, NULL, NULL, NULL, 915145200, NULL),
+(25, 4, 'posledni', NULL, NULL, NULL, NULL, NULL, 1233442800, 1234287009);
 
 -- --------------------------------------------------------
 
@@ -805,18 +813,52 @@ CREATE TABLE IF NOT EXISTS `vypecky_photogalery_photos` (
   `time_add` int(11) default NULL,
   PRIMARY KEY  (`id_photo`),
   KEY `id_galery` (`id_galery`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=59 ;
 
 --
 -- Vypisuji data pro tabulku `vypecky_photogalery_photos`
 --
 
 INSERT INTO `vypecky_photogalery_photos` (`id_photo`, `id_galery`, `label_cs`, `label_en`, `label_de`, `file`, `time_add`) VALUES
-(13, 13, 'Hrádek', NULL, NULL, 'obraz-hradu-muran182610.jpg', 1234128565),
-(14, 13, 'Úplněk a člověk', NULL, NULL, 'obraz-uplnek-mysli1.jpeg', 1234128578),
-(15, 13, 'Květina', NULL, NULL, 'obraz-02.jpg', 1234128593),
-(16, 13, 'Město v podvečer', NULL, NULL, 'obraz012.jpg', 1234128607),
-(10, 12, 'popis česky 2', 'label en 3', NULL, 'obraz011.jpg', 1234095062);
+(30, 15, NULL, NULL, NULL, 'obraz3.jpg', 1234282464),
+(17, 14, NULL, NULL, NULL, 'obraz-hradu-muran182611.jpg', 1234139965),
+(18, 14, NULL, NULL, NULL, 'obraz.jpg', 1234139965),
+(19, 14, NULL, NULL, NULL, 'obraz013.jpg', 1234139965),
+(20, 14, NULL, NULL, NULL, 'obraz-021.jpg', 1234139965),
+(21, 14, NULL, NULL, NULL, 'obraz-uplnek-mysli2.jpeg', 1234139966),
+(22, 14, NULL, NULL, NULL, 'obraz1.jpg', 1234205009),
+(23, 14, NULL, NULL, NULL, 'obraz014.jpg', 1234205009),
+(24, 14, NULL, NULL, NULL, 'obraz-uplnek-mysli3.jpeg', 1234205029),
+(25, 14, NULL, NULL, NULL, 'obraz015.jpg', 1234205030),
+(26, 14, NULL, NULL, NULL, 'obraz2.jpg', 1234205030),
+(27, 14, NULL, NULL, NULL, 'obraz-uplnek-mysli4.jpeg', 1234205033),
+(28, 14, NULL, NULL, NULL, 'obraz016.jpg', 1234205033),
+(31, 15, NULL, NULL, NULL, 'obraz011.jpg', 1234282464),
+(32, 15, NULL, NULL, NULL, 'obraz-uplnek-mysli5.jpeg', 1234282465),
+(33, 16, NULL, NULL, NULL, 'obraz-uplnek-mysli6.jpeg', 1234282510),
+(34, 17, NULL, NULL, NULL, 'obraz-uplnek-mysli7.jpeg', 1234282579),
+(35, 18, NULL, NULL, NULL, 'obraz-022.jpg', 1234282675),
+(37, 20, NULL, NULL, NULL, 'obraz-024.jpg', 1234282695),
+(40, 23, NULL, NULL, NULL, 'obraz-uplnek-mysli8.jpeg', 1234282785),
+(39, 22, NULL, NULL, NULL, 'obraz4.jpg', 1234282748),
+(41, 24, NULL, NULL, NULL, 'obraz-023.jpg', 1234282799),
+(42, 25, NULL, NULL, NULL, 'obraz017.jpg', 1234282814),
+(43, 26, NULL, NULL, NULL, 'obraz5.jpg', 1234286125),
+(44, 26, NULL, NULL, NULL, 'obraz6.jpg', 1234286125),
+(45, 26, NULL, NULL, NULL, 'obraz7.jpg', 1234286126),
+(46, 27, NULL, NULL, NULL, 'obraz018.jpg', 1234286189),
+(47, 27, NULL, NULL, NULL, 'obraz8.jpg', 1234286189),
+(48, 27, NULL, NULL, NULL, 'obraz9.jpg', 1234286190),
+(49, 27, NULL, NULL, NULL, 'obraz10.jpg', 1234286190),
+(50, 28, NULL, NULL, NULL, 'obraz-uplnek-mysli9.jpeg', 1234286239),
+(51, 28, NULL, NULL, NULL, 'obraz-uplnek-mysli10.jpeg', 1234286239),
+(52, 28, NULL, NULL, NULL, 'obraz-uplnek-mysli11.jpeg', 1234286239),
+(53, 28, NULL, NULL, NULL, 'obraz-uplnek-mysli12.jpeg', 1234286240),
+(54, 16, NULL, NULL, NULL, 'obraz11.jpg', 1234286736),
+(55, 16, NULL, NULL, NULL, 'obraz-uplnek-mysli13.jpeg', 1234286761),
+(56, 16, NULL, NULL, NULL, 'obraz-uplnek-mysli14.jpeg', 1234286761),
+(57, 16, NULL, NULL, NULL, 'obraz019.jpg', 1234286761),
+(58, 16, NULL, NULL, NULL, 'obraz0110.jpg', 1234286762);
 
 -- --------------------------------------------------------
 
