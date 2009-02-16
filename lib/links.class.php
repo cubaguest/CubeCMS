@@ -651,10 +651,26 @@ class Links {
       $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
       self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
       self::URL_PARAMETRES_SEPARATOR.self::DOWNLOAD_FILE_FILE_PARAM.self::URL_SEP_PARAM_VALUE.
-      $file;
+      urlencode($file);
 
       return $dwLink;
    }
+
+    /**
+     * Metoda vrací link pro stažení souboru pomocí specílního dwsouboru
+     * @param string -- cesta ks ouboru
+     * @param string -- název souboru
+     */
+   public static function getLinkToDwFile($dir, $file) {
+      $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
+      self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
+      self::URL_PARAMETRES_SEPARATOR.self::DOWNLOAD_FILE_FILE_PARAM.self::URL_SEP_PARAM_VALUE.
+      urlencode($file);
+
+      return $dwLink;
+   }
+
+
 
     /*
      * Metody pro zpracování a tvorbu obsahu URL
