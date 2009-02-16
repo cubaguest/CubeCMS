@@ -74,27 +74,31 @@ class NewsController extends Controller {
       } else {
          $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_NEWS));
       }
-
+      
       $scroll->setCountAllRecords($listNews->getCountNews());
 
       //		Vybrání novinek
-      $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
+//      if($listNews->getCountNews() < 1){
+         $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
+//      }
 
       //		Přidání linku pro editaci a jestli se dá editovat
-      foreach ($newsArray as $key => $news) {
-         if($news[NewsDetailModel::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){
-            $newsArray[$key][self::NEWS_EDITABLE] = true;
-            $newsArray[$key][self::NEWS_EDIT_LINK] = $this->getLink()
-            ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],$news[NewsDetailModel::COLUMN_NEWS_ID_NEW])
-            ->action($this->getAction()->edit());
-         } else {
-            $newsArray[$key][self::NEWS_EDITABLE] = false;
-         }
-         //			Link pro zobrazení
-         $newsArray[$key][self::NEWS_SHOW_LINK] = $this->getLink()
-         ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],
-            $news[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
+      if(!empty ($newsArray)){
+         foreach ($newsArray as $key => $news) {
+            if($news[NewsDetailModel::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){
+               $newsArray[$key][self::NEWS_EDITABLE] = true;
+               $newsArray[$key][self::NEWS_EDIT_LINK] = $this->getLink()
+               ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],$news[NewsDetailModel::COLUMN_NEWS_ID_NEW])
+               ->action($this->getAction()->edit());
+            } else {
+               $newsArray[$key][self::NEWS_EDITABLE] = false;
+            }
+            //			Link pro zobrazení
+            $newsArray[$key][self::NEWS_SHOW_LINK] = $this->getLink()
+            ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],
+               $news[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
 
+         }
       }
 
       //		Přenos do viewru
@@ -156,8 +160,7 @@ class NewsController extends Controller {
          $this->container()->addData('editable', true);
          $this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->add())->article());
       }
-      $this->container()->addLink('link_back', $this->getLink()->action()->article());
-
+      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }
 
    /**
@@ -189,7 +192,7 @@ class NewsController extends Controller {
       $this->container()->addData('NEWS_DATA', $newsForm->getValues());
       $this->container()->addData('ERROR_ITEMS', $newsForm->getErrorItems());
       //		Odkaz zpět
-      $this->container()->addLink('link_back', $this->getLink()->action()->article());
+      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }
 
   /**
@@ -232,7 +235,7 @@ class NewsController extends Controller {
       $this->container()->addData('ERROR_ITEMS', $newsForm->getErrorItems());
 
       //		Odkaz zpět
-      $this->container()->addLink('link_back', $this->getLink()->action());
+      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }
 
   /**

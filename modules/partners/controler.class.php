@@ -232,7 +232,7 @@ class PartnersController extends Controller {
       $deleteForm = new Form(self::FORM_PREFIX);
       
       $deleteForm->crSubmit(self::FORM_BUTTON_DELETE)
-      ->crInputHidden(self::FORM_ID, true, Form::VALIDATE_NUMBER_INT);
+      ->crInputHidden(self::FORM_ID, true, 'is_numeric');
 
       if($deleteForm->checkForm()){
          $partnerModel = new PartnerDetailModel();
