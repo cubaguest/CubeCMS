@@ -1,5 +1,5 @@
 <div>
-<h2>{$VARS.NEWS_DETAIL.label}</h2>
+<h2>{$VARS.NEWS_DETAIL.label}<span class="smallFont"></span></h2>
 {$VARS.NEWS_DETAIL.time|date_format:"%x %X"}<br />
 {$VARS.NEWS_DETAIL.username}<br />
 {$VARS.NEWS_DETAIL.text}
@@ -15,4 +15,5 @@
 	</form>
 </div>-->
 {/if}
+{include file='engine:buttonback.tpl'}
 </div>

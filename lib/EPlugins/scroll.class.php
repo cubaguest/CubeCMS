@@ -202,7 +202,7 @@ class ScrollEplugin extends Eplugin {
 	 *
 	 * @param int -- počet záznamů na stránce
 	 */
-	public function setCountRecordsOnPage($value)
+	public function setCountRecordsOnPage($value = 0)
 	{
 		$this->countOnPage = $value;
 	}

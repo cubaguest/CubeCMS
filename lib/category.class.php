@@ -37,7 +37,7 @@ class Category {
 	const COLUM_CAT_URLKEY	= 'urlkey';
 	const COLUM_CAT_LPANEL	= 'left_panel';
 	const COLUM_CAT_RPANEL	= 'right_panel';
-	const COLUM_CAT_PARAMS	= 'params';
+	const COLUM_CAT_PARAMS	= 'cparams';
 	const COLUM_CAT_SHOW_IN_MENU	= 'show_in_menu';
 	const COLUM_CAT_PROTECTED	= 'protected';
 
