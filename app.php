@@ -171,24 +171,6 @@ class AppCore {
     const MEDIA_URL_PARAM_TYPE = 'media';
 
     /**
-     * výchozí doména pro gettext
-     * @var string
-     */
-    const GETTEXT_DEFAULT_DOMAIN = 'messages';
-
-    /**
-     * Gettext engine locales dir
-     * @var string
-     */
-    const GETTEXT_DEFAULT_LOCALES_DIR = './locale';
-
-    /**
-     * Doména pro gettext a moduly
-     * @var string
-     */
-    const GETTEXT_MDOMAIN = 'module_messages';
-
-    /**
      * Konstanta s názvem adresáře se vzhledy
      * @var string
      */
@@ -544,19 +526,7 @@ class AppCore {
      * Metoda nastavuje locales a gettext pro překlady
      */
     private function _initLocale() {
-
         Locale::factory();
-        //			//Nastaveni jazyku pro generovaní url
-        ////			Links::setLang($selectLang);
-
-        //	nastavení gettext a locales
-        putenv("LANG=".Locale::getLocale());
-        setlocale(LC_ALL, Locale::getLocale());
-
-        bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, self::GETTEXT_DEFAULT_LOCALES_DIR);
-        textdomain(self::GETTEXT_DEFAULT_DOMAIN);
-        //		bind_textdomain_codeset("messages", "utf-8");
-
     }
 
     /**
@@ -894,6 +864,7 @@ class AppCore {
 
         $this->coreTpl->addVar('APP_LANGS' ,$langs);
         unset($langs);
+        $this->coreTpl->addVar('APP_LANG' ,Locale::getLang());
     }
 
     /**
@@ -1128,8 +1099,11 @@ class AppCore {
 
                     //					Spuštění phledu
                     if($ctrlResult){
+                        //					Zvolení překladu na modul
+                        Locale::switchToModuleTexts($module->getName());
                         $controller->runView($template, $requestName.AppCore::MODULE_VIEWER_SUFIX);
                     } else {
+                        Locale::switchToEngineTexts();
                         new CoreException(_('Controler modulu "') . $module->getName()
                             . _('" nebyl korektně proveden'), 21);
                     }
@@ -1150,7 +1124,7 @@ class AppCore {
                 Locale::switchToEngineTexts();
 
                 //				přepnutí překladu na engine
-                textdomain(self::GETTEXT_DEFAULT_DOMAIN);
+                //textdomain(self::GETTEXT_DEFAULT_DOMAIN);
 
                 //				odstranění proměných
                 unset($module);
@@ -1237,7 +1211,6 @@ class AppCore {
                     $tableIndex++;
                     $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
                 }
-                //			while (array_key_exists(self::MODULE_DBTABLES_PREFIX.$tableIndex, $item) AND ($item[self::MODULE_DBTABLES_PREFIX.$tableIndex] != null)) {
                 $panelModule = new Module($panel, $moduleDbTables);
                 self::$selectedModule = clone $panelModule;
                 $panelClassName = ucfirst($panelModule->getName()).self::MODULE_PANEL_CLASS_SUFIX;
@@ -1263,6 +1236,8 @@ class AppCore {
                 if(class_exists($panelClassName)){
                     //					Nastavení kategorie
 
+                    // Nastavení jazyka
+                    Locale::bindTextDomain($panelModule->getName());
 
                     //					nastavení tempalte
                     $panelTemplate->setModule($panelModule);

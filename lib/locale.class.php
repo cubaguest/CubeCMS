@@ -29,7 +29,26 @@ class Locale {
 	 * @var string
 	 */
 	const LOCALES_DIR = 'locale';
-	
+
+    /**
+     * výchozí doména pro gettext
+     * @var string
+     */
+    const GETTEXT_DEFAULT_DOMAIN = 'messages';
+
+    /**
+     * Gettext engine locales dir
+     * @var string
+     */
+    const GETTEXT_DEFAULT_LOCALES_DIR = './locale';
+
+    /**
+     * Doména pro gettext a moduly
+     * @var string
+     */
+    const GETTEXT_MDOMAIN = 'module_messages';
+
+
 	/**
 	 * Pole se všemi locales
 	 * @var array
@@ -88,9 +107,11 @@ class Locale {
 			}
 		}
 		self::_setLangTranslations();
-	}
-	
-	/**
+
+      self::setLocalesEnv(); // nastaví jazyk
+   }
+
+   /**
 	 * Metoda vrací pole s názvy jazyků
 	 * 
 	 * @return array -- pole s názvy jazyků
@@ -114,6 +135,19 @@ class Locale {
 									"de" => _('Německy'));
 	}
 	
+   /**
+    * Metoda nastaví jazyk
+    */
+   private static function setLocalesEnv() {
+      //	nastavení gettext a locales
+      putenv("LANG=".Locale::getLocale(Locale::getLang()));
+      setlocale(LC_ALL, Locale::getLocale(Locale::getLang()));
+
+      bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, self::GETTEXT_DEFAULT_LOCALES_DIR);
+      self::switchToEngineTexts();
+      //textdomain(self::GETTEXT_DEFAULT_DOMAIN);
+   }
+
 	/**
 	 * Metoda vrací zvolené locales pro zadaný jazyk
 	 * @param string -- jazyk (cs, en, de, ...)
@@ -183,6 +217,7 @@ class Locale {
 		} else {
 			self::$selectLang = self::$defaultLang;
 		}
+      self::setLocalesEnv(); // kvůli změně
 	}
 	
 	/**
@@ -208,7 +243,7 @@ class Locale {
 	 * Metoda přenastaví lokalizační texty na engine
 	 */
 	public static function switchToEngineTexts() {
-		textdomain(AppCore::GETTEXT_DEFAULT_DOMAIN);
+		textdomain(self::GETTEXT_DEFAULT_DOMAIN);
 	}
 
 	/**
@@ -232,10 +267,10 @@ class Locale {
 	 */
 	public static function bindTextDomain($moduleName = null) {
 		if($moduleName == null AND AppCore::getSelectedModule() != null){
-			bindtextdomain(AppCore::getSelectedModule()->getName(), '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR 
+			bindtextdomain(AppCore::getSelectedModule()->getName(), '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
 			. DIRECTORY_SEPARATOR . AppCore::getSelectedModule()->getName() . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
 		} else if($moduleName != null){
-			bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR 
+			bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
 			. DIRECTORY_SEPARATOR . $moduleName . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
 		}
 	}
