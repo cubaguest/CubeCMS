@@ -271,7 +271,11 @@ abstract class JsPlugin {
 		
 		if(!empty($this->pluginParams)){
 			$params = http_build_query($this->pluginParams);
-			$file.='?'.$params;
+         if(!strstr($file, '?')){
+            $file.='?'.$params;
+         } else {
+            $file.='&'.$params;
+         }
 		}
 		
 		return $file;

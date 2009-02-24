@@ -67,6 +67,11 @@ class TinyMce extends JsPlugin {
    const PARAM_MEDIA = 'media';
 
    /**
+    * Parametr s adresářem faces
+    */
+   const PARAM_FACE = 'facedir';
+
+   /**
     * Název pole s iconami (bez čísla!!!)
     */
    const ICONS_ROWS_NAME = 'theme_advanced_buttons';
@@ -151,19 +156,17 @@ class TinyMce extends JsPlugin {
 //		Název pluginu
 		$this->setJsPluginName("TinyMCE");
 		
-//		nastavení jazyka TinyMCE
-		$this->setParam('language', Locale::getLang());
 		$this->defaultParams['document_base_url'] = Links::getMainWebDir();
-		
-		$cssurl = '/'.AppCore::getTepmlateFaceDir(false);
-		$cssurl = substr($cssurl, 0, strlen($cssurl)-1);
-		$this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style.css';
-
 	}
 	
 	protected function initFiles() {
 //		Výchozí js soubor pluginu
-		$this->setSettingJsFile(new JsPluginJsFile("tiny_mce_default.js"));
+      $jsFile = new JsPluginJsFile("tiny_mce_default.js");
+      $face = AppCore::getTepmlateFaceDir(false,false);
+      $face = substr($face, 0, strlen($face)-1);
+      $jsFile->setParam(self::PARAM_FACE, $face);
+      $jsFile->setParam('language', Locale::getLang());
+		$this->setSettingJsFile($jsFile);
 		
 //		Přidání js soubrů pluginu
 		$this->addJsFile(new JsPluginJsFile("tiny_mce.js"));
@@ -176,6 +179,12 @@ class TinyMce extends JsPlugin {
 		if($this->getFileName() == 'tiny_mce_default.js'){
 			isset($_GET[self::GET_TINY_THEME]) == false ? $theme = null : $theme = rawurldecode($_GET[self::GET_TINY_THEME]);
 
+//         doplnění obsahu s css
+         if($this->getFileParam(self::PARAM_FACE) != null){
+            $cssurl = Links::getMainWebDir().AppCore::getTepmlateFaceDir(false);
+            $cssurl = substr($cssurl, 0, strlen($cssurl)-1).$this->getFileParam(self::PARAM_FACE).URL_SEPARATOR;
+            $this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style_tiny_mce.css';
+         }
 
          if($theme != self::TINY_THEME_SIMPLE){
             //         Doplnění parametru (images, media atd.)
@@ -265,6 +274,7 @@ class TinyMce extends JsPlugin {
       $params[self::PARAM_THEME] = self::THEME_ADVANCED;
 		
 		$this->checkImagesList($params);
+      $this->removeOtherParams($params);
 		$content .= $this->generateParamsForFile($params);
 		$content .= $this->cfgFileFooter();
 //		Odeslání souboru
@@ -310,6 +320,7 @@ class TinyMce extends JsPlugin {
       $params[self::PARAM_THEME] = self::THEME_ADVANCED;
 
       $this->checkImagesList($params);
+      $this->removeOtherParams($params);
 
 		$content .= $this->generateParamsForFile($params);
 		$content .= $this->cfgFileFooter();
@@ -328,6 +339,22 @@ class TinyMce extends JsPlugin {
 			unset($params[self::GET_TINY_IMAGES_LIST]);
 		}
 	}
+
+   /**
+    * Metoda odtraní přenesené parametry, které namájí být ve výsledném souboru
+    * @param array $params -- pole s parametry
+    */
+   private function removeOtherParams(&$params) {
+      if(isset ($params[self::PARAM_FACE])){
+         unset ($params[self::PARAM_FACE]);
+      }
+      if(isset ($params[self::PARAM_IMAGES])){
+         unset ($params[self::PARAM_IMAGES]);
+      }
+      if(isset ($params[self::PARAM_MEDIA])){
+         unset ($params[self::PARAM_MEDIA]);
+      }
+   }
 	
 	/**
 	 * Metoda vygeneruje řetězec s parametry
