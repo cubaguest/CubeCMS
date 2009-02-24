@@ -10,11 +10,11 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 <form method="post" action="{$THIS_PAGE_LINK}" enctype="multipart/form-data">
 	{foreach from=$APP_LANGS_NAMES key='KEYLANG' item='LANG' name='lang'}
 	<p id="textLang{$smarty.foreach.lang.iteration}" class="tabcontent">
-		{$VARS.FILE_LABEL_LABEL}{if $smarty.foreach.lang.first}{/if}:
-      <input name="dwfiles_label[{$KEYLANG}]" type="text" value="{$VARS.FILE_DATA.label.$KEYLANG}" {if $VARS.ERROR_ITEMS.label.$KEYLANG eq true}class="badItem"{/if} />
+		{$VARS.FILE_LABEL_LABEL}{if $smarty.foreach.lang.first}{/if}:<br />
+      <textarea name="dwfiles_label[{$KEYLANG}]" cols="40" rows="3" class="textarea{if $VARS.ERROR_ITEMS.label.$KEYLANG eq true} badItem{/if}">{$VARS.FILE_DATA.label.$KEYLANG}</textarea>
 	</p>
 	{/foreach}
-   {$VARS.FILE_LABEL}*:
+   {$VARS.FILE_LABEL}*:<br />
    <input name="dwfiles_file" type="file" value="" /><br /><br />
 	<input name="dwfiles_reset" type="reset" value="{$VARS.BUTTON_RESET}" />
 	<input name="dwfiles_send" type="submit" value="{$VARS.BUTTON_SEND}" />

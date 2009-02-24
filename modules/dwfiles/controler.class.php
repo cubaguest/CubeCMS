@@ -58,7 +58,7 @@ class DwfilesController extends Controller {
       $form->setPrefix(self::FORM_PREFIX);
 
       $form->crSubmit(self::FORM_BUTTON_SEND)
-      ->crInputText(self::FORM_FILE_LABEL, false, true)
+      ->crTextArea(self::FORM_FILE_LABEL, false, true)
       ->crInputFile(self::FORM_FILE, true);
 
  //        Pokud byl odeslán formulář
