@@ -56,6 +56,46 @@ class TinyMce extends JsPlugin {
     */
    const PARAM_THEME = 'theme';
 
+   /**
+    * Parametr obrázků
+    */
+   const PARAM_IMAGES = 'images';
+
+   /**
+    * Parametr obrázků
+    */
+   const PARAM_MEDIA = 'media';
+
+   /**
+    * Název pole s iconami (bez čísla!!!)
+    */
+   const ICONS_ROWS_NAME = 'theme_advanced_buttons';
+
+   /**
+    * Parametr přidá ikonu pro přidání obrázků
+    */
+   const ICON_IMAGES = 'image';
+
+   /**
+    * Parametr přidá ikonu pro přidání medií (flash)
+    */
+   const ICON_MEDIA = 'media';
+
+   /**
+    * Název parametru s pluginy v konfigu
+    */
+   const PLUGINS_ARRAY_NAME = 'plugins';
+
+   /**
+    * Název pluginu pro obrázky
+    */
+   const PLUGIN_IMAGES = 'advimage';
+
+   /**
+    * Název pluginu pro média
+    */
+   const PLUGIN_MEDIA = 'media';
+
 	/**
 	 * Mody tinymce
 	 * @var atring
@@ -83,8 +123,8 @@ class TinyMce extends JsPlugin {
 			);
 
    private $advancedParams = array(
-         'plugins' => array('safari', 'style', 'table', 'save', 'advhr', 'advimage', 'advlink', 'emotions', 'iespell', 'inlinepopups',
-					'insertdatetime', 'preview', 'media', 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
+         self::PLUGINS_ARRAY_NAME => array('safari', 'style', 'table', 'save', 'advhr', self::PLUGIN_IMAGES, 'advlink', 'emotions', 'iespell', 'inlinepopups',
+					'insertdatetime', 'preview', self::PLUGIN_MEDIA, 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
 					'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras'),
 			'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
 					'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen'),
@@ -92,9 +132,10 @@ class TinyMce extends JsPlugin {
 					'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
 					'forecolor', 'backcolor'),
 			'theme_advanced_buttons3' => array('tablecontrols', '|', 'hr', 'removeformat', 'visualaid', '|', 'sub', 'sup', '|', 'charmap',
-					'emotions', 'image', 'media', '|', 'ltr', 'rtl'));
+					'emotions', self::ICON_IMAGES , self::ICON_MEDIA, '|', 'ltr', 'rtl'));
 
-   private $advancedSimpleParams = array('plugins' => array('safari', 'inlinepopups', 'searchreplace', 'contextmenu', 'paste'),
+   private $advancedSimpleParams = array(
+         self::PLUGINS_ARRAY_NAME => array('safari', 'inlinepopups', 'searchreplace', 'contextmenu', 'paste'),
 			'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
 					'justifyfull', '|', 'bullist,numlist', '|','search', '|', 'link', 'unlink','|', 'undo', 'redo','code'),
 			'theme_advanced_buttons2' => array(),
@@ -134,6 +175,21 @@ class TinyMce extends JsPlugin {
 	protected function generateFile() {
 		if($this->getFileName() == 'tiny_mce_default.js'){
 			isset($_GET[self::GET_TINY_THEME]) == false ? $theme = null : $theme = rawurldecode($_GET[self::GET_TINY_THEME]);
+
+
+         if($theme != self::TINY_THEME_SIMPLE){
+            //         Doplnění parametru (images, media atd.)
+            if($this->getFileParam(self::PARAM_IMAGES)){
+               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$this->getFileParam(self::PARAM_IMAGES)], self::ICON_IMAGES);
+               array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_IMAGES);
+            }
+
+            if($this->getFileParam(self::PARAM_MEDIA)){
+               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$this->getFileParam(self::PARAM_MEDIA)], self::ICON_MEDIA);
+               array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_MEDIA);
+            }
+         }
+
 //			Který režim je zobrazen		
 			switch ($theme) {
 				case self::TINY_THEME_SIMPLE:
@@ -147,6 +203,7 @@ class TinyMce extends JsPlugin {
 					$this->generateAdvCfgFile();
 					break;
 			}
+
 		}
 	}
 	
@@ -174,7 +231,23 @@ class TinyMce extends JsPlugin {
 	public function setImagesList($fileLink) {
 		$this->setParam(self::GET_TINY_IMAGES_LIST, $fileLink);
 	}
-	
+
+   /**
+    * Metoda přidá iconu pro přidávání obrázků
+    * @param int $row = na který řádek v ikonách se má přidat
+    */
+   public function addImagesIcon($row = 1) {
+      $this->setParam(self::PARAM_IMAGES, $row);
+   }
+
+   /**
+    * Metoda přidá iconu pro přidávání medií
+    * @param int $row = na který řádek v ikonách se má přidat
+    */
+   public function addMediaIcon($row = 1) {
+      $this->setParam(self::PARAM_MEDIA, $row);
+   }
+
 	/**
 	 * Metoda vygeneruje hlavičku souboru
 	 *
@@ -235,7 +308,9 @@ class TinyMce extends JsPlugin {
 		}
 
       $params[self::PARAM_THEME] = self::THEME_ADVANCED;
-      
+
+      $this->checkImagesList($params);
+
 		$content .= $this->generateParamsForFile($params);
 		$content .= $this->cfgFileFooter();
 //		Odeslání souboru
@@ -248,7 +323,7 @@ class TinyMce extends JsPlugin {
 	 * @param array -- pole, kde se má popřípadě parametr nastavit
 	 */
 	private function checkImagesList(&$params) {
-		if(isset($_GET[self::GET_TINY_IMAGES_LIST])){
+		if($this->getFileParam(self::GET_TINY_IMAGES_LIST) != null){
 			$params['external_image_list_url'] = $this->getFileParam(self::GET_TINY_IMAGES_LIST);
 			unset($params[self::GET_TINY_IMAGES_LIST]);
 		}

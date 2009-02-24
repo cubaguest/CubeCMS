@@ -1,5 +1,5 @@
 {if $IMAGES_ID eq null}
-{assign var='IMAGES_ID' value=$VARS.USERFILES_ID}
+{assign var='IMAGES_ID' value=$VARS.USERIMAGES_ID}
 {/if}
 <div class="userImages">
 <h5>{$VARS.USERMIAGES_LABEL_NAME} ({$VARS.USERIMAGES_NUM_ROWS[$IMAGES_ID]})</h5>
@@ -32,8 +32,8 @@
       <td></td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">{$VARS.FILE_LINK_TO_SHOW_NAME}:<br />
-      <a href="{$IMAGE.link_show}" title="{$VARS.FILE_LINK_TO_SHOW_NAME} - {$IMAGE.file}" target="_blank">{$IMAGE.link_show}</a></td>
+      <td colspan="3" rowspan="1">{$VARS.IMAGE_LINK_TO_SHOW_NAME}:<br />
+      <a href="{$IMAGE.link_show}" title="{$VARS.IMAGE_LINK_TO_SHOW_NAME} - {$IMAGE.file}" target="_blank">{$IMAGE.link_show}</a></td>
     </tr>
 <!-- <tr><td colspan="3"></td>-->
 <!-- </tr>-->

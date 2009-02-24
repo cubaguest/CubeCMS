@@ -154,11 +154,13 @@ class UserImagesEplugin extends Eplugin {
 	 * Metoda nastavuje id článku pro který se budou ukládát soubory
 	 * @param integer -- id článku
 	 */
-	public function setIdArticle($idArticle){
+	public function setIdArticle($idArticle = null){
 		$this->idArticle = $idArticle;
 		$this->checkSendImages();
 		$this->checkDeleteImage();
 		$this->getImagesFromDb();
+
+      return $this;
 	}
 	
 	/**
@@ -260,8 +262,10 @@ class UserImagesEplugin extends Eplugin {
 	 */
 	public function getImagesList($idItem, $idArticle) {
 		$sqlSelect = $this->getDb()->select()->from(array('img' => self::DB_TABLE_USER_IMAGES), array(self::COLUM_FILE))
-											 ->where(self::COLUM_ID_ITEM.' = '.$idItem)
-											 ->where(self::COLUM_ID_ARTICLE.' = '.$idArticle);
+											 ->where(self::COLUM_ID_ITEM.' = '.$idItem);
+      if($idArticle != null){
+         $sqlSelect->where(self::COLUM_ID_ARTICLE.' = '.$idArticle);
+      }
 		
 //		vložení záznamu
 		$images = $this->getDb()->fetchAssoc($sqlSelect);
@@ -282,32 +286,32 @@ class UserImagesEplugin extends Eplugin {
 	private function getImagesFromDb() {
 		$sqlSelect = $this->getDb()->select()->from(array('images'=>self::DB_TABLE_USER_IMAGES), array(self::COLUM_FILE, 
 									self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID, self::COLUM_WIDTH, self::COLUM_HEIGHT));
-		
+
+      $sqlSelect->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
+      
 		if(is_string($this->idArticle) OR is_numeric($this->idArticle)){
-			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$this->idArticle)
-								   ->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
+			$sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$this->idArticle);
 		} else if(is_array($this->idArticle) AND !empty($this->idArticle)){
 			foreach ($this->idArticle as $id => $itemId){
 				//Pokud je zadáno asociativní pole bez id items
 				if(is_string($itemId) OR is_numeric($itemId)){
-					$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$itemId." AND ".self::COLUM_ID_ITEM." = ".$this->getModule()->getId(), "OR");
+					$sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$itemId." AND ".self::COLUM_ID_ITEM." = ".$this->getModule()->getId(), "OR");
 				} else if(is_array($itemId) AND !empty($itemId)){
 					$whereString = self::COLUM_ID_ITEM." = ".$id." AND (";
 					foreach ($itemId as $idArticle) {
 						$whereString.= self::COLUM_ID_ARTICLE." = ".$idArticle." OR ";
 					}
 					$whereString = substr($whereString, 0, strlen($whereString)-4).")";
-					$sqlSelect = $sqlSelect->where($whereString, "OR");
+					$sqlSelect->where($whereString, "OR");
 				} else if($itemId == null){
-					$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM." = ".$id, "OR");
+					$sqlSelect->where(self::COLUM_ID_ITEM." = ".$id, "OR");
 				}
 			}
 					
-		} else if (empty($this->idArticle)){
-			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
 		}
 											 
-		$sqlSelect = $sqlSelect->order(self::COLUM_TIME, "DESC");
+		$sqlSelect->order(self::COLUM_TIME, "DESC");
+
 		$this->imagesArray = $this->getDb()->fetchAssoc($sqlSelect);
 		$this->getDb()->getNumRows() != null ? $this->numberOfReturnRows = $this->getDb()->getNumRows() : $this->numberOfReturnRows = 0;
 		
@@ -338,7 +342,7 @@ class UserImagesEplugin extends Eplugin {
 		// tady je to kvůli více šablonám na stránce
 		self::$otherNumberOfReturnRows[$this->idUserImages] = $this->numberOfReturnRows;
 		$this->toTpl("USERIMAGES_NUM_ROWS", self::$otherNumberOfReturnRows);
-		$this->toTpl("USERIMAGESFILES_ID", $this->idUserImages);
+		$this->toTpl("USERIMAGES_ID", $this->idUserImages);
 		$this->toTplJSPlugin(new SubmitForm());
 //		$this->toTplJSPlugin(new LightBox());
 		self::$otherImagesArray[$this->idUserImages] = $this->imagesArray;
@@ -350,7 +354,12 @@ class UserImagesEplugin extends Eplugin {
 	 * @todo dodělat generování také do jiných typů souborů
 	 */
 	public function runOnlyEplugin() {
-		$array = $this->getImagesList(rawurldecode($_GET[self::GET_URL_ID_ITEM]),rawurldecode($_GET[self::GET_URL_ID_ARTICLE]));
+      $idArticle = null;
+      if(isset($_GET[self::GET_URL_ID_ARTICLE])){
+         $idArticle = rawurldecode($_GET[self::GET_URL_ID_ARTICLE]);
+      }
+		
+      $array = $this->getImagesList(rawurldecode($_GET[self::GET_URL_ID_ITEM]),$idArticle);
 		
 		isset($_GET[self::GET_URL_IMAGES_LIST_TYPE]) == false ? $type = null : $type = rawurldecode($_GET[self::GET_URL_IMAGES_LIST_TYPE]);
 		switch ($type) {
@@ -377,9 +386,17 @@ class UserImagesEplugin extends Eplugin {
 		switch ($type) {
 			case self::FILE_IMAGES_FORMAT_TINYMCE:
 				$link = new Links(true, true);
-				return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')->
-						param(array(self::GET_URL_ID_ARTICLE => $this->idArticle, self::GET_URL_ID_ITEM => $this->getModule()->getId(), 
-							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE)));
+
+            $params = array(self::GET_URL_ID_ITEM => $this->getModule()->getId(),
+							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE);
+            if($this->idArticle != null){
+               $params[self::GET_URL_ID_ARTICLE] = $this->idArticle;
+            } else {
+
+            }
+
+            return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')
+               ->param($params));
 			break;
 			
 			default:
