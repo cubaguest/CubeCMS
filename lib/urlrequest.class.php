@@ -261,7 +261,7 @@ class UrlRequest {
         //		pokud není akce
         if(!$this->moduleAction->isAction()){
             //			pokud je vybrán článek
-            if($article->isArticle()){
+            if($article->isArticle() AND !$this->moduleAction->isSomeAction()){
                 $action = strtolower($this->moduleAction->getDefaultArticleAction());
             }
             //			Pokud není vybrán článek

@@ -149,6 +149,19 @@ class Action {
 		}
 		return false;
 	}
+
+	/**
+	 * Funkce zjišťuje, jesli byla nějáká akce nastavena
+	 *
+	 * @return boolean -- true pokud byla akce nastavena
+	 */
+	public function isSomeAction()
+	{
+		if(self::$currentAction != null){
+			return true;
+		}
+		return false;
+	}
 	
 	/*
 	 * metody pro generování do url

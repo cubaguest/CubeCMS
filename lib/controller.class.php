@@ -306,7 +306,7 @@ abstract class Controller {
 				$view->mainView();
 				if(!method_exists($view, $this->actionViewer)){
 					//				přepnutí překladu na engine
-					textdomain(AppCore::GETTEXT_DEFAULT_DOMAIN);
+					textdomain(Locale::GETTEXT_DEFAULT_DOMAIN);
 					Locale::switchToEngineTexts();
 					new CoreException(_("Action Viewer ").$this->actionViewer._(" v modulu ") . $this->getModule()->getName(). _(" nebyl nalezen"), 11);
 					Locale::switchToModuleTexts();
