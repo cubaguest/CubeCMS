@@ -5,16 +5,16 @@
 <td width="100" align="left">
 {* Sipka na zacatek *}
 {if $VARS.BUTTON_BEGIN == true}
-<a href="{$VARS.SCROLL_BUTTONS_LINKS.begin}">{html_image file='./images/scroll/begin.png' alt='begin'}</a>
+<a href="{$VARS.SCROLL_BUTTONS_LINKS.begin}">{html_engine_image file='/scroll/begin.png' alt='begin'}</a>
 {else}
-{html_image file='./images/scroll/begin_disable.png' alt='begin'}
+{html_engine_image file='/scroll/begin_disable.png' alt='begin'}
 {/if}
 &#032;&#032;
 {* Sipka o jedno vpred *}
 {if $VARS.BUTTON_NEXT == true}
-<a href="{$VARS.SCROLL_BUTTONS_LINKS.next}">{html_image file='./images/scroll/back.png' alt=$VARS.NAME_BUTTON_PREVIOUS_PAGE}<span>{$VARS.NAME_BUTTON_PREVIOUS_PAGE}</span></a>
+<a href="{$VARS.SCROLL_BUTTONS_LINKS.next}">{html_engine_image file='/scroll/back.png' alt=$VARS.NAME_BUTTON_PREVIOUS_PAGE}<span>{$VARS.NAME_BUTTON_PREVIOUS_PAGE}</span></a>
 {else}
-{html_image file='./images/scroll/back_disable.png' alt=$VARS.NAME_BUTTON_PREVIOUS_PAGE}<span>{$VARS.NAME_BUTTON_PREVIOUS_PAGE}</span>
+{html_engine_image file='/scroll/back_disable.png' alt=$VARS.NAME_BUTTON_PREVIOUS_PAGE}<span>{$VARS.NAME_BUTTON_PREVIOUS_PAGE}</span>
 {/if}
 </td>
 <td align="center">
@@ -33,15 +33,15 @@
 <td width="100" align="right">
 {* Sipka o jedno vzad *}
 {if $VARS.BUTTON_BACK == true}
-<a href="{$VARS.SCROLL_BUTTONS_LINKS.back}"><span>{$VARS.NAME_BUTTON_NEXT_PAGE}</span>{html_image file='./images/scroll/next.png' alt=$VARS.NAME_BUTTON_NEXT_PAGE}</a>
+<a href="{$VARS.SCROLL_BUTTONS_LINKS.back}"><span>{$VARS.NAME_BUTTON_NEXT_PAGE}</span>{html_engine_image file='/scroll/next.png' alt=$VARS.NAME_BUTTON_NEXT_PAGE}</a>
 {else}
-<span>{$VARS.NAME_BUTTON_NEXT_PAGE}</span>{html_image file='./images/scroll/next_disable.png' alt=$VARS.NAME_BUTTON_NEXT_PAGE}
+<span>{$VARS.NAME_BUTTON_NEXT_PAGE}</span>{html_engine_image file='/scroll/next_disable.png' alt=$VARS.NAME_BUTTON_NEXT_PAGE}
 {/if}
 {* Sipka na konec *}
 {if $VARS.BUTTON_END == true}
-<a href="{$VARS.SCROLL_BUTTONS_LINKS.end}">{html_image file='./images/scroll/end.png' alt='end'}</a>
+<a href="{$VARS.SCROLL_BUTTONS_LINKS.end}">{html_engine_image file='/scroll/end.png' alt='end'}</a>
 {else}
-{html_image file='./images/scroll/end_disable.png' alt='end'}
+{html_engine_image file='/scroll/end_disable.png' alt='end'}
 {/if}
 </td>
 </tr>
