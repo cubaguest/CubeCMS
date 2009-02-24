@@ -5,11 +5,11 @@
 <table>
 	<tr>
 		<td>{$VARS.LOGIN_USER_NAME}:</td>
-		<td><input class="login_input" type="text" name="login_username" maxlength="20" id="login_panel" size="15" value="{$smarty.post.login_username}" /></td>
+		<td align="right"><input class="login_input" type="text" name="login_username" maxlength="20" id="login_panel" size="22" value="{$smarty.post.login_username}" /></td>
 	</tr>
 	<tr>
 		<td>{$VARS.LOGIN_USER_PASSWORD}:</td>
-		<td><input type="password" name="login_passwd" maxlength="20" id="passwd_panel" size="15" value="" /></td>
+		<td align="right"><input type="password" name="login_passwd" maxlength="20" id="passwd_panel" size="22" value="" /></td>
 	</tr>
 	<tr>
 		<td colspan="2" align="right"><input id="login_submit" type="submit" name="login_submit" value="{$VARS.LOGIN_BUTTON}" /></td>
