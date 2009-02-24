@@ -409,14 +409,20 @@ class AppCore {
      * Metoda vrací adresář ke zvolenému vzhledu
      *
      * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
+     * @param boolean -- jestli se má vrátit celá adresář faces (true)
      * @return string -- adresář zvoleného vzhledu
      */
-    public static function getTepmlateFaceDir($fullDir = true) {
-        if($fullDir){
-            return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateFaceDir.DIRECTORY_SEPARATOR;
-        } else {
-            return self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
-        }
+    public static function getTepmlateFaceDir($fullDir = true, $withFacesDir = true) {
+       if($fullDir){
+          return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateFaceDir.DIRECTORY_SEPARATOR;
+
+       } else {
+          if($withFacesDir){
+             return self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
+          } else {
+             return self::$templateFaceDir.URL_SEPARATOR;
+          }
+       }
     }
 
     /**
