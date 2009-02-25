@@ -529,7 +529,7 @@ class Form {
 
       if(!empty($item)){
          //      Jedná lise o jazykovou verzy
-         if(isset ($item[self::ITEM_LANGS]) AND $item[self::ITEM_LANGS]){
+         if(isset ($item[self::ITEM_LANGS]) AND $item[self::ITEM_LANGS] == true){
             $langs = Locale::getAppLangs();
             foreach ($langs as $lang) {
                if(isset ($value[$lang])){
@@ -551,8 +551,8 @@ class Form {
     * @return array -- pole s informacemi o prvku
     */
    private function findItem($name){
-      foreach ($this->formStructure as $vars) {
-         if(isset ($vars[$name])){
+      foreach ($this->formStructure as $key => $vars) {
+         if(is_array($vars) AND isset ($vars[$name])){
             return $vars[$name];
          }
       }
