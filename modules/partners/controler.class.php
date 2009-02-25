@@ -18,15 +18,21 @@ class PartnersController extends Controller {
 	const FORM_LOGO_FILE = 'logo_file';
 	const FORM_ID = 'id';
 	const FORM_DELETE_IMAGE = 'delete_image';
-	
+
+   /**
+    * Parametry pro velikost obrázku
+    */
+   const PARAM_LOGO_WIDTH = 'logowidth';
+   const PARAM_LOGO_HEIGHT = 'logoheight';
+
 	/**
 	 * Velikosti obrázku loga společnosti
 	 * @var int
 	 */
    const LOGO_IMAGE_WIDTH = 150;
    const LOGO_IMAGE_HEIGHT = 150;
-	const LOGO_BIG_IMAGE_WIDTH = 120;
-	const LOGO_BIG_IMAGE_HEIGHT = 80;
+//	const LOGO_BIG_IMAGE_WIDTH = 120;
+//	const LOGO_BIG_IMAGE_HEIGHT = 80;
 
    /**
     * Názvy prvků s odkazy
@@ -38,6 +44,12 @@ class PartnersController extends Controller {
 	 * @var string
 	 */
 //	const LOGO_BIG_DIR = 'big';
+
+   /**
+    * Pole s typy adres, které jsou validní
+    * @var array
+    */
+   private $validProtocols = array('http', 'https', 'ftp');
 
 
 	public function mainController() {
@@ -94,8 +106,16 @@ class PartnersController extends Controller {
             $imageFile = new ImageFile($addForm->getValue(self::FORM_LOGO_FILE));
             $flashFile = new FlashFile($addForm->getValue(self::FORM_LOGO_FILE));
             if($imageFile->isImage(false)){
+               $this->getModule()->getParam(self::PARAM_LOGO_WIDTH) == null ?
+               $newLogoWidth = self::LOGO_IMAGE_WIDTH :
+               $newLogoWidth = $this->getModule()->getParam(self::PARAM_LOGO_WIDTH);
+
+               $this->getModule()->getParam(self::PARAM_LOGO_HEIGHT) == null ?
+               $newLogoHeight = self::LOGO_IMAGE_HEIGHT :
+               $newLogoHeight = $this->getModule()->getParam(self::PARAM_LOGO_HEIGHT);
+
                $imageFile->saveImage($this->getModule()->getDir()->getDataDir(),
-                  self::LOGO_IMAGE_WIDTH, self::LOGO_IMAGE_HEIGHT);
+                  $newLogoWidth, $newLogoHeight);
                $logoFile = $imageFile->getName();
                $logoType = PartnerDetailModel::LOGO_IMAGE_TYPE;
                $logoWidth = self::LOGO_IMAGE_WIDTH;
@@ -111,9 +131,13 @@ class PartnersController extends Controller {
                $this->errMsg()->addMessage(_('Nebyl zadán korektní typ souboru'));
             }
          }
+
+         // dogenerování url adresy
+         $url = $this->validateUrl($addForm->getValue(self::FORM_URL));
+
 //         Uložení do modelu
          if(!$fileError AND $partnerModel->saveNewPartner($addForm->getValue(self::FORM_NAME),
-               $addForm->getValue(self::FORM_LABEL), $addForm->getValue(self::FORM_URL),
+               $addForm->getValue(self::FORM_LABEL), $url,
                $logoFile, $logoType, $logoWidth, $logoHeight)){
             $this->infoMsg()->addMessage(_('Partner byl uložen'));
             $this->getLink()->action()->reload();
@@ -184,8 +208,16 @@ class PartnersController extends Controller {
             $imageFile = new ImageFile($editForm->getValue(self::FORM_LOGO_FILE));
             $flashFile = new FlashFile($editForm->getValue(self::FORM_LOGO_FILE));
             if($imageFile->isImage(false)){
+               $this->getModule()->getParam(self::PARAM_LOGO_WIDTH) == null ?
+               $newLogoWidth = self::LOGO_IMAGE_WIDTH :
+               $newLogoWidth = $this->getModule()->getParam(self::PARAM_LOGO_WIDTH);
+
+               $this->getModule()->getParam(self::PARAM_LOGO_HEIGHT) == null ?
+               $newLogoHeight = self::LOGO_IMAGE_HEIGHT :
+               $newLogoHeight = $this->getModule()->getParam(self::PARAM_LOGO_HEIGHT);
+
                $imageFile->saveImage($this->getModule()->getDir()->getDataDir(),
-                  self::LOGO_IMAGE_WIDTH, self::LOGO_IMAGE_HEIGHT);
+                  $newLogoWidth, $newLogoHeight);
                // uložení do modelu
                $fileOk = $partnerDetailModel->saveEditPartnerFile($editForm->getValue(self::FORM_ID),
                   $imageFile->getName(), PartnerDetailModel::LOGO_IMAGE_TYPE,
@@ -203,21 +235,19 @@ class PartnersController extends Controller {
 
          }
 
+         // dogenerování url adresy
+         $url = $this->validateUrl($editForm->getValue(self::FORM_URL));
+
          //         Uložení do modelu
          if($fileOk AND $partnerModel->saveEditPartner($editForm->getValue(self::FORM_NAME),
                $editForm->getValue(self::FORM_LABEL), $editForm->getValue(self::FORM_ID),
-               $editForm->getValue(self::FORM_URL))){
+               $url)){
             $this->infoMsg()->addMessage(_('Partner byl uložen'));
             $this->getLink()->action()->article()->reload();
          } else {
             new CoreException(_('Chyba při ukládání partnera'),1);
          }
       }
-
-//      echo("<pre>");
-//      print_r($editForm->getValues());
-//      echo("</pre>");
-
 
       $this->container()->addData('PARTNER_DATA', $editForm->getValues());
       $this->container()->addData('ERROR_ITEMS', $editForm->getErrorItems());
@@ -247,6 +277,23 @@ class PartnersController extends Controller {
             new CoreException(_('Partnera se nepodařilo smazat'));
          }
       }
+   }
+
+
+   private function validateUrl($url) {
+      $isValidUrl = false;
+      foreach ($this->validProtocols as $protocol) {
+         if(substr($url, 0, strlen($protocol)) == $protocol){
+            $isValidUrl = true;
+            break;
+         }
+      }
+
+      if(!$isValidUrl){
+         $url = $this->validProtocols[0].'://'.$url;
+      }
+
+      return $url;
    }
 }
 

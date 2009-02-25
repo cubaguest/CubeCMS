@@ -38,6 +38,25 @@ class PartnersListModel extends DbModel {
 
 		return $returArray;
    }
+
+   /**
+    * Metoda vrací zadaný počet náhodných partnerů
+    * @param int $num -- (option) počet partnerů
+    */
+   public function getRandomPartners($num = 1) {
+      $sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(),
+         array(self::COLUMN_LABEL => "IFNULL(".self::COLUMN_LABEL_LANG_PREFIX.Locale::getLang()
+            .", ".self::COLUMN_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
+			self::COLUMN_ID_PARTNER, self::COLUMN_NAME, self::COLUMN_LOGO_FILE, self::COLUMN_LOGO_TYPE,
+         self::COLUMN_LOGO_WIDTH, self::COLUMN_LOGO_HEIGHT, self::COLUMN_URL))
+				->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId())
+				->order('rand()')
+            ->limit(0, $num);
+
+		$returArray = $this->getDb()->fetchAssoc($sqlSelect);
+
+		return $returArray;
+   }
 }
 
 ?>
