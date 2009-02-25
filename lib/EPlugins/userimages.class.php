@@ -242,6 +242,35 @@ class UserImagesEplugin extends Eplugin {
 		}
 	}
 	
+   /**
+    * Metoda vymaže všechny uživatelské obrázky
+    */
+   public function deleteAllImages() {
+      $images = $this->getImagesList($this->getModule()->getId(), $this->idArticle);
+
+      $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
+         $dirSmall = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR;
+
+      try {
+         foreach ($images as $key => $img) {
+            $file = new File($key, $dir);
+            $file->remove();
+            $file = new File($key, $dirSmall);
+            $file->remove();
+         }
+         // vymaz z db
+         $sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_IMAGES)
+         ->where(self::COLUM_ID_ITEM.' = '.$this->getModule()->getId())
+         ->where(self::COLUM_ID_ARTICLE.' = '.$this->idArticle);
+         $this->getDb()->query($sqlDel);
+      } catch (Exception $e) {
+         new CoreException(_('Nepodařilo se smazat uživatelské obrázky chyba ').$e->getMessage(),3);
+      }
+
+   }
+
 	/**
 	 * Metoda kontroluje, jestli nebyl soubor smazán
 	 */
