@@ -73,7 +73,7 @@ class FlashFile extends File {
          $this->flashHeight = $imageProperty[1];
          $type = $imageProperty[2];
 
-         if($type == IMAGETYPE_SWF){
+         if($type == IMAGETYPE_SWF OR $type == IMAGETYPE_SWC){
             $this->isFlash = true;
          } else {
             $this->isFlash = false;

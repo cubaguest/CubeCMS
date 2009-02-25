@@ -28,7 +28,12 @@ class Dir {
     * @param string $dirName -- (option) název adresáře
     */
    public function __construct($dirName = null) {
-      $this->dir = $dirName;
+      // kontrola správnosti adresáře
+      if($dirName instanceof Dir){
+         $this->dir = (string)$dirName;
+      } else {
+         $this->dir = $this->checkDirPath($dirName);
+      }
 
 //      if(AppCore::getModuleErrors() instanceof Messages){
 //         $this->errmsg = AppCore::getModuleErrors();
@@ -41,15 +46,19 @@ class Dir {
      * 
      * @todo dodělat přidávání lomítek před adresář
 	 */
-	public function checkDir($directory) {
+	public function checkDir($directory = null) {
 		//doplnění posledního lomítka za dest adresář
-		if($directory[strlen($directory)-1] != "/"){
+		if($directory != null){
+         $directory = $this->getDir();
+      }
+      if($directory[strlen($directory)-1] != "/"){
 			$directory .= "/";
 		}
 
 		if(!file_exists($directory) OR !is_dir($directory)){
 			return $this->createDirs($directory);
 		}
+      
       return true;
 	}
 
@@ -110,11 +119,32 @@ class Dir {
 	 * @param string -- cesta
 	 * @return string -- opravená cesta
 	 */
-	public function checkDirPath($path) {
-		if(($path[strlen($path)-1] != '/') AND ($path[strlen($path)-1] != '\\')){
-			$path.=DIRECTORY_SEPARATOR;
-		}
-		return $path;
-	}
+   public function checkDirPath($path = null) {
+      if($path == null){
+         $path = $this->getDir();
+      }
+      echo $this->dir;
+      if(($path[strlen($path)-1] != '/') AND ($path[strlen($path)-1] != '\\')){
+         $path.=DIRECTORY_SEPARATOR;
+      }
+
+      return $path;
+   }
+
+   /**
+    * Metoda vrací adresář
+    * @return string -- adresář
+    */
+   public function getDir() {
+      return $this->dir;
+   }
+
+   /**
+    * Magická metoda pro vracení adresáře jako řetězec
+    * @return string -- adresář
+    */
+   public function  __toString() {
+      return $this->getDir();
+   }
 }
 ?>

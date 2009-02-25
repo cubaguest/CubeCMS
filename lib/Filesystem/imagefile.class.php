@@ -114,9 +114,10 @@ class ImageFile extends File {
           * kvůli flashi je tady vyjímka protože flash se zpracovává v flashfile
           * a nelze mu měniti velikost ani jej resamplovat
           *
-          * Flash má typ obrázku 4
+          * Flash má typ obrázku 4 a 13
           */
-         if($this->imageType == null OR $this->imageType == IMAGETYPE_SWF){
+         if($this->imageType == null OR $this->imageType == IMAGETYPE_SWF OR
+            $this->imageType == IMAGETYPE_SWC){
             $this->isImage = false;
             if($this->reportErrors){
                $this->errMsg()->addMessage(_('Zadaný soubor není podporovaný obrázek'));
@@ -185,7 +186,7 @@ class ImageFile extends File {
             $imageType = $this->imageType;
          }
 
-         $saved = $this->saveNewImage($newImage, $imageType, $dstDir, $newName);
+         $saved = $this->saveNewImage($newImage, $imageType, new Dir($dstDir), $newName);
          imagedestroy($newImage);
       }
       return $saved;
@@ -304,9 +305,9 @@ class ImageFile extends File {
        *
        * @return boolean -- true pokud se obrázek podařilo uložit
        */
-      private function saveNewImage($newImage, $type, $dstDir, $fileName) {
-         $dirObj = new Dir();
-         if($dirObj->checkDir($dstDir)){
+      private function saveNewImage($newImage, $type, Dir $dstDir, $fileName) {
+         //$dirObj = new Dir();
+         if($dstDir->checkDir()){
 
             switch ($type) {
                case IMAGETYPE_GIF:

@@ -44,7 +44,7 @@ class File {
 
    /**
     * Adresář souboru
-    * @var string
+    * @var Dir
     */
    private $fileDir = null;
 
@@ -148,7 +148,7 @@ class File {
 
       // Pokud je vložen objekt File
       if($file instanceof File){
-         $this->fileDir = $file->getFileDir();
+         $this->fileDir = new Dir($file->getFileDir());
          $this->fileNameOutput = $file->getName();
          $this->fileNameInput = $file->getNameInput();
          $this->fileMimeType = $file->getMimeType();
@@ -161,7 +161,7 @@ class File {
             $arr = $this->parsePathFile($inputFile);
             if($arr != false){
                $this->fileNameInput = $arr[2];
-               $this->fileDir = $arr[1];
+               $this->fileDir = new Dir($arr[1]);
             }
             $this->fileNameOutput = $file;
          }
@@ -173,12 +173,12 @@ class File {
                if($arr != false){
                   $this->fileNameOutput = $arr[2];
                   $this->fileNameInput = $arr[2];
-                  $this->fileDir = $arr[1];
+                  $this->fileDir = new Dir($arr[1]);
                }
             } else {
                $this->fileNameOutput = $file;
                $this->fileNameInput = $file;
-               $this->fileDir = $dir;
+               $this->fileDir = new Dir($dir);
             }
          }
 
@@ -342,9 +342,10 @@ class File {
     * @return boolean -- true pokud byl soubor odstraněn
     */
    public function remove() {
-      if($this->exist()){
+      if($this->exist() AND !is_dir($this->getNameInput(true))){
          return unlink($this->getNameInput(true));
 		}
+      return false;
    }
 
    /**
