@@ -252,14 +252,16 @@ class Template {
 	 * @param boolean -- true pokud je zadána i cesta se souborem
 	 */
 	public function addCss($cssName, $withPath = false){
-		//TODO kontrola souborů a duplicit
-		if(!$withPath){
-			if($this->getModule() != null){
-				$cssName = $this->selectModuleStylesheetFaceFile($cssName);			
-//				$cssName = $this->module->getDir()->getStylesheetsDir().$cssName;
-			}
-		}
-		array_push(self::$stylesheets, $cssName);
+		//TODO kontrola souborů
+      if(!in_array($cssName, self::$stylesheets)){
+         if(!$withPath){
+            if($this->getModule() != null){
+               $cssName = $this->selectModuleStylesheetFaceFile($cssName);
+               //				$cssName = $this->module->getDir()->getStylesheetsDir().$cssName;
+            }
+         }
+         array_push(self::$stylesheets, $cssName);
+      }
 	}
 	
 	/**
@@ -290,13 +292,15 @@ class Template {
 	 * @param boolean -- true pokud je zadána i cesta se souborem
 	 */
 	public function addJS($javaScriptName, $withPath = false){
-		//TODO kontrola souborů a duplicit
-		if(!$withPath){
-			if($this->getModule() != null){			
-				$javaScriptName = $this->module->getDir()->getJavaScriptsDir().$javaScriptName;
-			}
-		}
-		array_push(self::$javascripts, $javaScriptName);
+      //TODO kontrola souborů
+      if(!in_array($javaScriptName, self::$javascripts)){
+         if(!$withPath){
+            if($this->getModule() != null){
+               $javaScriptName = $this->module->getDir()->getJavaScriptsDir().$javaScriptName;
+            }
+         }
+         array_push(self::$javascripts, $javaScriptName);
+      }
 	}
 	
 	/**
