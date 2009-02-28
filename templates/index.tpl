@@ -93,59 +93,14 @@
 	<div id="col1wrap" class="column">
 		<div id="col1pad" class="{if $LEFT_PANEL eq true}col1pad_plusleft {/if}{if $RIGHT_PANEL eq true}col1pad_plusright {/if}">
 
-		{* Vypis hlasek *}
-		{if $MESSAGES neq null}
-		<p class="message text">
-		{html_image file='./images/icons/accept.png'}
-		{foreach from=$MESSAGES key=MESSAGESNO item=MESSAGE}
-		{$MESSAGE}<br />
-		{/foreach}
-		</p>
-		{/if}
-
-		{* Vypis chybovych hlasek ENGINU *}
-		{if $CORE_ERRORS_EMPTY neq true}
-		<p class="error_message text">
-		{html_image file='./images/icons/coreerror.png'}
-		{foreach from=$CORE_ERRORS key=ERRNO item=ERROR}
-		{$ERROR_NAME}: ({$ERROR.code}) {$ERROR.name}. File: {$ERROR.file}. Line: {$ERROR.line}<br />
-		{/foreach}
-		</p>
-		{/if}
-
-		{* Vypis chybovych hlasek MODULU *}
-		{if $ERRORS neq null}
-		<p class="error_message text">
-		{html_image file='./images/icons/error.png'}
-		{foreach from=$ERRORS key=ERRNO item=ERROR}
-		{if $DEBUG_MODE == true}
-		{$ERROR_MODULE_NAME} {$ERROR}<br />
-		{else}
-		{$ERROR}<br />
-		{/if}
-		{/foreach}
-		</p>
-		{/if}
-
-		{* Vypis sablon modulu *}
-		{foreach from="$MODULES_TEMPLATES" item="TEMPLATE" key="TPLKEY" name ='mtemplates'}
-
-		{* upravit *}
-		{if $TEMPLATE.LABEL eq null AND $smarty.foreach.mtemplates.first}
-		<h1>&gt;&gt;{$CATEGORY_TITLE}{if $TEMPLATE.SUBLABEL neq null} - {$TEMPLATE.SUBLABEL}{/if}</h1>
-		{else}
-		<h1>&gt;&gt;{$TEMPLATE.LABEL}{if $TEMPLATE.SUBLABEL neq null} - {$TEMPLATE.SUBLABEL}{/if}</h1>
-		{/if}
-<!-- sof Module box -->
-		<div id="{$TEMPLATE.IDENT}Conteiner{$TPLKEY}" class="{$TEMPLATE.IDENT}ContainerClass moduleBox">
-		{foreach from=$TEMPLATE.TEMPLATES item=tplfile}
-			{assign var='MODULE_TPL_FILE' value=$tplfile.FILE}{* FOR LOADING MADULE TEPLATE WITH INCLUDE *}
-			{include file=$tplfile.FILE VARS=$TEMPLATE.VARS PRIVATE=$TEMPLATE.VARS ID=$FILE.ID}
-		{/foreach}
-		<hr class="reseter" />
-		</div>
-<!-- eof Module box -->
-		{/foreach}
+      {if $PAGE_NOT_FOUND eq true}
+         {$PAGE_NOT_FOUND_TEXT}
+      {else}
+         {include file='engine:messages.tpl'}
+         {include file='engine:modules.tpl'}
+      {/if}
+		
+		
 		<hr class="separator" />
 	</div><!-- col1pad -->
 </div><!-- col1wrap -->

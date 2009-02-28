@@ -145,8 +145,8 @@ class SiteMap {
 	 * @param string -- pro jaký vahledávač má být mapa generována
 	 * @return string -- bufer s vygenerovanou mapou
 	 */
-	public static function generateMap($mapType = 'google'){
-		if($mapType == 'google'){
+	public static function generateMap($mapType = 'xml'){
+		if($mapType == 'xml'){
 			ob_start();
 			header('Content-type: text/xml');
 			echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
@@ -166,7 +166,7 @@ class SiteMap {
 			return ob_get_clean();
 		} 
 //		Pro yahoo
-		else if($mapType == 'yahoo'){
+		else if($mapType == 'txt'){
 			ob_start();
 			header('Content-type: text/plain');
 			foreach (self::$items as $i)
