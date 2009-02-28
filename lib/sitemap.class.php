@@ -97,7 +97,12 @@ class SiteMap {
 	 * @param float -- priorita (0 - 1)
 	 */
 	public function addItem($url, $lastChange, $frequency = null ,$priority = null) {
-		$date = new DateTime(date(DATE_ISO8601,$lastChange));
+		// pokud je datum v budoucnosti nastavím aktuální
+      if($lastChange > time()){
+         $lastChange = time();
+      }
+
+      $date = new DateTime(date(DATE_ISO8601,$lastChange));
 		
 		if($frequency == null){
 			$frequency = $this->changeFreq;
@@ -146,7 +151,8 @@ class SiteMap {
 	 * @return string -- bufer s vygenerovanou mapou
 	 */
 	public static function generateMap($mapType = 'xml'){
-		if($mapType == 'xml'){
+      // Pro Google a Seznam
+      if($mapType == 'xml'){
 			ob_start();
 			header('Content-type: text/xml');
 			echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
@@ -158,11 +164,12 @@ class SiteMap {
 				foreach ($i as $index => $_i)
 				{
 					if (!$_i) continue;
-					echo "<$index>" . self::codeXML($_i) . "</$index>\n";
+					echo "<$index>" . self::codeXML((string)$_i) . "</$index>\n";
 				}
 				echo "</url>\n";
 			}
 			echo '</urlset>';
+         ob_flush();
 			return ob_get_clean();
 		} 
 //		Pro yahoo
@@ -173,6 +180,7 @@ class SiteMap {
 			{
 				echo $i['loc'] . "\n";
 			}
+         ob_flush();
 			return ob_get_clean();
 		}
 	}

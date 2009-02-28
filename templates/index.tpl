@@ -94,7 +94,7 @@
 		<div id="col1pad" class="{if $LEFT_PANEL eq true}col1pad_plusleft {/if}{if $RIGHT_PANEL eq true}col1pad_plusright {/if}">
 
       {if $PAGE_NOT_FOUND eq true}
-         {$PAGE_NOT_FOUND_TEXT}
+         {include file='engine:error404.tpl'}
       {else}
          {include file='engine:messages.tpl'}
          {include file='engine:modules.tpl'}

@@ -5,7 +5,7 @@
  * Obsluhuje celou aplikaci a její komponenty.
  *
  * @copyright  Copyright (c) 2008 Jakub Matas
- * @version    $Id: $ VVE3.5.0 $Revision: $
+ * @version    $Id: $ VVE3.9.1 $Revision: $
  * @author     $Author: jakub $ $Date: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
  *             $LastChangedBy: jakub $ $LastChangedDate: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
  * @abstract 	Hlavní třída aplikace(Singleton)
@@ -1016,8 +1016,8 @@ class AppCore {
       //		procházení prvků stránky
       if($items != null){
          //  Nastavení prováděné kategorie
-         self::$currentCategory = array(Category::COLUM_CAT_LABEL => Category::getLabel()
-            , Category::COLUM_CAT_ID => Category::getId());
+         self::$currentCategory = array(Category::COLUMN_CAT_LABEL => Category::getLabel()
+            , Category::COLUMN_CAT_ID => Category::getId());
          foreach ($items as $itemIndex => $item) {
             //			Vytvoření objektu šablony
             $template = new Template();
@@ -1206,8 +1206,8 @@ class AppCore {
             .Locale::getDefaultLang().")", "alt" => "IFNULL(item.alt_".Locale::getLang()
             .", item.alt_".Locale::getDefaultLang().")", '*'))
       ->join(array("cat" => $categoryTable), "cat.id_category=item.id_category",
-         null, array(Category::COLUM_CAT_LABEL => "IFNULL(cat.label_"
-            .Locale::getLang().", cat.label_".Locale::getDefaultLang().")", Category::COLUM_CAT_ID))
+         null, array(Category::COLUMN_CAT_LABEL => "IFNULL(cat.label_"
+            .Locale::getLang().", cat.label_".Locale::getDefaultLang().")", Category::COLUMN_CAT_ID))
       ->join(array("module" => $modulesTable), "item.id_module=module.id_module", null)
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->auth->getGroupName()." LIKE \"r__\"")
       ->where("panel.position = '".$panelSideLower."'", "and")
@@ -1228,8 +1228,8 @@ class AppCore {
             //						self::$currentCategory = array(Category::getLabel(), Category::getId());
             //	Nastavení kategorie
             self::$currentCategory = $category
-            = array(Category::COLUM_CAT_LABEL => $panel->{Category::COLUM_CAT_LABEL},
-               Category::COLUM_CAT_ID => $panel->{Category::COLUM_CAT_ID});
+            = array(Category::COLUMN_CAT_LABEL => $panel->{Category::COLUMN_CAT_LABEL},
+               Category::COLUMN_CAT_ID => $panel->{Category::COLUMN_CAT_ID});
 
             $tableIndex = 1; $moduleDbTables = array();
             $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
@@ -1269,8 +1269,8 @@ class AppCore {
                //					nastavení tempalte
                $panelTemplate->setModule($panelModule);
                $link = new Links(true);
-               $panelTemplate->setTplCatLink($link->category($panel->{Category::COLUM_CAT_LABEL},
-                     $panel->{Category::COLUM_CAT_ID}));
+               $panelTemplate->setTplCatLink($link->category($panel->{Category::COLUMN_CAT_LABEL},
+                     $panel->{Category::COLUMN_CAT_ID}));
                unset ($link);
 
                //	CONTROLLER PANELU
@@ -1344,9 +1344,10 @@ class AppCore {
       define('SITEMAP_COLUMN_PRIORITY', 'sitemap_priority');
 
       $itemsSelect = self::$dbConnector->select()
-      ->from(array("cat" => $categoryTable), array(Category::COLUM_CAT_LABEL => "IFNULL(item.".Category::COLUM_CAT_LABEL.'_'.Locale::getLang().", item.label_".Locale::getDefaultLang().")",
-                                            "alt" => "IFNULL(item.alt_".Locale::getLang().", item.alt_".Locale::getDefaultLang().")", '*'))
-      ->join(array("item" => $itemsTable), "item.id_category=cat.id_category", null)
+      ->from(array("cat" => $categoryTable), array('label' => "IFNULL(item.".Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getLang()
+            .", item.".Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")", 
+            "alt" => "IFNULL(item.alt_".Locale::getLang().", item.alt_".Locale::getDefaultLang().")", '*'))
+      ->join(array("item" => $itemsTable), "item.".Category::COLUMN_CAT_ID."=cat.".Category::COLUMN_CAT_ID, null)
       ->join(array("module" => $modulesTable), "module.id_module=item.id_module", 'LEFT')
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
       ->group('item.id_category')
@@ -1357,17 +1358,13 @@ class AppCore {
 
       if($items != null){
          foreach ($items as $itemIndex => $item) {
-            echo "<pre>";
-            print_r($item);
-            echo "</pre>";
-
             //				Vytvoření objektu pro práci s modulem
             $module = new Module($item, $this->getModuleTables($item));
             //				klonování modulu do statické proměné enginu
             self::$selectedModule = clone $module;
 
             $link = new Links(true);
-            $link = $link->category($item->{Category::COLUM_CAT_URLKEY});
+            $link = $link->category($item->{Category::COLUMN_CAT_LABEL_ORIG}, $item->{Category::COLUMN_CAT_ID});
 
             $moduleName = ucfirst($module->getName());
             $moduleClass = $moduleName.self::MODULE_SITEMAP_SUFIX_CLASS;
@@ -1382,13 +1379,14 @@ class AppCore {
             else {
                $sitemap = new SiteMap($module, $link, $item->{SITEMAP_COLUMN_CHANGEFREQ}, $item->{SITEMAP_COLUMN_PRIORITY});
             }
+
             $sitemap->run();
             unset($sitemap);
          }
          //			Vygenerování mapy
          //			Podle vyhledávače
-//         $searchEngine = htmlspecialchars($_GET['for']);
          SiteMap::generateMap(UrlRequest::getSupportedServicesName());
+         exit ();
       }
    }
 
@@ -1401,7 +1399,9 @@ class AppCore {
 
       //	Hlavni promene strany
       $this->coreTpl->addVar("PAGE_NOT_FOUND", true);
-      $this->coreTpl->addVar("PAGE_NOT_FOUND_TEXT", _('Chyba 404 - Stránka nebyla nalezena. Zkontrolujte prosím zadanou cestu.'));
+      $this->coreTpl->addVar("PAGE_NOT_FOUND_TEXT", _('Chyba 404 - Stránka nebyla nalezena.
+Zkontrolujte prosím zadanou adresum nebo přejděte na'));
+      $this->coreTpl->addVar("PAGE_NOT_FOUND_MAIN_PAGE", _(' hlavní stránku'));
    }
 
     /**

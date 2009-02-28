@@ -170,7 +170,7 @@ class Eplugin {
         $link = new Links($clear, $onlyWebRoot);
         $cat = AppCore::getSellectedCategory();
         if($cat != false){
-            $link->category($cat[Category::COLUM_CAT_LABEL], $cat[Category::COLUM_CAT_ID]);
+            $link->category($cat[Category::COLUMN_CAT_LABEL], $cat[Category::COLUMN_CAT_ID]);
         }
 //        $cat = Category::getCurrentCategory();
         return $link;

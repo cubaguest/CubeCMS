@@ -148,11 +148,16 @@ class UrlRequest {
    private static $supportedServicesType = null;
 
    /**
-    * Pole s parametry supproted services
+    * Název služby supproted services
     * @var string
     */
-   private static $supporteServicesArray = array(self::SUPPORTED_SERVICES_ARR_NAME => null,
-      self::SUPPORTED_SERVICES_ARR_PARAMS => null);
+   private static $supporteServicesName = null;
+
+   /**
+    * Parametry služby supproted services
+    * @var string
+    */
+   private static $supporteServicesParams = null;
 
    /**
     * Konstruktor
@@ -170,7 +175,6 @@ class UrlRequest {
 //      echo $_SERVER['REQUEST_URI'];
       //		Vytvoření url
       self::createUrl();
-
       //		Parsování url
       if(self::checkNormalUrl()){
          self::parseUrl();
@@ -194,7 +198,7 @@ class UrlRequest {
             return false;
          }
       }
-      return false;
+      return true;
    }
 
      /**
@@ -219,6 +223,7 @@ class UrlRequest {
       //		Kontrola jestli je zadána kategorie
       $isCategory = false;
       if(Links::checkCategoryUrlRequest(pos($urlItems))){
+         $isCategory = true;
          unset ($urlItems[key($urlItems)]);
       }
 
@@ -251,9 +256,8 @@ class UrlRequest {
       if(isset($urlItems) AND pos($urlItems) != null){
          Links::chackOtherUrlParams($urlItems);
       }
-
       // zjištění, jestli je nějáká kategorie nebo se jedná o neexistující stránku
-      if(!$isCategory AND !empty ($urlItemsBack)){
+      if(!$isCategory AND $urlItemsBack[0] != null){
          AppCore::setErrorPage(); // zapnem Chybovou stránku
       }
    }
@@ -267,40 +271,33 @@ class UrlRequest {
 
       $name = null;
       $params = null;
+      $regexResult = array();
       switch (self::$supportedServicesType) {
          case self::SUPPORTSERVICES_EPLUGIN_NAME:
-            $name = ereg('^eplugin([^\.]*)\.js.*$', $url);
-            $params = ereg('^eplugin[^\.]*.js\?(.*)$', $url);
+            ereg('^eplugin([^\.]*)\.js\?(.*)$', $url, $regexResult);
+            $name = $regexResult[1];
+            $params = $regexResult[2];
             break;
          case self::SUPPORTSERVICES_JSPLUGIN_NAME:
-            $name = ereg('^jsplugin([^\.]*)\.js.*$', $url);
-            $params = ereg('^jsplugin[^\.]*.js\?(.*)$', $url);
+            ereg('^jsplugin([^\.]*)\.js\?(.*)$', $url, $regexResult);
+            $name = $regexResult[1];
+            $params = $regexResult[2];
             break;
          case self::SUPPORTSERVICES_SITEMAP_NAME:
-            $name = ereg(self::$notNormalUrlArrayRegex[self::SUPPORTSERVICES_SITEMAP_NAME], $url);
+            ereg(self::$notNormalUrlArrayRegex[self::SUPPORTSERVICES_SITEMAP_NAME], $url, $regexResult);
+            $name = $regexResult[1];
             default:
                break;
-         }
-
-
-
-         self::$supporteServicesArray[self::SUPPORTED_SERVICES_ARR_NAME]= $name;
-         self::$supporteServicesArray[self::SUPPORTED_SERVICES_ARR_PARAMS]= $params;
-
       }
+      
+      self::$supporteServicesName = $name;
+      self::$supporteServicesParams = $params;
+   }
 
      /**
       * Metoda vytvoří url a uloží ji do $currentUrl
       */
       private static function createUrl() {
-         //		echo '<pre>';
-         //		echo $_SERVER['PHP_SELF'].'<br>';
-         //		echo $_SERVER['DOCUMENT_ROOT'].'<br>';
-         //		echo $_SERVER['REQUEST_URI'].'<br>';
-         //		echo $_SERVER['SCRIPT_NAME'].'<br>';
-         //		echo AppCore::getAppWebDir().'<br>';
-         //		echo '</pre>';
-
          $fullUrl = $_SERVER['REQUEST_URI'];
          self::$scriptName = $_SERVER["SCRIPT_NAME"];
          self::$serverName = $_SERVER["SERVER_NAME"];
@@ -391,8 +388,8 @@ class UrlRequest {
        * @return string -- název služby, záleží na typu (např. tinymce, ...)
        * u typu Sitemap vrací xml nebo txt
        */
-      public static function getSupportedServicesName() {
-         return self::$supporteServicesArray[self::SUPPORTED_SERVICES_ARR_NAME];
+      public static function getSupportedServicesName(){
+         return self::$supporteServicesName;
       }
 
       /**
@@ -400,7 +397,7 @@ class UrlRequest {
        * @return string -- string parametry, nerozparsované nebo null
        */
       public static function getSupportedServicesParams() {
-         return self::$supporteServicesArray[self::SUPPORTED_SERVICES_ARR_PARAMS];
+         return self::$supporteServicesParams;
       }
 
      /**
