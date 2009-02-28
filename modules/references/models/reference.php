@@ -12,6 +12,9 @@ class ReferenceModel extends DbModel {
    const COLUMN_REFERENCE_ID_ITEM = 'id_item';
    const COLUMN_REFERENCE_ID = 'id_reference';
    const COLUMN_REFERENCE_FILE = 'file';
+   
+   const COLUMN_TEXT = 'text';
+	const COLUMN_CHANGED_TIME = 'changed_time';
 
    private $refName = null;
 
@@ -148,11 +151,82 @@ class ReferenceModel extends DbModel {
       };
    }
 
-   private function getUserTable() {
-      $tableUsers = AppCore::sysConfig()->getOptionValue(Auth::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES);
-      return $tableUsers;
+   public function getOtherReferences() {
+      $sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(2),
+         array(self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT.'_'.Locale::getLang()
+            .",".self::COLUMN_TEXT.'_'.Locale::getDefaultLang().")"))
+									->where(self::COLUMN_REFERENCE_ID_ITEM." = ".$this->getModule()->getId());
+
+		$text=$this->getDb()->fetchObject($sqlSelect);
+		if($text != null){
+			return $text->{self::COLUMN_TEXT};
+		}
+      return null;
    }
 
+   /**
+	 * Metoda načte všechny jazkové variace textu z db
+	 *
+	 * @return array -- pole s textama
+	 */
+	public function getOtherRefAllLang() {
+		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(2))
+						->where(self::COLUMN_REFERENCE_ID_ITEM." = ".$this->getModule()->getId());
+
+		$text = $this->getDb()->fetchAssoc($sqlSelect,true);
+
+
+      if(!empty ($text)){
+         $text = $this->parseDbValuesToArray($text, self::COLUMN_TEXT);
+      }
+
+		return $text[self::COLUMN_TEXT];
+	}
+
+   public function saveEditOtherReferences($texts) {
+      if($this->isOtherRefSaved()){
+         $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
+            self::COLUMN_CHANGED_TIME, time());
+         //
+         $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable(2))
+               ->set($textArr)
+               ->where(self::COLUMN_REFERENCE_ID_ITEM." = '".$this->getModule()->getId()."'");
+         //
+         //      // vložení do db
+         if($this->getDb()->query($sqlInsert)){
+            return true;
+         } else {
+            return false;
+         };
+      } else {
+         $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
+            self::COLUMN_CHANGED_TIME, time(),
+            self::COLUMN_REFERENCE_ID_ITEM, $this->getModule()->getId());
+         //
+         $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable(2))
+               ->colums(array_keys($textArr))
+               ->values(array_values($textArr));
+         //      //		Vložení do db
+         if($this->getDb()->query($sqlInsert)){
+            return true;
+         } else {
+            return false;
+         }
+      }
+   }
+
+   private function isOtherRefSaved() {
+      $sql = $this->getDb()->select()->from($this->getModule()->getDbTable(2), array('count' => 'COUNT(*)'))
+      ->where(self::COLUMN_REFERENCE_ID_ITEM." = ".$this->getModule()->getId());
+
+      $count = $this->getDb()->fetchObject($sql);
+
+      if($count->count > 0){
+         return true;
+      }
+      return false;
+
+   }
 }
 
 ?>

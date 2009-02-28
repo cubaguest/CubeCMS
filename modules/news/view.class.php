@@ -71,6 +71,7 @@ class NewsView extends View {
 
       $this->template()->setTplSubLabel(_('Přidání novinky'));
       $this->template()->setSubTitle(_('Přidání novinky'), true);
+      $this->template()->addVar("ADD_NEWS_LABEL",_('Přidání novinky'));
 
       $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
       $this->assignLabels();
@@ -102,6 +103,7 @@ class NewsView extends View {
 
       $this->template()->setTplSubLabel(_("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
       $this->template()->setSubTitle(_("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'), true);
+      $this->template()->addVar("ADD_NEWS_LABEL",_("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
 
       $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
       $this->assignLabels();

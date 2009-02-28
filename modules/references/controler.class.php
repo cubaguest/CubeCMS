@@ -11,6 +11,7 @@ class ReferencesController extends Controller {
    * @var string
    */
    const FORM_PREFIX = 'reference_';
+   const FORM_PREFIX_OTHER = 'other_';
    const FORM_BUTTON_SEND = 'send';
    const FORM_BUTTON_EDIT = 'edit';
    const FORM_BUTTON_DELETE = 'delete';
@@ -18,6 +19,7 @@ class ReferencesController extends Controller {
    const FORM_INPUT_NAME = 'name';
    const FORM_INPUT_LABEL = 'label';
    const FORM_INPUT_FILE = 'file';
+   const FORM_INPUT_TEXT = 'text';
 
    /**
     * Adresíř s malými obrázky
@@ -51,19 +53,17 @@ class ReferencesController extends Controller {
       //		link pro přidání
       if($this->getrights()->iswritable()){
          $this->container()->addlink('LINK_TO_ADD_REFERENCE',$this->getLink()->action($this->getaction()->add()));
-
+         $this->container()->addlink('LINK_TO_EDIT_OTHER_REFERENCE',$this->getLink()->action($this->getaction()->editOtherReference()));
          // přidání linků pro editaci
-
          foreach ($referencesArr as $refKey => $refer) {
             $referencesArr[$refKey][self::REFERENCE_EDIT_LINK] =
             $this->getLink()->article($refer[ReferenceModel::COLUMN_REFERENCE_NAME],
                $refer[ReferenceModel::COLUMN_REFERENCE_ID])
             ->action($this->getaction()->edit());
-
          }
-
-
       }
+
+      $this->container()->addData('OTHER_REFERENCES', $referModel->getOtherReferences());
 
 
       $this->container()->addData('REFERENCES', $referencesArr);
@@ -231,6 +231,34 @@ class ReferencesController extends Controller {
 
       }
    }
+
+   public function editotherrefController() {
+      $form = new Form();
+      $form->setPrefix(self::FORM_PREFIX.self::FORM_PREFIX_OTHER);
+
+      $form->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
+            ->crSubmit(self::FORM_BUTTON_SEND);
+
+      $refM = new ReferenceModel();
+      $form->setValue(self::FORM_INPUT_TEXT, $refM->getOtherRefAllLang());
+
+ //        Pokud byl odeslán formulář
+      if($form->checkForm()){
+         if($refM->saveEditOtherReferences($form->getValue(self::FORM_INPUT_TEXT))){
+            $this->infoMsg()->addMessage(_('Ostatní reference byly uloženy'));
+            $this->getLink()->action()->reload();
+         } else {
+            new CoreException(_('Ostatní reference se nepodařilo uložit, chyba při ukládání.'), 1);
+         }
+      }
+//    Data do šablony
+      $this->container()->addData('REFERENCE_OTHER_DATA', $form->getValues());
+      $this->container()->addData('ERROR_ITEMS', $form->getErrorItems());
+
+      //		Odkaz zpět
+      $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
+   }
+
 }
 
 ?>

@@ -21,6 +21,7 @@ class DwfilesView extends View {
 		$this->template()->addTpl("files.tpl");
       $this->template()->addCss('style.css');
 		$this->template()->addVar('NOT_ANY_FILE',_('Žádný soubor nebyl uložen'));
+		$this->template()->addVar('DOWNLOAD_THIS',_('Stáhnout'));
 	}
 	/*EOF mainView*/
 	

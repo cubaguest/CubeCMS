@@ -7,10 +7,10 @@
       <!-- <p class="downside"></p> -->
    </div>
    {/if}
-   <h2>{$REFERENCE.name}</h2>
    <a href="{$VARS.IMAGES_DIR|cat:$REFERENCE.file}" title="{$REFERENCE.file}">
       {html_image file=$VARS.IMAGES_SMALL_DIR|cat:$REFERENCE.file class='referenceImage'}
    </a>
+   <h2>{$REFERENCE.name}</h2>
    {$REFERENCE.label}
    <br class="reseter" />
 </div>

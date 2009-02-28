@@ -7,6 +7,7 @@ class ReferencesView extends View {
          $this->template()->addVar('LINK_TO_EDIT_REFERENCE_NAME', _("Upravit referenci"));
          $this->template()->addVar('DELETE_REFERENCE_CONFIRM_MESSAGE', _("Smazast referenci"));
          $this->template()->addVar('LINK_TO_DELETE_REFERENCE_NAME', _("Smazast referenci"));
+         $this->template()->addVar('LINK_TO_EDIT_OTHER_REFERENCE_NAME', _("Upravit ostatní reference"));
          $this->template()->addVar('EDITABLE', true);
 
          //			JSPlugin pro potvrzení mazání
@@ -15,8 +16,10 @@ class ReferencesView extends View {
       }
 //
       $this->template()->addTpl("list.tpl");
+      $this->template()->addTpl("otherRef.tpl");
 //
-//      $this->template()->addVar("NEWS_LIST_ARRAY", $this->container()->getData('news_list'));
+      $this->template()->addVar("OTHER_REFERENCES_NAME", _('Ostatní reference'));
+
 //      $this->template()->addVar("NEWS_LIST_NAME", _("Novinky"));
       $this->template()->addCss("style.css");
 //
@@ -98,6 +101,7 @@ class ReferencesView extends View {
    private function assignLabels() {
       $this->template()->addVar('REFERENCE_LABEL_NAME', _('Název'));
       $this->template()->addVar('REFERENCE_TEXT_NAME', _('Popis'));
+      $this->template()->addVar('REFERENCE_OTEHR_TEXT_NAME', _('Text'));
       $this->template()->addVar('REFERENCE_IMAGE_LABEL', _('Obrázek'));
 
       $this->template()->addVar('BUTTON_RESET', _('Obnovit'));
@@ -127,6 +131,28 @@ class ReferencesView extends View {
       $jquery = new JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
+   }
+   
+   public function editotherrefView() {
+      $this->template()->addTpl('editOtherRef.tpl');
+      $this->template()->addCss("style.css");
+
+      $this->template()->setTplSubLabel(_("Úprava ostatních referencí"));
+      $this->template()->setSubTitle(_("Úprava ostatních referencí").' - '.$this->container()->getData('REFERENCE_NAME'), true);
+      $this->template()->addVar("EDIT_OTHER_REFERENCE_LABEL",_("Úprava ostatních referencí"));
+
+      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět na seznam'));
+      $this->assignLabels();
+
+      //      tinyMCE
+      $tinyMce = new TinyMce();
+      $tinyMce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+      $this->template()->addJsPlugin($tinyMce);
+
+      //Taby - uspořádání
+      $jquery = new JQuery();
+      $jquery->addWidgentTabs();
+      $this->template()->addJsPlugin($jquery);;
    }
 }
 

@@ -25,6 +25,7 @@ class PhotogaleryView extends View {
       $this->container()->getEplugin('scroll')->assignToTpl($this->template());
 
       $this->template()->addVar('NOT_ANY_GALERY', _('Źádná galerie nebyla nahrána'));
+      $this->template()->addVar('SHOW_GALERY', _("Zobrazit galerii"));
 	}
 
     /**
@@ -108,7 +109,10 @@ class PhotogaleryView extends View {
 		$this->template()->addVar("BUTTON_SEND", _('Odeslat'));
 		$this->template()->addVar("BUTTON_RESET", _('Obnovit'));
 
-      $this->template()->setTplSubLabel(_('Přidání fotky do galerie').' &#132'.$this->container()->getData('GALERY_LABEL').'&#132');
+      $this->template()->addVar("ADD_PHOTOS_LABEL", _('Přidání fotky do galerie').' &#132'.$this->container()->getData('GALERY_LABEL').'&#147');
+
+      $this->template()->setTplSubLabel(_('Přidání fotky do galerie').' &#132'.$this->container()->getData('GALERY_LABEL').'&#147');
+      $this->template()->setSubTitle($this->container()->getData('GALERY_LABEL')._(' - přidání fotky'));
    }
 
    /**
@@ -126,7 +130,8 @@ class PhotogaleryView extends View {
 
       $this->template()->addTpl('editGalery.tpl');
 
-		$this->template()->setTplSubLabel(_('Úprava galerie').' &#132'.$this->container()->getData('GALERY_LABEL').'&#132');
+		$this->template()->setTplSubLabel(_('Úprava galerie').' &#132'.$this->container()->getData('GALERY_LABEL').'&#147');
+      $this->template()->addVar("EDIT_GALERY_LABEL", _('Úprava galerie').' &#132'.$this->container()->getData('GALERY_LABEL').'&#147');
 
       $this->template()->addVar("BUTTON_BACK_NAME", _('Zpět'));
 		$this->template()->addVar("BUTTON_SEND", _('Odeslat'));
