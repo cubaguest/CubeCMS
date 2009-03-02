@@ -11,8 +11,10 @@ class DwfilesController extends Controller {
 	 */
 	const FORM_PREFIX = 'dwfiles_';
 	const FORM_BUTTON_SEND = 'send';
+	const FORM_BUTTON_DELETE = 'delete';
 	const FORM_FILE_LABEL = 'label';
 	const FORM_FILE = 'file';
+	const FORM_FILE_ID = 'file_id';
 
    /**
     * Prefix pro soubor
@@ -35,6 +37,7 @@ class DwfilesController extends Controller {
       $dwFiles = $fileM->getDwFiles();
 //		pokud má uživatel právo zápisu vytvoříme odkaz pro editaci
 		if($this->getRights()->isWritable()){
+         $this->chackDeleteFile();
 			$this->container()->addLink('LINK_TO_ADD_FILE', $this->getLink()->action($this->getAction()->addFile()));
 		}
 
@@ -82,6 +85,31 @@ class DwfilesController extends Controller {
       //		Odkaz zpět
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
 	}
+
+   /**
+    * Metoda maže soubor
+    */
+   private function chackDeleteFile() {
+      $deleteForm = new Form(self::FORM_PREFIX);
+
+      $deleteForm->crSubmit(self::FORM_BUTTON_DELETE)
+      ->crInputHidden(self::FORM_FILE_ID, true, 'is_number');
+
+      if($deleteForm->checkForm()){
+         $fileM = new FilesDetailModel();
+
+         $file = $fileM->getDwFile($deleteForm->getValue(self::FORM_FILE_ID));
+
+         $file = new File($file, $this->getModule()->getDir()->getDataDir());
+
+         if($file->remove() AND $fileM->deleteDwFile($deleteForm->getValue(self::FORM_FILE_ID))){
+            $this->infoMsg()->addMessage(_('Soubor byl smazán'));
+            $this->getLink()->reload();
+         } else {
+            new CoreException(_('Soubor se nepodařilo smazat.'), 2);
+         }
+      }
+   }
 }
 
 ?>

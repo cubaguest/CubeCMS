@@ -56,6 +56,34 @@ class FilesDetailModel extends DbModel {
 		return $returArray;
    }
 
+   /**
+    * Metoda vrací soubor podle ID
+    */
+   public function getDwFile($id) {
+      $sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(),
+         self::COLUMN_FILE_NAME)
+		->where(self::COLUMN_ID_FILE." = ".$id);
+
+		$returArray = $this->getDb()->fetchAssoc($sqlSelect, true);
+
+      if(!empty ($returArray)){
+         return $returArray[self::COLUMN_FILE_NAME];
+      }
+      return false;
+		
+   }
+
+   /**
+    * Metoda smaže soubor podle ID
+    */
+   public function deleteDwFile($id) {
+      $sqlDelete = $this->getDb()->delete()->from($this->getModule()->getDbTable())
+      ->where(self::COLUMN_ID_FILE." = ".$id);
+
+      return $this->getDb()->query($sqlDelete);
+
+   }
+
 
 //	public function getText() {
 //		if($this->text == null){
