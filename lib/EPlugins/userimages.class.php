@@ -5,10 +5,10 @@
  * a správu. Obsahuje také svou vlastní šablonu pro jednodušší integraci k modulům.
  * Je částečne napojena na TinyMce JsPlugin pro generování listu obrázků.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: userimages.class.php 3.1.8 beta1 13.11.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída Epluginu pro práci s obrázky, přikládanými do stránky
+ * @copyright  	Copyright (c) 2009 Jakub Matas
+ * @version    	$Id: $ VVE3.9.1 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @uses 			používá také třídu TinyMce tinymce.class.php 
  * @todo doělat mazání souborů z celého článku
  */
@@ -19,6 +19,11 @@ class UserImagesEplugin extends Eplugin {
 	 * @var string
 	 */
 	protected $templateFile = 'userimages.tpl';
+
+   /**
+    * Název souboru s listem obrázků
+    */
+   const IMAGES_LIST_JS_FILE = 'imageslist.js';
 
 	/**
 	 * Název databázové tabulky se změnama
@@ -84,12 +89,12 @@ class UserImagesEplugin extends Eplugin {
 	const FILE_IMAGES_FORMAT_ARRAY = 'array';
 	
 	/**
-	 * $_GET parametr s id itemu a článku
+	 * $_PARAM parametr s id itemu a článku
 	 * @var string
 	 */
-	const GET_URL_ID_ITEM = 'idI';
-	const GET_URL_ID_ARTICLE = 'idA';
-	const GET_URL_IMAGES_LIST_TYPE = 'type';
+	const PARAM_URL_ID_ITEM = 'idI';
+	const PARAM_URL_ID_ARTICLE = 'idA';
+	const PARAM_URL_IMAGES_LIST_TYPE = 'type';
 	
 	/**
 	 * Název volby s názvem tabulky uživatelů
@@ -383,25 +388,32 @@ class UserImagesEplugin extends Eplugin {
 	 * @todo dodělat generování také do jiných typů souborů
 	 */
 	public function runOnlyEplugin() {
-      $idArticle = null;
-      if(isset($_GET[self::GET_URL_ID_ARTICLE])){
-         $idArticle = rawurldecode($_GET[self::GET_URL_ID_ARTICLE]);
-      }
-		
-      $array = $this->getImagesList(rawurldecode($_GET[self::GET_URL_ID_ITEM]),$idArticle);
-		
-		isset($_GET[self::GET_URL_IMAGES_LIST_TYPE]) == false ? $type = null : $type = rawurldecode($_GET[self::GET_URL_IMAGES_LIST_TYPE]);
-		switch ($type) {
-			case self::FILE_IMAGES_FORMAT_TINYMCE:
-				$data = TinyMce::generateListImages($array);
-				header("Content-Length: " . strlen($data));
-				header("Content-type: application/x-javascript");
-				echo $data;
-				exit();
-			break;
-			default:
-			break;
-		}
+      if(UrlRequest::getSupportedServicesFile() == self::IMAGES_LIST_JS_FILE) {
+         $idArticle = null;
+
+         $file = new JsFile(UrlRequest::getSupportedServicesFile());
+         $file->setParams(UrlRequest::getSupportedServicesParams());
+
+         if($file->getParam(self::PARAM_URL_ID_ARTICLE)){
+            $idArticle = rawurldecode($_GET[self::GET_URL_ID_ARTICLE]);
+         }
+
+         $array = $this->getImagesList($file->getParam(self::PARAM_URL_ID_ITEM),$file->getParam(self::PARAM_URL_ID_ARTICLE));
+
+//         isset($_GET[self::GET_URL_IMAGES_LIST_TYPE]) == false ? $type = null : $type = rawurldecode($_GET[self::GET_URL_IMAGES_LIST_TYPE]);
+
+         switch ($file->getParam(self::PARAM_URL_IMAGES_LIST_TYPE)) {
+            case self::FILE_IMAGES_FORMAT_TINYMCE:
+               $data = TinyMce::generateListImages($array);
+               header("Content-Length: " . strlen($data));
+               header("Content-type: application/x-javascript");
+               echo $data;
+               exit();
+               break;
+            default:
+               break;
+            }
+         }
 		return false;
 	}
 	
@@ -414,18 +426,28 @@ class UserImagesEplugin extends Eplugin {
 	public function getImagesListLink($type) {
 		switch ($type) {
 			case self::FILE_IMAGES_FORMAT_TINYMCE:
-				$link = new Links(true, true);
+            $file = new JsFile(self::IMAGES_LIST_JS_FILE, true);
 
-            $params = array(self::GET_URL_ID_ITEM => $this->getModule()->getId(),
-							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE);
-            if($this->idArticle != null){
-               $params[self::GET_URL_ID_ARTICLE] = $this->idArticle;
-            } else {
+            $file->setParam(self::PARAM_URL_ID_ITEM, $this->getModule()->getId());
+            $file->setParam(self::PARAM_URL_IMAGES_LIST_TYPE, self::FILE_IMAGES_FORMAT_TINYMCE);
 
-            }
+//            echo $this->getFileLink($file, array(self::PARAM_URL_ID_ITEM => $this->getModule()->getId(),
+//							self::PARAM_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE));
 
-            return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')
-               ->param($params));
+            return $this->getFileLink($file);
+
+//            $link = new Links(true, true);
+//
+//            $params = array(self::GET_URL_ID_ITEM => $this->getModule()->getId(),
+//							self::GET_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE);
+//            if($this->idArticle != null){
+//               $params[self::GET_URL_ID_ARTICLE] = $this->idArticle;
+//            } else {
+//
+//            }
+
+//            return rawurldecode($link->file('eplugin'.strtolower($this->getEpluginName()).'.js')
+//               ->param($params));
 			break;
 			
 			default:

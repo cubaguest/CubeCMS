@@ -21,13 +21,13 @@ class JQuery extends JsPlugin {
 		//$this->addCssFile('tabcontent.css');
 		
 //		Přidání js soubrů pluginu
-		$this->addJsFile(new JsPluginJsFile("jquery.js"));
+		$this->addJsFile(new JsFile("jquery.js"));
 	}
 	
 	/**
 	 * Metda vytvoří výchozí konfigurační soubor
 	 */
-	protected function generateFile() {
+	protected function generateFile(JsFile $file) {
 	}
 
   /**
@@ -38,7 +38,7 @@ class JQuery extends JsPlugin {
    * Metoda přidá jádro pro efekty UI
    */
   public function addUICore() {
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-core.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-core.packed.js"));
     return $this;
   }
 
@@ -49,7 +49,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-draggable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-draggable.packed.js"));
     return $this;
   }
 
@@ -61,7 +61,7 @@ class JQuery extends JsPlugin {
     $this->addUICore();
     $this->addUIDraggable();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-droppable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-droppable.packed.js"));
     return $this;
   }
 
@@ -72,7 +72,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-resizable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-resizable.packed.js"));
     return $this;
   }
 
@@ -83,7 +83,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-selectable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-selectable.packed.js"));
     return $this;
   }
 
@@ -95,7 +95,7 @@ class JQuery extends JsPlugin {
     $this->addUICore();
     $this->addUIDraggable();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-sortable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-sortable.packed.js"));
     return $this;
   }
 
@@ -110,7 +110,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-accordion.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-accordion.packed.js"));
     return $this;
   }
 
@@ -123,7 +123,7 @@ class JQuery extends JsPlugin {
     $this->addUIDraggable();
     $this->addUIResizable();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-dialog.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-dialog.packed.js"));
     return $this;
   }
 
@@ -134,7 +134,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-slider.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-slider.packed.js"));
     return $this;
   }
 
@@ -145,7 +145,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-tabs.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-tabs.packed.js"));
     return $this;
   }
 
@@ -157,7 +157,7 @@ class JQuery extends JsPlugin {
     /**
      * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
      */
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-datepicker.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-datepicker.packed.js"));
     return $this;
   }
 
@@ -168,7 +168,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-progressbar.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-progressbar.packed.js"));
     return $this;
   }
 
@@ -182,7 +182,7 @@ class JQuery extends JsPlugin {
   public function addEffectCore() {
     //deps
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-effect-core.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-effect-core.packed.js"));
     return $this;
   }
 
@@ -193,7 +193,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addEffectCore();
 
-    $this->addJsFile(new JsPluginJsFile("jquery-ui-effect-all.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-effect-all.packed.js"));
     return $this;
   }
 
@@ -205,7 +205,7 @@ class JQuery extends JsPlugin {
    * Metoda přidá efekty UI - all (všechny efekty)
    */
   public function addPluginCookie() {
-    $this->addJsFile(new JsPluginJsFile("jquery-cookie.packed.js"));
+    $this->addJsFile(new JsFile("jquery-cookie.packed.js"));
     return $this;
   }
 

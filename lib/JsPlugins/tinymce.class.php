@@ -22,19 +22,19 @@ class TinyMce extends JsPlugin {
 	 * $GET s theme tinymce
 	 * @var string
 	 */
-	const GET_TINY_THEME = 'theme';
+	const PARAM_TINY_THEME = 'theme';
 	
 	/**
 	 * $GET s modem tinymce
 	 * @var string
 	 */
-	const GET_TINY_MODE = 'mode';
+	const PARAM_TINY_MODE = 'mode';
 	
 	/**
 	 * $GET s odkazem na list obrázků
 	 * @var string
 	 */
-	const GET_TINY_IMAGES_LIST = 'img';
+	const PARAM_TINY_IMAGES_LIST = 'img';
 	
 	/**
 	 * Druhy theme pro tiny mce
@@ -146,12 +146,6 @@ class TinyMce extends JsPlugin {
 			'theme_advanced_buttons2' => array(),
 			'theme_advanced_buttons3' => array());
 
-	/**
-	 * Enter description here...
-	 * @var string
-	 */
-	private $fileContent = null;
-	
 	protected function initJsPlugin() {
 //		Název pluginu
 		$this->setJsPluginName("TinyMCE");
@@ -161,7 +155,7 @@ class TinyMce extends JsPlugin {
 	
 	protected function initFiles() {
 //		Výchozí js soubor pluginu
-      $jsFile = new JsPluginJsFile("tiny_mce_default.js");
+      $jsFile = new JsFile("tiny_mce_params.js", true);
       $face = AppCore::getTepmlateFaceDir(false,false);
       $face = substr($face, 0, strlen($face)-1);
       $jsFile->setParam(self::PARAM_FACE, $face);
@@ -169,31 +163,32 @@ class TinyMce extends JsPlugin {
 		$this->setSettingJsFile($jsFile);
 		
 //		Přidání js soubrů pluginu
-		$this->addJsFile(new JsPluginJsFile("tiny_mce.js"));
+		$this->addJsFile(new JsFile("tiny_mce.js"));
 	}
 	
 	/**
 	 * Metda vytvoří výchozí konfigurační soubor
 	 */
-	protected function generateFile() {
-		if($this->getFileName() == 'tiny_mce_default.js'){
-			isset($_GET[self::GET_TINY_THEME]) == false ? $theme = null : $theme = rawurldecode($_GET[self::GET_TINY_THEME]);
+	protected function generateFile(JsFile $file) {
+      if($file->getName() == 'tiny_mce_params.js'){
+			$file->getParam(self::PARAM_THEME) == null ? $theme = null :
+            $theme = rawurldecode($file->getParam(self::PARAM_THEME));
 
 //         doplnění obsahu s css
-         if($this->getFileParam(self::PARAM_FACE) != null){
+         if($file->getParam(self::PARAM_FACE) != null){
             $cssurl = Links::getMainWebDir().AppCore::getTepmlateFaceDir(false);
-            $cssurl = substr($cssurl, 0, strlen($cssurl)-1).$this->getFileParam(self::PARAM_FACE).URL_SEPARATOR;
+            $cssurl = substr($cssurl, 0, strlen($cssurl)-1).$file->getParam(self::PARAM_FACE).URL_SEPARATOR;
             $this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style_tiny_mce.css';
          }
 
          if($theme != self::TINY_THEME_SIMPLE){
             //         Doplnění parametru (images, media atd.)
-            if($this->getFileParam(self::PARAM_IMAGES)){
+            if($file->getParam(self::PARAM_IMAGES)){
                array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$this->getFileParam(self::PARAM_IMAGES)], self::ICON_IMAGES);
                array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_IMAGES);
             }
 
-            if($this->getFileParam(self::PARAM_MEDIA)){
+            if($file->getParam(self::PARAM_MEDIA)){
                array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$this->getFileParam(self::PARAM_MEDIA)], self::ICON_MEDIA);
                array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_MEDIA);
             }
@@ -202,17 +197,16 @@ class TinyMce extends JsPlugin {
 //			Který režim je zobrazen		
 			switch ($theme) {
 				case self::TINY_THEME_SIMPLE:
-               $this->generateSimpleCfgFile();
+               $this->generateSimpleCfgFile($file->getParams());
 					break;
 				case self::TINY_THEME_ADVANCED_SIMPLE:
-               $this->generateAdvSimpleCfgFile();
+               $this->generateAdvSimpleCfgFile($file->getParams());
                break;
 				case self::TINY_THEME_ADVANCED:
 				default:
-					$this->generateAdvCfgFile();
+					$this->generateAdvCfgFile($file->getParams());
 					break;
 			}
-
 		}
 	}
 	
@@ -221,7 +215,7 @@ class TinyMce extends JsPlugin {
 	 *
 	 */
 	public function setMode($mode){
-		$this->setParam(self::GET_TINY_MODE, $mode);
+      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_MODE, $mode);
 	}
 
 	/**
@@ -229,7 +223,7 @@ class TinyMce extends JsPlugin {
 	 *
 	 */
 	public function setTheme($theme){
-		$this->setParam(self::GET_TINY_THEME, $theme);
+      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_THEME, $theme);
 	}
 	
 	/**
@@ -238,7 +232,7 @@ class TinyMce extends JsPlugin {
 	 * @param integer -- id článku
 	 */
 	public function setImagesList($fileLink) {
-		$this->setParam(self::GET_TINY_IMAGES_LIST, $fileLink);
+      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_IMAGES_LIST, $fileLink);
 	}
 
    /**
@@ -261,13 +255,12 @@ class TinyMce extends JsPlugin {
 	 * Metoda vygeneruje hlavičku souboru
 	 *
 	 */
-	private function generateAdvCfgFile() {
+	private function generateAdvCfgFile($fileParams) {
 		$content = $this->cfgFileHeader();
-		
       $params = array_merge($this->defaultParams, $this->advancedParams);
 
 //		Nahrazení parametrů za přenesené
-		foreach ($this->getFileParams() as $param => $value) {
+		foreach ($fileParams as $param => $value) {
 			$params[$param] = $value;
 		}
 
@@ -285,13 +278,13 @@ class TinyMce extends JsPlugin {
 	 * Metoda vygeneruje hlavičku souboru pro simple theme
 	 *
 	 */
-	private function generateSimpleCfgFile() {
+	private function generateSimpleCfgFile($fileParams) {
 		$content = $this->cfgFileHeader();
 
 		$params = $this->defaultParams;
 
 //		Nahrazení parametrů za přenesené
-		foreach ($this->getFileParams() as $param => $value) {
+		foreach ($fileParams as $param => $value) {
 			$params[$param] = $value;
 		}
 
@@ -307,13 +300,13 @@ class TinyMce extends JsPlugin {
 	 * Metoda vygeneruje hlavičku souboru pro simple theme
 	 *
 	 */
-	private function generateAdvSimpleCfgFile() {
+	private function generateAdvSimpleCfgFile($fileParams) {
 		$content = $this->cfgFileHeader();
 
 		$params = array_merge($this->defaultParams, $this->advancedSimpleParams);
 
 //		Nahrazení parametrů za přenesené
-		foreach ($this->getFileParams() as $param => $value) {
+		foreach ($fileParams as $param => $value) {
 			$params[$param] = $value;
 		}
 
@@ -334,9 +327,9 @@ class TinyMce extends JsPlugin {
 	 * @param array -- pole, kde se má popřípadě parametr nastavit
 	 */
 	private function checkImagesList(&$params) {
-		if($this->getFileParam(self::GET_TINY_IMAGES_LIST) != null){
-			$params['external_image_list_url'] = $this->getFileParam(self::GET_TINY_IMAGES_LIST);
-			unset($params[self::GET_TINY_IMAGES_LIST]);
+      if(isset ($params[self::PARAM_TINY_IMAGES_LIST]) AND $params[self::PARAM_TINY_IMAGES_LIST] != null){
+			$params['external_image_list_url'] = $params[self::PARAM_TINY_IMAGES_LIST];
+			unset($params[self::PARAM_TINY_IMAGES_LIST]);
 		}
 	}
 

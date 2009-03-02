@@ -154,6 +154,12 @@ class UrlRequest {
    private static $supporteServicesName = null;
 
    /**
+    * Název souboru služby supproted services
+    * @var string
+    */
+   private static $supporteServicesFile = null;
+
+   /**
     * Parametry služby supproted services
     * @var string
     */
@@ -270,18 +276,24 @@ class UrlRequest {
       $url = ereg_replace("^(.*)/$", "\\1", self::$currentUrl);
 
       $name = null;
+      $file = null;
       $params = null;
       $regexResult = array();
       switch (self::$supportedServicesType) {
          case self::SUPPORTSERVICES_EPLUGIN_NAME:
-            ereg('^eplugin([^\.]*)\.js\?(.*)$', $url, $regexResult);
+//            ereg('^eplugin([^\.]*)\.js\?(.*)$', $url, $regexResult);
+            ereg('^eplugin([^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
             $name = $regexResult[1];
-            $params = $regexResult[2];
+            $file = $regexResult[2];
+            $params = $regexResult[3];
             break;
          case self::SUPPORTSERVICES_JSPLUGIN_NAME:
-            ereg('^jsplugin([^\.]*)\.js\?(.*)$', $url, $regexResult);
+            ereg('^jsplugin([^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
             $name = $regexResult[1];
-            $params = $regexResult[2];
+            $file = $regexResult[2];
+            if(isset ($regexResult[3])){
+               $params = $regexResult[3];
+            }
             break;
          case self::SUPPORTSERVICES_SITEMAP_NAME:
             ereg(self::$notNormalUrlArrayRegex[self::SUPPORTSERVICES_SITEMAP_NAME], $url, $regexResult);
@@ -289,8 +301,8 @@ class UrlRequest {
             default:
                break;
       }
-      
       self::$supporteServicesName = $name;
+      self::$supporteServicesFile = $file;
       self::$supporteServicesParams = $params;
    }
 
@@ -390,6 +402,14 @@ class UrlRequest {
        */
       public static function getSupportedServicesName(){
          return self::$supporteServicesName;
+      }
+
+      /**
+       * Metoda vrací název souboru SupportedServices (Epluginu, JsPluginu, ...)
+       * @return string -- název souboru
+       */
+      public static function getSupportedServicesFile(){
+         return self::$supporteServicesFile;
       }
 
       /**

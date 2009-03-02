@@ -27,14 +27,14 @@ class SubmitForm extends JsPlugin {
 	 */
 	protected function initFiles() {
 		//		Přidání js soubrů pluginu
-		$this->addJsFile(new JsPluginJsFile("submitform.js"));
+		$this->addJsFile(new JsFile("submitform.js"));
 	}
 	
 	
 	/**
 	 * Metda vytvoří výchozí konfigurační soubor
 	 */
-	public function generateFile() {
+	public function generateFile(JsFile $file) {
 	}
 }
 

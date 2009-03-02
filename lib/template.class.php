@@ -486,34 +486,15 @@ class Template {
 	 */
 	final public function addJsPlugin(JsPlugin $jsPlugin)
 	{
-		if(get_parent_class($jsPlugin) == 'JsPlugin'){
-//			Vložení ostatních js souborů pluginu 
-			$jsOtherFiles = $jsPlugin->getAllJsFiles();
-			if(!empty($jsOtherFiles)){
-				foreach ($jsOtherFiles as $jsFile) {
-					$this->addJS($jsPlugin->getJsPluginDir().$jsFile, true);
-				}
-			}
-//			Vložení ostatních css souborů pluginu
-			$cssOtherFiles = $jsPlugin->getAllCssFiles();
-			if(!empty($cssOtherFiles)){
-				foreach ($cssOtherFiles as $cssFile) {
-					$this->addCss($jsPlugin->getJsPluginDir().$cssFile, true);
-				}
-			}
-			
-//			Přidání JS souboru s nastavením
-			if($jsPlugin->isDefaultJsSettingsFile() AND $jsPlugin->getSettingsJsFile() != null){
-				$this->addJS($jsPlugin->getJsPluginDir().$jsPlugin->getSettingsJsFile(), true);
-			} else if($jsPlugin->getSettingsJsFile() != null) {
-				$this->addJS($jsPlugin->getSettingsJsFile());
-			}
-//			Přidání CSS souboru s nastavením
-			if($jsPlugin->isDefaultCssSettingsFile() AND $jsPlugin->getSettingsCssFile() != null){
-				$this->addCss($jsPlugin->getJsPluginDir().$jsPlugin->getSettingsCssFile(), true);
-			} else if($jsPlugin->getSettingsCssFile() != null){
-				$this->addCss($jsPlugin->getSettingsCssFile());
-			}
+      if(get_parent_class($jsPlugin) == 'JsPlugin'){
+         $files = $jsPlugin->getAllJsFiles();
+         foreach ($files as $file) {
+            $this->addJS($file, true);
+         }
+         $files = $jsPlugin->getAllCssFiles();
+         foreach ($files as $file) {
+            $this->addCss($file, true);
+         }
 		} else {
 			new CoreException(_("Nebyl vložen objekt JsPluginu"), 1);
 		}

@@ -18,6 +18,11 @@ class Eplugin {
 	 */
 	const EPLUGINS_DEFAULT_TEMPALTES_DIR = AppCore::TEMPLATES_DIR;
 
+   /**
+    * Parametr pro přenos souboru js pluginu
+    */
+   const PARAMS_EPLUGIN_FILE_PREFIX = 'eplugin';
+
 	/**
 	 * Proměná s názvem šablony
 	 * @var string 
@@ -144,8 +149,7 @@ class Eplugin {
 	/**
 	 * Metoda nastavuje knihovnu epluginu je použita v epluginech
 	 */
-	public function setParams() {
-	}
+	public function setParams() {}
 
 	/**
 	 * Metoda se využívá pro načtení proměných do stránky, 
@@ -172,7 +176,6 @@ class Eplugin {
         if($cat != false){
             $link->category($cat[Category::COLUMN_CAT_LABEL], $cat[Category::COLUMN_CAT_ID]);
         }
-//        $cat = Category::getCurrentCategory();
         return $link;
 	}
 	
@@ -242,7 +245,8 @@ class Eplugin {
 	 * @return string -- název epluginu
 	 */
 	public final function getEpluginName() {
-		return strtolower(get_class($this));
+		$name = strtolower(get_class($this));
+      return str_ireplace(self::PARAMS_EPLUGIN_FILE_PREFIX, '', $name);
 	}
 	
 	/**
@@ -251,7 +255,6 @@ class Eplugin {
 	 */
 	final public function getTpl()
 	{
-//		echo $this->templateFile;
 		return $this->templateFile;
 	}
 	
@@ -305,9 +308,27 @@ class Eplugin {
 	 * Metoda vrací odkaz na soubor epluginu
 	 * //TODO možná implementovat vracení odkazu na EPlugin file (./epluginuserimages.js)
 	 */
-//	public function getFileLink() {
-//		;
-//	}
+	public function getFileLink($file = null, $params = null) {
+      if($file == null) {
+         $file = '.'.URL_SEPARATOR.self::PARAMS_EPLUGIN_FILE_PREFIX.$this->getEpluginName()
+            .URL_SEPARATOR.$this->getEpluginName().'js';
+         if($params != null AND is_array($params)) {
+            $param = http_build_query($params);
+            $file.='?'.$param;
+         }
+      } else if(is_string($file)) {
+         $file = '.'.URL_SEPARATOR.self::PARAMS_EPLUGIN_FILE_PREFIX.$this->getEpluginName().URL_SEPARATOR.$file;
+         if($params != null AND is_array($params)) {
+            $param = http_build_query($params);
+            $file.='?'.$param;
+         }
+      } else if($file instanceof JsFile){
+         $file = '.'.URL_SEPARATOR.self::PARAMS_EPLUGIN_FILE_PREFIX.$this->getEpluginName().URL_SEPARATOR.$file;
+      }
+
+      
+      return $file;
+	}
 	
 }
 ?>
