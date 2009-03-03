@@ -189,7 +189,7 @@ class Mysql_Db_Insert extends Db_Insert {
 					$valuesString.=self::SQL_SEPARATOR.$value.self::SQL_VALUE_SEPARATOR;
 				} else {
 					if($value != null){
-						$valuesString.=self::SQL_SEPARATOR."'".$value."'".self::SQL_VALUE_SEPARATOR;
+                  $valuesString.=self::SQL_SEPARATOR."'".addslashes($value)."'".self::SQL_VALUE_SEPARATOR;
 					} else {
 						$valuesString.=self::SQL_SEPARATOR."null".self::SQL_VALUE_SEPARATOR;
 					}

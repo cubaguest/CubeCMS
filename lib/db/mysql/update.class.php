@@ -189,9 +189,9 @@ class Mysql_Db_Update extends Db_Update{
 				if($value != null){
 					//				Pokud je zadán expresion výraz
 					if(strpos($value, $colum) === false){
-						$columsString.=self::SQL_SEPARATOR."`".$colum."`= '".$value."'".self::SQL_VALUE_SEPARATOR;
+						$columsString.=self::SQL_SEPARATOR."`".$colum."`= '".addslashes($value)."'".self::SQL_VALUE_SEPARATOR;
 					} else {
-						$columsString.=self::SQL_SEPARATOR."".$colum."= ".$value."".self::SQL_VALUE_SEPARATOR;
+                  $columsString.=self::SQL_SEPARATOR."".$colum."= ".addslashes($value)."".self::SQL_VALUE_SEPARATOR;
 					}
 				} else {
 					$columsString.=self::SQL_SEPARATOR."`".$colum."`= null".self::SQL_VALUE_SEPARATOR;
