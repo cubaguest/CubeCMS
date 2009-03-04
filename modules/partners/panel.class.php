@@ -26,7 +26,7 @@ class PartnersPanel extends Panel {
       $this->template()->addTpl("panel.tpl");
 
       $this->template()->addVar("PARTNERS_ARRAY", $this->partnersArray);
-//      $this->template()->addVar("PARTNERS_LINK", $this->sponsorsLink);
+      $this->template()->addVar("PARTNERS_LINK", $this->getLink());
       $this->template()->addVar("PARTNERS_LINK_NAME", _("Další partneři"));
       $this->template()->addVar('DIR_TO_IMAGES', $this->dirToImages);
 
