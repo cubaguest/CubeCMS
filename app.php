@@ -1429,7 +1429,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       if(UrlRequest::isSupportedServices()){
          //		Pokud se načítá statická část epluginu
          if(UrlRequest::getSupportedServicesType() == UrlRequest::SUPPORTSERVICES_EPLUGIN_NAME){
-            Eplugin::setRunOnly(true);
             //					$epluginName = ucfirst(Eplugin::getSelEpluginName());
             $epluginName = ucfirst(UrlRequest::getSupportedServicesName());
             $epluginWithOutEplugin = $epluginName.'Eplugin';
@@ -1439,12 +1438,12 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
             if(class_exists($epluginName)){
                $eplugin = new $epluginName();
                $eplugin->setAuthParam($this->auth);
-               $eplugin->runOnlyEplugin();
+               $eplugin->initRunOnlyEplugin();
                return true;
             } else if(class_exists($epluginWithOutEplugin)){
                $eplugin = new $epluginWithOutEplugin();
                $eplugin->setAuthParam($this->auth);
-               $eplugin->runOnlyEplugin();
+               $eplugin->initRunOnlyEplugin();
                return true;
             } else {
                new CoreException(_('Požadovaný eplugin nebyl nalezen'), 19);

@@ -133,30 +133,38 @@ class Eplugin {
 	 * Metoda nastavuje že je eplugin spouštěn samostatně nebo ne
 	 * @param boolean $value -- true pokud je eplugin spoštěn samostatně
 	 */
-	public static function setRunOnly($value){
-		self::$runOnly = $value;
-	}
+//	public static function setRunOnly($value){
+//		self::$runOnly = $value;
+//	}
 
 	/**
 	 * Metoda vrací jestli je eplugin spouštěn samostatně nebo jako
 	 * součást stránky
 	 * @return boolean -- true pokud je spuštěn samostatně
 	 */
-	public static function isRunOnly() {
-		return self::$runOnly;
-	}
+//	public static function isRunOnly() {
+//		return self::$runOnly;
+//	}
 
 	/**
 	 * Metoda nastavuje knihovnu epluginu je použita v epluginech
 	 */
 	public function setParams() {}
 
+   /**
+    * Metoda inicializuje spuštění epluginu pouze jako sjednoho souboru
+    */
+   public function initRunOnlyEplugin() {
+      $this->runOnlyEplugin(UrlRequest::getSupportedServicesFile(),
+         UrlRequest::getSupportedServicesParams());
+   }
+
 	/**
 	 * Metoda se využívá pro načtení proměných do stránky, 
 	 * je volána při volání parametru stránky pro EPlugin
 	 *
 	 */
-	public function runOnlyEplugin(){}
+	public function runOnlyEplugin($fileName, $fileParams = null){}
 	
 	/**
 	 * Inicializační metoda EPluginu

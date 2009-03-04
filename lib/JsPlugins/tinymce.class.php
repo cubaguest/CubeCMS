@@ -184,12 +184,12 @@ class TinyMce extends JsPlugin {
          if($theme != self::TINY_THEME_SIMPLE){
             //         Doplnění parametru (images, media atd.)
             if($file->getParam(self::PARAM_IMAGES)){
-               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$this->getFileParam(self::PARAM_IMAGES)], self::ICON_IMAGES);
+               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$file->getParam(self::PARAM_IMAGES)], self::ICON_IMAGES);
                array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_IMAGES);
             }
 
             if($file->getParam(self::PARAM_MEDIA)){
-               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$this->getFileParam(self::PARAM_MEDIA)], self::ICON_MEDIA);
+               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$file->getParam(self::PARAM_MEDIA)], self::ICON_MEDIA);
                array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_MEDIA);
             }
          }
@@ -240,7 +240,7 @@ class TinyMce extends JsPlugin {
     * @param int $row = na který řádek v ikonách se má přidat
     */
    public function addImagesIcon($row = 1) {
-      $this->setParam(self::PARAM_IMAGES, $row);
+      $this->getSettingsJsFile()->setParam(self::PARAM_IMAGES, $row);
    }
 
    /**
@@ -248,7 +248,7 @@ class TinyMce extends JsPlugin {
     * @param int $row = na který řádek v ikonách se má přidat
     */
    public function addMediaIcon($row = 1) {
-      $this->setParam(self::PARAM_MEDIA, $row);
+      $this->getSettingsJsFile()->setParam(self::PARAM_MEDIA, $row);
    }
 
 	/**

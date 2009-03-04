@@ -292,9 +292,9 @@ class UserImagesEplugin extends Eplugin {
 	/**
 	 * Metoda načte seznam obrázků
 	 * @param integer -- id item
-	 * @param integer -- id článku u kterého byla změna provedena
+	 * @param integer -- (option)id článku u kterého byla změna provedena
 	 */
-	public function getImagesList($idItem, $idArticle) {
+	public function getImagesList($idItem, $idArticle = null) {
 		$sqlSelect = $this->getDb()->select()->from(array('img' => self::DB_TABLE_USER_IMAGES), array(self::COLUM_FILE))
 											 ->where(self::COLUM_ID_ITEM.' = '.$idItem);
       if($idArticle != null){
@@ -323,7 +323,7 @@ class UserImagesEplugin extends Eplugin {
 
       $sqlSelect->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
       
-		if(is_string($this->idArticle) OR is_numeric($this->idArticle)){
+		if(is_numeric($this->idArticle)){
 			$sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$this->idArticle);
 		} else if(is_array($this->idArticle) AND !empty($this->idArticle)){
 			foreach ($this->idArticle as $id => $itemId){
@@ -343,7 +343,7 @@ class UserImagesEplugin extends Eplugin {
 			}
 					
 		}
-											 
+		
 		$sqlSelect->order(self::COLUM_TIME, "DESC");
 
 		$this->imagesArray = $this->getDb()->fetchAssoc($sqlSelect);
@@ -387,18 +387,21 @@ class UserImagesEplugin extends Eplugin {
 	 * Metoda je spuštěna pokud se generuje soubor pro výstup (list obrázků)
 	 * @todo dodělat generování také do jiných typů souborů
 	 */
-	public function runOnlyEplugin() {
-      if(UrlRequest::getSupportedServicesFile() == self::IMAGES_LIST_JS_FILE) {
+	public function runOnlyEplugin($file, $params = null) {
+      if($file == self::IMAGES_LIST_JS_FILE) {
+         $file = new JsFile($file, true);
+         $file->setParams($params);
+
          $idArticle = null;
 
-         $file = new JsFile(UrlRequest::getSupportedServicesFile());
-         $file->setParams(UrlRequest::getSupportedServicesParams());
+//         $file = new JsFile(UrlRequest::getSupportedServicesFile());
+//         $file->setParams(UrlRequest::getSupportedServicesParams());
 
          if($file->getParam(self::PARAM_URL_ID_ARTICLE)){
-            $idArticle = rawurldecode($_GET[self::GET_URL_ID_ARTICLE]);
+            $idArticle = rawurldecode($file->getParam(self::PARAM_URL_ID_ARTICLE));
          }
 
-         $array = $this->getImagesList($file->getParam(self::PARAM_URL_ID_ITEM),$file->getParam(self::PARAM_URL_ID_ARTICLE));
+         $array = $this->getImagesList($file->getParam(self::PARAM_URL_ID_ITEM),$idArticle);
 
 //         isset($_GET[self::GET_URL_IMAGES_LIST_TYPE]) == false ? $type = null : $type = rawurldecode($_GET[self::GET_URL_IMAGES_LIST_TYPE]);
 
@@ -430,6 +433,9 @@ class UserImagesEplugin extends Eplugin {
 
             $file->setParam(self::PARAM_URL_ID_ITEM, $this->getModule()->getId());
             $file->setParam(self::PARAM_URL_IMAGES_LIST_TYPE, self::FILE_IMAGES_FORMAT_TINYMCE);
+            if(is_numeric($this->idArticle)){
+               $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);
+            }
 
 //            echo $this->getFileLink($file, array(self::PARAM_URL_ID_ITEM => $this->getModule()->getId(),
 //							self::PARAM_URL_IMAGES_LIST_TYPE => self::FILE_IMAGES_FORMAT_TINYMCE));
