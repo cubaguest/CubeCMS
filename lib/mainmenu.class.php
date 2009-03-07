@@ -30,6 +30,7 @@ abstract class MainMenu {
 	const COLUMN_CATEGORY_ALT_IMAG 		= 'calt';
 	const COLUMN_CATEGORY_PROTECTED 	= 'protected';
 	const COLUMN_CATEGORY_SHOW_IN_MENU 	= 'show_in_menu';
+	const COLUMN_CATEGORY_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';
 	const COLUMN_CATEGORY_PRIORITY 		= 'priority';
 	const COLUMN_CATEGORY_ACTIVE 		= 'active';
 	
@@ -144,6 +145,10 @@ abstract class MainMenu {
 			->order(self::COLUMN_SECTION_LABEL_IMAG)
 			->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
 			->order(self::COLUMN_CATEGORY_LABEL_IMAG);
+
+      if(!$this->auth->isLogin()){
+         $menuSelect->where("cat.".self::COLUMN_CATEGORY_SHOW_WHEN_LOGIN_ONLY." = ".(int)false, "and");
+      }
 
 		$this->loadMenu($menuSelect);
 	}
