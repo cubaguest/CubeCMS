@@ -21,7 +21,7 @@ class JQuery extends JsPlugin {
 		//$this->addCssFile('tabcontent.css');
 		
 //		Přidání js soubrů pluginu
-		$this->addJsFile(new JsFile("jquery.js"));
+		$this->addJsFile(new JsFile("jquery-1.3.2.min.js"));
 	}
 	
 	/**
@@ -38,7 +38,7 @@ class JQuery extends JsPlugin {
    * Metoda přidá jádro pro efekty UI
    */
   public function addUICore() {
-    $this->addJsFile(new JsFile("jquery-ui-core.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.UICore.min.js"));
     return $this;
   }
 
@@ -49,7 +49,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-draggable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Draggable.min.js"));
     return $this;
   }
 
@@ -61,7 +61,7 @@ class JQuery extends JsPlugin {
     $this->addUICore();
     $this->addUIDraggable();
 
-    $this->addJsFile(new JsFile("jquery-ui-droppable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Droppable.min.js"));
     return $this;
   }
 
@@ -72,7 +72,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-resizable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Resizable.min.js"));
     return $this;
   }
 
@@ -83,7 +83,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-selectable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Selectable.min.js"));
     return $this;
   }
 
@@ -95,7 +95,7 @@ class JQuery extends JsPlugin {
     $this->addUICore();
     $this->addUIDraggable();
 
-    $this->addJsFile(new JsFile("jquery-ui-sortable.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Sortable.min.js"));
     return $this;
   }
 
@@ -110,7 +110,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-accordion.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Accordion.min.js"));
     return $this;
   }
 
@@ -123,7 +123,7 @@ class JQuery extends JsPlugin {
     $this->addUIDraggable();
     $this->addUIResizable();
 
-    $this->addJsFile(new JsFile("jquery-ui-dialog.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Dialog.min.js"));
     return $this;
   }
 
@@ -134,7 +134,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-slider.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Slider.min.js"));
     return $this;
   }
 
@@ -145,7 +145,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-tabs.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Tabs.min.js"));
     return $this;
   }
 
@@ -154,10 +154,11 @@ class JQuery extends JsPlugin {
    */
   public function addWidgentDatepicker() {
     //deps
+    $this->addUICore();
     /**
      * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
      */
-    $this->addJsFile(new JsFile("jquery-ui-datepicker.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Datepicker.min.js"));
     return $this;
   }
 
@@ -168,7 +169,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addUICore();
 
-    $this->addJsFile(new JsFile("jquery-ui-progressbar.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.Progressbar.min.js"));
     return $this;
   }
 
@@ -182,7 +183,7 @@ class JQuery extends JsPlugin {
   public function addEffectCore() {
     //deps
 
-    $this->addJsFile(new JsFile("jquery-ui-effect-core.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.EffectsCore.min.js"));
     return $this;
   }
 
@@ -193,7 +194,7 @@ class JQuery extends JsPlugin {
     //deps
     $this->addEffectCore();
 
-    $this->addJsFile(new JsFile("jquery-ui-effect-all.packed.js"));
+    $this->addJsFile(new JsFile("jquery-ui-1.7.EffectAll.min.js"));
     return $this;
   }
 
