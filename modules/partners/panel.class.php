@@ -11,7 +11,7 @@ class PartnersPanel extends Panel {
    public function panelController() {
       $partnersM = new PartnersListModel();
       $numPartners = $this->getModule()->getParam(self::PARAM_NUM_PARTNERS);
-      if($numPartners != null){
+      if($numPartners != 0 AND $numPartners != NULL){
          $this->partnersArray = $partnersM->getRandomPartners($this->getModule()
             ->getParam(self::PARAM_NUM_PARTNERS));
       } else {
