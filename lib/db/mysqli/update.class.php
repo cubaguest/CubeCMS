@@ -11,7 +11,7 @@ require_once './lib/db/update.class.php';
  * @abstract 		Třída pro aktualizaci záznamů
  */
 
-class Mysql_Db_Update extends Db_Update{
+class Mysqli_Db_Update extends Db_Update{
 	/**
 	 * Konstanty pro příkazy SQL
 	 * @var string
@@ -209,7 +209,7 @@ class Mysql_Db_Update extends Db_Update{
 	 */
 	private function _createTable() {
 		$fromString = null;
-		$fromString .= self::SQL_SEPARATOR . MySQLDb::$_tablePrefix . $this->_sqlQueryParts[self::TABLE];
+		$fromString .= self::SQL_SEPARATOR . MySQLiDb::$_tablePrefix . $this->_sqlQueryParts[self::TABLE];
 		return $fromString;
 	}
 

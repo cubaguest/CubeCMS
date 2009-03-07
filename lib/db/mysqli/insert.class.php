@@ -11,7 +11,7 @@ require_once './lib/db/insert.class.php';
  * @abstract 		Třída pro vkládaání záznamů do MySQL DB
  */
 
-class Mysql_Db_Insert extends Db_Insert {
+class Mysqli_Db_Insert extends Db_Insert {
 	/**
 	 * Konstanty pro příkazy SQL
 	 * @var string
@@ -169,7 +169,7 @@ class Mysql_Db_Insert extends Db_Insert {
 	 */
 	private function _createTable() {
 		$intoString = null;
-		$intoString = self::SQL_SEPARATOR.self::SQL_INTO.self::SQL_SEPARATOR."`".MySQLDb::$_tablePrefix.$this->_sqlQueryParts[self::SQL_TABLE]."`";
+		$intoString = self::SQL_SEPARATOR.self::SQL_INTO.self::SQL_SEPARATOR."`".MySQLiDb::$_tablePrefix.$this->_sqlQueryParts[self::SQL_TABLE]."`";
 
 		return $intoString;
 	}
@@ -209,7 +209,7 @@ class Mysql_Db_Insert extends Db_Insert {
      * @param string -- hodnota, která se kontroluje
      */
     private function checkSpecialSqlFunction($func) {
-    	if(in_array($func, MySQLDb::$specialSqlFunctions)){
+    	if(in_array($func, MySQLiDb::$specialSqlFunctions)){
     		return true;
     	} else {
     		return false;

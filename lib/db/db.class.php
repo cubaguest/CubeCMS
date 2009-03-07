@@ -32,13 +32,16 @@ class Db {
 		self::$_tablePrefix = $tablePrefix;
 		self::$_connectorType = $typ;
 
-		if($typ == "mysql"){
-			require_once './lib/db/mysql/db.class.php';
+      switch ($typ) {
+         case 'mysqli':
+            require_once './lib/db/mysqli/db.class.php';
+            return new MySQLiDb(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
+            break;
 
-			return new MySQLDb(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
-		} else {
-			return false;
-		}
+         default:
+            throw new UnexpectedValueException(_("Databázový engine ").$typ._(" nebyl implementován"), 101);
+            break;
+      }
 	}
 	
 	public static function addQueryCount() {

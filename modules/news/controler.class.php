@@ -56,6 +56,30 @@ class NewsController extends Controller {
    * Kontroler pro zobrazení novinek
    */
    public function mainController() {
+      // test SMAZAT !!!
+//      try {
+//         if(!is_numeric('pokus.txt')){
+//         // throw new CoreException(_('Chyba při načítání'));
+//            throw new RuntimeException(_(printf("pokus %s", 'typ')), 3);
+//         }
+//      } catch (Exception $e) {
+//         new CoreErrors($e);
+//      } catch (RuntimeException $e){
+//         new CoreErrors($e);
+//      }
+//      try {
+//         if(!is_numeric('pokus.txt')){
+//         // throw new CoreException(_('Chyba při načítání'));
+//            throw new RuntimeException("pokus", 3);
+//         }
+//      } catch (Exception $e) {
+//         new CoreErrors($e);
+//      } catch (RuntimeException $e){
+//         new CoreErrors($e);
+//      }
+
+      //CoreErrors::getErrors();
+
       //		Kontrola práv
       $this->checkReadableRights();
 

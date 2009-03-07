@@ -74,13 +74,13 @@ class Eplugin {
 	 * Objekt pro ukládání chybových hlášek
 	 * @var Messages
 	 */
-	private $errMsg = null;
+//	private $errMsg = null;
 	
 	/**
 	 * Objekt pro ukládání informačních hlášek
 	 * @var Messages
 	 */
-	private $infoMsg = null;
+//	private $infoMsg = null;
 
 	/**
 	 * Proměná obsahuje jestli se spouští pouze eplugin nebo celý web
@@ -108,16 +108,16 @@ class Eplugin {
 //            $this->rights =
 //		}
 
-		if(AppCore::getModuleErrors() instanceof Messages){
-			$this->errMsg = AppCore::getModuleErrors();
-		} else {
-			$this->errMsg = new Messages();
-		}
-		if(AppCore::getModuleMessages() instanceof Messages){
-			$this->infoMsg = AppCore::getModuleMessages();
-		} else {
-			$this->infoMsg = new Messages();
-		}
+//		if(AppCore::getModuleErrors() instanceof Messages){
+//			$this->errMsg = AppCore::getModuleErrors();
+//		} else {
+//			$this->errMsg = new Messages();
+//		}
+//		if(AppCore::getModuleMessages() instanceof Messages){
+//			$this->infoMsg = AppCore::getModuleMessages();
+//		} else {
+//			$this->infoMsg = new Messages();
+//		}
 		$this->init();
 	}
 	
@@ -235,7 +235,7 @@ class Eplugin {
 	 */
 	protected function errMsg()
 	{
-		return $this->errMsg;
+      return AppCore::getUserErrors();
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Eplugin {
 	 */
 	protected function infoMsg()
 	{
-		return $this->infoMsg;
+      return AppCore::getInfoMessages();
 	}
 	
 	/**

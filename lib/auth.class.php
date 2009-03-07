@@ -75,12 +75,6 @@ class Auth {
 	private $userMail = null;
 
 	/**
-	 * Objekt s chybami uživatele
-	 * @var Messages
-	 */
-	private $userErrors = null;
-	
-	/**
 	 * Objekt pro práci se sessions
 	 * @var Sessions
 	 */
@@ -101,11 +95,11 @@ class Auth {
 	/**
 	 * Konstruktor, provádí autorizaci
 	 */
-	function __construct($dbConnector, Messages &$errors) {
+	function __construct($dbConnector) {
 		//Zakladni proměne
 		$this->login = false;
 
-		$this->userErrors = $errors;
+//		$this->userErrors = $errors;
 //		inicializace konektoru k db
 		$this->dbConnector = $dbConnector;
 		
@@ -199,7 +193,7 @@ class Auth {
 		
 		if (isset($_POST["login_submit"])){
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
-				$this->userErrors->addMessage(_("Byly zadány prázdné údaje"));
+				$this->getError()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
 				$userSql = $this->dbConnector->select()->from(array("u" =>AppCore::sysConfig()->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES)))
 						->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, Config::SECTION_DB_TABLES)), "g.id_group = u.id_group" , "left", array("*", "gname" => "name"))
@@ -208,7 +202,7 @@ class Auth {
 				$userResult = $this->dbConnector->fetchObject($userSql);
 						
 				if (!($userResult)){
-					$this->userErrors->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
+					$this->getError()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
 				} 
 				else {
 					if (md5(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->password){
@@ -229,7 +223,7 @@ class Auth {
 						$return = true;
 						
 					} else {
-						$this->userErrors->addMessage(_("Bylo zadáno špatné heslo."));
+                  $this->getError()->addMessage(_("Bylo zadáno špatné heslo."));
 					}
 				}
 				unset($loginMysql);
@@ -322,7 +316,14 @@ class Auth {
 	public function getUserMail() {
 		return $this->userMail;
 	}
-	
+
+   /**
+    * Metoda vrací objekt s chybovými zprávami
+    * @return Messages -- objekt zpráv
+    */
+   public function getError() {
+      return AppCore::getUserErrors();
+   }
 }
 
 ?>

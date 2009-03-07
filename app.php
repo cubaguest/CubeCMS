@@ -353,7 +353,7 @@ class AppCore {
       $this->runApp();
 
       //		Vypsání chyb na výstup
-      $this->coreErrors->getErrorsToStdIO();
+//      $this->coreErrors->getErrorsToStdIO();
    }
 
     /**
@@ -361,7 +361,7 @@ class AppCore {
      * není povolen clone
      */
    private function __clone() {
-      throw new CoreException(_('Není povoleno inicializovat více jak jednu třídu aplikace'), 0);
+      throw new BadMethodCallException(_('Není povoleno inicializovat více jak jednu třídu aplikace'), 1);
    }
 
     /*
@@ -378,7 +378,7 @@ class AppCore {
       if (null === self::$_coreInstance) {
          self::$_coreInstance = new self();
       } else {
-         throw new Exception("Aplication object have been created");
+         throw new BadMethodCallException(_('Objekt aplikace byl již vytvořen'), 2);
       }
       return self::$_coreInstance;
    }
@@ -462,6 +462,14 @@ class AppCore {
       return self::$selectedModule;
    }
 
+     /**
+      * Metoda nastavuje objekt aktuálního modulu
+      * @param Module $module -- (option) objekt vybraného modulu
+      */
+   public static function setSelectedModule($module = null) {
+      self::$selectedModule = $module;
+   }
+
     /**
      * Metoda vrací onformace o práve zpracovávané kategori nebo false
      * @return array -- právě zpracovávaná kategorie (název, id)
@@ -500,8 +508,8 @@ class AppCore {
      * @todo -- optimalizovat pro lepší práci
      */
    private function _initCoreErros() {
-      $this->coreErrors = new Errors();
-      CoreException::_setErrorsHandler($this->coreErrors);
+//      $this->coreErrors = new Errors();
+//      CoreException::_setErrorsHandler($this->coreErrors);
    }
 
     /**
@@ -511,16 +519,21 @@ class AppCore {
 
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'db' . DIRECTORY_SEPARATOR. 'db.class.php');
 
-      self::$dbConnector = Db::factory(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION),
-         self::sysConfig()->getOptionValue("dbserver", self::MAIN_CONFIG_DB_SECTION),
-         self::sysConfig()->getOptionValue("dbuser", self::MAIN_CONFIG_DB_SECTION),
-         self::sysConfig()->getOptionValue("dbpasswd", self::MAIN_CONFIG_DB_SECTION),
-         self::sysConfig()->getOptionValue("dbname", self::MAIN_CONFIG_DB_SECTION),
-         self::sysConfig()->getOptionValue("tbprefix", self::MAIN_CONFIG_DB_SECTION));
+      try {
+         self::$dbConnector = Db::factory(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION),
+            self::sysConfig()->getOptionValue("dbserver", self::MAIN_CONFIG_DB_SECTION),
+            self::sysConfig()->getOptionValue("dbuser", self::MAIN_CONFIG_DB_SECTION),
+            self::sysConfig()->getOptionValue("dbpasswd", self::MAIN_CONFIG_DB_SECTION),
+            self::sysConfig()->getOptionValue("dbname", self::MAIN_CONFIG_DB_SECTION),
+            self::sysConfig()->getOptionValue("tbprefix", self::MAIN_CONFIG_DB_SECTION));
 
-      if(self::$dbConnector == false){
-         new CoreException(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 1);
+//         if(self::$dbConnector == false){
+//            //            throw new CoreException(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 1);
+//         }
+      } catch (UnexpectedValueException $e) {
+         new CoreErrors($e);
       }
+
    }
 
     /**
@@ -667,7 +680,8 @@ class AppCore {
       }
       //		knihovny pro práci s chybami
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'coreException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'errors.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'dbException.class.php');
+//      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'moduleException.class.php');
    }
 
     /**
@@ -677,15 +691,15 @@ class AppCore {
    private function _initMessagesAndErrors()
    {
       //		Vytvoření objektu pro práci se zprávami
-      self::$messages = new Messages('session', 'mmessages', true);
-      self::$userErrors = new Messages('session', 'merror');
+      self::$messages = new Messages('session', 'messages', true);
+      self::$userErrors = new Messages('session', 'errors');
    }
 
     /**
      * Metoda vrací objekt pro zprávy modulů
      * @return Messages -- objekt zpráv
      */
-   public static function &getModuleMessages() {
+   public static function &getInfoMessages() {
       return self::$messages;
    }
 
@@ -693,7 +707,7 @@ class AppCore {
      * Metoda vrací objekt pro chybové zprávy modulů
      * @return Messages -- objekt zpráv
      */
-   public static function &getModuleErrors() {
+   public static function &getUserErrors() {
       return self::$userErrors;
    }
 
@@ -722,7 +736,7 @@ class AppCore {
      * Metoda ověřuje autorizaci přístupu
      */
    private function coreAuth() {
-      $this->auth = new Auth(self::$dbConnector, self::getModuleErrors());
+      $this->auth = new Auth(self::$dbConnector);
    }
 
     /**
@@ -781,8 +795,6 @@ class AppCore {
          $this->template->assign($varName, $value);
       }
    }
-
-
 
     /*
      * VEŘEJÉ METODY
@@ -947,17 +959,6 @@ class AppCore {
       else {
          $this->template->display($faceFilePath."index.tpl");
       }
-
-
-      //		switch (AppCore::media()) {
-      //			case AppCore::MEDIA_PRINT_TYPE:
-      //				$this->template->display($faceFilePath."index-print.tpl");
-      //			break;
-      //
-      //			default:
-      //				$this->template->display($faceFilePath."index.tpl");
-      //			break;
-      //		}
 
       //		Při debug levelu vyšším jak 3 zobrazit výpis šablony
       if(self::$debugLevel >= 3){
@@ -1316,17 +1317,23 @@ class AppCore {
    }
 
    public function assignCoreErrorsToTpl() {
-      $this->assignVarToTpl("CORE_ERRORS", CoreException::getAllExceptions());
-      $this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreException::isEmpty());
+//      $this->assignVarToTpl("CORE_ERRORS", CoreException::getAllExceptions());
+//      $this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreException::isEmpty());
+$this->assignVarToTpl("ERROR_NAME", _('Chyba'));
+$this->assignVarToTpl("ERROR_IN_FILE", _('soubor'));
+$this->assignVarToTpl("ERROR_IN_FILE_LINE", _('řádek'));
+$this->assignVarToTpl("ERROR_TRACE", _('řádek'));
+$this->assignVarToTpl("CORE_ERRORS", CoreErrors::getErrors());
+$this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreErrors::isEmpty());
    }
 
     /**
      * Metoda přiřadí všechny proměnné do šablonovacího systému
      * //TODO není omplementována, vytvořit načítání do šablony.
      */
-   public function assignModuleVarsToTpl() {
-      $this->assignVarToTpl("MESSAGES", self::getModuleMessages()->getMessages());
-      $this->assignVarToTpl("ERRORS", self::getModuleErrors()->getMessages());
+   public function assignMessagesToTpl() {
+      $this->assignVarToTpl("MESSAGES", self::getInfoMessages()->getMessages());
+      $this->assignVarToTpl("ERRORS", self::getUserErrors()->getMessages());
    }
 
     /**
@@ -1508,7 +1515,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   }
 
                   //		Přiřazení proměných modulů do šablony
-                  $this->assignModuleVarsToTpl();
+                  $this->assignMessagesToTpl();
 
                   //		přiřazení hlavních proměných
                   $this->assignMainVarsToTemplate();

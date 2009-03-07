@@ -2,7 +2,7 @@
 require_once './lib/db/select.class.php';
 
 /**
- * Třída pro výběr záznamů z MySQL DB.
+ * Třída pro výběr záznamů z MySQLi DB.
  * Třída obsahuje implementaci metody select z db-interfacu.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
@@ -11,59 +11,9 @@ require_once './lib/db/select.class.php';
  * @abstract 		Třída pro výběr záznamů
  */
 
-class Mysql_Db_Select extends Db_Select {
-	/**
-	 * Konstanty pro příkazy SQL
-	 * @var string
-	 */
-	const SQL_SELECT     		= 'SELECT';
-    const SQL_FROM       		= 'FROM';
-    const SQL_WHERE      		= 'WHERE';
-    const SQL_GROUP_BY   		= 'GROUP BY';
-    const SQL_ORDER_BY   		= 'ORDER BY';
-    const SQL_HAVING     		= 'HAVING';
-    const SQL_AND        		= 'AND';
-    const SQL_AS         		= 'AS';
-    const SQL_OR         		= 'OR';
-    const SQL_ON        		= 'ON';
-    const SQL_ASC        		= 'ASC';
-    const SQL_DESC       		= 'DESC';
-    const SQL_SEPARATOR	 		= ' ';
-    const SQL_PARENTHESIS_L	 	= '(';
-    const SQL_PARENTHESIS_R	 	= ')';
-    const SQL_VALUE_SEPARATOR	= ',';
-    const SQL_ALL_VALUES		= '*';
-    const SQL_WITH_ROLLUP		= 'WITH ROLLUP';
-    const SQL_LIMIT		 		= 'LIMIT';
-    const SQL_COUNT		 		= 'COUNT';
-
+class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     /**
-     * Konstanty typů joinu
-     * @var string
-     */
-    const SQL_JOIN			= 'JOIN';
-    const SQL_LEFT_JOIN 	= 'LEFT JOIN';
-    const SQL_RIGHT_JOIN	= 'RIGHT JOIN';
-    const SQL_INNER_JOIN	= 'INNER JOIN';
-
-    /**
-     * Konstanty pro ukládání do pole SQL dotazu
-     * @var string
-     */
-    const COLUMS_ARRAY 					= 'COLUMS';
-    const WHERE_CONDITION_NAME_KEY 		= 'condition';
-    const WHERE_CONDITION_OPERATOR_KEY 	= 'operator';
-    const JOIN_TABLE_NAME_KEY			= 'name';
-    const JOIN_TABLE_CONDITION_KEY		= 'condition';
-    const ORDER_ORDER_KEY				= 'ORDER';
-    const ORDER_COLUM_KEY				= 'colum';
-    const GROUP_BY_KEY					= 'GROUP';
-    const GROUP_WITH_ROLLUP				= 'w_rolupp';
-    const LIMT_COUNT_ROWS_KEY			= 'limit_count';
-    const LIMT_OFFSET_KEY				= 'limit_offset';
-
-    /**
-     * Konstanta určující obsah SQL dotazu
+     * Proměnná určující obsah SQL dotazu
      * Musí mít správné pořadí, jak se má SQL dotaz řadit!!!
      *
      */
@@ -75,22 +25,6 @@ class Mysql_Db_Select extends Db_Select {
 											self::GROUP_BY_KEY			=> array(),
 								 			self::ORDER_ORDER_KEY		=> array(),
 								 			self::SQL_LIMIT				=> array());
-
-	/**
-	 * Pole s částmi SQL dotazu ze kterých se bude při výstupu generovat samotná SQL dotaz
-	 *
-	 * @var array
-	 */
-	protected $_sqlQueryParts = array();
-
-	protected $_connector = null;
-
-
-	public function __construct(Db $conector) {
-//		inicializace do zakladni podoby;
-		$this->_connector = $conector;
-		$this->_sqlQueryParts = self::$_sqlPartsInit;
-	}
 
 	/**
 	 * Metoda nastavuje z které tabulky se bude načítat
@@ -116,35 +50,6 @@ class Mysql_Db_Select extends Db_Select {
 			$columsArray = array($columsArray);
 		}
 		$this->_sqlQueryParts[self::COLUMS_ARRAY][$tableAlias] = $columsArray;
-
-		return $this;
-	}
-
-	/**
-	 * Metody vatváří podmínku WHERE
-	 *
-	 * @param string -- podmínka
-	 * @param string -- typ spojení podmínky (AND, OR) (výchozí je AND)
-	 *
-	 * @return Db_Select -- objekt Db_Select
-	 * //TODO dodělat aby se doplňovali magické uvozovky do lauzule
-	 */
-	public function where($condition, $operator = self::SQL_AND) {
-		$tmpArray = array();
-
-		if($operator != self::SQL_AND AND $operator != self::SQL_OR){
-			$operator = self::SQL_AND;
-		}
-
-		$tmpArray[self::WHERE_CONDITION_NAME_KEY] = $condition;
-		$tmpArray[self::WHERE_CONDITION_OPERATOR_KEY] = strtoupper($operator);
-
-//		pokud není vytvořeno pole podmínek -> vytvoř ho
-		if(!is_array($this->_sqlQueryParts[self::SQL_WHERE])){
-			$this->_sqlQueryParts[self::SQL_WHERE] = array();
-		}
-
-		array_push($this->_sqlQueryParts[self::SQL_WHERE], $tmpArray);
 
 		return $this;
 	}
@@ -276,13 +181,13 @@ class Mysql_Db_Select extends Db_Select {
 	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	public function limit($rowCount, $offset) {
+	/*publ*ic function limit($rowCount, $offset) {
 		$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $rowCount;
 		$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY] = $offset;
 
 		return $this;
 	}
-
+/*
 	/**
 	 * Metoda přidává do dotazu sloupce s počem záznamů
 	 * @param string -- alias pod kterým má být vrácena hodnota
@@ -304,7 +209,7 @@ class Mysql_Db_Select extends Db_Select {
 	 * Metody vytvoří část SQL dotazu se sloupcy, které se mají vybírat
 	 * @return string -- část SQL dotazu se sloupci
 	 */
-	private function _createColums() {
+   protected function _createColums() {
 		$columsString = null;
 		$colum = null;
 
@@ -313,7 +218,7 @@ class Mysql_Db_Select extends Db_Select {
 				foreach ($colums as $columAlias => $columString) {
 					//TODO NUTNÁ OPTIMALIZACE !!!!!!!!!!!!!!
 					$isFunction = false;
-					foreach (MySQLDb::$specialSqlFunctions as $function) {
+					foreach (MySQLiDb::$specialSqlFunctions as $function) {
 						if($function == substr($columString, 0, strlen($function))){
 							$isFunction = true;
 						}
@@ -370,7 +275,7 @@ class Mysql_Db_Select extends Db_Select {
 	/**
 	 * Metoda přidává do dotazu část s COUNT
 	 */
-	private function _createCount()
+   protected function _createCount()
 	{
 		$counts = null;
 		//TODO dodělat ošetření při použití sloupců bez group
@@ -399,11 +304,11 @@ class Mysql_Db_Select extends Db_Select {
 	 * Metoda vytváří část dotazu sek FROM
 	 * @return string -- část SQL dotazu s částí FROM
 	 */
-	private function _createFrom() {
+   protected function _createFrom() {
 		$fromString = null;
 		$fromString = self::SQL_SEPARATOR.self::SQL_FROM;
 		foreach ($this->_sqlQueryParts[self::SQL_FROM] as $tableAlias => $table) {
-			$fromString .= self::SQL_SEPARATOR . MySQLDb::$_tablePrefix . $table . self::SQL_SEPARATOR .self::SQL_AS . self::SQL_SEPARATOR .$tableAlias . ',';
+			$fromString .= self::SQL_SEPARATOR . MySQLiDb::$_tablePrefix . $table . self::SQL_SEPARATOR .self::SQL_AS . self::SQL_SEPARATOR .$tableAlias . ',';
 		}
 		//			odstranění poslední čárky
 		$fromString = substr($fromString, 0, strlen($fromString)-1);
@@ -415,7 +320,7 @@ class Mysql_Db_Select extends Db_Select {
 	 * Metoda vygeneruje část SQL příkazu s klauzulemi JOIN
 	 * @return string -- řetězec s klauzulemi JOIN
 	 */
-	private function _createJoin() {
+   protected function _createJoin() {
 		$joinsString = null;
 		$joinString = null;
 
@@ -424,7 +329,7 @@ class Mysql_Db_Select extends Db_Select {
 
 			foreach ($joinArray as $tableAlias => $table){
 				$joinString = self::SQL_SEPARATOR . $joinType . self::SQL_SEPARATOR;
-				$joinString .= MySQLDb::$_tablePrefix . $table[self::JOIN_TABLE_NAME_KEY] . self::SQL_SEPARATOR . self::SQL_AS . self::SQL_SEPARATOR
+				$joinString .= MySQLiDb::$_tablePrefix . $table[self::JOIN_TABLE_NAME_KEY] . self::SQL_SEPARATOR . self::SQL_AS . self::SQL_SEPARATOR
 							  .$tableAlias . self::SQL_SEPARATOR . self::SQL_ON . self::SQL_SEPARATOR . $table[self::JOIN_TABLE_CONDITION_KEY];
 
 				$joinsString .= $joinString;
@@ -438,29 +343,29 @@ class Mysql_Db_Select extends Db_Select {
 	 * Metoda vygeneruje část SQL dotazu s klauzulí WHERE
 	 * @return string -- část s kluzulí WHERE
 	 */
-	private function _createWhere(){
-		$wheresString = null;
-
-		if(!empty($this->_sqlQueryParts[self::SQL_WHERE])){
-			$wheresString = self::SQL_SEPARATOR . self::SQL_WHERE;
-
-			foreach ($this->_sqlQueryParts[self::SQL_WHERE] as $whereKey => $whereCondition){
-				if($whereKey != 0){
-					$wheresString .= $whereCondition[self::WHERE_CONDITION_OPERATOR_KEY];
-				}
-
-				$wheresString .= self::SQL_SEPARATOR .self::SQL_PARENTHESIS_L. $whereCondition[self::WHERE_CONDITION_NAME_KEY] .self::SQL_PARENTHESIS_R. self::SQL_SEPARATOR;
-			}
-		}
-
-		return $wheresString;
-	}
+//	private function _createWhere(){
+//		$wheresString = null;
+//
+//		if(!empty($this->_sqlQueryParts[self::SQL_WHERE])){
+//			$wheresString = self::SQL_SEPARATOR . self::SQL_WHERE;
+//
+//			foreach ($this->_sqlQueryParts[self::SQL_WHERE] as $whereKey => $whereCondition){
+//				if($whereKey != 0){
+//					$wheresString .= $whereCondition[self::WHERE_CONDITION_OPERATOR_KEY];
+//				}
+//
+//				$wheresString .= self::SQL_SEPARATOR .self::SQL_PARENTHESIS_L. $whereCondition[self::WHERE_CONDITION_NAME_KEY] .self::SQL_PARENTHESIS_R. self::SQL_SEPARATOR;
+//			}
+//		}
+//
+//		return $wheresString;
+//	}
 
 	/**
 	 * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
 	 * @return string -- část SQL s kluzulí ORDER BY
 	 */
-	private function _createOrder(){
+   protected function _createOrder(){
 		$orderString = null;
 		if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
 			$orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
@@ -478,7 +383,7 @@ class Mysql_Db_Select extends Db_Select {
 	 * Metoda vygeneruje část SQL dotazu s klauzulí GROUP BY
 	 * @return string -- část SQL s kluzulí GROUP BY
 	 */
-	private function _createGroup() {
+   protected function _createGroup() {
 
 		if(!empty($this->_sqlQueryParts[self::GROUP_BY_KEY])){
 			$groupString = null;
@@ -505,16 +410,16 @@ class Mysql_Db_Select extends Db_Select {
 	 *
 	 * @return string -- klauzule LIMIT
 	 */
-	private function _createLimit() {
-
-		if(!empty($this->_sqlQueryParts[self::SQL_LIMIT])){
-			$limitString = null;
-			$limitString = self::SQL_SEPARATOR . self::SQL_LIMIT . self::SQL_SEPARATOR . $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY]
-			. ',' . self::SQL_SEPARATOR .$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY];
-
-			return $limitString;
-		}
-	}
+//	private function _createLimit() {
+//
+//		if(!empty($this->_sqlQueryParts[self::SQL_LIMIT])){
+//			$limitString = null;
+//			$limitString = self::SQL_SEPARATOR . self::SQL_LIMIT . self::SQL_SEPARATOR . $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY]
+//			. ',' . self::SQL_SEPARATOR .$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY];
+//
+//			return $limitString;
+//		}
+//	}
 
 
    /**
@@ -522,23 +427,23 @@ class Mysql_Db_Select extends Db_Select {
      *
      * @return string -- objekt jako řetězec
      */
-    public function __toString()
-    {
-        $sql = self::SQL_SELECT;
-
-        foreach ($this->_sqlQueryParts as $partKey => $partValue) {
-        	$createMethod = '_create' . ucfirst($partKey);
-        	if(method_exists($this, $createMethod)){
-        		$sql .= $this->$createMethod();
-        	}
-        	;
-        }
-
-//		echo "<pre>";
-//		print_r($this);
-//		echo "</pre>";
-        return $sql;
-    }
+//    public function __toString()
+//    {
+//        $sql = self::SQL_SELECT;
+//
+//        foreach ($this->_sqlQueryParts as $partKey => $partValue) {
+//        	$createMethod = '_create' . ucfirst($partKey);
+//        	if(method_exists($this, $createMethod)){
+//        		$sql .= $this->$createMethod();
+//        	}
+//        	;
+//        }
+//
+////		echo "<pre>";
+////		print_r($this);
+////		echo "</pre>";
+//        return $sql;
+//    }
 }
 
 ?>

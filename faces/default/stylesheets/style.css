@@ -178,16 +178,20 @@ a:hover {
 }
 
 /* Hlášky */
-.error_message, .messages {
+.errorMessage, .messages {
 	font-size: small;
 	padding: 5px;
-	font-weight: 600;
-	
+	/*font-weight: 600;*/
 }
 
-.error_message { /* text-align: center; */
+.errorMessage { /* text-align: center; */
 	background-color: #FFAEAE;
 	border: 2px solid #8B0306;
+}
+
+.errorMessage p.errTrMargin {
+   padding-left: 20px;
+   display:block;
 }
 
 .message { /* text-align: center; */
@@ -195,7 +199,7 @@ a:hover {
 	border: 2px solid #688AAA;
 }
 
-.error_message img, .message img {
+.errorMessage img, .message img {
 	/*float: left;*/
 	vertical-align: middle;
 }

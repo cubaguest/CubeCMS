@@ -92,13 +92,6 @@ abstract class Controller {
 		$this->auth = $rights->getAuth();
 		$this->rights = $rights;
 
-		if(AppCore::getModuleMessages() instanceof Messages){
-			$this->infomsg = AppCore::getModuleMessages();
-		}
-
-		if(AppCore::getModuleErrors() instanceof Messages){
-			$this->errmsg = AppCore::getModuleErrors();
-		}
 		$this->article = new Article();
 		$this->container = new Container();
 
@@ -187,7 +180,7 @@ abstract class Controller {
 	 * @return Messages -- objekt zpráv
 	 */
 	final public function infoMsg() {
-		return $this->infomsg;
+      return AppCore::getInfoMessages();
 	}
 
 	/**
@@ -195,7 +188,7 @@ abstract class Controller {
 	 * @return Messages -- objekt zpráv
 	 */
 	final public function errMsg() {
-		return $this->errmsg;
+      return AppCore::getUserErrors();
 	}
 	
 	/**

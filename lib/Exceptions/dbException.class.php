@@ -1,6 +1,6 @@
 <?
 /**
- * Třída pro obsluhu vyjímek modulů v jádře
+ * Třída pro obsluhu vyjímek db modulů
  * Třída rozšiřuje třídu Exception
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
@@ -9,9 +9,6 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu chyb modulů
  */
-class CoreException extends Exception {
-   public function  __construct($message = null, $code = null) {
-      parent::__construct($message, $code);
-   }
+class DBException extends Exception {
 }
 ?>

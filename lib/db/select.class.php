@@ -10,12 +10,12 @@
  * @abstract 		Třída pro výběr záznamů z db
  */
 
-abstract class Db_Select {
+interface Db_Select extends Db_Query {
    /**
     * Vybrané konstanty pro SQL dotazy
     */
-   const SQL_ASC        		= 'ASC';
-   const SQL_DESC       		= 'DESC';
+//   const SQL_ASC        		= 'ASC';
+//   const SQL_DESC       		= 'DESC';
 	/**
 	 * Metoda nastavuje z které tabulky se bude načítat
 	 * klauzule FROM
@@ -25,7 +25,7 @@ abstract class Db_Select {
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	abstract function from($tableArray, $columsArray = "*");
+   public function from($tableArray, $columsArray = "*");
 	
 	/**
 	 * Metody vatváří podmínku WHERE
@@ -35,7 +35,7 @@ abstract class Db_Select {
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	abstract function where($condition, $operator = self::SQL_AND);
+//	abstract function where($condition, $operator = self::SQL_AND);
 	
 	/**
 	 * Metody vytvoří část pro klauzuli JOIN
@@ -48,7 +48,7 @@ abstract class Db_Select {
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	abstract function join($tableArray, $condition, $joinType = null, $columsArray = "*");
+	public function join($tableArray, $condition, $joinType = null, $columsArray = "*");
 	
 	/**
 	 * Metoda přiřadí řazení sloupcu v SQL dotazu
@@ -58,7 +58,7 @@ abstract class Db_Select {
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	abstract function order($colum, $order = self::SQL_ASC);
+	public function order($colum, $order = self::SQL_ASC);
 	
 	/**
 	 * Metoda přiřadí slouření sloupců v SQL dotazu pomocí klauzule GROUP BY
@@ -68,16 +68,7 @@ abstract class Db_Select {
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	abstract function group($colum, $withRollup = false);
-	
-	/**
-	 * Metoda přidá do SQL dotazu klauzuli LIMIT
-	 * @param integer -- počet záznamů
-	 * @param integer -- záčátek
-	 * 
-	 * @return Db_Select -- objekt Db_Select
-	 */
-	abstract function limit($rowCount, $offset);
+   public function group($colum, $withRollup = false);
 	
 	/**
 	 * Metoda přidává do dotazu sloupce s počem záznamů
@@ -86,7 +77,7 @@ abstract class Db_Select {
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	abstract function count($alias = null, $colum = self::SQL_ALL_VALUES);
+   public function count($alias = null, $colum = self::SQL_ALL_VALUES);
 }
 
 ?>

@@ -1,13 +1,14 @@
 <?php
 require_once './lib/db/db.interface.php';
-require_once './lib/db/mysql/select.class.php';
-require_once './lib/db/mysql/insert.class.php';
-require_once './lib/db/mysql/delete.class.php';
-require_once './lib/db/mysql/update.class.php';
+require_once './lib/db/mysqli/query.class.php';
+require_once './lib/db/mysqli/select.class.php';
+require_once './lib/db/mysqli/insert.class.php';
+require_once './lib/db/mysqli/delete.class.php';
+require_once './lib/db/mysqli/update.class.php';
 
 /**
- * Třída implementující databázový objekt typu MySQL.
- * Třída implementuje objet db konektoru k MySQL. Obsahuje implementace
+ * Třída implementující databázový objekt typu MySQLi.
+ * Třída implementuje objet db konektoru k MySQLi. Obsahuje implementace
  * metod pro práci s SQL dotazy a samotné připojování k databázi.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
@@ -16,7 +17,7 @@ require_once './lib/db/mysql/update.class.php';
  * @abstract 		Třída pro MySQL DB
  */
 
-class MySQLDb extends Db implements DbInterface {
+class MySQLiDb extends Db implements DbInterface {
 	/**
 	 * statické pole se specílními SQL funkcemi
 	 * @var array
@@ -72,9 +73,13 @@ class MySQLDb extends Db implements DbInterface {
 	 * @todo dodělat nastavení kódování
 	 */
 	private function _connect() {
-		if (mysqli_connect_errno()) {
-			throw new CoreException(mysqli_connect_error(), 201);
-		}
+      try {
+         if (mysqli_connect_errno()) {
+            throw new DBException(mysqli_connect_error(), 102);
+         }
+      } catch (DBException $e) {
+         new CoreErrors($e);
+      }
 		$this->_mysqliObject->set_charset("utf8");
 	}
 
@@ -83,11 +88,19 @@ class MySQLDb extends Db implements DbInterface {
 	 * @deprecated
 	 */
 	private function _disconect() {
-		if($this->_mysqliObject != null){
-			$this->_mysqliObject->close();
-		} else {
-			throw new CoreException("Database server not connected", 203);
-		}
+      try {
+         if($this->_mysqliObject == null){
+            throw new DBException(_('Databázový server není připojen'), 103);
+         }
+         $this->_mysqliObject->close();
+      } catch (DBException $e) {
+         new CoreErrors($e);
+      }
+//      if($this->_mysqliObject != null){
+//			$this->_mysqliObject->close();
+//		} else {
+//			throw new CoreException("Database server not connected", 203);
+//		}
 	}
 
 	/**
@@ -99,7 +112,6 @@ class MySQLDb extends Db implements DbInterface {
 		$this->_lastInsertedId = null;
 	}
 
-
 	/**
 	 * Metoda provede daný sql dotaz na databázi
 	 *
@@ -110,25 +122,29 @@ class MySQLDb extends Db implements DbInterface {
 		$this->_setDefault();
 
 		Db::addQueryCount();
-		
+		//$result = false;
 		$result = $this->_mysqliObject->query($sqlQuery);
-		if($result != null){
-			$queryType = strtolower(substr($sqlQuery, 0, 6));
 
-			if ($queryType == "select"){
-				$this->_numberOfReturnRows=$result->num_rows;
-			} else if($queryType == "insert"){
-				$this->_lastInsertedId=$this->_mysqliObject->insert_id;
-				$this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
-			} else if($queryType == "delete"){
-				$this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
-			} else if($queryType == "update"){
-				$this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
-			}
-		} else {
-			new CoreException($this->_mysqliObject->error, 204);
-			$result = false;
-		}
+      try {
+         if(!$result){
+            throw new DBException('('.$this->_mysqliObject->errno.') '.$this->_mysqliObject->error
+               ._(' v dotazu ').$sqlQuery, 104);
+         }
+
+         $queryType = strtolower(substr($sqlQuery, 0, 6));
+         if ($queryType == "select"){
+            $this->_numberOfReturnRows=$result->num_rows;
+         } else if($queryType == "insert"){
+            $this->_lastInsertedId=$this->_mysqliObject->insert_id;
+            $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
+         } else if($queryType == "delete"){
+            $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
+         } else if($queryType == "update"){
+            $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
+         }
+      } catch (DBException $e) {
+         new CoreErrors($e);
+      }
 		return $result;
 	}
 
@@ -165,7 +181,7 @@ class MySQLDb extends Db implements DbInterface {
 	 *
 	 */
 	public function select() {
-		return new Mysql_Db_Select($this);
+		return new Mysqli_Db_Select($this);
 	}
 	
 	/**
@@ -177,7 +193,7 @@ class MySQLDb extends Db implements DbInterface {
 	 */
 	public function count($table,$condition = null)
 	{
-		$select = new Mysql_Db_Select($this);
+		$select = new Mysqli_Db_Select($this);
 		$sqlCount = $select->from(array("tbl"=>$table))->count("count");
 		
 		if($condition != null){
@@ -199,7 +215,7 @@ class MySQLDb extends Db implements DbInterface {
 	 *
 	 */
 	public function insert() {
-		return new Mysql_Db_Insert($this);
+		return new Mysqli_Db_Insert($this);
 	}
 	
 	/**
@@ -209,7 +225,7 @@ class MySQLDb extends Db implements DbInterface {
 	 *
 	 */
 	public function delete() {
-		return new Mysql_Db_Delete($this);
+		return new Mysqli_Db_Delete($this);
 	}
 
 	/**
@@ -219,8 +235,15 @@ class MySQLDb extends Db implements DbInterface {
 	 *
 	 */
 	public function update() {
-		return new Mysql_Db_Update($this);
+		return new Mysqli_Db_Update($this);
 	}
+
+//   public function fetch($sqlQuery, $typeResult = MYSQLI_NUM) {
+//      $queryResult = $this->query($sqlQuery);
+//
+////      return $queryResult->fetch_all($typeResult);
+//return mysqli;
+//   }
 
 	/**
 	 * Metoda provede sql dotaz a výstup doplní do asociativního pole
@@ -235,9 +258,10 @@ class MySQLDb extends Db implements DbInterface {
 		if($queryResult){
 			$resultArray = array();
 			if(!$oneArray){
-				while ($sqlData=$queryResult->fetch_assoc()) {
+            while ($sqlData=$queryResult->fetch_assoc()) {
 					array_push($resultArray, $sqlData);
 				}
+//            $this->fetch($sqlQuery, MYSQLI_ASSOC);
 			} else {
 				$resultArray = $queryResult->fetch_assoc();
 			}

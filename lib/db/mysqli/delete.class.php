@@ -10,7 +10,7 @@ require_once './lib/db/delete.class.php';
  * @abstract 		Třída pro mazání záznamů
  */
 
-class Mysql_Db_Delete extends Db_Delete {
+class Mysqli_Db_Delete extends Db_Delete {
 	/**
 	 * Konstanty pro příkazy SQL
 	 * @var string
@@ -166,7 +166,7 @@ class Mysql_Db_Delete extends Db_Delete {
 		$fromString = null;
 		$fromString = self::SQL_SEPARATOR.self::SQL_FROM;
 		
-		$fromString .= self::SQL_SEPARATOR . MySQLDb::$_tablePrefix . $this->_sqlQueryParts[self::SQL_FROM] . self::SQL_SEPARATOR;
+		$fromString .= self::SQL_SEPARATOR . MySQLiDb::$_tablePrefix . $this->_sqlQueryParts[self::SQL_FROM] . self::SQL_SEPARATOR;
 		return $fromString;
 	}
 

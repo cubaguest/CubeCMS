@@ -6,7 +6,7 @@
 		<dbuser>dev</dbuser>
 		<dbpasswd>E58frT6X</dbpasswd>
 		<tbprefix>vypecky_</tbprefix>
-		<dbhandler>mysql</dbhandler></db>
+		<dbhandler>mysqli</dbhandler></db>
 	<smarty>
 		<templates_dir>templates</templates_dir>
 		<templates_c_dir>templates_c</templates_c_dir>
