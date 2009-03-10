@@ -21,6 +21,8 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 	<input type="text" size="40" maxlength="50" name="partner_url" value="{$VARS.PARTNER_DATA.url}" /><br />
 	{$VARS.PARTNER_LOGO_IMAGE}:<br />
 	<input type="file" size="40" maxlength="50" name="partner_logo_file" /><br />
+	{$VARS.PARTNER_PRIORITY}:<br />
+	<input type="text" size="10" maxlength="10" name="partner_priority" /><br />
 	
 	{if $VARS.EDIT_PARTNER eq true AND $VARS.PARTNER_LOGO_FILE neq null}
    {$VARS.DELTE_IMAGE_LABEL}&nbsp;&#132;{$VARS.PARTNER_LOGO_FILE}&#148;&nbsp;<input name="partner_delete_image" type="checkbox" /><br />

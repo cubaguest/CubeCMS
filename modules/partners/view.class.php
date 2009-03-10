@@ -14,6 +14,7 @@ class PartnersView extends View {
 			$this->template()->addVar('LINK_TO_ADD_NAME', _('Přidat partnera'));
 			$this->template()->addVar('LINK_TO_EDIT_NAME', _('Upravit partnera'));
 			$this->template()->addVar('LINK_TO_REMOVE_NAME', _('Smazat partnera'));
+         $this->template()->addVar('PARTNER_PRIORITY_LABEL', _('Priorita'));
 
 //			$this->template()->addVar('LINK_TO_DELETE_SPONSORS_NAME', _('Smazat'));
 			$this->template()->addVar('DELETE_CONFIRM_MESSAGE', _('Opravdu smazat partnera'));
@@ -27,7 +28,6 @@ class PartnersView extends View {
 
       $jQuery = new JQuery();
       $this->template()->addJsPlugin($jQuery);
-//		$this->template()->addVar('SPONSORS_ARRAY', $this->getModel()->allSponsorsArray);
 //		$this->template()->addVar('LINK_ADD_SPONSOR', $this->getModel()->linkAddSponsor);
 //		$this->template()->addVar('DIR_TO_IMAGES', $this->getModel()->dirToImages);
 //
@@ -44,6 +44,7 @@ class PartnersView extends View {
 		$this->template()->addVar('PARTNER_LABEL', _('Popis partnera'));
 		$this->template()->addVar('PARTNER_URL_NAME', _('WWW stránky partnera'));
 		$this->template()->addVar('PARTNER_LOGO_IMAGE', _('Logo (obrázek nebo flash) partnera'));
+		$this->template()->addVar('PARTNER_PRIORITY', _('Priorita pratnera (celé číslo od 0 do 1000)'));
 	}
 	
 	/**

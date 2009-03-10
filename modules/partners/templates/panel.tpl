@@ -5,11 +5,12 @@
 <a href="{$PARTNER.url}" title="{$PARTNER.name}" target="_blank">{$PARTNER.name}</a>
 {else}
    {if $PARTNER.logo_type eq 'image'}
-   <a href="{$PARTNER.url}" title="{$PARTNER.name}" target="_blank">
-      {html_image file=$VARS.DIR_TO_IMAGES|cat:$PARTNER.logo_file width=$VARS.LOGO_WIDTH}
+   <a href="{$PARTNER.url}" title="{$PARTNER.name}" target="_blank" rel="nofollow">
+      <img src="{$VARS.DIR_TO_IMAGES|cat:$PARTNER.logo_file}" title="{$VARS.DIR_TO_IMAGES|cat:$PARTNER.logo_file}" width="123" />
+      {* html_image file=$VARS.DIR_TO_IMAGES|cat:$PARTNER.logo_file width=$VARS.LOGO_WIDTH *}
    </a>
    {elseif $PARTNER.logo_type eq 'flash'}
-   <a href="{$PARTNER.url}" title="{$PARTNER.name}" target="_blank">
+   <a href="{$PARTNER.url}" title="{$PARTNER.name}" target="_blank" rel="nofollow">
       <!--[if !IE]> -->
       <object type="application/x-shockwave-flash" data="{$VARS.DIR_TO_IMAGES|cat:$PARTNER.logo_file}" width="{$PARTNER.logo_width}px" height="{$PARTNER.logo_height}px">
          <!-- <![endif]-->

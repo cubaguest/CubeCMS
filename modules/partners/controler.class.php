@@ -17,6 +17,7 @@ class PartnersController extends Controller {
 	const FORM_URL = 'url';
 	const FORM_LOGO_FILE = 'logo_file';
 	const FORM_ID = 'id';
+	const FORM_PRIORITY = 'priority';
 	const FORM_DELETE_IMAGE = 'delete_image';
 
    /**
@@ -88,6 +89,7 @@ class PartnersController extends Controller {
       $addForm->crInputText(self::FORM_NAME, true)
       ->crTextArea(self::FORM_LABEL, false, true, Form::CODE_HTMLDECODE)
       ->crInputText(self::FORM_URL, false, false, Form::VALIDATE_URL)
+      ->crInputText(self::FORM_PRIORITY, true, false, 'is_numeric')
       ->crInputFile(self::FORM_LOGO_FILE)
       ->crSubmit(self::FORM_BUTTON_SEND);
 
@@ -138,7 +140,7 @@ class PartnersController extends Controller {
 //         Uložení do modelu
          if(!$fileError AND $partnerModel->saveNewPartner($addForm->getValue(self::FORM_NAME),
                $addForm->getValue(self::FORM_LABEL), $url,
-               $logoFile, $logoType, $logoWidth, $logoHeight)){
+               $logoFile, $logoType, $logoWidth, $logoHeight, $addForm->getValue(self::FORM_PRIORITY))){
             $this->infoMsg()->addMessage(_('Partner byl uložen'));
             $this->getLink()->action()->reload();
          } else {
@@ -163,6 +165,7 @@ class PartnersController extends Controller {
       $editForm->crInputText(self::FORM_NAME, true)
       ->crTextArea(self::FORM_LABEL, false, true, Form::CODE_HTMLDECODE)
       ->crInputText(self::FORM_URL, false, false, Form::VALIDATE_URL)
+      ->crInputText(self::FORM_PRIORITY, true, false, 'is_numeric')
       ->crInputFile(self::FORM_LOGO_FILE)
       ->crInputHidden(self::FORM_ID, true)
       ->crInputCheckboxn(self::FORM_DELETE_IMAGE)
@@ -175,6 +178,7 @@ class PartnersController extends Controller {
       $editForm->setValue(self::FORM_LABEL, $partnerDetailModel->getLabelsLangs());
       $editForm->setValue(self::FORM_URL, $partnerDetailModel->getUrl());
       $editForm->setValue(self::FORM_ID, $partnerDetailModel->getId());
+      $editForm->setValue(self::FORM_PRIORITY, $partnerDetailModel->getPriority());
 
       $lname = $partnerDetailModel->getLabelsLangs();
       $this->container()->addData('PARTNER_NAME', $partnerDetailModel->getName());
@@ -241,7 +245,7 @@ class PartnersController extends Controller {
          //         Uložení do modelu
          if($fileOk AND $partnerModel->saveEditPartner($editForm->getValue(self::FORM_NAME),
                $editForm->getValue(self::FORM_LABEL), $editForm->getValue(self::FORM_ID),
-               $url)){
+               $editForm->getValue(self::FORM_PRIORITY), $url)){
             $this->infoMsg()->addMessage(_('Partner byl uložen'));
             $this->getLink()->action()->article()->reload();
          } else {
@@ -279,7 +283,6 @@ class PartnersController extends Controller {
       }
    }
 
-
    private function validateUrl($url) {
       $isValidUrl = false;
       foreach ($this->validProtocols as $protocol) {
@@ -288,11 +291,9 @@ class PartnersController extends Controller {
             break;
          }
       }
-
       if(!$isValidUrl){
          $url = $this->validProtocols[0].'://'.$url;
       }
-
       return $url;
    }
 }

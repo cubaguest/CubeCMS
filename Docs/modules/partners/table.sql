@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `valmez_partners` (
   `label_en` varchar(1000) default NULL,
   `label_de` varchar(1000) default NULL,
   `url` varchar(100) default NULL,
+  `priority` smallint(6) NOT NULL default '0' COMMENT 'Priorita pořadí',
   `logo_file` varchar(100) default NULL,
   `logo_type` enum('flash','image') default NULL,
   `logo_width` smallint(6) default NULL,

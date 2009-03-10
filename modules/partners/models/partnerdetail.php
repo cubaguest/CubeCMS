@@ -19,6 +19,7 @@ class PartnerDetailModel extends DbModel {
    const COLUMN_LOGO_TYPE = 'logo_type';
    const COLUMN_LOGO_WIDTH = 'logo_width';
    const COLUMN_LOGO_HEIGHT = 'logo_height';
+   const COLUMN_PRIORITY = 'priority';
 
    /**
     * Typy log
@@ -33,6 +34,7 @@ class PartnerDetailModel extends DbModel {
    private $partnerLabel = null;
    private $partnerUrl = null;
    private $partnerImage = null;
+   private $partnerPriority = 0;
 
 
 
@@ -48,7 +50,7 @@ class PartnerDetailModel extends DbModel {
     * @param int $logoHeight -- výška loga
     */
    public function saveNewPartner($name, $labelsArr, $Url = null, $logoFile = null,
-      $logoType = null, $logoWidth = null, $logoHeight = null) {
+      $logoType = null, $logoWidth = null, $logoHeight = null, $priority = 0) {
       $partnerArr = $this->createValuesArray(self::COLUMN_NAME, $name,
                                           self::COLUMN_LABEL, $labelsArr,
                                           self::COLUMN_URL, $Url,
@@ -56,7 +58,8 @@ class PartnerDetailModel extends DbModel {
                                           self::COLUMN_LOGO_FILE, $logoFile,
                                           self::COLUMN_LOGO_TYPE, $logoType,
                                           self::COLUMN_LOGO_WIDTH, $logoWidth,
-                                          self::COLUMN_LOGO_HEIGHT, $logoHeight);
+                                          self::COLUMN_LOGO_HEIGHT, $logoHeight,
+                                          self::COLUMN_PRIORITY, $priority);
 
       $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable())
       ->colums(array_keys($partnerArr))
@@ -90,6 +93,7 @@ class PartnerDetailModel extends DbModel {
       $this->partnerLabel = $partner[self::COLUMN_LABEL];
       $this->partnerUrl = $partner[self::COLUMN_URL];
       $this->partnerImage = $partner[self::COLUMN_LOGO_FILE];
+      $this->partnerPriority = $partner[self::COLUMN_PRIORITY];
 
       return $partner;
    }
@@ -118,6 +122,10 @@ class PartnerDetailModel extends DbModel {
       $this->loadData($id);
       return $this->partnerImage;
    }
+   public function getPriority($id = null) {
+      $this->loadData($id);
+      return $this->partnerPriority;
+   }
 
    private function loadData($id) {
       if(!$this->dataLoaded AND $id != null){
@@ -125,11 +133,12 @@ class PartnerDetailModel extends DbModel {
       }
    }
 
-   public function saveEditPartner($name, $labelsArr, $idPartner, $Url = null) {
+   public function saveEditPartner($name, $labelsArr, $idPartner,$priority = 0, $Url = null) {
 
       $partnerArr = $this->createValuesArray(self::COLUMN_NAME, $name,
          self::COLUMN_LABEL, $labelsArr,
-         self::COLUMN_URL, $Url);
+         self::COLUMN_URL, $Url,
+         self::COLUMN_PRIORITY, $priority);
       $sqlUpdate = $this->getDb()->update()->table($this->getModule()->getDbTable())
          ->set($partnerArr)
          ->where(self::COLUMN_ID_PARTNER.'='.$idPartner);

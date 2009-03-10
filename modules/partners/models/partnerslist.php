@@ -30,9 +30,10 @@ class PartnersListModel extends DbModel {
          array(self::COLUMN_LABEL => "IFNULL(".self::COLUMN_LABEL_LANG_PREFIX.Locale::getLang()
             .", ".self::COLUMN_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
 			self::COLUMN_ID_PARTNER, self::COLUMN_NAME, self::COLUMN_LOGO_FILE, self::COLUMN_LOGO_TYPE,
-         self::COLUMN_LOGO_WIDTH, self::COLUMN_LOGO_HEIGHT, self::COLUMN_URL))
+         self::COLUMN_LOGO_WIDTH, self::COLUMN_LOGO_HEIGHT, self::COLUMN_URL, PartnerDetailModel::COLUMN_PRIORITY))
 				->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId())
-				->order(self::COLUMN_NAME, 'desc');
+            ->order(PartnerDetailModel::COLUMN_PRIORITY,'desc')
+				->order(self::COLUMN_NAME, 'asc');
 
 		$returArray = $this->getDb()->fetchAssoc($sqlSelect);
 

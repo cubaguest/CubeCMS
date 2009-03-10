@@ -48,12 +48,15 @@
 
       {$PARTNER.label}
       <br />
+      
       <hr class="reseter" />
 
       {if $PARTNER.url neq null}
       <a href="{$PARTNER.url}" title="{$PARTNER.name}" target="_blank">{$PARTNER.url}</a>
       {/if}
-
+      {if $VARS.EDITABLE eq true}{debug}
+      <span>{$VARS.PARTNER_PRIORITY_LABEL}:{$PARTNER.priority}</span>
+      {/if}
       {if $VARS.EDITABLE eq true}
       <div class="editbox" id="editPartnerBox{$KEY}">
          <p class="upside"></p>
