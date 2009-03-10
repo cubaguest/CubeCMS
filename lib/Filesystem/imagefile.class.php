@@ -266,10 +266,22 @@ class ImageFile extends File {
             }
 
             $newImage = imagecreatetruecolor($width, $height);
+
+            // Zapnutí alfy, tj průhlednost
+            imagealphablending($newImage, false);
+            imagesavealpha($newImage, true);
+
             ImageCopyResampled($newImage, $tempImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight);
          } else {
             //			Ořezání obrázku do jedné velikosti
             $newImage = imagecreatetruecolor($width, $height);
+
+            // Zapnutí alfy, tj průhlednost
+            imagealphablending($newImage, false);
+            imagesavealpha($newImage, true);
+
+//            $alpha = imagecolorallocatealpha ($newImage,0,0,0,127);
+//            imagefilledrectangle($newImage, 0, 0, $width, $height, $alpha);
 
             $scale = (($width / $this->imageWidth) > ($height / $this->imageHeight)) ? ($width / $this->imageWidth) : ($height / $this->imageHeight); // vyber vetsi pomer a zkus to nejak dopasovat...
             $newW = $width/$scale;    // jak by mel byt zdroj velky (pro poradek :)
@@ -314,6 +326,8 @@ class ImageFile extends File {
                   $saved = imagegif($newImage, $dstDir.$fileName);
                   break;
                case IMAGETYPE_PNG:
+                  imagealphablending($newImage, false);
+                  imagesavealpha($newImage, true);
                   $saved = imagepng($newImage, $dstDir.$fileName, $this->pngQuality);
                   break;
                case IMAGETYPE_WBMP:
