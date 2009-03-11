@@ -31,6 +31,16 @@ class Auth {
 	const USER_IS_LOGIN		= 'login';
 	const USER_LOGIN_ADDRESS= 'ip_address';
 
+   /**
+    * Názvy některých sloupců
+    */
+   const COLUMN_USERNAME      = 'username';
+   const COLUMN_ID_GROUP      = 'id_group';
+   const COLUMN_GROUP_NAME    = 'gname';
+   const COLUMN_ID_USER       = 'id_user';
+   const COLUMN_USER_MAIL     = 'mail';
+   const COLUMN_USER_PHOTO    = 'foto_file';
+   
 	/**
 	 * Proměná - název session pro ukládání auth údajů
 	 * @var string
@@ -195,9 +205,10 @@ class Auth {
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
 				$this->getError()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
-				$userSql = $this->dbConnector->select()->from(array("u" =>AppCore::sysConfig()->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES)))
-						->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, Config::SECTION_DB_TABLES)), "g.id_group = u.id_group" , "left", array("*", "gname" => "name"))
-						->where("u.username = '".htmlentities($_POST["login_username"],ENT_QUOTES)."'");
+            $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
+               ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES), 'u')
+               ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, Config::SECTION_DB_TABLES)), "g.id_group = u.id_group" , "left", array("*", "gname" => "name"))
+					->where("u.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
 
 				$userResult = $this->dbConnector->fetchObject($userSql);
 						
@@ -209,28 +220,24 @@ class Auth {
 						//	Uspesne prihlaseni do systemu
 						$this->login = true;
 						self::$isLogIn = true;
-						$this->userName = $userResult->username;
-						$this->userGroupId = $userResult->id_group;
-						$this->userGroupName = $userResult->gname;
-						$this->userId = $userResult->id_user;
-						$this->userMail = $userResult->mail;
+						$this->userName = $userResult->{self::COLUMN_USERNAME};
+						$this->userGroupId = $userResult->{self::COLUMN_ID_GROUP};
+						$this->userGroupName = $userResult->{self::COLUMN_GROUP_NAME};
+						$this->userId = $userResult->{self::COLUMN_ID_USER};
+						$this->userMail = $userResult->{self::COLUMN_USER_MAIL};
 						
-						if($userResult->foto_file != null){
+						if($userResult->{self::COLUMN_USER_PHOTO} != null){
 							//TODO není dodělána práce s fotkou
 //							$_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
 						}
-						
 						$return = true;
-						
 					} else {
                   $this->getError()->addMessage(_("Bylo zadáno špatné heslo."));
 					}
 				}
 				unset($loginMysql);
-
 			}
 		}
-		
 		return $return;
 	}
 
@@ -239,25 +246,27 @@ class Auth {
 	 * @return boolean -- true pokud se uživatel odhlásil
 	 */
 	private function _logOutNow() {
-		
 		$return = false;
-		
 		if(isset($_POST["logout_submit"])){
 			$this->session->add(self::USER_IS_LOGIN, false);
 			$this->login = false;
 			self::$isLogIn = false;
 			session_destroy();
 			$return = true;
-			
 					
 			$link = new Links(true);
          $link->category()->action()->article()->rmParam()->reload();
-			
 		}
-		
 		return $return;
-
 	}
+
+   /**
+    * Metoda vrací objekt pro přístup k DB
+    * @return DbInterface
+    */
+   private function getDb() {
+      return AppCore::getDbConnector();
+   }
 
 	/**
 	 * Metoda vrací je-li uživatel přihlášen

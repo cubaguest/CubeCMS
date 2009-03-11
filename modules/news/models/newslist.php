@@ -89,6 +89,30 @@ class NewsListModel extends DbModel {
 		
 		return $returArray;
 	}
+
+	/**
+	 * Metoda vrací pole s vybranými novinkami
+	 *
+	 * @return array -- pole novinek
+	 */
+	public function getListNews() {
+		$sqlSelect = $this->getDb()->select()->from(array("news" => $this->getModule()->getDbTable()), array(self::COLUMN_NEWS_LABEL => "IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
+//							self::COLUMN_NEWS_LANG => "IF(`".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang()."` != 'NULL', '".Locale::getLang()."', '".Locale::getDefaultLang()."')",
+							self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
+							self::COLUMN_NEWS_ID_USER, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_TIME))
+//						->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
+						->where("news.".self::COLUMN_NEWS_ID_ITEM." = ".$this->getModule()->getId())
+						->where("news.".self::COLUMN_NEWS_DELETED." = ".(int)false)
+						->order("news.".self::COLUMN_NEWS_TIME, 'desc');
+
+//		if($this->tableUsers != null){
+//			$sqlSelect=$sqlSelect->join(array("users" => $tableUsers), "users.".self::COLUMN_NEWS_ID_USER." = news.".self::COLUMN_NEWS_ID_USER, null, Auth::USER_NAME);
+//		}
+
+		$returArray = $this->getDb()->fetchAssoc($sqlSelect);
+
+		return $returArray;
+	}
 	
 	/**
 	 * Metoda nastaví tabulku s uživateli
@@ -105,7 +129,19 @@ class NewsListModel extends DbModel {
 		
 		return $tableUsers;
 	}
-	
+
+   public function getLastChange() {
+      $sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), self::COLUMN_NEWS_TIME)
+						->limit(0, 1)
+						->order(self::COLUMN_NEWS_TIME, 'desc');
+
+      $returArray = $this->getDb()->fetchObject($sqlSelect);
+
+      if(!empty ($returArray)){
+         $returArray = $returArray->{self::COLUMN_NEWS_TIME};
+      }
+		return $returArray;
+   }
 	
 }
 

@@ -5,12 +5,13 @@
  * databázových konektorů.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: db.interface.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.2 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída s interfacem pro vytváření db konekorů
  */
 
-interface DbInterface{
+interface DbInterface {
 
 	/**
 	 * Metoda provede daný sql dotaz na databázi
@@ -69,15 +70,24 @@ interface DbInterface{
 	 * @return Db_Update -- objekt pro přístup k db;
 	 */
 	public function update();
-	
+
 	/**
-	 * Metoda provede sql dotaz a výstup doplní do asociativního pole
+	 * Metoda provede sql dotaz a výstup doplní do asociativního pole v numerickém
+    * poli podle záznamů
 	 *
 	 * @param string -- SQL dotaz
-	 * @param boolean -- jestli se má vrátit pouze pole s prvky, nebo pole s poly prvků
+	 * @return array/boolean -- asociativní/numerické pole s výsledky sql dotazu
+    * nebo false při prázdném výsledku
+	 */
+	public function fetchAll($sqlQuery);
+
+	/**
+	 * Metoda provede sql dotaz a výstup doplní do asociativního pole (např. do while)
+	 *
+	 * @param string -- SQL dotaz
 	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
 	 */
-	public function fetchAssoc($sqlQuery, $oneArray = false);
+	public function fetchAssoc($sqlQuery);
 	
 	/**
 	 * Metoda provede sql dotaz a výstup přiřadí do pole objektů mysqli

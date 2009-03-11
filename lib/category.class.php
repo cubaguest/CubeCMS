@@ -44,6 +44,8 @@ class Category {
    const COLUMN_CAT_LABEL_ORIG = 'label';
    const COLUMN_CAT_ALT_ORIG = 'alt';
 
+   const COLUMN_CAT_ACTIVE = 'active';
+
 	 /**
 	  * Id aktuální kategorie
 	  * @var integer
@@ -147,50 +149,67 @@ class Category {
 	  * @param string -- id kategorie
 	  */
 	private static function _loadSelectedFromDb($catId) {
-		$catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
-		$secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
-		$itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
-		//		$userNameGroup = self::$_auth->userdetail->offsetGet(Auth::USER_GROUP_NAME);
+
 		$userNameGroup = self::$_auth->getGroupName();
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
-			array(self::COLUMN_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang()
-			.", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUMN_CAT_LPANEL,
-			self::COLUMN_CAT_RPANEL, self::COLUMN_SEC_ID, self::COLUMN_CAT_PARAMS))
-		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
-		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", 
-			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
-			.Locale::getDefaultLang().")"))
-		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
-		->where("cat.active = 1", "and")
-		->where("cat.".self::COLUMN_CAT_ID." = '".self::$currentCategoryId."'", "and")
-		->order("sec.priority", "desc")
-		->order("cat.priority", "desc")
-		->order("clabel")
-		->limit(0,1);
+      $catModel = new CategoryModel();
 
-		$catArray = self::$_dbConnector->fetchObject($catSelect, true);
+
+
+//      $db = AppCore::getDbConnector();
+//
+//      $db->select()->table($catTable, 'cat')->colums(array(self::COLUMN_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang()
+//			.", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUMN_CAT_LPANEL,
+//			self::COLUMN_CAT_RPANEL, self::COLUMN_SEC_ID, self::COLUMN_CAT_PARAMS))
+//         ->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
+//         ->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner",
+//            array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
+//            .Locale::getDefaultLang().")"))
+//         ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, 'r__', 'LIKE')
+//         ->where(array("cat.".self::COLUMN_CAT_ACTIVE, 1), Db::SQL_AND,
+//                 array("cat.".self::COLUMN_CAT_ID, (int)self::$currentCategoryId))
+//         ->order("sec.priority", "desc")
+//         ->order("cat.priority", "desc")
+//         ->order("clabel")
+//         ->limit(0,1);
+
+
+//		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
+//			array(self::COLUMN_CAT_URLKEY, "clabel" => "IFNULL(cat.label_".Locale::getLang()
+//			.", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUMN_CAT_LPANEL,
+//			self::COLUMN_CAT_RPANEL, self::COLUMN_SEC_ID, self::COLUMN_CAT_PARAMS))
+//		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
+//		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner",
+//			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
+//			.Locale::getDefaultLang().")"))
+//		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
+//		->where("cat.active = 1", "and")
+//		->where("cat.".self::COLUMN_CAT_ID." = '".self::$currentCategoryId."'", "and")
+//		->order("sec.priority", "desc")
+//		->order("cat.priority", "desc")
+//		->order("clabel")
+//		->limit(0,1);
+
+      $catArray = $catModel->getCategory(self::$currentCategoryId);
 
 		//		Pokud nebyla načtena žádná kategorie
 		if(empty($catArray)){
          AppCore::setErrorPage();
          return false;
-//			$link = new Links(true);
-//			$link->category()->reload();
       } else {
 
-         self::$_categoryLabel = $catArray->{self::COLUMN_CAT_LABEL};
-         self::$_categoryId = $catArray->{self::COLUMN_CAT_ID};
-         self::$_sectionId = $catArray->{self::COLUMN_SEC_ID};
-         self::$_categoryLeftPanel = $catArray->{self::COLUMN_CAT_LPANEL};
-         self::$_categoryRightPanel = $catArray->{self::COLUMN_CAT_RPANEL};
-         self::$_sectionName = $catArray->{self::COLUMN_SEC_LABEL};
-         self::parseParams($catArray->{self::COLUMN_CAT_PARAMS});
+         self::$_categoryLabel = $catArray->{CategoryModel::COLUMN_CAT_LABEL};
+         self::$_categoryId = $catArray->{CategoryModel::COLUMN_CAT_ID};
+         self::$_sectionId = $catArray->{CategoryModel::COLUMN_SEC_ID};
+         self::$_categoryLeftPanel = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
+         self::$_categoryRightPanel = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
+         self::$_sectionName = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
+         self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
 
          //        načtení výchozí kategorie
          $defCatArr = self::getDefaultCategory();
 
-         if($defCatArr[self::COLUMN_CAT_ID] == self::$_categoryId){
+         if($defCatArr[CategoryModel::COLUMN_CAT_ID] == self::$_categoryId){
             self::$_categoryIsDefault = true;
          }
       }
@@ -247,43 +266,50 @@ class Category {
 	  * @return array -- pole s prvky výchozí kategorie
 	  */
 	public static function getDefaultCategory() {
-		$catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
-		$secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
-		$itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
-		$userNameGroup = self::$_auth->getGroupName();
+//		$catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
+//		$secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
+//		$itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
+//		$userNameGroup = self::$_auth->getGroupName();
 
+      $catModel = new CategoryModel();
 
-		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
-			array("clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_"
-			.Locale::getDefaultLang().")", "id_category", self::COLUMN_CAT_LPANEL,
-			self::COLUMN_CAT_RPANEL, self::COLUMN_SEC_ID, self::COLUMN_CAT_PARAMS))
-		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
-		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner", 
-			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
-			.Locale::getDefaultLang().")"))
-		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
-		->where("cat.active = 1", "and")
-		->order("sec.priority", "desc")
-		->order("cat.priority", "desc")
-		->order("clabel")
-		->limit(0,1);
+//      $
+//
+//
+//		$catSelect = self::$_dbConnector->select()->from(array("cat" => $catTable),
+//			array("clabel" => "IFNULL(cat.label_".Locale::getLang().", cat.label_"
+//			.Locale::getDefaultLang().")", "id_category", self::COLUMN_CAT_LPANEL,
+//			self::COLUMN_CAT_RPANEL, self::COLUMN_SEC_ID, self::COLUMN_CAT_PARAMS))
+//		->join(array("item" => $itemsTable), "cat.id_category = item.id_category", "inner", null)
+//		->join(array("sec" => $secTable), "cat.id_section = sec.id_section", "inner",
+//			array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
+//			.Locale::getDefaultLang().")"))
+//		->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
+//		->where("cat.active = 1", "and")
+//		->order("sec.priority", "desc")
+//		->order("cat.priority", "desc")
+//		->order("clabel")
+//		->limit(0,1);
 
-		$catArray = self::$_dbConnector->fetchObject($catSelect,true);
+      try {
+         $catArray = $catModel->getCategory();
+         if(empty($catArray)){
+            throw new RangeException(_('Nepodařilo se načíst výchozí kategorii. Chyba v konfiguraci.'),2);
+         }
+      } catch (RangeException $e) {
+         new CoreErrors($e);
+      }
 
 		//		Pokud nebyla načtena žádná kategorie
-		if(empty($catArray)){
-			throw new CoreException(_('Nepodařilo se načíst výchozí kategorii. Chyba v konfiguraci.'),2);
-		}
-
 		$catArr = array ();
-		$catArr[self::COLUMN_CAT_LABEL] = $catArray->{self::COLUMN_CAT_LABEL};
-		$catArr[self::COLUMN_CAT_ID] = $catArray->{self::COLUMN_CAT_ID};
-		$catArr[self::COLUMN_SEC_ID] = $catArray->{self::COLUMN_SEC_ID};
+      $catArr[self::COLUMN_CAT_LABEL] = $catArray->{CategoryModel::COLUMN_CAT_LABEL};
+		$catArr[self::COLUMN_CAT_ID] = $catArray->{CategoryModel::COLUMN_CAT_ID};
+		$catArr[self::COLUMN_SEC_ID] = $catArray->{CategoryModel::COLUMN_SEC_ID};
 //		$catArr[self::COLUMN_CAT_URLKEY] = $catArray->{self::COLUMN_CAT_URLKEY};
-		$catArr[self::COLUMN_CAT_LPANEL] = $catArray->{self::COLUMN_CAT_LPANEL};
-		$catArr[self::COLUMN_CAT_RPANEL] = $catArray->{self::COLUMN_CAT_RPANEL};
-		$catArr[self::COLUMN_SEC_LABEL] = $catArray->{self::COLUMN_SEC_LABEL};
-		$catArr[self::COLUMN_CAT_PARAMS] = self::parseParams($catArray->{self::COLUMN_CAT_PARAMS});
+		$catArr[self::COLUMN_CAT_LPANEL] = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
+		$catArr[self::COLUMN_CAT_RPANEL] = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
+		$catArr[self::COLUMN_SEC_LABEL] = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
+		$catArr[self::COLUMN_CAT_PARAMS] = self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
 
 		return $catArr;
 	}

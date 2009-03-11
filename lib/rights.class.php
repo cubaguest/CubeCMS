@@ -25,12 +25,6 @@ class Rights {
 	private $groupRights = array();
 	
 	/**
-	 * Proměná s objektem autorizace
-	 * @var Auth
-	 */
-	private $auth = null;
-	
-	/**
 	 * Právo čtení
 	 * @var boolean
 	 */
@@ -54,8 +48,7 @@ class Rights {
 	 * @param Auth -- objekt s autorizací
 	 * @param string -- pole s práva všech skupin
 	 */
-	function __construct(Auth $auth, $rights) {
-		$this->auth = $auth;
+	function __construct($rights) {
 		$this->groupRights = $rights;
 		
 		$this->setRights();
@@ -66,7 +59,7 @@ class Rights {
 	 * @return Auth -- objekt autorizace
 	 */
 	public function getAuth() {
-		return $this->auth;
+      return AppCore::getAuth();
 	}
 	
 	/**

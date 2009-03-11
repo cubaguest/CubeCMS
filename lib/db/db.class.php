@@ -11,6 +11,18 @@
  */
 
 class Db {
+   /**
+    * Konstanty pro tvorbu dotazů, které jsou globální pro všechny DB
+    */
+   const SQL_AND     = 'AND';
+   const SQL_OR      = 'OR';
+   const SQL_IN      = 'IN';
+   const SQL_LIKE    = 'LIKE';
+   const SQL_ALL     = '*';
+   const SQL_ASC     = 'ASC';
+   const SQL_DESC    = 'DESC';
+
+
 	/**
 	 * statické proměné určující připojení k db
 	 * @var string

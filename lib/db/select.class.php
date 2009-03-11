@@ -10,32 +10,36 @@
  * @abstract 		Třída pro výběr záznamů z db
  */
 
-interface Db_Select extends Db_Query {
+interface Db_Select{
    /**
-    * Vybrané konstanty pro SQL dotazy
-    */
-//   const SQL_ASC        		= 'ASC';
-//   const SQL_DESC       		= 'DESC';
-	/**
-	 * Metoda nastavuje z které tabulky se bude načítat
-	 * klauzule FROM
+	 * Metoda nastavuje která tabulka se bude používat
 	 *
-	 * @param string/array -- tabulka ze které se bude vybírat, u pole index označuje alias tabulky
-	 * @param string/array -- které sloupce mají být vabrány (option)
+	 * @param string -- tabulka pro použití
+	 * @param string -- alias tabulky pro použití
+	 * @param boolean -- (option) jestli se májí tabulky zamknout
+	 * @return Db_Select
+	 */
+	public function table($table, $alias = null, $lockTable = false);
+
+	/**
+	 * Metoda nastavuje které sloupce su budou načítat
+	 *
+	 * @param string/array -- sloupce, které se budou vybírat, intex označuje alias
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-   public function from($tableArray, $columsArray = "*");
+   public function colums($columsArray = '*');
 	
 	/**
 	 * Metody vatváří podmínku WHERE
 	 *
-	 * @param string -- podmínka
-	 * @param string -- typ spojení podmínky (AND, OR) (výchozí je AND)
+	 * @param string/array -- sloupec nebo pole podmínek
+	 * @param string/mixed -- hodnota
+	 * @param string/mixed -- typ porovnávání
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-//	abstract function where($condition, $operator = self::SQL_AND);
+   public function where($column, $value = null, $term = '=', $operator = self::SQL_AND);
 	
 	/**
 	 * Metody vytvoří část pro klauzuli JOIN
@@ -74,10 +78,19 @@ interface Db_Select extends Db_Query {
 	 * Metoda přidává do dotazu sloupce s počem záznamů
 	 * @param string -- alias pod kterým má být vrácena hodnota
 	 * @param string -- které sloupce se mají vybrat (option) default: všechny
-	 * 
+	 *
 	 * @return Db_Select -- objekt Db_Select
 	 */
    public function count($alias = null, $colum = self::SQL_ALL_VALUES);
+
+   /**
+	 * Metoda přidá do SQL dotazu klauzuli LIMIT
+	 * @param integer -- počet záznamů
+	 * @param integer -- záčátek
+	 *
+	 * @return Db_Select -- objekt sebe
+	 */
+	public function limit($rowCount, $offset);
 }
 
 ?>

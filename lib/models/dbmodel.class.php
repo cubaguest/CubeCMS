@@ -7,27 +7,18 @@ require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::E
  * s databází.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: dbmodel.class.php 3.0.55 26.9.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.2 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Abstraktní třída pro vytvoření modelu pro práci s databází
  */
 
 class DbModel extends Model {
-	
-	/**
-	 * Objekt konektoru k databázi
-	 *
-	 * @var DbInterface
-	 */
-	private $dbConnector = null;
-	
 	/**
 	 * Konstruktor třídy
 	 *
 	 */	
 	final function __construct() {
-		$this->db = AppCore::getDbConnector();
-		
 //		Inicializace modelu
 		$this->_init();
 	}
@@ -35,15 +26,11 @@ class DbModel extends Model {
 	/**
 	 * Metoda vrací objekt ke konektoru databáze
 	 * 
-	 * @return Dbinterface
+	 * @return DbInterface
 	 */
 	final public function getDb() {
 		return AppCore::getDbConnector();
 	}
-
-//   protected function createArrayByKeys() {
-//      ;
-//   }
 
    /**
     * Metoda vytvoří pole s hodnotami a klíči vhodnými pro uložení do db

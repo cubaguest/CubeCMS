@@ -5,8 +5,9 @@
  * třídy pro menu, a poskytuje základní přístup k prvkům menu.
  * 
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: mainmenu.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.2 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro vytvoření hlavního menu
  */
 
@@ -58,18 +59,6 @@ abstract class MainMenu {
 	const COLUMN_ITEM_PRIORITY 		= 'priority';
 	
 	/**
-	 * Objekt s databázovým kontrolerem
-	 * @var Db
-	 */
-	private $dbConnector = null;
-	
-	/**
-	 * Objekt s informacemi o autorizaci
-	 * @var Auth
-	 */
-	private $auth = null;
-	
-	/**
 	 * Objekt s šablonou
 	 * @var Template
 	 */
@@ -110,21 +99,20 @@ abstract class MainMenu {
 	 *
 	 * @param Db -- objekt databázového konektoru
 	 */
-	function __construct(Db $dbConnector, Auth $auth) {
-		$this->dbConnector = $dbConnector;
-		$this->auth = $auth;
+	function __construct() {
 		$this->template = new Template();
 		
 		$this->tablesSections = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
 		$this->tablesCategories = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->tablesItems = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
 		
-		$this->userGroupName = $this->auth->getGroupName();
+		$this->userGroupName = $this->auth()->getGroupName();
 	}
 	
 	public function controller() {
-		$menuSelect = $this->dbConnector->select()
-			->from(array("cat" => $this->tablesCategories), array(self::COLUMN_CATEGORY_LABEL_IMAG => "IFNULL(cat."
+      $menuSelect = $this->getDb()->select()
+      ->table($this->tablesCategories, 'cat')
+      ->colums(array(self::COLUMN_CATEGORY_LABEL_IMAG => "IFNULL(cat."
 					.self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getLang().", cat."
 					.self::COLUMN_CATEGORY_LABEL_PREFIX.Locale::getDefaultLang().")",
 					self::COLUMN_CATEGORY_ID, self::COLUMN_CATEGORY_ALT_IMAG => "IFNULL(cat."
@@ -138,16 +126,16 @@ abstract class MainMenu {
 				.Locale::getLang().", s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
 			->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID
 				." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
-			->where("cat.".self::COLUMN_CATEGORY_ACTIVE." = ".(int)true, "and")
-			->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU." = ".(int)true, "and")
+			->where("cat.".self::COLUMN_CATEGORY_ACTIVE, (int)true)
+			->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU, (int)true)
 			->group("cat.".self::COLUMN_CATEGORY_ID)
 			->order("s.".self::COLUMN_SECTION_PRIORITY, "desc")
 			->order(self::COLUMN_SECTION_LABEL_IMAG)
 			->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
 			->order(self::COLUMN_CATEGORY_LABEL_IMAG);
 
-      if(!$this->auth->isLogin()){
-         $menuSelect->where("cat.".self::COLUMN_CATEGORY_SHOW_WHEN_LOGIN_ONLY." = ".(int)false, "and");
+      if(!$this->auth()->isLogin()){
+         $menuSelect->where("cat.".self::COLUMN_CATEGORY_SHOW_WHEN_LOGIN_ONLY, (int)false);
       }
 
 		$this->loadMenu($menuSelect);
@@ -158,13 +146,17 @@ abstract class MainMenu {
 	 * @param DbInterface -- objekt s popisem jak se má menu načíst
 	 */
 	public function loadMenu($sqlSelect){
-//		Přidání výběru jen na zvolenou skupinu
-		$sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup()." LIKE \"r__\"");
-		$this->menuArray = $this->dbConnector->fetchAssoc($sqlSelect);
+      //	Přidání výběru jen na zvolenou skupinu
+      $sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup(),'r__', Db::SQL_LIKE);
 
-		if(empty($this->menuArray)){
-			new CoreException(_("Nepodařilo se nahrát hlavní menu z databáze"), 2);
-		}
+      try {
+         $this->menuArray = $this->getDb()->fetchAll($sqlSelect);
+         if(empty($this->menuArray)){
+            throw new RangeException(_("Nepodařilo se nahrát hlavní menu z databáze"), 2);
+         }
+      } catch (RangeException $e) {
+         new CoreErrors($e);
+      }
 	}
 	
 	public function view() {
@@ -236,7 +228,7 @@ abstract class MainMenu {
 	 * @return DbInterface -- objekt db konektoru
 	 */
 	public function getDb() {
-		return $this->dbConnector;
+      return AppCore::getDbConnector();
 	}
 	
 	/**
@@ -248,6 +240,13 @@ abstract class MainMenu {
 		return $this->userGroupName;
 	}
 	
+   /**
+    * Metoda vrací objekt autorizace
+    * @return Auth
+    */
+   private function auth() {
+      return AppCore::getAuth();
+   }
 	
 }
 

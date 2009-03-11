@@ -34,4 +34,5 @@
 		<images_lang>langs</images_lang></dirs>
 	<DEBUG_LEVEL>2</DEBUG_LEVEL>
 	<face>default</face>
+   <sitemap_periode>weekly</sitemap_periode>
 </config>

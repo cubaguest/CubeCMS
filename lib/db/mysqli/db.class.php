@@ -12,8 +12,9 @@ require_once './lib/db/mysqli/update.class.php';
  * metod pro práci s SQL dotazy a samotné připojování k databázi.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: db.class.php 3.0.0 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.2 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro MySQL DB
  */
 
@@ -21,6 +22,7 @@ class MySQLiDb extends Db implements DbInterface {
 	/**
 	 * statické pole se specílními SQL funkcemi
 	 * @var array
+    * @deprecated
 	 */
 	public static $specialSqlFunctions = array("NOW", "TIMESTAMPDIFF", "COUNT", "IFNULL", "IF");
 	
@@ -54,6 +56,18 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @var integer
 	 */
 	private $_lastInsertedId = null;
+
+   /**
+    * Předchozí SQl dotaz
+    * @var string
+    */
+   private $_previousSqlQuery = null;
+
+   /**
+    * Předcho SQl result
+    * @var MySQLi
+    */
+   private $_previousResult = null;
 
 	/**
 	 * Konstruktor třídy nastaví základní parametry
@@ -246,26 +260,43 @@ class MySQLiDb extends Db implements DbInterface {
 //   }
 
 	/**
-	 * Metoda provede sql dotaz a výstup doplní do asociativního pole
+	 * Metoda provede sql dotaz a výstup doplní do asociativního pole v numerickém
+    * poli podle záznamů
 	 *
 	 * @param string -- SQL dotaz
-	 * @param boolean -- jestli se má vrátit pouze pole s prvky, nebo pole s poly prvků
-	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
+	 * @return array/boolean -- asociativní/numerické pole s výsledky sql dotazu
+    * nebo false při prázdném výsledku
 	 */
-	public function fetchAssoc($sqlQuery, $oneArray = false) {
-		$queryResult = $this->query($sqlQuery);
+	public function fetchAll($sqlQuery) {
+		if($sqlQuery != $this->_previousSqlQuery){
+         $this->_previousResult = $this->query($sqlQuery);
+      }
 
-		if($queryResult){
+		if($this->_previousResult){
 			$resultArray = array();
-			if(!$oneArray){
-            while ($sqlData=$queryResult->fetch_assoc()) {
+            while ($sqlData=$this->_previousResult->fetch_assoc()) {
 					array_push($resultArray, $sqlData);
 				}
-//            $this->fetch($sqlQuery, MYSQLI_ASSOC);
-			} else {
-				$resultArray = $queryResult->fetch_assoc();
-			}
+//          $this->fetch($sqlQuery, MYSQLI_ASSOC); METODA V PHP 5.3.0
 			return $resultArray;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Metoda provede sql dotaz a výstup doplní do asociativního pole (např. do while)
+	 *
+	 * @param string -- SQL dotaz
+	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
+	 */
+	public function fetchAssoc($sqlQuery) {
+		if($sqlQuery != $this->_previousSqlQuery){
+         $this->_previousResult = $this->query($sqlQuery);
+      }
+
+		if($this->_previousResult){
+			return $this->_previousResult->fetch_assoc();
 		} else {
 			return false;
 		}
@@ -278,11 +309,13 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @return array -- pole objektů MySQLi_Result
 	 */
 	public function fetchObjectArray($sqlQuery) {
-		$queryResult = $this->query($sqlQuery);
+		if($sqlQuery != $this->_previousSqlQuery){
+         $this->_previousResult = $this->query($sqlQuery);
+      }
 
-		if($queryResult){
+		if($this->_previousResult){
 			$resultArray = array();
-			while ($sqlObject=$queryResult->fetch_object()) {
+			while ($sqlObject=$this->_previousResult->fetch_object()) {
 				array_push($resultArray, $sqlObject);
 			}
 			return $resultArray;
@@ -298,13 +331,23 @@ class MySQLiDb extends Db implements DbInterface {
 	 */
 	public function fetchObject($sqlQuery)
 	{
-		$queryResult = $this->query($sqlQuery);
-		if($queryResult){
-			return $queryResult->fetch_object();
+		if($sqlQuery != $this->_previousSqlQuery){
+         $this->_previousResult = $this->query($sqlQuery);
+      }
+		if($this->_previousResult){
+			return $this->_previousResult->fetch_object();
 		} else {
 			return false;
 		}
 	}
+
+   /**
+    * Metoda zakóduje řetězec pro použití v mysql (SQL injection)
+    * @param string $string -- řetězec určený k zakódování
+    */
+   public function escapeString($string) {
+      return $this->_mysqliObject->real_escape_string($string);
+   }
 }
 
 ?>

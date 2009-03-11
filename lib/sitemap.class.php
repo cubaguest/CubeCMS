@@ -37,12 +37,6 @@ class SiteMap {
 	private $module = null;
 	
 	/**
-	 * Proměná obsahuje DbConnector
-	 * @var DbInterface
-	 */
-	private $db = null;
-	
-	/**
 	 * Objekt s odkazem na kategorii
 	 * @var Links
 	 */
@@ -71,10 +65,8 @@ class SiteMap {
 	 *
 	 * @param Module -- objekt modulu
 	 */
-	function __construct(Module $module, Links $link, $changefreq, $priority) {
-		$this->module = $module;
-		$this->db = AppCore::getDbConnector();
-		$this->link = $link;
+	function __construct(Links $link, $changefreq = self::SITEMAP_SITE_CHANGE_YEARLY, $priority = 0.5) {
+      $this->link = $link;
 		
 		$this->changeFreq = $changefreq;
 		$this->priority = $priority;
@@ -85,7 +77,8 @@ class SiteMap {
 	 *
 	 */
 	public function run() {
-		$this->addItem($this->getLink(), filectime('./index.php'), self::SITEMAP_SITE_CHANGE_YEARLY, self::SITEMAP_SITE_DEFAULT_PRIORITY);
+		$this->addItem($this->getLink(), null, $this->changeFreq, $this->priority);
+      filectime('./index.php');
 	}
 	
 	/**
@@ -96,13 +89,16 @@ class SiteMap {
 	 * @param string -- četnost změny (kostanta SITEMAP_SITE_CHANGE_...)
 	 * @param float -- priorita (0 - 1)
 	 */
-	public function addItem($url, $lastChange, $frequency = null ,$priority = null) {
+	public function addItem($url, $lastChange = null, $frequency = null ,$priority = null) {
 		// pokud je datum v budoucnosti nastavím aktuální
       if($lastChange > time()){
          $lastChange = time();
       }
 
-      $date = new DateTime(date(DATE_ISO8601,$lastChange));
+      if($lastChange != null){
+         $date = new DateTime(date(DATE_ISO8601,$lastChange));
+         $lastChange = $date->format(DATE_ISO8601);
+      }
 		
 		if($frequency == null){
 			$frequency = $this->changeFreq;
@@ -110,20 +106,45 @@ class SiteMap {
 		if($priority == null){
 			$priority = $this->priority;
 		}
-		
-		array_push(self::$items, array('loc' => $url,
-									   'lastmod' => $date->format(DATE_ISO8601),
+      // mezi čísly má být tečka, né čárka
+      $priority = str_replace(',', '.', $priority);
+
+   	array_push(self::$items, array('loc' => (string)$url,
+									   'lastmod' => $lastChange,
 									   'changefreq' => $frequency,
 									   'priority'=>$priority));
 	}
-	
+
+   /**
+	 * Metoda přidává položku kategorie do siteampy
+	 *
+	 * @param integer -- čas poslední změny (timestamp)
+	 */
+   public function addCategoryItem($lastChange) {
+      // pokud je datum v budoucnosti nastavím aktuální
+      if($lastChange > time()){
+         $lastChange = time();
+      }
+
+      $date = new DateTime(date(DATE_ISO8601,$lastChange));
+      $lastChange = $date->format(DATE_ISO8601);
+
+      // mezi čísly má být tečka, né čárka
+      $priority = str_replace(',', '.', $this->priority);
+
+      array_push(self::$items, array('loc' => (string)$this->getLink(),
+									   'lastmod' => $lastChange,
+									   'changefreq' => $this->changeFreq,
+									   'priority'=>$this->priority));
+   }
+
 	/**
 	 * Meotda vrací objekt modulu
 	 *
 	 * @return Module -- objekt modulu
 	 */
 	public function getModule() {
-		return $this->module;
+      return AppCore::getSelectedModule();
 	}
 	
 	/**
@@ -132,7 +153,7 @@ class SiteMap {
 	 * @return DbInterface -- objekt databáze
 	 */
 	public function getDb() {
-		return $this->db;
+      return AppCore::getDbConnector();
 	}
 	
 	/**
