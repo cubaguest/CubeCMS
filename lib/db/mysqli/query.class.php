@@ -21,9 +21,9 @@ class Mysqli_Db_Query {
    const SQL_GROUP_BY   		= 'GROUP BY';
    const SQL_ORDER_BY   		= 'ORDER BY';
    const SQL_HAVING     		= 'HAVING';
-   const SQL_AND        		= 'AND';
+//   const SQL_AND        		= 'AND';
    const SQL_AS         		= 'AS';
-   const SQL_OR         		= 'OR';
+//   const SQL_OR         		= 'OR';
    const SQL_ON               = 'ON';
    const SQL_IN               = 'IN';
    const SQL_ASC        		= 'ASC';
@@ -38,23 +38,18 @@ class Mysqli_Db_Query {
    const SQL_COUNT		 		= 'COUNT';
 
     /**
-     * Konstanty typů joinu
-     * @var string
-     */
-   const SQL_JOIN			= 'JOIN';
-   const SQL_LEFT_JOIN 	= 'LEFT JOIN';
-   const SQL_RIGHT_JOIN	= 'RIGHT JOIN';
-   const SQL_INNER_JOIN	= 'INNER JOIN';
-
-    /**
      * Konstanty pro ukládání do pole SQL dotazu
      * @var string
      */
    const COLUMS_ARRAY                 = 'COLUMS';
-   const WHERE_CONDITION_NAME_KEY 		= 'condition';
+   const WHERE_CONDITION_NAME_KEY     = 'condition';
    const WHERE_CONDITION_OPERATOR_KEY = 'operator';
-   const JOIN_TABLE_NAME_KEY          = 'name';
-   const JOIN_TABLE_CONDITION_KEY     = 'condition';
+   const JOIN_TABLE_NAME              = 'table';
+   const JOIN_TABLE_CONDITION_COLUMN1 = 'column1';
+   const JOIN_TABLE_CONDITION_COLUMN2 = 'column2';
+   const JOIN_TABLE_CONDITION_TYPE    = 'cond_type';
+   const JOIN_TABLE_CONDITION_OPERATOR= 'operator';
+
    const ORDER_ORDER_KEY              = 'ORDER';
    const ORDER_COLUM_KEY              = 'colum';
    const GROUP_BY_KEY                 = 'GROUP';

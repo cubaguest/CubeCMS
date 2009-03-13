@@ -23,6 +23,25 @@ class Db {
    const SQL_DESC    = 'DESC';
    const SQL_NULL    = 'NULL';
 
+    /**
+     * Konstanty typů joinu
+     * @var string
+     */
+   const SQL_JOIN			= 'JOIN';
+   const SQL_JOIN_LEFT 	= 'LEFT JOIN';
+   const SQL_JOIN_RIGHT	= 'RIGHT JOIN';
+   const SQL_JOIN_INNER	= 'INNER JOIN';
+
+   /**
+    * Typ podmínky ON pro JOIN
+    */
+   const SQL_JOIN_COND_TYPE_ON = 'ON';
+
+   /**
+    * Typ podmínky USING pro JOIN
+    */
+   const SQL_JOIN_COND_TYPE_USING = 'USING';
+
 
 	/**
 	 * statické proměné určující připojení k db
