@@ -21,6 +21,7 @@ class Db {
    const SQL_ALL     = '*';
    const SQL_ASC     = 'ASC';
    const SQL_DESC    = 'DESC';
+   const SQL_NULL    = 'NULL';
 
 
 	/**

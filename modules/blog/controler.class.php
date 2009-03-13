@@ -118,23 +118,23 @@ class BlogController extends Controller {
 //            echo "TADY.....................".$pokusParam2->getValue()."<br>";
 //        }
 		
-		foreach ($blogs as $key => $blog){
-//            $this->pokusparam->setValue($blog[BlogDetailModel::COLUM_ID]);
-			$blogs[$key][BlogDetailModel::COLUM_TEXT] = $textHelper->removeHtmlTags($blog[BlogDetailModel::COLUM_TEXT]);
-			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $this->getLink()
-                ->article($blog[BlogDetailModel::COLUM_LABEL], $blog[BlogDetailModel::COLUM_ID]);
-//			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $this->getLink()->article($blog[BlogDetailModel::COLUM_URLKEY], $blog[BlogDetailModel::COLUM_ID]);
-			unset ($link);
-		}
+//		foreach ($blogs as $key => $blog){
+////            $this->pokusparam->setValue($blog[BlogDetailModel::COLUM_ID]);
+//			$blogs[$key][BlogDetailModel::COLUM_TEXT] = $textHelper->removeHtmlTags($blog[BlogDetailModel::COLUM_TEXT]);
+//			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $this->getLink()
+//                ->article($blog[BlogDetailModel::COLUM_LABEL], $blog[BlogDetailModel::COLUM_ID]);
+////			$blogs[$key][BlogDetailModel::COLUM_URLKEY] = $this->getLink()->article($blog[BlogDetailModel::COLUM_URLKEY], $blog[BlogDetailModel::COLUM_ID]);
+//			unset ($link);
+//		}
 
-		$this->container()->addData('BLOGS', $blogs);
-		$this->container()->addEplugin('scroll', $scroll);
-
-//		Vytvoření odkazů
-		if($this->getRights()->isWritable()){
-			$this->container()->addLink('LINK_TO_ADD_SECTION', $this->getLink()->action($this->getAction()->addSection()));
-            $this->container()->addLink('LINK_TO_ADD_BLOG', $this->getLink()->action($this->getAction()->addBlog()));
-		}
+//		$this->container()->addData('BLOGS', $blogs);
+//		$this->container()->addEplugin('scroll', $scroll);
+//
+////		Vytvoření odkazů
+//		if($this->getRights()->isWritable()){
+//			$this->container()->addLink('LINK_TO_ADD_SECTION', $this->getLink()->action($this->getAction()->addSection()));
+//            $this->container()->addLink('LINK_TO_ADD_BLOG', $this->getLink()->action($this->getAction()->addBlog()));
+//		}
 
 //		Scrolovátka
 //		$scroll = $this->eplugin()->scroll();

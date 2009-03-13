@@ -190,18 +190,9 @@ class Form {
    * @param string $formPrefix -- prefix formulářových prvků první úrovně
   */
    final public function  __construct($formPrefix = null) {
-      if(AppCore::getSelectedModule() instanceof Module){
-         $this->module = AppCore::getSelectedModule();
-      }
-
-      if(AppCore::getModuleMessages() instanceof Messages){
-         $this->infomsg = AppCore::getModuleMessages();
-      }
-
-      if(AppCore::getModuleErrors() instanceof Messages){
-         $this->errmsg = AppCore::getModuleErrors();
-      }
-
+      $this->infomsg = AppCore::getInfoMessages();
+      $this->errmsg = AppCore::getUserErrors();
+         
       $this->formPrefix = $formPrefix;
    }
 

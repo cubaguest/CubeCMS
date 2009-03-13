@@ -32,11 +32,11 @@ class BlogView extends View {
 //
 
 		}
-		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
-		$this->template()->addTpl('blogList.tpl');
-
-		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
-		$this->container()->getEplugin('scroll')->assignToTpl($this->template());
+//		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
+//		$this->template()->addTpl('blogList.tpl');
+//
+//		$this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
+//		$this->container()->getEplugin('scroll')->assignToTpl($this->template());
 	}
 
 	public function showView() {

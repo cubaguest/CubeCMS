@@ -206,9 +206,11 @@ class Auth {
 				$this->getError()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
             $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
-               ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES), 'u')
-               ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, Config::SECTION_DB_TABLES)), "g.id_group = u.id_group" , "left", array("*", "gname" => "name"))
-					->where("u.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
+               ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES),'user')
+            ->colums(Db::SQL_ALL)
+               ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, 
+                        Config::SECTION_DB_TABLES)), "g.id_group = user.id_group" , "left", array("*", "gname" => "name"))
+					->where("user.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
 
 				$userResult = $this->dbConnector->fetchObject($userSql);
 						

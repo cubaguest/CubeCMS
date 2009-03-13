@@ -56,30 +56,6 @@ class NewsController extends Controller {
    * Kontroler pro zobrazení novinek
    */
    public function mainController() {
-      // test SMAZAT !!!
-//      try {
-//         if(!is_numeric('pokus.txt')){
-//         // throw new CoreException(_('Chyba při načítání'));
-//            throw new RuntimeException(_(printf("pokus %s", 'typ')), 3);
-//         }
-//      } catch (Exception $e) {
-//         new CoreErrors($e);
-//      } catch (RuntimeException $e){
-//         new CoreErrors($e);
-//      }
-//      try {
-//         if(!is_numeric('pokus.txt')){
-//         // throw new CoreException(_('Chyba při načítání'));
-//            throw new RuntimeException("pokus", 3);
-//         }
-//      } catch (Exception $e) {
-//         new CoreErrors($e);
-//      } catch (RuntimeException $e){
-//         new CoreErrors($e);
-//      }
-
-      //CoreErrors::getErrors();
-
       //		Kontrola práv
       $this->checkReadableRights();
 
@@ -102,9 +78,7 @@ class NewsController extends Controller {
       $scroll->setCountAllRecords($listNews->getCountNews());
 
       //		Vybrání novinek
-//      if($listNews->getCountNews() < 1){
          $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
-//      }
 
       //		Přidání linku pro editaci a jestli se dá editovat
       if(!empty ($newsArray)){

@@ -32,6 +32,5 @@ class Menu extends MainMenu {
 		$this->addTpl("SECTION_ARRAY", $sectionArray);
 		$this->addTpl("CATEGORY_ARRAY", $categoryArray);
 	}
-	
 }
 ?>

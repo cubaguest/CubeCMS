@@ -5,7 +5,7 @@
  * Obsluhuje celou aplikaci a její komponenty.
  *
  * @copyright  Copyright (c) 2008 Jakub Matas
- * @version    $Id: $ VVE3.9.1 $Revision: $
+ * @version    $Id: $ VVE3.9.2 $Revision: $
  * @author     $Author: jakub $ $Date: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
  *             $LastChangedBy: jakub $ $LastChangedDate: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
  * @abstract 	Hlavní třída aplikace(Singleton)
@@ -319,15 +319,11 @@ class AppCore {
 
       //načtení potřebných knihoven
       $this->_loadLibraries();
-
-      $this->_initCoreErros();
-
+      // načtení systémového konfiguračního souboru
       $this->_initConfig();
 
       //		Zapnutí debugeru
-      if(self::sysConfig()->getOptionValue('DEBUG_LEVEL') > 1){
-         self::$debugLevel = self::sysConfig()->getOptionValue('DEBUG_LEVEL');
-      }
+      self::$debugLevel = self::sysConfig()->getOptionValue('DEBUG_LEVEL');
 
       //		Definování konstanty s datovým adresářem modulů //TODO upravit tak aby se to používalo korektně např. proměná
       define('MAIN_DATA_DIR', self::sysConfig()->getOptionValue('data_dir'));
@@ -341,8 +337,6 @@ class AppCore {
       //		inicializace sessions
       $this->_initSessions();
 
-
-
       //		inicializace db konektoru
       $this->_initDbConnector();
 
@@ -351,9 +345,6 @@ class AppCore {
 
       //Spuštění jádra aplikace
       $this->runApp();
-
-      //		Vypsání chyb na výstup
-//      $this->coreErrors->getErrorsToStdIO();
    }
 
     /**
@@ -501,16 +492,6 @@ class AppCore {
      /*
       * PRIVÁTNÍ METODY
       */
-
-    /**
-     * Metoda pro vytvoření objektu pro obsluhu chyb jádra
-     * (CoreErrors)
-     * @todo -- optimalizovat pro lepší práci
-     */
-   private function _initCoreErros() {
-//      $this->coreErrors = new Errors();
-//      CoreException::_setErrorsHandler($this->coreErrors);
-   }
 
     /**
      * Metoda inicializuje připojení k databázi
@@ -734,8 +715,8 @@ class AppCore {
       //		Načtení potřebných knihoven
       $this->loadModuleLibs();
 
-      ModuleDirs::setWebDir(self::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
-      ModuleDirs::setWebDataDir(self::sysConfig()->getOptionValue("data_dir"));;
+      ModuleDirs::setWebDir(AppCore::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
+      ModuleDirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));;
    }
 
 
@@ -1384,7 +1365,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
      */
    public function runApp() {
       //autorizace přístupu
-      self::coreAuth();
+      AppCore::coreAuth();
 
       //		Inicializace modulu
       $this->_initModules();
@@ -1434,6 +1415,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       // pokud je zpracovávána normální aplikace a její moduly
       else {
          switch (UrlRequest::getMediaType()) {
+            // Volba typu média
             case UrlRequest::MEDIA_TYPE_WWW:
                default:
                   //				Výchozí je zobrazena stránka =======================================
@@ -1456,7 +1438,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                      $this->runModules();
                   }
 
-                  //		spuštění panelů
+                  // =========	spuštění panelů
                   //		Levý
                   if(Category::isLeftPanel()){
                      $this->runPanel('left');
