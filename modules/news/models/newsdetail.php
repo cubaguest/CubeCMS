@@ -47,7 +47,7 @@ class NewsDetailModel extends DbModel {
                                           self::COLUMN_NEWS_ID_USER, $idUser,
                                           self::COLUMN_NEWS_TIME, time());
 
-      $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable())
+      $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
       ->colums(array_keys($newsArr))
       ->values(array_values($newsArr));
 //      //		Vložení do db

@@ -55,21 +55,22 @@ class PanelModel extends DbModel {
       $this->getTables();
 
       $sqlSelect = $this->getDb()->select()->table($this->panelsTable, 'panel')
-//      ->colums(array(self::COLUMN_LABEL))
-      ->join(array("item" => $this->itemsTable), "item.".self::COLUMN_ID_ITEM."=panel.".self::COLUMN_ID_ITEM,null,
-         array(self::COLUMN_LABEL => "IFNULL(item.".self::COLUMN_LABEL.'_'.Locale::getLang()
+      ->join(array("item" => $this->itemsTable), array(self::COLUMN_ID_ITEM, 'panel' => self::COLUMN_ID_ITEM),
+            null, array(self::COLUMN_LABEL => "IFNULL(item.".self::COLUMN_LABEL.'_'.Locale::getLang()
             .", item.".self::COLUMN_LABEL.'_'.Locale::getDefaultLang().")",
              self::COLUMN_ALT => "IFNULL(item.".self::COLUMN_ALT.'_'.Locale::getLang()
-             .", item.".self::COLUMN_ALT.'_'.Locale::getDefaultLang().")", Db::SQL_ALL))
-       ->join(array("cat" => $this->catTable), "cat.".CategoryModel::COLUMN_CAT_ID."=item.".CategoryModel::COLUMN_CAT_ID,
+             .", item.".self::COLUMN_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
+      ->join(array("cat" => $this->catTable),
+          array('item' =>CategoryModel::COLUMN_CAT_ID,CategoryModel::COLUMN_CAT_ID),
           null, array(Category::COLUMN_CAT_LABEL => "IFNULL(cat.".CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'
             .Locale::getLang().", cat.".CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
             CategoryModel::COLUMN_CAT_ID))
-      ->join(array("module" => $this->modulesTable), "item.".ModuleModel::COLUMN_ID_MODULE."=module.".ModuleModel::COLUMN_ID_MODULE, null)
-      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.AppCore::getAuth()->getGroupName(), "r__", Db::SQL_LIKE)
+      ->join(array("module" => $this->modulesTable), array('item'=>ModuleModel::COLUMN_ID_MODULE, ModuleModel::COLUMN_ID_MODULE),
+         null, Db::COLUMN_ALL)
+      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.AppCore::getAuth()->getGroupName(), "r__", Db::OPERATOR_LIKE)
       ->where("panel.".self::COLUMN_POSITION , strtolower($side))
       ->where("panel.".self::COLUMN_ENABLE, (int)true)
-      ->order("panel.".self::COLUMN_PRIORITY, Db::SQL_DESC);
+      ->order("panel.".self::COLUMN_PRIORITY, Db::ORDER_DESC);
 
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }

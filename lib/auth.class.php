@@ -207,9 +207,11 @@ class Auth {
 			} else {
             $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
                ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES),'user')
-            ->colums(Db::SQL_ALL)
+            ->colums(Db::COLUMN_ALL)
                ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, 
-                        Config::SECTION_DB_TABLES)), "g.id_group = user.id_group" , "left", array("*", "gname" => "name"))
+                        Config::SECTION_DB_TABLES)),
+                  array('g'=>'id_group', 'user'=> 'id_group') , Db::JOIN_LEFT,
+                  array("gname" => "name", Db::COLUMN_ALL))
 					->where("user.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
 
 				$userResult = $this->dbConnector->fetchObject($userSql);

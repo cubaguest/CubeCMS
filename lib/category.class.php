@@ -270,7 +270,7 @@ class Category {
 	  * @return integer -- id kategorie
 	  */
 	public static function getId() {
-		return self::$_categoryId;
+		return (int)self::$_categoryId;
 	}
 
 	 /**

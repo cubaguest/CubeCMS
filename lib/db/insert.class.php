@@ -1,45 +1,41 @@
 <?php
 /**
- * Abstraktní třída pro vkládání záznamů do db.
- * Třída zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
- * databázových konektorů.
+ * Rozhraní pro třídy pro vkládání záznamů do db.
+ * Rozhraní implementuje prvky třídy, které musí být použity v jednotlivých
+ * implementacích databázových konektorů.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: insert.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.2 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro vkládání záznamů do db
  */
 
-abstract class Db_Insert {
+interface Db_Insert {
 	/**
-	 * Metoda nastavuje do které tabulky se bude zapisovat
-	 * klauzule INTO
+	 * Metoda nastavuje která tabulka se bude používat
 	 *
-	 * @param string -- tabulka do které se bude zapisovat
-	 * 
-	 * @return Db_Insert -- objekt Db_Insert
+	 * @param string -- tabulka pro použití
+	 * @param string -- alias tabulky pro použití
+	 * @param boolean -- (option) jestli se májí tabulky zamknout
+	 * @return Db_Insert
 	 */
-	abstract function into($table);
+	public function table($table, $lockTable = false);
 	
 	/**
-	 * Metody vatváří sloupce, které se budou zapisovat 
-	 *
-	 * @param mixed -- sloupce (string nebo array)
-	 * @param string -- sloupce (neomezený počet parametrů)
-	 * 
+	 * Metoda nastavuje do kterých sloupců se budou vkládat záznamy
+    *
+	 * @param string/array -- sloupce, do kterých se má vkládat
 	 * @return Db_Insert -- objekt Db_Insert
 	 */
-	abstract function colums($colums);
+   public function colums($columsArray);
 	
 	/**
-	 * Metoda přiřadí hodnoty sloupscům
-	 *
+	 * Metoda přiřadí hodnoty sloupcům
+    *
 	 * @param string -- hodnota sloupce (proměnný počet parametrů)
-	 * 
 	 * @return Db_Insert -- objekt Db_Insert
 	 */
-	abstract function values($value);
-	
-	
+	public function values($value);
 }
 ?>

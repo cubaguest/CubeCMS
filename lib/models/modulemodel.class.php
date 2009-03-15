@@ -68,13 +68,13 @@ class ModuleModel extends DbModel {
       ->colums(array(self::COLUMN_LABEL => "IFNULL(item.".self::COLUMN_LABEL
             .'_'.Locale::getLang().", item.".self::COLUMN_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_ALT => "IFNULL(item.".self::COLUMN_ALT.'_'.Locale::getLang().", item."
-            .self::COLUMN_ALT.'_'.Locale::getDefaultLang().")", Db::SQL_ALL))
-      ->join(array("module" => $this->modulesTable), "item.".self::COLUMN_ID_MODULE."=module.".self::COLUMN_ID_MODULE, null)
-      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup,"r__", Db::SQL_LIKE)
+            .self::COLUMN_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
+      ->join(array("module" => $this->modulesTable), 
+         array("item" => self::COLUMN_ID_MODULE, self::COLUMN_ID_MODULE),null,Db::COLUMN_ALL)
+      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup,"r__", Db::OPERATOR_LIKE)
       ->where("item.".CategoryModel::COLUMN_CAT_ID, Category::getId())
-      ->order("item.".self::COLUMN_PRIORITY, "desc")
+      ->order("item.".self::COLUMN_PRIORITY, Db::ORDER_DESC)
       ->order(self::COLUMN_LABEL);
-
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }
 

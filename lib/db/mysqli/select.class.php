@@ -44,7 +44,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     * @return Db_Select
     */
    public function table($table, $alias = null, $lockTable = false){
-      return parent::table($table, $alias, $lockTable);
+      return parent::setTable($table, $alias, $lockTable);
    }
 
    /**
@@ -56,7 +56,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     *
     * @return Db_Select -- objekt Db_Select
     */
-   public function colums($columnsArray = '*', $tableAlias = true) {
+   public function colums($columnsArray = Db::COLUMN_ALL, $tableAlias = true) {
       if(!is_array($columnsArray)){
          $columnsArray = array($columnsArray);
       }
@@ -66,7 +66,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
          $arrName = parent::INDEX_COLUMS_NO_ALIAS;
       }
       // pokud má být použit hlavní alias tabulky
-      else if($tableAlias == true){
+      else if($tableAlias === true){
          $arrName = key($this->_sqlQueryParts[self::INDEX_TABLE]);
       }
       // pokud se má vložit nějaký jiný zadaný alias
@@ -95,24 +95,25 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     *
     * @param string/array -- název tabulky (alias je generován z prvních dvou
     * písmen) nebo pole kde index je alias tabulky
-    * @param array -- podmínka v klauzuli ON, je třeba zadat i s aliasy
-    * @param string -- konstanta Db:JOIN_XXX typ JOIN operace hodnoty jsou: JOIN, LEFT, RIGHT, INNER
+    * @param array -- podmínka, je třeba zadat i s aliasy
+    * array(column1, column2, conditionType[ON/USING], param[=;!=;<>]);
+    * @param integer -- konstanta Db:JOIN_XXX typ JOIN operace. Hodnoty jsou: JOIN, LEFT, RIGHT, INNER
     * @param string/array -- název sloupců, které se mají vybrat, výchozí je
     * žádný NULL. Lze použít metodu colums u které se definuje alias shodný s aliasem
     * připojené tabulky
     *
     * @return Db_Select -- objekt Db_Select
     */
-   public function join($tableArray, $conditionArr, $joinType = null, $columsArray = null) {
+   public function join($tableArray, $conditionArr, $joinType = Db::JOIN_NORMAL, $columsArray = null) {
       // podmínka musí být zadána jako pole
-      if(!is_array($conditionArr) OR count($columsArray) < 2 OR count($columsArray) > 4){
+      if(!is_array($conditionArr) OR count($conditionArr) < 2 OR count($conditionArr) > 4){
          throw new InvalidArgumentException(_('Nebylo předáno pole s podmínkou ve správném tvaru'), 1);
       }
 
       $tmpArray = array();
       // pokud není zadán typ podmínky
       if(!isset ($conditionArr[2])){
-         $conditionArr[2] = Db::SQL_JOIN_COND_TYPE_ON;
+         $conditionArr[2] = Db::JOIN_OPERATOR_ON;
       }
 
       // pokud není zadán typ porovnávání podmínky
@@ -123,23 +124,34 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       // volba tabulky
       if(is_array($tableArray)){
          $columKey = key($tableArray);
-         $tmpArray[parent::JOIN_TABLE_NAME][$columKey] = $tableArray[$columKey];
+         $tmpArray[parent::JOIN_TABLE_NAME] = $tableArray[$columKey];
       } else {
          $columKey = substr($tableArray, 0, 5);
-         $tmpArray[parent::JOIN_TABLE_NAME_KEY][$columKey] = $tableArray;
+         $tmpArray[parent::JOIN_TABLE_NAME_KEY] = $tableArray;
       }
 
       // Která podmínka se zpracovává (ON/USING)
       // ON
-      if($conditionArr[2] == Db::SQL_JOIN_COND_TYPE_ON){
-         $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN1] = $conditionArr[0];
-         $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2] = $conditionArr[1];
-         $tmpArray[parent::JOIN_TABLE_CONDITION_TYPE] = $conditionArr[2];
+      if($conditionArr[2] == Db::JOIN_OPERATOR_ON){
+         if(is_int(key($conditionArr))){
+            $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN1][$columKey] = $conditionArr[key($conditionArr)];
+         } else {
+            $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN1][key($conditionArr)] = $conditionArr[key($conditionArr)];
+         }
+         // posunutí na další prvek v poli
+         next($conditionArr);
+         if(is_int(key($conditionArr))){
+            $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2][$columKey] = $conditionArr[key($conditionArr)];
+         } else {
+            $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2][key($conditionArr)] = $conditionArr[key($conditionArr)];
+         }
+
+//         $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2] = $conditionArr[1];
+         $tmpArray[parent::JOIN_TABLE_CONDITION_TYPE] = parent::SQL_ON;
          $tmpArray[parent::JOIN_TABLE_CONDITION_OPERATOR] = $conditionArr[3];
       }
       // USING
-      else {
-
+      else if($conditionArr[2] == Db::JOIN_OPERATOR_USING) {
          if(!is_array($conditionArr[0])){
             $columsArr = array($conditionArr[0]);
             $conditionArr[0] = $columsArr;
@@ -147,27 +159,31 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
 
          $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN1] = $conditionArr[0];
          $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2] = $conditionArr[1];
-         $tmpArray[parent::JOIN_TABLE_CONDITION_TYPE] = $conditionArr[2];
+         $tmpArray[parent::JOIN_TABLE_CONDITION_TYPE] = parent::SQL_USING;
          $tmpArray[parent::JOIN_TABLE_CONDITION_OPERATOR] = null;
+      } else {
+         throw new RangeException(_('Nepodporovaný typ operátoru JOIN'),2);
       }
 
       // zvolení joinu
       $joinType = strtolower($joinType);
       switch ($joinType) {
-         case "left":
-            $this->_sqlQueryParts[Db::SQL_JOIN][Db::SQL_JOIN_LEFT][$columKey] = $tmpArray;
+         case Db::JOIN_LEFT:
+            $this->_sqlQueryParts[parent::SQL_JOIN][parent::SQL_JOIN_LEFT][$columKey] = $tmpArray;
             break;
-         case "right":
-            $this->_sqlQueryParts[Db::SQL_JOIN][Db::SQL_JOIN_RIGHT][$columKey] = $tmpArray;
+         case Db::JOIN_RIGHT:
+            $this->_sqlQueryParts[parent::SQL_JOIN][parent::SQL_JOIN_RIGHT][$columKey] = $tmpArray;
             break;
-         case "inner":
-            $this->_sqlQueryParts[Db::SQL_JOIN][Db::SQL_JOIN_INNER][$columKey] = $tmpArray;
+         case Db::JOIN_INNER:
+            $this->_sqlQueryParts[parent::SQL_JOIN][parent::SQL_JOIN_INNER][$columKey] = $tmpArray;
+            break;
+         case Db::JOIN_CROSS:
+            $this->_sqlQueryParts[parent::SQL_JOIN][parent::SQL_JOIN_CROSS][$columKey] = $tmpArray;
             break;
          default:
-            $this->_sqlQueryParts[Db::SQL_JOIN][Db::SQL_JOIN][$columKey] = $tmpArray;
+            $this->_sqlQueryParts[parent::SQL_JOIN][parent::SQL_JOIN][$columKey] = $tmpArray;
             break;
       }
-
       //	přidání sloupců
       if($columsArray != null){
          // převedení řetězce na pole
@@ -187,24 +203,25 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     * Metoda přiřadí řazení sloupcu v SQL dotazu
     *
     * @param string -- sloupec, podle kterého se má řadit
-    * @param string -- (option) jak se má sloupec řadit (ASC, DESC) (default: ASC)
+    * @param integer -- (option) jak se má sloupec řadit konstanta Db::ORDER_XXX (default: ASC)
     *
     * @return Db_Select -- objekt Db_Select
     */
-   public function order($colum, $order = self::SQL_ASC) {
+   public function order($colum, $order = Db::ORDER_ASC) {
       $order = strtoupper($order);
       if(!is_array($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
          $this->_sqlQueryParts[self::ORDER_ORDER_KEY] = array();
       }
 
       $columArray = array();
-
-      if($order == parent::SQL_DESC){
+      if($order == Db::ORDER_DESC){
          $columArray[parent::ORDER_COLUM_KEY] = $colum;
          $columArray[parent::ORDER_ORDER_KEY] = parent::SQL_DESC;
-      } else {
+      } else if($order == Db::ORDER_ASC) {
          $columArray[parent::ORDER_COLUM_KEY] = $colum;
          $columArray[parent::ORDER_ORDER_KEY] = parent::SQL_ASC;
+      } else {
+         throw new RangeException(_('Nepodporovaný typ řazení'), 3);
       }
       array_push($this->_sqlQueryParts[self::ORDER_ORDER_KEY], $columArray);
       return $this;
@@ -271,12 +288,12 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     * where(array($cola,$valuea,'='),'AND',array(array($colb,$valueb,'='),'OR',array($colc,$valuec,'=')))
     * WHERE ($cola = $valuea) AND (($colb = $valueb) OR ($colc = $valuec))
     * @param string -- sloupcec
-    * @param string -- hodnota
-    * @param string -- typ porovnávání
+    * @param char/int -- operátor porovnávání konstatna Db::OPERATOR_XXX
+    * @param int -- operátor porovnávání Db::COND_OPERATOR_XXX
     *
     * @return Db_Select -- objekt Db_Select
     */
-   public function where($column, $value = null, $term = '=', $operator = self::SQL_AND) {
+   public function where($column, $value = null, $term = '=', $operator = Db::COND_OPERATOR_AND) {
       if(is_array($column)){
          return parent::where(func_get_args());
       } else {
@@ -296,31 +313,29 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
             foreach ($colums as $columAlias => $columString) {
                if(!$this->isMySQLFunction($columString)AND ($columString[0] != self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] != self::SQL_PARENTHESIS_R)){
                   if($columString != parent::SQL_ALL_VALUES){
-                     $columString = '.`' . $this->_connector->escapeString($columString) . '`';
+                     $columString = '.`' . $this->getDbConnector()->escapeString($columString) . '`';
                   } else {
                      $columString = '.' . $columString . '';
                   }
 
                   if(is_int($columAlias)){
-                     $colum .= self::SQL_SEPARATOR . $columsTable . '' . $this->_connector->escapeString($columString) . ',';
+                     $colum .= self::SQL_SEPARATOR . $columsTable . '' . $this->getDbConnector()->escapeString($columString) . ',';
                   } else {
-                     $colum .= self::SQL_SEPARATOR . $columsTable . '' . $this->_connector->escapeString($columString) . "" . self::SQL_SEPARATOR . self::SQL_AS .
+                     $colum .= self::SQL_SEPARATOR . $columsTable . '' . $this->getDbConnector()->escapeString($columString) . "" . self::SQL_SEPARATOR . self::SQL_AS .
                      self::SQL_SEPARATOR . $columAlias . ',';
                   }
                }
                else if($columString[0] == self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] == self::SQL_PARENTHESIS_R){
-                  $colum .= self::SQL_SEPARATOR . $this->_connector->escapeString($columString) . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
+                  $colum .= self::SQL_SEPARATOR . $this->getDbConnector()->escapeString($columString) . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
                } else {
-                  $colum .= self::SQL_SEPARATOR . $this->_connector->escapeString($columString) . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
+                  $colum .= self::SQL_SEPARATOR . $this->getDbConnector()->escapeString($columString) . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
                }
             }
             $columsString .= $colum;
             $colum = null;
-
          }
          //	odstranění poslední čárky
          $columsString = substr($columsString, 0, strlen($columsString)-1);
-
       } else {
          $columsString = self::SQL_SEPARATOR.self::SQL_ALL_VALUES.self::SQL_SEPARATOR;
       }
@@ -384,13 +399,35 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
    protected function _createJoin() {
       $joinsString = null;
       $joinString = null;
-      foreach ($this->_sqlQueryParts[Db::SQL_JOIN] as $joinType => $joinArray) {
-         foreach ($joinArray as $tableAlias => $table){
-            $joinString = self::SQL_SEPARATOR . $joinType . self::SQL_SEPARATOR;
-            $joinString .= '`'.MySQLiDb::$_tablePrefix . $table[self::JOIN_TABLE_NAME_KEY].'`' . self::SQL_SEPARATOR . self::SQL_AS . self::SQL_SEPARATOR
-            .$tableAlias . self::SQL_SEPARATOR . self::SQL_ON . self::SQL_SEPARATOR . $table[self::JOIN_TABLE_CONDITION_KEY];
+      foreach ($this->_sqlQueryParts[parent::SQL_JOIN] as $joinType => $joinArray) {
+         if($joinType != parent::SQL_JOIN){
+            $joinType = $joinType . self::SQL_SEPARATOR;
+         } else {
+            $joinType = null;
+         }
 
-            $joinsString .= $joinString;
+         foreach ($joinArray as $tableAlias => $table){
+            $joinString = $joinType . parent::SQL_JOIN . parent::SQL_SEPARATOR;
+
+            $joinString .= '`'.MySQLiDb::$_tablePrefix . $table[self::JOIN_TABLE_NAME].'`' . self::SQL_SEPARATOR;
+            if(!is_int($tableAlias)){
+               $joinString .= parent::SQL_AS . parent::SQL_SEPARATOR . $tableAlias . parent::SQL_SEPARATOR;
+            }
+            $joinString .= parent::SQL_ON . parent::SQL_SEPARATOR;
+
+            if($table[parent::JOIN_TABLE_CONDITION_TYPE] == parent::SQL_ON){
+               // první sloupec
+               $joinString .= key($table[parent::JOIN_TABLE_CONDITION_COLUMN1]).'.'
+                  .$table[parent::JOIN_TABLE_CONDITION_COLUMN1][key($table[parent::JOIN_TABLE_CONDITION_COLUMN1])];
+               $joinString .= parent::SQL_SEPARATOR . $table[parent::JOIN_TABLE_CONDITION_OPERATOR] . parent::SQL_SEPARATOR;
+               // druhý sloupce
+               $joinString .= key($table[parent::JOIN_TABLE_CONDITION_COLUMN2]).'.'
+                  .$table[parent::JOIN_TABLE_CONDITION_COLUMN2][key($table[parent::JOIN_TABLE_CONDITION_COLUMN2])];
+
+            } else if($table[parent::JOIN_TABLE_CONDITION_TYPE] == parent::SQL_USING) {
+               throw new Exception(_('Nebyla implementována metoda USING u JOIN DODĚLAT!!!'));
+            }
+            $joinsString .= $joinString.parent::SQL_SEPARATOR;
          }
       }
       return $joinsString;
@@ -457,7 +494,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       $sql .= $this->_createTable();
 
       // JOIN
-      $sql .= $this->_createJoin();
+      $sql .= parent::SQL_SEPARATOR.$this->_createJoin();
 
       // where
       $sql .= $this->_createWhere();

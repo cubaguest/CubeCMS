@@ -28,18 +28,20 @@ interface Db_Select{
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-   public function colums($columsArray = '*');
+   public function colums($columsArray = Db::COLUMN_ALL);
 	
-	/**
-	 * Metody vatváří podmínku WHERE
-	 *
-	 * @param string/array -- sloupec nebo pole podmínek
-	 * @param string/mixed -- hodnota
-	 * @param string/mixed -- typ porovnávání
-	 * 
-	 * @return Db_Select -- objekt Db_Select
-	 */
-   public function where($column, $value = null, $term = '=', $operator = self::SQL_AND);
+   /**
+    * Metody vatváří podmínku WHERE. Pokud je třeba použít více podmínek, je
+    * zadáváno pole v tomot poředí např:
+    * where(array($cola,$valuea,'='),'AND',array(array($colb,$valueb,'='),'OR',array($colc,$valuec,'=')))
+    * WHERE ($cola = $valuea) AND (($colb = $valueb) OR ($colc = $valuec))
+    * @param string -- sloupcec
+    * @param char/int -- operátor porovnávání konstatna Db::OPERATOR_XXX
+    * @param int -- operátor porovnávání Db::COND_OPERATOR_XXX
+    *
+    * @return Db_Select -- objekt Db_Select
+    */
+   public function where($column, $value = null, $term = '=', $operator = Db::COND_OPERATOR_AND);
 	
 	/**
 	 * Metody vytvoří část pro klauzuli JOIN

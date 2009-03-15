@@ -29,6 +29,7 @@ class CategoryModel extends DbModel {
 	const COLUMN_CAT_PRIORITY	= 'priority';
 
    const COLUMN_CAT_LABEL_ORIG = 'label';
+   const COLUMN_SEC_LABEL_ORIG = 'label';
    const COLUMN_CAT_ALT_ORIG = 'alt';
 
    const COLUMN_CAT_ACTIVE = 'active';
@@ -64,14 +65,16 @@ class CategoryModel extends DbModel {
          ->colums(array("clabel" => "IFNULL(cat.label_".Locale::getLang()
             .", cat.label_".Locale::getDefaultLang().")", "id_category", self::COLUMN_CAT_LPANEL,
             self::COLUMN_CAT_RPANEL, self::COLUMN_SEC_ID, self::COLUMN_CAT_PARAMS))
-         ->join(array("item" => $this->itemsTable), "cat.id_category = item.id_category", "inner", null)
-         ->join(array("sec" => $this->secTable), "cat.id_section = sec.id_section", "inner",
-         array("slabel" => "IFNULL(sec.label_".Locale::getLang().", sec.label_"
-            .Locale::getDefaultLang().")"))
-         ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, 'r__', 'LIKE')
+      ->join(array('item' => $this->itemsTable),
+         array('cat' => self::COLUMN_CAT_ID, 'item'=>self::COLUMN_CAT_ID), Db::JOIN_INNER)
+      ->join(array('sec'=>$this->secTable),
+         array('cat' => self::COLUMN_SEC_ID, 'sec'=>self::COLUMN_SEC_ID), Db::JOIN_INNER,
+         array("slabel" => 'IFNULL(sec.'.self::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getLang()
+            .', sec.'.self::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getDefaultLang().")"))
+      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, 'r__', Db::OPERATOR_LIKE)
          ->where("cat.".self::COLUMN_CAT_ACTIVE, 1)
-         ->order("sec.priority", "desc")
-         ->order("cat.priority", "desc")
+         ->order("sec.priority", Db::ORDER_DESC)
+         ->order("cat.priority", Db::ORDER_DESC)
          ->order("clabel")
          ->limit(0,1);
 

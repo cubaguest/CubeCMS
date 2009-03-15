@@ -61,7 +61,6 @@ class NewsListModel extends DbModel {
 			$this->allNewsCount = $count->count;
 			$this->countNewsLoaded = true;
 		}
-		
 		return $this->allNewsCount;
 	}
 	
@@ -77,12 +76,14 @@ class NewsListModel extends DbModel {
             self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang()
             .", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_ID_USER, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_TIME))
-      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER
-         .' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
+      ->join(array('user' => $this->getUserTable()),
+         array('news'=>self::COLUMN_NEWS_ID_USER, self::COLUMN_ISER_ID), null, self::COLUMN_USER_NAME)
+//      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER
+//         .' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
       ->where("news.".self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
       ->where("news.".self::COLUMN_NEWS_DELETED, (int)false)
       ->limit($from, $count)
-      ->order("news.".self::COLUMN_NEWS_TIME, Db::SQL_DESC);
+      ->order("news.".self::COLUMN_NEWS_TIME, Db::ORDER_DESC);
 
       // jestli se mají sledovat uživatelé, tak tady něco musí být
 //		if($this->tableUsers != null){

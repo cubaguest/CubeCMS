@@ -118,20 +118,21 @@ abstract class MainMenu {
 					self::COLUMN_CATEGORY_ID, self::COLUMN_CATEGORY_ALT_IMAG => "IFNULL(cat."
 					.self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getLang().", cat."
 					.self::COLUMN_CATEGORY_ALT_PREFIX.Locale::getDefaultLang().")"))
-			->join(array("s" => $this->tablesSections), "s.".self::COLUMN_SECTION_ID
-				." = cat.".self::COLUMN_CATEGORY_ID_SECTION, null, array(self::COLUMN_SECTION_ID,
-				self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(s.".self::COLUMN_SECTION_LABEL_PREFIX
-				.Locale::getLang().", s.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getDefaultLang().")",
-				self::COLUMN_SECTION_ALT_IMAG => "IFNULL(s.".self::COLUMN_SECTION_ALT_PREFIX
-				.Locale::getLang().", s.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
-			->join(array("item" => $this->tablesItems), "cat.".self::COLUMN_CATEGORY_ID
-				." = item.".self::COLUMN_ITEM_ID_CATEGORY, null, null)
+
+      ->join(array('sec'=>$this->tablesSections),
+         array(self::COLUMN_SECTION_ID, 'cat'=>self::COLUMN_CATEGORY_ID_SECTION), null, array(self::COLUMN_SECTION_ID,
+				self::COLUMN_SECTION_LABEL_IMAG => "IFNULL(sec.".self::COLUMN_SECTION_LABEL_PREFIX
+				.Locale::getLang().", sec.".self::COLUMN_SECTION_LABEL_PREFIX.Locale::getDefaultLang().")",
+				self::COLUMN_SECTION_ALT_IMAG => "IFNULL(sec.".self::COLUMN_SECTION_ALT_PREFIX
+				.Locale::getLang().", sec.".self::COLUMN_SECTION_ALT_PREFIX.Locale::getDefaultLang().")"))
+      ->join(array("item" => $this->tablesItems),
+         array('cat' =>self::COLUMN_CATEGORY_ID, self::COLUMN_ITEM_ID_CATEGORY))
 			->where("cat.".self::COLUMN_CATEGORY_ACTIVE, (int)true)
 			->where("cat.".self::COLUMN_CATEGORY_SHOW_IN_MENU, (int)true)
 			->group("cat.".self::COLUMN_CATEGORY_ID)
-			->order("s.".self::COLUMN_SECTION_PRIORITY, "desc")
+         ->order("sec.".self::COLUMN_SECTION_PRIORITY, Db::ORDER_DESC)
 			->order(self::COLUMN_SECTION_LABEL_IMAG)
-			->order("cat.".self::COLUMN_CATEGORY_PRIORITY, "desc")
+			->order("cat.".self::COLUMN_CATEGORY_PRIORITY, Db::ORDER_DESC)
 			->order(self::COLUMN_CATEGORY_LABEL_IMAG);
 
       if(!$this->auth()->isLogin()){
@@ -147,7 +148,7 @@ abstract class MainMenu {
 	 */
 	public function loadMenu($sqlSelect){
       //	Přidání výběru jen na zvolenou skupinu
-      $sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup(),'r__', Db::SQL_LIKE);
+      $sqlSelect = $sqlSelect->where(Rights::RIGHTS_GROUPS_TABLE_PREFIX.$this->getUserGroup(),'r__', Db::OPERATOR_LIKE);
 
       try {
          $this->menuArray = $this->getDb()->fetchAll($sqlSelect);

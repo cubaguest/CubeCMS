@@ -12,35 +12,130 @@
 
 class Db {
    /**
+    * Operátor AND
+    */
+   const COND_OPERATOR_AND = 1;
+
+   /**
+    * Operátor OR
+    */
+   const COND_OPERATOR_OR = 2;
+
+   /**
+    * Operátor IS NULL
+    */
+   const OPERATOR_IS_NULL = 0;
+
+   /**
+    * Operátor IS NOT NULL
+    */
+   const OPERATOR_IS_NOT_NULL = 1;
+
+   /**
+    * Oparátor LIKE
+    */
+   const OPERATOR_LIKE = 2;
+
+   /**
+    * Oparátor NOT LIKE
+    */
+   const OPERATOR_NOT_LIKE = 3;
+
+   /**
+    * Operátor BETWEEN
+    */
+   const OPERATOR_BETWEEN = 4;
+
+   /**
+    * Operátor NOT BETWEEN
+    */
+   const OPERATOR_NOT_BETWEEN = 5;
+
+   /**
+    * Operátor IN
+    */
+   const OPERATOR_IN = 6;
+
+   /**
+    * Spojení JOIN bez omezení
+    */
+   const JOIN_NORMAL = 1;
+
+   /**
+    * Spojení JOIN LEFT
+    */
+   const JOIN_LEFT = 2;
+
+   /**
+    * Sojení JOIN RIGHT
+    */
+   const JOIN_RIGHT = 3;
+
+   /**
+    * Spojení JOIN INNER
+    */
+   const JOIN_INNER = 4;
+
+   /**
+    * Spojení JOIN CROSS
+    */
+   const JOIN_CROSS = 5;
+
+   /**
+    * Operátor spojení JOIN ON
+    */
+   const JOIN_OPERATOR_ON = 1;
+
+   /**
+    * Operátor spojení JOIN USING
+    */
+   const JOIN_OPERATOR_USING = 2;
+
+   /**
+    * Konstanta pro výběr všech sloupců
+    */
+   const COLUMN_ALL = '*';
+
+   /**
+    * Konstanta pro řazení ASC
+    */
+   const ORDER_ASC = 1;
+
+   /**
+    * Konstanta pro řazení DESC
+    */
+   const ORDER_DESC = 2;
+
+   /**
     * Konstanty pro tvorbu dotazů, které jsou globální pro všechny DB
     */
-   const SQL_AND     = 'AND';
-   const SQL_OR      = 'OR';
-   const SQL_IN      = 'IN';
-   const SQL_LIKE    = 'LIKE';
-   const SQL_ALL     = '*';
-   const SQL_ASC     = 'ASC';
-   const SQL_DESC    = 'DESC';
-   const SQL_NULL    = 'NULL';
+//   const SQL_AND     = 'AND';
+//   const SQL_OR      = 'OR';
+//   const SQL_IN      = 'IN';
+//   const SQL_LIKE    = 'LIKE';
+//   const SQL_ALL     = '*';
+//   const SQL_ASC     = 'ASC';
+//   const SQL_DESC    = 'DESC';
+//   const SQL_NULL    = 'NULL';
 
     /**
      * Konstanty typů joinu
      * @var string
      */
-   const SQL_JOIN			= 'JOIN';
-   const SQL_JOIN_LEFT 	= 'LEFT JOIN';
-   const SQL_JOIN_RIGHT	= 'RIGHT JOIN';
-   const SQL_JOIN_INNER	= 'INNER JOIN';
+//   const SQL_JOIN			= 'JOIN';
+//   const SQL_JOIN_LEFT 	= 'LEFT JOIN';
+//   const SQL_JOIN_RIGHT	= 'RIGHT JOIN';
+//   const SQL_JOIN_INNER	= 'INNER JOIN';
 
    /**
     * Typ podmínky ON pro JOIN
     */
-   const SQL_JOIN_COND_TYPE_ON = 'ON';
+//   const SQL_JOIN_COND_TYPE_ON = 'ON';
 
    /**
     * Typ podmínky USING pro JOIN
     */
-   const SQL_JOIN_COND_TYPE_USING = 'USING';
+//   const SQL_JOIN_COND_TYPE_USING = 'USING';
 
 
 	/**

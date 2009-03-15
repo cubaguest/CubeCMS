@@ -30,7 +30,7 @@ class MySQLiDb extends Db implements DbInterface {
 	 * Link k databázovému spojení
 	 * @var Mysql link
 	 */
-	private $_mysqlLink = null;
+//	private $_mysqlLink = null;
 
 	/**
 	 * Objekt mysqli
@@ -186,8 +186,6 @@ class MySQLiDb extends Db implements DbInterface {
 		return $this->_lastInsertedId;
 	}
 
-
-
 	/**
 	 * Metoda pro generování SQL dotazů typu SELECT
 	 *
@@ -205,8 +203,7 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @param string -- podmínka
 	 * @return integer -- počet záznamů v tabulce
 	 */
-	public function count($table,$condition = null)
-	{
+	public function count($table,$condition = null){
 		$select = new Mysqli_Db_Select($this);
 		$sqlCount = $select->from(array("tbl"=>$table))->count("count");
 		
@@ -329,8 +326,7 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @param string -- sql dotaz
 	 * @return MySQLi_Result -- objekt s prvky z db
 	 */
-	public function fetchObject($sqlQuery)
-	{
+	public function fetchObject($sqlQuery){
 		if($sqlQuery != $this->_previousSqlQuery){
          $this->_previousResult = $this->query($sqlQuery);
       }
@@ -349,5 +345,4 @@ class MySQLiDb extends Db implements DbInterface {
       return $this->_mysqliObject->real_escape_string($string);
    }
 }
-
 ?>
