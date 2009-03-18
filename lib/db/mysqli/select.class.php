@@ -3,7 +3,8 @@ require_once './lib/db/select.class.php';
 
 /**
  * Třída pro výběr záznamů z MySQLi DB.
- * Třída obsahuje implementaci metody select z db-interfacu.
+ * Třída obsahuje implementaci metody select z db-interfacu. a implementuje
+ * rozhraní Db_Select
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: $ VVE3.9.2 $Revision: $
@@ -11,6 +12,7 @@ require_once './lib/db/select.class.php';
  *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro výběr záznamů
  * @see           http://dev.mysql.com/doc/refman/5.1/en/select.html
+ * @package       mysqli
  */
 
 class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
@@ -18,14 +20,14 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
      * Proměnná určující obsah SQL dotazu
      */
    protected static $_sqlPartsInit = array(
-      self::COLUMS_ARRAY			=> array(),
-      self::SQL_COUNT				=> array(),
-      self::INDEX_TABLE          => array(),
-      self::SQL_JOIN             => array(),
-      self::SQL_WHERE				=> array(),
-      self::GROUP_BY_KEY			=> array(),
-      self::ORDER_ORDER_KEY		=> array(),
-      self::SQL_LIMIT				=> array());
+      parent::INDEX_COLUMS_ARRAY => array(),
+      parent::SQL_COUNT				=> array(),
+      parent::INDEX_TABLE        => array(),
+      parent::SQL_JOIN           => array(),
+      parent::SQL_WHERE				=> array(),
+      parent::GROUP_BY_KEY			=> array(),
+      parent::ORDER_ORDER_KEY		=> array(),
+      parent::SQL_LIMIT				=> array());
 
    /**
     * Inicializace
@@ -75,15 +77,15 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       }
 
       //  Vytvoření pole pokud neexistuje
-      if(!isset ($this->_sqlQueryParts[self::COLUMS_ARRAY][$arrName])){
-         $this->_sqlQueryParts[self::COLUMS_ARRAY][$arrName] = array();
+      if(!isset ($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY][$arrName])){
+         $this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY][$arrName] = array();
       }
 
       foreach ($columnsArray as $key => $column) {
          if(is_int($key)){
-            array_push($this->_sqlQueryParts[self::COLUMS_ARRAY][$arrName], $column);
+            array_push($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY][$arrName], $column);
          } else {
-            $this->_sqlQueryParts[self::COLUMS_ARRAY][$arrName][$key] = $column;
+            $this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY][$arrName][$key] = $column;
          }
       }
       return $this;
@@ -109,7 +111,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       if(!is_array($conditionArr) OR count($conditionArr) < 2 OR count($conditionArr) > 4){
          throw new InvalidArgumentException(_('Nebylo předáno pole s podmínkou ve správném tvaru'), 1);
       }
-
       $tmpArray = array();
       // pokud není zadán typ podmínky
       if(!isset ($conditionArr[2])){
@@ -120,7 +121,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       if(!isset ($conditionArr[3])){
          $conditionArr[3] = '=';
       }
-
       // volba tabulky
       if(is_array($tableArray)){
          $columKey = key($tableArray);
@@ -129,7 +129,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
          $columKey = substr($tableArray, 0, 5);
          $tmpArray[parent::JOIN_TABLE_NAME_KEY] = $tableArray;
       }
-
       // Která podmínka se zpracovává (ON/USING)
       // ON
       if($conditionArr[2] == Db::JOIN_OPERATOR_ON){
@@ -145,8 +144,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
          } else {
             $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2][key($conditionArr)] = $conditionArr[key($conditionArr)];
          }
-
-//         $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2] = $conditionArr[1];
          $tmpArray[parent::JOIN_TABLE_CONDITION_TYPE] = parent::SQL_ON;
          $tmpArray[parent::JOIN_TABLE_CONDITION_OPERATOR] = $conditionArr[3];
       }
@@ -208,23 +205,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     * @return Db_Select -- objekt Db_Select
     */
    public function order($colum, $order = Db::ORDER_ASC) {
-      $order = strtoupper($order);
-      if(!is_array($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
-         $this->_sqlQueryParts[self::ORDER_ORDER_KEY] = array();
-      }
-
-      $columArray = array();
-      if($order == Db::ORDER_DESC){
-         $columArray[parent::ORDER_COLUM_KEY] = $colum;
-         $columArray[parent::ORDER_ORDER_KEY] = parent::SQL_DESC;
-      } else if($order == Db::ORDER_ASC) {
-         $columArray[parent::ORDER_COLUM_KEY] = $colum;
-         $columArray[parent::ORDER_ORDER_KEY] = parent::SQL_ASC;
-      } else {
-         throw new RangeException(_('Nepodporovaný typ řazení'), 3);
-      }
-      array_push($this->_sqlQueryParts[self::ORDER_ORDER_KEY], $columArray);
-      return $this;
+      return parent::order($colum, $order);
    }
 
    /**
@@ -308,8 +289,8 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       $columsString = null;
       $colum = null;
 
-      if(!empty($this->_sqlQueryParts[self::COLUMS_ARRAY])){
-         foreach ($this->_sqlQueryParts[self::COLUMS_ARRAY] as $columsTable => $colums) {
+      if(!empty($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY])){
+         foreach ($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY] as $columsTable => $colums) {
             foreach ($colums as $columAlias => $columString) {
                if(!$this->isMySQLFunction($columString)AND ($columString[0] != self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] != self::SQL_PARENTHESIS_R)){
                   if($columString != parent::SQL_ALL_VALUES){
@@ -358,7 +339,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       //		AND !empty($this->_sqlQueryParts[self::SQL_GROUP_BY])
       if(!empty($this->_sqlQueryParts[self::SQL_COUNT])){
          //TODO dodělat čekování jestli náhodou pole neobsahuje název jednoho sloupce
-         if(!empty($this->_sqlQueryParts[self::COLUMS_ARRAY])
+         if(!empty($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY])
             AND !empty($this->_sqlQueryParts[self::GROUP_BY_KEY])){
             $counts = self::SQL_VALUE_SEPARATOR;
          }
@@ -427,7 +408,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
             } else if($table[parent::JOIN_TABLE_CONDITION_TYPE] == parent::SQL_USING) {
                throw new Exception(_('Nebyla implementována metoda USING u JOIN DODĚLAT!!!'));
             }
-            $joinsString .= $joinString.parent::SQL_SEPARATOR;
+            $joinsString .= parent::SQL_SEPARATOR.$joinString;
          }
       }
       return $joinsString;
@@ -437,19 +418,19 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
     * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
     * @return string -- část SQL s kluzulí ORDER BY
     */
-   protected function _createOrder(){
-      $orderString = null;
-      if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
-         $orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
-         foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
-            $orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
-         }
-
-         //			odstranění poslední čárky
-         $orderString = substr($orderString, 0, strlen($orderString)-1);
-      }
-      return $orderString;
-   }
+//   protected function _createOrder(){
+//      $orderString = null;
+//      if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
+//         $orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
+//         foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
+//            $orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
+//         }
+//
+//         //			odstranění poslední čárky
+//         $orderString = substr($orderString, 0, strlen($orderString)-1);
+//      }
+//      return $orderString;
+//   }
 
    /**
     * Metoda vygeneruje část SQL dotazu s klauzulí GROUP BY
@@ -494,7 +475,7 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       $sql .= $this->_createTable();
 
       // JOIN
-      $sql .= parent::SQL_SEPARATOR.$this->_createJoin();
+      $sql .= $this->_createJoin();
 
       // where
       $sql .= $this->_createWhere();

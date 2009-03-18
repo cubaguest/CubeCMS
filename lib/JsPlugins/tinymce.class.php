@@ -123,7 +123,8 @@ class TinyMce extends JsPlugin {
 			'document_base_url' => null,
 			'external_image_list_url' => null,
 			'remove_script_host' => 'false',
-			'content_css' => null
+			'content_css' => null,
+         'extended_valid_elements' => 'td[*],div[*]'
 //			'relative_urls' => 'false'
 			);
 

@@ -663,6 +663,7 @@ class AppCore {
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'coreException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'dbException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'badClassException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'imageException.class.php');
    }
 
     /**
@@ -1295,7 +1296,7 @@ class AppCore {
       $sitemapItems = $sitemapItems->getItems();
 
       // vyttvoření hlavní kategorie
-      $sitemap = new SiteMap(new Links(true, true), AppCore::sysConfig()->getOptionValue('sitemap_periode'), '1.0');
+      $sitemap = new SiteMap(new Links(true, true), AppCore::sysConfig()->getOptionValue('sitemap_periode'), 1.0);
       $sitemap->run();
       unset ($sitemap);
       // procházení kategoríí na vytváření sitemapy
@@ -1312,10 +1313,10 @@ class AppCore {
             $moduleClass = $moduleName.self::MODULE_SITEMAP_SUFIX_CLASS;
             //				Pokud existuje soubor tak jej načteme
             if(file_exists($module->getDir()->getMainDir(false).strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php')){
-               include ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php');
+               include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php');
                if(class_exists($moduleClass)){
                   $sitemap = new $moduleClass($link, $item->{SitemapModel::COLUMN_SITEMAP_FREQUENCY},
-                     $item->{SitemapModel::COLUMN_SITEMAP_PRIORITY});
+                     (float)$item->{SitemapModel::COLUMN_SITEMAP_PRIORITY});
 
                   // spuštění sitemapy
                   $sitemap->run();
@@ -1347,6 +1348,26 @@ class AppCore {
       $this->coreTpl->addVar("PAGE_NOT_FOUND_TEXT", _('Chyba 404 - Stránka nebyla nalezena.
 Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       $this->coreTpl->addVar("PAGE_NOT_FOUND_MAIN_PAGE", _(' hlavní stránku'));
+   }
+
+   /**
+    * Metoda spouští kód pro generování specielních stránek
+    */
+   public function runSpecialPage() {
+      $this->coreTpl->addVar('SPECIAL_PAGE', true);
+      $this->coreTpl->addVar('SPECIAL_PAGE_NAME', UrlRequest::getSpecialPage());
+      if(UrlRequest::getSpecialPage() == UrlRequest::SPECIAL_PAGE_SEARCH){
+         $this->runSearchPage();
+      }
+   }
+
+   /**
+    * Metoda pro spuštění hledání
+    */
+   public function runSearchPage() {
+      $searchM = new SearchModel();
+
+      $searchM->getModules();
    }
 
     /**
@@ -1423,17 +1444,21 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   //				inicializace šablonovacího systému
                   $this->_initTemplate();
 
-                  //nastavení vybrané kategorie
-                  $this->selectCategory();
-
                   // Globální inicializace proměných do šablony
                   $this->initialWebTpl();
 
                   //vytvoření hlavního menu
                   $this->createMainMenu();
 
+                  //nastavení vybrané kategorie
+                  $this->selectCategory();
+
+                  if(UrlRequest::isSpecialPage()){
+                     $this->runSpecialPage();
+                  }
+
                   // Pokud není chyba spustíme moduly
-                  if(!AppCore::isErrorPage()){
+                  if(!AppCore::isErrorPage() AND !UrlRequest::isSpecialPage()){
                      //		spuštění modulů
                      $this->runModules();
                   }
@@ -1449,7 +1474,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   }
 
                   // pokud se v aplikaci vyskitla chybová stránka, spustíme ji
-                  if(self::isErrorPage()){
+                  if(AppCore::isErrorPage()){
                      $this->runErrorPage();
                   }
 

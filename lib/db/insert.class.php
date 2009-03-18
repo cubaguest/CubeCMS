@@ -1,8 +1,8 @@
 <?php
 /**
- * Rozhraní pro třídy pro vkládání záznamů do db.
- * Rozhraní implementuje prvky třídy, které musí být použity v jednotlivých
- * implementacích databázových konektorů.
+ * Rozhraní pro vkládání záznamů do db.
+ * Rozhraní pro tvorbu třídy k vkládání záznamů do databáze. Implementuje metodu
+ * insert z rozhraní Db_Interface
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: $ VVE3.9.2 $Revision: $
@@ -16,7 +16,6 @@ interface Db_Insert {
 	 * Metoda nastavuje která tabulka se bude používat
 	 *
 	 * @param string -- tabulka pro použití
-	 * @param string -- alias tabulky pro použití
 	 * @param boolean -- (option) jestli se májí tabulky zamknout
 	 * @return Db_Insert
 	 */

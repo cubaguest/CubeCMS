@@ -4,9 +4,6 @@
  * 
  */
 class TextDetailModel extends DbModel {
-//	function _init() {
-
-//	}
 	/**
 	 * Názvy sloupců v db
 	 * @var string
@@ -27,7 +24,6 @@ class TextDetailModel extends DbModel {
 		if($this->text == null){
 			$this->getTextFromDb();
 		}
-		
 		return $this->text;
 	}
 	
@@ -36,8 +32,11 @@ class TextDetailModel extends DbModel {
 	 *
 	 */
 	private function getTextFromDb() {
-		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable(), array(self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT_LANG_PRFIX.Locale::getLang().",".self::COLUMN_TEXT_LANG_PRFIX.Locale::getDefaultLang().")"))
-									->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId());
+		$sqlSelect = $this->getDb()->select()
+      ->table($this->getModule()->getDbTable())
+      ->colums(array(self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT_LANG_PRFIX.Locale::getLang()
+            .",".self::COLUMN_TEXT_LANG_PRFIX.Locale::getDefaultLang().")"))
+		->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
 
 		$this->text=$this->getDb()->fetchObject($sqlSelect);
 		if($this->text != null){
@@ -51,16 +50,14 @@ class TextDetailModel extends DbModel {
 	 * @return array -- pole s textama
 	 */
 	public function getAllLangText() {
-		$sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable())
-						->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId());
+		$sqlSelect = $this->getDb()->select()
+         ->table($this->getModule()->getDbTable())
+			->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
 				
 		$text = $this->getDb()->fetchAssoc($sqlSelect,true);
-
-
       if(!empty ($text)){
          $text = $this->parseDbValuesToArray($text, self::COLUMN_TEXT);
       }
-
 		return $text[self::COLUMN_TEXT];
 	}
 	/*EOF getAllLangText*/
@@ -72,8 +69,7 @@ class TextDetailModel extends DbModel {
          //
          $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
                ->set($textArr)
-               ->where(self::COLUMN_ID_ITEM." = '".$this->getModule()->getId()."'");
-         //
+               ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
          //      // vložení do db
          if($this->getDb()->query($sqlInsert)){
             return true;
@@ -85,21 +81,25 @@ class TextDetailModel extends DbModel {
             self::COLUMN_CHANGED_TIME, time(),
             self::COLUMN_ID_ITEM, $this->getModule()->getId());
          //
-         $sqlInsert = $this->getDb()->insert()->into($this->getModule()->getDbTable())
+         $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
                ->colums(array_keys($textArr))
                ->values(array_values($textArr));
          //      //		Vložení do db
-         if($this->getDb()->query($sqlInsert)){
-            return true;
-         } else {
-            return false;
+         try {
+            if(!$this->getDb()->query($sqlInsert)){
+                  throw new DBException(_('Text se nepodařilo uložit, chyba při ukládání.'), 1);
+            }
+         } catch (Exception $e) {
+            new CoreErrors($e);
          }
+
       }
    }
 
    private function isSaved() {
-      $sql = $this->getDb()->select()->from($this->getModule()->getDbTable(), array('count' => 'COUNT(*)'))
-      ->where(self::COLUMN_ID_ITEM." = ".$this->getModule()->getId());
+      $sql = $this->getDb()->select()->table($this->getModule()->getDbTable())
+      ->colums(array('count' => 'COUNT(*)'))
+      ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
 
       $count = $this->getDb()->fetchObject($sql);
 
@@ -107,7 +107,18 @@ class TextDetailModel extends DbModel {
          return true;
       }
       return false;
+   }
 
+   public function getLastChange() {
+      $sqlSelect = $this->getDb()->select()
+      ->table($this->getModule()->getDbTable())
+      ->colums(self::COLUMN_CHANGED_TIME)
+		->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+
+		$time=$this->getDb()->fetchObject($sqlSelect);
+      if($time != null AND $time instanceof stdClass){
+         return $time->{self::COLUMN_CHANGED_TIME};
+		};
    }
 }
 

@@ -17,7 +17,9 @@ class Mysqli_Db_Query {
     */
    const SQL_SELECT     		= 'SELECT';
 	const SQL_INSERT     		= 'INSERT';
-
+   const SQL_DELETE     		= 'DELETE';
+   const SQL_UPDATE     		= 'UPDATE';
+   
    const SQL_WHERE      		= 'WHERE';
    const SQL_NULL             = 'NULL';
 
@@ -25,6 +27,7 @@ class Mysqli_Db_Query {
    const SQL_GROUP_BY   		= 'GROUP BY';
    const SQL_ORDER_BY   		= 'ORDER BY';
    const SQL_HAVING     		= 'HAVING';
+   const SQL_SET              = 'SET';
 
    const SQL_AND        		= 'AND';
    const SQL_OR         		= 'OR';
@@ -92,6 +95,10 @@ class Mysqli_Db_Query {
    const INDEX_WHERE_TERM        = 'term';
    const INDEX_WHERE_OPERATOR    = 'operator';
 
+   // insert
+   const INDEX_COLUMS_ARRAY 					= 'COLUMS';
+   const INDEX_VALUES_ARRAY					= 'VALUES';
+
     /**
      * Konstanta určující obsah SQL dotazu
      * Musí mít správné pořadí, jak se má SQL dotaz řadit!!!
@@ -147,6 +154,10 @@ class Mysqli_Db_Query {
     * @return
     */
    protected function setTable($table, $alias = null, $lockTable = false){
+      if(is_array($table)){
+         throw new InvalidArgumentException(_('Špatně zadaný parametr funkce s názvem tabulky'), 2);
+      }
+
       $this->_lockTables = $lockTable;
       if($alias == null){
          $alias = substr($table, 0, 5);
@@ -192,7 +203,7 @@ class Mysqli_Db_Query {
     * @param integer -- počet záznamů
     * @param integer -- záčátek
     *
-    * @return this -- objekt sebe
+    * @return Db_Query -- objekt sebe
     */
    public function limit($rowCount, $offset) {
       $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $rowCount;
@@ -200,6 +211,35 @@ class Mysqli_Db_Query {
 
       return $this;
    }
+
+   /**
+    * Metoda přiřadí řazení sloupcu v SQL dotazu
+    *
+    * @param string -- sloupec, podle kterého se má řadit
+    * @param integer -- (option) jak se má sloupec řadit konstanta Db::ORDER_XXX (default: ASC)
+    *
+    * @return Db_Query -- objekt Db_Select
+    */
+   public function order($colum, $order = Db::ORDER_ASC) {
+      $order = strtoupper($order);
+      if(!is_array($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
+         $this->_sqlQueryParts[self::ORDER_ORDER_KEY] = array();
+      }
+
+      $columArray = array();
+      if($order == Db::ORDER_DESC){
+         $columArray[self::ORDER_COLUM_KEY] = $colum;
+         $columArray[self::ORDER_ORDER_KEY] = self::SQL_DESC;
+      } else if($order == Db::ORDER_ASC) {
+         $columArray[self::ORDER_COLUM_KEY] = $colum;
+         $columArray[self::ORDER_ORDER_KEY] = self::SQL_ASC;
+      } else {
+         throw new RangeException(_('Nepodporovaný typ řazení'), 3);
+      }
+      array_push($this->_sqlQueryParts[self::ORDER_ORDER_KEY], $columArray);
+      return $this;
+   }
+
 
    /**
     * Metoda vygeneruje část SQL dotazu s klauzulí WHERE
@@ -363,6 +403,23 @@ class Mysqli_Db_Query {
       }
    }
 
+	/**
+	 * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
+	 * @return string -- část SQL s kluzulí ORDER BY
+	 */
+	protected function _createOrder(){
+		$orderString = null;
+		if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
+			$orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
+			foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
+				$orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
+			}
+			//			odstranění poslední čárky
+			$orderString = substr($orderString, 0, strlen($orderString)-1);
+		}
+		return $orderString;
+	}
+
    /**
     * Metoda vrací název tabulky
     * Nutně potřebuje oimplementovat zvlášť v každé podtřídě
@@ -378,7 +435,6 @@ class Mysqli_Db_Query {
             $table .= self::SQL_SEPARATOR.self::SQL_AS.self::SQL_SEPARATOR
                .key($this->_sqlQueryParts[self::INDEX_TABLE]);
          }
-
       }
       return $table;
    }

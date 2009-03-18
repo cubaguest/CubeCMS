@@ -136,7 +136,6 @@ class MySQLiDb extends Db implements DbInterface {
 		$this->_setDefault();
 
 		Db::addQueryCount();
-		//$result = false;
 		$result = $this->_mysqliObject->query($sqlQuery);
 
       try {

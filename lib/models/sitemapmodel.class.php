@@ -42,30 +42,18 @@ class SitemapModel extends DbModel {
       $this->getTables();
       $userNameGroup = AppCore::getAuth()->getGroupName();
 
-
-//      ->from(array("cat" => $categoryTable), array('label' => "IFNULL(item.".Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getLang()
-//            .", item.".Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
-//            "alt" => "IFNULL(item.alt_".Locale::getLang().", item.alt_".Locale::getDefaultLang().")", '*'))
-//      ->join(array("item" => $itemsTable), "item.".Category::COLUMN_CAT_ID."=cat.".Category::COLUMN_CAT_ID, null)
-//      ->join(array("module" => $modulesTable), "module.id_module=item.id_module", 'LEFT')
-//      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup." LIKE \"r__\"")
-//      ->group('item.id_category')
-//      ->order("cat.priority", "desc")
-//      ->order("item.priority", 'desc');
-
-
       $sqlSelect = $this->getDb()->select()->table($this->catTable, 'cat')
       ->colums(array("label" => "IFNULL(cat.".CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getLang()
             .", cat.".CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
             "alt" => "IFNULL(item.".CategoryModel::COLUMN_CAT_ALT_ORIG.'_'.Locale::getLang()
-            .", item.".CategoryModel::COLUMN_CAT_ALT_ORIG.'_'.Locale::getDefaultLang().")", Db::SQL_ALL))
-      ->join(array("item" => $this->itemsTable), "item.".CategoryModel::COLUMN_CAT_ID."=cat.".CategoryModel::COLUMN_CAT_ID, null)
-      ->join(array("module" => $this->modulesTable), "module.".ModuleModel::COLUMN_ID_MODULE."=item.".ModuleModel::COLUMN_ID_MODULE, 'LEFT')
-      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, "r__", Db::SQL_LIKE)
+            .", item.".CategoryModel::COLUMN_CAT_ALT_ORIG.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
+      ->join(array("item" => $this->itemsTable), array(CategoryModel::COLUMN_CAT_ID, 'cat'=>CategoryModel::COLUMN_CAT_ID), null, Db::COLUMN_ALL)
+      ->join(array("module" => $this->modulesTable), array(ModuleModel::COLUMN_ID_MODULE,
+          'item'=>ModuleModel::COLUMN_ID_MODULE), Db::JOIN_LEFT, Db::COLUMN_ALL)
+      ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, "r__", Db::OPERATOR_LIKE)
       ->group('item.'.CategoryModel::COLUMN_CAT_ID)
-      ->order("cat.".CategoryModel::COLUMN_CAT_PRIORITY, "desc")
-      ->order("item.".ModuleModel::COLUMN_PRIORITY, 'desc');
-
+      ->order("cat.".CategoryModel::COLUMN_CAT_PRIORITY, Db::ORDER_DESC)
+      ->order("item.".ModuleModel::COLUMN_PRIORITY, Db::ORDER_DESC);
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }
 

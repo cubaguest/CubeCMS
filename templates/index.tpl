@@ -92,15 +92,14 @@
 
 	<div id="col1wrap" class="column">
 		<div id="col1pad" class="{if $LEFT_PANEL eq true}col1pad_plusleft {/if}{if $RIGHT_PANEL eq true}col1pad_plusright {/if}">
-
       {if $PAGE_NOT_FOUND eq true}
          {include file='engine:error404.tpl'}
+      {elseif $SPECIAL_PAGE eq true}
+         {include file=engine:$SPECIAL_PAGE_NAME.tpl}
       {else}
          {include file='engine:messages.tpl'}
          {include file='engine:modules.tpl'}
       {/if}
-		
-		
 		<hr class="separator" />
 	</div><!-- col1pad -->
 </div><!-- col1wrap -->
@@ -149,9 +148,11 @@
 	<div id="col3pad">
 		{* Vypis svatku*}
 		<div class="menu_bar">
-			<div class="menu_bar_obsah">
-			{$TODAY_IS} - {$DATE}<br />
-			{$NAME_DAY_NAME} {$NAME_DAY}
+			<div class="menu_bar_obsah" style="text-align:right;">
+         <form action="{$MAIN_WEB_DIR}" method="get">
+            <input type="text" size="17" maxlength="100" name="search" value="{$smarty.get.search}" /><br /><br />
+            <input type="submit" value="Hledej" />
+         </form>
 			</div>
 		</div>
 
@@ -185,17 +186,16 @@
 		</div>
 		{/foreach}
 		
-<!--		-->
-<!--		{if $MODULES_RIGHT_PANEL eq true}-->
-<!--		{foreach from=$MODULES_RIGHT_PANEL_ARRAY item=VALUE}-->
-<!--		<div class="menu_bar">-->
-<!--			<h3>{$VALUE.panel_name}</h3>-->
-<!--			{if ($VALUE.values.module neq null and $VALUE.values.module_tpl_path neq null)}-->
-<!--			{include file=$VALUE.values.module_tpl_path}-->
-<!--			{/if}-->
-<!--		</div>-->
-<!--		{/foreach}-->
-<!--		{/if}-->
+		{if $MODULES_RIGHT_PANEL eq true}
+		{foreach from=$MODULES_RIGHT_PANEL_ARRAY item=VALUE}
+		<div class="menu_bar">
+			<h3>{$VALUE.panel_name}</h3>
+			{if ($VALUE.values.module neq null and $VALUE.values.module_tpl_path neq null)}
+			{include file=$VALUE.values.module_tpl_path}
+			{/if}
+		</div>
+		{/foreach}
+		{/if}
     <hr class="separator" />
 
 	</div><!-- col3pad -->

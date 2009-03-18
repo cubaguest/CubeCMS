@@ -66,16 +66,20 @@ class NewsDetailModel extends DbModel {
     */
    public function getNewsDetailSelLang($id) {
       //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()->from(array('news' => $this->getModule()->getDbTable()),
-         array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX
+      $sqlSelect = $this->getDb()->select()
+      ->table($this->getModule()->getDbTable(), 'news')
+      ->colums(array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX
             .Locale::getLang().",".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_TEXT =>"IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang()
             .",".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_TIME, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_ID_USER))
-      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('news.'.self::COLUMN_NEWS_ID_ITEM." = ".$this->getModule()->getId())
-      ->where('news.'.self::COLUMN_NEWS_ID_NEW." = '".$id."'")
-      ->where('news.'.self::COLUMN_NEWS_DELETED.' = '.(int)false);
+      ->join(array('user' => $this->getUserTable()),
+         array('news' => self::COLUMN_NEWS_ID_USER, self::COLUMN_ISER_ID),
+         null, self::COLUMN_USER_NAME)
+//      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
+      ->where('news.'.self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+      ->where('news.'.self::COLUMN_NEWS_ID_NEW, $id)
+      ->where('news.'.self::COLUMN_NEWS_DELETED, (int)false);
 
       $news = $this->getDb()->fetchAssoc($sqlSelect, true);
 
@@ -109,12 +113,14 @@ class NewsDetailModel extends DbModel {
     */
    public function getNewsDetailAllLangs($id) {
       //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()->from($this->getModule()->getDbTable())
-      ->where(self::COLUMN_NEWS_ID_ITEM." = ".$this->getModule()->getId())
-      ->where(self::COLUMN_NEWS_ID_NEW." = '".$id."'")
-      ->where(self::COLUMN_NEWS_DELETED.' = '.(int)false);
+      $sqlSelect = $this->getDb()->select()
+      ->table($this->getModule()->getDbTable())
+      ->colums(Db::COLUMN_ALL)
+      ->where(self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+      ->where(self::COLUMN_NEWS_ID_NEW, $id)
+      ->where(self::COLUMN_NEWS_DELETED, (int)false);
 
-      $news = $this->getDb()->fetchAssoc($sqlSelect, true);
+      $news = $this->getDb()->fetchAssoc($sqlSelect);
 
       $news = $this->parseDbValuesToArray($news, array(self::COLUMN_NEWS_LABEL,
                self::COLUMN_NEWS_TEXT));
@@ -137,7 +143,7 @@ class NewsDetailModel extends DbModel {
 
       $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
             ->set($newsArr)
-            ->where(self::COLUMN_NEWS_ID_NEW." = '".$idNews."'");
+            ->where(self::COLUMN_NEWS_ID_NEW, $idNews);
 
       // vložení do db
       if($this->getDb()->query($sqlInsert)){

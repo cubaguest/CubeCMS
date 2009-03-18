@@ -12,7 +12,14 @@ class TextController extends Controller {
 	const FORM_PREFIX = 'text_';
 	const FORM_BUTTON_SEND = 'send';
 	const FORM_TEXT = 'text';
-	
+
+   /**
+    * Názvy parametrů modulu
+    */
+   const PARAM_IMAGES = 'images';
+   const PARAM_FILES = 'files';
+   const PARAM_THEME = 'theme';
+
 	/**
 	 * Kontroler pro zobrazení textu
 	 */
@@ -36,15 +43,20 @@ class TextController extends Controller {
 	 */
 	public function edittextController() {
 		$this->checkWritebleRights();
-//		Uživatelské soubory
-		$files = new UserFilesEplugin($this->getRights());
-		$files->setIdArticle($this->getModule()->getId());
-		$this->container()->addEplugin('files', $files);
 
-//		Uživatelské obrázky
-		$images = new UserImagesEplugin($this->getRights());
-		$images->setIdArticle($this->getModule()->getId());
-		$this->container()->addEplugin('images', $images);
+      if($this->getModule()->getParam(self::PARAM_FILES, true)){
+         // Uživatelské soubory
+         $files = new UserFilesEplugin($this->getRights());
+         $files->setIdArticle($this->getModule()->getId());
+         $this->container()->addEplugin('files', $files);
+      }
+
+      if($this->getModule()->getParam(self::PARAM_IMAGES, true)){
+         //	Uživatelské obrázky
+         $images = new UserImagesEplugin($this->getRights());
+         $images->setIdArticle($this->getModule()->getId());
+         $this->container()->addEplugin('images', $images);
+      }
 
       $form = new Form();
       $form->setPrefix(self::FORM_PREFIX);
@@ -57,11 +69,12 @@ class TextController extends Controller {
 
  //        Pokud byl odeslán formulář
       if($form->checkForm()){
-         if($text->saveEditText($form->getValue(self::FORM_TEXT))){
+         try {
+            $text->saveEditText($form->getValue(self::FORM_TEXT));
             $this->infoMsg()->addMessage(_('Text byl uložen'));
             $this->getLink()->action()->reload();
-         } else {
-            new CoreException(_('Text se nepodařilo uložit, chyba při ukládání.'), 1);
+         } catch (Exception $e) {
+            new CoreErrors($e);
          }
       }
 //    Data do šablony

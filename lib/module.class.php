@@ -37,18 +37,6 @@ class Module {
 	private $idModule;
 
 	/**
-	 * popis modulu (label)
-	 * @var string
-	 */
-	private $moduleLabel;
-
-	/**
-	 * alt modulu (alt)
-	 * @var string
-	 */
-	private $moduleAlt;
-
-	/**
 	 * pole s parametry modulu
 	 * ["název parametru"] => "hodnota"
 	 * @var array
@@ -227,22 +215,29 @@ class Module {
 	 *
 	 * @param String -- parametry
 	 */
-	function setParams($catParams)
-	{
-		if ($catParams != null){
-			$arrayValues = array();
-			$arrayValues = explode(self::MODULE_PARAMS_SEPARATOR, $catParams);
+   function setParams($catParams){
+      if ($catParams != null){
+         $arrayValues = array();
+         $arrayValues = explode(self::MODULE_PARAMS_SEPARATOR, $catParams);
 
-			foreach ($arrayValues as $value) {
-				$tmpArrayValue = explode("=", $value);
-                if(isset($tmpArrayValue[1]) AND $tmpArrayValue[1] != null){
-                    $this->params[$tmpArrayValue[0]]=$tmpArrayValue[1];
-                } else {
-                    $this->params[$tmpArrayValue[0]]=null;
-                }
-			}
-		}
-	}
+         foreach ($arrayValues as $value) {
+            $tmpArrayValue = explode("=", $value);
+            if(isset($tmpArrayValue[1]) AND $tmpArrayValue[1] != null){
+               if($tmpArrayValue[1] == 'true'){
+                  $this->params[$tmpArrayValue[0]]=true;
+               } else if($tmpArrayValue[1] == 'false'){
+                  $this->params[$tmpArrayValue[0]]=false;
+               } else if(ereg('^[0-9]*$', $tmpArrayValue[1])){
+                  $this->params[$tmpArrayValue[0]]=(int)$tmpArrayValue[1];
+               } else {
+                  $this->params[$tmpArrayValue[0]]=$tmpArrayValue[1];
+               }
+            } else {
+               $this->params[$tmpArrayValue[0]]=null;
+            }
+         }
+      }
+   }
 
 	/**
 	 * Metoda vraci parametry modulu
@@ -256,15 +251,16 @@ class Module {
 
 	/**
 	 * Metoda vraci hodnotu zvoleneho parametru modulu
-	 *
-	 * @return string -- parametr
+	 * @param string $param -- název parametru
+    * @param mixed $defaultValue -- výchozí parametr
+	 * @return string -- hodnota parametr
 	 */
-	function getParam($param)
+	function getParam($param, $defaultValue = null)
 	{
 		if(isset($this->params[$param])){
 			return $this->params[$param];
 		} else {
-			return null;
+			return $defaultValue;
 		}
 	}
 

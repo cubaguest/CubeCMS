@@ -138,14 +138,6 @@ class File {
     * @param integer $size -- velikost souboru
     */
    function __construct($file, $dir = null, $inputFile = null, $mimeType = null, $size = null){
-      if(AppCore::getModuleMessages() instanceof Messages){
-         $this->infomsg = AppCore::getModuleMessages();
-      }
-
-      if(AppCore::getModuleErrors() instanceof Messages){
-         $this->errmsg = AppCore::getModuleErrors();
-      }
-
       // Pokud je vložen objekt File
       if($file instanceof File){
          $this->fileDir = new Dir($file->getFileDir());
@@ -196,7 +188,7 @@ class File {
   * @return Messages -- objekt zpráv
   */
    final protected function infoMsg() {
-      return $this->infomsg;
+      return AppCore::getInfoMessages();
    }
 
  /**
@@ -204,7 +196,7 @@ class File {
   * @return Messages -- objekt zpráv
   */
    final protected function errMsg() {
-      return $this->errmsg;
+      return AppCore::getUserErrors();
    }
 
    /**
@@ -305,13 +297,23 @@ class File {
       $newFile = $this->creatUniqueName($dstDir);
       $this->fileNewName = $newFile;
 
-      if($this->exist()){
-         $return = copy($this->getNameInput(true), $dstDir.$newFile);
-         chmod($dstDir.$newFile, 0666);
-      } else {
-         $return = false;
+      try {
+         if(!$this->exist()){
+            throw new UnexpectedValueException(_('Soubor pro kopírování neexistuje'), 1);
+         }
+         if(!copy($this->getNameInput(true), $dstDir.$newFile)){
+            throw new UnexpectedValueException(_('Chyba při kopírování souboru').' "'
+               .$this->getNameInput(true).'" > "'.$dstDir.$newFile.'"', 2);
+         }
+         if(!chmod($dstDir.$newFile, 0666)){
+            throw new UnexpectedValueException(_('Chyba při úpravě práv souboru'), 3);
+         }
+         return true;
+      } catch (UnexpectedValueException $e) {
+         new CoreErrors($e);
+         return false;
       }
-		return $return;
+      return false;
    }
 
    /**

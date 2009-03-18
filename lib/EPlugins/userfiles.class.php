@@ -89,18 +89,6 @@ class UserFilesEplugin extends Eplugin {
 	private static $otherFilesArray = array();
 	
 	/**
-	 * Pole s popisky
-	 * @var array
-	 */
-	private $labelsArray = array();
-	
-	/**
-	 * Pole s id modulu (items)
-	 * @var array
-	 */
-	private $idItems = null;
-	
-	/**
 	 * ID šablony
 	 * @var integer
 	 */
@@ -123,17 +111,13 @@ class UserFilesEplugin extends Eplugin {
 	 * Metoda inicializace, je spuštěna pří vytvoření objektu  
 	 *
 	 */
-	protected function init(){
-	}
+	protected function init(){}
 	
 	/**
 	 * Metoda je spuštěna při načítání souborů
 	 *
 	 */
-	public function runOnlyEplugin() {
-		
-	}
-	
+	public function runOnlyEplugin($fileName, $fileParams = null) {}
 	
 	/**
 	 * Metoda nastaví id šablony pro výpis
@@ -149,11 +133,8 @@ class UserFilesEplugin extends Eplugin {
 	 */
 	public function setIdArticle($idArticle){
 		$this->idArticle = $idArticle;
-		
 		$this->checkSendFile();
-		
 		$this->checkDeleteFile();
-		
 		$this->getFilesFromDb();
 	}
 	
@@ -167,24 +148,23 @@ class UserFilesEplugin extends Eplugin {
 
       if($sendForm->checkForm()){
          $file = $sendForm->getValue(self::FORM_NEW_FILE);
+         try {
+            $file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/');
+            $sqlInsert = $this->getDb()->insert()->table(self::DB_TABLE_USER_FILES)
+               ->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
+                  self::COLUM_ID_USER, self::COLUM_FILE,
+                  self::COLUM_SIZE, self::COLUM_TIME)
+               ->values($this->idArticle, $this->getModule()->getId(),
+                  $this->getRights()->getAuth()->getUserId(), $file->getName(),
+                  $file->getFileSize(), time());
 
-         if($file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/')){
-            $sqlInsert = $this->getDb()->insert()->into(self::DB_TABLE_USER_FILES)
-								  ->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
-								  		   self::COLUM_ID_USER, self::COLUM_FILE,
-								  		   self::COLUM_SIZE, self::COLUM_TIME)
-								  ->values($this->idArticle, $this->getModule()->getId(),
-								  		   $this->getRights()->getAuth()->getUserId(), $file->getName(),
-								  		   $file->getFileSize(), time());
-
-            if($this->getDb()->query($sqlInsert)){
-               $this->infoMsg()->addMessage(_('Soubor byl uložen'));
-               $this->getLinks()->reload();
-            } else {
-               new CoreException(_('Soubor se nepodařilo uložit'),1);
-            }
+            $this->getDb()->query($sqlInsert);
+            $this->infoMsg()->addMessage(_('Soubor byl uložen'));
+            $this->getLinks()->reload();
+         } catch (Exception $e) {
+            $this->errMsg()->addMessage(_('Soubor se nepodařilo uložit'));
+            new CoreErrors ($e);
          }
-
       }
 	}
 	
@@ -195,28 +175,34 @@ class UserFilesEplugin extends Eplugin {
 	 */
 	private function deleteUserFile($id) {
 //		načtení informací o souboru 
-		$sqlSelect = $this->getDb()->select()->from(array('files'=>self::DB_TABLE_USER_FILES), self::COLUM_FILE)
-								   ->where(self::COLUM_ID.' = '.$id);
+		$sqlSelect = $this->getDb()->select()->table(self::DB_TABLE_USER_FILES, 'files')
+         ->colums(self::COLUM_FILE)
+			->where(self::COLUM_ID, $id);
 								   
 		$file = $this->getDb()->fetchObject($sqlSelect);
-		
-		if($file != null){
+      try {
+         if($file == null){
+            throw new RuntimeException(_('zadaný soubor již neexistuje'), 1);
+         }
          $dir = AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/';
-			$file = new File($file->{self::COLUM_FILE}, $dir);
-			
-//			vymazání z db
-			$sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_FILES)
-											  ->where(self::COLUM_ID.' = '.$id);
-			
-         if($file->remove() AND $this->getDb()->query($sqlDel)){
-				$this->infoMsg()->addMessage(_('Soubor byl smazán'));
-				$this->getLinks()->reload();								  
-			} else {
-				new CoreException(_('Soubor se nepodařilo vymazaz z adresáře nebo z db'));	
-			}
-		} else {
-			new CoreException(_('Zadaný soubor neexistuje'));
-		}
+         $file = new File($file->{self::COLUM_FILE}, $dir);
+         //	vymazání z db
+         $sqlDel = $this->getDb()->delete()->table(self::DB_TABLE_USER_FILES)
+            ->where(self::COLUM_ID, $id);
+
+         if(!$file->remove()){
+            throw new RuntimeException(_('Soubor se nepodařilo vymazat z filesystému'),2);
+         }
+         if(!$this->getDb()->query($sqlDel)){
+            throw new DBException(_('Soubor se nepodařilo smazat z databáze'), 3);
+         }
+         $this->infoMsg()->addMessage(_('Soubor byl smazán'));
+         $this->getLinks()->reload();
+      } catch (RuntimeException $e) {
+         new CoreErrors($e);
+      } catch (DBException $e){
+         new CoreErrors($e);
+      }
 	}
 
    /**
@@ -258,93 +244,42 @@ class UserFilesEplugin extends Eplugin {
       if($form->checkForm()){
          $this->deleteUserFile($form->getValue(self::FORM_USERFILE_ID));
       }
-
-//		if(isset($_POST[self::FORM_PREFIX.self::FORM_BUTTON_DELETE])){
-//			if(!is_numeric($_POST[self::FORM_PREFIX.self::FORM_USERFILE_ID])){
-//				new CoreException(_('Nebylo zadáno správné ID souboru'));
-//			} else {
-//				$this->deleteUserFile(htmlspecialchars($_POST[self::FORM_PREFIX.self::FORM_USERFILE_ID]));
-//			}
-//		}
 	}
-	
-	
-	/**
-	 * Metoda vrací objekt změny s načtenými změnami u zadaných id článků
-	 * @param mixed -- array nebo integer s id článku (popřípadě podpole s id item a id článků)
-	 * @return Changes -- vrací objekt Changes (tedy sebe)
-	 */
-//	public function getChanges($idArticles = null, $idItems = null) {
-//		$this->idArticle = $idArticles;
-//		$this->idItems = $idItems;
-//		
-//		$this->getDataFromDb();
-//	
-////		return $this->changesArray;
-//		return $this;
-//	}
-	
-	/**
-	 * Metoda uloží změnu do db
-	 * @param string -- popis změny
-	 * @param integer -- id článku u kterého byla změna provedena
-	 * @param integer -- (option) id item u ktré byla změna provedena
-	 */
-//	public function createChange($label, $idArticle, $idItem = null) {
-//		$sqlInser = $this->getDb()->insert()->into(self::DB_TABLE_CHANGES);
-//		
-//		if($idItem == null){
-//			$sqlInser = $sqlInser->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM, self::COLUM_ID_USER, self::COLUM_LABEL, self::COLUM_TIME)
-//								->values($idArticle, $this->getModule()->getId(), $this->getRights()->getAuth()->getUserId(), $label, time());
-//		
-//		} else {
-//			$sqlInser = $sqlInser->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM, self::COLUM_ID_USER, self::COLUM_LABEL, self::COLUM_TIME)
-//								->values($idArticle, $idItem, $this->getRights()->getAuth()->getUserId(), $label, time());
-//		}
-//		
-////		vložení záznamu
-//		$this->getDb()->query($sqlInser);
-//	}
 	
 	/**
 	 * Metoda načte data z db
 	 */
 	private function getFilesFromDb() {
-		$sqlSelect = $this->getDb()->select()->from(array('files'=>self::DB_TABLE_USER_FILES), array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
+		$sqlSelect = $this->getDb()->select()
+      ->table(self::DB_TABLE_USER_FILES, 'files')
+      ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
 		
-//		echo "<pre>";
-//		print_r($this->idArticle);									 
-//		echo "</pre>";									 
-											 
 		if(is_string($this->idArticle) OR is_numeric($this->idArticle)){
-			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$this->idArticle)
-								   ->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
+			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE, $this->idArticle)
+								   ->where(self::COLUM_ID_ITEM, $this->getModule()->getId());
 		} else if(is_array($this->idArticle) AND !empty($this->idArticle)){
 			foreach ($this->idArticle as $id => $itemId){
 				//Pokud je zadáno asociativní pole bez id items
 				if(is_string($itemId) OR is_numeric($itemId)){
-					$sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE." = ".$itemId." AND ".self::COLUM_ID_ITEM." = ".$this->getModule()->getId(), "OR");
+					$sqlSelect->where(self::COLUM_ID_ARTICLE,$itemId)
+               ->where(self::COLUM_ID_ITEM, $this->getModule()->getId(), Db::COND_OPERATOR_OR);
 				} else if(is_array($itemId) AND !empty($itemId)){
-					$whereString = self::COLUM_ID_ITEM." = ".$id." AND (";
-					foreach ($itemId as $idArticle) {
-						$whereString.= self::COLUM_ID_ARTICLE." = ".$idArticle." OR ";
-					}
-					$whereString = substr($whereString, 0, strlen($whereString)-4).")";
-					$sqlSelect = $sqlSelect->where($whereString, "OR");
+               // REFACTORING
+//					$whereString = self::COLUM_ID_ITEM." = ".$id." AND (";
+//					foreach ($itemId as $idArticle) {
+//						$whereString.= self::COLUM_ID_ARTICLE, $idArticle, " OR ";
+//					}
+//					$whereString = substr($whereString, 0, strlen($whereString)-4).")";
+//               $sqlSelect = $sqlSelect->where($whereString, Db::COND_OPERATOR_OR);
 				} else if($itemId == null){
-					$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM." = ".$id, "OR");
+					$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM, $id, Db::COND_OPERATOR_OR);
 				}
 			}
-					
 		} else if (empty($this->idArticle)){
-			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM." = ".$this->getModule()->getId());
+			$sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM, $this->getModule()->getId());
 		}
-											 
-		$sqlSelect = $sqlSelect->order(self::COLUM_TIME, "DESC");
-		
-//		echo $sqlSelect;
-		
-		$this->filesArray = $this->getDb()->fetchAssoc($sqlSelect);
+      $sqlSelect = $sqlSelect->order(self::COLUM_TIME, Db::ORDER_DESC);
+		$this->filesArray = $this->getDb()->fetchAll($sqlSelect);
 		$this->getDb()->getNumRows() != null ? $this->numberOfReturnRows = $this->getDb()->getNumRows() : $this->numberOfReturnRows = 0;
 				
 		if ($this->filesArray != null) {
@@ -354,21 +289,7 @@ class UserFilesEplugin extends Eplugin {
 				$this->filesArray[$key][self::COLUM_LINK_TO_DOWNLOAD] = $this->getLinks()->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
 			}
 		}
-//		$links->getMainWebDir()."/".ENGINE_DOWNLOAD_FILE."?url=".MAIN_USER_FILES_DIR."&amp;file=");
-		
-//		echo "<pre>";
-//		print_r($this->filesArray);									 
-//		echo "</pre>";	
 	}
-	
-//	/**
-//	 * Metoda nastavuje id článku
-//	 * @param integer -- id článku
-//	 */
-//	public function setIdArticle($idArticle) {
-//		$this->idArticle = $idArticle;
-//	}
-	
 	
 	/**
 	 * Metoda obstarává přiřazení proměných do šablony
@@ -393,14 +314,8 @@ class UserFilesEplugin extends Eplugin {
 //		}
 		
 		$this->toTplJSPlugin(new SubmitForm());
-		
 		self::$otherFilesArray[$this->idUserFiles] = $this->filesArray;
-		
 		$this->toTpl("USERFILES_ARRAY",self::$otherFilesArray);
-		
-
-		
 	}
-
 }
 ?>

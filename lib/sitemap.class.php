@@ -67,7 +67,7 @@ class SiteMap {
 	 */
 	function __construct(Links $link, $changefreq = self::SITEMAP_SITE_CHANGE_YEARLY, $priority = 0.5) {
       $this->link = $link;
-		
+
 		$this->changeFreq = $changefreq;
 		$this->priority = $priority;
 	}
@@ -96,7 +96,7 @@ class SiteMap {
       }
 
       if($lastChange != null){
-         $date = new DateTime(date(DATE_ISO8601,$lastChange));
+         $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
          $lastChange = $date->format(DATE_ISO8601);
       }
 		
@@ -106,9 +106,7 @@ class SiteMap {
 		if($priority == null){
 			$priority = $this->priority;
 		}
-      // mezi čísly má být tečka, né čárka
-      $priority = str_replace(',', '.', $priority);
-
+      
    	array_push(self::$items, array('loc' => (string)$url,
 									   'lastmod' => $lastChange,
 									   'changefreq' => $frequency,
@@ -119,8 +117,9 @@ class SiteMap {
 	 * Metoda přidává položku kategorie do siteampy
 	 *
 	 * @param integer -- čas poslední změny (timestamp)
+    * @param float -- (option) o kolik se má snížit priorita článků
 	 */
-   public function addCategoryItem($lastChange) {
+   public function addCategoryItem($lastChange, $priorityForArticleDown = 0.1) {
       // pokud je datum v budoucnosti nastavím aktuální
       if($lastChange > time()){
          $lastChange = time();
@@ -129,13 +128,12 @@ class SiteMap {
       $date = new DateTime(date(DATE_ISO8601,$lastChange));
       $lastChange = $date->format(DATE_ISO8601);
 
-      // mezi čísly má být tečka, né čárka
-      $priority = str_replace(',', '.', $this->priority);
-
       array_push(self::$items, array('loc' => (string)$this->getLink(),
 									   'lastmod' => $lastChange,
 									   'changefreq' => $this->changeFreq,
 									   'priority'=>$this->priority));
+
+      $this->priority = $this->priority-$priorityForArticleDown;
    }
 
 	/**
@@ -181,11 +179,15 @@ class SiteMap {
 			echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 			foreach (self::$items as $i)
 			{
-				echo '<url>';
+				echo '<url>'."\n";
 				foreach ($i as $index => $_i)
 				{
 					if (!$_i) continue;
-					echo "<$index>" . self::codeXML((string)$_i) . "</$index>\n";
+               // float čísla s tečkou a stejnou přesností
+               if(is_float($_i)){
+                  $_i = sprintf("%1.4F", $_i);
+               }
+               echo "<$index>" . self::codeXML(trim((string)$_i)) . "</$index>\n";
 				}
 				echo "</url>\n";
 			}

@@ -1,12 +1,13 @@
 <?php
 /**
- * Abstraktní třída pro výběr záznamů z db.
- * Třída zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
+ * Rozhraní pro výběr záznamů z db.
+ * Rozhraní zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
  * databázových konektorů.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: select.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.2 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro výběr záznamů z db
  */
 
@@ -59,12 +60,12 @@ interface Db_Select{
 	/**
 	 * Metoda přiřadí řazení sloupcu v SQL dotazu
 	 *
-	 * @param string -- sloupec, podle kterého se má řadit
-	 * @param string -- (option) jak se má sloupec řadit (ASC, DESC) (default: ASC)
+    * @param string -- sloupec, podle kterého se má řadit
+    * @param integer -- (option) jak se má sloupec řadit konstanta Db::ORDER_XXX (default: ASC)
 	 * 
 	 * @return Db_Select -- objekt Db_Select
 	 */
-	public function order($colum, $order = self::SQL_ASC);
+	public function order($colum, $order = Db::ORDER_ASC);
 	
 	/**
 	 * Metoda přiřadí slouření sloupců v SQL dotazu pomocí klauzule GROUP BY

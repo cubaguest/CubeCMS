@@ -77,6 +77,11 @@ class UrlRequest {
       */
    const URL_SEPARATOR = '/';
 
+   /**
+    * Název konstanty pro specialní stránku hledání
+    */
+   const SPECIAL_PAGE_SEARCH = 'search';
+
      /**
       * Obsahuje typ media
       * @var array
@@ -166,6 +171,19 @@ class UrlRequest {
    private static $supporteServicesParams = null;
 
    /**
+    * Regulerni vyrazy pro vyhodnocování specielních stránek (search, sitemap,
+    * atd.), které jsou nezávislé na kategoriích
+    */
+   private static $specialPagesRegex = array(self::SPECIAL_PAGE_SEARCH => '^\?search=([^&]*)&?p?a?g?e?=?([0-9]*)?$',
+                                             'sitemap' => '^\?sitemap.html$');
+   
+   /**
+    * Název specialní stránky
+    * @var string
+    */
+   private static $specialPageName = null;
+
+   /**
     * Konstruktor
     */
    public function  __construct(Action $action, Routes $routes) {
@@ -178,11 +196,12 @@ class UrlRequest {
       * Metoda inicializuje požadavky v URL
       */
    public static function factory() {
-//      echo $_SERVER['REQUEST_URI'];
       //		Vytvoření url
       self::createUrl();
       //		Parsování url
-      if(self::checkNormalUrl()){
+      if(self::checkSpecialUrl()){
+         self::parseSpecialUrl();
+      } else if(self::checkNormalUrl()){
          self::parseUrl();
       } else {
          self::parseUrlForsupportedServices();
@@ -207,9 +226,21 @@ class UrlRequest {
       return true;
    }
 
-     /**
-      * Metoda parsuje celou url do pole s jednotlivými proměnými
-      */
+   /**
+    * Metoda zkontroluje jesli se nejedná o specialní URl obsažené v enginu
+    */
+   private static function checkSpecialUrl() {
+      foreach (self::$specialPagesRegex as $regex) {
+         if(ereg($regex, self::$currentUrl)){
+            return true;
+         }
+      }
+      return false;
+   }
+
+   /**
+    * Metoda parsuje celou url do pole s jednotlivými proměnými
+    */
    private static function parseUrl() {
       //		Rozdělíme řetězec podle separátorů
       $urlItems = $urlItemsBack = array();
@@ -220,17 +251,24 @@ class UrlRequest {
       $urlItems = $urlItemsBack = explode(URL_SEPARATOR, $url);
 
       reset($urlItems); // reset pole aby bylo na začátku
+      $isCategory = $lang = false;
 
       //		Kontrola jestli je zadán jazyk
       if(Links::checkLangUrlRequest(pos($urlItems))){
+         $lang = true;
          unset ($urlItems[key($urlItems)]);
       }
 
       //		Kontrola jestli je zadána kategorie
-      $isCategory = false;
       if(Links::checkCategoryUrlRequest(pos($urlItems))){
          $isCategory = true;
          unset ($urlItems[key($urlItems)]);
+      }
+
+      // zjištění, jestli je nějáká kategorie nebo se jedná o neexistující stránku
+      if(!$lang AND !$isCategory AND $urlItemsBack[0] != null){
+         AppCore::setErrorPage(); // zapnem Chybovou stránku
+         return false;
       }
 
       //  Kontrola předání cesty pokud je definována
@@ -262,10 +300,7 @@ class UrlRequest {
       if(isset($urlItems) AND pos($urlItems) != null){
          Links::chackOtherUrlParams($urlItems);
       }
-      // zjištění, jestli je nějáká kategorie nebo se jedná o neexistující stránku
-      if(!$isCategory AND $urlItemsBack[0] != null){
-         AppCore::setErrorPage(); // zapnem Chybovou stránku
-      }
+
    }
 
    /**
@@ -281,12 +316,11 @@ class UrlRequest {
       $regexResult = array();
       switch (self::$supportedServicesType) {
          case self::SUPPORTSERVICES_EPLUGIN_NAME:
-            ereg('^eplugin([^\./]*)/([^\.]*\..{1,5})\?(.*)$', $url, $regexResult);
+//            ereg('^eplugin([^\.]*)\.js\?(.*)$', $url, $regexResult);
+            ereg('^eplugin([^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
             $name = $regexResult[1];
             $file = $regexResult[2];
-            if(isset ($regexResult[3])){
-               $params = $regexResult[3];
-            }
+            $params = $regexResult[3];
             break;
          case self::SUPPORTSERVICES_JSPLUGIN_NAME:
             ereg('^jsplugin([^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
@@ -305,6 +339,17 @@ class UrlRequest {
       self::$supporteServicesName = $name;
       self::$supporteServicesFile = $file;
       self::$supporteServicesParams = $params;
+   }
+
+   /**
+    * Metoda parsuje specialní url
+    */
+   private static function parseSpecialUrl() {
+      $regexArr = array();
+      if(ereg(self::$specialPagesRegex[self::SPECIAL_PAGE_SEARCH], self::$currentUrl, $regexArr)){
+         self::$specialPageName = self::SPECIAL_PAGE_SEARCH;
+         Search::factory($regexArr[1], $regexArr[2]);
+      }
    }
 
      /**
@@ -419,6 +464,25 @@ class UrlRequest {
        */
       public static function getSupportedServicesParams() {
          return self::$supporteServicesParams;
+      }
+
+      /**
+       * Metoda vrací pokud je nastavena SpecialPage
+       * @return bool true pokud se zpracovává
+       */
+      public static function isSpecialPage() {
+         if(self::$specialPageName == null){
+            return false;
+         }
+         return true;
+      }
+
+      /**
+       * Metoda vrací název speciální stránky
+       * @return string -- konstanta SPECIAL_PAGE_XXX
+       */
+      public static function getSpecialPage() {
+         return self::$specialPageName;
       }
 
      /**

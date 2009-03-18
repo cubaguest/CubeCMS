@@ -1,14 +1,14 @@
 <?php
 /**
- * Abstraktní třída pro mazání záznamů z db.
- * Třída zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
- * databázových konektorů.
+ * Rozhraní pro odstraňování záznamů z db.
+ * Rozhraní pro tvorbu třídy k mazání odstraňování z databáze. Implementuje metodu
+ * delete z rozhraní Db_Interface
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
  * @version    	$Id: $ VVE3.9.2 $Revision: $
  * @author			$Author: $ $Date:$
  *						$LastChangedBy: $ $LastChangedDate: $
- * @abstract 		Třída pro mazání záznamů z db
+ * @abstract 		Rozhraní pro odstraňování záznamů z db
  */
 
 interface Db_Delete {
@@ -16,7 +16,8 @@ interface Db_Delete {
 	 * Metoda nastavuje z které tabulky se bude mazat
 	 * klauzule FROM
 	 *
-	 * @param string -- název tabulky ze které se bude vymazávat
+	 * @param string -- tabulka pro použití
+	 * @param boolean -- (option) jestli se májí tabulky zamknout
 	 * 
 	 * @return Db_Delete -- objekt Db_Delete
 	 */
@@ -38,8 +39,8 @@ interface Db_Delete {
 	/**
 	 * Metoda přiřadí řazení sloupcu v SQL dotazu
 	 *
-	 * @param string -- sloupec, podle kterého se má řadit
-	 * @param string -- (option) jak se má sloupec řadit (ASC, DESC) (default: ASC)
+    * @param string -- sloupec, podle kterého se má řadit
+    * @param integer -- (option) jak se má sloupec řadit konstanta Db::ORDER_XXX (default: ASC)
 	 * 
 	 * @return Db_Delete -- objekt Db_Delete
 	 */

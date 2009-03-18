@@ -29,19 +29,31 @@ class TextView extends View {
 		$this->template()->addVar('BUTTON_RESET', _('Obnovit'));
 		$this->template()->setTplSubLabel(_('Úprava textu'));
 		
+		$tinymce = new TinyMce();
+      if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'simple'){
+         $tinymce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+         if($this->getModule()->getParam(TextController::PARAM_IMAGES, true)){
+            $tinymce->addImagesIcon();
+         }
+      } else if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'full'){
+         $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
+      }
+      
 		//NOTE soubory
-		$this->template()->addTpl($this->container()->getEplugin('files')->getTpl(), true);
-		$this->container()->getEplugin('files')->assignToTpl($this->template());
+      if($this->getModule()->getParam(TextController::PARAM_FILES, true)){
+         $this->template()->addTpl($this->container()->getEplugin('files')->getTpl(), true);
+         $this->container()->getEplugin('files')->assignToTpl($this->template());
+      }
 
 		//NOTE obrázky
-		$eplImages = $this->container()->getEplugin('images');
-		$this->template()->addTpl($eplImages->getTpl(), true);
-		$eplImages->assignToTpl($this->template());
-		
-		$tinymce = new TinyMce();
-//		$tinymce->setTheme(TinyMce::TINY_THEME_SIMPLE);
-		$tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
-		$this->template()->addJsPlugin($tinymce);
+      if($this->getModule()->getParam(TextController::PARAM_IMAGES, true)){
+         $eplImages = $this->container()->getEplugin('images');
+         $this->template()->addTpl($eplImages->getTpl(), true);
+         $eplImages->assignToTpl($this->template());
+         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
+      }
+
+      $this->template()->addJsPlugin($tinymce);
 
       $jquery = new JQuery();
       $jquery->addWidgentTabs();
