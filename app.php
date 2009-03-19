@@ -16,169 +16,146 @@
 class AppCore {
     /**
      * Výchozí cestak enginu
-     * @var string
      */
    const MAIN_ENGINE_PATH = './';
 
     /**
      * Obsahuje hlavní soubor aplikace
-     * @var string
      */
    const APP_MAIN_FILE = 'index.php';
 
     /**
      * Název konfiguračního souboru
-     * @var string
      */
    const MAIN_CONFIG_FILE = "config.xml";
 
     /**
      * Název sekce v konf. souboru s konfigurací databáze
-     * @var string
      */
    const MAIN_CONFIG_DB_SECTION = "db";
 
     /**
      * Konstanta s adresářem s moduly
-     * @var string
      */
    const MODULES_DIR = "modules";
 
     /**
      * Adresář s engine-pluginy
-     * @var string
      */
    const ENGINE_EPLUINS_DIR = 'EPlugins';
 
     /**
      * Adresář s JS-pluginy
-     * @var string
      */
    const ENGINE_JSPLUINS_DIR = 'JsPlugins';
 
     /**
      * Adresář s helpery
-     * @var string
      */
    const ENGINE_HELPERS_DIR = 'helpers';
+
     /**
-     *
      * Adresář s validátory
-     * @var string
      */
    const ENGINE_VALIDATORS_DIR = 'Validators';
 
     /**
      * Adresář s Modely enginu
-     * @var string
      */
    const ENGINE_MODELS_DIR = 'models';
 
     /**
      * Adresář s pluginy filesystému
-     * @var string
      */
    const ENGINE_FILESYSTEM_DIR = 'Filesystem';
 
     /**
      * Adresář s ostatními pluginy
-     * @var string
      */
    const ENGINE_PLUGINS_DIR = 'Plugins';
 
     /**
      * Kešovací adresář pro dočasné soubory
-     * @var string
      */
    const ENGINE_CACHE_DIR = 'cache';
 
     /**
      * Konstanta s adresářem s šablonami systému
-     * @var string
      */
    const TEMPLATES_DIR = "templates";
 
     /**
      * Konstanta s adresářem s obrázky šablony
-     * @var string
      */
    const TEMPLATES_IMAGES_DIR = "images";
 
     /**
      * Konstanta s názvem adresáře se styly
-     * @var string
      */
    const TEMPLATES_STYLESHEETS_DIR = 'stylesheets';
 
     /**
      * Konstanta s názvem adresáře se specielními soubory (helpy, atd)
-     * @var string
      */
    const SPECIALITEMS_DIR = 'specialitems';
 
     /**
      * prefix názvu sloupců s tabulkami u modulu (dbtable1, dbtable2, atd.)
-     * @var string
      */
    const MODULE_DBTABLES_PREFIX = "dbtable";
 
     /**
      * Sufix pro metody kontroleru
-     * @var string
      */
    const MODULE_CONTROLLER_SUFIX = 'Controller';
 
     /**
      * Sufix pro metody viewru
-     * @var string
      */
    const MODULE_VIEWER_SUFIX = 'View';
 
     /**
      * Hlavní kontroler modulu - prefix
-     * @var string
      */
    const MODULE_MAIN_CONTROLLER_PREFIX = 'Main';
 
     /**
      * Sufix názvu třídy panelů
-     * @var string
      */
    const MODULE_PANEL_CLASS_SUFIX = 'Panel';
 
     /**
      * Název kontroleru panelu
-     * @var string
      */
    const MODULE_PANEL_CONTROLLER = 'panelController';
 
     /**
      * Název viewru panelu
-     * @var string
      */
    const MODULE_PANEL_VIEWER = 'panelView';
 
     /**
      * Název třídy pro sitemapu -- sufix
-     * @var string
      */
    const MODULE_SITEMAP_SUFIX_CLASS = 'SiteMap';
 
+   /**
+    * Název třídy pro hledání search -- sufix
+    */
+   const MODULE_SEARCH_SUFIX_CLASS = 'Search';
+
     /**
      * Parametr v url, kterým se přenáší typ média pro zobrazení
-     * @var string
      */
    const MEDIA_URL_PARAM_TYPE = 'media';
 
     /**
      * Konstanta s názvem adresáře se vzhledy
-     * @var string
      */
    const FACES_DIR = 'faces';
 
     /**
      * Konstanta obsahuje výchozí název vzhledu (face)
-     * @var string
      */
    const FACE_DEFAULT_NAME = 'default';
 
@@ -1367,7 +1344,39 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
    public function runSearchPage() {
       $searchM = new SearchModel();
 
-      $searchM->getModules();
+      $modules = $searchM->getModules();
+
+      if($modules != null){
+         foreach ($modules as $itemIndex => $item) {
+            //				Vytvoření objektu pro práci s modulem
+            $module = new Module($item, $this->getModuleTables($item));
+            AppCore::setSelectedModule($module);
+
+            $moduleName = ucfirst($module->getName());
+            $moduleClass = $moduleName.self::MODULE_SEARCH_SUFIX_CLASS;
+            //				Pokud existuje soubor tak jej načteme
+            if(file_exists($module->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php')){
+               include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php');
+               if(class_exists($moduleClass)){
+                  $sitemap = new $moduleClass($link, $item->{SitemapModel::COLUMN_SITEMAP_FREQUENCY},
+                     (float)$item->{SitemapModel::COLUMN_SITEMAP_PRIORITY});
+
+                  // spuštění sitemapy
+                  $sitemap->runSearch();
+                  unset($sitemap);
+               }
+            } else {
+               //throw new Exception(_('Chybí soubor pro zpracování sitemapy'));
+            }
+
+            // vyprázdnění modulu
+            AppCore::setSelectedModule();
+         }
+         //			Vygenerování mapy
+         //			Podle vyhledávače
+//         SiteMap::generateMap(UrlRequest::getSupportedServicesName());
+//         exit ();
+      }
    }
 
     /**

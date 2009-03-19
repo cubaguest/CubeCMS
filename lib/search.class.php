@@ -24,6 +24,18 @@ class Search {
    private static $searchPage = 1;
 
    /**
+    * Pole s výsledky hledání
+    * @var array
+    */
+   private static $searchResults = array();
+
+   /**
+    * Metoda proo hledání v modulu
+    */
+   public function runSearch(){}
+
+
+   /**
     * Factore metoda pro nasatvení parametrů hledacího modulu
     * @param string $searchString -- hledaný řetězec
     * @param int $page -- číslo stránky
