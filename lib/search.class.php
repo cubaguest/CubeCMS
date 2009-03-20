@@ -12,6 +12,12 @@
  */
 class Search {
    /**
+    * Pole s itemy, kde je modul použit
+    * @var array 
+    */
+   private $itemsArray = array();
+
+   /**
     * Řetězec, který se hledá
     * @var string
     */
@@ -30,9 +36,32 @@ class Search {
    private static $searchResults = array();
 
    /**
+    * Konstruktor
+    */
+   public function  __construct($itemsArray) {
+      $this->itemsArray = $itemsArray;
+   }
+
+   /**
     * Metoda proo hledání v modulu
     */
    public function runSearch(){}
+
+   /**
+    * Metoda vrací db konektor
+    * @return Db_Interface
+    */
+   public function getDb() {
+      return AppCore::getDbConnector();
+   }
+
+   /**
+    * Metoda vrací objekt modulu a jeho aprametrů
+    * @return Module -- objekt modulu
+    */
+   public function getModule() {
+      return AppCore::getSelectedModule();
+   }
 
 
    /**
@@ -51,6 +80,14 @@ class Search {
     */
    public static function setSearchString($string){
       self::$searchString = addslashes($string);
+   }
+
+   /**
+    * Metoda vrací pole s výsledky hledání
+    * @return array
+    */
+   public static function getResults() {
+      return self::$searchResults;
    }
 }
 ?>

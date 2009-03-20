@@ -72,9 +72,11 @@ class Module {
 		$this->setDbTables($dbTables);
 		$this->setDataDir($moduleObject->datadir);
       $this->setParams($moduleObject->params);
-		$this->setLabel($moduleObject->label);
-		$this->setAlt($moduleObject->alt);
-//		$this->setRecordsOnPage($moduleObject->scroll);
+      // nemusí být vždy zadán
+      if(isset ($moduleObject->label)){
+         $this->setLabel($moduleObject->label);
+         $this->setAlt($moduleObject->alt);
+      }
 	}
 
 	/**
@@ -90,8 +92,7 @@ class Module {
 	 *
 	 * @param integer -- id modulu (item)
 	 */
-	function setId($id)
-	{
+	function setId($id){
 		$this->id = $id;
 	}
 
@@ -100,8 +101,7 @@ class Module {
 	 *
 	 * @return integer -- id modulu (item)
 	 */
-	function getId()
-	{
+	function getId(){
 		return $this->id;
 	}
 
@@ -110,8 +110,7 @@ class Module {
 	 *
 	 * @param integer -- id modulu
 	 */
-	function setIdModule($idModule)
-	{
+	function setIdModule($idModule){
 		$this->idModule = $idModule;
 	}
 
@@ -120,8 +119,7 @@ class Module {
 	 *
 	 * @return integer -- id modulu
 	 */
-	function getIdModule()
-	{
+	function getIdModule(){
 		return $this->idModule;
 	}
 
@@ -130,8 +128,7 @@ class Module {
 	 *
 	 * @param String -- jmeno modulu
 	 */
-	function setName($moduleName)
-	{
+	function setName($moduleName){
 		$this->moduleName = $moduleName;
 	}
 
@@ -140,8 +137,7 @@ class Module {
 	 *
 	 * @return String -- jmeno modulu
 	 */
-	function getName()
-	{
+	function getName(){
 		return $this->moduleName;
 	}
 
@@ -150,8 +146,7 @@ class Module {
 	 *
 	 * @param String -- nazev modulu
 	 */
-	function setLabel($moduleLable)
-	{
+	function setLabel($moduleLable){
 		$this->label = $moduleLable;
 	}
 
@@ -160,8 +155,7 @@ class Module {
 	 *
 	 * @return String -- nazev modulu
 	 */
-	function getLabel()
-	{
+	function getLabel(){
 		return $this->label;
 	}
 
@@ -170,8 +164,7 @@ class Module {
 	 *
 	 * @param String -- popis modulu
 	 */
-	function setAlt($moduleAlt)
-	{
+	function setAlt($moduleAlt){
 		$this->alt = $moduleAlt;
 	}
 
@@ -180,8 +173,7 @@ class Module {
 	 *
 	 * @return String -- popis modulu
 	 */
-	function getAlt()
-	{
+	function getAlt(){
 		return $this->alt;
 	}
 
@@ -190,8 +182,7 @@ class Module {
 	 *
 	 * @param String -- jmeno adresare
 	 */
-	function setDataDir($dir)
-	{
+	function setDataDir($dir){
 		$this->dataDir = $dir;
 	}
 
@@ -201,8 +192,7 @@ class Module {
 	 * @param integer -- cislo tabulky
 	 * @return String -- jmeno adresare
 	 */
-	function getDbTable($tableNum = 1)
-	{
+	function getDbTable($tableNum = 1){
 		if(isset($this->dbTables[$tableNum])){
 			return $this->dbTables[$tableNum];
 		} else {
@@ -244,8 +234,7 @@ class Module {
 	 *
 	 * @return Array -- parametry
 	 */
-	function getParams()
-	{
+	function getParams(){
 		return $this->params;
 	}
 
@@ -255,8 +244,7 @@ class Module {
     * @param mixed $defaultValue -- výchozí parametr
 	 * @return string -- hodnota parametr
 	 */
-	function getParam($param, $defaultValue = null)
-	{
+	function getParam($param, $defaultValue = null){
 		if(isset($this->params[$param])){
 			return $this->params[$param];
 		} else {

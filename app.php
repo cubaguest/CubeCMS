@@ -1343,8 +1343,8 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
     */
    public function runSearchPage() {
       $searchM = new SearchModel();
-
       $modules = $searchM->getModules();
+      $itemsArray = $searchM->getItems();
 
       if($modules != null){
          foreach ($modules as $itemIndex => $item) {
@@ -1358,24 +1358,18 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
             if(file_exists($module->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php')){
                include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php');
                if(class_exists($moduleClass)){
-                  $sitemap = new $moduleClass($link, $item->{SitemapModel::COLUMN_SITEMAP_FREQUENCY},
-                     (float)$item->{SitemapModel::COLUMN_SITEMAP_PRIORITY});
+                  $sitemap = new $moduleClass($itemsArray[$module->getIdModule()]);
 
-                  // spuštění sitemapy
+                  // spuštění hledání v modulu
                   $sitemap->runSearch();
                   unset($sitemap);
                }
-            } else {
-               //throw new Exception(_('Chybí soubor pro zpracování sitemapy'));
             }
-
             // vyprázdnění modulu
             AppCore::setSelectedModule();
          }
-         //			Vygenerování mapy
-         //			Podle vyhledávače
-//         SiteMap::generateMap(UrlRequest::getSupportedServicesName());
-//         exit ();
+         $this->coreTpl->addVar('SEARCH_RESULTS', Search::getResults());
+         $this->coreTpl->addVar('NOT_ANY_SEARCH_RESULT',_('Žádná položka nebyla nalezena'));
       }
    }
 

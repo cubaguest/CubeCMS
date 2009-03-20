@@ -132,33 +132,40 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @param string -- sql dotaz
 	 */
 	public function query($sqlQuery) {
-		$this->_connect();
-		$this->_setDefault();
+      if($sqlQuery != $this->_previousSqlQuery){
+         $this->_previousSqlQuery = $sqlQuery;
 
-		Db::addQueryCount();
-		$result = $this->_mysqliObject->query($sqlQuery);
+         $this->_connect();
+         $this->_setDefault();
 
-      try {
-         if(!$result){
-            throw new DBException('('.$this->_mysqliObject->errno.') '.$this->_mysqliObject->error
-               ._(' v dotazu ').$sqlQuery, 104);
+         Db::addQueryCount();
+         $result = $this->_mysqliObject->query($sqlQuery);
+
+         try {
+            if(!$result){
+               throw new DBException('('.$this->_mysqliObject->errno.') '.$this->_mysqliObject->error
+                  ._(' v dotazu ').$sqlQuery, 104);
+            }
+
+            $queryType = strtolower(substr($sqlQuery, 0, 6));
+            if ($queryType == "select"){
+               $this->_numberOfReturnRows=$result->num_rows;
+            } else if($queryType == "insert"){
+               $this->_lastInsertedId=$this->_mysqliObject->insert_id;
+               $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
+            } else if($queryType == "delete"){
+               $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
+            } else if($queryType == "update"){
+               $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
+            }
+         } catch (DBException $e) {
+            new CoreErrors($e);
          }
-
-         $queryType = strtolower(substr($sqlQuery, 0, 6));
-         if ($queryType == "select"){
-            $this->_numberOfReturnRows=$result->num_rows;
-         } else if($queryType == "insert"){
-            $this->_lastInsertedId=$this->_mysqliObject->insert_id;
-            $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
-         } else if($queryType == "delete"){
-            $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
-         } else if($queryType == "update"){
-            $this->_numberOfAfectedRows = $this->_mysqliObject->affected_rows;
-         }
-      } catch (DBException $e) {
-         new CoreErrors($e);
+         $this->_previousResult = $result;
+         return $result;
+      } else {
+         return $this->_previousResult;
       }
-		return $result;
 	}
 
 	/**
@@ -264,20 +271,18 @@ class MySQLiDb extends Db implements DbInterface {
     * nebo false při prázdném výsledku
 	 */
 	public function fetchAll($sqlQuery) {
-		if($sqlQuery != $this->_previousSqlQuery){
-         $this->_previousResult = $this->query($sqlQuery);
-      }
+      $result = $this->query($sqlQuery);
 
-		if($this->_previousResult){
-			$resultArray = array();
-            while ($sqlData=$this->_previousResult->fetch_assoc()) {
-					array_push($resultArray, $sqlData);
-				}
-//          $this->fetch($sqlQuery, MYSQLI_ASSOC); METODA V PHP 5.3.0
-			return $resultArray;
-		} else {
-			return false;
-		}
+      if($result){
+         $resultArray = array();
+         while ($sqlData=$result->fetch_assoc()) {
+            array_push($resultArray, $sqlData);
+         }
+         //          $this->fetch($sqlQuery, MYSQLI_ASSOC); METODA V PHP 5.3.0
+         return $resultArray;
+      } else {
+         return false;
+      }
 	}
 
 	/**
@@ -287,12 +292,10 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
 	 */
 	public function fetchAssoc($sqlQuery) {
-		if($sqlQuery != $this->_previousSqlQuery){
-         $this->_previousResult = $this->query($sqlQuery);
-      }
+      $result = $this->query($sqlQuery);
 
-		if($this->_previousResult){
-			return $this->_previousResult->fetch_assoc();
+		if($result){
+			return $result->fetch_assoc();
 		} else {
 			return false;
 		}
@@ -305,19 +308,17 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @return array -- pole objektů MySQLi_Result
 	 */
 	public function fetchObjectArray($sqlQuery) {
-		if($sqlQuery != $this->_previousSqlQuery){
-         $this->_previousResult = $this->query($sqlQuery);
-      }
+      $result = $this->query($sqlQuery);
 
-		if($this->_previousResult){
-			$resultArray = array();
-			while ($sqlObject=$this->_previousResult->fetch_object()) {
-				array_push($resultArray, $sqlObject);
-			}
-			return $resultArray;
-		} else {
-			return false;
-		}
+      if($result){
+         $resultArray = array();
+         while ($sqlObject=$result->fetch_object()) {
+            array_push($resultArray, $sqlObject);
+         }
+         return $resultArray;
+      } else {
+         return false;
+      }
 	}
 
 	/**
@@ -326,14 +327,12 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @return MySQLi_Result -- objekt s prvky z db
 	 */
 	public function fetchObject($sqlQuery){
-		if($sqlQuery != $this->_previousSqlQuery){
-         $this->_previousResult = $this->query($sqlQuery);
+      $result = $this->query($sqlQuery);
+      if($result){
+         return $result->fetch_object();
+      } else {
+         return false;
       }
-		if($this->_previousResult){
-			return $this->_previousResult->fetch_object();
-		} else {
-			return false;
-		}
 	}
 
    /**
