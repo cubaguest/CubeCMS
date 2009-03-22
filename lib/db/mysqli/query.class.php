@@ -127,7 +127,7 @@ class Mysqli_Db_Query {
     * statické pole se specílními SQL funkcemi
     * @var array
     */
-   protected $specialSqlFunctions = array("NOW", "TIMESTAMPDIFF", "COUNT", "IFNULL", "IF");
+   protected $specialSqlFunctions = array("NOW", "TIMESTAMPDIFF", "COUNT", "IFNULL", "IF", 'MATCH', 'AGAINST');
 
 
    protected $whereTermConditions = array('=', '<', '>', '<>', '>=', '<=');
@@ -277,24 +277,28 @@ class Mysqli_Db_Query {
                $return .= self::SQL_PARENTHESIS_R;
             } else {
                $value = null;
+
                if(is_int($where[1])){
                   $value = $where[1];
-               } else if (is_array($where[1])) {
+               }
+               // pokud je vnořené pole, ale není to pole hodnot pro parametry IN nebo BEETWEN AND ($where[2] != Db::OPERATOR_IN)
+               else if (is_array($where[1])) {
+//                  $value = array();
                   foreach ($where[1] as $var){
                      if(is_int($var)){
-                        $value[] .= $var.self::SQL_VALUE_SEPARATOR;
+                        $value .= $var.self::SQL_VALUE_SEPARATOR;
                      } else {
-                        $value[] .= "'".$this->_connector->escapeString($var)."'".self::SQL_VALUE_SEPARATOR;
+                        $value .= "'".$this->_connector->escapeString($var)."'".self::SQL_VALUE_SEPARATOR;
                      }
                   }
                   $value = substr($value, 0, strlen($value)-1);
                } else {
                   $value = "'".$this->_connector->escapeString($where[1])."'";
                }
-               if(!isset ($where[2])){
+
+               if(!isset ($where[2]) AND $where[2] != null){
                   $where[2] = '=';
                }
-
                // Podle operátoru volíme podmínku
                // pokud se jedná o některý typ porovnávání (=; <; ...)
                if(in_array($where[2], $this->whereTermConditions)){
@@ -323,7 +327,7 @@ class Mysqli_Db_Query {
                      case Db::OPERATOR_IN:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IN
                            .self::SQL_SEPARATOR.self::SQL_PARENTHESIS_L;
-                        foreach ($value as $val) {
+                        foreach ($where[1] as $val) {
                            $whereCond .= $val.self::SQL_VALUE_SEPARATOR;
                         }
                         $whereCond = substr($whereCond, 0, strlen($whereCond)-1);
@@ -336,6 +340,7 @@ class Mysqli_Db_Query {
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IS_NOT_NULL;
                         break;
                      default:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.$where[1];
                         break;
                   }
                }

@@ -22,11 +22,6 @@ class Db {
    const COND_OPERATOR_OR = 2;
 
    /**
-    * Operátor IS NULL
-    */
-   const OPERATOR_IS_NULL = 0;
-
-   /**
     * Operátor IS NOT NULL
     */
    const OPERATOR_IS_NOT_NULL = 1;
@@ -55,6 +50,11 @@ class Db {
     * Operátor IN
     */
    const OPERATOR_IN = 6;
+   
+   /**
+    * Operátor IS NULL
+    */
+   const OPERATOR_IS_NULL = 7;
 
    /**
     * Spojení JOIN bez omezení
