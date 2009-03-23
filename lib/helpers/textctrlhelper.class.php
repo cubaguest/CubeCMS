@@ -10,6 +10,12 @@
  */
 
 class TextCtrlHelper extends CtrlHelper {
+   /**
+    * Pole znaků které se odstraňují protoože se nejedná o písmena
+    * @var array
+    */
+	private $nonLettersSymbols = array('/','\\','\'','"',',','.','<','>','?',';',':','[',']','{','}','|','=','+','-','_',')','(','*','&','^','%','$','#','@','!','~','`'	);//this will remove punctuation
+
 	/**
 	 * Metoda dekóduje znaky na entity html
 	 *
@@ -54,7 +60,21 @@ class TextCtrlHelper extends CtrlHelper {
 		$string=ereg_replace("<[^>]+>", "", $string);
 		return $string;
 	}
-	
+
+   /**
+    * Metoda odstraní znaky které nejsou písmena
+    * @param striing $string -- řetězec ze kterého se bude odstraňovat
+    * @return string -- řetězec bez specielních znaků
+    */
+	function removeNonLettersSymbols($string) {
+		for ($i = 0; $i < sizeof($this->symbols); $i++) {
+			$string = str_replace($this->symbols[$i],' ',$string);
+		}
+
+		return trim($string);
+	}
+
+
 }
 
 

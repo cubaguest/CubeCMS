@@ -296,20 +296,20 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
                   if($columString != parent::SQL_ALL_VALUES){
                      $columString = '.`' . $this->getDbConnector()->escapeString($columString) . '`';
                   } else {
-                     $columString = '.' . $columString . '';
+                     $columString = '.' . $columString;
                   }
 
                   if(is_int($columAlias)){
-                     $colum .= self::SQL_SEPARATOR . $columsTable . '' . $this->getDbConnector()->escapeString($columString) . ',';
+                     $colum .= self::SQL_SEPARATOR . $columsTable . $columString . ',';
                   } else {
-                     $colum .= self::SQL_SEPARATOR . $columsTable . '' . $this->getDbConnector()->escapeString($columString) . "" . self::SQL_SEPARATOR . self::SQL_AS .
+                     $colum .= self::SQL_SEPARATOR . $columsTable . $columString . self::SQL_SEPARATOR . self::SQL_AS .
                      self::SQL_SEPARATOR . $columAlias . ',';
                   }
                }
                else if($columString[0] == self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] == self::SQL_PARENTHESIS_R){
-                  $colum .= self::SQL_SEPARATOR . $this->getDbConnector()->escapeString($columString) . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
+                  $colum .= self::SQL_SEPARATOR . $columString . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
                } else {
-                  $colum .= self::SQL_SEPARATOR . $this->getDbConnector()->escapeString($columString) . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
+                  $colum .= self::SQL_SEPARATOR . $columString . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
                }
             }
             $columsString .= $colum;

@@ -283,17 +283,12 @@ class Mysqli_Db_Query {
                }
                // pokud je vnořené pole, ale není to pole hodnot pro parametry IN nebo BEETWEN AND ($where[2] != Db::OPERATOR_IN)
                else if (is_array($where[1])) {
-//                  $value = array();
                   foreach ($where[1] as $var){
-                     if(is_int($var)){
-                        $value .= $var.self::SQL_VALUE_SEPARATOR;
-                     } else {
-                        $value .= "'".$this->_connector->escapeString($var)."'".self::SQL_VALUE_SEPARATOR;
-                     }
+                     $value .= $this->checkValueFormat($var).self::SQL_VALUE_SEPARATOR;
                   }
                   $value = substr($value, 0, strlen($value)-1);
                } else {
-                  $value = "'".$this->_connector->escapeString($where[1])."'";
+                  $value .= $this->checkValueFormat($where[1]);
                }
 
                if(!isset ($where[2]) AND $where[2] != null){
@@ -464,6 +459,21 @@ class Mysqli_Db_Query {
     */
    protected function getDbConnector() {
       return $this->_connector;
+   }
+
+   /**
+    * Metoda zkontroluje a popřípadě opraví správné zadání hodnoty
+    * @param string $value -- hodnota
+    */
+   protected function checkValueFormat($value) {
+      // odstranění specielních znaků nevhodných pro mysql
+      $value = $this->_connector->escapeString($value);
+      if(is_int($value)){
+         return $value;
+      } else {
+         return "'".$value."'";
+      }
+      return $value;
    }
 }
 
