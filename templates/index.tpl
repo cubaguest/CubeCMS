@@ -150,7 +150,7 @@
 		<div class="menu_bar">
 			<div class="menu_bar_obsah" style="text-align:right;">
          <form action="{$MAIN_WEB_DIR}" method="get">
-            <input type="text" size="17" maxlength="100" name="search" value="{$smarty.get.search}" /><br /><br />
+            <input type="text" size="17" maxlength="100" name="search" value="{$smarty.get.search|escape:'html'}" /><br /><br />
             <input type="submit" value="Hledej" />
          </form>
 			</div>

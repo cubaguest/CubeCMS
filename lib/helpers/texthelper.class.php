@@ -83,12 +83,13 @@ class TextHelper extends Helper {
     * @return string -- ořezaná řetězec
     */
    public function truncate($text,$count, $endString = null) {
-      if (strlen($text) > $numb) {
-         $text = substr($text, 0, $numb);
-         $text = substr($text,0,strrpos($text," "));
+      if (strlen($text) > $count) {
+         $text = mb_substr($text, 0, $count);
+         $text = mb_substr($text,strpos($text," "), strlen($text));
+         $text = mb_substr($text,0,strrpos($text," "));
          //This strips the full stop:
-         if ((substr($text, -1)) == ".") {
-            $text = substr($text,0,(strrpos($text,".")));
+         if ((mb_substr($text, -1)) == ".") {
+            $text = mb_substr($text,0,(strrpos($text,".")));
          }
          $text = $text.$endString;
       }

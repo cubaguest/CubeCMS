@@ -35,4 +35,8 @@
 	<DEBUG_LEVEL>2</DEBUG_LEVEL>
 	<face>default</face>
    <sitemap_periode>weekly</sitemap_periode>
+   <search>
+      <result_lenght>300</result_lenght>
+      <highlight_tag>b</highlight_tag>
+   </search>
 </config>

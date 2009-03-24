@@ -292,13 +292,16 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
 	 */
 	public function fetchAssoc($sqlQuery) {
-      $result = $this->query($sqlQuery);
-
-		if($result){
-			return $result->fetch_assoc();
-		} else {
-			return false;
-		}
+//      try {
+         $result = $this->query($sqlQuery);
+//      } catch (DbException $e) {
+//         CoreErrors($e);
+//      }
+      if($result){
+         return $result->fetch_assoc();
+      } else {
+         return false;
+      }
 	}
 
 	/**

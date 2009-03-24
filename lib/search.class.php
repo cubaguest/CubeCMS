@@ -14,10 +14,11 @@ class Search {
    /**
     * Indexy pole s výsledky hledání
     */
-   const RESULT_IDEX_CATEGORY    = 'category';
-   const RESULT_IDEX_ARTICLE     = 'article';
-   const RESULT_IDEX_URL         = 'url';
-   const RESULT_IDEX_TEXT        = 'text';
+   const RESULT_INDEX_CATEGORY    = 'category';
+   const RESULT_INDEX_ARTICLE     = 'article';
+   const RESULT_INDEX_URL         = 'url';
+   const RESULT_INDEX_TEXT        = 'text';
+   const RESULT_INDEX_RELEVANCE   = 'relevance';
 
    /**
     * Pole s itemy, kde je modul použit
@@ -76,14 +77,16 @@ class Search {
     * @param string $category -- název kategorie
     * @param Links $url -- adkaz na výsledek
     * @param string $text -- text výsledku
+    * @param float $relevance -- relevance výsledku
     * @param string $article -- (option) název článku
     */
-   public function addResult($category, $url, $text, $article = null) {
+   public function addResult($category, $url, $text, $relevance = 0.1, $article = null) {
       $resultArr = array(
-         self::RESULT_IDEX_CATEGORY => $category,
-         self::RESULT_IDEX_URL => (string)$url,
-         self::RESULT_IDEX_TEXT => $text,
-         self::RESULT_IDEX_ARTICLE => $article);
+         self::RESULT_INDEX_CATEGORY => $category,
+         self::RESULT_INDEX_URL => (string)$url,
+         self::RESULT_INDEX_TEXT => $text,
+         self::RESULT_INDEX_RELEVANCE => $relevance,
+         self::RESULT_INDEX_ARTICLE => $article);
 
       array_push(self::$searchResults, $resultArr);
    }
@@ -105,12 +108,32 @@ class Search {
    }
 
    /**
+    * Metoda vrací název kategorie podle zadané id items
+    * @param integer $idItem
+    */
+   public function getCategory($idItem) {
+      return $this->itemsArray[$idItem][SearchModel::ITEMS_ARRAY_INDEX_CAT_NAME];
+   }
+
+   /**
+    * Metoda vrací odkaz na vytvořenou kategorii
+    * @param integer $idItem -- id items
+    * @return Links
+    */
+   public function getLink($idItem) {
+      $link = new Links();
+      $link->category($this->itemsArray[$idItem][SearchModel::ITEMS_ARRAY_INDEX_CAT_NAME],
+         $this->itemsArray[$idItem][SearchModel::ITEMS_ARRAY_INDEX_CAT_ID]);
+      return $link;
+   }
+
+   /**
     * Factore metoda pro nasatvení parametrů hledacího modulu
     * @param string $searchString -- hledaný řetězec
     * @param int $page -- číslo stránky
     */
    public static function factory($searchString, $page = 1) {
-      self::setSearchString($searchString);
+      self::setSearchString(urldecode($searchString));
       self::$searchPage = $page;
    }
 
@@ -119,7 +142,8 @@ class Search {
     * @param string $string -- hledaný řetězec
     */
    public static function setSearchString($string){
-      self::$searchString = addslashes($string);
+      $string = preg_replace('/\+/i', ' +' , $string);
+      self::$searchString = $string;
    }
 
    /**
@@ -127,7 +151,89 @@ class Search {
     * @return array
     */
    public static function getResults() {
+//echo "<pre>před";
+//print_r(self::$searchResults);
+//echo "</pre>";
+
+      self::sortResults();
+
+      //odstranění znaků
+      $removeChars = array('+', '-', '"', '(', ')', '~', '*');
+      $searchString = str_replace($removeChars, ' ', self::$searchString);
+
+      $searchArray = array();
+      $searchArray = preg_split('/[ ]+/', str_replace($removeChars, ' ', self::$searchString));
+
+      // Odstranění prázdných prvků v poli
+      foreach ($searchArray as $key => $val) {
+         if($val == null OR $val == ''){
+            unset ($searchArray[$key]);
+         }
+      }
+
+      $textHelper = new TextHelper();
+
+      $stringLenght = AppCore::sysConfig()->getOptionValue('result_lenght', 'search');
+      $delta = 20;
+      $highLightTag = AppCore::sysConfig()->getOptionValue('highlight_tag', 'search');
+
+//      procházení výsledků
+      foreach (self::$searchResults as $resultKey => $result) {
+         // odstranění html tagů
+         $text = strip_tags($result[self::RESULT_INDEX_TEXT]);
+
+         //Jestli se bude vůbec ořezávat
+         if(strlen($text) > $stringLenght){
+            reset($searchArray);
+            $pos = stripos($text, current($searchArray));
+            $start = $pos-(($stringLenght)/2);
+            if($start < 0){
+               $start = 0;
+            } else if(($stringLenght+$delta+$start) > strlen($text)){
+               $start = strlen($text)-$stringLenght+$delta;
+            }
+            $text = mb_substr($text, $start, $delta+$stringLenght);
+            $text = $textHelper->truncate($text, $stringLenght, '...');
+            if($start > 0) {
+               $text = '...'.$text;
+            }
+         }
+
+         foreach ($searchArray as $key => $val) {
+            $text = preg_replace('/('.$val.')/i', '<'.$highLightTag.'>\\1</'.$highLightTag.'>', $text);
+         }
+         self::$searchResults[$resultKey][self::RESULT_INDEX_TEXT] = $text;
+      }
+
+//echo "<pre>po";
+//print_r(self::$searchResults);
+//echo "</pre>";
       return self::$searchResults;
+   }
+
+   /**
+    * Metoda seřadí výsledky podle relevance
+    */
+   private static function sortResults(){
+      /**
+       * Privátní metoda pro porovnávání relevance
+       * @param array $a -- pole výsledku a
+       * @param array $b -- pole výsledku a
+       */
+      function cmpResult($a, $b) {
+         return strcmp($b[Search::RESULT_INDEX_RELEVANCE], $a[Search::RESULT_INDEX_RELEVANCE]);
+      }
+      usort(self::$searchResults, 'cmpResult');
+   }
+
+
+
+   /**
+    * Metoda vrací počet výsledků hledání
+    * @return integer -- počet výsledků
+    */
+   public static function getNumResults() {
+      return count(self::$searchResults);
    }
 
 }

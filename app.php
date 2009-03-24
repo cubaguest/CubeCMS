@@ -1369,7 +1369,10 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
             AppCore::setSelectedModule();
          }
          $this->coreTpl->addVar('SEARCH_RESULTS', Search::getResults());
+         $this->coreTpl->addVar('SEARCH_RESULTS_COUNT', Search::getNumResults());
          $this->coreTpl->addVar('NOT_ANY_SEARCH_RESULT',_('Žádná položka nebyla nalezena'));
+         $this->coreTpl->addVar('SEARCH_RESULT_COUNT_LABEL',_('Nalezeno výsledků'));
+         $this->coreTpl->addVar('SEARCH_RESULT_MORE',_('Více'));
       }
    }
 

@@ -16,10 +16,10 @@ class Mysqli_Db_Query {
     * @var string
     */
    const SQL_SELECT     		= 'SELECT';
-	const SQL_INSERT     		= 'INSERT';
+   const SQL_INSERT     		= 'INSERT';
    const SQL_DELETE     		= 'DELETE';
    const SQL_UPDATE     		= 'UPDATE';
-   
+
    const SQL_WHERE      		= 'WHERE';
    const SQL_NULL             = 'NULL';
 
@@ -127,7 +127,16 @@ class Mysqli_Db_Query {
     * statické pole se specílními SQL funkcemi
     * @var array
     */
-   protected $specialSqlFunctions = array("NOW", "TIMESTAMPDIFF", "COUNT", "IFNULL", "IF", 'MATCH', 'AGAINST');
+   protected $specialSqlFunctions = array("NOW(", "TIMESTAMPDIFF(", "COUNT(", "IFNULL(", "IF(", 'MATCH', 'AGAINST');
+
+   protected $sqlFunctionRepairArr = array(
+//      'patterns' =>
+//      array("/AGAINST[[:blank:]]?\(([^')]+) (IN BOOLEAN MODE)?\)/",
+//               "/AGAINST[[:blank:]]?\(([^')]+)\)/"),
+//      'replacements' =>
+//      array('AGAINST (\'\1\' \2)',
+//               'AGAINST (\'\1\')')
+   );
 
 
    protected $whereTermConditions = array('=', '<', '>', '<>', '>=', '<=');
@@ -190,8 +199,8 @@ class Mysqli_Db_Query {
          }
 
          $arr = array($column,
-                      $value,
-                      $term);
+            $value,
+            $term);
          array_push($this->_sqlQueryParts[self::SQL_WHERE], $arr);
          array_push($this->_sqlQueryParts[self::SQL_WHERE], $operator);
       }
@@ -252,7 +261,7 @@ class Mysqli_Db_Query {
          $wheresString = self::SQL_SEPARATOR . self::SQL_WHERE . self::SQL_SEPARATOR;
          $wheresString .= $this->_createWhereHelp($this->_sqlQueryParts[self::SQL_WHERE]);
       }
-//      echo $wheresString .' <br>';
+      //      echo $wheresString .' <br>';
       return $wheresString;
    }
 
@@ -268,12 +277,6 @@ class Mysqli_Db_Query {
             if(is_array($where[key($where)])){
                $return .= self::SQL_PARENTHESIS_L;
                $return .= $this->_createWhereHelp($where);
-//               echo "'".substr($return, 0, strlen($return)-strlen(self::SQL_AND)-2)."'";
-//               if(substr($return, strlen($return)-strlen(self::SQL_AND)-1, strlen(self::SQL_AND)) == self::SQL_AND){
-//                  $return = substr($return, 0, strlen($return)-strlen(self::SQL_AND)-2);
-//               } else if(substr($return, strlen($return)-strlen(self::SQL_OR)-1, strlen(self::SQL_OR)) == self::SQL_OR){
-//                  $return = substr($return, 0, strlen($return)-strlen(self::SQL_OR)-2);
-//               }
                $return .= self::SQL_PARENTHESIS_R;
             } else {
                $value = null;
@@ -281,7 +284,7 @@ class Mysqli_Db_Query {
                if(is_int($where[1])){
                   $value = $where[1];
                }
-               // pokud je vnořené pole, ale není to pole hodnot pro parametry IN nebo BEETWEN AND ($where[2] != Db::OPERATOR_IN)
+               // pokud je vnořené pole
                else if (is_array($where[1])) {
                   foreach ($where[1] as $var){
                      $value .= $this->checkValueFormat($var).self::SQL_VALUE_SEPARATOR;
@@ -307,26 +310,26 @@ class Mysqli_Db_Query {
                         break;
                      case Db::OPERATOR_NOT_LIKE:
                         $whereCond = self::SQL_NOT.self::SQL_SEPARATOR.$where[0]
-                           .self::SQL_SEPARATOR.self::SQL_LIKE.self::SQL_SEPARATOR.$value;
+                        .self::SQL_SEPARATOR.self::SQL_LIKE.self::SQL_SEPARATOR.$value;
                         break;
                      case Db::OPERATOR_BETWEEN:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_BETWEEN
-                           .self::SQL_SEPARATOR.$value[0].self::SQL_SEPARATOR.self::SQL_AND
-                           .self::SQL_SEPARATOR.$value[1];
+                        .self::SQL_SEPARATOR.$value[0].self::SQL_SEPARATOR.self::SQL_AND
+                        .self::SQL_SEPARATOR.$value[1];
                         break;
                      case Db::OPERATOR_NOT_BETWEEN:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_NOT_BETWEEN
-                           .self::SQL_SEPARATOR.$value[0].self::SQL_SEPARATOR.self::SQL_AND
-                           .self::SQL_SEPARATOR.$value[1];
+                        .self::SQL_SEPARATOR.$value[0].self::SQL_SEPARATOR.self::SQL_AND
+                        .self::SQL_SEPARATOR.$value[1];
                         break;
                      case Db::OPERATOR_IN:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IN
-                           .self::SQL_SEPARATOR.self::SQL_PARENTHESIS_L;
-                        foreach ($where[1] as $val) {
-                           $whereCond .= $val.self::SQL_VALUE_SEPARATOR;
-                        }
-                        $whereCond = substr($whereCond, 0, strlen($whereCond)-1);
-                        $whereCond .= self::SQL_PARENTHESIS_R;
+                        .self::SQL_SEPARATOR.self::SQL_PARENTHESIS_L .$value. self::SQL_PARENTHESIS_R;
+                        //                        foreach ($where[1] as $val) {
+                        //                           $whereCond .= $value;
+                        //                        }
+                        //                        $whereCond = substr($whereCond, 0, strlen($whereCond)-1);
+                        //                        $whereCond .= self::SQL_PARENTHESIS_R;
                         break;
                      case Db::OPERATOR_IS_NULL:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IS_NULL;
@@ -335,7 +338,7 @@ class Mysqli_Db_Query {
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IS_NOT_NULL;
                         break;
                      default:
-                        $whereCond = $where[0].self::SQL_SEPARATOR.$where[1];
+                        $whereCond = $where[0].self::SQL_SEPARATOR.$value;
                         break;
                   }
                }
@@ -359,33 +362,33 @@ class Mysqli_Db_Query {
     * @param integer $operator -- operátor Db:OPERATOR_X
     * @return string -- zvolený operátor
     */
-   protected function choseWhereTermOperator($operator) {
-      if(in_array($operator, $this->whereTermConditions)){
-         return $operator;
-      } else {
-         switch ($operator) {
-            case Db::OPERATOR_LIKE:
-               return self::SQL_LIKE;
-               break;
-            case Db::OPERATOR_NOT_LIKE:
-               return self::SQL_NOT;
-               break;
-            case Db::OPERATOR_IS_NULL:
-               return self::SQL_IS_NULL;
-               break;
-            case Db::OPERATOR_BETWEEN:
-               return self::SQL_BETWEEN;
-               break;
-            case Db::OPERATOR_NOT_BETWEEN:
-               return self::SQL_NOT_BETWEEN;
-               break;
-            case Db::OPERATOR_AND:
-            default:
-               return self::SQL_AND;
-               break;
-         }
-      }
-   }
+   //   protected function choseWhereTermOperator($operator) {
+   //      if(in_array($operator, $this->whereTermConditions)){
+   //         return $operator;
+   //      } else {
+   //         switch ($operator) {
+   //            case Db::OPERATOR_LIKE:
+   //               return self::SQL_LIKE;
+   //               break;
+   //            case Db::OPERATOR_NOT_LIKE:
+   //               return self::SQL_NOT;
+   //               break;
+   //            case Db::OPERATOR_IS_NULL:
+   //               return self::SQL_IS_NULL;
+   //               break;
+   //            case Db::OPERATOR_BETWEEN:
+   //               return self::SQL_BETWEEN;
+   //               break;
+   //            case Db::OPERATOR_NOT_BETWEEN:
+   //               return self::SQL_NOT_BETWEEN;
+   //               break;
+   //            case Db::OPERATOR_AND:
+   //            default:
+   //               return self::SQL_AND;
+   //               break;
+   //         }
+   //      }
+   //   }
 
    /**
     * Metoda vygeneruje čás SQL dotazu s klauzulí LIMIT
@@ -403,22 +406,23 @@ class Mysqli_Db_Query {
       }
    }
 
-	/**
-	 * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
-	 * @return string -- část SQL s kluzulí ORDER BY
-	 */
-	protected function _createOrder(){
-		$orderString = null;
-		if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
-			$orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
-			foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
-				$orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
-			}
-			//			odstranění poslední čárky
-			$orderString = substr($orderString, 0, strlen($orderString)-1);
-		}
-		return $orderString;
-	}
+   /**
+    * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
+    * @return string -- část SQL s kluzulí ORDER BY
+    */
+   protected function _createOrder(){
+      $orderString = null;
+      if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
+         $orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
+         foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
+            $orderString .= self::SQL_SEPARATOR . $this->checkValueFormat($orderArray[self::ORDER_COLUM_KEY], false)
+            . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
+         }
+         //			odstranění poslední čárky
+         $orderString = substr($orderString, 0, strlen($orderString)-1);
+      }
+      return $orderString;
+   }
 
    /**
     * Metoda vrací název tabulky
@@ -433,7 +437,7 @@ class Mysqli_Db_Query {
          $this->_sqlQueryParts[self::INDEX_TABLE][key($this->_sqlQueryParts[self::INDEX_TABLE])] . '`';
          if($withAlias){
             $table .= self::SQL_SEPARATOR.self::SQL_AS.self::SQL_SEPARATOR
-               .key($this->_sqlQueryParts[self::INDEX_TABLE]);
+            .key($this->_sqlQueryParts[self::INDEX_TABLE]);
          }
       }
       return $table;
@@ -446,7 +450,7 @@ class Mysqli_Db_Query {
     */
    protected function isMySQLFunction($string) {
       foreach ($this->specialSqlFunctions as $function) {
-         if($function == substr($string, 0, strlen($function))){
+         if(stripos($string, $function) !== false){
             return true;
          }
       }
@@ -462,16 +466,36 @@ class Mysqli_Db_Query {
    }
 
    /**
+    * Metoda projde řetězec a opraví všechny funkce pokud jsou špatně zadány
+    * @param string $string -- řetězec
+    */
+   protected function repairMySQLFunctions(&$string) {
+//      $string = preg_replace($this->sqlFunctionRepairArr['patterns'],
+//            $this->sqlFunctionRepairArr['replacements'], $string);
+   }
+
+   /**
     * Metoda zkontroluje a popřípadě opraví správné zadání hodnoty
     * @param string $value -- hodnota
+    * @param boolean $useApostrofs -- (option) jestli se mají případně přidat apostrofy za hodnoty
     */
-   protected function checkValueFormat($value) {
+   protected function checkValueFormat($value, $useApostrofs = true) {
       // odstranění specielních znaků nevhodných pro mysql
-      $value = $this->_connector->escapeString($value);
+//      $value = $this->_connector->escapeString($value);
       if(is_int($value)){
          return $value;
-      } else {
-         return "'".$value."'";
+      }
+      else if($this->isMySQLFunction($value)){
+//         $this->repairMySQLFunctions($value);
+         return $value;
+      }
+      // jedná se o normální řetězec
+      else {
+         $value = $this->_connector->escapeString($value);
+         if($useApostrofs){
+            $value = "'".$value."'";
+         }
+         return $value;
       }
       return $value;
    }

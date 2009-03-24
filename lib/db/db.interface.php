@@ -103,5 +103,11 @@ interface DbInterface {
 	 * @return MySQLi_Result -- objekt s prvky z db
 	 */
 	public function fetchObject($sqlQuery);
+
+   /**
+    * Metoda zakóduje řetězec pro použití v sql (SQL injection)
+    * @param string $string -- řetězec určený k zakódování
+    */
+   public function escapeString($string);
 }
 ?>
