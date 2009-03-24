@@ -1,15 +1,16 @@
 <?php
 /**
- * Ttřída textového Controll Helperu pro zjednodušení práce s texty.
+ * Ttřída textového Helperu pro zjednodušení práce s texty.
  * Třída poskytuje některé funkce pro práci s textem.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: localectrlhelper.class.php 3.0.55 27.9.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro práci s textovými prvky v kontroleru - helper
+ * @version    	$Id: $ VVE3.9.3 $Revision: $
+ * @author        $Author: $ $Date:$
+ *                $LastChangedBy: $ $LastChangedDate: $
+ * @abstract 		Třída pro práci s textovými prvky - helper
  */
 
-class TextCtrlHelper extends CtrlHelper {
+class TextHelper extends Helper {
    /**
     * Pole znaků které se odstraňují protoože se nejedná o písmena
     * @var array
@@ -66,7 +67,7 @@ class TextCtrlHelper extends CtrlHelper {
     * @param striing $string -- řetězec ze kterého se bude odstraňovat
     * @return string -- řetězec bez specielních znaků
     */
-	function removeNonLettersSymbols($string) {
+	public function removeNonLettersSymbols($string) {
 		for ($i = 0; $i < sizeof($this->symbols); $i++) {
 			$string = str_replace($this->symbols[$i],' ',$string);
 		}
@@ -74,8 +75,24 @@ class TextCtrlHelper extends CtrlHelper {
 		return trim($string);
 	}
 
-
+   /**
+    * Metoda ořeže řetězec na podřebnou délu se zachováním slov
+    * @param string $text -- text pro ořezání
+    * @param integer $count -- počet znaků pro ořezání
+    * @param string $endString -- (option)řetězec zakončení (např. ...)
+    * @return string -- ořezaná řetězec
+    */
+   public function truncate($text,$count, $endString = null) {
+      if (strlen($text) > $numb) {
+         $text = substr($text, 0, $numb);
+         $text = substr($text,0,strrpos($text," "));
+         //This strips the full stop:
+         if ((substr($text, -1)) == ".") {
+            $text = substr($text,0,(strrpos($text,".")));
+         }
+         $text = $text.$endString;
+      }
+      return $text;
+   }
 }
-
-
 ?>

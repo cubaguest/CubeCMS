@@ -13,252 +13,232 @@
  */
 
 class Links {
-    /**
-     * Oddělovač prametrů odkazu
-     * @var string
-     */
+   /**
+    * Oddělovač prametrů odkazu
+    * @var string
+    */
    const URL_PARAMETRES_SEPARATOR = '&amp;';
 
-    /**
-     * Oddělovač prametrů odkazu a samotného odkazu
-     * @var string
-     */
+   /**
+    * Oddělovač prametrů odkazu a samotného odkazu
+    * @var string
+    */
    const URL_SEPARATOR_LINK_PARAMS = '?';
 
-    /**
-     * Oddělovač parametrů v url
-     * @var string
-     */
+   /**
+    * Oddělovač parametrů v url
+    * @var string
+    */
    const URL_PARAMETRES_SEPARATOR_IN_URL = '&';
 
-    /**
-     * Oddělovač parametr/hodnota
-     * @var string
-     */
+   /**
+    * Oddělovač parametr/hodnota
+    * @var string
+    */
    const URL_SEP_PARAM_VALUE = '=';
 
-    /**
-     * Oddělovatč mezi názvem článku a id článku
-     * @var char
-     */
+   /**
+    * Oddělovatč mezi názvem článku a id článku
+    * @var char
+    */
    const URL_SEP_ARTICLE_ID = '-';
-    /**
-     *
-     * Oddělovatč mezi názvem kategorie a id kateogire
-     * @var char
-     */
+   /**
+    *
+    * Oddělovatč mezi názvem kategorie a id kateogire
+    * @var char
+    */
    const URL_SEP_CAT_ID = '-';
 
-/**
-     * Oddělovač v url mezi popisem akce a typem akce
-     * @var char
-     */
+   /**
+    * Oddělovač v url mezi popisem akce a typem akce
+    * @var char
+    */
    const URL_ACTION_LABEL_TYPE_SEP = '_';
 
-    /**
-     * Oddělovač url mezi typem akce a id item
-     * @var char
-     */
+   /**
+    * Oddělovač url mezi typem akce a id item
+    * @var char
+    */
    const URL_ACTION_TYPE_ID_SEP = '-';
 
-
-    /**
-     * Názec souboru pro stahování dat
-     * @var string
-     */
+   /**
+    * Názec souboru pro stahování dat
+    * @var string
+    */
    const DOWNLOAD_FILE = 'download.php';
 
-    /**
-     * Název parametru v url, přo který se přenáší název stahovanéh souboru
-     * @var string
-     */
+   /**
+    * Název parametru v url, přo který se přenáší název stahovanéh souboru
+    * @var string
+    */
    const DOWNLOAD_FILE_FILE_PARAM = 'file';
 
-    /**
-     * Název parametru v url, přo který se přenáší adresář stahovanéh souboru
-     * @var string
-     */
+   /**
+    * Název parametru v url, přo který se přenáší adresář stahovanéh souboru
+    * @var string
+    */
    const DOWNLOAD_FILE_DIR_PARAM = 'url';
 
-    /**
-     * Název položky pole se jménem
-     * @var string
-     */
+   /**
+    * Název položky pole se jménem
+    * @var string
+    */
    const LINK_ARRAY_ITEM_NAME = 'name';
 
-    /**
-     * Název položky pole s idčkem
-     * @var string
-     */
+   /**
+    * Název položky pole s idčkem
+    * @var string
+    */
    const LINK_ARRAY_ITEM_ID = 'id';
 
-    /**
-     * Název položky pole s volitelným parametrem
-     * @var string
-     */
+   /**
+    * Název položky pole s volitelným parametrem
+    * @var string
+    */
    const LINK_ARRAY_ITEM_OPTION = 'option';
 
-    /**
-     * Oddělovač předdefinované routy
-     * @var char
-     */
+   /**
+    * Oddělovač předdefinované routy
+    * @var char
+    */
    const PRETEFINED_ROUTES_ID_PREFIX = 'p';
 
-    /**
-     * Proměná s typem přenosového protokolu
-     * @var string
-     */
+   /**
+    * Proměná s typem přenosového protokolu
+    * @var string
+    */
    private static $user_transfer_protocol = null;
 
-    /**
-     * Proměnná s názvem jazyka
-     * @var string
-     */
+   /**
+    * Proměnná s názvem jazyka
+    * @var string
+    */
    private static $currentlang = null;
 
-    /**
-     * Proměnná s názvem jazyka
-     * @var string
-     */
+   /**
+    * Proměnná s názvem jazyka
+    * @var string
+    */
    private $lang = null;
 
-    /**
-     * Proměnná s názvem vybrané kategorie kategorie
-     * @var array
-     */
+   /**
+    * Proměnná s názvem vybrané kategorie kategorie
+    * @var array
+    */
    private static $currentCategory = array();
 
-    /**
-     * Proměnná s názvem kategorie
-     * @var array
-     */
+   /**
+    * Proměnná s názvem kategorie
+    * @var array
+    */
    private $category = array();
 
-    /**
-     * Proměná se zvolenou cestou
-     * @var array
-     */
+   /**
+    * Proměná se zvolenou cestou
+    * @var array
+    */
    private static $currentRoute = array();
 
-    /**
-     * Proměná se zvolenou cestou
-     * @var array
-     */
+   /**
+    * Proměná se zvolenou cestou
+    * @var array
+    */
    private $route = array();
 
-    /**
-     * Proměná s názvem článku (article key)
-     * @var array
-     */
+   /**
+    * Proměná s názvem článku (article key)
+    * @var array
+    */
    private static $currentArticle = array();
 
-    /**
-     * Proměná s názvem článku (article key)
-     * @var array
-     */
+   /**
+    * Proměná s názvem článku (article key)
+    * @var array
+    */
    private $article = array();
 
-    /**
-     * Proměná s názvem akce (action)
-     * @var array
-     */
+   /**
+    * Proměná s názvem akce (action)
+    * @var array
+    */
    private static $currentAction = array();
 
-    /**
-     * Proměná s názvem akce (action)
-     * @var array
-     */
+   /**
+    * Proměná s názvem akce (action)
+    * @var array
+    */
    private $action = array();
 
-    /**
-     * Proměná s názvem média
-     * @var string
-     */
+   /**
+    * Proměná s názvem média
+    * @var string
+    */
    private $mediaType = null;
 
-    /**
-     * Proměná s názvem souboru
-     * @var string
-     */
+   /**
+    * Proměná s názvem souboru
+    * @var string
+    */
    private $file = null;
 
-    /**
-     * Jestli se má tvořit nový odkaz od začátku
-     * @var boolean
-     */
-   //	private $clearLink = false;
-
-    /**
-     * Jestli se má tvořit nový odkaz k rootu webu
-     * @var boolean
-     */
+   /**
+    * Jestli se má tvořit nový odkaz k rootu webu
+    * @var boolean
+    */
    private $onlyWebRoot = false;
 
-    /**
-     * Jesti se má vrátit relativní cesta nebo celá
-     * @var boolean
-     */
-   //	private $relativePath = false;
-
-    /**
-     * Pole s parsovatelnými parametry v url
-     * @var array
-     */
+   /**
+    * Pole s parsovatelnými parametry v url
+    * @var array
+    */
    private static $currentParamsArray = array();
 
-    /**
-     * Pole s parsovatelnými parametry v url
-     * @var array
-     */
+   /**
+    * Pole s parsovatelnými parametry v url
+    * @var array
+    */
    private $paramsArray = array();
 
-    /**
-     * Pole s ostatními parametry v url
-     * @var array
-     */
+   /**
+    * Pole s ostatními parametry v url
+    * @var array
+    */
    private static $currentParamsNormalArray = array();
 
-    /**
-     * Pole s ostatními parametry v url
-     * @var array
-     */
+   /**
+    * Pole s ostatními parametry v url
+    * @var array
+    */
    private $paramsNormalArray = array();
 
-    /**
-     * Proměná obsahuje jestli se má dané stránka načíst znova
-     * @var boolean
-     */
-   //	private $reloadPage = false;
-
-    /**
-     * Konstruktor nastaví základní adresy a přenosový protokol
-     *
-     * @param boolean -- (option)true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
-     * @param boolean -- (option)true pokud má být vráce naprosto čistý link (web root)
-     *
-     */
+   /**
+    * Konstruktor nastaví základní adresy a přenosový protokol
+    *
+    * @param boolean -- (option)true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
+    * @param boolean -- (option)true pokud má být vráce naprosto čistý link (web root)
+    */
    function __construct($clear = false, $onlyWebRoot = false) {
       $this->clearLink = $clear;
       $this->onlyWebRoot = $onlyWebRoot;
       $this->_init();
    }
 
-    /*
-     * STATICKÉ METODY
-     */
+   /*
+    * STATICKÉ METODY
+    */
 
-    /**
-     * metoda nastavuje transportní protokol
-     * @param string -- přenosový protokol (např. http://)
-     */
+   /**
+    * metoda nastavuje transportní protokol
+    * @param string -- přenosový protokol (např. http://)
+    */
    public static function setTransferProtocol($protocol) {
       self::$user_transfer_protocol = $protocol;
    }
 
-    /**
-     * Metoda vrací přenosový protokol
-     * @return string -- přenosový protokol
-     */
+   /**
+    * Metoda vrací přenosový protokol
+    * @return string -- přenosový protokol
+    */
    public static function getTransferProtocol() {
       if(self::$user_transfer_protocol == null){
          return UrlRequest::TRANSFER_PROTOCOL;
@@ -267,31 +247,27 @@ class Links {
       }
    }
 
+   /**
+    * Metoda vrací adresu k web aplikaci
+    * @return string -- adresa ke kořenu aplikace
+    */
+  	public static function getMainWebDir() {
+      return UrlRequest::getBaseWebDir();
+ 	}
 
+   /*
+    * VEŘEJNÉ METODY
+    */
 
-    /**
-     * Metoda vrací adresu k web aplikaci
-     * @return string -- adresa ke kořenu aplikace
-     */
-   	public static function getMainWebDir() {
-//   		return self::getTransferProtocol().self::$serverName.self::$webUrl.self::COOL_URL_SEPARATOR;
-         return UrlRequest::getBaseWebDir();
-   	}
-
-    /*
-     * VEŘEJNÉ METODY
-     */
-
-    /**
-     * Metoda nastavuje název a id kategorie
-     * @param string -- klíč kategorie
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje název a id kategorie
+    * @param string -- klíč kategorie
+    *
+    * @return Links -- objket Links
+    */
    public function category($catName = null, $catId = null){
       if($catName != null AND $catId != null){
-         $help = new TextCtrlHelper();
-
+         $help = new TextHelper();
          $this->category[self::LINK_ARRAY_ITEM_NAME] = rawurlencode($help->utf2ascii($catName));
          $this->category[self::LINK_ARRAY_ITEM_ID] = $catId;
       } else {
@@ -301,12 +277,12 @@ class Links {
       return $this;
    }
 
-    /**
-     * Metoda nastavuje název a id routy
-     * @param string -- název cesty
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje název a id routy
+    * @param string -- název cesty
+    *
+    * @return Links -- objket Links
+    */
    public function route($name = null, $id = null){
       //		Pokud je předána předdefinovaná cesta
       if(is_array($name)){
@@ -323,13 +299,13 @@ class Links {
       return $this;
    }
 
-    /**
-     * Metoda nastavuje název article
-     * @param string -- jméno článku
-     * @param integer -- id článku
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje název article
+    * @param string -- jméno článku
+    * @param integer -- id článku
+    *
+    * @return Links -- objket Links
+    */
    public function article($article = null, $idArticle = null){
       if($article != null AND $idArticle != null AND is_numeric($idArticle)){
          $this->article[self::LINK_ARRAY_ITEM_ID] = $idArticle;
@@ -345,34 +321,34 @@ class Links {
       return $this;
    }
 
-    /**
-     * Metoda nastavuje typ media
-     * @param string -- jméno media
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje typ media
+    * @param string -- jméno media
+    *
+    * @return Links -- objket Links
+    */
    public function media($media = null){
       $this->mediaType = $media;
       return $this;
    }
 
-    /**
-     * Metoda nastavuje parametr nazev epluginu
-     * @param string -- jméno epluginu
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje parametr nazev epluginu
+    * @param string -- jméno epluginu
+    *
+    * @return Links -- objket Links
+    */
    public function file($file = null){
       $this->file = $file;
       return $this;
    }
 
-    /**
-     * Metoda nastavuje název action
-     * @param string -- jméno akce (action např. edit, show atd.)
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje název action
+    * @param string -- jméno akce (action např. edit, show atd.)
+    *
+    * @return Links -- objket Links
+    */
    public function action($action = null){
       if(!empty ($action)){
          $this->action[self::LINK_ARRAY_ITEM_NAME] = $action[0];
@@ -380,82 +356,27 @@ class Links {
          $this->action[self::LINK_ARRAY_ITEM_ID] = $action[2];
       } else {
          $this->action= null;
-         //            $this->action[self::LINK_ARRAY_ITEM_OPTION] = $action[1];
-         //            $this->action[self::LINK_ARRAY_ITEM_ID] = $action[2];
       }
       return $this;
    }
 
-    /**
-     * Metoda nastavuje název lokalizace
-     * @param string -- jméno jazyka (action např. cs, en, de atd.)
-     *
-     * @return Links -- objket Links
-     */
+   /**
+    * Metoda nastavuje název lokalizace
+    * @param string -- jméno jazyka (action např. cs, en, de atd.)
+    *
+    * @return Links -- objket Links
+    */
    public function lang($lang = null){
       $this->lang = $lang;
       return $this;
    }
 
-    /**
-     * Metoda nastavuje prametry do url (je li jich více)
-     * @param array -- pole parametrů (název=>hodnota)
-     * @param boolean -- jestli se mají použít i ostatní parametry
-     * @param array -- pole parametrů, které se mají odstranit //TODO zatím neimplementováno!!
-     *
-     * @return Links -- objket Links
-     * TODO není implementována, možná nebude třeba
-     */
-   //	public function params($params = null, $thisParamOnly = false) {
-   //
-   //		if($thisParamOnly OR $params == null){
-   //			$this->paramsArray = null;
-   //		}
-   //		if($params != null){
-   //			foreach ($params as $param => $value) {
-   //				$this->param($param, $value);
-   //			}
-   //		}
-   //		return $this;
-   //	}
-
-    /**
-     * Metoda nastavuje parametr do url
-     * @param string -- název parametru
-     * @param string -- hodnota parametru
-     *
-     * @return Links -- objket Links
-     */
-   //	public function param($param, $value, $thisParamOnly = false)
-   //	{
-   //		//TODO dodělat ošetření nevalidních znaků
-   //		if($thisParamOnly OR $param == null){
-   //			$this->paramsArray = null;
-   //		}
-   //		if($param != null){
-   //			$this->paramsArray[$param] = $value;
-   //		}
-   //		return $this;
-   //	}
-
-    /**
-     * Metoda odstraňuje zadaný parametr z url
-     *
-     * @param string -- název parametru, který se odebere
-     */
-   //	public function withoutParam($param){
-   //		if(isset($this->paramsArray[$param])){
-   //			unset($this->paramsArray[$param]);
-   //		}
-   //		return $this;
-   //	}
-
-    /**
-     * Metoda přidá nebo změní daný parametr v URL
-     * @param mixed $name -- objekt UrlParam nebo string
-     * @param mixed $value -- (option) hodnota parametru, jen v případě přímého
-     * předávání názvu parametru
-     */
+   /**
+    * Metoda přidá nebo změní daný parametr v URL
+    * @param mixed $name -- objekt UrlParam nebo string
+    * @param mixed $value -- (option) hodnota parametru, jen v případě přímého
+    * předávání názvu parametru
+    */
    public function param($name, $value = null) {
       //        Je vkládán objekt parametru
       if($name instanceof UrlParam){
@@ -492,14 +413,13 @@ class Links {
       return $this;
    }
 
-
-    /**
-     * Metoda odstraní daný parametr z url
-     * @param mixed $name -- (option) název parametru, který se má odstranit nebo
-     * objekt UrlParam. Pokud zůstane nezadán, odstraní se všechny parametry
-     *
-     * @return Links
-     */
+   /**
+    * Metoda odstraní daný parametr z url
+    * @param mixed $name -- (option) název parametru, který se má odstranit nebo
+    * objekt UrlParam. Pokud zůstane nezadán, odstraní se všechny parametry
+    *
+    * @return Links
+    */
    public function rmParam($name = null) {
       //        Je vkládán objekt parametru
       if($name instanceof UrlParam){
@@ -528,10 +448,10 @@ class Links {
       return $this;
    }
 
-    /**
-     * Metoda nastavuje znovunahrání stránky
-     * @param string -- externí odkaz na který se má přesměrovat (option)
-     */
+   /**
+    * Metoda nastavuje znovunahrání stránky
+    * @param string -- externí odkaz na který se má přesměrovat (option)
+    */
    public function reload($link = null){
       if($link == null){
          header("location: ".$this);
@@ -541,16 +461,15 @@ class Links {
       exit();
    }
 
-    /*
-     * PRIVÁTNÍ METODY
-     */
+   /*
+    * PRIVÁTNÍ METODY
+    */
 
-    /**
-     * Metoda inicializuje odkazy
-     *
-     */
-   private function _init()
-   {
+   /**
+    * Metoda inicializuje odkazy
+    *
+    */
+   private function _init(){
       if(!$this->onlyWebRoot){
          $this->lang = self::$currentlang;
          //            $this->lang = Locale::getLang();
@@ -566,17 +485,16 @@ class Links {
       }
    }
 
-    /**
-     * Metoda složí dohromady parametry pro url
-     */
-   private function completeUrlParams()
-   {
+   /**
+    * Metoda složí dohromady parametry pro url
+    */
+   private function completeUrlParams(){
       return http_build_query($this->paramsNormalArray);
    }
 
-    /**
-     * Metoda doplní část s názvem souboru
-     */
+   /**
+    * Metoda doplní část s názvem souboru
+    */
    private function getFile() {
       if($this->file != null){
          return $this->file;
@@ -585,26 +503,17 @@ class Links {
       }
    }
 
-    /*
-     * MAGICKÉ METODY
-     */
+   /*
+    * MAGICKÉ METODY
+    */
 
    /**
      * Metoda převede objekt na řetězec
      *
      * @return string -- objekt jako řetězec
      */
-   public function __toString()
-   {
-      //    	if(!$this->relativePath){
+   public function __toString(){
       $returnString = UrlRequest::getBaseWebDir();
-
-//      if($this->file != null){
-//         $returnString.=$this->file;
-//      }
-      //    	} else {
-      //    		$returnString = './';
-      //    	}
       if($this->lang != null){
          $returnString.=$this->getLang();
       }
@@ -620,47 +529,41 @@ class Links {
       if($this->getAction() != null){
          $returnString.=$this->getAction();
       }
-
-      //        $this->getMedia();
       //        Parsovatelné parametry
       if($this->getParams() != null){
          $returnString.=$this->getParams();
       }
-
-        /**
-         * @todo What is this? Know anybody what is this doing?
-         */
+      /**
+       * @todo What is this? Know anybody what is this doing?
+       */
       if($this->getFile() != null){
          $returnString.=$this->getFile();
       }
-
       //        normálové parametry
       if($this->getNormalParams() != null){
          $returnString.=$this->getNormalParams();
       }
-
       return $returnString;
    }
 
-    /**
-     * Metoda vrací link pro stažení souboru pomocí specílního dwsouboru
-     * @param string -- cesta ks ouboru
-     * @param string -- název souboru
-     */
+   /**
+    * Metoda vrací link pro stažení souboru pomocí specílního dwsouboru
+    * @param string -- cesta ks ouboru
+    * @param string -- název souboru
+    */
    public function getLinkToDownloadFile($dir, $file) {
       $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
       self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
       self::URL_PARAMETRES_SEPARATOR.self::DOWNLOAD_FILE_FILE_PARAM.self::URL_SEP_PARAM_VALUE.
       urlencode($file);
-
       return $dwLink;
    }
 
-    /**
-     * Metoda vrací link pro stažení souboru pomocí specílního dwsouboru
-     * @param string -- cesta ks ouboru
-     * @param string -- název souboru
-     */
+   /**
+    * Metoda vrací link pro stažení souboru pomocí specílního dwsouboru
+    * @param string -- cesta ks ouboru
+    * @param string -- název souboru
+    */
    public static function getLinkToDwFile($dir, $file) {
       $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
       self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
@@ -670,18 +573,16 @@ class Links {
       return $dwLink;
    }
 
+   /*
+    * Metody pro zpracování a tvorbu obsahu URL
+    */
 
-
-    /*
-     * Metody pro zpracování a tvorbu obsahu URL
-     */
-
-    /**
-     * Metoda kontroluje, jestli se jedná o nastaveni jazykové mutace
-     * FORMAT: en, cs, de
-     *
-     * @param string $lang -- řetězec s jazykem
-     */
+   /**
+    * Metoda kontroluje, jestli se jedná o nastaveni jazykové mutace
+    * FORMAT: en, cs, de
+    *
+    * @param string $lang -- řetězec s jazykem
+    */
    public static function checkLangUrlRequest($lang) {
       $matches = array();
       if(eregi('^([a-zA-Z]{2})$', $lang, $matches)){
@@ -692,12 +593,12 @@ class Links {
       return false;
    }
 
-    /**
-     * Metoda kontroluje, jestli se jedná o kategorii zadanou v url
-     * FORMAT: nazev-id
-     *
-     * @param string $category -- řetězec s kategorií
-     */
+   /**
+    * Metoda kontroluje, jestli se jedná o kategorii zadanou v url
+    * FORMAT: nazev-id
+    *
+    * @param string $category -- řetězec s kategorií
+    */
    public static function checkCategoryUrlRequest($category) {
       $matches = array();
       if(eregi('^([a-zA-Z0-9%\-]+)-([0-9]+)$', $category, $matches)){
@@ -709,29 +610,27 @@ class Links {
       return false;
    }
 
-    /**
-     * Metoda vrací kategorii
-     * @return string -- název kategorie (klíč)
-     */
+   /**
+    * Metoda vrací kategorii
+    * @return string -- název kategorie (klíč)
+    */
    private function getCategory() {
       if(!empty ($this->category)){
          $categoryName = $this->category[self::LINK_ARRAY_ITEM_NAME];
-
-         $utf = new TextCtrlHelper();
+         $utf = new TextHelper();
          $categoryName = $utf->utf2ascii($categoryName);
-
          return $categoryName.self::URL_SEP_CAT_ID
          .$this->category[self::LINK_ARRAY_ITEM_ID].UrlRequest::URL_SEPARATOR;
       }
       return null;
    }
 
-    /**
-     * Metoda kontroluje, jestli se jedná o routu zadanou v url
-     * FORMAT: FORMAT: nazev-rid nebo nazev-r{char}id
-     *
-     * @param string $route -- řetězec s cestou
-     */
+   /**
+    * Metoda kontroluje, jestli se jedná o routu zadanou v url
+    * FORMAT: FORMAT: nazev-rid nebo nazev-r{char}id
+    *
+    * @param string $route -- řetězec s cestou
+    */
    public static function checkRouteUrlRequest($route) {
       $matches = array();
       if(eregi('^([a-zA-Z0-9%\-]+)'.Routes::ROUTE_URL_ID_SEPARATOR.'r([a-z]?[0-9]+)$',$route, $matches)){
@@ -756,17 +655,15 @@ class Links {
       return false;
    }
 
-    /**
-     * Metoda vrací url část pro cestu
-     * @return string -- url část
-     */
+   /**
+    * Metoda vrací url část pro cestu
+    * @return string -- url část
+    */
    private function getRoute() {
       if(!empty ($this->route)){
          $utf = new TextCtrlHelper();
          $name = $utf->utf2ascii($this->route[self::LINK_ARRAY_ITEM_NAME]);
-
          $return = $name.self::URL_SEP_CAT_ID.'r';
-
          //            Pokud je předdefinovaná routa
          if($this->route[self::LINK_ARRAY_ITEM_OPTION]){
             $return .= self::PRETEFINED_ROUTES_ID_PREFIX;
@@ -776,12 +673,12 @@ class Links {
       return null;
    }
 
-    /**
-     * Metoda kontroluje, jestli se jedná o článek v URL
-     * FORMAT: nazev-id
-     *
-     * @param string $article -- řetězec s článkem
-     */
+   /**
+    * Metoda kontroluje, jestli se jedná o článek v URL
+    * FORMAT: nazev-id
+    *
+    * @param string $article -- řetězec s článkem
+    */
    public static function checkArticleUrlRequest($article) {
       $matches = array();
       if(eregi('^([a-zA-Z0-9%\-]+)-([0-9]+)$', $article, $matches)){
@@ -793,10 +690,10 @@ class Links {
       return false;
    }
 
-    /**
-     * Metoda vrací část článek (article) pro url
-     * @param string -- článek (article)
-     */
+   /**
+    * Metoda vrací část článek (article) pro url
+    * @param string -- článek (article)
+    */
    private function getArticle() {
       if(!empty ($this->article[self::LINK_ARRAY_ITEM_ID]) AND
          !empty ($this->article[self::LINK_ARRAY_ITEM_NAME])){
@@ -810,12 +707,12 @@ class Links {
       }
    }
 
-    /**
-     * Metoda kontroluje, jestli se jedná o akci v URL
-     * FORMAT: nazev-id
-     *
-     * @param string $action -- řetězec s akcí
-     */
+   /**
+    * Metoda kontroluje, jestli se jedná o akci v URL
+    * FORMAT: nazev-id
+    *
+    * @param string $action -- řetězec s akcí
+    */
    public static function checkActionUrlRequest($action) {
       $matches = array();
       $regex = '^([a-zA-Z0-9%\-]+)'.self::URL_ACTION_LABEL_TYPE_SEP.'([a-zA-Z]+)'
@@ -830,10 +727,10 @@ class Links {
       return false;
    }
 
-    /**
-     * Metoda vrací část akce (action) pro url
-     * @param string -- akce (action)
-     */
+   /**
+    * Metoda vrací část akce (action) pro url
+    * @param string -- akce (action)
+    */
    private function getAction() {
       if(!empty ($this->action)){
          $utf = new TextCtrlHelper();
@@ -848,11 +745,11 @@ class Links {
       }
    }
 
-    /**
-     * Metoda rozparsuje ostatní parametry v URL
-     *
-     * @param array -- pole s ostatními parametry v URL
-     */
+   /**
+    * Metoda rozparsuje ostatní parametry v URL
+    *
+    * @param array -- pole s ostatními parametry v URL
+    */
    public static function chackOtherUrlParams($params) {
       if(!empty ($params)){
          //  Vytažení ostatních parametrů v url do objektu UrrlParam
@@ -872,15 +769,14 @@ class Links {
       }
    }
 
-     /**
-     * Metoda parsuje normálové parametry a vrací je jako pole, kde klíč je název
-     * a hodnota parametru je hodnota
-     * @param string $params -- řetězec s parametry
-     * @return array -- pole s parametry
-     */
+   /**
+    * Metoda parsuje normálové parametry a vrací je jako pole, kde klíč je název
+    * a hodnota parametru je hodnota
+    * @param string $params -- řetězec s parametry
+    * @return array -- pole s parametry
+    */
    private static function parseNormalParams($params) {
       $paramsArr= array();
-
       // odstrannění otazníku na začátku
       if($params[0] == '?'){
          $params = substr($params, 1, strlen($params)-1);
@@ -901,10 +797,10 @@ class Links {
       return $paramsArr;
    }
 
-    /**
-     * Metoda vrací část s parametry pro url (parsovatelné)
-     * @param string -- řetězec s parametry
-     */
+   /**
+    * Metoda vrací část s parametry pro url (parsovatelné)
+    * @param string -- řetězec s parametry
+    */
    private function getParams() {
       $return = null;
       if(!empty ($this->paramsArray)){
@@ -915,10 +811,10 @@ class Links {
       return $return;
    }
 
-    /**
-     * Metoda vrací část s parametry pro url (normálové)
-     * @param string -- řetězec s parametry
-     */
+   /**
+    * Metoda vrací část s parametry pro url (normálové)
+    * @param string -- řetězec s parametry
+    */
    private function getNormalParams() {
       $return = null;
       if(!empty ($this->paramsNormalArray)){
@@ -927,10 +823,10 @@ class Links {
       return $return;
    }
 
-    /**
-     * Metoda vrací část lang pro url
-     * @param string -- lang
-     */
+   /**
+    * Metoda vrací část lang pro url
+    * @param string -- lang
+    */
    private function getLang() {
       if($this->lang != null){
          return $this->lang.UrlRequest::URL_SEPARATOR;
@@ -939,16 +835,15 @@ class Links {
       }
    }
 
-    /**
-     * Metoda doplní část media
-     * @todo patří vložit asij někam jinam, dořešit
-     */
+   /**
+    * Metoda doplní část media
+    * @todo patří vložit asij někam jinam, dořešit
+    */
    private function getMedia() {
       if($this->mediaType != null){
          //			$this->param(self::GET_MEDIA, $this->mediaType);
       }
    }
-
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");
 //echo("SERVER_NAME: ".$_SERVER["SERVER_NAME"]."<br>");
@@ -977,5 +872,4 @@ class Links {
 //	+--http://sprava.vypecky.info/index.php?cat=2
 //REQUEST_URI: /
 //	+--http://sprava.vypecky.info/
-
 ?>
