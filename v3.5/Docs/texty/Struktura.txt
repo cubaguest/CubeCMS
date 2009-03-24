@@ -1,0 +1,14 @@
+Controler:
+	-dbtables
+	-datadir
+	-create Model
+	-acl
+	-messages
+	-errors
+
+View:
+	-datadir
+	-load Model
+	-addTemplate
+	-addStylesheet
+	-addJavascript

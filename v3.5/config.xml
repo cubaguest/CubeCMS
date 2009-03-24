@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<db>
+		<dbname>dev</dbname>
+		<dbserver>localhost</dbserver>
+		<dbuser>dev</dbuser>
+		<dbpasswd>E58frT6X</dbpasswd>
+		<tbprefix>vypecky_</tbprefix>
+		<dbhandler>mysql</dbhandler></db>
+	<smarty>
+		<templates_dir>templates</templates_dir>
+		<templates_c_dir>templates_c</templates_c_dir>
+		<cache_dir>cache</cache_dir>
+		<config_dir>config</config_dir></smarty>
+	
+	<db_tables><category_table>categories</category_table>
+		<section_table>sections</section_table>
+		<items_table>items</items_table>
+		<modules_table>modules</modules_table>
+		<users_table>users</users_table>
+		<groups_table>groups</groups_table>
+		<panels_table>panels</panels_table></db_tables>
+	<users>
+		<default_id_group>2</default_id_group>
+		<default_group_name>guest</default_group_name>
+		<default_user_name>anonym</default_user_name></users>
+	<web_name>Vepřové Výpečky</web_name>
+	<engine_version>3.1beta1</engine_version>
+	<data_dir>data</data_dir>
+	<session_name>vypecky_session</session_name>
+	<langs>cs;en</langs>
+	<dirs>
+		<images>images</images>
+		<images_lang>langs</images_lang></dirs>
+	<DEBUG_LEVEL>2</DEBUG_LEVEL>
+	<face>default</face>
+</config>

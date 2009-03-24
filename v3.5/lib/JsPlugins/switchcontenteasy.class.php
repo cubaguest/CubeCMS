@@ -1,0 +1,35 @@
+<?php
+/**
+ * Třída JsPluginu SwitchContent.
+ * Třída vytváří plugin pro tvorbu rozbalovacího prvku (např. div).
+ *
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: switchcontenteasy.class.php 3.0.0 beta1 29.8.2008
+ * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @abstract 		Třída JsPluginu pro rozbalovací box
+ */
+
+class SwitchContentEasy extends JsPlugin {
+	protected function initJsPlugin() {
+//		Název pluginu
+		$this->setJsPluginName("SwitchContentEasy");
+		
+//		Přidání js soubrů pluginu
+		$this->addJsFile("switchcontent.js");
+	}
+	
+	protected function initFiles() {
+//		Přidání js soubrů pluginu
+		$this->addJsFile(new JsPluginJsFile("switchcontent.js"));
+	}
+	
+	
+	/**
+	 * Metda vytvoří výchozí konfigurační soubor
+	 */
+	protected function generateFile() {
+		
+	}
+}
+
+?>
