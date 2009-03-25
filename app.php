@@ -5,9 +5,9 @@
  * Obsluhuje celou aplikaci a její komponenty.
  *
  * @copyright  Copyright (c) 2008 Jakub Matas
- * @version    $Id: $ VVE3.9.2 $Revision: $
- * @author     $Author: jakub $ $Date: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
- *             $LastChangedBy: jakub $ $LastChangedDate: 2008-12-30 01:35:31 +0100 (Tue, 30 Dec 2008) $
+ * @version    $Id$ VVE3.9.2 $Revision$
+ * @author     $Author$ $Date$
+ *             $LastChangedBy$ $LastChangedDate$
  * @abstract 	Hlavní třída aplikace(Singleton)
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  *
