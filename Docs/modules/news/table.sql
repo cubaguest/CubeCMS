@@ -32,5 +32,11 @@ CREATE TABLE IF NOT EXISTS `vypecky_news` (
   `time` int(11) NOT NULL,
   `deleted` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`id_new`),
-  KEY `id_user` (`id_user`)
+  KEY `id_user` (`id_user`),
+  FULLTEXT KEY `label_cs` (`label_cs`),
+  FULLTEXT KEY `text_cs` (`text_cs`),
+  FULLTEXT KEY `label_en` (`label_en`),
+  FULLTEXT KEY `text_en` (`text_en`),
+  FULLTEXT KEY `label_de` (`label_de`),
+  FULLTEXT KEY `text_de` (`text_de`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

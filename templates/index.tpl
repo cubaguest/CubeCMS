@@ -218,6 +218,7 @@
 		<!-- ABZ rychle pocitadlo -->
 			<!--<a href="http://pocitadlo.abz.cz/" title="počítadlo přístupů: pocitadlo.abz.cz"><img src="http://pocitadlo.abz.cz/aip.php?tp=di" alt="počítadlo.abz.cz" border="0" /></a>-->
 		<!-- http://pocitadlo.abz.cz/ -->
+      <a href="{$SITEMAP_LINK}" title="{$SITEMAP_LINK_NAME}">{$SITEMAP_LINK_NAME}</a>
 	<hr class="separator" />
 </div><!-- footwrap -->
 

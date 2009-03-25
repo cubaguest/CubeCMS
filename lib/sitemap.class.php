@@ -53,7 +53,13 @@ class SiteMap {
 	 * @var float
 	 */
 	private $priority = self::SITEMAP_SITE_DEFAULT_PRIORITY;
-	
+
+   /**
+    * Pole s položkami
+    * @var array
+    */
+   private $itemsCurrentArray = array();
+
 	/**
 	 * Proměná obsahuje pole s položkama
 	 * @var array
@@ -71,7 +77,14 @@ class SiteMap {
 		$this->changeFreq = $changefreq;
 		$this->priority = $priority;
 	}
-	
+
+   /**
+    * Při zrušení objektu zařadíme aktuální položky do celkového pole
+    */
+   public function  __destruct() {
+      self::$items = array_merge(self::$items, $this->itemsCurrentArray);
+   }
+
 	/**
 	 * Metoda spouští proceduru pro přidávání položek do sitemap
 	 *
@@ -85,11 +98,12 @@ class SiteMap {
 	 * Metoda přidává položku do siteamp
 	 *
 	 * @param string -- odkaz
+	 * @param string -- název
 	 * @param integer -- čas poslední změny (timestamp)
 	 * @param string -- četnost změny (kostanta SITEMAP_SITE_CHANGE_...)
 	 * @param float -- priorita (0 - 1)
 	 */
-	public function addItem($url, $lastChange = null, $frequency = null ,$priority = null) {
+	public function addItem($url, $name, $lastChange = null, $frequency = null ,$priority = null) {
 		// pokud je datum v budoucnosti nastavím aktuální
       if($lastChange > time()){
          $lastChange = time();
@@ -106,11 +120,14 @@ class SiteMap {
 		if($priority == null){
 			$priority = $this->priority;
 		}
-      
-   	array_push(self::$items, array('loc' => (string)$url,
+
+//      $this->itemsCurrentArray =
+
+   	array_push($this->itemsCurrentArray, array('loc' => (string)$url,
 									   'lastmod' => $lastChange,
 									   'changefreq' => $frequency,
-									   'priority'=>$priority));
+									   'priority'=>$priority,
+                              'name' => $name));
 	}
 
    /**
@@ -177,12 +194,10 @@ class SiteMap {
 			echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 //			echo '<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">'."\n";
 			echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
-			foreach (self::$items as $i)
-			{
+			foreach (self::$items as $i){
 				echo '<url>'."\n";
-				foreach ($i as $index => $_i)
-				{
-					if (!$_i) continue;
+				foreach ($i as $index => $_i){
+					if (!$_i OR $index == 'name') continue;
                // float čísla s tečkou a stejnou přesností
                if(is_float($_i)){
                   $_i = sprintf("%1.4F", $_i);
@@ -223,5 +238,11 @@ class SiteMap {
 		
 	}
 	
+   /**
+    * Metoda vrací pole článků
+    */
+   public function getCurrentMapArray() {
+      return $this->itemsCurrentArray;
+   }
 }
 ?>

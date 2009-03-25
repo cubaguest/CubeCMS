@@ -282,18 +282,16 @@ class AppCore {
       List ($usec, $sec) = Explode (' ', microtime());
       $this->_stratTime=((float)$sec + (float)$usec);
 
-
+      // inicializace parametrů jádra a php
+      $this->_initCore();
 
       //	nastavení hlavního adresáře aplikace
         /*
          * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
          */
-      //$direName = dirname(__FILE__); // OLD version + dává někdy špatný výsledek
-      //$realPath = realpath($direName); // OLD version + dává někdy špatný výsledek
-      $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
-
-      //        echo '$direName: '.$direName."<br>";
-      //        echo '$realPath: '.$realPath."<br>";
+      $direName = dirname(__FILE__); // OLD version + dává někdy špatný výsledek
+      $realPath = realpath($direName); // OLD version + dává někdy špatný výsledek
+//      $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
 
       $this->setAppMainDir($realPath);
 
@@ -499,6 +497,13 @@ class AppCore {
    /*
     * PRIVÁTNÍ METODY
     */
+
+   /**
+    * Metoda inicializuje základní nastavení jádra systému
+    */
+   private function _initCore() {
+      mb_internal_encoding("UTF-8");
+   }
 
    /**
     * Metoda inicializuje připojení k databázi
@@ -781,6 +786,9 @@ class AppCore {
       $link = new Links();
       $this->coreTpl->addVar("MAIN_WEB_DIR", UrlRequest::getBaseWebDir());
       $this->coreTpl->addVar("THIS_PAGE_LINK", $link);
+      // mapa webu
+      $this->coreTpl->addVar("SITEMAP_LINK", UrlRequest::getBaseWebDir().UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP));
+      $this->coreTpl->addVar("SITEMAP_LINK_NAME", _('Mapa stránek'));
 
       $this->coreTpl->addVar("MAIN_LANG_IMAGES_PATH", self::sysConfig()->getOptionValue('images_lang', 'dirs').URL_SEPARATOR);
       $this->coreTpl->addVar("MAIN_CURRENT_FACE_PATH", self::getTepmlateFaceDir(false));
@@ -798,6 +806,8 @@ class AppCore {
 
       //Verze enginu
       $this->coreTpl->addVar("ENGINE_VERSION", self::sysConfig()->getOptionValue("engine_version"));
+
+
 
       //Debugovaci mod
       if (self::$debugLevel > 1){
@@ -999,7 +1009,7 @@ class AppCore {
                } else {
                   if(!method_exists($controller, strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX)){
                      throw new BadMethodCallException(_("Action Controller ")
-                           .strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX
+                        .strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX
                         ._(" v modulu ") . $module->getName()._(" nebyl nalezen"), 11);
                   }
 
@@ -1058,7 +1068,7 @@ class AppCore {
             } catch (BadMethodCallException $e){
                new CoreErrors($e);
             }
-        //				Vrácení překladu na engine pro jistotu
+            //				Vrácení překladu na engine pro jistotu
             Locale::switchToEngineTexts();
 
             //				odstranění proměných
@@ -1280,8 +1290,17 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
    public function runSpecialPage() {
       $this->coreTpl->addVar('SPECIAL_PAGE', true);
       $this->coreTpl->addVar('SPECIAL_PAGE_NAME', UrlRequest::getSpecialPage());
-      if(UrlRequest::getSpecialPage() == UrlRequest::SPECIAL_PAGE_SEARCH){
-         $this->runSearchPage();
+      switch (UrlRequest::getSpecialPage()) {
+         case UrlRequest::SPECIAL_PAGE_SEARCH:
+            $this->runSearchPage();
+            break;
+
+         case UrlRequest::SPECIAL_PAGE_SITEMAP:
+            $this->runSitemapPage();
+            break;
+         default:
+            $this->setErrorPage();
+            break;
       }
    }
 
@@ -1321,6 +1340,67 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
          $this->coreTpl->addVar('SEARCH_RESULT_COUNT_LABEL',_('Nalezeno výsledků'));
          $this->coreTpl->addVar('SEARCH_RESULT_MORE',_('Více'));
       }
+   }
+
+   /**
+    * Metoda spouští generování stránky s mapou webu
+    */
+   public function runSitemapPage() {
+      $sitemapItems = new SitemapModel();
+      $sitemapItems = $sitemapItems->getItemsOrderBySections();
+
+      // procházení kategoríí na vytváření sitemapy
+      $sitemapArray = array();
+      if($sitemapItems != null){
+         foreach ($sitemapItems as $itemIndex => $item) {
+            $idSection = $item->{SectionsModel::COLUMN_SEC_ID};
+            if(!isset ($sitemapArray[$idSection])){
+               $sitemapArray[$idSection] =
+               array('name' =>$item->{SectionsModel::COLUMN_SEC_LABEL},
+                     'categories' => array());
+            }
+            $idCategory = $item->{Category::COLUMN_CAT_ID};
+
+
+            //				Vytvoření objektu pro práci s modulem
+            $module = new Module($item, $this->getModuleTables($item));
+            AppCore::setSelectedModule($module);
+
+            $link = new Links(true);
+            $link = $link->category($item->{Category::COLUMN_CAT_LABEL}, $idCategory);
+
+            //            vytvoření pole s kategorií
+            if(!isset ($sitemapArray[$idSection]['categories'][$idCategory])){
+               $sitemapArray[$idSection]['categories'][$idCategory] = array(
+                  'name' => $item->{Category::COLUMN_CAT_LABEL},
+                  'url' => (string)$link,
+                  'results' => array());
+            }
+
+            $moduleName = ucfirst($module->getName());
+            $moduleClass = $moduleName.self::MODULE_SITEMAP_SUFIX_CLASS;
+            //				Pokud existuje soubor tak jej načteme
+            if(file_exists($module->getDir()->getMainDir(false).strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php')){
+               include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php');
+               if(class_exists($moduleClass)){
+                  $sitemap = new $moduleClass($link, null,null);
+
+                  // spuštění sitemapy
+                  $sitemap->run();
+                  $sitemapArray[$idSection]['categories'][$idCategory]['results'] =
+                     array_merge($sitemapArray[$idSection]['categories'][$idCategory]['results'],
+                     $sitemap->getCurrentMapArray());
+                  unset($sitemap);
+               }
+            } else {
+               //               throw new Exception(_('Chybí soubor pro zpracování sitemapy'));
+            }
+            // vyprázdnění modulu
+            AppCore::setSelectedModule();
+         }
+      }
+      $this->coreTpl->addVar('SITEMAP_PAGES', $sitemapArray);
+      $this->coreTpl->addVar('SITEMAP_PAGE_NAME', _('Mapa stránek'));
    }
 
    /**

@@ -34,6 +34,12 @@ class SitemapModel extends DbModel {
    private $itemsTable = null;
 
    /**
+    * Proměná s názvem tabulky se sekcemi
+    * @var string
+    */
+   private $sectionsTable = null;
+
+   /**
     * Metoda načte kategori, pokud je zadáno Id je načtena určitá, pokud ne je
     * načtena kategorie s nejvyšší prioritou
     * @param integer $idCat -- (option) id kategorie
@@ -61,6 +67,38 @@ class SitemapModel extends DbModel {
       $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", "db_tables");
 		$this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
+		$this->sectionsTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
+   }
+
+   public function getItemsOrderBySections() {
+      $this->getTables();
+      $userNameGroup = AppCore::getAuth()->getGroupName();
+      //SELECT items.*, cat.label_cs AS clabel, cat.*, sec.*, sec.label_cs AS slabel, modules.* FROM `vypecky_items` AS items
+      //JOIN vypecky_categories AS cat ON items.id_category = cat.id_category
+      //JOIN vypecky_sections AS sec ON cat.id_section = sec.id_section
+      //JOIN vypecky_modules AS modules ON items.id_module = modules.id_module
+      //WHERE group_guest LIKE 'r__'
+      //ORDER BY sec.priority, sec.id_section, cat.priority DESC, cat.id_category
+      $sqlSelect = $this->getDb()->select()->table($this->itemsTable, 'items')
+      ->colums()
+      ->join(array('cat' => $this->catTable), array('items' => CategoryModel::COLUMN_CAT_ID,
+            CategoryModel::COLUMN_CAT_ID), null,
+         array(CategoryModel::COLUMN_CAT_LABEL=>CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getLang(),
+            CategoryModel::COLUMN_CAT_ID))
+      ->join(array('sec'=>$this->sectionsTable), array(CategoryModel::COLUMN_SEC_ID, 'cat'=>CategoryModel::COLUMN_SEC_ID),
+         null, array(CategoryModel::COLUMN_SEC_LABEL=>CategoryModel::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getLang(), SectionsModel::COLUMN_SEC_ID))
+      ->join(array('modules' => $this->modulesTable),array(ModuleModel::COLUMN_ID_MODULE, 'items'=>ModuleModel::COLUMN_ID_MODULE),
+         null, Db::COLUMN_ALL)
+      ->where("items.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, "r__", Db::OPERATOR_LIKE)
+      ->order('sec.'.SectionsModel::COLUMN_SEC_PRIORITY, Db::ORDER_DESC)
+      ->order('sec.'.SectionsModel::COLUMN_SEC_ID)
+      ->order('cat.'.CategoryModel::COLUMN_CAT_PRIORITY, Db::ORDER_DESC)
+      ->order('cat.'.CategoryModel::COLUMN_CAT_ID);
+      ;
+
+      return $this->getDb()->fetchObjectArray($sqlSelect);
+
+
    }
 }
 

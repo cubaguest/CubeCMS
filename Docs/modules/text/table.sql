@@ -27,5 +27,8 @@ CREATE TABLE IF NOT EXISTS `vypecky_texts` (
   `text_de` mediumtext,
   `changed_time` int(11) default NULL,
   PRIMARY KEY  (`id_text`),
-  UNIQUE KEY `id_article` (`id_item`)
+  UNIQUE KEY `id_article` (`id_item`),
+  FULLTEXT KEY `text_cs` (`text_cs`),
+  FULLTEXT KEY `text_en` (`text_en`),
+  FULLTEXT KEY `text_de` (`text_de`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;

@@ -82,6 +82,11 @@ class UrlRequest {
     */
    const SPECIAL_PAGE_SEARCH = 'search';
 
+   /**
+    * Název konstanty pro specialní stránku mapy webu
+    */
+   const SPECIAL_PAGE_SITEMAP = 'sitemap';
+
      /**
       * Obsahuje typ media
       * @var array
@@ -174,8 +179,8 @@ class UrlRequest {
     * Regulerni vyrazy pro vyhodnocování specielních stránek (search, sitemap,
     * atd.), které jsou nezávislé na kategoriích
     */
-   private static $specialPagesRegex = array(self::SPECIAL_PAGE_SEARCH => '^\?search=([^&]*)&?p?a?g?e?=?([0-9]*)?$',
-                                             'sitemap' => '^\?sitemap.html$');
+   private static $specialPagesRegex = array(self::SPECIAL_PAGE_SEARCH => '\?search=([^&]*)&?p?a?g?e?=?([0-9]*)?',
+                                             self::SPECIAL_PAGE_SITEMAP => 'sitemap.html');
    
    /**
     * Název specialní stránky
@@ -231,7 +236,7 @@ class UrlRequest {
     */
    private static function checkSpecialUrl() {
       foreach (self::$specialPagesRegex as $regex) {
-         if(ereg($regex, self::$currentUrl)){
+         if(ereg('^'.$regex.'$', self::$currentUrl)){
             return true;
          }
       }
@@ -346,9 +351,11 @@ class UrlRequest {
     */
    private static function parseSpecialUrl() {
       $regexArr = array();
-      if(ereg(self::$specialPagesRegex[self::SPECIAL_PAGE_SEARCH], self::$currentUrl, $regexArr)){
+      if(ereg('^'.self::$specialPagesRegex[self::SPECIAL_PAGE_SEARCH].'$', self::$currentUrl, $regexArr)){
          self::$specialPageName = self::SPECIAL_PAGE_SEARCH;
          Search::factory($regexArr[1], $regexArr[2]);
+      } else if(ereg('^'.self::$specialPagesRegex[self::SPECIAL_PAGE_SITEMAP].'$', self::$currentUrl, $regexArr)){
+         self::$specialPageName = self::SPECIAL_PAGE_SITEMAP;
       }
    }
 
@@ -483,6 +490,15 @@ class UrlRequest {
        */
       public static function getSpecialPage() {
          return self::$specialPageName;
+      }
+
+      /**
+       * Metoda vrcí regulerní výraz pro specielní stránku
+       * @param string $pageType -- typ specielní stránky constanta SPECIAL_PAGE_XXX
+       * @return string -- regulerní výraz
+       */
+      public static function getSpecialPageRegexp($pageType) {
+         return self::$specialPagesRegex[$pageType];
       }
 
      /**
