@@ -85,7 +85,7 @@ class TextHelper extends Helper {
    public function truncate($text,$count, $endString = null) {
       if (strlen($text) > $count) {
          $text = mb_substr($text, 0, $count);
-         $text = mb_substr($text,strpos($text," "), strlen($text));
+//         $text = mb_substr($text,strpos($text," "), strlen($text));
          $text = mb_substr($text,0,strrpos($text," "));
          //This strips the full stop:
          if ((mb_substr($text, -1)) == ".") {

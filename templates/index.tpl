@@ -92,12 +92,12 @@
 
 	<div id="col1wrap" class="column">
 		<div id="col1pad" class="{if $LEFT_PANEL eq true}col1pad_plusleft {/if}{if $RIGHT_PANEL eq true}col1pad_plusright {/if}">
+      {include file='engine:messages.tpl'}
       {if $PAGE_NOT_FOUND eq true}
          {include file='engine:error404.tpl'}
       {elseif $SPECIAL_PAGE eq true}
          {include file=engine:$SPECIAL_PAGE_NAME.tpl}
       {else}
-         {include file='engine:messages.tpl'}
          {include file='engine:modules.tpl'}
       {/if}
 		<hr class="separator" />

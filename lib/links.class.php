@@ -310,7 +310,7 @@ class Links {
       if($article != null AND $idArticle != null AND is_numeric($idArticle)){
          $this->article[self::LINK_ARRAY_ITEM_ID] = $idArticle;
          $article = htmlspecialchars_decode($article);
-         $help = new TextCtrlHelper();
+         $help = new TextHelper();
          $article = $help->utf2ascii($article);
          $article = urlencode($article);
          $this->article[self::LINK_ARRAY_ITEM_NAME] = $article;
@@ -661,7 +661,7 @@ class Links {
     */
    private function getRoute() {
       if(!empty ($this->route)){
-         $utf = new TextCtrlHelper();
+         $utf = new TextHelper();
          $name = $utf->utf2ascii($this->route[self::LINK_ARRAY_ITEM_NAME]);
          $return = $name.self::URL_SEP_CAT_ID.'r';
          //            Pokud je předdefinovaná routa
@@ -697,7 +697,7 @@ class Links {
    private function getArticle() {
       if(!empty ($this->article[self::LINK_ARRAY_ITEM_ID]) AND
          !empty ($this->article[self::LINK_ARRAY_ITEM_NAME])){
-         $utf = new TextCtrlHelper();
+         $utf = new TextHelper();
          $name = $utf->utf2ascii($this->article[self::LINK_ARRAY_ITEM_NAME]);
 
          return rawurlencode($name).self::URL_SEP_ARTICLE_ID
@@ -733,7 +733,7 @@ class Links {
     */
    private function getAction() {
       if(!empty ($this->action)){
-         $utf = new TextCtrlHelper();
+         $utf = new TextHelper();
          $name = $utf->utf2ascii($this->action[self::LINK_ARRAY_ITEM_NAME]);
 
          return $name.self::URL_ACTION_LABEL_TYPE_SEP

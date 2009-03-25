@@ -171,6 +171,10 @@ class AppCore {
      */
    private static $_appWebDir = null;
 
+   /**
+    * Nastavený debugovací level
+    * @var integer
+    */
    private static $debugLevel = 1;
 
     /**
@@ -278,6 +282,8 @@ class AppCore {
       List ($usec, $sec) = Explode (' ', microtime());
       $this->_stratTime=((float)$sec + (float)$usec);
 
+
+
       //	nastavení hlavního adresáře aplikace
         /*
          * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
@@ -324,23 +330,23 @@ class AppCore {
       $this->runApp();
    }
 
-    /**
-     * Třída je singleton
-     * není povolen clone
-     */
-   private function __clone() {
+   /**
+    * Třída je singleton
+    * není povolen clone
+    */
+   public function __clone() {
       throw new BadMethodCallException(_('Není povoleno inicializovat více jak jednu třídu aplikace'), 1);
    }
 
-    /*
-     * STATICKÉ METODY
-     */
+   /*
+    * STATICKÉ METODY
+    */
 
-    /**
-     * Singleton instance objektu
-     *
-     * @return AppCore
-     */
+   /**
+    * Singleton instance objektu
+    *
+    * @return AppCore
+    */
    public static function getInstance()
    {
       if (null === self::$_coreInstance) {
@@ -351,40 +357,40 @@ class AppCore {
       return self::$_coreInstance;
    }
 
-    /**
-     * Metoda vrací adresář aplikace
-     * @return string -- adresář aplikace
-     */
+   /**
+    * Metoda vrací adresář aplikace
+    * @return string -- adresář aplikace
+    */
    public static function getAppWebDir()
    {
       return self::$_appWebDir;
    }
 
-    /**
-     * Metoda vygeneruje instanci aplikace
-     * pokud již instance existuje, bude vyhozena vyjímka
-     * Instance aplikace je singleton
-     *
-     */
+   /**
+    * Metoda vygeneruje instanci aplikace
+    * pokud již instance existuje, bude vyhozena vyjímka
+    * Instance aplikace je singleton
+    *
+    */
    public static function createApp() {
       self::getInstance();
    }
 
-    /**
-     * Metoda vrací objekt na systémovou konfiguraci
-     * @return Config -- objekt konfigurace
-     */
+   /**
+    * Metoda vrací objekt na systémovou konfiguraci
+    * @return Config -- objekt konfigurace
+    */
    public static function sysConfig() {
       return self::$sysConfig;
    }
 
-    /**
-     * Metoda vrací adresář ke zvolenému vzhledu
-     *
-     * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
-     * @param boolean -- jestli se má vrátit celá adresář faces (true)
-     * @return string -- adresář zvoleného vzhledu
-     */
+   /**
+    * Metoda vrací adresář ke zvolenému vzhledu
+    *
+    * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
+    * @param boolean -- jestli se má vrátit celá adresář faces (true)
+    * @return string -- adresář zvoleného vzhledu
+    */
    public static function getTepmlateFaceDir($fullDir = true, $withFacesDir = true) {
       if($fullDir){
          return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateFaceDir.DIRECTORY_SEPARATOR;
@@ -398,12 +404,12 @@ class AppCore {
       }
    }
 
-    /**
-     * Metoda vrací adresář k výchozímu vzhledu
-     *
-     * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
-     * @return string -- adresář výchozího vzhledu
-     */
+   /**
+    * Metoda vrací adresář k výchozímu vzhledu
+    *
+    * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
+    * @return string -- adresář výchozího vzhledu
+    */
    public static function getTepmlateDefaultFaceDir($fullDir = true) {
       if($fullDir){
          return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateDefaultFaceDir.DIRECTORY_SEPARATOR;
@@ -412,36 +418,36 @@ class AppCore {
       }
    }
 
-     /**
-      * Metoda vrací objekt db conektoru
-      *
-      * @return DbInterface -- objekt db konektoru
-      */
+   /**
+    * Metoda vrací objekt db conektoru
+    *
+    * @return DbInterface -- objekt db konektoru
+    */
    public static function getDbConnector() {
       return self::$dbConnector;
    }
 
-     /**
-      * Metoda vrací objekt aktuálního modulu
-      *
-      * @return Module -- objekt vybraného modulu
-      */
+   /**
+    * Metoda vrací objekt aktuálního modulu
+    *
+    * @return Module -- objekt vybraného modulu
+    */
    public static function getSelectedModule() {
       return self::$selectedModule;
    }
 
-     /**
-      * Metoda nastavuje objekt aktuálního modulu
-      * @param Module $module -- (option) objekt vybraného modulu
-      */
+   /**
+    * Metoda nastavuje objekt aktuálního modulu
+    * @param Module $module -- (option) objekt vybraného modulu
+    */
    public static function setSelectedModule($module = null) {
       self::$selectedModule = $module;
    }
 
-    /**
-     * Metoda vrací onformace o práve zpracovávané kategori nebo false
-     * @return array -- právě zpracovávaná kategorie (název, id)
-     */
+   /**
+    * Metoda vrací onformace o práve zpracovávané kategori nebo false
+    * @return array -- právě zpracovávaná kategorie (název, id)
+    */
    public static function getSellectedCategory() {
       if(!empty (self::$currentCategory)){
          return self::$currentCategory;
@@ -450,33 +456,55 @@ class AppCore {
       }
    }
 
-    /**
-     * Metoda nastavuje že má být zobrazena chybová stránka 404
-     * @param boolean $var (option) zapne chybovou stránku
-     */
+   /**
+    * Metoda nastavuje že má být zobrazena chybová stránka 404
+    * @param boolean $var (option) zapne chybovou stránku
+    */
    public static function setErrorPage($var = true) {
       self::$isErrorPage = $var;
    }
 
-    /**
-     * Metooda vrací jestli je nastaveny chybová stránka 404
-     * @return boolean -- true pokud je zobrazena
-     */
+   /**
+    * Metooda vrací jestli je nastaveny chybová stránka 404
+    * @return boolean -- true pokud je zobrazena
+    */
    public static function isErrorPage() {
       return self::$isErrorPage;
    }
 
-     /*
-      * PRIVÁTNÍ METODY
-      */
+   /**
+    * Metoda vrací objekt pro zprávy modulů
+    * @return Messages -- objekt zpráv
+    */
+   public static function &getInfoMessages() {
+      return self::$messages;
+   }
 
-    /**
-     * Metoda inicializuje připojení k databázi
-     */
+   /**
+    * Metoda vrací objekt pro chybové zprávy modulů
+    * @return Messages -- objekt zpráv
+    */
+   public static function &getUserErrors() {
+      return self::$userErrors;
+   }
+
+   /**
+    * Metoda vrací objekt autorizace
+    * @return Auth -- objekt autorizace
+    */
+   public static function getAuth(){
+      return self::$auth;
+   }
+
+   /*
+    * PRIVÁTNÍ METODY
+    */
+
+   /**
+    * Metoda inicializuje připojení k databázi
+    */
    private function _initDbConnector() {
-
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'db' . DIRECTORY_SEPARATOR. 'db.class.php');
-
       try {
          self::$dbConnector = Db::factory(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION),
             self::sysConfig()->getOptionValue("dbserver", self::MAIN_CONFIG_DB_SECTION),
@@ -485,51 +513,50 @@ class AppCore {
             self::sysConfig()->getOptionValue("dbname", self::MAIN_CONFIG_DB_SECTION),
             self::sysConfig()->getOptionValue("tbprefix", self::MAIN_CONFIG_DB_SECTION));
 
-//         if(self::$dbConnector == false){
-//            //            throw new CoreException(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 1);
-//         }
+         if(self::$dbConnector == false){
+            throw new UnexpectedValueException(self::sysConfig()->getOptionValue("dbhandler",
+                  self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 1);
+         }
       } catch (UnexpectedValueException $e) {
          new CoreErrors($e);
       }
-
    }
 
-    /**
-     * Metoda inicializuje požadavky v URL
-     */
+   /**
+    * Metoda inicializuje požadavky v URL
+    */
    private function _initUrlRequest() {
       UrlRequest::factory();
    }
 
-    /**
-     * Metoda inicializuje Seesion
-     *
-     * //TODO implementovat do třídy Session
-     */
+   /**
+    * Metoda inicializuje Seesion
+    *
+    * //TODO implementovat do třídy Session
+    */
    private function _initSessions() {
       //		//Nastaveni session
       Sessions::factory(self::sysConfig()->getOptionValue('session_name'));
    }
 
-
-        /**
-     * Metoda inicializuje konfiguraci s konfiguračního souboru
-     *
-     */
+   /**
+    * Metoda inicializuje konfiguraci s konfiguračního souboru
+    *
+    */
    private function _initConfig() {
       self::$sysConfig = new Config(self::getAppWebDir() . DIRECTORY_SEPARATOR . self::MAIN_CONFIG_FILE, $this->coreErrors);
    }
 
-    /**
-     * Metoda nastavuje locales a gettext pro překlady
-     */
+   /**
+    * Metoda nastavuje locales a gettext pro překlady
+    */
    private function _initLocale() {
       Locale::factory();
    }
 
-    /**
-     * Metoda inicializuje šablonovací systém (SMARTY)
-     */
+   /**
+    * Metoda inicializuje šablonovací systém (SMARTY)
+    */
    private function _initTemplate() {
       //		Vložení smarty třídy
       require_once ('.'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'smarty'.DIRECTORY_SEPARATOR.'libs'.DIRECTORY_SEPARATOR.'Smarty.class.php');
@@ -546,8 +573,6 @@ class AppCore {
       $this->template->plugins_dir = array(
                               'plugins', // the default under SMARTY_DIR
                               '..'.DIRECTORY_SEPARATOR . 'plugins'.DIRECTORY_SEPARATOR);
-
-      //		Registrace pluginu
 
       //		Pokud je debug tak vypnout kešování smarty
       if(self::$debugLevel >= 2){
@@ -574,14 +599,14 @@ class AppCore {
 
    }
 
-    /**
-     * Metoda načte potřebné knihovny
-     */
+   /**
+    * Metoda načte potřebné knihovny
+    */
    private function _loadLibraries() {
-        /**
-         * Funkce slouží pro automatické načítání potřebných tříd
-         * @param string -- název třídy
-         */
+      /**
+       * Funkce slouží pro automatické načítání potřebných tříd
+       * @param string -- název třídy
+       */
       function __autoload($classOrigName){
          //TODO dodělat kontroly, tak ať to vyhazuje přesnější chbové hlášky
          //		Zmenšení na malá písmena
@@ -641,96 +666,42 @@ class AppCore {
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'dbException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'badClassException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'imageException.class.php');
-   }
 
-    /**
-     * Metoda inicializuje objekty pro práci s hláškami
-     *
-     */
-   private function _initMessagesAndErrors()
-   {
-      //		Vytvoření objektu pro práci se zprávami
-      self::$messages = new Messages('session', 'messages', true);
-      self::$userErrors = new Messages('session', 'errors');
-   }
-
-    /**
-     * Metoda vrací objekt pro zprávy modulů
-     * @return Messages -- objekt zpráv
-     */
-   public static function &getInfoMessages() {
-      return self::$messages;
-   }
-
-    /**
-     * Metoda vrací objekt pro chybové zprávy modulů
-     * @return Messages -- objekt zpráv
-     */
-   public static function &getUserErrors() {
-      return self::$userErrors;
-   }
-   
-   /**
-    * Metoda vrací objekt autorizace
-    * @return Auth -- objekt autorizace
-    */
-   public static function getAuth(){
-      return self::$auth;
-   }
-
-    /**
-     * Metoda inicializuje typ média pro zobrazení
-     */
-   //	private function _initMediaType() {
-   //		if(UrlRequest::getMediaType() != null){
-   ////			AppCore::$mediaType = $_GET[self::MEDIA_URL_PARAM_TYPE];
-   //			AppCore::$mediaType = $_GET[Links::GET_MEDIA];
-   //		}
-   //	}
-
-   //	Metoda inicializuje moduly
-   private function _initModules() {
-      //		Načtení potřebných knihoven
-      $this->loadModuleLibs();
-
-      ModuleDirs::setWebDir(AppCore::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
-      ModuleDirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));;
-   }
-
-
-
-    /**
-     * Metoda ověřuje autorizaci přístupu
-     */
-   private static function coreAuth() {
-      self::$auth = new Auth(AppCore::getDbConnector());
-   }
-
-    /**
-     * Metoda načte potřebné knihovny pro moduly
-     */
-   private function loadModuleLibs() {
       //		načtení hlavních tříd modulu (controler, view)
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'controller.class.php');
       //		třída pro práci s pohledem
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'view.class.php');
    }
 
-    /**
-     * Metoda přiřadí popisky enginu do hlavní šablony
-     */
-   private function assignEngineLabelsToTpl()
-   {
-      //		Popisky loginu
-      $this->assignVarToTpl("LOGIN_LOGOUT_BUTTON_NAME", _("Odhlásit"));
-      $this->assignVarToTpl("LOGIN_LOGIN_BUTTON_NAME", _("Přihlásit"));
+   /**
+    * Metoda inicializuje objekty pro práci s hláškami
+    *
+    */
+   private function _initMessagesAndErrors(){
+      //		Vytvoření objektu pro práci se zprávami
+      self::$messages = new Messages('session', 'messages', true);
+      self::$userErrors = new Messages('session', 'errors');
    }
 
-    /**
-     * Metoda přiřadí proměné z šablony do hlavní šablony
-     * @param Template -- Objekt šablonovacího systému
-     * @param string -- název v hlavní šabloně
-     */
+   //	Metoda inicializuje moduly
+   private function _initModules() {
+      //		Načtení potřebných knihoven
+      ModuleDirs::setWebDir(AppCore::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
+      ModuleDirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));;
+   }
+
+   /**
+    * Metoda ověřuje autorizaci přístupu
+    */
+   private static function coreAuth() {
+      self::$auth = new Auth(AppCore::getDbConnector());
+   }
+
+   /**
+    * Metoda přiřadí proměné z šablony do hlavní šablony
+    * @param Template -- Objekt šablonovacího systému
+    * @param string -- název v hlavní šabloně
+    */
    private function assginTplObjToTpl(Template $templateObject, $templateArrayName = null) {
       if($templateArrayName != null){
          $this->assignVarToTpl($templateArrayName, $templateObject->getTemplatesArray());
@@ -747,15 +718,12 @@ class AppCore {
       }
    }
 
-    /**
-     * Metoda přiřadí proměnou do šablony
-     * @param string -- název proměné v šabloně
-     * @param mixed -- hodnota
-     */
+   /**
+    * Metoda přiřadí proměnou do šablony
+    * @param string -- název proměné v šabloně
+    * @param mixed -- hodnota
+    */
    private function assignVarToTpl($varName, $value) {
-      //		$this->template->assign($varName, $value);
-      $merge = false;
-
       if($this->template->get_template_vars($varName) != null){
          $this->template->append($varName, $value, true);
       } else {
@@ -763,22 +731,22 @@ class AppCore {
       }
    }
 
-    /*
-     * VEŘEJÉ METODY
-     */
+   /*
+    * VEŘEJÉ METODY
+    */
 
-    /**
-     * Metoda nastavuje hlavní adresář aplikace
-     *
-     * @param string -- hlavní adresář aplikace
-     */
+   /**
+    * Metoda nastavuje hlavní adresář aplikace
+    *
+    * @param string -- hlavní adresář aplikace
+    */
    public function setAppMainDir($appMainDir) {
       self::$_appWebDir = $appMainDir;
    }
 
-    /**
-     * Metoda vytvoří hlavní menu aplikace
-     */
+   /**
+    * Metoda vytvoří hlavní menu aplikace
+    */
    public function createMainMenu() {
       if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR. 'menu.class.php')){
          require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR. 'menu.class.php');
@@ -788,34 +756,21 @@ class AppCore {
 
       if(class_exists("Menu")){
          $menu = new Menu(self::$dbConnector);
-
          $menu->controller();
-
          $menu->view();
-
          $this->assginTplObjToTpl($menu->getTemplate(), MainMenu::TPL_ARRAY_NAME);
-
       } else {
          new CoreException(_("Třída s hlavním menu neexistuje"), 1);
       }
 
       //		Přiřazení souboru s šablonou menu podle zvoleéhoí vzhledu
       //		vybraný vzhled šablony //TODO přesunout do třídy pro práci s menu
-
       $this->assignVarToTpl('MAIN_MENU_TEMPLATE_FILE', 'menu.tpl');
    }
 
-    /**
-     * Metoda nastaví překlad na překlad enginu
-     */
-   private function setToEnginetranslator() {
-      ;
-   }
-
-
-    /**
-     * Metoda přiřadí do šablony hlavní proměnné systému
-     */
+   /**
+    * Metoda přiřadí do šablony hlavní proměnné systému
+    */
    public function assignMainVarsToTemplate() {
       //	Hlavni promene strany
       $this->coreTpl->addVar("MAIN_PAGE_TITLE", self::sysConfig()->getOptionValue("web_name"));
@@ -837,6 +792,9 @@ class AppCore {
       $this->coreTpl->addVar("NOT_LOGIN_USER_NAME",_("Nepřihlášen"));
       $this->coreTpl->addVar("LOGIN_USER_NAME",_("Přihlášen"));
       $this->coreTpl->addVar("USER_LOGIN_USERNAME", AppCore::getAuth()->getUserName());
+      //		Popisky loginu
+      $this->coreTpl->addVar("LOGIN_LOGOUT_BUTTON_NAME", _("Odhlásit"));
+      $this->coreTpl->addVar("LOGIN_LOGIN_BUTTON_NAME", _("Přihlásit"));
 
       //Verze enginu
       $this->coreTpl->addVar("ENGINE_VERSION", self::sysConfig()->getOptionValue("engine_version"));
@@ -873,19 +831,15 @@ class AppCore {
       $this->coreTpl->addVar('APP_LANG' ,Locale::getLang());
    }
 
-    /**
-     * metoda vyrenderuje šablonu
-     */
+   /**
+    * metoda vyrenderuje šablonu
+    */
    public function renderTemplate() {
       //		načtení doby zpracovávání aplikace
       List ($usec, $sec) = Explode (' ', microtime());
       $endTime = ((float)$sec + (float)$usec);
       $this->coreTpl->addVar("MAIN_EXEC_TIME", round($endTime-$this->_stratTime, 4));
       $this->coreTpl->addVar("COUNT_ALL_SQL_QUERY", Db::getCountQueries());
-
-
-      //		Přiřazení popisků do šablony
-      $this->assignEngineLabelsToTpl();
 
       //		Přiřazení javascriptů a stylů
       $this->assignVarToTpl("STYLESHEETS", Template::getStylesheets());
@@ -895,10 +849,6 @@ class AppCore {
       //		Přiřazení proměných z hlavní šablony
       $this->assginTplObjToTpl($this->coreTpl);
 
-
-        /**
-         * @todo dořešit při neexistenci ostatní typů medií
-         */
       //		zvolení vzhledu
       //		vybraný vzhled šablony
       if(file_exists(self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'index.tpl')){
@@ -935,12 +885,12 @@ class AppCore {
       }
    }
 
-    /**
-     * Metoda vytvoří pole tabulek modulu
-     *
-     * @param SqlObject -- objekt s tabulkami
-     * @return array -- pole s tabulkama
-     */
+   /**
+    * Metoda vytvoří pole tabulek modulu
+    *
+    * @param SqlObject -- objekt s tabulkami
+    * @return array -- pole s tabulkama
+    */
    private function getModuleTables($item) {
       $tableIndex = 1; $moduleDbTables = array();
       //		TODO potřebuje optimalizaci a OPRAVIT
@@ -950,15 +900,13 @@ class AppCore {
          $tableIndex++;
          $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
       };
-
       return $moduleDbTables;
    }
 
-
-    /**
-     * Metoda spouští moduly
-     * //TODO
-     */
+   /**
+    * Metoda spouští moduly
+    * //TODO
+    */
    public function runModules() {
       $modulesModel = new ModuleModel();
       $items = $modulesModel->getModules();
@@ -1132,9 +1080,9 @@ class AppCore {
       }
    }
 
-    /**
-     * Metoda inicializuje a spustí levý panel
-     */
+   /**
+    * Metoda inicializuje a spustí levý panel
+    */
    public function runPanel($side){
       //	Rozdělenní, který panel je zpracován
       $panelSideUpper = strtoupper($side);
@@ -1235,18 +1183,19 @@ class AppCore {
       unset($panelTemplate);
    }
 
-    /**
-     * metoda vybere, která kategorie je vybrána a uloží je di objektu kategorie
-     */
+   /**
+    * metoda vybere, která kategorie je vybrána a uloží je di objektu kategorie
+    */
    public function selectCategory() {
       Category::factory(AppCore::getAuth());
       $this->assignVarToTpl("MAIN_CATEGORY_TITLE", Category::getLabel());
       $this->assignVarToTpl("MAIN_CATEGORY_ID", Category::getId());
    }
 
+   /**
+    * Metoda přiřadí chyby do šablony
+    */
    public function assignCoreErrorsToTpl() {
-      //      $this->assignVarToTpl("CORE_ERRORS", CoreException::getAllExceptions());
-      //      $this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreException::isEmpty());
       $this->assignVarToTpl("ERROR_NAME", _('Chyba'));
       $this->assignVarToTpl("ERROR_IN_FILE", _('soubor'));
       $this->assignVarToTpl("ERROR_IN_FILE_LINE", _('řádek'));
@@ -1255,19 +1204,17 @@ class AppCore {
       $this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreErrors::isEmpty());
    }
 
-    /**
-     * Metoda přiřadí všechny proměnné do šablonovacího systému
-     * //TODO není omplementována, vytvořit načítání do šablony.
-     */
+   /**
+    * Metoda přiřadí zprávy šablonovacího systému
+    */
    public function assignMessagesToTpl() {
       $this->assignVarToTpl("MESSAGES", self::getInfoMessages()->getMessages());
       $this->assignVarToTpl("ERRORS", self::getUserErrors()->getMessages());
    }
 
-    /**
-     * Metoda vytváří sitemapu a odesílá ji na výstup
-     *
-     */
+   /**
+    * Metoda vytváří sitemapu a odesílá ji na výstup
+    */
    public function runSitemap() {
       $sitemapItems = new SitemapModel();
       $sitemapItems = $sitemapItems->getItems();
@@ -1376,10 +1323,10 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       }
    }
 
-    /**
-     * Metoda načte soubor se specialními vlastnostmi přenesenými do šablony,
-     * které jsou jednotné pro celý web
-     */
+   /**
+    * Metoda načte soubor se specialními vlastnostmi přenesenými do šablony,
+    * které jsou jednotné pro celý web
+    */
    private function initialWebTpl() {
       $fileName = 'initial'.ucfirst(UrlRequest::getMediaType()).'.php';
       if(file_exists(self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName)){
@@ -1387,9 +1334,9 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       }
    }
 
-    /**
-     * Hlavní metoda provádění aplikace
-     */
+   /**
+    * Hlavní metoda provádění aplikace
+    */
    public function runApp() {
       //autorizace přístupu
       AppCore::coreAuth();
@@ -1449,26 +1396,20 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   //				Příprava šablony
                   //				inicializace šablonovacího systému
                   $this->_initTemplate();
-
                   // Globální inicializace proměných do šablony
                   $this->initialWebTpl();
-
                   //vytvoření hlavního menu
                   $this->createMainMenu();
-
                   //nastavení vybrané kategorie
                   $this->selectCategory();
-
                   if(UrlRequest::isSpecialPage()){
                      $this->runSpecialPage();
                   }
-
                   // Pokud není chyba spustíme moduly
                   if(!AppCore::isErrorPage() AND !UrlRequest::isSpecialPage()){
                      //		spuštění modulů
                      $this->runModules();
                   }
-
                   // =========	spuštění panelů
                   //		Levý
                   if(Category::isLeftPanel()){
@@ -1483,16 +1424,12 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   if(AppCore::isErrorPage()){
                      $this->runErrorPage();
                   }
-
                   //		Přiřazení proměných modulů do šablony
                   $this->assignMessagesToTpl();
-
                   //		přiřazení hlavních proměných
                   $this->assignMainVarsToTemplate();
-
                   //		přiřazení chbových hlášek do šablony
                   $this->assignCoreErrorsToTpl();
-
                   //		render šablony
                   $this->renderTemplate();
                   break;
@@ -1500,5 +1437,4 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       }
    }
 }
-
 ?>
