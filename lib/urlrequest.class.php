@@ -236,7 +236,7 @@ class UrlRequest {
     */
    private static function checkSpecialUrl() {
       foreach (self::$specialPagesRegex as $regex) {
-         if(ereg('^[a-z]{0,3}/'.$regex.'$', self::$currentUrl)){
+         if(ereg('^[a-z]{0,3}/?'.$regex.'$', self::$currentUrl)){
             return true;
          }
       }

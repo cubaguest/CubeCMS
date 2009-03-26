@@ -117,7 +117,8 @@ class Locale {
          }
          // jazyk klienta byl zjištěn a nastaven
          else {
-            self::$selectLang = $session->get(self::SESSION_LANG);
+            self::$selectLang = self::$defaultLang;
+            $session->add(self::SESSION_LANG, self::$selectLang);
          }
       } else {
          if(!self::isAppLang(self::$selectLang)){
