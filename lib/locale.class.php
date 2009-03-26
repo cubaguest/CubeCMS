@@ -6,8 +6,9 @@
  * jazyků, a všech použiých jazyků v aplikaci.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: locale.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @version    	$Id: $ VVE3.9.3 $Revision: $
+ * @author			$Author: $ $Date:$
+ *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro obsluhu jazykového nastavení
  */
 
@@ -19,10 +20,10 @@ class Locale {
    const LANG_SEPARATOR = ';';
 
    /**
-    * Název $_GET s jazykem
+    * Název Session s jazykem
     * @var string
     */
-   const URL_PARAM_WITH_LANG = 'lang';
+   const SESSION_LANG = 'lang';
 
    /**
     * Název adresáře s locales
@@ -83,32 +84,70 @@ class Locale {
 
    /**
     * Metoda pro vytvoření prostředí třídy locales
-    *
-    * @param Config -- objekt systémové konfigurace
     */
    public static function factory() {
+      // vybere jazyky aplikace
       self::parseLangs();
+      // nastaví výchozí jazyk
+      self::$defaultLang = self::$appLangs[0];
+   }
 
-      if (!isset($_GET[self::URL_PARAM_WITH_LANG])){
-         echo $_SERVER["HTTP_ACCEPT_LANGUAGE"];
-         list($langPriority) = Explode(",", $_SERVER["HTTP_ACCEPT_LANGUAGE"]);
-         list($firstLang) = Explode(";", $langPriority);
-         if ($firstLang != "" AND self::langExist($firstLang)){
-            self::$selectLang = $firstLang;
-         } else {
-            self::$selectLang = self::$defaultLang;
+   /**
+    * Metoda nastaví aplikaci pro zvolený jazyk
+    */
+   public static function selectLang() {
+      $session = new Sessions();
+      if(self::$selectLang == null){
+         // pokud nebyl jazyk nastaven při prohlížení
+         if($session->isEmpty(self::SESSION_LANG)){
+            // načteme jazyk klienta a zjistíme, jestli existuje mutace aplikace
+            $lang = self::getLangsByClient();
+            if($lang !== false){
+               self::$selectLang = $lang;
+            } else {
+               self::$selectLang = self::$defaultLang;
+            }
+            $session->add(self::SESSION_LANG, self::$selectLang);
+
+            if(self::$selectLang != self::$defaultLang){
+               $link = new Links();
+               $link->lang(self::$selectLang)->reload();
+            }
+
+         }
+         // jazyk klienta byl zjištěn a nastaven
+         else {
+            self::$selectLang = $session->get(self::SESSION_LANG);
          }
       } else {
-
-         if(self::langExist($_GET[self::URL_PARAM_WITH_LANG])){
-            self::$selectLang = $_GET[self::URL_PARAM_WITH_LANG];
-         } else {
+         if(!self::isAppLang(self::$selectLang)){
             self::$selectLang = self::$defaultLang;
+            new CoreErrors(new UnexpectedValueException(
+                  _('Zvolený jazyk není v aplikaci implementován'),1));
+         }
+         
+         if(self::$selectLang != $session->get(self::SESSION_LANG)){
+            $session->add(self::SESSION_LANG, self::$selectLang);
+         } else {
+            self::$selectLang = $session->get(self::SESSION_LANG);
          }
       }
+      // Doplnění jazyků
       self::_setLangTranslations();
+      // nastaví Locales
+      self::setLocalesEnv();
+   }
 
-      self::setLocalesEnv(); // nastaví jazyk
+   /**
+    * Metoda zjistí jestli se jedná o jazyk aplikace
+    * @param string $lang -- jazyk (cs, en, de)
+    * @return boolean -- true pokud se jedná o jazyk aplikace
+    */
+   private static function isAppLang($lang){
+      if(in_array($lang, self::$appLangs)){
+         return true;
+      }
+      return false;
    }
 
    /**
@@ -125,9 +164,33 @@ class Locale {
    }
 
    /**
+    * Metoda načte a vrátí podporované jazyky klienta
+    * @return array -- pole jazyků klienta
+    * @todo -- optimalizovat
+    */
+   public static function getLangsByClient() {
+      $clientString = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
+      // odstraníme mezery KHTML, webkit
+      $clientString = str_replace(" ", "", $clientString);
+      // rozdělit na jazyky
+      $clientLangs = Explode(",", $clientString);
+      $langs = array();
+      $match = array();
+      foreach ($clientLangs as $lang) {
+         preg_match('/([a-z]{2,3})/', $lang, $match);
+         if (in_array($match[1], self::getAppLangs())){
+               return $match[1];
+         }
+//         $langs[] = preg_replace('/^!([a-z]{2,3})(.*)$/', 'd', $lang);
+      }
+      return false;
+   }
+
+
+
+   /**
     * Metoda nastaví názvy jazyků jayzyky
-    *
-    * //TODO dořešit při více jazyků
+    * //TODO dořešit přidávání více jazyků
     */
    private static function _setLangTranslations(){
       self::$localesNames = array("cs" => _('Česky'),
@@ -136,23 +199,21 @@ class Locale {
    }
 
    /**
-    * Metoda nastaví jazyk
+    * Metoda nastaví locales na daný jazyk
     */
    private static function setLocalesEnv() {
       //	nastavení gettext a locales
-      putenv("LANG=".Locale::getLocale(Locale::getLang()));
-      setlocale(LC_ALL, Locale::getLocale(Locale::getLang()));
-
+      putenv("LANG=".self::getLocale(self::getLang()));
+      setlocale(LC_ALL, self::getLocale(self::getLang()));
       bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, self::GETTEXT_DEFAULT_LOCALES_DIR);
       self::switchToEngineTexts();
-      //textdomain(self::GETTEXT_DEFAULT_DOMAIN);
    }
 
    /**
     * Metoda vrací zvolené locales pro zadaný jazyk
     * @param string -- jazyk (cs, en, de, ...)
     */
-   public static function getLocale($lang = null) {
+   private static function getLocale($lang = null) {
       if($lang == null){
          return self::$locales[self::$selectLang];
       } else {
@@ -205,16 +266,9 @@ class Locale {
       return false;
    }
 
-   private static function localeExist($locale) {
-      if(in_array($locale, self::$locales)){
-         return true;
-      }
-      return false;
-   }
-
    /**
     * Metoda nastaví vybraný jazyk
-    * @param string -- název jazyku
+    * @param string -- název jazyku (cs, en, de, ...)
     */
    public static function setLang($lang) {
       if(self::langExist($lang)){
@@ -222,7 +276,7 @@ class Locale {
       } else {
          self::$selectLang = self::$defaultLang;
       }
-      self::setLocalesEnv(); // kvůli změně
+      //self::setLocalesEnv(); // kvůli změně
    }
 
    /**
@@ -231,17 +285,6 @@ class Locale {
     */
    public static function getLang() {
       return self::$selectLang;
-   }
-
-   /**
-    * Metoda vrací vybraný jazyk aplikace, pokud není shodný s výchozím
-    * @return string -- vybraný jazyk aplikace
-    */
-   public static function getLangUrlPart() {
-      if(self::getLang() != self::getDefaultLang()){
-         return self::$selectLang;
-      }
-      return null;
    }
 
    /**

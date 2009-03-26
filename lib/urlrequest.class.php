@@ -4,9 +4,9 @@
  * Třída slouží pro parsování a obsluhu požadavků v URL adrese.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.3 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract		Třída pro obsluhu a UrlReqestu
  */
 class UrlRequest {
@@ -236,7 +236,7 @@ class UrlRequest {
     */
    private static function checkSpecialUrl() {
       foreach (self::$specialPagesRegex as $regex) {
-         if(ereg('^'.$regex.'$', self::$currentUrl)){
+         if(ereg('^[a-z]{0,3}/'.$regex.'$', self::$currentUrl)){
             return true;
          }
       }
@@ -351,10 +351,23 @@ class UrlRequest {
     */
    private static function parseSpecialUrl() {
       $regexArr = array();
-      if(ereg('^'.self::$specialPagesRegex[self::SPECIAL_PAGE_SEARCH].'$', self::$currentUrl, $regexArr)){
+      //		Rozdělíme řetězec podle separátorů
+      $urlItems = $urlItemsBack = array();
+      //		Odstranění posledního lomítka
+      $url = ereg_replace("^(.*)/$", "\\1", self::$currentUrl);
+      $urlItems = $urlItemsBack = explode(URL_SEPARATOR, $url);
+      reset($urlItems); // reset pole aby bylo na začátku
+
+      // jazyk
+      if(Links::checkLangUrlRequest(pos($urlItems))){
+         $lang = true;
+         unset ($urlItems[key($urlItems)]);
+      }
+
+      if(ereg(''.self::$specialPagesRegex[self::SPECIAL_PAGE_SEARCH].'$', $urlItems[key($urlItems)], $regexArr)){
          self::$specialPageName = self::SPECIAL_PAGE_SEARCH;
          Search::factory($regexArr[1], $regexArr[2]);
-      } else if(ereg('^'.self::$specialPagesRegex[self::SPECIAL_PAGE_SITEMAP].'$', self::$currentUrl, $regexArr)){
+      } else if(ereg(''.self::$specialPagesRegex[self::SPECIAL_PAGE_SITEMAP].'$', $urlItems[key($urlItems)], $regexArr)){
          self::$specialPageName = self::SPECIAL_PAGE_SITEMAP;
       }
    }

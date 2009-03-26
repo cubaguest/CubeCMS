@@ -83,10 +83,17 @@ class SitemapModel extends DbModel {
       ->colums()
       ->join(array('cat' => $this->catTable), array('items' => CategoryModel::COLUMN_CAT_ID,
             CategoryModel::COLUMN_CAT_ID), null,
-         array(CategoryModel::COLUMN_CAT_LABEL=>CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getLang(),
+         array(CategoryModel::COLUMN_CAT_LABEL=> 'IFNULL(cat.'.CategoryModel::COLUMN_CAT_LABEL_ORIG
+            .'_'.Locale::getLang().', cat.'.CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'
+            .Locale::getDefaultLang().')',
+//            CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getLang(),
             CategoryModel::COLUMN_CAT_ID))
       ->join(array('sec'=>$this->sectionsTable), array(CategoryModel::COLUMN_SEC_ID, 'cat'=>CategoryModel::COLUMN_SEC_ID),
-         null, array(CategoryModel::COLUMN_SEC_LABEL=>CategoryModel::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getLang(), SectionsModel::COLUMN_SEC_ID))
+         null, array(CategoryModel::COLUMN_SEC_LABEL=>'IFNULL(cat.'.CategoryModel::COLUMN_SEC_LABEL_ORIG
+            .'_'.Locale::getLang().', cat.'.CategoryModel::COLUMN_SEC_LABEL_ORIG.'_'
+            .Locale::getDefaultLang().')',
+//            CategoryModel::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getLang(),
+            SectionsModel::COLUMN_SEC_ID))
       ->join(array('modules' => $this->modulesTable),array(ModuleModel::COLUMN_ID_MODULE, 'items'=>ModuleModel::COLUMN_ID_MODULE),
          null, Db::COLUMN_ALL)
       ->where("items.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, "r__", Db::OPERATOR_LIKE)

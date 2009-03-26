@@ -212,15 +212,24 @@ class Links {
    private $paramsNormalArray = array();
 
    /**
+    * Jestli má být link vrácen prázdný
+    * @var boolean
+    */
+   private $clearLink = false;
+
+   /**
     * Konstruktor nastaví základní adresy a přenosový protokol
     *
     * @param boolean -- (option)true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
     * @param boolean -- (option)true pokud má být vráce naprosto čistý link (web root)
     */
    function __construct($clear = false, $onlyWebRoot = false) {
-      $this->clearLink = $clear;
+//      $this->clearLink = $clear;
       $this->onlyWebRoot = $onlyWebRoot;
       $this->_init();
+      if($clear){
+         $this->clear();
+      }
    }
 
    /*
@@ -271,8 +280,7 @@ class Links {
          $this->category[self::LINK_ARRAY_ITEM_NAME] = rawurlencode($help->utf2ascii($catName));
          $this->category[self::LINK_ARRAY_ITEM_ID] = $catId;
       } else {
-         $this->category[self::LINK_ARRAY_ITEM_NAME] = null;
-         $this->category[self::LINK_ARRAY_ITEM_ID] = null;
+         $this->category = null;
       }
       return $this;
    }
@@ -315,8 +323,7 @@ class Links {
          $article = urlencode($article);
          $this->article[self::LINK_ARRAY_ITEM_NAME] = $article;
       } else {
-         $this->article[self::LINK_ARRAY_ITEM_ID] = null;
-         $this->article[self::LINK_ARRAY_ITEM_NAME] = null;
+         $this->article = null;
       }
       return $this;
    }
@@ -461,6 +468,18 @@ class Links {
       exit();
    }
 
+   /**
+    * Metoda odstraní všechny parametry v odkazu
+    * @return Links -- sám sebe
+    */
+   public function clear($withOutCategory = false){
+      $this->route()->article()->action()->rmParam()->media();
+      if($withOutCategory){
+         $this->category();
+      }
+      return $this;
+   }
+
    /*
     * PRIVÁTNÍ METODY
     */
@@ -474,14 +493,14 @@ class Links {
          $this->lang = self::$currentlang;
          //            $this->lang = Locale::getLang();
          $this->category = self::$currentCategory;
-         if(!$this->clearLink){
+//         if(!$this->clearLink){
             $this->route = self::$currentRoute;
             $this->article = self::$currentArticle;
             $this->action = self::$currentAction;
             $this->paramsArray = self::$currentParamsArray;
             $this->paramsNormalArray = self::$currentParamsNormalArray;
             $this->mediaType = UrlRequest::getCurrentMediaUrlPart();
-         }
+//         }
       }
    }
 
@@ -584,10 +603,9 @@ class Links {
     * @param string $lang -- řetězec s jazykem
     */
    public static function checkLangUrlRequest($lang) {
-      $matches = array();
-      if(eregi('^([a-zA-Z]{2})$', $lang, $matches)){
-         Locale::setLang($matches[1]);
-         self::$currentlang = $matches[1];
+      if(eregi('^([a-zA-Z]{2})$', $lang)){
+         Locale::setLang($lang);
+         self::$currentlang = $lang;
          return true;
       }
       return false;
