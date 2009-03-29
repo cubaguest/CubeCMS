@@ -11,13 +11,8 @@
 
 abstract class View {
 	/**
-	 * Objekt modelu aplikace
-	 */
-	private $model = null;
-
-	/**
 	 * Objekt pro práci s šablonovacím systémem
-	 * @var 
+	 * @var Template
 	 */
 	private $template = null;
 	

@@ -140,7 +140,7 @@ class UserImagesEplugin extends Eplugin {
 
    /**
     * Pole s počty ostatních obrázků v jiných modulech
-    * @var <type>
+    * @var array
     */
    private static $otherNumberOfReturnRows = array();
 

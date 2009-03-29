@@ -161,7 +161,7 @@ class AppCore {
 
    /**
     * Instance hlavní třídy
-    * @var AppCoreClass
+    * @var AppCore
     */
    private static $_coreInstance = null;
 
@@ -376,8 +376,8 @@ class AppCore {
    /**
     * Metoda vrací adresář ke zvolenému vzhledu
     *
-    * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
-    * @param boolean -- jestli se má vrátit celá adresář faces (true)
+    * @param boolean $fullDir -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
+    * @param boolean $withFacesDir -- jestli se má vrátit celá adresář faces (true)
     * @return string -- adresář zvoleného vzhledu
     */
    public static function getTepmlateFaceDir($fullDir = true, $withFacesDir = true) {
@@ -396,7 +396,7 @@ class AppCore {
    /**
     * Metoda vrací adresář k výchozímu vzhledu
     *
-    * @param boolean -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
+    * @param boolean $fullDir -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
     * @return string -- adresář výchozího vzhledu
     */
    public static function getTepmlateDefaultFaceDir($fullDir = true) {

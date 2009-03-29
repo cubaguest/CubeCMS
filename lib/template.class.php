@@ -430,7 +430,7 @@ class Template {
 	
 	/**
 	 * Metoda vrací pole s šablonami a proměnými
-	 * @var array -- pole šablon a proměných
+	 * @return array -- pole šablon a proměných
 	 */
 	public function getTemplatesArray() {
 		return $this->templates;

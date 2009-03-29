@@ -14,19 +14,16 @@
 class Action {
 	/**
 	 * Název prvku s parametrem v url
-	 * @var string
 	 */
 	const ACTION_URL_PARAM = 'url';
 
 	/**
 	 * Název prvku s typem akce pro kontroler
-	 * @var string
 	 */
 	const ACTION_TYPE_PARAM = 'action';
 
 	/**
 	 * Název prvku s názvem akce -> jazykový popis pro url
-	 * @var string
 	 */
 	const ACTION_LABEL_PARAM = 'label';
 
@@ -49,12 +46,6 @@ class Action {
 	private $actionsArray = array();
 
 	/**
-	 * Objekt s parametry modulu
-	 * @var Module
-	 */
-	private $module = null;
-	
-	/**
 	 * výchozí akce
 	 * @var string
 	 */
@@ -62,11 +53,8 @@ class Action {
 	
 	/**
 	 * Konstruktor
-	 *
-	 * @param Module -- objekt modulu (nutný pro zjištění id modulu)
 	 */
 	public final function __construct(){
-		$this->module = AppCore::getSelectedModule();
 //		Vytvoření uživatelských akcí
 		$this->createDefaultActions();
       $this->init();
@@ -82,7 +70,7 @@ class Action {
 	 * @return Module -- objekt modulu
 	 */
 	private function getModule() {
-		return $this->module;
+      return AppCore::getSelectedModule();
 	}
 	
 	/**
@@ -99,6 +87,7 @@ class Action {
 	 * @param string -- zkratka akce
 	 * @param string -- název akce pro kontroler
 	 * @param string -- jazykový název akce - je přenášen do url
+	 * @param boolean -- jestli se jedná o výchozí akci, bude provedena místo akce show
 	 * @param boolean -- jestli má být daná akce výchozí
 	 */
 	final public function addAction($actionAbbr, $actionName, $actionLabel, $isDefault = false){
@@ -194,7 +183,7 @@ class Action {
 	/**
 	 * Metoda vytvoří objekt pro danou akci pro vložení do URL
 	 * @param string $actionAbbr -- identifikátor akce
-	 * @return pole obsahující název, zkratku, id item
+	 * @return array -- pole obsahující název, zkratku, id item
 	 */
    protected function createAction($actionAbbr) {
       $action = $this->actionsArray[$actionAbbr];

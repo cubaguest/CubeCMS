@@ -2,7 +2,6 @@
 /**
  * Třída obsluhuje db konektor k dabazázi, podle zvoleného typu vytvoří objekt 
  *
- * @category   	VVE VeproveVypeckyEnginy 
  * @package    	Action class
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id$ VVE3.9.4 $Revision$
