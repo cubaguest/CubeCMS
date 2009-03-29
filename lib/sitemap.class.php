@@ -104,7 +104,7 @@ class SiteMap {
       }
       if($lastChange != null){
          $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
-         $lastChange = $date->format(DATE_ISO8601);
+         $lastChange = $date->format('c');
       }
 		if($frequency == null){
 			$frequency = $this->changeFreq;
@@ -131,7 +131,7 @@ class SiteMap {
          $lastChange = time();
       }
       $date = new DateTime(date(DATE_ISO8601,$lastChange));
-      $lastChange = $date->format(DATE_ISO8601);
+      $lastChange = $date->format('c');
       array_push(self::$items, array('loc' => (string)$this->getLink(),
 									   'lastmod' => $lastChange,
 									   'changefreq' => $this->changeFreq,
