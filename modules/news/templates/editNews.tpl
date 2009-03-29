@@ -28,7 +28,7 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 {literal}
 <script>
   $(document).ready(function(){
-    $("#addNewForm > ul").tabs();
+    $("#addNewForm").tabs();
   });
 </script>
 {/literal}

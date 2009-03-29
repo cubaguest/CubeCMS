@@ -11,21 +11,9 @@
 
 abstract class View {
 	/**
-	 * Adresář s JavaScript Pluginy
-	 * @var string
-	 */
-	const JSPLUGINS_DIR = 'JsPlugins';
-	
-	/**
 	 * Objekt modelu aplikace
 	 */
 	private $model = null;
-
-	/**
-	 * Objekt s informacemi o modulu
-	 * @var Module
-	 */
-	private $module = null;
 
 	/**
 	 * Objekt pro práci s šablonovacím systémem
@@ -50,15 +38,13 @@ abstract class View {
 	 *
 	 * @param Model -- použitý model
 	 */
-	function __construct(Module $module, Rights $rights, Template &$template, Container $container) {
+	function __construct(Rights $rights, Template &$template, Container $container) {
 		$this->rights = $rights;
-		$this->module = $module;
 		$this->template = $template;
 		$this->container = $container;
 		
 //		inicializace viewru
 		$this->init();
-		
 		$this->saveContainerToTpl();
 	}
 
@@ -95,7 +81,7 @@ abstract class View {
 	 * @return Module -- objekt modulu
 	 */
 	final public function getModule() {
-		return 	$this->module;
+      return AppCore::getSelectedModule();
 	}
 	
 	/**
@@ -104,14 +90,6 @@ abstract class View {
 	 */
 	final public function getDataDir() {
 		return $this->getModule()->getDir()->getDataDir();
-	}
-	
-	/**
-	 * Funkce vrací objekt modelu
-	 * @return Models -- objekt modelu
-	 */
-	final public function getModel() {
-		return $this->model;
 	}
 	
 	/**
@@ -143,7 +121,6 @@ abstract class View {
 	final public function container() {
 		return $this->container;
 	}
-	
 }
 
 ?>

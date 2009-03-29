@@ -4,11 +4,11 @@
  * Třída poskytuj ezákladní přístup k parametrům modulu. Pomocí ní lze zjišťovat 
  * např. použité databázové tabulky modulu, adresáře, a některé ostatní parametry, 
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision: $
- * @author 		$Author: $ $Date:$
- *              $LastChangedBy: $ $LastChangedDate: $
- * @abstract 	Třída pro obsluhu modulů v kategorii
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
+ * @abstract      Třída pro obsluhu modulů v kategorii
  */
 
 class Module {
@@ -252,7 +252,6 @@ class Module {
 		}
 	}
 
-
 	/**
 	 * Metoda nastaví tabulky modulu
 	 * @param array -- pole s tabulkama
@@ -261,7 +260,6 @@ class Module {
 		//TODO není iplementována optimálně
 		$this->dbTables = $dbTables;
 	}
-
 }
 
 ?>

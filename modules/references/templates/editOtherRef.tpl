@@ -25,7 +25,7 @@
    {literal}
    <script>
       $(document).ready(function(){
-         $("#editOtherRefForm > ul").tabs();
+         $("#editOtherRefForm").tabs();
       });
    </script>
    {/literal}

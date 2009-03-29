@@ -6,9 +6,9 @@
  * přímé přesměrování na zvolený (vytvořený) odkaz pomocí klauzule redirect.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro práci s odkazy
  */
 
@@ -212,19 +212,12 @@ class Links {
    private $paramsNormalArray = array();
 
    /**
-    * Jestli má být link vrácen prázdný
-    * @var boolean
-    */
-   private $clearLink = false;
-
-   /**
     * Konstruktor nastaví základní adresy a přenosový protokol
     *
     * @param boolean -- (option)true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
     * @param boolean -- (option)true pokud má být vráce naprosto čistý link (web root)
     */
    function __construct($clear = false, $onlyWebRoot = false) {
-//      $this->clearLink = $clear;
       $this->onlyWebRoot = $onlyWebRoot;
       $this->_init();
       if($clear){
@@ -237,7 +230,7 @@ class Links {
     */
 
    /**
-    * metoda nastavuje transportní protokol
+    * Metoda nastavuje transportní protokol
     * @param string -- přenosový protokol (např. http://)
     */
    public static function setTransferProtocol($protocol) {
@@ -398,7 +391,6 @@ class Links {
                   $this->paramsArray[$paramKey] = rawurlencode($name);
                }
             }
-
             //                Pokud parametr v url není
             if($add){
                array_push($this->paramsArray, rawurlencode($name));
@@ -428,9 +420,8 @@ class Links {
     * @return Links
     */
    public function rmParam($name = null) {
-      //        Je vkládán objekt parametru
+      // Je vkládán objekt parametru
       if($name instanceof UrlParam){
-         //            $name = new UrlParam();
          // Pokud se nejedná o normálový
          if(!$name->isNormalParam()){
             // Projdem pole a otestujem hodnoty naproti regulérnímu výrazu parametru
@@ -443,11 +434,11 @@ class Links {
             unset ($this->paramsNormalArray[$name]);
          }
       }
-      //        Jedná se o běžně zadaný parametr
+      // Jedná se o běžně zadaný parametr
       else if($name != null) {
          unset($this->paramsNormalArray[$name]);
       }
-      //        Odstranění všch parametrů (normálových i obyčejných)
+      // Odstranění všch parametrů (normálových i obyčejných)
       else {
          $this->paramsArray = array();
          $this->paramsNormalArray = array();
@@ -491,16 +482,13 @@ class Links {
    private function _init(){
       if(!$this->onlyWebRoot){
          $this->lang = self::$currentlang;
-         //            $this->lang = Locale::getLang();
          $this->category = self::$currentCategory;
-//         if(!$this->clearLink){
-            $this->route = self::$currentRoute;
-            $this->article = self::$currentArticle;
-            $this->action = self::$currentAction;
-            $this->paramsArray = self::$currentParamsArray;
-            $this->paramsNormalArray = self::$currentParamsNormalArray;
-            $this->mediaType = UrlRequest::getCurrentMediaUrlPart();
-//         }
+         $this->route = self::$currentRoute;
+         $this->article = self::$currentArticle;
+         $this->action = self::$currentAction;
+         $this->paramsArray = self::$currentParamsArray;
+         $this->paramsNormalArray = self::$currentParamsNormalArray;
+         $this->mediaType = UrlRequest::getCurrentMediaUrlPart();
       }
    }
 
@@ -652,7 +640,6 @@ class Links {
    public static function checkRouteUrlRequest($route) {
       $matches = array();
       if(eregi('^([a-zA-Z0-9%\-]+)'.Routes::ROUTE_URL_ID_SEPARATOR.'r([a-z]?[0-9]+)$',$route, $matches)){
-
          self::$currentRoute[self::LINK_ARRAY_ITEM_NAME] = $matches[1];
          $matches2 = array();
          $pattern = '^r'.self::PRETEFINED_ROUTES_ID_PREFIX.'([0-9]+)';

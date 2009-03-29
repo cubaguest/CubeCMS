@@ -3,10 +3,10 @@
  * Třída Modelu pro práci se sitemap
  * Třída, která umožňuje pracovet s modelem sitemap
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s sitemap
  */
 
@@ -81,6 +81,9 @@ class SearchModel extends DbModel {
       return $modulesArray;
    }
 
+   /**
+    * Metoda načte tabulky
+    */
    private function getTables() {
       $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", "db_tables");

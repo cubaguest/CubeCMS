@@ -3,11 +3,11 @@
  * Třída pro obsluhu konfiguračního souboru.
  * Třída slouží k získávání parametrů z konfiguračního souboru.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id:config.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu konfiguračního souboru
- * 
  */
 
 class Config {
@@ -31,10 +31,9 @@ class Config {
 
 	/**
 	 * Konstruktor třídy
-	 *
 	 * @param string -- soubor s konfigurací
 	 */
-	function __construct($configFile, &$coreErrors) {
+	function __construct($configFile) {
 		$this->_configFile = $configFile;
 		$this->_configArray = array();
 		$this->_initConfigFile();
@@ -44,15 +43,17 @@ class Config {
 	 * Metoda načte konfigurační soubor do pole
 	 */
 	private function _initConfigFile() {
-		if (file_exists($this->_configFile)) {
-   			$xml = simplexml_load_file($this->_configFile);
-
-   			$this->_configArray = $this->_objToArray($xml);
-		} else {
-         echo $this->_configFile;
-			throw new CoreException(_('Nepodařilo se otevřít konfigurační soubor ') . $this->_configFile, 101);
-		};
-	}
+      try {
+         if (!file_exists($this->_configFile)){
+            throw new BadFileException(sprintf(_('Nepodařilo se otevřít konfigurační soubor "%s"'),
+               $this->_configFile), 101);
+         }
+         $xml = simplexml_load_file($this->_configFile);
+         $this->_configArray = $this->_objToArray($xml);
+      } catch (BadFileException $e) {
+         new CoreErrors($e);
+      }
+   }
 
 	/**
 	 * Metoda převede objekt SimpleXMLElement na pole
@@ -62,19 +63,13 @@ class Config {
 	 */
 	private function _objToArray($xmlObject) {
 		$return = null;
-
-		if(is_array($xmlObject))
-		{
+		if(is_array($xmlObject)){
 			foreach($xmlObject as $key => $value){
 				$return[$key] = $this->_objToArray($value);
 			}
-		}
-		else
-		{
+		} else {
 			$var = get_object_vars($xmlObject);
-
-			if($var)
-			{
+			if($var){
 				foreach($var as $key => $value){
 					$return[$key] = $this->_objToArray($value);
 				}
@@ -93,25 +88,26 @@ class Config {
 	 * @todo dodělat vracení z větší hloubky stromu
 	 */
 	public function getOptionValue($option, $parentKey = null){
-		$return = null;
-		if($parentKey == null){
-				if(!isset($this->_configArray[$option])){
-					$error = new CoreException(_("Volba ").$option._(" není definována"), 102);
-				} else {
-					$return = $this->_configArray[$option];
-				}
-		} else {
-				if(!isset($this->_configArray[$parentKey][$option])){
-					$error = new CoreException(_("Volba ").$option._(" v sekci ").$parentKey._("není definována"), 103);
-				} else {
-					return $this->_configArray[$parentKey][$option];
-				}
-		}
-		return $return;
+      try {
+         if($parentKey == null){
+            if(!isset($this->_configArray[$option])){
+               throw new InvalidArgumentException(sprintf(_("Volba %s není definována"), $option), 2);
+            }
+            return $this->_configArray[$option];
+         } else {
+            if(!isset($this->_configArray[$parentKey])){
+               throw new InvalidArgumentException(sprintf(_("Sekce %s není definována"), $parentKey), 3);
+            }
+
+            if(!isset($this->_configArray[$parentKey][$option])){
+               throw new InvalidArgumentException(sprintf(_("Volba %s v sekci %s není definována"),
+                  $option, $parentKey), 4);
+            }
+            return $this->_configArray[$parentKey][$option];
+         }
+      } catch (InvalidArgumentException $e) {
+         new CoreErrors($e);
+      }
 	}
-
 }
-
-
-
 ?>

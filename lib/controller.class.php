@@ -2,28 +2,17 @@
 /**
  * Abstraktní třída tvorbu kontroleru modulu.
  * Třída slouží jako základ pro tvorbu kontroleru modulu. Poskytuje přístup 
- * k vlastnostem modulu, práv hláškám, článku a kontaineru(přenos dat do pohledu)
+ * k vlastnostem modulu, práv, hláškám, článku a kontaineru(přenos dat do
+ * pohledu a šablony)
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: controller.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Abstraktní třída kontroleru modulu
  */
 
 abstract class Controller {
-
-	/**
-	 * Objekty se základními vlastnostmi modulu
-	 * @var Module
-	 */
-	private $module = null;
-
-	/**
-	 * Objekt se systémem autorizace přístupu
-	 * @var Auth
-	 */
-	private $auth = null;
-	
 	/**
 	 * Název nového actionViewru
 	 * @var string
@@ -43,18 +32,6 @@ abstract class Controller {
 	private $rights = null;
 
 	/**
-	 * Objekt s informačními zprávami modulu
-	 * @var Messages
-	 */
-	private $infomsg = null;
-
-	/**
-	 * Objekt s chybovými zprávami modulu (NE VYJÍMKY)
-	 * @var Messages
-	 */
-	private $errmsg = null;
-	
-	/**
 	 * Objekt s článkem
 	 * @var Article
 	 */
@@ -73,7 +50,7 @@ abstract class Controller {
 	private $viewTemplate = null;
 	
 	/**
-	 * Objek kontejneru pro přenos dat do viewru
+	 * Objekt kontejneru pro přenos dat do pohledu (viewru) a šablony
 	 * @var Container
 	 */
 	private $container = null;
@@ -81,23 +58,20 @@ abstract class Controller {
 	/**
 	 * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
 	 *
-	 * @param Module -- objekt modulu
+	 * @param Action $action -- objekt s akcemi
+	 * @param Routes $routes -- objekt s cestammi
+	 * @param Rights $rights -- objekt s právy k itemu
 	 */
-    public final function __construct(Action $action, Routes $routes, Rights $rights) {
-		
-		//TODO odstranit nepotřebné věci v paramtrech konstruktoru
-		$this->module = AppCore::getSelectedModule();
-		$this->action = $action;
-		$this->routes = $routes;
-		$this->auth = $rights->getAuth();
-		$this->rights = $rights;
-
-		$this->article = new Article();
-		$this->container = new Container();
-
-//        Inicializace kontroleru modulu
-        $this->init();
-	}
+   public final function __construct(Action $action, Routes $routes, Rights $rights) {
+      //TODO odstranit nepotřebné věci v paramtrech konstruktoru
+      $this->action = $action;
+      $this->routes = $routes;
+      $this->rights = $rights;
+      $this->article = new Article();
+      $this->container = new Container();
+      //        Inicializace kontroleru modulu
+      $this->init();
+   }
 
     /**
      * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
@@ -132,15 +106,15 @@ abstract class Controller {
 	 * @return Module -- objekt modulu
 	 */
 	final public function getModule() {
-		return $this->module;
+      return AppCore::getSelectedModule();
 	}
 	
 	/**
-	 * Metody vrací objekt autorizace
+	 * Metody vrací objekt autorizace (infoormace o přiihlášení)
 	 * @return Auth -- objekt autorizace
 	 */
 	final public function getAuth() {
-		return $this->auth;
+      return $this->getRights()->getAuth();
 	}
 	
 	/**
@@ -192,7 +166,8 @@ abstract class Controller {
 	}
 	
 	/**
-	 * Metoda vrací objekt kontaineru pro přenos dat mezi controlerem a viewrem
+	 * Metoda vrací objekt kontaineru pro přenos dat mezi controlerem, viewrem
+    * a šablonou
 	 * 
 	 * @return Container -- objekt kontaineru
 	 */
@@ -201,19 +176,18 @@ abstract class Controller {
 	}
 	
 	/**
-	 * Vrací objekt modulu
-	 * @return Module -- objekt modulu
+	 * Metoda volaná při destrukci objektu
 	 */
-	function __destruct() {
-	}
+	function __destruct() {}
 
 	/**
-	 * Hlavní metoda třídy kontroleru, provádí se pokud není žádná akce
+	 * Hlavní metoda třídy kontroleru, provádí se pokud není žádná akce ani
+    * článek. Musí být implementována v každém modulu
 	 */
 	abstract function mainController();
 
 	/**
-	 * Metoda změní výchozí actionViewer na zadaný
+	 * Metoda změní výchozí actionViewer pro danou akci na zadaný viewer
 	 * @param string -- název actionViewru
 	 */
 	final public function changeActionView($newActionView) {
@@ -233,7 +207,8 @@ abstract class Controller {
 	 */
 	final public function checkReadableRights() {
 		if(!$this->getRights()->isReadable()){
-			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"), true);
+			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
+kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->getLink(true)->reload();
 		}
 	}
@@ -242,7 +217,8 @@ abstract class Controller {
 	 */
 	final public function checkWritebleRights() {
 		if(!$this->getRights()->isWritable()){
-			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"), true);
+			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
+kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->getLink(true)->reload();
 		}
 	}
@@ -251,13 +227,14 @@ abstract class Controller {
 	 */
 	final public function checkControllRights() {
 		if(!$this->getRights()->isControll()){
-			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke kategorii nebo jste byl(a) odhlášen(a)"), true);
+			$this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
+kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->getLink(true)->reload();
 		}
 	}
 	
 	/**
-	 * metoda nastaví název použitého viewru (bez přívlasku View)
+	 * Metoda nastaví název použitého viewru (bez sufixu View)
 	 * 
 	 * @param string -- název viewru
 	 */
@@ -287,29 +264,19 @@ abstract class Controller {
 
 //		Načtení třídy
 		$viewClassName = ucfirst($this->getModule()->getName()).'View';
-		if(class_exists($viewClassName)){
-			//					Vytvoření objektu pohledu
-			$view = new $viewClassName($this->getModule(), $this->getRights(), $this->viewTemplate, $this->container());
+		if(!class_exists($viewClassName, false)){
+         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
+               , $viewClassName, $this->getModule()->getName()),1);
+      }
+		//	Vytvoření objektu pohledu
+		$view = new $viewClassName($this->getRights(), $this->viewTemplate, $this->container());
 
-//			zvolení viewru modulu pokud existuje
-			if(method_exists($view, $viewName)){//TODO doladit jesli se správně dělají akce
-				$view->$viewName();
-			}
-			else {
-				$view->mainView();
-				if(!method_exists($view, $this->actionViewer)){
-					//				přepnutí překladu na engine
-					textdomain(Locale::GETTEXT_DEFAULT_DOMAIN);
-					Locale::switchToEngineTexts();
-					new CoreException(_("Action Viewer ").$this->actionViewer._(" v modulu ") . $this->getModule()->getName(). _(" nebyl nalezen"), 11);
-					Locale::switchToModuleTexts();
-				}
-			}
-		} else {
-			Locale::switchToEngineTexts();
-			new CoreException(_("Nepodařilo se vytvořit objekt view modulu ") . $this->getModule()->getName(), 8);
-			Locale::switchToModuleTexts();
-		};
+      //	zvolení viewru modulu pokud existuje
+		if(!method_exists($view, $viewName)){//TODO doladit jesli se správně dělají akce
+         throw new BadMethodCallException(sprintf(_("Action Viewer \"%s\" v modulu
+\"%s\" nebyl implementován"), $viewName, $this->getModule()->getName()), 2);
+      }
+      $view->$viewName();
 	}
 }
 

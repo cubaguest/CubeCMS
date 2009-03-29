@@ -3,10 +3,10 @@
  * Třída Modelu pro práci s kategoriemi.
  * Třída, která umožňuje pracovet s modelem kategorií
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
  */
 
@@ -85,11 +85,13 @@ class CategoryModel extends DbModel {
       return $this->getDb()->fetchObject($sqlSelect);
    }
 
+   /**
+    * Metoda načte názvy tabulek
+    */
    private function getTables() {
       $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
 		$this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
    }
 }
-
 ?>

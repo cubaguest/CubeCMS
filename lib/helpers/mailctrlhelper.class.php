@@ -3,13 +3,14 @@
  * Ttřída Mail Controll Helperu pro zjednodušení práce s emaily.
  * Třída slouží pro práci s emailovými adresami a emaily(odesílání, atd).
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: mailctrlhelper.class.php 3.0.55 27.9.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro práci s mail prvky v kontroleru - helper
  */
 
-class MailCtrlHelper extends CtrlHelper {
+class MailHelper extends Helper {
 	/**
 	 * Metoda kontroluje emailovou adresu
 	 * 
@@ -22,12 +23,6 @@ class MailCtrlHelper extends CtrlHelper {
 		$name = '[-a-z0-9!#$%&\'*+/=?^_`{|}~]'; // znaky tvořící uživatelské jméno
 		$domain = '[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])'; // jedna komponenta domény
 		return eregi("^$name+(\\.$name+)*@($domain?\\.)+$domain\$", $email);
-//		if (eregi("^[a-z0-9_\.]+@[a-z0-9_\.]+[a-z]{2,3}$", $email)) {
-//			return true;
-//		}
-//		else {
-//			return false;
-//		}
 	}
 	
 	/**
@@ -51,15 +46,7 @@ class MailCtrlHelper extends CtrlHelper {
 		$headers .= "Content-Type: text/plain; charset=UTF-8\n";
 		$headers .= "Content-Transfer-Encoding: 8bit\n";
 		$headers .= "Return-Path: ".$fromMail."\n\n";
-		
-//		 -=-=-=- MAIL SUBJECT
-//		$subject = "Information Request from MSA Shipping - Contact Form";
-		
-//		 -=-=-=- MAIL TEXT
-//		echo $toMail.'<br>'.$subject.'<br>'.$message.'<br>'.$headers;
-//		Kompletování emailu a odeslní
 		return mail($toMail, $subject, $message, $headers);
-		
 	}
 	
 	/**
@@ -72,9 +59,5 @@ class MailCtrlHelper extends CtrlHelper {
 		}
 		return $text;
 	}
-	
-	
 }
-
-
 ?>

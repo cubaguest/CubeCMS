@@ -4,10 +4,10 @@
  * Třída obsluhuje přenášené akce v URL. Slouží také pro generování vlastních akcí 
  * v modulu, jejich úpravu. Podle zvolené akce se volí také kontroler modulu.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.5.0 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu akcí
  */
 
@@ -69,13 +69,13 @@ class Action {
 		$this->module = AppCore::getSelectedModule();
 //		Vytvoření uživatelských akcí
 		$this->createDefaultActions();
-        $this->init();
+      $this->init();
 	}
 
-    /**
-     * Metoda pro inicializaci akcí
-     */
-    protected function init() {}
+   /**
+    * Metoda pro inicializaci akcí
+    */
+   protected function init() {}
 
 	/**
 	 * Metoda vrací objekt na modul
@@ -113,7 +113,6 @@ class Action {
 	
 	/**
 	 * Funkce vrazí která akce je definována viz dokumentace
-	 *
 	 * @return string -- název prováděné akce viz dokumentace
 	 */
 	public function getSelectedAction() {
@@ -122,7 +121,6 @@ class Action {
 
 	/**
 	 * Funkce vrazí která akce je definována viz dokumentace
-	 *
 	 * @return integer -- id modulu, který má provést akci
 	 */
 	public function getSelectedId() {
@@ -139,11 +137,9 @@ class Action {
 
 	/**
 	 * Funkce zjišťuje, jesli byla akce nastavena
-	 *
 	 * @return boolean -- true pokud byla akce nastavena
 	 */
-	public function isAction()
-	{
+	public function isAction(){
 		if(self::$currentAction != null AND self::$currentActionIdItem == $this->getModule()->getId()){
 			return true;
 		}
@@ -152,11 +148,9 @@ class Action {
 
 	/**
 	 * Funkce zjišťuje, jesli byla nějáká akce nastavena
-	 *
 	 * @return boolean -- true pokud byla akce nastavena
 	 */
-	public function isSomeAction()
-	{
+	public function isSomeAction(){
 		if(self::$currentAction != null){
 			return true;
 		}
@@ -171,7 +165,7 @@ class Action {
 	 * Zakladni metoda pro vygenerování akce edit
 	 * @return string -- akce edit pro url 
 	 */
-	public function edit() {
+	public function edit(){
 		$actionAbbr = 'e';
 		$this->addAction($actionAbbr, "edit", _('uprava'));
 		return $this->createAction($actionAbbr);
@@ -202,29 +196,14 @@ class Action {
 	 * @param string $actionAbbr -- identifikátor akce
 	 * @return pole obsahující název, zkratku, id item
 	 */
-	protected function createAction($actionAbbr) {
-		$action = $this->actionsArray[$actionAbbr];
-
-        $return = array();
-        $return[0]= $action[self::ACTION_LABEL_PARAM];
-        $return[1]= $actionAbbr;
-        $return[2]= $this->getModule()->getId();
-
-        return $return;
-//		echo $returnString = $action[self::ACTION_LABEL_PARAM].self::ACTION_URL_LABEL_TYPE_SEP
-//			.$actionAbbr.self::ACTION_URL_TYPE_ID_SEP.$this->getModule()->getId();
-//		return $returnString;
-	}
-
-	/**
-	 * Metoda vrací výchozí akci pokud není definována
-	 * @return string
-	 * //TODO není korektní asi lepší použít setAction
-	 */
-//	public function getDefaultAction()
-//	{
-//		return $this->defaultAction;
-//	}
+   protected function createAction($actionAbbr) {
+      $action = $this->actionsArray[$actionAbbr];
+      $return = array();
+      $return[0]= $action[self::ACTION_LABEL_PARAM];
+      $return[1]= $actionAbbr;
+      $return[2]= $this->getModule()->getId();
+      return $return;
+   }
 
 	/**
 	 * Metoda nastavuje akci v url
@@ -236,5 +215,4 @@ class Action {
 		self::$currentActionIdItem = $idItem;
 	}
 }
-
 ?>

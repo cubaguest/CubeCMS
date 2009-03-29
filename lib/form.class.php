@@ -7,9 +7,9 @@
  * Umožňuje také generování podle jazykového nastavení
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: form.class.php 7 2009-01-21 21:32:52Z jakub $ VVE3.5.0 $Revision: 7 $
- * @author        $Author: jakub $ $Date: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
- *                $LastChangedBy: jakub $ $LastChangedDate: 2009-01-21 21:32:52 +0000 (St, 21 led 2009) $
+ * @version    	$Id$ VVE3.5.0 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract      Třída pro obsluhu formulářových prvků
  * @todo          Dodělat další validace, implementovat ostatní prvky formulářů
  */
@@ -132,12 +132,6 @@ class Form {
    private $isError = false;
 
   /**
-   * Poles chbějícími prvky
-   * @deprecated
-   */
-   //   private $errorMessages = array(self::ERROR_MISSING => false);
-
-  /**
    * Název prvků, ve kterých byla chyba
    * @var array
    */
@@ -184,24 +178,12 @@ class Form {
    */
    private $formValues = array();
 
-
- /**
-  * Konstruktor nastaví základní parametry
+  /**
+   * Konstruktor nastaví základní parametry
    * @param string $formPrefix -- prefix formulářových prvků první úrovně
-  */
+   */
    final public function  __construct($formPrefix = null) {
-      $this->infomsg = AppCore::getInfoMessages();
-      $this->errmsg = AppCore::getUserErrors();
-         
       $this->formPrefix = $formPrefix;
-   }
-
- /**
-  * Metoda vrací objekt s informačními zprávami
-  * @return Messages -- objekt zpráv
-  */
-   final private function infoMsg() {
-      return $this->infomsg;
    }
 
  /**
@@ -209,7 +191,7 @@ class Form {
   * @return Messages -- objekt zpráv
   */
    final private function errMsg() {
-      return $this->errmsg;
+      return AppCore::getUserErrors();
    }
 
  /**
@@ -240,6 +222,7 @@ class Form {
 
   /**
    * Metody vytváří prvek typu INPUT - TEXT
+   *
    * @param string $name -- Název prvku
    * @param boolean $obligation -- (option) jestli se jedná o povinný prvek
    * @param boolean $langs -- (option) jestli má prvek možnost jazykové mutace
@@ -253,9 +236,8 @@ class Form {
    * @return Form
    */
    public function crInputText($name, $obligation = false, $langs = false,
-      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
-      $maxChars = null, $minChars = null) {
-
+    $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
+    $maxChars = null, $minChars = null) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -266,7 +248,6 @@ class Form {
       $inputArray[self::ITEM_MIN_LENGHT] = $minChars;
 
       $this->formStructure[self::INPUT_TEXT][$name] = $inputArray;
-
       if($langs){
          $this->formValues[$name] = $this->createLangArray();
       } else {
@@ -287,8 +268,7 @@ class Form {
    * @return Form
    */
    public function crInputHidden($name, $obligation = false,
-      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE) {
-
+    $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -296,7 +276,6 @@ class Form {
       $inputArray[self::ITEM_VALIDATION] = $specialValidation;
 
       $this->formStructure[self::INPUT_HIDDEN][$name] = $inputArray;
-
       $this->formValues[$name] = null;
 
       return $this;
@@ -304,6 +283,7 @@ class Form {
 
   /**
    * Metody vytváří prvek typu INPUT - CHECKBOX
+   *
    * @param string $name -- Název prvku
    *
    * @return Form
@@ -317,6 +297,7 @@ class Form {
 
   /**
    * Metody vytváří prvek typu INPUT - FILE
+   *
    * @param string $name -- Název prvku
    * @param boolean $obligation -- jestli je zadaný prvek povinný
    *
@@ -326,12 +307,12 @@ class Form {
       $this->formStructure[self::INPUT_FILE][$name][self::ITEM_NAME] = $name;
       $this->formStructure[self::INPUT_FILE][$name][self::ITEM_OBLIGATION] = $obligation;
       $this->formValues[$name] = null;
-
       return $this;
    }
 
   /**
    * Metody vytváří prvek typu INPUT - TEXT
+   *
    * @param string $name -- Název prvku
    * @param boolean $obligation -- (option) jestli se jedná o povinný prvek
    * @param boolean $langs -- (option) jestli má prvek možnost jazykové mutace
@@ -345,9 +326,8 @@ class Form {
    * @return Form
    */
    public function crInputPassword($name, $obligation = false,
-      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
-      $maxChars = null, $minChars = null) {
-
+    $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
+    $maxChars = null, $minChars = null) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -360,29 +340,29 @@ class Form {
    }
 
    /**
-   * Metody vytváří prvek typu INPUT - DATE - ze smarty šablony
-   * @param string $name -- Název prvku
-   * @param int/timestamp $validateTime -- (option) jestli má být datum časově omezeno
+    * Metody vytváří prvek typu INPUT - DATE - ze smarty šablony
+    *
+    * @param string $name -- Název prvku
+    * @param int/timestamp $validateTime -- (option) jestli má být datum časově omezeno
     * Zadává se konstanta VALIDATE_DATE_XXX nebo časové razítko
-   * @param bool $down -- (option) pokud je true datum musí být menší než zadané
-   * @return Form
-   */
+    * @param bool $down -- (option) pokud je true datum musí být menší než zadané
+    *
+    * @return Form
+    */
    public function crInputDate($name, $validateTime = self::VALIDATE_DATE_ISEVERYTIME, $down = false) {
-
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_VALIDATION] = $validateTime;
       $inputArray[self::ITEM_CODE] = $down;
 
       $this->formStructure[self::INPUT_DATE][$name] = $inputArray;
-
       $this->formValues[$name] = null;
-
       return $this;
    }
 
   /**
    * Metody vytváří prvek typu TEXTAREA
+   *
    * @param string $name -- Název prvku
    * @param boolean $obligation -- (option) jestli se jedná o povinný prvek
    * @param boolean $langs -- (option) jestli má prvek možnost jazykové mutace
@@ -394,10 +374,8 @@ class Form {
    * @return Form
    */
    public function crTextArea($name, $obligation = false, $langs = false,
-      $code = self::CODE_HTMLENCODE, $maxChars = null, $minChars = null) {
-
+    $code = self::CODE_HTMLENCODE, $maxChars = null, $minChars = null) {
       $inputArray = array ();
-
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
       $inputArray[self::ITEM_LANGS] = $langs;
@@ -422,18 +400,12 @@ class Form {
   /**
    * Metoda zkontroluje, jestli byl formulář odeslán a překontroluje všechny prvky
    *
-   * @return boolean
+   * @return boolean -- true pokud je formulář vpořádku
    */
    public function checkForm() {
-      //    Pokud byl formulář odeslán
-      //      echo "<pre>";
-      //      print_r($_POST);
-      //      echo "</pre>";
       if(isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT]]) OR
-         isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT].'_x'])){
-
+       isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT].'_x'])){
          $this->fillinForm();
-
          return !$this->isError;
       }
       return false;
@@ -445,20 +417,21 @@ class Form {
 
    /**
     * Metoda vrací pole s chybně zadanými prvky
+    *
     * @return array -- pole s názvy chybně zadaných prvků
     */
    public function getErrorItems() {
       return $this->errorItems;
    }
 
-    /**
-   * Metoda vrací hodnoty formuláře jako pole hodnot
-   *
-   * @param boolean $oneArray(option) -- true pokud má být vráceno pole s jednou hloubkou,
-   * všechny indexy podpolí budo sloučeny s hlavními indexy pomocí operátoru
-   * @param boolean $withPrefix(option) -- jestli do indexů bude přidán také prefix formuláře
-   * @param string $operator(option) -- oddělovací operátor mezi indexy při slučování
-   */
+   /**
+    * Metoda vrací hodnoty formuláře jako pole hodnot
+    *
+    * @param boolean $oneArray(option) -- true pokud má být vráceno pole s jednou hloubkou,
+    * všechny indexy podpolí budo sloučeny s hlavními indexy pomocí operátoru
+    * @param boolean $withPrefix(option) -- jestli do indexů bude přidán také prefix formuláře
+    * @param string $operator(option) -- oddělovací operátor mezi indexy při slučování
+    */
    public function getValues($oneArray = false, $withPrefix = false, $operator = '_') {
       $returnaArray = array();
       //    Pokud má být prefix tak se doplní
@@ -469,55 +442,43 @@ class Form {
       } else {
          $returnaArray = $this->formValues;
       }
-
       if($oneArray){
          $returnaArray = $this->createOneArrayByKeys($returnaArray, null, $operator);
       }
       return $returnaArray;
    }
 
-  /**
-   * Metoda vrací hordnodu prvku ve formuláři
-   * @param string $itemName -- název formulářového prvku
-   * @param boolean $withPrefix -- jestli se má vracet i prefix formuláře
-   * @param boolean $oneArray -- jestli má být vráce pole o jednom rozměru,
-   * klíče budou sloučeny za sebe podle separátoru
-   * @param string $separator -- oddělovač klíčů v jednorozměrném poli
-   */
+   /**
+    * Metoda vrací hordnodu prvku ve formuláři
+    * @param string $itemName -- název formulářového prvku
+    * @param boolean $withPrefix -- jestli se má vracet i prefix formuláře
+    * @param boolean $oneArray -- jestli má být vráce pole o jednom rozměru,
+    * klíče budou sloučeny za sebe podle separátoru
+    * @param string $separator -- oddělovač klíčů v jednorozměrném poli
+    */
    public function getValue($itemName, $oneArray = false, $withPrefix = false, $separator = '_') {
       $value = null;
       if(key_exists($itemName, $this->formValues)){
-         //    if(isset ($this->formValues[$itemName])){
          if($oneArray AND is_array($this->formValues[$itemName])){
-            //        foreach ($this->formValues[$itemName] as $key => $val) {
-            //          $value[$this->formPrefix.$key]
-            //        }
             if(!$withPrefix){
                $value = $this->createOneArrayByKeys($this->formValues[$itemName]);
             } else {
                $value = $this->createOneArrayByKeys($this->formValues[$itemName], $this->formPrefix);
             }
          } else {
-            //        if(!$withPrefix){
             $value = $this->formValues[$itemName];
-            //        } else {
-            //          $value = $this->formValues[$itemName];
-            //        }
          }
-
-
       }
       return $value;
    }
 
-  /**
-   * Metoda nastavuje hodnotu prvkum formuláře
-   * @param string $itemName -- název prvku
-   * @param mixed $value -- hodnota prvku
-   */
+   /**
+    * Metoda nastavuje hodnotu prvkum formuláře
+    * @param string $itemName -- název prvku
+    * @param mixed $value -- hodnota prvku
+    */
    public function setValue($itemName, $value) {
       $item = $this->findItem($itemName);
-
       if(!empty($item)){
          //      Jedná lise o jazykovou verzy
          if(isset ($item[self::ITEM_LANGS]) AND $item[self::ITEM_LANGS] == true){
@@ -531,9 +492,8 @@ class Form {
             $this->formValues[$itemName] = $value;
          }
          return true;
-      } else {
-         return false;
       }
+      return false;
    }
 
    /**
@@ -549,12 +509,11 @@ class Form {
       }
    }
 
-  /**
-   * Metoda vytvoří pole, se sloučenými klíči
-   */
+   /**
+    * Metoda vytvoří pole, se sloučenými klíči
+    */
    private function createOneArrayByKeys($valuesArray, $currentPrefix = null, $separator = '_') {
       $values = array();
-
       if($currentPrefix != null){
          if($currentPrefix[strlen($currentPrefix)-1] != $separator){
             $prefixKey = $currentPrefix.$separator;
@@ -564,7 +523,6 @@ class Form {
       } else {
          $prefixKey = null;
       }
-
       foreach ($valuesArray as $key => $val) {
          if(is_array($val)){
             $values = array_merge($values, $this->createOneArrayByKeys($val,$prefixKey.$key, $separator));
@@ -643,13 +601,6 @@ class Form {
             if($value[self::ITEM_OBLIGATION]){
                //        pokud je více jazyků, je povinný havní jazyk aplikace
                if($value[self::ITEM_LANGS] AND is_array($_POST[$this->formPrefix.$inputName])){
-                  // Pokud bylo předáno pole prvků s jazyky
-                  //                  if(!isset ($_POST[$this->formPrefix.$inputName][$oblLang]) AND
-                  //                     is_array($_POST[$this->formPrefix.$inputName])){
-                  //
-                  //                  }
-                  //          Pokud nebyla hodnota vyplněna
-                  //                  else
                   if($_POST[$this->formPrefix.$inputName][$oblLang] == null
                      OR $_POST[$this->formPrefix.$inputName][$oblLang] == ''){
                      $this->addMissingValueError();
@@ -666,16 +617,7 @@ class Form {
                }
             }
             //  EOF  Kontrola povinnosti
-            //        data nejsou povinná
-            else {}
             $postValue = $_POST[$this->formPrefix.$inputName];
-            //echo get_magic_quotes_gpc()."<br>";
-            //echo set_magic_quotes_runtime(false)."<br>";
-            //echo get_magic_quotes_gpc()."<br>";
-            //        echo "<pre>";
-            //        print_r($postValue);
-            //        echo "</pre>";
-
 
             // SOF kódování
             if($value[self::ITEM_CODE] != self::CODE_NONE){
@@ -699,18 +641,11 @@ class Form {
                   $value[self::ITEM_MIN_LENGHT]);
             }
             // EOF délka řetězce
-
-            //        doplnění dat
-            //        foreach ($allLang as $lang) {
-            //          if(isset ($_POST[$this->formPrefix.$inputName][$lang])){
+            // doplnění dat
             $this->formValues[$inputName] = $postValue;
-            //          }
-            //        }
-
          } else {
             if($value[self::ITEM_OBLIGATION] == true){
-            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$_POST[$this->formPrefix.$inputName], 1);
+               throw new RangeException($this->createErrorMsg('input-text', $inputName),1);
             } else {
                $this->formValues[$inputName] = null;
             }
@@ -736,8 +671,6 @@ class Form {
                }
             }
             //  EOF  Kontrola povinnosti
-            //        data nejsou povinná
-            else {}
             $postValue = $_POST[$this->formPrefix.$inputName];
 
             // SOF kódování
@@ -759,8 +692,7 @@ class Form {
             $this->formValues[$inputName] = $postValue;
 
          } else {
-            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$this->formPrefix.$inputName, 2);
+            throw new RangeException($this->createErrorMsg('input-hidden', $inputName),2);
          }
       }
    }
@@ -845,17 +777,18 @@ class Form {
                }
             }
          } else {
-            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$this->formPrefix.$inputName._(' nebo nebyl odeslán formulář s parametrem "enctype"'), 6);
+            throw new RangeException(sprintf(
+               _('Nebyl odeslán formulářový prvek "input-file" s názvem "%s"
+nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inputName), 6);
          }
       }
    }
 
    /**
-   * Metoda vyplní data z formuláře do pole hodnot s datumy
+    * Metoda vyplní data z formuláře do pole hodnot s datumy
     *
     * @todo dodělat validaci
-   */
+    */
    private function fillInInputDate() {
       $inputs = $this->formStructure[self::INPUT_DATE];
       foreach ($inputs as $inputName => $value) {
@@ -863,20 +796,6 @@ class Form {
             $timestamp = mktime(0, 0, 0, $_POST[$this->formPrefix.$inputName]['Date_Day'],
                $_POST[$this->formPrefix.$inputName]['Date_Month'],
                $_POST[$this->formPrefix.$inputName]['Date_Year']);
-
-            // SOF Validace
-            //            if($value[self::ITEM_VALIDATION] != self::VALIDATE_DATE_ISEVERYTIME){
-            //               $this->validateItem($inputName, $timestamp, $value[self::ITEM_VALIDATION]);
-            //            }
-            // EOF Validace
-            //            Je odeslán bez hodnoty
-            //            if($_POST[$this->formPrefix.$inputName] == 'on'){
-            //               $this->formValues[$inputName] = true;
-            //            }
-            ////            Je odeslán s hodnotou
-            //            else {
-            //               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
-            //            }
          } else {
             $this->formValues[$inputName] = false;
          }
@@ -885,28 +804,29 @@ class Form {
 
    /**
     * Metoda vygeneruje chbovou hlášku pro chybně odeslaný soubor
+    * 
     * @param integer $errNumber -- číslo chyby z $_FILES
     * @param string $fileOriginalName -- původní název souboru
     */
    private function createUploadFileError($errNumber, $fileOriginalName) {
       switch($errNumber){
          case 0: //no error; possible file attack!
-            $this->errMsg()->addMessage(_('Problém s nahráním souboru ').$fileOriginalName);
+            $this->errMsg()->addMessage(sprintf(_('Problém s nahráním souboru "%s"'),$fileOriginalName));
             break;
          case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
-            $this->errMsg()->addMessage(_('Soubor je příliš ').$fileOriginalName._(' velký'));
+            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" je příliš velký'), $fileOriginalName));
             break;
          case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
-            $this->errMsg()->addMessage(_('Soubor je příliš ').$fileOriginalName._(' velký'));
+            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" je příliš velký'), $fileOriginalName));
             break;
          case 3: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(_('Soubor ').$fileOriginalName._(' byl nahrán jen částečně'));
+            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" byl nahrán jen částečně'),$fileOriginalName));
             break;
          case 4: //no file was uploaded
             $this->errMsg()->addMessage(_('Soubor nebyl vybrán'));
             break;
          default: //a default error, just in case!  :)
-            $this->errMsg()->addMessage(_('Problém s nahráním souboru ').$fileOriginalName);
+            $this->errMsg()->addMessage(sprintf(_('Problém s nahráním souboru "%s"'),$fileOriginalName));
             break;
       }
    }
@@ -916,7 +836,6 @@ class Form {
    */
    private function fillInInputPassword() {
       $inputs = $this->formStructure[self::INPUT_PASSWORD];
-
       foreach ($inputs as $inputName => $value) {
          //      Jestli byl prvek vůbec odeslán
          if(isset ($_POST[$this->formPrefix.$inputName])){
@@ -930,7 +849,6 @@ class Form {
             }
             //  EOF  Kontrola povinnosti
             $postValue = $_POST[$this->formPrefix.$inputName];
-
             // SOF kódování
             if($value[self::ITEM_CODE] != self::CODE_NONE){
                if($value[self::ITEM_CODE] == self::CODE_HTMLENCODE){
@@ -940,24 +858,20 @@ class Form {
                }
             }
             // EOF kódování
-
             // SOF Validace
             if($value[self::ITEM_VALIDATION] != self::VALIDATE_NONE){
                $this->validateItem($inputName, $postValue, $value[self::ITEM_VALIDATION]);
             }
             // EOF Validace
-
             // SOF délka řetězce
             if($value[self::ITEM_MIN_LENGHT] != null OR $value[self::ITEM_MIN_LENGHT] != null){
                $this->checkLenght($inputName, $postValue, $value[self::ITEM_MAX_LENGHT],
                   $value[self::ITEM_MIN_LENGHT]);
             }
             // EOF délka řetězce
-
             $this->formValues[$inputName] = $postValue;
          } else {
-            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ')
-               .$_POST[$this->formPrefix.$inputName], 3);
+            throw new RangeException($this->createErrorMsg('input-password', $inputName),7);
          }
       }
    }
@@ -997,14 +911,6 @@ class Form {
             //        data nejsou povinná
             else {}
             $postValue = $_POST[$this->formPrefix.$inputName];
-            //echo get_magic_quotes_gpc()."<br>";
-            //echo set_magic_quotes_runtime(false)."<br>";
-            //echo get_magic_quotes_gpc()."<br>";
-            //        echo "<pre>";
-            //        print_r($postValue);
-            //        echo "</pre>";
-
-
             // SOF kódování
             if($value[self::ITEM_CODE] != self::CODE_NONE){
                if($value[self::ITEM_CODE] == self::CODE_HTMLENCODE){
@@ -1014,13 +920,6 @@ class Form {
                }
             }
             // EOF kódování
-
-            // SOF Validace
-            //        if($value[self::ITEM_VALIDATION] != self::VALIDATE_NONE){
-            //          $this->validateItem($postValue, $value[self::ITEM_VALIDATION]);
-            //        }
-            // EOF Validace
-
             // SOF délka řetězce
             if($value[self::ITEM_MIN_LENGHT] != null OR $value[self::ITEM_MIN_LENGHT] != null){
                $this->checkLenght($inputName, $postValue, $value[self::ITEM_MAX_LENGHT],
@@ -1031,7 +930,7 @@ class Form {
             $this->formValues[$inputName] = $postValue;
 
          } else {
-            new CoreException(_('Nebyl odeslán formulářový prvek s názvem ').$_POST[$this->formPrefix.$inputName], 4);
+            throw new RangeException($this->createErrorMsg('textarea', $inputName),8);
          }
       }
    }
@@ -1041,7 +940,6 @@ class Form {
    */
    private function createLangArray() {
       $lang = Locale::getAppLangs();
-
       $retArr = array();
       foreach ($lang as $l) {
          $retArr[$l] = null;
@@ -1051,12 +949,12 @@ class Form {
 
   /**
    * Metoda překóduje prvky na html entity (rekurzivní funkce)
+   *
    * @param mixed $value -- hodnoty
    * @return mixed -- překódované hodnoty
    */
    private function codeHtmlEncode($value){
       $codeValue = null;
-
       if(is_array($value)){
          foreach ($value as $key => $val) {
             $codeValue[$key] = $this->codeHtmlEncode($val);
@@ -1066,18 +964,17 @@ class Form {
          $value = stripslashes($value);
          $codeValue = htmlspecialchars($value, ENT_QUOTES);
       }
-
       return $codeValue;
    }
 
   /**
    * Metoda překóduje html entity na prvky (rekurzivní funkce)
+   *
    * @param mixed $value -- hodnoty
    * @return mixed -- dekódované hodnoty
    */
    private function codeHtmlDecode($value){
       $codeValue = null;
-
       if(is_array($value)){
          foreach ($value as $key => $val) {
             $codeValue[$key] = $this->codeHtmlDecode($val);
@@ -1085,12 +982,12 @@ class Form {
       } else {
          $codeValue = htmlspecialchars_decode($value, ENT_QUOTES);
       }
-
       return $codeValue;
    }
 
   /**
    * Metoda pro validaci prvků
+   *
    * @param string $value -- název prvku
    * @param mixed $value -- hodnota, která se má kontrolovat
    * @param mixed $validation -- typ validace (buď kód nebo název funkce)
@@ -1112,10 +1009,9 @@ class Form {
                   $this->addErrorItem($itemName);
                }
                break;
-
             default:
-               throw new CoreException(_('Tento typ validace CODE: ').$validationCode
-                  ._('není implementovát. Implementuj!'));
+               throw new InvalidArgumentException(sprintf(
+                     _('Validace s kódem "%s" není implementována. Implementuj!!'),$validation),9);
                break;
          }
       } else if(function_exists($validation)){
@@ -1123,11 +1019,15 @@ class Form {
             $this->errMsg()->addMessage(_('Nebyl zadán správný typ prvku'));
             $this->addErrorItem($itemName);
          }
+      } else {
+         throw new InvalidArgumentException(sprintf(
+            _('Nepodporovaná validace s názvem "%s"'),$validation),10);
       }
    }
 
   /**
    * Metoda pro validaci emailu
+   *
    * @param string $email -- emailová adresa
    */
    private function validateEMail($email) {
@@ -1146,6 +1046,7 @@ class Form {
 
   /**
    * Metoda kontroluje délky řetězců
+   *
    * @param string $itemName -- název prvku
    * @param mixed $value -- hodnota prvku
    * @param int $maxChars -- maximální délka řetězce
@@ -1170,8 +1071,6 @@ class Form {
             }
          }
       }
-
-
    }
 
   /**
@@ -1183,11 +1082,10 @@ class Form {
 
   /**
    * Přidá název prvku do chybných prvků
+   *
    * @param string $name -- název prvku
    */
    private function addErrorItem($name, $subItem = null) {
-
-
       if($subItem == null){
          $this->errorItems[$name] = true;
       } else {
@@ -1197,12 +1095,23 @@ class Form {
    }
 
   /**
-   * @todo Odstranit
+   * @todo Odstranit pokud se nebude hodit
    */
    public function debug() {
       echo "<pre>";
       print_r($this);
       echo '</pre>';
+   }
+
+   /**
+    * Metoda vytvoří název pro chybovou hlášku neexistujícího prvku
+    * @param string $inputType -- typ prvku (např. input-hidden)
+    * @param string $inputName -- název prvku
+    * @return string -- vygenerovaná a přeložená chybová hláška
+    */
+   private function createErrorMsg($inputType, $inputName) {
+      return sprintf(_('Formulářový prvek "s%" s názvem "%s" nebyl odeslán'), 
+         $inputType, $this->formPrefix.$inputName);
    }
 }
 ?>

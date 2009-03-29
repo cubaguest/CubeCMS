@@ -40,16 +40,12 @@ class ReferencesController extends Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-
       if($this->getrights()->iswritable()){
          $this->checkDeleteReference();
       }
-
       //		Vytvoření modelu
       $referModel = new ReferenceModel();
-
       $referencesArr = $referModel->getReferencesList();
-
       //		link pro přidání
       if($this->getrights()->iswritable()){
          $this->container()->addlink('LINK_TO_ADD_REFERENCE',$this->getLink()->action($this->getaction()->add()));
@@ -62,10 +58,7 @@ class ReferencesController extends Controller {
             ->action($this->getaction()->edit());
          }
       }
-
       $this->container()->addData('OTHER_REFERENCES', $referModel->getOtherReferences());
-
-
       $this->container()->addData('REFERENCES', $referencesArr);
       $this->container()->addData('IMAGES_DIR', $this->getModule()->getDir()->getDataDir());
       $this->container()->addData('IMAGES_SMALL_DIR', $this->getModule()->getDir()->getDataDir()
@@ -77,47 +70,40 @@ class ReferencesController extends Controller {
    */
    public function addController(){
       $this->checkWritebleRights();
-
       $referenceForm = new Form();
       $referenceForm->setPrefix(self::FORM_PREFIX);
-
       $referenceForm->crInputText(self::FORM_INPUT_NAME, true, true)
       ->crTextArea(self::FORM_INPUT_LABEL, true, true, Form::CODE_HTMLDECODE)
       ->crInputFile(self::FORM_INPUT_FILE, true)
       ->crSubmit(self::FORM_BUTTON_SEND);
-
       //        Pokud byl odeslán formulář
       if($referenceForm->checkForm()){
          $image = new ImageFile($referenceForm->getValue(self::FORM_INPUT_FILE));
-
          if($image->isImage()){
             $refM = new ReferenceModel();
-
             try {
                //            Uložení obrázků
                // malý
                $image->saveImage($this->getModule()->getDir()->getDataDir()
                   .self::IMAGES_SMALL_DIR.DIRECTORY_SEPARATOR,
-                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_WIDTH),
-                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_HEIGHT));
+                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_WIDTH, 200),
+                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_HEIGHT, 150));
                // velký
                $image->saveImage($this->getModule()->getDir()->getDataDir(),
-                  $this->getModule()->getParam(self::PARAM_IMAGE_WIDTH),
-                  $this->getModule()->getParam(self::PARAM_IMAGE_HEIGHT));
-               $refM->saveNewReference($referenceForm->getValue(self::FORM_INPUT_NAME),
+                  $this->getModule()->getParam(self::PARAM_IMAGE_WIDTH, 800),
+                  $this->getModule()->getParam(self::PARAM_IMAGE_HEIGHT, 600));
+               if(!$refM->saveNewReference($referenceForm->getValue(self::FORM_INPUT_NAME),
                   $referenceForm->getValue(self::FORM_INPUT_LABEL),
-                  $image->getName());
-               $this->infoMsg()->addMessage(_('Reference byla uložena'));
+                  $image->getName())){
+                  throw new ModuleException(_m('Chyba při ukládání reference'), 1);
+               }
+               $this->infoMsg()->addMessage(_m('Reference byla uložena'));
                $this->getLink()->action()->reload();
             } catch (Exception $e) {
-               echo $e->getMessage();
-               new CoreException(_('Referenci se nepodařilo uložit, chyba:').$e->getMessage(), 1);
+               new ModuleException(_m('Referenci se nepodařilo uložit, chyba:').$e->getMessage(), 1);
             }
-
-
          }
       }
-
       $this->container()->addData('REFERENCE_DATA', $referenceForm->getValues());
       $this->container()->addData('ERROR_ITEMS', $referenceForm->getErrorItems());
       //		Odkaz zpět
@@ -129,25 +115,20 @@ class ReferencesController extends Controller {
    */
    public function editController() {
       $this->checkWritebleRights();
-
       $referenceForm = new Form();
       $referenceForm->setPrefix(self::FORM_PREFIX);
-
       $referenceForm->crInputText(self::FORM_INPUT_NAME, true, true)
       ->crTextArea(self::FORM_INPUT_LABEL, true, true, Form::CODE_HTMLDECODE)
       ->crInputFile(self::FORM_INPUT_FILE)
       ->crSubmit(self::FORM_BUTTON_SEND);
-
       //      Načtení hodnot prvků
       $referM = new ReferenceModel();
       $referM->loadReferenceDetailAllLangs($this->getArticle()->getArticle());
       //      Nastavení hodnot prvků
       $referenceForm->setValue(self::FORM_INPUT_NAME, $referM->getNamesLangs());
       $referenceForm->setValue(self::FORM_INPUT_LABEL, $referM->getLabelsLangs());
-
       $label = $referM->getNamesLangs();
       $this->container()->addData('REFERENCE_NAME', $label[Locale::getLang()]);
-
       //        Pokud byl odeslán formulář
       if($referenceForm->checkForm()){
             $imageName = null;
@@ -164,31 +145,30 @@ class ReferencesController extends Controller {
                      .self::IMAGES_SMALL_DIR.DIRECTORY_SEPARATOR);
                   $oldImage->remove();
                } catch (Exception $e) {
-                  new CoreException(_('Chyba při mazání obrázku.').$e->getMessage(),2);
+                  new CoreException(_m('Chyba při mazání obrázku.').$e->getMessage(),2);
                }
 
                // malý
                $image->saveImage($this->getModule()->getDir()->getDataDir()
                   .self::IMAGES_SMALL_DIR.DIRECTORY_SEPARATOR,
-                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_WIDTH),
-                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_HEIGHT));
+                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_WIDTH, 200),
+                  $this->getModule()->getParam(self::PARAM_SMALL_IMAGE_HEIGHT, 150));
                // velký
                $image->saveImage($this->getModule()->getDir()->getDataDir(),
-                  $this->getModule()->getParam(self::PARAM_IMAGE_WIDTH),
-                  $this->getModule()->getParam(self::PARAM_IMAGE_HEIGHT));
+                  $this->getModule()->getParam(self::PARAM_IMAGE_WIDTH,800),
+                  $this->getModule()->getParam(self::PARAM_IMAGE_HEIGHT,600));
                $imageName = $image->getName();
             }
          }
          //            Uložení dat do db
-         try {
-            $referM->saveEditReference($referenceForm->getValue(self::FORM_INPUT_NAME),
+         
+         if(!$referM->saveEditReference($referenceForm->getValue(self::FORM_INPUT_NAME),
                $referenceForm->getValue(self::FORM_INPUT_LABEL),
-               $imageName, $this->getArticle()->getArticle());
-         } catch (Exception $e) {
-            new CoreException(_('Chyba při ukládání obrázku').$e->getMessage(),3);
+               $imageName, $this->getArticle()->getArticle())){
+            throw new ModuleException(_m('Chyba při ukládání obrázku'),3);
          }
 
-         $this->infoMsg()->addMessage(_('Reference byla uložena'));
+         $this->infoMsg()->addMessage(_m('Reference byla uložena'));
          $this->getLink()->action()->article()->reload();
       }
 
@@ -222,11 +202,11 @@ class ReferencesController extends Controller {
             // vymaz z db
             $referM->deleteReference($delForm->getValue(self::FORM_INPUT_ID));
 
-            $this->infoMsg()->addMessage(_('Reference byla smazána'));
+            $this->infoMsg()->addMessage(_m('Reference byla smazána'));
             $this->getLink()->reload();
 
          } catch (Exception $e) {
-            new CoreException(_('Referenci se nepodařilo smazat').$e->getMessage(), 4);
+            new CoreException(_m('Referenci se nepodařilo smazat').$e->getMessage(), 4);
          }
 
       }
@@ -245,20 +225,17 @@ class ReferencesController extends Controller {
  //        Pokud byl odeslán formulář
       if($form->checkForm()){
          if($refM->saveEditOtherReferences($form->getValue(self::FORM_INPUT_TEXT))){
-            $this->infoMsg()->addMessage(_('Ostatní reference byly uloženy'));
+            $this->infoMsg()->addMessage(_m('Ostatní reference byly uloženy'));
             $this->getLink()->action()->reload();
          } else {
-            new CoreException(_('Ostatní reference se nepodařilo uložit, chyba při ukládání.'), 1);
+            new CoreException(_m('Ostatní reference se nepodařilo uložit, chyba při ukládání.'), 1);
          }
       }
-//    Data do šablony
+      //    Data do šablony
       $this->container()->addData('REFERENCE_OTHER_DATA', $form->getValues());
       $this->container()->addData('ERROR_ITEMS', $form->getErrorItems());
-
       //		Odkaz zpět
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
    }
-
 }
-
 ?>

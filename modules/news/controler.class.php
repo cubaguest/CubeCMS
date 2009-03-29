@@ -61,10 +61,9 @@ class NewsController extends Controller {
 
       //		Vytvoření modelu
       $listNews = new NewsListModel();
-
       //		Scrolovátka
       $scroll = new ScrollEplugin();
-
+      //TODO předělat na objekt parametru z enginu
       if(isset($_GET[self::GET_NUM_NEWS]) AND (is_numeric($_GET[self::GET_NUM_NEWS]) OR $_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS)){
          if(is_numeric($_GET[self::GET_NUM_NEWS])){
             $scroll->setCountRecordsOnPage((int)$_GET[self::GET_NUM_NEWS]);
@@ -72,14 +71,12 @@ class NewsController extends Controller {
             $scroll->setCountRecordsOnPage($listNews->getCountNews());
          }
       } else {
-         $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_NEWS));
+         $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_NEWS, 10));
       }
-      
       $scroll->setCountAllRecords($listNews->getCountNews());
 
       //		Vybrání novinek
-         $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
-
+      $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
       //		Přidání linku pro editaci a jestli se dá editovat
       if(!empty ($newsArray)){
          foreach ($newsArray as $key => $news) {
@@ -95,7 +92,6 @@ class NewsController extends Controller {
             $newsArray[$key][self::NEWS_SHOW_LINK] = $this->getLink()
             ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],
                $news[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
-
          }
       }
 
@@ -122,8 +118,7 @@ class NewsController extends Controller {
       $this->container()->addData('num_news', $numNewsArray);
    }
 
-   public function showController()
-   {
+   public function showController(){
       $newsDetail = new NewsDetailModel();
       $new = $newsDetail->getNewsDetailSelLang($this->getArticle()->getArticle());
 
@@ -141,11 +136,10 @@ class NewsController extends Controller {
 
             if($newDetail->deleteNews($form->getValue(self::FORM_INPUT_ID),
                   $this->getRights()->getAuth()->getUserId())){
-               $this->infoMsg()->addMessage(_('Novinka byla smazána'));
-               $this->getLink()->article()->action()->rmParam()->reload();
-            } else {
-               new CoreException(_('Novinku se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
+               throw new UnexpectedValueException(_m('Novinku se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
+            $this->infoMsg()->addMessage(_m('Novinka byla smazána'));
+            $this->getLink()->article()->action()->rmParam()->reload();
          }
       }
 
@@ -177,14 +171,13 @@ class NewsController extends Controller {
       //        Pokud byl odeslán formulář
       if($newsForm->checkForm()){
          $newsDetail = new NewsDetailModel();
-         if($newsDetail->saveNewNews($newsForm->getValue(self::FORM_INPUT_LABEL),
+         if(!$newsDetail->saveNewNews($newsForm->getValue(self::FORM_INPUT_LABEL),
                $newsForm->getValue(self::FORM_INPUT_TEXT),
                $this->getRights()->getAuth()->getUserId())){
-            $this->infoMsg()->addMessage(_('Novinka byla uložena'));
-            $this->getLink()->article()->action()->rmParam()->reload();
-         } else {
-            new CoreException(_('Novinku se nepodařilo uložit, chyba při ukládání.'), 1);
+            throw new UnexpectedValueException(_('Novinku se nepodařilo uložit, chyba při ukládání.'), 1);
          }
+         $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
+         $this->getLink()->article()->action()->rmParam()->reload();
       }
 
       $this->container()->addData('NEWS_DATA', $newsForm->getValues());
@@ -219,13 +212,12 @@ class NewsController extends Controller {
       //        Pokud byl odeslán formulář
       if($newsForm->checkForm()){
          $newsDetail = new NewsDetailModel();
-         if($newsDetail->saveEditNews($newsForm->getValue(self::FORM_INPUT_LABEL),
+         if(!$newsDetail->saveEditNews($newsForm->getValue(self::FORM_INPUT_LABEL),
                $newsForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            $this->infoMsg()->addMessage(_('Novinka byla uložena'));
-            $this->getLink()->action()->reload();
-         } else {
-            new CoreException(_('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
+            throw new UnexpectedValueException(_('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
          }
+         $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
+         $this->getLink()->action()->reload();
       }
 
 //    Data do šablony

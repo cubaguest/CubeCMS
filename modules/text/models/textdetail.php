@@ -71,28 +71,16 @@ class TextDetailModel extends DbModel {
                ->set($textArr)
                ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
          //      // vložení do db
-         if($this->getDb()->query($sqlInsert)){
-            return true;
-         } else {
-            return false;
-         };
+         return $this->getDb()->query($sqlInsert);
       } else {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
             self::COLUMN_CHANGED_TIME, time(),
             self::COLUMN_ID_ITEM, $this->getModule()->getId());
-         //
          $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
                ->colums(array_keys($textArr))
                ->values(array_values($textArr));
-         //      //		Vložení do db
-         try {
-            if(!$this->getDb()->query($sqlInsert)){
-                  throw new DBException(_('Text se nepodařilo uložit, chyba při ukládání.'), 1);
-            }
-         } catch (Exception $e) {
-            new CoreErrors($e);
-         }
-
+         //	Vložení do db
+         return $this->getDb()->query($sqlInsert);
       }
    }
 

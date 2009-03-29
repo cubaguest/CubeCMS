@@ -266,7 +266,8 @@ public function editController() {
 						$oldImage = $this->getDb()->fetchObject($sqlImageSelect);
 						if($oldImage->{self::COLUM_SPONSOR_LOGO_IMAGE} != null){
 							$file = new Files();
-							$file->deleteFile($this->getModule()->getDir()->getDataDir(), $oldImage->{self::COLUM_SPONSOR_LOGO_IMAGE});
+							$file->deleteFile($oldImage->{self::COLUM_SPONSOR_LOGO_IMAGE},
+                        $this->getModule()->getDir()->getDataDir());
 							unset($file);
 						}
 

@@ -4,10 +4,10 @@
  * Rozhraní zobrazuje prvky třídy, které musí být použity v jednotlivých implementacích
  * databázových konektorů.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro výběr záznamů z db
  */
 
@@ -95,5 +95,4 @@ interface Db_Select{
 	 */
 	public function limit($rowCount, $offset);
 }
-
 ?>

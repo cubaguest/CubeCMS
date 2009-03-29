@@ -6,10 +6,10 @@ require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::E
  * Tříta pro vytvoření modelu, přistupujícího k databázi. Umožňuje základní práce
  * s databází.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Abstraktní třída pro vytvoření modelu pro práci s databází
  */
 
@@ -40,25 +40,21 @@ class DbModel extends Model {
    protected function createValuesArray($name, $val) {
       $separator = '_';
       $returnArray = array();
-      if(func_num_args()%2 == 0){
-         $argv = func_get_args();
-
-//         Skáčeme po dvou, protože první je sloupec a adruhý je hodnota
-         for ($step = 0 ; $step < func_num_args() ; $step=$step+2) {
-            if(is_array($argv[$step+1])){
-               $returnArray = array_merge($returnArray, $this->createOneArray(
-                     $argv[$step+1],$argv[$step]));
-            } else {
-               $returnArray[$argv[$step]] = $argv[$step+1];
-            }
-         }
-      } else {
-         new CoreException(_('Nebyl předán potřebný počet argumentů'));
+      if(func_num_args()%2 != 0){
+         throw new InvalidArgumentException(_('Nebyl předán potřebný počet argumentů'),1);
       }
-
+      $argv = func_get_args();
+      //         Skáčeme po dvou, protože první je sloupec a adruhý je hodnota
+      for ($step = 0 ; $step < func_num_args() ; $step=$step+2) {
+         if(is_array($argv[$step+1])){
+            $returnArray = array_merge($returnArray, $this->createOneArray(
+                  $argv[$step+1],$argv[$step]));
+         } else {
+            $returnArray[$argv[$step]] = $argv[$step+1];
+         }
+      }
       return $returnArray;
    }
-
 
    /**
     * Metoda vytvoří z pole jednorozměrné pole oddělené separátorem
@@ -68,7 +64,6 @@ class DbModel extends Model {
     */
    private function createOneArray($arr, $prefix = null, $separator = '_') {
       $values = array();
-
       if($prefix != null){
          if($prefix[strlen($prefix)-1] != $separator){
             $prefixKey = $prefix.$separator;
@@ -78,7 +73,6 @@ class DbModel extends Model {
       } else {
          $prefixKey = null;
       }
-
       foreach ($arr as $key => $val) {
          if(is_array($val)){
             $values = array_merge($values, $this->createOneArray($val,$prefixKey.$key, $separator));
@@ -98,7 +92,6 @@ class DbModel extends Model {
       if(!is_array($prefixArray)){
          $prefixArray = array($prefixArray);
       }
-
       $returnArr = array();
       foreach ($values as $key => $var) {
          $matches = array();
@@ -111,7 +104,5 @@ class DbModel extends Model {
       };
       return $returnArr;
    }
-
 }
-
 ?>

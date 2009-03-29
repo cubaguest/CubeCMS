@@ -4,10 +4,10 @@
  * implementuje zvlášť, ale obsahuje vlastní metody pro zjednodušení přístupu
  * a vytvoření jednotlivých implementací
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.3 $Revision: $
- * @author        $Author: $ $Date:$
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract      Třída pro vyhledávání v modulech
  */
 class Search {
@@ -151,28 +151,19 @@ class Search {
     * @return array
     */
    public static function getResults() {
-//echo "<pre>před";
-//print_r(self::$searchResults);
-//echo "</pre>";
-
       self::sortResults();
-
       //odstranění znaků
       $removeChars = array('+', '-', '"', '(', ')', '~', '*');
       $searchString = str_replace($removeChars, ' ', self::$searchString);
-
       $searchArray = array();
       $searchArray = preg_split('/[ ]+/', str_replace($removeChars, ' ', self::$searchString));
-
       // Odstranění prázdných prvků v poli
       foreach ($searchArray as $key => $val) {
          if($val == null OR $val == ''){
             unset ($searchArray[$key]);
          }
       }
-
       $textHelper = new TextHelper();
-
       $stringLenght = AppCore::sysConfig()->getOptionValue('result_lenght', 'search');
       $delta = 20;
       $highLightTag = AppCore::sysConfig()->getOptionValue('highlight_tag', 'search');
@@ -181,7 +172,6 @@ class Search {
       foreach (self::$searchResults as $resultKey => $result) {
          // odstranění html tagů
          $text = strip_tags($result[self::RESULT_INDEX_TEXT]);
-
          //Jestli se bude vůbec ořezávat
          if(strlen($text) > $stringLenght){
             reset($searchArray);
@@ -198,16 +188,11 @@ class Search {
                $text = '...'.$text;
             }
          }
-
          foreach ($searchArray as $key => $val) {
             $text = preg_replace('/('.$val.')/i', '<'.$highLightTag.'>\\1</'.$highLightTag.'>', $text);
          }
          self::$searchResults[$resultKey][self::RESULT_INDEX_TEXT] = $text;
       }
-
-//echo "<pre>po";
-//print_r(self::$searchResults);
-//echo "</pre>";
       return self::$searchResults;
    }
 
@@ -226,8 +211,6 @@ class Search {
       usort(self::$searchResults, 'cmpResult');
    }
 
-
-
    /**
     * Metoda vrací počet výsledků hledání
     * @return integer -- počet výsledků
@@ -235,6 +218,5 @@ class Search {
    public static function getNumResults() {
       return count(self::$searchResults);
    }
-
 }
 ?>

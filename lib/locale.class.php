@@ -6,10 +6,11 @@
  * jazyků, a všech použiých jazyků v aplikaci.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.3 $Revision: $
+ * @version    	$Id: $ VVE3.9.4 $Revision: $
  * @author			$Author: $ $Date:$
  *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro obsluhu jazykového nastavení
+ * @internal      Last ErrorCode 2
  */
 
 class Locale {
@@ -207,7 +208,7 @@ class Locale {
       putenv("LANG=".self::getLocale(self::getLang()));
       setlocale(LC_ALL, self::getLocale(self::getLang()));
       bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, self::GETTEXT_DEFAULT_LOCALES_DIR);
-      self::switchToEngineTexts();
+      textdomain(self::GETTEXT_DEFAULT_DOMAIN);
    }
 
    /**
@@ -291,23 +292,26 @@ class Locale {
    /**
     * Metoda přenastaví lokalizační texty na engine
     */
-   public static function switchToEngineTexts() {
-      textdomain(self::GETTEXT_DEFAULT_DOMAIN);
-   }
+//   public static function switchToEngineTexts() {
+//      textdomain(self::GETTEXT_DEFAULT_DOMAIN);
+//   }
 
    /**
-    * Metoda přenastaví lokalizační texty na engine
+    * Metoda přenastaví lokalizační texty na modul
     *
     * @param string -- název modulu, na který se mají texty přnastavit (option)\
     * 					 pokud je prázdná použije se zvolený modul enginu
     */
-   public static function switchToModuleTexts($moduleName = null){
-      if($moduleName == null AND AppCore::getSelectedModule() != null){
-         textdomain(AppCore::getSelectedModule()->getName());
-      } else if($moduleName != null){
-         textdomain($moduleName);
-      }
-   }
+//   public static function switchToModuleTexts($moduleName = null){
+//      if($moduleName == null AND AppCore::getSelectedModule() != null){
+//         textdomain(AppCore::getSelectedModule()->getName());
+//      } else if($moduleName != null){
+//         if(textdomain($moduleName)){
+//            throw new InvalidArgumentException(sprintf(
+//                  _('Lokalizace pro modul "%s" nebyla načtena'), $moduleName), 2);
+//         }
+//      }
+//   }
 
    /**
     * Metoda přidá textovou doménu pro překlad
@@ -321,6 +325,25 @@ class Locale {
       } else if($moduleName != null){
          bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
             . DIRECTORY_SEPARATOR . $moduleName . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+      }
+   }
+
+   /**
+    * Metoda inicializuje doplňkové funkce pro práci s překlady
+    */
+   public static function initTranslationsFunctions() {
+      /**
+       * Funkce pro lokalizaci textů v modulech, pokud modul neexistuje je použit
+       * překlad pro engine
+       * 
+       * @param string $message -- zpráva pro překlad
+       * @return striing -- přeložený text
+       */
+      function _m($message) {
+         if(AppCore::getSelectedModule() != null){
+            return dgettext(AppCore::getSelectedModule()->getName(), $message);
+         }
+         return _($message);
       }
    }
 }

@@ -3,12 +3,13 @@
  * Třída pro práci se $_SESSIONS.
  * Třída umožňuje základní přístupy k Sessions, jejich vytváření, mazání, aktualizaci atd.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: sessions.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro práci se SESSIONS
  * 
- * //TODO dodělat! není skoro implementována
+ * @todo          dodělat! není skoro implementována
  */
 
 class Sessions {
@@ -20,33 +21,28 @@ class Sessions {
 	
 	/**
 	 * Statická metoda pro nastavení session
-	 * @param string -- název session do ketré se bude ukládat
+	 * @param string $sessionName -- název session do ketré se bude ukládat
 	 */
 	public static function factory($sessionName) {
 		//Nastaveni session
 		session_regenerate_id(); // ochrana před Session Fixation
 		// 	Nastaveni limutu pro automaticke odhlaseni
 		/* set the cache limiter to 'private' */
-
 		session_cache_limiter('private');
 		$cache_limiter = session_cache_limiter();
-
 		/* set the cache expire to 30 minutes */
 		session_cache_expire(30);
 		$cache_expire = session_cache_expire();
-
 		//session_set_cookie_params(1800);
 		session_name($sessionName);
 		session_start();
-		
 		self::$sessionInitalized = true;
 	}
-	
 	
 	/**
 	 * Konstruktor vytvoří objekt pro práci se session
 	 *
-	 * @param string -- název session (option)
+	 * @param string $sessionName -- název session (option)
 	 */
 	function __construct($sessionName = 'default_session') {
 		if(!self::$sessionInitalized){
@@ -57,8 +53,8 @@ class Sessions {
 	/**
 	 * Metoda uloží proměnou do session
 	 * 
-	 * @param string -- název proměné
-	 * @param mixed -- hodnota proměné
+	 * @param string $name -- název proměné
+	 * @param mixed $value -- hodnota proměné
 	 */
 	public function add($name, $value) {
 		$_SESSION[$name] = $value;
@@ -67,7 +63,7 @@ class Sessions {
 	/**
 	 * Metoda vrací obsah zadané session
 	 * 
-	 * @param string -- název session
+	 * @param string $name -- název session
 	 * @return mixed -- obsah session
 	 */
 	public function get($name){
@@ -79,11 +75,10 @@ class Sessions {
 		}
 	}
 	
-	
 	/**
 	 * Metoda zjišťuje jestli je daná session prázdná
 	 * 
-	 * @param string -- název session
+	 * @param string $name -- název session
 	 */
 	public function isEmpty($name) {
 		if(isset($_SESSION[$name])){
@@ -96,7 +91,7 @@ class Sessions {
 	/**
 	 * Metoda odstraní zadanou session
 	 * 
-	 * @param string -- název session
+	 * @param string $name -- název session
 	 */
 	public function remove($name){
 		if(isset($_SESSION[$name])){
@@ -112,8 +107,5 @@ class Sessions {
 		session_commit();
 		session_start();
 	}
-	
-	
 }
-
 ?>

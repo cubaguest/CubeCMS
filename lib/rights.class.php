@@ -4,14 +4,14 @@
  * Třída slouží pro práci s právy uživatele na zvolené kategorii. Umožňuje zjištění,
  * jestli je kategorie přístuppná pro čtení, zápis nebo kontrolu.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: rights.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro zjišťování práv uživatele
  */
 
 class Rights {
-
 	/**
 	 * Prefix sloupců s právy skupin
 	 * @var string
@@ -50,7 +50,6 @@ class Rights {
 	 */
 	function __construct($rights) {
 		$this->groupRights = $rights;
-		
 		$this->setRights();
 	}
 	
@@ -77,8 +76,6 @@ class Rights {
 		};
 	}
 	
-	
-	
 	/**
 	 * Metoda vrací true pokud má uživatel právo číst
 	 * @return boolean -- právo ke čtení
@@ -102,10 +99,5 @@ class Rights {
 	final public function isControll() {
 		return $this->controll;
 	}
-	
-	
-	
-	
 }
-
 ?>

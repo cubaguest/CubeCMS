@@ -11,10 +11,10 @@ require_once './lib/db/mysqli/update.class.php';
  * Třída implementuje objet db konektoru k MySQLi. Obsahuje implementace
  * metod pro práci s SQL dotazy a samotné připojování k databázi.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro MySQL DB
  */
 
@@ -26,12 +26,6 @@ class MySQLiDb extends Db implements DbInterface {
 	 */
 	public static $specialSqlFunctions = array("NOW", "TIMESTAMPDIFF", "COUNT", "IFNULL", "IF");
 	
-	/**
-	 * Link k databázovému spojení
-	 * @var Mysql link
-	 */
-//	private $_mysqlLink = null;
-
 	/**
 	 * Objekt mysqli
 	 * @var Mysqli
@@ -110,11 +104,6 @@ class MySQLiDb extends Db implements DbInterface {
       } catch (DBException $e) {
          new CoreErrors($e);
       }
-//      if($this->_mysqliObject != null){
-//			$this->_mysqliObject->close();
-//		} else {
-//			throw new CoreException("Database server not connected", 203);
-//		}
 	}
 
 	/**
@@ -134,10 +123,8 @@ class MySQLiDb extends Db implements DbInterface {
 	public function query($sqlQuery) {
       if($sqlQuery != $this->_previousSqlQuery){
          $this->_previousSqlQuery = $sqlQuery;
-
          $this->_connect();
          $this->_setDefault();
-
          Db::addQueryCount();
          $result = $this->_mysqliObject->query($sqlQuery);
 
@@ -146,7 +133,6 @@ class MySQLiDb extends Db implements DbInterface {
                throw new DBException('('.$this->_mysqliObject->errno.') '.$this->_mysqliObject->error
                   ._(' v dotazu ').$sqlQuery, 104);
             }
-
             $queryType = strtolower(substr($sqlQuery, 0, 6));
             if ($queryType == "select"){
                $this->_numberOfReturnRows=$result->num_rows;
@@ -196,7 +182,6 @@ class MySQLiDb extends Db implements DbInterface {
 	 * Metoda pro generování SQL dotazů typu SELECT
 	 *
 	 * @return Mysql_Db_Select/string -- vrací objekt nebo řetězec dotazu SELECT
-	 *
 	 */
 	public function select() {
 		return new Mysqli_Db_Select($this);
@@ -212,12 +197,10 @@ class MySQLiDb extends Db implements DbInterface {
 	public function count($table,$condition = null){
 		$select = new Mysqli_Db_Select($this);
 		$sqlCount = $select->from(array("tbl"=>$table))->count("count");
-		
 		if($condition != null){
 			$sqlCount = $sqlCount->where($condition);
 		}
 		$result = $this->query($sqlCount);
-		
 		if($result != null){
 			return $result->fetch_object()->count;
 		} else {
@@ -229,7 +212,6 @@ class MySQLiDb extends Db implements DbInterface {
 	 * Metoda pro generování SQL dotazů typu INSERT
 	 *
 	 * @return Mysql_Db_Insert/string -- vrací objekt nebo řetězec dotazu INSERT
-	 *
 	 */
 	public function insert() {
 		return new Mysqli_Db_Insert($this);
@@ -239,7 +221,6 @@ class MySQLiDb extends Db implements DbInterface {
 	 * Metoda pro generování SQL dotazů typu DELETE
 	 *
 	 * @return Mysql_Db_Delete/string -- vrací objekt nebo řetězec dotazu DELETE
-	 *
 	 */
 	public function delete() {
 		return new Mysqli_Db_Delete($this);
@@ -249,7 +230,6 @@ class MySQLiDb extends Db implements DbInterface {
 	 * Metoda pro generování SQL dotazů typu UPDATE
 	 *
 	 * @return Mysql_Db_Update/string -- vrací objekt nebo řetězec dotazu UPDATE
-	 *
 	 */
 	public function update() {
 		return new Mysqli_Db_Update($this);
@@ -257,9 +237,8 @@ class MySQLiDb extends Db implements DbInterface {
 
 //   public function fetch($sqlQuery, $typeResult = MYSQLI_NUM) {
 //      $queryResult = $this->query($sqlQuery);
-//
-////      return $queryResult->fetch_all($typeResult);
-//return mysqli;
+//      return $queryResult->fetch_all($typeResult);
+//      return mysqli;
 //   }
 
 	/**
@@ -272,7 +251,6 @@ class MySQLiDb extends Db implements DbInterface {
 	 */
 	public function fetchAll($sqlQuery) {
       $result = $this->query($sqlQuery);
-
       if($result){
          $resultArray = array();
          while ($sqlData=$result->fetch_assoc()) {
@@ -292,11 +270,7 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @return array/boolean -- asociativní pole s výsledky sql dotazu nebo false při prázdném výsledku
 	 */
 	public function fetchAssoc($sqlQuery) {
-//      try {
-         $result = $this->query($sqlQuery);
-//      } catch (DbException $e) {
-//         CoreErrors($e);
-//      }
+       $result = $this->query($sqlQuery);
       if($result){
          return $result->fetch_assoc();
       } else {

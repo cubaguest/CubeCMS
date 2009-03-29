@@ -3,10 +3,10 @@
  * Třída Modelu pro práci s panely modulů.
  * Třída, která umožňuje pracovet s modely panelů
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s panely
  */
 
@@ -75,6 +75,9 @@ class PanelModel extends DbModel {
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }
 
+   /**
+    * Metoda načte tabulky
+    */
    private function getTables() {
       $this->panelsTable = AppCore::sysConfig()->getOptionValue("panels_table", "db_tables");
       $this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", "db_tables");

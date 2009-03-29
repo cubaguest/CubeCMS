@@ -8,6 +8,7 @@
  * @version    	$Id: uploadfiles.class.php 3.0.0 beta1 29.8.2008
  * @author 		Jakub Matas <jakubmatas@gmail.com>
  * @abstract 		Třída pro obsluhu uploadovaných souborů
+ * @deprecated    není potřeba protože je integorivaná ve Form a files
  */
 
 class UploadFiles {

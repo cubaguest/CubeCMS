@@ -4,9 +4,10 @@
  *
  * @category   	VVE VeproveVypeckyEnginy 
  * @package    	Action class
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: db.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření db konektoru
  */
 
@@ -106,38 +107,6 @@ class Db {
     */
    const ORDER_DESC = 2;
 
-   /**
-    * Konstanty pro tvorbu dotazů, které jsou globální pro všechny DB
-    */
-//   const SQL_AND     = 'AND';
-//   const SQL_OR      = 'OR';
-//   const SQL_IN      = 'IN';
-//   const SQL_LIKE    = 'LIKE';
-//   const SQL_ALL     = '*';
-//   const SQL_ASC     = 'ASC';
-//   const SQL_DESC    = 'DESC';
-//   const SQL_NULL    = 'NULL';
-
-    /**
-     * Konstanty typů joinu
-     * @var string
-     */
-//   const SQL_JOIN			= 'JOIN';
-//   const SQL_JOIN_LEFT 	= 'LEFT JOIN';
-//   const SQL_JOIN_RIGHT	= 'RIGHT JOIN';
-//   const SQL_JOIN_INNER	= 'INNER JOIN';
-
-   /**
-    * Typ podmínky ON pro JOIN
-    */
-//   const SQL_JOIN_COND_TYPE_ON = 'ON';
-
-   /**
-    * Typ podmínky USING pro JOIN
-    */
-//   const SQL_JOIN_COND_TYPE_USING = 'USING';
-
-
 	/**
 	 * statické proměné určující připojení k db
 	 * @var string
@@ -149,8 +118,22 @@ class Db {
 	static $_tablePrefix = null;
 	static $_connectorType = null;
 
+   /**
+    * Interní počítadlo příkazů
+    * @var integer
+    */
 	static $_numberOfSqlQueries = 0;
 
+   /**
+    * Metoda pro sestavení spojení a základní nastavení db konektoru
+    * @param string $typ -- typ spojení
+    * @param string $serverName -- název serveru
+    * @param string $userName -- jméno uživatele
+    * @param string $userPasswd -- heslo pro připojení
+    * @param string $dbName -- název databáze
+    * @param string $tablePrefix -- prefix pro tabulky
+    * @return Db Konektory k danému databázovému stroji
+    */
 	public static function factory($typ, $serverName, $userName, $userPasswd, $dbName, $tablePrefix) {
 		self::$_serverName = $serverName;
 		self::$_userName = $userName;
@@ -164,22 +147,25 @@ class Db {
             require_once './lib/db/mysqli/db.class.php';
             return new MySQLiDb(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
             break;
-
          default:
-            throw new UnexpectedValueException(_("Databázový engine ").$typ._(" nebyl implementován"), 101);
+            throw new UnexpectedValueException(sprintf(_('Databázový engine "%s" nebyl implementován'),$typ), 101);
             break;
       }
 	}
-	
+
+   /**
+    * Metoda přičte k internímu počítadlu jedna
+    */
 	public static function addQueryCount() {
 		Db::$_numberOfSqlQueries++;
 	}
-	
+
+   /**
+    * metoda vrací počet provedených SQL dotazů
+    * @return integer
+    */
 	public static function getCountQueries() {
 		return Db::$_numberOfSqlQueries;
 	}
-	
-	
-
 }
 ?>

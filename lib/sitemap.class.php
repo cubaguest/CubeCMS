@@ -5,9 +5,10 @@
  * google (seznam) a yahoo. Je většinou volána zvlášť a využívá soubor sitemap.class.php 
  * v modulech pro generování pro generování data poslední změny atd.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: sitemap.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro tvorbu sitemap
  */
 
@@ -29,12 +30,6 @@ class SiteMap {
 	 * @var float
 	 */
 	const SITEMAP_SITE_DEFAULT_PRIORITY = 0.1;
-	
-	/**
-	 * Proměná obsahuje objekt modulu
-	 * @var Module
-	 */
-	private $module = null;
 	
 	/**
 	 * Objekt s odkazem na kategorii
@@ -73,7 +68,6 @@ class SiteMap {
 	 */
 	function __construct(Links $link, $changefreq = self::SITEMAP_SITE_CHANGE_YEARLY, $priority = 0.5) {
       $this->link = $link;
-
 		$this->changeFreq = $changefreq;
 		$this->priority = $priority;
 	}
@@ -108,21 +102,16 @@ class SiteMap {
       if($lastChange > time()){
          $lastChange = time();
       }
-
       if($lastChange != null){
          $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
          $lastChange = $date->format(DATE_ISO8601);
       }
-		
 		if($frequency == null){
 			$frequency = $this->changeFreq;
 		}
 		if($priority == null){
 			$priority = $this->priority;
 		}
-
-//      $this->itemsCurrentArray =
-
    	array_push($this->itemsCurrentArray, array('loc' => (string)$url,
 									   'lastmod' => $lastChange,
 									   'changefreq' => $frequency,
@@ -141,15 +130,12 @@ class SiteMap {
       if($lastChange > time()){
          $lastChange = time();
       }
-
       $date = new DateTime(date(DATE_ISO8601,$lastChange));
       $lastChange = $date->format(DATE_ISO8601);
-
       array_push(self::$items, array('loc' => (string)$this->getLink(),
 									   'lastmod' => $lastChange,
 									   'changefreq' => $this->changeFreq,
 									   'priority'=>$this->priority));
-
       $this->priority = $this->priority-$priorityForArticleDown;
    }
 
@@ -178,7 +164,6 @@ class SiteMap {
 	public function getLink() {
 		return $this->link;
 	}
-	
 	
 	/**
 	 * Metoda vygeneruje mapu webu
@@ -235,7 +220,6 @@ class SiteMap {
 		}
 		$translations[chr(38)] = '&';
 		return preg_replace("/&(?![A-Za-z]{0,4}\w{2,3};|#[0-9]{2,3};)/","&#38;",strtr($str,$translations));
-		
 	}
 	
    /**

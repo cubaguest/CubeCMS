@@ -4,9 +4,10 @@
  * Třida obsahuje vrstvu mezi šablonovacím systémem a samotným pohledem (viewrem). 
  * Umožňuje všechny základní operace při volbě a plnění šablony a jejímu zobrazení.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: template.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu šablony
  */
 
@@ -132,12 +133,8 @@ class Template {
 	
 	/**
 	 * Konstruktor třídy
-	 *
-	 * @param Module -- objekt modulu
 	 */
-	function __construct(){
-//		$this->module = $module;
-	}
+	function __construct(){}
 	
 	/**
 	 * Metoda vrací objekt modulu
@@ -148,14 +145,13 @@ class Template {
 	}
 	
 	/**
-	 * metoda přidává zadanou šablonu do výstupu
+	 * Metoda přidává zadanou šablonu do výstupu
 	 * 
 	 * @param string/array -- název šablony
 	 * @param boolean -- true pokud má být použita systémová šablona
 	 */
 	public function addTpl($tplName, $engineTpl = false, $tplId = 1){
 		$this->checkTemplatesArray();
-
 		//TODO kontrola souborů
 		//přidání šablony do pole s šablonami modulu
 		if($this->getModule() != null){
@@ -174,13 +170,11 @@ class Template {
 			} else {
 				if(!is_array($tplName)){
 					array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
-//						array(self::TEMPLATE_FILE_NAME => AppCore::getAppWebDir().DIRECTORY_SEPARATOR.AppCore::TEMPLATES_DIR.DIRECTORY_SEPARATOR.$tplName,
 						array(self::TEMPLATE_FILE_NAME => $this->selectGlobalTemplateFaceFile($tplName),
 					  	self::TEMPLATE_ID_NAME =>  $tplId));
 				} else {
 					foreach ($tplName as $tpl) {
 						array_push($this->templates[$this->getModule()->getId()][self::TEMPLATES_ARRAY_NAME],
-//						array(self::TEMPLATE_FILE_NAME => AppCore::getAppWebDir().DIRECTORY_SEPARATOR.AppCore::TEMPLATES_DIR.DIRECTORY_SEPARATOR.$tplName,
 							array(self::TEMPLATE_FILE_NAME => $this->selectGlobalTemplateFaceFile($tpl),
 					  		self::TEMPLATE_ID_NAME =>  $tplId));
 					}
@@ -193,7 +187,6 @@ class Template {
 	 * Metoda zjistí jestli šablona modulu existuje pro zadaný vzhled, a podle něj ji vrátí
 	 */
 	private function selectModuleTemplateFaceFile($file) {
-//		echo AppCore::getTepmlateFaceDir().$this->getModule()->getDir()->getTemplatesDir(false).$file. '<br />';
 //		zvolení vzhledu
 //		vybraný vzhled
 		if(file_exists(AppCore::getTepmlateFaceDir().$this->getModule()->getDir()->getTemplatesDir(false).$file)){
@@ -207,7 +200,6 @@ class Template {
 		else {
 			$faceFile = $this->getModule()->getDir()->getTemplatesDir().$file;
 		};
-		
 		return $faceFile;
 	}
 
@@ -215,7 +207,6 @@ class Template {
 	 * Metoda zjistí jestli globální šablona existuje pro zadaný vzhled, a podle něj ji vrátí
 	 */
 	private function selectGlobalTemplateFaceFile($file) {
-		
 //		zvolení vzhledu
 //		vybraný vzhled
 		if(file_exists(AppCore::getTepmlateFaceDir().AppCore::TEMPLATES_DIR.DIRECTORY_SEPARATOR.$file)){
@@ -229,7 +220,6 @@ class Template {
 		else {
 			$faceFile = $file;
 		};
-		
 		return $faceFile;
 	}
 	
@@ -237,7 +227,6 @@ class Template {
 	 * Metody kontroluje vytvoření pole s moduly (items) kategorie
 	 */
 	private function checkTemplatesArray(){
-		
 		if($this->getModule() != null){
 			if(!isset($this->templates[$this->getModule()->getId()])){
 				$this->templates[$this->getModule()->getId()] = array();
@@ -257,7 +246,6 @@ class Template {
          if(!$withPath){
             if($this->getModule() != null){
                $cssName = $this->selectModuleStylesheetFaceFile($cssName);
-               //				$cssName = $this->module->getDir()->getStylesheetsDir().$cssName;
             }
          }
          array_push(self::$stylesheets, $cssName);
@@ -268,7 +256,6 @@ class Template {
 	 * Metoda zjistí jestli stylesheet modulu existuje pro zadaný vzhled, a podle něj jej vrátí
 	 */
 	private function selectModuleStylesheetFaceFile($file) {
-//		echo AppCore::getTepmlateFaceDir().$this->getModule()->getDir()->getTemplatesDir(false).$file. '<br />';
 //		zvolení vzhledu
 //		vybraný vzhled
 		if(file_exists(AppCore::getTepmlateFaceDir().$this->getModule()->getDir()->getStylesheetsDir(false).$file)){
@@ -282,7 +269,6 @@ class Template {
 		else {
 			$faceFile = $this->getModule()->getDir()->getStylesheetsDir().$file;
 		};
-		
 		return $faceFile;
 	}
 	
@@ -353,7 +339,6 @@ class Template {
 			} else {
 				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL]=$name;
 			}
-			
 		}
 	}
 	
@@ -364,18 +349,17 @@ class Template {
 	 * @param string -- (option) oddělovač mezi více nadpisy (default '-')
 	 */
 	public function setSubTitle($name, $merge = false, $separator = '-') {
-		if($merge){
-				if($this->pageTitle != null){
-					$separator = ' '.$separator.' ';
-				} else {
-					$separator = null;
-				}
-			
-				$this->pageTitle.=$separator.$name;
-			} else {
-				$this->pageTitle=$name;
-			}
-	}
+      if($merge){
+         if($this->pageTitle != null){
+            $separator = ' '.$separator.' ';
+         } else {
+            $separator = null;
+         }
+         $this->pageTitle.=$separator.$name;
+      } else {
+         $this->pageTitle=$name;
+      }
+   }
 	
 	/**
 	 * Metoda vrací přiřazený název titulku okna
@@ -397,7 +381,6 @@ class Template {
 			} else {
 				$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_ALT]=$name;
 			}
-			
 		}
 	}
 
@@ -423,7 +406,6 @@ class Template {
 	 */
 	public function addVar($varName, $varValue, $isModuleVar = true) {
 		$this->checkVarsArray();
-		
 		if($isModuleVar AND $this->getModule() != null){
 			$this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME][$varName] = $varValue;
 		} else if($isModuleVar){
@@ -431,7 +413,6 @@ class Template {
 		} else {
 			$this->engineVars[$varName] = $varValue;
 		}
-		
 	}
 	
 	/**
@@ -440,7 +421,6 @@ class Template {
 	private function checkVarsArray() {
 //		kontrola hlavního pole
 		$this->checkTemplatesArray();
-		
 		if($this->getModule() != null){
 			if(!isset($this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME])){
 				$this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME] = array();
@@ -473,10 +453,8 @@ class Template {
 		$this->checkTemplatesArray();
 		$this->setTplLabel($this->getModule()->getLabel());
 		$this->setTplAlt($this->getModule()->getAlt());
-		
 //		Přiřazení identifikátoruModulu
 		$this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_STYLE_IDENT] = $this->getModule()->getName();
-		
 	}
 	
 	/**
@@ -484,21 +462,19 @@ class Template {
 	 * 
 	 * @param JsPlugin -- objekt js pluginu
 	 */
-	final public function addJsPlugin(JsPlugin $jsPlugin)
-	{
-      if(get_parent_class($jsPlugin) == 'JsPlugin'){
-         $files = $jsPlugin->getAllJsFiles();
-         foreach ($files as $file) {
-            $this->addJS($file, true);
-         }
-         $files = $jsPlugin->getAllCssFiles();
-         foreach ($files as $file) {
-            $this->addCss($file, true);
-         }
-		} else {
-			new CoreException(_("Nebyl vložen objekt JsPluginu"), 1);
-		}
-	}
+   final public function addJsPlugin(JsPlugin $jsPlugin){
+      if(get_parent_class($jsPlugin) != 'JsPlugin'){
+         throw new InvalidArgumentException(sprintf(_('Parametr "%s" naní objekt JsPluginu'), $jsPlugin),1);
+      }
+      $files = $jsPlugin->getAllJsFiles();
+      foreach ($files as $file) {
+         $this->addJS($file, true);
+      }
+      $files = $jsPlugin->getAllCssFiles();
+      foreach ($files as $file) {
+         $this->addCss($file, true);
+      }
+   }
 
 	/**
 	 * Metoda přidá funkci do parametru OnLoad při načtení stránky
@@ -516,5 +492,4 @@ class Template {
 		return self::$onLoadJsFunctions;
 	}
 }
-
 ?>

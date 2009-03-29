@@ -3,10 +3,10 @@
  * Třída Modelu pro práci s moduly.
  * Třída, která umožňuje pracovet s modelem modulů
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s moduly
  */
 
@@ -20,8 +20,6 @@ class ModuleModel extends DbModel {
 	const COLUMN_ALT        = 'alt';
 	const COLUMN_ID_MODULE  = 'id_module';
 	const COLUMN_PRIORITY   = 'priority';
-
-
 
 	const COLUMN_SEC_LABEL 	= 'slabel';
 	const COLUMN_CAT_ID		= 'id_category';
@@ -78,11 +76,13 @@ class ModuleModel extends DbModel {
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }
 
+   /**
+    * Metoda načte tabulky
+    */
    private function getTables() {
       $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", Config::SECTION_DB_TABLES);
 		$this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
    }
 }
-
 ?>

@@ -265,7 +265,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	width: 20px;
 	height: 20px;
 	border: 0;
-	cursor: pointer; cursor: hand
+	cursor: pointer; cursor: hand;
 }
 
 .form_buttons {
@@ -284,11 +284,12 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
         right: 5px;
         width: auto;
         height: 12px;
-        /*visibility: hidden;*/
         display: none;
-        /*padding-left: 30px;
-        padding-right: 30px;*/
         z-index: 100;
+      }
+
+      .editboxrmargin {
+         right: 40px;
       }
 
       .editbox .contentForm, .editbox .contentForm form input, .editbox .contentForm form{
@@ -318,9 +319,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 
       .editbox>.upside {
         display: inline;
-        /*         background: transparent url("toolbar_back_left4.png") top left no-repeat; */
         background: transparent url("../images/toolbox/l_black.png") top left no-repeat;
-        /*height: 9px;*/
         margin:0;
         padding-left: 6px;
         padding-top: 5px;
@@ -328,9 +327,6 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
       .editbox>.downside {
         display:inline;
         background: transparent url("../images/toolbox/r_black.png") top right no-repeat;
-        /*         background: transparent url("toolbar_back_right4.png") top right no-repeat; */
-        /*width: 9px;*/
-        /*margin:0;*/
         padding-left: 6px;
         padding-top: 5px;
       }

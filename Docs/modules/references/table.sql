@@ -10,7 +10,7 @@ INSERT INTO `dev`.`vypecky_modules` (
 `dbtable3`
 )
 VALUES (
-NULL , 'references', NULL , 'references', 'references', NULL, NULL
+NULL , 'references', NULL , 'references', 'references', 'texts' NULL
 );
 
 -- --------------------------------------------------------

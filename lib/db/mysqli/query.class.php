@@ -3,10 +3,10 @@
  * Třída pro tvorbu dotazů z MySQLi DB.
  * Třída obsahuje implementaci metody select z db-interfacu.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro výběr záznamů
  */
 
@@ -110,11 +110,14 @@ class Mysqli_Db_Query {
 
    /**
     * Pole s částmi SQL dotazu ze kterých se bude při výstupu generovat samotná SQL dotaz
-    *
     * @var array
     */
    protected $_sqlQueryParts = array();
 
+   /**
+    * Objekt konektoru
+    * @var Db
+    */
    protected $_connector = null;
 
    /**
@@ -138,9 +141,16 @@ class Mysqli_Db_Query {
 //               'AGAINST (\'\1\')')
    );
 
-
+   /**
+    * Pole s porovnávacími prvky
+    * @var array
+    */
    protected $whereTermConditions = array('=', '<', '>', '<>', '>=', '<=');
 
+   /**
+    * Konstruktor vytváří objekt pro přístup k databázi
+    * @param Db $conector -- objekt db konektoru
+    */
    public function __construct(Db $conector) {
       //		inicializace do zakladni podoby;
       $this->_connector = $conector;
@@ -166,7 +176,6 @@ class Mysqli_Db_Query {
       if(is_array($table)){
          throw new InvalidArgumentException(_('Špatně zadaný parametr funkce s názvem tabulky'), 2);
       }
-
       $this->_lockTables = $lockTable;
       if($alias == null){
          $alias = substr($table, 0, 5);
@@ -197,7 +206,6 @@ class Mysqli_Db_Query {
          } else {
             throw new InvalidArgumentException(_('Zadán nesprávný operátor porovnávání')." $operator ", 1);
          }
-
          $arr = array($column,
             $value,
             $term);
@@ -217,7 +225,6 @@ class Mysqli_Db_Query {
    public function limit($rowCount, $offset) {
       $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $rowCount;
       $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY] = $offset;
-
       return $this;
    }
 
@@ -234,7 +241,6 @@ class Mysqli_Db_Query {
       if(!is_array($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
          $this->_sqlQueryParts[self::ORDER_ORDER_KEY] = array();
       }
-
       $columArray = array();
       if($order == Db::ORDER_DESC){
          $columArray[self::ORDER_COLUM_KEY] = $colum;
@@ -248,7 +254,6 @@ class Mysqli_Db_Query {
       array_push($this->_sqlQueryParts[self::ORDER_ORDER_KEY], $columArray);
       return $this;
    }
-
 
    /**
     * Metoda vygeneruje část SQL dotazu s klauzulí WHERE
@@ -280,7 +285,6 @@ class Mysqli_Db_Query {
                $return .= self::SQL_PARENTHESIS_R;
             } else {
                $value = null;
-
                if(is_int($where[1])){
                   $value = $where[1];
                }
@@ -293,7 +297,6 @@ class Mysqli_Db_Query {
                } else {
                   $value .= $this->checkValueFormat($where[1]);
                }
-
                if(!isset ($where[2]) AND $where[2] != null){
                   $where[2] = '=';
                }
@@ -325,11 +328,6 @@ class Mysqli_Db_Query {
                      case Db::OPERATOR_IN:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IN
                         .self::SQL_SEPARATOR.self::SQL_PARENTHESIS_L .$value. self::SQL_PARENTHESIS_R;
-                        //                        foreach ($where[1] as $val) {
-                        //                           $whereCond .= $value;
-                        //                        }
-                        //                        $whereCond = substr($whereCond, 0, strlen($whereCond)-1);
-                        //                        $whereCond .= self::SQL_PARENTHESIS_R;
                         break;
                      case Db::OPERATOR_IS_NULL:
                         $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IS_NULL;
@@ -357,51 +355,16 @@ class Mysqli_Db_Query {
       return $return;
    }
 
-         /**
-    * Metoda převede operátor na daný operátor pro SQL dotaz
-    * @param integer $operator -- operátor Db:OPERATOR_X
-    * @return string -- zvolený operátor
-    */
-   //   protected function choseWhereTermOperator($operator) {
-   //      if(in_array($operator, $this->whereTermConditions)){
-   //         return $operator;
-   //      } else {
-   //         switch ($operator) {
-   //            case Db::OPERATOR_LIKE:
-   //               return self::SQL_LIKE;
-   //               break;
-   //            case Db::OPERATOR_NOT_LIKE:
-   //               return self::SQL_NOT;
-   //               break;
-   //            case Db::OPERATOR_IS_NULL:
-   //               return self::SQL_IS_NULL;
-   //               break;
-   //            case Db::OPERATOR_BETWEEN:
-   //               return self::SQL_BETWEEN;
-   //               break;
-   //            case Db::OPERATOR_NOT_BETWEEN:
-   //               return self::SQL_NOT_BETWEEN;
-   //               break;
-   //            case Db::OPERATOR_AND:
-   //            default:
-   //               return self::SQL_AND;
-   //               break;
-   //         }
-   //      }
-   //   }
-
    /**
     * Metoda vygeneruje čás SQL dotazu s klauzulí LIMIT
     *
     * @return string -- klauzule LIMIT
     */
    protected function _createLimit() {
-
       if(!empty($this->_sqlQueryParts[self::SQL_LIMIT])){
          $limitString = null;
          $limitString = self::SQL_SEPARATOR . self::SQL_LIMIT . self::SQL_SEPARATOR . $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY]
-         . ',' . self::SQL_SEPARATOR .$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY];
-
+            . ',' . self::SQL_SEPARATOR .$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY];
          return $limitString;
       }
    }
@@ -481,12 +444,10 @@ class Mysqli_Db_Query {
     */
    protected function checkValueFormat($value, $useApostrofs = true) {
       // odstranění specielních znaků nevhodných pro mysql
-//      $value = $this->_connector->escapeString($value);
       if(is_int($value)){
          return $value;
       }
       else if($this->isMySQLFunction($value)){
-//         $this->repairMySQLFunctions($value);
          return $value;
       }
       // jedná se o normální řetězec
@@ -500,5 +461,4 @@ class Mysqli_Db_Query {
       return $value;
    }
 }
-
 ?>

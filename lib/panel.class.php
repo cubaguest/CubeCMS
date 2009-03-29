@@ -5,27 +5,20 @@
  * základního přístu jak k vlastnostem modelu tak pohledu. Pomocí této třídy 
  * se také generují šablony panelů.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: panel.class.php 419 2008-11-28 23:21:19Z jakub $ VVE3.3.0 $Revision: 419 $
- * @author			$Author:$ $Date: $
- *						$LastChangedBy:$ $LastChangedDate:$
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Abstraktní třída pro práci s panely
  * @todo				Není implementována práce s chybami
  */
 
 abstract class Panel{
-
 	/**
 	 * Objekt pro práci s odkazy
 	 * @var Links
 	 */
 	private $_link = null;
-	
-	/**
-	 * Objekt pro práci s Db
-	 * @var DbInterface
-	 */
-	private $_db = null;
 	
 	/**
 	 * Objekt pro práci s module
@@ -70,25 +63,11 @@ abstract class Panel{
 	private $_rights = null;
 	
 	/**
-	 * Objekt s informačními hláškami
-	 * @var Messages
-	 */
-	private $_infoMsg = null;
-
-	/**
-	 * Objekt s chbovými hláškami
-	 * @var Messages
-	 */
-	private $_errMsg = null;
-	
-	/**
 	 * Konstruktor
 	 */
 	function __construct($category, Template &$template, Rights $rights) {
 		$this->_link = new Links(true);
-		$this->_db = AppCore::getDbConnector();
 		$this->_category = $category;
-		$this->_module = AppCore::getSelectedModule();
 		$this->_template = $template;
 		$this->_article = new Article();
 		$this->_rights = $rights;
@@ -99,40 +78,32 @@ abstract class Panel{
 //		Pokud ještě nebyla třída načtena
 		if(!class_exists($actionClassName,false)){
 //			načtení souboru s akcemi modulu
-			if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-				include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
-			} else {
-				new CoreException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
-			}
+			if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $module->getName()),1);
+         }
+         include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
 		}
-
 		if(class_exists($actionClassName)){
-			$this->_action = new $actionClassName($this->_module, $this->_article);
+         $this->_action = new $actionClassName($this->getModule(), $this->_article);
 		} else {
-			$this->_action = new Action($this->_module, $this->_article);
+         $this->_action = new Action($getModule(), $this->_article);
 		}
-
 //		Cesty
 		$routes = null;
 		$routesClassName = ucfirst($this->getModule()->getName()).'Routes';		
-		
-		
 //		Pokud ještě nebyla třída načtena
 		if(!class_exists($routesClassName, false)){		
 //			načtení souboru s cestami (routes) modulu
-			if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-				include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
-			} else {
-				new CoreException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
-			}
+			if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
+            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $module->getName()),2);
+         }
+         include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
 		}
-
 		if(class_exists($routesClassName)){
 			$this->_routes = new $routesClassName($this->_article);
 		} else {
 			$this->_routes = new Routes($this->_article);
 		}
-		
 	}
 		
 	/**
@@ -150,7 +121,7 @@ abstract class Panel{
 	 * @return DbInterface -- objekt databáze
 	 */
 	final public function getDb() {
-		return $this->_db;
+		return AppCore::getDbConnector();
 	}
 	
 	/**
@@ -168,7 +139,7 @@ abstract class Panel{
 	 * @return Module -- objekt modulu
 	 */
 	final public function getModule() {
-		return $this->_module;
+		return AppCore::getSelectedModule();
 	}
 	
 	/**
@@ -208,7 +179,7 @@ abstract class Panel{
 	 * @return Messages -- objekt zpráv
 	 */
 	final public function infoMsg() {
-		return $this->_infoMsg;
+      return AppCore::getInfoMessages();
 	}
 
 	/**
@@ -216,7 +187,7 @@ abstract class Panel{
 	 * @return Messages -- objekt zpráv
 	 */
 	final public function errMsg() {
-		return $this->_errMsg;
+      return AppCore::getUserErrors();
 	}
 	
 	/**

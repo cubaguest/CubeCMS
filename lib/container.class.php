@@ -1,13 +1,14 @@
 <?php
 /**
- * Třída pro přenos daty mezi controlerrem a viewrem.
- * Třída umožňuje přenášet data meti kontrolery a pohledy. Popřípadě 
- * jejich přímou prezentaci do šablony modulu.
+ * Třída pro přenos daty mezi controlerem, viewrem a šablonami. Data jsou
+ * ukládána a vybírána přes pole.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: container.class.php 3.0.5 27.9.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu dat mezi viewrem a controlerem
+ * @todo          nebylo by marné implementovat přes objekt pole
  */
 
 class Container {
@@ -29,20 +30,16 @@ class Container {
 	 */
 	private $links = array();
 	
-	
 	/**
 	 * Konstruktor
-	 *
 	 */
-	function __construct() {
-		;
-	}
+	function __construct() {}
 	
 	/**
 	 * Metoda uloži zadaná data pod zadaný index
 	 *
-	 * @param string/integer -- index dat
-	 * @param mixed -- data
+	 * @param string/integer $index -- index dat
+	 * @param mixed $value -- data
 	 */
 	public function addData($index, $value){
 		//TODO dodělat kontrolu, jestli položka už není vložena
@@ -52,22 +49,22 @@ class Container {
 	/**
 	 * Metoda vrací data ze zadaného indexu
 	 *
-	 * @param string/integer -- index pod kterým jsou data uložena
+	 * @param string/integer $index -- index pod kterým jsou data uložena
+	 * @param mixed $defaultValue -- výchozí hodnota
 	 * @return mixed -- uložená data
 	 */
-	public function getData($index) {
+	public function getData($index, $defaultValue = null) {
 		if(isset($this->data[$index])){
 			return $this->data[$index];
-		} else {
-			return null;
 		}
+      return $defaultValue;
 	}
 	
 	/**
 	 * Metoda uloži zadaný eplugin pod zadaný index
 	 *
-	 * @param string/integer -- index epluginu
-	 * @param Eplugin -- objekt epluginu
+	 * @param string/integer $index -- index epluginu
+	 * @param Eplugin $eplugin -- objekt epluginu
 	 */
 	public function addEplugin($index, Eplugin &$eplugin){
 		//TODO dodělat kontrolu, jestli položka už není vložena
@@ -81,19 +78,21 @@ class Container {
 	 * @return Eplugin -- uložený Eplugin
 	 */
 	public function getEplugin($index) {
-		if(isset($this->ePlugins[$index])){
-			return $this->ePlugins[$index];
-		} else {
-			throw new CoreException(_('Požedovaný eplugin nebyl přiřazen'));
-			return false;
-		}
+      try {
+         if(!isset($this->ePlugins[$index])){
+            throw new InvalidArgumentException(sprintf(_('Eplugin %s nebyl přiřazen'), $index),1);
+         }
+         return $this->ePlugins[$index];
+      } catch (InvalidArgumentException $e) {
+         new CoreErrors($e);
+      }
 	}
 	
 	/**
 	 * Metoda uloži zadaný link pod zadaný index
 	 *
-	 * @param string/integer -- index linku
-	 * @param Links -- objekt linku
+	 * @param string/integer $index -- index linku
+	 * @param Links $link -- objekt linku
 	 */
 	public function addLink($index, Links  $link){
 		//TODO dodělat kontrolu, jestli položka už není vložena
@@ -103,14 +102,14 @@ class Container {
 	/**
 	 * Metoda vrací link ze zadaného indexu
 	 *
-	 * @param string/integer -- index pod kterým je link uložen
+	 * @param string/integer $index -- index pod kterým je link uložen
 	 * @return Links -- uložený link
 	 */
 	public function getLink($index) {
 		if(isset($this->links[$index])){
 			return $this->links[$index];
 		} else {
-			return null;
+			return new Links();
 		}
 	}
 	
@@ -131,8 +130,5 @@ class Container {
 	public function getAllLinks() {
 		return $this->links;
 	}
-	
-	
 }
-
 ?>

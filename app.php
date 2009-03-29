@@ -1,142 +1,147 @@
 <?php
 /**
- * Vypecky Engine.
+ * VVE FrameWork
  * Hlavní třída aplikace - singleton
- * Obsluhuje celou aplikaci a její komponenty.
+ * Obsluhuje celou aplikaci a její komponenty a moduly.
  *
- * @copyright  Copyright (c) 2008 Jakub Matas
+ * @copyright  Copyright (c) 2008 - 2009 Jakub Matas
  * @version    $Id$ VVE3.9.2 $Revision$
  * @author     $Author$ $Date$
  *             $LastChangedBy$ $LastChangedDate$
  * @abstract 	Hlavní třída aplikace(Singleton)
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
- *
+ * @internal   Last ErrorCode 22
  */
 
 class AppCore {
-    /**
-     * Výchozí cestak enginu
-     */
+   /**
+    * Výchozí cestak enginu
+    */
    const MAIN_ENGINE_PATH = './';
 
-    /**
-     * Obsahuje hlavní soubor aplikace
-     */
+   /**
+    * Obsahuje hlavní soubor aplikace
+    */
    const APP_MAIN_FILE = 'index.php';
 
-    /**
-     * Název konfiguračního souboru
-     */
+   /**
+    * Název konfiguračního souboru
+    */
    const MAIN_CONFIG_FILE = "config.xml";
 
-    /**
-     * Název sekce v konf. souboru s konfigurací databáze
-     */
+   /**
+    * Název sekce v konf. souboru s konfigurací databáze
+    */
    const MAIN_CONFIG_DB_SECTION = "db";
 
-    /**
-     * Konstanta s adresářem s moduly
-     */
+   /**
+    * Konstanta s adresářem s moduly
+    */
    const MODULES_DIR = "modules";
 
-    /**
-     * Adresář s engine-pluginy
-     */
-   const ENGINE_EPLUINS_DIR = 'EPlugins';
+   /**
+    * Adresář s engine-pluginy
+    */
+   const ENGINE_EPLUINS_DIR = 'eplugins';
 
-    /**
-     * Adresář s JS-pluginy
-     */
-   const ENGINE_JSPLUINS_DIR = 'JsPlugins';
+   /**
+    * Adresář s JS-pluginy
+    */
+   const ENGINE_JSPLUINS_DIR = 'jsplugins';
 
-    /**
-     * Adresář s helpery
-     */
+   /**
+    * Adresář s helpery
+    */
    const ENGINE_HELPERS_DIR = 'helpers';
 
-    /**
-     * Adresář s validátory
-     */
-   const ENGINE_VALIDATORS_DIR = 'Validators';
+   /**
+    * Adresář s validátory
+    */
+   const ENGINE_VALIDATORS_DIR = 'validators';
 
-    /**
-     * Adresář s Modely enginu
-     */
+   /**
+    * Adresář s Modely enginu
+    */
    const ENGINE_MODELS_DIR = 'models';
 
-    /**
-     * Adresář s pluginy filesystému
-     */
-   const ENGINE_FILESYSTEM_DIR = 'Filesystem';
+   /**
+    * Adresář s pluginy filesystému
+    */
+   const ENGINE_FILESYSTEM_DIR = 'filesystem';
 
-    /**
-     * Adresář s ostatními pluginy
-     */
-   const ENGINE_PLUGINS_DIR = 'Plugins';
+   /**
+    * Adresář s ostatními pluginy
+    */
+   const ENGINE_PLUGINS_DIR = 'plugins';
 
-    /**
-     * Kešovací adresář pro dočasné soubory
-     */
+   /**
+    * Kešovací adresář pro dočasné soubory
+    */
    const ENGINE_CACHE_DIR = 'cache';
 
-    /**
-     * Konstanta s adresářem s šablonami systému
-     */
+   /**
+    * Kešovací adresář pro dočasné soubory
+    */
+   const ENGINE_EXCEPTIONS_DIR = 'exceptions';
+
+   /**
+    * Konstanta s adresářem s šablonami systému
+    */
    const TEMPLATES_DIR = "templates";
 
-    /**
-     * Konstanta s adresářem s obrázky šablony
+   /**
+    * Konstanta s adresářem s obrázky šablony
      */
    const TEMPLATES_IMAGES_DIR = "images";
 
-    /**
-     * Konstanta s názvem adresáře se styly
-     */
+   /**
+    * Konstanta s názvem adresáře se styly
+    */
    const TEMPLATES_STYLESHEETS_DIR = 'stylesheets';
 
-    /**
-     * Konstanta s názvem adresáře se specielními soubory (helpy, atd)
-     */
+   /**
+    * Konstanta s názvem adresáře se specielními soubory (helpy, atd)
+    */
    const SPECIALITEMS_DIR = 'specialitems';
 
-    /**
-     * prefix názvu sloupců s tabulkami u modulu (dbtable1, dbtable2, atd.)
-     */
+   /**
+    * prefix názvu sloupců s tabulkami u modulu (dbtable1, dbtable2, atd.)
+    */
    const MODULE_DBTABLES_PREFIX = "dbtable";
 
-    /**
-     * Sufix pro metody kontroleru
-     */
+   /**
+    * Sufix pro metody kontroleru
+    */
    const MODULE_CONTROLLER_SUFIX = 'Controller';
 
-    /**
-     * Sufix pro metody viewru
-     */
+   /**
+    * Sufix pro metody viewru
+    */
    const MODULE_VIEWER_SUFIX = 'View';
 
-    /**
-     * Hlavní kontroler modulu - prefix
-     */
+   /**
+    * Hlavní kontroler modulu - prefix
+    */
    const MODULE_MAIN_CONTROLLER_PREFIX = 'Main';
 
-    /**
-     * Sufix názvu třídy panelů
-     */
+   /**
+    * Sufix názvu třídy panelů
+    */
    const MODULE_PANEL_CLASS_SUFIX = 'Panel';
 
-    /**
-     * Název kontroleru panelu
-     */
+   /**
+    * Název kontroleru panelu
+    */
    const MODULE_PANEL_CONTROLLER = 'panelController';
 
-    /**
-     * Název viewru panelu
-     */
+   /**
+    * Název viewru panelu
+    */
    const MODULE_PANEL_VIEWER = 'panelView';
 
-    /**
-     * Název třídy pro sitemapu -- sufix
-     */
+   /**
+    * Název třídy pro sitemapu -- sufix
+    */
    const MODULE_SITEMAP_SUFIX_CLASS = 'SiteMap';
 
    /**
@@ -144,31 +149,26 @@ class AppCore {
     */
    const MODULE_SEARCH_SUFIX_CLASS = 'Search';
 
-    /**
-     * Parametr v url, kterým se přenáší typ média pro zobrazení
-     */
-   const MEDIA_URL_PARAM_TYPE = 'media';
-
-    /**
-     * Konstanta s názvem adresáře se vzhledy
-     */
+   /**
+    * Konstanta s názvem adresáře se vzhledy
+    */
    const FACES_DIR = 'faces';
 
-    /**
-     * Konstanta obsahuje výchozí název vzhledu (face)
-     */
+   /**
+    * Konstanta obsahuje výchozí název vzhledu (face)
+    */
    const FACE_DEFAULT_NAME = 'default';
 
-    /**
-     * Instance hlavní třídy
-     * @var AppCoreClass
-     */
+   /**
+    * Instance hlavní třídy
+    * @var AppCoreClass
+    */
    private static $_coreInstance = null;
 
-    /**
-     * Hlavní adresář aplikace
-     * @var string
-     */
+   /**
+    * Hlavní adresář aplikace
+    * @var string
+    */
    private static $_appWebDir = null;
 
    /**
@@ -177,103 +177,98 @@ class AppCore {
     */
    private static $debugLevel = 1;
 
-    /**
-     * Hlavní objekt šablony
-     * @var smarty
-     */
+   /**
+    * Hlavní objekt šablony
+    * @var smarty
+    */
    private $template = null;
 
-    /**
-     * Název vzhledu
-     * @var string
-     */
+   /**
+    * Název vzhledu
+    * @var string
+    */
    private $templateFace = null;
 
-    /**
-     * Cesta do zvoleného vzhledu
-     * @var string
-     */
+   /**
+    * Cesta do zvoleného vzhledu
+    * @var string
+    */
    private static $templateFaceDir = null;
 
-    /**
-     * Cesta do výchozího vzhledu
-     * @var string
-     */
+   /**
+    * Cesta do výchozího vzhledu
+    * @var string
+    */
    private static $templateDefaultFaceDir = null;
 
-    /**
-     * Objekt pro přístup k šabloně v jádře
-     * @var Template
-     */
+   /**
+    * Objekt pro přístup k šabloně v jádře
+    * @var Template
+    */
    private $coreTpl = null;
 
-    /**
-     * Objekt s chybovými hláškami jádra
-     * @var Errors
-     */
-   public $coreErrors = null;
-
-    /**
-     * Objekt s hláškami modulů
-     * @var Messages
-     */
+   /**
+    * Objekt s hláškami modulů
+    * @var Messages
+    */
    private static $messages = null;
 
-    /**
-     * Objekt s chybovými hláškami modulů (NE VYJÍMKY!)
-     * @var Messages
-     */
+   /**
+    * Objekt s chybovými hláškami modulů (NE VYJÍMKY!)
+    * @var Messages
+    */
    private static $userErrors = null;
 
-    /**
-     * Objekt Autorizace
-     * @var Auth
-     */
+   /**
+    * Objekt Autorizace
+    * @var Auth
+    */
    private static $auth = null;
 
-    /**
-     * objekt db konektory
-     * @var DbConnector
-     */
+   /**
+    * objekt db konektory
+    * @var DbConnector
+    */
    private static $dbConnector = null;
 
-    /**
-     * objekt právě vybraného modulu
-     * @var Module
-     */
+   /**
+    * objekt právě vybraného modulu
+    * @var Module
+    */
    private static $selectedModule = null;
 
-    /**
-     * Pole s aktuálními informacemi o zpracovávané kategorii
-     * @var array
-     */
+   /**
+    * Pole s aktuálními informacemi o zpracovávané kategorii
+    * @var array
+    */
    private static $currentCategory = array();
 
-    /**
-     * objekt konfiguračního souboru
-     * @var Config
-     */
+   /**
+    * objekt konfiguračního souboru
+    * @var Config
+    */
    private static $sysConfig = null;
 
-    /**
-     * Proměná pro sledování doby generování scriptu
-     * @var float
-     */
+   /**
+    * Proměná pro sledování doby generování scriptu
+    * @var float
+    */
    private $_stratTime = null;
 
-    /**
-     * Proměná obsahuje jestli je zobrazeny chybová stránka
-     */
+   /**
+    * Proměná obsahuje jestli je zobrazeny chybová stránka
+    * @var boolean
+    */
    static private $isErrorPage = false;
 
-    /*
-     * MAGICKÉ METODY
-     */
+   /*
+    * MAGICKÉ METODY
+    */
 
-    /**
-     * Konstruktor objektu AppCore
-     * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
-     */
+   /**
+    * Konstruktor objektu AppCore
+    * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
+    */
    private function __construct(){
       //		Definice globálních konstant
       define('URL_SEPARATOR', '/');
@@ -291,7 +286,7 @@ class AppCore {
          */
       $direName = dirname(__FILE__); // OLD version + dává někdy špatný výsledek
       $realPath = realpath($direName); // OLD version + dává někdy špatný výsledek
-//      $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
+      // $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
 
       $this->setAppMainDir($realPath);
 
@@ -317,13 +312,12 @@ class AppCore {
       Sessions::factory(self::sysConfig()->getOptionValue('session_name'));
       // výběr jazyka a locales
       Locale::selectLang();
-
       //		inicializace db konektoru
       $this->_initDbConnector();
-
       //		Inicializace chybových hlášek
       $this->_initMessagesAndErrors();
-
+      // inicializace funkcí pro překlady
+      Locale::initTranslationsFunctions();
       //Spuštění jádra aplikace
       $this->runApp();
    }
@@ -345,8 +339,7 @@ class AppCore {
     *
     * @return AppCore
     */
-   public static function getInstance()
-   {
+   public static function getInstance(){
       if (null === self::$_coreInstance) {
          self::$_coreInstance = new self();
       } else {
@@ -359,8 +352,7 @@ class AppCore {
     * Metoda vrací adresář aplikace
     * @return string -- adresář aplikace
     */
-   public static function getAppWebDir()
-   {
+   public static function getAppWebDir(){
       return self::$_appWebDir;
    }
 
@@ -368,7 +360,6 @@ class AppCore {
     * Metoda vygeneruje instanci aplikace
     * pokud již instance existuje, bude vyhozena vyjímka
     * Instance aplikace je singleton
-    *
     */
    public static function createApp() {
       self::getInstance();
@@ -391,8 +382,8 @@ class AppCore {
     */
    public static function getTepmlateFaceDir($fullDir = true, $withFacesDir = true) {
       if($fullDir){
-         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateFaceDir.DIRECTORY_SEPARATOR;
-
+         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR
+            .self::$templateFaceDir.DIRECTORY_SEPARATOR;
       } else {
          if($withFacesDir){
             return self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
@@ -410,7 +401,8 @@ class AppCore {
     */
    public static function getTepmlateDefaultFaceDir($fullDir = true) {
       if($fullDir){
-         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$templateDefaultFaceDir.DIRECTORY_SEPARATOR;
+         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR
+            .self::$templateDefaultFaceDir.DIRECTORY_SEPARATOR;
       } else {
          return self::FACES_DIR.URL_SEPARATOR.self::$templateDefaultFaceDir.URL_SEPARATOR;
       }
@@ -502,6 +494,7 @@ class AppCore {
     * Metoda inicializuje základní nastavení jádra systému
     */
    private function _initCore() {
+      // nastavení mb kodování na UTF protože celá aplikace pracuje s UTF
       mb_internal_encoding("UTF-8");
    }
 
@@ -509,9 +502,11 @@ class AppCore {
     * Metoda inicializuje připojení k databázi
     */
    private function _initDbConnector() {
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'db' . DIRECTORY_SEPARATOR. 'db.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'db'
+         . DIRECTORY_SEPARATOR. 'db.class.php');
       try {
-         self::$dbConnector = Db::factory(self::sysConfig()->getOptionValue("dbhandler", self::MAIN_CONFIG_DB_SECTION),
+         self::$dbConnector = Db::factory(self::sysConfig()->getOptionValue("dbhandler",
+               self::MAIN_CONFIG_DB_SECTION),
             self::sysConfig()->getOptionValue("dbserver", self::MAIN_CONFIG_DB_SECTION),
             self::sysConfig()->getOptionValue("dbuser", self::MAIN_CONFIG_DB_SECTION),
             self::sysConfig()->getOptionValue("dbpasswd", self::MAIN_CONFIG_DB_SECTION),
@@ -520,7 +515,7 @@ class AppCore {
 
          if(self::$dbConnector == false){
             throw new UnexpectedValueException(self::sysConfig()->getOptionValue("dbhandler",
-                  self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 1);
+                  self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 3);
          }
       } catch (UnexpectedValueException $e) {
          new CoreErrors($e);
@@ -533,7 +528,7 @@ class AppCore {
     */
    private function _initConfig() {
       self::$sysConfig = new Config(self::getAppWebDir() . DIRECTORY_SEPARATOR
-         . self::MAIN_CONFIG_FILE, $this->coreErrors);
+         . self::MAIN_CONFIG_FILE);
    }
 
    /**
@@ -543,9 +538,7 @@ class AppCore {
       //		Vložení smarty třídy
       require_once ('.'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'smarty'
          .DIRECTORY_SEPARATOR.'libs'.DIRECTORY_SEPARATOR.'Smarty.class.php');
-
       $this->template = new Smarty();
-
       //		Nastavení proměných smarty
       $this->template->template_dir = self::sysConfig()->getOptionValue("templates_dir", "smarty");
       $this->template->compile_dir = self::sysConfig()->getOptionValue("templates_c_dir", "smarty");
@@ -562,15 +555,12 @@ class AppCore {
          $this->template->force_compile = true;
          $this->template->clear_compiled_tpl();
       }
-
       //		Vytvoření objektu šablon pro jádro
       $this->coreTpl = new Template();
-
       //		inicializace vzhledu
       $this->templateFace = self::sysConfig()->getOptionValue('face');
       self::$templateFaceDir = self::sysConfig()->getOptionValue('face');
       self::$templateDefaultFaceDir = self::FACE_DEFAULT_NAME;
-
       //		Přidání do smarty objektu proměných s cestami k adresáři s engine šablonami
       $this->template->template_default_face_dir = self::getTepmlateDefaultFaceDir();
       $this->template->template_default_face_dir_rel = self::getTepmlateDefaultFaceDir(false);
@@ -600,7 +590,6 @@ class AppCore {
          if(strpos($className, 'eplugin') !== false AND $className != 'eplugin'){
             $epluginFile = str_replace('eplugin', '', $className);
          }
-
          //je načítána hlavní knihovna
          if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
                . $className . '.class.php')){
@@ -662,14 +651,22 @@ class AppCore {
          }
          else {
             new CoreErrors(new BadClassException(_("Nepodařilo se načíst potřebnou systémovou třídu ")
-                  .$className, 2));
+                  .$className, 4));
          }
       }
       //		knihovny pro práci s chybami
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'coreException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'dbException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'badClassException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'Exceptions' . DIRECTORY_SEPARATOR . 'imageException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+         . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'coreException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+         . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'moduleException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+         . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'dbException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+         . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badClassException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+         . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+         . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
 
       //		načtení hlavních tříd modulu (controler, view)
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'controller.class.php');
@@ -679,7 +676,6 @@ class AppCore {
 
    /**
     * Metoda inicializuje objekty pro práci s hláškami
-    *
     */
    private function _initMessagesAndErrors(){
       //		Vytvoření objektu pro práci se zprávami
@@ -687,17 +683,19 @@ class AppCore {
       self::$userErrors = new Messages('session', 'errors');
    }
 
-   //	Metoda inicializuje moduly
+   /**
+    * Medota pro inicializaci modulů
+    */
    private function _initModules() {
       //		Načtení potřebných knihoven
       ModuleDirs::setWebDir(AppCore::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
-      ModuleDirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));;
+      ModuleDirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));
    }
 
    /**
     * Metoda ověřuje autorizaci přístupu
     */
-   private static function coreAuth() {
+   private function coreAuth() {
       self::$auth = new Auth(AppCore::getDbConnector());
    }
 
@@ -715,7 +713,6 @@ class AppCore {
          }
       }
       $this->assignVarToTpl('MAIN_MODULE_TITLE', $templateObject->getSubTitle());
-
       $engineVars = $templateObject->getEngineVarsArray();
       if(!empty($engineVars)){
          $this->assignVarToTpl('MODULE_ENGINE_VARS', $engineVars);
@@ -741,7 +738,6 @@ class AppCore {
 
    /**
     * Metoda nastavuje hlavní adresář aplikace
-    *
     * @param string -- hlavní adresář aplikace
     */
    public function setAppMainDir($appMainDir) {
@@ -752,21 +748,24 @@ class AppCore {
     * Metoda vytvoří hlavní menu aplikace
     */
    public function createMainMenu() {
-      if(file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR. 'menu.class.php')){
-         require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR. 'menu.class.php');
-      } else {
-         new CoreException(_("Nebyl nalezen soubor pro vytvoření hlavního menu"), 1);
-      }
+      try {
+         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+               . 'menu.class.php')){
+            throw new BadFileException(_('Soubor s třídou pro tvorbu menu nebyl nalezen'), 5);
+         }
+         require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+            . 'menu.class.php');
 
-      if(class_exists("Menu")){
+         if(!class_exists("Menu", false)){
+            throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
+         }
          $menu = new Menu(self::$dbConnector);
          $menu->controller();
          $menu->view();
          $this->assginTplObjToTpl($menu->getTemplate(), MainMenu::TPL_ARRAY_NAME);
-      } else {
-         new CoreException(_("Třída s hlavním menu neexistuje"), 1);
+      } catch (Exception $e) {
+         new CoreErrors($e);
       }
-
       //		Přiřazení souboru s šablonou menu podle zvoleéhoí vzhledu
       //		vybraný vzhled šablony //TODO přesunout do třídy pro práci s menu
       $this->assignVarToTpl('MAIN_MENU_TEMPLATE_FILE', 'menu.tpl');
@@ -778,24 +777,21 @@ class AppCore {
    public function assignMainVarsToTemplate() {
       //	Hlavni promene strany
       $this->coreTpl->addVar("MAIN_PAGE_TITLE", self::sysConfig()->getOptionValue("web_name"));
-
       //adresa k rootu webu
       $this->coreTpl->addVar("MAIN_ROOT_DIR", self::getAppWebDir());
-
       $link = new Links();
       $this->coreTpl->addVar("MAIN_WEB_DIR", UrlRequest::getBaseWebDir());
-      $this->coreTpl->addVar("THIS_PAGE_LINK", $link);
-
+      $this->coreTpl->addVar("THIS_PAGE_LINK", (string)$link);
       // mapa webu
-      $this->coreTpl->addVar("SITEMAP_LINK", $link->clear(true)
+      $this->coreTpl->addVar("SITEMAP_LINK", (string)$link->clear(true)
          .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP));
       $this->coreTpl->addVar("SITEMAP_LINK_NAME", _('Mapa stránek'));
-
-      $this->coreTpl->addVar("MAIN_LANG_IMAGES_PATH", self::sysConfig()->getOptionValue('images_lang', 'dirs').URL_SEPARATOR);
+      $this->coreTpl->addVar("MAIN_LANG_IMAGES_PATH", self::sysConfig()
+         ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR);
       $this->coreTpl->addVar("MAIN_CURRENT_FACE_PATH", self::getTepmlateFaceDir(false));
-      $this->coreTpl->addVar("MAIN_CURRENT_FACE_IMAGES_PATH", self::getTepmlateFaceDir(false).self::sysConfig()->getOptionValue('images', 'dirs').URL_SEPARATOR);
+      $this->coreTpl->addVar("MAIN_CURRENT_FACE_IMAGES_PATH", self::getTepmlateFaceDir(false)
+         .self::sysConfig()->getOptionValue('images', 'dirs').URL_SEPARATOR);
       unset($link);
-
       //Přihlášení uživatele
       $this->coreTpl->addVar("USER_IS_LOGIN",  AppCore::getAuth()->isLogin());
       $this->coreTpl->addVar("NOT_LOGIN_USER_NAME",_("Nepřihlášen"));
@@ -804,20 +800,17 @@ class AppCore {
       //		Popisky loginu
       $this->coreTpl->addVar("LOGIN_LOGOUT_BUTTON_NAME", _("Odhlásit"));
       $this->coreTpl->addVar("LOGIN_LOGIN_BUTTON_NAME", _("Přihlásit"));
-
+      // hledání
+      $this->coreTpl->addVar("SEARCH_BUTTON", _("Hledej"));
+      $this->coreTpl->addVar("SEARCH_NAME", _("Hledání"));
       //Verze enginu
       $this->coreTpl->addVar("ENGINE_VERSION", self::sysConfig()->getOptionValue("engine_version"));
-
-
-
       //Debugovaci mod
       if (self::$debugLevel > 1){
          $this->coreTpl->addVar("DEBUG_MODE", true);
       }
-
       //		Přiřazení jazykového pole
       $this->coreTpl->addVar("APP_LANGS_NAMES", Locale::getAppLangsNames());
-
       //		Vytvoření odkazů s jazyky
       $langs = array();
       $langNames = Locale::getAppLangsNames();
@@ -836,7 +829,6 @@ class AppCore {
       unset($langNames);
       unset($link);
       unset($langArr);
-
       $this->coreTpl->addVar('APP_LANGS' ,$langs);
       unset($langs);
       $this->coreTpl->addVar('APP_LANG' ,Locale::getLang());
@@ -844,6 +836,8 @@ class AppCore {
 
    /**
     * metoda vyrenderuje šablonu
+    * @todo Předělat, protože se nekontroluje existence jiných typů médií a
+    * chybí propojení s kategorií, kde bude volba indexu také
     */
    public function renderTemplate() {
       //		načtení doby zpracovávání aplikace
@@ -851,15 +845,12 @@ class AppCore {
       $endTime = ((float)$sec + (float)$usec);
       $this->coreTpl->addVar("MAIN_EXEC_TIME", round($endTime-$this->_stratTime, 4));
       $this->coreTpl->addVar("COUNT_ALL_SQL_QUERY", Db::getCountQueries());
-
       //		Přiřazení javascriptů a stylů
       $this->assignVarToTpl("STYLESHEETS", Template::getStylesheets());
       $this->assignVarToTpl("JAVASCRIPTS", Template::getJavaScripts());
       $this->assignVarToTpl("ON_LOAD_JS_FUNCTIONS", Template::getJsOnLoad());
-
       //		Přiřazení proměných z hlavní šablony
       $this->assginTplObjToTpl($this->coreTpl);
-
       //		zvolení vzhledu
       //		vybraný vzhled šablony
       if(file_exists(self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'index.tpl')){
@@ -873,7 +864,6 @@ class AppCore {
       else {
          $faceFilePath = '';
       }
-
       //		Zvolení zobrazovaného média
       //		Medium pro tisk
       if(UrlRequest::getMediaType() == UrlRequest::MEDIA_TYPE_PRINT){
@@ -887,12 +877,9 @@ class AppCore {
       else {
          $this->template->display($faceFilePath."index.tpl");
       }
-
       //		Při debug levelu vyšším jak 3 zobrazit výpis šablony
       if(self::$debugLevel >= 3){
-         echo "<pre style='text-align: left'>";
-         print_r($this->template->get_template_vars());
-         echo "</pre>";
+         $this->assignVarToTpl("SHOW_DEBUG_CONSOLE", true);
       }
    }
 
@@ -916,43 +903,46 @@ class AppCore {
 
    /**
     * Metoda spouští moduly
-    * //TODO
     */
    public function runModules() {
       $modulesModel = new ModuleModel();
       $items = $modulesModel->getModules();
-
       //		procházení prvků stránky
       if($items != null){
          //  Nastavení prováděné kategorie
          self::$currentCategory = array(Category::COLUMN_CAT_LABEL => Category::getLabel()
             , Category::COLUMN_CAT_ID => Category::getId());
          foreach ($items as $itemIndex => $item) {
+            // kontrola  jestli nebyla vyvolána chabová stránka
+            if(AppCore::isErrorPage()){
+               break;
+            }
             //			Vytvoření objektu šablony
             $template = new Template();
-
             //				Vytvoření objektu pro práci s modulem
             $module = new Module($item, $this->getModuleTables($item));
             //				klonování modulu do statické proměné enginu
             self::$selectedModule = clone $module;
-
             //				vytvoření pole se skupinama a právama
             $userRights = array();
             foreach ($item as $collum => $value){
-               if (substr($collum,0,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX)) == Rights::RIGHTS_GROUPS_TABLE_PREFIX){
-                  $userRights[substr($collum,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX), strlen($collum))]=$value;
+               if (substr($collum,0,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX)) ==
+                  Rights::RIGHTS_GROUPS_TABLE_PREFIX){
+                  $userRights[substr($collum,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX),
+                     strlen($collum))]=$value;
                }
             }
             //				Vytvoření objektu pro přístup k právům modulu
             $moduleRights = new Rights($userRights);
-
             try {
                // načtení souboru s akcemi modulu
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát akci modulu ") . $module->getName(), 12);
+               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                     . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+                  throw new BadFileException(_("Nepodařilo se nahrát akci modulu ") 
+                     . $module->getName(), 7);
                }
-               include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
-
+               include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+               . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
                //				Vytvoření objektu akce
                $action = null;
                $actionClassName = ucfirst($module->getName()).'Action';
@@ -961,13 +951,13 @@ class AppCore {
                } else {
                   $action = new Action();
                }
-
                //				načtení souboru s cestami (routes) modulu
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 10);
+               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                     . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
+                  throw new BadFileException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 8);
                }
-               include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
-
+               include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
                //				Vytvoření objektu cesty (routes)
                $routes = null;
                $routesClassName = ucfirst($module->getName()).'Routes';
@@ -976,87 +966,73 @@ class AppCore {
                } else {
                   $routes = new Routes();
                }
-
                //				Vytvoření ubjektu UrlReqestu
                $urlRequest = new UrlRequest($action, $routes);
-
                //				načtení souboru s kontrolerem modulu
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát controler modulu ") . $module->getName(), 5);
+               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                     . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
+                  throw new BadFileException(_("Nepodařilo se nahrát controler modulu ") 
+                     . $module->getName(), 9);
                }
-               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
-
+               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
                //			Vytvoření objektu kontroleru
                $controllerClassName = ucfirst($module->getName()).'Controller';
                if(!class_exists($controllerClassName)){
-                  throw new BadClassException(_("Nepodařilo se vytvořit objekt controleru modulu ") . $module->getName(), 6);
+                  throw new BadClassException(_("Nepodařilo se vytvořit objekt controleru modulu ") 
+                     . $module->getName(), 10);
                }
                //					Vytvoření objektu kontroleru
                $controller = new $controllerClassName($action, $routes, $moduleRights);
-
                //					Volba metody kontroluru podle urlrequestu
                $requestName = $urlRequest->choseController();
                $requestControllerName = $requestName.AppCore::MODULE_CONTROLLER_SUFIX;
-
-               //					Příprava a nastavení použití překladu
+               //	Příprava a nastavení použití překladu
                Locale::bindTextDomain($module->getName());
-
-               //					Zvolení překladu na modul
-               Locale::switchToModuleTexts($module->getName());
-
                //					Spuštění kontroleru
                if(method_exists($controller, $requestControllerName)){
                   $ctrlResult = $controller->$requestControllerName();
                } else {
-                  if(!method_exists($controller, strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX)){
-                     throw new BadMethodCallException(_("Action Controller ")
-                        .strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX
-                        ._(" v modulu ") . $module->getName()._(" nebyl nalezen"), 11);
+                  if(!method_exists($controller, strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX)
+                        .self::MODULE_CONTROLLER_SUFIX)){
+                     throw new BadMethodCallException(sprintf(
+                           _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
+                        strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX,
+                        $module->getName()), 11);
                   }
-
                   $ctrlResult = $controller->mainController();
-                  //	Vrácení překladu na engine
-                  Locale::switchToEngineTexts();
-                  new CoreErrors(new BadMethodCallException(_("Action Controller ").$requestControllerName._(" v modulu ") . $module->getName()._(" nebyl nalezen"), 11));
+                  throw new BadMethodCallException(sprintf(
+                     _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
+                     $requestControllerName, $module->getName()), 12);
                }
-               Locale::switchToEngineTexts();
-
                //			načtení souboru s viewrem modulu
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát viewer modulu ") . $module->getName(), 7);
+               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
+                  throw new BadFileException(sprintf(_('Nepodařilo se nahrát soubor vieweru modulu "%s"'),
+                     $module->getName()), 13);
                }
-               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
-
+               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
                //					Donastavení šablon
                $template->setModule($module);
-
-               //					Spuštění viewru
-               //					Pokud proběhl kontroler v pořádku
-               //Není-li v kontroleru přiřazen výstup
+               //	Spuštění viewru pokud proběhl kontroler v pořádku
+               // Není-li v kontroleru přiřazen výstup
                if($ctrlResult === null){
                   $ctrlResult = true;
                }
-
                //	Spuštění pohledu
                if($ctrlResult){
                   if(!method_exists($controller, 'runView')){
                      throw new BadMethodCallException(_("Action Controller runView v modulu ")
-                        . $module->getName()._(" nebyl nalezen"), 11);
+                        . $module->getName()._(" nebyl nalezen"), 14);
                   }
-                  //					Zvolení překladu na modul
-                  Locale::switchToModuleTexts($module->getName());
                   $controller->runView($template, $requestName.AppCore::MODULE_VIEWER_SUFIX);
                } else {
-                  Locale::switchToEngineTexts();
-                  new CoreErrors(new BadMethodCallException(_('Controler modulu "') . $module->getName()
-                        ._('" nebyl korektně proveden'), 21));
+                  throw new BadMethodCallException(_('Controler modulu "')
+                        . $module->getName()._('" nebyl korektně proveden'), 15);
                }
-
-               //					Uložení šablony a proměných do hlavní šablony
+               //	Uložení šablony a proměných do hlavní šablony
                $this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
-
-               //	Vrácení překladu na engine
-               Locale::switchToEngineTexts();
                unset($template);
                unset($controller);
                $isModuleControlerRun = true;
@@ -1069,21 +1045,19 @@ class AppCore {
             } catch (BadMethodCallException $e){
                new CoreErrors($e);
             }
-            //				Vrácení překladu na engine pro jistotu
-            Locale::switchToEngineTexts();
-
             //				odstranění proměných
             unset($module);
-            self::$selectedModule = null;
+            AppCore::setSelectedModule();
             unset($model);
             unset($action);
             unset($routes);
             unset($controller);
             unset($actionCtrl);
          }
+         AppCore::setSelectedModule();
       } else {
          if(new Links() == new Links(true)){
-            throw new UnderflowException(_("Nepodařilo se nahrát prvky kategorie z databáze."), 9);
+            throw new UnderflowException(_("Nepodařilo se nahrát prvky kategorie z databáze."), 16);
          } else {
             $redir = new Links(true);
             $redir->category()->action()->article()->rmParam()->reload();
@@ -1098,23 +1072,18 @@ class AppCore {
       //	Rozdělenní, který panel je zpracován
       $panelSideUpper = strtoupper($side);
       $panelSideLower = strtolower($side);
-
       //	Zapnutí panelu
       $this->assignVarToTpl($panelSideUpper."_PANEL", true);
-
       // Načtení panelů
       $panelModel = new PanelModel();
       $panelData = $panelModel->getPanel($side);
-
       if(!empty($panelData)){
          $panelTemplate = new Template();
-
          foreach ($panelData as $panel) {
             // Nastavení prováděné kategorie
             self::$currentCategory = $category
             = array(Category::COLUMN_CAT_LABEL => $panel->{Category::COLUMN_CAT_LABEL},
                Category::COLUMN_CAT_ID => $panel->{Category::COLUMN_CAT_ID});
-
             // Vytvoření tabulek
             $tableIndex = 1; $moduleDbTables = array();
             $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
@@ -1123,23 +1092,23 @@ class AppCore {
                $tableIndex++;
                $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
             }
-
             // Příprava modulu
             $panelModule = new Module($panel, $moduleDbTables);
             self::$selectedModule = clone $panelModule;
             $panelClassName = ucfirst($panelModule->getName()).self::MODULE_PANEL_CLASS_SUFIX;
-
             // Spuštění panelu
             try {
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
-                  throw new BadFileException(_("Controler a Viewer panelu ").$panelModule->getName()._(" neexistuje."),15);
+               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
+                  throw new BadFileException(_("Controler a Viewer panelu ").$panelModule->getName()
+                     ._(" neexistuje."),17);
                }
-               include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
-
+               include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
                if(!class_exists($panelClassName)){
-                  throw new BadClassException(_("Třídat ").$panelClassName._(" panelu ").$panelModule->getName()._(" neexistuje."),16);
+                  throw new BadClassException(_("Třídat ").$panelClassName._(" panelu ")
+                     .$panelModule->getName()._(" neexistuje."),18);
                }
-
                //	vytvoření pole se skupinama a právama
                $userRights = array();
                foreach ($panel as $collum => $value){
@@ -1147,37 +1116,32 @@ class AppCore {
                      $userRights[substr($collum,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX), strlen($collum))]=$value;
                   }
                }
-
                //	Vytvoření objektu pro přístup k právům modulu
                $panelRights = new Rights($userRights);
-
                //	nastavení tempalte
                $panelTemplate->setModule($panelModule);
                $link = new Links(true);
                $panelTemplate->setTplCatLink($link->category($panel->{CategoryModel::COLUMN_CAT_LABEL},
                      $panel->{CategoryModel::COLUMN_CAT_ID}));
                unset ($link);
-
                //	CONTROLLER PANELU
                $panel = new $panelClassName($category, $panelTemplate, $panelRights);
-
                //	spuštění controleru
                if(!method_exists($panel, self::MODULE_PANEL_CONTROLLER)){
-                  throw new BadMethodCallException(_("Neexistuje controler panelu ").$panelModule->getName(),17);
+                  throw new BadMethodCallException(_("Neexistuje controler panelu ")
+                     .$panelModule->getName(),19);
                }
                Locale::switchToModuleTexts(); //jazykové nastavení na modul
                $panel->{self::MODULE_PANEL_CONTROLLER}();
                Locale::switchToEngineTexts(); //jazykové nastavení na engine
-
                if(!method_exists($panel, self::MODULE_PANEL_VIEWER)){
-                  throw new BadMethodCallException(_("Neexistuje viewer panelu ").$panelModule->getName(),18);
+                  throw new BadMethodCallException(_("Neexistuje viewer panelu ")
+                     .$panelModule->getName(),20);
                }
                Locale::switchToModuleTexts(); //jazykové nastavení na modul
                $panel->{self::MODULE_PANEL_VIEWER}();
                Locale::switchToEngineTexts(); //jazykové nastavení na engine
-
                AppCore::setSelectedModule();
-
             } catch (BadClassException $e) {
                new CoreErrors($e);
             } catch (BadFileException $e) {
@@ -1229,9 +1193,9 @@ class AppCore {
    public function runSitemap() {
       $sitemapItems = new SitemapModel();
       $sitemapItems = $sitemapItems->getItems();
-
       // vyttvoření hlavní kategorie
-      $sitemap = new SiteMap(new Links(true, true), AppCore::sysConfig()->getOptionValue('sitemap_periode'), 1.0);
+      $sitemap = new SiteMap(new Links(true, true), AppCore::sysConfig()
+         ->getOptionValue('sitemap_periode'), 1.0);
       $sitemap->run();
       unset ($sitemap);
       // procházení kategoríí na vytváření sitemapy
@@ -1240,10 +1204,9 @@ class AppCore {
             //				Vytvoření objektu pro práci s modulem
             $module = new Module($item, $this->getModuleTables($item));
             AppCore::setSelectedModule($module);
-
             $link = new Links(true);
-            $link = $link->category($item->{Category::COLUMN_CAT_LABEL_ORIG}, $item->{Category::COLUMN_CAT_ID});
-
+            $link = $link->category($item->{Category::COLUMN_CAT_LABEL_ORIG},
+               $item->{Category::COLUMN_CAT_ID});
             $moduleName = ucfirst($module->getName());
             $moduleClass = $moduleName.self::MODULE_SITEMAP_SUFIX_CLASS;
             //				Pokud existuje soubor tak jej načteme
@@ -1252,7 +1215,6 @@ class AppCore {
                if(class_exists($moduleClass)){
                   $sitemap = new $moduleClass($link, $item->{SitemapModel::COLUMN_SITEMAP_FREQUENCY},
                      (float)$item->{SitemapModel::COLUMN_SITEMAP_PRIORITY});
-
                   // spuštění sitemapy
                   $sitemap->run();
                   unset($sitemap);
@@ -1260,12 +1222,10 @@ class AppCore {
             } else {
                //throw new Exception(_('Chybí soubor pro zpracování sitemapy'));
             }
-
             // vyprázdnění modulu
             AppCore::setSelectedModule();
          }
-         //			Vygenerování mapy
-         //			Podle vyhledávače
+         //	Vygenerování mapy	Podle vyhledávače a ukončení scriptu
          SiteMap::generateMap(UrlRequest::getSupportedServicesName());
          exit ();
       }
@@ -1277,7 +1237,6 @@ class AppCore {
    public function runErrorPage() {
       // Odeslání chybové hlavičky o nenalezení stránky
       header("HTTP/1.0 404 Not Found");
-
       //	Hlavni promene strany
       $this->coreTpl->addVar("PAGE_NOT_FOUND", true);
       $this->coreTpl->addVar("PAGE_NOT_FOUND_TEXT", _('Chyba 404 - Stránka nebyla nalezena.
@@ -1295,7 +1254,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
          case UrlRequest::SPECIAL_PAGE_SEARCH:
             $this->runSearchPage();
             break;
-
          case UrlRequest::SPECIAL_PAGE_SITEMAP:
             $this->runSitemapPage();
             break;
@@ -1312,13 +1270,11 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       $searchM = new SearchModel();
       $modules = $searchM->getModules();
       $itemsArray = $searchM->getItems();
-
       if($modules != null){
          foreach ($modules as $itemIndex => $item) {
             //				Vytvoření objektu pro práci s modulem
             $module = new Module($item, $this->getModuleTables($item));
             AppCore::setSelectedModule($module);
-
             $moduleName = ucfirst($module->getName());
             $moduleClass = $moduleName.self::MODULE_SEARCH_SUFIX_CLASS;
             //				Pokud existuje soubor tak jej načteme
@@ -1326,7 +1282,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php');
                if(class_exists($moduleClass)){
                   $sitemap = new $moduleClass($itemsArray[$module->getIdModule()]);
-
                   // spuštění hledání v modulu
                   $sitemap->runSearch();
                   unset($sitemap);
@@ -1349,7 +1304,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
    public function runSitemapPage() {
       $sitemapItems = new SitemapModel();
       $sitemapItems = $sitemapItems->getItemsOrderBySections();
-
       // procházení kategoríí na vytváření sitemapy
       $sitemapArray = array();
       if($sitemapItems != null){
@@ -1361,15 +1315,11 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                      'categories' => array());
             }
             $idCategory = $item->{Category::COLUMN_CAT_ID};
-
-
             //				Vytvoření objektu pro práci s modulem
             $module = new Module($item, $this->getModuleTables($item));
             AppCore::setSelectedModule($module);
-
             $link = new Links(true);
             $link = $link->category($item->{Category::COLUMN_CAT_LABEL}, $idCategory);
-
             //            vytvoření pole s kategorií
             if(!isset ($sitemapArray[$idSection]['categories'][$idCategory])){
                $sitemapArray[$idSection]['categories'][$idCategory] = array(
@@ -1377,7 +1327,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   'url' => (string)$link,
                   'results' => array());
             }
-
             $moduleName = ucfirst($module->getName());
             $moduleClass = $moduleName.self::MODULE_SITEMAP_SUFIX_CLASS;
             //				Pokud existuje soubor tak jej načteme
@@ -1385,7 +1334,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SITEMAP_SUFIX_CLASS).'.class.php');
                if(class_exists($moduleClass)){
                   $sitemap = new $moduleClass($link, null,null);
-
                   // spuštění sitemapy
                   $sitemap->run();
                   $sitemapArray[$idSection]['categories'][$idCategory]['results'] =
@@ -1393,8 +1341,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                      $sitemap->getCurrentMapArray());
                   unset($sitemap);
                }
-            } else {
-               //               throw new Exception(_('Chybí soubor pro zpracování sitemapy'));
             }
             // vyprázdnění modulu
             AppCore::setSelectedModule();
@@ -1420,11 +1366,9 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
     */
    public function runApp() {
       //autorizace přístupu
-      AppCore::coreAuth();
-
+      $this->coreAuth();
       //		Inicializace modulu
       $this->_initModules();
-
       // pokud je spuštěna služba Supported Services (Eplugin, JsPlugin, Sitemap, RSS, Atom)
       if(UrlRequest::isSupportedServices()){
          //		Pokud se načítá statická část epluginu
@@ -1446,7 +1390,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                $eplugin->initRunOnlyEplugin();
                return true;
             } else {
-               new CoreException(_('Požadovaný eplugin nebyl nalezen'), 19);
+               new CoreException(_('Požadovaný eplugin nebyl nalezen'), 21);
             }
             unset($epluginName);
          }
@@ -1458,7 +1402,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                $jsplugin = new $jspluginName();
                return true;
             } else {
-               new CoreException(_('Požadovaný jsplugin nebyl nalezen'), 20);
+               new CoreException(_('Požadovaný jsplugin nebyl nalezen'), 22);
             }
             unset($jspluginName);
          }
@@ -1500,7 +1444,6 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   if(Category::isRightPanel()){
                      $this->runPanel('right');
                   }
-
                   // pokud se v aplikaci vyskitla chybová stránka, spustíme ji
                   if(AppCore::isErrorPage()){
                      $this->runErrorPage();

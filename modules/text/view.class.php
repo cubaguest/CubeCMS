@@ -10,7 +10,7 @@ class TextView extends View {
 			$this->template()->addTpl('editButton.tpl');
 			$this->template()->addVar('WRITABLE', true);
 			
-			$this->template()->addVar('LINK_TO_EDIT_TEXT_NAME', _("Upravit"));
+			$this->template()->addVar('LINK_TO_EDIT_TEXT_NAME', _m("Upravit"));
 			$this->template()->addVar('LINK_TO_EDIT_TEXT',$this->container()->getLink('link_edit'));
 			
 			// editační tlačítka
@@ -24,10 +24,10 @@ class TextView extends View {
 	
 	public function edittextView() {
 		$this->template()->addTpl("textedit.tpl");
-		$this->template()->addVar('TEXT_NAME', _('Text'));
-		$this->template()->addVar('BUTTON_TEXT_SEND', _('Odeslat'));
-		$this->template()->addVar('BUTTON_RESET', _('Obnovit'));
-		$this->template()->setTplSubLabel(_('Úprava textu'));
+		$this->template()->addVar('TEXT_NAME', _m('Text'));
+		$this->template()->addVar('BUTTON_TEXT_SEND', _m('Odeslat'));
+		$this->template()->addVar('BUTTON_RESET', _m('Obnovit'));
+		$this->template()->setTplSubLabel(_m('Úprava textu'));
 		
 		$tinymce = new TinyMce();
       if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'simple'){
@@ -59,7 +59,7 @@ class TextView extends View {
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
 
-      $this->template()->addVar('BUTTON_BACK_NAME', _('Zpět'));;
+      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět'));;
 	}
 	// EOF edittextView
 }

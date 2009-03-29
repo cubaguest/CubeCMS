@@ -4,13 +4,14 @@
  * Třidá poskytuje metody pro práci s datumem a čase. Jejich kontrolu a prasování.
  * Kontrolu ročního období atd.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: datetimectrlhelper.class.php 3.0.55 27.9.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro práci s datumi a časi v kontroleru - helper
  */
 
-class DateTimeCtrlHelper extends CtrlHelper {
+class DateTimeHelper extends Helper {
 	/**
 	 * KOnstanta s názvem pole z $_POST s dny
 	 * @var string
@@ -35,8 +36,7 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	 * Konstruktor třídy
 	 *
 	 */
-	function __construct() {
-	}
+	function __construct() {}
 	
 	/**
 	 * Metoda vrací časové razítko ze zadaného pole, vygenerovaného pomocí SMARTY
@@ -46,15 +46,12 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	 */
 	public function createStampSmartyPost($postName) {
 		$day = $month = $year = $hour = $minute = $second = null;
-		
 		if(isset($_POST[$postName][self::POST_DATE_ARRAY_DAY_KEY])){
 			$day = (int)$_POST[$postName][self::POST_DATE_ARRAY_DAY_KEY];
 		}
-		
 		if(isset($_POST[$postName][self::POST_DATE_ARRAY_MONTH_KEY])){
 			$month = (int)$_POST[$postName][self::POST_DATE_ARRAY_MONTH_KEY];
 		}
-		
 		if(isset($_POST[$postName][self::POST_DATE_ARRAY_YEAR_KEY])){
 			$year = (int)$_POST[$postName][self::POST_DATE_ARRAY_YEAR_KEY];
 		}
@@ -71,7 +68,6 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	public function getSeason($timestamp){
 		$month = date("n",$timestamp);
   		$day = date("j",$timestamp);
-  
   		switch($month){
     		case 1: case 2: return 3;
     		case 3: if ($day < 21) return 3; else return 0;
@@ -101,7 +97,6 @@ class DateTimeCtrlHelper extends CtrlHelper {
 		} else {
 			$date = $time = false;
 		}
-		
 		if($timestam){
 			return $time;
 		} else {
@@ -119,18 +114,15 @@ class DateTimeCtrlHelper extends CtrlHelper {
 	 */
 	public function checkTime($time, $timestamp = false) {
 		$nums = explode(self::TIME_SEAPRATOR, $time, 2);
-		
 		$allOk = true;
 //		Jestli se jedná o hodinu
 		if(!isset($nums[0]) OR $nums[0] < 0 OR $nums[0] > 23){
 			 $allOk = false;
 		}
-
 //		Jestli se jedná o minuty
 		if(!isset($nums[1]) OR $nums[1] < 0 OR $nums[1] > 59){
 			 $allOk = false;
 		}
-		
 		if($allOk){
 			if(!$timestamp){
 				return $nums[0].self::TIME_SEAPRATOR.$nums[1]; 
@@ -141,6 +133,5 @@ class DateTimeCtrlHelper extends CtrlHelper {
 			return false;
 		}
 	}
-	
 }
 ?>

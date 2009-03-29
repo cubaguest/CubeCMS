@@ -150,8 +150,9 @@
 		<div class="menu_bar">
 			<div class="menu_bar_obsah" style="text-align:right;">
          <form action="{$MAIN_WEB_DIR}" method="get">
+            <label>{$SEARCH_NAME}</label>
             <input type="text" size="17" maxlength="100" name="search" value="{$smarty.get.search|escape:'html'}" /><br /><br />
-            <input type="submit" value="Hledej" />
+            <input type="submit" value="{$SEARCH_BUTTON}" />
          </form>
 			</div>
 		</div>
@@ -225,5 +226,7 @@
 </div><!-- bodywrap /-->
 
   </body>
-
+{if $SHOW_DEBUG_CONSOLE eq true}
+{debug output=html}
+{/if}
 </html>

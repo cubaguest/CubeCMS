@@ -4,18 +4,23 @@
  * Třída obsluhuje přihlášení/odhlášení uživatele a práci s vlastnostmi (jméno, email, 
  * id, skupinu, atd.) přihlášeného uživatele. 
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: auth.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu autorizace uživatele
+ * @todo          Dodělat načítání z modelu a převést taknázvy sloupců do modelu
  */
 
 class Auth {
 	/**
-	 * Konstanta s parametrem s názvem tabulky uživatelů
-	 * @var string
+	 * Konstanta s názvem tabulky uživatelů
 	 */
 	const CONFIG_USERS_TABLE_NAME = 'users_table';
+
+   /**
+	 * Konstanta s názvem tabulky se skupinami
+	 */
 	const CONFIG_GROUPS_TABLE_NAME = 'groups_table';
 	
 	/**
@@ -96,7 +101,7 @@ class Auth {
 	 */
 	private $dbConnector = null;
 
-	/*
+	/**
 	 * Proměná obsahuje jestli je uživatel přihlášen
 	 * @var boolean
 	 */
@@ -108,14 +113,10 @@ class Auth {
 	function __construct($dbConnector) {
 		//Zakladni proměne
 		$this->login = false;
-
-//		$this->userErrors = $errors;
 //		inicializace konektoru k db
 		$this->dbConnector = $dbConnector;
-		
 //		Inicializace session
 		$this->session = new Sessions();
-		
 
 	//Jestli uzivatel prihlasen, je zvolena skupina uzivatele, v opacnem pripade vychozi skupina
 		if(!$this->_userIslogIn()){
@@ -128,9 +129,8 @@ class Auth {
 				$this->_saveUserDetailToSession();
 			}
 		} else {
-//			načtení detailů
+         //	načtení detailů
 			$this->_setUserDetailFromSession();
-			
 			//Uživatel se odhlásil
 			if($this->_logOutNow()){
 				$this->_setDefaultUserParams();
@@ -152,7 +152,6 @@ class Auth {
 			$this->login = false;
 			self::$isLogIn = false;
 		}
-
 		return $this->login;
 	}
 
@@ -191,11 +190,8 @@ class Auth {
 		$this->session->add(self::USER_IS_LOGIN, true);
 	}
 	
-	
-	
 	/**
 	 * Metoda ověří přihlašovací údaje a přihlásí uživatele do aplikace
-	 * //TODO není dodělána
 	 * @return boolean -- true pokud se uživatele podařilo přihlásit
 	 */
 	private function _logInNow() {
@@ -207,7 +203,7 @@ class Auth {
 			} else {
             $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
                ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES),'user')
-            ->colums(Db::COLUMN_ALL)
+               ->colums(Db::COLUMN_ALL)
                ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, 
                         Config::SECTION_DB_TABLES)),
                   array('g'=>'id_group', 'user'=> 'id_group') , Db::JOIN_LEFT,
@@ -289,7 +285,6 @@ class Auth {
 		return self::$isLogIn;
 	}
 	
-	
 	/**
 	 * Metoda vrací název skupiny ve které je uživatel
 	 * @return string -- název skupiny
@@ -338,5 +333,4 @@ class Auth {
       return AppCore::getUserErrors();
    }
 }
-
 ?>

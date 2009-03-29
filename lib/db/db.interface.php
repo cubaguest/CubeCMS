@@ -4,15 +4,14 @@
  * Třída zobrazuje prvky základní třídy dbkonektoru, které musí být použity v jednotlivých implementacích
  * databázových konektorů.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída s interfacem pro vytváření db konekorů
  */
 
 interface DbInterface {
-
 	/**
 	 * Metoda provede daný sql dotaz na databázi
 	 *

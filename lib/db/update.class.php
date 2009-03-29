@@ -4,7 +4,7 @@
  * Rozhraní pro tvorbu třídy k úpravě záznamů v databáze. Implementuje metodu
  * update z rozhraní Db_Interface
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id: $ VVE3.9.2 $Revision: $
  * @author			$Author: $ $Date:$
  *						$LastChangedBy: $ $LastChangedDate: $

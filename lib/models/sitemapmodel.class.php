@@ -3,15 +3,14 @@
  * Třída Modelu pro práci se sitemap
  * Třída, která umožňuje pracovet s modelem sitemap
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s sitemap
  */
 
 class SitemapModel extends DbModel {
-
    const COLUMN_SITEMAP_FREQUENCY = 'sitemap_changefreq';
    const COLUMN_SITEMAP_PRIORITY = 'sitemap_priority';
 
@@ -63,6 +62,9 @@ class SitemapModel extends DbModel {
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }
 
+   /**
+    * Načte tabulky
+    */
    private function getTables() {
       $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", "db_tables");
@@ -70,6 +72,10 @@ class SitemapModel extends DbModel {
 		$this->sectionsTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
    }
 
+   /**
+    * Načte Itemy podle sekcí
+    * @return array -- pole s itemy
+    */
    public function getItemsOrderBySections() {
       $this->getTables();
       $userNameGroup = AppCore::getAuth()->getGroupName();
@@ -101,12 +107,7 @@ class SitemapModel extends DbModel {
       ->order('sec.'.SectionsModel::COLUMN_SEC_ID)
       ->order('cat.'.CategoryModel::COLUMN_CAT_PRIORITY, Db::ORDER_DESC)
       ->order('cat.'.CategoryModel::COLUMN_CAT_ID);
-      ;
-
       return $this->getDb()->fetchObjectArray($sqlSelect);
-
-
    }
 }
-
 ?>

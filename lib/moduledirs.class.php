@@ -4,9 +4,10 @@
  * Třída slouží pro přístup k jednotlivým adresářům modulu. Pracuje jak s datovým, 
  * tak s hlavním adresářem modulu, ale i s adresáři stylesheetu a šablon modulu.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: moduledirs.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id: $ VVE3.9.4 $Revision: $
+ * @author        $Author: $ $Date:$
+ *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro obsluhu adresářů modulu
  */
 

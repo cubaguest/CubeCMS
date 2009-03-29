@@ -5,69 +5,47 @@
  * tj. vytváření a mazání adresářů, kopírování, mazání a přesun souborů souborů, 
  * popřípadě zjišťování jejich existence.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: files.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu souborů
+ * @todo          Dodělat zadávání souboru nebo adresáře přes konstruktor
  */
 
 class Files {
-	function __construct() {
-		;
-	}
-	
 	/**
 	 * Metoda překopíruje zadaný soubor do zadaného adresáře pod novým jménem
-	 * //TODO not implemented
-	 * @param string -- název souboru
-	 * @param string -- adresář, kam se má soubor nakopírovat
-	 * @param string -- název souboru
+	 * @param string $srcFile -- název souboru
+	 * @param string $dstDir -- adresář, kam se má soubor nakopírovat
+	 * @param string $newName -- název souboru
 	 */
 	public function copyAs($srcFile, $dstDir, $newName) {
 		if(!file_exists($dstDir)){
 			$this->createDirs($dstDir);
 		}
 		$return = copy($srcFile, $dstDir.$newName);
-		
 		chmod($dstDir.$newName, 0666);
-		
 		return $return;
-		
 	}
 	
 	/**
 	 * Funkce vytvoři zadaný adresář i podadresáře, pokud neexistují
 	 *
-	 * @param string -- adresář
+	 * @param string $path -- adresář
 	 */
-	private function createDirs($path)
-	{
-		if (!is_dir($path))
-		{
-//			$directory_path = "";
-//			$directories = explode("/",$path);
-//			array_pop($directories);
-//
-//			foreach($directories as $directory)
-//			{
-//				$directory_path .= $directory."/";
-//				if (!is_dir($directory_path))
-//				{
-//					mkdir($directory_path, 0777, true);
+	private function createDirs($path){
+		if (!is_dir($path)){
 					mkdir($path, 0777, true);
 					chmod($path, 0777);
-//					chmod($directory_path, 0777);
-//				}
-//			}
 		}
 	}
 	  
 	/**
 	 * Funkce vytvoří nový název souboru, který je v zadaném adresáři unikátní
 	 *
-	 * @param string -- název souboru
-	 * @param string -- adresář, kde se bude soubor vytvářet
-	 *
+	 * @param string $file -- název souboru
+	 * @param string $destinationDir -- adresář, kde se bude soubor vytvářet
 	 * @return string -- nový název souboru
 	 */
 	public function createNewFileName($file, $destinationDir){
@@ -98,7 +76,6 @@ class Files {
 		$file_name_short = $sFunction->utf2ascii($file_name_short);
 		unset($sFunction);
 		
-		
 		if($addNumber == 0){
 			$new_file_name=$file_name_short.$file_name_extension;
 		} else {
@@ -108,18 +85,16 @@ class Files {
 		if(file_exists($destinationDir.$new_file_name)){
 			$new_file_name = $this->createNewFileName($file, $destinationDir, (++$addNumber));
 		}
-		
 		return $new_file_name;
 	}
 	
 	/**
 	 * Metoda otestuje existenci adresáře, a pokud neexistuje pokusí se jej vytvořit
 	 * @param string -- název adresáře
+    * @todo dodělat přidávání lomítek před adresář
 	 */
 	public function checkDir($directory) {
-		//TODO dodělat přidávání lomítek před adresář
-		
-		//doplnění posledního lomítka za dest adresář
+		//doplnění posledního lomítka za cílový adresář
 		if($directory[strlen($directory)-1] != "/"){
 			$directory .= "/";
 		}
@@ -132,105 +107,91 @@ class Files {
 	/**
 	 * Rozbali zip soubor do cílového adresáře
 	 *
-	 * @param   string --	Cesta k zip souboru
-	 * @param   string --	Cesta, kam se zip soubor rozbalí, (false rozbalí soubor do aktuálního adresáře se zip souborem)
-	 * @param   boolean --	Jestli má být zip soubor rozbalen do adresáře se stejným jménem
-	 * @param   boolean --	Jestli mají být soubory přepsány 
+	 * @param string $src_file -- Cesta k zip souboru
+	 * @param string $dest_dir -- (option)Cesta, kam se zip soubor rozbalí, (false rozbalí soubor do aktuálního adresáře se zip souborem)
+	 * @param boolean $create_zip_name_dir -- (option)Jestli má být zip soubor rozbalen do adresáře se stejným jménem
+	 * @param boolean $overwrite -- (option)Jestli mají být soubory přepsány
 	 *
 	 * @return  boolean     Succesful or not
+    * @todo Doladit tak aby v podmínce nebylo přiřazení
 	 */
-	public function unZip($src_file, $dest_dir=false, $create_zip_name_dir=true, $overwrite=true)
-	{
-		if(function_exists("zip_open"))
-		{
-			if(!is_resource(zip_open($src_file)))
-			{
-				$src_file=dirname($_SERVER['SCRIPT_FILENAME'])."/".$src_file;
-			}
+   public function unZip($src_file, $dest_dir=false, $create_zip_name_dir=true, $overwrite=true){
+      if(!function_exists("zip_open")){
+         throw new BadFunctionCallException(_('Metoda pro práci se ZIP soubory
+není implementována. Je třeba použít PHP verze 5.2.0 nebo vyšší'), 1);
+      }
+      if(!is_resource(zip_open($src_file))){
+         $src_file=dirname($_SERVER['SCRIPT_FILENAME'])."/".AppCore::ENGINE_CACHE_DIR.$src_file;
+      }
+      else if (is_resource($zip = zip_open($src_file))) {
+         $splitter = ($create_zip_name_dir === true) ? "." : "/";
+         if ($dest_dir === false) $dest_dir = substr($src_file, 0, strrpos($src_file, $splitter))."/";
 
-			if (is_resource($zip = zip_open($src_file)))
-			{
-				$splitter = ($create_zip_name_dir === true) ? "." : "/";
-				if ($dest_dir === false) $dest_dir = substr($src_file, 0, strrpos($src_file, $splitter))."/";
+         // Create the directories to the destination dir if they don't already exist
+         $this->createDirs($dest_dir);
 
-				// Create the directories to the destination dir if they don't already exist
-				$this->createDirs($dest_dir);
+         // For every file in the zip-packet
+         while ($zip_entry = zip_read($zip)){
+            // Now we're going to create the directories in the destination directories
 
-				// For every file in the zip-packet
-				while ($zip_entry = zip_read($zip))
-				{
-					// Now we're going to create the directories in the destination directories
+            // If the file is not in the root dir
+            $pos_last_slash = strrpos(zip_entry_name($zip_entry), "/");
+            if ($pos_last_slash !== false){
+               // Create the directory where the zip-entry should be saved (with a "/" at the end)
+               $this->createDirs($dest_dir.substr(zip_entry_name($zip_entry), 0, $pos_last_slash+1));
+            }
 
-					// If the file is not in the root dir
-					$pos_last_slash = strrpos(zip_entry_name($zip_entry), "/");
-					if ($pos_last_slash !== false)
-					{
-						// Create the directory where the zip-entry should be saved (with a "/" at the end)
-						$this->createDirs($dest_dir.substr(zip_entry_name($zip_entry), 0, $pos_last_slash+1));
-					}
+            // Open the entry
+            if (zip_entry_open($zip,$zip_entry,"r")){
 
-					// Open the entry
-					if (zip_entry_open($zip,$zip_entry,"r"))
-					{
+               // The name of the file to save on the disk
+               $file_name = $dest_dir.zip_entry_name($zip_entry);
 
-						// The name of the file to save on the disk
-						$file_name = $dest_dir.zip_entry_name($zip_entry);
+               // Check if the files should be overwritten or not
+               if ($overwrite === true || $overwrite === false && !is_file($file_name)){
+                  // Get the content of the zip entry
+                  $fstream = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
 
-						// Check if the files should be overwritten or not
-						if ($overwrite === true || $overwrite === false && !is_file($file_name))
-						{
-							// Get the content of the zip entry
-							$fstream = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
-
-							if(!is_dir($file_name))
-							file_put_contents($file_name, $fstream );
-							// Set the rights
-							if(file_exists($file_name))
-							{
-								chmod($file_name, 0777);
-							}
-						}
-
-						// Close the entry
-						zip_entry_close($zip_entry);
-					}
-				}
-				// Close the zip-file
-				zip_close($zip);
-			}
-			else
-			{
-				//        echo "No Zip Archive Found.";
-				return false;
-			}
-
-			return true;
-		}
-		else
-		{
-			if(version_compare(phpversion(), "5.2.0", "<"))
-			$infoVersion="(use PHP 5.2.0 or later)";
-
-			new CoreException(_('Je potřeba PHP zip rozšíření pro práci se zip archívy ').$infoVersion);
-		}
-	}
+                  if(!is_dir($file_name))
+                  file_put_contents($file_name, $fstream );
+                  // Set the rights
+                  if(file_exists($file_name)){
+                     chmod($file_name, 0777);
+                  }
+               }
+               // Close the entry
+               zip_entry_close($zip_entry);
+            }
+         }
+         // Close the zip-file
+         zip_close($zip);
+      } else {
+         throw new InvalidArgumentException(sprintf(_('Soubor "%" není ZIP archív'), $src_file),2);
+      }
+      return true;
+   }
 	
 	/**
 	 * Metoda smaže zadaný soubor
-	 * 
-	 * @param string -- cesta k souboru
+    *
 	 * @param string -- název souboru
+	 * @param string -- cesta k souboru
 	 * 
 	 * @return boolean -- true pokud byl soubor smazán
 	 */
-	public function deleteFile($dstDir, $file) {
-		$deleted = false;
-		if(file_exists($dstDir.$file)){
-			if(unlink($dstDir.$file)){
-				$deleted = true;
-			}
+	public function deleteFile($file, $dstDir = null) {
+		if($dstDir != null){
+         $filePath = $dstDir.$file;
+      } else {
+         $filePath = $file;
+      }
+      if(!file_exists($filePath)){
+         throw new InvalidArgumentException(sprintf(_('Soubor "%" neexistuje, nelze jej smazat'), $filePath));
+      }
+		if(!unlink($filePath)){
+         throw new UnexpectedValueException(sprintf(_('Soubor "%" se nepodařilo smazat'), $filePath));
 		}
-		return $deleted;
+		return true;
 	}
 	
 	/**
@@ -248,16 +209,19 @@ class Files {
 						continue;
 					}
 					if (!$this->rmDir($filepath.'/'.$sf)){
-						new CoreException($filepath.'/'.$sf._(' soubor nemohl být smazán.'));
+						throw new UnexpectedValueException(
+                     sprintf(_('Soubor "%s" v adresáři "%s" se nepodařilo smazat'), $sf, $filepath));
 					}
 				}
 				closedir($dh);
 			}
-			return rmdir($filepath);
+			if(!rmdir($filepath)){
+             throw new UnexpectedValueException(
+                 sprintf(_('Adresář "%s" se nepodařilo smazat'), $filepath));
+         }
 		}
-		if(file_exists($filepath)){
-			return unlink($filepath);
-		}
+      $this->deleteFile($filepath);
+      return true;
 	}
 	
 	/**

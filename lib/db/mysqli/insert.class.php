@@ -5,7 +5,7 @@ require_once './lib/db/insert.class.php';
  * Třída pro vkládání záznamů do MySQL DB.
  * Třída obsahuje implementaci metody insert z db.interfacu a rozhraní Db_Insert
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id: $ VVE3.9.2 $Revision: $
  * @author			$Author: $ $Date:$
  *						$LastChangedBy: $ $LastChangedDate: $
@@ -132,7 +132,6 @@ class Mysqli_Db_Insert extends Mysqli_Db_Query implements Db_Insert {
    private function _createValues() {
       $valuesString = null;
       $valuesString = parent::SQL_SEPARATOR.parent::SQL_VALUES;
-
       foreach ($this->_sqlQueryParts[parent::INDEX_VALUES_ARRAY] as $values){
          $valuesString.=parent::SQL_SEPARATOR.parent::SQL_PARENTHESIS_L;
          foreach ($values as $value){
@@ -163,13 +162,10 @@ class Mysqli_Db_Insert extends Mysqli_Db_Query implements Db_Insert {
      */
    public function __toString(){
       $sql = parent::SQL_INSERT.parent::SQL_SEPARATOR.parent::SQL_INTO.parent::SQL_SEPARATOR;
-
       // tabulka
       $sql .= $this->_createTable(false);
-
       //sloupce
       $sql .= $this->_createColums();
-
       //hodnoty
       $sql .= $this->_createValues();
       return $sql;

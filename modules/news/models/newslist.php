@@ -77,7 +77,7 @@ class NewsListModel extends DbModel {
       ->limit($from, $count)
       ->order("news.".self::COLUMN_NEWS_TIME, Db::ORDER_DESC);
 
-      // jestli se mají sledovat uživatelé, tak tady něco musí být
+// jestli se mají sledovat uživatelé, tak tady něco musí být
 //		if($this->tableUsers != null){
 //			$sqlSelect=$sqlSelect->join(array("users" => $tableUsers), "users.".self::COLUMN_NEWS_ID_USER." = news.".self::COLUMN_NEWS_ID_USER, null, Auth::USER_NAME);
 //		}

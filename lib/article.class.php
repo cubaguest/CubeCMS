@@ -5,11 +5,11 @@
  * přístup přímo k názvu článku. Je propojena s Třídou routes, protože 
  * cesta se odvozuje od názvu článku. 
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision: $
- * @author 		$Author: $ $Date:$
- *              $LastChangedBy: $ $LastChangedDate: $
- * @abstract 	Třída pro obsluhu článku přenášeného v URL
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
+ * @abstract      Třída pro obsluhu článku přenášeného v URL
  */
 
 class Article {
@@ -26,11 +26,9 @@ class Article {
 	private static $currentArticleId = null;
 
 	/**
-	 * Konstruktor nastaví klíč článku z url
-	 *
+	 * Konstruktor
 	 */
-	function __construct() {
-	}
+	function __construct() {}
 
 	/**
 	 * Metoda nastaví id aktuálního článku
@@ -50,8 +48,8 @@ class Article {
 
 	/**
 	 * Metoda vytvoří řetězec článku pro url
-	 * @param <type> $label
-	 * @param <type> $id
+	 * @param string $label -- název článku
+	 * @param integer $id -- id článku
 	 */
 	public function createUrl($label, $id) {
 		$textHelp = new TextCtrlHelper();
@@ -77,5 +75,4 @@ class Article {
 		return (string)self::$currentArticleId;
 	}
 }
-
 ?>

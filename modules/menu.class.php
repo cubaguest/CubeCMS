@@ -1,4 +1,9 @@
 <?php
+/**
+ * Uživatelská třída menu, načítá, vytváří a organizuje rozložení menu pro výpis
+ * v šabloně
+ */
+
 class Menu extends MainMenu {
 	public function createMenu() {
 		$categoryArray = array();

@@ -7,9 +7,9 @@
  * využít při ladění aplikace, protože bude obsahovat jednotlivé vyjímky.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.1 $Revision: $
- * @author        $Author: $ $Date: $
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract      Třída pro obsluhu chyb jádra a modulů
  */
 class CoreErrors {
@@ -54,6 +54,10 @@ class CoreErrors {
       return $errArray;
    }
 
+   /**
+    * Metoda zjišťuje jestli je pole s vyjímkami prázdné
+    * @return boolean -- true pokud je pole prázdné
+    */
    public static function isEmpty() {
       if(empty (self::$exceptionsArray)){
          return true;

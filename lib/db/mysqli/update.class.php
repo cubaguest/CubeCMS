@@ -6,13 +6,14 @@ require_once './lib/db/update.class.php';
  * Třída obsahuje implementaci metody update z db.interface a implementuje metody
  * v rozhraní Db_Update
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro aktualizaci záznamů
  * @see           http://dev.mysql.com/doc/refman/5.1/en/update.html
  * @package       mysqli
+ * @todo          Dodělat regulérní výraz při vkládání hodnot
  */
 
 class Mysqli_Db_Update extends Mysqli_Db_Query implements Db_Update{
@@ -66,8 +67,7 @@ class Mysqli_Db_Update extends Mysqli_Db_Query implements Db_Update{
     *
     * @return Db_Update -- objekt Db_Update
     */
-   public function set($values)
-   {
+   public function set($values){
       $this->_sqlQueryParts[self::INDEX_COLUMS_ARRAY] = $values;
       return $this;
    }
@@ -109,10 +109,10 @@ class Mysqli_Db_Update extends Mysqli_Db_Query implements Db_Update{
                if($this->isMySQLFunction($value) ){
                   $columsString.=self::SQL_SEPARATOR."`".$colum."`= ".$value.self::SQL_VALUE_SEPARATOR;
                }
-               // Je výpočetní výraz
-               else if(ereg('^([a-zA-Z0-9]*)([+-\*/]*)([0-9]*)$', $value)){
-                  $columsString.=self::SQL_SEPARATOR."`".$colum."`= ".$value.self::SQL_VALUE_SEPARATOR;
-               }
+               // Je výpočetní výraz -- není korektní
+//               else if(ereg('^([a-zA-Z0-9]*)([+-\*/]*)([0-9]*)$', $value)){
+//                  $columsString.=self::SQL_SEPARATOR."`".$colum."`= ".$value.self::SQL_VALUE_SEPARATOR;
+//               }
                // Je normální hodnota
                else {
                   if(!is_int($value)){
@@ -139,8 +139,7 @@ class Mysqli_Db_Update extends Mysqli_Db_Query implements Db_Update{
      *
      * @return string -- objekt jako řetězec
      */
-   public function __toString()
-   {
+   public function __toString(){
       $sql = self::SQL_UPDATE;
       // tabulka
       $sql .= $this->_createTable(false);
@@ -152,7 +151,6 @@ class Mysqli_Db_Update extends Mysqli_Db_Query implements Db_Update{
       $sql .= $this->_createOrder();
       // limit
       $sql .= $this->_createLimit();
-
       return $sql;
    }
 }

@@ -6,10 +6,10 @@ require_once './lib/db/select.class.php';
  * Třída obsahuje implementaci metody select z db-interfacu. a implementuje
  * rozhraní Db_Select
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro výběr záznamů
  * @see           http://dev.mysql.com/doc/refman/5.1/en/select.html
  * @package       mysqli
@@ -36,7 +36,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       $this->_sqlQueryParts = self::$_sqlPartsInit;
    }
 
-
    /**
     * Metoda nastavuje která tabulka se bude používat
     *
@@ -62,7 +61,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       if(!is_array($columnsArray)){
          $columnsArray = array($columnsArray);
       }
-
       // pokud se ukládá bez aliasu
       if($tableAlias == null OR $tableAlias == false){
          $arrName = parent::INDEX_COLUMS_NO_ALIAS;
@@ -75,7 +73,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       else {
          $arrName = $tableAlias;
       }
-
       //  Vytvoření pole pokud neexistuje
       if(!isset ($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY][$arrName])){
          $this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY][$arrName] = array();
@@ -116,7 +113,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       if(!isset ($conditionArr[2])){
          $conditionArr[2] = Db::JOIN_OPERATOR_ON;
       }
-
       // pokud není zadán typ porovnávání podmínky
       if(!isset ($conditionArr[3])){
          $conditionArr[3] = '=';
@@ -153,15 +149,13 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
             $columsArr = array($conditionArr[0]);
             $conditionArr[0] = $columsArr;
          }
-
          $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN1] = $conditionArr[0];
          $tmpArray[parent::JOIN_TABLE_CONDITION_COLUMN2] = $conditionArr[1];
          $tmpArray[parent::JOIN_TABLE_CONDITION_TYPE] = parent::SQL_USING;
          $tmpArray[parent::JOIN_TABLE_CONDITION_OPERATOR] = null;
       } else {
-         throw new RangeException(_('Nepodporovaný typ operátoru JOIN'),2);
+         throw new RangeException(sprintf(_('Nepodporovaný typ operátoru JOIN code "%s"'), $joinType),2);
       }
-
       // zvolení joinu
       $joinType = strtolower($joinType);
       switch ($joinType) {
@@ -220,20 +214,15 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       if(!is_array($this->_sqlQueryParts[self::GROUP_BY_KEY])){
          $this->_sqlQueryParts[self::GROUP_BY_KEY] = array();
       }
-
       $groupTmpArray = array();
       $groupTmpArray[self::ORDER_COLUM_KEY] = $colum;
-
       if(!$withRollup){
          $groupTmpArray[self::GROUP_WITH_ROLLUP] = false;
       } else {
          $groupTmpArray[self::GROUP_WITH_ROLLUP] = true;
       }
-
       array_push($this->_sqlQueryParts[self::GROUP_BY_KEY], $groupTmpArray);
-
       return $this;
-
    }
 
    /**
@@ -259,7 +248,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       } else {
          $this->_sqlQueryParts[self::SQL_COUNT][$alias] = self::SQL_ALL_VALUES;
       }
-
       return $this;
    }
 
@@ -288,7 +276,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
    protected function _createColums() {
       $columsString = null;
       $colum = null;
-
       if(!empty($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY])){
          foreach ($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY] as $columsTable => $colums) {
             foreach ($colums as $columAlias => $columString) {
@@ -334,7 +321,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       } else {
          $columsString = self::SQL_SEPARATOR.self::SQL_ALL_VALUES.self::SQL_SEPARATOR;
       }
-
       // Co tohle dělá??
       if(empty($this->_sqlQueryParts[self::GROUP_BY_KEY])
          AND !empty($this->_sqlQueryParts[self::SQL_COUNT])){
@@ -383,7 +369,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       }
       //			odstranění poslední čárky
       $fromString = substr($fromString, 0, strlen($fromString)-1);
-
       return $fromString;
    }
 
@@ -400,7 +385,6 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
          } else {
             $joinType = null;
          }
-
          foreach ($joinArray as $tableAlias => $table){
             $joinString = $joinType . parent::SQL_JOIN . parent::SQL_SEPARATOR;
 
@@ -429,29 +413,10 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
    }
 
    /**
-    * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
-    * @return string -- část SQL s kluzulí ORDER BY
-    */
-//   protected function _createOrder(){
-//      $orderString = null;
-//      if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
-//         $orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
-//         foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
-//            $orderString .= self::SQL_SEPARATOR . $orderArray[self::ORDER_COLUM_KEY] . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
-//         }
-//
-//         //			odstranění poslední čárky
-//         $orderString = substr($orderString, 0, strlen($orderString)-1);
-//      }
-//      return $orderString;
-//   }
-
-   /**
     * Metoda vygeneruje část SQL dotazu s klauzulí GROUP BY
     * @return string -- část SQL s kluzulí GROUP BY
     */
    protected function _createGroup() {
-
       if(!empty($this->_sqlQueryParts[self::GROUP_BY_KEY])){
          $groupString = null;
          $groupString = self::SQL_SEPARATOR . self::SQL_GROUP_BY;
@@ -462,12 +427,9 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
                $groupString .= self::SQL_SEPARATOR . self::SQL_WITH_ROLLUP;
             }
             $groupString .= ',';
-
          }
-
          //			odstranění poslední čárky
          $groupString = substr($groupString, 0, strlen($groupString)-1);
-
          return $groupString;
       }
    }
@@ -477,32 +439,23 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
      *
      * @return string -- objekt jako řetězec
      */
-   public function __toString()
-   {
+   public function __toString(){
       $sql = parent::SQL_SELECT;
-
       // Sloupce
       $sql .= $this->_createColums();
-
       // Tabulka
       $sql .= parent::SQL_SEPARATOR.parent::SQL_FROM.parent::SQL_SEPARATOR;
       $sql .= $this->_createTable();
-
       // JOIN
       $sql .= $this->_createJoin();
-
       // where
       $sql .= $this->_createWhere();
-
       // Group by
       $sql .= $this->_createGroup();
-
       // ORDER
       $sql .= $this->_createOrder();
-
       // LIMIT
       $sql .= $this->_createLimit();
-      
       return $sql;
    }
 }
@@ -528,5 +481,4 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
  *     | INTO var_name [, var_name]]
  *   [FOR UPDATE | LOCK IN SHARE MODE]]
  */
-
 ?>

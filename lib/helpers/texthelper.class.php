@@ -3,10 +3,10 @@
  * Ttřída textového Helperu pro zjednodušení práce s texty.
  * Třída poskytuje některé funkce pro práci s textem.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.3 $Revision: $
- * @author        $Author: $ $Date:$
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.3 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro práci s textovými prvky - helper
  */
 
@@ -15,7 +15,8 @@ class TextHelper extends Helper {
     * Pole znaků které se odstraňují protoože se nejedná o písmena
     * @var array
     */
-	private $nonLettersSymbols = array('/','\\','\'','"',',','.','<','>','?',';',':','[',']','{','}','|','=','+','-','_',')','(','*','&','^','%','$','#','@','!','~','`'	);//this will remove punctuation
+	private $nonLettersSymbols = array('/','\\','\'','"',',','.','<','>','?',';',':','[',']',
+      '{','}','|','=','+','-','_',')','(','*','&','^','%','$','#','@','!','~','`');
 
 	/**
 	 * Metoda dekóduje znaky na entity html
@@ -27,7 +28,6 @@ class TextHelper extends Helper {
 	public function decodeHtmlSpecialChars($text) {
 		//TODO pořešid pokud je zaplé tiny mce
 		$text = htmlspecialchars_decode($text);
-		
 		return $text;
 	}
 	
@@ -40,15 +40,16 @@ class TextHelper extends Helper {
 	public function utf2ascii($text)
 	{
 		$return = Str_Replace(
-		Array("á","č","ď","é","ě","í","ľ","ň","ó","ř","š","ť","ú","ů","ý","ž","Á","Č","Ď","É","Ě","Í","Ľ","Ň","Ó","Ř","Š","Ť","Ú","Ů","Ý","Ž") ,
-		Array("a","c","d","e","e","i","l","n","o","r","s","t","u","u","y","z","A","C","D","E","E","I","L","N","O","R","S","T","U","U","Y","Z") ,
+		Array("á","č","ď","é","ě","í","ľ","ň","ó","ř","š","ť","ú","ů","ý","ž","Á","Č",
+         "Ď","É","Ě","Í","Ľ","Ň","Ó","Ř","Š","Ť","Ú","Ů","Ý","Ž") ,
+		Array("a","c","d","e","e","i","l","n","o","r","s","t","u","u","y","z","A","C",
+         "D","E","E","I","L","N","O","R","S","T","U","U","Y","Z") ,
 		$text);
-
 		$return = Str_Replace(Array(" ", "_"), "-", $return); //nahradí mezery a podtržítka pomlčkami
 		$return = Str_Replace(array("----","---","--"), "-", $return); //odstraní nekolik pomlcek za sebou
 		$return = Str_Replace(Array("(",")",".","!",",","\"","'"), "", $return); //odstraní ().!,"'
 		$return = StrToLower($return); //velká písmena nahradí malými.
-        return $return;
+      return $return;
 	}
 
 	/**
@@ -71,7 +72,6 @@ class TextHelper extends Helper {
 		for ($i = 0; $i < sizeof($this->symbols); $i++) {
 			$string = str_replace($this->symbols[$i],' ',$string);
 		}
-
 		return trim($string);
 	}
 
@@ -85,7 +85,6 @@ class TextHelper extends Helper {
    public function truncate($text,$count, $endString = null) {
       if (strlen($text) > $count) {
          $text = mb_substr($text, 0, $count);
-//         $text = mb_substr($text,strpos($text," "), strlen($text));
          $text = mb_substr($text,0,strrpos($text," "));
          //This strips the full stop:
          if ((mb_substr($text, -1)) == ".") {

@@ -3,10 +3,10 @@
  * Třída Modelu pro práci se sekcemi
  * Třída, která umožňuje pracovet s modelem kategorií
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
  */
 
@@ -39,6 +39,9 @@ class SectionsModel extends DbModel {
     */
    private $itemsTable = null;
 
+   /**
+    * Metoda načte tabulky
+    */
    private function getTables() {
       $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
 		$this->secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
