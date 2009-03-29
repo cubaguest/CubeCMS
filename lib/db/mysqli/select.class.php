@@ -279,7 +279,8 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
       if(!empty($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY])){
          foreach ($this->_sqlQueryParts[parent::INDEX_COLUMS_ARRAY] as $columsTable => $colums) {
             foreach ($colums as $columAlias => $columString) {
-               if(!$this->isMySQLFunction($columString)AND ($columString[0] != parent::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] != parent::SQL_PARENTHESIS_R)){
+               if(!$this->isMySQLFunction($columString)AND ($columString[0] != parent::SQL_PARENTHESIS_L
+                     AND $columString[strlen($columString)-1] != parent::SQL_PARENTHESIS_R)){
                   if($columString != parent::SQL_ALL_VALUES){
                      $columString = '.`' . $this->getDbConnector()->escapeString($columString) . '`';
                   } else {
@@ -293,13 +294,16 @@ class Mysqli_Db_Select extends Mysqli_Db_Query implements Db_Select {
                      parent::SQL_SEPARATOR . $columAlias . ',';
                   }
                }
-               else if($columString[0] == self::SQL_PARENTHESIS_L AND $columString[strlen($columString)-1] == self::SQL_PARENTHESIS_R){
-                  $colum .= self::SQL_SEPARATOR . $columString . self::SQL_SEPARATOR . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
+               else if($columString[0] == self::SQL_PARENTHESIS_L
+                  AND $columString[strlen($columString)-1] == self::SQL_PARENTHESIS_R){
+                  $colum .= self::SQL_SEPARATOR . $columString . self::SQL_SEPARATOR
+                     . self::SQL_AS .	self::SQL_SEPARATOR . $columAlias . ',';
                }
                // pokud je obsažen poddotaz
                else if(strpos($columString,parent::SQL_SELECT) !== false){
-                  $colum .= parent::SQL_SEPARATOR.parent::SQL_PARENTHESIS_L.$columString.parent::SQL_PARENTHESIS_R
-                  .parent::SQL_SEPARATOR.parent::SQL_AS.parent::SQL_SEPARATOR . $columAlias . ',';
+                  $colum .= parent::SQL_SEPARATOR.parent::SQL_PARENTHESIS_L.$columString
+                  .parent::SQL_PARENTHESIS_R.parent::SQL_SEPARATOR.parent::SQL_AS
+                  .parent::SQL_SEPARATOR . $columAlias . ',';
                }
                // pokud jsou obsaženy specialní funkce
                else {
