@@ -1131,16 +1131,12 @@ class AppCore {
                   throw new BadMethodCallException(_("Neexistuje controler panelu ")
                      .$panelModule->getName(),19);
                }
-               Locale::switchToModuleTexts(); //jazykové nastavení na modul
                $panel->{self::MODULE_PANEL_CONTROLLER}();
-               Locale::switchToEngineTexts(); //jazykové nastavení na engine
                if(!method_exists($panel, self::MODULE_PANEL_VIEWER)){
                   throw new BadMethodCallException(_("Neexistuje viewer panelu ")
                      .$panelModule->getName(),20);
                }
-               Locale::switchToModuleTexts(); //jazykové nastavení na modul
                $panel->{self::MODULE_PANEL_VIEWER}();
-               Locale::switchToEngineTexts(); //jazykové nastavení na engine
                AppCore::setSelectedModule();
             } catch (BadClassException $e) {
                new CoreErrors($e);

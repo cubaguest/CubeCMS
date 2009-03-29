@@ -197,11 +197,12 @@ class ReferenceModel extends DbModel {
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(1))
+                  ->colums(self::COLUMN_REFERENCE_CHANGED_TIME)
 						->where(self::COLUMN_REFERENCE_ID_ITEM, $this->getModule()->getId())
                   ->order(self::COLUMN_REFERENCE_CHANGED_TIME, Db::ORDER_ASC)
                   ->limit(0, 1);
-		$time = $this->getDb()->fetchAssoc($sqlSelect,true);
-      if(!empty ($text)){
+		$time = $this->getDb()->fetchAssoc($sqlSelect);
+      if(!empty ($time)){
          return $time[self::COLUMN_REFERENCE_CHANGED_TIME];
       }
 		return false;
