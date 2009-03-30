@@ -11,10 +11,10 @@ for locale in cs_CZ en_US de_DE; do
 #localeDir=$LOCALES_DIR$locale;
 	if [ -d "$LOCALES_DIR$locale" ]; then
 		if [ -f "$LOCALES_DIR$locale$LOCALES_MESSAGES_DIR$domain.po" ]; then
-			xgettext -j --from-code=UTF-8 *.php -d $domain -p $LOCALES_DIR$locale$LOCALES_MESSAGES_DIR;
+			xgettext -j --from-code=UTF-8 *.php --keyword=_m -d $domain -p $LOCALES_DIR$locale$LOCALES_MESSAGES_DIR;
 			echo "locale $locale doplněno";
 		else
-			xgettext --from-code=UTF-8 *.php -d $domain -p $LOCALES_DIR$locale$LOCALES_MESSAGES_DIR;
+			xgettext --from-code=UTF-8 *.php --keyword=_m -d $domain -p $LOCALES_DIR$locale$LOCALES_MESSAGES_DIR;
 			echo "locale $locale vytvořeno";
 		fi
 	else
