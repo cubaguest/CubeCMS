@@ -24,7 +24,7 @@ class NewsView extends View {
       $this->template()->addVar('NUM_NEWS', $this->container()->getData('num_news'));
       $this->template()->addVar('NUM_NEWS_ALL', $this->container()->getLink('all_news'));
       $this->template()->addVar('NUM_NEWS_ALL_NAME', _m('Vše'));
-      $this->template()->addVar('NUM_NEWS_SHOW', _m('Zobrazit novinek'));
+      $this->template()->addVar('NUM_NEWS_SHOW', _m('Zobrazit novinku'));
 
    }
 
