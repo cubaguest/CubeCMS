@@ -54,6 +54,18 @@ class Module {
 	 * @var string
 	 */
 	private $dataDir = null;
+
+	/**
+	 * Proměná s názvem Itemu
+	 * @var string
+	 */
+	private $label = null;
+
+	/**
+	 * Proměná s popisem itemu
+	 * @var string
+	 */
+	private $alt = null;
 	
 	/**
 	 * Konstruktor třídy pro práci s modulem
