@@ -174,7 +174,7 @@ class NewsController extends Controller {
          if(!$newsDetail->saveNewNews($newsForm->getValue(self::FORM_INPUT_LABEL),
                $newsForm->getValue(self::FORM_INPUT_TEXT),
                $this->getRights()->getAuth()->getUserId())){
-            throw new UnexpectedValueException(_('Novinku se nepodařilo uložit, chyba při ukládání.'), 1);
+            throw new UnexpectedValueException(_m('Novinku se nepodařilo uložit, chyba při ukládání.'), 1);
          }
          $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
          $this->getLink()->article()->action()->rmParam()->reload();
@@ -214,7 +214,7 @@ class NewsController extends Controller {
          $newsDetail = new NewsDetailModel();
          if(!$newsDetail->saveEditNews($newsForm->getValue(self::FORM_INPUT_LABEL),
                $newsForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            throw new UnexpectedValueException(_('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
+            throw new UnexpectedValueException(_m('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
          }
          $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
          $this->getLink()->action()->reload();
@@ -235,5 +235,4 @@ class NewsController extends Controller {
       
    }
 }
-
 ?>

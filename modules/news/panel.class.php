@@ -47,8 +47,8 @@ class NewsPanel extends Panel {
 		
 		$this->template()->addVar("NEWS_ARRAY", $this->newsArray);
 		$this->template()->addVar("NEWS_LINK", $this->newsLink);
-		$this->template()->addVar("NEWS_LINK_NAME", _("Další novinky"));
-		$this->template()->addVar("NEWS_MORE", _("Více"));
+		$this->template()->addVar("NEWS_LINK_NAME", _m("Další novinky"));
+		$this->template()->addVar("NEWS_MORE", _m("Více"));
 	}
 }
 ?>
