@@ -315,6 +315,13 @@ class UserFilesEplugin extends Eplugin {
 		$this->toTplJSPlugin(new SubmitForm());
 		self::$otherFilesArray[$this->idUserFiles] = $this->filesArray;
 		$this->toTpl("USERFILES_ARRAY",self::$otherFilesArray);
+
+      $ajaxLink = new AjaxLink($this);
+      $ajaxLink->setAction('addFile');
+      $ajaxLink->addParam('idArticle', $this->idArticle);
+      $ajaxLink->addParam('idItem', $this->getModule()->getId());
+echo (string)$ajaxLink;
+		$this->toTpl("AJAX_ADD_FILE_LINK",(string)$ajaxLink);
 	}
 }
 ?>

@@ -80,9 +80,14 @@ class AppCore {
    const ENGINE_CACHE_DIR = 'cache';
 
    /**
-    * Kešovací adresář pro dočasné soubory
+    * Adresář pro knihovny z vyjímkami
     */
    const ENGINE_EXCEPTIONS_DIR = 'exceptions';
+
+   /**
+    * Adresář pro knihovny pro práci s ajaxem
+    */
+   const ENGINE_AJAX_DIR = 'ajax';
 
    /**
     * Konstanta s adresářem s šablonami systému
@@ -667,6 +672,10 @@ class AppCore {
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
+
+      // načtení ajaxových knihoven
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+         . self::ENGINE_AJAX_DIR . DIRECTORY_SEPARATOR . 'ajaxlink.class.php');
 
       //		načtení hlavních tříd modulu (controler, view)
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'controller.class.php');
@@ -1405,6 +1414,18 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
          //		Pokud se načítá statická část sitemap
          else if(UrlRequest::getSupportedServicesType() == UrlRequest::SUPPORTSERVICES_SITEMAP_NAME){
             $this->runSitemap();
+         }
+      }
+      // pokud je spuštěn ajax požadavek
+      else if(UrlRequest::isAjaxRequest()){
+         if(UrlRequest::getAjaxType() == AjaxLink::AJAX_EPLUGIN_NAME){
+            $epluginName = UrlRequest::getAjaxName().ucfirst(Eplugin::PARAMS_EPLUGIN_FILE_PREFIX);
+            $eplugin = new $epluginName();
+
+            $eplugin->runAjax();
+
+         } else if(UrlRequest::getAjaxType() == AjaxLink::AJAX_MODULE_NAME){
+            
          }
       }
       // pokud je zpracovávána normální aplikace a její moduly

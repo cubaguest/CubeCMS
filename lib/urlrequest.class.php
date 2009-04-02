@@ -111,12 +111,6 @@ class UrlRequest {
    private static $scriptName = null;
 
    /**
-    * Objekt zvoleného modulu
-    * @var Module
-    */
-   private $module = null;
-
-   /**
     * Objekt akce modulu
     * @var Action
     */
@@ -187,10 +181,32 @@ class UrlRequest {
    private static $specialPageName = null;
 
    /**
+    * Jestli je zpracováván ajax soubor
+    * @var boolean
+    */
+   private static $isAjax = false;
+
+   /**
+    * O jaký typ ajax se jedná (module, aplugin)
+    * @var string
+    */
+   private static $ajaxType = null;
+
+   /**
+    * Název modulu nebo epluginu
+    * @var string
+    */
+   private static $ajaxName = null;
+
+   /**
+    * Parametry ajax souboru
+    * @var array
+    */
+   private static $ajaxParams = array();
+   /**
     * Konstruktor
     */
    public function  __construct(Action $action, Routes $routes) {
-      $this->module = AppCore::getSelectedModule();
       $this->moduleAction = $action;
       $this->moduleRoutes = $routes;
    }
@@ -204,6 +220,8 @@ class UrlRequest {
       //		Parsování url
       if(self::checkSpecialUrl()){
          self::parseSpecialUrl();
+      } else if(self::checkAjaxFileUrl()){
+         self::parseAjaxUrl();
       } else if(self::checkNormalUrl()){
          self::parseUrl();
       } else {
@@ -237,6 +255,17 @@ class UrlRequest {
          if(ereg('^[a-z]{0,3}/?'.$regex.'$', self::$currentUrl)){
             return true;
          }
+      }
+      return false;
+   }
+
+   /**
+    * Metoda kontroluje jestli se nejedná o url s ajax akcí
+    */
+   private static function checkAjaxFileUrl(){
+      if(ereg('^ajax(module|eplugin)([^.]+).php', self::$currentUrl)){
+         self::$isAjax = true;
+         return true;
       }
       return false;
    }
@@ -349,6 +378,21 @@ class UrlRequest {
       } else if(ereg(''.self::$specialPagesRegex[self::SPECIAL_PAGE_SITEMAP].'$', $urlItems[key($urlItems)], $regexArr)){
          self::$specialPageName = self::SPECIAL_PAGE_SITEMAP;
       }
+   }
+
+   /**
+    * Metoda parsuje url pro ajax akci
+    */
+   private static function parseAjaxUrl(){
+      $regexResult = array();
+      ereg('^ajax(module|eplugin)([^.]+).php\??(.*)$', self::$currentUrl,$regexResult);
+      self::$ajaxType = $regexResult[1];
+      self::$ajaxName = $regexResult[2];
+      if (isset ($regexResult[3])){
+         self::$ajaxParams = $regexResult[3];
+      }
+      
+
    }
 
    /**
@@ -486,6 +530,30 @@ class UrlRequest {
     */
    public static function getSpecialPageRegexp($pageType) {
       return self::$specialPagesRegex[$pageType];
+   }
+
+   /**
+    * Metoda vrací jestli je spuštěn ajax požadavek
+    * @return boolean -- true pokud je ajax požadavek
+    */
+   public static function isAjaxRequest() {
+      return self::$isAjax;
+   }
+
+   /**
+    * Metoda vrací typ ajax požadavku - (module, eplugin)
+    * @return string
+    */
+   public static function getAjaxType() {
+      return self::$ajaxType;
+   }
+
+   /**
+    * Metoda vrací název ajax modulu nebo epluginu
+    * @return string -- název 
+    */
+   public static function getAjaxName() {
+      return self::$ajaxName;
    }
 }
 ?>
