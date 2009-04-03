@@ -249,7 +249,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	width: 20px;
 	height: 20px;
 	border: 0;
-	cursor: pointer; cursor: hand
+	cursor: pointer; cursor: hand;
 }
 
 .delete_button_image {
@@ -257,7 +257,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	width: 20px;
 	height: 20px;
 	border: 0;
-	cursor: pointer; cursor: hand
+	cursor: pointer; cursor: hand;
 }
 
 .add_button_image {
@@ -693,12 +693,12 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	border: 1px solid #0f6572;
 }
 
+#uploadFileButton {
+   cursor: pointer;
+}
+
 /* Tabulkový obsah */
 .tabcontent {
 	border: 1px solid black;
 	padding: 5px;
-}
-.tabsContent {
-	
-	/*padding-top: 20px;*/
 }

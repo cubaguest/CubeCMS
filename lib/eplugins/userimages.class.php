@@ -246,7 +246,9 @@ class UserImagesEplugin extends Eplugin {
          ->where(self::COLUM_ID,$id);
          $this->getDb()->query($sqlDel);
          $this->infoMsg()->addMessage(_('Obrázek byl smazán'));
-         $this->getLinks()->reload();
+         if(!UrlRequest::isAjaxRequest()){
+            $this->getLinks()->reload();
+         }
       } catch (Exception $e) {
          new CoreErrors($e);
       }
@@ -320,12 +322,15 @@ class UserImagesEplugin extends Eplugin {
    /**
     * Metoda načte data z db
     */
-   private function getImagesFromDb() {
+   private function getImagesFromDb($idItem = null) {
+      if($idItem == null){
+         $idItem = $this->getModule()->getId();
+      }
       $sqlSelect = $this->getDb()->select()
       ->table(self::DB_TABLE_USER_IMAGES, 'images')
       ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID,
             self::COLUM_WIDTH, self::COLUM_HEIGHT));
-      $sqlSelect->where(self::COLUM_ID_ITEM, $this->getModule()->getId());
+      $sqlSelect->where(self::COLUM_ID_ITEM, $idItem);
       if(is_numeric($this->idArticle)){
          $sqlSelect->where(self::COLUM_ID_ARTICLE, $this->idArticle);
       } else if(is_array($this->idArticle) AND !empty($this->idArticle)){
@@ -333,7 +338,7 @@ class UserImagesEplugin extends Eplugin {
             //Pokud je zadáno asociativní pole bez id items
             if(is_string($itemId) OR is_numeric($itemId)){
                $sqlSelect->where(self::COLUM_ID_ARTICLE, $itemId)
-               ->where(self::COLUM_ID_ITEM, $this->getModule()->getId(), Db::COND_OPERATOR_OR);
+               ->where(self::COLUM_ID_ITEM, $idItem, Db::COND_OPERATOR_OR);
             } else if(is_array($itemId) AND !empty($itemId)){
                // REFACTORING
                //					$whereString = self::COLUM_ID_ITEM." = ".$id." AND (";
@@ -360,6 +365,79 @@ class UserImagesEplugin extends Eplugin {
       }
    }
 
+/**
+    * Metoda volaná přes ajax pro přidání souboru
+    * @param Ajax $ajaxObj -- objekt ajax, poskytuje základní parametry předané
+    * požadavkem
+    */
+   public function addImageAjax($ajaxObj) {
+      $form = new Form(self::FORM_PREFIX);
+      $form->crSubmit(self::FORM_BUTTON_SEND)
+      ->crInputFile(self::FORM_NEW_FILE, true)
+      ->crInputHidden('idItem', true, 'is_numeric')
+      ->crInputHidden('idArticle', false, 'is_numeric');
+      if($form->checkForm()){
+         $file = $form->getValue(self::FORM_NEW_FILE);
+         $imageFile = new ImageFile($file);
+         if($imageFile->isImage()){
+            try {
+               $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR
+               .DIRECTORY_SEPARATOR.self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
+               // kopírování originálu
+               $imageFile->copy($dir);
+               // uložení změnšeniny
+               if(!$imageFile->saveImage($dir.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR,
+                     self::THUMBNAIL_WIDTH, self::THUMBNAIL_HEIGHT)){
+                  throw new RuntimeException(_('Obrázek se nepodařilo uložit do adresáře'),1);
+               }
+               $sqlInsert = $this->getDb()->insert()->table(self::DB_TABLE_USER_IMAGES)
+               ->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
+                  self::COLUM_ID_USER, self::COLUM_FILE,	self::COLUM_WIDTH,
+                  self::COLUM_HEIGHT, self::COLUM_SIZE, self::COLUM_TIME)
+               ->values($form->getValue('idArticle'),	$form->getValue('idItem'),
+                  AppCore::getAuth()->getUserId(),$imageFile->getName(),
+                  $imageFile->getOriginalWidth(), $imageFile->getOriginalHeight(),
+                  $imageFile->getFileSize(), time());
+               if(!$this->getDb()->query($sqlInsert)){
+                  throw new Exception(_('Obrázek se nepodařilo uložit'),2);
+               }
+               $this->infoMsg()->addMessage(_('Obrázek byl uložen'));
+            } catch (Exception $e) {
+               new CoreErrors($e);
+            }
+         }
+      }
+   }
+
+   /**
+    * Metoda vrací seznam obrázků volaním přes ajax a vypisuje JSON
+    * @param Ajax $ajaxOb -- objekt vvolaného ajaxu
+    */
+   public function getImagesAjax($ajaxOb) {
+      if($ajaxOb->getAjaxParam('idArticle')){
+         $this->idArticle = $ajaxOb->getAjaxParam('idArticle');
+      }
+      $this->getImagesFromDb($ajaxOb->getAjaxParam('idItem'));
+
+      header('Cache-Control: no-cache, must-revalidate');
+      //header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+      header('Content-type: application/json');
+
+      echo '{"images":[';
+      foreach ($this->imagesArray as $file) {
+         echo json_encode($file).',';
+      }
+      echo ']}';
+   }
+
+   /**
+    * Metoda pro mazání souboru ajaxem
+    * @param Ajax $ajaxObj -- objekt ajaxu
+    */
+   public function deleteImageAjax($ajaxObj){
+      $this->deleteUserImage($ajaxObj->getAjaxParam('idImage'));
+   }
+
    /**
     * Metoda obstarává přiřazení proměných do šablony
     *
@@ -374,15 +452,25 @@ class UserImagesEplugin extends Eplugin {
       $this->toTpl("IMAGE_DIMENSIONS_WIDTH", _("Šířka"));
       $this->toTpl("IMAGE_DIMENSIONS_HEIGHT", _("Výška"));
       $this->toTpl("IMAGE_LINK_TO_SHOW_NAME", _("Odkaz pro zobrazení"));
-      $this->toTpl("CONFIRM_MESAGE_DELETE", _("Opravdu smazat obrázek"));
+      $this->toTpl("CONFIRM_MESAGE_DELETE_IMAGE", _("Opravdu smazat obrázek"));
       // tady je to kvůli více šablonám na stránce
       self::$otherNumberOfReturnRows[$this->idUserImages] = $this->numberOfReturnRows;
       $this->toTpl("USERIMAGES_NUM_ROWS", self::$otherNumberOfReturnRows);
       $this->toTpl("USERIMAGES_ID", $this->idUserImages);
-      $this->toTplJSPlugin(new SubmitForm());
-      //		$this->toTplJSPlugin(new LightBox());
       self::$otherImagesArray[$this->idUserImages] = $this->imagesArray;
       $this->toTpl("USERIMAGES_ARRAY",self::$otherImagesArray);
+
+      $jQueryPlugin = new JQuery();
+      $jQueryPlugin->addPluginAjaxUploadFile();
+      $this->toTplJSPlugin($jQueryPlugin);
+      // AJAX
+      $ajaxLink = new AjaxLink($this);
+      $this->toTpl("AJAX_USERIMAGE_FILE",$ajaxLink->getFile());
+      $this->toTpl("ID_ITEM", $this->getModule()->getId());
+      if($this->idArticle != null){
+         $this->toTpl("ID_ARTICLE", $this->idArticle);
+      }
+      $this->toTpl("UPLOAD_IMAGE",_('Nahrát obrázek'));
    }
 
    /**

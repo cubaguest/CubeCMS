@@ -106,6 +106,30 @@ class AjaxLink {
    }
 
    /**
+    * Metoda vrací soubor pro zpracování ajaxem
+    * @return string -- název souboru
+    */
+   public function getFile() {
+      return (string)$this->link.self::AJAX_LINK_PREFIX.$this->ajaxFile;
+   }
+
+   /**
+    * Metoda vrací řetězec parametrů pro ajax
+    * @return string -- pole parametrů
+    */
+   public function getParams() {
+      $string = null;
+      if($this->ajaxAction != null){
+         $string .= self::AJAX_ACTION_INDEX.'='.$this->ajaxAction;
+         if(!empty ($this->ajaxFileParams)){
+            $string .= '&';
+         }
+      }
+      $string .= http_build_query($this->ajaxFileParams);
+      return $string;
+   }
+
+   /**
     * Metoda vytvoří řetěuzec z odkazu
     * @return string -- vrací odkaz na ajaxový soubor
     */

@@ -64,5 +64,14 @@ class CoreErrors {
       }
       return false;
    }
+
+   /**
+    * Metoda vrací poslední chybu v enginu jako string
+    * @return string -- poslední chyba
+    */
+   public static function getLastError() {
+      return self::$exceptionsArray[0]->getMessage().' - '.self::$exceptionsArray[0]->getFile()
+         .' > line: '.self::$exceptionsArray[0]->getLine();
+   }
 }
 ?>

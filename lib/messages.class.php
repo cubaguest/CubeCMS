@@ -130,7 +130,7 @@ class Messages {
     * @return boolean -- true jestlize neni vlozena zadna zprava
     */
    function isEmpty(){
-      if (sizeof($this->message) == 0){
+      if (sizeof($this->messages) == 0){
          return true;
       }
       return false;
@@ -179,6 +179,18 @@ class Messages {
          $this->saveTarget = $target;
          $this->saveTargetName = $name;
       }
+   }
+
+   /**
+    * Magická metooda vrátí chybové hlášky jako řetězec
+    */
+   public function  __toString() {
+      $messages = $this->getMessages();
+      $string = null;
+      foreach ($messages as $msg) {
+         $string .= $msg.'. ';
+      }
+      return $string;
    }
 }
 ?>

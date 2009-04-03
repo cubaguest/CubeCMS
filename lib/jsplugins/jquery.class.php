@@ -195,5 +195,13 @@ class JQuery extends JsPlugin {
     $this->addJsFile(new JsFile("jquery-cookie.packed.js"));
     return $this;
   }
+
+  /**
+   * Metoda přidá efekty UI - all (všechny efekty)
+   */
+  public function addPluginAjaxUploadFile() {
+    $this->addJsFile(new JsFile("ajaxupload.2.8.js"));
+    return $this;
+  }
 }
 ?>

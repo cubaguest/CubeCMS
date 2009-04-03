@@ -263,7 +263,7 @@ class UrlRequest {
     * Metoda kontroluje jestli se nejedná o url s ajax akcí
     */
    private static function checkAjaxFileUrl(){
-      if(ereg('^ajax(module|eplugin)([^.]+).php', self::$currentUrl)){
+      if(ereg('^([a-zA-Z]{2,3}/)?ajax(module|eplugin)([^.]+).php', self::$currentUrl)){
          self::$isAjax = true;
          return true;
       }
@@ -385,11 +385,11 @@ class UrlRequest {
     */
    private static function parseAjaxUrl(){
       $regexResult = array();
-      ereg('^ajax(module|eplugin)([^.]+).php\??(.*)$', self::$currentUrl,$regexResult);
-      self::$ajaxType = $regexResult[1];
-      self::$ajaxName = $regexResult[2];
-      if (isset ($regexResult[3])){
-         self::$ajaxParams = $regexResult[3];
+      ereg('^([a-zA-Z]{2,3}/)?ajax(module|eplugin)([^.]+).php\??(.*)$', self::$currentUrl,$regexResult);
+      self::$ajaxType = $regexResult[2];
+      self::$ajaxName = $regexResult[3];
+      if (isset ($regexResult[4])){
+         self::$ajaxParams = $regexResult[4];
       }
       
 
@@ -554,6 +554,14 @@ class UrlRequest {
     */
    public static function getAjaxName() {
       return self::$ajaxName;
+   }
+
+   /**
+    * Metoda vrací řetězec s parametry ajax souboru
+    * @return string -- řetězec parametrů
+    */
+   public static function getAjaxFileParams() {
+      return self::$ajaxParams;
    }
 }
 ?>

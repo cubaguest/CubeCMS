@@ -676,6 +676,8 @@ class AppCore {
       // načtení ajaxových knihoven
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_AJAX_DIR . DIRECTORY_SEPARATOR . 'ajaxlink.class.php');
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+         . self::ENGINE_AJAX_DIR . DIRECTORY_SEPARATOR . 'ajax.class.php');
 
       //		načtení hlavních tříd modulu (controler, view)
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'controller.class.php');
@@ -688,7 +690,11 @@ class AppCore {
     */
    private function _initMessagesAndErrors(){
       //		Vytvoření objektu pro práci se zprávami
-      self::$messages = new Messages('session', 'messages', true);
+      if(!UrlRequest::isAjaxRequest()){
+         self::$messages = new Messages('session', 'messages', true);
+      } else {
+         self::$messages = new Messages('session', 'messages');
+      }
       self::$userErrors = new Messages('session', 'errors');
    }
 
@@ -1418,15 +1424,43 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
       }
       // pokud je spuštěn ajax požadavek
       else if(UrlRequest::isAjaxRequest()){
-         if(UrlRequest::getAjaxType() == AjaxLink::AJAX_EPLUGIN_NAME){
-            $epluginName = UrlRequest::getAjaxName().ucfirst(Eplugin::PARAMS_EPLUGIN_FILE_PREFIX);
-            $eplugin = new $epluginName();
+         try {
+            if(UrlRequest::getAjaxType() == AjaxLink::AJAX_EPLUGIN_NAME){
+               $epluginName = UrlRequest::getAjaxName().ucfirst(Eplugin::PARAMS_EPLUGIN_FILE_PREFIX);
 
-            $eplugin->runAjax();
+               if(!class_exists($epluginName)) {
+                  throw new BadClassException(_('Neplatný typ Epluginu'), 23);
+               }
+               $eplugin = new $epluginName();
+               //            $ajaxObj = new Ajax(UrlRequest::getAjaxFileParams());
+               $ajaxObj = new Ajax(UrlRequest::getAjaxFileParams());
 
-         } else if(UrlRequest::getAjaxType() == AjaxLink::AJAX_MODULE_NAME){
-            
+               if(!method_exists($eplugin, $ajaxObj->getAjaxMetod())){
+                  throw new BadClassException(_('Neexistující ajax metoda Epluginu'), 24);
+               }
+
+               $eplugin->{$ajaxObj->getAjaxMetod()}($ajaxObj);
+
+            } else if(UrlRequest::getAjaxType() == AjaxLink::AJAX_MODULE_NAME){
+
+            }
+         } catch (Exception $e) {
+            new CoreErrors($e);
          }
+
+         if(!AppCore::getInfoMessages()->isEmpty()){
+            echo AppCore::getInfoMessages();
+         }
+
+         if(!AppCore::getUserErrors()->isEmpty()){
+            echo AppCore::getUserErrors();
+         }
+
+         if(!CoreErrors::isEmpty()){
+            echo CoreErrors::getLastError();
+         }
+         exit();
+         
       }
       // pokud je zpracovávána normální aplikace a její moduly
       else {
