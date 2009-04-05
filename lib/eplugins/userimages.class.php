@@ -256,30 +256,35 @@ class UserImagesEplugin extends Eplugin {
 
    /**
     * Metoda vymaže všechny uživatelské obrázky
+    * @param integer $idArticle -- id článku u kterého se mají obrázky vymazat
     */
-   public function deleteAllImages() {
-      //      $images = $this->getImagesList($this->getModule()->getId(), $this->idArticle);
+   public function deleteAllImages($idArticle = null) {
+      $this->idArticle = $idArticle;
+
+      $this->getImagesFromDb();
       //
-      //      $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
-      //            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
-      //         $dirSmall = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
-      //            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR;
-      //
-      //      try {
-      //         foreach ($images as $key => $img) {
-      //            $file = new File($key, $dir);
-      //            $file->remove();
-      //            $file = new File($key, $dirSmall);
-      //            $file->remove();
-      //         }
-      //         // vymaz z db
-      //         $sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_IMAGES)
-      //         ->where(self::COLUM_ID_ITEM.' = '.$this->getModule()->getId())
-      //         ->where(self::COLUM_ID_ARTICLE.' = '.$this->idArticle);
-      //         $this->getDb()->query($sqlDel);
-      //      } catch (Exception $e) {
-      //         new CoreException(_('Nepodařilo se smazat uživatelské obrázky chyba ').$e->getMessage(),3);
-      //      }
+      $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+      .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
+      $dirSmall = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+      .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR;
+
+      try {
+         foreach ($this->imagesArray as $uImage) {
+            $file = new File($uImage[self::COLUM_FILE], $dir);
+            $file->remove();
+            $file = new File($uImage[self::COLUM_FILE], $dirSmall);
+            $file->remove();
+         }
+         // vymaz z db
+         $sqlDel = $this->getDb()->delete()->table(self::DB_TABLE_USER_IMAGES)
+         ->where(self::COLUM_ID_ITEM,$this->getModule()->getId())
+         ->where(self::COLUM_ID_ARTICLE,$this->idArticle);
+         if(!$this->getDb()->query($sqlDel)){
+            throw new UnexpectedValueException(_('Chyba při mazání uživatelských obrázků'), 4);
+         }
+      } catch (Exception $e) {
+         new CoreErrors($e);
+      }
    }
 
    /**
@@ -523,6 +528,19 @@ class UserImagesEplugin extends Eplugin {
             break;
       }
       return false;
+   }
+
+   /**
+    * Metoda přejmenuje id článku na nové (při vytváření článků u kterých není id)
+    * @param integer $oldId -- staré id článku (nejčastěji id uživatele)
+    * @param integer $newId -- nové id (nejčastěji id nového článku)
+    * @return boolean -- pokudakce proběhla
+    */
+   public function renameIdArticle($oldId,$newId) {
+      return $this->getDb()->query($this->getDb()->update()
+         ->table(UserImagesEplugin::DB_TABLE_USER_IMAGES, 'images')
+         ->set(array(self::COLUM_ID_ARTICLE => $newId))
+         ->where(self::COLUM_ID_ARTICLE, $oldId));
    }
 }
 ?>

@@ -17,7 +17,7 @@ interface Db_Update {
 	 *
 	 * @param string -- tabulka pro použití
 	 * @param boolean -- (option) jestli se májí tabulky zamknout
-	 * @return Db_Select
+	 * @return Db_Update
 	 */
 	public function table($table, $lockTable = false);
 	

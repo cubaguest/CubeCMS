@@ -214,30 +214,29 @@ class UserFilesEplugin extends Eplugin {
    /**
     * Metoda vymaže všechny uživatelské obrázky
     */
-   public function deleteAllFiles() {
-      //      $images = $this->getFilesFromDb($this->getModule()->getId(), $this->idArticle);
-      //
-      //      $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
-      //            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR;
-      //         $dirSmall = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
-      //            .self::USERIMAGES_FILES_DIR.DIRECTORY_SEPARATOR.self::USERIMAGES_SMALL_FILES_DIR.DIRECTORY_SEPARATOR;
-      //
-      //      try {
-      //         foreach ($images as $key => $img) {
-      //            $file = new File($key, $dir);
-      //            $file->remove();
-      //            $file = new File($key, $dirSmall);
-      //            $file->remove();
-      //         }
-      //         // vymaz z db
-      //         $sqlDel = $this->getDb()->delete()->from(self::DB_TABLE_USER_IMAGES)
-      //         ->where(self::COLUM_ID_ITEM.' = '.$this->getModule()->getId())
-      //         ->where(self::COLUM_ID_ARTICLE.' = '.$this->idArticle);
-      //         $this->getDb()->query($sqlDel);
-      //      } catch (Exception $e) {
-      //         new CoreException(_('Nepodařilo se smazat uživatelské obrázky chyba ').$e->getMessage(),3);
-      //      }
+   public function deleteAllFiles($idArticle = null) {
+      $this->idArticle = $idArticle;
 
+      $this->getFilesFromDb();
+      //
+      $dir = AppCore::getAppWebDir().DIRECTORY_SEPARATOR.MAIN_DATA_DIR.DIRECTORY_SEPARATOR
+      .self::USER_FILES_DIR.DIRECTORY_SEPARATOR;
+
+      try {
+         foreach ($this->filesArray as $ufile) {
+            $file = new File($ufile[self::COLUM_FILE], $dir);
+            $file->remove();
+         }
+         // vymaz z db
+         $sqlDel = $this->getDb()->delete()->table(self::DB_TABLE_USER_FILES)
+         ->where(self::COLUM_ID_ITEM,$this->getModule()->getId())
+         ->where(self::COLUM_ID_ARTICLE,$this->idArticle);
+         if(!$this->getDb()->query($sqlDel)){
+            throw new UnexpectedValueException(_('Chyba při mazání uživatelských souborů'), 4);
+         }
+      } catch (Exception $e) {
+         new CoreErrors($e);
+      }
    }
 
    /**
@@ -400,6 +399,19 @@ class UserFilesEplugin extends Eplugin {
       if($this->idArticle != null){
          $this->toTpl("ID_ARTICLE", $this->idArticle);
       }
+   }
+
+   /**
+    * Metoda přejmenuje id článku na nové (při vytváření článků u kterých není id)
+    * @param integer $oldId -- staré id článku (nejčastěji id uživatele)
+    * @param <type> $newId -- nové id (nejčastěji id nového článku)
+    * @return boolean -- pokudakce proběhla
+    */
+   public function renameIdArticle($oldId,$newId) {
+      return $this->getDb()->query($this->getDb()->update()
+         ->table(self::DB_TABLE_USER_FILES, 'files')
+         ->set(array(self::COLUM_ID_ARTICLE => $newId))
+         ->where(self::COLUM_ID_ARTICLE, $oldId));
    }
 }
 ?>
