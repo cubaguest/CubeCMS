@@ -48,7 +48,7 @@
          clearFiles();
          var count = 0;
          $.getJSON(
-         "{/literal}{$VARS.AJAX_USERFILE_FILE}?action=getFiles&idItem={$VARS.ID_ITEM}{literal}",
+         "{/literal}{$VARS.AJAX_USERFILE_FILE}?action=getFiles&idItem={$VARS.ID_ITEM}&idArticle={$VARS.ID_ARTICLE|default:$VARS.ID_ITEM}{literal}",
          function(jsondata){
             $.each(jsondata.files, function(i,ufile){
                count++;
@@ -68,8 +68,8 @@
                   +"</td></tr>"
                   +"<tr><td colspan=\"3\" style=\"border: 1px solid gray;\"></td></tr>";
                $(tbl).appendTo("#userFilesList tbody");
-               $("#userFilesCount").text(count);
             });
+            $("#userFilesCount").text(count);
          });
       };
 

@@ -49,7 +49,7 @@
          clearImages();
          var count = 0;
          $.getJSON(
-         "{/literal}{$VARS.AJAX_USERIMAGE_FILE}?action=getImages&idItem={$VARS.ID_ITEM}{literal}",
+         "{/literal}{$VARS.AJAX_USERIMAGE_FILE}?action=getImages&idItem={$VARS.ID_ITEM}&idArticle={$VARS.ID_ARTICLE|default:$VARS.ID_ITEM}{literal}",
          function(jsondata){
             $.each(jsondata.images, function(i,uimage){
                count++;
@@ -69,8 +69,8 @@
                   +"<tr><td colspan=\"4\" style=\"border: 1px solid gray;\"></td></tr>";
 
                $(tbl).appendTo("#userImagesList tbody");
-               $("#userImagesCount").text(count);
             });
+            $("#userImagesCount").text(count);
          });
          return false;
       };
