@@ -374,6 +374,8 @@ class UserFilesEplugin extends Eplugin {
       $this->toTpl("BUTTON_USERFILE_DELETE", _("Smazat"));
       $this->toTpl("BUTTON_USERFILE_SEND", _("Přidat"));
       $this->toTpl("CONFIRM_MESAGE_DELETE_FILE", _("Opravdu smazat soubor"));
+      $this->toTpl("FILE_LINK_TO_SHOW_NAME", _("Odkaz pro zobrazení"));
+      $this->toTpl("FILE_LINK_TO_DOWNLOAD_NAME", _("Odkaz pro stažení"));
 
       self::$otherNumberOfReturnRows[$this->idUserFiles] = $this->numberOfReturnRows;
       $this->toTpl("USERFILES_NUM_ROWS", self::$otherNumberOfReturnRows);
