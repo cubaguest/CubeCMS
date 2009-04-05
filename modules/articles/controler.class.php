@@ -10,6 +10,21 @@ class ArticlesController extends Controller {
     */
    const PARAM_EDIT_ONLY_OWNER = 'editonlyowner';
 
+   /**
+    * Parametry s typem editoru
+    */
+   const PARAM_EDITOR_THEME = 'theme';
+
+   /**
+    * Parametr jestli se používají obrázky
+    */
+   const PARAM_IMAGES = 'images';
+
+   /**
+    * Parametr jestli se používají soubory
+    */
+   const PARAM_FILES = 'files';
+
   /**
    * Speciální imageinární sloupce
    * @var string
@@ -44,30 +59,12 @@ class ArticlesController extends Controller {
       $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_ARTICLES_ON_PAGE, 10));
       $scroll->setCountAllRecords($articleModel->getCountArticles());
 
-      //		Vybrání novinek
-      $articlesArray = $articleModel->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
+      //		Vybrání článků
+      $articlesArray = $articleModel->getSelectedListArticles($scroll->getStartRecord(), $scroll->getCountRecords());
 
       //		Přidání linku pro editaci a jestli se dá editovat
       if(!empty ($articlesArray)){
          foreach ($articlesArray as $key => $article) {
-            $articlesArray[$key][self::ARTICLE_EDITABLE] = false;
-            if($this->getRights()->isControll() OR
-             ((bool)$this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, false) == false
-             AND $this->getRights()->isWritable())){
-               $articlesArray[$key][self::ARTICLE_EDITABLE] = true;
-               $articlesArray[$key][self::ARTICLE_EDIT_LINK] = $this->getLink()
-               ->article($article[NewsDetailModel::COLUMN_NEWS_LABEL],$article[NewsDetailModel::COLUMN_NEWS_ID_NEW])
-               ->action($this->getAction()->editArticle());
-            } else if($this->getRights()->isWritable()){
-               // editovat může pouze vlastník
-               if($article[NewsDetailModel::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){
-                  $articlesArray[$key][self::ARTICLE_EDITABLE] = true;
-                  $articlesArray[$key][self::ARTICLE_EDIT_LINK] = $this->getLink()
-                  ->article($article[NewsDetailModel::COLUMN_NEWS_LABEL],$article[NewsDetailModel::COLUMN_NEWS_ID_NEW])
-                  ->action($this->getAction()->edit());
-               }
-            }
-
             //			Link pro zobrazení
             $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->getLink()
             ->article($article[NewsDetailModel::COLUMN_NEWS_LABEL],
@@ -80,10 +77,10 @@ class ArticlesController extends Controller {
 
       //		Link pro přidání
       if($this->getRights()->isWritable()){
-         $this->container()->addLink('add_article',$this->getLink()->action($this->getAction()->addArticle()));
+         $this->container()->addLink('LINK_ADD_ARTICLE',$this->getLink()->action($this->getAction()->addArticle()));
       }
       // předání dat
-      $this->container()->addData('article_list', $articlesArray);
+      $this->container()->addData('ARTICLE_LIST_ARRAY', $articlesArray);
    }
 
    public function showController(){
@@ -126,30 +123,44 @@ class ArticlesController extends Controller {
    /**
    * Kontroler pro přidání novinky
    */
-   public function addController(){
+   public function addarticleController(){
       $this->checkWritebleRights();
 
-      $newsForm = new Form();
-      $newsForm->setPrefix(self::FORM_PREFIX);
+      if($this->getModule()->getParam(self::PARAM_FILES, true)){
+         // Uživatelské soubory
+         $files = new UserFilesEplugin($this->getRights());
+         $files->setIdArticle($this->getRights()->getAuth()->getUserId()*(-1));
+         $this->container()->addEplugin('files', $files);
+      }
 
-      $newsForm->crInputText(self::FORM_INPUT_LABEL, true, true)
-      ->crTextArea(self::FORM_INPUT_TEXT, true, true)
+      if($this->getModule()->getParam(self::PARAM_IMAGES, true)){
+         //	Uživatelské obrázky
+         $images = new UserImagesEplugin($this->getRights());
+         $images->setIdArticle($this->getRights()->getAuth()->getUserId()*(-1));
+         $this->container()->addEplugin('images', $images);
+      }
+
+      $articleForm = new Form();
+      $articleForm->setPrefix(self::FORM_PREFIX);
+
+      $articleForm->crInputText(self::FORM_INPUT_LABEL, true, true)
+      ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
       ->crSubmit(self::FORM_BUTTON_SEND);
 
       //        Pokud byl odeslán formulář
-      if($newsForm->checkForm()){
-         $newsDetail = new NewsDetailModel();
-         if(!$newsDetail->saveNewNews($newsForm->getValue(self::FORM_INPUT_LABEL),
-               $newsForm->getValue(self::FORM_INPUT_TEXT),
+      if($articleForm->checkForm()){
+         $articleDetail = new ArticleDetailModel();
+         if(!$articleDetail->saveNewArticle($articleForm->getValue(self::FORM_INPUT_LABEL),
+               $articleForm->getValue(self::FORM_INPUT_TEXT),
                $this->getRights()->getAuth()->getUserId())){
-            throw new UnexpectedValueException(_m('Novinku se nepodařilo uložit, chyba při ukládání.'), 1);
+            throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
          }
-         $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
+         $this->infoMsg()->addMessage(_m('Článek byl uložen'));
          $this->getLink()->article()->action()->rmParam()->reload();
       }
 
-      $this->container()->addData('NEWS_DATA', $newsForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $newsForm->getErrorItems());
+      $this->container()->addData('ARTICLE_DATA', $articleForm->getValues());
+      $this->container()->addData('ERROR_ITEMS', $articleForm->getErrorItems());
       //		Odkaz zpět
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }

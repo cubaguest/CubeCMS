@@ -1,55 +1,51 @@
 <?php
 /*
- * Třída modelu s listem Novinek
+ * Třída modelu detailem článku
  */
-class NewsDetailModel extends DbModel {
-   /**
-    * Názvy sloupců v databázi
-    * @var string
-    */
-   const COLUMN_NEWS_LABEL = 'label';
-   const COLUMN_NEWS_LABEL_LANG_PREFIX = 'label_';
-   const COLUMN_NEWS_TEXT = 'text';
-   const COLUMN_NEWS_TEXT_LANG_PREFIX = 'text_';
-   const COLUMN_NEWS_TIME = 'time';
-   const COLUMN_NEWS_ID_USER = 'id_user';
-   const COLUMN_NEWS_ID_ITEM = 'id_item';
-   const COLUMN_NEWS_ID_NEW = 'id_new';
-   const COLUMN_NEWS_DELETED = 'deleted';
+class ArticleDetailModel extends DbModel {
+	/**
+	 * Názvy sloupců v databázi
+	 */
+	const COLUMN_ARTICLE_LABEL = 'label';
+	const COLUMN_ARTICLE_TEXT = 'text';
+	const COLUMN_ARTICLE_TIME = 'time';
+	const COLUMN_ARTICLE_ID_USER = 'id_user';
+	const COLUMN_ARTICLE_ID_ITEM = 'id_item';
+	const COLUMN_ARTICLE_ID = 'id_article';
 
-   /**
-    * Sloupce u tabulky uživatelů
-    * @var string
-    */
-   const COLUMN_USER_NAME = 'username';
-   const COLUMN_ISER_ID =	 'id_user';
+	/**
+	 * Sloupce u tabulky uživatelů
+	 * @var string
+	 */
+	const COLUMN_USER_NAME = 'username';
+	const COLUMN_USER_ID =	 'id_user';
 
-   private $newsLabel = null;
-
-   private $newsText = null;
-   
-   private $newsId = null;
-
-   private $newsIdUser = null;
+//   private $newsLabel = null;
+//
+//   private $newsText = null;
+//
+//   private $newsId = null;
+//
+//   private $newsIdUser = null;
 
 
    /**
     * Metoda uloží novinku do db
     *
-    * @param array -- pole s nadpisem novinky
-    * @param array -- pole s textem novinky
+    * @param array -- pole s nadpisem článku
+    * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveNewNews($newsLabels, $newsTexts, $idUser = 0) {
-      $newsArr = $this->createValuesArray(self::COLUMN_NEWS_LABEL, $newsLabels,
-                                          self::COLUMN_NEWS_TEXT, $newsTexts,
-                                          self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId(),
-                                          self::COLUMN_NEWS_ID_USER, $idUser,
-                                          self::COLUMN_NEWS_TIME, time());
+   public function saveNewArticle($articleLabels, $articleTexts, $idUser = 0) {
+      $articleArr = $this->createValuesArray(self::COLUMN_ARTICLE_LABEL, $articleLabels,
+                                          self::COLUMN_ARTICLE_TEXT, $articleTexts,
+                                          self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId(),
+                                          self::COLUMN_ARTICLE_ID_USER, $idUser,
+                                          self::COLUMN_ARTICLE_TIME, time());
 
       $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
-      ->colums(array_keys($newsArr))
-      ->values(array_values($newsArr));
+      ->colums(array_keys($articleArr))
+      ->values(array_values($articleArr));
 //      //		Vložení do db
       if($this->getDb()->query($sqlInsert)){
          return true;

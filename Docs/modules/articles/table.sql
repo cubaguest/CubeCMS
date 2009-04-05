@@ -3,7 +3,7 @@
 INSERT INTO `dev`.`vypecky_modules` (
 `id_module` ,
 `name` ,
-`params` ,
+`mparams` ,
 `datadir` ,
 `dbtable1` ,
 `dbtable2` ,
