@@ -1,0 +1,464 @@
+<?php
+/**
+ * Třída pro tvorbu dotazů z MySQLi DB.
+ * Třída obsahuje implementaci metody select z db-interfacu.
+ *
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
+ * @abstract 		Třída pro výběr záznamů
+ */
+
+class Mysqli_Db_Query {
+   /**
+    * Konstanty pro příkazy SQL
+    * @var string
+    */
+   const SQL_SELECT     		= 'SELECT';
+   const SQL_INSERT     		= 'INSERT';
+   const SQL_DELETE     		= 'DELETE';
+   const SQL_UPDATE     		= 'UPDATE';
+
+   const SQL_WHERE      		= 'WHERE';
+   const SQL_NULL             = 'NULL';
+
+   const SQL_FROM       		= 'FROM';
+   const SQL_GROUP_BY   		= 'GROUP BY';
+   const SQL_ORDER_BY   		= 'ORDER BY';
+   const SQL_HAVING     		= 'HAVING';
+   const SQL_SET              = 'SET';
+
+   const SQL_AND        		= 'AND';
+   const SQL_OR         		= 'OR';
+   const SQL_LIKE         		= 'LIKE';
+   const SQL_NOT         		= 'NOT';
+   const SQL_BETWEEN      		= 'BETWEEN';
+   const SQL_NOT_BETWEEN  		= 'NOT BETWEEN';
+   const SQL_IS_NULL          = 'IS NULL';
+   const SQL_IS_NOT_NULL      = 'IS NOT NULL';
+   const SQL_USING       		= 'USING';
+
+   const SQL_AS         		= 'AS';
+   const SQL_ON               = 'ON';
+   const SQL_IN               = 'IN';
+
+   const SQL_ASC        		= 'ASC';
+   const SQL_DESC       		= 'DESC';
+
+   const SQL_SEPARATOR	 		= ' ';
+   const SQL_PARENTHESIS_L    = '(';
+   const SQL_PARENTHESIS_R    = ')';
+   const SQL_VALUE_SEPARATOR	= ',';
+   const SQL_ALL_VALUES       = '*';
+
+   const SQL_WITH_ROLLUP		= 'WITH ROLLUP';
+   const SQL_LIMIT		 		= 'LIMIT';
+   const SQL_COUNT		 		= 'COUNT';
+
+   const SQL_JOIN             = 'JOIN';
+   const SQL_JOIN_LEFT        = 'LEFT';
+   const SQL_JOIN_RIGHT       = 'RIGHT';
+   const SQL_JOIN_INNER       = 'INNER';
+   const SQL_JOIN_CROSS       = 'CROSS';
+
+   const SQL_INTO       		= 'INTO';
+   const SQL_VALUES      		= 'VALUES';
+
+    /**
+     * Konstanty pro ukládání do pole SQL dotazu
+     * @var string
+     */
+   const COLUMS_ARRAY                 = 'COLUMS';
+   const WHERE_CONDITION_NAME_KEY     = 'condition';
+   const WHERE_CONDITION_OPERATOR_KEY = 'operator';
+   const JOIN_TABLE_NAME              = 'table';
+   const JOIN_TABLE_CONDITION_COLUMN1 = 'column1';
+   const JOIN_TABLE_CONDITION_COLUMN2 = 'column2';
+   const JOIN_TABLE_CONDITION_TYPE    = 'cond_type';
+   const JOIN_TABLE_CONDITION_OPERATOR= 'operator';
+
+   const ORDER_ORDER_KEY              = 'ORDER';
+   const ORDER_COLUM_KEY              = 'colum';
+   const GROUP_BY_KEY                 = 'GROUP';
+   const GROUP_WITH_ROLLUP            = 'w_rolupp';
+   const LIMT_COUNT_ROWS_KEY          = 'limit_count';
+   const LIMT_OFFSET_KEY              = 'limit_offset';
+
+    /**
+     * Název indexů s částmi sql dotazu
+     */
+   const INDEX_TABLE             = 'table';
+   const INDEX_COLUMS_NO_ALIAS   = 'noalias';
+   const INDEX_WHERE_COLUMN      = 'column';
+   const INDEX_WHERE_VALUE       = 'value';
+   const INDEX_WHERE_TERM        = 'term';
+   const INDEX_WHERE_OPERATOR    = 'operator';
+
+   // insert
+   const INDEX_COLUMS_ARRAY 					= 'COLUMS';
+   const INDEX_VALUES_ARRAY					= 'VALUES';
+
+    /**
+     * Konstanta určující obsah SQL dotazu
+     * Musí mít správné pořadí, jak se má SQL dotaz řadit!!!
+     *
+     */
+   protected static $_sqlPartsInit = array(self::INDEX_TABLE   => array(),
+      self::SQL_WHERE		=> array(),
+      self::SQL_LIMIT		=> array());
+
+   /**
+    * Pole s částmi SQL dotazu ze kterých se bude při výstupu generovat samotná SQL dotaz
+    * @var array
+    */
+   protected $_sqlQueryParts = array();
+
+   /**
+    * Objekt konektoru
+    * @var Db
+    */
+   protected $_connector = null;
+
+   /**
+    * Proměnná obsahuje jestli se mají zamknout tabulky
+    * @var boolean
+    */
+   protected $_lockTables = false;
+
+   /**
+    * statické pole se specílními SQL funkcemi
+    * @var array
+    */
+   protected $specialSqlFunctions = array("NOW(", "TIMESTAMPDIFF(", "COUNT(", "IFNULL(", "IF(", 'MATCH', 'AGAINST');
+
+   protected $sqlFunctionRepairArr = array(
+//      'patterns' =>
+//      array("/AGAINST[[:blank:]]?\(([^')]+) (IN BOOLEAN MODE)?\)/",
+//               "/AGAINST[[:blank:]]?\(([^')]+)\)/"),
+//      'replacements' =>
+//      array('AGAINST (\'\1\' \2)',
+//               'AGAINST (\'\1\')')
+   );
+
+   /**
+    * Pole s porovnávacími prvky
+    * @var array
+    */
+   protected $whereTermConditions = array('=', '<', '>', '<>', '>=', '<=');
+
+   /**
+    * Konstruktor vytváří objekt pro přístup k databázi
+    * @param Db $conector -- objekt db konektoru
+    */
+   public function __construct(Db $conector) {
+      //		inicializace do zakladni podoby;
+      $this->_connector = $conector;
+      $this->init();
+   }
+
+   /**
+    * Inicializace proměných
+    */
+   protected function init() {
+      $this->_sqlQueryParts = self::$_sqlPartsInit;
+   }
+
+   /**
+    * Metoda nastavuje která tabulka se bude používat
+    *
+    * @param string -- tabulka pro použití
+    * @param string -- alias tabulky pro použití
+    * @param boolean -- (option) jestli se májí tabulky zamknout
+    * @return
+    */
+   protected function setTable($table, $alias = null, $lockTable = false){
+      if(is_array($table)){
+         throw new InvalidArgumentException(_('Špatně zadaný parametr funkce s názvem tabulky'), 2);
+      }
+      $this->_lockTables = $lockTable;
+      if($alias == null){
+         $alias = substr($table, 0, 5);
+      }
+      $this->_sqlQueryParts[self::INDEX_TABLE][$alias] = $table;
+      return $this;
+   }
+
+   /**
+    * Metody vytváří podmínku WHERE
+    *
+    * @param string -- název sloupce
+    * @param string/integer -- hodnota
+    * @param char/int -- operátor porovnávání konstatna Db::OPERATOR_XXX
+    * @param int -- operátor porovnávání Db::COND_OPERATOR_XXX
+    *
+    * @return Db_Query -- objekt Db_Query
+    * @todo doladit
+    */
+   public function where($column, $value = null, $term = '=', $operator = Db::COND_OPERATOR_AND) {
+      if(is_array($column)){
+         $this->_sqlQueryParts[self::SQL_WHERE] = array_merge($this->_sqlQueryParts[self::SQL_WHERE], $column);
+      } else {
+         if($operator == Db::COND_OPERATOR_AND){
+            $operator = self::SQL_AND;
+         } else if($operator == Db::COND_OPERATOR_OR){
+            $operator = self::SQL_OR;
+         } else {
+            throw new InvalidArgumentException(_('Zadán nesprávný operátor porovnávání')." $operator ", 1);
+         }
+         $arr = array($column,
+            $value,
+            $term);
+         array_push($this->_sqlQueryParts[self::SQL_WHERE], $arr);
+         array_push($this->_sqlQueryParts[self::SQL_WHERE], $operator);
+      }
+      return $this;
+   }
+
+   /**
+    * Metoda přidá do SQL dotazu klauzuli LIMIT
+    * @param integer -- počet záznamů
+    * @param integer -- záčátek
+    *
+    * @return Db_Query -- objekt sebe
+    */
+   public function limit($rowCount, $offset) {
+      $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $rowCount;
+      $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY] = $offset;
+      return $this;
+   }
+
+   /**
+    * Metoda přiřadí řazení sloupcu v SQL dotazu
+    *
+    * @param string -- sloupec, podle kterého se má řadit
+    * @param integer -- (option) jak se má sloupec řadit konstanta Db::ORDER_XXX (default: ASC)
+    *
+    * @return Db_Query -- objekt Db_Select
+    */
+   public function order($colum, $order = Db::ORDER_ASC) {
+      $order = strtoupper($order);
+      if(!is_array($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
+         $this->_sqlQueryParts[self::ORDER_ORDER_KEY] = array();
+      }
+      $columArray = array();
+      if($order == Db::ORDER_DESC){
+         $columArray[self::ORDER_COLUM_KEY] = $colum;
+         $columArray[self::ORDER_ORDER_KEY] = self::SQL_DESC;
+      } else if($order == Db::ORDER_ASC) {
+         $columArray[self::ORDER_COLUM_KEY] = $colum;
+         $columArray[self::ORDER_ORDER_KEY] = self::SQL_ASC;
+      } else {
+         throw new RangeException(_('Nepodporovaný typ řazení'), 3);
+      }
+      array_push($this->_sqlQueryParts[self::ORDER_ORDER_KEY], $columArray);
+      return $this;
+   }
+
+   /**
+    * Metoda vygeneruje část SQL dotazu s klauzulí WHERE
+    * @return string -- část s kluzulí WHERE
+    */
+   protected function _createWhere(){
+      $wheresString = null;
+
+      if(!empty($this->_sqlQueryParts[self::SQL_WHERE])){
+         $wheresString = self::SQL_SEPARATOR . self::SQL_WHERE . self::SQL_SEPARATOR;
+         $wheresString .= $this->_createWhereHelp($this->_sqlQueryParts[self::SQL_WHERE]);
+      }
+      //      echo $wheresString .' <br>';
+      return $wheresString;
+   }
+
+   /**
+    * Pomocná rekurzivní funkce pro vytváření klauzule WHERE
+    * @param array $array -- pole s parametry WHERE
+    * @return string -- vytvořené pole
+    */
+   private function _createWhereHelp($array) {
+      $return = null;
+      foreach ($array as $where){
+         if(is_array($where)){
+            if(is_array($where[key($where)])){
+               $return .= self::SQL_PARENTHESIS_L;
+               $return .= $this->_createWhereHelp($where);
+               $return .= self::SQL_PARENTHESIS_R;
+            } else {
+               $value = null;
+               if(is_int($where[1])){
+                  $value = $where[1];
+               }
+               // pokud je vnořené pole
+               else if (is_array($where[1])) {
+                  foreach ($where[1] as $var){
+                     $value .= $this->checkValueFormat($var).self::SQL_VALUE_SEPARATOR;
+                  }
+                  $value = substr($value, 0, strlen($value)-1);
+               } else {
+                  $value .= $this->checkValueFormat($where[1]);
+               }
+               if(!isset ($where[2]) AND $where[2] != null){
+                  $where[2] = '=';
+               }
+               // Podle operátoru volíme podmínku
+               // pokud se jedná o některý typ porovnávání (=; <; ...)
+               if(in_array($where[2], $this->whereTermConditions)){
+                  $whereCond = $where[0] . self::SQL_SEPARATOR . $where[2] . self::SQL_SEPARATOR . $value;
+               }
+               // pokud se jedná o některý jiný operátor
+               else {
+                  switch ($where[2]) {
+                     case Db::OPERATOR_LIKE:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_LIKE.self::SQL_SEPARATOR.$value;
+                        break;
+                     case Db::OPERATOR_NOT_LIKE:
+                        $whereCond = self::SQL_NOT.self::SQL_SEPARATOR.$where[0]
+                        .self::SQL_SEPARATOR.self::SQL_LIKE.self::SQL_SEPARATOR.$value;
+                        break;
+                     case Db::OPERATOR_BETWEEN:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_BETWEEN
+                        .self::SQL_SEPARATOR.$value[0].self::SQL_SEPARATOR.self::SQL_AND
+                        .self::SQL_SEPARATOR.$value[1];
+                        break;
+                     case Db::OPERATOR_NOT_BETWEEN:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_NOT_BETWEEN
+                        .self::SQL_SEPARATOR.$value[0].self::SQL_SEPARATOR.self::SQL_AND
+                        .self::SQL_SEPARATOR.$value[1];
+                        break;
+                     case Db::OPERATOR_IN:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IN
+                        .self::SQL_SEPARATOR.self::SQL_PARENTHESIS_L .$value. self::SQL_PARENTHESIS_R;
+                        break;
+                     case Db::OPERATOR_IS_NULL:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IS_NULL;
+                        break;
+                     case Db::OPERATOR_IS_NOT_NULL:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.self::SQL_IS_NOT_NULL;
+                        break;
+                     default:
+                        $whereCond = $where[0].self::SQL_SEPARATOR.$value;
+                        break;
+                  }
+               }
+               $return .= self::SQL_PARENTHESIS_L . $whereCond . self::SQL_PARENTHESIS_R;
+            }
+         } else {
+            $return .= self::SQL_SEPARATOR.$where.self::SQL_SEPARATOR;
+            // odstranění posledního operátoru AND nebo OR
+         }
+      }
+      if(substr($return, strlen($return)-strlen(self::SQL_AND)-1, strlen(self::SQL_AND)) == self::SQL_AND){
+         $return = substr($return, 0, strlen($return)-strlen(self::SQL_AND)-2);
+      } else if(substr($return, strlen($return)-strlen(self::SQL_OR)-1, strlen(self::SQL_OR)) == self::SQL_OR){
+         $return = substr($return, 0, strlen($return)-strlen(self::SQL_OR)-2);
+      }
+      return $return;
+   }
+
+   /**
+    * Metoda vygeneruje čás SQL dotazu s klauzulí LIMIT
+    *
+    * @return string -- klauzule LIMIT
+    */
+   protected function _createLimit() {
+      if(!empty($this->_sqlQueryParts[self::SQL_LIMIT])){
+         $limitString = null;
+         $limitString = self::SQL_SEPARATOR . self::SQL_LIMIT . self::SQL_SEPARATOR . $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY]
+            . ',' . self::SQL_SEPARATOR .$this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY];
+         return $limitString;
+      }
+   }
+
+   /**
+    * Metoda vygeneruje část SQL dotazu s klauzulí ORDER BY
+    * @return string -- část SQL s kluzulí ORDER BY
+    */
+   protected function _createOrder(){
+      $orderString = null;
+      if(!empty($this->_sqlQueryParts[self::ORDER_ORDER_KEY])){
+         $orderString = self::SQL_SEPARATOR . self::SQL_ORDER_BY;
+         foreach ($this->_sqlQueryParts[self::ORDER_ORDER_KEY] as $index => $orderArray) {
+            $orderString .= self::SQL_SEPARATOR . $this->checkValueFormat($orderArray[self::ORDER_COLUM_KEY], false)
+            . self::SQL_SEPARATOR . $orderArray[self::ORDER_ORDER_KEY] . ',';
+         }
+         //			odstranění poslední čárky
+         $orderString = substr($orderString, 0, strlen($orderString)-1);
+      }
+      return $orderString;
+   }
+
+   /**
+    * Metoda vrací název tabulky
+    * Nutně potřebuje oimplementovat zvlášť v každé podtřídě
+    * @param boolean $withAlias -- (option) jestli se má použít i alias tabulky
+    * @return string -- klauzule TABLE
+    */
+   protected function _createTable($withAlias = true) {
+      $table = null;
+      if(!empty($this->_sqlQueryParts[self::INDEX_TABLE])){
+         $table = self::SQL_SEPARATOR . '`' . MySQLiDb::$_tablePrefix .
+         $this->_sqlQueryParts[self::INDEX_TABLE][key($this->_sqlQueryParts[self::INDEX_TABLE])] . '`';
+         if($withAlias){
+            $table .= self::SQL_SEPARATOR.self::SQL_AS.self::SQL_SEPARATOR
+            .key($this->_sqlQueryParts[self::INDEX_TABLE]);
+         }
+      }
+      return $table;
+   }
+
+   /**
+    * Metoda kontroluje, jestli se nejedná o vnitřní funkci MYSQL, pokud ano vrací true
+    * @param string $string -- testovaný řetězec
+    * @todo -- nutná optimalizace
+    */
+   protected function isMySQLFunction($string) {
+      foreach ($this->specialSqlFunctions as $function) {
+         if(stripos($string, $function) !== false){
+            return true;
+         }
+      }
+      return false;
+   }
+
+   /**
+    * Metoda vrací Db konektor k Mysqli
+    * @return MySQLiDb
+    */
+   protected function getDbConnector() {
+      return $this->_connector;
+   }
+
+   /**
+    * Metoda projde řetězec a opraví všechny funkce pokud jsou špatně zadány
+    * @param string $string -- řetězec
+    */
+   protected function repairMySQLFunctions(&$string) {
+//      $string = preg_replace($this->sqlFunctionRepairArr['patterns'],
+//            $this->sqlFunctionRepairArr['replacements'], $string);
+   }
+
+   /**
+    * Metoda zkontroluje a popřípadě opraví správné zadání hodnoty
+    * @param string $value -- hodnota
+    * @param boolean $useApostrofs -- (option) jestli se mají případně přidat apostrofy za hodnoty
+    */
+   protected function checkValueFormat($value, $useApostrofs = true) {
+      // odstranění specielních znaků nevhodných pro mysql
+      if(is_int($value)){
+         return $value;
+      }
+      else if($this->isMySQLFunction($value)){
+         return $value;
+      }
+      // jedná se o normální řetězec
+      else {
+         $value = $this->_connector->escapeString($value);
+         if($useApostrofs){
+            $value = "'".$value."'";
+         }
+         return $value;
+      }
+      return $value;
+   }
+}
+?>
