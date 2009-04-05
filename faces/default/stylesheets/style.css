@@ -56,6 +56,10 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 	visibility: hidden;
 }
 
+.smallFont {
+   font-size: 60%;
+}
+
 #bodywrap {
 	min-width: 600px; /* slušné prohlížeče */
 	max-width: 1000px;
