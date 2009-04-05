@@ -60,6 +60,26 @@ class ArticlesListModel extends DbModel {
 		return $returArray;
 	}
 
+/**
+	 * Metoda vrací pole se všemi články
+	 *
+	 * @return array -- pole článků
+	 */
+	public function getListArticles() {
+      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'articletb')
+      ->colums(array(ArticleDetailModel::COLUMN_ARTICLE_LABEL => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_LABEL
+            .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
+            ArticleDetailModel::COLUMN_ARTICLE_TEXT => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_TEXT
+            .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
+            ArticleDetailModel::COLUMN_ARTICLE_ID_USER, ArticleDetailModel::COLUMN_ARTICLE_ID,
+            ArticleDetailModel::COLUMN_ARTICLE_EDIT_TIME))
+      ->where("articletb.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->order("articletb.".ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
+
+		$returArray = $this->getDb()->fetchAll($sqlSelect);
+		return $returArray;
+	}
+
 	/**
 	 * Metoda nastaví tabulku s uživateli
 	 *

@@ -67,8 +67,8 @@ class ArticlesController extends Controller {
          foreach ($articlesArray as $key => $article) {
             //			Link pro zobrazení
             $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->getLink()
-            ->article($article[NewsDetailModel::COLUMN_NEWS_LABEL],
-               $article[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
+            ->article($article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
+               $article[ArticleDetailModel::COLUMN_ARTICLE_ID]);
          }
       }
 
@@ -84,38 +84,53 @@ class ArticlesController extends Controller {
    }
 
    public function showController(){
-      $newsDetail = new NewsDetailModel();
-      $new = $newsDetail->getNewsDetailSelLang($this->getArticle()->getArticle());
+      $articleDetail = new ArticleDetailModel();
+      $articleArr = $articleDetail->getArticleDetailSelLang($this->getArticle()->getArticle());
 
       //      obsluha Mazání novinky
-      if(($this->getRights()->isWritable() AND $newsDetail->getIdUser()
+      if(($this->getRights()->isWritable() AND $articleDetail->getIdUser()
             == $this->getRights()->getAuth()->getUserId()) OR
          $this->getRights()->isControll()){
-         $form = new Form(self::FORM_PREFIX);
+         
+      }
 
+      $this->container()->addData('ARTICLE', $articleArr);
+      $this->container()->addData('ARTICLE_LABEL', $articleArr[ArticleDetailModel::COLUMN_ARTICLE_LABEL]);
+
+      if($this->getRights()->isControll() OR
+         ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
+         ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == true AND
+            $articleDetail->getIdUser() == $this->getRights()->getAuth()->getUserId())){
+
+         $form = new Form(self::FORM_PREFIX);
          $form->crInputHidden(self::FORM_INPUT_ID, true, 'is_numeric')
          ->crSubmit(self::FORM_BUTTON_DELETE);
 
          if($form->checkForm()){
-            $newDetail = new NewsDetailModel();
+//            $images = new UserImagesEplugin($this->getRights());
+//            if(!$images->deleteAllImages())
+            $files = new UserFilesEplugin($this->getRights());
+            $files->deleteAllFiles($articleArr[ArticleDetailModel::COLUMN_ARTICLE_ID]);
 
-            if($newDetail->deleteNews($form->getValue(self::FORM_INPUT_ID),
-                  $this->getRights()->getAuth()->getUserId())){
-               throw new UnexpectedValueException(_m('Novinku se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
+            $images = new UserImagesEplugin($this->getRights());
+
+            $images->deleteAllImages($articleArr[ArticleDetailModel::COLUMN_ARTICLE_ID]);
+
+
+            if(!$articleDetail->deleteArticle($form->getValue(self::FORM_INPUT_ID))){
+               throw new UnexpectedValueException(_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
-            $this->infoMsg()->addMessage(_m('Novinka byla smazána'));
+            $this->infoMsg()->addMessage(_m('Článek byl smazán'));
             $this->getLink()->article()->action()->rmParam()->reload();
          }
+
+         $this->container()->addLink('EDIT_LINK', $this->getLink()->action($this->getAction()->editArticle()));
+         $this->container()->addData('EDITABLE', true);
       }
 
-      $this->container()->addData('new', $new);
-      $this->container()->addData('new_name', $new[NewsDetailModel::COLUMN_NEWS_LABEL]);
-
-      if($this->getRights()->isControll() OR $new[NewsDetailModel::COLUMN_NEWS_ID_USER]
-         == $this->getRights()->getAuth()->getUserId()){
-         $this->container()->addLink('edit_link', $this->getLink()->action($this->getAction()->edit()));
-         $this->container()->addData('editable', true);
-         $this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->add())->article());
+      if($this->getRights()->isWritable()){
+         $this->container()->addLink('ADD_LINK',$this->getLink()->action($this->getAction()->addArticle())->article());
+         $this->container()->addData('WRITABLE', true);
       }
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }
@@ -155,6 +170,17 @@ class ArticlesController extends Controller {
                $this->getRights()->getAuth()->getUserId())){
             throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
          }
+
+         if(isset ($images)){
+            $images->renameIdArticle($this->getRights()->getAuth()->getUserId()*(-1),
+               $articleDetail->getLastInsertedId());
+         }
+
+         if(isset ($files)){
+            $files->renameIdArticle($this->getRights()->getAuth()->getUserId()*(-1),
+               $articleDetail->getLastInsertedId());
+         }
+
          $this->infoMsg()->addMessage(_m('Článek byl uložen'));
          $this->getLink()->article()->action()->rmParam()->reload();
       }
@@ -168,43 +194,60 @@ class ArticlesController extends Controller {
   /**
    * controller pro úpravu novinky
    */
-   public function editController() {
+   public function editArticleController() {
       $this->checkWritebleRights();
 
-      $newsForm = new Form();
-      $newsForm->setPrefix(self::FORM_PREFIX);
+      $ardicleEditForm = new Form(self::FORM_PREFIX);
 
-      $newsForm->crInputText(self::FORM_INPUT_LABEL, true, true)
-      ->crTextArea(self::FORM_INPUT_TEXT, true, true)
+      $ardicleEditForm->crInputText(self::FORM_INPUT_LABEL, true, true)
+      ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
       ->crSubmit(self::FORM_BUTTON_SEND);
 
       //      Načtení hodnot prvků
-      $newsModel = new NewsDetailModel();
-      $newsModel->getNewsDetailAllLangs($this->getArticle());
+      $articleModel = new ArticleDetailModel();
+      $articleModel->getArticleDetailAllLangs($this->getArticle());
       //      Nastavení hodnot prvků
-      $newsForm->setValue(self::FORM_INPUT_LABEL, $newsModel->getLabelsLangs());
-      $newsForm->setValue(self::FORM_INPUT_TEXT, $newsModel->getTextsLangs());
+      $ardicleEditForm->setValue(self::FORM_INPUT_LABEL, $articleModel->getLabelsLangs());
+      $ardicleEditForm->setValue(self::FORM_INPUT_TEXT, $articleModel->getTextsLangs());
+      $label = $articleModel->getLabelsLangs();
+      
+      $this->container()->addData('ARTICLE_NAME', $label[Locale::getLang()]);
 
-      $label = $newsModel->getLabelsLangs();
-      $this->container()->addData('NEWS_NAME', $label[Locale::getLang()]);
+      if($this->getModule()->getParam(self::PARAM_FILES, true)){
+         // Uživatelské soubory
+         $files = new UserFilesEplugin($this->getRights());
+         $files->setIdArticle($articleModel->getId());
+         $this->container()->addEplugin('files', $files);
+      }
+
+      if($this->getModule()->getParam(self::PARAM_IMAGES, true)){
+         //	Uživatelské obrázky
+         $images = new UserImagesEplugin($this->getRights());
+         $images->setIdArticle($articleModel->getId());
+         $this->container()->addEplugin('images', $images);
+      }
+
 
       //        Pokud byl odeslán formulář
-      if($newsForm->checkForm()){
-         $newsDetail = new NewsDetailModel();
-         if(!$newsDetail->saveEditNews($newsForm->getValue(self::FORM_INPUT_LABEL),
-               $newsForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            throw new UnexpectedValueException(_m('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
+      if($ardicleEditForm->checkForm()){
+         if(!$articleModel->saveEditArticle($ardicleEditForm->getValue(self::FORM_INPUT_LABEL),
+               $ardicleEditForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
+            throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 2);
          }
-         $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
+         $this->infoMsg()->addMessage(_m('Článek byl uložen'));
          $this->getLink()->action()->reload();
       }
 
+//      echo "<pre>";
+//      var_dump($ardicleEditForm->getValues());
+//      echo "</pre>";
+
       //    Data do šablony
-      $this->container()->addData('NEWS_DATA', $newsForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $newsForm->getErrorItems());
+      $this->container()->addData('ARTICLE_DATA', $ardicleEditForm->getValues());
+      $this->container()->addData('ERROR_ITEMS', $ardicleEditForm->getErrorItems());
 
       //		Odkaz zpět
-      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
+      $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
    }
 
   /**

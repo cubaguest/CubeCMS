@@ -13,6 +13,7 @@ class ArticlesView extends View {
       $this->template()->addTpl("list.tpl");
 
       $this->template()->addVar("ARTICLES_LIST_NAME", _m("Články"));
+      $this->template()->addVar("ARTICLES_MORE_NAME", _m("Více"));
       $this->template()->addCss("style.css");
 
       //TODO korektní cestu
@@ -23,15 +24,12 @@ class ArticlesView extends View {
    public function showView(){
       if($this->getRights()->isWritable()){
          $this->template()->addTpl('editButtons.tpl');
-         $this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _m("Přidat novinku"));
-         $this->template()->addVar('LINK_TO_ADD_NEWS', $this->container()->getLink('add_new'));
+         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
 
-         $this->template()->addVar('LINK_TO_EDIT_NEWS_NAME', _m("Upravit"));
-         $this->template()->addVar("NEWS_EDIT", $this->container()->getData('editable'));
-         $this->template()->addVar('LINK_TO_EDIT_NEWS', $this->container()->getLink('edit_link'));
+         $this->template()->addVar('LINK_TO_EDIT_ARTICLE_NAME', _m("Upravit"));
 
-         $this->template()->addVar('LINK_TO_DELETE_NEWS_NAME', _m("Smazat"));
-         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat novinku"));
+         $this->template()->addVar('LINK_TO_DELETE_ARTICLE_NAME', _m("Smazat"));
+         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat článek"));
 
          //			JSPlugin pro potvrzení mazání
          $submitForm = new SubmitForm();
@@ -42,13 +40,11 @@ class ArticlesView extends View {
          $this->template()->addJsPlugin($jquery);
       }
 
-      $this->template()->addTpl("newDetail.tpl");
+      $this->template()->addTpl("articleDetail.tpl");
       $this->template()->addCss("style.css");
 
-      $this->template()->addVar("NEWS_DETAIL", $this->container()->getData('new'));
-
-      $this->template()->setTplSubLabel($this->container()->getData('new_name'));
-      $this->template()->setSubTitle($this->container()->getData('new_name'), true);
+      $this->template()->setTplSubLabel($this->container()->getData('ARTICLE_LABEL'));
+      $this->template()->setSubTitle($this->container()->getData('ARTICLE_LABEL'), true);
 
       $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
    }
@@ -91,6 +87,9 @@ class ArticlesView extends View {
          $eplImages->assignToTpl($this->template());
          $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
       }
+      
+      // vložení šablony epluginu TinyMCE
+      $this->template()->addJsPlugin($tinymce);
 
       //Tabulkové uspořádání
       $jquery = new JQuery();
@@ -113,16 +112,45 @@ class ArticlesView extends View {
    /**
     * Viewer pro editaci novinky
     */
-   public function editView() {
-      $this->template()->addTpl('editNews.tpl');
+   public function editArticleView() {
+      $this->template()->addTpl('editArticle.tpl');
       $this->template()->addCss("style.css");
 
-      $this->template()->setTplSubLabel(_m("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
-      $this->template()->setSubTitle(_m("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'), true);
-      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
+      $this->template()->setTplSubLabel(_m("Úprava článku").' - '.$this->container()->getData('ARTICLE_NAME'));
+      $this->template()->setSubTitle(_m("Úprava článku").' - '.$this->container()->getData('ARTICLE_NAME'), true);
+      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava článku").' - '.$this->container()->getData('ARTICLE_NAME'));
 
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
+      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na článek'));
       $this->assignLabels();
+
+      // tiny mce
+      $tinymce = new TinyMce();
+      if($this->getModule()->getParam(ArticlesController::PARAM_EDITOR_THEME) == 'simple'){
+         $tinymce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+         if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+            $tinymce->addImagesIcon();
+         }
+      } else if($this->getModule()->getParam(ArticlesController::PARAM_EDITOR_THEME, 'advanced') == 'advanced'){
+         $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
+      }
+
+      //NOTE soubory
+      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_FILES, true)){
+         $this->template()->addTpl($this->container()->getEplugin('files')->getTpl(), true);
+         $this->container()->getEplugin('files')->assignToTpl($this->template());
+      }
+
+		//NOTE obrázky
+      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+         $eplImages = $this->container()->getEplugin('images');
+         $this->template()->addTpl($eplImages->getTpl(), true);
+         $eplImages->assignToTpl($this->template());
+         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
+      }
+
+      // vložení šablony epluginu TinyMCE
+      $this->template()->addJsPlugin($tinymce);
+
       //Taby - uspořádání
       $jquery = new JQuery();
       $jquery->addWidgentTabs();

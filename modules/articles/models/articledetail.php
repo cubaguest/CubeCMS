@@ -8,7 +8,8 @@ class ArticleDetailModel extends DbModel {
 	 */
 	const COLUMN_ARTICLE_LABEL = 'label';
 	const COLUMN_ARTICLE_TEXT = 'text';
-	const COLUMN_ARTICLE_TIME = 'time';
+	const COLUMN_ARTICLE_TIME = 'add_time';
+	const COLUMN_ARTICLE_EDIT_TIME = 'edit_time';
 	const COLUMN_ARTICLE_ID_USER = 'id_user';
 	const COLUMN_ARTICLE_ID_ITEM = 'id_item';
 	const COLUMN_ARTICLE_ID = 'id_article';
@@ -20,14 +21,14 @@ class ArticleDetailModel extends DbModel {
 	const COLUMN_USER_NAME = 'username';
 	const COLUMN_USER_ID =	 'id_user';
 
-//   private $newsLabel = null;
+   private $articleLabel = null;
 //
-//   private $newsText = null;
+   private $articleText = null;
 //
-//   private $newsId = null;
+   private $articleId = null;
 //
-//   private $newsIdUser = null;
-
+   private $articleIdUser = null;
+   private $lastEditIdArticle = null;
 
    /**
     * Metoda uloží novinku do db
@@ -41,13 +42,15 @@ class ArticleDetailModel extends DbModel {
                                           self::COLUMN_ARTICLE_TEXT, $articleTexts,
                                           self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId(),
                                           self::COLUMN_ARTICLE_ID_USER, $idUser,
-                                          self::COLUMN_ARTICLE_TIME, time());
+                                          self::COLUMN_ARTICLE_TIME, time(),
+                                          self::COLUMN_ARTICLE_EDIT_TIME, time());
 
       $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
       ->colums(array_keys($articleArr))
       ->values(array_values($articleArr));
 //      //		Vložení do db
       if($this->getDb()->query($sqlInsert)){
+         $this->lastEditIdArticle = $this->getDb()->getLastInsertedId();
          return true;
       } else {
          return false;
@@ -55,50 +58,57 @@ class ArticleDetailModel extends DbModel {
    }
 
    /**
-    * Metoda vrací novinku podle zadaného ID a v aktuálním jazyku
-    *
-    * @param integer -- id novinky
-    * @return array -- pole s novinkou
+    * Metoda vrací id posledního vloženého článku
+    * @return integer -- id článku
     */
-   public function getNewsDetailSelLang($id) {
+   public function getLastInsertedId() {
+      return $this->lastEditIdArticle;
+   }
+
+   /**
+    * Metoda vrací článek podle zadaného ID a v aktuálním jazyku
+    *
+    * @param integer -- id článku
+    * @return array -- pole s článkem
+    */
+   public function getArticleDetailSelLang($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable(), 'news')
-      ->colums(array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX
-            .Locale::getLang().",".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
-            self::COLUMN_NEWS_TEXT =>"IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang()
-            .",".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
-            self::COLUMN_NEWS_TIME, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_ID_USER))
+      ->table($this->getModule()->getDbTable(), 'article')
+      ->colums(array(self::COLUMN_ARTICLE_LABEL =>"IFNULL(".self::COLUMN_ARTICLE_LABEL.'_'.Locale::getLang()
+            .",".self::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
+            self::COLUMN_ARTICLE_TEXT =>"IFNULL(".self::COLUMN_ARTICLE_TEXT.'_'.Locale::getLang()
+            .",".self::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
+            self::COLUMN_ARTICLE_TIME, self::COLUMN_ARTICLE_ID, self::COLUMN_ARTICLE_ID_USER))
       ->join(array('user' => $this->getUserTable()),
-         array('news' => self::COLUMN_NEWS_ID_USER, self::COLUMN_ISER_ID),
+         array('article' => self::COLUMN_ARTICLE_ID_USER, self::COLUMN_USER_ID),
          null, self::COLUMN_USER_NAME)
 //      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('news.'.self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
-      ->where('news.'.self::COLUMN_NEWS_ID_NEW, $id)
-      ->where('news.'.self::COLUMN_NEWS_DELETED, (int)false);
+      ->where('article.'.self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->where('article.'.self::COLUMN_ARTICLE_ID, $id);
 
-      $news = $this->getDb()->fetchAssoc($sqlSelect, true);
+      $article = $this->getDb()->fetchAssoc($sqlSelect);
 
-      $this->newsId = $news[self::COLUMN_NEWS_ID_NEW];
-      $this->newsIdUser = $news[self::COLUMN_NEWS_ID_USER];
+      $this->articleId = $article[self::COLUMN_ARTICLE_ID];
+      $this->articleIdUser = $article[self::COLUMN_ARTICLE_ID_USER];
 
-      return $news;
+      return $article;
    }
 
    public function getLabelsLangs() {
-      return $this->newsLabel;
+      return $this->articleLabel;
    }
 
    public function getTextsLangs() {
-      return $this->newsText;
+      return $this->articleText;
    }
 
    public function getId() {
-      return $this->newsId;
+      return $this->articleId;
    }
 
    public function getIdUser() {
-      return $this->newsIdUser;
+      return $this->articleIdUser;
    }
 
    /**
@@ -107,39 +117,42 @@ class ArticleDetailModel extends DbModel {
     * @param integer -- id novinky
     * @return array -- pole s novinkou
     */
-   public function getNewsDetailAllLangs($id) {
+   public function getArticleDetailAllLangs($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
       ->table($this->getModule()->getDbTable())
       ->colums(Db::COLUMN_ALL)
-      ->where(self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
-      ->where(self::COLUMN_NEWS_ID_NEW, $id)
-      ->where(self::COLUMN_NEWS_DELETED, (int)false);
+      ->where(self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->where(self::COLUMN_ARTICLE_ID, $id);
 
-      $news = $this->getDb()->fetchAssoc($sqlSelect);
+      $article = $this->getDb()->fetchAssoc($sqlSelect);
 
-      $news = $this->parseDbValuesToArray($news, array(self::COLUMN_NEWS_LABEL,
-               self::COLUMN_NEWS_TEXT));
+      if(empty ($article)){
+         throw new UnexpectedValueException(_('Zadaný článek neexistuje'), 1);
+      }
+      $article = $this->parseDbValuesToArray($article, array(self::COLUMN_ARTICLE_LABEL,
+               self::COLUMN_ARTICLE_TEXT));
 
-      $this->newsText = $news[self::COLUMN_NEWS_TEXT];
-      $this->newsLabel = $news[self::COLUMN_NEWS_LABEL];
-      $this->newsId = $news[self::COLUMN_NEWS_ID_NEW];
+      $this->articleText = $article[self::COLUMN_ARTICLE_TEXT];
+      $this->articleLabel = $article[self::COLUMN_ARTICLE_LABEL];
+      $this->articleId = $article[self::COLUMN_ARTICLE_ID];
 
-      return $news;
+      return $article;
    }
 
    /**
-    * Metoda uloží upravenou ovinku do db
+    * Metoda uloží upravený článek do db
     *
-    * @param array -- pole s detaily novinky
+    * @param array -- pole s detaily článku
     */
-   public function saveEditNews($newsLabels, $newsTexts, $idNews) {
-      $newsArr = $this->createValuesArray(self::COLUMN_NEWS_LABEL, $newsLabels,
-                                          self::COLUMN_NEWS_TEXT, $newsTexts);
+   public function saveEditArticle($labels, $texts, $id) {
+      $articleArr = $this->createValuesArray(self::COLUMN_ARTICLE_LABEL, $labels,
+                                          self::COLUMN_ARTICLE_TEXT, $texts,
+                                          self::COLUMN_ARTICLE_EDIT_TIME, time());
 
       $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
-            ->set($newsArr)
-            ->where(self::COLUMN_NEWS_ID_NEW, $idNews);
+            ->set($articleArr)
+            ->where(self::COLUMN_ARTICLE_ID, $id);
 
       // vložení do db
       if($this->getDb()->query($sqlInsert)){
@@ -149,13 +162,17 @@ class ArticleDetailModel extends DbModel {
       };
    }
 
-   public function deleteNews($idNews) {
-      //			smazání novinky
-      $sqlUpdate = $this->getDb()->update()->table($this->getModule()->getDbTable())
-      ->set(array(self::COLUMN_NEWS_DELETED => (int)true))
-      ->where(self::COLUMN_NEWS_ID_NEW." = ".$idNews);
+   /**
+    * Metoda smaže zadaný článek
+    * @param integer $idArticle
+    * @return bool
+    */
+   public function deleteArticle($idArticle) {
+      $sqlDelete = $this->getDb()
+      ->delete()->table($this->getModule()->getDbTable())
+      ->where(self::COLUMN_ARTICLE_ID,$idArticle);
 
-      if($this->getDb()->query($sqlUpdate)){
+      if($this->getDb()->query($sqlDelete)){
          return true;
       } else {
          return false;
