@@ -16,8 +16,8 @@ class NewsSearch extends Search {
 
 //echo $sqlSearch;
       while ($row = $this->getDb()->fetchAssoc($sqlSearch)) {
-         $this->addResult($this->getCategory($row[TextDetailModel::COLUMN_ID_ITEM]),
-            $this->getLink($row[TextDetailModel::COLUMN_ID_ITEM])
+         $this->addResult($this->getCategory($row[NewsDetailModel::COLUMN_NEWS_ID_ITEM]),
+            $this->getLink($row[NewsDetailModel::COLUMN_NEWS_ID_ITEM])
                ->article($row[NewsDetailModel::COLUMN_NEWS_LABEL.'_'.Locale::getLang()],
                $row[NewsDetailModel::COLUMN_NEWS_ID_NEW]),
             $row[NewsDetailModel::COLUMN_NEWS_TEXT.'_'.Locale::getLang()],
