@@ -9,12 +9,10 @@ class TextAction extends Action {
 
 	protected function init() {
 		$this->addAction(self::ACTION_EDIT_TEXT_ABBR, "edittext", _('uprava-textu'));
-    }
-
+   }
 
 	public function editText() {
 		return $this->createAction(self::ACTION_EDIT_TEXT_ABBR);
 	}
-
 }
 ?>
