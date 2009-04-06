@@ -21,6 +21,11 @@ class UserFilesEplugin extends Eplugin {
    protected $templateFile = 'userfiles.tpl';
 
    /**
+    * Název souboru s listem obrázků
+    */
+   const IMAGES_LIST_JS_FILE = 'imageslist.js';
+
+   /**
     * Název databázové tabulky se změnama
     * @var string
     */
@@ -33,19 +38,46 @@ class UserFilesEplugin extends Eplugin {
    const USER_FILES_DIR = 'userfiles';
 
    /**
+    * Název adresáře s miniaturami obrázků
+    */
+   const USER_FILES_SMALL_IMAGES_DIR = 'small';
+
+   /**
+    * Šířka miniatury
+    * @var integer
+    */
+   const IMAGE_THUMBNAIL_WIDTH = 150;
+
+   /**
+    * Výška miniatury
+    * @var integer
+    */
+   const IMAGE_THUMBNAIL_HEIGHT = 150;
+
+   /**
     * Názvy sloupců v db
     * @var string
     */
    const COLUM_ID				= 'id_file';
-   const COLUM_ID_USER			= 'id_user';
-   const COLUM_ID_ITEM			= 'id_item';
-   const COLUM_ID_ARTICLE		= 'id_article';
+   const COLUM_ID_USER		= 'id_user';
+   const COLUM_ID_ITEM		= 'id_item';
+   const COLUM_ID_ARTICLE	= 'id_article';
    const COLUM_FILE			= 'file';
    const COLUM_SIZE			= 'size';
    const COLUM_TIME			= 'time';
+   const COLUM_TYPE			= 'type';
+   const COLUM_WIDTH			= 'width';
+   const COLUM_HEIGHT		= 'height';
 
    const COLUM_LINK_TO_SHOW	= 'link_show';
    const COLUM_LINK_TO_DOWNLOAD= 'link_download';
+   const COLUM_LINK_TO_SMALL	= 'link_small';
+   /**
+    * Typy souborů které rozeznává
+    */
+   const FILE_TYPE_OTHER = 'file';
+   const FILE_TYPE_IMAGE = 'image';
+   const FILE_TYPE_FLASH = 'flash';
 
    /**
     * Názvy formulářových prvků
@@ -155,12 +187,39 @@ class UserFilesEplugin extends Eplugin {
          $file = $sendForm->getValue(self::FORM_NEW_FILE);
          try {
             $file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/');
+
+            //zjištění typu souboru (obrázek, soubor, flash)
+            $image = new ImageFile($file);
+            $flash = new FlashFile($file);
+
+            $width = 0;
+            $height = 0;
+            
+            if($image->isImage(false)){
+               // uložení malého obrázku pro náhledy
+               $image->saveImage(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'
+                  .self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/',
+                  self::IMAGE_THUMBNAIL_WIDTH, self::IMAGE_THUMBNAIL_HEIGHT);
+
+               $fileType = self::FILE_TYPE_IMAGE;
+               $width = $image->getOriginalWidth();
+               $height = $image->getOriginalHeight();
+            } else if($flash->isFlash(false)){
+               $fileType = self::FILE_TYPE_FLASH;
+               $width = $flash->getWidth();
+               $height = $flash->getHeight();
+            } else {
+               $fileType = self::FILE_TYPE_OTHER;
+            }
+
             $sqlInsert = $this->getDb()->insert()->table(self::DB_TABLE_USER_FILES)
             ->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
                self::COLUM_ID_USER, self::COLUM_FILE,
+               self::COLUM_TYPE, self::COLUM_WIDTH, self::COLUM_HEIGHT,
                self::COLUM_SIZE, self::COLUM_TIME)
             ->values($this->idArticle, $this->getModule()->getId(),
                $this->getRights()->getAuth()->getUserId(), $file->getName(),
+               $fileType, $width, $height,
                $file->getFileSize(), time());
             $this->getDb()->query($sqlInsert);
             $this->infoMsg()->addMessage(_('Soubor byl uložen'));
@@ -183,13 +242,22 @@ class UserFilesEplugin extends Eplugin {
       ->colums(self::COLUM_FILE)
       ->where(self::COLUM_ID, $id);
 
-      $file = $this->getDb()->fetchObject($sqlSelect);
+      $dbFile = $this->getDb()->fetchObject($sqlSelect);
       try {
-         if($file == null){
-            throw new RuntimeException(_('zadaný soubor již neexistuje'), 1);
+         if($dbFile == null){
+            throw new RuntimeException(_('Zadaný soubor již neexistuje'), 1);
          }
          $dir = AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/';
-         $file = new File($file->{self::COLUM_FILE}, $dir);
+         $file = new File($dbFile->{self::COLUM_FILE}, $dir);
+
+         // pokud je obrázek smažeme i miniaturu
+         if($dbFile->{self::COLUM_TYPE} == self::FILE_TYPE_IMAGE){
+            $smallFile = new File($dbFile->{self::COLUM_FILE}, $dir.self::USER_FILES_SMALL_IMAGES_DIR.'/');
+            if(!$smallFile->remove()){
+               throw new RuntimeException(_('Soubor se nepodařilo vymazat z filesystému'),2);
+            }
+         }
+
          //	vymazání z db
          $sqlDel = $this->getDb()->delete()->table(self::DB_TABLE_USER_FILES)
          ->where(self::COLUM_ID, $id);
@@ -226,6 +294,11 @@ class UserFilesEplugin extends Eplugin {
          foreach ($this->filesArray as $ufile) {
             $file = new File($ufile[self::COLUM_FILE], $dir);
             $file->remove();
+            // pokud je obrázek maže se i miniatura
+            if($ufile[self::COLUM_TYPE] == self::FILE_TYPE_IMAGE){
+               $file = new File($ufile[self::COLUM_FILE], $dir.self::USER_FILES_SMALL_IMAGES_DIR.'/');
+               $file->remove();
+            }
          }
          // vymaz z db
          $sqlDel = $this->getDb()->delete()->table(self::DB_TABLE_USER_FILES)
@@ -262,7 +335,8 @@ class UserFilesEplugin extends Eplugin {
 
       $sqlSelect = $this->getDb()->select()
       ->table(self::DB_TABLE_USER_FILES, 'files')
-      ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
+//      ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
+      ->colums(Db::COLUMN_ALL);
 
       if(is_string($this->idArticle) OR is_numeric($this->idArticle)){
          $sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE, $this->idArticle)
@@ -295,8 +369,14 @@ class UserFilesEplugin extends Eplugin {
       if ($this->filesArray != null) {
          //	pprojití pole a dolnění odkazů
          foreach ($this->filesArray as $key => $file) {
-            $this->filesArray[$key][self::COLUM_LINK_TO_SHOW] = Links::getMainWebDir().MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
-            $this->filesArray[$key][self::COLUM_LINK_TO_DOWNLOAD] = $this->getLinks()->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
+            $this->filesArray[$key][self::COLUM_LINK_TO_SHOW] = Links::getMainWebDir()
+               .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
+            $this->filesArray[$key][self::COLUM_LINK_TO_DOWNLOAD] = $this->getLinks()
+               ->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
+            if($file[self::COLUM_TYPE] == self::FILE_TYPE_IMAGE){
+               $this->filesArray[$key][self::COLUM_LINK_TO_SMALL] = MAIN_DATA_DIR
+                  .'/'.self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/'.$file[self::COLUM_FILE];
+            }
          }
       }
    }
@@ -316,14 +396,39 @@ class UserFilesEplugin extends Eplugin {
          $file = $sendForm->getValue(self::FORM_NEW_FILE);
          try {
             $file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/');
+
+            //zjištění typu souboru (obrázek, soubor, flash)
+            $image = new ImageFile($file);
+            $flash = new FlashFile($file);
+
+            $width = 0;
+            $height = 0;
+
+            if($image->isImage(false)){
+               // uložení malého obrázku pro náhledy
+               $image->saveImage(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'
+                  .self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/',
+                  self::IMAGE_THUMBNAIL_WIDTH, self::IMAGE_THUMBNAIL_HEIGHT);
+               
+               $fileType = self::FILE_TYPE_IMAGE;
+               $width = $image->getOriginalWidth();
+               $height = $image->getOriginalHeight();
+            } else if($flash->isFlash(false)){
+               $fileType = self::FILE_TYPE_FLASH;
+               $width = $flash->getWidth();
+               $height = $flash->getHeight();
+            } else {
+               $fileType = self::FILE_TYPE_OTHER;
+            }
+
             $sqlInsert = $this->getDb()->insert()->table(self::DB_TABLE_USER_FILES)
             ->colums(self::COLUM_ID_ARTICLE, self::COLUM_ID_ITEM,
-               self::COLUM_ID_USER,
-               self::COLUM_FILE,
+               self::COLUM_ID_USER,self::COLUM_FILE,
+               self::COLUM_TYPE, self::COLUM_WIDTH, self::COLUM_HEIGHT,
                self::COLUM_SIZE, self::COLUM_TIME)
             ->values($sendForm->getValue('idArticle'), $sendForm->getValue('idItem'),
-               AppCore::getAuth()->getUserId(),
-               $file->getName(),
+               AppCore::getAuth()->getUserId(),$file->getName(),
+               $fileType, $width, $height,
                $file->getFileSize(), time());
             $this->getDb()->query($sqlInsert);
             echo _('Soubor byl uložen');
@@ -373,6 +478,7 @@ class UserFilesEplugin extends Eplugin {
       $this->toTpl("BUTTON_USERFILE_DELETE", _("Smazat"));
       $this->toTpl("BUTTON_USERFILE_SEND", _("Přidat"));
       $this->toTpl("CONFIRM_MESAGE_DELETE_FILE", _("Opravdu smazat soubor"));
+      $this->toTpl("CONFIRM_MESAGE_DELETE_IMAGE", _("Opravdu smazat obrázek"));
       $this->toTpl("FILE_LINK_TO_SHOW_NAME", _("Odkaz pro zobrazení"));
       $this->toTpl("FILE_LINK_TO_DOWNLOAD_NAME", _("Odkaz pro stažení"));
 

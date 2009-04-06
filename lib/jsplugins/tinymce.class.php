@@ -115,6 +115,7 @@ class TinyMce extends JsPlugin {
 			'mode' => 'textareas',
 			self::PARAM_THEME => 'advanced',
 			'language' => 'cs',
+         'force_br_newlines' => 'true',
 			'theme_advanced_toolbar_location' => 'top',
 			'theme_advanced_toolbar_align' => 'left',
 			'theme_advanced_statusbar_location' => 'bottom',
@@ -123,6 +124,7 @@ class TinyMce extends JsPlugin {
 			'encoding' => 'xml',
 			'document_base_url' => null,
 			'external_image_list_url' => null,
+         'external_link_list_url' => "./myexternallist.js",
 			'remove_script_host' => 'false',
 			'content_css' => null,
          'extended_valid_elements' => 'td[*],div[*]'

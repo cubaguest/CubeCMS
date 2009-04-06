@@ -40,6 +40,12 @@ class ArticlesView extends View {
          $this->template()->addJsPlugin($jquery);
       }
 
+      //převedeme všechny lightbox převedeme na lightbox rel
+      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+         $this->template()->addJsPlugin(new LightBox());
+         $this->template()->addVar('LIGHTBOX', true);
+      }
+
       $this->template()->addTpl("articleDetail.tpl");
       $this->template()->addCss("style.css");
 
@@ -67,26 +73,28 @@ class ArticlesView extends View {
       $tinymce = new TinyMce();
       if($this->getModule()->getParam(ArticlesController::PARAM_EDITOR_THEME) == 'simple'){
          $tinymce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
-         if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+//         if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
             $tinymce->addImagesIcon();
-         }
+//         }
       } else if($this->getModule()->getParam(ArticlesController::PARAM_EDITOR_THEME, 'advanced') == 'advanced'){
          $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
       }
 
       //NOTE soubory
       if((bool)$this->getModule()->getParam(ArticlesController::PARAM_FILES, true)){
-         $this->template()->addTpl($this->container()->getEplugin('files')->getTpl(), true);
-         $this->container()->getEplugin('files')->assignToTpl($this->template());
+         $eplFiles = $this->container()->getEplugin('files');
+         $this->template()->addTpl($eplFiles->getTpl(), true);
+         $eplFiles->assignToTpl($this->template());
+//         $tinymce->setImagesList($eplFiles->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
       }
 
 		//NOTE obrázky
-      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
-         $eplImages = $this->container()->getEplugin('images');
-         $this->template()->addTpl($eplImages->getTpl(), true);
-         $eplImages->assignToTpl($this->template());
-         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
-      }
+//      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+//         $eplImages = $this->container()->getEplugin('images');
+//         $this->template()->addTpl($eplImages->getTpl(), true);
+//         $eplImages->assignToTpl($this->template());
+//         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
+//      }
       
       // vložení šablony epluginu TinyMCE
       $this->template()->addJsPlugin($tinymce);
@@ -127,9 +135,9 @@ class ArticlesView extends View {
       $tinymce = new TinyMce();
       if($this->getModule()->getParam(ArticlesController::PARAM_EDITOR_THEME) == 'simple'){
          $tinymce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
-         if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+//         if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
             $tinymce->addImagesIcon();
-         }
+//         }
       } else if($this->getModule()->getParam(ArticlesController::PARAM_EDITOR_THEME, 'advanced') == 'advanced'){
          $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
       }
@@ -141,12 +149,12 @@ class ArticlesView extends View {
       }
 
 		//NOTE obrázky
-      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
-         $eplImages = $this->container()->getEplugin('images');
-         $this->template()->addTpl($eplImages->getTpl(), true);
-         $eplImages->assignToTpl($this->template());
-         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
-      }
+//      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_IMAGES, true)){
+//         $eplImages = $this->container()->getEplugin('images');
+//         $this->template()->addTpl($eplImages->getTpl(), true);
+//         $eplImages->assignToTpl($this->template());
+//         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
+//      }
 
       // vložení šablony epluginu TinyMCE
       $this->template()->addJsPlugin($tinymce);

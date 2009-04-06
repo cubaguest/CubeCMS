@@ -20,7 +20,7 @@
    <script type="text/javascript">
       $(document).ready(function() {
          new Ajax_upload('#uploadFileButton', {
-            action: '{/literal}{$VARS.AJAX_USERFILE_FILE}{literal}', 
+            action: '{/literal}{$VARS.AJAX_USERFILE_FILE}{literal}',
             name: 'userfiles_new_file',
             autoSubmit: true,
             data: {
@@ -52,21 +52,41 @@
          function(jsondata){
             $.each(jsondata.files, function(i,ufile){
                count++;
-               var tbl ="<tr><td>"+ufile.file+"</td>"
-                  +"<td>"+ Math.round(ufile.size/1024 * 100)/100 + "KB</td>"
-                  +"<td align=\"right\">"
-                  +"<form action=\"{/literal}{$THIS_PAGE_LINK}{literal}\" method=\"post\"  onsubmit=\"return deleteFile('{/literal}{$VARS.CONFIRM_MESAGE_DELETE_FILE}{literal} - "+ufile.file+"', '"+ufile.id_file+"');\">"
-                  +"<input type=\"hidden\" name=\"userfiles_id\" value=\""+ufile.id_file+"\" />"
-                  +"<input type=\"submit\" name=\"userfiles_delete\" value=\"{/literal}{$VARS.BUTTON_USERFILE_DELETE}{literal}\" />"
-                  +"</form>"
-                  +"</td></tr>"
-                  +"<tr><td colspan=\"3\">"
-                  +"<a href=\""+ufile.link_show+"\" title=\"{/literal}{$VARS.FILE_LINK_TO_SHOW_NAME}{literal} - "+ufile.file+"\" target=\"_blank\">"+ufile.link_show+"</a>"
-                  +"</td></tr>"
-                  +"<tr><td colspan=\"3\">"
-                  +"<a href=\""+ufile.link_download+"\" title=\"{/literal}{$VARS.FILE_LINK_TO_DOWNLOAD_NAME}{literal} - "+ufile.file+"\">"+ufile.link_download+"</a>"
-                  +"</td></tr>"
-                  +"<tr><td colspan=\"3\" style=\"border: 1px solid gray;\"></td></tr>";
+               //if(ufile.type == 'image'){
+                  var tbl ="<tr><td rowspan=\"3\">";
+
+                  tbl+="<a href=\""+ufile.link_show+"\" rel=\"lightbox\" title=\""+ufile.file+"\"><img src=\""+ufile.link_small+"\" alt=\""+ufile.file+"\"</a>"
+                     +"</td><td>"+ufile.file+"</td>"
+                     +"<td>"+ Math.round(ufile.size/1024 * 100)/100 + "KB</td>"
+                     +"<td align=\"right\">"
+                     +"<form action=\"{/literal}{$THIS_PAGE_LINK}{literal}\" method=\"post\" onsubmit=\"return deleteFile('{/literal}{$VARS.CONFIRM_MESAGE_DELETE_IMAGE}{literal} - "+ufile.file+"', '"+ufile.id_file+"');\">"
+                     +"<input type=\"hidden\" name=\"userfiles_id\" value=\""+ufile.id_file+"\" />"
+                     +"<input type=\"submit\" name=\"userfiles_delete\" value=\"{/literal}{$VARS.BUTTON_USERIMAGE_DELETE}{literal}\" />"
+                     +"</form></td></tr>"
+                     +"<tr><td colspan=\"3\">"+ufile.width+" x "+ufile.height+"px</td></tr>"
+                     +"<tr><td colspan=\"3\">"
+                     +"<a href=\""+ufile.link_show+"\" title=\"{/literal}{$VARS.IMAGE_LINK_TO_SHOW_NAME}{literal} - "+ufile.file+" target=\"_blank\">"+ufile.link_show+"</a>"
+                     +"</td></tr>"
+                     +"<tr><td colspan=\"4\" style=\"border: 1px solid gray;\"></td></tr>";
+
+               //else {
+               //   var tbl ="<tr><td>"+ufile.file+"</td>"
+               //      +"<td>"+ Math.round(ufile.size/1024 * 100)/100 + "KB</td>"
+               //      +"<td align=\"right\">"
+               //      +"<form action=\"{/literal}{$THIS_PAGE_LINK}{literal}\" method=\"post\"  onsubmit=\"return deleteFile('{/literal}{$VARS.CONFIRM_MESAGE_DELETE_FILE}{literal} - "+ufile.file+"', '"+ufile.id_file+"');\">"
+               //      +"<input type=\"hidden\" name=\"userfiles_id\" value=\""+ufile.id_file+"\" />"
+               //      +"<input type=\"submit\" name=\"userfiles_delete\" value=\"{/literal}{$VARS.BUTTON_USERFILE_DELETE}{literal}\" />"
+               //      +"</form>"
+               //      +"</td></tr>"
+               //      +"<tr><td colspan=\"3\">"
+               //      +"<a href=\""+ufile.link_show+"\" title=\"{/literal}{$VARS.FILE_LINK_TO_SHOW_NAME}{literal} - "+ufile.file+"\" target=\"_blank\">"+ufile.link_show+"</a>"
+               //      +"</td></tr>"
+               //      +"<tr><td colspan=\"3\">"
+               //      +"<a href=\""+ufile.link_download+"\" title=\"{/literal}{$VARS.FILE_LINK_TO_DOWNLOAD_NAME}{literal} - "+ufile.file+"\">"+ufile.link_download+"</a>"
+               //      +"</td></tr>"
+               //      +"<tr><td colspan=\"3\" style=\"border: 1px solid gray;\"></td></tr>";
+               //}
+
                $(tbl).appendTo("#userFilesList tbody");
             });
             $("#userFilesCount").text(count);
@@ -95,28 +115,51 @@
    <table id="userFilesList" border="0" cellpadding="2" cellspacing="2">
       <tbody>
          {foreach from=$VARS.USERFILES_ARRAY[$FILES_ID] item="FILE"}
+         
          <tr>
+            <td rowspan="3">
+               {if $FILE.type eq 'image'}
+               <a href="{$FILE.link_show}" rel="lightbox" title="{$FILE.file}">
+                  <img src="{$FILE.link_small}" alt="file {$FILE.file}" height="60" />
+               </a>
+               {else}
+                  <img src="images/icons/textfile.png" align="file {$FILE.file}" height="60" />
+               {/if}
+            </td>
             <td>{$FILE.file}</td>
-            <td>{math equation="x / 1024" x=$FILE.size format="%.2f"}KB</td>
+            <td>
+               {math equation="x/1024" x=$FILE.size format="%.2f"}KB
+               {if $FILE.type eq 'image'}
+               {$FILE.width} x {$FILE.height}px
+               {/if}
+            </td>
             <td align="right">
-               <form action="{$THIS_PAGE_LINK}" method="post" onsubmit="return deleteFile('{$VARS.CONFIRM_MESAGE_DELETE_FILE} - {$FILE.file}', '{$FILE.id_file}');">
-                  <input class="id_file" type="hidden" name="userfiles_id" value="{$FILE.id_file}" />
-                  <input type="submit" name="userfiles_delete" value="{$VARS.BUTTON_USERFILE_DELETE}" />
+               <form action="{$THIS_PAGE_LINK}" method="post" onsubmit="return deleteImage('{$VARS.CONFIRM_MESAGE_DELETE_IMAGE} - {$FILE.file}', '{$FILE.id_file}');">
+                  <input type="hidden" name="userimages_id" value="{$FILE.id_file}" />
+                  <input type="submit" name="userimages_delete" value="{$VARS.BUTTON_USERFILE_DELETE}" />
                </form>
             </td>
          </tr>
          <tr>
             <td colspan="3">
-               <a href="{$FILE.link_show}" title="{$VARS.FILE_LINK_TO_SHOW_NAME} - {$FILE.file}" target="_blank">{$FILE.link_show}</a>
+               <span class="smallFont">
+                  <a href="{$FILE.link_show}" title="{$VARS.FILE_LINK_TO_SHOW_NAME} - {$FILE.file}" target="_blank">{$FILE.link_show}</a>
+                  {*if $FILE.type eq 'image'}
+                  <br />
+                  <a href="{$FILE.link_small}" title="{$VARS.FILE_LINK_TO_SHOW_NAME} - {$FILE.file}" target="_blank">{$FILE.link_small}</a>
+                  {/if*}
+               </span>
             </td>
          </tr>
          <tr>
             <td colspan="3">
-               <a href="{$FILE.link_download}" title="{$VARS.FILE_LINK_TO_DOWNLOAD_NAME} - {$FILE.file}">{$FILE.link_download}</a>
+               <span class="smallFont">
+                  <a href="{$FILE.link_download}" title="{$VARS.FILE_LINK_TO_DOWNLOAD_NAME} - {$FILE.file}">{$FILE.link_download}</a>
+               </span>
             </td>
          </tr>
          <tr>
-            <td colspan="3" style="border: 1px solid gray;"></td>
+            <td colspan="4" style="border: 1px solid gray;"></td>
          </tr>
          {/foreach}
       </tbody>

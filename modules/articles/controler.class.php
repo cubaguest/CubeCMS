@@ -148,12 +148,12 @@ class ArticlesController extends Controller {
          $this->container()->addEplugin('files', $files);
       }
 
-      if($this->getModule()->getParam(self::PARAM_IMAGES, true)){
-         //	Uživatelské obrázky
-         $images = new UserImagesEplugin($this->getRights());
-         $images->setIdArticle($this->getRights()->getAuth()->getUserId()*(-1));
-         $this->container()->addEplugin('images', $images);
-      }
+//      if($this->getModule()->getParam(self::PARAM_IMAGES, true)){
+//         //	Uživatelské obrázky
+//         $images = new UserImagesEplugin($this->getRights());
+//         $images->setIdArticle($this->getRights()->getAuth()->getUserId()*(-1));
+//         $this->container()->addEplugin('images', $images);
+//      }
 
       $articleForm = new Form();
       $articleForm->setPrefix(self::FORM_PREFIX);
@@ -171,10 +171,10 @@ class ArticlesController extends Controller {
             throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
          }
 
-         if(isset ($images)){
-            $images->renameIdArticle($this->getRights()->getAuth()->getUserId()*(-1),
-               $articleDetail->getLastInsertedId());
-         }
+//         if(isset ($images)){
+//            $images->renameIdArticle($this->getRights()->getAuth()->getUserId()*(-1),
+//               $articleDetail->getLastInsertedId());
+//         }
 
          if(isset ($files)){
             $files->renameIdArticle($this->getRights()->getAuth()->getUserId()*(-1),
