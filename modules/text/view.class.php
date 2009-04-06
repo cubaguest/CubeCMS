@@ -12,11 +12,14 @@ class TextView extends View {
 			
 			$this->template()->addVar('LINK_TO_EDIT_TEXT_NAME', _m("Upravit"));
 			$this->template()->addVar('LINK_TO_EDIT_TEXT',$this->container()->getLink('link_edit'));
-			
-			// editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
 		}
+
+      $jquery = new JQuery();
+      $this->template()->addJsPlugin($jquery);
+      if((bool)$this->getModule()->getParam(TextController::PARAM_FILES, true)){
+         $this->template()->addJsPlugin(new LightBox());
+         $this->template()->addVar('LIGHTBOX', true);
+      }
 		$this->template()->addTpl("text.tpl");
 		$this->template()->addVar('TEXT', $this->container()->getData('text'));
 	}
@@ -32,7 +35,7 @@ class TextView extends View {
 		$tinymce = new TinyMce();
       if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'simple'){
          $tinymce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
-         if($this->getModule()->getParam(TextController::PARAM_IMAGES, true)){
+         if($this->getModule()->getParam(TextController::PARAM_FILES, true)){
             $tinymce->addImagesIcon();
          }
       } else if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'full'){
@@ -41,20 +44,18 @@ class TextView extends View {
       
 		//NOTE soubory
       if($this->getModule()->getParam(TextController::PARAM_FILES, true)){
-         $this->template()->addTpl($this->container()->getEplugin('files')->getTpl(), true);
-         $this->container()->getEplugin('files')->assignToTpl($this->template());
-      }
-
-		//NOTE obrázky
-      if($this->getModule()->getParam(TextController::PARAM_IMAGES, true)){
-         $eplImages = $this->container()->getEplugin('images');
-         $this->template()->addTpl($eplImages->getTpl(), true);
-         $eplImages->assignToTpl($this->template());
-         $tinymce->setImagesList($eplImages->getImagesListLink(UserImagesEplugin::FILE_IMAGES_FORMAT_TINYMCE));
+         $eplFiles = $this->container()->getEplugin('files');
+         $this->template()->addTpl($eplFiles->getTpl(), true);
+         $eplFiles->assignToTpl($this->template());
+         $tinymce->setImagesList($eplFiles->getImagesListLink());
+         $tinymce->setLinksList($eplFiles->getLinksListLink());
       }
 
       $this->template()->addJsPlugin($tinymce);
-
+      if((bool)$this->getModule()->getParam(TextController::PARAM_FILES, true)){
+         $this->template()->addJsPlugin(new LightBox());
+         $this->template()->addVar('LIGHTBOX', true);
+      }
       $jquery = new JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);

@@ -19,4 +19,11 @@
 {/literal}
 {/if}
 {include file='engine:buttonback.tpl'}
+{if $VARS.LIGHTBOX}
+{literal}
+<script type="text/javascript">
+$(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+</script>
+{/literal}
+{/if}
 </div>

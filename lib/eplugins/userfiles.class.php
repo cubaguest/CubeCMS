@@ -26,6 +26,11 @@ class UserFilesEplugin extends Eplugin {
    const IMAGES_LIST_JS_FILE = 'imageslist.js';
 
    /**
+    * Název souboru s listem odkazů
+    */
+   const LINKS_LIST_JS_FILE = 'linkslist.js';
+
+   /**
     * Název databázové tabulky se změnama
     * @var string
     */
@@ -90,6 +95,21 @@ class UserFilesEplugin extends Eplugin {
    const FORM_BUTTON_DELETE = 'delete';
 
    /**
+    * Formáty pro vrácení seznamu obrázků
+    * @var string
+    */
+   const FILE_LIST_FORMAT_TINYMCE = 'tinymce';
+   const FILE_LIST_FORMAT_ARRAY = 'array';
+
+   /**
+    * $_PARAM parametr s id itemu a článku
+    * @var string
+    */
+   const PARAM_URL_ID_ITEM = 'idI';
+   const PARAM_URL_ID_ARTICLE = 'idA';
+   const PARAM_URL_LIST_TYPE = 'type';
+
+   /**
     * Název volby s názvem tabulky uživatelů
     * @var string
     */
@@ -152,10 +172,96 @@ class UserFilesEplugin extends Eplugin {
 
    /**
     * Metoda je spuštěna při načítání souborů
-    * @param string $fileName -- název souboru
-    * @param array $fileparams -- pole s parametry pluginu
+    * @param string $file -- název souboru
+    * @param array $params -- pole s parametry pluginu
     */
-   public function runOnlyEplugin($fileName, $fileParams = null) {}
+   public function runOnlyEplugin($file, $params = null) {
+      if($file == self::IMAGES_LIST_JS_FILE) {
+         $file = new JsFile($file, true);
+         $file->setParams($params);
+         $idArticle = null;
+         if($file->getParam(self::PARAM_URL_ID_ARTICLE)){
+            $idArticle = rawurldecode($file->getParam(self::PARAM_URL_ID_ARTICLE));
+         }
+         $array = $this->getImagesList($file->getParam(self::PARAM_URL_ID_ITEM),$idArticle);
+         switch ($file->getParam(self::PARAM_URL_LIST_TYPE)) {
+            case self::FILE_LIST_FORMAT_TINYMCE:
+               TinyMce::sendListImages($array);
+               break;
+            default:
+               break;
+         }
+      } else if($file == self::LINKS_LIST_JS_FILE){
+         $file = new JsFile($file, true);
+         $file->setParams($params);
+         $idArticle = null;
+         if($file->getParam(self::PARAM_URL_ID_ARTICLE)){
+            $idArticle = rawurldecode($file->getParam(self::PARAM_URL_ID_ARTICLE));
+         }
+         $array = $this->getLinksList($file->getParam(self::PARAM_URL_ID_ITEM),$idArticle);
+         switch ($file->getParam(self::PARAM_URL_LIST_TYPE)) {
+            case self::FILE_LIST_FORMAT_TINYMCE:
+               TinyMce::sendListLinks($array);
+               break;
+            default:
+               break;
+         }
+      }
+      return false;
+   }
+
+   /**
+    * Metoda načte seznam obrázků
+    * @param integer -- id item
+    * @param integer -- (option)id článku u kterého byla změna provedena
+    */
+   public function getImagesList($idItem, $idArticle = null) {
+      $sqlSelect = $this->getDb()->select()->table(self::DB_TABLE_USER_FILES,'files')
+      ->colums(self::COLUM_FILE)
+      ->where(self::COLUM_ID_ITEM, $idItem)
+      ->where(self::COLUM_TYPE, self::FILE_TYPE_IMAGE);
+      if($idArticle != null){
+         $sqlSelect->where(self::COLUM_ID_ARTICLE, $idArticle);
+      }
+      //	vložení záznamu
+      $images = $this->getDb()->fetchAll($sqlSelect);
+      $returnArray = array();
+      //	Převedení na normální pole kde klíč je název souboru a hodota je cesta
+      if(!empty($images)){
+         foreach ($images as $image) {
+            $returnArray[$image[self::COLUM_FILE]] = $this->getLinks()->getMainWebDir()
+               .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$image[self::COLUM_FILE];
+         }
+      }
+      return $returnArray;
+   }
+
+   /**
+    * Metoda načte seznam odkazů k souborům
+    * @param integer -- id item
+    * @param integer -- (option)id článku u kterého byla změna provedena
+    */
+   public function getLinksList($idItem, $idArticle = null) {
+      $sqlSelect = $this->getDb()->select()->table(self::DB_TABLE_USER_FILES,'files')
+      ->colums(self::COLUM_FILE)
+      ->where(self::COLUM_ID_ITEM, $idItem);
+      if($idArticle != null){
+         $sqlSelect->where(self::COLUM_ID_ARTICLE, $idArticle);
+      }
+      //	vložení záznamu
+      $links = $this->getDb()->fetchAll($sqlSelect);
+      $returnArray = array();
+      //	Převedení na normální pole kde klíč je název souboru a hodota je cesta
+      if(!empty($links)){
+         foreach ($links as $file) {
+            $returnArray[$file[self::COLUM_FILE]] = Links::getMainWebDir()
+            .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
+            $returnArray[$file[self::COLUM_FILE]._('-Stažení')] = $this->getLinks()
+            ->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
+         }
+      }
+      return $returnArray;
+   }
 
    /**
     * Metoda nastaví id šablony pro výpis
@@ -239,7 +345,7 @@ class UserFilesEplugin extends Eplugin {
    private function deleteUserFile($id) {
       //		načtení informací o souboru
       $sqlSelect = $this->getDb()->select()->table(self::DB_TABLE_USER_FILES, 'files')
-      ->colums(self::COLUM_FILE)
+      ->colums(array(self::COLUM_FILE, self::COLUM_TYPE))
       ->where(self::COLUM_ID, $id);
 
       $dbFile = $this->getDb()->fetchObject($sqlSelect);
@@ -510,7 +616,7 @@ class UserFilesEplugin extends Eplugin {
    /**
     * Metoda přejmenuje id článku na nové (při vytváření článků u kterých není id)
     * @param integer $oldId -- staré id článku (nejčastěji id uživatele)
-    * @param <type> $newId -- nové id (nejčastěji id nového článku)
+    * @param integer $newId -- nové id (nejčastěji id nového článku)
     * @return boolean -- pokudakce proběhla
     */
    public function renameIdArticle($oldId,$newId) {
@@ -518,6 +624,54 @@ class UserFilesEplugin extends Eplugin {
          ->table(self::DB_TABLE_USER_FILES, 'files')
          ->set(array(self::COLUM_ID_ARTICLE => $newId))
          ->where(self::COLUM_ID_ARTICLE, $oldId));
+   }
+
+   /**
+    * Metoda vrací odkaz na soubor se seznamem obrázků
+    * @param string -- (option) typ v jakém se mají obrázky formátu vrátit (default: self::FILE_IMAGES_FORMAT_TINYMCE)
+    * @return mixed -- seznam obrázků
+    * @todo dodělat tak by se daly předávat i celá pole v url parametrech, a jiné druhy souborů
+    */
+   public function getImagesListLink($type = self::FILE_LIST_FORMAT_TINYMCE) {
+      switch ($type) {
+         case self::FILE_LIST_FORMAT_TINYMCE:
+            $file = new JsFile(self::IMAGES_LIST_JS_FILE, true);
+            $file->setParam(self::PARAM_URL_ID_ITEM, $this->getModule()->getId());
+            $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
+            if(is_numeric($this->idArticle)){
+               $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);
+            }
+            return $this->getFileLink($file);
+            break;
+         default:
+            $link = Links::getMainWebDir().'eplugin'.strtolower($this->getEpluginName()).'.js';
+            break;
+      }
+      return false;
+   }
+
+   /**
+    * Metoda vrací odkaz na soubor se seznamem linků k souborům a obrázkům
+    * @param string -- (option)typ v jakém se mají obrázky formátu vrátit (default: self::FILE_IMAGES_FORMAT_TINYMCE)
+    * @return mixed -- seznam obrázků
+    * @todo dodělat tak by se daly předávat i celá pole v url parametrech, a jiné druhy souborů
+    */
+   public function getLinksListLink($type = self::FILE_LIST_FORMAT_TINYMCE) {
+      switch ($type) {
+         case self::FILE_LIST_FORMAT_TINYMCE:
+            $file = new JsFile(self::LINKS_LIST_JS_FILE, true);
+            $file->setParam(self::PARAM_URL_ID_ITEM, $this->getModule()->getId());
+            $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
+            if(is_numeric($this->idArticle)){
+               $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);
+            }
+            return $this->getFileLink($file);
+            break;
+         default:
+            $link = Links::getMainWebDir().'eplugin'.strtolower($this->getEpluginName()).'.js';
+            break;
+      }
+      return false;
    }
 }
 ?>

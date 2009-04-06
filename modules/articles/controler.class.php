@@ -16,11 +16,6 @@ class ArticlesController extends Controller {
    const PARAM_EDITOR_THEME = 'theme';
 
    /**
-    * Parametr jestli se používají obrázky
-    */
-   const PARAM_IMAGES = 'images';
-
-   /**
     * Parametr jestli se používají soubory
     */
    const PARAM_FILES = 'files';

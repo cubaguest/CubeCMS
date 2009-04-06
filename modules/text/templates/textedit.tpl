@@ -28,5 +28,12 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
   });
 </script>
 {/literal}
+{if $VARS.LIGHTBOX}
+{literal}
+<script type="text/javascript">
+$(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+</script>
+{/literal}
+{/if}
 </div>
 {include file="engine:buttonback.tpl"}

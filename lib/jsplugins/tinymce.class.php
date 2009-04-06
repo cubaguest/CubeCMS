@@ -38,6 +38,12 @@ class TinyMce extends JsPlugin {
 	const PARAM_TINY_IMAGES_LIST = 'img';
 	
 	/**
+	 * $GET s odkazem na list odkazů
+	 * @var string
+	 */
+	const PARAM_TINY_LINKS_LIST = 'link';
+
+	/**
 	 * Druhy theme pro tiny mce
 	 * @var string
 	 */
@@ -124,7 +130,7 @@ class TinyMce extends JsPlugin {
 			'encoding' => 'xml',
 			'document_base_url' => null,
 			'external_image_list_url' => null,
-         'external_link_list_url' => "./myexternallist.js",
+         'external_link_list_url' => null,
 			'remove_script_host' => 'false',
 			'content_css' => null,
          'extended_valid_elements' => 'td[*],div[*]'
@@ -232,12 +238,19 @@ class TinyMce extends JsPlugin {
 	}
 	
 	/**
-	 * Metoda nastavuje jestli se načíst obrázky a odkud
-	 * @param integer -- id itemu
-	 * @param integer -- id článku
+	 * Metoda nastavuje jestli se mají načíst obrázky a odkud
+	 * @param string $fileLink -- odkaz
 	 */
 	public function setImagesList($fileLink) {
       $this->getSettingsJsFile()->setParam(self::PARAM_TINY_IMAGES_LIST, $fileLink);
+	}
+
+	/**
+	 * Metoda nastavuje jestli se mají načíst odkazy a odkud
+	 * @param string $fileLink -- odkaz
+	 */
+	public function setLinksList($fileLink) {
+      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_LINKS_LIST, $fileLink);
 	}
 
    /**
@@ -269,6 +282,7 @@ class TinyMce extends JsPlugin {
 		}
       $params[self::PARAM_THEME] = self::THEME_ADVANCED;
 		$this->checkImagesList($params);
+		$this->checkLinksList($params);
       $this->removeOtherParams($params);
 		$content .= $this->generateParamsForFile($params);
 		$content .= $this->cfgFileFooter();
@@ -306,6 +320,7 @@ class TinyMce extends JsPlugin {
 		}
       $params[self::PARAM_THEME] = self::THEME_ADVANCED;
       $this->checkImagesList($params);
+      $this->checkLinksList($params);
       $this->removeOtherParams($params);
 		$content .= $this->generateParamsForFile($params);
 		$content .= $this->cfgFileFooter();
@@ -322,6 +337,18 @@ class TinyMce extends JsPlugin {
       if(isset ($params[self::PARAM_TINY_IMAGES_LIST]) AND $params[self::PARAM_TINY_IMAGES_LIST] != null){
 			$params['external_image_list_url'] = $params[self::PARAM_TINY_IMAGES_LIST];
 			unset($params[self::PARAM_TINY_IMAGES_LIST]);
+		}
+	}
+
+	/**
+	 * Metoda zkontroluje, jestli nebyl předán i odkaz na list odkazů
+	 *
+	 * @param array -- pole, kde se má popřípadě parametr nastavit
+	 */
+	private function checkLinksList(&$params) {
+      if(isset ($params[self::PARAM_TINY_LINKS_LIST]) AND $params[self::PARAM_TINY_LINKS_LIST] != null){
+			$params['external_link_list_url'] = $params[self::PARAM_TINY_LINKS_LIST];
+			unset($params[self::PARAM_TINY_LINKS_LIST]);
 		}
 	}
 
@@ -394,7 +421,7 @@ class TinyMce extends JsPlugin {
 	 *
 	 * @param unknown_type $imagesArray
 	 */
-	public static function generateListImages($imagesArray) {
+	public static function sendListImages($imagesArray) {
 		$string = "var tinyMCEImageList = new Array(\n";
 		foreach ($imagesArray as $name => $path) {
 			$string .= "[\"".$name."\", \"".$path."\"],\n";
@@ -403,7 +430,30 @@ class TinyMce extends JsPlugin {
 			$string = substr($string, 0, strlen($string)-2)."\n";
 		}
 		$string .= ");\n";
-		return $string;
+		header("Content-Length: " . strlen($string));
+      header("Content-type: application/x-javascript");
+		echo $string;
+      exit();
+	}
+
+	/**
+	 * Metoda vygeneruje z pole string pro list linků v TinyMCE
+	 *
+	 * @param unknown_type $imagesArray
+	 */
+	public static function sendListLinks($imagesArray) {
+		$string = "var tinyMCELinkList = new Array(\n";
+		foreach ($imagesArray as $name => $path) {
+			$string .= "[\"".$name."\", \"".$path."\"],\n";
+		}
+		if(!empty($imagesArray)){
+			$string = substr($string, 0, strlen($string)-2)."\n";
+		}
+		$string .= ");\n";
+      header("Content-Length: " . strlen($string));
+      header("Content-type: application/x-javascript");
+		echo $string;
+      exit();
 	}
 }
 ?>

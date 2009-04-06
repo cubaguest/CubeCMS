@@ -15,7 +15,6 @@ class TextController extends Controller {
    /**
     * Názvy parametrů modulu
     */
-   const PARAM_IMAGES = 'images';
    const PARAM_FILES = 'files';
    const PARAM_THEME = 'theme';
 
@@ -48,13 +47,6 @@ class TextController extends Controller {
          $files = new UserFilesEplugin($this->getRights());
          $files->setIdArticle($this->getModule()->getId());
          $this->container()->addEplugin('files', $files);
-      }
-
-      if($this->getModule()->getParam(self::PARAM_IMAGES, true)){
-         //	Uživatelské obrázky
-         $images = new UserImagesEplugin($this->getRights());
-         $images->setIdArticle($this->getModule()->getId());
-         $this->container()->addEplugin('images', $images);
       }
 
       $form = new Form();
