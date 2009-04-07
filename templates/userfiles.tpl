@@ -55,12 +55,14 @@
                   var tbl ="<tr><td rowspan=\"3\">";
                   if(ufile.type == 'image'){
                      tbl+="<a href=\""+ufile.link_show+"\" rel=\"lightbox\" title=\""+ufile.file+"\"><img src=\""+ufile.link_small+"\" alt=\""+ufile.file+"\" height=\"60\" /></a>"
+                  } else if(ufile.type == 'flash'){
+                     tbl+="<img src=\"images/icons/flashfile.png\" alt=\"file "+ufile.file+"\" height=\"60\" />";
                   } else {
-                     tbl+="<img src=\"images/icons/textfile.png\" align=\"file {$FILE.file}\" height=\"60\" />";
+                     tbl+="<img src=\"images/icons/textfile.png\" alt=\"file "+ufile.file+"\" height=\"60\" />";
                   }
                   tbl+="</td><td>"+ufile.file
                      +"</td><td>"+ Math.round(ufile.size/1024 * 100)/100 + "KB";
-                  if(ufile.type == 'image'){
+                  if(ufile.type == 'image' || ufile.type == 'flash'){
                      tbl+=" "+ufile.width+" x "+ufile.height+"px";
                   }
                   tbl+="</td><td align=\"right\">";
@@ -113,6 +115,8 @@
                <a href="{$FILE.link_show}" rel="lightbox" title="{$FILE.file}" rel="lightbox">
                   <img src="{$FILE.link_small}" alt="file {$FILE.file}" height="60" />
                </a>
+               {elseif $FILE.type eq 'flash'}
+                  <img src="images/icons/flashfile.png" alt="file {$FILE.file}" height="60" />
                {else}
                   <img src="images/icons/textfile.png" alt="file {$FILE.file}" height="60" />
                {/if}
@@ -120,7 +124,7 @@
             <td>{$FILE.file}</td>
             <td>
                {math equation="x/1024" x=$FILE.size format="%.2f"}KB
-               {if $FILE.type eq 'image'}
+               {if $FILE.type eq 'image' OR $FILE.type eq 'flash'}
                {$FILE.width} x {$FILE.height}px
                {/if}
             </td>

@@ -551,14 +551,23 @@ class AppCore {
       $this->template->config_dir = self::sysConfig()->getOptionValue("config_dir", "smarty");
 
       //nastavení cesty k pluginům smarty
-      $this->template->plugins_dir = array(
-                              'plugins', // the default under SMARTY_DIR
-                              '..'.DIRECTORY_SEPARATOR . 'plugins'.DIRECTORY_SEPARATOR);
+      $this->template->plugins_dir[] = '../plugins';
 
+      // filtry pro jazyky
+      switch (Locale::getLang()) {
+         case 'cs':
+            //$this->template->load_filter('post', 'cztypo');
+            $this->template->load_filter('output', 'czechtypo');
+            break;
+         default:
+            break;
+      }
       //		Pokud je debug tak vypnout kešování smarty
       if(self::$debugLevel >= 2){
          $this->template->force_compile = true;
          $this->template->clear_compiled_tpl();
+      } else {
+         $this->template->caching = true;
       }
       //		Vytvoření objektu šablon pro jádro
       $this->coreTpl = new Template();
@@ -879,6 +888,7 @@ class AppCore {
       else {
          $faceFilePath = '';
       }
+
       //		Zvolení zobrazovaného média
       //		Medium pro tisk
       if(UrlRequest::getMediaType() == UrlRequest::MEDIA_TYPE_PRINT){
