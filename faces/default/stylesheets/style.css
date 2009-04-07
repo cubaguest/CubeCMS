@@ -491,11 +491,16 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 /* Styl pro vnitrek boxu */
 	/* obal text */
 .moduleBox {
-  position: relative;
+   position: relative;
 	border: 1px solid #0f6572;
-	width: 100%;
+	/*width: 100%;*/
 	margin-bottom: 10px;
 	background-color: white;
+   padding: 7px;
+}
+
+.moduleBox>div {
+   
 }
 
 	/* titulek obal */

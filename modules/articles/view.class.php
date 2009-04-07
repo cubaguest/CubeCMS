@@ -12,6 +12,19 @@ class ArticlesView extends View {
 
       $this->template()->addTpl("list.tpl");
 
+      $lists = $this->container()->getData('ARTICLE_LIST_ARRAY');
+      foreach ($lists as $key => $article) {
+         $out = array();
+         preg_match("/(<img[^>]*\/?>)/i", $article[ArticleDetailModel::COLUMN_ARTICLE_TEXT], $out);
+         if(!empty ($out[1])){
+            preg_match('/src="([^"]*)"/i', $out[1], $out);
+            $lists[$key]['title_image'] = $out[1];
+         } else {
+            $lists[$key]['title_image'] = null;
+         }
+      }
+      $this->template()->addVar('ARTICLE_LIST_ARRAY', $lists);
+
       $this->template()->addVar("ARTICLES_LIST_NAME", _m("Články"));
       $this->template()->addVar("ARTICLES_MORE_NAME", _m("Více"));
       $this->template()->addCss("style.css");
