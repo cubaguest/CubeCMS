@@ -37,6 +37,7 @@ class Form {
    const INPUT_FILE     = 'inputfile';
    const INPUT_DATE     = 'inputdate';
    const INPUT_TEXTAREA	= 'textarea';
+   const INPUT_SELECT	= 'select';
 
  /**
   * Způsob kódování přenesených dat
@@ -288,9 +289,24 @@ class Form {
    *
    * @return Form
    */
-   public function crInputCheckboxn($name) {
+   public function crInputCheckbox($name) {
       $this->formStructure[self::INPUT_CHECKBOX][$name][self::ITEM_NAME] = $name;
       $this->formValues[$name] = false;
+
+      return $this;
+   }
+
+  /**
+   * Metody vytváří prvek typu SELECT
+   *
+   * @param string $name -- Název prvku
+   * @param int/string $defaultValue -- (option) výchozí hodnota prvku
+   *
+   * @return Form
+   */
+   public function crSelect($name, $defaultValue = null) {
+      $this->formStructure[self::INPUT_SELECT][$name][self::ITEM_NAME] = $name;
+      $this->formValues[$name] = $defaultValue;
 
       return $this;
    }
@@ -557,6 +573,10 @@ class Form {
       if(isset ($this->formStructure[self::INPUT_CHECKBOX])){
          $this->fillInInputCheckbox();
       }
+      //    vyplnění checkbox polí
+      if(isset ($this->formStructure[self::INPUT_SELECT])){
+         $this->fillInInputSelect();
+      }
       //    vyplnění heslových polí
       if(isset ($this->formStructure[self::INPUT_PASSWORD])){
          $this->fillInInputPassword();
@@ -715,6 +735,24 @@ class Form {
             }
          } else {
             $this->formValues[$inputName] = false;
+         }
+      }
+   }
+
+  /**
+   * Metoda vyplní data z formuláře do pole hodnot s daty
+   */
+   private function fillInInputSelect() {
+      $inputs = $this->formStructure[self::INPUT_SELECT];
+
+      foreach ($inputs as $inputName => $value) {
+         if(isset ($_POST[$this->formPrefix.$inputName])){
+            //            Je odeslán bez hodnoty
+            if($_POST[$this->formPrefix.$inputName] != ''){
+               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
+            }
+         } else {
+            throw new RangeException($this->createErrorMsg('select', $inputName),3);
          }
       }
    }

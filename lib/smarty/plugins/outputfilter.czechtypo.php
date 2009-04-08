@@ -33,9 +33,9 @@
 	$text = eregi_replace($pattern, $replacement, $text);
 
 	//české uvozovky
-	$pattern = "\"([^\\]+)\"";
-	$replacement = "&#8222;\\1&#8220;";
-	$text = eregi_replace($pattern, $replacement, $text);
+//	$pattern = '"([^\\"]+)"';
+//	$replacement = "&#8222;\\1&#8220;";
+//	$text = eregi_replace($pattern, $replacement, $text);
 	return $text;
  }
 ?>

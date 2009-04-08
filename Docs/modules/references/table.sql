@@ -9,9 +9,7 @@ INSERT INTO `dev`.`vypecky_modules` (
 `dbtable2` ,
 `dbtable3`
 )
-VALUES (
-NULL , 'references', NULL , 'references', 'references', 'texts' NULL
-);
+VALUES (NULL , 'references', NULL , 'references', 'references', 'texts' , NULL);
 
 -- --------------------------------------------------------
 
