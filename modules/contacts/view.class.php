@@ -82,12 +82,12 @@ class ContactsView extends View {
     * Viewer pro editaci novinky
     */
    public function editView() {
-      $this->template()->addTpl('editReference.tpl');
+      $this->template()->addTpl('editContact.tpl');
       $this->template()->addCss("style.css");
 
-      $this->template()->setTplSubLabel(_m("Úprava reference").' - '.$this->container()->getData('REFERENCE_NAME'));
-      $this->template()->setSubTitle(_m("Úprava reference").' - '.$this->container()->getData('REFERENCE_NAME'), true);
-      $this->template()->addVar("ADD_REFERENCE_LABEL",_m("Úprava reference").' - '.$this->container()->getData('REFERENCE_NAME'));
+      $this->template()->setTplSubLabel(_m("Úprava kontaktu").' - '.$this->container()->getData('CONTACT_NAME'));
+      $this->template()->setSubTitle(_m("Úprava kontaktu").' - '.$this->container()->getData('CONTACT_NAME'), true);
+      $this->template()->addVar("ADD_CONTACT_LABEL",_m("Úprava kontaktu").' - '.$this->container()->getData('CONTACT_NAME'));
 
       $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
       $this->assignLabels();
@@ -96,6 +96,8 @@ class ContactsView extends View {
       $tinyMce = new TinyMce();
       $tinyMce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
       $this->template()->addJsPlugin($tinyMce);
+
+      $this->seradAreas();
 
       //Taby - uspořádání
       $jquery = new JQuery();

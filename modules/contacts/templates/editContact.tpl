@@ -23,7 +23,7 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
    <label>{$VARS.CONTACT_CITY_LABEL}</label><br />
    <select name="contact_id_city">
        <option value='0'>--</option>
-      {html_options options=$VARS.AREAS selected=$VARS.SELECT_AREA}
+      {html_options options=$VARS.AREAS selected=$VARS.CONTACT_DATA.id_city}
    </select>
 	<br />
 	<br />

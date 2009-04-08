@@ -9,7 +9,7 @@ class ContactModel extends DbModel {
     */
    const COLUMN_CONTACT_NAME = 'name';
    const COLUMN_CONTACT_ID_ITEM = 'id_item';
-   const COLUMN_CONTACT_ID = 'id_reference';
+   const COLUMN_CONTACT_ID = 'id_contact';
    const COLUMN_CONTACT_ID_CITY = 'id_city';
    const COLUMN_CONTACT_FILE = 'file';
    const COLUMN_CONTACT_CHANGED_TIME = 'changed_time';
@@ -26,6 +26,7 @@ class ContactModel extends DbModel {
    
    private $conId = null;
    private $conFile = null;
+   private $conIdCity = null;
 
    /**
     * Metoda uloží referenci do db
@@ -85,86 +86,96 @@ class ContactModel extends DbModel {
       return $this->getDb()->fetchAll($sqlSelect);
    }
 
-   public function getLabelsLangs() {
-      return $this->refLabe;
+   public function getTextsLangs() {
+      return $this->conText;
    }
 
    public function getNamesLangs() {
-      return $this->refName;
+      return $this->conName;
    }
 
    public function getId() {
-      return $this->refId;
+      return $this->conId;
    }
+
+   public function getIdCity() {
+      return $this->conIdCity;
+   }
+
    public function getFile($id = null) {
       if($this->getNamesLangs() == null AND $id != null){
-         $this->getReferenceDetailAllLangs($id);
+         $this->getContactDetailAllLangs($id);
       }
-      return $this->refFile;
+      return $this->conFile;
    }
 
    /**
-    * Metoda vrací referenci podle zadaného ID ve všech jazycích
+    * Metoda vrací kontakt podle zadaného ID ve všech jazycích
     *
-    * @param integer -- id reference
-    * @return array -- pole s referencí
+    * @param integer -- id kontaktu
+    * @return array -- pole s kontaktem
     */
-   public function loadReferenceDetailAllLangs($id) {
+   public function loadContactDetailAllLangs($id) {
       //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable())
-      ->where(self::COLUMN_REFERENCE_ID, $id);
-      $reference = $this->getDb()->fetchAssoc($sqlSelect);
-      if(!empty ($reference)){
-         $reference = $this->parseDbValuesToArray($reference, array(self::COLUMN_REFERENCE_NAME,
-               self::COLUMN_REFERENCE_LABEL));
-         $this->refName = $reference[self::COLUMN_REFERENCE_NAME];
-         $this->refLabe = $reference[self::COLUMN_REFERENCE_LABEL];
-         $this->refId = $reference[self::COLUMN_REFERENCE_ID];
-         $this->refFile = $reference[self::COLUMN_REFERENCE_FILE];
+      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'contact')
+      ->colums(Db::COLUMN_ALL)
+      ->join(array('city' => $this->getModule()->getDbTable(3)), array('contact' => self::COLUMN_CONTACT_ID_CITY,
+         self::COLUMN_ID_CITY), null, self::COLUMN_CONTACT_ID_CITY)
+      ->where(self::COLUMN_CONTACT_ID, $id);
+      $contact = $this->getDb()->fetchAssoc($sqlSelect);
+      if(!empty ($contact)){
+         $contact = $this->parseDbValuesToArray($contact, array(self::COLUMN_CONTACT_NAME,
+               self::COLUMN_CONTACT_TEXT));
+         $this->conName = $contact[self::COLUMN_CONTACT_NAME];
+         $this->conText = $contact[self::COLUMN_CONTACT_TEXT];
+         $this->conId = $contact[self::COLUMN_CONTACT_ID];
+         $this->conFile = $contact[self::COLUMN_CONTACT_FILE];
+         $this->conIdCity = $contact[self::COLUMN_CONTACT_ID_CITY];
       }
-      return $reference;
+      return $contact;
    }
 
    /**
-    * Metoda uloží upravenou ovinku do db
+    * Metoda uloží upravený kontakt do db
     *
     * @param array -- pole s detaily novinky
     */
-   public function saveEditReference($names, $labels, $file, $id) {
+   public function saveEditContact($names, $labels, $file, $idCity, $id) {
       if($file != null){
-         $refArr = $this->createValuesArray(self::COLUMN_REFERENCE_NAME, $names,
-            self::COLUMN_REFERENCE_LABEL, $labels,
-            self::COLUMN_REFERENCE_CHANGED_TIME, time(),
-            self::COLUMN_REFERENCE_FILE, $file);
+         $conArr = $this->createValuesArray(self::COLUMN_CONTACT_NAME, $names,
+            self::COLUMN_CONTACT_TEXT, $labels,
+            self::COLUMN_CONTACT_CHANGED_TIME, time(),
+            self::COLUMN_CONTACT_ID_CITY, $idCity,
+            self::COLUMN_CONTACT_FILE, $file);
       } else {
-         $refArr = $this->createValuesArray(self::COLUMN_REFERENCE_NAME, $names,
-            self::COLUMN_REFERENCE_LABEL, $labels,
-            self::COLUMN_REFERENCE_CHANGED_TIME, time());
+         $conArr = $this->createValuesArray(self::COLUMN_CONTACT_NAME, $names,
+            self::COLUMN_CONTACT_TEXT, $labels,
+            self::COLUMN_CONTACT_ID_CITY, $idCity,
+            self::COLUMN_CONTACT_CHANGED_TIME, time());
       }
 
       $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable(), true)
-      ->set($refArr)
-      ->where(self::COLUMN_REFERENCE_ID, $id);
+      ->set($conArr)
+      ->where(self::COLUMN_CONTACT_ID, $id);
       // vložení do db
       return $this->getDb()->query($sqlInsert);
    }
 
-   public function deleteReference($id) {
-      //			smazání novinky
+   public function deleteContact($id) {
       $sqlUpdate = $this->getDb()->delete()->table($this->getModule()->getDbTable(), true)
-      ->where(self::COLUMN_REFERENCE_ID, $id);
+      ->where(self::COLUMN_CONTACT_ID, $id);
       return $this->getDb()->query($sqlUpdate);
    }
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(1))
-                  ->colums(self::COLUMN_REFERENCE_CHANGED_TIME)
-						->where(self::COLUMN_REFERENCE_ID_ITEM, $this->getModule()->getId())
-                  ->order(self::COLUMN_REFERENCE_CHANGED_TIME, Db::ORDER_ASC)
+                  ->colums(self::COLUMN_CONTACT_CHANGED_TIME)
+						->where(self::COLUMN_CONTACT_ID_ITEM, $this->getModule()->getId())
+                  ->order(self::COLUMN_CONTACT_CHANGED_TIME, Db::ORDER_ASC)
                   ->limit(0, 1);
 		$time = $this->getDb()->fetchAssoc($sqlSelect);
       if(!empty ($time)){
-         return $time[self::COLUMN_REFERENCE_CHANGED_TIME];
+         return $time[self::COLUMN_CONTACT_CHANGED_TIME];
       }
 		return false;
    }

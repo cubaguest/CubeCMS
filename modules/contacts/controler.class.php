@@ -56,7 +56,7 @@ class ContactsController extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       if($this->getrights()->iswritable()){
-         $this->checkDeleteReference();
+         $this->checkDeleteContact();
       }
       //		Vytvoření modelu
       $referModel = new ContactModel();
@@ -121,7 +121,7 @@ class ContactsController extends Controller {
             }
          }
       }
-      $this->container()->addData('CONTACTS_DATA', $addContactForm->getValues());
+      $this->container()->addData('CONTACT_DATA', $addContactForm->getValues());
       $this->container()->addData('ERROR_ITEMS', $addContactForm->getErrorItems());
       $this->container()->addData('AREAS', $cities);
       $this->container()->addData('SELECT_AREA', 0);
@@ -130,37 +130,42 @@ class ContactsController extends Controller {
    }
 
   /**
-   * controller pro úpravu novinky
+   * controller pro úpravu kontaktu
    */
    public function editController() {
       $this->checkWritebleRights();
-      $referenceForm = new Form();
-      $referenceForm->setPrefix(self::FORM_PREFIX);
-      $referenceForm->crInputText(self::FORM_INPUT_NAME, true, true)
-      ->crTextArea(self::FORM_INPUT_LABEL, true, true, Form::CODE_HTMLDECODE)
+
+      $contM = new ContactModel();
+      // načtení měst
+      $cities = $contM->getAreas();
+
+      $editContactForm = new Form(self::FORM_PREFIX);
+      $editContactForm->crInputText(self::FORM_INPUT_NAME, true, true)
+      ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
       ->crInputFile(self::FORM_INPUT_FILE)
+      ->crSelect(self::FORM_INPUT_ID_CITY, 0)
       ->crSubmit(self::FORM_BUTTON_SEND);
       //      Načtení hodnot prvků
-      $referM = new ReferenceModel();
-      $referM->loadReferenceDetailAllLangs($this->getArticle()->getArticle());
+      $contM->loadContactDetailAllLangs($this->getArticle()->getArticle());
       //      Nastavení hodnot prvků
-      $referenceForm->setValue(self::FORM_INPUT_NAME, $referM->getNamesLangs());
-      $referenceForm->setValue(self::FORM_INPUT_LABEL, $referM->getLabelsLangs());
-      $label = $referM->getNamesLangs();
-      $this->container()->addData('REFERENCE_NAME', $label[Locale::getLang()]);
+      $editContactForm->setValue(self::FORM_INPUT_NAME, $contM->getNamesLangs());
+      $editContactForm->setValue(self::FORM_INPUT_TEXT, $contM->getTextsLangs());
+      $editContactForm->setValue(self::FORM_INPUT_ID_CITY, $contM->getIdCity());
+      $name = $contM->getNamesLangs();
+      $this->container()->addData('CONTACT_NAME', $name[Locale::getLang()]);
       //        Pokud byl odeslán formulář
-      if($referenceForm->checkForm()){
+      if($editContactForm->checkForm()){
             $imageName = null;
          // byl odeslán obrázek
-         if($referenceForm->getValue(self::FORM_INPUT_FILE)){
-            $image = new ImageFile($referenceForm->getValue(self::FORM_INPUT_FILE));
+         if($editContactForm->getValue(self::FORM_INPUT_FILE)){
+            $image = new ImageFile($editContactForm->getValue(self::FORM_INPUT_FILE));
             // kontrola jestli je obrázek
             if($image->isImage()){
                // smažeme starý
                try {
-                  $oldImage = new File($referM->getFile(), $this->getModule()->getDir()->getDataDir());
+                  $oldImage = new File($contM->getFile(), $this->getModule()->getDir()->getDataDir());
                   $oldImage->remove();
-                  $oldImage = new File($referM->getFile(), $this->getModule()->getDir()->getDataDir()
+                  $oldImage = new File($contM->getFile(), $this->getModule()->getDir()->getDataDir()
                      .self::IMAGES_SMALL_DIR.DIRECTORY_SEPARATOR);
                   $oldImage->remove();
                } catch (Exception $e) {
@@ -181,20 +186,21 @@ class ContactsController extends Controller {
          }
          //            Uložení dat do db
          
-         if(!$referM->saveEditReference($referenceForm->getValue(self::FORM_INPUT_NAME),
-               $referenceForm->getValue(self::FORM_INPUT_LABEL),
-               $imageName, $this->getArticle()->getArticle())){
-            throw new ModuleException(_m('Chyba při ukládání obrázku'),3);
+         if(!$contM->saveEditContact($editContactForm->getValue(self::FORM_INPUT_NAME),
+               $editContactForm->getValue(self::FORM_INPUT_TEXT),
+               $imageName, $editContactForm->getValue(self::FORM_INPUT_ID_CITY),
+               $this->getArticle()->getArticle())){
+            throw new ModuleException(_m('Chyba při ukládání kontaktu'),3);
          }
 
-         $this->infoMsg()->addMessage(_m('Reference byla uložena'));
+         $this->infoMsg()->addMessage(_m('Kontakt byl uložen'));
          $this->getLink()->action()->article()->reload();
       }
 
       //    Data do šablony
-      $this->container()->addData('REFERENCE_DATA', $referenceForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $referenceForm->getErrorItems());
-
+      $this->container()->addData('CONTACT_DATA', $editContactForm->getValues());
+      $this->container()->addData('ERROR_ITEMS', $editContactForm->getErrorItems());
+      $this->container()->addData('AREAS', $cities);
       //		Odkaz zpět
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }
@@ -202,30 +208,27 @@ class ContactsController extends Controller {
   /**
    * metoda pro mazání novinky
    */
-   private function checkDeleteReference() {
+   private function checkDeleteContact() {
       $delForm = new Form(self::FORM_PREFIX);
       $delForm->crSubmit(self::FORM_BUTTON_DELETE)
       ->crInputHidden(self::FORM_INPUT_ID, true, 'is_numeric');
 
       if($delForm->checkForm()){
-         $referM = new ReferenceModel();
-         $referM->loadReferenceDetailAllLangs($delForm->getValue(self::FORM_INPUT_ID));
+         $contactM = new ContactModel;
+         $contactM->loadContactDetailAllLangs($delForm->getValue(self::FORM_INPUT_ID));
          // smazání obrázků
          try {
-            $oldImage = new File($referM->getFile(), $this->getModule()->getDir()->getDataDir());
+            $oldImage = new File($contactM->getFile(), $this->getModule()->getDir()->getDataDir());
             $oldImage->remove();
-            $oldImage = new File($referM->getFile(), $this->getModule()->getDir()->getDataDir()
+            $oldImage = new File($contactM->getFile(), $this->getModule()->getDir()->getDataDir()
                .self::IMAGES_SMALL_DIR.DIRECTORY_SEPARATOR);
             $oldImage->remove();
-
             // vymaz z db
-            $referM->deleteReference($delForm->getValue(self::FORM_INPUT_ID));
-
-            $this->infoMsg()->addMessage(_m('Reference byla smazána'));
+            $contactM->deleteContact($delForm->getValue(self::FORM_INPUT_ID));
+            $this->infoMsg()->addMessage(_m('kontakt byl smazán'));
             $this->getLink()->reload();
-
          } catch (Exception $e) {
-            new CoreException(_m('Referenci se nepodařilo smazat').$e->getMessage(), 4);
+            new CoreException(_m('Kontakt se nepodařilo smazat').$e->getMessage(), 4);
          }
 
       }
