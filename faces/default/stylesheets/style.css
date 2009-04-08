@@ -91,9 +91,9 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 
 .column {
 	float: left;
-	padding-bottom: 20010px;
+	/*padding-bottom: 20000px;*/
 	/* trik z One True Layout pro srovnání výšky sloupců */
-	margin-bottom: -20000px; /* aby měly všechny sloupce stejnou výšku */
+	/*margin-bottom: -20000px; /* aby měly všechny sloupce stejnou výšku */
 }
 
 #col1wrap {
@@ -146,6 +146,10 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 h1 {
 	font-size: 12pt;
 	color: #007070;
+}
+
+h2 {
+   font-size: 12pt;
 }
 
 h3 a {

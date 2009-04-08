@@ -1,5 +1,4 @@
 {include file=module:map.tpl}
-
 {foreach from=$VARS.CONTACTS item="CONTACT" key=KEY}
 {if $VARS.EDITABLE}
 {include file="module:addButton.tpl"}
@@ -21,7 +20,7 @@
    </div>
    {/if}
    {if $AREA_NAME neq $CONTACT.area_name}
-   <p class="smallFont contactAreaName" id="{$CONTACT.area_name|ascii:true|lower}">{$CONTACT.area_name}</p>
+   <p class="contactAreaName" id="{$CONTACT.area_name|ascii:true|lower}">{$CONTACT.area_name}</p>
    {assign var=AREA_NAME value=$CONTACT.area_name}
    {/if}
 
