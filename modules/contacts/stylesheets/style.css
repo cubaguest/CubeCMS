@@ -1,0 +1,20 @@
+@CHARSET "UTF-8";
+.contactImage {
+	display: block;
+   float:left;
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-right: 10px;
+}
+
+div.contact {
+   position: relative;
+}
+
+div.mapBox {
+   text-align:center;
+}
+
+p.contactAreaName {
+   margin: 10px 0;
+}
