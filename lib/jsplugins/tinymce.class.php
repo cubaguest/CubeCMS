@@ -193,7 +193,7 @@ class TinyMce extends JsPlugin {
          if($file->getParam(self::PARAM_FACE) != null){
             $cssurl = Links::getMainWebDir().AppCore::getTepmlateFaceDir(false);
             $cssurl = substr($cssurl, 0, strlen($cssurl)-1).$file->getParam(self::PARAM_FACE).URL_SEPARATOR;
-            $this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style_tiny_mce.css';
+            $this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style.css';
          }
          if($theme != self::TINY_THEME_SIMPLE){
             //         Doplnění parametru (images, media atd.)

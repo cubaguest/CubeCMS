@@ -56,15 +56,13 @@ class Dir {
 	 * @param string -- adresář
 	 */
    public function createDirs($path){
-      if (is_dir($path)){
-         return true;
-      }
       if(!mkdir($path, 0777, true)){
          throw new CoreException(sprintf(_('Adresáři "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),$path), 2);
       }
       if(!chmod($path, 0777)){
          throw new CoreException(sprintf(_('Adresáři "%s" se nepodařilo přidělit potřebná oprávnění'),$path), 3);
       }
+      return true;
    }
 
    /**
@@ -110,7 +108,6 @@ class Dir {
       if($path == null){
          $path = $this->getDir();
       }
-      echo $this->dir;
       if(($path[strlen($path)-1] != '/') AND ($path[strlen($path)-1] != '\\')){
          $path.=DIRECTORY_SEPARATOR;
       }
