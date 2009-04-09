@@ -22,7 +22,7 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 	{/if}
 	<input name="article_reset" type="reset" value="{$VARS.BUTTON_RESET}" />
 	<input name="article_send" type="submit" value="{$VARS.BUTTON_SEND}" />
-	
+	{include file=engine:help.tpl helpfile='edit' module='articles'}
 </form>
 </div>
 {literal}

@@ -32,7 +32,7 @@ class="selected"{/if}>{html_engine_image file=$MAIN_LANG_IMAGES_PATH|cat:$KEYLAN
 	{/if}
 	<input name="contact_reset" type="reset" value="{$VARS.BUTTON_RESET}" />
 	<input name="contact_send" type="submit" value="{$VARS.BUTTON_SEND}" />
-	
+	{include file=engine:help.tpl helpfile='edit' module='contacts'}
 </form>
 </div>
 {literal}
