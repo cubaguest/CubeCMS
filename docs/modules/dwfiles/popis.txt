@@ -1,0 +1,3 @@
+Modul pro práce se soubory ke stažení (např. ceníky atd.)
+
+Obsahuje pouze tabulku, nemá žádné nasatvení v db
