@@ -1,2 +1,0 @@
-ALTER TABLE `rialto_items` CHANGE `label_cs` `label_cs` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
-CHANGE `alt_cs` `alt_cs` VARCHAR( 400 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 

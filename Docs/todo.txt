@@ -1,5 +1,0 @@
-TODO List
-
-- dodělat parametry u JsPluginu - možnost volby ve viewru (např. u TinyMCE)
-- dodělat validátor na fomuláře a třídu pro jednoduchou obsluhu formulářových prvků
-- Dodělat odkazy v hlavičce kategorie, tak aby se na ně dalo klikat jako na cestu ke zvolenému článku
