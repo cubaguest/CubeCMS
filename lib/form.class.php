@@ -419,6 +419,10 @@ class Form {
    * @return boolean -- true pokud je formulář vpořádku
    */
    public function checkForm() {
+      if(!isset ($this->formStructure[self::INPUT_SUBMIT])){
+         throw new CoreException(_('Nebyl nasatven prvek s potvrzovacím tlačítkem'),1);
+      }
+
       if(isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT]]) OR
        isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT].'_x'])){
          $this->fillinForm();

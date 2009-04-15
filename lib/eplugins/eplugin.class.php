@@ -46,7 +46,19 @@ class Eplugin {
 	 * @var Rights
 	 */
 	private $rights = null;
-	
+
+   /**
+    * Id šablony
+    * @var integer
+    */
+   protected $idTpl = 1;
+
+   /**
+    * podnázev šablony pluginu
+    * @var string
+    */
+   protected static $tplSubName = array();
+
 	/**
 	 * Konstruktor třídy, spouští metodu init();
 	 */
@@ -246,5 +258,41 @@ class Eplugin {
       }
       return $file;
 	}
+
+   /**
+	 * Metoda nastaví id šablony pro výpis
+	 * @param integer -- id šablony (jakékoliv)
+	 */
+	public function setIdTpl($id) {
+		$this->idTpl = $id;
+	}
+
+   /**
+    * Metoda vrací id šablony
+    * @return integer
+    */
+   protected function getIdTpl() {
+      return $this->idTpl;
+   }
+
+   /**
+	 * Metoda nastaví podnázev šablony pro výpis
+	 * @param string -- podnázev šablony (jakékoliv)
+	 */
+	public function setTplSubName($name) {
+      self::$tplSubName[$this->getIdTpl()] = $name;
+	}
+
+   /**
+    * Metoda vrací podnázev šablony
+    * @return string
+    */
+   protected function getTplSubName() {
+      if(isset(self::$tplSubName[$this->getIdTpl()])){
+         return self::$tplSubName[$this->getIdTpl()];
+      } else {
+         return null;
+      }
+   }
 }
 ?>

@@ -146,12 +146,6 @@ class UserFilesEplugin extends Eplugin {
    private static $otherFilesArray = array();
 
    /**
-    * ID šablony
-    * @var integer
-    */
-   private $idUserFiles = '1';
-
-   /**
     * Počet vrácených záznamů
     * @var integer
     */
@@ -588,9 +582,9 @@ class UserFilesEplugin extends Eplugin {
       $this->toTpl("FILE_LINK_TO_SHOW_NAME", _("Odkaz pro zobrazení"));
       $this->toTpl("FILE_LINK_TO_DOWNLOAD_NAME", _("Odkaz pro stažení"));
 
-      self::$otherNumberOfReturnRows[$this->idUserFiles] = $this->numberOfReturnRows;
+      self::$otherNumberOfReturnRows[$this->getIdTpl()] = $this->numberOfReturnRows;
       $this->toTpl("USERFILES_NUM_ROWS", self::$otherNumberOfReturnRows);
-      $this->toTpl("USERFILES_ID", $this->idUserFiles);
+      $this->toTpl("USERFILES_ID", $this->getIdTpl());
 
       //		if(!empty(self::$otherChanges)){
       //			$array = self::$otherChanges;
@@ -600,7 +594,7 @@ class UserFilesEplugin extends Eplugin {
       $jQueryPlugin->addPluginAjaxUploadFile();
       $this->toTplJSPlugin($jQueryPlugin);
 
-      self::$otherFilesArray[$this->idUserFiles] = $this->filesArray;
+      self::$otherFilesArray[$this->getIdTpl()] = $this->filesArray;
       $this->toTpl("USERFILES_ARRAY",self::$otherFilesArray);
 
       $ajaxLink = new AjaxLink($this);

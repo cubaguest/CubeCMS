@@ -147,11 +147,19 @@ class Template {
 	/**
 	 * Metoda přidává zadanou šablonu do výstupu
 	 * 
-	 * @param string/array -- název šablony
+	 * @param string/array/Eplugin -- název šablony nebo objekt Epluginu
 	 * @param boolean -- true pokud má být použita systémová šablona
 	 */
 	public function addTpl($tplName, $engineTpl = false, $tplId = 1){
 		$this->checkTemplatesArray();
+      // pokud se jedná o eplugin tak vložíme části
+      if(class_exists(get_class($tplName), false) AND get_parent_class($tplName) == 'Eplugin'){
+         $epl = $tplName;
+         $this->addTpl($epl->getTpl(), true);
+         $epl->assignToTpl($this);
+         return true;
+      }
+
 		//TODO kontrola souborů
 		//přidání šablony do pole s šablonami modulu
 		if($this->getModule() != null){

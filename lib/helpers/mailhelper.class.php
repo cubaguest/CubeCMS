@@ -36,11 +36,13 @@ class MailHelper extends Helper {
 	 * 
 	 * @return boolean -- true pokud se podařilo email odeslat
 	 */
-	public function sendMail($toMail,$subject,$message,$fromMail,$headers = null) {
+	public function sendMail($toMail,$subject,$message,$fromMail=null,$headers = null) {
 //		Vytvoření hlavičky
 //		 -=-=-=- MAIL HEADERS
-		$headers .= "From: $fromMail\n";
-		$headers .= "Reply-To: $fromMail\n";
+      if($fromMail != null){
+         $headers .= "From: $fromMail\n";
+         $headers .= "Reply-To: $fromMail\n";
+      }
 		$headers .= "MIME-Version: 1.0\n";
     	$headers .= "X-Priority: 3 \n";
 		$headers .= "Content-Type: text/plain; charset=UTF-8\n";
