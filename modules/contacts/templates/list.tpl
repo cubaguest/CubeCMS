@@ -1,5 +1,5 @@
 {include file=module:map.tpl}
-{foreach from=$VARS.CONTACTS item="CONTACT" key=KEY}
+{foreach from=$VARS.CONTACTS item="CONTACT" key=KEY name=contacts}
 {if $VARS.EDITABLE}
 {include file="module:addButton.tpl"}
 {/if}
@@ -20,11 +20,17 @@
    </div>
    {/if}
    {if $AREA_NAME neq $CONTACT.area_name}
+   {* linka *}
+   <hr />
+   {if $CONTACT.id_city neq 65535}
    <p class="contactAreaName" id="{$CONTACT.area_name|ascii:true|lower}">{$CONTACT.area_name}</p>
    {assign var=AREA_NAME value=$CONTACT.area_name}
    {/if}
+   {/if}
 
+   {if $CONTACT.id_city neq 65535}
    <p class="smallFont">{$CONTACT.city_name}</p>
+   {/if}
    <h2>{$CONTACT.name}</h2>
    <a href="{$VARS.IMAGES_DIR|cat:$CONTACT.file}" title="{$CONTACT.file}">
       {html_image file=$VARS.IMAGES_SMALL_DIR|cat:$CONTACT.file class='contactImage'}
@@ -41,6 +47,9 @@
    </script>
    {/literal}
    <br class="reseter" />
+   <p style="text-align:right;">
+   <a href="{$THIS_PAGE_LINK}#pageTop" title="{$VARS.PAGE_UP}">[ {$VARS.PAGE_UP} ]</a>
+   </p>
 </div>
 <div class="hr"></div>
 {/foreach}

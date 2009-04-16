@@ -81,6 +81,7 @@ class ContactModel extends DbModel {
       ->join(array('area' => $this->getModule()->getDbTable(2)), array('city' => self::COLUMN_ID_AREA,
             self::COLUMN_ID_AREA),null, self::COLUMN_AREA_NAME)
       ->where('contact.'.self::COLUMN_CONTACT_ID_ITEM, $this->getModule()->getId())
+      ->order('area.'.self::COLUMN_ID_AREA, Db::ORDER_ASC)
       ->order('area.'.self::COLUMN_AREA_NAME)
       ->order('city.'.self::COLUMN_CITY_NAME);
       return $this->getDb()->fetchAll($sqlSelect);

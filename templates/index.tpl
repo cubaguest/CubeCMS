@@ -47,7 +47,7 @@
 {/literal}
 </head>
 
-<body {if !empty($ON_LOAD_JS_FUNCTIONS)}onload="{foreach from=$ON_LOAD_JS_FUNCTIONS item='function'}{$function}; {/foreach}"{/if}>
+<body {if !empty($ON_LOAD_JS_FUNCTIONS)}onload="{foreach from=$ON_LOAD_JS_FUNCTIONS item='function'}{$function}; {/foreach}"{/if} id="pageTop">
 
 <div id="bodywrap">
 

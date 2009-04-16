@@ -558,6 +558,7 @@ class AppCore {
          case 'cs':
             //$this->template->load_filter('post', 'cztypo');
             $this->template->load_filter('output', 'czechtypo');
+            $this->template->load_filter('output', 'trimwhitespace');
             break;
          default:
             break;

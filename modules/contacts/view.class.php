@@ -20,6 +20,8 @@ class ContactsView extends View {
       $jQuery = new JQuery();
       $this->template()->addJsPlugin($jQuery);
       $this->template()->addJsPlugin(new LightBox());
+
+      $this->template()->addVar('PAGE_UP', _m('nahoru'));
    }
 
    /**
