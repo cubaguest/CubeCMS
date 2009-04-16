@@ -1,0 +1,18 @@
+@CHARSET "UTF-8";
+.productsList {
+}
+
+div.productBox {
+   width:300px;
+   float: left;
+}
+
+div.productBox>div {
+   padding: 12px;
+   border: 1px solid gray;
+   margin: 10px;
+}
+
+.productBox p.productImage {
+   text-align: center;
+}

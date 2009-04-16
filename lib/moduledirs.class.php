@@ -156,7 +156,8 @@ class ModuleDirs {
 	 */
 	public function getDataDir($withRelPrefix = true) {
 		if($this->moduleDataDir == null){
-			return false;
+         throw new ModuleException(sprintf(_('Modul "%s" nemá definovaný datový adresář'),
+               AppCore::getSelectedModule()->getName()));
 		} else {
             if($withRelPrefix){
                 return self::getWebDir().self::getWebDataDir().self::DIR_SEPARATOR.$this->moduleDataDir.self::DIR_SEPARATOR;
