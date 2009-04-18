@@ -3,7 +3,7 @@
 
 {* upravit *}
 {if $TEMPLATE.LABEL eq null AND $smarty.foreach.mtemplates.first}
-<h1>&gt;&gt;{$CATEGORY_TITLE}{if $TEMPLATE.SUBLABEL neq null} - {$TEMPLATE.SUBLABEL}{/if}</h1>
+<h1>&gt;&gt;{$MAIN_CATEGORY_TITLE}{if $TEMPLATE.SUBLABEL neq null} - {$TEMPLATE.SUBLABEL}{/if}</h1>
 {else}
 <h1>&gt;&gt;{$TEMPLATE.LABEL}{if $TEMPLATE.SUBLABEL neq null} - {$TEMPLATE.SUBLABEL}{/if}</h1>
 {/if}

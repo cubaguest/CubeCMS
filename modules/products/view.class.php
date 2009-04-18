@@ -11,20 +11,7 @@ class ProductsView extends View {
       }
 
       $this->template()->addTpl("list.tpl");
-/*
-      $lists = $this->container()->getData('ARTICLE_LIST_ARRAY');
-      foreach ($lists as $key => $article) {
-         $out = array();
-         preg_match("/(<img[^>]*\/?>)/i", $article[ProductsController::COLUMN_PRODUCT_TEXT], $out);
-         if(!empty ($out[1])){
-            preg_match('/src="([^"]*)"/i', $out[1], $out);
-            $lists[$key]['title_image'] = $out[1];
-         } else {
-            $lists[$key]['title_image'] = null;
-         }
-      }
-      $this->template()->addVar('ARTICLE_LIST_ARRAY', $lists);
-*/
+
       $this->template()->addVar("PRODUCTS_LIST_NAME", _m("Produkty"));
       $this->template()->addVar("PRODUCTS_MORE_NAME", _m("Více"));
       $this->template()->addCss("style.css");
@@ -36,12 +23,12 @@ class ProductsView extends View {
    public function showView(){
       if($this->getRights()->isWritable()){
          $this->template()->addTpl('editButtons.tpl');
-         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
+         $this->template()->addVar('LINK_TO_ADD_PRODUCT_NAME', _m("Přidat produkt"));
 
-         $this->template()->addVar('LINK_TO_EDIT_ARTICLE_NAME', _m("Upravit"));
+         $this->template()->addVar('LINK_TO_EDIT_PRODUCT_NAME', _m("Upravit"));
 
-         $this->template()->addVar('LINK_TO_DELETE_ARTICLE_NAME', _m("Smazat"));
-         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat článek"));
+         $this->template()->addVar('LINK_TO_DELETE_PRODUCT_NAME', _m("Smazat"));
+         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat produkt"));
 
          //			JSPlugin pro potvrzení mazání
          $submitForm = new SubmitForm();
@@ -58,11 +45,11 @@ class ProductsView extends View {
          $this->template()->addVar('LIGHTBOX', true);
       }
 
-      $this->template()->addTpl("articleDetail.tpl");
+      $this->template()->addTpl("productDetail.tpl");
       $this->template()->addCss("style.css");
 
-      $this->template()->setTplSubLabel($this->container()->getData('ARTICLE_LABEL'));
-      $this->template()->setSubTitle($this->container()->getData('ARTICLE_LABEL'), true);
+      $this->template()->setTplSubLabel($this->container()->getData('PRODUCT_LABEL'));
+      $this->template()->setSubTitle($this->container()->getData('PRODUCT_LABEL'), true);
 
       $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
    }
@@ -122,15 +109,15 @@ class ProductsView extends View {
    /**
     * Viewer pro editaci novinky
     */
-   public function editArticleView() {
-      $this->template()->addTpl('editArticle.tpl');
+   public function editproductView() {
+      $this->template()->addTpl('editProduct.tpl');
       $this->template()->addCss("style.css");
 
-      $this->template()->setTplSubLabel(_m("Úprava článku").' - '.$this->container()->getData('ARTICLE_NAME'));
-      $this->template()->setSubTitle(_m("Úprava článku").' - '.$this->container()->getData('ARTICLE_NAME'), true);
-      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava článku").' - '.$this->container()->getData('ARTICLE_NAME'));
+      $this->template()->setTplSubLabel(_m("Úprava produktu").' - '.$this->container()->getData('PRODUCT_NAME'));
+      $this->template()->setSubTitle(_m("Úprava produktu").' - '.$this->container()->getData('PRODUCT_NAME'), true);
+      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava produktu").' - '.$this->container()->getData('PRODUCT_NAME'));
 
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na článek'));
+      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na produkt'));
       $this->assignLabels();
 
       // tiny mce

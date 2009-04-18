@@ -23,12 +23,11 @@ class ProductDetailModel extends DbModel {
 	const COLUMN_USER_ID =	 'id_user';
 
    private $productLabel = null;
-//
+
    private $productText = null;
-//
+
    private $productId = null;
-//
-   private $productIdUser = null;
+
    private $lastEditIdProduct = null;
 
    /**
@@ -68,33 +67,28 @@ class ProductDetailModel extends DbModel {
    }
 
    /**
-    * Metoda vrací článek podle zadaného ID a v aktuálním jazyku
+    * Metoda vrací produkt podle zadaného ID a v aktuálním jazyku
     *
-    * @param integer -- id článku
-    * @return array -- pole s článkem
+    * @param integer -- id produktu
+    * @return array -- pole s produktem
     */
-   public function getArticleDetailSelLang($id) {
+   public function getProductDetailSelLang($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable(), 'article')
+      ->table($this->getModule()->getDbTable(), 'product')
       ->colums(array(self::COLUMN_PRODUCT_LABEL =>"IFNULL(".self::COLUMN_PRODUCT_LABEL.'_'.Locale::getLang()
             .",".self::COLUMN_PRODUCT_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_PRODUCT_TEXT =>"IFNULL(".self::COLUMN_PRODUCT_TEXT.'_'.Locale::getLang()
             .",".self::COLUMN_PRODUCT_TEXT.'_'.Locale::getDefaultLang().")",
-            self::COLUMN_PRODUCT_TIME, self::COLUMN_PRODUCT_ID, self::COLUMN_PRODUCT_ID_USER))
-      ->join(array('user' => $this->getUserTable()),
-         array('article' => self::COLUMN_PRODUCT_ID_USER, self::COLUMN_USER_ID),
-         null, self::COLUMN_USER_NAME)
-//      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('article.'.self::COLUMN_PRODUCT_ID_ITEM, $this->getModule()->getId())
-      ->where('article.'.self::COLUMN_PRODUCT_ID, $id);
+            self::COLUMN_PRODUCT_ID, self::COLUMN_PRODUCT_FILE))
+      ->where('product.'.self::COLUMN_PRODUCT_ID_ITEM, $this->getModule()->getId())
+      ->where('product.'.self::COLUMN_PRODUCT_ID, $id);
 
-      $article = $this->getDb()->fetchAssoc($sqlSelect);
+      $product = $this->getDb()->fetchAssoc($sqlSelect);
 
-      $this->productId = $article[self::COLUMN_PRODUCT_ID];
-      $this->productIdUser = $article[self::COLUMN_PRODUCT_ID_USER];
+      $this->productId = $product[self::COLUMN_PRODUCT_ID];
 
-      return $article;
+      return $product;
    }
 
    public function getLabelsLangs() {
@@ -114,12 +108,12 @@ class ProductDetailModel extends DbModel {
    }
 
    /**
-    * Metoda vrací novinku podle zadaného ID ve všech jazycích
+    * Metoda vrací produkt podle zadaného ID ve všech jazycích
     *
-    * @param integer -- id novinky
-    * @return array -- pole s novinkou
+    * @param integer -- id produktu
+    * @return array -- pole s produktem
     */
-   public function getArticleDetailAllLangs($id) {
+   public function getProductDetailAllLangs($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
       ->table($this->getModule()->getDbTable())
@@ -127,19 +121,19 @@ class ProductDetailModel extends DbModel {
       ->where(self::COLUMN_PRODUCT_ID_ITEM, $this->getModule()->getId())
       ->where(self::COLUMN_PRODUCT_ID, $id);
 
-      $article = $this->getDb()->fetchAssoc($sqlSelect);
+      $product = $this->getDb()->fetchAssoc($sqlSelect);
 
-      if(empty ($article)){
-         throw new UnexpectedValueException(_('Zadaný článek neexistuje'), 1);
+      if(empty ($product)){
+         throw new UnexpectedValueException(_('Zadaný produkt neexistuje'), 1);
       }
-      $article = $this->parseDbValuesToArray($article, array(self::COLUMN_PRODUCT_LABEL,
+      $product = $this->parseDbValuesToArray($product, array(self::COLUMN_PRODUCT_LABEL,
                self::COLUMN_PRODUCT_TEXT));
 
-      $this->productText = $article[self::COLUMN_PRODUCT_TEXT];
-      $this->productLabel = $article[self::COLUMN_PRODUCT_LABEL];
-      $this->productId = $article[self::COLUMN_PRODUCT_ID];
+      $this->productText = $product[self::COLUMN_PRODUCT_TEXT];
+      $this->productLabel = $product[self::COLUMN_PRODUCT_LABEL];
+      $this->productId = $product[self::COLUMN_PRODUCT_ID];
 
-      return $article;
+      return $product;
    }
 
    /**
@@ -147,10 +141,17 @@ class ProductDetailModel extends DbModel {
     *
     * @param array -- pole s detaily článku
     */
-   public function saveEditArticle($labels, $texts, $id) {
+   public function saveEditProduct($labels, $texts, $file, $id) {
+      if($file == null){
       $articleArr = $this->createValuesArray(self::COLUMN_PRODUCT_LABEL, $labels,
                                           self::COLUMN_PRODUCT_TEXT, $texts,
                                           self::COLUMN_PRODUCT_EDIT_TIME, time());
+      } else {
+         $articleArr = $this->createValuesArray(self::COLUMN_PRODUCT_LABEL, $labels,
+                                          self::COLUMN_PRODUCT_TEXT, $texts,
+                                          self::COLUMN_PRODUCT_FILE, $file,
+                                          self::COLUMN_PRODUCT_EDIT_TIME, time());
+      }
 
       $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
             ->set($articleArr)

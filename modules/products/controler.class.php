@@ -72,49 +72,37 @@ class ProductsController extends Controller {
    }
 
    public function showController(){
-      $articleDetail = new ProductDetailModel();
-      $articleArr = $articleDetail->getArticleDetailSelLang($this->getArticle()->getArticle());
+      $pproductDetail = new ProductDetailModel();
+      $productArr = $pproductDetail->getProductDetailSelLang($this->getArticle()->getArticle());
 
-      //      obsluha Mazání novinky
-      if(($this->getRights()->isWritable() AND $articleDetail->getIdUser()
-            == $this->getRights()->getAuth()->getUserId()) OR
-         $this->getRights()->isControll()){
-         
-      }
+      $this->container()->addData('PRODUCT', $productArr);
+      $this->container()->addData('PRODUCT_LABEL', $productArr[ProductDetailModel::COLUMN_PRODUCT_LABEL]);
 
-      $this->container()->addData('ARTICLE', $articleArr);
-      $this->container()->addData('ARTICLE_LABEL', $articleArr[ProductDetailModel::COLUMN_PRODUCT_LABEL]);
-
-      if($this->getRights()->isControll() OR
-         ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
-         ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == true AND
-            $articleDetail->getIdUser() == $this->getRights()->getAuth()->getUserId())){
-
+      if($this->getRights()->isWritable()){
          $form = new Form(self::FORM_PREFIX);
          $form->crInputHidden(self::FORM_INPUT_ID, true, 'is_numeric')
          ->crSubmit(self::FORM_BUTTON_DELETE);
 
          if($form->checkForm()){
             $files = new UserFilesEplugin($this->getRights());
-            $files->deleteAllFiles($articleArr[ProductDetailModel::COLUMN_PRODUCT_ID]);
-            $images = new UserImagesEplugin($this->getRights());
-            $images->deleteAllImages($articleArr[ProductDetailModel::COLUMN_PRODUCT_ID]);
-            if(!$articleDetail->deleteArticle($form->getValue(self::FORM_INPUT_ID))){
-               throw new UnexpectedValueException(_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
+            $files->deleteAllFiles($productArr[ProductDetailModel::COLUMN_PRODUCT_ID]);
+            if(!$pproductDetail->deleteArticle($form->getValue(self::FORM_INPUT_ID))){
+               throw new UnexpectedValueException(_m('Produkt se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
-            $this->infoMsg()->addMessage(_m('Článek byl smazán'));
+            $this->infoMsg()->addMessage(_m('Produkt byl smazán'));
             $this->getLink()->article()->action()->rmParam()->reload();
          }
 
-         $this->container()->addLink('EDIT_LINK', $this->getLink()->action($this->getAction()->editArticle()));
+         $this->container()->addLink('EDIT_LINK', $this->getLink()->action($this->getAction()->editProduct()));
          $this->container()->addData('EDITABLE', true);
       }
 
       if($this->getRights()->isWritable()){
-         $this->container()->addLink('ADD_LINK',$this->getLink()->action($this->getAction()->addArticle())->article());
+         $this->container()->addLink('ADD_LINK',$this->getLink()->action($this->getAction()->addProduct())->article());
          $this->container()->addData('WRITABLE', true);
       }
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
+      $this->container()->addData('IMAGES_PATH', $this->getModule()->getDir()->getDataDir(true));
    }
 
    /**
@@ -173,47 +161,67 @@ class ProductsController extends Controller {
    }
 
   /**
-   * controller pro úpravu novinky
+   * controller pro úpravu produktu
    */
-   public function editArticleController() {
+   public function editProductController() {
       $this->checkWritebleRights();
 
-      $ardicleEditForm = new Form(self::FORM_PREFIX);
+      $productEditForm = new Form(self::FORM_PREFIX);
 
-      $ardicleEditForm->crInputText(self::FORM_INPUT_LABEL, true, true)
+      $productEditForm->crInputText(self::FORM_INPUT_LABEL, true, true)
       ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
+      ->crInputFile(self::FORM_INPUT_IMAGE, false)
       ->crSubmit(self::FORM_BUTTON_SEND);
 
       //      Načtení hodnot prvků
-      $articleModel = new ProductDetailModel();
-      $articleModel->getArticleDetailAllLangs($this->getArticle());
+      $productModel = new ProductDetailModel();
+      $productModel->getProductDetailAllLangs($this->getArticle());
       //      Nastavení hodnot prvků
-      $ardicleEditForm->setValue(self::FORM_INPUT_LABEL, $articleModel->getLabelsLangs());
-      $ardicleEditForm->setValue(self::FORM_INPUT_TEXT, $articleModel->getTextsLangs());
-      $label = $articleModel->getLabelsLangs();
+      $productEditForm->setValue(self::FORM_INPUT_LABEL, $productModel->getLabelsLangs());
+      $productEditForm->setValue(self::FORM_INPUT_TEXT, $productModel->getTextsLangs());
+      $label = $productModel->getLabelsLangs();
       
-      $this->container()->addData('ARTICLE_NAME', $label[Locale::getLang()]);
+      $this->container()->addData('PRODUCT_NAME', $label[Locale::getLang()]);
 
       if($this->getModule()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
          $files = new UserFilesEplugin($this->getRights());
-         $files->setIdArticle($articleModel->getId());
+         $files->setIdArticle($productModel->getId());
          $this->container()->addEplugin('files', $files);
       }
 
       //        Pokud byl odeslán formulář
-      if($ardicleEditForm->checkForm()){
-         if(!$articleModel->saveEditArticle($ardicleEditForm->getValue(self::FORM_INPUT_LABEL),
-               $ardicleEditForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 2);
+      if($productEditForm->checkForm()){
+         $fileName = null;
+         $isImage = true;
+         // pokud byl odeslán soubor
+         try {
+            if($productEditForm->getValue(self::FORM_INPUT_IMAGE) != null){
+               $image = new ImageFile($productEditForm->getValue(self::FORM_INPUT_IMAGE));
+               if($image->isImage()){
+                  $image->saveImage($this->getModule()->getDir()->getDataDir());
+                  $fileName = $image->getName();
+               } else {
+                  $isImage = false;
+               }
+            }
+
+            if(!$isImage OR !$productModel->saveEditProduct($productEditForm->getValue(self::FORM_INPUT_LABEL),
+                  $productEditForm->getValue(self::FORM_INPUT_TEXT),
+                  $fileName, $this->getArticle())){
+               throw new UnexpectedValueException(_m('Produkt se nepodařilo uložit, chyba při ukládání.'), 2);
+            }
+            $this->infoMsg()->addMessage(_m('Produkt byl uložen'));
+            $this->getLink()->action()->reload();
+         } catch (Exception $e) {
+            new CoreErrors($e);
          }
-         $this->infoMsg()->addMessage(_m('Článek byl uložen'));
-         $this->getLink()->action()->reload();
+
       }
 
       //    Data do šablony
-      $this->container()->addData('ARTICLE_DATA', $ardicleEditForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $ardicleEditForm->getErrorItems());
+      $this->container()->addData('PRODUCT_DATA', $productEditForm->getValues());
+      $this->container()->addData('ERROR_ITEMS', $productEditForm->getErrorItems());
 
       //		Odkaz zpět
       $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
