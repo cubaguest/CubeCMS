@@ -283,14 +283,13 @@ class File {
       $this->fileNewName = $newFile;
 
       if(!$this->exist()){
-         throw new UnexpectedValueException(_('Soubor pro kopírování neexistuje'), 1);
+         throw new UnexpectedValueException(sprintf(_('Soubor %s pro kopírování neexistuje'), $this->getNameInput(true)), 1);
       }
       if(!copy($this->getNameInput(true), $dstDir.$newFile)){
-         throw new UnexpectedValueException(_('Chyba při kopírování souboru').' "'
-            .$this->getNameInput(true).'" > "'.$dstDir.$newFile.'"', 2);
+         throw new UnexpectedValueException(sprintf(_('Chyba při kopírování souboru %s > %s'), $this->getNameInput(true), $dstDir.$newFile), 2);
       }
       if(!chmod($dstDir.$newFile, 0666)){
-         throw new UnexpectedValueException(_('Chyba při úpravě práv souboru'), 3);
+         throw new UnexpectedValueException(sprintf(_('Chyba při úpravě práv souboru %s'),$this->getNameInput(true)), 3);
       }
       return true;
    }
@@ -326,7 +325,7 @@ class File {
       if($this->exist() AND !is_dir($this->getNameInput(true))){
          return unlink($this->getNameInput(true));
       }
-      return false;
+      throw new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getNameInput()));
    }
 
    /**

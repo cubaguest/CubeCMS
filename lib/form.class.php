@@ -139,24 +139,6 @@ class Form {
    private $errorItems = array();
 
   /**
-  * Obejt pro informační hlášky
-  * @var Messages
-  */
-   private $infomsg = null;
-
- /**
-  * Obejt pro chybové hlášky hlášky
-  * @var Messages
-  */
-   private $errmsg = null;
-
- /**
-  * Objekt modulu
-  * @var Module
-  */
-   private $module = null;
-
-  /**
    * Prefix pro formulářové prvky první úrovně
    * @var string
    */
@@ -835,9 +817,10 @@ nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inpu
       $inputs = $this->formStructure[self::INPUT_DATE];
       foreach ($inputs as $inputName => $value) {
          if(isset ($_POST[$this->formPrefix.$inputName])){
-            $timestamp = mktime(0, 0, 0, $_POST[$this->formPrefix.$inputName]['Date_Day'],
-               $_POST[$this->formPrefix.$inputName]['Date_Month'],
+            $timestamp = mktime(0, 0, 0, $_POST[$this->formPrefix.$inputName]['Date_Month'],
+               $_POST[$this->formPrefix.$inputName]['Date_Day'],
                $_POST[$this->formPrefix.$inputName]['Date_Year']);
+            $this->formValues[$inputName] = $timestamp;
          } else {
             $this->formValues[$inputName] = false;
          }

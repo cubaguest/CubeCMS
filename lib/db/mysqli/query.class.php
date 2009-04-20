@@ -261,12 +261,10 @@ class Mysqli_Db_Query {
     */
    protected function _createWhere(){
       $wheresString = null;
-
       if(!empty($this->_sqlQueryParts[self::SQL_WHERE])){
          $wheresString = self::SQL_SEPARATOR . self::SQL_WHERE . self::SQL_SEPARATOR;
          $wheresString .= $this->_createWhereHelp($this->_sqlQueryParts[self::SQL_WHERE]);
       }
-      //      echo $wheresString .' <br>';
       return $wheresString;
    }
 

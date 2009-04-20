@@ -14,12 +14,12 @@ class Db {
    /**
     * Operátor AND
     */
-   const COND_OPERATOR_AND = 1;
+   const COND_OPERATOR_AND = 'AND';
 
    /**
     * Operátor OR
     */
-   const COND_OPERATOR_OR = 2;
+   const COND_OPERATOR_OR = 'OR';
 
    /**
     * Operátor IS NOT NULL
