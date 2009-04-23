@@ -911,7 +911,7 @@ nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inpu
 
       foreach ($inputs as $inputName => $value) {
          //      Jestli byl prvek vůbec odeslán
-         if(isset ($_POST[$this->formPrefix.$inputName][$oblLang])){
+         if(isset ($_POST[$this->formPrefix.$inputName])){
             //   SOF   Kontrola povinnosti
             if($value[self::ITEM_OBLIGATION]){
                //        pokud je více jazyků, je povinný havní jazyk aplikace
@@ -1135,7 +1135,7 @@ nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inpu
     * @return string -- vygenerovaná a přeložená chybová hláška
     */
    private function createErrorMsg($inputType, $inputName) {
-      return sprintf(_('Formulářový prvek "s%" s názvem "%s" nebyl odeslán'), 
+      return sprintf(_('Formulářový prvek "%s" s názvem "%s" nebyl odeslán'),
          $inputType, $this->formPrefix.$inputName);
    }
 }
