@@ -34,6 +34,8 @@ class Form {
    const INPUT_HIDDEN	= 'inputhidden';
    const INPUT_PASSWORD	= 'inputpasswd';
    const INPUT_CHECKBOX	= 'inputcheckbox';
+   const INPUT_RADIO    = 'inputradio';
+   const INPUT_CHECKBOX_GROUP	= 'inputcheckboxgroup';
    const INPUT_FILE     = 'inputfile';
    const INPUT_DATE     = 'inputdate';
    const INPUT_TEXTAREA	= 'textarea';
@@ -42,71 +44,58 @@ class Form {
  /**
   * Způsob kódování přenesených dat
   * bez kódování html zanků
-  * @var int
   */
    const CODE_NONE = 0;
 
  /**
   * Způsob kódování přenesených dat
   * zakódování html zanků
-  * @var int
   */
    const CODE_HTMLENCODE = 1;
 
  /**
   * Způsob kódování přenesených dat
   * dekódování html zanků
-  * @var int
   */
    const CODE_HTMLDECODE = 2;
 
  /**
   * Parametr pro žádnou validací
-  * @var int
   */
    const VALIDATE_NONE = 0;
 
  /**
   * Parametr pro validaci emailu
-  * @var int
   */
    const VALIDATE_EMAIL = 1;
 
  /**
   * Proměná pro zapnutí validace data
-  * @var int
   */
    const VALIDATE_DATE = 2;
 
  /**
   * Proměná pro validaci času
-  * @var int
   */
    const VALIDATE_TIME = 3;
 
-
  /**
   * Parametr pro validaci URL
-  * @var int
   */
-  const VALIDATE_URL = 4;
+   const VALIDATE_URL = 4;
 
    /**
    * Proměná pro zapnutí validace data a datum není omezené
-   * @var int
    */
    const VALIDATE_DATE_ISEVERYTIME = 'E';
 
-
   /**
    * Proměná pro zapnutí validace data a datum musí být v budoucnosti
-   * @var int
    */
    const VALIDATE_DATE_ISFUTURE = 'F';
 
   /**
    * Proměná pro zapnutí validace data a datum musí být v minulosti
-   * @var int
    */
    const VALIDATE_DATE_ISPAST = 'P';
 
@@ -118,13 +107,19 @@ class Form {
 
    /**
     * Název proměné s originálním názvem souboru
-    * @var string
     */
    const POST_FILES_ERROR 			= 'error';
    const POST_FILES_ORIGINAL_NAME	= 'name';
    const POST_FILES_SIZE 			= 'size';
    const POST_FILES_TYPE 			= 'type';
    const POST_FILES_TMP_NAME		= 'tmp_name';
+
+   /**
+    * Druhy povinností pro skupinu checkboxů
+    */
+   const CHECKBOX_GROUP_OBL_NONE = 0;
+   const CHECKBOX_GROUP_OBL_ONE = 1;
+   const CHECKBOX_GROUP_OBL_ALL = 2;
 
   /**
    * Proměná obsahuje, jestli bylo v zadání formuláře chyba
@@ -160,6 +155,12 @@ class Form {
    * @var array
    */
    private $formValues = array();
+
+   /**
+    * Jestli byl formulář naplněn
+    * @var boolean
+    */
+   private $formFillin = false;
 
   /**
    * Konstruktor nastaví základní parametry
@@ -219,8 +220,8 @@ class Form {
    * @return Form
    */
    public function crInputText($name, $obligation = false, $langs = false,
-    $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
-    $maxChars = null, $minChars = null) {
+      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
+      $maxChars = null, $minChars = null) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -251,7 +252,7 @@ class Form {
    * @return Form
    */
    public function crInputHidden($name, $obligation = false,
-    $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE) {
+      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -275,6 +276,37 @@ class Form {
       $this->formStructure[self::INPUT_CHECKBOX][$name][self::ITEM_NAME] = $name;
       $this->formValues[$name] = false;
 
+      return $this;
+   }
+
+  /**
+   * Metody vytváří prvek typu INPUT - RADIO
+   *
+   * @param string $name -- Název prvku
+   *
+   * @return Form
+   */
+   public function crInputRadio($name) {
+      $this->formStructure[self::INPUT_RADIO][$name][self::ITEM_NAME] = $name;
+      $this->formValues[$name] = false;
+
+      return $this;
+   }
+
+  /**
+   * Metody vytváří skupinu prveků typu INPUT - CHECKBOX, které spolu souvisí
+   *
+   * @param string $groupName -- Název skupiny
+   * @param array $name -- Pole názvů prvků
+   *
+   * @return Form
+   */
+   public function crInputCheckboxGroup($groupName, $names, $obligation = self::CHECKBOX_GROUP_OBL_NONE) {
+      foreach ($names as $name) {
+         $this->formStructure[self::INPUT_CHECKBOX_GROUP][$groupName]['boxes'][$name][self::ITEM_NAME] = $name;
+         $this->formStructure[self::INPUT_CHECKBOX_GROUP][$groupName][self::ITEM_OBLIGATION] = $obligation;
+         $this->formValues[$name] = false;
+      }
       return $this;
    }
 
@@ -324,8 +356,8 @@ class Form {
    * @return Form
    */
    public function crInputPassword($name, $obligation = false,
-    $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
-    $maxChars = null, $minChars = null) {
+      $specialValidation = self::VALIDATE_NONE, $code = self::CODE_HTMLENCODE,
+      $maxChars = null, $minChars = null) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -372,7 +404,7 @@ class Form {
    * @return Form
    */
    public function crTextArea($name, $obligation = false, $langs = false,
-    $code = self::CODE_HTMLENCODE, $maxChars = null, $minChars = null) {
+      $code = self::CODE_HTMLENCODE, $maxChars = null, $minChars = null) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_OBLIGATION] = $obligation;
@@ -401,14 +433,26 @@ class Form {
    * @return boolean -- true pokud je formulář vpořádku
    */
    public function checkForm() {
+      if($this->sendForm()){
+         return !$this->isError;
+      }
+      return false;
+   }
+
+   /**
+    * Metoda zjišťuje jestli byl formulář odeslán
+    *
+    * @return boolean -- true pokud byl formulář odeslán
+    */
+   public function sendForm() {
       if(!isset ($this->formStructure[self::INPUT_SUBMIT])){
          throw new CoreException(_('Nebyl nasatven prvek s potvrzovacím tlačítkem'),1);
       }
 
       if(isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT]]) OR
-       isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT].'_x'])){
+         isset ($_POST[$this->formPrefix.$this->formStructure[self::INPUT_SUBMIT].'_x'])){
          $this->fillinForm();
-         return !$this->isError;
+         return true;
       }
       return false;
    }
@@ -424,6 +468,18 @@ class Form {
     */
    public function getErrorItems() {
       return $this->errorItems;
+   }
+
+   /**
+    * Metoda přidá chybnou hodnotu do seznamu chybných prvků
+    * @param string $name -- název prvku
+    * @param boolean $value -- (option - true) jestli je prvek chybný
+    * @param string $msg -- (option - null) chybová hláška
+    */
+   public function setErrorItem($name, $value = true, $msg = null) {
+      $this->isError = true;
+      $this->addMissingValueError($msg);
+      $this->addErrorItem($name);
    }
 
    /**
@@ -543,41 +599,51 @@ class Form {
    * Metoda vyplní odeslané pole do hodnot formuláře
    */
    private function fillinForm() {
-      // tlačítko submit
-      if(isset ($this->formStructure[self::INPUT_SUBMIT])){
-         $this->fillInSubmit();
-      }
-      //    vyplnění textových polí
-      if(isset ($this->formStructure[self::INPUT_TEXT])){
-         $this->fillInInputText();
-      }
-      //    vyplnění zkrytých polí
-      if(isset ($this->formStructure[self::INPUT_HIDDEN])){
-         $this->fillInInputHidden();
-      }
-      //    vyplnění checkbox polí
-      if(isset ($this->formStructure[self::INPUT_CHECKBOX])){
-         $this->fillInInputCheckbox();
-      }
-      //    vyplnění checkbox polí
-      if(isset ($this->formStructure[self::INPUT_SELECT])){
-         $this->fillInInputSelect();
-      }
-      //    vyplnění heslových polí
-      if(isset ($this->formStructure[self::INPUT_PASSWORD])){
-         $this->fillInInputPassword();
-      }
-      //    vyplnění souborových polí
-      if(isset ($this->formStructure[self::INPUT_FILE])){
-         $this->fillInInputFile();
-      }
-      //    vyplnění pole s datem
-      if(isset ($this->formStructure[self::INPUT_DATE])){
-         $this->fillInInputDate();
-      }
-      // Vyplnění textarea
-      if(isset ($this->formStructure[self::INPUT_TEXTAREA])){
-         $this->fillInTextArea();
+      if(!$this->formFillin){
+         // tlačítko submit
+         if(isset ($this->formStructure[self::INPUT_SUBMIT])){
+            $this->fillInSubmit();
+         }
+         //    vyplnění textových polí
+         if(isset ($this->formStructure[self::INPUT_TEXT])){
+            $this->fillInInputText();
+         }
+         //    vyplnění zkrytých polí
+         if(isset ($this->formStructure[self::INPUT_HIDDEN])){
+            $this->fillInInputHidden();
+         }
+         //    vyplnění checkbox polí
+         if(isset ($this->formStructure[self::INPUT_CHECKBOX])){
+            $this->fillInInputCheckbox();
+         }
+         //    vyplnění checkbox-group polí
+         if(isset ($this->formStructure[self::INPUT_CHECKBOX_GROUP])){
+            $this->fillInInputCheckboxGroup();
+         }
+         //    vyplnění radio polí
+         if(isset ($this->formStructure[self::INPUT_RADIO])){
+            $this->fillInInputRadio();
+         }
+         //    vyplnění checkbox polí
+         if(isset ($this->formStructure[self::INPUT_SELECT])){
+            $this->fillInInputSelect();
+         }
+         //    vyplnění heslových polí
+         if(isset ($this->formStructure[self::INPUT_PASSWORD])){
+            $this->fillInInputPassword();
+         }
+         //    vyplnění souborových polí
+         if(isset ($this->formStructure[self::INPUT_FILE])){
+            $this->fillInInputFile();
+         }
+         //    vyplnění pole s datem
+         if(isset ($this->formStructure[self::INPUT_DATE])){
+            $this->fillInInputDate();
+         }
+         // Vyplnění textarea
+         if(isset ($this->formStructure[self::INPUT_TEXTAREA])){
+            $this->fillInTextArea();
+         }
       }
       //    $this->debug();
 
@@ -728,6 +794,71 @@ class Form {
   /**
    * Metoda vyplní data z formuláře do pole hodnot s daty
    */
+   private function fillInInputRadio() {
+      $inputs = $this->formStructure[self::INPUT_RADIO];
+
+      foreach ($inputs as $inputName => $value) {
+         if(isset ($_POST[$this->formPrefix.$inputName])){
+            //            Je odeslán bez hodnoty
+            if($_POST[$this->formPrefix.$inputName] == 'on'){
+               $this->formValues[$inputName] = true;
+            }
+            //            Je odeslán s hodnotou
+            else {
+               $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
+            }
+         } else {
+            $this->formValues[$inputName] = false;
+         }
+      }
+   }
+
+  /**
+   * Metoda vyplní data z formuláře do pole hodnot s daty
+   */
+   private function fillInInputCheckboxGroup() {
+      $inputs = $this->formStructure[self::INPUT_CHECKBOX_GROUP];
+      foreach ($inputs as $itemKey => $item) {
+         $allItems = true;
+         $oneItem = false;
+         foreach ($item['boxes'] as $inputName => $value) {
+            if(isset ($_POST[$this->formPrefix.$inputName])){
+               //            Je odeslán bez hodnoty
+               if($_POST[$this->formPrefix.$inputName] == 'on'){
+                  $this->formValues[$inputName] = true;
+               }
+               //            Je odeslán s hodnotou
+               else {
+                  $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
+               }
+               $oneItem = true;
+            } else {
+               $allItems = false;
+               $this->formValues[$inputName] = false;
+            }
+         }
+         switch ($item[self::ITEM_OBLIGATION]) {
+            case self::CHECKBOX_GROUP_OBL_ALL:
+               if($allItems == false){
+                  $this->addMissingValueError();
+                  $this->addErrorItem($itemKey);
+               }
+               break;
+            case self::CHECKBOX_GROUP_OBL_ONE:
+               if($oneItem == false){
+                  $this->addMissingValueError();
+                  $this->addErrorItem($itemKey);
+               }
+               break;
+            default:
+               break;
+         }
+      }
+   }
+
+  /**
+   * Metoda vyplní data z formuláře do pole hodnot s daty
+   */
    private function fillInInputSelect() {
       $inputs = $this->formStructure[self::INPUT_SELECT];
 
@@ -802,7 +933,7 @@ class Form {
             }
          } else {
             throw new RangeException(sprintf(
-               _('Nebyl odeslán formulářový prvek "input-file" s názvem "%s"
+                  _('Nebyl odeslán formulářový prvek "input-file" s názvem "%s"
 nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inputName), 6);
          }
       }
@@ -829,7 +960,7 @@ nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inpu
 
    /**
     * Metoda vygeneruje chbovou hlášku pro chybně odeslaný soubor
-    * 
+    *
     * @param integer $errNumber -- číslo chyby z $_FILES
     * @param string $fileOriginalName -- původní název souboru
     */
@@ -1046,7 +1177,7 @@ nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inpu
          }
       } else {
          throw new InvalidArgumentException(sprintf(
-            _('Nepodporovaná validace s názvem "%s"'),$validation),10);
+               _('Nepodporovaná validace s názvem "%s"'),$validation),10);
       }
    }
 
@@ -1100,9 +1231,14 @@ nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inpu
 
   /**
    * Metoda přidá chybovou hlášku o nevyplněném prvku
+   * @param string $message -- chybová zpráva
    */
-   private function addMissingValueError() {
-      $this->errMsg()->addMessage(_('Nebyly vyplněny všechny povinné údaje'));
+   private function addMissingValueError($message = null) {
+      if($message == null){
+         $this->errMsg()->addMessage(_('Nebyly vyplněny všechny povinné údaje'));
+      } else {
+         $this->errMsg()->addMessage($message);
+      }
    }
 
   /**
