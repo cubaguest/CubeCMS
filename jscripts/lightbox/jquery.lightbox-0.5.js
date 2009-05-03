@@ -37,6 +37,7 @@
 			containerResizeSpeed:	400,		// (integer) Specify the resize duration of container image. These number are miliseconds. 400 is default.
 			// Configuration related to texts in caption. For example: Image 2 of 8. You can alter either "Image" and "of" texts.
 			txtImage:				'Image',	// (string) Specify text "Image"
+			showNumImages:       true,	// (boolean) Specify if show number of images
 			txtOf:					'of',		// (string) Specify text "of"
 			// Configuration related to keyboard navigation
 			keyToClose:				'c',		// (string) (c = close) Letter to close the jQuery lightBox interface. Beyond this letter, the letter X and the SCAPE key is used to.
@@ -244,7 +245,7 @@
 				$('#lightbox-image-details-caption').html(settings.imageArray[settings.activeImage][1]).show();
 			}
 			// If we have a image set, display 'Image X of X'
-			if ( settings.imageArray.length > 1 ) {
+			if ( settings.imageArray.length > 1 && settings.showNumImages) {
 				$('#lightbox-image-details-currentNumber').html(settings.txtImage + ' ' + ( settings.activeImage + 1 ) + ' ' + settings.txtOf + ' ' + settings.imageArray.length).show();
 			}		
 		}
