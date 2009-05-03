@@ -269,11 +269,13 @@ class Form {
    * Metody vytváří prvek typu INPUT - CHECKBOX
    *
    * @param string $name -- Název prvku
+   * @param boolean $obligation -- jestli je prvek zadaný povině
    *
    * @return Form
    */
-   public function crInputCheckbox($name) {
+   public function crInputCheckbox($name, $obligation = false) {
       $this->formStructure[self::INPUT_CHECKBOX][$name][self::ITEM_NAME] = $name;
+      $this->formStructure[self::INPUT_CHECKBOX][$name][self::ITEM_OBLIGATION] = $obligation;
       $this->formValues[$name] = false;
 
       return $this;
@@ -555,6 +557,27 @@ class Form {
    }
 
    /**
+    * Metoda nastavuje hodnoty prvků formuláře
+    * @param array $items -- pole s názvy prvků (název => hodnota)
+    * @param string $prefix -- jestli je v poli i prafix formulářových prvků
+    * @todo -- dodělat při vkládání prvků s jazykovými verzemi (nejspíše v
+    * jednorozměrném poli se sufixem _cs, _en atd.) a dodělat při vložení prefixu
+    */
+   public function setValues($items, $prefix = false) {
+      if(!empty($items)){
+         foreach ($items as $itemName => $itemValue) {
+            if(is_array($itemValue)){
+               
+            } else {
+               $this->formValues[$itemName] = $itemValue;
+            }
+         }
+         return true;
+      }
+      return false;
+   }
+
+   /**
     * Metoda nalezne prvek ve struktůře formuláře a vrátího
     * @param string $name -- název
     * @return array -- pole s informacemi o prvku
@@ -785,6 +808,10 @@ class Form {
             else {
                $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
             }
+         } else if($value[self::ITEM_OBLIGATION] == true) {
+            $this->formValues[$inputName] = false;
+            $this->addMissingValueError();
+            $this->addErrorItem($inputName);
          } else {
             $this->formValues[$inputName] = false;
          }
@@ -869,7 +896,8 @@ class Form {
                $this->formValues[$inputName] = $_POST[$this->formPrefix.$inputName];
             }
          } else {
-            throw new RangeException($this->createErrorMsg('select', $inputName),3);
+            $this->formValues[$inputName] = false;
+//            throw new RangeException($this->createErrorMsg('select', $inputName),3);
          }
       }
    }
@@ -932,9 +960,9 @@ class Form {
                }
             }
          } else {
-            throw new RangeException(sprintf(
-                  _('Nebyl odeslán formulářový prvek "input-file" s názvem "%s"
-nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inputName), 6);
+//            throw new RangeException(sprintf(
+//                  _('Nebyl odeslán formulářový prvek "input-file" s názvem "%s"
+//nebo nebyl odeslán formulář s parametrem "enctype"'), $this->formPrefix.$inputName), 6);
          }
       }
    }
