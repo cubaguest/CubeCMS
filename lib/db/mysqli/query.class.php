@@ -130,7 +130,7 @@ class Mysqli_Db_Query {
     * statické pole se specílními SQL funkcemi
     * @var array
     */
-   protected $specialSqlFunctions = array("NOW(", "TIMESTAMPDIFF(", "COUNT(", "IFNULL(", "IF(", 'MATCH', 'AGAINST');
+   protected $specialSqlFunctions = array("NOW(", "TIMESTAMPDIFF(", "COUNT(", "IFNULL(", "IF(", 'MATCH(', 'AGAINST(');
 
    protected $sqlFunctionRepairArr = array(
 //      'patterns' =>
@@ -411,7 +411,7 @@ class Mysqli_Db_Query {
     */
    protected function isMySQLFunction($string) {
       foreach ($this->specialSqlFunctions as $function) {
-         if(stripos($string, $function) !== false){
+         if(strpos($string, $function) !== false){
             return true;
          }
       }
