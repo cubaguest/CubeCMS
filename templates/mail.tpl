@@ -1,7 +1,6 @@
 {if $MAILS_ID eq null}
 {assign var='MAILS_ID' value=$VARS.SENDMAILS_ID}
 {/if}
-{debug}
 <div class="sendMails">
    <a href="{$THIS_PAGE_LINK}#mailEdit" id="mailEditButton">
       {$VARS.MAIL_FORM_SHOW}
@@ -12,7 +11,9 @@
    <div id="mailEditTabs">
       <ul class="editMailTabs langMenu">
          <li><a href="#mailAddress" class="selected">{$VARS.MAILS_LABEL}</a></li>
+         {if $VARS.IS_MAIL_TEXT[$MAILS_ID]}
          <li><a href="#editMail" class="selected">{$VARS.EDIT_MAIL_LABEL}</a></li>
+         {/if}
       </ul>
       <div id="mailAddress" class="tabcontent">
          <form action="{$THIS_PAGE_LINK}" method="post">
@@ -42,6 +43,7 @@
             </tbody>
          </table>
       </div>
+      {if $VARS.IS_MAIL_TEXT[$MAILS_ID]}
       <div id="editMail" class="tabcontent">
          <form action="{$THIS_PAGE_LINK}" method="post">
             <label>{$VARS.MAIL_SUBJECT}:</label><br />
@@ -62,6 +64,7 @@
 
          </p>
       </div>
+      {/if}
    </div>
    {literal}
    <script type="text/javascript">
