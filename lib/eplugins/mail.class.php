@@ -73,6 +73,11 @@ class MailEplugin extends Eplugin {
    const TRANSLATE_TYPE_BOOLEAN = 2;
 
    /**
+    * Název parametru pro konstruktor s id item
+    */
+   const CONSTRUCT_PARAM_ID_ITEM = 'idItem';
+
+   /**
     * Pole s maily
     * @var array
     */
@@ -113,15 +118,33 @@ class MailEplugin extends Eplugin {
    private $idArticle = null;
 
    /**
+    * Jestli se dá upravovat text
+    * @var boolean
+    */
+   private $isTexts = true;
+   private static $isTextsOthers = array();
+
+   /**
+    * Id item
+    * @var integer 
+    */
+   private $idItem = false;
+
+   /**
     * Metoda inicializace, je spuštěna pří vytvoření objektu
     */
-   protected function init(){
+   protected function init($paramsArr = array()){
+      if(isset ($paramsArr[self::CONSTRUCT_PARAM_ID_ITEM])){
+         $this->idItem = $paramsArr[self::CONSTRUCT_PARAM_ID_ITEM];
+      }
+
       $this->checkMailOperation();
       //Načtení dat
       $this->getMailsFromDb();
       $this->getMailDetails();
       // Vytvoření základní překladové tabulky
       $this->createBasicTranslateValues();
+
    }
 
    /**
@@ -230,6 +253,21 @@ class MailEplugin extends Eplugin {
    }
 
    /**
+    * Metoda vrací seznam registrovaných adres
+    * @return array -- pole adres
+    */
+   public function getMailAddress() {
+      if(empty ($this->mailsArray)){
+         $this->getMailsFromDb();
+      }
+      $mails = array();
+      foreach ($this->mailsArray as $mail) {
+         array_push($mails, $mail[self::COLUMN_MAIL]);
+      }
+      return $mails;
+   }
+
+   /**
     * Metoda uloží mail do db
     * @param string -- mail
     * @param integer -- (option) id item u ktré byl mail uložen
@@ -237,13 +275,23 @@ class MailEplugin extends Eplugin {
    private function saveNewMail($mail) {
       $sqlInser = $this->getDb()->insert()
       ->table(self::DB_TABLE_SENDMAILS);
-
-      if($this->idArticle == null){
-         $sqlInser->colums(array(self::COLUMN_MAIL, self::COLUMN_ID_ITEM))
-         ->values($mail, $this->getModule()->getId());
+      
+      if($this->idItem == false){
+         if($this->idArticle == null){
+            $sqlInser->colums(array(self::COLUMN_MAIL, self::COLUMN_ID_ITEM))
+            ->values($mail, $this->getModule()->getId());
+         } else {
+            $sqlInser->colums(array(self::COLUMN_MAIL, self::COLUMN_ID_ITEM, self::COLUMN_ID_ARTICLE))
+            ->values($mail, $this->getModule()->getId(), $this->idArticle);
+         }
       } else {
-         $sqlInser->colums(array(self::COLUMN_MAIL, self::COLUMN_ID_ITEM, self::COLUMN_ID_ARTICLE))
-         ->values($mail, $this->getModule()->getId(), $this->idArticle);
+         if($this->idArticle == null){
+            $sqlInser->colums(array(self::COLUMN_MAIL, self::COLUMN_ID_ITEM))
+            ->values($mail, $this->idItem);
+         } else {
+            $sqlInser->colums(array(self::COLUMN_MAIL, self::COLUMN_ID_ITEM, self::COLUMN_ID_ARTICLE))
+            ->values($mail, $this->idItem, $this->idArticle);
+         }
       }
       //		vložení záznamu
       return $this->getDb()->query($sqlInser);
@@ -278,6 +326,23 @@ class MailEplugin extends Eplugin {
    }
 
    /**
+    * Metoda nastaví jestli se u mailu používají texty nebo ne
+    * @param boolean $isText -- true pokud používají
+    */
+   public function setIsMailText($isText = true) {
+      $this->isTexts = $isText;
+   }
+
+   /**
+    * Metoda nastaví id itemu pokud má být odlišné od id modulu. Pokud je id 0 tak
+    * jsou mejly zobrazenu u všech modulů používající tento plugin
+    * @param int $id -- id modulu
+    */
+   public function setIdItem($id = false) {
+      $this->idItem = $id;
+   }
+
+   /**
     * Metoda doplní hodnoty do textu mailu a vrátí jej
     * @return string -- text mailu
     */
@@ -309,7 +374,8 @@ class MailEplugin extends Eplugin {
       $sqlSelect = $this->getDb()->select()
       ->table(self::DB_TABLE_SENDMAILS)
       ->colums(array(self::COLUMN_ID, self::COLUMN_MAIL))
-      ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+      ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId(),'=',Db::COND_OPERATOR_OR)
+      ->where(self::COLUMN_ID_ITEM, '0');
 
       if($this->idArticle != null){
          $sqlSelect->where(self::COLUMN_ID_ARTICLE, $this->idArticle);
@@ -371,6 +437,10 @@ class MailEplugin extends Eplugin {
       self::$mailTextDetailOthers[$this->getIdTpl()] = $this->mailTextDetail;
       //		self::$mailTextinDbOthers[$this->idSendMails] = $this->mailTextInDb;
       $this->toTpl("MAIL_TEXT_DETAIL", self::$mailTextDetailOthers);
+
+      //		List s povolenými texty
+      self::$isTextsOthers[$this->getIdTpl()] = $this->isTexts;
+      $this->toTpl("IS_MAIL_TEXT", self::$isTextsOthers);
 
       //		List se seznamem povolených hodnot
       self::$mailTextTransTableOthers[$this->getIdTpl()] = $this->mailTextTransTable;

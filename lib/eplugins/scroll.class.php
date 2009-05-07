@@ -334,9 +334,13 @@ class ScrollEplugin extends Eplugin {
    protected function assignTpl(){
       //	Zapnutí tlačítek
       $this->toTpl("BUTTON_BEGIN", $this->isButtonBegin());
+      $this->toTpl("BUTTON_BEGIN_NAME", _('Začátek'));
       $this->toTpl("BUTTON_NEXT", $this->isButtonNext());
+      $this->toTpl("BUTTON_NEXT_NAME", _('Další'));
       $this->toTpl("BUTTON_BACK", $this->isButtonBack());
+      $this->toTpl("BUTTON_BACK_NAME", _('Předchozí'));
       $this->toTpl("BUTTON_END", $this->isButtonEnd());
+      $this->toTpl("BUTTON_END_NAME", _('Konec'));
       //	Odkazy tlačítek
       $this->toTpl("SCROLL_BUTTONS_LINKS", $this->buttonsLinks);
       //	Data o pozici scrolování
