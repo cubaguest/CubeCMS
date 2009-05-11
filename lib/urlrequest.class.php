@@ -84,7 +84,7 @@ class UrlRequest {
     * Obsahuje typ media
     * @var array
     */
-   private static $media = null;
+   private static $media = 'www';
 
    /**
     * Obsahuje současnou url adresu
