@@ -48,6 +48,12 @@ class Eplugin {
    private $rights = null;
 
    /**
+    * Objekt s informacemi o uživateli
+    * @var Auth
+    */
+   private $auth = null;
+
+   /**
     * Id šablony
     * @var integer
     */
@@ -285,6 +291,14 @@ class Eplugin {
       } else {
          return null;
       }
+   }
+
+   /**
+    * Metoda nastavuje do epluginu objkek autorizace
+    * @param Auth $auth -- objekt autorizace
+    */
+   public function setAuthParam(Auth $auth) {
+      $this->auth = $auth;
    }
 }
 ?>
