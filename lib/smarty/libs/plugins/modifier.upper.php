@@ -20,7 +20,11 @@
  */
 function smarty_modifier_upper($string)
 {
-    return strtoupper($string);
+   if(function_exists('mb_strtoupper')){
+      return mb_strtoupper($string);
+   } else {
+      return strtoupper($string);
+   }
 }
 
 ?>
