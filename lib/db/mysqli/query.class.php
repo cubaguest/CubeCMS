@@ -217,14 +217,14 @@ class Mysqli_Db_Query {
 
    /**
     * Metoda přidá do SQL dotazu klauzuli LIMIT
-    * @param integer -- počet záznamů
-    * @param integer -- záčátek
+    * @param integer $startRow -- záčátek
+    * @param integer $numRowns -- počet záznamů
     *
     * @return Db_Query -- objekt sebe
     */
-   public function limit($rowCount, $offset) {
-      $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $rowCount;
-      $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY] = $offset;
+   public function limit($startRow, $numRowns) {
+      $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_COUNT_ROWS_KEY] = $startRow;
+      $this->_sqlQueryParts[self::SQL_LIMIT][self::LIMT_OFFSET_KEY] = $numRowns;
       return $this;
    }
 

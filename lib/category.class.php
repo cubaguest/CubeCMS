@@ -228,8 +228,6 @@ class Category {
       if ($params != null){
          $arrayValues = array();
          $arrayValues = explode(self::CAT_PARAMS_SEPARATOR, $params);
-         //			print_r($arrayValues);
-
          foreach ($arrayValues as $value) {
             $tmpArrayValue = explode("=", $value);
             self::$_categoryParams[$tmpArrayValue[0]]=$tmpArrayValue[1];
