@@ -133,7 +133,10 @@ class TinyMce extends JsPlugin {
          'external_link_list_url' => null,
 			'remove_script_host' => 'false',
 			'content_css' => null,
-         'extended_valid_elements' => 'td[*],div[*]'
+         'extended_valid_elements' => 'td[*],div[*]',
+//         'convert_newlines_to_brs' => true,
+         'force_br_newlines' => true
+ //        'force_p_newlines' => false
 //			'relative_urls' => 'false'
 			);
 
