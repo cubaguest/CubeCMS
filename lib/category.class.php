@@ -154,7 +154,7 @@ class Category {
          self::$_categoryLeftPanel = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
          self::$_categoryRightPanel = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
          self::$_sectionName = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
-         self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
+         self::$_categoryParams = self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
          //        načtení výchozí kategorie
          $defCatArr = self::getDefaultCategory();
          if($defCatArr[CategoryModel::COLUMN_CAT_ID] == self::$_categoryId){
@@ -182,7 +182,7 @@ class Category {
       self::$_categoryLeftPanel = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
       self::$_categoryRightPanel = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
       self::$_sectionName = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
-      self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
+      self::$_categoryParams = self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
       self::$_categoryIsDefault = true;
    }
 
@@ -225,14 +225,19 @@ class Category {
     * @param string -- řetězec s paramaetry
     */
    private static function parseParams($params){
+      $rParams = array();
       if ($params != null){
          $arrayValues = array();
          $arrayValues = explode(self::CAT_PARAMS_SEPARATOR, $params);
          foreach ($arrayValues as $value) {
-            $tmpArrayValue = explode("=", $value);
-            self::$_categoryParams[$tmpArrayValue[0]]=$tmpArrayValue[1];
+            $tmpArrayValue = explode('=', $value);
+            $rParams[$tmpArrayValue[0]]=$tmpArrayValue[1];
          }
       }
+//      echo "<pre>set";
+//      print_r($rParams);
+//      echo "</pre>";
+      return $rParams;
    }
 
    /**
@@ -293,10 +298,11 @@ class Category {
 
    /**
     * Metoda vrací požedovaný parametr
-    * @param string -- index parametru
+    * @param string $param -- index parametru
+    * @param mixed $defaultParam -- výchozí hodnota
     * @return string -- parametr
     */
-   public static function getParam($param) {
+   public static function getParam($param, $defaultParam = null) {
       if(isset(self::$_categoryParams[$param])){
          return self::$_categoryParams[$param];
       } else {
