@@ -29,11 +29,19 @@
 			// Configuration related to images
 			imageLoading:			'jscripts/lightbox/images/lightbox-ico-loading.gif',		// (string) Path and the name of the loading icon
 			imageBtnPrev:			'jscripts/lightbox/images/lightbox-btn-prev.gif',			// (string) Path and the name of the prev button image
+			imageBtnPrevPositionLeft: 'left',			// (string) Path and the name of the prev button image
+			imageBtnPrevPositionTop:   '15%',			// (string) Path and the name of the prev button image
 			imageBtnNext:			'jscripts/lightbox/images/lightbox-btn-next.gif',			// (string) Path and the name of the next button image
+			imageBtnNextPositionLeft:	'right',			// (string) Path and the name of the next button image
+			imageBtnNextPositionTop:	'15%',			// (string) Path and the name of the next button image
 			imageBtnClose:			'jscripts/lightbox/images/lightbox-btn-close.gif',		// (string) Path and the name of the close btn
 			imageBlank:				'jscripts/lightbox/images/lightbox-blank.gif',			// (string) Path and the name of a blank image (one pixel)
 			// Configuration related to container image box
 			containerBorderSize:	10,			// (integer) If you adjust the padding in the CSS for the container, #lightbox-container-image-box, you will need to update this value
+			containerBorderSizeTop:	10,			// (integer) If you adjust the padding in the CSS for the container, #lightbox-container-image-box, you will need to update this value
+			containerBorderSizeRight:	10,			// (integer) If you adjust the padding in the CSS for the container, #lightbox-container-image-box, you will need to update this value
+			containerBorderSizeBottom:	10,			// (integer) If you adjust the padding in the CSS for the container, #lightbox-container-image-box, you will need to update this value
+			containerBorderSizeLeft:	10,			// (integer) If you adjust the padding in the CSS for the container, #lightbox-container-image-box, you will need to update this value
 			containerResizeSpeed:	400,		// (integer) Specify the resize duration of container image. These number are miliseconds. 400 is default.
 			// Configuration related to texts in caption. For example: Image 2 of 8. You can alter either "Image" and "of" texts.
 			txtImage:				'Image',	// (string) Specify text "Image"
@@ -205,8 +213,8 @@
 			var intCurrentWidth = $('#lightbox-container-image-box').width();
 			var intCurrentHeight = $('#lightbox-container-image-box').height();
 			// Get the width and height of the selected image plus the padding
-			var intWidth = (intImageWidth + (settings.containerBorderSize * 2)); // Plus the image�s width and the left and right padding value
-			var intHeight = (intImageHeight + (settings.containerBorderSize * 2)); // Plus the image�s height and the left and right padding value
+			var intWidth = (intImageWidth + (settings.containerBorderSizeLeft+settings.containerBorderSizeRight)); // Plus the image�s width and the left and right padding value
+			var intHeight = (intImageHeight + (settings.containerBorderSizeTop+settings.containerBorderSizeBottom)); // Plus the image�s height and the left and right padding value
 			// Diferences
 			var intDiffW = intCurrentWidth - intWidth;
 			var intDiffH = intCurrentHeight - intHeight;
@@ -219,8 +227,8 @@
 					___pause(100);	
 				}
 			} 
-			$('#lightbox-container-image-data-box').css({ width: intImageWidth });
-			$('#lightbox-nav-btnPrev,#lightbox-nav-btnNext').css({ height: intImageHeight + (settings.containerBorderSize * 2) });
+			$('#lightbox-container-image-data-box').css({ width: intImageWidth + (settings.containerBorderSizeLeft+settings.containerBorderSizeRight) });
+			$('#lightbox-nav-btnPrev,#lightbox-nav-btnNext').css({ height: intImageHeight + (settings.containerBorderSizeTop+settings.containerBorderSizeBottom) });
 		};
 		/**
 		 * Show the prepared image
@@ -262,7 +270,7 @@
 			// Show the prev button, if not the first image in set
 			if ( settings.activeImage != 0 ) {
 				if ( settings.fixedNavigation ) {
-					$('#lightbox-nav-btnPrev').css({ 'background' : 'url(' + settings.imageBtnPrev + ') left 15% no-repeat' })
+					$('#lightbox-nav-btnPrev').css({ 'background' : 'url(' + settings.imageBtnPrev + ') '+settings.imageBtnPrevPositionLeft+' '+settings.imageBtnPrevPositionTop+' no-repeat' })
 						.unbind()
 						.bind('click',function() {
 							settings.activeImage = settings.activeImage - 1;
@@ -272,7 +280,7 @@
 				} else {
 					// Show the images button for Next buttons
 					$('#lightbox-nav-btnPrev').unbind().hover(function() {
-						$(this).css({ 'background' : 'url(' + settings.imageBtnPrev + ') left 15% no-repeat' });
+						$(this).css({ 'background' : 'url(' + settings.imageBtnPrev + ') '+settings.imageBtnPrevPositionLeft+' '+settings.imageBtnPrevPositionTop+' no-repeat' });
 					},function() {
 						$(this).css({ 'background' : 'transparent url(' + settings.imageBlank + ') no-repeat' });
 					}).show().bind('click',function() {
@@ -286,7 +294,7 @@
 			// Show the next button, if not the last image in set
 			if ( settings.activeImage != ( settings.imageArray.length -1 ) ) {
 				if ( settings.fixedNavigation ) {
-					$('#lightbox-nav-btnNext').css({ 'background' : 'url(' + settings.imageBtnNext + ') right 15% no-repeat' })
+					$('#lightbox-nav-btnNext').css({ 'background' : 'url(' + settings.imageBtnNext + ') '+settings.imageBtnNextPositionLeft+' '+settings.imageBtnNextPositionTop+' no-repeat' })
 						.unbind()
 						.bind('click',function() {
 							settings.activeImage = settings.activeImage + 1;
@@ -296,7 +304,7 @@
 				} else {
 					// Show the images button for Next buttons
 					$('#lightbox-nav-btnNext').unbind().hover(function() {
-						$(this).css({ 'background' : 'url(' + settings.imageBtnNext + ') right 15% no-repeat' });
+						$(this).css({ 'background' : 'url(' + settings.imageBtnNext + ') '+settings.imageBtnNextPositionLeft+' '+settings.imageBtnNextPositionTop+' no-repeat' });
 					},function() {
 						$(this).css({ 'background' : 'transparent url(' + settings.imageBlank + ') no-repeat' });
 					}).show().bind('click',function() {
