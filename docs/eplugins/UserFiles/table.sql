@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `vypecky_userfiles` (
+CREATE TABLE IF NOT EXISTS `PREFIX_userfiles` (
   `id_file` smallint(6) NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
   `id_article` smallint(6) NOT NULL,

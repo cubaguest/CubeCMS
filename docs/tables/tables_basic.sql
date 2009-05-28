@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_categories` (
   `show_in_menu` tinyint(1) NOT NULL default '1' COMMENT 'Má li se položka zobrazit v menu',
   `show_when_login_only` tinyint(1) NOT NULL default '0' COMMENT 'Jstli má bát položka zobrazena po přihlášení',
   PRIMARY KEY  (`id_category`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=18 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_items` (
   PRIMARY KEY  (`id_item`),
   KEY `id_category` (`id_category`),
   KEY `id_module` (`id_module`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_modules` (
   `dbtable2` varchar(50) default NULL,
   `dbtable3` varchar(50) default NULL,
   PRIMARY KEY  (`id_module`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Vypisuji data pro tabulku `PREFIX_modules`
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_sections` (
   `alt_de` varchar(200) default NULL,
   `priority` smallint(6) NOT NULL default '0',
   PRIMARY KEY  (`id_section`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 

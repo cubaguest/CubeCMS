@@ -1,25 +1,25 @@
 -- ZMĚNIT PREFIX !!!!!!!!!!!!!!!!!
 
-INSERT INTO `dev`.`vypecky_modules` (
+INSERT INTO `dev`.`PREFIX_modules` (
 `id_module` ,
 `name` ,
-`params` ,
+`mparams` ,
 `datadir` ,
 `dbtable1` ,
 `dbtable2` ,
 `dbtable3`
 )
 VALUES (
-NULL , 'text', NULL , NULL, 'textx', NULL, NULL
+NULL , 'text', NULL , NULL, 'texts', NULL, NULL
 );
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `vypecky_texts`
+-- Struktura tabulky `PREFIX_texts`
 --
 
-CREATE TABLE IF NOT EXISTS `vypecky_texts` (
+CREATE TABLE IF NOT EXISTS `PREFIX_texts` (
   `id_text` smallint(4) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
   `text_cs` mediumtext,
@@ -31,4 +31,4 @@ CREATE TABLE IF NOT EXISTS `vypecky_texts` (
   FULLTEXT KEY `text_cs` (`text_cs`),
   FULLTEXT KEY `text_en` (`text_en`),
   FULLTEXT KEY `text_de` (`text_de`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
