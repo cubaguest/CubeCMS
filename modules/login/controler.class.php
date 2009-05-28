@@ -35,9 +35,9 @@ class LoginController extends Controller {
 
       $form = new Form(self::FORM_PREFIX);
 
-      $form->crInputPassword(self::FORM_PASSWD_OLD, true, Form::VALIDATION_NONE, Form::CODE_HTMLENCODE, 50, self::PASSWD_MIN_LENGTH)
-      ->crInputPassword(self::FORM_PASSWD_NEW, true, Form::VALIDATION_NONE, Form::CODE_HTMLENCODE, 50, self::PASSWD_MIN_LENGTH)
-      ->crInputPassword(self::FORM_PASSWD_NEW_CONFIRM, true, Form::VALIDATION_NONE, Form::CODE_HTMLENCODE, 50, self::PASSWD_MIN_LENGTH)
+      $form->crInputPassword(self::FORM_PASSWD_OLD, true, Form::VALIDATE_NONE, Form::CODE_HTMLENCODE, 50, self::PASSWD_MIN_LENGTH)
+      ->crInputPassword(self::FORM_PASSWD_NEW, true, Form::VALIDATE_NONE, Form::CODE_HTMLENCODE, 50, self::PASSWD_MIN_LENGTH)
+      ->crInputPassword(self::FORM_PASSWD_NEW_CONFIRM, true, Form::VALIDATE_NONE, Form::CODE_HTMLENCODE, 50, self::PASSWD_MIN_LENGTH)
       ->crSubmit(self::FORM_BUTTON_CHANGE);
 
       //        Pokud byl odeslán formulář

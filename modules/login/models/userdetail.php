@@ -21,10 +21,11 @@ class UserDetailModel extends DbModel {
 	 */
 	public function getPasswd($idUser) {	
 //			načtení fotky z db
-			$sqlSelect = $this->getDb()->select()->from(array('user'=>$this->getModule()->getDbTable()), self::COLUMN_USER_PASSWORD)
-				->where(self::COLUMN_ID." = '".$idUser."'");
+$sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'user')
+            ->colums(self::COLUMN_USER_PASSWORD)
+				->where(self::COLUMN_ID, $idUser);
 												 
-			$user = $this->getDb()->fetchAssoc($sqlSelect, true);	
+			$user = $this->getDb()->fetchAssoc($sqlSelect);	
 		
 		return $user[self::COLUMN_USER_PASSWORD];
 	}
@@ -40,7 +41,7 @@ class UserDetailModel extends DbModel {
 //			načtení fotky z db
 			$sqlUpdate = $this->getDb()->update()->table($this->getModule()->getDbTable())
 									   ->set(array(self::COLUMN_USER_PASSWORD => $password))
-									   ->where(self::COLUMN_ID.' = '.$idUser);
+									   ->where(self::COLUMN_ID,$idUser);
 		
 		return $this->getDb()->query($sqlUpdate);
 	}
