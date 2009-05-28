@@ -47,13 +47,6 @@ class Auth {
    const COLUMN_USER_PHOTO    = 'foto_file';
    
 	/**
-	 * Proměná - název session pro ukládání auth údajů
-	 * @var string
-	 * @deprecated 
-	 */
-	private $_sessionName = "LOGIN_SESSION";
-
-	/**
 	 * Je-li uživatel přihlášen
 	 * @var boolean
 	 */
@@ -127,6 +120,8 @@ class Auth {
 			} else {
 				//Zdařilé přihlášení, uložení detaileg o uživateli do session
 				$this->_saveUserDetailToSession();
+            $link = new Links();
+            $link->category()->action()->article()->rmParam()->reload();
 			}
 		} else {
          //	načtení detailů
