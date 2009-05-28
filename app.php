@@ -1378,8 +1378,8 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
     */
    private function initialWebTpl() {
       $fileName = 'initial'.ucfirst(UrlRequest::getMediaType()).'.php';
-      if(file_exists(self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName)){
-         require self::MAIN_ENGINE_PATH.self::MODULES_DIR.'/'.$fileName;
+      if(file_exists(self::MAIN_ENGINE_PATH.self::MODULES_DIR.DIRECTORY_SEPARATOR.$fileName)){
+         require self::MAIN_ENGINE_PATH.self::MODULES_DIR.DIRECTORY_SEPARATOR.$fileName;
       }
    }
 
@@ -1483,12 +1483,13 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   //				Příprava šablony
                   //				inicializace šablonovacího systému
                   $this->_initTemplate();
+                  //nastavení vybrané kategorie
+                  $this->selectCategory();
                   // Globální inicializace proměných do šablony
                   $this->initialWebTpl();
                   //vytvoření hlavního menu
                   $this->createMainMenu();
-                  //nastavení vybrané kategorie
-                  $this->selectCategory();
+
                   if(UrlRequest::isSpecialPage()){
                      $this->runSpecialPage();
                   }
