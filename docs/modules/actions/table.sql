@@ -3,7 +3,7 @@
 INSERT INTO `dev`.`vypecky_modules` (
 `id_module` ,
 `name` ,
-`params` ,
+`mparams` ,
 `datadir` ,
 `dbtable1` ,
 `dbtable2` ,
@@ -16,13 +16,13 @@ NULL , 'actions', NULL , 'actions', 'actions', NULL, NULL
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `vypecky_news`
+-- Struktura tabulky `vypecky_actions`
 --
 
 CREATE TABLE IF NOT EXISTS `vypecky_actions` (
-  `id_new` smallint(6) NOT NULL auto_increment,
+  `id_action` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
-  `id_user` smallint(6) NOT NULL,
+  `id_user` smallint(5) unsigned NOT NULL,
   `label_cs` varchar(50) NOT NULL,
   `text_cs` varchar(500) NOT NULL,
   `label_en` varchar(50) default NULL,
@@ -30,8 +30,11 @@ CREATE TABLE IF NOT EXISTS `vypecky_actions` (
   `label_de` varchar(50) default NULL,
   `text_de` varchar(500) default NULL,
   `time` int(11) NOT NULL,
+  `start_date` date default NULL,
+  `stop_date` date default NULL,
+  `image` varchar(200) default NULL,
   `disable` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`id_new`),
+  PRIMARY KEY  (`id_action`),
   KEY `id_user` (`id_user`),
   FULLTEXT KEY `label_cs` (`label_cs`),
   FULLTEXT KEY `text_cs` (`text_cs`),
@@ -39,4 +42,4 @@ CREATE TABLE IF NOT EXISTS `vypecky_actions` (
   FULLTEXT KEY `text_en` (`text_en`),
   FULLTEXT KEY `label_de` (`label_de`),
   FULLTEXT KEY `text_de` (`text_de`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

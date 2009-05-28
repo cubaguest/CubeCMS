@@ -1,21 +1,14 @@
 <div>
-{foreach from=$VARS.NEWS_LIST_ARRAY item="new"}
+{foreach from=$VARS.ACTIONS_LIST item=action}
 <div>
-<h2><a href="{$new.showlink}" title="{$new.label}">{$new.label}</a></h2>
-{$new.time|date_format:"%x %X"}<br />
-{$new.username}<br />
-{$new.text}
-</div>
-{/foreach}
-<div>
-{$VARS.NUM_NEWS_SHOW}:
-{foreach from=$VARS.NUM_NEWS item='LINK' key='NUM'}
-{if $LINK neq null}
-<a href="{$LINK}" title="{$NUM}">{$NUM}</a>
-{else}
-<span>{$NUM}</span>
+<h2><a href="{$action.showlink}" title="{$action.label}">{$action.label}</a></h2>
+<!--&nbsp;<span class="smallFont">{$action.start_date|date_format:"%x"} - {$action.stop_date|date_format:"%x"}</span>-->
+{if $action.image neq null}
+<img style="float:left;" src="{$VARS.IMAGES_DIR}{$action.image}" alt="{$action.image}" />
 {/if}
-{/foreach}
-<a href="{$VARS.NUM_NEWS_ALL}" title="{$VARS.NUM_NEWS_ALL_NAME}">{$VARS.NUM_NEWS_ALL_NAME}</a>
+
+{$action.text}
 </div>
+<br clear="all" />
+{/foreach}
 </div>

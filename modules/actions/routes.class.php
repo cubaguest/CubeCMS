@@ -1,5 +1,5 @@
 <?php
-class ActionssRoutes extends Routes {
+class ActionsRoutes extends Routes {
     function initRoutes() {
 	}
 }
