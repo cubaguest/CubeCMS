@@ -100,7 +100,9 @@ abstract class MainMenu {
     * @param Db -- objekt databázového konektoru
     */
    function __construct() {
+      // šablona
       $this->template = new Template();
+
       $this->tablesSections = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
       $this->tablesCategories = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
       $this->tablesItems = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
@@ -165,19 +167,10 @@ abstract class MainMenu {
    abstract function createMenu();
 
    /**
-    * Metoda přiřadí proměnou do šablony
-    * @param string -- název proměnné
-    * @param mixed -- hodnota proměnné
-    */
-   protected function addTpl($varName, $varValue) {
-      $this->template->addVar($varName, $varValue);
-   }
-
-   /**
     * Metoda vrací šablony a proměné menu
     * @return Template
     */
-   public function getTemplate() {
+   public function template() {
       return $this->template;
    }
 

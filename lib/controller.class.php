@@ -69,6 +69,8 @@ abstract class Controller {
       $this->rights = $rights;
       $this->article = new Article();
       $this->container = new Container();
+      $this->viewTemplate = new Template();
+
       //        Inicializace kontroleru modulu
       $this->init();
    }
@@ -248,8 +250,8 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
 	 * 
 	 * @param Template -- objetk šablony (odkaz)
 	 */
-	final public function runView(&$template, $actionName) {
-		$this->viewTemplate = $template;
+	final public function runView($actionName) {
+
 
 		if($this->actionViewer == null){
 			$viewName = $actionName;

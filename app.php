@@ -90,21 +90,11 @@ class AppCore {
    const ENGINE_AJAX_DIR = 'ajax';
 
    /**
-    * Konstanta s adresářem s šablonami systému
+    * Adresář pro knihovny pro práci s šablonou
     */
-   const TEMPLATES_DIR = "templates";
+   const ENGINE_TEMPLATE_DIR = 'templates';
 
-   /**
-    * Konstanta s adresářem s obrázky šablony
-     */
-   const TEMPLATES_IMAGES_DIR = "images";
-
-   /**
-    * Konstanta s názvem adresáře se styly
-    */
-   const TEMPLATES_STYLESHEETS_DIR = 'stylesheets';
-
-   /**
+  /**
     * Konstanta s názvem adresáře se specielními soubory (helpy, atd)
     */
    const SPECIALITEMS_DIR = 'specialitems';
@@ -153,16 +143,6 @@ class AppCore {
     * Název třídy pro hledání search -- sufix
     */
    const MODULE_SEARCH_SUFIX_CLASS = 'Search';
-
-   /**
-    * Konstanta s názvem adresáře se vzhledy
-    */
-   const FACES_DIR = 'faces';
-
-   /**
-    * Konstanta obsahuje výchozí název vzhledu (face)
-    */
-   const FACE_DEFAULT_NAME = 'default';
 
    /**
     * Instance hlavní třídy
@@ -385,18 +365,18 @@ class AppCore {
     * @param boolean $withFacesDir -- jestli se má vrátit celá adresář faces (true)
     * @return string -- adresář zvoleného vzhledu
     */
-   public static function getTepmlateFaceDir($fullDir = true, $withFacesDir = true) {
-      if($fullDir){
-         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR
-            .self::$templateFaceDir.DIRECTORY_SEPARATOR;
-      } else {
-         if($withFacesDir){
-            return self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
-         } else {
-            return self::$templateFaceDir.URL_SEPARATOR;
-         }
-      }
-   }
+   //   public static function getTepmlateFaceDir($fullDir = true, $withFacesDir = true) {
+   //      if($fullDir){
+   //         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR
+   //            .self::$templateFaceDir.DIRECTORY_SEPARATOR;
+   //      } else {
+   //         if($withFacesDir){
+   //            return self::FACES_DIR.URL_SEPARATOR.self::$templateFaceDir.URL_SEPARATOR;
+   //         } else {
+   //            return self::$templateFaceDir.URL_SEPARATOR;
+   //         }
+   //      }
+   //   }
 
    /**
     * Metoda vrací adresář k výchozímu vzhledu
@@ -404,14 +384,14 @@ class AppCore {
     * @param boolean $fullDir -- jestli se má vrátit celá cesta nebo jemo část od hlavního adresáře
     * @return string -- adresář výchozího vzhledu
     */
-   public static function getTepmlateDefaultFaceDir($fullDir = true) {
-      if($fullDir){
-         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR
-            .self::$templateDefaultFaceDir.DIRECTORY_SEPARATOR;
-      } else {
-         return self::FACES_DIR.URL_SEPARATOR.self::$templateDefaultFaceDir.URL_SEPARATOR;
-      }
-   }
+   //   public static function getTepmlateDefaultFaceDir($fullDir = true) {
+   //      if($fullDir){
+   //         return self::$_appWebDir.DIRECTORY_SEPARATOR.self::FACES_DIR.DIRECTORY_SEPARATOR
+   //            .self::$templateDefaultFaceDir.DIRECTORY_SEPARATOR;
+   //      } else {
+   //         return self::FACES_DIR.URL_SEPARATOR.self::$templateDefaultFaceDir.URL_SEPARATOR;
+   //      }
+   //   }
 
    /**
     * Metoda vrací objekt db conektoru
@@ -540,50 +520,26 @@ class AppCore {
     * Metoda inicializuje šablonovací systém (SMARTY)
     */
    private function _initTemplate() {
-      //		Vložení smarty třídy
-      require_once ('.'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'smarty'
-         .DIRECTORY_SEPARATOR.'libs'.DIRECTORY_SEPARATOR.'Smarty.class.php');
-      $this->template = new Smarty();
-      //		Nastavení proměných smarty
-      $this->template->template_dir = self::sysConfig()->getOptionValue("templates_dir", "smarty");
-      $this->template->compile_dir = self::sysConfig()->getOptionValue("templates_c_dir", "smarty");
-      $this->template->cache_dir = self::sysConfig()->getOptionValue("cache_dir", "smarty");
-      $this->template->config_dir = self::sysConfig()->getOptionValue("config_dir", "smarty");
-
-      //nastavení cesty k pluginům smarty
-      $this->template->plugins_dir[] = '../plugins';
+      Template::factory();
+      $this->coreTpl = new CoreTemplate();
 
       // filtry pro jazyky
       switch (Locale::getLang()) {
          case 'cs':
             //$this->template->load_filter('post', 'cztypo');
-            $this->template->load_filter('output', 'czechtypo');
-            $this->template->load_filter('output', 'trimwhitespace');
+            //            $this->template->load_filter('output', 'czechtypo');
+            //            $this->template->load_filter('output', 'trimwhitespace');
             break;
          default:
             break;
       }
       //		Pokud je debug tak vypnout kešování smarty
       if(self::$debugLevel >= 2){
-         $this->template->force_compile = true;
-         $this->template->clear_compiled_tpl();
+         //         $this->template->force_compile = true;
+         //         $this->template->clear_compiled_tpl();
       } else {
-         $this->template->caching = true;
+         //         $this->template->caching = true;
       }
-      //		Vytvoření objektu šablon pro jádro
-      $this->coreTpl = new Template();
-      //		inicializace vzhledu
-      $this->templateFace = self::sysConfig()->getOptionValue('face');
-      self::$templateFaceDir = self::sysConfig()->getOptionValue('face');
-      self::$templateDefaultFaceDir = self::FACE_DEFAULT_NAME;
-      //		Přidání do smarty objektu proměných s cestami k adresáři s engine šablonami
-      $this->template->template_default_face_dir = self::getTepmlateDefaultFaceDir();
-      $this->template->template_default_face_dir_rel = self::getTepmlateDefaultFaceDir(false);
-      $this->template->template_face_dir = self::getTepmlateFaceDir();
-      $this->template->template_face_dir_rel = self::getTepmlateFaceDir(false);
-      $this->template->template_engine_stylesheets_dir = self::TEMPLATES_STYLESHEETS_DIR;
-      $this->template->template_engine_images_dir = self::TEMPLATES_IMAGES_DIR;
-      $this->template->template_modules_dir = self::MODULES_DIR;
    }
 
    /**
@@ -610,6 +566,12 @@ class AppCore {
                . $className . '.class.php')){
             require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
                . $className . '.class.php');
+         }
+         //je načítán šablonovací systém
+         else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+               . AppCore::ENGINE_TEMPLATE_DIR . DIRECTORY_SEPARATOR . $className . '.class.php')) {
+            require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+               . AppCore::ENGINE_TEMPLATE_DIR . DIRECTORY_SEPARATOR . $className . '.class.php');
          }
          //je načítán e-plugin
          else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
@@ -670,17 +632,17 @@ class AppCore {
          }
       }
       //		knihovny pro práci s chybami
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'coreException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'moduleException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'dbException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badClassException.class.php');
       require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
-      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR 
+      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
          . self::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
 
       // načtení ajaxových knihoven
@@ -729,33 +691,33 @@ class AppCore {
     * @param Template -- Objekt šablonovacího systému
     * @param string -- název v hlavní šabloně
     */
-   private function assginTplObjToTpl(Template $templateObject, $templateArrayName = null) {
-      if($templateArrayName != null){
-         $this->assignVarToTpl($templateArrayName, $templateObject->getTemplatesArray());
-      } else {
-         foreach ($templateObject->getTemplatesArray() as $key => $value) {
-            $this->assignVarToTpl($key, $value);
-         }
-      }
-      $this->assignVarToTpl('MAIN_MODULE_TITLE', $templateObject->getSubTitle());
-      $engineVars = $templateObject->getEngineVarsArray();
-      if(!empty($engineVars)){
-         $this->assignVarToTpl('MODULE_ENGINE_VARS', $engineVars);
-      }
-   }
+   //   private function assginTplObjToTpl(Template $templateObject, $templateArrayName = null) {
+   //      if($templateArrayName != null){
+   //         $this->assignVarToTpl($templateArrayName, $templateObject->getTemplatesArray());
+   //      } else {
+   //         foreach ($templateObject->getTemplatesArray() as $key => $value) {
+   //            $this->assignVarToTpl($key, $value);
+   //         }
+   //      }
+   //      $this->assignVarToTpl('MAIN_MODULE_TITLE', $templateObject->getSubTitle());
+   //      $engineVars = $templateObject->getEngineVarsArray();
+   //      if(!empty($engineVars)){
+   //         $this->assignVarToTpl('MODULE_ENGINE_VARS', $engineVars);
+   //      }
+   //   }
 
    /**
     * Metoda přiřadí proměnou do šablony
     * @param string -- název proměné v šabloně
     * @param mixed -- hodnota
     */
-   private function assignVarToTpl($varName, $value) {
-      if($this->template->get_template_vars($varName) != null){
-         $this->template->append($varName, $value, true);
-      } else {
-         $this->template->assign($varName, $value);
-      }
-   }
+   //   private function assignVarToTpl($varName, $value) {
+   //      if($this->template->get_template_vars($varName) != null){
+   //         $this->template->append($varName, $value, true);
+   //      } else {
+   //         $this->template->assign($varName, $value);
+   //      }
+   //   }
 
    /*
     * VEŘEJÉ METODY
@@ -784,79 +746,80 @@ class AppCore {
          if(!class_exists("Menu", false)){
             throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
          }
-         $menu = new Menu(self::$dbConnector);
+         $menu = new Menu();
          $menu->controller();
          $menu->view();
-         $this->assginTplObjToTpl($menu->getTemplate(), MainMenu::TPL_ARRAY_NAME);
+         $this->coreTpl->addTplObj("MENU", $menu->template());
+         //         $this->assginTplObjToTpl($menu->getTemplateObj(), MainMenu::TPL_ARRAY_NAME);
       } catch (Exception $e) {
          new CoreErrors($e);
       }
       //		Přiřazení souboru s šablonou menu podle zvoleéhoí vzhledu
       //		vybraný vzhled šablony //TODO přesunout do třídy pro práci s menu
-      $this->assignVarToTpl('MAIN_MENU_TEMPLATE_FILE', 'menu.tpl');
+      //      $this->assignVarToTpl('MAIN_MENU_TEMPLATE_FILE', 'menu.tpl');
    }
 
    /**
     * Metoda přiřadí do šablony hlavní proměnné systému
     */
    public function assignMainVarsToTemplate() {
-      //	Hlavni promene strany
-      $this->coreTpl->addVar("MAIN_PAGE_TITLE", self::sysConfig()->getOptionValue("web_name"));
-      //adresa k rootu webu
-      $this->coreTpl->addVar("MAIN_ROOT_DIR", self::getAppWebDir());
-      $link = new Links();
-      $this->coreTpl->addVar("MAIN_WEB_DIR", UrlRequest::getBaseWebDir());
-      $this->coreTpl->addVar("THIS_PAGE_LINK", (string)$link);
-      // mapa webu
-      $this->coreTpl->addVar("SITEMAP_LINK", (string)$link->clear(true)
-         .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP));
-      $this->coreTpl->addVar("SITEMAP_LINK_NAME", _('Mapa stránek'));
-      $this->coreTpl->addVar("MAIN_LANG_IMAGES_PATH", self::sysConfig()
-         ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR);
-      $this->coreTpl->addVar("MAIN_CURRENT_FACE_PATH", self::getTepmlateFaceDir(false));
-      $this->coreTpl->addVar("MAIN_CURRENT_FACE_IMAGES_PATH", self::getTepmlateFaceDir(false)
-         .self::sysConfig()->getOptionValue('images', 'dirs').URL_SEPARATOR);
-      unset($link);
-      //Přihlášení uživatele
-      $this->coreTpl->addVar("USER_IS_LOGIN",  AppCore::getAuth()->isLogin());
-      $this->coreTpl->addVar("NOT_LOGIN_USER_NAME",_("Nepřihlášen"));
-      $this->coreTpl->addVar("LOGIN_USER_NAME",_("Přihlášen"));
-      $this->coreTpl->addVar("USER_LOGIN_USERNAME", AppCore::getAuth()->getUserName());
-      //		Popisky loginu
-      $this->coreTpl->addVar("LOGIN_LOGOUT_BUTTON_NAME", _("Odhlásit"));
-      $this->coreTpl->addVar("LOGIN_LOGIN_BUTTON_NAME", _("Přihlásit"));
-      // hledání
-      $this->coreTpl->addVar("SEARCH_BUTTON", _("Hledej"));
-      $this->coreTpl->addVar("SEARCH_NAME", _("Hledání"));
-      //Verze enginu
-      $this->coreTpl->addVar("ENGINE_VERSION", self::sysConfig()->getOptionValue("engine_version"));
-      //Debugovaci mod
-      if (self::$debugLevel > 1){
-         $this->coreTpl->addVar("DEBUG_MODE", true);
-      }
-      //		Přiřazení jazykového pole
-      $this->coreTpl->addVar("APP_LANGS_NAMES", Locale::getAppLangsNames());
-      //		Vytvoření odkazů s jazyky
-      $langs = array();
-      $langNames = Locale::getAppLangsNames();
-      $link = new Links();
-      foreach (Locale::getAppLangs() as $langKey => $lang) {
-         $langArr = array();
-         $langArr['name'] = $lang;
-         $langArr['label'] = $langNames[$lang];
-         if($lang != Locale::getDefaultLang()){
-            $langArr['link'] = (string)$link->lang($lang);
-         } else {
-            $langArr['link'] = (string)$link->lang();
-         }
-         array_push($langs, $langArr);
-      }
-      unset($langNames);
-      unset($link);
-      unset($langArr);
-      $this->coreTpl->addVar('APP_LANGS' ,$langs);
-      unset($langs);
-      $this->coreTpl->addVar('APP_LANG' ,Locale::getLang());
+      //      //	Hlavni promene strany
+      $this->coreTpl->setVar("MAIN_PAGE_TITLE", self::sysConfig()->getOptionValue("web_name"));
+      //      //adresa k rootu webu
+      //      $this->coreTpl->addVar("MAIN_ROOT_DIR", self::getAppWebDir());
+      //      $link = new Links();
+      //      $this->coreTpl->addVar("MAIN_WEB_DIR", UrlRequest::getBaseWebDir());
+      //      $this->coreTpl->addVar("THIS_PAGE_LINK", (string)$link);
+      //      // mapa webu
+      //      $this->coreTpl->addVar("SITEMAP_LINK", (string)$link->clear(true)
+      //         .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP));
+      //      $this->coreTpl->addVar("SITEMAP_LINK_NAME", _('Mapa stránek'));
+      //      $this->coreTpl->addVar("MAIN_LANG_IMAGES_PATH", self::sysConfig()
+      //         ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR);
+      //      $this->coreTpl->addVar("MAIN_CURRENT_FACE_PATH", self::getTepmlateFaceDir(false));
+      //      $this->coreTpl->addVar("MAIN_CURRENT_FACE_IMAGES_PATH", self::getTepmlateFaceDir(false)
+      //         .self::sysConfig()->getOptionValue('images', 'dirs').URL_SEPARATOR);
+      //      unset($link);
+      //      //Přihlášení uživatele
+      //      $this->coreTpl->addVar("USER_IS_LOGIN",  AppCore::getAuth()->isLogin());
+      //      $this->coreTpl->addVar("NOT_LOGIN_USER_NAME",_("Nepřihlášen"));
+      //      $this->coreTpl->addVar("LOGIN_USER_NAME",_("Přihlášen"));
+      //      $this->coreTpl->addVar("USER_LOGIN_USERNAME", AppCore::getAuth()->getUserName());
+      //      //		Popisky loginu
+      //      $this->coreTpl->addVar("LOGIN_LOGOUT_BUTTON_NAME", _("Odhlásit"));
+      //      $this->coreTpl->addVar("LOGIN_LOGIN_BUTTON_NAME", _("Přihlásit"));
+      //      // hledání
+      //      $this->coreTpl->addVar("SEARCH_BUTTON", _("Hledej"));
+      //      $this->coreTpl->addVar("SEARCH_NAME", _("Hledání"));
+      //      //Verze enginu
+      //      $this->coreTpl->addVar("ENGINE_VERSION", self::sysConfig()->getOptionValue("engine_version"));
+      //      //Debugovaci mod
+      //      if (self::$debugLevel > 1){
+      //         $this->coreTpl->addVar("DEBUG_MODE", true);
+      //      }
+      //      //		Přiřazení jazykového pole
+      //      $this->coreTpl->addVar("APP_LANGS_NAMES", Locale::getAppLangsNames());
+      //      //		Vytvoření odkazů s jazyky
+      //      $langs = array();
+      //      $langNames = Locale::getAppLangsNames();
+      //      $link = new Links();
+      //      foreach (Locale::getAppLangs() as $langKey => $lang) {
+      //         $langArr = array();
+      //         $langArr['name'] = $lang;
+      //         $langArr['label'] = $langNames[$lang];
+      //         if($lang != Locale::getDefaultLang()){
+      //            $langArr['link'] = (string)$link->lang($lang);
+      //         } else {
+      //            $langArr['link'] = (string)$link->lang();
+      //         }
+      //         array_push($langs, $langArr);
+      //      }
+      //      unset($langNames);
+      //      unset($link);
+      //      unset($langArr);
+      //      $this->coreTpl->addVar('APP_LANGS' ,$langs);
+      //      unset($langs);
+      //      $this->coreTpl->addVar('APP_LANG' ,Locale::getLang());
    }
 
    /**
@@ -868,45 +831,53 @@ class AppCore {
       //		načtení doby zpracovávání aplikace
       List ($usec, $sec) = Explode (' ', microtime());
       $endTime = ((float)$sec + (float)$usec);
-      $this->coreTpl->addVar("MAIN_EXEC_TIME", round($endTime-$this->_stratTime, 4));
-      $this->coreTpl->addVar("COUNT_ALL_SQL_QUERY", Db::getCountQueries());
-      //		Přiřazení javascriptů a stylů
-      $this->assignVarToTpl("STYLESHEETS", Template::getStylesheets());
-      $this->assignVarToTpl("JAVASCRIPTS", Template::getJavaScripts());
-      $this->assignVarToTpl("ON_LOAD_JS_FUNCTIONS", Template::getJsOnLoad());
-      //		Přiřazení proměných z hlavní šablony
-      $this->assginTplObjToTpl($this->coreTpl);
-      //		zvolení vzhledu
-      //		vybraný vzhled šablony
-      if(file_exists(self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'index.tpl')){
-         $faceFilePath = self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
-      }
-      //		Výchozí vzhled
-      else if(file_exists(self::getTepmlateDefaultFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'index.tpl')){
-         $faceFilePath = self::getTepmlateDefaultFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
-      }
-      //		Vzhled v engine
-      else {
-         $faceFilePath = '';
-      }
 
-      //		Zvolení zobrazovaného média
-      //		Medium pro tisk
-      if(UrlRequest::getMediaType() == UrlRequest::MEDIA_TYPE_PRINT){
-         $this->template->display($faceFilePath."index-print.tpl");
-      }
-      //		Specielní media
-      else if(file_exists($faceFilePath."index-".UrlRequest::getMediaType().".tpl")){
-         $this->template->display($faceFilePath."index-".UrlRequest::getMediaType().".tpl");
-      }
+
+      //      $this->coreTpl->addVar("MAIN_EXEC_TIME", round($endTime-$this->_stratTime, 4));
+      //      $this->coreTpl->addVar("COUNT_ALL_SQL_QUERY", Db::getCountQueries());
+      //      //		Přiřazení javascriptů a stylů
+      //      $this->assignVarToTpl("STYLESHEETS", Template::getStylesheets());
+      //      $this->assignVarToTpl("JAVASCRIPTS", Template::getJavaScripts());
+      //      $this->assignVarToTpl("ON_LOAD_JS_FUNCTIONS", Template::getJsOnLoad());
+      //      //		Přiřazení proměných z hlavní šablony
+      //      $this->assginTplObjToTpl($this->coreTpl);
+      //      //		zvolení vzhledu
+      //      //		vybraný vzhled šablony
+      //      if(file_exists(self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'index.tpl')){
+      //         $faceFilePath = self::getTepmlateFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      //      }
+      //      //		Výchozí vzhled
+      //      else if(file_exists(self::getTepmlateDefaultFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'index.tpl')){
+      //         $faceFilePath = self::getTepmlateDefaultFaceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      //      }
+      //      //		Vzhled v engine
+      //      else {
+      //         $faceFilePath = '';
+      //      }
+      //
+      //      //		Zvolení zobrazovaného média
+      //      //		Medium pro tisk
+      //      if(UrlRequest::getMediaType() == UrlRequest::MEDIA_TYPE_PRINT){
+      ////         $this->template->display($faceFilePath."index-print.tpl");
+      //         $this->template->display($faceFilePath."index-print.tpl");
+      //      }
+      //      //		Specielní media
+      //      else if(file_exists($faceFilePath."index-".UrlRequest::getMediaType().".tpl")){
+      ////         $this->template->display($faceFilePath."index-".UrlRequest::getMediaType().".tpl");
+      //         $this->template->display($faceFilePath."index-".UrlRequest::getMediaType().".tpl");
+      //      }
       //		Výchozí médium (www)
-      else {
-         $this->template->display($faceFilePath."index.tpl");
-      }
-      //		Při debug levelu vyšším jak 3 zobrazit výpis šablony
-      if(self::$debugLevel >= 3){
-         $this->assignVarToTpl("SHOW_DEBUG_CONSOLE", true);
-      }
+      //      else {
+      //         $this->template->display($faceFilePath."index.tpl");
+      $this->coreTpl->addTplFile("index.phtml", true);
+      //      }
+      //      //		Při debug levelu vyšším jak 3 zobrazit výpis šablony
+      //      if(self::$debugLevel >= 3){
+      //         $this->assignVarToTpl("SHOW_DEBUG_CONSOLE", true);
+      //      }
+
+
+      $this->coreTpl->renderTemplate();
    }
 
    /**
@@ -944,7 +915,7 @@ class AppCore {
                break;
             }
             //			Vytvoření objektu šablony
-            $template = new Template();
+            //            $template = new Template();
             //				Vytvoření objektu pro práci s modulem
             $module = new Module($item, $this->getModuleTables($item));
             //				klonování modulu do statické proměné enginu
@@ -955,7 +926,7 @@ class AppCore {
                if (substr($collum,0,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX)) ==
                   Rights::RIGHTS_GROUPS_TABLE_PREFIX){
                   $userRights[substr($collum,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX),
-                     strlen($collum))]=$value;
+                        strlen($collum))]=$value;
                }
             }
             //				Vytvoření objektu pro přístup k právům modulu
@@ -964,7 +935,7 @@ class AppCore {
                // načtení souboru s akcemi modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                      . $module->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát akci modulu ") 
+                  throw new BadFileException(_("Nepodařilo se nahrát akci modulu ")
                      . $module->getName(), 7);
                }
                include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
@@ -983,7 +954,7 @@ class AppCore {
                   throw new BadFileException(_("Nepodařilo se nahrát cestu modul ") . $module->getName(), 8);
                }
                include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+               . $module->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
                //				Vytvoření objektu cesty (routes)
                $routes = null;
                $routesClassName = ucfirst($module->getName()).'Routes';
@@ -997,15 +968,15 @@ class AppCore {
                //				načtení souboru s kontrolerem modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                      . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát controler modulu ") 
+                  throw new BadFileException(_("Nepodařilo se nahrát controler modulu ")
                      . $module->getName(), 9);
                }
                require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
+               . $module->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
                //			Vytvoření objektu kontroleru
                $controllerClassName = ucfirst($module->getName()).'Controller';
                if(!class_exists($controllerClassName)){
-                  throw new BadClassException(_("Nepodařilo se vytvořit objekt controleru modulu ") 
+                  throw new BadClassException(_("Nepodařilo se vytvořit objekt controleru modulu ")
                      . $module->getName(), 10);
                }
                //					Vytvoření objektu kontroleru
@@ -1023,24 +994,24 @@ class AppCore {
                         .self::MODULE_CONTROLLER_SUFIX)){
                      throw new BadMethodCallException(sprintf(
                            _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
-                        strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX,
-                        $module->getName()), 11);
+                           strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX).self::MODULE_CONTROLLER_SUFIX,
+                           $module->getName()), 11);
                   }
                   $ctrlResult = $controller->mainController();
                   throw new BadMethodCallException(sprintf(
-                     _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
-                     $requestControllerName, $module->getName()), 12);
+                        _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
+                        $requestControllerName, $module->getName()), 12);
                }
                //			načtení souboru s viewrem modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
+                     . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
                   throw new BadFileException(sprintf(_('Nepodařilo se nahrát soubor vieweru modulu "%s"'),
-                     $module->getName()), 13);
+                        $module->getName()), 13);
                }
                require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
+               . $module->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
                //					Donastavení šablon
-               $template->setModule($module);
+               //               $template->setModule($module);
                //	Spuštění viewru pokud proběhl kontroler v pořádku
                // Není-li v kontroleru přiřazen výstup
                if($ctrlResult === null){
@@ -1052,14 +1023,14 @@ class AppCore {
                      throw new BadMethodCallException(_("Action Controller runView v modulu ")
                         . $module->getName()._(" nebyl nalezen"), 14);
                   }
-                  $controller->runView($template, $requestName.AppCore::MODULE_VIEWER_SUFIX);
+                  $controller->runView($requestName.AppCore::MODULE_VIEWER_SUFIX);
                } else {
                   throw new BadMethodCallException(_('Controler modulu "')
-                        . $module->getName()._('" nebyl korektně proveden'), 15);
+                     . $module->getName()._('" nebyl korektně proveden'), 15);
                }
                //	Uložení šablony a proměných do hlavní šablony
-               $this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
-               unset($template);
+               //               $this->assginTplObjToTpl($template, 'MODULES_TEMPLATES');
+               //               unset($template);
                unset($controller);
                $isModuleControlerRun = true;
             } catch (Exception $e) {
@@ -1125,12 +1096,12 @@ class AppCore {
             // Spuštění panelu
             try {
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
+                     . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
                   throw new BadFileException(_("Controler a Viewer panelu ").$panelModule->getName()
                      ._(" neexistuje."),17);
                }
                include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
+               . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
                if(!class_exists($panelClassName)){
                   throw new BadClassException(_("Třídat ").$panelClassName._(" panelu ")
                      .$panelModule->getName()._(" neexistuje."),18);
@@ -1145,13 +1116,13 @@ class AppCore {
                //	Vytvoření objektu pro přístup k právům modulu
                $panelRights = new Rights($userRights);
                //	nastavení tempalte
-               $panelTemplate->setModule($panelModule);
+               //               $panelTemplate->setModule($panelModule);
                $link = new Links(true);
-               $panelTemplate->setTplCatLink($link->category($panel->{CategoryModel::COLUMN_CAT_LABEL},
-                     $panel->{CategoryModel::COLUMN_CAT_ID}));
+               //               $panelTemplate->setTplCatLink($link->category($panel->{CategoryModel::COLUMN_CAT_LABEL},
+               //                     $panel->{CategoryModel::COLUMN_CAT_ID}));
                unset ($link);
                //	CONTROLLER PANELU
-               $panel = new $panelClassName($category, $panelTemplate, $panelRights);
+               //               $panel = new $panelClassName($category, $panelTemplate, $panelRights);
                //	spuštění controleru
                if(!method_exists($panel, self::MODULE_PANEL_CONTROLLER)){
                   throw new BadMethodCallException(_("Neexistuje controler panelu ")
@@ -1174,10 +1145,10 @@ class AppCore {
          }
       }
       //		Přiřazení panelů do šablony
-      if(isset($panelTemplate)){
-         $this->assginTplObjToTpl($panelTemplate, 'PANEL_'.$panelSideUpper.'_TEMPLATES');
-      }
-      unset($panelTemplate);
+      //      if(isset($panelTemplate)){
+      //         $this->assginTplObjToTpl($panelTemplate, 'PANEL_'.$panelSideUpper.'_TEMPLATES');
+      //      }
+      //      unset($panelTemplate);
    }
 
    /**
@@ -1185,28 +1156,28 @@ class AppCore {
     */
    public function selectCategory() {
       Category::factory(AppCore::getAuth());
-      $this->assignVarToTpl("MAIN_CATEGORY_TITLE", Category::getLabel());
-      $this->assignVarToTpl("MAIN_CATEGORY_ID", Category::getId());
+      //      $this->assignVarToTpl("MAIN_CATEGORY_TITLE", Category::getLabel());
+      //      $this->assignVarToTpl("MAIN_CATEGORY_ID", Category::getId());
    }
 
    /**
     * Metoda přiřadí chyby do šablony
     */
    public function assignCoreErrorsToTpl() {
-      $this->assignVarToTpl("ERROR_NAME", _('Chyba'));
-      $this->assignVarToTpl("ERROR_IN_FILE", _('soubor'));
-      $this->assignVarToTpl("ERROR_IN_FILE_LINE", _('řádek'));
-      $this->assignVarToTpl("ERROR_TRACE", _('řádek'));
-      $this->assignVarToTpl("CORE_ERRORS", CoreErrors::getErrors());
-      $this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreErrors::isEmpty());
+      //      $this->assignVarToTpl("ERROR_NAME", _('Chyba'));
+      //      $this->assignVarToTpl("ERROR_IN_FILE", _('soubor'));
+      //      $this->assignVarToTpl("ERROR_IN_FILE_LINE", _('řádek'));
+      //      $this->assignVarToTpl("ERROR_TRACE", _('řádek'));
+      //      $this->assignVarToTpl("CORE_ERRORS", CoreErrors::getErrors());
+      //      $this->assignVarToTpl("CORE_ERRORS_EMPTY", CoreErrors::isEmpty());
    }
 
    /**
     * Metoda přiřadí zprávy šablonovacího systému
     */
    public function assignMessagesToTpl() {
-      $this->assignVarToTpl("MESSAGES", self::getInfoMessages()->getMessages());
-      $this->assignVarToTpl("ERRORS", self::getUserErrors()->getMessages());
+      //      $this->assignVarToTpl("MESSAGES", self::getInfoMessages()->getMessages());
+      //      $this->assignVarToTpl("ERRORS", self::getUserErrors()->getMessages());
    }
 
    /**
@@ -1260,18 +1231,18 @@ class AppCore {
       // Odeslání chybové hlavičky o nenalezení stránky
       header("HTTP/1.0 404 Not Found");
       //	Hlavni promene strany
-      $this->coreTpl->addVar("PAGE_NOT_FOUND", true);
-      $this->coreTpl->addVar("PAGE_NOT_FOUND_TEXT", _('Chyba 404 - Stránka nebyla nalezena.
-Zkontrolujte prosím zadanou adresum nebo přejděte na'));
-      $this->coreTpl->addVar("PAGE_NOT_FOUND_MAIN_PAGE", _(' hlavní stránku'));
+      //      $this->coreTpl->addVar("PAGE_NOT_FOUND", true);
+      //      $this->coreTpl->addVar("PAGE_NOT_FOUND_TEXT", _('Chyba 404 - Stránka nebyla nalezena.
+      //Zkontrolujte prosím zadanou adresum nebo přejděte na'));
+      //      $this->coreTpl->addVar("PAGE_NOT_FOUND_MAIN_PAGE", _(' hlavní stránku'));
    }
 
    /**
     * Metoda spouští kód pro generování specielních stránek
     */
    public function runSpecialPage() {
-      $this->coreTpl->addVar('SPECIAL_PAGE', true);
-      $this->coreTpl->addVar('SPECIAL_PAGE_NAME', UrlRequest::getSpecialPage());
+      //      $this->coreTpl->addVar('SPECIAL_PAGE', true);
+      //      $this->coreTpl->addVar('SPECIAL_PAGE_NAME', UrlRequest::getSpecialPage());
       switch (UrlRequest::getSpecialPage()) {
          case UrlRequest::SPECIAL_PAGE_SEARCH:
             $this->runSearchPage();
@@ -1312,11 +1283,11 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
             // vyprázdnění modulu
             AppCore::setSelectedModule();
          }
-         $this->coreTpl->addVar('SEARCH_RESULTS', Search::getResults());
-         $this->coreTpl->addVar('SEARCH_RESULTS_COUNT', Search::getNumResults());
-         $this->coreTpl->addVar('NOT_ANY_SEARCH_RESULT',_('Žádná položka nebyla nalezena'));
-         $this->coreTpl->addVar('SEARCH_RESULT_COUNT_LABEL',_('Nalezeno výsledků'));
-         $this->coreTpl->addVar('SEARCH_RESULT_MORE',_('Více'));
+         //         $this->coreTpl->addVar('SEARCH_RESULTS', Search::getResults());
+         //         $this->coreTpl->addVar('SEARCH_RESULTS_COUNT', Search::getNumResults());
+         //         $this->coreTpl->addVar('NOT_ANY_SEARCH_RESULT',_('Žádná položka nebyla nalezena'));
+         //         $this->coreTpl->addVar('SEARCH_RESULT_COUNT_LABEL',_('Nalezeno výsledků'));
+         //         $this->coreTpl->addVar('SEARCH_RESULT_MORE',_('Více'));
       }
    }
 
@@ -1359,7 +1330,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   // spuštění sitemapy
                   $sitemap->run();
                   $sitemapArray[$idSection]['categories'][$idCategory]['results'] =
-                     array_merge($sitemapArray[$idSection]['categories'][$idCategory]['results'],
+                  array_merge($sitemapArray[$idSection]['categories'][$idCategory]['results'],
                      $sitemap->getCurrentMapArray());
                   unset($sitemap);
                }
@@ -1376,7 +1347,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
     * Metoda načte soubor se specialními vlastnostmi přenesenými do šablony,
     * které jsou jednotné pro celý web
     */
-   private function initialWebTpl() {
+   private function initialWebSettings() {
       $fileName = 'initial'.ucfirst(UrlRequest::getMediaType()).'.php';
       if(file_exists(self::MAIN_ENGINE_PATH.self::MODULES_DIR.DIRECTORY_SEPARATOR.$fileName)){
          require self::MAIN_ENGINE_PATH.self::MODULES_DIR.DIRECTORY_SEPARATOR.$fileName;
@@ -1471,7 +1442,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
             echo CoreErrors::getLastError();
          }
          exit();
-         
+
       }
       // pokud je zpracovávána normální aplikace a její moduly
       else {
@@ -1486,7 +1457,7 @@ Zkontrolujte prosím zadanou adresum nebo přejděte na'));
                   //nastavení vybrané kategorie
                   $this->selectCategory();
                   // Globální inicializace proměných do šablony
-                  $this->initialWebTpl();
+                  $this->initialWebSettings();
                   //vytvoření hlavního menu
                   $this->createMainMenu();
 

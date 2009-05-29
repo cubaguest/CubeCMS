@@ -9,10 +9,10 @@
 /**
  * Pokud je hlavní strana aplikace, je vložen flash jinak obrázek
  */
-if(Category::isDefault()){
-    $this->assignVarToTpl("IS_HOMEPAGE", true);
-} else {
-    $this->assignVarToTpl("IS_HOMEPAGE", false);
-}
+//if(Category::isDefault()){
+//    $this->assignVarToTpl("IS_HOMEPAGE", true);
+//} else {
+//    $this->assignVarToTpl("IS_HOMEPAGE", false);
+//}
 
 ?>
