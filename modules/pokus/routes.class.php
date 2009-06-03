@@ -3,7 +3,7 @@
  * Třída obsluhující cesty modulu
  *
  */
-class ModuleRoutes extends Routes {
+class PokusRoutes extends Routes {
 	function initRoutes() {
 //		$this->addRoute("all");
 //		$this->addRoute("pokus");
