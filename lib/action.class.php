@@ -70,7 +70,8 @@ class Action {
 	 * @return Module -- objekt modulu
 	 */
 	private function getModule() {
-      return AppCore::getSelectedModule();
+      return Module::getCurrentModule();
+//      return AppCore::getSelectedModule();
 	}
 	
 	/**

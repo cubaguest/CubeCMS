@@ -19,30 +19,8 @@ abstract class Controller {
 	 */
 	private $actionViewer = null;
 	
-	/**
-	 * Objekt pto práci s akcemi
-	 * @var ModuleAction
-	 */
-	private $action = null;
-	
-	/**
-	 * Objekt s právy k modulu
-	 * @var Rights
-	 */
-	private $rights = null;
+   private $moduleSys = null;
 
-	/**
-	 * Objekt s článkem
-	 * @var Article
-	 */
-	private $article = null;
-
-	/**
-	 * Objekt s cestami
-	 * @var Routes
-	 */
-	private $routes = null;
-	
 	/**
 	 * Objekt s šablonou
 	 * @var Template
@@ -62,16 +40,15 @@ abstract class Controller {
 	 * @param Routes $routes -- objekt s cestammi
 	 * @param Rights $rights -- objekt s právy k itemu
 	 */
-   public final function __construct(Action $action, Routes $routes, Rights $rights) {
+   public final function __construct(ModuleSys $moduleSys) {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
-      $this->action = $action;
-      $this->routes = $routes;
-      $this->rights = $rights;
-      $this->article = new Article();
-      $this->container = new Container();
+//      $this->container = new Container();
+      $this->moduleSys = $moduleSys;
       $this->viewTemplate = new Template();
+      // donastavení systému do šablony
+      $this->viewTemplate->_setSysModule($this->moduleSys);
 
-      //        Inicializace kontroleru modulu
+      // Inicializace kontroleru modulu
       $this->init();
    }
 
@@ -88,7 +65,15 @@ abstract class Controller {
 	final public function getSysConfig(){
 		return AppCore::sysConfig();
 	}
-	
+
+   /**
+    * Metoda vrací objekt systému modulu
+    * @return ModuleSys
+    */
+   final public function sys() {
+      return $this->moduleSys;
+   }
+
 	/**
 	 * Metoda vrací odkaz na objekt pro práci s odkazy
     * @param boolean -- true pokud má byt link čistý
@@ -96,43 +81,85 @@ abstract class Controller {
 	 * @return Links -- objekt pro práci s odkazy
 	 */
 	final public function getLink($clear = false, $onlyWebRoot = false) {
+      return $this->link($clear, $onlyWebRoot);
+	}
+	
+	/**
+	 * Metoda vrací odkaz na objekt pro práci s odkazy
+    * @param boolean -- true pokud má byt link čistý
+    * @param boolean -- true pokud má byt link bez kategorie
+	 * @return Links -- objekt pro práci s odkazy
+	 */
+	final public function link($clear = false, $onlyWebRoot = false) {
 		$link = new Links($clear, $onlyWebRoot);
       if(!$onlyWebRoot){
          $link->category(Category::getLabel(), Category::getId());
       }
 		return $link;
 	}
-	
+
 	/**
 	 * Metody vrací objekt modulu
 	 * @return Module -- objekt modulu
 	 */
 	final public function getModule() {
-      return AppCore::getSelectedModule();
+      return $this->module();
+	}
+
+	/**
+	 * Metody vrací objekt modulu
+	 * @return Module -- objekt modulu
+	 */
+	final public function module() {
+      return $this->sys()->module();
+	}
+
+	/**
+	 * Metody vrací objekt autorizace (infoormace o přiihlášení)
+	 * @return Auth -- objekt autorizace
+	 */
+	final public function getAuth() {
+      return $this->auth();
 	}
 	
 	/**
 	 * Metody vrací objekt autorizace (infoormace o přiihlášení)
 	 * @return Auth -- objekt autorizace
 	 */
-	final public function getAuth() {
-      return $this->getRights()->getAuth();
+	final public function auth() {
+      return $this->sys()->rights()->getAuth();
+	}
+
+	/**
+	 * Metoda vrací objekt na akci
+	 * @return ModuleAction -- objekt akce
+	 */
+	final public function getAction() {
+		return $this->action();
 	}
 	
 	/**
 	 * Metoda vrací objekt na akci
 	 * @return ModuleAction -- objekt akce
 	 */
-	final public function getAction() {
-		return $this->action;
+	final public function action() {
+      return $this->sys()->action();
 	}
-	
+
 	/**
 	 * Metoda vrací objekt s právy na modul
 	 * @return Rights -- objekt práv
 	 */
 	final public function getRights() {
-		return $this->rights;
+		return $this->rights();
+	}
+
+	/**
+	 * Metoda vrací objekt s právy na modul
+	 * @return Rights -- objekt práv
+	 */
+	final public function rights() {
+      return $this->sys()->rights();
 	}
 
 	/**
@@ -140,7 +167,15 @@ abstract class Controller {
 	 * @return Article -- objekt článku
 	 */
 	final public function getArticle() {
-		return $this->article;
+		return $this->article();
+	}
+
+	/**
+	 * Metoda vrací objekt s článkem
+	 * @return Article -- objekt článku
+	 */
+	final public function article() {
+      return $this->sys()->article();
 	}
 
 	/**
@@ -148,7 +183,15 @@ abstract class Controller {
 	 * @return Routes -- objekt Rout
 	 */
 	final public function getRoutes() {
-		return $this->routes;
+		return $this->routes();
+	}
+
+	/**
+	 * Metoda vrací objekt s cetsami - routes
+	 * @return Routes -- objekt Rout
+	 */
+	final public function routes() {
+      return $this->sys()->route();
 	}
 
 	/**
@@ -167,20 +210,32 @@ abstract class Controller {
       return AppCore::getUserErrors();
 	}
 	
-	/**
-	 * Metoda vrací objekt kontaineru pro přenos dat mezi controlerem, viewrem
-    * a šablonou
-	 * 
-	 * @return Container -- objekt kontaineru
-	 */
-	final public function container() {
-		return $this->container;
-	}
-	
+   // =========== METODY PRO VLOŽENÍ DO ŠABLONY
+   /**
+    * Metoda přidá proměnnou do viewru a šablony
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    */
+   final public function viewAddVar($name, $value) {
+      $this->viewTemplate->setVar($name, $value);
+   }
+
+   /**
+    * Metoda přidá eplugin do viewru a šablony
+    * @param string $name -- název Epluginu
+    * @param Eplugin $eplugin -- objket Epluginu
+    */
+   final public function viewAddEPlugin($name, Eplugin $eplugin) {
+      $this->viewTemplate->addEplugin($name, $eplugin);
+   }
+
+
 	/**
 	 * Metoda volaná při destrukci objektu
 	 */
-	function __destruct() {}
+	function __destruct() {
+      unset ($this->viewTemplate);
+   }
 
 	/**
 	 * Hlavní metoda třídy kontroleru, provádí se pokud není žádná akce ani
@@ -243,7 +298,14 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
 	final public function setView($view) {
 		$this->actionViewer = $view;
 	}
-	
+
+   /**
+    * Metoda vrací objekt šablony
+    * @return Template
+    */
+   final public function _getTemplateObj() {
+      return $this->viewTemplate;
+   }
 		
 	/**
 	 * Metoda spustí viewer modulu
@@ -271,7 +333,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
                , $viewClassName, $this->getModule()->getName()),1);
       }
 		//	Vytvoření objektu pohledu
-		$view = new $viewClassName($this->getRights(), $this->viewTemplate, $this->container());
+      $view = new $viewClassName($this->viewTemplate, $this->sys());
 
       //	zvolení viewru modulu pokud existuje
 		if(!method_exists($view, $viewName)){//TODO doladit jesli se správně dělají akce

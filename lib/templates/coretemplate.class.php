@@ -22,7 +22,31 @@ class CoreTemplate extends Template {
    }
 
    public function style($name) {
-      return $this->getFileDir($name, self::STYLESHEETS_DIR, true).$name;
+      return parent::getFileDir($name, self::STYLESHEETS_DIR).$name;
+   }
+
+   /**
+    * metoda přidává zadany css styl do výstupu
+    * @param string -- název scc stylu
+    * @param boolean -- true pokud je zadána i cesta se souborem
+    */
+   public static function addCss($cssName){
+      //TODO kontrola souborů
+      if(!in_array($cssName, self::$stylesheets)){
+         array_push(self::$stylesheets, $cssName);
+      }
+   }
+
+   /**
+    * metoda přidává zadaný javascript do výstupu
+    * @param string -- název javascriptu
+    * @param boolean -- true pokud je zadána i cesta se souborem
+    */
+   public static function addJS($jsFile){
+      //TODO kontrola souborů
+      if(!in_array($jsFile, self::$javascripts)){
+         array_push(self::$javascripts, $jsFile);
+      }
    }
 
 }

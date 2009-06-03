@@ -6,22 +6,13 @@
 
 class TextView extends View {
 	public function mainView() {
-		if($this->getRights()->isWritable()){
-			$this->template()->addTpl('editButton.tpl');
-			$this->template()->addVar('WRITABLE', true);
-			
-			$this->template()->addVar('LINK_TO_EDIT_TEXT_NAME', _m("Upravit"));
-			$this->template()->addVar('LINK_TO_EDIT_TEXT',$this->container()->getLink('link_edit'));
-		}
-
-      $jquery = new JQuery();
-      $this->template()->addJsPlugin($jquery);
-      if((bool)$this->getModule()->getParam(TextController::PARAM_FILES, true)){
-         $this->template()->addJsPlugin(new LightBox());
-         $this->template()->addVar('LIGHTBOX', true);
+      if((bool)$this->sys()->module()->getParam(TextController::PARAM_FILES, true)){
+         $this->addJsPlugin(new LightBox());
       }
-		$this->template()->addTpl("text.tpl");
-		$this->template()->addVar('TEXT', $this->container()->getData('text'));
+      $this->addTpl("text.phtml");
+      $this->addCss("style.css");
+      $model = new TextDetailModel();
+      $this->addVar('TEXT', $model->getText());
 	}
 	/*EOF mainView*/
 	

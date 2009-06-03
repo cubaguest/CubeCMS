@@ -84,6 +84,12 @@ class Locale {
    private static $appLangs = array();
 
    /**
+    * Doména modulu
+    * @var string
+    */
+   private $moduleDomain = null;
+
+   /**
     * Metoda pro vytvoření prostředí třídy locales
     */
    public static function factory() {
@@ -109,12 +115,10 @@ class Locale {
                self::$selectLang = self::$defaultLang;
             }
             $session->add(self::SESSION_LANG, self::$selectLang);
-
             if(self::$selectLang != self::$defaultLang){
                $link = new Links();
                $link->lang(self::$selectLang)->reload();
             }
-
          }
          // jazyk klienta byl zjištěn a nastaven
          else {
@@ -290,48 +294,24 @@ class Locale {
    }
 
    /**
-    * Metoda přenastaví lokalizační texty na engine
-    */
-//   public static function switchToEngineTexts() {
-//      textdomain(self::GETTEXT_DEFAULT_DOMAIN);
-//   }
-
-   /**
-    * Metoda přenastaví lokalizační texty na modul
-    *
-    * @param string -- název modulu, na který se mají texty přnastavit (option)\
-    * 					 pokud je prázdná použije se zvolený modul enginu
-    */
-//   public static function switchToModuleTexts($moduleName = null){
-//      if($moduleName == null AND AppCore::getSelectedModule() != null){
-//         textdomain(AppCore::getSelectedModule()->getName());
-//      } else if($moduleName != null){
-//         if(textdomain($moduleName)){
-//            throw new InvalidArgumentException(sprintf(
-//                  _('Lokalizace pro modul "%s" nebyla načtena'), $moduleName), 2);
-//         }
-//      }
-//   }
-
-   /**
     * Metoda přidá textovou doménu pro překlad
     *
     * @param string -- název modulu pro kterou se má překlad přidat (Option)
     */
-   public static function bindTextDomain($moduleName = null) {
-      if($moduleName == null AND AppCore::getSelectedModule() != null){
-         bindtextdomain(AppCore::getSelectedModule()->getName(), '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
-            . DIRECTORY_SEPARATOR . AppCore::getSelectedModule()->getName() . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
-      } else if($moduleName != null){
-         bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
-            . DIRECTORY_SEPARATOR . $moduleName . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
-      }
-   }
+//   public static function bindTextDomain($moduleName = null) {
+//      if($moduleName == null AND AppCore::getSelectedModule() != null){
+//         bindtextdomain(AppCore::getSelectedModule()->getName(), '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
+//            . DIRECTORY_SEPARATOR . AppCore::getSelectedModule()->getName() . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+//      } else if($moduleName != null){
+//         bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
+//            . DIRECTORY_SEPARATOR . $moduleName . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+//      }
+//   }
 
    /**
     * Metoda inicializuje doplňkové funkce pro práci s překlady
     */
-   public static function initTranslationsFunctions() {
+//   public static function initTranslationsFunctions() {
       /**
        * Funkce pro lokalizaci textů v modulech, pokud modul neexistuje je použit
        * překlad pro engine
@@ -339,12 +319,30 @@ class Locale {
        * @param string $message -- zpráva pro překlad
        * @return striing -- přeložený text
        */
-      function _m($message) {
-         if(AppCore::getSelectedModule() != null){
-            return dgettext(AppCore::getSelectedModule()->getName(), $message);
-         }
-         return _($message);
-      }
+//      function _m($message) {
+//         if(AppCore::getSelectedModule() != null){
+//            return dgettext(AppCore::getSelectedModule()->getName(), $message);
+//         }
+//         return _($message);
+//      }
+//   }
+
+   /**
+    * Konstruktor vytvoří objekt pro přístup k locales
+    * @param string $moduleDomain
+    */
+   public function  __construct($moduleDomain) {
+      $this->moduleDomain = $moduleDomain;
+      $this->bindTextDomain();
+   }
+
+   public function _m($message) {
+      return dgettext($this->moduleDomain, $message);
+   }
+
+   private function bindTextDomain() {
+      bindtextdomain($this->moduleDomain, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
+         . DIRECTORY_SEPARATOR . $this->moduleDomain . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
    }
 }
 ?>

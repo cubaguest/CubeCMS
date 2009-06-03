@@ -1,1 +1,0 @@
-<h1>{html_image file='./images/icons/acount.png'}{$VARS.LOGIN_PAGE_NAME}</h1>

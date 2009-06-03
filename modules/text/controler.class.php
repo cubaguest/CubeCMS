@@ -26,14 +26,14 @@ class TextController extends Controller {
       $this->checkReadableRights();
 
       //		Model pro načtení textu
-      $model = new TextDetailModel();
-      $this->container()->addData('text', $model->getText());
-      $this->container()->text = $model->getText();
+//      $model = new TextDetailModel();
+//      $this->container()->addData('text', $model->getText());
+//      $this->container()->text = $model->getText();
 
       //		pokud má uživatel právo zápisu vytvoříme odkaz pro editaci
-      if($this->getRights()->isWritable()){
-         $this->container()->addLink('link_edit', $this->getLink()->action($this->getAction()->editText()));
-      }
+//      if($this->getRights()->isWritable()){
+//         $this->container()->addLink('link_edit', $this->getLink()->action($this->getAction()->editText()));
+//      }
    }
 
    /**

@@ -11,7 +11,7 @@
  * @abstract 		Třída pro obsluhu šablony
  */
 
-class Template {
+class TemplateOld {
 	/**
 	 * Název pole s moduly (items) kategorie
 	 * @var array

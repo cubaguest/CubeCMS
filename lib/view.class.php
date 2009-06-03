@@ -3,10 +3,11 @@
  * Abstraktní třída pro objektu viewru.
  * Třídá slouží jako základ pro tvorbu Viewrů jednotlivých modulů. Poskytuje základní paramtery a metody k vytvoření pohledu modulu.
  * 
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: view.class.php 3.0.0 beta1 29.8.2008
- * @author 		Jakub Matas <jakubmatas@gmail.com>
- * @abstract 		Třída pro tvorbu a obsluhu pohledu
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id: controller.class.php 610 2009-05-29 07:14:39Z jakub $ VVE3.9.4 $Revision: 610 $
+ * @author        $Author: jakub $ $Date: 2009-05-29 09:14:39 +0200 (Pá, 29 kvě 2009) $
+ *                $LastChangedBy: jakub $ $LastChangedDate: 2009-05-29 09:14:39 +0200 (Pá, 29 kvě 2009) $
+ * @abstract 		Abstraktní třída kontroleru modulu
  */
 
 abstract class View {
@@ -23,40 +24,39 @@ abstract class View {
 	private $rights = null;
 	
 	/**
-	 * Objekt kontaineru ve který obsahuje data z kontroleru
-	 * @var Container
+	 * Objekt se systémovými parametry modulu (práva, ...)
+	 * @var ModuleSys
 	 */
-	private $container = null;
+	private $moduleSys = null;
 	
 	/**
 	 * Konstruktor Viewu
 	 *
 	 * @param Model -- použitý model
 	 */
-	function __construct(Rights $rights, Template &$template, Container $container) {
-		$this->rights = $rights;
+	function __construct(Template $template, ModuleSys $moduleSys) {
 		$this->template = $template;
-		$this->container = $container;
+      $this->moduleSys = $moduleSys;
 		
 //		inicializace viewru
 		$this->init();
-		$this->saveContainerToTpl();
+		//$this->saveContainerToTpl();
 	}
 
 	/**
 	 * Metoda vloži data s containeru do šablony
 	 *
 	 */
-	private function saveContainerToTpl() {
-//		Uložení dat containeru do šablony
-		foreach ($this->container()->getAllData() as $key => $var) {
-			$this->template()->addVar($key, $var);
-		}
-//		Uložení odkazů do šablony
-		foreach ($this->container()->getAllLinks() as $key => $var) {
-			$this->template()->addVar($key, $var);
-		}
-	}
+//	private function saveContainerToTpl() {
+////		Uložení dat containeru do šablony
+//		foreach ($this->container()->getAllData() as $key => $var) {
+//			$this->template()->addVar($key, $var);
+//		}
+////		Uložení odkazů do šablony
+//		foreach ($this->container()->getAllLinks() as $key => $var) {
+//			$this->template()->addVar($key, $var);
+//		}
+//	}
 	
 	/**
 	 * Metoda, která se provede vždy
@@ -75,47 +75,143 @@ abstract class View {
 	 *
 	 * @return Module -- objekt modulu
 	 */
-	final public function getModule() {
-      return AppCore::getSelectedModule();
-	}
+//	final public function getModule() {
+//      return Module::getCurrentModule();
+////      return AppCore::getSelectedModule();
+//	}
 	
 	/**
 	 * Funkce vrací datový adresář modulu
 	 * @return string -- datový adresář modulu
 	 */
-	final public function getDataDir() {
-		return $this->getModule()->getDir()->getDataDir();
-	}
+//	final public function getDataDir() {
+//		return $this->getModule()->getDir()->getDataDir();
+//	}
 	
 	/**
 	 * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
 	 * @return Template -- objekt šablony
 	 */
-	final public function template(){
+   private function template(){
 		//TODO zbytečné
 		if($this->template == null){
-			return $this->template = new Template();
+         $this->template = new Template();
+			return $this->template;
 		} else {
 			return $this->template;
 		}
 	}
+
+   /**
+    * Metoda vrací objekt se systémovým nasatvením modulu
+    * @return ModuleSys
+    */
+   final public function sys() {
+      return $this->moduleSys;
+   }
+
+   /**
+    * Metoda přidá danou šablonu
+    * @param string $name -- název šablony
+    * @param boolean $engine -- jestli je šablona enginu
+    * @return View -- vrací objekt sebe
+    */
+   final public function addTpl($name, $engine  = false) {
+      $this->template()->addTplFile($name, $engine);
+      return $this;
+   }
 	
+   /**
+    * Metoda přidá proměnnou do šablony
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    * @param boolean/string $array -- jestli má být proměná zařazena do pole
+    * nebo pod název pole
+    * @return View -- vrací objekt sebe
+    */
+   final public function addVar($name, $value, $array = false) {
+      $this->template()->setVar($name, $value, $array);
+      return $this;
+   }
+
+   /**
+    * Metoda přidá do šablony zadaný odkaz
+    * @param Links $link -- objekt odkazu
+    * @return View -- vrací sám sebe
+    */
+   final public function addLink($name, Links $link){
+      $this->template()->setLink($name, $link);
+      return $this;
+   }
+
 	/**
 	 * Metoda vrací objekt k právům uživatele
 	 * @return Rights -- objekt práv
 	 */
-	final public function getRights() {
-		return $this->rights;
+	final public function rights() {
+      return $this->sys()->rights();
 	}
-	
+
+   /**
+    * Metoda vrací objekt odkazu na  danou stránku
+    * @return Links -- objek odkazů
+    */
+   final public function link() {
+      return clone $this->sys()->link();
+   }
+
+	/**
+	 * Metoda přidá do šablony objekt JsPluginu
+	 * @return JsPlugin -- objekt JsPluginu
+	 */
+	final public function addJsPlugin(JsPlugin $jsplugin) {
+      $jsfiles = $jsplugin->getAllJsFiles();
+      foreach ($jsfiles as $file) {
+         CoreTemplate::addJS($file);
+      }
+
+      $cssfiles = $jsplugin->getAllCssFiles();
+      foreach ($cssfiles as $file) {
+         CoreTemplate::addCss($file);
+      }
+
+
+	}
+
+   /**
+    * Metoda přidá javascript soubor do šablony
+    * @param string/JsFile $jsfile -- název souboru nebo objek JsFile(pro virtuální)
+    */
+   final public function addJs($jsfile, $engine = false) {
+      if(!$engine){
+         $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->sys()->module()->getName());
+      } else {
+         $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR);
+      }
+      CoreTemplate::addJS($dir.$jsfile);
+   }
+
+   /**
+    * Metoda přidá zadaný css soubor do stylů stránky
+    * @param string $cssfile -- css soubor
+    */
+   final public function addCss($cssfile, $engine = false) {
+      if(!$engine){
+         $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR, $this->sys()->module()->getName());
+      } else {
+         $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR);
+      }
+      CoreTemplate::addCss($cssDir.$cssfile);
+   }
+
 	/**
 	 * Metoda vrací objekt kontaineru. který slouží pro přenos dat z kontroleru do viewru
 	 * 
 	 * @return Container -- objekt s daty
 	 */
-	final public function container() {
-		return $this->container;
-	}
+//	final public function container() {
+//		return $this->container;
+//	}
 }
 
 ?>

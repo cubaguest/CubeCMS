@@ -18,7 +18,8 @@ abstract class Model {
 	 * @return Module -- objekt modulu
 	 */
 	final public function getModule() {
-		return AppCore::getSelectedModule();
+      return Module::getCurrentModule();
+//		return AppCore::getSelectedModule();
 	}
 	
 	/**

@@ -17,7 +17,9 @@ class Module {
 	 * @var string
 	 */
 	const MODULE_PARAMS_SEPARATOR = ';';
-	
+
+   private static $currentModule = null;
+
 	/**
 	 * název modulu
 	 * @var string
@@ -89,7 +91,45 @@ class Module {
          $this->setLabel($moduleObject->label);
          $this->setAlt($moduleObject->alt);
       }
+      $this->setCurrentModule($this);
 	}
+
+   /**
+    * Destruktor odstraní právě prováděný modul
+    */
+   public function  __destruct() {
+      $this->setCurrentModule();
+   }
+
+   /**
+    * Metoda nastaví objekt modulu
+    */
+   private function setCurrentModule($obj = null) {
+      self::$currentModule = $obj;
+   }
+
+   /**
+    * Metoda vrací zpracovávaný objekt modulu
+    * @return Module
+    */
+   public static function getCurrentModule() {
+      return self::$currentModule;
+   }
+
+   /**
+    * Metoda vrací zpracovávaný objekt modulu
+    * @return Module
+    */
+//   public function getCurrentModule() {
+//      return self::$currentModule;
+//   }
+
+   /**
+    * Třída je singleton není povolen clone
+    */
+//   public function __clone() {
+//      throw new BadMethodCallException(_('Není povoleno inicializovat více jak jednu třídu aplikace'), 1);
+//   }
 
 	/**
 	 * Metoda vrací objekt s adresáři modulu
@@ -104,7 +144,7 @@ class Module {
 	 *
 	 * @param integer -- id modulu (item)
 	 */
-	function setId($id){
+	private function setId($id){
 		$this->id = $id;
 	}
 
@@ -113,7 +153,7 @@ class Module {
 	 *
 	 * @return integer -- id modulu (item)
 	 */
-	function getId(){
+	public function getId(){
 		return $this->id;
 	}
 
@@ -122,7 +162,7 @@ class Module {
 	 *
 	 * @param integer -- id modulu
 	 */
-	function setIdModule($idModule){
+	private function setIdModule($idModule){
 		$this->idModule = $idModule;
 	}
 
@@ -131,7 +171,7 @@ class Module {
 	 *
 	 * @return integer -- id modulu
 	 */
-	function getIdModule(){
+	public function getIdModule(){
 		return $this->idModule;
 	}
 
@@ -140,7 +180,7 @@ class Module {
 	 *
 	 * @param String -- jmeno modulu
 	 */
-	function setName($moduleName){
+	private function setName($moduleName){
 		$this->moduleName = $moduleName;
 	}
 
@@ -149,7 +189,7 @@ class Module {
 	 *
 	 * @return String -- jmeno modulu
 	 */
-	function getName(){
+	public function getName(){
 		return $this->moduleName;
 	}
 
@@ -158,7 +198,7 @@ class Module {
 	 *
 	 * @param String -- nazev modulu
 	 */
-	function setLabel($moduleLable){
+	private function setLabel($moduleLable){
 		$this->label = $moduleLable;
 	}
 
@@ -167,7 +207,7 @@ class Module {
 	 *
 	 * @return String -- nazev modulu
 	 */
-	function getLabel(){
+	public function getLabel(){
 		return $this->label;
 	}
 
@@ -176,7 +216,7 @@ class Module {
 	 *
 	 * @param String -- popis modulu
 	 */
-	function setAlt($moduleAlt){
+	private function setAlt($moduleAlt){
 		$this->alt = $moduleAlt;
 	}
 
@@ -185,7 +225,7 @@ class Module {
 	 *
 	 * @return String -- popis modulu
 	 */
-	function getAlt(){
+	public function getAlt(){
 		return $this->alt;
 	}
 
@@ -194,7 +234,7 @@ class Module {
 	 *
 	 * @param String -- jmeno adresare
 	 */
-	function setDataDir($dir){
+	private function setDataDir($dir){
 		$this->dataDir = $dir;
 	}
 
@@ -204,7 +244,7 @@ class Module {
 	 * @param integer -- cislo tabulky
 	 * @return String -- jmeno adresare
 	 */
-	function getDbTable($tableNum = 1){
+	public function getDbTable($tableNum = 1){
 		if(isset($this->dbTables[$tableNum])){
 			return $this->dbTables[$tableNum];
 		} else {
@@ -217,7 +257,7 @@ class Module {
 	 *
 	 * @param String -- parametry
 	 */
-   function setParams($catParams){
+   private function setParams($catParams){
       if ($catParams != null){
          $arrayValues = array();
          $arrayValues = explode(self::MODULE_PARAMS_SEPARATOR, $catParams);
@@ -246,7 +286,7 @@ class Module {
 	 *
 	 * @return Array -- parametry
 	 */
-	function getParams(){
+	public function getParams(){
 		return $this->params;
 	}
 
@@ -256,7 +296,7 @@ class Module {
     * @param mixed $defaultValue -- výchozí parametr
 	 * @return string -- hodnota parametr
 	 */
-	function getParam($param, $defaultValue = null){
+	public function getParam($param, $defaultValue = null){
 		if(isset($this->params[$param])){
 			return $this->params[$param];
 		} else {
