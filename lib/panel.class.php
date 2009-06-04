@@ -15,94 +15,53 @@
 
 abstract class Panel{
 	/**
-	 * Objekt pro práci s odkazy
-	 * @var Links
-	 */
-	private $_link = null;
-	
-	/**
-	 * Objekt pro práci s module
-	 * @var Module
-	 */
-	private $_module = null;
-	
-	/**
-	 * Pole s parametry kategorie
-	 * @var Array
-	 */
-	private $_category = null;
-	
-	/**
 	 * Objekt s šablonovacím systémem
 	 * @var Template
 	 */
 	private $_template = null;
 	
-	/**
-	 * Objekt s článkem
-	 * @var Article
-	 */
-	private $_article = null;
-	
-	/**
-	 * Objekt s akcemi
-	 * @var Action
-	 */
-	private $_action = null;
-	
-	/**
-	 * Objekt s cestami
-	 * @var Routes
-	 */
-	private $_routes = null;
-	
-	/**
-	 * Objekt s právy uživatele
-	 * @var Rights
-	 */
-	private $_rights = null;
-	
+   private $_moduleSys = null;
+
+
 	/**
 	 * Konstruktor
 	 */
-	function __construct($category, Template &$template, Rights $rights) {
-		$this->_link = new Links(true);
-		$this->_category = $category;
-		$this->_template = $template;
-		$this->_article = new Article();
-		$this->_rights = $rights;
-		
-		$action = null;
-		$actionClassName = ucfirst($this->getModule()->getName()).'Action';
+	function __construct(ModuleSys $sys) {
+		$this->_template = new Template();
+      $this->_moduleSys = $sys;
+
+
+		//$action = null;
+		$actionClassName = ucfirst($this->module()->getName()).'Action';
 		
 //		Pokud ještě nebyla třída načtena
 		if(!class_exists($actionClassName,false)){
 //			načtení souboru s akcemi modulu
-			if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $module->getName()),1);
+			if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),1);
          }
-         include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+         include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
 		}
 		if(class_exists($actionClassName)){
-         $this->_action = new $actionClassName($this->getModule(), $this->_article);
+         $this->sys()->setAction(new $actionClassName($this->module(), $this->article()));
 		} else {
-         $this->_action = new Action($getModule(), $this->_article);
+         $this->sys()->setAction(new Action($getModule(), $this->article()));
 		}
 //		Cesty
 		$routes = null;
-		$routesClassName = ucfirst($this->getModule()->getName()).'Routes';		
+		$routesClassName = ucfirst($this->module()->getName()).'Routes';
 //		Pokud ještě nebyla třída načtena
 		if(!class_exists($routesClassName, false)){		
 //			načtení souboru s cestami (routes) modulu
-			if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $module->getName()),2);
+			if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
+            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),2);
          }
-         include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->getModule()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+         include '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
 		}
 		if(class_exists($routesClassName)){
-			$this->_routes = new $routesClassName($this->_article);
+         $this->sys()->setRoute(new $routesClassName($this->article()));
 		} else {
-			$this->_routes = new Routes($this->_article);
+         $this->sys()->setRoute(new Routes($this->article()));
 		}
 	}
 		
@@ -120,58 +79,71 @@ abstract class Panel{
 	 * Metoda vrací objekt pro přístup k db
 	 * @return DbInterface -- objekt databáze
 	 */
-	final public function getDb() {
-		return AppCore::getDbConnector();
-	}
+	//final public function getDb() {
+	//	return AppCore::getDbConnector();
+	//}
 	
+   /**
+    * Metoda vrací systémový objekt modulu
+    * @return ModuleSys
+    */
+   final public function sys() {
+      return $this->_moduleSys;
+   }
+
 	/**
 	 * Metoda vrací odkaz na objekt pro práci s odkazy
 	 * @return Links -- objekt pro práci s odkazy
 	 */
-	final public function getLink($clear = true) {
-		$link = new Links($clear);
-		return $link->category($this->_category[Category::COLUMN_CAT_LABEL],
-			$this->_category[Category::COLUMN_CAT_ID]);
+	final public function link($clear = true) {
+		//$link = new Links($clear);
+		//return $link->category($this->_category[Category::COLUMN_CAT_LABEL],
+		//	$this->_category[Category::COLUMN_CAT_ID]);
+      $link = $this->sys()->link();
+      if($clear){
+         $link->clear();
+      }
+      return $link;
 	}
 	
 	/**
 	 * Metody vrací objekt modulu
 	 * @return Module -- objekt modulu
 	 */
-	final public function getModule() {
-		return AppCore::getSelectedModule();
+	final public function module() {
+      return $this->sys()->module();
 	}
 	
 	/**
 	 * Metoda vrací objekt na akci
 	 * @return ModuleAction -- objekt akce
 	 */
-	final public function getAction() {
-		return $this->_action;
+	final public function action() {
+      return $this->sys()->action();
 	}
 
 	/**
 	 * Metoda vrací objekt na akci
 	 * @return ModuleAction -- objekt akce
 	 */
-	final public function getRoute() {
-		return $this->_routes;
+	final public function route() {
+      return $this->sys()->route();
 	}
 	
 	/**
 	 * Metoda vrací objekt s právy na modul
 	 * @return Rights -- objekt práv
 	 */
-	final public function getRights() {
-		return $this->_rights;
+	final public function rights() {
+      return $this->sys()->rights();
 	}
 
 	/**
 	 * Metoda vrací objekt s článkem
 	 * @return Article -- objekt článku
 	 */
-	final public function getArticle() {
-		return $this->_article;
+	final public function article() {
+      return $this->sys()->rights();
 	}
 
 	/**

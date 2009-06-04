@@ -27,23 +27,23 @@ class NewsPanel extends Panel {
 	
 	public function panelController() {
       $newsM = new NewsListModel();
-      $this->newsArray = $newsM->getSelectedListNews(0, $this->getModule()->getParam(self::PARAM_NUMBER_OF_NEWS));
+      $this->newsArray = $newsM->getSelectedListNews(0, $this->module()->getParam(self::PARAM_NUMBER_OF_NEWS));
 		
       //	Přidání odkazů přímo na detail novinky
       if(!empty ($this->newsArray)){
          foreach ($this->newsArray as $newKey => $new) {
-            $this->newsArray[$newKey][self::SHOW_LINK_NAME] = $this->getLink()
+            $this->newsArray[$newKey][self::SHOW_LINK_NAME] = $this->link()
             ->article($new[NewsListModel::COLUMN_NEWS_LABEL], $new[NewsListModel::COLUMN_NEWS_ID_NEW]);
          }
       }
 
 		
-		$this->newsLink = $this->getLink();
+		$this->newsLink = $this->link();
 	}
 	
 	public function panelView() {
-		$this->template()->addTpl("panel.tpl");
-		$this->template()->addCss("style.css");
+      $this->template()->addTplFile("panel.tpl");
+		$this->template()-> addCss("style.css");
 		
 		$this->template()->addVar("NEWS_ARRAY", $this->newsArray);
 		$this->template()->addVar("NEWS_LINK", $this->newsLink);

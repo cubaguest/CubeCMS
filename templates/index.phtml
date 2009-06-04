@@ -2,9 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs" lang="cs">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="cache-control" content="no-cache" />
       <meta http-equiv="pragma" content="no-cache" />
-      <meta http-equiv="expires" content="-1" />
-      <title><?=$this->v('MAIN_PAGE_TITLE').' - '.$this->v('MAIN_CATEGORY_TITLE').' - '.$this->v('MAIN_MODULE_TITLE');?></title>
+      <meta http-equiv="pragma" content="-1" />
+      <title><?=$this->v('MAIN_PAGE_TITLE').' - '.$this->v('$MAIN_CATEGORY_TITLE').' - '.$this->v('$MAIN_MODULE_TITLE');?></title>
 
       <base href="<?=UrlRequest::getBaseWebDir()?>" />
 
@@ -84,27 +85,9 @@
             {if $LEFT_PANEL eq true}
             <div id="col2wrap" class="column">
                <div id="col2pad">
-                  {* Výpis menu s odkazy *}
-                  {if $LEFT_MENU_PANEL eq true}
-                  {foreach from=$LEFT_MENU_PANEL_ARRAY key=KEY item=ITEM}
-                  <div class="menu_bar">
-                     <h3>{$ITEM.section}</h3>
-                     <div class="menu_bar_obsah">
-                        {foreach from=$ITEM item=MENUITEM}
-                        {if is_array($MENUITEM)}
-                        {if $MENUITEM.url neq null}
-                        <a href="{$MENUITEM.url}" title="{$MENUITEM.name}">{$MENUITEM.name}</a><br />
-                        {else}
-                        <span>{$MENUITEM.name}</span>
-                        {/if}
-                        {/if}
-                        {/foreach}
-                     </div>
-                  </div>
-                  {/foreach}
-                  {/if}
-
                   {* Výpis panelů modulů *}
+
+
                   {* if empty($PANEL_LEFT_TEMPLATES) *}
                   {foreach from=$PANEL_LEFT_TEMPLATES item=TEMPLATES}
                   <div class="menu_bar">
@@ -203,6 +186,14 @@
       </div><!-- bodywrap /-->
 
    </body>
+   <?
+   if($this->v("SHOW_DEBUG_CONSOLE")){
+      echo "<pre>";
+      print_r($this);
+      echo "</pre>";
+   }
+   ?>
+
    {if $SHOW_DEBUG_CONSOLE eq true}
    {debug output=html}
    {/if}

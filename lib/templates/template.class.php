@@ -199,12 +199,12 @@ class Template {
 
    // vrácení odkazu
    public function l($name = null) {
-      if($name == null){
+      if($name == null AND $this->sys() != null){
          return $this->sys()->link();
       } else if(isset ($this->templateLinks[$name])) {
          return $this->templateLinks[$name];
       } else {
-         return null;
+         return new Links();
       }
    }
 // vrácení odkazu - alias

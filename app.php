@@ -5,7 +5,7 @@
  * Obsluhuje celou aplikaci a její komponenty a moduly.
  *
  * @copyright  Copyright (c) 2008 - 2009 Jakub Matas
- * @version    $Id$ VVE3.9.2 $Revision$
+ * @version    $Id$ VVE 5.0.0 $Revision$
  * @author     $Author$ $Date$
  *             $LastChangedBy$ $LastChangedDate$
  * @abstract 	Hlavní třída aplikace(Singleton)
@@ -191,12 +191,6 @@ class AppCore {
     * @var DbConnector
     */
    private static $dbConnector = null;
-
-   /**
-    * objekt právě vybraného modulu
-    * @var Module
-    */
-   //   private static $selectedModule = null;
 
    /**
     * Pole s aktuálními informacemi o zpracovávané kategorii
@@ -927,9 +921,9 @@ class AppCore {
                //				Vytvoření objektu akce
                $actionClassName = ucfirst($sysModule->module()->getName()).'Action';
                if(class_exists($actionClassName)){
-                  $sysModule->setAction(new $actionClassName());
+                  $sysModule->setAction(new $actionClassName($sysModule->module()));
                } else {
-                  $sysModule->setAction(new Action());
+                  $sysModule->setAction(new Action($sysModule->module()));
                }
                //				načtení souboru s cestami (routes) modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
@@ -1049,12 +1043,11 @@ class AppCore {
       $panelSideUpper = strtoupper($side);
       $panelSideLower = strtolower($side);
       //	Zapnutí panelu
-      $this->assignVarToTpl($panelSideUpper."_PANEL", true);
+      $this->coreTpl->setVar($panelSideUpper."_PANEL", true);
       // Načtení panelů
       $panelModel = new PanelModel();
       $panelData = $panelModel->getPanel($side);
       if(!empty($panelData)){
-         $panelTemplate = new Template();
          foreach ($panelData as $panel) {
             // Nastavení prováděné kategorie
             self::$currentCategory = $category
@@ -1068,22 +1061,26 @@ class AppCore {
                $tableIndex++;
                $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
             }
+            // systemový objekt
+            $panelSys = new ModuleSys();
+
             // Příprava modulu
-            $panelModule = new Module($panel, $moduleDbTables);
-            self::$selectedModule = clone $panelModule;
-            $panelClassName = ucfirst($panelModule->getName()).self::MODULE_PANEL_CLASS_SUFIX;
+            $panelSys->setModule(new Module($panel, $moduleDbTables));
+            
+            
+            $panelClassName = ucfirst($panelSys->module()->getName()).self::MODULE_PANEL_CLASS_SUFIX;
             // Spuštění panelu
             try {
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                     . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
-                  throw new BadFileException(_("Controler a Viewer panelu ").$panelModule->getName()
+                     . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
+                  throw new BadFileException(_("Controler a Viewer panelu ").$panelSys->module()->getName()
                      ._(" neexistuje."),17);
                }
                include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-               . $panelModule->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
+               . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
                if(!class_exists($panelClassName)){
                   throw new BadClassException(_("Třídat ").$panelClassName._(" panelu ")
-                     .$panelModule->getName()._(" neexistuje."),18);
+                     .$panelSys->module()->getName()._(" neexistuje."),18);
                }
                //	vytvoření pole se skupinama a právama
                $userRights = array();
@@ -1093,27 +1090,29 @@ class AppCore {
                   }
                }
                //	Vytvoření objektu pro přístup k právům modulu
-               $panelRights = new Rights($userRights);
-               //	nastavení tempalte
-               //               $panelTemplate->setModule($panelModule);
+               $panelSys->setRights(new Rights($userRights));
+
+               // objekt odkazu
                $link = new Links(true);
-               //               $panelTemplate->setTplCatLink($link->category($panel->{CategoryModel::COLUMN_CAT_LABEL},
-               //                     $panel->{CategoryModel::COLUMN_CAT_ID}));
-               unset ($link);
+               $link->category($panel->{Category::COLUMN_CAT_LABEL}, $panel->{Category::COLUMN_CAT_ID});
+               $panelSys->setLink($link);
+               
                //	CONTROLLER PANELU
-               //               $panel = new $panelClassName($category, $panelTemplate, $panelRights);
+               $panelCtrl = new $panelClassName($panelSys);
+
                //	spuštění controleru
-               if(!method_exists($panel, self::MODULE_PANEL_CONTROLLER)){
+               if(!method_exists($panelCtrl, self::MODULE_PANEL_CONTROLLER)){
                   throw new BadMethodCallException(_("Neexistuje controler panelu ")
-                     .$panelModule->getName(),19);
+                     .$panelSys->module()->getName(),19);
                }
-               $panel->{self::MODULE_PANEL_CONTROLLER}();
-               if(!method_exists($panel, self::MODULE_PANEL_VIEWER)){
+
+
+               $panelCtrl->{self::MODULE_PANEL_CONTROLLER}();
+               if(!method_exists($panelCtrl, self::MODULE_PANEL_VIEWER)){
                   throw new BadMethodCallException(_("Neexistuje viewer panelu ")
-                     .$panelModule->getName(),20);
+                     .$panelSys->module()->getName(),20);
                }
-               $panel->{self::MODULE_PANEL_VIEWER}();
-               AppCore::setSelectedModule();
+               $panelCtrl->{self::MODULE_PANEL_VIEWER}();
             } catch (BadClassException $e) {
                new CoreErrors($e);
             } catch (BadFileException $e) {
@@ -1121,6 +1120,7 @@ class AppCore {
             } catch (BadMethodCallException $e) {
                new CoreErrors($e);
             }
+            $this->coreTpl->setVar($panelSideUpper."_PANEL", $panelCtrl->_getTemplateObj(), true);
          }
       }
       //		Přiřazení panelů do šablony
@@ -1313,8 +1313,7 @@ class AppCore {
             AppCore::setSelectedModule();
          }
       }
-      $this->coreTpl->addVar('SITEMAP_PAGES', $sitemapArray);
-      $this->coreTpl->addVar('SITEMAP_PAGE_NAME', _('Mapa stránek'));
+      $this->coreTpl->setVar('SITEMAP_PAGES', $sitemapArray);
    }
 
    /**
@@ -1446,11 +1445,11 @@ class AppCore {
                   // =========	spuštění panelů
                   //		Levý
                   if(Category::isLeftPanel()){
-//                     $this->runPanel('left');
+                     $this->runPanel('left');
                   }
                   //		Pravý
                   if(Category::isRightPanel()){
-//                     $this->runPanel('right');
+                     $this->runPanel('right');
                   }
                   // pokud se v aplikaci vyskitla chybová stránka, spustíme ji
                   if(AppCore::isErrorPage()){

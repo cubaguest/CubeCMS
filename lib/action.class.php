@@ -50,12 +50,20 @@ class Action {
 	 * @var string
 	 */
 	private $defaultAction = null;
-	
+
+   /**
+    * Objekt modulu
+    * @var Module
+    */
+   private $module = null;
+
 	/**
 	 * Konstruktor
+    * @param Module $odule -- objekt modulu
 	 */
-	public final function __construct(){
+	public final function __construct(Module $module){
 //		Vytvoření uživatelských akcí
+      $this->module = $module;
 		$this->createDefaultActions();
       $this->init();
 	}
@@ -69,11 +77,16 @@ class Action {
 	 * Metoda vrací objekt na modul
 	 * @return Module -- objekt modulu
 	 */
-	private function getModule() {
-      return Module::getCurrentModule();
+	private function module() {
+      return $this->module;
 //      return AppCore::getSelectedModule();
 	}
-	
+
+   final public function _m($message) {
+      $loc = new Locale($this->module()->getName());
+      return $loc->_m($message);
+   }
+
 	/**
 	 * Metody vytvoří výchozí akce (add, edit a show)
 	 */
@@ -191,7 +204,7 @@ class Action {
       $return = array();
       $return[0]= $action[self::ACTION_LABEL_PARAM];
       $return[1]= $actionAbbr;
-      $return[2]= $this->getModule()->getId();
+      $return[2]= $this->module()->getId();
       return $return;
    }
 

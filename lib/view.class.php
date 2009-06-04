@@ -18,12 +18,6 @@ abstract class View {
 	private $template = null;
 	
 	/**
-	 * Objekt pro zjištění práv uživatele
-	 * @var Rights
-	 */
-	private $rights = null;
-	
-	/**
 	 * Objekt se systémovými parametry modulu (práva, ...)
 	 * @var ModuleSys
 	 */
