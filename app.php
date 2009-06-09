@@ -733,42 +733,33 @@ class AppCore {
     * Metoda přiřadí do šablony hlavní proměnné systému
     */
    public function assignMainVarsToTemplate() {
-      //      //	Hlavni promene strany
-      $this->coreTpl->setVar("MAIN_PAGE_TITLE", self::sysConfig()->getOptionValue("web_name"));
+      //	Hlavni promene strany
+      $this->coreTpl->pageTitle = self::sysConfig()->getOptionValue("web_name");
       //adresa k rootu webu
-      $this->coreTpl->setVar("MAIN_ROOT_DIR", self::getAppWebDir());
+      $this->coreTpl->rootDir = self::getAppWebDir();
       $link = new Links();
-      $this->coreTpl->setVar("MAIN_WEB_DIR", UrlRequest::getBaseWebDir());
+      $this->coreTpl->mainWebDir = UrlRequest::getBaseWebDir();
       //            $this->coreTpl->setVar("THIS_PAGE_LINK", (string)$link);
       // mapa webu
-      $this->coreTpl->setVar("SITEMAP_LINK", (string)$link->clear(true)
-         .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP));
-      $this->coreTpl->setVar("SITEMAP_LINK_NAME", _('Mapa stránek'));
-      $this->coreTpl->setVar("MAIN_LANG_IMAGES_PATH", self::sysConfig()
-         ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR);
-      //            $this->coreTpl->addVar("MAIN_CURRENT_FACE_PATH", self::getTepmlateFaceDir(false));
-      //            $this->coreTpl->setVar("MAIN_CURRENT_FACE_IMAGES_PATH", self::getTepmlateFaceDir(false)
-      //               .self::sysConfig()->getOptionValue('images', 'dirs').URL_SEPARATOR);
+      $this->coreTpl->sitemapLink = (string)$link->clear(true)
+         .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP);
+      $this->coreTpl->mainLangImagesPath = self::sysConfig()
+         ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR;
       unset($link);
       //Přihlášení uživatele
-      $this->coreTpl->setVar("USER_IS_LOGIN",  AppCore::getAuth()->isLogin());
-      $this->coreTpl->setVar("NOT_LOGIN_USER_NAME",_("Nepřihlášen"));
-      $this->coreTpl->setVar("LOGIN_USER_NAME",_("Přihlášen"));
-      $this->coreTpl->setVar("USER_LOGIN_USERNAME", AppCore::getAuth()->getUserName());
-      //		Popisky loginu
-      $this->coreTpl->setVar("LOGIN_LOGOUT_BUTTON_NAME", _("Odhlásit"));
-      $this->coreTpl->setVar("LOGIN_LOGIN_BUTTON_NAME", _("Přihlásit"));
-      // hledání
-      $this->coreTpl->setVar("SEARCH_BUTTON", _("Hledej"));
-      $this->coreTpl->setVar("SEARCH_NAME", _("Hledání"));
+      $this->coreTpl->userIsLogin = AppCore::getAuth()->isLogin();
+      $this->coreTpl->userLoginUsername = AppCore::getAuth()->getUserName();
       //Verze enginu
-      $this->coreTpl->setVar("ENGINE_VERSION", self::sysConfig()->getOptionValue("engine_version"));
+      $this->coreTpl->engineVersion = self::sysConfig()->getOptionValue("engine_version");
       //Debugovaci mod
       if (self::$debugLevel > 1){
-         $this->coreTpl->setVar("DEBUG_MODE", true);
+         $this->coreTpl->debugMode = true;
+      }
+      if (self::$debugLevel > 2){
+         $this->coreTpl->showDebugConsole = true;
       }
       //      //		Přiřazení jazykového pole
-      $this->coreTpl->setVar("APP_LANGS_NAMES", Locale::getAppLangsNames());
+      $this->coreTpl->appLangsNames = Locale::getAppLangsNames();
       //      //		Vytvoření odkazů s jazyky
       $langs = array();
       $langNames = Locale::getAppLangsNames();
@@ -787,9 +778,9 @@ class AppCore {
       unset($langNames);
       unset($link);
       unset($langArr);
-      $this->coreTpl->setVar('APP_LANGS' ,$langs);
+      $this->coreTpl->appLangs = $langs;
       unset($langs);
-      $this->coreTpl->setVar('APP_LANG' ,Locale::getLang());
+      $this->coreTpl->appLang = Locale::getLang();
    }
 
    /**
@@ -803,8 +794,8 @@ class AppCore {
       $endTime = ((float)$sec + (float)$usec);
 
 
-      $this->coreTpl->setVar("MAIN_EXEC_TIME", round($endTime-$this->_stratTime, 4));
-      $this->coreTpl->setVar("COUNT_ALL_SQL_QUERY", Db::getCountQueries());
+      $this->coreTpl->execTime = round($endTime-$this->_stratTime, 4);
+      $this->coreTpl->countAllSqlQueries = Db::getCountQueries();
       //      //		Přiřazení javascriptů a stylů
       //      $this->assignVarToTpl("STYLESHEETS", Template::getStylesheets());
       //      $this->assignVarToTpl("JAVASCRIPTS", Template::getJavaScripts());
@@ -876,6 +867,9 @@ class AppCore {
       $items = $modulesModel->getModules();
       //		procházení prvků stránky
       if($items != null){
+         // pole s šablonama
+         $modulesTemplates = array();
+
          //  Nastavení prováděné kategorie
          self::$currentCategory = array(Category::COLUMN_CAT_LABEL => Category::getLabel()
             , Category::COLUMN_CAT_ID => Category::getId());
@@ -1006,7 +1000,7 @@ class AppCore {
                      . $sysModule->module()->getName()._('" nebyl korektně proveden'), 15);
                }
                //	Uložení šablony a proměných do hlavní šablony
-               $this->coreTpl->setVar("MODULES", $controller->_getTemplateObj(), true);
+               array_push($modulesTemplates, $controller->_getTemplateObj());
                unset($controller);
                $isModuleControlerRun = true;
             } catch (Exception $e) {
@@ -1025,6 +1019,8 @@ class AppCore {
             //				odstranění proměných
             unset($controller);
          }
+         $this->coreTpl->modules = $modulesTemplates;
+         unset ($modulesTemplates);
       } else {
          if(new Links() == new Links(true)){
             throw new UnderflowException(_("Nepodařilo se nahrát prvky kategorie z databáze."), 16);
@@ -1036,7 +1032,9 @@ class AppCore {
    }
 
    /**
-    * Metoda inicializuje a spustí levý panel
+    * Metoda inicializuje a spustí panel
+    * @param string $side -- jaký panel je spuštěn (left, right, bottom, top, ...)
+    * @todo dodělat implementaci ostatních pozic panelů
     */
    public function runPanel($side){
       //	Rozdělenní, který panel je zpracován
@@ -1048,6 +1046,7 @@ class AppCore {
       $panelModel = new PanelModel();
       $panelData = $panelModel->getPanel($side);
       if(!empty($panelData)){
+         $panelsTempaltes = array();
          foreach ($panelData as $panel) {
             // Nastavení prováděné kategorie
             self::$currentCategory = $category
@@ -1120,8 +1119,10 @@ class AppCore {
             } catch (BadMethodCallException $e) {
                new CoreErrors($e);
             }
-            $this->coreTpl->setVar($panelSideUpper."_PANEL", $panelCtrl->_getTemplateObj(), true);
+            array_push($panelsTempaltes, $panelCtrl->_getTemplateObj());
          }
+         $this->coreTpl->{$panelSideUpper."_PANEL"} = $panelsTempaltes;
+         unset ($panelsTempaltes);
       }
       //		Přiřazení panelů do šablony
       //      if(isset($panelTemplate)){
@@ -1135,26 +1136,26 @@ class AppCore {
     */
    public function selectCategory() {
       Category::factory(AppCore::getAuth());
-      $this->coreTpl->setVar("MAIN_CATEGORY_TITLE", Category::getLabel());
-      $this->coreTpl->setVar("MAIN_CATEGORY_ID", Category::getId());
+      $this->coreTpl->categoryTitle = Category::getLabel();
+      $this->coreTpl->categoryId = Category::getId();
    }
 
    /**
     * Metoda přiřadí chyby do šablony
     */
    public function assignCoreErrorsToTpl() {
-      $this->coreTpl->setVar("CORE_ERRORS", CoreErrors::getErrors());
-      $this->coreTpl->setVar("CORE_ERRORS_EMPTY", CoreErrors::isEmpty());
+      $this->coreTpl->coreErrors = CoreErrors::getErrors();
+      $this->coreTpl->coreErrorsEmpty = CoreErrors::isEmpty();
    }
 
    /**
     * Metoda přiřadí zprávy šablonovacího systému
     */
    public function assignMessagesToTpl() {
-      $this->coreTpl->setVar("MESSAGES", self::getInfoMessages()->getMessages());
-      $this->coreTpl->setVar("MESSAGES_EMPTY", self::getInfoMessages()->isEmpty());
-      $this->coreTpl->setVar("MODULE_ERRORS", self::getUserErrors()->getMessages());
-      $this->coreTpl->setVar("MODULE_ERRORS_EMPTY", self::getUserErrors()->isEmpty());
+      $this->coreTpl->messages = self::getInfoMessages()->getMessages();
+//      $this->coreTpl->setVar("MESSAGES_EMPTY", self::getInfoMessages()->isEmpty());
+      $this->coreTpl->moduleErrors = self::getUserErrors()->getMessages();
+//      $this->coreTpl->setVar("MODULE_ERRORS_EMPTY", self::getUserErrors()->isEmpty());
    }
 
    /**
@@ -1208,15 +1209,15 @@ class AppCore {
       // Odeslání chybové hlavičky o nenalezení stránky
       header("HTTP/1.0 404 Not Found");
       //	Hlavni promene strany
-      $this->coreTpl->setVar("PAGE_NOT_FOUND", true);
+      $this->coreTpl->pageNotFound = true;
    }
 
    /**
     * Metoda spouští kód pro generování specielních stránek
     */
    public function runSpecialPage() {
-      $this->coreTpl->setVar('SPECIAL_PAGE', true);
-      $this->coreTpl->setVar('SPECIAL_PAGE_NAME', UrlRequest::getSpecialPage());
+      $this->coreTpl->specialPage = true;
+      $this->coreTpl->specialPageName = UrlRequest::getSpecialPage();
       switch (UrlRequest::getSpecialPage()) {
          case UrlRequest::SPECIAL_PAGE_SEARCH:
             $this->runSearchPage();
@@ -1257,11 +1258,8 @@ class AppCore {
             // vyprázdnění modulu
             AppCore::setSelectedModule();
          }
-         $this->coreTpl->setVar('SEARCH_RESULTS', Search::getResults());
-         $this->coreTpl->setVar('SEARCH_RESULTS_COUNT', Search::getNumResults());
-         $this->coreTpl->setVar('NOT_ANY_SEARCH_RESULT',_('Žádná položka nebyla nalezena'));
-         $this->coreTpl->setVar('SEARCH_RESULT_COUNT_LABEL',_('Nalezeno výsledků'));
-         $this->coreTpl->setVar('SEARCH_RESULT_MORE',_('Více'));
+         $this->coreTpl->searchResults = Search::getResults();
+         $this->coreTpl->searchResultsCount = Search::getNumResults();
       }
    }
 
@@ -1313,7 +1311,7 @@ class AppCore {
             AppCore::setSelectedModule();
          }
       }
-      $this->coreTpl->setVar('SITEMAP_PAGES', $sitemapArray);
+      $this->coreTpl->sitemapPages = $sitemapArray;
    }
 
    /**

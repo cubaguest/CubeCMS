@@ -1,20 +1,20 @@
 <?// Vypis hlasek
-if(!$this->v("MESSAGES_EMPTY")){ ?>
+if(!empty ($this->messages)){ ?>
 <p class="message text">
    <img src="./images/icons/accept.png" alt="message icon" />
-   <? foreach ($this->v("MESSAGES") as $message) {
+   <? foreach ($this->messages as $message) {
       echo $message . "<br />";
    }?>
 </p>
 <? }?>
 
 <? // chyby enginu
-if(!$this->v("CORE_ERRORS_EMPTY")){ ?>
+if(!$this->coreErrorsEmpty){ ?>
 <div class="errorMessage text">
    <img src="./images/icons/coreerror.png" alt="core error icon" />
-   <? foreach ($this->v("CORE_ERRORS") as $error) {?>
+   <? foreach ($this->coreErrors as $error) {?>
       <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
-      <?=_("soubor")?> <?=$error["file"]?>, <?=_("řádek")?> <?=$error["line"]?>
+      <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?>
       <? if($this->v("DEBUG_MODE")){
          foreach ($error["trace"] as $err) {?>
          <p class="errTrMargin">
@@ -28,12 +28,12 @@ if(!$this->v("CORE_ERRORS_EMPTY")){ ?>
 <? }?>
 
 <? // chyby modulu
-if(!$this->v("MODULE_ERRORS_EMPTY")){ ?>
+if(!empty ($this->moduleErrors)){ ?>
 <div class="errorMessage text">
    <img src="./images/icons/error.png" alt="error icon" />
-   <? foreach ($this->v("MODULE_ERRORS") as $error) {
-      if($this->v("DEBUG_MODE")){
-         echo _('Modul'). $error ."<br />";
+   <? foreach ($this->moduleErrors as $error) {
+      if($this->debugMode){
+         echo _('Modul')." ". $error ."<br />";
       } else{
          echo $error ."<br />";
       }

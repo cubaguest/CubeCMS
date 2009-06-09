@@ -7,12 +7,13 @@
 class TextView extends View {
 	public function mainView() {
       if((bool)$this->sys()->module()->getParam(TextController::PARAM_FILES, true)){
-         $this->addJsPlugin(new LightBox());
+         $this->template()->addJsPlugin(new LightBox());
       }
-      $this->addTpl("text.phtml");
-      $this->addCss("style.css");
+      $this->template()->addTplFile("text.phtml");
+      $this->template()->addCssFile("style.css");
+
       $model = new TextDetailModel();
-      $this->addVar('TEXT', $model->getText());
+      $this->template()->text = $model->getText();
 	}
 	/*EOF mainView*/
 	

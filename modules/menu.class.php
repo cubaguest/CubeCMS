@@ -35,8 +35,8 @@ class Menu extends MainMenu {
 
       //		přiřazení do šablony
       $this->template()->addTplFile("menu.phtml", true);
-      $this->template()->setVar("SECTIONS_ARRAY", $sectionArray);
-      $this->template()->setVar("CATEGORY_ARRAY", $categoryArray);
+      $this->template()->sectionsArray = $sectionArray;
+      $this->template()->categoryArray = $categoryArray;
    }
 }
 ?>

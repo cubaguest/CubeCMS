@@ -86,7 +86,7 @@ abstract class View {
 	 * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
 	 * @return Template -- objekt šablony
 	 */
-   private function template(){
+   public function template(){
 		//TODO zbytečné
 		if($this->template == null){
          $this->template = new Template();
@@ -110,10 +110,10 @@ abstract class View {
     * @param boolean $engine -- jestli je šablona enginu
     * @return View -- vrací objekt sebe
     */
-   final public function addTpl($name, $engine  = false) {
-      $this->template()->addTplFile($name, $engine);
-      return $this;
-   }
+//   final public function addTpl($name, $engine  = false) {
+//      $this->template()->addTplFile($name, $engine);
+//      return $this;
+//   }
 	
    /**
     * Metoda přidá proměnnou do šablony
@@ -123,20 +123,20 @@ abstract class View {
     * nebo pod název pole
     * @return View -- vrací objekt sebe
     */
-   final public function addVar($name, $value, $array = false) {
-      $this->template()->setVar($name, $value, $array);
-      return $this;
-   }
+//   final public function addVar($name, $value, $array = false) {
+//      $this->template()->setVar($name, $value, $array);
+//      return $this;
+//   }
 
    /**
     * Metoda přidá do šablony zadaný odkaz
     * @param Links $link -- objekt odkazu
     * @return View -- vrací sám sebe
     */
-   final public function addLink($name, Links $link){
-      $this->template()->setLink($name, $link);
-      return $this;
-   }
+//   final public function addLink($name, Links $link){
+//      $this->template()->setLink($name, $link);
+//      return $this;
+//   }
 
 	/**
 	 * Metoda vrací objekt k právům uživatele
@@ -153,59 +153,5 @@ abstract class View {
    final public function link() {
       return clone $this->sys()->link();
    }
-
-	/**
-	 * Metoda přidá do šablony objekt JsPluginu
-	 * @return JsPlugin -- objekt JsPluginu
-	 */
-	final public function addJsPlugin(JsPlugin $jsplugin) {
-      $jsfiles = $jsplugin->getAllJsFiles();
-      foreach ($jsfiles as $file) {
-         CoreTemplate::addJS($file);
-      }
-
-      $cssfiles = $jsplugin->getAllCssFiles();
-      foreach ($cssfiles as $file) {
-         CoreTemplate::addCss($file);
-      }
-
-
-	}
-
-   /**
-    * Metoda přidá javascript soubor do šablony
-    * @param string/JsFile $jsfile -- název souboru nebo objek JsFile(pro virtuální)
-    */
-   final public function addJs($jsfile, $engine = false) {
-      if(!$engine){
-         $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->sys()->module()->getName());
-      } else {
-         $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR);
-      }
-      CoreTemplate::addJS($dir.$jsfile);
-   }
-
-   /**
-    * Metoda přidá zadaný css soubor do stylů stránky
-    * @param string $cssfile -- css soubor
-    */
-   final public function addCss($cssfile, $engine = false) {
-      if(!$engine){
-         $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR, $this->sys()->module()->getName());
-      } else {
-         $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR);
-      }
-      CoreTemplate::addCss($cssDir.$cssfile);
-   }
-
-	/**
-	 * Metoda vrací objekt kontaineru. který slouží pro přenos dat z kontroleru do viewru
-	 * 
-	 * @return Container -- objekt s daty
-	 */
-//	final public function container() {
-//		return $this->container;
-//	}
 }
-
 ?>

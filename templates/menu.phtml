@@ -1,7 +1,7 @@
 <!-- Sekce v menu  -->
 <div class="chromestyle" id="chromemenu">
    <ul>
-      <? foreach ($this->v("SECTIONS_ARRAY") as $sec_key => $section) {?>
+      <? foreach ($this->sectionsArray as $sec_key => $section) {?>
       <li>
          <? if($section["submenu"]){?>
          <a href="#" rel="dropmenu<?=$sec_key?>" title="<?=$section["slabel"]?>"><?=$section["slabel"]?></a>
@@ -13,7 +13,7 @@
    </ul>
 </div>
 <!-- Kategorie v podmenu -->
-<? foreach ($this->v("CATEGORY_ARRAY") as $cat_key => $category) {?>
+<? foreach ($this->categoryArray as $cat_key => $category) {?>
 <div id="dropmenu<?=$cat_key?>" class="dropmenudiv">
    <? foreach ($category as $menuItem){?>
    <a href="<?=$menuItem["url"]?>" title="<?=$menuItem["calt"]?>"><?=$menuItem["clabel"]?></a>
