@@ -11,6 +11,8 @@
  * @abstract 		Třída pro obsluhu šablony
  */
 
+require_once 'tplmodifiers.php';
+
 class Template {
    /**
     * Proměná s názvem titulku okna
@@ -132,11 +134,17 @@ class Template {
 
    /**
     * Konstruktor třídy
+    * @param ModuleSys $modulesys -- systémový objekt modulu a práv
     */
-   public function __construct(){}
+   public function __construct(ModuleSys $moduleSys = null){
+      if($moduleSys != null){
+         $this->_setSysModule($moduleSys);
+      }
+   }
 
    // metoda pro vytvoření proměné
    public function  __set($name, $value) {
+//      var_dump($name, $value);
       //      if($value instanceof Links){
       //
       //      } else {
@@ -168,23 +176,9 @@ class Template {
     */
 
    // nastaví privátní proměnou
-   //   public function setVar($name, $value, $array = false) {
-   //      if(!$array){
-   ////         $this->privateVars[$name] = new TplVar($name, $value);
-   //         $this->privateVars[$name] = $value;
-   //      } else {
-   //         if(!isset ($this->privateVars[$name]) OR !is_array($this->privateVars[$name])){
-   //            $this->privateVars[$name] = array();
-   //         }
-   //         if($array === true){
-   ////            array_push($this->privateVars[$name], new TplVar($name, $value));
-   //            array_push($this->privateVars[$name], $value);
-   //         } else {
-   ////            $this->privateVars[$name][$array] = new TplVar($name, $value);
-   //            $this->privateVars[$name][$array] = $value;
-   //         }
-   //      }
-   //   }
+      public function setVar($name, $value) {
+         $this->privateVars[$name] = $value;
+      }
 
    // vrací privátní proměnou
    //   public function v($name) {
@@ -198,14 +192,14 @@ class Template {
 
    // nastaví globální proměnou
    public function setPVar($name, $value) {
-      self::$publicVars[$name] = new TplVar($name, $value);
+      self::$publicVars[$name] = $value;
    }
 
    // vrací globální proměnou
    public function pVar($name) {
       $return = null;
       if (isset (self::$publicVars[$name])){
-         return self::$publicVars[$name]->get();
+         return self::$publicVars[$name];
       } else {
          return null;
       }
@@ -222,9 +216,9 @@ class Template {
    // vrácení odkazu
    public function l($name = null) {
       if($name == null AND $this->sys() != null){
-         return $this->sys()->link();
+         return $this->sys()->link()->clear();
       } else if(isset ($this->templateLinks[$name])) {
-         return $this->templateLinks[$name];
+         return $this->templateLinks[$name]->clear();
       } else {
          return new Links();
       }
@@ -251,7 +245,7 @@ class Template {
 
    // přidá název šablony do seznamu renderovaných šablon objektu
    public function addTplFile($name, $engine = false) {
-      if(!$engine AND $this->sys()->module() instanceof Module){
+      if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
          array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR,
                $this->sys()->module()->getName()).$name);
       } else {
@@ -277,7 +271,7 @@ class Template {
     * @param boolean $engine -- (option) jestli se jedná o šablonu enginu
     */
    public function includeTpl($name, $engine = false) {
-      if(!$engine AND $this->sys()->module() instanceof Module){
+      if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
          include_once (self::getFileDir($name, self::TEMPLATES_DIR,
                $this->sys()->module()->getName())).$name;
       } else {
@@ -289,16 +283,24 @@ class Template {
     * Metoda vrací název zvoleného vhledu
     * @return string -- název vzhledu
     */
-   public function face() {
-      return self::$face;
-   }
+//   public function face() {
+//      return self::$face;
+//   }
 
    /**
     * Metoda vrací adresář zvoleného vhledu
     * @return string -- adresář vzhledu
     */
    final public function faceDir() {
-      return AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR.$this->face();
+      return AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR.self::face();
+   }
+
+   /**
+    * Metoda vrací adresář zvoleného vhledu
+    * @return string -- adresář vzhledu
+    */
+   final public static function face() {
+      return self::$face;
    }
 
    // přidá podřízený objekt šablony
@@ -380,7 +382,7 @@ class Template {
     * @return Template -- objekt sebe
     */
    final public function addJsFile($jsfile, $engine = false) {
-      if(!$engine){
+      if(!$engine AND $this->sys() != null){
          $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->sys()->module()->getName());
       } else {
          $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR);
@@ -395,7 +397,7 @@ class Template {
     * @return Template -- objekt sebe
     */
    final public function addCssFile($cssfile, $engine = false) {
-      if(!$engine){
+      if(!$engine AND $this->sys() != null){
          $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR, $this->sys()->module()->getName());
       } else {
          $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR);
@@ -430,8 +432,8 @@ class Template {
       if($moduleName){
          $moduleDir = AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR;
       }
-      //      echo AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
-      //            .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$type.DIRECTORY_SEPARATOR.$file;
+//            echo AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
+//               .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$typeDir.DIRECTORY_SEPARATOR.$file."<br>";
       // první zkusíme jestli existuje soubor v šaboně webu
       try {
          if(file_exists(AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
@@ -480,18 +482,6 @@ class Template {
    protected function module() {
       return $this->sys()->module();
    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -38,21 +38,6 @@ abstract class View {
 	}
 
 	/**
-	 * Metoda vloži data s containeru do šablony
-	 *
-	 */
-//	private function saveContainerToTpl() {
-////		Uložení dat containeru do šablony
-//		foreach ($this->container()->getAllData() as $key => $var) {
-//			$this->template()->addVar($key, $var);
-//		}
-////		Uložení odkazů do šablony
-//		foreach ($this->container()->getAllLinks() as $key => $var) {
-//			$this->template()->addVar($key, $var);
-//		}
-//	}
-	
-	/**
 	 * Metoda, která se provede vždy
 	 */
 	public function init() {
@@ -64,24 +49,6 @@ abstract class View {
 	 */
 	abstract function mainView();
 
-	/**
-	 * Metoda vrací objekt modulu
-	 *
-	 * @return Module -- objekt modulu
-	 */
-//	final public function getModule() {
-//      return Module::getCurrentModule();
-////      return AppCore::getSelectedModule();
-//	}
-	
-	/**
-	 * Funkce vrací datový adresář modulu
-	 * @return string -- datový adresář modulu
-	 */
-//	final public function getDataDir() {
-//		return $this->getModule()->getDir()->getDataDir();
-//	}
-	
 	/**
 	 * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
 	 * @return Template -- objekt šablony
@@ -102,6 +69,14 @@ abstract class View {
     */
    final public function sys() {
       return $this->moduleSys;
+   }
+
+   /**
+    * Metoda vrací objekt s modulem
+    * @return Module
+    */
+   final public function module() {
+      return $this->sys()->module();
    }
 
    /**
@@ -152,6 +127,24 @@ abstract class View {
     */
    final public function link() {
       return clone $this->sys()->link();
+   }
+
+   /**
+    * Metoda vytvoří objekt modelu
+    * @param string $name --  název modelu
+    * @return Objekt modelu
+    */
+   final public function createModel($name) {
+      return new $name($this->sys());
+   }
+
+   /**
+    * Metoda přeloží zadaný řetězec
+    * @param string $message -- řetězec k přeložení
+    * @return string -- přeložený řetězec
+    */
+   final public function _m($message) {
+      return $this->sys()->locale()->_m($message);
    }
 }
 ?>

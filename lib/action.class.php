@@ -143,7 +143,7 @@ class Action {
 	 * @return boolean -- true pokud byla akce nastavena
 	 */
 	public function isAction(){
-		if(self::$currentAction != null AND self::$currentActionIdItem == $this->getModule()->getId()){
+		if(self::$currentAction != null AND self::$currentActionIdItem == $this->module()->getId()){
 			return true;
 		}
 		return false;

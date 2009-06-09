@@ -1,5 +1,5 @@
 <p>
-{foreach from=$APP_LANGS item="LANG" name='langForeach'}
-<a href="{$LANG.link}" title="{$LANG.label}" >{$LANG.name}</a>{ if !$smarty.foreach.langForeach.last}&nbsp;&#448;&nbsp;{/if}
-{/foreach}
+   <? foreach ($this->pVar("appLangs") as $lang) {?>
+      <a href="<?=$lang["link"]?>" title="<?=$lang["label"]?>"><?=$lang["name"]?></a>
+   <?}?>
 </p>

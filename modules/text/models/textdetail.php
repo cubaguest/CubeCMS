@@ -33,10 +33,10 @@ class TextDetailModel extends DbModel {
 	 */
 	private function getTextFromDb() {
 		$sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable())
+      ->table($this->module()->getDbTable())
       ->colums(array(self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT_LANG_PRFIX.Locale::getLang()
             .",".self::COLUMN_TEXT_LANG_PRFIX.Locale::getDefaultLang().")"))
-		->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+		->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 
 		$this->text=$this->getDb()->fetchObject($sqlSelect);
 		if($this->text != null){
@@ -51,8 +51,8 @@ class TextDetailModel extends DbModel {
 	 */
 	public function getAllLangText() {
 		$sqlSelect = $this->getDb()->select()
-         ->table($this->getModule()->getDbTable())
-			->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+         ->table($this->module()->getDbTable())
+			->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 				
 		$text = $this->getDb()->fetchAssoc($sqlSelect,true);
       if(!empty ($text)){
@@ -67,16 +67,16 @@ class TextDetailModel extends DbModel {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
             self::COLUMN_CHANGED_TIME, time());
          //
-         $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
+         $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
                ->set($textArr)
-               ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+               ->where(self::COLUMN_ID_ITEM, $this->module()->getId());
          //      // vložení do db
          return $this->getDb()->query($sqlInsert);
       } else {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
             self::COLUMN_CHANGED_TIME, time(),
             self::COLUMN_ID_ITEM, $this->getModule()->getId());
-         $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
+         $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
                ->colums(array_keys($textArr))
                ->values(array_values($textArr));
          //	Vložení do db
@@ -85,9 +85,9 @@ class TextDetailModel extends DbModel {
    }
 
    private function isSaved() {
-      $sql = $this->getDb()->select()->table($this->getModule()->getDbTable())
+      $sql = $this->getDb()->select()->table($this->module()->getDbTable())
       ->colums(array('count' => 'COUNT(*)'))
-      ->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+      ->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 
       $count = $this->getDb()->fetchObject($sql);
 
@@ -99,9 +99,9 @@ class TextDetailModel extends DbModel {
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable())
+      ->table($this->module()->getDbTable())
       ->colums(self::COLUMN_CHANGED_TIME)
-		->where(self::COLUMN_ID_ITEM, $this->getModule()->getId());
+		->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 
 		$time=$this->getDb()->fetchObject($sqlSelect);
       if($time != null AND $time instanceof stdClass){

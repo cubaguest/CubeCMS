@@ -12,16 +12,41 @@
  */
 
 abstract class Model {
+   
+   /**
+    * Proměná obsahuj eobjek tsystémových proměných
+    * @var ModuleSys 
+    */
+   private $sys = null;
+
+   /**
+    * KOnstruktor vytvoří objekt modelu
+    * @param ModuleSys $sys -- systémové informace
+    */
+   public function  __construct(ModuleSys $sys = null) {
+      $this->sys = $sys;
+      $this->_init();
+   }
+
+   /**
+    * Metoda vrací systémový objekt
+    * @return ModuleSys -- objekt systému
+    */
+   final public function sys() {
+      return $this->sys;
+   }
+
 	/**
 	 * Metoda vrací objekt modulu
-	 * 
 	 * @return Module -- objekt modulu
 	 */
-	final public function getModule() {
-      return Module::getCurrentModule();
-//		return AppCore::getSelectedModule();
+	final public function module() {
+      return $this->sys()->module();
 	}
-	
+
+
+
+
 	/**
 	 * Abstraktní metoda pro inicializaci modelu
 	 */

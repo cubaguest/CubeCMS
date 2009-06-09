@@ -4,3 +4,8 @@
 	border: 1px solid black;
 	margin-bottom: 10px;
 }
+
+.newsTextPanel {
+   overflow: auto;
+   height: 100px;
+}

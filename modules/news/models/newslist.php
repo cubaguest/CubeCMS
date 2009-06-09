@@ -44,9 +44,9 @@ class NewsListModel extends DbModel {
 	 */
 	public function getCountNews() {
 		if(!$this->countNewsLoaded){
-         $sqlCount = $this->getDb()->select()->table($this->getModule()->getDbTable())
+         $sqlCount = $this->getDb()->select()->table($this->module()->getDbTable())
          ->colums(array("count"=>"COUNT(*)"))
-         ->where(self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+         ->where(self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
 			->where(self::COLUMN_NEWS_DELETED, (int)false);
 		
 			$count = $this->getDb()->fetchObject($sqlCount);
@@ -63,7 +63,7 @@ class NewsListModel extends DbModel {
 	 * @return array -- pole novinek
 	 */
    public function getSelectedListNews($from, $count=5) {
-      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'news')
+      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'news')
       ->colums(array(self::COLUMN_NEWS_LABEL => "IFNULL(".self::COLUMN_NEWS_LABEL.'_'.Locale::getLang().", ".self::COLUMN_NEWS_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang()
             .", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
@@ -72,7 +72,7 @@ class NewsListModel extends DbModel {
          array('news'=>self::COLUMN_NEWS_ID_USER, self::COLUMN_ISER_ID), null, self::COLUMN_USER_NAME)
 //      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER
 //         .' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where("news.".self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+      ->where("news.".self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
       ->where("news.".self::COLUMN_NEWS_DELETED, (int)false)
       ->limit($from, $count)
       ->order("news.".self::COLUMN_NEWS_TIME, Db::ORDER_DESC);
@@ -93,11 +93,11 @@ class NewsListModel extends DbModel {
 	 * @return array -- pole novinek
 	 */
 	public function getListNews() {
-      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'news')
+      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'news')
       ->colums(array(self::COLUMN_NEWS_LABEL => "IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_TEXT => "IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang().", ".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_ID_USER, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_TIME))
-      ->where("news.".self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+      ->where("news.".self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
       ->where("news.".self::COLUMN_NEWS_DELETED, (int)false)
       ->order("news.".self::COLUMN_NEWS_TIME, Db::ORDER_DESC);
 
@@ -128,7 +128,7 @@ class NewsListModel extends DbModel {
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable())
+      ->table($this->module()->getDbTable())
       ->colums(self::COLUMN_NEWS_TIME)
       ->limit(0, 1)
       ->order(self::COLUMN_NEWS_TIME, Db::ORDER_DESC);

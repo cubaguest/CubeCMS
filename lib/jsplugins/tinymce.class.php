@@ -176,9 +176,9 @@ class TinyMce extends JsPlugin {
 	protected function initFiles() {
 //		Výchozí js soubor pluginu
       $jsFile = new JsFile("tiny_mce_params.js", true);
-      $face = AppCore::getTepmlateFaceDir(false,false);
-      $face = substr($face, 0, strlen($face)-1);
-      $jsFile->setParam(self::PARAM_FACE, $face);
+      //$face =  AppCore::getTepmlateFaceDir(false,false);
+      //$face = substr($face, 0, strlen($face)-1);
+      $jsFile->setParam(self::PARAM_FACE, Template::face());
       $jsFile->setParam('language', Locale::getLang());
 		$this->setSettingJsFile($jsFile);
 //		Přidání js soubrů pluginu
@@ -194,9 +194,9 @@ class TinyMce extends JsPlugin {
          $theme = rawurldecode($file->getParam(self::PARAM_THEME));
 //         doplnění obsahu s css
          if($file->getParam(self::PARAM_FACE) != null){
-            $cssurl = Links::getMainWebDir().AppCore::getTepmlateFaceDir(false);
+            $cssurl = Links::getMainWebDir().Template::face();
             $cssurl = substr($cssurl, 0, strlen($cssurl)-1).$file->getParam(self::PARAM_FACE).URL_SEPARATOR;
-            $this->defaultParams['content_css'] = $cssurl.AppCore::TEMPLATES_STYLESHEETS_DIR.'/style-tinymce.css';
+            $this->defaultParams['content_css'] = $cssurl.Template::STYLESHEETS_DIR.'/style-tinymce.css';
          }
          if($theme != self::TINY_THEME_SIMPLE){
             //         Doplnění parametru (images, media atd.)

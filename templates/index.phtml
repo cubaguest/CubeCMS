@@ -6,13 +6,13 @@
       <meta http-equiv="pragma" content="no-cache" />
       <meta http-equiv="pragma" content="-1" />
       <title>
-      <?
-      echo($this->pageTitle);
-      if(!empty ($this->categoryTitle))
+         <?
+         echo($this->pageTitle);
+         if(!empty ($this->categoryTitle))
          echo ' - '.$this->categoryTitle;
-      if(!empty ($this->moduleTitle))
+         if(!empty ($this->moduleTitle))
          echo ' - '.$this->moduleTitle;
-      ?></title>
+         ?></title>
 
       <base href="<?=UrlRequest::getBaseWebDir()?>" />
 
@@ -24,9 +24,9 @@
       <? }?>
 
       <!--[if lte IE 6]>
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
-      <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
-      <![endif]-->
+<link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
+<script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
+<![endif]-->
 
       <!--Menu styly -->
       <link rel="stylesheet" type="text/css" href="<?=$this->style('chromestyle.css')?>" />
@@ -75,7 +75,7 @@
          <div id="colswrap">
 
             <div id="col1wrap" class="column">
-               <div id="col1pad" class="{if $LEFT_PANEL eq true}col1pad_plusleft {/if}{if $RIGHT_PANEL eq true}col1pad_plusright {/if}">
+               <div id="col1pad" class="<?if(!empty($this->leftPanel)) echo "col1pad_plusleft";?>  <?if(!empty($this->rightPanel)) echo "col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
                   if($this->pageNotFound){
                      $this->includeTpl("error404.phtml", true);
@@ -89,106 +89,57 @@
                </div><!-- col1pad -->
             </div><!-- col1wrap -->
 
-            {if $LEFT_PANEL eq true}
+            <? // levy panel
+            if(!empty($this->leftPanel)){?>
             <div id="col2wrap" class="column">
                <div id="col2pad">
-                  {* Výpis panelů modulů *}
+                  <?
+                  foreach ($this->leftPanel as $panel) {
+                     echo ("<h3><a href=\"{$panel->l()}\" title=\"\">&gt;&gt;{$panel->module()->getName()}</a></h3>");
+                     $this->includeTplObj($panel);
+                  }?>
 
-
-                  {* if empty($PANEL_LEFT_TEMPLATES) *}
-                  {foreach from=$PANEL_LEFT_TEMPLATES item=TEMPLATES}
-                  <div class="menu_bar">
-                     <h3><a href="{$TEMPLATES.LINK}" title="{$TEMPLATES.LABEL}">&gt;&gt;{$TEMPLATES.LABEL}</a></h3>
-                     {foreach from=$TEMPLATES.TEMPLATES item=FILE}
-                     {include file=$FILE.FILE VARS=$TEMPLATES.VARS ID=$FILE.ID}
-                     {/foreach}
-                  </div>
-                  {/foreach}
-                  {* /if *}
                   <hr class="separator" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
-            {/if}
+            <?}?>
 
-            {if $RIGHT_PANEL eq true}
-            <div id="col3wrap" class="column">
-               <div id="col3pad">
-                  {* Vypis svatku*}
-                  <div class="menu_bar">
-                     <div class="menu_bar_obsah" style="text-align:right;">
-                        <form action="{$MAIN_WEB_DIR}" method="get">
-                           <label>{$SEARCH_NAME}</label>
-                           <input type="text" size="17" maxlength="100" name="search" value="{$smarty.get.search|escape:'html'}" /><br /><br />
-                           <input type="submit" value="{$SEARCH_BUTTON}" />
-                        </form>
-                     </div>
-                  </div>
 
-                  {* Výpis menu s odkazy *}
-                  {if $RIGHT_MENU_PANEL eq true}
-                  {foreach from=$RIGHT_MENU_PANEL_ARRAY key=KEY item=ITEM}
-                  <div class="menu_bar">
-                     <h3>{$ITEM.section}</h3>
-                     <div class="menu_bar_obsah">
-                        {foreach from=$ITEM item=MENUITEM}
-                        {if is_array($MENUITEM)}
-                        {if $MENUITEM.url neq null}
-                        <a href="{$MENUITEM.url}" title="{$MENUITEM.name}">{$MENUITEM.name}</a><br />
-                        {else}
-                        <span>{$MENUITEM.name}</span>
-                        {/if}
-                        {/if}
-                        {/foreach}
-                     </div>
-                  </div>
-                  {/foreach}
-                  {/if}
+            <? // pravy panel
+            if(!empty($this->rightPanel)){?>
+            <div id="col2wrap" class="column">
+               <div id="col2pad">
+                  <?
+                  foreach ($this->rightPanel as $panel) {
+                     echo ("<h3><a href=\"{$panel->l()}\" title=\"\">&gt;&gt;{$panel->module()->getName()}</a></h3>");
+                     $this->includeTplObj($panel);
+                  }?>
 
-                  {* Výpis panelů modulů *}
-                  {foreach from=$PANEL_RIGHT_TEMPLATES item=TEMPLATES}
-                  <div class="menu_bar">
-                     <h3><a href="{$TEMPLATES.LINK}" title="{$TEMPLATES.LABEL}">&gt;&gt;{$TEMPLATES.LABEL}</a></h3>
-                     {foreach from=$TEMPLATES.TEMPLATES item=FILE}
-                     {include file=$FILE.FILE VARS=$TEMPLATES.VARS ID=$FILE.ID}
-                     {/foreach}
-                  </div>
-                  {/foreach}
-
-                  {if $MODULES_RIGHT_PANEL eq true}
-                  {foreach from=$MODULES_RIGHT_PANEL_ARRAY item=VALUE}
-                  <div class="menu_bar">
-                     <h3>{$VALUE.panel_name}</h3>
-                     {if ($VALUE.values.module neq null and $VALUE.values.module_tpl_path neq null)}
-                     {include file=$VALUE.values.module_tpl_path}
-                     {/if}
-                  </div>
-                  {/foreach}
-                  {/if}
                   <hr class="separator" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+            <?}?>
 
-               </div><!-- col3pad -->
-            </div><!-- col3wrap -->
-            {/if}
 
-            <div class="reseter">&nbsp;</div>
+      <div class="reseter">&nbsp;</div>
 
-         </div><!-- colswrap -->
+      </div><!-- colswrap -->
 
-         <div class="reseter">&nbsp;</div>
+      <div class="reseter">&nbsp;</div>
 
-         <div id="footwrap">
-            <?$this->includeTpl("langs.phtml",true);?> <br />
-            <?$this->includeTpl("login.phtml", true);?>
-            Generated:	{$smarty.now|date_format:'%H:%M:%S %d.%m.%Y'} Powered by <a href="http://www.gentoo.org" title="Gentoo">GENTOO</a>,
-            <a href="http://www.vypecky.info" title="Vepřové Výpečky">Vypecky.info engine ver. {$ENGINE_VERSION}</a>, <a href="http://www.php.net" title="PHP">PHP</a>,
-            <a href="http://www.mysql.com" title="MySQL">MySQL</a>, <a href="http://www.smarty.net" title="Smarty Templates">Smarty</a>.
-            Script generated by <?=$this->execTime?> s, SQL queries: <?=$this->countAllSqlQueries;?>
-            <!-- ABZ rychle pocitadlo -->
+      <div id="footwrap">
+         <?$this->includeTpl("langs.phtml",true);?> <br />
+         <?$this->includeTpl("login.phtml", true);?>
+         Generated:	{$smarty.now|date_format:'%H:%M:%S %d.%m.%Y'} Powered by <a href="http://www.gentoo.org" title="Gentoo">GENTOO</a>,
+         <a href="http://www.vypecky.info" title="Vepřové Výpečky">Vypecky.info engine ver. {$ENGINE_VERSION}</a>, <a href="http://www.php.net" title="PHP">PHP</a>,
+         <a href="http://www.mysql.com" title="MySQL">MySQL</a>, <a href="http://www.smarty.net" title="Smarty Templates">Smarty</a>.
+         Script generated by <?=$this->execTime?> s, SQL queries: <?=$this->countAllSqlQueries;?>
+         <!-- ABZ rychle pocitadlo -->
 <!--<a href="http://pocitadlo.abz.cz/" title="počítadlo přístupů: pocitadlo.abz.cz"><img src="http://pocitadlo.abz.cz/aip.php?tp=di" alt="počítadlo.abz.cz" border="0" /></a>-->
-            <!-- http://pocitadlo.abz.cz/ -->
-            <a href="<?=$this->sitemapLink;?>" title="<?=_("mapa stránek")?>"><?=_("mapa stránek")?></a>
-            <hr class="separator" />
-         </div><!-- footwrap -->
+         <!-- http://pocitadlo.abz.cz/ -->
+         <a href="<?=$this->sitemapLink;?>" title="<?=_("mapa stránek")?>"><?=_("mapa stránek")?></a>
+         <hr class="separator" />
+      </div><!-- footwrap -->
 
       </div><!-- bodywrap /-->
 

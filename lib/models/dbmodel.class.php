@@ -15,15 +15,6 @@ require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::E
 
 class DbModel extends Model {
 	/**
-	 * Konstruktor třídy
-	 *
-	 */	
-	final function __construct() {
-//		Inicializace modelu
-		$this->_init();
-	}
-
-	/**
 	 * Metoda vrací objekt ke konektoru databáze
 	 * 
 	 * @return DbInterface

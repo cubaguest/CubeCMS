@@ -17,7 +17,7 @@ class Eplugin {
     * Výchozí cesta s šablonama
     * @var string
     */
-   const EPLUGINS_DEFAULT_TEMPALTES_DIR = AppCore::TEMPLATES_DIR;
+   const EPLUGINS_DEFAULT_TEMPALTES_DIR = Template::TEMPLATES_DIR;
 
    /**
     * Parametr pro přenos souboru js pluginu

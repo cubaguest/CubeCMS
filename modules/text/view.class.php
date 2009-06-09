@@ -5,56 +5,62 @@
  */
 
 class TextView extends View {
-	public function mainView() {
+   public function mainView() {
       if((bool)$this->sys()->module()->getParam(TextController::PARAM_FILES, true)){
          $this->template()->addJsPlugin(new LightBox());
       }
       $this->template()->addTplFile("text.phtml");
       $this->template()->addCssFile("style.css");
 
-      $model = new TextDetailModel();
+      $model = $this->createModel("TextDetailModel");
       $this->template()->text = $model->getText();
-	}
-	/*EOF mainView*/
-	
-	public function edittextView() {
-		$this->template()->addTpl("textedit.tpl");
-		$this->template()->addVar('TEXT_NAME', _m('Text'));
-		$this->template()->addVar('BUTTON_TEXT_SEND', _m('Odeslat'));
-		$this->template()->addVar('BUTTON_RESET', _m('Obnovit'));
-		$this->template()->setTplSubLabel(_m('Úprava textu'));
-		
-		$tinymce = new TinyMce();
-      if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'simple'){
+
+      if($this->rights()->isWritable()){
+         $toolbox = new TplToolbox();
+         $toolbox->addTool('edit_text', $this->_m("Upravit"),
+            $this->link()->action($this->sys()->action()->edittext()),
+            $this->_m("Upravit text"), "text_edit.png");
+         $this->template()->toolbox = $toolbox;
+      }
+   }
+   /*EOF mainView*/
+
+   public function edittextView() {
+      $this->template()->addTplFile("textedit.phtml");
+      $this->template()->addCssFile("style.css");
+
+      $tinymce = new TinyMce();
+      if($this->module()->getParam(TextController::PARAM_THEME, 'advanced') == 'simple'){
          $tinymce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
-         if($this->getModule()->getParam(TextController::PARAM_FILES, true)){
+         if($this->module()->getParam(TextController::PARAM_FILES, true)){
             $tinymce->addImagesIcon();
          }
-      } else if($this->getModule()->getParam(TextController::PARAM_THEME, 'advanced') == 'full'){
+      } else if($this->module()->getParam(TextController::PARAM_THEME, 'advanced') == 'full'){
          $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
       }
-      
-		//NOTE soubory
-      if($this->getModule()->getParam(TextController::PARAM_FILES, true)){
-         $eplFiles = $this->container()->getEplugin('files');
-         $this->template()->addTpl($eplFiles->getTpl(), true);
-         $eplFiles->assignToTpl($this->template());
-         $tinymce->setImagesList($eplFiles->getImagesListLink());
-         $tinymce->setLinksList($eplFiles->getLinksListLink());
-      }
+
+      //NOTE soubory
+//      if($this->module()->getParam(TextController::PARAM_FILES, true)){
+//         $eplFiles = $this->container()->getEplugin('files');
+//         $this->template()->addTpl($eplFiles->getTpl(), true);
+//         $eplFiles->assignToTpl($this->template());
+//         $tinymce->setImagesList($eplFiles->getImagesListLink());
+//         $tinymce->setLinksList($eplFiles->getLinksListLink());
+//      }
 
       $this->template()->addJsPlugin($tinymce);
-      if((bool)$this->getModule()->getParam(TextController::PARAM_FILES, true)){
-         $this->template()->addJsPlugin(new LightBox());
-         $this->template()->addVar('LIGHTBOX', true);
-      }
+//      if((bool)$this->module()->getParam(TextController::PARAM_FILES, true)){
+//         $this->template()->addJsPlugin(new LightBox());
+//         $this->template()->addVar('LIGHTBOX', true);
+//      }
+      $text = $this->createModel("TextDetailModel");
+      $this->template()->texts = $text->getAllLangText();
+
       $jquery = new JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět'));;
-	}
-	// EOF edittextView
+   }
+   // EOF edittextView
 }
 
 ?>

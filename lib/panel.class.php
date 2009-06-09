@@ -27,7 +27,7 @@ abstract class Panel{
 	 * Konstruktor
 	 */
 	function __construct(ModuleSys $sys) {
-		$this->_template = new Template();
+		$this->_template = new Template($sys);
       $this->_moduleSys = $sys;
 
 
@@ -45,7 +45,7 @@ abstract class Panel{
 		if(class_exists($actionClassName)){
          $this->sys()->setAction(new $actionClassName($this->module(), $this->article()));
 		} else {
-         $this->sys()->setAction(new Action($getModule(), $this->article()));
+         $this->sys()->setAction(new Action($this->module()->getName(), $this->article()));
 		}
 //		Cesty
 		$routes = null;
@@ -169,5 +169,22 @@ abstract class Panel{
 	final public function template(){
 		return $this->_template;
 	}
+
+   /**
+    * Metoda vrací objekt šablony
+    * @return Template
+    */
+   final public function _getTemplateObj() {
+      return $this->template();
+   }
+
+   /**
+    * Metoda vytvoří objekt modelu
+    * @param string $name --  název modelu
+    * @return Objekt modelu
+    */
+   final public function createModel($name) {
+      return new $name($this->sys());
+   }
 }
 ?>

@@ -1,8 +1,11 @@
 <div><?=$this->text;?></div>
-
 <? // zapnuti lightboxu pokud je nastavenos
 if((bool)$this->sys()->module()->getParam(TextController::PARAM_FILES, true)){?>
 <script type="text/javascript">
    $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
 </script>
-<?}?>
+<?}
+if($this->sys()->rights()->isWritable()){
+   $this->includeTplObj($this->toolbox);
+}
+?>

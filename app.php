@@ -272,7 +272,7 @@ class AppCore {
       //		Inicializace chybových hlášek
       $this->_initMessagesAndErrors();
       // inicializace funkcí pro překlady
-//      Locale::initTranslationsFunctions();
+      //      Locale::initTranslationsFunctions();
       //Spuštění jádra aplikace
       $this->runApp();
    }
@@ -742,9 +742,9 @@ class AppCore {
       //            $this->coreTpl->setVar("THIS_PAGE_LINK", (string)$link);
       // mapa webu
       $this->coreTpl->sitemapLink = (string)$link->clear(true)
-         .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP);
+      .UrlRequest::getSpecialPageRegexp(UrlRequest::SPECIAL_PAGE_SITEMAP);
       $this->coreTpl->mainLangImagesPath = self::sysConfig()
-         ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR;
+      ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR;
       unset($link);
       //Přihlášení uživatele
       $this->coreTpl->userIsLogin = AppCore::getAuth()->isLogin();
@@ -759,7 +759,7 @@ class AppCore {
          $this->coreTpl->showDebugConsole = true;
       }
       //      //		Přiřazení jazykového pole
-      $this->coreTpl->appLangsNames = Locale::getAppLangsNames();
+      $this->coreTpl->setPVar("appLangsNames", Locale::getAppLangsNames());
       //      //		Vytvoření odkazů s jazyky
       $langs = array();
       $langNames = Locale::getAppLangsNames();
@@ -778,9 +778,9 @@ class AppCore {
       unset($langNames);
       unset($link);
       unset($langArr);
-      $this->coreTpl->appLangs = $langs;
+      $this->coreTpl->setPVar("appLangs", $langs);
       unset($langs);
-      $this->coreTpl->appLang = Locale::getLang();
+      $this->coreTpl->setPVar("appLang", Locale::getLang());
    }
 
    /**
@@ -956,7 +956,7 @@ class AppCore {
                $requestName = $urlRequest->choseController();
                $requestControllerName = $requestName.AppCore::MODULE_CONTROLLER_SUFIX;
                //	Příprava a nastavení použití překladu
-//               Locale::bindTextDomain($sysModule->module()->getName());
+               //               Locale::bindTextDomain($sysModule->module()->getName());
                //					Spuštění kontroleru
                if(method_exists($controller, $requestControllerName)){
                   $ctrlResult = $controller->$requestControllerName();
@@ -1041,7 +1041,13 @@ class AppCore {
       $panelSideUpper = strtoupper($side);
       $panelSideLower = strtolower($side);
       //	Zapnutí panelu
-      $this->coreTpl->setVar($panelSideUpper."_PANEL", true);
+
+      $panelSides = array();
+      $panelSides[$panelSideUpper] = true;
+      if(!is_array($this->coreTpl->panel)){
+         $this->coreTpl->panel = array();
+      }
+      $this->coreTpl->panel  = array_merge($this->coreTpl->panel, $panelSides);
       // Načtení panelů
       $panelModel = new PanelModel();
       $panelData = $panelModel->getPanel($side);
@@ -1065,7 +1071,9 @@ class AppCore {
 
             // Příprava modulu
             $panelSys->setModule(new Module($panel, $moduleDbTables));
-            
+
+            // nastavení locales
+            $panelSys->setLocale(new Locale($panelSys->module()->getName()));
             
             $panelClassName = ucfirst($panelSys->module()->getName()).self::MODULE_PANEL_CLASS_SUFIX;
             // Spuštění panelu
@@ -1095,7 +1103,7 @@ class AppCore {
                $link = new Links(true);
                $link->category($panel->{Category::COLUMN_CAT_LABEL}, $panel->{Category::COLUMN_CAT_ID});
                $panelSys->setLink($link);
-               
+
                //	CONTROLLER PANELU
                $panelCtrl = new $panelClassName($panelSys);
 
@@ -1121,7 +1129,7 @@ class AppCore {
             }
             array_push($panelsTempaltes, $panelCtrl->_getTemplateObj());
          }
-         $this->coreTpl->{$panelSideUpper."_PANEL"} = $panelsTempaltes;
+         $this->coreTpl->{$panelSideLower."Panel"} = $panelsTempaltes;
          unset ($panelsTempaltes);
       }
       //		Přiřazení panelů do šablony
@@ -1153,9 +1161,9 @@ class AppCore {
     */
    public function assignMessagesToTpl() {
       $this->coreTpl->messages = self::getInfoMessages()->getMessages();
-//      $this->coreTpl->setVar("MESSAGES_EMPTY", self::getInfoMessages()->isEmpty());
+      //      $this->coreTpl->setVar("MESSAGES_EMPTY", self::getInfoMessages()->isEmpty());
       $this->coreTpl->moduleErrors = self::getUserErrors()->getMessages();
-//      $this->coreTpl->setVar("MODULE_ERRORS_EMPTY", self::getUserErrors()->isEmpty());
+      //      $this->coreTpl->setVar("MODULE_ERRORS_EMPTY", self::getUserErrors()->isEmpty());
    }
 
    /**

@@ -1,0 +1,41 @@
+<div id="editTextForm">
+<ul class="langMenu">
+   <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+      <li>
+         <a href="#textLang<?=$key?>" class="selectedd">
+            <img src="images/lang/<?$key?>.png" title="<?=$lang?>" />
+            <?=$lang?>
+         </a>
+      </li>
+   <?}?>
+</ul>
+
+<div class="tabsContent">
+<form method="post" action="<?=$this->l();?>">
+   <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+   <p id="textLang<?=$key?>" class="tabcontent">
+      <?=$this->_m("Text");?>*:<br />
+		<textarea class="textarea_tinymce textarea{if $VARS.ERROR_ITEMS.text.$KEYLANG eq true} badItem{/if}"
+            rows="20" cols="70" name="text_text[<?=$key;?>]"
+            ><?=$this->post("text_text[$key]", $this->texts[$key]);?></textarea>
+	</p>
+   
+   
+   <?}?>
+	<br />
+   <input name="text_reset" type="reset" value="<?=$this->_m("Obnovit")?>" />
+	<input name="text_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
+	
+</form>
+</div>
+<script>
+  $(document).ready(function(){
+    $("#editTextForm").tabs();
+  });
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+</script>
+</div>
+<?$this->includeTpl("buttonback.phtml", true);?>

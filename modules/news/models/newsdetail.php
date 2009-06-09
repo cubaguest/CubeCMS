@@ -43,11 +43,11 @@ class NewsDetailModel extends DbModel {
    public function saveNewNews($newsLabels, $newsTexts, $idUser = 0) {
       $newsArr = $this->createValuesArray(self::COLUMN_NEWS_LABEL, $newsLabels,
                                           self::COLUMN_NEWS_TEXT, $newsTexts,
-                                          self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId(),
+                                          self::COLUMN_NEWS_ID_ITEM, $this->module()->getId(),
                                           self::COLUMN_NEWS_ID_USER, $idUser,
                                           self::COLUMN_NEWS_TIME, time());
 
-      $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
+      $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
       ->colums(array_keys($newsArr))
       ->values(array_values($newsArr));
 //      //		Vložení do db
@@ -67,7 +67,7 @@ class NewsDetailModel extends DbModel {
    public function getNewsDetailSelLang($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable(), 'news')
+      ->table($this->module()->getDbTable(), 'news')
       ->colums(array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX
             .Locale::getLang().",".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
             self::COLUMN_NEWS_TEXT =>"IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang()
@@ -77,7 +77,7 @@ class NewsDetailModel extends DbModel {
          array('news' => self::COLUMN_NEWS_ID_USER, self::COLUMN_ISER_ID),
          null, self::COLUMN_USER_NAME)
 //      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('news.'.self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+      ->where('news.'.self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
       ->where('news.'.self::COLUMN_NEWS_ID_NEW, $id)
       ->where('news.'.self::COLUMN_NEWS_DELETED, (int)false);
 
@@ -114,9 +114,9 @@ class NewsDetailModel extends DbModel {
    public function getNewsDetailAllLangs($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable())
+      ->table($this->module()->getDbTable())
       ->colums(Db::COLUMN_ALL)
-      ->where(self::COLUMN_NEWS_ID_ITEM, $this->getModule()->getId())
+      ->where(self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
       ->where(self::COLUMN_NEWS_ID_NEW, $id)
       ->where(self::COLUMN_NEWS_DELETED, (int)false);
 
@@ -141,7 +141,7 @@ class NewsDetailModel extends DbModel {
       $newsArr = $this->createValuesArray(self::COLUMN_NEWS_LABEL, $newsLabels,
                                           self::COLUMN_NEWS_TEXT, $newsTexts);
 
-      $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
+      $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
             ->set($newsArr)
             ->where(self::COLUMN_NEWS_ID_NEW, $idNews);
 
@@ -155,7 +155,7 @@ class NewsDetailModel extends DbModel {
 
    public function deleteNews($idNews) {
       //			smazání novinky
-      $sqlUpdate = $this->getDb()->update()->table($this->getModule()->getDbTable())
+      $sqlUpdate = $this->getDb()->update()->table($this->module()->getDbTable())
       ->set(array(self::COLUMN_NEWS_DELETED => (int)true))
       ->where(self::COLUMN_NEWS_ID_NEW." = ".$idNews);
 

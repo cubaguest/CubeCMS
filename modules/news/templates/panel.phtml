@@ -1,0 +1,12 @@
+<div>
+<?
+foreach ($this->news as $new) {?>
+<h5>
+   <a href="<?=$this->link()->article($new["label"],$new["id_new"])?>" title="<?=$new["label"]?>"><?=$new["label"]?></a>
+</h5>
+   <p class="newsTextPanel"><?=$new["text"];?></p>
+  <a href="<?=$this->link()->article($new["label"],$new["id_new"])?>" title="<?=$this->_m("více")?>">[&nbsp;<?=$this->_m("více")?>&nbsp;]</a><br /><br />
+<?}?>
+<a href="<?=$this->l();?>" title="<?=$this->_m("další")?>"><?=$this->_m("další")?></a>
+</div>
+

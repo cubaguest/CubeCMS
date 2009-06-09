@@ -31,7 +31,7 @@ abstract class Controller {
 	 * Objekt kontejneru pro přenos dat do pohledu (viewru) a šablony
 	 * @var Container
 	 */
-	private $container = null;
+//	private $container = null;
 	
 	/**
 	 * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
@@ -342,6 +342,15 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
       }
       $view->$viewName();
 	}
+
+   /**
+    * Metoda vytvoří objekt modelu
+    * @param string $name --  název modelu
+    * @return Objekt modelu
+    */
+   final public function createModel($name) {
+      return new $name($this->sys());
+   }
 }
 
 ?>

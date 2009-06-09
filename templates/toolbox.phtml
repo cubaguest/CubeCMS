@@ -1,0 +1,26 @@
+<div id="toolbox<?=$this->getRandSeek();?>" class="toolbox">
+   <?
+   foreach ($this->getTools() as $tool) {?>
+   <form method="post" action="<?=$tool['link'];?>">
+      <?
+      if($tool['nameHidden'] != null){?>
+      <input type="hidden" value="<?=$tool['valueHidden'];?>" name="<?=$tool['nameHidden'];?>" />
+      <?}?>
+      <!--<input type="image" src="images/toolbox/<?=$tool['icon'];?>" name="<?=$tool['name'];?>"
+             value="<?=$tool['value'];?>" title="<?=$tool['title'];?>" />-->
+      <input type="submit" name="<?=$tool['name'];?>" value="<?=$tool['value'];?>" 
+      title="<?=$tool['title'];?>" style="background-image: url('images/toolbox/<?=$tool['icon'];?>')" />
+   </form>
+   <?}?>
+</div>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+      $("div#toolbox<?=$this->getRandSeek();?>").css({ "opacity": 0.3});
+   });
+   $("div#toolbox<?=$this->getRandSeek();?>").hover(
+   function(){$("div#toolbox<?=$this->getRandSeek();?>").fadeTo(100, 1) (100);},
+   function(){$("div#toolbox<?=$this->getRandSeek();?>").fadeTo(300, 0.3);}
+);
+
+</script>
