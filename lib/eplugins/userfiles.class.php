@@ -15,10 +15,9 @@
 
 class UserFilesEplugin extends Eplugin {
    /**
-    * Název primární šablony s posunovátky
-    * @var string
+    * Název šablony s listem souborů
     */
-   protected $templateFile = 'userfiles.tpl';
+   const TPL_FILE = 'userfiles.phtml';
 
    /**
     * Název souboru s listem obrázků
@@ -126,9 +125,10 @@ class UserFilesEplugin extends Eplugin {
     */
    const AJAX_PARAM_IDITEM = 'idItem';
 
+
    /**
-    * Proměnná s id článku, u kterého se zobrazí změny
-    * @var integer/array
+    * Id článku u kterého se zpracovávají soubory
+    * @var integer
     */
    private $idArticle = null;
 
@@ -139,30 +139,30 @@ class UserFilesEplugin extends Eplugin {
    private $filesArray = array();
 
    /**
-    * Pole se všemi soubory (obsahuje všechny soubory ze všech instancí pluginu)
-    * @static
-    * @var array
-    */
-   private static $otherFilesArray = array();
-
-   /**
     * Počet vrácených záznamů
     * @var integer
     */
    private $numberOfReturnRows = 0;
 
    /**
-    * Proměná obsahuje počet všech souborů ze všech ionstancí
-    * @static
-    * @var integer
-    */
-   private static $otherNumberOfReturnRows = array();
-
-   /**
     * Metoda inicializace, je spuštěna pří vytvoření objektu
     *
     */
-   protected function init(){}
+   protected function init($params = null){
+      if($this->sys()->article() != null){
+         $this->idArticle = $this->sys()->article()->getArticle();
+      }
+   }
+
+   /**
+    * Metoda spustí eplugin
+    * @param mixed $params -- parametry epluginu (pokud je třeba)
+    */
+   protected function run($params = null){
+      $this->checkSendFile();
+      $this->checkDeleteFile();
+      $this->getFilesFromDb();
+   }
 
    /**
     * Metoda je spuštěna při načítání souborů
@@ -266,17 +266,6 @@ class UserFilesEplugin extends Eplugin {
    }
 
    /**
-    * Metoda nastavuje id článku pro který se budou ukládát soubory
-    * @param integer -- id článku
-    */
-   public function setIdArticle($idArticle){
-      $this->idArticle = $idArticle;
-      $this->checkSendFile();
-      $this->checkDeleteFile();
-      $this->getFilesFromDb();
-   }
-
-   /**
     * Metoda kontroluje, jestli byl odeslán soubor, pokud ano je soubor nahrán a uložen do db
     */
    private function checkSendFile() {
@@ -317,8 +306,8 @@ class UserFilesEplugin extends Eplugin {
                self::COLUM_ID_USER, self::COLUM_FILE,
                self::COLUM_TYPE, self::COLUM_WIDTH, self::COLUM_HEIGHT,
                self::COLUM_SIZE, self::COLUM_TIME)
-            ->values($this->idArticle, $this->getModule()->getId(),
-               $this->getRights()->getAuth()->getUserId(), $file->getName(),
+            ->values($this->idArticle, $this->module()->getId(),
+               $this->sys()->rights()->getAuth()->getUserId(), $file->getName(),
                $fileType, $width, $height,
                $file->getFileSize(), time());
             $this->getDb()->query($sqlInsert);
@@ -382,8 +371,7 @@ class UserFilesEplugin extends Eplugin {
    /**
     * Metoda vymaže všechny uživatelské obrázky
     */
-   public function deleteAllFiles($idArticle = null) {
-      $this->idArticle = $idArticle;
+   public function deleteAllFiles() {
 
       $this->getFilesFromDb();
       //
@@ -402,7 +390,7 @@ class UserFilesEplugin extends Eplugin {
          }
          // vymaz z db
          $sqlDel = $this->getDb()->delete()->table(self::DB_TABLE_USER_FILES)
-         ->where(self::COLUM_ID_ITEM,$this->getModule()->getId())
+         ->where(self::COLUM_ID_ITEM,$this->module()->getId())
          ->where(self::COLUM_ID_ARTICLE,$this->idArticle);
          if(!$this->getDb()->query($sqlDel)){
             throw new UnexpectedValueException(_('Chyba při mazání uživatelských souborů'), 4);
@@ -430,7 +418,7 @@ class UserFilesEplugin extends Eplugin {
     */
    private function getFilesFromDb($idItem = null) {
       if($idItem == null){
-         $idItem = $this->getModule()->getId();
+         $idItem = $this->module()->getId();
       }
 
       $sqlSelect = $this->getDb()->select()
@@ -446,7 +434,7 @@ class UserFilesEplugin extends Eplugin {
             //Pokud je zadáno asociativní pole bez id items
             if(is_string($itemId) OR is_numeric($itemId)){
                $sqlSelect->where(self::COLUM_ID_ARTICLE,$itemId)
-               ->where(self::COLUM_ID_ITEM, $this->getModule()->getId(), Db::COND_OPERATOR_OR);
+               ->where(self::COLUM_ID_ITEM, $this->module()->getId(), Db::COND_OPERATOR_OR);
             } else if(is_array($itemId) AND !empty($itemId)){
                // REFACTORING
                //					$whereString = self::COLUM_ID_ITEM." = ".$id." AND (";
@@ -573,37 +561,26 @@ class UserFilesEplugin extends Eplugin {
     * Metoda obstarává přiřazení proměných do šablony
     *
     */
-   protected function assignTpl(){
-      $this->toTpl("USERFILES_LABEL_NAME", _("Nahrané soubory"));
-      $this->toTpl("BUTTON_USERFILE_DELETE", _("Smazat"));
-      $this->toTpl("BUTTON_USERFILE_SEND", _("Přidat"));
-      $this->toTpl("CONFIRM_MESAGE_DELETE_FILE", _("Opravdu smazat soubor"));
-      $this->toTpl("CONFIRM_MESAGE_DELETE_IMAGE", _("Opravdu smazat obrázek"));
-      $this->toTpl("FILE_LINK_TO_SHOW_NAME", _("Odkaz pro zobrazení"));
-      $this->toTpl("FILE_LINK_TO_DOWNLOAD_NAME", _("Odkaz pro stažení"));
-
-      self::$otherNumberOfReturnRows[$this->getIdTpl()] = $this->numberOfReturnRows;
-      $this->toTpl("USERFILES_NUM_ROWS", self::$otherNumberOfReturnRows);
-      $this->toTpl("USERFILES_ID", $this->getIdTpl());
-
-      //		if(!empty(self::$otherChanges)){
-      //			$array = self::$otherChanges;
-      //		}
-
+   protected function view(){
+      $this->template()->addTplFile(self::TPL_FILE, true);
       $jQueryPlugin = new JQuery();
-      $jQueryPlugin->addPluginAjaxUploadFile();
-      $this->toTplJSPlugin($jQueryPlugin);
+      $jQueryPlugin->addPluginAjaxUploadFile();      
+      $this->template()->addJsPlugin($jQueryPlugin);
 
-      self::$otherFilesArray[$this->getIdTpl()] = $this->filesArray;
-      $this->toTpl("USERFILES_ARRAY",self::$otherFilesArray);
+      $this->template()->numRows = $this->numberOfReturnRows;
+
+      
+      $this->template()->filesArray = $this->filesArray;
 
       $ajaxLink = new AjaxLink($this);
-      $this->toTpl("AJAX_USERFILE_FILE",$ajaxLink->getFile());
-      $this->toTpl("AJAX_ADD_FILE_PARAMS",$ajaxLink->getParams());
-      $this->toTpl("UPLOAD_FILE",_('Nahrát soubor'));
-      $this->toTpl("ID_ITEM", $this->getModule()->getId());
+
+      $this->template()->ajaxUserfileFile = $ajaxLink->getFile();
+      $this->template()->ajaxAddFileParams = $ajaxLink->getParams();
+      $this->template()->idItem = $this->module()->getId();
       if($this->idArticle != null){
-         $this->toTpl("ID_ARTICLE", $this->idArticle);
+         $this->template()->idArticle = $this->idArticle;
+      } else {
+         $this->template()->idArticle = $this->module()->getId();
       }
    }
 
@@ -630,7 +607,7 @@ class UserFilesEplugin extends Eplugin {
       switch ($type) {
          case self::FILE_LIST_FORMAT_TINYMCE:
             $file = new JsFile(self::IMAGES_LIST_JS_FILE, true);
-            $file->setParam(self::PARAM_URL_ID_ITEM, $this->getModule()->getId());
+            $file->setParam(self::PARAM_URL_ID_ITEM, $this->module()->getId());
             $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
             if(is_numeric($this->idArticle)){
                $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);
@@ -654,7 +631,7 @@ class UserFilesEplugin extends Eplugin {
       switch ($type) {
          case self::FILE_LIST_FORMAT_TINYMCE:
             $file = new JsFile(self::LINKS_LIST_JS_FILE, true);
-            $file->setParam(self::PARAM_URL_ID_ITEM, $this->getModule()->getId());
+            $file->setParam(self::PARAM_URL_ID_ITEM, $this->module()->getId());
             $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
             if(is_numeric($this->idArticle)){
                $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);

@@ -81,7 +81,7 @@ class ModuleSys {
     * @return Links
     */
    public function link() {
-      return $this->links;
+      return clone $this->links;
    }
 
    /**
@@ -162,6 +162,14 @@ class ModuleSys {
     */
    public function locale() {
       return $this->locale;
+   }
+
+   /**
+    * Metoda vrací objekt autorizace
+    * @return Auth
+    */
+   public function auth() {
+      return AppCore::getAuth();
    }
 }
 ?>

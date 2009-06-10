@@ -1,31 +1,28 @@
-{if $FILES_ID eq null}
-{assign var='FILES_ID' value=$VARS.USERFILES_ID}
-{/if}
 <div class="userFiles">
-   <h5>{$VARS.USERFILES_LABEL_NAME} (<span id="userFilesCount">{$VARS.USERFILES_NUM_ROWS[$FILES_ID]}</span>)</h5>
+   <h5><?=_("Uživatelské soubory")?> (<span id="userFilesCount"><?=$this->numRows?></span>)</h5>
    <script type="text/javascript">
       <!--
-      document.write("<a id=\"uploadFileButton\">{$VARS.UPLOAD_FILE}</a>");
+      document.write("<a id=\"uploadFileButton\"><?=_('Nahrát soubor')?></a>");
       document.write("<img style=\"display: none\" id=\"uploadFileStatus\" \n\
    src=\"images/progress.gif\" width=\"16\" height=\"16\" alt=\"progress\" />");
       //-->
    </script>
    <noscript>
-      <form method="post" action="{$THIS_PAGE_LINK}" enctype="multipart/form-data">
+      <form method="post" action="<?=$this->l();?>" enctype="multipart/form-data">
          <input type="file" name="userfiles_new_file" value="" />
-         <input type="submit" name="userfiles_send_file" value="{$VARS.BUTTON_USERFILE_SEND}"/>
+         <input type="submit" name="userfiles_send_file" value="<?=_("přidat")?>"/>
       </form>
    </noscript>
-   {literal}
+
    <script type="text/javascript">
       $(document).ready(function() {
          new Ajax_upload('#uploadFileButton', {
-            action: '{/literal}{$VARS.AJAX_USERFILE_FILE}{literal}',
+            action: '<?=$this->ajaxUserfileFile?>',
             name: 'userfiles_new_file',
             autoSubmit: true,
             data: {
-               userfiles_idItem : "{/literal}{$VARS.ID_ITEM}{literal}",
-               userfiles_idArticle : "{/literal}{$VARS.ID_ARTICLE|default:$VARS.ID_ITEM}{literal}",
+               userfiles_idItem : "<?=$this->idItem;?>",
+               userfiles_idArticle : "<?=$this->idArticle;?>",
                action : 'addFile',
                userfiles_send_file: 1},
             onComplete : function(file, response){
@@ -47,8 +44,7 @@
       function loadFiles(){
          clearFiles();
          var count = 0;
-         $.getJSON(
-         "{/literal}{$VARS.AJAX_USERFILE_FILE}?action=getFiles&idItem={$VARS.ID_ITEM}&idArticle={$VARS.ID_ARTICLE|default:$VARS.ID_ITEM}{literal}",
+         $.getJSON("<?=$this->ajaxUserfileFile?>?action=getFiles&idItem=<?=$this->idItem?>&idArticle=<?=$this->idArticle?>",
          function(jsondata){
             $.each(jsondata.files, function(i,ufile){
                count++;
@@ -67,18 +63,18 @@
                   }
                   tbl+="</td><td align=\"right\">";
                   if(ufile.type == 'image'){
-                     tbl+="<form action=\"{/literal}{$THIS_PAGE_LINK}{literal}\" method=\"post\" onsubmit=\"return deleteFile('{/literal}{$VARS.CONFIRM_MESAGE_DELETE_IMAGE}{literal} - "+ufile.file+"', '"+ufile.id_file+"');\">";
+                     tbl+="<form action=\"<?=$this->l()?>\" method=\"post\" onsubmit=\"return deleteFile('<?=_("Opravdu smazat obrázek")?> - "+ufile.file+"', '"+ufile.id_file+"');\">";
                   } else {
-                     tbl+="<form action=\"{/literal}{$THIS_PAGE_LINK}{literal}\" method=\"post\" onsubmit=\"return deleteFile('{/literal}{$VARS.CONFIRM_MESAGE_DELETE_FILE}{literal} - "+ufile.file+"', '"+ufile.id_file+"');\">";
+                     tbl+="<form action=\"<?=$this->l()?>\" method=\"post\" onsubmit=\"return deleteFile('<?=_("Opravdu smazat soubor")?> - "+ufile.file+"', '"+ufile.id_file+"');\">";
                   }
                   tbl+="<input type=\"hidden\" name=\"userfiles_id\" value=\""+ufile.id_file+"\" />"
-                     +"<input type=\"submit\" name=\"userfiles_delete\" value=\"{/literal}{$VARS.BUTTON_USERFILE_DELETE}{literal}\" />"
+                     +"<input type=\"submit\" name=\"userfiles_delete\" value=\"<?=_("Smazat")?>\" />"
                      +"</form></td></tr>"
                      +"<tr><td colspan=\"3\"><span class=\"smallFont\">"
-                     +"<a href=\""+ufile.link_show+"\" title=\"{/literal}{$VARS.FILE_LINK_TO_SHOW_NAME}{literal} - "+ufile.file+"\" target=\"_blank\">"+ufile.link_show+"</a>"
+                     +"<a href=\""+ufile.link_show+"\" title=\"<?=_("Odkaz pro zobrazení")?> - "+ufile.file+"\" target=\"_blank\">"+ufile.link_show+"</a>"
                      +"</span></td></tr>"
                      +"<tr><td colspan=\"3\"><span class=\"smallFont\">"
-                     +"<a href=\""+ufile.link_download+"\" title=\"{/literal}{$VARS.FILE_LINK_TO_DOWNLOAD_NAME}{literal} - "+ufile.file+"\">"+ufile.link_download+"</a>"
+                     +"<a href=\""+ufile.link_download+"\" title=\"<?=_("Odkaz pro stažení")?> - "+ufile.file+"\">"+ufile.link_download+"</a>"
                      +"</span></td></tr>"
                      +"<tr><td colspan=\"4\" style=\"border: 1px solid gray;\"></td></tr>";
                $(tbl).appendTo("#userFilesList tbody");
@@ -91,7 +87,7 @@
          if (confirm(name)){
             $.ajax({
                type: "POST",
-               url: "{/literal}{$VARS.AJAX_USERFILE_FILE}{literal}",
+               url: "<?=$this->ajaxUserfileFile?>",
                data: {
                   idFile : idFile,
                   action : 'deleteFile'},
@@ -105,58 +101,59 @@
          return false;
       }
    </script>
-   {/literal}
+   
    <table id="userFilesList" border="0" cellpadding="2" cellspacing="2">
       <tbody>
-         {foreach from=$VARS.USERFILES_ARRAY[$FILES_ID] item="FILE"}
+         <? foreach ($this->filesArray as $file) {?>
+               
          <tr>
             <td rowspan="3">
-               {if $FILE.type eq 'image'}
-               <a href="{$FILE.link_show}" rel="lightbox" title="{$FILE.file}" rel="lightbox">
-                  <img src="{$FILE.link_small}" alt="file {$FILE.file}" height="60" />
+               <?if($file['type'] == 'image'){?>
+               <a href="<?=$file['link_show']?>" rel="lightbox" title="<?=$file['file']?>" rel="lightbox">
+                  <img src="<?=$file['link_small']?>" alt="file <?=$file['file']?>" height="60" />
                </a>
-               {elseif $FILE.type eq 'flash'}
-                  <img src="images/icons/flashfile.png" alt="file {$FILE.file}" height="60" />
-               {else}
-                  <img src="images/icons/textfile.png" alt="file {$FILE.file}" height="60" />
-               {/if}
+               <?} else if($file['type'] == 'flash'){?>
+                  <img src="images/icons/flashfile.png" alt="file <?=$file['file']?>" height="60" />
+               <?} else {?>
+                  <img src="images/icons/textfile.png" alt="file <?=$file['file']?>" height="60" />
+               <?}?>
             </td>
-            <td>{$FILE.file}</td>
+            <td><?=$file['file']?></td>
             <td>
-               {math equation="x/1024" x=$FILE.size format="%.2f"}KB
-               {if $FILE.type eq 'image' OR $FILE.type eq 'flash'}
-               {$FILE.width} x {$FILE.height}px
-               {/if}
+               <?printf("%.2f KB &nbsp;&nbsp;&nbsp;", $file['size']/1024);
+               if($file['type'] == 'image' OR $file['type'] == 'flash'){
+                  echo _("rozměry").": ".$file['width']." x ".$file['height']." px";
+               }?>
             </td>
             <td align="right">
-               {if $FILE.type eq 'image'}
-               <form action="{$THIS_PAGE_LINK}" method="post" onsubmit="return deleteFile('{$VARS.CONFIRM_MESAGE_DELETE_IMAGE} - {$FILE.file}', '{$FILE.id_file}');">
-               {else}
-               <form action="{$THIS_PAGE_LINK}" method="post" onsubmit="return deleteFile('{$VARS.CONFIRM_MESAGE_DELETE_FILE} - {$FILE.file}', '{$FILE.id_file}');">
-               {/if}
+               <?if($file['type'] == 'image'){?>
+               <form action="<?=$this->l()?>" method="post" onsubmit="return deleteFile('<?=_("Opravdu smazat obrázek")?> - <?=$file['file']?>', '<?=$file['id_file']?>');">
+               <?} else {?>
+               <form action="<?=$this->l()?>" method="post" onsubmit="return deleteFile('<?=_("Opravdu smazat soubor")?> - <?=$file['file']?>', '<?=$file['id_file']?>');">
+               <?}?>
                   <input type="hidden" name="userimages_id" value="{$FILE.id_file}" />
-                  <input type="submit" name="userimages_delete" value="{$VARS.BUTTON_USERFILE_DELETE}" />
+                  <input type="submit" name="userimages_delete" value="<?=_("Smazat")?>" />
                </form>
             </td>
          </tr>
          <tr>
             <td colspan="3">
                <span class="smallFont">
-                  <a href="{$FILE.link_show}" title="{$VARS.FILE_LINK_TO_SHOW_NAME} - {$FILE.file}" target="_blank">{$FILE.link_show}</a>
+                  <a href="<?=$file['link_show']?>" title="<?=_("Odkaz pro zobrazení")." - ".$file['file']?>" target="_blank"><?=$file['link_show']?></a>
                </span>
             </td>
          </tr>
          <tr>
             <td colspan="3">
                <span class="smallFont">
-                  <a href="{$FILE.link_download}" title="{$VARS.FILE_LINK_TO_DOWNLOAD_NAME} - {$FILE.file}">{$FILE.link_download}</a>
+                  <a href="<?=$file['link_download']?>" title="<?=_("Odkaz pro stažení")." - ".$file['file']?>"><?=$file['link_download']?></a>
                </span>
             </td>
          </tr>
          <tr>
             <td colspan="4" style="border: 1px solid gray;"></td>
          </tr>
-         {/foreach}
+         <?}?>
       </tbody>
    </table>
 </div>

@@ -40,17 +40,14 @@ class TextView extends View {
       }
 
       //NOTE soubory
-//      if($this->module()->getParam(TextController::PARAM_FILES, true)){
-//         $eplFiles = $this->container()->getEplugin('files');
-//         $this->template()->addTpl($eplFiles->getTpl(), true);
-//         $eplFiles->assignToTpl($this->template());
-//         $tinymce->setImagesList($eplFiles->getImagesListLink());
-//         $tinymce->setLinksList($eplFiles->getLinksListLink());
-//      }
+      if($this->module()->getParam(TextController::PARAM_FILES, true)){
+         $tinymce->setImagesList($this->EPLfiles->getImagesListLink());
+         $tinymce->setLinksList($this->EPLfiles->getLinksListLink());
+      }
 
       $this->template()->addJsPlugin($tinymce);
 //      if((bool)$this->module()->getParam(TextController::PARAM_FILES, true)){
-//         $this->template()->addJsPlugin(new LightBox());
+         $this->template()->addJsPlugin(new LightBox());
 //         $this->template()->addVar('LIGHTBOX', true);
 //      }
       $text = $this->createModel("TextDetailModel");

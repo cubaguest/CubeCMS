@@ -142,17 +142,20 @@ class Template {
       }
    }
 
-   // metoda pro vytvoření proměné
+   /**
+    * Magická metoda pro vložení neinicializované proměné do objektu
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    */
    public function  __set($name, $value) {
-//      var_dump($name, $value);
-      //      if($value instanceof Links){
-      //
-      //      } else {
       $this->privateVars[$name] = $value;
-      //      }
    }
 
-   // metoda vrací proměnou
+   /**
+    * Metoda vraci inicializovanou proměnnou, pokud je
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
    public function  __get($name) {
       if(isset($this->privateVars[$name])){
          return $this->privateVars[$name];
@@ -161,10 +164,19 @@ class Template {
       }
    }
 
+   /**
+    * Metoda kontroluje jestli byla daná proměnná inicializována
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
    public function  __isset($name) {
       return isset($this->privateVars[$name]);
    }
 
+   /**
+    * Metoda maže danou proměnnou z objektu
+    * @param string $name -- název proměnné
+    */
    public function  __unset($name) {
       if(isset ($this->privateVars[$name])){
          unset ($this->privateVars[$name]);
@@ -312,6 +324,7 @@ class Template {
    }
 
    // přidá podřízený objekt šablony
+   // pravděpodobně nepotřebná
    final public function addTplObj($name, Template $obj, $array = false) {
       if($array){
          if(!isset ($this->templateObjects[$name])){
@@ -331,6 +344,8 @@ class Template {
    final public function includeTplObj($name) {
       if($name instanceof Template){
          $name->renderTemplate();
+      } else if($name instanceof Eplugin){
+         $name->renderEplugin();
       } else {
          if(isset ($this->templateObjects[$name])){
             $this->templateObjects[$name]->renderTemplate();
@@ -344,10 +359,10 @@ class Template {
     * @param Eplugin $eplugin -- samotný Eplugin
     * @return Template -- vrací sebe
     */
-   final public function addEplugin($name, Eplugin $eplugin) {
-      $this->eplugins[$name] = clone $eplugin;
-      return $this;
-   }
+//   final public function addEplugin($name, Eplugin $eplugin) {
+//      $this->eplugins[$name] = clone $eplugin;
+//      return $this;
+//   }
 
 /**
     * Metoda vrqací systémový objekt modulu
@@ -376,7 +391,6 @@ class Template {
       foreach ($jsfiles as $file) {
          CoreTemplate::addJS($file);
       }
-
       $cssfiles = $jsplugin->getAllCssFiles();
       foreach ($cssfiles as $file) {
          CoreTemplate::addCss($file);

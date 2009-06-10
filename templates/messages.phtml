@@ -15,11 +15,11 @@ if(!$this->coreErrorsEmpty){ ?>
    <? foreach ($this->coreErrors as $error) {?>
       <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
       <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?>
-      <? if($this->v("DEBUG_MODE")){
+      <? if($this->debugMode){
          foreach ($error["trace"] as $err) {?>
          <p class="errTrMargin">
-            <?=$err["class"].$err["type"].$err["function"];
-            echo _("soubor").": ".$err["file"] ._("řádek").": ".$err["line"];?>
+            <?=$err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
+            echo _("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;"._("řádek").": ".$err["line"];?>
          </p>
          <?}
       }?>

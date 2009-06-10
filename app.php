@@ -944,6 +944,16 @@ class AppCore {
                }
                require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
+
+               //			načtení souboru s viewrem modulu
+               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                     . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
+                  throw new BadFileException(sprintf(_('Nepodařilo se nahrát soubor vieweru modulu "%s"'),
+                        $sysModule->module()->getName()), 13);
+               }
+               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+               . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
+
                //			Vytvoření objektu kontroleru
                $controllerClassName = ucfirst($sysModule->module()->getName()).'Controller';
                if(!class_exists($controllerClassName)){
@@ -973,14 +983,7 @@ class AppCore {
                         _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
                         $requestControllerName, $sysModule->module()->getName()), 12);
                }
-               //			načtení souboru s viewrem modulu
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                     . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php')){
-                  throw new BadFileException(sprintf(_('Nepodařilo se nahrát soubor vieweru modulu "%s"'),
-                        $sysModule->module()->getName()), 13);
-               }
-               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-               . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
+
                //					Donastavení šablon
                //               $template->setModule($module);
                //	Spuštění viewru pokud proběhl kontroler v pořádku
@@ -1353,12 +1356,10 @@ class AppCore {
              */
             if(class_exists($epluginName)){
                $eplugin = new $epluginName();
-               $eplugin->setAuthParam(AppCore::getAuth());
                $eplugin->initRunOnlyEplugin();
                return true;
             } else if(class_exists($epluginWithOutEplugin)){
                $eplugin = new $epluginWithOutEplugin();
-               $eplugin->setAuthParam(AppCore::getAuth());
                $eplugin->initRunOnlyEplugin();
                return true;
             } else {

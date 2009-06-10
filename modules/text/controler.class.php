@@ -34,11 +34,10 @@ class TextController extends Controller {
 
       if($this->getModule()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-         //         $files = new UserFilesEplugin($this->getRights());
-         //         $files->setIdArticle($this->getModule()->getId());
-         //         $this->container()->addEplugin('files', $files);
+         $files = new UserFilesEplugin($this->sys());
+         $this->view()->EPLfiles = $files;
       }
-echo "tady";
+
       $form = new Form();
       $form->setPrefix(self::FORM_PREFIX);
 

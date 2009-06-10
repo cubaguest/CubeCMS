@@ -18,7 +18,17 @@ abstract class Controller {
 	 * @var string
 	 */
 	private $actionViewer = null;
-	
+
+   /**
+    * Objket viewru
+    * @var View
+    */
+   private $viewObj = null;
+
+   /**
+    * Objekt se systémovými informacemi o modulu
+    * @var ModuleSys
+    */
    private $moduleSys = null;
 
 	/**
@@ -48,8 +58,24 @@ abstract class Controller {
       // donastavení systému do šablony
       $this->viewTemplate->_setSysModule($this->moduleSys);
 
+      //		Načtení třídy View
+		$viewClassName = ucfirst($this->module()->getName()).'View';
+		if(!class_exists($viewClassName, false)){
+         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
+               , $viewClassName, $this->module()->getName()),1);
+      }
+		//	Vytvoření objektu pohledu
+      $this->viewObj = new $viewClassName($this->viewTemplate, $this->sys());
+
       // Inicializace kontroleru modulu
       $this->init();
+   }
+
+   /**
+    * Metoda vytvoří objekt viewru
+    */
+   private function createViewObj() {
+      ;
    }
 
     /**
@@ -74,11 +100,20 @@ abstract class Controller {
       return $this->moduleSys;
    }
 
+   /**
+    * MEtoda vrací objekt viewru modulu
+    * @return View
+    */
+   final public function view() {
+      return $this->viewObj;
+   }
+
 	/**
 	 * Metoda vrací odkaz na objekt pro práci s odkazy
     * @param boolean -- true pokud má byt link čistý
     * @param boolean -- true pokud má byt link bez kategorie
 	 * @return Links -- objekt pro práci s odkazy
+    * @deprecated
 	 */
 	final public function getLink($clear = false, $onlyWebRoot = false) {
       return $this->link($clear, $onlyWebRoot);
@@ -101,6 +136,7 @@ abstract class Controller {
 	/**
 	 * Metody vrací objekt modulu
 	 * @return Module -- objekt modulu
+    * @deprecated
 	 */
 	final public function getModule() {
       return $this->module();
@@ -117,6 +153,7 @@ abstract class Controller {
 	/**
 	 * Metody vrací objekt autorizace (infoormace o přiihlášení)
 	 * @return Auth -- objekt autorizace
+    * @deprecated
 	 */
 	final public function getAuth() {
       return $this->auth();
@@ -133,6 +170,7 @@ abstract class Controller {
 	/**
 	 * Metoda vrací objekt na akci
 	 * @return ModuleAction -- objekt akce
+    * @deprecated
 	 */
 	final public function getAction() {
 		return $this->action();
@@ -149,6 +187,7 @@ abstract class Controller {
 	/**
 	 * Metoda vrací objekt s právy na modul
 	 * @return Rights -- objekt práv
+    * @deprecated
 	 */
 	final public function getRights() {
 		return $this->rights();
@@ -165,6 +204,7 @@ abstract class Controller {
 	/**
 	 * Metoda vrací objekt s článkem
 	 * @return Article -- objekt článku
+    * @deprecated
 	 */
 	final public function getArticle() {
 		return $this->article();
@@ -181,6 +221,7 @@ abstract class Controller {
 	/**
 	 * Metoda vrací objekt s cetsami - routes
 	 * @return Routes -- objekt Rout
+    * @deprecated
 	 */
 	final public function getRoutes() {
 		return $this->routes();
@@ -216,18 +257,18 @@ abstract class Controller {
     * @param string $name -- název proměnné
     * @param mixed $value -- hodnota proměnné
     */
-   final public function viewAddVar($name, $value) {
-      $this->viewTemplate->setVar($name, $value);
-   }
+//   final public function viewAddVar($name, $value) {
+//      $this->viewTemplate->setVar($name, $value);
+//   }
 
    /**
     * Metoda přidá eplugin do viewru a šablony
     * @param string $name -- název Epluginu
     * @param Eplugin $eplugin -- objket Epluginu
     */
-   final public function viewAddEPlugin($name, Eplugin $eplugin) {
-      $this->viewTemplate->addEplugin($name, $eplugin);
-   }
+//   final public function viewAddEPlugin($name, Eplugin $eplugin) {
+//      $this->viewTemplate->addEplugin($name, $eplugin);
+//   }
 
 
 	/**
@@ -326,21 +367,14 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
 			$this->actionViewer .= AppCore::MODULE_VIEWER_SUFIX;
 		}
 
-//		Načtení třídy
-		$viewClassName = ucfirst($this->getModule()->getName()).'View';
-		if(!class_exists($viewClassName, false)){
-         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
-               , $viewClassName, $this->getModule()->getName()),1);
-      }
-		//	Vytvoření objektu pohledu
-      $view = new $viewClassName($this->viewTemplate, $this->sys());
-
       //	zvolení viewru modulu pokud existuje
-		if(!method_exists($view, $viewName)){//TODO doladit jesli se správně dělají akce
+		if(!method_exists($this->view(), $viewName)){//TODO doladit jesli se správně dělají akce
          throw new BadMethodCallException(sprintf(_("Action Viewer \"%s\" v modulu
 \"%s\" nebyl implementován"), $viewName, $this->getModule()->getName()), 2);
       }
-      $view->$viewName();
+      $this->view()->$viewName();
+
+      unset ($this->viewObj);
 	}
 
    /**

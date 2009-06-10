@@ -23,6 +23,12 @@ abstract class View {
 	 */
 	private $moduleSys = null;
 	
+   /**
+    * Pole s proměnými z kontroleru, na konci každé metody jsou přeneseny do šablony
+    * @var array 
+    */
+   protected $viewVars = array();
+
 	/**
 	 * Konstruktor Viewu
 	 *
@@ -34,15 +40,62 @@ abstract class View {
 		
 //		inicializace viewru
 		$this->init();
-		//$this->saveContainerToTpl();
 	}
+
+   /**
+    * Destruktor při vyčištění viewru převede všechny interní proměnné do šablony
+    */
+   public function  __destruct() {
+      foreach ($this->viewVars as $varName => $var) {
+         $this->template()->{$varName} = $var;
+      }
+   }
+
+   /**
+    * Magická metoda pro vložení neinicializované proměné do objektu
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    */
+   public function  __set($name, $value) {
+      $this->viewVars[$name] = $value;
+   }
+
+   /**
+    * Metoda vraci inicializovanou proměnnou, pokud je
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
+   public function  __get($name) {
+      if(isset($this->viewVars[$name])){
+         return $this->viewVars[$name];
+      } else {
+         return null;
+      }
+   }
+
+   /**
+    * Metoda kontroluje jestli byla daná proměnná inicializována
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
+   public function  __isset($name) {
+      return isset($this->viewVars[$name]);
+   }
+
+   /**
+    * Metoda maže danou proměnnou z objektu
+    * @param string $name -- název proměnné
+    */
+   public function  __unset($name) {
+      if(isset ($this->viewVars[$name])){
+         unset ($this->viewVars[$name]);
+      }
+   }
 
 	/**
 	 * Metoda, která se provede vždy
 	 */
-	public function init() {
-		
-	}
+	public function init() {}
 	
 	/**
 	 * Hlavní abstraktní třída pro vytvoření pohledu

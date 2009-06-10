@@ -25,58 +25,33 @@ class Eplugin {
    const PARAMS_EPLUGIN_FILE_PREFIX = 'eplugin';
 
    /**
-    * Proměná s názvem šablony
-    * @var string
+    * Objekt šablony
+    * @var Template
     */
-   protected $templateFile = null;
+   protected $template = null;
 
    /**
-    * Proměná s polem hodnot předávaných do šablony
-    * @var array
+    * Objekt se systémovými informacemi o modulu
+    * @var ModuleSys
     */
-   private $_tplVarsArray = array();
-
-   /**
-    * Proměná s polem
-    */
-   private $_tplJSPluginsArray = array();
-
-   /**
-    * Objekt s informacemi o právach uživatele
-    * @var Rights
-    */
-   private $rights = null;
-
-   /**
-    * Objekt s informacemi o uživateli
-    * @var Auth
-    */
-   private $auth = null;
-
-   /**
-    * Id šablony
-    * @var integer
-    */
-   protected $idTpl = 1;
-
-   /**
-    * podnázev šablony pluginu
-    * @var string
-    */
-   protected static $tplSubName = array();
+   private $sys = null;
 
    /**
     * Konstruktor třídy, spouští metodu init();
     */
-   function __construct(Rights $rights = null, $paramsForInit = array()){
-      if($rights instanceof Rights){
-         $this->rights = $rights;
-         $this->auth = $rights->getAuth();
+   function __construct(ModuleSys $sys = null, $paramsForInit = null, $paramsForRun = null){
+      if($sys != null AND $sys instanceof ModuleSys){
+         $this->sys = $sys;
+      } else {
+         $this->sys = new ModuleSys();
       }
-        /**
-         * @todo dodělat, tak ať se to nčítá třeba přímo z modulu nebo kategoorie, nebo jádra
-         */
-      $this->init($paramsForInit);
+
+      if(!UrlRequest::isAjaxRequest() AND !UrlRequest::isSupportedServices()){
+         $this->template = new Template();
+         $this->init($paramsForInit);
+         $this->run($paramsForRun);
+         $this->view();
+      }
    }
 
    /**
@@ -101,9 +76,21 @@ class Eplugin {
 
    /**
     * Inicializační metoda EPluginu
-    *
+    * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
-   protected function init(){}
+   protected function init($params = null){}
+
+   /**
+    * Spuštění pluginu
+    * @param mixed $params -- parametry epluginu (pokud je třeba)
+    */
+   protected function run($params = null) {}
+
+   /**
+    * Metoda nastaví id šablony pro výpis
+    * @param integer -- id šablony (jakékoliv)
+    */
+   protected function view() {}
 
    /**
     * Metoda vrací objekt k tvorbě odkazů
@@ -120,12 +107,21 @@ class Eplugin {
    }
 
    /**
+    * Metoda vrací systémový objekt modulu
+    *
+    * @return ModuleSys -- objekt modulu
+    */
+   protected function sys(){
+      return $this->sys;
+   }
+
+   /**
     * Metoda vrací objekt modulu
     *
     * @return Module -- objekt modulu
     */
-   protected function getModule(){
-      return AppCore::getSelectedModule();
+   protected function module(){
+      return $this->sys()->module();
    }
 
 
@@ -152,8 +148,8 @@ class Eplugin {
     *
     * @return Rights -- objekt Rights
     */
-   protected function getRights(){
-      return $this->rights;
+   protected function rights(){
+      return $this->sys()->rights();
    }
 
    /**
@@ -184,11 +180,11 @@ class Eplugin {
    }
 
    /**
-    * Metoda vrací název šablony
-    * @return string -- název šablony
+    * Metoda vrací objekt šablony
+    * @return Template -- objekt šablony
     */
-   final public function getTpl(){
-      return $this->templateFile;
+   final public function template(){
+      return $this->template;
    }
 
    /**
@@ -197,23 +193,23 @@ class Eplugin {
     *
     * @param Template -- objekt šablony
     */
-   public function assignToTpl(Template $template)	{
-      //		Přiřazení proměnných do pole
-      $this->assignTpl();
-      //		Vložení proměných do šablony
-      foreach ($this->_tplVarsArray as $var => $value) {
-         $template->addVar($var, $value);
-      }
-      //		Vložení JSPluginů
-      foreach ($this->_tplJSPluginsArray as $jsPlugin) {
-         $template->addJsPlugin($jsPlugin);
-      }
-   }
+   //   public function assignToTpl(Template $template)	{
+   //      //		Přiřazení proměnných do pole
+   //      $this->assignTpl();
+   //      //		Vložení proměných do šablony
+   //      foreach ($this->_tplVarsArray as $var => $value) {
+   //         $template->addVar($var, $value);
+   //      }
+   //      //		Vložení JSPluginů
+   //      foreach ($this->_tplJSPluginsArray as $jsPlugin) {
+   //         $template->addJsPlugin($jsPlugin);
+   //      }
+   //   }
 
    /**
     * Metoda obstarává přiřazení proměných do šablony
     */
-   protected function assignTpl(){}
+   //   protected function assignTpl(){}
 
    /**
     * Metoda pro asociování proměných do šablony
@@ -221,17 +217,17 @@ class Eplugin {
     * @param string -- název proměnné
     * @param mixed -- hodnota proměnné
     */
-   final protected function toTpl($tplValueName, $value){
-      $this->_tplVarsArray[$tplValueName] = $value;
-   }
+   //   final protected function toTpl($tplValueName, $value){
+   //      $this->_tplVarsArray[$tplValueName] = $value;
+   //   }
 
    /**
     * Metoda přidává zadaný objekt JSpluginu do šablony
     * @param JSPlugin -- objekt JSPluginu
     */
-   final protected function toTplJSPlugin($jsPlugin) {
-      array_push($this->_tplJSPluginsArray, $jsPlugin);
-   }
+   //   final protected function toTplJSPlugin($jsPlugin) {
+   //      array_push($this->_tplJSPluginsArray, $jsPlugin);
+   //   }
 
    /**
     * Metoda vrací odkaz na soubor epluginu
@@ -261,44 +257,46 @@ class Eplugin {
     * Metoda nastaví id šablony pro výpis
     * @param integer -- id šablony (jakékoliv)
     */
-   public function setIdTpl($id) {
-      $this->idTpl = $id;
+   final public function renderEplugin() {
+      $this->template()->renderTemplate();
    }
 
    /**
     * Metoda vrací id šablony
     * @return integer
     */
-   protected function getIdTpl() {
-      return $this->idTpl;
-   }
+   //   protected function getIdTpl() {
+   //      return $this->idTpl;
+   //   }
 
    /**
     * Metoda nastaví podnázev šablony pro výpis
     * @param string -- podnázev šablony (jakékoliv)
     */
-   public function setTplSubName($name) {
-      self::$tplSubName[$this->getIdTpl()] = $name;
-   }
+   //   public function setTplSubName($name) {
+   //      self::$tplSubName[$this->getIdTpl()] = $name;
+   //   }
 
    /**
     * Metoda vrací podnázev šablony
     * @return string
     */
-   protected function getTplSubName() {
-      if(isset(self::$tplSubName[$this->getIdTpl()])){
-         return self::$tplSubName[$this->getIdTpl()];
-      } else {
-         return null;
-      }
-   }
+   //   protected function getTplSubName() {
+   //      if(isset(self::$tplSubName[$this->getIdTpl()])){
+   //         return self::$tplSubName[$this->getIdTpl()];
+   //      } else {
+   //         return null;
+   //      }
+   //   }
 
    /**
     * Metoda nastavuje do epluginu objkek autorizace
     * @param Auth $auth -- objekt autorizace
     */
-   public function setAuthParam(Auth $auth) {
-      $this->auth = $auth;
-   }
+//      public function setAuthParam(Auth $auth) {
+//
+//         $this->sys()->setRights(new Rights(null));
+//         $this->sys()->setRights(new Rights(null));
+//      }
 }
 ?>
