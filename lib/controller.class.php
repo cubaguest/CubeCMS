@@ -351,6 +351,15 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
    final public function createModel($name) {
       return new $name($this->sys());
    }
+
+   /**
+    * Metoda přeloží zadaný řetězec
+    * @param string $message -- řetězec k přeložení
+    * @return string -- přeložený řetězec
+    */
+   final public function _m($message) {
+      return $this->sys()->locale()->_m($message);
+   }
 }
 
 ?>

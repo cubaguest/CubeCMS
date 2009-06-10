@@ -34,11 +34,11 @@ class TextController extends Controller {
 
       if($this->getModule()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-//         $files = new UserFilesEplugin($this->getRights());
-//         $files->setIdArticle($this->getModule()->getId());
-//         $this->container()->addEplugin('files', $files);
+         //         $files = new UserFilesEplugin($this->getRights());
+         //         $files->setIdArticle($this->getModule()->getId());
+         //         $this->container()->addEplugin('files', $files);
       }
-
+echo "tady";
       $form = new Form();
       $form->setPrefix(self::FORM_PREFIX);
 
@@ -47,10 +47,12 @@ class TextController extends Controller {
 
       //        Pokud byl odeslán formulář
       if($form->checkForm()){
+         $text = $this->createModel("TextDetailModel");
          if(!$text->saveEditText($form->getValue(self::FORM_TEXT))){
-            throw new UnexpectedValueException(_m('Text se nepodařilo uložit'));
+            throw new UnexpectedValueException($this->_m('Text se nepodařilo uložit'));
          }
-         $this->infoMsg()->addMessage(_m('Text byl uložen'));
+
+         $this->infoMsg()->addMessage($this->_m('Text byl uložen'));
          $this->getLink()->action()->reload();
       }
    }

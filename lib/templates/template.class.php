@@ -214,18 +214,26 @@ class Template {
    }
 
    // vrácení odkazu
-   public function l($name = null) {
-      if($name == null AND $this->sys() != null){
-         return $this->sys()->link()->clear();
-      } else if(isset ($this->templateLinks[$name])) {
-         return $this->templateLinks[$name]->clear();
+   public function l($clear = false) {
+//      if($name == null AND $this->sys() != null){
+      if($this->sys() != null){
+         $link = $this->sys()->link();
+//      }
+//      else if(isset ($this->templateLinks[$name])) {
+//         $link = $this->templateLinks[$name];
       } else {
-         return new Links();
+         $link = new Links();
       }
+
+      if($clear){
+         $link->clear();
+      }
+
+      return $link;
    }
    // vrácení odkazu - alias
-   public function link($name = null) {
-      return $this->l($name);
+   public function link($clear = false) {
+      return $this->l($clear);
    }
 
    /**
