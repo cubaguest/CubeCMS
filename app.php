@@ -892,6 +892,9 @@ class AppCore {
             // nastavení locales
             $sysModule->setLocale(new Locale($sysModule->module()->getName()));
 
+            // nasatvení article
+            $sysModule->setArticle(new Article());
+
             //	vytvoření pole se skupinama a právama
             $userRights = array();
             foreach ($item as $collum => $value){

@@ -1,0 +1,13 @@
+<div>
+   <h2><?=$this->article['label']?>&nbsp;
+      <span class="smallFont"><?=strftime("%x %X", $this->article['add_time'])?> - <?=$this->article['username']?></span>
+   </h2>
+   <?=$this->article['text']?>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->article()));?>
+
+   <?if($this->lightBox){?>
+   <script type="text/javascript">
+      $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+   </script>
+   <?}?>
+</div>

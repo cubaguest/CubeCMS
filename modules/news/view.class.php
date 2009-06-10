@@ -1,30 +1,30 @@
 <?php
 class NewsView extends View {
    public function mainView() {
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('addButton.tpl');
-         $this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _m("Přidat novinku"));
-         $this->template()->addVar('LINK_TO_ADD_NEWS', $this->container()->getLink('add_new'));
-
-         // editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
-      }
-
-      $this->template()->addTpl("list.tpl");
-
-      $this->template()->addVar("NEWS_LIST_ARRAY", $this->container()->getData('news_list'));
-      $this->template()->addVar("NEWS_LIST_NAME", _m("Novinky"));
-      $this->template()->addCss("style.css");
-
-      //TODO korektní cestu
-      $this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
-      $this->container()->getEplugin('scroll')->assignToTpl($this->template());
-
-      $this->template()->addVar('NUM_NEWS', $this->container()->getData('num_news'));
-      $this->template()->addVar('NUM_NEWS_ALL', $this->container()->getLink('all_news'));
-      $this->template()->addVar('NUM_NEWS_ALL_NAME', _m('Vše'));
-      $this->template()->addVar('NUM_NEWS_SHOW', _m('Zobrazit novinku'));
+//      if($this->getRights()->isWritable()){
+//         $this->template()->addTpl('addButton.tpl');
+//         $this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _m("Přidat novinku"));
+//         $this->template()->addVar('LINK_TO_ADD_NEWS', $this->container()->getLink('add_new'));
+//
+//         // editační tlačítka
+//         $jquery = new JQuery();
+//         $this->template()->addJsPlugin($jquery);
+//      }
+//
+//      $this->template()->addTpl("list.tpl");
+//
+//      $this->template()->addVar("NEWS_LIST_ARRAY", $this->container()->getData('news_list'));
+//      $this->template()->addVar("NEWS_LIST_NAME", _m("Novinky"));
+//      $this->template()->addCss("style.css");
+//
+//      //TODO korektní cestu
+//      $this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
+//      $this->container()->getEplugin('scroll')->assignToTpl($this->template());
+//
+//      $this->template()->addVar('NUM_NEWS', $this->container()->getData('num_news'));
+//      $this->template()->addVar('NUM_NEWS_ALL', $this->container()->getLink('all_news'));
+//      $this->template()->addVar('NUM_NEWS_ALL_NAME', _m('Vše'));
+//      $this->template()->addVar('NUM_NEWS_SHOW', _m('Zobrazit novinku'));
 
    }
 

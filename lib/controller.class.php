@@ -71,13 +71,6 @@ abstract class Controller {
       $this->init();
    }
 
-   /**
-    * Metoda vytvoří objekt viewru
-    */
-   private function createViewObj() {
-      ;
-   }
-
     /**
      * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
      * kontroleru

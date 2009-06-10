@@ -23,9 +23,9 @@ class ArticlesListModel extends DbModel {
 	 */
 	public function getCountArticles() {
 		if(!$this->countArticlesLoaded){
-         $sqlCount = $this->getDb()->select()->table($this->getModule()->getDbTable())
+         $sqlCount = $this->getDb()->select()->table($this->module()->getDbTable())
          ->colums(array("count"=>"COUNT(*)"))
-         ->where(ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId());
+         ->where(ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId());
 		
 			$count = $this->getDb()->fetchObject($sqlCount);
 			$this->allArticlesCount = $count->count;
@@ -41,7 +41,7 @@ class ArticlesListModel extends DbModel {
 	 * @return array -- pole článků
 	 */
    public function getSelectedListArticles($from, $count=5) {
-      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'article')
+      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'article')
       ->colums(array(ArticleDetailModel::COLUMN_ARTICLE_LABEL => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_LABEL
             .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
             ArticleDetailModel::COLUMN_ARTICLE_TEXT => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_TEXT.'_'.Locale::getLang()
@@ -53,7 +53,7 @@ class ArticlesListModel extends DbModel {
          null, ArticleDetailModel::COLUMN_USER_NAME)
 //      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER
 //         .' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where("article.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->where("article.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
       ->limit($from, $count)
       ->order("article.".ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
 		$returArray = $this->getDb()->fetchAll($sqlSelect);
@@ -66,14 +66,14 @@ class ArticlesListModel extends DbModel {
 	 * @return array -- pole článků
 	 */
 	public function getListArticles() {
-      $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'articletb')
+      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'articletb')
       ->colums(array(ArticleDetailModel::COLUMN_ARTICLE_LABEL => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_LABEL
             .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
             ArticleDetailModel::COLUMN_ARTICLE_TEXT => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_TEXT
             .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
             ArticleDetailModel::COLUMN_ARTICLE_ID_USER, ArticleDetailModel::COLUMN_ARTICLE_ID,
             ArticleDetailModel::COLUMN_ARTICLE_EDIT_TIME))
-      ->where("articletb.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->where("articletb.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
       ->order("articletb.".ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
 
 		$returArray = $this->getDb()->fetchAll($sqlSelect);
@@ -97,7 +97,7 @@ class ArticlesListModel extends DbModel {
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable())
+      ->table($this->module()->getDbTable())
       ->colums(ArticleDetailModel::COLUMN_ARTICLE_TIME)
       ->limit(0, 1)
       ->order(ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);

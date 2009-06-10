@@ -48,49 +48,50 @@ class ArticlesController extends Controller {
       $this->checkReadableRights();
 
       //		Vytvoření modelu
-      $articleModel = new ArticlesListModel();
+      $articleModel = $this->createModel("ArticlesListModel");
       //		Scrolovátka
-      $scroll = new ScrollEplugin();
-      $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_ARTICLES_ON_PAGE, 10));
+      $scroll = new ScrollEplugin($this->sys());
+      $scroll->setCountRecordsOnPage($this->module()->getParam(self::PARAM_NUM_ARTICLES_ON_PAGE, 10));
       $scroll->setCountAllRecords($articleModel->getCountArticles());
-
+//      var_dump($scroll);
       //		Vybrání článků
-      $articlesArray = $articleModel->getSelectedListArticles($scroll->getStartRecord(), $scroll->getCountRecords());
+      $this->view()->articlesArray = $articleModel->getSelectedListArticles($scroll->getStartRecord(), $scroll->getCountRecords());
+      $this->view()->EPLscroll = $scroll;
 
       //		Přidání linku pro editaci a jestli se dá editovat
-      if(!empty ($articlesArray)){
-         foreach ($articlesArray as $key => $article) {
-            //			Link pro zobrazení
-            $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->getLink()
-            ->article($article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
-               $article[ArticleDetailModel::COLUMN_ARTICLE_ID]);
-         }
-      }
+//      if(!empty ($articlesArray)){
+//         foreach ($articlesArray as $key => $article) {
+//            //			Link pro zobrazení
+//            $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->getLink()
+//            ->article($article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
+//               $article[ArticleDetailModel::COLUMN_ARTICLE_ID]);
+//         }
+//      }
 
       //		Přenos do viewru
-      $this->container()->addEplugin('scroll',$scroll);
+//      $this->container()->addEplugin('scroll',$scroll);
 
       //		Link pro přidání
-      if($this->getRights()->isWritable()){
-         $this->container()->addLink('LINK_ADD_ARTICLE',$this->getLink()->action($this->getAction()->addArticle()));
-      }
+//      if($this->getRights()->isWritable()){
+//         $this->container()->addLink('LINK_ADD_ARTICLE',$this->getLink()->action($this->getAction()->addArticle()));
+//      }
       // předání dat
-      $this->container()->addData('ARTICLE_LIST_ARRAY', $articlesArray);
+//      $this->container()->addData('ARTICLE_LIST_ARRAY', $articlesArray);
    }
 
    public function showController(){
-      $articleDetail = new ArticleDetailModel();
-      $articleArr = $articleDetail->getArticleDetailSelLang($this->getArticle()->getArticle());
+//      $articleDetail = new ArticleDetailModel();
+//      $articleArr = $articleDetail->getArticleDetailSelLang($this->getArticle()->getArticle());
 
       //      obsluha Mazání novinky
-      if(($this->getRights()->isWritable() AND $articleDetail->getIdUser()
-            == $this->getRights()->getAuth()->getUserId()) OR
-         $this->getRights()->isControll()){
-         
-      }
+//      if(($this->getRights()->isWritable() AND $articleDetail->getIdUser()
+//            == $this->getRights()->getAuth()->getUserId()) OR
+//         $this->getRights()->isControll()){
+//
+//      }
 
-      $this->container()->addData('ARTICLE', $articleArr);
-      $this->container()->addData('ARTICLE_LABEL', $articleArr[ArticleDetailModel::COLUMN_ARTICLE_LABEL]);
+//      $this->container()->addData('ARTICLE', $articleArr);
+//      $this->container()->addData('ARTICLE_LABEL', $articleArr[ArticleDetailModel::COLUMN_ARTICLE_LABEL]);
 
       if($this->getRights()->isControll() OR
          ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
@@ -113,15 +114,15 @@ class ArticlesController extends Controller {
             $this->getLink()->article()->action()->rmParam()->reload();
          }
 
-         $this->container()->addLink('EDIT_LINK', $this->getLink()->action($this->getAction()->editArticle()));
-         $this->container()->addData('EDITABLE', true);
+//         $this->container()->addLink('EDIT_LINK', $this->getLink()->action($this->getAction()->editArticle()));
+//         $this->container()->addData('EDITABLE', true);
       }
 
-      if($this->getRights()->isWritable()){
-         $this->container()->addLink('ADD_LINK',$this->getLink()->action($this->getAction()->addArticle())->article());
-         $this->container()->addData('WRITABLE', true);
-      }
-      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
+//      if($this->getRights()->isWritable()){
+//         $this->container()->addLink('ADD_LINK',$this->getLink()->action($this->getAction()->addArticle())->article());
+//         $this->container()->addData('WRITABLE', true);
+//      }
+//      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
    }
 
    /**

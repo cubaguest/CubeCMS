@@ -1,3 +1,11 @@
+<?
+if(isset ($vars['link'])){
+   $link = $vars['link'];
+} else {
+   $link = $this->l();
+}
+?>
+
 <p>
-<a href="" title="<?=_("Zpět")?>"><?=_("Zpět")?></a>
+<a href="<?=$link?>" title="<?=_("Zpět")?>"><?=_("Zpět")?></a>
 </p>

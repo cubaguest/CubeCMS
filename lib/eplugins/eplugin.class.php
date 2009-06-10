@@ -50,7 +50,6 @@ class Eplugin {
          $this->template = new Template();
          $this->init($paramsForInit);
          $this->run($paramsForRun);
-         $this->view();
       }
    }
 
@@ -188,6 +187,15 @@ class Eplugin {
    }
 
    /**
+    * Metoda vrací objekt šablony !!!(interní)
+    * @return Template -- objekt šablony
+    */
+//   final public function _getTemplate(){
+//      $this->view();
+//      return $this->template();
+//   }
+
+   /**
     * Metoda zařadí proměné epluginu do šablony
     * Je volána z viewru
     *
@@ -258,6 +266,7 @@ class Eplugin {
     * @param integer -- id šablony (jakékoliv)
     */
    final public function renderEplugin() {
+      $this->view();
       $this->template()->renderTemplate();
    }
 

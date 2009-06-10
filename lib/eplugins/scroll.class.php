@@ -20,28 +20,24 @@ class ScrollEplugin extends Eplugin {
 
    /**
     * Výchozí počáteční záznam
-    * @var integer
     */
    const DEFAULT_START_RECORD = 0;
 
    /**
     * Konstanta s oddělovačem sousedů
-    * @var string
     */
    const NEIGHBOURS_SEPARATOR = ' ';
 
    /**
     * Výchozí první stránka
-    * @var integer
     */
    const DEFAULT_START_PAGE = 1;
 
 
    /**
     * Název primární šablony s posunovátky
-    * @var string
     */
-   protected $templateFile = 'scroll.tpl';
+   const TPL_FILE = 'scroll.phtml';
 
    /**
     * Proměná obsahuje celkový počet záznamů v db
@@ -72,8 +68,8 @@ class ScrollEplugin extends Eplugin {
     * @var boolean
     */
    private $activeButtonBegin = false;
+   private $activeButtonPrevious = false;
    private $activeButtonNext = false;
-   private $activeButtonBack = false;
    private $activeButtonEnd = false;
 
    /**
@@ -130,12 +126,17 @@ class ScrollEplugin extends Eplugin {
    /**
     * Metoda inicializace, je spuštěna pří vytvoření objektu
     */
-   protected function init(){
+   protected function init($params = null){
       // nastavení objektu parametru
       $this->param = new UrlParam($this->urlParamName, self::URL_PARAM_PATTERN);
-      //	Nčtení stránky z url
+   }
+
+   /**
+    * Metoda spuštění, je spuštěna pří vytvoření objektu
+    */
+   protected function run($params = null){
+      //	Načtení stránky z url
       $this->getPageFromUrl();
-      $this->createLabels();
    }
 
    /**
@@ -203,7 +204,7 @@ class ScrollEplugin extends Eplugin {
       if ($this->selectPage != 1){
          $this->activeButtonBegin = true;
          //	if ($this->selectPage != 2){
-         $this->activeButtonNext = true;
+         $this->activeButtonPrevious = true;
          //	}
       }
       //	Výpočet všech stránek
@@ -218,7 +219,7 @@ class ScrollEplugin extends Eplugin {
       if ($this->selectPage != $this->countAllPages AND $this->countAllPages != 0){
          $this->activeButtonEnd = true;
          //	if ($this->selectPage != $this->countAllPages-1){
-         $this->activeButtonBack = true;
+         $this->activeButtonNext = true;
          //	}
       }
    }
@@ -253,26 +254,15 @@ class ScrollEplugin extends Eplugin {
       if($this->isButtonBegin()){
          $this->buttonsLinks["begin"]=$this->getLinks()->param($this->param->setValue(1));
       }
-      if($this->isButtonNext()){
-         $this->buttonsLinks["next"]=$this->getLinks()->param($this->param->setValue($this->selectPage-1));
+      if($this->isButtonPrevious()){
+         $this->buttonsLinks["previous"]=$this->getLinks()->param($this->param->setValue($this->selectPage-1));
       }
-      if($this->isButtonBack()){
-         $this->buttonsLinks["back"]=$this->getLinks()->param($this->param->setValue($this->selectPage+1));
+      if($this->isButtonNext()){
+         $this->buttonsLinks["next"]=$this->getLinks()->param($this->param->setValue($this->selectPage+1));
       }
       if($this->isButtonEnd()){
          $this->buttonsLinks["end"]=$this->getLinks()->param($this->param->setValue($this->countAllPages));
       }
-   }
-
-   /**
-    * Metoda vygeneruje popisky do pole
-    */
-   private function createLabels(){
-      //Popisky tlačítek
-      $this->labelsArray["begin"] = _("Začátek");
-      $this->labelsArray["next"] = _("Další");
-      $this->labelsArray["back"] = _("Předchozí");
-      $this->labelsArray["end"] = _("Konec");
    }
 
    /**
@@ -281,7 +271,7 @@ class ScrollEplugin extends Eplugin {
     * @return boolean -- true pokud je tlačítko aktivní
     */
    public function isButtonBegin(){
-      return $this->activeButtonBegin;
+      return (bool)$this->activeButtonBegin;
    }
 
    /**
@@ -289,8 +279,8 @@ class ScrollEplugin extends Eplugin {
     *
     * @return boolean -- true pokud je tlačítko aktivní
     */
-   public function isButtonNext(){
-      return $this->activeButtonNext;
+   public function isButtonPrevious(){
+      return (bool)$this->activeButtonPrevious;
    }
 
    /**
@@ -298,8 +288,8 @@ class ScrollEplugin extends Eplugin {
     *
     * @return boolean -- true pokud je tlačítko aktivní
     */
-   public function isButtonBack(){
-      return $this->activeButtonBack;
+   public function isButtonNext(){
+      return (bool)$this->activeButtonNext;
    }
 
    /**
@@ -308,7 +298,7 @@ class ScrollEplugin extends Eplugin {
     * @return boolean -- true pokud je tlačítko aktivní
     */
    public function isButtonEnd(){
-      return $this->activeButtonEnd;
+      return (bool)$this->activeButtonEnd;
    }
 
    /**
@@ -331,26 +321,37 @@ class ScrollEplugin extends Eplugin {
    /**
     * Metoda obstarává přiřazení proměných do šablony
     */
-   protected function assignTpl(){
+   protected function view(){
+      $this->template()->addTplFile(self::TPL_FILE, true);
+      $this->template()->buttonBegin = $this->isButtonBegin();
+      $this->template()->buttonPrevious = $this->isButtonPrevious();
+      $this->template()->buttonNext = $this->isButtonNext();
+      $this->template()->buttonEnd = $this->isButtonEnd();
+      $this->template()->buttonLinks = $this->buttonsLinks;
+      $this->template()->selectPage = $this->selectPage;
+      $this->template()->allPages = $this->countAllPages;
+      $this->template()->leftNeigbourts = $this->pagesLeftSideArray;
+      $this->template()->rightNeigbourts = $this->pagesRightSideArray;
+
       //	Zapnutí tlačítek
-      $this->toTpl("BUTTON_BEGIN", $this->isButtonBegin());
-      $this->toTpl("BUTTON_BEGIN_NAME", _('Začátek'));
-      $this->toTpl("BUTTON_NEXT", $this->isButtonNext());
-      $this->toTpl("BUTTON_NEXT_NAME", _('Další'));
-      $this->toTpl("BUTTON_BACK", $this->isButtonBack());
-      $this->toTpl("BUTTON_BACK_NAME", _('Předchozí'));
-      $this->toTpl("BUTTON_END", $this->isButtonEnd());
-      $this->toTpl("BUTTON_END_NAME", _('Konec'));
-      //	Odkazy tlačítek
-      $this->toTpl("SCROLL_BUTTONS_LINKS", $this->buttonsLinks);
-      //	Data o pozici scrolování
-      $this->toTpl("SCROLL_SELECTED_PAGE", $this->selectPage);
-      $this->toTpl("SCROLL_ALL_PAGES", $this->countAllPages);
-      //	popisky
-      $this->toTpl("SCROLL_LABELS_ARRAY", $this->labelsArray);
-      //	Sousedé u pozice
-      $this->toTpl("SCROLL_LEFT_SIDE_DATA_ARRAY", $this->pagesLeftSideArray);
-      $this->toTpl("SCROLL_RIGHT_SIDE_DATA_ARRAY", $this->pagesRightSideArray);
+//      $this->toTpl("BUTTON_BEGIN", $this->isButtonBegin());
+//      $this->toTpl("BUTTON_BEGIN_NAME", _('Začátek'));
+//      $this->toTpl("BUTTON_NEXT", $this->isButtonNext());
+//      $this->toTpl("BUTTON_NEXT_NAME", _('Další'));
+//      $this->toTpl("BUTTON_BACK", $this->isButtonBack());
+//      $this->toTpl("BUTTON_BACK_NAME", _('Předchozí'));
+//      $this->toTpl("BUTTON_END", $this->isButtonEnd());
+//      $this->toTpl("BUTTON_END_NAME", _('Konec'));
+//      //	Odkazy tlačítek
+//      $this->toTpl("SCROLL_BUTTONS_LINKS", $this->buttonsLinks);
+//      //	Data o pozici scrolování
+//      $this->toTpl("SCROLL_SELECTED_PAGE", $this->selectPage);
+//      $this->toTpl("SCROLL_ALL_PAGES", $this->countAllPages);
+//      //	popisky
+////      $this->toTpl("SCROLL_LABELS_ARRAY", $this->labelsArray);
+//      //	Sousedé u pozice
+//      $this->toTpl("SCROLL_LEFT_SIDE_DATA_ARRAY", $this->pagesLeftSideArray);
+//      $this->toTpl("SCROLL_RIGHT_SIDE_DATA_ARRAY", $this->pagesRightSideArray);
    }
 }
 ?>

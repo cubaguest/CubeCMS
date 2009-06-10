@@ -74,7 +74,7 @@ class ArticleDetailModel extends DbModel {
    public function getArticleDetailSelLang($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable(), 'article')
+      ->table($this->module()->getDbTable(), 'article')
       ->colums(array(self::COLUMN_ARTICLE_LABEL =>"IFNULL(".self::COLUMN_ARTICLE_LABEL.'_'.Locale::getLang()
             .",".self::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_ARTICLE_TEXT =>"IFNULL(".self::COLUMN_ARTICLE_TEXT.'_'.Locale::getLang()
@@ -84,7 +84,7 @@ class ArticleDetailModel extends DbModel {
          array('article' => self::COLUMN_ARTICLE_ID_USER, self::COLUMN_USER_ID),
          null, self::COLUMN_USER_NAME)
 //      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('article.'.self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->where('article.'.self::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
       ->where('article.'.self::COLUMN_ARTICLE_ID, $id);
 
       $article = $this->getDb()->fetchAssoc($sqlSelect);
@@ -120,9 +120,9 @@ class ArticleDetailModel extends DbModel {
    public function getArticleDetailAllLangs($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->getModule()->getDbTable())
+      ->table($this->module()->getDbTable())
       ->colums(Db::COLUMN_ALL)
-      ->where(self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId())
+      ->where(self::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
       ->where(self::COLUMN_ARTICLE_ID, $id);
 
       $article = $this->getDb()->fetchAssoc($sqlSelect);
@@ -150,7 +150,7 @@ class ArticleDetailModel extends DbModel {
                                           self::COLUMN_ARTICLE_TEXT, $texts,
                                           self::COLUMN_ARTICLE_EDIT_TIME, time());
 
-      $sqlInsert = $this->getDb()->update()->table($this->getModule()->getDbTable())
+      $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
             ->set($articleArr)
             ->where(self::COLUMN_ARTICLE_ID, $id);
 
@@ -169,7 +169,7 @@ class ArticleDetailModel extends DbModel {
     */
    public function deleteArticle($idArticle) {
       $sqlDelete = $this->getDb()
-      ->delete()->table($this->getModule()->getDbTable())
+      ->delete()->table($this->module()->getDbTable())
       ->where(self::COLUMN_ARTICLE_ID,$idArticle);
 
       if($this->getDb()->query($sqlDelete)){

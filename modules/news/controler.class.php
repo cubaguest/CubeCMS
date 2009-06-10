@@ -60,62 +60,65 @@ class NewsController extends Controller {
       $this->checkReadableRights();
 
       //		Vytvoření modelu
-      $listNews = new NewsListModel();
+//      $listNews = new NewsListModel();
       //		Scrolovátka
       $scroll = new ScrollEplugin();
+
+      
+
       //TODO předělat na objekt parametru z enginu
-      if(isset($_GET[self::GET_NUM_NEWS]) AND (is_numeric($_GET[self::GET_NUM_NEWS]) OR $_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS)){
-         if(is_numeric($_GET[self::GET_NUM_NEWS])){
-            $scroll->setCountRecordsOnPage((int)$_GET[self::GET_NUM_NEWS]);
-         } else if($_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS){
-            $scroll->setCountRecordsOnPage($listNews->getCountNews());
-         }
-      } else {
-         $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_NEWS, 10));
-      }
-      $scroll->setCountAllRecords($listNews->getCountNews());
+//      if(isset($_GET[self::GET_NUM_NEWS]) AND (is_numeric($_GET[self::GET_NUM_NEWS]) OR $_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS)){
+//         if(is_numeric($_GET[self::GET_NUM_NEWS])){
+//            $scroll->setCountRecordsOnPage((int)$_GET[self::GET_NUM_NEWS]);
+//         } else if($_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS){
+//            $scroll->setCountRecordsOnPage($listNews->getCountNews());
+//         }
+//      } else {
+//         $scroll->setCountRecordsOnPage($this->getModule()->getParam(self::PARAM_NUM_NEWS, 10));
+//      }
+//      $scroll->setCountAllRecords($listNews->getCountNews());
 
       //		Vybrání novinek
-      $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
+//      $newsArray = $listNews->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
       //		Přidání linku pro editaci a jestli se dá editovat
-      if(!empty ($newsArray)){
-         foreach ($newsArray as $key => $news) {
-            if($news[NewsDetailModel::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){
-               $newsArray[$key][self::NEWS_EDITABLE] = true;
-               $newsArray[$key][self::NEWS_EDIT_LINK] = $this->getLink()
-               ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],$news[NewsDetailModel::COLUMN_NEWS_ID_NEW])
-               ->action($this->getAction()->edit());
-            } else {
-               $newsArray[$key][self::NEWS_EDITABLE] = false;
-            }
-            //			Link pro zobrazení
-            $newsArray[$key][self::NEWS_SHOW_LINK] = $this->getLink()
-            ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],
-               $news[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
-         }
-      }
+//      if(!empty ($newsArray)){
+//         foreach ($newsArray as $key => $news) {
+//            if($news[NewsDetailModel::COLUMN_NEWS_ID_USER] == $this->getRights()->getAuth()->getUserId() OR $this->getRights()->isControll()){
+//               $newsArray[$key][self::NEWS_EDITABLE] = true;
+//               $newsArray[$key][self::NEWS_EDIT_LINK] = $this->getLink()
+//               ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],$news[NewsDetailModel::COLUMN_NEWS_ID_NEW])
+//               ->action($this->getAction()->edit());
+//            } else {
+//               $newsArray[$key][self::NEWS_EDITABLE] = false;
+//            }
+//            //			Link pro zobrazení
+//            $newsArray[$key][self::NEWS_SHOW_LINK] = $this->getLink()
+//            ->article($news[NewsDetailModel::COLUMN_NEWS_LABEL],
+//               $news[NewsDetailModel::COLUMN_NEWS_ID_NEW]);
+//         }
+//      }
 
       //		Přenos do viewru
-      $this->container()->addEplugin('scroll',$scroll);
+//      $this->container()->addEplugin('scroll',$scroll);
 
       //		Link pro přidání
-      if($this->getRights()->isWritable()){
-         $this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->add()));
-      }
+//      if($this->getRights()->isWritable()){
+//         $this->container()->addLink('add_new',$this->getLink()->action($this->getAction()->add()));
+//      }
 
-      $this->container()->addData('news_list', $newsArray);
+//      $this->container()->addData('news_list', $newsArray);
 
       //		linky pro zobrazení určitého počtu novinek
-      foreach ($this->getNumShowNews as $num) {
-         $numNewsArray[$num] = null;
-         if($listNews->getCountNews() >= $num){
-            //				$numNewsArray[$num] = $this->getLink()->params()->param(self::GET_NUM_NEWS, $num);
-            //				$this->container()->addLink('show_'.$num,$this->getLink()->param(self::GET_NUM_NEWS, $num));
-         };
-      }
+//      foreach ($this->getNumShowNews as $num) {
+//         $numNewsArray[$num] = null;
+//         if($listNews->getCountNews() >= $num){
+//            //				$numNewsArray[$num] = $this->getLink()->params()->param(self::GET_NUM_NEWS, $num);
+//            //				$this->container()->addLink('show_'.$num,$this->getLink()->param(self::GET_NUM_NEWS, $num));
+//         };
+//      }
       //		$this->container()->addLink('all_news',$this->getLink()->params()->param(self::GET_NUM_NEWS, self::GET_ALL_NEWS));
 
-      $this->container()->addData('num_news', $numNewsArray);
+//      $this->container()->addData('num_news', $numNewsArray);
    }
 
    public function showController(){

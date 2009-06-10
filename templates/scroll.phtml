@@ -1,0 +1,59 @@
+<!--Sipky pro posun stranek-->
+<div class="scroll_main">
+<table>
+<tr>
+<td width="100" align="left">
+<? //Sipka na zacatek
+   if($this->buttonBegin){?>
+      <a href="<?=$this->buttonLinks['begin']?>" title="<?_("Začátek")?>">
+      <img src="images/scroll/begin.png" alt="<?_("Začátek")?>" />
+      </a>
+   <?} else {?>
+      <img src="images/scroll/begin_disable.png" alt="<?_("Začátek - vypnuto")?>" />
+   <?}?>
+   &#032;&#032;
+
+<? //Sipka na předchozí
+   if($this->buttonPrevious){?>
+      <a href="<?=$this->buttonLinks['previous']?>" title="<?_("Předchozí")?>">
+      <img src="images/scroll/previous.png" alt="<?_("Předchozí")?>" />
+      <span><?_("Předchozí")?></span>
+      </a>
+   <?} else {?>
+      <img src="images/scroll/previous_disable.png" alt="<?_("Předchozí - vypnuto")?>" />
+      <span><?_("Předchozí")?></span>
+   <?}?>
+</td>
+<td align="center">
+   <? foreach ($this->leftNeigbourts as $number) {?>
+      &nbsp;<a href="<?=$number['link'];?>" title="<?=$number['name'];?>"><?=$number['name'];?></a>&nbsp;
+   <?}?>
+   [&nbsp;<?=$this->selectPage?>/<?=$this->allPages?>&nbsp;]
+   <? foreach ($this->rightNeigbourts as $number) {?>
+      &nbsp;<a href="<?=$number['link'];?>" title="<?=$number['name'];?>"><?=$number['name'];?></a>&nbsp;
+   <?}?>
+</td>
+<td width="100" align="right">
+<? //Sipka na další
+   if($this->buttonNext){?>
+      <a href="<?=$this->buttonLinks['next']?>" title="<?_("Další")?>">
+      <img src="images/scroll/next.png" alt="<?_("Další")?>" />
+      <span><?_("Další")?></span>
+      </a>
+   <?} else {?>
+      <img src="images/scroll/next_disable.png" alt="<?_("Další - vypnuto")?>" />
+      <span><?_("Další")?></span>
+   <?}?>
+   &#032;&#032;
+<? //Sipka na konec
+   if($this->buttonEnd){?>
+      <a href="<?=$this->buttonLinks['end']?>" title="<?_("Konec")?>">
+      <img src="images/scroll/end.png" alt="<?_("Konec")?>" />
+      </a>
+   <?} else {?>
+      <img src="images/scroll/end_disable.png" alt="<?_("Konec - vypnuto")?>" />
+   <?}?>
+</td>
+</tr>
+</table>
+</div>

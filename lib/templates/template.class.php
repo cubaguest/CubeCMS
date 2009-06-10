@@ -290,13 +290,14 @@ class Template {
     * @param string $name -- název šablony
     * @param boolean $engine -- (option) jestli se jedná o šablonu enginu
     */
-   public function includeTpl($name, $engine = false) {
+   public function includeTpl($name, $engine = false, $vars = null) {
       if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
          include_once (self::getFileDir($name, self::TEMPLATES_DIR,
-               $this->sys()->module()->getName())).$name;
+               $this->sys()->module()->getName()).$name);
       } else {
-         include_once (self::getFileDir($name, self::TEMPLATES_DIR, false)).$name;
+         include_once (self::getFileDir($name, self::TEMPLATES_DIR, false).$name);
       }
+      unset ($vars);
    }
 
    /**

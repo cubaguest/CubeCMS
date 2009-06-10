@@ -1,17 +1,18 @@
 <?php
 class ArticlesView extends View {
    public function mainView() {
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('addButton.tpl');
-         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
+//      if($this->getRights()->isWritable()){
+//         $this->template()->addTpl('addButton.tpl');
+//         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
+//
+//         // editační tlačítka
+//         $jquery = new JQuery();
+//         $this->template()->addJsPlugin($jquery);
+//      }
 
-         // editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
-      }
-
-      $this->template()->addTpl("list.tpl");
-
+      $this->template()->addTplFile("list.phtml");
+      $this->template()->addCssFile("style.css");
+/*
       $lists = $this->container()->getData('ARTICLE_LIST_ARRAY');
       foreach ($lists as $key => $article) {
          $out = array();
@@ -27,22 +28,21 @@ class ArticlesView extends View {
 
       $this->template()->addVar("ARTICLES_LIST_NAME", _m("Články"));
       $this->template()->addVar("ARTICLES_MORE_NAME", _m("Více"));
-      $this->template()->addCss("style.css");
-
+*/
       //TODO korektní cestu
-      $this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
-      $this->container()->getEplugin('scroll')->assignToTpl($this->template());
+//      $this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
+//      $this->container()->getEplugin('scroll')->assignToTpl($this->template());
    }
 
    public function showView(){
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('editButtons.tpl');
-         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
-
-         $this->template()->addVar('LINK_TO_EDIT_ARTICLE_NAME', _m("Upravit"));
-
-         $this->template()->addVar('LINK_TO_DELETE_ARTICLE_NAME', _m("Smazat"));
-         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat článek"));
+      if($this->rights()->isWritable()){
+//         $this->template()->addTplFile('editButtons.tpl');
+//         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
+//
+//         $this->template()->addVar('LINK_TO_EDIT_ARTICLE_NAME', _m("Upravit"));
+//
+//         $this->template()->addVar('LINK_TO_DELETE_ARTICLE_NAME', _m("Smazat"));
+//         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat článek"));
 
          //			JSPlugin pro potvrzení mazání
          $submitForm = new SubmitForm();
@@ -54,18 +54,22 @@ class ArticlesView extends View {
       }
 
       //převedeme všechny lightbox převedeme na lightbox rel
-      if((bool)$this->getModule()->getParam(ArticlesController::PARAM_FILES, true)){
+      if((bool)$this->module()->getParam(ArticlesController::PARAM_FILES, true)){
          $this->template()->addJsPlugin(new LightBox());
-         $this->template()->addVar('LIGHTBOX', true);
+         $this->template()->lightBox = true;
+//         $this->template()->addVar('LIGHTBOX', true);
       }
 
-      $this->template()->addTpl("articleDetail.tpl");
-      $this->template()->addCss("style.css");
+      $model = $this->createModel("ArticleDetailModel");
+      $this->template()->article = $model->getArticleDetailSelLang($this->sys()->article()->getArticle());
 
-      $this->template()->setTplSubLabel($this->container()->getData('ARTICLE_LABEL'));
-      $this->template()->setSubTitle($this->container()->getData('ARTICLE_LABEL'), true);
+      $this->template()->addTplFile("articleDetail.phtml");
+      $this->template()->addCssFile("style.css");
 
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
+//      $this->template()->setTplSubLabel($this->container()->getData('ARTICLE_LABEL'));
+//      $this->template()->setSubTitle($this->container()->getData('ARTICLE_LABEL'), true);
+
+//      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
    }
 
    /**

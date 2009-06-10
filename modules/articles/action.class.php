@@ -10,8 +10,8 @@ class ArticlesAction extends Action {
 	const ACTION_EDIT_ARTICLE_ABBR = 'ea';
 
     protected function init() {
-		$this->addAction(self::ACTION_ADD_ARTICLE_ABBR, "addarticle", _m('pridani-clanku'));
-		$this->addAction(self::ACTION_EDIT_ARTICLE_ABBR, "editarticle", _m('uprava-clanku'));
+       $this->addAction(self::ACTION_ADD_ARTICLE_ABBR, "addarticle", $this->_m('pridani-clanku'));
+		$this->addAction(self::ACTION_EDIT_ARTICLE_ABBR, "editarticle", $this->_m('uprava-clanku'));
     }
 
 
