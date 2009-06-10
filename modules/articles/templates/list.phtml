@@ -25,6 +25,9 @@
    </div>
    <?}?>
    <br />
+<?if($this->sys()->rights()->isWritable()){
+   $this->includeTplObj($this->toolbox);
+}?>
 </div>
 <?
 $this->includeTplObj($this->EPLscroll);

@@ -132,8 +132,7 @@ class ArticlesController extends Controller {
       $this->checkWritebleRights();
       if($this->getModule()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-         $files = new UserFilesEplugin($this->getRights());
-         $files->setIdArticle($this->getRights()->getAuth()->getUserId()*(-1));
+         $files = new UserFilesEplugin($this->sys());
          $this->container()->addEplugin('files', $files);
       }
 

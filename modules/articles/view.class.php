@@ -1,14 +1,19 @@
 <?php
 class ArticlesView extends View {
    public function mainView() {
-//      if($this->getRights()->isWritable()){
+      if($this->rights()->isWritable()){
+         $toolbox = new TplToolbox();
+         $toolbox->addTool('add_article', $this->_m("Přidat"),
+            $this->link()->action($this->sys()->action()->addarticle()),
+            $this->_m("Přidat článek"), "text_add.png");
+         $this->template()->toolbox = $toolbox;
 //         $this->template()->addTpl('addButton.tpl');
 //         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
 //
 //         // editační tlačítka
 //         $jquery = new JQuery();
 //         $this->template()->addJsPlugin($jquery);
-//      }
+      }
 
       $this->template()->addTplFile("list.phtml");
       $this->template()->addCssFile("style.css");

@@ -8,3 +8,7 @@
 {/foreach}
 <a href="{$VARS.NEWS_LINK}" title="{$VARS.NEWS_LINK_NAME}">{$VARS.NEWS_LINK_NAME}</a>
 </div>
+<?}if($this->sys()->rights()->isWritable()){
+   $this->includeTplObj($this->toolbox);
+}
+?>
