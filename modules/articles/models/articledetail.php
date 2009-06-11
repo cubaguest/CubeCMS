@@ -40,12 +40,12 @@ class ArticleDetailModel extends DbModel {
    public function saveNewArticle($articleLabels, $articleTexts, $idUser = 0) {
       $articleArr = $this->createValuesArray(self::COLUMN_ARTICLE_LABEL, $articleLabels,
                                           self::COLUMN_ARTICLE_TEXT, $articleTexts,
-                                          self::COLUMN_ARTICLE_ID_ITEM, $this->getModule()->getId(),
+                                          self::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId(),
                                           self::COLUMN_ARTICLE_ID_USER, $idUser,
                                           self::COLUMN_ARTICLE_TIME, time(),
                                           self::COLUMN_ARTICLE_EDIT_TIME, time());
 
-      $sqlInsert = $this->getDb()->insert()->table($this->getModule()->getDbTable())
+      $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
       ->colums(array_keys($articleArr))
       ->values(array_values($articleArr));
 //      //		Vložení do db

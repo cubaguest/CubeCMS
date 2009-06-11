@@ -738,7 +738,8 @@ class AppCore {
       //adresa k rootu webu
       $this->coreTpl->rootDir = self::getAppWebDir();
       $link = new Links();
-      $this->coreTpl->mainWebDir = UrlRequest::getBaseWebDir();
+      $this->coreTpl->setPVar("mainWebDir", UrlRequest::getBaseWebDir());
+      //$this->coreTpl->mainWebDir = UrlRequest::getBaseWebDir();
       //            $this->coreTpl->setVar("THIS_PAGE_LINK", (string)$link);
       // mapa webu
       $this->coreTpl->sitemapLink = (string)$link->clear(true)

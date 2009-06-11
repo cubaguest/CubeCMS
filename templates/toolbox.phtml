@@ -1,7 +1,11 @@
 <div id="toolbox<?=$this->getRandSeek();?>" class="toolbox">
    <?
    foreach ($this->getTools() as $tool) {?>
-   <form method="post" action="<?=$tool['link'];?>">
+   <form method="post" action="<?=$tool['link'];?>"
+   <?if($tool['message'] != null){?> 
+     onsubmit="return if (confirm(<?=$tool['message']?>)) return true;"
+   <?}?>
+   >
       <?
       if($tool['nameHidden'] != null){?>
       <input type="hidden" value="<?=$tool['valueHidden'];?>" name="<?=$tool['nameHidden'];?>" />

@@ -25,7 +25,6 @@
 	<br />
    <input name="text_reset" type="reset" value="<?=$this->_m("Obnovit")?>" />
 	<input name="text_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
-	
 </form>
 </div>
 <script>
@@ -33,13 +32,8 @@
     $("#editTextForm").tabs();
   });
 </script>
-
-<script type="text/javascript">
-$(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
-</script>
 </div>
 <?$this->includeTpl("buttonback.phtml", true);?>
+<? $this->includeTplObj($this->EPLfiles); ?>
 
-<?
-$this->includeTplObj($this->EPLfiles);
-?>
+

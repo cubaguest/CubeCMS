@@ -80,6 +80,7 @@
                $(tbl).appendTo("#userFilesList tbody");
             });
             $("#userFilesCount").text(count);
+            $('a[rel*=lightbox]').lightBox();
          });
       };
 
@@ -156,4 +157,8 @@
          <?}?>
       </tbody>
    </table>
+
+   <script type="text/javascript">
+      $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+   </script>
 </div>

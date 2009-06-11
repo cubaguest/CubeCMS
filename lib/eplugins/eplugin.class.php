@@ -50,6 +50,7 @@ class Eplugin {
          $this->template = new Template();
          $this->init($paramsForInit);
          $this->run($paramsForRun);
+         $this->view();
       }
    }
 

@@ -69,7 +69,7 @@ class TplToolbox extends Template {
     * @return TplToolbox -- sám sebe vrací
     */
    public function addTool($name, $value, $targetLink, $title = null, $icon = self::ICON_ADD,
-      $nameHidden = null, $valueHidden = null, $index = null) {
+      $nameHidden = null, $valueHidden = null, $confirmMessage = null, $index = null) {
 
       $tool = array();
       $tool['name'] = $name;
@@ -84,6 +84,7 @@ class TplToolbox extends Template {
       $tool['icon'] = $icon;
       $tool['nameHidden'] = $nameHidden;
       $tool['valueHidden'] = $valueHidden;
+      $tool['message'] = $confirmMessage;
       
       if($index == null){
          array_push($this->tools, $tool);

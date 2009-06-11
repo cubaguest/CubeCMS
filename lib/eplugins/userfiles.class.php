@@ -258,11 +258,12 @@ class UserFilesEplugin extends Eplugin {
    }
 
    /**
-    * Metoda nastaví id šablony pro výpis
-    * @param ineger -- id šablony (jakékoliv)
+    * Metoda nastaví id článku pro výpis
+    * @param integer -- id článku (jakékoliv)
     */
-   public function setIdTpl($id) {
-      $this->idUserFiles = $id;
+   public function setIdArticle($id) {
+      $this->idArticle = $id;
+      $this->getFilesFromDb();
    }
 
    /**
@@ -426,10 +427,7 @@ class UserFilesEplugin extends Eplugin {
 //      ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
       ->colums(Db::COLUMN_ALL);
 
-      if(is_string($this->idArticle) OR is_numeric($this->idArticle)){
-         $sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE, $this->idArticle)
-         ->where(self::COLUM_ID_ITEM, $idItem);
-      } else if(is_array($this->idArticle) AND !empty($this->idArticle)){
+      if(is_array($this->idArticle) AND !empty($this->idArticle)){
          foreach ($this->idArticle as $id => $itemId){
             //Pokud je zadáno asociativní pole bez id items
             if(is_string($itemId) OR is_numeric($itemId)){
@@ -447,7 +445,10 @@ class UserFilesEplugin extends Eplugin {
                $sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM, $id, Db::COND_OPERATOR_OR);
             }
          }
-      } else if (empty($this->idArticle)){
+      } else if($this->idArticle != null){
+         $sqlSelect = $sqlSelect->where(self::COLUM_ID_ARTICLE, $this->idArticle)
+         ->where(self::COLUM_ID_ITEM, $idItem);
+      } else if ($this->idArticle == null){
          $sqlSelect = $sqlSelect->where(self::COLUM_ID_ITEM, $idItem);
       }
       $sqlSelect = $sqlSelect->order(self::COLUM_TIME, Db::ORDER_DESC);
@@ -540,7 +541,7 @@ class UserFilesEplugin extends Eplugin {
 
       header('Cache-Control: no-cache, must-revalidate');
       //header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-      header('Content-type: application/json');
+      header('Content-type: application/json; charset=utf-8');
 
       echo '{"files":[';
       foreach ($this->filesArray as $file) {
@@ -566,6 +567,8 @@ class UserFilesEplugin extends Eplugin {
       $jQueryPlugin = new JQuery();
       $jQueryPlugin->addPluginAjaxUploadFile();      
       $this->template()->addJsPlugin($jQueryPlugin);
+      $this->template()->addJsPlugin(new LightBox());
+      $this->template()->setPVar('lightBox', true);
 
       $this->template()->numRows = $this->numberOfReturnRows;
 
@@ -609,7 +612,7 @@ class UserFilesEplugin extends Eplugin {
             $file = new JsFile(self::IMAGES_LIST_JS_FILE, true);
             $file->setParam(self::PARAM_URL_ID_ITEM, $this->module()->getId());
             $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
-            if(is_numeric($this->idArticle)){
+            if($this->idArticle != null){
                $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);
             }
             return $this->getFileLink($file);
@@ -633,7 +636,7 @@ class UserFilesEplugin extends Eplugin {
             $file = new JsFile(self::LINKS_LIST_JS_FILE, true);
             $file->setParam(self::PARAM_URL_ID_ITEM, $this->module()->getId());
             $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
-            if(is_numeric($this->idArticle)){
+            if($this->idArticle != null){
                $file->setParam(self::PARAM_URL_ID_ARTICLE, $this->idArticle);
             }
             return $this->getFileLink($file);

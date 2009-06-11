@@ -108,9 +108,9 @@ class ArticlesController extends Controller {
             $images = new UserImagesEplugin($this->getRights());
             $images->deleteAllImages($articleArr[ArticleDetailModel::COLUMN_ARTICLE_ID]);
             if(!$articleDetail->deleteArticle($form->getValue(self::FORM_INPUT_ID))){
-               throw new UnexpectedValueException(_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
+               throw new UnexpectedValueException($this->_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
-            $this->infoMsg()->addMessage(_m('Článek byl smazán'));
+            $this->infoMsg()->addMessage($this->_m('Článek byl smazán'));
             $this->getLink()->article()->action()->rmParam()->reload();
          }
 
@@ -133,7 +133,8 @@ class ArticlesController extends Controller {
       if($this->getModule()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
          $files = new UserFilesEplugin($this->sys());
-         $this->container()->addEplugin('files', $files);
+         $files->setIdArticle($this->rights()->getAuth()->getUserId()*(-1));
+         $this->view()->EPLfiles = $files;
       }
 
       $articleForm = new Form();
@@ -145,24 +146,21 @@ class ArticlesController extends Controller {
 
       //        Pokud byl odeslán formulář
       if($articleForm->checkForm()){
-         $articleDetail = new ArticleDetailModel();
+         $articleDetail = $this->createModel("ArticleDetailModel");
          if(!$articleDetail->saveNewArticle($articleForm->getValue(self::FORM_INPUT_LABEL),
                $articleForm->getValue(self::FORM_INPUT_TEXT),
-               $this->getRights()->getAuth()->getUserId())){
-            throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
+               $this->rights()->getAuth()->getUserId())){
+            throw new UnexpectedValueException($this->_m('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
          }
          if(isset ($files)){
-            $files->renameIdArticle($this->getRights()->getAuth()->getUserId()*(-1),
+            $files->renameIdArticle($this->rights()->getAuth()->getUserId()*(-1),
                $articleDetail->getLastInsertedId());
          }
-         $this->infoMsg()->addMessage(_m('Článek byl uložen'));
+         $this->infoMsg()->addMessage($this->_m('Článek byl uložen'));
          $this->getLink()->article()->action()->rmParam()->reload();
       }
 
-      $this->container()->addData('ARTICLE_DATA', $articleForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $articleForm->getErrorItems());
-      //		Odkaz zpět
-      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
+      $this->view()->errorItems = $articleForm->getErrorItems();
    }
 
   /**
