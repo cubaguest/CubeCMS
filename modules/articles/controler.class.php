@@ -62,7 +62,7 @@ class ArticlesController extends Controller {
 //      if(!empty ($articlesArray)){
 //         foreach ($articlesArray as $key => $article) {
 //            //			Link pro zobrazení
-//            $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->getLink()
+//            $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->link()
 //            ->article($article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
 //               $article[ArticleDetailModel::COLUMN_ARTICLE_ID]);
 //         }
@@ -73,7 +73,7 @@ class ArticlesController extends Controller {
 
       //		Link pro přidání
 //      if($this->getRights()->isWritable()){
-//         $this->container()->addLink('LINK_ADD_ARTICLE',$this->getLink()->action($this->getAction()->addArticle()));
+//         $this->container()->addLink('LINK_ADD_ARTICLE',$this->link()->action($this->getAction()->addArticle()));
 //      }
       // předání dat
 //      $this->container()->addData('ARTICLE_LIST_ARRAY', $articlesArray);
@@ -94,8 +94,8 @@ class ArticlesController extends Controller {
 //      $this->container()->addData('ARTICLE_LABEL', $articleArr[ArticleDetailModel::COLUMN_ARTICLE_LABEL]);
 
       if($this->getRights()->isControll() OR
-         ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
-         ($this->getRights()->isWritable() AND $this->getModule()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == true AND
+         ($this->getRights()->isWritable() AND $this->module()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
+         ($this->getRights()->isWritable() AND $this->module()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == true AND
             $articleDetail->getIdUser() == $this->getRights()->getAuth()->getUserId())){
 
          $form = new Form(self::FORM_PREFIX);
@@ -111,18 +111,18 @@ class ArticlesController extends Controller {
                throw new UnexpectedValueException($this->_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
             $this->infoMsg()->addMessage($this->_m('Článek byl smazán'));
-            $this->getLink()->article()->action()->rmParam()->reload();
+            $this->link()->article()->action()->rmParam()->reload();
          }
 
-//         $this->container()->addLink('EDIT_LINK', $this->getLink()->action($this->getAction()->editArticle()));
+//         $this->container()->addLink('EDIT_LINK', $this->link()->action($this->getAction()->editArticle()));
 //         $this->container()->addData('EDITABLE', true);
       }
 
 //      if($this->getRights()->isWritable()){
-//         $this->container()->addLink('ADD_LINK',$this->getLink()->action($this->getAction()->addArticle())->article());
+//         $this->container()->addLink('ADD_LINK',$this->link()->action($this->getAction()->addArticle())->article());
 //         $this->container()->addData('WRITABLE', true);
 //      }
-//      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
+//      $this->container()->addLink('BUTTON_BACK', $this->link()->article()->action());
    }
 
    /**
@@ -130,7 +130,7 @@ class ArticlesController extends Controller {
    */
    public function addarticleController(){
       $this->checkWritebleRights();
-      if($this->getModule()->getParam(self::PARAM_FILES, true)){
+      if($this->module()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
          $files = new UserFilesEplugin($this->sys());
          $files->setIdArticle($this->rights()->getAuth()->getUserId()*(-1));
@@ -157,7 +157,7 @@ class ArticlesController extends Controller {
                $articleDetail->getLastInsertedId());
          }
          $this->infoMsg()->addMessage($this->_m('Článek byl uložen'));
-         $this->getLink()->article()->action()->rmParam()->reload();
+         $this->link()->article()->action()->rmParam()->reload();
       }
 
       $this->view()->errorItems = $articleForm->getErrorItems();
@@ -176,38 +176,37 @@ class ArticlesController extends Controller {
       ->crSubmit(self::FORM_BUTTON_SEND);
 
       //      Načtení hodnot prvků
-      $articleModel = new ArticleDetailModel();
-      $articleModel->getArticleDetailAllLangs($this->getArticle());
+//      $articleModel = new ArticleDetailModel($this->sys());
+//      $articleModel->getArticleDetailAllLangs($this->getArticle());
       //      Nastavení hodnot prvků
-      $ardicleEditForm->setValue(self::FORM_INPUT_LABEL, $articleModel->getLabelsLangs());
-      $ardicleEditForm->setValue(self::FORM_INPUT_TEXT, $articleModel->getTextsLangs());
-      $label = $articleModel->getLabelsLangs();
+//      $ardicleEditForm->setValue(self::FORM_INPUT_LABEL, $articleModel->getLabelsLangs());
+//      $ardicleEditForm->setValue(self::FORM_INPUT_TEXT, $articleModel->getTextsLangs());
+//      $label = $articleModel->getLabelsLangs();
       
-      $this->container()->addData('ARTICLE_NAME', $label[Locale::getLang()]);
+//      $this->container()->addData('ARTICLE_NAME', $label[Locale::getLang()]);
 
-      if($this->getModule()->getParam(self::PARAM_FILES, true)){
+      if($this->module()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-         $files = new UserFilesEplugin($this->getRights());
-         $files->setIdArticle($articleModel->getId());
-         $this->container()->addEplugin('files', $files);
+//         $files = new UserFilesEplugin($this->getRights());
+//         $files->setIdArticle($articleModel->getId());
+//         $this->container()->addEplugin('files', $files);
+         $files = new UserFilesEplugin($this->sys());
+         $this->view()->EPLfiles = $files;
       }
 
       //        Pokud byl odeslán formulář
       if($ardicleEditForm->checkForm()){
+         $articleModel = new ArticleDetailModel($this->sys());
          if(!$articleModel->saveEditArticle($ardicleEditForm->getValue(self::FORM_INPUT_LABEL),
                $ardicleEditForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            throw new UnexpectedValueException(_m('Článek se nepodařilo uložit, chyba při ukládání.'), 2);
+            throw new UnexpectedValueException($this->_m('Článek se nepodařilo uložit, chyba při ukládání.'), 2);
          }
-         $this->infoMsg()->addMessage(_m('Článek byl uložen'));
-         $this->getLink()->action()->reload();
+         $this->infoMsg()->addMessage($this->_m('Článek byl uložen'));
+         $this->link()->action()->reload();
       }
 
       //    Data do šablony
-      $this->container()->addData('ARTICLE_DATA', $ardicleEditForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $ardicleEditForm->getErrorItems());
-
-      //		Odkaz zpět
-      $this->container()->addLink('BUTTON_BACK', $this->getLink()->action());
+      $this->view()->errorItems = $ardicleEditForm->getErrorItems();
    }
 }
 ?>

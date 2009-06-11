@@ -16,10 +16,10 @@
          <p id="articleLang<?=$key?>" class="tabcontent">
             <?=$this->_m("Název článku");?>:<br />
             <input type="text" size="40" maxlength="50" name="article_label[<?=$key?>]"
-            value="<?=$this->post("article_label[$key]", $this->article_label[$key]);?>" /><br />
+            value="<?=$this->post("article_label[$key]", $this->article['label'][$key]);?>" /><br />
             <?=$this->_m("Text");?>*:<br />
             <textarea class="textarea_tinymce textarea" rows="25" cols="70"
-            name="article_text[<?=$key;?>]"><?=$this->post("article_text[$key]", $this->article_text[$key]);?></textarea>
+            name="article_text[<?=$key;?>]"><?=$this->post("article_text[$key]", $this->article['text'][$key]);?></textarea>
          </p>
 
          <?}?>

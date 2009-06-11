@@ -24,8 +24,13 @@ abstract class Model {
     * @param ModuleSys $sys -- systémové informace
     */
    public function  __construct(ModuleSys $sys = null) {
+      if($sys != null){
       $this->sys = $sys;
-      $this->_init();
+      } else {
+         $this->sys = new ModuleSys();
+      }
+
+      $this->init();
    }
 
    /**
@@ -48,8 +53,8 @@ abstract class Model {
 
 
 	/**
-	 * Abstraktní metoda pro inicializaci modelu
+	 * Abstraktní metoda pro inicializaci modelu pokud je třeba
 	 */
-	protected function _init(){}	
+	protected function init(){}	
 }
 ?>

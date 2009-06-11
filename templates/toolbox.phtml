@@ -3,7 +3,7 @@
    foreach ($this->getTools() as $tool) {?>
    <form method="post" action="<?=$tool['link'];?>"
    <?if($tool['message'] != null){?> 
-     onsubmit="return if (confirm(<?=$tool['message']?>)) return true;"
+     onsubmit="return (confirm('<?=$tool["message"]?>'));"
    <?}?>
    >
       <?

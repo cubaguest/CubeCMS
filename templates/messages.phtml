@@ -1,10 +1,15 @@
 <?// Vypis hlasek
 if(!empty ($this->messages)){ ?>
-<p class="message text">
+<p class="message text" id="messages">
    <img src="./images/icons/accept.png" alt="message icon" />
    <? foreach ($this->messages as $message) {
       echo $message . "<br />";
    }?>
+   <script type="text/javascript">
+      <!--
+      setTimeout('document.getElementById("messages").style.display = "none"', 2000);
+      -->
+   </script>
 </p>
 <? }?>
 
