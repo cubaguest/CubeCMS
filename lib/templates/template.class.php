@@ -277,11 +277,9 @@ class Template {
    public function renderTemplate() {
       // zastavení výpisu buferu
       ob_start();
-
       foreach ($this->templateFiles as $file) {
-         include_once $file;
+         include $file;
       }
-
       ob_end_flush();
    }
 
@@ -292,10 +290,10 @@ class Template {
     */
    public function includeTpl($name, $engine = false, $vars = null) {
       if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
-         include_once (self::getFileDir($name, self::TEMPLATES_DIR,
+         include (self::getFileDir($name, self::TEMPLATES_DIR,
                $this->sys()->module()->getName()).$name);
       } else {
-         include_once (self::getFileDir($name, self::TEMPLATES_DIR, false).$name);
+         include (self::getFileDir($name, self::TEMPLATES_DIR, false).$name);
       }
       unset ($vars);
    }

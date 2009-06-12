@@ -319,10 +319,16 @@ class ScrollEplugin extends Eplugin {
    }
 
    /**
+    * Metoda inicializuje šablonu
+    */
+   protected function initTemplate() {
+      $this->template()->addTplFile(self::TPL_FILE, true);
+   }
+
+   /**
     * Metoda obstarává přiřazení proměných do šablony
     */
    protected function view(){
-      $this->template()->addTplFile(self::TPL_FILE, true);
       $this->template()->buttonBegin = $this->isButtonBegin();
       $this->template()->buttonPrevious = $this->isButtonPrevious();
       $this->template()->buttonNext = $this->isButtonNext();
@@ -332,26 +338,6 @@ class ScrollEplugin extends Eplugin {
       $this->template()->allPages = $this->countAllPages;
       $this->template()->leftNeigbourts = $this->pagesLeftSideArray;
       $this->template()->rightNeigbourts = $this->pagesRightSideArray;
-
-      //	Zapnutí tlačítek
-//      $this->toTpl("BUTTON_BEGIN", $this->isButtonBegin());
-//      $this->toTpl("BUTTON_BEGIN_NAME", _('Začátek'));
-//      $this->toTpl("BUTTON_NEXT", $this->isButtonNext());
-//      $this->toTpl("BUTTON_NEXT_NAME", _('Další'));
-//      $this->toTpl("BUTTON_BACK", $this->isButtonBack());
-//      $this->toTpl("BUTTON_BACK_NAME", _('Předchozí'));
-//      $this->toTpl("BUTTON_END", $this->isButtonEnd());
-//      $this->toTpl("BUTTON_END_NAME", _('Konec'));
-//      //	Odkazy tlačítek
-//      $this->toTpl("SCROLL_BUTTONS_LINKS", $this->buttonsLinks);
-//      //	Data o pozici scrolování
-//      $this->toTpl("SCROLL_SELECTED_PAGE", $this->selectPage);
-//      $this->toTpl("SCROLL_ALL_PAGES", $this->countAllPages);
-//      //	popisky
-////      $this->toTpl("SCROLL_LABELS_ARRAY", $this->labelsArray);
-//      //	Sousedé u pozice
-//      $this->toTpl("SCROLL_LEFT_SIDE_DATA_ARRAY", $this->pagesLeftSideArray);
-//      $this->toTpl("SCROLL_RIGHT_SIDE_DATA_ARRAY", $this->pagesRightSideArray);
    }
 }
 ?>

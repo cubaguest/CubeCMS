@@ -107,17 +107,17 @@
 
             <? // pravy panel
             if(!empty($this->rightPanel)){?>
-            <div id="col2wrap" class="column">
-               <div id="col2pad">
+            <div id="col3wrap" class="column">
+               <div id="col3pad">
                   <?
-                  foreach ($this->rightPanel as $panel) {
-                     echo ("<h3><a href=\"{$panel->l()}\" title=\"\">&gt;&gt;{$panel->module()->getName()}</a></h3>");
-                     $this->includeTplObj($panel);
+                  foreach ($this->rightPanel as $panelR) {
+                     echo ("<h3><a href=\"{$panelR->l()}\" title=\"\">&gt;&gt;{$panelR->module()->getName()}</a></h3>");
+                     $this->includeTplObj($panelR);
                   }?>
 
                   <hr class="separator" />
-               </div><!-- col2pad -->
-            </div><!-- col2wrap -->
+               </div><!-- col3pad -->
+            </div><!-- col3wrap -->
             <?}?>
 
 
@@ -149,5 +149,6 @@
       echo "<pre>";
       print_r($this);
       echo "</pre>";
-   }?>
+   }
+   ?>
 </html>

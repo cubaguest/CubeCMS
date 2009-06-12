@@ -60,10 +60,16 @@ class NewsController extends Controller {
       $this->checkReadableRights();
 
       //		Vytvoření modelu
-//      $listNews = new NewsListModel();
+      $newsM = new NewsListModel($this->sys());
       //		Scrolovátka
-      $scroll = new ScrollEplugin();
+      $scroll = new ScrollEplugin($this->sys());
 
+      $scroll->setCountRecordsOnPage($this->module()->getParam(self::PARAM_NUM_NEWS, 10));
+      $scroll->setCountAllRecords($newsM->getCountNews());
+//      var_dump($scroll);
+      //		Vybrání článků
+      $this->view()->newsArray = $newsM->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
+      $this->view()->EPLscroll = $scroll;
       
 
       //TODO předělat na objekt parametru z enginu
@@ -183,10 +189,7 @@ class NewsController extends Controller {
          $this->getLink()->article()->action()->rmParam()->reload();
       }
 
-      $this->container()->addData('NEWS_DATA', $newsForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $newsForm->getErrorItems());
-      //		Odkaz zpět
-      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
+      $this->view()->errorItems = $newsForm->getErrorItems();
    }
 
   /**

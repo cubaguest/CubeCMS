@@ -739,6 +739,8 @@ class AppCore {
       $this->coreTpl->rootDir = self::getAppWebDir();
       $link = new Links();
       $this->coreTpl->setPVar("mainWebDir", UrlRequest::getBaseWebDir());
+      $this->coreTpl->setPVar("imagesDir", Template::FACES_DIR.URL_SEPARATOR.Template::face()
+         .URL_SEPARATOR.Template::IMAGES_DIR.URL_SEPARATOR);
       //$this->coreTpl->mainWebDir = UrlRequest::getBaseWebDir();
       //            $this->coreTpl->setVar("THIS_PAGE_LINK", (string)$link);
       // mapa webu
@@ -983,11 +985,10 @@ class AppCore {
                            $sysModule->module()->getName()), 11);
                   }
                   $ctrlResult = $controller->mainController();
-                  throw new BadMethodCallException(sprintf(
+                  new CoreErrors(new BadMethodCallException(sprintf(
                         _('Action Controller "%s" v modulu "%s" nebyl nalezen'),
-                        $requestControllerName, $sysModule->module()->getName()), 12);
+                        $requestControllerName, $sysModule->module()->getName()), 12));
                }
-
                //					Donastavení šablon
                //               $template->setModule($module);
                //	Spuštění viewru pokud proběhl kontroler v pořádku
@@ -997,10 +998,10 @@ class AppCore {
                }
                //	Spuštění pohledu
                if($ctrlResult){
-                  if(!method_exists($controller, 'runView')){
-                     throw new BadMethodCallException(_("Action Controller runView v modulu ")
-                        . $sysModule->module()->getName()._(" nebyl nalezen"), 14);
-                  }
+//                  if(!method_exists($controller, 'runView')){
+//                     throw new BadMethodCallException(_("Action Controller runView v modulu ")
+//                        . $sysModule->module()->getName()._(" nebyl nalezen"), 14);
+//                  }
                   $controller->runView($requestName.AppCore::MODULE_VIEWER_SUFIX);
                } else {
                   throw new BadMethodCallException(_('Controler modulu "')
@@ -1009,8 +1010,7 @@ class AppCore {
                //	Uložení šablony a proměných do hlavní šablony
                array_push($modulesTemplates, $controller->_getTemplateObj());
                unset($controller);
-               $isModuleControlerRun = true;
-            } catch (Exception $e) {
+            } catch (ModuleException $e) {
                new CoreErrors($e);
             } catch (BadClassException $e){
                new CoreErrors($e);
@@ -1020,7 +1020,7 @@ class AppCore {
                new CoreErrors($e);
             } catch (CoreException $e){
                new CoreErrors($e);
-            } catch (ModuleException $e){
+            } catch (Exception $e){
                new CoreErrors($e);
             }
             //				odstranění proměných
@@ -1036,7 +1036,7 @@ class AppCore {
             $redir->category()->action()->article()->rmParam()->reload();
          }
       }
-   }
+  }
 
    /**
     * Metoda inicializuje a spustí panel
@@ -1085,17 +1085,32 @@ class AppCore {
             $panelClassName = ucfirst($panelSys->module()->getName()).self::MODULE_PANEL_CLASS_SUFIX;
             // Spuštění panelu
             try {
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                     . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
-                  throw new BadFileException(_("Controler a Viewer panelu ").$panelSys->module()->getName()
-                     ._(" neexistuje."),17);
+               if(!class_exists($panelClassName, false)){
+
+                  $file = self::getAppWebDir() . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                        . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
+
+echo $file;flush();
+error_log("chaby");
+var_dump(error_get_last());
+                  if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                        . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
+                     throw new BadFileException(_("Controler a Viewer panelu ").$panelSys->module()->getName()
+                        ._(" neexistuje."),17);
+                  }
+
+                  include_once ($file);
+                  //echo "tady";flush();//exit();
+echo "tady";flush();//exit();
+
+
+                  if(!class_exists($panelClassName, false)){
+                     throw new BadClassException(_("Třídat ").$panelClassName._(" panelu ")
+                        .$panelSys->module()->getName()._(" neexistuje."),18);
+                  }
                }
-               include '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-               . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
-               if(!class_exists($panelClassName)){
-                  throw new BadClassException(_("Třídat ").$panelClassName._(" panelu ")
-                     .$panelSys->module()->getName()._(" neexistuje."),18);
-               }
+//echo "tady";flush();//exit();
+
                //	vytvoření pole se skupinama a právama
                $userRights = array();
                foreach ($panel as $collum => $value){
@@ -1120,30 +1135,28 @@ class AppCore {
                      .$panelSys->module()->getName(),19);
                }
 
-
                $panelCtrl->{self::MODULE_PANEL_CONTROLLER}();
                if(!method_exists($panelCtrl, self::MODULE_PANEL_VIEWER)){
                   throw new BadMethodCallException(_("Neexistuje viewer panelu ")
                      .$panelSys->module()->getName(),20);
                }
                $panelCtrl->{self::MODULE_PANEL_VIEWER}();
-            } catch (BadClassException $e) {
+            } catch (Exceptionn $e) {
                new CoreErrors($e);
             } catch (BadFileException $e) {
                new CoreErrors($e);
             } catch (BadMethodCallException $e) {
                new CoreErrors($e);
+            } catch (BadClassExceptio $e) {
+               new CoreErrors($e);
             }
+             
+
             array_push($panelsTempaltes, $panelCtrl->_getTemplateObj());
          }
          $this->coreTpl->{$panelSideLower."Panel"} = $panelsTempaltes;
          unset ($panelsTempaltes);
       }
-      //		Přiřazení panelů do šablony
-      //      if(isset($panelTemplate)){
-      //         $this->assginTplObjToTpl($panelTemplate, 'PANEL_'.$panelSideUpper.'_TEMPLATES');
-      //      }
-      //      unset($panelTemplate);
    }
 
    /**
@@ -1426,7 +1439,6 @@ class AppCore {
             echo CoreErrors::getLastError();
          }
          exit();
-
       }
       // pokud je zpracovávána normální aplikace a její moduly
       else {
@@ -1474,7 +1486,7 @@ class AppCore {
                   $this->assignCoreErrorsToTpl();
                   //		render šablony
                   $this->renderTemplate();
-                  break;
+                  return true;
          }
       }
    }

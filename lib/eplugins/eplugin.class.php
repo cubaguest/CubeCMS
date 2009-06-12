@@ -50,7 +50,8 @@ class Eplugin {
          $this->template = new Template();
          $this->init($paramsForInit);
          $this->run($paramsForRun);
-         $this->view();
+         $this->initTemplate();
+         //$this->view();
       }
    }
 
@@ -85,6 +86,11 @@ class Eplugin {
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
    protected function run($params = null) {}
+
+   /**
+    * Metoda inicializuje šablonu
+    */
+   protected function initTemplate() {}
 
    /**
     * Metoda nastaví id šablony pro výpis

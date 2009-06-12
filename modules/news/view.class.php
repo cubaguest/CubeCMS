@@ -1,6 +1,17 @@
 <?php
 class NewsView extends View {
    public function mainView() {
+      if($this->rights()->isWritable()){
+         $toolbox = new TplToolbox();
+         $toolbox->addTool('add_article', $this->_m("Přidat"),
+            $this->link()->action($this->sys()->action()->addNews()),
+            $this->_m("Přidat novinku"), "text_add.png");
+         $this->template()->toolbox = $toolbox;
+      }
+
+      $this->template()->addTplFile("list.phtml");
+      $this->template()->addCssFile("style.css");
+
 //      if($this->getRights()->isWritable()){
 //         $this->template()->addTpl('addButton.tpl');
 //         $this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _m("Přidat novinku"));
@@ -65,21 +76,17 @@ class NewsView extends View {
     * Viewer pro přidání novinky
     */
    public function addView() {
-      $this->template()->addTpl('editNews.tpl');
-      $this->template()->addCss("style.css");
+      $this->template()->addTplFile('editNews.phtml');
+      $this->template()->addCssFile("style.css");
 
-      $this->template()->setTplSubLabel(_m('Přidání novinky'));
-      $this->template()->setSubTitle(_m('Přidání novinky'), true);
-      $this->template()->addVar("ADD_NEWS_LABEL",_m('Přidání novinky'));
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
-      $this->assignLabels();
+//      $this->template()->setTplSubLabel(_m('Přidání novinky'));
+//      $this->template()->setSubTitle(_m('Přidání novinky'), true);
+//      $this->template()->addVar("ADD_NEWS_LABEL",_m('Přidání novinky'));
 
       //Tabulkové uspořádání
       $jquery = new JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
    }
 
    /**

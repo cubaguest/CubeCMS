@@ -1,0 +1,18 @@
+<div>
+   <? foreach ($this->newsArray as $new) {?>
+      <div>
+      <h2>
+         <a href="<?=$this->l()->article($new['label'], $new['id_new'])?>" title="<?=$new['label']?>"><?=$new['label']?></a>
+         <span class="smallFont"><?=strftime("%x %X", $new['time'])?> - <?=$new['username']?></span>
+      </h2>
+      <?print (xhtml_cut(remove_tag('img', $new['text']), 300));?>
+      </div>
+   <br />
+   <?}?>
+<?if($this->sys()->rights()->isWritable()){
+   $this->includeTplObj($this->toolbox);
+}?>
+</div>
+<?
+$this->includeTplObj($this->EPLscroll);
+?>

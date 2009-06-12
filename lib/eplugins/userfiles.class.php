@@ -224,7 +224,7 @@ class UserFilesEplugin extends Eplugin {
       if(!empty($images)){
          foreach ($images as $image) {
             $returnArray[$image[self::COLUM_FILE]] = $this->getLinks()->getMainWebDir()
-               .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$image[self::COLUM_FILE];
+            .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$image[self::COLUM_FILE];
          }
       }
       return $returnArray;
@@ -284,7 +284,7 @@ class UserFilesEplugin extends Eplugin {
 
             $width = 0;
             $height = 0;
-            
+
             if($image->isImage(false)){
                // uložení malého obrázku pro náhledy
                $image->saveImage(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'
@@ -424,7 +424,7 @@ class UserFilesEplugin extends Eplugin {
 
       $sqlSelect = $this->getDb()->select()
       ->table(self::DB_TABLE_USER_FILES, 'files')
-//      ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
+      //      ->colums(array(self::COLUM_FILE, self::COLUM_SIZE, self::COLUM_TIME, self::COLUM_ID));
       ->colums(Db::COLUMN_ALL);
 
       if(is_array($this->idArticle) AND !empty($this->idArticle)){
@@ -459,12 +459,12 @@ class UserFilesEplugin extends Eplugin {
          //	pprojití pole a dolnění odkazů
          foreach ($this->filesArray as $key => $file) {
             $this->filesArray[$key][self::COLUM_LINK_TO_SHOW] = Links::getMainWebDir()
-               .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
+            .MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
             $this->filesArray[$key][self::COLUM_LINK_TO_DOWNLOAD] = $this->getLinks()
-               ->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
+            ->getLinkToDownloadFile('./'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
             if($file[self::COLUM_TYPE] == self::FILE_TYPE_IMAGE){
                $this->filesArray[$key][self::COLUM_LINK_TO_SMALL] = MAIN_DATA_DIR
-                  .'/'.self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/'.$file[self::COLUM_FILE];
+               .'/'.self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/'.$file[self::COLUM_FILE];
             }
          }
       }
@@ -498,7 +498,7 @@ class UserFilesEplugin extends Eplugin {
                $image->saveImage(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'
                   .self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/',
                   self::IMAGE_THUMBNAIL_WIDTH, self::IMAGE_THUMBNAIL_HEIGHT);
-               
+
                $fileType = self::FILE_TYPE_IMAGE;
                $width = $image->getOriginalWidth();
                $height = $image->getOriginalHeight();
@@ -521,7 +521,7 @@ class UserFilesEplugin extends Eplugin {
                $file->getFileSize(), time());
             $this->getDb()->query($sqlInsert);
             echo _('Soubor byl uložen');
-//            $this->getLinks()->reload();
+            //            $this->getLinks()->reload();
          } catch (Exception $e) {
             echo _('Soubor se nepodařilo uložit');
             new CoreErrors ($e);
@@ -559,20 +559,32 @@ class UserFilesEplugin extends Eplugin {
    }
 
    /**
+    * Metoda inicializuje šablonu
+    */
+   protected function initTemplate() {
+      $this->template()->addTplFile(self::TPL_FILE, true);
+      $jQueryPlugin = new JQuery();
+      $jQueryPlugin->addPluginAjaxUploadFile();
+      $this->template()->addJsPlugin($jQueryPlugin);
+      $this->template()->addJsPlugin(new LightBox());
+      $this->template()->setPVar('lightBox', true);
+   }
+
+   /**
     * Metoda obstarává přiřazení proměných do šablony
     *
     */
    protected function view(){
-      $this->template()->addTplFile(self::TPL_FILE, true);
-      $jQueryPlugin = new JQuery();
-      $jQueryPlugin->addPluginAjaxUploadFile();      
-      $this->template()->addJsPlugin($jQueryPlugin);
-      $this->template()->addJsPlugin(new LightBox());
-      $this->template()->setPVar('lightBox', true);
+//      $this->template()->addTplFile(self::TPL_FILE, true);
+//      $jQueryPlugin = new JQuery();
+//      $jQueryPlugin->addPluginAjaxUploadFile();
+//      $this->template()->addJsPlugin($jQueryPlugin);
+//      $this->template()->addJsPlugin(new LightBox());
+      
 
       $this->template()->numRows = $this->numberOfReturnRows;
 
-      
+
       $this->template()->filesArray = $this->filesArray;
 
       $ajaxLink = new AjaxLink($this);

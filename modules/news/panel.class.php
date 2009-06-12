@@ -20,7 +20,6 @@ class NewsPanel extends Panel {
       $this->template()->addCssFile("style.css");
       $newsM = $this->createModel("NewsListModel");
       $this->template()->news = $newsM->getSelectedListNews(0, $this->module()->getParam(self::PARAM_NUMBER_OF_NEWS));
-      $this->template()->addJsPlugin(new JQuery());
 	}
 }
 ?>
