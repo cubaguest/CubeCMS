@@ -13,7 +13,7 @@
  * @todo          dodělat mazání všech souborů z článku a mazání souborů z více článků
  */
 
-class UserFilesEplugin extends Eplugin {
+class Eplugin_UserFiles extends Eplugin {
    /**
     * Název šablony s listem souborů
     */
@@ -171,7 +171,7 @@ class UserFilesEplugin extends Eplugin {
     */
    public function runOnlyEplugin($file, $params = null) {
       if($file == self::IMAGES_LIST_JS_FILE) {
-         $file = new JsFile($file, true);
+         $file = new JsPlugin_JsFile($file, true);
          $file->setParams($params);
          $idArticle = null;
          if($file->getParam(self::PARAM_URL_ID_ARTICLE)){
@@ -186,7 +186,7 @@ class UserFilesEplugin extends Eplugin {
                break;
          }
       } else if($file == self::LINKS_LIST_JS_FILE){
-         $file = new JsFile($file, true);
+         $file = new JsPlugin_JsFile($file, true);
          $file->setParams($params);
          $idArticle = null;
          if($file->getParam(self::PARAM_URL_ID_ARTICLE)){
@@ -563,10 +563,10 @@ class UserFilesEplugin extends Eplugin {
     */
    protected function initTemplate() {
       $this->template()->addTplFile(self::TPL_FILE, true);
-      $jQueryPlugin = new JQuery();
+      $jQueryPlugin = new JsPlugin_JQuery();
       $jQueryPlugin->addPluginAjaxUploadFile();
       $this->template()->addJsPlugin($jQueryPlugin);
-      $this->template()->addJsPlugin(new LightBox());
+      $this->template()->addJsPlugin(new JsPlugin_LightBox());
       $this->template()->setPVar('lightBox', true);
    }
 
@@ -621,7 +621,7 @@ class UserFilesEplugin extends Eplugin {
    public function getImagesListLink($type = self::FILE_LIST_FORMAT_TINYMCE) {
       switch ($type) {
          case self::FILE_LIST_FORMAT_TINYMCE:
-            $file = new JsFile(self::IMAGES_LIST_JS_FILE, true);
+            $file = new JsPlugin_JsFile(self::IMAGES_LIST_JS_FILE, true);
             $file->setParam(self::PARAM_URL_ID_ITEM, $this->module()->getId());
             $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
             if($this->idArticle != null){
@@ -645,7 +645,7 @@ class UserFilesEplugin extends Eplugin {
    public function getLinksListLink($type = self::FILE_LIST_FORMAT_TINYMCE) {
       switch ($type) {
          case self::FILE_LIST_FORMAT_TINYMCE:
-            $file = new JsFile(self::LINKS_LIST_JS_FILE, true);
+            $file = new JsPlugin_JsFile(self::LINKS_LIST_JS_FILE, true);
             $file->setParam(self::PARAM_URL_ID_ITEM, $this->module()->getId());
             $file->setParam(self::PARAM_URL_LIST_TYPE, self::FILE_LIST_FORMAT_TINYMCE);
             if($this->idArticle != null){

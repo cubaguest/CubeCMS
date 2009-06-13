@@ -11,23 +11,23 @@
  * @see           http://www.dynamicdrive.com/dynamicindex4/lightbox2/index.htm
  */
 
-class LightBox extends JsPlugin {
+class JsPlugin_LightBox extends JsPlugin {
 	protected function initJsPlugin() {
 //		Název pluginu
 		$this->setJsPluginName("LightBox");
 	}
 	
 	protected function initFiles() {
-      $this->addDependJsPlugin(new JQuery());
+      $this->addDependJsPlugin(new JsPlugin_JQuery());
 //		Přidání css stylu
 		$this->addCssFile('jquery.lightbox-0.5.css');
 		//		Přidání js soubrů pluginu
-		$this->addJsFile(new JsFile("jquery.lightbox-0.5.pack.js"));
+		$this->addJsFile(new JsPlugin_JsFile("jquery.lightbox-0.5.pack.js"));
 	}
 	
 	/**
 	 * Metda vytvoří výchozí konfigurační soubor
 	 */
-	public function generateFile(JsFile $file) {}
+	public function generateFile(JsPlugin_JsFile $file) {}
 }
 ?>

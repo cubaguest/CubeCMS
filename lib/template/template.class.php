@@ -15,19 +15,6 @@ require_once 'tplmodifiers.php';
 
 class Template {
    /**
-    * Proměná s názvem titulku okna
-    * @var string
-    */
-//   private $pageTitle = null;
-
-   /**
-    * Pole s funkcemi spoštěnými při načtení stránky
-    * @var array
-    */
-   private static $onLoadJsFunctions = array();
-
-   // NEW ====================================================================
-   /**
     * Názvem adresáře se vzhledy
     */
    const FACES_DIR = 'faces';
@@ -122,15 +109,27 @@ class Template {
    protected $moduleSys = null;
 
    /**
-    * Pole s Epluginama
-    * @var array
+    * Proměná s názvem titulku okna kategorie
+    * @var string
     */
-   private $eplugins = array();
+   private static $catTitle = false;
+
+   /**
+    * Proměná s názvem titulku okna článku
+    * @var string
+    */
+   private static $articleTitle = false;
+
+   /**
+    * Proměná s názvem titulku okna akce
+    * @var string
+    */
+   private static $actionTitle = false;
+
 
    /*
     * ============= MAGICKÉ METODY
     */
-
 
    /**
     * Konstruktor třídy
@@ -187,27 +186,30 @@ class Template {
     * ========== VEŘEJNÉ METODY
     */
 
-   // nastaví privátní proměnou
-      public function setVar($name, $value) {
-         $this->privateVars[$name] = $value;
-      }
+   /**
+    * Metoda nasatvi privátní proměnnou šablony
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    */
+   public function setVar($name, $value) {
+      $this->privateVars[$name] = $value;
+   }
 
-   // vrací privátní proměnou
-   //   public function v($name) {
-   //      $return = null;
-   //      if (isset ($this->privateVars[$name])){
-   //         return $this->privateVars[$name];
-   //      } else {
-   //         return null;
-   //      }
-   //   }
-
-   // nastaví globální proměnou
+   /**
+    * Metoda nastaví globální proměnnou pro celou šablonu
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    */
    public function setPVar($name, $value) {
       self::$publicVars[$name] = $value;
    }
 
    // vrací globální proměnou
+   /**
+    * Metoda vrací hodnotu veřejné proměnné
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
    public function pVar($name) {
       $return = null;
       if (isset (self::$publicVars[$name])){
@@ -217,6 +219,55 @@ class Template {
       }
    }
 
+   /**
+    * Metoda nastaví název titulku pro kategorii
+    * @param string $text -- název kategorie
+    */
+   final public function setCatTitle($text) {
+      self::$catTitle = $text;
+   }
+
+   /**
+    * Metoda vrátí název titulku kategorie
+    * @return string
+    */
+   final public function catTitle() {
+      return self::$catTitle;
+   }
+
+   /**
+    * Metoda nastaví název titulku pro článek
+    * @param string $text -- název článek
+    */
+   final public function setArticleTitle($text) {
+      self::$articleTitle = $text;
+   }
+
+   /**
+    * Metoda vrátí název titulku článeku
+    * @return string
+    */
+   final public function articleTitle() {
+      return self::$articleTitle;
+   }
+
+   /**
+    * Metoda nastaví název titulku pro akci
+    * @param string $text -- název akce
+    */
+   final public function setActionTitle($text) {
+      self::$actionTitle = $text;
+   }
+
+   /**
+    * Metoda vrátí název titulku akce
+    * @return string
+    */
+   final public function actionTitle() {
+      return self::$actionTitle;
+   }
+
+   // nepoužito zatím
    public function setLink($name, Links $link = null) {
       if($link == null){
          $this->templateLinks[$name] = $this->sys()->link();
@@ -225,25 +276,32 @@ class Template {
       }
    }
 
-   // vrácení odkazu
+   /**
+    * Metoda vrátí objekt odkazu na aktuální kategorii a modul
+    * @param boolean $clear -- jestli má být odkaz prázdný
+    * @return Links
+    */
    public function l($clear = false) {
-//      if($name == null AND $this->sys() != null){
+      //      if($name == null AND $this->sys() != null){
       if($this->sys() != null){
          $link = $this->sys()->link();
-//      }
-//      else if(isset ($this->templateLinks[$name])) {
-//         $link = $this->templateLinks[$name];
+         //      }
+         //      else if(isset ($this->templateLinks[$name])) {
+         //         $link = $this->templateLinks[$name];
       } else {
          $link = new Links();
       }
-
       if($clear){
          $link->clear();
       }
-
       return $link;
    }
-   // vrácení odkazu - alias
+
+   /**
+    * Metoda vrátí objekt odkazu na aktuální kategorii a modul (alias na l())
+    * @param boolean $clear -- jestli má být odkaz prázdný
+    * @return Links
+    */
    public function link($clear = false) {
       return $this->l($clear);
    }
@@ -262,8 +320,11 @@ class Template {
       }
    }
 
-
-   // přidá název šablony do seznamu renderovaných šablon objektu
+   /**
+    * Metoda přidá požadovaný soubor šablony do výstupu
+    * @param string $name -- název souboru
+    * @param boolean $engine -- jestli se jedná o šablonu enginu
+    */
    public function addTplFile($name, $engine = false) {
       if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
          array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR,
@@ -273,12 +334,16 @@ class Template {
       }
    }
 
-   // vykreslí šablonu
+   /**
+    * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
+    */
    public function renderTemplate() {
       // zastavení výpisu buferu
       ob_start();
       foreach ($this->templateFiles as $file) {
-         include $file;
+         if(file_exists($file)){
+            include $file;
+         }
       }
       ob_end_flush();
    }
@@ -299,27 +364,11 @@ class Template {
    }
 
    /**
-    * Metoda vrací název zvoleného vhledu
-    * @return string -- název vzhledu
-    */
-//   public function face() {
-//      return self::$face;
-//   }
-
-   /**
     * Metoda vrací adresář zvoleného vhledu
     * @return string -- adresář vzhledu
     */
    final public function faceDir() {
       return AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR.self::face();
-   }
-
-   /**
-    * Metoda vrací adresář zvoleného vhledu
-    * @return string -- adresář vzhledu
-    */
-   final public static function face() {
-      return self::$face;
    }
 
    // přidá podřízený objekt šablony
@@ -340,6 +389,11 @@ class Template {
    }
 
    // metoda vyrenderuje název objektu šablony nebo objekt šablony
+   /**
+    * Metoda vloží do šablony zadaný objekt šablony a vyrenderuje jej zvlášť,
+    * nezávisle na objektu nadřízeném
+    * @param Template $name -- objekt šablony
+    */
    final public function includeTplObj($name) {
       if($name instanceof Template){
          $name->renderTemplate();
@@ -353,17 +407,6 @@ class Template {
    }
 
    /**
-    * Metoda přidá EPlugin do šablony
-    * @param string $name -- název epluginu v šabloně
-    * @param Eplugin $eplugin -- samotný Eplugin
-    * @return Template -- vrací sebe
-    */
-//   final public function addEplugin($name, Eplugin $eplugin) {
-//      $this->eplugins[$name] = clone $eplugin;
-//      return $this;
-//   }
-
-/**
     * Metoda vrqací systémový objekt modulu
     * @return ModuleSys
     */
@@ -388,11 +431,11 @@ class Template {
    final public function addJsPlugin(JsPlugin $jsplugin) {
       $jsfiles = $jsplugin->getAllJsFiles();
       foreach ($jsfiles as $file) {
-         CoreTemplate::addJS($file);
+         Template_Core::addJS($file);
       }
       $cssfiles = $jsplugin->getAllCssFiles();
       foreach ($cssfiles as $file) {
-         CoreTemplate::addCss($file);
+         Template_Core::addCss($file);
       }
       return $this;
    }
@@ -408,7 +451,7 @@ class Template {
       } else {
          $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR);
       }
-      CoreTemplate::addJS($dir.$jsfile);
+      Template_Core::addJS($dir.$jsfile);
       return $this;
    }
 
@@ -423,19 +466,20 @@ class Template {
       } else {
          $cssDir = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR);
       }
-      CoreTemplate::addCss($cssDir.$cssfile);
+      Template_Core::addCss($cssDir.$cssfile);
       return $this;
    }
-
 
    /*
     * ========== Metody pro nastavení šablony
     */
+   /**
+    * Metoda nastaví objekt modulu šablony
+    * @param ModuleSys $module -- objekt modulu šablony
+    */
    public function _setSysModule(ModuleSys $module) {
       $this->moduleSys = clone $module;
    }
-
-
 
    /*
     * ========== STATICKÉ METODY
@@ -453,24 +497,24 @@ class Template {
       if($moduleName){
          $moduleDir = AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR;
       }
-//            echo AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
-//               .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$typeDir.DIRECTORY_SEPARATOR.$file."<br>";
-      // první zkusíme jestli existuje soubor v šaboně webu
+
       try {
-         if(file_exists(AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
-               .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$typeDir.DIRECTORY_SEPARATOR.$file)){
-            return AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
-            .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
+         $faceDir = AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
+         .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
+         $engineDir = AppCore::MAIN_ENGINE_PATH.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
+         if(file_exists($faceDir.$file)){
+            return $faceDir;
          }
          // jesti existuje alespoň výchozí soubor v default faces
          //         else if(){
-         //
          //         }
          // použijeme soubor přímo s enginu
-         else if(file_exists(AppCore::MAIN_ENGINE_PATH.$moduleDir.$typeDir.DIRECTORY_SEPARATOR.$file)) {
-            return AppCore::MAIN_ENGINE_PATH.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
+         else if(file_exists($engineDir.$file)) {
+            return $engineDir;
          } else {
-            throw new InvalidArgumentException(sprintf(_('Neexistující soubor %s'), $file));
+            throw new InvalidArgumentException(sprintf(
+                  _('Neexistující soubor %s v adresáři enginu (%s) ani vzhledu (%s)'),
+                  $file, $engineDir, $faceDir));
          }
       } catch (InvalidArgumentException $e) {
          new CoreErrors($e);
@@ -488,12 +532,20 @@ class Template {
     * Metoda nastaví název vzhledu webu (faces)
     * @param string $face -- název vzhledu
     */
-   public static function setFace($face) {
+   final public static function setFace($face) {
       self::$face = $face;
    }
 
+   /**
+    * Metoda vrací adresář zvoleného vhledu
+    * @return string -- adresář vzhledu
+    */
+   final public static function face() {
+      return self::$face;
+   }
+
    /*
-    * ============= PRIVÁTNÍ METODY
+    * ============= CHRÁNĚNNÉ METODY
     */
 
    /**
@@ -503,195 +555,5 @@ class Template {
    protected function module() {
       return $this->sys()->module();
    }
-
-
-
-
-
-
-   /**
-    * Metoda nastaví název modulu, který bude vypsán na začátku
-    * @param string -- název
-    * @param boolena -- (option) jesli se má název přidat za stávající nebo přepsat
-    */
-   //   public function setTplLabel($name, $merge = false) {
-   //      if($this->getModule() != null){
-   //         if($merge){
-   //            $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_LABEL].=$name;
-   //         } else {
-   //            $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_LABEL]=$name;
-   //         }
-   //      }
-   //   }
-
-   /**
-    * Metoda nastaví podnázev modulu, který bude vypsán na začátku
-    * @param string -- podnázev
-    * @param boolena -- (option) jesli se má název přidat za stávající nebo přepsat
-    * @param string -- (option) oddělovač mezi více nadpisy (default '-')
-    */
-   //   public function setTplSubLabel($name, $merge = false, $separator = '-') {
-   //      if($this->getModule() != null){
-   //         if($merge){
-   //            if(isset($this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL]) AND $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL] != null){
-   //               $separator = ' '.$separator.' ';
-   //            } else {
-   //               $separator = null;
-   //               $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL] = null;
-   //            }
-   //            $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL].=$separator.$name;
-   //         } else {
-   //            $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_SUBLABEL]=$name;
-   //         }
-   //      }
-   //   }
-
-   /**
-    * Metoda nastaví podtitulek modulu, který bude vypsán ve jménu okna
-    * @param string -- podnázev
-    * @param boolena -- (option) jesli se má název přidat za stávající nebo přepsat
-    * @param string -- (option) oddělovač mezi více nadpisy (default '-')
-    */
-   //   public function setSubTitle($name, $merge = false, $separator = '-') {
-   //      if($merge){
-   //         if($this->pageTitle != null){
-   //            $separator = ' '.$separator.' ';
-   //         } else {
-   //            $separator = null;
-   //         }
-   //         $this->pageTitle.=$separator.$name;
-   //      } else {
-   //         $this->pageTitle=$name;
-   //      }
-   //   }
-
-   /**
-    * Metoda vrací přiřazený název titulku okna
-    * @return string -- titulek okna
-    */
-   //   public function getSubTitle() {
-   //      return $this->pageTitle;
-   //   }
-
-   /**
-    * Metoda nastaví popis (alt) modulu, který bude vypsán na začátku
-    * @param string -- popis
-    * @param boolena -- (option) jesli se má popis přidat za stávající nebo přepsat
-    */
-   //   public function setTplAlt($name, $merge = false) {
-   //      if($this->getModule() != null){
-   //         if($merge){
-   //            $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_ALT].=$name;
-   //         } else {
-   //            $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_ALT]=$name;
-   //         }
-   //      }
-   //   }
-
-   /**
-    * Metoda nastaví popis link na kategorii s modulem, který bude vypsán na začátku
-    * (použití asi jenom v panelech)
-    * @param string -- link
-    */
-   //   public function setTplCatLink($link = null) {
-   //      if($link == null){
-   //         $link = new Links();
-   //      }
-   //      if($this->getModule() != null){
-   //         $this->templates[$this->getModule()->getId()][self::TEMPLATE_CATEGORY_LINK]=$link;
-   //      }
-   //   }
-
-   /**
-    * Metoda přiřazuje proměnné do šablony
-    * @param string -- název proměnné
-    * @param string/array -- hodnota proměnné
-    * @param boolean -- true pokud má být proměná zařazena do modulu (default: true)
-    */
-   //   public function addVar($varName, $varValue, $isModuleVar = true) {
-   //      $this->checkVarsArray();
-   //      if($isModuleVar AND $this->getModule() != null){
-   //         $this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME][$varName] = $varValue;
-   //      } else if($isModuleVar){
-   //         $this->templates[$varName] = $varValue;
-   //      } else {
-   //         $this->engineVars[$varName] = $varValue;
-   //      }
-   //   }
-
-   /**
-    * Metody zkontroluje vytvoření pole s proměnnými v šabloně
-    */
-   //   private function checkVarsArray() {
-   //      //		kontrola hlavního pole
-   //      $this->checkTemplatesArray();
-   //      if($this->getModule() != null){
-   //         if(!isset($this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME])){
-   //            $this->templates[$this->getModule()->getId()][self::VARIABLES_ARRAY_NAME] = array();
-   //         }
-   //      }
-   //   }
-
-   /**
-    * Metoda vrací pole s šablonami a proměnými
-    * @return array -- pole šablon a proměných
-    */
-   //   public function getTemplatesArray() {
-   //      return $this->templates;
-   //   }
-
-   /**
-    * Metoda vrací pole s proměnými předanými do enginu
-    * @return array -- pole proměných
-    */
-   //   public function getEngineVarsArray() {
-   //      return $this->engineVars;
-   //   }
-
-   /**
-    * Metoda nastavuje modul
-    * @param Module -- objekt modulu
-    */
-   //   public function setModule(Module $module=null) {
-   //      $this->module = $module;
-   //      $this->checkTemplatesArray();
-   //      $this->setTplLabel($this->getModule()->getLabel());
-   //      $this->setTplAlt($this->getModule()->getAlt());
-   //      //		Přiřazení identifikátoruModulu
-   //      $this->templates[$this->getModule()->getId()][self::TEMPLATE_MODULE_STYLE_IDENT] = $this->getModule()->getName();
-   //   }
-
-   /**
-    * Metoda přidává zadaný JsPlugin do šablony
-    *
-    * @param JsPlugin -- objekt js pluginu
-    */
-   //   final public function addJsPlugin(JsPlugin $jsPlugin){
-   //      if(get_parent_class($jsPlugin) != 'JsPlugin'){
-   //         throw new InvalidArgumentException(sprintf(_('Parametr "%s" naní objekt JsPluginu'), $jsPlugin),1);
-   //      }
-   //      $files = $jsPlugin->getAllJsFiles();
-   //      foreach ($files as $file) {
-   //         $this->addJS($file, true);
-   //      }
-   //      $files = $jsPlugin->getAllCssFiles();
-   //      foreach ($files as $file) {
-   //         $this->addCss($file, true);
-   //      }
-   //   }
-
-   /**
-    * Metoda přidá funkci do parametru OnLoad při načtení stránky
-    * @param string -- název funkce pro nahrání
-    */
-   //   final public function addJsOnLoad($jsFunction) {
-   //      array_push(self::$onLoadJsFunctions, $jsFunction);
-   //   }
-
-   /**
-    * Metoda vrací pole s js funkcemi určenými k načtení po nahrátí stránky
-    * @return array -- pole s funkcemi
-    */
-   //
 }
 ?>

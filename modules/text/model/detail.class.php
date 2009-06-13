@@ -3,7 +3,7 @@
  * Třída modelu s detailem textu
  * 
  */
-class TextDetailModel extends DbModel {
+class Text_Model_Detail extends Model_Db {
 	/**
 	 * Názvy sloupců v db
 	 * @var string

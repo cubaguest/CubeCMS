@@ -2,7 +2,7 @@
 /*
  * Třída modelu s listem Novinek
  */
-class ArticlesListModel extends DbModel {
+class Articles_Model_List extends Model_Db {
 	/**
 	 * Celkový počet novinek
 	 * @var integer
@@ -25,7 +25,7 @@ class ArticlesListModel extends DbModel {
 		if(!$this->countArticlesLoaded){
          $sqlCount = $this->getDb()->select()->table($this->module()->getDbTable())
          ->colums(array("count"=>"COUNT(*)"))
-         ->where(ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId());
+         ->where(Articles_Model_Detail::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId());
 		
 			$count = $this->getDb()->fetchObject($sqlCount);
 			$this->allArticlesCount = $count->count;
@@ -42,20 +42,20 @@ class ArticlesListModel extends DbModel {
 	 */
    public function getSelectedListArticles($from, $count=5) {
       $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'article')
-      ->colums(array(ArticleDetailModel::COLUMN_ARTICLE_LABEL => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_LABEL
-            .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
-            ArticleDetailModel::COLUMN_ARTICLE_TEXT => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_TEXT.'_'.Locale::getLang()
-            .", ".ArticleDetailModel::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
-            ArticleDetailModel::COLUMN_ARTICLE_ID_USER, ArticleDetailModel::COLUMN_ARTICLE_ID,
-            ArticleDetailModel::COLUMN_ARTICLE_TIME))
+      ->colums(array(Articles_Model_Detail::COLUMN_ARTICLE_LABEL => "IFNULL(".Articles_Model_Detail::COLUMN_ARTICLE_LABEL
+            .'_'.Locale::getLang().", ".Articles_Model_Detail::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
+            Articles_Model_Detail::COLUMN_ARTICLE_TEXT => "IFNULL(".Articles_Model_Detail::COLUMN_ARTICLE_TEXT.'_'.Locale::getLang()
+            .", ".Articles_Model_Detail::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
+            Articles_Model_Detail::COLUMN_ARTICLE_ID_USER, Articles_Model_Detail::COLUMN_ARTICLE_ID,
+            Articles_Model_Detail::COLUMN_ARTICLE_TIME))
       ->join(array('user' => $this->getUserTable()),
-         array('article'=>ArticleDetailModel::COLUMN_ARTICLE_ID_USER, ArticleDetailModel::COLUMN_USER_ID),
-         null, ArticleDetailModel::COLUMN_USER_NAME)
+         array('article'=>Articles_Model_Detail::COLUMN_ARTICLE_ID_USER, Articles_Model_Detail::COLUMN_USER_ID),
+         null, Articles_Model_Detail::COLUMN_USER_NAME)
 //      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER
 //         .' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where("article.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
+      ->where("article.".Articles_Model_Detail::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
       ->limit($from, $count)
-      ->order("article.".ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
+      ->order("article.".Articles_Model_Detail::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
 		$returArray = $this->getDb()->fetchAll($sqlSelect);
 		return $returArray;
 	}
@@ -67,14 +67,14 @@ class ArticlesListModel extends DbModel {
 	 */
 	public function getListArticles() {
       $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'articletb')
-      ->colums(array(ArticleDetailModel::COLUMN_ARTICLE_LABEL => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_LABEL
-            .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
-            ArticleDetailModel::COLUMN_ARTICLE_TEXT => "IFNULL(".ArticleDetailModel::COLUMN_ARTICLE_TEXT
-            .'_'.Locale::getLang().", ".ArticleDetailModel::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
-            ArticleDetailModel::COLUMN_ARTICLE_ID_USER, ArticleDetailModel::COLUMN_ARTICLE_ID,
-            ArticleDetailModel::COLUMN_ARTICLE_EDIT_TIME))
-      ->where("articletb.".ArticleDetailModel::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
-      ->order("articletb.".ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
+      ->colums(array(Articles_Model_Detail::COLUMN_ARTICLE_LABEL => "IFNULL(".Articles_Model_Detail::COLUMN_ARTICLE_LABEL
+            .'_'.Locale::getLang().", ".Articles_Model_Detail::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
+            Articles_Model_Detail::COLUMN_ARTICLE_TEXT => "IFNULL(".Articles_Model_Detail::COLUMN_ARTICLE_TEXT
+            .'_'.Locale::getLang().", ".Articles_Model_Detail::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
+            Articles_Model_Detail::COLUMN_ARTICLE_ID_USER, Articles_Model_Detail::COLUMN_ARTICLE_ID,
+            Articles_Model_Detail::COLUMN_ARTICLE_EDIT_TIME))
+      ->where("articletb.".Articles_Model_Detail::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
+      ->order("articletb.".Articles_Model_Detail::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
 
 		$returArray = $this->getDb()->fetchAll($sqlSelect);
 		return $returArray;
@@ -98,14 +98,14 @@ class ArticlesListModel extends DbModel {
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
       ->table($this->module()->getDbTable())
-      ->colums(ArticleDetailModel::COLUMN_ARTICLE_TIME)
+      ->colums(Articles_Model_Detail::COLUMN_ARTICLE_TIME)
       ->limit(0, 1)
-      ->order(ArticleDetailModel::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
+      ->order(Articles_Model_Detail::COLUMN_ARTICLE_TIME, Db::ORDER_DESC);
 
       $returArray = $this->getDb()->fetchObject($sqlSelect);
 
       if(!empty ($returArray)){
-         $returArray = $returArray->{ArticleDetailModel::COLUMN_ARTICLE_TIME};
+         $returArray = $returArray->{Articles_Model_Detail::COLUMN_ARTICLE_TIME};
       }
 		return $returArray;
    }

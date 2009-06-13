@@ -12,7 +12,7 @@
  * @abstract 		Třída JsPluginu TinyMce
  */
 
-class TinyMce extends JsPlugin {
+class JsPlugin_TinyMce extends JsPlugin {
 	/**
 	 * Konstanta s názvem adresáře s pluginem
 	 * @var string
@@ -175,20 +175,20 @@ class TinyMce extends JsPlugin {
 	
 	protected function initFiles() {
 //		Výchozí js soubor pluginu
-      $jsFile = new JsFile("tiny_mce_params.js", true);
+      $jsFile = new JsPlugin_JsFile("tiny_mce_params.js", true);
       //$face =  AppCore::getTepmlateFaceDir(false,false);
       //$face = substr($face, 0, strlen($face)-1);
       $jsFile->setParam(self::PARAM_FACE, Template::face());
       $jsFile->setParam('language', Locale::getLang());
 		$this->setSettingJsFile($jsFile);
 //		Přidání js soubrů pluginu
-		$this->addJsFile(new JsFile("tiny_mce.js"));
+		$this->addJsFile(new JsPlugin_JsFile("tiny_mce.js"));
 	}
 	
 	/**
 	 * Metda vytvoří výchozí konfigurační soubor
 	 */
-	protected function generateFile(JsFile $file) {
+	protected function generateFile(JsPlugin_JsFile $file) {
       if($file->getName() == 'tiny_mce_params.js'){
 			$file->getParam(self::PARAM_THEME) == null ? $theme = null :
          $theme = rawurldecode($file->getParam(self::PARAM_THEME));

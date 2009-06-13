@@ -10,7 +10,7 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s panely
  */
 
-class PanelModel extends DbModel {
+class Model_Panel extends Model_Db {
 
    /**
     * Konstanty s názzvy sloupců
@@ -61,12 +61,12 @@ class PanelModel extends DbModel {
              self::COLUMN_ALT => "IFNULL(item.".self::COLUMN_ALT.'_'.Locale::getLang()
              .", item.".self::COLUMN_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
       ->join(array("cat" => $this->catTable),
-          array('item' =>CategoryModel::COLUMN_CAT_ID,CategoryModel::COLUMN_CAT_ID),
-          null, array(Category::COLUMN_CAT_LABEL => "IFNULL(cat.".CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'
-            .Locale::getLang().", cat.".CategoryModel::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
-            CategoryModel::COLUMN_CAT_ID))
-      ->join(array("module" => $this->modulesTable), array('item'=>ModuleModel::COLUMN_ID_MODULE, ModuleModel::COLUMN_ID_MODULE),
-         null, Db::COLUMN_ALL)
+          array('item' =>Model_Category::COLUMN_CAT_ID,Model_Category::COLUMN_CAT_ID),
+          null, array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'
+            .Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
+            Model_Category::COLUMN_CAT_ID))
+      ->join(array("module" => $this->modulesTable), array('item'=>Model_Module::COLUMN_ID_MODULE
+            ,Model_Module::COLUMN_ID_MODULE), null, Db::COLUMN_ALL)
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.AppCore::getAuth()->getGroupName(), "r__", Db::OPERATOR_LIKE)
       ->where("panel.".self::COLUMN_POSITION , strtolower($side))
       ->where("panel.".self::COLUMN_ENABLE, (int)true)

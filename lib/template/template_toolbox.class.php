@@ -11,7 +11,7 @@
  * @abstract 		Třída pro obsluhu šablony
  */
 
-class TplToolbox extends Template {
+class Template_Toolbox extends Template {
    /**
     * Ikona pro přidání
     */
@@ -53,7 +53,7 @@ class TplToolbox extends Template {
     */
    private function createTemplate() {
       $this->addTplFile("toolbox.phtml", true);
-      $this->addJsPlugin(new JQuery());
+      $this->addJsPlugin(new JsPlugin_JQuery());
    }
 
    /**

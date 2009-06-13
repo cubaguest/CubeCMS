@@ -10,7 +10,7 @@
  * @abstract 		Třída pro práci s textovými prvky - helper
  */
 
-class TextHelper extends Helper {
+class Helper_Text extends Helper {
    /**
     * Pole znaků které se odstraňují protoože se nejedná o písmena
     * @var array

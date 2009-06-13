@@ -11,7 +11,7 @@
  * @abstract 		Třída pro obsluhu šablony
  */
 
-class CoreTemplate extends Template {
+class Template_Core extends Template {
 
    public function getStylesheets() {
       return self::$stylesheets;

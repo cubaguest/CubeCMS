@@ -12,7 +12,7 @@
  * @abstract 		Třída EPluginu pro práci se scrolovátky
  */
 
-class ScrollEplugin extends Eplugin {
+class Eplugin_Scroll extends Eplugin {
     /**
      * Regulérní výraz pro parsování parametru s číslem stránky
      */

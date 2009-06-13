@@ -10,7 +10,7 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s moduly
  */
 
-class ModuleModel extends DbModel {
+class Model_Module extends Model_Db {
 
 	 /**
 	  * Názvy sloupců v db tabulce
@@ -70,7 +70,7 @@ class ModuleModel extends DbModel {
       ->join(array("module" => $this->modulesTable), 
          array("item" => self::COLUMN_ID_MODULE, self::COLUMN_ID_MODULE),null,Db::COLUMN_ALL)
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup,"r__", Db::OPERATOR_LIKE)
-      ->where("item.".CategoryModel::COLUMN_CAT_ID, Category::getId())
+      ->where("item.".Model_Category::COLUMN_CAT_ID, Category::getId())
       ->order("item.".self::COLUMN_PRIORITY, Db::ORDER_DESC)
       ->order(self::COLUMN_LABEL);
       return $this->getDb()->fetchObjectArray($sqlSelect);

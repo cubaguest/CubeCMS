@@ -85,7 +85,7 @@ abstract class JsPlugin {
 		$this->initJsPlugin();
       // Pokud je zpracováván virtuální soubor JsPluginu
       if(UrlRequest::isSupportedServices()){
-         $file = new JsFile(rawurldecode(UrlRequest::getSupportedServicesFile()), true);
+         $file = new JsPlugin_JsFile(rawurldecode(UrlRequest::getSupportedServicesFile()), true);
          // generování obsahu souboru
          $file->setParams(UrlRequest::getSupportedServicesParams());
       	$this->generateFile($file);
@@ -104,7 +104,7 @@ abstract class JsPlugin {
 	 * je volána při volání parametru stránky pro JsPlugin
 	 * a je pouze zpracována tato metoda (generování nastavení atd)
 	 */
-	protected abstract function generateFile(JsFile $file);
+	protected abstract function generateFile(JsPlugin_JsFile $file);
 	
 	/**
 	 * Metoda inisializuje všechny soubory, se kterými JsPlugin pracuje
@@ -113,9 +113,9 @@ abstract class JsPlugin {
 	
 	/**
 	 * Metoda nastavuje js soubor s nasatvením pluginu
-	 * @param JsFile -- název js souboru (je umístěn v adresáři modulu)
+	 * @param JsPlugin_JsFile -- název js souboru (je umístěn v adresáři modulu)
 	 */
-	final protected function setSettingJsFile(JsFile $jsFile) {
+	final protected function setSettingJsFile(JsPlugin_JsFile $jsFile) {
 		$this->settingsJsFile = $jsFile;
 	}
 	
@@ -129,9 +129,9 @@ abstract class JsPlugin {
 	
 	/**
 	 * Metoda přídává js soubor se scriptem
-	 * @param JsFile -- název js souboru
+	 * @param JsPlugin_JsFile -- název js souboru
 	 */
-	final protected function addJsFile(JsFile $jsFile){
+	final protected function addJsFile(JsPlugin_JsFile $jsFile){
       if(!in_array($jsFile->getName(), $this->jsFilesArray)){
          array_push($this->jsFilesArray, $jsFile);
       }
@@ -152,7 +152,7 @@ abstract class JsPlugin {
    final protected function addDependJsPlugin(JsPlugin $jsplugin) {
       $file = $jsplugin->getAllJsFiles();
       foreach ($file as $f) {
-         $this->addJsFile(new JsFile($f));
+         $this->addJsFile(new JsPlugin_JsFile($f));
       }
       $file = $jsplugin->getAllCssFiles();
       foreach ($file as $f) {
@@ -215,9 +215,9 @@ abstract class JsPlugin {
 	
 	/**
 	 * Metoda nastaví nový výchozí js soubor nastavení
-	 * @param JsFile -- název js souboru
+	 * @param JsPlugin_JsFile -- název js souboru
 	 */
-	final public function setDefJsFile(JsFile $jsFile){
+	final public function setDefJsFile(JsPlugin_JsFile $jsFile){
 		$this->settingsJsFileIsDefault = false;
 		$this->setSettingJsFile($jsFile);
 	}
@@ -278,7 +278,7 @@ abstract class JsPlugin {
 	
 	/**
 	 * Metoda vrací název výchozího js souboru s nastavením
-	 * @return JsFile -- název js souboru
+	 * @return JsPlugin_JsFile -- název js souboru
 	 */
 	final public function getSettingsJsFile(){
 		return $this->settingsJsFile;

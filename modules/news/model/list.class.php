@@ -2,7 +2,7 @@
 /*
  * Třída modelu s listem Novinek
  */
-class NewsListModel extends DbModel {
+class News_Model_List extends Model_Db {
 	/**
 	 * Názvy sloupců v databázi
 	 * @var string

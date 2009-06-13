@@ -2,7 +2,7 @@
 /*
  * Třída modelu detailem článku
  */
-class ArticleDetailModel extends DbModel {
+class Articles_Model_Detail extends Model_Db {
 	/**
 	 * Názvy sloupců v databázi
 	 */

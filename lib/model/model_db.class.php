@@ -1,5 +1,5 @@
 <?php
-require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . 'model.class.php';
+//require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . 'model.class.php';
 
 /**
  * Abstraktní třída pro Db Model.
@@ -7,13 +7,13 @@ require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::E
  * s databází.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ VVE3.9.2 $Revision$
- * @author			$Author$ $Date$
- *						$LastChangedBy$ $LastChangedDate$
+ * @version    	$Id: dbmodel.class.php 615 2009-06-09 13:05:12Z jakub $ VVE3.9.2 $Revision: 615 $
+ * @author			$Author: jakub $ $Date: 2009-06-09 15:05:12 +0200 (Út, 09 čen 2009) $
+ *						$LastChangedBy: jakub $ $LastChangedDate: 2009-06-09 15:05:12 +0200 (Út, 09 čen 2009) $
  * @abstract 		Abstraktní třída pro vytvoření modelu pro práci s databází
  */
 
-class DbModel extends Model {
+class Model_Db extends Model {
 	/**
 	 * Metoda vrací objekt ke konektoru databáze
 	 * 
