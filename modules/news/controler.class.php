@@ -167,7 +167,7 @@ class NewsController extends Controller {
    /**
    * Kontroler pro přidání novinky
    */
-   public function addController(){
+   public function addnewsController(){
       $this->checkWritebleRights();
 
       $newsForm = new Form();

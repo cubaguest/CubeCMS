@@ -525,7 +525,6 @@ class AppCore {
          //TODO dodělat kontroly, tak ať to vyhazuje přesnější chbové hlášky
          //		Zmenšení na malá písmena
          $className = strtolower($classOrigName);
-
          $epluginFile = $className;
          //pokud je eplugin odstraníme jej z názvu
          if(strpos($className, 'eplugin') !== false AND $className != 'eplugin'){
@@ -534,8 +533,12 @@ class AppCore {
          //je načítána hlavní knihovna
          if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
                . $className . '.class.php')){
-            require ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+//            echo $classOrigName." - MainClass - ".'.'. DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
+//               . $className . '.class.php ';
+            require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
                . $className . '.class.php');
+
+//            echo " LOADED <br>";flush();
          }
          //je načítán šablonovací systém
          else if(file_exists('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR
@@ -911,26 +914,30 @@ class AppCore {
             $sysModule->setRights(new Rights($userRights));
             try {
                // načtení souboru s akcemi modulu
-               if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                     . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-                  throw new BadFileException(_("Nepodařilo se nahrát akci modulu ")
-                     . $sysModule->module()->getName(), 7);
-               }
-               include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-               . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
                //				Vytvoření objektu akce
                $actionClassName = ucfirst($sysModule->module()->getName()).'Action';
-               if(class_exists($actionClassName)){
+               if(!class_exists($actionClassName, false)){
+                  if(file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                        . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+//                     throw new BadFileException(_("Nepodařilo se nahrát akci modulu ")
+//                        . $sysModule->module()->getName(), 7);
+                  require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+                  }
+               }
+               
+               if(class_exists($actionClassName, false)){
                   $sysModule->setAction(new $actionClassName($sysModule->module()));
                } else {
                   $sysModule->setAction(new Action($sysModule->module()));
                }
+
                //				načtení souboru s cestami (routes) modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                      . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
                   throw new BadFileException(_("Nepodařilo se nahrát cestu modul ") . $sysModule->module()->getName(), 8);
                }
-               include_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
+               require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
                //				Vytvoření objektu cesty (routes)
                $routes = null;
@@ -940,8 +947,6 @@ class AppCore {
                } else {
                   $sysModule->setRoute(new Routes());
                }
-               //				Vytvoření ubjektu UrlReqestu
-               $urlRequest = new UrlRequest($sysModule->action(), $sysModule->route());
                //				načtení souboru s kontrolerem modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                      . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'controler.class.php')){
@@ -949,7 +954,7 @@ class AppCore {
                      . $sysModule->module()->getName(), 9);
                }
                require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-               . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
+                  . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'controler.class.php';
 
                //			načtení souboru s viewrem modulu
                if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
@@ -958,7 +963,7 @@ class AppCore {
                         $sysModule->module()->getName()), 13);
                }
                require_once '.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-               . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
+                  . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
 
                //			Vytvoření objektu kontroleru
                $controllerClassName = ucfirst($sysModule->module()->getName()).'Controller';
@@ -968,6 +973,9 @@ class AppCore {
                }
                //					Vytvoření objektu kontroleru
                $controller = new $controllerClassName($sysModule);
+
+               //				Vytvoření ubjektu UrlReqestu
+               $urlRequest = new UrlRequest($sysModule->action(), $sysModule->route());
                //					Volba metody kontroluru podle urlrequestu
                $requestName = $urlRequest->choseController();
                $requestControllerName = $requestName.AppCore::MODULE_CONTROLLER_SUFIX;
@@ -1090,18 +1098,17 @@ class AppCore {
                   $file = self::getAppWebDir() . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
                         . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php';
 
-echo $file;flush();
-error_log("chaby");
-var_dump(error_get_last());
-                  if(!file_exists('.' . DIRECTORY_SEPARATOR . self::MODULES_DIR . DIRECTORY_SEPARATOR
-                        . $panelSys->module()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')){
+//echo $file;flush();
+//error_log("chyba");
+                  if(!file_exists($file)){
                      throw new BadFileException(_("Controler a Viewer panelu ").$panelSys->module()->getName()
                         ._(" neexistuje."),17);
                   }
-
-                  include_once ($file);
-                  //echo "tady";flush();//exit();
-echo "tady";flush();//exit();
+//print ("panel");flush();
+                  require_once ($file);
+//var_dump(error_get_last());
+//                  //echo "tady";flush();//exit();
+//echo "tady";flush();//exit();
 
 
                   if(!class_exists($panelClassName, false)){

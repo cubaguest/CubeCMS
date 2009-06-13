@@ -1,4 +1,5 @@
 <?php
+include_once './lib/panel.class.php';
 class NewsPanel extends Panel {
 	/**
 	 * Počet novinek v panelu

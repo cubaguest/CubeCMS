@@ -75,7 +75,7 @@ class NewsView extends View {
    /**
     * Viewer pro přidání novinky
     */
-   public function addView() {
+   public function addNewsView() {
       $this->template()->addTplFile('editNews.phtml');
       $this->template()->addCssFile("style.css");
 

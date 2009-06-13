@@ -15,7 +15,7 @@ class Action {
 	/**
 	 * Název prvku s parametrem v url
 	 */
-	const ACTION_URL_PARAM = 'url';
+	//const ACTION_URL_PARAM = 'url';
 
 	/**
 	 * Název prvku s typem akce pro kontroler
@@ -41,7 +41,7 @@ class Action {
 
 	/**
 	 * Pole s definovanými akcemi
-	 * @var array
+	 * @var ArrayObject
 	 */
 	private $actionsArray = array();
 
@@ -49,7 +49,7 @@ class Action {
 	 * výchozí akce
 	 * @var string
 	 */
-	private $defaultAction = null;
+	private $defaultAction = "s";
 
    /**
     * Objekt modulu
@@ -79,7 +79,6 @@ class Action {
 	 */
 	private function module() {
       return $this->module;
-//      return AppCore::getSelectedModule();
 	}
 
    final public function _m($message) {
@@ -91,7 +90,7 @@ class Action {
 	 * Metody vytvoří výchozí akce (add, edit a show)
 	 */
 	private function createDefaultActions() {
-		$this->add();
+      $this->add();
 		$this->edit();
 		$this->show();
 	}
@@ -105,10 +104,12 @@ class Action {
 	 * @param boolean -- jestli má být daná akce výchozí
 	 */
 	final public function addAction($actionAbbr, $actionName, $actionLabel, $isDefault = false){
-		if(!key_exists($actionAbbr, $this->actionsArray)){
-			$this->actionsArray[$actionAbbr] = array(self::ACTION_TYPE_PARAM => $actionName,
+      if(!key_exists($actionAbbr, $this->actionsArray)){
+
+         $array = array(self::ACTION_TYPE_PARAM => $actionName,
 															  self::ACTION_LABEL_PARAM => $actionLabel);
-			if($isDefault){
+			$this->actionsArray[$actionAbbr] = $array;
+         if($isDefault){
 				$this->defaultAction = $actionAbbr;
 			}
 		}
@@ -119,7 +120,11 @@ class Action {
 	 * @return string -- název prováděné akce viz dokumentace
 	 */
 	public function getSelectedAction() {
-		return $this->actionsArray[self::$currentAction][self::ACTION_TYPE_PARAM];
+      if(isset ($this->actionsArray[self::$currentAction])){
+         return $this->actionsArray[self::$currentAction][self::ACTION_TYPE_PARAM];
+      } else {
+         return $this->getDefaultArticleAction();
+      }
 	}
 
 	/**
@@ -170,7 +175,7 @@ class Action {
 	 */
 	public function edit(){
 		$actionAbbr = 'e';
-		$this->addAction($actionAbbr, "edit", _('uprava'));
+      $this->addAction($actionAbbr, "edit", _('uprava'));
 		return $this->createAction($actionAbbr);
 	}
 	
