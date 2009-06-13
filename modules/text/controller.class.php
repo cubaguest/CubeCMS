@@ -3,7 +3,7 @@
  * Třída pro obsluhu akcí a kontrolerů modulu
  */
 
-class TextController extends Controller {
+class Text_Controller extends Controller {
    /**
     * Názvy formůlářových prvků
     * @var string
@@ -34,7 +34,7 @@ class TextController extends Controller {
 
       if($this->getModule()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-         $files = new UserFilesEplugin($this->sys());
+         $files = new Eplugin_UserFiles($this->sys());
          $this->view()->EPLfiles = $files;
       }
 
@@ -46,7 +46,7 @@ class TextController extends Controller {
 
       //        Pokud byl odeslán formulář
       if($form->checkForm()){
-         $text = $this->createModel("TextDetailModel");
+         $text = Text_Model_Detail($this->sys());
          if(!$text->saveEditText($form->getValue(self::FORM_TEXT))){
             throw new UnexpectedValueException($this->_m('Text se nepodařilo uložit'));
          }

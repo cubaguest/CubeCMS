@@ -132,40 +132,6 @@ abstract class View {
       return $this->sys()->module();
    }
 
-   /**
-    * Metoda přidá danou šablonu
-    * @param string $name -- název šablony
-    * @param boolean $engine -- jestli je šablona enginu
-    * @return View -- vrací objekt sebe
-    */
-//   final public function addTpl($name, $engine  = false) {
-//      $this->template()->addTplFile($name, $engine);
-//      return $this;
-//   }
-	
-   /**
-    * Metoda přidá proměnnou do šablony
-    * @param string $name -- název proměnné
-    * @param mixed $value -- hodnota proměnné
-    * @param boolean/string $array -- jestli má být proměná zařazena do pole
-    * nebo pod název pole
-    * @return View -- vrací objekt sebe
-    */
-//   final public function addVar($name, $value, $array = false) {
-//      $this->template()->setVar($name, $value, $array);
-//      return $this;
-//   }
-
-   /**
-    * Metoda přidá do šablony zadaný odkaz
-    * @param Links $link -- objekt odkazu
-    * @return View -- vrací sám sebe
-    */
-//   final public function addLink($name, Links $link){
-//      $this->template()->setLink($name, $link);
-//      return $this;
-//   }
-
 	/**
 	 * Metoda vrací objekt k právům uživatele
 	 * @return Rights -- objekt práv

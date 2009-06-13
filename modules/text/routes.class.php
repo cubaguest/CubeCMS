@@ -3,7 +3,7 @@
  * Třída obsluhující cesty modulu
  *
  */
-class TextRoutes extends Routes {
+class Text_Routes extends Routes {
 	function initRoutes() {
 	}
 }

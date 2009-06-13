@@ -1,5 +1,5 @@
 <?php
-class NewsView extends View {
+class News_View extends View {
    public function mainView() {
       if($this->rights()->isWritable()){
          $toolbox = new TplToolbox();
@@ -75,7 +75,7 @@ class NewsView extends View {
    /**
     * Viewer pro přidání novinky
     */
-   public function addNewsView() {
+   public function adddNewsView() {
       $this->template()->addTplFile('editNews.phtml');
       $this->template()->addCssFile("style.css");
 

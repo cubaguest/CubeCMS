@@ -1,6 +1,6 @@
 <div><?=$this->text;?></div>
 <? // zapnuti lightboxu pokud je nastavenos
-if((bool)$this->sys()->module()->getParam(TextController::PARAM_FILES, true)){?>
+if((bool)$this->sys()->module()->getParam(Text_Controller::PARAM_FILES, true)){?>
 <script type="text/javascript">
    $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
 </script>

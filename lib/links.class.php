@@ -269,7 +269,7 @@ class Links {
     */
    public function category($catName = null, $catId = null){
       if($catName != null AND $catId != null){
-         $help = new TextHelper();
+         $help = new Helper_Text();
          $this->category[self::LINK_ARRAY_ITEM_NAME] = rawurlencode($help->utf2ascii($catName));
          $this->category[self::LINK_ARRAY_ITEM_ID] = $catId;
       } else {
@@ -311,7 +311,7 @@ class Links {
       if($article != null AND $idArticle != null AND is_numeric($idArticle)){
          $this->article[self::LINK_ARRAY_ITEM_ID] = $idArticle;
          $article = htmlspecialchars_decode($article);
-         $help = new TextHelper();
+         $help = new Helper_Text();
          $article = $help->utf2ascii($article);
          $article = urlencode($article);
          $this->article[self::LINK_ARRAY_ITEM_NAME] = $article;
@@ -623,7 +623,7 @@ class Links {
    private function getCategory() {
       if(!empty ($this->category)){
          $categoryName = $this->category[self::LINK_ARRAY_ITEM_NAME];
-         $utf = new TextHelper();
+         $utf = new Helper_Text();
          $categoryName = $utf->utf2ascii($categoryName);
          return $categoryName.self::URL_SEP_CAT_ID
          .$this->category[self::LINK_ARRAY_ITEM_ID].UrlRequest::URL_SEPARATOR;
@@ -666,7 +666,7 @@ class Links {
     */
    private function getRoute() {
       if(!empty ($this->route)){
-         $utf = new TextHelper();
+         $utf = new Helper_Text();
          $name = $utf->utf2ascii($this->route[self::LINK_ARRAY_ITEM_NAME]);
          $return = $name.self::URL_SEP_CAT_ID.'r';
          //            Pokud je předdefinovaná routa
@@ -702,7 +702,7 @@ class Links {
    private function getArticle() {
       if(!empty ($this->article[self::LINK_ARRAY_ITEM_ID]) AND
          !empty ($this->article[self::LINK_ARRAY_ITEM_NAME])){
-         $utf = new TextHelper();
+         $utf = new Helper_Text();
          $name = $utf->utf2ascii($this->article[self::LINK_ARRAY_ITEM_NAME]);
 
          return rawurlencode($name).self::URL_SEP_ARTICLE_ID
@@ -738,7 +738,7 @@ class Links {
     */
    private function getAction() {
       if(!empty ($this->action)){
-         $utf = new TextHelper();
+         $utf = new Helper_Text();
          $name = $utf->utf2ascii($this->action[self::LINK_ARRAY_ITEM_NAME]);
 
          return $name.self::URL_ACTION_LABEL_TYPE_SEP
@@ -844,11 +844,11 @@ class Links {
     * Metoda doplní část media
     * @todo patří vložit asij někam jinam, dořešit
     */
-   private function getMedia() {
-      if($this->mediaType != null){
-         //			$this->param(self::GET_MEDIA, $this->mediaType);
-      }
-   }
+//   private function getMedia() {
+//      if($this->mediaType != null){
+//         //			$this->param(self::GET_MEDIA, $this->mediaType);
+//      }
+//   }
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");
 //echo("SERVER_NAME: ".$_SERVER["SERVER_NAME"]."<br>");

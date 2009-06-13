@@ -8,10 +8,12 @@
       <title>
          <?
          echo($this->pageTitle);
-         if(!empty ($this->categoryTitle))
-         echo ' - '.$this->categoryTitle;
-         if(!empty ($this->moduleTitle))
-         echo ' - '.$this->moduleTitle;
+         if($this->catTitle())
+            echo ' - '.$this->catTitle();
+         if($this->articleTitle())
+            echo ' - '.$this->articleTitle();
+         if($this->actionTitle())
+            echo ' - '.$this->actionTitle();
          ?></title>
 
       <base href="<?=UrlRequest::getBaseWebDir()?>" />

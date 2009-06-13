@@ -1,5 +1,10 @@
 <?php
-class ArticlesView extends View {
+class Articles_View extends View {
+   /**
+    * Název parametru s počtem článků na stránce
+    */
+   const PARAM_NUM_ARTICLES_ON_PAGE = 'scroll';
+
    public function mainView() {
       if($this->rights()->isWritable()){
          $toolbox = new TplToolbox();
@@ -7,52 +12,39 @@ class ArticlesView extends View {
             $this->link()->action($this->sys()->action()->addarticle()),
             $this->_m("Přidat článek"), "text_add.png");
          $this->template()->toolbox = $toolbox;
-         //         $this->template()->addTpl('addButton.tpl');
-         //         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
-         //
-         //         // editační tlačítka
-         //         $jquery = new JQuery();
-         //         $this->template()->addJsPlugin($jquery);
       }
 
       $this->template()->addTplFile("list.phtml");
       $this->template()->addCssFile("style.css");
-/*
-      $lists = $this->container()->getData('ARTICLE_LIST_ARRAY');
-      foreach ($lists as $key => $article) {
+
+      //		Vytvoření modelu
+      $articleModel = new Articles_Model_List($this->sys());
+      //		Scrolovátka
+      $scroll = new Eplugin_Scroll($this->sys());
+      $scroll->setCountRecordsOnPage($this->module()->getParam(self::PARAM_NUM_ARTICLES_ON_PAGE, 10));
+      $scroll->setCountAllRecords($articleModel->getCountArticles());
+//      var_dump($scroll);
+      //		Vybrání článků
+      $this->template()->articlesArray = $articleModel->getSelectedListArticles($scroll->getStartRecord(), $scroll->getCountRecords());
+      $this->template()->EPLscroll = $scroll;
+
+      $list = $this->template()->articlesArray;
+      foreach ($list as &$article) {
          $out = array();
-         preg_match("/(<img[^>]*\/?>)/i", $article[ArticleDetailModel::COLUMN_ARTICLE_TEXT], $out);
+         preg_match("/(<img[^>]*\/?>)/i", $article[Articles_Model_Detail::COLUMN_ARTICLE_TEXT], $out);
          if(!empty ($out[1])){
             preg_match('/src="([^"]*)"/i', $out[1], $out);
-            $lists[$key]['title_image'] = $out[1];
+            $article['title_image'] = $out[1];
          } else {
-            $lists[$key]['title_image'] = null;
+            $article['title_image'] = null;
          }
       }
-      $this->template()->addVar('ARTICLE_LIST_ARRAY', $lists);
+      $this->template()->articlesArray = $list;
 
-      $this->template()->addVar("ARTICLES_LIST_NAME", _m("Články"));
-      $this->template()->addVar("ARTICLES_MORE_NAME", _m("Více"));
-*/
-      //TODO korektní cestu
-      //      $this->template()->addTpl($this->container()->getEplugin('scroll')->getTpl(), true);
-      //      $this->container()->getEplugin('scroll')->assignToTpl($this->template());
    }
 
    public function showView(){
       if($this->rights()->isWritable()){
-         //         $this->template()->addTplFile('editButtons.tpl');
-         //         $this->template()->addVar('LINK_TO_ADD_ARTICLE_NAME', _m("Přidat článek"));
-         //
-         //         $this->template()->addVar('LINK_TO_EDIT_ARTICLE_NAME', _m("Upravit"));
-         //
-         //         $this->template()->addVar('LINK_TO_DELETE_ARTICLE_NAME', _m("Smazat"));
-         //         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat článek"));
-
-         //			JSPlugin pro potvrzení mazání
-//         $submitForm = new SubmitForm();
-//         $this->template()->addJsPlugin($submitForm);
-
          // editační tlačítka
          $jquery = new JQuery();
          $this->template()->addJsPlugin($jquery);
@@ -67,22 +59,17 @@ class ArticlesView extends View {
       }
 
       //převedeme všechny lightbox převedeme na lightbox rel
-      if((bool)$this->module()->getParam(ArticlesController::PARAM_FILES, true)){
-         $this->template()->addJsPlugin(new LightBox());
+      if((bool)$this->module()->getParam(Articles_Controller::PARAM_FILES, true)){
+         $this->template()->addJsPlugin(new JsPlugin_LightBox());
          $this->template()->lightBox = true;
-         //         $this->template()->addVar('LIGHTBOX', true);
       }
 
-      $model = $this->createModel("ArticleDetailModel");
+      $model = new Articles_Model_Detail($this->sys());
       $this->template()->article = $model->getArticleDetailSelLang($this->sys()->article()->getArticle());
 
       $this->template()->addTplFile("articleDetail.phtml");
       $this->template()->addCssFile("style.css");
-
-      //      $this->template()->setTplSubLabel($this->container()->getData('ARTICLE_LABEL'));
-      //      $this->template()->setSubTitle($this->container()->getData('ARTICLE_LABEL'), true);
-
-      //      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
+      $this->template()->setArticleTitle($this->template()->article[Articles_Model_Detail::COLUMN_ARTICLE_LABEL]);
    }
 
    /**

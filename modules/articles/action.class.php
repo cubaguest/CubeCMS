@@ -3,7 +3,7 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class ArticlesAction extends Action {
+class Articles_Action extends Action {
 	
 
 	const ACTION_ADD_ARTICLE_ABBR = 'aa';

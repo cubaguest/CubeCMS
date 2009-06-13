@@ -1,5 +1,5 @@
 <?php
-class NewsRoutes extends Routes {
+class News_Routes extends Routes {
 //    const ROUTE_SECTIONS_ID = 1;
 
     function initRoutes() {

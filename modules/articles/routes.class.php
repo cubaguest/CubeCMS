@@ -1,5 +1,5 @@
 <?php
-class ArticlesRoutes extends Routes {
+class Articles_Routes extends Routes {
    function initRoutes() {
 	}
 }

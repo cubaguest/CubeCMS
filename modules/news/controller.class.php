@@ -1,5 +1,5 @@
 <?php
-class NewsController extends Controller {
+class News_Controller extends Controller {
   /**
    * Sloupce u tabulky uživatelů
    * @var string
@@ -60,9 +60,9 @@ class NewsController extends Controller {
       $this->checkReadableRights();
 
       //		Vytvoření modelu
-      $newsM = new NewsListModel($this->sys());
+      $newsM = new News_Model_List($this->sys());
       //		Scrolovátka
-      $scroll = new ScrollEplugin($this->sys());
+      $scroll = new Eplugin_Scroll($this->sys());
 
       $scroll->setCountRecordsOnPage($this->module()->getParam(self::PARAM_NUM_NEWS, 10));
       $scroll->setCountAllRecords($newsM->getCountNews());

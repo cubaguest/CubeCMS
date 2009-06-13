@@ -3,7 +3,7 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class TextAction extends Action {
+class Text_Action extends Action {
 
    const ACTION_EDIT_TEXT_ABBR = 'at';
 

@@ -23,21 +23,21 @@ class Category {
     * Názvy sloupců v db tabulce
     * @var string
     */
-   const COLUMN_CAT_LABEL 	= 'clabel';
-   const COLUMN_SEC_LABEL 	= 'slabel';
-   const COLUMN_CAT_ID		= 'id_category';
-   const COLUMN_SEC_ID		= 'id_section';
-   const COLUMN_CAT_URLKEY	= 'urlkey';
-   const COLUMN_CAT_LPANEL	= 'left_panel';
-   const COLUMN_CAT_RPANEL	= 'right_panel';
-   const COLUMN_CAT_PARAMS	= 'cparams';
-   const COLUMN_CAT_SHOW_IN_MENU	= 'show_in_menu';
-   const COLUMN_CAT_PROTECTED	= 'protected';
-
-   const COLUMN_CAT_LABEL_ORIG = 'label';
-   const COLUMN_CAT_ALT_ORIG = 'alt';
-
-   const COLUMN_CAT_ACTIVE = 'active';
+//   const COLUMN_CAT_LABEL 	= 'clabel';
+//   const COLUMN_SEC_LABEL 	= 'slabel';
+//   const COLUMN_CAT_ID		= 'id_category';
+//   const COLUMN_SEC_ID		= 'id_section';
+//   const COLUMN_CAT_URLKEY	= 'urlkey';
+//   const COLUMN_CAT_LPANEL	= 'left_panel';
+//   const COLUMN_CAT_RPANEL	= 'right_panel';
+//   const COLUMN_CAT_PARAMS	= 'cparams';
+//   const COLUMN_CAT_SHOW_IN_MENU	= 'show_in_menu';
+//   const COLUMN_CAT_PROTECTED	= 'protected';
+//
+//   const COLUMN_CAT_LABEL_ORIG = 'label';
+//   const COLUMN_CAT_ALT_ORIG = 'alt';
+//
+//   const COLUMN_CAT_ACTIVE = 'active';
 
    /**
     * Id aktuální kategorie
@@ -141,23 +141,23 @@ class Category {
     */
    private static function _loadSelectedFromDb($catId) {
       $userNameGroup = self::$_auth->getGroupName();
-      $catModel = new CategoryModel();
+      $catModel = new Model_Category();
       $catArray = $catModel->getCategory(self::$currentCategoryId);
       //		Pokud nebyla načtena žádná kategorie
       if(empty($catArray)){
          AppCore::setErrorPage();
          return false;
       } else {
-         self::$_categoryLabel = $catArray->{CategoryModel::COLUMN_CAT_LABEL};
-         self::$_categoryId = $catArray->{CategoryModel::COLUMN_CAT_ID};
-         self::$_sectionId = $catArray->{CategoryModel::COLUMN_SEC_ID};
-         self::$_categoryLeftPanel = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
-         self::$_categoryRightPanel = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
-         self::$_sectionName = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
-         self::$_categoryParams = self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
+         self::$_categoryLabel = $catArray->{Model_Category::COLUMN_CAT_LABEL};
+         self::$_categoryId = $catArray->{Model_Category::COLUMN_CAT_ID};
+         self::$_sectionId = $catArray->{Model_Category::COLUMN_SEC_ID};
+         self::$_categoryLeftPanel = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
+         self::$_categoryRightPanel = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
+         self::$_sectionName = $catArray->{Model_Category::COLUMN_SEC_LABEL};
+         self::$_categoryParams = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
          //        načtení výchozí kategorie
          $defCatArr = self::getDefaultCategory();
-         if($defCatArr[CategoryModel::COLUMN_CAT_ID] == self::$_categoryId){
+         if($defCatArr[Model_Category::COLUMN_CAT_ID] == self::$_categoryId){
             self::$_categoryIsDefault = true;
          }
       }
@@ -167,7 +167,7 @@ class Category {
     * metoda načte výchozí kategorii z databáze
     */
    private static function _loadDefaultFromDb() {
-      $catModel = new CategoryModel();
+      $catModel = new Model_Category();
       $catArray = $catModel->getCategory();
       try {
          if(empty ($catArray)){
@@ -176,13 +176,13 @@ class Category {
       } catch (RangeException $e) {
          new CoreErrors($e);
       }
-      self::$_categoryLabel = $catArray->{CategoryModel::COLUMN_CAT_LABEL};
-      self::$_categoryId = $catArray->{CategoryModel::COLUMN_CAT_ID};
-      self::$_sectionId = $catArray->{CategoryModel::COLUMN_SEC_ID};
-      self::$_categoryLeftPanel = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
-      self::$_categoryRightPanel = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
-      self::$_sectionName = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
-      self::$_categoryParams = self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
+      self::$_categoryLabel = $catArray->{Model_Category::COLUMN_CAT_LABEL};
+      self::$_categoryId = $catArray->{Model_Category::COLUMN_CAT_ID};
+      self::$_sectionId = $catArray->{Model_Category::COLUMN_SEC_ID};
+      self::$_categoryLeftPanel = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
+      self::$_categoryRightPanel = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
+      self::$_sectionName = $catArray->{Model_Category::COLUMN_SEC_LABEL};
+      self::$_categoryParams = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
       self::$_categoryIsDefault = true;
    }
 
@@ -191,7 +191,7 @@ class Category {
     * @return array -- pole s prvky výchozí kategorie
     */
    public static function getDefaultCategory() {
-      $catModel = new CategoryModel();
+      $catModel = new Model_Category();
       try {
          $catArray = $catModel->getCategory();
          if(empty($catArray)){
@@ -202,13 +202,13 @@ class Category {
       }
       //		Pokud nebyla načtena žádná kategorie
       $catArr = array ();
-      $catArr[self::COLUMN_CAT_LABEL] = $catArray->{CategoryModel::COLUMN_CAT_LABEL};
-      $catArr[self::COLUMN_CAT_ID] = $catArray->{CategoryModel::COLUMN_CAT_ID};
-      $catArr[self::COLUMN_SEC_ID] = $catArray->{CategoryModel::COLUMN_SEC_ID};
-      $catArr[self::COLUMN_CAT_LPANEL] = $catArray->{CategoryModel::COLUMN_CAT_LPANEL};
-      $catArr[self::COLUMN_CAT_RPANEL] = $catArray->{CategoryModel::COLUMN_CAT_RPANEL};
-      $catArr[self::COLUMN_SEC_LABEL] = $catArray->{CategoryModel::COLUMN_SEC_LABEL};
-      $catArr[self::COLUMN_CAT_PARAMS] = self::parseParams($catArray->{CategoryModel::COLUMN_CAT_PARAMS});
+      $catArr[Model_Category::COLUMN_CAT_LABEL] = $catArray->{Model_Category::COLUMN_CAT_LABEL};
+      $catArr[Model_Category::COLUMN_CAT_ID] = $catArray->{Model_Category::COLUMN_CAT_ID};
+      $catArr[Model_Category::COLUMN_SEC_ID] = $catArray->{Model_Category::COLUMN_SEC_ID};
+      $catArr[Model_Category::COLUMN_CAT_LPANEL] = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
+      $catArr[Model_Category::COLUMN_CAT_RPANEL] = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
+      $catArr[Model_Category::COLUMN_SEC_LABEL] = $catArray->{Model_Category::COLUMN_SEC_LABEL};
+      $catArr[Model_Category::COLUMN_CAT_PARAMS] = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
       return $catArr;
    }
 

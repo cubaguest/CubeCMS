@@ -20,6 +20,10 @@ abstract class Panel {
     */
    private $_template = null;
 
+   /**
+    * Proměnná obsahuje objekt systému modulu
+    * @var ModuleSys
+    */
    private $_moduleSys = null;
 
    /**
@@ -31,37 +35,35 @@ abstract class Panel {
 
       //$action = null;
       // název třídy s akcí
-      $actionClassName = ucfirst($this->module()->getName()).'Action';
+      $actionClassName = ucfirst($this->module()->getName()).'_Action';
       //		Pokud ještě nebyla třída načtena
-      if(!class_exists($actionClassName,false)){
-         //			načtení souboru s akcemi modulu
-         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),1);
-         }
-         require '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+      //      if(!class_exists($actionClassName,false)){
+      //         //			načtení souboru s akcemi modulu
+      //         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
+      //            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),1);
+      //         }
+      //         require '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
+      //      }
+
+
+      //               var_dump($actions);flush();
+      if(class_exists($actionClassName)){
+         $this->sys()->setAction(new $actionClassName($this->sys()->module()));
+      } else {
+         $panelSys->setAction(new Action($this->module()->getName(), $panelSys->article()));
       }
 
-
-      $actions = new $actionClassName($this->sys()->module());
-      //               var_dump($actions);flush();
-      //               if(class_exists($actionClassName)){
-      $this->sys()->setAction($actions);
-
-      //               } else {
-      //                  $panelSys->setAction(new Action($panelSys->module()->getName(), $panelSys->article()));
-      //               }
-      
       //		Cesty
       $routes = null;
-      $routesClassName = ucfirst($this->module()->getName()).'Routes';
+      $routesClassName = ucfirst($this->module()->getName()).'_Routes';
       //		Pokud ještě nebyla třída načtena
-      if(!class_exists($routesClassName, false)){
-         //			načtení souboru s cestami (routes) modulu
-         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),2);
-         }
-         require '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
-      }
+      //      if(!class_exists($routesClassName, false)){
+      //         //			načtení souboru s cestami (routes) modulu
+      //         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
+      //            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),2);
+      //         }
+      //         require '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
+      //      }
       if(class_exists($routesClassName)){
          $this->sys()->setRoute(new $routesClassName($this->article()));
       } else {
@@ -78,14 +80,6 @@ abstract class Panel {
     * Metoda viewru panelu
     */
    abstract function panelView();
-
-   /**
-    * Metoda vrací objekt pro přístup k db
-    * @return DbInterface -- objekt databáze
-    */
-   //final public function getDb() {
-   //	return AppCore::getDbConnector();
-   //}
 
    /**
     * Metoda vrací systémový objekt modulu

@@ -1,10 +1,5 @@
 <?php
-class ArticlesController extends Controller {
-   /**
-    * Název parametru s počtem článků na stránce
-    */
-   const PARAM_NUM_ARTICLES_ON_PAGE = 'scroll';
-
+class Articles_Controller extends Controller {
    /**
     * Název parametru jestli články může editovat každy nebo pouze vlastník
     */
@@ -46,37 +41,6 @@ class ArticlesController extends Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-
-      //		Vytvoření modelu
-      $articleModel = $this->createModel("ArticlesListModel");
-      //		Scrolovátka
-      $scroll = new ScrollEplugin($this->sys());
-      $scroll->setCountRecordsOnPage($this->module()->getParam(self::PARAM_NUM_ARTICLES_ON_PAGE, 10));
-      $scroll->setCountAllRecords($articleModel->getCountArticles());
-//      var_dump($scroll);
-      //		Vybrání článků
-      $this->view()->articlesArray = $articleModel->getSelectedListArticles($scroll->getStartRecord(), $scroll->getCountRecords());
-      $this->view()->EPLscroll = $scroll;
-
-      //		Přidání linku pro editaci a jestli se dá editovat
-//      if(!empty ($articlesArray)){
-//         foreach ($articlesArray as $key => $article) {
-//            //			Link pro zobrazení
-//            $articlesArray[$key][self::ARTICLE_SHOW_LINK] = $this->link()
-//            ->article($article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
-//               $article[ArticleDetailModel::COLUMN_ARTICLE_ID]);
-//         }
-//      }
-
-      //		Přenos do viewru
-//      $this->container()->addEplugin('scroll',$scroll);
-
-      //		Link pro přidání
-//      if($this->getRights()->isWritable()){
-//         $this->container()->addLink('LINK_ADD_ARTICLE',$this->link()->action($this->getAction()->addArticle()));
-//      }
-      // předání dat
-//      $this->container()->addData('ARTICLE_LIST_ARRAY', $articlesArray);
    }
 
    public function showController(){

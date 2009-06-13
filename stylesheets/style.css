@@ -56,6 +56,10 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 	visibility: hidden;
 }
 
+.smallFont {
+   font-size: 80%;
+}
+
 #bodywrap {
 	min-width: 600px; /* slušné prohlížeče */
 	max-width: 1000px;
@@ -72,7 +76,7 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 }
 
 #footwrap { /*background-color: #c0c0c0;*/
-	text-align: center;
+	text-align: left;
 	background-color: white;
 }
 
@@ -87,9 +91,9 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 
 .column {
 	float: left;
-	padding-bottom: 20010px;
+	/*padding-bottom: 20000px;*/
 	/* trik z One True Layout pro srovnání výšky sloupců */
-	margin-bottom: -20000px; /* aby měly všechny sloupce stejnou výšku */
+	/*margin-bottom: -20000px; /* aby měly všechny sloupce stejnou výšku */
 }
 
 #col1wrap {
@@ -105,6 +109,7 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 	/*margin-left: 0px;
 	margin-right: 0px;*/
 	/*overflow: hidden;*/
+   position: relative;
 }
 
 .col1pad_plusleft{
@@ -144,6 +149,10 @@ h1 {
 	color: #007070;
 }
 
+h2 {
+   font-size: 12pt;
+}
+
 h3 a {
 	color: white;
 }
@@ -178,27 +187,33 @@ a:hover {
 }
 
 /* Hlášky */
-.error_message { /* text-align: center; */
-	background-color: #FFAEAE;
-	font-weight: 600;
-	padding: 5px;
+.errorMessage, .messages {
 	font-size: small;
-	/*width: 100%;*/ /*margin:0 auto;*/
-	/*margin-left: 5px;
-	margin-right: 5px;*/
+	padding: 5px;
+	/*font-weight: 600;*/
+}
+
+.errorMessage { /* text-align: center; */
+	background-color: #FFAEAE;
 	border: 2px solid #8B0306;
+}
+
+.errorMessage p.errorContent {
+   padding-left: 40px;
+   padding-bottom: 15px;
+   display:block;
+}
+
+.errorMessage img {
+   float:left;
 }
 
 .message { /* text-align: center; */
 	background-color: #9CCFFF;
-	font-weight: 600;
-	padding: 5px;
-	/*width: 700px;*/ /*margin:0 auto;*/
-	margin-left: 5px;
-	margin-right: 5px;
+	border: 2px solid #688AAA;
 }
 
-.error_message img, .message img {
+.errorMessage img, .message img {
 	/*float: left;*/
 	vertical-align: middle;
 }
@@ -238,14 +253,17 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 }
 
 
+.badItem {
+  background-color: #f08682;
+}
 
- /* ============ ODDELAT ============= */
+/* ODSTRANIT */
 .edit_button_image {
 	background: url(../images/buttons/b_edit.png) 0 0 no-repeat;
 	width: 20px;
 	height: 20px;
 	border: 0;
-	cursor: pointer; cursor: hand
+	cursor: pointer; cursor: hand;
 }
 
 .delete_button_image {
@@ -253,7 +271,7 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	width: 20px;
 	height: 20px;
 	border: 0;
-	cursor: pointer; cursor: hand
+	cursor: pointer; cursor: hand;
 }
 
 .add_button_image {
@@ -271,25 +289,59 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 .form_buttons_inline form {
 	display: inline;
 }
-.files_delete_form, .form_buttons_inline {
-	text-align: right;
-	margin-right: 10px;
-	margin-bottom: 10px;
+
+/* EOF ODSTRANIT */
+/* Panel s editací */
+.toolbox {
+   background: orange;
+   border: olive 1px solid;
+   position: absolute;
+   top: 5px;
+   right: 10px;
+   width: auto;
+   height: auto;
+   padding: 2px 2px 2px 2px;
+   background-repeat: no-repeat;
 }
 
-/* ========= POSEM ============ */
+.toolbox input {
+   background:none;
+   border:none;
+   color:gray;
+   cursor: pointer;
+   text-align:left;
+   padding: 0 0 0 16px;
+   background-repeat: no-repeat;
+}
 
-/* Panel s editací */
+.toolbox form input[type="hidden"] {
+   display:none;
+}
+
+.toolbox form input[type="image"] {
+   vertical-align:bottom;
+}
+
+.toolbox form input[type="submit"]:hover {
+   background:none;
+   background-repeat: no-repeat;
+   color: black;
+}
+
+
+
       .editbox {
         position: absolute;
         top: 7px;
         right: 5px;
         width: auto;
         height: 12px;
-        /*visibility: hidden;*/
         display: none;
-        /*padding-left: 30px;
-        padding-right: 30px;*/
+        z-index: 100;
+      }
+
+      .editboxrmargin {
+         right: 40px;
       }
 
       .editbox .contentForm, .editbox .contentForm form input, .editbox .contentForm form{
@@ -301,9 +353,13 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
       }
 
       .editbox .contentForm form input {
-        padding: 2px 2px 2px 0;
+        padding: 2px 1px 2px 1px;
         border-top: 1px solid black;
         border-bottom: 1px solid black;
+      }
+
+      .editbox .contentForm form input[type="hidden"] {
+        display:none;
       }
 
       .editbox .contentForm {
@@ -315,25 +371,25 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 
       .editbox>.upside {
         display: inline;
-        /*         background: transparent url("toolbar_back_left4.png") top left no-repeat; */
         background: transparent url("../images/toolbox/l_black.png") top left no-repeat;
-        /*height: 9px;*/
         margin:0;
         padding-left: 6px;
-        padding-top: 1px;
+        padding-top: 5px;
       }
       .editbox>.downside {
         display:inline;
         background: transparent url("../images/toolbox/r_black.png") top right no-repeat;
-        /*         background: transparent url("toolbar_back_right4.png") top right no-repeat; */
-        /*width: 9px;*/
-        /*margin:0;*/
         padding-left: 6px;
-        padding-top: 1px;
+        padding-top: 5px;
       }
 
 
 /* EOF Panel s editací */
+
+
+.files_delete_form {
+	text-align: right;
+}
 
 .button_back {
 	display: block;
@@ -483,11 +539,16 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 /* Styl pro vnitrek boxu */
 	/* obal text */
 .moduleBox {
-  position: relative;
+   position: relative;
 	border: 1px solid #0f6572;
-	width: 100%;
+	/*width: 100%;*/
 	margin-bottom: 10px;
 	background-color: white;
+   padding: 7px;
+}
+
+.moduleBox>div {
+   
 }
 
 	/* titulek obal */
@@ -607,6 +668,48 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	height: 0;
 }
 
+/* Jazykové taby */
+/* TABS content */
+      .ui-tabs-hide { display: none; }
+
+      .ui-tabs-selected { background-color: white; }
+
+      ul.langMenu {
+        margin-bottom:2px;
+        /*background-color: white;*/
+      }
+
+
+      ul.langMenu li {
+        display: inline;
+        border-width: 1px 1px 0 1px;
+        border-color: black;
+        border-style: solid;
+        padding: 3px;
+      }
+
+      ul.langMenu li a img {
+        padding-right: 3px;
+      }
+
+      .normal ul {
+        margin: 0;
+      }
+
+      
+      ul.ui-tabs-panel {
+        margin-bottom: 0px;
+        border-width: 1px;
+        border-color: black;
+        border-style: none;
+      }
+
+      .contentBox {
+        position: relative;
+      }
+/* EOF Jazykové taby */
+
+
 /* linky nad boxy */
 
 .border_top {
@@ -645,4 +748,14 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 .userFiles table, .userImages table {
 	width: 100%;
 	border: 1px solid #0f6572;
+}
+
+#uploadFileButton {
+   cursor: pointer;
+}
+
+/* Tabulkový obsah */
+.tabcontent {
+	border: 1px solid black;
+	padding: 5px;
 }

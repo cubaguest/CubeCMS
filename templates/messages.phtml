@@ -18,17 +18,18 @@ if(!$this->coreErrorsEmpty){ ?>
 <div class="errorMessage text">
    <img src="./images/icons/coreerror.png" alt="core error icon" />
    <? foreach ($this->coreErrors as $error) {?>
+   <p class="errorContent">
       <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
-      <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?>
+      <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?><br />
       <? if($this->debugMode){
          foreach ($error["trace"] as $err) {?>
-         <p class="errTrMargin">
             <?=$err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
             echo _("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;"._("řádek").": ".$err["line"];?>
-         </p>
-         <?}
-      }?>
-      <?}?>
+      <br />
+      <?}
+}?>
+   </p>
+   <?}?>
 </div>
 <? }?>
 
@@ -42,6 +43,6 @@ if(!empty ($this->moduleErrors)){ ?>
       } else{
          echo $error ."<br />";
       }
-     }?>
+   }?>
 </div>
 <? }?>

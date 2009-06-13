@@ -1,6 +1,5 @@
 <?php
-include_once './lib/panel.class.php';
-class NewsPanel extends Panel {
+class News_Panel extends Panel {
 	/**
 	 * Počet novinek v panelu
 	 * @var integer
@@ -19,8 +18,8 @@ class NewsPanel extends Panel {
 	public function panelView() {
       $this->template()->addTplFile("panel.phtml");
       $this->template()->addCssFile("style.css");
-      $newsM = $this->createModel("NewsListModel");
-      $this->template()->news = $newsM->getSelectedListNews(0, $this->module()->getParam(self::PARAM_NUMBER_OF_NEWS));
+      $newsM = new News_Model_List($this->sys());
+      $this->template()->news = $newsM->getSelectedListNews(0, $this->module()->getParam(self::PARAM_NUMBER_OF_NEWS,5));
 	}
 }
 ?>

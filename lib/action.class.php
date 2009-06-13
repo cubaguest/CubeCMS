@@ -13,11 +13,6 @@
 
 class Action {
 	/**
-	 * Název prvku s parametrem v url
-	 */
-	//const ACTION_URL_PARAM = 'url';
-
-	/**
 	 * Název prvku s typem akce pro kontroler
 	 */
 	const ACTION_TYPE_PARAM = 'action';

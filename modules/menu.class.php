@@ -4,20 +4,20 @@
  * v šabloně
  */
 
-class Menu extends MainMenu {
+class Menu extends Menu_Main {
    public function createMenu() {
       $categoryArray = array();
       $sectionArray = array();
       $oldIdSection = null;
 
       foreach ($this->menuArray as $index => $item) {
-         $item["url"]=$this->getLink()->category($item[Category::COLUMN_CAT_LABEL],
-            $item[Category::COLUMN_CAT_ID]);
-         if($item["id_section"] != $oldIdSection){
-            $oldIdSection = $item["id_section"];
+         $item["url"]=$this->getLink()->category($item[Model_Category::COLUMN_CAT_LABEL],
+            $item[Model_Category::COLUMN_CAT_ID]);
+         if($item[Model_Category::COLUMN_SEC_ID] != $oldIdSection){
+            $oldIdSection = $item[Model_Category::COLUMN_SEC_ID];
             $categoryArray[$oldIdSection] = array();
             array_push($categoryArray[$oldIdSection], $item);
-            $sectionArray[$item["id_section"]] = $item;
+            $sectionArray[$item[Model_Category::COLUMN_SEC_ID]] = $item;
          } else {
             array_push($categoryArray[$oldIdSection], $item);
          }
