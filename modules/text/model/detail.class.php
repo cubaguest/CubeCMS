@@ -75,7 +75,7 @@ class Text_Model_Detail extends Model_Db {
       } else {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
             self::COLUMN_CHANGED_TIME, time(),
-            self::COLUMN_ID_ITEM, $this->getModule()->getId());
+            self::COLUMN_ID_ITEM, $this->module()->getId());
          $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
                ->colums(array_keys($textArr))
                ->values(array_values($textArr));

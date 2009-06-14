@@ -76,9 +76,23 @@ class Action {
       return $this->module;
 	}
 
-   final public function _m($message) {
+   /**
+    * Metoda přeloží zadaný text
+    * @param string $message -- text k přeložení
+    * @return string -- přeložený text
+    */
+   final public function _($message) {
       $loc = new Locale($this->module()->getName());
       return $loc->_m($message);
+   }
+
+    /**
+    * Metoda přeloží zadaný text alias pro _()
+    * @param string $message -- text k přeložení
+    * @return string -- přeložený text
+    */
+   final public function _m($message) {
+      return $this->_($message);
    }
 
 	/**

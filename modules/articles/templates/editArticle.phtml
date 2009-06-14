@@ -3,7 +3,7 @@
       <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
       <li>
          <a href="#articleLang<?=$key?>" class="selectedd">
-            <img src="images/lang/<?$key?>.png" title="<?=$lang?>" />
+            <img src="images/lang/<?$key?>.png" alt="<?=$lang?>" />
             <?=$lang?>
          </a>
       </li>
@@ -35,7 +35,7 @@
       
    </div>
    <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()));?>
-   <script>
+   <script type="text/javascript">
       $(document).ready(function(){
          $("#editArticleForm").tabs();
       });

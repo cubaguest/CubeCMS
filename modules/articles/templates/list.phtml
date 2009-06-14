@@ -1,32 +1,33 @@
 <div class="articlesList">
-   <? foreach ($this->articlesArray as $article) {?>
+   <?if(!empty ($thic->articlesArray)) {
+      foreach ($this->articlesArray as $article) {?>
    <div>
       <h2><a href="<?=$this->l()->article($article['label'], $article['id_article'])?>"
              title="<?=$article['label']?>"><?=$article['label']?>&nbsp;
-          <span class="smallFont"><?=strftime("%x %X", $article['add_time'])?> - <?=$article['username']?></span>
-          </a>
+            <span class="smallFont"><?=strftime("%x %X", $article['add_time'])?> - <?=$article['username']?></span>
+         </a>
       </h2>
       <div class="imageBox">
-         <?
-//         var_dump($article);exit;
-         if(isset($article['title_image'])){?>
-            <?=imageTag($article['title_image'], "article title image", 80, 80);?>
-         <?} else {?>
-            <img src="images/icons/article_icon.png" alt="article title image" height="80" />
-         <?}?>
+               <?
+               //         var_dump($article);exit;
+               if(isset($article['title_image'])) {?>
+                  <?=imageTag($article['title_image'], "article title image", 80, 80);?>
+               <?} else {?>
+         <img src="images/icons/article_icon.png" alt="article title image" height="80" />
+               <?}?>
       </div>
-      <?//print (xhtml_cut(remove_tag('img', $article['text']), 650));?>
-      <?print truncate(strip_tags($article['text']), 640);?>
+            <?//print (xhtml_cut(remove_tag('img', $article['text']), 650));?>
+            <?print truncate(strip_tags($article['text']), 640);?>
       <p style="text-align:right;">
          <a href="<?=$this->l()->article($article['label'], $article['id_article'])?>"
-         title="<?=$article['label']?>">[&nbsp;<?=$this->_m("více")?>&nbsp;]</a></p>
+            title="<?=$article['label']?>">[&nbsp;<?=$this->_m("více")?>&nbsp;]</a></p>
       <hr class="reseter" />
    </div>
-   <?}?>
+      <?}}?>
    <br />
-<?if($this->sys()->rights()->isWritable()){
-   $this->includeTplObj($this->toolbox);
-}?>
+   <?if($this->sys()->rights()->isWritable()) {
+      $this->includeTplObj($this->toolbox);
+   }?>
 </div>
 <?
 $this->includeTplObj($this->EPLscroll);

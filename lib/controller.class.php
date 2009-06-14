@@ -385,6 +385,15 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @param string $message -- řetězec k přeložení
     * @return string -- přeložený řetězec
     */
+   final public function _($message) {
+      return $this->sys()->locale()->_m($message);
+   }
+
+   /**
+    * Metoda přeloží zadaný řetězec alias pro _()
+    * @param string $message -- řetězec k přeložení
+    * @return string -- přeložený řetězec
+    */
    final public function _m($message) {
       return $this->sys()->locale()->_m($message);
    }
