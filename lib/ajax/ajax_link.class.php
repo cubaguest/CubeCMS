@@ -8,7 +8,7 @@
  *						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro tvorbu ajaxových odkazů
  */
-class AjaxLink {
+class Ajax_Link {
    /**
     * Prefix odkazů
     */

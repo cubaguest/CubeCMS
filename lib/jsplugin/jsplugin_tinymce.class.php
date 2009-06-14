@@ -169,7 +169,6 @@ class JsPlugin_TinyMce extends JsPlugin {
 
 	protected function initJsPlugin() {
 //		Název pluginu
-		$this->setJsPluginName("TinyMCE");
 		$this->defaultParams['document_base_url'] = Links::getMainWebDir();
 	}
 	

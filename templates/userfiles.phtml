@@ -52,9 +52,9 @@
                   if(ufile.type == 'image'){
                      tbl+="<a href=\""+ufile.link_show+"\" rel=\"lightbox\" title=\""+ufile.file+"\"><img src=\""+ufile.link_small+"\" alt=\""+ufile.file+"\" height=\"60\" /></a>"
                   } else if(ufile.type == 'flash'){
-                     tbl+="<img src=\"images/icons/flashfile.png\" alt=\"file "+ufile.file+"\" height=\"60\" />";
+                     tbl+="<img src=\"images/icons/flashfile.png\" alt=\"file "+ufile.file+"\" width=\"80\" />";
                   } else {
-                     tbl+="<img src=\"images/icons/textfile.png\" alt=\"file "+ufile.file+"\" height=\"60\" />";
+                     tbl+="<img src=\"images/icons/textfile.png\" alt=\"file "+ufile.file+"\" width=\"80\" />";
                   }
                   tbl+="</td><td>"+ufile.file
                      +"</td><td>"+ Math.round(ufile.size/1024 * 100)/100 + "KB";
@@ -111,12 +111,12 @@
             <td rowspan="3">
                <?if($file['type'] == 'image'){?>
                <a href="<?=$file['link_show']?>" rel="lightbox" title="<?=$file['file']?>" rel="lightbox">
-                  <img src="<?=$file['link_small']?>" alt="file <?=$file['file']?>" height="60" />
+                  <img src="<?=$file['link_small']?>" alt="file <?=$file['file']?>" width="80" />
                </a>
                <?} else if($file['type'] == 'flash'){?>
-                  <img src="images/icons/flashfile.png" alt="file <?=$file['file']?>" height="60" />
+                  <img src="images/icons/flashfile.png" alt="file <?=$file['file']?>" width="80" />
                <?} else {?>
-                  <img src="images/icons/textfile.png" alt="file <?=$file['file']?>" height="60" />
+                  <img src="images/icons/textfile.png" alt="file <?=$file['file']?>" width="80" />
                <?}?>
             </td>
             <td><?=$file['file']?></td>

@@ -180,7 +180,7 @@ class Eplugin_UserFiles extends Eplugin {
          $array = $this->getImagesList($file->getParam(self::PARAM_URL_ID_ITEM),$idArticle);
          switch ($file->getParam(self::PARAM_URL_LIST_TYPE)) {
             case self::FILE_LIST_FORMAT_TINYMCE:
-               TinyMce::sendListImages($array);
+               JsPlugin_TinyMce::sendListImages($array);
                break;
             default:
                break;
@@ -195,7 +195,7 @@ class Eplugin_UserFiles extends Eplugin {
          $array = $this->getLinksList($file->getParam(self::PARAM_URL_ID_ITEM),$idArticle);
          switch ($file->getParam(self::PARAM_URL_LIST_TYPE)) {
             case self::FILE_LIST_FORMAT_TINYMCE:
-               TinyMce::sendListLinks($array);
+               JsPlugin_TinyMce::sendListLinks($array);
                break;
             default:
                break;
@@ -487,8 +487,8 @@ class Eplugin_UserFiles extends Eplugin {
             $file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/');
 
             //zjištění typu souboru (obrázek, soubor, flash)
-            $image = new ImageFile($file);
-            $flash = new FlashFile($file);
+            $image = new File_Image($file);
+            $flash = new File_Flash($file);
 
             $width = 0;
             $height = 0;
@@ -587,7 +587,7 @@ class Eplugin_UserFiles extends Eplugin {
 
       $this->template()->filesArray = $this->filesArray;
 
-      $ajaxLink = new AjaxLink($this);
+      $ajaxLink = new Ajax_Link($this);
 
       $this->template()->ajaxUserfileFile = $ajaxLink->getFile();
       $this->template()->ajaxAddFileParams = $ajaxLink->getParams();

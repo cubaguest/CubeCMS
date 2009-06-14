@@ -44,59 +44,40 @@ class Articles_Controller extends Controller {
    }
 
    public function showController(){
-//      $articleDetail = new ArticleDetailModel();
-//      $articleArr = $articleDetail->getArticleDetailSelLang($this->getArticle()->getArticle());
+      $this->checkReadableRights();
 
-      //      obsluha Mazání novinky
-//      if(($this->getRights()->isWritable() AND $articleDetail->getIdUser()
-//            == $this->getRights()->getAuth()->getUserId()) OR
-//         $this->getRights()->isControll()){
-//
-//      }
+      $articleDetail = new Articles_Model_Detail($this->sys());
+      $this->view()->article = $articleDetail->getArticleDetailSelLang($this->sys()->article()->getArticle());
 
-//      $this->container()->addData('ARTICLE', $articleArr);
-//      $this->container()->addData('ARTICLE_LABEL', $articleArr[ArticleDetailModel::COLUMN_ARTICLE_LABEL]);
-
-      if($this->getRights()->isControll() OR
-         ($this->getRights()->isWritable() AND $this->module()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
-         ($this->getRights()->isWritable() AND $this->module()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == true AND
-            $articleDetail->getIdUser() == $this->getRights()->getAuth()->getUserId())){
+      if($this->rights()->isControll() OR
+         ($this->rights()->isWritable() AND $this->module()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == false) OR
+         ($this->rights()->isWritable() AND $this->module()->getParam(self::PARAM_EDIT_ONLY_OWNER, true) == true AND
+            $articleDetail->getIdUser() == $this->rights()->getAuth()->getUserId())){
 
          $form = new Form(self::FORM_PREFIX);
          $form->crInputHidden(self::FORM_INPUT_ID, true, 'is_numeric')
          ->crSubmit(self::FORM_BUTTON_DELETE);
 
          if($form->checkForm()){
-            $files = new UserFilesEplugin($this->getRights());
-            $files->deleteAllFiles($articleArr[ArticleDetailModel::COLUMN_ARTICLE_ID]);
-            $images = new UserImagesEplugin($this->getRights());
-            $images->deleteAllImages($articleArr[ArticleDetailModel::COLUMN_ARTICLE_ID]);
+            $files = new Eplugin_UserFiles($this->sys());
+            $files->deleteAllFiles($this->view()->article[Articles_Model_Detail::COLUMN_ARTICLE_ID]);
             if(!$articleDetail->deleteArticle($form->getValue(self::FORM_INPUT_ID))){
                throw new UnexpectedValueException($this->_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
             $this->infoMsg()->addMessage($this->_m('Článek byl smazán'));
             $this->link()->article()->action()->rmParam()->reload();
          }
-
-//         $this->container()->addLink('EDIT_LINK', $this->link()->action($this->getAction()->editArticle()));
-//         $this->container()->addData('EDITABLE', true);
       }
-
-//      if($this->getRights()->isWritable()){
-//         $this->container()->addLink('ADD_LINK',$this->link()->action($this->getAction()->addArticle())->article());
-//         $this->container()->addData('WRITABLE', true);
-//      }
-//      $this->container()->addLink('BUTTON_BACK', $this->link()->article()->action());
    }
 
    /**
    * Kontroler pro přidání novinky
    */
-   public function addarticleController(){
+   public function addArticleController(){
       $this->checkWritebleRights();
       if($this->module()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-         $files = new UserFilesEplugin($this->sys());
+         $files = new Eplugin_UserFiles($this->sys());
          $files->setIdArticle($this->rights()->getAuth()->getUserId()*(-1));
          $this->view()->EPLfiles = $files;
       }
@@ -110,7 +91,7 @@ class Articles_Controller extends Controller {
 
       //        Pokud byl odeslán formulář
       if($articleForm->checkForm()){
-         $articleDetail = $this->createModel("ArticleDetailModel");
+         $articleDetail = new Articles_Model_Detail($this->sys());
          if(!$articleDetail->saveNewArticle($articleForm->getValue(self::FORM_INPUT_LABEL),
                $articleForm->getValue(self::FORM_INPUT_TEXT),
                $this->rights()->getAuth()->getUserId())){
@@ -139,28 +120,15 @@ class Articles_Controller extends Controller {
       ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
       ->crSubmit(self::FORM_BUTTON_SEND);
 
-      //      Načtení hodnot prvků
-//      $articleModel = new ArticleDetailModel($this->sys());
-//      $articleModel->getArticleDetailAllLangs($this->getArticle());
-      //      Nastavení hodnot prvků
-//      $ardicleEditForm->setValue(self::FORM_INPUT_LABEL, $articleModel->getLabelsLangs());
-//      $ardicleEditForm->setValue(self::FORM_INPUT_TEXT, $articleModel->getTextsLangs());
-//      $label = $articleModel->getLabelsLangs();
-      
-//      $this->container()->addData('ARTICLE_NAME', $label[Locale::getLang()]);
-
       if($this->module()->getParam(self::PARAM_FILES, true)){
          // Uživatelské soubory
-//         $files = new UserFilesEplugin($this->getRights());
-//         $files->setIdArticle($articleModel->getId());
-//         $this->container()->addEplugin('files', $files);
-         $files = new UserFilesEplugin($this->sys());
+         $files = new Eplugin_UserFiles($this->sys());
          $this->view()->EPLfiles = $files;
       }
 
       //        Pokud byl odeslán formulář
       if($ardicleEditForm->checkForm()){
-         $articleModel = new ArticleDetailModel($this->sys());
+         $articleModel = new Articles_Model_Detail($this->sys());
          if(!$articleModel->saveEditArticle($ardicleEditForm->getValue(self::FORM_INPUT_LABEL),
                $ardicleEditForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
             throw new UnexpectedValueException($this->_m('Článek se nepodařilo uložit, chyba při ukládání.'), 2);

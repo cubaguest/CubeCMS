@@ -10,7 +10,7 @@
  * @abstract 		Třída pro práci s Flash objekty
  */
 
-class FlashFile extends File {
+class File_Flash extends File {
    /**
     * Proměná obsahuje jestli je soubor Flash
     * @var boolean

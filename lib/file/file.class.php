@@ -33,7 +33,7 @@ class File {
 
    /**
     * Adresář souboru
-    * @var Dir
+    * @var File_Dir
     */
    private $fileDir = null;
 
@@ -129,7 +129,7 @@ class File {
    function __construct($file, $dir = null, $inputFile = null, $mimeType = null, $size = null){
       // Pokud je vložen objekt File
       if($file instanceof File){
-         $this->fileDir = new Dir($file->getFileDir());
+         $this->fileDir = new File_Dir($file->getFileDir());
          $this->fileNameOutput = $file->getName();
          $this->fileNameInput = $file->getNameInput();
          $this->fileMimeType = $file->getMimeType();
@@ -141,7 +141,7 @@ class File {
             $arr = $this->parsePathFile($inputFile);
             if($arr != false){
                $this->fileNameInput = $arr[2];
-               $this->fileDir = new Dir($arr[1]);
+               $this->fileDir = new File_Dir($arr[1]);
             }
             $this->fileNameOutput = $file;
          }
@@ -153,12 +153,12 @@ class File {
                if($arr != false){
                   $this->fileNameOutput = $arr[2];
                   $this->fileNameInput = $arr[2];
-                  $this->fileDir = new Dir($arr[1]);
+                  $this->fileDir = new File_Dir($arr[1]);
                }
             } else {
                $this->fileNameOutput = $file;
                $this->fileNameInput = $file;
-               $this->fileDir = new Dir($dir);
+               $this->fileDir = new File_Dir($dir);
             }
          }
          $this->fileMimeTypeEntered = $mimeType;
@@ -274,7 +274,7 @@ class File {
     */
    public function copy($dstDir, $fileName = null) {
       // Kontrola adresáře
-      $dirObj = new Dir();
+      $dirObj = new File_Dir();
       $dirObj->checkDir($dstDir);
       unset ($dirObj);
 

@@ -30,7 +30,7 @@ class Ajax {
     * @param string $fileParams -- řetězec parametrů předané scriptu
     */
    public function  __construct($fileParams) {
-      $this->action = AjaxLink::AJAX_DEFAULT_ACTION;
+      $this->action = Ajax_Link::AJAX_DEFAULT_ACTION;
       // parametry přenesené přes GET
       if(!empty ($fileParams)){
          $params = explode('&', $fileParams);
@@ -40,16 +40,16 @@ class Ajax {
             $par[$p[0]] = rawurldecode($p[1]);
          }
 
-         if(isset ($par[AjaxLink::AJAX_ACTION_INDEX])){
-            $this->action = $par[AjaxLink::AJAX_ACTION_INDEX];
-            unset ($par[AjaxLink::AJAX_ACTION_INDEX]);
+         if(isset ($par[Ajax_Link::AJAX_ACTION_INDEX])){
+            $this->action = $par[Ajax_Link::AJAX_ACTION_INDEX];
+            unset ($par[Ajax_Link::AJAX_ACTION_INDEX]);
          }
          $this->paramsArray = $par;
       }
       //      Pokud je odesláno metodou post
       if(!empty ($_POST)){
-         if(isset ($_POST[AjaxLink::AJAX_ACTION_INDEX])){
-            $this->action = addslashes($_POST[AjaxLink::AJAX_ACTION_INDEX]);
+         if(isset ($_POST[Ajax_Link::AJAX_ACTION_INDEX])){
+            $this->action = addslashes($_POST[Ajax_Link::AJAX_ACTION_INDEX]);
          }
       }
    }

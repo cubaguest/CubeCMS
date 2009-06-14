@@ -13,8 +13,6 @@
 
 class JsPlugin_LightBox extends JsPlugin {
 	protected function initJsPlugin() {
-//		Název pluginu
-		$this->setJsPluginName("LightBox");
 	}
 	
 	protected function initFiles() {

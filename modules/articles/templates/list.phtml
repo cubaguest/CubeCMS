@@ -10,14 +10,13 @@
          <?
 //         var_dump($article);exit;
          if(isset($article['title_image'])){?>
-         <img src="<?=$article['title_image']?>" alt="article title image" height="80"/>
+            <?=imageTag($article['title_image'], "article title image", 80, 80);?>
          <?} else {?>
-         <img src="images/icons/article_icon.png" alt="article title image" height="80" />
+            <img src="images/icons/article_icon.png" alt="article title image" height="80" />
          <?}?>
       </div>
-      <?print (xhtml_cut(remove_tag('img', $article['text']), 650));?>
-
-      {$article.text|protect_html|truncate:650}
+      <?//print (xhtml_cut(remove_tag('img', $article['text']), 650));?>
+      <?print truncate(strip_tags($article['text']), 640);?>
       <p style="text-align:right;">
          <a href="<?=$this->l()->article($article['label'], $article['id_article'])?>"
          title="<?=$article['label']?>">[&nbsp;<?=$this->_m("více")?>&nbsp;]</a></p>

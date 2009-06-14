@@ -46,7 +46,7 @@ class Text_Controller extends Controller {
 
       //        Pokud byl odeslán formulář
       if($form->checkForm()){
-         $text = Text_Model_Detail($this->sys());
+         $text = new Text_Model_Detail($this->sys());
          if(!$text->saveEditText($form->getValue(self::FORM_TEXT))){
             throw new UnexpectedValueException($this->_m('Text se nepodařilo uložit'));
          }

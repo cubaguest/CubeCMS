@@ -1,0 +1,7 @@
+<div>
+   <h2>
+      <a href="<?=$this->l()->article($this->new['label'], $this->new['id_new'])?>" title="<?=$this->new['label']?>"><?=$this->new['label']?></a>
+      <span class="smallFont"><?=strftime("%x %X", $this->new['time'])?> - <?=$this->new['username']?></span>
+   </h2>
+   <?=$this->new['text'];?>
+</div>

@@ -107,7 +107,7 @@ class Eplugin {
       $link = new Links($clear, $onlyWebRoot);
       $cat = AppCore::getSellectedCategory();
       if($cat != false){
-         $link->category($cat[Category::COLUMN_CAT_LABEL], $cat[Category::COLUMN_CAT_ID]);
+         $link->category($cat[Model_Category::COLUMN_CAT_LABEL], $cat[Model_Category::COLUMN_CAT_ID]);
       }
       return $link;
    }
@@ -181,8 +181,9 @@ class Eplugin {
     * @return string -- název epluginu
     */
    public final function getEpluginName() {
-      $name = strtolower(get_class($this));
-      return str_ireplace(self::PARAMS_EPLUGIN_FILE_PREFIX, '', $name);
+      return strtolower(get_class($this));
+//      $name = strtolower(get_class($this));
+//      return str_ireplace(self::PARAMS_EPLUGIN_FILE_PREFIX, '', $name);
    }
 
    /**
@@ -194,76 +195,25 @@ class Eplugin {
    }
 
    /**
-    * Metoda vrací objekt šablony !!!(interní)
-    * @return Template -- objekt šablony
-    */
-//   final public function _getTemplate(){
-//      $this->view();
-//      return $this->template();
-//   }
-
-   /**
-    * Metoda zařadí proměné epluginu do šablony
-    * Je volána z viewru
-    *
-    * @param Template -- objekt šablony
-    */
-   //   public function assignToTpl(Template $template)	{
-   //      //		Přiřazení proměnných do pole
-   //      $this->assignTpl();
-   //      //		Vložení proměných do šablony
-   //      foreach ($this->_tplVarsArray as $var => $value) {
-   //         $template->addVar($var, $value);
-   //      }
-   //      //		Vložení JSPluginů
-   //      foreach ($this->_tplJSPluginsArray as $jsPlugin) {
-   //         $template->addJsPlugin($jsPlugin);
-   //      }
-   //   }
-
-   /**
-    * Metoda obstarává přiřazení proměných do šablony
-    */
-   //   protected function assignTpl(){}
-
-   /**
-    * Metoda pro asociování proměných do šablony
-    *
-    * @param string -- název proměnné
-    * @param mixed -- hodnota proměnné
-    */
-   //   final protected function toTpl($tplValueName, $value){
-   //      $this->_tplVarsArray[$tplValueName] = $value;
-   //   }
-
-   /**
-    * Metoda přidává zadaný objekt JSpluginu do šablony
-    * @param JSPlugin -- objekt JSPluginu
-    */
-   //   final protected function toTplJSPlugin($jsPlugin) {
-   //      array_push($this->_tplJSPluginsArray, $jsPlugin);
-   //   }
-
-   /**
     * Metoda vrací odkaz na soubor epluginu
     * //TODO možná implementovat vracení odkazu na EPlugin file (./epluginuserimages.js)
     */
    public function getFileLink($file = null, $params = null) {
       if($file == null) {
-         $file = '.'.URL_SEPARATOR.self::PARAMS_EPLUGIN_FILE_PREFIX.$this->getEpluginName()
+         $file = '.'.URL_SEPARATOR.$this->getEpluginName()
          .URL_SEPARATOR.$this->getEpluginName().'js';
          if($params != null AND is_array($params)) {
             $param = http_build_query($params);
             $file.='?'.$param;
          }
       } else if(is_string($file)) {
-         $file = '.'.URL_SEPARATOR.self::PARAMS_EPLUGIN_FILE_PREFIX.$this->getEpluginName().URL_SEPARATOR.$file;
+         $file = '.'.URL_SEPARATOR.$this->getEpluginName().URL_SEPARATOR.$file;
          if($params != null AND is_array($params)) {
             $param = http_build_query($params);
             $file.='?'.$param;
          }
-      } else if($file instanceof JsFile){
-         $file = '.'.URL_SEPARATOR.self::PARAMS_EPLUGIN_FILE_PREFIX.$this->getEpluginName().URL_SEPARATOR.$file;
+      } else if($file instanceof JsPlugin_JsFile){
+         $file = '.'.URL_SEPARATOR.$this->getEpluginName().URL_SEPARATOR.$file;
       }
       return $file;
    }

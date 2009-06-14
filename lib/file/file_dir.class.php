@@ -10,7 +10,7 @@
  * @abstract		Třída pro práci s adresáři
  * @todo -- refaktoring, tak aby to byl objekt plnohodnotný
  */
-class Dir {
+class File_Dir {
    /**
     * Adresář a cesta k němu
     * @var string
@@ -23,7 +23,7 @@ class Dir {
     */
    public function __construct($dirName = null) {
       // kontrola správnosti adresáře
-      if($dirName instanceof Dir){
+      if($dirName instanceof File_Dir){
          $this->dir = (string)$dirName;
       } else {
          $this->dir = $this->checkDirPath($dirName);

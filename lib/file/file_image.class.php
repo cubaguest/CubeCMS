@@ -11,7 +11,7 @@
  * @abstract 		Třída pro práci s obrázky
  */
 
-class ImageFile extends File {
+class File_Image extends File {
    /**
     * Proměná obsahuje jestli je soubor obrázek
     * @var boolean
@@ -182,7 +182,7 @@ class ImageFile extends File {
          if($imageType == null){
             $imageType = $this->imageType;
          }
-         $saved = $this->saveNewImage($newImage, $imageType, new Dir($dstDir), $newName);
+         $saved = $this->saveNewImage($newImage, $imageType, new File_Dir($dstDir), $newName);
          imagedestroy($newImage);
       }
       return $saved;
@@ -303,7 +303,7 @@ class ImageFile extends File {
     *
     * @return boolean -- true pokud se obrázek podařilo uložit
     */
-      private function saveNewImage($newImage, $type, Dir $dstDir, $fileName) {
+      private function saveNewImage($newImage, $type, File_Dir $dstDir, $fileName) {
          if($dstDir->checkDir()){
             switch ($type) {
                case IMAGETYPE_GIF:

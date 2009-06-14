@@ -252,6 +252,9 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	font-family: "Tahoma", "Arial", sans-serif;
 }
 
+.textarea_tinymce {
+   width: 100%;
+}
 
 .badItem {
   background-color: #f08682;

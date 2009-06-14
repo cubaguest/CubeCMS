@@ -15,9 +15,8 @@
 
 class JsPlugin_JQuery extends JsPlugin {
 	protected function initJsPlugin() {
-//		Název pluginu
-		$this->setJsPluginName("jQuery");
 	}
+   
 	protected function initFiles() {
 //		Přidání js soubrů pluginu
 		$this->addJsFile(new JsPlugin_JsFile("jquery-1.3.2.min.js"));

@@ -223,6 +223,7 @@ class Links {
       if($clear){
          $this->clear();
       }
+
    }
 
    /*

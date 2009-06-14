@@ -28,7 +28,7 @@
          <input name="article_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
          <?$this->includeTpl("help.phtml", true, array('file' => 'edit', 'module' => 'articles'));?>
          <?if($this->edit){?>
-            <input name="article_id" type="hidden" value="" />
+            <input name="article_id" type="hidden" value="<?=$this->article['id_article']?>" />
          <?}?>
 
       </form>

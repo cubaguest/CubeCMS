@@ -332,13 +332,13 @@ class UrlRequest {
       $regexResult = array();
       switch (self::$supportedServicesType) {
          case self::SUPPORTSERVICES_EPLUGIN_NAME:
-            ereg('^eplugin([^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
+            ereg('^(eplugin[^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
             $name = $regexResult[1];
             $file = $regexResult[2];
             $params = $regexResult[3];
             break;
          case self::SUPPORTSERVICES_JSPLUGIN_NAME:
-            ereg('^jsplugin([^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
+            ereg('^(jsplugin[^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
             $name = $regexResult[1];
             $file = $regexResult[2];
             if(isset ($regexResult[3])){

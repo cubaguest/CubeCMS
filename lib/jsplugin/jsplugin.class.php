@@ -82,7 +82,8 @@ abstract class JsPlugin {
 	 * Konstruktor třídy
 	 */
 	final public function __construct(){
-		$this->initJsPlugin();
+      $this->jsPluginName = get_class($this);
+      $this->initJsPlugin();
       // Pokud je zpracováván virtuální soubor JsPluginu
       if(UrlRequest::isSupportedServices()){
          $file = new JsPlugin_JsFile(rawurldecode(UrlRequest::getSupportedServicesFile()), true);
@@ -92,6 +93,7 @@ abstract class JsPlugin {
 		} else {
 			$this->initFiles();
 		}
+
 	}
 	
 	/**
@@ -235,18 +237,19 @@ abstract class JsPlugin {
 	 * Metoda nastaví název js pluginu -- je totžný s názvem adresáře (case insensitive)
 	 * @param string -- název JsPluginu
 	 */
-	final protected function setJsPluginName($pluginName){
-		$this->jsPluginName = $pluginName;
-	}
+//	final protected function setJsPluginName($pluginName){
+//		$this->jsPluginName = $pluginName;
+//	}
 	
 	/**
 	 * Metoda vrací název adresáře pluginu
 	 * @return string -- název adresáře
 	 */
 	final public function getDir(){
-      $dir = '.'.URL_SEPARATOR.self::JSPLUGINS_BASE_DIR.URL_SEPARATOR
-				.strtolower($this->jsPluginName).URL_SEPARATOR;
-		return $dir;
+      //odstranění přívlastku JsPlugin
+      $jsDir = str_ireplace(__CLASS__.'_', '', $this->jsPluginName);
+      return '.'.URL_SEPARATOR.self::JSPLUGINS_BASE_DIR.URL_SEPARATOR
+				.strtolower($jsDir).URL_SEPARATOR;
 	}
 
    /**
@@ -256,7 +259,8 @@ abstract class JsPlugin {
     * @return string -- virtuální adresář se souborem
     */
    final public function getVirtualDir(){
-      $dir = '.'.URL_SEPARATOR.self::VIRTUAL_DIR_PREFIX.strtolower($this->jsPluginName).URL_SEPARATOR;
+//      $dir = '.'.URL_SEPARATOR.self::VIRTUAL_DIR_PREFIX.strtolower($this->jsPluginName).URL_SEPARATOR;
+      $dir = '.'.URL_SEPARATOR.strtolower($this->jsPluginName).URL_SEPARATOR;
 		return $dir;
    }
 	

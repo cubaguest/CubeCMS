@@ -889,8 +889,7 @@ class AppCore {
             }
             //	Vytvoření objektu pro přístup k právům modulu
             $sysModule->setRights(new Rights($userRights));
-            try {
-               // načtení souboru s akcemi modulu
+              // načtení souboru s akcemi modulu
                //				Vytvoření objektu akce
                $actionClassName = ucfirst($sysModule->module()->getName()).'_Action';
 //               if(!class_exists($actionClassName, false)){
@@ -943,6 +942,8 @@ class AppCore {
 //                  . $sysModule->module()->getName() . DIRECTORY_SEPARATOR . 'view.class.php';
 
                //			Vytvoření objektu kontroleru
+            try {
+//                throw new Exception("pokus",21);
                $controllerClassName = ucfirst($sysModule->module()->getName()).'_Controller';
                if(!class_exists($controllerClassName)){
                   throw new BadClassException(_("Nepodařilo se vytvořit objekt controleru modulu ")
@@ -959,8 +960,9 @@ class AppCore {
                //	Příprava a nastavení použití překladu
                //               Locale::bindTextDomain($sysModule->module()->getName());
                //					Spuštění kontroleru
+            
                if(method_exists($controller, $requestControllerName)){
-                  $ctrlResult = $controller->$requestControllerName();
+                  $ctrlResult = $controller->{$requestControllerName}();
                } else {
                   if(!method_exists($controller, strtolower(self::MODULE_MAIN_CONTROLLER_PREFIX)
                         .self::MODULE_CONTROLLER_SUFIX)){
@@ -994,22 +996,26 @@ class AppCore {
                }
                //	Uložení šablony a proměných do hlavní šablony
                array_push($modulesTemplates, $controller->_getTemplateObj());
-               unset($controller);
-            } catch (ModuleException $e) {
-               new CoreErrors($e);
-            } catch (BadClassException $e){
-               new CoreErrors($e);
-            } catch (BadFileException $e){
-               new CoreErrors($e);
-            } catch (BadMethodCallException $e){
-               new CoreErrors($e);
-            } catch (CoreException $e){
-               new CoreErrors($e);
-            } catch (Exception $e){
-               new CoreErrors($e);
+               //unset($controller);
+
+            }
+//            catch (ModuleException $e) {
+//               new CoreErrors($e);
+//            } catch (BadClassException $e){
+//               new CoreErrors($e);
+//            } catch (BadFileException $e){
+//               new CoreErrors($e);
+//            } catch (BadMethodCallException $e){
+//               new CoreErrors($e);
+//            } catch (CoreException $e){
+//               new CoreErrors($e);
+//            }
+            catch (Exception $e){
+               echo $e;flush();
+               //new CoreErrors($e);
             }
             //				odstranění proměných
-            unset($controller);
+            //unset($controller);
          }
          $this->coreTpl->modules = $modulesTemplates;
          unset ($modulesTemplates);
@@ -1040,6 +1046,7 @@ class AppCore {
          $this->coreTpl->panel = array();
       }
       $this->coreTpl->panel  = array_merge($this->coreTpl->panel, $panelSides);
+
       // Načtení panelů
       $panelModel = new Model_Panel();
       $panelData = $panelModel->getPanel($side);
@@ -1377,9 +1384,10 @@ class AppCore {
       // pokud je spuštěn ajax požadavek
       else if(UrlRequest::isAjaxRequest()){
          try {
-            if(UrlRequest::getAjaxType() == AjaxLink::AJAX_EPLUGIN_NAME){
-               $epluginName = UrlRequest::getAjaxName().ucfirst(Eplugin::PARAMS_EPLUGIN_FILE_PREFIX);
-
+            if(UrlRequest::getAjaxType() == Ajax_Link::AJAX_EPLUGIN_NAME){
+               $epluginName = UrlRequest::getAjaxName();
+//echo $epluginName;
+//exit ();
                if(!class_exists($epluginName)) {
                   throw new BadClassException(_('Neplatný typ Epluginu'), 23);
                }
@@ -1393,7 +1401,7 @@ class AppCore {
 
                $eplugin->{$ajaxObj->getAjaxMetod()}($ajaxObj);
 
-            } else if(UrlRequest::getAjaxType() == AjaxLink::AJAX_MODULE_NAME){
+            } else if(UrlRequest::getAjaxType() == Ajax_Link::AJAX_MODULE_NAME){
 
             }
          } catch (Exception $e) {
@@ -1438,6 +1446,7 @@ class AppCore {
                      //		spuštění modulů
                      $this->runModules();
                   }
+
                   // =========	spuštění panelů
                   //		Levý
                   if(Category::isLeftPanel()){
