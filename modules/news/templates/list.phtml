@@ -2,8 +2,9 @@
    <? foreach ($this->newsArray as $new) {?>
       <div>
       <h2>
-         <a href="<?=$this->l()->article($new['label'], $new['id_new'])?>" title="<?=$new['label']?>"><?=$new['label']?></a>
+         <a href="<?=$this->l()->article($new['label'], $new['id_new'])?>" title="<?=$new['label']?>"><?=$new['label']?>
          <span class="smallFont"><?=strftime("%x %X", $new['time'])?> - <?=$new['username']?></span>
+         </a>
       </h2>
       <?print (xhtml_cut(remove_tag('img', $new['text']), 300));?>
       </div>

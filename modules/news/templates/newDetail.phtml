@@ -4,4 +4,8 @@
       <span class="smallFont"><?=strftime("%x %X", $this->new['time'])?> - <?=$this->new['username']?></span>
    </h2>
    <?=$this->new['text'];?>
+   <?if(isset ($this->toolbox)){
+      $this->includeTplObj($this->toolbox);
+   }?>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->article()));?>
 </div>

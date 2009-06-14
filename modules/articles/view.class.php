@@ -46,9 +46,6 @@ class Articles_View extends View {
    public function showView(){
       if($this->rights()->isWritable()){
          // editační tlačítka
-         $jquery = new JsPlugin_JQuery();
-         $this->template()->addJsPlugin($jquery);
-
          $toolbox = new Template_Toolbox();
          $toolbox->addTool('edit_article', $this->_m("Upravit"),
             $this->link()->action($this->sys()->action()->editarticle()),

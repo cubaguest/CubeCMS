@@ -14,25 +14,20 @@ class News_View extends View {
    }
 
    public function showView(){
-      if($this->rights()->isWritable()){
-//         $this->template()->addTpl('editButtons.tpl');
-//         $this->template()->addVar('LINK_TO_ADD_NEWS_NAME', _m("Přidat novinku"));
-//         $this->template()->addVar('LINK_TO_ADD_NEWS', $this->container()->getLink('add_new'));
-//
-//         $this->template()->addVar('LINK_TO_EDIT_NEWS_NAME', _m("Upravit"));
-//         $this->template()->addVar("NEWS_EDIT", $this->container()->getData('editable'));
-//         $this->template()->addVar('LINK_TO_EDIT_NEWS', $this->container()->getLink('edit_link'));
-//
-//         $this->template()->addVar('LINK_TO_DELETE_NEWS_NAME', _m("Smazat"));
-//         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat novinku"));
-//
-//         //			JSPlugin pro potvrzení mazání
-//         $submitForm = new SubmitForm();
-//         $this->template()->addJsPlugin($submitForm);
-//
-//         // editační tlačítka
-//         $jquery = new JQuery();
-//         $this->template()->addJsPlugin($jquery);
+      $this->template()->new;
+      if($this->rights()->isControll() OR
+         $this->template()->new[News_Model_Detail::COLUMN_NEWS_ID_USER]
+         == $this->rights()->getAuth()->getUserId()){
+         // editační tlačítka
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_news', $this->_m("Upravit"),
+            $this->link()->action($this->sys()->action()->editNews()),
+            $this->_m("Upravit novinku"), "text_edit.png")
+         ->addTool('news_delete', $this->_m("Smazat"), $this->link(),
+            $this->_m("Smazat novinku"), "remove.png", "news_id",
+            $this->template()->new[News_Model_Detail::COLUMN_NEWS_ID_NEW],
+            $this->_m("Opravdu smazat novinku")."?");
+         $this->template()->toolbox = $toolbox;
       }
 
       $this->template()->addTplFile("newDetail.phtml");
@@ -59,31 +54,22 @@ class News_View extends View {
    }
 
    /**
-    * Metoda přiřadí popisky do šablony
-    */
-   private function assignLabels() {
-      $this->template()->addVar('NEWS_LABEL_NAME', _m('Popis'));
-      $this->template()->addVar('NEWS_TEXT_NAME', _m('Text'));
-
-      $this->template()->addVar('BUTTON_RESET', _m('Obnovit'));
-      $this->template()->addVar('BUTTON_SEND', _m('Uložit'));
-   }
-
-   /**
     * Viewer pro editaci novinky
     */
-   public function editView() {
-      $this->template()->addTpl('editNews.tpl');
-      $this->template()->addCss("style.css");
+   public function editNewsView() {
+      $this->template()->addTplFile('editNews.phtml');
+      $this->template()->addCssFile("style.css");
 
-      $this->template()->setTplSubLabel(_m("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
-      $this->template()->setSubTitle(_m("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'), true);
-      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava novinky").' - '.$this->container()->getData('NEWS_NAME'));
+      $newsModel = new News_Model_Detail($this->sys());
+      $this->template()->new = $newsModel->getNewsDetailAllLangs($this->sys()->article());
 
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
-      $this->assignLabels();
+      // Tiny MCE plugin
+      $tinymce = new JsPlugin_TinyMce();
+      $tinymce->setTheme(JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+      $this->template()->addJsPlugin($tinymce);
+
       //Taby - uspořádání
-      $jquery = new JQuery();
+      $jquery = new JsPlugin_JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
    }

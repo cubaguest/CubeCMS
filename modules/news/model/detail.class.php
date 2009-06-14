@@ -157,7 +157,7 @@ class News_Model_Detail extends Model_Db {
       //			smazání novinky
       $sqlUpdate = $this->getDb()->update()->table($this->module()->getDbTable())
       ->set(array(self::COLUMN_NEWS_DELETED => (int)true))
-      ->where(self::COLUMN_NEWS_ID_NEW." = ".$idNews);
+      ->where(self::COLUMN_NEWS_ID_NEW, $idNews);
 
       if($this->getDb()->query($sqlUpdate)){
          return true;

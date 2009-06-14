@@ -60,7 +60,7 @@ class News_Controller extends Controller {
       //		Vybrání článků
       $this->view()->newsArray = $newsM->getSelectedListNews($scroll->getStartRecord(), $scroll->getCountRecords());
       $this->view()->EPLscroll = $scroll;
-      
+//      throw new Exception("pokus");
 
       //TODO předělat na objekt parametru z enginu
 //      if(isset($_GET[self::GET_NUM_NEWS]) AND (is_numeric($_GET[self::GET_NUM_NEWS]) OR $_GET[self::GET_NUM_NEWS] == self::GET_ALL_NEWS)){
@@ -93,22 +93,20 @@ class News_Controller extends Controller {
       $this->view()->new = $newsDetail->getNewsDetailSelLang($this->getArticle()->getArticle());
 
       //      obsluha Mazání novinky
-      if(($this->getRights()->isWritable() AND $newsDetail->getIdUser()
-            == $this->getRights()->getAuth()->getUserId()) OR
-         $this->getRights()->isControll()){
+      if($this->getRights()->isControll() OR
+            $this->view()->new[News_Model_Detail::COLUMN_NEWS_ID_USER] 
+            == $this->rights()->getAuth()->getUserId()) {
          $form = new Form(self::FORM_PREFIX);
 
          $form->crInputHidden(self::FORM_INPUT_ID, true, 'is_numeric')
          ->crSubmit(self::FORM_BUTTON_DELETE);
 
          if($form->checkForm()){
-            $newDetail = new NewsDetailModel();
-
-            if($newDetail->deleteNews($form->getValue(self::FORM_INPUT_ID),
-                  $this->getRights()->getAuth()->getUserId())){
-               throw new UnexpectedValueException(_m('Novinku se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
+            $newDetail = new News_Model_Detail($this->sys());
+            if(!$newDetail->deleteNews($form->getValue(self::FORM_INPUT_ID))){
+               throw new UnexpectedValueException($this->_m('Novinku se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
-            $this->infoMsg()->addMessage(_m('Novinka byla smazána'));
+            $this->infoMsg()->addMessage($this->_m('Novinka byla smazána'));
             $this->getLink()->article()->action()->rmParam()->reload();
          }
       }
@@ -146,50 +144,24 @@ class News_Controller extends Controller {
   /**
    * controller pro úpravu novinky
    */
-   public function editController() {
+   public function editNewsController() {
       $this->checkWritebleRights();
 
       $newsForm = new Form();
       $newsForm->setPrefix(self::FORM_PREFIX);
-
       $newsForm->crInputText(self::FORM_INPUT_LABEL, true, true)
-            ->crTextArea(self::FORM_INPUT_TEXT, true, true)
-            ->crSubmit(self::FORM_BUTTON_SEND);
-
-      //      Načtení hodnot prvků
-      $newsModel = new NewsDetailModel();
-      $newsModel->getNewsDetailAllLangs($this->getArticle());
-      //      Nastavení hodnot prvků
-      $newsForm->setValue(self::FORM_INPUT_LABEL, $newsModel->getLabelsLangs());
-      $newsForm->setValue(self::FORM_INPUT_TEXT, $newsModel->getTextsLangs());
-
-      $label = $newsModel->getLabelsLangs();
-      $this->container()->addData('NEWS_NAME', $label[Locale::getLang()]);
-
+      ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
+      ->crSubmit(self::FORM_BUTTON_SEND);
       //        Pokud byl odeslán formulář
       if($newsForm->checkForm()){
-         $newsDetail = new NewsDetailModel();
+         $newsDetail = new News_Model_Detail($this->sys());
          if(!$newsDetail->saveEditNews($newsForm->getValue(self::FORM_INPUT_LABEL),
-               $newsForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            throw new UnexpectedValueException(_m('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
+               $newsForm->getValue(self::FORM_INPUT_TEXT), $this->article())){
+            throw new UnexpectedValueException($this->_m('Novinku se nepodařilo uložit, chyba při ukládání.'), 2);
          }
-         $this->infoMsg()->addMessage(_m('Novinka byla uložena'));
+         $this->infoMsg()->addMessage($this->_m('Novinka byla uložena'));
          $this->getLink()->action()->reload();
       }
-
-//    Data do šablony
-      $this->container()->addData('NEWS_DATA', $newsForm->getValues());
-      $this->container()->addData('ERROR_ITEMS', $newsForm->getErrorItems());
-
-      //		Odkaz zpět
-      $this->container()->addLink('BUTTON_BACK', $this->getLink()->article()->action());
-   }
-
-  /**
-   * metoda pro mazání novinky
-   */
-   private function deleteNews() {
-      
    }
 }
 ?>

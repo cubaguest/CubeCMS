@@ -13,6 +13,7 @@ class News_Panel extends Panel {
 	const SHOW_LINK_NAME = 'show_link';
 	
 	public function panelController() {
+
 	}
 	
 	public function panelView() {

@@ -10,5 +10,8 @@
  * @abstract      Třída pro obsluhu chyb načítání tříd
  */
 class BadClassException extends Exception {
+   public function  __construct($message = null, $code = null) {
+      parent::__construct($message, $code);
+   }
 }
 ?>
