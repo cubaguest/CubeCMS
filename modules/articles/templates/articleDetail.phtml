@@ -3,6 +3,7 @@
       <span class="smallFont"><?=strftime("%x %X", $this->article['add_time'])?> - <?=$this->article['username']?></span>
    </h2>
    <?=$this->article['text']?>
+   <hr class="reseter" />
    <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->article()));?>
 
    <?if($this->lightBox){?>
