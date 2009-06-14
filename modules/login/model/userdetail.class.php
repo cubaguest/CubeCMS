@@ -2,7 +2,7 @@
 /*
  * Třída modelu s detailem uživatele
  */
-class UserDetailModel extends DbModel {
+class Login_Model_UserDetail extends Model_Db {
 	/**
 	 * Pole s názvy sloupců v tabulce
 	 * @var array
@@ -21,7 +21,7 @@ class UserDetailModel extends DbModel {
 	 */
 	public function getPasswd($idUser) {	
 //			načtení fotky z db
-$sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), 'user')
+$sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'user')
             ->colums(self::COLUMN_USER_PASSWORD)
 				->where(self::COLUMN_ID, $idUser);
 												 
@@ -39,7 +39,7 @@ $sqlSelect = $this->getDb()->select()->table($this->getModule()->getDbTable(), '
 	 */
 	public function setPasswd($idUser, $password) {	
 //			načtení fotky z db
-			$sqlUpdate = $this->getDb()->update()->table($this->getModule()->getDbTable())
+			$sqlUpdate = $this->getDb()->update()->table($this->module()->getDbTable())
 									   ->set(array(self::COLUMN_USER_PASSWORD => $password))
 									   ->where(self::COLUMN_ID,$idUser);
 		
