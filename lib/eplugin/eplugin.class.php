@@ -32,18 +32,18 @@ class Eplugin {
 
    /**
     * Objekt se systémovými informacemi o modulu
-    * @var ModuleSys
+    * @var Module_Sys
     */
    private $sys = null;
 
    /**
     * Konstruktor třídy, spouští metodu init();
     */
-   function __construct(ModuleSys $sys = null, $paramsForInit = null, $paramsForRun = null){
-      if($sys != null AND $sys instanceof ModuleSys){
+   function __construct(Module_Sys $sys = null, $paramsForInit = null, $paramsForRun = null){
+      if($sys != null AND $sys instanceof Module_Sys){
          $this->sys = $sys;
       } else {
-         $this->sys = new ModuleSys();
+         $this->sys = new Module_Sys();
       }
 
       if(!UrlRequest::isAjaxRequest() AND !UrlRequest::isSupportedServices()){
@@ -115,7 +115,7 @@ class Eplugin {
    /**
     * Metoda vrací systémový objekt modulu
     *
-    * @return ModuleSys -- objekt modulu
+    * @return Module_Sys -- objekt modulu
     */
    protected function sys(){
       return $this->sys;

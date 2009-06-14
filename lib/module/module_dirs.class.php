@@ -5,13 +5,13 @@
  * tak s hlavním adresářem modulu, ale i s adresáři stylesheetu a šablon modulu.
  * 
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE3.9.4 $Revision: $
+ * @version    	$Id: $ VVE 5.0.0 $Revision: $
  * @author        $Author: $ $Date:$
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro obsluhu adresářů modulu
  */
 
-class ModuleDirs {
+class Module_Dirs {
 	/**
 	 * Adresář se složkami modulu
 	 * @var string
@@ -99,7 +99,7 @@ class ModuleDirs {
 	 * @param string -- adresář webu
 	 */
 	public static function setWebDir($webDir) {
-		ModuleDirs::$mainWebDir = $webDir;
+		self::$mainWebDir = $webDir;
 	}
 
 	/**
@@ -108,7 +108,7 @@ class ModuleDirs {
 	 * @return string -- adresář webu
 	 */
 	private static function getWebDir() {
-		return ModuleDirs::$mainWebDir;
+		return self::$mainWebDir;
 	}
 
 	/**
@@ -117,7 +117,7 @@ class ModuleDirs {
 	 * @param string -- datový adresář webu
 	 */
 	public static function setWebDataDir($dataDir) {
-		ModuleDirs::$mainDataDir = $dataDir;
+		self::$mainDataDir = $dataDir;
 	}
 	
 	/**
@@ -126,7 +126,7 @@ class ModuleDirs {
 	 * @return string -- datový adresář webu
 	 */
 	private static function getWebDataDir() {
-		return ModuleDirs::$mainDataDir;
+		return self::$mainDataDir;
 	}
 
 	/**
@@ -136,7 +136,7 @@ class ModuleDirs {
 	 */
 	public function getMainDir($withRelativePrefix = true) {
 		if($withRelativePrefix){
-			return ModuleDirs::getWebDir().self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir.self::DIR_SEPARATOR;
+			return self::getWebDir().self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir.self::DIR_SEPARATOR;
 		} else {
 			return self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir.self::DIR_SEPARATOR;
 		}

@@ -3,13 +3,14 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class LoginAction extends Action {
+class Login_Action extends Action {
 	
 
 	const ACTION_CHANGE_PASSWD_ABBR = 'cp';
 
     protected function init() {
-		$this->addAction(self::ACTION_CHANGE_PASSWD_ABBR, "changepasswd", _('zmena-hesla'));
+		$this->addAction(self::ACTION_CHANGE_PASSWD_ABBR, "changepasswd",
+         $this->_m('zmena-hesla'));
     }
 
 

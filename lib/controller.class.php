@@ -27,7 +27,7 @@ abstract class Controller {
 
    /**
     * Objekt se systémovými informacemi o modulu
-    * @var ModuleSys
+    * @var Module_Sys
     */
    private $moduleSys = null;
 
@@ -46,11 +46,9 @@ abstract class Controller {
    /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
-    * @param Action $action -- objekt s akcemi
-    * @param Routes $routes -- objekt s cestammi
-    * @param Rights $rights -- objekt s právy k itemu
+    * @param Module_Sys $moduleSys -- systémový objekt modulu
     */
-   public final function __construct(ModuleSys $moduleSys) {
+   public final function __construct(Module_Sys $moduleSys) {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
       //      $this->container = new Container();
       $this->moduleSys = $moduleSys;
@@ -106,7 +104,7 @@ abstract class Controller {
 
    /**
     * Metoda vrací objekt systému modulu
-    * @return ModuleSys
+    * @return Module_Sys
     */
    final public function sys() {
       return $this->moduleSys;

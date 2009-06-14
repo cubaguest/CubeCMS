@@ -104,7 +104,7 @@ class Template {
 
    /**
     * Objekt vlastností modulu (jeho klon)
-    * @var ModuleSys
+    * @var Module_Sys
     */
    protected $moduleSys = null;
 
@@ -133,9 +133,9 @@ class Template {
 
    /**
     * Konstruktor třídy
-    * @param ModuleSys $modulesys -- systémový objekt modulu a práv
+    * @param Module_Sys $modulesys -- systémový objekt modulu a práv
     */
-   public function __construct(ModuleSys $moduleSys = null){
+   public function __construct(Module_Sys $moduleSys = null){
       if($moduleSys != null){
          $this->_setSysModule($moduleSys);
       }
@@ -408,7 +408,7 @@ class Template {
 
    /**
     * Metoda vrqací systémový objekt modulu
-    * @return ModuleSys
+    * @return Module_Sys
     */
    final public function sys() {
       return $this->moduleSys;
@@ -419,8 +419,18 @@ class Template {
     * @param string $message -- řetězec k přeložení
     * @return string -- přeložený řetězec
     */
-   final public function _m($message) {
+   final public function _($message) {
       return $this->sys()->locale()->_m($message);
+   }
+
+   /**
+    * Metoda přeloží zadaný řetězec alias k metodě _()
+    * @param string $message -- řetězec k přeložení
+    * @return string -- přeložený řetězec
+    * @deprecated -- lepší je použití $this->_() pro podobnost s funkcí gettextu
+    */
+   final public function _m($message) {
+      return $this->_($message);
    }
 
    /**
@@ -475,9 +485,9 @@ class Template {
     */
    /**
     * Metoda nastaví objekt modulu šablony
-    * @param ModuleSys $module -- objekt modulu šablony
+    * @param Module_Sys $module -- objekt modulu šablony
     */
-   public function _setSysModule(ModuleSys $module) {
+   public function _setSysModule(Module_Sys $module) {
       $this->moduleSys = clone $module;
    }
 
@@ -554,6 +564,14 @@ class Template {
     */
    protected function module() {
       return $this->sys()->module();
+   }
+
+   /**
+    * Metoda vrací objekt akcí modulu
+    * @return Action
+    */
+   protected function action() {
+      return $this->sys()->action();
    }
 }
 ?>

@@ -22,14 +22,15 @@ abstract class Panel {
 
    /**
     * Proměnná obsahuje objekt systému modulu
-    * @var ModuleSys
+    * @var Module_Sys
     */
    private $_moduleSys = null;
 
    /**
     * Konstruktor
+    * @param Module_Sys $sys -- systémový objekt modulu
     */
-   function __construct(ModuleSys $sys) {
+   function __construct(Module_Sys $sys) {
       $this->_template = new Template($sys);
       $this->_moduleSys = $sys;
 
@@ -83,7 +84,7 @@ abstract class Panel {
 
    /**
     * Metoda vrací systémový objekt modulu
-    * @return ModuleSys
+    * @return Module_Sys
     */
    final public function sys() {
       return $this->_moduleSys;

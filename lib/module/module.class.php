@@ -116,27 +116,12 @@ class Module {
       return self::$currentModule;
    }
 
-   /**
-    * Metoda vrací zpracovávaný objekt modulu
-    * @return Module
-    */
-//   public function getCurrentModule() {
-//      return self::$currentModule;
-//   }
-
-   /**
-    * Třída je singleton není povolen clone
-    */
-//   public function __clone() {
-//      throw new BadMethodCallException(_('Není povoleno inicializovat více jak jednu třídu aplikace'), 1);
-//   }
-
 	/**
 	 * Metoda vrací objekt s adresáři modulu
-	 * @return ModuleDirs -- objek s adresáři modulu
+	 * @return Module_Dirs -- objek s adresáři modulu
 	 */
 	public function getDir() {
-		return new ModuleDirs($this->getName(), $this->dataDir);
+		return new Module_Dirs($this->getName(), $this->dataDir);
 	}
 
 	/**
@@ -307,9 +292,9 @@ class Module {
 	/**
 	 * Metoda nastaví tabulky modulu
 	 * @param array -- pole s tabulkama
+    * @todo není iplementována optimálně
 	 */
 	public function setDbTables($dbTables) {
-		//TODO není iplementována optimálně
 		$this->dbTables = $dbTables;
 	}
 }

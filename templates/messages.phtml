@@ -5,6 +5,7 @@ if(!empty ($this->messages)){ ?>
    <? foreach ($this->messages as $message) {
       echo $message . "<br />";
    }?>
+   <hr class="reseter" />
    <script type="text/javascript">
       <!--
       setTimeout('document.getElementById("messages").style.display = "none"', 2000);
@@ -30,6 +31,7 @@ if(!$this->coreErrorsEmpty){ ?>
 }?>
    </p>
    <?}?>
+   <hr class="reseter" />
 </div>
 <? }?>
 
@@ -39,10 +41,12 @@ if(!empty ($this->moduleErrors)){ ?>
    <img src="./images/icons/error.png" alt="error icon" />
    <? foreach ($this->moduleErrors as $error) {
       if($this->debugMode){
-         echo _('Modul')." ". $error ."<br />";
+         //echo _('Modul')." ". $error ."<br />";
+         echo _("Chyba:")." ".$error ."<br />";
       } else{
          echo $error ."<br />";
       }
    }?>
+   <hr class="reseter" />
 </div>
 <? }?>

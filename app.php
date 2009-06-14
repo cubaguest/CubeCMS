@@ -592,8 +592,8 @@ class AppCore {
     */
    private function _initModules() {
       //		Načtení potřebných knihoven
-      ModuleDirs::setWebDir(AppCore::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
-      ModuleDirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));
+      Module_Dirs::setWebDir(AppCore::MAIN_ENGINE_PATH); //TODO patří přepsat tak aby se to zadávalo jinde
+      Module_Dirs::setWebDataDir(AppCore::sysConfig()->getOptionValue("data_dir"));
    }
 
    /**
@@ -767,7 +767,7 @@ class AppCore {
             }
 
             // vytvoření objektu sys systémem modulu
-            $sysModule = new ModuleSys();
+            $sysModule = new Module_Sys();
 
             // doplnění odkazů
             $sysModule->setLink(new Links());
@@ -972,7 +972,7 @@ class AppCore {
                $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
             }
             // systemový objekt
-            $panelSys = new ModuleSys();
+            $panelSys = new Module_Sys();
 
             // Příprava modulu
             $panelSys->setModule(new Module($panel, $moduleDbTables));

@@ -129,5 +129,22 @@ class File_Dir {
    public function  __toString() {
       return $this->getDir();
    }
+
+   /**
+	 * Metoda vymaže zadaný adresář z filesystému i s obsahem
+	 *
+	 * @param dir -- adresář, který se má smazat
+    * @deprecated -- je obssažena přes parametr rmdir pro rekurzi
+	 */
+	public function deltree($f){
+		foreach(glob($f.'/*') as $sf){
+			if (is_dir($sf) && !is_link($sf)){
+				deltree($sf);
+				rmdir($sf);
+			}else{
+				unlink($sf);
+			}
+		}
+	}
 }
 ?>

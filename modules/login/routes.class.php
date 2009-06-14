@@ -3,7 +3,7 @@
  * Třída obsluhující cesty modulu
  *
  */
-class LoginRoutes extends Routes {
+class Login_Routes extends Routes {
 	function initRoutes() {
 	}
 }

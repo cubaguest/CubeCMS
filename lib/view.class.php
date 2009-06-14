@@ -19,7 +19,7 @@ abstract class View {
 
    /**
     * Objekt se systémovými parametry modulu (práva, ...)
-    * @var ModuleSys
+    * @var Module_Sys
     */
    private $moduleSys = null;
 
@@ -32,9 +32,10 @@ abstract class View {
    /**
     * Konstruktor Viewu
     *
-    * @param Model -- použitý model
+    * @param Template $template -- objekt šablony
+    * @param Module_Sys $moduleSys --  systémový objekt modulu
     */
-   function __construct(Template $template, ModuleSys $moduleSys) {
+   function __construct(Template $template, Module_Sys $moduleSys) {
       $this->template = $template;
       $this->moduleSys = $moduleSys;
 
@@ -137,7 +138,7 @@ abstract class View {
 
    /**
     * Metoda vrací objekt se systémovým nasatvením modulu
-    * @return ModuleSys
+    * @return Module_Sys
     */
    final public function sys() {
       return $this->moduleSys;

@@ -1,33 +1,33 @@
-<h2>{$VARS.LOGIN_CHANGE_PASSWORD_NAME}</h2>
+<h2><?=$this->_m('Změna hesla');?></h2>
 <div class="edit_form">
-<form method="post" action="{$THIS_PAGE_LINK}">
+<form method="post" action="<?=$this->l();?>">
    <table>
    <tbody>
       <tr>
-         <td width="150px">{$VARS.OLD_PSSWD}:</td>
+         <td width="150px"><?=$this->_m('Staré heslo');?>:</td>
          <td>
             <input type="password" name="passwd_old" size="20" maxlength="20" alt="{$VARS.OLD_PSSW}" />
          </td>
       </tr>
       <tr>
-         <td>{$VARS.NEW_PSSWD}:</td>
+         <td><?=$this->_m('Nové heslo');?>:</td>
          <td>
             <input type="password" name="passwd_new" size="20" maxlength="20" alt="{$VARS.NEW_PSSWD}" />
          </td>
       </tr>
       <tr>
-         <td>{$VARS.NEW_PSSWD_CONFIRM}:</td>
+         <td><?=$this->_m('Nové heslo');?>:</td>
          <td>
-            <input type="password" name="passwd_new_confirm" size="20" maxlength="20" alt="{$VARS.NEW_PSSWD_CONFIRM}" />
+            <input type="password" name="passwd_new_confirm" size="20" maxlength="20" />
          </td>
       </tr>
       <tr>
          <td colspan="2"  align="right">
-            <input type="submit" name="passwd_change" value="{$VARS.SEND_PASSWD_BUTTON}" alt="{$VARS.SEND_PASSWD_BUTTON}" />
+            <input type="submit" name="passwd_change" value="<?=$this->_m('Změnit');?>" />
        	</td>
       </tr>
       <tr>
-         <td><input type="button" value="{$VARS.GENERATE_PSSWD_BUTTON}" onclick="suggestPassword()" /></td>
+         <td><input type="button" value="<?=$this->_m('Generovat heslo');?>" onclick="suggestPassword()" /></td>
          <td><input type="text" name="generated_pw" id="generated_pw" /></td>
       </tr>
   </tbody>

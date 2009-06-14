@@ -9,7 +9,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třídy pro sjednocení systémových informací o modulu
  */
-class ModuleSys {
+class Module_Sys {
    /**
     * Objekt modulu
     * @var Module
