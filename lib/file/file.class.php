@@ -400,7 +400,7 @@ class File {
       $file_name_short = $file_ext[1];
       $file_name_extension = $file_ext[2];
       //odstraneni nepovolenych zanků a složení dohromady
-      $sFunction = new SpecialFunctions();
+      $sFunction = new Helper_Text();
       $file_name_short = $sFunction->utf2ascii($file_name_short);
       unset($sFunction);
       if($addNumber == 0){
