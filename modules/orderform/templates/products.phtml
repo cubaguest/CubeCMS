@@ -1,0 +1,131 @@
+<fieldset>
+   <legend><?=$this->_("Výběr produktu")?></legend>
+<div id="productsTabs">
+   <ul class="tabsMenu">
+      <?foreach ($this->products as $prKey => $product) {?>
+      <li><a href="#product<?=$prKey?>"><span><?=$product->name?></span></a></li>
+      <? }?>
+   </ul>
+   <?foreach ($this->products as $prKey => $product) {?>
+   <div id="product<?=$prKey?>" class="tabsContent productsList">
+         <?foreach ($product->product as $prod) {?>
+      <!--<a href="#" title="<?=$this->_("Vybrat produkt");?>" onclick="return selectProduct(this);">-->
+      <img src="<?=$this->sys()->module()->getDir()->getImagesDir(true).$product->dir.'/'.$prod->file?>"
+           alt="<?=$prod->label?>" onclick="selectProduct(this, '<?=$prod->type?>', 
+            <?=$prod->dimensions?>, '<?=$prod->label?>');" />
+      <!--</a>-->
+         <?}?>
+   </div>
+   <? }?>
+   <div id="productSizes" style="display:none">
+      <h3 id="selectProductLabel"><?=$this->_("Vybráno")?>:&nbsp;<span></span></h3>
+      <h3><?=$this->_("Rozměry")?>:</h3>
+      <table border="0" cellpadding="1" cellspacing="1">
+         <tr class="productSizesPart1">
+            <td rowspan="5" width="120" align="center">
+               <img id="selectProductImg" src="" alt="image" />
+            </td>
+            <th width="50">
+               <?=$this->_("Šířka");?><br/>[mm]
+            </th>
+            <th width="50">
+               <?=$this->_("Výška");?><br/>[mm]
+            </th>
+            <th width="50">
+               <?=$this->_("Žaluzie");?>
+            </th>
+            <th width="50">
+               <?=$this->_("Okenní sitě");?>
+            </th>
+            <th width="50">
+               <?=$this->_("Síťové dveře");?>
+            </th>
+            <th width="50">
+               <?=$this->_("Rolety");?>
+            </th>
+            <th width="50">
+               <?=$this->_("Vnitřní parapet");?>
+            </th>
+            <th width="50">
+               <?=$this->_("Vnější parapet");?>
+            </th>
+         </tr>
+         <tr class="productSizesPart1">
+            <th colspan="8">
+               <?=$this->_("Část 1");?>
+            </th>
+         </tr>
+         <tr class="productSizesPart1">
+            <td><input name="width_1" value="3333" type="text" size="3" style="width:35px" /></td>
+            <td><input name="height_1" value="3333" type="text" size="3" style="width:35px" /></td>
+            <td><input name="louver_1" value="1" type="checkbox" /></td>
+            <td><input name="grid_1" value="1" type="checkbox" /></td>
+            <td><input name="doorgrid_1" value="1" type="checkbox" /></td>
+            <td><input name="rolltop_1" type="checkbox" /></td>
+            <td><input name="indoorparapet_1" type="checkbox" /></td>
+            <td><input name="outdoorparapet_1" type="checkbox" /></td>
+         </tr>
+         <tr class="productSizesPart2" style="display:none">
+            <th colspan="8">
+               <?=$this->_("Část 2");?>
+            </th>
+         </tr>
+         <tr class="productSizesPart2">
+            <td><input name="width_2" type="text" size="3" style="width:35px" /></td>
+            <td><input name="height_2" type="text" size="3" style="width:35px" /></td>
+            <td><input name="louver_2" type="checkbox" /></td>
+            <td><input name="grid_2" type="checkbox" /></td>
+            <td><input name="doorgrid_2" type="checkbox" /></td>
+            <td><input name="rolltop_2" type="checkbox" /></td>
+            <td><input name="indoorparapet_2" type="checkbox" /></td>
+            <td><input name="outdoorparapet_2" type="checkbox" /></td>
+         </tr>
+      </table>
+      <br />
+      <h3><?=$this->_("Barvy dekorů")?>:</h3>
+      <table id="productColors">
+         <tr>
+            <td width="120"></td>
+            <?foreach ($this->productColors as $color) {?>
+            <td>
+               <img src="<?=$this->sys()->module()->getDir()->getImagesDir(true).'colors/'.$color->image?>"
+                    alt="<?=$color->name?>" />
+            </td>
+            <?}?>
+         </tr>
+         <tr>
+            <td><?=$this->_("Vnitřní barva")?></td>
+            <?foreach ($this->productColors as $color) {?>
+            <td align="center">
+               <input type="radio" name="color_inside" value="<?=$color->code?>" checked />
+            </td>
+            <?}?>
+         </tr>
+         <tr>
+            <td><?=$this->_("Vnější barva")?></td>
+            <?foreach ($this->productColors as $color) {?>
+            <td align="center">
+               <input type="radio" name="color_outside" value="<?=$color->code?>" checked />
+            </td>
+            <?}?>
+         </tr>
+      </table>
+
+      <p id="productAddButton" style="text-align:right;display:none;">
+         <?=$this->_("Kusů")?>:
+         <input type="text" name="productKs" value="33" size="3" maxlength="4" />&nbsp;
+         <input type="button" name="addProduct" value="<?=$this->_("Přidat")?>" onclick="addProductItem();" />
+      </p>
+   </div>
+   <div class="productSizesBottomLine"></div>
+</div>
+</fieldset>
+<script type="text/javascript">
+<!--
+   // vytvoření tabů
+   $(document).ready(function(){
+      $("#productsTabs").tabs();
+      toggleBasket(); // zobrazení košíku pokud není prázdný
+   });
+   -->
+</script>

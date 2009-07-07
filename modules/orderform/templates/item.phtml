@@ -1,0 +1,58 @@
+<div id="basketProduct_<?=$this->itemId?>">
+   <div class="basketProductHead" onClick="showDetail(this);">
+      <a style="float:right"><?=$this->_("zobrazit detail")?></a>
+      <img src="images/buttons/expand2.gif" alt="expand image" />
+      <?=$this->item['label']?>&nbsp;-&nbsp;<?=$this->item['count']?>&nbsp;ks&nbsp;
+      (<?=$this->item['params'][1]['width']?>&nbsp;&times;&nbsp;<?=$this->item['params'][1]['height']?>&nbsp;mm)
+   </div>
+   <div class="basketProductDetail">
+      <table class="paramsTable">
+         <tr class="labelRow">
+            <td width="110" rowspan="9"><img src="<?=$this->item['image']?>" alt="image <?=$this->item['label']?>" /></td>
+            <th width="40"><?=$this->_("Šířka")?><br />[mm]</th>
+            <th width="40"><?=$this->_("Výška")?><br />[mm]</th>
+            <th width="45"><?=$this->_("Žaluzie")?></th>
+            <th width="45"><?=$this->_("Rolety")?></th>
+            <th width="45"><?=$this->_("Okenní sítě")?></th>
+            <th width="45"><?=$this->_("Síťové dveře")?></th>
+            <th width="45"><?=$this->_("Vnitřní parapet")?></th>
+            <th width="45"><?=$this->_("Vnější parapet")?></th>
+         </tr>
+         <?foreach ($this->item['params'] as $key => $var) {?>
+         <tr>
+            <td><?=$var['width']?></td>
+            <td><?=$var['height']?></td>
+            <td>
+               <?if($var['louver']){?><input type="checkbox" checked disabled />
+               <?}else{?><input type="checkbox" disabled /><?}?>
+            </td>
+            <td>
+               <?if($var['grid']){?><input type="checkbox" checked disabled />
+               <?}else{?><input type="checkbox" disabled /><?}?>
+            </td>
+            <td>
+               <?if($var['doorgrid']){?><input type="checkbox" checked disabled />
+               <?}else{?><input type="checkbox" disabled /><?}?>
+            </td>
+            <td>
+               <?if($var['rolltop']){?><input type="checkbox" checked disabled />
+               <?}else{?><input type="checkbox" disabled /><?}?>
+            </td>
+            <td>
+               <?if($var['indoorparapet']){?><input type="checkbox" checked disabled />
+               <?}else{?><input type="checkbox" disabled /><?}?>
+            </td>
+            <td>
+               <?if($var['outdoorparapet']){?><input type="checkbox" checked disabled />
+               <?}else{?><input type="checkbox" disabled /><?}?>
+            </td>
+         </tr>
+         <?}?>
+      </table>
+      <?if(!isset($this->hideDelete) AND !$this->hideDelete){?>
+      <p style="text-align:right">
+         <input type="button" name="deleteItem" value="Smazat" onclick="return deleteItem(<?=$this->itemId?>);" />
+      </p>
+      <?}?>
+   </div>
+</div>

@@ -1,17 +1,16 @@
 <?php
-class NewsSiteMap extends SiteMap {
+class Actions_SiteMap extends SiteMap {
 	public function run() {
-      $newsModel = new NewsListModel();
+      $actionModel = new Actions_Model_List($this->sys());
 
       // kategorie
-      $this->addCategoryItem($newsModel->getLastChange());
-      $newsArr = $newsModel->getListNews();
-      foreach ($newsArr as $news) {
-         $this->addItem($this->getLink()->article($news[NewsListModel::COLUMN_NEWS_LABEL],
-               $news[NewsListModel::COLUMN_NEWS_ID_NEW]),
-               $news[NewsListModel::COLUMN_NEWS_LABEL],
-               $news[NewsListModel::COLUMN_NEWS_TIME],
-               parent::SITEMAP_SITE_CHANGE_MONTHLY);
+      $this->addCategoryItem($actionModel->getLastChange());
+      $actionsArr = $actionModel->getListActions();
+      foreach ($actionsArr as $action) {
+         $this->addItem($this->link()->article($action[Actions_Model_Detail::COLUMN_ACTION_LABEL],
+               $action[Actions_Model_Detail::COLUMN_ACTION_ID]),
+               $action[Actions_Model_Detail::COLUMN_ACTION_LABEL],
+               $action[Actions_Model_Detail::COLUMN_ACTION_TIME]);
       }
 	}
 }

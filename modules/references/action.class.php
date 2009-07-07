@@ -3,24 +3,27 @@
  * Třída pro obsluhu akcí v modulu
  *
  */
-class ReferencesAction extends Action {
-	
-
-	const ACTION_EDIT_REF_ABBR = 'er';
-	const ACTION_EDIT_OTHER_REF_ABBR = 'eor';
+class References_Action extends Action {
+	const ACTION_ADD_REFER_ABBR = 'ar';
+	const ACTION_EDIT_TEXT_REFER_ABBR = 'ert';
+	const ACTION_EDIT_PHOTOS_REFER_ABBR = 'erp';
 
     protected function init() {
-		$this->addAction(self::ACTION_EDIT_REF_ABBR, "editref", _('uprava-reference'));
-		$this->addAction(self::ACTION_EDIT_OTHER_REF_ABBR, "editotherref", _('uprava-ostatnich-referenci'));
+      $this->addAction(self::ACTION_ADD_REFER_ABBR, "addreference", $this->_('pridani-reference'));
+      $this->addAction(self::ACTION_EDIT_TEXT_REFER_ABBR, "editreferencetext", $this->_('uprava-textu-reference'));
+		$this->addAction(self::ACTION_EDIT_PHOTOS_REFER_ABBR, "editreferencephotos", $this->_('uprava-fotek-reference'));
     }
 
-	public function editReference() {
-		return $this->createAction(self::ACTION_EDIT_REF_ABBR);
+
+	public function addReference() {
+		return $this->createAction(self::ACTION_ADD_REFER_ABBR);
 	}
 
-   public function editOtherReference() {
-		return $this->createAction(self::ACTION_EDIT_OTHER_REF_ABBR);
+	public function editReferenceText() {
+		return $this->createAction(self::ACTION_EDIT_TEXT_REFER_ABBR);
 	}
-
+	public function editReferencePhotos() {
+		return $this->createAction(self::ACTION_EDIT_PHOTOS_REFER_ABBR);
+	}
 }
 ?>

@@ -1,6 +1,21 @@
 @CHARSET "UTF-8";
-.news {
-	background-color: white;
-	border: 1px solid black;
-	margin-bottom: 10px;
+.panelActions>img {
+	padding: 0 0 10px 10px;
+}
+
+.panelActions>a {
+   text-align:right;
+   display:block;
+}
+
+.action .actionHidden {
+   color:gray;
+}
+
+.action p.subLabel {
+   font-weight:bold;
+}
+
+.action img {
+   padding: 0px 10px 10px 0px;
 }

@@ -1,0 +1,74 @@
+@CHARSET "UTF-8";
+/* TABS content */
+ul.tabsMenu .ui-state-default { background-color: silver; }
+ul.tabsMenu .ui-state-active { background-color: white; }
+
+ul.tabsMenu {
+   margin-bottom:2px;
+   padding-left: 10px;
+   /*background-color: white;*/
+}
+
+ul.tabsMenu li {
+   display: inline;
+   border-width: 1px 1px 0 1px;
+   border-color: gray;
+   border-style: solid;
+   padding: 3px;
+}
+
+ul.tabsMenu li a img {
+   padding-right: 3px;
+}
+
+ul.tabsMenu {
+   margin-bottom: 2px;
+   border-width: 1px;
+   border-color: gray;
+   border-style: none;
+}
+
+.tabsContent {
+   border: 1px solid gray;
+   border-bottom: none;
+   padding: 5px;
+}
+
+
+.productsList img {
+   padding: 2px;
+   border: 1px solid white;
+   cursor:pointer;
+}
+
+.productsList img:hover, img.selectedProduct {
+   border: 1px solid orange;
+}
+
+#productSizes {
+   border: 1px solid gray;
+   border-top: none;
+   border-bottom: none;
+   padding: 5px;
+}
+
+.productSizesBottomLine {
+   border-bottom: 1px solid gray;
+}
+
+/*košík*/
+.basketProductHead {
+   border: 1px solid gray;
+   background-color:silver;
+   cursor:pointer;
+   padding: 4px;
+   margin-top: 2px;
+}
+
+.basketProductDetail {
+   padding: 5px;
+   clear:left;
+   display:none;
+   border: 1px solid gray;
+   border-top: none;
+}

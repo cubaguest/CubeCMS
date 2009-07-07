@@ -1,30 +1,56 @@
 @CHARSET "UTF-8";
-.referenceImage {
-	display: block;
-   float:right;
-   margin-top: 10px;
-   margin-bottom: 10px;
+.referencesList {
+   text-align:justify;
+}
+
+.referencesList .imageBox {
+   width: 80px;
+   height: 80px;
+   padding: 5px;
+   margin: 0 5px 0 5px;
+   border:1px solid gray;
+   text-align:center;
+   float:left;
+}
+
+#referenceImages .refPhotoImage img {
+   float:left;
+}
+
+.referencePhotos {
+
+}
+.referencePhotos img {
+   float:left;
    margin-left: 10px;
 }
 
-div.reference {
-   position: relative;
-}
 
-div.otherReference {
-   position: relative;
-}
 
-div.otherReference div#otherReferencesBox {
+#upload_process{
+   top:0;
+   left:0;
+   width:100%;
+   height:100%;
+   z-index:100;
+   position:absolute;
+   /*visibility:hidden;*/
    display:none;
+   /*width:400px;*/
+   margin:0px;
+   padding:0px;
+   background-color:#fff;
+   text-align:center;
 }
 
-div.otherReference a#showOtherReferences {
-   text-align:right;
-   cursor:pointer;
-   display:block;
+div#uploadForm {
+   border:1px solid #ccc;
+   position:relative;
+   padding:5px;
 }
 
-div.otherReference .editbox {
-   right: 20px;
+div#uploadForm form{
+   position:relative;
+   width:100%;
+   margin:0px;
 }

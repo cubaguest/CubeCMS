@@ -1,0 +1,60 @@
+<div id="editActionForm">
+   <h1><?=$this->pageLabel;
+      if(isset ($this->action['label'][Locale::getLang()])){?>
+      "<?=$this->action['label'][Locale::getLang()]?>"
+      <?}?>
+   </h1>
+<ul class="langMenu">
+      <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+      <li>
+         <a href="#actionLang<?=$key?>" class="selectedd">
+            <img src="images/lang/<?=$key?>.png" alt="<?=$lang?>" />
+            <?=$lang?>
+         </a>
+      </li>
+      <?}?>
+   </ul>
+   <div class="tabsContent">
+      <form method="post" action="<?=$this->l();?>" enctype="multipart/form-data">
+         <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+         <p id="actionLang<?=$key?>" class="tabcontent">
+            <?=$this->_("Název akce (bude zobrazen v panelu)");?>*:<br />
+            <input type="text" size="40" maxlength="50" name="action_label[<?=$key?>]"
+            value="<?=$this->post("action_label[$key]", $this->action['label'][$key]);?>" /><br />
+            <?=$this->_("Krátký popis akce (bude zobrazen v panelu)");?>*:<br />
+            <input type="text" size="70" maxlength="150" name="action_text_short[<?=$key?>]"
+            value="<?=$this->post("action_text_short[$key]", $this->action['text_short'][$key]);?>" /><br />
+            <?=$this->_("Text akce");?>*:<br />
+            <textarea class="textarea_tinymce textarea" rows="15" cols="70"
+            name="action_text[<?=$key;?>]"><?=$this->post("action_text[$key]", $this->action['text'][$key]);?></textarea>
+         </p>
+         <?}?>
+         <?=$this->_("Obrázek akce")?>:<br />
+         <input name="action_image" type="file" value="" size="30" /><br />
+         <?if($this->editAction){?>
+            <?=$this->_("Aktuální obrázek:")?>"<?=$this->action[Actions_Model_Detail::COLUMN_ACTION_IMAGE];?>"<br />
+            <?=$this->_("Smazat obrázek")?>
+            <input name="action_delete_image" type="checkbox" />
+            <br />
+         <?}?>
+         <br />
+         <?=$this->_("Datum zahájení akce")?>:<br />
+         <?=crSelectDate("action_startdate", $this->action[Actions_Model_Detail::COLUMN_ACTION_DATE_START], 5,0);?>
+         <br />
+         <?=$this->_("Datum ukončení akce")?>:<br />
+         <?=crSelectDate("action_stopdate", $this->action[Actions_Model_Detail::COLUMN_ACTION_DATE_STOP], 5,0);?>
+         <br />
+         <input name="action_reset" type="reset" value="<?=$this->_("Obnovit")?>" />
+         <input name="action_send" type="submit" value="<?=$this->_("Odeslat")?>" />
+         <?if($this->edit){?>
+            <input name="action_id" type="hidden" value="<?=$this->action['id_action']?>" />
+         <?}?>
+      </form>
+   </div>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()));?>
+   <script type="text/javascript">
+  $(document).ready(function(){
+    $("#editActionForm").tabs();
+  });
+</script>
+</div>

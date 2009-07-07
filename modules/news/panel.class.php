@@ -6,12 +6,6 @@ class News_Panel extends Panel {
 	 */
 	const PARAM_NUMBER_OF_NEWS = 'scrollpanel';
 
-	/**
-	 * Název proměné s linkem na detail
-	 * @var string
-	 */
-	const SHOW_LINK_NAME = 'show_link';
-	
 	public function panelController() {
 
 	}

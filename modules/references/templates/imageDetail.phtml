@@ -1,0 +1,45 @@
+<table class="refPhoto" id="refPhoto<?=$this->image['id_ref_photo']?>">
+   <tr>
+      <td class="refPhotoImage" rowspan="2" width="<?=$this->sys()->module()->getParam(References_Controller::PARAM_SMALL_IMAGE_WIDTH, 150)+10?>">
+         <a href="<?=$this->sys()->module()->getDir()->getDataDir().$this->image['file']?>"
+            title="<?=$this->image['label'][Locale::getLang()]?>" rel="lightbox">
+            <img src="<?=$this->sys()->module()->getDir()->getDataDir()
+                     .References_Controller::IMAGES_SMALL_DIR.'/'.$this->image['file']?>"
+                 alt="image <?=$this->image['file']?>" />
+         </a>
+      </td>
+      <td class="refPhotoEdit">
+         <ul class="langMenu">
+            <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+            <li>
+               <a href="#refPhotoLang<?=$key.'_'.$this->image['id_ref_photo']?>" class="selected"><?=$lang?></a>
+            </li>
+            <?}?>
+         </ul>
+         <form action="<?=$this->l()?>" method="post" onsubmit="return savePhotoLabel(this, <?=$this->image['id_ref_photo']?>);">
+            <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+            <p id="refPhotoLang<?=$key.'_'.$this->image['id_ref_photo']?>" class="tabcontent">
+                  <?=$this->_m("Název fotky");?>:
+               <input type="text" size="32" maxlength="50" name="reference_photo_label[<?=$key?>]"
+                      value="<?=$this->post("reference_photo_label[$key]", $this->image['label'][$key]);?>" />
+               <input type="hidden" name="reference_photo_id"
+                      value="<?=$this->post("reference_photo_id", $this->image['id_ref_photo']);?>" />
+               <input name="reference_photo_send" type="submit" value="<?=$this->_("uložit")?>">
+               <img class="refFormImgOk<?=$this->image['id_ref_photo']?>" src="images/icons/icon_ok.png"
+                    width="14" alt="save Ok" style="display:none"/>
+               <img class="refFormImgProgress<?=$this->image['id_ref_photo']?>" src="images/progress.gif"
+                    width="14" alt="saving" style="display:none"/>
+            </p>
+            <?}?>
+         </form>
+      </td>
+   </tr>
+   <tr>
+      <td align="right">
+         <form action="<?=$this->l()?>" method="post" onsubmit="return deletePhoto(<?=$this->image['id_ref_photo']?>)">
+            <input name="reference_photo_id" type="hidden" value="<?=$this->image['id_ref_photo']?>"/>
+            <input name="reference_photo_delete" type="submit" value="<?=$this->_("smazat")?>">
+         </form>
+      </td>
+   </tr>
+</table>

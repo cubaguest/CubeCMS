@@ -1,0 +1,21 @@
+<div id="firstpane" class="menu_list">
+  <p class="menu_head">Header-1</p>
+    <div class="menu_body">
+        <a href="#">Link-1</a>
+    </div>
+  <p class="menu_head">Header-2</p>
+    <div class="menu_body">
+        <a href="#">Link-1</a>
+    </div>
+  <p class="menu_head">Header-3</p>
+    <div class="menu_body">
+        <a href="#">Link-1</a>
+   </div>
+</div>
+<script type="text/javascript">
+$("#firstpane p.menu_head").click(function()
+{
+    $(this).css({backgroundImage:"url(down.png)"}).next("div.menu_body").slideToggle(300).siblings("div.menu_body").slideUp("slow");
+    $(this).siblings().css({backgroundImage:"url(left.png)"});
+});
+</script>

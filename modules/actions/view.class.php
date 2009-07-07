@@ -1,112 +1,79 @@
 <?php
-class ActionsView extends View {
+class Actions_View extends View {
    public function mainView() {
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('addButton.tpl');
-         $this->template()->addVar('LINK_TO_ADD_ACTION_NAME', _m("Přidat akci"));
-         $this->template()->addVar('LINK_TO_ADD_ACTION', $this->container()->getLink('add_action'));
-         // editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
+      if($this->rights()->isWritable()){
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('add_action', $this->_("Přidat"),
+            $this->link()->action($this->sys()->action()->addNewAction()),
+            $this->_("Přidat akci"), "text_add.png");
+         $this->template()->toolbox = $toolbox;
       }
 
-      $this->template()->addTpl("list.tpl");
-
-      $this->template()->addVar("ACTION_LIST_NAME", _m("Akce"));
-      $this->template()->addCss("style.css");
-
-      //TODO korektní cestu
-      $this->template()->addTpl($this->container()->getEplugin('scroll'));
+      $this->template()->addTplFile("list.phtml");
+      $this->template()->addCssFile("style.css");
    }
 
    public function showView(){
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('editButtons.tpl');
-         $this->template()->addVar('LINK_TO_ADD_ACTION_NAME', _m("Přidat akci"));
-         $this->template()->addVar('LINK_TO_EDIT_ACTION_NAME', _m("Upravit"));
-
-         $this->template()->addVar('LINK_TO_DELETE_ACTION_NAME', _m("Smazat"));
-         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat akci"));
-
-         //			JSPlugin pro potvrzení mazání
-         $submitForm = new SubmitForm();
-         $this->template()->addJsPlugin($submitForm);
-
+      $actionDetailM = new Actions_Model_Detail($this->sys());
+      $this->template()->action = $actionDetailM->getActionDetailSelLang($this->sys()->article());
+      
+      if($this->rights()->isWritable()){
          // editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_action', $this->_("Upravit"),
+            $this->link()->action($this->sys()->action()->editAction()),
+            $this->_("Upravit akci"), "text_edit.png")
+         ->addTool(Actions_Controller::FORM_PREFIX.Actions_Controller::FORM_BUTTON_DELETE,
+            $this->_("Smazat"), $this->link(),
+            $this->_("Smazat akci"), "remove.png", Actions_Controller::FORM_PREFIX.Actions_Controller::FORM_INPUT_ID,
+            $this->template()->action[Actions_Model_Detail::COLUMN_ACTION_ID],
+            $this->_("Opravdu smazat akci")."?");
+         $this->template()->toolbox = $toolbox;
       }
-
-      $this->template()->addTpl("actionDetail.tpl");
-      $this->template()->addCss("style.css");
-
-      $this->template()->setTplSubLabel($this->container()->getData('NEW_NAME'));
-      $this->template()->setSubTitle($this->container()->getData('NEW_NAME'), true);
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
+      
+      $this->template()->addTplFile("actionDetail.phtml");
+      $this->template()->addCssFile("style.css");
    }
 
    /**
     * Viewer pro přidání novinky
     */
-   public function addNActionView() {
-      $this->template()->addTpl('editAction.tpl');
-      $this->template()->addCss("style.css");
-
-      $this->template()->setTplSubLabel(_m('Přidání akce'));
-      $this->template()->setSubTitle(_m('Přidání akce'), true);
-      $this->template()->addVar("ADD_ACTION_LABEL",_m('Přidání akce'));
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
-      $this->assignLabels();
+   public function addNewActionView() {
+      $this->template()->addTplFile('editAction.phtml');
+      $this->template()->addCssFile("style.css");
+      $this->template()->pageLabel = $this->_("Přidání akce");
 
       //Tabulkové uspořádání
-      $jquery = new JQuery();
+      $jquery = new JsPlugin_JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
 
-      $tinyMce = new TinyMce();
-      $tinyMce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+      $tinyMce = new JsPlugin_TinyMce();
+      $tinyMce->setTheme(JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
       $this->template()->addJsPlugin($tinyMce);
-   }
-
-   /**
-    * Metoda přiřadí popisky do šablony
-    */
-   private function assignLabels() {
-      $this->template()->addVar('ACTION_LABEL_NAME', _m('Název'));
-      $this->template()->addVar('ACTION_TEXT_NAME', _m('Text'));
-      //      $this->template()->addVar('SHOW_DATE_START', _m('Zobrazit od'));
-      //      $this->template()->addVar('SHOW_DATE_STOP', _m('Zobrazit do'));
-      $this->template()->addVar('ACTION_IMAGE', _m('Obrázek akce'));
-
-      $this->template()->addVar('BUTTON_RESET', _m('Obnovit'));
-      $this->template()->addVar('BUTTON_SEND', _m('Uložit'));
    }
 
    /**
     * Viewer pro editaci novinky
     */
-   public function editView() {
-      $this->template()->addTpl('editAction.tpl');
-      $this->template()->addCss("style.css");
+   public function editActionView() {
+      $this->template()->addTplFile('editAction.phtml');
+      $this->template()->addCssFile("style.css");
 
-      $this->template()->setTplSubLabel(_m("Úprava akce").' - '.$this->container()->getData('ACTION_NAME'));
-      $this->template()->setSubTitle(_m("Úprava akce").' - '.$this->container()->getData('ACTION_NAME'), true);
-      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava akce").' - '.$this->container()->getData('ACTION_NAME'));
 
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
-      $this->template()->addVar('EDITING', true);
-      $this->template()->addVar('DELETE_IMAGE', _m('Smazat obrázek'));
-      $this->assignLabels();
+      $actM = new Actions_Model_Detail($this->sys());
+      $this->template()->action = $actM->getActionDetailAllLangs($this->sys()->article());
+      $this->template()->editAction = true;
+
+      $this->template()->pageLabel = $this->_("Úprava akce");
+
       //Taby - uspořádání
-      $jquery = new JQuery();
+      $jquery = new JsPlugin_JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
 
-      $tinyMce = new TinyMce();
-      $tinyMce->setTheme(TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+      $tinyMce = new JsPlugin_TinyMce();
+      $tinyMce->setTheme(JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
       $this->template()->addJsPlugin($tinyMce);
    }
 }

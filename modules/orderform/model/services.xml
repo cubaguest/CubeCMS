@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services>
+   <service>
+      <name>Montáž</name>
+      <inputname>montaz</inputname>
+   </service>
+   <service>
+      <name>Demontáž</name>
+      <inputname>demontaz</inputname>
+   </service>
+   <service>
+      <name>Zednické práce</name>
+      <inputname>zednicke_prace</inputname>
+   </service>
+   <service>
+      <name>Montážní doplňky</name>
+      <inputname>montazni_doplnky</inputname>
+   </service>
+   <service>
+      <name>Doprava</name>
+      <inputname>doprava</inputname>
+   </service>
+   <service>
+      <name>Likvidace starých oken</name>
+      <inputname>likvidace_starych_ken</inputname>
+   </service>
+</services>

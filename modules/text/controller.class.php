@@ -5,7 +5,7 @@
 
 class Text_Controller extends Controller {
    /**
-    * Názvy formůlářových prvků
+    * Názvy formulářových prvků
     * @var string
     */
    const FORM_PREFIX = 'text_';

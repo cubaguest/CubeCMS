@@ -4,8 +4,6 @@
  *
  */
 class Articles_Action extends Action {
-	
-
 	const ACTION_ADD_ARTICLE_ABBR = 'aa';
 	const ACTION_EDIT_ARTICLE_ABBR = 'ea';
 
@@ -22,6 +20,5 @@ class Articles_Action extends Action {
 	public function editArticle() {
 		return $this->createAction(self::ACTION_EDIT_ARTICLE_ABBR);
 	}
-
 }
 ?>

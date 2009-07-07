@@ -1,17 +1,16 @@
 <?php
-class ArticlesSiteMap extends SiteMap {
+class Products_SiteMap extends SiteMap {
 	public function run() {
-      $articleModel = new ArticlesListModel();
+      $productModel = new Products_Model_List($this->sys());
 
       // kategorie
-      $this->addCategoryItem($articleModel->getLastChange());
-      $articleArr = $articleModel->getListArticles();
-      foreach ($articleArr as $article) {
-         $this->addItem($this->getLink()->article($article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
-               $article[ArticleDetailModel::COLUMN_ARTICLE_ID]),
-            $article[ArticleDetailModel::COLUMN_ARTICLE_LABEL],
-            $article[ArticleDetailModel::COLUMN_ARTICLE_EDIT_TIME],
-            parent::SITEMAP_SITE_CHANGE_MONTHLY);
+      $this->addCategoryItem($productModel->getLastChange());
+      $prodArr = $productModel->getListProducts();
+      foreach ($prodArr as $product) {
+         $this->addItem($this->link()->article($product[Products_Model_Detail::COLUMN_PRODUCT_LABEL],
+               $product[Products_Model_Detail::COLUMN_PRODUCT_ID]),
+            $product[Products_Model_Detail::COLUMN_PRODUCT_LABEL],
+            $product[Products_Model_Detail::COLUMN_PRODUCT_EDIT_TIME]);
       }
 	}
 }

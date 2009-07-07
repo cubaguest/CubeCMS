@@ -1,0 +1,14 @@
+<div class="panelActions">
+<?foreach ($this->actions as $action) {?>
+   <h3><a href="<?=$this->l()->article($action['label'],$action['id_action'])?>"
+        title="<?=$action['label']?>"><?=$action['label']?></a></h3>
+   <?if($action['image'] != null) {?>
+   <?=imageTag($this->module()->getDir()->getDataDir().$action['image'], $action['image'], 90, 90, "float:right")?>
+   <!--<img style="float:left;" src="" alt="image <?=$action['image']?>" />-->
+   <?}?>
+   <?=$action[Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT]?>
+   <hr class="reseter" />
+   <a href="<?=$this->l()->article($action['label'],$action['id_action'])?>" 
+      title="<?=$this->_("více o akci")." ".$action['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+<?}?>
+</div>

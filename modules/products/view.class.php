@@ -1,147 +1,117 @@
 <?php
-class ProductsView extends View {
-   public function mainView() {
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('addButton.tpl');
-         $this->template()->addVar('LINK_TO_ADD_PRODUCT_NAME', _m("Přidat produkt"));
+class Products_View extends View {
+   const SHOW_PRODUCTS_NUM = 20;
 
-         // editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
+   public function mainView() {
+      if($this->rights()->isWritable()) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('add_product', $this->_m("Přidat"),
+             $this->link()->action($this->sys()->action()->addProduct()),
+             $this->_m("Přidat produkt"), "text_add.png");
+         $this->template()->toolbox = $toolbox;
       }
 
-      $this->template()->addTpl("list.tpl");
+      $this->template()->addTplFile("list.phtml");
+      $this->template()->addCssFile("style.css");
 
-      $this->template()->addVar("PRODUCTS_LIST_NAME", _m("Produkty"));
-      $this->template()->addVar("PRODUCTS_MORE_NAME", _m("Více"));
-      $this->template()->addCss("style.css");
+      //		Vytvoření modelu
+      $productModel = new Products_Model_List($this->sys());
+      //		Scrolovátka
+      $scroll = new Eplugin_Scroll($this->sys());
+      $scroll->setCountRecordsOnPage(self::SHOW_PRODUCTS_NUM);
+      $scroll->setCountAllRecords($productModel->getCountProducts());
+      //      var_dump($scroll);
+      //		Vybrání článků
+      $list = $productModel->getSelectedListProducts($scroll->getStartRecord(), $scroll->getCountRecords());
+      $this->template()->EPLscroll = $scroll;
 
-      //TODO korektní cestu
-      $this->template()->addTpl($this->container()->getEplugin('scroll'));
+      foreach ($list as &$products) {
+         $out = array();
+         preg_match("/(<img[^>]*\/?>)/i", $products[Products_Model_Detail::COLUMN_PRODUCT_TEXT], $out);
+         if(!empty ($out[1])) {
+            preg_match('/src="([^"]*)"/i', $out[1], $out);
+            $products['title_image'] = $out[1];
+         } else {
+            $products['title_image'] = null;
+         }
+      }
+      $this->template()->productsArray = $list;
    }
 
-   public function showView(){
-      if($this->getRights()->isWritable()){
-         $this->template()->addTpl('editButtons.tpl');
-         $this->template()->addVar('LINK_TO_ADD_PRODUCT_NAME', _m("Přidat produkt"));
-
-         $this->template()->addVar('LINK_TO_EDIT_PRODUCT_NAME', _m("Upravit"));
-
-         $this->template()->addVar('LINK_TO_DELETE_PRODUCT_NAME', _m("Smazat"));
-         $this->template()->addVar('DELETE_CONFIRM_MESSAGE', _m("Smazat produkt"));
-
-         //			JSPlugin pro potvrzení mazání
-         $submitForm = new SubmitForm();
-         $this->template()->addJsPlugin($submitForm);
-
-         // editační tlačítka
-         $jquery = new JQuery();
-         $this->template()->addJsPlugin($jquery);
+   public function showView() {
+      if($this->rights()->isWritable()) {
+      // editační tlačítka
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_product', $this->_m("Upravit"),
+             $this->link()->action($this->sys()->action()->editProduct()),
+             $this->_m("Upravit prrodukt"), "text_edit.png")
+             ->addTool('product_delete', $this->_m("Smazat"), $this->link(),
+             $this->_m("Smazat produkt"), "remove.png", "product_id",
+             $this->template()->product[Products_Model_Detail::COLUMN_PRODUCT_ID],
+             $this->_m("Opravdu smazat produkt")."?");
+         $this->template()->toolbox = $toolbox;
       }
 
       //převedeme všechny lightbox převedeme na lightbox rel
-      if((bool)$this->getModule()->getParam(ProductsController::PARAM_FILES, true)){
-         $this->template()->addJsPlugin(new LightBox());
-         $this->template()->addVar('LIGHTBOX', true);
-      }
+      $this->template()->addJsPlugin(new JsPlugin_LightBox());
+      $this->template()->lightBox = true;
 
-      $this->template()->addTpl("productDetail.tpl");
-      $this->template()->addCss("style.css");
-
-      $this->template()->setTplSubLabel($this->container()->getData('PRODUCT_LABEL'));
-      $this->template()->setSubTitle($this->container()->getData('PRODUCT_LABEL'), true);
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
+      $this->template()->addTplFile("productDetail.phtml");
+      $this->template()->addCssFile("style.css");
+      $this->template()->setArticleTitle($this->template()->product[Products_Model_Detail::COLUMN_PRODUCT_LABEL]);
    }
 
    /**
     * Viewer pro přidání produktu
     */
-   public function addproductView() {
-      $this->template()->addTpl('editProduct.tpl');
-      $this->template()->addCss("style.css");
-
-      $this->template()->setTplSubLabel(_m('Přidání produktu'));
-      $this->template()->setSubTitle(_m('Přidání produktu'), true);
-      $this->template()->addVar("ADD_PRODUCTS_LABEL",_m('Přidání produktu'));
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
-      $this->assignLabels();
+   public function addProductView() {
+      $this->template()->addTplFile('editProduct.phtml');
+      $this->template()->addCssFile("style.css");
+      $this->template()->setActionTitle($this->_m("přidání produktu"));
 
       // tiny mce
-      $tinymce = new TinyMce();
-      $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
+      $tinymce = new JsPlugin_TinyMce();
+      $tinymce->setTheme(JsPlugin_TinyMce::TINY_THEME_FULL);
 
       //NOTE soubory
-      if((bool)$this->getModule()->getParam(ProductsController::PARAM_FILES, true)){
-         $eplFiles = $this->container()->getEplugin('files');
-         $this->template()->addTpl($eplFiles->getTpl(), true);
-         $eplFiles->assignToTpl($this->template());
-         $tinymce->setImagesList($eplFiles->getImagesListLink());
-         $tinymce->setLinksList($eplFiles->getLinksListLink());
-      }
+      $tinymce->setImagesList($this->EPLfiles->getImagesListLink());
+      $tinymce->setLinksList($this->EPLfiles->getLinksListLink());
 
       // vložení šablony epluginu TinyMCE
       $this->template()->addJsPlugin($tinymce);
-      if((bool)$this->getModule()->getParam(ProductsController::PARAM_FILES, true)){
-         $this->template()->addJsPlugin(new LightBox());
-         $this->template()->addVar('LIGHTBOX', true);
-      }
+
       //Tabulkové uspořádání
-      $jquery = new JQuery();
+      $jquery = new JsPlugin_JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na seznam'));
-   }
-
-   /**
-    * Metoda přiřadí popisky do šablony
-    */
-   private function assignLabels() {
-      $this->template()->addVar('PRODUCT_LABEL_NAME', _m('Název'));
-      $this->template()->addVar('PRODUCT_TEXT_NAME', _m('Text'));
-      $this->template()->addVar('PRODUCT_IMAGE_NAME', _m('Titulní obrázek'));
-
-      $this->template()->addVar('BUTTON_RESET', _m('Obnovit'));
-      $this->template()->addVar('BUTTON_SEND', _m('Uložit'));
    }
 
    /**
     * Viewer pro editaci novinky
     */
    public function editproductView() {
-      $this->template()->addTpl('editProduct.tpl');
-      $this->template()->addCss("style.css");
+      $this->template()->addTplFile('editProduct.phtml');
+      $this->template()->addCssFile("style.css");
 
-      $this->template()->setTplSubLabel(_m("Úprava produktu").' - '.$this->container()->getData('PRODUCT_NAME'));
-      $this->template()->setSubTitle(_m("Úprava produktu").' - '.$this->container()->getData('PRODUCT_NAME'), true);
-      $this->template()->addVar("ADD_NEWS_LABEL",_m("Úprava produktu").' - '.$this->container()->getData('PRODUCT_NAME'));
-
-      $this->template()->addVar('BUTTON_BACK_NAME', _m('Zpět na produkt'));
-      $this->assignLabels();
+      $model = new Products_Model_Detail($this->sys());
+      $this->template()->product = $model->getProductDetailAllLangs($this->sys()->article()->getArticle());
+      $this->template()->setArticleTitle($this->template()
+         ->article[Products_Model_Detail::COLUMN_PRODUCT_LABEL][Locale::getLang()]);
+      $this->template()->setActionTitle($this->_m("úprava produktu"));
 
       // tiny mce
-      $tinymce = new TinyMce();
-      $tinymce->setTheme(TinyMce::TINY_THEME_FULL);
+      $tinymce = new JsPlugin_TinyMce();
+      $tinymce->setTheme(JsPlugin_TinyMce::TINY_THEME_FULL);
 
       //NOTE soubory
-      if((bool)$this->getModule()->getParam(ProductsController::PARAM_FILES, true)){
-         $eplFiles = $this->container()->getEplugin('files');
-         $this->template()->addTpl($eplFiles->getTpl(), true);
-         $eplFiles->assignToTpl($this->template());
-         $tinymce->setImagesList($eplFiles->getImagesListLink());
-         $tinymce->setLinksList($eplFiles->getLinksListLink());
-      }
+      $tinymce->setImagesList($this->EPLfiles->getImagesListLink());
+      $tinymce->setLinksList($this->EPLfiles->getLinksListLink());
 
       // vložení šablony epluginu TinyMCE
       $this->template()->addJsPlugin($tinymce);
-      if((bool)$this->getModule()->getParam(ProductsController::PARAM_FILES, true)){
-         $this->template()->addJsPlugin(new LightBox());
-         $this->template()->addVar('LIGHTBOX', true);
-      }
-      
-      //Taby - uspořádání
-      $jquery = new JQuery();
+
+      //Tabulkové uspořádání
+      $jquery = new JsPlugin_JQuery();
       $jquery->addWidgentTabs();
       $this->template()->addJsPlugin($jquery);
    }

@@ -2,40 +2,12 @@
 .productsList {
 }
 
-div.productBox {
-   
-   /*width:600px;
-   float: left;*/
-   margin: 20px;
-   padding: 6px 10px;
-}
-
-div.productBox h2 {
-   height: 140px;
-}
-
-div.productBox a {
-   color: black;
-}
-
-div.productBox p>a, div.productBox h2>a {
-   /*background-color: white;*/
-}
-
-/*
-div.productBox>div {
-   padding: 12px;
-   border: 1px solid gray;
-   margin: 10px;
-}
-
-.productBox p.productImage {
-   text-align: center;
-}
-*/
-
-
-div.productDetailImage {
-   float: left;
-   padding: 0 10px 10px 0;
+.productsList .imageBox {
+   width: 80px;
+   height: 80px;
+   padding: 5px;
+   margin: 0 5px 0 5px;
+   border:1px solid gray;
+   text-align:center;
+   float:left;
 }

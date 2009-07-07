@@ -13,11 +13,11 @@ class Menu extends Menu_Main {
       foreach ($this->menuArray as $index => $item) {
          $item["url"]=$this->getLink()->category($item[Model_Category::COLUMN_CAT_LABEL],
             $item[Model_Category::COLUMN_CAT_ID]);
-         if($item[Model_Category::COLUMN_SEC_ID] != $oldIdSection){
-            $oldIdSection = $item[Model_Category::COLUMN_SEC_ID];
+         if($item[Model_Category::COLUMN_CAT_SEC_ID] != $oldIdSection){
+            $oldIdSection = $item[Model_Category::COLUMN_CAT_SEC_ID];
             $categoryArray[$oldIdSection] = array();
             array_push($categoryArray[$oldIdSection], $item);
-            $sectionArray[$item[Model_Category::COLUMN_SEC_ID]] = $item;
+            $sectionArray[$item[Model_Category::COLUMN_CAT_SEC_ID]] = $item;
          } else {
             array_push($categoryArray[$oldIdSection], $item);
          }
