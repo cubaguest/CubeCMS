@@ -3,9 +3,9 @@
  * Metoda pro práci se soubory typu zip, umožňuje rozbalování souborů, pakování
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE3.9.4 $Revision: $
- * @author			$Author: $ $Date: $
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract		Třída pro práci se ZIP soubory
  */
 class ZipFile extends File {

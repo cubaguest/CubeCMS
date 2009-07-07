@@ -3,9 +3,9 @@
  * Metoda pro práci s textovými soubory, umožňuje jejich vytváření, mazání, ukládání
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE3.9.4 $Revision: $
- * @author			$Author: $ $Date: $
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract		Třída pro práci s textovými souory
  * @todo          není zcela implementovány, chyby načítání, doimplementovat metody
  * getContent a setContent

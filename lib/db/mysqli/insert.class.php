@@ -6,9 +6,9 @@ require_once './lib/db/insert.class.php';
  * Třída obsahuje implementaci metody insert z db.interfacu a rozhraní Db_Insert
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE3.9.2 $Revision: $
- * @author			$Author: $ $Date:$
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vkládání záznamů do MySQL DB
  * @see           http://dev.mysql.com/doc/refman/5.1/en/insert.html
  * @package       mysqli

@@ -3,9 +3,9 @@
  * Třída pro tvorbu odkazů pro ajaxové načítání
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE3.5.0 $Revision: $
- * @author			$Author: $ $Date: $
- *						$LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.5.0 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro tvorbu ajaxových odkazů
  */
 class Ajax_Link {

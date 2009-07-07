@@ -5,9 +5,9 @@
  * třídy pro menu, a poskytuje základní přístup k prvkům menu.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: mainmenu.class.php 610 2009-05-29 07:14:39Z jakub $ VVE3.9.2 $Revision: 610 $
- * @author			$Author: jakub $ $Date: 2009-05-29 09:14:39 +0200 (Pá, 29 kvě 2009) $
- *						$LastChangedBy: jakub $ $LastChangedDate: 2009-05-29 09:14:39 +0200 (Pá, 29 kvě 2009) $
+ * @version    	$Id$ VVE3.9.2 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření hlavního menu
  * @todo          Předělat načítání SQL položek do modelu
  */

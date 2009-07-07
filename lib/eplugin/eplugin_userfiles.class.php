@@ -5,9 +5,9 @@
  * teké obstarává jejich výpis pomocí vlastní šablony to článku.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE3.9.4 $Revision: $
- * @author        $Author: $ $Date:$
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída Epluginu pro práci se soubory, přikládanými do stránky
  *
  * @todo          dodělat mazání všech souborů z článku a mazání souborů z více článků

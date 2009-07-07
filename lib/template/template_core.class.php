@@ -5,9 +5,9 @@
  * Umožňuje všechny základní operace při volbě a plnění šablony a jejímu zobrazení.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: template.class.php 576 2009-04-15 10:52:59Z jakub $ VVE3.9.4 $Revision: 576 $
- * @author        $Author: jakub $ $Date: 2009-04-15 10:52:59 +0000 (St, 15 dub 2009) $
- *                $LastChangedBy: jakub $ $LastChangedDate: 2009-04-15 10:52:59 +0000 (St, 15 dub 2009) $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu šablony
  */
 

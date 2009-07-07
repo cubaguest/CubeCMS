@@ -5,9 +5,9 @@
  * tak s hlavním adresářem modulu, ale i s adresáři stylesheetu a šablon modulu.
  * 
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE 5.0.0 $Revision: $
- * @author        $Author: $ $Date:$
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE 5.0.0 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu adresářů modulu
  */
 

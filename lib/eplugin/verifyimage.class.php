@@ -3,9 +3,9 @@
  * Description of verifyimageclass
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: verifyimageclass.class.php 419 2008-11-28 23:21:19Z jakub $ VVE3.3.0 $Revision: 419 $
- * @author			$Author: jakub $ $Date: 2008-11-28 23:21:19 +0000 (Pá, 28 lis 2008) $
- *						$LastChangedBy: jakub $ $LastChangedDate: 2008-11-28 23:21:19 +0000 (Pá, 28 lis 2008) $
+ * @version    	$Id$ VVE3.3.0 $Revision$
+ * @author			$Author$ $Date$
+ *						$LastChangedBy$ $LastChangedDate$
  * @abstract		text
  */
 class VerifyImageEplugin extends Eplugin {

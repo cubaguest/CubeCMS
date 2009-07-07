@@ -4,9 +4,9 @@
  * Třída slouží pro validaci časů a datumů
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: timevalidator.class.php 533 2009-03-29 00:11:57Z jakub $ VVE3.9.4 $Revision: 533 $
- * @author        $Author: jakub $ $Date: 2009-03-29 00:11:57 +0000 (Ne, 29 bře 2009) $
- *                $LastChangedBy: jakub $ $LastChangedDate: 2009-03-29 00:11:57 +0000 (Ne, 29 bře 2009) $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro validaci časů a datumů prvků
  */
 class Validator_Time extends Validator {

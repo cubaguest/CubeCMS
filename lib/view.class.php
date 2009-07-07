@@ -4,9 +4,9 @@
  * Třídá slouží jako základ pro tvorbu Viewrů jednotlivých modulů. Poskytuje základní paramtery a metody k vytvoření pohledu modulu.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: controller.class.php 610 2009-05-29 07:14:39Z jakub $ VVE3.9.4 $Revision: 610 $
- * @author        $Author: jakub $ $Date: 2009-05-29 09:14:39 +0200 (Pá, 29 kvě 2009) $
- *                $LastChangedBy: jakub $ $LastChangedDate: 2009-05-29 09:14:39 +0200 (Pá, 29 kvě 2009) $
+ * @version    	$Id$ VVE3.9.4 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Abstraktní třída kontroleru modulu
  */
 

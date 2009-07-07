@@ -4,9 +4,9 @@
  * potřebné pro práci s moduly (modul, práva, akce, odkazy, ...)
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE 5.0.0 $Revision: $
- * @author        $Author: $ $Date: $
- *                $LastChangedBy: $ $LastChangedDate: $
+ * @version    	$Id$ VVE 5.0.0 $Revision$
+ * @author        $Author$ $Date$
+ *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třídy pro sjednocení systémových informací o modulu
  */
 class Module_Sys {
