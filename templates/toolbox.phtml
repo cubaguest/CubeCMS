@@ -19,11 +19,11 @@
 </div>
 
 <script type="text/javascript">
-   $(document).ready(function(){
-      $("div#toolbox<?=$this->getRandSeek();?>").css({ "opacity": 0.5});
-   });
+//   $(document).ready(function(){
+      $("div#toolbox<?=$this->getRandSeek();?>").css({opacity: 0.3});
+//   });
    $("div#toolbox<?=$this->getRandSeek();?>").hover(
-   function(){$("div#toolbox<?=$this->getRandSeek();?>").fadeTo(100, 1) (100);},
+   function(){$("div#toolbox<?=$this->getRandSeek();?>").fadeTo(100, 1);},
    function(){$("div#toolbox<?=$this->getRandSeek();?>").fadeTo(300, 0.5);}
 );
 

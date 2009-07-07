@@ -17,13 +17,12 @@
    <script type="text/javascript">
       $(document).ready(function() {
          new Ajax_upload('#uploadFileButton', {
-            action: '<?=$this->ajaxUserfileFile?>',
+            //action: '<?=$this->ajaxUserfileFile?>',
+            action: '<?=$this->ajaxLink->action('addFile')->param('idArticle', $this->idArticle)?>',
             name: 'userfiles_new_file',
             autoSubmit: true,
             data: {
-               userfiles_idItem : "<?=$this->idItem;?>",
                userfiles_idArticle : "<?=$this->idArticle;?>",
-               action : 'addFile',
                userfiles_send_file: 1},
             onComplete : function(file, response){
                $('#uploadFileStatus').hide();
@@ -44,7 +43,7 @@
       function loadFiles(){
          clearFiles();
          var count = 0;
-         $.getJSON("<?=$this->ajaxUserfileFile?>?action=getFiles&idItem=<?=$this->idItem?>&idArticle=<?=$this->idArticle?>",
+         $.getJSON("<?=$this->ajaxLink->action('getFiles')->param('idArticle', $this->idArticle)?>",
          function(jsondata){
             $.each(jsondata.files, function(i,ufile){
                count++;
@@ -88,10 +87,9 @@
          if (confirm(name)){
             $.ajax({
                type: "POST",
-               url: "<?=$this->ajaxUserfileFile?>",
+               url: "<?=$this->ajaxLink->action('deleteFile')?>",
                data: {
-                  idFile : idFile,
-                  action : 'deleteFile'},
+                  idFile : idFile},
                success: function(msg){
                   loadFiles();
                   alert( msg );

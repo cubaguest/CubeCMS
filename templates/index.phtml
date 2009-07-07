@@ -82,7 +82,7 @@
                   if($this->pageNotFound){
                      $this->includeTpl("error404.phtml", true);
                   } else if($this->specialPage){
-                     $this->includeTpl($this->specialPageName, true);
+                     $this->includeTpl($this->specialPageName.".phtml", true);
                   } else {
                      $this->includeTpl("modules.phtml", true);
                   }

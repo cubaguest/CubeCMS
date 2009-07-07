@@ -1,23 +1,25 @@
-<h1>{$SITEMAP_PAGE_NAME} {$MAIN_PAGE_TITLE}</h1>
+<h1><?=_("Mapa stránek")?> <?=$this->pageTitle;?></h1>
 <div class="moduleBox">
-{foreach from=$SITEMAP_PAGES item=SECTION}
-<ul>
-   <li>{$SECTION.name}
-      <ul>
-         {foreach from=$SECTION.categories item=CATEGORY}
-         <li>
-            <a href="{$CATEGORY.url}" title="{$CATEGORY.name}">{$CATEGORY.name}</a>
-            {if !empty($CATEGORY.results)}
-            <ul>
-            {foreach from=$CATEGORY.results item=RESULT}
-               <li><a href="{$RESULT.loc}" title="{$RESULT.name}">{$RESULT.name}</a></li>
-            {/foreach}
-            </ul>
-            {/if}
-         </li>
-         {/foreach}
-      </ul>
-   </li>
-</ul>
-{/foreach}
+<?foreach ($this->sitemapPages as $section) {?>
+   <ul>
+      <li><?=$section['name']?>
+         <ul>
+            <?foreach ($section['categories'] as $category) {?>
+            <li>
+               <a href="<?=$category['url']?>" title="<?=$category['name']?>"><?=$category['name']?></a>
+               <?if(!empty ($category['results'])){?>
+               <ul>
+               <?foreach ($category['results'] as $result) {?>
+                  <li>
+                     <a href="<?=$result['loc']?>" title="<?=$result['name']?>"><?=$result['name']?></a>
+                  </li>
+               <?}?>
+               </ul>
+               <?}?>
+            </li>
+            <?}?>
+         </ul>
+      </li>
+   </ul>
+<?}?>
 </div>

@@ -1,14 +1,31 @@
-<div style="text-align:right">{$SEARCH_RESULT_COUNT_LABEL}: {$SEARCH_RESULTS_COUNT}</div>
-{foreach from="$SEARCH_RESULTS" item="RESULT" key="RESULT_KEY" name ='searchresults'}
-<h2>
-   <a href="{$RESULT.url}" title="{$RESULT.category}{if $RESULT.article neq null} - {$RESULT.article}{/if}">
-   {$RESULT.category}{if $RESULT.article neq null} - {$RESULT.article}{/if}
-   </a>
-</h2>
-<div class="moduleBox">
-   {$RESULT.text}<br />
-   {$SEARCH_RESULT_MORE}: <a href="{$RESULT.url}" title="{$RESULT.url}">{$RESULT.url|truncate:100}</a>
+<div>
+<?
+   if($this->searchResultsCount == 0){
+      printf(_("Pro výraz \"%s\" nebyl nalezen žádný výsledek. Zkontrolujte hledaný výraz."), $this->articleTitle());
+   } else if($this->searchResultsCount == 1){
+      printf(_("Pro výraz \"%s\" byl nalezen %u výsledek"), $this->articleTitle(), $this->searchResultsCount);
+   } else if($this->searchResultsCount > 1 AND $this->searchResultsCount < 5){
+      printf(_("Pro výraz \"%s\" byly nalezeny %u výsledky"), $this->articleTitle(), $this->searchResultsCount);
+   } else {
+      printf(_("Pro výraz \"%s\" bylo nalezeno %u výsledeků"), $this->articleTitle(), $this->searchResultsCount);
+   }
+?>
 </div>
-{foreachelse}
-{$NOT_ANY_SEARCH_RESULT}
-{/foreach}
+<div id="searchResults">
+<?
+if(!empty ($this->searchResults)){
+foreach ($this->searchResults as $result) {?>
+<h2>
+   <a href="<?=$result['category_url'];?>" title="<?=$result['category']?>"><?=$result['category']?></a>
+   <?if(!empty ($result['article'])){?>
+      &nbsp;&raquo;&nbsp;
+      <a href="<?=$result['url']?>" title="<?=$result['category']?>"><?=$result['article']?></a>
+   <?}?>
+</h2>
+<div>
+   <?=$result['text']?><br />
+   <?=_("více")?>: <a href="<?=$result['url']?>" title="<?=$result['url']?>"><?=$result['url']?></a>
+</div>
+<?}
+}?>
+</div>
