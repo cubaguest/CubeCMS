@@ -86,13 +86,13 @@ class Mysqli_Db_Update extends Mysqli_Db_Query implements Db_Update{
 
    /**
     * Metoda přidá do SQL dotazu klauzuli LIMIT
-    * @param integer -- počet záznamů
-    * @param integer -- záčátek
+    * @param integer $startRow -- záčátek
+    * @param integer $offset -- počet záznamů
     *
     * @return Db_Update -- objekt Db_Update
     */
-   public function limit($rowCount, $offset) {
-      return parent::limit($rowCount, $offset);
+   public function limit($startRow, $offset) {
+      return parent::limit($startRow, $offset);
    }
 
    /**

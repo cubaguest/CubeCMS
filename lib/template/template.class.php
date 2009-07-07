@@ -12,6 +12,7 @@
  */
 
 require_once 'tplmodifiers.php';
+require_once 'template_items.php';
 
 class Template {
    /**
@@ -155,12 +156,12 @@ class Template {
     * @param string $name -- název proměnné
     * @return mixed -- hodnota proměnné
     */
-   public function  __get($name) {
-      if(isset($this->privateVars[$name])){
-         return $this->privateVars[$name];
-      } else {
-         return null;
+   public function  &__get($name) {
+      if(!isset($this->privateVars[$name])){
+         $this->privateVars[$name] = null;
+         trigger_error(sprintf(_('Nedefinovaná proměnná %s'),$name), E_USER_NOTICE);
       }
+      return $this->privateVars[$name];
    }
 
    /**
@@ -180,6 +181,21 @@ class Template {
       if(isset ($this->privateVars[$name])){
          unset ($this->privateVars[$name]);
       }
+   }
+
+   /**
+    * Magická metoda převede šablonu na řetězec
+    * @return string -- vygenerovaný řetězec z šablon
+    */
+   public function  __toString() {
+      // zastavení výpisu buferu
+      ob_start();
+      foreach ($this->templateFiles as $file) {
+         if(file_exists($file)) {
+            include $file;
+         }
+      }
+      return ob_get_clean();
    }
 
    /*
@@ -232,7 +248,7 @@ class Template {
     * @return string
     */
    final public function catTitle() {
-      return self::$catTitle;
+      return htmlspecialchars(self::$catTitle);
    }
 
    /**
@@ -248,7 +264,7 @@ class Template {
     * @return string
     */
    final public function articleTitle() {
-      return self::$articleTitle;
+      return htmlspecialchars(self::$articleTitle);
    }
 
    /**
@@ -264,7 +280,7 @@ class Template {
     * @return string
     */
    final public function actionTitle() {
-      return self::$actionTitle;
+      return htmlspecialchars(self::$actionTitle);
    }
 
    // nepoužito zatím
@@ -321,6 +337,20 @@ class Template {
    }
 
    /**
+    * Metoda vrací obsah prvku $_GET, ošetřený o specielní znaky v url
+    * @param string $name -- název prvku
+    * @param string $defaultValue -- výchozí hodnota pokud prvek nebyl odeslán
+    * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
+    */
+   public function get($name, $defaultValue = null) {
+      if(isset ($_GET[$name])){
+         return urldecode($_GET[$name]);
+      } else {
+         return $defaultValue;
+      }
+   }
+
+   /**
     * Metoda přidá požadovaný soubor šablony do výstupu
     * @param string $name -- název souboru
     * @param boolean $engine -- jestli se jedná o šablonu enginu
@@ -340,12 +370,38 @@ class Template {
    public function renderTemplate() {
       // zastavení výpisu buferu
       ob_start();
+//      $renderedTemlate = null;
       foreach ($this->templateFiles as $file) {
-         if(file_exists($file)){
-            include $file;
+         if(file_exists($file)) {
+                     include $file;
+//            $content = file_get_contents($file);
+//
+//            $res = '';
+//            $blocks = array();
+//            unset($php);
+//            foreach (token_get_all($content) as $token) {
+//               if (is_array($token)) {
+//                  if ($token[0] === T_INLINE_HTML) {
+//                     $res .= $token[1];
+//                     unset($php);
+//                  } else {
+//                     if (!isset($php)) {
+//                        $res .= $php = "\x01@php:p" . count($blocks) . "@\x02";
+//                        $php = & $blocks[$php];
+//                     }
+//                     $php .= $token[1];
+//                  }
+//               } else {
+//                  $php .= $token;
+//               }
+//            }
+//            $content = strtr($content, $blocks);
+//
+//            $renderedTemlate .= eval('<?' . $content);
          }
       }
       ob_end_flush();
+//      return $renderedTemlate;
    }
 
    /**
@@ -355,11 +411,16 @@ class Template {
     */
    public function includeTpl($name, $engine = false, $vars = null) {
       if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
-         include (self::getFileDir($name, self::TEMPLATES_DIR,
-               $this->sys()->module()->getName()).$name);
+         $path = self::getFileDir($name, self::TEMPLATES_DIR, $this->sys()->module()->getName());
       } else {
-         include (self::getFileDir($name, self::TEMPLATES_DIR, false).$name);
+         $path = self::getFileDir($name, self::TEMPLATES_DIR, false);
       }
+      if(file_exists($path.$name)){
+         include $path.$name;
+      } else {
+         throw new BadFileException(sprintf(_("Soubor šablony %s nebyl nalezen"),$name));
+      }
+
       unset ($vars);
    }
 
@@ -395,7 +456,9 @@ class Template {
     * @param Template $name -- objekt šablony
     */
    final public function includeTplObj($name) {
-      if($name instanceof Template){
+      if(is_null($name == null)){
+         echo null;
+      } else if($name instanceof Template){
          $name->renderTemplate();
       } else if($name instanceof Eplugin){
          $name->renderEplugin();
@@ -452,16 +515,21 @@ class Template {
 
    /**
     * Metoda přidá javascript soubor do šablony
-    * @param string/JsFile $jsfile -- název souboru nebo objek JsFile(pro virtuální)
+    * @param string/JsPlugin_JsFile $jsfile -- název souboru nebo objek JsFile(pro virtuální)
     * @return Template -- objekt sebe
     */
    final public function addJsFile($jsfile, $engine = false) {
+      //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
+      if(eregi('http://[a-zA-Z_.]+', $jsfile)){
+         Template_Core::addJS($jsfile);
+      } else {
       if(!$engine AND $this->sys() != null){
          $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->sys()->module()->getName());
       } else {
          $dir = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR);
       }
       Template_Core::addJS($dir.$jsfile);
+      }
       return $this;
    }
 

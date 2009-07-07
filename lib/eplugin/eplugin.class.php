@@ -130,6 +130,18 @@ class Eplugin {
       return $this->sys()->module();
    }
 
+   /**
+    * Metoda vrací id item nastavené epluginu
+    *
+    * @return integer -- id item
+    */
+   public function getIdItem(){
+      if($this->sys()->module() instanceof Module){
+         return $this->sys()->module()->getId();
+      }
+      return 0;
+   }
+
 
    /**
     * Metoda vrací objekt k připojení k db

@@ -73,22 +73,36 @@ class MySQLiDb extends Db implements DbInterface {
 	 * @param string -- prefix tabulek (option)
 	 */
 	function __construct(){
-		$this->_mysqliObject = new mysqli(parent::$_serverName, parent::$_userName, parent::$_userPassword, parent::$_dbName);
-	}
+		try {
+         if (gethostbyname(parent::$_serverName) != parent::$_serverName){
+            $this->_mysqliObject = new Mysqli(parent::$_serverName, parent::$_userName,
+            parent::$_userPassword, parent::$_dbName);
+         } else {
+            $this->_mysqliObject = new Mysqli(parent::$_serverNameBackup,
+               parent::$_userNameBackup, parent::$_userPasswordBackup, parent::$_dbNameBackup);
+         }
+         if($this->_mysqliObject->connect_errno != 0){
+            throw new DBException(mysqli_connect_error(), 102);
+         }
+
+         $this->_mysqliObject->set_charset("utf8");
+      } catch (DBException $e) {
+         new CoreErrors($e);
+      }
+   }
 
 	/**
 	 * Metoda provede připojení k databázi a nastaví link na spojení
 	 * @todo dodělat nastavení kódování
 	 */
 	private function _connect() {
-      try {
-         if (mysqli_connect_errno()) {
-            throw new DBException(mysqli_connect_error(), 102);
-         }
-      } catch (DBException $e) {
-         new CoreErrors($e);
-      }
-		$this->_mysqliObject->set_charset("utf8");
+//      try {
+//         if (mysqli_connect_errno()) {
+//            throw new DBException(mysqli_connect_error(), 102);
+//         }
+//      } catch (DBException $e) {
+//         new CoreErrors($e);
+//      }
 	}
 
 	/**

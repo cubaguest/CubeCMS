@@ -32,10 +32,10 @@ class SiteMap {
 	const SITEMAP_SITE_DEFAULT_PRIORITY = 0.1;
 	
 	/**
-	 * Objekt s odkazem na kategorii
-	 * @var Links
+	 * Objekt se systémem modulu
+	 * @var Module_Sys
 	 */
-	private $link = null;
+	private $sys = null;
 	
 	/**
 	 * Frekvence změn na stránce
@@ -66,8 +66,8 @@ class SiteMap {
 	 *
 	 * @param Module -- objekt modulu
 	 */
-	function __construct(Links $link, $changefreq = self::SITEMAP_SITE_CHANGE_YEARLY, $priority = 0.5) {
-      $this->link = $link;
+	function __construct(Module_Sys $sys, $changefreq = self::SITEMAP_SITE_CHANGE_YEARLY, $priority = 0.5) {
+      $this->sys = $sys;
 		$this->changeFreq = $changefreq;
 		$this->priority = $priority;
 	}
@@ -79,12 +79,20 @@ class SiteMap {
       self::$items = array_merge(self::$items, $this->itemsCurrentArray);
    }
 
+   /**
+    * Metoda vrací systémový objekt modulu
+    * @return Module_Sys
+    */
+   protected function sys() {
+      return $this->sys;
+   }
+
 	/**
 	 * Metoda spouští proceduru pro přidávání položek do sitemap
 	 *
 	 */
 	public function run() {
-		$this->addItem($this->getLink(), null, $this->changeFreq, $this->priority);
+		$this->addItem($this->link(), null, $this->changeFreq, $this->priority);
       filectime('./index.php');
 	}
 	
@@ -132,7 +140,7 @@ class SiteMap {
       }
       $date = new DateTime(date(DATE_ISO8601,$lastChange));
       $lastChange = $date->format('c');
-      array_push(self::$items, array('loc' => (string)$this->getLink(),
+      array_push(self::$items, array('loc' => (string)$this->link(),
 									   'lastmod' => $lastChange,
 									   'changefreq' => $this->changeFreq,
 									   'priority'=>$this->priority));
@@ -144,8 +152,8 @@ class SiteMap {
 	 *
 	 * @return Module -- objekt modulu
 	 */
-	public function getModule() {
-      return AppCore::getSelectedModule();
+	public function module() {
+      return $this->sys()->module();
 	}
 	
 	/**
@@ -161,8 +169,8 @@ class SiteMap {
 	 * Metoda vrací objekt odkazu
 	 * @return Links -- objekt odkazu
 	 */
-	public function getLink() {
-		return $this->link;
+	public function link() {
+		return clone $this->sys()->link();
 	}
 	
 	/**

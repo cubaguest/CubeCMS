@@ -85,13 +85,13 @@ class Mysqli_Db_Delete extends Mysqli_Db_Query implements Db_Delete {
 
    /**
     * Metoda přidá do SQL dotazu klauzuli LIMIT
-    * @param integer -- počet záznamů
-    * @param integer -- záčátek
+    * @param integer $startRow -- záčátek
+    * @param integer $offset -- počet záznamů
     *
     * @return Db_Delete -- objekt Db_Delete
     */
-   public function limit($rowCount, $offset) {
-      return parent::limit($rowCount, $offset);
+   public function limit($startRow, $offset) {
+      return parent::limit($startRow, $offset);
    }
 
    /**

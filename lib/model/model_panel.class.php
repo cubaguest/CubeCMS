@@ -15,8 +15,6 @@ class Model_Panel extends Model_Db {
    /**
     * Konstanty s názzvy sloupců
     */
-   const COLUMN_LABEL = 'label';
-   const COLUMN_ALT = 'alt';
    const COLUMN_POSITION = 'position';
    const COLUMN_ENABLE = 'enable';
    const COLUMN_PRIORITY = 'priority';
@@ -55,22 +53,25 @@ class Model_Panel extends Model_Db {
       $this->getTables();
 
       $sqlSelect = $this->getDb()->select()->table($this->panelsTable, 'panel')
-      ->join(array("item" => $this->itemsTable), array(self::COLUMN_ID_ITEM, 'panel' => self::COLUMN_ID_ITEM),
-            null, array(self::COLUMN_LABEL => "IFNULL(item.".self::COLUMN_LABEL.'_'.Locale::getLang()
-            .", item.".self::COLUMN_LABEL.'_'.Locale::getDefaultLang().")",
-             self::COLUMN_ALT => "IFNULL(item.".self::COLUMN_ALT.'_'.Locale::getLang()
-             .", item.".self::COLUMN_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
+      ->join(array("item" => $this->itemsTable), array(self::COLUMN_ID_ITEM, 'panel' => Model_Module::COLUMN_ITEM_ID),
+            null, array(Model_Module::COLUMN_ITEM_LABEL => "IFNULL(item.".Model_Module::COLUMN_ITEM_LABEL.'_'.Locale::getLang()
+            .", item.".Model_Module::COLUMN_ITEM_LABEL.'_'.Locale::getDefaultLang().")",
+             Model_Module::COLUMN_ITEM_ALT => "IFNULL(item.".Model_Module::COLUMN_ITEM_ALT.'_'.Locale::getLang()
+             .", item.".Model_Module::COLUMN_ITEM_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
       ->join(array("cat" => $this->catTable),
           array('item' =>Model_Category::COLUMN_CAT_ID,Model_Category::COLUMN_CAT_ID),
           null, array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'
             .Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
+            Model_Category::COLUMN_CAT_ALT => "IFNULL(cat.".Model_Category::COLUMN_CAT_ALT_ORIG.'_'
+            .Locale::getLang().", cat.".Model_Category::COLUMN_CAT_ALT_ORIG.'_'.Locale::getDefaultLang().")",
             Model_Category::COLUMN_CAT_ID))
       ->join(array("module" => $this->modulesTable), array('item'=>Model_Module::COLUMN_ID_MODULE
             ,Model_Module::COLUMN_ID_MODULE), null, Db::COLUMN_ALL)
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.AppCore::getAuth()->getGroupName(), "r__", Db::OPERATOR_LIKE)
       ->where("panel.".self::COLUMN_POSITION , strtolower($side))
       ->where("panel.".self::COLUMN_ENABLE, (int)true)
-      ->order("panel.".self::COLUMN_PRIORITY, Db::ORDER_DESC);
+      ->order("panel.".self::COLUMN_PRIORITY, Db::ORDER_DESC)
+      ->order(Model_Category::COLUMN_CAT_LABEL);
 
       return $this->getDb()->fetchObjectArray($sqlSelect);
    }

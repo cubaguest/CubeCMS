@@ -133,6 +133,7 @@ class JsPlugin_TinyMce extends JsPlugin {
          'external_link_list_url' => null,
 			'remove_script_host' => 'false',
 			'content_css' => null,
+			'template_external_list_url' => null,
          'extended_valid_elements' => 'td[*],div[*]',
 //         'convert_newlines_to_brs' => true,
          'force_br_newlines' => true
@@ -147,9 +148,9 @@ class JsPlugin_TinyMce extends JsPlugin {
    private $advancedParams = array(
          self::PLUGINS_ARRAY_NAME => array('safari', 'style', 'table', 'save', 'advhr', self::PLUGIN_IMAGES, 'advlink', 'emotions', 'iespell', 'inlinepopups',
 					'insertdatetime', 'preview', self::PLUGIN_MEDIA, 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
-					'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras'),
+					'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras', 'template'),
 			'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
-					'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen'),
+					'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen', 'template'),
 			'theme_advanced_buttons2' => array('cut', 'copy', 'paste', 'pastetext', '|', 'search,replace', '|', 'bullist,numlist', '|', 'outdent',
 					'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
 					'forecolor', 'backcolor'),
@@ -193,9 +194,9 @@ class JsPlugin_TinyMce extends JsPlugin {
          $theme = rawurldecode($file->getParam(self::PARAM_THEME));
 //         doplnění obsahu s css
          if($file->getParam(self::PARAM_FACE) != null){
-            $cssurl = Links::getMainWebDir().Template::face();
-            $cssurl = substr($cssurl, 0, strlen($cssurl)-1).$file->getParam(self::PARAM_FACE).URL_SEPARATOR;
-            $this->defaultParams['content_css'] = $cssurl.Template::STYLESHEETS_DIR.'/style-tinymce.css';
+            $faceUrl = Links::getMainWebDir().Template::FACES_DIR.URL_SEPARATOR.Template::face().URL_SEPARATOR;
+            $this->defaultParams['content_css'] = $faceUrl.Template::STYLESHEETS_DIR.'/style-tinymce.css';
+            $this->defaultParams['template_external_list_url'] = $faceUrl.Template::TEMPLATES_DIR.'/tinymce/templates.js';
          }
          if($theme != self::TINY_THEME_SIMPLE){
             //         Doplnění parametru (images, media atd.)

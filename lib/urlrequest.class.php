@@ -199,6 +199,18 @@ class UrlRequest {
    private static $ajaxName = null;
 
    /**
+    * Název akce modulu nebo epluginu
+    * @var string
+    */
+   private static $ajaxAction = null;
+
+   /**
+    * Id item pro dený ajax požadavek
+    * @var integer
+    */
+   private static $ajaxIdItem = null;
+
+   /**
     * Parametry ajax souboru
     * @var array
     */
@@ -263,7 +275,7 @@ class UrlRequest {
     * Metoda kontroluje jestli se nejedná o url s ajax akcí
     */
    private static function checkAjaxFileUrl(){
-      if(ereg('^([a-zA-Z]{2,3}/)?ajax(module|eplugin)([^.]+).php', self::$currentUrl)){
+      if(ereg('^ajax/(module|eplugin)/([^/.]+)_([[:digit:]]+).php', self::$currentUrl)){
          self::$isAjax = true;
          return true;
       }
@@ -385,14 +397,14 @@ class UrlRequest {
     */
    private static function parseAjaxUrl(){
       $regexResult = array();
-      ereg('^([a-zA-Z]{2,3}/)?ajax(module|eplugin)([^.]+).php\??(.*)$', self::$currentUrl,$regexResult);
-      self::$ajaxType = $regexResult[2];
-      self::$ajaxName = $regexResult[3];
-      if (isset ($regexResult[4])){
-         self::$ajaxParams = $regexResult[4];
+      ereg('^ajax/(module|eplugin)/([^/.]+)_([^/._]+)_([[:digit:]]+).php\??(.*)$', self::$currentUrl,$regexResult);
+      Ajax::setType($regexResult[1]);
+      Ajax::setName($regexResult[2]);
+      Ajax::setAction($regexResult[3]);
+      Ajax::setIdItem($regexResult[4]);
+      if (isset ($regexResult[5])){
+         Ajax::setParams($regexResult[5]);
       }
-      
-
    }
 
    /**
@@ -538,30 +550,6 @@ class UrlRequest {
     */
    public static function isAjaxRequest() {
       return self::$isAjax;
-   }
-
-   /**
-    * Metoda vrací typ ajax požadavku - (module, eplugin)
-    * @return string
-    */
-   public static function getAjaxType() {
-      return self::$ajaxType;
-   }
-
-   /**
-    * Metoda vrací název ajax modulu nebo epluginu
-    * @return string -- název 
-    */
-   public static function getAjaxName() {
-      return self::$ajaxName;
-   }
-
-   /**
-    * Metoda vrací řetězec s parametry ajax souboru
-    * @return string -- řetězec parametrů
-    */
-   public static function getAjaxFileParams() {
-      return self::$ajaxParams;
    }
 }
 ?>

@@ -372,7 +372,7 @@ class Form {
    }
 
    /**
-    * Metody vytváří prvek typu INPUT - DATE - ze smarty šablony
+    * Metody vytváří prvek typu SELECT - DATE - ze šablonovacího systému
     *
     * @param string $name -- Název prvku
     * @param int/timestamp $validateTime -- (option) jestli má být datum časově omezeno
@@ -381,7 +381,7 @@ class Form {
     *
     * @return Form
     */
-   public function crInputDate($name, $validateTime = self::VALIDATE_DATE_ISEVERYTIME, $down = false) {
+   public function crSelectDate($name, $validateTime = self::VALIDATE_DATE_ISEVERYTIME, $down = false) {
       $inputArray = array ();
       $inputArray[self::ITEM_NAME] = $name;
       $inputArray[self::ITEM_VALIDATION] = $validateTime;
@@ -661,7 +661,7 @@ class Form {
          }
          //    vyplnění pole s datem
          if(isset ($this->formStructure[self::INPUT_DATE])){
-            $this->fillInInputDate();
+            $this->fillInSelectDate();
          }
          // Vyplnění textarea
          if(isset ($this->formStructure[self::INPUT_TEXTAREA])){
@@ -972,13 +972,13 @@ class Form {
     *
     * @todo dodělat validaci
     */
-   private function fillInInputDate() {
+   private function fillInSelectDate() {
       $inputs = $this->formStructure[self::INPUT_DATE];
       foreach ($inputs as $inputName => $value) {
          if(isset ($_POST[$this->formPrefix.$inputName])){
-            $timestamp = mktime(0, 0, 0, $_POST[$this->formPrefix.$inputName]['Date_Month'],
-               $_POST[$this->formPrefix.$inputName]['Date_Day'],
-               $_POST[$this->formPrefix.$inputName]['Date_Year']);
+            $timestamp = mktime(0, 0, 0, $_POST[$this->formPrefix.$inputName]['mounth'],
+               $_POST[$this->formPrefix.$inputName]['day'],
+               $_POST[$this->formPrefix.$inputName]['year']);
             $this->formValues[$inputName] = $timestamp;
          } else {
             $this->formValues[$inputName] = false;
@@ -1215,7 +1215,7 @@ class Form {
    * @param string $email -- emailová adresa
    */
    private function validateEMail($email) {
-      $validator = new UrlValidator();
+      $validator = new Validator_Url();
       return $validator->checkMail($email);
    }
 
@@ -1224,7 +1224,7 @@ class Form {
    * @param string $url -- URL adresa
    */
    private function validateURL($url) {
-      $validator = new UrlValidator();
+      $validator = new Validator_Url();
       return $validator->checkUrl($url);
    }
 

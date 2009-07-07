@@ -2,16 +2,20 @@
 <config>
 	<db>
 		<dbname>dev</dbname>
-		<dbserver>localhost</dbserver>
+		<dbnamebackup>dev</dbnamebackup>
+		<dbserver>dev.vypecky.info</dbserver>
+		<dbserverbackup>localhost</dbserverbackup>
 		<dbuser>dev</dbuser>
+		<dbuserbackup>dev</dbuserbackup>
 		<dbpasswd>E58frT6X</dbpasswd>
+		<dbpasswdbackup>E58frT6X</dbpasswdbackup>
 		<tbprefix>vypecky_</tbprefix>
 		<dbhandler>mysqli</dbhandler></db>
-	<templates>
+	<smarty>
 		<templates_dir>templates</templates_dir>
 		<templates_c_dir>templates_c</templates_c_dir>
 		<cache_dir>cache</cache_dir>
-		<config_dir>config</config_dir></templates>
+		<config_dir>config</config_dir></smarty>
 	
 	<db_tables><category_table>categories</category_table>
 		<section_table>sections</section_table>
@@ -24,16 +28,16 @@
 		<default_id_group>2</default_id_group>
 		<default_group_name>guest</default_group_name>
 		<default_user_name>anonym</default_user_name></users>
-	<web_name>Vepřové Výpečky</web_name>
-	<engine_version>3.1beta1</engine_version>
+	<web_name>Vepřové Výpečky Engine</web_name>
+	<engine_version>5.0</engine_version>
 	<data_dir>data</data_dir>
 	<session_name>vypecky_session</session_name>
-	<langs>cs;en</langs>
+	<langs>cs</langs>
 	<dirs>
 		<images>images</images>
 		<images_lang>langs</images_lang></dirs>
 	<DEBUG_LEVEL>2</DEBUG_LEVEL>
-	<face>default</face>
+	<face>vypecky</face>
    <sitemap_periode>weekly</sitemap_periode>
    <search>
       <result_lenght>300</result_lenght>

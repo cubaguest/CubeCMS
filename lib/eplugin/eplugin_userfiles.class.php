@@ -475,11 +475,10 @@ class Eplugin_UserFiles extends Eplugin {
     * @param Ajax $ajaxObj -- objekt ajax, poskytuje základní parametry předané
     * požadavkem
     */
-   public function addFileAjax($ajaxObj) {
+   public function addFileAjax(Ajax $ajaxObj) {
       $sendForm = new Form(self::FORM_PREFIX);
       $sendForm->crSubmit(self::FORM_BUTTON_SEND)
       ->crInputFile(self::FORM_NEW_FILE, true)
-      ->crInputHidden('idItem', true, 'is_numeric')
       ->crInputHidden('idArticle', false, 'is_numeric');
       if($sendForm->checkForm()){
          $file = $sendForm->getValue(self::FORM_NEW_FILE);
@@ -515,7 +514,7 @@ class Eplugin_UserFiles extends Eplugin {
                self::COLUM_ID_USER,self::COLUM_FILE,
                self::COLUM_TYPE, self::COLUM_WIDTH, self::COLUM_HEIGHT,
                self::COLUM_SIZE, self::COLUM_TIME)
-            ->values($sendForm->getValue('idArticle'), $sendForm->getValue('idItem'),
+            ->values($sendForm->getValue('idArticle'), $ajaxObj->getIdItem(),
                AppCore::getAuth()->getUserId(),$file->getName(),
                $fileType, $width, $height,
                $file->getFileSize(), time());
@@ -533,11 +532,11 @@ class Eplugin_UserFiles extends Eplugin {
     * Metoda vrací seznam souborů volaním přes ajax
     * @param Ajax $ajaxOb -- objekt vvolaného ajaxu
     */
-   public function getFilesAjax($ajaxOb) {
-      if($ajaxOb->getAjaxParam('idArticle')){
-         $this->idArticle = $ajaxOb->getAjaxParam('idArticle');
+   public function getFilesAjax(Ajax $ajaxOb) {
+      if($ajaxOb->getParam('idArticle')){
+         $this->idArticle = $ajaxOb->getParam('idArticle');
       }
-      $this->getFilesFromDb($ajaxOb->getAjaxParam('idItem'));
+      $this->getFilesFromDb($ajaxOb->getIdItem());
 
       header('Cache-Control: no-cache, must-revalidate');
       //header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -554,8 +553,8 @@ class Eplugin_UserFiles extends Eplugin {
     * Metoda pro mazání souboru ajaxem
     * @param Ajax $ajaxObj -- objekt ajaxu
     */
-   public function deleteFileAjax($ajaxObj){
-      $this->deleteUserFile($ajaxObj->getAjaxParam('idFile'));
+   public function deleteFileAjax(Ajax $ajaxObj){
+      $this->deleteUserFile($ajaxObj->getParam('idFile'));
    }
 
    /**
@@ -575,23 +574,11 @@ class Eplugin_UserFiles extends Eplugin {
     *
     */
    protected function view(){
-//      $this->template()->addTplFile(self::TPL_FILE, true);
-//      $jQueryPlugin = new JQuery();
-//      $jQueryPlugin->addPluginAjaxUploadFile();
-//      $this->template()->addJsPlugin($jQueryPlugin);
-//      $this->template()->addJsPlugin(new LightBox());
-      
-
       $this->template()->numRows = $this->numberOfReturnRows;
-
-
       $this->template()->filesArray = $this->filesArray;
 
-      $ajaxLink = new Ajax_Link($this);
-
-      $this->template()->ajaxUserfileFile = $ajaxLink->getFile();
-      $this->template()->ajaxAddFileParams = $ajaxLink->getParams();
-      $this->template()->idItem = $this->module()->getId();
+      $this->template()->ajaxLink = new Ajax_Link($this);
+      $this->template()->idItem = $this->sys()->module()->getId();
       if($this->idArticle != null){
          $this->template()->idArticle = $this->idArticle;
       } else {

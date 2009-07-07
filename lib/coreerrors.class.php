@@ -13,11 +13,17 @@
  * @abstract      Třída pro obsluhu chyb jádra a modulů
  */
 class CoreErrors {
+/**
+ * pole s vyjímkami vyvolanými v aplikaci
+ * @var array
+ */
+   private static $exceptionsArray = array();
+
    /**
-    * pole s vyjímkami vyvolanými v aplikaci
+    * pole s chybami, varováními a poznámkami v aplikaci
     * @var array
     */
-   private static $exceptionsArray = array();
+   private static $errorsArray = array();
 
    /**
     * Konstruktor třídy, přiřadí vyjímku do výstupu
@@ -31,7 +37,7 @@ class CoreErrors {
     * Metoda přidá vijímku do pole vyjímek
     * @param Exception $exception -- zachycená vyjímka
     */
-   public static function addException(Exception $exception){
+   public static function addException(Exception $exception) {
       array_push(self::$exceptionsArray, $exception);
    }
 
@@ -44,11 +50,18 @@ class CoreErrors {
 
       foreach (self::$exceptionsArray as $exception) {
          $errArray->append(array('message'=>$exception->getMessage(),
-                                 'file' => $exception->getFile(),
-                                 'name' => get_class($exception),
-                                 'line' => $exception->getLine(),
-                                 'code' => $exception->getCode(),
-                                 'trace' => $exception->getTrace()));
+             'file' => $exception->getFile(),
+             'name' => get_class($exception),
+             'line' => $exception->getLine(),
+             'code' => $exception->getCode(),
+             'trace' => $exception->getTrace()));
+      }
+      foreach (self::$errorsArray as $err) {
+         $errArray->append(array('message'=>$err['message'],
+             'file' => $err['file'],
+             'name' => $err['name'],
+             'code' => $err['code'],
+             'line' => $err['line']));
       }
 
       return $errArray;
@@ -59,7 +72,7 @@ class CoreErrors {
     * @return boolean -- true pokud je pole prázdné
     */
    public static function isEmpty() {
-      if(empty (self::$exceptionsArray)){
+      if(empty (self::$exceptionsArray)) {
          return true;
       }
       return false;
@@ -71,7 +84,61 @@ class CoreErrors {
     */
    public static function getLastError() {
       return self::$exceptionsArray[0]->getMessage().' - '.self::$exceptionsArray[0]->getFile()
-         .' > line: '.self::$exceptionsArray[0]->getLine();
+          .' > line: '.self::$exceptionsArray[0]->getLine();
+   }
+
+   /**
+    * Metoda pro zachytávání normálních chyb v enginu a modulech
+    */
+   public static function errorHandler($errno, $errstr, $errfile, $errline) {
+      switch ($errno) {
+         case E_USER_ERROR:
+         //       $array = array();
+         //       $array['name'] = "ERROR";
+         //       $array['code'] = $errno;
+         //       $array['message'] = $errstr;
+         //       $array['file'] = $errfile;
+         //       $array['line'] = $errline;
+         //        echo "<b>My ERROR</b> [$errno] $errstr<br />\n";
+         //        echo "  Fatal error on line $errline in file $errfile";
+         //        echo ", PHP " . PHP_VERSION . " (" . PHP_OS . ")<br />\n";
+         //        echo "Aborting...<br />\n";
+            return false;
+            exit(1);
+            break;
+
+         case E_USER_WARNING:
+            $array = array();
+            $array['name'] = "WARNING";
+            $array['code'] = $errno;
+            $array['message'] = $errstr;
+            $array['file'] = $errfile;
+            $array['line'] = $errline;
+            //        echo "<b>My WARNING</b> [$errno] $errstr<br />\n";
+            break;
+
+         case E_USER_NOTICE:
+            $array = array();
+            $array['name'] = "NOTICE";
+            $array['code'] = $errno;
+            $array['message'] = $errstr;
+            $array['file'] = $errfile;
+            $array['line'] = $errline;
+            //        echo "<b>My NOTICE</b> [$errno] $errstr<br />\n";
+            break;
+
+         default:
+            $array = array();
+            $array['name'] = "UNKNOWN ERROR";
+            $array['code'] = $errno;
+            $array['message'] = $errstr;
+            $array['file'] = $errfile;
+            $array['line'] = $errline;
+            //        echo "Unknown error type: [$errno] $errstr<br />\n";
+            break;
+      }
+      array_push(self::$errorsArray, $array);
+      return true;
    }
 }
 ?>

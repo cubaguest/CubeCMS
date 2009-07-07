@@ -38,7 +38,6 @@ abstract class View {
    function __construct(Template $template, Module_Sys $moduleSys) {
       $this->template = $template;
       $this->moduleSys = $moduleSys;
-
       //		inicializace viewru
       $this->init();
    }
@@ -67,17 +66,11 @@ abstract class View {
     * @param string $name -- název proměnné
     * @return mixed -- hodnota proměnné
     */
-   public function  __get($name) {
-      //      if(isset($this->viewVars[$name])){
-      //         return $this->viewVars[$name];
-      //      } else {
-      //         return null;
-      //      }
-      if(isset($this->template()->{$name})){
-         return $this->template()->{$name};
-      } else {
-         return null;
+   public function  &__get($name) {
+      if(!isset($this->template()->{$name})){
+         $this->template()->{$name} = null;
       }
+      return $this->template()->{$name};
    }
 
    /**
@@ -178,11 +171,20 @@ abstract class View {
    }
 
    /**
-    * Metoda přeloží zadaný řetězec
+    * Metoda přeloží zadaný řetězec alias pro funkci _()
     * @param string $message -- řetězec k přeložení
     * @return string -- přeložený řetězec
     */
    final public function _m($message) {
+      return $this->_($message);
+   }
+
+   /**
+    * Metoda přeloží zadaný řetězec
+    * @param string $message -- řetězec k přeložení
+    * @return string -- přeložený řetězec
+    */
+   final public function _($message) {
       return $this->sys()->locale()->_m($message);
    }
 }

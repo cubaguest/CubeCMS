@@ -18,14 +18,6 @@ class Module {
 	 */
 	const MODULE_PARAMS_SEPARATOR = ';';
 
-   private static $currentModule = null;
-
-	/**
-	 * název modulu
-	 * @var string
-	 */
-	private $moduleName;
-
 	/**
 	 * id modulu (item prvku) v db
 	 * @var integer
@@ -52,23 +44,17 @@ class Module {
 	private $dbTables = array();
 
 	/**
-	 * Proměná s datovým adresářem modulu
-	 * @var string
+	 * Objekt s adresáři modulu
+	 * @var Module_Dirs
 	 */
-	private $dataDir = null;
+	private $moduleDirs = null;
 
-	/**
-	 * Proměná s názvem Itemu
-	 * @var string
-	 */
-	private $label = null;
+   /**
+    * Objekt s názvy modulu
+    * @var Module_Labels 
+    */
+   private $moduleLabels = null;
 
-	/**
-	 * Proměná s popisem itemu
-	 * @var string
-	 */
-	private $alt = null;
-	
 	/**
 	 * Konstruktor třídy pro práci s modulem
 	 *
@@ -80,40 +66,36 @@ class Module {
 	 * @param string -- parametry modulu
 	 */
 	function __construct(stdClass $moduleObject, $dbTables){
-		$this->setId($moduleObject->id_item);
-		$this->setIdModule($moduleObject->id_module);
-		$this->setName($moduleObject->name);
+		$this->setId($moduleObject->{Model_Module::COLUMN_ITEM_ID});
+		$this->setIdModule($moduleObject->{Model_Module::COLUMN_ID_MODULE});
 		$this->setDbTables($dbTables);
-		$this->setDataDir($moduleObject->datadir);
-      $this->setParams($moduleObject->params);
-      // nemusí být vždy zadán
-      if(isset ($moduleObject->label)){
-         $this->setLabel($moduleObject->label);
-         $this->setAlt($moduleObject->alt);
-      }
-      $this->setCurrentModule($this);
+      $this->setParams($moduleObject->{Model_Module::COLUMN_ITEM_PARAMS});
+      $this->moduleLabels = new Module_Labels($moduleObject);
+      $this->moduleDirs = new Module_Dirs($this->getLabel()->name(),
+         $moduleObject->{Model_Module::COLUMN_DATADIR});
 	}
 
    /**
     * Destruktor odstraní právě prováděný modul
     */
    public function  __destruct() {
-      $this->setCurrentModule();
    }
 
    /**
-    * Metoda nastaví objekt modulu
+    * Metoda vrací objekt s názvy modulu (alias pro label())
+    * @return Module_Labels
+    * @deprecated -- lepší použít label(pro přístup k objektu s názvy)
     */
-   private function setCurrentModule($obj = null) {
-      self::$currentModule = $obj;
+   public function getLabel() {
+      return $this->label();
    }
 
    /**
-    * Metoda vrací zpracovávaný objekt modulu
-    * @return Module
+    * Metoda vrací objekt s názvy modulu
+    * @return Module_Labels
     */
-   public static function getCurrentModule() {
-      return self::$currentModule;
+   public function label() {
+      return $this->moduleLabels;
    }
 
 	/**
@@ -121,7 +103,7 @@ class Module {
 	 * @return Module_Dirs -- objek s adresáři modulu
 	 */
 	public function getDir() {
-		return new Module_Dirs($this->getName(), $this->dataDir);
+		return $this->moduleDirs;
 	}
 
 	/**
@@ -161,48 +143,12 @@ class Module {
 	}
 
 	/**
-	 * Funkce nastavi jmeno module
-	 *
-	 * @param String -- jmeno modulu
-	 */
-	private function setName($moduleName){
-		$this->moduleName = $moduleName;
-	}
-
-	/**
 	 * Funkce vraci jmeno modulu
 	 *
 	 * @return String -- jmeno modulu
 	 */
 	public function getName(){
-		return $this->moduleName;
-	}
-
-	/**
-	 * Funkce nastavi nazev modulu
-	 *
-	 * @param String -- nazev modulu
-	 */
-	private function setLabel($moduleLable){
-		$this->label = $moduleLable;
-	}
-
-	/**
-	 * Funkce vraci nazev modulu
-	 *
-	 * @return String -- nazev modulu
-	 */
-	public function getLabel(){
-		return $this->label;
-	}
-
-	/**
-	 * Funkce nastavi popis (alt) modulu
-	 *
-	 * @param String -- popis modulu
-	 */
-	private function setAlt($moduleAlt){
-		$this->alt = $moduleAlt;
+		return $this->getLabel()->name();
 	}
 
 	/**
@@ -211,16 +157,7 @@ class Module {
 	 * @return String -- popis modulu
 	 */
 	public function getAlt(){
-		return $this->alt;
-	}
-
-	/**
-	 * Funkce nastavi cestu k adresari s daty modulu
-	 *
-	 * @param String -- jmeno adresare
-	 */
-	private function setDataDir($dir){
-		$this->dataDir = $dir;
+		return $this->getLabel()->alt();
 	}
 
 	/**
@@ -294,7 +231,7 @@ class Module {
 	 * @param array -- pole s tabulkama
     * @todo není iplementována optimálně
 	 */
-	public function setDbTables($dbTables) {
+	private function setDbTables($dbTables) {
 		$this->dbTables = $dbTables;
 	}
 }

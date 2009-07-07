@@ -12,6 +12,11 @@
 
 class Db {
    /**
+    * Název sekce v konf. souboru s konfigurací databáze
+    */
+   const CONFIG_DB_SECTION = "db";
+
+   /**
     * Operátor AND
     */
    const COND_OPERATOR_AND = 'AND';
@@ -111,9 +116,13 @@ class Db {
 	 * @var string
 	 */
 	static $_serverName = null;
+	static $_serverNameBackup = null;
 	static $_userName = null;
+	static $_userNameBackup = null;
 	static $_userPassword = null;
+	static $_userPasswordBackup = null;
 	static $_dbName = null;
+	static $_dbNameBackup = null;
 	static $_tablePrefix = null;
 	static $_connectorType = null;
 
@@ -133,15 +142,19 @@ class Db {
     * @param string $tablePrefix -- prefix pro tabulky
     * @return Db Konektory k danému databázovému stroji
     */
-	public static function factory($typ, $serverName, $userName, $userPasswd, $dbName, $tablePrefix) {
-		self::$_serverName = $serverName;
-		self::$_userName = $userName;
-		self::$_userPassword = $userPasswd;
-		self::$_dbName = $dbName;
-		self::$_tablePrefix = $tablePrefix;
-		self::$_connectorType = $typ;
+	public static function factory() {
+      self::$_serverName = AppCore::sysConfig()->getOptionValue("dbserver", self::CONFIG_DB_SECTION);
+      self::$_serverNameBackup = AppCore::sysConfig()->getOptionValue("dbserverbackup", self::CONFIG_DB_SECTION);
+		self::$_userName = AppCore::sysConfig()->getOptionValue("dbuser", self::CONFIG_DB_SECTION);
+		self::$_userNameBackup = AppCore::sysConfig()->getOptionValue("dbuserbackup", self::CONFIG_DB_SECTION);
+		self::$_userPassword = AppCore::sysConfig()->getOptionValue("dbpasswd", self::CONFIG_DB_SECTION);
+		self::$_userPasswordBackup = AppCore::sysConfig()->getOptionValue("dbpasswdbackup", self::CONFIG_DB_SECTION);
+		self::$_dbName = AppCore::sysConfig()->getOptionValue("dbname", self::CONFIG_DB_SECTION);
+		self::$_dbNameBackup = AppCore::sysConfig()->getOptionValue("dbnamebackup", self::CONFIG_DB_SECTION);
+		self::$_tablePrefix = AppCore::sysConfig()->getOptionValue("tbprefix", self::CONFIG_DB_SECTION);
+		self::$_connectorType = AppCore::sysConfig()->getOptionValue("dbhandler", self::CONFIG_DB_SECTION);
 
-      switch ($typ) {
+      switch (self::$_connectorType) {
          case 'mysqli':
             require_once './lib/db/mysqli/db.class.php';
             return new MySQLiDb(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);

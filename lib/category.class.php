@@ -20,26 +20,6 @@ class Category {
    const CAT_PARAMS_SEPARATOR = ';';
 
    /**
-    * Názvy sloupců v db tabulce
-    * @var string
-    */
-//   const COLUMN_CAT_LABEL 	= 'clabel';
-//   const COLUMN_SEC_LABEL 	= 'slabel';
-//   const COLUMN_CAT_ID		= 'id_category';
-//   const COLUMN_SEC_ID		= 'id_section';
-//   const COLUMN_CAT_URLKEY	= 'urlkey';
-//   const COLUMN_CAT_LPANEL	= 'left_panel';
-//   const COLUMN_CAT_RPANEL	= 'right_panel';
-//   const COLUMN_CAT_PARAMS	= 'cparams';
-//   const COLUMN_CAT_SHOW_IN_MENU	= 'show_in_menu';
-//   const COLUMN_CAT_PROTECTED	= 'protected';
-//
-//   const COLUMN_CAT_LABEL_ORIG = 'label';
-//   const COLUMN_CAT_ALT_ORIG = 'alt';
-//
-//   const COLUMN_CAT_ACTIVE = 'active';
-
-   /**
     * Id aktuální kategorie
     * @var integer
     */
@@ -87,6 +67,12 @@ class Category {
     * @var string
     */
    private static $_sectionName = null;
+
+   /**
+    * Popis sekce
+    * @var string
+    */
+   private static $_sectionAlt = null;
 
    /**
     * Pole s parametry kategorie
@@ -150,10 +136,11 @@ class Category {
       } else {
          self::$_categoryLabel = $catArray->{Model_Category::COLUMN_CAT_LABEL};
          self::$_categoryId = $catArray->{Model_Category::COLUMN_CAT_ID};
-         self::$_sectionId = $catArray->{Model_Category::COLUMN_SEC_ID};
+         self::$_sectionId = $catArray->{Model_Category::COLUMN_CAT_SEC_ID};
          self::$_categoryLeftPanel = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
          self::$_categoryRightPanel = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
-         self::$_sectionName = $catArray->{Model_Category::COLUMN_SEC_LABEL};
+         self::$_sectionName = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
+         self::$_sectionAlt = $catArray->{Model_Sections::COLUMN_SEC_ALT};
          self::$_categoryParams = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
          //        načtení výchozí kategorie
          $defCatArr = self::getDefaultCategory();
@@ -178,10 +165,11 @@ class Category {
       }
       self::$_categoryLabel = $catArray->{Model_Category::COLUMN_CAT_LABEL};
       self::$_categoryId = $catArray->{Model_Category::COLUMN_CAT_ID};
-      self::$_sectionId = $catArray->{Model_Category::COLUMN_SEC_ID};
+      self::$_sectionId = $catArray->{Model_Category::COLUMN_CAT_SEC_ID};
       self::$_categoryLeftPanel = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
       self::$_categoryRightPanel = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
-      self::$_sectionName = $catArray->{Model_Category::COLUMN_SEC_LABEL};
+      self::$_sectionName = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
+      self::$_sectionAlt = $catArray->{Model_Sections::COLUMN_SEC_ALT};
       self::$_categoryParams = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
       self::$_categoryIsDefault = true;
    }
@@ -204,10 +192,11 @@ class Category {
       $catArr = array ();
       $catArr[Model_Category::COLUMN_CAT_LABEL] = $catArray->{Model_Category::COLUMN_CAT_LABEL};
       $catArr[Model_Category::COLUMN_CAT_ID] = $catArray->{Model_Category::COLUMN_CAT_ID};
-      $catArr[Model_Category::COLUMN_SEC_ID] = $catArray->{Model_Category::COLUMN_SEC_ID};
+      $catArr[Model_Category::COLUMN_CAT_SEC_ID] = $catArray->{Model_Category::COLUMN_CAT_SEC_ID};
       $catArr[Model_Category::COLUMN_CAT_LPANEL] = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
       $catArr[Model_Category::COLUMN_CAT_RPANEL] = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
-      $catArr[Model_Category::COLUMN_SEC_LABEL] = $catArray->{Model_Category::COLUMN_SEC_LABEL};
+      $catArr[Model_Sections::COLUMN_SEC_LABEL] = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
+      $catArr[Model_Sections::COLUMN_SEC_ALT] = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
       $catArr[Model_Category::COLUMN_CAT_PARAMS] = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
       return $catArr;
    }

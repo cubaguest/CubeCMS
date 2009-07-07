@@ -22,7 +22,7 @@ class Module_Dirs {
 	 * Adresář s modely
 	 * @var string
 	 */
-	const MODELS_DIR = 'models';
+	const MODELS_DIR = 'model';
 
 	/**
 	 * Adresář s šablonami
@@ -48,6 +48,12 @@ class Module_Dirs {
 	 */
 	const JAVASCRIPTS_DIR = 'javascripts';
 	
+	/**
+	 * Adresář s obrázky modulu
+	 * @var string
+	 */
+	const IMAGES_DIR = 'images';
+
 	/**
 	 * oddělovač adresářů
 	 * @var string
@@ -139,6 +145,30 @@ class Module_Dirs {
 			return self::getWebDir().self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir.self::DIR_SEPARATOR;
 		} else {
 			return self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir.self::DIR_SEPARATOR;
+		}
+	}
+
+	/**
+	 * Metoda vrací adresář k obrázkům modulu
+	 * @param boolean -- jestli se má vráti i cesta s prefixe (nutné pro relativní přístup)
+	 * @return string -- cesta k obrázkům modulu
+	 */
+	public function getImagesDir($withRelativePrefix = true) {
+      //pokud existuje adresář ve faces
+      if(is_dir(self::getWebDir().Template::FACES_DIR.self::DIR_SEPARATOR.Template::face()
+         .self::DIR_SEPARATOR.self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir
+         .self::DIR_SEPARATOR.self::IMAGES_DIR)){
+         $returnDir = Template::FACES_DIR.self::DIR_SEPARATOR.Template::face()
+         .self::DIR_SEPARATOR.self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir
+         .self::DIR_SEPARATOR.self::IMAGES_DIR.self::DIR_SEPARATOR;
+      } else {
+         $returnDir = self::MODULES_MAIN_DIR.self::DIR_SEPARATOR.$this->moduleDir
+         .self::DIR_SEPARATOR.self::IMAGES_DIR.self::DIR_SEPARATOR;
+      }
+      if($withRelativePrefix){
+			return self::getWebDir().$returnDir;
+		} else {
+			return $returnDir;
 		}
 	}
 

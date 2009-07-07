@@ -16,11 +16,8 @@ class ModuleException extends Exception {
     */
    private $moduleName = null;
 
-   public function  __construct($message = null, $code = null) {
-      if(AppCore::getSelectedModule() == null){
-         throw new BadMethodCallException(_('Nepovolené volání ModuleException'));
-      }
-      $this->moduleName = AppCore::getSelectedModule()->getName();
+   public function  __construct($message = null, $code = null, $moduleName = null) {
+      $this->moduleName = $moduleName;
       parent::__construct($message, $code);
    }
 

@@ -74,7 +74,7 @@ function xhtml_cut($s, $limit){
     * @param int $maxHeight -- maximální výška
     * @return string -- tag obrázku
     */
-   function imageTag($imagePath, $alt = null, $mw = false, $mh = false) {
+   function imageTag($imagePath, $alt = null, $mw = false, $mh = false, $style = null) {
       if(file_exists($imagePath)){
          $imageSizes = getimagesize($imagePath);
          if($imageSizes){
@@ -82,7 +82,7 @@ function xhtml_cut($s, $limit){
             foreach(array('w','h') as $v) { $m = "m{$v}";
                if(${$v} > ${$m} && ${$m}) { $o = ($v == 'w') ? 'h' : 'w';
                   $r = ${$m} / ${$v}; ${$v} = ${$m}; ${$o} = ceil(${$o} * $r); } }
-            return("<img src='{$imagePath}' alt='{$alt}' width='{$w}' height='{$h}' />");
+            return("<img src=\"{$imagePath}\" alt=\"{$alt}\" width=\"{$w}\" height=\"{$h}\" style=\"{$style}\" />");
          }
       }
       return null;

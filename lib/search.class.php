@@ -17,6 +17,7 @@ class Search {
    const RESULT_INDEX_CATEGORY    = 'category';
    const RESULT_INDEX_ARTICLE     = 'article';
    const RESULT_INDEX_URL         = 'url';
+   const RESULT_INDEX_CATEGORY_URL= 'category_url';
    const RESULT_INDEX_TEXT        = 'text';
    const RESULT_INDEX_RELEVANCE   = 'relevance';
 
@@ -45,9 +46,16 @@ class Search {
    protected static $searchResults = array();
 
    /**
+    * Systémový objekt modulu
+    * @var Module_Sys
+    */
+   protected $moduleSys = null;
+
+   /**
     * Konstruktor
     */
-   public function  __construct($itemsArray) {
+   public function  __construct($itemsArray, Module_Sys $sys) {
+      $this->moduleSys = $sys;
       $this->itemsArray = $itemsArray;
    }
 
@@ -60,16 +68,24 @@ class Search {
     * Metoda vrací db konektor
     * @return DbInterface
     */
-   public function getDb() {
+   protected function getDb() {
       return AppCore::getDbConnector();
+   }
+
+   /**
+    * Metooda vrací systémový objekt modulu
+    * @return Module_Sys
+    */
+   protected function sys() {
+      return $this->moduleSys;
    }
 
    /**
     * Metoda vrací objekt modulu a jeho aprametrů
     * @return Module -- objekt modulu
     */
-   public function getModule() {
-      return AppCore::getSelectedModule();
+   protected function module() {
+      return $this->sys()->module();
    }
 
    /**
@@ -84,6 +100,7 @@ class Search {
       $resultArr = array(
          self::RESULT_INDEX_CATEGORY => $category,
          self::RESULT_INDEX_URL => (string)$url,
+         self::RESULT_INDEX_CATEGORY_URL => (string)$url->clear(),
          self::RESULT_INDEX_TEXT => $text,
          self::RESULT_INDEX_RELEVANCE => $relevance,
          self::RESULT_INDEX_ARTICLE => $article);
@@ -112,7 +129,7 @@ class Search {
     * @param integer $idItem
     */
    public function getCategory($idItem) {
-      return $this->itemsArray[$idItem][SearchModel::ITEMS_ARRAY_INDEX_CAT_NAME];
+      return $this->itemsArray[$idItem][Model_Search::ITEMS_ARRAY_INDEX_CAT_NAME];
    }
 
    /**
@@ -120,10 +137,10 @@ class Search {
     * @param integer $idItem -- id items
     * @return Links
     */
-   public function getLink($idItem) {
+   public function link($idItem) {
       $link = new Links();
-      $link->category($this->itemsArray[$idItem][SearchModel::ITEMS_ARRAY_INDEX_CAT_NAME],
-         $this->itemsArray[$idItem][SearchModel::ITEMS_ARRAY_INDEX_CAT_ID]);
+      $link->category($this->itemsArray[$idItem][Model_Search::ITEMS_ARRAY_INDEX_CAT_NAME],
+         $this->itemsArray[$idItem][Model_Search::ITEMS_ARRAY_INDEX_CAT_ID]);
       return $link;
    }
 
@@ -163,7 +180,7 @@ class Search {
             unset ($searchArray[$key]);
          }
       }
-      $textHelper = new TextHelper();
+      $textHelper = new Helper_Text();
       $stringLenght = AppCore::sysConfig()->getOptionValue('result_lenght', 'search');
       $delta = 20;
       $highLightTag = AppCore::sysConfig()->getOptionValue('highlight_tag', 'search');

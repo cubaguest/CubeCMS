@@ -416,5 +416,13 @@ class File {
       }
       return $createNewFileName;
    }
+
+   /**
+    * Metoda nastaví práva k souboru
+    * @param int $mode -- octal -- práva souboru např 0777
+    */
+   public function setRights($mode) {
+      @chmod($this->fileDir.$this->fileNameOutput, $mode);
+   }
 }
 ?>

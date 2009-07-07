@@ -344,14 +344,11 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @param Template -- objetk šablony (odkaz)
     */
    final public function runView($actionName) {
-
-
       if($this->actionViewer == null){
          $viewName = $actionName;
       } else {
          $viewName = $this->actionViewer.AppCore::MODULE_VIEWER_SUFIX;
       }
-
       //			Doplnění sufixu View pro jistotu
       if (strpos($this->actionViewer, AppCore::MODULE_VIEWER_SUFIX) === false) {
          $this->actionViewer .= AppCore::MODULE_VIEWER_SUFIX;

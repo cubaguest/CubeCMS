@@ -12,10 +12,10 @@
  */
 
 class File_Image extends File {
-   /**
-    * Proměná obsahuje jestli je soubor obrázek
-    * @var boolean
-    */
+/**
+ * Proměná obsahuje jestli je soubor obrázek
+ * @var boolean
+ */
    private $isImage = false;
 
    /**
@@ -78,8 +78,8 @@ class File_Image extends File {
     * @param string $dir -- (option) název adresáře se souborem může být uveden
     * v názvu souboru
     */
-   function __construct($file, $dir = null){
-      if($file instanceof File){
+   function __construct($file, $dir = null) {
+      if($file instanceof File) {
          parent::__construct($file);
       } else {
          parent::__construct($file, $dir);
@@ -101,32 +101,31 @@ class File_Image extends File {
     * Metoda načte informace o obrázku
     */
    private function checkIsImage() {
-      //	Ověření existence obrázku
-      if($this->getNameInput() != null AND $this->exist()){
-
-         //		zjištění vlastností obrázků
+   //	Ověření existence obrázku
+      if($this->getNameInput() != null AND $this->exist()) {
+      //		zjištění vlastností obrázků
          $imageProperty = getimagesize($this->getNameInput(true));
          $this->imageWidth = $imageProperty[0];
          $this->imageHeight = $imageProperty[1];
          $this->imageType = $imageProperty[2];
          /*
-          * kvůli flashi je tady vyjímka protože flash se zpracovává v flashfile
+          * kvůli flashi je tady vyjímka protože flash se zpracovává v File_Flash
           * a nelze mu měniti velikost ani jej resamplovat
           *
           * Flash má typ obrázku 4 a 13
           */
          if($this->imageType == null OR $this->imageType == IMAGETYPE_SWF OR
-            $this->imageType == IMAGETYPE_SWC){
+             $this->imageType == IMAGETYPE_SWC) {
             $this->isImage = false;
-            if($this->reportErrors){
+            if($this->reportErrors) {
                $this->errMsg()->addMessage(_('Zadaný soubor není podporovaný obrázek'));
             }
          } else {
             $this->isImage = true;
          }
       } else {
-         if($this->reportErrors){
-            new CoreException(_('Soubor se zadaným obrázkem neexistuje'), 1);
+         if($this->reportErrors) {
+            new CoreException(sprintf(_('Soubor "%s" se zadaným obrázkem neexistuje'),$this->getNameInput()), 1);
          }
       }
    }
@@ -137,7 +136,7 @@ class File_Image extends File {
     * @param integer -- šířka v px
     * @param integer -- výška v px
     */
-   public function setDimensions($width, $height){
+   public function setDimensions($width, $height) {
       $this->newImageWidth = $width;
       $this->newImageHeight = $height;
    }
@@ -162,24 +161,24 @@ class File_Image extends File {
     * @return boolean -- true pokud se obrázek podařilo uložit
     */
    public function saveImage($dstDir, $width = null, $heigh = null, $newName = null, $imageType = null) {
-      //		test jestli je zpracováván obrázek
-      if($this->isImage()){
+   //		test jestli je zpracováván obrázek
+      if($this->isImage()) {
          $saved = false;
          $tmpImage = $this->createTempImage();
-         if($width == null){
+         if($width == null) {
             $width = $this->imageWidth;
          }
-         if($heigh == null){
+         if($heigh == null) {
             $heigh = $this->imageHeight;
          }
-         if($newName == null){
+         if($newName == null) {
             $newName = $this->getName();
          }
 
          //			Test názvu souboru
          $newName = $this->creatUniqueName($dstDir);
          $newImage = $this->resampleImage($tmpImage,$width,$heigh);
-         if($imageType == null){
+         if($imageType == null) {
             $imageType = $this->imageType;
          }
          $saved = $this->saveNewImage($newImage, $imageType, new File_Dir($dstDir), $newName);
@@ -218,7 +217,7 @@ class File_Image extends File {
     * @return image -- vrací objekt obrázku z původního obrázku
     */
    private function createTempImage() {
-      //		Zjištění druhu obrázku a vytvoření pracovního obrázk
+   //		Zjištění druhu obrázku a vytvoření pracovního obrázk
       switch ($this->imageType) {
          case IMAGETYPE_GIF:
             $tempImage = imagecreatefromgif($this->getNameInput(true));
@@ -237,61 +236,79 @@ class File_Image extends File {
             break;
          default:
             $tempImage = false;
-         };
-         return $tempImage;
-      }
+      };
+      return $tempImage;
+   }
 
    /**
     * Metoda přesampluje zadaný obrázek na nový obrázek
     *
     * @param image -- vytvořený obrázek z původního
-    * @param int -- šířka nového obrázku
-    * @param int -- výška nového obrázku
+    * @param int $maxWidth -- šířka nového obrázku
+    * @param int $maxHeight -- výška nového obrázku
     */
-      private function resampleImage($tempImage, $width, $height) {
-         if(!$this->cropNewImage){
-            //				obrázek je na šířku
-            if($this->imageWidth > $this->imageHeight){
-               $imageRate = $this->imageHeight/$this->imageWidth;
-               $height = $imageRate*$width;
-            }
-            //				obrázek je na výšku
-            else {
-               $imageRate = $this->imageWidth/$this->imageHeight;
-               $width = $imageRate*$height;
-            }
-            $newImage = imagecreatetruecolor($width, $height);
-            // Zapnutí alfy, tj průhlednost
-            imagealphablending($newImage, false);
-            imagesavealpha($newImage, true);
-            ImageCopyResampled($newImage, $tempImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight);
-         } else {
-            //			Ořezání obrázku do jedné velikosti
-            $newImage = imagecreatetruecolor($width, $height);
-            // Zapnutí alfy, tj průhlednost
-            imagealphablending($newImage, false);
-            imagesavealpha($newImage, true);
-            $scale = (($width / $this->imageWidth) > ($height / $this->imageHeight)) ? ($width / $this->imageWidth) : ($height / $this->imageHeight); // vyber vetsi pomer a zkus to nejak dopasovat...
-            $newW = $width/$scale;    // jak by mel byt zdroj velky (pro poradek :)
-            $newH = $height/$scale;
-            // ktera strana precuhuje vic (kvuli chybe v zaokrouhleni)
-            if (($this->imageWidth - $newW) > ($this->imageHeight - $newH)) {
-               //				na sirku
-               $imageX = floor(($this->imageWidth - $newW)/2);
-               $imageY = 0;
-               $imageWidth = floor($newW);
-               $imageHeight = $this->imageHeight;
-            } else {
-               //				na vysku
-               $imageX = 0;
-               $imageY = floor(($this->imageHeight - $newH)/2);
-               $imageWidth = $this->imageWidth;
-               $imageHeight = floor($newH);
-            }
-            ImageCopyResampled($newImage, $tempImage, 0,0, $imageX, $imageY, $width, $height, $imageWidth,$imageHeight);
+   private function resampleImage($tempImage, $maxWidth = false, $maxHeight = false) {
+      if(!$this->cropNewImage) {
+      //				obrázek je na šířku
+      //            if($this->imageWidth > $this->imageHeight){
+      //               $imageRate = $this->imageHeight/$this->imageWidth;
+      //               $height = $imageRate*$width;
+      //            }
+      //            //				obrázek je na výšku
+      //            else {
+      //               $imageRate = $this->imageWidth/$this->imageHeight;
+      //               $width = $imageRate*$height;
+      //            }
+//      $width = 567;
+//      $height = 448;
+      $width = $this->imageWidth;
+      $height = $this->imageHeight;
+//      $maxWidth = 150;
+//      $maxHeight = 75;
+         if($width > $maxWidth && $width) {
+            $rate = $maxWidth / $width;
+            $width = $maxWidth;
+            $height = ceil($rate * $height);
          }
-         return $newImage;
+         if($height > $maxHeight && $maxHeight) {
+            $rate = $maxHeight / $height;
+            $height = $maxHeight;
+            $width = ceil($rate * $width);
+         }
+
+
+         $newImage = imagecreatetruecolor($width, $height);
+         // Zapnutí alfy, tj průhlednost
+         imagealphablending($newImage, false);
+         imagesavealpha($newImage, true);
+         ImageCopyResampled($newImage, $tempImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight);
+      } else {
+      //			Ořezání obrázku do jedné velikosti
+         $newImage = imagecreatetruecolor($width, $height);
+         // Zapnutí alfy, tj průhlednost
+         imagealphablending($newImage, false);
+         imagesavealpha($newImage, true);
+         $scale = (($width / $this->imageWidth) > ($height / $this->imageHeight)) ? ($width / $this->imageWidth) : ($height / $this->imageHeight); // vyber vetsi pomer a zkus to nejak dopasovat...
+         $newW = $width/$scale;    // jak by mel byt zdroj velky (pro poradek :)
+         $newH = $height/$scale;
+         // ktera strana precuhuje vic (kvuli chybe v zaokrouhleni)
+         if (($this->imageWidth - $newW) > ($this->imageHeight - $newH)) {
+         //				na sirku
+            $imageX = floor(($this->imageWidth - $newW)/2);
+            $imageY = 0;
+            $imageWidth = floor($newW);
+            $imageHeight = $this->imageHeight;
+         } else {
+         //				na vysku
+            $imageX = 0;
+            $imageY = floor(($this->imageHeight - $newH)/2);
+            $imageWidth = $this->imageWidth;
+            $imageHeight = floor($newH);
+         }
+         ImageCopyResampled($newImage, $tempImage, 0,0, $imageX, $imageY, $width, $height, $imageWidth,$imageHeight);
       }
+      return $newImage;
+   }
 
    /**
     * Metoda uloží obrázek do souboru
@@ -303,33 +320,37 @@ class File_Image extends File {
     *
     * @return boolean -- true pokud se obrázek podařilo uložit
     */
-      private function saveNewImage($newImage, $type, File_Dir $dstDir, $fileName) {
-         if($dstDir->checkDir()){
-            switch ($type) {
-               case IMAGETYPE_GIF:
-                  $saved = imagegif($newImage, $dstDir.$fileName);
-                  break;
-               case IMAGETYPE_PNG:
-                  imagealphablending($newImage, false);
-                  imagesavealpha($newImage, true);
-                  $saved = imagepng($newImage, $dstDir.$fileName, $this->pngQuality);
-                  break;
-               case IMAGETYPE_WBMP:
-                  $saved = imagewbmp($newImage, $dstDir.$fileName);
-                  break;
-               case IMAGETYPE_JPEG2000:
-                  $saved = imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality); //jen výstup do jpegu
-                  break;
-               case IMAGETYPE_JPEG:
-                  default: // výchozí je jpeg
-                     $saved = imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality);
-                     break;
-               }
-               return $saved;
-            } else {
-               new CoreException(_('Nepodařilo se vytvořit adresář pro uložení obrázku'), 2);
-            }
+   private function saveNewImage($newImage, $type, File_Dir $dstDir, $fileName) {
+      if($dstDir->checkDir()) {
+         switch ($type) {
+            case IMAGETYPE_GIF:
+               $saved = imagegif($newImage, $dstDir.$fileName);
+               break;
+            case IMAGETYPE_PNG:
+               imagealphablending($newImage, false);
+               imagesavealpha($newImage, true);
+               $saved = imagepng($newImage, $dstDir.$fileName, $this->pngQuality);
+               break;
+            case IMAGETYPE_WBMP:
+               $saved = imagewbmp($newImage, $dstDir.$fileName);
+               break;
+            case IMAGETYPE_JPEG2000:
+               $saved = imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality); //jen výstup do jpegu
+               break;
+            case IMAGETYPE_JPEG:
+            default: // výchozí je jpeg
+               $saved = imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality);
+               break;
          }
+         // nastavení práv k obrázku na zápis pro všechny, kvůli ftp účtu ať může mazat
+         $file = new File($fileName, $dstDir);
+         $file->setRights(0777);
+
+         return $saved;
+      } else {
+         new CoreException(_('Nepodařilo se vytvořit adresář pro uložení obrázku'), 2);
+      }
+   }
 
    /**
     * Funkce vytvoří obrázek ze zadaného obrázku a uloží jej do specifikovaného souboru
@@ -343,72 +364,72 @@ class File_Image extends File {
     * @param integer -- výsledná kvalit png komprese (default 9
     * @return boolean -- true, jestliže byl obrázek uspěšně vytvořen a ulože
     */
-         public function createImage($srcFile, $destFile, $width, $height, $cropSize = false, $jpegQuality = 85, $pngQuality = 9){
-            //	Výpočet nové velikosti
-            $imageProperty = getimagesize($srcFile);
-            if($cropSize == false){
-               //	obrázek je na šířku
-               if($imageProperty[0] > $imageProperty[1]){
-                  $imageRate = $imageProperty[1]/$imageProperty[0];
-                  $height = $imageRate*$width;
-               }
-               //	obrázek je na výšku
-               else {
-                  $imageRate = $imageProperty[0]/$imageProperty[1];
-                  $width = $imageRate*$height;
-               }
-               $newImage = imagecreatetruecolor($width, $height);
-               imagecopyresampled($newImage, $tempImage, 0,0,0,0, $width, $height, $imageProperty[0], $imageProperty[1]);
-            } else {
-               //			Ořezání obrázku do jedné velikosti
-               $newImage = imagecreatetruecolor($width, $height);
-               $scale = (($width / $imageProperty[0]) > ($height / $imageProperty[1])) ? ($width / $imageProperty[0]) : ($height / $imageProperty[1]); // vyber vetsi pomer a zkus to nejak dopasovat...
-               $newW = $width/$scale;    // jak by mel byt zdroj velky (pro poradek :)
-               $newH = $height/$scale;
-               // ktera strana precuhuje vic (kvuli chybe v zaokrouhleni)
-               if (($imageProperty[0] - $newW) > ($imageProperty[1] - $newH)) {
-                  $imageX = floor(($imageProperty[0] - $newW)/2);
-                  $imageY = 0;
-                  $imageWidth = floor($newW);
-                  $imageHeight = $imageProperty[1];
-               }
-               else {
-                  $imageX = 0;
-                  $imageY = floor(($imageProperty[1] - $newH)/2);
-                  $imageWidth = $imageProperty[0];
-                  $imageHeight = floor($newH);
-               }
-               ImageCopyResampled($newImage, $tempImage, 0,0, $imageX, $imageY, $width, $height, $imageWidth,$imageHeight);
-            }
-            //			uložení obrázku
-            if ($newImageType == IMAGETYPE_JPEG){
-               $newImageFunction($newImage, $destFile, $jpegQuality);
-            } else if($newImageType == IMAGETYPE_JPEG){
-               $newImageFunction($newImage, $destFile, $pngQuality);
-            } else {
-               $newImageFunction($newImage, $destFile);
-            }
-            ImageDestroy($newImage);
-            ImageDestroy($tempImage);
-            return true;
+   public function createImage($srcFile, $destFile, $width, $height, $cropSize = false, $jpegQuality = 85, $pngQuality = 9) {
+   //	Výpočet nové velikosti
+      $imageProperty = getimagesize($srcFile);
+      if($cropSize == false) {
+      //	obrázek je na šířku
+         if($imageProperty[0] > $imageProperty[1]) {
+            $imageRate = $imageProperty[1]/$imageProperty[0];
+            $height = $imageRate*$width;
          }
+         //	obrázek je na výšku
+         else {
+            $imageRate = $imageProperty[0]/$imageProperty[1];
+            $width = $imageRate*$height;
+         }
+         $newImage = imagecreatetruecolor($width, $height);
+         imagecopyresampled($newImage, $tempImage, 0,0,0,0, $width, $height, $imageProperty[0], $imageProperty[1]);
+      } else {
+      //			Ořezání obrázku do jedné velikosti
+         $newImage = imagecreatetruecolor($width, $height);
+         $scale = (($width / $imageProperty[0]) > ($height / $imageProperty[1])) ? ($width / $imageProperty[0]) : ($height / $imageProperty[1]); // vyber vetsi pomer a zkus to nejak dopasovat...
+         $newW = $width/$scale;    // jak by mel byt zdroj velky (pro poradek :)
+         $newH = $height/$scale;
+         // ktera strana precuhuje vic (kvuli chybe v zaokrouhleni)
+         if (($imageProperty[0] - $newW) > ($imageProperty[1] - $newH)) {
+            $imageX = floor(($imageProperty[0] - $newW)/2);
+            $imageY = 0;
+            $imageWidth = floor($newW);
+            $imageHeight = $imageProperty[1];
+         }
+         else {
+            $imageX = 0;
+            $imageY = floor(($imageProperty[1] - $newH)/2);
+            $imageWidth = $imageProperty[0];
+            $imageHeight = floor($newH);
+         }
+         ImageCopyResampled($newImage, $tempImage, 0,0, $imageX, $imageY, $width, $height, $imageWidth,$imageHeight);
+      }
+      //			uložení obrázku
+      if ($newImageType == IMAGETYPE_JPEG) {
+         $newImageFunction($newImage, $destFile, $jpegQuality);
+      } else if($newImageType == IMAGETYPE_JPEG) {
+            $newImageFunction($newImage, $destFile, $pngQuality);
+         } else {
+            $newImageFunction($newImage, $destFile);
+         }
+      ImageDestroy($newImage);
+      ImageDestroy($tempImage);
+      return true;
+   }
 
    /**
     * Metoda vrací rozměr původního obrázku - Šířku
     *
     * @return integer -- šířka obrázku
     */
-         public function getOriginalWidth() {
-            return $this->imageWidth;
-         }
+   public function getOriginalWidth() {
+      return $this->imageWidth;
+   }
 
    /**
     * Metoda vrací rozměr původního obrázku - Výšku
     *
     * @return integer -- výška obrázku
     */
-         public function getOriginalHeight() {
-            return $this->imageHeight;
-         }
-      }
+   public function getOriginalHeight() {
+      return $this->imageHeight;
+   }
+}
       ?>
