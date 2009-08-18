@@ -23,7 +23,7 @@ class References_Model_List extends Model_Db {
 	 */
 	public function getCountReferences() {
 		if(!$this->countRefLoaded){
-         $sqlCount = $this->getDb()->select()->table($this->module()->getDbTable())
+         $sqlCount = $this->getDb()->select()->table(Db::table(References_Model_Detail::DB_TABLE))
          ->colums(array("count"=>"COUNT(*)"))
          ->where(References_Model_Detail::COLUMN_ID_ITEM, $this->module()->getId());
 			$count = $this->getDb()->fetchObject($sqlCount);
@@ -40,13 +40,13 @@ class References_Model_List extends Model_Db {
 	 * @return array -- pole referencí
 	 */
    public function getSelectedListReferences($from, $count=5) {
-      echo $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'refer')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(References_Model_Detail::DB_TABLE), 'refer')
       ->colums(array(References_Model_Detail::COLUMN_NAME => "IFNULL(".References_Model_Detail::COLUMN_NAME
             .'_'.Locale::getLang().", ".References_Model_Detail::COLUMN_NAME.'_'.Locale::getDefaultLang().")",
             References_Model_Detail::COLUMN_TEXT => "IFNULL(".References_Model_Detail::COLUMN_TEXT.'_'.Locale::getLang()
             .", ".References_Model_Detail::COLUMN_TEXT.'_'.Locale::getDefaultLang().")",
             References_Model_Detail::COLUMN_ID, References_Model_Detail::COLUMN_TIME))
-      ->join(array('photo' => $this->module()->getDbTable(2)), 
+      ->join(array('photo' => Db::table(References_Model_Photos::DB_TABLE)),
          array('refer' => References_Model_Detail::COLUMN_ID,
          References_Model_Photos::COLUMN_ID_REFERENCE), Db::JOIN_LEFT, References_Model_Photos::COLUMN_FILE)
       ->where("refer.".References_Model_Detail::COLUMN_ID_ITEM, $this->module()->getId())
@@ -63,7 +63,7 @@ class References_Model_List extends Model_Db {
 	 * @return array -- pole referencí
 	 */
 	public function getListReferences() {
-      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'refertb')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(References_Model_Detail::DB_TABLE), 'refertb')
       ->colums(array(References_Model_Detail::COLUMN_NAME => "IFNULL(".References_Model_Detail::COLUMN_NAME
             .'_'.Locale::getLang().", ".References_Model_Detail::COLUMN_NAME.'_'.Locale::getDefaultLang().")",
             References_Model_Detail::COLUMN_TEXT => "IFNULL(".References_Model_Detail::COLUMN_TEXT
@@ -79,7 +79,7 @@ class References_Model_List extends Model_Db {
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(References_Model_Detail::DB_TABLE))
       ->colums(References_Model_Detail::COLUMN_TIME)
       ->limit(0, 1)
       ->order(References_Model_Detail::COLUMN_TIME, Db::ORDER_DESC);

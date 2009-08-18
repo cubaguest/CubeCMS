@@ -3,9 +3,9 @@ class News_View extends View {
    public function mainView() {
       if($this->rights()->isWritable()){
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_article', $this->_m("Přidat"),
+         $toolbox->addTool('add_article', $this->_("Přidat"),
             $this->link()->action($this->sys()->action()->addNews()),
-            $this->_m("Přidat novinku"), "text_add.png");
+            $this->_("Přidat novinku"), "text_add.png");
          $this->template()->toolbox = $toolbox;
       }
 
@@ -20,15 +20,19 @@ class News_View extends View {
          == $this->rights()->getAuth()->getUserId()){
          // editační tlačítka
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_news', $this->_m("Upravit"),
+         $toolbox->addTool('edit_news', $this->_("Upravit"),
             $this->link()->action($this->sys()->action()->editNews()),
-            $this->_m("Upravit novinku"), "text_edit.png")
-         ->addTool('news_delete', $this->_m("Smazat"), $this->link(),
-            $this->_m("Smazat novinku"), "remove.png", "news_id",
+            $this->_("Upravit novinku"), "text_edit.png")
+         ->addTool('news_delete', $this->_("Smazat"), $this->link(),
+            $this->_("Smazat novinku"), "remove.png", "news_id",
             $this->template()->new[News_Model_Detail::COLUMN_NEWS_ID_NEW],
-            $this->_m("Opravdu smazat novinku")."?");
+            $this->_("Opravdu smazat novinku")."?");
          $this->template()->toolbox = $toolbox;
       }
+
+//      $this->template()->setArticleName($this->template()->new[News_Model_Detail::COLUMN_NEWS_LABEL]
+//         ." - ".strftime("%x", $this->template()->new[News_Model_Detail::COLUMN_NEWS_TIME]));
+      $this->template()->setArticleName($this->template()->new[News_Model_Detail::COLUMN_NEWS_LABEL]);
 
       $this->template()->addTplFile("newDetail.phtml");
       $this->template()->addCssFile("style.css");
@@ -40,7 +44,7 @@ class News_View extends View {
    public function addNewsView() {
       $this->template()->addTplFile('editNews.phtml');
       $this->template()->addCssFile("style.css");
-      $this->template()->setActionTitle($this->_m("přidání článku"));
+      $this->template()->setActionName($this->_("přidání novinky"));
 
       // Tiny MCE plugin
       $tinymce = new JsPlugin_TinyMce();
@@ -61,7 +65,10 @@ class News_View extends View {
       $this->template()->addCssFile("style.css");
 
       $newsModel = new News_Model_Detail($this->sys());
-      $this->template()->new = $newsModel->getNewsDetailAllLangs($this->sys()->article());
+      $this->template()->new = $newsModel->getNewsDetail($this->sys()->article());
+
+      $this->template()->setArticleName($this->template()->new[News_Model_Detail::COLUMN_NEWS_LABEL][Locale::getLang()]);
+      $this->template()->setActionName($this->_("úprava novinky"));
 
       // Tiny MCE plugin
       $tinymce = new JsPlugin_TinyMce();

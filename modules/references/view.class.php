@@ -53,7 +53,7 @@ class References_View extends View {
 
       $this->template()->addTplFile("referenceDetail.phtml");
       $this->template()->addCssFile("style.css");
-      $this->template()->setArticleTitle($this->template()->reference[References_Model_Detail::COLUMN_NAME]);
+      $this->template()->setArticleName($this->template()->reference[References_Model_Detail::COLUMN_NAME]);
    }
 
    /**
@@ -62,7 +62,7 @@ class References_View extends View {
    public function addReferenceView() {
       $this->template()->addTplFile('editReference.phtml');
       $this->template()->addCssFile("style.css");
-      $this->template()->setActionTitle($this->_m("přidání článku"));
+      $this->template()->setActionName($this->_m("přidání článku"));
 
       // tiny mce
       $tinymce = new JsPlugin_TinyMce();
@@ -84,9 +84,9 @@ class References_View extends View {
 
       $model = new References_Model_Detail($this->sys());
       $this->template()->reference = $model->getReferenceDetailAllLangs($this->sys()->article()->getArticle());
-      $this->template()->setArticleTitle($this->template()
+      $this->template()->setArticleName($this->template()
          ->reference[References_Model_Detail::COLUMN_NAME][Locale::getLang()]);
-      $this->template()->setActionTitle($this->_("úprava reference"));
+      $this->template()->setActionName($this->_("úprava reference"));
 
       // tiny mce
       $tinymce = new JsPlugin_TinyMce();
@@ -105,6 +105,11 @@ class References_View extends View {
    public function editReferencePhotosView() {
       $this->template()->addTplFile('editPhotos.phtml');
       $this->template()->addCssFile("style.css");
+
+      $model = new References_Model_Detail($this->sys());
+      $reference = $model->getReferenceDetailAllLangs($this->sys()->article()->getArticle());
+      $this->template()->setArticleName($reference[References_Model_Detail::COLUMN_NAME][Locale::getLang()]);
+      $this->template()->setActionName($this->_("úprava fotek reference"));
 
       $model = new References_Model_Photos($this->sys());
       $this->template()->images = $model->getListAllLangs($this->sys()->article());
@@ -126,10 +131,7 @@ class References_View extends View {
    public function addPhotoAjaxView() {
       $this->template()->addTplFile('photoAjax.phtml');
       $this->template()->image = false;
-      $this->template()->imageTpl =
-'test
-test
-asdsa';
+      
       if($this->template()->lastId){
          $model = new References_Model_Photos($this->sys());
          $imageTpl = new Template($this->sys());

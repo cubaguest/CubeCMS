@@ -48,11 +48,11 @@ class Text_Controller extends Controller {
       if($form->checkForm()){
          $text = new Text_Model_Detail($this->sys());
          if(!$text->saveEditText($form->getValue(self::FORM_TEXT))){
-            throw new UnexpectedValueException($this->_m('Text se nepodařilo uložit'));
+            throw new UnexpectedValueException($this->_('Text se nepodařilo uložit'));
          }
 
-         $this->infoMsg()->addMessage($this->_m('Text byl uložen'));
-         $this->getLink()->action()->reload();
+         $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+         $this->link()->action()->reload();
       }
    }
 }

@@ -16,10 +16,10 @@
          <p id="referenceLang<?=$key?>" class="tabcontent">
             <?=$this->_m("Název reference");?>:<br />
             <input type="text" size="40" maxlength="50" name="reference_name[<?=$key?>]"
-            value="<?=$this->post("reference_name[$key]", $this->reference['name'][$key]);?>" /><br />
+            value="<?=$this->post($_POST["reference_name"][$key], $this->reference['name'][$key]);?>" /><br />
             <?=$this->_m("Text reference");?>*:<br />
             <textarea class="textarea_tinymce textarea" rows="25" cols="70"
-            name="reference_text[<?=$key;?>]"><?=$this->post("reference_text[$key]", $this->reference['text'][$key]);?></textarea>
+            name="reference_text[<?=$key;?>]"><?=$this->post($_POST["reference_text"][$key], $this->reference['text'][$key]);?></textarea>
          </p>
 
          <?}?>

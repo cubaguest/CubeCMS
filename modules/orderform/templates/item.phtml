@@ -17,6 +17,7 @@
             <th width="45"><?=$this->_("Síťové dveře")?></th>
             <th width="45"><?=$this->_("Vnitřní parapet")?></th>
             <th width="45"><?=$this->_("Vnější parapet")?></th>
+            <th width="45"><?=$this->_("Typ mřížky")?></th>
          </tr>
          <?foreach ($this->item['params'] as $key => $var) {?>
          <tr>
@@ -46,10 +47,35 @@
                <?if($var['outdoorparapet']){?><input type="checkbox" checked disabled />
                <?}else{?><input type="checkbox" disabled /><?}?>
             </td>
+            <td>
+               <?=$var['gridtypename']?>
+            </td>
          </tr>
          <?}?>
       </table>
-      <?if(!isset($this->hideDelete) AND !$this->hideDelete){?>
+      <table>
+         <tr>
+            <?if($this->item['profileWindowType'] != 'null'){?>
+            <th>
+               <?=$this->_("Okenní profil")?>:
+            </th>
+            <td>
+               <img src="<?=$this->item['profileWindowImage']?>" alt="image <?=$this->item['profileWindowName']?>" width="40"/>
+               <?=$this->item['profileWindowName']?>
+            </td>
+            <?}?>
+            <?if($this->item['profileDoorType'] != 'null'){?>
+            <th>
+               <?=$this->_("Dveřní profil")?>:
+            </th>
+            <td>
+               <img src="<?=$this->item['profileDoorImage']?>" alt="image <?=$this->item['profileDoorName']?>" width="40"/>
+               <?=$this->item['profileDoorName']?>
+            </td>
+            <?}?>
+         </tr>
+      </table>
+      <?if(!$this->hideDelete){?>
       <p style="text-align:right">
          <input type="button" name="deleteItem" value="Smazat" onclick="return deleteItem(<?=$this->itemId?>);" />
       </p>

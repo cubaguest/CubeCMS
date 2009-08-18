@@ -20,13 +20,13 @@
          <p id="actionLang<?=$key?>" class="tabcontent">
             <?=$this->_("Název akce (bude zobrazen v panelu)");?>*:<br />
             <input type="text" size="40" maxlength="50" name="action_label[<?=$key?>]"
-            value="<?=$this->post("action_label[$key]", $this->action['label'][$key]);?>" /><br />
+            value="<?=$this->post($_POST["action_label"][$key], $this->action['label'][$key]);?>" /><br />
             <?=$this->_("Krátký popis akce (bude zobrazen v panelu)");?>*:<br />
             <input type="text" size="70" maxlength="150" name="action_text_short[<?=$key?>]"
-            value="<?=$this->post("action_text_short[$key]", $this->action['text_short'][$key]);?>" /><br />
+            value="<?=$this->post($_POST["action_text_short"][$key], $this->action['text_short'][$key]);?>" /><br />
             <?=$this->_("Text akce");?>*:<br />
             <textarea class="textarea_tinymce textarea" rows="15" cols="70"
-            name="action_text[<?=$key;?>]"><?=$this->post("action_text[$key]", $this->action['text'][$key]);?></textarea>
+            name="action_text[<?=$key;?>]"><?=$this->post($_POST["action_text"][$key], $this->action['text'][$key]);?></textarea>
          </p>
          <?}?>
          <?=$this->_("Obrázek akce")?>:<br />

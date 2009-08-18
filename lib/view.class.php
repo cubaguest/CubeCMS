@@ -66,11 +66,11 @@ abstract class View {
     * @param string $name -- název proměnné
     * @return mixed -- hodnota proměnné
     */
-   public function  &__get($name) {
+   public function  __get($name) {
       if(!isset($this->template()->{$name})){
-         $this->template()->{$name} = null;
+         $this->template()->$name = null;
       }
-      return $this->template()->{$name};
+      return $this->template()->$name;
    }
 
    /**

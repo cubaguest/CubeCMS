@@ -466,6 +466,8 @@ class AppCore {
             throw new UnexpectedValueException(self::sysConfig()->getOptionValue("dbhandler",
                   self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 3);
          }
+         // inicializace PDO
+         Db_PDO::factory();
       } catch (UnexpectedValueException $e) {
          new CoreErrors($e);
       }
@@ -545,7 +547,7 @@ class AppCore {
             echo $classOrigName." ".$file." module-file: ".$moduleFile;
 //                        throw new BadFileException(sprintf(_("Nebyla nalezena třída %s soubor %s"),
 //                              $classOrigName, $file));
-            flush();
+//            flush();
          }
       }
       //		knihovny pro práci s chybami
@@ -634,8 +636,7 @@ class AppCore {
    public function assignMainVarsToTemplate() {
       //	Hlavni promene strany
       $this->coreTpl->pageTitle = self::sysConfig()->getOptionValue("web_name");
-      $this->coreTpl->setCatTitle(Category::getLabel());
-      $this->coreTpl->categoryTitle = Category::getLabel();
+      $this->coreTpl->setCategoryName(Category::getLabel());
       $this->coreTpl->categoryId = Category::getId();
       //adresa k rootu webu
       $this->coreTpl->rootDir = self::getAppWebDir();
@@ -726,17 +727,17 @@ class AppCore {
     * @param SqlObject -- objekt s tabulkami
     * @return array -- pole s tabulkama
     */
-   private function getModuleTables($item) {
-      $tableIndex = 1; $moduleDbTables = array();
-      //		TODO potřebuje optimalizaci a OPRAVIT
-      $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-      while (isset($item->$objectName) AND ($item->$objectName != null)){
-         $moduleDbTables[$tableIndex] = $item->$objectName;
-         $tableIndex++;
-         $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-      };
-      return $moduleDbTables;
-   }
+//   private function getModuleTables($item) {
+//      $tableIndex = 1; $moduleDbTables = array();
+//      //		TODO potřebuje optimalizaci a OPRAVIT
+//      $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+//      while (isset($item->$objectName) AND ($item->$objectName != null)){
+//         $moduleDbTables[$tableIndex] = $item->$objectName;
+//         $tableIndex++;
+//         $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+//      };
+//      return $moduleDbTables;
+//   }
 
    /**
     * Metoda spouští moduly
@@ -762,11 +763,12 @@ class AppCore {
             $sysModule = new Module_Sys();
 
             // doplnění odkazů
-            $sysModule->setLink(new Links());
-            $sysModule->link()->category(Category::getLabel(), Category::getId());
-
+            $link = new Links();
+            $link->category(Category::getLabel(), Category::getId());
+            $sysModule->setLink($link);
+            
             //	Vytvoření objektu pro práci s modulem
-            $sysModule->setModule(new Module($item, $this->getModuleTables($item)));
+            $sysModule->setModule(new Module($item));
 
             // nastavení locales
             $sysModule->setLocale(new Locale($sysModule->module()->getName()));
@@ -883,7 +885,7 @@ class AppCore {
          $sysModule->link()->category($item->{Model_Category::COLUMN_CAT_LABEL}, $item->{Model_Category::COLUMN_CAT_ID});
 
          //	Vytvoření objektu pro práci s modulem
-         $sysModule->setModule(new Module($item, $this->getModuleTables($item)));
+         $sysModule->setModule(new Module($item));
 
          // nastavení locales
          $sysModule->setLocale(new Locale($sysModule->module()->getName()));
@@ -989,18 +991,18 @@ class AppCore {
             = array(Model_Category::COLUMN_CAT_LABEL => $panel->{Model_Category::COLUMN_CAT_LABEL},
                Model_Category::COLUMN_CAT_ID => $panel->{Model_Category::COLUMN_CAT_ID});
             // Vytvoření tabulek
-            $tableIndex = 1; $moduleDbTables = array();
-            $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-            while (isset($panel->$objectName) AND ($panel->$objectName != null)){
-               $moduleDbTables[$tableIndex] = $panel->$objectName;
-               $tableIndex++;
-               $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
-            }
+//            $tableIndex = 1; $moduleDbTables = array();
+//            $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+//            while (isset($panel->$objectName) AND ($panel->$objectName != null)){
+//               $moduleDbTables[$tableIndex] = $panel->$objectName;
+//               $tableIndex++;
+//               $objectName=self::MODULE_DBTABLES_PREFIX.$tableIndex;
+//            }
             // systemový objekt
             $panelSys = new Module_Sys();
 
             // Příprava modulu
-            $panelSys->setModule(new Module($panel, $moduleDbTables));
+            $panelSys->setModule(new Module($panel));
 
             // nastavení locales
             $panelSys->setLocale(new Locale($panelSys->module()->getName()));
@@ -1091,7 +1093,7 @@ class AppCore {
          foreach ($sitemapItems as $itemIndex => $item) {
             $moduleSys = new Module_Sys();
             //				Vytvoření objektu pro práci s modulem
-            $moduleSys->setModule(new Module($item, $this->getModuleTables($item)));
+            $moduleSys->setModule(new Module($item));
             $link = new Links(true);
             $moduleSys->setLink($link->category($item->{Model_Category::COLUMN_CAT_LABEL_ORIG},
                $item->{Model_Category::COLUMN_CAT_ID}));
@@ -1161,12 +1163,11 @@ class AppCore {
          foreach ($modules as $itemIndex => $item) {
             $moduleSys = new Module_Sys();
             //				Vytvoření objektu pro práci s modulem
-            $moduleSys->setModule(new Module($item, $this->getModuleTables($item)));
+            $moduleSys->setModule(new Module($item));
             $moduleName = ucfirst($moduleSys->module()->getName());
             $moduleClass = $moduleName.'_'.self::MODULE_SEARCH_SUFIX_CLASS;
             //				Pokud existuje soubor tak jej načteme
             if(file_exists($moduleSys->module()->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php')){
-//               include_once ($module->getDir()->getMainDir(false).strtolower(self::MODULE_SEARCH_SUFIX_CLASS).'.class.php');
                if(class_exists($moduleClass)){
                   $searchObj = new $moduleClass($itemsArray[$moduleSys->module()->getIdModule()], $moduleSys);
                   // spuštění hledání v modulu
@@ -1180,8 +1181,8 @@ class AppCore {
             }
             // vyprázdnění modulu
          }
-         $this->coreTpl->setCatTitle(_("hledání"));
-         $this->coreTpl->setArticleTitle(urldecode($_GET[UrlRequest::SPECIAL_PAGE_SEARCH]));
+         $this->coreTpl->setCategoryName(_("hledání"));
+         $this->coreTpl->setArticleName(htmlspecialchars(rawurldecode($this->coreTpl->get('search',null,false))));
          $this->coreTpl->searchResults = Search::getResults();
          $this->coreTpl->searchResultsCount = Search::getNumResults();
       }
@@ -1207,7 +1208,7 @@ class AppCore {
             // systémový objekt modulu
             $moduleSys = new Module_Sys();
             //				Vytvoření objektu pro práci s modulem
-            $moduleSys->setModule(new Module($item, $this->getModuleTables($item)));
+            $moduleSys->setModule(new Module($item));
             $link = new Links(true);
             $link->category($item->{Model_Category::COLUMN_CAT_LABEL}, $idCategory);
             $moduleSys->setLink($link);

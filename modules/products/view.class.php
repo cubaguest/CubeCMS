@@ -2,12 +2,16 @@
 class Products_View extends View {
    const SHOW_PRODUCTS_NUM = 20;
 
+   public function init() {
+      $this->template()->setPVar("productHeader", true);
+   }
+
    public function mainView() {
       if($this->rights()->isWritable()) {
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_product', $this->_m("Přidat"),
+         $toolbox->addTool('add_product', $this->_("Přidat"),
              $this->link()->action($this->sys()->action()->addProduct()),
-             $this->_m("Přidat produkt"), "text_add.png");
+             $this->_("Přidat produkt"), "text_add.png");
          $this->template()->toolbox = $toolbox;
       }
 
@@ -24,6 +28,12 @@ class Products_View extends View {
       //		Vybrání článků
       $list = $productModel->getSelectedListProducts($scroll->getStartRecord(), $scroll->getCountRecords());
       $this->template()->EPLscroll = $scroll;
+
+      // přesměrování pokud je jeden produkt
+      if(count($list) == 1){
+         $this->link()->article($list[0][Products_Model_Detail::COLUMN_PRODUCT_LABEL],
+         $list[0][Products_Model_Detail::COLUMN_PRODUCT_ID])->reload();
+      }
 
       foreach ($list as &$products) {
          $out = array();
@@ -42,13 +52,16 @@ class Products_View extends View {
       if($this->rights()->isWritable()) {
       // editační tlačítka
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_product', $this->_m("Upravit"),
+         $toolbox->addTool('add_product', $this->_("Přidat"),
+             $this->link()->action($this->sys()->action()->addProduct()),
+             $this->_("Přidat produkt"), "text_add.png")
+             ->addTool('edit_product', $this->_("Upravit"),
              $this->link()->action($this->sys()->action()->editProduct()),
-             $this->_m("Upravit prrodukt"), "text_edit.png")
-             ->addTool('product_delete', $this->_m("Smazat"), $this->link(),
-             $this->_m("Smazat produkt"), "remove.png", "product_id",
+             $this->_("Upravit prrodukt"), "text_edit.png")
+             ->addTool('product_delete', $this->_("Smazat"), $this->link(),
+             $this->_("Smazat produkt"), "remove.png", "product_id",
              $this->template()->product[Products_Model_Detail::COLUMN_PRODUCT_ID],
-             $this->_m("Opravdu smazat produkt")."?");
+             $this->_("Opravdu smazat produkt")."?");
          $this->template()->toolbox = $toolbox;
       }
 
@@ -58,7 +71,7 @@ class Products_View extends View {
 
       $this->template()->addTplFile("productDetail.phtml");
       $this->template()->addCssFile("style.css");
-      $this->template()->setArticleTitle($this->template()->product[Products_Model_Detail::COLUMN_PRODUCT_LABEL]);
+      $this->template()->setArticleName($this->template()->product[Products_Model_Detail::COLUMN_PRODUCT_LABEL]);
    }
 
    /**
@@ -67,7 +80,7 @@ class Products_View extends View {
    public function addProductView() {
       $this->template()->addTplFile('editProduct.phtml');
       $this->template()->addCssFile("style.css");
-      $this->template()->setActionTitle($this->_m("přidání produktu"));
+      $this->template()->setActionName($this->_("přidání produktu"));
 
       // tiny mce
       $tinymce = new JsPlugin_TinyMce();
@@ -95,9 +108,9 @@ class Products_View extends View {
 
       $model = new Products_Model_Detail($this->sys());
       $this->template()->product = $model->getProductDetailAllLangs($this->sys()->article()->getArticle());
-      $this->template()->setArticleTitle($this->template()
-         ->article[Products_Model_Detail::COLUMN_PRODUCT_LABEL][Locale::getLang()]);
-      $this->template()->setActionTitle($this->_m("úprava produktu"));
+      $this->template()->setArticleName($this->template()
+          ->product[Products_Model_Detail::COLUMN_PRODUCT_LABEL][Locale::getLang()]);
+      $this->template()->setActionName($this->_("úprava produktu"));
 
       // tiny mce
       $tinymce = new JsPlugin_TinyMce();

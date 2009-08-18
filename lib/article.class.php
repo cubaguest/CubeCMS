@@ -74,5 +74,13 @@ class Article {
 	public function __toString() {
 		return (string)self::$currentArticleId;
 	}
+
+   /**
+    * Metoda vrací id zvoleného článku
+    * @return integer
+    */
+   public static function getId() {
+      return self::$currentArticleId;
+   }
 }
 ?>

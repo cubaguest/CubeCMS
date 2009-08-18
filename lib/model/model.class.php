@@ -47,6 +47,14 @@ abstract class Model {
       return $this->sys()->module();
 	}
 
+   /**
+    * Metoda vrací id modulu
+    * @return integer
+    */
+   final public function idItem() {
+      return $this->module()->getId();
+   }
+
 	/**
 	 * Abstraktní metoda pro inicializaci modelu pokud je třeba
 	 */

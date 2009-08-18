@@ -49,6 +49,12 @@ class SiteMap {
 	 */
 	private $priority = self::SITEMAP_SITE_DEFAULT_PRIORITY;
 
+	/**
+	 * Priorita stránky s článkem v mapě
+	 * @var float
+	 */
+	private $priorityArticle = self::SITEMAP_SITE_DEFAULT_PRIORITY;
+
    /**
     * Pole s položkami
     * @var array
@@ -118,8 +124,9 @@ class SiteMap {
 			$frequency = $this->changeFreq;
 		}
 		if($priority == null){
-			$priority = $this->priority;
+			$priority = $this->priorityArticle;
 		}
+
    	array_push($this->itemsCurrentArray, array('loc' => (string)$url,
 									   'lastmod' => $lastChange,
 									   'changefreq' => $frequency,
@@ -144,7 +151,7 @@ class SiteMap {
 									   'lastmod' => $lastChange,
 									   'changefreq' => $this->changeFreq,
 									   'priority'=>$this->priority));
-      $this->priority = $this->priority-$priorityForArticleDown;
+      $this->priorityArticle = $this->priority-$priorityForArticleDown;
    }
 
 	/**

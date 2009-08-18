@@ -1,21 +1,22 @@
-<div id="firstpane" class="menu_list">
-  <p class="menu_head">Header-1</p>
+<?$rand = rand();?>
+<div id="pane<?=$rand?>" class="menu_list">
+  <p class="menu_head"><span><?=$this->module()->label()->categoryLabel()?></span></p>
     <div class="menu_body">
-        <a href="#">Link-1</a>
+       <?foreach ($this->products as $product) {?>
+       <a href="<?=$this->l()->article($product[Products_Model_Detail::COLUMN_PRODUCT_LABEL],
+         $product[Products_Model_Detail::COLUMN_PRODUCT_ID])?>"
+         title="<?=$product[Products_Model_Detail::COLUMN_PRODUCT_LABEL]?>">
+          <?=$product[Products_Model_Detail::COLUMN_PRODUCT_LABEL]?></a>
+       <?}?>
     </div>
-  <p class="menu_head">Header-2</p>
-    <div class="menu_body">
-        <a href="#">Link-1</a>
-    </div>
-  <p class="menu_head">Header-3</p>
-    <div class="menu_body">
-        <a href="#">Link-1</a>
-   </div>
 </div>
 <script type="text/javascript">
-$("#firstpane p.menu_head").click(function()
-{
-    $(this).css({backgroundImage:"url(down.png)"}).next("div.menu_body").slideToggle(300).siblings("div.menu_body").slideUp("slow");
-    $(this).siblings().css({backgroundImage:"url(left.png)"});
+$("#pane<?=$rand?> p.menu_head").click(function(){
+    $(this).next("div.menu_body").slideToggle(300).siblings("div.menu_body").slideUp("fast");
+    //$(this).siblings().css({backgroundImage:"url(left.png)"});
 });
+<?if($this->module()->label()->categoryLabel() == Category::getLabel()){?>
+   $("#pane<?=$rand?> div.menu_body").slideDown(100);
+
+<?}?>
 </script>

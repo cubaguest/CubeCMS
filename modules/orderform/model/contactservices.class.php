@@ -11,7 +11,7 @@ class Orderform_Model_Contactservices extends Model_Db {
     */
    public function getCityList() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable(), 'cities')
+      ->table(Db::table(Contacts_Model_Detail::DB_TABLE), 'cities')
       ->colums(array(Orderform_Model_Detail::COLUMN_CITY_ID,
               Orderform_Model_Detail::COLUMN_CITY_NAME =>"IFNULL(cities.".Orderform_Model_Detail::COLUMN_CITY_NAME.'_'
             .Locale::getLang().",cities.".Orderform_Model_Detail::COLUMN_CITY_NAME.'_'.Locale::getDefaultLang().")",
@@ -25,7 +25,7 @@ class Orderform_Model_Contactservices extends Model_Db {
     * return SimpleXMLElement
     */
    public function getServices() {
-      return new SimpleXMLElement(file_get_contents($this->sys()->module()->getDir()->getModelsDir().self::FILE_SERVICES));
+      return new SimpleXMLElement(file_get_contents($this->sys()->module()->getDir()->getDataDir().self::FILE_SERVICES));
    }
 }
 ?>

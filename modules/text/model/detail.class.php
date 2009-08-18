@@ -4,6 +4,11 @@
  * 
  */
 class Text_Model_Detail extends Model_Db {
+   /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'texts';
+
 	/**
 	 * Názvy sloupců v db
 	 * @var string
@@ -33,7 +38,7 @@ class Text_Model_Detail extends Model_Db {
 	 */
 	private function getTextFromDb() {
 		$sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(self::DB_TABLE))
       ->colums(array(self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT_LANG_PRFIX.Locale::getLang()
             .",".self::COLUMN_TEXT_LANG_PRFIX.Locale::getDefaultLang().")"))
 		->where(self::COLUMN_ID_ITEM, $this->module()->getId());
@@ -51,7 +56,7 @@ class Text_Model_Detail extends Model_Db {
 	 */
 	public function getAllLangText() {
 		$sqlSelect = $this->getDb()->select()
-         ->table($this->module()->getDbTable())
+         ->table(Db::table(self::DB_TABLE))
 			->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 				
 		$text = $this->getDb()->fetchAssoc($sqlSelect,true);
@@ -67,7 +72,7 @@ class Text_Model_Detail extends Model_Db {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
             self::COLUMN_CHANGED_TIME, time());
          //
-         $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
+         $sqlInsert = $this->getDb()->update()->table(Db::table(self::DB_TABLE))
                ->set($textArr)
                ->where(self::COLUMN_ID_ITEM, $this->module()->getId());
          //      // vložení do db
@@ -76,7 +81,7 @@ class Text_Model_Detail extends Model_Db {
          $textArr = $this->createValuesArray(self::COLUMN_TEXT, $texts,
             self::COLUMN_CHANGED_TIME, time(),
             self::COLUMN_ID_ITEM, $this->module()->getId());
-         $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
+         $sqlInsert = $this->getDb()->insert()->table(Db::table(self::DB_TABLE))
                ->colums(array_keys($textArr))
                ->values(array_values($textArr));
          //	Vložení do db
@@ -85,7 +90,7 @@ class Text_Model_Detail extends Model_Db {
    }
 
    private function isSaved() {
-      $sql = $this->getDb()->select()->table($this->module()->getDbTable())
+      $sql = $this->getDb()->select()->table(Db::table(self::DB_TABLE))
       ->colums(array('count' => 'COUNT(*)'))
       ->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 
@@ -99,7 +104,7 @@ class Text_Model_Detail extends Model_Db {
 
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(self::DB_TABLE))
       ->colums(self::COLUMN_CHANGED_TIME)
 		->where(self::COLUMN_ID_ITEM, $this->module()->getId());
 

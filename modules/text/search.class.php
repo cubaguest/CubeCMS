@@ -2,7 +2,7 @@
 class Text_Search extends Search {
 	public function runSearch() {
 
-      $sqlSearch = $this->getDb()->select()->table($this->module()->getDbTable())
+      $sqlSearch = $this->getDb()->select()->table(Db::table(Text_Model_Detail::DB_TABLE))
       ->colums(array(
             parent::RESULT_INDEX_RELEVANCE => 'MATCH('.Text_Model_Detail::COLUMN_TEXT.'_'.Locale::getLang()
             .') AGAINST(\''.$this->getDb()->escapeString($this->getSearchString()).'\')', Db::COLUMN_ALL))

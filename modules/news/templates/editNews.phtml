@@ -3,7 +3,7 @@
       <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
       <li>
          <a href="#newsLang<?=$key?>" class="selectedd">
-            <img src="images/lang/<?$key?>.png" title="<?=$lang?>" />
+            <img src="images/lang/<?=$key?>.png" alt="<?=$lang?>" />
             <?=$lang?>
          </a>
       </li>
@@ -16,10 +16,10 @@
          <p id="newsLang<?=$key?>" class="tabcontent">
             <?=$this->_m("Název novinky");?>:<br />
             <input type="text" size="40" maxlength="50" name="news_label[<?=$key?>]"
-                   value="<?=$this->post("news_label[$key]", $this->new['label'][$key]);?>" /><br />
+                   value="<?=$this->post($_POST["news_label"][$key], $this->new['label'][$key]);?>" /><br />
             <?=$this->_m("Text");?>*:<br />
             <textarea class="textarea_tinymce textarea" rows="5" cols="70"
-                      name="news_text[<?=$key;?>]"><?=$this->post("news_text[$key]", $this->new['text'][$key]);?></textarea>
+                      name="news_text[<?=$key;?>]"><?=$this->post($_POST["news_text"][$key], $this->new['text'][$key]);?></textarea>
          </p>
 
             <?}?>
@@ -34,9 +34,11 @@
       </form>
    </div>
    <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()));?>
-   <script>
+   <script type="text/javascript" language="javascript">
+      <!--
       $(document).ready(function(){
          $("#editNewForm").tabs();
       });
+      -->
    </script>
 </div>

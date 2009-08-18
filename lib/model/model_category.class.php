@@ -12,6 +12,11 @@
 
 class Model_Category extends Model_Db {
    /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'categories';
+
+   /**
     * Názvy sloupců v db tabulce
     * @var string
     */
@@ -37,39 +42,19 @@ class Model_Category extends Model_Db {
    const COLUMN_CAT_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority';
 
    /**
-    * Proměná s názvem tabulky s kategoriemi
-    * @var string
-    */
-   private $catTable = null;
-
-   /**
-    * Proměná s názvem tabulky se sekcemi
-    * @var string
-    */
-   private $secTable = null;
-
-   /**
-    * Proměná s názvem tabulky s itemi
-    * @var string
-    */
-   private $itemsTable = null;
-
-   /**
     * Metoda načte kategori, pokud je zadáno Id je načtena určitá, pokud ne je
     * načtena kategorie s nejvyšší prioritou
     * @param integer $idCat -- (option) id kategorie
     */
    public function getCategory($idCat = null) {
-      $this->getTables();
       $userNameGroup = AppCore::getAuth()->getGroupName();
-
-      $sqlSelect = $this->getDb()->select()->table($this->catTable, 'cat')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(self::DB_TABLE), 'cat')
           ->colums(array(self::COLUMN_CAT_LABEL => "IFNULL(cat.".self::COLUMN_CAT_LABEL_ORIG."_".Locale::getLang()
           .", cat.".self::COLUMN_CAT_LABEL_ORIG."_".Locale::getDefaultLang().")", self::COLUMN_CAT_ID, self::COLUMN_CAT_LPANEL,
           self::COLUMN_CAT_RPANEL, self::COLUMN_CAT_SEC_ID, self::COLUMN_CAT_PARAMS))
-          ->join(array('item' => $this->itemsTable),
+          ->join(array('item' => Db::table(Model_Module::DB_TABLE_ITEMS)),
           array('cat' => self::COLUMN_CAT_ID, self::COLUMN_CAT_ID), Db::JOIN_INNER)
-          ->join(array('sec'=>$this->secTable),
+          ->join(array('sec'=>Db::table(Model_Sections::DB_TABLE)),
           array('cat' => self::COLUMN_CAT_SEC_ID, Model_Sections::COLUMN_SEC_ID), Db::JOIN_INNER,
           array(Model_Sections::COLUMN_SEC_LABEL => 'IFNULL(sec.'.Model_Sections::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getLang()
           .', sec.'.Model_Sections::COLUMN_SEC_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
@@ -87,15 +72,6 @@ class Model_Category extends Model_Db {
       }
 
       return $this->getDb()->fetchObject($sqlSelect);
-   }
-
-   /**
-    * Metoda načte názvy tabulek
-    */
-   private function getTables() {
-      $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
-      $this->secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
-      $this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
    }
 }
 ?>

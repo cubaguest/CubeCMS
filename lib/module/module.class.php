@@ -65,10 +65,10 @@ class Module {
 	 * @param array -- pole názvů db tabulek modulu
 	 * @param string -- parametry modulu
 	 */
-	function __construct(stdClass $moduleObject, $dbTables){
+	function __construct(stdClass $moduleObject){
 		$this->setId($moduleObject->{Model_Module::COLUMN_ITEM_ID});
 		$this->setIdModule($moduleObject->{Model_Module::COLUMN_ID_MODULE});
-		$this->setDbTables($dbTables);
+//		$this->setDbTables($dbTables);
       $this->setParams($moduleObject->{Model_Module::COLUMN_ITEM_PARAMS});
       $this->moduleLabels = new Module_Labels($moduleObject);
       $this->moduleDirs = new Module_Dirs($this->getLabel()->name(),
@@ -166,13 +166,13 @@ class Module {
 	 * @param integer -- cislo tabulky
 	 * @return String -- jmeno adresare
 	 */
-	public function getDbTable($tableNum = 1){
-		if(isset($this->dbTables[$tableNum])){
-			return $this->dbTables[$tableNum];
-		} else {
-			return false;
-		}
-	}
+//	public function getDbTable($tableNum = 1){
+//		if(isset($this->dbTables[$tableNum])){
+//			return $this->dbTables[$tableNum];
+//		} else {
+//			return false;
+//		}
+//	}
 
 	/**
 	 * Funkce nastavi parametry modulu
@@ -231,9 +231,9 @@ class Module {
 	 * @param array -- pole s tabulkama
     * @todo není iplementována optimálně
 	 */
-	private function setDbTables($dbTables) {
-		$this->dbTables = $dbTables;
-	}
+//	private function setDbTables($dbTables) {
+//		$this->dbTables = $dbTables;
+//	}
 }
 
 ?>

@@ -2,7 +2,7 @@
 class News_Search extends Search {
 	public function runSearch() {
 
-      $sqlSearch = $this->getDb()->select()->table($this->module()->getDbTable())
+      $sqlSearch = $this->getDb()->select()->table(Db::table(News_Model_Detail::DB_TABLE))
       ->colums(array(
             parent::RESULT_INDEX_RELEVANCE => 'MATCH('.News_Model_Detail::COLUMN_NEWS_LABEL.'_'.Locale::getLang()
             .') AGAINST(\''.$this->getDb()->escapeString($this->getSearchString()).'\') + MATCH('

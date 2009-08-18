@@ -113,19 +113,19 @@ class Template {
     * Proměná s názvem titulku okna kategorie
     * @var string
     */
-   private static $catTitle = false;
+   private static $categoryName = false;
 
    /**
     * Proměná s názvem titulku okna článku
     * @var string
     */
-   private static $articleTitle = false;
+   private static $articleName = false;
 
    /**
     * Proměná s názvem titulku okna akce
     * @var string
     */
-   private static $actionTitle = false;
+   private static $actionName = false;
 
 
    /*
@@ -159,7 +159,7 @@ class Template {
    public function  &__get($name) {
       if(!isset($this->privateVars[$name])){
          $this->privateVars[$name] = null;
-         trigger_error(sprintf(_('Nedefinovaná proměnná %s'),$name), E_USER_NOTICE);
+         //trigger_error(sprintf(_('Nedefinovaná proměnná %s'),$name), E_USER_NOTICE);
       }
       return $this->privateVars[$name];
    }
@@ -239,48 +239,63 @@ class Template {
     * Metoda nastaví název titulku pro kategorii
     * @param string $text -- název kategorie
     */
-   final public function setCatTitle($text) {
-      self::$catTitle = $text;
+   final public function setCategoryName($text) {
+      self::$categoryName = $text;
    }
 
    /**
     * Metoda vrátí název titulku kategorie
+    * @param bool $decode -- jestli se mají html znaky převést na entity
     * @return string
     */
-   final public function catTitle() {
-      return htmlspecialchars(self::$catTitle);
+   final public function categoryName($decode = false) {
+      if(!$decode){
+         return htmlspecialchars_decode(self::$categoryName);
+      } else {
+         return self::$categoryName;
+      }
    }
 
    /**
     * Metoda nastaví název titulku pro článek
     * @param string $text -- název článek
     */
-   final public function setArticleTitle($text) {
-      self::$articleTitle = $text;
+   final public function setArticleName($text) {
+      self::$articleName = $text;
    }
 
    /**
     * Metoda vrátí název titulku článeku
+    * @param bool $decode -- jestli se mají html znaky převést na entity
     * @return string
     */
-   final public function articleTitle() {
-      return htmlspecialchars(self::$articleTitle);
+   final public function articleName($decode = false) {
+      if(!$decode){
+         return htmlspecialchars_decode(self::$articleName);
+      } else {
+         return self::$articleName;
+      }
    }
 
    /**
     * Metoda nastaví název titulku pro akci
     * @param string $text -- název akce
     */
-   final public function setActionTitle($text) {
-      self::$actionTitle = $text;
+   final public function setActionName($text) {
+      self::$actionName = $text;
    }
 
    /**
     * Metoda vrátí název titulku akce
+    * @param bool $decode -- jestli se mají html znaky převést na entity
     * @return string
     */
-   final public function actionTitle() {
-      return htmlspecialchars(self::$actionTitle);
+   final public function actionName($decode = false) {
+      if(!$decode){
+         return htmlspecialchars_decode(self::$actionName);
+      } else {
+         return self::$actionName;
+      }
    }
 
    // nepoužito zatím
@@ -329,8 +344,8 @@ class Template {
     * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
     */
    public function post($name, $defaultValue = null) {
-      if(isset ($_POST[$name])){
-         return htmlspecialchars($_POST[$name]);
+      if($name != null){
+         return htmlspecialchars($name);
       } else {
          return $defaultValue;
       }
@@ -344,7 +359,11 @@ class Template {
     */
    public function get($name, $defaultValue = null) {
       if(isset ($_GET[$name])){
-         return urldecode($_GET[$name]);
+         if($decode) {
+            return urldecode($_GET[$name]);
+         } else {
+            return $_GET[$name];
+         }
       } else {
          return $defaultValue;
       }
@@ -615,11 +634,16 @@ class Template {
    }
 
    /**
-    * Metoda vrací adresář zvoleného vhledu
+    * Metoda vrací adresář nebo název zvoleného vhledu
+    * @param boolean $onlyName -- (option) jestli se má vrátit jen název (default: true)
     * @return string -- adresář vzhledu
     */
-   final public static function face() {
-      return self::$face;
+   final public static function face($onlyName = true) {
+      if($onlyName){
+         return self::$face;
+      } else {
+         return Links::getMainWebDir().self::FACES_DIR.'/'.self::$face.'/';
+      }
    }
 
    /*

@@ -3,6 +3,11 @@
  * Třída modelu detailem článku
  */
 class References_Model_Detail extends Model_Db {
+   /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'references';
+
 	/**
 	 * Názvy sloupců v databázi
 	 */
@@ -42,7 +47,7 @@ class References_Model_Detail extends Model_Db {
                                           self::COLUMN_TIME, time(),
                                           self::COLUMN_TIME, time());
 
-      $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
+      $sqlInsert = $this->getDb()->insert()->table(Db::table(self::DB_TABLE))
       ->colums(array_keys($refArr))
       ->values(array_values($refArr));
 //      //		Vložení do db
@@ -71,7 +76,7 @@ class References_Model_Detail extends Model_Db {
    public function getReferenceDetailSelLang($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(self::DB_TABLE))
       ->colums(array(self::COLUMN_NAME =>"IFNULL(".self::COLUMN_NAME.'_'.Locale::getLang()
             .",".self::COLUMN_NAME.'_'.Locale::getDefaultLang().")",
             self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT.'_'.Locale::getLang()
@@ -96,7 +101,7 @@ class References_Model_Detail extends Model_Db {
    public function getReferenceDetailAllLangs($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(self::DB_TABLE))
       ->colums(Db::COLUMN_ALL)
       ->where(self::COLUMN_ID_ITEM, $this->module()->getId())
       ->where(self::COLUMN_ID, $id);
@@ -126,7 +131,7 @@ class References_Model_Detail extends Model_Db {
                                           self::COLUMN_TEXT, $texts,
                                           self::COLUMN_TIME, time());
 
-      $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
+      $sqlInsert = $this->getDb()->update()->table(Db::table(self::DB_TABLE))
             ->set($refArr)
             ->where(self::COLUMN_ID, $id);
 
@@ -145,7 +150,7 @@ class References_Model_Detail extends Model_Db {
     */
    public function deleteReference($idArticle) {
       $sqlDelete = $this->getDb()
-      ->delete()->table($this->module()->getDbTable())
+      ->delete()->table(Db::table(self::DB_TABLE))
       ->where(self::COLUMN_ID,$idArticle);
 
       if($this->getDb()->query($sqlDelete)){

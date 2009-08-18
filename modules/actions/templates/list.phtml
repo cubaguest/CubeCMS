@@ -1,8 +1,18 @@
 <div>
    <?foreach ($this->actionsList as $action) {?>
-   <div class="action">
+   <?if(((int)$action['start_date']<time()) AND ((int)$action['stop_date']>time())){?>
+      <div class="action">
+   <?} else {?>
+      <div class="actionHidden">
+   <?}?>
+
       <h2><a href="<?=$this->l()->article($action['label'], $action['id_action'])?>"
-             title="<?=$action['label']?>"><?=$action['label']?></a></h2>
+             title="<?=$action['label']?>"><?=$action['label']?></a>
+       <?if(((int)$action['start_date']<time()) AND ((int)$action['stop_date']>time())){?>
+      <?} else {?>
+         <span><?=$this->_("Nezveřejněno")?></span>
+      <?}?>
+      </h2>
       <p class="subLabel"><?=$action['text_short']?></p>
       <?if($this->sys()->rights()->isWritable()) {?>
          <?=$this->_("Zveřejněno:")."&nbsp;".$this->_("od")." ".strftime("%x", $action['start_date'])
@@ -10,13 +20,8 @@
       <?}?>
       <?if($action['image'] != null) {?>
       <img style="float:left;" src="<?=$this->module()->getDir()->getDataDir().$action['image']?>" alt="image <?=$action['image']?>" />
-         <?}?>
-      <?if(((int)$action['start_date']<time()) AND ((int)$action['stop_date']>time())){?>
-         <?print truncate(strip_tags($action['text']), 400)?>
-      <?} else {?>
-         <p class="actionHidden"><?print truncate(strip_tags($action['text']), 400)?></p>
-         
       <?}?>
+      <?print truncate(strip_tags($action['text']), 400)?>
    </div>
    <br clear="all" />
    <?}?>

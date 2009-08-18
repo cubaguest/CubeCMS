@@ -7,11 +7,13 @@
  * Zkrácení textu s XHTML značkami
  * @param string $s -- zkracovaný řetězec bez komentářů a bloků skriptu
  * @param int $limit -- požadovaný počet vrácených znaků
+ * @param string $delimiter -- (option) oddělovač na konci (např. "...")
  * @return string -- zkrácený řetězec se správně uzavřenými značkami
  * @author Jakub Vrána
  * @link http://www.root.cz/clanky/php-zkraceni-textu-s-xhtml-znackami/
  */
-function xhtml_cut($s, $limit){
+function xhtml_cut($s, $limit, $delimiter = '...'){
+   $strLen = strlen($s);
    $length = 0;
    $tags = array(); // dosud neuzavřené značky
    for ($i=0; $i < strlen($s) && $length < $limit; $i++) {
@@ -48,9 +50,13 @@ function xhtml_cut($s, $limit){
          }
       }
       $s = substr($s, 0, $i);
+      if($strLen > $limit){
+         $s .= $delimiter;
+      }
       if ($tags) {
          $s .= "</" . implode("></", $tags) . ">";
       }
+
       return $s;
    }
 
@@ -74,7 +80,7 @@ function xhtml_cut($s, $limit){
     * @param int $maxHeight -- maximální výška
     * @return string -- tag obrázku
     */
-   function imageTag($imagePath, $alt = null, $mw = false, $mh = false, $style = null) {
+   function imageTag($imagePath, $alt = null, $mw = false, $mh = false, $clases = null, $other = null) {
       if(file_exists($imagePath)){
          $imageSizes = getimagesize($imagePath);
          if($imageSizes){
@@ -82,7 +88,26 @@ function xhtml_cut($s, $limit){
             foreach(array('w','h') as $v) { $m = "m{$v}";
                if(${$v} > ${$m} && ${$m}) { $o = ($v == 'w') ? 'h' : 'w';
                   $r = ${$m} / ${$v}; ${$v} = ${$m}; ${$o} = ceil(${$o} * $r); } }
-            return("<img src=\"{$imagePath}\" alt=\"{$alt}\" width=\"{$w}\" height=\"{$h}\" style=\"{$style}\" />");
+
+            $class = null;
+            if($clases != null) {
+               foreach ($clases as $cl) {
+                  $class .= $cl." ";
+               }
+               substr($class, 0, strlen($class)-1);
+               $class = "class=\"".$class."\" ";
+            }
+
+            $others = null;
+            if($other != null) {
+               foreach ($other as $key => $val) {
+                  $others .= $key."=\"{$val}\" ";
+               }
+//               substr($others, 0, strlen($other)-1);
+//               $others = $others." ";
+            }
+
+            return("<img src=\"{$imagePath}\" alt=\"{$alt}\" width=\"{$w}\" height=\"{$h}\" {$class}{$others}/>");
          }
       }
       return null;

@@ -1,162 +1,96 @@
 <div class="userFiles">
+<div id="uploadUserFilesForm">
    <h5><?=_("Uživatelské soubory")?> (<span id="userFilesCount"><?=$this->numRows?></span>)</h5>
-   <script type="text/javascript">
-      <!--
-      document.write("<a id=\"uploadFileButton\"><?=_('Nahrát soubor')?></a>");
-      document.write("<img style=\"display: none\" id=\"uploadFileStatus\" \n\
-   src=\"images/progress.gif\" width=\"16\" height=\"16\" alt=\"progress\" />");
-      //-->
-   </script>
-   <noscript>
-      <form method="post" action="<?=$this->l();?>" enctype="multipart/form-data">
-         <input type="file" name="userfiles_new_file" value="" />
-         <input type="submit" name="userfiles_send_file" value="<?=_("přidat")?>"/>
-      </form>
-   </noscript>
+   <form action="<?=$this->ajaxLink->action('addFile')->param('idArticle', $this->idArticle)?>" method="post" enctype="multipart/form-data" target="upload_target" onsubmit="startUploadUserFile();" >
+      <label><?=_("Soubor");?>*:</label>
+      <input name="userfiles_new_file" type="file" />
+      <input name="userfiles_idArticle" type="hidden" value="<?=$this->idArticle?>" />
+      <input type="submit" name="userfiles_send_file" value="<?=_("Nahrát")?>" />
+      <img id="upload_userfile_process" src="images/progress.gif" alt="loading" width="16" style="display:none"/>&nbsp;
+      <span id="userfile_upload_result"></span>
+   </form>
+   <iframe id="upload_target" name="upload_target" src="#" style="width:0;height:0;border:0px solid #fff;"></iframe>
 
-   <script type="text/javascript">
-      $(document).ready(function() {
-         new Ajax_upload('#uploadFileButton', {
-            //action: '<?=$this->ajaxUserfileFile?>',
-            action: '<?=$this->ajaxLink->action('addFile')->param('idArticle', $this->idArticle)?>',
-            name: 'userfiles_new_file',
-            autoSubmit: true,
-            data: {
-               userfiles_idArticle : "<?=$this->idArticle;?>",
-               userfiles_send_file: 1},
-            onComplete : function(file, response){
-               $('#uploadFileStatus').hide();
-               alert( response );
-               loadFiles();
-            },
-            onSubmit : function(file , ext){
-               $('#uploadFileStatus').show();
+</div>
+
+<?// výpis souborů?>
+<div id="userfiles_fileslist">
+   <?foreach ($this->filesArray as $file) {
+      $this->fileTpl->file = $file;
+      $this->includeTplObj($this->fileTpl);
+   }?>
+</div>
+
+
+   <script language="javascript" type="text/javascript">
+<!--
+   $(document).ready(function() {
+      setLightBox();
+      $(".userfiles_file_detail").hide();
+   });
+
+   // zobrazení detailu
+   function showFileDetail(obj){
+      if(obj.opened == true){
+         $(obj).next().slideUp(100);
+         $(obj).children("img.userfiles_file_header_exp_img").attr("src", "images/buttons/expand2.gif");
+         obj.opened = false;
+      } else {
+         $(obj).next().slideDown(100);
+         $(obj).children("img.userfiles_file_header_exp_img").attr("src", "images/buttons/collapse2.gif");
+         obj.opened = true;
+      }
+      return false;
+   }
+
+   // funkce pro nahrání obrázku
+   function startUploadUserFile(){
+      $("#upload_userfile_process").css("display", "inline");
+      return true;
+   }
+
+   // funkce volaná po nahrání
+   function stopUploadUserFile(successMessage, insertHtml, countFiles){
+      $("#userfile_upload_result").text(successMessage);
+      $("#upload_userfile_process").css("display", "none");
+      var newObj = $(insertHtml);
+      newObj.hide();
+      newObj.children("div.userfiles_file_detail").hide();
+      $("#userfiles_fileslist").prepend(newObj);
+      newObj.slideDown("normal");
+      $("#userFilesCount").text(countFiles);
+      setLightBox();
+      return true;
+   }
+
+   // funkce pro mazání obrázku
+    function deleteUserFilesFile(qmsg, idF){
+       if(confirm(qmsg)){
+          $.ajax({
+              type: "POST",
+              url: "<?=$this->ajaxLink->action('deleteFile')?>",
+              data: {
+                  idFile : idF},
+              success: function(msg){
+                 if(msg != false){
+                    $("#userfiles_file"+idF).slideUp("normal",
+                      function callback() {
+                          $(this).remove(); // dom element
+                          setLightBox();
+                      });
+                  } else {
+                     alert(msg+"<?=_("Soubor se nepodařilo smazat")?>");
+                  }
             }
-
          });
-      });
-
-      function clearFiles(){
-         $("#userFilesList tbody").html("");
       }
+      return false;
+   }
 
-      function loadFiles(){
-         clearFiles();
-         var count = 0;
-         $.getJSON("<?=$this->ajaxLink->action('getFiles')->param('idArticle', $this->idArticle)?>",
-         function(jsondata){
-            $.each(jsondata.files, function(i,ufile){
-               count++;
-                  var tbl ="<tr><td rowspan=\"3\">";
-                  if(ufile.type == 'image'){
-                     tbl+="<a href=\""+ufile.link_show+"\" rel=\"lightbox\" title=\""+ufile.file+"\"><img src=\""+ufile.link_small+"\" alt=\""+ufile.file+"\" height=\"60\" /></a>"
-                  } else if(ufile.type == 'flash'){
-                     tbl+="<img src=\"images/icons/flashfile.png\" alt=\"file "+ufile.file+"\" width=\"80\" />";
-                  } else {
-                     tbl+="<img src=\"images/icons/textfile.png\" alt=\"file "+ufile.file+"\" width=\"80\" />";
-                  }
-                  tbl+="</td><td>"+ufile.file
-                     +"</td><td>"+ Math.round(ufile.size/1024 * 100)/100 + "KB";
-                  if(ufile.type == 'image' || ufile.type == 'flash'){
-                     tbl+=" "+ufile.width+" x "+ufile.height+"px";
-                  }
-                  tbl+="</td><td align=\"right\">";
-                  if(ufile.type == 'image'){
-                     tbl+="<form action=\"<?=$this->l()?>\" method=\"post\" onsubmit=\"return deleteFile('<?=_("Opravdu smazat obrázek")?> - "+ufile.file+"', '"+ufile.id_file+"');\">";
-                  } else {
-                     tbl+="<form action=\"<?=$this->l()?>\" method=\"post\" onsubmit=\"return deleteFile('<?=_("Opravdu smazat soubor")?> - "+ufile.file+"', '"+ufile.id_file+"');\">";
-                  }
-                  tbl+="<input type=\"hidden\" name=\"userfiles_id\" value=\""+ufile.id_file+"\" />"
-                     +"<input type=\"submit\" name=\"userfiles_delete\" value=\"<?=_("Smazat")?>\" />"
-                     +"</form></td></tr>"
-                     +"<tr><td colspan=\"3\"><span class=\"smallFont\">"
-                     +"<a href=\""+ufile.link_show+"\" title=\"<?=_("Odkaz pro zobrazení")?> - "+ufile.file+"\" target=\"_blank\">"+ufile.link_show+"</a>"
-                     +"</span></td></tr>"
-                     +"<tr><td colspan=\"3\"><span class=\"smallFont\">"
-                     +"<a href=\""+ufile.link_download+"\" title=\"<?=_("Odkaz pro stažení")?> - "+ufile.file+"\">"+ufile.link_download+"</a>"
-                     +"</span></td></tr>"
-                     +"<tr><td colspan=\"4\" style=\"border: 1px solid gray;\"></td></tr>";
-               $(tbl).appendTo("#userFilesList tbody");
-            });
-            $("#userFilesCount").text(count);
-            $('a[rel*=lightbox]').lightBox();
-         });
-      };
-
-      function deleteFile(name, idFile){
-         if (confirm(name)){
-            $.ajax({
-               type: "POST",
-               url: "<?=$this->ajaxLink->action('deleteFile')?>",
-               data: {
-                  idFile : idFile},
-               success: function(msg){
-                  loadFiles();
-                  alert( msg );
-               }
-            });
-            return false;
-         }
-         return false;
-      }
-   </script>
-   
-   <table id="userFilesList" border="0" cellpadding="2" cellspacing="2">
-      <tbody>
-         <? foreach ($this->filesArray as $file) {?>
-               
-         <tr>
-            <td rowspan="3">
-               <?if($file['type'] == 'image'){?>
-               <a href="<?=$file['link_show']?>" rel="lightbox" title="<?=$file['file']?>" rel="lightbox">
-                  <img src="<?=$file['link_small']?>" alt="file <?=$file['file']?>" width="80" />
-               </a>
-               <?} else if($file['type'] == 'flash'){?>
-                  <img src="images/icons/flashfile.png" alt="file <?=$file['file']?>" width="80" />
-               <?} else {?>
-                  <img src="images/icons/textfile.png" alt="file <?=$file['file']?>" width="80" />
-               <?}?>
-            </td>
-            <td><?=$file['file']?></td>
-            <td>
-               <?printf("%.2f KB &nbsp;&nbsp;&nbsp;", $file['size']/1024);
-               if($file['type'] == 'image' OR $file['type'] == 'flash'){
-                  echo _("rozměry").": ".$file['width']." x ".$file['height']." px";
-               }?>
-            </td>
-            <td align="right">
-               <?if($file['type'] == 'image'){?>
-               <form action="<?=$this->l()?>" method="post" onsubmit="return deleteFile('<?=_("Opravdu smazat obrázek")?> - <?=$file['file']?>', '<?=$file['id_file']?>');">
-               <?} else {?>
-               <form action="<?=$this->l()?>" method="post" onsubmit="return deleteFile('<?=_("Opravdu smazat soubor")?> - <?=$file['file']?>', '<?=$file['id_file']?>');">
-               <?}?>
-                  <input type="hidden" name="userimages_id" value="{$FILE.id_file}" />
-                  <input type="submit" name="userimages_delete" value="<?=_("Smazat")?>" />
-               </form>
-            </td>
-         </tr>
-         <tr>
-            <td colspan="3">
-               <span class="smallFont">
-                  <a href="<?=$file['link_show']?>" title="<?=_("Odkaz pro zobrazení")." - ".$file['file']?>" target="_blank"><?=$file['link_show']?></a>
-               </span>
-            </td>
-         </tr>
-         <tr>
-            <td colspan="3">
-               <span class="smallFont">
-                  <a href="<?=$file['link_download']?>" title="<?=_("Odkaz pro stažení")." - ".$file['file']?>"><?=$file['link_download']?></a>
-               </span>
-            </td>
-         </tr>
-         <tr>
-            <td colspan="4" style="border: 1px solid gray;"></td>
-         </tr>
-         <?}?>
-      </tbody>
-   </table>
-
-   <script type="text/javascript">
-      $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
-   </script>
+   // funkce znovu vatvoří lightbox
+   function setLightBox(){
+      $('a[rel*=lightbox]').lightBox();
+   }
+   -->
+</script>
 </div>

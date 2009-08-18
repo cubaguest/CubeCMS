@@ -1,0 +1,47 @@
+<?// Vypis hlasek
+if(!empty ($this->messages)) { ?>
+<div class="message infoMessage">
+   <img src="<?=Template::face(false)?>images/icons/accept.png" alt="message icon" />
+      <? foreach ($this->messages as $message) {
+         print ("<p>".$message . "</p>");
+      }?>
+   <hr class="reseter" />
+   <script type="text/javascript">
+      <!--
+      ssetTimeout('document.getElementById("messages").style.display = "none"', 5000);
+      -->
+   </script>
+</div>
+<? }?>
+
+<? // chyby enginu
+if(!$this->coreErrorsEmpty) { ?>
+<div class="message errorMessage">
+   <img src="<?=Template::face(false)?>images/icons/coreerror.png" alt="core error icon" />
+      <? foreach ($this->coreErrors as $error) {?>
+   <p>
+            <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
+            <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?><br />
+            <? if($this->debugMode) {
+               foreach ($error["trace"] as $err) {?>
+                  <?=$err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
+                  echo _("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;"._("řádek").": ".$err["line"];?>
+      <br />
+               <?}
+            }?>
+   </p>
+      <?}?>
+   <hr class="reseter" />
+</div>
+<? }?>
+
+<? // chyby modulu
+if(!empty ($this->moduleErrors)) { ?>
+<div class="message errorMessage">
+   <img src="<?=Template::face(false)?>images/icons/error.png" alt="error icon" />
+      <? foreach ($this->moduleErrors as $error) {
+         print ("<p>"._("Chyba:")." ".$error ."</p>");
+      }?>
+   <hr class="reseter" />
+</div>
+<? }?>

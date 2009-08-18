@@ -1,5 +1,6 @@
 <?php
 class Products_Panel extends Panel {
+   private static $links = array();
 
 	public function panelController() {
 	}
@@ -14,6 +15,9 @@ class Products_Panel extends Panel {
       $this->template()->addTplFile("panel.phtml");
       $this->template()->addCssFile("style.css");
 
+      // odkaz do hlavičky
+      array_push(self::$links, $this->link());
+      $this->template()->setPVar("productsUrl", self::$links);
 	}
 }
 ?>

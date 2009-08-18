@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs" lang="cs">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="cache-control" content="no-cache" />
+      <meta http-equiv="pragma" content="no-cache" />
+      <meta http-equiv="pragma" content="-1" />
+      <title>
+         <?
+         echo($this->pageTitle);
+         if($this->categoryName())
+            echo ' - '.$this->categoryName();
+         if($this->articleName())
+            echo ' - '.$this->articleName();
+         if($this->actionName())
+            echo ' - '.$this->actionName();
+         ?></title>
+
+      <base href="<?=UrlRequest::getBaseWebDir()?>" />
+
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
+      <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
+
+      <? foreach ($this->getStylesheets() as $style){?>
+      <link rel="stylesheet" type="text/css" href="<?=$style?>" />
+      <? }?>
+
+      <!--[if lte IE 6]>
+<link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
+<script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
+<![endif]-->
+
+      <!--Menu styly -->
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('chromestyle.css')?>" />
+      <script type="text/javascript" src="./jscripts/chromejs/chrome.js"></script>
+
+      <?//Vypis stylesheetu modulu
+      foreach ($this->getStylesheets() as $style){?>
+      <link rel="stylesheet" type="text/css" href="<?=$style?>" /><?}?>
+
+      <?//Vypis javascriptu
+      foreach ($this->getJavaScripts() as $jsFile){?>
+      <script src="<?=$jsFile?>" type="text/javascript"></script><?}?>
+
+   </head>
+
+   <body id="pageTop">
+
+      <div id="bodywrap">
+
+         <div id="headwrap">
+            <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
+            <div id="menuBox">
+               <div>
+                  <form id="menuSearch" action="<?=$this->l()->clear(true);?>">
+                     <input type="text" size="12" maxlength="50" name="search" value="<?=rawurldecode($this->get('search',null,false))?>"/>
+                     <input type="submit" value="<?=_("Hledej")?>" />
+                  </form>
+               </div>
+               <div id="menuMain">
+                  <? $this->includeTplObj("MENU"); ?> <!-- render menu-->
+               </div>
+               <hr class="separator" />
+            </div>
+
+            <div id="pageHeader">
+   <?
+   $headerFile =Template::face(false)."flash/";
+   $prLinks = $this->pVar("productsUrl");
+   if($this->pVar("productHeader") === true){
+      $headerFile .= "header2.swf?homeurl=".urlencode(Links::getMainWebDir())
+      ."&xmlfile=".urlencode("./data/header/images.xml");
+   } else {
+      $headerFile .= "header1.swf?homeurl=".urlencode(Links::getMainWebDir())
+      ."&winurl=".urlencode($prLinks[0])
+      ."&doorurl=".urlencode($prLinks[1])
+      ."&knoburl=".urlencode($prLinks[2])
+      ."&shadeurl=".urlencode($prLinks[3])
+      ."&paraurl=".urlencode($prLinks[4]);
+   }?>
+   <!--[if !IE]> -->
+   <object type="application/x-shockwave-flash"
+           data="<?=$headerFile?>" width="1000" height="204">
+      <!-- <![endif]-->
+
+      <!--[if IE]>
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"
+        width="1000" height="204">
+        <param name="movie" value="<?=$headerFile?>" />
+      <!--><!--dgx-->
+      <param name="loop" value="true" />
+      <param name="menu" value="false" />
+      <param name="wmode" value="opaque" />
+
+      <p><?=_("Prosím nainstalijte si Adobe Flash Player")?></p>
+   </object>
+   <!-- <![endif]-->
+            </div>
+
+         </div><!-- headwrap -->
+         <div id="colswrap">
+
+            <div id="col1wrap">
+               <div id="col1pad" class="<?if(!empty($this->leftPanel)) echo "col1pad_plusleft";?>  <?if(!empty($this->rightPanel)) echo "col1pad_plusright";?>">
+                  <? $this->includeTpl("messages.phtml", true);
+                  if($this->pageNotFound){
+                     $this->includeTpl("error404.phtml", true);
+                  } else if($this->specialPage){
+                     $this->includeTpl($this->specialPageName.".phtml", true);
+                  } else {
+                     $this->includeTpl("modules.phtml", true);
+                  }
+                  ?>
+                  <hr class="separator" />
+               </div><!-- col1pad -->
+            </div><!-- col1wrap -->
+
+<? // levy panel ?>
+            <div id="col2wrap">
+               <div id="col2pad">
+                  <?
+                  if(!empty($this->leftPanel)){
+                     foreach ($this->leftPanel as $panelL) {?>
+                     <?if($panelL->module()->label()->name() == "products"){?>
+                     <div class="panel">
+                        <?if($panelL->module()->label()->label() != null){?>
+                        <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
+                        <?}?>
+                        <?$this->includeTplObj($panelL);?>
+                     </div>
+                     <?} else {?>
+                     <div class="panel panelLeft">
+                        <?if($panelL->module()->label()->label() != null){?>
+                        <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
+                        <?}?>
+                        <?$this->includeTplObj($panelL);?>
+                     </div>
+                     <?}?>
+                   <?}
+                  }?>
+                  <hr class="separator" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+
+<? // pravy panel?>
+            <div id="col3wrap">
+               <div id="col3pad">
+                  <?
+                  if(!empty($this->rightPanel)) {
+                  foreach ($this->rightPanel as $panel) {?>
+                  <div class="panel panelRight">
+                     <h3><a href="<?=$panel->l()?>" title="<?=$panel->module()->getLabel()?>"><?=$panel->module()->getLabel()?></a></h3>
+                     <?$this->includeTplObj($panel);?>
+                  </div>
+                  <?}}?>
+                  <hr class="separator" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+
+            <div class="reseter">&nbsp;</div>
+         </div><!-- colswrap -->
+
+         <div class="reseter">&nbsp;</div>
+         <div id="footwrap">
+            <a href="<?=$this->sitemapLink;?>" title="<?=_("mapa stránek")?>"><?=_("mapa stránek")?></a>
+            <hr class="separator" />
+         </div><!-- footwrap -->
+      </div><!-- bodywrap /-->
+   </body>
+   <?
+   if($this->showDebugConsole){
+      echo "<pre>";
+      print_r($this);
+      echo "</pre>";
+   }?>
+</html>

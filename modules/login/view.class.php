@@ -32,6 +32,8 @@ class Login_View extends View {
 	public function changepasswdView() {
 		$this->template()->addTplFile("changepsswd.phtml");
 		$this->template()->addJSFile("generatepswd.js");
+      $this->template()->setActionName($this->_("změna hesla"));
+
 	}
 	
 }

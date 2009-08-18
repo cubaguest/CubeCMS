@@ -21,7 +21,7 @@ class Login_Model_UserDetail extends Model_Db {
 	 */
 	public function getPasswd($idUser) {	
 //			načtení fotky z db
-$sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'user')
+$sqlSelect = $this->getDb()->select()->table(Db::table(Model_Users::DB_TABLE), 'user')
             ->colums(self::COLUMN_USER_PASSWORD)
 				->where(self::COLUMN_ID, $idUser);
 												 
@@ -39,7 +39,7 @@ $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'use
 	 */
 	public function setPasswd($idUser, $password) {	
 //			načtení fotky z db
-			$sqlUpdate = $this->getDb()->update()->table($this->module()->getDbTable())
+			$sqlUpdate = $this->getDb()->update()->table(Db::table(Model_Users::DB_TABLE))
 									   ->set(array(self::COLUMN_USER_PASSWORD => $password))
 									   ->where(self::COLUMN_ID,$idUser);
 		

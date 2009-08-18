@@ -134,12 +134,6 @@ class Db {
 
    /**
     * Metoda pro sestavení spojení a základní nastavení db konektoru
-    * @param string $typ -- typ spojení
-    * @param string $serverName -- název serveru
-    * @param string $userName -- jméno uživatele
-    * @param string $userPasswd -- heslo pro připojení
-    * @param string $dbName -- název databáze
-    * @param string $tablePrefix -- prefix pro tabulky
     * @return Db Konektory k danému databázovému stroji
     */
 	public static function factory() {
@@ -179,5 +173,14 @@ class Db {
 	public static function getCountQueries() {
 		return Db::$_numberOfSqlQueries;
 	}
+
+   /**
+    * Metoda vrátí upravený název tabulky
+    * @param string $name -- název tabulky (nejčastěji konstanta)
+    * @return string -- upravený název tabulky
+    */
+   public static function table($name) {
+      return $name;
+   }
 }
 ?>

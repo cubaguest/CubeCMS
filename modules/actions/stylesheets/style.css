@@ -8,8 +8,15 @@
    display:block;
 }
 
-.action .actionHidden {
+.action {
+}
+
+.actionHidden {
    color:gray;
+}
+
+.actionHidden:hover {
+   color:black;
 }
 
 .action p.subLabel {

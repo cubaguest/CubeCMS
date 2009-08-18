@@ -11,6 +11,10 @@
  */
 
 class Model_Sections extends Model_Db {
+   /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'sections';
 
 	 /**
 	  * Názvy sloupců v db tabulce
@@ -22,33 +26,6 @@ class Model_Sections extends Model_Db {
 	const COLUMN_SEC_PRIORITY		= 'priority';
    const COLUMN_SEC_LABEL_ORIG = 'label';
    const COLUMN_SEC_ALT_ORIG = 'alt';
-
-   /**
-    * Proměná s názvem tabulky s kategoriemi
-    * @var string
-    */
-   private $catTable = null;
-
-   /**
-    * Proměná s názvem tabulky se sekcemi
-    * @var string
-    */
-   private $secTable = null;
-
-   /**
-    * Proměná s názvem tabulky s itemi
-    * @var string
-    */
-   private $itemsTable = null;
-
-   /**
-    * Metoda načte tabulky
-    */
-   private function getTables() {
-      $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
-		$this->secTable = AppCore::sysConfig()->getOptionValue("section_table", "db_tables");
-		$this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
-   }
 }
 
 ?>

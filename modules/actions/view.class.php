@@ -33,6 +33,7 @@ class Actions_View extends View {
       
       $this->template()->addTplFile("actionDetail.phtml");
       $this->template()->addCssFile("style.css");
+      $this->template()->setArticleName($this->template()->action[Actions_Model_Detail::COLUMN_ACTION_LABEL]);
    }
 
    /**
@@ -41,7 +42,7 @@ class Actions_View extends View {
    public function addNewActionView() {
       $this->template()->addTplFile('editAction.phtml');
       $this->template()->addCssFile("style.css");
-      $this->template()->pageLabel = $this->_("Přidání akce");
+      $this->template()->setActionName($this->_("přidání akce"));
 
       //Tabulkové uspořádání
       $jquery = new JsPlugin_JQuery();
@@ -65,7 +66,9 @@ class Actions_View extends View {
       $this->template()->action = $actM->getActionDetailAllLangs($this->sys()->article());
       $this->template()->editAction = true;
 
-      $this->template()->pageLabel = $this->_("Úprava akce");
+      $this->template()->setActionName($this->_("Úprava akce"));
+      $this->template()->setArticleName($this->template()
+         ->action[Actions_Model_Detail::COLUMN_ACTION_LABEL][Locale::getLang()]);
 
       //Taby - uspořádání
       $jquery = new JsPlugin_JQuery();

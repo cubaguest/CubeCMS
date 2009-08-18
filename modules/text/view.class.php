@@ -17,9 +17,9 @@ class Text_View extends View {
 
       if($this->rights()->isWritable()){
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_text', $this->_m("Upravit"),
+         $toolbox->addTool('edit_text', $this->_("Upravit"),
             $this->link()->action($this->sys()->action()->edittext()),
-            $this->_m("Upravit text"), "text_edit.png");
+            $this->_("Upravit text"), "text_edit.png");
          $this->template()->toolbox = $toolbox;
       }
    }
@@ -28,7 +28,7 @@ class Text_View extends View {
    public function edittextView() {
       $this->template()->addTplFile("textedit.phtml");
       $this->template()->addCssFile("style.css");
-      $this->template()->setActionTitle($this->_m("úprava textu"));
+      $this->template()->setActionName($this->_("úprava textu"));
 
       $tinymce = new JsPlugin_TinyMce();
       if($this->module()->getParam(Text_Controller::PARAM_THEME, 'advanced') == 'simple'){

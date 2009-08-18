@@ -86,8 +86,7 @@ class Ajax_Link {
       } else {
          trigger_error(_('Nepodporovaný typ ajaxové funkce'), E_USER_WARNING);
       }
-      $this->link = new Links();
-      $this->link->clear(true,true);
+      $this->link = Links::getMainWebDir();
    }
 
    /**

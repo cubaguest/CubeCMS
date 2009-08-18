@@ -208,7 +208,8 @@ class Email {
 //      $mail . "\n\n";
 
       // Tělo zprávy e-mailu
-      $mail .= "\n".$this->mailContent."\n\n"; 
+//      $mail .= "\n".$this->mailContent."\n\n";
+      $mail .= $this->mailContent;
 
       // přidání příloh
       foreach ($this->mailAttachments as $attachment) {

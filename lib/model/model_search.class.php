@@ -17,37 +17,18 @@ class Model_Search extends Model_Db {
    const COLUMN_ID_ITEM = 'id_item';
 
    /**
-    * Proměná s názvem tabulky s kategoriemi
-    * @var string
-    */
-   private $catTable = null;
-
-   /**
-    * Proměná s názvem tabulky se sekcemi
-    * @var string
-    */
-   private $modulesTable = null;
-
-   /**
-    * Proměná s názvem tabulky s itemi
-    * @var string
-    */
-   private $itemsTable = null;
-
-   /**
     * Metoda načte moduly ze kterých se bude vyhledávat
     * @return array -- pole modulů
     */
    public function getModules() {
-      $this->getTables();
       $userNameGroup = AppCore::getAuth()->getGroupName();
 
-      $sqlSelect = $this->getDb()->select()->table($this->modulesTable, 'modules')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(Model_Module::DB_TABLE_MODULES), 'modules')
       ->colums(Db::COLUMN_ALL)
-      ->join(array('items' => $this->itemsTable),
+      ->join(array('items' => Db::table(Model_Module::DB_TABLE_ITEMS)),
          array(Model_Module::COLUMN_ID_MODULE, 'modules' => Model_Module::COLUMN_ID_MODULE),
          null, Db::COLUMN_ALL)
-      ->join(array('cat' => $this->catTable), array(Model_Module::COLUMN_ITEM_CAT_ID,
+      ->join(array('cat' => Db::table(Model_Category::DB_TABLE)), array(Model_Module::COLUMN_ITEM_CAT_ID,
          'items' => Model_Module::COLUMN_ITEM_CAT_ID), null,
             array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
                .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
@@ -64,12 +45,11 @@ class Model_Search extends Model_Db {
     * Metoda načte všechny items a zařadí je do modulů s kategorií
     */
    public function getItems() {
-      $this->getTables();
       $userNameGroup = AppCore::getAuth()->getGroupName();
 
-      $sqlSelect = $this->getDb()->select()->table($this->itemsTable, 'item')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(Model_Module::DB_TABLE_ITEMS), 'item')
       ->colums(array(Model_Module::COLUMN_ID_MODULE, self::COLUMN_ID_ITEM))
-      ->join(array('cat' => $this->catTable), array(Model_Module::COLUMN_ITEM_CAT_ID,
+      ->join(array('cat' => Db::table(Model_Category::DB_TABLE)), array(Model_Module::COLUMN_ITEM_CAT_ID,
          'item' => Model_Module::COLUMN_ITEM_CAT_ID), null,
             array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
                .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
@@ -84,21 +64,12 @@ class Model_Search extends Model_Db {
          if(!isset ($modulesArray[$result[Model_Module::COLUMN_ID_MODULE]])){
             $modulesArray[$result[Model_Module::COLUMN_ID_MODULE]] = array();
          }
-         $itemArr = array(self::ITEMS_ARRAY_INDEX_CAT_ID => $result[self::COLUMN_ID_ITEM],
+         $itemArr = array(self::ITEMS_ARRAY_INDEX_CAT_ID => $result[Model_Category::COLUMN_CAT_ID],
             self::ITEMS_ARRAY_INDEX_CAT_NAME => $result[Model_Category::COLUMN_CAT_LABEL]);
          
          $modulesArray[$result[Model_Module::COLUMN_ID_MODULE]][$result[self::COLUMN_ID_ITEM]] = $itemArr;
       }
       return $modulesArray;
-   }
-
-   /**
-    * Metoda načte tabulky
-    */
-   private function getTables() {
-      $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
-		$this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", "db_tables");
-		$this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
    }
 }
 

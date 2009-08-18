@@ -2,7 +2,12 @@
 /*
  * Třída modelu s listem Novinek
  */
-class News_Model_Detail extends Model_Db {
+class News_Model_Detail extends Model_PDO {
+/**
+ * Tabulka s detaily
+ */
+   const DB_TABLE = 'news';
+
    /**
     * Názvy sloupců v databázi
     * @var string
@@ -25,11 +30,8 @@ class News_Model_Detail extends Model_Db {
    const COLUMN_ISER_ID =	 'id_user';
 
    private $newsLabel = null;
-
    private $newsText = null;
-   
    private $newsId = null;
-
    private $newsIdUser = null;
 
 
@@ -41,21 +43,21 @@ class News_Model_Detail extends Model_Db {
     * @param boolean -- id uživatele
     */
    public function saveNewNews($newsLabels, $newsTexts, $idUser = 0) {
-      $newsArr = $this->createValuesArray(self::COLUMN_NEWS_LABEL, $newsLabels,
-                                          self::COLUMN_NEWS_TEXT, $newsTexts,
-                                          self::COLUMN_NEWS_ID_ITEM, $this->module()->getId(),
-                                          self::COLUMN_NEWS_ID_USER, $idUser,
-                                          self::COLUMN_NEWS_TIME, time());
+   // INSERT INTO `moravaokno_news` ( `label_cs` , `label_en` , `text_cs` , `text_en` , `id_item` , `id_user` , `time` )
+   //VALUES ( 'pokuis', NULL, 'texttt', NULL, '8', '1', 1248730583)
 
-      $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
-      ->colums(array_keys($newsArr))
-      ->values(array_values($newsArr));
-//      //		Vložení do db
-      if($this->getDb()->query($sqlInsert)){
-         return true;
-      } else {
-         return false;
-      }
+      $this->setIUValues(array(self::COLUMN_NEWS_LABEL => $newsLabels,
+          self::COLUMN_NEWS_TEXT => $newsTexts,
+          self::COLUMN_NEWS_ID_ITEM => $this->module()->getId(),
+          self::COLUMN_NEWS_ID_USER => $idUser,
+          self::COLUMN_NEWS_TIME => time()));
+//echo ("INSERT INTO ".Db_PDO::table(News_Model_Detail::DB_TABLE)
+//          ." {$this->getInsertLabels()}"
+//          ." VALUES {$this->getInsertValues()}");
+      $dbc = new Db_PDO();
+      return $dbc->exec("INSERT INTO ".Db_PDO::table(News_Model_Detail::DB_TABLE)
+          ." {$this->getInsertLabels()}"
+          ." VALUES {$this->getInsertValues()}");
    }
 
    /**
@@ -64,29 +66,27 @@ class News_Model_Detail extends Model_Db {
     * @param integer -- id novinky
     * @return array -- pole s novinkou
     */
-   public function getNewsDetailSelLang($id) {
-      //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable(), 'news')
-      ->colums(array(self::COLUMN_NEWS_LABEL =>"IFNULL(".self::COLUMN_NEWS_LABEL_LANG_PREFIX
-            .Locale::getLang().",".self::COLUMN_NEWS_LABEL_LANG_PREFIX.Locale::getDefaultLang().")",
-            self::COLUMN_NEWS_TEXT =>"IFNULL(".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getLang()
-            .",".self::COLUMN_NEWS_TEXT_LANG_PREFIX.Locale::getDefaultLang().")",
-            self::COLUMN_NEWS_TIME, self::COLUMN_NEWS_ID_NEW, self::COLUMN_NEWS_ID_USER))
-      ->join(array('user' => $this->getUserTable()),
-         array('news' => self::COLUMN_NEWS_ID_USER, self::COLUMN_ISER_ID),
-         null, self::COLUMN_USER_NAME)
-//      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('news.'.self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
-      ->where('news.'.self::COLUMN_NEWS_ID_NEW, $id)
-      ->where('news.'.self::COLUMN_NEWS_DELETED, (int)false);
+   //   public function getNewsDetailSelLang($id) {
+   public function getNewsDetail($id) {
+   //      SELECT IFNULL(label_en,label_cs) AS label, IFNULL(text_en,text_cs) AS text,
+   //      news.`time`, news.`id_new`, news.`id_user`, user.`username`
+   //      FROM `moravaokno_news` AS news JOIN `moravaokno_users` AS user
+   //      ON news.id_user = user.id_user
+   //      WHERE (news.id_item = '8') AND (news.id_new = 6) AND (news.deleted = 0)
+   //		načtení novinky z db
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT news.*, user.`".Model_Users::COLUMN_USERNAME."`
+      FROM ".Db_PDO::table(News_Model_Detail::DB_TABLE)." AS news
+      JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON news.".self::COLUMN_NEWS_ID_USER
+          ." = user.".Model_Users::COLUMN_ID." WHERE (news.".self::COLUMN_NEWS_ID_NEW." = :id)");
 
-      $news = $this->getDb()->fetchAssoc($sqlSelect, true);
+      $dbst->bindValue('id', $id, PDO::PARAM_INT);
+      $dbst->execute();
 
-      $this->newsId = $news[self::COLUMN_NEWS_ID_NEW];
-      $this->newsIdUser = $news[self::COLUMN_NEWS_ID_USER];
+      $cl = new Model_LangContainer();
+      $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
 
-      return $news;
+      return $dbst->fetch();
    }
 
    public function getLabelsLangs() {
@@ -106,71 +106,27 @@ class News_Model_Detail extends Model_Db {
    }
 
    /**
-    * Metoda vrací novinku podle zadaného ID ve všech jazycích
-    *
-    * @param integer -- id novinky
-    * @return array -- pole s novinkou
-    */
-   public function getNewsDetailAllLangs($id) {
-      //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
-      ->colums(Db::COLUMN_ALL)
-      ->where(self::COLUMN_NEWS_ID_ITEM, $this->module()->getId())
-      ->where(self::COLUMN_NEWS_ID_NEW, $id)
-      ->where(self::COLUMN_NEWS_DELETED, (int)false);
-
-      $news = $this->getDb()->fetchAssoc($sqlSelect);
-
-      $news = $this->parseDbValuesToArray($news, array(self::COLUMN_NEWS_LABEL,
-               self::COLUMN_NEWS_TEXT));
-
-      $this->newsText = $news[self::COLUMN_NEWS_TEXT];
-      $this->newsLabel = $news[self::COLUMN_NEWS_LABEL];
-      $this->newsId = $news[self::COLUMN_NEWS_ID_NEW];
-
-      return $news;
-   }
-
-   /**
     * Metoda uloží upravenou ovinku do db
     *
     * @param array -- pole s detaily novinky
     */
    public function saveEditNews($newsLabels, $newsTexts, $idNews) {
-      $newsArr = $this->createValuesArray(self::COLUMN_NEWS_LABEL, $newsLabels,
-                                          self::COLUMN_NEWS_TEXT, $newsTexts);
+   //UPDATE `moravaokno_news` SET `label_cs`= 'Saul Griffith's lofty', `label_en`=NULL,
+   //`text_cs`= ' text', `text_en`=NULL WHERE (id_new = '6')
+      $this->setIUValues(array(self::COLUMN_NEWS_LABEL => $newsLabels,
+          self::COLUMN_NEWS_TEXT => $newsTexts));
 
-      $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
-            ->set($newsArr)
-            ->where(self::COLUMN_NEWS_ID_NEW, $idNews);
-
-      // vložení do db
-      if($this->getDb()->query($sqlInsert)){
-         return true;
-      } else {
-         return false;
-      };
+      $dbc = new Db_PDO();
+      return $dbc->exec("UPDATE ".Db_PDO::table(News_Model_Detail::DB_TABLE)
+             ." SET {$this->getUpdateValues()} "
+             ."WHERE (".self::COLUMN_NEWS_ID_NEW." = ".$dbc->quote($idNews, PDO::PARAM_INT).")");
    }
 
    public function deleteNews($idNews) {
-      //			smazání novinky
-      $sqlUpdate = $this->getDb()->update()->table($this->module()->getDbTable())
-      ->set(array(self::COLUMN_NEWS_DELETED => (int)true))
-      ->where(self::COLUMN_NEWS_ID_NEW, $idNews);
-
-      if($this->getDb()->query($sqlUpdate)){
-         return true;
-      } else {
-         return false;
-      };
+   //			smazání novinky
+      $dbc = new Db_PDO();
+      return $dbc->exec("DELETE FROM ".Db_PDO::table(News_Model_Detail::DB_TABLE)
+             ." WHERE (".self::COLUMN_NEWS_ID_NEW." = ".$dbc->quote($idNews, PDO::PARAM_INT).")");
    }
-
-   private function getUserTable() {
-      $tableUsers = AppCore::sysConfig()->getOptionValue(Auth::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES);
-      return $tableUsers;
-   }
-
 }
-
 ?>

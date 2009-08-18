@@ -18,19 +18,13 @@ class Actions_Model_List extends Model_Db {
 	private $countActionsLoaded = false;
 	
 	/**
-	 * Tabulka s uživateli
-	 * @var string
-	 */
-	private $tableUsers = null;
-	
-	/**
 	 * Metoda vrací počet novinek
 	 *
 	 * @return integer -- počet novinek
 	 */
 	public function getCountActions($all = false) {
 		if(!$this->countActionsLoaded){
-         $sqlCount = $this->getDb()->select()->table($this->module()->getDbTable())
+         $sqlCount = $this->getDb()->select()->table(Db::table(Actions_Model_Detail::DB_TABLE))
          ->colums(array("count"=>"COUNT(*)"))
          ->where(Actions_Model_Detail::COLUMN_ACTION_ID_ITEM, $this->module()->getId())
 			->where(Actions_Model_Detail::COLUMN_ACTION_DISABLED, (int)false)
@@ -53,7 +47,7 @@ class Actions_Model_List extends Model_Db {
 	 * @return array -- pole akcí
 	 */
    public function getSelectedListActions($from, $count=5, $all = false) {
-      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'actions')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(Actions_Model_Detail::DB_TABLE), 'actions')
       ->colums(array(Actions_Model_Detail::COLUMN_ACTION_LABEL => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_LABEL
             .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_LABEL.'_'.Locale::getDefaultLang().")",
             Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT
@@ -72,7 +66,6 @@ class Actions_Model_List extends Model_Db {
          $sqlSelect->where("actions.".Actions_Model_Detail::COLUMN_ACTION_DATE_START, time(), "<=")
          ->where("actions.".Actions_Model_Detail::COLUMN_ACTION_DATE_STOP, time(), ">=");
       }
-//      echo $sqlSelect;
 
 		$returArray = $this->getDb()->fetchAll($sqlSelect);
 		return $returArray;
@@ -84,7 +77,7 @@ class Actions_Model_List extends Model_Db {
 	 * @return array -- pole akcí
 	 */
 	public function getListActions() {
-      $sqlSelect = $this->getDb()->select()->table($this->module()->getDbTable(), 'action')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(Actions_Model_Detail::DB_TABLE), 'action')
       ->colums(array(Actions_Model_Detail::COLUMN_ACTION_LABEL => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_LABEL
             .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_LABEL.'_'.Locale::getDefaultLang().")",
             Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT
@@ -98,10 +91,6 @@ class Actions_Model_List extends Model_Db {
       ->where("action.".Actions_Model_Detail::COLUMN_ACTION_DATE_STOP, time(), ">=")
       ->order("action.".Actions_Model_Detail::COLUMN_ACTION_TIME, Db::ORDER_DESC);
 
-//		if($this->tableUsers != null){
-//			$sqlSelect=$sqlSelect->join(array("users" => $tableUsers), "users.".self::COLUMN_ACTION_ID_USER." = news.".self::COLUMN_ACTION_ID_USER, null, Auth::USER_NAME);
-//		}
-
 		$returArray = $this->getDb()->fetchAll($sqlSelect);
 
 		return $returArray;
@@ -109,7 +98,7 @@ class Actions_Model_List extends Model_Db {
 	
    public function getLastChange() {
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(Actions_Model_Detail::DB_TABLE))
       ->colums(Actions_Model_Detail::COLUMN_ACTION_TIME)
       ->limit(0, 1)
       ->order(Actions_Model_Detail::COLUMN_ACTION_TIME, Db::ORDER_DESC);

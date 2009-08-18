@@ -62,9 +62,9 @@ class Articles_Controller extends Controller {
             $files = new Eplugin_UserFiles($this->sys());
             $files->deleteAllFiles($this->view()->article[Articles_Model_Detail::COLUMN_ARTICLE_ID]);
             if(!$articleDetail->deleteArticle($form->getValue(self::FORM_INPUT_ID))){
-               throw new UnexpectedValueException($this->_m('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
+               throw new UnexpectedValueException($this->_('Článek se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
             }
-            $this->infoMsg()->addMessage($this->_m('Článek byl smazán'));
+            $this->infoMsg()->addMessage($this->_('Článek byl smazán'));
             $this->link()->article()->action()->rmParam()->reload();
          }
       }
@@ -95,13 +95,13 @@ class Articles_Controller extends Controller {
          if(!$articleDetail->saveNewArticle($articleForm->getValue(self::FORM_INPUT_LABEL),
                $articleForm->getValue(self::FORM_INPUT_TEXT),
                $this->rights()->getAuth()->getUserId())){
-            throw new UnexpectedValueException($this->_m('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
+            throw new UnexpectedValueException($this->_('Článek se nepodařilo uložit, chyba při ukládání.'), 1);
          }
          if(isset ($files)){
             $files->renameIdArticle($this->rights()->getAuth()->getUserId()*(-1),
                $articleDetail->getLastInsertedId());
          }
-         $this->infoMsg()->addMessage($this->_m('Článek byl uložen'));
+         $this->infoMsg()->addMessage($this->_('Článek byl uložen'));
          $this->link()->article()->action()->rmParam()->reload();
       }
 
@@ -131,9 +131,9 @@ class Articles_Controller extends Controller {
          $articleModel = new Articles_Model_Detail($this->sys());
          if(!$articleModel->saveEditArticle($ardicleEditForm->getValue(self::FORM_INPUT_LABEL),
                $ardicleEditForm->getValue(self::FORM_INPUT_TEXT), $this->getArticle())){
-            throw new UnexpectedValueException($this->_m('Článek se nepodařilo uložit, chyba při ukládání.'), 2);
+            throw new UnexpectedValueException($this->_('Článek se nepodařilo uložit, chyba při ukládání.'), 2);
          }
-         $this->infoMsg()->addMessage($this->_m('Článek byl uložen'));
+         $this->infoMsg()->addMessage($this->_('Článek byl uložen'));
          $this->link()->action()->reload();
       }
 

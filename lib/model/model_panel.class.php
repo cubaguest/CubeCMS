@@ -11,6 +11,10 @@
  */
 
 class Model_Panel extends Model_Db {
+   /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'panels';
 
    /**
     * Konstanty s názzvy sloupců
@@ -21,51 +25,25 @@ class Model_Panel extends Model_Db {
 	const COLUMN_ID_ITEM    = 'id_item';
 
    /**
-    * Proměná s názvem tabulky s kategoriemi
-    * @var string
-    */
-   private $catTable = null;
-
-   /**
-    * Proměná s názvem tabulky se sekcemi
-    * @var string
-    */
-   private $modulesTable = null;
-
-   /**
-    * Proměná s názvem tabulky s itemi
-    * @var string
-    */
-   private $itemsTable = null;
-
-   /**
-    * Proměná s názvem tabulky s panely
-    * @var string
-    */
-   private $panelsTable = null;
-
-   /**
     * Metoda načte panely z db
     * @param string -- pozice panelu
     * @return array -- pole s panely
     */
    public function getPanel($side) {
-      $this->getTables();
-
-      $sqlSelect = $this->getDb()->select()->table($this->panelsTable, 'panel')
-      ->join(array("item" => $this->itemsTable), array(self::COLUMN_ID_ITEM, 'panel' => Model_Module::COLUMN_ITEM_ID),
+      $sqlSelect = $this->getDb()->select()->table(Db::table(self::DB_TABLE), 'panel')
+      ->join(array("item" => Db::table(Model_Module::DB_TABLE_ITEMS)), array(self::COLUMN_ID_ITEM, 'panel' => Model_Module::COLUMN_ITEM_ID),
             null, array(Model_Module::COLUMN_ITEM_LABEL => "IFNULL(item.".Model_Module::COLUMN_ITEM_LABEL.'_'.Locale::getLang()
             .", item.".Model_Module::COLUMN_ITEM_LABEL.'_'.Locale::getDefaultLang().")",
              Model_Module::COLUMN_ITEM_ALT => "IFNULL(item.".Model_Module::COLUMN_ITEM_ALT.'_'.Locale::getLang()
              .", item.".Model_Module::COLUMN_ITEM_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
-      ->join(array("cat" => $this->catTable),
+      ->join(array("cat" => Db::table(Model_Category::DB_TABLE)),
           array('item' =>Model_Category::COLUMN_CAT_ID,Model_Category::COLUMN_CAT_ID),
           null, array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'
             .Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
             Model_Category::COLUMN_CAT_ALT => "IFNULL(cat.".Model_Category::COLUMN_CAT_ALT_ORIG.'_'
             .Locale::getLang().", cat.".Model_Category::COLUMN_CAT_ALT_ORIG.'_'.Locale::getDefaultLang().")",
             Model_Category::COLUMN_CAT_ID))
-      ->join(array("module" => $this->modulesTable), array('item'=>Model_Module::COLUMN_ID_MODULE
+      ->join(array("module" => Db::table(Model_Module::DB_TABLE_MODULES)), array('item'=>Model_Module::COLUMN_ID_MODULE
             ,Model_Module::COLUMN_ID_MODULE), null, Db::COLUMN_ALL)
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.AppCore::getAuth()->getGroupName(), "r__", Db::OPERATOR_LIKE)
       ->where("panel.".self::COLUMN_POSITION , strtolower($side))
@@ -74,16 +52,6 @@ class Model_Panel extends Model_Db {
       ->order(Model_Category::COLUMN_CAT_LABEL);
 
       return $this->getDb()->fetchObjectArray($sqlSelect);
-   }
-
-   /**
-    * Metoda načte tabulky
-    */
-   private function getTables() {
-      $this->panelsTable = AppCore::sysConfig()->getOptionValue("panels_table", "db_tables");
-      $this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", "db_tables");
-      $this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
-      $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
    }
 }
 

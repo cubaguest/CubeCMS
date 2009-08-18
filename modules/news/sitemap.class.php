@@ -9,7 +9,7 @@ class News_SiteMap extends SiteMap {
       foreach ($newsArr as $news) {
          $this->addItem($this->link()->article($news[News_Model_List::COLUMN_NEWS_LABEL],
                $news[News_Model_List::COLUMN_NEWS_ID_NEW]),
-               $news[News_Model_List::COLUMN_NEWS_LABEL],
+               (string)$news[News_Model_List::COLUMN_NEWS_LABEL],
                $news[News_Model_List::COLUMN_NEWS_TIME],
                parent::SITEMAP_SITE_CHANGE_MONTHLY);
       }

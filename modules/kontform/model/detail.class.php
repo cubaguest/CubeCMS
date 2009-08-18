@@ -4,6 +4,11 @@
  * 
  */
 class Kontform_Model_Detail extends Model_Db {
+   /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'kontform';
+    
 	/**
 	 * Názvy sloupců v db
 	 * @var string
@@ -29,7 +34,7 @@ class Kontform_Model_Detail extends Model_Db {
             self::COLUMN_EMAIL, $email,
             self::COLUMN_QUESTION, $question,
             self::COLUMN_IP, $_SERVER['REMOTE_ADDR']);
-        $sqlInsert = $this->getDb($this->sys())->insert()->table($this->module()->getDbTable())
+        $sqlInsert = $this->getDb($this->sys())->insert()->table(Db::table(self::DB_TABLE))
                ->colums(array_keys($textArr))
                ->values(array_values($textArr));
           //TODO zde ještě odeslat informace na email..

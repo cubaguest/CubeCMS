@@ -112,7 +112,7 @@ class File_Image extends File {
           * kvůli flashi je tady vyjímka protože flash se zpracovává v File_Flash
           * a nelze mu měniti velikost ani jej resamplovat
           *
-          * Flash má typ obrázku 4 a 13
+          * Flash má typ obrázku 4 a 13 (IMAGETYPE_SWF a IMAGETYPE_SWC)
           */
          if($this->imageType == null OR $this->imageType == IMAGETYPE_SWF OR
              $this->imageType == IMAGETYPE_SWC) {
@@ -249,22 +249,8 @@ class File_Image extends File {
     */
    private function resampleImage($tempImage, $maxWidth = false, $maxHeight = false) {
       if(!$this->cropNewImage) {
-      //				obrázek je na šířku
-      //            if($this->imageWidth > $this->imageHeight){
-      //               $imageRate = $this->imageHeight/$this->imageWidth;
-      //               $height = $imageRate*$width;
-      //            }
-      //            //				obrázek je na výšku
-      //            else {
-      //               $imageRate = $this->imageWidth/$this->imageHeight;
-      //               $width = $imageRate*$height;
-      //            }
-//      $width = 567;
-//      $height = 448;
       $width = $this->imageWidth;
       $height = $this->imageHeight;
-//      $maxWidth = 150;
-//      $maxHeight = 75;
          if($width > $maxWidth && $width) {
             $rate = $maxWidth / $width;
             $width = $maxWidth;
@@ -275,8 +261,6 @@ class File_Image extends File {
             $height = $maxHeight;
             $width = ceil($rate * $width);
          }
-
-
          $newImage = imagecreatetruecolor($width, $height);
          // Zapnutí alfy, tj průhlednost
          imagealphablending($newImage, false);
@@ -324,31 +308,35 @@ class File_Image extends File {
       if($dstDir->checkDir()) {
          switch ($type) {
             case IMAGETYPE_GIF:
-               $saved = imagegif($newImage, $dstDir.$fileName);
+               $saved = @imagegif($newImage, $dstDir.$fileName);
                break;
             case IMAGETYPE_PNG:
                imagealphablending($newImage, false);
                imagesavealpha($newImage, true);
-               $saved = imagepng($newImage, $dstDir.$fileName, $this->pngQuality);
+               $saved = @imagepng($newImage, $dstDir.$fileName, $this->pngQuality);
                break;
             case IMAGETYPE_WBMP:
-               $saved = imagewbmp($newImage, $dstDir.$fileName);
+               $saved = @imagewbmp($newImage, $dstDir.$fileName);
                break;
             case IMAGETYPE_JPEG2000:
-               $saved = imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality); //jen výstup do jpegu
+               $saved = @imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality); //jen výstup do jpegu
                break;
             case IMAGETYPE_JPEG:
             default: // výchozí je jpeg
-               $saved = imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality);
+               $saved = @imagejpeg($newImage, $dstDir.$fileName, $this->jpegQuality);
                break;
          }
          // nastavení práv k obrázku na zápis pro všechny, kvůli ftp účtu ať může mazat
+         if(!$saved){
+            throw new InvalidArgumentException(_("Chyba při ukládání obrázku. Zkontrolujte práva k adresáři."), 3);
+         }
          $file = new File($fileName, $dstDir);
          $file->setRights(0777);
+         unset ($file);
 
          return $saved;
       } else {
-         new CoreException(_('Nepodařilo se vytvořit adresář pro uložení obrázku'), 2);
+         throw new UnexpectedValueException(_('Nepodařilo se vytvořit adresář pro uložení obrázku'), 2);
       }
    }
 

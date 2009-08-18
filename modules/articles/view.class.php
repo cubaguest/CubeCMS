@@ -8,9 +8,9 @@ class Articles_View extends View {
    public function mainView() {
       if($this->rights()->isWritable()){
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_article', $this->_m("Přidat"),
+         $toolbox->addTool('add_article', $this->_("Přidat"),
             $this->link()->action($this->sys()->action()->addarticle()),
-            $this->_m("Přidat článek"), "text_add.png");
+            $this->_("Přidat článek"), "text_add.png");
          $this->template()->toolbox = $toolbox;
       }
 
@@ -47,13 +47,13 @@ class Articles_View extends View {
       if($this->rights()->isWritable()){
          // editační tlačítka
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_article', $this->_m("Upravit"),
+         $toolbox->addTool('edit_article', $this->_("Upravit"),
             $this->link()->action($this->sys()->action()->editarticle()),
-            $this->_m("Upravit článek"), "text_edit.png")
-         ->addTool('article_delete', $this->_m("Smazat"), $this->link(),
-            $this->_m("Smazat článek"), "remove.png", "article_id", 
+            $this->_("Upravit článek"), "text_edit.png")
+         ->addTool('article_delete', $this->_("Smazat"), $this->link(),
+            $this->_("Smazat článek"), "remove.png", "article_id", 
             $this->template()->article[Articles_Model_Detail::COLUMN_ARTICLE_ID],
-            $this->_m("Opravdu smazat článek")."?");
+            $this->_("Opravdu smazat článek")."?");
          $this->template()->toolbox = $toolbox;
       }
 
@@ -65,7 +65,7 @@ class Articles_View extends View {
 
       $this->template()->addTplFile("articleDetail.phtml");
       $this->template()->addCssFile("style.css");
-      $this->template()->setArticleTitle($this->template()->article[Articles_Model_Detail::COLUMN_ARTICLE_LABEL]);
+      $this->template()->setArticleName($this->template()->article[Articles_Model_Detail::COLUMN_ARTICLE_LABEL]);
    }
 
    /**
@@ -74,7 +74,7 @@ class Articles_View extends View {
    public function addarticleView() {
       $this->template()->addTplFile('editArticle.phtml');
       $this->template()->addCssFile("style.css");
-      $this->template()->setActionTitle($this->_m("přidání článku"));
+      $this->template()->setActionName($this->_("přidání článku"));
 
       // tiny mce
       $tinymce = new JsPlugin_TinyMce();
@@ -110,9 +110,9 @@ class Articles_View extends View {
 
       $model = new Articles_Model_Detail($this->sys());
       $this->template()->article = $model->getArticleDetailAllLangs($this->sys()->article()->getArticle());
-      $this->template()->setArticleTitle($this->template()
+      $this->template()->setArticleName($this->template()
          ->article[Articles_Model_Detail::COLUMN_ARTICLE_LABEL][Locale::getLang()]);
-      $this->template()->setActionTitle($this->_m("úprava článku"));
+      $this->template()->setActionName($this->_("úprava článku"));
 
       // tiny mce
       $tinymce = new JsPlugin_TinyMce();

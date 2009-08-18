@@ -1,13 +1,13 @@
 <div>
 <?
    if($this->searchResultsCount == 0){
-      printf(_("Pro výraz \"%s\" nebyl nalezen žádný výsledek. Zkontrolujte hledaný výraz."), $this->articleTitle());
+      printf(_("Pro výraz \"%s\" nebyl nalezen žádný výsledek. Zkontrolujte hledaný výraz."), $this->articleName());
    } else if($this->searchResultsCount == 1){
-      printf(_("Pro výraz \"%s\" byl nalezen %u výsledek"), $this->articleTitle(), $this->searchResultsCount);
+      printf(_("Pro výraz \"%s\" byl nalezen %u výsledek"), $this->articleName(), $this->searchResultsCount);
    } else if($this->searchResultsCount > 1 AND $this->searchResultsCount < 5){
-      printf(_("Pro výraz \"%s\" byly nalezeny %u výsledky"), $this->articleTitle(), $this->searchResultsCount);
+      printf(_("Pro výraz \"%s\" byly nalezeny %u výsledky"), $this->articleName(), $this->searchResultsCount);
    } else {
-      printf(_("Pro výraz \"%s\" bylo nalezeno %u výsledeků"), $this->articleTitle(), $this->searchResultsCount);
+      printf(_("Pro výraz \"%s\" bylo nalezeno %u výsledeků"), $this->articleName(), $this->searchResultsCount);
    }
 ?>
 </div>

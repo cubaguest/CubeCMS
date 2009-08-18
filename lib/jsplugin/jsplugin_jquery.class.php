@@ -56,7 +56,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addUIDraggable();
-    $this->addJsFile(new JsFile("jquery-ui-1.7.Droppable.min.js"));
+    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Droppable.min.js"));
     return $this;
   }
 
@@ -66,7 +66,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addUIResizable() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsFile("jquery-ui-1.7.Resizable.min.js"));
+    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Resizable.min.js"));
     return $this;
   }
 

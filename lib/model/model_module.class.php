@@ -11,6 +11,15 @@
  */
 
 class Model_Module extends Model_Db {
+   /**
+    * Tabulka s moduly
+    */
+    const DB_TABLE_MODULES = 'modules';
+
+   /**
+    * Tabulka s itemy
+    */
+    const DB_TABLE_ITEMS = 'items';
 
 	 /**
 	  * Názvy sloupců v db tabulce
@@ -30,31 +39,12 @@ class Model_Module extends Model_Db {
 	const COLUMN_ITEM_CAT_ID= 'id_category';
 
    /**
-    * Proměná s názvem tabulky s kategoriemi
-    * @var string
-    */
-   private $catTable = null;
-
-   /**
-    * Proměná s názvem tabulky se sekcemi
-    * @var string
-    */
-   private $modulesTable = null;
-
-   /**
-    * Proměná s názvem tabulky s itemi
-    * @var string
-    */
-   private $itemsTable = null;
-
-   /**
     * Název skupiny uživatele
     * @var atring 
     */
    private $userNameGroup = null;
 
    protected function init() {
-      $this->getTables();
       $this->userNameGroup = AppCore::getAuth()->getGroupName();
    }
 
@@ -63,14 +53,14 @@ class Model_Module extends Model_Db {
     * @return array -- pole s moduly
     */
    public function getModules() {
-      $sqlSelect = $this->getDb()->select()->table($this->itemsTable, 'item')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(self::DB_TABLE_ITEMS), 'item')
       ->colums(array(self::COLUMN_ITEM_LABEL => "IFNULL(item.".self::COLUMN_ITEM_LABEL
             .'_'.Locale::getLang().", item.".self::COLUMN_ITEM_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_ITEM_ALT => "IFNULL(item.".self::COLUMN_ITEM_ALT.'_'.Locale::getLang().", item."
             .self::COLUMN_ITEM_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
-      ->join(array("module" => $this->modulesTable), 
+      ->join(array("module" => Db::table(self::DB_TABLE_MODULES)),
          array("item" => self::COLUMN_ID_MODULE, self::COLUMN_ID_MODULE),null,Db::COLUMN_ALL)
-      ->join(array("cat" => $this->catTable),
+      ->join(array("cat" => Db::table(Model_Category::DB_TABLE)),
          array("item" => self::COLUMN_ITEM_CAT_ID, Model_Category::COLUMN_CAT_ID),null,
          array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
             .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",
@@ -84,27 +74,18 @@ class Model_Module extends Model_Db {
    }
 
    /**
-    * Metoda načte tabulky
-    */
-   private function getTables() {
-      $this->catTable = AppCore::sysConfig()->getOptionValue("category_table", "db_tables");
-		$this->modulesTable = AppCore::sysConfig()->getOptionValue("modules_table", Config::SECTION_DB_TABLES);
-		$this->itemsTable = AppCore::sysConfig()->getOptionValue("items_table", "db_tables");
-   }
-
-   /**
     * Metoda načte požadovaný item i s modulem a kategoriílocalhost
     * @param integer $idItem  -- id item
     */
    public function getModule($idItem) {
-      $sqlSelect = $this->getDb()->select()->table($this->itemsTable, 'item')
+      $sqlSelect = $this->getDb()->select()->table(Db::table(self::DB_TABLE_ITEMS), 'item')
       ->colums(array(self::COLUMN_ITEM_LABEL => "IFNULL(item.".self::COLUMN_ITEM_LABEL
             .'_'.Locale::getLang().", item.".self::COLUMN_ITEM_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_ITEM_ALT => "IFNULL(item.".self::COLUMN_ITEM_ALT.'_'.Locale::getLang().", item."
             .self::COLUMN_ITEM_ALT.'_'.Locale::getDefaultLang().")", Db::COLUMN_ALL))
-      ->join(array("module" => $this->modulesTable),
+      ->join(array("module" => Db::table(self::DB_TABLE_MODULES)),
          array("item" => self::COLUMN_ID_MODULE, self::COLUMN_ID_MODULE),null,Db::COLUMN_ALL)
-      ->join(array("cat" => $this->catTable),
+      ->join(array("cat" => Db::table(Model_Category::DB_TABLE)),
          array("item" => self::COLUMN_ITEM_CAT_ID, Model_Category::COLUMN_CAT_ID),null,
          array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
             .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG.'_'.Locale::getDefaultLang().")",

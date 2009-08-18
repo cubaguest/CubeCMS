@@ -1,0 +1,60 @@
+<!--Sipky pro posun stranek-->
+<?if($this->allPages > 1){?>
+<div class="scroll_main">
+<table>
+<tr>
+<td width="100" align="left">
+<? //Sipka na zacatek
+   if($this->buttonBegin){?>
+      <a href="<?=$this->buttonLinks['begin']?>" title="<?_("Začátek")?>">
+      |<
+      </a>
+   <?} else {?>
+      |<
+   <?}?>
+   &#032;&#032;
+
+<? //Sipka na předchozí
+   if($this->buttonPrevious){?>
+      <a href="<?=$this->buttonLinks['previous']?>" title="<?_("Předchozí")?>">
+         <span>&lt;<?=_("Předchozí")?></span>
+      </a>
+   <?} else {?>
+      
+      <span>&lt;<?=_("Předchozí")?></span>
+   <?}?>
+</td>
+<td align="center">
+   <? foreach ($this->leftNeigbourts as $number) {?>
+      &nbsp;<a href="<?=$number['link'];?>" title="<?=$number['name'];?>"><?=$number['name'];?></a>&nbsp;
+   <?}?>
+   [&nbsp;<?=$this->selectPage?>/<?=$this->allPages?>&nbsp;]
+   <? foreach ($this->rightNeigbourts as $number) {?>
+      &nbsp;<a href="<?=$number['link'];?>" title="<?=$number['name'];?>"><?=$number['name'];?></a>&nbsp;
+   <?}?>
+</td>
+<td width="100" align="right">
+<? //Sipka na další
+   if($this->buttonNext){?>
+      <a href="<?=$this->buttonLinks['next']?>" title="<?_("Další")?>">
+      
+         <span><?=_("Další")?>&gt;</span>
+      </a>
+   <?} else {?>
+      
+      <span><?=_("Další")?>&gt;</span>
+   <?}?>
+   &#032;&#032;
+<? //Sipka na konec
+   if($this->buttonEnd){?>
+      <a href="<?=$this->buttonLinks['end']?>" title="<?_("Konec")?>">
+      >|
+      </a>
+   <?} else {?>
+      >|
+   <?}?>
+</td>
+</tr>
+</table>
+</div>
+<?}?>

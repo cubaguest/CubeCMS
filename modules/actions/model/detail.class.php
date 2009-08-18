@@ -4,6 +4,11 @@
  */
 class Actions_Model_Detail extends Model_Db {
    /**
+    * Tabulka s detaily
+    */
+    const DB_TABLE = 'actions';
+    
+   /**
     * Názvy sloupců v databázi
     * @var string
     */
@@ -52,7 +57,7 @@ class Actions_Model_Detail extends Model_Db {
          self::COLUMN_ACTION_ID_USER, $idUser,
          self::COLUMN_ACTION_TIME, time());
 
-      $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
+      $sqlInsert = $this->getDb()->insert()->table(Db::table(self::DB_TABLE))
       ->colums(array_keys($actionArr))
       ->values(array_values($actionArr));
       //		Vložení do db
@@ -72,7 +77,7 @@ class Actions_Model_Detail extends Model_Db {
    public function getActionDetailSelLang($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable(), 'action')
+      ->table(Db::table(self::DB_TABLE), 'action')
       ->colums(array(self::COLUMN_ACTION_LABEL =>"IFNULL(".self::COLUMN_ACTION_LABEL.'_'
             .Locale::getLang().",".self::COLUMN_ACTION_LABEL.'_'.Locale::getDefaultLang().")",
             self::COLUMN_ACTION_TEXT =>"IFNULL(".self::COLUMN_ACTION_TEXT.'_'.Locale::getLang()
@@ -92,25 +97,9 @@ class Actions_Model_Detail extends Model_Db {
       return $action;
    }
 
-//   public function getLabelsLangs() {
-//      return $this->actionLabel;
-//   }
-//
-//   public function getTextsLangs() {
-//      return $this->actionText;
-//   }
-//
    public function getFile() {
       return $this->actionFile;
    }
-//
-//   public function getId() {
-//      return $this->actionId;
-//   }
-//
-//   public function getIdUser() {
-//      return $this->actionIdUser;
-//   }
 
    /**
     * Metoda vrací akci podle zadaného ID ve všech jazycích
@@ -121,7 +110,7 @@ class Actions_Model_Detail extends Model_Db {
    public function getActionDetailAllLangs($id) {
       //		načtení novinky z db
       $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
+      ->table(Db::table(self::DB_TABLE))
       ->colums(Db::COLUMN_ALL)
       ->where(self::COLUMN_ACTION_ID_ITEM, $this->module()->getId())
       ->where(self::COLUMN_ACTION_ID, $id)
@@ -155,7 +144,7 @@ class Actions_Model_Detail extends Model_Db {
             self::COLUMN_ACTION_TEXT_SHORT, $shortTexts,
             self::COLUMN_ACTION_TEXT, $texts);
       }
-      $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
+      $sqlInsert = $this->getDb()->update()->table(Db::table(self::DB_TABLE))
       ->set($actionArr)
       ->where(self::COLUMN_ACTION_ID, $idAction);
 
@@ -169,7 +158,7 @@ class Actions_Model_Detail extends Model_Db {
 
    public function deleteAction($idAction) {
       //			smazání novinky
-      $sqlUpdate = $this->getDb()->delete()->table($this->module()->getDbTable())
+      $sqlUpdate = $this->getDb()->delete()->table(Db::table(self::DB_TABLE))
       ->where(self::COLUMN_ACTION_ID, $idAction);
 
       if($this->getDb()->query($sqlUpdate)){

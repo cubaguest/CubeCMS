@@ -15,11 +15,6 @@
 
 class Eplugin_UserFiles extends Eplugin {
    /**
-    * Název šablony s listem souborů
-    */
-   const TPL_FILE = 'userfiles.phtml';
-
-   /**
     * Název souboru s listem obrázků
     */
    const IMAGES_LIST_JS_FILE = 'imageslist.js';
@@ -471,6 +466,30 @@ class Eplugin_UserFiles extends Eplugin {
    }
 
    /**
+    * Metoda načte soubor z db
+    * @param int $idFile -- id souboru
+    */
+   private function getFileFromDb($idFile) {
+      $sqlSelect = $this->getDb()->select()
+          ->table(self::DB_TABLE_USER_FILES, 'files')
+          ->colums(Db::COLUMN_ALL)
+          ->where(self::COLUM_ID, $idFile);
+
+      $file = $this->getDb()->fetchAssoc($sqlSelect);
+
+      $file[self::COLUM_LINK_TO_SHOW] = Links::getMainWebDir().MAIN_DATA_DIR.'/'
+          .self::USER_FILES_DIR.'/'.$file[self::COLUM_FILE];
+      $file[self::COLUM_LINK_TO_DOWNLOAD] = $this->getLinks()->getLinkToDownloadFile(
+          './'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/', $file[self::COLUM_FILE]);
+      if($file[self::COLUM_TYPE] == self::FILE_TYPE_IMAGE) {
+         $file[self::COLUM_LINK_TO_SMALL] = MAIN_DATA_DIR
+             .'/'.self::USER_FILES_DIR.'/'.self::USER_FILES_SMALL_IMAGES_DIR.'/'.$file[self::COLUM_FILE];
+      }
+
+      return $file;
+   }
+
+   /**
     * Metoda volaná přes ajax pro přidání souboru
     * @param Ajax $ajaxObj -- objekt ajax, poskytuje základní parametry předané
     * požadavkem
@@ -482,6 +501,9 @@ class Eplugin_UserFiles extends Eplugin {
       ->crInputHidden('idArticle', false, 'is_numeric');
       if($sendForm->checkForm()){
          $file = $sendForm->getValue(self::FORM_NEW_FILE);
+         // hlavní šablona
+         $tpl = new Template();
+
          try {
             $file->copy(AppCore::getAppWebDir().'/'.MAIN_DATA_DIR.'/'.self::USER_FILES_DIR.'/');
 
@@ -519,12 +541,26 @@ class Eplugin_UserFiles extends Eplugin {
                $fileType, $width, $height,
                $file->getFileSize(), time());
             $this->getDb()->query($sqlInsert);
-            echo _('Soubor byl uložen');
+            $lastId = $this->getDb()->getLastInsertedId();
+
+            $tpl->addTplFile("userfiles_addfile.phtml", true);
+            $tpl->filesCount = count($this->getLinksList($ajaxObj->getIdItem(), $sendForm->getValue('idArticle')))/2;
+
+            $fileTpl = new Template();
+            $fileTpl->addTplFile("userfiles_detail.phtml", true);
+
+            $fileTpl->file = $this->getFileFromDb($lastId);
+            $tpl->fileTpl = $fileTpl;
+
+            $result = _('Soubor byl uložen');
             //            $this->getLinks()->reload();
          } catch (Exception $e) {
-            echo _('Soubor se nepodařilo uložit');
+            $result = _('Soubor se nepodařilo uložit');
             new CoreErrors ($e);
          }
+
+         $tpl->result = $result;
+         $tpl->renderTemplate();
       }
    }
 
@@ -561,12 +597,16 @@ class Eplugin_UserFiles extends Eplugin {
     * Metoda inicializuje šablonu
     */
    protected function initTemplate() {
-      $this->template()->addTplFile(self::TPL_FILE, true);
+      $this->template()->addTplFile("userfiles.phtml", true);
       $jQueryPlugin = new JsPlugin_JQuery();
-      $jQueryPlugin->addPluginAjaxUploadFile();
       $this->template()->addJsPlugin($jQueryPlugin);
       $this->template()->addJsPlugin(new JsPlugin_LightBox());
       $this->template()->setPVar('lightBox', true);
+
+      // šablona pro obrázky
+      $this->template()->fileTpl = new Template();
+      $this->template()->fileTpl->addTplFile("userfiles_detail.phtml", true);
+      $this->template()->addCssFile("style_userfiles.css",true);
    }
 
    /**

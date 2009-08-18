@@ -21,9 +21,9 @@
             <p id="refPhotoLang<?=$key.'_'.$this->image['id_ref_photo']?>" class="tabcontent">
                   <?=$this->_m("Název fotky");?>:
                <input type="text" size="32" maxlength="50" name="reference_photo_label[<?=$key?>]"
-                      value="<?=$this->post("reference_photo_label[$key]", $this->image['label'][$key]);?>" />
+                      value="<?=$this->post($_POST["reference_photo_label"][$key], $this->image['label'][$key]);?>" />
                <input type="hidden" name="reference_photo_id"
-                      value="<?=$this->post("reference_photo_id", $this->image['id_ref_photo']);?>" />
+                      value="<?=$this->post($_POST["reference_photo_id"], $this->image['id_ref_photo']);?>" />
                <input name="reference_photo_send" type="submit" value="<?=$this->_("uložit")?>">
                <img class="refFormImgOk<?=$this->image['id_ref_photo']?>" src="images/icons/icon_ok.png"
                     width="14" alt="save Ok" style="display:none"/>

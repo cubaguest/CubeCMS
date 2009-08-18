@@ -1,0 +1,120 @@
+<?php
+/**
+ * Třída obsluhuje db konektor k dabazázi, podle zvoleného typu vytvoří objekt
+ *
+ * @package    	Action class
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id: db.class.php 582 2009-04-20 11:17:17Z jakub $ VVE3.9.4 $Revision: 582 $
+ * @author        $Author: jakub $ $Date: 2009-04-20 11:17:17 +0000 (Po, 20 dub 2009) $
+ *                $LastChangedBy: jakub $ $LastChangedDate: 2009-04-20 11:17:17 +0000 (Po, 20 dub 2009) $
+ * @abstract 		Třída pro vytvoření db konektoru
+ */
+
+class Db_PDO extends PDO {
+   /**
+    * Název sekce v konf. souboru s konfigurací databáze
+    */
+   const CONFIG_DB_SECTION = "db";
+   /**
+    * statické proměné určující připojení k db
+    * @var string
+    */
+   private static $serverName = null;
+   private static $userName = null;
+   private static $userPassword = null;
+   private static $dbName = null;
+   private static $tablePrefix = null;
+   private static $connectorType = null;
+
+   /**
+    * Interní počítadlo příkazů
+    * @var integer
+    */
+   static $numberOfSqlQueries = 0;
+
+
+   public function  __construct() {
+      if(func_num_args() == 0) {
+         try {
+            switch (self::$connectorType) {
+               case 'mysqli':
+               //(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
+                  parent::__construct("mysql:host=".self::$serverName.";dbname=".self::$dbName,
+                      self::$userName, self::$userPassword);
+                  break;
+               case 'pgsql':
+                  parent::__construct("pgsql:dbname=".self::$dbName.";host=".self::$serverName,
+                      self::$userName,self::$userPassword);
+                  break;
+               case 'sqllite':
+                  parent::__construct("sqlite:".self::$dbName);
+                  break;
+               default:
+                  throw new PDOException(sprintf(_('Databázový engine "%s" není vv PDO podporován'),$typ), 101);
+                  break;
+            }
+         } catch (PDOException $e) {
+            new CoreErrors($e);
+         }
+
+      }
+      else {
+      // TODO dodělat vytváření podle zadaných hodnot
+      }
+      $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+   }
+
+   /**
+    * Metoda pro sestavení spojení a základní nastavení db konektoru
+    * @return Db Konektory k danému databázovému stroji
+    */
+   public static function factory() {
+
+
+      self::$serverName = AppCore::sysConfig()->getOptionValue("dbserver", self::CONFIG_DB_SECTION);
+//      self::$_serverNameBackup = AppCore::sysConfig()->getOptionValue("dbserverbackup", self::CONFIG_DB_SECTION);
+      self::$userName = AppCore::sysConfig()->getOptionValue("dbuser", self::CONFIG_DB_SECTION);
+//      self::$userNameBackup = AppCore::sysConfig()->getOptionValue("dbuserbackup", self::CONFIG_DB_SECTION);
+      self::$userPassword = AppCore::sysConfig()->getOptionValue("dbpasswd", self::CONFIG_DB_SECTION);
+//      self::$userPasswordBackup = AppCore::sysConfig()->getOptionValue("dbpasswdbackup", self::CONFIG_DB_SECTION);
+      self::$dbName = AppCore::sysConfig()->getOptionValue("dbname", self::CONFIG_DB_SECTION);
+//      self::$dbNameBackup = AppCore::sysConfig()->getOptionValue("dbnamebackup", self::CONFIG_DB_SECTION);
+      self::$tablePrefix = AppCore::sysConfig()->getOptionValue("tbprefix", self::CONFIG_DB_SECTION);
+      self::$connectorType = AppCore::sysConfig()->getOptionValue("dbhandler", self::CONFIG_DB_SECTION);
+
+   //      switch (self::$_connectorType) {
+   //         case 'mysqli':
+   //            require_once './lib/db/mysqli/db.class.php';
+   //            return new MySQLiDb(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
+   //            break;
+   //         default:
+   //            throw new UnexpectedValueException(sprintf(_('Databázový engine "%s" nebyl implementován'),$typ), 101);
+   //            break;
+   //      }
+   }
+
+   /**
+    * Metoda přičte k internímu počítadlu jedna
+    */
+   public static function addQueryCount() {
+      Db::$numberOfSqlQueries++;
+   }
+
+   /**
+    * metoda vrací počet provedených SQL dotazů
+    * @return integer
+    */
+   public static function getCountQueries() {
+      return Db::$numberOfSqlQueries;
+   }
+
+   /**
+    * Metoda vrátí upravený název tabulky
+    * @param string $name -- název tabulky (nejčastěji konstanta)
+    * @return string -- upravený název tabulky
+    */
+   public static function table($name) {
+      return self::$tablePrefix.$name;
+   }
+}
+?>

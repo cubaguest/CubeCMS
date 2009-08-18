@@ -66,7 +66,7 @@ abstract class Controller {
       $this->viewObj = new $viewClassName($this->viewTemplate, $this->sys());
 
       // nastavení titulku kategorie šablony
-      $this->viewTemplate->setCatTitle($this->sys()->module()->getLabel());
+      $this->viewTemplate->setCategoryName($this->sys()->module()->getLabel());
 
       // Inicializace kontroleru modulu
       $this->init();
@@ -136,9 +136,12 @@ abstract class Controller {
     * @return Links -- objekt pro práci s odkazy
     */
    final public function link($clear = false, $onlyWebRoot = false) {
-      $link = new Links($clear, $onlyWebRoot);
-      if(!$onlyWebRoot){
-         $link->category(Category::getLabel(), Category::getId());
+      $link = clone $this->sys()->link();
+      if($clear){
+         $link->clear();
+      }
+      if($onlyWebRoot){
+         $link->clear()->category();
       }
       return $link;
    }

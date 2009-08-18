@@ -16,10 +16,10 @@
          <p id="articleLang<?=$key?>" class="tabcontent">
             <?=$this->_m("Název produktu");?>:<br />
             <input type="text" size="40" maxlength="50" name="product_label[<?=$key?>]"
-            value="<?=$this->post("product_label[$key]", $this->product['label'][$key]);?>" /><br />
+            value="<?=$this->post($_POST["product_label"][$key], $this->product['label'][$key]);?>" /><br />
             <?=$this->_m("Text");?>*:<br />
             <textarea class="textarea_tinymce textarea" rows="25" cols="70"
-            name="product_text[<?=$key;?>]"><?=$this->post("product_text[$key]", $this->product['text'][$key]);?></textarea>
+            name="product_text[<?=$key;?>]"><?=$this->post($_POST["product_text"][$key], $this->product['text'][$key]);?></textarea>
          </p>
 
          <?}?>
