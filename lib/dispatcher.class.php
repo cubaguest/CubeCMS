@@ -1,15 +1,15 @@
 <?php
 /**
- * Description of UrlRequest
- * Třída slouží pro parsování a obsluhu požadavků v URL adrese.
+ * Description of Dispatcher
+ * Třída slouží pro parsování a obsluhu základních požadavků v URL adrese.
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id$ VVE3.9.3 $Revision$
+ * @version    	$Id$ VVE 6.0 $Revision$
  * @author			$Author$ $Date$
  *						$LastChangedBy$ $LastChangedDate$
- * @abstract		Třída pro obsluhu a UrlReqestu
+ * @abstract		Třída pro obsluhu Url adres
  */
-class UrlRequest {
+class Dispatcher {
      /**
       * Název parametru s typem media
       */

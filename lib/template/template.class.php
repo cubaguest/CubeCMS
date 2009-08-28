@@ -596,9 +596,9 @@ class Template {
       }
 
       try {
-         $faceDir = AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR
+         $faceDir = './'.self::FACES_DIR.DIRECTORY_SEPARATOR
          .self::$face.DIRECTORY_SEPARATOR.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
-         $engineDir = AppCore::MAIN_ENGINE_PATH.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
+         $engineDir = './'.$moduleDir.$typeDir.DIRECTORY_SEPARATOR;
          if(file_exists($faceDir.$file)){
             return $faceDir;
          }

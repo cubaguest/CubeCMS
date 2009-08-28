@@ -242,7 +242,7 @@ class Links {
     */
    public static function getTransferProtocol() {
       if(self::$user_transfer_protocol == null) {
-         return UrlRequest::TRANSFER_PROTOCOL;
+         return Dispatcher::TRANSFER_PROTOCOL;
       } else {
          return self::$user_transfer_protocol;
       }
@@ -253,7 +253,7 @@ class Links {
     * @return string -- adresa ke kořenu aplikace
     */
    public static function getMainWebDir() {
-      return UrlRequest::getBaseWebDir();
+      return Dispatcher::getBaseWebDir();
    }
 
    /*
@@ -497,7 +497,7 @@ class Links {
          $this->action = self::$currentAction;
          $this->paramsArray = self::$currentParamsArray;
          $this->paramsNormalArray = self::$currentParamsNormalArray;
-         $this->mediaType = UrlRequest::getCurrentMediaUrlPart();
+         $this->mediaType = Dispatcher::getCurrentMediaUrlPart();
       }
    }
 
@@ -529,7 +529,7 @@ class Links {
     * @return string -- objekt jako řetězec
     */
    public function __toString() {
-      $returnString = UrlRequest::getBaseWebDir();
+      $returnString = Dispatcher::getBaseWebDir();
       if($this->lang != null) {
          $returnString.=$this->getLang();
       }
@@ -568,7 +568,7 @@ class Links {
     * @param string -- název souboru
     */
    public function getLinkToDownloadFile($dir, $file) {
-      $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
+      $dwLink = Dispatcher::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
           self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
           self::URL_PARAMETRES_SEPARATOR.self::DOWNLOAD_FILE_FILE_PARAM.self::URL_SEP_PARAM_VALUE.
           urlencode($file);
@@ -581,7 +581,7 @@ class Links {
     * @param string -- název souboru
     */
    public static function getLinkToDwFile($dir, $file) {
-      $dwLink = UrlRequest::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
+      $dwLink = Dispatcher::getBaseWebDir().self::DOWNLOAD_FILE.self::URL_SEPARATOR_LINK_PARAMS.
           self::DOWNLOAD_FILE_DIR_PARAM.self::URL_SEP_PARAM_VALUE.urlencode($dir).
           self::URL_PARAMETRES_SEPARATOR.self::DOWNLOAD_FILE_FILE_PARAM.self::URL_SEP_PARAM_VALUE.
           urlencode($file);
@@ -635,7 +635,7 @@ class Links {
          $utf = new Helper_Text();
          $categoryName = $utf->utf2ascii($categoryName);
          return $categoryName.self::URL_SEP_CAT_ID
-             .$this->category[self::LINK_ARRAY_ITEM_ID].UrlRequest::URL_SEPARATOR;
+             .$this->category[self::LINK_ARRAY_ITEM_ID].Dispatcher::URL_SEPARATOR;
       }
       return null;
    }
@@ -682,7 +682,7 @@ class Links {
          if($this->route[self::LINK_ARRAY_ITEM_OPTION]) {
             $return .= self::PRETEFINED_ROUTES_ID_PREFIX;
          }
-         return 	$return.$this->route[self::LINK_ARRAY_ITEM_ID].UrlRequest::URL_SEPARATOR;
+         return 	$return.$this->route[self::LINK_ARRAY_ITEM_ID].Dispatcher::URL_SEPARATOR;
       }
       return null;
    }
@@ -715,7 +715,7 @@ class Links {
          $name = $utf->utf2ascii($this->article[self::LINK_ARRAY_ITEM_NAME]);
 
          return rawurlencode($name).self::URL_SEP_ARTICLE_ID
-             .$this->article[self::LINK_ARRAY_ITEM_ID].UrlRequest::URL_SEPARATOR;
+             .$this->article[self::LINK_ARRAY_ITEM_ID].Dispatcher::URL_SEPARATOR;
       } else {
          return null;
       }
@@ -753,7 +753,7 @@ class Links {
          return $name.self::URL_ACTION_LABEL_TYPE_SEP
              .$this->action[self::LINK_ARRAY_ITEM_OPTION]
              .self::URL_ACTION_TYPE_ID_SEP.$this->action[self::LINK_ARRAY_ITEM_ID]
-             .UrlRequest::URL_SEPARATOR;
+             .Dispatcher::URL_SEPARATOR;
       } else {
          return null;
       }
@@ -819,7 +819,7 @@ class Links {
       $return = null;
       if(!empty ($this->paramsArray)) {
          foreach ($this->paramsArray as $param) {
-            $return .= rawurlencode($param).UrlRequest::URL_SEPARATOR;
+            $return .= rawurlencode($param).Dispatcher::URL_SEPARATOR;
          }
       }
       return $return;
@@ -843,7 +843,7 @@ class Links {
     */
    private function getLang() {
       if($this->lang != null) {
-         return $this->lang.UrlRequest::URL_SEPARATOR;
+         return $this->lang.Dispatcher::URL_SEPARATOR;
       } else {
          return null;
       }

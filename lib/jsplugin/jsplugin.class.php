@@ -85,10 +85,10 @@ abstract class JsPlugin {
       $this->jsPluginName = get_class($this);
       $this->initJsPlugin();
       // Pokud je zpracováván virtuální soubor JsPluginu
-      if(UrlRequest::isSupportedServices()){
-         $file = new JsPlugin_JsFile(rawurldecode(UrlRequest::getSupportedServicesFile()), true);
+      if(Dispatcher::isSupportedServices()){
+         $file = new JsPlugin_JsFile(rawurldecode(Dispatcher::getSupportedServicesFile()), true);
          // generování obsahu souboru
-         $file->setParams(UrlRequest::getSupportedServicesParams());
+         $file->setParams(Dispatcher::getSupportedServicesParams());
       	$this->generateFile($file);
 		} else {
 			$this->initFiles();

@@ -3,7 +3,7 @@
 	<db>
 		<dbname>dev</dbname>
 		<dbnamebackup>dev</dbnamebackup>
-		<dbserver>dev.vypecky.info</dbserver>
+		<dbserver>localhost</dbserver>
 		<dbserverbackup>localhost</dbserverbackup>
 		<dbuser>dev</dbuser>
 		<dbuserbackup>dev</dbuserbackup>
@@ -17,7 +17,8 @@
 		<cache_dir>cache</cache_dir>
 		<config_dir>config</config_dir></smarty>
 	
-	<db_tables><category_table>categories</category_table>
+	<db_tables>
+      <category_table>categories</category_table>
 		<section_table>sections</section_table>
 		<items_table>items</items_table>
 		<modules_table>modules</modules_table>
@@ -29,7 +30,7 @@
 		<default_group_name>guest</default_group_name>
 		<default_user_name>anonym</default_user_name></users>
 	<web_name>Vepřové Výpečky Engine</web_name>
-	<engine_version>5.0</engine_version>
+	<engine_version>6.0</engine_version>
 	<data_dir>data</data_dir>
 	<session_name>vypecky_session</session_name>
 	<langs>cs</langs>
@@ -37,7 +38,7 @@
 		<images>images</images>
 		<images_lang>langs</images_lang></dirs>
 	<DEBUG_LEVEL>2</DEBUG_LEVEL>
-	<face>vypecky</face>
+	<face>default</face>
    <sitemap_periode>weekly</sitemap_periode>
    <search>
       <result_lenght>300</result_lenght>
