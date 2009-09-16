@@ -181,22 +181,37 @@ class JsPlugin_TinyMce extends JsPlugin {
 
    protected function initJsPlugin() {
    //		Název pluginu
-      $this->defaultParams['document_base_url'] = Links::getMainWebDir();
+      $this->defaultParams['document_base_url'] = Url_Request::getBaseWebDir();
    }
 
    protected function initFiles() {
    //		Výchozí js soubor pluginu
-      $jsFile = new JsPlugin_JsFile("tiny_mce_params.js", true);
-      //$face =  AppCore::getTepmlateFaceDir(false,false);
-      //$face = substr($face, 0, strlen($face)-1);
-      $jsFile->setParam(self::PARAM_FACE, Template::face());
-      $jsFile->setParam(self::PARAM_CATEGORY, Category::getLabel());
-      $jsFile->setParam(self::PARAM_SECTION, Category::getSectionLabel());
-      $jsFile->setParam('language', Locale::getLang());
-      $this->setSettingJsFile($jsFile);
+//      $jsFile = new JsPlugin_JsFile("tiny_mce_params.js", true);
+//      //$face =  AppCore::getTepmlateFaceDir(false,false);
+//      //$face = substr($face, 0, strlen($face)-1);
+//      $jsFile->setParam(self::PARAM_FACE, Template::face());
+////      $jsFile->setParam(self::PARAM_CATEGORY, Category::getLabel());
+////      $jsFile->setParam(self::PARAM_SECTION, Category::getSectionLabel());
+//      $jsFile->setParam('language', Locale::getLang());
+//      $this->addJsFile($jsFile);
       //		Přidání js soubrů pluginu
       $this->addJsFile(new JsPlugin_JsFile("tiny_mce.js"));
+      $this->addJsFile(new JsPlugin_JsFile("settings_basictheme.js", true));
    }
+
+   /**
+    * Metodda pro generování základního nastavení
+    */
+   public function settings_basictheme(){
+      print "nastveni ";
+
+   }
+
+
+
+   // ========================= OLD ===========================
+
+
 
    /**
     * Metda vytvoří výchozí konfigurační soubor

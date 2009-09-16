@@ -69,8 +69,6 @@ class Db_PDO extends PDO {
     * @return Db Konektory k danému databázovému stroji
     */
    public static function factory() {
-
-
       self::$serverName = AppCore::sysConfig()->getOptionValue("dbserver", self::CONFIG_DB_SECTION);
 //      self::$_serverNameBackup = AppCore::sysConfig()->getOptionValue("dbserverbackup", self::CONFIG_DB_SECTION);
       self::$userName = AppCore::sysConfig()->getOptionValue("dbuser", self::CONFIG_DB_SECTION);
@@ -97,7 +95,7 @@ class Db_PDO extends PDO {
     * Metoda přičte k internímu počítadlu jedna
     */
    public static function addQueryCount() {
-      Db::$numberOfSqlQueries++;
+      Db_PDO::$numberOfSqlQueries++;
    }
 
    /**
@@ -105,7 +103,7 @@ class Db_PDO extends PDO {
     * @return integer
     */
    public static function getCountQueries() {
-      return Db::$numberOfSqlQueries;
+      return Db_PDO::$numberOfSqlQueries;
    }
 
    /**

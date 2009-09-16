@@ -5,20 +5,19 @@
  * jednoduché nasatvené parametrů souboru.
  *
  * @copyright  	Copyright (c) 2009 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
- * @author			$Author$ $Date$
- *						$LastChangedBy$ $LastChangedDate$
+ * @version    	$Id: jsplugin_jsfile.class.php 639 2009-07-07 20:59:50Z jakub $ VVE3.9.4 $Revision: 639 $
+ * @author			$Author: jakub $ $Date: 2009-07-07 22:59:50 +0200 (Út, 07 čec 2009) $
+ *						$LastChangedBy: jakub $ $LastChangedDate: 2009-07-07 22:59:50 +0200 (Út, 07 čec 2009) $
  * @abstract 		Třida pro práci s javascript soubry
  */
 
-class JsPlugin_JsFile {
+class JsPlugin_File {
 	
 	/**
-	 * Název js souboru 
-	 *
+	 * Název souboru 
 	 * @var string
 	 */
-	private $jsFile = null;
+	private $file = null;
 	
 	/**
 	 * Pole s parametry js souboru
@@ -34,11 +33,10 @@ class JsPlugin_JsFile {
 
 	/**
 	 * Konstruktor
-	 *
 	 * @param string -- název souboru
 	 */
 	function __construct($file, $virtual = false) {
-		$this->jsFile = $file;
+		$this->file = $file;
       $this->virtualFile = $virtual;
 	}
 	
@@ -56,7 +54,7 @@ class JsPlugin_JsFile {
 	 * @return string -- soubor s parametry
 	 */
 	function __toString() {
-		$file = $this->jsFile;
+		$file = $this->file;
 		if(!empty($this->fileParams)){
 			$params = http_build_query($this->fileParams);
 			$file.='?'.$params;
@@ -121,7 +119,7 @@ class JsPlugin_JsFile {
     * @return string -- název souboru
     */
    public function getName() {
-      return $this->jsFile;
+      return $this->file;
    }
 }
 ?>

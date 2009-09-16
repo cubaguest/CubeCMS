@@ -26,10 +26,11 @@ class Text_Model_Detail extends Model_Db {
 	 * @return string -- načtený text
 	 */
 	public function getText() {
-		if($this->text == null){
-			$this->getTextFromDb();
-		}
-		return $this->text;
+//		if($this->text == null){
+//			$this->getTextFromDb();
+//		}
+//		return $this->text;
+      return "pokusný text";
 	}
 	
 	/**

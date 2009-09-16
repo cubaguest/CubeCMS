@@ -8,7 +8,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro vytvoření objektu pro přístup k datům
  */
-class Model_LangContainer implements ArrayAccess, Countable {
+class Model_LangContainer implements ArrayAccess, Countable, Iterator {
 /**
  * Pole s prvky objektu
  * @var array
@@ -20,6 +20,12 @@ class Model_LangContainer implements ArrayAccess, Countable {
     * @var bool
     */
    private $allLangs = false;
+
+   /**
+    * Aktuální pozice ukazatele na prvek
+    * @var int
+    */
+    private $position = 0;
 
    /**
     * Konstruktor
@@ -115,6 +121,29 @@ class Model_LangContainer implements ArrayAccess, Countable {
    public function count() {
       return count($this->values);
    }
+
+   /**
+    * Metody pro posun po prvcích pomocí foreach
+    */
+   public function rewind() {
+      reset($this->values);
+    }
+
+    public function current() {
+      return current($this->values);
+    }
+
+    public function key() {
+      return key($this->values);
+    }
+
+    public function next() {
+      next($this->values);
+    }
+
+    public function valid() {
+        return $this->current() !== false;
+    }
 }
 /**
  * Podpůrná třda pro práci s jazykovými sloupci v Model_LangContainer

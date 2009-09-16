@@ -8,12 +8,12 @@
       <title>
          <?
          echo($this->pageTitle);
-         if($this->categoryName())
-            echo ' - '.$this->categoryName();
-         if($this->articleName())
-            echo ' - '.$this->articleName();
-         if($this->actionName())
-            echo ' - '.$this->actionName();
+//         if($this->categoryName())
+//            echo ' - '.$this->categoryName();
+//         if($this->articleName())
+//            echo ' - '.$this->articleName();
+//         if($this->actionName())
+//            echo ' - '.$this->actionName();
          ?></title>
 
       <base href="<?=Links::getMainWebDir()?>" />
@@ -174,5 +174,13 @@
       echo "<pre>";
       print_r($this);
       echo "</pre>";
-   }?>
+   }
+
+   if($this->debug == 2){
+      print ("Run functions: ".xdebug_get_function_count()."<br />");
+      print ("Memory: ".xdebug_memory_usage()."<br />");
+      print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");
+      print ("Index time: ".xdebug_time_index()."<br />");
+   }
+   ?>
 </html>

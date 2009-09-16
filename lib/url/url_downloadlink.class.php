@@ -5,10 +5,10 @@
  * tvorbu a validaci, popřípadě změnu jednotlivých parametrů. Umožňuje také
  * přímé přesměrování na zvolený (vytvořený) odkaz pomocí klauzule redirect.
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
- * @author			$Author$ $Date$
- *						$LastChangedBy$ $LastChangedDate$
+ * @copyright  	Copyright (c) 2009 Jakub Matas
+ * @version    	$Id: url_link.class.php 646 2009-08-28 13:44:00Z jakub $ VVE3.9.4 $Revision: 646 $
+ * @author			$Author: jakub $ $Date: 2009-08-28 15:44:00 +0200 (Pá, 28 srp 2009) $
+ *						$LastChangedBy: jakub $ $LastChangedDate: 2009-08-28 15:44:00 +0200 (Pá, 28 srp 2009) $
  * @abstract 		Třída pro práci s odkazy
  */
 
@@ -38,72 +38,6 @@ class Links {
    const URL_SEP_PARAM_VALUE = '=';
 
    /**
-    * Oddělovatč mezi názvem článku a id článku
-    * @var char
-    */
-   const URL_SEP_ARTICLE_ID = '-';
-   /**
-    *
-    * Oddělovatč mezi názvem kategorie a id kateogire
-    * @var char
-    */
-   const URL_SEP_CAT_ID = '-';
-
-   /**
-    * Oddělovač v url mezi popisem akce a typem akce
-    * @var char
-    */
-   const URL_ACTION_LABEL_TYPE_SEP = '_';
-
-   /**
-    * Oddělovač url mezi typem akce a id item
-    * @var char
-    */
-   const URL_ACTION_TYPE_ID_SEP = '-';
-
-   /**
-    * Názec souboru pro stahování dat
-    * @var string
-    */
-   const DOWNLOAD_FILE = 'download.php';
-
-   /**
-    * Název parametru v url, přo který se přenáší název stahovanéh souboru
-    * @var string
-    */
-   const DOWNLOAD_FILE_FILE_PARAM = 'file';
-
-   /**
-    * Název parametru v url, přo který se přenáší adresář stahovanéh souboru
-    * @var string
-    */
-   const DOWNLOAD_FILE_DIR_PARAM = 'url';
-
-   /**
-    * Název položky pole se jménem
-    * @var string
-    */
-   const LINK_ARRAY_ITEM_NAME = 'name';
-
-   /**
-    * Název položky pole s idčkem
-    * @var string
-    */
-   const LINK_ARRAY_ITEM_ID = 'id';
-
-   /**
-    * Název položky pole s volitelným parametrem
-    * @var string
-    */
-   const LINK_ARRAY_ITEM_OPTION = 'option';
-
-   /**
-    * Oddělovač předdefinované routy
-    * @var char
-    */
-   const PRETEFINED_ROUTES_ID_PREFIX = 'p';
-
-   /**
     * Proměná s typem přenosového protokolu
     * @var string
     */
@@ -125,91 +59,91 @@ class Links {
     * Proměnná s názvem vybrané kategorie kategorie
     * @var array
     */
-   private static $currentCategory = array();
+//   private static $currentCategory = array();
 
    /**
     * Proměnná s názvem kategorie
     * @var array
     */
-   private $category = array();
+//   private $category = array();
 
    /**
     * Proměná se zvolenou cestou
     * @var array
     */
-   private static $currentRoute = array();
+//   private static $currentRoute = array();
 
    /**
     * Proměná se zvolenou cestou
     * @var array
     */
-   private $route = array();
+//   private $route = array();
 
    /**
     * Proměná s názvem článku (article key)
     * @var array
     */
-   private static $currentArticle = array();
+//   private static $currentArticle = array();
 
    /**
     * Proměná s názvem článku (article key)
     * @var array
     */
-   private $article = array();
+//   private $article = array();
 
    /**
     * Proměná s názvem akce (action)
     * @var array
     */
-   private static $currentAction = array();
+//   private static $currentAction = array();
 
    /**
     * Proměná s názvem akce (action)
     * @var array
     */
-   private $action = array();
+//   private $action = array();
 
    /**
     * Proměná s názvem média
     * @var string
     */
-   private $mediaType = null;
+//   private $mediaType = null;
 
    /**
     * Proměná s názvem souboru
     * @var string
     */
-   private $file = null;
+//   private $file = null;
 
    /**
     * Jestli se má tvořit nový odkaz k rootu webu
     * @var boolean
     */
-   private $onlyWebRoot = false;
+//   private $onlyWebRoot = false;
 
    /**
     * Pole s parsovatelnými parametry v url
     * @var array
     */
-   private static $currentParamsArray = array();
+//   private static $currentParamsArray = array();
 
    /**
     * Pole s parsovatelnými parametry v url
     * @var array
     */
-   private $paramsArray = array();
+//   private $paramsArray = array();
 
    /**
     * Pole s ostatními parametry v url
     * @var array
     */
-   private static $currentParamsNormalArray = array();
+//   private static $currentParamsNormalArray = array();
 
    /**
     * Pole s ostatními parametry v url
     * @var array
     */
-   private $paramsNormalArray = array();
+//   private $paramsNormalArray = array();
 
    /**
     * Konstruktor nastaví základní adresy a přenosový protokol
@@ -217,11 +151,11 @@ class Links {
     * @param boolean $onlyWebRoot -- (option) true pokud má být vráce naprosto čistý link (web root)
     */
    function __construct($clear = false, $onlyWebRoot = false) {
-      $this->onlyWebRoot = $onlyWebRoot;
-      $this->_init();
-      if($clear) {
-         $this->clear();
-      }
+//      $this->onlyWebRoot = $onlyWebRoot;
+//      $this->_init();
+//      if($clear) {
+//         $this->clear();
+//      }
    }
 
    /*
@@ -242,7 +176,7 @@ class Links {
     */
    public static function getTransferProtocol() {
       if(self::$user_transfer_protocol == null) {
-         return Url_Request::TRANSFER_PROTOCOL;
+//         return Url_Request::TRANSFER_PROTOCOL;
       } else {
          return self::$user_transfer_protocol;
       }
@@ -266,11 +200,9 @@ class Links {
     *
     * @return Links -- objket Links
     */
-   public function category($catName = null, $catId = null) {
-      if($catName != null AND $catId != null) {
-         $help = new Helper_Text();
-         $this->category[self::LINK_ARRAY_ITEM_NAME] = rawurlencode($help->utf2ascii($catName));
-         $this->category[self::LINK_ARRAY_ITEM_ID] = $catId;
+   public function category($catKey) {
+      if($catKey != null) {
+         $this->category = $catKey;
       } else {
          $this->category = null;
       }
@@ -283,44 +215,7 @@ class Links {
     *
     * @return Links -- objket Links
     */
-   public function route($name = null, $id = null) {
-   //		Pokud je předána předdefinovaná cesta
-      if(is_array($name)) {
-         $this->route[self::LINK_ARRAY_ITEM_NAME] = $name[0];
-         $this->route[self::LINK_ARRAY_ITEM_ID] = $name[1];
-         $this->route[self::LINK_ARRAY_ITEM_OPTION] = true;
-      }
-      //        pokud je předána uživatelská cesta
-      if($name != null AND $id != null) {
-         $this->route[self::LINK_ARRAY_ITEM_NAME] = $name;
-         $this->route[self::LINK_ARRAY_ITEM_ID] = $id;
-         $this->route[self::LINK_ARRAY_ITEM_OPTION] = false;
-      }
-      return $this;
-   }
-
-   /**
-    * Metoda nastavuje název article
-    * @param string -- jméno článku
-    * @param integer -- id článku
-    *
-    * @return Links -- objket Links
-    */
-   public function article($article = null, $idArticle = null) {
-      if($article != null AND $idArticle != null AND !is_numeric($idArticle)) {
-         throw new InvalidArgumentException(_("Nebylo předáno id článku"), 1);
-      }
-
-      if($article != null AND $idArticle != null) {
-         $this->article[self::LINK_ARRAY_ITEM_ID] = $idArticle;
-         //         $article = htmlspecialchars_decode($article);
-         $help = new Helper_Text();
-         $article = $help->utf2ascii($article);
-         $article = rawurlencode($article);
-         $this->article[self::LINK_ARRAY_ITEM_NAME] = $article;
-      } else {
-         $this->article = null;
-      }
+   public function route($name = null, $params = array()) {
       return $this;
    }
 
@@ -332,34 +227,6 @@ class Links {
     */
    public function media($media = null) {
       $this->mediaType = $media;
-      return $this;
-   }
-
-   /**
-    * Metoda nastavuje parametr nazev epluginu
-    * @param string -- jméno epluginu
-    *
-    * @return Links -- objket Links
-    */
-   public function file($file = null) {
-      $this->file = $file;
-      return $this;
-   }
-
-   /**
-    * Metoda nastavuje název action
-    * @param string -- jméno akce (action např. edit, show atd.)
-    *
-    * @return Links -- objket Links
-    */
-   public function action($action = null) {
-      if(!empty ($action)) {
-         $this->action[self::LINK_ARRAY_ITEM_NAME] = $action[0];
-         $this->action[self::LINK_ARRAY_ITEM_OPTION] = $action[1];
-         $this->action[self::LINK_ARRAY_ITEM_ID] = $action[2];
-      } else {
-         $this->action= null;
-      }
       return $this;
    }
 
@@ -473,7 +340,7 @@ class Links {
     * @return Links -- sám sebe
     */
    public function clear($withOutCategory = false) {
-      $this->route()->article()->action()->rmParam()->media();
+      $this->route()->rmParam()->media();
       if($withOutCategory) {
          $this->category();
       }
@@ -493,8 +360,6 @@ class Links {
          $this->lang = self::$currentlang;
          $this->category = self::$currentCategory;
          $this->route = self::$currentRoute;
-         $this->article = self::$currentArticle;
-         $this->action = self::$currentAction;
          $this->paramsArray = self::$currentParamsArray;
          $this->paramsNormalArray = self::$currentParamsNormalArray;
 //         $this->mediaType = Url_Request::getCurrentMediaUrlPart();
@@ -506,17 +371,6 @@ class Links {
     */
    private function completeUrlParams() {
       return http_build_query($this->paramsNormalArray);
-   }
-
-   /**
-    * Metoda doplní část s názvem souboru
-    */
-   private function getFile() {
-      if($this->file != null) {
-         return $this->file;
-      } else {
-         return null;
-      }
    }
 
    /*
@@ -539,21 +393,9 @@ class Links {
       if($this->getRoute() != null) {
          $returnString.=$this->getRoute();
       }
-      if($this->getArticle() != null) {
-         $returnString.=$this->getArticle();
-      }
-      if($this->getAction() != null) {
-         $returnString.=$this->getAction();
-      }
       //        Parsovatelné parametry
       if($this->getParams() != null) {
          $returnString.=$this->getParams();
-      }
-      /**
-       * @todo What is this? Know anybody what is this doing?
-       */
-      if($this->getFile() != null) {
-         $returnString.=$this->getFile();
       }
       //        normálové parametry
       if($this->getNormalParams() != null) {

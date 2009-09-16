@@ -13,46 +13,16 @@
 
 abstract class Model {
    /**
-    * Proměná obsahuj eobjek tsystémových proměných
-    * @var Module_Sys
-    */
-   private $sys = null;
-
-   /**
     * KOnstruktor vytvoří objekt modelu
     * @param Module_Sys $sys -- systémové informace
     */
-   public function  __construct(Module_Sys $sys = null) {
-      if($sys != null){
-      $this->sys = $sys;
-      } else {
-         $this->sys = new Module_Sys();
-      }
+   public function  __construct() {
+//      if($sys != null){
+//      $this->sys = $sys;
+//      } else {
+//         $this->sys = new Module_Sys();
+//      }
       $this->init();
-   }
-
-   /**
-    * Metoda vrací systémový objekt
-    * @return Module_Sys -- objekt systému
-    */
-   final public function sys() {
-      return $this->sys;
-   }
-
-	/**
-	 * Metoda vrací objekt modulu
-	 * @return Module -- objekt modulu
-	 */
-	final public function module() {
-      return $this->sys()->module();
-	}
-
-   /**
-    * Metoda vrací id modulu
-    * @return integer
-    */
-   final public function idItem() {
-      return $this->module()->getId();
    }
 
 	/**

@@ -89,12 +89,6 @@ class Auth {
 	private $session;
 	
 	/**
-	 * Konektor na databázi
-	 * @var DbConnector
-	 */
-	private $dbConnector = null;
-
-	/**
 	 * Proměná obsahuje jestli je uživatel přihlášen
 	 * @var boolean
 	 */
@@ -103,11 +97,9 @@ class Auth {
 	/**
 	 * Konstruktor, provádí autorizaci
 	 */
-	function __construct($dbConnector) {
+	function __construct() {
 		//Zakladni proměne
 		$this->login = false;
-//		inicializace konektoru k db
-		$this->dbConnector = $dbConnector;
 //		Inicializace session
 		$this->session = new Sessions();
 
@@ -194,23 +186,22 @@ class Auth {
 		
 		if (isset($_POST["login_submit"])){
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
-				$this->getError()->addMessage(_("Byly zadány prázdné údaje"));
+				$this->errMsg()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
-            $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
-               ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES),'user')
-               ->colums(Db::COLUMN_ALL)
-               ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME, 
-                        Config::SECTION_DB_TABLES)),
-                  array('g'=>'id_group', 'user'=> 'id_group') , Db::JOIN_LEFT,
-                  array("gname" => "name", Db::COLUMN_ALL))
-					->where("user.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
-
-				$userResult = $this->dbConnector->fetchObject($userSql);
+//            $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
+//               ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES),'user')
+//               ->colums(Db::COLUMN_ALL)
+//               ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME,
+//                        Config::SECTION_DB_TABLES)),
+//                  array('g'=>'id_group', 'user'=> 'id_group') , Db::JOIN_LEFT,
+//                  array("gname" => "name", Db::COLUMN_ALL))
+//					->where("user.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
+//
+//				$userResult = $this->dbConnector->fetchObject($userSql);
 						
 				if (!($userResult)){
-					$this->getError()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
-				} 
-				else {
+					$this->errMsg()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
+				} else {
 					if (md5(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->password){
 						//	Uspesne prihlaseni do systemu
 						$this->login = true;
@@ -227,7 +218,7 @@ class Auth {
 						}
 						$return = true;
 					} else {
-                  $this->getError()->addMessage(_("Bylo zadáno špatné heslo."));
+                  $this->errMsg()->addMessage(_("Bylo zadáno špatné heslo."));
 					}
 				}
 				unset($loginMysql);
@@ -254,14 +245,6 @@ class Auth {
 		}
 		return $return;
 	}
-
-   /**
-    * Metoda vrací objekt pro přístup k DB
-    * @return DbInterface
-    */
-   private function getDb() {
-      return AppCore::getDbConnector();
-   }
 
 	/**
 	 * Metoda vrací je-li uživatel přihlášen
@@ -324,7 +307,7 @@ class Auth {
     * Metoda vrací objekt s chybovými zprávami
     * @return Messages -- objekt zpráv
     */
-   public function getError() {
+   public function errMsg() {
       return AppCore::getUserErrors();
    }
 }

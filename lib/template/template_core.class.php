@@ -13,41 +13,36 @@
 
 class Template_Core extends Template {
 
+   /**
+    * Konstruktor
+    */
+   function  __construct() {
+      parent::__construct(new Url_Link());
+   }
+
+   /**
+    * Metoda vrací pole se všemy css soubory
+    * @return array
+    */
    public function getStylesheets() {
       return self::$stylesheets;
    }
 
+   /**
+    * Metoda vrací pole se všemi javascripty
+    * @return array
+    */
    public function getJavascripts() {
       return self::$javascripts;
    }
 
+   /**
+    * Metoda vkládá cestu k css souboru i s názvem souboru
+    * @param string $name -- název souboru
+    * @return string -- cesta k souboru
+    */
    public function style($name) {
       return parent::getFileDir($name, self::STYLESHEETS_DIR).$name;
    }
-
-   /**
-    * metoda přidává zadany css styl do výstupu
-    * @param string -- název scc stylu
-    * @param boolean -- true pokud je zadána i cesta se souborem
-    */
-   public static function addCss($cssName){
-      //TODO kontrola souborů
-      if(!in_array($cssName, self::$stylesheets)){
-         array_push(self::$stylesheets, $cssName);
-      }
-   }
-
-   /**
-    * metoda přidává zadaný javascript do výstupu
-    * @param string -- název javascriptu
-    * @param boolean -- true pokud je zadána i cesta se souborem
-    */
-   public static function addJS($jsFile){
-      //TODO kontrola souborů
-      if(!in_array($jsFile, self::$javascripts)){
-         array_push(self::$javascripts, $jsFile);
-      }
-   }
-
 }
 ?>

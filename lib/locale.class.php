@@ -294,40 +294,6 @@ class Locale {
    }
 
    /**
-    * Metoda přidá textovou doménu pro překlad
-    *
-    * @param string -- název modulu pro kterou se má překlad přidat (Option)
-    */
-//   public static function bindTextDomain($moduleName = null) {
-//      if($moduleName == null AND AppCore::getSelectedModule() != null){
-//         bindtextdomain(AppCore::getSelectedModule()->getName(), '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
-//            . DIRECTORY_SEPARATOR . AppCore::getSelectedModule()->getName() . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
-//      } else if($moduleName != null){
-//         bindtextdomain($moduleName, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
-//            . DIRECTORY_SEPARATOR . $moduleName . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
-//      }
-//   }
-
-   /**
-    * Metoda inicializuje doplňkové funkce pro práci s překlady
-    */
-//   public static function initTranslationsFunctions() {
-      /**
-       * Funkce pro lokalizaci textů v modulech, pokud modul neexistuje je použit
-       * překlad pro engine
-       * 
-       * @param string $message -- zpráva pro překlad
-       * @return striing -- přeložený text
-       */
-//      function _m($message) {
-//         if(AppCore::getSelectedModule() != null){
-//            return dgettext(AppCore::getSelectedModule()->getName(), $message);
-//         }
-//         return _($message);
-//      }
-//   }
-
-   /**
     * Konstruktor vytvoří objekt pro přístup k locales
     * @param string $moduleDomain
     */

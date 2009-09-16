@@ -20,200 +20,112 @@ class Category {
    const CAT_PARAMS_SEPARATOR = ';';
 
    /**
-    * Id aktuální kategorie
-    * @var integer
-    */
-   private static $currentCategoryId = null;
-
-   /**
-    * Proměná s konektorem pro připojení db
-    * @var Db
-    */
-   private static $_dbConnector = null;
-
-   /**
-    * proměná a autorizací přístupu
-    * @var Auth
-    */
-   private static $_auth = null;
-
-   /**
-    * Proměné s informacemi o kategorii
-    * @var string
-    */
-   private static $_categoryLabel = null;
-
-   /**
-    * Id kategorie
-    * @var integer
-    */
-   private static $_categoryId = null;
-
-   /**
-    * Id Sekce
-    * @var int
-    */
-   private static $_sectionId = null;
-
-   /**
-    * Proměné jesli jsou zapnuty panely
-    * @var boolean
-    */
-   private static $_categoryLeftPanel = false;
-   private static $_categoryRightPanel = false;
-
-   /**
-    * názvem sekce
-    * @var string
-    */
-   private static $_sectionName = null;
-
-   /**
-    * Popis sekce
-    * @var string
-    */
-   private static $_sectionAlt = null;
-
-   /**
     * Pole s parametry kategorie
     * @var array
     */
-   private static $_categoryParams = array();
+   private $params = array();
+
+   /**
+    * Objekt kategorie
+    * @var Object
+    */
+   private $category = null;
 
    /**
     * Proměná obsahuje jestli je vybraná kategorie jako hlavní kategorie
     * @var boolean
     */
-   private static $_categoryIsDefault = false;
+   private $categoryIsDefault = false;
+
+   /**
+    * Objekt hlavní kategorie
+    * @var Category
+    */
+   private static $mainCategory = null;
+
+   /**
+    * Objekt s právy kategorie
+    * @var Rights 
+    */
+   private $categoryRights = null;
+
+   /**
+    * Objekt modulu
+    * @var Module
+    */
+   private $module = null;
 
    /**
     * Konstruktor načte informace o kategorii
-    * @param Db object -- konektor k databázi
+    * @string $catKey --  klíč kategorie
+    * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
     */
-   public static function factory(Auth $auth) {
-      //		nastavení db
-      self::$_dbConnector = AppCore::getDbConnector();
-      self::$_auth = $auth;
-
+   public function  __construct($catKey = null, $isMainCategory = false) {
       //		vbrání kategorie
-      if(self::$currentCategoryId != null){
-         self::_loadSelectedFromDb(self::$currentCategoryId);
+      if($catKey != null){
+         $this->loadCat($catKey);
+         $this->categoryIsDefault = false;
       } else {
-         self::_loadDefaultFromDb();
+         $this->loadCat();
+         $this->categoryIsDefault = true;
       }
-   }
-
-   /**
-    * Nastavuje id aktuální kategorie
-    * @param integer $id -- id aktuální kategorie
-    */
-   public static function setCurrentCategoryId($id) {
-      self::$currentCategoryId = $id;
-   }
-
-   /**
-    * Metoda vrací část url adresy s kategorií
-    * @return array -- pole s částmi pro URL
-    */
-   public static function getCurrentCategory() {
-      $array = array(Links::LINK_ARRAY_ITEM_ID => self::$currentCategoryId,
-         Links::LINK_ARRAY_ITEM_NAME => self::$currentCategoryName);
-      return $array;
+      if(!empty ($this->category)){
+         $this->categoryRights = new Rights();
+         $this->loadRights();
+      }
+      if($isMainCategory){
+         self::$mainCategory = $this;
+      }
    }
 
    /**
     * metoda načte vybranou kategorii z databáze
-    * @param integer $catId -- id kategorie
+    * @param string $catKey -- klíč kategorie
     */
-   private static function _loadSelectedFromDb($catId) {
-      $userNameGroup = self::$_auth->getGroupName();
+   private function loadCat($catKey = null) {
+//      $userNameGroup = AppCore::getAuth()->getGroupName();
       $catModel = new Model_Category();
-      $catArray = $catModel->getCategory(self::$currentCategoryId);
+      $catArray = $catModel->getCategory($catKey);
       //		Pokud nebyla načtena žádná kategorie
       if(empty($catArray)){
-         AppCore::setErrorPage();
+//         AppCore::setErrorPage();
+         $this->category = false;
          return false;
       } else {
-         self::$_categoryLabel = $catArray->{Model_Category::COLUMN_CAT_LABEL};
-         self::$_categoryId = $catArray->{Model_Category::COLUMN_CAT_ID};
-         self::$_sectionId = $catArray->{Model_Category::COLUMN_CAT_SEC_ID};
-         self::$_categoryLeftPanel = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
-         self::$_categoryRightPanel = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
-         self::$_sectionName = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
-         self::$_sectionAlt = $catArray->{Model_Sections::COLUMN_SEC_ALT};
-         self::$_categoryParams = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
-         //        načtení výchozí kategorie
-         $defCatArr = self::getDefaultCategory();
-         if($defCatArr[Model_Category::COLUMN_CAT_ID] == self::$_categoryId){
-            self::$_categoryIsDefault = true;
-         }
+          $this->category = $catArray;
       }
+      // vytvoření objektu Modulu
+      $this->module = new Module((string)$this->category->{Model_Module::COLUMN_NAME},
+         $this->parseParams($this->category->{Model_Category::COLUMN_PARAMS}));
    }
 
    /**
-    * metoda načte výchozí kategorii z databáze
+    * Metoda načte práva ke kategorii
     */
-   private static function _loadDefaultFromDb() {
-      $catModel = new Model_Category();
-      $catArray = $catModel->getCategory();
-      try {
-         if(empty ($catArray)){
-            throw new RangeException(_('Nepodařilo se načíst výchozí kategorii. Chyba v konfiguraci.'),1);
-         }
-      } catch (RangeException $e) {
-         new CoreErrors($e);
-      }
-      self::$_categoryLabel = $catArray->{Model_Category::COLUMN_CAT_LABEL};
-      self::$_categoryId = $catArray->{Model_Category::COLUMN_CAT_ID};
-      self::$_sectionId = $catArray->{Model_Category::COLUMN_CAT_SEC_ID};
-      self::$_categoryLeftPanel = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
-      self::$_categoryRightPanel = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
-      self::$_sectionName = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
-      self::$_sectionAlt = $catArray->{Model_Sections::COLUMN_SEC_ALT};
-      self::$_categoryParams = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
-      self::$_categoryIsDefault = true;
-   }
-
-   /**
-    * Metoda načte informace o výchozí kategorii
-    * @return array -- pole s prvky výchozí kategorie
-    */
-   public static function getDefaultCategory() {
-      $catModel = new Model_Category();
-      try {
-         $catArray = $catModel->getCategory();
-         if(empty($catArray)){
-            throw new RangeException(_('Nepodařilo se načíst výchozí kategorii. Chyba v konfiguraci.'),2);
-         }
-      } catch (RangeException $e) {
-         new CoreErrors($e);
-      }
-      //		Pokud nebyla načtena žádná kategorie
-      $catArr = array ();
-      $catArr[Model_Category::COLUMN_CAT_LABEL] = $catArray->{Model_Category::COLUMN_CAT_LABEL};
-      $catArr[Model_Category::COLUMN_CAT_ID] = $catArray->{Model_Category::COLUMN_CAT_ID};
-      $catArr[Model_Category::COLUMN_CAT_SEC_ID] = $catArray->{Model_Category::COLUMN_CAT_SEC_ID};
-      $catArr[Model_Category::COLUMN_CAT_LPANEL] = $catArray->{Model_Category::COLUMN_CAT_LPANEL};
-      $catArr[Model_Category::COLUMN_CAT_RPANEL] = $catArray->{Model_Category::COLUMN_CAT_RPANEL};
-      $catArr[Model_Sections::COLUMN_SEC_LABEL] = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
-      $catArr[Model_Sections::COLUMN_SEC_ALT] = $catArray->{Model_Sections::COLUMN_SEC_LABEL};
-      $catArr[Model_Category::COLUMN_CAT_PARAMS] = self::parseParams($catArray->{Model_Category::COLUMN_CAT_PARAMS});
-      return $catArr;
+   public function loadRights() {
+      // načtení práv
+         foreach ($this->category as $collum => $value) {
+            if (substr($collum,0,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX)) ==
+                Rights::RIGHTS_GROUPS_TABLE_PREFIX) {
+               $this->categoryRights->addRight(substr($collum,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX),
+                     strlen($collum)), $value);
+            }
+         };
    }
 
    /**
     * Metoda vrací true pokud vybraná kategorie je výchozí kategorií
     * @return boolean -- true pokud je výchozí kategorie
     */
-   public static function isDefault() {
-      return self::$_categoryIsDefault;
+   public function isDefault() {
+      return $this->categoryIsDefault;
    }
 
    /**
     * Metoda parsuje parametry kategorie a uloží je do pole
     * @param string -- řetězec s paramaetry
     */
-   private static function parseParams($params){
+   private function parseParams($params){
       $rParams = array();
       if ($params != null){
          $arrayValues = array();
@@ -223,9 +135,6 @@ class Category {
             $rParams[$tmpArrayValue[0]]=$tmpArrayValue[1];
          }
       }
-//      echo "<pre>set";
-//      print_r($rParams);
-//      echo "</pre>";
       return $rParams;
    }
 
@@ -233,70 +142,121 @@ class Category {
     * Metoda vrací název kategorie
     * @return string -- název kategorie
     */
-   public static function getLabel() {
-      return self::$_categoryLabel;
+   public function getLabel() {
+      return (string)$this->category->{Model_Category::COLUMN_CAT_LABEL};
    }
 
    /**
     * Metoda vrací id kategorie
     * @return integer -- id kategorie
     */
-   public static function getId() {
-      return (int)self::$_categoryId;
+   public function getId() {
+      return (int)$this->category->{Model_Category::COLUMN_CAT_ID};
    }
 
    /**
     * Metoda vrací id sekce kategorie
     * @return integer -- id sekce kategorie
     */
-   public static function getSectionId() {
-      return self::$_sectionId;
+   public function getSectionId() {
+      return (int)$this->category->{Model_Sections::COLUMN_SEC_ID};
    }
 
    /**
     * Metoda vrací název sekce kategorie
     * @return string -- název sekce kategorie
     */
-   public static function getSectionLabel() {
-      return self::$_sectionName;
+   public function getSectionLabel() {
+      return (string)$this->category->{Model_Sections::COLUMN_SEC_LABEL};
    }
 
    /**
     * Metoda vrací urlkey kategorie
     * @return string -- urlkey kategorie
     */
-   public static function getUrlKey() {
-      return self::$_categoryUrlkey;
+   public function getUrlKey() {
+      return (string)$this->category->{Model_Category::COLUMN_URLKEY};
    }
 
    /**
     * Metoda vrací jesli je zapnut levý panel
     * @return boolena -- true pokud je panel zapnut
     */
-   public static function isLeftPanel(){
-      return self::$_categoryLeftPanel;
+   public function isLeftPanel(){
+      return $this->category->{Model_Category::COLUMN_CAT_LPANEL};
    }
 
    /**
     * Metoda vrací jesli je zapnut pravý panel
     * @return boolena -- true pokud je panel zapnut
     */
-   public static function isRightPanel(){
-      return self::$_categoryRightPanel;
+   public function isRightPanel(){
+      return $this->category->{Model_Category::COLUMN_CAT_RPANEL};
    }
 
    /**
-    * Metoda vrací požedovaný parametr
+    * Metoda vrací požadovaný parametr
     * @param string $param -- index parametru
     * @param mixed $defaultParam -- výchozí hodnota
     * @return string -- parametr
     */
-   public static function getParam($param, $defaultParam = null) {
-      if(isset(self::$_categoryParams[$param])){
-         return self::$_categoryParams[$param];
-      } else {
-         return null;
+//   public function getParam($param, $defaultParam = null) {
+//      if(isset($this->params[$param])){
+//         return $this->params[$param];
+//      } else {
+//         return $defaultParam;
+//      }
+//   }
+
+   /**
+    * Metoda vrací všechny parametry kategorie
+    * @return array -- parametry
+    */
+//   public function getParams() {
+//      return $this->params;
+//   }
+
+   /**
+    * Metoda vrací jestli se jedná o validní kategorii
+    * @return bool
+    */
+   public function isValid() {
+      if(empty ($this->category)){
+         return false;
       }
+      return true;
+   }
+
+   /**
+    * Metoda vrací práva ke kategorii
+    * @return Rights
+    */
+   public function getRights() {
+      return $this->categoryRights;
+   }
+
+   /**
+    * Metoda vrací objekt hlavní kategorie
+    * @return Category
+    */
+   public static function getMainCategory() {
+      return self::$mainCategory;
+   }
+
+   /**
+    * Metoda vrací název modulu
+    * @return string
+    */
+//   public function getModuleName() {
+//      return (string)$this->category->{Model_Module::COLUMN_NAME};
+//   }
+
+   /**
+    * Metoda vrací objekt modulu pro zadanou kategorii
+    * @return Module
+    */
+   public function getModule() {
+      return $this->module;
    }
 }
 ?>

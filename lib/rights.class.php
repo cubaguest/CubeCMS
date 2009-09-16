@@ -19,28 +19,10 @@ class Rights {
 	const RIGHTS_GROUPS_TABLE_PREFIX = 'group_';
 	
 	/**
-	 * Pole s právy ve všech skupinách
+	 * Pole s právy
 	 * @var array
 	 */
-	private $groupRights = array();
-	
-	/**
-	 * Právo čtení
-	 * @var boolean
-	 */
-	private $read = false;
-	
-	/**
-	 * Právo zápisu
-	 * @var boolean
-	 */
-	private $write = false;
-	
-	/**
-	 * Právo kontroly
-	 * @var boolean
-	 */
-	private $controll = false;
+	private $rights = array();
 	
 	/**
 	 * Konstruktor
@@ -48,9 +30,7 @@ class Rights {
 	 * @param Auth -- objekt s autorizací
 	 * @param string -- pole s práva všech skupin
 	 */
-	function __construct($rights) {
-		$this->groupRights = $rights;
-		$this->setRights();
+	function __construct() {
 	}
 	
 	/**
@@ -64,24 +44,35 @@ class Rights {
 	/**
 	 * Metoda nastaví práva
 	 */
-	private function setRights() {
-		if (ereg("^r[cw-]{2}$", $this->groupRights[$this->getAuth()->getGroupName()])){
-			$this->read = true;
+	private function parseRights($r) {
+      $rigths = array('read'=> false,
+                      'write' => false,
+                      'controll' => false);
+		if (ereg("^r[cw-]{2}$", $r)){
+         $rigths['read'] = true;
 		}
-		if (ereg("^[r-]w[c-]$", $this->groupRights[$this->getAuth()->getGroupName()])){
-			$this->write = true;
+		if (ereg("^[r-]w[c-]$", $r)){
+         $rigths['write'] = true;
 		}
-		if (ereg("^[rw-]{2}c$", $this->groupRights[$this->getAuth()->getGroupName()])){
-			$this->controll = true;
+		if (ereg("^[rw-]{2}c$", $r)){
+         $rigths['controll'] = true;
 		};
+      return $rigths;
 	}
+
+   /**
+    * Metoda přidá právo
+    */
+    public function addRight($name, $value) {
+       $this->rights[$name] = $this->parseRights($value);
+    }
 	
 	/**
 	 * Metoda vrací true pokud má uživatel právo číst
 	 * @return boolean -- právo ke čtení
 	 */
 	final public function isReadable() {
-		return $this->read;
+		return $this->rights[$this->getAuth()->getGroupName()]['read'];
 	}
 	
 	/**
@@ -89,7 +80,8 @@ class Rights {
 	 * @return boolean -- právo k zápisu
 	 */
 	final public function isWritable() {
-		return $this->write;
+//		return $this->write;
+      return $this->rights[$this->getAuth()->getGroupName()]['write'];
 	}
 	
 	/**
@@ -97,7 +89,8 @@ class Rights {
 	 * @return boolean -- plné právo
 	 */
 	final public function isControll() {
-		return $this->controll;
+//		return $this->controll;
+      return $this->rights[$this->getAuth()->getGroupName()]['controll'];
 	}
 }
 ?>

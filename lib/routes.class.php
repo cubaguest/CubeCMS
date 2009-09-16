@@ -1,7 +1,7 @@
 <?php
 /**
  * Třída pro obsluhu cest(routes).
- * Třida je určena k zjišťování a volby cesty pro kontroler a viewer. 
+ * Třida je určena k zjišťování a volby cesty pro kontroler a viewer.
  * Také slouží pro generování vlastních cest jednotlivých modulů.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
@@ -12,125 +12,144 @@
  */
 
 class Routes {
-	/**
-	 * Prefix pro id cesty u předdefinovaných cest
-	 */
-	const PRETEFINED_ROUTES_ID_PREFIX = 'p';
+/**
+ * Pole s cestami
+ * @var array
+ */
+   private $routes = array();
 
-	/**
-	 * Oddělovač mezi cestou a článkem (route-article)
-	 */
-	const ROUTE_URL_ID_SEPARATOR = '-';
+   /**
+    * Proměnná obsahuje urll část cesty
+    * @var string
+    */
+   private $urlRequest = null;
 
-	/**
-	 * Prvek s názvem cesty pro kontroler
-	 */
-	const ROUTE_NAME = 'name';
+   /**
+    * Název vybrané cesty
+    * @var string
+    */
+   private $selectedRoute = null;
 
-	/**
-	 * Prvek s popisem cesty pro jazyky
-	 */
-	const ROUTE_LABEl = 'label';
+   /**
+    * Pole s parametry předanými v url
+    * @var array
+    */
+   private $routeParams = array();
 
-	/**
-	 * Název routy kontroleru při použití výchozí routy
-	 */
-	const ROUTE_NOTPREDEFINED_CONTROLER = 'rdefault';
+   /**
+    * Konstruktor třídy
+    */
+   function __construct($urlRequest) {
+      $this->urlRequest = $urlRequest;
+      $this->initRoutes();
+//      $this->checkRoutes();
+   }
 
-	/**
-	 * ID vybrané cesty
-	 * @var integer
-	 */
-	private static $currentRouteId = null;
+   /**
+    * Metoda, která nastavuje cesty
+    *
+    */
+   protected function initRoutes() {}
 
-	/**
-	 * Jestli je cesta předdefinována nebo ne
-	 * @var boolean
-	 */
-	private static $currentRouteIsPredefined = false;
+   /**
+    * Metoda kontroluje cesty a vybírá správnou cestu
+    */
+   public function checkRoutes() {
+      foreach ($this->routes as $routeName => $route) {
+//         print "route<br>";
+//         var_dump($this->urlRequest);
+         $matches = array();
+         if(preg_match("/^".(string)$route['regexp']."\/?$/i", $this->urlRequest, $matches)) {
+            $this->selectedRoute = $routeName;
+            $this->routeParams = $matches;
+//            var_dump($matches);
+//            print "matches<br>";
+            return true;
+         }
+      }
+   }
 
-	/**
-	 * Pole s cestami
-	 * @var array
-	 */
-	private $routes = array();
-	
-	/**
-	 * Konstruktor třídy
-	 *
-	 * @param Article -- objekt článku (article)
-	 */
-	function __construct() {
-		$this->initRoutes();
-	}
+   /**
+    * Metoda přidává cestu do seznamu cest
+    * @param string -- název cesty
+    */
+   final public function addRoute($name, $regexp, $action, $replacement) {
+      $rege = addcslashes($regexp, '/');
 
-	/**
-	 * Nastavuje aktuální cestu
-	 * @param integer $id -- id cesty
-    * @param bool $predefined -- o jaký druh cesty se jedná (předdefinovaná x uživatelská)
-	 */
-	public static function setCurrentRouteId($id, $predefined = false){
-		//		Pokud je předdefinovaná cesta
-		if($predefined){
-			self::$currentRouteId = $id;
-			self::$currentRouteIsPredefined = true;
-		}
-		//		je použita výchozí cesta
-		else {
-			self::$currentRouteId = $id;
-			self::$currentRouteIsPredefined = false;
-		}
-	}
+      // přidání povinného parametru
+      $rege = preg_replace("/::([a-z0-9_-]+)::/", "(?P<$1>[a-z0-9_-]+)", $rege);
+      // přidání nepovinných parametrů
+      $rege = preg_replace("/:\?:([a-z0-9_-]+):\?:/", "(?:(?P<$1>[a-z0-9_-]+)\/?)?", $rege);
+      $rege = preg_replace("/\//", "/?", $rege);
+//      var_dump($rege);
+      $this->routes[$name] = array('name' => $name,
+          'regexp' => $rege,
+          'route' => $regexp,
+          'actionCtrl' => $action,
+          'replacement' => $replacement);
+   }
 
-	/**
-	 * Metoda, která nastavuje cesty
-	 *
-	 */
-	function initRoutes(){}
-	
-	/**
-	 * Metoda přidává cestu do seznamu cest
-	 * @param string -- název cesty
-	 */
-	final public function addRoute($id, $routeName, $label) {
-		$this->routes[$id] = array(self::ROUTE_NAME => $routeName, self::ROUTE_LABEl => $label);
-	}
-	
-	/**
-	 * Metoda vrací použitou cestu
-	 * @return string -- název cesty
-	 */
-	final public function getRoute() {
-		if(self::$currentRouteIsPredefined){
-			return $this->routes[self::$currentRouteId][self::ROUTE_NAME];
-		} else {
-			return self::ROUTE_NOTPREDEFINED_CONTROLER;
-		}
-	}
+   /**
+    * Metoda vrací název použité cesty
+    * @return string -- název cesty
+    */
+   final public function getRouteName() {
+      return $this->selectedRoute;
+   }
 
-	/**
-	 * Metoda vrací true pokud je nastaveno cesta
-	 * @return boolean -- true pokud je cesta nastavena
-	 */
-	public function isRoute() {
-		if(self::$currentRouteId != null){
-			return true;
-		}
-		return false;
-	}
+   /**
+    * Metoda vrací true pokud je nastavena cesta a je validní
+    * @return boolean -- true pokud je cesta nastavena
+    */
+   public function isRoute() {
+      if($this->selectedRoute === null) {
+         return false;
+      }
+      return true;
+   }
 
-    /**
-     * Metoda vrací informace o předdefinované cestě
-     * @param integer $id -- id routy
-     * @return array -- pole s informacemi o routě
-     */
-    public function getPredefRoute($id) {
-        if(isset($this->routes[$id])){
-            $arr = array();
-            $arr[0] = $this->routes[$id][self::ROUTE_LABEl];
-            $arr[1] = $id;
-            return $arr;
-        }
-    }
+   /**
+    * Metoda vrací název akce která se má podle cesty provádět
+    * @return string
+    */
+   public function getActionName() {
+      if($this->selectedRoute != null){
+         return $this->routes[$this->selectedRoute]['actionCtrl'];
+      }
+      return false;
+   }
+
+   /**
+    * Metoda vrací pole s parametry předanými v url
+    * @return array -- pole parametrů
+    */
+   public function getRouteParams() {
+      return $this->routeParams;
+   }
+
+   /**
+    * Metoda vrací parametr předaný v url
+    * @return string -- parametr
+    */
+   public function getRouteParam($name, $defaultValue = null) {
+      if(isset($this->routeParams[$name])){
+         return $this->routeParams[$name];
+      } else {
+         return $defaultValue;
+      }
+   }
+
+   /**
+    * Metoda vrací zadanou cestu ze seznamu cest
+    * @param string $name -- název cesty
+    * @return array -- pole s parametry cesty (název, regexp, ...)
+    */
+   public function getRoute($name) {
+      if(isset($this->routes[$name])){
+         return $this->routes[$name];
+      } else {
+         return null;
+      }
+   }
 }
 ?>

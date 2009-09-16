@@ -26,64 +26,64 @@ abstract class Controller {
    private $viewObj = null;
 
    /**
-    * Objekt se systémovými informacemi o modulu
-    * @var Module_Sys
+    * Objekt kategorie
+    * @var Category
     */
-   private $moduleSys = null;
+   private $category = null;
 
    /**
-    * Objekt s šablonou
-    * @var Template
+    * Objekt modulu
+    * @var Module
     */
-   private $viewTemplate = null;
+   private $module = null;
 
    /**
-    * Objekt kontejneru pro přenos dat do pohledu (viewru) a šablony
-    * @var Container
+    * Objket pro lokalizaci
+    * @var Locale
     */
-   //	private $container = null;
+    private $locale = null;
+
+    /**
+     * Objekt cest modulu
+     * @var Routes
+     */
+    private $routes = null;
+
+    /**
+     * objekt linku
+     * @var Url_Link
+     */
+    private $link = null;
 
    /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
     * @param Module_Sys $moduleSys -- systémový objekt modulu
     */
-   public final function __construct(Module_Sys $moduleSys) {
+   public final function __construct(Category $category, Routes $routes) {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
       //      $this->container = new Container();
-      $this->moduleSys = $moduleSys;
-      $this->viewTemplate = new Template();
-      // donastavení systému do šablony
-      $this->viewTemplate->_setSysModule($this->moduleSys);
+      $this->category = $category;
+      $this->routes = $routes;
+
+      $link = new Url_Link_Module();
+      $link->setModuleRoutes($routes);
+      $link->category($this->category()->getUrlKey());
+      $this->link = $link;
+      // locales
+      $this->locale = new Locale($category->getModule()->getName());
 
       //		Načtení třídy View
-      $viewClassName = ucfirst($this->module()->getName()).'_View';
-      if(!class_exists($viewClassName)){
-         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
-               , $viewClassName, $this->module()->getName()),1);
-      }
+      $viewClassName = ucfirst($category->getModule()->getName()).'_View';
+//      if(!class_exists($viewClassName)){
+//         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
+//               , $viewClassName, $this->module()->getName()),1);
+//      }
       //	Vytvoření objektu pohledu
-      $this->viewObj = new $viewClassName($this->viewTemplate, $this->sys());
-
-      // nastavení titulku kategorie šablony
-      $this->viewTemplate->setCategoryName($this->sys()->module()->getLabel());
+      $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
 
       // Inicializace kontroleru modulu
       $this->init();
-
-      /**
-       * funkce pro aautomatické načítání modelu
-       */
-//      function __autoload($classOrigName){
-//         $modelFileName = substr($className, 0, strpos(strtolower($classOrigName), 'model'));
-//         if (file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-//               . Module::getCurrentModule()->getName() . DIRECTORY_SEPARATOR
-//               . AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $modelFileName . '.php')){
-//            require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-//               . Module::getCurrentModule()->getName() . DIRECTORY_SEPARATOR
-//               . AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . $modelFileName . '.php');
-//         }
-//      }
    }
 
 
@@ -103,14 +103,6 @@ abstract class Controller {
    }
 
    /**
-    * Metoda vrací objekt systému modulu
-    * @return Module_Sys
-    */
-   final public function sys() {
-      return $this->moduleSys;
-   }
-
-   /**
     * MEtoda vrací objekt viewru modulu
     * @return View
     */
@@ -125,23 +117,20 @@ abstract class Controller {
     * @return Links -- objekt pro práci s odkazy
     * @deprecated
     */
-   final public function getLink($clear = false, $onlyWebRoot = false) {
-      return $this->link($clear, $onlyWebRoot);
-   }
+//   final public function getLink($clear = false, $onlyWebRoot = false) {
+//      return $this->link($clear, $onlyWebRoot);
+//   }
 
    /**
     * Metoda vrací odkaz na objekt pro práci s odkazy
     * @param boolean -- true pokud má byt link čistý
     * @param boolean -- true pokud má byt link bez kategorie
-    * @return Links -- objekt pro práci s odkazy
+    * @return Url_Link -- objekt pro práci s odkazy
     */
-   final public function link($clear = false, $onlyWebRoot = false) {
-      $link = clone $this->sys()->link();
+   final public function link($clear = false) {
+      $link = clone $this->link;
       if($clear){
          $link->clear();
-      }
-      if($onlyWebRoot){
-         $link->clear()->category();
       }
       return $link;
    }
@@ -152,7 +141,7 @@ abstract class Controller {
     * @deprecated
     */
    final public function getModule() {
-      return $this->module();
+      return $this->category()->getModule();
    }
 
    /**
@@ -160,7 +149,55 @@ abstract class Controller {
     * @return Module -- objekt modulu
     */
    final public function module() {
-      return $this->sys()->module();
+      return $this->category()->getModule();
+   }
+
+   /**
+    * Metoda vrací objekt kategorie
+    * @return Category
+    */
+   final public function category() {
+      return $this->category;
+   }
+
+   /**
+    * Metoda vrací objekt cest
+    * @return Routes
+    */
+   final public function routes() {
+      return $this->routes;
+   }
+
+   /**
+    * Metoda vrací parametry požadavku vybrané z URL
+    * @param string $name -- název parametru
+    * @param mixed $def -- výchozí hodnota vrácená pokud nebyl parametr přenesen
+    * @return mixed -- hodnota parametru
+    */
+   final public function getRequest($name, $def = null) {
+      return $this->routes()->getRouteParam($name, $def);
+   }
+
+   /**
+    * Metoda vrací parametr předaný v url za cestou
+    * @param string $name -- název parametru
+    * @param mixed $def -- výchozí hodnota vrácená pokud nebyl parametr přenesen
+    * @return mixed -- hodnota parametru
+    */
+   final public function getRequestParam($name, $def = null) {
+      if(isset ($_GET[$name])){
+         return urldecode($_GET[$name]);
+      } else {
+         return $def;
+      }
+   }
+
+   /**
+    * Metoda vrací objekt lokalizace
+    * @return Locale
+    */
+   final public function locale() {
+      return $this->locale;
    }
 
    /**
@@ -177,24 +214,7 @@ abstract class Controller {
     * @return Auth -- objekt autorizace
     */
    final public function auth() {
-      return $this->sys()->rights()->getAuth();
-   }
-
-   /**
-    * Metoda vrací objekt na akci
-    * @return ModuleAction -- objekt akce
-    * @deprecated
-    */
-   final public function getAction() {
-      return $this->action();
-   }
-
-   /**
-    * Metoda vrací objekt na akci
-    * @return ModuleAction -- objekt akce
-    */
-   final public function action() {
-      return $this->sys()->action();
+//      return $this->sys()->rights()->getAuth();
    }
 
    /**
@@ -211,41 +231,7 @@ abstract class Controller {
     * @return Rights -- objekt práv
     */
    final public function rights() {
-      return $this->sys()->rights();
-   }
-
-   /**
-    * Metoda vrací objekt s článkem
-    * @return Article -- objekt článku
-    * @deprecated
-    */
-   final public function getArticle() {
-      return $this->article();
-   }
-
-   /**
-    * Metoda vrací objekt s článkem
-    * @return Article -- objekt článku
-    */
-   final public function article() {
-      return $this->sys()->article();
-   }
-
-   /**
-    * Metoda vrací objekt s cetsami - routes
-    * @return Routes -- objekt Rout
-    * @deprecated
-    */
-   final public function getRoutes() {
-      return $this->routes();
-   }
-
-   /**
-    * Metoda vrací objekt s cetsami - routes
-    * @return Routes -- objekt Rout
-    */
-   final public function routes() {
-      return $this->sys()->route();
+      return $this->category()->getRights();
    }
 
    /**
@@ -268,14 +254,7 @@ abstract class Controller {
     * Metoda volaná při destrukci objektu
     */
    function __destruct() {
-      unset ($this->viewTemplate);
    }
-
-   /**
-    * Hlavní metoda třídy kontroleru, provádí se pokud není žádná akce ani
-    * článek. Musí být implementována v každém modulu
-    */
-   abstract function mainController();
 
    /**
     * Metoda změní výchozí actionViewer pro danou akci na zadaný viewer
@@ -297,30 +276,30 @@ abstract class Controller {
     * Metoda kontroluje práva pro čtení modulu. v opačném případě vyvolá přesměrování
     */
    final public function checkReadableRights() {
-      if(!$this->getRights()->isReadable()){
+      if(!$this->rights()->isReadable()){
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
-         $this->getLink(true)->reload();
+         $this->link(true)->reload();
       }
    }
    /**
     * Metoda kontroluje práva pro zápis do modulu. v opačném případě vyvolá přesměrování
     */
    final public function checkWritebleRights() {
-      if(!$this->getRights()->isWritable()){
+      if(!$this->rights()->isWritable()){
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
-         $this->getLink(true)->reload();
+         $this->link(true)->reload();
       }
    }
    /**
     * Metoda kontroluje práva pro plný přístup k modulu. v opačném případě vyvolá přesměrování
     */
    final public function checkControllRights() {
-      if(!$this->getRights()->isControll()){
+      if(!$this->rights()->isControll()){
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
-         $this->getLink(true)->reload();
+         $this->link(true)->reload();
       }
    }
 
@@ -338,46 +317,66 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @return Template
     */
    final public function _getTemplateObj() {
-      return $this->viewTemplate;
+      return $this->view()->template();
    }
 
    /**
-    * Metoda spustí viewer modulu
-    *
-    * @param Template -- objetk šablony (odkaz)
+    * Metoda spustí metodu kontroleru a viewer modulu
     */
-   final public function runView($actionName) {
-      if($this->actionViewer == null){
-         $viewName = $actionName;
+   final public function runCtrl() {
+      if(!method_exists($this, $this->routes()->getActionName().'Controller')) {
+         throw new BadMethodCallException(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
+         $this->routes()->getActionName(), $this->module()->getName()), 1);
+      }
+
+      if($this->actionViewer === null) {
+         $viewName = $this->routes()->getActionName().'View';
       } else {
-         $viewName = $this->actionViewer.AppCore::MODULE_VIEWER_SUFIX;
+         $viewName = $this->actionViewer.'View';
       }
-      //			Doplnění sufixu View pro jistotu
-      if (strpos($this->actionViewer, AppCore::MODULE_VIEWER_SUFIX) === false) {
-         $this->actionViewer .= AppCore::MODULE_VIEWER_SUFIX;
+      //	zvolení viewru modulu pokud existuje
+      if(!method_exists($this->view(), $viewName)) {
+         throw new BadMethodCallException(sprintf(
+         _("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
+         $viewName, $this->module()->getName()), 2);
       }
 
-      //	zvolení viewru modulu pokud existuje
-      try {
-         if(!method_exists($this->view(), $viewName)){//TODO doladit jesli se správně dělají akce
-            throw new BadMethodCallException(sprintf(
-                  _("Action Viewer \"%s\" v modulu \"%s\" nebyl implementován"),
-                  $viewName, $this->getModule()->getName()), 2);
-         }
+      // spuštění Controlleru
+      if($this->{$this->routes()->getActionName().'Controller'}() !== false) {
+      // pokud je kontrolel v pořádku spustíme view
          $this->view()->$viewName();
-      } catch (BadMethodCallException $e) {
-         new CoreErrors($e);
       }
-      unset ($this->viewObj);
    }
 
    /**
-    * Metoda vytvoří objekt modelu
-    * @param string $name --  název modelu
-    * @return Objekt modelu
+    * Metoda spustí zadanou akci na daném kontroleru. Kontroluje, jestli existuje
+    * metoda viewru pro daný výstup, nebo ne
+    * @param string $actionName -- název akce
+    * @param string $outputType -- typ výstupu
     */
-   final public function createModel($name) {
-      return new $name($this->sys());
+   final public function runCtrlAction($actionName, $outputType) {
+      if(!method_exists($this, $actionName.'Controller')) {
+         trigger_error(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
+         $actionName, $this->module()->getName()));
+      }
+
+      $viewName = null;
+      //	zvolení viewru modulu pokud existuje
+      if(method_exists($this->view(), $actionName.ucfirst($outputType).'View')) {
+         $viewName = $actionName.ucfirst($outputType).'View';
+      } else if(method_exists($this->view(), $actionName.'View')) {
+         $viewName = $actionName.'View';
+      } else {
+         trigger_error(sprintf(_("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
+         $actionName, $this->module()->getName()));
+
+      }
+
+      // spuštění Viewru
+      if($this->{$actionName.'Controller'}() !== false AND $viewName != null) {
+      // pokud je kontrolel v pořádku spustíme view
+         $this->view()->{$viewName}();
+      }
    }
 
    /**
@@ -386,7 +385,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @return string -- přeložený řetězec
     */
    final public function _($message) {
-      return $this->sys()->locale()->_m($message);
+      return $this->locale()->_m($message);
    }
 
    /**
@@ -395,7 +394,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @return string -- přeložený řetězec
     */
    final public function _m($message) {
-      return $this->sys()->locale()->_m($message);
+      return $this->locale()->_m($message);
    }
 }
 ?>

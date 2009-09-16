@@ -37,19 +37,29 @@ class Helper_Text extends Helper {
 	 * @param string -- řetězec z kterého se odstraní znaky
 	 * @return string -- výsledný řetězec
 	 */
-	public function utf2ascii($text)
-	{
-		$return = Str_Replace(
-		Array("á","č","ď","é","ě","í","ľ","ň","ó","ř","š","ť","ú","ů","ý","ž","Á","Č",
-         "Ď","É","Ě","Í","Ľ","Ň","Ó","Ř","Š","Ť","Ú","Ů","Ý","Ž") ,
-		Array("a","c","d","e","e","i","l","n","o","r","s","t","u","u","y","z","A","C",
-         "D","E","E","I","L","N","O","R","S","T","U","U","Y","Z") ,
-		$text);
-		$return = Str_Replace(Array(" ", "_"), "-", $return); //nahradí mezery a podtržítka pomlčkami
-		$return = Str_Replace(array("----","---","--"), "-", $return); //odstraní nekolik pomlcek za sebou
-		$return = Str_Replace(Array("(",")",".","!",",","\"","'"), "", $return); //odstraní ().!,"'
-		$return = StrToLower($return); //velká písmena nahradí malými.
-      return $return;
+	public function utf2ascii(&$text){
+//		$return = Str_Replace(
+//		Array("á","č","ď","é","ě","í","ľ","ň","ó","ř","š","ť","ú","ů","ý","ž","Á","Č",
+//         "Ď","É","Ě","Í","Ľ","Ň","Ó","Ř","Š","Ť","Ú","Ů","Ý","Ž") ,
+//		Array("a","c","d","e","e","i","l","n","o","r","s","t","u","u","y","z","A","C",
+//         "D","E","E","I","L","N","O","R","S","T","U","U","Y","Z") ,
+//		$text);
+
+		$text = strtr($text,
+		Array("á" => 'a',"č"=>'c',"ď"=>'d',"é"=>'e',"ě"=>'e',"í"=>'i',"ľ"=>'l',"ň"=>'n',
+         "ó"=>'o',"ř"=>'r',"š"=>'s',"ť"=>'t',"ú"=>'u',"ů"=>'u',"ý"=>'y',"ž"=>'z',"Á"=>'A',
+         "Č"=>'C',"Ď"=>'D',"É"=>'E',"Ě"=>'E',"Í"=>'I',"Ľ"=>'L',"Ň"=>'N',"Ó"=>'O',"Ř"=>'R',
+         "Š"=>'S',"Ť"=>'T',"Ú"=>'U',"Ů"=>'U',"Ý"=>'Y',"Ž"=>'Z'));
+//		Array("a","c","d","e","e","i","l","n","o","r","s","t","u","u","y","z","A","C",
+//         "D","E","E","I","L","N","O","R","S","T","U","U","Y","Z") ,
+//		$text);
+      $text = preg_replace("/[ \_-]{1,}/", "-", $text);
+      $text = preg_replace("/[().\"\'!?<>,]?/", "", $text);
+//		$return = Str_Replace(Array(" ", "_"), "-", $return); //nahradí mezery a podtržítka pomlčkami
+//		$return = Str_Replace(array("----","---","--"), "-", $return); //odstraní nekolik pomlcek za sebou
+//		$text = Str_Replace(Array("(",")",".","!",",","\"","'"), "", $text); //odstraní ().!,"'
+//		$return = StrToLower($return); //velká písmena nahradí malými.
+      return $text;
 	}
 
 	/**

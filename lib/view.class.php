@@ -18,16 +18,22 @@ abstract class View {
    private $template = null;
 
    /**
-    * Objekt se systémovými parametry modulu (práva, ...)
-    * @var Module_Sys
+    * Objekt s pro lokalizaci
+    * @var Locale
     */
-   private $moduleSys = null;
+   private $locale = null;
 
    /**
-    * Pole s proměnými z kontroleru, na konci každé metody jsou přeneseny do šablony
-    * @var array
+    * Objekt s odkazem
+    * @var Url_Link
     */
-   protected $viewVars = array();
+   private $link = null;
+
+   /**
+    * Objekt c kategorií
+    * @var Category
+    */
+   private $categrory = null;
 
    /**
     * Konstruktor Viewu
@@ -35,9 +41,11 @@ abstract class View {
     * @param Template $template -- objekt šablony
     * @param Module_Sys $moduleSys --  systémový objekt modulu
     */
-   function __construct(Template $template, Module_Sys $moduleSys) {
-      $this->template = $template;
-      $this->moduleSys = $moduleSys;
+   function __construct(Url_Link_Module $link, Category $category) {
+      $this->template = new Template_Module($link, $category);
+      $this->link = $link;
+      $this->categrory = $category;
+      $this->locale = new Locale($category->getModule()->getName());
       //		inicializace viewru
       $this->init();
    }
@@ -46,9 +54,6 @@ abstract class View {
     * Destruktor při vyčištění viewru převede všechny interní proměnné do šablony
     */
    public function  __destruct() {
-      foreach ($this->viewVars as $varName => $var) {
-         $this->template()->{$varName} = $var;
-      }
    }
 
    /**
@@ -97,15 +102,6 @@ abstract class View {
    }
 
    /**
-    * Metoda převede proměnné viewru do šablony
-    */
-   //   public function _assignVarsToTemplate() {
-   //      foreach ($this->viewVars as $varName => $var) {
-   //         $this->template()->{$varName} = $var;
-   //      }
-   //   }
-
-   /**
     * Metoda, která se provede vždy
     */
    public function init() {}
@@ -120,29 +116,23 @@ abstract class View {
     * @return Template -- objekt šablony
     */
    public function template(){
-      //TODO zbytečné
-      if($this->template == null){
-         $this->template = new Template();
-         return $this->template;
-      } else {
-         return $this->template;
-      }
+      return $this->template;
    }
 
    /**
-    * Metoda vrací objekt se systémovým nasatvením modulu
-    * @return Module_Sys
+    * Metoda vrací objekt s kategorií
+    * @return Category
     */
-   final public function sys() {
-      return $this->moduleSys;
+   final public function category() {
+      return $this->categrory;
    }
 
    /**
-    * Metoda vrací objekt s modulem
-    * @return Module
+    * Metoda vrací název modulu
+    * @return string
     */
    final public function module() {
-      return $this->sys()->module();
+      return $this->categrory()->getModuleName();
    }
 
    /**
@@ -150,24 +140,23 @@ abstract class View {
     * @return Rights -- objekt práv
     */
    final public function rights() {
-      return $this->sys()->rights();
+      return $this->category()->getRights();
+   }
+
+   /**
+    * Metoda vrací objekt odkazu na  danou stránku (alias pro metodu l())
+    * @return Url_link_Module -- objek odkazů
+    */
+   final public function link() {
+      return clone $this->l();
    }
 
    /**
     * Metoda vrací objekt odkazu na  danou stránku
-    * @return Links -- objek odkazů
+    * @return Url_link_Module -- objek odkazů
     */
-   final public function link() {
-      return clone $this->sys()->link();
-   }
-
-   /**
-    * Metoda vytvoří objekt modelu
-    * @param string $name --  název modelu
-    * @return Objekt modelu
-    */
-   final public function createModel($name) {
-      return new $name($this->sys());
+   final public function l() {
+      return clone $this->link;
    }
 
    /**

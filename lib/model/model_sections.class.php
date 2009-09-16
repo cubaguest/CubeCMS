@@ -24,8 +24,6 @@ class Model_Sections extends Model_Db {
 	const COLUMN_SEC_ALT 	= 'salt';
 	const COLUMN_SEC_ID		= 'id_section';
 	const COLUMN_SEC_PRIORITY		= 'priority';
-   const COLUMN_SEC_LABEL_ORIG = 'label';
-   const COLUMN_SEC_ALT_ORIG = 'alt';
 }
 
 ?>
