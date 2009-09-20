@@ -1,5 +1,6 @@
 <div id="editTextForm">
-<ul class="langMenu">
+<?if(Locale::isMultilang()){?>
+   <ul class="langMenu">
    <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
       <li>
          <a href="#textLang<?=$key?>" class="selected">
@@ -9,22 +10,22 @@
       </li>
    <?}?>
 </ul>
-
+<?}?>
 <div class="tabsContent">
 <form method="post" action="<?=$this->l();?>">
    <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
    <p id="textLang<?=$key?>" class="tabcontent">
-      <?=$this->_m("Text");?>*:<br />
-		<textarea class="textarea_tinymce textarea{if $VARS.ERROR_ITEMS.text.$KEYLANG eq true} badItem{/if}"
+      <?=$this->_("Text");?>*:<br />
+		<textarea class="textarea_tinymce textarea"
             rows="20" cols="70" name="text_text[<?=$key;?>]"
-            ><?=$this->post($_POST["text_text"][$key], $this->texts[$key]);?></textarea>
+            ><?=$this->post('["text_text"]['.$key.']', $this->texts->{Text_Model_Detail::COLUMN_TEXT}[$key]);?></textarea>
 	</p>
    
    
    <?}?>
 	<br />
-   <input name="text_reset" type="reset" value="<?=$this->_m("Obnovit")?>" />
-	<input name="text_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
+   <input name="text_reset" type="reset" value="<?=$this->_("Obnovit")?>" />
+	<input name="text_send" type="submit" value="<?=$this->_("Odeslat")?>" />
 </form>
 </div>
 <script type="text/javascript" language="javascript">
@@ -35,7 +36,8 @@
       -->
    </script>
 </div>
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->l()->action()));?>
+<?
+$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
 <? $this->includeTplObj($this->EPLfiles); ?>
 
 

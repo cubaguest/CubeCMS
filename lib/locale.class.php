@@ -84,6 +84,12 @@ class Locale {
    private static $appLangs = array();
 
    /**
+    * Jestli je aplikace vícejazyčná
+    * @var boolean
+    */
+   private static $isMultilang = false;
+
+   /**
     * Doména modulu
     * @var string
     */
@@ -95,6 +101,9 @@ class Locale {
    public static function factory() {
       // vybere jazyky aplikace
       self::parseLangs();
+      if(count(self::$appLangs) > 1){
+         self::$isMultilang = true;
+      }
       // nastaví výchozí jazyk
       self::$defaultLang = self::$appLangs[0];
    }
@@ -309,6 +318,14 @@ class Locale {
    private function bindTextDomain() {
       bindtextdomain($this->moduleDomain, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
          . DIRECTORY_SEPARATOR . $this->moduleDomain . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+   }
+
+   /**
+    * Metoda vrací true pokud se jedná o vícejazyčnou aplikaci
+    * @return boolean
+    */
+   public static function isMultilang() {
+      return self::$isMultilang;
    }
 }
 ?>

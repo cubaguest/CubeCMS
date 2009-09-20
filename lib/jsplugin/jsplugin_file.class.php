@@ -12,7 +12,6 @@
  */
 
 class JsPlugin_File {
-	
 	/**
 	 * Název souboru 
 	 * @var string
@@ -31,13 +30,24 @@ class JsPlugin_File {
     */
    private $virtualFile = false;
 
+   /**
+    * Adresář se souborem
+    * @var string
+    */
+   private $dir = null;
+
 	/**
 	 * Konstruktor
 	 * @param string -- název souboru
 	 */
-	function __construct($file, $virtual = false) {
+	function __construct($file, $virtual = false, $dir = null) {
 		$this->file = $file;
       $this->virtualFile = $virtual;
+      if($virtual){
+         $this->dir = "./jsplugin/JSPLUGINNAME/".Category::getMainCategory()->getUrlKey()."/";
+      } else {
+         $this->dir = "./".JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
+      }
 	}
 	
 	/**
@@ -54,7 +64,7 @@ class JsPlugin_File {
 	 * @return string -- soubor s parametry
 	 */
 	function __toString() {
-		$file = $this->file;
+		$file = $this->getName();
 		if(!empty($this->fileParams)){
 			$params = http_build_query($this->fileParams);
 			$file.='?'.$params;
@@ -118,8 +128,20 @@ class JsPlugin_File {
     * Metoda vrací název souboru
     * @return string -- název souboru
     */
-   public function getName() {
-      return $this->file;
+   public function getName($withDir = true) {
+      if($withDir == true){
+         return $this->getDir().$this->file;
+      } else {
+         return $this->file;
+      }
+   }
+   
+   /**
+    * Metoda vrací název souboru
+    * @return string -- název souboru
+    */
+   public function getDir() {
+      return $this->dir;
    }
 }
 ?>

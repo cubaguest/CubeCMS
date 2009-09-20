@@ -735,6 +735,10 @@ class AppCore {
 
       // spuštění modulu
       try {
+         if(self::getCategory() instanceof Category){
+            throw new CoreException(_("Špatně zadaná požadavek na modul"));
+         }
+
          // načtení a kontrola cest u modulu
          $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
          if(!class_exists($routesClassName)) {
@@ -756,10 +760,10 @@ class AppCore {
          $controller = new $controllerClassName(self::getCategory(), $routes);
          $controller->runCtrlAction($this->urlRequest->getAction(), $this->urlRequest->getOutputType());
          
-      } catch (Exception $e)  {
-         new CoreErrors($e);
+      } catch (Exception $e){
+         trigger_error($e->getMessage());
       }
-
+      
       $content = ob_get_contents();
       // vytvoření objektu pro odeslání typu výstupu
       $output = new Template_Output($this->urlRequest->getOutputType());
@@ -1050,7 +1054,7 @@ class AppCore {
       $pluginName = 'JsPlugin_'.ucfirst($this->urlRequest->getName());
 
       $jsPlugin = new $pluginName();
-
+      
       // vytvoření souboru
       $file = new JsPlugin_File($this->urlRequest->getAction().'.'.$this->urlRequest->getOutputType(), true);
       $file->setParams($this->urlRequest->getUrlParams());
@@ -1083,9 +1087,12 @@ class AppCore {
     */
    public function runCore() {
       $this->urlRequest = new Url_Request();
+      Locale::setLang($this->urlRequest->getUrlLang());
 
       // načtení kategorie
       self::$category = new Category($this->urlRequest->getCategory(),true);
+
+      Url_Link::setCategory(self::$category->getUrlKey());
 
       // kontrola jestli zadaná kategorie vůbec existuje
       if(!self::$category->isValid()) {

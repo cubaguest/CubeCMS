@@ -125,40 +125,52 @@ class JsPlugin_TinyMce extends JsPlugin {
    const TINY_MODE_TEXTAREAS = 'textareas';
 
    /**
+    * Pole s konfigurací pluginu
+    * @var array
+    */
+   protected $config = array(
+   'theme' => 'simple',
+   'mode' => 'textareas',
+   'entity_encoding' => 'raw',
+   'encoding' => 'xml',
+   'external_image_list_url' => null,
+   'external_link_list_url' => null,
+   'template_external_list_url' => null,
+   'template_replace_values' => array()
+   );
+
+
+   /**
     * výchozí parametry tinyMCE
     */
    private $defaultParams = array(
    'mode' => 'textareas',
-   self::PARAM_THEME => 'advanced',
+   'theme' => 'advanced',
    'language' => 'cs',
-   'force_br_newlines' => 'true',
+   'force_br_newlines' => true,
+   'document_base_url' => null,
+   'remove_script_host' => false,
+   'content_css' => null,
+   'extended_valid_elements' => 'td[*],div[*]',
    'theme_advanced_toolbar_location' => 'top',
    'theme_advanced_toolbar_align' => 'left',
    'theme_advanced_statusbar_location' => 'bottom',
-   'theme_advanced_resizing' => 'true',
-   'entity_encoding' => 'raw',
-   'encoding' => 'xml',
-   'document_base_url' => null,
+   'theme_advanced_resizing' => 'true');
+
+   private $advParams = array(
    'external_image_list_url' => null,
    'external_link_list_url' => null,
-   'remove_script_host' => 'false',
-   'content_css' => null,
    'template_external_list_url' => null,
    'template_replace_values' => array(),
-   'extended_valid_elements' => 'td[*],div[*]',
-   //         'convert_newlines_to_brs' => true,
-   'force_br_newlines' => true
-   //        'force_p_newlines' => false
-   //			'relative_urls' => 'false'
-   );
+   'theme_advanced_toolbar_location' => 'external');
 
    /**
     * Parametry pro Advanced THEME
     * @var array
     */
-   private $advancedParams = array(
-   self::PLUGINS_ARRAY_NAME => array('safari', 'style', 'table', 'save', 'advhr', self::PLUGIN_IMAGES, 'advlink', 'emotions', 'iespell', 'inlinepopups',
-   'insertdatetime', 'preview', self::PLUGIN_MEDIA, 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
+   private $advanced1Params = array(
+   'plugins' => array('safari', 'style', 'table', 'save', 'advhr', 'advimage', 'advlink', 'emotions', 'iespell', 'inlinepopups',
+   'insertdatetime', 'preview', 'media', 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
    'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras', 'template'),
    'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
    'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen', 'template'),
@@ -166,45 +178,106 @@ class JsPlugin_TinyMce extends JsPlugin {
    'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
    'forecolor', 'backcolor'),
    'theme_advanced_buttons3' => array('tablecontrols', '|', 'hr', 'removeformat', 'visualaid', '|', 'sub', 'sup', '|', 'charmap',
-   'emotions', self::ICON_IMAGES , self::ICON_MEDIA, '|', 'ltr', 'rtl'));
+   'emotions', 'image' , 'media', '|', 'ltr', 'rtl'));
 
    /**
     * Parametry pro ořezané advanced THEME
     * @var array
     */
    private $advancedSimpleParams = array(
-   self::PLUGINS_ARRAY_NAME => array('safari', 'inlinepopups', 'searchreplace', 'contextmenu', 'paste'),
+   'plugins' => array('safari', 'inlinepopups', 'searchreplace', 'contextmenu', 'paste'),
    'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
    'justifyfull', '|', 'bullist,numlist', '|','search', '|', 'link', 'unlink','|', 'undo', 'redo','code'),
    'theme_advanced_buttons2' => array(),
    'theme_advanced_buttons3' => array());
+
+   /**
+    * Parametry pro ořezané advanced THEME
+    * @var array
+    */
+   private $advancedFullParams = array(
+   'plugins' => "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,imagemanager,filemanager",
+   'theme_advanced_buttons1' => "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+   'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+   'theme_advanced_buttons3' => "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+   'theme_advanced_buttons4' => "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage"
+);
 
    protected function initJsPlugin() {
    //		Název pluginu
       $this->defaultParams['document_base_url'] = Url_Request::getBaseWebDir();
    }
 
-   protected function initFiles() {
-   //		Výchozí js soubor pluginu
-//      $jsFile = new JsPlugin_JsFile("tiny_mce_params.js", true);
-//      //$face =  AppCore::getTepmlateFaceDir(false,false);
-//      //$face = substr($face, 0, strlen($face)-1);
-//      $jsFile->setParam(self::PARAM_FACE, Template::face());
-////      $jsFile->setParam(self::PARAM_CATEGORY, Category::getLabel());
-////      $jsFile->setParam(self::PARAM_SECTION, Category::getSectionLabel());
-//      $jsFile->setParam('language', Locale::getLang());
-//      $this->addJsFile($jsFile);
-      //		Přidání js soubrů pluginu
+   protected function setFiles() {
       $this->addJsFile(new JsPlugin_JsFile("tiny_mce.js"));
-      $this->addJsFile(new JsPlugin_JsFile("settings_basictheme.js", true));
+
+      switch ($this->getCfgParam('theme')) {
+         case 'simple':
+            $cfgFile = new JsPlugin_JsFile("settingssimple.js", true);
+            break;
+         case 'advanced2':
+            $cfgFile = new JsPlugin_JsFile("settingsadvanced2.js", true);
+            break;
+         case 'full':
+            $cfgFile = new JsPlugin_JsFile("settingsfull.js", true);
+            break;
+         case 'advanced1':
+         default:
+            $cfgFile = new JsPlugin_JsFile("settingsadvanced1.js", true);
+            break;
+      }
+
+
+      $this->addJsFile($cfgFile);
    }
 
    /**
-    * Metodda pro generování základního nastavení
+    * Metodda pro generování simple theme
     */
-   public function settings_basictheme(){
-      print "nastveni ";
+   public function settingsSimpleView() {
+      $params = $this->defaultParams;
+      $params['document_base_url'] = Url_Request::getBaseWebDir();
+      $params['language'] = Locale::getLang();
+      $params['theme'] = 'simple';
 
+      $content = $this->cfgFileHeader();
+      $content .= $this->generateParamsForFile($params);
+      $content .= $this->cfgFileFooter();
+
+      print ($content);
+   }
+
+   /**
+    * Metodda pro generování advanced 1 theme
+    */
+   public function settingsSimpleView() {
+      $params = $this->defaultParams;
+      $params['document_base_url'] = Url_Request::getBaseWebDir();
+      $params['language'] = Locale::getLang();
+      $params['theme'] = 'simple';
+
+      $content = $this->cfgFileHeader();
+      $content .= $this->generateParamsForFile($params);
+      $content .= $this->cfgFileFooter();
+
+      print ($content);
+   }
+
+   /**
+    * Metodda pro generování advanced 1 theme
+    */
+   public function settingsFullView() {
+      $params = $this->defaultParams;
+      $params['document_base_url'] = Url_Request::getBaseWebDir();
+      $params['language'] = Locale::getLang();
+
+      $params = array_merge($params, $this->advancedFullParams);
+
+      $content = $this->cfgFileHeader();
+      $content .= $this->generateParamsForFile($params);
+      $content .= $this->cfgFileFooter();
+
+      print ($content);
    }
 
 
@@ -217,49 +290,49 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metda vytvoří výchozí konfigurační soubor
     */
    protected function generateFile(JsPlugin_JsFile $file) {
-      if($file->getName() == 'tiny_mce_params.js') {
-         $file->getParam(self::PARAM_THEME) == null ? $theme = null :
-             $theme = rawurldecode($file->getParam(self::PARAM_THEME));
-         //         doplnění obsahu s css
-         if($file->getParam(self::PARAM_FACE) != null) {
-            $faceUrl = Links::getMainWebDir().Template::FACES_DIR.URL_SEPARATOR.Template::face().URL_SEPARATOR;
-            $this->defaultParams['content_css'] = $faceUrl.Template::STYLESHEETS_DIR.'/style-tinymce.css';
-            $this->defaultParams['template_external_list_url'] = $faceUrl.Template::TEMPLATES_DIR.'/tinymce/templates.js';
-         }
-         if($file->getParam(self::PARAM_CATEGORY) != null) {
-            $this->defaultParams['template_replace_values']['categoryName'] = rawurldecode($file->getParam(self::PARAM_CATEGORY));
-         }
-         if($file->getParam(self::PARAM_SECTION) != null) {
-            $this->defaultParams['template_replace_values']['sectionName'] = rawurldecode($file->getParam(self::PARAM_SECTION));
-         }
-
-
-         if($theme != self::TINY_THEME_SIMPLE) {
-         //         Doplnění parametru (images, media atd.)
-            if($file->getParam(self::PARAM_IMAGES)) {
-               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$file->getParam(self::PARAM_IMAGES)], self::ICON_IMAGES);
-               array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_IMAGES);
-            }
-            if($file->getParam(self::PARAM_MEDIA)) {
-               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$file->getParam(self::PARAM_MEDIA)], self::ICON_MEDIA);
-               array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_MEDIA);
-            }
-         }
-
-         //			Který režim je zobrazen
-         switch ($theme) {
-            case self::TINY_THEME_SIMPLE:
-               $this->generateSimpleCfgFile($file->getParams());
-               break;
-            case self::TINY_THEME_ADVANCED_SIMPLE:
-               $this->generateAdvSimpleCfgFile($file->getParams());
-               break;
-            case self::TINY_THEME_ADVANCED:
-            default:
-               $this->generateAdvCfgFile($file->getParams());
-               break;
-         }
-      }
+   //      if($file->getName() == 'tiny_mce_params.js') {
+   //         $file->getParam(self::PARAM_THEME) == null ? $theme = null :
+   //             $theme = rawurldecode($file->getParam(self::PARAM_THEME));
+   //         //         doplnění obsahu s css
+   //         if($file->getParam(self::PARAM_FACE) != null) {
+   //            $faceUrl = Links::getMainWebDir().Template::FACES_DIR.URL_SEPARATOR.Template::face().URL_SEPARATOR;
+   //            $this->defaultParams['content_css'] = $faceUrl.Template::STYLESHEETS_DIR.'/style-tinymce.css';
+   //            $this->defaultParams['template_external_list_url'] = $faceUrl.Template::TEMPLATES_DIR.'/tinymce/templates.js';
+   //         }
+   //         if($file->getParam(self::PARAM_CATEGORY) != null) {
+   //            $this->defaultParams['template_replace_values']['categoryName'] = rawurldecode($file->getParam(self::PARAM_CATEGORY));
+   //         }
+   //         if($file->getParam(self::PARAM_SECTION) != null) {
+   //            $this->defaultParams['template_replace_values']['sectionName'] = rawurldecode($file->getParam(self::PARAM_SECTION));
+   //         }
+   //
+   //
+   //         if($theme != self::TINY_THEME_SIMPLE) {
+   //         //         Doplnění parametru (images, media atd.)
+   //            if($file->getParam(self::PARAM_IMAGES)) {
+   //               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$file->getParam(self::PARAM_IMAGES)], self::ICON_IMAGES);
+   //               array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_IMAGES);
+   //            }
+   //            if($file->getParam(self::PARAM_MEDIA)) {
+   //               array_push($this->advancedSimpleParams[self::ICONS_ROWS_NAME.$file->getParam(self::PARAM_MEDIA)], self::ICON_MEDIA);
+   //               array_push($this->advancedSimpleParams[self::PLUGINS_ARRAY_NAME], self::PLUGIN_MEDIA);
+   //            }
+   //         }
+   //
+   //         //			Který režim je zobrazen
+   //         switch ($theme) {
+   //            case self::TINY_THEME_SIMPLE:
+   //               $this->generateSimpleCfgFile($file->getParams());
+   //               break;
+   //            case self::TINY_THEME_ADVANCED_SIMPLE:
+   //               $this->generateAdvSimpleCfgFile($file->getParams());
+   //               break;
+   //            case self::TINY_THEME_ADVANCED:
+   //            default:
+   //               $this->generateAdvCfgFile($file->getParams());
+   //               break;
+   //         }
+   //      }
    }
 
    /**
@@ -312,21 +385,21 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metoda vygeneruje hlavičku souboru
     *
     */
-   private function generateAdvCfgFile($fileParams) {
-      $content = $this->cfgFileHeader();
-      $params = array_merge($this->defaultParams, $this->advancedParams);
-      //		Nahrazení parametrů za přenesené
-      foreach ($fileParams as $param => $value) {
-         $params[$param] = $value;
-      }
-      $params[self::PARAM_THEME] = self::THEME_ADVANCED;
-      $this->checkImagesList($params);
-      $this->checkLinksList($params);
-      $this->removeOtherParams($params);
-      $content .= $this->generateParamsForFile($params);
-      $content .= $this->cfgFileFooter();
-      //		Odeslání souboru
-      $this->sendFileContent($content);
+   private function generateCfgFile($fileParams) {
+   //      $content = $this->cfgFileHeader();
+   //      $params = array_merge($this->defaultParams, $this->advancedParams);
+   //      //		Nahrazení parametrů za přenesené
+   //      foreach ($fileParams as $param => $value) {
+   //         $params[$param] = $value;
+   //      }
+   //      $params[self::PARAM_THEME] = self::THEME_ADVANCED;
+   //      $this->checkImagesList($params);
+   //      $this->checkLinksList($params);
+   //      $this->removeOtherParams($params);
+   //      $content .= $this->generateParamsForFile($params);
+   //      $content .= $this->cfgFileFooter();
+   //      //		Odeslání souboru
+   //      $this->sendFileContent($content);
    }
 
    /**
@@ -334,37 +407,37 @@ class JsPlugin_TinyMce extends JsPlugin {
     *
     */
    private function generateSimpleCfgFile($fileParams) {
-      $content = $this->cfgFileHeader();
-      $params = $this->defaultParams;
-      //		Nahrazení parametrů za přenesené
-      foreach ($fileParams as $param => $value) {
-         $params[$param] = $value;
-      }
-      $params[self::PARAM_THEME] = self::THEME_SIMPLE;
-      $content .= $this->generateParamsForFile($params);
-      $content .= $this->cfgFileFooter();
-      //		Odeslání souboru
-      $this->sendFileContent($content);
+   //      $content = $this->cfgFileHeader();
+   //      $params = $this->defaultParams;
+   //      //		Nahrazení parametrů za přenesené
+   //      foreach ($fileParams as $param => $value) {
+   //         $params[$param] = $value;
+   //      }
+   //      $params[self::PARAM_THEME] = self::THEME_SIMPLE;
+   //      $content .= $this->generateParamsForFile($params);
+   //      $content .= $this->cfgFileFooter();
+   //      //		Odeslání souboru
+   //      $this->sendFileContent($content);
    }
 
    /**
     * Metoda vygeneruje hlavičku souboru pro simple theme
     */
    private function generateAdvSimpleCfgFile($fileParams) {
-      $content = $this->cfgFileHeader();
-      $params = array_merge($this->defaultParams, $this->advancedSimpleParams);
-      //		Nahrazení parametrů za přenesené
-      foreach ($fileParams as $param => $value) {
-         $params[$param] = $value;
-      }
-      $params[self::PARAM_THEME] = self::THEME_ADVANCED;
-      $this->checkImagesList($params);
-      $this->checkLinksList($params);
-      $this->removeOtherParams($params);
-      $content .= $this->generateParamsForFile($params);
-      $content .= $this->cfgFileFooter();
-      //		Odeslání souboru
-      $this->sendFileContent($content);
+   //      $content = $this->cfgFileHeader();
+   //      $params = array_merge($this->defaultParams, $this->advancedSimpleParams);
+   //      //		Nahrazení parametrů za přenesené
+   //      foreach ($fileParams as $param => $value) {
+   //         $params[$param] = $value;
+   //      }
+   //      $params[self::PARAM_THEME] = self::THEME_ADVANCED;
+   //      $this->checkImagesList($params);
+   //      $this->checkLinksList($params);
+   //      $this->removeOtherParams($params);
+   //      $content .= $this->generateParamsForFile($params);
+   //      $content .= $this->cfgFileFooter();
+   //      //		Odeslání souboru
+   //      $this->sendFileContent($content);
    }
 
    /**
@@ -413,32 +486,59 @@ class JsPlugin_TinyMce extends JsPlugin {
     * @return string -- řetězec s generovaným souborem
     */
    private function generateParamsForFile($params) {
-      $string = null;
-      foreach ($params as $param => $value) {
-         if(is_array($value)) {
-            $str = null;
-            if(empty ($value) OR is_numeric(key($value))){
-               $str = null;
-               foreach ($value as $val) {
-                  $str .= $val.',';
-               }
-               $str = '"'.substr($str, 0, strlen($str)-1).'"';
-            } else {
-               $str = null;
-               foreach ($value as $key => $val) {
-                  $str .= $key.':"'.$val.'",';
-               }
-               $str = "{".substr($str, 0, strlen($str)-1)."}";
-            }
-            $string .= "\t".$param.' : '.(string)$str.",\n";
-         } else if($value != null) {
-            $string .= "\t".$param.' : "'.(string)$value."\",\n";
+      $content = null;
+      foreach ($params as $paramName => $paramValue) {
+         if(is_array($paramValue)) {
+            $content .= $this->generateParamsForFile($paramValue);
          } else {
-            $string .= "\t".$param." : \"\",\n";
+            if(is_bool($paramValue)){
+               if($paramValue){
+                  $v = "true";
+               } else {
+                  $v = "false";
+               }
+            } else if(is_int($paramValue)){
+               $v = (string)$paramValue;
+            } else {
+               $v = "\"".$paramValue."\"";
+            }
+            $content .= $paramName." : ".$v.",\n";
          }
       }
-      $string = substr($string, 0, strlen($string)-2)."\n";
-      return $string;
+      // odstraní poslední čárku
+      $content = substr($content, 0, strlen($content)-2);
+      $content .= "\n";
+      return $content;
+
+
+
+
+   //      $string = null;
+   //      foreach ($params as $param => $value) {
+   //         if(is_array($value)) {
+   //            $str = null;
+   //            if(empty ($value) OR is_numeric(key($value))) {
+   //               $str = null;
+   //               foreach ($value as $val) {
+   //                  $str .= $val.',';
+   //               }
+   //               $str = '"'.substr($str, 0, strlen($str)-1).'"';
+   //            } else {
+   //               $str = null;
+   //               foreach ($value as $key => $val) {
+   //                  $str .= $key.':"'.$val.'",';
+   //               }
+   //               $str = "{".substr($str, 0, strlen($str)-1)."}";
+   //            }
+   //            $string .= "\t".$param.' : '.(string)$str.",\n";
+   //         } else if($value != null) {
+   //               $string .= "\t".$param.' : "'.(string)$value."\",\n";
+   //            } else {
+   //               $string .= "\t".$param." : \"\",\n";
+   //            }
+   //      }
+   //      $string = substr($string, 0, strlen($string)-2)."\n";
+   //      return $string;
    }
 
    /**

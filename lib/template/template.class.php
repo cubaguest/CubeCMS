@@ -268,13 +268,13 @@ class Template {
 
    /**
     * Metoda vrací obsah prvku post, ošetřený o specielní znaky
-    * @param string $name -- název prvku
+    * @param string $name -- název prvku např. "['text']['dalsi']"
     * @param string $defaultValue -- výchozí hodnota pokud prvek nebyl odeslán
     * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
     */
    public function post($name, $defaultValue = null) {
-      if($name != null) {
-         return htmlspecialchars($name);
+      if(isset ($_POST{$name})){
+         return htmlspecialchars($_POST{$name});
       } else {
          return $defaultValue;
       }
@@ -282,13 +282,13 @@ class Template {
 
    /**
     * Metoda vrací obsah prvku $_GET, ošetřený o specielní znaky v url
-    * @param string $name -- název prvku
+    * @param string $name -- název prvku např. "['text']['dalsi']"
     * @param string $defaultValue -- výchozí hodnota pokud prvek nebyl odeslán
     * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
     */
    public function get($name, $defaultValue = null) {
-      if(isset ($_GET[$name])) {
-         return urldecode($_GET[$name]);
+      if(isset ($_GET{$name})) {
+         return urldecode($_GET{$name});
       } else {
          return $defaultValue;
       }
@@ -335,7 +335,7 @@ class Template {
     * @param string $name -- název šablony
     * @param boolean $engine -- (option) jestli se jedná o šablonu enginu
     */
-   public function includeTpl($name, $vars = null) {
+   public function includeTpl($name, $engine = false, $vars = null) {
       $path = self::getFileDir($name, self::TEMPLATES_DIR);
       include $path.$name;
       unset ($vars);

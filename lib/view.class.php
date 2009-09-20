@@ -33,7 +33,7 @@ abstract class View {
     * Objekt c kategorií
     * @var Category
     */
-   private $categrory = null;
+   private $category = null;
 
    /**
     * Konstruktor Viewu
@@ -44,7 +44,7 @@ abstract class View {
    function __construct(Url_Link_Module $link, Category $category) {
       $this->template = new Template_Module($link, $category);
       $this->link = $link;
-      $this->categrory = $category;
+      $this->category = $category;
       $this->locale = new Locale($category->getModule()->getName());
       //		inicializace viewru
       $this->init();
@@ -124,7 +124,7 @@ abstract class View {
     * @return Category
     */
    final public function category() {
-      return $this->categrory;
+      return $this->category;
    }
 
    /**
@@ -132,7 +132,7 @@ abstract class View {
     * @return string
     */
    final public function module() {
-      return $this->categrory()->getModuleName();
+      return $this->category()->getModule()->getName();
    }
 
    /**
@@ -160,6 +160,14 @@ abstract class View {
    }
 
    /**
+    * Metoda vrací objekt Locale pro překlady
+    * @return Locale -- objek lokalizace
+    */
+   final public function locale() {
+      return $this->locale;
+   }
+
+   /**
     * Metoda přeloží zadaný řetězec alias pro funkci _()
     * @param string $message -- řetězec k přeložení
     * @return string -- přeložený řetězec
@@ -174,7 +182,7 @@ abstract class View {
     * @return string -- přeložený řetězec
     */
    final public function _($message) {
-      return $this->sys()->locale()->_m($message);
+      return $this->locale()->_m($message);
    }
 }
 ?>

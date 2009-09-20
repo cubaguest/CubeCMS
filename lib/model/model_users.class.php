@@ -9,11 +9,16 @@
  * @abstract 		Třída s modelem pro práci s uživateli
  */
 
-class Model_Users extends Model_Db {
+class Model_Users extends Model_PDO {
    /**
     * Název tabulky s uživateli
     */
     const DB_TABLE = 'users';
+
+   /**
+    * Název tabulky se skupinami
+    */
+    const DB_TABLE_GROUPS = 'groups';
 
 	 /**
 	  * Názvy sloupců v db tabulce
@@ -30,5 +35,26 @@ class Model_Users extends Model_Db {
 	const COLUMN_BLOCKED    = 'blocked';
 	const COLUMN_FOTO_FILE  = 'foto_file';
 	const COLUMN_DELETED    = 'deleted';
+
+
+
+	const COLUMN_GROUP_NAME    = 'gname';
+
+   /**
+    * Metoda načte kategori, pokud je zadán klíč je načtena určitá, pokud ne je
+    * načtena kategorie s nejvyšší prioritou
+    * @param string $catKey -- (option) klíč kategorie
+    */
+   public function getUser($username) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->query("SELECT *, grp.name AS gname FROM ".Db_PDO::table(self::DB_TABLE)." AS user
+             JOIN ".Db_PDO::table(self::DB_TABLE_GROUPS)." AS grp ON user.".self::COLUMN_ID_GROUP
+             ." = grp.".self::COLUMN_ID_GROUP."
+             WHERE (user.".self::COLUMN_USERNAME." = ".$dbc->quote($username).")");
+      $dbst->execute();
+
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      return $dbst->fetch();
+   }
 }
 ?>

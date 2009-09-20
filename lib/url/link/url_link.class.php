@@ -136,7 +136,7 @@ class Url_Link {
     */
    public function category($catKey = null) {
       if($catKey != null) {
-         $this->category = $catKey;
+         $this->category = vve_cr_url_key($catKey);
       } else {
          $this->category = null;
       }
@@ -294,7 +294,6 @@ class Url_Link {
     * @param string -- externí odkaz na který se má přesměrovat (option)
     */
    public function reload($link = null) {
-   //      var_dump(headers_list());flush();
       if (!headers_sent()) {
          if($link == null) {
             header("Location: ".$this);
@@ -426,10 +425,12 @@ class Url_Link {
    /**
     * Metoda odtraní z url špatné znaky a opakování
     * @param string $url -- url adresa
+    * @todo ověřit nutnost, popřípadě vyřešit jinak protože na začátku adresy jsou
+    * vždy dvě lomítka viz. http://
     */
    protected function repairUrl($url) {
-      $url = vve_cr_url_key($url);
-      $url = preg_replace("/\/{2,}/", "/", $url);
+//      $url = vve_cr_url_key($url);
+//      $url = preg_replace("/\/{2,}/", "/", $url); // TODO ověřit nutnost
       return $url;
    }
 }

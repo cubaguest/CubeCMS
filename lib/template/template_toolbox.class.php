@@ -43,7 +43,7 @@ class Template_Toolbox extends Template {
     * Konstruktor, vytvoří základní šablonu pro nástroje.
     */
    public function  __construct() {
-      parent::__construct();
+      parent::__construct(new Url_Link());
       $this->randomSeek = rand();
       $this->createTemplate();
    }
@@ -80,7 +80,7 @@ class Template_Toolbox extends Template {
          $tool['title'] = $value;
       }
 
-      $tool['link'] = $targetLink;
+      $tool['link'] = (string)$targetLink;
       $tool['icon'] = $icon;
       $tool['nameHidden'] = $nameHidden;
       $tool['valueHidden'] = $valueHidden;

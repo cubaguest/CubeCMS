@@ -36,30 +36,6 @@ abstract class JsPlugin {
 	 */
 	private $cssFilesArray = array();
 	
-//	/**
-//	 * Výchozí js soubor s nastavení js pluginu
-//	 * @var string
-//	 */
-//	private $settingsJsFile = null;
-//
-//	/**
-//	 * Proměná obsahuje je-li použit výchozí js soubor s nastavením
-//	 * @var boolean
-//	 */
-//	private $settingsJsFileIsDefault = true;
-//
-//	/**
-//	 * Výchozí css soubor s nastavením js pluginu
-//	 * @var string
-//	 */
-//	private $settingsCssFile = null;
-//
-//	/**
-//	 * Proměná obsahuje je-li použit výchozí css soubor s nastavením
-//	 * @var boolean
-//	 */
-//	private $settingsCssFileIsDefault = true;
-		
 	/**
 	 * Název JsPluginu -- je totožný s adresářem js pluginu
 	 * @var string
@@ -72,49 +48,44 @@ abstract class JsPlugin {
 	 */
 	private $pluginParams = array();
 	
+   /**
+    * Pole s konfigurací pluginu
+    * @var array
+    */
+   protected $config = array();
+
 	/**
 	 * Konstruktor třídy
 	 */
 	final public function __construct(){
-      $this->jsPluginName = get_class($this);
+      $this->jsPluginName = str_ireplace(__CLASS__.'_', '', get_class($this));
       $this->initJsPlugin();
-		$this->initFiles();
 	}
 	
 	/**
 	 * Třída, která se provede při inicializaci pluginu
 	 */
-	protected abstract function initJsPlugin();
+	protected function initJsPlugin(){}
 	
 	/**
 	 * Metoda inisializuje všechny soubory, se kterými JsPlugin pracuje
 	 */
-	protected  abstract function initFiles();
+	protected abstract function setFiles();
 	
 	/**
 	 * Metoda pro spuštění akce JsPluginu
 	 */
 	public function runAction($actionName, $params, $outputType){
       $this->pluginParams = $params;
-      $this->{$actionName}();
+      if(method_exists($this, $actionName.ucfirst($outputType).'View')){
+         $this->{$actionName.ucfirst($outputType).'View'}();
+      } else if(method_exists($this, $actionName.'View')) {
+         $this->{$actionName.'View'}();
+      } else {
+         trigger_error(_('Neimplementována metoda JsPluginu'));
+      }
    }
 
-	/**
-	 * Metoda nastavuje js soubor s nasatvením pluginu
-	 * @param JsPlugin_JsFile -- název js souboru (je umístěn v adresáři modulu)
-	 */
-//	final protected function setSettingJsFile(JsPlugin_JsFile $jsFile) {
-//		$this->settingsJsFile = $jsFile;
-//	}
-	
-	/**
-	 * Metoda nastavuje css soubor, který se načte místo výchozího
-	 * @param string -- název css souboru (je umístěn v adresáři modulu)
-	 */
-//	final protected function setSettingCssFile($cssFile) {
-//		$this->settingsCssFile = $cssFile;
-//	}
-	
 	/**
 	 * Metoda přídává js soubor se scriptem
 	 * @param JsPlugin_JsFile -- název js souboru
@@ -150,30 +121,17 @@ abstract class JsPlugin {
 
 	/**
 	 * Metoda vrací pole všech Js souborů pluginu i s cestami
-	 * @param boolean $withPaths -- jestli mají být vloženy i cesty
     * @return array -- pole js souborů
 	 */
-	final public function getAllJsFiles($withPaths = true){
+	final public function getAllJsFiles(){
+      if(empty ($this->jsFilesArray)){
+         $this->setFiles();
+      }
       $filesArray = array();
-      //			Vložení ostatních js souborů pluginu
+      //			Vložení js souborů pluginu
       if(!empty($this->jsFilesArray)) {
          foreach ($this->jsFilesArray as $jsFile) {
-            if($withPaths AND !ereg('^./'.self::JSPLUGINS_BASE_DIR.'/(.*)$', $jsFile)){
-               if($jsFile->isVirtual()){
-                  array_push($filesArray, $this->getVirtualDir().$jsFile);
-               } else {
-                  array_push($filesArray, $this->getDir().$jsFile);
-               }
-            } else {
-               array_push($filesArray, $jsFile);
-            }
-         }
-      }
-      if($this->getSettingsJsFile() != null) {
-       if($this->getSettingsJsFile()->isVirtual()) {
-            array_push($filesArray, $this->getVirtualDir().$this->getSettingsJsFile());
-         } else {
-            array_push($filesArray, $this->getDir().$this->getSettingsJsFile());
+            array_push($filesArray, str_replace('JSPLUGINNAME', strtolower($this->jsPluginName), $jsFile->getName()));
          }
       }
       return $filesArray;
@@ -184,51 +142,30 @@ abstract class JsPlugin {
 	 *@return array -- pole Css souborů
 	 */
 	final public function getAllCssFiles(){
+      if(empty ($this->cssFilesArray)){
+         $this->setFiles();
+      }
       $filesArray = array();
-		//			Vložení ostatních css souborů pluginu
+		//			Vložení css souborů pluginu
       if(!empty($this->cssFilesArray)) {
          $cssFiles = $this->cssFilesArray;
          foreach ($cssFiles as $cssFile) {
             array_push($filesArray, $this->getDir().$cssFile);
          }
       }
-      //			Přidání CSS souboru s nastavením
-      if($this->isDefaultCssSettingsFile() AND $this->getSettingsCssFile() != null) {
-         array_push($filesArray, $this->getDir().$this->getSettingsCssFile());
-      } else if($this->getSettingsCssFile() != null) {
-         array_push($filesArray, $this->getSettingsCssFile());
-      }
       return $filesArray;
 	}
-	
-	/**
-	 * Metoda nastaví nový výchozí js soubor nastavení
-	 * @param JsPlugin_JsFile -- název js souboru
-	 */
-//	final public function setDefJsFile(JsPlugin_JsFile $jsFile){
-//		$this->settingsJsFileIsDefault = false;
-//		$this->setSettingJsFile($jsFile);
-//	}
-	
-	/**
-	 * Metoda nastaví nový výchozí css soubor nastavení
-	 * @param string -- název css souboru
-	 */
-//	final public function setDefCssFile($cssFile){
-//		$this->settingsCssFileIsDefault = false;
-//		$this->setSettingCssFile($cssFile);
-//	}
 	
 	/**
 	 * Metoda vrací název adresáře pluginu
 	 * @return string -- název adresáře
 	 */
-	final public function getDir(){
-      //odstranění přívlastku JsPlugin
-      $jsDir = str_ireplace(__CLASS__.'_', '', $this->jsPluginName);
-      return '.'.URL_SEPARATOR.self::JSPLUGINS_BASE_DIR.URL_SEPARATOR
-				.strtolower($jsDir).URL_SEPARATOR;
-	}
+//	final public function getDir(){
+//      //odstranění přívlastku JsPlugin
+//      $jsDir = str_ireplace(__CLASS__.'_', '', $this->jsPluginName);
+//      return '.'.URL_SEPARATOR.self::JSPLUGINS_BASE_DIR.URL_SEPARATOR
+//				.strtolower($jsDir).URL_SEPARATOR;
+//	}
 
    /**
     * Metoda vrací virtuální složku pro jsplugin, je využito při generování dynamických
@@ -236,76 +173,44 @@ abstract class JsPlugin {
     *
     * @return string -- virtuální adresář se souborem
     */
-   final public function getVirtualDir(){
-//      $dir = '.'.URL_SEPARATOR.self::VIRTUAL_DIR_PREFIX.strtolower($this->jsPluginName).URL_SEPARATOR;
-      $dir = '.'.URL_SEPARATOR.strtolower($this->jsPluginName).URL_SEPARATOR;
-		return $dir;
-   }
+//   final public function getVirtualDir(){
+////      $dir = '.'.URL_SEPARATOR.self::VIRTUAL_DIR_PREFIX.strtolower($this->jsPluginName).URL_SEPARATOR;
+//      $dir = '.'.URL_SEPARATOR.strtolower($this->jsPluginName).URL_SEPARATOR;
+//		return $dir;
+//   }
 	
 	/**
-	 * Metoda vrací true pokud se použije výchozí js soubor s nastavením JsPluginu
-	 * @return boolean -- true pro výchozí nastavení
-	 */
-//	final public function isDefaultJsSettingsFile(){
-//      return $this->settingsJsFileIsDefault;
-//	}
-	
-	/**
-	 * Metoda vrací true pokud se použije výchozí css soubr s nastavením JsPluginu
-	 * @return boolean -- true pro výchozí nastavení
-	 */
-//	final public function isDefaultCssSettingsFile(){
-//		return $this->settingsCssFileIsDefault;
-//	}
-	
-	/**
-	 * Metoda vrací název výchozího js souboru s nastavením
-	 * @return JsPlugin_JsFile -- název js souboru
-	 */
-//	final public function getSettingsJsFile(){
-//		return $this->settingsJsFile;
-//	}
-	
-	/**
-	 * Metoda vrací název výchozího css souboru s nastavením
-	 * @return string -- název css souboru
-	 */
-//	final public function getSettingsCssFile(){
-//		return $this->settingsCssFile;
-//	}
-	
-	/**
-	 * Metoda nastaví zadaný parametr pluginu
+	 * Metoda nastaví zadaný konfigurační parametr pluginu
 	 *
 	 * @param string -- název parametru
 	 * @param mixed -- hodnota paramettru
 	 */
-//	final public function setPluginParam($paramName, $paramValue) {
-//		$this->pluginParams[$paramName] = $paramValue;
-//	}
+	final public function setCfgParam($paramName, $paramValue) {
+		$this->config[$paramName] = $paramValue;
+	}
 
 	/**
-	 * Metoda vrací zadaný parametr pluginu
+	 * Metoda vrací zadaný konfigurační parametr pluginu
 	 *
 	 * @param string -- název parametru
 	 * @return mixed -- hodnota parametru
 	 */
-//	final protected function getPluginParam($paramName) {
-//		if(isset($this->pluginParams[$paramName])){
-//			return $this->pluginParams[$paramName];
-//		} else {
-//			return null;
-//		}
-//	}
+	final protected function getCfgParam($paramName) {
+		if(isset($this->config[$paramName])){
+			return $this->config[$paramName];
+		} else {
+			return null;
+		}
+	}
 		
 	/**
-	 * Metoda vrací všechny parametry parametr
+	 * Metoda vrací všechny konfigurační parametry parametr
 	 *
 	 * @return array -- pole s parametry
 	 */
-//	final protected function getAllPluginParams() {
-//		return $this->pluginParams;
-//	}
+	final protected function getAllCfgParams() {
+		return $this->config;
+	}
 	
 	/**
 	 * metoda odešla obsah na výstup a ukončí script

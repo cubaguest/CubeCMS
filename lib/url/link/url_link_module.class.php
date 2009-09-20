@@ -43,21 +43,24 @@ class Url_Link_Module extends Url_Link {
     * @return Links -- objket Links
     */
    public function route($name = null, $params = array()) {
-      if($name === null) {
+      if($name == null) {
          $this->route = null;
       } else {
          $route = $this->routes->getRoute($name);
          $routeReplacement = $route['replacement'];
-         foreach ($params as $pname => $pvalue) {
-            $routeReplacement = preg_replace("/{".$pname."}/i", $pvalue, $routeReplacement);
+         if($routeReplacement != null AND $routeReplacement != '') {
+            foreach ($params as $pname => $pvalue) {
+               $routeReplacement = preg_replace("/{".$pname."}/i", $pvalue, $routeReplacement);
+            }
+            // odstranění nepoovinných parametrů, které nebyly zadány
+            $routeReplacement = preg_replace("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "", $routeReplacement);
+            // odstranění nevyplněných nepovinných parametrů
+            $routeReplacement = preg_replace("/[()]+/i", "", $routeReplacement);
+            $this->route = $routeReplacement;
+         } else {
+            $this->route = $route['regexp'];
          }
-         // odstranění nepoovinných parametrů, které nebyly zadány
-         $routeReplacement = preg_replace("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "", $routeReplacement);
-         // odstranění nevyplněných nepovinných parametrů
-         $routeReplacement = preg_replace("/[()]+/i", "", $routeReplacement);
-         $this->route = $routeReplacement;
       }
-
       return $this;
    }
 

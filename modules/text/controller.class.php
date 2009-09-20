@@ -73,9 +73,6 @@ class Text_Controller extends Controller {
 //         $this->link()->action()->reload();
 //      }
    }
-
-   public function listController() {
-   }
 }
 
 ?>

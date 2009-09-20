@@ -3,7 +3,7 @@
  * Třída modelu s detailem textu
  * 
  */
-class Text_Model_Detail extends Model_Db {
+class Text_Model_Detail extends Model_PDO {
    /**
     * Tabulka s detaily
     */
@@ -34,37 +34,30 @@ class Text_Model_Detail extends Model_Db {
 	}
 	
 	/**
-	 * Metoda načte jeden jazykový text z databáze
-	 *
-	 */
-	private function getTextFromDb() {
-		$sqlSelect = $this->getDb()->select()
-      ->table(Db::table(self::DB_TABLE))
-      ->colums(array(self::COLUMN_TEXT =>"IFNULL(".self::COLUMN_TEXT_LANG_PRFIX.Locale::getLang()
-            .",".self::COLUMN_TEXT_LANG_PRFIX.Locale::getDefaultLang().")"))
-		->where(self::COLUMN_ID_ITEM, $this->module()->getId());
-
-		$this->text=$this->getDb()->fetchObject($sqlSelect);
-		if($this->text != null){
-			$this->text=$this->text->{self::COLUMN_TEXT};
-		};
-	}
-	
-	/**
 	 * Metoda načte všechny jazkové variace textu z db 
 	 *
 	 * @return array -- pole s textama
 	 */
-	public function getAllLangText() {
-		$sqlSelect = $this->getDb()->select()
-         ->table(Db::table(self::DB_TABLE))
-			->where(self::COLUMN_ID_ITEM, $this->module()->getId());
-				
-		$text = $this->getDb()->fetchAssoc($sqlSelect,true);
-      if(!empty ($text)){
-         $text = $this->parseDbValuesToArray($text, self::COLUMN_TEXT);
-      }
-		return $text[self::COLUMN_TEXT];
+	public function getAllLangText($idText) {
+//		$sqlSelect = $this->getDb()->select()
+//         ->table(Db::table(self::DB_TABLE))
+//			->where(self::COLUMN_ID_ITEM, $this->module()->getId());
+//
+//		$text = $this->getDb()->fetchAssoc($sqlSelect,true);
+//      if(!empty ($text)){
+//         $text = $this->parseDbValuesToArray($text, self::COLUMN_TEXT);
+//      }
+//		return $text[self::COLUMN_TEXT];
+
+      $dbc = new Db_PDO();
+         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
+             WHERE (text.".self::COLUMN_ID_ITEM." = ".$dbc->quote($idText).")");
+      $dbst->execute();
+
+      $cl = new Model_LangContainer();
+      $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
+      return $dbst->fetch();
+
 	}
 	/*EOF getAllLangText*/
 

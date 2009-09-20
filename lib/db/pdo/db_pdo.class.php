@@ -41,6 +41,7 @@ class Db_PDO extends PDO {
                //(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
                   parent::__construct("mysql:host=".self::$serverName.";dbname=".self::$dbName,
                       self::$userName, self::$userPassword);
+                  $this->exec('SET CHARACTER SET utf8');
                   break;
                case 'pgsql':
                   parent::__construct("pgsql:dbname=".self::$dbName.";host=".self::$serverName,

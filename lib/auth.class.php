@@ -36,15 +36,15 @@ class Auth {
 	const USER_IS_LOGIN		= 'login';
 	const USER_LOGIN_ADDRESS= 'ip_address';
 
-   /**
-    * Názvy některých sloupců
-    */
-   const COLUMN_USERNAME      = 'username';
-   const COLUMN_ID_GROUP      = 'id_group';
-   const COLUMN_GROUP_NAME    = 'gname';
-   const COLUMN_ID_USER       = 'id_user';
-   const COLUMN_USER_MAIL     = 'mail';
-   const COLUMN_USER_PHOTO    = 'foto_file';
+//   /**
+//    * Názvy některých sloupců
+//    */
+//   const COLUMN_USERNAME      = 'username';
+//   const COLUMN_ID_GROUP      = 'id_group';
+//   const COLUMN_GROUP_NAME    = 'gname';
+//   const COLUMN_ID_USER       = 'id_user';
+//   const COLUMN_USER_MAIL     = 'mail';
+//   const COLUMN_USER_PHOTO    = 'foto_file';
    
 	/**
 	 * Je-li uživatel přihlášen
@@ -110,10 +110,10 @@ class Auth {
 				//přihlášení se nezdařilo
 				$this->_setDefaultUserParams();
 			} else {
-				//Zdařilé přihlášení, uložení detaileg o uživateli do session
+				//Zdařilé přihlášení, uložení detailu o uživateli do session
 				$this->_saveUserDetailToSession();
-            $link = new Links();
-            $link->category()->action()->article()->rmParam()->reload();
+            $link = new Url_Link();
+            $link->reload();
 			}
 		} else {
          //	načtení detailů
@@ -188,31 +188,22 @@ class Auth {
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
 				$this->errMsg()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
-//            $userSql = $this->getDb()->select()->table(AppCore::sysConfig()
-//               ->getOptionValue(self::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES),'user')
-//               ->colums(Db::COLUMN_ALL)
-//               ->join(array("g"=>AppCore::sysConfig()->getOptionValue(self::CONFIG_GROUPS_TABLE_NAME,
-//                        Config::SECTION_DB_TABLES)),
-//                  array('g'=>'id_group', 'user'=> 'id_group') , Db::JOIN_LEFT,
-//                  array("gname" => "name", Db::COLUMN_ALL))
-//					->where("user.".self::COLUMN_USERNAME, htmlentities($_POST["login_username"],ENT_QUOTES));
-//
-//				$userResult = $this->dbConnector->fetchObject($userSql);
-						
+            $model = new Model_Users();
+            $userResult = $model->getUser(htmlentities($_POST["login_username"],ENT_QUOTES));
 				if (!($userResult)){
 					$this->errMsg()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
 				} else {
-					if (md5(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->password){
+					if (md5(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD}){
 						//	Uspesne prihlaseni do systemu
 						$this->login = true;
 						self::$isLogIn = true;
-						$this->userName = $userResult->{self::COLUMN_USERNAME};
-						$this->userGroupId = $userResult->{self::COLUMN_ID_GROUP};
-						$this->userGroupName = $userResult->{self::COLUMN_GROUP_NAME};
-						$this->userId = $userResult->{self::COLUMN_ID_USER};
-						$this->userMail = $userResult->{self::COLUMN_USER_MAIL};
+						$this->userName = $userResult->{Model_Users::COLUMN_USERNAME};
+						$this->userGroupId = $userResult->{Model_Users::COLUMN_ID_GROUP};
+						$this->userGroupName = $userResult->{Model_Users::COLUMN_GROUP_NAME};
+						$this->userId = $userResult->{Model_Users::COLUMN_ID};
+						$this->userMail = $userResult->{Model_Users::COLUMN_MAIL};
 						
-						if($userResult->{self::COLUMN_USER_PHOTO} != null){
+						if($userResult->{Model_Users::COLUMN_FOTO_FILE} != null){
 							//TODO není dodělána práce s fotkou
 //							$_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
 						}
@@ -240,8 +231,8 @@ class Auth {
 			session_destroy();
 			$return = true;
 					
-			$link = new Links(true);
-         $link->category()->action()->article()->rmParam()->reload();
+			$link = new Url_Link();
+         $link->reload();
 		}
 		return $return;
 	}
