@@ -209,8 +209,7 @@ class JsPlugin_TinyMce extends JsPlugin {
    }
 
    protected function setFiles() {
-      $this->addJsFile(new JsPlugin_JsFile("tiny_mce.js"));
-
+      $this->addFile(new JsPlugin_JsFile("tiny_mce.js"));
       switch ($this->getCfgParam('theme')) {
          case 'simple':
             $cfgFile = new JsPlugin_JsFile("settingssimple.js", true);
@@ -226,9 +225,7 @@ class JsPlugin_TinyMce extends JsPlugin {
             $cfgFile = new JsPlugin_JsFile("settingsadvanced1.js", true);
             break;
       }
-
-
-      $this->addJsFile($cfgFile);
+      $this->addFile($cfgFile);
    }
 
    /**
@@ -250,7 +247,7 @@ class JsPlugin_TinyMce extends JsPlugin {
    /**
     * Metodda pro generování advanced 1 theme
     */
-   public function settingsSimpleView() {
+   public function settingsAdvanced1View() {
       $params = $this->defaultParams;
       $params['document_base_url'] = Url_Request::getBaseWebDir();
       $params['language'] = Locale::getLang();

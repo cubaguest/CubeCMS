@@ -1,16 +1,16 @@
 <div class="userFiles">
+
 <div id="uploadUserFilesForm">
    <h5><?=_("Uživatelské soubory")?> (<span id="userFilesCount"><?=$this->numRows?></span>)</h5>
-   <form action="<?=$this->ajaxLink->action('addFile')->param('idArticle', $this->idArticle)?>" method="post" enctype="multipart/form-data" target="upload_target" onsubmit="startUploadUserFile();" >
+   <form action="<?=$this->link()->onlyAction('addFile', 'html')->param('idArticle', $this->idArticle)?>" method="post" enctype="multipart/form-data" target="upload_target" onsubmit="startUploadUserFile();" >
       <label><?=_("Soubor");?>*:</label>
       <input name="userfiles_new_file" type="file" />
       <input name="userfiles_idArticle" type="hidden" value="<?=$this->idArticle?>" />
       <input type="submit" name="userfiles_send_file" value="<?=_("Nahrát")?>" />
       <img id="upload_userfile_process" src="images/progress.gif" alt="loading" width="16" style="display:none"/>&nbsp;
       <span id="userfile_upload_result"></span>
-   </form>
+   </form><!---->
    <iframe id="upload_target" name="upload_target" src="#" style="width:0;height:0;border:0px solid #fff;"></iframe>
-
 </div>
 
 <?// výpis souborů?>

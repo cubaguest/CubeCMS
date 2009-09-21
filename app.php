@@ -243,7 +243,6 @@ class AppCore {
       $direName = dirname(__FILE__); // OLD version + dává někdy špatný výsledek
       $realPath = realpath($direName); // OLD version + dává někdy špatný výsledek
       // $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
-
       $this->setAppMainDir($realPath.DIRECTORY_SEPARATOR);
 
       //	přidání adresáře pro načítání knihoven
@@ -1056,12 +1055,33 @@ class AppCore {
       $jsPlugin = new $pluginName();
       
       // vytvoření souboru
-      $file = new JsPlugin_File($this->urlRequest->getAction().'.'.$this->urlRequest->getOutputType(), true);
-      $file->setParams($this->urlRequest->getUrlParams());
+//      $file = new JsPlugin_File($this->urlRequest->getAction().'.'.$this->urlRequest->getOutputType(), true);
+//      $file->setParams($this->urlRequest->getUrlParams());
       ob_start();
       $jsPlugin->runAction($this->urlRequest->getAction(), $this->urlRequest->getUrlParams(),
       $this->urlRequest->getOutputType());
 //      $jsPlugin->{$this->urlRequest->getAction()}($file);
+      $content = ob_get_contents();
+      // vytvoření objektu pro odeslání typu výstupu
+      $output = new Template_Output($this->urlRequest->getOutputType());
+      $output->addHeader("Content-Length: " . strlen($content));
+      // odeslání hlaviček
+      $output->sendHeaders();
+      ob_flush();
+   }
+
+   /**
+    * Metoda pro spuštění akce na componentě
+    */
+   public function runComponent() {
+      $componentName = 'Component_'.ucfirst($this->urlRequest->getName());
+
+      $component = new $componentName();
+
+      ob_start();
+      $component->runAction($this->urlRequest->getAction(), $this->urlRequest->getUrlParams(),
+      $this->urlRequest->getOutputType());
+
       $content = ob_get_contents();
       // vytvoření objektu pro odeslání typu výstupu
       $output = new Template_Output($this->urlRequest->getOutputType());
@@ -1110,8 +1130,8 @@ class AppCore {
          case Url_Request::URL_TYPE_ENGINE_PAGE:
             print "special page";
             break;
-         case Url_Request::URL_TYPE_EPLUGIN:
-            print "eplugin";
+         case Url_Request::URL_TYPE_COMPONENT:
+            $this->runComponent();
             break;
          case Url_Request::URL_TYPE_JSPLUGIN:
             $this->runJsPlugin();

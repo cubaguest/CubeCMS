@@ -4,8 +4,7 @@
    <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
       <li>
          <a href="#textLang<?=$key?>" class="selected">
-            <img src="images/lang/<?=$key?>.png" alt="<?=$lang?>" />
-            <?=$lang?>
+            <?print (vve_tpl_langImage($key)); print($lang)?>
          </a>
       </li>
    <?}?>
@@ -38,6 +37,6 @@
 </div>
 <?
 $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
-<? $this->includeTplObj($this->EPLfiles); ?>
+<?$this->userfiles->renderComponent()?>
 
 

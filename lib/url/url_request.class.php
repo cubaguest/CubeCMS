@@ -18,7 +18,7 @@ class Url_Request {
    const URL_TYPE_NORMAL = 'normal';
    const URL_TYPE_ENGINE_PAGE = 'special';
    const URL_TYPE_MODULE = 'module';
-   const URL_TYPE_EPLUGIN = 'eplugin';
+   const URL_TYPE_COMPONENT = 'component';
    const URL_TYPE_JSPLUGIN = 'jsplugin';
 
 
@@ -202,8 +202,8 @@ class Url_Request {
          $this->urlType = self::URL_TYPE_ENGINE_PAGE;
       } else if($this->parseModuleUrl()) {
          $this->urlType = self::URL_TYPE_MODULE;
-      } else if($this->parseEpluginUrl()) {
-         $this->urlType = self::URL_TYPE_EPLUGIN;
+      } else if($this->parseComponentUrl()) {
+         $this->urlType = self::URL_TYPE_COMPONENT;
       } else if($this->parseJsPluginUrl()) {
          $this->urlType = self::URL_TYPE_JSPLUGIN;
       } else {
@@ -272,9 +272,9 @@ class Url_Request {
    /**
     * Metoda zkontroluje jesli se nejedná o url k akci epluginu (např. při ajax requestu)
     */
-   private function parseEpluginUrl() {
+   private function parseComponentUrl() {
       $matches = array();
-      if(!preg_match("/eplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+      if(!preg_match("/component\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?<params>[^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
       $this->category = $matches['category'];

@@ -15,17 +15,12 @@ class JsPlugin_LightBox extends JsPlugin {
 	protected function initJsPlugin() {
 	}
 	
-	protected function initFiles() {
+	protected function setFiles() {
       $this->addDependJsPlugin(new JsPlugin_JQuery());
 //		Přidání css stylu
-		$this->addCssFile('jquery.lightbox-0.5.css');
+		$this->addFile(new JsPlugin_CssFile('jquery.lightbox-0.5.css'));
 		//		Přidání js soubrů pluginu
-		$this->addJsFile(new JsPlugin_JsFile("jquery.lightbox-0.5.pack.js"));
+		$this->addFile(new JsPlugin_JsFile("jquery.lightbox-0.5.pack.js"));
 	}
-	
-	/**
-	 * Metda vytvoří výchozí konfigurační soubor
-	 */
-	public function generateFile(JsPlugin_JsFile $file) {}
 }
 ?>

@@ -18,7 +18,7 @@ class JsPlugin_JQuery extends JsPlugin {
    
 	protected function setFiles() {
 //		Přidání js soubrů pluginu
-		$this->addJsFile(new JsPlugin_JsFile("jquery-1.3.2.min.js"));
+		$this->addFile(new JsPlugin_JsFile("jquery-1.3.2.min.js"));
 	}
 	
 	/**
@@ -34,7 +34,7 @@ class JsPlugin_JQuery extends JsPlugin {
    * Metoda přidá jádro pro efekty UI
    */
   public function addUICore() {
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.UICore.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.UICore.min.js"));
     return $this;
   }
 
@@ -44,7 +44,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addUIDraggable() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Draggable.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Draggable.min.js"));
     return $this;
   }
 
@@ -55,7 +55,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addUIDraggable();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Droppable.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Droppable.min.js"));
     return $this;
   }
 
@@ -65,7 +65,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addUIResizable() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Resizable.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Resizable.min.js"));
     return $this;
   }
 
@@ -75,7 +75,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addUISelectable() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Selectable.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Selectable.min.js"));
     return $this;
   }
 
@@ -86,7 +86,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addUIDraggable();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Sortable.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Sortable.min.js"));
     return $this;
   }
 
@@ -100,7 +100,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addWidgentAccordion() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Accordion.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Accordion.min.js"));
     return $this;
   }
 
@@ -112,7 +112,7 @@ class JsPlugin_JQuery extends JsPlugin {
     $this->addUICore();
     $this->addUIDraggable();
     $this->addUIResizable();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Dialog.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Dialog.min.js"));
     return $this;
   }
 
@@ -122,7 +122,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addWidgentSlider() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Slider.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Slider.min.js"));
     return $this;
   }
 
@@ -132,7 +132,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addWidgentTabs() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Tabs.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Tabs.min.js"));
     return $this;
   }
 
@@ -145,7 +145,7 @@ class JsPlugin_JQuery extends JsPlugin {
     /**
      * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
      */
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Datepicker.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Datepicker.min.js"));
     return $this;
   }
 
@@ -155,7 +155,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addWidgentProgressBar() {
     //deps
     $this->addUICore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.Progressbar.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Progressbar.min.js"));
     return $this;
   }
 
@@ -168,7 +168,7 @@ class JsPlugin_JQuery extends JsPlugin {
    */
   public function addEffectCore() {
     //deps
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.EffectsCore.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.EffectsCore.min.js"));
     return $this;
   }
 
@@ -178,7 +178,7 @@ class JsPlugin_JQuery extends JsPlugin {
   public function addEffectAll() {
     //deps
     $this->addEffectCore();
-    $this->addJsFile(new JsPlugin_JsFile("jquery-ui-1.7.EffectAll.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.EffectAll.min.js"));
     return $this;
   }
 
@@ -190,7 +190,7 @@ class JsPlugin_JQuery extends JsPlugin {
    * Metoda přidá efekty UI - all (všechny efekty)
    */
   public function addPluginCookie() {
-    $this->addJsFile(new JsPlugin_JsFile("jquery-cookie.packed.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery-cookie.packed.js"));
     return $this;
   }
 
@@ -198,7 +198,7 @@ class JsPlugin_JQuery extends JsPlugin {
    * Metoda přidá efekty UI - all (všechny efekty)
    */
   public function addPluginAjaxUploadFile() {
-    $this->addJsFile(new JsPlugin_JsFile("ajaxupload.2.8.js"));
+    $this->addFile(new JsPlugin_JsFile("ajaxupload.2.8.js"));
     return $this;
   }
 }

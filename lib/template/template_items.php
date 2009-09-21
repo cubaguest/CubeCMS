@@ -126,4 +126,12 @@ function crSelectDate($name, $time = null, $yearOffsetPlus = 10, $yearOffsetMinu
    }
    print ($htmlResult);
 }
+
+function vve_tpl_langImage($lang){
+//   $element = new Html_Element('img');
+
+   return "<img src=\"images/langs/{$lang}.png\" alt=\"{$lang}\" />";
+
+}
+
 ?>

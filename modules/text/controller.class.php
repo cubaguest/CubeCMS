@@ -48,13 +48,12 @@ class Text_Controller extends Controller {
     * Kontroler pro editaci textu
     */
    public function editController() {
-//      $this->checkWritebleRights();
+      $this->checkWritebleRights();
 //
-//      if($this->getModule()->getParam(self::PARAM_FILES, true)){
-//         // Uživatelské soubory
-//         $files = new Eplugin_UserFiles($this->sys());
-//         $this->view()->EPLfiles = $files;
-//      }
+      if($this->getModule()->getParam(self::PARAM_FILES, true)){
+         // Uživatelské soubory
+         $this->view()->userfiles = new Component_UserFiles();
+      }
 //
 //      $form = new Form();
 //      $form->setPrefix(self::FORM_PREFIX);

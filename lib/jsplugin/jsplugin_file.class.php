@@ -143,5 +143,13 @@ class JsPlugin_File {
    public function getDir() {
       return $this->dir;
    }
+
+   /**
+    * Metoda nastaví název adresáře s JSPluginem
+    * @param string $name -- název pluginu
+    */
+   public function setPluginName($name) {
+      $this->dir = str_replace('JSPLUGINNAME', strtolower($name), $this->dir);
+   }
 }
 ?>

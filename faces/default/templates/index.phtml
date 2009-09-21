@@ -22,10 +22,6 @@
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
       <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
 
-      <? foreach ($this->getStylesheets() as $style){?>
-      <link rel="stylesheet" type="text/css" href="<?=$style?>" />
-      <? }?>
-
       <!--[if lte IE 6]>
 <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
 <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
@@ -37,11 +33,11 @@
 
       <?//Vypis stylesheetu modulu
       foreach ($this->getStylesheets() as $style){?>
-      <link rel="stylesheet" type="text/css" href="<?=$style?>" /><?}?>
+      <link rel="stylesheet" type="text/css" href="<?=$style?>" /><?echo"\n";}?>
 
       <?//Vypis javascriptu
       foreach ($this->getJavaScripts() as $jsFile){?>
-      <script src="<?=$jsFile?>" type="text/javascript"></script><?}?>
+      <script src="<?=$jsFile?>" type="text/javascript"></script><?echo"\n";}?>
 
    </head>
 

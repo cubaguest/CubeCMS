@@ -13,6 +13,7 @@
 
 require_once 'tplmodifiers.php';
 require_once 'template_items.php';
+require_once 'template_functions.php';
 
 class Template {
 /**
@@ -273,7 +274,7 @@ class Template {
     * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
     */
    public function post($name, $defaultValue = null) {
-      if(isset ($_POST{$name})){
+      if(isset ($_POST{$name})) {
          return htmlspecialchars($_POST{$name});
       } else {
          return $defaultValue;
@@ -359,8 +360,8 @@ class Template {
          $name->renderTemplate();
       }
       else if($name instanceof Eplugin) {
-         $name->template()->renderTemplate();
-      }
+            $name->template()->renderTemplate();
+         }
    }
 
    /**
@@ -369,13 +370,19 @@ class Template {
     * @return Template -- objekt sebe
     */
    final public function addJsPlugin(JsPlugin $jsplugin) {
-      $jsfiles = $jsplugin->getAllJsFiles();
+      $jsfiles = $jsplugin->getAllFiles();
       foreach ($jsfiles as $file) {
-         Template::addJS($file);
-      }
-      $cssfiles = $jsplugin->getAllCssFiles();
-      foreach ($cssfiles as $file) {
-         Template::addCss($file);
+         if($file instanceof JsPlugin_JsFile) {
+            Template::addJS($file->getName());
+         } else if($file instanceof JsPlugin_CssFile) {
+            // pokud existuje css soubor u faces, vložíme ten
+               if(file_exists(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
+                   .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
+                  Template::addCss('./'.self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true).DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
+               } else {
+                  Template::addCss($file->getName());
+               }
+            }
       }
       return $this;
    }
@@ -478,7 +485,7 @@ class Template {
       if($onlyName) {
          return self::$face;
       } else {
-         return Links::getMainWebDir().self::FACES_DIR.'/'.self::$face.'/';
+         return Url_Request::getBaseWebDir().self::FACES_DIR.'/'.self::$face.'/';
       }
    }
 }
