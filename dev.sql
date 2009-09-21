@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Počítač: localhost
--- Vygenerováno: Pátek 28. srpna 2009, 15:46
+-- Vygenerováno: Pondělí 21. září 2009, 13:59
 -- Verze MySQL: 5.0.75
 -- Verze PHP: 5.2.6-3ubuntu4.2
 
@@ -25,6 +25,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Struktura tabulky `vypecky_actions`
 --
 
+DROP TABLE IF EXISTS `vypecky_actions`;
 CREATE TABLE IF NOT EXISTS `vypecky_actions` (
   `id_action` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -64,6 +65,7 @@ INSERT INTO `vypecky_actions` (`id_action`, `id_item`, `id_user`, `label_cs`, `t
 -- Struktura tabulky `vypecky_articles`
 --
 
+DROP TABLE IF EXISTS `vypecky_articles`;
 CREATE TABLE IF NOT EXISTS `vypecky_articles` (
   `id_article` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -103,6 +105,7 @@ INSERT INTO `vypecky_articles` (`id_article`, `id_item`, `id_user`, `add_time`, 
 -- Struktura tabulky `vypecky_categories`
 --
 
+DROP TABLE IF EXISTS `vypecky_categories`;
 CREATE TABLE IF NOT EXISTS `vypecky_categories` (
   `id_category` smallint(3) NOT NULL auto_increment,
   `id_section` smallint(5) unsigned default NULL,
@@ -131,14 +134,16 @@ CREATE TABLE IF NOT EXISTS `vypecky_categories` (
   `show_in_menu` tinyint(1) NOT NULL default '1' COMMENT 'Má li se položka zobrazit v menu',
   `show_when_login_only` tinyint(1) NOT NULL default '0' COMMENT 'Jstli má bát položka zobrazena po přihlášení',
   PRIMARY KEY  (`id_category`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
 
 --
 -- Vypisuji data pro tabulku `vypecky_categories`
 --
 
 INSERT INTO `vypecky_categories` (`id_category`, `id_section`, `id_module`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `params`, `protected`, `priority`, `active`, `group_guest`, `group_user`, `group_admin`, `group_poweruser`, `left_panel`, `right_panel`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`) VALUES
-(1, 1, 1, 'text-s-obrazky-a-soubory', 'text s obrázky a soubory', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'r--', 'r--', 'r--', 1, 1, 'monthly', 0.8, 1, 0);
+(1, 1, 1, 'text-s-obrazky-a-soubory', 'text s obrázky a soubory', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 10, 1, 'r--', 'r--', 'rwc', 'rw-', 1, 1, 'monthly', 0.8, 1, 0),
+(12, 1, 1, 'text-druhy', 'Text Druhý', NULL, 'text-second', 'Text Second', NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'r--', 'rwc', 'rw-', 1, 1, 'yearly', 0.1, 1, 0),
+(13, 1, 7, 'pokus', 'testovací kategorie', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'rw-', 'rwc', 'rwc', 1, 1, 'yearly', 0.1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -146,6 +151,7 @@ INSERT INTO `vypecky_categories` (`id_category`, `id_section`, `id_module`, `url
 -- Struktura tabulky `vypecky_contacts`
 --
 
+DROP TABLE IF EXISTS `vypecky_contacts`;
 CREATE TABLE IF NOT EXISTS `vypecky_contacts` (
   `id_contact` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -183,6 +189,7 @@ INSERT INTO `vypecky_contacts` (`id_contact`, `id_item`, `id_city`, `name_cs`, `
 -- Struktura tabulky `vypecky_contacts_areas`
 --
 
+DROP TABLE IF EXISTS `vypecky_contacts_areas`;
 CREATE TABLE IF NOT EXISTS `vypecky_contacts_areas` (
   `id_area` int(11) NOT NULL auto_increment,
   `area_name` varchar(200) NOT NULL,
@@ -216,6 +223,7 @@ INSERT INTO `vypecky_contacts_areas` (`id_area`, `area_name`) VALUES
 -- Struktura tabulky `vypecky_contacts_cities`
 --
 
+DROP TABLE IF EXISTS `vypecky_contacts_cities`;
 CREATE TABLE IF NOT EXISTS `vypecky_contacts_cities` (
   `id_city` int(11) NOT NULL auto_increment,
   `id_area` int(11) NOT NULL,
@@ -443,6 +451,7 @@ INSERT INTO `vypecky_contacts_cities` (`id_city`, `id_area`, `city_name`) VALUES
 -- Struktura tabulky `vypecky_eplugin_sendmails`
 --
 
+DROP TABLE IF EXISTS `vypecky_eplugin_sendmails`;
 CREATE TABLE IF NOT EXISTS `vypecky_eplugin_sendmails` (
   `id_mail` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -466,6 +475,7 @@ INSERT INTO `vypecky_eplugin_sendmails` (`id_mail`, `id_item`, `id_article`, `ma
 -- Struktura tabulky `vypecky_eplugin_sendmailstexts`
 --
 
+DROP TABLE IF EXISTS `vypecky_eplugin_sendmailstexts`;
 CREATE TABLE IF NOT EXISTS `vypecky_eplugin_sendmailstexts` (
   `id_text` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -489,6 +499,7 @@ INSERT INTO `vypecky_eplugin_sendmailstexts` (`id_text`, `id_item`, `id_article`
 -- Struktura tabulky `vypecky_groups`
 --
 
+DROP TABLE IF EXISTS `vypecky_groups`;
 CREATE TABLE IF NOT EXISTS `vypecky_groups` (
   `id_group` smallint(3) unsigned NOT NULL auto_increment COMMENT 'ID skupiny',
   `name` varchar(15) default NULL COMMENT 'Nazev skupiny',
@@ -513,6 +524,7 @@ INSERT INTO `vypecky_groups` (`id_group`, `name`, `label`, `used`) VALUES
 -- Struktura tabulky `vypecky_items`
 --
 
+DROP TABLE IF EXISTS `vypecky_items`;
 CREATE TABLE IF NOT EXISTS `vypecky_items` (
   `id_item` smallint(6) NOT NULL auto_increment,
   `label_cs` varchar(100) default NULL,
@@ -557,6 +569,7 @@ INSERT INTO `vypecky_items` (`id_item`, `label_cs`, `alt_cs`, `label_en`, `alt_e
 -- Struktura tabulky `vypecky_modules`
 --
 
+DROP TABLE IF EXISTS `vypecky_modules`;
 CREATE TABLE IF NOT EXISTS `vypecky_modules` (
   `id_module` smallint(5) unsigned NOT NULL auto_increment,
   `name` varchar(50) default NULL,
@@ -603,6 +616,7 @@ INSERT INTO `vypecky_modules` (`id_module`, `name`, `mparams`, `datadir`, `dbtab
 -- Struktura tabulky `vypecky_news`
 --
 
+DROP TABLE IF EXISTS `vypecky_news`;
 CREATE TABLE IF NOT EXISTS `vypecky_news` (
   `id_new` smallint(6) NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -657,6 +671,7 @@ INSERT INTO `vypecky_news` (`id_new`, `id_item`, `id_user`, `label_cs`, `text_cs
 -- Struktura tabulky `vypecky_panels`
 --
 
+DROP TABLE IF EXISTS `vypecky_panels`;
 CREATE TABLE IF NOT EXISTS `vypecky_panels` (
   `id_panel` smallint(3) NOT NULL auto_increment,
   `priority` smallint(2) NOT NULL default '0',
@@ -681,6 +696,7 @@ INSERT INTO `vypecky_panels` (`id_panel`, `priority`, `label`, `id_item`, `posit
 -- Struktura tabulky `vypecky_photogalery_galeries`
 --
 
+DROP TABLE IF EXISTS `vypecky_photogalery_galeries`;
 CREATE TABLE IF NOT EXISTS `vypecky_photogalery_galeries` (
   `id_galery` smallint(6) NOT NULL auto_increment,
   `id_item` smallint(6) NOT NULL,
@@ -707,6 +723,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_photogalery_galeries` (
 -- Struktura tabulky `vypecky_photogalery_photos`
 --
 
+DROP TABLE IF EXISTS `vypecky_photogalery_photos`;
 CREATE TABLE IF NOT EXISTS `vypecky_photogalery_photos` (
   `id_photo` smallint(5) unsigned NOT NULL auto_increment,
   `id_galery` smallint(5) unsigned NOT NULL,
@@ -730,6 +747,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_photogalery_photos` (
 -- Struktura tabulky `vypecky_products`
 --
 
+DROP TABLE IF EXISTS `vypecky_products`;
 CREATE TABLE IF NOT EXISTS `vypecky_products` (
   `id_product` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -769,6 +787,7 @@ INSERT INTO `vypecky_products` (`id_product`, `id_item`, `id_user`, `add_time`, 
 -- Struktura tabulky `vypecky_references`
 --
 
+DROP TABLE IF EXISTS `vypecky_references`;
 CREATE TABLE IF NOT EXISTS `vypecky_references` (
   `id_reference` smallint(5) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -803,14 +822,15 @@ INSERT INTO `vypecky_references` (`id_reference`, `id_item`, `name_cs`, `label_c
 -- Struktura tabulky `vypecky_sections`
 --
 
+DROP TABLE IF EXISTS `vypecky_sections`;
 CREATE TABLE IF NOT EXISTS `vypecky_sections` (
   `id_section` smallint(3) NOT NULL auto_increment,
-  `label_cs` varchar(50) default NULL,
-  `alt_cs` varchar(200) default NULL,
-  `label_en` varchar(50) default NULL,
-  `alt_en` varchar(200) default NULL,
-  `label_de` varchar(50) default NULL,
-  `alt_de` varchar(200) default NULL,
+  `slabel_cs` varchar(50) default NULL,
+  `salt_cs` varchar(200) default NULL,
+  `slabel_en` varchar(50) default NULL,
+  `salt_en` varchar(200) default NULL,
+  `slabel_de` varchar(50) default NULL,
+  `salt_de` varchar(200) default NULL,
   `priority` smallint(6) NOT NULL default '0',
   PRIMARY KEY  (`id_section`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
@@ -819,7 +839,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_sections` (
 -- Vypisuji data pro tabulku `vypecky_sections`
 --
 
-INSERT INTO `vypecky_sections` (`id_section`, `label_cs`, `alt_cs`, `label_en`, `alt_en`, `label_de`, `alt_de`, `priority`) VALUES
+INSERT INTO `vypecky_sections` (`id_section`, `slabel_cs`, `salt_cs`, `slabel_en`, `salt_en`, `slabel_de`, `salt_de`, `priority`) VALUES
 (1, 'section 1', NULL, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
@@ -828,6 +848,7 @@ INSERT INTO `vypecky_sections` (`id_section`, `label_cs`, `alt_cs`, `label_en`, 
 -- Struktura tabulky `vypecky_texts`
 --
 
+DROP TABLE IF EXISTS `vypecky_texts`;
 CREATE TABLE IF NOT EXISTS `vypecky_texts` (
   `id_text` smallint(4) unsigned NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -858,6 +879,7 @@ INSERT INTO `vypecky_texts` (`id_text`, `id_item`, `text_cs`, `changed_time`, `t
 -- Struktura tabulky `vypecky_userfiles`
 --
 
+DROP TABLE IF EXISTS `vypecky_userfiles`;
 CREATE TABLE IF NOT EXISTS `vypecky_userfiles` (
   `id_file` smallint(6) NOT NULL auto_increment,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -899,6 +921,7 @@ INSERT INTO `vypecky_userfiles` (`id_file`, `id_item`, `id_article`, `id_user`, 
 -- Struktura tabulky `vypecky_users`
 --
 
+DROP TABLE IF EXISTS `vypecky_users`;
 CREATE TABLE IF NOT EXISTS `vypecky_users` (
   `id_user` smallint(5) unsigned NOT NULL auto_increment COMMENT 'ID uzivatele',
   `username` varchar(20) NOT NULL COMMENT 'Uzivatelske jmeno',

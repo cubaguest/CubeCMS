@@ -1,15 +1,15 @@
 <?php
 /**
- * Abstraktní třída pro Engine Pluginy - EPlugins.
- * Třída obsahuje základní metody pro vytváření EPluginu a práci s nimi
+ * Abstraktní třída pro komponenty -- Components
+ * Třída obsahuje základní metody pro vytváření komponent a práci s nimi
  * (např. scroll, comments, atd.).
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: eplugin.class.php 636 2009-07-07 20:17:18Z jakub $ VVE3.9.4 $Revision: 636 $
+ * @version    	$Id: component.class.php 636 2009-07-07 20:17:18Z jakub $ VVE 6.0 $Revision: 636 $
  * @author        $Author: jakub $ $Date: 2009-07-07 20:17:18 +0000 (Út, 07 čec 2009) $
  *                $LastChangedBy: jakub $ $LastChangedDate: 2009-07-07 20:17:18 +0000 (Út, 07 čec 2009) $
- * @abstract 		Abstraktní třída pro vytvoření Epluginu
- * @todo 			implementovat generování názvu souborů pro zvolený eplugin
+ * @abstract 		Abstraktní třída pro vytvoření komponenty
+ * @todo 			implementovat generování názvu souborů pro zvolenou komponentu
  */
 
 class Component {
@@ -17,7 +17,7 @@ class Component {
  * Výchozí cesta s šablonama
  * @var string
  */
-   const EPLUGINS_DEFAULT_TEMPALTES_DIR = Template::TEMPLATES_DIR;
+   const COMPONENTS_DEFAULT_TEMPALTES_DIR = Template::TEMPLATES_DIR;
 
    /**
     * Parametr pro přenos souboru js pluginu
@@ -34,7 +34,7 @@ class Component {
     * Název komponenty
     * @var string
     */
-      private $componentName = null;
+   private $componentName = null;
 
    /**
     * Objekt odkazů
@@ -62,14 +62,14 @@ class Component {
       $this->link =  new Url_Link_Component($this->componentName);
       $this->link->category(Category::getMainCategory()->getUrlKey());
       $this->init();
-      if(!$runOnly){
+      if(!$runOnly) {
          $this->template = new Template_Component($this->link);
       }
    }
 
    /**
     * Metoda nastaví id článku
-    * @param integer $id 
+    * @param integer $id
     */
    public function setIdArticle($id) {
       $this->idArticle = $id;
@@ -88,21 +88,21 @@ class Component {
     * akce a spustí zadané metody
     */
    public function runAction($actionName, $params, $outputType) {
-      // inicializační metoda
+   // inicializační metoda
       $this->init();
 
       $this->pluginParams = $params;
       if(method_exists($this, $actionName.ucfirst($outputType).'Controller') AND
-         method_exists($this, $actionName.ucfirst($outputType).'View')){
+          method_exists($this, $actionName.ucfirst($outputType).'View')) {
          $this->{$actionName.ucfirst($outputType).'Controller'}();
          $this->{$actionName.ucfirst($outputType).'View'}();
       } else if(method_exists($this, $actionName.'Controller') AND
-         method_exists($this, $actionName.'View')) {
-         $this->{$actionName.'Controller'}();
-         $this->{$actionName.'View'}();
-      } else {
-         trigger_error(_('Neimplementována metoda Componenty'));
-      }
+             method_exists($this, $actionName.'View')) {
+            $this->{$actionName.'Controller'}();
+            $this->{$actionName.'View'}();
+         } else {
+            trigger_error(_('Neimplementována metoda Componenty'));
+         }
    }
 
    /**
@@ -130,18 +130,6 @@ class Component {
    protected function link() {
       return $this->link;
    }
-
-   /**
-    * Metoda vrací id item nastavené epluginu
-    *
-    * @return integer -- id item
-    */
-//   public function getIdItem() {
-//      if($this->sys()->module() instanceof Module) {
-//         return $this->sys()->module()->getId();
-//      }
-//      return 0;
-//   }
 
    /**
     * Metoda vrací objekt chbových zpráv
@@ -178,30 +166,6 @@ class Component {
    }
 
    /**
-    * Metoda vrací odkaz na soubor epluginu
-    * //TODO možná implementovat vracení odkazu na EPlugin file (./epluginuserimages.js)
-    */
-//   public function getFileLink($file = null, $params = null) {
-//      if($file == null) {
-//         $file = '.'.URL_SEPARATOR.$this->getEpluginName()
-//             .URL_SEPARATOR.$this->getEpluginName().'js';
-//         if($params != null AND is_array($params)) {
-//            $param = http_build_query($params);
-//            $file.='?'.$param;
-//         }
-//      } else if(is_string($file)) {
-//            $file = '.'.URL_SEPARATOR.$this->getEpluginName().URL_SEPARATOR.$file;
-//            if($params != null AND is_array($params)) {
-//               $param = http_build_query($params);
-//               $file.='?'.$param;
-//            }
-//         } else if($file instanceof JsPlugin_JsFile) {
-//               $file = '.'.URL_SEPARATOR.$this->getEpluginName().URL_SEPARATOR.$file;
-//            }
-//      return $file;
-//   }
-
-   /**
     * Metoda nastaví id šablony pro výpis
     * @param integer -- id šablony (jakékoliv)
     */
@@ -215,44 +179,5 @@ class Component {
 
       return (string)$this->template();
    }
-
-
-/**
- * Metoda vrací id šablony
- * @return integer
- */
-//   protected function getIdTpl() {
-//      return $this->idTpl;
-//   }
-
-/**
- * Metoda nastaví podnázev šablony pro výpis
- * @param string -- podnázev šablony (jakékoliv)
- */
-//   public function setTplSubName($name) {
-//      self::$tplSubName[$this->getIdTpl()] = $name;
-//   }
-
-/**
- * Metoda vrací podnázev šablony
- * @return string
- */
-//   protected function getTplSubName() {
-//      if(isset(self::$tplSubName[$this->getIdTpl()])){
-//         return self::$tplSubName[$this->getIdTpl()];
-//      } else {
-//         return null;
-//      }
-//   }
-
-/**
- * Metoda nastavuje do epluginu objkek autorizace
- * @param Auth $auth -- objekt autorizace
- */
-//      public function setAuthParam(Auth $auth) {
-//
-//         $this->sys()->setRights(new Rights(null));
-//         $this->sys()->setRights(new Rights(null));
-//      }
 }
 ?>

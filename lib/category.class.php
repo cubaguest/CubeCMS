@@ -175,7 +175,11 @@ class Category {
     * @return string -- urlkey kategorie
     */
    public function getUrlKey() {
-      return (string)$this->category->{Model_Category::COLUMN_URLKEY};
+      if(isset ($this->category->{Model_Category::COLUMN_URLKEY})){
+         return (string)$this->category->{Model_Category::COLUMN_URLKEY};
+      } else {
+         return null;
+      }
    }
 
    /**

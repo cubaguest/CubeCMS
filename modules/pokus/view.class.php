@@ -4,13 +4,9 @@
  *
  */
 
-class PokusView extends View {
+class Pokus_View extends View {
    public function mainView() {
-      $this->template()->addTpl("pokusform.tpl");
-
-      $eplMail = $this->container()->getEplugin('mail');
-      $eplMail->setTplSubName(_('pro odeslání'));
-      $this->template()->addTpl($eplMail);
+      $this->template()->addTplFile("pokusform.phtml");
    }
 }
 
