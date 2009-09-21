@@ -14,18 +14,23 @@
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
 class Form_Element_Submit extends Form_Element implements Form_Element_Interface {
-   /**
-    * jestli je element potvrzen
-    * @var boolean
-    */
+/**
+ * jestli je element potvrzen
+ * @var boolean
+ */
    private $isSubmited = false;
+
+   protected function init() {
+      $this->htmlElement = new Html_Element('input');
+      $this->htmlElementLabel = new Html_Element('label');
+   }
 
    /**
     * Metoda naplní prvek
     */
    public function populate($method = 'post') {
-      if($method == 'post'){
-         if(isset ($_POST[$this->elementPrefix.$this->getName()])){
+      if($method == 'post') {
+         if(isset ($_POST[$this->formElementPrefix.$this->getName()])) {
             $this->isSubmited = true;
             $this->isPopulated = true;
          }
@@ -38,6 +43,21 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
     */
    public function isValid() {
       return $this->isSubmited;
+   }
+
+      /**
+    * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
+    * @return string
+    */
+   public function controll() {
+      $this->html()->setAttrib('name', $this->formElementPrefix.$this->getName());
+      $this->html()->setAttrib('type', 'submit');
+      $this->html()->setAttrib('value', '');
+      return $this->html();
+   }
+
+   public function  __toString() {
+      return (string)$this->controll();
    }
 }
 ?>

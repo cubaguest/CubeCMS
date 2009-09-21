@@ -13,7 +13,7 @@
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract      Třída pro obsluhu formulářů
  */
-class Form extends Html_Element implements ArrayAccess {
+class Form implements ArrayAccess {
 /**
  * Prefix pro všechny prvky ve formuláři
  * @var string
@@ -57,15 +57,91 @@ class Form extends Html_Element implements ArrayAccess {
    private $sendMethod = 'post';
 
    /**
+    * Objekt odkazu na akci pro formulář
+    * @var Url_Link
+    */
+   private $formAction = null;
+
+   /**
+    * Objekt elementu, do kterého bude formlář vykreslen
+    * @var Html_Element
+    */
+   private $htmlElement = null;
+
+   /**
     * Konstruktor vytváří objekt formuláře
     * @param string $prefix -- (option) prefix pro formulářové prvky
     */
    function __construct($prefix = null) {
       $this->formPrefix = $prefix;
-      parent::__construct('form');
-      $this->setAttrib('action', new Links());
-      $this->setAttrib('method', 'post');
+      $this->formAction = new Url_Link();
+      $this->htmlElement = new Html_Element('form');
    }
+
+   public function  __toString() {
+      return $this->creatString();
+   }
+
+   /**
+    * Metoda vytvoří řetězec s formulářem, pro použití v šabloně
+    * @param string $type -- jaký typ se má vrátit (table, null, ...) viz doc
+    * @return string -- formulář jako řetězec
+    */
+   private function creatString($type = 'table') {
+      $this->htmlElement->setAttrib('action', $this->formAction);
+      $this->htmlElement->setAttrib('method', 'post');
+
+      $table = new Html_Element('table');
+      // přidání podřízených elementů
+      foreach ($this->elements as $element) {
+         $table->addContent($element->render($type));
+         $table->addContent("\n");
+      }
+      $this->htmlElement->addContent($table);
+
+      return (string)$this->htmlElement;
+   }
+
+   /**
+    * Magická metoda pro vložení neinicializované proměné do objektu
+    * @param string $name -- název proměnné
+    * @param mixed $value -- hodnota proměnné
+    */
+   public function  __set($name, $value) {
+      $this->elements[$name] = $value;
+   }
+
+   /**
+    * Metoda vraci inicializovanou proměnnou, pokud je
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
+   public function  __get($name) {
+      if(!isset($this->elements[$name])){
+         $this->elements[$name] = null;
+      }
+      return $this->elements[$name];
+   }
+
+   /**
+    * Metoda kontroluje jestli byla daná proměnná inicializována
+    * @param string $name -- název proměnné
+    * @return mixed -- hodnota proměnné
+    */
+   public function  __isset($name) {
+      return isset ($this->elements[$name]);
+   }
+
+   /**
+    * Metoda maže danou proměnnou z objektu
+    * @param string $name -- název proměnné
+    */
+   public function  __unset($name) {
+      if(isset ($this->elements[$name])){
+         unset ($this->elements[$name]);
+      }
+   }
+
 
    /*
     * Metody pro přístup k prvkům formuláře
@@ -86,6 +162,9 @@ class Form extends Html_Element implements ArrayAccess {
     * @return Form_Element
     */
    function offsetGet($name) {
+      if(!isset($this->elements[$name])){
+         $this->elements[$name] = null;
+      }
       return $this->elements[$name];
    }
 
@@ -219,12 +298,8 @@ class Form extends Html_Element implements ArrayAccess {
     * @todo dodělat přiřazení priority prvkům kvůli vykreslení v šabloě
     */
    public function addElement(Form_Element $element, $priority = null) {
-//      $element->setRequestType($this->getRequest());
-      $element->setPrefix($this->formPrefix);
       $this->elements[$element->getName()] = $element;
-//      if($element instanceof Form_Element_Submit) {
-//         $this->submitElements[$element->getName()] = & $this->elements[$element->getName()];
-//      }
+      $this->elements[$element->getName()]->setPrefix($this->formPrefix);
    }
 
    /*
@@ -236,18 +311,20 @@ class Form extends Html_Element implements ArrayAccess {
      */
 
    /**
-    * Metoda vyrenderuje formulář
+    * Metoda vyrenderuje formulář podle zadaného typu
+    * @param string $type -- typ rendereru (table, null, atd)
     */
-   public function render() {
-      ;
+   public function render($type = 'table') {
+      print ($this->creatString($type));
    }
 
    /**
-    * Metoda přidá css třídu do dormuláře
-    * @param string $class -- název třídy
+    * Metoda vrací objekt html elemntu formuláře, vhodné pro úpravu tříd, přidání
+    * vlastností, atd
+    * @return Html_Element
     */
-   public function addCssClass($class) {
-      ;
+   public function html() {
+      return $this->htmlElement;
    }
 
    /**

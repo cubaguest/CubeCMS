@@ -1,32 +1,31 @@
 <?php
 /**
- * Interface elementu formuláře
- * Interface definující základní vlastnosti elemntu formuláře
+ * Třída elementu formuláře
  *
  * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: form.class.php 630 2009-06-14 15:52:19Z jakub $ VVE 5.1.0 $Revision: 630 $
+ * @version    	$Id: form_element.class.php 630 2009-06-14 15:52:19Z jakub $ VVE 5.1.0 $Revision: 630 $
  * @author        $Author: jakub $ $Date: 2009-06-14 15:52:19 +0000 (Sun, 14 Jun 2009) $
  *                $LastChangedBy: jakub $ $LastChangedDate: 2009-06-14 15:52:19 +0000 (Sun, 14 Jun 2009) $
  * @abstract      Třída pro obsluhu formulářů
  */
-class Form_Element extends Html_Element implements Form_Element_Interface {
+class Form_Element implements Form_Element_Interface {
    /**
     * Název elementu
     * @var string
     */
-   protected $elementName = null;
+   protected $formElementName = null;
 
    /**
     * Prefix elementu
     * @var string
     */
-    protected $elementPrefix = null;
+    protected $formElementPrefix = null;
 
    /**
     * Popisek elementu
     * @var string
     */
-   protected $elementLabel = null;
+   protected $formElementLabel = null;
 
    /**
     * Pole s validátory
@@ -71,14 +70,35 @@ class Form_Element extends Html_Element implements Form_Element_Interface {
    protected $langs = array();
 
    /**
+    * Objekt Html elementu pro daný prvek
+    * @var Html_Element
+    */
+   protected $htmlElement = null;
+
+   /**
+    * Objekt Html elementu pro daný popisek prvku
+    * @var Html_Element
+    */
+   protected $htmlElementLabel = null;
+
+   /**
     * Konstruktor elemntu
     * @param string $name -- název elemntu
     * @param string $label -- popis elemntu
     */
-   public function  __construct($name = null, $label = null, $prefix = null) {
-      $this->elementName = $name;
-      $this->elementLabel = $label;
-      $this->elementPrefix = $prefix;
+   public function  __construct($name, $label = null, $prefix = null) {
+      $this->formElementName = $name;
+      $this->formElementLabel = $label;
+      $this->formElementPrefix = $prefix;
+      $this->init();
+   }
+
+   /**
+    * Metoda pro inicializaci
+    */
+   protected function init() {
+      $this->htmlElement = new Html_Element('input');
+      $this->htmlElementLabel = new Html_Element('label');
    }
 
    /*
@@ -149,7 +169,15 @@ class Form_Element extends Html_Element implements Form_Element_Interface {
     * @return string
     */
    final public function getName() {
-      return $this->elementName;
+      return $this->formElementPrefix.$this->formElementName;
+   }
+
+   /**
+    * Metoda vrací popis prvku
+    * @return string -- popis prvku, je zadáván při vytvoření
+    */
+   final public function getLabel() {
+      return $this->formElementLabel;
    }
 
    /**
@@ -165,7 +193,7 @@ class Form_Element extends Html_Element implements Form_Element_Interface {
     * @param string $prefix -- prefix elementu ve formuláři
     */
    final public function setPrefix($prefix) {
-      $this->elementPrefix = $prefix;
+      $this->formElementPrefix = $prefix.$this->formElementPrefix;
    }
 
    /*
@@ -203,6 +231,69 @@ class Form_Element extends Html_Element implements Form_Element_Interface {
     */
    final protected function errMsg() {
       return AppCore::getUserErrors();
+   }
+
+   /**
+    * Metoda vrací popisek k prvku (html element label)
+    * @return string
+    */
+   public function label() {
+      $this->htmlLabel()->addContent($this->formElementLabel);
+      $this->htmlLabel()->setAttrib('for', $this->getName());
+      if(!$this->isValid AND $this->isPopulated){
+         $this->htmlLabel()->addClass('formErrorLabel');
+      }
+      return (string)$this->htmlLabel();
+   }
+
+   /**
+    * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
+    * @return string
+    */
+   public function controll() {
+      return null;
+   }
+
+   /**
+    * Metoda vyrenderuje celý element i s popiskem
+    * @param string $type -- typ renderu (table,null,...)
+    */
+   public function render($type = "table") {
+      $string = null;
+      switch ($type) {
+         case 'table':
+         default:
+            $tr = new Html_Element('tr');
+            $td1 = new Html_Element('td');
+            $td1->addContent($this->label());
+            $tr->addContent($td1);
+            $td2 = new Html_Element('td');
+            $td2->addContent($this->controll());
+            $tr->addContent($td2);
+            $string = $tr;
+            break;
+      }
+      return (string)$string;
+   }
+
+   public function  __toString() {
+      return (string)$this->render();
+   }
+
+   /**
+    * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu
+    * @return Html_Element
+    */
+   public function html() {
+      return $this->htmlElement;
+   }
+
+   /**
+    * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu
+    * @return Html_Element
+    */
+   public function htmlLabel() {
+      return $this->htmlElementLabel;
    }
 }
 ?>
