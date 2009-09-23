@@ -1,4 +1,18 @@
+<!--
 <form method="post" action="">
    <input name="pokus_name" type="text" size="30" maxlength="50" value="" />
 	<input type="submit" name="pokus_send" value="SEND" />
 </form>
+-->
+<?
+//$eleme = new Html_Element('form');
+//$eleme->setAttrib('method', 'post')->setAttrib('action', '');
+//
+//$childElement = new Html_Element('input');
+//$childElement->setAttrib('type', 'text');
+//$childElement->setAttrib('name', 'pokus_text2');
+//
+//$eleme->addContent($childElement);
+$this->form->name->html()->setAttrib('rel', 'link');
+?>
+<?=$this->form?>
