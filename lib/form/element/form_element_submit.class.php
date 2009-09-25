@@ -29,12 +29,19 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
     * Metoda naplní prvek
     */
    public function populate($method = 'post') {
-      if($method == 'post') {
-         if(isset ($_POST[$this->formElementPrefix.$this->getName()])) {
-            $this->isSubmited = true;
-            $this->isPopulated = true;
-         }
+      switch ($method) {
+         case 'get':
+            if(isset ($_GET[$this->getName()])) {
+               $this->isSubmited = true;
+            }
+            break;
+         default:
+            if(isset ($_POST[$this->getName()])) {
+               $this->isSubmited = true;
+            }
+            break;
       }
+      $this->isPopulated = true;
    }
 
    /**
@@ -45,12 +52,12 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
       return $this->isSubmited;
    }
 
-      /**
+   /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
    public function controll() {
-      $this->html()->setAttrib('name', $this->formElementPrefix.$this->getName());
+      $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'submit');
       $this->html()->setAttrib('value', '');
       return $this->html();

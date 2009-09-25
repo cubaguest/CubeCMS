@@ -12,19 +12,27 @@
 class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_Interface {
 
    public function  __construct($errMsg = null) {
-      parent::__construct($errMsg);
-      if($errMsg == null){
-         $this->errMessage = _("Nebyly vyplněny všechny povinné údaje");
+      if($errMsg == null) {
+         parent::__construct(_("Nebyly vyplněny všechny povinné údaje"));
       } else {
-         $this->errMessage = $errMsg;
+         parent::__construct($errMsg);
       }
    }
 
+   /**
+    * Metoda přidá do elementu prvky z validace
+    * @param Form_Element $element -- samotný element
+    */
+   public function addHtmlElementParams(Form_Element $element) {
+      $element->htmlLabel()->addClass('requiredElem');
+      $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
+   }
+
    public function validate(Form_Element $elemObj) {
-      if($elemObj->multiple() OR $elemObj->multiLang()){
+      if($elemObj->isMultiple() OR $elemObj->isMultiLang()) {
 
       } else {
-         if($elemObj->getValues() == null OR $elemObj->getValues() == ""){
+         if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
             $this->errMsg()->addMessage($this->errMessage);
             return false;
          }

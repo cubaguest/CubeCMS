@@ -23,24 +23,24 @@ class Form_Element_Text extends Form_Element {
    /**
     * Metoda naplní prvek
     */
-   public function populate($method = 'post') {
-      switch ($method) {
-         case 'get':
-            $this->values = $_GET[$this->formElementPrefix.$this->elementName];
-            break;
-         default:
-            $this->values = $_POST[$this->formElementPrefix.$this->elementName];
-            break;
-      }
-      $this->isPopulated = true;
-
-      // validace prvku
-      foreach ($this->validators as $validator) {
-         if(!$validator->validate($this)){
-            $this->isValid = false;
-         }
-      }
-   }
+//   public function populate($method = 'post') {
+//      switch ($method) {
+//         case 'get':
+//            $this->values = $_GET[$this->formElementPrefix.$this->elementName];
+//            break;
+//         default:
+//            $this->values = $_POST[$this->formElementPrefix.$this->elementName];
+//            break;
+//      }
+//      $this->isPopulated = true;
+//
+//      // validace prvku
+//      foreach ($this->validators as $validator) {
+//         if(!$validator->validate($this)){
+//            $this->isValid = false;
+//         }
+//      }
+//   }
 
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
@@ -49,6 +49,7 @@ class Form_Element_Text extends Form_Element {
    public function controll() {
       $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'text');
+      $this->html()->setAttrib('id', $this->getName());
       $this->html()->setAttrib('value', '');
       return $this->html();
    }
@@ -58,6 +59,21 @@ class Form_Element_Text extends Form_Element {
       $str .= new Html_Element('br');
       $str .= $this->controll();
       return $str;
+   }
+
+   /**
+    * Metoda upraví vlastnost prvku u vykreslení
+    * @param string $type -- typ parametru, který se má upravit 
+    * @param mixed $value -- hodnota parametru
+    */
+   public function setRender($type, $size = 30) {
+      switch ($type) {
+         case 'size':
+            $this->html()->setAttrib('size', $size);
+            break;
+         default:
+            break;
+      }
    }
 }
 ?>

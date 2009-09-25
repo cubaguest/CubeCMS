@@ -58,6 +58,12 @@ class Form_Element implements Form_Element_Interface {
    protected $isMultiple = false;
 
    /**
+    * Proměnná obsahuje ža je prvek povinný
+    * @var boolean
+    */
+//   protected $isRequired = false;
+
+   /**
     * Pole s odeslanými hodnotami
     * @var mixed
     */
@@ -118,7 +124,8 @@ class Form_Element implements Form_Element_Interface {
 //         }
 //      }
 //      $this->validators[$name] = $params;
-      array_push($this->validators, $validator);
+//      array_push($this->validators, $validator);
+      $this->validators[get_class($validator)] = $validator;
    }
 
    /**
@@ -144,25 +151,17 @@ class Form_Element implements Form_Element_Interface {
     * @param bool $multiple -- true pro nasatvení vícerozměrného elementu
     * @return bool -- true pokud je element vicerozměrný
     */
-   public function multiple($multiple = null) {
-      if($multiple !== null){
-
-      }
+   public function isMultiple() {
       return $this->isMultiple;
    }
 
    /**
     * Metofda vrací jestli se jedná o vícerozměrný element
-    * @param array $multiLang -- true nebo pole s jazyky
     * @return bool -- true pokud je element vicerozměrný
     */
-   public function multiLang($multiLang = null) {
-      if($multiLang !== null){
-         $this->isMultilang = true;
-      }
+   public function isMultiLang() {
       return $this->isMultilang;
    }
-
 
    /**
     * Metoda vrací název elementu
@@ -223,6 +222,27 @@ class Form_Element implements Form_Element_Interface {
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
    public function populate($method = 'post'){
+      switch ($method) {
+         case 'get':
+            $this->values = $_GET[$this->getName()];
+            break;
+         default:
+            $this->values = $_POST[$this->getName()];
+            break;
+      }
+      $this->isPopulated = true;
+   }
+
+   /**
+    * Metoda provede validace
+    */
+   public function validate() {
+      // validace prvku
+      foreach ($this->validators as $validator) {
+         if(!$validator->validate($this)){
+            $this->isValid = false;
+         }
+      }
    }
 
    /**
@@ -240,9 +260,16 @@ class Form_Element implements Form_Element_Interface {
    public function label() {
       $this->htmlLabel()->addContent($this->formElementLabel);
       $this->htmlLabel()->setAttrib('for', $this->getName());
+      
+      foreach ($this->validators as $validator) {
+         $validator->addHtmlElementParams($this);
+      }
+
       if(!$this->isValid AND $this->isPopulated){
          $this->htmlLabel()->addClass('formErrorLabel');
+         $this->html()->addClass('formError');
       }
+
       return (string)$this->htmlLabel();
    }
 
@@ -251,7 +278,7 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function controll() {
-      return null;
+      return $this->html();
    }
 
    /**
@@ -264,9 +291,10 @@ class Form_Element implements Form_Element_Interface {
          case 'table':
          default:
             $tr = new Html_Element('tr');
-            $td1 = new Html_Element('td');
+            $td1 = new Html_Element('th');
             $td1->addContent($this->label());
             $tr->addContent($td1);
+            // kontrolní element
             $td2 = new Html_Element('td');
             $td2->addContent($this->controll());
             $tr->addContent($td2);

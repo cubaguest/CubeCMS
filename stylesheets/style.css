@@ -122,7 +122,7 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 
 #col2wrap {
 	width: 180px;
-	margin-left: -100%; /* position column to the left side */
+	/*margin-left: -100%;  position column to the left side */
 	/*margin-left: -20px;*/ /*background-color: #ffe0e0;*/
 }
 
@@ -219,6 +219,18 @@ a:hover {
 }
 
 /* formulařové prvky */
+.requiredElem {
+   color:maroon;
+}
+
+.formErrorLabel {
+   color:red;
+}
+
+.formError {
+   background-color: #f4d0d0;
+}
+
 input, button {
 	border: 1px solid #0f6572;
 	background-color: #e1ebec;
@@ -254,10 +266,6 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 
 .textarea_tinymce {
    width: 100%;
-}
-
-.badItem {
-  background-color: #f08682;
 }
 
 /* ODSTRANIT */

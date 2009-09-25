@@ -196,6 +196,7 @@ class Form implements ArrayAccess {
       foreach ($this->elements as $element) {
          if($element instanceof Form_Element_Submit){
             $element->populate();
+//            $element->validate();
             if($element->isValid()){
                $this->isSend = true;
                break;
@@ -212,8 +213,9 @@ class Form implements ArrayAccess {
    public function isValid() {
       if($this->isSend()){
          $this->populate();
+         return $this->isValid;
       }
-      return $this->isValid;
+      return false;
    }
 
    /**
@@ -222,6 +224,7 @@ class Form implements ArrayAccess {
    public function populate() {
       foreach ($this->elements as $name => $element) {
          $element->populate($this->sendMethod);
+         $element->validate();
          if(!$element->isValid()){
             $this->isValid = false;
          }
@@ -235,11 +238,11 @@ class Form implements ArrayAccess {
     * @return bool -- true pokud byl formulář již vyplněn
     */
    public function isPopulated() {
-      $element->populate();
-         $element->validate();
-         if($element->isValid()){
-            $submited = true;
-         }
+//      $element->populate();
+//      $element->validate();
+//      if($element->isValid()) {
+//         $submited = true;
+//      }
       return $this->isPopulated;
    }
 

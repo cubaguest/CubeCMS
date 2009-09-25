@@ -73,34 +73,6 @@ class Html_Element {
       return $elem;
    }
 
-
-   public function  __toStringBeginOld() {
-      $string = "<".$this->elementName;
-      // render atributů
-      foreach ($this->attribs as $name => $value) {
-         $string .= " ".$name."=\"$value\"";
-      }
-      // render tříd
-      if(!empty ($this->classes)) {
-         $string .= " class=\"";
-         foreach ($this->classes as $class) {
-            $string .= $class."";
-         }
-         $string .= "\"";
-      }
-      // inline nebo block element
-      if($this->isInline) {
-         $string .= " />\n";
-      } else {
-         $string .= ">\n";
-         // obsah
-         $string .= $this->content."\n";
-         // ukončovací tag
-         $string .= "</".$this->elementName.">\n";
-      }
-      return $string;
-   }
-
    /**
     * Metoda vrátí začátek elementu
     */
@@ -114,8 +86,9 @@ class Html_Element {
       if(!empty ($this->classes)) {
          $string .= " class=\"";
          foreach ($this->classes as $class) {
-            $string .= $class."";
+            $string .= $class." ";
          }
+         $string = substr($string, 0, strlen($string)-1);
          $string .= "\"";
       }
       if($this->isInline) {
