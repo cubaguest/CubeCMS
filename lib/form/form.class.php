@@ -88,8 +88,8 @@ class Form implements ArrayAccess {
     * @return string -- formulář jako řetězec
     */
    private function creatString($type = 'table') {
-      $this->htmlElement->setAttrib('action', $this->formAction);
-      $this->htmlElement->setAttrib('method', 'post');
+      $this->html()->setAttrib('action', $this->formAction);
+      $this->html()->setAttrib('method', 'post');
 
       $table = new Html_Element('table');
       // přidání podřízených elementů
@@ -97,9 +97,9 @@ class Form implements ArrayAccess {
          $table->addContent($element->render($type));
          $table->addContent("\n");
       }
-      $this->htmlElement->addContent($table);
+      $this->html()->addContent($table);
 
-      return (string)$this->htmlElement;
+      return (string)$this->html();
    }
 
    /**
@@ -265,30 +265,34 @@ class Form implements ArrayAccess {
    /**
     * Metoda nastavuje akci pro formulář, tedy adresu kam se má odkazovat
     * @param string $link -- odkaz pro akci
+    * @todo
     */
    public function setAction($link) {
-      $this->setAttrib('action', (string)$link);
+      $this->html()->setAttrib('action', (string)$link);
    }
 
    /**
     * Metoda vrací akci pro odeslání formuláře
     * @return Links
+    * @todo
     */
    public function getAction() {
-      return $this->getAttrib('action');
+      return $this->html()->getAttrib('action');
    }
 
    /**
     * Metoda nastavuje metodu odeslání formuláře (post|get)
     * @param string $method -- typ metody (výchozí je 'post')
+    * @todo
     */
    public function setSendMethod($method = "post") {
-      $this->setAttrib('method', strtolower($method));
+      $this->html()->setAttrib('method', strtolower($method));
    }
 
    /**
     * Metoda vrací nastavenou metodu odeslání formuláře
     * @return string (post|get)
+    * @todo
     */
    public function getSendMethod() {
       return $this->getAttrib('method');
@@ -303,6 +307,11 @@ class Form implements ArrayAccess {
    public function addElement(Form_Element $element, $priority = null) {
       $this->elements[$element->getName()] = $element;
       $this->elements[$element->getName()]->setPrefix($this->formPrefix);
+
+      // pokud je soubor přidám do formu že se bude přenášet po částech
+      if($element instanceof Form_Element_File){
+         $this->html()->setAttrib("enctype", "multipart/form-data");
+      }
    }
 
    /*
@@ -330,39 +339,9 @@ class Form implements ArrayAccess {
       return $this->htmlElement;
    }
 
-   /**
-    * Metoda odebere css třídu z formuláře
-    * @param string $name -- název třídy
-    */
-   public function removeCssClass($name) {
-      ;
-   }
-
     /*
      * Podpůrné metody
      */
-
-     /**
-      * Metoda vrací typ zvoleného requestu
-      * @retur 
-      */
-     private function getRequest() {
-        if($this->sendMethod == 'post'){
-           return $_POST;
-        } else if($this->sendMethod == 'get'){
-           return $_GET;
-        } else {
-           throw new InvalidArgumentException(_('Nepodporovaný typ požadavku'), 1);
-        }
-     }
-
-   /**
-    * Metoda vrací objekt s chybovými zprávami
-    * @return Messages -- objekt zpráv
-    */
-   final private function errMsg() {
-      return AppCore::getUserErrors();
-   }
 }
 
 ?>

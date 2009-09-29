@@ -30,15 +30,8 @@
       <!--Menu styly -->
       <link rel="stylesheet" type="text/css" href="<?=$this->style('chromestyle.css')?>" />
       <script type="text/javascript" src="./jscripts/chromejs/chrome.js"></script>
-
-      <?//Vypis stylesheetu modulu
-      foreach ($this->getStylesheets() as $style){?>
-      <link rel="stylesheet" type="text/css" href="<?=$style?>" /><?echo"\n";}?>
-
-      <?//Vypis javascriptu
-      foreach ($this->getJavaScripts() as $jsFile){?>
-      <script src="<?=$jsFile?>" type="text/javascript"></script><?echo"\n";}?>
-
+      {STYLESHEETS}
+      {JAVASCRIPTS}
    </head>
 
    <body id="pageTop">
@@ -61,38 +54,6 @@
             </div>
 
             <div id="pageHeader">
-   <?
-   $headerFile =Template::face(false)."flash/";
-   $prLinks = $this->pVar("productsUrl");
-   if($this->pVar("productHeader") === true){
-      $headerFile .= "header2.swf?homeurl=".urlencode(Links::getMainWebDir())
-      ."&xmlfile=".urlencode("./data/header/images.xml");
-   } else {
-      $headerFile .= "header1.swf?homeurl=".urlencode(Links::getMainWebDir())
-      ."&winurl=".urlencode($prLinks[0])
-      ."&doorurl=".urlencode($prLinks[1])
-      ."&knoburl=".urlencode($prLinks[2])
-      ."&shadeurl=".urlencode($prLinks[3])
-      ."&paraurl=".urlencode($prLinks[4]);
-   }?>
-   <!--[if !IE]> -->
-   <object type="application/x-shockwave-flash"
-           data="<?=$headerFile?>" width="1000" height="204">
-      <!-- <![endif]-->
-
-      <!--[if IE]>
-      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-        codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"
-        width="1000" height="204">
-        <param name="movie" value="<?=$headerFile?>" />
-      <!--><!--dgx-->
-      <param name="loop" value="true" />
-      <param name="menu" value="false" />
-      <param name="wmode" value="opaque" />
-
-      <p><?=_("Prosím nainstalijte si Adobe Flash Player")?></p>
-   </object>
-   <!-- <![endif]-->
             </div>
 
          </div><!-- headwrap -->

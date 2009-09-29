@@ -59,8 +59,16 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
    public function controll() {
       $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'submit');
-      $this->html()->setAttrib('value', '');
+      $this->html()->setAttrib('value', $this->getLabel());
       return $this->html();
+   }
+
+   /**
+    * Metoda vrací label
+    * @return string
+    */
+   public function label() {
+      return null;
    }
 
    public function  __toString() {

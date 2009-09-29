@@ -221,6 +221,7 @@ class JsPlugin_TinyMce extends JsPlugin {
             $cfgFile = new JsPlugin_JsFile("settingsfull.js", true);
             break;
          case 'advanced1':
+         case 'advanced':
          default:
             $cfgFile = new JsPlugin_JsFile("settingsadvanced1.js", true);
             break;
@@ -248,7 +249,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metodda pro generování advanced 1 theme
     */
    public function settingsAdvanced1View() {
-      $params = $this->defaultParams;
+      $params = array_merge($this->defaultParams, $this->advanced1Params);
       $params['document_base_url'] = Url_Request::getBaseWebDir();
       $params['language'] = Locale::getLang();
       $params['theme'] = 'simple';
@@ -264,7 +265,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metodda pro generování advanced 1 theme
     */
    public function settingsFullView() {
-      $params = $this->defaultParams;
+      $params = array_merge($this->defaultParams, $this->advParams, $this->advancedFullParams);
       $params['document_base_url'] = Url_Request::getBaseWebDir();
       $params['language'] = Locale::getLang();
 
@@ -278,6 +279,70 @@ class JsPlugin_TinyMce extends JsPlugin {
    }
 
 
+   // metody pro nastavení
+   /**
+    * Metoda nastaví typ zobrazení pluginu
+    */
+   public function setTheme($theme) {
+      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_THEME, $theme);
+   }
+
+   /*
+    * privátní metody
+    */
+
+   /**
+    * Metoda vygeneruje řetězec s parametry
+    *
+    * @param array -- pole parametrů
+    * @return string -- řetězec s generovaným souborem
+    */
+   private function generateParamsForFile($params) {
+      $content = null;
+      foreach ($params as $paramName => $paramValue) {
+         if(is_array($paramValue)) {
+            $content .= $this->generateParamsForFile($paramValue);
+         } else {
+            if(is_bool($paramValue)){
+               if($paramValue){
+                  $v = "true";
+               } else {
+                  $v = "false";
+               }
+            } else if(is_int($paramValue)){
+               $v = (string)$paramValue;
+            } else {
+               $v = "\"".$paramValue."\"";
+            }
+            $content .= $paramName." : ".$v.",\n";
+         }
+      }
+      // odstraní poslední čárku
+      $content = substr($content, 0, strlen($content)-2);
+      $content .= "\n";
+      return $content;
+   }
+
+   /**
+    * Metoda generuje hlavičku konfogiračního souboru
+    *
+    * @return string -- hlavička souboru
+    */
+   private function cfgFileHeader() {
+      $header = "tinyMCE.init({\n";
+      return $header;
+   }
+
+   /**
+    * Metoda generuje patičku konfiguračního souboru
+    *
+    * @return string -- patička souboru
+    */
+   private function cfgFileFooter() {
+      $footer = "});\n";
+      return $footer;
+   }
+
 
    // ========================= OLD ===========================
 
@@ -286,7 +351,7 @@ class JsPlugin_TinyMce extends JsPlugin {
    /**
     * Metda vytvoří výchozí konfigurační soubor
     */
-   protected function generateFile(JsPlugin_JsFile $file) {
+//   protected function generateFile(JsPlugin_JsFile $file) {
    //      if($file->getName() == 'tiny_mce_params.js') {
    //         $file->getParam(self::PARAM_THEME) == null ? $theme = null :
    //             $theme = rawurldecode($file->getParam(self::PARAM_THEME));
@@ -330,59 +395,52 @@ class JsPlugin_TinyMce extends JsPlugin {
    //               break;
    //         }
    //      }
-   }
+//   }
 
    /**
     * Metoda nastaví typ zobrazení pluginu
     */
-   public function setMode($mode) {
-      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_MODE, $mode);
-   }
-
-   /**
-    * Metoda nastaví typ zobrazení pluginu
-    */
-   public function setTheme($theme) {
-      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_THEME, $theme);
-   }
+//   public function setMode($mode) {
+//      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_MODE, $mode);
+//   }
 
    /**
     * Metoda nastavuje jestli se mají načíst obrázky a odkud
     * @param string $fileLink -- odkaz
     */
-   public function setImagesList($fileLink) {
-      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_IMAGES_LIST, $fileLink);
-   }
+//   public function setImagesList($fileLink) {
+//      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_IMAGES_LIST, $fileLink);
+//   }
 
    /**
     * Metoda nastavuje jestli se mají načíst odkazy a odkud
     * @param string $fileLink -- odkaz
     */
-   public function setLinksList($fileLink) {
-      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_LINKS_LIST, $fileLink);
-   }
+//   public function setLinksList($fileLink) {
+//      $this->getSettingsJsFile()->setParam(self::PARAM_TINY_LINKS_LIST, $fileLink);
+//   }
 
    /**
     * Metoda přidá iconu pro přidávání obrázků
     * @param int $row = na který řádek v ikonách se má přidat
     */
-   public function addImagesIcon($row = 1) {
-      $this->getSettingsJsFile()->setParam(self::PARAM_IMAGES, $row);
-   }
+//   public function addImagesIcon($row = 1) {
+//      $this->getSettingsJsFile()->setParam(self::PARAM_IMAGES, $row);
+//   }
 
    /**
     * Metoda přidá iconu pro přidávání medií
     * @param int $row = na který řádek v ikonách se má přidat
     */
-   public function addMediaIcon($row = 1) {
-      $this->getSettingsJsFile()->setParam(self::PARAM_MEDIA, $row);
-   }
+//   public function addMediaIcon($row = 1) {
+//      $this->getSettingsJsFile()->setParam(self::PARAM_MEDIA, $row);
+//   }
 
    /**
     * Metoda vygeneruje hlavičku souboru
     *
     */
-   private function generateCfgFile($fileParams) {
+//   private function generateCfgFile($fileParams) {
    //      $content = $this->cfgFileHeader();
    //      $params = array_merge($this->defaultParams, $this->advancedParams);
    //      //		Nahrazení parametrů za přenesené
@@ -397,13 +455,13 @@ class JsPlugin_TinyMce extends JsPlugin {
    //      $content .= $this->cfgFileFooter();
    //      //		Odeslání souboru
    //      $this->sendFileContent($content);
-   }
+//   }
 
    /**
     * Metoda vygeneruje hlavičku souboru pro simple theme
     *
     */
-   private function generateSimpleCfgFile($fileParams) {
+//   private function generateSimpleCfgFile($fileParams) {
    //      $content = $this->cfgFileHeader();
    //      $params = $this->defaultParams;
    //      //		Nahrazení parametrů za přenesené
@@ -415,12 +473,12 @@ class JsPlugin_TinyMce extends JsPlugin {
    //      $content .= $this->cfgFileFooter();
    //      //		Odeslání souboru
    //      $this->sendFileContent($content);
-   }
+//   }
 
    /**
     * Metoda vygeneruje hlavičku souboru pro simple theme
     */
-   private function generateAdvSimpleCfgFile($fileParams) {
+//   private function generateAdvSimpleCfgFile($fileParams) {
    //      $content = $this->cfgFileHeader();
    //      $params = array_merge($this->defaultParams, $this->advancedSimpleParams);
    //      //		Nahrazení parametrů za přenesené
@@ -435,167 +493,85 @@ class JsPlugin_TinyMce extends JsPlugin {
    //      $content .= $this->cfgFileFooter();
    //      //		Odeslání souboru
    //      $this->sendFileContent($content);
-   }
+//   }
 
    /**
     * Metoda zkontroluje, jestli nebyl předán i odkaz na list obrázků
     *
     * @param array -- pole, kde se má popřípadě parametr nastavit
     */
-   private function checkImagesList(&$params) {
-      if(isset ($params[self::PARAM_TINY_IMAGES_LIST]) AND $params[self::PARAM_TINY_IMAGES_LIST] != null) {
-         $params['external_image_list_url'] = $params[self::PARAM_TINY_IMAGES_LIST];
-         unset($params[self::PARAM_TINY_IMAGES_LIST]);
-      }
-   }
+//   private function checkImagesList(&$params) {
+//      if(isset ($params[self::PARAM_TINY_IMAGES_LIST]) AND $params[self::PARAM_TINY_IMAGES_LIST] != null) {
+//         $params['external_image_list_url'] = $params[self::PARAM_TINY_IMAGES_LIST];
+//         unset($params[self::PARAM_TINY_IMAGES_LIST]);
+//      }
+//   }
 
    /**
     * Metoda zkontroluje, jestli nebyl předán i odkaz na list odkazů
     *
     * @param array -- pole, kde se má popřípadě parametr nastavit
     */
-   private function checkLinksList(&$params) {
-      if(isset ($params[self::PARAM_TINY_LINKS_LIST]) AND $params[self::PARAM_TINY_LINKS_LIST] != null) {
-         $params['external_link_list_url'] = $params[self::PARAM_TINY_LINKS_LIST];
-         unset($params[self::PARAM_TINY_LINKS_LIST]);
-      }
-   }
+//   private function checkLinksList(&$params) {
+//      if(isset ($params[self::PARAM_TINY_LINKS_LIST]) AND $params[self::PARAM_TINY_LINKS_LIST] != null) {
+//         $params['external_link_list_url'] = $params[self::PARAM_TINY_LINKS_LIST];
+//         unset($params[self::PARAM_TINY_LINKS_LIST]);
+//      }
+//   }
 
    /**
     * Metoda odtraní přenesené parametry, které namájí být ve výsledném souboru
     * @param array $params -- pole s parametry
     */
-   private function removeOtherParams(&$params) {
-      $array = array(self::PARAM_FACE, self::PARAM_IMAGES, self::PARAM_MEDIA,
-          self::PARAM_CATEGORY, self::PARAM_SECTION);
-
-      foreach ($array as $param) {
-         if(isset ($params[$param])) {
-            unset ($params[$param]);
-         }
-      }
-   }
-
-   /**
-    * Metoda vygeneruje řetězec s parametry
-    *
-    * @param array -- pole parametrů
-    * @return string -- řetězec s generovaným souborem
-    */
-   private function generateParamsForFile($params) {
-      $content = null;
-      foreach ($params as $paramName => $paramValue) {
-         if(is_array($paramValue)) {
-            $content .= $this->generateParamsForFile($paramValue);
-         } else {
-            if(is_bool($paramValue)){
-               if($paramValue){
-                  $v = "true";
-               } else {
-                  $v = "false";
-               }
-            } else if(is_int($paramValue)){
-               $v = (string)$paramValue;
-            } else {
-               $v = "\"".$paramValue."\"";
-            }
-            $content .= $paramName." : ".$v.",\n";
-         }
-      }
-      // odstraní poslední čárku
-      $content = substr($content, 0, strlen($content)-2);
-      $content .= "\n";
-      return $content;
-
-
-
-
-   //      $string = null;
-   //      foreach ($params as $param => $value) {
-   //         if(is_array($value)) {
-   //            $str = null;
-   //            if(empty ($value) OR is_numeric(key($value))) {
-   //               $str = null;
-   //               foreach ($value as $val) {
-   //                  $str .= $val.',';
-   //               }
-   //               $str = '"'.substr($str, 0, strlen($str)-1).'"';
-   //            } else {
-   //               $str = null;
-   //               foreach ($value as $key => $val) {
-   //                  $str .= $key.':"'.$val.'",';
-   //               }
-   //               $str = "{".substr($str, 0, strlen($str)-1)."}";
-   //            }
-   //            $string .= "\t".$param.' : '.(string)$str.",\n";
-   //         } else if($value != null) {
-   //               $string .= "\t".$param.' : "'.(string)$value."\",\n";
-   //            } else {
-   //               $string .= "\t".$param." : \"\",\n";
-   //            }
-   //      }
-   //      $string = substr($string, 0, strlen($string)-2)."\n";
-   //      return $string;
-   }
-
-   /**
-    * Metoda generuje hlavičku konfogiračního souboru
-    *
-    * @return string -- hlavička souboru
-    */
-   private function cfgFileHeader() {
-      $header = "tinyMCE.init({\n";
-      return $header;
-   }
-
-   /**
-    * Metoda generuje patičku konfiguračního souboru
-    *
-    * @return string -- patička souboru
-    */
-   private function cfgFileFooter() {
-      $footer = "});\n";
-      return $footer;
-   }
+//   private function removeOtherParams(&$params) {
+//      $array = array(self::PARAM_FACE, self::PARAM_IMAGES, self::PARAM_MEDIA,
+//          self::PARAM_CATEGORY, self::PARAM_SECTION);
+//
+//      foreach ($array as $param) {
+//         if(isset ($params[$param])) {
+//            unset ($params[$param]);
+//         }
+//      }
+//   }
 
    /**
     * Metoda vygeneruje z pole string pro list obrázků v TinyMCE
     *
     * @param unknown_type $imagesArray
     */
-   public static function sendListImages($imagesArray) {
-      $string = "var tinyMCEImageList = new Array(\n";
-      foreach ($imagesArray as $name => $path) {
-         $string .= "[\"".$name."\", \"".$path."\"],\n";
-      }
-      if(!empty($imagesArray)) {
-         $string = substr($string, 0, strlen($string)-2)."\n";
-      }
-      $string .= ");\n";
-      header("Content-Length: " . strlen($string));
-      header("Content-type: application/x-javascript");
-      echo $string;
-      exit();
-   }
+//   public static function sendListImages($imagesArray) {
+//      $string = "var tinyMCEImageList = new Array(\n";
+//      foreach ($imagesArray as $name => $path) {
+//         $string .= "[\"".$name."\", \"".$path."\"],\n";
+//      }
+//      if(!empty($imagesArray)) {
+//         $string = substr($string, 0, strlen($string)-2)."\n";
+//      }
+//      $string .= ");\n";
+//      header("Content-Length: " . strlen($string));
+//      header("Content-type: application/x-javascript");
+//      echo $string;
+//      exit();
+//   }
 
    /**
     * Metoda vygeneruje z pole string pro list linků v TinyMCE
     *
     * @param unknown_type $imagesArray
     */
-   public static function sendListLinks($imagesArray) {
-      $string = "var tinyMCELinkList = new Array(\n";
-      foreach ($imagesArray as $name => $path) {
-         $string .= "[\"".$name."\", \"".$path."\"],\n";
-      }
-      if(!empty($imagesArray)) {
-         $string = substr($string, 0, strlen($string)-2)."\n";
-      }
-      $string .= ");\n";
-      header("Content-Length: " . strlen($string));
-      header("Content-type: application/x-javascript");
-      echo $string;
-      exit();
-   }
+//   public static function sendListLinks($imagesArray) {
+//      $string = "var tinyMCELinkList = new Array(\n";
+//      foreach ($imagesArray as $name => $path) {
+//         $string .= "[\"".$name."\", \"".$path."\"],\n";
+//      }
+//      if(!empty($imagesArray)) {
+//         $string = substr($string, 0, strlen($string)-2)."\n";
+//      }
+//      $string .= ");\n";
+//      header("Content-Length: " . strlen($string));
+//      header("Content-type: application/x-javascript");
+//      echo $string;
+//      exit();
+//   }
 }
 ?>

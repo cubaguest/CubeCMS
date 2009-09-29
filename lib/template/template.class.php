@@ -440,6 +440,22 @@ class Template {
       }
    }
 
+      /**
+    * Metoda vrací pole se všemy css soubory
+    * @return array
+    */
+   public static function getStylesheets() {
+      return self::$stylesheets;
+   }
+
+   /**
+    * Metoda vrací pole se všemi javascripty
+    * @return array
+    */
+   public static function getJavascripts() {
+      return self::$javascripts;
+   }
+
    /**
     * Metoda vrací název adresáře s požadovaným souborem (bez souboru)
     * @param string $file -- název souboru

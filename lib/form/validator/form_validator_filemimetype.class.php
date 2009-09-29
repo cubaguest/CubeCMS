@@ -9,10 +9,21 @@
  *
  * @author jakub
  */
-class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_Interface {
-   public function  __construct($errMsg = null) {
+class Form_Validator_FileMimeType extends Form_Validator implements Form_Validator_Interface {
+   /**
+    * Pole s povolenými typ souborů
+    * @var array
+    */
+   private $mimeTypes = array();
+
+   public function  __construct($mimeTypes, $errMsg = null) {
+      if(!is_array($mimeTypes)){
+         $mimeTypes = array($mimeTypes);
+      }
+      $this->mimeTypes = $mimeTypes;
+
       if($errMsg == null) {
-         parent::__construct(_("Nebyla vyplněna povinná položka \"%s\""));
+         parent::__construct(_("V položce \"%s\" nebyl odeslán povolený typ souboru"));
       } else {
          parent::__construct($errMsg);
       }
@@ -23,29 +34,30 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->htmlLabel()->addClass('requiredElem');
-      $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
+      $mimes = null;
+      foreach ($this->mimeTypes as $type) {
+         $mimes .= $type.", ";
+      }
+      $mimes = substr($mimes, 0, strlen($mimes)-2);
+
+      $element->addValidationConditionLabel(sprintf(_("soubor typu %s"),$mimes));
    }
 
    public function validate(Form_Element $elemObj) {
+      $values = $elemObj->getValues();
+      if(empty($values)){
+         return true;
+      }
       switch (get_class($elemObj)) {
          // input text
-         case 'Form_Element_Text':
-         case 'Form_Element_Password':
+         case 'Form_Element_File':
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
+               if(!in_array($values['type'], $this->mimeTypes)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
-            }
-            break;
-         // input checkbox
-         case 'Form_Element_Checkbox':
-            if($elemObj->getValues() == false){
-               $this->errMsg()->addMessage($this->errMessage);
-               return false;
             }
             break;
          default:
@@ -53,12 +65,6 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
       }
       return true;
 
-   }
-
-   private function checkEmptyValues($array) {
-      foreach ($array as $key => $val) {
-         ;
-      }
    }
 }
 ?>

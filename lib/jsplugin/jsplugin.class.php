@@ -59,7 +59,7 @@ abstract class JsPlugin {
 	 */
 	final public function __construct(){
       $this->jsPluginName = str_ireplace(__CLASS__.'_', '', get_class($this));
-      $this->setFiles();
+//      $this->setFiles();
       $this->initJsPlugin();
 	}
 	
@@ -112,9 +112,7 @@ abstract class JsPlugin {
     * @return array of JsPlugin_JsFile -- pole souborů
 	 */
 	final public function getAllFiles(){
-//      if(empty ($this->FilesArray)){
-//         $this->setFiles();
-//      }
+      $this->setFiles();
       return $this->filesArray;
 	}
 	

@@ -11,8 +11,9 @@ interface Form_Validator_Interface {
 
    /**
     * Metoda přidá do elementu prvky z validace
-    * @param Form_Element $element -- element
+    * @param Form_Element $element -- samotný element
     */
-   public function addHtmlElementParams(Form_Element $elemObj);
+   public function addHtmlElementParams(Form_Element $element);
+
 }
 ?>

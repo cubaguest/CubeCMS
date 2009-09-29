@@ -49,7 +49,7 @@ class Html_Element {
     * @var array
     */
    private $inlineElements = array('br','hr', 'base', 'basefont', 'area',
-      'col', 'colgroup', 'frame', 'img', 'input', 'meta', 'param', 'option',
+      'col', 'colgroup', 'frame', 'img', 'input', 'meta', 'param',
       'spacer');
 
    /**
@@ -60,7 +60,7 @@ class Html_Element {
    public function  __construct($name, $content = null) {
       $this->isInline = in_array($name, $this->inlineElements);
       $this->elementName = $name;
-      $this->content = (string)$content;
+      $this->content = $content;
    }
 
    /**
@@ -92,9 +92,12 @@ class Html_Element {
          $string .= "\"";
       }
       if($this->isInline) {
-         $string .= " />\n";
+         $string .= " />";
       } else {
-         $string .= ">\n";
+         $string .= ">";
+      }
+      if(!$this->isEmpty()){
+         $string .= "\n";
       }
       return $string;
    }
@@ -167,6 +170,17 @@ class Html_Element {
     */
    public function clearContent() {
       $this->content = null;
+   }
+
+   /**
+    * Metoda vrací jestli je prvek prázdný - nemá žádný obsah
+    * @return boolean
+    */
+   public function isEmpty() {
+      if($this->content == null){
+         return true;
+      }
+      return false;
    }
 }
 ?>

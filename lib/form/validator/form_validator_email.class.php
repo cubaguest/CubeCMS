@@ -9,10 +9,10 @@
  *
  * @author jakub
  */
-class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_Interface {
+class Form_Validator_Email extends Form_Validator implements Form_Validator_Interface {
    public function  __construct($errMsg = null) {
       if($errMsg == null) {
-         parent::__construct(_("Nebyla vyplněna povinná položka \"%s\""));
+         parent::__construct(_("Položka \"%s\" není korektní emailová adresa"));
       } else {
          parent::__construct($errMsg);
       }
@@ -23,11 +23,12 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->htmlLabel()->addClass('requiredElem');
-      $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
+      $element->addValidationConditionLabel(_('např: info@domena.cz'));
    }
 
    public function validate(Form_Element $elemObj) {
+      $name = '[-a-z0-9!#$%&\'*+/=?^_`{|}~]'; // znaky tvořící uživatelské jméno
+      $domain = '[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])'; // jedna komponenta domény
       switch (get_class($elemObj)) {
          // input text
          case 'Form_Element_Text':
@@ -35,17 +36,10 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
+               if($elemObj->getValues() != null AND !eregi("^$name+(\\.$name+)*@($domain?\\.)+$domain\$", $elemObj->getValues())){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
-            }
-            break;
-         // input checkbox
-         case 'Form_Element_Checkbox':
-            if($elemObj->getValues() == false){
-               $this->errMsg()->addMessage($this->errMessage);
-               return false;
             }
             break;
          default:
@@ -53,12 +47,6 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
       }
       return true;
 
-   }
-
-   private function checkEmptyValues($array) {
-      foreach ($array as $key => $val) {
-         ;
-      }
    }
 }
 ?>

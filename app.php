@@ -317,6 +317,14 @@ class AppCore {
    }
 
    /**
+    * Metoda vrací cestu k cache adresáři aplikace
+    * @return string
+    */
+   public static function getAppCacheDir() {
+      return self::getAppWebDir().self::ENGINE_CACHE_DIR.DIRECTORY_SEPARATOR;
+   }
+
+   /**
     * Metoda vygeneruje instanci aplikace
     * pokud již instance existuje, bude vyhozena vyjímka
     * Instance aplikace je singleton

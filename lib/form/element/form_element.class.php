@@ -9,17 +9,17 @@
  * @abstract      Třída pro obsluhu formulářů
  */
 class Form_Element implements Form_Element_Interface {
-   /**
-    * Název elementu
-    * @var string
-    */
+/**
+ * Název elementu
+ * @var string
+ */
    protected $formElementName = null;
 
    /**
     * Prefix elementu
     * @var string
     */
-    protected $formElementPrefix = null;
+   protected $formElementPrefix = null;
 
    /**
     * Popisek elementu
@@ -55,13 +55,7 @@ class Form_Element implements Form_Element_Interface {
     * Jestli se jedná o vícerozměrný prvek
     * @var boolean
     */
-   protected $isMultiple = false;
-
-   /**
-    * Proměnná obsahuje ža je prvek povinný
-    * @var boolean
-    */
-//   protected $isRequired = false;
+   protected $isDimensional = false;
 
    /**
     * Pole s odeslanými hodnotami
@@ -88,6 +82,18 @@ class Form_Element implements Form_Element_Interface {
    protected $htmlElementLabel = null;
 
    /**
+    * Objekt s popiskem validací
+    * @var Html_Element
+    */
+   protected $htmlElementValidaionLabel = null;
+
+   /**
+    * Pole s texty k validacím
+    * @var array
+    */
+   protected $htmlValidationsLabels = array();
+
+   /**
     * Konstruktor elemntu
     * @param string $name -- název elemntu
     * @param string $label -- popis elemntu
@@ -96,6 +102,7 @@ class Form_Element implements Form_Element_Interface {
       $this->formElementName = $name;
       $this->formElementLabel = $label;
       $this->formElementPrefix = $prefix;
+      $this->initHtmlElements();
       $this->init();
    }
 
@@ -103,8 +110,15 @@ class Form_Element implements Form_Element_Interface {
     * Metoda pro inicializaci
     */
    protected function init() {
+   }
+
+   /**
+    * Metoda pro inicializaci html elementu
+    */
+   protected function initHtmlElements() {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
+      $this->htmlElementValidaionLabel = new Html_Element('p');
    }
 
    /*
@@ -116,16 +130,18 @@ class Form_Element implements Form_Element_Interface {
     * @param Form_Validator_Interface $validator -- typ validace
     */
    final public function addValidation(Form_Validator_Interface $validator) {
-//      // pokud jsou předány argumenty
-//      $params = array();
-//      if(func_num_args() > 1){
-//         for ($i = 1 ; $i < func_num_args() ; $i++) {
-//            $params[$i] = func_get_arg($i);
-//         }
-//      }
-//      $this->validators[$name] = $params;
-//      array_push($this->validators, $validator);
       $this->validators[get_class($validator)] = $validator;
+      // doplnění popisků k validaci
+      $validator->addHtmlElementParams($this);
+   //      array_push($this->validators, $validator);
+   }
+
+   /**
+    * Metoda nastaví hodnoty do prvku
+    * @param mixed $values -- hodnoty
+    */
+   public function setValues($values) {
+      $this->values = $values;
    }
 
    /**
@@ -133,17 +149,31 @@ class Form_Element implements Form_Element_Interface {
     * @param array $names -- (option) názvy jednotlivých prvků, jinak jsou
     * použity čísla
     */
-   public function setMultiple($names = null) {
+   public function setDimensional($names = null) {
       ;
+   }
+
+   /**
+    * Metoda přidá popisek k validaci
+    * @param string $text -- popisek
+    */
+   public function addValidationConditionLabel($text) {
+      array_push($this->htmlValidationsLabels, $text);
    }
 
    /**
     * Metoda nastaví že se jedná o jazykový prvek
     * @param array $langs -- (option) pole jazyků, pokud není zadáno jsou použity
     * interní jazyky aplikace
+    * @return Form_Element -- vrací samo sebe
     */
    public function setLangs($langs = null) {
-      ;
+      if($langs == null) {
+         $langs = Locale::getAppLangsNames();
+      }
+      $this->isMultilang = true;
+      $this->langs = $langs;
+      return $this;
    }
 
    /**
@@ -151,8 +181,8 @@ class Form_Element implements Form_Element_Interface {
     * @param bool $multiple -- true pro nasatvení vícerozměrného elementu
     * @return bool -- true pokud je element vicerozměrný
     */
-   public function isMultiple() {
-      return $this->isMultiple;
+   public function isDimensional() {
+      return $this->isDimensional;
    }
 
    /**
@@ -161,6 +191,14 @@ class Form_Element implements Form_Element_Interface {
     */
    public function isMultiLang() {
       return $this->isMultilang;
+   }
+
+   /**
+    * Metofda vrací pole s jazyky prvku
+    * @return array -- pole s jazyky
+    */
+   public function getLangs() {
+      return $this->langs;
    }
 
    /**
@@ -180,8 +218,8 @@ class Form_Element implements Form_Element_Interface {
    }
 
    /**
-    * Metoda vrací hodnoty elementu
-    * @return mixed (string/array)
+    * Metoda vrací hodnotu prvku
+    * @retrun mixed -- hodnota prvku
     */
    public function getValues() {
       return $this->values;
@@ -221,13 +259,21 @@ class Form_Element implements Form_Element_Interface {
     * Metoda naplní element
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
-   public function populate($method = 'post'){
+   public function populate($method = 'post') {
       switch ($method) {
          case 'get':
-            $this->values = $_GET[$this->getName()];
+            if(isset ($_GET[$this->getName()])) {
+               $this->values = $_GET[$this->getName()];
+            } else {
+               $this->values = null;
+            }
             break;
          default:
-            $this->values = $_POST[$this->getName()];
+            if(isset ($_POST[$this->getName()])) {
+               $this->values = $_POST[$this->getName()];
+            } else {
+               $this->values = null;
+            }
             break;
       }
       $this->isPopulated = true;
@@ -237,10 +283,11 @@ class Form_Element implements Form_Element_Interface {
     * Metoda provede validace
     */
    public function validate() {
-      // validace prvku
+   // validace prvku
       foreach ($this->validators as $validator) {
-         if(!$validator->validate($this)){
+         if(!$validator->validate($this)) {
             $this->isValid = false;
+            break;
          }
       }
    }
@@ -258,16 +305,31 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function label() {
-      $this->htmlLabel()->addContent($this->formElementLabel);
-      $this->htmlLabel()->setAttrib('for', $this->getName());
-      
-      foreach ($this->validators as $validator) {
-         $validator->addHtmlElementParams($this);
+
+      if(!$this->isValid AND $this->isPopulated) {
+         $this->htmlLabel()->addClass('formErrorLabel');
       }
 
-      if(!$this->isValid AND $this->isPopulated){
-         $this->htmlLabel()->addClass('formErrorLabel');
-         $this->html()->addClass('formError');
+      $this->htmlLabel()->addContent($this->formElementLabel);
+      if($this->isMultilang()) {
+//         Template::addJS('./jscripts/formswitchlangs.js');
+
+         $cnt = $langButtons = null;
+         foreach ($this->getLangs() as $langKey => $langLabel) {
+            $this->htmlLabel()->setAttrib('for', $this->getName().'['.$langKey.']');
+            $this->htmlLabel()->setAttrib('id', "label_".$this->getName().'['.$langKey.']');
+
+//            $a = new Html_Element('a', $langLabel);
+//            $a->setAttrib('href', "#");
+//            $a->setAttrib('title', $langLabel);
+//            $a->setAttrib('onclick', "return formSwitchLang('".$this->getName()."[".$langKey."]');");
+//            $langButtons .= $a.(new Html_Element('br'));
+
+            $cnt .= $this->htmlLabel();
+         }
+         return $cnt;
+      } else {
+         $this->htmlLabel()->setAttrib('for', $this->getName());
       }
 
       return (string)$this->htmlLabel();
@@ -278,6 +340,32 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function controll() {
+      if(!$this->isValid AND $this->isPopulated) {
+         $this->html()->addClass('formError');
+      }
+
+      if($this->isMultiLang()) {
+         $cnt = null;
+         foreach ($this->getLangs() as $langKey => $langLabel) {
+            $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
+            $this->html()->setAttrib('id', $this->getName().'['.$langKey.']');
+            $cnt .= $this->html();
+         }
+
+         // script pro vybrání jazyka -- TODO předělat
+         $script = new Html_Element('script');
+         $script->setAttrib('type', "text/javascript");
+         $script->addContent('formSwitchLang("'.$this->getName()."[".Locale::getLang().']");');
+
+
+         return $cnt.$script;
+      } else {
+      // tady bude if při multilang
+         $this->html()->setAttrib('name', $this->getName());
+         //         $this->html()->setAttrib('type', 'text');
+         $this->html()->setAttrib('id', $this->getName());
+         $this->html()->setAttrib('value', $this->getValues());
+      }
       return $this->html();
    }
 
@@ -292,11 +380,16 @@ class Form_Element implements Form_Element_Interface {
          default:
             $tr = new Html_Element('tr');
             $td1 = new Html_Element('th');
+            $td1->setAttrib('allign', 'right');
+            $td1->setAttrib('width', 100);
             $td1->addContent($this->label());
             $tr->addContent($td1);
             // kontrolní element
             $td2 = new Html_Element('td');
+            $td2->addContent($this->labelLangs());
             $td2->addContent($this->controll());
+            // popisky k validátorům
+            $td2->addContent($this->labelValidations());
             $tr->addContent($td2);
             $string = $tr;
             break;
@@ -304,12 +397,67 @@ class Form_Element implements Form_Element_Interface {
       return (string)$string;
    }
 
+   public function labelValidations() {
+      if(!empty($this->htmlValidationsLabels)) {
+      //         $this->htmlValidLabel()->addContent(new Html_Element('br'));
+         $labels = "(";
+         foreach ($this->htmlValidationsLabels as $lab) {
+            $labels .= $lab.", ";
+         }
+         $labels = substr($labels, 0, strlen($labels)-2).")";
+
+         $this->htmlValidLabel()->addContent($labels);
+         $this->htmlValidLabel()->addClass('formValidationLabel');
+         return $this->htmlValidLabel();
+      }
+      return null;
+   }
+
+   /**
+    * Funkce vygeneruje přepínač pro volbu jazyku
+    * @return <type>
+    */
+   public function labelLangs() {
+      if($this->isMultilang() AND count($this->langs) > 1) {
+         Template::addJS('./jscripts/formswitchlangs.js');
+
+         $langButtons = null;
+         foreach ($this->getLangs() as $langKey => $langLabel) {
+            $a = new Html_Element('a', $langLabel);
+            $a->setAttrib('href', "#");
+            $a->setAttrib('title', $langLabel);
+            $a->setAttrib('onclick', "return formSwitchLang('".$this->getName()."[".$langKey."]');");
+//            $langButtons .= $a.(new Html_Element('br'));
+            $langButtons .= $a;
+         }
+         return $langButtons.(new Html_Element('br'));
+      }
+      return null;
+   }
+
+   /**
+    * Metoda upraví vlastnost prvku u vykreslení
+    * @param string $type -- typ parametru, který se má upravit
+    * @param mixed $value -- hodnota parametru
+    * @todo -- asij nebude třeba
+    */
+   public function setRender($type, $size = 30) {
+      switch ($type) {
+         case 'size':
+            $this->html()->setAttrib('size', $size);
+            break;
+         default:
+            break;
+      }
+   }
+
    public function  __toString() {
       return (string)$this->render();
    }
 
    /**
-    * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu
+    * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu.
+    * Element kontrolního prvku formuláře (např. input)
     * @return Html_Element
     */
    public function html() {
@@ -318,10 +466,20 @@ class Form_Element implements Form_Element_Interface {
 
    /**
     * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu
+    * Element popisku formuláře (label)
     * @return Html_Element
     */
    public function htmlLabel() {
       return $this->htmlElementLabel;
+   }
+
+   /**
+    * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu
+    * Element popisku pro validace
+    * @return Html_Element
+    */
+   public function htmlValidLabel() {
+      return $this->htmlElementValidaionLabel;
    }
 }
 ?>

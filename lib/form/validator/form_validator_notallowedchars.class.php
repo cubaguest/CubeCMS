@@ -9,10 +9,21 @@
  *
  * @author jakub
  */
-class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_Interface {
-   public function  __construct($errMsg = null) {
+class Form_Validator_NotAllowedChars extends Form_Validator implements Form_Validator_Interface {
+   /**
+    * Pole s nepovolenými znaky
+    * @var array
+    */
+   private $notAllowedChars = array();
+
+   public function  __construct($chars = null, $errMsg = null) {
+      trigger_error("Validator ".__CLASS__." není implementován");
+      if(!is_array($chars)){
+         $chars = array($chars);
+      }
+      $this->notAllowedChars = $chars;
       if($errMsg == null) {
-         parent::__construct(_("Nebyla vyplněna povinná položka \"%s\""));
+         parent::__construct(_("Položka \"%s\" obsahuje nepovolené znaky"));
       } else {
          parent::__construct($errMsg);
       }
@@ -23,8 +34,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->htmlLabel()->addClass('requiredElem');
-      $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
+      $element->htmlValidLabel()->addContent(' '.sprintf(_("(nepovolené znaky: %s )"), $this->getChars()));
    }
 
    public function validate(Form_Element $elemObj) {
@@ -55,10 +65,12 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
 
    }
 
-   private function checkEmptyValues($array) {
-      foreach ($array as $key => $val) {
-         ;
-      }
+   private function getChars() {
+//      foreach ($array as $key => $val) {
+//         ;
+//      }
+
+      return '",",".","!"';
    }
 }
 ?>

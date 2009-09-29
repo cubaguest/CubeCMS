@@ -1,7 +1,7 @@
 <!--
 <form method="post" action="">
    <input name="pokus_name" type="text" size="30" maxlength="50" value="" />
-	<input type="submit" name="pokus_send" value="SEND" />
+   <input type="submit" name="pokus_send" value="SEND" />
 </form>
 -->
 <?
@@ -13,6 +13,14 @@
 //$childElement->setAttrib('name', 'pokus_text2');
 //
 //$eleme->addContent($childElement);
-$this->form->name->html()->setAttrib('rel', 'link');
+$this->form->label->htmlLabel()->setAttrib('width', 100);
+//$this->form->text->html()->addClass('tinymce');
+//$this->form->text->html()->setAttrib('cols', "60");
+//$this->form->text->html()->setAttrib('rows', "10");
+
+//$tinyMCE = new JsPlugin_TinyMce();
+//$tinyMCE->setCfgParam('theme', 'full');
+//$this->addJsPlugin($tinyMCE);
+
 ?>
 <?=$this->form?>

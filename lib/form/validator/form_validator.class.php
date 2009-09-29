@@ -16,11 +16,11 @@ class Form_Validator {
       $this->errMessage = $errMessage;
    }
 
-    /**
+   /**
     * Metoda přidá do elementu prvky z validace
     * @param Form_Element $element -- samotný element
     */
-   public function addHtmlElementParams(Form_Element $element){}
+   public function addHtmlElementParams(Form_Element $element) {}
 
    /**
     * Metoda vrací objekt k chybovým hláškám modulů
