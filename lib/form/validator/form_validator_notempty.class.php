@@ -10,12 +10,25 @@
  * @author jakub
  */
 class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_Interface {
-   public function  __construct($errMsg = null) {
+
+/**
+ * Které položky jsou povinné
+ * @var array
+ */
+   private $columsNotEmpty = array();
+
+
+   public function  __construct($errMsg = null, $columsNotEmpty = null) {
       if($errMsg == null) {
          parent::__construct(_("Nebyla vyplněna povinná položka \"%s\""));
       } else {
          parent::__construct($errMsg);
       }
+      $cl = array();
+      if(!is_array($columsNotEmpty) AND $columsNotEmpty != null) {
+         $cl = array($columsNotEmpty);
+      }
+      $this->columsNotEmpty = $cl;
    }
 
    /**
@@ -29,11 +42,26 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
 
    public function validate(Form_Element $elemObj) {
       switch (get_class($elemObj)) {
-         // input text
+      // input text
          case 'Form_Element_Text':
+         case 'Form_Element_TextArea':
          case 'Form_Element_Password':
-            if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
-
+            if($elemObj->isMultiLang()) {
+               // pokud se kontrolují jen některé sloupce
+               if(!empty ($this->columsNotEmpty)){
+                  $retu = $this->checkEmptyValues($elemObj->getValues(), $this->columsNotEmpty);
+                  if($retu !== true){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
+                     return false;
+                  }
+               }
+               // pokud mají být vyplněny všechny sloupce
+               else {
+                  if(!$this->checkEmptyAllValues($elemObj->getValues())){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     return false;
+                  }
+               }
             } else {
                if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
@@ -43,8 +71,8 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             break;
          // input checkbox
          case 'Form_Element_Checkbox':
-            if($elemObj->getValues() == false){
-               $this->errMsg()->addMessage($this->errMessage);
+            if($elemObj->getValues() == false) {
+               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                return false;
             }
             break;
@@ -55,10 +83,47 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
 
    }
 
-   private function checkEmptyValues($array) {
-      foreach ($array as $key => $val) {
-         ;
+   /**
+    * Metoda zkontroluje jestli jsou prvky z pole colum vyplněny
+    * @param string/array $values -- pole s hodnotami
+    * @param array $colums -- pole s nutnými prvky
+    * @param <type> $key
+    * @return <type>
+    */
+   private function checkEmptyValues($values, $colums, $key = null) {
+      if(!is_array($values)) {
+         if(key_exists($key, $colums) AND $values == null){
+            return $colums[$key];
+         }
+      } else {
+         foreach ($values as $valKey => $val) {
+            $ret = $this->checkEmptyValues($val, $colums, $valKey);
+            if($ret !== true){
+               return $ret;
+            }
+         }
       }
+      return true;
+   }
+
+   /**
+    * Metoda zkontroluje jestli jsou všechny prvky vyplněny
+    * @param array/string $values
+    * @return boolean -- pokud je jeden prvek prázný vrací false
+    */
+   private function checkEmptyAllValues($values) {
+      if(!is_array($values)) {
+         if($values == null){
+            return false;
+         }
+      } else {
+         foreach ($values as $val) {
+            if(!$this->checkEmptyAllValues($val)){
+               return false;
+            }
+         }
+      }
+      return true;
    }
 }
 ?>

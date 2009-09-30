@@ -27,6 +27,12 @@ class Form implements ArrayAccess {
    private $elements = array();
 
    /**
+    * Pole se skupinami elementů
+    * @var array
+    */
+   private $elementsGroups = array();
+
+   /**
     * Proměná obsahuje jestli byl formulář odeslán
     * @var boolean
     */
@@ -84,20 +90,63 @@ class Form implements ArrayAccess {
 
    /**
     * Metoda vytvoří řetězec s formulářem, pro použití v šabloně
-    * @param string $type -- jaký typ se má vrátit (table, null, ...) viz doc
+    * @param Form_Decorator $decorator -- objekt dekorátoru
     * @return string -- formulář jako řetězec
     */
-   private function creatString($type = 'table') {
+   private function creatString(Form_Decorator $decorator = null) {
+      // nastavení elementu form
       $this->html()->setAttrib('action', $this->formAction);
       $this->html()->setAttrib('method', 'post');
 
-      $table = new Html_Element('table');
-      // přidání podřízených elementů
-      foreach ($this->elements as $element) {
-         $table->addContent($element->render($type));
-         $table->addContent("\n");
+      if($decorator == null){
+         $decorator = new Form_Decorator();
       }
-      $this->html()->addContent($table);
+
+      $formContent = null;
+      $d = clone $decorator;
+      foreach ($this->elementsGroups as $key => $grp) {
+         // pokud element není ve skupině
+         if(!is_array($grp)){
+            $d->addElement($this->elements[$key]);
+         }
+         // pokud patří do skupiny
+         else {
+            $formContent .= $d->render();
+            $d = clone $decorator;
+            $groupCnt = null;
+            foreach ($grp['elements'] as $key2 => $elemName) {
+               $d->addElement($this->elements[$key2]);
+            }
+            $filedset = new Html_Element('fieldset');
+            if($grp['label'] != null){
+               $filedset->addContent(new Html_Element('legend', $grp['label']));
+            }
+            if($grp['text'] != null){
+               $p = new Html_Element('p', $grp['text']);
+               $p->addClass('formGroupText');
+               $filedset->addContent($p);
+            }
+            $filedset->addContent($d->render(true));
+            $formContent .= $filedset;
+            $d = clone $decorator;
+         }
+      }
+      $formContent .= $d->render();
+
+//      $table = new Html_Element('table');
+//      $table->addClass('formTable');
+//      // přidání podřízených elementů
+//      foreach ($this->elements as $element) {
+//         $table->addContent($element->render('table'));
+//         $table->addContent("\n");
+//         // přidání scriptů
+////         $script->addContent($element->scripts());
+//      }
+      $this->html()->addContent($formContent);
+
+//      if(!$script->isEmpty()){
+//         $this->html()->addContent($script);
+//      }
 
       return (string)$this->html();
    }
@@ -117,7 +166,7 @@ class Form implements ArrayAccess {
     * @return mixed -- hodnota proměnné
     */
    public function  __get($name) {
-      if(!isset($this->elements[$name])){
+      if(!isset($this->elements[$name])) {
          $this->elements[$name] = null;
       }
       return $this->elements[$name];
@@ -137,7 +186,7 @@ class Form implements ArrayAccess {
     * @param string $name -- název proměnné
     */
    public function  __unset($name) {
-      if(isset ($this->elements[$name])){
+      if(isset ($this->elements[$name])) {
          unset ($this->elements[$name]);
       }
    }
@@ -162,7 +211,7 @@ class Form implements ArrayAccess {
     * @return Form_Element
     */
    function offsetGet($name) {
-      if(!isset($this->elements[$name])){
+      if(!isset($this->elements[$name])) {
          $this->elements[$name] = null;
       }
       return $this->elements[$name];
@@ -194,10 +243,10 @@ class Form implements ArrayAccess {
     */
    public function isSend() {
       foreach ($this->elements as $element) {
-         if($element instanceof Form_Element_Submit){
+         if($element instanceof Form_Element_Submit) {
             $element->populate();
-//            $element->validate();
-            if($element->isValid()){
+            //            $element->validate();
+            if($element->isValid()) {
                $this->isSend = true;
                break;
             }
@@ -211,7 +260,7 @@ class Form implements ArrayAccess {
     * @return booleant -- true pokud je formulář v pořádku
     */
    public function isValid() {
-      if($this->isSend()){
+      if($this->isSend()) {
          $this->populate();
          return $this->isValid;
       }
@@ -225,7 +274,7 @@ class Form implements ArrayAccess {
       foreach ($this->elements as $name => $element) {
          $element->populate($this->sendMethod);
          $element->validate();
-         if(!$element->isValid()){
+         if(!$element->isValid()) {
             $this->isValid = false;
          }
       }
@@ -238,11 +287,11 @@ class Form implements ArrayAccess {
     * @return bool -- true pokud byl formulář již vyplněn
     */
    public function isPopulated() {
-//      $element->populate();
-//      $element->validate();
-//      if($element->isValid()) {
-//         $submited = true;
-//      }
+   //      $element->populate();
+   //      $element->validate();
+   //      if($element->isValid()) {
+   //         $submited = true;
+   //      }
       return $this->isPopulated;
    }
 
@@ -253,7 +302,7 @@ class Form implements ArrayAccess {
       $submited = false;
       // projití všech submitů a zjištění jestli nebyl některý spuštěn
       foreach ($this->submitElements as $name => $element) {
-         
+
       }
       return $submited;
    }
@@ -301,17 +350,40 @@ class Form implements ArrayAccess {
    /**
     * Metoda přidá element do formuláře
     * @param Form_Element $element -- objetk formulářového elementu
-    * @param integer $priority -- priorita (vhodné při řazení)
+    * @param integer $group -- priorita (vhodné při řazení)
     * @todo dodělat přiřazení priority prvkům kvůli vykreslení v šabloě
     */
-   public function addElement(Form_Element $element, $priority = null) {
-      $this->elements[$element->getName()] = $element;
-      $this->elements[$element->getName()]->setPrefix($this->formPrefix);
+   public function addElement(Form_Element $element, $group = null) {
+      $name = $element->getName();
+      $this->elements[$name] = $element;
+      $this->elements[$name]->setPrefix($this->formPrefix);
+
+      if($group == null){
+         $this->elementsGroups[$name] = $this->elements[$name]->getName();
+      } else {
+         if(!isset ($this->elementsGroups[$group])){
+            $this->addGroup($group);
+         }
+         $this->elementsGroups[$group]['elements'][$name] = $this->elements[$name]->getName();
+      }
 
       // pokud je soubor přidám do formu že se bude přenášet po částech
-      if($element instanceof Form_Element_File){
+      if($element instanceof Form_Element_File) {
          $this->html()->setAttrib("enctype", "multipart/form-data");
       }
+   }
+
+   /**
+    * Metoda přidá skupinu pro elementy
+    * @param string $name -- název skupiny - pro zařazování
+    * @param string $label -- název skupiny - její název při renderu
+    * @param string $text -- text ke skupině - popisný text ke skupině
+    */
+   public function addGroup($name, $label = null, $text = null) {
+//      $this->elementsGroups[$name] = array();
+      $this->elementsGroups[$name]['elements'] = array();
+      $this->elementsGroups[$name]['label'] = $label;
+      $this->elementsGroups[$name]['text'] = $text;
    }
 
    /*
@@ -324,10 +396,10 @@ class Form implements ArrayAccess {
 
    /**
     * Metoda vyrenderuje formulář podle zadaného typu
-    * @param string $type -- typ rendereru (table, null, atd)
+    * @param Form_Decorator $decorator -- objekt Form dekorátoru
     */
-   public function render($type = 'table') {
-      print ($this->creatString($type));
+   public function render(Form_Decorator $decorator = null) {
+      print ($this->creatString($decorator));
    }
 
    /**

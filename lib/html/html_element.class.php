@@ -42,7 +42,7 @@ class Html_Element {
     * Obsah elementu
     * @var string
     */
-   private $content = null;
+   protected $content = null;
 
    /**
     * Pole s elementy, které jsou inline (nepárové)
@@ -69,6 +69,7 @@ class Html_Element {
     */
    public function  __toString() {
       $elem = $this->__toStringBegin();
+      $elem .= $this->__toStringContent();
       $elem .= $this->__toStringEnd();
       return $elem;
    }
@@ -103,14 +104,19 @@ class Html_Element {
    }
 
    /**
+    * Metoda vrátí obsah elementu
+    */
+   public function __toStringContent() {
+      return $this->content;
+   }
+
+   /**
     * Metoda vrátí konec elementu
     */
    public function __toStringEnd() {
       $string = null;
       // inline nebo block element
       if(!$this->isInline) {
-         // obsah
-         $string .= $this->content;
          // ukončovací tag
          $string .= "</".$this->elementName.">\n";
       }

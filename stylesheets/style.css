@@ -1,21 +1,74 @@
 @CHARSET "UTF-8";
+/* SOF RESET */
+/* v1.0 | 20080212 */
+
+/* prvky:   - jsou znepoužitelněny*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, input, select, textarea,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	/*line-height: 1;*/
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+/* EOF RESET */
+
 
 /* Základní nastavení layoutu */
 html,body {
 	border: 0px none;
 	margin: 0px;
-	/*margin-top: 5px;*/
-	/*=margin-top: 10px;*/
 	padding: 0px;
 	font-family: "Tahoma", "Arial", sans-serif !important;
 	text-align: left;
 	font-size: 9pt !important;
 	background: url('../images/backshadow.png') fixed top center white repeat-y;
-	/*quotes: "„" "“";*/
 }
 
 body {
-	background-color: white; /* purple tone for outer space */
+	/*background-color: white;  purple tone for outer space */
 }
 
 /* boxy */
@@ -44,20 +97,9 @@ body {
 	font-size: 0px;
 }
 
-/* zakladni nastaveni pro boy */
-p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
-	border: 0px none;
-	margin: 0px;
-	padding: 0px;
-}
-
 .separator {
 	display: none;
 	visibility: hidden;
-}
-
-.smallFont {
-   font-size: 80%;
 }
 
 #bodywrap {
@@ -122,7 +164,7 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 
 #col2wrap {
 	width: 180px;
-	/*margin-left: -100%;  position column to the left side */
+	/*margin-left: -100%;  position column to the left side*/
 	/*margin-left: -20px;*/ /*background-color: #ffe0e0;*/
 }
 
@@ -142,6 +184,7 @@ p,img,table,tr,th,td,h1,h2,h3,h4,h5 {
 	/*overflow: auto;*/
 	padding: 10px 4px 0px 4px;
 }
+
 
 /* uprava prvku globalne */
 h1 {
@@ -186,8 +229,9 @@ a:hover {
 	border: none
 }
 
+
 /* Hlášky */
-.errorMessage, .messages {
+.errorMessage, .message {
 	font-size: small;
 	padding: 5px;
 	/*font-weight: 600;*/
@@ -204,19 +248,17 @@ a:hover {
    display:block;
 }
 
-.errorMessage img {
-   float:left;
-}
-
 .message { /* text-align: center; */
 	background-color: #9CCFFF;
 	border: 2px solid #688AAA;
 }
 
 .errorMessage img, .message img {
-	/*float: left;*/
+	float: left;
 	vertical-align: middle;
 }
+
+
 
 /* formulařové prvky */
 .requiredElem {
@@ -231,7 +273,52 @@ a:hover {
    background-color: #f4d0d0;
 }
 
-input, button {
+a.formLinkLang {
+   color: #999999;
+}
+
+a.formLinkSelLang {
+   color: black;
+   font-weight:bold;
+   background-color:#cccccc;
+   border-style: solid;
+   border-width: 1px 1px 0 1px;
+   border-color: #666666;
+   padding: 0 2px;
+}
+
+/* tabulka formuláře */
+fieldset, .formTable {
+   background-color: #c7e0f9;
+   width: 900px;
+   margin-bottom: 10px;
+   /*border: 1px solid gray;*/
+}
+
+fieldset p.formGroupText {
+   padding: 5px;
+}
+
+fieldset legend {
+   background-color: #c7e0f9;
+   padding: 0 5px;
+   border: 1px solid gray;
+   border-bottom: none;
+}
+
+.formTable td, .formTableGroup td, .formTable th, .formTableGroup th {
+   padding: 5px;
+}
+
+.formTable th.formLabels, .formTableGroup th.formLabels {
+   width: 100px;
+   text-align:right;
+}
+
+.formTable td.formControlls {
+}
+
+input, button, textarea {
 	border: 1px solid #0f6572;
 	background-color: #e1ebec;
 	font-size: 10pt;
@@ -257,51 +344,17 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	color: white;
 }
 
-.textarea {
-	border: 1px solid #0f6572;
-	background-color: #e1ebec;
-	font-size: 10pt;
-	font-family: "Tahoma", "Arial", sans-serif;
-}
 
+
+/*Pro tinyMCE*/
 .textarea_tinymce {
    width: 100%;
 }
 
-/* ODSTRANIT */
-.edit_button_image {
-	background: url(../images/buttons/b_edit.png) 0 0 no-repeat;
-	width: 20px;
-	height: 20px;
-	border: 0;
-	cursor: pointer; cursor: hand;
-}
 
-.delete_button_image {
-	background: url(../images/buttons/b_drop.png) 0 0 no-repeat;
-	width: 20px;
-	height: 20px;
-	border: 0;
-	cursor: pointer; cursor: hand;
-}
 
-.add_button_image {
-	background: url(../images/buttons/upload.png) 0 0 no-repeat;
-	width: 20px;
-	height: 20px;
-	border: 0;
-	cursor: pointer; cursor: hand;
-}
 
-.form_buttons {
-	text-align: right;
-}
 
-.form_buttons_inline form {
-	display: inline;
-}
-
-/* EOF ODSTRANIT */
 /* Panel s editací */
 .toolbox {
    background: orange;

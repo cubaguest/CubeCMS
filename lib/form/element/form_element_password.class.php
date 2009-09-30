@@ -19,9 +19,8 @@ class Form_Element_Password extends Form_Element_Text {
     * @return string
     */
    public function controll() {
-      parent::controll();
       $this->html()->setAttrib('type', 'password');
-      return $this->html();
+      return parent::controll();
    }
 }
 ?>

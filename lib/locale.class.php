@@ -243,10 +243,14 @@ class Locale {
 
    /**
     * Metoda vrací výchozí jazyk aplikace (první, uvedený v configu)
-    * @return string -- výchozí jazyk (cs, en, ..)
+    * @return string/array -- výchozí jazyk (cs, en, ..)
     */
-   public static function getDefaultLang(){
-      return self::$defaultLang;
+   public static function getDefaultLang($returnArray = false){
+      if($returnArray){
+         return self::getLangLabel(self::$defaultLang);
+      } else {
+         return self::$defaultLang;
+      }
    }
 
    /**
@@ -300,6 +304,19 @@ class Locale {
     */
    public static function getLang() {
       return self::$selectLang;
+   }
+   
+   /**
+    * Metoda vrací pole s vypraným jazykem
+    * @param string $langShor -- zkratka jazyka
+    */
+   public static function getLangLabel($langShor) {
+      if(in_array($langShor, self::$appLangs)){
+         $lang = Locale::getAppLangsNames();
+         return array($langShor => $lang[$langShor]);
+      } else {
+         return false;
+      }
    }
 
    /**

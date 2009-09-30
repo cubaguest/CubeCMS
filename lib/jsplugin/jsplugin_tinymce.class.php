@@ -161,8 +161,9 @@ class JsPlugin_TinyMce extends JsPlugin {
    'external_image_list_url' => null,
    'external_link_list_url' => null,
    'template_external_list_url' => null,
-   'template_replace_values' => array(),
-   'theme_advanced_toolbar_location' => 'external');
+   'template_replace_values' => array()
+//   ,'theme_advanced_toolbar_location' => 'external'
+);
 
    /**
     * Parametry pro Advanced THEME

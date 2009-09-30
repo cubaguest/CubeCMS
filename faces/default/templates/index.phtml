@@ -1,19 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs" lang="cs">
+<?print ('<?xml version="1.0" encoding="utf-8"?>')?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locale::getLang()?>" lang="<?=Locale::getLang()?>">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <?if(Auth::isLoginStatic()) {?>
       <meta http-equiv="cache-control" content="no-cache" />
       <meta http-equiv="pragma" content="no-cache" />
       <meta http-equiv="pragma" content="-1" />
+      <?}?>
       <title>
          <?
          echo($this->pageTitle);
-//         if($this->categoryName())
-//            echo ' - '.$this->categoryName();
-//         if($this->articleName())
-//            echo ' - '.$this->articleName();
-//         if($this->actionName())
-//            echo ' - '.$this->actionName();
+         //         if($this->categoryName())
+         //            echo ' - '.$this->categoryName();
+         //         if($this->articleName())
+         //            echo ' - '.$this->articleName();
+         //         if($this->actionName())
+         //            echo ' - '.$this->actionName();
          ?></title>
 
       <base href="<?=Links::getMainWebDir()?>" />
@@ -42,9 +45,11 @@
             <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
             <div id="menuBox">
                <div>
-                  <form id="menuSearch" action="<?=$this->l()->clear(true);?>">
-                     <input type="text" size="12" maxlength="50" name="search" value="<?=rawurldecode($this->get('search',null,false))?>"/>
-                     <input type="submit" value="<?=_("Hledej")?>" />
+                  <form id="menuSearch" method="get" action="<?=$this->l()->clear(true);?>">
+                     <p>
+                        <input type="text" size="12" maxlength="50" name="search" value="<?=rawurldecode($this->get('search',null,false))?>" />
+                        <input type="submit" value="<?=_("Hledej")?>" />
+                     </p>
                   </form>
                </div>
                <div id="menuMain">
@@ -62,56 +67,56 @@
             <div id="col1wrap">
                <div id="col1pad" class="<?if(!empty($this->leftPanel)) echo "col1pad_plusleft";?>  <?if(!empty($this->rightPanel)) echo "col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
-                  if($this->pageNotFound){
+                  if($this->pageNotFound) {
                      $this->includeTpl("error404.phtml", true);
-                  } else if($this->specialPage){
-                     $this->includeTpl($this->specialPageName.".phtml", true);
-                  } else {
-                     $this->includeTpl("modules.phtml", true);
-                  }
+                  } else if($this->specialPage) {
+                        $this->includeTpl($this->specialPageName.".phtml", true);
+                     } else {
+                        $this->includeTpl("modules.phtml", true);
+                     }
                   ?>
                   <hr class="separator" />
                </div><!-- col1pad -->
             </div><!-- col1wrap -->
 
-<? // levy panel ?>
+            <? // levy panel ?>
             <div id="col2wrap">
                <div id="col2pad">
                   <?
-                  if(!empty($this->leftPanel)){
+                  if(!empty($this->leftPanel)) {
                      foreach ($this->leftPanel as $panelL) {?>
-                     <?if($panelL->module()->label()->name() == "products"){?>
-                     <div class="panel">
-                        <?if($panelL->module()->label()->label() != null){?>
-                        <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
+                        <?if($panelL->module()->label()->name() == "products") {?>
+                  <div class="panel">
+                              <?if($panelL->module()->label()->label() != null) {?>
+                     <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
+                              <?}?>
+                              <?$this->includeTplObj($panelL);?>
+                  </div>
+                        <?} else {?>
+                  <div class="panel panelLeft">
+                              <?if($panelL->module()->label()->label() != null) {?>
+                     <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
+                              <?}?>
+                              <?$this->includeTplObj($panelL);?>
+                  </div>
                         <?}?>
-                        <?$this->includeTplObj($panelL);?>
-                     </div>
-                     <?} else {?>
-                     <div class="panel panelLeft">
-                        <?if($panelL->module()->label()->label() != null){?>
-                        <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
-                        <?}?>
-                        <?$this->includeTplObj($panelL);?>
-                     </div>
-                     <?}?>
-                   <?}
+                     <?}
                   }?>
                   <hr class="separator" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
 
-<? // pravy panel?>
+            <? // pravy panel?>
             <div id="col3wrap">
                <div id="col3pad">
                   <?
                   if(!empty($this->rightPanel)) {
-                  foreach ($this->rightPanel as $panel) {?>
+                     foreach ($this->rightPanel as $panel) {?>
                   <div class="panel panelRight">
                      <h3><a href="<?=$panel->l()?>" title="<?=$panel->module()->getLabel()?>"><?=$panel->module()->getLabel()?></a></h3>
-                     <?$this->includeTplObj($panel);?>
+                           <?$this->includeTplObj($panel);?>
                   </div>
-                  <?}}?>
+                     <?}}?>
                   <hr class="separator" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
@@ -126,19 +131,21 @@
             <hr class="separator" />
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->
+      <div id="debug">
+         <?
+         if($this->showDebugConsole) {
+            echo "<pre>";
+            print_r($this);
+            echo "</pre>";
+         }
+         
+         if($this->debug == 2) {
+            print ("Run functions: ".xdebug_get_function_count()."<br />");
+            print ("Memory: ".xdebug_memory_usage()."<br />");
+            print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");
+            print ("Index time: ".xdebug_time_index()."<br />");
+         }
+         ?>
+      </div>
    </body>
-   <?
-   if($this->showDebugConsole){
-      echo "<pre>";
-      print_r($this);
-      echo "</pre>";
-   }
-
-   if($this->debug == 2){
-      print ("Run functions: ".xdebug_get_function_count()."<br />");
-      print ("Memory: ".xdebug_memory_usage()."<br />");
-      print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");
-      print ("Index time: ".xdebug_time_index()."<br />");
-   }
-   ?>
 </html>

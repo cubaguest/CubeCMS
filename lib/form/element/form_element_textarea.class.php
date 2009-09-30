@@ -23,84 +23,71 @@ class Form_Element_TextArea extends Form_Element_Text {
     * @return string
     */
    public function controll() {
-      
-      
-      // tady bude if při multilang
-      if($this->isMultiLang()){
-         $cnt = null;
-         foreach ($this->getLangs() as $langKey => $langLabel) {
-            $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-            $this->html()->setAttrib('id', $this->getName().'['.$langKey.']');
-            $cnt .= $this->html();
-         }
-         // script pro vybrání jazyka
-         $script = new Html_Element('script');
-         $script->setAttrib('type', "text/javascript");
-         $script->addContent('formSwitchLang("'.$this->getName()."[".Locale::getLang().']");');
-
-
-         return $cnt.$script;
-      } else {
-         $this->html()->setAttrib('id', $this->getName());
-         $this->html()->setAttrib('name', $this->getName());
-         $this->html()->addContent($this->getValues());
-      }
-
-
-      return $this->html();
+      $this->html()->setAttrib('type');
+      return Form_Element::controll();
+//
+//
+//      // tady bude if při multilang
+//      if($this->isMultiLang()){
+//         $cnt = null;
+//         foreach ($this->getLangs() as $langKey => $langLabel) {
+//            $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
+//            $this->html()->setAttrib('id', $this->getName().'['.$langKey.']');
+//            $cnt .= $this->html();
+//         }
+//         // script pro vybrání jazyka
+//         $script = new Html_Element('script');
+//         $script->setAttrib('type', "text/javascript");
+//         $script->addContent('formSwitchLang("'.$this->getName()."[".Locale::getLang().']");');
+//
+//
+//         return $cnt.$script;
+//      } else {
+//         $this->html()->setAttrib('id', $this->getName());
+//         $this->html()->setAttrib('name', $this->getName());
+//         $this->html()->addContent($this->getValues());
+//      }
+//
+//
+//      return $this->html();
    }
 
    /**
     * Metoda vrací popisek k prvku (html element label)
     * @return string
     */
-   public function label() {
-      $this->htmlLabel()->addContent($this->formElementLabel);
-      if(!$this->isValid AND $this->isPopulated) {
-         $this->htmlLabel()->addClass('formErrorLabel');
-         $this->html()->addClass('formError');
-      }
-
-      if($this->isMultilang()){
-         Template::addJS('./jscripts/formswitchlangs.js');
-
-         $cnt = $langButtons = null;
-         foreach ($this->getLangs() as $langKey => $langLabel) {
-            $this->htmlLabel()->clearContent();
-            $this->htmlLabel()->addContent($this->formElementLabel);
-            $this->htmlLabel()->setAttrib('for', $this->getName().'['.$langKey.']');
-            $this->htmlLabel()->setAttrib('id', "label_".$this->getName().'['.$langKey.']');
-
-            $a = new Html_Element('a', $langLabel);
-            $a->setAttrib('href', "#");
-            $a->setAttrib('title', $langLabel);
-            $a->setAttrib('onclick', "return formSwitchLang('".$this->getName()."[".$langKey."]');");
-            $langButtons .= $a.(new Html_Element('br'));
-
-            $cnt .= $this->htmlLabel().'<br />';
-         }
-         return $cnt.(new Html_Element('br')).$langButtons;
-      } else {
-         $this->htmlLabel()->setAttrib('for', $this->getName());
-      }
-
-      return (string)$this->htmlLabel();
-   }
-
-   /**
-    * Metoda upraví vlastnost prvku u vykreslení
-    * @param string $type -- typ parametru, který se má upravit 
-    * @param mixed $value -- hodnota parametru
-    */
-   public function setRender($type, $size = 30) {
-      switch ($type) {
-         case 'size':
-            $this->html()->setAttrib('size', $size);
-            break;
-         default:
-            break;
-      }
-   }
+//   public function label() {
+//      $this->htmlLabel()->addContent($this->formElementLabel);
+//      if(!$this->isValid AND $this->isPopulated) {
+//         $this->htmlLabel()->addClass('formErrorLabel');
+//         $this->html()->addClass('formError');
+//      }
+//
+//      if($this->isMultilang()){
+//         Template::addJS('./jscripts/formswitchlangs.js');
+//
+//         $cnt = $langButtons = null;
+//         foreach ($this->getLangs() as $langKey => $langLabel) {
+//            $this->htmlLabel()->clearContent();
+//            $this->htmlLabel()->addContent($this->formElementLabel);
+//            $this->htmlLabel()->setAttrib('for', $this->getName().'['.$langKey.']');
+//            $this->htmlLabel()->setAttrib('id', "label_".$this->getName().'['.$langKey.']');
+//
+//            $a = new Html_Element('a', $langLabel);
+//            $a->setAttrib('href', "#");
+//            $a->setAttrib('title', $langLabel);
+//            $a->setAttrib('onclick', "return formSwitchLang('".$this->getName()."[".$langKey."]');");
+//            $langButtons .= $a.(new Html_Element('br'));
+//
+//            $cnt .= $this->htmlLabel().'<br />';
+//         }
+//         return $cnt.(new Html_Element('br')).$langButtons;
+//      } else {
+//         $this->htmlLabel()->setAttrib('for', $this->getName());
+//      }
+//
+//      return (string)$this->htmlLabel();
+//   }
 
    /**
     * Metoda vyrenderuje celý element i s popiskem
