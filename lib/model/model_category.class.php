@@ -81,5 +81,32 @@ class Model_Category extends Model_PDO {
    //      WHERE (item.group_guest LIKE 'r__') AND (cat.active = 1)
    //      ORDER BY sec.priority DESC, cat.priority DESC, clabel ASC LIMIT 0, 1
    }
+   
+   /**
+    * Metoda načte všechny kategorie
+    * @return PDOStatement -- objekt s daty
+    */
+   public function getCategoryList() {
+      $dbc = new Db_PDO();
+         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
+             INNER JOIN ".Db_PDO::table(Model_Sections::DB_TABLE)." AS sec ON cat.".self::COLUMN_SEC_ID
+             ." = sec.".Model_Sections::COLUMN_SEC_ID."
+             INNER JOIN ".Db_PDO::table(Model_Module::DB_TABLE_MODULES)." AS module ON cat.".self::COLUMN_MODULE_ID
+             ." = module.".Model_Module::COLUMN_ID_MODULE."
+             ORDER BY cat.".self::COLUMN_PRIORITY." DESC");
+      $dbst->execute();
+
+      $cl = new Model_LangContainer();
+      $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
+      return $dbst;
+
+   //      SELECT IFNULL(cat.label_cs, cat.label_cs) AS clabel, cat.`id_category`, cat.`left_panel`,
+   //      cat.`right_panel`, cat.`id_section`, cat.`cparams`, IFNULL(sec.label_cs, sec.label_cs) AS slabel,
+   //      IFNULL(sec.alt_cs, sec.alt_cs) AS salt FROM `vypecky_categories` AS cat
+   //      INNER JOIN `vypecky_items` AS item ON cat.id_category = item.id_category
+   //      INNER JOIN `vypecky_sections` AS sec ON cat.id_section = sec.id_section
+   //      WHERE (item.group_guest LIKE 'r__') AND (cat.active = 1)
+   //      ORDER BY sec.priority DESC, cat.priority DESC, clabel ASC LIMIT 0, 1
+   }
 }
 ?>

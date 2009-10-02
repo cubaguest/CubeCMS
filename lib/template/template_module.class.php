@@ -138,7 +138,7 @@ class Template_Module extends Template {
          return $mainDir;
       } else {
          trigger_error(sprintf(_('Soubor "%s" s šablonou v modulu "%s" nebyl nalezen'),
-               $file, $moduleName),E_NOTICE);
+               $file, $moduleName));
       }
    }
 }

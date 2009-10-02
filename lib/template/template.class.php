@@ -324,7 +324,9 @@ class Template {
    // zastavení výpisu buferu
       ob_start();
       foreach ($this->templateFiles as $file) {
-         include $file;
+         if(file_exists($file)){
+            include $file;
+         }
       }
       $contents = ob_get_contents();
       ob_end_clean();

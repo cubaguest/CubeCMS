@@ -33,7 +33,7 @@
 	<engine_version>6.0</engine_version>
 	<data_dir>data</data_dir>
 	<session_name>vypecky_session</session_name>
-	<langs>cs;en</langs>
+	<langs>cs;en;de</langs>
 	<dirs>
 		<images>images</images>
 		<images_lang>langs</images_lang></dirs>

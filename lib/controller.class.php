@@ -32,12 +32,6 @@ abstract class Controller {
    private $category = null;
 
    /**
-    * Objekt modulu
-    * @var Module
-    */
-   private $module = null;
-
-   /**
     * Objket pro lokalizaci
     * @var Locale
     */

@@ -22,12 +22,6 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
    private $allLangs = false;
 
    /**
-    * Aktuální pozice ukazatele na prvek
-    * @var int
-    */
-    private $position = 0;
-
-   /**
     * Konstruktor
     * @param bool $allLangs -- jestli má být vytvořeno pole se všemi jazyky,
     * nebo jen výchozí jazyk

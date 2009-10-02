@@ -43,6 +43,7 @@ class Url_Link_Module extends Url_Link {
     * @return Links -- objket Links
     */
    public function route($name = null, $params = array()) {
+      
       if($name == null) {
          $this->route = null;
       } else {

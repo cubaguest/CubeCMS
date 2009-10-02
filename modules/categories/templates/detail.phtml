@@ -1,0 +1,16 @@
+<?
+$model = new Model_Category();
+$category = $model->getCategory($this->cat);
+
+$this->setPageTitle($this->_('Uprava kategorie').' '.$category->{Model_Category::COLUMN_CAT_LABEL});
+?>
+
+<div>
+   <table>
+      <tr>
+         <th width="100"><?=$this->_('Název')?></th>
+         <td><?=$category->{Model_Category::COLUMN_CAT_LABEL}?></td>
+      </tr>
+   </table>
+
+</div>
