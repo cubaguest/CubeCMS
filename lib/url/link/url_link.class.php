@@ -68,6 +68,18 @@ class Url_Link {
    protected static $currentCategory = null;
 
    /**
+    * Proměná se zvolenou cestou
+    * @var string
+    */
+   protected $route = null;
+
+   /**
+    * Aktuálně zvolená cesta
+    * @var string
+    */
+   protected static $currentRoute = null;
+
+   /**
     * Pole s parsovatelnými parametry v url
     * @var array
     */
@@ -141,6 +153,14 @@ class Url_Link {
          $this->category = null;
       }
       return $this;
+   }
+
+   /**
+    * Metoda nastaví aktuální cestu (routu)
+    * @param string $route -- aktuální cesta
+    */
+   public static function setRoute($route) {
+      self::$currentRoute = $route;
    }
 
    /**
@@ -228,7 +248,7 @@ class Url_Link {
    // Je vkládán objekt parametru
    //      if($name instanceof UrlParam) {
    //      // Pokud se nejedná o normálový
-   //         if(!$name->isNormalParam()) {
+   //         if(!$name->isNormalParam()url/link/url_link.class.php on line 336 Call Stack #TimeMemoryFunctionLocation 10,000658620{main}( )../index.php:0 20,0178283012AppCore::createApp( )../index.php:11 30,0179283076AppCore::getInstance( )../app.php:333 40,0179283440AppCore->__construct( )../app.php:304 50,0796674396AppCore->runCore( )../app.php:282 60,17492024004AppCore->renderTemplate( )../app.php:1183 70,17512024664Template->renderTemplate( )../app.php:682 80,17512024720Template_Core->__toString( )../template_core.class.php:0 90,17632113808) {
    //         // Projdem pole a otestujem hodnoty naproti regulérnímu výrazu parametru
    //            foreach ($this->paramsArray as $paramKey => $param) {
    //               if(ereg($name->getPattern(), $param)) {
@@ -313,6 +333,7 @@ class Url_Link {
     */
    public function clear($withOutCategory = false) {
       $this->rmParam();
+      $this->route = null;
       if($withOutCategory) {
          $this->category();
       }
@@ -331,6 +352,7 @@ class Url_Link {
    //      if(!$this->onlyWebRoot) {
       $this->lang = self::$currentlang;
       $this->category = self::$currentCategory;
+      $this->route = self::$currentRoute;
       $this->paramsArray = self::$currentParams;
    //         $this->paramsNormalArray = self::$currentParamsNormalArray;
    //         $this->mediaType = Url_Request::getCurrentMediaUrlPart();
@@ -353,7 +375,11 @@ class Url_Link {
       }
       if($this->category != null) {
          $returnString.=$this->getCategory();
+      }      
+      if($this->getRoute() != null) {
+         $returnString.=$this->getRoute();
       }
+
       //        Parsovatelné parametry
       if(!empty ($this->paramsArray)) {
          $returnString.=$this->getParams();
@@ -417,6 +443,19 @@ class Url_Link {
    protected function getCategory() {
       if($this->category != null) {
          return $this->category.Url_Request::URL_SEPARATOR;
+      } else {
+         return null;
+      }
+   }
+
+   /**
+    * Metoda vrací část s cestou pro url
+    * @param string -- cesta (routa)
+    */
+   protected function getRoute() {
+      if($this->route != null) {
+//         return $this->route.Url_Request::URL_SEPARATOR;
+         return $this->route;
       } else {
          return null;
       }

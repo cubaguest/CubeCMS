@@ -39,6 +39,7 @@ class Model_Users extends Model_PDO {
 
 
 	const COLUMN_GROUP_NAME    = 'gname';
+	const COLUMN_GROUP_LABEL    = 'label';
 
    /**
     * Metoda načte kategori, pokud je zadán klíč je načtena určitá, pokud ne je
@@ -55,6 +56,19 @@ class Model_Users extends Model_PDO {
 
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetch();
+   }
+
+   /**
+    * Metoda vrací seznam skupin v systému
+    * @return PDOStatement
+    */
+   public function getGroups() {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->query("SELECT *, name AS gname FROM ".Db_PDO::table(self::DB_TABLE_GROUPS));
+      $dbst->execute();
+
+//      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      return $dbst;
    }
 }
 ?>

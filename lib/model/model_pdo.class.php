@@ -27,12 +27,12 @@ class Model_PDO extends Model {
     */
    protected function setIUValues($columns, $separator = '_', $clPrefix = null) {
       foreach ($columns as $clKey => $clVal) {
-         if(!is_null($clPrefix)){
+         if(!is_null($clPrefix)) {
             $prefix = $clPrefix.$separator;
          } else {
             $prefix = null;
          }
-         if(is_array($clVal)){
+         if(is_array($clVal)) {
             $this->setIUValues($clVal, $separator, $prefix.$clKey);
          } else {
             $this->insUpdtValues[$prefix.$clKey] = $clVal;
@@ -47,7 +47,7 @@ class Model_PDO extends Model {
    public function getInsertLabels($separator = '_') {
       $returnStr = "(";
       foreach (array_keys($this->insUpdtValues) as $variable) {
-//         $returnStr .= '´'.$variable.'´, ';
+      //         $returnStr .= '´'.$variable.'´, ';
          $returnStr .= $variable.', ';
       };
       return substr($returnStr, 0, strlen($returnStr)-2).")";
@@ -61,7 +61,15 @@ class Model_PDO extends Model {
       $pdo = new Db_PDO();
       $returnStr = "(";
       foreach (array_values($this->insUpdtValues) as $variable) {
-         $returnStr .= $pdo->quote($variable).", ";
+         if(is_bool($variable) AND $variable){
+            $returnStr .= '1, ';
+         } else if(is_bool($variable) AND !$variable){
+            $returnStr .= '0, ';
+         } else if($variable == null OR $variable == '') {
+            $returnStr .= "NULL, ";            
+         } else {
+            $returnStr .= $pdo->quote($variable).", ";   
+         }
       };
       return substr($returnStr, 0, strlen($returnStr)-2).")";
    }
@@ -75,7 +83,7 @@ class Model_PDO extends Model {
       $returnStr = null;
       //      var_dump($this->insUpdtValues);
       foreach ($this->insUpdtValues as $key => $variable) {
-//         $returnStr .= '`'.$key.'` = '.$pdo->quote($variable).", ";
+      //         $returnStr .= '`'.$key.'` = '.$pdo->quote($variable).", ";
          $returnStr .= $key.' = '.$pdo->quote($variable).", ";
       };
       return substr($returnStr, 0, strlen($returnStr)-2);
@@ -87,6 +95,7 @@ class Model_PDO extends Model {
     * @param string $name -- název pro sloupec
     * @param mixed $val -- hodnota sloupce
     * @param string $separator -- oddělovač hodnot (option default: '_')
+    * @todo odstranit
     */
    protected function createValuesArray($name, $val, $separator = '_') {
       $returnArray = array();

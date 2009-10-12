@@ -11,16 +11,17 @@
  */
 class Form_Decorator {
    private $decoration = array('wrap' => 'table',
-      'wrapclass' => 'formTable',
-      'wrapgroupclass' => 'formTableGroup',
+   'wrapclass' => 'formTable',
+   'wrapgroupclass' => 'formTableGroup',
    'rowwrap' => 'tr',
    'labelwrap' => 'th',
    'labelwrapclass' => 'formLabels',
+   'sublabelclass' => 'formSubLabels',
    'ctrlwrap' => 'td',
    'ctrlwrapclass' => 'formControlls',
    'newline' => false,
    'labelcontent' => array('label'),
-   'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations'),
+   'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations', 'subLabel'),
    'labelwrapwidth' => 100,
    'ctrlwrapwidth' => 400);
 
@@ -50,20 +51,24 @@ class Form_Decorator {
       $row = new Html_Element($this->decoration['rowwrap']);
       $cellLabel = new Html_Element($this->decoration['labelwrap']);
       $cellLabel->addClass($this->decoration['labelwrapclass']);
-//      $cellLabel->setAttrib('width', $this->decoration['labelwrapwidth']);
+      //      $cellLabel->setAttrib('width', $this->decoration['labelwrapwidth']);
       foreach ($this->decoration['labelcontent'] as $type) {
          $cellLabel->addContent($element->{$type}());
       }
       $row->addContent($cellLabel);
 
       $cellCtrl = new Html_Element($this->decoration['ctrlwrap']);
+      // sublabel
+      if(!$element->htmlSubLabel()->isEmpty()) {
+         $element->htmlSubLabel()->addClass($this->decoration['sublabelclass']);
+      }
       foreach ($this->decoration['ctrlcontent'] as $type) {
          $cellCtrl->addContent($element->{$type}());
       }
       // skripty pro práci s prvky
       $cellCtrl->addContent($element->scripts());
       $cellCtrl->addClass($this->decoration['ctrlwrapclass']);
-//      $cellCtrl->setAttrib('width', $this->decoration['ctrlwrapwidth']);
+      //      $cellCtrl->setAttrib('width', $this->decoration['ctrlwrapwidth']);
       $row->addContent($cellCtrl);
 
       $this->content .= $row;
@@ -77,7 +82,7 @@ class Form_Decorator {
    public function render($createGroupClass = false) {
       if($this->content != null) {
          $dec = new Html_Element($this->decoration['wrap'], $this->content);
-         if($createGroupClass){
+         if($createGroupClass) {
             $dec->addClass($this->decoration['wrapgroupclass']);
          } else {
             $dec->addClass($this->decoration['wrapclass']);

@@ -26,15 +26,33 @@
       <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
 
       <!--[if lte IE 6]>
-<link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
-<script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
-<![endif]-->
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
+      <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
+      <![endif]-->
 
-      <!--Menu styly -->
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('chromestyle.css')?>" />
-      <script type="text/javascript" src="./jscripts/chromejs/chrome.js"></script>
       {STYLESHEETS}
       {JAVASCRIPTS}
+      <?//Menu styly tady protože se přidává JsPlugin Jquery?>
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
+      <script type="text/javascript" src="jscripts/smoothmenu/ddsmoothmenu.js">
+         /***********************************************
+          * Smooth Navigational Menu- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+          * This notice MUST stay intact for legal use
+          * Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+          ***********************************************/   
+      </script>
+      <script type="text/javascript">
+         ddsmoothmenu.init({
+            mainmenuid: "smoothmenu1",
+            orientation: "h",
+            classname: "ddsmoothmenu",
+            contentsource: "markup"})
+      </script>
+      <?
+//      $script = new Html_Element_Script('');;
+//      print ($script);
+      ?>
+
    </head>
 
    <body id="pageTop">
@@ -53,7 +71,7 @@
                   </form>
                </div>
                <div id="menuMain">
-                  <? $this->includeTplObj("MENU"); ?> <!-- render menu-->
+                  <? $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
                </div>
                <hr class="separator" />
             </div>
@@ -138,7 +156,7 @@
             print_r($this);
             echo "</pre>";
          }
-         
+
          if($this->debug == 2) {
             print ("Run functions: ".xdebug_get_function_count()."<br />");
             print ("Memory: ".xdebug_memory_usage()."<br />");

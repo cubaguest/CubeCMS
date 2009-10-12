@@ -105,7 +105,7 @@ class Locale {
          self::$isMultilang = true;
       }
       // nastaví výchozí jazyk
-      self::$defaultLang = self::$appLangs[0];
+      self::$defaultLang = VVE_DEFAULT_APP_LANG;
    }
 
    /**
@@ -257,7 +257,7 @@ class Locale {
     * Metoda rozparsuje hodnoty jazyku uvedených v configu
     */
    private static function parseLangs() {
-      $langs = AppCore::sysConfig()->getOptionValue("langs");
+      $langs = VVE_APP_LANGS;
       if ($langs != null){
          self::$appLangs = explode(self::LANG_SEPARATOR, $langs);
          self::$defaultLang = self::$appLangs[0];

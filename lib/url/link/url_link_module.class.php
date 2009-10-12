@@ -14,18 +14,6 @@
 
 class Url_Link_Module extends Url_Link {
    /**
-    * Proměná se zvolenou cestou
-    * @var string
-    */
-   private $route = null;
-
-   /**
-    * Aktuálně zvolená cesta
-    * @var string
-    */
-   private static $currentRoute = null;
-
-   /**
     * Objekt s cestami modulu
     * @var Routes
     */
@@ -66,22 +54,12 @@ class Url_Link_Module extends Url_Link {
    }
 
    /**
-    * Metoda nastaví aktuální cestu (routu)
-    * @param string $route -- aktuální cesta
-    */
-   public static function setRoute($route) {
-      self::$currentRoute = $route;
-   }
-
-   /**
     * Metoda odstraní všechny parametry v odkazu
     * @return Links -- sám sebe
     */
    public function clear($withOutCategory = false) {
       $this->route()->rmParam();
-      if($withOutCategory) {
-         $this->category();
-      }
+      parent::clear($withOutCategory);
       return $this;
    }
 
@@ -113,36 +91,36 @@ class Url_Link_Module extends Url_Link {
     *
     * @return string -- objekt jako řetězec
     */
-   public function __toString() {
-      $returnString = Url_Request::getBaseWebDir();
-      if($this->getLang() != null) {
-         $returnString.=$this->getLang();
-      }
-      if($this->getCategory() != null) {
-         $returnString.=$this->getCategory();
-      }
-      if($this->getRoute() != null) {
-         $returnString.=$this->getRoute();
-      }
-      //        Parsovatelné parametry
-      if($this->getParams() != null) {
-         $returnString.=$this->getParams();
-      }
-      $returnString = $this->repairUrl($returnString);
-      return $returnString;
-   }
+//   public function __toString() {
+//      $returnString = Url_Request::getBaseWebDir();
+//      if($this->getLang() != null) {
+//         $returnString.=$this->getLang();
+//      }
+//      if($this->getCategory() != null) {
+//         $returnString.=$this->getCategory();
+//      }
+//      if($this->getRoute() != null) {
+//         $returnString.=$this->getRoute();
+//      }
+//      //        Parsovatelné parametry
+//      if($this->getParams() != null) {
+//         $returnString.=$this->getParams();
+//      }
+//      $returnString = $this->repairUrl($returnString);
+//      return $returnString;
+//   }
 
-   /**
-    * Metoda vrací část s cestou pro url
-    * @param string -- cesta (routa)
-    */
-   protected function getRoute() {
-      if($this->route != null) {
-         return $this->route.Url_Request::URL_SEPARATOR;
-      } else {
-         return null;
-      }
-   }
+//   /**
+//    * Metoda vrací část s cestou pro url
+//    * @param string -- cesta (routa)
+//    */
+//   protected function getRoute() {
+//      if($this->route != null) {
+//         return $this->route.Url_Request::URL_SEPARATOR;
+//      } else {
+//         return null;
+//      }
+//   }
 
    /**
     * Metoda přidá cesty do objektu linků

@@ -20,12 +20,6 @@ class Category {
    const CAT_PARAMS_SEPARATOR = ';';
 
    /**
-    * Pole s parametry kategorie
-    * @var array
-    */
-   private $params = array();
-
-   /**
     * Objekt kategorie
     * @var Object
     */
@@ -95,7 +89,7 @@ class Category {
           $this->category = $catArray;
       }
       // vytvoření objektu Modulu
-      $this->module = new Module((string)$this->category->{Model_Module::COLUMN_NAME},
+      $this->module = new Module((string)$this->category->{Model_Category::COLUMN_MODULE},
          $this->parseParams($this->category->{Model_Category::COLUMN_PARAMS}));
    }
 

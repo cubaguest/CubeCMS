@@ -8,6 +8,7 @@
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu konfiguračního souboru
+ * @deprecated    Nastavení systému se převádí na konstanty
  */
 
 class Config {

@@ -466,7 +466,7 @@ class Template {
     * @return string -- adresář bez souboru
     */
    public static function getFileDir($file, $dir = self::TEMPLATES_DIR) {
-      $faceDir = './'.self::FACES_DIR.DIRECTORY_SEPARATOR
+      $faceDir =  './'.self::FACES_DIR.DIRECTORY_SEPARATOR
           .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
       $mainDir = './'.$dir.DIRECTORY_SEPARATOR;
       // pokud existuje soubor ve vzhledu
@@ -483,7 +483,7 @@ class Template {
     * Metoda pro základní nasatvení šablonovacího systému
     */
    public static function factory() {
-      self::setFace(AppCore::sysConfig()->getOptionValue(self::FACE_CONFIG_PARAM));
+      self::setFace(VVE_TEMPLATE_FACE);
    }
 
    /**

@@ -56,14 +56,10 @@ class Routes {
     */
    public function checkRoutes() {
       foreach ($this->routes as $routeName => $route) {
-//         print "route<br>";
-//         var_dump($this->urlRequest);
          $matches = array();
          if(preg_match("/^".(string)$route['regexp']."\/?$/i", $this->urlRequest, $matches)) {
             $this->selectedRoute = $routeName;
             $this->routeParams = $matches;
-//            var_dump($matches);
-//            print "matches<br>";
             return true;
          }
       }

@@ -10,7 +10,7 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
  */
 
-class Component_Model_UserFiles extends Model_PDO {
+class Component_UserFiles_Model extends Model_PDO {
 /**
  * Tabulka s detaily
  */

@@ -327,6 +327,7 @@ input, button, textarea {
 
 input[type="image"] {
 	border: 0;
+   background-color:transparent;
 }
 
 input[type="submit"]:hover, button[type="submit"]:hover {

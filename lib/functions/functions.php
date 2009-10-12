@@ -29,13 +29,19 @@ function vve_to_ascii(&$string) {
 
 /**
  * Funkce odstrani nepovolené znaky a diakritiku pro vložení jako klíč do db
- * @param string $string -- řetězec pro převedení
- * @return string -- řetězec s převedenými znaky
+ * @param string/array $string -- řetězec nebo pole pro převedení
+ * @return string/array -- řetězec nebo pole s převedenými znaky
  */
 function vve_cr_url_key($string) {
-   $string = vve_to_ascii($string);
-   $string = preg_replace("/[ \_-]{1,}/", "-", $string);
-   $string = preg_replace("/[().\"\'!?<>,]?/", "", $string);
+   if(is_array($string)) {
+      foreach ($string as $key => $variable) {
+         $string[$key] = vve_cr_url_key($variable);
+      }
+   } else {
+      $string = vve_to_ascii($string);
+      $string = preg_replace("/[ \_-]{1,}/", "-", $string);
+      $string = preg_replace("/[().\"\'!?<>,]?/", "", $string);
+   }
    return $string;
 }
 ?>

@@ -1,0 +1,9 @@
+<div>
+<?
+// donastavení formuláře
+$this->form->priority->html()->setAttrib('size', 4);
+?>
+
+<?=$this->form?>
+<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+</div>

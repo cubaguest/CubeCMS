@@ -158,9 +158,9 @@ class Auth {
 	 * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
 	 */
 	private function _setDefaultUserParams() {
-		$this->userGroupId = AppCore::sysConfig()->getOptionValue("default_id_group", "users");
-		$this->userGroupName = AppCore::sysConfig()->getOptionValue("default_group_name", "users");
-		$this->userName = AppCore::sysConfig()->getOptionValue("default_user_name", "users");
+		$this->userGroupId = VVE_DEFAULT_ID_GROUP;
+		$this->userGroupName = VVE_DEFAULT_GROUP_NAME;
+		$this->userName = VVE_DEFAULT_USER_NAME;
 	}
 	
 	/**

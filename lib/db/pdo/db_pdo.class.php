@@ -42,6 +42,7 @@ class Db_PDO extends PDO {
                   parent::__construct("mysql:host=".self::$serverName.";dbname=".self::$dbName,
                       self::$userName, self::$userPassword);
                   $this->exec('SET CHARACTER SET utf8');
+                  $this->exec('SET character_set_connection = utf8;');
                   break;
                case 'pgsql':
                   parent::__construct("pgsql:dbname=".self::$dbName.";host=".self::$serverName,
@@ -51,7 +52,7 @@ class Db_PDO extends PDO {
                   parent::__construct("sqlite:".self::$dbName);
                   break;
                default:
-                  throw new PDOException(sprintf(_('Databázový engine "%s" není vv PDO podporován'),$typ), 101);
+                  throw new PDOException(sprintf(_('Databázový engine "%s" není v PDO podporován'),self::$connectorType), 101);
                   break;
             }
          } catch (PDOException $e) {
@@ -70,26 +71,18 @@ class Db_PDO extends PDO {
     * @return Db Konektory k danému databázovému stroji
     */
    public static function factory() {
-      self::$serverName = AppCore::sysConfig()->getOptionValue("dbserver", self::CONFIG_DB_SECTION);
-//      self::$_serverNameBackup = AppCore::sysConfig()->getOptionValue("dbserverbackup", self::CONFIG_DB_SECTION);
-      self::$userName = AppCore::sysConfig()->getOptionValue("dbuser", self::CONFIG_DB_SECTION);
-//      self::$userNameBackup = AppCore::sysConfig()->getOptionValue("dbuserbackup", self::CONFIG_DB_SECTION);
-      self::$userPassword = AppCore::sysConfig()->getOptionValue("dbpasswd", self::CONFIG_DB_SECTION);
-//      self::$userPasswordBackup = AppCore::sysConfig()->getOptionValue("dbpasswdbackup", self::CONFIG_DB_SECTION);
-      self::$dbName = AppCore::sysConfig()->getOptionValue("dbname", self::CONFIG_DB_SECTION);
-//      self::$dbNameBackup = AppCore::sysConfig()->getOptionValue("dbnamebackup", self::CONFIG_DB_SECTION);
-      self::$tablePrefix = AppCore::sysConfig()->getOptionValue("tbprefix", self::CONFIG_DB_SECTION);
-      self::$connectorType = AppCore::sysConfig()->getOptionValue("dbhandler", self::CONFIG_DB_SECTION);
-
-   //      switch (self::$_connectorType) {
-   //         case 'mysqli':
-   //            require_once './lib/db/mysqli/db.class.php';
-   //            return new MySQLiDb(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
-   //            break;
-   //         default:
-   //            throw new UnexpectedValueException(sprintf(_('Databázový engine "%s" nebyl implementován'),$typ), 101);
-   //            break;
-   //      }
+//      self::$serverName = AppCore::sysConfig()->getOptionValue("dbserver", self::CONFIG_DB_SECTION);
+//      self::$userName = AppCore::sysConfig()->getOptionValue("dbuser", self::CONFIG_DB_SECTION);
+//      self::$userPassword = AppCore::sysConfig()->getOptionValue("dbpasswd", self::CONFIG_DB_SECTION);
+//      self::$dbName = AppCore::sysConfig()->getOptionValue("dbname", self::CONFIG_DB_SECTION);
+//      self::$tablePrefix = AppCore::sysConfig()->getOptionValue("tbprefix", self::CONFIG_DB_SECTION);
+//      self::$connectorType = AppCore::sysConfig()->getOptionValue("dbhandler", self::CONFIG_DB_SECTION);
+      self::$serverName = VVE_DB_SERVER;
+      self::$userName = VVE_DB_USER;
+      self::$userPassword = VVE_DB_PASSWD;
+      self::$dbName = VVE_DB_NAME;
+      self::$tablePrefix = VVE_DB_PREFIX;
+      self::$connectorType = VVE_DB_TYPE;
    }
 
    /**

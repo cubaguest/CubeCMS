@@ -28,6 +28,12 @@ class Form_Element implements Form_Element_Interface {
    protected $formElementLabel = null;
 
    /**
+    * Subpopisek elementu
+    * @var string
+    */
+   protected $formElementSubLabel = null;
+
+   /**
     * Pole s validátory
     * @var array
     */
@@ -82,6 +88,12 @@ class Form_Element implements Form_Element_Interface {
    protected $htmlElementLabel = null;
 
    /**
+    * Objekt Html elementu pro daný subpopisek prvku
+    * @var Html_Element
+    */
+   protected $htmlElementSubLabel = null;
+
+   /**
     * Objekt s popiskem validací
     * @var Html_Element
     */
@@ -119,6 +131,7 @@ class Form_Element implements Form_Element_Interface {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
       $this->htmlElementValidaionLabel = new Html_Element('p');
+      $this->htmlElementSubLabel = new Html_Element('span');
    }
 
    /*
@@ -173,6 +186,16 @@ class Form_Element implements Form_Element_Interface {
       }
       $this->isMultilang = true;
       $this->langs = $langs;
+      return $this;
+   }
+
+   /**
+    * Metoda nastaví subpopisek k elementu
+    * @param string $string -- subpopisek
+    * @return Form_Element
+    */
+   public function setSubLabel($string) {
+      $this->formElementSubLabel = $string;
       return $this;
    }
 
@@ -251,9 +274,41 @@ class Form_Element implements Form_Element_Interface {
       return $this->isPopulated;
    }
 
+   /**
+    * Metoda vrací jestli je element prázdný
+    */
+   public function isEmpty() {
+//      if($this->isMultilang OR $this->isDimensional()) {
+         return $this->checkEmpty($this->getValues());
+//      } else {
+//         if($this->getValues() == null OR $this->getValues() == '') {
+//            return true;
+//         }
+//         return false;
+//      }
+   }
+
    /*
     * Interní metody
     */
+
+    /**
+     * metoda zkorntroluje jestli je prvek prázdný
+     * @param array/string $array -- pole nebo řetězec
+     * @return boolean -- true pro prázdný prvek
+     */
+   private function checkEmpty($array) {
+      if(is_array($array)) {
+         foreach ($array as $var) {
+            if(!$this->checkEmpty($var)) {
+               return false;
+            }
+         }
+      } else if($array != null AND $array != '') {
+         return false;
+      }
+      return true;
+   }
 
    /**
     * Metoda naplní element
@@ -313,8 +368,6 @@ class Form_Element implements Form_Element_Interface {
       $this->htmlLabel()->addContent($this->formElementLabel.":");
       $this->htmlLabel()->addClass($this->getName()."_label_class");
       if($this->isMultilang()) {
-//         Template::addJS('./jscripts/formswitchlangs.js');
-
          $cnt = $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $this->htmlLabel()->setAttrib('for', $this->getName().'_'.$langKey);
@@ -332,6 +385,15 @@ class Form_Element implements Form_Element_Interface {
    }
 
    /**
+    * Metoda vrací subpopisek
+    * @return string -- řetězec z html elementu
+    */
+   public function subLabel() {
+      $this->htmlSubLabel()->addContent($this->formElementSubLabel);
+      return (string)$this->htmlSubLabel();
+   }
+
+   /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
@@ -339,7 +401,7 @@ class Form_Element implements Form_Element_Interface {
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass('formError');
       }
-      
+
       $values = $this->getValues();
 
       $this->html()->addClass($this->getName()."_class");
@@ -350,7 +412,7 @@ class Form_Element implements Form_Element_Interface {
             $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
             $this->html()->setAttrib('value', $values[$langKey]);
             $this->html()->setAttrib('lang', $langKey);
-            
+
             $container = new Html_Element('p', $this->html());
             $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             $container->addClass($this->getName()."_container_class");
@@ -363,7 +425,7 @@ class Form_Element implements Form_Element_Interface {
          $this->html()->setAttrib('name', $this->getName());
          //         $this->html()->setAttrib('type', 'text');
          $this->html()->setAttrib('id', $this->getName());
-         $this->html()->setAttrib('value', $values);
+         $this->html()->setAttrib('value', (string)$values);
       }
       return $this->html();
    }
@@ -408,13 +470,13 @@ class Form_Element implements Form_Element_Interface {
       }
       return null;
    }
-   
+
    /**
     * Metoda pro generování scriptů. potřebných pro práci s formulářem
     */
    public function scripts() {
-      if($this->isMultiLang()){
-         // script pro vybrání jazyka -- TODO předělat
+      if($this->isMultiLang()) {
+      // script pro vybrání jazyka -- TODO předělat
          $script = new Html_Element_Script();
          $script->setAttrib('type', "text/javascript");
          $script->addContent('showOnly("'.$this->getName().'","'.Locale::getLang().'");');
@@ -497,6 +559,15 @@ class Form_Element implements Form_Element_Interface {
     */
    public function htmlValidLabel() {
       return $this->htmlElementValidaionLabel;
+   }
+
+   /**
+    * Metoda vrací objekt Html elementu, vhodné pro úpravu vlastností elementu
+    * Element subpopisku
+    * @return Html_Element
+    */
+   public function htmlSubLabel() {
+      return $this->htmlElementSubLabel;
    }
 }
 ?>

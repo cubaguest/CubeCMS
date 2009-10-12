@@ -50,7 +50,7 @@ class Html_Element {
     */
    private $inlineElements = array('br','hr', 'base', 'basefont', 'area',
       'col', 'colgroup', 'frame', 'img', 'input', 'meta', 'param',
-      'spacer');
+      'spacer', 'link');
 
    /**
     * Konstruktor pro vatvoření html tagu
@@ -68,6 +68,9 @@ class Html_Element {
     * @return string -- tag určený pro výpis
     */
    public function  __toString() {
+      if($this->isInline AND $this->isEmpty() AND empty($this->classes) AND empty ($this->attribs)){
+         return (string)null;
+      }
       $elem = $this->__toStringBegin();
       $elem .= $this->__toStringContent();
       $elem .= $this->__toStringEnd();

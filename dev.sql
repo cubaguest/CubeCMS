@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Počítač: localhost
--- Vygenerováno: Pondělí 21. září 2009, 13:59
+-- Vygenerováno: Pondělí 12. října 2009, 10:20
 -- Verze MySQL: 5.0.75
 -- Verze PHP: 5.2.6-3ubuntu4.2
 
@@ -108,17 +108,22 @@ INSERT INTO `vypecky_articles` (`id_article`, `id_item`, `id_user`, `add_time`, 
 DROP TABLE IF EXISTS `vypecky_categories`;
 CREATE TABLE IF NOT EXISTS `vypecky_categories` (
   `id_category` smallint(3) NOT NULL auto_increment,
-  `id_section` smallint(5) unsigned default NULL,
-  `id_module` smallint(5) unsigned default NULL,
-  `urlkey_cs` varchar(100) NOT NULL,
-  `label_cs` varchar(50) default NULL,
-  `alt_cs` varchar(200) default NULL,
+  `module` varchar(20) default NULL,
+  `urlkey_cs` varchar(100) character set utf8 collate utf8_czech_ci NOT NULL,
+  `label_cs` varchar(50) character set utf8 collate utf8_czech_ci default NULL,
+  `alt_cs` varchar(200) character set utf8 collate utf8_czech_ci default NULL,
   `urlkey_en` varchar(100) default NULL,
   `label_en` varchar(50) default NULL,
   `alt_en` varchar(200) default NULL,
   `urlkey_de` varchar(100) default NULL,
   `label_de` varchar(50) default NULL,
   `alt_de` varchar(200) default NULL,
+  `keywords_cs` varchar(200) character set utf8 collate utf8_czech_ci default NULL,
+  `description_cs` varchar(500) character set utf8 collate utf8_czech_ci default NULL,
+  `keywords_en` varchar(200) default NULL,
+  `description_en` varchar(500) default NULL,
+  `keywords_de` varchar(200) default NULL,
+  `description_de` varchar(500) default NULL,
   `params` varchar(200) default NULL,
   `protected` tinyint(1) NOT NULL default '0',
   `priority` smallint(2) NOT NULL default '0',
@@ -134,16 +139,55 @@ CREATE TABLE IF NOT EXISTS `vypecky_categories` (
   `show_in_menu` tinyint(1) NOT NULL default '1' COMMENT 'Má li se položka zobrazit v menu',
   `show_when_login_only` tinyint(1) NOT NULL default '0' COMMENT 'Jstli má bát položka zobrazena po přihlášení',
   PRIMARY KEY  (`id_category`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=51 ;
 
 --
 -- Vypisuji data pro tabulku `vypecky_categories`
 --
 
-INSERT INTO `vypecky_categories` (`id_category`, `id_section`, `id_module`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `params`, `protected`, `priority`, `active`, `group_guest`, `group_user`, `group_admin`, `group_poweruser`, `left_panel`, `right_panel`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`) VALUES
-(1, 1, 1, 'text-s-obrazky-a-soubory', 'text s obrázky a soubory', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 10, 1, 'r--', 'r--', 'rwc', 'rw-', 1, 1, 'monthly', 0.8, 1, 0),
-(12, 1, 1, 'text-druhy', 'Text Druhý', NULL, 'text-second', 'Text Second', NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'r--', 'rwc', 'rw-', 1, 1, 'yearly', 0.1, 1, 0),
-(13, 1, 7, 'pokus', 'testovací kategorie', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'rw-', 'rwc', 'rwc', 1, 1, 'yearly', 0.1, 1, 0);
+INSERT INTO `vypecky_categories` (`id_category`, `module`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `params`, `protected`, `priority`, `active`, `group_guest`, `group_user`, `group_admin`, `group_poweruser`, `left_panel`, `right_panel`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`) VALUES
+(1, 'text', 'text-s-obrazky-a-soubory', 'text s obrázky a soubory', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 10, 1, 'r--', 'r--', 'rwc', 'rw-', 1, 1, 'monthly', 0.8, 1, 0),
+(12, 'text', 'text-druhy', 'Text Druhý', NULL, 'text-second', 'Text Second', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'r--', 'rwc', 'rw-', 1, 1, 'yearly', 0.1, 1, 0),
+(13, 'pokus', 'pokus', 'testovací kategorie', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 'r--', 'rw-', 'rwc', 'rwc', 1, 1, 'yearly', 0.1, 1, 0),
+(14, 'categories', 'kategorie', 'kategorie', NULL, 'categories', 'categories', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 1, '---', '---', 'rwc', '---', 1, 1, 'never', 0.1, 1, 0),
+(50, 'text', 'cesko-recke-behy', 'česko  řecké běhy', '', '', '', '', '', '', '', 'běhy slalom sport', 'Stránka s informacemi o běhání v česku a řecku', '', '', '', '', NULL, 0, 0, 1, 'r--', 'r--', 'rwc', 'r--', 1, 1, 'yearly', 0, 1, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `vypecky_config`
+--
+
+DROP TABLE IF EXISTS `vypecky_config`;
+CREATE TABLE IF NOT EXISTS `vypecky_config` (
+  `id_config` smallint(5) unsigned NOT NULL auto_increment,
+  `key` varchar(50) character set utf8 NOT NULL,
+  `value` text character set utf8,
+  `values` varchar(200) character set utf8 default NULL,
+  PRIMARY KEY  (`id_config`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
+
+--
+-- Vypisuji data pro tabulku `vypecky_config`
+--
+
+INSERT INTO `vypecky_config` (`id_config`, `key`, `value`, `values`) VALUES
+(1, 'DEFAULT_ID_GROUP', '2', NULL),
+(2, 'DEFAULT_GROUP_NAME', 'guest', NULL),
+(3, 'DEFAULT_USER_NAME', 'anonym', NULL),
+(4, 'APP_LANGS', 'cs;en;de', NULL),
+(5, 'DEFAULT_APP_LANG', 'cs', NULL),
+(6, 'IMAGES_DIR', 'images', NULL),
+(7, 'IMAGES_LANGS_DIR', 'langs', NULL),
+(8, 'DEBUG_LEVEL', '2', NULL),
+(9, 'TEMPLATE_FACE', 'default', NULL),
+(10, 'SITEMAP_PERIODE', 'weekly', NULL),
+(11, 'SEARCH_RESULT_LENGHT', '300', NULL),
+(12, 'SEARCH_HIGHLIGHT_TAG', 'strong', NULL),
+(13, 'SESSION_NAME', 'vypecky_cookie', NULL),
+(14, 'WEB_NAME', 'Vepřové Výpečky', NULL),
+(15, 'CATEGORIES_STRUCTURE', 'O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:13:"Hlavní sekce";s:2:"en";N;s:2:"de";N;}s:20:"\0Menu_Sections\0level";i:0;s:17:"\0Menu_Sections\0id";i:51246421;s:23:"\0Menu_Sections\0idParent";N;s:24:"\0Menu_Sections\0childrens";a:4:{i:0;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:7:"Hlavní";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:1;s:17:"\0Menu_Sections\0id";i:523857685;s:23:"\0Menu_Sections\0idParent";i:51246421;s:24:"\0Menu_Sections\0childrens";a:0:{}}i:1;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:8:"Doplňky";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:1;s:17:"\0Menu_Sections\0id";i:2026422696;s:23:"\0Menu_Sections\0idParent";i:51246421;s:24:"\0Menu_Sections\0childrens";a:2:{i:0;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:9:"JsPluginy";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:2;s:17:"\0Menu_Sections\0id";i:1276501734;s:23:"\0Menu_Sections\0idParent";i:2026422696;s:24:"\0Menu_Sections\0childrens";a:0:{}}i:1;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:10:"Komponenty";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:2;s:17:"\0Menu_Sections\0id";i:2056888460;s:23:"\0Menu_Sections\0idParent";i:2026422696;s:24:"\0Menu_Sections\0childrens";a:0:{}}}}i:2;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:6:"Moduly";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:1;s:17:"\0Menu_Sections\0id";i:1378333988;s:23:"\0Menu_Sections\0idParent";i:51246421;s:24:"\0Menu_Sections\0childrens";a:3:{i:0;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:10:"Základní";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:2;s:17:"\0Menu_Sections\0id";i:144463462;s:23:"\0Menu_Sections\0idParent";i:1378333988;s:24:"\0Menu_Sections\0childrens";a:2:{i:0;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:19:"Textové a Znakové";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:3;s:17:"\0Menu_Sections\0id";i:553342086;s:23:"\0Menu_Sections\0idParent";i:144463462;s:24:"\0Menu_Sections\0childrens";a:1:{i:0;s:1:"1";}}i:1;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:9:"Grafické";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:3;s:17:"\0Menu_Sections\0id";i:198504839;s:23:"\0Menu_Sections\0idParent";i:144463462;s:24:"\0Menu_Sections\0childrens";a:0:{}}}}i:1;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:11:"Pokročilé";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:2;s:17:"\0Menu_Sections\0id";i:720806407;s:23:"\0Menu_Sections\0idParent";i:1378333988;s:24:"\0Menu_Sections\0childrens";a:1:{i:0;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:8:"Textové";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:3;s:17:"\0Menu_Sections\0id";i:1669142342;s:23:"\0Menu_Sections\0idParent";i:720806407;s:24:"\0Menu_Sections\0childrens";a:0:{}}}}i:2;O:13:"Menu_Sections":5:{s:21:"\0Menu_Sections\0labels";a:3:{s:2:"cs";s:14:"Konfigurační";s:2:"en";s:0:"";s:2:"de";s:0:"";}s:20:"\0Menu_Sections\0level";i:2;s:17:"\0Menu_Sections\0id";i:780317735;s:23:"\0Menu_Sections\0idParent";i:1378333988;s:24:"\0Menu_Sections\0childrens";a:0:{}}}}i:3;s:2:"12";}}', NULL);
 
 -- --------------------------------------------------------
 
@@ -503,7 +547,7 @@ DROP TABLE IF EXISTS `vypecky_groups`;
 CREATE TABLE IF NOT EXISTS `vypecky_groups` (
   `id_group` smallint(3) unsigned NOT NULL auto_increment COMMENT 'ID skupiny',
   `name` varchar(15) default NULL COMMENT 'Nazev skupiny',
-  `label` varchar(20) default NULL,
+  `label` varchar(100) default NULL,
   `used` tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (`id_group`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
@@ -516,7 +560,7 @@ INSERT INTO `vypecky_groups` (`id_group`, `name`, `label`, `used`) VALUES
 (1, 'admin', 'Administrátor', 1),
 (2, 'guest', 'Host', 1),
 (3, 'user', 'Uživatel', 1),
-(4, 'poweruser', 'uživatel s většími p', 1);
+(4, 'poweruser', 'uživatel s většími právy', 1);
 
 -- --------------------------------------------------------
 
@@ -588,7 +632,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_modules` (
 INSERT INTO `vypecky_modules` (`id_module`, `name`, `mparams`, `datadir`, `dbtable1`, `dbtable2`, `dbtable3`) VALUES
 (1, 'text', NULL, NULL, 'texts', NULL, NULL),
 (2, 'news', NULL, NULL, 'news', NULL, NULL),
-(3, 'dwfiles', NULL, 'dwfiles', 'dwfiles', NULL, NULL),
+(3, 'categories', NULL, NULL, NULL, NULL, NULL),
 (4, 'login', NULL, NULL, 'users', NULL, NULL),
 (5, 'minigalery', NULL, 'minigalery', 'minigalery', NULL, NULL),
 (6, 'workers', NULL, 'workers', 'workers', NULL, NULL),
@@ -825,6 +869,7 @@ INSERT INTO `vypecky_references` (`id_reference`, `id_item`, `name_cs`, `label_c
 DROP TABLE IF EXISTS `vypecky_sections`;
 CREATE TABLE IF NOT EXISTS `vypecky_sections` (
   `id_section` smallint(3) NOT NULL auto_increment,
+  `id_parent` int(11) NOT NULL,
   `slabel_cs` varchar(50) default NULL,
   `salt_cs` varchar(200) default NULL,
   `slabel_en` varchar(50) default NULL,
@@ -833,14 +878,18 @@ CREATE TABLE IF NOT EXISTS `vypecky_sections` (
   `salt_de` varchar(200) default NULL,
   `priority` smallint(6) NOT NULL default '0',
   PRIMARY KEY  (`id_section`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 --
 -- Vypisuji data pro tabulku `vypecky_sections`
 --
 
-INSERT INTO `vypecky_sections` (`id_section`, `slabel_cs`, `salt_cs`, `slabel_en`, `salt_en`, `slabel_de`, `salt_de`, `priority`) VALUES
-(1, 'section 1', NULL, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `vypecky_sections` (`id_section`, `id_parent`, `slabel_cs`, `salt_cs`, `slabel_en`, `salt_en`, `slabel_de`, `salt_de`, `priority`) VALUES
+(1, 0, 'section 1', NULL, NULL, NULL, NULL, NULL, 0),
+(6, 0, 'sekce 2', 'druhá sekce s dalšími nástroji', NULL, NULL, NULL, NULL, 5),
+(7, 1, 'pod sekce 1', NULL, NULL, NULL, NULL, NULL, 0),
+(9, 1, 'podsekce 2', NULL, NULL, NULL, NULL, NULL, 0),
+(10, 7, 'podpodsekce 1', NULL, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 

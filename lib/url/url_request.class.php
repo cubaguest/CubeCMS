@@ -101,64 +101,6 @@ class Url_Request {
    private $outputType = 'html';
 
    /**
-    * pole s regexy pro SupportedSeervices, podle nich se rozpoznávají
-    * @var array
-    */
-   //   private static $notNormalUrlArrayRegex = array(self::SUPPORTSERVICES_SITEMAP_NAME => '^sitemap.(xml|txt)$',
-   //   self::SUPPORTSERVICES_EPLUGIN_NAME => '^eplugin[^\.]*.js(.*)$',
-   //   self::SUPPORTSERVICES_JSPLUGIN_NAME => '^jsplugin[^\.]*.js(.*)$');
-
-   /**
-    * Jestli je zvoleno SupportedServices
-    * @var bool
-    */
-   //   private static $isSupportedServices = false;
-
-   /**
-    * Která ze Supported Services je volána
-    * @var string
-    */
-   //   private static $supportedServicesType = null;
-
-   /**
-    * Název služby supproted services
-    * @var string
-    */
-   //   private static $supporteServicesName = null;
-
-   /**
-    * Název souboru služby supproted services
-    * @var string
-    */
-   //   private static $supporteServicesFile = null;
-
-   /**
-    * Parametry služby supproted services
-    * @var string
-    */
-   //   private static $supporteServicesParams = null;
-
-   /**
-    * Regulerni vyrazy pro vyhodnocování specielních stránek (search, sitemap,
-    * atd.), které jsou nezávislé na kategoriích
-    * @var array
-    */
-   //   private static $specialPagesRegex = array(self::SPECIAL_PAGE_SEARCH => '\?search=([^&]*)&?p?a?g?e?=?([0-9]*)?',
-   //   self::SPECIAL_PAGE_SITEMAP => 'sitemap.html');
-
-   /**
-    * Název specialní stránky
-    * @var string
-    */
-   //   private static $specialPageName = null;
-
-   /**
-    * Jestli je zpracováván ajax soubor
-    * @var boolean
-    */
-   //   private static $isAjax = false;
-
-   /**
     * Konstruktor
     */
    public function  __construct() {
@@ -226,10 +168,9 @@ class Url_Request {
     */
    private function parseNormalUrl() {
       $matches = array();
-      if(!preg_match("/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-zA-Z0-9_-]*)\/(?P<other>[^?\/]*)\/?\??(?P<params>.*)/i", self::$fullUrl, $matches)) {
+      if(!preg_match("/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-zA-Z0-9_-]*)\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i", self::$fullUrl, $matches)) {
          return false;
       }
-//      var_dump($matches);
       $this->category = $matches['category'];
       $this->moduleUrlPart = $matches['other'];
       $this->parmas = $matches['params'];

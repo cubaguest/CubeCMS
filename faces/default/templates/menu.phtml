@@ -1,26 +1,24 @@
-<!-- Sekce v menu  -->
-<div class="chromestyle" id="chromemenu">
-   <ul>
-      <? foreach ($this->sectionsArray as $sec_key => $section) {?>
-      <li>
-         <? if($section["submenu"]){?>
-         <a href="#" rel="dropmenu<?=$sec_key?>" title="<?=$section["slabel"]?>" onclick="return false"><?=$section["slabel"]?></a>
-         <? } else { ?>
-         <a href="<?=$section["url"]?>" title="<?=$section["calt"]?>"><?=$section["clabel"]?></a>
-         <? } ?>
-      </li>
-      <?}?>
-   </ul>
-</div>
-<!-- Kategorie v podmenu -->
-<? foreach ($this->categoryArray as $cat_key => $category) {?>
-<div id="dropmenu<?=$cat_key?>" class="dropmenudiv">
-   <? foreach ($category as $menuItem){?>
-   <a href="<?=$menuItem["url"]?>" title="<?=$menuItem["calt"]?>"><?=$menuItem["clabel"]?></a>
-   <? }?>
-</div>
-<? } ?>
+<?
+// funkce pro render menu
+function vveMenuRenderFunc($menuArr, $link) {
+   print ("<ul>\n");
+   foreach ($menuArr as $key => $item) {
+      print ("<li>");
+      if($item instanceof Menu_Sections) {
+         print ('<a href="#" title="'.$item->getLabel().'">'.$item->getLabel()."</a>\n");
+         vveMenuRenderFunc($item, $link);
+      } else {
+         print ('<a href="'.$link->clear()->category($item[Model_Category::COLUMN_URLKEY]).'">'
+             .$item[Model_Category::COLUMN_CAT_LABEL].'</a>'."");
+      }
+      print ("</li>\n");
+   }
+   print ("</ul>\n");
+}
+?>
 
-<script type="text/javascript">
-   cssdropdown.startchrome("chromemenu")
-</script> 
+<!-- Halvni menu sekce v menu  -->
+<div id="smoothmenu1" class="ddsmoothmenu">
+   <?=vveMenuRenderFunc($this->menu, $this->link())?>
+   <br style="clear: left" />
+</div>

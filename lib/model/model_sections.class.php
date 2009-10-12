@@ -10,7 +10,7 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
  */
 
-class Model_Sections extends Model_Db {
+class Model_Sections extends Model_PDO {
    /**
     * Tabulka s detaily
     */
@@ -24,6 +24,17 @@ class Model_Sections extends Model_Db {
 	const COLUMN_SEC_ALT 	= 'salt';
 	const COLUMN_SEC_ID		= 'id_section';
 	const COLUMN_SEC_PRIORITY		= 'priority';
+
+   /**
+    * Metoda vrací seznam sekcí
+    * @return PDOStatement -- pole se sekcema
+    */
+   public function getSections() {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)."
+             ORDER BY ".self::COLUMN_SEC_PRIORITY." ASC", PDO::FETCH_CLASS, 'Model_LangContainer');
+      return $dbst->fetchAll();
+   }
 }
 
 ?>

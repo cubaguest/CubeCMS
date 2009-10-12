@@ -24,11 +24,10 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
       } else {
          parent::__construct($errMsg);
       }
-      $cl = array();
       if(!is_array($columsNotEmpty) AND $columsNotEmpty != null) {
-         $cl = array($columsNotEmpty);
+         $columsNotEmpty = array($columsNotEmpty);
       }
-      $this->columsNotEmpty = $cl;
+      $this->columsNotEmpty = $columsNotEmpty;
    }
 
    /**
@@ -87,8 +86,9 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
     * Metoda zkontroluje jestli jsou prvky z pole colum vyplněny
     * @param string/array $values -- pole s hodnotami
     * @param array $colums -- pole s nutnými prvky
-    * @param <type> $key
-    * @return <type>
+    * @param string $key -- název klíče k prováděnému poli
+    * @return bool/string -- true pokud je vše v pořádku, jinak řetězec z pole
+    * s kontrolovanými prvky
     */
    private function checkEmptyValues($values, $colums, $key = null) {
       if(!is_array($values)) {

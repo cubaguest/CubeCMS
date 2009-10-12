@@ -14,15 +14,14 @@
  */
 
 class AppCore {
+   /**
+    * Verze enginu
+    */
+   const ENGINE_VERSION = '6.0.0';
 /**
  * Obsahuje hlavní soubor aplikace
  */
    const APP_MAIN_FILE = 'index.php';
-
-   /**
-    * Název konfiguračního souboru
-    */
-   const MAIN_CONFIG_FILE = "config.xml";
 
    /**
     * Konstanta s adresářem s moduly
@@ -60,9 +59,15 @@ class AppCore {
    const ENGINE_MODELS_DIR = 'models';
 
    /**
-    * Adresář s pluginy filesystému
+    * Adresář s konfigurací aplikace
     */
-   //   const ENGINE_FILESYSTEM_DIR = 'filesystem';
+   const ENGINE_CONFIG_DIR = 'config';
+
+   /**
+    * Název konfiguračního souboru
+    */
+   const ENGINE_CONFIG_FILE = "config.php";
+
 
    /**
     * Adresář s ostatními pluginy
@@ -155,7 +160,7 @@ class AppCore {
     * Nastavený debugovací level
     * @var integer
     */
-   private static $debugLevel = 1;
+//   private static $debugLevel = 1;
 
    /**
     * Objekt pro přístup k šabloně v jádře
@@ -203,7 +208,7 @@ class AppCore {
     * objekt konfiguračního souboru
     * @var Config
     */
-   private static $sysConfig = null;
+//   private static $sysConfig = null;
 
    /**
     * Proměná pro sledování doby generování scriptu
@@ -228,6 +233,9 @@ class AppCore {
    private function __construct() {
    //		Definice globálních konstant
       define('URL_SEPARATOR', '/');
+      define('VVE_APP_IS_RUN', true);
+      require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
+
 
       //		inicializace stratovacího času
       List ($usec, $sec) = Explode (' ', microtime());
@@ -250,14 +258,12 @@ class AppCore {
 
       //načtení potřebných knihoven
       $this->_loadLibraries();
+
+      // inicializace db konektoru
+      $this->_initDb();
+
       // načtení systémového konfiguračního souboru
       $this->_initConfig();
-
-      //		Zapnutí debugeru
-      self::$debugLevel = self::sysConfig()->getOptionValue('DEBUG_LEVEL');
-
-      //		Definování konstanty s datovým adresářem modulů //TODO upravit tak aby se to používalo korektně např. proměná
-      define('MAIN_DATA_DIR', self::sysConfig()->getOptionValue('data_dir'));
 
       //		inicializace URL
       Url_Request::factory();
@@ -266,11 +272,9 @@ class AppCore {
       Locale::factory();
 
       //		inicializace sessions
-      Sessions::factory(self::sysConfig()->getOptionValue('session_name'));
+      Sessions::factory(VVE_SESSION_NAME);
       // výběr jazyka a locales
       Locale::selectLang();
-      //		inicializace db konektoru
-      $this->_initDb();
       //		Inicializace chybových hlášek
       $this->_initMessagesAndErrors();
 
@@ -337,17 +341,9 @@ class AppCore {
     * Metoda vrací objekt na systémovou konfiguraci
     * @return Config -- objekt konfigurace
     */
-   public static function sysConfig() {
-      return self::$sysConfig;
-   }
-
-   /**
-    * Metoda vrací objekt db conektoru
-    *
-    * @return DbInterface -- objekt db konektoru
-    */
-   public static function getDbConnector() {
-   }
+//   public static function sysConfig() {
+//      return self::$sysConfig;
+//   }
 
    /**
     * Metoda nastavuje že má být zobrazena chybová stránka 404
@@ -413,15 +409,7 @@ class AppCore {
     * Metoda inicializuje připojení k databázi
     */
    private function _initDb() {
-   //      require_once ('.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. 'db'
-   //         . DIRECTORY_SEPARATOR. 'db.class.php');
       try {
-      //         self::$dbConnector = Db::factory();
-      //
-      //         if(self::$dbConnector == false){
-      //            throw new UnexpectedValueException(self::sysConfig()->getOptionValue("dbhandler",
-      //                  self::MAIN_CONFIG_DB_SECTION)._(" Databázový engine nebyl implementován"), 3);
-      //         }
       // inicializace PDO
          Db_PDO::factory();
       } catch (PDOException $e) {
@@ -434,8 +422,15 @@ class AppCore {
     *
     */
    private function _initConfig() {
-      self::$sysConfig = new Config(self::getAppWebDir() . DIRECTORY_SEPARATOR
-          . self::MAIN_CONFIG_FILE);
+      $cfgModel = new Model_Config();
+      $cfgVals = $cfgModel->getConfigStat();
+      while ($cfg = $cfgVals->fetch()) {
+         if(!defined('VVE_'.$cfg[Model_Config::COLUMN_KEY])){
+            define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), $cfg[Model_Config::COLUMN_VALUE]);
+         }
+      }
+//      self::$sysConfig = new Config(self::getAppWebDir() . DIRECTORY_SEPARATOR
+//          . self::ENGINE_CONFIG_FILE);
    }
 
    /**
@@ -568,24 +563,24 @@ class AppCore {
     * Metoda vytvoří hlavní menu aplikace
     */
    public function createMainMenu() {
-   //      try {
-   //         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-   //               . 'menu.class.php')){
-   //            throw new BadFileException(_('Soubor s třídou pro tvorbu menu nebyl nalezen'), 5);
-   //         }
-   //         require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-   //            . 'menu.class.php');
-   //
-   //         if(!class_exists("Menu", false)){
-   //            throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
-   //         }
-   //         $menu = new Menu();
-   //         $menu->controller();
-   //         $menu->view();
-   //         $this->coreTpl->addTplObj("MENU", $menu->template());
-   //      } catch (Exception $e) {
-   //         new CoreErrors($e);
-   //      }
+         try {
+            if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+                  . 'menu.class.php')){
+               throw new BadFileException(_('Soubor s třídou pro tvorbu menu nebyl nalezen'), 5);
+            }
+            require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+               . 'menu.class.php');
+   
+            if(!class_exists("Menu", false)){
+               throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
+            }
+            $menu = new Menu();
+            $menu->controller();
+            $menu->view();
+            $this->coreTpl->menuObj = $menu->template();
+         } catch (Exception $e) {
+            new CoreErrors($e);
+         }
    }
 
    /**
@@ -593,7 +588,7 @@ class AppCore {
     */
    public function assignMainVarsToTemplate() {
    //	Hlavni promene strany
-      $this->coreTpl->pageTitle = self::sysConfig()->getOptionValue("web_name");
+      $this->coreTpl->pageTitle = VVE_WEB_NAME;
       if(!AppCore::isErrorPage()){
          $this->coreTpl->setCategoryName(Category::getMainCategory()->getLabel());
          $this->coreTpl->categoryId = Category::getMainCategory()->getId();
@@ -609,25 +604,16 @@ class AppCore {
       // mapa webu
       //      $this->coreTpl->sitemapLink = (string)$link->clear(true)
       //          .Url_Request::getSpecialPageRegexp(Url_Request::SPECIAL_PAGE_SITEMAP);
-      $this->coreTpl->mainLangImagesPath = self::sysConfig()
-          ->getOptionValue('images_lang', 'dirs').URL_SEPARATOR;
+      $this->coreTpl->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
       unset($link);
       //Přihlášení uživatele
       $this->coreTpl->userIsLogin = AppCore::getAuth()->isLogin();
       $this->coreTpl->userLoginUsername = AppCore::getAuth()->getUserName();
       //Verze enginu
-      $this->coreTpl->engineVersion = self::sysConfig()->getOptionValue("engine_version");
-      //Debugovaci mod
-      if (self::$debugLevel > 1) {
-         $this->coreTpl->debugMode = true;
-      }
-      if (self::$debugLevel > 2) {
-         $this->coreTpl->showDebugConsole = true;
-      }
-      $this->coreTpl->debug = self::$debugLevel;
-      //      //		Přiřazení jazykového pole
+      $this->coreTpl->engineVersion = self::ENGINE_VERSION;
+      // Přiřazení jazykového pole
       $this->coreTpl->setPVar("appLangsNames", Locale::getAppLangsNames());
-      //      //		Vytvoření odkazů s jazyky
+      // Vytvoření odkazů s jazyky
       $langs = array();
       $langNames = Locale::getAppLangsNames();
       $link = new Links();

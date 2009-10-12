@@ -13,10 +13,10 @@
  */
 
 abstract class Controller {
-   /**
-    * Název nového actionViewru
-    * @var string
-    */
+/**
+ * Název nového actionViewru
+ * @var string
+ */
    private $actionViewer = null;
 
    /**
@@ -35,19 +35,19 @@ abstract class Controller {
     * Objket pro lokalizaci
     * @var Locale
     */
-    private $locale = null;
+   private $locale = null;
 
-    /**
-     * Objekt cest modulu
-     * @var Routes
-     */
-    private $routes = null;
+   /**
+    * Objekt cest modulu
+    * @var Routes
+    */
+   private $routes = null;
 
-    /**
-     * objekt linku
-     * @var Url_Link
-     */
-    private $link = null;
+   /**
+    * objekt linku
+    * @var Url_Link
+    */
+   private $link = null;
 
    /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
@@ -55,8 +55,8 @@ abstract class Controller {
     * @param Module_Sys $moduleSys -- systémový objekt modulu
     */
    public final function __construct(Category $category, Routes $routes) {
-      //TODO odstranit nepotřebné věci v paramtrech konstruktoru
-      //      $this->container = new Container();
+   //TODO odstranit nepotřebné věci v paramtrech konstruktoru
+   //      $this->container = new Container();
       $this->category = $category;
       $this->routes = $routes;
 
@@ -69,10 +69,10 @@ abstract class Controller {
 
       //		Načtení třídy View
       $viewClassName = ucfirst($category->getModule()->getName()).'_View';
-//      if(!class_exists($viewClassName)){
-//         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
-//               , $viewClassName, $this->module()->getName()),1);
-//      }
+      //      if(!class_exists($viewClassName)){
+      //         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
+      //               , $viewClassName, $this->module()->getName()),1);
+      //      }
       //	Vytvoření objektu pohledu
       $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
 
@@ -82,17 +82,17 @@ abstract class Controller {
 
 
 
-    /**
-     * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
-     * kontroleru
-     */
+   /**
+    * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
+    * kontroleru
+    */
    protected function init() {}
 
    /**
     * Metoda vrací objekt systémové konfigurace
     * @return Config -- objekt systémové konfigurace
     */
-   final public function getSysConfig(){
+   final public function getSysConfig() {
       return AppCore::sysConfig();
    }
 
@@ -111,19 +111,19 @@ abstract class Controller {
     * @return Links -- objekt pro práci s odkazy
     * @deprecated
     */
-//   final public function getLink($clear = false, $onlyWebRoot = false) {
-//      return $this->link($clear, $onlyWebRoot);
-//   }
+   //   final public function getLink($clear = false, $onlyWebRoot = false) {
+   //      return $this->link($clear, $onlyWebRoot);
+   //   }
 
    /**
     * Metoda vrací odkaz na objekt pro práci s odkazy
     * @param boolean -- true pokud má byt link čistý
     * @param boolean -- true pokud má byt link bez kategorie
-    * @return Url_Link -- objekt pro práci s odkazy
+    * @return Url_Link_Module -- objekt pro práci s odkazy
     */
    final public function link($clear = false) {
       $link = clone $this->link;
-      if($clear){
+      if($clear) {
          $link->clear();
       }
       return $link;
@@ -179,7 +179,7 @@ abstract class Controller {
     * @return mixed -- hodnota parametru
     */
    final public function getRequestParam($name, $def = null) {
-      if(isset ($_GET[$name])){
+      if(isset ($_GET[$name])) {
          return urldecode($_GET[$name]);
       } else {
          return $def;
@@ -208,7 +208,7 @@ abstract class Controller {
     * @return Auth -- objekt autorizace
     */
    final public function auth() {
-//      return $this->sys()->rights()->getAuth();
+   //      return $this->sys()->rights()->getAuth();
    }
 
    /**
@@ -270,7 +270,7 @@ abstract class Controller {
     * Metoda kontroluje práva pro čtení modulu. v opačném případě vyvolá přesměrování
     */
    final public function checkReadableRights() {
-      if(!$this->rights()->isReadable()){
+      if(!$this->rights()->isReadable()) {
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
          $this->link(true)->reload();
@@ -280,7 +280,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * Metoda kontroluje práva pro zápis do modulu. v opačném případě vyvolá přesměrování
     */
    final public function checkWritebleRights() {
-      if(!$this->rights()->isWritable()){
+      if(!$this->rights()->isWritable()) {
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
          $this->link(true)->reload();
@@ -290,7 +290,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * Metoda kontroluje práva pro plný přístup k modulu. v opačném případě vyvolá přesměrování
     */
    final public function checkControllRights() {
-      if(!$this->rights()->isControll()){
+      if(!$this->rights()->isControll()) {
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
          $this->link(true)->reload();
@@ -329,15 +329,15 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
          $viewName = $this->actionViewer.'View';
       }
       //	zvolení viewru modulu pokud existuje
-      if(!method_exists($this->view(), $viewName)) {
-         throw new BadMethodCallException(sprintf(
-         _("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
-         $viewName, $this->module()->getName()), 2);
-      }
+//      if(!method_exists($this->view(), $viewName)) {
+//         throw new BadMethodCallException(sprintf(
+//         _("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
+//         $viewName, $this->module()->getName()), 2);
+//      }
+      // spuštění kontroleru
+      $ctrlResult = $this->{$this->routes()->getActionName().'Controller'}();
 
-      // spuštění Controlleru
-      if($this->{$this->routes()->getActionName().'Controller'}() !== false) {
-      // pokud je kontrolel v pořádku spustíme view
+      if(method_exists($this->view(), $viewName) AND $ctrlResult !== false) {
          $this->view()->$viewName();
       }
    }
@@ -351,7 +351,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
    final public function runCtrlAction($actionName, $outputType) {
       if(!method_exists($this, $actionName.'Controller')) {
          trigger_error(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
-         $actionName, $this->module()->getName()));
+             $actionName, $this->module()->getName()));
       }
 
       $viewName = null;
@@ -359,12 +359,12 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
       if(method_exists($this->view(), $actionName.ucfirst($outputType).'View')) {
          $viewName = $actionName.ucfirst($outputType).'View';
       } else if(method_exists($this->view(), $actionName.'View')) {
-         $viewName = $actionName.'View';
-      } else {
-         trigger_error(sprintf(_("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
-         $actionName, $this->module()->getName()));
+            $viewName = $actionName.'View';
+         } else {
+            trigger_error(sprintf(_("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
+                $actionName, $this->module()->getName()));
 
-      }
+         }
 
       // spuštění Viewru
       if($this->{$actionName.'Controller'}() !== false AND $viewName != null) {
