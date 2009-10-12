@@ -193,28 +193,6 @@ class Category {
    }
 
    /**
-    * Metoda vrací požadovaný parametr
-    * @param string $param -- index parametru
-    * @param mixed $defaultParam -- výchozí hodnota
-    * @return string -- parametr
-    */
-//   public function getParam($param, $defaultParam = null) {
-//      if(isset($this->params[$param])){
-//         return $this->params[$param];
-//      } else {
-//         return $defaultParam;
-//      }
-//   }
-
-   /**
-    * Metoda vrací všechny parametry kategorie
-    * @return array -- parametry
-    */
-//   public function getParams() {
-//      return $this->params;
-//   }
-
-   /**
     * Metoda vrací jestli se jedná o validní kategorii
     * @return bool
     */
@@ -240,14 +218,6 @@ class Category {
    public static function getMainCategory() {
       return self::$mainCategory;
    }
-
-   /**
-    * Metoda vrací název modulu
-    * @return string
-    */
-//   public function getModuleName() {
-//      return (string)$this->category->{Model_Module::COLUMN_NAME};
-//   }
 
    /**
     * Metoda vrací objekt modulu pro zadanou kategorii

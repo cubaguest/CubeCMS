@@ -21,9 +21,15 @@ class Menu_Main {
 
    /**
     * Objekt menu se sekcemi
-    * @var Menu_Sections
+    * @var Category_Structure
     */
    protected $menu = null;
+
+   /**
+    * Pole s aktuální cestou
+    * @var array
+    */
+   private $currentPath = array();
 
    /**
     * Konstruktor vytvoří objek menu
@@ -38,22 +44,41 @@ class Menu_Main {
    protected function init() {}
 
    public function controller() {
+//      $menu = new Category_Structure(0);
+//
+//      $cat1 = new Category_Structure(1);
+//      $menu->addChild(&$cat1);
+//
+//      $cat1->addChild(new Category_Structure(12));
+//      $cat1->addChild(new Category_Structure(13));
+//
+//
+//      $cat2 = new Category_Structure(50);
+//      $menu->addChild(&$cat2);
+//      $cat2->addChild(new Category_Structure(14));
+//
+//      $menu->saveStructure();
+
          // načtení menu z
       $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
 
       $catModel = new Model_Category();
-      $categories = $catModel->getCategoryList();
-      $catArray = array();
-      foreach ($categories as $row) {
-         $catArray[$row[Model_Category::COLUMN_CAT_ID]] = $row;
-      }
-
-      $menu->setCategories($catArray);
+      $menu->setCategories($catModel->getCategoryList());
 
       $this->menu = $menu;
+      var_dump(Category::getMainCategory()->getId());
+      // cesta ke kategorii
+      $menu->getPath(Category::getMainCategory()->getId(), $this->currentPath);
+//      rsort($this->currentPath);
+//      foreach ($this->currentPath as $path) {
+//         print ($path->getCatObj()->{Model_Category::COLUMN_CAT_LABEL}." >> ");
+//      }
+
+//      $menu->render();
    }
 
    public function view() {
+      $this->template()->setPVar('CATEGORY_PATH', $this->currentPath);
       $this->template()->menu = $this->menu;
       $this->template()->addTplFile("menu.phtml", true);
       $this->template()->addJsPlugin(new JsPlugin_JQuery());

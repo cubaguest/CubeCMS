@@ -1107,8 +1107,6 @@ class AppCore {
       self::$category = new Category($this->urlRequest->getCategory(),true);
 
       Url_Link::setCategory(self::$category->getUrlKey());
-
-      // kontrola jestli zadaná kategorie vůbec existuje
       if(!self::$category->isValid()) {
          AppCore::setErrorPage();
       }
@@ -1141,6 +1139,7 @@ class AppCore {
             if(!AppCore::isErrorPage()) {
             //		spuštění modulů
                $this->runModule();
+
                // =========	spuštění panelů
                //		Levý
                if(self::$category->isLeftPanel()) {

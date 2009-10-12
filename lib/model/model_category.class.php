@@ -23,6 +23,7 @@ class Model_Category extends Model_PDO {
    const COLUMN_CAT_LABEL 	= 'label';
    const COLUMN_CAT_ALT 	= 'alt';
    const COLUMN_CAT_ID		= 'id_category';
+   const COLUMN_CAT_ID_PARENT		= 'id_parent';
    //   const COLUMN_SEC_ID	= 'id_section';
    //   const COLUMN_MODULE_ID	= 'id_module';
    const COLUMN_MODULE	= 'module';
@@ -38,6 +39,8 @@ class Model_Category extends Model_PDO {
    const COLUMN_ACTIVE = 'active';
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_DESCRIPTION = 'description';
+   const COLUMN_ORDER = 'order';
+   const COLUMN_LEVEL = 'level';
 
    const COLUMN_CAT_SITEMAP_CHANGE_FREQ = 'sitemap_changefreq';
    const COLUMN_CAT_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority';
@@ -112,27 +115,36 @@ class Model_Category extends Model_PDO {
 
    /**
     * Metoda načte všechny kategorie
+    * @param bool $allCategories -- jestli mají být vráceny všechny kategorie
     * @return PDOStatement -- objekt s daty
     */
-   public function getCategoryList($withRights = true) {
+   public function getCategoryList($allCategories = false) {
       $dbc = new Db_PDO();
       //      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
       //             INNER JOIN ".Db_PDO::table(Model_Sections::DB_TABLE)." AS sec ON cat.".self::COLUMN_SEC_ID
       //          ." = sec.".Model_Sections::COLUMN_SEC_ID."
       //             ORDER BY cat.".self::COLUMN_PRIORITY." DESC");
-      if($withRights) {
+      if(!$allCategories) {
          $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-             WHERE (cat.".self::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')
-             ORDER BY cat.".self::COLUMN_PRIORITY." DESC");
+             WHERE (cat.".self::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')".
+         " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
       } else {
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-            ORDER BY cat.".self::COLUMN_PRIORITY." DESC");
+         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
+         " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
       }
       $dbst->execute();
 
       //      $cl = new Model_LangContainer();
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      return $dbst->fetchAll();
+
+      $cats = array();
+//      foreach ($categories as $row) {
+      while($row = $dbst->fetch()){
+         $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
+      }
+
+//      return $dbst->fetchAll();
+      return $cats;
 
    //      SELECT IFNULL(cat.label_cs, cat.label_cs) AS clabel, cat.`id_category`, cat.`left_panel`,
    //      cat.`right_panel`, cat.`id_section`, cat.`cparams`, IFNULL(sec.label_cs, sec.label_cs) AS slabel,
@@ -164,7 +176,7 @@ class Model_Category extends Model_PDO {
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
-                   self::COLUMN_CAT_ALT => $alt,
+          self::COLUMN_CAT_ALT => $alt,
           self::COLUMN_MODULE => $module, self::COLUMN_KEYWORDS => $keywords,
           self::COLUMN_DESCRIPTION => $description, self::COLUMN_URLKEY => $urlkey,
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
@@ -175,10 +187,10 @@ class Model_Category extends Model_PDO {
       $this->setIUValues($rights);
 
       $dbc = new Db_PDO();
-      $dbst = $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+      $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
           ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
 
-      return true;
+      return $dbc->lastInsertId();
    }
 
    /**
@@ -202,7 +214,7 @@ class Model_Category extends Model_PDO {
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
-                   self::COLUMN_CAT_ALT => $alt,
+          self::COLUMN_CAT_ALT => $alt,
           self::COLUMN_MODULE => $module, self::COLUMN_KEYWORDS => $keywords,
           self::COLUMN_DESCRIPTION => $description, self::COLUMN_URLKEY => $urlkey,
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,

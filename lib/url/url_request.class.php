@@ -105,10 +105,10 @@ class Url_Request {
     */
    public function  __construct() {
       $this->checkUrlType();
-      // pokud je normální url vytvoříme část pro modul
-//      if($this->urlType == self::URL_TYPE_NORMAL) {
-//
-//      }
+   // pokud je normální url vytvoříme část pro modul
+   //      if($this->urlType == self::URL_TYPE_NORMAL) {
+   //
+   //      }
    }
 
    /**
@@ -139,26 +139,35 @@ class Url_Request {
     * Metoda zjistí typ url
     */
    public function checkUrlType() {
-   // jesli se zpracovává soubor modulu
+      $validRequest = true;
+      // jesli se zpracovává soubor modulu
       if($this->parseSpecialPageUrl()) {
          $this->urlType = self::URL_TYPE_ENGINE_PAGE;
       } else if($this->parseModuleUrl()) {
-         $this->urlType = self::URL_TYPE_MODULE;
-      } else if($this->parseComponentUrl()) {
-         $this->urlType = self::URL_TYPE_COMPONENT;
-      } else if($this->parseJsPluginUrl()) {
-         $this->urlType = self::URL_TYPE_JSPLUGIN;
-      } else {
-         $this->parseNormalUrl();
-         $this->urlType = self::URL_TYPE_NORMAL;
-      }
+            $this->urlType = self::URL_TYPE_MODULE;
+         } else if($this->parseComponentUrl()) {
+               $this->urlType = self::URL_TYPE_COMPONENT;
+            } else if($this->parseJsPluginUrl()) {
+                  $this->urlType = self::URL_TYPE_JSPLUGIN;
+               } else {
+                  if($this->parseNormalUrl()) {
+                     $this->urlType = self::URL_TYPE_NORMAL;
+                  } else {
+                     $validRequest = false;
+                  }
+               }
+
+      if($validRequest) {
       // doplněnívýchozích hodnot do objektů odkazů
       // nastavení odkazů
-      Url_Link::setCategory($this->getCategory());
-      Url_Link_Module::setRoute($this->getModuleUrlPart());
-      Url_Link::setParams($this->getUrlParams());
-      Url_Link::setLang($this->getUrlLang());
-      Locale::setLang($this->getUrlLang());
+         Url_Link::setCategory($this->getCategory());
+         Url_Link_Module::setRoute($this->getModuleUrlPart());
+         Url_Link::setParams($this->getUrlParams());
+         Url_Link::setLang($this->getUrlLang());
+         Locale::setLang($this->getUrlLang());
+      } else {
+      //AppCore::setErrorPage(true);
+      }
    }
 
    /**
@@ -167,15 +176,42 @@ class Url_Request {
     * @return boolean true pokud se jedná o normální url
     */
    private function parseNormalUrl() {
-      $matches = array();
-      if(!preg_match("/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-zA-Z0-9_-]*)\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i", self::$fullUrl, $matches)) {
-         return false;
+      // pokud není žádná adresa (jen jazyk)
+      $match = array();
+      if(!self::$fullUrl) {
+         return true;
       }
-      $this->category = $matches['category'];
-      $this->moduleUrlPart = $matches['other'];
-      $this->parmas = $matches['params'];
-      $this->lang = $matches['lang'];
-      return true;
+      
+      // nastavení jazyku
+      if(eregi("^([a-z]{2}\??)/?", self::$fullUrl, $match)){
+         if(!empty ($match)) {
+            $this->lang = $match[1];
+            Locale::setLang($this->lang);
+         }
+      }
+
+      // nařtení kategorií
+      $modelCat = new Model_Category();
+      $categories = $modelCat->getCategoryList();
+      //      var_dump($categories);
+      foreach ($categories as $key => $cat) {
+         if (strpos(self::$fullUrl, (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
+            $matches = array();
+            $regexp = "/(?:(?P<lang>[a-z]{2})\/)?".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
+            ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
+
+//            var_dump($regexp);
+            preg_match($regexp, self::$fullUrl, $matches);
+            $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
+//            var_dump($this->category);
+            $this->moduleUrlPart = $matches['other'];
+            $this->parmas = $matches['params'];
+            $this->lang = $matches['lang'];
+            return true;
+            break;
+         }
+      }
+      return false;
    }
 
    /**

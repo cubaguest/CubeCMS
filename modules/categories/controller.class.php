@@ -5,66 +5,61 @@
  */
 
 class Categories_Controller extends Controller {
-   private $sections = array();
-   private $sectionsArray = array();
+   private $categoriesArray = array();
 
    public function mainController() {
       $this->checkReadableRights();
 
-      $formDelete = new Form('section_');
+      $formDelete = new Form('category_');
 
       $elemId = new Form_Element_Hidden('id');
       $formDelete->addElement($elemId);
 
-      $elemCatId = new Form_Element_Hidden('cat_id');
-      $formDelete->addElement($elemCatId);
-
       $submit = new Form_Element_Submit('remove');
       $formDelete->addElement($submit);
-
+//
       if($formDelete->isValid()){
-         $sections = unserialize(VVE_CATEGORIES_STRUCTURE);
-//         $sections = new Menu_Sections(null);
-         // mažeme kategorii
-         if($formDelete->cat_id->getValues() != null){
-            $sections->removeCat($formDelete->id->getValues(), $formDelete->cat_id->getValues());
-            $this->infoMsg()->addMessage($this->_("Kategorie byla odebrána ze sekce"));
-         }
-         // mažeme sekci
-         else {
-            $sections->removeSec($formDelete->id->getValues());
-            $this->infoMsg()->addMessage($this->_("Sekce byla smazána"));
-         }
-         $model = new Model_Config();
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($sections));
-         $this->link()->route()->reload();
-      }
+         $categories = unserialize(VVE_CATEGORIES_STRUCTURE);
+         
+         // mažeme kategorii z DB
+         $model = new Model_Category();
+         $model->deleteCategory($formDelete->id->getValues());
 
-      // form pro posun
-      $formMove = new Form('item');
-
-      $childKey = new Form_Element_Hidden('child_key');
-      $formMove->addElement($childKey);
-
-      $parentID = new Form_Element_Hidden('parent_id');
-      $formMove->addElement($parentID);
-
-      $moveTo = new Form_Element_Hidden('move_to');
-      $formMove->addElement($moveTo);
-
-      $submit = new Form_Element_Submit('move');
-      $formMove->addElement($submit);
-
-      if($formMove->isValid()){
-         $sections = unserialize(VVE_CATEGORIES_STRUCTURE);
-         $sections = new Menu_Sections(null);
-
-         $sections->moveChild($idParent, $key, $moveTo);
+         // mažeme kategorii ze struktury
+         $categories->removeCat($formDelete->id->getValues());
+         $categories->saveStructure();
+         $this->infoMsg()->addMessage($this->_("Kategorie byla smazána"));
 
 //         $model = new Model_Config();
-//         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($sections));
+//         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($categories));
          $this->link()->route()->reload();
       }
+//
+//      // form pro posun
+//      $formMove = new Form('item');
+//
+//      $childKey = new Form_Element_Hidden('child_key');
+//      $formMove->addElement($childKey);
+//
+//      $parentID = new Form_Element_Hidden('parent_id');
+//      $formMove->addElement($parentID);
+//
+//      $moveTo = new Form_Element_Hidden('move_to');
+//      $formMove->addElement($moveTo);
+//
+//      $submit = new Form_Element_Submit('move');
+//      $formMove->addElement($submit);
+//
+//      if($formMove->isValid()){
+//         $sections = unserialize(VVE_CATEGORIES_STRUCTURE);
+//         $sections = new Menu_Sections(null);
+//
+//         $sections->moveChild($idParent, $key, $moveTo);
+//
+////         $model = new Model_Config();
+////         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($sections));
+//         $this->link()->route()->reload();
+//      }
 
       // nastavení viewru
       $this->view()->template()->addTplFile('list.phtml');
@@ -106,7 +101,21 @@ class Categories_Controller extends Controller {
       $form->alt->setValues($cat[Model_Category::COLUMN_CAT_ALT]);
       $form->keywords->setValues($cat[Model_Category::COLUMN_KEYWORDS]);
       $form->description->setValues($cat[Model_Category::COLUMN_DESCRIPTION]);
-//      $form->section->setValues($cat[Model_Category::COLUMN_SEC_ID]);
+      // nadřazená kategorie
+
+      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+      $catModel = new Model_Category();
+      $menu->setCategories($catModel->getCategoryList());
+
+      $selCat = $menu->getCategory($this->getRequest('categoryid'));
+      $menu->removeCat($this->getRequest('categoryid'));
+
+      $this->catsToArrayForForm($menu);
+
+      $form->parent_cat->setOptions($this->categoriesArray);
+      $form->parent_cat->setValues($selCat->getParentId());
+
+
       $form->module->setValues($cat[Model_Category::COLUMN_MODULE]);
       $form->urlkey->setValues($cat[Model_Category::COLUMN_URLKEY]);
       $form->priority->setValues($cat[Model_Category::COLUMN_PRIORITY]);
@@ -157,8 +166,18 @@ class Categories_Controller extends Controller {
              $form->panel_right->getValues(),$form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
              $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
 
+         // uprava struktury
+         if($form->parent_cat->getValues() != $selCat->getParentId()){
+            $menuRepair = unserialize(VVE_CATEGORIES_STRUCTURE);
+            $cat = $menuRepair->getCategory($this->getRequest('categoryid'));
+            $menuRepair->removeCat($this->getRequest('categoryid'));
+            $menuRepair->addChild($cat, $form->parent_cat->getValues());
+            $menuRepair->saveStructure();
+         }
+
          $this->infoMsg()->addMessage('Kategorie byla uložena');
-         $this->link()->route('detail', array('categoryid' => $this->getRequest('categoryid')))->reload();
+//         $this->link()->route('detail', array('categoryid' => $this->getRequest('categoryid')))->reload();
+         $this->link()->route()->reload();
 
       }
 
@@ -170,6 +189,14 @@ class Categories_Controller extends Controller {
       $form = $this->createForm();
 
       $form->show_in_menu->setValues(true);
+
+      // kategorie
+      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+      $catModel = new Model_Category();
+      $menu->setCategories($catModel->getCategoryList());
+      
+      $this->catsToArrayForForm($menu);
+      $form->parent_cat->setOptions($this->categoriesArray);
 
       if($form->isValid()) {
 
@@ -194,11 +221,18 @@ class Categories_Controller extends Controller {
          }
 
          $categoryModel = new Model_Category();
-         $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
+         $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
              $form->module->getValues(),$form->keywords->getValues(),
              $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->panel_left->getValues(),
              $form->panel_right->getValues(),$form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
              $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
+
+         // po uložení vložíme do struktury
+         if($lastId !== false){
+            $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+            $menu->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
+            $menu->saveStructure();
+         }
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
          $this->link()->route()->reload();
@@ -242,16 +276,9 @@ class Categories_Controller extends Controller {
       // SETTINGS
       $form->addGroup('settings', $this->_('Nastavení'), $this->_('Položky související s nastavením kategorie'));
 
-      // sekce
-//      $secModel = new Model_Sections();
-//      $sections = $secModel->getSections();
-//      $options = null;
-//      foreach ($sections as $section) {
-//         $options[(string)$section->{Model_Sections::COLUMN_SEC_LABEL}] = $section->{Model_Sections::COLUMN_SEC_ID};
-//      }
-//      $catSections = new Form_Element_Select('section', $this->_('Sekce'));
-//      $catSections->setOptions($options);
-//      $form->addElement($catSections, 'settings');
+      // kaegorie
+      $catSections = new Form_Element_Select('parent_cat', $this->_('Nadřazená kategorie'));
+      $form->addElement($catSections, 'settings');
 
       // moduly
       $moduleModel = new Model_Module();
@@ -332,158 +359,22 @@ class Categories_Controller extends Controller {
       return $form;
    }
 
-   public function addsectionController(){
-      $this->checkWritebleRights();
-      // objekt se sekcemi
-      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-      $menu->setLabel($this->_('Hlavní sekce'));
-      $this->sectionsToArrayForForm($menu);
-
-      $form = new Form('section');
-
-      $sections = new Form_Element_Select('parent', $this->_('Nadřazená sekce'));
-      $sections->setOptions($this->sections);
-      $form->addElement($sections);
-
-      $label = new Form_Element_Text('label', $this->_('Název'));
-      $label->setLangs();
-      $label->addValidation(new Form_Validator_Length(5, 30));
-      $label->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
-      $form->addElement($label);
-
-      $form->addElement(new Form_Element_Submit('send', $this->_('Odeslat')));
-
-      if($form->isValid()){
-         $newSec = new Menu_Sections($form->label->getValues());
-         $menu->addChild($newSec, $form->parent->getValues());
-
-//         print (base64_encode(serialize($menu)));
-
-         $model = new Model_Config();
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($menu));
-         $this->infoMsg()->addMessage($this->_("Sekce byla uložena"));
-         $this->link()->route()->reload();
+   private function catsToArrayForForm($categories) {
+   // pokud je hlavní kategorie
+      if($categories->getLevel() != 0) {
+         $this->categoriesArray[str_repeat('&nbsp;', $categories->getLevel()*3).
+             (string)$categories->getCatObj()->{Model_Category::COLUMN_CAT_LABEL}]
+             = (string)$categories->getCatObj()->{Model_Category::COLUMN_CAT_ID};
+      } else {
+         $this->categoriesArray[$this->_('Kořen')] = 0;
       }
-
-      $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile('editSection.phtml');
-   }
-
-   private function sectionsToArrayForForm($sections) {
-      if($sections instanceof Menu_Sections){
-         $this->sections[str_repeat('&nbsp;', $sections->getLevel()*3).$sections->getLabel()]
-            = $sections->getId();
-         foreach ($sections->getChildrens() as $child){
-            $this->sectionsToArrayForForm($child);
+      if(!$categories->isEmpty()) {
+         foreach ($categories as $cat) {
+            $this->catsToArrayForForm($cat);
          }
       }
    }
-
-   public function connectController() {
-      $this->checkWritebleRights();
-      $form = new Form('connect');
-      
-      // kategorie
-      $modelCat = new Model_Category();
-      $cat = $modelCat->getCategoryList(false);
-
-      $categories = array();
-      foreach ($cat as $catVal) {
-         $categories[(string)$catVal[Model_Category::COLUMN_CAT_LABEL]] = $catVal[Model_Category::COLUMN_CAT_ID];
-      }
-      $selCat = new Form_Element_Select('cat', $this->_('Kategorie'));
-      $selCat->setOptions($categories);
-      $form->addElement($selCat);
-
-      // sekce
-      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-      $menu->setLabel($this->_('Hlavní sekce'));
-      $this->sectionsToArrayForForm($menu);
-
-      $sections = new Form_Element_Select('section', $this->_('Sekce'));
-      $sections->setOptions($this->sections);
-      $form->addElement($sections);
-
-      $submit = new Form_Element_Submit('send', $this->_('Odeslat'));
-      $form->addElement($submit);
-
-      if($form->isValid()){
-         $sections = unserialize(VVE_CATEGORIES_STRUCTURE);
-//         $sections = new Menu_Sections(null);
-         $sections->addChild($form->cat->getValues(), $form->section->getValues());
-
-         $model = new Model_Config();
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($sections));
-         $this->infoMsg()->addMessage($this->_("Propojení bylo uloženo"));
-         $this->link()->route()->reload();
-      }
-
-      $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile('connect.phtml');
-   }
-
-   public function editSectionController() {
-      $this->checkWritebleRights();
-      // objekt se sekcemi
-      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-//      echo "<pre>";
-//      print_r($menu);
-//      echo "</pre>";
-      $menuSelSection = $menu->getSection($this->getRequest('secid'));
-
-      $menuForForm = unserialize(VVE_CATEGORIES_STRUCTURE);
-      $menuForForm->setLabel($this->_('Hlavní sekce'));
-      $menuForForm->removeSec($this->getRequest('secid'));
-
-      $this->sectionsToArrayForForm($menuForForm);
-      // odstranění sekce z výpisu
-
-      
-
-      if($menuSelSection == false){
-         $this->errMsg()->addMessage($this->_('Neexistující sekce'));
-         return false;
-      }
-
-//      unset($this->sections[array_search($this->getRequest('secid'), $this->sections)]);
-
-      $form = new Form('section');
-
-      $sections = new Form_Element_Select('parent', $this->_('Nadřazená sekce'));
-      $sections->setOptions($this->sections);
-      $sections->setValues($menuSelSection->getParentId());
-      $form->addElement($sections);
-
-      $label = new Form_Element_Text('label', $this->_('Název'));
-      $label->setLangs();
-      $label->setValues($menuSelSection->getLabels());
-      $label->addValidation(new Form_Validator_Length(5, 30));
-      $label->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
-      $form->addElement($label);
-
-      $form->addElement(new Form_Element_Submit('send', $this->_('Odeslat')));
-
-      if($form->isValid()){
-         $menuSelSection->setLabels($form->label->getValues());
-         // pokud se přesunuje
-         if($menuSelSection->getParentId() != $form->parent->getValues()){
-            // smazání staré pozice sekce
-            $menu->removeSec($this->getRequest('secid'));
-            // uložení sekce pod novou sekci
-            $menu->addChild($menuSelSection, $form->parent->getValues());
-         }
-         
-
-         // uložení do konfigu
-         $model = new Model_Config();
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($menu));
-         $this->infoMsg()->addMessage($this->_("Sekce byla uložena"));
-         $this->link()->route()->reload();
-      }
-
-      $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile('editSection.phtml');
-   }
+   
 }
 
 ?>

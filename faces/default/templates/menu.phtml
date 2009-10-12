@@ -4,12 +4,10 @@ function vveMenuRenderFunc($menuArr, $link) {
    print ("<ul>\n");
    foreach ($menuArr as $key => $item) {
       print ("<li>");
-      if($item instanceof Menu_Sections) {
-         print ('<a href="#" title="'.$item->getLabel().'">'.$item->getLabel()."</a>\n");
+      print ('<a href="'.$link->clear()->category($item->getCatObj()->{Model_Category::COLUMN_URLKEY}).'">'
+             .$item->getCatObj()->{Model_Category::COLUMN_CAT_LABEL}.'</a>'."");
+      if(!$item->isEmpty()){
          vveMenuRenderFunc($item, $link);
-      } else {
-         print ('<a href="'.$link->clear()->category($item[Model_Category::COLUMN_URLKEY]).'">'
-             .$item[Model_Category::COLUMN_CAT_LABEL].'</a>'."");
       }
       print ("</li>\n");
    }
