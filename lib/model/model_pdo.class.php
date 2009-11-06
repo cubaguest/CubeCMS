@@ -1,8 +1,6 @@
 <?php
-//require_once '.' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR. AppCore::ENGINE_MODELS_DIR . DIRECTORY_SEPARATOR . 'model.class.php';
-
 /**
- * Abstraktní třída pro Db Model.
+ * Abstraktní třída pro Db Model typu PDO.
  * Tříta pro vytvoření modelu, přistupujícího k databázi. Umožňuje základní práce
  * s databází.
  *

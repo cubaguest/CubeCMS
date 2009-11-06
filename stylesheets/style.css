@@ -164,8 +164,8 @@ body {
 
 #col2wrap {
 	width: 180px;
-	/*margin-left: -100%;  position column to the left side*/
-	/*margin-left: -20px;*/ /*background-color: #ffe0e0;*/
+	margin-left: -100%;  /*position column to the left side*/
+	/*margin-left: -1000px; /*background-color: #ffe0e0;*/
 }
 
 #col2pad {
@@ -197,7 +197,6 @@ h2 {
 }
 
 h3 a {
-	color: white;
 }
 
 a {
@@ -290,7 +289,7 @@ a.formLinkSelLang {
 /* tabulka formuláře */
 fieldset, .formTable {
    background-color: #c7e0f9;
-   width: 900px;
+   width: 96%;
    margin-bottom: 10px;
    /*border: 1px solid gray;*/
 }
@@ -345,16 +344,10 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 	color: white;
 }
 
-
-
 /*Pro tinyMCE*/
 .textarea_tinymce {
    width: 100%;
 }
-
-
-
-
 
 /* Panel s editací */
 .toolbox {
@@ -392,89 +385,44 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
    background-repeat: no-repeat;
    color: black;
 }
-
-
-
-      .editbox {
-        position: absolute;
-        top: 7px;
-        right: 5px;
-        width: auto;
-        height: 12px;
-        display: none;
-        z-index: 100;
-      }
-
-      .editboxrmargin {
-         right: 40px;
-      }
-
-      .editbox .contentForm, .editbox .contentForm form input, .editbox .contentForm form{
-        background-color: white;
-        display: inline;
-        margin:0;
-        padding:0;
-        border:0;
-      }
-
-      .editbox .contentForm form input {
-        padding: 2px 1px 2px 1px;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-      }
-
-      .editbox .contentForm form input[type="hidden"] {
-        display:none;
-      }
-
-      .editbox .contentForm {
-        /*         border-bottom: 1px solid #9d6a05; */
-        /*border-color: #9d6a05;
-        border-style: solid;
-        border-width: 1px 0 1px 0;*/
-      }
-
-      .editbox>.upside {
-        display: inline;
-        background: transparent url("../images/toolbox/l_black.png") top left no-repeat;
-        margin:0;
-        padding-left: 6px;
-        padding-top: 5px;
-      }
-      .editbox>.downside {
-        display:inline;
-        background: transparent url("../images/toolbox/r_black.png") top right no-repeat;
-        padding-left: 6px;
-        padding-top: 5px;
-      }
-
-
 /* EOF Panel s editací */
 
-
-.files_delete_form {
-	text-align: right;
-}
-
+ /* odkaz zpět */
 .button_back {
 	display: block;
 	text-align: center;
 	margin-bottom: 5px;
 }
+/* EOF back */
+
+/* SOF main content */
+
+#col1pad>div {
+   background-color:white;
+}
+
+/* EOF Main Content */
+/* SOF Panels Content */
+
+div.panel {
+   background-color: white;
+}
+
+div.panelLeft .panelLinkMore {
+   text-align:right;
+}
+/* EOF Panels Content */
+
+/* SOF Sitemap Content */
+.sitemapList li {
+   margin-left:20px;
+}
+/* EOF sitemap Content */
 
 .note {
 	font-size: 8pt;
 	padding-bottom: 5px;
 }
-
-/* soubory a obrázky k textům */
-.user_images {
-	width: 100%;
-}
-.images_obsah form {
-	padding-bottom: 5px;
-}
-
 
 /* nastavení prvků hodnocení */
 .rating {
@@ -787,7 +735,6 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 /* scrolovátka */
 .scroll_main {
 	text-align: center;
-	width: 100%;
 	background-color: white;
 }
 
@@ -795,9 +742,10 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 }
 
 .scroll_main table {
-	width: 100%;
+	width: 98%;
 	padding-left: 10px;
 	padding-right: 10px;
+   margin: 0 auto;
 	background-color: white;
 }
 

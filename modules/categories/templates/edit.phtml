@@ -1,9 +1,25 @@
 <div>
 <?
+// do titulku
+if($this->edit){
+   $this->addPageTitle($this->_('úprava kategorie'));
+   $this->addPageTitle($this->catName);
+   $this->addPageHeadline($this->_('úprava kategorie'));
+   $this->addPageHeadline($this->catName);
+} else {
+   $this->addPageTitle($this->_('přidání kategorie'));
+   $this->addPageHeadline($this->_('přidání kategorie'));
+}
 // donastavení formuláře
 $this->form->priority->html()->setAttrib('size', 4);
 ?>
 
+<h2><?=$this->_('Úprava detailu kategorie');?></h2>
 <?=$this->form?>
+<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+<br/>
+<br/>
+<h2><?=$this->_('Úprava panelů kategorie');?></h2>
+
 <?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
 </div>

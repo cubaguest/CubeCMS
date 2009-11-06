@@ -1,10 +1,10 @@
 <?php
 /**
  * Třída pro generování sitemapy.
- * Třída generuje mapu webu v požadovaném formátu. Podporovány jsou formát pro 
- * google (seznam) a yahoo. Je většinou volána zvlášť a využívá soubor sitemap.class.php 
+ * Třída generuje mapu webu v požadovaném formátu. Podporovány jsou formát pro
+ * google (seznam) a yahoo. Je většinou volána zvlášť a využívá soubor sitemap.class.php
  * v modulech pro generování pro generování data poslední změny atd.
- * 
+ *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id$ VVE3.9.4 $Revision$
  * @author        $Author$ $Date$
@@ -13,235 +13,274 @@
  */
 
 class SiteMap {
-	/**
-	 * Proměné s názvy četností změn
-	 * @var string
-	 */
-	const SITEMAP_SITE_CHANGE_ALWAYS 	= 'always';
-	const SITEMAP_SITE_CHANGE_HOURLY 	= 'hourly';
-	const SITEMAP_SITE_CHANGE_DAILY 	= 'daily';
-	const SITEMAP_SITE_CHANGE_WEEKLY 	= 'weekly';
-	const SITEMAP_SITE_CHANGE_MONTHLY 	= 'monthly';
-	const SITEMAP_SITE_CHANGE_YEARLY 	= 'yearly';
-	const SITEMAP_SITE_CHANGE_NEVER 	= 'never';
-	
-	/**
-	 * Výchozí priorita obsahu
-	 * @var float
-	 */
-	const SITEMAP_SITE_DEFAULT_PRIORITY = 0.1;
-	
-	/**
-	 * Objekt se systémem modulu
-	 * @var Module_Sys
-	 */
-	private $sys = null;
-	
-	/**
-	 * Frekvence změn na stránce
-	 * @var string
-	 */
-	private $changeFreq = self::SITEMAP_SITE_CHANGE_YEARLY;
-	
-	/**
-	 * Priorita stránky v mapě
-	 * @var float
-	 */
-	private $priority = self::SITEMAP_SITE_DEFAULT_PRIORITY;
+/**
+ * Proměné s názvy četností změn
+ * @var string
+ */
+   const SITEMAP_SITE_CHANGE_ALWAYS 	= 'always';
+   const SITEMAP_SITE_CHANGE_HOURLY 	= 'hourly';
+   const SITEMAP_SITE_CHANGE_DAILY 	= 'daily';
+   const SITEMAP_SITE_CHANGE_WEEKLY 	= 'weekly';
+   const SITEMAP_SITE_CHANGE_MONTHLY 	= 'monthly';
+   const SITEMAP_SITE_CHANGE_YEARLY 	= 'yearly';
+   const SITEMAP_SITE_CHANGE_NEVER 	= 'never';
 
-	/**
-	 * Priorita stránky s článkem v mapě
-	 * @var float
-	 */
-	private $priorityArticle = self::SITEMAP_SITE_DEFAULT_PRIORITY;
+   /**
+    * Výchozí priorita obsahu
+    * @var float
+    */
+   const SITEMAP_SITE_DEFAULT_PRIORITY = 0.5;
+
+   /**
+    * Frekvence změn na stránce
+    * @var string
+    */
+   private $changeFreq = self::SITEMAP_SITE_CHANGE_YEARLY;
+
+   /**
+    * Priorita stránky v mapě
+    * @var float
+    */
+   private $priority = self::SITEMAP_SITE_DEFAULT_PRIORITY;
+
+   /**
+    * Priorita stránky s článkem v mapě
+    * @var float
+    */
+   private $priorityArticle = self::SITEMAP_SITE_DEFAULT_PRIORITY;
 
    /**
     * Pole s položkami
     * @var array
     */
-   private $itemsCurrentArray = array();
-
-	/**
-	 * Proměná obsahuje pole s položkama
-	 * @var array
-	 */
-	private static $items = array();
-		
-	/**
-	 * Konstruktor -- vytvoří prostředí pro práci se sitemap
-	 *
-	 * @param Module -- objekt modulu
-	 */
-	function __construct(Module_Sys $sys, $changefreq = self::SITEMAP_SITE_CHANGE_YEARLY, $priority = 0.5) {
-      $this->sys = $sys;
-		$this->changeFreq = $changefreq;
-		$this->priority = $priority;
-	}
+   private $items = array();
 
    /**
-    * Při zrušení objektu zařadíme aktuální položky do celkového pole
+    * Pole se všemi položkami
+    * @var array
     */
-   public function  __destruct() {
-      self::$items = array_merge(self::$items, $this->itemsCurrentArray);
+   private static $itemsAll = array();
+
+   /**
+    * Pole s parametry kategorie
+    * @var array
+    */
+   private $catItem = array();
+
+   /**
+    * Proměná obsahuje objekt odkazu
+    * @var Url_Link_Module
+    */
+   private $link = null;
+
+   /**
+    * Objekt kategorie
+    * @var Category
+    */
+   private $category = null;
+
+   /**
+    * Objekt cest modulu
+    * @var Routes
+    */
+   private $routes = null;
+
+   /**
+    * Konstruktor -- vytvoří prostředí pro práci se sitemap
+    *
+    * @param Module -- objekt modulu
+    */
+   function __construct(Category $category, Routes $routes) {
+      $this->routes = $routes;
+      $this->category = $category;
+
+      $link = new Url_Link_Module();
+      $link->setModuleRoutes($routes);
+      $link->category($this->category()->getUrlKey());
+      $this->link = $link;
    }
 
    /**
-    * Metoda vrací systémový objekt modulu
-    * @return Module_Sys
+    * Metoda vrací objekt kategorie
+    * @return Category
     */
-   protected function sys() {
-      return $this->sys;
+   final public function category() {
+      return $this->category;
    }
 
-	/**
-	 * Metoda spouští proceduru pro přidávání položek do sitemap
-	 *
-	 */
-	public function run() {
-		$this->addItem($this->link(), null, $this->changeFreq, $this->priority);
-      filectime('./index.php');
-	}
-	
-	/**
-	 * Metoda přidává položku do siteamp
-	 *
-	 * @param string -- odkaz
-	 * @param string -- název
-	 * @param integer -- čas poslední změny (timestamp)
-	 * @param string -- četnost změny (kostanta SITEMAP_SITE_CHANGE_...)
-	 * @param float -- priorita (0 - 1)
-	 */
-	public function addItem($url, $name, $lastChange = null, $frequency = null ,$priority = null) {
-		// pokud je datum v budoucnosti nastavím aktuální
-      if($lastChange > time()){
+   /**
+    * Metoda vrací objekt cest
+    * @return Routes
+    */
+   final public function routes() {
+      return $this->routes;
+   }
+
+   /**
+    * Metoda spouští proceduru pro přidávání položek do sitemap
+    *
+    */
+   public function run() {
+      $this->addCategoryItem(filemtime(AppCore::getAppWebDir().Template::FACES_DIR));
+   }
+
+   /**
+    * Metoda přidává položku do siteamp
+    *
+    * @param string -- odkaz
+    * @param string -- název
+    * @param integer -- čas poslední změny (timestamp)
+    * @param string -- četnost změny (kostanta SITEMAP_SITE_CHANGE_...)
+    * @param float -- priorita (0 - 1)
+    */
+   public function addItem($url, $name, $lastChange = null, $frequency = null ,$priorityDown = 0.1) {
+   // pokud je datum v budoucnosti nastavím aktuální
+      $item = array('loc' => (string)$url,'name' => $name);
+      if($lastChange > time()) {
          $lastChange = time();
       }
-      if($lastChange != null){
+      if($lastChange !== null|false) {
          $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
          $lastChange = $date->format('c');
+         $item['lastmod'] = $lastChange;
       }
-		if($frequency == null){
-			$frequency = $this->changeFreq;
-		}
-		if($priority == null){
-			$priority = $this->priorityArticle;
-		}
-
-   	array_push($this->itemsCurrentArray, array('loc' => (string)$url,
-									   'lastmod' => $lastChange,
-									   'changefreq' => $frequency,
-									   'priority'=>$priority,
-                              'name' => $name));
-	}
-
-   /**
-	 * Metoda přidává položku kategorie do siteampy
-	 *
-	 * @param integer -- čas poslední změny (timestamp)
-    * @param float -- (option) o kolik se má snížit priorita článků
-	 */
-   public function addCategoryItem($lastChange, $priorityForArticleDown = 0.1) {
-      // pokud je datum v budoucnosti nastavím aktuální
-      if($lastChange > time()){
-         $lastChange = time();
+      if($frequency == null) {
+         $frequency = $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ};
       }
-      $date = new DateTime(date(DATE_ISO8601,$lastChange));
-      $lastChange = $date->format('c');
-      array_push(self::$items, array('loc' => (string)$this->link(),
-									   'lastmod' => $lastChange,
-									   'changefreq' => $this->changeFreq,
-									   'priority'=>$this->priority));
-      $this->priorityArticle = $this->priority-$priorityForArticleDown;
+      $item['changefreq'] = $frequency;
+      $item['priority'] = $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY}-$priorityDown;
+      array_push($this->items, $item);
    }
 
-	/**
-	 * Meotda vrací objekt modulu
-	 *
-	 * @return Module -- objekt modulu
-	 */
-	public function module() {
-      return $this->sys()->module();
-	}
-	
-	/**
-	 * Metoda vrací objekt pro přístup k db
-	 *
-	 * @return DbInterface -- objekt databáze
-	 */
-	public function getDb() {
-      return AppCore::getDbConnector();
-	}
-	
-	/**
-	 * Metoda vrací objekt odkazu
-	 * @return Links -- objekt odkazu
-	 */
-	public function link() {
-		return clone $this->sys()->link();
-	}
-	
-	/**
-	 * Metoda vygeneruje mapu webu
-	 *
-	 * @param string -- pro jaký vahledávač má být mapa generována
-	 * @return string -- bufer s vygenerovanou mapou
-	 */
-	public static function generateMap($mapType = 'xml'){
-      // Pro Google a Seznam
-      if($mapType == 'xml'){
-			ob_start();
-			header('Content-type: text/xml');
-			echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-//			echo '<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">'."\n";
-			echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
-			foreach (self::$items as $i){
-				echo '<url>'."\n";
-				foreach ($i as $index => $_i){
-					if (!$_i OR $index == 'name') continue;
+   /**
+    * Metoda přidává položku kategorie do siteampy
+    *
+    * @param integer -- čas poslední změny (timestamp)
+    * @param float -- (option) o kolik se má snížit priorita článků
+    */
+   public function addCategoryItem($lastChange) {
+   // pokud je datum v budoucnosti nastavím aktuální
+      if($lastChange > time()) {
+         $lastChange = time();
+      }
+      if($lastChange === false|null) {
+         $lastChange = filemtime(AppCore::getAppWebDir().'index.php');
+      }
+
+      $date = new DateTime(date(DATE_ISO8601,$lastChange));
+      $lastChange = $date->format('c');
+      $this->catItem = array('loc' => (string)$this->link(),
+          'lastmod' => $lastChange,
+          'changefreq' => $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},
+          'priority'=>$this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY},
+          'name' => $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_LABEL});
+   }
+
+   /**
+    * Metoda vrací objekt odkazu
+    * @return Links -- objekt odkazu
+    */
+   public function link() {
+      return clone $this->link;
+   }
+
+   /**
+    * Metoda vygeneruje mapu webu
+    *
+    * @param string -- pro jaký vahledávač má být mapa generována
+    * @return string -- bufer s vygenerovanou mapou
+    */
+   public static function generateMap($mapType = 'xml') {
+   // Pro Google a Seznam
+      if($mapType == 'xml') {
+         echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+         //			echo '<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">'."\n";
+         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+         foreach (self::$itemsAll as $item) {
+         // kategorie
+            echo '<url>'."\n";
+            foreach ($item['cat'] as $index => $_i) {
+               if (!$_i OR $index == 'name') continue;
                // float čísla s tečkou a stejnou přesností
-               if(is_float($_i)){
+               if(is_float($_i)) {
                   $_i = sprintf("%1.4F", $_i);
                }
                echo "<$index>" . self::codeXML(trim((string)$_i)) . "</$index>\n";
-				}
-				echo "</url>\n";
-			}
-			echo '</urlset>';
-         ob_flush();
-			return ob_get_clean();
-		} 
-//		Pro yahoo
-		else if($mapType == 'txt'){
-			ob_start();
-			header('Content-type: text/plain');
-			foreach (self::$items as $i)
-			{
-				echo $i['loc'] . "\n";
-			}
-         ob_flush();
-			return ob_get_clean();
-		}
-	}
-	
-	/**
-	 * Metoda zakoduje řetězec do xml
-	 *
-	 * @param string -- řetězec
-	 */
-	private static function codeXML($str) {
-		$translations = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
-		foreach ($translations as $key => $value) {
-			$translations[$key] = '&#' . ord($key) . ':';
-		}
-		$translations[chr(38)] = '&';
-		return preg_replace("/&(?![A-Za-z]{0,4}\w{2,3};|#[0-9]{2,3};)/","&#38;",strtr($str,$translations));
-	}
-	
+            }
+            echo "</url>\n";
+            // články
+            if(isset ($item['items']) AND !empty ($item['items'])) {
+               foreach ($item['items'] as $it) {
+                  echo '<url>'."\n";
+                  foreach ($it as $index => $_i) {
+                     if (!$_i OR $index == 'name') continue;
+                     // float čísla s tečkou a stejnou přesností
+                     if(is_float($_i)) {
+                        $_i = sprintf("%1.4F", $_i);
+                     }
+                     echo "<$index>" . self::codeXML(trim((string)$_i)) . "</$index>\n";
+                  }
+                  echo "</url>\n";
+               }
+            }
+         }
+         echo '</urlset>';
+      } else if($mapType == 'txt') {
+         //		Pro yahoo
+            foreach (self::$itemsAll as $item) {
+               echo $item['cat']['loc'] . "\n";
+               // články
+               if(isset ($item['items']) AND !empty ($item['items'])) {
+                  foreach ($item['items'] as $it) {
+                     echo $it['loc'] . "\n";
+                  }
+               }
+            }
+         }
+   }
+
+   /**
+    * Metoda přidá hlavní stránku
+    */
+   public static function addMainPage() {
+   //      $arr = array('loc' => (string)Url_Request::getBaseWebDir());
+      array_push(self::$itemsAll, array('cat' => array('loc' => (string)Url_Request::getBaseWebDir())));
+   }
+
+   /**
+    * Metoda zakoduje řetězec do xml
+    *
+    * @param string -- řetězec
+    */
+   private static function codeXML($str) {
+      $translations = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
+      foreach ($translations as $key => $value) {
+         $translations[$key] = '&#' . ord($key) . ':';
+      }
+      $translations[chr(38)] = '&';
+      return preg_replace("/&(?![A-Za-z]{0,4}\w{2,3};|#[0-9]{2,3};)/","&#38;",strtr($str,$translations));
+   }
+
    /**
     * Metoda vrací pole článků
     */
-   public function getCurrentMapArray() {
-      return $this->itemsCurrentArray;
+   public function createMapArray() {
+      $retArr = array();
+      $retArr['cat'] = $this->catItem;
+      $retArr['items'] = $this->items;
+      array_push(self::$itemsAll, $retArr);
+      return $retArr;
+   }
+
+   public function  __destruct() {
+      $this->createMapArray();
+   }
+
+   /**
+    * Metoda vrací pole článků
+    */
+   public static function getCurrentItemsArray() {
+      return self::$itemsAll;
    }
 }
 ?>

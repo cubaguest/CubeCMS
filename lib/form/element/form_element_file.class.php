@@ -47,10 +47,11 @@ class Form_Element_File extends Form_Element {
 
          } else {
             if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_OK) {
+               $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"]);
                move_uploaded_file($_FILES[$this->getName()]["tmp_name"],
-                   $this->uploadDir . $_FILES[$this->getName()]["name"]);
+                   $this->uploadDir . $saveFileName);
                // vatvoření pole s informacemi o souboru
-               $this->values = array('name' => $_FILES[$this->getName()]["name"],
+               $this->values = array('name' => $saveFileName,
                    'path' => $this->uploadDir,
                    'size' => $_FILES[$this->getName()]["size"],
                    'type' => $this->getMimeType($this->uploadDir.$_FILES[$this->getName()]["name"]),
@@ -147,7 +148,12 @@ class Form_Element_File extends Form_Element {
    // tady bude if při multilang
       $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'file');
-      $this->html()->setAttrib('id', $this->getName());
+
+      if($this->isDimensional()){
+         $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+      } else {
+         $this->html()->setAttrib('id', $this->getName());
+      }
       $this->html()->setAttrib('value', $this->getValues());
       return $this->html();
    }

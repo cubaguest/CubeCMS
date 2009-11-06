@@ -8,16 +8,7 @@
       <meta http-equiv="pragma" content="no-cache" />
       <meta http-equiv="pragma" content="-1" />
       <?}?>
-      <title>
-         <?
-         echo($this->pageTitle);
-         //         if($this->categoryName())
-         //            echo ' - '.$this->categoryName();
-         //         if($this->articleName())
-         //            echo ' - '.$this->articleName();
-         //         if($this->actionName())
-         //            echo ' - '.$this->actionName();
-         ?></title>
+      <title><?print(VVE_WEB_NAME);?>{PAGE_TITLE}</title>
 
       <base href="<?=Links::getMainWebDir()?>" />
 
@@ -49,8 +40,8 @@
             contentsource: "markup"})
       </script>
       <?
-//      $script = new Html_Element_Script('');;
-//      print ($script);
+      //      $script = new Html_Element_Script('');;
+      //      print ($script);
       ?>
 
    </head>
@@ -82,13 +73,15 @@
          </div><!-- headwrap -->
          <div id="colswrap">
 
-            <div id="col1wrap">
-               <div id="col1pad" class="<?if(!empty($this->leftPanel)) echo "col1pad_plusleft";?>  <?if(!empty($this->rightPanel)) echo "col1pad_plusright";?>">
+            <div id="col1wrap" class="column">
+               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['left'])) echo " col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
-                  if($this->pageNotFound) {
+                  $this->includeTpl("navigation.phtml", true);?>
+                  <h1>{PAGE_HEADLINE}</h1>
+                  <?if($this->pageNotFound) {
                      $this->includeTpl("error404.phtml", true);
                   } else if($this->specialPage) {
-                        $this->includeTpl($this->specialPageName.".phtml", true);
+                        $this->includeTplObj($this->specialPageTpl);
                      } else {
                         $this->includeTpl("modules.phtml", true);
                      }
@@ -98,26 +91,14 @@
             </div><!-- col1wrap -->
 
             <? // levy panel ?>
-            <div id="col2wrap">
+            <div id="col2wrap" class="column">
                <div id="col2pad">
                   <?
-                  if(!empty($this->leftPanel)) {
-                     foreach ($this->leftPanel as $panelL) {?>
-                        <?if($panelL->module()->label()->name() == "products") {?>
-                  <div class="panel">
-                              <?if($panelL->module()->label()->label() != null) {?>
-                     <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
-                              <?}?>
-                              <?$this->includeTplObj($panelL);?>
-                  </div>
-                        <?} else {?>
+                  if(!empty($this->panels['left'])) {
+                     foreach ($this->panels['left'] as $panelL) {?>
                   <div class="panel panelLeft">
-                              <?if($panelL->module()->label()->label() != null) {?>
-                     <h3><a href="<?$panelL->l()?>" title="<?=$panelL->module()->getLabel()?>"><?=$panelL->module()->getLabel()?></a></h3>
-                              <?}?>
-                              <?$this->includeTplObj($panelL);?>
+                           <?$this->includeTplObj($panelL);?>
                   </div>
-                        <?}?>
                      <?}
                   }?>
                   <hr class="separator" />
@@ -125,16 +106,16 @@
             </div><!-- col2wrap -->
 
             <? // pravy panel?>
-            <div id="col3wrap">
+            <div id="col3wrap" class="column">
                <div id="col3pad">
                   <?
-                  if(!empty($this->rightPanel)) {
-                     foreach ($this->rightPanel as $panel) {?>
+                  if(!empty($this->panels['right'])) {
+                     foreach ($this->panels['right'] as $panelR) {?>
                   <div class="panel panelRight">
-                     <h3><a href="<?=$panel->l()?>" title="<?=$panel->module()->getLabel()?>"><?=$panel->module()->getLabel()?></a></h3>
-                           <?$this->includeTplObj($panel);?>
+                           <?$this->includeTplObj($panelR);?>
                   </div>
-                     <?}}?>
+                     <?}
+                  }?>
                   <hr class="separator" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
@@ -144,8 +125,18 @@
 
          <div class="reseter">&nbsp;</div>
          <div id="footwrap">
-            <?$this->includeTpl("login.phtml", true);?>
-            <a href="<?=$this->sitemapLink;?>" title="<?=_("mapa stránek")?>"><?=_("mapa stránek")?></a>
+            <?
+            if(!empty($this->panels['bottom'])) {
+               foreach ($this->panels['bottom'] as $panelB) {?>
+            <div class="panel" style="float:left; width: 200px;">
+                     <?$this->includeTplObj($panelB);?>
+            </div>
+               <?}
+            }?>
+            <hr class="reseter" />
+            <?
+            $this->includeTpl("login.phtml", true);?>
+            <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=_("mapa stránek")?>"><?=_("mapa stránek")?></a>
             <hr class="separator" />
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->

@@ -13,7 +13,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
-class Form_Element_Hidden extends Form_Element_Text {
+class Form_Element_Hidden extends Form_Element {
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
@@ -21,6 +21,26 @@ class Form_Element_Hidden extends Form_Element_Text {
    public function controll() {
       $this->html()->setAttrib('type', 'hidden');
       return parent::controll();
+   }
+
+   /**
+    * Metoda vrací popisek k prvku (html element label)
+    * @return string
+    */
+   public function label() {
+      return (string)null;
+   }
+
+   /**
+    * Metoda vrací subpopisek
+    * @return string -- řetězec z html elementu
+    */
+   public function subLabel() {
+      return (string)null;
+   }
+   
+   public function labelValidations() {
+      return (string)null;
    }
 }
 ?>

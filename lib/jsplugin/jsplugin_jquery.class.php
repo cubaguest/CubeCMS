@@ -201,5 +201,13 @@ class JsPlugin_JQuery extends JsPlugin {
     $this->addFile(new JsPlugin_JsFile("ajaxupload.2.8.js"));
     return $this;
   }
+
+  /**
+   * Metoda přidá efekty UI - all (všechny efekty)
+   */
+  public function addPluginOpacityRollOver() {
+    $this->addFile(new JsPlugin_JsFile("jquery.opacityrollover.js"));
+    return $this;
+  }
 }
 ?>

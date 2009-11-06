@@ -61,7 +61,7 @@ class Form_Element implements Form_Element_Interface {
     * Jestli se jedná o vícerozměrný prvek
     * @var boolean
     */
-   protected $isDimensional = false;
+   protected $dimensional = false;
 
    /**
     * Pole s odeslanými hodnotami
@@ -152,18 +152,21 @@ class Form_Element implements Form_Element_Interface {
    /**
     * Metoda nastaví hodnoty do prvku
     * @param mixed $values -- hodnoty
+    * @return Form_Element
     */
    public function setValues($values) {
       $this->values = $values;
+      return $this;
    }
 
    /**
     * Metoda nastaví jestli je prvek vícerozměrný
-    * @param array $names -- (option) názvy jednotlivých prvků, jinak jsou
-    * použity čísla
+    * @param string $name -- (option) název prvku pro pole
+    * @@return Form_Element
     */
-   public function setDimensional($names = null) {
-      ;
+   public function setDimensional($name = null) {
+      $this->dimensional = $name;
+      return $this;
    }
 
    /**
@@ -205,7 +208,10 @@ class Form_Element implements Form_Element_Interface {
     * @return bool -- true pokud je element vicerozměrný
     */
    public function isDimensional() {
-      return $this->isDimensional;
+      if($this->dimensional === false){
+         return false;
+      }
+      return true;
    }
 
    /**
@@ -242,9 +248,13 @@ class Form_Element implements Form_Element_Interface {
 
    /**
     * Metoda vrací hodnotu prvku
-    * @retrun mixed -- hodnota prvku
+    * @param $key -- (option) klíč hodnoty (pokud je pole)
+    * @return mixed -- hodnota prvku
     */
-   public function getValues() {
+   public function getValues($key = null) {
+      if($key !== null AND isset($this->values[$key])){
+         return $this->values[$key];
+      }
       return $this->values;
    }
 
@@ -360,7 +370,7 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function label() {
-
+      $this->htmlLabel()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
          $this->htmlLabel()->addClass('formErrorLabel');
       }
@@ -378,7 +388,11 @@ class Form_Element implements Form_Element_Interface {
          }
          return $cnt;
       } else {
-         $this->htmlLabel()->setAttrib('for', $this->getName());
+         if($this->isDimensional()){
+            $this->htmlLabel()->setAttrib('for', $this->getName());
+         } else {
+            $this->htmlLabel()->setAttrib('for', $this->getName()."_".$this->dimensional);
+         }
       }
 
       return (string)$this->htmlLabel();
@@ -398,6 +412,7 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function controll() {
+      $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass('formError');
       }
@@ -410,7 +425,7 @@ class Form_Element implements Form_Element_Interface {
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
             $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
-            $this->html()->setAttrib('value', $values[$langKey]);
+            $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
             $this->html()->setAttrib('lang', $langKey);
 
             $container = new Html_Element('p', $this->html());
@@ -421,11 +436,16 @@ class Form_Element implements Form_Element_Interface {
          }
          return $cnt;
       } else {
-      // tady bude if při multilang
-         $this->html()->setAttrib('name', $this->getName());
+         if($this->isDimensional()){
+            $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
+            $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+         } else {
+            $this->html()->setAttrib('name', $this->getName());
+            $this->html()->setAttrib('id', $this->getName());
+         }
          //         $this->html()->setAttrib('type', 'text');
-         $this->html()->setAttrib('id', $this->getName());
-         $this->html()->setAttrib('value', (string)$values);
+         
+         $this->html()->setAttrib('value', htmlspecialchars((string)$values));
       }
       return $this->html();
    }

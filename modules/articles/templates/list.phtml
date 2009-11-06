@@ -1,34 +1,56 @@
+<?
+if($this->top === true) {
+   $this->addPageTitle($this->_('nejčtenější články'));
+   $this->addPageHeadline($this->_('nejčtenější články'));
+}
+?>
 <div class="articlesList">
-   <?if(!empty ($thic->articlesArray)) {
-      foreach ($this->articlesArray as $article) {?>
+   <?if($this->top === true) {?>
+   <p style="text-align:right"><a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovější články')?></a></p>
+   <?} else {?>
+   <p style="text-align:right"><a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenější články')?></a></p>
+   <?}?>
+   <?if(!empty ($this->articles)) {
+      foreach ($this->articles as $article) {
+         ?>
    <div>
-      <h2><a href="<?=$this->l()->article($article['label'], $article['id_article'])?>"
-             title="<?=$article['label']?>"><?=$article['label']?>&nbsp;
-            <span class="smallFont"><?=strftime("%x %X", $article['add_time'])?> - <?=$article['username']?></span>
+      <h2><a href="<?=$this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+            <span class="smallFont"><?=strftime("%x %X", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a>
       </h2>
+            <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
+            $out = array();
+            preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model_Detail::COLUMN_TEXT}, $out);
+            if(!empty ($out) AND $out[1] != '0') {?>
       <div class="imageBox">
-               <?
-               //         var_dump($article);exit;
-               if(isset($article['title_image'])) {?>
-                  <?=imageTag($article['title_image'], "article title image", 80, 80);?>
-               <?} else {?>
-         <img src="images/icons/article_icon.png" alt="article title image" height="80" />
-               <?}?>
+                  <?=vve_tpl_image_tag($out[1], "article title image", 80, 80);?>
       </div>
-            <?//print (xhtml_cut(remove_tag('img', $article['text']), 650));?>
-            <?print truncate(strip_tags($article['text']), 640);?>
-      <p style="text-align:right;">
-         <a href="<?=$this->l()->article($article['label'], $article['id_article'])?>"
-            title="<?=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a></p>
+            <?}?>
+
+            <?//print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
+            <?print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
       <hr class="reseter" />
+      <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
+      <p style="text-align:right;">
+         <a href="<?=$this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+      </p>
+      <br />
    </div>
-      <?}}?>
-   <br />
-   <?if($this->sys()->rights()->isWritable()) {
-      $this->includeTplObj($this->toolbox);
+     <?}
+      print($this->scrollComp);
+   } else {
+      print ($this->_('Není vložen žádný článek'));
    }?>
+
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('add_article', $this->_("Přidat článek"),
+          $this->link()->route('add'),
+          $this->_("Přidat nový článek"), "text_add.png");
+      $this->includeTplObj($toolbox);
+   }
+   ?>
 </div>
-<?
-$this->includeTplObj($this->EPLscroll);
-?>

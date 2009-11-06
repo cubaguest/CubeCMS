@@ -1,0 +1,37 @@
+<?
+$this->addPageTitle($this->_('úprava obrázků'));
+$this->addPageHeadline($this->_('úprava obrázků'));
+
+?>
+<div id="editImagesForm">
+   <h2><?=$this->_('Přidání obrázku');?></h2>
+   <form method="post" action="<?=$this->link()?>" enctype="multipart/form-data">
+   <? print ($this->addForm->image->label());
+      print ($this->addForm->image->labelValidations());
+      print ($this->addForm->image->controll());
+      print ($this->addForm->send->controll()); ?>
+   </form>
+   <br />
+   <h2><?=$this->_('Úpravy obrázků');?></h2>
+   <?
+   
+   ?>
+   <table>
+   <?while ($image = $this->images->fetch()) {
+      ?>
+      <tr>
+         <td>
+            <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+               .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" />
+         </td>
+         <td></td>
+      </tr>
+
+
+   <?}?>
+   </table>
+
+
+</div>
+<?
+$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>

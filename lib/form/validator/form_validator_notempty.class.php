@@ -51,6 +51,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                   $retu = $this->checkEmptyValues($elemObj->getValues(), $this->columsNotEmpty);
                   if($retu !== true){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
+                     $this->isValid = false;
                      return false;
                   }
                }
@@ -58,12 +59,14 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                else {
                   if(!$this->checkEmptyAllValues($elemObj->getValues())){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     $this->isValid = false;
                      return false;
                   }
                }
             } else {
                if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  $this->isValid = false;
                   return false;
                }
             }
@@ -72,6 +75,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
          case 'Form_Element_Checkbox':
             if($elemObj->getValues() == false) {
                $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+               $this->isValid = false;
                return false;
             }
             break;

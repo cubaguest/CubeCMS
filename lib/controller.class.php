@@ -52,7 +52,8 @@ abstract class Controller {
    /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
-    * @param Module_Sys $moduleSys -- systémový objekt modulu
+    * @param Category $category -- obejkt kategorie
+    * @param Routes $routes -- objekt cest pro daný modul
     */
    public final function __construct(Category $category, Routes $routes) {
    //TODO odstranit nepotřebné věci v paramtrech konstruktoru

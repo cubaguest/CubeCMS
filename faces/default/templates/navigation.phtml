@@ -1,0 +1,13 @@
+<?
+$arr = $this->pVar('CURRENT_CATEGORY_PATH');
+if(count($arr) > 1) {
+   foreach ($arr as $path) {?>
+<a href="<?=$this->link(true)->category($path->getCatObj()->getUrlKey())?>">
+      <?=$path->getCatObj()->getLabel()?></a>
+      <?
+      if(next($arr) !== false) {
+         print ("&nbsp;".VVE_NAVIGATION_SEPARATOR."&nbsp");
+      //   @prev();
+      }
+   }
+}?>

@@ -15,61 +15,52 @@
 
 abstract class Panel {
    /**
-    * Objekt s šablonovacím systémem
-    * @var Template
+    * Objekt šablony
+    * @var Template_Module
     */
-   private $_template = null;
+   private $template = null;
 
    /**
-    * Proměnná obsahuje objekt systému modulu
-    * @var Module_Sys
+    * Objekt kategorie
+    * @var Category
     */
-   private $_moduleSys = null;
+   private $category = null;
+
+   /**
+    * Objket pro lokalizaci
+    * @var Locale
+    */
+   private $locale = null;
+
+   /**
+    * Objekt cest modulu
+    * @var Routes
+    */
+   private $routes = null;
+
+   /**
+    * objekt linku
+    * @var Url_Link
+    */
+   private $link = null;
 
    /**
     * Konstruktor
-    * @param Module_Sys $sys -- systémový objekt modulu
+    * @param Category $category -- obejkt kategorie
+    * @param Routes $routes -- objekt cest pro daný modul
     */
-   function __construct(Module_Sys $sys) {
-      $this->_template = new Template($sys);
-      $this->_moduleSys = $sys;
+   function __construct(Category $category, Routes $routes) {
+      $this->category = $category;
+      $this->routes = $routes;
 
-      //$action = null;
-      // název třídy s akcí
-      $actionClassName = ucfirst($this->module()->getName()).'_Action';
-      //		Pokud ještě nebyla třída načtena
-      //      if(!class_exists($actionClassName,false)){
-      //         //			načtení souboru s akcemi modulu
-      //         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php')){
-      //            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),1);
-      //         }
-      //         require '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'action.class.php';
-      //      }
+      $link = new Url_Link_Module();
+      $link->setModuleRoutes($routes);
+      $link->category($this->category()->getUrlKey());
+      $this->link = $link;
+      // locales
+      $this->locale = new Locale($category->getModule()->getName());
 
-
-      //               var_dump($actions);flush();
-      if(class_exists($actionClassName)){
-         $this->sys()->setAction(new $actionClassName($this->sys()->module()));
-      } else {
-         $panelSys->setAction(new Action($this->module()->getName(), $panelSys->article()));
-      }
-
-      //		Cesty
-      $routes = null;
-      $routesClassName = ucfirst($this->module()->getName()).'_Routes';
-      //		Pokud ještě nebyla třída načtena
-      //      if(!class_exists($routesClassName, false)){
-      //         //			načtení souboru s cestami (routes) modulu
-      //         if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php')){
-      //            throw new BadClassException(sprintf(_('Nepodařilo se nahrát akci modulu '), $this->module()->getName()),2);
-      //         }
-      //         require '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR . $this->module()->getName() . DIRECTORY_SEPARATOR . 'routes.class.php';
-      //      }
-      if(class_exists($routesClassName)){
-         $this->sys()->setRoute(new $routesClassName($this->article()));
-      } else {
-         $this->sys()->setRoute(new Routes($this->article()));
-      }
+      $this->template = new Template_Module(clone $this->link(), $this->category);
    }
 
    /**
@@ -83,11 +74,11 @@ abstract class Panel {
    abstract function panelView();
 
    /**
-    * Metoda vrací systémový objekt modulu
-    * @return Module_Sys
+    * Metoda spustí metody pro obsluhu panelu
     */
-   final public function sys() {
-      return $this->_moduleSys;
+   final public function run() {
+      $this->panelController();
+      $this->panelView();
    }
 
    /**
@@ -95,10 +86,7 @@ abstract class Panel {
     * @return Links -- objekt pro práci s odkazy
     */
    final public function link($clear = true) {
-      //$link = new Links($clear);
-      //return $link->category($this->_category[Category::COLUMN_CAT_LABEL],
-      //	$this->_category[Category::COLUMN_CAT_ID]);
-      $link = $this->sys()->link();
+      $link = clone $this->link;
       if($clear){
          $link->clear();
       }
@@ -106,43 +94,11 @@ abstract class Panel {
    }
 
    /**
-    * Metody vrací objekt modulu
-    * @return Module -- objekt modulu
+    * Metody vrací objekt kategorie
+    * @return Category -- objekt kategorie
     */
-   final public function module() {
-      return $this->sys()->module();
-   }
-
-   /**
-    * Metoda vrací objekt na akci
-    * @return ModuleAction -- objekt akce
-    */
-   final public function action() {
-      return $this->sys()->action();
-   }
-
-   /**
-    * Metoda vrací objekt na akci
-    * @return ModuleAction -- objekt akce
-    */
-   final public function route() {
-      return $this->sys()->route();
-   }
-
-   /**
-    * Metoda vrací objekt s právy na modul
-    * @return Rights -- objekt práv
-    */
-   final public function rights() {
-      return $this->sys()->rights();
-   }
-
-   /**
-    * Metoda vrací objekt s článkem
-    * @return Article -- objekt článku
-    */
-   final public function article() {
-      return $this->sys()->rights();
+   final public function category() {
+      return $this->category;
    }
 
    /**
@@ -166,7 +122,7 @@ abstract class Panel {
     * @return Template -- objekt šablony
     */
    final public function template(){
-      return $this->_template;
+      return $this->template;
    }
 
    /**
@@ -175,15 +131,6 @@ abstract class Panel {
     */
    final public function _getTemplateObj() {
       return $this->template();
-   }
-
-   /**
-    * Metoda vytvoří objekt modelu
-    * @param string $name --  název modelu
-    * @return Objekt modelu
-    */
-   final public function createModel($name) {
-      return new $name($this->sys());
    }
 }
 ?>

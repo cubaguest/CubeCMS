@@ -176,7 +176,7 @@ class Model_LangContainer_LangColumn implements ArrayAccess, Countable {
     * @return mixed
     */
    public function  &__get($name) {
-      return $this->values[$name];
+      return stripcslashes($this->values[$name]);
    }
 
    /**
@@ -254,13 +254,13 @@ class Model_LangContainer_LangColumn implements ArrayAccess, Countable {
     */
    public function  __toString() {
       if(gettype($this->values[Locale::getLang()]) == 'string'
-        AND $this->values[Locale::getLang()] != null) {
+        AND $this->values[Locale::getLang()] != ''|null) {
          return $this->values[Locale::getLang()];
       } else if(gettype($this->values[Locale::getDefaultLang()]) == 'string'
-        AND $this->values[Locale::getDefaultLang()] != null) {
+        AND $this->values[Locale::getDefaultLang()] != ''|null) {
          return $this->values[Locale::getDefaultLang()];
       } else {
-         return null;
+         return (string)null;
       }
    }
 }

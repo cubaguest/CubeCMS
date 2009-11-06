@@ -12,8 +12,22 @@
 class Form_Validator {
    protected $errMessage = null;
 
+   /**
+    * Proměná s výsledkem validátoru
+    * @var boolean
+    */
+   protected $isValid = true;
+
    public function  __construct($errMessage = null) {
       $this->errMessage = $errMessage;
+   }
+
+   /**
+    * Metoda vrací jestli je validátor validní
+    * @return boolean
+    */
+   public function isValid() {
+      return $this->isValid;
    }
 
    /**

@@ -40,7 +40,13 @@ class Component {
     * Objekt odkazů
     * @var Url_Link_Component
     */
-   private $link = null;
+   private $componentLink = null;
+
+   /**
+    * Objekt odkazů
+    * @var Url_Link
+    */
+   private $pageLink = null;
 
    /**
     * Id článku, ke které se bude komponenta vztahovat
@@ -55,15 +61,45 @@ class Component {
    private $pluginParams = array();
 
    /**
+    * Pole s konfiguračními hodnotami
+    * @var array
+    */
+   protected $config = array();
+
+   /**
     * Konstruktor třídy, spouští metodu init();
     */
    function __construct($runOnly = false) {
       $this->componentName = str_ireplace(__CLASS__.'_', '', get_class($this));
-      $this->link =  new Url_Link_Component($this->componentName);
-      $this->link->category(Category::getMainCategory()->getUrlKey());
+      $this->componentLink =  new Url_Link_Component($this->componentName);
+      $this->pageLink =  new Url_Link();
+      $this->componentLink->category(Category::getSelectedCategory()->getUrlKey());
       $this->init();
       if(!$runOnly) {
-         $this->template = new Template_Component($this->link);
+         $this->template = new Template_Component($this->componentLink, $this->pageLink);
+      }
+   }
+
+   /**
+    * Metoda pro nasatvování komponenty
+    * @param string $name -- název konfigurační hodnoty
+    * @param mixed $value -- hodnota konfigurační hodnoty
+    * @return Component
+    */
+   public function setConfig($name, $value) {
+      $this->config[$name] = $value;
+      return $this;
+   }
+
+   /**
+    * Metoda vrací konfiguraci komponenty
+    * @param string $name -- název konfigurační hodnoty
+    */
+   public function getConfig($name) {
+      if(isset ($this->config[$name])){
+         return $this->config[$name];
+      } else {
+         return null;
       }
    }
 
@@ -123,12 +159,26 @@ class Component {
    protected function mainView() {}
 
    /**
+    * Metoda pro spouštění některých akcí přímo v kontroleru
+    */
+   public function runCtrlPart() {}
+
+   /**
     * Metoda vrací objekt k tvorbě odkazů
     *
     * @return Url_Link_Component -- objekt odkazů
     */
    protected function link() {
-      return $this->link;
+      return $this->componentLink;
+   }
+
+   /**
+    * Metoda vrací objekt k tvorbě odkazů odpovídající dané stránce
+    *
+    * @return Url_Link -- objekt odkazů
+    */
+   protected function pageLink() {
+      return $this->componentLink;
    }
 
    /**
@@ -150,11 +200,11 @@ class Component {
    }
 
    /**
-    * Metoda vrací název epluginu
-    * @return string -- název epluginu
+    * Metoda vrací název komponenty
+    * @return string -- název komponenty
     */
-   public final function getEpluginName() {
-      return strtolower(get_class($this));
+   public final function getComponentName() {
+      return $this->componentName;
    }
 
    /**
@@ -166,8 +216,8 @@ class Component {
    }
 
    /**
-    * Metoda nastaví id šablony pro výpis
-    * @param integer -- id šablony (jakékoliv)
+    * Metoda vykreslí komponentu
+    * @todo ??????
     */
    final public function renderComponent() {
       print ($this);

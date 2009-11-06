@@ -15,11 +15,17 @@
 
 class Template_Component extends Template {
    /**
+    * Proměná obsahuje odkaz na stránku
+    * @var Url_Link
+    */
+   private $pageLink = null;
+   /**
     * KOnstruktor vytvoří objekt šablony pro modul
     * @param Url_Link_Module $link -- objekt odkazu
     * @param Category $category -- objekt kategorie
     */
-   function  __construct(Url_Link_Component $link) {
+   function  __construct(Url_Link_Component $link, Url_Link $pageLink) {
+      $this->pageLink = $pageLink;
       parent::__construct($link);
    }
 
@@ -28,7 +34,15 @@ class Template_Component extends Template {
     * @return Category
     */
    public function category() {
-      return Category::getMainCategory();
+      return Category::getSelectedCategory();
+   }
+
+   /**
+    * Metoda vrací odkaz na stránku
+    * @return Url_Link 
+    */
+   public function pageLink() {
+      return $this->pageLink;
    }
 
    /**

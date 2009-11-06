@@ -1,0 +1,75 @@
+<?php
+header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+header( 'Cache-Control: post-check=0, pre-check=0', false );
+header( 'Pragma: no-cache' ); 
+if(!empty ($this->files)) {?>
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+   <tr>
+      <th width="80">&nbsp;ikona</th>
+      <th width="340">název</th>
+      <th>úpravy</th>
+   </tr>
+      <?
+      foreach ($this->files as $file) {
+         if($file['size'] < 1024) {$file['size'] = ($file['size']); $k = " B";}
+         if($file['size'] >= 1024) {$file['size'] = ($file['size'] / 1024); $k = " kB";}
+         if($file['size'] >= 1024) {$file['size'] = ($file['size'] / 1024); $k = " MB";}
+         ?>
+   <tr class="file">
+      <td class="icon" align="center" valign="middle" height="80">
+         <span file="<?=$file['path']?>">
+         <?if($file['type'] == 'image'){?>
+         <a href="#" onclick="FileBrowserFilesFunctions.imagePopup('<?=$file['name']."?".time()?>','<?=$file['path']?>')">
+            <?=vve_tpl_image_tag($file['path']."?".time(), $file['name'], 75, 75);?>
+         </a>
+         <?} else {?>
+            <?//Url_Request::getBaseWebDir().'images/mime/'.$file['type'].'.png'
+            if(file_exists(AppCore::getAppWebDir().'images/mime/'.$file['mime'].'.png')){
+               $image = Url_Request::getBaseWebDir().'images/mime/'.$file['mime'].'.png';
+            } else {
+               $image = Url_Request::getBaseWebDir().'images/mime/unknown.png';
+            }
+            print(vve_tpl_image_tag($image, 'mime icon', 75, 75));
+            ?>
+         <?}?>
+         </span>
+      </td>
+      <td>
+         <span class="name"><?=$file['name']?></span><br/>
+         <span class="fileLabel">Velikost:&nbsp;<?printf("%.2f %s", $file['size'], $k)?></span><br />
+         <?if($file['type'] == 'image') {?>
+         <span class="fileLabel">Rozměry:&nbsp;<?=$file['width'].' x '.$file['height']?>px</span><br />
+         <?}?>
+         <span class="fileLabel">Mime typ:&nbsp;<?=$file['mime']?></span>
+      </td>
+      <td>
+         <?if($file['type'] == 'image'){?>
+         <span>Úpravy:</span><br />
+         <input type="image" src="../../../images/toolbox/image.png"
+                title="Zobrazit náhled" onclick="FileBrowserFilesFunctions.imagePopup('<?=$file['name']."?".time()?>', '<?=$file['path']?>')" />
+         <input type="image" src="../../../images/toolbox/transform-scale.png"
+                title="Změnit velikost" onclick="FileBrowserFilesFunctions.scaleImage('<?=$file['name']?>')" />
+         <input type="image" src="../../../images/toolbox/transform-rotate.png"
+                title="Změnit rotaci" onclick="FileBrowserFilesFunctions.rotateImage('<?=$file['name']?>')" />
+         <input type="image" src="../../../images/toolbox/transform-flip.png"
+                title="Zrcadlit" onclick="FileBrowserFilesFunctions.flipImage('<?=$file['name']?>')" />
+         <?}?>
+         <br />
+         <span>Soubor:</span><br />
+         <input type="image" src="../../../images/toolbox/rename.png"
+                title="Přejmenovat soubor" onclick="FileBrowserFilesFunctions.renameFile('<?=$file['name']?>')" />
+         <input type="image" src="../../../images/toolbox/remove.png"
+                title="Smazat soubor" onclick="FileBrowserFilesFunctions.removeFile('<?=$file['name']?>')" />
+         <span class="draggable">
+            <img src="../../../images/toolbox/move.png" title="Přesunout soubor do adresáře (uchopte a přetáhněte)" alt="Přesunout soubor"/>
+            <input type="hidden" value="<?=$file['name']?>" name="moved_file" />
+         </span>
+      </td>
+   </tr>
+      <?}?>
+</table>
+<?} else {?>
+<div><?=_("Adresář je prázdný")?></div>
+<?}?>

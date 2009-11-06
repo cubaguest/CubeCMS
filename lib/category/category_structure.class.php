@@ -58,7 +58,7 @@ class Category_Structure implements Iterator {
    public function render() {
       if($this->level != 0) { // vynecháme ROOT kategorii
          $str = str_repeat('&nbsp;', $this->level*3);
-         print ($str." cat ".$this->catObj->label." - id: ".$this->catObj->id_category." level: ".$this->level."<br/>");
+//         print ($str." cat ".$this->catObj->label." - id: ".$this->catObj->id_category." level: ".$this->level."<br/>");
       }
       foreach ($this->childrens as $key => $child) {
          $child->render();
@@ -73,17 +73,22 @@ class Category_Structure implements Iterator {
       return $this->idParent;
    }
 
-   public function getPath($idCat, &$retArray) {
+   public function getPath($idCat, $retArray = array()) {
+      if($this->getId() == $idCat){
+         array_push($retArray, $this);
+         return $retArray;
+      }
+      $newArr = $retArray;
+      if($this->getCatObj() !== null){
+         array_push($newArr, $this);
+      }
       foreach ($this->childrens as $child) {
-         if($child->getPath($idCat,$retArray)){
-            array_push($retArray, $child);
-            return true;
+         $ret = $child->getPath($idCat, $newArr);
+         if($ret !== false){
+            return $ret;
          }
       }
-      if($this->getId() == $idCat){
-//         array_push($retArray, $this);
-         return true;
-      }
+      return false;
    }
    
    /**
@@ -92,7 +97,7 @@ class Category_Structure implements Iterator {
     */
    public function setCategories($catArray) {
       if(isset ($catArray[$this->getId()]) AND $this->level != 0) {
-         $this->catObj = $catArray[$this->getId()];
+         $this->catObj = new Category(null, false, $catArray[$this->getId()]);
       }
       foreach ($this->childrens as $key => $child) {
          if(isset ($catArray[$child->getId()])) {
@@ -181,17 +186,93 @@ class Category_Structure implements Iterator {
     * @param integer $key -- klíč v poli
     * @param string $moveTo -- jestli nahoru nebo dolu ('up','down')
     */
-   public function moveChild($idParent, $key, $moveTo = 'down') {
-      $section = $this->getSection($idParent);
-      if($moveTo == 'down') {
+//   public function moveChild($id, $moveTo = 'down') {
+//      $keyUp = null;
+//      foreach ($this->childrens as $key => $child) {
+//         if($child->getId() == $id){
+//            if($moveTo == 'down') {
+//
+//            } else if($moveTo == 'up') {
+//               $tmpChild = $this->childrens[$keyUp];
+//               $this->childrens[$keyUp] = $child;
+//               $this->childrens[$key] = $tmpChild;
+//            } else {
+//               new UnexpectedValueException(_('Nočekávaná hodnota pro posun'), 1);
+//            }
+//            return true;
+//         }
+//         $keyUp = $key;
+//      }
+//      return false;
+//   }
 
-      } else if($moveTo == 'up') {
-
-         } else {
-            new UnexpectedValueException(_('Nočekávaná hodnota pro posun'), 1);
-         }
-
+   public function swapChild($child1, $child2) {
+      if($child1 instanceof Category_Structure AND $child2 instanceof Category_Structure){
+         $ch1Key = $this->getChildKey($child1);
+         $ch2Key = $this->getChildKey($child2);
+         $tmpChild = $this->childrens[$ch2Key];
+         $this->childrens[$ch2Key] = $this->childrens[$ch1Key];
+         $this->childrens[$ch1Key] = $tmpChild;
+      } else {
+         throw new InvalidArgumentException(_('Pro změnu nebyly předány platní potomci'), 2);
+      }
    }
+
+   /**
+    * Metoda najde a vrátí klíč k potomku v poli
+    * @param int $id -- id potomka
+    * @return int -- klíč v poli
+    */
+   private function getChildKey($schild) {
+      reset($this->childrens);
+      while ($child = current($this->childrens)) {
+         if ($child->getId() == $schild->getId()) {
+            return key($this->childrens);
+         }
+         @next($this->childrens);
+      }
+      return false;
+   }
+
+   public function prevChild(Category_Structure $schild) {
+      reset($this->childrens);
+      while ($child = current($this->childrens)) {
+         if ($child->getId() == $schild->getId()) {
+            if(@prev($this->childrens)){
+               return current($this->childrens);
+            } else {
+               return null;
+            }
+         }
+         @next($this->childrens);
+      }
+      return null;
+   }
+
+   public function nextChild(Category_Structure $schild) {
+      reset($this->childrens);
+      while ($child = current($this->childrens)) {
+         if ($child->getId() == $schild->getId()) {
+            if(@next($this->childrens)){
+               return current($this->childrens);
+            } else {
+               return null;
+            }
+         }
+         @next($this->childrens);
+      }
+      return null;
+   }
+
+   public function getChild($id) {
+      foreach ($this->childrens as $child) {
+         if($child->getId() == $id){
+            return $child;
+         }
+      }
+      return false;
+   }
+
 
    // methods implements Iterator
    public function current() {
@@ -226,19 +307,6 @@ class Category_Structure implements Iterator {
       return $this->catObj;
    }
 
-   /**
-    * Metoda proo serializaci
-    * @return array
-    */
-   //   public function __sleep() {
-   //      foreach (Locale::getAppLangs() as $lang) {
-   //         if(!key_exists($lang, $this->labels)) {
-   //            $this->labels[$lang] = null;
-   //         }
-   //      }
-   //      return array_keys(get_object_vars($this));
-   //   }
-
    public function saveStructure($structure = null) {
       if($structure == null) {
          $model = new Model_Config();
@@ -247,6 +315,18 @@ class Category_Structure implements Iterator {
          $model = new Model_Config();
          $model->saveCfg('CATEGORIES_STRUCTURE', serialize($structure));
       }
+   }
+
+   /**
+    * Magická metoda pro výpis
+    * @return string
+    */
+   public function  __toString() {
+      if($this->getLevel() != 0){
+         return (string)$this->getCatObj()->getLabel();
+      }
+      $string = null;
+      return $string;
    }
 }
 ?>

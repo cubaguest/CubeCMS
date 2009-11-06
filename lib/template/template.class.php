@@ -99,22 +99,16 @@ class Template {
    protected static $javascripts = array();
 
    /**
-    * Objekt vlastností modulu (jeho klon)
-    * @var Module_Sys
+    * Proměná s názvem nadpisu
+    * @var array
     */
-   //   protected $moduleSys = null;
+   protected static $pageHeadline = array();
 
    /**
-    * Proměná s názvem titulku okna kategorie
-    * @var string
+    * Proměná s názvem titulku okna
+    * @var array
     */
-   private static $categoryName = false;
-
-   /**
-    * Proměná s názvem titulku okna článku
-    * @var string
-    */
-   private static $pageTitle = false;
+   protected static $pageTitle = array();
 
    /**
     * Objekt s odkazem pro danou šablonu
@@ -189,12 +183,22 @@ class Template {
    }
 
    // vrací globální proměnou
+   
+//   public function pVar($name) {
+//      $return = null;
+//      if (isset (self::$publicVars[$name])) {
+//         return self::$publicVars[$name];
+//      } else {
+//         return null;
+//      }
+//   }
+
    /**
     * Metoda vrací hodnotu veřejné proměnné
     * @param string $name -- název proměnné
     * @return mixed -- hodnota proměnné
     */
-   public function pVar($name) {
+   public static function pVar($name) {
       $return = null;
       if (isset (self::$publicVars[$name])) {
          return self::$publicVars[$name];
@@ -207,42 +211,16 @@ class Template {
     * Metoda nastaví název titulku pro kategorii
     * @param string $text -- název kategorie
     */
-   final public function setCategoryName($text) {
-      self::$categoryName = $text;
+   final public static function addPageHeadline($text) {
+      array_push(self::$pageHeadline, $text);
    }
 
    /**
-    * Metoda vrátí název titulku kategorie
-    * @param bool $decode -- jestli se mají html znaky převést na entity
-    * @return string
-    */
-   final public function categoryName($decode = false) {
-      if(!$decode) {
-         return htmlspecialchars_decode(self::$categoryName);
-      } else {
-         return self::$categoryName;
-      }
-   }
-
-   /**
-    * Metoda nastaví název titulku pro článek
+    * Metoda přidá text k titulku pro článek
     * @param string $text -- název článek
     */
-   final public function setPageTitle($text) {
-      self::$pageTitle = $text;
-   }
-
-   /**
-    * Metoda vrátí název titulku článeku
-    * @param bool $decode -- jestli se mají html znaky převést na entity
-    * @return string
-    */
-   final public function pageTitle($decode = false) {
-      if(!$decode) {
-         return htmlspecialchars_decode(self::$pageTitle);
-      } else {
-         return self::$pageTitle;
-      }
+   final public static function addPageTitle($text) {
+      array_push(self::$pageTitle, $text);
    }
 
    /**
@@ -375,7 +353,7 @@ class Template {
       $jsfiles = $jsplugin->getAllFiles();
       foreach ($jsfiles as $file) {
          if($file instanceof JsPlugin_JsFile) {
-            Template::addJS($file->getName());
+            Template::addJS($file);
          } else if($file instanceof JsPlugin_CssFile) {
             // pokud existuje css soubor u faces, vložíme ten
                if(file_exists(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)

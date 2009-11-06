@@ -58,11 +58,19 @@ abstract class JsPlugin {
 	 * Konstruktor třídy
 	 */
 	final public function __construct(){
-      $this->jsPluginName = str_ireplace(__CLASS__.'_', '', get_class($this));
+      $this->setJsPluginName(str_ireplace(__CLASS__.'_', '', get_class($this)));
 //      $this->setFiles();
       $this->initJsPlugin();
 	}
 	
+   /**
+    * Metoda nastaví název JsPluginu (nový, přepíše aktuální), pouze v případě nouze
+    * @param string $name -- název JsPluginu používá se pro přístup k adresáři
+    */
+   public function setJsPluginName($name) {
+      $this->jsPluginName = $name;
+   }
+
 	/**
 	 * Třída, která se provede při inicializaci pluginu
 	 */

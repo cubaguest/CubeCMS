@@ -23,6 +23,11 @@ class Template_Output {
     */
    private $headers = array();
 
+   /**
+    * Obsahuje délku výstupu pro hlavičku
+    * @var int
+    */
+   private $cntLenght = null;
    /*
     * ============= MAGICKÉ METODY
     */
@@ -47,12 +52,20 @@ class Template_Output {
       switch ($this->outputType) {
          case "json":
             break;
+         case "xml":
+            $this->addHeader('Content-type: text/xml');
+            break;
+         case "txt":
+            $this->addHeader('Content-type: text/plain');
+            break;
          case "js":
-            array_push($this->headers, "Content-type: application/x-javascript");
+            $this->addHeader("Content-type: application/x-javascript");
             break;
          case "xhtml":
+         case "html":
+         case "php":
          default:
-            array_push($this->headers, "Content-type: text/html");
+            $this->addHeader("Content-type: text/html");
             break;
       }
    }
@@ -66,11 +79,22 @@ class Template_Output {
    }
 
    /**
+    * Metoda nastaví délu výstupu
+    * @param int $lenght -- délka výstupu
+    */
+   public function setContentLenght($lenght) {
+      $this->cntLenght = $lenght;
+   }
+
+   /**
     * Metoda odešle hlavičky
     */
    public function sendHeaders() {
       foreach ($this->headers as $header) {
          header($header);
+      }
+      if($this->cntLenght !== null){
+         header("Content-Length: ".$this->cntLenght);
       }
    }
 

@@ -56,6 +56,7 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
             } else {
                if(!in_array($values['extension'], $this->extensions)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  $this->isValid = false;
                   return false;
                }
             }

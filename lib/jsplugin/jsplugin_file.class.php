@@ -44,7 +44,7 @@ class JsPlugin_File {
 		$this->file = $file;
       $this->virtualFile = $virtual;
       if($virtual){
-         $this->dir = "./jsplugin/JSPLUGINNAME/".Category::getMainCategory()->getUrlKey()."/";
+         $this->dir = "./jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
       } else {
          $this->dir = "./".JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
       }
@@ -99,7 +99,7 @@ class JsPlugin_File {
    }
 
    /**
-    * Metoda nasatvuje parametr souboru
+    * Metoda nastavuje parametr souboru
     * @param string $paramName -- název parametru
     * @param string $value  -- (option) hodnota parametru, pokud je null tak je
     * parametr smazán

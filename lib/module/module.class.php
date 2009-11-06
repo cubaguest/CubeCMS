@@ -40,5 +40,19 @@
          return $defaultParam;
       }
    }
+
+   /**
+    * Metoda datový vrací adresář modulu
+    * @return <type>
+    */
+   public function getDataDir($webAddres = false) {
+      if($webAddres){
+         return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getName().URL_SEPARATOR;
+      } else {
+         $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR);
+         $dir->checkDir();
+         return (string)$dir;
+      }
+   }
  }
 ?>

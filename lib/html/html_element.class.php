@@ -161,9 +161,11 @@ class Html_Element {
    /**
     * Metoda přidá zadanou třídu do elementu
     * @param string $class -- název třídy
+    * @return Form_Element
     */
    public function addClass($class) {
       array_push($this->classes, $class);
+      return $this;
    }
 
    /**

@@ -1,6 +1,6 @@
 <?// Vypis hlasek
 if(!empty ($this->messages)) { ?>
-<div class="message infoMessage">
+<div class="message infoMessage" id="messages">
    <img src="<?=Template::face(false)?>images/icons/accept.png" alt="message icon" />
       <? foreach ($this->messages as $message) {
          print ("<p>".$message . "</p>");

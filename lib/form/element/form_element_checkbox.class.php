@@ -23,7 +23,7 @@ class Form_Element_Checkbox extends Form_Element {
     * Metoda naplní element
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
-   public function populate($method = 'post'){
+   public function populate($method = 'post') {
       parent::populate($method);
       if($this->values == null){
          $this->values = false;
@@ -31,58 +31,49 @@ class Form_Element_Checkbox extends Form_Element {
    }
 
    /**
-    * Metoda nastaví volbu že se dají vybírat více prvků
-    * @param $multiple -- true pro povolení více voleb
-    * @return Form_Element_Select -- sám sebe
+    * Metoda vrací hodnotu prvku
+    * @param $key -- (option) klíč hodnoty (pokud je pole)
+    * @return mixed -- hodnota prvku
     */
-//   public function setMultiple($multiple = true) {
-//      $this->isMultiple = $multiple;
-//      return $this;
-//   }
+   public function getValues($key = null) {
+      if($key !== null AND isset($this->values[$key])){
+         return true;
+      }
+//      else if($key !== null AND is_array($this->values) AND !isset($this->values[$key])) {
+//         return false;
+//      }
+      return false;
+   }
 
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
    public function controll() {
-      $this->html()->setAttrib('name', $this->getName());
+      if($this->isDimensional()) {
+         $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
+         $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+      } else {
+         $this->html()->setAttrib('name', $this->getName());
+         $this->html()->setAttrib('id', $this->getName());
+      }
+
       $this->html()->setAttrib('type', 'checkbox');
-      if(!empty ($this->values)){
+      if(!empty ($this->values)) {
          $this->html()->setAttrib('value', $this->values);
       }
-      if($this->values == true){
+      if($this->values == true) {
          $this->html()->setAttrib('checked', 'checked');
       }
 
       $l = new Html_Element('label', $this->getLabel());
-      $l->setAttrib('for', $this->getName());
+      if($this->isDimensional()) {
+         $l->setAttrib('for', $this->getName()."_".$this->dimensional);
+      } else {
+         $l->setAttrib('for', $this->getName());
+      }
 
       return $this->html();
-
-//      $first = true;
-//      foreach ($this->options as $optLabel => $optVal) {
-//         $opt = clone $this->html();
-//         $opt->setAttrib('id', $this->getName(),'_'.$optVal);
-//         $opt->setAttrib('value', $optVal);
-//         if(($this->values == $optVal) OR (empty ($this->values) AND $first == true)) {
-//            $opt->setAttrib('checked', 'checked');
-//         }
-//         $first = false;
-//         $group .= (string)$opt;
-//         $l = new Html_Element('label', $optLabel);
-//         $l->setAttrib('for', $this->getName(),'_'.$optVal);
-//         $group .= $l;
-//         $group .= new Html_Element('br');
-//      }
-//      return $group;
    }
-
-   /**
-    * Metoda vrací popisek k prvku (html element label)
-    * @return string
-    */
-//   public function label() {
-//      return (string)null;
-//   }
 }
 ?>

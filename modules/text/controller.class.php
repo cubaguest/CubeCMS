@@ -4,44 +4,15 @@
  */
 
 class Text_Controller extends Controller {
-   /**
-    * Názvy formulářových prvků
-    * @var string
-    */
-   const FORM_PREFIX = 'text_';
-   const FORM_BUTTON_SEND = 'send';
-   const FORM_TEXT = 'text';
-
-   /**
-    * Názvy parametrů modulu
-    */
-   const PARAM_FILES = 'files';
-   const PARAM_THEME = 'theme';
-
-   /**
-    * Kontroler pro zobrazení textu
-    */
+/**
+ * Kontroler pro zobrazení textu
+ */
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-      // ================ SOF ODSTRANIT
-//      $link = new Url_Link();
-//      $link = $this->link();
-//      var_dump($link);
-//      $start = xdebug_time_index();
-
-//      var_dump($link);
-//      for ($number_variable = 0 ; $number_variable < 10 ; $number_variable++) {
-//         print ($link->clear()->route('edit2', array('article' => 'dlouhý článek s mezerama a češtinou!!?', 'page' => 2))."<br />");
-//      }
-//      print ($link->lang()."<br />");
-////      print ($link->clear(true)."<br />");
-//      print (Locale::getLang()."<br />");
-//      print ("PAGE ".$this->getRequest('page', 1)."<br />");
-//      print ("PAGE ".$this->getRequest('article')."<br />");
-//         print ((xdebug_time_index() - $start)."<br>");
-
-   // ================ EOF ODSTRANIT
+      // viewer
+      $this->view()->template()->addTplFile("text.phtml");
+      $this->view()->template()->addCssFile("style.css");
    }
 
    /**
@@ -49,28 +20,51 @@ class Text_Controller extends Controller {
     */
    public function editController() {
       $this->checkWritebleRights();
-//
-      if($this->getModule()->getParam(self::PARAM_FILES, true)){
-         // Uživatelské soubory
-         $this->view()->userfiles = new Component_UserFiles();
+
+      $form = new Form("text_");
+      
+      $label = new Form_Element_Text('label', $this->_('Nadpis'));
+      $label->setSubLabel($this->_('Doplní se k nadpisu kategorie a stránky'));
+      $label->setLangs();
+      $form->addElement($label);
+
+      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea->setLangs();
+      $textarea->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $form->addElement($textarea);
+
+      $textareaPanel = new Form_Element_TextArea('paneltext', $this->_("Text panelu"));
+      $textareaPanel->setSubLabel($this->_('Je zobrazen v panelu, pokud je panel zapnut'));
+      $textareaPanel->setLangs();
+      $form->addElement($textareaPanel);
+
+      $model = new Text_Model_Detail();
+      $text = $model->getText($this->category()->getId());
+      if($text != false){
+         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+         $form->label->setValues($text->{Text_Model_Detail::COLUMN_LABEL});
+         $form->paneltext->setValues($text->{Text_Model_Detail::COLUMN_TEXT_PANEL});
       }
-//
-//      $form = new Form();
-//      $form->setPrefix(self::FORM_PREFIX);
-//
-//      $form->crTextArea(self::FORM_TEXT, true, true, Form::CODE_HTMLDECODE)
-//      ->crSubmit(self::FORM_BUTTON_SEND);
-//
-//      //        Pokud byl odeslán formulář
-//      if($form->checkForm()){
-//         $text = new Text_Model_Detail($this->sys());
-//         if(!$text->saveEditText($form->getValue(self::FORM_TEXT))){
-//            throw new UnexpectedValueException($this->_('Text se nepodařilo uložit'));
-//         }
-//
-//         $this->infoMsg()->addMessage($this->_('Text byl uložen'));
-//         $this->link()->action()->reload();
-//      }
+
+      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $form->addElement($submit);
+
+      if($form->isValid()){
+         try {
+            $model->saveText($form->text->getValues(), $form->label->getValues(),
+               $form->paneltext->getValues(), $this->category()->getId());
+            $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+            $this->link()->route()->reload();
+         } catch (PDOException $e) {
+            new CoreErrors($e);
+         }
+      }
+
+      // view
+      $this->view()->template()->form = $form;
+      $this->view()->template()->addTplFile("textedit.phtml");
+      $this->view()->template()->addCssFile("style.css");
+      //
    }
 }
 

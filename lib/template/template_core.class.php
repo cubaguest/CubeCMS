@@ -63,6 +63,22 @@ class Template_Core extends Template {
       }
       $contents = str_replace('{JAVASCRIPTS}', $jscripts, $contents);
 
+      // doplníme titulek stránky
+      $title = null;
+      $arr = array_merge(Template::pVar('CURRENT_CATEGORY_PATH'), self::$pageTitle);
+      foreach ($arr as $subtitle) {
+         $title .= ' - '.(string)$subtitle;
+      }
+//      $title = substr($title, 0, strlen($title)-3);
+      $contents = str_replace('{PAGE_TITLE}', $title, $contents);
+
+      // doplníme hlavní nadpis stránky
+      $headline = null;
+      foreach (self::$pageHeadline as $line) {
+         $headline .= (string)$line.VVE_HEADLINE_SEPARATOR;
+      }
+      $headline = substr($headline, 0, strlen($headline)-strlen(VVE_HEADLINE_SEPARATOR));
+      $contents = str_replace('{PAGE_HEADLINE}', $headline, $contents);
       
       return (string)$contents;
    }

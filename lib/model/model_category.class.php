@@ -28,8 +28,7 @@ class Model_Category extends Model_PDO {
    //   const COLUMN_MODULE_ID	= 'id_module';
    const COLUMN_MODULE	= 'module';
    const COLUMN_URLKEY	= 'urlkey';
-   const COLUMN_CAT_LPANEL	= 'left_panel';
-   const COLUMN_CAT_RPANEL	= 'right_panel';
+   const COLUMN_INDIVIDUAL_PANELS	= 'individual_panels';
    const COLUMN_PARAMS	= 'params';
    const COLUMN_CAT_SHOW_IN_MENU	= 'show_in_menu';
    const COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';
@@ -61,10 +60,13 @@ class Model_Category extends Model_PDO {
       //             WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
       //             AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
       //             ." = ".$dbc->quote($catKey).") LIMIT 0, 1");
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
              WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
              AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
-             ." = ".$dbc->quote($catKey).") LIMIT 0, 1");
+             ." = :catkey OR cat.".self::COLUMN_URLKEY.'_'.Locale::getDefaultLang()
+             ." = :catkey2) LIMIT 0, 1");
+          $dbst->bindParam(':catkey', $catKey);
+          $dbst->bindParam(':catkey2', $catKey);
       } else {
          $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
              WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
@@ -145,14 +147,6 @@ class Model_Category extends Model_PDO {
 
 //      return $dbst->fetchAll();
       return $cats;
-
-   //      SELECT IFNULL(cat.label_cs, cat.label_cs) AS clabel, cat.`id_category`, cat.`left_panel`,
-   //      cat.`right_panel`, cat.`id_section`, cat.`cparams`, IFNULL(sec.label_cs, sec.label_cs) AS slabel,
-   //      IFNULL(sec.alt_cs, sec.alt_cs) AS salt FROM `vypecky_categories` AS cat
-   //      INNER JOIN `vypecky_items` AS item ON cat.id_category = item.id_category
-   //      INNER JOIN `vypecky_sections` AS sec ON cat.id_section = sec.id_section
-   //      WHERE (item.group_guest LIKE 'r__') AND (cat.active = 1)
-   //      ORDER BY sec.priority DESC, cat.priority DESC, clabel ASC LIMIT 0, 1
    }
 
    /**
@@ -163,8 +157,7 @@ class Model_Category extends Model_PDO {
     * @param <type> $description
     * @param <type> $urlkey
     * @param <type> $priority
-    * @param <type> $panelLeft
-    * @param <type> $panelRight
+    * @param <type> $inidividualPanels
     * @param <type> $showInMenu
     * @param <type> $showWhenLoginOnly
     * @param <type> $rights
@@ -172,11 +165,11 @@ class Model_Category extends Model_PDO {
     * @param <type> $sitemapFrequency
     */
    public function saveNewCategory($name, $alt, $module, $keywords, $description, $urlkey,
-       $priority, $panelLeft, $panelRight, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
+       $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
-          self::COLUMN_CAT_ALT => $alt,
+          self::COLUMN_CAT_ALT => $alt, self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
           self::COLUMN_MODULE => $module, self::COLUMN_KEYWORDS => $keywords,
           self::COLUMN_DESCRIPTION => $description, self::COLUMN_URLKEY => $urlkey,
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
@@ -201,8 +194,7 @@ class Model_Category extends Model_PDO {
     * @param <type> $description
     * @param <type> $urlkey
     * @param <type> $priority
-    * @param <type> $panelLeft
-    * @param <type> $panelRight
+    * @param <type> $inidividualPanels
     * @param <type> $showInMenu
     * @param <type> $showWhenLoginOnly
     * @param <type> $rights
@@ -210,11 +202,11 @@ class Model_Category extends Model_PDO {
     * @param <type> $sitemapFrequency
     */
    public function saveEditCategory($id, $name, $alt, $module, $keywords, $description, $urlkey,
-       $priority, $panelLeft, $panelRight, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
+       $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
-          self::COLUMN_CAT_ALT => $alt,
+          self::COLUMN_CAT_ALT => $alt,self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
           self::COLUMN_MODULE => $module, self::COLUMN_KEYWORDS => $keywords,
           self::COLUMN_DESCRIPTION => $description, self::COLUMN_URLKEY => $urlkey,
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
@@ -225,13 +217,9 @@ class Model_Category extends Model_PDO {
       $this->setIUValues($rights);
 
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+      return $dbc->exec("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET ".$this->getUpdateValues()
-          ." WHERE ".self::COLUMN_CAT_ID." = :id");
-
-      return $dbst->execute(array(':id' => $id));
-
-      return true;
+          ." WHERE ".self::COLUMN_CAT_ID." = ".$dbc->quote($id));
    }
 
    public function deleteCategory($id) {
@@ -239,7 +227,6 @@ class Model_Category extends Model_PDO {
       $st = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           . " WHERE ".self::COLUMN_CAT_ID." = :id");
       return $st->execute(array(':id' => $id));
-
    }
 }
 ?>

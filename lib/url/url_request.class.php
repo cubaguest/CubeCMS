@@ -16,17 +16,23 @@ class Url_Request {
    const URL_SEPARATOR = '/';
 
    const URL_TYPE_NORMAL = 'normal';
-   const URL_TYPE_ENGINE_PAGE = 'special';
-   const URL_TYPE_MODULE = 'module';
-   const URL_TYPE_COMPONENT = 'component';
-   const URL_TYPE_JSPLUGIN = 'jsplugin';
-
+   const URL_TYPE_ENGINE_PAGE = 'specialpage';
+   const URL_TYPE_MODULE_REQUEST = 'module';
+   const URL_TYPE_COMPONENT_REQUEST = 'component';
+   const URL_TYPE_JSPLUGIN_REQUEST = 'jsplugin';
+   const URL_TYPE_SUPPORT_SERVICE = 'supportservice';
 
    /**
     * jestli se jedná o normální url nebo url s podpůrnými službami
     * @var string
     */
    private $urlType = self::URL_TYPE_NORMAL;
+
+   /**
+    * Proměnná obsahuje jestli je zpracovávána celá stránka, nebo jenom jeden požadavek
+    * @var bool
+    */
+   private $pageFull = true;
 
    /**
     * Ćást URL s cestami modulu
@@ -45,6 +51,12 @@ class Url_Request {
     * @var string
     */
    private static $fullUrl = null;
+
+   /**
+    * Obsahuje část s url bez baseWebUrl
+    * @var string
+    */
+    private static $webUrl = null;
 
    /**
     * Základní URL adresa aplikace
@@ -105,10 +117,6 @@ class Url_Request {
     */
    public function  __construct() {
       $this->checkUrlType();
-   // pokud je normální url vytvoříme část pro modul
-   //      if($this->urlType == self::URL_TYPE_NORMAL) {
-   //
-   //      }
    }
 
    /**
@@ -121,10 +129,13 @@ class Url_Request {
       self::$serverName = $_SERVER["SERVER_NAME"];
       //		Najdeme co je cesta k aplikaci a co je předaná url
       self::$fullUrl = substr($fullUrl, strpos(self::$scriptName, AppCore::APP_MAIN_FILE));
+      // odstraníme dvojté lomítka
+      self::$fullUrl = preg_replace('/[\/]{2,}/', '/', self::$fullUrl);
       //		Vytvoříme základní URL cestu k aplikaci
       $positionLastChar=strrpos(self::$scriptName, self::URL_SEPARATOR);
       self::$baseWebUrl=self::$transferProtocol.self::$serverName
-          .substr(self::$scriptName, 0, $positionLastChar).self::URL_SEPARATOR;;
+          .substr(self::$scriptName, 0, $positionLastChar).self::URL_SEPARATOR;
+      self::$webUrl = str_replace(self::$baseWebUrl, '', self::$fullUrl);
    }
 
    /**
@@ -137,36 +148,22 @@ class Url_Request {
 
    /**
     * Metoda zjistí typ url
+    * @todo dodělat lepší optimalizaci
     */
    public function checkUrlType() {
-      $validRequest = true;
+      $validRequest = false;
       // jesli se zpracovává soubor modulu
-      if($this->parseSpecialPageUrl()) {
-         $this->urlType = self::URL_TYPE_ENGINE_PAGE;
-      } else if($this->parseModuleUrl()) {
-            $this->urlType = self::URL_TYPE_MODULE;
-         } else if($this->parseComponentUrl()) {
-               $this->urlType = self::URL_TYPE_COMPONENT;
-            } else if($this->parseJsPluginUrl()) {
-                  $this->urlType = self::URL_TYPE_JSPLUGIN;
-               } else {
-                  if($this->parseNormalUrl()) {
-                     $this->urlType = self::URL_TYPE_NORMAL;
-                  } else {
-                     $validRequest = false;
-                  }
-               }
+      if($this->parseSpecialPageUrl() OR $this->parseSupportServiceUrl()
+          OR $this->parseModuleUrl() OR $this->parseComponentUrl()
+          OR $this->parseJsPluginUrl() OR $this->parseNormalUrl()) {
 
-      if($validRequest) {
-      // doplněnívýchozích hodnot do objektů odkazů
-      // nastavení odkazů
+         $validRequest = true;
+         AppCore::setErrorPage(false);
          Url_Link::setCategory($this->getCategory());
          Url_Link_Module::setRoute($this->getModuleUrlPart());
          Url_Link::setParams($this->getUrlParams());
-         Url_Link::setLang($this->getUrlLang());
          Locale::setLang($this->getUrlLang());
-      } else {
-      //AppCore::setErrorPage(true);
+         Url_Link::setLang($this->getUrlLang());
       }
    }
 
@@ -176,39 +173,70 @@ class Url_Request {
     * @return boolean true pokud se jedná o normální url
     */
    private function parseNormalUrl() {
-      // pokud není žádná adresa (jen jazyk)
-      $match = array();
-      if(!self::$fullUrl) {
+      if(self::$fullUrl == null) {
          return true;
       }
-      
+
+      // pokud není žádná adresa (jen jazyk)
+      $return = false;
       // nastavení jazyku
-      if(eregi("^([a-z]{2}\??)/?", self::$fullUrl, $match)){
+      $match = array('url' => null);
+      if(preg_match("/^(?:(?P<lang>[a-z]{2})\/)?(?P<url>.*)/", self::$fullUrl, $match) ){
          if(!empty ($match)) {
-            $this->lang = $match[1];
+            $this->lang = $match['lang'];
             Locale::setLang($this->lang);
+            Url_Link::setLang(Locale::getLang());
+            $return = true;
          }
       }
-
+//      var_dump($match);
+      if(!empty ($match['url'])) {
+         $return = false;
       // nařtení kategorií
-      $modelCat = new Model_Category();
-      $categories = $modelCat->getCategoryList();
-      //      var_dump($categories);
-      foreach ($categories as $key => $cat) {
-         if (strpos(self::$fullUrl, (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
-            $matches = array();
-            $regexp = "/(?:(?P<lang>[a-z]{2})\/)?".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
-            ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
+         $modelCat = new Model_Category();
+         $categories = $modelCat->getCategoryList();
+         foreach ($categories as $key => $cat) {
+            if((string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue;
+            if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
+               $matches = array();
+               $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
+                   ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
 
-//            var_dump($regexp);
-            preg_match($regexp, self::$fullUrl, $matches);
-            $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
-//            var_dump($this->category);
-            $this->moduleUrlPart = $matches['other'];
-            $this->parmas = $matches['params'];
-            $this->lang = $matches['lang'];
+               if(preg_match($regexp, $match['url'], $matches)) {
+//                  var_dump($matches);
+                  $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
+                  $this->moduleUrlPart = $matches['other'];
+                  $this->parmas = $matches['params'];
+                  $return = true;
+                  break;
+               }
+            }
+         }
+      }
+      return $return;
+   }
+
+   /**
+    * Metoda zkontroluje jesli se nejedná o specialní stránky obsažené v enginu
+    * (hledání, sitemap, atd)
+    */
+   private function parseSpecialPageUrl() {
+      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?\?(?P<name>search)=(?P<action>.*)/i',
+         '/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(html)+)/i');
+//      var_dump(self::$webUrl);
+      foreach ($regexps as $regex) {
+         $matches = array();
+         if(preg_match($regex, self::$webUrl, $matches) != 0) {
+//            var_dump($matches);
+            if(isset ($matches['output'])) {
+               $this->outputType = $matches['output'];
+            }
+            if(isset ($matches['action'])) {
+               $this->outputType = $matches['action'];
+            }
+            $this->name = $matches['name'];
+            $this->urlType = self::URL_TYPE_ENGINE_PAGE;
             return true;
-            break;
          }
       }
       return false;
@@ -218,12 +246,24 @@ class Url_Request {
     * Metoda zkontroluje jesli se nejedná o specialní stránky obsažené v enginu
     * (hledání, sitemap, atd)
     */
-   private function parseSpecialPageUrl() {
-   //      foreach (self::$specialPagesRegex as $regex) {
-   //         if(ereg('^[a-z]{0,3}/?'.$regex.'$', self::$currentUrl)) {
-   //            return true;
-   //         }
-   //      }
+   private function parseSupportServiceUrl() {
+      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(xml|txt)+)/i');
+      foreach ($regexps as $regex) {
+         $matches = array();
+         if(preg_match($regex, self::$webUrl, $matches) != 0) {
+//            var_dump($matches);
+            if(isset ($matches['output'])) {
+               $this->outputType = $matches['output'];
+            }
+            if(isset ($matches['action'])) {
+               $this->outputType = $matches['action'];
+            }
+            $this->name = $matches['name'];
+            $this->urlType = self::URL_TYPE_SUPPORT_SERVICE;
+            $this->pageFull = false;
+            return true;
+         }
+      }
       return false;
    }
 
@@ -243,6 +283,8 @@ class Url_Request {
       if(isset ($matches['params'])) {
          $this->parmas = $matches['params'];
       }
+      $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+      $this->pageFull = false;
       return true;
    }
 
@@ -262,6 +304,8 @@ class Url_Request {
       if(isset ($matches['params'])) {
          $this->parmas = $matches['params'];
       }
+      $this->urlType = self::URL_TYPE_COMPONENT_REQUEST;
+      $this->pageFull = false;
       return true;
    }
 
@@ -271,7 +315,8 @@ class Url_Request {
     */
    private function parseJsPluginUrl() {
       $matches = array();
-      if(!preg_match("/jsplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+//      if(!preg_match("/jsplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+      if(!preg_match("/jsplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?cat-(?P<category>[0-9]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
       $this->category = $matches['category'];
@@ -282,6 +327,8 @@ class Url_Request {
       if(isset ($matches['params'])) {
          $this->parmas = $matches['params'];
       }
+      $this->urlType = self::URL_TYPE_JSPLUGIN_REQUEST;
+      $this->pageFull = false;
       return true;
    }
 
@@ -342,139 +389,11 @@ class Url_Request {
    }
 
    /**
-    * Metoda kontroluje jestli se nejedná o url s ajax akcí
+    * Metoda vrací jestli se zpracovává celá celá stránka, nebo jenom část
+    * @return bool -- true pokud je zpracovávána stránka
     */
-   //   private static function checkAjaxFileUrl() {
-   //      if(ereg('^ajax/(module|eplugin)/([^/.]+)_([[:digit:]]+).php', self::$fullUrl)) {
-   //         self::$isAjax = true;
-   //         return true;
-   //      }
-   //      return false;
-   //   }
-
-   /**
-    * Metoda parsuje celou url do pole s jednotlivými proměnými
-    */
-   private function parseUrl() {
-   //		Rozdělíme řetězec podle separátorů
-   //      $urlItems = $urlItemsBack = array();
-   //      //		Odstranění posledního lomítka
-   //      $url = ereg_replace("^(.*)/$", "\\1", self::$currentUrl);
-   //      $urlItems = $urlItemsBack = explode(URL_SEPARATOR, $url);
-   //      reset($urlItems); // reset pole aby bylo na začátku
-   //      $isCategory = $lang = false;
-   //      //		Kontrola jestli je zadán jazyk
-   //      if(Links::checkLangUrlRequest(pos($urlItems))) {
-   //         $lang = true;
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      //		Kontrola jestli je zadána kategorie
-   //      if(Links::checkCategoryUrlRequest(pos($urlItems))) {
-   //         $isCategory = true;
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      // zjištění, jestli je nějáká kategorie nebo se jedná o neexistující stránku
-   //      if(!$lang AND !$isCategory AND $urlItemsBack[0] != null) {
-   //         AppCore::setErrorPage(); // zapnem Chybovou stránku
-   //         return false;
-   //      }
-   //      //  Kontrola předání cesty pokud je definována
-   //      if(Links::checkRouteUrlRequest(pos($urlItems))) {
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      //		Načetní článku FORMAT: "nazev-id"
-   //      if(Links::checkArticleUrlRequest(pos($urlItems))) {
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      //		Načtení akce FORMAT: nazev_{action name (např. char)}-id_item
-   //      if(Links::checkActionUrlRequest(pos($urlItems))) {
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      //		Načtení typu media FORMAT: media{typ media např www,print}
-   //      $matches = array();
-   //      $expresion = '^'.self::PARAM_MEDIA_TYPE_PREFIX.'([a-zA-Z]+)$';
-   //      if(eregi($expresion, pos($urlItems), $matches)) {
-   //         self::$media = $matches[1];
-   //         self::$currentMediaUrlPart = pos($urlItems);
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      //        Vybrání ostatních  parametrů
-   //      if(isset($urlItems) AND pos($urlItems) != null) {
-   //         Links::chackOtherUrlParams($urlItems);
-   //      }
-   }
-
-   /**
-    * Metoda parsuje url pro Supported Services (eplugins, jsplugins, sitemp, atd.)
-    */
-   private static function parseUrlForsupportedServices() {
-   //		Odstranění posledního lomítka
-   //      $url = ereg_replace("^(.*)/$", "\\1", self::$fullUrl);
-   //      $name = $file = $params = null;
-   //      $regexResult = array();
-   //      switch (self::$supportedServicesType) {
-   //         case self::SUPPORTSERVICES_EPLUGIN_NAME:
-   //            ereg('^(eplugin[^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
-   //            $name = $regexResult[1];
-   //            $file = $regexResult[2];
-   //            $params = $regexResult[3];
-   //            break;
-   //         case self::SUPPORTSERVICES_JSPLUGIN_NAME:
-   //            ereg('^(jsplugin[^\./]*)/([^\.]*\.js)\?(.*)$', $url, $regexResult);
-   //            $name = $regexResult[1];
-   //            $file = $regexResult[2];
-   //            if(isset ($regexResult[3])) {
-   //               $params = $regexResult[3];
-   //            }
-   //            break;
-   //         case self::SUPPORTSERVICES_SITEMAP_NAME:
-   //            ereg(self::$notNormalUrlArrayRegex[self::SUPPORTSERVICES_SITEMAP_NAME], $url, $regexResult);
-   //            $name = $regexResult[1];
-   //         default:
-   //            break;
-   //      }
-   //      self::$supporteServicesName = $name;
-   //      self::$supporteServicesFile = $file;
-   //      self::$supporteServicesParams = $params;
-   }
-
-   /**
-    * Metoda parsuje specialní url
-    */
-   private function parseSpecialUrl() {
-   //      $regexArr = array();
-   //      //		Rozdělíme řetězec podle separátorů
-   //      $urlItems = $urlItemsBack = array();
-   //      //		Odstranění posledního lomítka
-   //      $url = ereg_replace("^(.*)/$", "\\1", self::$currentUrl);
-   //      $urlItems = $urlItemsBack = explode(URL_SEPARATOR, $url);
-   //      reset($urlItems); // reset pole aby bylo na začátku
-   //      // jazyk
-   //      if(Links::checkLangUrlRequest(pos($urlItems))) {
-   //         $lang = true;
-   //         unset ($urlItems[key($urlItems)]);
-   //      }
-   //      if(ereg(''.self::$specialPagesRegex[self::SPECIAL_PAGE_SEARCH].'$', $urlItems[key($urlItems)], $regexArr)) {
-   //         self::$specialPageName = self::SPECIAL_PAGE_SEARCH;
-   //         Search::factory($regexArr[1], $regexArr[2]);
-   //      } else if(ereg(''.self::$specialPagesRegex[self::SPECIAL_PAGE_SITEMAP].'$', $urlItems[key($urlItems)], $regexArr)) {
-   //            self::$specialPageName = self::SPECIAL_PAGE_SITEMAP;
-   //         }
-   }
-
-   /**
-    * Metoda parsuje url pro ajax akci
-    */
-   private static function parseAjaxUrl() {
-   //      $regexResult = array();
-   //      ereg('^ajax/(module|eplugin)/([^/.]+)_([^/._]+)_([[:digit:]]+).php\??(.*)$', self::$fullUrl,$regexResult);
-   //      Ajax::setType($regexResult[1]);
-   //      Ajax::setName($regexResult[2]);
-   //      Ajax::setAction($regexResult[3]);
-   //      Ajax::setIdItem($regexResult[4]);
-   //      if (isset ($regexResult[5])) {
-   //         Ajax::setParams($regexResult[5]);
-   //      }
+   public function isFullPage() {
+      return $this->pageFull;
    }
 
    /**
@@ -484,127 +403,5 @@ class Url_Request {
    public static function getBaseWebDir() {
       return self::$baseWebUrl;
    }
-
-   /**
-    * Metoda vrací typ média pro načtenou stránku
-    * @return string
-    */
-   //   public static function getMediaType() {
-   //      return self::$media;
-   //   }
-
-   /**
-    * Metoda vrací URl část řetězce s nastaveným typem média
-    * @return string -- url část
-    */
-   //   public static function getCurrentMediaUrlPart() {
-   //      return self::$currentMediaUrlPart;
-   //   }
-
-   /**
-    * Metoda zevolí typ kontroleru modulu
-    */
-   public function choseController() {
-   //		Vyvoříme objekt článku kvůli zjišťování přítomnosti článku
-   //      $article = new Article();
-   //      //		pokud není akce
-   //      if(!$this->moduleAction->isAction()) {
-   //      //			pokud je vybrán článek
-   //         if($article->isArticle() AND !$this->moduleAction->isSomeAction()) {
-   //            $action = strtolower($this->moduleAction->getDefaultArticleAction());
-   //         }
-   //         //			Pokud není vybrán článek
-   //         else {
-   //            $action = strtolower(AppCore::MODULE_MAIN_CONTROLLER_PREFIX);
-   //         }
-   //      }
-   //      //		Pokud je vybrána akce
-   //      else {
-   //         $action = $this->moduleAction->getSelectedAction();
-   //      }
-   //      //		Přiřazení routy
-   //      if($this->moduleRoutes->isRoute()) {
-   //         $action = ucfirst($action);
-   //         $action = $this->moduleRoutes->getRoute().$action;
-   //      }
-   //      return $action;
-   }
-
-/**
- * Metoda vrací pokud je nastavena SupportedServices
- * @return bool true pokud se zpracovává
- */
-//   public static function isSupportedServices() {
-//      return self::$isSupportedServices;
-//   }
-
-/**
- * Metoda vrací typ SupportedServices (Eplugin, JsPlugin, ...)
- * @return string -- konstanta SUPPORTED_SERVICES_XXX
- */
-//   public static function getSupportedServicesType() {
-//      return self::$supportedServicesType;
-//   }
-
-/**
- * Metoda vrací název SupportedServices (Epluginu, JsPluginu, ...)
- * @return string -- název služby, záleží na typu (např. tinymce, ...)
- * u typu Sitemap vrací xml nebo txt
- */
-//   public static function getSupportedServicesName() {
-//      return self::$supporteServicesName;
-//   }
-
-/**
- * Metoda vrací název souboru SupportedServices (Epluginu, JsPluginu, ...)
- * @return string -- název souboru
- */
-//   public static function getSupportedServicesFile() {
-//      return self::$supporteServicesFile;
-//   }
-
-/**
- * Metoda vrací parametry SupportedServices, všechny co jsou za otazníkem
- * @return string -- string parametry, nerozparsované nebo null
- */
-//   public static function getSupportedServicesParams() {
-//      return self::$supporteServicesParams;
-//   }
-
-/**
- * Metoda vrací pokud je nastavena SpecialPage
- * @return bool true pokud se zpracovává
- */
-//   public static function isSpecialPage() {
-//      if(self::$specialPageName == null) {
-//         return false;
-//      }
-//      return true;
-//   }
-
-/**
- * Metoda vrací název speciální stránky
- * @return string -- konstanta SPECIAL_PAGE_XXX
- */
-//   public static function getSpecialPage() {
-//      return self::$specialPageName;
-//   }
-
-/**
- * Metoda vrcí regulerní výraz pro specielní stránku
- * @param string $pageType -- typ specielní stránky constanta SPECIAL_PAGE_XXX
- * @return string -- regulerní výraz
- */
-//   public static function getSpecialPageRegexp($pageType) {
-//      return self::$specialPagesRegex[$pageType];
-//   }
-
-/**
- * Metoda vrací jestli je spuštěn ajax požadavek
- * @return boolean -- true pokud je ajax požadavek
- */
-//   public static function isAjaxRequest() {
-//      return self::$isAjax;
-//   }
 }
 ?>

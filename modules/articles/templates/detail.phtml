@@ -1,0 +1,32 @@
+<? // načtení detailu
+$this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
+$this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
+?>
+
+<div>
+   <!--<h2><?=htmlspecialchars($this->article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;-->
+   <div class="smallFont"><?=$this->_('Přidáno')." ".strftime("%x %X", $this->article->{Articles_Model_Detail::COLUMN_ADD_TIME})
+          ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
+      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
+   </div>
+   <!--</h2>-->
+   <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
+   <hr class="reseter" />
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
+
+   <?
+   if($this->category()->getRights()->isControll() OR
+       ($this->category()->getRights()->isWritable() AND
+       $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == $this->category()->getRights()->getAuth()->getId())) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('edit_article', $this->_("Upravit článek"),
+          $this->link()->route('edit', array('articlekey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+          $this->_("Upravit zobrazený článek"), "text_edit.png");
+      $toolbox->addTool('article_delete', $this->_("Smazat článek"),
+          $this->link(), $this->_("Smazat zobrazený článek"), "text_edit.png",
+          'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
+          $this->_('Opravdu smazat článek?'));
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>

@@ -23,7 +23,7 @@ function vve_to_ascii(&$string) {
        "Í"=>'I',"Î"=>'I',"Ľ"=>'L',"Ĺ"=>'L',"Ň"=>'N',"Ń"=>'N',
        "Ó"=>'O',"Ô"=>'O',"Ő"=>'O',"Ö"=>'O',"Ř"=>'R',"Š"=>'S',"Ś"=>'S',
        "Ť"=>'T',"Ú"=>'U',"Ů"=>'U',"Ű"=>'U',"Ü"=>'U',"Ý"=>'Y',"Ž"=>'Z',"Ź"=>'Z'));
-   $string = StrToLower($string); //velká písmena nahradí malými.
+//   $string = StrToLower($string); //velká písmena nahradí malými.
    return $string;
 }
 
@@ -39,9 +39,51 @@ function vve_cr_url_key($string) {
       }
    } else {
       $string = vve_to_ascii($string);
-      $string = preg_replace("/[ \_-]{1,}/", "-", $string);
-      $string = preg_replace("/[().\"\'!?<>,]?/", "", $string);
+
+//      $regexp = array('/(^[^a-z]{1,})|([\\:;()"\'!?.,|<>\/]?)/i', '/[ \_-]{1,}/');
+      $regexp = array('/(^[^a-z]{1,})|([^ \/a-z\_-]?)/i', '/[ \_-]{1,}/');
+      $replacements = array('', '-');
+      $string = preg_replace($regexp, $replacements, $string);
+
+//      $string = preg_replace('/^[ :;\_()."\'!?<>,-]{1,}/', "", $string);
+//      $string = preg_replace("/[ \_-]{1,}/", "-", $string);
+//      $string = preg_replace("/[().\"\'!?<>,]?/", "", $string);
    }
    return $string;
+}
+
+/**
+ * Funkce odstrani nepovolené znaky a diakritiku pro vytvoření bezpečného názvu souboru
+ * @param string/array $string -- řetězec nebo pole pro převedení
+ * @return string/array -- řetězec nebo pole s převedenými znaky
+ */
+function vve_cr_safe_file_name($string) {
+   if(is_array($string)) {
+      foreach ($string as $key => $variable) {
+         $string[$key] = vve_cr_safe_file_name($variable);
+      }
+   } else {
+      $string = vve_to_ascii($string);
+      $string = preg_replace("/[ ]{1,}/", "-", $string);
+      $string = preg_replace("/[()\"\'!?,]?/", "", $string);
+   }
+   return $string;
+}
+
+/**
+ * Funkce rozparsuje řetězec z konfoigurace podle odělovače (možné variany: "left;right" nebo ("left=0;right=2"))
+ * @param string $value -- řetězec pro parsování
+ * @param string $delimiter -- oddělovač
+ * @return array -- pole s hodnotami
+ */
+function vve_parse_cfg_value($value, $delimiter = ';') {
+   $arr = $retArr = array();
+   $arr = explode($delimiter, $value);
+
+   foreach ($arr as $ret) {
+      $retArr[$ret] = $ret;
+   }
+   
+   return $retArr;
 }
 ?>

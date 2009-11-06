@@ -54,12 +54,18 @@ class Form_Element_Select extends Form_Element {
 
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
-    * @return string
+    * @return Html_Element
     */
    public function controll() {
-      $this->html()->setAttrib('name', $this->getName());
-      $this->html()->setAttrib('id', $this->getName());
-
+      $this->html()->clearContent();
+      if($this->isDimensional()){
+         $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
+         $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+      } else {
+         $this->html()->setAttrib('id', $this->getName());
+         $this->html()->setAttrib('name', $this->getName());
+      }
+      
       if($this->isMultiple) {
          $this->html()->setAttrib('multiple', 'multiple');
       }

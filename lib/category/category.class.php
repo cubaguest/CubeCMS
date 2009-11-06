@@ -35,7 +35,7 @@ class Category {
     * Objekt hlavní kategorie
     * @var Category
     */
-   private static $mainCategory = null;
+   private static $selectedCategory = null;
 
    /**
     * Objekt s právy kategorie
@@ -54,21 +54,21 @@ class Category {
     * @string $catKey --  klíč kategorie
     * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
     */
-   public function  __construct($catKey = null, $isMainCategory = false) {
+   public function  __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null) {
       //		vbrání kategorie
       if($catKey != null){
-         $this->loadCat($catKey);
+         $this->loadCat($catKey, $categoryDataObj);
          $this->categoryIsDefault = false;
       } else {
-         $this->loadCat();
+         $this->loadCat(null, $categoryDataObj);
          $this->categoryIsDefault = true;
       }
       if(!empty ($this->category)){
          $this->categoryRights = new Rights();
          $this->loadRights();
       }
-      if($isMainCategory){
-         self::$mainCategory = $this;
+      if($isSelectedCategory){
+         self::$selectedCategory = $this;
       }
    }
 
@@ -76,10 +76,14 @@ class Category {
     * metoda načte vybranou kategorii z databáze
     * @param string $catKey -- klíč kategorie
     */
-   private function loadCat($catKey = null) {
-//      $userNameGroup = AppCore::getAuth()->getGroupName();
-      $catModel = new Model_Category();
-      $catArray = $catModel->getCategory($catKey);
+   private function loadCat($catKey = null, $catDataObj = null) {
+      // zjistíme jestli nemáme načtená data
+      if($catDataObj === null){
+         $catModel = new Model_Category();
+         $catArray = $catModel->getCategory($catKey);
+      } else {
+         $catArray = $catDataObj;
+      }
       //		Pokud nebyla načtena žádná kategorie
       if(empty($catArray)){
 //         AppCore::setErrorPage();
@@ -177,19 +181,11 @@ class Category {
    }
 
    /**
-    * Metoda vrací jesli je zapnut levý panel
-    * @return boolena -- true pokud je panel zapnut
+    * Metoda vrací jesli jsou pro danou kategorii individuální panely
+    * @return boolena -- true pokud jsou panely individuální
     */
-   public function isLeftPanel(){
-      return $this->category->{Model_Category::COLUMN_CAT_LPANEL};
-   }
-
-   /**
-    * Metoda vrací jesli je zapnut pravý panel
-    * @return boolena -- true pokud je panel zapnut
-    */
-   public function isRightPanel(){
-      return $this->category->{Model_Category::COLUMN_CAT_RPANEL};
+   public function isIndividualPanels(){
+      return $this->category->{Model_Category::COLUMN_INDIVIDUAL_PANELS};
    }
 
    /**
@@ -215,8 +211,8 @@ class Category {
     * Metoda vrací objekt hlavní kategorie
     * @return Category
     */
-   public static function getMainCategory() {
-      return self::$mainCategory;
+   public static function getSelectedCategory() {
+      return self::$selectedCategory;
    }
 
    /**
@@ -225,6 +221,14 @@ class Category {
     */
    public function getModule() {
       return $this->module;
+   }
+
+   /**
+    * Metoda vrací objekt data kategorie (nejčastěji načtené přes model)
+    * @return Object
+    */
+   public function getCatDataObj() {
+      return $this->category;
    }
 }
 ?>

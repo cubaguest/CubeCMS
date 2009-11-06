@@ -2,7 +2,7 @@
 $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
 
 $catModel = new Model_Category();
-$menu->setCategories($catModel->getCategoryList());
+$menu->setCategories($catModel->getCategoryList(true));
 
 
 
@@ -14,45 +14,49 @@ define('SECTION_MOVEDOWN_LABEL', $this->_('Dolu'));
 // funkce pro render menu
 function vveSectionsRenderFunc($menuArr, $link) {
    $link2 = clone $link;
+   $link3 = clone $link;
    //   print ("<ul>\n");
    $first = true;
    $count = $menuArr->count();
    $cycle = 0;
-//   $level = $menuArr->getLevel();
+   //   $level = $menuArr->getLevel();
    foreach ($menuArr as $key => $item) {$cycle++?>
 <tr><td width="350">
-      <span class="sec"><?=str_repeat('&nbsp;', ($item->getLevel())*6).$item->getCatObj()->{Model_Category::COLUMN_CAT_LABEL}?></span>
+      <span class="sec"><?=str_repeat('&nbsp;', ($item->getLevel())*6).$item?></span>
+      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=$item?>">link</a>
    </td><td>
       <form method="post" action="<?=$link2->route('edit',array('categoryid' => $item->getId()))?>" style="display:inline;">
          <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="category_edit" title="<?=SECTION_EDTI_LABEL?>" />
       </form>
-      <form method="post" action="<?=$link?>" style="display:inline;" onsubmit="return submitRemoveSec('<?=$item->getCatObj()->{Model_Category::COLUMN_CAT_LABEL};?>')">
+      <form method="post" action="<?=$link?>" style="display:inline;" onsubmit="return submitRemoveCat('<?=$item;?>')">
          <input type="hidden" value="<?=$item->getId()?>" name="category_id" />
          <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
                 value="remove" name="category_remove" title="<?=SECTION_REMOVE_LABEL?>" />
       </form>
-               <?if(!$first) {?>
+            <?if(!$first) {?>
       <form method="post" action="<?=$link?>" style="display:inline;">
-         <input type="hidden" value="<?=$key?>" name="item_child_key" />
-         <input type="hidden" value="<?=$menuArr->getId()?>" name="item_parent_id" />
+         <input type="hidden" value="<?=$item->getId()?>" name="item_id" />
          <input type="hidden" value="up" name="item_move_to" />
          <input type="image" src="<?=vve_get_tpl_file('toolbox/go-up.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="item_move" title="<?=SECTION_MOVEUP_LABEL?>" />
       </form>
-               <?}
-               if($cycle < $count) {?>
+            <?}
+            if($cycle < $count) {?>
       <form method="post" action="<?=$link?>" style="display:inline;">
-         <input type="hidden" value="<?=$key?>" name="item_child_key" />
-         <input type="hidden" value="<?=$menuArr->getId()?>" name="item_parent_id" />
+         <input type="hidden" value="<?=$item->getId()?>" name="item_id" />
          <input type="hidden" value="down" name="item_move_to" />
          <input type="image" src="<?=vve_get_tpl_file('toolbox/go-down.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="item_move" title="<?=SECTION_MOVEDOWN_LABEL?>" />
       </form>
-               <?}?>
-   </td></tr>
+            <?}?>
+   </td>
+</tr>
+<tr>
+   <td colspan="2"><hr /></td>
+</tr>
       <?
-      if(!$item->isEmpty()){
+      if(!$item->isEmpty()) {
          vveSectionsRenderFunc($item, $link);
       }
       $first = false;
@@ -65,7 +69,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
    <h2><?=$this->_("Struktura stránek")?></h2>
    <div id="sections">
       <table>
-      <?=vveSectionsRenderFunc($menu, $this->link())?>
+         <?=vveSectionsRenderFunc($menu, $this->link())?>
       </table>
    </div>
    <br />

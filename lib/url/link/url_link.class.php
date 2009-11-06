@@ -92,6 +92,18 @@ class Url_Link {
    protected static $currentParams = array();
 
    /**
+    * Soubor který se má zobrazit
+    * @var string
+    */
+   protected $file = null;
+
+   /**
+    * Soubor který se má zobrazit
+    * @var string
+    */
+   protected static $currentFile = null;
+
+   /**
     * Konstruktor nastaví základní adresy a přenosový protokol
     * @param boolean $clear -- (option) true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
     * @param boolean $onlyWebRoot -- (option) true pokud má být vráce naprosto čistý link (web root)
@@ -198,42 +210,21 @@ class Url_Link {
 
    /**
     * Metoda přidá nebo změní daný parametr v URL
-    * @param mixed $name -- objekt UrlParam nebo string
-    * @param mixed $value -- (option) hodnota parametru, jen v případě přímého
-    * předávání názvu parametru
+    * @param string $name -- objekt UrlParam nebo string
+    * @param string $value -- (option) hodnota parametru, pokud je null bude parametr odstraněn
     */
    public function param($name, $value = null) {
-   //        Je vkládán objekt parametru
-   //      if($name instanceof UrlParam) {
-   //      //            $name = new UrlParam();
-   //      // Pokud se nejedná o normálový
-   //         if(!$name->isNormalParam()) {
-   //            $add = true;
-   //            // Projdem pole a otestujem hodnoty naproti regulérnímu výrazu parametru
-   //            foreach ($this->paramsArray as $paramKey => $param) {
-   //               if(ereg($name->getPattern(), $param)) {
-   //                  $add = false;
-   //                  $this->paramsArray[$paramKey] = rawurlencode($name);
-   //               }
-   //            }
-   //            //                Pokud parametr v url není
-   //            if($add) {
-   //               array_push($this->paramsArray, rawurlencode($name));
-   //            }
-   //         } else {
-   //            $this->paramsNormalArray[$name] = rawurlencode($value);
-   //         }
-   //      }
-   //      //        Jedná se o běžně zadaný parametr
-   //      else {
-      if(!is_array($name)) {
-         $this->paramsNormalArray[$name] = rawurlencode($value);
-      } else {
-         foreach ($name as $key => $val) {
-            $this->paramsNormalArray[$key] = rawurlencode($val);
+      if($value !== null) {
+         if(!is_array($name)) {
+            $this->paramsArray[$name] = rawurlencode($value);
+         } else {
+            foreach ($name as $key => $val) {
+               $this->paramsArray[$key] = rawurlencode($val);
+            }
          }
+      } else {
+         $this->rmParam($name);
       }
-      //      }
       return $this;
    }
 
@@ -245,22 +236,6 @@ class Url_Link {
     * @return Links
     */
    public function rmParam($name = null) {
-   // Je vkládán objekt parametru
-   //      if($name instanceof UrlParam) {
-   //      // Pokud se nejedná o normálový
-   //         if(!$name->isNormalParam()url/link/url_link.class.php on line 336 Call Stack #TimeMemoryFunctionLocation 10,000658620{main}( )../index.php:0 20,0178283012AppCore::createApp( )../index.php:11 30,0179283076AppCore::getInstance( )../app.php:333 40,0179283440AppCore->__construct( )../app.php:304 50,0796674396AppCore->runCore( )../app.php:282 60,17492024004AppCore->renderTemplate( )../app.php:1183 70,17512024664Template->renderTemplate( )../app.php:682 80,17512024720Template_Core->__toString( )../template_core.class.php:0 90,17632113808) {
-   //         // Projdem pole a otestujem hodnoty naproti regulérnímu výrazu parametru
-   //            foreach ($this->paramsArray as $paramKey => $param) {
-   //               if(ereg($name->getPattern(), $param)) {
-   //                  unset ($this->paramsArray[$paramKey]);
-   //               }
-   //            }
-   //         } else {
-   //            unset ($this->paramsNormalArray[$name]);
-   //         }
-   //      }
-   //      // Jedná se o běžně zadaný parametr
-   //      else
       if($name != null) {
          unset($this->paramsArray[$name]);
       }
@@ -269,6 +244,37 @@ class Url_Link {
          $this->paramsArray = array();
       }
       return $this;
+   }
+
+   /**
+    * Metoda vrací parametr z url adresy
+    * @param string $name -- název parametru
+    * @param mixed $defValue -- výchozí hodnota parametru
+    * @return mixed -- hodnota parametru
+    */
+   public function getParam($name, $defValue = null) {
+      if(isset ($_GET[$name])){
+         return rawurldecode($_GET[$name]);
+      } else {
+         return $defValue;
+      }
+   }
+
+   /**
+    * Metoda nastaví aktuální soubor
+    * @param string $file -- název souboru
+    */
+   public function file($file = null) {
+      $this->file = $file;
+      return $this;
+   }
+
+   /**
+    * Metoda nastaví aktuální soubor (alias pro file($file))
+    * @param string $file -- název souboru
+    */
+   public function setFile($file = null) {
+      return $this->file($file);
    }
 
    /**
@@ -292,22 +298,14 @@ class Url_Link {
    }
 
    /**
-    * Metoda nastaví aktuální cestu (routu)
-    * @param string $route -- aktuální cesta
-    */
-//   public static function setRoute($route) {
-//      self::$currentRoute = $route;
-//   }
-
-   /**
     * Metoda nastaví aktuální jazyk
     * @param string $lang -- aktuální jazyk
     */
    public static function setLang($lang) {
-      self::$currentlang = $lang;
+      if(Locale::getDefaultLang() != $lang){
+         self::$currentlang = $lang;
+      }
    }
-
-
 
    /**
     * Metoda nastavuje znovunahrání stránky
@@ -353,6 +351,7 @@ class Url_Link {
       $this->lang = self::$currentlang;
       $this->category = self::$currentCategory;
       $this->route = self::$currentRoute;
+      $this->file = self::$currentFile;
       $this->paramsArray = self::$currentParams;
    //         $this->paramsNormalArray = self::$currentParamsNormalArray;
    //         $this->mediaType = Url_Request::getCurrentMediaUrlPart();
@@ -379,7 +378,9 @@ class Url_Link {
       if($this->getRoute() != null) {
          $returnString.=$this->getRoute();
       }
-
+      if($this->file != null) {
+         $returnString.=$this->getFile();
+      }
       //        Parsovatelné parametry
       if(!empty ($this->paramsArray)) {
          $returnString.=$this->getParams();
@@ -454,8 +455,19 @@ class Url_Link {
     */
    protected function getRoute() {
       if($this->route != null) {
-//         return $this->route.Url_Request::URL_SEPARATOR;
          return $this->route;
+      } else {
+         return null;
+      }
+   }
+
+   /**
+    * Metoda vrací část se souborem pro url
+    * @param string -- soubor
+    */
+   protected function getFile() {
+      if($this->file != null) {
+         return $this->file;
       } else {
          return null;
       }

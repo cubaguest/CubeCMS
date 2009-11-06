@@ -2,33 +2,22 @@
 /*
  * Třída modelu detailem článku
  */
-class Articles_Model_Detail extends Model_Db {
-	/**
-	 * Názvy sloupců v databázi
-	 */
-	const COLUMN_ARTICLE_LABEL = 'label';
-	const COLUMN_ARTICLE_TEXT = 'text';
-	const COLUMN_ARTICLE_TIME = 'add_time';
-	const COLUMN_ARTICLE_EDIT_TIME = 'edit_time';
-	const COLUMN_ARTICLE_ID_USER = 'id_user';
-	const COLUMN_ARTICLE_ID_ITEM = 'id_item';
-	const COLUMN_ARTICLE_ID = 'id_article';
+class Articles_Model_Detail extends Model_PDO {
+   const DB_TABLE = 'articles';
 
-	/**
-	 * Sloupce u tabulky uživatelů
-	 * @var string
-	 */
-	const COLUMN_USER_NAME = 'username';
-	const COLUMN_USER_ID =	 'id_user';
-
-   private $articleLabel = null;
-//
-   private $articleText = null;
-//
-   private $articleId = null;
-//
-   private $articleIdUser = null;
-   private $lastEditIdArticle = null;
+/**
+ * Názvy sloupců v databázi
+ */
+   const COLUMN_NAME = 'name';
+   const COLUMN_TEXT = 'text';
+   const COLUMN_URLKEY = 'urlkey';
+   const COLUMN_ADD_TIME = 'add_time';
+   const COLUMN_EDIT_TIME = 'edit_time';
+   const COLUMN_ID_USER = 'id_user';
+   const COLUMN_ID_USER_LAST_EDIT = 'is_user_last_edit';
+   const COLUMN_ID_CATEGORY = 'id_cat';
+   const COLUMN_ID = 'id_article';
+   const COLUMN_SHOWED = 'viewed';
 
    /**
     * Metoda uloží novinku do db
@@ -37,23 +26,43 @@ class Articles_Model_Detail extends Model_Db {
     * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveNewArticle($articleLabels, $articleTexts, $idUser = 0) {
-      $articleArr = $this->createValuesArray(self::COLUMN_ARTICLE_LABEL, $articleLabels,
-                                          self::COLUMN_ARTICLE_TEXT, $articleTexts,
-                                          self::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId(),
-                                          self::COLUMN_ARTICLE_ID_USER, $idUser,
-                                          self::COLUMN_ARTICLE_TIME, time(),
-                                          self::COLUMN_ARTICLE_EDIT_TIME, time());
+   public function saveArticle($name, $text, $urlKey, $idCat = 0, $idUser = 0, $id = null) {
+      // globalní prvky
+      $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
+             self::COLUMN_URLKEY => $urlKey, self::COLUMN_EDIT_TIME => time()));
 
-      $sqlInsert = $this->getDb()->insert()->table($this->module()->getDbTable())
-      ->colums(array_keys($articleArr))
-      ->values(array_values($articleArr));
-//      //		Vložení do db
-      if($this->getDb()->query($sqlInsert)){
-         $this->lastEditIdArticle = $this->getDb()->getLastInsertedId();
-         return true;
+      $dbc = new Db_PDO();
+
+      if($id !== null) {
+         $this->setIUValues(array(self::COLUMN_ID_USER_LAST_EDIT => $idUser));
+
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET ".$this->getUpdateValues()
+          ." WHERE ".self::COLUMN_ID." = :id");
+         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+         return $dbst->execute();
       } else {
-         return false;
+         if($idCat == 0){
+            throw new InvalidArgumentException($this->_('Při ukládání nového článku musí být zadáno id'), 1);
+         }
+         // unikátní klíč
+//         $dbc = new Db_PDO();
+//         // načtu všechny existující url klíče
+//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)."
+//             WHERE (".self::COLUMN_ID_CATEGORY." = '".$idCat."')");
+//
+//         while($row = $dbst->fetch()){
+//            $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
+//         }
+
+         $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat,
+               self::COLUMN_ID_USER => $idUser,
+               self::COLUMN_ADD_TIME => time()));
+
+         $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+             ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
+
+         return $dbc->lastInsertId();
       }
    }
 
@@ -61,105 +70,56 @@ class Articles_Model_Detail extends Model_Db {
     * Metoda vrací id posledního vloženého článku
     * @return integer -- id článku
     */
-   public function getLastInsertedId() {
-      return $this->lastEditIdArticle;
+   public function addShowCount($urlKey) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET ".self::COLUMN_SHOWED." = ".self::COLUMN_SHOWED."+1"
+          ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey"
+          ." OR ".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey2)");
+      $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
+      $dbst->bindParam(':urlkey2', $urlKey, PDO::PARAM_STR);
+      return $dbst->execute();
    }
 
    /**
-    * Metoda vrací článek podle zadaného ID a v aktuálním jazyku
+    * Metoda vrací článek podle zadaného klíče
     *
-    * @param integer -- id článku
-    * @return array -- pole s článkem
+    * @param string -- url klíč článku
+    * @return PDOStatement -- pole s článkem
     */
-   public function getArticleDetailSelLang($id) {
-      //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable(), 'article')
-      ->colums(array(self::COLUMN_ARTICLE_LABEL =>"IFNULL(".self::COLUMN_ARTICLE_LABEL.'_'.Locale::getLang()
-            .",".self::COLUMN_ARTICLE_LABEL.'_'.Locale::getDefaultLang().")",
-            self::COLUMN_ARTICLE_TEXT =>"IFNULL(".self::COLUMN_ARTICLE_TEXT.'_'.Locale::getLang()
-            .",".self::COLUMN_ARTICLE_TEXT.'_'.Locale::getDefaultLang().")",
-            self::COLUMN_ARTICLE_TIME, self::COLUMN_ARTICLE_ID, self::COLUMN_ARTICLE_ID_USER))
-      ->join(array('user' => $this->getUserTable()),
-         array('article' => self::COLUMN_ARTICLE_ID_USER, self::COLUMN_USER_ID),
-         null, self::COLUMN_USER_NAME)
-//      ->join(array('user' => $this->getUserTable()), 'news.'.self::COLUMN_NEWS_ID_USER.' = user.'.self::COLUMN_ISER_ID, null, self::COLUMN_USER_NAME)
-      ->where('article.'.self::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
-      ->where('article.'.self::COLUMN_ARTICLE_ID, $id);
+   public function getArticle($urlKey) {
+      $dbc = new Db_PDO();
+         $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
+         ." FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
+         ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON article.".self::COLUMN_ID_USER
+         ." = user.".Model_Users::COLUMN_ID
+         ." WHERE (article.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey"
+         ." OR article.".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey2)".
+          " LIMIT 0, 1");
+       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
+       $dbst->bindParam(':urlkey2', $urlKey, PDO::PARAM_STR);
+      $dbst->execute();
 
-      $article = $this->getDb()->fetchAssoc($sqlSelect);
-
-      $this->articleId = $article[self::COLUMN_ARTICLE_ID];
-      $this->articleIdUser = $article[self::COLUMN_ARTICLE_ID_USER];
-
-      return $article;
-   }
-
-   public function getLabelsLangs() {
-      return $this->articleLabel;
-   }
-
-   public function getTextsLangs() {
-      return $this->articleText;
-   }
-
-   public function getId() {
-      return $this->articleId;
-   }
-
-   public function getIdUser() {
-      return $this->articleIdUser;
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      return $dbst->fetch();
    }
 
    /**
-    * Metoda vrací novinku podle zadaného ID ve všech jazycích
+    * Metoda vrací článek podle zadaného ID
     *
-    * @param integer -- id novinky
-    * @return array -- pole s novinkou
+    * @param int -- id článku
+    * @return PDOStatement -- pole s článkem
     */
-   public function getArticleDetailAllLangs($id) {
-      //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()
-      ->table($this->module()->getDbTable())
-      ->colums(Db::COLUMN_ALL)
-      ->where(self::COLUMN_ARTICLE_ID_ITEM, $this->module()->getId())
-      ->where(self::COLUMN_ARTICLE_ID, $id);
+   public function getArticleById($id) {
+      $dbc = new Db_PDO();
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
+         ." WHERE (".self::COLUMN_ID." = :id)".
+          " LIMIT 0, 1");
+      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+      $dbst->execute();
 
-      $article = $this->getDb()->fetchAssoc($sqlSelect);
-
-      if(empty ($article)){
-         throw new UnexpectedValueException(_('Zadaný článek neexistuje'), 1);
-      }
-      $article = $this->parseDbValuesToArray($article, array(self::COLUMN_ARTICLE_LABEL,
-               self::COLUMN_ARTICLE_TEXT));
-
-      $this->articleText = $article[self::COLUMN_ARTICLE_TEXT];
-      $this->articleLabel = $article[self::COLUMN_ARTICLE_LABEL];
-      $this->articleId = $article[self::COLUMN_ARTICLE_ID];
-
-      return $article;
-   }
-
-   /**
-    * Metoda uloží upravený článek do db
-    *
-    * @param array -- pole s detaily článku
-    */
-   public function saveEditArticle($labels, $texts, $id) {
-      $articleArr = $this->createValuesArray(self::COLUMN_ARTICLE_LABEL, $labels,
-                                          self::COLUMN_ARTICLE_TEXT, $texts,
-                                          self::COLUMN_ARTICLE_EDIT_TIME, time());
-
-      $sqlInsert = $this->getDb()->update()->table($this->module()->getDbTable())
-            ->set($articleArr)
-            ->where(self::COLUMN_ARTICLE_ID, $id);
-
-      // vložení do db
-      if($this->getDb()->query($sqlInsert)){
-         return true;
-      } else {
-         return false;
-      };
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      return $dbst->fetch();
    }
 
    /**
@@ -168,22 +128,32 @@ class Articles_Model_Detail extends Model_Db {
     * @return bool
     */
    public function deleteArticle($idArticle) {
-      $sqlDelete = $this->getDb()
-      ->delete()->table($this->module()->getDbTable())
-      ->where(self::COLUMN_ARTICLE_ID,$idArticle);
-
-      if($this->getDb()->query($sqlDelete)){
-         return true;
-      } else {
-         return false;
-      };
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
+          ." WHERE (".Articles_Model_Detail::COLUMN_ID ." = :id)");
+      $dbst->bindParam(':id', $idArticle, PDO::PARAM_INT);
+      return $dbst->execute();
    }
 
-   private function getUserTable() {
-      $tableUsers = AppCore::sysConfig()->getOptionValue(Auth::CONFIG_USERS_TABLE_NAME, Config::SECTION_DB_TABLES);
-      return $tableUsers;
+   /**
+    * Metoda vrací poslední změnu článků v dané kategorii
+    * @param int $id -- id kategorie
+    * @return int -- timestamp
+    */
+   public function getLastChange($id) {
+      $dbc = new Db_PDO();
+         $dbst = $dbc->prepare("SELECT ".self::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
+         ." WHERE (".self::COLUMN_ID_CATEGORY." = :id)".
+          " LIMIT 0, 1");
+      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+      $dbst->execute();
+      
+      $fetch = $dbst->fetchObject();
+      if($fetch != false){
+         return $fetch->et;
+      }
+      return false;
    }
-
 }
 
 ?>

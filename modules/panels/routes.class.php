@@ -1,0 +1,16 @@
+<?php
+/**
+ * Třída obsluhující cesty modulu
+ *
+ */
+class Panels_Routes extends Routes {
+	function initRoutes() {
+//      $this->addRoute('add', "add", 'add', null);
+//      $this->addRoute('edit', "category-::categoryid::/edit/", 'edit','category-{categoryid}/edit');
+//      $this->addRoute('detail', "category-::categoryid::/", 'show','category-{categoryid}');
+
+      $this->addRoute('normal', null, 'main', null);
+	}
+}
+
+?>
