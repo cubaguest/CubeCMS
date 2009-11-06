@@ -18,7 +18,7 @@ class Photogalery_Controller extends Controller {
    const SMALL_WIDTH = 75;
    const SMALL_HEIGHT = 75;
 
-   const MEDIUM_WIDTH = 400;
+   const MEDIUM_WIDTH = 600;
    const MEDIUM_HEIGHT = 400;
 
     /**
@@ -104,14 +104,66 @@ class Photogalery_Controller extends Controller {
             self::MEDIUM_WIDTH, self::MEDIUM_HEIGHT);
 
          // uloženhí do db
-         $imagesM->saveImage($image->getName(), $this->category()->getId());
+         $imagesM->saveImage($this->category()->getId(), $image->getName(), $image->getName());
 
          $this->infoMsg()->addMessage($this->_('Obrázek byl uložen'));
          $this->link()->reload();
       }
 
+      $editForm = new Form('editimage_');
+
+      $imgName = new Form_Element_Text('name', $this->_('Název'));
+      $imgName->setLangs();
+      $editForm->addElement($imgName);
+
+      $imgOrd = new Form_Element_Text('ord', $this->_('Pořadí'));
+      $editForm->addElement($imgOrd);
+
+      $imgDesc = new Form_Element_TextArea('desc', $this->_('Popis'));
+      $imgDesc->setLangs();
+      $editForm->addElement($imgDesc);
+
+      $imgDel = new Form_Element_Checkbox('delete', $this->_('Smazat'));
+      $editForm->addElement($imgDel);
+      $imgId = new Form_Element_Hidden('id');
+      $editForm->addElement($imgId);
+      $imgFile = new Form_Element_Hidden('file');
+      $editForm->addElement($imgFile);
+
+      $submit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $editForm->addElement($submit);
+
+      if($editForm->isValid()){
+         $files = $editForm->file->getValues();
+         $names = $editForm->name->getValues();
+         $descs = $editForm->desc->getValues();
+         $ordss = $editForm->ord->getValues();
+         foreach ($editForm->id->getValues() as $id){
+            if($editForm->delete->getValues($id) === true){
+               // mažese
+//               print ('smaz id'.$id."<br />");
+               // smazání souborů
+               $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir()
+                  .self::DIR_SMALL.DIRECTORY_SEPARATOR);
+               $file->remove();
+               $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir()
+                  .self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
+               $file->remove();
+               $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir());
+               $file->remove();
+               $imagesM->deleteImage($id);
+            } else {
+               // ukládají změny
+//               print ('ulož id'.$id."<br />");
+               $imagesM->saveImage($this->category()->getId(), null, $names[$id], $descs[$id],$ord[$id],$id);
+            }
+         }
+      }
+
+
       $this->view()->template()->images = $imagesM->getImages($this->category()->getId());
       $this->view()->template()->addForm = $addForm;
+      $this->view()->template()->editForm = $editForm;
       $this->view()->template()->addTplFile("editimages.phtml");
       $this->view()->template()->addCssFile("style.css");
    }

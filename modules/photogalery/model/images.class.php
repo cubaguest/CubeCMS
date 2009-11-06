@@ -29,15 +29,18 @@ class PhotoGalery_Model_Images extends Model_PDO {
       return $dbst;
    }
 
-   public function saveImage($file, $idCat, $name = null, $desc = null, $idImage = null) {
+   public function saveImage($idCat, $file = null, $name = null, $desc = null, $ord = 0, $idImage = null) {
       // globalní prvky
-      $this->setIUValues(array(self::COLUMN_FILE => $file, self::COLUMN_TIME_EDIT => time(),
-                               self::COLUMN_ID_CAT => $idCat));
+      $this->setIUValues(array(self::COLUMN_TIME_EDIT => time(),
+                               self::COLUMN_ID_CAT => $idCat,
+                               self::COLUMN_ORDER => $ord));
 
+      if($file != null){
+         $this->setIUValues(array(self::COLUMN_FILE => $file));
+      }
       if($name != null){
          $this->setIUValues(array(self::COLUMN_NAME => $name));
       }
-
       if($desc != null){
          $this->setIUValues(array(self::COLUMN_DESC => $desc));
       }
@@ -52,6 +55,19 @@ class PhotoGalery_Model_Images extends Model_PDO {
       } else {
          // provádí se update
       }
+   }
+
+   /**
+    * Metoda smaže zadaný obrázek
+    * @param integer $idImg
+    * @return bool
+    */
+   public function deleteImage($idImg) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
+          ." WHERE (".self::COLUMN_ID ." = :id)");
+      $dbst->bindParam(':id', $idImg, PDO::PARAM_INT);
+      return $dbst->execute();
    }
 	
 }

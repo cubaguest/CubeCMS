@@ -184,6 +184,13 @@ class Html_Element {
    }
 
    /**
+    * Metoda vymaže třídy elementu
+    */
+   public function clearClasses() {
+      $this->classes = array();
+   }
+
+   /**
     * Metoda vrací jestli je prvek prázdný - nemá žádný obsah
     * @return boolean
     */

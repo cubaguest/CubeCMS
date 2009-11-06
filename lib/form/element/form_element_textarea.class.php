@@ -28,21 +28,27 @@ class Form_Element_TextArea extends Form_Element_Text {
       }
 
       $values = $this->getValues();
-
+      $this->html()->clearClasses();
       $this->html()->addClass($this->getName()."_class");
       if($this->isMultiLang()) {
          $cnt = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-            $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
-            $this->html()->setAttrib('lang', $langKey);
-            $this->html()->clearContent();
-            $this->html()->addContent($values[$langKey]);
-
             $container = new Html_Element('p', $this->html());
-            $container->setAttrib('id', $this->getName().'_container_'.$langKey);
-            $container->addClass($this->getName()."_container_class");
-
+            $this->html()->clearContent();
+            $this->html()->setAttrib('lang', $langKey);
+            if($this->isDimensional()){
+               $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
+               $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional.'_'.$langKey);
+               $container->setAttrib('id', $this->getName()."_".$this->dimensional.'_container_'.$langKey);
+               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
+               $this->html()->addContent($values[$this->dimensional][$langKey]);
+            } else {
+               $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
+               $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
+               $container->setAttrib('id', $this->getName().'_container_'.$langKey);
+               $container->addClass($this->getName()."_container_class");
+               $this->html()->addContent($values[$langKey]);
+            }
             $cnt .= $container;
          }
          return $cnt;

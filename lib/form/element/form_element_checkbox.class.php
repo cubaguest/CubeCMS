@@ -25,8 +25,24 @@ class Form_Element_Checkbox extends Form_Element {
     */
    public function populate($method = 'post') {
       parent::populate($method);
+//      $this->checkValRecurs($this->values);
       if($this->values == null){
          $this->values = false;
+      }
+   }
+   /**
+    * @todo dořešit
+    * @param <type> $arr
+    */
+   private function checkValRecurs(&$arr) {
+      if(is_array($arr)){
+         foreach ($arr as &$var) {
+            $this->checkValRecurs($var);
+         }
+      } else {
+         if($arr == 'on'){
+            $arr = true;
+         }
       }
    }
 
