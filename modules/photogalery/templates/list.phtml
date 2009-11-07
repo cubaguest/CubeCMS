@@ -41,12 +41,11 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
                               .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="Title #0" />
                </a>
                <div class="caption">
-                  <?
-//                  if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null){?>
-                  <div class="image-title">Title #0</div>
-                  <?//}?>
+                  <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null){?>
+                  <div class="image-title"><?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?></div>
+                  <?}?>
                   <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null){?>
-                  <div class="image-desc">Description</div>
+                  <div class="image-desc"><?=$image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
                   <?}?>
 
                   <!--<div class="download">

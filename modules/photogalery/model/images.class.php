@@ -54,6 +54,11 @@ class PhotoGalery_Model_Images extends Model_PDO {
          return $dbc->lastInsertId();
       } else {
          // provádí se update
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET ".$this->getUpdateValues()
+          ." WHERE ".self::COLUMN_ID." = :id");
+         $dbst->bindParam(':id', $idImage, PDO::PARAM_INT);
+         return $dbst->execute();
       }
    }
 

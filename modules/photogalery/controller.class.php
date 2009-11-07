@@ -35,28 +35,14 @@ class Photogalery_Controller extends Controller {
       $this->checkWritebleRights();
 
       $form = new Form("text_");
-
-//      $label = new Form_Element_Text('label', $this->_('Nadpis'));
-//      $label->setSubLabel($this->_('Doplní se k nadpisu kategorie a stránky'));
-//      $label->setLangs();
-//      $form->addElement($label);
-
       $textarea = new Form_Element_TextArea('text', $this->_("Text"));
       $textarea->setLangs();
-//      $textarea->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
       $form->addElement($textarea);
-
-//      $textareaPanel = new Form_Element_TextArea('paneltext', $this->_("Text panelu"));
-//      $textareaPanel->setSubLabel($this->_('Je zobrazen v panelu, pokud je panel zapnut'));
-//      $textareaPanel->setLangs();
-//      $form->addElement($textareaPanel);
 
       $model = new Text_Model_Detail();
       $text = $model->getText($this->category()->getId());
       if($text != false){
          $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
-//         $form->label->setValues($text->{Text_Model_Detail::COLUMN_LABEL});
-//         $form->paneltext->setValues($text->{Text_Model_Detail::COLUMN_TEXT_PANEL});
       }
 
       $submit = new Form_Element_Submit('send', $this->_("Uložit"));
@@ -86,7 +72,6 @@ class Photogalery_Controller extends Controller {
       $imagesM = new PhotoGalery_Model_Images();
 
       $addForm = new Form('addimage_');
-
       $addFile = new Form_Element_File('image', $this->_('Obrázek'));
       $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $addFile->setUploadDir($this->category()->getModule()->getDataDir());
@@ -111,18 +96,14 @@ class Photogalery_Controller extends Controller {
       }
 
       $editForm = new Form('editimage_');
-
       $imgName = new Form_Element_Text('name', $this->_('Název'));
       $imgName->setLangs();
       $editForm->addElement($imgName);
-
       $imgOrd = new Form_Element_Text('ord', $this->_('Pořadí'));
       $editForm->addElement($imgOrd);
-
       $imgDesc = new Form_Element_TextArea('desc', $this->_('Popis'));
       $imgDesc->setLangs();
       $editForm->addElement($imgDesc);
-
       $imgDel = new Form_Element_Checkbox('delete', $this->_('Smazat'));
       $editForm->addElement($imgDel);
       $imgId = new Form_Element_Hidden('id');
@@ -137,12 +118,10 @@ class Photogalery_Controller extends Controller {
          $files = $editForm->file->getValues();
          $names = $editForm->name->getValues();
          $descs = $editForm->desc->getValues();
-         $ordss = $editForm->ord->getValues();
+         $orders = $editForm->ord->getValues();
          foreach ($editForm->id->getValues() as $id){
             if($editForm->delete->getValues($id) === true){
-               // mažese
-//               print ('smaz id'.$id."<br />");
-               // smazání souborů
+               // mažese smazání souborů
                $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir()
                   .self::DIR_SMALL.DIRECTORY_SEPARATOR);
                $file->remove();
@@ -154,10 +133,11 @@ class Photogalery_Controller extends Controller {
                $imagesM->deleteImage($id);
             } else {
                // ukládají změny
-//               print ('ulož id'.$id."<br />");
-               $imagesM->saveImage($this->category()->getId(), null, $names[$id], $descs[$id],$ord[$id],$id);
+               $imagesM->saveImage($this->category()->getId(), null, $names[$id], $descs[$id],$orders[$id],$id);
             }
          }
+         $this->infoMsg()->addMessage($this->_('Obrázky byly uloženy'));
+         $this->link()->reload();
       }
 
 
