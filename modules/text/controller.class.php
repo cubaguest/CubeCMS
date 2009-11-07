@@ -66,6 +66,8 @@ class Text_Controller extends Controller {
       $this->view()->template()->addCssFile("style.css");
       //
    }
+
+   public function textController() {}
 }
 
 ?>
