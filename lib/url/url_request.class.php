@@ -203,7 +203,6 @@ class Url_Request {
                    ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
 
                if(preg_match($regexp, $match['url'], $matches)) {
-//                  var_dump($matches);
                   $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
                   $this->moduleUrlPart = $matches['other'];
                   $this->parmas = $matches['params'];
@@ -223,7 +222,6 @@ class Url_Request {
    private function parseSpecialPageUrl() {
       $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?\?(?P<name>search)=(?P<action>.*)/i',
          '/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(html)+)/i');
-//      var_dump(self::$webUrl);
       foreach ($regexps as $regex) {
          $matches = array();
          if(preg_match($regex, self::$webUrl, $matches) != 0) {
@@ -251,7 +249,6 @@ class Url_Request {
       foreach ($regexps as $regex) {
          $matches = array();
          if(preg_match($regex, self::$webUrl, $matches) != 0) {
-//            var_dump($matches);
             if(isset ($matches['output'])) {
                $this->outputType = $matches['output'];
             }
@@ -272,7 +269,7 @@ class Url_Request {
     */
    private function parseModuleUrl() {
       $matches = array();//(?:(?P<lang>[a-z]{2})\/)?
-      if(!preg_match("/module\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+      if(!preg_match("/module\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[\/a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
       $this->category = $matches['category'];

@@ -647,7 +647,7 @@ class AppCore {
    public function runModuleOnly() {
       // spuštění modulu
       try {
-         if(self::getCategory() instanceof Category){
+         if(!self::getCategory() instanceof Category){
             throw new CoreException(_("Špatně zadaný požadavek na modul"));
          }
          // načtení a kontrola cest u modulu
@@ -1010,8 +1010,8 @@ class AppCore {
     */
    private function initialWebSettings() {
       $fileName = 'initial'.ucfirst($this->urlRequest->getOutputType()).'.php';
-      if(file_exists('./'.self::MODULES_DIR.DIRECTORY_SEPARATOR.$fileName)) {
-         require './'.self::MODULES_DIR.DIRECTORY_SEPARATOR.$fileName;
+      if(file_exists(AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName)) {
+         require AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName;
       }
    }
 
@@ -1026,7 +1026,7 @@ class AppCore {
       // načtení kategorie
       self::$category = new Category($this->urlRequest->getCategory(),true);
       Url_Link::setCategory(self::$category->getUrlKey());
-      if(!self::$category->isValid()) {
+      if(!self::getCategory()->isValid()) {
          AppCore::setErrorPage();
       }
 

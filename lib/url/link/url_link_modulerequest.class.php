@@ -12,56 +12,22 @@
  * @abstract 		Třída pro práci s odkazy
  */
 
-class Url_Link_Module extends Url_Link {
-   /**
-    * Objekt s cestami modulu
-    * @var Routes
-    */
-   private $routes = null;
-
+class Url_Link_ModuleRequest extends Url_Link {
+   const URL_REQUEST = 'module';
    /*
     * VEŘEJNÉ METODY
     */
 
-   /**
-    * Metoda nastavuje název a id routy
-    * @param string -- název cesty
-    * @param array -- pole s parametry pojmenovanými podle cesty
-    *
-    * @return Links -- objket Links
-    */
-   public function route($name = null, $params = array()) {
-      
-      if($name == null) {
-         $this->route = null;
-      } else {
-         $route = $this->routes->getRoute($name);
-         $routeReplacement = $route['replacement'];
-         if($routeReplacement != null AND $routeReplacement != '') {
-            foreach ($params as $pname => $pvalue) {
-               $routeReplacement = preg_replace("/{".$pname."}/i", $pvalue, $routeReplacement);
-            }
-            // odstranění nepoovinných parametrů, které nebyly zadány
-            $routeReplacement = preg_replace("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "", $routeReplacement);
-            // odstranění nevyplněných nepovinných parametrů
-            $routeReplacement = preg_replace("/[()]+/i", "", $routeReplacement);
-            $this->route = $routeReplacement;
-         } else {
-            $this->route = $route['regexp'];
-         }
-      }
-      return $this;
-   }
-
-   /**
-    * Metoda odstraní všechny parametry v odkazu
-    * @return Links -- sám sebe
-    */
-   public function clear($withOutCategory = false) {
-      $this->route()->rmParam();
-      parent::clear($withOutCategory);
-      return $this;
-   }
+    /**
+     * Metoda nastaví akci modulu
+     * @param string $request -- název akce modulu
+     * @param string $output -- typ výstupu (koncovka souboru)
+     * @return Url_Link_ModuleRequest
+     */
+    public function action($request, $output) {
+       $this->file($request.".".$output);
+       return $this;
+    }
 
    /*
     * PRIVÁTNÍ METODY
@@ -74,21 +40,38 @@ class Url_Link_Module extends Url_Link {
    protected function _init() {
       $this->lang = self::$currentlang;
       $this->category = self::$currentCategory;
-      $this->route = self::$currentRoute;
       $this->paramsArray = self::$currentParams;
    }
 
-   /**
-    * Metoda přidá cesty do objektu linků
-    * @param Routes $routes -- cesty modulu
-    */
-   public function setModuleRoutes(Routes $routes) {
-      $this->routes = $routes;
-   }
    /*
     * MAGICKÉ METODY
     */
-
+   /**
+    * Metoda převede objekt na řetězec
+    *
+    * @return string -- objekt jako řetězec
+    */
+   public function __toString() {
+      $returnString = Url_Request::getBaseWebDir().self::URL_REQUEST.URL_SEPARATOR;
+      if($this->lang != null) {
+         $returnString.=$this->getLang();
+      }
+      if($this->category != null) {
+         $returnString.=$this->getCategory();
+      }
+//      if($this->getRoute() != null) {
+//         $returnString.=$this->getRoute();
+//      }
+      if($this->file != null) {
+         $returnString.=$this->getFile();
+      }
+      //        Parsovatelné parametry
+      if(!empty ($this->paramsArray)) {
+         $returnString.=$this->getParams();
+      }
+      $returnString = $this->repairUrl($returnString);
+      return $returnString;
+   }
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");
 //echo("SERVER_NAME: ".$_SERVER["SERVER_NAME"]."<br>");

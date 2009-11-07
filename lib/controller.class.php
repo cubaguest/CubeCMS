@@ -360,12 +360,11 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
       if(method_exists($this->view(), $actionName.ucfirst($outputType).'View')) {
          $viewName = $actionName.ucfirst($outputType).'View';
       } else if(method_exists($this->view(), $actionName.'View')) {
-            $viewName = $actionName.'View';
-         } else {
-            trigger_error(sprintf(_("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
-                $actionName, $this->module()->getName()));
-
-         }
+         $viewName = $actionName.'View';
+      } else {
+         trigger_error(sprintf(_("Action Viewer \"%sView\" nebo \"%s\" v modulu \"%s\" nebyl implementován"),
+             $actionName, $actionName.ucfirst($outputType).'View', $this->module()->getName()));
+      }
 
       // spuštění Viewru
       if($this->{$actionName.'Controller'}() !== false AND $viewName != null) {
