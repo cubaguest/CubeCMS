@@ -26,9 +26,9 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
             <li>
                <a class="thumb" name="leaf" href="<?=$this->category()->getModule()->getDataDir(true)
                          .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-                  title="Title #0">
+                  title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
                   <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                              .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="Title #0" />
+                              .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
                </a>
                <div class="caption">
                      <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null) {?>
@@ -37,11 +37,10 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
                      <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null) {?>
                   <div class="image-desc"><?=$image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
                      <?}?>
-                     <div class="image-desc">Galleriffic is a jQuery plugin that provides a rich, post-back free experience optimized to handle high volumes of photos while conserving bandwidth. I am not so great at spelling</div>
-                  <!--<div class="download">
+                  <div class="download">
                      <a href="<?=$this->category()->getModule()->getDataDir(true)
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>">Download Original</a>
-                  </div>-->
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"><?=$this->_('Originál')?></a>
+                  </div>
                </div>
             </li>
             <?}?>
@@ -59,12 +58,13 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
       </div>
       <div id="caption" class="caption-container">
       </div>
+   <div style="position:relative; clear:both"></div>
    </div>
-   <div></div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
 
    <script type="text/javascript">
+      /* <![CDATA[ */
       jQuery(document).ready(function($) {
          // We only want these styles applied when javascript is enabled
          $('div.content').css('display', 'block');
@@ -181,6 +181,7 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
 
          /****************************************************************************************/
       });
+      /* ]]> */
    </script>
 
 
