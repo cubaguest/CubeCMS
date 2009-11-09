@@ -95,9 +95,15 @@ class Template_Module extends Template {
       if(eregi('http://[a-zA-Z_.]+', $jsfile)){
          self::addJS($jsfile);
       } else if(!$engine) {
-         self::addJS(self::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->category->getModule()->getName()).$jsfile);
+         $filePath = self::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->category->getModule()->getName(), false);
+         if($filePath != null){
+            self::addJS($filePath.$jsfile);
+         }
       } else {
-         self::addJS(parent::getFileDir($jsfile, Template::JAVASCRIPTS_DIR).$jsfile);
+         $filePath = parent::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);
+         if($filePath != null){
+            self::addJS($filePath.$jsfile);
+         }
       }
       return $this;
    }
@@ -111,9 +117,15 @@ class Template_Module extends Template {
       if(eregi('http://[a-zA-Z_.]+', $cssfile)){
          self::addCss($jsfile);
       } else if(!$engine) {
-         self::addCss(self::getFileDir($cssfile, self::STYLESHEETS_DIR, $this->category->getModule()->getName()).$cssfile);
+         $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $this->category->getModule()->getName(), false);
+         if($filePath != null){
+            self::addCss($filePath.$cssfile);
+         }
       } else {
-         self::addCss(parent::getFileDir($cssfile, Template::STYLESHEETS_DIR).$cssfile);
+         $filePath = parent::getFileDir($cssfile, Template::STYLESHEETS_DIR, false);
+         if($filePath!=null){
+            self::addCss($filePath.$cssfile);
+         }
       }
       return $this;
    }
@@ -125,17 +137,26 @@ class Template_Module extends Template {
     * @param boolean $engine -- jestli se jedná o objekt enginu nebo modulu
     * @return string -- adresář bez souboru
     */
-   public static function getFileDir($file, $dir = self::TEMPLATES_DIR, $moduleName = null) {
-      $faceDir = './'.self::FACES_DIR.DIRECTORY_SEPARATOR.self::$face.DIRECTORY_SEPARATOR
+   public static function getFileDir($file, $dir = self::TEMPLATES_DIR, $moduleName = null, $realpath = true) {
+      $faceDir = AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.self::$face.DIRECTORY_SEPARATOR
           .AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR
           .$dir.DIRECTORY_SEPARATOR;
-      $mainDir = './'.AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR
+      $mainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$moduleName.DIRECTORY_SEPARATOR
           .$dir.DIRECTORY_SEPARATOR;
       // pokud existuje soubor ve vzhledu
       if(file_exists($faceDir.$file)) {
-         return $faceDir;
+          if($realpath){
+             $faceDir;
+          } else {
+             return Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR.AppCore::MODULES_DIR.URL_SEPARATOR.$moduleName.URL_SEPARATOR;
+          }
+         
       } else if(file_exists($mainDir.$file)) {
-         return $mainDir;
+         if($realpath){
+            return $mainDir;
+         } else {
+            return null;
+         }
       } else {
          trigger_error(sprintf(_('Soubor "%s" s šablonou v modulu "%s" nebyl nalezen'),
                $file, $moduleName));

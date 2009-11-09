@@ -289,26 +289,30 @@ class Template {
    /**
     * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
     */
-   public function renderTemplate() {
-      print ($this);
-   }
+//   public function renderTemplate() {
+//      print ($this);
+//   }
 
 
    /**
     * Magická metoda převede šablonu na řetězec
     * @return string -- vygenerovaný řetězec z šablon
     */
-   public function  __toString() {
+   public function renderTemplate() {
    // zastavení výpisu buferu
       ob_start();
       foreach ($this->templateFiles as $file) {
          if(file_exists($file)){
-            include $file;
+            try {
+               include $file;
+            } catch (Exception $e) {
+               new CoreErrors($e);
+            }
          }
       }
       $contents = ob_get_contents();
       ob_end_clean();
-      return (string)$contents;
+      print (string)$contents;
    }
 
    /**
@@ -358,7 +362,7 @@ class Template {
             // pokud existuje css soubor u faces, vložíme ten
                if(file_exists(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
                    .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
-                  Template::addCss('./'.self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true).DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
+                  Template::addCss(Url_Request::getBaseWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true).DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
                } else {
                   Template::addCss($file->getName());
                }
@@ -377,7 +381,10 @@ class Template {
       if(eregi('http://[a-zA-Z_.]+', $jsfile)) {
          Template::addJS($jsfile);
       } else {
-         Template::addJS(Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR).$jsfile);
+         $filePath = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);
+         if($filePath != null){
+            Template::addJS($filePath.$jsfile);
+         }
       }
       return $this;
    }
@@ -388,7 +395,10 @@ class Template {
     * @return Template -- objekt sebe
     */
    public function addCssFile($cssfile) {
-      Template::addCss(Template::getFileDir($cssfile, Template::STYLESHEETS_DIR).$cssfile);
+      $filePath = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR, false);
+      if($filePath != null){
+         Template::addCss($filePath.$cssfile);
+      }
       return $this;
    }
 
@@ -443,15 +453,24 @@ class Template {
     * @param boolean $engine -- jestli se jedná o objekt enginu nebo modulu
     * @return string -- adresář bez souboru
     */
-   public static function getFileDir($file, $dir = self::TEMPLATES_DIR) {
-      $faceDir =  './'.self::FACES_DIR.DIRECTORY_SEPARATOR
+   public static function getFileDir($file, $dir = self::TEMPLATES_DIR, $realpath = true) {
+      $faceDir =  AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR
           .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
-      $mainDir = './'.$dir.DIRECTORY_SEPARATOR;
+      $mainDir = AppCore::getAppLibDir().$dir.DIRECTORY_SEPARATOR;
       // pokud existuje soubor ve vzhledu
       if(file_exists($faceDir.$file)) {
-         return $faceDir;
+          if($realpath){
+             return $faceDir;
+          } else {
+             return Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR.$dir.URL_SEPARATOR;
+          }
       } else if(file_exists($mainDir.$file)) {
-            return $mainDir;
+            if($realpath){
+               return $mainDir;
+            }
+            else {
+               return (string)null;
+            }
          } else {
             trigger_error(sprintf(_('Soubor "%s" nebyl nalezen'), $file));
          }

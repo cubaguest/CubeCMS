@@ -26,19 +26,23 @@ class Template_Core extends Template {
     * @return string -- cesta k souboru
     */
    public function style($name) {
-      return parent::getFileDir($name, self::STYLESHEETS_DIR).$name;
+      return parent::getFileDir($name, self::STYLESHEETS_DIR, false).$name;
    }
 
    /**
     * Magická metoda převede šablonu na řetězec
     * @return string -- vygenerovaný řetězec z šablon
     */
-   public function  __toString() {
+   public function  renderTemplate() {
    // zastavení výpisu buferu
+//      ob_start();
+//      foreach ($this->templateFiles as $file) {
+//         include $file;
+//      }
+//      $contents = ob_get_contents();
+//      ob_end_clean();
       ob_start();
-      foreach ($this->templateFiles as $file) {
-         include $file;
-      }
+      parent::renderTemplate();
       $contents = ob_get_contents();
       ob_end_clean();
 
@@ -67,7 +71,7 @@ class Template_Core extends Template {
       $title = null;
       $arr = array_merge(Template::pVar('CURRENT_CATEGORY_PATH'), self::$pageTitle);
       foreach ($arr as $subtitle) {
-         $title .= ' - '.(string)$subtitle;
+         $title .= ' '.VVE_PAGE_TITLE_SEPARATOR.' '.(string)$subtitle;
       }
 //      $title = substr($title, 0, strlen($title)-3);
       $contents = str_replace('{PAGE_TITLE}', $title, $contents);
@@ -79,8 +83,19 @@ class Template_Core extends Template {
       }
       $headline = substr($headline, 0, strlen($headline)-strlen(VVE_HEADLINE_SEPARATOR));
       $contents = str_replace('{PAGE_HEADLINE}', $headline, $contents);
-      
-      return (string)$contents;
+
+      // dovypsání CoreErrors
+      if(!CoreErrors::isEmpty()){
+         $tpl = new Template(new Url_Link(true));
+         $tpl->addTplFile('coreerrors.phtml');
+         ob_start();
+         $tpl->renderTemplate();
+         $errContents = ob_get_contents();
+         ob_end_clean();
+         $contents = str_replace('{CORE_ERRORS}', $errContents, $contents);
+      }
+
+      print ((string)$contents);
    }
 }
 ?>
