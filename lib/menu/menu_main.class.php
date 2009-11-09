@@ -41,14 +41,20 @@ class Menu_Main {
       $this->init();
    }
 
+   /**
+    * Metoda provede inicializaci menu
+    */
+   public static function factory() {
+      // načtení menu z
+      self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+      $catModel = new Model_Category();
+      self::$menu->setCategories($catModel->getCategoryList());
+   }
+
    protected function init() {}
 
    public function controller() {
-      // načtení menu z
-      self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
 
-      $catModel = new Model_Category();
-      self::$menu->setCategories($catModel->getCategoryList());
    }
 
    public function view() {
