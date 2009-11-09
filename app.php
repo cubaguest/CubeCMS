@@ -526,24 +526,28 @@ class AppCore {
     * Metoda vytvoří hlavní menu aplikace
     */
    public function createMainMenu() {
-         try {
-            if(!file_exists('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-                  . 'menu.class.php')){
-               throw new BadFileException(_('Soubor s třídou pro tvorbu menu nebyl nalezen'), 5);
-            }
-            require_once ('.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-               . 'menu.class.php');
-   
-            if(!class_exists("Menu", false)){
-               throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
-            }
-            $menu = new Menu();
-            $menu->controller();
-            $menu->view();
-            $this->coreTpl->menuObj = $menu->template();
-         } catch (Exception $e) {
-            new CoreErrors($e);
+      Menu_Main::factory();
+      try {
+         if(!file_exists(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR . DIRECTORY_SEPARATOR
+             . 'menu.class.php')) {
+            $menuFile = AppCore::getAppLibDir().AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+                . 'menu.class.php';
+         } else {
+            $menuFile = AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR . DIRECTORY_SEPARATOR
+                . 'menu.class.php';
          }
+         require_once $menuFile;
+
+         if(!class_exists("Menu", false)) {
+            throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
+         }
+         $menu = new Menu();
+         $menu->controller();
+         $menu->view();
+         $this->coreTpl->menuObj = $menu->template();
+      } catch (Exception $e ) {
+         new CoreErrors($e);
+      }
    }
 
    /**
@@ -1089,6 +1093,8 @@ class AppCore {
             $this->coreTpl->pageNotFound = true;
          }
 
+         // vložení proměných šablony z jadra
+         $this->assignMainVarsToTemplate();
          //	Přiřazení hlášek do šablony
          $this->assignMessagesToTpl();
 
