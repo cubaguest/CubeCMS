@@ -29,7 +29,7 @@ class PhotoGalery_Model_Images extends Model_PDO {
       return $dbst;
    }
 
-   public function saveImage($idCat, $file = null, $name = null, $desc = null, $ord = 0, $idImage = null) {
+   public function saveImage($idCat, $file = null, $name = null, $desc = null, $ord = '0', $idImage = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_TIME_EDIT => time(),
                                self::COLUMN_ID_CAT => $idCat,
@@ -38,9 +38,20 @@ class PhotoGalery_Model_Images extends Model_PDO {
       if($file != null){
          $this->setIUValues(array(self::COLUMN_FILE => $file));
       }
+
       if($name != null){
+         //vatvoření pole s popisky
+         if(!is_array($name)){
+            $langs = Locale::getAppLangs();
+            $names = array();
+            foreach ($langs as $l) {
+               $names[$l]=$name;
+            }
+            $name=$names;
+         }
          $this->setIUValues(array(self::COLUMN_NAME => $name));
       }
+
       if($desc != null){
          $this->setIUValues(array(self::COLUMN_DESC => $desc));
       }
