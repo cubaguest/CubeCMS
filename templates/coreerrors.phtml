@@ -1,0 +1,19 @@
+<div class="message errorMessage">
+   <img src="<?=Template::face(false)?>images/icons/coreerror.png" alt="core error icon" />
+      <?
+      $errors = CoreErrors::getErrors();
+      foreach ($errors as $error) {?>
+   <p>
+            <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
+            <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?><br />
+            <? if($this->debugMode) {
+               foreach ($error["trace"] as $err) {?>
+                  <?=$err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
+                  echo _("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;"._("řádek").": ".$err["line"];?>
+      <br />
+               <?}
+            }?>
+   </p>
+      <?}?>
+   <hr class="reseter" />
+</div>

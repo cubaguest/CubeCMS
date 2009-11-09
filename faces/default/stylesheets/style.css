@@ -230,14 +230,14 @@ a:hover {
 
 /* Hlášky */
 .errorMessage, .message {
-	font-size: small;
-	padding: 5px;
-	/*font-weight: 600;*/
+   font-size: small;
+   padding: 5px;
+   /*font-weight: 600;*/
 }
 
-.errorMessage { /* text-align: center; */
-	background-color: #FFAEAE;
-	border: 2px solid #8B0306;
+.message { /* text-align: center; */
+           background-color: #9CCFFF;
+           border: 2px solid #688AAA;
 }
 
 .errorMessage p.errorContent {
@@ -246,17 +246,15 @@ a:hover {
    display:block;
 }
 
-.message { /* text-align: center; */
-	background-color: #9CCFFF;
-	border: 2px solid #688AAA;
+.errorMessage { /* text-align: center; */
+                background-color: #FFAEAE;
+                border: 2px solid #8B0306;
 }
 
 .errorMessage img, .message img {
-	float: left;
-	vertical-align: middle;
+   float: left;
+   vertical-align: middle;
 }
-
-
 
 /* formulařové prvky */
 .requiredElem {
