@@ -17,14 +17,14 @@ class Model_Module extends Model {
  * @return array -- pole s moduly
  */
    public function getModules() {
-      $handle = opendir(AppCore::getAppWebDir().AppCore::MODULES_DIR);
+      $handle = opendir(AppCore::getAppLibDir().AppCore::MODULES_DIR);
       if (!$handle) {
          trigger_error(_('Nepodařilo se otevřít adresář s moduly'));
       }
 
       $directories = array();
       while (false !== ($file = readdir($handle))) {
-         if ($file != "." AND $file != ".." AND is_dir(AppCore::getAppWebDir()
+         if ($file != "." AND $file != ".." AND is_dir(AppCore::getAppLibDir()
                .AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$file)) {
             array_push($directories, $file);
          }
