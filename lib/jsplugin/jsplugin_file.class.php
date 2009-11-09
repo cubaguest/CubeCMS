@@ -44,9 +44,11 @@ class JsPlugin_File {
 		$this->file = $file;
       $this->virtualFile = $virtual;
       if($virtual){
-         $this->dir = "./jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
+         $this->dir = Url_Request::getBaseWebDir()."jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
+//         $this->dir = "jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
       } else {
-         $this->dir = "./".JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
+         $this->dir = Url_Request::getBaseWebDir().JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
+//         $this->dir = JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
       }
 	}
 	
