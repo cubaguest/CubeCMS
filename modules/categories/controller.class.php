@@ -150,19 +150,24 @@ class Categories_Controller extends Controller {
          $urlkey = $form->urlkey->getValues();
          $names = $form->name->getValues();
          $p = end($path);
-         $catObj = $p->getCatObj()->getCatDataObj();
+         $catObj = null;
+         if($p->getCatObj() != null){
+            $catObj = $p->getCatObj()->getCatDataObj();
+         }
 
          foreach ($urlkey as $lang => $variable) {
          // klíč podkategorií
             $urlPath = null;
-            $urlPath = $catObj[Model_Category::COLUMN_URLKEY][$lang];
+            if($catObj != null){
+               $urlPath = $catObj[Model_Category::COLUMN_URLKEY][$lang];
+            }
             if($urlPath != null) $urlPath .= URL_SEPARATOR;
             if($variable == null AND $names[$lang] == null) {
                $urlkey[$lang] = null;
             } else if($variable == null AND $names[$lang] != null) {
-               $urlkey[$lang] = $urlPath.vve_cr_url_key($names[$lang]);
+               $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($names[$lang]));
             } else {
-               $urlkey[$lang] = vve_cr_url_key($variable);
+               $urlkey[$lang] = vve_cr_url_key(strtolower($variable));
             }
          }
 
@@ -234,9 +239,9 @@ class Categories_Controller extends Controller {
             if($variable == null AND $names[$lang] == null) {
                $urlkey[$lang] = null;
             } else if($variable == null) {
-               $urlkey[$lang] = $urlPath.vve_cr_url_key($names[$lang]);
+               $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($names[$lang]));
             } else {
-               $urlkey[$lang] = $urlPath.vve_cr_url_key($variable);
+               $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($variable));
                
             }
          }
