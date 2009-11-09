@@ -45,6 +45,12 @@ class Html_Element {
    protected $content = null;
 
    /**
+    * Obsah elementu který se přidá na konec před vykreslením
+    * @var string
+    */
+   protected $contentEnd = null;
+
+   /**
     * Pole s elementy, které jsou inline (nepárové)
     * @var array
     */
@@ -110,7 +116,7 @@ class Html_Element {
     * Metoda vrátí obsah elementu
     */
    public function __toStringContent() {
-      return $this->content;
+      return $this->content.$this->contentEnd;
    }
 
    /**
@@ -174,8 +180,12 @@ class Html_Element {
     * Metoda přidá potomka elementu (objekt elemeentu)
     * @param Html_Element $content -- objekt elementu
     */
-   public function addContent($content) {
-      $this->content .= (string)$content;
+   public function addContent($content, $end = false) {
+      if(!$end){
+         $this->content .= (string)$content;
+      } else {
+         $this->contentEnd .= (string)$content;
+      }
    }
 
    /**
@@ -183,6 +193,7 @@ class Html_Element {
     */
    public function clearContent() {
       $this->content = null;
+      $this->contentEnd = null;
    }
 
    /**
@@ -197,7 +208,7 @@ class Html_Element {
     * @return boolean
     */
    public function isEmpty() {
-      if($this->content == null){
+      if($this->content == null AND $this->contentEnd == null){
          return true;
       }
       return false;

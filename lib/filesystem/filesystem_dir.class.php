@@ -56,7 +56,7 @@ class Filesystem_Dir {
 	 * @param string -- adresář
 	 */
    public function createDir($path){
-      if(!mkdir($path, 0777, true)){
+      if(!@mkdir($path, 0777, true)){
          throw new CoreException(sprintf(_('Adresáři "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),$path), 2);
       }
       if(!chmod($path, 0777)){
@@ -85,12 +85,12 @@ class Filesystem_Dir {
 				}
 				closedir($dir);
 			}
-			if (!rmdir($filepath)){
+			if (!@rmdir($filepath)){
             throw new CoreException(sprintf(_('Adresář "%s" se nepodařilo smazát.'),$filepath),5);
 			}
          return true;
 		} else if(file_exists($filepath)){
-			if (!unlink($filepath)){
+			if (!@unlink($filepath)){
             throw new CoreException(sprintf(_('Soubor "%s" se nepodařilo smazát.'),$filepath),6);
 			}
 		}

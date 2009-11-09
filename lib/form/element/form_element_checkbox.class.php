@@ -54,6 +54,8 @@ class Form_Element_Checkbox extends Form_Element {
    public function getValues($key = null) {
       if($key !== null AND isset($this->values[$key])){
          return true;
+      } else if(isset ($this->values) AND $this->values !== false) {
+         return true;
       }
 //      else if($key !== null AND is_array($this->values) AND !isset($this->values[$key])) {
 //         return false;

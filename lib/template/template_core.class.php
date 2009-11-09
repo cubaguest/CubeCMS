@@ -69,7 +69,11 @@ class Template_Core extends Template {
 
       // doplníme titulek stránky
       $title = null;
-      $arr = array_merge(Template::pVar('CURRENT_CATEGORY_PATH'), self::$pageTitle);
+      if(is_array(Template::pVar('CURRENT_CATEGORY_PATH'))){
+         $arr = array_merge(Template::pVar('CURRENT_CATEGORY_PATH'), self::$pageTitle);
+      } else {
+         $arr = self::$pageTitle;
+      }
       foreach ($arr as $subtitle) {
          $title .= ' '.VVE_PAGE_TITLE_SEPARATOR.' '.(string)$subtitle;
       }

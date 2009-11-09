@@ -287,16 +287,20 @@ class Template {
    }
 
    /**
-    * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
+    * Magická metoda převede šablonu na řetězec
+    * @return string -- vygenerovaný řetězec z šablon
     */
-//   public function renderTemplate() {
-//      print ($this);
-//   }
+   public function  __toString() {
+      ob_start();
+      $this->renderTemplate();
+      $cnt = ob_get_contents();
+      ob_clean();
+      return $cnt;
+   }
 
 
    /**
-    * Magická metoda převede šablonu na řetězec
-    * @return string -- vygenerovaný řetězec z šablon
+    * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
     */
    public function renderTemplate() {
    // zastavení výpisu buferu

@@ -414,7 +414,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function subLabel() {
       $this->htmlSubLabel()->addContent($this->formElementSubLabel);
-      return (string)$this->htmlSubLabel();
+      return $this->htmlSubLabel();
    }
 
    /**
@@ -454,6 +454,7 @@ class Form_Element implements Form_Element_Interface {
          }
          return $cnt;
       } else {
+         $container = new Html_Element('p');
          if($this->isDimensional()){
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
             $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
@@ -464,8 +465,9 @@ class Form_Element implements Form_Element_Interface {
          //         $this->html()->setAttrib('type', 'text');
          
          $this->html()->setAttrib('value', htmlspecialchars((string)$values));
+         $container->addContent($this->html());
+         return $container;
       }
-      return $this->html();
    }
 
    public function labelValidations() {
@@ -519,7 +521,7 @@ class Form_Element implements Form_Element_Interface {
     * Metoda pro generování scriptů. potřebných pro práci s formulářem
     */
    public function scripts() {
-      if($this->isMultiLang()) {
+      if($this->isMultiLang() AND count($this->langs) > 1) {
       // script pro vybrání jazyka -- TODO předělat
          $script = new Html_Element_Script();
          $script->setAttrib('type', "text/javascript");

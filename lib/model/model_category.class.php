@@ -201,13 +201,13 @@ class Model_Category extends Model_PDO {
     * @param <type> $sitemapPriority
     * @param <type> $sitemapFrequency
     */
-   public function saveEditCategory($id, $name, $alt, $module, $keywords, $description, $urlkey,
+   public function saveEditCategory($id, $name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt,self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
-          self::COLUMN_MODULE => $module, self::COLUMN_KEYWORDS => $keywords,
+          self::COLUMN_MODULE => $module, self::COLUMN_PARAMS => $moduleParams, self::COLUMN_KEYWORDS => $keywords,
           self::COLUMN_DESCRIPTION => $description, self::COLUMN_URLKEY => $urlkey,
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
