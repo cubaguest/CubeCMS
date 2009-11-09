@@ -13,23 +13,13 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
    <div>
          <?=$text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
+   <br />
    <?}?>
 
    <!-- Start Advanced Gallery Html Containers -->
-   <div class="content">
-      <div class="slideshow-container">
-         <div id="caption" class="caption-container">
-            <div class="photo-index"></div>
-         </div>
-         <div id="controls" class="controls"></div>
-         <div id="loading" class="loader"></div>
-         <div id="slideshow" class="slideshow"></div>
-      </div>
-
-   </div>
    <div class="navigation-container">
       <div id="thumbs" class="navigation">
-         <a class="pageLink prev" style="visibility: hidden;" href="#" title="Previous Page">&lt;&lt;</a>
+         <a class="pageLink prev" style="visibility: hidden;" href="#" title="Previous Page">&lt;</a>
          <ul class="thumbs noscript">
             <?while ($image = $images->fetch()) {
                ?>
@@ -41,25 +31,38 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
                               .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="Title #0" />
                </a>
                <div class="caption">
-                  <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null){?>
+                     <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null) {?>
                   <div class="image-title"><?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?></div>
-                  <?}?>
-                  <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null){?>
+                     <?}?>
+                     <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null) {?>
                   <div class="image-desc"><?=$image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
-                  <?}?>
-
+                     <?}?>
+                     <div class="image-desc">Galleriffic is a jQuery plugin that provides a rich, post-back free experience optimized to handle high volumes of photos while conserving bandwidth. I am not so great at spelling</div>
                   <!--<div class="download">
                      <a href="<?=$this->category()->getModule()->getDataDir(true)
-                               .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>">Download Original</a>
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>">Download Original</a>
                   </div>-->
                </div>
             </li>
             <?}?>
          </ul>
-         <a class="pageLink next" style="visibility: hidden;" href="#" title="Next Page">&gt;&gt;</a>
+         <a class="pageLink next" style="visibility: hidden;" href="#" title="Next Page">&gt;</a>
 
       </div>
    </div>
+
+   <div class="content">
+      <div class="slideshow-container">
+         <div id="controls" class="controls"></div>
+         <div id="loading" class="loader"></div>
+         <div id="slideshow" class="slideshow"></div>
+      </div>
+      <div id="caption" class="caption-container">
+      </div>
+   </div>
+   <div></div>
+   <!-- End Gallery Html Containers -->
+   <hr class="reseter" />
 
    <script type="text/javascript">
       jQuery(document).ready(function($) {
@@ -79,8 +82,8 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
          // Initialize Advanced Galleriffic Gallery
          var gallery = $('#thumbs').galleriffic({
             delay:                     2000,
-            numThumbs:                 7,
-            preloadAhead:              7,
+            numThumbs:                 6,
+            preloadAhead:              6,
             enableTopPager:            false,
             enableBottomPager:         false,
             imageContainerSel:         '#slideshow',
@@ -107,7 +110,7 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
 
                // Update the photo index display
                this.$captionContainer.find('div.photo-index')
-               .html('Photo '+ (nextIndex+1) +' of '+ this.data.length);
+               .html('<?=$this->_('Fotka')?> '+ (nextIndex+1) +' <?=$this->_('z')?> '+ this.data.length);
             },
             onPageTransitionOut:       function(callback) {
                this.fadeTo('fast', 0.0, callback);

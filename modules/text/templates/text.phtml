@@ -14,8 +14,7 @@ if($text != false) {
 ?>
 <div>
    <div><?=$text?></div>
-   <? // zapnuti lightboxu pokud je nastavenos
-   //if((bool)$this->category()->getModule()->getParam(Text_Controller::PARAM_FILES, true)) {?>
+   <? $this->addJsPlugin(new JsPlugin_LightBox())?>
    <script type="text/javascript">
       $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
    </script>

@@ -40,7 +40,8 @@ $this->addPageHeadline($this->_('úprava obrázků'));
                   $this->editForm->ord->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                   $this->editForm->ord->setValues($image->{PhotoGalery_Model_Images::COLUMN_ORDER});
                   print ($this->editForm->ord->label());
-                  print ($this->editForm->ord->controll()->setAttrib('size', 5));
+                  $this->editForm->ord->html()->setAttrib('size', 5);
+                  print ($this->editForm->ord->controll());
                   print ($this->editForm->ord->scripts());
                   ?>
                   <?

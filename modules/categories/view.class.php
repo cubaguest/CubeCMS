@@ -12,8 +12,8 @@ class Categories_View extends View {
    public function showView() {
    }
 
-//   public function editView() {
-//   }
+   public function moduledocView() {
+   }
 }
 
 ?>

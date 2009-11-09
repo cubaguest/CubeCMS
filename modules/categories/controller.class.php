@@ -125,6 +125,7 @@ class Categories_Controller extends Controller {
 
 
       $form->module->setValues($cat[Model_Category::COLUMN_MODULE]);
+      $form->moduleParams->setValues($cat[Model_Category::COLUMN_PARAMS]);
       $form->urlkey->setValues($cat[Model_Category::COLUMN_URLKEY]);
       $form->priority->setValues($cat[Model_Category::COLUMN_PRIORITY]);
       $form->individual_panels->setValues($cat[Model_Category::COLUMN_INDIVIDUAL_PANELS]);
@@ -179,10 +180,9 @@ class Categories_Controller extends Controller {
             $grName = Model_Category::COLUMN_GROUP_PREFIX.$group[Model_Users::COLUMN_GROUP_NAME];
             $rights[$grName] = $form->{$grName}->getValues();
          }
-
          $categoryModel = new Model_Category();
          $categoryModel->saveEditCategory($this->getRequest('categoryid'), $form->name->getValues(),$form->alt->getValues(),
-             $form->module->getValues(),$form->keywords->getValues(),
+             $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
              $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
              $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
              $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
@@ -257,7 +257,7 @@ class Categories_Controller extends Controller {
 
          $categoryModel = new Model_Category();
          $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
-             $form->module->getValues(),$form->keywords->getValues(),
+             $form->module->getValues(), $form->moduleParams->getValues(),$form->keywords->getValues(),
              $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
              $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
              $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
@@ -327,6 +327,13 @@ class Categories_Controller extends Controller {
       $catModule = new Form_Element_Select('module', $this->_('Modul'));
       $catModule->setOptions($options);
       $form->addElement($catModule, 'settings');
+
+
+
+      // url klíč kategorie
+      $catModuleParams = new Form_Element_Text('moduleParams', $this->_('Paramerty modulu'));
+      $catModuleParams->setSubLabel($this->_('Parametry jednotlivých modulu lze nalést v dokumentaci k modulům. Udávají se ve tveru "param=value;param2=value"'));
+      $form->addElement($catModuleParams,'settings');
 
       // url klíč kategorie
       $catUrlKey = new Form_Element_Text('urlkey', $this->_('Url klíč'));
@@ -408,6 +415,16 @@ class Categories_Controller extends Controller {
          foreach ($categories as $cat) {
             $this->catsToArrayForForm($cat);
          }
+      }
+   }
+
+   public function moduledocController() {
+      if(file_exists(AppCore::getAppLibDir().'docs'.DIRECTORY_SEPARATOR.AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+         .$this->getRequestParam('module').DIRECTORY_SEPARATOR.'spicifikation.html')){
+         print file_get_contents(AppCore::getAppLibDir().'docs'.DIRECTORY_SEPARATOR.AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+         .$this->getRequestParam('module').DIRECTORY_SEPARATOR.'spicifikation.html');
+      } else {
+         print ($this->_('Dokumentace k modulu neexistuje'));
       }
    }
 

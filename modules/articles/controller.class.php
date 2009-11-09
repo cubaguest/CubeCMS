@@ -15,7 +15,7 @@ class Articles_Controller extends Controller {
          $artModel->getCountArticles($this->category()->getId()));
       
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-         $this->category()->getModule()->getParam('article_scroll', 2));
+         $this->category()->getModule()->getParam('scroll', 2));
 
       $scrollComponent->runCtrlPart();
   

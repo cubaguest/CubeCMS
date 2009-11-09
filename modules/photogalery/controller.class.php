@@ -84,9 +84,11 @@ class Photogalery_Controller extends Controller {
          $file = $addFile->getValues();
          $image = new Filesystem_File_Image($file['name'], $this->category()->getModule()->getDataDir());
          $image->saveAs($this->category()->getModule()->getDataDir().self::DIR_SMALL,
-            self::SMALL_WIDTH, self::SMALL_HEIGHT, true);
+            $this->category()->getModule()->getParam('imagesmallwidth', self::SMALL_WIDTH),
+            $this->category()->getModule()->getParam('imagesmallheight', self::SMALL_HEIGHT), true);
          $image->saveAs($this->category()->getModule()->getDataDir().self::DIR_MEDIUM,
-            self::MEDIUM_WIDTH, self::MEDIUM_HEIGHT);
+            $this->category()->getModule()->getParam('imagewidth', self::MEDIUM_WIDTH),
+            $this->category()->getModule()->getParam('imageheight', self::MEDIUM_HEIGHT));
 
          // uloženhí do db
          $imagesM->saveImage($this->category()->getId(), $image->getName(), $image->getName());
