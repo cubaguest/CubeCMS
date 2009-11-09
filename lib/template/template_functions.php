@@ -96,8 +96,12 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...'){
     * @param int $maxHeight -- maximální výška
     * @return string -- tag obrázku
     */
-   function vve_tpl_image_tag($imagePath, $alt = null, $mw = false, $mh = false, $clases = null, $other = null) {
+   function vve_tpl_image_tag($imagePath, $alt = null, $mw = false, $mh = false, $clases = null, $other = null, $realpath = false) {
       if(file_exists($imagePath) OR ereg('^http.*', $imagePath)){
+         // zajistíme převod na reálnou adresu
+         if(strpos(Url_Request::getBaseWebDir(), $imagePath)){
+            $imagePath = str_replace(Url_Request::getBaseWebDir(),AppCore::getAppWebDir(), $imagePath);
+         }
          $imageSizes = getimagesize($imagePath);
          if($imageSizes){
             list($w,$h) = $imageSizes;
@@ -122,7 +126,8 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...'){
 //               substr($others, 0, strlen($other)-1);
 //               $others = $others." ";
             }
-
+            // převod zpět na adresu serveru
+            $imagePath = str_replace(AppCore::getAppWebDir(), Url_Request::getBaseWebDir(), $imagePath);
             return("<img src=\"{$imagePath}\" alt=\"{$alt}\" width=\"{$w}\" height=\"{$h}\" {$class}{$others}/>");
          }
       }
