@@ -8,7 +8,7 @@
       <meta http-equiv="pragma" content="no-cache" />
       <meta http-equiv="pragma" content="-1" />
       <?}?>
-      <title><?print(VVE_WEB_NAME);?>{PAGE_TITLE}</title>
+      <title><?print(VVE_WEB_NAME);?>{*-PAGE_TITLE-*}</title>
 
       <base href="<?=Links::getMainWebDir()?>" />
 
@@ -21,8 +21,8 @@
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
 
-      {STYLESHEETS}
-      {JAVASCRIPTS}
+      {*-STYLESHEETS-*}
+      {*-JAVASCRIPTS-*}
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
       <script type="text/javascript" src="jscripts/smoothmenu/ddsmoothmenu.js">
@@ -77,7 +77,7 @@
                <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['left'])) echo " col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);?>
-                  <h1>{PAGE_HEADLINE}</h1>
+                  <h1>{*-PAGE_HEADLINE-*}</h1>
                   <?if($this->pageNotFound) {
                      $this->includeTpl("error404.phtml", true);
                   } else if($this->specialPage) {

@@ -55,7 +55,7 @@ class Template_Core extends Template {
          $elem->setAttrib('href', $css);
          $cssfiles .= $elem;
       }
-      $contents = str_replace('{STYLESHEETS}', $cssfiles, $contents);
+      $contents = str_replace('{*-STYLESHEETS-*}', $cssfiles, $contents);
 
       //vytvoříme pole javascriptů
       $jscripts = null;
@@ -65,7 +65,7 @@ class Template_Core extends Template {
          $elem->setAttrib('type', "text/javascript");
          $jscripts .= $elem;
       }
-      $contents = str_replace('{JAVASCRIPTS}', $jscripts, $contents);
+      $contents = str_replace('{*-JAVASCRIPTS-*}', $jscripts, $contents);
 
       // doplníme titulek stránky
       $title = null;
@@ -74,7 +74,7 @@ class Template_Core extends Template {
          $title .= ' '.VVE_PAGE_TITLE_SEPARATOR.' '.(string)$subtitle;
       }
 //      $title = substr($title, 0, strlen($title)-3);
-      $contents = str_replace('{PAGE_TITLE}', $title, $contents);
+      $contents = str_replace('{*-PAGE_TITLE-*}', $title, $contents);
 
       // doplníme hlavní nadpis stránky
       $headline = null;
@@ -82,7 +82,7 @@ class Template_Core extends Template {
          $headline .= (string)$line.VVE_HEADLINE_SEPARATOR;
       }
       $headline = substr($headline, 0, strlen($headline)-strlen(VVE_HEADLINE_SEPARATOR));
-      $contents = str_replace('{PAGE_HEADLINE}', $headline, $contents);
+      $contents = str_replace('{*-PAGE_HEADLINE-*}', $headline, $contents);
 
       // dovypsání CoreErrors
       if(!CoreErrors::isEmpty()){
@@ -92,9 +92,11 @@ class Template_Core extends Template {
          $tpl->renderTemplate();
          $errContents = ob_get_contents();
          ob_end_clean();
-         $contents = str_replace('{CORE_ERRORS}', $errContents, $contents);
+         $contents = str_replace('{*-CORE_ERRORS-*}', $errContents, $contents);
       }
 
+      // odstranění všech proměnných
+      $contents = preg_replace('/\{\*\-[A-Za-z0-9_-]+-\*\}/', '', $contents);
       print ((string)$contents);
    }
 }
