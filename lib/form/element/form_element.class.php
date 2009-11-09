@@ -370,7 +370,6 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function label() {
-      $this->htmlLabel()->clearClasses();
       $this->htmlLabel()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
          $this->htmlLabel()->addClass('formErrorLabel');
@@ -429,7 +428,6 @@ class Form_Element implements Form_Element_Interface {
       }
 
       $values = $this->getValues();
-      $this->html()->clearClasses();
       $this->html()->addClass($this->getName()."_class");
 
       if($this->isMultiLang()) {

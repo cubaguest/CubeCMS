@@ -28,7 +28,6 @@ class Form_Element_TextArea extends Form_Element_Text {
       }
 
       $values = $this->getValues();
-      $this->html()->clearClasses();
       $this->html()->addClass($this->getName()."_class");
       if($this->isMultiLang()) {
          $cnt = null;
