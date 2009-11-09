@@ -164,7 +164,9 @@ class Html_Element {
     * @return Form_Element
     */
    public function addClass($class) {
-      array_push($this->classes, $class);
+      if(!in_array($class, $this->classes)){
+         array_push($this->classes, $class);
+      }
       return $this;
    }
 
