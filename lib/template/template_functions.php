@@ -99,9 +99,12 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...'){
    function vve_tpl_image_tag($imagePath, $alt = null, $mw = false, $mh = false, $clases = null, $other = null, $realpath = false) {
       if(file_exists($imagePath) OR ereg('^http.*', $imagePath)){
          // zajistíme převod na reálnou adresu
-         if(strpos(Url_Request::getBaseWebDir(), $imagePath)){
-            $imagePath = str_replace(Url_Request::getBaseWebDir(),AppCore::getAppWebDir(), $imagePath);
-         }
+//         if(strpos($imagePath, Url_Request::getBaseWebDir()) >= 1){
+//            $imagePath = str_replace(Url_Request::getBaseWebDir(),AppCore::getAppWebDir(), $imagePath);
+//print (addcslashes(Url_Request::getBaseWebDir(), '/'));
+            $imagePath = preg_replace('/'.addcslashes(Url_Request::getBaseWebDir(), '/').'([^?]*)?.*/', AppCore::getAppWebDir().'$1', $imagePath);
+//         }
+//         print ($imagePath);
          $imageSizes = getimagesize($imagePath);
          if($imageSizes){
             list($w,$h) = $imageSizes;
