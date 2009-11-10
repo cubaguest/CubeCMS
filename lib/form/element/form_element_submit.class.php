@@ -18,11 +18,11 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
  * jestli je element potvrzen
  * @var boolean
  */
-   private $isSubmited = false;
+   protected $isSubmited = false;
 
    protected function init() {
       $this->htmlElement = new Html_Element('input');
-      $this->htmlElementLabel = new Html_Element('label');
+//      $this->htmlElementLabel = new Html_Element('label');
    }
 
    /**

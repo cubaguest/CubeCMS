@@ -132,22 +132,7 @@ class Form implements ArrayAccess {
          }
       }
       $formContent .= $d->render();
-
-//      $table = new Html_Element('table');
-//      $table->addClass('formTable');
-//      // přidání podřízených elementů
-//      foreach ($this->elements as $element) {
-//         $table->addContent($element->render('table'));
-//         $table->addContent("\n");
-//         // přidání scriptů
-////         $script->addContent($element->scripts());
-//      }
       $this->html()->addContent($formContent);
-
-//      if(!$script->isEmpty()){
-//         $this->html()->addContent($script);
-//      }
-
       return (string)$this->html();
    }
 
@@ -244,7 +229,7 @@ class Form implements ArrayAccess {
    public function isSend() {
       foreach ($this->elements as $element) {
          if($element instanceof Form_Element_Submit) {
-            $element->populate();
+            $element->populate($this->sendMethod);
             //            $element->validate();
             if($element->isValid()) {
                $this->isSend = true;
@@ -287,11 +272,6 @@ class Form implements ArrayAccess {
     * @return bool -- true pokud byl formulář již vyplněn
     */
    public function isPopulated() {
-   //      $element->populate();
-   //      $element->validate();
-   //      if($element->isValid()) {
-   //         $submited = true;
-   //      }
       return $this->isPopulated;
    }
 

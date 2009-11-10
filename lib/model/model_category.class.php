@@ -65,8 +65,8 @@ class Model_Category extends Model_PDO {
              AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
              ." = :catkey OR cat.".self::COLUMN_URLKEY.'_'.Locale::getDefaultLang()
              ." = :catkey2) LIMIT 0, 1");
-          $dbst->bindParam(':catkey', $catKey);
-          $dbst->bindParam(':catkey2', $catKey);
+         $dbst->bindParam(':catkey', $catKey);
+         $dbst->bindParam(':catkey2', $catKey);
       } else {
          $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
              WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
@@ -129,10 +129,10 @@ class Model_Category extends Model_PDO {
       if(!$allCategories) {
          $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
              WHERE (cat.".self::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')".
-         " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+             " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
       } else {
          $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
-         " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+             " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
       }
       $dbst->execute();
 
@@ -140,12 +140,12 @@ class Model_Category extends Model_PDO {
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
 
       $cats = array();
-//      foreach ($categories as $row) {
-      while($row = $dbst->fetch()){
+      //      foreach ($categories as $row) {
+      while($row = $dbst->fetch()) {
          $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
       }
 
-//      return $dbst->fetchAll();
+      //      return $dbst->fetchAll();
       return $cats;
    }
 
@@ -164,13 +164,13 @@ class Model_Category extends Model_PDO {
     * @param <type> $sitemapPriority
     * @param <type> $sitemapFrequency
     */
-   public function saveNewCategory($name, $alt, $module, $keywords, $description, $urlkey,
+   public function saveNewCategory($name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt, self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
-          self::COLUMN_MODULE => $module, self::COLUMN_KEYWORDS => $keywords,
+          self::COLUMN_MODULE => $module, self::COLUMN_PARAMS => $moduleParams, self::COLUMN_KEYWORDS => $keywords,
           self::COLUMN_DESCRIPTION => $description, self::COLUMN_URLKEY => $urlkey,
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
@@ -180,6 +180,9 @@ class Model_Category extends Model_PDO {
       $this->setIUValues($rights);
 
       $dbc = new Db_PDO();
+      print ("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+          ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
+
       $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
           ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
 

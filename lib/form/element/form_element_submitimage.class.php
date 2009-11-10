@@ -18,7 +18,7 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
  * jestli je element potvrzen
  * @var boolean
  */
-   private $isSubmited = false;
+//   private $isSubmited = false;
 
    /**
     * Souřadnice x potvrzení
@@ -38,26 +38,23 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
     */
    private $imageFile = null;
 
-//   protected function init() {
-//      $this->htmlElement = new Html_Element('input');
-//      $this->htmlElementLabel = new Html_Element('label');
-//   }
-
    /**
     * Metoda naplní prvek
     */
    public function populate($method = 'post') {
       switch ($method) {
          case 'get':
-            if(isset ($_GET[$this->getName()]) OR (isset ($_GET[$this->getName().'_x'])) AND isset ($_GET[$this->getName().'_y'])) {
+            if(isset ($_GET[$this->getName()]) OR (isset ($_GET[$this->getName().'_x']) AND isset ($_GET[$this->getName().'_y']))) {
                $this->isSubmited = true;
                $this->submitX = $_GET[$this->getName().'_x'];
                $this->submitY = $_GET[$this->getName().'_y'];
             }
             break;
          default:
-            if(isset ($_POST[$this->getName()])) {
+            if(isset ($_POST[$this->getName()]) OR (isset ($_POST[$this->getName().'_x']) AND isset ($_POST[$this->getName().'_y']))) {
                $this->isSubmited = true;
+               $this->submitX = $_POST[$this->getName().'_x'];
+               $this->submitY = $_POST[$this->getName().'_y'];
             }
             break;
       }

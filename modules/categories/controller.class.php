@@ -14,9 +14,9 @@ class Categories_Controller extends Controller {
       $elemId = new Form_Element_Hidden('id');
       $formDelete->addElement($elemId);
 
-      $submit = new Form_Element_Submit('remove');
-      $formDelete->addElement($submit);
-      //
+      $submitDel = new Form_Element_SubmitImage('remove');
+      $formDelete->addElement($submitDel);
+
       if($formDelete->isValid()) {
          $categories = unserialize(VVE_CATEGORIES_STRUCTURE);
 
@@ -207,7 +207,7 @@ class Categories_Controller extends Controller {
       $form = $this->createForm();
 
       $form->show_in_menu->setValues(true);
-
+      
       // kategorie
       $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
       $catModel = new Model_Category();
@@ -252,9 +252,9 @@ class Categories_Controller extends Controller {
 
          $categoryModel = new Model_Category();
          $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
-             $form->module->getValues(), $form->moduleParams->getValues(),$form->keywords->getValues(),
-             $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
-             $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
+             $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
+             $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
+             $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
              $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
 
          // po uložení vložíme do struktury
