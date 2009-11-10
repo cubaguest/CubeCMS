@@ -8,8 +8,7 @@ class Categories_Controller extends Controller {
    private $categoriesArray = array();
 
    public function mainController() {
-      $this->checkReadableRights();
-
+      $this->checkWritebleRights();
       $formDelete = new Form('category_');
 
       $elemId = new Form_Element_Hidden('id');
@@ -30,8 +29,6 @@ class Categories_Controller extends Controller {
          $categories->saveStructure();
          $this->infoMsg()->addMessage($this->_("Kategorie byla smazána"));
 
-         //         $model = new Model_Config();
-         //         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($categories));
          $this->link()->route()->reload();
       }
 
@@ -60,8 +57,7 @@ class Categories_Controller extends Controller {
                $parent->swapChild($parent->getChild($id), $parent->nextChild($parent->getChild($id)));
             }
 
-            $model = new Model_Config();
-            $model->saveCfg('CATEGORIES_STRUCTURE', serialize($menu));
+            $menu->saveStructure();
             $this->infoMsg()->addMessage($this->_("Pozice byla změněna"));
             $this->link()->route()->reload();
          } catch (Exception $e) {
@@ -89,7 +85,6 @@ class Categories_Controller extends Controller {
          $this->infoMsg()->addMessage($this->_('Kategorie byla smzána'));
          $this->link()->clear()->reload();
       }
-
 
       // nastavení viewru
       $this->view()->template()->addTplFile('detail.phtml');

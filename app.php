@@ -220,6 +220,9 @@ class AppCore {
       //		inicializace URL
       Url_Request::factory();
 
+      // inicializace Šablonovacího systému
+      Template::factory();
+
       //inicializace lokalizace
       Locale::factory();
 
@@ -1062,7 +1065,6 @@ class AppCore {
          }
       } else {
       // je zpracovávána stránka aplikace
-         Template::factory();
          $this->coreTpl = new Template_Core();
 
          // Globální inicializace proměných do šablony

@@ -209,7 +209,6 @@ class JsPlugin_TinyMce extends JsPlugin {
    );
 
    protected function initJsPlugin() {
-   //		Název pluginu
       $this->defaultParams['document_base_url'] = Url_Request::getBaseWebDir();
    }
 
@@ -249,9 +248,11 @@ class JsPlugin_TinyMce extends JsPlugin {
       } else {
          $params['editor_selector'] = $this->getCfgParam('editor_selector');
       }
-//      if($this->config['specific_textareas'] == true){
-//         
-//      }
+      if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
+            Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')){
+         $params['content_css'] = Template::face(false).Template::STYLESHEETS_DIR.URL_SEPARATOR.'style-content.css';
+      }
+
       return $params;
    }
 

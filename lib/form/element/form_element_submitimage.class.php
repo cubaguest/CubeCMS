@@ -21,6 +21,18 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
    private $isSubmited = false;
 
    /**
+    * Souřadnice x potvrzení
+    * @var int
+    */
+   private $submitX = 0;
+
+   /**
+    * Souřadnice y potvrzení
+    * @var int
+    */
+   private $submitY = 0;
+
+   /**
     * Soubor s obrázkem
     * @var string
     */
@@ -34,21 +46,36 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
    /**
     * Metoda naplní prvek
     */
-//   public function populate($method = 'post') {
-//      switch ($method) {
-//         case 'get':
-//            if(isset ($_GET[$this->getName()])) {
-//               $this->isSubmited = true;
-//            }
-//            break;
-//         default:
-//            if(isset ($_POST[$this->getName()])) {
-//               $this->isSubmited = true;
-//            }
-//            break;
-//      }
-//      $this->isPopulated = true;
-//   }
+   public function populate($method = 'post') {
+      switch ($method) {
+         case 'get':
+            if(isset ($_GET[$this->getName()]) OR (isset ($_GET[$this->getName().'_x'])) AND isset ($_GET[$this->getName().'_y'])) {
+               $this->isSubmited = true;
+               $this->submitX = $_GET[$this->getName().'_x'];
+               $this->submitY = $_GET[$this->getName().'_y'];
+            }
+            break;
+         default:
+            if(isset ($_POST[$this->getName()])) {
+               $this->isSubmited = true;
+            }
+            break;
+      }
+      $this->isPopulated = true;
+   }
+
+   /**
+    * Metoda vrací souřadnice potvrzení
+    * @param char $axis -- 'x' nebo 'y'
+    * @return int -- souřadnice
+    */
+   public function getSubmitPosition($axis = 'x') {
+      if($axis == 'x'){
+         return $this->submitX;
+      } else {
+         return $this->submitY;
+      }
+   }
 
    /**
     * Metoda nasatví obrázek elementu
