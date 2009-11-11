@@ -381,9 +381,9 @@ class AppCore {
       $cfgVals = $cfgModel->getConfigStat();
       while ($cfg = $cfgVals->fetch()) {
          if(!defined('VVE_'.$cfg[Model_Config::COLUMN_KEY])){
-            if($cfg[Model_Config::COLUMN_KEY] == 'true'){
+            if($cfg[Model_Config::COLUMN_VALUE] == 'true'){
                define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), true);
-            } else if($cfg[Model_Config::COLUMN_KEY] == 'false'){
+            } else if($cfg[Model_Config::COLUMN_VALUE] == 'false'){
                define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), false);
             } else {
                define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), $cfg[Model_Config::COLUMN_VALUE]);

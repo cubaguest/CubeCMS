@@ -123,7 +123,7 @@ class Photogalery_Controller extends Controller {
          $orders = $editForm->ord->getValues();
          foreach ($editForm->id->getValues() as $id){
             if($editForm->delete->getValues($id) === true){
-               // mažese smazání souborů
+               // smazání souborů
                $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir()
                   .self::DIR_SMALL.DIRECTORY_SEPARATOR);
                $file->remove();
@@ -132,6 +132,7 @@ class Photogalery_Controller extends Controller {
                $file->remove();
                $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir());
                $file->remove();
+               // remove z db
                $imagesM->deleteImage($id);
             } else {
                // ukládají změny

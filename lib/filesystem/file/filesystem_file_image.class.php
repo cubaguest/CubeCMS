@@ -162,30 +162,30 @@ class Filesystem_File_Image extends Filesystem_File {
     * Metoda rozhoduje ze kterého typu obrázku se bude načítat obrázku
     */
    public function createWorkingImage() {
-      if(VVE_USE_IMAGEMAGICK != true){
-   //		Zjištění druhu obrázku a vytvoření pracovního obrázku
-      switch ($this->imageType) {
-         case IMAGETYPE_GIF:
-            $this->workingImage = imagecreatefromgif($this->getName(true));
-            break;
-         case IMAGETYPE_JPEG:
-            $this->workingImage = imagecreatefromjpeg($this->getName(true));
-            break;
-         case IMAGETYPE_PNG:
-            $this->workingImage = imagecreatefrompng($this->getName(true));
-            break;
-         case IMAGETYPE_WBMP:
-            $this->workingImage = imagecreatefromwbmp($this->getName(true));
-            break;
-         case IMAGETYPE_JPEG2000:
-            $this->workingImage = imagecreatefromjpeg($this->getName(true));
-            break;
-         default:
-            $this->isError = true;
-            if($this->reportErrors()) {
-               throw new UnexpectedValueException(_('Soubor je neplatný typ obrázku'), 2);
-            }
-      };
+      if(VVE_USE_IMAGEMAGICK != true) {
+      //		Zjištění druhu obrázku a vytvoření pracovního obrázku
+         switch ($this->imageType) {
+            case IMAGETYPE_GIF:
+               $this->workingImage = imagecreatefromgif($this->getName(true));
+               break;
+            case IMAGETYPE_JPEG:
+               $this->workingImage = imagecreatefromjpeg($this->getName(true));
+               break;
+            case IMAGETYPE_PNG:
+               $this->workingImage = imagecreatefrompng($this->getName(true));
+               break;
+            case IMAGETYPE_WBMP:
+               $this->workingImage = imagecreatefromwbmp($this->getName(true));
+               break;
+            case IMAGETYPE_JPEG2000:
+               $this->workingImage = imagecreatefromjpeg($this->getName(true));
+               break;
+            default:
+               $this->isError = true;
+               if($this->reportErrors()) {
+                  throw new UnexpectedValueException(_('Soubor je neplatný typ obrázku'), 2);
+               }
+         };
       }
    }
 
@@ -194,18 +194,21 @@ class Filesystem_File_Image extends Filesystem_File {
     * @param int $maxWidth -- šířka nového obrázku
     * @param int $maxHeight -- výška nového obrázku
     */
-   public function resampleImage($maxWidth = false, $maxHeight = false) {
+   public function resampleImage($maxWidth = null, $maxHeight = null, $crop = null) {
       if($this->workingImage === null|false) {
          $this->loadImage();
       }
+      if($crop === null){
+         $crop = $this->cropImage;
+      }
 
-      if($maxWidth === false) {
+      if($maxWidth === null) {
          $maxWidth = $this->imageWidth;
          if($this->newImageWidth !== false) {
             $maxWidth = $this->newImageWidth;
          }
       }
-      if($maxHeight === false) {
+      if($maxHeight === null) {
          $maxHeight = $this->imageHeight;
          if($this->newImageHeight !== false) {
             $maxHeight = $this->newImageHeight;
@@ -213,8 +216,7 @@ class Filesystem_File_Image extends Filesystem_File {
       }
 
       if(VVE_USE_IMAGEMAGICK != true) {
-         $tempImage = $this->workingImage;
-         if(!$this->cropImage) {
+         if($crop === false) {
             $width = $this->imageWidth;
             $height = $this->imageHeight;
             if($width > $maxWidth && $width) {
@@ -231,7 +233,7 @@ class Filesystem_File_Image extends Filesystem_File {
             // Zapnutí alfy, tj průhlednost
             imagealphablending($newImage, false);
             imagesavealpha($newImage, true);
-            if(!imagecopyresampled($newImage, $tempImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight)) {
+            if(!imagecopyresampled($newImage, $this->workingImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight)) {
                if($this->reportErrors())
                   throw new UnexpectedValueException(_('Chyba při resamplování obrázku'), 3);
                $this->isError = true;
@@ -259,7 +261,7 @@ class Filesystem_File_Image extends Filesystem_File {
             // Zapnutí alfy, tj průhlednost
             imagealphablending($newImage, false);
             imagesavealpha($newImage, true);//            d d  s        s        d      d      s           s
-            if(!imagecopyresampled($newImage, $tempImage, 0,0, $imageX, $imageY, $maxWidth, $maxHeight, $imageWidth,$imageHeight)) {
+            if(!imagecopyresampled($newImage, $this->workingImage, 0,0, $imageX, $imageY, $maxWidth, $maxHeight, $imageWidth,$imageHeight)) {
                if($this->reportErrors())
                   throw new UnexpectedValueException(_('Chyba při resamplování obrázku'), 3);
                $this->isError = true;
@@ -267,31 +269,31 @@ class Filesystem_File_Image extends Filesystem_File {
          }
          $this->workingImage = $newImage;
       } else {
-         // použití imagemagick jako resizer
-         if($this->cropImage) {
+      // použití imagemagick jako resizer
+         if($crop == true) {
             $offsetX = $offsetY = 0;
 
             $resizeString = null;
             //zjištění největší velikossti
-            if($maxWidth > $maxHeight){
+            if($maxWidth > $maxHeight) {
                $resizeString = $maxWidth.'x';
                $offsetY = round(($maxWidth/$this->imageWidth*$this->imageHeight-$maxHeight)/2,0);
             } else if($maxWidth < $maxHeight) {
-               $resizeString = 'x'.$maxHeight;
-               $offsetX = round(($maxHeight/$this->imageHeight*$this->imageWidth-$maxWidth)/2,0);
-            } else {
-               if($this->imageWidth > $this->imageHeight){
                   $resizeString = 'x'.$maxHeight;
                   $offsetX = round(($maxHeight/$this->imageHeight*$this->imageWidth-$maxWidth)/2,0);
                } else {
-                  $resizeString = $maxWidth.'x';
-                  $offsetY = round(($maxWidth/$this->imageWidth*$this->imageHeight-$maxHeight)/2,0);
+                  if($this->imageWidth > $this->imageHeight) {
+                     $resizeString = 'x'.$maxHeight;
+                     $offsetX = round(($maxHeight/$this->imageHeight*$this->imageWidth-$maxWidth)/2,0);
+                  } else {
+                     $resizeString = $maxWidth.'x';
+                     $offsetY = round(($maxWidth/$this->imageWidth*$this->imageHeight-$maxHeight)/2,0);
+                  }
                }
-            }
             exec('convert -resize '.escapeshellarg($resizeString).' '.$this->getName(true).' '.(string)$dir.$newName);
 
             exec('convert -crop '.escapeshellarg($maxWidth).'x'.escapeshellarg($maxHeight)
-                  .'+'.$offsetX.'+'.$offsetY.' '.(string)$dir.$newName.' '.(string)$dir.$newName);
+                .'+'.$offsetX.'+'.$offsetY.' '.(string)$dir.$newName.' '.(string)$dir.$newName);
          } else {
             exec('convert -resize '.escapeshellarg($maxWidth).'x'.escapeshellarg($maxHeight)
                 .' '.$this->getName(true).' '.$this->getName(true));
@@ -306,7 +308,7 @@ class Filesystem_File_Image extends Filesystem_File {
     */
    public function rotateImage($angle, $bgColor = 0, $ignoreTransparent = 0) {
       if(VVE_USE_IMAGEMAGICK != true) {
-         
+
          if($this->workingImage === null OR $this->workingImage === false) {
             $this->loadImage();
          }
@@ -317,7 +319,7 @@ class Filesystem_File_Image extends Filesystem_File {
             $this->imagerotateEquivalent($angle, $bgColor, $ignoreTransparent);
          }
       } else {
-//         exec('convert -rotate '.escapeshellarg($angle).' -background '.escapeshellarg($bgColor).' '.$this->getName(true).' '.$this->getName(true));
+      //         exec('convert -rotate '.escapeshellarg($angle).' -background '.escapeshellarg($bgColor).' '.$this->getName(true).' '.$this->getName(true));
          exec('convert -rotate '.escapeshellarg($angle).' '.$this->getName(true).' '.$this->getName(true));
       }
    }
@@ -330,16 +332,16 @@ class Filesystem_File_Image extends Filesystem_File {
       switch ($axis) {
          case 'y':
             if(VVE_USE_IMAGEMAGICK != true) {
-               
+
             } else {
                exec('convert -flop '.$this->getName(true).' '.$this->getName(true));
             }
-            
+
             break;
          case 'x':
          default:
             if(VVE_USE_IMAGEMAGICK != true) {
-            
+
             } else {
                exec('convert -flip '.$this->getName(true).' '.$this->getName(true));
             }
@@ -355,52 +357,46 @@ class Filesystem_File_Image extends Filesystem_File {
     *
     * @return boolean -- true pokud se obrázek podařilo uložit
     */
-   public function saveWorkingImage($type, $newImageDirName = null) {
+   public function saveWorkingImage($type, $newDir=null, $newImageName = null) {
       if(VVE_USE_IMAGEMAGICK != true) {
-         if($newImageDirName === null) {
-            if(!$this->isError()) {
-               $this->remove();
-            }
-            $newImageName = $this->getName(true);
-         } else {
-
+         // dodělat smazání původního obrázku pokud již existuje
+         if($newDir == null) {
+            $newDir = $this->getDir();
          }
-         if($this->getDir()->checkDir()) {
-            switch ($type) {
-               case IMAGETYPE_GIF:
-                  $saved = imagegif($this->workingImage, $newImageName);
-                  break;
-               case IMAGETYPE_PNG:
-                  imagealphablending($this->workingImage, false);
-                  imagesavealpha($this->workingImage, true);
-                  $saved = imagepng($this->workingImage,$newImageName, round($this->quality/10,0));
-                  break;
-               case IMAGETYPE_WBMP:
-                  $saved = imagewbmp($this->workingImage, $newImageName);
-                  break;
-               case IMAGETYPE_JPEG2000:
-               //jen výstup do jpegu
-                  $saved = imagejpeg($this->workingImage, $newImageName, $this->quality);
-                  break;
-               case IMAGETYPE_JPEG:
-               default: // výchozí je jpeg
-                  $saved = imagejpeg($this->workingImage, $newImageName, $this->quality);
-                  break;
-            }
-            // nastavení práv k obrázku na zápis pro všechny, kvůli ftp účtu ať může mazat
-            if(!$saved) {
-               $this->isError = true;
-               if($this->reportErrors())
-                  throw new InvalidArgumentException(_("Chyba při ukládání obrázku. Zkontrolujte práva k adresáři."), 3);
-            }
-            $this->setRights(0777);
-         } else {
+         if($newImageName == null) {
+            $newImageName = $this->getName();
+         }
+
+         switch ($type) {
+            case IMAGETYPE_GIF:
+               $saved = @imagegif($this->workingImage, $newDir.$newImageName);
+               break;
+            case IMAGETYPE_PNG:
+               imagealphablending($this->workingImage, false);
+               imagesavealpha($this->workingImage, true);
+               $saved = @imagepng($this->workingImage,$newDir.$newImageName, round($this->quality/10,0));
+               break;
+            case IMAGETYPE_WBMP:
+               $saved = @imagewbmp($this->workingImage, $newDir.$newImageName);
+               break;
+            case IMAGETYPE_JPEG2000:
+            //jen výstup do jpegu
+               $saved = @imagejpeg($this->workingImage, $newDir.$newImageName, $this->quality);
+               break;
+            case IMAGETYPE_JPEG:
+            default: // výchozí je jpeg
+               $saved = @imagejpeg($this->workingImage, $newDir.$newImageName, $this->quality);
+               break;
+         }
+         // nastavení práv k obrázku na zápis pro všechny, kvůli ftp účtu ať může mazat
+         if(!$saved) {
             $this->isError = true;
             if($this->reportErrors())
-               throw new UnexpectedValueException(_('Nepodařilo se vytvořit adresář pro uložení obrázku'), 2);
+               throw new InvalidArgumentException(_("Chyba při ukládání pracovního obrázku. Zkontrolujte práva k adresáři."), 3);
          }
+         $this->setRights(0777);
       } else {
-//         convert imagemagick to another formt
+      //         convert imagemagick to another formt
       }
    }
 
@@ -516,9 +512,9 @@ class Filesystem_File_Image extends Filesystem_File {
             $srcX = round(rotateX($x, $y, $theta));
             $srcY = round(rotateY($x, $y, $theta));
             if($srcX >= 0 && $srcX < $srcw && $srcY >= 0 && $srcY < $srch) {
-                $color = imagecolorat($this->workingImage, $srcX, $srcY );
+               $color = imagecolorat($this->workingImage, $srcX, $srcY );
             } else {
-                $color = $bgcolor;
+               $color = $bgcolor;
             }
             imagesetpixel($destimg, $x-$minX, $y-$minY, $color);
          }
@@ -546,46 +542,35 @@ class Filesystem_File_Image extends Filesystem_File {
       if($this->workingImage === null|false) {
          $this->loadImage();
       }
-      
+
       if($maxWidth === false|null) {
          $maxWidth = $this->imageWidth;
       }
       if($maxHeight === false|null) {
          $maxHeight = $this->imageHeight;
       }
-      
+
+      $dir = new Filesystem_Dir($dstDir);
+      $dir->checkDir();
+
       if(VVE_USE_IMAGEMAGICK != true) {
       //		test jestli je zpracováván obrázek
          if($this->isImage()) {
-            $saved = false;
-            $tmpImage = $this->createWorkingImage();
-            if($width == null) {
-               $width = $this->imageWidth;
-            }
-            if($height == null) {
-               $height = $this->imageHeight;
-            }
-            if($newName == null) {
-               $newName = $this->getName();
-            }
-
-            //			Test názvu souboru
-            $newName = $this->creatUniqueName($dstDir);
-            $newImage = $this->resampleImage($tmpImage,$width,$height);
+            //	Test názvu souboru Je třeba?
+            // $newName = $this->creatUniqueName($dstDir);
+            $this->resampleImage($maxWidth,$maxHeight, $crop);
             if($imageType == null) {
                $imageType = $this->imageType;
             }
-            $saved = $this->saveWorkingImage($newImage, $imageType, new Filesystem_Dir($dstDir), $newName);
-            imagedestroy($newImage);
+            
+            $this->saveWorkingImage($imageType, $dir, $newName);
+            imagedestroy($this->workingImage);
+            $this->workingImage = null;
          }
-         return $saved;
       } else {
-         if($newName === null){
+         if($newName === null) {
             $newName = $this->getName();
          }
-
-         $dir = new Filesystem_Dir($dstDir);
-         $dir->checkDir();
 
          // použití imagemagick jako resizer
          if($crop === true) {
@@ -593,25 +578,25 @@ class Filesystem_File_Image extends Filesystem_File {
 
             $resizeString = null;
             //zjištění největší velikossti
-            if($maxWidth > $maxHeight){
+            if($maxWidth > $maxHeight) {
                $resizeString = $maxWidth.'x';
                $offsetY = round(($maxWidth/$this->imageWidth*$this->imageHeight-$maxHeight)/2,0);
             } else if($maxWidth < $maxHeight) {
-               $resizeString = 'x'.$maxHeight;
-               $offsetX = round(($maxHeight/$this->imageHeight*$this->imageWidth-$maxWidth)/2,0);
-            } else {
-               if($this->imageWidth > $this->imageHeight){
                   $resizeString = 'x'.$maxHeight;
                   $offsetX = round(($maxHeight/$this->imageHeight*$this->imageWidth-$maxWidth)/2,0);
                } else {
-                  $resizeString = $maxWidth.'x';
-                  $offsetY = round(($maxWidth/$this->imageWidth*$this->imageHeight-$maxHeight)/2,0);
+                  if($this->imageWidth > $this->imageHeight) {
+                     $resizeString = 'x'.$maxHeight;
+                     $offsetX = round(($maxHeight/$this->imageHeight*$this->imageWidth-$maxWidth)/2,0);
+                  } else {
+                     $resizeString = $maxWidth.'x';
+                     $offsetY = round(($maxWidth/$this->imageWidth*$this->imageHeight-$maxHeight)/2,0);
+                  }
                }
-            }
             exec('convert -resize '.escapeshellarg($resizeString).' -quality '.$this->quality.' '.$this->getName(true).' '.(string)$dir.$newName);
-            
+
             exec('convert -crop '.escapeshellarg($maxWidth).'x'.escapeshellarg($maxHeight)
-                  .'+'.$offsetX.'+'.$offsetY.' -quality '.$this->quality.' '.(string)$dir.$newName.' '.(string)$dir.$newName);
+                .'+'.$offsetX.'+'.$offsetY.' -quality '.$this->quality.' '.(string)$dir.$newName.' '.(string)$dir.$newName);
 
          } else {
             exec('convert -resize '.escapeshellarg($maxWidth).'x'.escapeshellarg($maxHeight)
@@ -633,7 +618,7 @@ class Filesystem_File_Image extends Filesystem_File {
     *
     * @return boolean -- true pokud se obrázek podařilo uložit
     *
-    * 
+    *
     */
    public function saveAs($dstDir, $width = null, $heigh = null, $crop = false, $newName = null, $imageType = null) {
       return $this->saveAsResampledImage($dstDir, $width, $heigh, $crop, $newName, $imageType);

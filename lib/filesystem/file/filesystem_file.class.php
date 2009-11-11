@@ -13,10 +13,10 @@
  */
 
 class Filesystem_File {
-/**
- * Název souboru
- * @var string
- */
+   /**
+    * Název souboru
+    * @var string
+    */
    private $fileName = null;
 
    /**
@@ -55,58 +55,58 @@ class Filesystem_File {
     */
    protected static $mimeTypes = array(
 
-   'txt' => 'text/plain',
-   'htm' => 'text/html',
-   'html' => 'text/html',
-   'php' => 'text/html',
-   'css' => 'text/css',
-   'js' => 'application/javascript',
-   'json' => 'application/json',
-   'xml' => 'application/xml',
-   'swf' => 'application/x-shockwave-flash',
-   'flv' => 'video/x-flv',
+       'txt' => 'text/plain',
+       'htm' => 'text/html',
+       'html' => 'text/html',
+       'php' => 'text/html',
+       'css' => 'text/css',
+       'js' => 'application/javascript',
+       'json' => 'application/json',
+       'xml' => 'application/xml',
+       'swf' => 'application/x-shockwave-flash',
+       'flv' => 'video/x-flv',
 
-   // images
-   'png' => 'image/png',
-   'jpe' => 'image/jpeg',
-   'jpeg' => 'image/jpeg',
-   'jpg' => 'image/jpeg',
-   'gif' => 'image/gif',
-   'bmp' => 'image/bmp',
-   'ico' => 'image/vnd.microsoft.icon',
-   'tiff' => 'image/tiff',
-   'tif' => 'image/tiff',
-   'svg' => 'image/svg+xml',
-   'svgz' => 'image/svg+xml',
+       // images
+       'png' => 'image/png',
+       'jpe' => 'image/jpeg',
+       'jpeg' => 'image/jpeg',
+       'jpg' => 'image/jpeg',
+       'gif' => 'image/gif',
+       'bmp' => 'image/bmp',
+       'ico' => 'image/vnd.microsoft.icon',
+       'tiff' => 'image/tiff',
+       'tif' => 'image/tiff',
+       'svg' => 'image/svg+xml',
+       'svgz' => 'image/svg+xml',
 
-   // archives
-   'zip' => 'application/zip',
-   'rar' => 'application/x-rar-compressed',
-   'exe' => 'application/x-msdownload',
-   'msi' => 'application/x-msdownload',
-   'cab' => 'application/vnd.ms-cab-compressed',
+       // archives
+       'zip' => 'application/zip',
+       'rar' => 'application/x-rar-compressed',
+       'exe' => 'application/x-msdownload',
+       'msi' => 'application/x-msdownload',
+       'cab' => 'application/vnd.ms-cab-compressed',
 
-   // audio/video
-   'mp3' => 'audio/mpeg',
-   'qt' => 'video/quicktime',
-   'mov' => 'video/quicktime',
+       // audio/video
+       'mp3' => 'audio/mpeg',
+       'qt' => 'video/quicktime',
+       'mov' => 'video/quicktime',
 
-   // adobe
-   'pdf' => 'application/pdf',
-   'psd' => 'image/vnd.adobe.photoshop',
-   'ai' => 'application/postscript',
-   'eps' => 'application/postscript',
-   'ps' => 'application/postscript',
+       // adobe
+       'pdf' => 'application/pdf',
+       'psd' => 'image/vnd.adobe.photoshop',
+       'ai' => 'application/postscript',
+       'eps' => 'application/postscript',
+       'ps' => 'application/postscript',
 
-   // ms office
-   'doc' => 'application/msword',
-   'rtf' => 'application/rtf',
-   'xls' => 'application/vnd.ms-excel',
-   'ppt' => 'application/vnd.ms-powerpoint',
+       // ms office
+       'doc' => 'application/msword',
+       'rtf' => 'application/rtf',
+       'xls' => 'application/vnd.ms-excel',
+       'ppt' => 'application/vnd.ms-powerpoint',
 
-   // open office
-   'odt' => 'application/vnd.oasis.opendocument.text',
-   'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+       // open office
+       'odt' => 'application/vnd.oasis.opendocument.text',
+       'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
    );
 
    /**
@@ -117,19 +117,21 @@ class Filesystem_File {
     * parsovat z názvu souboru)
     */
    function __construct($file, $dir = null, $reportErrors = true) {
-   // Pokud je vložen objekt File
+      // Pokud je vložen objekt File
       if($file instanceof File) {
          $this->fileDir = new Filesystem_Dir($file->getDir());
          $this->fileName = $file->getName();
-      } else {
+      }
+      else {
          if($dir == null) {
-         // rozparsování cesty a soubou u tmp
+            // rozparsování cesty a soubou u tmp
             $arr = $this->parsePathFile($file);
             if($arr != false) {
                $this->fileName = $arr[2];
                $this->fileDir = new Filesystem_Dir($arr[1]);
             }
-         } else {
+         }
+         else {
             $this->fileName = $file;
             $this->fileDir = new Filesystem_Dir($dir);
          }
@@ -245,7 +247,7 @@ class Filesystem_File {
     * @return boolean -- true pokud byl soubor zkopírován
     */
    public function copy($dstDir, $fileName = null) {
-   // Kontrola adresáře
+      // Kontrola adresáře
       $dirObj = new Filesystem_Dir();
       $dirObj->checkDir($dstDir);
       unset ($dirObj);
@@ -273,7 +275,7 @@ class Filesystem_File {
     * @return boolean -- true pokud byl soubor přejmenován
     */
    public function rename($targetDir, $newName) {
-      
+
    }
 
    /**
@@ -295,11 +297,11 @@ class Filesystem_File {
     */
    public function remove() {
       if($this->exist() AND !is_dir($this->getName(true))) {
-         if(!unlink($this->getName(true))){
-            throw new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getName()));
+         if(!@unlink($this->getName(true))) {
+            new CoreErrors(new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getName())));
          }
       }
-      
+
    }
 
    /**
@@ -325,16 +327,18 @@ class Filesystem_File {
     * @return string -- mime type
     */
    private function locateMimeType() {
-   //      $file = $this->fileName;
+      //      $file = $this->fileName;
       $fileArray = explode('.',$this->getName());
       $ext = strtolower(array_pop($fileArray));
       if (function_exists('finfo_open')) {
          $finfo = finfo_open(FILEINFO_MIME);
          $this->fileMimeType = finfo_file($finfo, $this->getName(true));
          finfo_close($finfo);
-      } else if (array_key_exists($ext, self::$mimeTypes)) {
+      }
+      else if (array_key_exists($ext, self::$mimeTypes)) {
          $this->fileMimeType = self::$mimeTypes[$ext];
-      } else {
+      }
+      else {
          $this->fileMimeType = 'application/octet-stream';
       }
    }
@@ -350,17 +354,19 @@ class Filesystem_File {
     * @todo -- dodělat při přijmu souboru se dvěmi příponami
     */
    protected function creatUniqueName($destinationDir, $newName = null, $number = 0) {
-   // Pokud je zadáno pouze číslo
+      // Pokud je zadáno pouze číslo
       if(is_int($newName)) {
          $newFileName = $this->getName() ;
          $addNumber = $newName;
-      } else if($newName != null) {
-            $newFileName = $newName;
-            $addNumber = $number;
-         } else {
-            $newFileName = $this->getName();
-            $addNumber = $number;
-         }
+      }
+      else if($newName != null) {
+         $newFileName = $newName;
+         $addNumber = $number;
+      }
+      else {
+         $newFileName = $this->getName();
+         $addNumber = $number;
+      }
       //doplnění posledního lomítka za dest adresář
       if($destinationDir[strlen($destinationDir)-1] != "/" AND $addNumber == 0) {
          $destinationDir .= "/";
@@ -375,13 +381,15 @@ class Filesystem_File {
       unset($sFunction);
       if($addNumber == 0) {
          $createNewFileName=$file_name_short.'.'.$file_name_extension;
-      } else {
+      }
+      else {
          $createNewFileName=$file_name_short.$addNumber.'.'.$file_name_extension;
       }
       // kontrola existence
       if(file_exists($destinationDir.$createNewFileName)) {
          $createNewFileName = $this->creatUniqueName($destinationDir, (++$addNumber));
-      } else {
+      }
+      else {
          $this->fileName = $createNewFileName;
       }
       return $createNewFileName;
