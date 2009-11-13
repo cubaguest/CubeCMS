@@ -29,17 +29,18 @@ class Model_Config extends Model_PDO {
 
 
    /**
-    * Metoda načte konfigurační volby
+    * Metoda načte konfigurační volby (pro načtení do enginu)
     * @return PDOStatement -- konfigurační volby
+    * @todo -- pokoumat jestli by nebylo lepší mít i global config pro některé volby
     */
    public function getConfigStat() {
       $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
+//      if(VVE_USE_GLOBAL_CONFIGS){
+//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE).", ".VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE);
+//      } else {
+         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
+//      }
       return $dbst;
-   }
-
-   public function saveNewCfg($key, $value) {
-      ;
    }
 
    public function saveCfg($key,$value) {
@@ -47,8 +48,6 @@ class Model_Config extends Model_PDO {
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)." SET `value` = :val WHERE `key` = :key");
       $dbst->bindValue(':key', $key, PDO::PARAM_STR);
       $dbst->bindValue(':val', $value, PDO::PARAM_STR);
-      //      $dbst->debugDumpParams();
-      //      exit();
       return $dbst->execute();
    }
 
