@@ -31,9 +31,9 @@ class Sessions {
 		session_cache_limiter('private');
 		$cache_limiter = session_cache_limiter();
 		/* set the cache expire to 30 minutes */
-		session_cache_expire(30);
+		session_cache_expire(60);
 		$cache_expire = session_cache_expire();
-		//session_set_cookie_params(1800);
+      session_set_cookie_params(3600, '/', substr($_SERVER['SERVER_NAME'],strpos($_SERVER['SERVER_NAME'],".")));
 		session_name($sessionName);
 		session_start();
 		self::$sessionInitalized = true;

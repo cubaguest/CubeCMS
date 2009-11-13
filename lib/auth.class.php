@@ -36,16 +36,6 @@ class Auth {
 	const USER_IS_LOGIN		= 'login';
 	const USER_LOGIN_ADDRESS= 'ip_address';
 
-//   /**
-//    * Názvy některých sloupců
-//    */
-//   const COLUMN_USERNAME      = 'username';
-//   const COLUMN_ID_GROUP      = 'id_group';
-//   const COLUMN_GROUP_NAME    = 'gname';
-//   const COLUMN_ID_USER       = 'id_user';
-//   const COLUMN_USER_MAIL     = 'mail';
-//   const COLUMN_USER_PHOTO    = 'foto_file';
-   
 	/**
 	 * Je-li uživatel přihlášen
 	 * @var boolean
