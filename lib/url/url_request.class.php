@@ -126,10 +126,12 @@ class Url_Request {
    //		Vytvoření url
       $fullUrl = $_SERVER['REQUEST_URI'];
       self::$scriptName = $_SERVER["SCRIPT_NAME"];
-      self::$serverName = $_SERVER["SERVER_NAME"];
+      $serverName = $_SERVER["SERVER_NAME"];
       if(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null){
-         self::$serverName = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', self::$serverName, 1);
+         $fullUrl = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', $fullUrl);
+         self::$scriptName = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', self::$scriptName);
       }
+      self::$serverName = $serverName;
       //		Najdeme co je cesta k aplikaci a co je předaná url
       self::$fullUrl = substr($fullUrl, strpos(self::$scriptName, AppCore::APP_MAIN_FILE));
       // odstraníme dvojté lomítka
