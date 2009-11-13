@@ -11,7 +11,6 @@ class Configuration_Controller extends Controller {
       $this->checkWritebleRights();
       // nastavení viewru
       $this->view()->template()->addTplFile('list.phtml');
-      $this->view()->template()->addCssFile('style.css');
    }
 
    public function showController() {
