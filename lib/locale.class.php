@@ -56,7 +56,10 @@ class Locale {
     */
    private static $locales = array("cs" => "cs_CZ.UTF-8",
                                    "en" => "en_US",
-                                   "de" => "de_DE");
+                                   "de" => "de_DE",
+                                   "sk" => "sk_SK.UTF-8",
+                                   "ru" => "ru_RU",
+                                   "pl" => "pl_PL ");
 
    /**
     * Pole se všemi názvy jazyků
@@ -210,7 +213,10 @@ class Locale {
    private static function _setLangTranslations(){
       self::$localesNames = array("cs" => _('Česky'),
                                   "en" => _('Anglicky'),
-                                  "de" => _('Německy'));
+                                  "de" => _('Německy'),
+                                  "ru" => _('Rusky'),
+                                  "sk" => _('Slovensky'),
+                                  "pl" => _('Polsky'));
    }
 
    /**

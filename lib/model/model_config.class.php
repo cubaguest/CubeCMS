@@ -23,6 +23,9 @@ class Model_Config extends Model_PDO {
    const COLUMN_KEY = 'key';
    const COLUMN_VALUE = 'value';
    const COLUMN_VALUES = 'values';
+   const COLUMN_PROTECTED = 'protected';
+   const COLUMN_TYPE = 'type';
+   const COLUMN_LABEL = 'label';
 
 
    /**
@@ -34,19 +37,40 @@ class Model_Config extends Model_PDO {
       $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
       return $dbst;
    }
-   
+
    public function saveNewCfg($key, $value) {
       ;
    }
-   
+
    public function saveCfg($key,$value) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)." SET `value` = :val WHERE `key` = :key");
       $dbst->bindValue(':key', $key, PDO::PARAM_STR);
       $dbst->bindValue(':val', $value, PDO::PARAM_STR);
-//      $dbst->debugDumpParams();
-//      exit();
+      //      $dbst->debugDumpParams();
+      //      exit();
       return $dbst->execute();
+   }
+
+   public function getList() {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+          ." WHERE (".self::COLUMN_PROTECTED." = 0)");
+
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->execute();
+
+      return $dbst;
+   }
+
+   public function getOption($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+          ." WHERE (".self::COLUMN_ID." = :id)");
+      $dbst->bindValue(":id", $id, PDO::PARAM_INT);
+
+      $dbst->execute();
+      return $dbst->fetchObject();
    }
 }
 ?>

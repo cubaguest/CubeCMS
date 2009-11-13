@@ -59,11 +59,20 @@ class Form_Element_Select extends Form_Element {
    public function controll() {
       $this->html()->clearContent();
       if($this->isDimensional()){
-         $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
+         if($this->isMultiple) {
+            $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."][]");
+         } else {
+            $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
+         }
          $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
       } else {
          $this->html()->setAttrib('id', $this->getName());
-         $this->html()->setAttrib('name', $this->getName());
+         if($this->isMultiple) {
+            $this->html()->setAttrib('name', $this->getName().'[]');
+         } else {
+            $this->html()->setAttrib('name', $this->getName());
+         }
+         
       }
       
       if($this->isMultiple) {
@@ -77,7 +86,7 @@ class Form_Element_Select extends Form_Element {
             foreach ($optVal as $optLabel2 => $optVal2) {
                $optChild = new Html_Element('option', $optLabel2);
                $optChild->setAttrib('value', $optVal2);
-               if($this->values == $optVal2) {
+               if($this->values == $optVal2 OR (is_array($this->values) AND in_array($optVal2, $this->values))) {
                   $optChild->setAttrib('selected', 'selected');
                }
                $opt->addContent($optChild);
@@ -85,7 +94,7 @@ class Form_Element_Select extends Form_Element {
          } else {
             $opt = new Html_Element('option', $optLabel);
             $opt->setAttrib('value', $optVal);
-            if($this->values == $optVal) {
+            if($this->values == $optVal OR (is_array($this->values) AND in_array($optVal, $this->values))) {
                $opt->setAttrib('selected', 'selected');
             }
          }

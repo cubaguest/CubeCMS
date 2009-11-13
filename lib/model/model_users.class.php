@@ -48,8 +48,8 @@ class Model_Users extends Model_PDO {
     */
    public function getUser($username) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT *, grp.name AS gname FROM ".Db_PDO::table(self::DB_TABLE)." AS user
-             JOIN ".Db_PDO::table(self::DB_TABLE_GROUPS)." AS grp ON user.".self::COLUMN_ID_GROUP
+      $dbst = $dbc->query("SELECT *, grp.name AS gname FROM ".self::getUsersTable()." AS user
+             JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP
              ." = grp.".self::COLUMN_ID_GROUP."
              WHERE (user.".self::COLUMN_USERNAME." = ".$dbc->quote($username).")");
       $dbst->execute();
@@ -64,11 +64,37 @@ class Model_Users extends Model_PDO {
     */
    public function getGroups() {
       $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT *, name AS gname FROM ".Db_PDO::table(self::DB_TABLE_GROUPS));
+      $dbst = $dbc->query("SELECT *, name AS gname FROM ".self::getGroupsTable());
       $dbst->execute();
 
 //      $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst;
+   }
+   
+   /**
+    * Metoda vrací název tabulky s uživateli (včetně prefixu)
+    * @return string -- název tabulky
+    */
+   public static function getUsersTable() {
+      if(VVE_USE_GLOBAL_ACCOUNTS === true){
+         return VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE;
+      } else {
+         return Db_PDO::table(self::DB_TABLE);
+      }
+      
+   }
+
+   /**
+    * Metoda vrací název tabulky se skupinami (včetně prefixu)
+    * @return string -- název tabulky
+    */
+   public static function getGroupsTable() {
+      if(VVE_USE_GLOBAL_ACCOUNTS === true){
+         return VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE_GROUPS;
+      } else {
+         return Db_PDO::table(self::DB_TABLE_GROUPS);
+      }
+
    }
 }
 ?>
