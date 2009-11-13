@@ -127,6 +127,9 @@ class Url_Request {
       $fullUrl = $_SERVER['REQUEST_URI'];
       self::$scriptName = $_SERVER["SCRIPT_NAME"];
       self::$serverName = $_SERVER["SERVER_NAME"];
+      if(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null){
+         self::$serverName = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', self::$serverName, 1);
+      }
       //		Najdeme co je cesta k aplikaci a co je předaná url
       self::$fullUrl = substr($fullUrl, strpos(self::$scriptName, AppCore::APP_MAIN_FILE));
       // odstraníme dvojté lomítka
