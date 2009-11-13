@@ -24,7 +24,7 @@ class Articles_Model_List extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
           ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-          ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+          ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
           ." = user.".Model_Users::COLUMN_ID
           ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
           ." ORDER BY ".Articles_Model_Detail::COLUMN_ADD_TIME." DESC"
@@ -47,7 +47,7 @@ class Articles_Model_List extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
           ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-          ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+          ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
           ." = user.".Model_Users::COLUMN_ID
           ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
           ." ORDER BY ".Articles_Model_Detail::COLUMN_SHOWED." DESC"

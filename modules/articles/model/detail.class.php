@@ -91,7 +91,7 @@ class Articles_Model_Detail extends Model_PDO {
       $dbc = new Db_PDO();
          $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
          ." FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
-         ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON article.".self::COLUMN_ID_USER
+         ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".self::COLUMN_ID_USER
          ." = user.".Model_Users::COLUMN_ID
          ." WHERE (article.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey"
          ." OR article.".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey2)".
