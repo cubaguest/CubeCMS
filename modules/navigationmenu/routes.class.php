@@ -3,10 +3,10 @@
  * Třída obsluhující cesty modulu
  *
  */
-class Users_Routes extends Routes {
+class NavigationMenu_Routes extends Routes {
 	function initRoutes() {
       $this->addRoute('add', "add", 'add', null);
-      $this->addRoute('edit', "user-::id::/edit/", 'edit','user-{id}/edit');
+      $this->addRoute('edit', "item-::id::/edit/", 'edit','item-{id}/edit');
 
       $this->addRoute('normal', null, 'main', null);
 	}

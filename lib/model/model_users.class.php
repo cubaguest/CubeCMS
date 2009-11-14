@@ -70,7 +70,21 @@ class Model_Users extends Model_PDO {
 //      $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst;
    }
-   
+
+   /**
+    * Metoda vrací seznam skupin v systému
+    * @return PDOStatement
+    */
+   public function getUsersList() {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->query("SELECT *, grps.name AS gname FROM ".self::getUsersTable()." AS users"
+      ." JOIN ".self::getGroupsTable()." AS grps ON users.".self::COLUMN_ID_GROUP." = grps.".self::COLUMN_ID_GROUP);
+      $dbst->execute();
+      return $dbst;
+   }
+
+
+
    /**
     * Metoda vrací název tabulky s uživateli (včetně prefixu)
     * @return string -- název tabulky
@@ -94,7 +108,6 @@ class Model_Users extends Model_PDO {
       } else {
          return Db_PDO::table(self::DB_TABLE_GROUPS);
       }
-
    }
 }
 ?>

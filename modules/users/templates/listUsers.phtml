@@ -1,0 +1,51 @@
+<?
+$model = new Model_Users();
+$users = $model->getUsersList();
+?>
+<div>
+   <h2><?=$this->_('Uživatelé')?></h2>
+   <table>
+      <tr>
+         <th width="20"><?=$this->_('id')?></th>
+         <th width="80"><?=$this->_('Jméno')?></th>
+         <th width="80"><?=$this->_('Přijmení')?></th>
+         <th width="80"><?=$this->_('Uživ. jméno')?></th>
+         <th width="200"><?=$this->_('E-mail')?></th>
+         <th width="60"><?=$this->_('Skupina')?></th>
+         <th width="60"><?=$this->_('Operace')?></th>
+      </tr>
+      <?
+      while ($row = $users->fetchObject()) {?>
+      <tr>
+         <td><?=$row->{Model_Users::COLUMN_ID}?></td>
+         <td><?=$row->{Model_Users::COLUMN_NAME}?></td>
+         <td><?=$row->{Model_Users::COLUMN_SURNAME}?></td>
+         <td><?=$row->{Model_Users::COLUMN_USERNAME}?></td>
+         <td><?=$row->{Model_Users::COLUMN_MAIL}?></td>
+         <td><?=$row->{Model_Users::COLUMN_GROUP_NAME}?></td>
+         <td>
+            <?if($this->category()->getRights()->isControll()){?>
+            <form method="post" action="<?=$this->link()->route('edit',array('user' => $row->{Model_Users::COLUMN_ID}))?>" style="display:inline;">
+               <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="user_edit" title="<?=$this->_('Upravit')?>" />
+            </form>
+            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return confirm('<?=$this->_('Opravdu smazat uživatele: ').$row->{Model_Users::COLUMN_USERNAME};?>')">
+               <input type="hidden" value="<?=$row->{Model_Users::COLUMN_ID}?>" name="user_id" />
+               <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="user_remove" title="<?=$this->_('Smazat')?>" />
+            </form>
+            <?}?>
+         </td>
+      </tr>
+
+      <?}?>
+
+   </table>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      function submitRemoveUser(msg){
+         return ;
+      }
+      /* ]]> */
+   </script>
+</div>

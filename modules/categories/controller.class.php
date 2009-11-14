@@ -227,7 +227,7 @@ class Categories_Controller extends Controller {
          // klíč podkategorií
             $urlPath = null;
             $p = end($path);
-            $catObj = $p->getCatObj();
+            $catObj = $p->getCatObj()->getCatDataObj();
             $urlPath = $catObj[Model_Category::COLUMN_URLKEY][$lang];
             if($urlPath != null) $urlPath .= URL_SEPARATOR;
 
