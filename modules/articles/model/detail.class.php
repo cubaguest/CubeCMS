@@ -136,6 +136,19 @@ class Articles_Model_Detail extends Model_PDO {
    }
 
    /**
+    * Metoda vymaže články podle zadaného id kategorie
+    * @param int $id -- id kategorie
+    */
+   public function deleteArticleByCat($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
+          ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
+      $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
+      $dbst->execute();
+      return $dbst;
+   }
+
+   /**
     * Metoda vrací poslední změnu článků v dané kategorii
     * @param int $id -- id kategorie
     * @return int -- timestamp

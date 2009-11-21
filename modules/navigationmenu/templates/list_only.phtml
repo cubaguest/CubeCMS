@@ -1,0 +1,39 @@
+<?
+$model = new NavigationMenu_Models_List();
+$listSubdomains = $model->getSubdomainsList();
+$listProjects = $model->getProjectsList();
+
+?>
+<div class="navigationMenu">
+   <ul id="subdomains">
+      <?while ($row = $listSubdomains->fetch()) {?>
+      <li>
+         <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
+            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>">
+            <?
+            if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
+         <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
+               .URL_SEPARATOR.$row->{NavigationMenu_Models_List::COL_ICON}?>"
+              alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                 <?}?>
+         <?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+      </li>
+      <?}?>
+   </ul>
+   <ul id="projects">
+      <?while ($row = $listProjects->fetch()) {?>
+      <li>
+         <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
+            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>">
+            <?
+            if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
+         <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
+               .URL_SEPARATOR.$row->{NavigationMenu_Models_List::COL_ICON}?>"
+              alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                 <?}?>
+         <?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+      </li>
+      <?}?>
+   </ul>
+   <hr class="reseter" />
+</div>

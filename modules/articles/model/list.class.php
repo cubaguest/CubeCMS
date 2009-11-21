@@ -31,9 +31,9 @@ class Articles_Model_List extends Model_PDO {
           ." LIMIT :fromRow, :rowCount ");
 
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
-      $dbst->bindParam(':fromRow', $fromRow, PDO::PARAM_INT);
-      $dbst->bindParam(':rowCount', $rowsCount, PDO::PARAM_INT);
+      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':fromRow', (int)$fromRow, PDO::PARAM_INT);
+      $dbst->bindValue(':rowCount', (int)$rowsCount, PDO::PARAM_INT);
       $dbst->execute();
 
       return $dbst;

@@ -19,10 +19,20 @@ class Categories_Controller extends Controller {
 
       if($formDelete->isValid()) {
          $categories = unserialize(VVE_CATEGORIES_STRUCTURE);
+         // načtení kategorie (nutné pro vyčištění)
+         $cM = new Model_Category();
+         $cat = $cM->getCategoryById($formDelete->id->getValues());
+
+         // vymažeme práva
+         $rModel = new Model_Rights();
+         $rModel->deleteCatRights($formDelete->id->getValues());
 
          // mažeme kategorii z DB
-         $model = new Model_Category();
-         $model->deleteCategory($formDelete->id->getValues());
+         $cM->deleteCategory($formDelete->id->getValues());
+
+         // vyčištění kategorie
+         $moduleCtrName = $cat->{Model_Category::COLUMN_MODULE}.'_Controller';
+         call_user_func($moduleCtrName."::clearOnRemove", $formDelete->id->getValues());
 
          // mažeme kategorii ze struktury
          $categories->removeCat($formDelete->id->getValues());
@@ -108,7 +118,7 @@ class Categories_Controller extends Controller {
 
       $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
       $catModel = new Model_Category();
-      $menu->setCategories($catModel->getCategoryList());
+      $menu->setCategories($catModel->getCategoryList(true));
 
       $selCat = $menu->getCategory($this->getRequest('categoryid'));
       $menu->removeCat($this->getRequest('categoryid'));
@@ -130,14 +140,15 @@ class Categories_Controller extends Controller {
       $form->sitemap_frequency->setValues($cat[Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ]);
 
       // práva
-      $rights = array();
-      $usrModel = new Model_Users();
-      $groups = $usrModel->getGroups();
-      while ($group = $groups->fetch()) {
-         $grName = Model_Category::COLUMN_GROUP_PREFIX.$group[Model_Users::COLUMN_GROUP_NAME];
-         $form->{$grName}->setValues($cat[Model_Category::COLUMN_GROUP_PREFIX
-             .$group[Model_Users::COLUMN_GROUP_NAME]]);
+      $rModel = new Model_Rights();
+      $rights = $rModel->getRights($this->getRequest('categoryid'));
+      if($rights !== false){
+         while ($right = $rights->fetchObject()) {
+            $grName = 'group_'.$right->{Model_Users::COLUMN_GROUP_NAME};
+            $form->{$grName}->setValues($right->{Model_Rights::COLUMN_RIGHT});
+         }
       }
+
 
       // odeslání formuláře
       if($form->isValid()) {
@@ -166,21 +177,22 @@ class Categories_Controller extends Controller {
                $urlkey[$lang] = vve_cr_url_key(strtolower($variable));
             }
          }
-
-         // práva
-         $rights = array();
-         $usrModel = new Model_Users();
-         $groups = $usrModel->getGroups();
-         while ($group = $groups->fetch()) {
-            $grName = Model_Category::COLUMN_GROUP_PREFIX.$group[Model_Users::COLUMN_GROUP_NAME];
-            $rights[$grName] = $form->{$grName}->getValues();
-         }
+         // kategorie
          $categoryModel = new Model_Category();
          $categoryModel->saveEditCategory($this->getRequest('categoryid'), $form->name->getValues(),$form->alt->getValues(),
              $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
              $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
              $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
-             $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
+             $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
+
+         // práva
+         $usrModel = new Model_Users();
+         $groups = $usrModel->getGroups();
+         while ($group = $groups->fetchObject()) {
+            $grName = 'group_'.$group->{Model_Users::COLUMN_GROUP_NAME};
+            $right = $form->{$grName}->getValues();
+            $rModel->saveRight($right, $group->{Model_Users::COLUMN_ID_GROUP}, $this->getRequest('categoryid'));
+         }
 
          // uprava struktury
          if($form->parent_cat->getValues() != $selCat->getParentId()) {
@@ -211,7 +223,7 @@ class Categories_Controller extends Controller {
       // kategorie
       $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
       $catModel = new Model_Category();
-      $menu->setCategories($catModel->getCategoryList());
+      $menu->setCategories($catModel->getCategoryList(true));
 
       $this->catsToArrayForForm($menu);
       $form->parent_cat->setOptions($this->categoriesArray);
@@ -227,8 +239,11 @@ class Categories_Controller extends Controller {
          // klíč podkategorií
             $urlPath = null;
             $p = end($path);
-            $catObj = $p->getCatObj()->getCatDataObj();
-            $urlPath = $catObj[Model_Category::COLUMN_URLKEY][$lang];
+            // pokud se vkládá do kořenu. Kořen nemá kategorii
+            if($p->getCatObj() !== null){
+               $catObj = $p->getCatObj()->getCatDataObj();
+               $urlPath = $catObj[Model_Category::COLUMN_URLKEY][$lang];
+            }
             if($urlPath != null) $urlPath .= URL_SEPARATOR;
 
             if($variable == null AND $names[$lang] == null) {
@@ -241,22 +256,23 @@ class Categories_Controller extends Controller {
             }
          }
 
-         // práva
-         $rights = array();
-         $usrModel = new Model_Users();
-         $groups = $usrModel->getGroups();
-         while ($group = $groups->fetch()) {
-            $grName = Model_Category::COLUMN_GROUP_PREFIX.$group[Model_Users::COLUMN_GROUP_NAME];
-            $rights[$grName] = $form->{$grName}->getValues();
-         }
 
          $categoryModel = new Model_Category();
          $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
              $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
              $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
              $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
-             $rights,$form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
+             $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
 
+         // práva
+         $usrModel = new Model_Users();
+         $rModel = new Model_Rights();
+         $groups = $usrModel->getGroups();
+         while ($group = $groups->fetchObject()) {
+            $grName = 'group_'.$group->{Model_Users::COLUMN_GROUP_NAME};
+            $right = $form->{$grName}->getValues();
+            $rModel->saveRight($right, $group->{Model_Users::COLUMN_ID_GROUP}, $lastId);
+         }
          // po uložení vložíme do struktury
          if($lastId !== false) {
             $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
@@ -364,16 +380,22 @@ class Categories_Controller extends Controller {
       $rightsTypes = array('r--'=>'r--', '-w-'=>'-w-', '--c'=>'--c', 'rw-'=>'rw-',
           'r-c'=>'r-c', '-wc'=>'-wc', 'rwc'=>'rwc', '---' => '---');
 
-      while ($group = $groups->fetch()) {
-         $catGuestRigths = new Form_Element_Select('group_'.$group[Model_Users::COLUMN_GROUP_NAME],
-             sprintf($this->_('Práva pro %s'), $group[Model_Users::COLUMN_GROUP_NAME]));
-         $catGuestRigths->setOptions($rightsTypes);
-         $form->addElement($catGuestRigths, 'rights');
+      while ($group = $groups->fetchObject()) {
+         if($group->{Model_Users::COLUMN_GROUP_LABEL} != null) {
+            $grName = $group->{Model_Users::COLUMN_GROUP_LABEL};
+         } else {
+            $grName = $group->{Model_Users::COLUMN_GROUP_NAME};
+         }
+         $catGrpRigths = new Form_Element_Select('group_'.$group->{Model_Users::COLUMN_GROUP_NAME}, 
+            sprintf($this->_("Skupina\n \"%s\""), $grName));
+         $catGrpRigths->setOptions($rightsTypes);
+         $catGrpRigths->setValues($group->{Model_Users::COLUMN_GROUP_DEF_RIGHT});
+         $form->addElement($catGrpRigths, 'rights');
       }
 
       $form->addGroup('sitemap', $this->_('Mapa stránek'), $this->_('Nastavení mapy stránek pro vyhledávače'));
 
-      // nastvaení SITEMPS
+      // nastvaení SITEMAPS
       // priorita
       $catSitemapPriority = new Form_Element_Text('sitemap_priority', $this->_('Priorita kategorie v sitemap'));
       $catSitemapPriority->setSubLabel('0 - 1, čím větší, tím výše kategorie bude');

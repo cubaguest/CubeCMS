@@ -18,7 +18,7 @@ class Articles_Controller extends Controller {
          $this->category()->getModule()->getParam('scroll', 2));
 
       $scrollComponent->runCtrlPart();
-  
+
       $articles = $artModel->getList($this->category()->getId(),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
@@ -119,7 +119,7 @@ class Articles_Controller extends Controller {
 
          $artModel = new Articles_Model_Detail();
          $count = $artModel->saveArticle($names, $addForm->text->getValues(), $urlkey,
-             $this->category()->getId(), $this->rights()->getAuth()->getUserId());
+             $this->category()->getId(), $this->auth()->getUserId());
 
          if($count != 0) {
             $this->infoMsg()->addMessage($this->_('Článek byl uložen'));
@@ -170,7 +170,7 @@ class Articles_Controller extends Controller {
          }
 
          if($artModel->saveArticle($names, $editForm->text->getValues(), $urlkey,
-         $this->category()->getId(), $this->rights()->getAuth()->getUserId(),
+         $this->category()->getId(), $this->auth()->getUserId(),
          $editForm->art_id->getValues())) {
             // nahrání nové verze článku (kvůli url klíči)
             $article = $artModel->getArticleById($editForm->art_id->getValues());
@@ -213,6 +213,15 @@ class Articles_Controller extends Controller {
       $form->addElement($iSubmit);
 
       return $form;
+   }
+
+   /**
+    * Smazání článků při odstranění kategorie
+    * @param int $idCat
+    */
+   public static function clearOnRemove($idCat) {
+      $model = new Articles_Model_Detail();
+      $model->deleteArticleByCat($idCat);
    }
 }
 ?>

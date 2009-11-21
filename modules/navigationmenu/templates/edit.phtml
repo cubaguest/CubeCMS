@@ -1,22 +1,18 @@
 <div>
 <?
 // do titulku
-   $this->addPageTitle($this->_('úprava volby'));
-   $this->addPageTitle($this->option->{Model_Config::COLUMN_KEY});
-   $this->addPageHeadline($this->_('úprava volby'));
-   $this->addPageHeadline($this->option->{Model_Config::COLUMN_KEY});
-// donastavení formuláře
-//$this->form->priority->html()->setAttrib('size', 4);
-//
-//$this->form->module->htmlSubLabel()->addContent('<br /><p id="moduleNameDoc"></p>', true);
-//$this->form->moduleParams->htmlSubLabel()->addContent('<br /><a id="getModuleParams" href="">doc</a><p id="moduleDoc"></p>', true);
-
-//$this->addJsPlugin(new JsPlugin_JQuery());
+if($this->edit === true){
+   $this->addPageTitle($this->_('úprava navigačního odkazu'));
+   $this->addPageTitle($this->name);
+   $this->addPageHeadline($this->_('úprava navigačního odkazu'));
+   $this->addPageHeadline($this->name);
+} else {
+   $this->addPageTitle($this->_('přidání navigačního odkazu'));
+   $this->addPageHeadline($this->_('přidání navigačního odkazu'));
+}
 ?>
 
-<p><?=$this->option->{Model_Config::COLUMN_LABEL}?></p>
 <?=$this->form?>
-
 
 <script type="text/javascript">
    /* <![CDATA[ */
