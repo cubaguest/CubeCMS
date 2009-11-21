@@ -109,7 +109,7 @@ abstract class View {
    /**
     * Hlavní abstraktní třída pro vytvoření pohledu
     */
-   abstract function mainView();
+   public function mainView(){}
 
    /**
     * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
