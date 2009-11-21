@@ -209,7 +209,7 @@ abstract class Controller {
     * @return Auth -- objekt autorizace
     */
    final public function auth() {
-   //      return $this->sys()->rights()->getAuth();
+      return AppCore::getAuth();
    }
 
    /**
@@ -389,6 +389,14 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     */
    final public function _m($message) {
       return $this->locale()->_m($message);
+   }
+
+   /**
+    * Metoda implementující mazání při odstranění kategori. Je určena k vičištění.
+    * @param int $idCat -- id kategorie
+    */
+   public static function clearOnRemove($idCat) {
+      ;
    }
 }
 ?>

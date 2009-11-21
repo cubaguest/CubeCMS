@@ -34,7 +34,8 @@ class Model_Category extends Model_PDO {
    const COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';
    const COLUMN_CAT_PROTECTED	= 'protected';
    const COLUMN_PRIORITY	= 'priority';
-   const COLUMN_GROUP_PREFIX	= 'group_';
+//   const COLUMN_GROUP_PREFIX	= 'group_';
+   const COLUMN_ID_GROUP	= 'id_group';
    const COLUMN_ACTIVE = 'active';
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_DESCRIPTION = 'description';
@@ -54,51 +55,54 @@ class Model_Category extends Model_PDO {
 
       $dbc = new Db_PDO();
       if($catKey != null) {
-      //         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-      //             INNER JOIN ".Db_PDO::table(Model_Sections::DB_TABLE)." AS sec ON cat.".self::COLUMN_SEC_ID
-      //             ." = sec.".Model_Sections::COLUMN_SEC_ID."
-      //             WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
-      //             AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
-      //             ." = ".$dbc->quote($catKey).") LIMIT 0, 1");
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-             WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
-             AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+         ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+         .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+             ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+             ." AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
              ." = :catkey OR cat.".self::COLUMN_URLKEY.'_'.Locale::getDefaultLang()
              ." = :catkey2) LIMIT 0, 1");
-         $dbst->bindParam(':catkey', $catKey);
-         $dbst->bindParam(':catkey2', $catKey);
+
+         $dbst->bindValue(":catkey", $catKey);
+         $dbst->bindValue(":catkey2", $catKey);
+         $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
       } else {
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-             WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
-             AND (cat.".self::COLUMN_ACTIVE." = 1)
-             ORDER BY cat.".self::COLUMN_PRIORITY." ASC LIMIT 0, 1");
-      //         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-      //             INNER JOIN ".Db_PDO::table(Model_Sections::DB_TABLE)." AS sec ON cat.".self::COLUMN_SEC_ID
-      //             ." = sec.".Model_Sections::COLUMN_SEC_ID."
-      //             WHERE (cat.".self::COLUMN_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
-      //             AND (cat.".self::COLUMN_ACTIVE." = 1)
-      //             ORDER BY cat.".self::COLUMN_PRIORITY." ASC LIMIT 0, 1");
+            $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+         ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+         .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+         ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+         ." ORDER BY cat.".self::COLUMN_PRIORITY." ASC LIMIT 0, 1");
+      
+         $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
       }
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_INTO, new Model_LangContainer());
       return $dbst->fetch();
-
-   //      SELECT IFNULL(cat.label_cs, cat.label_cs) AS clabel, cat.`id_category`, cat.`left_panel`,
-   //      cat.`right_panel`, cat.`id_section`, cat.`cparams`, IFNULL(sec.label_cs, sec.label_cs) AS slabel,
-   //      IFNULL(sec.alt_cs, sec.alt_cs) AS salt FROM `vypecky_categories` AS cat
-   //      INNER JOIN `vypecky_items` AS item ON cat.id_category = item.id_category
-   //      INNER JOIN `vypecky_sections` AS sec ON cat.id_section = sec.id_section
-   //      WHERE (item.group_guest LIKE 'r__') AND (cat.active = 1)
-   //      ORDER BY sec.priority DESC, cat.priority DESC, clabel ASC LIMIT 0, 1
    }
+
+   /**
+    * Metoda vrací kategorii podle zadaného id
+    * @param int $id -- id kategorie
+    * @return Object
+    */
+   public function getCategoryById($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
+             WHERE (cat.".self::COLUMN_CAT_ID." = :idcat) LIMIT 0, 1");
+      $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
+      $dbst->setFetchMode(PDO::FETCH_INTO, new Model_LangContainer());
+      $dbst->execute();
+
+      return $dbst->fetch();
+   }
+
+
    /**
     * Metoda načte kategori se zadaným id
     * @param string $catId -- id kategorie
     */
    public function getCategoryWoutRights($catId) {
-      $userNameGroup = AppCore::getAuth()->getGroupName();
-
       $dbc = new Db_PDO();
       //         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
       //             INNER JOIN ".Db_PDO::table(Model_Sections::DB_TABLE)." AS sec ON cat.".self::COLUMN_SEC_ID
@@ -118,23 +122,35 @@ class Model_Category extends Model_PDO {
    /**
     * Metoda načte všechny kategorie
     * @param bool $allCategories -- jestli mají být vráceny všechny kategorie
+    * bez ohledu na práva (POZOR!! bezpečnostní riziko)
     * @return PDOStatement -- objekt s daty
     */
    public function getCategoryList($allCategories = false) {
       $dbc = new Db_PDO();
-      //      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-      //             INNER JOIN ".Db_PDO::table(Model_Sections::DB_TABLE)." AS sec ON cat.".self::COLUMN_SEC_ID
-      //          ." = sec.".Model_Sections::COLUMN_SEC_ID."
-      //             ORDER BY cat.".self::COLUMN_PRIORITY." DESC");
+//SELECT *
+//FROM vypecky_categories AS cat
+//JOIN vypecky_rights AS rights ON rights.id_category = cat.id_category
+//WHERE (rights.id_group =1 AND rights.right LIKE 'r__')
+//ORDER BY LENGTH( urlkey_cs ) DESC
+
       if(!$allCategories) {
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-             WHERE (cat.".self::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')".
-             " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
+//             WHERE (cat.".self::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')".
+//             " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+         ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+         .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+         ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+         ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+         $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+         
       } else {
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
              " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
       }
       $dbst->execute();
+
+      
 
       //      $cl = new Model_LangContainer();
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
@@ -160,12 +176,11 @@ class Model_Category extends Model_PDO {
     * @param <type> $inidividualPanels
     * @param <type> $showInMenu
     * @param <type> $showWhenLoginOnly
-    * @param <type> $rights
     * @param <type> $sitemapPriority
     * @param <type> $sitemapFrequency
     */
    public function saveNewCategory($name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
-       $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
+       $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
@@ -177,11 +192,9 @@ class Model_Category extends Model_PDO {
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
           self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency));
 
-      $this->setIUValues($rights);
-
       $dbc = new Db_PDO();
-      print ("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-          ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
+//      print ("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+//          ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
 
       $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
           ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
@@ -200,12 +213,11 @@ class Model_Category extends Model_PDO {
     * @param <type> $inidividualPanels
     * @param <type> $showInMenu
     * @param <type> $showWhenLoginOnly
-    * @param <type> $rights
     * @param <type> $sitemapPriority
     * @param <type> $sitemapFrequency
     */
    public function saveEditCategory($id, $name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
-       $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $rights, $sitemapPriority,
+       $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
        $sitemapFrequency) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
@@ -216,8 +228,6 @@ class Model_Category extends Model_PDO {
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
           self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency));
-
-      $this->setIUValues($rights);
 
       $dbc = new Db_PDO();
       return $dbc->exec("UPDATE ".Db_PDO::table(self::DB_TABLE)

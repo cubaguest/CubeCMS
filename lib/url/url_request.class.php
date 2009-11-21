@@ -18,6 +18,7 @@ class Url_Request {
    const URL_TYPE_NORMAL = 'normal';
    const URL_TYPE_ENGINE_PAGE = 'specialpage';
    const URL_TYPE_MODULE_REQUEST = 'module';
+   const URL_TYPE_MODULE_STATIC_REQUEST = 'modules';
    const URL_TYPE_COMPONENT_REQUEST = 'component';
    const URL_TYPE_JSPLUGIN_REQUEST = 'jsplugin';
    const URL_TYPE_SUPPORT_SERVICE = 'supportservice';
@@ -160,7 +161,8 @@ class Url_Request {
       // jesli se zpracovává soubor modulu
       if($this->parseSpecialPageUrl() OR $this->parseSupportServiceUrl()
           OR $this->parseModuleUrl() OR $this->parseComponentUrl()
-          OR $this->parseJsPluginUrl() OR $this->parseNormalUrl()) {
+          OR $this->parseJsPluginUrl() OR $this->parseNormalUrl()
+          OR $this->parseModuleStaticUrl()) {
 
          $validRequest = true;
          AppCore::setErrorPage(false);
@@ -286,6 +288,27 @@ class Url_Request {
          $this->parmas = $matches['params'];
       }
       $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+      $this->pageFull = false;
+      return true;
+   }
+
+   /**
+    * Metoda zkontroluje jesli se nejedná o url k statické akci modulu (např. při ajax requestu)
+    */
+   private function parseModuleStaticUrl() {
+      $matches = array();//(?:(?P<lang>[a-z]{2})\/)?
+      if(!preg_match("/module_s\/(?:(?P<lang>[a-z]{2})\/)?(?P<mname>[\/a-z]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+         return false;
+      }
+      $this->category = null;
+      $this->name = $matches['mname'];
+      $this->action = $matches['action'];
+      $this->outputType = $matches['output'];
+      $this->lang = $matches['lang'];
+      if(isset ($matches['params'])) {
+         $this->parmas = $matches['params'];
+      }
+      $this->urlType = self::URL_TYPE_MODULE_STATIC_REQUEST;
       $this->pageFull = false;
       return true;
    }

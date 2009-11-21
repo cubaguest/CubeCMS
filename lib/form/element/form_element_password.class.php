@@ -13,7 +13,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
-class Form_Element_Password extends Form_Element_Text {
+class Form_Element_Password extends Form_Element {
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string

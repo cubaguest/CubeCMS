@@ -35,12 +35,6 @@ class Template_Core extends Template {
     */
    public function  renderTemplate() {
    // zastavení výpisu buferu
-//      ob_start();
-//      foreach ($this->templateFiles as $file) {
-//         include $file;
-//      }
-//      $contents = ob_get_contents();
-//      ob_end_clean();
       ob_start();
       parent::renderTemplate();
       $contents = ob_get_contents();

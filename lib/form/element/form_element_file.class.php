@@ -168,10 +168,16 @@ class Form_Element_File extends Form_Element {
 
    /**
     * Metoda naplní ovjekt typu file
-    * @param File $file -- objekt File
+    * @param string $className -- název třídy která se má vytvořit
+    * @todo -- dořešit
     */
-   public function fillinFileObject(File &$file) {
-      ;
+   public function createFileObject($className) {
+      if(!class_exists($className)){
+         throw new UnexpectedValueException(sprintf(_('Třídu %s se nepodařilo načíst'),$className), 1);
+      }
+
+      $fileObj = new $className($this->values['name'], $this->uploadDir);
+      return $fileObj;
    }
 }
 ?>

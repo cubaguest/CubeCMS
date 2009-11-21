@@ -25,6 +25,9 @@ class Sessions {
 	 */
 	public static function factory($sessionName) {
 		//Nastaveni session
+      if($_SERVER['SERVER_NAME'] != 'localhost'){
+         session_set_cookie_params(3600, '/', substr($_SERVER['SERVER_NAME'],strpos($_SERVER['SERVER_NAME'],".")));
+      }
 		session_regenerate_id(); // ochrana před Session Fixation
 		// 	Nastaveni limutu pro automaticke odhlaseni
 		/* set the cache limiter to 'private' */
@@ -33,7 +36,6 @@ class Sessions {
 		/* set the cache expire to 30 minutes */
 		session_cache_expire(60);
 		$cache_expire = session_cache_expire();
-      session_set_cookie_params(3600, '/', substr($_SERVER['SERVER_NAME'],strpos($_SERVER['SERVER_NAME'],".")));
 		session_name($sessionName);
 		session_start();
 		self::$sessionInitalized = true;

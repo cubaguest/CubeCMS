@@ -13,10 +13,10 @@
  */
 
 class Category {
-   /**
-    * Odělovač parametrů v pramaterech kategorie
-    * @var string
-    */
+/**
+ * Odělovač parametrů v pramaterech kategorie
+ * @var string
+ */
    const CAT_PARAMS_SEPARATOR = ';';
 
    /**
@@ -39,7 +39,7 @@ class Category {
 
    /**
     * Objekt s právy kategorie
-    * @var Rights 
+    * @var Rights
     */
    private $categoryRights = null;
 
@@ -55,19 +55,19 @@ class Category {
     * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
     */
    public function  __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null) {
-      //		vbrání kategorie
-      if($catKey != null){
+   //		vbrání kategorie
+      if($catKey != null) {
          $this->loadCat($catKey, $categoryDataObj);
          $this->categoryIsDefault = false;
       } else {
          $this->loadCat(null, $categoryDataObj);
          $this->categoryIsDefault = true;
       }
-      if(!empty ($this->category)){
+      if(!empty ($this->category)) {
          $this->categoryRights = new Rights();
          $this->loadRights();
       }
-      if($isSelectedCategory){
+      if($isSelectedCategory) {
          self::$selectedCategory = $this;
       }
    }
@@ -77,38 +77,31 @@ class Category {
     * @param string $catKey -- klíč kategorie
     */
    private function loadCat($catKey = null, $catDataObj = null) {
-      // zjistíme jestli nemáme načtená data
-      if($catDataObj === null){
+   // zjistíme jestli nemáme načtená data
+      if($catDataObj === null) {
          $catModel = new Model_Category();
          $catArray = $catModel->getCategory($catKey);
       } else {
          $catArray = $catDataObj;
       }
       //		Pokud nebyla načtena žádná kategorie
-      if(empty($catArray)){
-//         AppCore::setErrorPage();
+      if(empty($catArray)) {
+      //         AppCore::setErrorPage();
          $this->category = false;
          return false;
       } else {
-          $this->category = $catArray;
+         $this->category = $catArray;
       }
       // vytvoření objektu Modulu
       $this->module = new Module((string)$this->category->{Model_Category::COLUMN_MODULE},
-         $this->parseParams($this->category->{Model_Category::COLUMN_PARAMS}));
+          $this->parseParams($this->category->{Model_Category::COLUMN_PARAMS}));
    }
 
    /**
     * Metoda načte práva ke kategorii
     */
    public function loadRights() {
-      // načtení práv
-         foreach ($this->category as $collum => $value) {
-            if (substr($collum,0,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX)) ==
-                Rights::RIGHTS_GROUPS_TABLE_PREFIX) {
-               $this->categoryRights->addRight(substr($collum,strlen(Rights::RIGHTS_GROUPS_TABLE_PREFIX),
-                     strlen($collum)), $value);
-            }
-         };
+      $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});
    }
 
    /**
@@ -123,9 +116,9 @@ class Category {
     * Metoda parsuje parametry kategorie a uloží je do pole
     * @param string -- řetězec s paramaetry
     */
-   private function parseParams($params){
+   private function parseParams($params) {
       $rParams = array();
-      if ($params != null){
+      if ($params != null) {
          $arrayValues = array();
          $arrayValues = explode(self::CAT_PARAMS_SEPARATOR, $params);
          foreach ($arrayValues as $value) {
@@ -173,7 +166,7 @@ class Category {
     * @return string -- urlkey kategorie
     */
    public function getUrlKey() {
-      if(isset ($this->category->{Model_Category::COLUMN_URLKEY})){
+      if(isset ($this->category->{Model_Category::COLUMN_URLKEY})) {
          return (string)$this->category->{Model_Category::COLUMN_URLKEY};
       } else {
          return null;
@@ -184,7 +177,7 @@ class Category {
     * Metoda vrací jesli jsou pro danou kategorii individuální panely
     * @return boolena -- true pokud jsou panely individuální
     */
-   public function isIndividualPanels(){
+   public function isIndividualPanels() {
       return $this->category->{Model_Category::COLUMN_INDIVIDUAL_PANELS};
    }
 
@@ -193,7 +186,7 @@ class Category {
     * @return bool
     */
    public function isValid() {
-      if(empty ($this->category)){
+      if(empty ($this->category)) {
          return false;
       }
       return true;

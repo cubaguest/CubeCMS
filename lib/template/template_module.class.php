@@ -18,7 +18,7 @@ class Template_Module extends Template {
  * Objekt pro lokalizaci v modulu
  * @var Locale
  */
-   private $locale = null;
+   protected $locale = null;
 
    /**
     * Objekt kategorie pro kterou je šablona tvořena
@@ -155,6 +155,8 @@ class Template_Module extends Template {
          if($realpath){
             return $mainDir;
          } else {
+            return Url_Request::getBaseWebDir().AppCore::MODULES_DIR.URL_SEPARATOR.$moduleName.URL_SEPARATOR
+          .$dir.URL_SEPARATOR;
             return null;
          }
       } else {

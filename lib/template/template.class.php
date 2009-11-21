@@ -145,7 +145,6 @@ class Template {
    public function  &__get($name) {
       if(!isset($this->privateVars[$name])) {
          $this->privateVars[$name] = null;
-      //trigger_error(sprintf(_('Nedefinovaná proměnná %s'),$name), E_USER_NOTICE);
       }
       return $this->privateVars[$name];
    }
@@ -181,17 +180,6 @@ class Template {
    public function setPVar($name, $value) {
       self::$publicVars[$name] = $value;
    }
-
-   // vrací globální proměnou
-   
-//   public function pVar($name) {
-//      $return = null;
-//      if (isset (self::$publicVars[$name])) {
-//         return self::$publicVars[$name];
-//      } else {
-//         return null;
-//      }
-//   }
 
    /**
     * Metoda vrací hodnotu veřejné proměnné
@@ -278,12 +266,7 @@ class Template {
     * @param string $name -- název souboru
     */
    public function addTplFile($name) {
-   //      if(!$engine AND $this->sys() != null AND $this->sys()->module() instanceof Module){
-   //         array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR,
-   //               $this->sys()->module()->getName()).$name);
-   //      } else {
       array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR).$name);
-   //      }
    }
 
    /**
@@ -471,9 +454,8 @@ class Template {
       } else if(file_exists($mainDir.$file)) {
             if($realpath){
                return $mainDir;
-            }
-            else {
-               return (string)null;
+            } else {
+               return Url_Request::getBaseWebDir().$dir.URL_SEPARATOR;
             }
          } else {
             trigger_error(sprintf(_('Soubor "%s" nebyl nalezen'), $file));

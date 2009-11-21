@@ -13,12 +13,6 @@
 
 class Rights {
 	/**
-	 * Prefix sloupců s právy skupin
-	 * @var string
-	 */
-	const RIGHTS_GROUPS_TABLE_PREFIX = 'group_';
-	
-	/**
 	 * Pole s právy
 	 * @var array
 	 */
@@ -31,14 +25,6 @@ class Rights {
 	 * @param string -- pole s práva všech skupin
 	 */
 	function __construct() {
-	}
-	
-	/**
-	 * Metoda vrací přístup k objektu autorizace
-	 * @return Auth -- objekt autorizace
-	 */
-	public function getAuth() {
-      return AppCore::getAuth();
 	}
 	
 	/**
@@ -63,8 +49,8 @@ class Rights {
    /**
     * Metoda přidá právo
     */
-    public function addRight($name, $value) {
-       $this->rights[$name] = $this->parseRights($value);
+    public function addRight($value) {
+       $this->rights = $this->parseRights($value);
     }
 	
 	/**
@@ -72,7 +58,7 @@ class Rights {
 	 * @return boolean -- právo ke čtení
 	 */
 	final public function isReadable() {
-		return $this->rights[$this->getAuth()->getGroupName()]['read'];
+		return $this->rights['read'];
 	}
 	
 	/**
@@ -81,7 +67,7 @@ class Rights {
 	 */
 	final public function isWritable() {
 //		return $this->write;
-      return $this->rights[$this->getAuth()->getGroupName()]['write'];
+      return $this->rights['write'];
 	}
 	
 	/**
@@ -90,7 +76,7 @@ class Rights {
 	 */
 	final public function isControll() {
 //		return $this->controll;
-      return $this->rights[$this->getAuth()->getGroupName()]['controll'];
+      return $this->rights['controll'];
 	}
 }
 ?>

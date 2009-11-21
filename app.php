@@ -652,30 +652,46 @@ class AppCore {
     * Metoda spustí samotný požadavek na modul, např generování listu v xml souboru
     */
    public function runModuleOnly() {
+      if($this->urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_REQUEST) {
       // spuštění modulu
-      try {
-         if(!self::getCategory() instanceof Category){
-            throw new CoreException(_("Špatně zadaný požadavek na modul"));
+         try {
+            if(!self::getCategory() instanceof Category) {
+               throw new CoreException(_("Špatně zadaný požadavek na modul"));
+            }
+            // načtení a kontrola cest u modulu
+            $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
+            if(!class_exists($routesClassName)) {
+               throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' cest (routes) modulu."),
+               self::getCategory()->getModule()->getName()), 10);
+            }
+            //	Vytvoření objektu s cestama modulu
+            $routes = new $routesClassName($this->urlRequest->getModuleUrlPart());
+            // načtení kontroleru
+            $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
+            if(!class_exists($controllerClassName)) {
+               trigger_error(sprintf(_("Nepodařilo se načíst třídu '%s' controleru modulu."),
+                   self::getCategory()->getModule()->getName()), 10);
+            }
+            //					Vytvoření objektu kontroleru
+            $controller = new $controllerClassName(self::getCategory(), $routes);
+            $controller->runCtrlAction($this->urlRequest->getAction(), $this->urlRequest->getOutputType());
+         } catch (Exception $e ){
+            
          }
+      } else {
          // načtení a kontrola cest u modulu
-         $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
-         if(!class_exists($routesClassName)) {
-            throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' cest (routes) modulu."),
-                self::getCategory()->getModule()->getName()), 10);
-         }
-         //	Vytvoření objektu s cestama modulu
-         $routes = new $routesClassName($this->urlRequest->getModuleUrlPart());
-         // načtení kontroleru
-         $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
-         if(!class_exists($controllerClassName)) {
-            trigger_error(sprintf(_("Nepodařilo se načíst třídu '%s' controleru modulu."),
-                self::getCategory()->getModule()->getName()), 10);
-         }
-         //					Vytvoření objektu kontroleru
-         $controller = new $controllerClassName(self::getCategory(), $routes);
-         $controller->runCtrlAction($this->urlRequest->getAction(), $this->urlRequest->getOutputType());
-      } catch (Exception $e){
-         trigger_error($e->getMessage());
+            $className = ucfirst($this->urlRequest->getName()).'_Controller';
+            $classNameV = ucfirst($this->urlRequest->getName()).'_View';
+            $methodName = $this->urlRequest->getAction().'Controller';
+            $methodNameV = $this->urlRequest->getAction().'View';
+            if(method_exists($className,$methodName)){
+               call_user_func($className."::".$methodName);
+               if(method_exists($classNameV,$methodNameV)){
+                  call_user_func($classNameV."::".$methodNameV);
+               }
+            } else {
+               trigger_error(_('Neimplementovaná statická akce modulu'));
+            }
       }
    }
 
@@ -1036,7 +1052,7 @@ class AppCore {
       if(!self::getCategory()->isValid()) {
          AppCore::setErrorPage();
       }
-
+      
       // zapnutí buferu
       $output = new Template_Output($this->urlRequest->getOutputType());
 
@@ -1047,6 +1063,7 @@ class AppCore {
       // vybrání části pro zpracování podle požadavku
          switch ($this->urlRequest->getUrlType()) {
             case Url_Request::URL_TYPE_MODULE_REQUEST:
+            case Url_Request::URL_TYPE_MODULE_STATIC_REQUEST:
                $this->runModuleOnly();
                break;
             case Url_Request::URL_TYPE_SUPPORT_SERVICE:
@@ -1069,9 +1086,9 @@ class AppCore {
 
          // Globální inicializace proměných do šablony
          $this->initialWebSettings();
-            //vytvoření hlavního menu
+         //vytvoření hlavního menu
          $this->createMainMenu();
-
+         
          if($this->urlRequest->getUrlType() == Url_Request::URL_TYPE_ENGINE_PAGE
             AND !AppCore::isErrorPage()) {
          // zpracování stránky enginu (sitemap, search, atd.)

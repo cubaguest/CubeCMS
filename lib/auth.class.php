@@ -120,6 +120,7 @@ class Auth {
 	/**
 	 * Metoda zjistí jesli je uživatel již přihlášen
 	 * @return boolean -- true pokud je uživatel přihlášen
+    * @todo přidání kontroly IP adresy proti zneužití
 	 */
 	private function _userIslogIn() {
 		if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
@@ -183,7 +184,7 @@ class Auth {
 				if (!($userResult)){
 					$this->errMsg()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
 				} else {
-					if (md5(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD}){
+					if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD}){
 						//	Uspesne prihlaseni do systemu
 						$this->login = true;
 						self::$isLogIn = true;
@@ -290,6 +291,15 @@ class Auth {
     */
    public function errMsg() {
       return AppCore::getUserErrors();
+   }
+
+   /**
+    * Metoda provede zašifrování hesla
+    * @param string $pass -- heslo raw
+    * @return string -- šifrované heslo
+    */
+   public static function cryptPassword($pass) {
+      return sha1($pass);
    }
 }
 ?>

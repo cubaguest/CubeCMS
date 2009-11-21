@@ -142,6 +142,14 @@ class Filesystem_File {
    }
 
    /**
+    * Metoda pro převod na řetězec (vrací název souboru)
+    * @return string -- název souboru
+    */
+   public function  __toString() {
+      return $this->getName();
+   }
+
+   /**
     * Metoza zapíná nebo vypíná report chyb
     * @param bool $rep -- true pro zapnutí reportování chyb
     */
@@ -318,7 +326,7 @@ class Filesystem_File {
     * @return integer -- velikost souboru
     */
    private function locateFileSize() {
-      return filesize($this->getName(true));
+      return @filesize($this->getName(true));
    }
 
    /**
@@ -328,7 +336,7 @@ class Filesystem_File {
     */
    private function locateMimeType() {
       //      $file = $this->fileName;
-      $fileArray = explode('.',$this->getName());
+      $fileArray = @explode('.',$this->getName());
       $ext = strtolower(array_pop($fileArray));
       if (function_exists('finfo_open')) {
          $finfo = finfo_open(FILEINFO_MIME);

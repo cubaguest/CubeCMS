@@ -397,6 +397,7 @@ class Filesystem_File_Image extends Filesystem_File {
          $this->setRights(0777);
       } else {
       //         convert imagemagick to another formt
+         $this->saveAs($this->getDir(), $this->newImageWidth, $this->newImageHeight, $this->cropImage);
       }
    }
 
@@ -417,6 +418,9 @@ class Filesystem_File_Image extends Filesystem_File {
    public function save($width = false, $height = false) {
    //		test jestli je zpracováván obrázek
       if($this->isImage()) {
+         if($width !== false) $this->newImageWidth = $width;
+         if($height !== false) $this->newImageHeight = $height;
+
          $this->saveWorkingImage($this->imageType);
       }
    }

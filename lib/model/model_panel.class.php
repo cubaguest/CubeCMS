@@ -15,7 +15,7 @@ class Model_Panel extends Model_PDO {
  * Tabulka s detaily
  */
    const DB_TABLE = 'panels';
-
+   
    /**
     * Konstanty s názzvy sloupců
     */
@@ -24,7 +24,7 @@ class Model_Panel extends Model_PDO {
    const COLUMN_ID_SHOW_CAT = 'id_show_cat';
    const COLUMN_ORDER = 'porder';
    const COLUMN_POSITION    = 'position';
-
+   
    /**
     * Metoda uloží panel
     * @param int $idCat -- id kategorie ke které panel patří
@@ -41,7 +41,7 @@ class Model_Panel extends Model_PDO {
       if($idShowCat !== null) {
          $this->setIUValues(array(self::COLUMN_ID_SHOW_CAT => $idShowCat));
       }
-
+      
       $dbc = new Db_PDO();
       // ukládá se nový
       if($idPanel === null) {
@@ -50,14 +50,14 @@ class Model_Panel extends Model_PDO {
          return $dbc->lastInsertId();
       } else {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-          ." SET ".$this->getUpdateValues()
-          ." WHERE ".self::COLUMN_ID." = :id");
-
+             ." SET ".$this->getUpdateValues()
+             ." WHERE ".self::COLUMN_ID." = :id");
+         
          return $dbst->execute(array(':id' => $idPanel));
          return true;
       }
    }
-
+   
    /**
     * Metoda načte všechny kategorie
     * @param bool $allCategories -- jestli mají být vráceny všechny kategorie
@@ -66,25 +66,29 @@ class Model_Panel extends Model_PDO {
     */
    public function getPanelsList($idCat = 0, $withRights = true) {
       $dbc = new Db_PDO();
-
-      if($withRights){
-      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
-         JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat.".Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
-          ." WHERE (cat.".Model_Category::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')"
-          ." AND (panel.".self::COLUMN_ID_SHOW_CAT." = ".$idCat.")"
-          ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." ASC");
+      
+      if($withRights) {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel"
+             ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat."
+             .Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
+             ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+             .Model_Rights::COLUMN_ID_CATEGORY." = cat.".Model_Category::COLUMN_CAT_ID
+             ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+             ." AND (panel.".self::COLUMN_ID_SHOW_CAT." = ".$idCat.")"
+             ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." ASC");
+          $dbst->bindValue(":idgrp",AppCore::getAuth()->getGroupId() , PDO::PARAM_INT);
       } else {
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
          JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat.".Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
-          ." WHERE (panel.".self::COLUMN_ID_SHOW_CAT." = ".$idCat.")"
-          ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." ASC");
+             ." WHERE (panel.".self::COLUMN_ID_SHOW_CAT." = ".$idCat.")"
+             ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." ASC");
       }
-
+      
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       return $dbst;
    }
-
+   
    public function deletePanel($id) {
       $dbc = new Db_PDO();
       $st = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
