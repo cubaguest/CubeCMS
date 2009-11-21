@@ -6,7 +6,7 @@
 
 class Login_View extends View {
 	public function mainView() {
-      if($this->rights()->getAuth()->isLogin()){
+      if(Auth::isLoginStatic()){
          $this->template()->addTplFile("buttoneditpasswd.phtml");
          $this->template()->addTplFile("logout.phtml");
       } else {
