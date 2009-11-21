@@ -17,7 +17,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 	border: 0;
 	outline: 0;
 	font-size: 100%;
-	vertical-align: baseline;
+	/*vertical-align: baseline; /* Ověřit v IE */
 	background: transparent;
 }
 body {
@@ -110,7 +110,6 @@ body {
 	margin: 0px auto 0px auto;
 	padding: 0px;
 	overflow: hidden;
-	background: url("../images/textura.png") repeat;
 }
 
 #headwrap { /*background-color: #007070;*/
@@ -231,14 +230,14 @@ a:hover {
 
 /* Hlášky */
 .errorMessage, .message {
-	font-size: small;
-	padding: 5px;
-	/*font-weight: 600;*/
+   font-size: small;
+   padding: 5px;
+   /*font-weight: 600;*/
 }
 
-.errorMessage { /* text-align: center; */
-	background-color: #FFAEAE;
-	border: 2px solid #8B0306;
+.message { /* text-align: center; */
+           background-color: #9CCFFF;
+           border: 2px solid #688AAA;
 }
 
 .errorMessage p.errorContent {
@@ -247,17 +246,24 @@ a:hover {
    display:block;
 }
 
-.message { /* text-align: center; */
-	background-color: #9CCFFF;
-	border: 2px solid #688AAA;
+.errorMessage { /* text-align: center; */
+                background-color: #FFAEAE;
+                border: 2px solid #8B0306;
 }
 
 .errorMessage img, .message img {
-	float: left;
-	vertical-align: middle;
+   float: left;
+   vertical-align: middle;
+   margin-right: 5px;
 }
 
-
+div.infoMessage {
+   position: fixed;
+   top:0;
+   width: 600px;
+   margin: 0 auto;
+   z-index: 10000;
+}
 
 /* formulařové prvky */
 .requiredElem {
@@ -396,9 +402,8 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 /* EOF back */
 
 /* SOF main content */
-
 #col1pad>div {
-   background-color:white;
+   /*background-color:white;*/
 }
 
 /* EOF Main Content */

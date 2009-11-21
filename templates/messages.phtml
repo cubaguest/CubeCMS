@@ -1,7 +1,7 @@
 <?// Vypis hlasek
 if(!empty ($this->messages)) { ?>
 <div class="message infoMessage" id="messages">
-   <img src="<?=Template::face(false)?>images/icons/accept.png" alt="message icon" />
+   <img src="<?=Template::face(false)?>images/icons/accept.png" alt="message icon" width="16" />
       <? foreach ($this->messages as $message) {
          print ("<p>".$message . "</p>");
       }?>
@@ -19,7 +19,7 @@ if(!empty ($this->messages)) { ?>
 <? // chyby modulu
 if(!empty ($this->moduleErrors)) { ?>
 <div class="message errorMessage">
-   <img src="<?=Template::face(false)?>images/icons/error.png" alt="error icon" />
+   <img src="<?=Template::face(false)?>images/icons/error.png" alt="error icon" width="16" />
       <? foreach ($this->moduleErrors as $error) {
          print ("<p>"._("Chyba:")." ".$error ."</p>");
       }?>
