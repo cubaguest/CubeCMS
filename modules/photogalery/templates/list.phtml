@@ -190,10 +190,10 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('edit_text', $this->_("Upravit text"),
           $this->link()->route('edittext'),
-          $this->_("Upravit text galerie"), "text_edit.png");
+          $this->_("Upravit text galerie"), "page_edit.png");
       $toolbox->addTool('edit_images', $this->_("Upravit obrázky"),
           $this->link()->route('editimages'),
-          $this->_("Upravit text galerie"), "image.png");
+          $this->_("Upravit text galerie"), "image_edit.png");
       $this->includeTplObj($toolbox);
    }
    ?>

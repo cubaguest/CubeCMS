@@ -32,14 +32,14 @@ $this->addJsPlugin(new JsPlugin_JQuery());
             <form method="post" action="<?=$this->link()?>" style="display:inline;">
                <input type="hidden" value="<?=$row->{Model_Users::COLUMN_ID}?>" name="userstatus_id" />
                <input type="hidden" value="enable" name="userstatus_status" />
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/disable.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/disable.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="userstatus_change" title="<?=$this->_('Aktivovat uživatele')?>" />
             </form>
          <?} else {?>
             <form method="post" action="<?=$this->link()?>" style="display:inline;">
                <input type="hidden" value="<?=$row->{Model_Users::COLUMN_ID}?>" name="userstatus_id" />
                <input type="hidden" value="disable" name="userstatus_status" />
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/enable.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/enable.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="userstatus_change" title="<?=$this->_('Deaktivovat uživatele')?>" />
             </form>
          <?}?>
@@ -47,12 +47,12 @@ $this->addJsPlugin(new JsPlugin_JQuery());
          <td>
             <?if($this->category()->getRights()->isControll()){?>
             <form method="post" action="<?=$this->link()->route('edituser',array('id' => $row->{Model_Users::COLUMN_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/user_edit.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="user_edit" title="<?=$this->_('Upravit')?>" />
             </form>
             <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return confirm('<?=$this->_('Opravdu smazat uživatele: ').$row->{Model_Users::COLUMN_USERNAME};?>')">
                <input type="hidden" value="<?=$row->{Model_Users::COLUMN_ID}?>" name="user_id" />
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/user_delete.png', VVE_TPL_FILE_IMAGE)?>"
                       value="remove" name="user_remove" title="<?=$this->_('Smazat')?>" />
             </form>
             <?}?>
@@ -92,12 +92,12 @@ $this->addJsPlugin(new JsPlugin_JQuery());
          <td>
             <?if($this->category()->getRights()->isControll()){?>
             <form method="post" action="<?=$this->link()->route('editgroup',array('id' => $row->{Model_Users::COLUMN_ID_GROUP}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/group_edit.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="group_edit" title="<?=$this->_('Upravit')?>" />
             </form>
             <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return confirm('<?=$this->_('Opravdu smazat skupinu: ').$row->{Model_Users::COLUMN_GROUP_LABEL};?>')">
                <input type="hidden" value="<?=$row->{Model_Users::COLUMN_ID_GROUP}?>" name="group_id" />
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/group_delete.png', VVE_TPL_FILE_IMAGE)?>"
                       value="remove" name="group_remove" title="<?=$this->_('Smazat')?>" />
             </form>
             <?}?>
@@ -110,10 +110,10 @@ $this->addJsPlugin(new JsPlugin_JQuery());
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('add_user', $this->_("Přidat uživatele"),
           $this->link()->route('adduser'),
-          $this->_("Přidat nového uživatele"), "text_add.png");
+          $this->_("Přidat nového uživatele"), "user_add.png");
       $toolbox->addTool('add_group', $this->_("Přidat skupinu"),
           $this->link()->route('addgroup'),
-          $this->_("Přidat novou skupinu"), "text_add.png");
+          $this->_("Přidat novou skupinu"), "group_add.png");
       $this->includeTplObj($toolbox);
    }
    ?>

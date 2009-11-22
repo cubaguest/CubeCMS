@@ -26,19 +26,19 @@ function vveSectionsRenderFunc($menuArr, $link) {
       <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=$item?>">link</a>
    </td><td>
       <form method="post" action="<?=$link2->route('edit',array('categoryid' => $item->getId()))?>" style="display:inline;">
-         <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+         <input type="image" src="<?=vve_get_tpl_file('icons/application_edit.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="category_edit" title="<?=SECTION_EDTI_LABEL?>" />
       </form>
       <form method="post" action="<?=$link?>" style="display:inline;" onsubmit="return submitRemoveCat('<?=$item;?>')">
          <input type="hidden" value="<?=$item->getId()?>" name="category_id" />
-         <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
+         <input type="image" src="<?=vve_get_tpl_file('icons/application_delete.png', VVE_TPL_FILE_IMAGE)?>"
                 value="remove" name="category_remove" title="<?=SECTION_REMOVE_LABEL?>" />
       </form>
             <?if(!$first) {?>
       <form method="post" action="<?=$link?>" style="display:inline;">
          <input type="hidden" value="<?=$item->getId()?>" name="item_id" />
          <input type="hidden" value="up" name="item_move_to" />
-         <input type="image" src="<?=vve_get_tpl_file('toolbox/go-up.png', VVE_TPL_FILE_IMAGE)?>"
+         <input type="image" src="<?=vve_get_tpl_file('icons/go-up.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="item_move" title="<?=SECTION_MOVEUP_LABEL?>" />
       </form>
             <?}
@@ -46,7 +46,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
       <form method="post" action="<?=$link?>" style="display:inline;">
          <input type="hidden" value="<?=$item->getId()?>" name="item_id" />
          <input type="hidden" value="down" name="item_move_to" />
-         <input type="image" src="<?=vve_get_tpl_file('toolbox/go-down.png', VVE_TPL_FILE_IMAGE)?>"
+         <input type="image" src="<?=vve_get_tpl_file('icons/go-down.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="item_move" title="<?=SECTION_MOVEDOWN_LABEL?>" />
       </form>
             <?}?>
@@ -85,7 +85,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('add_category', $this->_("Přidat kategorii"),
           $this->link()->route('add'),
-          $this->_("Přidat novou kategorii"), "text_add.png");
+          $this->_("Přidat novou kategorii"), "application_add.png");
       $this->includeTplObj($toolbox);
    }
    ?>

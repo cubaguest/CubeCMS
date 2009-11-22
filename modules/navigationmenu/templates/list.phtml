@@ -23,12 +23,12 @@ $listProjects = $model->getProjectsList();
          <td>
                   
             <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
             </form>
             <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
                <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
                       value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
             </form>
          </td>
@@ -56,12 +56,12 @@ $listProjects = $model->getProjectsList();
          <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
          <td>
             <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
             </form>
             <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
                <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
-               <input type="image" src="<?=vve_get_tpl_file('toolbox/remove.png', VVE_TPL_FILE_IMAGE)?>"
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
                       value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
             </form>
          </td>
@@ -80,7 +80,7 @@ $listProjects = $model->getProjectsList();
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('add_nav_link', $this->_("Přidat odkaz"),
           $this->link()->route('add'),
-          $this->_("Přidat nový odkaz"), "text_add.png");
+          $this->_("Přidat nový odkaz"), "link_add.png");
       $this->includeTplObj($toolbox);
    }
    ?>

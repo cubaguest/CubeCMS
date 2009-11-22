@@ -21,7 +21,7 @@ $list = $model->getList();
             <td><?=$row->{Model_Config::COLUMN_VALUE}?></td>
             <td>
                <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{Model_Config::COLUMN_ID}))?>" style="display:inline;">
-                  <input type="image" src="<?=vve_get_tpl_file('toolbox/text_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                  <input type="image" src="<?=vve_get_tpl_file('icons/plugin_edit.png', VVE_TPL_FILE_IMAGE)?>"
                          value="edit" name="category_edit" title="<?=$this->_('Upravit')?>" />
                </form>
             </td>

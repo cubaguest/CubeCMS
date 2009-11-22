@@ -21,9 +21,9 @@ $this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('edit_article', $this->_("Upravit článek"),
           $this->link()->route('edit', array('articlekey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-          $this->_("Upravit zobrazený článek"), "text_edit.png");
+          $this->_("Upravit zobrazený článek"), "page_edit.png");
       $toolbox->addTool('article_delete', $this->_("Smazat článek"),
-          $this->link(), $this->_("Smazat zobrazený článek"), "text_edit.png",
+          $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
           'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
           $this->_('Opravdu smazat článek?'));
       $this->includeTplObj($toolbox);
