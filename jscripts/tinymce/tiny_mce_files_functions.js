@@ -61,7 +61,7 @@ var FileBrowserFilesFunctions = {
          //					containment: $('#demo-frame').length ? '#demo-frame' : 'document', // stick to demo-frame if present
          //         helper: 'clone',
          helper: function(event){
-            return $('<img src="../../../images/toolbox/go-up.png" width="16" height="16" title="Přesunout soubor do adresáře" alt="Přesunout soubor"/>');
+            return $('<img src="../../../images/icons/go-up.png" width="16" height="16" title="Přesunout soubor do adresáře" alt="Přesunout soubor"/>');
          },
 
          cursor: 'move',

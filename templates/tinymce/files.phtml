@@ -3,7 +3,7 @@ header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
 header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 header( 'Cache-Control: post-check=0, pre-check=0', false );
-header( 'Pragma: no-cache' ); 
+header( 'Pragma: no-cache' );
 if(!empty ($this->files)) {?>
 <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
    <tr>
@@ -47,23 +47,23 @@ if(!empty ($this->files)) {?>
       <td>
          <?if($file['type'] == 'image'){?>
          <span>Úpravy:</span><br />
-         <input type="image" src="../../../images/toolbox/image.png"
+         <input type="image" src="../../../images/icons/image.png"
                 title="Zobrazit náhled" onclick="FileBrowserFilesFunctions.imagePopup('<?=$file['name']."?".time()?>', '<?=$file['path']?>')" />
-         <input type="image" src="../../../images/toolbox/transform-scale.png"
+         <input type="image" src="../../../images/icons/transform-scale.png"
                 title="Změnit velikost" onclick="FileBrowserFilesFunctions.scaleImage('<?=$file['name']?>')" />
-         <input type="image" src="../../../images/toolbox/transform-rotate.png"
+         <input type="image" src="../../../images/icons/transform-rotate.png"
                 title="Změnit rotaci" onclick="FileBrowserFilesFunctions.rotateImage('<?=$file['name']?>')" />
-         <input type="image" src="../../../images/toolbox/transform-flip.png"
+         <input type="image" src="../../../images/icons/transform-flip.png"
                 title="Zrcadlit" onclick="FileBrowserFilesFunctions.flipImage('<?=$file['name']?>')" />
          <?}?>
          <br />
          <span>Soubor:</span><br />
-         <input type="image" src="../../../images/toolbox/rename.png"
+         <input type="image" src="../../../images/icons/page_edit.png"
                 title="Přejmenovat soubor" onclick="FileBrowserFilesFunctions.renameFile('<?=$file['name']?>')" />
-         <input type="image" src="../../../images/toolbox/remove.png"
+         <input type="image" src="../../../images/icons/delete.png"
                 title="Smazat soubor" onclick="FileBrowserFilesFunctions.removeFile('<?=$file['name']?>')" />
          <span class="draggable">
-            <img src="../../../images/toolbox/move.png" title="Přesunout soubor do adresáře (uchopte a přetáhněte)" alt="Přesunout soubor"/>
+            <img src="../../../images/icons/page_go.png" title="Přesunout soubor do adresáře (uchopte a přetáhněte)" alt="Přesunout soubor"/>
             <input type="hidden" value="<?=$file['name']?>" name="moved_file" />
          </span>
       </td>
