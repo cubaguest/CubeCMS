@@ -1,5 +1,4 @@
-<div class="message errorMessage">
-   <img src="<?=Template::face(false)?>images/icons/coreerror.png" alt="core error icon" />
+<div class="message" id="coreErrMessage" style="background-image: url('<?=vve_get_tpl_file('icons/exclamation.png', VVE_TPL_FILE_IMAGE)?>')">
       <?
       $errors = CoreErrors::getErrors();
       foreach ($errors as $error) {?>

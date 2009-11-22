@@ -16,7 +16,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 	padding: 0;
 	border: 0;
 	outline: 0;
-	font-size: 100%;
+   font-size: 10pt;
 	/*vertical-align: baseline; /* Ověřit v IE */
 	background: transparent;
 }
@@ -63,7 +63,7 @@ html,body {
 	padding: 0px;
 	font-family: "Tahoma", "Arial", sans-serif !important;
 	text-align: left;
-	font-size: 9pt !important;
+	/*font-size: 62.5% !important;*/
 	background: url('../images/backshadow.png') fixed top center white repeat-y;
 }
 
@@ -229,24 +229,47 @@ a:hover {
 
 
 /* Hlášky */
-.errorMessage, .message {
+.message {
    font-size: small;
-   padding: 5px;
+   padding: 5px 5px 5px 40px;
+   background-repeat: no-repeat;
+   background-position: 11px 50%;
+   margin-bottom: 5px;
    /*font-weight: 600;*/
 }
-
-.message { /* text-align: center; */
-           background-color: #9CCFFF;
-           border: 2px solid #688AAA;
+.message p {
+   margin-bottom:3px;
+   border-top: 1px solid gray;
+}
+.message p:first-child {
+   border: none;
 }
 
+#infoMessages {
+   border-bottom: 2px #b7dcff solid;
+   border-top: 2px #b7dcff solid;
+   background-color: #cce6ff;
+}
+
+#errMessages {
+   border-bottom: 2px #ffc7c0 solid;
+   border-top: 2px #ffc7c0 solid;
+   background-color: #ffe3e0;
+}
+
+#coreErrMessage {
+   border-bottom: 2px #ffa095 solid;
+   border-top: 2px #ffa095 solid;
+   background-color: #ffb2a9;
+}
+/*
 .errorMessage p.errorContent {
    padding-left: 40px;
    padding-bottom: 15px;
    display:block;
 }
 
-.errorMessage { /* text-align: center; */
+.errorMessage {
                 background-color: #FFAEAE;
                 border: 2px solid #8B0306;
 }
@@ -255,15 +278,15 @@ a:hover {
    float: left;
    vertical-align: middle;
    margin-right: 5px;
-}
+}*/
 
-div.infoMessage {
+/*div.infoMessage {
    position: fixed;
    top:0;
    width: 600px;
    margin: 0 auto;
    z-index: 10000;
-}
+}*/
 
 /* formulařové prvky */
 .requiredElem {
