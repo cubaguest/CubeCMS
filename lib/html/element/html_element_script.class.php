@@ -21,6 +21,7 @@ class Html_Element_Script extends Html_Element {
     */
    public function  __construct($content = null) {
       parent::__construct('script', $content);
+      $this->setAttrib('type', 'text/javascript');
    }
 
    /**

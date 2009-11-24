@@ -74,7 +74,8 @@ class Html_Element {
     * @return string -- tag určený pro výpis
     */
    public function  __toString() {
-      if($this->isInline AND $this->isEmpty() AND empty($this->classes) AND empty ($this->attribs)){
+//      if($this->isInline AND $this->isEmpty() AND empty($this->classes) AND empty ($this->attribs)){
+      if($this->isEmpty() AND empty($this->classes) AND empty ($this->attribs)){
          return (string)null;
       }
       $elem = $this->__toStringBegin();
@@ -102,13 +103,13 @@ class Html_Element {
          $string .= "\"";
       }
       if($this->isInline) {
-         $string .= " />";
+         $string .= " />\n";
       } else {
          $string .= ">";
       }
-      if(!$this->isEmpty()){
-         $string .= "\n";
-      }
+//      if(!$this->isEmpty()){
+//         $string .= "";
+//      }
       return $string;
    }
 
