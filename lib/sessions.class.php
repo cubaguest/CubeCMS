@@ -24,9 +24,16 @@ class Sessions {
 	 * @param string $sessionName -- název session do ketré se bude ukládat
 	 */
 	public static function factory($sessionName) {
+      // pokud je id sessison přenesena v jiném parametru než než pře cookie
+      if(isset ($_REQUEST['sessionid'])){
+         session_id($_REQUEST['sessionid']);
+      }
+
 		//Nastaveni session
-      if($_SERVER['SERVER_NAME'] != 'localhost'){
+      if($_SERVER['SERVER_NAME'] != 'localhost' AND preg_match("/^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" .
+            "(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$/", $_SERVER['SERVER_NAME']) == 0){
          session_set_cookie_params(3600, '/', substr($_SERVER['SERVER_NAME'],strpos($_SERVER['SERVER_NAME'],".")));
+         
       }
 		session_regenerate_id(); // ochrana před Session Fixation
 		// 	Nastaveni limutu pro automaticke odhlaseni
