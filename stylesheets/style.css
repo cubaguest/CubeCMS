@@ -102,6 +102,10 @@ body {
 	visibility: hidden;
 }
 
+.hidden {
+   display:none;
+}
+
 #bodywrap {
 	min-width: 600px; /* slušné prohlížeče */
 	max-width: 1000px;
