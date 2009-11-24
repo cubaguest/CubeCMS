@@ -198,7 +198,7 @@ class Filesystem_File_Image extends Filesystem_File {
       if($this->workingImage === null|false) {
          $this->loadImage();
       }
-      if($crop === null){
+      if($crop === null) {
          $crop = $this->cropImage;
       }
 
@@ -359,7 +359,7 @@ class Filesystem_File_Image extends Filesystem_File {
     */
    public function saveWorkingImage($type, $newDir=null, $newImageName = null) {
       if(VVE_USE_IMAGEMAGICK != true) {
-         // dodělat smazání původního obrázku pokud již existuje
+      // dodělat smazání původního obrázku pokud již existuje
          if($newDir == null) {
             $newDir = $this->getDir();
          }
@@ -560,13 +560,13 @@ class Filesystem_File_Image extends Filesystem_File {
       if(VVE_USE_IMAGEMAGICK != true) {
       //		test jestli je zpracováván obrázek
          if($this->isImage()) {
-            //	Test názvu souboru Je třeba?
-            // $newName = $this->creatUniqueName($dstDir);
+         //	Test názvu souboru Je třeba?
+         // $newName = $this->creatUniqueName($dstDir);
             $this->resampleImage($maxWidth,$maxHeight, $crop);
             if($imageType == null) {
                $imageType = $this->imageType;
             }
-            
+
             $this->saveWorkingImage($imageType, $dir, $newName);
             imagedestroy($this->workingImage);
             $this->workingImage = null;
@@ -626,6 +626,54 @@ class Filesystem_File_Image extends Filesystem_File {
     */
    public function saveAs($dstDir, $width = null, $heigh = null, $crop = false, $newName = null, $imageType = null) {
       return $this->saveAsResampledImage($dstDir, $width, $heigh, $crop, $newName, $imageType);
+   }
+
+   /**
+    * Metoda provede ořez pracovního obrázku
+    * @param <type> $srcX
+    * @param <type> $srcD
+    * @param <type> $dstW
+    * @param <type> $dstH
+    */
+   public function crop($srcX, $srcD, $dstW, $dstH) {
+      ;
+   }
+
+
+   /**
+    * Metoda provede ořez pracovního obrázku a uloží jej na zadané místo
+    * @param <type> $dstDir
+    * @param <type> $srcX
+    * @param <type> $srcD
+    * @param <type> $srcW
+    * @param <type> $srcH
+    */
+   public function cropAndSave($dstDir, $imgW, $imgH, $srcX, $srcY, $srcW, $srcH) {
+      if($this->workingImage === null|false) {
+         $this->loadImage();
+      }
+//      $args = func_get_args();
+//      var_dump($args);
+//      ob_flush();exit();
+      if(VVE_USE_IMAGEMAGICK != true) {
+
+         $newImage = imagecreatetruecolor($imgW, $imgH);
+         // Zapnutí alfy, tj průhlednost
+         imagealphablending($newImage, false);
+         imagesavealpha($newImage, true);
+         if(!@imagecopyresampled($newImage, $this->workingImage,
+         //d d s s
+         0,0,$srcX,$srcY,
+         $imgW, $imgH, $srcW, $srcH)) {
+            if($this->reportErrors())
+               throw new UnexpectedValueException(_('Chyba při resamplování obrázku'), 3);
+            $this->isError = true;
+         }
+         $this->workingImage = $newImage;
+         $this->saveWorkingImage($this->imageType, $dstDir);
+      } else {
+
+      }
    }
 
    /**
