@@ -187,19 +187,23 @@ class Locale {
     * @todo -- optimalizovat
     */
    public static function getLangsByClient() {
-      $clientString = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
-      // odstraníme mezery KHTML, webkit
-      $clientString = str_replace(" ", "", $clientString);
-      // rozdělit na jazyky
-      $clientLangs = Explode(",", $clientString);
-      $langs = array();
-      $match = array();
-      foreach ($clientLangs as $lang) {
-         preg_match('/([a-z]{2,3})/', $lang, $match);
-         if (in_array($match[1], self::getAppLangs())){
+      if(isset ($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
+         $clientString = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
+         // odstraníme mezery KHTML, webkit
+         $clientString = str_replace(" ", "", $clientString);
+         // rozdělit na jazyky
+         $clientLangs = Explode(",", $clientString);
+         $langs = array();
+         $match = array();
+         foreach ($clientLangs as $lang) {
+            preg_match('/([a-z]{2,3})/', $lang, $match);
+            if (in_array($match[1], self::getAppLangs())) {
                return $match[1];
+            }
+         //         $langs[] = preg_replace('/^!([a-z]{2,3})(.*)$/', 'd', $lang);
          }
-//         $langs[] = preg_replace('/^!([a-z]{2,3})(.*)$/', 'd', $lang);
+      } else {
+         return self::getDefaultLang();
       }
       return false;
    }
