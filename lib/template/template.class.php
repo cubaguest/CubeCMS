@@ -338,9 +338,8 @@ class Template {
    /**
     * Metoda přidá do šablony objekt JsPluginu
     * @param JsPlugin $jsplugin -- objekt JsPluginu
-    * @return Template -- objekt sebe
     */
-   final public function addJsPlugin(JsPlugin $jsplugin) {
+   final static public function addJsPlugin(JsPlugin $jsplugin) {
       $jsfiles = $jsplugin->getAllFiles();
       foreach ($jsfiles as $file) {
          if($file instanceof JsPlugin_JsFile) {
@@ -355,7 +354,6 @@ class Template {
                }
             }
       }
-      return $this;
    }
 
    /**
