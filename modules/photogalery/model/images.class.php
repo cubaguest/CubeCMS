@@ -29,6 +29,18 @@ class PhotoGalery_Model_Images extends Model_PDO {
       return $dbst;
    }
 
+	public function getImage($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+          ." WHERE (".self::COLUMN_ID." = :idimage)");
+
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->bindParam(':idimage', $id, PDO::PARAM_INT);
+      $dbst->execute();
+
+      return $dbst->fetch();
+   }
+
    public function saveImage($idCat, $file = null, $name = null, $desc = null, $ord = '0', $idImage = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_TIME_EDIT => time(),
