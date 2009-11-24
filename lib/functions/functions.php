@@ -41,7 +41,7 @@ function vve_cr_url_key($string) {
       $string = vve_to_ascii($string);
 
 //      $regexp = array('/(^[^a-z]{1,})|([\\:;()"\'!?.,|<>\/]?)/i', '/[ \_-]{1,}/');
-      $regexp = array('/(^[^a-z]{1,})|([^ \/a-z\_-]?)/i', '/[ \_-]{1,}/');
+      $regexp = array('/(^[^a-z0-9]{1,})|([^ \/a-z0-9\_-]?)/i', '/[ \_-]{1,}/');
       $replacements = array('', '-');
       $string = preg_replace($regexp, $replacements, $string);
 
