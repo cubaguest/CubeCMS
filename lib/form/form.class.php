@@ -48,7 +48,7 @@ class Form implements ArrayAccess {
     * Jestli je formulář validně vyplněn
     * @var boolean
     */
-   private $isValid = true;
+   private $isValid = null;
 
    /**
     * Pole s portvrzovacími elementy
@@ -82,6 +82,8 @@ class Form implements ArrayAccess {
       $this->formPrefix = $prefix;
       $this->formAction = new Url_Link();
       $this->htmlElement = new Html_Element('form');
+      $this->setAction(new Url_Link_Module());
+      $this->setSendMethod();
    }
 
    public function  __toString() {
@@ -94,10 +96,6 @@ class Form implements ArrayAccess {
     * @return string -- formulář jako řetězec
     */
    private function creatString(Form_Decorator $decorator = null) {
-      // nastavení elementu form
-      $this->html()->setAttrib('action', $this->formAction);
-      $this->html()->setAttrib('method', 'post');
-
       if($decorator == null){
          $decorator = new Form_Decorator();
       }
@@ -133,7 +131,18 @@ class Form implements ArrayAccess {
       }
       $formContent .= $d->render();
       $this->html()->addContent($formContent);
+      $this->html()->addContent($this->scripts());
+      
       return (string)$this->html();
+   }
+
+   /**
+    * Metoda vykreslí skripty formuláře
+    */
+   public function scripts() {
+      Template::addJsPlugin(new JsPlugin_JQuery());
+      $script = new Html_Element_Script('formShowOnlyLang(\''.Locale::getLang().'\');');
+      return $script;
    }
 
    /**
@@ -245,11 +254,16 @@ class Form implements ArrayAccess {
     * @return booleant -- true pokud je formulář v pořádku
     */
    public function isValid() {
-      if($this->isSend()) {
-         $this->populate();
+      if($this->isValid === null){
+         if($this->isSend()) {
+            $this->isValid = true;
+            $this->populate();
+            return $this->isValid;
+         }
+         return false;
+      } else {
          return $this->isValid;
       }
-      return false;
    }
 
    /**

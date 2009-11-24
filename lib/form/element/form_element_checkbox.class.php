@@ -21,10 +21,9 @@ class Form_Element_Checkbox extends Form_Element {
 
    /**
     * Metoda naplní element
-    * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
-   public function populate($method = 'post') {
-      parent::populate($method);
+   public function populate() {
+      parent::populate();
 //      $this->checkValRecurs($this->values);
       if($this->values == null){
          $this->values = false;

@@ -28,18 +28,9 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
    /**
     * Metoda naplní prvek
     */
-   public function populate($method = 'post') {
-      switch ($method) {
-         case 'get':
-            if(isset ($_GET[$this->getName()])) {
-               $this->isSubmited = true;
-            }
-            break;
-         default:
-            if(isset ($_POST[$this->getName()])) {
-               $this->isSubmited = true;
-            }
-            break;
+   public function populate() {
+      if(isset ($_REQUEST[$this->getName()])) {
+         $this->isSubmited = true;
       }
       $this->isPopulated = true;
    }

@@ -39,15 +39,17 @@ class Form_Element_TextArea extends Form_Element_Text {
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional.'_'.$langKey);
                $container->setAttrib('id', $this->getName()."_".$this->dimensional.'_container_'.$langKey);
-               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
+//               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
                $this->html()->addContent($values[$this->dimensional][$langKey]);
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
-               $container->addClass($this->getName()."_container_class");
                $this->html()->addContent($values[$langKey]);
             }
+            $container->addClass("elem_container_class");
+            $container->setAttrib('lang', $langKey);
+
             $cnt .= $container;
          }
          return $cnt;

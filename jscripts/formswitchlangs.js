@@ -1,24 +1,26 @@
-document.write('<script type="text/javascript" src="./jscripts/jquery/jquery-1.3.2.min.js"></script>');
+function formElemSwitchLang(linkObj, lang){
+   // zkrytí všech
+   var parent = $(linkObj).parent("td").parent('tr');
 
-function formSwitchLang(linkObj, elemName, lang){
-   showOnly(elemName, lang);
+   parent.find('label').hide();
+   parent.find(".elem_container_class").hide();
+   // odznačení
+   parent.find("a.formLinkSelLang").removeClass('formLinkSelLang');
+
+   $(linkObj).addClass('formLinkSelLang');
+   parent.find("label[lang="+lang+"]").show();
+   parent.find(".elem_container_class[lang="+lang+"]").show();
    return false;
 }
 
-function showOnly(elemName, lang){
+function formShowOnlyLang(lang){
    // zkrytí všech
-   $("."+elemName+'_container_class').hide();
-   $("."+elemName+'_label_class').hide();
+   $("form label").hide();
+   $("form .elem_container_class").hide();
    // odznačení
-   $("."+elemName+'_lang_link').removeClass('formLinkSelLang');
-   // u tinymce zkrytí i potomka - editor
-//   $("."+elemName+'_class').next('span.mceEditor').hide();
+   $("form a.formLinkSelLang").removeClass('formLinkSelLang');
 
-   // zobrazení nastaveného
-   $("#"+elemName+'_container_'+lang).show();
-//   $("#"+elemName+'_'+lang).next('span.mceEditor').show();
-   $("#"+elemName+"_label_"+lang).show();
-   $("#"+elemName+'_'+lang+"_parent").show();
-   // vyznačení
-   $("#"+elemName+"_lang_link_"+lang).addClass('formLinkSelLang');
+   $("form a[lang="+lang+"]").addClass('formLinkSelLang');
+   $("form label[lang="+lang+"]").show();
+   $("form .elem_container_class[lang="+lang+"]").show();
 }

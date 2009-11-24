@@ -23,7 +23,8 @@ class Form_Decorator {
    'labelcontent' => array('label'),
    'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations', 'subLabel'),
    'labelwrapwidth' => 100,
-   'ctrlwrapwidth' => 400);
+   'ctrlwrapwidth' => 400,
+   'hiddenClass' => 'hidden');
 
    private $content = null;
 
@@ -49,6 +50,11 @@ class Form_Decorator {
 
    public function addElement(Form_Element $element) {
       $row = new Html_Element($this->decoration['rowwrap']);
+
+      if($element instanceof Form_Element_Hidden) {
+         $row->addClass($this->decoration['hiddenClass']);
+      }
+
       $cellLabel = new Html_Element($this->decoration['labelwrap']);
       $cellLabel->addClass($this->decoration['labelwrapclass']);
       //      $cellLabel->setAttrib('width', $this->decoration['labelwrapwidth']);
@@ -70,9 +76,7 @@ class Form_Decorator {
       $cellCtrl->addClass($this->decoration['ctrlwrapclass']);
       //      $cellCtrl->setAttrib('width', $this->decoration['ctrlwrapwidth']);
       $row->addContent($cellCtrl);
-
       $this->content .= $row;
-
    }
 
    /**

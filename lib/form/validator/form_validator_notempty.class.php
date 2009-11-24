@@ -52,7 +52,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                   if($retu !== true){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
                      $this->isValid = false;
-                     return false;
+//                     return false;
                   }
                }
                // pokud mají být vyplněny všechny sloupce
@@ -60,14 +60,22 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                   if(!$this->checkEmptyAllValues($elemObj->getValues())){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
-                     return false;
+//                     return false;
                   }
                }
             } else {
-               if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
-                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                  $this->isValid = false;
-                  return false;
+               if($elemObj->isDimensional()) {
+                  if(!$this->checkEmptyAllValues($elemObj->getValues())) {
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     $this->isValid = false;
+//                     return false;
+                  }
+               } else {
+                  if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     $this->isValid = false;
+//                     return false;
+                  }
                }
             }
             break;
@@ -76,13 +84,13 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             if($elemObj->getValues() == false) {
                $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                $this->isValid = false;
-               return false;
+//               return false;
             }
             break;
          default:
             break;
       }
-      return true;
+      return $this->isValid();
 
    }
 

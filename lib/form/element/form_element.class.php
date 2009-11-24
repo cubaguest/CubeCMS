@@ -131,7 +131,7 @@ class Form_Element implements Form_Element_Interface {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
       $this->htmlElementValidaionLabel = new Html_Element('p');
-      $this->htmlElementSubLabel = new Html_Element('span');
+      $this->htmlElementSubLabel = new Html_Element('p');
    }
 
    /*
@@ -322,24 +322,12 @@ class Form_Element implements Form_Element_Interface {
 
    /**
     * Metoda naplní element
-    * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
-   public function populate($method = 'post') {
-      switch ($method) {
-         case 'get':
-            if(isset ($_GET[$this->getName()])) {
-               $this->values = $_GET[$this->getName()];
-            } else {
-               $this->values = null;
-            }
-            break;
-         default:
-            if(isset ($_POST[$this->getName()])) {
-               $this->values = $_POST[$this->getName()];
-            } else {
-               $this->values = null;
-            }
-            break;
+   public function populate() {
+      if(isset ($_REQUEST[$this->getName()])) {
+         $this->values = $_REQUEST[$this->getName()];
+      } else {
+         $this->values = null;
       }
       $this->isPopulated = true;
    }
@@ -398,7 +386,7 @@ class Form_Element implements Form_Element_Interface {
          }
          return $cnt;
       } else {
-         if($this->isDimensional()){
+         if(!$this->isDimensional()){
             $this->htmlLabel()->setAttrib('for', $this->getName());
          } else {
             $this->htmlLabel()->setAttrib('for', $this->getName()."_".$this->dimensional);
@@ -432,6 +420,7 @@ class Form_Element implements Form_Element_Interface {
 
       if($this->isMultiLang()) {
          $cnt = null;
+         $first = true;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $container = new Html_Element('p', $this->html());
             if($this->isDimensional()){
@@ -439,34 +428,41 @@ class Form_Element implements Form_Element_Interface {
                $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional.'_'.$langKey);
                $this->html()->setAttrib('value', htmlspecialchars($values[$this->dimensional][$langKey]));
                $container->setAttrib('id', $this->getName()."_".$this->dimensional.'_container_'.$langKey);
-               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
                $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
-               $container->addClass($this->getName()."_container_class");
             }
+
             $this->html()->setAttrib('lang', $langKey);
+            $container->addClass("elem_container_class");
+            $container->setAttrib('lang', $langKey);
 
 
             $cnt .= $container;
          }
          return $cnt;
       } else {
-         $container = new Html_Element('p');
+//         $container = new Html_Element('p');
          if($this->isDimensional()){
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
             $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+            if(is_array($values)){
+               $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
+            } else {
+               $this->html()->setAttrib('value', htmlspecialchars((string)$values));
+            }
          } else {
             $this->html()->setAttrib('name', $this->getName());
             $this->html()->setAttrib('id', $this->getName());
+            $this->html()->setAttrib('value', htmlspecialchars((string)$values));
          }
          //         $this->html()->setAttrib('type', 'text');
          
-         $this->html()->setAttrib('value', htmlspecialchars((string)$values));
-         $container->addContent($this->html());
-         return $container;
+//         $container->addContent($this->html());
+//         return $container;
+         return $this->html();
       }
    }
 
@@ -492,6 +488,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function labelLangs() {
       if($this->isMultilang() AND count($this->langs) > 1) {
+         Template::addJsPlugin(new JsPlugin_JQuery());
          Template::addJS('./jscripts/formswitchlangs.js');
 
          $langButtons = null;
@@ -500,14 +497,12 @@ class Form_Element implements Form_Element_Interface {
             $a->setAttrib('href', "#");
             $a->addClass("formLinkLang");
             if($this->isDimensional()){
-               $a->addClass($this->getName()."_".$this->dimensional."_lang_link");
                $a->setAttrib('id', $this->getName()."_".$this->dimensional."_lang_link_".$langKey);
-               $a->setAttrib('onclick', "return formSwitchLang(this, '".$this->getName()."_".$this->dimensional."','".$langKey."');");
             } else {
-               $a->addClass($this->getName()."_lang_link");
                $a->setAttrib('id', $this->getName()."_lang_link_".$langKey);
-               $a->setAttrib('onclick', "return formSwitchLang(this, '".$this->getName()."','".$langKey."');");
             }
+            $a->addClass("elem_lang_link");
+            $a->setAttrib('onclick', "return formElemSwitchLang(this,'".$langKey."');");
             $a->setAttrib('title', $langLabel);
             $a->setAttrib('lang', $langKey);
             $langButtons .= $a;
@@ -521,17 +516,6 @@ class Form_Element implements Form_Element_Interface {
     * Metoda pro generování scriptů. potřebných pro práci s formulářem
     */
    public function scripts() {
-      if($this->isMultiLang() AND count($this->langs) > 1) {
-      // script pro vybrání jazyka -- TODO předělat
-         $script = new Html_Element_Script();
-         $script->setAttrib('type', "text/javascript");
-         if($this->isDimensional()){
-            $script->addContent('showOnly("'.$this->getName()."_".$this->dimensional.'","'.Locale::getLang().'");');
-         } else {
-            $script->addContent('showOnly("'.$this->getName().'","'.Locale::getLang().'");');
-         }
-         return $script;
-      }
       return null;
    }
 

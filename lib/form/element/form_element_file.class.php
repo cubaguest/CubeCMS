@@ -40,7 +40,7 @@ class Form_Element_File extends Form_Element {
     * Metoda naplní element
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
-   public function populate($method = 'post') {
+   public function populate() {
       if(isset ($_FILES[$this->getName()])) {
       //         $this->values = $_FILES[$this->getName()];
          if($this->isMultiLang() OR $this->isDimensional()) {

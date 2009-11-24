@@ -14,7 +14,7 @@ interface Form_Element_Interface {
     * Metoda provede naplnění elementu
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     */
-   public function populate($method = 'post');
+   public function populate();
 
    /**
     * Metoda vrátí jestli je element validní
