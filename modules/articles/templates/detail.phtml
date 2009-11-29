@@ -12,7 +12,6 @@ $this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
    <!--</h2>-->
    <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />
-   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
 
    <?
    if($this->category()->getRights()->isControll() OR
@@ -29,4 +28,7 @@ $this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
       $this->includeTplObj($toolbox);
    }
    ?>
+   <br />
+   <?=$this->shares?>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
 </div>

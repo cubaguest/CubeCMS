@@ -91,6 +91,12 @@ class Articles_Controller extends Controller {
          }
       }
 
+      // komponenta pro vypsání odkazů na sdílení
+      $shares = new Component_Share();
+      $shares->setConfig('url', (string)$this->link());
+      $shares->setConfig('title', $article->{Articles_Model_Detail::COLUMN_NAME});
+
+      $this->view()->template()->shares=$shares;
       $this->view()->template()->article=$article;
       $this->view()->template()->addTplFile("detail.phtml");
       $this->view()->template()->addCssFile("style.css");
