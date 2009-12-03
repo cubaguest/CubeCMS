@@ -40,6 +40,12 @@ class Form_Element implements Form_Element_Interface {
    protected $validators = array();
 
    /**
+    * Pole s filtry aplikovanými na element
+    * @var array
+    */
+   protected $filters = array();
+
+   /**
     * Jestli je prvek validní
     * @var boolean
     */
@@ -68,6 +74,12 @@ class Form_Element implements Form_Element_Interface {
     * @var mixed
     */
    protected $values = null;
+
+   /**
+    * Pole s odeslanými hodnotami a přehnanými přes filtr
+    * @var mixed
+    */
+   protected $valuesFiltered = null;
 
    /**
     * Pole s jazyky prvku
@@ -146,6 +158,17 @@ class Form_Element implements Form_Element_Interface {
       $this->validators[get_class($validator)] = $validator;
       // doplnění popisků k validaci
       $validator->addHtmlElementParams($this);
+   //      array_push($this->validators, $validator);
+   }
+   
+   /**
+    * Metoda přidá elemntu filtr, který upraví výstup elementu
+    * @param Form_Filter_Interface $filter -- typ filtru
+    */
+   final public function addFilter(Form_Filter_Interface $filter) {
+      $this->filters[get_class($filter)] = $filter;
+      // doplnění popisků k validaci
+      $filter->addHtmlElementParams($this);
    //      array_push($this->validators, $validator);
    }
 
@@ -252,6 +275,11 @@ class Form_Element implements Form_Element_Interface {
     * @return mixed -- hodnota prvku
     */
    public function getValues($key = null) {
+//      $this->valuesFiltered = $this->values;
+//      foreach ($this->filters as $filter) {
+//         $filter->filter($this);
+//      }
+      
       if($key !== null AND isset($this->values[$key])){
          return $this->values[$key];
       }
@@ -464,6 +492,17 @@ class Form_Element implements Form_Element_Interface {
 //         return $container;
          return $this->html();
       }
+   }
+
+   /**
+    * Metoda vrací všechny prvky, keré patří ke kontrolu, tj controll, labelValidations, subLabel
+    * @return string -- včechny prvky vyrenderované
+    */
+   public function controllAll() {
+      $ret = $this->controll();
+      $ret .= $this->labelValidations();
+      $ret .= $this->subLabel();
+      return $ret;
    }
 
    public function labelValidations() {

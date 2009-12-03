@@ -18,7 +18,8 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
 
    public function  __construct($extensions, $errMsg = null) {
       if(!is_array($extensions)){
-         $extensions = array($extensions);
+         $extensions = str_replace(' ', null, $extensions);
+         $extensions = explode(';', $extensions);
       }
       $this->extensions = $extensions;
 

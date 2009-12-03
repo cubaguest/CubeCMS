@@ -118,11 +118,16 @@ class Filesystem_File {
     */
    function __construct($file, $dir = null, $reportErrors = true) {
       // Pokud je vložen objekt File
-      if($file instanceof File) {
+      if($file instanceof Filesystem_File) {
          $this->fileDir = new Filesystem_Dir($file->getDir());
          $this->fileName = $file->getName();
       }
-      else {
+      else if($file instanceof Form_Element_File){
+         $elem = $file->getValues();
+         $this->fileName = $elem['name'];
+         $this->fileDir = new Filesystem_Dir($elem['dir']);
+         $this->fileMimeType = $elem['type'];
+      } else {
          if($dir == null) {
             // rozparsování cesty a soubou u tmp
             $arr = $this->parsePathFile($file);
@@ -335,19 +340,21 @@ class Filesystem_File {
     * @return string -- mime type
     */
    private function locateMimeType() {
+      if($this->fileMimeType === null) {
       //      $file = $this->fileName;
-      $fileArray = @explode('.',$this->getName());
-      $ext = strtolower(array_pop($fileArray));
-      if (function_exists('finfo_open')) {
-         $finfo = finfo_open(FILEINFO_MIME);
-         $this->fileMimeType = finfo_file($finfo, $this->getName(true));
-         finfo_close($finfo);
-      }
-      else if (array_key_exists($ext, self::$mimeTypes)) {
-         $this->fileMimeType = self::$mimeTypes[$ext];
-      }
-      else {
-         $this->fileMimeType = 'application/octet-stream';
+         $fileArray = @explode('.',$this->getName());
+         $ext = strtolower(array_pop($fileArray));
+         if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME);
+            $this->fileMimeType = finfo_file($finfo, $this->getName(true));
+            finfo_close($finfo);
+         }
+         else if (array_key_exists($ext, self::$mimeTypes)) {
+               $this->fileMimeType = self::$mimeTypes[$ext];
+            }
+            else {
+               $this->fileMimeType = 'application/octet-stream';
+            }
       }
    }
 
