@@ -1,0 +1,304 @@
+<div>
+   <?
+   // do titulku
+   if($this->edit) {
+      $this->addPageTitle($this->_('úprava filmu'));
+      $this->addPageTitle($this->catName);
+      $this->addPageHeadline($this->_('úprava filmu'));
+      $this->addPageHeadline($this->catName);
+   } else {
+      $this->addPageTitle($this->_('přidání filmu'));
+      $this->addPageHeadline($this->_('přidání filmu'));
+   }
+   // donastavení formuláře
+   //$this->form->priority->html()->setAttrib('size', 4);
+   //
+   //$this->form->module->htmlSubLabel()->addContent('<br /><p id="moduleNameDoc"></p>', true);
+   //$this->form->moduleParams->htmlSubLabel()->addContent('<br /><a id="getModuleParams" href="">doc</a><p id="moduleDoc"></p>', true);
+
+   $jQuery = new JsPlugin_JQuery();
+   $jQuery->addWidgentDatepicker();
+   $this->addJsPlugin($jQuery);
+
+   $tinymce2 = new JsPlugin_TinyMce();
+   $tinymce2->setCfgParam('theme', 'advancedsimple');
+   $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
+   $this->addJsPlugin($tinymce2);
+   ?>
+   <?=$this->form->html()?>
+   <form action="<?=$this->link()?>" method="post" enctype="multipart/form-data">
+      <fieldset>
+         <legend><?=$this->_('Informace o filmu')?></legend>
+         <table class="formTableGroup">
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->name->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->name->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->originalname->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->originalname->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->label->label();?>
+               </th>
+               <td class="formControlls">
+                  <?$this->form->label->html()->addClass('mceEditorSimple')?>
+                  <?=$this->form->label->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->length->label();?>
+               </th>
+               <td class="formControlls">
+                  <?$this->form->length->html()->setAttrib('size', 3);?>
+                  <?$this->form->length->html()->setAttrib('maxlength', 3);?>
+                  <?=$this->form->length->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->type->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->type->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->image->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->image->controllAll();?>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->imdbid->label();?>
+               </th>
+               <td class="formControlls">
+                  <?$this->form->imdbid->html()->setAttrib('size', 8);?>
+                  <?=$this->form->imdbid->controllAll();?>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->csfdid->label();?>
+               </th>
+               <td class="formControlls">
+                  <?$this->form->csfdid->html()->setAttrib('size', 8);?>
+                  <?=$this->form->csfdid->controllAll();?>
+               </td>
+            </tr>
+         </table>
+      </fieldset>
+      <fieldset>
+         <legend><?=$this->_('Informace o promítání')?></legend>
+         <?if(!$this->edit) {
+            $classJsAdd = 'jsadded';
+            $vals = $this->form->dateId->getValues();
+            if(count($vals) == 0) $vals = array(1);
+            ?>
+         <table class="formTableGroup">
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->price->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->price->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->access->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->access->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->filmclub->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->filmclub->controllAll();?>
+                  <span></span>
+               </td>
+            </tr>
+         </table>
+         <table class="formTableGroup" id="dateRowsTable">
+               <?foreach ($vals as $i => $val) {?>
+            <tr class="<?=$classJsAdd?>">
+               <th><?=$this->_('Datum')?></th>
+               <th class="formLabels" style="width:50px">
+                        <?print($this->form->datestart->label())?>
+               </th>
+               <td class="formControlls">
+                        <?
+                        $this->form->datestart->html()->setAttrib('size', 10);
+                        $this->form->datestart->html()->addClass('datepicker');
+                        $this->form->datestart->setDimensional($i);
+                        print($this->form->datestart->controll())
+                            ?>
+               </td>
+               <th class="formLabels" style="width:50px">
+                        <?print($this->form->datestop->label())?>
+               </th>
+               <td class="formControlls">
+                        <?
+                        $this->form->datestop->html()->setAttrib('size', 10);
+                        $this->form->datestop->html()->addClass('datepicker');
+                        $this->form->datestop->setDimensional($i);
+                        print($this->form->datestop->controll())
+                            ?>
+               </td>
+               <th class="formLabels" style="width:50px">
+                        <?=$this->form->time->label()?>
+               </th>
+               <td>
+                        <?$this->form->time->html()->setAttrib('size', 5);
+//                        $this->form->time->html()->setAttrib('onblur', 'return checkDate(this)');
+                        $this->form->time->setDimensional($i);
+                        print($this->form->time->controll())?>
+               </td>
+               <td>
+                  <a href="#" onclick="return deleteDateRow(this);" title="<?=$this->_('Odstranit řádek')?>">
+                     <img src="<?=vve_get_tpl_file('icons/date_delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" />
+                  </a>
+                        <?
+                        $this->form->dateDeleted->setDimensional($i);
+                        $this->form->dateDeleted->setValues('false');
+                        print($this->form->dateDeleted->controll());
+                        ?>
+                        <?
+                        $this->form->dateId->setDimensional($i);
+                        print($this->form->dateId->controll());
+                        ?>
+               </td>
+            </tr>
+               <?}
+               $lastId = $i;
+               $count = count($vals);?>
+         </table>
+
+
+         <?}?>
+         <table class="formTableGroup" style="width:100%;">
+            <tr>
+               <td align="right">
+                  <a href="#" onclick="return addDateRow();" title="<?=$this->_('Přidat řádek')?>"><?=$this->_('Přidat řádek')?></a>
+               </td>
+            </tr>
+         </table>
+      </fieldset>
+      <table class="formTable">
+         <tr>
+            <th class="formLabels"></th>
+            <td class="formControlls">
+
+               <input name="movie_send" type="submit" value="Uložit" /><span></span>
+            </td>
+         </tr>
+      </table>
+   </form>
+
+
+   <?
+   // link pro loading dokumentace k modulu
+   //$linkModDoc = new Url_Link_ModuleRequest();
+   //$linkModDoc->action('moduledoc', 'html');
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         $.datepicker.setDefaults(['<?=Locale::getLang()?>'] ) ;
+         //$.datepicker.regional['<?=Locale::getLang()?>']
+         $("input.datepicker").datepicker();
+         //      $('#moduleDoc').hide();
+         //      $('#getModuleParams').click(function(){
+         //         $('#moduleDoc').toggle();
+         //         return false;
+         //      });
+         //      $('#categorymodule').change(function(){
+         //         $('#moduleDoc').load('<?//=$linkModDoc?>?modulep='+$(this).val()+' .moduleParams');
+         //         $('#moduleNameDoc').load('<?//=$linkModDoc?>?modulep='+$(this).val()+' .moduleLabel');
+         //         return false;
+         //      });
+         //      $('#categorymodule').click(function(){
+         //         $('#moduleDoc').load('<?//=$linkModDoc?>?module='+$(this).val()+' .moduleParams');
+         //         $('#moduleNameDoc').load('<?//=$linkModDoc?>?module='+$(this).val()+' .moduleLabel');
+         //         return false;
+         //      });
+      });
+      // funkce pro práci s řádky datumů
+      var lastId = <?=$lastId?>;
+      // přidání položky
+      function addDateRow(){
+         //         numRows++;
+         lastId++;
+         var row = $('#dateRowsTable tr:last').clone();
+         row.addClass('jsadded');
+         row.show();
+         row.find('input.movie_datestart_class').removeClass('hasDatepicker');
+         row.find('input.movie_datestop_class').removeClass('hasDatepicker');
+         //         var time = new Date.now();
+         row.find('input.movie_datestart_class').attr('id','movie_datestart_'+lastId);
+         row.find('input.movie_datestop_class').attr('id','movie_datestop_'+lastId);
+         row.find('input.movie_datestart_class').attr('name','movie_datestart['+(lastId)+']');
+         row.find('input.movie_datestop_class').attr('name','movie_datestop['+(lastId)+']');
+         row.find('input.movie_time_class').attr('name','movie_time['+(lastId)+']');
+         row.find('input.movie_dateDeleted_class').attr('name','movie_dateDeleted['+(lastId)+']');
+         row.find('input.movie_dateId_class').attr('name','movie_dateId['+(lastId)+']');
+         row.find('label.movie_datestart__label_class').attr('for','movie_datestart_'+lastId);
+         row.find('label.movie_datestop__label_class').attr('for','movie_datestop_'+lastId);
+
+         // datepicker
+         row.find('input.datepicker').datepicker();
+
+         $('#dateRowsTable').append(row);
+         return false;
+      }
+      // odstranění položky
+      function deleteDateRow(obj){
+         var row = $(obj).parent('td').parent('tr');
+         if($('#dateRowsTable tr').length == 1){//pokud je jeden nemažese
+            return false;
+         }
+
+         // první nelze vymazat
+         if(row.hasClass('jsadded')){
+            row.remove();
+         } else {
+            row.find('input.movie_dateDeleted_class').val('true');
+            row.hide();
+         }
+         //         numRows--;
+         return false;
+      }
+      // kontrola času
+      function checkDate(obj){
+         alert('Čas!');
+         return false;
+      }
+
+      /* ]]> */
+   </script>
+
+   <?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+</div>
