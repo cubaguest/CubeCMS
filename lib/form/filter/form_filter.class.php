@@ -8,7 +8,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro vytvoření fitru
  */
-class Form_Filter {
+class Form_Filter implements Form_Filter_Interface {
    public function  __construct() {
    }
 

@@ -76,6 +76,12 @@ class Form_Element implements Form_Element_Interface {
    protected $values = null;
 
    /**
+    * Pole s nefiltrovanými hodnotami
+    * @var array
+    */
+   protected $unfilteredValues = null;
+
+   /**
     * Pole s odeslanými hodnotami a přehnanými přes filtr
     * @var mixed
     */
@@ -274,16 +280,18 @@ class Form_Element implements Form_Element_Interface {
     * @param $key -- (option) klíč hodnoty (pokud je pole)
     * @return mixed -- hodnota prvku
     */
-   public function getValues($key = null) {
-//      $this->valuesFiltered = $this->values;
-//      foreach ($this->filters as $filter) {
-//         $filter->filter($this);
-//      }
-      
-      if($key !== null AND isset($this->values[$key])){
-         return $this->values[$key];
+   public function getValues($key = null, $filtered = true) {
+      if($filtered) {
+         if($key !== null AND isset($this->values[$key])) {
+            return $this->values[$key];
+         }
+         return $this->values;
+      } else {
+         if($key !== null AND isset($this->unfilteredValues[$key])) {
+            return $this->unfilteredValues[$key];
+         }
+         return $this->unfilteredValues;
       }
-      return $this->values;
    }
 
    /**
@@ -317,7 +325,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function isEmpty() {
 //      if($this->isMultilang OR $this->isDimensional()) {
-         return $this->checkEmpty($this->getValues());
+         return $this->checkEmpty($this->getValues(null, false));
 //      } else {
 //         if($this->getValues() == null OR $this->getValues() == '') {
 //            return true;
@@ -357,6 +365,7 @@ class Form_Element implements Form_Element_Interface {
       } else {
          $this->values = null;
       }
+      $this->unfilteredValues = $this->values;
       $this->isPopulated = true;
    }
 
@@ -370,6 +379,15 @@ class Form_Element implements Form_Element_Interface {
             $this->isValid = false;
             break;
          }
+      }
+   }
+
+   /**
+    * Metodda provede přefiltrování obsahu elementu
+    */
+   public function filter(){
+      foreach ($this->filters as $filter) {
+         $filter->filter($this);
       }
    }
 
@@ -443,7 +461,7 @@ class Form_Element implements Form_Element_Interface {
          $this->html()->addClass('formError');
       }
 
-      $values = $this->getValues();
+      $values = $this->getValues(null,false);
       $this->html()->addClass($this->getName()."_class");
 
       if($this->isMultiLang()) {
@@ -505,6 +523,10 @@ class Form_Element implements Form_Element_Interface {
       return $ret;
    }
 
+   /**
+    * Metoda vrací popisek k validacím
+    * @return string
+    */
    public function labelValidations() {
       if(!empty($this->htmlValidationsLabels)) {
       //         $this->htmlValidLabel()->addContent(new Html_Element('br'));
@@ -523,7 +545,7 @@ class Form_Element implements Form_Element_Interface {
 
    /**
     * Funkce vygeneruje přepínač pro volbu jazyku
-    * @return <type>
+    * @return string
     */
    public function labelLangs() {
       if($this->isMultilang() AND count($this->langs) > 1) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Třída přefiltruje element a vytvoří v něm datum se zadaným formátem
+ * Rozhraní pro implementaci filtru aplikujícího na formulářová element
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id: $ VVE6.0.0 $Revision: $
@@ -8,21 +8,20 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro vytvoření fitru
  */
-class Form_Filter_DateTime {
-   public function  __construct($format = 'Y-m-d H:i') {
-   }
+interface Form_Filter_Interface {
+   public function  __construct();
 
    /**
     * Metoda aplikuje filtr na daný element
     * @param Form_Element $elem
     */
-   public function filter(Form_Element &$elem) {}
+   public function filter(Form_Element &$elem);
 
    /**
     * Metoda přidá do elementu prvky z validace
     * @param Form_Element $element -- samotný element
     */
-   public function addHtmlElementParams(Form_Element $element) {}
+   public function addHtmlElementParams(Form_Element $element);
 
 }
 ?>

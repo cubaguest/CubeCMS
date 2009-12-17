@@ -276,6 +276,7 @@ class Form implements ArrayAccess {
          if(!$element->isValid()) {
             $this->isValid = false;
          }
+         $element->filter();
       }
       $this->isPopulated = true;
    }
