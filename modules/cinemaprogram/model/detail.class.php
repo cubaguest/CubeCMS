@@ -40,16 +40,36 @@ class CinemaProgram_Model_Detail extends Model_PDO {
     *
     * @return string -- načtený text
     */
-   public function getText($idCat) {
+   public function getMovies($idCat, $month, $fromDay = 1, $days = 14) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
-             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idCat)");
-      $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS movies"
+          ." JOIN ".Db_PDO::table(self::DB_TABLE_TIME)." AS times ON movies.".self::COL_ID
+          ." = times.".self::COL_T_ID_M
+          ." WHERE (MONTH(times.".self::COL_T_DATEFROM.") = :mm OR MONTH(times.".self::COL_T_DATETO.") = :mm )"
+       ." AND DAY(times.".self::COL_T_DATEFROM.") >= :fromday"
+       ." AND DAY(times.".self::COL_T_DATETO.") <= :today"
+      ." AND movies.".self::COL_ID_CAT." = :idcat"
+      ." GROUP BY times.".self::COL_T_ID_M);
+
+//WHERE (MONTH(times.date_from) = 12 OR MONTH(times.date_to) = 12)
+//AND (DAY(times.date_from) >= 1) AND (DAY(times.date_to) <= 14)
+
+      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':mm', (int)$month, PDO::PARAM_INT);
+      $dbst->bindValue(':fromday', (int)$fromDay, PDO::PARAM_INT);
+      $dbst->bindValue(':today', (int)$days+$fromDay-1, PDO::PARAM_INT);
       $dbst->execute();
 
-      $cl = new Model_LangContainer();
-      $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
-      return $dbst->fetch();
+      return $dbst;
+   }
+
+   public function getTimes($idMovie) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TIME)
+          ." WHERE ".self::COL_T_ID_M." = :idmov ");
+      $dbst->bindValue(':idmov', (int)$idMovie, PDO::PARAM_INT);
+      $dbst->execute();
+      return $dbst;
    }
 
    public function saveMovie($name, $label, $price, $length, $version, $idCat, $origname = null, $filmClub = false,

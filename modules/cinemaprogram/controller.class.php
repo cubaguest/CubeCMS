@@ -8,63 +8,79 @@ class CinemaProgram_Controller extends Controller {
    const CSFD_LINK_ID = 'http://www.csfd.cz/film/{ID}-nazev-filmu/';
 
 
-/**
- * Kontroler pro zobrazení textu
- */
+   /**
+    * Kontroler pro zobrazení textu
+    */
    public function mainController() {
-      //		Kontrola práv
+   //		Kontrola práv
       $this->checkReadableRights();
+
+      $model = new CinemaProgram_Model_Detail();
+
+
       // viewer
+      $this->view()->template()->mmodel = $model;
+      $this->view()->template()->movies = $model->getMovies($this->category()->getId(), 12);
       $this->view()->template()->addTplFile("list.phtml");
    }
 
    public function addController() {
-      //		Kontrola práv
+   //		Kontrola práv
       $this->checkWritebleRights();
 
       $form = $this->createForm();
 
-//      $form->dateId->setValues($arr);
-//      $form->datestop->setValues($arrDates);
-//      $form->datestart->setValues($arrDates);
+      //      $form->dateId->setValues($arr);
+      //      $form->datestop->setValues($arrDates);
+      //      $form->datestart->setValues($arrDates);
 
-      if($form->isValid()){
+      if($form->isValid()) {
          $model = new CinemaProgram_Model_Detail();
-//         if($form->image->getValues() !== null){
-//            $image = new Filesystem_File_Image($form->image, $this->getModule()->getDataDir());
-//         }
+         $imgName = null;
+         if($form->image->getValues() !== null) {
+            $image = new Filesystem_File_Image($form->image, $this->getModule()->getDataDir());
+            $imgName = $image->getName();
+         }
 
-//         $instId = $model->saveMovie($form->name->getValues(), $form->label->getValues(), $form->price->getValues(),
-//            $form->length->getValues(), $form->type->getValues(), $this->category()->getId(),
-//            $form->originalname->getValues(), $form->filmclub->getValues(),
-//          $form->access->getValues(), $form->imdbid->getValues(), $form->csfdid->getValues(), $image->getName());
-print "<br>";
-print "<br>";
-print "<br>";
+         $instId = $model->saveMovie($form->name->getValues(), $form->label->getValues(),
+            $form->price->getValues(), $form->length->getValues(), $form->type->getValues(),
+            $this->category()->getId(), $form->originalname->getValues(), $form->filmclub->getValues(),
+             $form->access->getValues(), $form->imdbid->getValues(), $form->csfdid->getValues(), $imgName);
 
-          $datesFrom = $form->datestart->getValues();
-          $datesTo = $form->datestop->getValues();
-          $times = $form->time->getValues();
+         $datesFrom = $form->datestart->getValues();
+         $datesTo = $form->datestop->getValues();
+         $times = $form->time->getValues();
 
-          foreach ($datesFrom as $key => $dateF) {
-             $dateFrom = new DateTime($dateF);
-             print ($dateFrom->format("Y-m-d")." - ");
-             if($datesTo[$key] != null){
-               $dateTo = new DateTime($datesTo[$key]);
-               print ($dateTo->format("Y-m-d")." - ");
-             }
-             $time = new DateTime($times[$key]);
-             print ($time->format("H:i")."<br >");
-          }
+         $timeM = new CinemaProgram_Model_TimeDetail();
+         foreach ($datesFrom as $key => $dateF) {
+            if($datesTo[$key] == null){
+               $datesTo[$key] = $dateF;
+            }
+            $timeM->saveTime($dateF, $datesTo[$key], $times[$key], $instId);
+         //             $dateFrom = new DateTime($dateF);
+//                      print ($dateF->format("Y-m-d")." - ");
+//         ////             print ($dateFrom->format("Y-m-d")." - ");
+//         ////             if($datesTo[$key] != null){
+//         ////               $dateTo = new DateTime($datesTo[$key]);
+//         ////               print ($dateTo->format("Y-m-d")." - ");
+//                        if($datesTo[$key] != null){
+//                        print ($datesTo[$key]->format("Y-m-d")." - ");
+//                        } else {
+//                        print (" null - ");
+//                        }
+//         //             }
+//         //             $time = new DateTime($times[$key]);
+//                      print ($times[$key]->format("H:i")."<br >");
+         }
 
-          var_dump($datesFrom);
-          var_dump($datesTo);
-          var_dump($times);
+      //          var_dump($datesFrom);
+      //          var_dump($datesTo);
+      //          var_dump($times);
 
-//          $this->infoMsg()->addMessage($this->_('Film byl uložen'));
-//          $this->link()->route()->reload();
+                $this->infoMsg()->addMessage($this->_('Film byl uložen'));
+                $this->link()->route()->reload();
       }
-      
+
 
       // viewer
       $this->view()->template()->form = $form;
@@ -87,7 +103,7 @@ print "<br>";
 
       $elemOName = new Form_Element_Text('originalname', $this->_('Originální název'));
       $form->addElement($elemOName,'filmdetail');
-      
+
       $elemLabel = new Form_Element_TextArea('label', $this->_('Popis'));
       $elemLabel->setSubLabel($this->_('Režie, herci, země původu, atd.'));
       $elemLabel->addValidation(new Form_Validator_NotEmpty());
@@ -100,7 +116,7 @@ print "<br>";
 
       $elemType = new Form_Element_Select('type', $this->_('Znění'));
       $types = array('Česky' => 'czech', 'Originální s titulky' => 'origwsubtitles',
-      'Originální' => 'original','Dabované' => 'dabbing');
+          'Originální' => 'original','Dabované' => 'dabbing');
       $elemType->setOptions($types);
       $form->addElement($elemType,'filmdetail');
 
@@ -142,10 +158,12 @@ print "<br>";
       $elemDateStart = new Form_Element_Text('datestart', $this->_('Od'));
       $elemDateStart->setDimensional();
       $elemDateStart->addValidation(new Form_Validator_NotEmpty());
+      $elemDateStart->addFilter(new Form_Filter_DateTimeObj());
       $form->addElement($elemDateStart,'filmshowdetail');
 
       $elemDateStop = new Form_Element_Text('datestop', $this->_('Do'));
       $elemDateStop->setDimensional();
+      $elemDateStop->addFilter(new Form_Filter_DateTimeObj());
       $form->addElement($elemDateStop,'filmshowdetail');
 
       $elemDateDeleted = new Form_Element_Hidden('dateDeleted');
@@ -155,10 +173,11 @@ print "<br>";
       $elemDateId = new Form_Element_Hidden('dateId');
       $elemDateId->setDimensional();
       $form->addElement($elemDateId,'filmshowdetail');
-      
+
       $elemTime = new Form_Element_Text('time', $this->_('Čas'));
       $elemTime->setDimensional();
       $elemTime->addValidation(new Form_Validator_NotEmpty());
+      $elemTime->addFilter(new Form_Filter_DateTimeObj());
       $form->addElement($elemTime,'filmshowdetail');
       // EOF časové hranice
 

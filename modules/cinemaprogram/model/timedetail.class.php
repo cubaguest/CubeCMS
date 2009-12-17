@@ -3,69 +3,25 @@
  * Třída modelu s detailem textu
  * 
  */
-class CinemProgram_Model_TimeDetail extends Model_PDO {
+class CinemaProgram_Model_TimeDetail extends Model_PDO {
 /**
  * Tabulka s detaily
  */
-   const DB_TABLE = 'texts';
+   const DB_TABLE = 'cinemaprogram_time';
 
    /**
     * Názvy sloupců v db
     * @var string
     */
-   const COLUMN_ID_CATEGORY = 'id_item';
-   const COLUMN_SUBKEY = 'subkey';
-   const COLUMN_CHANGED_TIME = 'changed_time';
-   const COLUMN_TEXT = 'text';
-   const COLUMN_LABEL = 'label';
-   const COLUMN_TEXT_PANEL = 'text_panel';
+   const COLUMN_ID = 'id_time';
+   const COLUMN_ID_MOVIE = 'id_movie';
+   const COLUMN_DATEFROM = 'date_from';
+   const COLUMN_DATETO = 'date_to';
+   const COLUMN_TIME = 'time';
 
-   /**
-    * Metoda provede načtení textu z db
-    *
-    * @return string -- načtený text
-    */
-   public function getText($idCat) {
+   public function saveTime(DateTime $dateF,DateTime $dateT, DateTime $time, $idMovie, $idTime = null) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
-             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idCat)");
-      $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->execute();
-
-      $cl = new Model_LangContainer();
-      $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
-      return $dbst->fetch();
-   }
-
-   public function saveText($texts, $label, $panelText, $idCat, $subKey = 'NULL') {
-   // zjištění jestli existuje záznam
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE (".self::COLUMN_ID_CATEGORY." = :idCat AND ".self::COLUMN_SUBKEY." = :subkey)");
-      //      if($subKey === null) {
-      $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
-      //      } else {
-      //         $dbst->bindValue(':subkey', $subKey);
-      //      }
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->execute();
-      $count = $dbst->rowCount();
-      //      $count = $dbst->fetch();
-      //      $count = $count[0];
-      //          exit;
-      // globalní prvky
-      $dbc = new Db_PDO();
-      $this->setIUValues(array(self::COLUMN_TEXT => $texts, self::COLUMN_SUBKEY => $subKey,
-          self::COLUMN_CHANGED_TIME => time()));
-
-      if($label !== null){
-         $this->setIUValues(array(self::COLUMN_LABEL => $label));
-      }
-      if($panelText !== null){
-         $this->setIUValues(array(self::COLUMN_TEXT_PANEL => $panelText));
-      }
-
-      if($count != 0) {
+      if($idTime !== null) {
       // je už uloženo
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
              ." SET ".$this->getUpdateValues()." WHERE ".self::COLUMN_ID_CATEGORY." = ".(int)$idCat);
@@ -74,10 +30,18 @@ class CinemProgram_Model_TimeDetail extends Model_PDO {
          $dbst->execute();
       } else {
       // není uloženo
-         $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat));
-         $dbc->query("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-             ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
-         return $dbc->lastInsertId();
+         $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+             ." (`id_movie`, `date_from`, `date_to`, `time`) VALUES (:idm, :datef, :datet, :mtime)");
+
+         $dbst->bindValue('idm', $idMovie, PDO::PARAM_INT);
+         $dbst->bindValue('datef', $dateF->format('Y-m-d'));
+//         if($dateT == null){
+//            $dbst->bindValue('datet', null);
+//         } else {
+            $dbst->bindValue('datet', $dateT->format('Y-m-d'));
+//         }
+         $dbst->bindValue('mtime', $time->format('H:i'));
+         return $dbst->execute();
       }
    }
 
