@@ -1,27 +1,18 @@
 <?php
 /**
- * Rozhraní pro implementaci filtru aplikujícího na formulářová element
+ * Interface filtru elementu formuláře
+ * Interface definující základní vlastnosti filtru elemntu formuláře
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE6.0.0 $Revision: $
- * @author        $Author: $ $Date: $
- *                $LastChangedBy: $ $LastChangedDate: $
- * @abstract 		Třída pro vytvoření fitru
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: $ VVE 6.0.0 $Revision:  $
+ * @author        $Author:  $ $Date: $
+ *                $LastChangedBy:  $ $LastChangedDate: $
+ * @abstract      Třída pro tvorbu filtrů elemntů formuláře
  */
 interface Form_Filter_Interface {
-   public function  __construct();
-
    /**
-    * Metoda aplikuje filtr na daný element
-    * @param Form_Element $elem
+    * Metoda provede filtrování dat alamentu
     */
-   public function filter(Form_Element &$elem);
-
-   /**
-    * Metoda přidá do elementu prvky z validace
-    * @param Form_Element $element -- samotný element
-    */
-   public function addHtmlElementParams(Form_Element $element);
-
+   public function filer();
 }
 ?>

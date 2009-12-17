@@ -405,6 +405,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function label() {
       $this->htmlLabel()->clearContent();
+      $this->htmlLabel()->clearClasses();
       if(!$this->isValid AND $this->isPopulated) {
          $this->htmlLabel()->addClass('formErrorLabel');
       }
@@ -457,6 +458,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function controll() {
       $this->html()->clearContent();
+      $this->html()->clearClasses();
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass('formError');
       }
@@ -549,9 +551,6 @@ class Form_Element implements Form_Element_Interface {
     */
    public function labelLangs() {
       if($this->isMultilang() AND count($this->langs) > 1) {
-         Template::addJsPlugin(new JsPlugin_JQuery());
-         Template::addJS('./jscripts/formswitchlangs.js');
-
          $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $a = new Html_Element('a', $langLabel);

@@ -14,10 +14,10 @@
  * @abstract      Třída pro obsluhu formulářů
  */
 class Form implements ArrayAccess {
-/**
- * Prefix pro všechny prvky ve formuláři
- * @var string
- */
+   /**
+    * Prefix pro všechny prvky ve formuláři
+    * @var string
+    */
    private $formPrefix = null;
 
    /**
@@ -75,6 +75,11 @@ class Form implements ArrayAccess {
    private $htmlElement = null;
 
    /**
+    * Jestli je formulář vícejazyčný
+    * @var boolean
+    */
+   private $formIsMultilang = false;
+   /**
     * Konstruktor vytváří objekt formuláře
     * @param string $prefix -- (option) prefix pro formulářové prvky
     */
@@ -96,7 +101,7 @@ class Form implements ArrayAccess {
     * @return string -- formulář jako řetězec
     */
    private function creatString(Form_Decorator $decorator = null) {
-      if($decorator == null){
+      if($decorator == null) {
          $decorator = new Form_Decorator();
       }
 
@@ -104,7 +109,7 @@ class Form implements ArrayAccess {
       $d = clone $decorator;
       foreach ($this->elementsGroups as $key => $grp) {
          // pokud element není ve skupině
-         if(!is_array($grp)){
+         if(!is_array($grp)) {
             $d->addElement($this->elements[$key]);
          }
          // pokud patří do skupiny
@@ -116,10 +121,10 @@ class Form implements ArrayAccess {
                $d->addElement($this->elements[$key2]);
             }
             $filedset = new Html_Element('fieldset');
-            if($grp['label'] != null){
+            if($grp['label'] != null) {
                $filedset->addContent(new Html_Element('legend', $grp['label']));
             }
-            if($grp['text'] != null){
+            if($grp['text'] != null) {
                $p = new Html_Element('p', $grp['text']);
                $p->addClass('formGroupText');
                $filedset->addContent($p);
@@ -132,7 +137,7 @@ class Form implements ArrayAccess {
       $formContent .= $d->render();
       $this->html()->addContent($formContent);
       $this->html()->addContent($this->scripts());
-      
+
       return (string)$this->html();
    }
 
@@ -140,8 +145,12 @@ class Form implements ArrayAccess {
     * Metoda vykreslí skripty formuláře
     */
    public function scripts() {
-      Template::addJsPlugin(new JsPlugin_JQuery());
-      $script = new Html_Element_Script('formShowOnlyLang(\''.Locale::getLang().'\');');
+      $script = null;
+      if($this->formIsMultilang) {
+         Template::addJsPlugin(new JsPlugin_JQuery());
+         Template::addJS(Url_Request::getBaseWebDir().'jscripts/formswitchlangs.js');
+         $script = new Html_Element_Script('formShowOnlyLang(\''.Locale::getLang().'\');');
+      }
       return $script;
    }
 
@@ -188,7 +197,7 @@ class Form implements ArrayAccess {
 
    /*
     * Metody pro přístup k prvkům formuláře
-    */
+   */
 
    /**
     * Metoda přidává nový prvek do pole elemntů
@@ -229,7 +238,7 @@ class Form implements ArrayAccess {
 
    /*
     * Metody zajišťující kontrolu a odeslání formuláře
-    */
+   */
 
    /**
     * Metoda zjišťuje jestli byl formulář odeslán
@@ -254,7 +263,7 @@ class Form implements ArrayAccess {
     * @return booleant -- true pokud je formulář v pořádku
     */
    public function isValid() {
-      if($this->isValid === null){
+      if($this->isValid === null) {
          if($this->isSend()) {
             $this->isValid = true;
             $this->populate();
@@ -304,7 +313,7 @@ class Form implements ArrayAccess {
 
    /*
     * Metody pro práci s formulářem
-    */
+   */
 
    /**
     * Metoda nastavuje akci pro formulář, tedy adresu kam se má odkazovat
@@ -352,11 +361,14 @@ class Form implements ArrayAccess {
       $name = $element->getName();
       $this->elements[$name] = $element;
       $this->elements[$name]->setPrefix($this->formPrefix);
+      if($element->isMultiLang()) {
+         $this->formIsMultilang = true;
+      }
 
-      if($group == null){
+      if($group == null) {
          $this->elementsGroups[$name] = $this->elements[$name]->getName();
       } else {
-         if(!isset ($this->elementsGroups[$group])){
+         if(!isset ($this->elementsGroups[$group])) {
             $this->addGroup($group);
          }
          $this->elementsGroups[$group]['elements'][$name] = $this->elements[$name]->getName();
@@ -383,11 +395,11 @@ class Form implements ArrayAccess {
 
    /*
     * Metody pro zpracování obsahu formuláře
-    */
+   */
 
-    /*
+   /*
      * Metody pro render formuláře
-     */
+   */
 
    /**
     * Metoda vyrenderuje formulář podle zadaného typu
@@ -406,9 +418,9 @@ class Form implements ArrayAccess {
       return $this->htmlElement;
    }
 
-    /*
+   /*
      * Podpůrné metody
-     */
+   */
 }
 
 ?>
