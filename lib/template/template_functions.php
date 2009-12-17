@@ -95,6 +95,7 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...'){
     * @param int $maxWidth -- maximální šířka
     * @param int $maxHeight -- maximální výška
     * @return string -- tag obrázku
+    * @todo dodělat pokud je s obrázkem předán parametr, ten se musí zkopírovat také na výstup
     */
    function vve_tpl_image_tag($imagePath, $alt = null, $mw = false, $mh = false, $clases = null, $other = null, $realpath = false) {
       if(file_exists($imagePath) OR ereg('^http.*', $imagePath)){
