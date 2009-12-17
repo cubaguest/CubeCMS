@@ -12,7 +12,7 @@
 
       <title><?print(VVE_WEB_NAME);?>{*-PAGE_TITLE-*}</title>
 
-      <base href="<?=Links::getMainWebDir()?>" />
+      <base href="<?=Url_Link::getMainWebDir()?>" />
 
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
@@ -43,13 +43,7 @@
             contentsource: "markup"});
          /* ]]> */
       </script>
-      <?
-      //      $script = new Html_Element_Script('');;
-      //      print ($script);
-      ?>
-
    </head>
-
    <body id="pageTop">
       <? NavigationMenu_View::listView(); ?>
       <div id="bodywrap">

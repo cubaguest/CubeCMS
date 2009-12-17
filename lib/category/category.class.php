@@ -51,7 +51,7 @@ class Category {
 
    /**
     * Konstruktor načte informace o kategorii
-    * @string $catKey --  klíč kategorie
+    * @string/int $catKey --  klíč nebo id kategorie
     * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
     */
    public function  __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null) {
@@ -80,7 +80,11 @@ class Category {
    // zjistíme jestli nemáme načtená data
       if($catDataObj === null) {
          $catModel = new Model_Category();
-         $catArray = $catModel->getCategory($catKey);
+         if(!is_numeric($catKey)){
+            $catArray = $catModel->getCategory($catKey);
+         } else {
+            $catArray = $catModel->getCategoryById($catKey);
+         }
       } else {
          $catArray = $catDataObj;
       }

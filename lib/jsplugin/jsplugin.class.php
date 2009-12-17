@@ -156,5 +156,13 @@ abstract class JsPlugin {
 	final protected function getAllCfgParams() {
 		return $this->config;
 	}
+
+   /**
+    * Metoda vrací název jspluginu
+    * @return string
+    */
+   public function getName(){
+      return $this->jsPluginName;
+   }
 }
 ?>

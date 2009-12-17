@@ -1,9 +1,9 @@
 function formElemSwitchLang(linkObj, lang){
    // zkrytí všech
-   var parent = $(linkObj).parent("td").parent('tr');
+   var parent = $(linkObj).parent("td");
 
-   parent.find('label').hide();
-   parent.find(".elem_container_class").hide();
+   parent.find('label[lang]').hide();
+   parent.find(".elem_container_class[lang]").hide();
    // odznačení
    parent.find("a.formLinkSelLang").removeClass('formLinkSelLang');
 
@@ -15,8 +15,8 @@ function formElemSwitchLang(linkObj, lang){
 
 function formShowOnlyLang(lang){
    // zkrytí všech
-   $("form label").hide();
-   $("form .elem_container_class").hide();
+   $("form label[lang]").hide();
+   $("form .elem_container_class[lang]").hide();
    // odznačení
    $("form a.formLinkSelLang").removeClass('formLinkSelLang');
 

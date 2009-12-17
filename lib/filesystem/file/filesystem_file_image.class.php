@@ -635,8 +635,31 @@ class Filesystem_File_Image extends Filesystem_File {
     * @param <type> $dstW
     * @param <type> $dstH
     */
-   public function crop($srcX, $srcD, $dstW, $dstH) {
-      ;
+   public function crop($srcX, $srcY, $dstX, $dstY) {
+      if($this->workingImage === null|false) {
+         $this->loadImage();
+      }
+//      $args = func_get_args();
+//      var_dump($args);
+//      ob_flush();exit();
+      if(VVE_USE_IMAGEMAGICK != true) {
+
+         $newImage = imagecreatetruecolor($dstX-$srcX, $dstY-$srcY);
+         // Zapnutí alfy, tj průhlednost
+         imagealphablending($newImage, false);
+         imagesavealpha($newImage, true);
+         if(!@imagecopyresampled($newImage, $this->workingImage,
+         //d d s s
+         0,0,$srcX,$srcY,
+         $dstX-$srcX, $dstY-$srcY, $dstX-$srcX, $dstY-$srcY)) {
+            if($this->reportErrors())
+               throw new UnexpectedValueException(_('Chyba při resamplování obrázku'), 3);
+            $this->isError = true;
+         }
+         $this->workingImage = $newImage;
+      } else {
+
+      }
    }
 
 
