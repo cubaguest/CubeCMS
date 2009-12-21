@@ -21,12 +21,6 @@ class Form_Element_File extends Form_Element {
    private $uploadDir = null;
 
    /**
-    * pole se soubory
-    * @var array
-    */
-   protected $values = array();
-
-   /**
     * Konstruktor elemntu
     * @param string $name -- název elemntu
     * @param string $label -- popis elemntu
@@ -51,14 +45,14 @@ class Form_Element_File extends Form_Element {
                move_uploaded_file($_FILES[$this->getName()]["tmp_name"],
                    $this->uploadDir . $saveFileName);
                // vatvoření pole s informacemi o souboru
-               $this->values = array('name' => $saveFileName,
+               $this->unfilteredValues = array('name' => $saveFileName,
                    'path' => $this->uploadDir,
                    'size' => $_FILES[$this->getName()]["size"],
                    'type' => $this->getMimeType($this->uploadDir.$_FILES[$this->getName()]["name"]),
                    'extension' => $this->getExtension($_FILES[$this->getName()]["name"]));
 //               array_push($this->values, $file);
             } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
-                  $this->values = null;
+                  $this->unfilteredValues = null;
                } else {
                   $this->creteUploadError($_FILES[$this->getName()]['error'], $_FILES[$this->getName()]['name']);
                }
@@ -154,7 +148,7 @@ class Form_Element_File extends Form_Element {
       } else {
          $this->html()->setAttrib('id', $this->getName());
       }
-      $this->html()->setAttrib('value', $this->getValues());
+      $this->html()->setAttrib('value', $this->getUnfilteredValues());
       return $this->html();
    }
 

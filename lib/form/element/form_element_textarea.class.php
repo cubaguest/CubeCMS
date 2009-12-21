@@ -27,7 +27,7 @@ class Form_Element_TextArea extends Form_Element_Text {
          $this->html()->addClass('formError');
       }
 
-      $values = $this->getValues();
+      $values = $this->getUnfilteredValues();
       $this->html()->addClass($this->getName()."_class");
       if($this->isMultiLang()) {
          $cnt = null;

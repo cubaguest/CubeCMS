@@ -78,7 +78,7 @@ class Form_Element_Select extends Form_Element {
       if($this->isMultiple) {
          $this->html()->setAttrib('multiple', 'multiple');
       }
-
+      $values = $this->getUnfilteredValues();
       foreach ($this->options as $optLabel => $optVal) {
          if(is_array($optVal)) {
             $opt = new Html_Element('optgroup');
@@ -86,7 +86,7 @@ class Form_Element_Select extends Form_Element {
             foreach ($optVal as $optLabel2 => $optVal2) {
                $optChild = new Html_Element('option', $optLabel2);
                $optChild->setAttrib('value', $optVal2);
-               if($this->values == $optVal2 OR (is_array($this->values) AND in_array($optVal2, $this->values))) {
+               if($values == $optVal2 OR (is_array($values) AND in_array($optVal2, $values))) {
                   $optChild->setAttrib('selected', 'selected');
                }
                $opt->addContent($optChild);
@@ -94,7 +94,7 @@ class Form_Element_Select extends Form_Element {
          } else {
             $opt = new Html_Element('option', $optLabel);
             $opt->setAttrib('value', $optVal);
-            if($this->values == $optVal OR (is_array($this->values) AND in_array($optVal, $this->values))) {
+            if($values == $optVal OR (is_array($values) AND in_array($optVal, $values))) {
                $opt->setAttrib('selected', 'selected');
             }
          }

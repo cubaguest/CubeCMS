@@ -284,8 +284,9 @@ class Form implements ArrayAccess {
          $element->validate();
          if(!$element->isValid()) {
             $this->isValid = false;
+         } else {
+            $element->filter();
          }
-         $element->filter();
       }
       $this->isPopulated = true;
    }

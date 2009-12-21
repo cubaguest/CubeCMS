@@ -82,12 +82,6 @@ class Form_Element implements Form_Element_Interface {
    protected $unfilteredValues = null;
 
    /**
-    * Pole s odeslanými hodnotami a přehnanými přes filtr
-    * @var mixed
-    */
-   protected $valuesFiltered = null;
-
-   /**
     * Pole s jazyky prvku
     * @var array
     */
@@ -184,7 +178,7 @@ class Form_Element implements Form_Element_Interface {
     * @return Form_Element
     */
    public function setValues($values) {
-      $this->values = $values;
+      $this->unfilteredValues = $values;
       return $this;
    }
 
@@ -268,6 +262,14 @@ class Form_Element implements Form_Element_Interface {
    }
 
    /**
+    * Metoda nasatví popis elementu
+    * @param string $label -- popis elementu
+    */
+   final public function setLabel($label) {
+      $this->formElementLabel = $label;
+   }
+
+   /**
     * Metoda vrací popis prvku
     * @return string -- popis prvku, je zadáván při vytvoření
     */
@@ -280,18 +282,22 @@ class Form_Element implements Form_Element_Interface {
     * @param $key -- (option) klíč hodnoty (pokud je pole)
     * @return mixed -- hodnota prvku
     */
-   public function getValues($key = null, $filtered = true) {
-      if($filtered) {
-         if($key !== null AND isset($this->values[$key])) {
-            return $this->values[$key];
-         }
-         return $this->values;
-      } else {
-         if($key !== null AND isset($this->unfilteredValues[$key])) {
-            return $this->unfilteredValues[$key];
-         }
-         return $this->unfilteredValues;
+   public function getValues($key = null) {
+      if($key !== null AND isset($this->values[$key])) {
+         return $this->values[$key];
       }
+      return $this->values;
+   }
+
+   /**
+    * Metoda vrací nefiltrované hodnoty prvku
+    * @return mixed -- hodnota prvku
+    */
+   public function getUnfilteredValues($key = null) {
+      if($key !== null AND isset($this->unfilteredValues[$key])) {
+         return $this->unfilteredValues[$key];
+      }
+      return $this->unfilteredValues;
    }
 
    /**
@@ -386,6 +392,7 @@ class Form_Element implements Form_Element_Interface {
     * Metodda provede přefiltrování obsahu elementu
     */
    public function filter(){
+      $this->values = $this->unfilteredValues;
       foreach ($this->filters as $filter) {
          $filter->filter($this);
       }
@@ -404,43 +411,44 @@ class Form_Element implements Form_Element_Interface {
     * @return string
     */
    public function label() {
-      $this->htmlLabel()->clearContent();
-      $this->htmlLabel()->clearClasses();
+      $elem = clone $this->htmlLabel();
+      $elem->clearContent();
+//      $this->htmlLabel()->clearClasses();
       if(!$this->isValid AND $this->isPopulated) {
-         $this->htmlLabel()->addClass('formErrorLabel');
+         $elem->addClass('formErrorLabel');
       }
 
-      $this->htmlLabel()->addContent($this->formElementLabel.":");
+      $elem->addContent($this->formElementLabel.":");
       if($this->isDimensional()){
-         $this->htmlLabel()->addClass($this->getName()."_".$this->dimensional."_label_class");
+         $elem->addClass($this->getName()."_".$this->dimensional."_label_class");
       } else {
-         $this->htmlLabel()->addClass($this->getName()."_label_class");
+         $elem->addClass($this->getName()."_label_class");
       }
       if($this->isMultilang()) {
          $cnt = $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             if($this->isDimensional()){
-               $this->htmlLabel()->setAttrib('for', $this->getName()."_".$this->dimensional.'_'.$langKey);
-               $this->htmlLabel()->setAttrib('id', $this->getName()."_".$this->dimensional.'_label_'.$langKey);
-               $this->htmlLabel()->setAttrib('lang', $langKey);
+               $elem->setAttrib('for', $this->getName()."_".$this->dimensional.'_'.$langKey);
+               $elem->setAttrib('id', $this->getName()."_".$this->dimensional.'_label_'.$langKey);
+               $elem->setAttrib('lang', $langKey);
             } else {
-               $this->htmlLabel()->setAttrib('for', $this->getName().'_'.$langKey);
-               $this->htmlLabel()->setAttrib('id', $this->getName().'_label_'.$langKey);
-               $this->htmlLabel()->setAttrib('lang', $langKey);
+               $elem->setAttrib('for', $this->getName().'_'.$langKey);
+               $elem->setAttrib('id', $this->getName().'_label_'.$langKey);
+               $elem->setAttrib('lang', $langKey);
             }
 
-            $cnt .= $this->htmlLabel();
+            $cnt .= $elem;
          }
          return $cnt;
       } else {
          if(!$this->isDimensional()){
-            $this->htmlLabel()->setAttrib('for', $this->getName());
+            $elem->setAttrib('for', $this->getName());
          } else {
-            $this->htmlLabel()->setAttrib('for', $this->getName()."_".$this->dimensional);
+            $elem->setAttrib('for', $this->getName()."_".$this->dimensional);
          }
       }
 
-      return (string)$this->htmlLabel();
+      return (string)$elem;
    }
 
    /**
@@ -463,7 +471,8 @@ class Form_Element implements Form_Element_Interface {
          $this->html()->addClass('formError');
       }
 
-      $values = $this->getValues(null,false);
+      $values = $this->getUnfilteredValues();
+//      var_dump($values);
       $this->html()->addClass($this->getName()."_class");
 
       if($this->isMultiLang()) {

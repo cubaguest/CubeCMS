@@ -75,11 +75,13 @@ class Form_Element_Checkbox extends Form_Element {
          $this->html()->setAttrib('id', $this->getName());
       }
 
+      $values = $this->getUnfilteredValues();
+
       $this->html()->setAttrib('type', 'checkbox');
-      if(!empty ($this->values)) {
-         $this->html()->setAttrib('value', $this->values);
+      if(!empty ($values)) {
+         $this->html()->setAttrib('value', $values);
       }
-      if($this->values == true) {
+      if($values == true) {
          $this->html()->setAttrib('checked', 'checked');
       }
 
