@@ -75,13 +75,15 @@ class Template_Module extends Template {
    /**
     * Metoda přidá požadovaný soubor šablony do výstupu
     * @param string $name -- název souboru
-    * @param boolean $engine -- jestli se jedná o šablonu enginu
+    * @param boolean $type -- jestli se jedná o šablonu enginu
     */
-   public function addTplFile($name, $engine = false) {
-         if(!$engine){
+   public function addTplFile($name, $type = null) {
+         if($type === null){
             array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR, $this->category->getModule()->getName()).$name);
-         } else {
+         } else if($type === true){
             array_push($this->templateFiles, parent::getFileDir($name, self::TEMPLATES_DIR, false).$name);
+         } else if(is_string($type)){
+            array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR, $type).$name);
          }
    }
 
@@ -163,6 +165,29 @@ class Template_Module extends Template {
          trigger_error(sprintf(_('Soubor "%s" s šablonou v modulu "%s" nebyl nalezen'),
                $file, $moduleName));
       }
+   }
+
+   /**
+    * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
+    */
+   public function renderTemplate() {
+   // zastavení výpisu buferu
+      ob_start();
+      foreach ($this->templateFiles as $file) {
+         if(file_exists($file)){
+            try {
+               $strpos = strpos($file, 'modules/')+8;
+               $module = substr($file, $strpos, strpos($file, "/templates") - $strpos);
+               $this->locale()->setDomain($module);
+               include $file;
+            } catch (Exception $e) {
+               new CoreErrors($e);
+            }
+         }
+      }
+      $contents = ob_get_contents();
+      ob_end_clean();
+      print (string)$contents;
    }
 }
 ?>
