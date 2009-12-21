@@ -149,6 +149,7 @@ class JsPlugin_TinyMce extends JsPlugin {
    'theme' => 'advanced',
    'mode' => "textareas",
    'language' => 'cs',
+   'category_id' => null,
    'force_br_newlines' => true,
    'document_base_url' => null,
    'remove_script_host' => false,
@@ -201,7 +202,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     * @var array
     */
    private $advancedFullParams = array(
-   'plugins' => "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,imagemanager,filemanager",
+   'plugins' => "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
    'theme_advanced_buttons1' => "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
    'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
    'theme_advanced_buttons3' => "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
@@ -222,13 +223,17 @@ class JsPlugin_TinyMce extends JsPlugin {
             $cfgFile = new JsPlugin_JsFile("settingsadvancedsimple.js", true);
             break;
          case 'full':
-            $this->addFile(new JsPlugin_JsFile("tinymce-files.js"));
+            $editorFile = new JsPlugin_JsFile("tiny_mce_browser.js");
+            $editorFile->setParam('cat', Category::getSelectedCategory()->getId());
+            $this->addFile($editorFile);
             $cfgFile = new JsPlugin_JsFile("settingsfull.js", true);
             break;
          case 'advanced1':
          case 'advanced':
          default:
-            $this->addFile(new JsPlugin_JsFile("tinymce-files.js"));
+            $editorFile = new JsPlugin_JsFile("tiny_mce_browser.js");
+            $editorFile->setParam('cat', Category::getSelectedCategory()->getId());
+            $this->addFile($editorFile);
             $cfgFile = new JsPlugin_JsFile("settingsadvanced1.js", true);
             break;
       }
@@ -243,6 +248,7 @@ class JsPlugin_TinyMce extends JsPlugin {
    private function setBasicOptions(&$params) {
       $params['document_base_url'] = Url_Request::getBaseWebDir();
       $params['language'] = Locale::getLang();
+      $params['category_id'] = AppCore::getCategory()->getId();
       if(isset ($_GET['editor_selector'])){
          $params['editor_selector'] = rawurldecode($_GET['editor_selector']);
       } else {
@@ -381,18 +387,20 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
 
    public function filebrowserView() {
-      $template = new Template(new Url_Link());
-      $template->addTplFile('tinymce/filebrowser.phtml');
+      
 
-      $template->renderTemplate();
+//      $template = new Template(new Url_Link());
+//      $template->addTplFile('tinymce/filebrowser.phtml');
+//
+//      $template->renderTemplate();
    }
 
    /**
     * Metoda vrátí adresáře ve formátu JSON
     */
    public function getDirsView() {
-      $tpl = new Template(new Url_Link());
-      $tpl->addTplFile('tinymce/dirs.phtml');
+      $tpl = new Template_JsPlugin(new Url_Link(), AppCore::getCategory(), $this);
+      $tpl->addTplFile('browser/dirs.phtml');
 
       $tpl->dirs = $this->loadDir(AppCore::getAppWebDir().'data/');
       $tpl->dataPath = AppCore::getAppWebDir().'data/';
@@ -421,7 +429,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metoda vrátí adresáře ve formátu JSON
     */
    public function getFilesView() {
-      $tpl = new Template(new Url_Link());
+      $tpl = new Template_JsPlugin(new Url_Link(), AppCore::getCategory(), $this);
       if(isset ($_GET['dir'])) {
          $dir = urldecode($_GET['dir']);
       } else {
@@ -433,7 +441,7 @@ class JsPlugin_TinyMce extends JsPlugin {
             $it = new DirectoryIterator(AppCore::getAppWebDir().$dir);
             foreach ($it as $itFile) {
                if(!$itFile->isDir() AND !$itFile->isDot()) {
-                  if(($size = getimagesize($itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName())) !== false
+                  if(($size = @getimagesize($itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName())) !== false
                      AND $size[2] != IMAGETYPE_SWC AND $size != IMAGETYPE_SWF) {
                      $file = array(
                          'type' => 'image',
@@ -442,7 +450,7 @@ class JsPlugin_TinyMce extends JsPlugin {
                          'height' => $size[1],
                          'mime' => $size['mime'],
                          'size' => filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName()),
-                         'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR.$itFile->getFileName()
+                         'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR
                      );
                      array_push($files, $file);
                   }
@@ -464,7 +472,7 @@ class JsPlugin_TinyMce extends JsPlugin {
                          'name' => $itFile->getFileName(),
                          'mime' => null,
                          'size' => filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName()),
-                         'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR.$itFile->getFileName()
+                         'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR
                      );
                      if($finfo !== false){
                         $file['mime'] = finfo_file($finfo, $itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName());
@@ -485,7 +493,7 @@ class JsPlugin_TinyMce extends JsPlugin {
                if(!$itFile->isDir() AND !$itFile->isDot()) {
                   $file = array();
                   $file['size'] = filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName());
-                  $file['path'] = Url_Request::getBaseWebDir().$dir.URL_SEPARATOR.$itFile->getFileName();
+                  $file['path'] = Url_Request::getBaseWebDir().$dir.URL_SEPARATOR;
                   $file['name'] = $itFile->getFileName();
                   $file['type'] = 'file';
                   $file['mime'] = null;
@@ -509,7 +517,7 @@ class JsPlugin_TinyMce extends JsPlugin {
             }
             break;
       }
-      $tpl->addTplFile('tinymce/files.phtml');
+      $tpl->addTplFile('browser/files.phtml');
       //      print(new Url_Link());
       $tpl->files = $files;
       //      $tpl->dataPath = AppCore::getAppWebDir().'data/';
@@ -740,36 +748,73 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metoda pro změnu velikosti obrázku
     */
    public function resizeimageView() {
+      if(Auth::isLoginStatic()){
+
       $path = $_POST['path'];
       $file = $_POST['file'];
-      $size = $_POST['size'];
+      $width = $_POST['size_w'];
+      $heigh = $_POST['size_h'];
 
-      $x = false;
-      $regexp = '/x=([[:digit:]]+)/i';
-      $matches = array();
-      if(preg_match($regexp, $size, $matches) != 0){
-         $x = $matches[1];
+      $badValues = false;
+      if(!is_numeric($width) OR !is_numeric($heigh)){
+         $badValues = true;
       }
-      $y = false;
-      $regexp = '/y=([[:digit:]]+)/i';
-      $matches = array();
-      if(preg_match($regexp, $size, $matches) != 0){
-         $y = $matches[1];
-      }
+
+      $path = str_replace(Url_Request::getBaseWebDir(), AppCore::getAppWebDir(), $path);
 
       $image = new Filesystem_File_Image($file, $path, false);
-      $image->setDimensions($x, $y);
-      if(strpos($size, 'crop') !== false){
-         $image->setCrop(true);
-      }
-      $image->resampleImage();
+//      $image->setDimensions();
+      $image->resampleImage($width, $heigh);
       $image->save();
-      if(!$image->isError()){
+      if(!$image->isError() AND $badValues !== true){
          $code = true;
          $message = sprintf(_('Velikost obrázku "%s" byla upravenna'),$image->getName());
       } else {
          $code = false;
          $message = sprintf(_('Velikost obrázku "%s" se nepodařilo upravit'),$image->getName());
+      }
+      } else {
+         $code = false;
+         $message = sprintf(_('Nemáte dostatečná práva nebo jste byl odhlášen'),$image->getName());
+      }
+
+      $this->sendJsonData(array('code' => $code, 'message' => $message));
+   }
+
+   /**
+    * Metoda pro změnu velikosti obrázku
+    */
+   public function cropimageView() {
+      if(Auth::isLoginStatic()){
+
+      $path = $_POST['path'];
+      $file = $_POST['file'];
+      $x1 = $_POST['x1'];
+      $y1 = $_POST['y1'];
+      $x2 = $_POST['x2'];
+      $y2 = $_POST['y2'];
+
+      $badValues = false;
+      if(!is_numeric($x1) OR !is_numeric($y1) OR !is_numeric($x2) OR !is_numeric($y2)){
+         $badValues = true;
+      }
+
+      $path = str_replace(Url_Request::getBaseWebDir(), AppCore::getAppWebDir(), $path);
+
+      $image = new Filesystem_File_Image($file, $path, false);
+//      $image->setDimensions();
+      $image->crop($x1, $y1, $x2, $y2);
+      $image->save();
+      if(!$image->isError() AND $badValues !== true){
+         $code = true;
+         $message = sprintf(_('Obrázek "%s" byl ořezán'),$image->getName());
+      } else {
+         $code = false;
+         $message = sprintf(_('Obrázek "%s" se nepodařilo ořezat'),$image->getName());
+      }
+      } else {
+         $code = false;
+         $message = sprintf(_('Nemáte dostatečná práva nebo jste byl odhlášen'),$image->getName());
       }
 
       $this->sendJsonData(array('code' => $code, 'message' => $message));
