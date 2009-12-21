@@ -8,14 +8,14 @@ class Photogalery_View extends View {
 	}
 	
 	public function editimagesView() {
-      $this->view()->template()->addTplFile("editimages.phtml");
+      $this->template()->addTplFile("editimages.phtml");
    }
 
    public function uploadFileView() {}
    public function checkFileView() {}
 
    public function editphotoView() {
-      $this->view()->template()->addTplFile("editphoto.phtml");
+      $this->template()->addTplFile("editphoto.phtml");
    }
 }
 

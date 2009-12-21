@@ -26,8 +26,6 @@ class Articles_Controller extends Controller {
 
       $this->view()->template()->scrollComp = $scrollComponent;
       $this->view()->template()->articles = $articles;
-      $this->view()->template()->addTplFile("list.phtml");
-      $this->view()->template()->addCssFile("style.css");
    }
 
    /**

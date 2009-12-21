@@ -27,6 +27,27 @@ class Photogalerymed_Controller extends Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
+
+      // načtení článků
+      $artModel = new Articles_Model_List();
+
+      $scrollComponent = new Component_Scroll();
+      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,
+         $artModel->getCountArticles($this->category()->getId()));
+
+      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
+         $this->category()->getModule()->getParam('scroll', 2));
+
+      $scrollComponent->runCtrlPart();
+
+      $articles = $artModel->getList($this->category()->getId(),
+         $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
+         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
+
+
+      $this->view()->template()->scrollComp = $scrollComponent;
+      $this->view()->template()->articles = $articles;
+
       $this->view()->template()->addTplFile("list.phtml");
    }
 
@@ -130,8 +151,11 @@ class Photogalerymed_Controller extends Controller {
 //   }
 
    public function editimagesController() {
+      $artModel = new Articles_Model_Detail();
+      $art = $artModel->getArticle($this->getRequest('urlkey'));
+
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', 28);
+      $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
       $ctr->editimagesController();
 
       $this->view()->template()->addTplFile('editimages.phtml', 'photogalery');
@@ -143,8 +167,11 @@ class Photogalerymed_Controller extends Controller {
    }
    
    public function uploadFileController() {
+      $artModel = new Articles_Model_Detail();
+      $art = $artModel->getArticle($this->getRequest('urlkey'));
+
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', 28);
+      $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
       $ctr->uploadFileController();
    }
 

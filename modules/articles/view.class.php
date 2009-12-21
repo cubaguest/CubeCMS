@@ -1,6 +1,8 @@
 <?php
 class Articles_View extends View {
    public function mainView() {
+      $this->view()->template()->addTplFile("list.phtml");
+      $this->view()->template()->addCssFile("style.css");
    }
 
    public function showView(){

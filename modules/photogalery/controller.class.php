@@ -139,6 +139,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->images = $imagesM->getImages($this->category()->getId(), $this->getOption('idArt'));
       $this->view()->template()->addForm = $addForm;
       $this->view()->template()->editForm = $editForm;
+      $this->view()->template()->idArt = $this->getOption('idArt');
    }
 
    private function saveImageForm() {
@@ -148,9 +149,9 @@ class Photogalery_Controller extends Controller {
       $addFile->setUploadDir($this->category()->getModule()->getDataDir());
       $addForm->addElement($addFile);
 
-//      $idArt = new Form_Element_Hidden('idArt');
-//      $idArt->setValues($this->getOption('idArt'));
-//      $addForm->addElement($idArt);
+      $idArt = new Form_Element_Hidden('idArt');
+      $idArt->setValues($this->getOption('idArt'));
+      $addForm->addElement($idArt);
 
       $addSubmit = new Form_Element_Submit('send',$this->_('Odeslat'));
       $addForm->addElement($addSubmit);
@@ -167,7 +168,7 @@ class Photogalery_Controller extends Controller {
 
          // uloženhí do db
          $imagesM = new PhotoGalery_Model_Images();
-         $imagesM->saveImage($this->category()->getId(), $this->getOption('idArt'),
+         $imagesM->saveImage($this->category()->getId(), $addForm->idArt->getValues(),
                  $image->getName(), $image->getName());
       }
       return $addForm;

@@ -15,6 +15,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
       <form id="mainftp" method="post" action="<?=$this->link()?>" enctype="multipart/form-data">
          <? print ($this->addForm->image->label());
          print ($this->addForm->image->labelValidations());
+         print ("<p>".$this->addForm->idArt->controll()."</p>");
          print ("<p>".$this->addForm->image->controll()."</p>");
          print ("<p>".$this->addForm->send->controll()."</p>"); ?>
       </form>
@@ -134,7 +135,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
             'fileDesc'  : 'images',
             'fileExt'   : '*.jpg;*. jpeg;*.png;*. gif',
             'fileDataName' : 'addimage_image',
-            'scriptData' : {'sessionid': '<?=session_id();?>', 'addimage_send' : 'send'},
+            'scriptData' : {'sessionid': '<?=session_id();?>', 'addimage_send' : 'send', 'addimage_idArt' : <?=$this->addForm->idArt->getUnfilteredValues()?>},
             onProgress: function() {
                $('#loader').show();
                $('#mainftpQueue').show();
