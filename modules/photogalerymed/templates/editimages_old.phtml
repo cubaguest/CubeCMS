@@ -6,6 +6,7 @@ $this->addPageHeadline($this->_('úprava obrázků'));
 
 $this->addJsPlugin(new JsPlugin_Uploadify());
 ?>
+photogalerymed
 <div id="editImagesForm">
    <h2><?=$this->_('Přidání obrázku');?></h2>
 
@@ -21,7 +22,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
    </div>
 
    <br />
-   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
+   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('detail', array('urlkey' => $this->urlKey))));?>
    <h2><?=$this->_('Úpravy obrázků');?></h2>
    <div id="allfiles">
       <form method="post" action="<?=$this->link()?>">
@@ -115,7 +116,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
    <?$uploadLink = new Url_Link_ModuleRequest();?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      jQuery(document).ready(function() {
+      /*jQuery(document).ready(function() {
          var elem = $('#mainftp');
          var elem2 = $('#mainftp').parent();
          $('#mainftp').uploadify({
@@ -153,7 +154,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
                alert ('Upload error');
             }
          });
-      });
+      });*/
 
       function deleteAll(){
          if(confirm('<?=$this->_('Smazat všechny obrázky?')?>')){
@@ -167,5 +168,5 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
    </script>
 
 
-   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
+   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('detail', array('urlkey' => $this->urlKey))));?>
 </div>

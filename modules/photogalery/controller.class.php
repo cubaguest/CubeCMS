@@ -21,12 +21,22 @@ class Photogalery_Controller extends Controller {
    const MEDIUM_WIDTH = 600;
    const MEDIUM_HEIGHT = 400;
 
+   public $idArt = null;
+
+   public function init(){
+      $this->setOption('idArt', $this->category()->getId());
+   }
+
    /**
     * Kontroler pro zobrazení fotogalerii
     */
    public function mainController() {
    //		Kontrola práv
       $this->checkReadableRights();
+
+      $modelImages = new PhotoGalery_Model_Images();
+      $this->view()->template()->images = $modelImages->getImages($this->category()->getId(),
+              $this->getRequest('idart', $this->category()->getId()));
       $this->view()->template()->addTplFile("list.phtml");
    }
 
@@ -60,7 +70,6 @@ class Photogalery_Controller extends Controller {
 
       // view
       $this->view()->template()->form = $form;
-
       $this->view()->template()->addTplFile("edittext.phtml");
    }
 
@@ -88,33 +97,38 @@ class Photogalery_Controller extends Controller {
       $editForm->addElement($imgDel);
       $imgId = new Form_Element_Hidden('id');
       $editForm->addElement($imgId);
-      $imgFile = new Form_Element_Hidden('file');
-      $editForm->addElement($imgFile);
+//      $imgFile = new Form_Element_Hidden('file');
+//      $editForm->addElement($imgFile);
 
       $submit = new Form_Element_Submit('save', $this->_('Uložit'));
       $editForm->addElement($submit);
 
       if($editForm->isValid()) {
-         $files = $editForm->file->getValues();
+//         $files = $editForm->file->getValues();
          $names = $editForm->name->getValues();
          $descs = $editForm->desc->getValues();
          $orders = $editForm->ord->getValues();
-         foreach ($editForm->id->getValues() as $id) {
+         $ids = $editForm->id->getValues();
+
+         foreach ($ids as $id) {
             if($editForm->delete->getValues($id) === true) {
+               $img = $imagesM->getImage($id);
             // smazání souborů
-               $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir()
-                   .self::DIR_SMALL.DIRECTORY_SEPARATOR);
+               $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
+                       $this->category()->getModule()->getDataDir().self::DIR_SMALL.DIRECTORY_SEPARATOR);
                $file->remove();
-               $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir()
-                   .self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
+               $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
+                       $this->category()->getModule()->getDataDir().self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
                $file->remove();
-               $file = new Filesystem_File($files[$id], $this->category()->getModule()->getDataDir());
+               $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
+                       $this->category()->getModule()->getDataDir());
                $file->remove();
                // remove z db
                $imagesM->deleteImage($id);
             } else {
             // ukládají změny
-               $imagesM->saveImage($this->category()->getId(), null, $names[$id], $descs[$id],$orders[$id],$id);
+               $imagesM->saveImage($this->category()->getId(), $this->getOption('idArt'),
+                       null, $names[$id], $descs[$id],$orders[$id],$id);
             }
          }
          $this->infoMsg()->addMessage($this->_('Obrázky byly uloženy'));
@@ -122,10 +136,9 @@ class Photogalery_Controller extends Controller {
       }
 
 
-      $this->view()->template()->images = $imagesM->getImages($this->category()->getId());
+      $this->view()->template()->images = $imagesM->getImages($this->category()->getId(), $this->getOption('idArt'));
       $this->view()->template()->addForm = $addForm;
       $this->view()->template()->editForm = $editForm;
-      $this->view()->template()->addTplFile("editimages.phtml");
    }
 
    private function saveImageForm() {
@@ -134,6 +147,10 @@ class Photogalery_Controller extends Controller {
       $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $addFile->setUploadDir($this->category()->getModule()->getDataDir());
       $addForm->addElement($addFile);
+
+//      $idArt = new Form_Element_Hidden('idArt');
+//      $idArt->setValues($this->getOption('idArt'));
+//      $addForm->addElement($idArt);
 
       $addSubmit = new Form_Element_Submit('send',$this->_('Odeslat'));
       $addForm->addElement($addSubmit);
@@ -150,7 +167,8 @@ class Photogalery_Controller extends Controller {
 
          // uloženhí do db
          $imagesM = new PhotoGalery_Model_Images();
-         $imagesM->saveImage($this->category()->getId(), $image->getName(), $image->getName());
+         $imagesM->saveImage($this->category()->getId(), $this->getOption('idArt'),
+                 $image->getName(), $image->getName());
       }
       return $addForm;
    }
@@ -183,7 +201,7 @@ class Photogalery_Controller extends Controller {
       $this->checkWritebleRights();
 
       $m = new PhotoGalery_Model_Images();
-      $image = $m->getImage($this->getRequest('id'));
+      $image = $m->getImage($this->getRequest('id', $this->getOption('idImage')));
 
       $editForm = new Form('image_');
 
@@ -215,7 +233,6 @@ class Photogalery_Controller extends Controller {
 
       $this->view()->template()->form = $editForm;
       $this->view()->template()->image = $image;
-      $this->view()->template()->addTplFile("editphoto.phtml");
    }
 }
 ?>

@@ -10,22 +10,20 @@ class PhotoGalery_Model_Images extends Model_PDO {
 	 */
 	const COLUMN_ID 					= 'id_photo';
 	const COLUMN_ID_CAT           = 'id_category';
-	const COLUMN_ID_ART           = 'id_article';
 	const COLUMN_NAME             = 'name';
 	const COLUMN_DESC             = 'desc';
 	const COLUMN_TIME_EDIT 			= 'edit_time';
 	const COLUMN_FILE 				= 'file';
 	const COLUMN_ORDER 				= 'ord';
 
-	public function getImages($idCat, $idArt) {
+	public function getImages($idCat) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ID_ART." = :idart)"
+          ." WHERE (".self::COLUMN_ID_CAT." = :idcat)"
           ." ORDER BY ".self::COLUMN_ORDER);
 
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
-      $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
       $dbst->execute();
 
       return $dbst;
@@ -43,11 +41,10 @@ class PhotoGalery_Model_Images extends Model_PDO {
       return $dbst->fetch();
    }
 
-   public function saveImage($idCat, $idArticle, $file = null, $name = null, $desc = null, $ord = '0', $idImage = null) {
+   public function saveImage($idCat, $file = null, $name = null, $desc = null, $ord = '0', $idImage = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_TIME_EDIT => time(),
                                self::COLUMN_ID_CAT => $idCat,
-                               self::COLUMN_ID_ART => $idArticle,
                                self::COLUMN_ORDER => $ord));
 
       if($file != null){

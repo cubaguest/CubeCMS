@@ -3,7 +3,8 @@ $this->addCssFile("style.css");
 
 $model = new Text_Model_Detail();
 $text = $model->getText(Category::getSelectedCategory()->getId());
-
+$modelImages = new PhotoGalery_Model_Images();
+$images = $modelImages->getImages($this->category()->getId());
 
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
@@ -19,7 +20,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 
    <!-- Start Advanced Gallery Html Containers -->
    <div class="navigation-container">
-      <?while ($image = $this->images->fetch()) {
+      <?while ($image = $images->fetch()) {
          ?>
       <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true)
                 .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
