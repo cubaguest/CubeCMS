@@ -43,7 +43,7 @@
 
    /**
     * Metoda datový vrací adresář modulu
-    * @return <type>
+    * @return string
     */
    public function getDataDir($webAddres = false) {
       if($webAddres){
