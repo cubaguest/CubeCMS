@@ -1,13 +1,13 @@
 <?php
 class Actions_View extends View {
    public function mainView() {
-      if($this->rights()->isWritable()){
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_action', $this->_("Přidat"),
-            $this->link()->action($this->sys()->action()->addNewAction()),
-            $this->_("Přidat akci"), "text_add.png");
-         $this->template()->toolbox = $toolbox;
-      }
+//      if($this->rights()->isWritable()){
+//         $toolbox = new Template_Toolbox();
+//         $toolbox->addTool('add_action', $this->_("Přidat"),
+//            $this->link()->action($this->sys()->action()->addNewAction()),
+//            $this->_("Přidat akci"), "text_add.png");
+//         $this->template()->toolbox = $toolbox;
+//      }
 
       $this->template()->addTplFile("list.phtml");
       $this->template()->addCssFile("style.css");

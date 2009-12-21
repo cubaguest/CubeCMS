@@ -1,53 +1,11 @@
 <?php
 class Actions_Controller extends Controller {
   /**
-   * Názvy formůlářových prvků
-   * @var string
-   */
-   const FORM_PREFIX = 'action_';
-   const FORM_BUTTON_SEND = 'send';
-   const FORM_BUTTON_EDIT = 'edit';
-   const FORM_BUTTON_DELETE = 'delete';
-   const FORM_INPUT_ID = 'id';
-   const FORM_INPUT_LABEL = 'label';
-   const FORM_INPUT_TEXT = 'text';
-   const FORM_INPUT_TEXT_SHORT = 'text_short';
-   const FORM_INPUT_DATE_START = 'startdate';
-   const FORM_INPUT_DATE_STOP = 'stopdate';
-   const FORM_INPUT_IMAGE = 'image';
-   const FORM_INPUT_DELETE_IMAGE = 'delete_image';
-
-   /**
-    * Parametr s počtem novinek na stránku
-    * @var string
-    */
-   const PARAM_NUM_ACTIONS = 'scroll';
-
-  /**
    * Kontroler pro zobrazení novinek
    */
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-
-      $all = false;
-      if($this->rights()->isWritable()){
-         $all = true;
-      }
-
-      //		Vytvoření modelu
-      $listActions = new Actions_Model_List($this->sys());
-      //		Scrolovátka
-      $scroll = new Eplugin_Scroll($this->sys());
-      $scroll->setCountRecordsOnPage($this->module()->getParam(self::PARAM_NUM_ACTIONS, 10), $all);
-
-      $scroll->setCountAllRecords($listActions->getCountActions());
-
-      //		Vybrání akcí
-      $this->view()->actionsList = $listActions->getSelectedListActions($scroll->getStartRecord(), $scroll->getCountRecords(), $all);
-
-      //		Přenos do viewru
-      $this->view()->EPLscroll = $scroll;
    }
 
    public function showController(){

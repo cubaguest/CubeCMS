@@ -1,34 +1,5 @@
 <div>
-   <?foreach ($this->actionsList as $action) {?>
-   <?if(((int)$action['start_date']<time()) AND ((int)$action['stop_date']>time())){?>
-      <div class="action">
-   <?} else {?>
-      <div class="actionHidden">
-   <?}?>
+   <a href="<?=$this->link()->route(null)?>" title=""><?=$this->_('Popis')?></a>
+   <a href="<?=$this->link()->route(null)?>" title=""><?=$this->_('Fotky')?></a>
 
-      <h2><a href="<?=$this->l()->article($action['label'], $action['id_action'])?>"
-             title="<?=$action['label']?>"><?=$action['label']?></a>
-       <?if(((int)$action['start_date']<time()) AND ((int)$action['stop_date']>time())){?>
-      <?} else {?>
-         <span><?=$this->_("Nezveřejněno")?></span>
-      <?}?>
-      </h2>
-      <p class="subLabel"><?=$action['text_short']?></p>
-      <?if($this->sys()->rights()->isWritable()) {?>
-         <?=$this->_("Zveřejněno:")."&nbsp;".$this->_("od")." ".strftime("%x", $action['start_date'])
-         ."&nbsp;".$this->_("do")."&nbsp;".strftime("%x", $action['stop_date'])?><br />
-      <?}?>
-      <?if($action['image'] != null) {?>
-      <img style="float:left;" src="<?=$this->module()->getDir()->getDataDir().$action['image']?>" alt="image <?=$action['image']?>" />
-      <?}?>
-      <?print truncate(strip_tags($action['text']), 400)?>
-   </div>
-   <br clear="all" />
-   <?}?>
-   <?if($this->sys()->rights()->isWritable()) {
-      $this->includeTplObj($this->toolbox);
-   }?>
 </div>
-<?
-$this->includeTplObj($this->EPLscroll);
-?>
