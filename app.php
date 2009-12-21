@@ -615,13 +615,22 @@ class AppCore {
          // kontola cest
          $routes->checkRoutes();
 
+//         print ("<br>");
+//         var_dump($routes->getClassName());
+
          if(!$routes->getActionName()){
             AppCore::setErrorPage();
             return false;
          }
 
-      // načtení kontroleru
-         $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
+         // načtení kontroleru
+         if($routes->getClassName() == null){
+            $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
+         } else {
+            $controllerClassName = ucfirst($routes->getClassName()).'_Controller';
+         }
+
+         
          if(!class_exists($controllerClassName)) {
             throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' controleru modulu."),
                 self::getCategory()->getModule()->getName()), 10);

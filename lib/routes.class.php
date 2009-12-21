@@ -77,11 +77,15 @@ class Routes {
       // přidání nepovinných parametrů
       $rege = preg_replace("/:\?:([a-z0-9_-]+):\?:/", "(?:(?P<$1>[a-z0-9_-]+)\/?)?", $rege);
       $rege = preg_replace("/\//", "/?", $rege);
-//      var_dump($rege);
+      $act = array();
+      // jestli bude existovat externí napojení
+      preg_match("/(?:(?P<class>\w+)::)?(?P<method>\w+)/", $action, $act);
+
       $this->routes[$name] = array('name' => $name,
           'regexp' => $rege,
           'route' => $regexp,
-          'actionCtrl' => $action,
+          'actionCtrl' => $act['method'],
+          'actionClass' => $act['class'],
           'replacement' => $replacement);
    }
 
@@ -114,6 +118,18 @@ class Routes {
       }
       return false;
    }
+
+   /**
+    * Metoda vrací název třídy pro danou metodu kontroleru
+    * @return string
+    */
+   public function getClassName(){
+      if($this->selectedRoute != null){
+         return $this->routes[$this->selectedRoute]['actionClass'];
+      }
+      return false;
+   }
+
 
    /**
     * Metoda vrací pole s parametry předanými v url

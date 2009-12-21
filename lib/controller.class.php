@@ -13,10 +13,10 @@
  */
 
 abstract class Controller {
-/**
- * Název nového actionViewru
- * @var string
- */
+   /**
+    * Název nového actionViewru
+    * @var string
+    */
    private $actionViewer = null;
 
    /**
@@ -35,7 +35,7 @@ abstract class Controller {
     * Objket pro lokalizaci
     * @var Locale
     */
-   private $locale = null;
+   public $locale = null;
 
    /**
     * Objekt cest modulu
@@ -50,14 +50,19 @@ abstract class Controller {
    private $link = null;
 
    /**
+    * Natavení kontroleru
+    * @var array
+    */
+   private $options = array();
+
+   /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
     * @param Category $category -- obejkt kategorie
     * @param Routes $routes -- objekt cest pro daný modul
     */
-   public final function __construct(Category $category, Routes $routes) {
-   //TODO odstranit nepotřebné věci v paramtrech konstruktoru
-   //      $this->container = new Container();
+   public final function __construct(Category $category, Routes $routes, View $view = null) {
+      //TODO odstranit nepotřebné věci v paramtrech konstruktoru
       $this->category = $category;
       $this->routes = $routes;
 
@@ -66,16 +71,20 @@ abstract class Controller {
       $link->category($this->category()->getUrlKey());
       $this->link = $link;
       // locales
-      $this->locale = new Locale($category->getModule()->getName());
+      //      $this->locale = new Locale($category->getModule()->getName());
+      $className = get_class($this);
+      $moduleName = substr($className, 0, strpos($className, '_'));
+      $this->locale = new Locale(strtolower($moduleName));
 
-      //		Načtení třídy View
-      $viewClassName = ucfirst($category->getModule()->getName()).'_View';
-      //      if(!class_exists($viewClassName)){
-      //         throw new BadClassException(sprintf(_('Třída viewru "%s" modulu "%s" neexistuje')
-      //               , $viewClassName, $this->module()->getName()),1);
+      //	Načtení třídy View
+      $viewClassName = ucfirst($moduleName).'_View';
       //      }
       //	Vytvoření objektu pohledu
-      $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
+      if($view === null) {
+         $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
+      } else {
+         $this->viewObj = $view;
+      }
 
       // Inicializace kontroleru modulu
       $this->init();
@@ -87,7 +96,9 @@ abstract class Controller {
     * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
     * kontroleru
     */
-   protected function init() {}
+   protected function init() {
+
+   }
 
    /**
     * Metoda vrací objekt systémové konfigurace
@@ -106,15 +117,27 @@ abstract class Controller {
    }
 
    /**
-    * Metoda vrací odkaz na objekt pro práci s odkazy
-    * @param boolean -- true pokud má byt link čistý
-    * @param boolean -- true pokud má byt link bez kategorie
-    * @return Links -- objekt pro práci s odkazy
-    * @deprecated
+    * Metoda vrací konfigurační volbu
+    * @param string $name -- název volby
+    * @param mixed $defaultValue -- výchozí hodnota
+    * @return mixed -- obsah volby
     */
-   //   final public function getLink($clear = false, $onlyWebRoot = false) {
-   //      return $this->link($clear, $onlyWebRoot);
-   //   }
+   final public function getOption($name, $defaultValue = null) {
+      if(isset ($this->options[$name])) {
+         return $this->options[$name];
+      }
+      return $defaultValue;
+   }
+
+   /**
+    * Metoda nasatvuje konfigurační volbu
+    * @param string $name -- název volby
+    * @param mixed $value -- výchozí hodnota
+    * @return mixed -- obsah volby
+    */
+   final public function setOption($name, $value = null) {
+      $this->options[$name] = $value;
+   }
 
    /**
     * Metoda vrací odkaz na objekt pro práci s odkazy
@@ -316,6 +339,14 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
    }
 
    /**
+    * Metoda vrací pole s šablonami
+    * @return array
+    */
+   final public function _getTemplateObjs() {
+      return $this->view()->template();
+   }
+
+   /**
     * Metoda spustí metodu kontroleru a viewer modulu
     */
    final public function runCtrl() {
@@ -352,7 +383,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
    final public function runCtrlAction($actionName, $outputType) {
       if(!method_exists($this, $actionName.'Controller')) {
          trigger_error(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
-             $actionName, $this->module()->getName()));
+                 $actionName, $this->module()->getName()));
       }
 
       $viewName = null;
@@ -363,12 +394,12 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
          $viewName = $actionName.'View';
       } else {
          trigger_error(sprintf(_("Action Viewer \"%sView\" nebo \"%s\" v modulu \"%s\" nebyl implementován"),
-             $actionName, $actionName.ucfirst($outputType).'View', $this->module()->getName()));
+                 $actionName, $actionName.ucfirst($outputType).'View', $this->module()->getName()));
       }
 
       // spuštění Viewru
       if($this->{$actionName.'Controller'}() !== false AND $viewName != null) {
-      // pokud je kontrolel v pořádku spustíme view
+         // pokud je kontrolel v pořádku spustíme view
          $this->view()->{$viewName}();
       }
    }

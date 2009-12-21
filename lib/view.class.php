@@ -113,7 +113,7 @@ abstract class View {
 
    /**
     * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
-    * @return Template -- objekt šablony
+    * @return Template_Module -- objekt šablony
     */
    public function template(){
       return $this->template;

@@ -99,6 +99,12 @@ class Locale {
    private $moduleDomain = null;
 
    /**
+    * Pole s importovanými doménami překladu
+    * @var array
+    */
+   private static $bindedDomains = array();
+
+   /**
     * Metoda pro vytvoření prostředí třídy locales
     */
    public static function factory() {
@@ -335,16 +341,24 @@ class Locale {
     */
    public function  __construct($moduleDomain) {
       $this->moduleDomain = $moduleDomain;
-      $this->bindTextDomain();
+      $this->bindTextDomain($moduleDomain);
+   }
+
+   public function setDomain($domain){
+      $this->bindTextDomain($domain);
+      $this->moduleDomain = $domain;
    }
 
    public function _m($message) {
       return dgettext($this->moduleDomain, $message);
    }
 
-   private function bindTextDomain() {
-      bindtextdomain($this->moduleDomain, '.' . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
-         . DIRECTORY_SEPARATOR . $this->moduleDomain . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+   private function bindTextDomain($moduleDomain) {
+      if(!in_array($moduleDomain, self::$bindedDomains)){
+         bindtextdomain($moduleDomain, AppCore::getAppLibDir() . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
+         . DIRECTORY_SEPARATOR . $moduleDomain . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
+         array_push(self::$bindedDomains, $moduleDomain);
+      }
    }
 
    /**
