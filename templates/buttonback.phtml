@@ -1,4 +1,6 @@
-<?if(isset ($vars['link'])){$link = (string)$vars['link'];} else {$link = $this->l();}
+<?
+if(isset ($vars['link'])){$link = (string)$vars['link'];} else {$link = $this->l();}
+//if(isset($this->linkBack)){$link = (string)$this->linkBack;}
 ?>
 <p class="buttonBack">
    <a href="<?=$link?>" title="<?=_("Zpět")?>"><span>&laquo;</span>&nbsp;<?=_("Zpět")?></a>

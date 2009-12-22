@@ -1,25 +1,32 @@
-<?// Vypis hlasek
-if(!empty ($this->messages)) { ?>
-<div class="message" id="infoMessages" style="background-image: url('<?=vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>')">
-      <? foreach ($this->messages as $message) {
-         print ("<p>".$message . "</p>");
-      }?>
+<div class="message" id="infoMessages" style="
+<?if(empty ($this->messages)) {?>
+     display: none;
+        <?}?>
+     background-image: url('<?=vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>')">
+     <?// Vypis hlasek
+     if(!empty ($this->messages)) {
+        foreach ($this->messages as $message) {
+           print ("<p>".$message . "</p>");
+        }
+     }?>
    <hr class="reseter" />
    <script type="text/javascript">
       //setTimeout('document.getElementById("messages").style.display = "none"', 5000);
    </script>
 </div>
-<? }?>
 
 {*-CORE_ERRORS-*}
 
-<? // chyby modulu
-if(!empty ($this->moduleErrors)) { ?>
-<div class="message" id="errMessages" style="background-image: url('<?=vve_get_tpl_file('icons/error.png', VVE_TPL_FILE_IMAGE)?>')">
-   <!--<img src="<?=Template::face(false)?>images/icons/error.png" alt="error icon" width="16" />-->
-      <? foreach ($this->moduleErrors as $error) {
+<? // chyby modulu?>
+<div class="message" id="errMessages" style="
+    <?if(empty ($this->moduleErrors)) {?>
+     display: none;
+        <?}?>
+     background-image: url('<?=vve_get_tpl_file('icons/error.png', VVE_TPL_FILE_IMAGE)?>')">
+   <?if(!empty ($this->moduleErrors)) {
+      foreach ($this->moduleErrors as $error) {
          print ("<p>"._("Chyba:")." ".$error ."</p>");
-      }?>
+      }
+   }?>
    <hr class="reseter" />
 </div>
-<? }?>
