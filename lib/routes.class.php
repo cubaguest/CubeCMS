@@ -86,7 +86,8 @@ class Routes {
           'route' => $regexp,
           'actionCtrl' => $act['method'],
           'actionClass' => $act['class'],
-          'replacement' => $replacement);
+          'replacement' => $replacement,
+          'default' => array());
    }
 
    /**
@@ -95,6 +96,27 @@ class Routes {
     */
    final public function getRouteName() {
       return $this->selectedRoute;
+   }
+   
+   /**
+    * Metoda nastaví výchozí parametr pro cestu
+    * @param string $routeName -- název cesty
+    * @param string $param -- název parametr
+    * @param string $value -- hodnota parametru
+    * @return Routes -- sám sebe
+    */
+   final public function setRouteDefParam($routeName, $param, $value){
+      $this->routes[$routeName]['default'][$param] = $value;
+      return $this;
+   }
+
+   /**
+    * Metoda vrací pole s výchozími hodnotami dané cesty
+    * @param string $routeName -- název cesty
+    * @return array
+    */
+   final public function getRouteDefParams($routeName){
+      return $this->routes[$routeName]['default'];
    }
 
    /**

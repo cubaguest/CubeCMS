@@ -106,6 +106,7 @@ class Messages {
       if($save === true){
          if(!in_array($messageText, $this->messagesForSave)){
             array_push($this->messagesForSave, $messageText);
+            $this->saveMessages();
          }
       } else if($save === false){
          if(!in_array($messageText, $this->messages)){
@@ -115,6 +116,7 @@ class Messages {
          if($this->defaultSaveMessages){
             if(!in_array($messageText, $this->messagesForSave)){
                array_push($this->messagesForSave, $messageText);
+               $this->saveMessages();
             }
          } else {
             if(!in_array($messageText, $this->messages)){

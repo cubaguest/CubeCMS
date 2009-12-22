@@ -76,11 +76,10 @@ abstract class Controller {
       $moduleName = substr($className, 0, strpos($className, '_'));
       $this->locale = new Locale(strtolower($moduleName));
 
-      //	Načtení třídy View
-      $viewClassName = ucfirst($moduleName).'_View';
-      //      }
       //	Vytvoření objektu pohledu
       if($view === null) {
+         //	Načtení třídy View
+         $viewClassName = ucfirst($moduleName).'_View';
          $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
       } else {
          $this->viewObj = $view;
@@ -371,6 +370,8 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
 
       if(method_exists($this->view(), $viewName) AND $ctrlResult !== false) {
          $this->view()->$viewName();
+      } else if($ctrlResult === false) {
+         AppCore::setErrorPage(true);
       }
    }
 

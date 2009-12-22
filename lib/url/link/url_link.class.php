@@ -314,7 +314,7 @@ class Url_Link {
    public function reload($link = null) {
       if (!headers_sent()) {
          if($link == null) {
-            header("Location: ".$this);
+            header("Location: ".(string)$this);
          } else {
             header("Location: ".(string)$link);
          }

@@ -30,14 +30,14 @@ class Template_Output {
    private $cntLenght = null;
    /*
     * ============= MAGICKÉ METODY
-    */
+   */
 
    /**
     * Konstruktor třídy
     * @param string $outputType -- typ odesílaných dat (xhtml, js, css, json, ...)
     */
    public function __construct($outputType) {
-      if($outputType == null AND $outputType == ""){
+      if($outputType == null AND $outputType == "") {
          $this->outputType = "xhtml";
       } else {
          $this->outputType = $outputType;
@@ -65,6 +65,13 @@ class Template_Output {
          case "html":
          case "php":
          default:
+            if(Auth::isLoginStatic()) {
+               $this->addHeader( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+               $this->addHeader( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+               $this->addHeader( 'Cache-Control: no-store, no-cache, must-revalidate' );
+               $this->addHeader( 'Cache-Control: post-check=0, pre-check=0', false );
+               $this->addHeader( 'Pragma: no-cache' );
+            }
             $this->addHeader("Content-type: text/html");
             break;
       }
@@ -93,7 +100,7 @@ class Template_Output {
       foreach ($this->headers as $header) {
          header($header);
       }
-      if($this->cntLenght !== null){
+      if($this->cntLenght !== null) {
          header("Content-Length: ".$this->cntLenght);
       }
    }

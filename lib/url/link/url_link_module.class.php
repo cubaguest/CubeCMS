@@ -37,11 +37,16 @@ class Url_Link_Module extends Url_Link {
       } else {
          $route = $this->routes->getRoute($name);
          $routeReplacement = $route['replacement'];
-         if($routeReplacement != null AND $routeReplacement != '') {
+         if($routeReplacement != null|'') {
+            $params = array_merge($this->routes->getRouteDefParams($name), $params);
             foreach ($params as $pname => $pvalue) {
                $routeReplacement = preg_replace("/{".$pname."}/i", $pvalue, $routeReplacement);
+//               if(isset ($defRoutes[$pname])){
+//                  unset ($defRoutes[$pname]);
+//               }
             }
-            // odstranění nepoovinných parametrů, které nebyly zadány
+
+            // odstranění nepovinných parametrů, které nebyly zadány
             $routeReplacement = preg_replace("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "", $routeReplacement);
             // odstranění nevyplněných nepovinných parametrů
             $routeReplacement = preg_replace("/[()]+/i", "", $routeReplacement);
@@ -84,6 +89,14 @@ class Url_Link_Module extends Url_Link {
     */
    public function setModuleRoutes(Routes $routes) {
       $this->routes = $routes;
+   }
+
+   /**
+    * Metoda vrací objekt s cestami modulu
+    * @return Routes
+    */
+   public function getRoutes(){
+      return $this->routes;
    }
    /*
     * MAGICKÉ METODY
