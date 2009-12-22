@@ -1,0 +1,65 @@
+<?
+$this->addJsPlugin(new JsPlugin_Uploadify());
+?>
+<div id="addImageForm">
+   <h2><?=$this->_('Přidání obrázku');?></h2>
+   <span id="loader" style="display:none"><img src="images/progress.gif" alt="Loading..." width="16" /></span>
+   <div id="sidebar">
+      <!-- form to be replaced by uploadify -->
+      <form id="mainftp" method="post" action="<?=$this->link()?>" enctype="multipart/form-data">
+         <? print ($this->addForm->image->label());
+         print ($this->addForm->image->labelValidations());
+         print ("<p>".$this->addForm->idArt->controll()."</p>");
+         print ("<p>".$this->addForm->image->controll()."</p>");
+         print ("<p>".$this->addForm->send->controll()."</p>"); ?>
+      </form>
+   </div>
+</div>
+<?$uploadLink = new Url_Link_ModuleRequest();?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   jQuery(document).ready(function() {
+      $('#mainftp').uploadify({
+         'uploader'	: 'jscripts/jqueryuploadify/uploadify.swf',
+         'script'    : '<?=$uploadLink->action('uploadFile', 'php');?>',
+         'checkScript' : '<?=$uploadLink->action('checkFile', 'php');?>',
+         'multi'			: true,
+         'auto'			: true,
+         'height'		:	'32', //height of your browse button file
+         'width'			:	'105', //width of your browse button file
+         'sizeLimit'	:	'5120000',  //remove this to set no limit on upload size
+         //'simUploadLimit' : '2', //remove this to set no limit on simultaneous uploads
+         //'buttonImg' : 'images/browse_<?=Locale::getLang()?>.png',
+         'buttonText': '<?=$this->_('Prochazet')?>',
+         'cancelImg' : 'images/cancel.png',
+         'fileDesc'  : 'images',
+         'fileExt'   : '*.jpg;*. jpeg;*.png;*. gif',
+         'fileDataName' : 'addimage_image',
+         'scriptData' : {'sessionid': '<?=session_id();?>', 'addimage_send' : 'send', 'addimage_idArt' : <?=$this->addForm->idArt->getUnfilteredValues()?>},
+         onProgress: function() {
+            $('#loader').show();
+            $('#mainftpQueue').show();
+         },
+         onSelect : function(){
+            $('#errMessages').empty();
+            $('#infoMessages').empty();
+         },
+         onAllComplete: function() {
+            $('#loader').hide();
+            $('#mainftpQueue').hide();
+            $('#allfiles').load(location.href+" #allfiles>*","",function(){
+               //alert(location.href+" #allfiles>*");
+               formShowOnlyLang('<?=Locale::getLang()?>');
+            });
+            $('#infoMessages').append("<p><?=$this->_('Obrázky byly nahrány')?></p>").show();
+
+            //location.reload(); //uncomment this line if youw ant to refresh the whole page instead of just the #allfiles div
+         },
+         onError : function(event,queueID,fileObj){
+            $('#errMessages').append('<p><?=$this->_('Obrázek')?> '+fileObj.name+' <?=$this->_("se nepodařilo nahrát")?></p>').show();
+         }
+      });
+   });
+   /* ]]> */
+</script>
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('detail')));?>

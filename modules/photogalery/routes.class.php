@@ -6,7 +6,7 @@ class Photogalery_Routes extends Routes {
       $this->addRoute('editimages', "editimages", 'editimages', "editimages/");
       $this->addRoute('edittext', "edittext", 'edittext','edittext/');
 
-      $this->addRoute('normal', null, 'main', null);
+      $this->addRoute('detail', null, 'main', null);
 	}
 }
 

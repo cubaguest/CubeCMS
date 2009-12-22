@@ -1,42 +1,29 @@
 <?
 $this->addCssFile("style.css");
 
-$model = new Text_Model_Detail();
-$text = $model->getText(Category::getSelectedCategory()->getId());
-$modelImages = new PhotoGalery_Model_Images();
-$images = $modelImages->getImages($this->category()->getId());
-
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
 
 ?>
-<div class="imagesList">
-   <?if($text != null) {?>
-   <div>
-         <?=$text->{Text_Model_Detail::COLUMN_TEXT}?>
+<div>
+   <?if($this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
+   <div class="photogaleryMedText">
+         <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    </div>
    <br />
-   <?}?>
+      <?}?>
 
    <!-- Start Advanced Gallery Html Containers -->
-   <div class="navigation-container">
-      <?while ($image = $images->fetch()) {
+   <div class="photogaleryMedImages">
+      <?while ($image = $this->images->fetch()) {
          ?>
       <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true)
-                .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+                    .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
          title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
          <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                     .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
       </a>
-      <!--<div class="caption">
-         <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null) {?>
-         <div class="image-title"><?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?></div>
          <?}?>
-         <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null) {?>
-         <div class="image-desc"><?=$image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
-         <?}?>
-      </div>-->
-      <?}?>
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
@@ -64,11 +51,12 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('edit_text', $this->_("Upravit text"),
-          $this->link()->route('edittext'),
-          $this->_("Upravit text galerie"), "page_edit.png");
+              $this->link()->route('edittext', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+              $this->_("Upravit text galerie"), "page_edit.png");
       $toolbox->addTool('edit_images', $this->_("Upravit obrázky"),
-          $this->link()->route('editimages'),
-          $this->_("Upravit text galerie"), "image_edit.png");
+              $this->link()->route('editimages', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+              $this->_("Upravit text galerie"), "image_edit.png");
       $this->includeTplObj($toolbox);
    }?>
 </div>
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>

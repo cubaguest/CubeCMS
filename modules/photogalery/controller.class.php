@@ -135,6 +135,11 @@ class Photogalery_Controller extends Controller {
          $this->link()->reload();
       }
 
+      // odkaz na editaci obrázku
+      $this->view()->template()->linkImageCrop = $this->link()->route('editphoto',
+              array('id' => '%s'));
+//      $this->view()->template()->linkBack = ;
+
 
       $this->view()->template()->images = $imagesM->getImages($this->category()->getId(), $this->getOption('idArt'));
       $this->view()->template()->addForm = $addForm;
@@ -202,7 +207,7 @@ class Photogalery_Controller extends Controller {
       $this->checkWritebleRights();
 
       $m = new PhotoGalery_Model_Images();
-      $image = $m->getImage($this->getRequest('id', $this->getOption('idImage')));
+      $image = $m->getImage($this->getRequest('id'));
 
       $editForm = new Form('image_');
 
@@ -217,23 +222,32 @@ class Photogalery_Controller extends Controller {
       $elemH = new Form_Element_Hidden('height');
       $editForm->addElement($elemH);
 
+      $elemGoBack = new Form_Element_Checkbox('goBack', $this->_('Přejít po uložení zpět'));
+      $elemGoBack->setValues(true);
+      $editForm->addElement($elemGoBack);
+
       $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $editForm->addElement($elemSubmit);
 
       if($editForm->isValid()){
-         $image = new Filesystem_File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE},
+         $imageF = new Filesystem_File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE},
             $this->getModule()->getDataDir().self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
-         $image->cropAndSave($this->getModule()->getDataDir().self::DIR_SMALL.DIRECTORY_SEPARATOR,
+         $imageF->cropAndSave($this->getModule()->getDataDir().self::DIR_SMALL.DIRECTORY_SEPARATOR,
             self::SMALL_WIDTH, self::SMALL_HEIGHT,
             $editForm->start_x->getValues(), $editForm->start_y->getValues(),
             $editForm->width->getValues(), $editForm->height->getValues());
          $this->infoMsg()->addMessage($this->_('Miniatura byla upravena'));
-         $this->link()->route('editimages')->reload();
+         if($editForm->goBack->getValues() == true){
+            $this->link()->route('editimages')->reload();
+         } else {
+            $this->link()->reload();
+         }
       }
 
-
+//      $this->view()->template()->linkBack = $this->link()->route('editimages');
       $this->view()->template()->form = $editForm;
       $this->view()->template()->image = $image;
+//         var_dump($this->view()->template()->image);
    }
 }
 ?>

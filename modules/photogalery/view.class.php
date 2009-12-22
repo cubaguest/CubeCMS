@@ -8,6 +8,7 @@ class Photogalery_View extends View {
 	}
 	
 	public function editimagesView() {
+      $this->template()->addTplFile("addimage.phtml");
       $this->template()->addTplFile("editimages.phtml");
    }
 

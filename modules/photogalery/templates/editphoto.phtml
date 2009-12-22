@@ -6,15 +6,27 @@ $this->addPageHeadline($this->_('úprava miniatury'));
 
 $this->addJsPlugin(new JsPlugin_JCrop());
 ?>
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('editimages')));?>
 <div id="editPhotoForm">
+   <table class="formTable">
+      <tr>
+         <td>
+            <p><?=$this->_('Aktuální miniatura')?></p>
+            <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir().Photogalery_Controller::DIR_SMALL
+                    .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
+                    $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
+         </td>
+      </tr>
+   </table>
+
    <form action="<?=$this->form->getAction()?>" method="post">
       <table class="formTable">
          <tr>
             <td id="cropImage">
                <p><?=$this->_('Myší vyberte oblast ze které se má vytvořit miniatura')?></p>
                <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir().Photogalery_Controller::DIR_MEDIUM
-                   .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
-                   $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
+                       .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
+                       $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
             </td>
          </tr>
          <tr>
@@ -23,9 +35,9 @@ $this->addJsPlugin(new JsPlugin_JCrop());
                <p id="preview" style="overflow:hidden; width:<?=Photogalery_Controller::SMALL_WIDTH?>px;
                   height:<?=Photogalery_Controller::SMALL_WIDTH?>px;">
                   <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_MEDIUM
-                           .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>"
+                               .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>"
                        alt="<?=$this->category()->getModule()->getDataDir()
-                           .$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
+                               .$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
                </p>
             </td>
          </tr>
@@ -46,7 +58,7 @@ $this->addJsPlugin(new JsPlugin_JCrop());
                <?
                $this->form->start_y->setValues(0);
                print($this->form->start_y->controll())
-               ?>
+                       ?>
             </td>
          </tr>
          <tr class="hidden">
@@ -55,7 +67,7 @@ $this->addJsPlugin(new JsPlugin_JCrop());
                <?
                $this->form->width->setValues(Photogalery_Controller::SMALL_WIDTH);
                print($this->form->width->controll())
-               ?>
+                       ?>
             </td>
          </tr>
          <tr class="hidden">
@@ -64,13 +76,21 @@ $this->addJsPlugin(new JsPlugin_JCrop());
                <?
                $this->form->height->setValues(Photogalery_Controller::SMALL_HEIGHT);
                print($this->form->height->controll())
-               ?>
+                       ?>
             </td>
          </tr>
          <tr>
             <th class="formLabels"></th>
             <td class="formControlls">
                <?=$this->form->save->controll()?>
+            </td>
+         </tr>
+         <tr>
+            <td class="formLabels">
+               <?=$this->form->goBack->label()."<br />";?>
+            </td>
+            <td class="formControlls">
+               <?=$this->form->goBack->controll();?>
             </td>
          </tr>
          </tbody>
@@ -92,10 +112,10 @@ $this->addJsPlugin(new JsPlugin_JCrop());
                marginTop: '-' + Math.round(ry * coords.y) + 'px'
             });
          }
-            $('#image_start_x').val(coords.x);
-            $('#image_start_y').val(coords.y);
-            $('#image_width').val(coords.w);
-            $('#image_height').val(coords.h);
+         $('#image_start_x').val(coords.x);
+         $('#image_start_y').val(coords.y);
+         $('#image_width').val(coords.w);
+         $('#image_height').val(coords.h);
       };
 
       jQuery(document).ready(function() {
@@ -113,5 +133,4 @@ $this->addJsPlugin(new JsPlugin_JCrop());
       /* ]]> */
    </script>
 </div>
-<?
-$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('editimages')));?>
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('editimages')));?>

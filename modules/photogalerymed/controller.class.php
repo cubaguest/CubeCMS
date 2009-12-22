@@ -33,22 +33,41 @@ class Photogalerymed_Controller extends Controller {
 
       $scrollComponent = new Component_Scroll();
       $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,
-         $artModel->getCountArticles($this->category()->getId()));
+              $artModel->getCountArticles($this->category()->getId()));
 
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-         $this->category()->getModule()->getParam('scroll', 2));
+              $this->category()->getModule()->getParam('scroll', 2));
 
       $scrollComponent->runCtrlPart();
 
       $articles = $artModel->getList($this->category()->getId(),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
+              $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
+              $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
 
 
       $this->view()->template()->scrollComp = $scrollComponent;
       $this->view()->template()->articles = $articles;
+   }
 
-      $this->view()->template()->addTplFile("list.phtml");
+   public function showController() {
+      $this->checkReadableRights();
+
+      $artM = new Articles_Model_Detail();
+      $article = $artM->getArticle($this->getRequest('urlkey'));
+      
+      if($article == false){
+         return false;
+      }
+      $artM->addShowCount($this->getRequest('urlkey'));
+      $imagesM = new PhotoGalery_Model_Images();
+      $images = $imagesM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID});
+
+
+      $this->view()->template()->article = $article;
+      $this->view()->template()->images = $images;
+
+      unset ($article);
+      unset ($artM);
    }
 
    /**
@@ -90,7 +109,6 @@ class Photogalerymed_Controller extends Controller {
 
       $this->view()->template()->form = $form;
       $this->view()->template()->edit = false;
-      $this->view()->template()->addTplFile('edittext.phtml');
    }
 
    private function formEditGalery() {
@@ -116,8 +134,43 @@ class Photogalerymed_Controller extends Controller {
       return $form;
    }
 
-//   public function edittextController() {
-//      $this->checkWritebleRights();
+   public function edittextController() {
+      $this->checkWritebleRights();
+
+      $form = $this->formEditGalery();
+
+      $model = new Articles_Model_Detail();
+      $art = $model->getArticle($this->getRequest('urlkey'));
+
+      // doplnění formu
+      $form->name->setValues($art->{Articles_Model_Detail::COLUMN_NAME});
+      $form->text->setValues($art->{Articles_Model_Detail::COLUMN_TEXT});
+      $form->urlkey->setValues($art->{Articles_Model_Detail::COLUMN_URLKEY});
+
+      if($form->isValid()) {
+         $urlkeys = $form->urlkey->getValues();
+         $names = $form->name->getValues();
+         foreach ($urlkeys as $lang => $variable) {
+            if($variable == null AND $names[$lang] == null) {
+               $urlkeys[$lang] = null;
+            } else if($variable == null) {
+               $urlkeys[$lang] = vve_cr_url_key($names[$lang]);
+            } else {
+               $urlkeys[$lang] = vve_cr_url_key($variable);
+            }
+         }
+
+         $model->saveArticle($names, $form->text->getValues(), $urlkeys,
+                 $this->category()->getId(), $this->auth()->getUserId(), $art->{Articles_Model_Detail::COLUMN_ID});
+
+         //načtení vytvořené galerie
+         $this->infoMsg()->addMessage($this->_('Galerie byla uložen'));
+         // redirekt na editaci obrázků
+         $this->link()->route('detail', array('urlkey' => $this->getRequest('urlkey')))->reload();
+      }
+
+      $this->view()->template()->form = $form;
+      $this->view()->template()->edit = true;
 //
 //      $form = new Form("text_");
 //      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
@@ -148,38 +201,44 @@ class Photogalerymed_Controller extends Controller {
 //      $this->view()->template()->form = $form;
 //
 //      $this->view()->template()->addTplFile("edittext.phtml");
-//   }
+   }
 
    public function editimagesController() {
+      $this->routes()->setRouteDefParam('detail', 'urlkey', $this->getRequest('urlkey'))->
+              setRouteDefParam('editphoto', 'urlkey', $this->getRequest('urlkey'));
+
       $artModel = new Articles_Model_Detail();
       $art = $artModel->getArticle($this->getRequest('urlkey'));
+
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
       $ctr->editimagesController();
 
-      $this->view()->template()->addTplFile('editimages.phtml', 'photogalery');
    }
 
    public function checkFileController() {
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->checkFileController();
    }
-   
+
    public function uploadFileController() {
       $artModel = new Articles_Model_Detail();
       $art = $artModel->getArticle($this->getRequest('urlkey'));
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
+
+      if($art !== false) {
+         $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
+      }
       $ctr->uploadFileController();
    }
 
    public function editphotoController() {
+      $this->routes()->setRouteDefParam('editimages', 'urlkey', $this->getRequest('urlkey'));
+
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->editphotoController();
-
-      $this->view()->template()->addTplFile("editphoto.phtml", 'photogalery');
    }
 
 
