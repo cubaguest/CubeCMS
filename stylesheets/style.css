@@ -440,7 +440,7 @@ div.panel {
    background-color: white;
 }
 
-div.panelLeft .panelLinkMore {
+div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
    text-align:right;
 }
 /* EOF Panels Content */
