@@ -16,7 +16,11 @@
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME_DIR = 'base';
 
-   private $themeName = self::BASE_THEME_DIR;
+   /**
+    * Pole s konfigurací pluginu
+    * @var array
+    */
+   protected $config = array('theme' => self::BASE_THEME_DIR);
 
 	protected function initJsPlugin() {}
 
@@ -39,8 +43,8 @@ class JsPlugin_JQuery extends JsPlugin {
    */
   public function addUICore() {
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.UICore.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.core.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
-    $this->addFile(new JsPlugin_CssFile("ui.theme.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.core.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.theme.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -72,7 +76,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Resizable.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.resizable.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.resizable.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -108,7 +112,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Accordion.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.accordion.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.accordion.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -121,7 +125,7 @@ class JsPlugin_JQuery extends JsPlugin {
     $this->addUIDraggable();
     $this->addUIResizable();
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Dialog.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.dialog.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.dialog.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -132,7 +136,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Slider.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.slider.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.slider.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -143,7 +147,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Tabs.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.tabs.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.tabs.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -158,7 +162,7 @@ class JsPlugin_JQuery extends JsPlugin {
      */
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Datepicker.min.js"));
     $this->addFile(new JsPlugin_JsFile("ui.datepicker-".Locale::getLang().".js",false,'ui/i18n/'));
-    $this->addFile(new JsPlugin_CssFile("ui.datepicker.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.datepicker.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -169,7 +173,7 @@ class JsPlugin_JQuery extends JsPlugin {
     //deps
     $this->addUICore();
     $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Progressbar.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.progressbar.css",false,'ui/themes/'.$this->themeName.URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("ui.progressbar.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 

@@ -38,7 +38,7 @@ class Url_Link_Module extends Url_Link {
          $route = $this->routes->getRoute($name);
          $routeReplacement = $route['replacement'];
          if($routeReplacement != null|'') {
-            $params = array_merge($this->routes->getRouteDefParams($name), $params);
+            $params = array_merge($this->routes->getRouteParams(), $params);
             foreach ($params as $pname => $pvalue) {
                $routeReplacement = preg_replace("/{".$pname."}/i", $pvalue, $routeReplacement);
 //               if(isset ($defRoutes[$pname])){

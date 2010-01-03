@@ -178,6 +178,16 @@ class Form_Element implements Form_Element_Interface {
     * @return Form_Element
     */
    public function setValues($values) {
+      $this->values = $this->unfilteredValues = $values;
+      return $this;
+   }
+
+   /**
+    * Metoda nastaví nefiltrované hodnoty do prvku
+    * @param mixed $values -- hodnoty
+    * @return Form_Element
+    */
+   public function setUnfilteredValues($values) {
       $this->unfilteredValues = $values;
       return $this;
    }
@@ -417,8 +427,9 @@ class Form_Element implements Form_Element_Interface {
       if(!$this->isValid AND $this->isPopulated) {
          $elem->addClass('formErrorLabel');
       }
-
-      $elem->addContent($this->formElementLabel.":");
+      if($this->formElementLabel !== null){
+         $elem->addContent($this->formElementLabel.":");
+      }
       if($this->isDimensional()){
          $elem->addClass($this->getName()."_".$this->dimensional."_label_class");
       } else {
@@ -466,7 +477,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function controll() {
       $this->html()->clearContent();
-      $this->html()->clearClasses();
+//      $this->html()->clearClasses();
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass('formError');
       }

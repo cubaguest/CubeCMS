@@ -16,9 +16,9 @@ require_once 'template_items.php';
 require_once 'template_functions.php';
 
 class Template {
-/**
- * Názvem adresáře se vzhledy
- */
+   /**
+    * Názvem adresáře se vzhledy
+    */
    const FACES_DIR = 'faces';
 
    /**
@@ -118,7 +118,7 @@ class Template {
 
    /*
     * ============= MAGICKÉ METODY
-    */
+   */
 
    /**
     * Konstruktor třídy
@@ -170,7 +170,7 @@ class Template {
 
    /*
     * ========== VEŘEJNÉ METODY
-    */
+   */
 
    /**
     * Metoda nastaví globální proměnnou pro celou šablonu
@@ -286,10 +286,10 @@ class Template {
     * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
     */
    public function renderTemplate() {
-   // zastavení výpisu buferu
+      // zastavení výpisu buferu
       ob_start();
       foreach ($this->templateFiles as $file) {
-         if(file_exists($file)){
+         if(file_exists($file)) {
             try {
                include $file;
             } catch (Exception $e) {
@@ -331,8 +331,8 @@ class Template {
          $name->renderTemplate();
       }
       else if($name instanceof Eplugin) {
-            $name->template()->renderTemplate();
-         }
+         $name->template()->renderTemplate();
+      }
    }
 
    /**
@@ -346,13 +346,13 @@ class Template {
             Template::addJS($file);
          } else if($file instanceof JsPlugin_CssFile) {
             // pokud existuje css soubor u faces, vložíme ten
-               if(file_exists(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
-                   .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
-                  Template::addCss(Url_Request::getBaseWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true).DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
-               } else {
-                  Template::addCss($file->getName());
-               }
+            if(file_exists(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
+            .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
+               Template::addCss(Url_Request::getBaseWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true).DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
+            } else {
+               Template::addCss($file->getName());
             }
+         }
       }
    }
 
@@ -362,12 +362,12 @@ class Template {
     * @return Template -- objekt sebe
     */
    public function addJsFile($jsfile) {
-   //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
+      //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
       if(eregi('http://[a-zA-Z_.]+', $jsfile)) {
          Template::addJS($jsfile);
       } else {
          $filePath = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);
-         if($filePath != null){
+         if($filePath != null) {
             Template::addJS($filePath.$jsfile);
          }
       }
@@ -381,7 +381,7 @@ class Template {
     */
    public function addCssFile($cssfile) {
       $filePath = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR, false);
-      if($filePath != null){
+      if($filePath != null) {
          Template::addCss($filePath.$cssfile);
       }
       return $this;
@@ -389,7 +389,7 @@ class Template {
 
    /*
     * ========== STATICKÉ METODY
-    */
+   */
 
    /**
     * metoda přidává zadany css styl do výstupu
@@ -397,7 +397,7 @@ class Template {
     * @param boolean -- true pokud je zadána i cesta se souborem
     */
    public static function addCss($cssName) {
-   //TODO kontrola souborů
+      //TODO kontrola souborů
       if(!in_array($cssName, self::$stylesheets)) {
          array_push(self::$stylesheets, $cssName);
       }
@@ -409,13 +409,13 @@ class Template {
     * @param boolean -- true pokud je zadána i cesta se souborem
     */
    public static function addJS($jsFile) {
-   //TODO kontrola souborů
+      //TODO kontrola souborů
       if(!in_array($jsFile, self::$javascripts)) {
          array_push(self::$javascripts, $jsFile);
       }
    }
 
-      /**
+   /**
     * Metoda vrací pole se všemy css soubory
     * @return array
     */
@@ -440,24 +440,24 @@ class Template {
     */
    public static function getFileDir($file, $dir = self::TEMPLATES_DIR, $realpath = true) {
       $faceDir =  AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR
-          .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
+              .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
       $mainDir = AppCore::getAppLibDir().$dir.DIRECTORY_SEPARATOR;
       // pokud existuje soubor ve vzhledu
       if(file_exists($faceDir.$file)) {
-          if($realpath){
-             return $faceDir;
-          } else {
-             return Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR.$dir.URL_SEPARATOR;
-          }
-      } else if(file_exists($mainDir.$file)) {
-            if($realpath){
-               return $mainDir;
-            } else {
-               return Url_Request::getBaseWebDir().$dir.URL_SEPARATOR;
-            }
+         if($realpath) {
+            return $faceDir;
          } else {
-            trigger_error(sprintf(_('Soubor "%s" nebyl nalezen'), $file));
+            return Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR.$dir.URL_SEPARATOR;
          }
+      } else if(file_exists($mainDir.$file)) {
+         if($realpath) {
+            return $mainDir;
+         } else {
+            return Url_Request::getBaseWebDir().$dir.URL_SEPARATOR;
+         }
+      } else {
+         trigger_error(sprintf(_('Soubor "%s" nebyl nalezen'), $file));
+      }
    }
 
    /**
@@ -486,6 +486,43 @@ class Template {
       } else {
          return Url_Request::getBaseWebDir().self::FACES_DIR.'/'.self::$face.'/';
       }
+   }
+
+   /**
+    * Metoda vloží požadovný soubor ze zadanéého zdroje
+    * @param string $resource
+    */
+   public function addFile($resource) {
+      /*
+       * Formáty:
+       * tpl://file -- tpl file from current module
+       * css://file -- css file from current module
+       * js://file -- javascript file from current module
+       * tpl://module/file -- tpl file from defined module
+       * css://module/file -- css file from defined module
+       *
+      */
+      $matches = array();
+      if(preg_match('/^(?:(?P<res>[a-z]+):\/\/)(?:(?P<module>[a-z.]+)\/)?(?:(?P<file>[a-z.]+))/', $resource, $matches)) {
+         switch ($matches['res']) {
+            case 'tpl':
+               
+               break;
+            case 'css':
+            
+               break;
+            case 'js':
+            
+               break;
+            default:
+               break;
+         }
+         
+      } else {
+         throw new UnexpectedValueException(_('Nepodporovaný typ zdroje'));
+      }
+
+
    }
 }
 ?>

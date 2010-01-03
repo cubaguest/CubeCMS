@@ -42,7 +42,6 @@ class Routes {
    function __construct($urlRequest) {
       $this->urlRequest = $urlRequest;
       $this->initRoutes();
-//      $this->checkRoutes();
    }
 
    /**
@@ -59,6 +58,9 @@ class Routes {
          $matches = array();
          if(preg_match("/^".(string)$route['regexp']."\/?$/i", $this->urlRequest, $matches)) {
             $this->selectedRoute = $routeName;
+            foreach ($matches as $key => $value) {
+               if(is_int($key)) unset ($matches[$key]);
+            }
             $this->routeParams = $matches;
             return true;
          }
@@ -86,8 +88,7 @@ class Routes {
           'route' => $regexp,
           'actionCtrl' => $act['method'],
           'actionClass' => $act['class'],
-          'replacement' => $replacement,
-          'default' => array());
+          'replacement' => $replacement);
    }
 
    /**
@@ -99,24 +100,14 @@ class Routes {
    }
    
    /**
-    * Metoda nastaví výchozí parametr pro cestu
-    * @param string $routeName -- název cesty
+    * Metoda nastaví parametr pro cestu (POZOR! Url_Link jej přepíše)
     * @param string $param -- název parametr
     * @param string $value -- hodnota parametru
     * @return Routes -- sám sebe
     */
-   final public function setRouteDefParam($routeName, $param, $value){
-      $this->routes[$routeName]['default'][$param] = $value;
+   final public function setRouteParam($param, $value){
+      $this->routeParams[$name] = $value;
       return $this;
-   }
-
-   /**
-    * Metoda vrací pole s výchozími hodnotami dané cesty
-    * @param string $routeName -- název cesty
-    * @return array
-    */
-   final public function getRouteDefParams($routeName){
-      return $this->routes[$routeName]['default'];
    }
 
    /**

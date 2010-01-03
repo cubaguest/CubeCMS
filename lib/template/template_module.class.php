@@ -133,6 +133,21 @@ class Template_Module extends Template {
    }
 
    /**
+    * Metoda vloží šablonu na zadané místo
+    * @param string $name -- název šablony
+    * @param boolean $engine -- (option) jestli se jedná o šablonu enginu
+    */
+   public function includeTpl($name, $engine = false, $vars = null) {
+      if($engine){
+         $path = parent::getFileDir($name, self::TEMPLATES_DIR);
+      } else {
+         $path = self::getFileDir($name, self::TEMPLATES_DIR, $this->category()->getModule()->getName());
+      }
+      include $path.$name;
+      unset ($vars);
+   }
+
+   /**
     * Metoda vrací název adresáře s požadovaným souborem (bez souboru)
     * @param string $file -- název souboru
     * @param string $type -- typ adresáře - konstanta třídy

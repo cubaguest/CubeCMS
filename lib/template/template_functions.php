@@ -83,7 +83,12 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...'){
     * @return string -- upravený řetězec
     */
    function vve_tpl_remove_tag($tagName, $string){
-      $string = preg_replace('/<'.$tagName.' [^<>]*>/i', '', $string);
+      if(!is_array($tagName)){
+         $tagName = array($tagName);
+      }
+      foreach ($tagName as $tag){
+         $string = preg_replace('/<'.$tag.' [^<>]*>/i', '', $string);
+      }
       return $string;
    }
 
@@ -115,6 +120,9 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...'){
 
             $class = null;
             if($clases != null) {
+               if(!is_array($clases)){
+                  $clases = array($clases);
+               }
                foreach ($clases as $cl) {
                   $class .= $cl." ";
                }
