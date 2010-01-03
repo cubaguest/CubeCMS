@@ -36,8 +36,7 @@ class Photogalery_Controller extends Controller {
 
       $modelImages = new PhotoGalery_Model_Images();
       $this->view()->template()->images = $modelImages->getImages($this->category()->getId(),
-              $this->getRequest('idart', $this->category()->getId()));
-      $this->view()->template()->addTplFile("list.phtml");
+              $this->getOption('idArt', $this->category()->getId()));
    }
 
    public function edittextController() {
@@ -73,12 +72,12 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->addTplFile("edittext.phtml");
    }
 
-   public function editimagesController() {
+   public function editphotosController() {
       $this->checkWritebleRights();
 
       $imagesM = new PhotoGalery_Model_Images();
 
-      $addForm = $this->saveImageForm();
+      $addForm = $this->savePhotoForm();
       if($addForm->isValid()) {
          $this->infoMsg()->addMessage($this->_('Obrázek byl uložen'));
          $this->link()->reload();
@@ -147,7 +146,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->idArt = $this->getOption('idArt');
    }
 
-   private function saveImageForm() {
+   private function savePhotoForm() {
       $addForm = new Form('addimage_');
       $addFile = new Form_Element_File('image', $this->_('Obrázek'));
       $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
@@ -184,7 +183,7 @@ class Photogalery_Controller extends Controller {
     */
    public function uploadFileController() {
       $this->checkWritebleRights();
-      if($this->saveImageForm()->isValid()){
+      if($this->savePhotoForm()->isValid()){
          echo "1";
       } else {
          echo $this->_('Neplatný typ souboru');
@@ -238,7 +237,7 @@ class Photogalery_Controller extends Controller {
             $editForm->width->getValues(), $editForm->height->getValues());
          $this->infoMsg()->addMessage($this->_('Miniatura byla upravena'));
          if($editForm->goBack->getValues() == true){
-            $this->link()->route('editimages')->reload();
+            $this->link()->route('editphotos')->reload();
          } else {
             $this->link()->reload();
          }

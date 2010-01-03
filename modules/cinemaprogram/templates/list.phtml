@@ -1,18 +1,17 @@
 <?
-//print("locale");
-//var_dump(setlocale(LC_ALL, "cs_CZ.UTF8"));
 ?>
 
 <div>
-   <?foreach ($this->movies as $movie) {?>
-   <h2><?=$movie[CinemaProgram_Model_Detail::COL_NAME]?></h2>
+   <p><?=strftime("%x", $this->curDate->format("U"))." - ".strftime("%x", $this->toDate->format("U"))?></p>
+   <?while ($movie = $this->movies->fetch()) {?>
+   <h2><?=$movie->{CinemaProgram_Model_Detail::COL_NAME}?></h2>
    časy:<br />
    <?
-   $times = $this->mmodel->getTimes($movie[CinemaProgram_Model_Detail::COL_ID]);
-   foreach ($times as $time) {
-      $tf = new DateTime((string)$time[CinemaProgram_Model_Detail::COL_T_TIME]);
-      $dff = new DateTime((string)$time[CinemaProgram_Model_Detail::COL_T_DATEFROM]);
-      $dtf = new DateTime((string)$time[CinemaProgram_Model_Detail::COL_T_DATETO]);
+   $times = $this->cmodel->getTimes($movie->{CinemaProgram_Model_Detail::COL_ID});
+   while ($time = $times->fetch()) {
+      $tf = new DateTime((string)$time->{CinemaProgram_Model_Detail::COL_T_TIME});
+      $dff = new DateTime((string)$time->{CinemaProgram_Model_Detail::COL_T_DATEFROM});
+      $dtf = new DateTime((string)$time->{CinemaProgram_Model_Detail::COL_T_DATETO});
 
       if($dff != $dtf){
          print (strftime("%A",$dff->format("U"))." - ".strftime("%A",$dtf->format("U"))."<br />");
@@ -23,7 +22,8 @@
       print(" ");
       print ($this->_("čas: ").$tf->format("H:i"));
       print("<br />");
-   }?>
+   }
+   ?>
 
    <hr />
    <?}?>

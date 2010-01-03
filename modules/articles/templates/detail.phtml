@@ -1,25 +1,49 @@
 <? // načtení detailu
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
 $this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
+
+
+$piroBox = new JsPlugin_PiroBox();
+$this->addJsPlugin($piroBox);
 ?>
 
 <div>
    <!--<h2><?=htmlspecialchars($this->article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;-->
    <div class="smallFont"><?=$this->_('Přidáno')." ".strftime("%x %X", $this->article->{Articles_Model_Detail::COLUMN_ADD_TIME})
           ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
+      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;<br />
+   <?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME})?>
+
    </div>
    <!--</h2>-->
    <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         $().piroBox({
+            my_speed: 300, //animation speed
+            bg_alpha: 0.8, //background opacity
+            radius: 4, //caption rounded corner
+            scrollImage : false, // true == image follows the page _|_ false == image remains in the same open position
+            // in some cases of very large images or long description could be useful.
+            slideShow : 'slideshow', // true == slideshow on, false == slideshow off
+            slideSpeed : 3, //slideshow
+            pirobox_next : 'piro_next', // Nav buttons -> piro_next == inside piroBox , piro_next_out == outside piroBox
+            pirobox_prev : 'piro_prev', // Nav buttons -> piro_prev == inside piroBox , piro_prev_out == outside piroBox
+            close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
+         });
+      });
 
+      /* ]]> */
+   </script>
    <?
    if($this->category()->getRights()->isControll() OR
        ($this->category()->getRights()->isWritable() AND
        $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == $this->category()->getRights()->getAuth()->getId())) {
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('edit_article', $this->_("Upravit článek"),
-          $this->link()->route('edit', array('articlekey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+          $this->link()->route('edit'),
           $this->_("Upravit zobrazený článek"), "page_edit.png");
       $toolbox->addTool('article_delete', $this->_("Smazat článek"),
           $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",

@@ -18,6 +18,7 @@ class Articles_Model_Detail extends Model_PDO {
    const COLUMN_ID_CATEGORY = 'id_cat';
    const COLUMN_ID = 'id_article';
    const COLUMN_SHOWED = 'viewed';
+   const COLUMN_PUBLIC = 'public';
 
    /**
     * Metoda uloží novinku do db
@@ -26,10 +27,11 @@ class Articles_Model_Detail extends Model_PDO {
     * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveArticle($name, $text, $urlKey, $idCat = 0, $idUser = 0, $id = null) {
+   public function saveArticle($name, $text, $urlKey, $idCat = 0, $idUser = 0, $public = true, $id = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
-             self::COLUMN_URLKEY => $urlKey, self::COLUMN_EDIT_TIME => time()));
+             self::COLUMN_URLKEY => $urlKey, self::COLUMN_EDIT_TIME => time(),
+             self::COLUMN_PUBLIC => $public));
 
       $dbc = new Db_PDO();
 

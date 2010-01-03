@@ -1,31 +1,38 @@
 <?
 $this->addCssFile("style.css");
-
-//$model = new Text_Model_Detail();
-//$text = $model->getText(Category::getSelectedCategory()->getId());
-//$modelImages = new PhotoGalery_Model_Images();
-//$images = $modelImages->getImages($this->category()->getId());
-
-// jquery galerka
-
+$modelImages = new PhotoGalery_Model_Images();
 ?>
-<div class="imagesList">
+<div class="galeriesList">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
+         $noPClass = $noPubllic = null;
+         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
+            $noPClass = 'noPublicGalery';
+            $noPubllic = '<span class="smallFont">'.$this->_('Nezveřejněno').'</span>';
+         }
          ?>
-   <div>
+   <div class="<?=$noPClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
             <span class="smallFont"><?=strftime("%x %X", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a>
+         </a><?=$noPubllic?>
       </h2>
-            <?//print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
-            <?print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
+      <?
+      $images = $modelImages->getImages($this->category()->getId(), 
+              $article->{Articles_Model_Detail::COLUMN_ID},
+              $this->category()->getModule()->getParam('imagesinlist', 8));
+      while ($row = $images->fetch()) {?>
+      <img alt="<?=$row->{PhotoGalery_Model_Images::COLUMN_NAME}?>" 
+           src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL
+              .URL_SEPARATOR.$row->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
+      <?}?>
+
+            <?//print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
       <hr class="reseter" />
       <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+            title="<?=$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
       </p>
       <br />
    </div>

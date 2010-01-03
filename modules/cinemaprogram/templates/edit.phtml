@@ -92,7 +92,10 @@
                </th>
                <td class="formControlls">
                   <?$this->form->imdbid->html()->setAttrib('size', 8);?>
-                  <?=$this->form->imdbid->controllAll();?>
+                  <?=$this->form->imdbid->controll();?>
+                  <a href="#" onclick="return testImdbId()">Test</a>
+                  <?=$this->form->imdbid->subLabel();?>
+                  <?=$this->form->imdbid->labelValidations();?>
                </td>
             </tr>
             <tr>
@@ -101,7 +104,10 @@
                </th>
                <td class="formControlls">
                   <?$this->form->csfdid->html()->setAttrib('size', 8);?>
-                  <?=$this->form->csfdid->controllAll();?>
+                  <?=$this->form->csfdid->controll();?>
+                  <a href="#" onclick="return testCsfdId()">Test</a>
+                  <?=$this->form->csfdid->subLabel();?>
+                  <?=$this->form->csfdid->labelValidations();?>
                </td>
             </tr>
          </table>
@@ -296,7 +302,18 @@
          alert('Čas!');
          return false;
       }
-
+      // test imdb odkazu
+      function testImdbId(){
+         window.open('http://www.imdb.com/title/tt'+$('input[name=movie_imdbid]').val(),
+         "<?=$this->_('Test odkazu IMDB')?>", "");
+         return false;
+      }
+      // test csfd odkazu
+      function testCsfdId(){
+         window.open('http://www.csfd.cz/film/'+$('input[name=movie_csfdid]').val()+'-nazev-filmu',
+         "<?=$this->_('Test odkazu ČSFD')?>", "");
+         return false;
+      }
       /* ]]> */
    </script>
 

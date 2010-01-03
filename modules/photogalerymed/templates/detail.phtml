@@ -1,6 +1,8 @@
 <?
 $this->addCssFile("style.css");
 
+$this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
+$this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
 
@@ -50,12 +52,12 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
    <?
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_text', $this->_("Upravit text"),
+      $toolbox->addTool('edit_galery', $this->_("Upravit galerii"),
               $this->link()->route('edittext', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-              $this->_("Upravit text galerie"), "page_edit.png");
-      $toolbox->addTool('edit_images', $this->_("Upravit obrázky"),
-              $this->link()->route('editimages', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-              $this->_("Upravit text galerie"), "image_edit.png");
+              $this->_("Upravit galerii"), "page_edit.png");
+      $toolbox->addTool('edit_images', $this->_("Upravit fotky"),
+              $this->link()->route('editphotos', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+              $this->_("Upravit fotky galerie"), "image_edit.png");
       $this->includeTplObj($toolbox);
    }?>
 </div>

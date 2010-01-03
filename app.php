@@ -44,7 +44,7 @@ class AppCore {
    const ENGINE_JSPLUINS_DIR = 'jsplugins';
 
    /**
-    * Adresář s helpery
+    * Adset_magic_quotes_runtime(false);resář s helpery
     */
    const ENGINE_HELPERS_DIR = 'helpers';
 
@@ -186,6 +186,8 @@ class AppCore {
    //		Definice globálních konstant
       define('URL_SEPARATOR', '/');
       define('VVE_APP_IS_RUN', true);
+      set_magic_quotes_runtime(false); // magic quotes OFF !!
+      if(get_magic_quotes_gpc() === 1) trigger_error("Magic quotes is Enable, please disable this feature");
       require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
 
 

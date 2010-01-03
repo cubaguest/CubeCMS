@@ -19,7 +19,13 @@ class Articles_Controller extends Controller {
 
       $scrollComponent->runCtrlPart();
 
-      $articles = $artModel->getList($this->category()->getId(),
+      if($this->rights()->isWritable()){
+         $onlyPublic = false;
+      } else {
+         $onlyPublic = true;
+      }
+
+      $articles = $artModel->getList($this->category()->getId(),$onlyPublic,
          $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
 
@@ -46,7 +52,13 @@ class Articles_Controller extends Controller {
 
       $scrollComponent->runCtrlPart();
 
-      $articles = $artModel->getListTop($this->category()->getId(),
+      if($this->rights()->isWritable()){
+         $onlyPublic = false;
+      } else {
+         $onlyPublic = true;
+      }
+
+      $articles = $artModel->getListTop($this->category()->getId(),$onlyPublic,
          $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
       
@@ -57,17 +69,23 @@ class Articles_Controller extends Controller {
       $this->view()->template()->addCssFile("style.css");
    }
 
+   public function archiveController() {
+      $this->checkReadableRights();
+
+      $m = new Articles_Model_List();
+      $this->view()->template()->articles = $m->getListAll($this->category()->getId());
+   }
+
    public function showController() {
       $this->checkReadableRights();
 
       $artM = new Articles_Model_Detail();
-      $artM->addShowCount($this->getRequest('articlekey'));
-      $article = $artM->getArticle($this->getRequest('articlekey'));
-      
-      if(empty ($article)){
+      $article = $artM->getArticle($this->getRequest('urlkey'));
+      if($article == false){
          AppCore::setErrorPage(true);
          return false;
       }
+      $artM->addShowCount($this->getRequest('urlkey'));
 
 
       $deleteForm = new Form('article_');
@@ -80,7 +98,6 @@ class Articles_Controller extends Controller {
       $deleteForm->addElement($feSubmit);
 
       if($this->category()->getRights()->isWritable() AND $deleteForm->isValid()){
-         $artM = new Articles_Model_Detail();
          if($artM->deleteArticle($deleteForm->id->getValues())){
             $this->infoMsg()->addMessage($this->_('Článek byl smazán'));
             $this->link()->route()->rmParam()->reload();
@@ -123,19 +140,18 @@ class Articles_Controller extends Controller {
 
          $artModel = new Articles_Model_Detail();
          $count = $artModel->saveArticle($names, $addForm->text->getValues(), $urlkey,
-             $this->category()->getId(), $this->auth()->getUserId());
-
+             $this->category()->getId(), $this->auth()->getUserId(),$editForm->public->getValues());
          if($count != 0) {
-            $this->infoMsg()->addMessage($this->_('Článek byl uložen'));
-            $this->link()->route()->reload();
+            $art = $artModel->getArticleById($count);
+
+            $this->infoMsg()->addMessage($this->_('Uloženo'));
+            $this->link()->route('detail', array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
          } else {
-            $this->errMsg()->addMessage($this->_('Článek se nepodařilo uložit'));
+            $this->errMsg()->addMessage($this->_('Text se nepodařilo uložit'));
          }
       }
 
       $this->view()->template()->addForm = $addForm;
-      $this->view()->template()->addTplFile("edit.phtml");
-      $this->view()->template()->addCssFile("style.css");
    }
 
    /**
@@ -152,12 +168,13 @@ class Articles_Controller extends Controller {
 
       // načtení dat
       $artModel = new Articles_Model_Detail();
-      $article = $artModel->getArticle($this->getRequest('articlekey'));
+      $article = $artModel->getArticle($this->getRequest('urlkey'));
 
       $editForm->name->setValues($article->{Articles_Model_Detail::COLUMN_NAME});
       $editForm->text->setValues($article->{Articles_Model_Detail::COLUMN_TEXT});
       $editForm->urlkey->setValues($article->{Articles_Model_Detail::COLUMN_URLKEY});
       $editForm->art_id->setValues($article->{Articles_Model_Detail::COLUMN_ID});
+      $editForm->public->setValues($article->{Articles_Model_Detail::COLUMN_PUBLIC});
 
       if($editForm->isValid()) {
       // generování url klíče
@@ -174,21 +191,19 @@ class Articles_Controller extends Controller {
          }
 
          if($artModel->saveArticle($names, $editForm->text->getValues(), $urlkey,
-         $this->category()->getId(), $this->auth()->getUserId(),
+         $this->category()->getId(), $this->auth()->getUserId(),$editForm->public->getValues(),
          $editForm->art_id->getValues())) {
             // nahrání nové verze článku (kvůli url klíči)
             $article = $artModel->getArticleById($editForm->art_id->getValues());
 
-            $this->infoMsg()->addMessage($this->_('Článek byl uložen'));
-            $this->link()->route('detail',array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
+            $this->infoMsg()->addMessage($this->_('Uloženo'));
+            $this->link()->route('detail',array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
          } else {
-            $this->errMsg()->addMessage($this->_('Článek se nepodařilo uložit'));
+            $this->errMsg()->addMessage($this->_('Text se nepodařilo uložit'));
          }
       }
 
       $this->view()->template()->addForm = $editForm;
-      $this->view()->template()->addTplFile("edit.phtml");
-      $this->view()->template()->addCssFile("style.css");
    }
 
    /**
@@ -212,6 +227,11 @@ class Articles_Controller extends Controller {
       $iUrlKey->setLangs();
       $iUrlKey->setSubLabel($this->_('Pokud není klíč zadán, je generován automaticky'));
       $form->addElement($iUrlKey);
+
+      $iPub = new Form_Element_Checkbox('public', $this->_('Veřejný'));
+      $iPub->setSubLabel($this->_('Veřejný - viditelný všem návštěvníkům'));
+      $iPub->setValues(true);
+      $form->addElement($iPub);
 
       $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $form->addElement($iSubmit);

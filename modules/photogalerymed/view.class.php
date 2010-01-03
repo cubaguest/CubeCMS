@@ -27,9 +27,9 @@ class Photogalerymed_View extends View {
    public function checkFileView() {}
 
 
-   public function editimagesView() {
+   public function editphotosView() {
       $this->template()->addTplFile('addimage.phtml', 'photogalery');
-      $this->template()->addTplFile('editimages.phtml', 'photogalery');
+      $this->template()->addTplFile('editphotos.phtml', 'photogalery');
    }
 
    public function editphotoView() {

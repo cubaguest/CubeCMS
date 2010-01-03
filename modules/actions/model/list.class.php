@@ -2,27 +2,13 @@
 /*
  * Třída modelu s listem akcí
  */
-class Actions_Model_List extends Model_Db {
-	/**
-	 * Sloupce u tabulky uživatelů
-	 * @var string
-	 */
-	const COLUMN_USER_NAME = 'username';
-	const COLUMN_ISER_ID =	 'id_user';	
-	
-	/**
-	 * Celkový počet novinek
-	 * @var integer
-	 */
-	private $allActionsCount = 0;
-	private $countActionsLoaded = false;
-	
+class Actions_Model_List extends Model_PDO {
 	/**
 	 * Metoda vrací počet novinek
 	 *
 	 * @return integer -- počet novinek
 	 */
-	public function getCountActions($all = false) {
+	public function getCountActions() {
 		if(!$this->countActionsLoaded){
          $sqlCount = $this->getDb()->select()->table(Db::table(Actions_Model_Detail::DB_TABLE))
          ->colums(array("count"=>"COUNT(*)"))
@@ -42,73 +28,88 @@ class Actions_Model_List extends Model_Db {
 	
 	
 	/**
-	 * Metoda vrací pole s vybranými akcemi
-	 * 
-	 * @return array -- pole akcí
+	 * Metoda vrací vybrané akce podle času
+	 * @return PDOStatement -- pole akcí
 	 */
-   public function getSelectedListActions($from, $count=5, $all = false) {
-      $sqlSelect = $this->getDb()->select()->table(Db::table(Actions_Model_Detail::DB_TABLE), 'actions')
-      ->colums(array(Actions_Model_Detail::COLUMN_ACTION_LABEL => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_LABEL
-            .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_LABEL.'_'.Locale::getDefaultLang().")",
-            Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT
-            .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT.'_'.Locale::getDefaultLang().")",
-            Actions_Model_Detail::COLUMN_ACTION_TEXT => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_TEXT.'_'.Locale::getLang()
-            .", ".Actions_Model_Detail::COLUMN_ACTION_TEXT.'_'.Locale::getDefaultLang().")",
-            Actions_Model_Detail::COLUMN_ACTION_ID_USER, Actions_Model_Detail::COLUMN_ACTION_ID,
-            Actions_Model_Detail::COLUMN_ACTION_TIME, Actions_Model_Detail::COLUMN_ACTION_DATE_START,
-            Actions_Model_Detail::COLUMN_ACTION_DATE_STOP, Db::COLUMN_ALL))
-      ->where("actions.".Actions_Model_Detail::COLUMN_ACTION_ID_ITEM, $this->module()->getId())
-//      ->where("actions.".Actions_Model_Detail::COLUMN_ACTION_DISABLED, (int)false)
-      ->limit($from, $count)
-//      ->order("actions.".Actions_Model_Detail::COLUMN_ACTION_TIME, Db::ORDER_DESC)
-      ;
-      if(!$all){
-         $sqlSelect->where("actions.".Actions_Model_Detail::COLUMN_ACTION_DATE_START, time(), "<=")
-         ->where("actions.".Actions_Model_Detail::COLUMN_ACTION_DATE_STOP, time(), ">=");
+   public function getActions($idCat, $fromTime, $toTime, $onlyPublic = true) {
+      $dbc = new Db_PDO();
+      if($onlyPublic) {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
+                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+                 ." AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_START." < :dateE)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_STOP." > :dateS)"
+                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
+      } else {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
+                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_START." < :dateE)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_STOP." > :dateS)"
+                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
       }
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':dateS', (int)$fromTime, PDO::PARAM_INT);
+      $dbst->bindValue(':dateE', (int)$toTime, PDO::PARAM_INT);
+      $dbst->execute();
 
-		$returArray = $this->getDb()->fetchAll($sqlSelect);
-		return $returArray;
+      return $dbst;
 	}
 
 	/**
-	 * Metoda vrací pole se všemi akcemi
-	 *
+	 * Metoda vrací aktuální akci
+	 * @return PDOStatement -- pole akcí
+	 */
+   public function getCurrentActions($idCat, $onlyPublic = true) {
+      $dbc = new Db_PDO();
+      if($onlyPublic) {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
+                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+                 ." AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_START." < :date)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_STOP." > :date)"
+                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
+      } else {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
+                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_START." < :date)"
+                 ." AND (".Actions_Model_Detail::COLUMN_DATE_STOP." > :date)"
+                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
+      }
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':date', time(), PDO::PARAM_INT);
+      $dbst->execute();
+
+      return $dbst;
+	}
+
+	/**
+	 * Metoda vrací všechny akce
+    * @param int $idCat -- id kategorie
+    * @param bool $onlyPublic -- (option) jestli jenom veřejné akce
 	 * @return array -- pole akcí
 	 */
-	public function getListActions() {
-      $sqlSelect = $this->getDb()->select()->table(Db::table(Actions_Model_Detail::DB_TABLE), 'action')
-      ->colums(array(Actions_Model_Detail::COLUMN_ACTION_LABEL => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_LABEL
-            .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_LABEL.'_'.Locale::getDefaultLang().")",
-            Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT
-            .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_TEXT_SHORT.'_'.Locale::getDefaultLang().")",
-            Actions_Model_Detail::COLUMN_ACTION_TEXT => "IFNULL(".Actions_Model_Detail::COLUMN_ACTION_TEXT
-            .'_'.Locale::getLang().", ".Actions_Model_Detail::COLUMN_ACTION_TEXT.'_'.Locale::getDefaultLang().")",
-            Actions_Model_Detail::COLUMN_ACTION_ID, Actions_Model_Detail::COLUMN_ACTION_TIME))
-      ->where("action.".Actions_Model_Detail::COLUMN_ACTION_ID_ITEM, $this->module()->getId())
-//      ->where("action.".Actions_Model_Detail::COLUMN_ACTION_DELETED, (int)false)
-      ->where("action.".Actions_Model_Detail::COLUMN_ACTION_DATE_START, time(), "<=")
-      ->where("action.".Actions_Model_Detail::COLUMN_ACTION_DATE_STOP, time(), ">=")
-      ->order("action.".Actions_Model_Detail::COLUMN_ACTION_TIME, Db::ORDER_DESC);
+	public function getAllActions($idCat, $onlyPublic = true) {
+      $dbc = new Db_PDO();
+      if($onlyPublic) {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
+                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+                 ." AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)"
+                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." DESC");
+      } else {
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
+                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." DESC");
+      }
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+      $dbst->execute();
 
-		$returArray = $this->getDb()->fetchAll($sqlSelect);
-
-		return $returArray;
+      return $dbst;
 	}
 	
    public function getLastChange() {
-      $sqlSelect = $this->getDb()->select()
-      ->table(Db::table(Actions_Model_Detail::DB_TABLE))
-      ->colums(Actions_Model_Detail::COLUMN_ACTION_TIME)
-      ->limit(0, 1)
-      ->order(Actions_Model_Detail::COLUMN_ACTION_TIME, Db::ORDER_DESC);
-
-      $returArray = $this->getDb()->fetchObject($sqlSelect);
-
-      if(!empty ($returArray)){
-         $returArray = $returArray->{Actions_Model_Detail::COLUMN_ACTION_TIME};
-      }
-		return $returArray;
    }
 	
 }

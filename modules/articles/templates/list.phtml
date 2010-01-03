@@ -1,23 +1,34 @@
 <?
+$this->addCssFile("style.css");
+
 if($this->top === true) {
    $this->addPageTitle($this->_('nejčtenější články'));
    $this->addPageHeadline($this->_('nejčtenější články'));
 }
 ?>
 <div class="articlesList">
-   <?if($this->top === true) {?>
-   <p style="text-align:right"><a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovější články')?></a></p>
+<p style="text-align:right">
+<?if($this->top === true) {?>
+   <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovější články')?></a>
    <?} else {?>
-   <p style="text-align:right"><a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenější články')?></a></p>
+   <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenější články')?></a>
    <?}?>
+   <a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
+</p>
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
+         $showClass = $public = null;
+         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
+            $showClass = 'noPublicArticle';
+            $public = $this->_('Nezveřejněn');
+         }
          ?>
-   <div>
-      <h2><a href="<?=$this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+   <div class="<?=$showClass?>">
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
-            <span class="smallFont"><?=strftime("%x %X", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a>
+            <span class="smallFont">
+             <?=strftime("%x %X", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+         </a><?='<span class="smallFont">'.$public.'</span>'?>
       </h2>
             <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
             $out = array();
@@ -33,7 +44,7 @@ if($this->top === true) {
       <hr class="reseter" />
       <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
-         <a href="<?=$this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
             title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
       </p>
       <br />

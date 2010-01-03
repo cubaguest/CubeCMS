@@ -1,0 +1,46 @@
+<?
+$this->addCssFile("style.css");
+// do titulku
+if($this->edit) {
+   $this->addPageTitle($this->_('úprava akce'));
+   $this->addPageTitle($this->catName);
+   $this->addPageHeadline($this->_('úprava akce'));
+   $this->addPageHeadline($this->catName);
+} else {
+   $this->addPageTitle($this->_('přidání akce'));
+   $this->addPageHeadline($this->_('přidání akce'));
+}
+// donastavení formuláře
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+
+$tinymce = new JsPlugin_TinyMce();
+$tinymce->setCfgParam('theme', 'full');
+$this->addJsPlugin($tinymce);
+
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addWidgentDatepicker();
+$this->addJsPlugin($jQuery);
+
+?>
+
+<div id="editArticleForm">
+   <?print($this->form);?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         $.datepicker.setDefaults(['<?=Locale::getLang()?>'] ) ;
+         //$.datepicker.regional['<?=Locale::getLang()?>']
+         $("input[name=action_date_start]").datepicker();
+         $("input[name=action_date_stop]").datepicker();
+      });
+      /* ]]> */
+   </script>
+</div>
+<?
+if($this->edit) {
+   $this->includeTpl('buttonback.phtml', true, array('link' => $this->link()
+           ->route('detail', array('urlkey' => $this->action->{Actions_Model_Detail::COLUMN_URLKEY}))));
+} else {
+   $this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()));
+}
+?>

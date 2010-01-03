@@ -36,11 +36,18 @@ class Photogalerymed_Controller extends Controller {
               $artModel->getCountArticles($this->category()->getId()));
 
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-              $this->category()->getModule()->getParam('scroll', 2));
+              $this->category()->getModule()->getParam('scroll', 
+                      $this->category()->getModule()->getParam('scroll',10)));
 
       $scrollComponent->runCtrlPart();
 
-      $articles = $artModel->getList($this->category()->getId(),
+      if($this->rights()->isWritable()){
+         $onlyPublic = false;
+      } else {
+         $onlyPublic = true;
+      }
+
+      $articles = $artModel->getList($this->category()->getId(),$onlyPublic,
               $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
               $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
 
@@ -74,6 +81,8 @@ class Photogalerymed_Controller extends Controller {
     * Přidání galerie
     */
    public function addController() {
+      $this->checkWritebleRights();
+      
       $form = $this->formEditGalery();
       $form->save->setLabel($this->_('Pokračovat'));
 
@@ -92,7 +101,7 @@ class Photogalerymed_Controller extends Controller {
 
          $artModel = new Articles_Model_Detail();
          $artID = $artModel->saveArticle($names, $form->text->getValues(), $urlkey,
-                 $this->category()->getId(), $this->auth()->getUserId());
+                 $this->category()->getId(), $this->auth()->getUserId(),$form->public->getValues());
 
          //načtení vytvořené galerie
          $gal = $artModel->getArticleById($artID);
@@ -100,7 +109,7 @@ class Photogalerymed_Controller extends Controller {
          if($artID != 0) {
             $this->infoMsg()->addMessage($this->_('Galerie byla uložen'));
             // redirekt na editaci obrázků
-            $this->link()->route('editimages', array('urlkey' => $gal->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
+            $this->link()->route('editphotos', array('urlkey' => $gal->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
          } else {
             $this->errMsg()->addMessage($this->_('Galerii se nepodařilo uložit'));
          }
@@ -128,6 +137,11 @@ class Photogalerymed_Controller extends Controller {
       $iUrlKey->setSubLabel($this->_('Pokud není klíč zadán, je generován automaticky'));
       $form->addElement($iUrlKey);
 
+      $iPub = new Form_Element_Checkbox('public', $this->_('Veřejný'));
+      $iPub->setSubLabel($this->_('Veřejný - viditelný všem návštěvníkům'));
+      $iPub->setValues(true);
+      $form->addElement($iPub);
+
       $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $form->addElement($iSubmit);
 
@@ -146,6 +160,7 @@ class Photogalerymed_Controller extends Controller {
       $form->name->setValues($art->{Articles_Model_Detail::COLUMN_NAME});
       $form->text->setValues($art->{Articles_Model_Detail::COLUMN_TEXT});
       $form->urlkey->setValues($art->{Articles_Model_Detail::COLUMN_URLKEY});
+      $form->public->setValues($art->{Articles_Model_Detail::COLUMN_PUBLIC});
 
       if($form->isValid()) {
          $urlkeys = $form->urlkey->getValues();
@@ -159,61 +174,32 @@ class Photogalerymed_Controller extends Controller {
                $urlkeys[$lang] = vve_cr_url_key($variable);
             }
          }
-
+//         print("<br>");
+//         print("<br>");
          $model->saveArticle($names, $form->text->getValues(), $urlkeys,
-                 $this->category()->getId(), $this->auth()->getUserId(), $art->{Articles_Model_Detail::COLUMN_ID});
+                 $this->category()->getId(), $this->auth()->getUserId(), 
+                 $form->public->getValues(),$art->{Articles_Model_Detail::COLUMN_ID});
 
          //načtení vytvořené galerie
          $this->infoMsg()->addMessage($this->_('Galerie byla uložen'));
+         $artNew = $model->getArticleById($art->{Articles_Model_Detail::COLUMN_ID});
+
          // redirekt na editaci obrázků
-         $this->link()->route('detail', array('urlkey' => $this->getRequest('urlkey')))->reload();
+         $this->link()->route('detail', array('urlkey' => $artNew->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
       $this->view()->template()->form = $form;
       $this->view()->template()->edit = true;
-//
-//      $form = new Form("text_");
-//      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
-//      $textarea->setLangs();
-//      $form->addElement($textarea);
-//
-//      $model = new Text_Model_Detail();
-//      $text = $model->getText($this->category()->getId());
-//      if($text != false) {
-//         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
-//      }
-//
-//      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
-//      $form->addElement($submit);
-//
-//      if($form->isValid()) {
-//         try {
-//            $model->saveText($form->text->getValues(), null,
-//                    null, $this->category()->getId());
-//            $this->infoMsg()->addMessage($this->_('Text byl uložen'));
-//            $this->link()->route()->reload();
-//         } catch (PDOException $e) {
-//            new CoreErrors($e);
-//         }
-//      }
-//
-//      // view
-//      $this->view()->template()->form = $form;
-//
-//      $this->view()->template()->addTplFile("edittext.phtml");
    }
 
-   public function editimagesController() {
-      $this->routes()->setRouteDefParam('detail', 'urlkey', $this->getRequest('urlkey'))->
-              setRouteDefParam('editphoto', 'urlkey', $this->getRequest('urlkey'));
-
+   public function editphotosController() {
       $artModel = new Articles_Model_Detail();
       $art = $artModel->getArticle($this->getRequest('urlkey'));
 
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->editimagesController();
+      $ctr->editphotosController();
 
    }
 
@@ -235,8 +221,6 @@ class Photogalerymed_Controller extends Controller {
    }
 
    public function editphotoController() {
-      $this->routes()->setRouteDefParam('editimages', 'urlkey', $this->getRequest('urlkey'));
-
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->editphotoController();
    }

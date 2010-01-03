@@ -2,12 +2,12 @@
 <div>
    <h4><?=$this->_('Nejnovější')?>:</h4><br />
    <?foreach ($this->newArticles as $article) {?>
-   <a href="<?=$this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
       title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
    <?}?>
    <h4><?=$this->_('Nejčtenější')?>:</h4><br />
    <?foreach ($this->topArticles as $article) {?>
-   <a href="<?=$this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
       title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
    <?
    }

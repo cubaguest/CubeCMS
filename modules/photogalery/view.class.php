@@ -6,10 +6,14 @@ class Photogalery_View extends View {
 	public function init() {
 //		$this->template()->addCss('style.css');
 	}
+
+	public function mainView() {
+      $this->template()->addTplFile("list.phtml");
+	}
 	
-	public function editimagesView() {
+	public function editphotosView() {
       $this->template()->addTplFile("addimage.phtml");
-      $this->template()->addTplFile("editimages.phtml");
+      $this->template()->addTplFile("editphotos.phtml");
    }
 
    public function uploadFileView() {}

@@ -1,167 +1,118 @@
 <?php
 /*
  * Třída modelu s listem Novinek
- */
-class Actions_Model_Detail extends Model_Db {
+*/
+class Actions_Model_Detail extends Model_PDO {
    /**
     * Tabulka s detaily
     */
-    const DB_TABLE = 'actions';
-    
+   const DB_TABLE = 'actions';
+
    /**
     * Názvy sloupců v databázi
     * @var string
     */
-   const COLUMN_ACTION_LABEL = 'label';
-   const COLUMN_ACTION_TEXT = 'text';
-   const COLUMN_ACTION_TEXT_SHORT = 'text_short';
-   const COLUMN_ACTION_TIME = 'time';
-   const COLUMN_ACTION_ID_USER = 'id_user';
-   const COLUMN_ACTION_ID_ITEM = 'id_item';
-   const COLUMN_ACTION_ID = 'id_action';
-   const COLUMN_ACTION_DISABLED = 'disable';
-   const COLUMN_ACTION_DATE_START = 'start_date';
-   const COLUMN_ACTION_DATE_STOP = 'stop_date';
-   const COLUMN_ACTION_IMAGE = 'image';
-
-   private $actionLabel = null;
-
-   private $actionText = null;
-
-   private $actionId = null;
-
-   private $actionFile = null;
-
-   private $actionIdUser = null;
-
+   const COLUMN_NAME = 'name';
+   const COLUMN_TEXT = 'text';
+   const COLUMN_URLKEY = 'urlkey';
+   const COLUMN_EDIT_TIME = 'edit_time';
+   const COLUMN_ID_USER = 'id_user';
+   const COLUMN_ID_CAT = 'id_category';
+   const COLUMN_ID = 'id_action';
+   const COLUMN_PUBLIC = 'public';
+   const COLUMN_DATE_START = 'start_date';
+   const COLUMN_DATE_STOP = 'stop_date';
+   const COLUMN_IMAGE = 'image';
 
    /**
-    * Metoda uloží novinku do db
+    * Metoda uloží akci do db
     *
     * @param array -- pole s nadpisem novinky
     * @param array -- pole s textem novinky
     * @param boolean -- id uživatele
     */
-   public function saveNewAction($labels, $shortTexts, $texts, $datestart, $datestop, $file, $idUser = 0) {
-      if($file === true){
-         $file = null;
-      }
+   public function saveAction($name, $text, $urlKey, DateTime $dateFrom, DateTime $dateTo, $image = null, $idCat = 0,
+           $idUser = 0, $public = true, $id = null) {
+      // globalní prvky
+      $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
+              self::COLUMN_URLKEY => $urlKey, self::COLUMN_EDIT_TIME => time(),
+              self::COLUMN_PUBLIC => $public, self::COLUMN_IMAGE => $image,
+              self::COLUMN_DATE_START => $dateFrom->format('U'),
+              self::COLUMN_DATE_STOP => $dateTo->format('U')));
 
-      $actionArr = $this->createValuesArray(self::COLUMN_ACTION_LABEL, $labels,
-         self::COLUMN_ACTION_TEXT, $texts,
-         self::COLUMN_ACTION_TEXT_SHORT, $shortTexts,
-         self::COLUMN_ACTION_DATE_START, $datestart,
-         self::COLUMN_ACTION_DATE_STOP, $datestop,
-         self::COLUMN_ACTION_IMAGE, $file,
-         self::COLUMN_ACTION_ID_ITEM, $this->module()->getId(),
-         self::COLUMN_ACTION_ID_USER, $idUser,
-         self::COLUMN_ACTION_TIME, time());
+      $dbc = new Db_PDO();
 
-      $sqlInsert = $this->getDb()->insert()->table(Db::table(self::DB_TABLE))
-      ->colums(array_keys($actionArr))
-      ->values(array_values($actionArr));
-      //		Vložení do db
-      if($this->getDb()->query($sqlInsert)){
-         return true;
+      if($id !== null) {
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+                 ." SET ".$this->getUpdateValues()
+                 ." WHERE ".self::COLUMN_ID." = :id");
+         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+         return $dbst->execute();
       } else {
-         return false;
+         if($idCat == 0) {
+            throw new InvalidArgumentException($this->_('Při ukládání nové akce musí být zadáno id'), 1);
+         }
+         // unikátní klíč
+//         $dbc = new Db_PDO();
+//         // načtu všechny existující url klíče
+//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)."
+//             WHERE (".self::COLUMN_ID_CATEGORY." = '".$idCat."')");
+//
+//         while($row = $dbst->fetch()){
+//            $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
+//         }
+
+         $this->setIUValues(array(self::COLUMN_ID_CAT => $idCat,
+                 self::COLUMN_ID_USER => $idUser));
+         $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+                 ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
+
+         return $dbc->lastInsertId();
       }
    }
 
    /**
-    * Metoda vrací novinku podle zadaného ID a v aktuálním jazyku
-    *
-    * @param integer -- id novinky
-    * @return array -- pole s novinkou
-    */
-   public function getActionDetailSelLang($id) {
-      //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()
-      ->table(Db::table(self::DB_TABLE), 'action')
-      ->colums(array(self::COLUMN_ACTION_LABEL =>"IFNULL(".self::COLUMN_ACTION_LABEL.'_'
-            .Locale::getLang().",".self::COLUMN_ACTION_LABEL.'_'.Locale::getDefaultLang().")",
-            self::COLUMN_ACTION_TEXT =>"IFNULL(".self::COLUMN_ACTION_TEXT.'_'.Locale::getLang()
-            .",".self::COLUMN_ACTION_TEXT.'_'.Locale::getDefaultLang().")",
-            self::COLUMN_ACTION_TEXT_SHORT =>"IFNULL(".self::COLUMN_ACTION_TEXT_SHORT.'_'
-            .Locale::getLang().",".self::COLUMN_ACTION_TEXT_SHORT.'_'.Locale::getDefaultLang().")",
-            Db::COLUMN_ALL))
-      ->where('action.'.self::COLUMN_ACTION_ID_ITEM, $this->module()->getId())
-      ->where('action.'.self::COLUMN_ACTION_ID, $id)
-      ->where('action.'.self::COLUMN_ACTION_DISABLED, (int)false);
-
-      $action = $this->getDb()->fetchAssoc($sqlSelect, true);
-
-      $this->actionId = $action[self::COLUMN_ACTION_ID];
-      //      $this->actionIdUser = $action[self::COLUMN_ACTION_ID_USER];
-
-      return $action;
-   }
-
-   public function getFile() {
-      return $this->actionFile;
-   }
-
-   /**
-    * Metoda vrací akci podle zadaného ID ve všech jazycích
+    * Metoda vrací akci podle zadaného ID
     *
     * @param integer -- id akce
-    * @return array -- pole s akcí
+    * @return Model_langContainer -- objekt s akcí
     */
-   public function getActionDetailAllLangs($id) {
-      //		načtení novinky z db
-      $sqlSelect = $this->getDb()->select()
-      ->table(Db::table(self::DB_TABLE))
-      ->colums(Db::COLUMN_ALL)
-      ->where(self::COLUMN_ACTION_ID_ITEM, $this->module()->getId())
-      ->where(self::COLUMN_ACTION_ID, $id)
-      ->where(self::COLUMN_ACTION_DISABLED, (int)false);
+   public function getActionById($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
+              ." WHERE (".self::COLUMN_ID." = :id)".
+              " LIMIT 0, 1");
+      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+      $dbst->execute();
 
-      $action = $this->getDb()->fetchAssoc($sqlSelect);
-
-      $action = $this->parseDbValuesToArray($action, array(self::COLUMN_ACTION_LABEL,
-            self::COLUMN_ACTION_TEXT, self::COLUMN_ACTION_TEXT_SHORT));
-
-      return $action;
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      return $dbst->fetch();
    }
 
    /**
-    * Metoda uloží upravenou ovinku do db
+    * Metoda vrací akci podle zadaného klíče
     *
-    * @param array -- pole s detaily novinky
+    * @param string -- url klíč článku
+    * @return PDOStatement -- pole s článkem
     */
-   public function saveEditAction($labels, $shortTexts, $texts, $dateStart, $dateStop, $file, $idAction) {
-      if($file === false){
-         $actionArr = $this->createValuesArray(self::COLUMN_ACTION_LABEL, $labels,
-            self::COLUMN_ACTION_DATE_START, $dateStart,
-            self::COLUMN_ACTION_DATE_STOP, $dateStop,
-            self::COLUMN_ACTION_TEXT_SHORT, $shortTexts,
-            self::COLUMN_ACTION_TEXT, $texts);
-      } else {
-         $actionArr = $this->createValuesArray(self::COLUMN_ACTION_LABEL, $labels,
-            self::COLUMN_ACTION_IMAGE, (string)$file,
-            self::COLUMN_ACTION_DATE_START, $dateStart,
-            self::COLUMN_ACTION_DATE_STOP, $dateStop,
-            self::COLUMN_ACTION_TEXT_SHORT, $shortTexts,
-            self::COLUMN_ACTION_TEXT, $texts);
-      }
-      $sqlInsert = $this->getDb()->update()->table(Db::table(self::DB_TABLE))
-      ->set($actionArr)
-      ->where(self::COLUMN_ACTION_ID, $idAction);
+   public function getAction($urlKey) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+              ." LIMIT 0, 1");
+      $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
+      $dbst->execute();
 
-      // vložení do db
-      if($this->getDb()->query($sqlInsert)){
-         return true;
-      } else {
-         return false;
-      };
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      return $dbst->fetch();
    }
 
    public function deleteAction($idAction) {
       //			smazání novinky
       $sqlUpdate = $this->getDb()->delete()->table(Db::table(self::DB_TABLE))
-      ->where(self::COLUMN_ACTION_ID, $idAction);
+              ->where(self::COLUMN_ACTION_ID, $idAction);
 
-      if($this->getDb()->query($sqlUpdate)){
+      if($this->getDb()->query($sqlUpdate)) {
          return true;
       } else {
          return false;

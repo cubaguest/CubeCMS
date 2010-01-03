@@ -1,26 +1,7 @@
-.inputImages>td {
-   border: 1px solid black;
+.galeriesList>div {
+   margin-bottom: 10px;
 }
 
-/* seznam fotek */
-#galeryPhotos {
-   /*position: relative;*/
-}
-
-#galeryPhotos .galeryPhoto {
-   display: block;
-   position: relative;
-   float: left;
-   margin: 1px;
-}
-/* seznam fotek mazani */
-.galeryPhoto .deletePhotoForm {
-   top: 0;
-   left: 0;
-   position: absolute;
-
-}
-
-.galeryPhoto .deletePhotoForm form input {
-   background-color: #ff3333;
+.galeriesList div.noPublicGalery {
+   background-color: #dddbdb;
 }

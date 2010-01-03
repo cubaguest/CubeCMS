@@ -1,149 +1,262 @@
 <?php
 class Actions_Controller extends Controller {
+
+   protected $action = null;
   /**
    * Kontroler pro zobrazení novinek
    */
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
+
+      $timeSpace = $this->category()->getModule()->getParam('time', "1_M");
+      $arr = explode("_", $timeSpace);
+
+      $startTime = mktime(0, 0, 0, $this->getRequest('month', date("n")),
+                 $this->getRequest('day', date("j")), $this->getRequest('year', date("Y")));
+
+      $dateStart = new DateTime(date('Y-m-d',$startTime));
+      $dateEnd = new DateTime(date('Y-m-d',$startTime));
+      switch (strtolower($arr[1])) {
+         case 'y':
+            $dateStart->modify("+".$arr[0]." year");
+            $dateEnd->modify("-".$arr[0]." year");
+            break;
+         case 'm':
+            $dateStart->modify("+".$arr[0]." month");
+            $dateEnd->modify("-".$arr[0]." month");
+            break;
+         case 'd':
+         default:
+            $dateStart->modify("+".$arr[0]." day");
+            $dateEnd->modify("-".$arr[0]." day");
+            break;
+      }
+      $timeNext = $dateStart->format("U");
+      $timePrev = $dateEnd->format("U");
+
+      $acM = new Actions_Model_List();
+      $actions = $acM->getActions($this->category()->getId(), $startTime, $timeNext,
+              !$this->getRights()->isWritable());
+
+      $this->view()->template()->actions = $actions;
+      $this->view()->template()->dateFrom = $startTime;
+      $this->view()->template()->dateTo = $timeNext;
+
+      // link další
+      $this->view()->template()->linkNext = $this->link()->route('normaldate',
+              array('day' => date('j', $timeNext) , 'month' => date('n', $timeNext),
+                 'year' => date('Y', $timeNext)));
+      // link předchozí
+      $this->view()->template()->linkBack = $this->link()->route('normaldate',
+              array('day' => date('j', $timePrev) , 'month' => date('n', $timePrev),
+                 'year' => date('Y', $timePrev)));
    }
 
    public function showController(){
-      //      obsluha Mazání akce
-      if($this->rights()->isWritable()){
-         $form = new Form(self::FORM_PREFIX);
+      $this->checkReadableRights();
 
-         $form->crInputHidden(self::FORM_INPUT_ID, true, 'is_numeric')
-         ->crSubmit(self::FORM_BUTTON_DELETE);
-
-         if($form->checkForm()){
-            $actionDetail = new Actions_Model_Detail($this->sys());
-            $action = $actionDetail->getActionDetailAllLangs($this->sys()->article());
-            // smaž obrázek
-            if($action[Actions_Model_Detail::COLUMN_ACTION_IMAGE] != null){
-               // smaže strý obrázek
-               $file = new File($action[Actions_Model_Detail::COLUMN_ACTION_IMAGE], $this->module()->getDir()->getDataDir());
-               $file->remove();
-            }
-
-            if($actionDetail->deleteAction($form->getValue(self::FORM_INPUT_ID),
-                  $this->getRights()->getAuth()->getUserId())){
-               throw new UnexpectedValueException($this->_('Akci se nepodařilo smazat, zřejmně špatně přenesené id'), 3);
-            }
-            $this->infoMsg()->addMessage($this->_('Akce byla smazána'));
-            $this->getLink()->article()->action()->rmParam()->reload();
-         }
+      $model = new Actions_Model_Detail();
+      $this->action = $model->getAction($this->getRequest('urlkey'));
+      if($this->action == false){
+         AppCore::setErrorPage(true);
+         return false;
       }
+
+      $this->view()->template()->action = $this->action;
+   }
+
+   public function archiveController(){
+      $this->checkReadableRights();
    }
 
    /**
    * Kontroler pro přidání novinky
    */
-   public function addNewActionController(){
+   public function addController(){
       $this->checkWritebleRights();
 
-      $actionForm = new Form();
-      $actionForm->setPrefix(self::FORM_PREFIX);
+      $form = $this->createForm();
 
-      $actionForm->crInputText(self::FORM_INPUT_LABEL, true, true)
-      ->crInputText(self::FORM_INPUT_TEXT_SHORT, true, true)
-      ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
-      ->crSelectDate(self::FORM_INPUT_DATE_START)
-      ->crSelectDate(self::FORM_INPUT_DATE_STOP)
-      ->crInputFile(self::FORM_INPUT_IMAGE)
-      ->crSubmit(self::FORM_BUTTON_SEND);
-      //        Pokud byl odeslán formulář
-      if($actionForm->checkForm()){
-         $actionDetail = new Actions_Model_Detail($this->sys());
-         try {
-            $imageName = true;
-            if($actionForm->getValue(self::FORM_INPUT_IMAGE) != null){
-               $image = new File_Image($actionForm->getValue(self::FORM_INPUT_IMAGE));
-               if($image->isImage()){
-                  $image->saveImage($this->getModule()->getDir()->getDataDir());
-                  $imageName = $image->getName();
-               } else {
-                  $imageName = false;
-               }
-            }
-            if(!$imageName OR !$actionDetail->saveNewAction($actionForm->getValue(self::FORM_INPUT_LABEL),
-                  $actionForm->getValue(self::FORM_INPUT_TEXT_SHORT),
-                  $actionForm->getValue(self::FORM_INPUT_TEXT),
-                  $actionForm->getValue(self::FORM_INPUT_DATE_START),
-                  $actionForm->getValue(self::FORM_INPUT_DATE_STOP),
-                  $imageName,
-                  $this->getRights()->getAuth()->getUserId())){
-               throw new UnexpectedValueException($this->_('Akci se nepodařilo uložit, chyba při ukládání.'), 1);
-            }
-         } catch (Exception $e) {
-            new CoreErrors($e);
+      if($form->isValid()){
+         $model = new Actions_Model_Detail();
+         
+         // pokud je nový obr nahrajeme jej
+         $file = null;
+         if($form->image->getValues() != null){
+            $f = $form->image->getValues();
+            $file = $f['name'];
          }
 
+         // pokud není zadáno konečé datum
+         $date_stop = $form->date_stop->getValues();
+         if($date_stop == null){
+            $date_stop = $form->date_start->getValues(); // +1 sekunda
+            $date_stop->modify('+1 seconds');
+         }
+
+         // URL klíč
+         $urlkeys = $form->urlkey->getValues();
+         $names = $form->name->getValues();
+         foreach ($urlkeys as $lang => $variable) {
+            if($variable == null AND $names[$lang] == null) {
+               $urlkeys[$lang] = null;
+            } else if($variable == null) {
+               $urlkeys[$lang] = vve_cr_url_key($names[$lang]);
+            } else {
+               $urlkeys[$lang] = vve_cr_url_key($variable);
+            }
+         }
+
+         $ids = $model->saveAction($names, $form->text->getValues(), $urlkeys,
+                 $form->date_start->getValues(), $date_stop,
+                 $file, $this->category()->getId(), $this->auth()->getUserId(),
+                 $form->public->getValues());
+
+         $act = $model->getActionById($ids);
+
          $this->infoMsg()->addMessage($this->_('Akce byla uložena'));
-         $this->getLink()->article()->action()->rmParam()->reload();
+         $this->link()->route('detail', array('urlkey' => $act->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
-      $this->view()->errorItems = $actionForm->getErrorItems();
+
+      $this->view()->template()->form = $form;
+      $this->view()->template()->edit = false;
    }
 
   /**
    * controller pro úpravu akce
    */
-   public function editActionController() {
+   public function editController() {
       $this->checkWritebleRights();
 
-      $actionForm = new Form();
-      $actionForm->setPrefix(self::FORM_PREFIX);
 
-      $actionForm->crInputText(self::FORM_INPUT_LABEL, true, true)
-         ->crInputText(self::FORM_INPUT_TEXT_SHORT, true, true)
-         ->crTextArea(self::FORM_INPUT_TEXT, true, true, Form::CODE_HTMLDECODE)
-         ->crInputFile(self::FORM_INPUT_IMAGE)
-         ->crInputCheckbox(self::FORM_INPUT_DELETE_IMAGE)
-         ->crSelectDate(self::FORM_INPUT_DATE_START)
-         ->crSelectDate(self::FORM_INPUT_DATE_STOP)
-         ->crSubmit(self::FORM_BUTTON_SEND);
+      $model = new Actions_Model_Detail();
+      $action = $model->getAction($this->getRequest('urlkey'));
+      if($action == false) return false;
+      
+      $form = $this->createForm(true);
 
-      //        Pokud byl odeslán formulář
-      if($actionForm->checkForm()){
-         $imageName = false;
-         $actionModel = new Actions_Model_Detail($this->sys());
-         $action = $actionModel->getActionDetailAllLangs($this->sys()->article());
-         try {
-            if($action[Actions_Model_Detail::COLUMN_ACTION_IMAGE] != null AND
-               ($actionForm->getValue(self::FORM_INPUT_DELETE_IMAGE) == true OR 
-                $actionForm->getValue(self::FORM_INPUT_IMAGE) != null)){
-               // smaže strý obrázek
-               $file = new File($action[Actions_Model_Detail::COLUMN_ACTION_IMAGE], $this->module()->getDir()->getDataDir());
-               $file->remove();
-               $imageName = null;
-            }
+      $form->name->setValues($action->{Actions_Model_Detail::COLUMN_NAME});
+      $form->text->setValues($action->{Actions_Model_Detail::COLUMN_TEXT});
+      $form->date_start->setValues(strftime("%x",$action->{Actions_Model_Detail::COLUMN_DATE_START}));
+      $form->date_stop->setValues(strftime("%x",$action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+      $form->urlkey->setValues($action->{Actions_Model_Detail::COLUMN_URLKEY});
+      $form->public->setValues($action->{Actions_Model_Detail::COLUMN_PUBLIC});
 
-            if($actionForm->getValue(self::FORM_INPUT_IMAGE) != null){
-               $image = new File_Image($actionForm->getValue(self::FORM_INPUT_IMAGE));
-               if($image->isImage()){
-                  $image->saveImage($this->module()->getDir()->getDataDir());
-                  $imageName = $image->getName();
-               }
-            }
-            if(!$actionModel->saveEditAction(
-                  $actionForm->getValue(self::FORM_INPUT_LABEL),
-                  $actionForm->getValue(self::FORM_INPUT_TEXT_SHORT),
-                  $actionForm->getValue(self::FORM_INPUT_TEXT),
-                  $actionForm->getValue(self::FORM_INPUT_DATE_START),
-                  $actionForm->getValue(self::FORM_INPUT_DATE_STOP),
-                  $imageName,
-                  $this->sys()->article())){
-                  var_dump($imageName);
-               throw new UnexpectedValueException($this->_('Akci se nepodařilo uložit, chyba při ukládání.'), 2);
-            }
-            $this->infoMsg()->addMessage($this->_('Akce byla uložena'));
-            $this->getLink()->action()->reload();
-         } catch (Exception $e) {
-            new CoreErrors($e);
-         }
+      if($action->{Actions_Model_Detail::COLUMN_IMAGE} == null){
+         $form->image->setSubLabel($this->_('Źádný obrázek'));
+      } else {
+         $form->image->setSubLabel($action->{Actions_Model_Detail::COLUMN_IMAGE});
       }
-      $this->view()->errorItems = $actionForm->getErrorItems();
+
+      if($form->isValid()){
+         $file = $action->{Actions_Model_Detail::COLUMN_IMAGE};
+
+         // smazání opbrázku
+         if($form->image->getValues() != null OR $form->del_image->getValues() == true){
+            $fileR = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE}, $this->category()->getModule()->getDataDir());
+            $fileR->remove();
+            unset ($fileR);
+            $file = null;
+         }
+         // pokud je nový obr nahrajeme jej
+         if($form->image->getValues() != null){
+            $f = $form->image->getValues();
+            $file = $f['name'];
+         }
+
+         // pokud není zadáno konečé datum
+         $date_stop = $form->date_stop->getValues();
+         if($date_stop == null){
+            $date_stop = $form->date_start->getValues(); // +1 sekunda
+            $date_stop->modify('+1 seconds');
+         }
+
+         // URL klíč
+         $urlkeys = $form->urlkey->getValues();
+         $names = $form->name->getValues();
+         foreach ($urlkeys as $lang => $variable) {
+            if($variable == null AND $names[$lang] == null) {
+               $urlkeys[$lang] = null;
+            } else if($variable == null) {
+               $urlkeys[$lang] = vve_cr_url_key($names[$lang]);
+            } else {
+               $urlkeys[$lang] = vve_cr_url_key($variable);
+            }
+         }
+
+         $model->saveAction($names, $form->text->getValues(), $urlkeys,
+                 $form->date_start->getValues(), $date_stop,
+                 $file, $this->category()->getId(), $this->auth()->getUserId(),
+                 $form->public->getValues(),$action->{Actions_Model_Detail::COLUMN_ID});
+
+         $act = $model->getActionById($action->{Actions_Model_Detail::COLUMN_ID});
+
+         $this->infoMsg()->addMessage($this->_('Akce byla uložena'));
+         $this->link()->route('detail', array('urlkey' => $act->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
+      }
+
+
+      $this->view()->template()->form = $form;
+      $this->view()->template()->edit = true;
+      $this->view()->template()->action = $action;
+
+   }
+
+   /**
+    * Vytvoří formulář pro úpravu akce
+    * @return From
+    */
+   public function createForm($delImg = false) {
+      $form = new Form('action_');
+
+      $eName = new Form_Element_Text('name', $this->_('Název'));
+      $eName->setLangs();
+      $eName->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $form->addElement($eName);
+
+      $eText = new Form_Element_TextArea('text', $this->_('Text'));
+      $eText->setLangs();
+      $eText->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $form->addElement($eText);
+
+      $eDateS = new Form_Element_Text('date_start', $this->_('Od'));
+      $eDateS->addValidation(new Form_Validator_NotEmpty());
+      $eDateS->addValidation(new Form_Validator_Date());
+      $eDateS->addFilter(new Form_Filter_DateTimeObj());
+      $form->addElement($eDateS);
+
+      $eDateT = new Form_Element_Text('date_stop', $this->_('Do'));
+      $eDateT->addValidation(new Form_Validator_Date());
+      $eDateT->addFilter(new Form_Filter_DateTimeObj());
+      $form->addElement($eDateT);
+
+      $eFile = new Form_Element_File('image', $this->_('Obrázek'));
+      $eFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'png')));
+      $eFile->setUploadDir($this->category()->getModule()->getDataDir());
+      $form->addElement($eFile);
+
+      if($delImg === true){
+         $eDelImg = new Form_Element_Checkbox('del_image', null);
+         $eDelImg->setSubLabel($this->_('Smazat nahraný obrázek'));
+         $form->addElement($eDelImg);
+      }
+
+      $eUrlKey = new Form_Element_Text('urlkey', $this->_('Url klíč'));
+      $eUrlKey->setLangs();
+      $eUrlKey->setSubLabel($this->_('Pokud není klíč zadán, je generován automaticky'));
+      $form->addElement($eUrlKey);
+
+      $ePub = new Form_Element_Checkbox('public', $this->_('Veřejný'));
+      $ePub->setSubLabel($this->_('Veřejný - viditelný všem návštěvníkům'));
+      $ePub->setUnfilteredValues(true);
+      $form->addElement($ePub);
+
+      $eSub = new Form_Element_Submit('save', $this->_('Uložit'));
+      $form->addElement($eSub);
+
+      return $form;
    }
 }
 ?>

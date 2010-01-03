@@ -17,11 +17,19 @@ class CinemaProgram_Controller extends Controller {
 
       $model = new CinemaProgram_Model_Detail();
 
+      $day = $this->getRequest('day', date('d'));
 
+      $curDate = new DateTime($this->getRequest('year', date('Y'))."-"
+              .$this->getRequest('month', date('m'))."-".$this->getRequest('day', date('d')));
+      $toDate = clone $curDate;
+      $toDate->modify("+1 month");
+
+      
       // viewer
-      $this->view()->template()->mmodel = $model;
-      $this->view()->template()->movies = $model->getMovies($this->category()->getId(), 12);
-      $this->view()->template()->addTplFile("list.phtml");
+      $this->view()->template()->cmodel = $model;
+      $this->view()->template()->movies = $model->getMovies($this->category()->getId(), $curDate, $toDate);
+      $this->view()->template()->curDate = $curDate;
+      $this->view()->template()->toDate = $toDate;
    }
 
    public function addController() {

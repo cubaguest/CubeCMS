@@ -40,35 +40,49 @@ class CinemaProgram_Model_Detail extends Model_PDO {
     *
     * @return string -- načtený text
     */
-   public function getMovies($idCat, $month, $fromDay = 1, $days = 14) {
+   public function getMovies($idCat, DateTime $fromDate, DateTime $toDate) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS movies"
           ." JOIN ".Db_PDO::table(self::DB_TABLE_TIME)." AS times ON movies.".self::COL_ID
           ." = times.".self::COL_T_ID_M
-          ." WHERE (MONTH(times.".self::COL_T_DATEFROM.") = :mm OR MONTH(times.".self::COL_T_DATETO.") = :mm )"
-       ." AND DAY(times.".self::COL_T_DATEFROM.") >= :fromday"
-       ." AND DAY(times.".self::COL_T_DATETO.") <= :today"
+          ." WHERE times.".self::COL_T_DATETO." >= :datefrom"
+       ." AND times.".self::COL_T_DATETO." <= :dateto"
       ." AND movies.".self::COL_ID_CAT." = :idcat"
-      ." GROUP BY times.".self::COL_T_ID_M);
-
-//WHERE (MONTH(times.date_from) = 12 OR MONTH(times.date_to) = 12)
-//AND (DAY(times.date_from) >= 1) AND (DAY(times.date_to) <= 14)
+      ." GROUP BY times.".self::COL_T_ID_M
+      ." ORDER BY times.".self::COL_T_DATEFROM." ASC");
 
       $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':mm', (int)$month, PDO::PARAM_INT);
-      $dbst->bindValue(':fromday', (int)$fromDay, PDO::PARAM_INT);
-      $dbst->bindValue(':today', (int)$days+$fromDay-1, PDO::PARAM_INT);
+      $dbst->bindValue(':datefrom', $fromDate->format('Y-m-d'), PDO::PARAM_STR);
+      $dbst->bindValue(':dateto', $toDate->format('Y-m-d'), PDO::PARAM_STR);
+//      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS movies"
+//          ." JOIN ".Db_PDO::table(self::DB_TABLE_TIME)." AS times ON movies.".self::COL_ID
+//          ." = times.".self::COL_T_ID_M
+//          ." WHERE (MONTH(times.".self::COL_T_DATEFROM.") = :mm OR MONTH(times.".self::COL_T_DATETO.") = :mm )"
+//       ." AND DAY(times.".self::COL_T_DATEFROM.") >= :fromdate"
+//       ." AND DAY(times.".self::COL_T_DATETO.") <= :today"
+//      ." AND movies.".self::COL_ID_CAT." = :idcat"
+//      ." GROUP BY times.".self::COL_T_ID_M);
+//
+////WHERE (MONTH(times.date_from) = 12 OR MONTH(times.date_to) = 12)
+////AND (DAY(times.date_from) >= 1) AND (DAY(times.date_to) <= 14)
+//
+//      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+//      $dbst->bindValue(':mm', (int)$month, PDO::PARAM_INT);
+//      $dbst->bindValue(':fromday', (int)$fromDay, PDO::PARAM_INT);
+//      $dbst->bindValue(':today', (int)$days+$fromDay-1, PDO::PARAM_INT);
       $dbst->execute();
-
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst;
    }
 
    public function getTimes($idMovie) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TIME)
-          ." WHERE ".self::COL_T_ID_M." = :idmov ");
+          ." WHERE ".self::COL_T_ID_M." = :idmov"
+          ." ORDER BY ".self::COL_T_DATEFROM." ASC");
       $dbst->bindValue(':idmov', (int)$idMovie, PDO::PARAM_INT);
       $dbst->execute();
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst;
    }
 
@@ -91,7 +105,8 @@ class CinemaProgram_Model_Detail extends Model_PDO {
              .self::COL_FC."`, `".self::COL_LABEL."`,`".self::COL_PRICE."`,`".self::COL_LENGTH
              ."`,`".self::COL_ACCESS."`,`".self::COL_VERSION."`,`".self::COL_IMDBID."`,`".self::COL_CSFDID
              ."`,`".self::COL_IMAGE."`)"
-             ." VALUES (:idcat, :name, :nameorig, :fc, :lab, :price, :leng, :access, :vers, :imdbid, :csfdid, :img)");
+             ." VALUES (:idcat, :name, :nameorig, :fc, :lab, :price, :leng, :access,".
+                 " :vers, :imdbid, :csfdid, :img)");
 
          $dbst->bindValue(':idcat', $idCat, PDO::PARAM_INT);
          $dbst->bindValue(':price', $price, PDO::PARAM_INT);
@@ -105,6 +120,7 @@ class CinemaProgram_Model_Detail extends Model_PDO {
          $dbst->bindValue(':lab', $label, PDO::PARAM_STR);
          $dbst->bindValue(':vers', $version, PDO::PARAM_STR);
          $dbst->bindValue(':fc', $filmClub, PDO::PARAM_BOOL);
+//         $dbst->bindValue(':change', time(), PDO::PARAM_INT);
 
          $dbst->execute();
          return $dbc->lastInsertId();
