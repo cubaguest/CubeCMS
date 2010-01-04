@@ -314,11 +314,11 @@ class Template {
    }
 
    /**
-    * Metoda vrací adresář zvoleného vhledu
+    * Metoda vrací adresář zvoleného vhledu (absolutní)
     * @return string -- adresář vzhledu
     */
-   final public function faceDir() {
-      return AppCore::MAIN_ENGINE_PATH.self::FACES_DIR.DIRECTORY_SEPARATOR.self::face();
+   final public static function faceDir() {
+      return AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.self::face().DIRECTORY_SEPARATOR;
    }
 
    /**
