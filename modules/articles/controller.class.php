@@ -113,8 +113,52 @@ class Articles_Controller extends Controller {
 
       $this->view()->template()->shares=$shares;
       $this->view()->template()->article=$article;
-      $this->view()->template()->addTplFile("detail.phtml");
-      $this->view()->template()->addCssFile("style.css");
+   }
+
+   public function showPdfController() {
+      $this->checkReadableRights();
+
+      // načtení článku
+      $artM = new Articles_Model_Detail();
+      $article = $artM->getArticle($this->getRequest('urlkey'));
+
+      if($article == false) return false;
+
+      // komponenta TcPDF
+      $c = new Component_Tcpdf();
+      // vytvoření pdf objektu
+      $c->pdf()->SetAuthor($article->{Model_Users::COLUMN_USERNAME});
+      $c->pdf()->SetTitle($article->{Articles_Model_Detail::COLUMN_NAME});
+      $c->pdf()->SetSubject(VVE_WEB_NAME." - ".$this->category()->getLabel());
+      $c->pdf()->SetKeywords($this->category()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
+
+      // ---------------------------------------------------------
+      $c->pdf()->setHeaderData('', 0, PDF_HEADER_TITLE." - ".$this->category()->getLabel()
+              ." - ".$article->{Articles_Model_Detail::COLUMN_NAME},
+              strftime("%x")." - ".$this->link()->route('detail'));
+      // set font
+      $font = PDF_FONT_NAME_MAIN;
+      // add a page
+      $c->pdf()->AddPage();
+      // nadpis
+      $c->pdf()->SetFont($font, 'B', PDF_FONT_SIZE_MAIN+2);
+      $name = "<h1>".$article->{Articles_Model_Detail::COLUMN_NAME}
+      ."</h1>";
+      $c->pdf()->writeHTML($name, true, 0, true, 0);
+
+      $c->pdf()->Ln();
+      // datum autor 
+      $c->pdf()->SetFont($font, 'BI', PDF_FONT_SIZE_MAIN);
+      $author = "<p>(".strftime("%x", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})
+      ." - ".$article->{Model_Users::COLUMN_USERNAME}.")</p>";
+      $c->pdf()->writeHTML($author, true, 0, true, 0);
+      $c->pdf()->Ln();
+
+
+      $c->pdf()->SetFont($font, '', PDF_FONT_SIZE_MAIN);
+      $c->pdf()->writeHTML($article->{Articles_Model_Detail::COLUMN_TEXT}, true, 0, true, 0);
+      // výstup
+      $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
    }
 
    /**
@@ -140,7 +184,7 @@ class Articles_Controller extends Controller {
 
          $artModel = new Articles_Model_Detail();
          $count = $artModel->saveArticle($names, $addForm->text->getValues(), $urlkey,
-             $this->category()->getId(), $this->auth()->getUserId(),$editForm->public->getValues());
+             $this->category()->getId(), $this->auth()->getUserId(),$addForm->public->getValues());
          if($count != 0) {
             $art = $artModel->getArticleById($count);
 
@@ -152,6 +196,7 @@ class Articles_Controller extends Controller {
       }
 
       $this->view()->template()->addForm = $addForm;
+      $this->view()->template()->edit = false;
    }
 
    /**
@@ -204,6 +249,7 @@ class Articles_Controller extends Controller {
       }
 
       $this->view()->template()->addForm = $editForm;
+      $this->view()->template()->edit = true;
    }
 
    /**

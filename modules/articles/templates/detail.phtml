@@ -1,4 +1,5 @@
 <? // načtení detailu
+$this->addCssFile("style.css");
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
 $this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
 
@@ -52,6 +53,8 @@ $this->addJsPlugin($piroBox);
       $this->includeTplObj($toolbox);
    }
    ?>
+   <br />
+   <p><?=$this->_('Stáhnout')?>:&nbsp;<a href="<?=$this->link()->route('detailpdf')?>" title="pdf">pdf</a> </p>
    <br />
    <?=$this->shares?>
    <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>

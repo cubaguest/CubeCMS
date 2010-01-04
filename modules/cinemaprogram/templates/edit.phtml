@@ -151,27 +151,15 @@
          <table class="formTableGroup" id="dateRowsTable">
                <?foreach ($vals as $i => $val) {?>
             <tr class="<?=$classJsAdd?>">
-               <th><?=$this->_('Datum')?></th>
-               <th class="formLabels" style="width:50px">
-                        <?print($this->form->datestart->label())?>
+               <th class="formLabels">
+                        <?print($this->form->date->label())?>
                </th>
                <td class="formControlls">
                         <?
-                        $this->form->datestart->html()->setAttrib('size', 10);
-                        $this->form->datestart->html()->addClass('datepicker');
-                        $this->form->datestart->setDimensional($i);
-                        print($this->form->datestart->controll())
-                            ?>
-               </td>
-               <th class="formLabels" style="width:50px">
-                        <?print($this->form->datestop->label())?>
-               </th>
-               <td class="formControlls">
-                        <?
-                        $this->form->datestop->html()->setAttrib('size', 10);
-                        $this->form->datestop->html()->addClass('datepicker');
-                        $this->form->datestop->setDimensional($i);
-                        print($this->form->datestop->controll())
+                        $this->form->date->html()->setAttrib('size', 10);
+                        $this->form->date->html()->addClass('datepicker');
+                        $this->form->date->setDimensional($i);
+                        print($this->form->date->controll())
                             ?>
                </td>
                <th class="formLabels" style="width:50px">
@@ -179,7 +167,7 @@
                </th>
                <td>
                         <?$this->form->time->html()->setAttrib('size', 5);
-//                        $this->form->time->html()->setAttrib('onblur', 'return checkDate(this)');
+//                        $this->form->time->html()->setAttrib('onChange', 'return checkTime(this)');
                         $this->form->time->setDimensional($i);
                         print($this->form->time->controll())?>
                </td>
@@ -261,18 +249,18 @@
          var row = $('#dateRowsTable tr:last').clone();
          row.addClass('jsadded');
          row.show();
-         row.find('input.movie_datestart_class').removeClass('hasDatepicker');
-         row.find('input.movie_datestop_class').removeClass('hasDatepicker');
+         row.find('input.movie_date_class').removeClass('hasDatepicker');
+//         row.find('input.movie_datestop_class').removeClass('hasDatepicker');
          //         var time = new Date.now();
-         row.find('input.movie_datestart_class').attr('id','movie_datestart_'+lastId);
-         row.find('input.movie_datestop_class').attr('id','movie_datestop_'+lastId);
-         row.find('input.movie_datestart_class').attr('name','movie_datestart['+(lastId)+']');
-         row.find('input.movie_datestop_class').attr('name','movie_datestop['+(lastId)+']');
+         row.find('input.movie_date_class').attr('id','movie_date_'+lastId);
+//         row.find('input.movie_datestop_class').attr('id','movie_datestop_'+lastId);
+         row.find('input.movie_date_class').attr('name','movie_date['+(lastId)+']');
+//         row.find('input.movie_datestop_class').attr('name','movie_datestop['+(lastId)+']');
          row.find('input.movie_time_class').attr('name','movie_time['+(lastId)+']');
          row.find('input.movie_dateDeleted_class').attr('name','movie_dateDeleted['+(lastId)+']');
          row.find('input.movie_dateId_class').attr('name','movie_dateId['+(lastId)+']');
-         row.find('label.movie_datestart__label_class').attr('for','movie_datestart_'+lastId);
-         row.find('label.movie_datestop__label_class').attr('for','movie_datestop_'+lastId);
+         row.find('label.movie_date__label_class').attr('for','movie_date_'+lastId);
+//         row.find('label.movie_datestop__label_class').attr('for','movie_datestop_'+lastId);
 
          // datepicker
          row.find('input.datepicker').datepicker();

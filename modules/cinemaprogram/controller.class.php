@@ -18,18 +18,31 @@ class CinemaProgram_Controller extends Controller {
       $model = new CinemaProgram_Model_Detail();
 
       $day = $this->getRequest('day', date('d'));
+      $deltaDay = 14;
 
       $curDate = new DateTime($this->getRequest('year', date('Y'))."-"
               .$this->getRequest('month', date('m'))."-".$this->getRequest('day', date('d')));
       $toDate = clone $curDate;
-      $toDate->modify("+1 month");
+
+
+      $toDate->modify("+".$deltaDay." day");
 
       
       // viewer
       $this->view()->template()->cmodel = $model;
       $this->view()->template()->movies = $model->getMovies($this->category()->getId(), $curDate, $toDate);
+      $this->view()->template()->times = $model->getTimesWithMovies($this->category()->getId(), $curDate, $toDate);
       $this->view()->template()->curDate = $curDate;
       $this->view()->template()->toDate = $toDate;
+      $this->view()->template()->deltaDay = $deltaDay;
+      $prvDate = clone $curDate;
+      $prvDate->modify("-".$deltaDay." day");
+      $this->view()->template()->linkBack = $this->link()->route('normaldate', 
+              array('day' => $prvDate->format('j') , 'month' => $prvDate->format('n'),
+                 'year' => $prvDate->format('Y')));
+      $this->view()->template()->linkNext = $this->link()->route('normaldate',
+              array('day' => $toDate->format('j') , 'month' => $toDate->format('n'),
+                 'year' => $toDate->format('Y')));
    }
 
    public function addController() {
@@ -55,38 +68,14 @@ class CinemaProgram_Controller extends Controller {
             $this->category()->getId(), $form->originalname->getValues(), $form->filmclub->getValues(),
              $form->access->getValues(), $form->imdbid->getValues(), $form->csfdid->getValues(), $imgName);
 
-         $datesFrom = $form->datestart->getValues();
-         $datesTo = $form->datestop->getValues();
+         $dates = $form->date->getValues();
          $times = $form->time->getValues();
 
-         $timeM = new CinemaProgram_Model_TimeDetail();
-         foreach ($datesFrom as $key => $dateF) {
-            if($datesTo[$key] == null){
-               $datesTo[$key] = $dateF;
-            }
-            $timeM->saveTime($dateF, $datesTo[$key], $times[$key], $instId);
-         //             $dateFrom = new DateTime($dateF);
-//                      print ($dateF->format("Y-m-d")." - ");
-//         ////             print ($dateFrom->format("Y-m-d")." - ");
-//         ////             if($datesTo[$key] != null){
-//         ////               $dateTo = new DateTime($datesTo[$key]);
-//         ////               print ($dateTo->format("Y-m-d")." - ");
-//                        if($datesTo[$key] != null){
-//                        print ($datesTo[$key]->format("Y-m-d")." - ");
-//                        } else {
-//                        print (" null - ");
-//                        }
-//         //             }
-//         //             $time = new DateTime($times[$key]);
-//                      print ($times[$key]->format("H:i")."<br >");
+         foreach ($dates as $key => $date) {
+            $model->saveTime($date, $times[$key], $instId);
          }
-
-      //          var_dump($datesFrom);
-      //          var_dump($datesTo);
-      //          var_dump($times);
-
-                $this->infoMsg()->addMessage($this->_('Film byl uložen'));
-                $this->link()->route()->reload();
+         $this->infoMsg()->addMessage($this->_('Film byl uložen'));
+         $this->link()->route()->reload();
       }
 
 
@@ -163,16 +152,16 @@ class CinemaProgram_Controller extends Controller {
 
 
       // Časové hranice
-      $elemDateStart = new Form_Element_Text('datestart', $this->_('Od'));
-      $elemDateStart->setDimensional();
-      $elemDateStart->addValidation(new Form_Validator_NotEmpty());
-      $elemDateStart->addFilter(new Form_Filter_DateTimeObj());
-      $form->addElement($elemDateStart,'filmshowdetail');
+      $elemDate = new Form_Element_Text('date', $this->_('Datum'));
+      $elemDate->setDimensional();
+      $elemDate->addValidation(new Form_Validator_NotEmpty());
+      $elemDate->addFilter(new Form_Filter_DateTimeObj());
+      $form->addElement($elemDate,'filmshowdetail');
 
-      $elemDateStop = new Form_Element_Text('datestop', $this->_('Do'));
-      $elemDateStop->setDimensional();
-      $elemDateStop->addFilter(new Form_Filter_DateTimeObj());
-      $form->addElement($elemDateStop,'filmshowdetail');
+//      $elemDateStop = new Form_Element_Text('datestop', $this->_('Do'));
+//      $elemDateStop->setDimensional();
+//      $elemDateStop->addFilter(new Form_Filter_DateTimeObj());
+//      $form->addElement($elemDateStop,'filmshowdetail');
 
       $elemDateDeleted = new Form_Element_Hidden('dateDeleted');
       $elemDateDeleted->setDimensional();

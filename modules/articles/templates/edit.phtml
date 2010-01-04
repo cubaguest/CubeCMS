@@ -21,5 +21,9 @@ $this->addJsPlugin($tinymce);
 
 <div id="editArticleForm">
    <?print($this->addForm);?>
-   <?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+   <?if($this->edit === true){
+      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));
+   } else {
+      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
+   }?>
 </div>

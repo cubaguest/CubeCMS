@@ -7,6 +7,8 @@ class Articles_Routes extends Routes {
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
       $this->addRoute('detail', "::urlkey::", 'show','{urlkey}/');
 
+      $this->addRoute('detailpdf', "::urlkey::.pdf", 'showPdf','{urlkey}.pdf');
+
       $this->addRoute('normal', null, 'main', null);
 	}
 }

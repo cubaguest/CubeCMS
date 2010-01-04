@@ -1,41 +1,111 @@
 <?
+// titulek
+$range = strftime("%x", $this->curDate->format("U"))." - ".strftime("%x", $this->toDate->format("U"));
+$this->addPageTitle($range);
+$this->addPageHeadline($range);
+
+$this->addJsPlugin(new JsPlugin_JQuery());
+
+// načtení časů a převod do pole
+$movies = array();
+while ($time = $this->times->fetch()) {
+   if(!isset ($movies[$time->{CinemaProgram_Model_Detail::COL_T_DATE}])){
+      $movies[$time->{CinemaProgram_Model_Detail::COL_T_DATE}] = array();
+   }
+
+   if(!isset ($movies[$time->{CinemaProgram_Model_Detail::COL_T_DATE}][$time->{CinemaProgram_Model_Detail::COL_ID}])){
+      $movies[$time->{CinemaProgram_Model_Detail::COL_T_DATE}]
+         [$time->{CinemaProgram_Model_Detail::COL_ID}]
+         = array('movie' => $time, 'times' => array());
+   }
+   array_push($movies[$time->{CinemaProgram_Model_Detail::COL_T_DATE}]
+         [$time->{CinemaProgram_Model_Detail::COL_ID}]['times'], $time->{CinemaProgram_Model_Detail::COL_T_TIME});
+
+}
 ?>
 
 <div>
-   <p><?=strftime("%x", $this->curDate->format("U"))." - ".strftime("%x", $this->toDate->format("U"))?></p>
-   <?while ($movie = $this->movies->fetch()) {?>
-   <h2><?=$movie->{CinemaProgram_Model_Detail::COL_NAME}?></h2>
-   časy:<br />
    <?
-   $times = $this->cmodel->getTimes($movie->{CinemaProgram_Model_Detail::COL_ID});
-   while ($time = $times->fetch()) {
-      $tf = new DateTime((string)$time->{CinemaProgram_Model_Detail::COL_T_TIME});
-      $dff = new DateTime((string)$time->{CinemaProgram_Model_Detail::COL_T_DATEFROM});
-      $dtf = new DateTime((string)$time->{CinemaProgram_Model_Detail::COL_T_DATETO});
-
-      if($dff != $dtf){
-         print (strftime("%A",$dff->format("U"))." - ".strftime("%A",$dtf->format("U"))."<br />");
-         print (strftime("%x",$dff->format("U"))." - ".strftime("%x",$dtf->format("U")));
-      } else {
-         print (strftime("%A",$dff->format("U"))."<br />". strftime("%x",$dff->format("U")));
-      }
-      print(" ");
-      print ($this->_("čas: ").$tf->format("H:i"));
-      print("<br />");
+   $cDay = clone $this->curDate;
+   for ($day = 1; $day <= $this->deltaDay; $day++) {?>
+   <div style="margin-bottom: 10px">
+      <span style="font-weight: bold"><?=strftime("%x", $cDay->format("U"))
+              ." - ".strftime("%A", $cDay->format("U"))?></span><br />
+      <?
+      if(isset ($movies[$cDay->format("Y-m-d")])){?>
+         <table style="width: 97%; border: 1px solid gray;">
+         <?
+         $prevMovieId = null;
+         foreach ($movies[$cDay->format("Y-m-d")] as $movie) {
+            $m = $movie['movie'];?>
+            <tr>
+               <td style="width: 150px; padding: 2px" valign="middle">
+            <?
+            $str = null;
+            foreach ($movie['times'] as $t) {
+               $time = new DateTime($t);
+               $str .= $time->format("H:i").", ";
+            }
+            print (substr($str, 0, strlen($str)-2));
+            ?>
+               </td>
+               <td style="padding: 2px">
+                  <p>
+                     <?
+                     if($m->{CinemaProgram_Model_Detail::COL_FC} == true){?>
+                     <span style="color: red">FK</span>&nbsp;
+                     <?}
+                     ?>
+                     <a href="#" title="<?=$this->_('Zobrazit detail')?>"
+                        onclick="return showDetail(this)"><?=$m->{CinemaProgram_Model_Detail::COL_NAME}?></a>
+                     <span style="float: right;"><?=$m->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min/<?=$m->{CinemaProgram_Model_Detail::COL_PRICE}?>Kč</span>
+                  </p>
+                  <div class="movieInfo" style="display: none;">
+                     <?if($m->{CinemaProgram_Model_Detail::COL_NAME_ORIG} != null){?>
+                     <span style="font-style: italic">(<?=$m->{CinemaProgram_Model_Detail::COL_NAME_ORIG}?>)</span><br />
+                     <?}?>
+                     <?if($m->{CinemaProgram_Model_Detail::COL_ACCESS} != 0){?>
+                        <?=$this->_('Přistupno od')?>&nbsp;<?=$m->{CinemaProgram_Model_Detail::COL_ACCESS}?>&nbsp;<?=$this->_('let')?><br />
+                     <?}?>
+                     <?=$m->{CinemaProgram_Model_Detail::COL_LABEL}?>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td colspan="2" style="border-bottom: 1px solid gray"></td>
+            </tr>
+         <?}?>
+      </table>
+      <?} else {
+         print ($this->_('Nepromítá se'));
+      }?>
+   </div>
+      <?
+      $cDay->modify('+1 day');
    }
    ?>
 
-   <hr />
-   <?}?>
+   &laquo;<a href="<?=$this->linkBack?>" title="<?=$this->_('Vzad')?>">-<?=$this->deltaDay."&nbsp;".$this->_('dní')?></a>&nbsp;&brvbar;&nbsp;
+   <a href="<?=$this->linkNext?>" title="<?=$this->_('Vpřed')?>">+<?=$this->deltaDay."&nbsp;".$this->_('dní')?></a>&raquo;
+
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      function showDetail(linkObj){
+         $(linkObj).parent().parent().children('div.movieInfo').toggle();
+
+         return false;
+      }
+      /* ]]> */
+   </script>
 </div>
 
 
 <?
-   if($this->category()->getRights()->isWritable()) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('add_movie', $this->_("Přidat film"),
-          $this->link()->route('add'),
-          $this->_("Přidat nový film"), "film_add.png");
-      $this->includeTplObj($toolbox);
-   }
-   ?>
+if($this->category()->getRights()->isWritable()) {
+   $toolbox = new Template_Toolbox();
+   $toolbox->addTool('add_movie', $this->_("Přidat film"),
+           $this->link()->route('add'),
+           $this->_("Přidat nový film"), "film_add.png");
+   $this->includeTplObj($toolbox);
+}
+?>

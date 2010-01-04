@@ -9,6 +9,7 @@ class Articles_View extends View {
    }
 
    public function showView() {
+      $this->template()->addTplFile("detail.phtml");
    }
 
    public function archiveView() {
