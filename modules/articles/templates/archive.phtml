@@ -11,7 +11,8 @@ $this->addJsPlugin($jQuery);
    <?
    $previousYear = null;
    while ($row = $this->articles->fetch()) {
-      $year = date('Y',$row->{Articles_Model_Detail::COLUMN_ADD_TIME});
+      $date = new DateTime($row->{Articles_Model_Detail::COLUMN_ADD_TIME});
+      $year = $date->format("Y");
       if($year != $previousYear) {
          if($previousYear !== null) {
             print ("</ul></div>");

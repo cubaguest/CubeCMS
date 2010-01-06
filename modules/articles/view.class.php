@@ -27,7 +27,7 @@ class Articles_View extends View {
     * Viewer pro editaci novinky
     */
    public function editView() {
-      $this->template()->addTplFile("edit.phtml");
+      $this->addView();
    }
 }
 

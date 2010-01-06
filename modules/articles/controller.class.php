@@ -19,13 +19,7 @@ class Articles_Controller extends Controller {
 
       $scrollComponent->runCtrlPart();
 
-      if($this->rights()->isWritable()){
-         $onlyPublic = false;
-      } else {
-         $onlyPublic = true;
-      }
-
-      $articles = $artModel->getList($this->category()->getId(),$onlyPublic,
+      $articles = $artModel->getList($this->category()->getId(),!$this->rights()->isWritable(),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
 
@@ -184,7 +178,7 @@ class Articles_Controller extends Controller {
 
          $artModel = new Articles_Model_Detail();
          $count = $artModel->saveArticle($names, $addForm->text->getValues(), $urlkey,
-             $this->category()->getId(), $this->auth()->getUserId(),$addForm->public->getValues());
+             $this->category()->getId(), Auth::getUserId(),$addForm->public->getValues());
          if($count != 0) {
             $art = $artModel->getArticleById($count);
 
@@ -287,11 +281,11 @@ class Articles_Controller extends Controller {
 
    /**
     * Smazání článků při odstranění kategorie
-    * @param int $idCat
+    * @param Category $category
     */
-   public static function clearOnRemove($idCat) {
+   public static function clearOnRemove(Category $category) {
       $model = new Articles_Model_Detail();
-      $model->deleteArticleByCat($idCat);
+      $model->deleteArticleByCat($category->getId());
    }
 }
 ?>

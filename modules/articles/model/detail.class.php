@@ -30,7 +30,7 @@ class Articles_Model_Detail extends Model_PDO {
    public function saveArticle($name, $text, $urlKey, $idCat = 0, $idUser = 0, $public = true, $id = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
-             self::COLUMN_URLKEY => $urlKey, self::COLUMN_EDIT_TIME => time(),
+             self::COLUMN_URLKEY => $urlKey,
              self::COLUMN_PUBLIC => $public));
 
       $dbc = new Db_PDO();
@@ -59,7 +59,7 @@ class Articles_Model_Detail extends Model_PDO {
 
          $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat,
                self::COLUMN_ID_USER => $idUser,
-               self::COLUMN_ADD_TIME => time()));
+               self::COLUMN_ADD_TIME => date("Y-m-d H:i:s")));
 
          $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
              ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());

@@ -22,12 +22,13 @@ if($this->top === true) {
             $showClass = 'noPublicArticle';
             $public = $this->_('Nezveřejněn');
          }
+         $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
    <div class="<?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
             <span class="smallFont">
-             <?=strftime("%x %X", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+             <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a><?='<span class="smallFont">'.$public.'</span>'?>
       </h2>
             <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
