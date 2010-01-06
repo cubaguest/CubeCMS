@@ -5,9 +5,15 @@ $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
 $this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
-
+$addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+$editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
 ?>
 <div>
+   <p>
+      <?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
+          ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
+      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
+   </p>
    <?if($this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
    <div class="photogaleryMedText">
          <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
@@ -29,6 +35,8 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
+   <p><?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $editDate->format("U"))?></p>
+   
 
    <script type="text/javascript">
       /* <![CDATA[ */
