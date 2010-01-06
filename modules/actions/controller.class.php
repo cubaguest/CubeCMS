@@ -9,6 +9,15 @@ class Actions_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
 
+      // uložení datumu do session pokud existuje - kvuli návratu
+      if($this->getRequest('day') != null){
+         $_SESSION['actionBack'] = array('day' => $this->getRequest('day'),
+                                       'month' => $this->getRequest('month'),
+                                       'year' => $this->getRequest('year'));
+      } else {
+         unset ($_SESSION['actionBack']);
+      }
+
       $timeSpace = $this->category()->getModule()->getParam('time', "1_M");
       $arr = explode("_", $timeSpace);
 
@@ -61,6 +70,16 @@ class Actions_Controller extends Controller {
       if($this->action == false){
          AppCore::setErrorPage(true);
          return false;
+      }
+
+      // odkaz zpět
+      if(isset ($_SESSION['actionBack'])){
+            $this->view()->template()->linkBack = $this->link()->route('normaldate', 
+                    array('day' => $_SESSION['actionBack']['day'],
+               'month' => $_SESSION['actionBack']['month'],
+               'year' => $_SESSION['actionBack']['year']));
+      } else {
+            $this->view()->template()->linkBack = $this->link()->route();
       }
 
       $this->view()->template()->action = $this->action;
