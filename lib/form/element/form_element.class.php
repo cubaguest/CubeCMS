@@ -175,10 +175,15 @@ class Form_Element implements Form_Element_Interface {
    /**
     * Metoda nastaví hodnoty do prvku
     * @param mixed $values -- hodnoty
+    * @param mixed $key -- klíč pokud se element chová jako pole
     * @return Form_Element
     */
-   public function setValues($values) {
-      $this->values = $this->unfilteredValues = $values;
+   public function setValues($values, $key = null) {
+      if($key === null){
+         $this->values = $this->unfilteredValues = $values;
+      } else {
+         $this->values[$key] = $this->unfilteredValues[$key] = $values;
+      }
       return $this;
    }
 

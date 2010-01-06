@@ -304,17 +304,26 @@ class Filesystem_File {
    }
 
    /**
+    * Metoda vymaže soubor z flesystému (alias pro delete)
+    *
+    * @return boolean -- true pokud byl soubor odstraněn
+    * @deprecated
+    */
+   public function remove() {
+      $this->delete();
+   }
+
+   /**
     * Metoda vymaže soubor z flesystému
     *
     * @return boolean -- true pokud byl soubor odstraněn
     */
-   public function remove() {
+   public function delete() {
       if($this->exist() AND !is_dir($this->getName(true))) {
          if(!@unlink($this->getName(true))) {
             new CoreErrors(new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getName())));
          }
       }
-
    }
 
    /**

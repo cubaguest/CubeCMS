@@ -85,7 +85,7 @@ class Form_Element_Select extends Form_Element {
             $opt->setAttrib('label', $optLabel);
             foreach ($optVal as $optLabel2 => $optVal2) {
                $optChild = new Html_Element('option', $optLabel2);
-               $optChild->setAttrib('value', $optVal2);
+               $optChild->setAttrib('value', (string)$optVal2);
                if($values == $optVal2 OR (is_array($values) AND in_array($optVal2, $values))) {
                   $optChild->setAttrib('selected', 'selected');
                }
@@ -93,7 +93,7 @@ class Form_Element_Select extends Form_Element {
             }
          } else {
             $opt = new Html_Element('option', $optLabel);
-            $opt->setAttrib('value', $optVal);
+            $opt->setAttrib('value', (string)$optVal);
             if($values == $optVal OR (is_array($values) AND in_array($optVal, $values))) {
                $opt->setAttrib('selected', 'selected');
             }

@@ -14,16 +14,6 @@
 
 class Auth {
 	/**
-	 * Konstanta s názvem tabulky uživatelů
-	 */
-	const CONFIG_USERS_TABLE_NAME = 'users_table';
-
-   /**
-	 * Konstanta s názvem tabulky se skupinami
-	 */
-	const CONFIG_GROUPS_TABLE_NAME = 'groups_table';
-	
-	/**
 	 * Konstanty označující informace o uživateli
 	 * @var string
 	 */
@@ -40,37 +30,37 @@ class Auth {
 	 * Je-li uživatel přihlášen
 	 * @var boolean
 	 */
-	private $login = false;
+	private static $login = false;
 
 	/**
 	 * Skupina uživatele
 	 * @var string
 	 */
-	private $userGroupName = null;
+	private static $userGroupName = null;
 
 	/**
 	 * Skupina uživatele
 	 * @var integer
 	 */
-	private $userGroupId = null;
+	private static $userGroupId = null;
 
 	/**
 	 * Id uživatele
 	 * @var integer
 	 */
-	private $userId = null;
+	private static $userId = null;
 
 	/**
 	 * Uživatelské jméno uživatele
 	 * @var string
 	 */
-	private $userName = null;
+	private static $userName = null;
 
 	/**
 	 * Mail uživatele
 	 * @var string
 	 */
-	private $userMail = null;
+	private static $userMail = null;
 
 	/**
 	 * Objekt pro práci se sessions
@@ -89,7 +79,7 @@ class Auth {
 	 */
 	function __construct() {
 		//Zakladni proměne
-		$this->login = false;
+		self::$login = false;
 //		Inicializace session
 		$this->session = new Sessions();
 
@@ -124,13 +114,11 @@ class Auth {
 	 */
 	private function _userIslogIn() {
 		if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
-			$this->login = true;
-			self::$isLogIn = true;
+			self::$login = true;
 		} else {
-			$this->login = false;
-			self::$isLogIn = false;
+			self::$login = false;
 		}
-		return $this->login;
+		return self::$login;
 	}
 
 	/**
@@ -138,31 +126,31 @@ class Auth {
 	 */
 	private function _setUserDetailFromSession() {
 		$this->session->add(self::USER_LOGIN_TIME, time());	
-		$this->userName = $this->session->get(self::USER_NAME);
-		$this->userMail = $this->session->get(self::USER_MAIL);
-		$this->userId = $this->session->get(self::USER_ID);
-		$this->userGroupId = $this->session->get(self::USER_ID_GROUP);
-		$this->userGroupName = $this->session->get(self::USER_GROUP_NAME);
+		self::$userName = $this->session->get(self::USER_NAME);
+		self::$userMail = $this->session->get(self::USER_MAIL);
+		self::$userId = $this->session->get(self::USER_ID);
+		self::$userGroupId = $this->session->get(self::USER_ID_GROUP);
+		self::$userGroupName = $this->session->get(self::USER_GROUP_NAME);
 	}
 	
 	/**
 	 * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
 	 */
 	private function _setDefaultUserParams() {
-		$this->userGroupId = VVE_DEFAULT_ID_GROUP;
-		$this->userGroupName = VVE_DEFAULT_GROUP_NAME;
-		$this->userName = VVE_DEFAULT_USER_NAME;
+		self::$userGroupId = VVE_DEFAULT_ID_GROUP;
+		self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
+		self::$userName = VVE_DEFAULT_USER_NAME;
 	}
 	
 	/**
 	 * metoda ukládá parametry uživatele do session
 	 */
 	private function _saveUserDetailToSession() {
-		$this->session->add(self::USER_NAME, $this->userName);
-		$this->session->add(self::USER_MAIL, $this->userMail);
-		$this->session->add(self::USER_ID, $this->userId);
-		$this->session->add(self::USER_ID_GROUP, $this->userGroupId);
-		$this->session->add(self::USER_GROUP_NAME, $this->userGroupName);
+		$this->session->add(self::USER_NAME, self::$userName);
+		$this->session->add(self::USER_MAIL, self::$userMail);
+		$this->session->add(self::USER_ID, self::$userId);
+		$this->session->add(self::USER_ID_GROUP, self::$userGroupId);
+		$this->session->add(self::USER_GROUP_NAME, self::$userGroupName);
 		$this->session->add(self::USER_LOGIN_ADDRESS, $_SERVER['REMOTE_ADDR']);
 		$this->session->add(self::USER_LOGIN_TIME, time());
 		$this->session->add(self::USER_IS_LOGIN, true);
@@ -177,22 +165,21 @@ class Auth {
 		
 		if (isset($_POST["login_submit"])){
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
-				$this->errMsg()->addMessage(_("Byly zadány prázdné údaje"));
+				AppCore::getUserErrors()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
             $model = new Model_Users();
             $userResult = $model->getUser(htmlentities($_POST["login_username"],ENT_QUOTES));
 				if (!($userResult)){
-					$this->errMsg()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
+					AppCore::getUserErrors()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
 				} else {
 					if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD}){
 						//	Uspesne prihlaseni do systemu
-						$this->login = true;
-						self::$isLogIn = true;
-						$this->userName = $userResult->{Model_Users::COLUMN_USERNAME};
-						$this->userGroupId = $userResult->{Model_Users::COLUMN_ID_GROUP};
-						$this->userGroupName = $userResult->{Model_Users::COLUMN_GROUP_NAME};
-						$this->userId = $userResult->{Model_Users::COLUMN_ID};
-						$this->userMail = $userResult->{Model_Users::COLUMN_MAIL};
+						self::$login = true;
+						self::$userName = $userResult->{Model_Users::COLUMN_USERNAME};
+						self::$userGroupId = $userResult->{Model_Users::COLUMN_ID_GROUP};
+						self::$userGroupName = $userResult->{Model_Users::COLUMN_GROUP_NAME};
+						self::$userId = $userResult->{Model_Users::COLUMN_ID};
+						self::$userMail = $userResult->{Model_Users::COLUMN_MAIL};
 						
 						if($userResult->{Model_Users::COLUMN_FOTO_FILE} != null){
 							//TODO není dodělána práce s fotkou
@@ -200,10 +187,11 @@ class Auth {
 						}
 						$return = true;
 					} else {
-                  $this->errMsg()->addMessage(_("Bylo zadáno špatné heslo."));
+                  AppCore::getUserErrors()->addMessage(_("Bylo zadáno špatné heslo."));
 					}
 				}
-				unset($loginMysql);
+				unset ($loginMysql);
+            unset ($model);
 			}
 		}
 		return $return;
@@ -217,8 +205,7 @@ class Auth {
 		$return = false;
 		if(isset($_POST["logout_submit"])){
 			$this->session->add(self::USER_IS_LOGIN, false);
-			$this->login = false;
-			self::$isLogIn = false;
+			self::$login = false;
 			session_destroy();
 			$return = true;
 					
@@ -233,65 +220,58 @@ class Auth {
 	 *
 	 * @return boolean -- je li uživatel přihlášen
 	 */
-	function isLogin() {
-		return $this->login;
+	public static function isLogin() {
+		return self::$login;
 	}
 	
 	/**
 	 * Metoda vrací jestli je uživatel přihlášen
 	 * @return boolean -- true pokud je uživatel přihlášen
+    * @deprecated
 	 */
 	public static function isLoginStatic() {
-		return self::$isLogIn;
+		return self::$login;
 	}
 	
 	/**
 	 * Metoda vrací název skupiny ve které je uživatel
 	 * @return string -- název skupiny
 	 */
-	public function getGroupName() {
-		return $this->userGroupName;
+	public static function getGroupName() {
+		return self::$userGroupName;
 	}
 	
 	/**
 	 * Metoda vrací id skupiny ve které je uživatel
 	 * @return integer -- id skupiny
 	 */
-	public function getGroupId() {
-		return $this->userGroupId;
+	public static function getGroupId() {
+		return self::$userGroupId;
 	}
 	
 	/**
 	 * Metoda vrací id uživatele
 	 * @return integer -- id uživatele
 	 */
-	public function getUserId() {
-		return $this->userId;
+	public static function getUserId() {
+		return self::$userId;
 	}
 	
 	/**
 	 * Metoda vrací název uživatele
 	 * @return string -- název uživatele
 	 */
-	public function getUserName() {
-		return $this->userName;
+	public static function getUserName() {
+		return self::$userName;
 	}
 	
 	/**
 	 * Metoda vrací mail uživatele
 	 * @return string -- mail uživatele
 	 */
-	public function getUserMail() {
-		return $this->userMail;
+	public static function getUserMail() {
+		return self::$userMail;
 	}
-
-   /**
-    * Metoda vrací objekt s chybovými zprávami
-    * @return Messages -- objekt zpráv
-    */
-   public function errMsg() {
-      return AppCore::getUserErrors();
-   }
 
    /**
     * Metoda provede zašifrování hesla

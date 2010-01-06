@@ -49,7 +49,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    const TINY_THEME_SIMPLE = 'simple';
    const TINY_THEME_ADVANCED = 'advanced';
-   const TINY_THEME_ADVANCED_SIMPLE = 'advsimple';
+   const TINY_THEME_ADVANCED_SIMPLE = 'advancedsimple';
    const TINY_THEME_FULL = 'full';
 
    /**

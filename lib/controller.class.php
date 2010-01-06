@@ -103,9 +103,9 @@ abstract class Controller {
     * Metoda vrací objekt systémové konfigurace
     * @return Config -- objekt systémové konfigurace
     */
-   final public function getSysConfig() {
-      return AppCore::sysConfig();
-   }
+//   final public function getSysConfig() {
+//      return AppCore::sysConfig();
+//   }
 
    /**
     * MEtoda vrací objekt viewru modulu
@@ -215,23 +215,6 @@ abstract class Controller {
     */
    final public function locale() {
       return $this->locale;
-   }
-
-   /**
-    * Metody vrací objekt autorizace (infoormace o přiihlášení)
-    * @return Auth -- objekt autorizace
-    * @deprecated
-    */
-   final public function getAuth() {
-      return $this->auth();
-   }
-
-   /**
-    * Metody vrací objekt autorizace (infoormace o přiihlášení)
-    * @return Auth -- objekt autorizace
-    */
-   final public function auth() {
-      return AppCore::getAuth();
    }
 
    /**
@@ -359,12 +342,6 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
       } else {
          $viewName = $this->actionViewer.'View';
       }
-      //	zvolení viewru modulu pokud existuje
-//      if(!method_exists($this->view(), $viewName)) {
-//         throw new BadMethodCallException(sprintf(
-//         _("Action Viewer \"%sView\" v modulu \"%s\" nebyl implementován"),
-//         $viewName, $this->module()->getName()), 2);
-//      }
       // spuštění kontroleru
       $ctrlResult = $this->{$this->routes()->getActionName().'Controller'}();
 
@@ -425,10 +402,8 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
 
    /**
     * Metoda implementující mazání při odstranění kategori. Je určena k vičištění.
-    * @param int $idCat -- id kategorie
+    * @param Category $category -- objekt kategorie
     */
-   public static function clearOnRemove($idCat) {
-      ;
-   }
+   public static function clearOnRemove(Category $category) {}
 }
 ?>

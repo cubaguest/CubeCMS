@@ -66,7 +66,6 @@ class Rights {
 	 * @return boolean -- právo k zápisu
 	 */
 	final public function isWritable() {
-//		return $this->write;
       return $this->rights['write'];
 	}
 	
@@ -75,7 +74,6 @@ class Rights {
 	 * @return boolean -- plné právo
 	 */
 	final public function isControll() {
-//		return $this->controll;
       return $this->rights['controll'];
 	}
 }

@@ -105,7 +105,12 @@ class Category {
     * Metoda načte práva ke kategorii
     */
    public function loadRights() {
-      $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});
+      // admin může vše
+      if(Auth::getUserName() == 'admin'){
+         $this->categoryRights->addRight('rwc');
+      } else {
+         $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});
+      }
    }
 
    /**
