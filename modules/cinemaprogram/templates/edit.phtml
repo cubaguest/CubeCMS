@@ -3,9 +3,9 @@
    // do titulku
    if($this->edit) {
       $this->addPageTitle($this->_('úprava filmu'));
-      $this->addPageTitle($this->catName);
+      $this->addPageTitle($this->movie->{CinemaProgram_Model_Detail::COL_NAME});
       $this->addPageHeadline($this->_('úprava filmu'));
-      $this->addPageHeadline($this->catName);
+      $this->addPageHeadline($this->movie->{CinemaProgram_Model_Detail::COL_NAME});
    } else {
       $this->addPageTitle($this->_('přidání filmu'));
       $this->addPageHeadline($this->_('přidání filmu'));
@@ -53,7 +53,9 @@
                   <?=$this->form->label->label();?>
                </th>
                <td class="formControlls">
-                  <?$this->form->label->html()->addClass('mceEditorSimple')?>
+                  <?$this->form->label->html()->addClass('mceEditorSimple');
+                  $this->form->label->html()->setAttrib('rows', 15);
+                  ?>
                   <?=$this->form->label->controllAll();?>
                   <span></span>
                </td>
@@ -83,9 +85,26 @@
                   <?=$this->form->image->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->image->controllAll();?>
+                  <?
+                  if($this->edit AND $this->movie->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {
+                     $this->form->image->setSubLabel($this->_('Uloženo').":&nbsp;".vve_tpl_image_tag(
+                             $this->category()->getModule()->getDataDir()
+                             .$this->movie->{CinemaProgram_Model_Detail::COL_IMAGE}, null, 100));
+                  }
+                  print ($this->form->image->controllAll());
+                  ?>
                </td>
             </tr>
+            <?if($this->edit AND $this->movie->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {?>
+            <tr>
+               <th class="formLabels">
+                  <?=$this->form->image_del->label();?>
+               </th>
+               <td class="formControlls">
+                  <?=$this->form->image_del->controllAll();?>
+               </td>
+            </tr>
+            <?}?>
             <tr>
                <th class="formLabels">
                   <?=$this->form->imdbid->label();?>
@@ -93,7 +112,7 @@
                <td class="formControlls">
                   <?$this->form->imdbid->html()->setAttrib('size', 8);?>
                   <?=$this->form->imdbid->controll();?>
-                  <a href="#" onclick="return testImdbId()">Test</a>
+                  <a href="javascript:testImdbId()" title="<?=$this->_('Test odkazu na IMDB')?>">Test</a>
                   <?=$this->form->imdbid->subLabel();?>
                   <?=$this->form->imdbid->labelValidations();?>
                </td>
@@ -105,7 +124,7 @@
                <td class="formControlls">
                   <?$this->form->csfdid->html()->setAttrib('size', 8);?>
                   <?=$this->form->csfdid->controll();?>
-                  <a href="#" onclick="return testCsfdId()">Test</a>
+                  <a href="javascript:testCsfdId()" title="<?=$this->_('Test odkazu na ČSFD')?>">Test</a>
                   <?=$this->form->csfdid->subLabel();?>
                   <?=$this->form->csfdid->labelValidations();?>
                </td>
@@ -114,11 +133,6 @@
       </fieldset>
       <fieldset>
          <legend><?=$this->_('Informace o promítání')?></legend>
-         <?if(!$this->edit) {
-            $classJsAdd = 'jsadded';
-            $vals = $this->form->dateId->getValues();
-            if(count($vals) == 0) $vals = array(1);
-            ?>
          <table class="formTableGroup">
             <tr>
                <th class="formLabels">
@@ -148,9 +162,17 @@
                </td>
             </tr>
          </table>
+         <?
+         $lastId = 1;
+         $vals = $this->form->dateId->getValues();
+         if(count($vals) == 0){
+            $vals = array(1);
+         };
+         if(!$this->edit) {}
+            ?>
          <table class="formTableGroup" id="dateRowsTable">
                <?foreach ($vals as $i => $val) {?>
-            <tr class="<?=$classJsAdd?>">
+            <tr>
                <th class="formLabels">
                         <?print($this->form->date->label())?>
                </th>
@@ -179,8 +201,10 @@
                         $this->form->dateDeleted->setDimensional($i);
                         $this->form->dateDeleted->setValues('false');
                         print($this->form->dateDeleted->controll());
-                        ?>
-                        <?
+
+                        if($this->form->dateId->getValues($i) == null){
+                           $this->form->dateId->setValues('new', $i);
+                        }
                         $this->form->dateId->setDimensional($i);
                         print($this->form->dateId->controll());
                         ?>
@@ -188,11 +212,10 @@
             </tr>
                <?}
                $lastId = $i;
-               $count = count($vals);?>
+               ?>
          </table>
 
 
-         <?}?>
          <table class="formTableGroup" style="width:100%;">
             <tr>
                <td align="right">
@@ -224,65 +247,45 @@
          $.datepicker.setDefaults(['<?=Locale::getLang()?>'] ) ;
          //$.datepicker.regional['<?=Locale::getLang()?>']
          $("input.datepicker").datepicker();
-         //      $('#moduleDoc').hide();
-         //      $('#getModuleParams').click(function(){
-         //         $('#moduleDoc').toggle();
-         //         return false;
-         //      });
-         //      $('#categorymodule').change(function(){
-         //         $('#moduleDoc').load('<?//=$linkModDoc?>?modulep='+$(this).val()+' .moduleParams');
-         //         $('#moduleNameDoc').load('<?//=$linkModDoc?>?modulep='+$(this).val()+' .moduleLabel');
-         //         return false;
-         //      });
-         //      $('#categorymodule').click(function(){
-         //         $('#moduleDoc').load('<?//=$linkModDoc?>?module='+$(this).val()+' .moduleParams');
-         //         $('#moduleNameDoc').load('<?//=$linkModDoc?>?module='+$(this).val()+' .moduleLabel');
-         //         return false;
-         //      });
       });
-      // funkce pro práci s řádky datumů
       var lastId = <?=$lastId?>;
-      // přidání položky
+      // add row
       function addDateRow(){
-         //         numRows++;
          lastId++;
          var row = $('#dateRowsTable tr:last').clone();
-         row.addClass('jsadded');
          row.show();
          row.find('input.movie_date_class').removeClass('hasDatepicker');
-//         row.find('input.movie_datestop_class').removeClass('hasDatepicker');
-         //         var time = new Date.now();
+         row.find('input.movie_date_class').attr('name','movie_date['+lastId+']');
          row.find('input.movie_date_class').attr('id','movie_date_'+lastId);
-//         row.find('input.movie_datestop_class').attr('id','movie_datestop_'+lastId);
-         row.find('input.movie_date_class').attr('name','movie_date['+(lastId)+']');
-//         row.find('input.movie_datestop_class').attr('name','movie_datestop['+(lastId)+']');
-         row.find('input.movie_time_class').attr('name','movie_time['+(lastId)+']');
-         row.find('input.movie_dateDeleted_class').attr('name','movie_dateDeleted['+(lastId)+']');
-         row.find('input.movie_dateId_class').attr('name','movie_dateId['+(lastId)+']');
          row.find('label.movie_date__label_class').attr('for','movie_date_'+lastId);
-//         row.find('label.movie_datestop__label_class').attr('for','movie_datestop_'+lastId);
-
+         row.find('input.movie_time_class').attr('name','movie_time['+lastId+']');
+         row.find('input.movie_time_class').attr('id','movie_time_'+lastId);
+         row.find('label.movie_time__label_class').attr('for','movie_time_'+lastId);
+         row.find('input.movie_dateDeleted_class').attr('name','movie_dateDeleted['+lastId+']');
+         row.find('input.movie_dateDeleted_class').attr('id','movie_dateDeleted_'+lastId);
+         row.find('input.movie_dateDeleted_class').val('false');
+         row.find('input.movie_dateId_class').attr('name','movie_dateId['+lastId+']');
+         row.find('input.movie_dateId_class').attr('id','movie_dateId_'+lastId);
+         row.find('input.movie_dateId_class').val('new');
          // datepicker
          row.find('input.datepicker').datepicker();
-
          $('#dateRowsTable').append(row);
          return false;
       }
       // odstranění položky
       function deleteDateRow(obj){
          var row = $(obj).parent('td').parent('tr');
-         if($('#dateRowsTable tr').length == 1){//pokud je jeden nemažese
+         if($('#dateRowsTable tr:visible').length == 1){//pokud je jeden nemažese
             return false;
          }
-
          // první nelze vymazat
-         if(row.hasClass('jsadded')){
+         var val = row.find("input.movie_dateId_class").val();
+         if(val == 'new'){
             row.remove();
          } else {
             row.find('input.movie_dateDeleted_class').val('true');
             row.hide();
          }
-         //         numRows--;
          return false;
       }
       // kontrola času
@@ -292,6 +295,7 @@
       }
       // test imdb odkazu
       function testImdbId(){
+         // doplnit na regexp protože v controlleru je konstanta s linkem
          window.open('http://www.imdb.com/title/tt'+$('input[name=movie_imdbid]').val(),
          "<?=$this->_('Test odkazu IMDB')?>", "");
          return false;
@@ -304,6 +308,5 @@
       }
       /* ]]> */
    </script>
-
-   <?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+   <?=$this->includeTpl('buttonback.phtml', true)?>
 </div>

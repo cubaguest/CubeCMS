@@ -75,6 +75,17 @@ class CinemaProgram_Model_Detail extends Model_PDO {
       return $dbst;*/
    }
 
+   public function getMovie($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE `".self::COL_ID."` = :idmovie");
+
+      $dbst->bindValue(':idmovie', (int)$id, PDO::PARAM_INT);
+      $dbst->execute();
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      return $dbst->fetch();
+   }
+
    public function getTimesWithMovies($idCat, DateTime $dateFrom, DateTime $dateTo) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TIME)." AS times"
@@ -97,23 +108,40 @@ class CinemaProgram_Model_Detail extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TIME)
               ." WHERE ".self::COL_T_ID_M." = :idmov"
-              ." ORDER BY ".self::COL_T_DATEFROM." ASC");
+              ." ORDER BY ".self::COL_T_DATE." ASC");
       $dbst->bindValue(':idmov', (int)$idMovie, PDO::PARAM_INT);
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst;
    }
 
-   public function saveMovie($name, $label, $price, $length, $version, $idCat, $origname = null, $filmClub = false,
+   public function saveMovie($name, $label, $price, $length, $version, $idCat,
+           $origname = null, $filmClub = false,
            $access = 0, $imdbid = null, $csfdid = null, $image = null, $id = null) {
       $dbc = new Db_PDO();
 
       if($id !== null) {
-//         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-//          ." SET ".$this->getUpdateValues()
-//          ." WHERE ".self::COLUMN_ID." = :id");
-//         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-//         return $dbst->execute();
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET `".self::COL_NAME."` = :name, `".self::COL_LABEL."` = :label,"
+          ." `".self::COL_PRICE."` = :price, `".self::COL_LENGTH."` = :length,"
+          ." `".self::COL_VERSION."` = :version, `".self::COL_NAME_ORIG."` = :origname,"
+          ." `".self::COL_FC."` = :filmclub, `".self::COL_ACCESS."` = :access,"
+          ." `".self::COL_IMDBID."` = :imdbid, `".self::COL_CSFDID."` = :csfdid,"
+          ." `".self::COL_IMAGE."` = :image"
+          ." WHERE ".self::COL_ID." = :idmovie");
+         $dbst->bindValue(':name', $name, PDO::PARAM_STR);
+         $dbst->bindValue(':label', $label, PDO::PARAM_STR);
+         $dbst->bindValue(':price', $price, PDO::PARAM_INT);
+         $dbst->bindValue(':length', $length, PDO::PARAM_INT);
+         $dbst->bindValue(':version', $version, PDO::PARAM_STR);
+         $dbst->bindValue(':origname', $origname, PDO::PARAM_STR);
+         $dbst->bindValue(':filmclub', $filmClub, PDO::PARAM_INT);
+         $dbst->bindValue(':access', $access, PDO::PARAM_INT);
+         $dbst->bindValue(':imdbid', $imdbid, PDO::PARAM_INT);
+         $dbst->bindValue(':csfdid', $csfdid, PDO::PARAM_INT);
+         $dbst->bindValue(':image', $image, PDO::PARAM_STR);
+         $dbst->bindValue(':idmovie', $id, PDO::PARAM_INT);
+         return $dbst->execute();
       } else {
          if($idCat == 0) {
             throw new InvalidArgumentException($this->_('Při ukládání nového filmu musí být zadáno id kategorie'), 1);
@@ -150,10 +178,12 @@ class CinemaProgram_Model_Detail extends Model_PDO {
       if($idTime !== null) {
          // je už uloženo
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE_TIME)
-                 ." SET ".$this->getUpdateValues()." WHERE ".self::COLUMN_ID_CATEGORY." = ".(int)$idCat);
-         //             ." WHERE ".self::COLUMN_ID_CATEGORY." = :category");
-         //$dbst->bindParam(1, $idCat, PDO::PARAM_INT);
-         $dbst->execute();
+          ." SET `".self::COL_T_DATE."` = :mdate, `".self::COL_T_TIME."` = :mtime"
+          ." WHERE ".self::COL_T_ID." = :idtime");
+         $dbst->bindValue(':mdate', (string)$date->format('Y-m-d'), PDO::PARAM_STR);
+         $dbst->bindValue(':mtime', (string)$time->format('H:i'), PDO::PARAM_STR);
+         $dbst->bindValue(':idtime', $idTime, PDO::PARAM_INT);
+         return $dbst->execute();
       } else {
          // není uloženo
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_TIME)
@@ -167,6 +197,32 @@ class CinemaProgram_Model_Detail extends Model_PDO {
       }
    }
 
+
+   public function deleteMovie($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
+          ." WHERE (".self::COL_ID ." = :idmovie)");
+      $dbst->bindParam(':idmovie', $id, PDO::PARAM_INT);
+      return $dbst->execute();
+   }
+
+   public function deleteTime($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_TIME)
+          ." WHERE (".self::COL_T_ID ." = :idtime)");
+      $dbst->bindParam(':idtime', $id, PDO::PARAM_INT);
+      return $dbst->execute();
+   }
+
+   public function deleteTimes($idMovie) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_TIME)
+          ." WHERE (".self::COL_T_ID_M ." = :idmovie)");
+      $dbst->bindParam(':idmovie', $idMovie, PDO::PARAM_INT);
+      return $dbst->execute();
+   }
+
+   
    public function getLastChange($idCat) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
