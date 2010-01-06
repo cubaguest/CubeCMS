@@ -32,7 +32,9 @@ class Categories_Controller extends Controller {
 
          // vyčištění kategorie
          $moduleCtrName = $cat->{Model_Category::COLUMN_MODULE}.'_Controller';
-         call_user_func($moduleCtrName."::clearOnRemove", $formDelete->id->getValues());
+         $rmCategoryObj = new Category($cat->{Model_Category::COLUMN_URLKEY},false, $cat);
+
+         call_user_func($moduleCtrName."::clearOnRemove", $rmCategoryObj);
 
          // mažeme kategorii ze struktury
          $categories->removeCat($formDelete->id->getValues());
