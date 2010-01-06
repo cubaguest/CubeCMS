@@ -1,16 +1,17 @@
+<h3><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h3>
 <div>
-   <?
-   foreach ($this->news as $new) {?>
-   <h5>
-      <a href="<?=$this->link()->article($new["label"],$new["id_new"])?>" title="<?=$new["label"]?>"><?=$new["label"]?></a>
-   </h5>
-   <div class="newsTextPanel"><?=$new["text"];?></div>
-   <a href="<?=$this->link()->article($new["label"],$new["id_new"])?>"
-      title="<?=$this->_m("více")?>">[&nbsp;<?=$this->_m("více")?>&nbsp;]</a>
-   <br />
-   <br />
+   <?while ($new = $this->newArticles->fetch()) {?>
+   <a href="<?=$this->link()->route('detail', array('urlkey'
+      => $new->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($new->{Articles_Model_Detail::COLUMN_NAME})?>"
+      ><?=vve_tpl_truncate($new->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
+      <p>
+         <?=vve_tpl_truncate($new->{Articles_Model_Detail::COLUMN_TEXT},100)?>
+      </p>
+
    <?}?>
-   <a href="<?=$this->l();?>" title="<?=$this->_m("další")?>"><?=$this->_m("další")?></a>
 </div>
-
-
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>
