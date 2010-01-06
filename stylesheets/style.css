@@ -437,7 +437,9 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 /* SOF Panels Content */
 
 div.panel {
-   background-color: white;
+   background-color: #cfcfd0;
+   border: 1px solid #006666;
+   margin-bottom: 10px;
 }
 
 div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
