@@ -56,6 +56,12 @@ abstract class Controller {
    private $options = array();
 
    /**
+    * Název modulu -- lze použít pro načítání knihoven atd (např. Articles)
+    * @var string
+    */
+   protected $moduleName = null;
+
+   /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
     * @param Category $category -- obejkt kategorie
@@ -66,49 +72,43 @@ abstract class Controller {
       $this->category = $category;
       $this->routes = $routes;
 
+      // název modulu
+      $className = get_class($this);
+      $this->moduleName = substr($className, 0, strpos($className,'_'));
+
       $link = new Url_Link_Module();
       $link->setModuleRoutes($routes);
       $link->category($this->category()->getUrlKey());
       $this->link = $link;
       // locales
-      //      $this->locale = new Locale($category->getModule()->getName());
-      $className = get_class($this);
-      $moduleName = substr($className, 0, strpos($className, '_'));
-      $this->locale = new Locale(strtolower($moduleName));
+      $this->locale = new Locale(strtolower($this->moduleName));
 
       //	Vytvoření objektu pohledu
-      if($view === null) {
-         //	Načtení třídy View
-         $viewClassName = ucfirst($moduleName).'_View';
-         $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
-      } else {
-         $this->viewObj = $view;
-      }
+      $this->viewObj = $view;
+      $this->initView();
 
       // Inicializace kontroleru modulu
       $this->init();
    }
 
-
+   private function initView() {
+      if($this->view() === null) {
+         //	Načtení třídy View
+         $viewClassName = ucfirst($this->moduleName).'_View';
+         $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
+      } else {
+         $this->viewObj = $view;
+      }
+   }
 
    /**
     * Inicializační metoda pro kontroler. je spuštěna vždy při vytvoření objektu
     * kontroleru
     */
-   protected function init() {
-
-   }
+   protected function init() {}
 
    /**
-    * Metoda vrací objekt systémové konfigurace
-    * @return Config -- objekt systémové konfigurace
-    */
-//   final public function getSysConfig() {
-//      return AppCore::sysConfig();
-//   }
-
-   /**
-    * MEtoda vrací objekt viewru modulu
+    * Metoda vrací objekt viewru modulu
     * @return View
     */
    final public function view() {
@@ -312,6 +312,9 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
       $this->actionViewer = $view;
    }
 
+   /*
+    * @todo -- dořešit jestli je třeba několika objektů šablon
+    */
    /**
     * Metoda vrací objekt šablony
     * @return Template
@@ -346,6 +349,14 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
       $ctrlResult = $this->{$this->routes()->getActionName().'Controller'}();
 
       if(method_exists($this->view(), $viewName) AND $ctrlResult !== false) {
+         // spuštění všech kontrolerů komponent
+         $variables = $this->view()->template()->getTemplateVars();
+         foreach ($variables as $var){
+            if($var instanceof Component){
+               $var->mainController();
+            }
+         }
+
          $this->view()->$viewName();
       } else if($ctrlResult === false) {
          AppCore::setErrorPage(true);
