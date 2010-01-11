@@ -639,9 +639,6 @@ class Filesystem_File_Image extends Filesystem_File {
       if($this->workingImage === null|false) {
          $this->loadImage();
       }
-//      $args = func_get_args();
-//      var_dump($args);
-//      ob_flush();exit();
       if(VVE_USE_IMAGEMAGICK != true) {
 
          $newImage = imagecreatetruecolor($dstX-$srcX, $dstY-$srcY);
@@ -675,9 +672,6 @@ class Filesystem_File_Image extends Filesystem_File {
       if($this->workingImage === null|false) {
          $this->loadImage();
       }
-//      $args = func_get_args();
-//      var_dump($args);
-//      ob_flush();exit();
       if(VVE_USE_IMAGEMAGICK != true) {
 
          $newImage = imagecreatetruecolor($imgW, $imgH);
