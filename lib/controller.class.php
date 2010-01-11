@@ -92,12 +92,10 @@ abstract class Controller {
    }
 
    private function initView() {
-      if($this->view() === null) {
+      if($this->viewObj === null) {
          //	Načtení třídy View
          $viewClassName = ucfirst($this->moduleName).'_View';
          $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
-      } else {
-         $this->viewObj = $view;
       }
    }
 
