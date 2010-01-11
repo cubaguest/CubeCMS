@@ -1,13 +1,12 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of form_validate_noemptyclass
+ * Třída formulářového validátoru pro kontrolu emailu
  *
- * @author jakub
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: $ VVE 6.0.0 $Revision:  $
+ * @author        $Author:  $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
+ * @abstract      Třída validátoru pro kontrolu emailu
  */
 class Form_Validator_Email extends Form_Validator implements Form_Validator_Interface {
    public function  __construct($errMsg = null) {
@@ -36,7 +35,7 @@ class Form_Validator_Email extends Form_Validator implements Form_Validator_Inte
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getValues() != null AND !eregi("^$name+(\\.$name+)*@($domain?\\.)+$domain\$", $elemObj->getValues())){
+               if($elemObj->getUnfilteredValues() != null AND !eregi("^$name+(\\.$name+)*@($domain?\\.)+$domain\$", $elemObj->getUnfilteredValues())){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }

@@ -86,49 +86,5 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
       return true;
 
    }
-
-   /**
-    * Metoda zkontroluje jestli jsou prvky z pole colum vyplněny
-    * @param string/array $values -- pole s hodnotami
-    * @param array $colums -- pole s nutnými prvky
-    * @param string $key -- název klíče k prováděnému poli
-    * @return bool/string -- true pokud je vše v pořádku, jinak řetězec z pole
-    * s kontrolovanými prvky
-    */
-//   private function checkEmptyValues($values, $colums, $key = null) {
-//      if(!is_array($values)) {
-//         if(key_exists($key, $colums) AND $values == null){
-//            return $colums[$key];
-//         }
-//      } else {
-//         foreach ($values as $valKey => $val) {
-//            $ret = $this->checkEmptyValues($val, $colums, $valKey);
-//            if($ret !== true){
-//               return $ret;
-//            }
-//         }
-//      }
-//      return true;
-//   }
-
-   /**
-    * Metoda zkontroluje jestli jsou všechny prvky vyplněny
-    * @param array/string $values
-    * @return boolean -- pokud je jeden prvek prázný vrací false
-    */
-//   private function checkEmptyAllValues($values) {
-//      if(!is_array($values)) {
-//         if($values == null){
-//            return false;
-//         }
-//      } else {
-//         foreach ($values as $val) {
-//            if(!$this->checkEmptyAllValues($val)){
-//               return false;
-//            }
-//         }
-//      }
-//      return true;
-//   }
 }
 ?>

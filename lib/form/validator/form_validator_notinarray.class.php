@@ -38,8 +38,8 @@ class Form_Validator_NotInArray extends Form_Validator implements Form_Validator
             if($elemObj->isMultiLang()) {
                trigger_error('Not implemented validation !!');
             } else {
-               if(in_array($elemObj->getValues(), $this->array)) {
-                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$elemObj->getValues()));
+               if(in_array($elemObj->getUnfilteredValues(), $this->array)) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$elemObj->getUnfilteredValues()));
                   return false;
                }
             }

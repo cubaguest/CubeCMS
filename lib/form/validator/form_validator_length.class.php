@@ -54,12 +54,12 @@ class Form_Validator_Length extends Form_Validator implements Form_Validator_Int
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getValues() != null AND !is_null($this->max)
-                  AND strlen($elemObj->getValues()) > $this->max) {
+               if($elemObj->getUnfilteredValues() != null AND !is_null($this->max)
+                  AND strlen($elemObj->getUnfilteredValues()) > $this->max) {
                   $this->errMsg()->addMessage(sprintf(_("\"%s\" je příliš dlouhý"), $elemObj->getLabel()));
                   return false;
-               } else if($elemObj->getValues() != null
-                  AND !is_null($this->min) AND strlen($elemObj->getValues()) < $this->min) {
+               } else if($elemObj->getUnfilteredValues() != null
+                  AND !is_null($this->min) AND strlen($elemObj->getUnfilteredValues()) < $this->min) {
                   $this->errMsg()->addMessage(sprintf(_("\"%s\" je příliš krátký"), $elemObj->getLabel()));
                   return false;
                }

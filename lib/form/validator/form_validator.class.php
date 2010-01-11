@@ -1,15 +1,14 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of form_validate_noemptyclass
+ * Abstraktní třída formulářového validátoru
  *
- * @author jakub
+ * @copyright  	Copyright (c) 2008 Jakub Matas
+ * @version    	$Id: $ VVE 6.0.0 $Revision:  $
+ * @author        $Author:  $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
+ * @abstract      Abstraktní třída validátoru
  */
-class Form_Validator {
+abstract class Form_Validator {
    protected $errMessage = null;
 
    /**
@@ -35,6 +34,12 @@ class Form_Validator {
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {}
+
+   /**
+    * Metoda provede validaci formulářového prvku
+    * @param Form_Element $elemObj -- prvek
+    */
+   public function validate(Form_Element $elemObj) {}
 
    /**
     * Metoda vrací objekt k chybovým hláškám modulů

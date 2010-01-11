@@ -35,7 +35,7 @@ class Form_Validator_FileSize extends Form_Validator implements Form_Validator_I
    }
 
    public function validate(Form_Element $elemObj) {
-      $values = $elemObj->getValues();
+      $values = $elemObj->getUnfilteredValues();
       if(empty($values)){
          return true;
       }

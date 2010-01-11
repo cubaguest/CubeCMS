@@ -58,6 +58,12 @@ class Form_Element implements Form_Element_Interface {
    protected $isPopulated = false;
 
    /**
+    * Jestli byl prvek filtrován
+    * @var boolean
+    */
+   protected $isFiltered = false;
+
+   /**
     * Jestli se jedná o vícejazyčný prvek
     * @var boolean
     */
@@ -175,14 +181,15 @@ class Form_Element implements Form_Element_Interface {
    /**
     * Metoda nastaví hodnoty do prvku
     * @param mixed $values -- hodnoty
-    * @param mixed $key -- klíč pokud se element chová jako pole
+    * @param string $key -- klíč pokud se element chová jako pole
+    * @param bool $unfiltered -- jestli se mají hodnoty ukládat do nefiltrovaných (vhodné pro filtry)
     * @return Form_Element
     */
    public function setValues($values, $key = null) {
-      if($key === null){
-         $this->values = $this->unfilteredValues = $values;
+      if($key === null) {
+         $this->unfilteredValues = $values;
       } else {
-         $this->values[$key] = $this->unfilteredValues[$key] = $values;
+         $this->unfilteredValues[$key] = $values;
       }
       return $this;
    }
@@ -192,8 +199,8 @@ class Form_Element implements Form_Element_Interface {
     * @param mixed $values -- hodnoty
     * @return Form_Element
     */
-   public function setUnfilteredValues($values) {
-      $this->unfilteredValues = $values;
+   public function setFilteredValues($values) {
+      $this->values = $values;
       return $this;
    }
 
@@ -298,6 +305,10 @@ class Form_Element implements Form_Element_Interface {
     * @return mixed -- hodnota prvku
     */
    public function getValues($key = null) {
+      if($this->isFiltered != true){
+         $this->filter();
+      }
+
       if($key !== null AND isset($this->values[$key])) {
          return $this->values[$key];
       }
@@ -345,14 +356,7 @@ class Form_Element implements Form_Element_Interface {
     * Metoda vrací jestli je element prázdný
     */
    public function isEmpty() {
-//      if($this->isMultilang OR $this->isDimensional()) {
-         return $this->checkEmpty($this->getValues(null, false));
-//      } else {
-//         if($this->getValues() == null OR $this->getValues() == '') {
-//            return true;
-//         }
-//         return false;
-//      }
+      return $this->checkEmpty($this->getValues(null, false));
    }
 
    /*
@@ -409,8 +413,9 @@ class Form_Element implements Form_Element_Interface {
    public function filter(){
       $this->values = $this->unfilteredValues;
       foreach ($this->filters as $filter) {
-         $filter->filter($this);
+         $filter->filter($this, $this->values);
       }
+      $this->isFiltered = true;
    }
 
    /**

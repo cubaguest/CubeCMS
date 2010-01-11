@@ -20,16 +20,15 @@ class Form_Filter_DateTimeObj extends Form_Filter {
     * Metoda aplikuje filtr na daný element
     * @param Form_Element $elem
     */
-   public function filter(Form_Element &$elem) {
-      $values = $elem->getValues();
-         switch (get_class($elem)) {
-            case "Form_Element_Text":
-               $this->filterValue($values);
-               break;
-            default:
-               break;
-         }
-      $elem->setValues($values);
+   public function filter(Form_Element &$elem, &$values) {
+      switch (get_class($elem)) {
+         case "Form_Element_Text":
+            $this->filterValue($values);
+            break;
+         default:
+            break;
+      }
+//      $elem->setFilteredValues($values);
    }
 
    /**

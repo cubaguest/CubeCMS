@@ -48,7 +48,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             if($elemObj->isMultiLang()) {
                // pokud se kontrolují jen některé sloupce
                if(!empty ($this->columsNotEmpty)){
-                  $retu = $this->checkEmptyValues($elemObj->getValues(), $this->columsNotEmpty);
+                  $retu = $this->checkEmptyValues($elemObj->getUnfilteredValues(), $this->columsNotEmpty);
                   if($retu !== true){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
                      $this->isValid = false;
@@ -57,7 +57,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                }
                // pokud mají být vyplněny všechny sloupce
                else {
-                  if(!$this->checkEmptyAllValues($elemObj->getValues())){
+                  if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
 //                     return false;
@@ -65,13 +65,13 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                }
             } else {
                if($elemObj->isDimensional()) {
-                  if(!$this->checkEmptyAllValues($elemObj->getValues())) {
+                  if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())) {
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
 //                     return false;
                   }
                } else {
-                  if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
+                  if($elemObj->getUnfilteredValues() == null OR $elemObj->getUnfilteredValues() == "") {
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
 //                     return false;
@@ -81,7 +81,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             break;
          // input checkbox
          case 'Form_Element_Checkbox':
-            if($elemObj->getValues() == false) {
+            if($elemObj->getUnfilteredValues() == false) {
                $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                $this->isValid = false;
 //               return false;

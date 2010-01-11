@@ -44,7 +44,7 @@ class Form_Validator_FileMimeType extends Form_Validator implements Form_Validat
    }
 
    public function validate(Form_Element $elemObj) {
-      $values = $elemObj->getValues();
+      $values = $elemObj->getUnfilteredValues();
       if(empty($values)){
          return true;
       }

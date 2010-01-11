@@ -14,6 +14,6 @@ interface Form_Filter_Interface {
     * Metoda provede filtrování dat alamentu
     * @param Form_Element $elem -- element, který se bude filtrovat
     */
-   public function filter(Form_Element &$elem);
+   public function filter(Form_Element &$elem, &$values);
 }
 ?>

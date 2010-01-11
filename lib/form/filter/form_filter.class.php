@@ -16,7 +16,7 @@ class Form_Filter implements Form_Filter_Interface {
     * Metoda aplikuje filtr na daný element
     * @param Form_Element $elem
     */
-   public function filter(Form_Element &$elem) {}
+   public function filter(Form_Element &$elem, &$values) {}
 
    /**
     * Metoda přidá do elementu prvky z validace

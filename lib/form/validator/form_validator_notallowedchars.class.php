@@ -45,7 +45,7 @@ class Form_Validator_NotAllowedChars extends Form_Validator implements Form_Vali
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
+               if($elemObj->getUnfilteredValues() == null OR $elemObj->getUnfilteredValues() == "") {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
@@ -53,7 +53,7 @@ class Form_Validator_NotAllowedChars extends Form_Validator implements Form_Vali
             break;
          // input checkbox
          case 'Form_Element_Checkbox':
-            if($elemObj->getValues() == false){
+            if($elemObj->getUnfilteredValues() == false){
                $this->errMsg()->addMessage($this->errMessage);
                return false;
             }

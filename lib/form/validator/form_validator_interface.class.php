@@ -3,6 +3,13 @@
  * Iterface k validátoru formuláře
  */
 interface Form_Validator_Interface {
+
+   /**
+    * Metoda vrací jestli je validátor validní
+    * @return boolean
+    */
+   public function isValid();
+
    /**
     * Metoda provede validaci prvku
     * @param Form_Element $elemObj -- element

@@ -45,7 +45,7 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
    }
 
    public function validate(Form_Element $elemObj) {
-      $values = $elemObj->getValues();
+      $values = $elemObj->getUnfilteredValues();
       if(empty($values)){
          return true;
       }

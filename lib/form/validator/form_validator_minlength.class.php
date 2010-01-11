@@ -26,15 +26,7 @@ class Form_Validator_MinLength extends Form_Validator implements Form_Validator_
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-   //      if($this->min === null){
-   //         $element->htmlLabel()->addContent(' '.sprintf(_("(max. %s znaků)"), $this->max));
-   //      } else if($this->max === null){
-            $element->htmlLabel()->addContent(' '.sprintf(_("(min. %s znaků)"), $this->min));
-   //      } else if($this->min == $this->max){
-   //         $element->htmlLabel()->addContent(' '.sprintf(_("(%s znaků)"), $this->max));
-   //      } else {
-   //         $element->htmlLabel()->addContent(' '.sprintf(_("(%s - %s znaků)"),$this->min, $this->max));
-   //      }
+      $element->htmlLabel()->addContent(' '.sprintf(_("(min. %s znaků)"), $this->min));
    }
 
    public function validate(Form_Element $elemObj) {
@@ -44,7 +36,7 @@ class Form_Validator_MinLength extends Form_Validator implements Form_Validator_
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if(strlen($elemObj->getValues()) < $this->min) {
+               if(strlen($elemObj->getUnfilteredValues()) < $this->min) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
