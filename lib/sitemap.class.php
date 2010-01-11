@@ -32,24 +32,6 @@ class SiteMap {
    const SITEMAP_SITE_DEFAULT_PRIORITY = 0.5;
 
    /**
-    * Frekvence změn na stránce
-    * @var string
-    */
-   private $changeFreq = self::SITEMAP_SITE_CHANGE_YEARLY;
-
-   /**
-    * Priorita stránky v mapě
-    * @var float
-    */
-   private $priority = self::SITEMAP_SITE_DEFAULT_PRIORITY;
-
-   /**
-    * Priorita stránky s článkem v mapě
-    * @var float
-    */
-   private $priorityArticle = self::SITEMAP_SITE_DEFAULT_PRIORITY;
-
-   /**
     * Pole s položkami
     * @var array
     */
@@ -80,18 +62,11 @@ class SiteMap {
    private $category = null;
 
    /**
-    * Objekt cest modulu
-    * @var Routes
-    */
-   private $routes = null;
-
-   /**
     * Konstruktor -- vytvoří prostředí pro práci se sitemap
     *
     * @param Module -- objekt modulu
     */
    function __construct(Category $category, Routes $routes) {
-      $this->routes = $routes;
       $this->category = $category;
 
       $link = new Url_Link_Module();
@@ -109,19 +84,11 @@ class SiteMap {
    }
 
    /**
-    * Metoda vrací objekt cest
-    * @return Routes
-    */
-   final public function routes() {
-      return $this->routes;
-   }
-
-   /**
     * Metoda spouští proceduru pro přidávání položek do sitemap
     *
     */
    public function run() {
-      $this->addCategoryItem(filemtime(AppCore::getAppWebDir().Template::FACES_DIR));
+      
    }
 
    /**
@@ -133,22 +100,24 @@ class SiteMap {
     * @param string -- četnost změny (kostanta SITEMAP_SITE_CHANGE_...)
     * @param float -- priorita (0 - 1)
     */
-   public function addItem($url, $name, $lastChange = null, $frequency = null ,$priorityDown = 0.1) {
+   public function addItem($url, $name, DateTime $lastChange = null, $frequency = null ,$priorityDown = 1.0000) {
    // pokud je datum v budoucnosti nastavím aktuální
       $item = array('loc' => (string)$url,'name' => $name);
-      if($lastChange > time()) {
-         $lastChange = time();
-      }
+//      if($lastChange > time()) {
+//         $lastChange = time();
+//      }
+
       if($lastChange !== null|false) {
-         $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
-         $lastChange = $date->format('c');
-         $item['lastmod'] = $lastChange;
+//         $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
+//         $lastChange = $date->format('c');
+         $item['lastmod'] = $lastChange->format('c');
       }
-      if($frequency == null) {
-         $frequency = $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ};
+
+      if($frequency != null) {
+         $item['changefreq'] = $frequency;
       }
-      $item['changefreq'] = $frequency;
       $item['priority'] = $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY}-$priorityDown;
+      if($item['priority'] < 0) $item['priority'] = 0;
       array_push($this->items, $item);
    }
 
@@ -158,19 +127,9 @@ class SiteMap {
     * @param integer -- čas poslední změny (timestamp)
     * @param float -- (option) o kolik se má snížit priorita článků
     */
-   public function addCategoryItem($lastChange) {
-   // pokud je datum v budoucnosti nastavím aktuální
-      if($lastChange > time()) {
-         $lastChange = time();
-      }
-      if($lastChange === false|null) {
-         $lastChange = filemtime(AppCore::getAppWebDir().'index.php');
-      }
-
-      $date = new DateTime(date(DATE_ISO8601,$lastChange));
-      $lastChange = $date->format('c');
+   public function addCategoryItem(DateTime $lastChange) {
       $this->catItem = array('loc' => (string)$this->link(),
-          'lastmod' => $lastChange,
+          'lastmod' => $lastChange->format('c'),
           'changefreq' => $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},
           'priority'=>$this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY},
           'name' => $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_LABEL});
@@ -202,7 +161,7 @@ class SiteMap {
             foreach ($item['cat'] as $index => $_i) {
                if (!$_i OR $index == 'name') continue;
                // float čísla s tečkou a stejnou přesností
-               if(is_float($_i)) {
+               if(is_float($_i) OR is_numeric($_i)) {
                   $_i = sprintf("%1.4F", $_i);
                }
                echo "<$index>" . self::codeXML(trim((string)$_i)) . "</$index>\n";
@@ -243,7 +202,6 @@ class SiteMap {
     * Metoda přidá hlavní stránku
     */
    public static function addMainPage() {
-   //      $arr = array('loc' => (string)Url_Request::getBaseWebDir());
       array_push(self::$itemsAll, array('cat' => array('loc' => (string)Url_Request::getBaseWebDir())));
    }
 
