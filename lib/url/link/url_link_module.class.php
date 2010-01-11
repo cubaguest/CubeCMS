@@ -28,7 +28,7 @@ class Url_Link_Module extends Url_Link {
     * @param string -- název cesty
     * @param array -- pole s parametry pojmenovanými podle cesty
     *
-    * @return Links -- objket Links
+    * @return Url_Link_Module -- objket Links
     */
    public function route($name = null, $params = array()) {
       
@@ -60,7 +60,7 @@ class Url_Link_Module extends Url_Link {
 
    /**
     * Metoda odstraní všechny parametry v odkazu
-    * @return Links -- sám sebe
+    * @return Url_Link_Module -- sám sebe
     */
    public function clear($withOutCategory = false) {
       $this->route()->rmParam();
