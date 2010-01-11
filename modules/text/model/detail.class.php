@@ -15,7 +15,7 @@ class Text_Model_Detail extends Model_PDO {
     */
    const COLUMN_ID_CATEGORY = 'id_item';
    const COLUMN_SUBKEY = 'subkey';
-   const COLUMN_CHANGED_TIME = 'changed_time';
+   const COLUMN_CHANGED_TIME = 'changed';
    const COLUMN_TEXT = 'text';
    const COLUMN_LABEL = 'label';
    const COLUMN_TEXT_PANEL = 'text_panel';
@@ -55,8 +55,7 @@ class Text_Model_Detail extends Model_PDO {
       //          exit;
       // globalní prvky
       $dbc = new Db_PDO();
-      $this->setIUValues(array(self::COLUMN_TEXT => $texts, self::COLUMN_SUBKEY => $subKey,
-          self::COLUMN_CHANGED_TIME => time()));
+      $this->setIUValues(array(self::COLUMN_TEXT => $texts, self::COLUMN_SUBKEY => $subKey));
 
       if($label !== null){
          $this->setIUValues(array(self::COLUMN_LABEL => $label));
@@ -87,7 +86,6 @@ class Text_Model_Detail extends Model_PDO {
              ." WHERE ".self::COLUMN_ID_CATEGORY." = :idcategory");
       $dbst->bindParam(':idcategory', $idCat);
       $dbst->execute();
-//      var_dump($dbst);
       $fetch = $dbst->fetchObject();
       if($fetch == false){
          return false;
