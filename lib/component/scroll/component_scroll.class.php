@@ -62,10 +62,17 @@ class Component_Scroll extends Component {
    }
 
    /**
-    * Metoda vrací číslo stránky
+    * Metoda nastaveí číslo stránky
     */
    private function setPageNumber() {
       $this->selectPage = $this->pageLink()->getParam($this->getConfig('page_param'), 1);
+   }
+
+   /**
+    * Metoda nastaví číslo stránky
+    */
+   public function setCurPageNumber($page) {
+      $this->selectPage = $page;
    }
 
    /**
@@ -91,14 +98,14 @@ class Component_Scroll extends Component {
     * Spuštění pluginu
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
-   protected function mainController() {
+   public function mainController() {
    }
 
    /**
     * Metoda nastaví id šablony pro výpis
     * @param integer -- id šablony (jakékoliv)
     */
-   protected function mainView() {
+   public function mainView() {
       $this->countButtons();
       $this->countPagesButtons();
       $this->template()->selectedPage = $this->selectPage;
