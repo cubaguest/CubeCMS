@@ -13,6 +13,19 @@
       <title><?print(VVE_WEB_NAME);?>{*-PAGE_TITLE-*}</title>
 
       <base href="<?=Url_Link::getMainWebDir()?>" />
+      <?//feedy RSS
+      $model = new Model_Category();
+      $cats = $model->getCategoryList();
+      $link = new Url_Link(true);
+      foreach ($cats as $cat){
+         if($cat[Model_Category::COLUMN_FEEDS] != true) continue;
+         $link->category($cat[Model_Category::COLUMN_URLKEY])
+                 ->file(str_replace("{type}", 'rss', constant(ucfirst($cat[Model_Category::COLUMN_MODULE])
+                         ."_Routes::FEED_FILE")));
+         ?>
+      <link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat[Model_Category::COLUMN_CAT_LABEL]?>"
+            href="<?=$link?>" />
+      <?}?>
 
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
