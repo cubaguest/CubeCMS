@@ -258,6 +258,20 @@ class Locale {
    }
 
    /**
+    * Metoda vrací zvolené locales pro zadaný jazyk
+    * @param string -- jazyk (cs, en, de, ...)
+    */
+   public static function getLangLocale($lang = null) {
+      if($lang == null){
+         $lang =  self::$selectLang;
+      }
+      $locale = self::$locales[$lang];
+      // odstranění za tečkou
+      $locale = preg_replace("/\.[\w-]+/i", '', $locale);
+      return $locale;
+   }
+
+   /**
     * Metoda vrací výchozí jazyk aplikace (první, uvedený v configu)
     * @return string/array -- výchozí jazyk (cs, en, ..)
     */
