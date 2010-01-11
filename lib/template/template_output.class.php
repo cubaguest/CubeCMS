@@ -56,11 +56,13 @@ class Template_Output {
             $this->addHeader('Content-type: text/xml');
             break;
          case "rss":
-            $this->addHeader('Content-type: text/rss+xml');
+//            $this->addHeader('Content-type: application/rss+xml');
+            $this->addHeader('Content-type: application/xml');
 //            $this->addHeader('Content-type: text/xml');
             break;
          case "atom":
-            $this->addHeader('Content-type: text/atom+xml');
+//            $this->addHeader('Content-type: application/atom+xml');
+            $this->addHeader('Content-type: application/xml');
 //            $this->addHeader('Content-type: text/xml');
             break;
          case "txt":
@@ -69,19 +71,20 @@ class Template_Output {
          case "js":
             $this->addHeader("Content-type: application/x-javascript");
             break;
-         case "xhtml":
          case "html":
+         case "xhtml":
          case "php":
          default:
-            if(Auth::isLogin()) {
-               $this->addHeader( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-               $this->addHeader( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-               $this->addHeader( 'Cache-Control: no-store, no-cache, must-revalidate' );
-               $this->addHeader( 'Cache-Control: post-check=0, pre-check=0', false );
-               $this->addHeader( 'Pragma: no-cache' );
-            }
             $this->addHeader("Content-type: text/html");
+//            $this->addHeader("Content-type: application/xhtml+xml");
             break;
+      }
+      if(Auth::isLogin()) {
+         $this->addHeader( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+         $this->addHeader( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+         $this->addHeader( 'Cache-Control: no-store, no-cache, must-revalidate' );
+         $this->addHeader( 'Cache-Control: post-check=0, pre-check=0', false );
+         $this->addHeader( 'Pragma: no-cache' );
       }
    }
 
