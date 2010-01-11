@@ -555,14 +555,14 @@ class Component_UserFiles extends Component {
    /**
     * Hlavní metoda spuštění kontroleru
     */
-   protected function mainController() {
+   public function mainController() {
       ;
    }
 
    /**
     * Metoda inicializuje šablonu
     */
-   protected function mainView() {
+   public function mainView() {
       $this->template()->addTplFile("userfiles.phtml");
       $this->template()->addJsPlugin(new JsPlugin_JQuery());
       $this->template()->addJsPlugin(new JsPlugin_LightBox());

@@ -20,11 +20,6 @@ class Component {
    const COMPONENTS_DEFAULT_TEMPALTES_DIR = Template::TEMPLATES_DIR;
 
    /**
-    * Parametr pro přenos souboru js pluginu
-    */
-   //   const PARAMS_EPLUGIN_FILE_PREFIX = 'eplugin';
-
-   /**
     * Objekt šablony
     * @var Template
     */
@@ -150,13 +145,13 @@ class Component {
     * Spuštění pluginu
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
-   protected function mainController() {}
+   public function mainController() {}
 
    /**
     * Metoda nastaví id šablony pro výpis
     * @param integer -- id šablony (jakékoliv)
     */
-   protected function mainView() {}
+   public function mainView() {}
 
    /**
     * Metoda pro spouštění některých akcí přímo v kontroleru
@@ -224,9 +219,7 @@ class Component {
    }
 
    public function  __toString() {
-      $this->mainController();
       $this->mainView();
-
       return (string)$this->template();
    }
 }

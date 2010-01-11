@@ -35,7 +35,24 @@ class Component_Tcpdf extends Component {
                       .DIRECTORY_SEPARATOR.Locale::getLang().".php";
 
       // nastavení pro šablony
-      require_once Template::faceDir().'config'.DIRECTORY_SEPARATOR."tcpdf.conf.php";
+//      require_once Template::faceDir().'config'.DIRECTORY_SEPARATOR."tcpdf.conf.php";
+
+      /*
+       * Konfigurace tcpdf
+       * příklad lze nalézt v adresáři s knihovnou /lib/nonvve/tcpdf/
+      */
+
+      define("K_TCPDF_EXTERNAL_CONFIG", true);
+
+      /**
+       * header title
+       */
+      define ('VVE_PDF_HEADER_TITLE', VVE_WEB_NAME);
+
+      /**
+       * header description string
+       */
+      define ('VVE_PDF_HEADER_STRING', (string)new Url_Link());
 
       // donastavení do konfigu
       /**
@@ -78,14 +95,28 @@ class Component_Tcpdf extends Component {
        */
       define ('K_BLANK_IMAGE', K_PATH_IMAGES.'_blank.png');
 
+      /**
+       * height of cell repect font height
+       */
+      define('K_CELL_HEIGHT_RATIO', 1.25);
 
+      /**
+       * title magnification respect main font size
+       */
+      define('K_TITLE_MAGNIFICATION', 1.3);
+
+      /**
+       * reduction factor for small font
+       */
+      define('K_SMALL_RATIO', 2/3);
+      
 
       // jádro
       require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
                       .'nonvve'.DIRECTORY_SEPARATOR."tcpdf".DIRECTORY_SEPARATOR."tcpdf.php";
-      $this->setConfig('orientation', PDF_PAGE_ORIENTATION);
-      $this->setConfig('unit', PDF_UNIT);
-      $this->setConfig('format', PDF_PAGE_FORMAT);
+      $this->setConfig('orientation', VVE_PDF_PAGE_ORIENTATION);
+      $this->setConfig('unit', VVE_PDF_UNIT);
+      $this->setConfig('format', VVE_PDF_PAGE_FORMAT);
    }
 
    /**
@@ -97,23 +128,23 @@ class Component_Tcpdf extends Component {
               $this->getConfig("format"), $this->getConfig("unicode"), $this->getConfig("encoding"),
               $this->getConfig("diskcache"));
 
-      $this->tcPDFObj->SetCreator(PDF_CREATOR);
+      $this->tcPDFObj->SetCreator(VVE_PDF_CREATOR);
       $this->tcPDFObj->setLanguageArray($tcpdfLangSet);
 
       /**
        * @todo TOHLE dodělat !! nebo jestli to stačí
        */
       // set default monospaced font
-      $this->tcPDFObj->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+      $this->tcPDFObj->SetDefaultMonospacedFont(VVE_PDF_FONT_MONOSPACED);
       //set margins
-      $this->tcPDFObj->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+      $this->tcPDFObj->SetMargins(VVE_PDF_MARGIN_LEFT, VVE_PDF_MARGIN_TOP, VVE_PDF_MARGIN_RIGHT);
       //set auto page breaks
-      $this->tcPDFObj->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
+      $this->tcPDFObj->SetAutoPageBreak(true, VVE_PDF_MARGIN_BOTTOM);
       //set image scale factor
-      $this->tcPDFObj->setImageScale(PDF_IMAGE_SCALE_RATIO);
+      $this->tcPDFObj->setImageScale(VVE_PDF_IMAGE_SCALE_RATIO);
 
-      $this->tcPDFObj->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-      $this->tcPDFObj->SetHeaderMargin(PDF_MARGIN_HEADER);
+      $this->tcPDFObj->setHeaderFont(Array(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN));
+      $this->tcPDFObj->SetHeaderMargin(VVE_PDF_MARGIN_HEADER);
 
       return $this->tcPDFObj;
    }
@@ -163,7 +194,7 @@ class Component_Tcpdf extends Component {
     * Spuštění pluginu
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
-   protected function mainController() {
+   public function mainController() {
 
    }
 
@@ -171,7 +202,7 @@ class Component_Tcpdf extends Component {
     * Metoda nastaví id šablony pro výpis
     * @param integer -- id šablony (jakékoliv)
     */
-   protected function mainView() {
+   public function mainView() {
 
    }
 }

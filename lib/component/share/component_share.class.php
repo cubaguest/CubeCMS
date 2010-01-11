@@ -33,14 +33,14 @@ class Component_Share extends Component {
     * Spuštění pluginu
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
-   protected function mainController() {
+   public function mainController() {
    }
 
    /**
     * Metoda nastaví id šablony pro výpis
     * @param integer -- id šablony (jakékoliv)
     */
-   protected function mainView() {
+   public function mainView() {
       $m = new Component_Share_Model();
       $this->template()->shares = $m->getShares();
       
