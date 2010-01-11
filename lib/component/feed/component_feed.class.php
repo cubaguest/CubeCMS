@@ -113,11 +113,8 @@ class Component_Feed extends Component {
 
       $feed->writeElement('docs', "http://www.rssboard.org/rss-specification");
 
-      if($this->getConfig('link') != null) {
-         $feed->writeElement('link', $this->getConfig('link'));
-      } else {
-         $feed->writeElement('link', Url_Link::getMainWebDir());
-      }
+      $feed->writeElement('link', $this->getConfig('link')->clear());
+
       $feed->startElement("atom:link");
       $feed->writeAttribute("href", $this->getConfig('link'));
       $feed->writeAttribute("rel", "self");
@@ -146,7 +143,7 @@ class Component_Feed extends Component {
          $feed->startElement("item");// SOF item
          $feed->writeElement('title', $item['title']);
          $feed->writeElement('link', $item['link']);
-         $feed->writeElement('description', $item['desc']);
+         $feed->writeElement('description', strip_tags($item['desc'], "<p><a><strong>"));
          $feed->writeElement('guid', $item['guid']);
          if($item['authorEmail'] != null) {
             $feed->writeElement('author', $item['authorEmail']);
@@ -198,12 +195,14 @@ class Component_Feed extends Component {
       $feed->writeAttribute('type', "text");
 
       $feed->startElement('link');
-      if($this->getConfig('link') != null) {
          $feed->writeAttribute('href', $this->getConfig('link'));
-      } else {
-         $feed->writeAttribute('href', new Url_Link());
-      }
-      $feed->writeAttribute('rel', "self");
+         $feed->writeAttribute('rel', "self");
+         $feed->writeAttribute('type', "application/atom+xml");
+      $feed->endElement();
+      
+      $feed->startElement('link');
+         $feed->writeAttribute('href', $this->getConfig('link')->clear());
+         $feed->writeAttribute('rel', "alternate");
       $feed->endElement();
 
       $feed->writeElement('id', 'tag:'.$_SERVER['SERVER_NAME'].','.date("Y").':'.$this->getConfig('link'));
@@ -245,9 +244,9 @@ class Component_Feed extends Component {
 
          $feed->writeElement('updated', $item['pubDate']->format(DATE_RFC3339));
 
-         $feed->startElement('summary');
-            $feed->text(vve_tpl_truncate(strip_tags($item['desc']),400));
-          $feed->endElement(); // eof summary
+//         $feed->startElement('summary');
+//            $feed->text(vve_tpl_truncate(strip_tags($item['desc']),400));
+//          $feed->endElement(); // eof summary
 
 //         <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>
          $feed->startElement('link');
@@ -258,15 +257,15 @@ class Component_Feed extends Component {
 
 
 //         <content type="xhtml" xml:lang="en"   xml:base="http://diveintomark.org/">
-//         $feed->startElement('content');
-//            $feed->writeAttribute('type', 'xhtml');
+         $feed->startElement('content');
+            $feed->writeAttribute('type', 'xhtml');
 //            $feed->writeAttribute('xml:lang', Locale::getLang());
 //            $feed->writeAttribute('xml:base', "http://diveintomark.org/");
-//            $feed->startElement('div');
-//               $feed->writeAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-//               $feed->text($item['desc']);
-//            $feed->endElement(); // eof div
-//         $feed->endElement(); // eof content
+            $feed->startElement('div');
+               $feed->writeAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+               $feed->text(vve_tpl_xhtml_cut(strip_tags($item['desc'], "<p><a><strong>"), 400));
+            $feed->endElement(); // eof div
+         $feed->endElement(); // eof content
 
 //         if($item['category'] != null) {
 //            $feed->startElement('category'); // SOF category
