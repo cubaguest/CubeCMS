@@ -139,10 +139,19 @@ class Category {
    }
 
    /**
+    * Metoda vrací název kategorie alias pro getName
+    * @return string -- název kategorie
+    * @deprecated -- použít getName
+    */
+   public function getLabel() {
+      return $this->getName();
+   }
+
+   /**
     * Metoda vrací název kategorie
     * @return string -- název kategorie
     */
-   public function getLabel() {
+   public function getName() {
       return (string)$this->category->{Model_Category::COLUMN_CAT_LABEL};
    }
 
