@@ -51,8 +51,7 @@ class PhotoGalery_Model_Images extends Model_PDO {
 
    public function saveImage($idCat, $idArticle, $file = null, $name = null, $desc = null, $ord = '0', $idImage = null) {
       // globalní prvky
-      $this->setIUValues(array(self::COLUMN_TIME_EDIT => time(),
-              self::COLUMN_ID_CAT => $idCat,
+      $this->setIUValues(array(self::COLUMN_ID_CAT => $idCat,
               self::COLUMN_ID_ART => $idArticle,
               self::COLUMN_ORDER => $ord));
 
@@ -114,6 +113,20 @@ class PhotoGalery_Model_Images extends Model_PDO {
               ." AND (".PhotoGalery_Model_Images::COLUMN_ID_ART." = '".$idArt."')");
       $count = $dbst->fetch();
       return $count[0];
+   }
+
+   /**
+    * Metoda nastaví změnu obrázku
+    * @param int $id -- id obrázku
+    * @todo nepoužito (ověřit jak to dělat lépe)
+    */
+   public function setLastChange($idImage) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
+          ." WHERE (".self::COLUMN_ID." = :idimage)");
+      $dbst->bindParam(':idimage', $idImage, PDO::PARAM_INT);
+      return $dbst->execute();
    }
 
 }

@@ -35,8 +35,11 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
-   <p><?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $editDate->format("U"))?></p>
-   
+   <?$this->includeTpl('articletools.phtml', true, array(
+      'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
+              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+              'linkToPdf' => $this->link()->route('detailpdf'),
+              'shares' => $this->shares));?>
 
    <script type="text/javascript">
       /* <![CDATA[ */

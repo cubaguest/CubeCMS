@@ -15,17 +15,16 @@ class Articles_Controller extends Controller {
          $artModel->getCountArticles($this->category()->getId()));
       
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-         $this->category()->getModule()->getParam('scroll', 2));
+         $this->category()->getModule()->getParam('scroll', 5));
 
       $scrollComponent->runCtrlPart();
 
-      $articles = $artModel->getList($this->category()->getId(),!$this->rights()->isWritable(),
+      $articles = $artModel->getList($this->category()->getId(),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
+         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
 
-
-      $this->view()->template()->scrollComp = $scrollComponent;
-      $this->view()->template()->articles = $articles;
+      $this->view()->scrollComp = $scrollComponent;
+      $this->view()->articles = $articles;
    }
 
    /**
@@ -46,28 +45,20 @@ class Articles_Controller extends Controller {
 
       $scrollComponent->runCtrlPart();
 
-      if($this->rights()->isWritable()){
-         $onlyPublic = false;
-      } else {
-         $onlyPublic = true;
-      }
-
-      $articles = $artModel->getListTop($this->category()->getId(),$onlyPublic,
+      $articles = $artModel->getListTop($this->category()->getId(),
          $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE));
+         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
       
-      $this->view()->template()->articles = $articles;
-      $this->view()->template()->scrollComp = $scrollComponent;
-      $this->view()->template()->top = true;
-      $this->view()->template()->addTplFile("list.phtml");
-      $this->view()->template()->addCssFile("style.css");
+      $this->view()->articles = $articles;
+      $this->view()->scrollComp = $scrollComponent;
+      $this->view()->top = true;
    }
 
    public function archiveController() {
       $this->checkReadableRights();
 
       $m = new Articles_Model_List();
-      $this->view()->template()->articles = $m->getListAll($this->category()->getId());
+      $this->view()->articles = $m->getListAll($this->category()->getId());
    }
 
    public function showController() {
@@ -105,54 +96,14 @@ class Articles_Controller extends Controller {
       $shares->setConfig('url', (string)$this->link());
       $shares->setConfig('title', $article->{Articles_Model_Detail::COLUMN_NAME});
 
-      $this->view()->template()->shares=$shares;
-      $this->view()->template()->article=$article;
+      $this->view()->shares=$shares;
+      $this->view()->article=$article;
    }
 
    public function showPdfController() {
       $this->checkReadableRights();
 
-      // načtení článku
-      $artM = new Articles_Model_Detail();
-      $article = $artM->getArticle($this->getRequest('urlkey'));
-
-      if($article == false) return false;
-
-      // komponenta TcPDF
-      $c = new Component_Tcpdf();
-      // vytvoření pdf objektu
-      $c->pdf()->SetAuthor($article->{Model_Users::COLUMN_USERNAME});
-      $c->pdf()->SetTitle($article->{Articles_Model_Detail::COLUMN_NAME});
-      $c->pdf()->SetSubject(VVE_WEB_NAME." - ".$this->category()->getLabel());
-      $c->pdf()->SetKeywords($this->category()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
-
-      // ---------------------------------------------------------
-      $c->pdf()->setHeaderData('', 0, PDF_HEADER_TITLE." - ".$this->category()->getLabel()
-              ." - ".$article->{Articles_Model_Detail::COLUMN_NAME},
-              strftime("%x")." - ".$this->link()->route('detail'));
-      // set font
-      $font = PDF_FONT_NAME_MAIN;
-      // add a page
-      $c->pdf()->AddPage();
-      // nadpis
-      $c->pdf()->SetFont($font, 'B', PDF_FONT_SIZE_MAIN+2);
-      $name = "<h1>".$article->{Articles_Model_Detail::COLUMN_NAME}
-      ."</h1>";
-      $c->pdf()->writeHTML($name, true, 0, true, 0);
-
-      $c->pdf()->Ln();
-      // datum autor 
-      $c->pdf()->SetFont($font, 'BI', PDF_FONT_SIZE_MAIN);
-      $author = "<p>(".strftime("%x", $article->{Articles_Model_Detail::COLUMN_ADD_TIME})
-      ." - ".$article->{Model_Users::COLUMN_USERNAME}.")</p>";
-      $c->pdf()->writeHTML($author, true, 0, true, 0);
-      $c->pdf()->Ln();
-
-
-      $c->pdf()->SetFont($font, '', PDF_FONT_SIZE_MAIN);
-      $c->pdf()->writeHTML($article->{Articles_Model_Detail::COLUMN_TEXT}, true, 0, true, 0);
-      // výstup
-      $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
+      $this->view()->urlkey = $this->getRequest('urlkey');
    }
 
    /**
@@ -189,8 +140,8 @@ class Articles_Controller extends Controller {
          }
       }
 
-      $this->view()->template()->addForm = $addForm;
-      $this->view()->template()->edit = false;
+      $this->view()->addForm = $addForm;
+      $this->view()->edit = false;
    }
 
    /**
@@ -230,8 +181,9 @@ class Articles_Controller extends Controller {
          }
 
          if($artModel->saveArticle($names, $editForm->text->getValues(), $urlkey,
-         $this->category()->getId(), $this->auth()->getUserId(),$editForm->public->getValues(),
+         $this->category()->getId(), Auth::getUserId(),$editForm->public->getValues(),
          $editForm->art_id->getValues())) {
+
             // nahrání nové verze článku (kvůli url klíči)
             $article = $artModel->getArticleById($editForm->art_id->getValues());
 
@@ -242,8 +194,8 @@ class Articles_Controller extends Controller {
          }
       }
 
-      $this->view()->template()->addForm = $editForm;
-      $this->view()->template()->edit = true;
+      $this->view()->addForm = $editForm;
+      $this->view()->edit = true;
    }
 
    /**
@@ -286,6 +238,13 @@ class Articles_Controller extends Controller {
    public static function clearOnRemove(Category $category) {
       $model = new Articles_Model_Detail();
       $model->deleteArticleByCat($category->getId());
+   }
+
+   // RSS
+   public function exportController(){
+      $this->checkReadableRights();
+      
+      $this->view()->type = $this->getRequest('type', 'rss');
    }
 }
 ?>

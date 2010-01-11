@@ -43,21 +43,20 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
        ($this->category()->getRights()->isWritable() AND
        $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == $this->category()->getRights()->getAuth()->getId())) {
       $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_article', $this->_("Upravit článek"),
+      $toolbox->addTool('edit_article', $this->_("Upravit"),
           $this->link()->route('edit'),
           $this->_("Upravit zobrazený článek"), "page_edit.png");
-      $toolbox->addTool('article_delete', $this->_("Smazat článek"),
+      $toolbox->addTool('article_delete', $this->_("Smazat"),
           $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
           'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
           $this->_('Opravdu smazat článek?'));
       $this->includeTplObj($toolbox);
    }
    ?>
-   <br />
-   <p><?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $editDate->format("U"))?></p>
-   <br />
-   <p><?=$this->_('Stáhnout')?>:&nbsp;<a href="<?=$this->link()->route('detailpdf')?>" title="pdf">pdf</a> </p>
-   <br />
-   <?=$this->shares?>
+      <?$this->includeTpl('articletools.phtml', true, array(
+      'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
+              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+              'linkToPdf' => $this->link()->route('detailpdf'),
+              'shares' => $this->shares));?>
    <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
 </div>

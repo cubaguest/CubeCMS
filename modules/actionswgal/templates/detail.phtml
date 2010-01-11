@@ -23,8 +23,6 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
          print ("&nbsp;&mdash;&nbsp;");
          print ($stopDate);
       }?>
-      <br />
-      <?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $this->action->{Actions_Model_Detail::COLUMN_EDIT_TIME})?>
    </p>
    <!--<p>
       <a href="<?=$this->link()->route('detail')?>"><?=$this->_('Text')?></a>
@@ -82,7 +80,12 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
       <?}?>
    <hr class="reseter" />
 
-   <?$this->includeTpl('tools.phtml')?>
+   <?//$this->includeTpl('tools.phtml')?>
+   <?$this->includeTpl('articletools.phtml', true, array(
+                 'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+                 'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
+                 'linkToPdf' => $this->link()->route('detailpdf'),
+                 'shares' => $this->shares));?>
    <br />
    <?=$this->shares?>
 </div>

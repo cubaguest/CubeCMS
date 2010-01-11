@@ -15,7 +15,6 @@ class Actions_Model_Detail extends Model_PDO {
    const COLUMN_NAME = 'name';
    const COLUMN_TEXT = 'text';
    const COLUMN_URLKEY = 'urlkey';
-   const COLUMN_EDIT_TIME = 'edit_time';
    const COLUMN_ID_USER = 'id_user';
    const COLUMN_ID_CAT = 'id_category';
    const COLUMN_ID = 'id_action';
@@ -23,6 +22,7 @@ class Actions_Model_Detail extends Model_PDO {
    const COLUMN_DATE_START = 'start_date';
    const COLUMN_DATE_STOP = 'stop_date';
    const COLUMN_IMAGE = 'image';
+   const COLUMN_CHANGED = 'changed';
 
    /**
     * Metoda uloží akci do db
@@ -35,7 +35,7 @@ class Actions_Model_Detail extends Model_PDO {
            $idUser = 0, $public = true, $id = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
-              self::COLUMN_URLKEY => $urlKey, self::COLUMN_EDIT_TIME => time(),
+              self::COLUMN_URLKEY => $urlKey,
               self::COLUMN_PUBLIC => $public, self::COLUMN_IMAGE => $image,
               self::COLUMN_DATE_START => $dateFrom->format('U'),
               self::COLUMN_DATE_STOP => $dateTo->format('U')));
@@ -97,9 +97,16 @@ class Actions_Model_Detail extends Model_PDO {
     */
    public function getAction($urlKey) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
-              ." LIMIT 0, 1");
+//      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+//              ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+//              ." LIMIT 0, 1");
+
+      $dbst = $dbc->prepare("SELECT action.*, user.".Model_Users::COLUMN_USERNAME
+         ." FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
+         ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
+         ." = user.".Model_Users::COLUMN_ID
+         ." WHERE (action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+         ." LIMIT 0, 1");
       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
       $dbst->execute();
 

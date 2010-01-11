@@ -1,5 +1,5 @@
 <?php
-class Actionswgal_View extends View {
+class Actionswgal_View extends Actions_View {
    public function init() {
       $this->template()->addCssFile("style.css");
    }

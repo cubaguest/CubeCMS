@@ -151,23 +151,16 @@ class Articles_Model_Detail extends Model_PDO {
    }
 
    /**
-    * Metoda vrací poslední změnu článků v dané kategorii
-    * @param int $id -- id kategorie
-    * @return int -- timestamp
+    * Metoda nastaví změnu článku
+    * @param int $id -- id článku
     */
-   public function getLastChange($id) {
+   public function setLastChange($idArt) {
       $dbc = new Db_PDO();
-         $dbst = $dbc->prepare("SELECT ".self::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
-         ." WHERE (".self::COLUMN_ID_CATEGORY." = :id)".
-          " LIMIT 0, 1");
-      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-      $dbst->execute();
-      
-      $fetch = $dbst->fetchObject();
-      if($fetch != false){
-         return $fetch->et;
-      }
-      return false;
+      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
+          ." WHERE (".self::COLUMN_ID." = :idart)");
+      $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
+      return $dbst->execute();
    }
 }
 

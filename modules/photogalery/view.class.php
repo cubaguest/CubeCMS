@@ -12,8 +12,12 @@ class Photogalery_View extends View {
 	}
 	
 	public function editphotosView() {
+      $this->template()->addPageTitle($this->_('úprava obrázků'));
+      $this->template()->addPageHeadline($this->_('úprava obrázků'));
+
       $this->template()->addTplFile("addimage.phtml");
       $this->template()->addTplFile("editphotos.phtml");
+
    }
 
    public function uploadFileView() {}

@@ -11,6 +11,7 @@ class Actions_Routes extends Routes {
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
       // detail akce
       $this->addRoute('detail', "::urlkey::", 'show','{urlkey}/');
+      $this->addRoute('detailpdf', "::urlkey::.pdf", 'showPdf','{urlkey}.pdf');
       // list akcí
       $this->addRoute('normal', null, 'main', null);
    }

@@ -1,19 +1,18 @@
 <?php
 class Articles_SiteMap extends SiteMap {
 	public function run() {
-      $articleModel = new Articles_Model_Detail();
-
-      // kategorie
-      $this->addCategoryItem($articleModel->getLastChange($this->category()->getId()));
-
-
       $articleModel = new Articles_Model_List();
-      $articleArr = $articleModel->getList($this->category()->getId());
-      foreach ($articleArr as $article) {
-         $this->addItem($this->link()->route('detail', array('articlekey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
+      // kategorie
+      $this->addCategoryItem(new DateTime($articleModel->getLastChange($this->category()->getId())));
+
+      // články
+      $articles = $articleModel->getListAll($this->category()->getId());
+      while ($article = $articles->fetch()) {
+         $this->addItem($this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
             $article->{Articles_Model_Detail::COLUMN_NAME},
-            $article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
+            new DateTime($article->{Articles_Model_Detail::COLUMN_EDIT_TIME}));
       }
+//      $this->addItem($this->link()->route('detail', array('urlkey' => 'url')),'art', new DateTime());
 	}
 }
 ?>

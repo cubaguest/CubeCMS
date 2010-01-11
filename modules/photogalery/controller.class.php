@@ -35,8 +35,8 @@ class Photogalery_Controller extends Controller {
       $this->checkReadableRights();
 
       $modelImages = new PhotoGalery_Model_Images();
-      $this->view()->template()->images = $modelImages->getImages($this->category()->getId(),
-              $this->getOption('idArt', $this->category()->getId()));
+      $this->view()->images = $modelImages->getImages($this->category()->getId(),
+              $this->getOption('idArt'));
    }
 
    public function edittextController() {
@@ -72,7 +72,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->addTplFile("edittext.phtml");
    }
 
-   public function editphotosController() {
+   public function editphotosController($delImgCallBackFunc = null) {
       $this->checkWritebleRights();
 
       $imagesM = new PhotoGalery_Model_Images();
@@ -96,14 +96,11 @@ class Photogalery_Controller extends Controller {
       $editForm->addElement($imgDel);
       $imgId = new Form_Element_Hidden('id');
       $editForm->addElement($imgId);
-//      $imgFile = new Form_Element_Hidden('file');
-//      $editForm->addElement($imgFile);
 
       $submit = new Form_Element_Submit('save', $this->_('Uložit'));
       $editForm->addElement($submit);
 
       if($editForm->isValid()) {
-//         $files = $editForm->file->getValues();
          $names = $editForm->name->getValues();
          $descs = $editForm->desc->getValues();
          $orders = $editForm->ord->getValues();
@@ -130,6 +127,7 @@ class Photogalery_Controller extends Controller {
                        null, $names[$id], $descs[$id],$orders[$id],$id);
             }
          }
+
          $this->infoMsg()->addMessage($this->_('Obrázky byly uloženy'));
          $this->link()->reload();
       }
@@ -137,8 +135,6 @@ class Photogalery_Controller extends Controller {
       // odkaz na editaci obrázku
       $this->view()->template()->linkImageCrop = $this->link()->route('editphoto',
               array('id' => '%s'));
-//      $this->view()->template()->linkBack = ;
-
 
       $this->view()->template()->images = $imagesM->getImages($this->category()->getId(), $this->getOption('idArt'));
       $this->view()->template()->addForm = $addForm;
@@ -174,6 +170,7 @@ class Photogalery_Controller extends Controller {
          $imagesM = new PhotoGalery_Model_Images();
          $imagesM->saveImage($this->category()->getId(), $addForm->idArt->getValues(),
                  $image->getName(), $image->getName());
+
       }
       return $addForm;
    }
@@ -243,10 +240,8 @@ class Photogalery_Controller extends Controller {
          }
       }
 
-//      $this->view()->template()->linkBack = $this->link()->route('editimages');
       $this->view()->template()->form = $editForm;
       $this->view()->template()->image = $image;
-//         var_dump($this->view()->template()->image);
    }
 }
 ?>

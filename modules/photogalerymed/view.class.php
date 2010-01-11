@@ -1,5 +1,5 @@
 <?php
-class Photogalerymed_View extends View {
+class Photogalerymed_View extends Articles_View {
 	/**
 	 * Inicializace
 	 */
@@ -28,6 +28,10 @@ class Photogalerymed_View extends View {
 
 
    public function editphotosView() {
+      $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
+         ." - ".$this->_('úprava obrázků'));
+      $this->template()->addPageHeadline($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
+         ." - ".$this->_('úprava obrázků'));
       $this->template()->addTplFile('addimage.phtml', 'photogalery');
       $this->template()->addTplFile('editphotos.phtml', 'photogalery');
    }

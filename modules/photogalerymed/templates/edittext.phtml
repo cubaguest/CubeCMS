@@ -22,4 +22,8 @@ if($this->edit){
    ?>
 </div>
 <?
-$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
+if($this->edit){
+   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('detail')));
+} else {
+   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route()));
+}

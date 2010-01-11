@@ -4,8 +4,6 @@ $this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
 ?>
 
 <div>
-   <!--<h2><?=htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>&nbsp;-->
-   <!--</h2>-->
    <p>
       <?
       $startDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_START});
@@ -15,8 +13,6 @@ $this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
          print ("&nbsp;&mdash;&nbsp;");
          print ($stopDate);
       }?>
-      <br />
-   <?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $this->action->{Actions_Model_Detail::COLUMN_EDIT_TIME})?>
    </p>
    <?
    if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
@@ -27,6 +23,11 @@ $this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
 
    <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />
+   <?$this->includeTpl('articletools.phtml', true, array(
+                 'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+                 'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
+                 'linkToPdf' => $this->link()->route('detailpdf'),
+                 'shares' => $this->shares));?>
 
    <?
    if($this->category()->getRights()->isWritable()) {
@@ -41,7 +42,5 @@ $this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
       $this->includeTplObj($toolbox);
    }
    ?>
-   <br />
-   <?=$this->shares?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true);?>

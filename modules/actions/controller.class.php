@@ -82,7 +82,18 @@ class Actions_Controller extends Controller {
             $this->view()->template()->linkBack = $this->link()->route();
       }
 
+      // komponenta pro vypsání odkazů na sdílení
+      $shares = new Component_Share();
+      $shares->setConfig('url', (string)$this->link());
+      $shares->setConfig('title', $this->action->{Actions_Model_Detail::COLUMN_NAME});
+      $this->view()->template()->shares=$shares;
+
       $this->view()->template()->action = $this->action;
+   }
+
+   public function showPdfController() {
+      $this->checkReadableRights();
+      $this->view()->urlkey = $this->getRequest('urlkey');
    }
 
    public function archiveController(){
@@ -129,7 +140,7 @@ class Actions_Controller extends Controller {
 
          $ids = $model->saveAction($names, $form->text->getValues(), $urlkeys,
                  $form->date_start->getValues(), $date_stop,
-                 $file, $this->category()->getId(), $this->auth()->getUserId(),
+                 $file, $this->category()->getId(), Auth::getUserId(),
                  $form->public->getValues());
 
          $act = $model->getActionById($ids);
@@ -207,7 +218,7 @@ class Actions_Controller extends Controller {
 
          $model->saveAction($names, $form->text->getValues(), $urlkeys,
                  $form->date_start->getValues(), $date_stop,
-                 $file, $this->category()->getId(), $this->auth()->getUserId(),
+                 $file, $this->category()->getId(), Auth::getUserId(),
                  $form->public->getValues(),$action->{Actions_Model_Detail::COLUMN_ID});
 
          $act = $model->getActionById($action->{Actions_Model_Detail::COLUMN_ID});
@@ -269,7 +280,7 @@ class Actions_Controller extends Controller {
 
       $ePub = new Form_Element_Checkbox('public', $this->_('Veřejný'));
       $ePub->setSubLabel($this->_('Veřejný - viditelný všem návštěvníkům'));
-      $ePub->setUnfilteredValues(true);
+      $ePub->setValues(true);
       $form->addElement($ePub);
 
       $eSub = new Form_Element_Submit('save', $this->_('Uložit'));
