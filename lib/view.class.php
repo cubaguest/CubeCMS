@@ -62,7 +62,6 @@ abstract class View {
     * @param mixed $value -- hodnota proměnné
     */
    public function  __set($name, $value) {
-//      $this->viewVars[$name] = $value;
       $this->template()->{$name} = $value;
    }
 
@@ -93,9 +92,6 @@ abstract class View {
     * @param string $name -- název proměnné
     */
    public function  __unset($name) {
-      //      if(isset ($this->viewVars[$name])){
-      //         unset ($this->viewVars[$name]);
-      //      }
       if(isset ($this->template()->{$name})){
          unset ($this->template()->{$name});
       }
