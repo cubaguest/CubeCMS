@@ -130,7 +130,6 @@ class Categories_Controller extends Controller {
       $form->parent_cat->setOptions($this->categoriesArray);
       $form->parent_cat->setValues($selCat->getParentId());
 
-
       $form->module->setValues($cat[Model_Category::COLUMN_MODULE]);
       $form->moduleParams->setValues($cat[Model_Category::COLUMN_PARAMS]);
       $form->urlkey->setValues($cat[Model_Category::COLUMN_URLKEY]);
@@ -142,6 +141,7 @@ class Categories_Controller extends Controller {
       $form->sitemap_frequency->setValues($cat[Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ]);
 
       // práva
+      $form->rights_default->setValues($cat[Model_Category::COLUMN_DEF_RIGHT]);
       $rModel = new Model_Rights();
       $rights = $rModel->getRights($this->getRequest('categoryid'));
       if($rights !== false){
@@ -150,7 +150,6 @@ class Categories_Controller extends Controller {
             $form->{$grName}->setValues($right->{Model_Rights::COLUMN_RIGHT});
          }
       }
-
 
       // odeslání formuláře
       if($form->isValid()) {
@@ -179,13 +178,22 @@ class Categories_Controller extends Controller {
                $urlkey[$lang] = vve_cr_url_key(strtolower($variable));
             }
          }
+
+         // zjištění jestli je možné vytvoři feedy
+         $classRName = ucfirst($form->module->getValues())."_Routes::FEEDS";
+         $feeds = false;
+         if(constant($classRName) != null){
+            $feeds = true;
+         }
+
          // kategorie
          $categoryModel = new Model_Category();
          $categoryModel->saveEditCategory($this->getRequest('categoryid'), $form->name->getValues(),$form->alt->getValues(),
              $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
              $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
              $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
-             $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
+             $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
+                 $form->rights_default->getValues(), $feeds);
 
          // práva
          $usrModel = new Model_Users();
@@ -258,13 +266,20 @@ class Categories_Controller extends Controller {
             }
          }
 
+         // zjištění jestli je možné vytvoři feedy
+         $classRName = ucfirst($form->module->getValues())."_Routes::FEEDS";
+         $feeds = false;
+         if(constant($classRName) != null){
+            $feeds = true;
+         }
 
          $categoryModel = new Model_Category();
          $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
              $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
              $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
              $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
-             $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues());
+             $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
+             $form->rights_default->getValues(), $feeds);
 
          // práva
          $usrModel = new Model_Users();
@@ -381,6 +396,11 @@ class Categories_Controller extends Controller {
       // pole s typy práv
       $rightsTypes = array('r--'=>'r--', '-w-'=>'-w-', '--c'=>'--c', 'rw-'=>'rw-',
           'r-c'=>'r-c', '-wc'=>'-wc', 'rwc'=>'rwc', '---' => '---');
+
+      // výchozí práva kategorie
+      $catGrpRigths = new Form_Element_Select('rights_default', $this->_('Výchozí práva'));
+      $catGrpRigths->setOptions($rightsTypes);
+      $form->addElement($catGrpRigths, 'rights');
 
       while ($group = $groups->fetchObject()) {
          if($group->{Model_Users::COLUMN_GROUP_LABEL} != null) {
