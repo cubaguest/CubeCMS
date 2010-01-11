@@ -266,7 +266,10 @@ class Template {
     * @param string $name -- název souboru
     */
    public function addTplFile($name) {
-      array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR).$name);
+      $file = self::getFileDir($name, self::TEMPLATES_DIR).$name;
+      if(!in_array($file, $this->templateFiles)){
+         array_push($this->templateFiles, $file);
+      }
    }
 
    /**
@@ -275,9 +278,18 @@ class Template {
     */
    public function  __toString() {
       ob_start();
-      $this->renderTemplate();
+//      $this->renderTemplate();
+      foreach ($this->templateFiles as $file) {
+         if(file_exists($file)) {
+//            try {
+               include $file;
+//            } catch (Exception $e) {
+//               new CoreErrors($e);
+//            }
+         }
+      }
       $cnt = ob_get_contents();
-      ob_clean();
+      ob_end_clean();
       return $cnt;
    }
 
@@ -287,19 +299,7 @@ class Template {
     */
    public function renderTemplate() {
       // zastavení výpisu buferu
-      ob_start();
-      foreach ($this->templateFiles as $file) {
-         if(file_exists($file)) {
-            try {
-               include $file;
-            } catch (Exception $e) {
-               new CoreErrors($e);
-            }
-         }
-      }
-      $contents = ob_get_contents();
-      ob_end_clean();
-      print (string)$contents;
+      print ($this);
    }
 
    /**
@@ -521,8 +521,14 @@ class Template {
       } else {
          throw new UnexpectedValueException(_('Nepodporovaný typ zdroje'));
       }
+   }
 
-
+   /**
+    * Metoda vrací všechny proměnné šablony
+    * @return array
+    */
+   public function getTemplateVars(){
+      return  $this->privateVars;
    }
 }
 ?>

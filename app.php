@@ -15,6 +15,11 @@
 
 class AppCore {
    /**
+    * Název enginu
+    */
+   const ENGINE_NAME = 'VVE';
+
+   /**
     * Verze enginu
     */
    const ENGINE_VERSION = '6.0.0';
@@ -186,6 +191,11 @@ class AppCore {
       //		Definice globálních konstant
       define('URL_SEPARATOR', '/');
       define('VVE_APP_IS_RUN', true);
+      // verze PHP
+      if(!defined('PHP_VERSION_ID')){
+         $version = explode('.',PHP_VERSION);
+         define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+      }
       set_magic_quotes_runtime(false); // magic quotes OFF !!
       if(get_magic_quotes_gpc() === 1) trigger_error("Magic quotes is Enable, please disable this feature");
       require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
@@ -548,7 +558,7 @@ class AppCore {
    public function assignMainVarsToTemplate() {
       //	Hlavni promene strany
       $this->coreTpl->rootDir = self::getAppWebDir();
-      $link = new Links();
+      $link = new Url_Link();
       $this->coreTpl->setPVar("mainWebDir", Url_Request::getBaseWebDir());
       $this->coreTpl->setPVar("imagesDir", Template::face().Template::IMAGES_DIR.URL_SEPARATOR);
       $this->coreTpl->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
@@ -561,7 +571,7 @@ class AppCore {
       // Vytvoření odkazů s jazyky
       $langs = array();
       $langNames = Locale::getAppLangsNames();
-      $link = new Links();
+      $link = new Url_Link();
       foreach (Locale::getAppLangs() as $langKey => $lang) {
          $langArr = array();
          $langArr['name'] = $lang;
@@ -593,7 +603,7 @@ class AppCore {
       $this->coreTpl->countAllSqlQueries = Db_PDO::getCountQueries();
       $this->coreTpl->addTplFile("index.phtml", true);
       // render šablony
-      $this->coreTpl->renderTemplate();
+      print($this->coreTpl);
    }
 
    /**
@@ -771,6 +781,8 @@ class AppCore {
          .$catObj->getModule()->getName().DIRECTORY_SEPARATOR.'sitemap.class.php')) {
             $sitemap = new SiteMap($catObj, $routes, $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},
                     $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY});
+            // vložení alespoň změny kategorie
+            $sitemap->addCategoryItem(new DateTime($category->{Model_Category::COLUMN_CHANGED}));
          } else {
             $sClassName = ucfirst($catObj->getModule()->getName()).'_Sitemap';
             $sitemap = new $sClassName($catObj, $routes, $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},

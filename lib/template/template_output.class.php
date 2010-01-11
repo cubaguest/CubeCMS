@@ -55,6 +55,14 @@ class Template_Output {
          case "xml":
             $this->addHeader('Content-type: text/xml');
             break;
+         case "rss":
+            $this->addHeader('Content-type: text/rss+xml');
+//            $this->addHeader('Content-type: text/xml');
+            break;
+         case "atom":
+            $this->addHeader('Content-type: text/atom+xml');
+//            $this->addHeader('Content-type: text/xml');
+            break;
          case "txt":
             $this->addHeader('Content-type: text/plain');
             break;
@@ -65,7 +73,7 @@ class Template_Output {
          case "html":
          case "php":
          default:
-            if(Auth::isLoginStatic()) {
+            if(Auth::isLogin()) {
                $this->addHeader( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
                $this->addHeader( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
                $this->addHeader( 'Cache-Control: no-store, no-cache, must-revalidate' );

@@ -17,6 +17,7 @@ class Template_Core extends Template {
     * Konstruktor
     */
    function  __construct() {
+      ob_start();
       parent::__construct(new Url_Link());
    }
 
@@ -33,12 +34,11 @@ class Template_Core extends Template {
     * Magická metoda převede šablonu na řetězec
     * @return string -- vygenerovaný řetězec z šablon
     */
-   public function  renderTemplate() {
+   public function   __toString() {
    // zastavení výpisu buferu
       ob_start();
-      parent::renderTemplate();
+      print(parent::__toString());
       $contents = ob_get_contents();
-      ob_end_clean();
 
       //vytvoříme pole css souborů
       $cssfiles = null;
@@ -71,7 +71,6 @@ class Template_Core extends Template {
       foreach ($arr as $subtitle) {
          $title .= ' '.VVE_PAGE_TITLE_SEPARATOR.' '.(string)$subtitle;
       }
-//      $title = substr($title, 0, strlen($title)-3);
       $contents = str_replace('{*-PAGE_TITLE-*}', $title, $contents);
 
       // doplníme hlavní nadpis stránky
@@ -95,7 +94,10 @@ class Template_Core extends Template {
 
       // odstranění všech proměnných
       $contents = preg_replace('/\{\*\-[A-Za-z0-9_-]+-\*\}/', '', $contents);
+      ob_clean();
       print ((string)$contents);
    }
+
+
 }
 ?>

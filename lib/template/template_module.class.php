@@ -183,11 +183,13 @@ class Template_Module extends Template {
    }
 
    /**
-    * Metoda vykreslí danou šablonu a její výsledek odešle na výstup
+    * Magická metoda převede šablonu na řetězec
+    * @return string -- vygenerovaný řetězec z šablon
     */
-   public function renderTemplate() {
-   // zastavení výpisu buferu
+   public function  __toString() {
+      // zastavení výpisu buferu
       ob_start();
+      ob_clean();
       foreach ($this->templateFiles as $file) {
          if(file_exists($file)){
             try {
@@ -200,9 +202,9 @@ class Template_Module extends Template {
             }
          }
       }
-      $contents = ob_get_contents();
-      ob_end_clean();
-      print (string)$contents;
+//      $contents = ob_get_flush();
+      $contents = ob_get_clean();
+      return $contents;
    }
 }
 ?>
