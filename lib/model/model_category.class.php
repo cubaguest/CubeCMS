@@ -8,6 +8,7 @@
  * @author			$Author$ $Date$
  *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
+ * @todo          nutný refaktoring
  */
 
 class Model_Category extends Model_PDO {
@@ -34,16 +35,24 @@ class Model_Category extends Model_PDO {
    const COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';
    const COLUMN_CAT_PROTECTED	= 'protected';
    const COLUMN_PRIORITY	= 'priority';
-//   const COLUMN_GROUP_PREFIX	= 'group_';
+   const COLUMN_DEF_RIGHT	= 'default_right';
    const COLUMN_ID_GROUP	= 'id_group';
    const COLUMN_ACTIVE = 'active';
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_DESCRIPTION = 'description';
    const COLUMN_ORDER = 'order';
    const COLUMN_LEVEL = 'level';
+   const COLUMN_CHANGED = 'changed';
+   const COLUMN_FEEDS = 'feeds';
 
    const COLUMN_CAT_SITEMAP_CHANGE_FREQ = 'sitemap_changefreq';
    const COLUMN_CAT_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority';
+
+   /**
+    * Pole s kategoriemi
+    * @var array
+    */
+   private $catList = null;
 
    /**
     * Metoda načte kategori, pokud je zadán klíč je načtena určitá, pokud ne je
@@ -126,43 +135,35 @@ class Model_Category extends Model_PDO {
     * @return PDOStatement -- objekt s daty
     */
    public function getCategoryList($allCategories = false) {
-      $dbc = new Db_PDO();
-//SELECT *
-//FROM vypecky_categories AS cat
-//JOIN vypecky_rights AS rights ON rights.id_category = cat.id_category
-//WHERE (rights.id_group =1 AND rights.right LIKE 'r__')
-//ORDER BY LENGTH( urlkey_cs ) DESC
+      if($this->catList == null OR $allCategories == true) {
+         $dbc = new Db_PDO();
+         if(!$allCategories) {
+            $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+                    ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+                    .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+                    ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+                    ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+            $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
 
-      if(!$allCategories) {
-//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-//             WHERE (cat.".self::COLUMN_GROUP_PREFIX.AppCore::getAuth()->getGroupName()." LIKE 'r__')".
-//             " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
-         ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
-         .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
-         ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
-         ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
-         $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
-         
+         } else {
+            $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
+                    " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+         }
+         $dbst->execute();
+         $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+
+         $cats = array();
+         //      foreach ($categories as $row) {
+         while($row = $dbst->fetch()) {
+            $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
+         }
+         if($allCategories === false) {
+            $this->catList = $cats;
+         }
+         return $cats;
       } else {
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
-             " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+         return $this->catList;
       }
-      $dbst->execute();
-
-      
-
-      //      $cl = new Model_LangContainer();
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-
-      $cats = array();
-      //      foreach ($categories as $row) {
-      while($row = $dbst->fetch()) {
-         $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
-      }
-
-      //      return $dbst->fetchAll();
-      return $cats;
    }
 
    /**
@@ -181,7 +182,7 @@ class Model_Category extends Model_PDO {
     */
    public function saveNewCategory($name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
-       $sitemapFrequency) {
+       $sitemapFrequency, $defRight, $feeds) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt, self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
@@ -190,7 +191,8 @@ class Model_Category extends Model_PDO {
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
-          self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency));
+          self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency,
+          self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds));
 
       $dbc = new Db_PDO();
 //      print ("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
@@ -218,7 +220,7 @@ class Model_Category extends Model_PDO {
     */
    public function saveEditCategory($id, $name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
-       $sitemapFrequency) {
+       $sitemapFrequency, $defRight, $feeds) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt,self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
@@ -227,7 +229,8 @@ class Model_Category extends Model_PDO {
           self::COLUMN_PRIORITY => $priority, self::COLUMN_CAT_SHOW_IN_MENU => $showInMenu,
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
-          self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency));
+          self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency,
+          self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds));
 
       $dbc = new Db_PDO();
       return $dbc->exec("UPDATE ".Db_PDO::table(self::DB_TABLE)
@@ -240,6 +243,19 @@ class Model_Category extends Model_PDO {
       $st = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           . " WHERE ".self::COLUMN_CAT_ID." = :id");
       return $st->execute(array(':id' => $id));
+   }
+   
+   /**
+    * Metoda nastaví změnu kategorie
+    * @param int $id -- id kategorie
+    */
+   public static function setLastChange($idCategory) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET `".self::COLUMN_CHANGED."` = NOW()"
+          ." WHERE (".self::COLUMN_CAT_ID." = :idcat)");
+      $dbst->bindParam(':idcat', $idCategory, PDO::PARAM_INT);
+      return $dbst->execute();
    }
 }
 ?>
