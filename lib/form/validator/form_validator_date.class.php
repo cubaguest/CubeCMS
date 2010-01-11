@@ -12,7 +12,7 @@ class Form_Validator_Date extends Form_Validator implements Form_Validator_Inter
 
    public function  __construct($errMsg = null, $beforeDate = null, $afterDate = null) {
       if($errMsg == null) {
-         parent::__construct(_('Nebylo vyplněno korektní datum v položce \"%s\"'));
+         parent::__construct(_('Nebylo vyplněno korektní datum v položce "%s"'));
       } else {
          parent::__construct($errMsg);
       }
@@ -34,12 +34,19 @@ class Form_Validator_Date extends Form_Validator implements Form_Validator_Inter
             $values = $elemObj->getUnfilteredValues();
             if(!$elemObj->isMultiLang()) {
                $date = array();
-               if(preg_match("/^([0-3]?[0-9]{1})\.([0-1]?[0-9]{1})\.([1-2]{1}[0-9]{3})$/", $values, $date)
-                       AND checkdate($date[2],$date[1],$date[3])) {
-                  return true;
-               } else if(preg_match('/([1-2]{1}[0-9]{3}).([0-1]?[0-9]{1}).([0-3]?[0-9]{1})/', $values, $date)
+               if(empty ($values)) return true;
+
+               $correctDate = false;
+               if(preg_match("/^([0-3]?[0-9]{1})\.([0-1]?[0-9]{1})\.([1-2]{1}[0-9]{3})$/", $values, $date) == 1 AND checkdate($date[2],$date[1],$date[3])){
+                  $correctDate = true;
+               } else if(preg_match('/^([1-2]{1}[0-9]{3}).([0-1]?[0-9]{1}).([0-3]?[0-9]{1})$/', $values, $date) == 1
                        AND checkdate($date[1], $date[2], $date[3])) {
-                  return true;
+                  $correctDate = true;
+               }
+
+               if(!$correctDate){
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  return false;
                }
             } else {
                throw new RuntimeException(_('Neimplementovaná Validace Data'));
