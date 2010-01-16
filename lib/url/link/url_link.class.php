@@ -160,7 +160,8 @@ class Url_Link {
     */
    public function category($catKey = null) {
       if($catKey != null) {
-         $this->category = vve_cr_url_key($catKey);
+//         $this->category = vve_cr_url_key($catKey);
+         $this->category = $catKey;
       } else {
          $this->category = null;
       }
