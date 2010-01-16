@@ -91,9 +91,26 @@ function vve_parse_cfg_value($value, $delimiter = ';') {
  * Funkce přepíše všechny relativní adresy v řetězce a absolutní
  * @param string &$string -- samotný řetězec
  * @param string $atrName -- (option) název atribut, který se má opravovat (default: src a href)
+ * @return string -- řetězec s opravenou adresou
  */
 function vve_create_full_url_path(&$string, $atrNames = 'src|href') {
    $string = preg_replace('/(src|href)="(?!http)([^"]+)"/i', '\\1="'.Url_Link::getMainWebDir().'\\2"', $string);
    return $string;
+}
+
+/**
+ * Funkce odstraní html tagy z řetězce a pole (rekurzivní)
+ * @param mixed $value -- samotný řetězec nebo pole
+ * @return mixed -- řětezce nebo pole bez html tagů
+ */
+function vve_strip_tags($value){
+   if(is_array($value)){
+      foreach ($value as $key => $val){
+         $value[$key] = vve_strip_tags($val);
+      }
+   } else {
+      $value = strip_tags($value);
+   }
+   return $value;
 }
 ?>
