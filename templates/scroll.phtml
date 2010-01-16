@@ -8,10 +8,10 @@
    if($this->activeButtonBegin){
       ?>
       <a href="<?=$this->pageLink()->param('page', '1')?>" title="<?_("Začátek")?>">
-      |<
+      |&lt;
       </a>
    <?} else {?>
-      |<
+      |&lt;
    <?}?>
    &#032;&#032;
 
@@ -49,10 +49,10 @@
 <? //Sipka na konec
    if($this->activeButtonEnd){?>
       <a href="<?=$this->pageLink()->param('page', $this->countAllPages)?>" title="<?_("Konec")?>">
-      >|
+      &gt;|
       </a>
    <?} else {?>
-      >|
+      &gt;|
    <?}?>
 </td>
 </tr>
