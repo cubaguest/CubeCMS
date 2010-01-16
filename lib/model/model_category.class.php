@@ -257,5 +257,30 @@ class Model_Category extends Model_PDO {
       $dbst->bindParam(':idcat', $idCategory, PDO::PARAM_INT);
       return $dbst->execute();
    }
+
+   public function search($string){
+      $dbc = new Db_PDO();
+      $clabel = self::COLUMN_CAT_LABEL.'_'.Locale::getLang();
+      $ctext = self::COLUMN_DESCRIPTION.'_'.Locale::getLang();
+
+      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1).' * MATCH(cat.'.$clabel.') AGAINST (:sstring)'
+              .' + MATCH(cat.'.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
+              .' FROM '.Db_PDO::table(self::DB_TABLE).' as cat'
+              ." LEFT JOIN ".Model_Rights::getRightsTable()." AS rights ON rights.".Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+              .' WHERE MATCH(cat.'.$clabel.', cat.'.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
+//              .' AND (rights.'.Model_Rights::COLUMN_ID_GROUP.' = :idgrp AND rights.'.Model_Rights::COLUMN_RIGHT.' LIKE :rightstr)'
+              .' AND rights.'.Model_Rights::COLUMN_RIGHT.' LIKE :rightstr'
+              .' GROUP BY cat.'.self::COLUMN_CAT_ID
+              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1)
+              .' * MATCH(cat.'.$clabel.') AGAINST (:sstring) + MATCH(cat.'.$ctext.') AGAINST (:sstring) DESC');
+
+      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
+      $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+      $dbst->bindValue(":rightstr", "r__", PDO::PARAM_STR);
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->execute();
+
+      return $dbst;
+   }
 }
 ?>
