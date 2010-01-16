@@ -1,0 +1,37 @@
+<div>
+   <div style="text-align: center">
+      <form method="get" action="<?=$this->link()?>">
+         <label for="search_string"><?=$this->_('Hledat')?>:&nbsp;</label>
+         <input id="search_string" type="text" size="35" name="q" value="<?=$this->searchString?>" />
+         <?
+         if(count($this->apis) > 0){?>
+         <select name="s">
+            <option value="all" <?=$this->searchTarget == 'all' ? ' selected="selected"' :''?>
+                    ><?=$this->_('všude')?></option>
+            <option value="this" <?=$this->searchTarget == 'this' ? ' selected="selected"' :''?>
+                    ><?=VVE_WEB_NAME?></option>
+            <?while ($api = current($this->apis)) {?>
+            <option value="<?=$api->{Search_Model_Api::COLUMN_ID}?>"
+               <?=$this->searchTarget == $api->{Search_Model_Api::COLUMN_ID} ? ' selected="selected"' :''?>
+                    ><?=$api->{Search_Model_Api::COLUMN_NAME}?></option>
+            <?
+            next($this->apis);
+            }?>
+         </select>
+         <?}?>
+         <input type="submit" value="<?=$this->_('Hledat')?>" />
+      </form>
+   </div>
+
+   <?
+   if($this->search === true) $this->includeTpl('results.phtml');
+   ?>
+   <?
+   if($this->category()->getRights()->isControll()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('edit_search', $this->_("Upravit hledání"),
+          $this->link()->route('editsapi'),
+          $this->_("Upravit parametry hledání"), "magnifier_zoom_in.png");
+      $this->includeTplObj($toolbox);
+   }?>
+</div>
