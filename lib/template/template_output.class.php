@@ -53,29 +53,29 @@ class Template_Output {
          case "json":
             break;
          case "xml":
-            $this->addHeader('Content-type: text/xml');
+            $this->addHeader('Content-type: text/xml; charset=utf-8');
             break;
          case "rss":
 //            $this->addHeader('Content-type: application/rss+xml');
-            $this->addHeader('Content-type: application/xml');
+            $this->addHeader('Content-type: application/xml; charset=utf-8');
 //            $this->addHeader('Content-type: text/xml');
             break;
          case "atom":
 //            $this->addHeader('Content-type: application/atom+xml');
-            $this->addHeader('Content-type: application/xml');
+            $this->addHeader('Content-type: application/xml; charset=utf-8');
 //            $this->addHeader('Content-type: text/xml');
             break;
          case "txt":
-            $this->addHeader('Content-type: text/plain');
+            $this->addHeader('Content-type: text/plain; charset=utf-8');
             break;
          case "js":
-            $this->addHeader("Content-type: application/x-javascript");
+            $this->addHeader("Content-type: application/x-javascript; charset=utf-8");
             break;
          case "html":
          case "xhtml":
          case "php":
          default:
-            $this->addHeader("Content-type: text/html");
+            $this->addHeader("Content-type: text/html; charset=utf-8");
 //            $this->addHeader("Content-type: application/xhtml+xml");
             break;
       }
