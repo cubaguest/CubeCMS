@@ -201,7 +201,7 @@ abstract class Controller {
     */
    final public function getRequestParam($name, $def = null) {
       if(isset ($_GET[$name])) {
-         return urldecode($_GET[$name]);
+         return rawurldecode($_GET[$name]);
       } else {
          return $def;
       }
