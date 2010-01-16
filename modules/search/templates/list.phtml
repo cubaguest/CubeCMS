@@ -10,7 +10,7 @@
          <th><?=$this->_('Akce')?></th>
       </tr>
       <?$someApi = false;
-      while ($api = $this->apis->fetch()) {
+      foreach ($this->apis as $api) {
          $someApi = true;
          ?>
       <tr>

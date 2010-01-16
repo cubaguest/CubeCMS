@@ -10,6 +10,7 @@ class Articles_Model_Detail extends Model_PDO {
  */
    const COLUMN_NAME = 'name';
    const COLUMN_TEXT = 'text';
+   const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_URLKEY = 'urlkey';
    const COLUMN_ADD_TIME = 'add_time';
    const COLUMN_EDIT_TIME = 'edit_time';
@@ -30,8 +31,8 @@ class Articles_Model_Detail extends Model_PDO {
    public function saveArticle($name, $text, $urlKey, $idCat = 0, $idUser = 0, $public = true, $id = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
-             self::COLUMN_URLKEY => $urlKey,
-             self::COLUMN_PUBLIC => $public));
+             self::COLUMN_URLKEY => $urlKey, self::COLUMN_PUBLIC => $public,
+            self::COLUMN_TEXT_CLEAR => vve_strip_tags($text)));
 
       $dbc = new Db_PDO();
 
@@ -69,8 +70,8 @@ class Articles_Model_Detail extends Model_PDO {
    }
 
    /**
-    * Metoda vrací id posledního vloženého článku
-    * @return integer -- id článku
+    * Metoda přičte přečtení článku
+    * @return string $urlkey -- url klíč článku
     */
    public function addShowCount($urlKey) {
       $dbc = new Db_PDO();
@@ -161,6 +162,39 @@ class Articles_Model_Detail extends Model_PDO {
           ." WHERE (".self::COLUMN_ID." = :idart)");
       $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
       return $dbst->execute();
+   }
+
+   /**
+    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
+    * @param integer $idCat
+    * @param string $string
+    * @param bool $publicOnly
+    * @return PDOStatement
+    */
+   public function search($idCat, $string, $publicOnly = true){
+      $dbc = new Db_PDO();
+      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locale::getLang();
+      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+
+      $wherePub = null;
+      if($publicOnly){
+         $wherePub = ' AND '.Articles_Model_Detail::COLUMN_PUBLIC.' = 1';
+      }
+
+      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
+              .' + MATCH('.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
+              .' FROM '.Db_PDO::table(Articles_Model_Detail::DB_TABLE)
+              .' WHERE MATCH('.$clabel.', '.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
+              .' AND `'.Articles_Model_Detail::COLUMN_ID_CATEGORY.'` = :idCat'
+              .$wherePub // Public articles
+              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
+              .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring) DESC');
+
+      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->execute();
+      return $dbst;
    }
 }
 

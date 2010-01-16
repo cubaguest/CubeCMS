@@ -38,11 +38,6 @@ class Actions_Model_List extends Model_PDO {
       } else {
          $whereP = null;
       }
-//         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
-//                 ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
-//                 .$whereP
-//                 ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
-
          $dbst = $dbc->prepare("SELECT actions.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
@@ -57,6 +52,34 @@ class Actions_Model_List extends Model_PDO {
       $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
       $dbst->bindValue(':dateS', (int)$fromTime, PDO::PARAM_INT);
       $dbst->bindValue(':dateE', (int)$toTime, PDO::PARAM_INT);
+      $dbst->execute();
+
+      return $dbst;
+	}
+
+	/**
+	 * Metoda vrací vybrané akce podle času
+	 * @return PDOStatement -- pole akcí
+	 */
+   public function getActionsByAdded($idCat, $num = 100, $onlyPublic = true) {
+      $dbc = new Db_PDO();
+      if($onlyPublic) {
+         $whereP = " AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)";
+      } else {
+         $whereP = null;
+      }
+         $dbst = $dbc->prepare("SELECT actions.*, user.".Model_Users::COLUMN_USERNAME
+              ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
+              ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
+              ." = user.".Model_Users::COLUMN_ID
+              ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
+              . $whereP // public
+              ." ORDER BY ".Actions_Model_Detail::COLUMN_ADDED." ASC"
+              ." LIMIT 0, :numAc");
+
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':numAc', (int)$num, PDO::PARAM_INT);
       $dbst->execute();
 
       return $dbst;

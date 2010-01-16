@@ -1,5 +1,8 @@
 <?php
 class Actions_Routes extends Routes {
+   const FEEDS = true; // podle tohohle se generují feedy
+   const FEED_FILE = '{type}.xml';
+
    function initRoutes() {
       // přidání akce
       $this->addRoute('add', "add", 'add', "add/");
@@ -12,6 +15,8 @@ class Actions_Routes extends Routes {
       // detail akce
       $this->addRoute('detail', "::urlkey::", 'show','{urlkey}/');
       $this->addRoute('detailpdf', "::urlkey::.pdf", 'showPdf','{urlkey}.pdf');
+      // exporty
+      $this->addRoute('export', "(?P<type>(?:rss)|(?:atom)).xml", 'export', self::FEED_FILE);
       // list akcí
       $this->addRoute('normal', null, 'main', null);
    }

@@ -8,6 +8,7 @@ class Actions_Panel extends Panel {
 
       $model = new Actions_Model_List();
       $this->template()->actions = $model->getCurrentActions($this->category()->getId());
+      $this->template()->rssLink = $this->link()->route('export', array('type' => 'rss'));
 	}
 }
 ?>

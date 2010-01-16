@@ -66,29 +66,27 @@ class Actions_Controller extends Controller {
       $this->checkReadableRights();
 
       $model = new Actions_Model_Detail();
-      $this->action = $model->getAction($this->getRequest('urlkey'));
-      if($this->action == false){
+      $this->view()->action = $model->getAction($this->getRequest('urlkey'));
+      if($this->view()->action == false){
          AppCore::setErrorPage(true);
          return false;
       }
 
       // odkaz zpět
       if(isset ($_SESSION['actionBack'])){
-            $this->view()->template()->linkBack = $this->link()->route('normaldate', 
+            $this->view()->linkBack = $this->link()->route('normaldate', 
                     array('day' => $_SESSION['actionBack']['day'],
                'month' => $_SESSION['actionBack']['month'],
                'year' => $_SESSION['actionBack']['year']));
       } else {
-            $this->view()->template()->linkBack = $this->link()->route();
+            $this->view()->linkBack = $this->link()->route();
       }
 
       // komponenta pro vypsání odkazů na sdílení
       $shares = new Component_Share();
       $shares->setConfig('url', (string)$this->link());
-      $shares->setConfig('title', $this->action->{Actions_Model_Detail::COLUMN_NAME});
-      $this->view()->template()->shares=$shares;
-
-      $this->view()->template()->action = $this->action;
+      $shares->setConfig('title', $this->view()->action->{Actions_Model_Detail::COLUMN_NAME});
+      $this->view()->shares=$shares;
    }
 
    public function showPdfController() {
@@ -140,6 +138,7 @@ class Actions_Controller extends Controller {
 
          $ids = $model->saveAction($names, $form->text->getValues(), $urlkeys,
                  $form->date_start->getValues(), $date_stop,
+                 $form->time->getValues(),$form->place->getValues(),$form->price->getValues(),
                  $file, $this->category()->getId(), Auth::getUserId(),
                  $form->public->getValues());
 
@@ -173,6 +172,9 @@ class Actions_Controller extends Controller {
       $form->date_stop->setValues(strftime("%x",$action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
       $form->urlkey->setValues($action->{Actions_Model_Detail::COLUMN_URLKEY});
       $form->public->setValues($action->{Actions_Model_Detail::COLUMN_PUBLIC});
+      $form->time->setValues($action->{Actions_Model_Detail::COLUMN_TIME});
+      $form->place->setValues($action->{Actions_Model_Detail::COLUMN_PLACE});
+      $form->price->setValues($action->{Actions_Model_Detail::COLUMN_PRICE});
 
       if($action->{Actions_Model_Detail::COLUMN_IMAGE} == null){
          $form->image->setSubLabel($this->_('Źádný obrázek'));
@@ -218,6 +220,7 @@ class Actions_Controller extends Controller {
 
          $model->saveAction($names, $form->text->getValues(), $urlkeys,
                  $form->date_start->getValues(), $date_stop,
+                 $form->time->getValues(),$form->place->getValues(),$form->price->getValues(),
                  $file, $this->category()->getId(), Auth::getUserId(),
                  $form->public->getValues(),$action->{Actions_Model_Detail::COLUMN_ID});
 
@@ -262,6 +265,17 @@ class Actions_Controller extends Controller {
       $eDateT->addFilter(new Form_Filter_DateTimeObj());
       $form->addElement($eDateT);
 
+      $eTime = new Form_Element_Text('time', $this->_('Čas konání'));
+      $eTime->addValidation(new Form_Validator_Time());
+      $form->addElement($eTime);
+
+      $ePlace = new Form_Element_Text('place', $this->_('Místo konání'));
+      $form->addElement($ePlace);
+
+      $ePrice = new Form_Element_Text('price', $this->_('Cena'));
+      $ePrice->addValidation(new Form_Validator_IsNumber());
+      $form->addElement($ePrice);
+
       $eFile = new Form_Element_File('image', $this->_('Obrázek'));
       $eFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'png')));
       $eFile->setUploadDir($this->category()->getModule()->getDataDir());
@@ -287,6 +301,12 @@ class Actions_Controller extends Controller {
       $form->addElement($eSub);
 
       return $form;
+   }
+
+   // RSS
+   public function exportController(){
+      $this->checkReadableRights();
+      $this->view()->type = $this->getRequest('type', 'rss');
    }
 }
 ?>

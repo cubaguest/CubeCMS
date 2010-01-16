@@ -45,7 +45,18 @@ class Articles_View extends View {
       $article = $artM->getArticle($this->urlkey);
 
       if($article == false) return false;
+      $c = $this->createPdf($article);
+      
+      // výstup
+      $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
+   }
 
+   /**
+    * Metoda vytvoří pdf soubor
+    * @param Object $article -- článek
+    * @return Component_Tcpdf
+    */
+   protected function createPdf($article){
       // komponenta TcPDF
       $c = new Component_Tcpdf();
       // vytvoření pdf objektu
@@ -55,9 +66,11 @@ class Articles_View extends View {
       $c->pdf()->SetKeywords($this->category()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
 
       // ---------------------------------------------------------
+      $c->pdf()->setHeaderFont(array(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN-2));
       $c->pdf()->setHeaderData('', 0, VVE_WEB_NAME." - ".$this->category()->getLabel()
-              ." - ".$article->{Articles_Model_Detail::COLUMN_NAME},
-              strftime("%x")." - ".$this->link()->route('detail'));
+              ." - ".$article->{Articles_Model_Detail::COLUMN_NAME}
+              , strftime("%x")." - ".$this->link()->route('detail'));
+
       // add a page
       $c->pdf()->AddPage();
       // nadpis
@@ -67,6 +80,7 @@ class Articles_View extends View {
       $c->pdf()->writeHTML($name, true, 0, true, 0);
 
       $c->pdf()->Ln();
+
       // datum autor
       $date = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'BI', VVE_PDF_FONT_SIZE_MAIN);
@@ -78,8 +92,8 @@ class Articles_View extends View {
 
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
       $c->pdf()->writeHTML($article->{Articles_Model_Detail::COLUMN_TEXT}, true, 0, true, 0);
-      // výstup
-      $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
+
+      return $c;
    }
 
    public function exportView() {
@@ -99,7 +113,9 @@ class Articles_View extends View {
               $article->{Articles_Model_Detail::COLUMN_TEXT},
               $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
               new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}),
-              $article->{Model_Users::COLUMN_USERNAME});
+              $article->{Model_Users::COLUMN_USERNAME}, null, null,
+              $article->{Articles_Model_Detail::COLUMN_URLKEY}."_".$article->{Articles_Model_Detail::COLUMN_ID}
+              ."_".$article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
    }
 
    $feed->flush();

@@ -33,7 +33,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
          'buttonText': '<?=$this->_('Prochazet')?>',
          'cancelImg' : 'images/cancel.png',
          'fileDesc'  : 'images',
-         'fileExt'   : '*.jpg;*. jpeg;*.png;*. gif;*.JPG',
+         'fileExt'   : '*.jpg;*.jpeg;*.png;*.gif;*.JPG',
          'fileDataName' : 'addimage_image',
          'scriptData' : {'sessionid': '<?=session_id();?>', 'addimage_send' : 'send', 'addimage_idArt' : <?=$this->addForm->idArt->getUnfilteredValues()?>},
          onProgress: function() {

@@ -4,7 +4,7 @@ class Actionswgal_Controller extends Actions_Controller {
    public function showController(){
       parent::showController();
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $this->action->{Actions_Model_Detail::COLUMN_ID});
+      $ctr->setOption('idArt', $this->view()->action->{Actions_Model_Detail::COLUMN_ID});
       $ctr->mainController();
    }
 

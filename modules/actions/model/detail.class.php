@@ -14,6 +14,7 @@ class Actions_Model_Detail extends Model_PDO {
     */
    const COLUMN_NAME = 'name';
    const COLUMN_TEXT = 'text';
+   const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_URLKEY = 'urlkey';
    const COLUMN_ID_USER = 'id_user';
    const COLUMN_ID_CAT = 'id_category';
@@ -23,6 +24,10 @@ class Actions_Model_Detail extends Model_PDO {
    const COLUMN_DATE_STOP = 'stop_date';
    const COLUMN_IMAGE = 'image';
    const COLUMN_CHANGED = 'changed';
+   const COLUMN_ADDED = 'time_add';
+   const COLUMN_TIME = 'time';
+   const COLUMN_PLACE = 'place';
+   const COLUMN_PRICE = 'price';
 
    /**
     * Metoda uloží akci do db
@@ -31,12 +36,15 @@ class Actions_Model_Detail extends Model_PDO {
     * @param array -- pole s textem novinky
     * @param boolean -- id uživatele
     */
-   public function saveAction($name, $text, $urlKey, DateTime $dateFrom, DateTime $dateTo, $image = null, $idCat = 0,
-           $idUser = 0, $public = true, $id = null) {
+   public function saveAction($name, $text, $urlKey, DateTime $dateFrom, DateTime $dateTo,
+           $time = null, $place = null, $price = null, $image = null, $idCat = 0,
+           $idUser = 1, $public = true, $id = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
-              self::COLUMN_URLKEY => $urlKey,
+              self::COLUMN_TEXT_CLEAR => vve_strip_tags($text),
+              self::COLUMN_URLKEY => $urlKey, self::COLUMN_PRICE => $price,
               self::COLUMN_PUBLIC => $public, self::COLUMN_IMAGE => $image,
+              self::COLUMN_TIME => $time, self::COLUMN_PLACE => $place,
               self::COLUMN_DATE_START => $dateFrom->format('U'),
               self::COLUMN_DATE_STOP => $dateTo->format('U')));
 
@@ -63,7 +71,8 @@ class Actions_Model_Detail extends Model_PDO {
 //         }
 
          $this->setIUValues(array(self::COLUMN_ID_CAT => $idCat,
-                 self::COLUMN_ID_USER => $idUser));
+                 self::COLUMN_ID_USER => $idUser,
+                 self::COLUMN_ADDED => 'NOW()'));
          $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
                  ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
 
@@ -102,11 +111,11 @@ class Actions_Model_Detail extends Model_PDO {
 //              ." LIMIT 0, 1");
 
       $dbst = $dbc->prepare("SELECT action.*, user.".Model_Users::COLUMN_USERNAME
-         ." FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
-         ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
-         ." = user.".Model_Users::COLUMN_ID
-         ." WHERE (action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
-         ." LIMIT 0, 1");
+              ." FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
+              ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
+              ." = user.".Model_Users::COLUMN_ID
+              ." WHERE (action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+              ." LIMIT 0, 1");
       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
       $dbst->execute();
 
@@ -115,15 +124,46 @@ class Actions_Model_Detail extends Model_PDO {
    }
 
    public function deleteAction($idAction) {
-      //			smazání novinky
-      $sqlUpdate = $this->getDb()->delete()->table(Db::table(self::DB_TABLE))
-              ->where(self::COLUMN_ACTION_ID, $idAction);
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
+          ." WHERE (".self::COLUMN_ID ." = :id)");
+      $dbst->bindParam(':id', $idAction, PDO::PARAM_INT);
+      return $dbst->execute();
+   }
 
-      if($this->getDb()->query($sqlUpdate)) {
-         return true;
-      } else {
-         return false;
-      };
+   /**
+    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
+    * @param integer $idCat
+    * @param string $string
+    * @param bool $publicOnly
+    * @return PDOStatement
+    */
+   public function search($idCat, $string, $publicOnly = true) {
+      $dbc = new Db_PDO();
+      $clabel = self::COLUMN_NAME.'_'.Locale::getLang();
+      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+      $cplace = self::COLUMN_PLACE;
+
+      $wherePub = null;
+      if($publicOnly) {
+         $wherePub = ' AND '.self::COLUMN_PUBLIC.' = 1';
+      }
+
+      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
+              .' + MATCH('.$ctext.') AGAINST (:sstring) + MATCH('.$cplace.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
+              .' FROM '.Db_PDO::table(self::DB_TABLE)
+              .' WHERE MATCH('.$clabel.', '.$ctext.', '.$cplace.') AGAINST (:sstring IN BOOLEAN MODE)'
+              .' AND `'.self::COLUMN_ID_CAT.'` = :idCat'
+              .$wherePub // Public articles
+              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
+              .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring)'
+              .' + MATCH('.$cplace.') AGAINST (:sstring) DESC');
+
+      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
+      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->execute();
+      return $dbst;
    }
 }
 

@@ -1,3 +1,6 @@
+<?if($this->rssLink != null){?>
+<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+<?}?>
 <h3><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h3>
 <div>
    <h4><?=$this->_('Nejnovější')?>:</h4><br />

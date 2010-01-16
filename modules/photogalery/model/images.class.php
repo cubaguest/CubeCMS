@@ -17,18 +17,23 @@ class PhotoGalery_Model_Images extends Model_PDO {
    const COLUMN_FILE 				= 'file';
    const COLUMN_ORDER 				= 'ord';
 
+   /**
+    *
+    * @param <type> $idCat
+    * @param <type> $idArt
+    * @param <type> $num
+    * @return PDOStatement
+    */
    public function getImages($idCat, $idArt, $num = 0) {
       $dbc = new Db_PDO();
-      if($num == 0) {
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-                 ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ID_ART." = :idart)"
-                 ." ORDER BY ".self::COLUMN_ORDER);
-      } else {
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-                 ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ID_ART." = :idart)"
-                 ." ORDER BY ".self::COLUMN_ORDER
-                 ." LIMIT 0,".(int)$num);
+      $limit = null;
+      if($num != 0) {
+         $limit = " LIMIT 0,".(int)$num;
       }
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ID_ART." = :idart)"
+              ." ORDER BY ".self::COLUMN_ORDER
+              .$limit);
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
       $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
@@ -123,8 +128,8 @@ class PhotoGalery_Model_Images extends Model_PDO {
    public function setLastChange($idImage) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-          ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
-          ." WHERE (".self::COLUMN_ID." = :idimage)");
+              ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
+              ." WHERE (".self::COLUMN_ID." = :idimage)");
       $dbst->bindParam(':idimage', $idImage, PDO::PARAM_INT);
       return $dbst->execute();
    }

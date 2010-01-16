@@ -14,16 +14,6 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
 <div>
    <!--<h2><?=htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>&nbsp;-->
    <!--</h2>-->
-   <p>
-      <?
-      $startDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_START});
-      $stopDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP});
-      print ($startDate);
-      if($startDate != $stopDate) {
-         print ("&nbsp;&mdash;&nbsp;");
-         print ($stopDate);
-      }?>
-   </p>
    <!--<p>
       <a href="<?=$this->link()->route('detail')?>"><?=$this->_('Text')?></a>
       <a href="<?=$this->link()->route('detailPhotos')?>"><?=$this->_('Fotky')?></a>
@@ -39,8 +29,34 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
       <div id="actionText"><!-- SOF TEXT -->
          <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
             print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().
-                    $this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', null,null, 'actionImage'));
+                    $this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));
          }?>
+
+         <p>
+            <span style="font-weight: bold">
+            <?
+            $startDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_START});
+            $stopDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP});
+            print ($startDate);
+            if($startDate != $stopDate) {
+               print ("&nbsp;&mdash;&nbsp;");
+               print ($stopDate);
+            }?>
+            <?if($this->action->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00') {?>
+               <?=$this->action->{Actions_Model_Detail::COLUMN_TIME}?>
+            <?}?>
+            </span>
+            <br />   
+            <?if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null) {?>
+            <?=$this->action->{Actions_Model_Detail::COLUMN_PLACE}?><br />
+               <?}?>
+            <?if($this->action->{Actions_Model_Detail::COLUMN_PRICE} != null) {?>
+            <?=$this->_('Vstupné')?>:&nbsp;<?=$this->action->{Actions_Model_Detail::COLUMN_PRICE}?>&nbsp;Kč<br />
+               <?}?>
+
+         </p>
+         <br />
+
          <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
       </div> <!-- EOF TEXT -->
       <?if($countImages > 0) {?>
@@ -82,11 +98,26 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
 
    <?//$this->includeTpl('tools.phtml')?>
    <?$this->includeTpl('articletools.phtml', true, array(
-                 'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
-                 'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
-                 'linkToPdf' => $this->link()->route('detailpdf'),
-                 'shares' => $this->shares));?>
+           'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+           'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
+           'linkToPdf' => $this->link()->route('detailpdf'),
+           'shares' => $this->shares));?>
    <br />
-   <?=$this->shares?>
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('edit_article', $this->_("Upravit akci"),
+              $this->link()->route('edit'),
+              $this->_("Upravit zobrazenou akci"), "page_edit.png");
+      $toolbox->addTool('edit_photos', $this->_("Upravit fotky"),
+              $this->link()->route('editphotos'),
+              $this->_("Upravit fotky zobrazené akce"), "image_edit.png");
+      $toolbox->addTool('article_delete', $this->_("Smazat akci"),
+              $this->link(), $this->_("Smazat zobrazenou akci"), "page_delete.png",
+              'article_id', (int)$this->action->{Articles_Model_Detail::COLUMN_ID},
+              $this->_('Opravdu smazat akci?'));
+      $this->includeTplObj($toolbox);
+   }
+   ?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>

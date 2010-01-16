@@ -9,11 +9,11 @@ class Actions_View extends View {
       $this->template()->addTplFile("list.phtml");
    }
 
-   public function showView(){
+   public function showView() {
       $this->template()->addTplFile("detail.phtml");
    }
 
-   public function archiveView(){
+   public function archiveView() {
       $this->template()->addTplFile("archive.phtml");
    }
 
@@ -31,6 +31,13 @@ class Actions_View extends View {
 
       if($action == false) return false;
 
+      $c = $this->createPdf($action);
+      
+      // výstup
+      $c->flush($action->{Actions_Model_Detail::COLUMN_URLKEY}.'.pdf');
+   }
+
+   protected function createPdf($action){
       // komponenta TcPDF
       $c = new Component_Tcpdf();
       // vytvoření pdf objektu
@@ -40,13 +47,14 @@ class Actions_View extends View {
       $c->pdf()->SetKeywords($this->category()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
 
       // ---------------------------------------------------------
-      $c->pdf()->setHeaderData('', 0, PDF_HEADER_TITLE." - ".$this->category()->getLabel()
+      $c->pdf()->setHeaderFont(array(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN-2));
+      $c->pdf()->setHeaderData('', 0, VVE_WEB_NAME." - ".$this->category()->getLabel()
               ." - ".$action->{Actions_Model_Detail::COLUMN_NAME},
               strftime("%x")." - ".$this->link()->route('detail'));
       // add a page
       $c->pdf()->AddPage();
       // nadpis
-      $c->pdf()->SetFont(PDF_FONT_NAME_MAIN, 'B', PDF_FONT_SIZE_MAIN+2);
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+2);
       $name = "<h1>".$action->{Actions_Model_Detail::COLUMN_NAME}."</h1>";
       $c->pdf()->writeHTML($name, true, 0, true, 0);
 
@@ -58,23 +66,53 @@ class Actions_View extends View {
          $stopDateString = " - ".$stopDate;
       }
 
-      $c->pdf()->SetFont(PDF_FONT_NAME_MAIN, 'BI', PDF_FONT_SIZE_MAIN);
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'BI', VVE_PDF_FONT_SIZE_MAIN);
       $author = "<p>".$startDate.$stopDateString."</p>";
       $c->pdf()->writeHTML($author, true, 0, true, 0);
       $c->pdf()->Ln();
 
 
-      $c->pdf()->SetFont(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN);
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
       $c->pdf()->writeHTML($action->{Actions_Model_Detail::COLUMN_TEXT}, true, 0, true, 0);
-      // výstup
-      $c->flush($action->{Actions_Model_Detail::COLUMN_URLKEY}.'.pdf');
+      
+      return $c;
    }
-
    /**
     * Viewer pro editaci novinky
     */
    public function editView() {
       $this->template()->addTplFile('edit.phtml');
+   }
+
+   public function exportView() {
+      $feed = new Component_Feed(true);
+
+      $feed ->setConfig('type', $this->type);
+      $feed ->setConfig('title', $this->category()->getName());
+      $feed ->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
+      $feed ->setConfig('link', $this->link());
+      $model = new Actions_Model_List();
+      $actions = $model->getActionsByAdded($this->category()->getId(), VVE_FEED_NUM);
+
+      while ($action = $actions->fetch()) {
+         $startDate = strftime("%x", $action->{Actions_Model_Detail::COLUMN_DATE_START});
+         $stopDate = strftime("%x", $action->{Actions_Model_Detail::COLUMN_DATE_STOP});
+         $stopDateString = null;
+         if($startDate != $stopDate) {
+            $stopDateString = " - ".$stopDate;
+         }
+         $desc = "<h3>".$startDate.$stopDateString."</h3>";
+         $desc .= $action->{Actions_Model_Detail::COLUMN_TEXT};
+
+         $feed->addItem($action->{Actions_Model_Detail::COLUMN_NAME},$desc,
+                 $this->link()->route('detail', array('urlkey' => $action->{Actions_Model_Detail::COLUMN_URLKEY})),
+                 new DateTime($action->{Actions_Model_Detail::COLUMN_ADDED}),
+                 $action->{Model_Users::COLUMN_USERNAME},null,null,
+                 $action->{Actions_Model_Detail::COLUMN_URLKEY}."_".$action->{Actions_Model_Detail::COLUMN_ID}."_".
+                 $action->{Actions_Model_Detail::COLUMN_CHANGED});
+      }
+
+      $feed->flush();
    }
 }
 
