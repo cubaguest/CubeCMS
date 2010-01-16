@@ -12,7 +12,7 @@
  */
 
 class Component_Feed extends Component {
-
+   const RSS_AVAIL_TAGS = '<p><a><strong><br><img><h1><h2><h3><h4><h5>';
 
    /**
     * Pole s prvky kanálu
@@ -143,7 +143,7 @@ class Component_Feed extends Component {
          $feed->startElement("item");// SOF item
          $feed->writeElement('title', $item['title']);
          $feed->writeElement('link', $item['link']);
-         $feed->writeElement('description', strip_tags($item['desc'], "<p><a><strong>"));
+         $feed->writeElement('description', strip_tags($item['desc'], self::RSS_AVAIL_TAGS));
          $feed->writeElement('guid', $item['guid']);
          if($item['authorEmail'] != null) {
             $feed->writeElement('author', $item['authorEmail']);
@@ -263,7 +263,7 @@ class Component_Feed extends Component {
 //            $feed->writeAttribute('xml:base', "http://diveintomark.org/");
             $feed->startElement('div');
                $feed->writeAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-               $feed->text(vve_tpl_xhtml_cut(strip_tags($item['desc'], "<p><a><strong>"), 400));
+               $feed->text(vve_tpl_xhtml_cut(strip_tags($item['desc'], "<p><a><strong><br><img>"), 400));
             $feed->endElement(); // eof div
          $feed->endElement(); // eof content
 
