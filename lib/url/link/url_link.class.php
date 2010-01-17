@@ -485,6 +485,54 @@ class Url_Link {
 //      $url = preg_replace("/\/{2,}/", "/", $url); // TODO ověřit nutnost
       return $url;
    }
+
+   /**
+    * Metoda inicializuje zpětný odkaz, kde bude tato metoda volána je považován za kořenový kontroller
+    */
+   public function backInit() {
+      unset ($_SESSION['linkBack'][$this->category]);
+      if(!isset ($_SESSION['linkBack'])) $_SESSION['linkBack'] = array();
+      $_SESSION['linkBack'][$this->category] = array();
+      $this->setBack($this);
+   }
+
+   /**
+    * Metoda uloží daný odkaz pod daný level
+    * @param Url_LInk $link -- objekt odkazu
+    * @param int $appLevel (option) level (def: 0)
+    */
+   private function setBack(Url_Link $link, $appLevel = 0) {
+      $_SESSION['linkBack'][$this->category][$appLevel] = $link;
+      ksort($_SESSION['linkBack'][$this->category]);
+   }
+
+   /**
+    * Metoda vytvoří nový zpětný odkaz a vrátí předešlý odkaz s menším levelem
+    * @param Url_Link $noBackLink -- objekt odkazu pokud neexistuje zpětný
+    * @param int $maxLevel -- maximální level zpětného odkazu
+    * @param int $curLevel -- (option) aktuální level (def: $maxLevel+1)
+    * @param Url_Link $curLink -- (option) nový zpětný odkaz
+    * @return Url_Link
+    */
+   public function back(Url_Link $noBackLink, $maxLevel, $curLevel = null, Url_Link $curLink = null) {
+      if($curLink === null) $curLink = $this;
+      if($curLevel === null) $curLevel = $maxLevel+1;
+      // init pokud není
+      if(!isset ($_SESSION['linkBack'][$this->category])) {
+         $this->init($link->clear());
+      }
+
+      // vrázení odkazu
+      for ($level = $maxLevel; $level >= 0; $level--) {
+         if(isset ($_SESSION['linkBack'][$this->category][$level])) {
+            $noBackLink = $_SESSION['linkBack'][$this->category][$level];
+            break;
+         }
+      }
+      // vytvoření aktuálního odkazu
+      $this->setBack($curLink,$curLevel);
+      return $noBackLink;
+   }
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");
 //echo("SERVER_NAME: ".$_SERVER["SERVER_NAME"]."<br>");
