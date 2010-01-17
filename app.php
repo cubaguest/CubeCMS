@@ -558,11 +558,11 @@ class AppCore {
    public function assignMainVarsToTemplate() {
       //	Hlavni promene strany
       $this->coreTpl->rootDir = self::getAppWebDir();
-      $link = new Url_Link();
       $this->coreTpl->setPVar("mainWebDir", Url_Request::getBaseWebDir());
       $this->coreTpl->setPVar("imagesDir", Template::face().Template::IMAGES_DIR.URL_SEPARATOR);
       $this->coreTpl->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
-      unset($link);
+      $this->coreTpl->pageKeywords = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS};
+      $this->coreTpl->pageDesc = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};
       //Přihlášení uživatele
       $this->coreTpl->userIsLogin = Auth::isLogin();
       $this->coreTpl->userLoginUsername = Auth::getUserName();

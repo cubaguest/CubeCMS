@@ -1,4 +1,4 @@
-<h3><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h3>
+<h2><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h2>
 <div class="panelActions">
    <h4><?=$this->_('Aktuální')?>:</h4><br />
    <?while ($row = $this->actions->fetch()) {?>
