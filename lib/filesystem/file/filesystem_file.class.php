@@ -117,6 +117,7 @@ class Filesystem_File {
     * parsovat z názvu souboru)
     */
    function __construct($file, $dir = null, $reportErrors = true) {
+      if($file == null) throw new UnexpectedValueException(_('Nulový soubor'));
       // Pokud je vložen objekt File
       if($file instanceof Filesystem_File) {
          $this->fileDir = new Filesystem_Dir($file->getDir());
