@@ -23,6 +23,7 @@ class Form_Validator_Time extends Form_Validator implements Form_Validator_Inter
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
+       $element->addValidationConditionLabel(_("HH:MM nebo HH:MM:SS"));
    }
 
    public function validate(Form_Element $elemObj) {
