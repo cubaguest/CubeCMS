@@ -1,12 +1,14 @@
 <?
 $model = new NavigationMenu_Models_List();
-$listSubdomains = $model->getSubdomainsList();
-$listProjects = $model->getProjectsList();
+$listSubdomains = $model->getSubdomainsList()->fetchAll();
+$listProjects = $model->getProjectsList()->fetchAll();
 
 ?>
 <div class="navigationMenu">
+   <?if(!empty ($listSubdomains)){?>
    <ul id="subdomains">
-      <?while ($row = $listSubdomains->fetch()) {?>
+      <?//while ($row = $listSubdomains->fetch()) {?>
+      <?foreach ($listSubdomains as $row) {?>
       <li>
          <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
             title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>">
@@ -20,8 +22,10 @@ $listProjects = $model->getProjectsList();
       </li>
       <?}?>
    </ul>
+   <?}?>
+   <?if(!empty ($listSubdomains)){?>
    <ul id="projects">
-      <?while ($row = $listProjects->fetch()) {?>
+      <?foreach ($listProjects as $row) {?>
       <li>
          <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
             title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>">
@@ -35,5 +39,6 @@ $listProjects = $model->getProjectsList();
       </li>
       <?}?>
    </ul>
+   <?}?>
    <hr class="reseter" />
 </div>

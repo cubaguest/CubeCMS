@@ -67,14 +67,16 @@
          <div id="headwrap">
             <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
             <div id="menuBox">
-               <div>
+               <br />
+               <br />
+               <!--<div>
                   <form id="menuSearch" method="get" action="<?=$this->l()->clear(true);?>">
                      <p>
                         <input type="text" size="12" maxlength="50" name="search" value="<?=rawurldecode($this->get('search',null,false))?>" />
                         <input type="submit" value="<?=_("Hledej")?>" />
                      </p>
                   </form>
-               </div>
+               </div>-->
                <div id="menuMain">
                   <? $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
                </div>
