@@ -33,6 +33,7 @@ class Form_Element_File extends Form_Element {
    /**
     * Metoda naplní element
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
+    * @todo dodělat vytváření unikátních názvů souborů
     */
    public function populate() {
       if(isset ($_FILES[$this->getName()])) {
@@ -42,13 +43,16 @@ class Form_Element_File extends Form_Element {
          } else {
             if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_OK) {
                $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"]);
+               // kontrola adresáře
+               $dir = new Filesystem_Dir($this->uploadDir);
+               $dir->checkDir();
                move_uploaded_file($_FILES[$this->getName()]["tmp_name"],
-                   $this->uploadDir . $saveFileName);
+                   $dir . $saveFileName);
                // vatvoření pole s informacemi o souboru
                $this->unfilteredValues = array('name' => $saveFileName,
-                   'path' => $this->uploadDir,
+                   'path' => $dir,
                    'size' => $_FILES[$this->getName()]["size"],
-                   'type' => $this->getMimeType($this->uploadDir.$_FILES[$this->getName()]["name"]),
+                   'type' => $this->getMimeType($dir.$_FILES[$this->getName()]["name"]),
                    'extension' => $this->getExtension($_FILES[$this->getName()]["name"]));
 //               array_push($this->values, $file);
             } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
