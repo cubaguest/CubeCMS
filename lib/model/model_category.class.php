@@ -28,6 +28,7 @@ class Model_Category extends Model_PDO {
    //   const COLUMN_SEC_ID	= 'id_section';
    //   const COLUMN_MODULE_ID	= 'id_module';
    const COLUMN_MODULE	= 'module';
+   const COLUMN_DATADIR	= 'data_dir';
    const COLUMN_URLKEY	= 'urlkey';
    const COLUMN_INDIVIDUAL_PANELS	= 'individual_panels';
    const COLUMN_PARAMS	= 'params';
@@ -182,7 +183,7 @@ class Model_Category extends Model_PDO {
     */
    public function saveNewCategory($name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
-       $sitemapFrequency, $defRight, $feeds) {
+       $sitemapFrequency, $defRight, $feeds, $dataDir = null) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt, self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
@@ -192,7 +193,8 @@ class Model_Category extends Model_PDO {
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
           self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency,
-          self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds));
+          self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds,
+          self::COLUMN_DATADIR => $dataDir));
 
       $dbc = new Db_PDO();
 //      print ("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
@@ -220,7 +222,7 @@ class Model_Category extends Model_PDO {
     */
    public function saveEditCategory($id, $name, $alt, $module, $moduleParams, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
-       $sitemapFrequency, $defRight, $feeds) {
+       $sitemapFrequency, $defRight, $feeds, $dataDir = null) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt,self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
@@ -230,7 +232,8 @@ class Model_Category extends Model_PDO {
           self::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY => $showWhenLoginOnly,
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
           self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency,
-          self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds));
+          self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds,
+          self::COLUMN_DATADIR => $dataDir));
 
       $dbc = new Db_PDO();
       return $dbc->exec("UPDATE ".Db_PDO::table(self::DB_TABLE)
