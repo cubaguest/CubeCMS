@@ -18,7 +18,7 @@ $this->addCssFile("style.css");
    ?>
             <tr>
                <td width="100">
-                  <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                  <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
            .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
                </td>
                <td valign="top" style="padding-right:10px;">

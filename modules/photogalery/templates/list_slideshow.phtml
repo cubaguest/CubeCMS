@@ -26,10 +26,10 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
             <?while ($image = $images->fetch()) {
                ?>
             <li>
-               <a class="thumb" name="leaf" href="<?=$this->category()->getModule()->getDataDir(true)
+               <a class="thumb" name="leaf" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
                          .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
                   title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-                  <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                  <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                               .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
                </a>
                <div class="caption">
@@ -40,8 +40,8 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
                   <div class="image-desc"><?=$image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
                      <?}?>
                   <div class="download">
-                     <a href="<?=$this->category()->getModule()->getDataDir(true)
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"><?=$this->_('Originál')?></a>
+                     <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+                         .Photogalery_Controller::DIR_ORIGINAL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"><?=$this->_('Originál')?></a>
                   </div>
                </div>
             </li>

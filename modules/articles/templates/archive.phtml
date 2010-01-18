@@ -6,37 +6,38 @@ $jQuery = new JsPlugin_JQuery();
 $jQuery->addWidgentAccordion();
 $this->addJsPlugin($jQuery);
 ?>
+<div>
+   <div id="articlesArchiveList">
+      <?
+      $previousYear = null;
+      while ($row = $this->articles->fetch()) {
+         $date = new DateTime($row->{Articles_Model_Detail::COLUMN_ADD_TIME});
+         $year = $date->format("Y");
+         if($year != $previousYear) {
+            if($previousYear !== null) {
+               print ("</ul></div>");
+            }?>
+      <h2 class="archiveYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
+      <div class="">
+         <ul>
+                  <?$previousYear = $year;
+               }?>
+            <li>
+               <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+                  title="<?=$row->{Articles_Model_Detail::COLUMN_NAME}?>"><?=$row->{Articles_Model_Detail::COLUMN_NAME}?></a>
+            </li>
+               <?}?>
+         </ul>
+      </div>
+   </div>
+   <hr class="reseter" />
+   <script type="text/javascript">
 
-<div id="articlesArchiveList">
-   <?
-   $previousYear = null;
-   while ($row = $this->articles->fetch()) {
-      $date = new DateTime($row->{Articles_Model_Detail::COLUMN_ADD_TIME});
-      $year = $date->format("Y");
-      if($year != $previousYear) {
-         if($previousYear !== null) {
-            print ("</ul></div>");
-         }?>
-   <h2 class="archiveYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
-   <div class="">
-            <ul>
-         <?$previousYear = $year;
-      }?>
-   <li>
-      <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-         title="<?=$row->{Articles_Model_Detail::COLUMN_NAME}?>"><?=$row->{Articles_Model_Detail::COLUMN_NAME}?></a>
-   </li>
-      <?}?>
-            </ul>
-</div>
-</div>
-<hr class="reseter" />
-<script type="text/javascript">
-
-   $(function() {
-      $("#articlesArchiveList").accordion({
-         collapsible: true
+      $(function() {
+         $("#articlesArchiveList").accordion({
+            collapsible: true
+         });
       });
-   });
-</script>
-<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
+   </script>
+</div>
+<?$this->includeTpl("buttonback.phtml", true);?>

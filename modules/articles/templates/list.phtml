@@ -8,11 +8,10 @@ if($this->top === true) {
 ?>
 <div class="articlesList">
 <p style="text-align:right">
-<?if($this->top === true) {?>
-   <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovější články')?></a>
-   <?} else {?>
-   <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenější články')?></a>
-   <?}?>
+   <?=$this->_('Řadit podle')?>:&nbsp;
+   <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
+   <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenějších')?></a>
+   &nbsp;&brvbar;&nbsp;
    <a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
 </p>
    <?if(!empty ($this->articles)) {

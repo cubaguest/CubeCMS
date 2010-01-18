@@ -56,12 +56,16 @@ class Photogalerymed_View extends Articles_View {
       $row = $coll = $maxHeight = 0;
 
       while ($image = $images->fetch()) {
-         $sizes = getimagesize($this->category()->getModule()->getDataDir().Photogalery_Controller::DIR_MEDIUM
+         $sizes = getimagesize($this->category()->getModule()->getDataDir()
+                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                 .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
          if($sizes[0] > 80/0.27){ $width = 80; } else { $width = $sizes[0]*0.27; } // převody mezi px<>mm
 
-         $c->pdf()->Image($this->category()->getModule()->getDataDir().Photogalery_Controller::DIR_MEDIUM
+         $c->pdf()->Image($this->category()->getModule()->getDataDir()
+                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                 .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $coll*100+VVE_PDF_MARGIN_LEFT, '', $width);
 
@@ -78,6 +82,9 @@ class Photogalerymed_View extends Articles_View {
       // výstup
       $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
    }
+   
+   public function checkFileView() {}
+   public function uploadFileView() {}
 }
 
 ?>

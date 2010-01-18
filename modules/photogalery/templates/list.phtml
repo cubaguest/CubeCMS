@@ -21,10 +21,10 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
    <div class="navigation-container">
       <?while ($image = $this->images->fetch()) {
          ?>
-      <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true)
+      <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
                 .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
          title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+         <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                      .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
       </a>
       <!--<div class="caption">

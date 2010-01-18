@@ -25,6 +25,8 @@ class Articles_Controller extends Controller {
 
       $this->view()->scrollComp = $scrollComponent;
       $this->view()->articles = $articles;
+      // odkaz zpět
+      $this->link()->backInit();
    }
 
    /**
@@ -33,7 +35,6 @@ class Articles_Controller extends Controller {
    public function topController() {
    //		Kontrola práv
       $this->checkReadableRights();
-
       // načtení článků
       $artModel = new Articles_Model_List();
       $scrollComponent = new Component_Scroll();
@@ -52,13 +53,16 @@ class Articles_Controller extends Controller {
       $this->view()->articles = $articles;
       $this->view()->scrollComp = $scrollComponent;
       $this->view()->top = true;
+      // odkaz zpět
+      $this->link()->backInit();
    }
 
    public function archiveController() {
       $this->checkReadableRights();
-
       $m = new Articles_Model_List();
       $this->view()->articles = $m->getListAll($this->category()->getId());
+      // odkaz zpět
+      $this->view()->linkBack = $this->link()->back($this->link()->route(), 0);
    }
 
    public function showController() {
@@ -83,22 +87,33 @@ class Articles_Controller extends Controller {
       $deleteForm->addElement($feSubmit);
 
       if($this->category()->getRights()->isWritable() AND $deleteForm->isValid()){
-         if($artM->deleteArticle($deleteForm->id->getValues())){
-            $this->infoMsg()->addMessage($this->_('Článek byl smazán'));
-            $this->link()->route()->rmParam()->reload();
-         } else {
-            $this->errMsg()->addMessage($this->_('Článek se nepodařilo smazat'));
-         }
+         $this->deleteArticle($deleteForm->id->getValues());
+
+         $this->link()->route()->rmParam()->reload();
       }
 
       // komponenta pro vypsání odkazů na sdílení
       $shares = new Component_Share();
-      $shares->setConfig('url', (string)$this->link());
+      $shares->setConfig('url', (string)$this->link()->rmParam());
       $shares->setConfig('title', $article->{Articles_Model_Detail::COLUMN_NAME});
 
       $this->view()->shares=$shares;
       $this->view()->article=$article;
+      // odkaz zpět
+      $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
    }
+
+   /**
+    * Metoda smaže článek z dat
+    * @param int $idArticle
+    */
+   protected function deleteArticle($idArticle){
+      $artM = new Articles_Model_Detail();
+      $artM->deleteArticle($idArticle);
+      $this->infoMsg()->addMessage($this->_('Článek byl smazán'));
+   }
+
+
 
    public function showPdfController() {
       $this->checkReadableRights();

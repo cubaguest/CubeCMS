@@ -114,8 +114,7 @@ class Articles_View extends View {
               $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
               new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}),
               $article->{Model_Users::COLUMN_USERNAME}, null, null,
-              $article->{Articles_Model_Detail::COLUMN_URLKEY}."_".$article->{Articles_Model_Detail::COLUMN_ID}
-              ."_".$article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
+              $article->{Articles_Model_Detail::COLUMN_URLKEY}."_".$article->{Articles_Model_Detail::COLUMN_ID});
    }
 
    $feed->flush();

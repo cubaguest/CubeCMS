@@ -1,4 +1,4 @@
 <?php
-class Photogalerymed_Search extends Text_Search {
+class Photogalerymed_Search extends Articles_Search {
 }
 ?>
