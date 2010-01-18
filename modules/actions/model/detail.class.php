@@ -104,7 +104,7 @@ class Actions_Model_Detail extends Model_PDO {
     * @param string -- url klíč článku
     * @return PDOStatement -- pole s článkem
     */
-   public function getAction($urlKey) {
+   public function getAction($urlKey, $idCat) {
       $dbc = new Db_PDO();
 //      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
 //              ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
@@ -115,8 +115,10 @@ class Actions_Model_Detail extends Model_PDO {
               ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+              ." AND (action.".self::COLUMN_ID_CAT." = :idcat)"
               ." LIMIT 0, 1");
       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
+      $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');

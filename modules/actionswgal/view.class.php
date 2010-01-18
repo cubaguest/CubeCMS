@@ -14,7 +14,7 @@ class Actionswgal_View extends Actions_View {
    }
 
    public function showPhotosView(){
-//      $this->template()->addTplFile("listPhotos.phtml");
+      $this->template()->addTplFile("listPhotos.phtml");
       $this->showView();
    }
 

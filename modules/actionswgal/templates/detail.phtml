@@ -28,8 +28,8 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
          <?}?>
       <div id="actionText"><!-- SOF TEXT -->
          <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-            print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().
-                    $this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));
+            print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->imagesDir.DIRECTORY_SEPARATOR
+                    .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));
          }?>
 
          <p>
@@ -58,15 +58,17 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
          <br />
 
          <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
+         <hr class="reseter" />
       </div> <!-- EOF TEXT -->
       <?if($countImages > 0) {?>
       <div id="actionImages"><!-- SOF IMAGES -->
             <?while ($image = $this->images->fetch()) {?>
-         <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true)
-                          .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+         <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+               .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
             title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-            <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                               .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+            <img src="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+               alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
          </a>
                <?}?>
       </div>
@@ -75,7 +77,7 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
    <?if($countImages > 0) {?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $("#actionTabs").tabs();
+      $("#actionTabs").tabs({});
 
       $(document).ready(function(){
          $().piroBox({
@@ -90,6 +92,9 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
             pirobox_prev : 'piro_prev', // Nav buttons -> piro_prev == inside piroBox , piro_prev_out == outside piroBox
             close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
          });
+         if($('#actionText').height() > $('#actionImages').height()){
+            $('#actionImages').height($('#actionText').height());
+         }
       });
       /* ]]> */
    </script>
@@ -106,18 +111,18 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
    <?
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_article', $this->_("Upravit akci"),
+      $toolbox->addTool('edit_action', $this->_("Upravit akci"),
               $this->link()->route('edit'),
               $this->_("Upravit zobrazenou akci"), "page_edit.png");
       $toolbox->addTool('edit_photos', $this->_("Upravit fotky"),
               $this->link()->route('editphotos'),
               $this->_("Upravit fotky zobrazené akce"), "image_edit.png");
-      $toolbox->addTool('article_delete', $this->_("Smazat akci"),
+      $toolbox->addTool('action_delete', $this->_("Smazat akci"),
               $this->link(), $this->_("Smazat zobrazenou akci"), "page_delete.png",
-              'article_id', (int)$this->action->{Articles_Model_Detail::COLUMN_ID},
+              'action_id', (int)$this->action->{Articles_Model_Detail::COLUMN_ID},
               $this->_('Opravdu smazat akci?'));
       $this->includeTplObj($toolbox);
    }
    ?>
 </div>
-<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
+<?$this->includeTpl("buttonback.phtml", true);?>

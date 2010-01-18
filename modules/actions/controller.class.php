@@ -2,27 +2,22 @@
 class Actions_Controller extends Controller {
 
    protected $action = null;
-  /**
-   * Kontroler pro zobrazení novinek
-   */
+   /**
+    * Kontroler pro zobrazení novinek
+    */
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
 
       // uložení datumu do session pokud existuje - kvuli návratu
-      if($this->getRequest('day') != null){
-         $_SESSION['actionBack'] = array('day' => $this->getRequest('day'),
-                                       'month' => $this->getRequest('month'),
-                                       'year' => $this->getRequest('year'));
-      } else {
-         unset ($_SESSION['actionBack']);
-      }
+      // odkaz zpět
+      $this->link()->backInit();
 
       $timeSpace = $this->category()->getModule()->getParam('time', "1_M");
       $arr = explode("_", $timeSpace);
 
       $startTime = mktime(0, 0, 0, $this->getRequest('month', date("n")),
-                 $this->getRequest('day', date("j")), $this->getRequest('year', date("Y")));
+              $this->getRequest('day', date("j")), $this->getRequest('year', date("Y")));
 
       $dateStart = new DateTime(date('Y-m-d',$startTime));
       $dateEnd = new DateTime(date('Y-m-d',$startTime));
@@ -55,31 +50,39 @@ class Actions_Controller extends Controller {
       // link další
       $this->view()->template()->linkNext = $this->link()->route('normaldate',
               array('day' => date('j', $timeNext) , 'month' => date('n', $timeNext),
-                 'year' => date('Y', $timeNext)));
+              'year' => date('Y', $timeNext)));
       // link předchozí
       $this->view()->template()->linkBack = $this->link()->route('normaldate',
               array('day' => date('j', $timePrev) , 'month' => date('n', $timePrev),
-                 'year' => date('Y', $timePrev)));
+              'year' => date('Y', $timePrev)));
    }
 
-   public function showController(){
+   public function showController() {
       $this->checkReadableRights();
 
       $model = new Actions_Model_Detail();
-      $this->view()->action = $model->getAction($this->getRequest('urlkey'));
-      if($this->view()->action == false){
+      $this->view()->action = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
+      if($this->view()->action == false) {
          AppCore::setErrorPage(true);
          return false;
       }
 
       // odkaz zpět
-      if(isset ($_SESSION['actionBack'])){
-            $this->view()->linkBack = $this->link()->route('normaldate', 
-                    array('day' => $_SESSION['actionBack']['day'],
-               'month' => $_SESSION['actionBack']['month'],
-               'year' => $_SESSION['actionBack']['year']));
-      } else {
-            $this->view()->linkBack = $this->link()->route();
+      $this->view()->linkBack = $this->link()->back($this->link()->route(), 0);
+
+      // práva k zápisu a kontrole
+      if($this->rights()->isWritable() OR $this->rights()->isControll()) {
+         // mazání akce
+         $delForm = new Form('action_');
+
+         $elemId = new Form_Element_Hidden('id');
+         $delForm->addElement($elemId);
+
+         $elemSubmit = new Form_Element_SubmitImage('delete');
+         $delForm->addElement($elemSubmit);
+         if($delForm->isValid()) {
+            $this->deleteAction($this->view()->action);
+         }
       }
 
       // komponenta pro vypsání odkazů na sdílení
@@ -87,6 +90,32 @@ class Actions_Controller extends Controller {
       $shares->setConfig('url', (string)$this->link());
       $shares->setConfig('title', $this->view()->action->{Actions_Model_Detail::COLUMN_NAME});
       $this->view()->shares=$shares;
+      $this->view()->imagesDir=$this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()];
+   }
+
+   protected function deleteAction($action) {
+      $this->deleteActionData($action);
+      $this->infoMsg()->addMessage(sprintf($this->_('Akce "%s" byla smazána'), $action->{Actions_Model_Detail::COLUMN_NAME}));
+      $this->view()->linkBack->reload();
+   }
+
+   protected function deleteActionData($action) {
+      // obrázek akce
+      if($file->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+         $fileObj = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
+                 $this->category()->getModule()->getDataDir()
+                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+         $fileObj->delete();
+      }
+      // smazání adresáře
+      $dir = $this->category()->getModule()->getDataDir().$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()];
+      if(file_exists($dir) AND is_dir($dir)){
+         $dir = new Filesystem_Dir($dir);
+         $dir->rmDir();
+      }
+
+      $model = new Actions_Model_Detail();
+      $model->deleteAction($action->{Actions_Model_Detail::COLUMN_ID});
    }
 
    public function showPdfController() {
@@ -94,31 +123,32 @@ class Actions_Controller extends Controller {
       $this->view()->urlkey = $this->getRequest('urlkey');
    }
 
-   public function archiveController(){
+   public function archiveController() {
       $this->checkReadableRights();
+      $this->link()->backInit();
    }
 
    /**
-   * Kontroler pro přidání novinky
-   */
-   public function addController(){
+    * Kontroler pro přidání novinky
+    */
+   public function addController() {
       $this->checkWritebleRights();
 
       $form = $this->createForm();
 
-      if($form->isValid()){
+      if($form->isValid()) {
          $model = new Actions_Model_Detail();
-         
+
          // pokud je nový obr nahrajeme jej
          $file = null;
-         if($form->image->getValues() != null){
+         if($form->image->getValues() != null) {
             $f = $form->image->getValues();
             $file = $f['name'];
          }
 
          // pokud není zadáno konečé datum
          $date_stop = $form->date_stop->getValues();
-         if($date_stop == null){
+         if($date_stop == null) {
             $date_stop = $form->date_start->getValues(); // +1 sekunda
             $date_stop->modify('+1 seconds');
          }
@@ -144,26 +174,38 @@ class Actions_Controller extends Controller {
 
          $act = $model->getActionById($ids);
 
+         // přesunutí obrázku akce do správného adresáře
+         if($form->image->getValues() != null) {
+            $fileObj = new Filesystem_File($file, AppCore::getAppCacheDir());
+            $fileObjR = clone $fileObj;
+            $fileObj->move($this->category()->getModule()->getDataDir().$act[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+            unset ($fileObj);
+            $fileObjR->delete();
+            unset ($fileObjR);
+         }
+
          $this->infoMsg()->addMessage($this->_('Akce byla uložena'));
          $this->link()->route('detail', array('urlkey' => $act->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
+      // odkaz zpět
+      $this->view()->linkBack = $this->link()->back($this->link()->route(), 0);
 
       $this->view()->template()->form = $form;
       $this->view()->template()->edit = false;
    }
 
-  /**
-   * controller pro úpravu akce
-   */
+   /**
+    * controller pro úpravu akce
+    */
    public function editController() {
       $this->checkWritebleRights();
 
 
       $model = new Actions_Model_Detail();
-      $action = $model->getAction($this->getRequest('urlkey'));
+      $action = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
       if($action == false) return false;
-      
+
       $form = $this->createForm(true);
 
       $form->name->setValues($action->{Actions_Model_Detail::COLUMN_NAME});
@@ -176,31 +218,42 @@ class Actions_Controller extends Controller {
       $form->place->setValues($action->{Actions_Model_Detail::COLUMN_PLACE});
       $form->price->setValues($action->{Actions_Model_Detail::COLUMN_PRICE});
 
-      if($action->{Actions_Model_Detail::COLUMN_IMAGE} == null){
+      if($action->{Actions_Model_Detail::COLUMN_IMAGE} == null) {
          $form->image->setSubLabel($this->_('Źádný obrázek'));
       } else {
          $form->image->setSubLabel($action->{Actions_Model_Detail::COLUMN_IMAGE});
       }
 
-      if($form->isValid()){
+      if($form->isValid()) {
          $file = $action->{Actions_Model_Detail::COLUMN_IMAGE};
 
          // smazání opbrázku
-         if($form->image->getValues() != null OR $form->del_image->getValues() == true){
-            $fileR = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE}, $this->category()->getModule()->getDataDir());
+         if(($form->image->getValues() != null OR $form->del_image->getValues() == true)
+                 AND $file != null) {
+            $fileR = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
+                    $this->category()->getModule()->getDataDir()
+                    .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
             $fileR->remove();
             unset ($fileR);
             $file = null;
+
          }
          // pokud je nový obr nahrajeme jej
-         if($form->image->getValues() != null){
+         if($form->image->getValues() != null) {
             $f = $form->image->getValues();
             $file = $f['name'];
+            $fileObj = new Filesystem_File($file, AppCore::getAppCacheDir());
+            $fileObjR = clone $fileObj;
+            $fileObj->move($this->category()->getModule()->getDataDir()
+                    .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+            unset ($fileObj);
+            $fileObjR->delete();
+            unset ($fileObjR);
          }
 
          // pokud není zadáno konečé datum
          $date_stop = $form->date_stop->getValues();
-         if($date_stop == null){
+         if($date_stop == null) {
             $date_stop = $form->date_start->getValues(); // +1 sekunda
             $date_stop->modify('+1 seconds');
          }
@@ -224,12 +277,21 @@ class Actions_Controller extends Controller {
                  $file, $this->category()->getId(), Auth::getUserId(),
                  $form->public->getValues(),$action->{Actions_Model_Detail::COLUMN_ID});
 
-         $act = $model->getActionById($action->{Actions_Model_Detail::COLUMN_ID});
+         $actionNew = $model->getActionById($action->{Actions_Model_Detail::COLUMN_ID});
+
+         // přejmenování složky
+         if($action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()] != $actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]) {
+            $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir()
+                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+            $dir->rename($actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+         }
 
          $this->infoMsg()->addMessage($this->_('Akce byla uložena'));
-         $this->link()->route('detail', array('urlkey' => $act->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
+         $this->link()->route('detail', array('urlkey' => $actionNew->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
+      // odkaz zpět
+      $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
 
       $this->view()->template()->form = $form;
       $this->view()->template()->edit = true;
@@ -278,10 +340,10 @@ class Actions_Controller extends Controller {
 
       $eFile = new Form_Element_File('image', $this->_('Obrázek'));
       $eFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'png')));
-      $eFile->setUploadDir($this->category()->getModule()->getDataDir());
+      $eFile->setUploadDir(AppCore::getAppCacheDir());
       $form->addElement($eFile);
 
-      if($delImg === true){
+      if($delImg === true) {
          $eDelImg = new Form_Element_Checkbox('del_image', null);
          $eDelImg->setSubLabel($this->_('Smazat nahraný obrázek'));
          $form->addElement($eDelImg);
@@ -304,7 +366,7 @@ class Actions_Controller extends Controller {
    }
 
    // RSS
-   public function exportController(){
+   public function exportController() {
       $this->checkReadableRights();
       $this->view()->type = $this->getRequest('type', 'rss');
    }

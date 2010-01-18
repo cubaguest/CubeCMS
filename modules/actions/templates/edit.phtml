@@ -37,10 +37,5 @@ $this->addJsPlugin($jQuery);
    </script>
 </div>
 <?
-if($this->edit) {
-   $this->includeTpl('buttonback.phtml', true, array('link' => $this->link()
-           ->route('detail', array('urlkey' => $this->action->{Actions_Model_Detail::COLUMN_URLKEY}))));
-} else {
-   $this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()));
-}
+   $this->includeTpl('buttonback.phtml', true);
 ?>

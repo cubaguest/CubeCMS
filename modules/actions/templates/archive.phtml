@@ -22,31 +22,41 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
          $prevYear = $year;?>
       <h2 class="actionYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
       <div>
-         <table>
+         <table cellpadding="0" cellspacing="0">
                <?$curAct = $model->getActions($this->category()->getId(),
                        mktime(0, 0, 0, 1, 1, $year), mktime(23, 59, 59, 12, 31, $year),
                        !$this->category()->getRights()->isWritable());
-
+               $prevMounth = null;
                while ($rowY = $curAct->fetch()) {
                   $class = null;
-                  if(!$rowY->{Actions_Model_Detail::COLUMN_PUBLIC}){
+                  if(!$rowY->{Actions_Model_Detail::COLUMN_PUBLIC}) {
                      $class = 'nonPublicAction';
                   }
                   $startDate = strftime("%x", $rowY->{Actions_Model_Detail::COLUMN_DATE_START});
                   $stopDate = strftime("%x", $rowY->{Actions_Model_Detail::COLUMN_DATE_STOP});
-                  ?>
-            <tr class="<?=$class?>">
-               <td><?=($startDate);?></td>
+                  $mounth = strftime("%B", $rowY->{Actions_Model_Detail::COLUMN_DATE_STOP});
+                  $mounthNum = strftime("%Y_%m", $rowY->{Actions_Model_Detail::COLUMN_DATE_STOP});
+                  if($mounth != $prevMounth) {
+                     $prevMounth = $mounth;?>
+            <tr>
+               <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?=$mounthNum?>');"
+                                  title="<?=$this->_('zobraz')." ".$mounth?>">
+                     <img src="<?=vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
+                          alt="expand" />&nbsp;<?=$mounth?></a></td>
+            </tr>
+                     <?}?>
+            <tr class="mounth_<?=$mounthNum?>" style="display: none;">
+               <td><span style="padding-left: 1em;"><?=$startDate?></span></td>
                <td>
-                  <?if($startDate != $stopDate) {
-                        print ("&nbsp;&mdash;&nbsp;");
-                        print ($stopDate);
-                     }?>
+                        <?if($startDate != $stopDate) {
+                           print ("&nbsp;&mdash;&nbsp;");
+                           print ($stopDate);
+                        }?>
                </td>
                <td>
                   &nbsp;&nbsp;
                   <a href="<?=$this->link()->route('detail',
-                          array('urlkey' => $rowY->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+                                   array('urlkey' => $rowY->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
                      title="<?=$rowY->{Articles_Model_Detail::COLUMN_NAME}?>"
                      ><?print ($rowY->{Articles_Model_Detail::COLUMN_NAME});?></a>
                </td>
@@ -67,4 +77,18 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
          active: '.year<?=date('Y')?>'
       });
    });
+
+   function showMonth(aObj, cls){
+      //$(cls).toggle();
+      $(cls).toggle(0,
+      function(){
+         if($(this).is(":hidden")){
+            $(aObj).children("img").attr('src', 'images/buttons/expand2.gif');
+         } else {
+            $(aObj).children("img").attr('src', 'images/buttons/collapse2.gif');
+         }
+      }
+   );
+      return false;
+   }
 </script>

@@ -1,10 +1,10 @@
 <?php
 class Articles_Controller extends Controller {
-/**
- * Kontroler pro zobrazení novinek
- */
+   /**
+    * Kontroler pro zobrazení novinek
+    */
    public function mainController() {
-   //		Kontrola práv
+      //		Kontrola práv
       $this->checkReadableRights();
 
       // načtení článků
@@ -12,16 +12,16 @@ class Articles_Controller extends Controller {
 
       $scrollComponent = new Component_Scroll();
       $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,
-         $artModel->getCountArticles($this->category()->getId()));
-      
+              $artModel->getCountArticles($this->category()->getId()));
+
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-         $this->category()->getModule()->getParam('scroll', 5));
+              $this->category()->getModule()->getParam('scroll', 5));
 
       $scrollComponent->runCtrlPart();
 
       $articles = $artModel->getList($this->category()->getId(),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
+              $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
+              $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
 
       $this->view()->scrollComp = $scrollComponent;
       $this->view()->articles = $articles;
@@ -33,23 +33,23 @@ class Articles_Controller extends Controller {
     * Kontroler pro zobrazení novinek
     */
    public function topController() {
-   //		Kontrola práv
+      //		Kontrola práv
       $this->checkReadableRights();
       // načtení článků
       $artModel = new Articles_Model_List();
       $scrollComponent = new Component_Scroll();
       $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,
-         $artModel->getCountArticles($this->category()->getId()));
+              $artModel->getCountArticles($this->category()->getId()));
 
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-         $this->category()->getModule()->getParam('article_scroll', 2));
+              $this->category()->getModule()->getParam('article_scroll', 2));
 
       $scrollComponent->runCtrlPart();
 
       $articles = $artModel->getListTop($this->category()->getId(),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
-         $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
-      
+              $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
+              $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
+
       $this->view()->articles = $articles;
       $this->view()->scrollComp = $scrollComponent;
       $this->view()->top = true;
@@ -70,26 +70,29 @@ class Articles_Controller extends Controller {
 
       $artM = new Articles_Model_Detail();
       $article = $artM->getArticle($this->getRequest('urlkey'));
-      if($article == false){
+      if($article == false) {
          AppCore::setErrorPage(true);
          return false;
       }
+      $this->view()->article=$article;
+      
       $artM->addShowCount($this->getRequest('urlkey'));
 
+      if($this->category()->getRights()->isWritable()
+              OR $this->category()->getRights()->isControll()) {
+         $deleteForm = new Form('article_');
 
-      $deleteForm = new Form('article_');
+         $feId = new Form_Element_Hidden('id');
+         $feId->addValidation(new Form_Validator_IsNumber());
+         $deleteForm->addElement($feId);
 
-      $feId = new Form_Element_Hidden('id');
-      $feId->addValidation(new Form_Validator_IsNumber());
-      $deleteForm->addElement($feId);
+         $feSubmit = new Form_Element_Submit('delete');
+         $deleteForm->addElement($feSubmit);
 
-      $feSubmit = new Form_Element_Submit('delete');
-      $deleteForm->addElement($feSubmit);
-
-      if($this->category()->getRights()->isWritable() AND $deleteForm->isValid()){
-         $this->deleteArticle($deleteForm->id->getValues());
-
-         $this->link()->route()->rmParam()->reload();
+         if($deleteForm->isValid()) {
+            $this->deleteArticle($deleteForm->id->getValues());
+            $this->link()->route()->rmParam()->reload();
+         }
       }
 
       // komponenta pro vypsání odkazů na sdílení
@@ -98,7 +101,7 @@ class Articles_Controller extends Controller {
       $shares->setConfig('title', $article->{Articles_Model_Detail::COLUMN_NAME});
 
       $this->view()->shares=$shares;
-      $this->view()->article=$article;
+      
       // odkaz zpět
       $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
    }
@@ -107,13 +110,11 @@ class Articles_Controller extends Controller {
     * Metoda smaže článek z dat
     * @param int $idArticle
     */
-   protected function deleteArticle($idArticle){
+   protected function deleteArticle($idArticle) {
       $artM = new Articles_Model_Detail();
       $artM->deleteArticle($idArticle);
       $this->infoMsg()->addMessage($this->_('Článek byl smazán'));
    }
-
-
 
    public function showPdfController() {
       $this->checkReadableRights();
@@ -129,33 +130,19 @@ class Articles_Controller extends Controller {
       $addForm = $this->createForm();
 
       if($addForm->isValid()) {
-      // generování url klíče
-         $urlkey = $addForm->urlkey->getValues();
+         // generování url klíče
+         $urlkeys = $addForm->urlkey->getValues();
          $names = $addForm->name->getValues();
-         foreach ($urlkey as $lang => $variable) {
-            if($variable == null AND $names[$lang] == null) {
-               $urlkey[$lang] = null;
-            } else if($variable == null) {
-               $urlkey[$lang] = vve_cr_url_key($names[$lang]);
-            } else {
-               $urlkey[$lang] = vve_cr_url_key($variable);
-            }
-         }
-
-         $artModel = new Articles_Model_Detail();
-         $count = $artModel->saveArticle($names, $addForm->text->getValues(), $urlkey,
-             $this->category()->getId(), Auth::getUserId(),$addForm->public->getValues());
-         if($count != 0) {
-            $art = $artModel->getArticleById($count);
-
-            $this->infoMsg()->addMessage($this->_('Uloženo'));
-            $this->link()->route('detail', array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
-         } else {
-            $this->errMsg()->addMessage($this->_('Text se nepodařilo uložit'));
-         }
+         $urlkeys = $this->createUrlKey($urlkeys, $names);
+         $model = new Articles_Model_Detail();
+         $lasId = $this->saveArticle($names, $urlkeys, $addForm);
+         $art = $model->getArticleById($lasId);
+         $this->infoMsg()->addMessage($this->_('Uloženo'));
+         $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
+                 array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
-      $this->view()->addForm = $addForm;
+      $this->view()->form = $addForm;
       $this->view()->edit = false;
    }
 
@@ -172,8 +159,8 @@ class Articles_Controller extends Controller {
       $editForm->addElement($iIdElem);
 
       // načtení dat
-      $artModel = new Articles_Model_Detail();
-      $article = $artModel->getArticle($this->getRequest('urlkey'));
+      $model = new Articles_Model_Detail();
+      $article = $model->getArticle($this->getRequest('urlkey'));
 
       $editForm->name->setValues($article->{Articles_Model_Detail::COLUMN_NAME});
       $editForm->text->setValues($article->{Articles_Model_Detail::COLUMN_TEXT});
@@ -182,42 +169,62 @@ class Articles_Controller extends Controller {
       $editForm->public->setValues($article->{Articles_Model_Detail::COLUMN_PUBLIC});
 
       if($editForm->isValid()) {
-      // generování url klíče
-         $urlkey = $editForm->urlkey->getValues();
+         // generování url klíče
+         $urlkeys = $editForm->urlkey->getValues();
          $names = $editForm->name->getValues();
-         foreach ($urlkey as $lang => $variable) {
-            if($variable == null AND $names[$lang] == null) {
-               $urlkey[$lang] = null;
-            } else if($variable == null) {
-               $urlkey[$lang] = vve_cr_url_key($names[$lang]);
-            } else {
-               $urlkey[$lang] = vve_cr_url_key($variable);
-            }
-         }
+         $urlkeys = $this->createUrlKey($urlkeys, $names);
 
-         if($artModel->saveArticle($names, $editForm->text->getValues(), $urlkey,
-         $this->category()->getId(), Auth::getUserId(),$editForm->public->getValues(),
-         $editForm->art_id->getValues())) {
-
-            // nahrání nové verze článku (kvůli url klíči)
-            $article = $artModel->getArticleById($editForm->art_id->getValues());
-
-            $this->infoMsg()->addMessage($this->_('Uloženo'));
-            $this->link()->route('detail',array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
-         } else {
-            $this->errMsg()->addMessage($this->_('Text se nepodařilo uložit'));
-         }
+         $this->saveArticle($names, $urlkeys, $editForm, $article);
+         // nahrání nové verze článku (kvůli url klíči)
+         $article = $model->getArticleById($editForm->art_id->getValues());
+         $this->link()->route('detail',array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
-      $this->view()->addForm = $editForm;
+      $this->view()->form = $editForm;
       $this->view()->edit = true;
+   }
+
+   /**
+    * Uložení samotného článku
+    * @param <type> $names
+    * @param <type> $urlkeys
+    * @param <type> $form
+    */
+   protected function saveArticle($names, $urlkeys, $form, $article=null) {
+      if($form->art_id == null) $idart = null;
+      else $idart = $form->art_id->getValues();
+      $model = new Articles_Model_Detail();
+      $lastId = $model->saveArticle($names, $form->text->getValues(), $urlkeys,
+              $this->category()->getId(), Auth::getUserId(),$form->public->getValues(),$idart);
+
+      $this->infoMsg()->addMessage($this->_('Uloženo'));
+      return $lastId;
+   }
+
+   /**
+    * Metoda vygeneruje url klíče
+    * @param <type> $urlkeys
+    * @param <type> $names
+    * @return <type>
+    */
+   protected function createUrlKey($urlkeys, $names) {
+      foreach ($urlkeys as $lang => $variable) {
+         if($variable == null AND $names[$lang] == null) {
+            $urlkeys[$lang] = null;
+         } else if($variable == null) {
+            $urlkeys[$lang] = vve_cr_url_key($names[$lang]);
+         } else {
+            $urlkeys[$lang] = vve_cr_url_key($variable);
+         }
+      }
+      return $urlkeys;
    }
 
    /**
     * Metoda  vytvoří element formuláře
     * @return Form
     */
-   public function createForm() {
+   protected function createForm() {
       $form = new Form('ardicle_');
 
       $iName = new Form_Element_Text('name', $this->_('Nadpis'));
@@ -227,7 +234,9 @@ class Articles_Controller extends Controller {
 
       $iText = new Form_Element_TextArea('text', $this->_('Text'));
       $iText->setLangs();
-      $iText->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      if($this->getOption('textEmpty', false) == false) {
+         $iText->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      }
       $form->addElement($iText);
 
       $iUrlKey = new Form_Element_Text('urlkey', $this->_('Url klíč'));
@@ -256,9 +265,9 @@ class Articles_Controller extends Controller {
    }
 
    // RSS
-   public function exportController(){
+   public function exportController() {
       $this->checkReadableRights();
-      
+
       $this->view()->type = $this->getRequest('type', 'rss');
    }
 }
