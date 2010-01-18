@@ -21,9 +21,7 @@ class Photogalery_Controller extends Controller {
    const MEDIUM_WIDTH = 600;
    const MEDIUM_HEIGHT = 400;
 
-   public $idArt = null;
-
-   public function init(){
+   public function init() {
       $this->setOption('idArt', $this->category()->getId());
    }
 
@@ -31,12 +29,15 @@ class Photogalery_Controller extends Controller {
     * Kontroler pro zobrazení fotogalerii
     */
    public function mainController() {
-   //		Kontrola práv
+      //		Kontrola práv
       $this->checkReadableRights();
 
       $modelImages = new PhotoGalery_Model_Images();
       $this->view()->images = $modelImages->getImages($this->category()->getId(),
               $this->getOption('idArt'));
+
+      $this->view()->subdir = $this->getOption('subdir', null);
+      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
    }
 
    public function edittextController() {
@@ -59,7 +60,7 @@ class Photogalery_Controller extends Controller {
       if($form->isValid()) {
          try {
             $model->saveText($form->text->getValues(), null,
-                null, $this->category()->getId());
+                    null, $this->category()->getId());
             $this->infoMsg()->addMessage($this->_('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
@@ -108,21 +109,9 @@ class Photogalery_Controller extends Controller {
 
          foreach ($ids as $id) {
             if($editForm->delete->getValues($id) === true) {
-               $img = $imagesM->getImage($id);
-            // smazání souborů
-               $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
-                       $this->category()->getModule()->getDataDir().self::DIR_SMALL.DIRECTORY_SEPARATOR);
-               $file->remove();
-               $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
-                       $this->category()->getModule()->getDataDir().self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
-               $file->remove();
-               $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
-                       $this->category()->getModule()->getDataDir());
-               $file->remove();
-               // remove z db
-               $imagesM->deleteImage($id);
+               $this->deleteImage($id);
             } else {
-            // ukládají změny
+               // ukládají změny
                $imagesM->saveImage($this->category()->getId(), $this->getOption('idArt'),
                        null, $names[$id], $descs[$id],$orders[$id],$id);
             }
@@ -140,13 +129,48 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->addForm = $addForm;
       $this->view()->template()->editForm = $editForm;
       $this->view()->template()->idArt = $this->getOption('idArt');
+      // adresáře k fotkám
+      $this->view()->subdir = $this->getOption('subdir', null);
+      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
+   }
+
+   /**
+    * Metoda vymaže obrázek
+    */
+   private function deleteImage($idImage) {
+      $imagesM = new PhotoGalery_Model_Images();
+      $img = $imagesM->getImage($idImage);
+      // smazání souborů
+      $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
+              $this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL.DIRECTORY_SEPARATOR);
+      $file->remove();
+      $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
+              $this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
+      $file->remove();
+      $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
+              $this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
+      $file->remove();
+      // remove z db
+      $imagesM->deleteImage($idImage);
+   }
+
+   /**
+    * Metoda vymaže obrázky od článku
+    */
+   public function deleteImages($idArt) {
+      $imagesM = new PhotoGalery_Model_Images();
+      $images = $imagesM->getImages($this->category()->getId(), $idArt);
+      while ($image = $images->fetch()) {
+         $this->deleteImage($image->{PhotoGalery_Model_Images::COLUMN_ID});
+      }
    }
 
    private function savePhotoForm() {
       $addForm = new Form('addimage_');
       $addFile = new Form_Element_File('image', $this->_('Obrázek'));
       $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
-      $addFile->setUploadDir($this->category()->getModule()->getDataDir());
+      $addFile->setUploadDir($this->category()->getModule()->getDataDir()
+              .$this->getOption('subdir', null).self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
       $addForm->addElement($addFile);
 
       $idArt = new Form_Element_Hidden('idArt');
@@ -158,13 +182,13 @@ class Photogalery_Controller extends Controller {
 
       if($addForm->isValid()) {
          $file = $addFile->getValues();
-         $image = new Filesystem_File_Image($file['name'], $this->category()->getModule()->getDataDir());
-         $image->saveAs($this->category()->getModule()->getDataDir().self::DIR_SMALL,
-             $this->category()->getModule()->getParam('imagesmallwidth', self::SMALL_WIDTH),
-             $this->category()->getModule()->getParam('imagesmallheight', self::SMALL_HEIGHT), true);
-         $image->saveAs($this->category()->getModule()->getDataDir().self::DIR_MEDIUM,
-             $this->category()->getModule()->getParam('imagewidth', self::MEDIUM_WIDTH),
-             $this->category()->getModule()->getParam('imageheight', self::MEDIUM_HEIGHT));
+         $image = new Filesystem_File_Image($file['name'], $this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_ORIGINAL);
+         $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL,
+                 $this->category()->getModule()->getParam('imagesmallwidth', self::SMALL_WIDTH),
+                 $this->category()->getModule()->getParam('imagesmallheight', self::SMALL_HEIGHT), true);
+         $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM,
+                 $this->category()->getModule()->getParam('imagewidth', self::MEDIUM_WIDTH),
+                 $this->category()->getModule()->getParam('imageheight', self::MEDIUM_HEIGHT));
 
          // uloženhí do db
          $imagesM = new PhotoGalery_Model_Images();
@@ -180,7 +204,7 @@ class Photogalery_Controller extends Controller {
     */
    public function uploadFileController() {
       $this->checkWritebleRights();
-      if($this->savePhotoForm()->isValid()){
+      if($this->savePhotoForm()->isValid()) {
          echo "1";
       } else {
          echo $this->_('Neplatný typ souboru');
@@ -191,7 +215,7 @@ class Photogalery_Controller extends Controller {
       $fileArray = array();
       foreach ($_POST as $key => $value) {
          if ($key != 'folder') {
-            if (file_exists($this->getModule()->getDataDir() . $value)) {
+            if (file_exists($this->getModule()->getDataDir() . $this->getOption('subdir', null).self::DIR_ORIGINAL.DIRECTORY_SEPARATOR . $value)) {
                $fileArray[$key] = $value;
             }
          }
@@ -225,15 +249,15 @@ class Photogalery_Controller extends Controller {
       $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $editForm->addElement($elemSubmit);
 
-      if($editForm->isValid()){
+      if($editForm->isValid()) {
          $imageF = new Filesystem_File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE},
-            $this->getModule()->getDataDir().self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
-         $imageF->cropAndSave($this->getModule()->getDataDir().self::DIR_SMALL.DIRECTORY_SEPARATOR,
-            self::SMALL_WIDTH, self::SMALL_HEIGHT,
-            $editForm->start_x->getValues(), $editForm->start_y->getValues(),
-            $editForm->width->getValues(), $editForm->height->getValues());
+                 $this->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
+         $imageF->cropAndSave($this->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL.DIRECTORY_SEPARATOR,
+                 self::SMALL_WIDTH, self::SMALL_HEIGHT,
+                 $editForm->start_x->getValues(), $editForm->start_y->getValues(),
+                 $editForm->width->getValues(), $editForm->height->getValues());
          $this->infoMsg()->addMessage($this->_('Miniatura byla upravena'));
-         if($editForm->goBack->getValues() == true){
+         if($editForm->goBack->getValues() == true) {
             $this->link()->route('editphotos')->reload();
          } else {
             $this->link()->reload();
@@ -242,6 +266,9 @@ class Photogalery_Controller extends Controller {
 
       $this->view()->template()->form = $editForm;
       $this->view()->template()->image = $image;
+       // adresáře k fotkám
+      $this->view()->subdir = $this->getOption('subdir', null);
+      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
    }
 }
 ?>
