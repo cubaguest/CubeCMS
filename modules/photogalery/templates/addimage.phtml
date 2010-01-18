@@ -41,8 +41,8 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
             $('#mainftpQueue').show();
          },
          onSelect : function(){
-            $('#errMessages').empty();
-            $('#infoMessages').empty();
+            $('#errMessages').empty().hide();
+            $('#infoMessages').empty().hide();
          },
          onAllComplete: function() {
             $('#loader').hide();
