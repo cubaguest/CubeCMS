@@ -99,6 +99,10 @@ class Category {
       // vytvoření objektu Modulu
       $this->module = new Module((string)$this->category->{Model_Category::COLUMN_MODULE},
           $this->parseParams($this->category->{Model_Category::COLUMN_PARAMS}));
+      // pokud je zadána vlastní složka pro data
+      if($this->category->{Model_Category::COLUMN_DATADIR} != null){
+         $this->module->setDataDir($this->category->{Model_Category::COLUMN_DATADIR});
+      }
    }
 
    /**
