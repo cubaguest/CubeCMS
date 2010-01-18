@@ -666,6 +666,12 @@ class AppCore {
             }
             //	Vytvoření objektu s cestama modulu
             $routes = new $routesClassName($this->urlRequest->getModuleUrlPart());
+            // kontola cest
+            $routes->checkRoutes();
+            if(!$routes->getActionName()) {
+               AppCore::setErrorPage();
+               return false;
+            }
             // načtení kontroleru
             $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
             if(!class_exists($controllerClassName)) {
