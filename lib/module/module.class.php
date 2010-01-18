@@ -12,11 +12,13 @@
  class Module {
     private $name = null;
     private $params = null;
+    private $dataDir = null;
 
 
     public function  __construct($name, $params) {
        $this->name = $name;
        $this->params = $params;
+       $this->dataDir = $name;
     }
 
     /**
@@ -25,6 +27,14 @@
      */
     public function getName() {
        return $this->name;
+    }
+
+    /**
+     * Metoda nastaví název datového adresáře
+     * @return string
+     */
+    public function setDataDir($name) {
+       $this->dataDir = $name;
     }
 
     /**
@@ -44,13 +54,14 @@
    /**
     * Metoda datový vrací adresář modulu
     * @return string
+    * @todo -- ověřit vytváření adresáře
     */
    public function getDataDir($webAddres = false) {
       if($webAddres){
-         return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getName().URL_SEPARATOR;
+         return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->dataDir.URL_SEPARATOR;
       } else {
-         $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR);
-         $dir->checkDir();
+         $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$this->dataDir.DIRECTORY_SEPARATOR);
+         //$dir->checkDir(); -- TODO
          return (string)$dir;
       }
    }
