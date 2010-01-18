@@ -71,7 +71,9 @@ class Filesystem_Dir {
 	 * @param string -- adresář/soubor, který se má smazat
 	 * @return boolena -- true pokud se podařilo adresář/soubor smazat
 	 */
-	public function rmDir($filepath){
+	public function rmDir($filepath = null){
+      if($filepath === null) $filepath = $this->getDir();
+      
 		if (is_dir($filepath) && !is_link($filepath)){
          $dir = opendir($filepath);
 			if ($dir){
