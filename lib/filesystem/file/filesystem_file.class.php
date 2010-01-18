@@ -301,7 +301,15 @@ class Filesystem_File {
     * @return boolean -- true pokud byl soubor přesunut
     */
    public function move($dstDir, $newName = null) {
-      ;
+      $dstDir = new Filesystem_Dir($dstDir);
+      $dstDir->checkDir();
+      if($newName === null) $newName = $this->getName();
+      if(!@rename($this->getName(true), $dstDir.$newName)){
+         throw new UnexpectedValueException(_('Soubor se nepodařilo přesunout'));
+         return false;
+      }
+      $this->fileDir = $dstDir;
+      return true;
    }
 
    /**
