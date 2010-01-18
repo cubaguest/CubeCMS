@@ -38,9 +38,9 @@ class Model_Users extends Model_PDO {
 
 
 
+   const COLUMN_GROUP_ID    = 'id_group';
    const COLUMN_GROUP_NAME    = 'gname';
    const COLUMN_GROUP_LABEL    = 'label';
-   const COLUMN_GROUP_DEF_RIGHT    = 'default_right';
 
    /**
     * Metoda načte uživatele podle uživatelského jména
@@ -68,6 +68,21 @@ class Model_Users extends Model_PDO {
              JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP
           ." = grp.".self::COLUMN_ID_GROUP."
              WHERE (user.".self::COLUMN_ID." = ".$dbc->quote((int)$id).")");
+      $dbst->execute();
+
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      return $dbst->fetch();
+   }
+
+   /**
+    * Metoda načte skupinu podle id
+    * @param int $id -- id skupiny
+    */
+   public function getGroupById($id) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT *, name AS gname FROM ".self::getGroupsTable()
+             ." WHERE (".self::COLUMN_GROUP_ID." = :idgrp)");
+      $dbst->bindValue(':idgrp', $id, PDO::PARAM_INT);
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -174,35 +189,44 @@ class Model_Users extends Model_PDO {
           . " WHERE ".self::COLUMN_ID." = ".$dbc->quote((int)$id));
    }
 
-   public function saveGroup($name,$label,$defGrp, $id = null) {
+   public function saveGroup($name,$label, $id = null) {
       $dbc = new Db_PDO();
       if($id === null) {
-      // nový uživatel
+      // nová skupina
          $dbst = $dbc->prepare("INSERT INTO ".self::getGroupsTable()
-             ." (`name`, `".self::COLUMN_GROUP_LABEL."`, `".self::COLUMN_GROUP_DEF_RIGHT."`)"
-             ." VALUES (:name, :label, :default)");
+             ." (`name`, `".self::COLUMN_GROUP_LABEL."`)"
+             ." VALUES (:name, :label)");
       } else {
-      // existující uživatel
-         $passSql = null;
-         if($password != null){
-            $passSql = "`".self::COLUMN_PASSWORD."` = ".$dbc->quote(Auth::cryptPassword($password)).",";
-         }
-
-         $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
-                ." `".self::COLUMN_USERNAME."` = :username, `".self::COLUMN_NAME."` = :name,"
-                ." `".self::COLUMN_SURNAME."` = :surname, ".$passSql
-                ." `".self::COLUMN_ID_GROUP."` = :idgrp, `".self::COLUMN_MAIL."` = :mail,"
-                ." `".self::COLUMN_NOTE."` = :note, `".self::COLUMN_BLOCKED."` = :blocked"
-                ." WHERE (".self::COLUMN_ID." = :iduser)");
-         $dbst->bindValue(':iduser', $id);
+      // existující skupina
+//         $passSql = null;
+//         if($password != null){
+//            $passSql = "`".self::COLUMN_PASSWORD."` = ".$dbc->quote(Auth::cryptPassword($password)).",";
+//         }
+//
+//         $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
+//                ." `".self::COLUMN_USERNAME."` = :username, `".self::COLUMN_NAME."` = :name,"
+//                ." `".self::COLUMN_SURNAME."` = :surname, ".$passSql
+//                ." `".self::COLUMN_ID_GROUP."` = :idgrp, `".self::COLUMN_MAIL."` = :mail,"
+//                ." `".self::COLUMN_NOTE."` = :note, `".self::COLUMN_BLOCKED."` = :blocked"
+//                ." WHERE (".self::COLUMN_ID." = :iduser)");
+//         $dbst->bindValue(':iduser', $id);
       }
 
       $dbst->bindValue(':name', $name);
       $dbst->bindValue(':label', $label);
-      $dbst->bindValue(':default', $defGrp);
 
       $dbst->execute();
-      return $dbst;
+      return $dbc->lastInsertId();
+   }
+
+   /**
+    * Metoda smaže skupinu z db
+    * @param int $id -- id skupiny
+    */
+   public function deleteGroup($id) {
+      $dbc = new Db_PDO();
+      return $dbc->query("DELETE FROM ".self::getGroupsTable()
+          . " WHERE ".self::COLUMN_GROUP_ID." = ".$dbc->quote((int)$id));
    }
 
    /**

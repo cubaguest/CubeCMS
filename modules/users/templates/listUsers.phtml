@@ -80,17 +80,17 @@ $this->addJsPlugin(new JsPlugin_JQuery());
          <th width="20"><?=$this->_('id')?></th>
          <th width="80"><?=$this->_('jméno')?></th>
          <th><?=$this->_('popis')?></th>
-         <th width="60"><?=$this->_('výchozí práva')?></th>
          <th width="60"><?=$this->_('operace')?></th>
       </tr>
-      <? while ($row = $grList->fetchObject()) {?>
+      <? while ($row = $grList->fetchObject()) {
+         ?>
       <tr>
          <td><?=$row->{Model_Users::COLUMN_ID_GROUP}?></td>
          <td><?=$row->{Model_Users::COLUMN_GROUP_NAME}?></td>
          <td><?=$row->{Model_Users::COLUMN_GROUP_LABEL}?></td>
-         <td><?=$row->{Model_Users::COLUMN_GROUP_DEF_RIGHT}?></td>
          <td>
-            <?if($this->category()->getRights()->isControll()){?>
+            <?if($this->category()->getRights()->isControll()
+                    AND $row->{Model_Users::COLUMN_GROUP_NAME} != 'admin'){?>
             <form method="post" action="<?=$this->link()->route('editgroup',array('id' => $row->{Model_Users::COLUMN_ID_GROUP}))?>" style="display:inline;">
                <input type="image" src="<?=vve_get_tpl_file('icons/group_edit.png', VVE_TPL_FILE_IMAGE)?>"
                       value="edit" name="group_edit" title="<?=$this->_('Upravit')?>" />

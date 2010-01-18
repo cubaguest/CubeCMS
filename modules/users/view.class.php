@@ -6,7 +6,7 @@
 
 class Users_View extends View {
 	public function mainView() {
-
+      $this->template()->addTplFile('listUsers.phtml');
    }
 	/**
 	 * Viewer pro zobrazení detailu

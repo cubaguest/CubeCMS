@@ -427,7 +427,7 @@ class Categories_Controller extends Controller {
          $catGrpRigths = new Form_Element_Select('group_'.$group->{Model_Users::COLUMN_GROUP_NAME}, 
             sprintf($this->_("Skupina\n \"%s\""), $grName));
          $catGrpRigths->setOptions($rightsTypes);
-         $catGrpRigths->setValues($group->{Model_Users::COLUMN_GROUP_DEF_RIGHT});
+         $catGrpRigths->setValues(reset($rightsTypes));
          $form->addElement($catGrpRigths, 'rights');
       }
 

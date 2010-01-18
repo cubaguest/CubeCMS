@@ -15,11 +15,12 @@ class Users_Controller extends Controller {
       $this->checkControllRights();
       $model = new Model_Users();
 
+      /*
+       * Odstranění uživatele
+       */
       $formRemove = new Form('user_');
-
       $elemId = new Form_Element_Hidden('id');
       $formRemove->addElement($elemId);
-
       $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
       $formRemove->addElement($elemSub);
 
@@ -30,6 +31,29 @@ class Users_Controller extends Controller {
          $this->link()->reload();
       }
 
+      /*
+       * Odstranění skupiny
+       */
+      $formRemoveGr = new Form('group_');
+      $elemId = new Form_Element_Hidden('id');
+      $formRemoveGr->addElement($elemId);
+      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
+      $formRemoveGr->addElement($elemSub);
+
+      if($formRemoveGr->isValid()){
+         $group = $model->getGroupById($formRemoveGr->id->getValues());
+         $model->deleteGroup($formRemoveGr->id->getValues());
+         // smazání všech práv k dané skupině
+         $rModel = new Model_Rights();
+         $rModel->deleteRightsByGrID($formRemoveGr->id->getValues());
+
+         $this->infoMsg()->addMessage($this->_(sprintf('Skupina "%s" byla smazána', $group->{Model_Users::COLUMN_GROUP_NAME})));
+         $this->link()->reload();
+      }
+
+      /*
+       * Změna uživatelského statusu
+       */
       $formEnable = new Form('userstatus_');
 
       $elemId = new Form_Element_Hidden('id');
@@ -50,11 +74,8 @@ class Users_Controller extends Controller {
          }
          $this->link()->reload();
       }
-
-
-      $this->view()->template()->addTplFile('listUsers.phtml');
 	}
-	
+
 	/**
 	 * Metoda pro zobrazení detailu zástupce
 	 */
@@ -161,7 +182,9 @@ class Users_Controller extends Controller {
 
       $grps = array();
       while ($group = $groups->fetchObject()) {
-         $grps[$group->{Model_Users::COLUMN_GROUP_LABEL}] = $group->{Model_Users::COLUMN_ID_GROUP};
+         if($group->{Model_Users::COLUMN_GROUP_LABEL} != null) $grname = $group->{Model_Users::COLUMN_GROUP_LABEL};
+         else $grname = $group->{Model_Users::COLUMN_GROUP_NAME};
+         $grps[$grname] = $group->{Model_Users::COLUMN_ID_GROUP};
       }
 
       $elemGrp = new Form_Element_Select('group', $this->_('Skupina'));
@@ -192,8 +215,17 @@ class Users_Controller extends Controller {
       $form = $this->createGroupForm();
 
       if($form->isValid()){
-         $uModel->saveGroup($form->name->getValues(), $form->label->getValues(), $form->def_status->getValues());
-         $this->infoMsg()->addMessage($this->_('Skupina byla uložena'));
+         $idGroup = $uModel->saveGroup($form->name->getValues(), $form->label->getValues());
+         // vytvoření práv pro všechny kategorie
+         $catModel = new Model_Category();
+         $categories = $catModel->getCategoryList(true);
+
+         $modelR = new Model_Rights();
+         foreach ($categories as $category){
+            $modelR->saveRight($category[Model_Category::COLUMN_DEF_RIGHT], $idGroup, $category[Model_Category::COLUMN_CAT_ID]);
+         }
+
+         $this->infoMsg()->addMessage($this->_('Skupina byla uložena a přidělena práva k ní'));
          $this->link()->route()->reload();
       }
 
@@ -216,11 +248,11 @@ class Users_Controller extends Controller {
       $form->addElement($elemLabel);
 
       // pole s typy práv
-      $rightsTypes = array('r--'=>'r--', '-w-'=>'-w-', '--c'=>'--c', 'rw-'=>'rw-',
-          'r-c'=>'r-c', '-wc'=>'-wc', 'rwc'=>'rwc', '---' => '---');
-      $catGrpRigths = new Form_Element_Select('def_status', $this->_("Výchozí práva"));
-      $catGrpRigths->setOptions($rightsTypes);
-      $form->addElement($catGrpRigths);
+//      $rightsTypes = array('r--'=>'r--', '-w-'=>'-w-', '--c'=>'--c', 'rw-'=>'rw-',
+//          'r-c'=>'r-c', '-wc'=>'-wc', 'rwc'=>'rwc', '---' => '---');
+//      $catGrpRigths = new Form_Element_Select('def_status', $this->_("Výchozí práva"));
+//      $catGrpRigths->setOptions($rightsTypes);
+//      $form->addElement($catGrpRigths);
 
       $elemSubmit = new Form_Element_Submit('send', $this->_('odeslat'));
       $form->addElement($elemSubmit);

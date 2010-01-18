@@ -81,9 +81,17 @@ class Model_Rights extends Model_PDO {
    /**
     * Metoda vymaže práva
     * @param int $idCat -- id kategorie
-    * @param int $idGroup -- id skupiny
+    * @deprecated -- použít funkci deleteRightsByCatID
     */
    public function deleteCatRights($idCat) {
+      return $this->deleteRightsByCatID($idCat);
+   }
+
+   /**
+    * Metoda vymaže práva
+    * @param int $idCat -- id kategorie
+    */
+   public function deleteRightsByCatID($idCat) {
       $dbc = new Db_PDO();
       $st = $dbc->prepare("DELETE FROM ".self::getRightsTable()
           . " WHERE ".self::COLUMN_ID_CATEGORY." = :idcat ");
@@ -91,16 +99,22 @@ class Model_Rights extends Model_PDO {
    }
 
    /**
+    * Metoda vymaže práva podle id skupiny
+    * @param int $idGroup -- id skupiny
+    */
+   public function deleteRightsByGrID($idGrp) {
+      $dbc = new Db_PDO();
+      $st = $dbc->prepare("DELETE FROM ".self::getRightsTable()
+          . " WHERE ".self::COLUMN_ID_GROUP." = :idgrp ");
+      return $st->execute(array(':idgrp' => $idGrp));
+   }
+
+   /**
     * Metoda vrací název tabulky s právy (včetně prefixu)
     * @return string -- název tabulky
     */
    public static function getRightsTable() {
-//      if(VVE_USE_GLOBAL_ACCOUNTS === true) {
-//         return VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE;
-//      } else {
-         return Db_PDO::table(self::DB_TABLE);
-//      }
-
+      return Db_PDO::table(self::DB_TABLE);
    }
 }
 ?>
