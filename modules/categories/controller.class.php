@@ -132,6 +132,7 @@ class Categories_Controller extends Controller {
 
       $form->module->setValues($cat[Model_Category::COLUMN_MODULE]);
       $form->moduleParams->setValues($cat[Model_Category::COLUMN_PARAMS]);
+      $form->datadir->setValues($cat[Model_Category::COLUMN_DATADIR]);
       $form->urlkey->setValues($cat[Model_Category::COLUMN_URLKEY]);
       $form->priority->setValues($cat[Model_Category::COLUMN_PRIORITY]);
       $form->individual_panels->setValues($cat[Model_Category::COLUMN_INDIVIDUAL_PANELS]);
@@ -186,6 +187,17 @@ class Categories_Controller extends Controller {
             $feeds = true;
          }
 
+         $datadir = null;
+         if($form->datadir->getValues() != $cat[Model_Category::COLUMN_DATADIR]){
+            $datadir = vve_cr_safe_file_name($form->datadir->getValues());
+            // pokud byl předtím definován dojde k přesunu
+            if($cat[Model_Category::COLUMN_DATADIR] != null){
+               $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$cat[Model_Category::COLUMN_DATADIR]);
+               $dir->rename($datadir);
+               unset ($dir);
+            }
+         }
+
          // kategorie
          $categoryModel = new Model_Category();
          $categoryModel->saveEditCategory($this->getRequest('categoryid'), $form->name->getValues(),$form->alt->getValues(),
@@ -193,7 +205,7 @@ class Categories_Controller extends Controller {
              $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
              $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
              $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds);
+                 $form->rights_default->getValues(), $feeds, $datadir);
 
          // práva
          $usrModel = new Model_Users();
@@ -262,7 +274,6 @@ class Categories_Controller extends Controller {
                $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($names[$lang]));
             } else {
                $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($variable));
-               
             }
          }
 
@@ -273,13 +284,15 @@ class Categories_Controller extends Controller {
             $feeds = true;
          }
 
+         $datadir = vve_cr_safe_file_name($form->datadir->getValues());
+         
          $categoryModel = new Model_Category();
          $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
              $form->module->getValues(), $form->moduleParams->getValues(), $form->keywords->getValues(),
              $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
              $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
              $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-             $form->rights_default->getValues(), $feeds);
+             $form->rights_default->getValues(), $feeds, $datadir);
 
          // práva
          $usrModel = new Model_Users();
@@ -356,7 +369,10 @@ class Categories_Controller extends Controller {
       $catModule->setOptions($options);
       $form->addElement($catModule, 'settings');
 
-
+      $catDataDir = new Form_Element_Text('datadir', $this->_('Adresář s daty'));
+      $catDataDir->setSubLabel($this->_('Název datového adresář (ne cestu). Do něj budou ukládány všechyn soubory modulu. 
+         Pokud zůstane prázdný, použije se název modulu. POZOR! změna tohoto parametru může zapříčinit ztrátu dat!'));
+      $form->addElement($catDataDir, 'labels');
 
       // url klíč kategorie
       $catModuleParams = new Form_Element_Text('moduleParams', $this->_('Paramerty modulu'));
