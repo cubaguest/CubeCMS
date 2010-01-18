@@ -146,5 +146,21 @@ class Filesystem_Dir {
 			}
 		}
 	}
+
+   /**
+    * Metoda přejmenuje adresář
+    * @param string $newName -- nový název
+    */
+   public function rename($newName){
+      $dirOld = substr($this->dir, 0, strlen($this->dir)-1);
+      $dir = substr($dirOld, 0, strrpos($dirOld, DIRECTORY_SEPARATOR)+1);
+      $newDir = $this->checkDirPath($dir.$newName);
+      if(@rename($this->dir, $newDir)){
+         $this->dir = $newDir;
+      } else {
+         throw new UnexpectedValueException(_('Adresář se nepodařilo přejmenovat'));
+      }
+      return true;
+   }
 }
 ?>
