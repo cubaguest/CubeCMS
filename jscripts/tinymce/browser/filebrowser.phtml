@@ -6,6 +6,14 @@ header( 'Cache-Control: post-check=0, pre-check=0', false );
 header( 'Pragma: no-cache' );
 // vatvoření základních url
 
+//kontrola zadání sesion pokud není je spojení odmítnuto
+if(!isset ($_REQUEST['sessionid'])){
+   header('HTTP/1.1 403 Forbidden');
+   exit();
+} else {
+   
+}
+
 $str = preg_replace("/jscripts(.*)$/", '', $_SERVER['SCRIPT_NAME']);
 $pluginUrl = "http://".$_SERVER['SERVER_NAME'].$str."jsplugin/tinymce/cat-".$_GET['cat']."/";
 
@@ -21,8 +29,9 @@ $pluginUrl = "http://".$_SERVER['SERVER_NAME'].$str."jsplugin/tinymce/cat-".$_GE
 <script type="text/javascript" src="../../jquery/jquery-ui-1.7.UICore.min.js"></script>
 <script type="text/javascript" src="../../jquery/jquery-ui-1.7.Draggable.min.js"></script>
 <script type="text/javascript" src="../../jquery/jquery-ui-1.7.Droppable.min.js"></script>
+<!--<script type="text/javascript" src="../../jquery/jquery-ui-1.7.Selectable.min.js"></script>-->
 <script type="text/javascript" src="../../jquerytree/jquery.tree.min.js"></script>
-<!--<script type="text/javascript" src="../../jquerytree/plugins/jquery.tree.contextmenu.js"></script>-->
+<script type="text/javascript" src="../../jquerytree/plugins/jquery.tree.contextmenu.js"></script>
 <script type="text/javascript" src="../../jquerytree/plugins/jquery.tree.cookie.js"></script>
 <script type="text/javascript" src="../../jquerytree/plugins/jquery.tree.hotkeys.js"></script>
 <script type="text/javascript" src="tiny_mce_files_functions.js"></script>
@@ -55,33 +64,64 @@ $pluginUrl = "http://".$_SERVER['SERVER_NAME'].$str."jsplugin/tinymce/cat-".$_GE
    }
 
    /* styly textu */
-   #fileList table th {
-      font-size:10px !important;
-      text-align:left;
+   /* sof FILE */
+   p, span, ul,ol, li {
+      margin: 0;
+      list-style: none;
+      padding: 0;
+      outline: none;
    }
 
-   tr.file td {
-      border:1px solid transparent;
-      border-top-color:gray;
-      padding:3px;
-      cursor:pointer;
+   #filesHeader {
+      background-color: silver;
+      font-weight: bold;
+      border-bottom: 1px solid gray;
+   }
+   .filePreview {
+      float: left;
+      width: 80px;
+   }
+   .fileName {
+      float: left;
+      width: 330px;
+   }
+   .fileActions {
+
    }
 
-   tr.clicked{
-      background:#BEEBFF none repeat scroll 0 0;
-      -moz-background-clip:border;
-      -moz-background-inline-policy:continuous;
-      -moz-background-origin:padding;
+   .file {
+      clear: left;
+      height: 80px;
+      padding: 5px;
+      
+   }
+/* corers */
+   .file, .fileSelected, .moving {
+      border: 1px solid transparent;
+      -moz-border-radius-bottomleft:3px;
+      -moz-border-radius-bottomright:3px;
+      -moz-border-radius-topleft:3px;
+      -moz-border-radius-topright:3px;
+   }
+   
+   .fileHover {
+      background-color: #e7f4f9;
+      border:1px solid #D8F0FA;
    }
 
+   .fileSelected, .moving {
+      background-color: #beebff;
+      border:1px solid #99DEFD;
+   }
+   .moving {
+      position: absolute;
+      padding: 2px;
+      max-width: 300px;
+   }
    span.fileLabel {
       color:gray;
    }
-
-   .file div {
-      height:75px;
-   }
-
+   /* eof FILE */
    input[type="image"], input[type="hidden"] {
       border:none;
       background-color:transparent;
@@ -97,10 +137,19 @@ $pluginUrl = "http://".$_SERVER['SERVER_NAME'].$str."jsplugin/tinymce/cat-".$_GE
    #operationResult {
       background-color: #d1e8ff;
    }
+
+   span.errmsg {
+      font-weight: bold;
+      color: red;
+   }
+   span.msg {
+      color: olive;
+   }
 </style>
 <script language="javascript" type="text/javascript">
    // počáteční nastavení
    tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
+   var sessionId = '<?=$_REQUEST['sessionid']?>';
 </script>
 <table style="" id="mainTable">
    <tr>
@@ -116,7 +165,7 @@ $pluginUrl = "http://".$_SERVER['SERVER_NAME'].$str."jsplugin/tinymce/cat-".$_GE
          <span>Cesta:&nbsp;</span><span id="actualDir"></span>
       </td>
       <td width="270">
-         <span>Soubor:&nbsp;</span><span id="actualFile"></span>
+         <span>Soubor:&nbsp;</span><span id="actualFile"></span>&nbsp;
       </td>
    </tr>
    <tr valign="top">
@@ -131,21 +180,22 @@ $pluginUrl = "http://".$_SERVER['SERVER_NAME'].$str."jsplugin/tinymce/cat-".$_GE
       <td>
          <div>
             <span>Složku:</span>
-            <input type="image" src="../../../images/icons/folder_add.png"
+            <input id="buttonCreateDir" type="image" src="../../../images/icons/folder_add.png"
                    title="Vytvořit složku" onclick="FileBrowserDirsFunctions.createDir()" />
-            <input type="image" src="../../../images/icons/folder_delete.png"
+            <input id="buttonDeleteDir" type="image" src="../../../images/icons/folder_delete.png"
                    title="Smazat složku" onclick="FileBrowserDirsFunctions.removeDir()" />
-            <input type="image" src="../../../images/icons/folder_edit.png"
+            <input id="buttonRenameDir" type="image" src="../../../images/icons/folder_edit.png"
                    title="Přejmenovat složku" onclick="FileBrowserDirsFunctions.renameDir()" />
-            <input type="image" src="../../../images/icons/view-refresh.png"
+            <input id="buttonCreateDir" type="image" src="../../../images/icons/view-refresh.png"
                    title="Obnovit složky" onclick="FileBrowserDirsFunctions.loadDirs();" />
          </div>
       </td>
       <td></td>
       <td align="right">
+         <span>Vybráno:</span><span id="actualFiles"></span>&nbsp;souborů&nbsp;
          <span>Zaškrtnuté:</span>
          <input type="image" src="../../../images/icons/delete.png"
-                title="Smazat označené soubory" onclick="FileBrowserFilesFunctions.removeCheckedFiles()" />
+                title="Smazat označené soubory" onclick="FileBrowserFilesFunctions.removeSelectedFiles()" />
       </td>
    </tr>
    <tr>

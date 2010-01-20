@@ -13,10 +13,10 @@
  */
 
 class JsPlugin_TinyMce extends JsPlugin {
-/**
- * Konstanta s názvem adresáře s pluginem
- * @var string
- */
+   /**
+    * Konstanta s názvem adresáře s pluginem
+    * @var string
+    */
    const TINY_MCE_MAIN_DIR = 'tinymce';
 
    /**
@@ -125,20 +125,25 @@ class JsPlugin_TinyMce extends JsPlugin {
    const TINY_MODE_TEXTAREAS = 'textareas';
 
    /**
+    * Název souboru se seznamem editovatelných adresářů
+    */
+   const W_DIRS_FILE = 'dirs.xml';
+
+   /**
     * Pole s konfigurací pluginu
     * @var array
     */
    protected $config = array(
-   'theme' => 'simple',
-   'skin' => "o2k7",
-   'skin_variant' => "black",
-   'specific_textareas' => false,
-	'editor_selector' => 'mceEditor',
-   'textarea_trigger' => "convert_this",
-   'external_image_list_url' => null,
-   'external_link_list_url' => null,
-   'template_external_list_url' => null,
-   'template_replace_values' => array()
+           'theme' => 'simple',
+           'skin' => "o2k7",
+           'skin_variant' => "black",
+           'specific_textareas' => false,
+           'editor_selector' => 'mceEditor',
+           'textarea_trigger' => "convert_this",
+           'external_image_list_url' => null,
+           'external_link_list_url' => null,
+           'template_external_list_url' => null,
+           'template_replace_values' => array()
    );
 
 
@@ -146,31 +151,31 @@ class JsPlugin_TinyMce extends JsPlugin {
     * výchozí parametry tinyMCE
     */
    private $defaultParams = array(
-   'theme' => 'advanced',
-   'mode' => "textareas",
-   'language' => 'cs',
-   'entity_encoding' => 'raw',
-   //'encoding' => 'xml',
-   'category_id' => null,
-   'force_br_newlines' => true,
-   'document_base_url' => null,
-   'remove_script_host' => false,
-   'content_css' => null,
-   'extended_valid_elements' => 'td[*],div[*]',
-   'forced_root_block' => false,
-   'theme_advanced_toolbar_location' => 'top',
-   'theme_advanced_toolbar_align' => 'left',
-   'theme_advanced_statusbar_location' => 'bottom',
-   'theme_advanced_resizing' => 'true');
+           'theme' => 'advanced',
+           'mode' => "textareas",
+           'language' => 'cs',
+           'entity_encoding' => 'raw',
+           //'encoding' => 'xml',
+           'category_id' => null,
+           'force_br_newlines' => true,
+           'document_base_url' => null,
+           'remove_script_host' => false,
+           'content_css' => null,
+           'extended_valid_elements' => 'td[*],div[*]',
+           'forced_root_block' => false,
+           'theme_advanced_toolbar_location' => 'top',
+           'theme_advanced_toolbar_align' => 'left',
+           'theme_advanced_statusbar_location' => 'bottom',
+           'theme_advanced_resizing' => 'true');
 
    private $advParams = array(
-   'external_image_list_url' => null,
-   'external_link_list_url' => null,
-   'template_external_list_url' => null,
-   'template_replace_values' => array(),
-   'file_browser_callback' => 'vveTinyMCEFileBrowser'
+           'external_image_list_url' => null,
+           'external_link_list_url' => null,
+           'template_external_list_url' => null,
+           'template_replace_values' => array(),
+           'file_browser_callback' => 'vveTinyMCEFileBrowser'
 
-   //   ,'theme_advanced_toolbar_location' => 'external'
+           //   ,'theme_advanced_toolbar_location' => 'external'
    );
 
    /**
@@ -178,41 +183,41 @@ class JsPlugin_TinyMce extends JsPlugin {
     * @var array
     */
    private $advanced1Params = array(
-   'plugins' => array('safari', 'style', 'table', 'save', 'advhr', 'advimage', 'advlink', 'emotions', 'iespell', 'inlinepopups',
-   'insertdatetime', 'preview', 'media', 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
-   'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras', 'template'),
-   'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
-   'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen', 'template'),
-   'theme_advanced_buttons2' => array('cut', 'copy', 'paste', 'pastetext', '|', 'search,replace', '|', 'bullist,numlist', '|', 'outdent',
-   'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
-   'forecolor', 'backcolor'),
-   'theme_advanced_buttons3' => array('tablecontrols', '|', 'hr', 'removeformat', 'visualaid', '|', 'sub', 'sup', '|', 'charmap',
-   'emotions', 'image' , 'media', '|', 'ltr', 'rtl'));
+           'plugins' => array('safari', 'style', 'table', 'save', 'advhr', 'advimage', 'advlink', 'emotions', 'iespell', 'inlinepopups',
+                           'insertdatetime', 'preview', 'media', 'searchreplace', 'print', 'contextmenu', 'paste', 'directionality', 'fullscreen',
+                           'noneditable', 'visualchars', 'nonbreaking', 'xhtmlxtras', 'template'),
+           'theme_advanced_buttons1' => array('bold', 'italic', 'underline', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright',
+                           'justifyfull', '|', 'formatselect', 'fontselect', 'fontsizeselect', '|', 'preview', 'fullscreen', 'template'),
+           'theme_advanced_buttons2' => array('cut', 'copy', 'paste', 'pastetext', '|', 'search,replace', '|', 'bullist,numlist', '|', 'outdent',
+                           'indent,blockquote', '|', 'undo', 'redo', '|', 'link', 'unlink', 'anchor', 'cleanup', 'code', '|', 'inserttime', '|',
+                           'forecolor', 'backcolor'),
+           'theme_advanced_buttons3' => array('tablecontrols', '|', 'hr', 'removeformat', 'visualaid', '|', 'sub', 'sup', '|', 'charmap',
+                           'emotions', 'image' , 'media', '|', 'ltr', 'rtl'));
 
    /**
     * Parametry pro ořezané advanced THEME
     * @var array
     */
    private $advancedSimpleParams = array(
-   'plugins' => 'safari,inlinepopups,searchreplace,contextmenu,paste',
-   'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,|,search,|,link,unlink,|,undo,redo,code',
-   'theme_advanced_buttons2' => null,
-   'theme_advanced_buttons3' => null);
+           'plugins' => 'safari,inlinepopups,searchreplace,contextmenu,paste',
+           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,|,search,|,link,unlink,|,undo,redo,code',
+           'theme_advanced_buttons2' => null,
+           'theme_advanced_buttons3' => null);
 
    /**
     * Parametry pro ořezané advanced THEME
     * @var array
     */
    private $advancedFullParams = array(
-   'plugins' => "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+           'plugins' => "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
 //   'theme_advanced_buttons1' => "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-   'theme_advanced_buttons1' => "newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+           'theme_advanced_buttons1' => "newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
 //   'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-   'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,backcolor",
+           'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,backcolor",
 //   'theme_advanced_buttons3' => "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-   'theme_advanced_buttons3' => "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+           'theme_advanced_buttons3' => "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
 //   'theme_advanced_buttons4' => "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage"
-   'theme_advanced_buttons4' => "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertdate,inserttime,preview"
+           'theme_advanced_buttons4' => "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertdate,inserttime,preview"
    );
 
    protected function initJsPlugin() {
@@ -249,19 +254,20 @@ class JsPlugin_TinyMce extends JsPlugin {
 
    /**
     * Metoda nastaví některé dynmické proměnné, které jsou ve všech módech
-    * @param <type> $params 
+    * @param <type> $params
     */
    private function setBasicOptions(&$params) {
       $params['document_base_url'] = Url_Request::getBaseWebDir();
       $params['language'] = Locale::getLang();
       $params['category_id'] = AppCore::getCategory()->getId();
-      if(isset ($_GET['editor_selector'])){
+      $params['sessionid'] = Sessions::getSessionId();
+      if(isset ($_GET['editor_selector'])) {
          $params['editor_selector'] = rawurldecode($_GET['editor_selector']);
       } else {
          $params['editor_selector'] = $this->getCfgParam('editor_selector');
       }
       if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
-            Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')){
+      Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
          $params['content_css'] = Template::face(false).Template::STYLESHEETS_DIR.URL_SEPARATOR.'style-content.css';
       }
       $params['skin'] = $this->getCfgParam('skin');
@@ -337,7 +343,7 @@ class JsPlugin_TinyMce extends JsPlugin {
 
    /*
     * privátní metody
-    */
+   */
 
    /**
     * Metoda vygeneruje řetězec s parametry
@@ -358,10 +364,10 @@ class JsPlugin_TinyMce extends JsPlugin {
                   $v = "false";
                }
             } else if(is_int($paramValue)) {
-                  $v = (string)$paramValue;
-               } else {
-                  $v = "\"".$paramValue."\"";
-               }
+               $v = (string)$paramValue;
+            } else {
+               $v = "\"".$paramValue."\"";
+            }
             $content .= $paramName." : ".$v.",\n";
          }
       }
@@ -393,25 +399,27 @@ class JsPlugin_TinyMce extends JsPlugin {
 
    /*
     * Metody pro generování obsahu filebrowseru
-    */
+   */
 
    public function filebrowserView() {
-      
-
-//      $template = new Template(new Url_Link());
-//      $template->addTplFile('tinymce/filebrowser.phtml');
-//
-//      $template->renderTemplate();
    }
 
    /**
     * Metoda vrátí adresáře ve formátu JSON
     */
    public function getDirsView() {
+      if(!$this->category()->getRights()->isWritable()) {
+         header('HTTP/1.1 403 Forbidden');
+         print(_('Byl jste odhlášen.').' '._('Adresáře se nepodařilo načíst'));
+         flush();
+         exit();
+      }
+
       $tpl = new Template_JsPlugin(new Url_Link(), AppCore::getCategory(), $this);
       $tpl->addTplFile('browser/dirs.phtml');
 
       $tpl->dirs = $this->loadDir(AppCore::getAppWebDir().'data/');
+      $tpl->wrdirs = $this->loadWritableDirs();
       $tpl->dataPath = AppCore::getAppWebDir().'data/';
 
       $tpl->renderTemplate();
@@ -428,7 +436,7 @@ class JsPlugin_TinyMce extends JsPlugin {
             $arr = $this->loadDir($itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName());
             $array[$itFile->getFileName()]['childs'] = $arr;
             $array[$itFile->getFileName()]['path'] = str_replace(AppCore::getAppWebDir(),
-                '', $itFile->getPath()).URL_SEPARATOR.$itFile->getFileName();
+                    '', $itFile->getPath()).URL_SEPARATOR.$itFile->getFileName();
          }
       }
       return $array;
@@ -438,6 +446,13 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metoda vrátí adresáře ve formátu JSON
     */
    public function getFilesView() {
+      if(!$this->category()->getRights()->isWritable()) {
+         header('HTTP/1.1 403 Forbidden');
+         print(_('Byl jste odhlášen.').' '._('Soubory se nepodařilo načíst'));
+         flush();
+         exit();
+      }
+
       $tpl = new Template_JsPlugin(new Url_Link(), AppCore::getCategory(), $this);
       if(isset ($_GET['dir'])) {
          $dir = urldecode($_GET['dir']);
@@ -451,15 +466,15 @@ class JsPlugin_TinyMce extends JsPlugin {
             foreach ($it as $itFile) {
                if(!$itFile->isDir() AND !$itFile->isDot()) {
                   if(($size = @getimagesize($itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName())) !== false
-                     AND $size[2] != IMAGETYPE_SWC AND $size != IMAGETYPE_SWF) {
+                          AND $size[2] != IMAGETYPE_SWC AND $size != IMAGETYPE_SWF) {
                      $file = array(
-                         'type' => 'image',
-                         'name' => $itFile->getFileName(),
-                         'width' => $size[0],
-                         'height' => $size[1],
-                         'mime' => $size['mime'],
-                         'size' => filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName()),
-                         'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR
+                             'type' => 'image',
+                             'name' => $itFile->getFileName(),
+                             'width' => $size[0],
+                             'height' => $size[1],
+                             'mime' => $size['mime'],
+                             'size' => filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName()),
+                             'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR
                      );
                      array_push($files, $file);
                   }
@@ -477,13 +492,13 @@ class JsPlugin_TinyMce extends JsPlugin {
 
                   if(preg_match("/\.(swf|wmv|rm|mov)$/i",$itFile->getFileName())) {
                      $file = array(
-                         'type' => 'video-x-generic',
-                         'name' => $itFile->getFileName(),
-                         'mime' => null,
-                         'size' => filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName()),
-                         'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR
+                             'type' => 'video-x-generic',
+                             'name' => $itFile->getFileName(),
+                             'mime' => null,
+                             'size' => filesize(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$itFile->getFileName()),
+                             'path' => Url_Request::getBaseWebDir().$dir.URL_SEPARATOR
                      );
-                     if($finfo !== false){
+                     if($finfo !== false) {
                         $file['mime'] = finfo_file($finfo, $itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName());
                         $file['mime'] = preg_replace(array('/^([^\ ]+)/', '/^(\w+)\//'), array('\1', '\1-'), $file['mime']);
                      }
@@ -495,7 +510,7 @@ class JsPlugin_TinyMce extends JsPlugin {
          default:
             $it = new DirectoryIterator(AppCore::getAppWebDir().$dir);
             $finfo = false;
-            if(function_exists('finfo_open')){
+            if(function_exists('finfo_open')) {
                $finfo = finfo_open(FILEINFO_MIME);
             }
             foreach ($it as $itFile) {
@@ -506,7 +521,7 @@ class JsPlugin_TinyMce extends JsPlugin {
                   $file['name'] = $itFile->getFileName();
                   $file['type'] = 'file';
                   $file['mime'] = null;
-                  if($finfo !== false){
+                  if($finfo !== false) {
                      $file['mime'] = finfo_file($finfo, $itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName());
                      $file['mime'] = preg_replace(array('/^([^\ ]+)/', '/^(\w+)\//'), array('\1', '\1-'), $file['mime']);
                      $file['mime'] = preg_replace('/^([^ ]+) (.*)$/', '\1', $file['mime']);
@@ -514,12 +529,12 @@ class JsPlugin_TinyMce extends JsPlugin {
                   $matches = array();
                   // obr
                   if(($size = getimagesize($itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName())) !== false
-                     AND $size[2] != IMAGETYPE_SWC AND $size[2] != IMAGETYPE_SWF) {
+                          AND $size[2] != IMAGETYPE_SWC AND $size[2] != IMAGETYPE_SWF) {
                      $file['type'] = 'image';
                      $file['width'] = $size[0];
                      $file['height'] = $size[1];
                      $file['mime'] = $size['mime'];
-                     
+
                   }
                   array_push($files, $file);
                }
@@ -529,6 +544,12 @@ class JsPlugin_TinyMce extends JsPlugin {
       $tpl->addTplFile('browser/files.phtml');
       //      print(new Url_Link());
       $tpl->files = $files;
+      $dirs = $this->loadWritableDirs();
+      if(in_array($dir, $dirs)) {
+         $tpl->editable = true;
+      } else {
+         $tpl->editable = false;
+      }
       //      $tpl->dataPath = AppCore::getAppWebDir().'data/';
 
       $tpl->renderTemplate();
@@ -545,92 +566,197 @@ class JsPlugin_TinyMce extends JsPlugin {
       $newDir = vve_cr_safe_file_name($_POST['dirname']);
       $path = $_POST['path'];
 
-      if(!Auth::isLoginStatic()){
-         $message = sprintf(_('Byl jste odhlášen. Adresář "%s" se nepodařilo vytvořit'), $path.$newDir);
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Adresář "%s" se nepodařilo vytvořit'), $path.$newDir);
          $code = false;
-      }
-
-      if($path == 'null' OR $path == null) {
-         $path = 'data';
-      }
-      if(substr($path, strlen($path)-1, 1) != '/') {
-         $path .= DIRECTORY_SEPARATOR;
-      }
-//      print (AppCore::getAppWebDir().$path.$newDir);
-      if(@mkdir(AppCore::getAppWebDir().$path.$newDir, 0777, true)) {
-         $message = sprintf(_('Adresář "%s" byl vytvořen'), $path.$newDir);
-         $code = true;
       } else {
-         $message = sprintf(_('Adresář "%s" se nepodařilo vytvořit'), $path.$newDir);
-         $code = false;
+
+         if($path == 'null' OR $path == null) {
+            $path = 'data';
+         }
+         if(substr($path, strlen($path)-1, 1) != '/') {
+            $path .= DIRECTORY_SEPARATOR;
+         }
+//      print (AppCore::getAppWebDir().$path.$newDir);
+         if(file_exists(AppCore::getAppWebDir().$path.$newDir)
+                 AND is_dir(AppCore::getAppWebDir().$path.$newDir)) {
+            $message = sprintf(_('Adresář "%s" již existuje'), AppCore::getAppWebDir().$path.$newDir);
+            $code = false;
+         } else if(@mkdir(AppCore::getAppWebDir().$path.$newDir, 0777, true)) {
+            $dirs = $this->loadWritableDirs();
+            $this->addNewWrDir($path.$newDir, $dirs);
+            $this->saveWritableDirs($dirs);
+            $message = sprintf(_('Adresář "%s" byl vytvořen'), $path.$newDir);
+            $code = true;
+         } else {
+            $message = sprintf(_('Adresář "%s" se nepodařilo vytvořit'), $path.$newDir);
+            $code = false;
+         }
       }
 
       $this->sendJsonData(array('code' => $code, 'message' => $message, 'data' => $newDir,
-          'path' => $path.$newDir));
+              'path' => $path.$newDir));
    }
 
    /**
     * Metoda pro mazání adresáře
     */
    public function removedirView() {
-      function deleteDirectory($dirname) {
-               if (!file_exists($dirname)) {return false;} // Sanity check
-               if (is_file($dirname) || is_link($dirname)) {return unlink($dirname);}
-               $dir = dir($dirname);
-               while (false !== $entry = $dir->read()) {
-                  if ($entry == '.' || $entry == '..') {continue;}
-                  if(!deleteDirectory($dirname . DIRECTORY_SEPARATOR . $entry)){
-                     return false;
-                  }
-               }
-               $dir->close();
-               return rmdir($dirname);
-      }
       $dir = $_POST['dir'];
-      //      var_dump(deleteDirectory(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR));
-      if(deleteDirectory(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR)) {
-      //      if(@rmdir(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.'*')) {
-         $message = sprintf(_('Adresář "%s" byl smazán'), $dir);
-         $code = true;
-      } else {
-         $message = sprintf(_('Adresář "%s" se nepodařilo smazat'), $dir);
+
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Adresář "%s" se nepodařilo smazat'), $dir);
          $code = false;
+      } else {
+         function deleteDirectory($dirname) {
+            if (!file_exists($dirname)) {
+               return false;
+            } // Sanity check
+            if (is_file($dirname) || is_link($dirname)) {
+               return unlink($dirname);
+            }
+            $dir = dir($dirname);
+            while (false !== $entry = $dir->read()) {
+               if ($entry == '.' || $entry == '..') {
+                  continue;
+               }
+               if(!deleteDirectory($dirname . DIRECTORY_SEPARATOR . $entry)) {
+                  return false;
+               }
+            }
+            $dir->close();
+            return rmdir($dirname);
+         }
+         $wDirs = $this->loadWritableDirs();
+
+         if(in_array($dir, $wDirs)) {
+            if(deleteDirectory(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR)) {
+               $dirs = $this->loadWritableDirs();
+               $this->delWrDir($dir, $dirs);
+               $this->saveWritableDirs($dirs);
+               $message = sprintf(_('Adresář "%s" byl smazán'), $dir);
+               $code = true;
+            } else {
+               $message = sprintf(_('Adresář "%s" se nepodařilo smazat'), $dir);
+               $code = false;
+            }
+         } else {
+            $message = sprintf(_('Adresář "%s" nelze smazat. Systémový?'), $dir);
+            $code = false;
+         }
       }
+
       $this->sendJsonData(array('code' => $code, 'message' => $message));
    }
 
+   private function loadWritableDirs() {
+      $arr = array();
+      if(file_exists(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::W_DIRS_FILE)) {
+         $dirs = simplexml_load_file(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::W_DIRS_FILE);
+         // TODO tohle optimalizovat !!!!!!!!!!!!
+         foreach ($dirs->name as $dir) {
+            if(empty ($dir)) continue;
+            array_push($arr, $dir);
+         }
+      }
+      return $arr;
+   }
+
+   private function saveWritableDirs($dirs) {
+      $xml = new XMLWriter();
+      $xml->openMemory();
+      $xml->setIndent(4);
+      $xml->startDocument('1.0', 'UTF-8');
+      $xml->startElement('dirs');
+      foreach ($dirs as $dir) {
+         $xml->writeElement('name', $dir);
+      }
+      $xml->endElement();
+//      if(file_exists(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::W_DIRS_FILE)){
+//         unlink(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::W_DIRS_FILE);
+//      }
+      file_put_contents(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::W_DIRS_FILE, $xml->outputMemory(), LOCK_EX);
+   }
+
+   private function addNewWrDir($dirName, &$dirs) {
+      $dirs[] = $dirName;
+      return $dirs;
+   }
+
+   private function delWrDir($dirName, &$dirs) {
+      foreach ($dirs as $key => $dir) {
+         if(preg_match("/^".str_replace('/', '\/', $dirName)."(\/|$)/", $dir) == 1) {
+            unset ($dirs[$key]);
+         }
+      }
+   }
+
+   private function renameWrDir($oldName, $newName, &$dirs) {
+      foreach ($dirs as &$dir) {
+         $dir = preg_replace("/^".str_replace('/', '\/', $oldName)."(\/|$)/", $newName."\\1", $dir);
+      }
+   }
+
    public function renamedirView() {
-      $oldDirName = vve_cr_safe_file_name($_POST['oldname']);
+      $oldDirName = $_POST['oldname'];
       $newDirName = vve_cr_safe_file_name($_POST['newname']);
       $path = $_POST['path'];
-      $path = str_ireplace($_POST['newname'], '', $path);
-      if(@rename(AppCore::getAppWebDir().$path.$oldDirName,
-         AppCore::getAppWebDir().$path.$newDirName)) {
-         $message = sprintf(_('Adresář "%s" byl přejmenován'), $path.$oldDirName);
-         $code = true;
-      } else {
-         $message = sprintf(_('Adresář "%s" se nepodařilo přejmenovat'), $path.$oldDirName);
+
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Adresář "%s" se nepodařilo přejmenovat'), $oldDirName);
          $code = false;
+      } else {
+
+         if(file_exists(AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$newDirName)
+                 AND is_dir(AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$newDirName)) {
+            $message = sprintf(_('Adresář "%s" již existuje'), $path.DIRECTORY_SEPARATOR.$newDirName);
+            $code = false;
+         } else if(@rename(AppCore::getAppWebDir().$oldDirName,
+         AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$newDirName)) {
+            $dirs = $this->loadWritableDirs();
+            $this->renameWrDir($oldDirName, $path.DIRECTORY_SEPARATOR.$newDirName, $dirs);
+            $this->saveWritableDirs($dirs);
+            $message = sprintf(_('Adresář "%s" byl přejmenován na "%s"'), $oldDirName,$path.DIRECTORY_SEPARATOR.$newDirName);
+            $code = true;
+         } else {
+            $message = sprintf(_('Adresář "%s" se nepodařilo přejmenovat'), $oldDirName);
+            $code = false;
+         }
       }
       $this->sendJsonData(array('code' => $code, 'message' => $message, 'data' => $newDirName));
    }
-   
+
    /**
     * Metoda pro přesun adresářů
     */
    public function movedirView() {
       $oldPath = $_POST['oldpath'];
       $newPath = $_POST['newpath'];
+      $dir = substr($oldPath, strrpos($oldPath,URL_SEPARATOR)+1);
 
-      if(@rename(AppCore::getAppWebDir().$oldPath,
-         AppCore::getAppWebDir().$newPath)) {
-         $message = sprintf(_('Adresář "%s" byl přesunut'), $oldPath);
-         $code = true;
-      } else {
-         $message = sprintf(_('Adresář "%s" se nepodařilo přesunout'), $oldPath);
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Adresář "%s" se nepodařilo přesunout'), $oldPath);
          $code = false;
+      } else {
+         $dirs = $this->loadWritableDirs();
+         $this->renameWrDir($oldPath, $newPath.URL_SEPARATOR.$dir, $dirs);
+         $this->saveWritableDirs($dirs);
+         if(file_exists(AppCore::getAppWebDir().$newPath.DIRECTORY_SEPARATOR.$dir)
+                 AND is_dir(AppCore::getAppWebDir().$newPath.DIRECTORY_SEPARATOR.$dir)) {
+            $message = sprintf(_('Adresář "%s" již existuje'), $newPath.DIRECTORY_SEPARATOR.$dir);
+            $code = false;
+         } else if(@rename(AppCore::getAppWebDir().$oldPath,
+         AppCore::getAppWebDir().$newPath.DIRECTORY_SEPARATOR.$dir)) {
+            $message = sprintf(_('Adresář "%s" byl přesunut do "%s"'), $oldPath, $newPath.URL_SEPARATOR.$dir);
+            $code = true;
+         } else {
+            $message = sprintf(_('Adresář "%s" se nepodařilo přesunout'), $oldPath);
+            $code = false;
+         }
       }
-      $this->sendJsonData(array('code' => $code, 'message' => $message));
+      $this->sendJsonData(array('code' => $code, 'message' => $message,
+              'data' => $newPath.URL_SEPARATOR.$dir,
+              'dataold' => str_replace('/', '\/', $oldPath)));
    }
 
    /**
@@ -644,59 +770,100 @@ class JsPlugin_TinyMce extends JsPlugin {
          $dir .= DIRECTORY_SEPARATOR;
       }
 
-      $form = new Form('newf_');
+      if(!$this->category()->getRights()->isWritable()) {
+         print ('<script language="javascript" type="text/javascript">
+         alert("'._('Byl jste odhlášen.').' '._('Soubor nebyl nahrán.').'");
+         </script> ');
+      } else {
 
-      $file = new Form_Element_File('File');
-      $validNoEmpty = new Form_Validator_NotEmpty();
-      $file->addValidation($validNoEmpty);
+         $form = new Form('newf_');
 
-      if($listType == 'image') {
-         $validOnlyImage = new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif'));
-         $file->addValidation($validOnlyImage);
-      } else if($listType == 'media') {
+         $file = new Form_Element_File('File');
+         $validNoEmpty = new Form_Validator_NotEmpty();
+         $file->addValidation($validNoEmpty);
+
+         if($listType == 'image') {
+            $validOnlyImage = new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif'));
+            $file->addValidation($validOnlyImage);
+         } else if($listType == 'media') {
             $validOnlyImage = new Form_Validator_FileExtension(array('swf', 'qt', 'wmv', 'rm'));
             $file->addValidation($validOnlyImage);
          }
 
-      $file->setUploadDir(AppCore::getAppWebDir().$dir);
-      $form->addElement($file);
+         $file->setUploadDir(AppCore::getAppWebDir().$dir);
+         $form->addElement($file);
 
-      $submit = new Form_Element_Submit('Upload');
-      $form->addElement($submit);
+         $submit = new Form_Element_Submit('Upload');
+         $form->addElement($submit);
 
-      $result = null;
-      if($form->isSend()) {
+         $result = null;
+         if($form->isSend()) {
 
-         if($form->isValid()) {
-            $result = _('Soubor byl uložen');
+            if($form->isValid()) {
+               $result = _('Soubor byl uložen');
+            }
+            if(!$validNoEmpty->isValid()) {
+               $result = _('Soubor nebyl vybrán');
+            }
+            // pouze obrázky
+            if(isset ($validOnlyImage) AND !$validOnlyImage->isValid()) {
+               $result = _('Soubor není obrázek');
+            }
          }
-         if(!$validNoEmpty->isValid()) {
-            $result = _('Soubor nebyl vybrán');
-         }
-         // pouze obrázky
-         if(isset ($validOnlyImage) AND !$validOnlyImage->isValid()) {
-            $result = _('Soubor není obrázek');
-         }
-      }
-      sleep(1);
-      print ('<script language="javascript" type="text/javascript">
+         sleep(1);
+         print ('<script language="javascript" type="text/javascript">
          parent.FileBrowserFilesFunctions.stopUpload("'.$result.'");
          </script> ');
+      }
    }
 
    public function removeFileView() {
       $file = $_POST['file'];
       $dir = $_POST['dir'];
-      $code = false;
-      if(file_exists(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)) {
-         if(unlink(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)) {
-            $message = sprintf(_('Soubor "%s" byl smazán'), $file);
-            $code = true;
-         } else {
-            $message = sprintf(_('Soubor "%s" se napodařilo smazat'), $file);
-         }
+
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo smazat'), $file);
+         $code = false;
       } else {
-         $message = sprintf(_('Soubor "%s" v adresáři "%s" neexistuje'), $file, $dir);
+         $code = false;
+         if(file_exists(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)) {
+            if(unlink(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)) {
+               $message = sprintf(_('Soubor "%s" byl smazán'), $file);
+               $code = true;
+            } else {
+               $message = sprintf(_('Soubor "%s" se napodařilo smazat'), $file);
+            }
+         } else {
+            $message = sprintf(_('Soubor "%s" v adresáři "%s" neexistuje'), $file, $dir);
+         }
+      }
+      $this->sendJsonData(array('code' => $code, 'message' => $message));
+   }
+
+   public function removeFilesView() {
+      $files = $_POST['files'];
+      $dir = $_POST['dir'];
+
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubory "%s" se nepodařilo smazat'), $files);
+         $code = false;
+      } else {
+         $files = explode(';', $files);
+         $code = true;
+         $badFiles = null;
+         foreach ($files as $file) {
+            if(file_exists(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)
+                    OR unlink(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)) {
+            } else {
+               $code = false;
+               $badFiles .= $file.', ';
+            }
+         }
+         if($code) {
+            $message = _('Soubory byly smazány');
+         } else {
+            $badFiles = sprintf(_('Soubory "%s" se napodařilo smazat'), substr($badFiles, 0, strlen($badFiles)-2));
+         }
       }
       $this->sendJsonData(array('code' => $code, 'message' => $message));
    }
@@ -709,18 +876,23 @@ class JsPlugin_TinyMce extends JsPlugin {
       $newName = vve_cr_safe_file_name($_POST['newname']);
       $path = $_POST['path'];
 
-      if(file_exists(AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$oldName)) {
-         if(@rename(AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$oldName,
-         AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$newName)) {
-            $message = _('Soubor byl přejmenován');
-            $code = true;
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo přejmenovat'), $oldName);
+         $code = false;
+      } else {
+         if(file_exists(AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$oldName)) {
+            if(@rename(AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$oldName,
+            AppCore::getAppWebDir().$path.DIRECTORY_SEPARATOR.$newName)) {
+               $message = sprintf(_('Soubor "%s" byl přejmenován na "%s"'), $oldName, $newName);
+               $code = true;
+            } else {
+               $message = sprintf(_('Soubor "%s" se nepodařilo přejmenovat'), $oldName);
+               $code = false;
+            }
          } else {
-            $message = _('Soubor se nepodařilo přejmenovat');
+            $message = sprintf(_('Soubor "%s" nebyl nalezen'), $oldName);
             $code = false;
          }
-      } else {
-         $message = _('Soubor nebyl nalezen');
-         $code = false;
       }
       $this->sendJsonData(array('code' => $code, 'message' => $message));
    }
@@ -733,58 +905,70 @@ class JsPlugin_TinyMce extends JsPlugin {
       $dir = $_POST['dir'];
       $newDir = $_POST['newdir'];
 
-      if(file_exists(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file)) {
-         if(@rename(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$file,
-         AppCore::getAppWebDir().$newDir.DIRECTORY_SEPARATOR.$file)) {
-            $message = _('Soubor byl přesunut');
-            $code = true;
-         } else {
-            $message = _('Soubor se nepodařilo přesunut');
-            $code = false;
-         }
-      } else {
-         $message = _('Soubor v adresáři neexistuje');
+      $files = explode(';', $file);
+
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo přesunot'), $file);
          $code = false;
+      } else if($files[0] == '') {
+         $message = _('Nebyl vybrán žádný soubor pro přesun');
+         $code = false;
+      } else {
+         foreach ($files as $f) {
+            if(file_exists(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$f)) {
+               if(@rename(AppCore::getAppWebDir().$dir.DIRECTORY_SEPARATOR.$f,
+               AppCore::getAppWebDir().$newDir.DIRECTORY_SEPARATOR.$f)) {
+                  $message = sprintf(_('Soubor "%s "byl přesunut'), $file);
+                  $code = true;
+               } else {
+                  $message = sprintf(_('Soubor "%s" se nepodařilo přesunut'), $file);
+                  $code = false;
+               }
+            } else {
+               $message = sprintf(_('Soubor "%s" v adresáři neexistuje'), $file);
+               $code = false;
+            }
+         }
       }
+
       $this->sendJsonData(array('code' => $code, 'message' => $message));
    }
 
 
    /*
     * POMOCNÉ funkce pro úpravu obrázků
-    */
+   */
    /**
     * Metoda pro změnu velikosti obrázku
     */
    public function resizeimageView() {
-      if(Auth::isLoginStatic()){
-
       $path = $_POST['path'];
       $file = $_POST['file'];
       $width = $_POST['size_w'];
       $heigh = $_POST['size_h'];
 
-      $badValues = false;
-      if(!is_numeric($width) OR !is_numeric($heigh)){
-         $badValues = true;
-      }
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo upravit'), $image->getName());
+         $code = false;
+      } else {
+         $badValues = false;
+         if(!is_numeric($width) OR !is_numeric($heigh)) {
+            $badValues = true;
+         }
 
-      $path = str_replace(Url_Request::getBaseWebDir(), AppCore::getAppWebDir(), $path);
+         $path = str_replace(Url_Request::getBaseWebDir(), AppCore::getAppWebDir(), $path);
 
-      $image = new Filesystem_File_Image($file, $path, false);
+         $image = new Filesystem_File_Image($file, $path, false);
 //      $image->setDimensions();
-      $image->resampleImage($width, $heigh);
-      $image->save();
-      if(!$image->isError() AND $badValues !== true){
-         $code = true;
-         $message = sprintf(_('Velikost obrázku "%s" byla upravenna'),$image->getName());
-      } else {
-         $code = false;
-         $message = sprintf(_('Velikost obrázku "%s" se nepodařilo upravit'),$image->getName());
-      }
-      } else {
-         $code = false;
-         $message = sprintf(_('Nemáte dostatečná práva nebo jste byl odhlášen'),$image->getName());
+         $image->resampleImage($width, $heigh);
+         $image->save();
+         if(!$image->isError() AND $badValues !== true) {
+            $code = true;
+            $message = sprintf(_('Velikost obrázku "%s" byla upravenna'),$image->getName());
+         } else {
+            $code = false;
+            $message = sprintf(_('Velikost obrázku "%s" se nepodařilo upravit'),$image->getName());
+         }
       }
 
       $this->sendJsonData(array('code' => $code, 'message' => $message));
@@ -794,8 +978,6 @@ class JsPlugin_TinyMce extends JsPlugin {
     * Metoda pro změnu velikosti obrázku
     */
    public function cropimageView() {
-      if(Auth::isLoginStatic()){
-
       $path = $_POST['path'];
       $file = $_POST['file'];
       $x1 = $_POST['x1'];
@@ -803,27 +985,29 @@ class JsPlugin_TinyMce extends JsPlugin {
       $x2 = $_POST['x2'];
       $y2 = $_POST['y2'];
 
-      $badValues = false;
-      if(!is_numeric($x1) OR !is_numeric($y1) OR !is_numeric($x2) OR !is_numeric($y2)){
-         $badValues = true;
-      }
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo upravit'), $image->getName());
+         $code = false;
+      } else {
 
-      $path = str_replace(Url_Request::getBaseWebDir(), AppCore::getAppWebDir(), $path);
+         $badValues = false;
+         if(!is_numeric($x1) OR !is_numeric($y1) OR !is_numeric($x2) OR !is_numeric($y2)) {
+            $badValues = true;
+         }
 
-      $image = new Filesystem_File_Image($file, $path, false);
+         $path = str_replace(Url_Request::getBaseWebDir(), AppCore::getAppWebDir(), $path);
+
+         $image = new Filesystem_File_Image($file, $path, false);
 //      $image->setDimensions();
-      $image->crop($x1, $y1, $x2, $y2);
-      $image->save();
-      if(!$image->isError() AND $badValues !== true){
-         $code = true;
-         $message = sprintf(_('Obrázek "%s" byl ořezán'),$image->getName());
-      } else {
-         $code = false;
-         $message = sprintf(_('Obrázek "%s" se nepodařilo ořezat'),$image->getName());
-      }
-      } else {
-         $code = false;
-         $message = sprintf(_('Nemáte dostatečná práva nebo jste byl odhlášen'),$image->getName());
+         $image->crop($x1, $y1, $x2, $y2);
+         $image->save();
+         if(!$image->isError() AND $badValues !== true) {
+            $code = true;
+            $message = sprintf(_('Obrázek "%s" byl ořezán'),$image->getName());
+         } else {
+            $code = false;
+            $message = sprintf(_('Obrázek "%s" se nepodařilo ořezat'),$image->getName());
+         }
       }
 
       $this->sendJsonData(array('code' => $code, 'message' => $message));
@@ -837,24 +1021,29 @@ class JsPlugin_TinyMce extends JsPlugin {
       $file = $_POST['file'];
       $angle = $_POST['angle'];
 
-      $bgColor = 0;
-      $regexp = '/bg=([[:digit:]]+)/i';
-      $matches = array();
-      if(preg_match($regexp, $angle, $matches) != 0){
-         $bgColor = $matches[1];
-      }
-
-      $image = new Filesystem_File_Image($file, $path, false);
-      $image->rotateImage($angle, $bgColor);
-      $image->save();
-      if(!$image->isError()){
-         $code = true;
-         $message = sprintf(_('Rotace obrázku "%s" byla upravenna'),$image->getName());
-      } else {
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo upravit'), $file);
          $code = false;
-         $message = sprintf(_('Rotaci obrázku "%s" se nepodařilo upravit'),$image->getName());
-      }
+      } else {
 
+         $bgColor = 0;
+         $regexp = '/bg=([[:digit:]]+)/i';
+         $matches = array();
+         if(preg_match($regexp, $angle, $matches) != 0) {
+            $bgColor = $matches[1];
+         }
+
+         $image = new Filesystem_File_Image($file, $path, false);
+         $image->rotateImage($angle, $bgColor);
+         $image->save();
+         if(!$image->isError()) {
+            $code = true;
+            $message = sprintf(_('Rotace obrázku "%s" byla upravenna'),$image->getName());
+         } else {
+            $code = false;
+            $message = sprintf(_('Rotaci obrázku "%s" se nepodařilo upravit'),$image->getName());
+         }
+      }
       $this->sendJsonData(array('code' => $code, 'message' => $message));
    }
 
@@ -866,22 +1055,26 @@ class JsPlugin_TinyMce extends JsPlugin {
       $file = $_POST['file'];
       $axis = $_POST['axis'];
 
-      $image = new Filesystem_File_Image($file, $path, false);
-
-      $regexp = '/([xy]{1})/i';
-      $matches = array();
-      if(preg_match($regexp, $axis, $matches) != 0){
-         $image->flip($matches[1]);
-      }
-      $image->save();
-      if(!$image->isError()){
-         $code = true;
-         $message = sprintf(_('Zrcadlení obrázku "%s" bylo provedeno'),$image->getName());
-      } else {
+      if(!$this->category()->getRights()->isWritable()) {
+         $message = _('Byl jste odhlášen.').sprintf(' '._('Soubor "%s" se nepodařilo upravit'), $file);
          $code = false;
-         $message = sprintf(_('Zrcadlení obrázku "%s" se nepodařilo provést'),$image->getName());
-      }
+      } else {
+         $image = new Filesystem_File_Image($file, $path, false);
 
+         $regexp = '/([xy]{1})/i';
+         $matches = array();
+         if(preg_match($regexp, $axis, $matches) != 0) {
+            $image->flip($matches[1]);
+         }
+         $image->save();
+         if(!$image->isError()) {
+            $code = true;
+            $message = sprintf(_('Zrcadlení obrázku "%s" bylo provedeno'),$image->getName());
+         } else {
+            $code = false;
+            $message = sprintf(_('Zrcadlení obrázku "%s" se nepodařilo provést'),$image->getName());
+         }
+      }
       $this->sendJsonData(array('code' => $code, 'message' => $message));
    }
 }

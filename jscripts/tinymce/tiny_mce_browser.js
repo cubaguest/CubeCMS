@@ -6,7 +6,8 @@ function vveTinyMCEFileBrowser (field_name, url, type, win) {
 
    var cmsURL = location.toString();    // script URL - use an absolute path!
    tinyMCE.activeEditor.windowManager.open({
-      file : "./jscripts/tinymce/browser/filebrowser.phtml?cat="+tinyMCE.activeEditor.getParam('category_id'),
+      file : "./jscripts/tinymce/browser/filebrowser.phtml?cat="+tinyMCE.activeEditor.getParam('category_id')
+         +'&sessionid='+tinyMCE.activeEditor.getParam('sessionid'),
       title : 'File Browser',
       width : 750,  // Your dimensions may differ - toy around with them!
       height : 400,
