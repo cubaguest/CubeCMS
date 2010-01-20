@@ -31,12 +31,6 @@ abstract class JsPlugin {
 	private $filesArray = array();
 	
 	/**
-	 * Pole obsahuje seznam css souborů nutných pro načtení
-	 * @var array
-	 */
-	private $cssFilesArray = array();
-	
-	/**
 	 * Název JsPluginu -- je totožný s adresářem js pluginu
 	 * @var string
 	 */
@@ -54,6 +48,12 @@ abstract class JsPlugin {
     */
    protected $config = array();
 
+   /**
+    * Objekt vybrané kategorie
+    * @var Category
+    */
+   private $category = null;
+
 	/**
 	 * Konstruktor třídy
 	 */
@@ -69,6 +69,26 @@ abstract class JsPlugin {
     */
    public function setJsPluginName($name) {
       $this->jsPluginName = $name;
+   }
+
+   /**
+    * Metoda nastaví název objekt kategorie
+    * @param Category $category -- název JsPluginu používá se pro přístup k adresáři
+    */
+   public function setCategory(Category $category) {
+      $this->category = $category;
+   }
+
+   /**
+    * Metoda vrací objekt vybrané kategorie
+    * @return Category
+    */
+   public function category(){
+      if($this->category == null){
+         return Category::getSelectedCategory();
+      } else {
+         return $this->category;
+      }
    }
 
 	/**
