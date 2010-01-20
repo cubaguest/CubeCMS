@@ -116,5 +116,13 @@ class Sessions {
 		session_commit();
 		session_start();
 	}
+
+   /**
+    * Metoda vrací id session s přihlašovacími údaji
+    * @return string
+    */
+   public static function getSessionId(){
+      return session_id();
+   }
 }
 ?>
