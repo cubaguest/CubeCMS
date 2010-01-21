@@ -1,0 +1,61 @@
+<? // načtení detailu
+$this->addPageTitle($this->_('Archiv'));
+$this->addPageHeadline($this->_('Archiv'));
+
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+
+<div>
+      <?
+      $previousYear = null;
+      $display = null;
+      $image = 'images/buttons/collapse.gif';
+      while ($row = $this->articles->fetch()) {
+         $year = date('Y',$row->{Articles_Model_Detail::COLUMN_ADD_TIME});
+         if($year != $previousYear) {
+            if($previousYear !== null) {
+               print ("</ul>");
+            }?>
+   <h2 class="archiveYearLabel"><img src="<?=$image?>" alt="image" /><?=$year?></h2>
+            <?
+            print('<ul class="archiveYear" style="'.$display.'">');
+            $previousYear = $year;
+            $display = 'display: none;';
+            $image = 'images/buttons/expand.gif';
+         }?>
+      <li>
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?=$row->{Articles_Model_Detail::COLUMN_NAME}?>"><?=$row->{Articles_Model_Detail::COLUMN_NAME}?></a>
+      </li>
+   <?}?>
+   </ul>
+   <hr class="reseter" />
+   <script type="text/javascript">
+
+      $(document).ready(function(){
+         $("h2.archiveYearLabel").click(function(){
+            var h2obj = $(this);
+            $(this).next(".archiveYear").slideToggle(200, function(){
+               if($(this).is(":hidden")){
+                  h2obj.children("img").attr('src', 'images/buttons/expand.gif');
+               } else {
+                  h2obj.children("img").attr('src', 'images/buttons/collapse.gif');
+               }
+            });
+         });
+
+      });
+//      function togg(year){
+//         $(".archiveYear"+year).toggle(
+//         function(){
+//            $(this).children('img').attr('src', 'images/buttons/collapse.gif');
+//         }, function(){
+//            $(this).children('img').attr('src', 'images/buttons/expand.gif');
+//
+//         }
+//         );
+//         return false;
+//      }
+   </script>
+</div>
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>

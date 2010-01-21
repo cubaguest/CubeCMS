@@ -1,0 +1,24 @@
+/* SOF navigation Menu */
+.navigationMenu {
+   background-color:white;
+   border-bottom:1px solid #cccccc;
+   position: fixed;
+   top:0;
+   width: 100%;
+   z-index: 10000;
+}
+.navigationMenu #subdomains {
+   float:left;
+}
+.navigationMenu #projects {
+   float:right;
+}
+
+.navigationMenu li {
+   float:left;
+   padding: 2px;
+}
+.navigationMenu li img {
+   vertical-align:bottom;
+}
+/* EOF navigation Menu */

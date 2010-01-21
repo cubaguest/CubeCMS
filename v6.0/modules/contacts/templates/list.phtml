@@ -1,0 +1,27 @@
+<?if($this->sys()->rights()->isWritable()) {
+      $this->includeTplObj($this->toolbox);
+}?>
+
+<?foreach ($this->contacts as $contact) {?>
+<div class="contact">
+   <h2><?=$contact["name"]?></h2>
+   <a href="<?=$this->module()->getDir()->getDataDir().$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>"
+      title="<?=$this->_("Budova kontaktu")?> <?=$contact["name"]?>" rel="lightbox">
+      <img src="<?=$this->module()->getDir()->getDataDir()."small/".$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>"
+        alt="image<?=$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?> " />
+   </a>
+   <b><?=$contact["name_type"]?></b>
+   <?=$contact[Contacts_Model_Detail::COLUMN_CONTACT_TEXT];?>
+   <?if($this->sys()->rights()->isWritable()){?>
+   <br />Priorita:<?=$contact['priority']?><br />
+   <?$this->includeTplObj($contact['toolbox'])?>
+   <?}?>
+   <hr class="reseter" />
+</div>
+<?}?>
+
+<script type="text/javascript">
+   $(function() {
+      $('.contact>a').lightBox();
+   });
+</script>

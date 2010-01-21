@@ -1,0 +1,42 @@
+<h2><?=$this->_('Kontaktní formulář');?></h2>
+<div id="kont_form">
+    <form method="post" action="<?=$this->l();?>">
+        <table>
+            <tr>
+                <td width="150px"><?=$this->_('Jméno');?>:</td>
+                <td>
+                    <input name="kontform_name" type="text" alt="{$VARS.INPUT_NAME}"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td width="150px"><?=$this->_('Příjmení');?>:</td>
+                <td>
+                    <input name="kontform_surname" type="text" alt="{$VARS.INPUT_SURNAME}" />
+                </td>
+            </tr>
+
+            <tr>
+                <td width="150px"><?=$this->_('E-mail');?>:</td>
+                <td>
+                    <input name="kontform_email" type="text" alt="{$VARS.INPUT_EMAIL}" />
+                </td>
+            </tr>
+
+            <tr>
+                <td width="150px"><?=$this->_('Dotaz');?>:</td>
+                <td>
+                    <textarea name="kontform_question" cols="60" rows="6"></textarea>
+                </td>
+            </tr>
+
+            <tr><td></td><td>
+                    <input name="kontform_reset" type="reset" value="Vymazat Formulář" />
+                    <input name="kontform_send" type="submit" value="Odeslat" />
+            </td></tr>
+        </table>
+    </form>
+</div>
+<?if($this->sys()->rights()->isWritable()){
+   $this->includeTplObj($this->toolbox);
+}?>

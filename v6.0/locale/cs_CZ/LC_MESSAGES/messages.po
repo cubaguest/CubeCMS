@@ -1,0 +1,122 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-08-08 19:31+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: app.php:342
+msgid " Databázový engine nebyl implementován"
+msgstr ""
+
+#: app.php:473
+msgid "Nepodařilo se načíst potřebnou systémovou třídu "
+msgstr ""
+
+#: app.php:556
+msgid "Odhlásit"
+msgstr ""
+
+#: app.php:557
+msgid "Přihlásit"
+msgstr ""
+
+#: app.php:608
+msgid "Nebyl nalezen soubor pro vytvoření hlavního menu"
+msgstr ""
+
+#: app.php:620
+msgid "Třída s hlavním menu neexistuje"
+msgstr ""
+
+#: app.php:649
+msgid "Nepřihlášen"
+msgstr ""
+
+#: app.php:650
+msgid "Přihlášen"
+msgstr ""
+
+#: app.php:776
+msgid "Nepodařilo se nahrát akci modulu "
+msgstr ""
+
+#: app.php:788
+msgid "Nepodařilo se nahrát cestu modul "
+msgstr ""
+
+#: app.php:802
+msgid "Nepodařilo se nahrát controler modulu "
+msgstr ""
+
+#: app.php:845
+msgid "Action Controller "
+msgstr ""
+
+#: app.php:845 app.php:892 app.php:898
+msgid " v modulu "
+msgstr ""
+
+#: app.php:845 app.php:892 app.php:898
+msgid " nebyl nalezen"
+msgstr ""
+
+#: app.php:856
+msgid "Nepodařilo se vytvořit objekt controleru modulu "
+msgstr ""
+
+#: app.php:863
+msgid "Nepodařilo se nahrát viewer modulu "
+msgstr ""
+
+#: app.php:892 app.php:898
+msgid "Action Viewer "
+msgstr ""
+
+#: app.php:910
+msgid "Nepodařilo se vytvořit objekt view modulu "
+msgstr ""
+
+#: app.php:912
+msgid ""
+"Objekt view modulu nebyl vytvořen, protože nebyl vytvořen objekt kontroleru "
+msgstr ""
+
+#: app.php:931
+msgid "Nepodařilo se nahrát prvky kategorie z databáze."
+msgstr ""
+
+#: app.php:1002
+msgid "Controler a Viewer panelu "
+msgstr ""
+
+#: app.php:1002 app.php:1048
+msgid " neexistuje."
+msgstr ""
+
+#: app.php:1037
+msgid "Neexistuje controler panelu "
+msgstr ""
+
+#: app.php:1044
+msgid "Neexistuje viewer panelu "
+msgstr ""
+
+#: app.php:1048
+msgid "Třídat "
+msgstr ""
+
+#: app.php:1048
+msgid " panelu "
+msgstr ""

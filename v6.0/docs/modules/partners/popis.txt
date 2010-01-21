@@ -1,0 +1,18 @@
+Modul partners
+
+Modul parnerů, zobrazuje partnery. U partnera je zadána adresa, název, popis 
+a logo ve formátu swf(flash) nebo obrázek.
+
+Obsahuje panel, kde zobrazí jen určitý náhodný počet nebo všechny,
+
+Parametry pro item:
+logowidth (int) -- šířka loga
+logoheight (int) -- výška loga
+
+numinpanel (int)-- kolik partnerů se má zobrazit (pokud je 0 budou zobrazeny
+všichni)
+
+panellogowidth (int) -- šířka loga v panelu
+panellogoheght (int) -- výška loga v panelu
+
+
