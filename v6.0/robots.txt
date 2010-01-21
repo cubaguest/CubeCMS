@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /templates/
-Disallow: /lib/
-Disallow: /docs/
