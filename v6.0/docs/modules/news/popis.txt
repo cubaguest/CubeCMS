@@ -1,8 +1,0 @@
-Modul news
-
-Modul novinek, zobrazuje krátké zprávy. Obsahuje panel, kde zobrazí jen určitý počet
-
-Parametry pro item:
-scroll (int) -- kolik novinek má být zobrazeno v listu
-scrollpanel (int) -- kolik novinek má být zobrazeno v panelu
-
