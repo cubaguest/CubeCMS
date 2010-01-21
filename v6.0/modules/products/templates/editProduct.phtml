@@ -1,0 +1,45 @@
+<div id="editProductForm">
+   <ul class="langMenu">
+      <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+      <li>
+         <a href="#articleLang<?=$key?>" class="selectedd">
+            <img src="images/lang/<?=$key?>.png" alt="<?=$lang?>" />
+            <?=$lang?>
+         </a>
+      </li>
+      <?}?>
+   </ul>
+
+   <div class="tabsContent">
+      <form method="post" action="<?=$this->l();?>">
+         <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+         <p id="articleLang<?=$key?>" class="tabcontent">
+            <?=$this->_m("Název produktu");?>:<br />
+            <input type="text" size="40" maxlength="50" name="product_label[<?=$key?>]"
+            value="<?=$this->post($_POST["product_label"][$key], $this->product['label'][$key]);?>" /><br />
+            <?=$this->_m("Text");?>*:<br />
+            <textarea class="textarea_tinymce textarea" rows="25" cols="70"
+            name="product_text[<?=$key;?>]"><?=$this->post($_POST["product_text"][$key], $this->product['text'][$key]);?></textarea>
+         </p>
+
+         <?}?>
+         <br />
+         <input name="product_reset" type="reset" value="<?=$this->_m("Obnovit")?>" />
+         <input name="product_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
+         <?$this->includeTpl("help.phtml", true, array('file' => 'edit', 'module' => 'articles'));?>
+         <?if($this->edit){?>
+            <input name="product_id" type="hidden" value="<?=$this->product['id_product']?>" />
+         <?}?>
+
+      </form>
+      
+   </div>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()));?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $("#editProductForm").tabs();
+      });
+   </script>
+      <? $this->includeTplObj($this->EPLfiles); ?>
+
+</div>

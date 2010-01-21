@@ -1,0 +1,15 @@
+<?php
+class Actions_Search extends Search {
+   public function runSearch() {
+      $model = new Actions_Model_Detail();
+      $result = $model->search($this->getCategory()->getId(), $this->getSearchString(), !$this->getCategory()->getRights()->isWritable());
+
+      while ($res = $result->fetch()) {
+         $this->addResult($res->{Actions_Model_Detail::COLUMN_NAME},
+                 $this->link()->route('detail', array('urlkey' => $res->{Actions_Model_Detail::COLUMN_URLKEY})),
+                 $res->{Actions_Model_Detail::COLUMN_TEXT_CLEAR}." ".$res->{Actions_Model_Detail::COLUMN_PLACE},
+                 $res->{Search::COLUMN_RELEVATION});
+      }
+   }
+}
+?>

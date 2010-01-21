@@ -1,0 +1,6 @@
+<script language="javascript" type="text/javascript">
+   var content = '<?=ereg_replace("(\n)", '\n\\\\1',$this->imageTpl);?>';
+   
+   window.top.window.stopUpload("<?=$this->result;?>",content);
+</script>
+

@@ -1,0 +1,24 @@
+Šablony pro VVE
+
+Samotné šablony využívají šablonovací systém SMARTY
+
+Volba vzhledu se provádí v hlavním konfiguračním souboru "config.xml" volbou "face"
+
+struktura:
+/faces/ -- adresář se vzhledy
+/faces/your-face/ -- adresář s novou šablonou
+
+Adresáře mají stejnou strukturu jako hlavní aplikace, proto je nutné dodržet tuto strukturu, 
+neboť aplikace podle ní hledá potřebné soubory.
+
+Struktura šablony vzhledu:
+
+/your-face/templates/ -- hlavní šablony
+/your-face/stylesheets/ -- hlavní css soubory
+/your-face/modules/<modulename>/templates/ -- šablony modulu
+/your-face/modules/<modulename>/stylesheets/ -- css soubory modulu
+
+Postup výběru šablony:
+1. Prohledání adresáře se zvoleným vzhledem /fases/your-face/
+2. Pokud ani zde nebyl soubor nalezen, je prohledán adresář v enginu (u modulu /modules/templates/)
+
