@@ -1,0 +1,162 @@
+<fieldset>
+   <legend><?=$this->_("Výběr produktu")?></legend>
+   <div id="productsTabs">
+      <ul class="tabsMenu">
+         <?foreach ($this->products as $prKey => $product) {?>
+         <li><a href="#product<?=$prKey?>"><span><?=$product->name?></span></a></li>
+         <? }?>
+      </ul>
+      <?$prc = 1;
+      foreach ($this->products as $prKey => $product) {?>
+      <div id="product<?=$prKey?>" class="tabsContent productsList">
+            <?foreach ($product->product as $prod) {
+               isset($prod->profilewindow) ? $prWin = "true":$prWin = "false";
+               isset($prod->profiledoor) ? $prDoor = "true":$prDoor = "false";
+               ?>
+         <p class="productParam">
+            <a  href="<?=$this->l()?>#" title="<?=$this->_("Vybrat")." ".$prod->label?>"
+                onclick="return selectProduct(this, new Product('<?=$prod->type?>',<?=$prod->dimensions?>,'<?=$prod->label?>',
+                   '<?=$this->sys()->module()->getDir()->getDataDir(true)."images/".$product->dir."/".$prod->file?>',<?=$prWin?>,<?=$prDoor?>));">
+               <img src="<?=$this->sys()->module()->getDir()->getDataDir(true)."images/".$product->dir.'/'.$prod->file?>"
+                    alt="<?=$prod->label?>" />
+            </a>
+         </p>
+            <?}?>
+         <hr class="reseter" />
+      </div>
+         <?$prc++;}?>
+      <div id="productParamSizes" style="display:none">
+         <h3 id="selectProductLabel"><?=$this->_("Vybraný produkt")?>:</h3>
+         <span></span><br />
+         <img id="selectProductImg" src="" alt="image" height="60" />
+         <br />
+         <br />
+         
+         <h3><?=$this->_("Rozměry")?>:</h3>
+         <table border="0" cellpadding="1" cellspacing="1">
+            <tbody>
+               <tr class="productParamSizesLabels">
+                  <th width="40"><?=$this->_("Část");?></th>
+                  <th width="50">
+                     <?=$this->_("Šířka");?><br/>[mm]
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Výška");?><br/>[mm]
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Žaluzie");?>
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Okenní sitě");?>
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Síťové dveře");?>
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Rolety");?>
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Vnitřní parapet");?>
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Vnější parapet");?>
+                  </th>
+                  <th width="50">
+                     <?=$this->_("Typ mřížky");?>
+                  </th>
+               </tr>
+            </tbody>
+         </table>
+         <br />
+         <h3><?=$this->_("Profil")?>:</h3>
+         <table>
+            <tr>
+               <td class="productWindowProfile" colspan="<?=count($this->profileWindow, COUNT_RECURSIVE)?>" style="display:none">
+                  <h4><?=$this->_("Oknenní profil");?></h4>
+               </td>
+               <td class="productDoorProfile" colspan="<?=count($this->profileDoor, COUNT_RECURSIVE)?>" style="display:none">
+                  <h4><?=$this->_("Dveřní profil");?></h4>
+               </td>
+            </tr>
+            <tr>
+               <?$first = true;
+               foreach ($this->profileWindow as $key => $profile) {?>
+               <td align="center" class="productWindowProfile productParam
+                      <?if($first) {?> selectedProductParam<?}?>" style="display:none">
+                  <a href="<?=$this->l()?>#" title="<?=$profile->name?>" onclick="return selectProfile(this, 'Window');">
+                     <img src="<?=$this->sys()->module()->getDir()->getDataDir(true).'images/profiles/'.$profile->image?>"
+                          alt="<?=$profile->name?>" width="80"/>
+                     <br />
+                     <?=$profile->name?>
+                  </a>
+                     <?if($first) {?>
+                  <input type="radio" name="window_profile" value="<?=$profile->code?>" checked style="display:none" />
+                     <?} else {?>
+                  <input type="radio" name="window_profile" value="<?=$profile->code?>" style="display:none" />
+                     <?}?>
+               </td>
+                  <?$first = false;}?>
+               <?$first = true;
+               foreach ($this->profileDoor as $key => $profile) {?>
+               <td align="center" class="productDoorProfile productParam
+                      <?if($first) {?> selectedProductParam<?}?>" style="display:none">
+                  <a href="<?=$this->l()?>#" title="<?=$profile->name?>" onclick="return selectProfile(this, 'Door');">
+                     <img src="<?=$this->sys()->module()->getDir()->getDataDir(true).'images/profiles/'.$profile->image?>"
+                          alt="<?=$profile->name?>" width="80"/>
+                     <br />
+                     <?=$profile->name?>
+                  </a>
+                     <?if($first) {?>
+                  <input type="radio" name="door_profile" value="<?=$profile->code?>" checked style="display:none" />
+                     <?} else {?>
+                  <input type="radio" name="door_profile" value="<?=$profile->code?>" style="display:none" />
+                     <?}?>
+               </td>
+                  <?$first = false;}?>
+            </tr>
+         </table>
+         
+         <p id="productAddButton" style="text-align:right;">
+            <?=$this->_("Kusů")?>:
+            <input type="text" name="productKs" value="33" size="3" maxlength="4" />&nbsp;
+            <input type="button" name="addProduct" value="<?=$this->_("Přidat")?>" onclick="addProductItem();" />
+         </p>
+      </div>
+      <div class="productSizesBottomLine"></div>
+   </div>
+</fieldset>
+
+<!-- SOF js template -->
+<table id="productParamSizesTemplate" style="display:none">
+   <tr class="productParamSizesValues">
+      <th class="productParamSizesPart">XX</th>
+      <td><input name="width_XX" value="3333" type="text" size="3" style="width:35px" /></td>
+      <td><input name="height_XX" value="3333" type="text" size="3" style="width:35px" /></td>
+      <td><input name="louver_XX" value="1" type="checkbox" /></td>
+      <td><input name="grid_XX" value="1" type="checkbox" /></td>
+      <td><input name="doorgrid_XX" value="1" type="checkbox" /></td>
+      <td><input name="rolltop_XX" type="checkbox" /></td>
+      <td><input name="indoorparapet_XX" type="checkbox" /></td>
+      <td><input name="outdoorparapet_XX" type="checkbox" /></td>
+      <td>
+         <select name="gridtype_XX">
+            <?foreach ($this->grids as $key => $grid) {?>
+            <option value="<?=$grid->type?>"><?=$grid->name?></option>
+            <?}?>
+         </select>
+
+      </td>
+   </tr>
+</table>
+<!-- EOF js template -->
+
+
+<script type="text/javascript">
+   <!--
+   // vytvoření tabů
+   $(document).ready(function(){
+      $("#productsTabs").tabs();
+      toggleBasket(); // zobrazení košíku pokud není prázdný
+   });
+   -->
+</script>

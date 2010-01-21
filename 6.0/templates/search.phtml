@@ -1,0 +1,39 @@
+<h1>
+   <span><?=_("hledání výrazu").sprintf(' "%s"',$this->articleName())?></span>
+</h1>
+<div class="content">
+   <h2>
+      <?
+      if($this->searchResultsCount == 0) {
+         printf(_("Nebyl nalezen žádný výsledek. Zkontrolujte hledaný výraz."));
+      } else if($this->searchResultsCount == 1) {
+            printf(_("Byl nalezen %u výsledek"), $this->searchResultsCount);
+         } else if($this->searchResultsCount > 1 AND $this->searchResultsCount < 5) {
+               printf(_("Byly nalezeny %u výsledky"), $this->searchResultsCount);
+            } else {
+               printf(_("Bylo nalezeno %u výsledeků"), $this->searchResultsCount);
+            }
+      ?>
+   </h2>
+</div>
+<div id="searchResults">
+   <?
+   if(!empty ($this->searchResults)) {
+      foreach ($this->searchResults as $result) {?>
+   <div class="searchResult content">
+      <h2>
+         <a href="<?=$result['category_url'];?>" title="<?=$result['category']?>"><?=$result['category']?></a>
+               <?if(!empty ($result['article'])) {?>
+         &nbsp;&raquo;&nbsp;
+         <a href="<?=$result['url']?>" title="<?=$result['category']?>"><?=$result['article']?></a>
+               <?}?>
+      </h2>
+      <div>
+               <?=$result['text']?><br />
+               <?=_("více")?>: <a href="<?=$result['url']?>" title="<?=$result['category']." ".$result['article']?>"><?=$result['url']?></a>
+      </div>
+   </div>
+      <?}?>
+   <div class="contentLine"></div>
+   <?}?>
+</div>

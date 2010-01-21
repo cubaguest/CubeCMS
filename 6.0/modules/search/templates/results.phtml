@@ -1,0 +1,30 @@
+<h2><?=$this->_('Výsledky hledání')?>:</h2>
+<p><?printf($this->_('Nalezeno %s výsledků'),count($this->results))?></p>
+<?
+//foreach ($this->results as $result) {
+for ($i = $this->start; $i < $this->stop; $i++) {
+if(!isset ($this->results[$i])) break;
+$result = $this->results[$i];
+   ?>
+<h3>
+
+   <? // pokud je stejná adresa
+   if($result[Search::R_I_CAT_LINK] == $result[Search::R_I_LINK]){?>
+   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=$result[Search::R_I_CAT_NAME]?>"><?=$result[Search::R_I_CAT_NAME]?>&nbsp;-&nbsp;<?=$result[Search::R_I_NAME]?></a>
+<?} else { // pokud se adresa liší?>
+   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=$result[Search::R_I_CAT_NAME]?>"><?=$result[Search::R_I_CAT_NAME]?></a>
+   <?if($result[Search::R_I_NAME] != null){?>
+   &nbsp;&raquo;&nbsp;<a href="<?=$result[Search::R_I_LINK]?>" title="<?=$result[Search::R_I_NAME]?>"><?=$result[Search::R_I_NAME]?></a>
+   <?}?>
+<?}?>
+</h3>
+<div>
+   <?=$result[Search::R_I_TEXT]?>
+</div>
+<p>
+   <a href="<?=$result[Search::R_I_LINK]?>" title="<?=$this->_('Přejít na adresu')?>"><?=$result[Search::R_I_LINK]?></a>
+</p>
+<br />
+<?}
+print $this->scrollComp;
+?>

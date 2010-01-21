@@ -1,0 +1,9 @@
+Lokalizace:
+
+1 - vytáhnutí textů: 'xgettext <-j> --from-code=UTF-8 *.php -d <doména> -p locale/<jazyk (cs_CZ, en_US, ...)>/LC_MESSAGES/'
+	(doména -- název modulu, -j spojit se stávajícím překladem - u již přeložených modulů)
+2 - nakopírování vygenerovaného souboru do překladů viz bod 1
+3 - překlad
+4 - kompilace: 'msgfmt locale/<jazyk (cs_CZ, en_US, ...)>/LC_MESSAGES/<doména>.po' POZOR !!>radši použít: 'msgfmt news.po -o news.mo'
+	nebo přímo 'msgfmt locale/en_US/LC_MESSAGES/<doména>.po -o locale/en_US/LC_MESSAGES/<doména>.mo -v -c'
+

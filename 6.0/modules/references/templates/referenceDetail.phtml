@@ -1,0 +1,28 @@
+<div class="referenceDetail">
+   <h2><?=$this->reference['name']?></h2>
+   <?=$this->reference['text']?>
+   <hr class="reseter" />
+   <br />
+   <!-- zde budou fotky -->
+   <div class="referencePhotos">
+   <?foreach ($this->images as $image) {?>
+   <p>
+      <a href="<?=$this->sys()->module()->getDir()->getDataDir().$image['file']?>"
+         title="<?=$image['label']?>" rel="lightbox">
+         <img src="<?=$this->sys()->module()->getDir()->getDataDir().References_Controller::IMAGES_SMALL_DIR
+            .'/'.$image['file']?>" alt="<?=$image['file']?>" />
+      </a>
+   </p>
+   <?}?>
+   </div>
+
+   <hr class="reseter" />
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->article()));?>
+
+   <script language="javascript" type="text/javascript">
+      $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+   </script>
+   <?if($this->sys()->rights()->isWritable()){
+      $this->includeTplObj($this->toolbox);
+   }?>
+</div>

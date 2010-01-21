@@ -1,0 +1,48 @@
+<?
+?>
+<div class="searchApiList">
+   <h2><?=$this->_('Uložené API');?></h2>
+   <table style="width: 95%" cellpadding="0" cellspacing="0">
+      <tr>
+         <th style="width: 50%"><?=$this->_('Url')?></th>
+         <th style="width: 20%"><?=$this->_('Název')?></th>
+         <th style="width: 20%"><?=$this->_('API')?></th>
+         <th><?=$this->_('Akce')?></th>
+      </tr>
+      <?$someApi = false;
+      foreach ($this->apis as $api) {
+         $someApi = true;
+         ?>
+      <tr>
+         <td><?=$api->{Search_Model_Api::COLUMN_URL}?></td>
+         <td><?=$api->{Search_Model_Api::COLUMN_NAME}?></td>
+         <td><?=array_search($api->{Search_Model_Api::COLUMN_API}, Search_Controller::$apis);?></td>
+         <td>
+            <form action="<?=$this->link()?>" method="post">
+                  <?
+                  $this->formDel->delete->setImage('images/icons/magifier_zoom_out.png');
+                  $this->formDel->id->setValues($api->{Search_Model_Api::COLUMN_ID});
+                  print($this->formDel->id->controllAll());
+                  print($this->formDel->delete->controll()->setAttrib('onclick', "return confirm('Smazat?')"));
+                  ?>
+            </form>
+         </td>
+      </tr>
+         <?}
+         if($someApi === false){?>
+      <tr>
+         <td colspan="3"><?=$this->_('Žádné API není přidáno')?></td>
+      </tr>
+            
+            <?}?>
+
+   </table>
+   <br />
+   <h2><?=$this->_('Přidání API');?></h2>
+   <?print($this->formAdd);?>
+
+   <h2><?=$this->_('Popis API');?></h2>
+   <?print($this->apiLabels);?>
+
+</div>
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()->route()));?>

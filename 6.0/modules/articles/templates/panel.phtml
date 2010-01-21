@@ -1,0 +1,22 @@
+<?if($this->rssLink != null){?>
+<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+<?}?>
+<h2><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h2>
+<div>
+   <h3><?=$this->_('Nejnovější')?>:</h3><br />
+   <?foreach ($this->newArticles as $article) {?>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
+   <?}?>
+   <h3><?=$this->_('Nejčtenější')?>:</h3><br />
+   <?foreach ($this->topArticles as $article) {?>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
+   <?
+   }
+   ?>
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>

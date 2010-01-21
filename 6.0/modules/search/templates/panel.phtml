@@ -1,0 +1,13 @@
+<h2><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h2>
+<div>
+   <form method="get" action="<?=$this->link()?>">
+      <p>
+      <input id="search_string_panel" type="text" size="14" name="q" value="<?=$this->searchString?>" />
+      <input type="submit" value="<?=$this->_('Hledat')?>" />
+      </p>
+   </form>
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Hledání')?></a>
+</p>

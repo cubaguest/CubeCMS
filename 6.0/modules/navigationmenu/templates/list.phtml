@@ -1,0 +1,88 @@
+<?
+$model = new NavigationMenu_Models_List();
+$listSubdomains = $model->getSubdomainsList();
+$listProjects = $model->getProjectsList();
+
+?>
+<div class="navMenuList">
+   <h2><?=$this->_("Subdoména")?></h2>
+   <table>
+      <?while ($row = $listSubdomains->fetch()) {?>
+      <tr>
+         <td width="200">
+               <?
+               if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
+            <img src="<?=$this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
+                 alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                    <?}?>
+            <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
+               title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>"><?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+         </td>
+            <?if($this->category()->getRights()->isWritable()) {?>
+         <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
+         <td>
+                  
+            <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
+            </form>
+            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
+               <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
+            </form>
+         </td>
+            <?}?>
+      </tr>
+      <?}?>
+   </table>
+
+
+   <br />
+   <h2><?=$this->_("Projekty")?></h2>
+   <table>
+      <?while ($row = $listProjects->fetch()) {?>
+      <tr>
+         <td width="200">
+               <?
+               if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
+            <img src="<?=$this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
+                 alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                    <?}?>
+            <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
+               title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>"><?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+         </td>
+            <?if($this->category()->getRights()->isWritable()) {?>
+         <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
+         <td>
+            <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
+            </form>
+            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
+               <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
+               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
+            </form>
+         </td>
+            <?}?>
+      </tr>
+      <?}?>
+   </table>
+   <script type="text/javascript">
+      function submitRemove(msg){
+         return confirm('<?=$this->_('Opravdu smazat odkaz: ')?>'+msg+'?');
+      }
+   </script>
+
+   <?// toolbox
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('add_nav_link', $this->_("Přidat odkaz"),
+          $this->link()->route('add'),
+          $this->_("Přidat nový odkaz"), "link_add.png");
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>
+

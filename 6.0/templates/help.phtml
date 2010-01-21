@@ -1,0 +1,10 @@
+<a href="javascript:popupHelp('<?=$this->pVar("mainWebDir");?>docs/modules/<?=$vars['module']?>/help/<?=$vars['file']?>.<?=$this->pVar("appLang")?>.xhtml');" title="help" onclick="">
+   <img src="images/toolbox/help.png" alt="help" />&nbsp;<?=_("Nápověda")?>
+</a>
+<script type="text/javascript">
+<!--
+function popupHelp(file) {
+   window.open( file, "Help","status = 1, height = 500, width = 300, resizable = 1, scrollbars = yes" )
+}
+//-->
+</script>

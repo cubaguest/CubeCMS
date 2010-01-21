@@ -1,0 +1,28 @@
+@CHARSET "UTF-8";
+.login_form_module {
+	text-align: center;
+}
+
+.login_form_module div {
+   margin: 100px auto;
+	width: 300px;
+	text-align: left;
+}
+
+.login_form_module div p {
+}
+.login_form_module div p b {
+	vertical-align: top;
+}
+
+.login_form_module div table {
+	width: 100%;
+	border: 1px solid #007070;
+}
+
+.login_form_module div table td {
+}
+
+.login_form_module div table td input[type="text"], .login_form_module div table td input[type="password"]{
+	/*width: 100%;*/
+}

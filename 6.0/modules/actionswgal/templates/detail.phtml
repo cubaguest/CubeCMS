@@ -1,0 +1,128 @@
+<? // načtení detailu
+$this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
+$this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
+
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addWidgentTabs();
+$this->addJsPlugin($jQuery);
+$this->addJsPlugin(new JsPlugin_PiroBox());
+
+$photosModel = new PhotoGalery_Model_Images();
+$countImages = $photosModel->getCountImages($this->category()->getId(), $this->action->{Actions_Model_Detail::COLUMN_ID});
+?>
+
+<div>
+   <!--<h2><?=htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>&nbsp;-->
+   <!--</h2>-->
+   <!--<p>
+      <a href="<?=$this->link()->route('detail')?>"><?=$this->_('Text')?></a>
+      <a href="<?=$this->link()->route('detailPhotos')?>"><?=$this->_('Fotky')?></a>
+   </p>-->
+
+   <div id="actionTabs">
+      <?if($countImages > 0) {?>
+      <ul>
+         <li><a href="#actionText"><?=$this->_('Text')?></a></li>
+         <li><a href="#actionImages"><?=$this->_('Fotky')?></a></li>
+      </ul>
+         <?}?>
+      <div id="actionText"><!-- SOF TEXT -->
+         <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+            print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->imagesDir.DIRECTORY_SEPARATOR
+                    .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));
+         }?>
+
+         <p>
+            <span style="font-weight: bold">
+            <?
+            $startDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_START});
+            $stopDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP});
+            print ($startDate);
+            if($startDate != $stopDate) {
+               print ("&nbsp;&mdash;&nbsp;");
+               print ($stopDate);
+            }?>
+            <?if($this->action->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00') {?>
+               <?=$this->action->{Actions_Model_Detail::COLUMN_TIME}?>
+            <?}?>
+            </span>
+            <br />   
+            <?if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null) {?>
+            <?=$this->action->{Actions_Model_Detail::COLUMN_PLACE}?><br />
+               <?}?>
+            <?if($this->action->{Actions_Model_Detail::COLUMN_PRICE} != null) {?>
+            <?=$this->_('Vstupné')?>:&nbsp;<?=$this->action->{Actions_Model_Detail::COLUMN_PRICE}?>&nbsp;Kč<br />
+               <?}?>
+
+         </p>
+         <br />
+
+         <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
+         <hr class="reseter" />
+      </div> <!-- EOF TEXT -->
+      <?if($countImages > 0) {?>
+      <div id="actionImages"><!-- SOF IMAGES -->
+            <?while ($image = $this->images->fetch()) {?>
+         <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+               .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+            title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+            <img src="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+               alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+         </a>
+               <?}?>
+      </div>
+         <?}?>
+   </div>
+   <?if($countImages > 0) {?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $("#actionTabs").tabs({});
+
+      $(document).ready(function(){
+         $().piroBox({
+            my_speed: 300, //animation speed
+            bg_alpha: 0.8, //background opacity
+            radius: 4, //caption rounded corner
+            scrollImage : false, // true == image follows the page _|_ false == image remains in the same open position
+            // in some cases of very large images or long description could be useful.
+            slideShow : 'slideshow', // true == slideshow on, false == slideshow off
+            slideSpeed : 3, //slideshow
+            pirobox_next : 'piro_next', // Nav buttons -> piro_next == inside piroBox , piro_next_out == outside piroBox
+            pirobox_prev : 'piro_prev', // Nav buttons -> piro_prev == inside piroBox , piro_prev_out == outside piroBox
+            close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
+         });
+         if($('#actionText').height() > $('#actionImages').height()){
+            $('#actionImages').height($('#actionText').height());
+         }
+      });
+      /* ]]> */
+   </script>
+      <?}?>
+   <hr class="reseter" />
+
+   <?//$this->includeTpl('tools.phtml')?>
+   <?$this->includeTpl('articletools.phtml', true, array(
+           'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+           'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
+           'linkToPdf' => $this->link()->route('detailpdf'),
+           'shares' => $this->shares));?>
+   <br />
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('edit_action', $this->_("Upravit akci"),
+              $this->link()->route('edit'),
+              $this->_("Upravit zobrazenou akci"), "page_edit.png");
+      $toolbox->addTool('edit_photos', $this->_("Upravit fotky"),
+              $this->link()->route('editphotos'),
+              $this->_("Upravit fotky zobrazené akce"), "image_edit.png");
+      $toolbox->addTool('action_delete', $this->_("Smazat akci"),
+              $this->link(), $this->_("Smazat zobrazenou akci"), "page_delete.png",
+              'action_id', (int)$this->action->{Articles_Model_Detail::COLUMN_ID},
+              $this->_('Opravdu smazat akci?'));
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>
+<?$this->includeTpl("buttonback.phtml", true);?>

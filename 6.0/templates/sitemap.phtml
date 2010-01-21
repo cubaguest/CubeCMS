@@ -1,0 +1,32 @@
+<?
+// funkce pro render menu
+define('LANG_ARTICLES', _('Články'));
+function vveRenderMap($menuArr, $link, $catsArr) {
+   print ("<ul>\n");
+   foreach ($menuArr as $key => $item) {
+      print ("<li>");
+      print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
+         .$item->getCatObj()->getLabel().'</a>'."");
+      if(isset ($catsArr[$item->getCatObj()->getId()]) AND !empty ($catsArr[$item->getCatObj()->getId()]['items'])){
+          print ("<ul>\n");
+          foreach ($catsArr[$item->getCatObj()->getId()]['items'] as $itemArt) {
+            print ('<li><a href="'.$itemArt['loc'].'">'.$itemArt['name'].'</a></li>');
+         }
+         print ("</ul>\n<br />");
+      }
+
+      if(!$item->isEmpty()){
+         vveRenderMap($item, $link, $catsArr);
+      }
+      print ("</li>\n");
+   }
+   print ("</ul><br />\n");
+}
+?>
+
+<!-- Halvni menu sekce v menu  -->
+<h1><?=_("Mapa stránek")?></h1>
+<div class="sitemapList">
+   <?=vveRenderMap($this->categories, $this->link(), $this->catArr)?>
+   <br style="clear: left" />
+</div>

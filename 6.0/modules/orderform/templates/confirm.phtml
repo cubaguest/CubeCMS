@@ -1,0 +1,101 @@
+<h1><?=$this->_("Potvrzení objednávky")?></h1>
+<h3><?=$this->_("Vybrané produkty");?>:</h3>
+<p>
+   <a href="#" title="<?=$this->_("Rozbalit vše")?>" onclick="return expandAll()"
+      ><?=$this->_("Rozbalit vše")?></a>
+   <a href="#" title="<?=$this->_("Sbalit vše")?>" onclick="return collapseAll()"
+      ><?=$this->_("Sbalit vše")?></a>
+</p>
+<div id="basketProducts">
+   <?foreach ($this->items as $key => $var) {
+      $this->itemTpl->item = $var;
+      $this->itemTpl->hideDelete = true;
+      $this->itemTpl->itemId = $key;
+      $this->includeTplObj($this->itemTpl);
+      $items++;
+   }?>
+</div>
+<br />
+<h3><?=$this->_("Vybrané služby");?>:</h3>
+<?foreach ($this->services as $service) {
+   if($this->buyDetails[(string)$service->inputname]) {?>
+      <input type="checkbox" checked name="orderform_<?=$service->inputname?>" disabled /><?=$service->name?><br/>
+   <?} else {?>
+      <input type="checkbox" name="orderform_<?=$service->inputname?>" disabled /><?=$service->name?><br/>
+<?}}?>
+<br />
+<h3><?=$this->_("Místo odběru");?>:</h3>
+<?=$this->buyDetails['office']?>
+<br />
+<br />
+<h3><?=$this->_("Osobní údaje");?>:</h3>
+<table>
+   <tr>
+      <td width="100"><?=$this->_("Jméno")?>:</td>
+      <td><?=$this->buyDetails['name']?></td>
+   </tr>
+   <tr>
+      <td><?=$this->_("Přijmení")?>:</td>
+      <td><?=$this->buyDetails['surname']?></td>
+   </tr>
+   <tr>
+      <td><?=$this->_("Telefon")?>:</td>
+      <td><?=$this->buyDetails['phone']?></td>
+   </tr>
+   <tr>
+      <td><?=$this->_("Email")?>:</td>
+      <td><a href="mailto:<?=$this->buyDetails['email']?>"
+             title="<?=$this->buyDetails['email']?>"><?=$this->buyDetails['email']?></a></td>
+   </tr>
+   <?if($this->buyDetails['company'] != null){?>
+   <tr>
+      <td><?=$this->_("Firma")?>:</td>
+      <td><?=$this->buyDetails['company']?></td>
+   </tr>
+   <?}?>
+</table>
+<br />
+<form method="post" action="<?=$this->l()->action()?>" style="display:inline">
+   <input type="submit" name="orderform_confirm_back" value="&laquo;&nbsp;<?=$this->_("Zpět")?>" />
+</form>
+<form method="post" action="<?=$this->l()?>" style="display:inline">
+   <input type="submit" name="orderform_confirm_send" value="<?=$this->_("Potvrdit")?>" />
+</form>
+
+<script type="text/javascript" language="javascript">
+   <!--
+   // zobrazení detailu
+   function showDetail(obj){
+      if(obj.opened == true){
+         $(obj).next().slideUp(100);
+         $(obj).children("img").attr("src", "images/buttons/expand2.gif");
+         obj.opened = false;
+      } else {
+         $(obj).next().slideDown(100);
+         $(obj).children("img").attr("src", "images/buttons/collapse2.gif");
+         obj.opened = true;
+      }
+      return false;
+   }
+
+   // rozbalí všechny prvky v košíku
+   function expandAll(){
+      $("#basketProducts div.basketProductHead").each(function(){
+         $(this).children("img").attr("src", "images/buttons/collapse2.gif");
+         $(this).next().slideDown(100);
+         this.opened = true;
+      });
+      return false;
+   }
+
+   // sbalí všechny prvky v košíku
+   function collapseAll(){
+      $("#basketProducts div.basketProductHead").each(function(){
+         $(this).next().slideUp(100);
+         this.opened = false;
+         $(this).children("img").attr("src", "images/buttons/expand2.gif");
+      });
+      return false;
+   }
+   -->
+</script>

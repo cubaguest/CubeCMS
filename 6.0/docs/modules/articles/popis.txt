@@ -1,0 +1,14 @@
+Modul articles
+
+Modul článků, zobrazuje články, ve stylu blogu. Umožnujě přidávat soubory a obrázky.
+Obsahuje panel s posledními články
+
+Parametry pro item:
+scroll (int) -- kolik článků má být zobrazeno v listu
+editonlyowner (bool) -- jestli má být článek editovatelný pouze vlastníkem (default: false)
+theme (advanced/simple) -- které theme editoru je zobrazeno (default: advanced(full))
+files (bool) -- jestli se mají použít uživatelské soubory (default: true)
+
+
+scrollpanel (int) -- kolik novinek má být zobrazeno v panelu
+
