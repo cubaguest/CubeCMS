@@ -1,0 +1,8 @@
+<h2><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h2>
+<div>
+   <?=$this->shortText->{Text_Model_Detail::COLUMN_TEXT_PANEL}?><br />
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>

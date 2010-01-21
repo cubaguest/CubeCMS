@@ -1,0 +1,13 @@
+<h2><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></h2>
+<div class="panelActions">
+   <h3><?=$this->_('Aktuální')?>:</h3><br />
+   <?while ($row = $this->actions->fetch()) {?>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+      title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
+      ><?=$row->{Actions_Model_Detail::COLUMN_NAME}?></a><br />
+   <?}?>
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>

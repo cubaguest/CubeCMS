@@ -1,0 +1,24 @@
+<div>
+<?
+// do titulku
+if($this->edit){
+   $this->addPageTitle($this->_('úprava kategorie'));
+   $this->addPageTitle($this->userName);
+   $this->addPageHeadline($this->_('úprava kategorie'));
+   $this->addPageHeadline($this->userName);
+} else {
+   $this->addPageTitle($this->_('přidání uživatele'));
+   $this->addPageHeadline($this->_('přidání uživatele'));
+}
+// donastavení formuláře
+
+?>
+
+<?=$this->form?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   /* ]]> */
+</script>
+
+<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+</div>
