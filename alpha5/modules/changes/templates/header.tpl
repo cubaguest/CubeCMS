@@ -1,1 +1,0 @@
-<h1>{html_image file='./images/icons/changes.png'}{$VARS.CHANGES}</h1>

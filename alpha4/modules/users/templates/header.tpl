@@ -1,1 +1,0 @@
-<h2>{$VARS.USER_PAGE_NAME}</h2>

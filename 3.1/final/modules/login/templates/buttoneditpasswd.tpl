@@ -1,4 +1,0 @@
-<div>
-	<a href="{$VARS.LINK_TO_CHANGE_PASSWD}" title="{$VARS.LOGOUT_BUTTON_CHANGE_PASSWD}">{$VARS.LOGOUT_BUTTON_CHANGE_PASSWD}</a><br />
-</div>
-<br />

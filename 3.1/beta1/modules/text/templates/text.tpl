@@ -1,1 +1,0 @@
-<div>{$VARS.TEXT}</div>

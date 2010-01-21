@@ -1,9 +1,0 @@
-Modul text
-
-Modul text pro práci s texty ve stránce
-
-Parametry pro item:
-images (bool) -- jstli se má pracovat s obrázky
-files (bool) -- jstli se má pracovat se soubory
-theme (simple,advanced,full) -- které theme se má zobrazovat
-
