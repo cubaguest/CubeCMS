@@ -1,0 +1,108 @@
+<?
+$this->addCssFile("style.css");
+?>
+<div id="editImagesForm">
+   <h2><?=$this->_('Úpravy obrázků');?></h2>
+   <div id="allfiles">
+      <form method="post" action="<?=$this->link()?>">
+         <table style="width:90%;">
+            <tr>
+               <td colspan="3" align="right">
+                  <a href="#" title="<?=$this->_('Označit vše pro smazání')?>" onclick="return deleteAll()"><?=$this->_('Označit vše pro smazání')?></a>
+                  <?=$this->editForm->save->controll()?>
+               </td>
+            </tr>
+            <?$step = 0;
+            while ($image = $this->images->fetch()) {
+               $step++;
+   ?>
+            <tr>
+               <td width="100">
+                  <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+           .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
+               </td>
+               <td valign="top" style="padding-right:10px;">
+                     <?
+                     $this->editForm->name->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->name->setValues(array($image->{PhotoGalery_Model_Images::COLUMN_ID} =>
+                             $image->{PhotoGalery_Model_Images::COLUMN_NAME}));
+                     print ($this->editForm->name->label()."<br />");
+                     print ($this->editForm->name->labelLangs());
+                     print ($this->editForm->name->controll());
+                     print ($this->editForm->name->scripts());
+                     ?><br />
+                     <?
+                     $this->editForm->ord->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->ord->setValues($image->{PhotoGalery_Model_Images::COLUMN_ORDER});
+                     print ($this->editForm->ord->label());
+                     $this->editForm->ord->html()->setAttrib('size', 5);
+                     print ($this->editForm->ord->controll());
+                     print ($this->editForm->ord->scripts());
+                     ?>
+                     <?
+                     $this->editForm->delete->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->delete->setValues(false);
+                     print ($this->editForm->delete->label());
+                     print ($this->editForm->delete->controll()->setAttrib('onclick', "if(this.checked == true)return confirm('Smazat?')"));
+                     print ($this->editForm->delete->scripts());
+   ?><br />
+
+               </td>
+               <td valign="top">
+                     <?
+                     $this->editForm->desc->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->desc->setValues(array($image->{PhotoGalery_Model_Images::COLUMN_ID} =>
+                             $image->{PhotoGalery_Model_Images::COLUMN_DESC}));
+                     print ($this->editForm->desc->label()."<br />");
+                     print ($this->editForm->desc->labelLangs());
+                     print ($this->editForm->desc->controll());
+                     print ($this->editForm->desc->scripts());
+                     ?>
+                     <?
+                     $this->editForm->id->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->id->setValues($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     print ($this->editForm->id->controll());
+   ?>
+               </td>
+            </tr>
+            <tr>
+               <td colspan="3" style="border-bottom: 1px solid gray">
+                  <a href="<?=$this->link()->route('editphoto',array('id' => $image->{PhotoGalery_Model_Images::COLUMN_ID}))?>"
+                     title="<?=$this->_('Upravit miniaturu')?>"><?=$this->_('Upravit miniaturu')?></a>
+               </td>
+            </tr>
+
+               <?
+   if($step%5 == 0) {?>
+            <tr>
+               <td colspan="3" align="right">
+      <?=$this->editForm->save->controll()?>
+               </td>
+            </tr>
+                  <?}
+            }
+if($step%5 != 0) {?>
+            <tr>
+               <td colspan="3" align="right">
+   <?=$this->editForm->save->controll()?>
+               </td>
+            </tr>
+   <?}?>
+         </table>
+<?=$this->editForm->scripts()?>
+      </form>
+   </div>
+   <script type="text/javascript">
+   /* <![CDATA[ */
+   function deleteAll(){
+      if(confirm('<?=$this->_('Smazat všechny obrázky?')?>')){
+         $('#allfiles input[type=checkbox]').each(function(){
+            $(this).attr('checked', 'checked');
+         });
+      }
+      return false;
+   }
+   /* ]]> */
+</script>
+</div>
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));?>

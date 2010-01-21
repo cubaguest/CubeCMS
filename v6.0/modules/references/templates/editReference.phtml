@@ -1,0 +1,42 @@
+<div id="editReferenceForm">
+   <ul class="langMenu">
+      <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+      <li>
+         <a href="#referenceLang<?=$key?>" class="selected">
+            <img src="images/lang/<?=$key?>.png" alt="<?=$lang?>" />
+            <?=$lang?>
+         </a>
+      </li>
+      <?}?>
+   </ul>
+
+   <div class="tabsContent">
+      <form method="post" action="<?=$this->l();?>">
+         <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+         <p id="referenceLang<?=$key?>" class="tabcontent">
+            <?=$this->_m("Název reference");?>:<br />
+            <input type="text" size="40" maxlength="50" name="reference_name[<?=$key?>]"
+            value="<?=$this->post($_POST["reference_name"][$key], $this->reference['name'][$key]);?>" /><br />
+            <?=$this->_m("Text reference");?>*:<br />
+            <textarea class="textarea_tinymce textarea" rows="25" cols="70"
+            name="reference_text[<?=$key;?>]"><?=$this->post($_POST["reference_text"][$key], $this->reference['text'][$key]);?></textarea>
+         </p>
+
+         <?}?>
+         <br />
+         <input name="reference_reset" type="reset" value="<?=$this->_m("Obnovit")?>" />
+         <input name="reference_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
+         <?if($this->edit){?>
+            <input name="reference_id" type="hidden" value="<?=$this->reference['id_reference']?>" />
+         <?}?>
+
+      </form>
+      
+   </div>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()));?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $("#editReferenceForm").tabs();
+      });
+   </script>
+</div>

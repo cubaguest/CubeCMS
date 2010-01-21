@@ -1,0 +1,15 @@
+<div>
+   <h2><?=$this->product['label']?></h2>
+   <?=$this->product['text']?>
+   <hr class="reseter" />
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->article()));?>
+
+   <?if($this->lightBox){?>
+   <script type="text/javascript">
+      $(document).ready(function() { $('a[rel*=lightbox]').lightBox(); });
+   </script>
+   <?}?>
+   <?if($this->sys()->rights()->isWritable()){
+      $this->includeTplObj($this->toolbox);
+   }?>
+</div>

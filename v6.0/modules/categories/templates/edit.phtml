@@ -1,0 +1,61 @@
+<div>
+<?
+// do titulku
+if($this->edit){
+   $this->addPageTitle($this->_('úprava kategorie'));
+   $this->addPageTitle($this->catName);
+   $this->addPageHeadline($this->_('úprava kategorie'));
+   $this->addPageHeadline($this->catName);
+} else {
+   $this->addPageTitle($this->_('přidání kategorie'));
+   $this->addPageHeadline($this->_('přidání kategorie'));
+}
+// donastavení formuláře
+$this->form->priority->html()->setAttrib('size', 4);
+
+$this->form->module->htmlSubLabel()->addContent('<br /><p id="moduleNameDoc"></p>', true);
+$this->form->moduleParams->htmlSubLabel()->addContent('<br /><a id="getModuleParams" href="">doc</a><p id="moduleDoc"></p>', true);
+
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+
+<h2><?=$this->_('Úprava detailu kategorie');?></h2>
+<?=$this->form?>
+<?
+// link pro loading dokumentace k modulu
+$linkModDoc = new Url_Link_ModuleRequest();
+$linkModDoc->action('moduledoc', 'html');
+?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+      $('#moduleDoc').hide();
+      // načtení nasatvené dokumentace
+      $('#moduleDoc').load('<?=$linkModDoc?>?module='+$('#categorymodule').val()+' .moduleParams');
+      $('#moduleNameDoc').load('<?=$linkModDoc?>?module='+$(this).val()+' .moduleLabel');
+
+      $('#getModuleParams').click(function(){
+         $('#moduleDoc').toggle();
+         return false;
+      });
+      $('#categorymodule').change(function(){
+         $('#moduleDoc').load('<?=$linkModDoc?>?modulep='+$(this).val()+' .moduleParams');
+         $('#moduleNameDoc').load('<?=$linkModDoc?>?modulep='+$(this).val()+' .moduleLabel');
+         return false;
+      });
+      $('#categorymodule').click(function(){
+         $('#moduleDoc').load('<?=$linkModDoc?>?module='+$(this).val()+' .moduleParams');
+         $('#moduleNameDoc').load('<?=$linkModDoc?>?module='+$(this).val()+' .moduleLabel');
+         return false;
+      });
+   });
+   /* ]]> */
+</script>
+
+<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+<br/>
+<br/>
+<h2><?=$this->_('Úprava panelů kategorie');?></h2>
+
+<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+</div>
