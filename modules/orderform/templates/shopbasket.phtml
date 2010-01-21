@@ -1,0 +1,254 @@
+<fieldset>
+   <legend><?=$this->_("Košík")?></legend>
+   <div id="basketProducts" style="display:none">
+      <p>
+         <a href="#" title="<?=$this->_("Rozbalit vše")?>" onclick="return expandAll()"
+            ><?=$this->_("Rozbalit vše")?></a>
+         <a href="#" title="<?=$this->_("Sbalit vše")?>" onclick="return collapseAll()"
+            ><?=$this->_("Sbalit vše")?></a>
+         <a href="#" title="<?=$this->_("Odstranit všechny položky");?>"
+            onclick="return deleteAllItems();"><?=$this->_("Odstranit všechny položky");?></a>
+      </p>
+      <?if(!empty ($this->items)) {
+         foreach ($this->items as $key => $var) {
+            $this->itemTpl->item = $var;
+            $this->itemTpl->itemId = $key;
+            $this->itemTpl->hideDelete = false;
+            $this->includeTplObj($this->itemTpl);
+            $items++;
+      }}?>
+   </div>
+   <p id="basketNotAnyItem"><?=$this->_("Nebyla vložena žádná položka");?></p>
+</fieldset>
+<script type="text/javascript" language="javascript">
+   <!--
+   // počet položek v košíku
+   var numItems = <?=$items?>;
+
+   // vybraný produkt
+   var selectedProduc = null;
+
+   // zobrazení detailu prvku v košíku
+   function showDetail(obj){
+      if(obj.opened == true){
+         $(obj).next().slideUp(100);
+         $(obj).children("img").attr("src", "images/buttons/expand2.gif");
+         obj.opened = false;
+      } else {
+         $(obj).next().slideDown(100);
+         $(obj).children("img").attr("src", "images/buttons/collapse2.gif");
+         obj.opened = true;
+      }
+      return false;
+   }
+
+   // rozbalí všechny prvky v košíku
+   function expandAll(){
+      $("#basketProducts div.basketProductHead").each(function(){
+         $(this).children("img").attr("src", "images/buttons/collapse2.gif");
+         $(this).next().slideDown(100);
+         this.opened = true;
+      });
+      return false;
+   }
+
+   // sbalí všechny prvky v košíku
+   function collapseAll(){
+      $("#basketProducts div.basketProductHead").each(function(){
+         $(this).next().slideUp(100);
+         this.opened = false;
+         $(this).children("img").attr("src", "images/buttons/expand2.gif");
+      });
+      return false;
+   }
+
+   // mazání z košíku
+   function deleteItem(num){
+      if(confirm('<?=$this->_("Opravdu smazat?")?>')){
+         $.ajax({
+            type: "POST",
+            url: "<?=$this->ajaxLink->action('basketRemoveItem')?>",
+            data: {idItem : num},
+            success: function(returnData){
+               $("#basketProduct_"+num).slideUp(200, function(){
+                  $(this).remove();
+               });
+               numItems--;
+               toggleBasket();
+               return true;
+            },
+            error: function(msg){
+               alert("<?=$this->_("Položku se nepodařilo odstranit z košíku ERR:")?> "+msg);
+            }
+         });
+      }
+      return false;
+   }
+
+   // mazání celého košíku
+   function deleteAllItems(){
+      if(confirm('<?=$this->_("Opravdu smazat všechny položky?")?>')){
+         $.ajax({
+            type: "POST",
+            url: "<?=$this->ajaxLink->action('basketRemoveAll')?>",
+            success: function(returnData){
+               $("#basketProducts div").remove();
+               numItems = 0;
+               toggleBasket();
+               return true;
+            },
+            error: function(msg){
+               alert("<?=$this->_("Položky se nepodařilo odstranit z košíku ERR:")?> "+msg);
+            }
+         });
+      }
+      return false;
+   }
+
+   // jestli je košík zobrazen nebo zkryt
+   function toggleBasket(){
+      if(numItems == 0){
+         $("#basketProducts").hide();
+         $("#basketNotAnyItem").show();
+      } else {
+         $("#basketProducts").show();
+         $("#basketNotAnyItem").hide();
+      }
+   }
+
+   // přidá produkt do košíku (nevykresluje)
+   function addProductItem(){
+      // kontrola rozměrů podle počtu oken
+      for (var i = 1; i <= selectedProduc.dimension; i++) {
+         if($("input[name=width_"+i+"]").val() == "" || isNaN(parseInt($("input[name=width_"+i+"]").val())) ||
+            $("input[name=height_"+i+"]").val() == "" || isNaN(parseInt($("input[name=height_"+i+"]").val()))){
+            alert("<?=$this->_("Nebyly zadány všechny rozměry")?>");
+            return false;
+         }
+      }
+      // kontrola počtu kusů
+      if($("input[name=productKs]").val() == "" || isNaN(parseInt($("input[name=productKs]").val()))){
+         alert("<?=$this->_("Nebyl zadán počet kusů")?>");
+         return false;
+      }
+
+      //vytvoření pole
+      selectedProduc['count'] = $("input[name=productKs]").val();
+
+      // vytvoření pole s parametry
+      for (var i = 1; i <= selectedProduc.dimension; i++) {
+         selectedProduc['param_width_'+i] = $("input[name=width_"+i+"]").val();
+         selectedProduc['param_height_'+i] = $("input[name=height_"+i+"]").val();
+         selectedProduc['param_louver_'+i] = $("input[name=louver_"+i+"]").is(':checked');
+         selectedProduc['param_grid_'+i] = $("input[name=grid_"+i+"]").is(':checked');
+         selectedProduc['param_gridtype_'+i] = $("select[name=gridtype_"+i+"]").val();
+         selectedProduc['param_gridtypename_'+i] = $("select[name=gridtype_"+i+"] option:checked").text();
+         selectedProduc['param_doorgrid_'+i] = $("input[name=doorgrid_"+i+"]").is(':checked');
+         selectedProduc['param_rolltop_'+i] = $("input[name=rolltop_"+i+"]").is(':checked');
+         selectedProduc['param_indoorparapet_'+i] = $("input[name=indoorparapet_"+i+"]").is(':checked');
+         selectedProduc['param_outdoorparapet_'+i] = $("input[name=outdoorparapet_"+i+"]").is(':checked');
+      }
+
+      // uložení do košíku
+      // odeslání na server
+      $.ajax({
+         type: "POST",
+         url: "<?=$this->ajaxLink->action('basketAddItem')?>",
+         //               data: product,
+         data: selectedProduc,
+         success: function(returnData){
+            // šablona položky v košíku
+            var tpl = $(returnData);
+            $("div#basketProducts").append(tpl);
+            numItems++;
+            toggleBasket();
+            alert("<?=$this->_('Přidáno')?>");
+         },
+         error: function(msg){
+            alert("<?=$this->_("Položku se nepodařilo přidat do košíku ERR:")?> "+msg);
+         }
+      });
+   }
+
+   /*
+    * Funkce pro volbu produktu
+    */
+   // nastaví zaměření na profil
+   function selectProfile(obj, type){
+      $(obj).parent().parent().children("td.product"+type+"Profile").removeClass("selectedProductParam");
+      $(obj).parent().addClass("selectedProductParam");
+      $(obj).parent().children("input[type=radio]").attr("checked", "checked");
+      if(type == "Window"){
+         selectedProduc.profileWindowImage = $(obj).children("img").attr("src");
+         selectedProduc.profileWindowType = $(obj).next("input[type=radio]").val();
+         selectedProduc.profileWindowName = $(obj).attr("title");
+      } else if(type == "Door"){
+         selectedProduc.profileDoorImage = $(obj).children("img").attr("src");
+         selectedProduc.profileDoorType = $(obj).next("input[type=radio]").val();
+         selectedProduc.profileDoorName = $(obj).attr("title");
+      }
+      return false;
+   }
+
+   // nastaví zaměření na profil
+   function selectProduct(obj, productObj){
+      // zvýraznění obrázku produktu
+      $(obj).parent().parent().find("p").removeClass("selectedProductParam");
+      $(obj).parent("p").addClass("selectedProductParam");
+
+      /*
+       * nastavení které parametry jsopu zobrazeny
+       * zobrazení dimenzí pro produkty
+       * vymazání starých prvků s rozměry
+       */
+      $(".productParamSizesValuesShowed").remove();
+
+      var contentText = null;
+      var newContent = null;
+      for (i = 0; i < productObj.dimension; i++) {
+         contentText = $("#productParamSizesTemplate tr").clone().html();
+         newContent = $("<tr>" + contentText.replace(/XX/g, i+1) + "</tr>");
+         newContent.addClass("productParamSizesValuesShowed");
+         newContent.appendTo($("tr.productParamSizesLabels").parent());
+      }
+
+      // výběr profilu
+      // okna
+      if(productObj.profileWindow == true){
+         $(".productWindowProfile").show();
+      } else {
+         $(".productWindowProfile").hide();
+      }
+      // dveře
+      if(productObj.profileDoor == true){
+         $(".productDoorProfile").show();
+      } else {
+         $(".productDoorProfile").hide();
+      }
+
+      // zobrazení celých parametrů
+      $("#productParamSizes").slideDown(100);
+      $("#productParamSizes").scrollTop($("#productParamSizes").position().top);
+
+
+      // nastvení vybraného produktu a přiřazení základních hodnot
+      selectedProduc = productObj;
+      if(selectedProduc.profileWindow){
+         selectedProduc.profileWindowImage = $("input[name=window_profile]:checked").prev("a").children("img").attr("src");
+         selectedProduc.profileWindowType = $("input[name=window_profile]:checked").val();
+         selectedProduc.profileWindowName = $("input[name=window_profile]:checked").prev("a").attr("title");
+      }
+      if(selectedProduc.profileDoor){
+         selectedProduc.profileDoorImage = $("input[name=window_profile]:checked").prev("a").children("img").attr("src");
+         selectedProduc.profileDoorType = $("input[name=door_profile]:checked").val();
+         selectedProduc.profileDoorName = $("input[name=door_profile]:checked").prev("a").attr("title");
+      }
+
+      // změna obrázku
+      $("#selectProductImg").attr("src", productObj.image);
+      // změna nadpisu
+      $("#selectProductLabel").next("span").text(productObj.label);
+      return false;
+   }
+   -->
+</script>

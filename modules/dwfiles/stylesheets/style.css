@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+.dwFiles form {
+	display: inline;
+}
+.dwFiles form input {
+   background-color: #ff3333;
+}

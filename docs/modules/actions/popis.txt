@@ -1,0 +1,8 @@
+Modul actions
+
+Modul akcí, zobrazuje akce podle zadaného data. Obsahuje panel, kde zobrazí jen určitý počet
+
+Parametry pro item:
+scroll (int) -- kolik akcí má být zobrazeno v listu
+scrollpanel (int) -- kolik akcí má být zobrazeno v panelu
+
