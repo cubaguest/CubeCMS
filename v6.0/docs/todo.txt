@@ -1,6 +1,0 @@
-TODO List
-
-- dodělat validátor na fomuláře a třídu pro jednoduchou obsluhu formulářových prvků
-   formulářové prvky budou ve zvláštních třídách.
-- dodělat render formuláře do šablonovacího systému
-- Dodělat odkazy v hlavičce kategorie, tak aby se na ně dalo klikat jako na cestu ke zvolenému článku
