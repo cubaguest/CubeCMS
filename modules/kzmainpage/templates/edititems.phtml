@@ -1,0 +1,118 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<div>
+   <?=$this->form->renderStart();?>
+   <fieldset>
+      <?$step = 0;
+      foreach ($this->curBoxes as $key => $box) {
+         $this->form->api->setValues((string)$box);
+         $this->form->api->setDimensional($step);
+         $this->form->api->html()->addClass('boxApiSelect');
+
+         $this->form->sel->setValues((string)$box['type']);
+         $this->form->sel->setDimensional($step);
+
+         $this->form->sel_article->setOptions($this->websApis[(string)$box]['options']);
+         $this->form->sel_article->setDimensional($step);
+         $this->form->sel_article->setValues($box['url']);
+         $this->form->sel_article->html()->addClass('boxArtSelect');
+         $this->form->actualurl->setDimensional($step);
+         $this->form->actualurl->setValues($this->websApis[(string)$box]['actualurl']);
+         ?>
+      <table id="boxSet_<?=$step?>" class="formTableGroup tblBoxSetting" width="400">
+         <tr>
+            <th class="formLabels">
+                  <?=$this->form->api->label();?>
+            </th>
+            <td class="formControlls">
+                  <?=$this->form->api->controllAll();?>
+               <span></span>
+            </td>
+         </tr>
+         <tr>
+            <th class="formLabels">
+                  <?=$this->form->sel->label();?>
+            </th>
+            <td class="formControlls">
+                  <?=$this->form->sel->controllAll();?>
+               <span></span>
+            </td>
+         </tr>
+         <tr>
+            <th class="formLabels">
+                  <?=$this->form->sel_article->label();?>
+            </th>
+            <td class="formControlls">
+                  <?=$this->form->sel_article->controllAll();?>
+               <span></span>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="2" align="right">
+               <?=$this->form->actualurl->controllAll();?>
+               <a href="#" class="buttonRemoveBox" title="Odstranit">Odstranit</a>
+            </td>
+         </tr>
+      </table>
+         <?
+         $step++;
+         }?>
+      <table class="formTableGroup" width="400">
+         <tr>
+            <td colspan="2" align="right"><a href="#" class="buttonAddBox" title="Přidat box">Přidat box</a></td>
+         </tr>
+         <tr>
+            <th class="formLabels">
+            </th>
+            <td class="formControlls">
+               <?=$this->form->save->controllAll();?>
+               <span></span>
+            </td>
+         </tr>
+      </table>
+   </fieldset>
+   <?=$this->form->renderEnd();?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+       function evRemoveBox(event){
+         if($('.tblBoxSetting').length > 1){
+            var obj = $(this).parents('table');
+            obj.remove();
+         }
+         return false;
+      }
+
+      function evChangeApi(ev){
+         var selApi = $(this).children("option:selected").val();
+         var select = $(this).parents('table').find(".boxArtSelect").html('')
+         .load('<?=$this->link()->route('loadArticles')?>?type='+selApi);
+      }
+
+      $('.buttonAddBox').click(function(){
+         var jTbl = $('.tblBoxSetting:last').clone(true);
+         var id = parseInt(jTbl.attr('id').match(/boxSet_([0-9]+)/)[1]);
+         var idNew = id+1;
+         var regexp = new RegExp('_'+id+'([^_])','g');
+         var regexp2 = new RegExp('\\['+id+'\\]','g');
+         var str = jTbl.html();
+         str = str.replace(regexp, '_'+idNew+'$1');
+         str = str.replace(regexp2, '['+idNew+']');
+         var newTbl = $('<table></tabel>').attr('id', 'boxSet_'+idNew)
+         .addClass('formTableGroup').addClass('tblBoxSetting').html(str);
+         newTbl.find('a.buttonRemoveBox').bind('click', null, evRemoveBox);
+         newTbl.find('select.boxApiSelect').bind('change', null, evChangeApi);
+         $('table.tblBoxSetting:last').after(newTbl);
+         return false;
+      });
+
+
+      $(document).ready(function(){
+         $(".buttonRemoveBox").bind('click', null, evRemoveBox);
+         $(".boxApiSelect").bind('change', null, evChangeApi);
+      });
+
+      /* ]]> */
+   </script>
+</div>
+<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>

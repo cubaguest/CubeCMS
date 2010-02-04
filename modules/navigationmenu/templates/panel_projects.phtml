@@ -1,0 +1,35 @@
+<?//<desc>Panel zobrazuje seznam projektů</desc>
+$icon = null;
+if($this->panel->{Model_Panel::COLUMN_ICON} != null){
+   $icon = '<img src="'.Panel::getIconDir().$this->panel->{Model_Panel::COLUMN_ICON}.'" alt="'.$this->panel->{Model_Panel::COLUMN_ICON}.'" />';
+}
+$backImg = null;
+if($this->panel->{Model_Panel::COLUMN_BACK_IMAGE} != null){
+   $backImg = 'background-image: url(\''.Panel::getBackImgDir().$this->panel->{Model_Panel::COLUMN_BACK_IMAGE}.'\');';
+}
+?>
+<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->category()->getLabel()?></a></p>
+<span class="panelSubLabel"><?=$this->_('Projekty')?></span>
+<div style="<?=$backImg?>">
+   <?foreach ($this->links as $link) {
+      $params = null;
+      if($link->{NavigationMenu_Models_List::COL_URL} == true) $params = ' rel="nofollow"';
+      if($link->{NavigationMenu_Models_List::COL_NEW_WIN} == true) $params .= ' class="linkNewWin" onclick="return ! window.open(this.href);"';
+      ?>
+   <a href="<?=$link->{NavigationMenu_Models_List::COL_URL}?>"
+      title="<?=htmlspecialchars($link->{NavigationMenu_Models_List::COL_NAME})?>"<?=$params?>>
+   <?if($link->{NavigationMenu_Models_List::COL_ICON} != null){?>
+      <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.NavigationMenu_Controller::ICONS_DIR
+               .URL_SEPARATOR.$link->{NavigationMenu_Models_List::COL_ICON}?>"
+           alt="icon <?=htmlspecialchars($link->{NavigationMenu_Models_List::COL_NAME})?>" />
+      <?}?>
+      <?=vve_tpl_truncate($link->{NavigationMenu_Models_List::COL_NAME},25)?></a>
+   <br />
+   <?
+   }
+   ?>
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>

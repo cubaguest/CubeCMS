@@ -1,0 +1,34 @@
+<?// vypočty
+$data = unserialize($this->poll->{Polls_Model_Detail::COL_DATA});
+$maxVote = 0;
+$allVotes = 0;
+foreach ($data as $key => $vote) {
+   if($vote['count'] > $maxVote) $maxVote = $vote['count'];
+   $allVotes += $vote['count'];
+}
+// SOF Form
+print($this->formmulti->renderStart());?>
+<div>
+   <?foreach ($data as $key => $answer) {
+      $maxVote == 0 ? $prRender = 0 : $prRender = round(($answer['count']/($maxVote/100)*0.9));
+      $percent = $allVotes/100;
+      $percent == 0 ? $pr = 0 : $pr = round($answer['count']/$percent);
+      ?>
+   <input name="vote_multi_answer[<?=$key?>]" id="vote_multi_answer_<?=$this->poll->{Polls_Model_Detail::COL_ID}."_".$key?>" type="checkbox" />
+   <label for="vote_multi_answer_<?=$this->poll->{Polls_Model_Detail::COL_ID}."_".$key?>>"><?=$answer['answer']?></label>
+   <br />
+   <p class="pollGraph" style="width: <?=$prRender?>%;">
+      <span class="pollNumbers"><?printf('%d %% (%d)',$pr ,$answer['count'])?></span>
+   </p>
+      <?
+   }?>
+   <?
+   $this->formmulti->id_poll->setValues($this->poll->{Polls_Model_Detail::COL_ID});
+   print ($this->formmulti->id_poll->controll());
+   print ($this->formmulti->vote->controll());
+   ?>
+   <br />
+   <span class="loader" style="display:none"><img src="images/progress.gif" alt="Loading..." width="16" /></span>
+   <span class="pollNumVotes"><?printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model_Detail::COL_VOTES});?></span>
+</div>
+<?=$this->formmulti->renderEnd()// EOF form?>

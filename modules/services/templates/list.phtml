@@ -1,0 +1,56 @@
+<?
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addWidgentTabs();
+$this->addJsPlugin($jQuery);
+?>
+<div>
+   <div id="serviceActionTabs">
+      <ul>
+         <li><a href="#optimalization"><?=$this->_('Optimalizace')?></a></li>
+         <li><a href="#backup"><?=$this->_('Záloha')?></a></li>
+      </ul>
+
+      <div id="optimalization">
+         <h2>Cache</h2>
+         <div>
+            Vyčištění odkládacího prostoru pro soubory.<br />
+            Aktuální velikost:
+            <span style="font-weight:bold;<?if($this->isBigSize === true){print("color:red;");}?>">
+            <?
+            if($this->cacheSize > 1024*1024){
+               print (round($this->cacheSize/(1024*1024),2)."&nbsp;MB");
+            } else if($this->cacheSize > 1024){
+               print (round($this->cacheSize/(1024),2)."&nbsp;KB");
+            } else {
+               print (round($this->cacheSize,2)."&nbsp;B");
+            }
+            ?>
+            </span>
+            <form action="<?=$this->link()?>" method="post">
+            <?=$this->formClearCache->clear->controll()?>
+            </form>
+         </div>
+         <h2>Databázové tabulky</h2>
+         <div>
+            Optimalizuje databázové tabulky a odstraní z nich přebytečná data<br />
+            <form action="<?=$this->link()?>" method="post">
+            <?=$this->formOptimizeDbTables->optimise->controll()?>
+            </form>
+         </div>
+      </div>
+      <div id="backup">
+         <h2>Záloha databáze</h2>
+         <div>
+            Provést zálohu celé databáze stránek a uložit do souboru
+            <input name="backupDb" type="submit" value="Zálohovat" />
+         </div>
+      </div>
+   </div>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $("#serviceActionTabs").tabs({});
+      /* ]]> */
+   </script>
+
+
+</div>

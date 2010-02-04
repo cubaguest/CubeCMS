@@ -1,0 +1,32 @@
+<?
+$icon = null;
+if($this->panel->{Model_Panel::COLUMN_ICON} != null){
+   $icon = '<img src="'.Panel::getIconDir().$this->panel->{Model_Panel::COLUMN_ICON}.'" alt="'.$this->panel->{Model_Panel::COLUMN_ICON}.'" />';
+}
+$backImg = null;
+if($this->panel->{Model_Panel::COLUMN_BACK_IMAGE} != null){
+   $backImg = 'background-image: url(\''.Panel::getBackImgDir().$this->panel->{Model_Panel::COLUMN_BACK_IMAGE}.'\');';
+}
+?>
+<p class="panelLabel"><?=$icon?><a href="<?=$this->l();?>" title="<?=$this->_('Účet')?>"><?=$this->_('Účet')?></a></p>
+<div style="<?=$backImg?>">
+<form method="post" action="<?=$this->l();?>">
+   <p>
+      <? if(!Auth::isLoginStatic()){?>
+      <label for="panel_login_username"><?=$this->_('Jméno')?></label><br />
+      <input id="panel_login_username" class="login_input" type="text" 
+             name="login_username" maxlength="20" size="15" value="_intranet_login"
+             onclick="if (this.value == '_intranet_login') { this.value = ''; }"
+             onblur="if (this.value == '') { this.value = '_intranet_login'; }"/><br />
+      <label for="panel_login__passwd"><?=$this->_('Heslo')?></label><br />
+      <input id="panel_login__passwd" type="password" name="login_passwd" maxlength="20" 
+             size="15" value="Password" onclick="if (this.value == 'Password') { this.value = ''; }"
+             onblur="if (this.value == '') { this.value = 'Password'; }"/><br />
+      <input id="login_submit" type="submit" name="login_submit" value="<?=$this->_('přihlásit')?>" />
+      <? } else { ?>
+      <?=$this->_('Jste přihlášen')?><br />
+      <input id="login_submit" type="submit" name="logout_submit" value="<?=$this->_('odhlásit')?>" />
+      <? } ?>
+   </p>
+</form>
+</div>

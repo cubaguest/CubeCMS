@@ -1,0 +1,65 @@
+<? // načtení detailu
+$this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
+$this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
+?>
+<div>
+   <?if($this->action->{Actions_Model_Detail::COLUMN_SUBANME} != null){?>
+      <p><?=$this->action->{Actions_Model_Detail::COLUMN_SUBANME}?></p>
+      <?}?>
+   <?if($this->action->{Actions_Model_Detail::COLUMN_AUTHOR} != null){?>
+      <p><?=$this->action->{Actions_Model_Detail::COLUMN_AUTHOR}?></p>
+      <?}?>
+   <p>
+      <?
+      $startDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_START});
+      $stopDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP});
+      print ($startDate);
+      if($startDate != $stopDate) {
+         print ("&nbsp;&mdash;&nbsp;");
+         print ($stopDate);
+      }
+      if($this->action->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00'|null){
+         $time = new DateTime($this->action->{Actions_Model_Detail::COLUMN_TIME});
+         print (",&nbsp;".$time->format("G:i"));
+      }
+      if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null){
+         print ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
+      }
+      if((int)$this->action->{Actions_Model_Detail::COLUMN_PRICE} != null|0){
+         printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PRICE});
+      }
+      if((int)$this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0){
+         printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
+      }
+      ?>
+   </p>
+   <?
+   if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+      print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->imagesDir.DIRECTORY_SEPARATOR
+              .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', null,null, 'actionImage'));
+   }
+   ?>
+
+   <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
+   <hr class="reseter" />
+   <?$this->includeTpl('articletools.phtml', true, array(
+                 'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+                 'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
+                 'linkToPdf' => $this->link()->route('detailexport',array('output' => 'pdf')),
+                 'shares' => $this->shares));?>
+
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('edit_action', $this->_("Upravit akci"),
+              $this->link()->route('edit'),
+              $this->_("Upravit zobrazenou akci"), "page_edit.png");
+      $toolbox->addTool('action_delete', $this->_("Smazat akci"),
+              $this->link(), $this->_("Smazat zobrazenou akci"), "page_delete.png",
+              'action_id', (int)$this->action->{Articles_Model_Detail::COLUMN_ID},
+              $this->_('Opravdu smazat akci?'));
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>
+<?$this->includeTpl("buttonback.phtml", true);?>

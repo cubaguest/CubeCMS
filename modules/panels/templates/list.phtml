@@ -1,0 +1,63 @@
+<div>
+   <?
+   $panels = $this->panelM->getPanelsList(0,false);
+   $linkajaxPanelInfo = new Url_Link_ModuleRequest();
+   ?>
+   <h2><?=$this->_('Seznam panelů');?></h2>
+   <table>
+      <tr>
+         <th width="200"><?=$this->_('kategorie')?></th>
+         <th width="100"><?=$this->_('box')?></th>
+         <th width="100"><?=$this->_('šablona')?></th>
+         <th width="90"><?=$this->_('pořadí')?></th>
+         <th width="40"><?=$this->_('akce')?></th>
+      </tr>
+      <?
+      $previousPos = null;
+      foreach ($panels as $key => $panel) {
+         if($previousPos != $panel->{Model_Panel::COLUMN_POSITION}) {?>
+      <tr>
+         <td colspan="5"><hr/></td>
+      </tr>
+         <?}?>
+      <tr>
+         <td><?=$panel->{Model_Category::COLUMN_CAT_LABEL}?></td>
+         <td><?=$panel->{Model_Panel::COLUMN_POSITION}?></td>
+         <td><?print($panel->{Model_Panel::COLUMN_TPL} ? $panel->{Model_Panel::COLUMN_TPL} : 'panel.phtml')?></td>
+         <td>
+            <form method="post" action="<?=$this->link()?>" style="display:inline;">
+               <input type="text" name="panel_position" value="<?=$panel->{Model_Panel::COLUMN_ORDER}?>" style="width: 30px" size="4" />
+               <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
+               <input type="image" src="<?=vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="panel_changepos" title="<?=$this->_('Uložit')?>" />
+            </form>
+         </td>
+         <td>
+            <form method="post" action="<?=$this->link()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
+               <input type="image" src="<?=vve_get_tpl_file('icons/page_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="panel_edit" title="<?=$this->_('Upravit')?>" />
+            </form>
+            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return confirm('<?=$this->_('Smazat panel')?>?');">
+               <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
+               <input type="image" src="<?=vve_get_tpl_file('icons/page_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="panel_delete" title="<?=$this->_('Smazat')?>" />
+            </form>
+         </td>
+      </tr>
+         <?
+         $previousPos = $panel->{Model_Panel::COLUMN_POSITION};
+      }
+      ?>
+
+   </table>
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('add_panel', $this->_("Přidat panel"),
+          $this->link()->route('add'),
+          $this->_("Přidat nový panel"), "page_add.png");
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>
+

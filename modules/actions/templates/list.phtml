@@ -1,0 +1,96 @@
+<?
+$this->addPageTitle(strftime("%x", $this->dateFrom).' - '.strftime("%x", $this->dateTo));
+$this->addPageHeadline(strftime("%x", $this->dateFrom).' - '.strftime("%x", $this->dateTo));
+
+?>
+<div class="actionsList">
+   <?
+   if($this->text != false){?>
+   <div>
+      <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
+   </div>
+   <?}?>
+
+   <div style="text-align: right">
+      <a href="<?=$this->link()->route('archive')?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
+   </div>
+
+   <?while ($row = $this->actions->fetch()) {
+      if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
+      else $class = 'nonPublicAction';
+      $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
+      if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
+         $subLabel = '<span class="articleSubLabel">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
+      }
+
+      ?>
+   <div class="<?=$class?>">
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
+             ><?=$subLabel?></a></h2>
+            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+      <p>
+               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+      </p>
+            <?}?>
+      <p>
+            <?
+            $startDate = strftime("%x", $row->{Actions_Model_Detail::COLUMN_DATE_START});
+            $stopDate = strftime("%x", $row->{Actions_Model_Detail::COLUMN_DATE_STOP});
+            print ($startDate);
+            if($startDate != $stopDate) {
+               print ("&nbsp;&mdash;&nbsp;");
+               print ($stopDate);
+            }
+            if($row->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00'|null) {
+               $time = new DateTime($row->{Actions_Model_Detail::COLUMN_TIME});
+               print (",&nbsp;".$time->format("G:i"));
+            }
+            if($row->{Actions_Model_Detail::COLUMN_PLACE} != null) {
+               print ',&nbsp;'.$row->{Actions_Model_Detail::COLUMN_PLACE};
+            }
+            if((int)$row->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
+            }
+            if((int)$row->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
+            }
+            ?>
+      </p>
+      <p>
+            <?
+            if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+               print (vve_tpl_image_tag($this->category()->getModule()->getDataDir()
+                       .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                       .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
+            }
+            ?>
+            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
+      </p>
+      <p style="text-align: right">
+         <a href="<?=$this->link()->route('detail',
+                       array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+      </p>
+   </div>
+
+      <?}?>
+
+   &laquo;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;
+   <a href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&raquo;
+
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('add_action', $this->_("Přidat akci"),
+              $this->link()->route('add'),
+              $this->_("Přidat novou akci"), "page_add.png");
+      if($this->category()->getRights()->isControll()) {
+         $toolbox->addTool('edit_action_text', $this->_("Upravit úvodní text"),
+                 $this->link()->route('editlabel'),
+                 $this->_("Upravit úvodní text"), "page_edit.png");
+      }
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>

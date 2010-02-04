@@ -1,0 +1,72 @@
+<div>
+   <?
+// donastavení formuláře
+   $this->form->panel_order->html()->setAttrib('size', 4);
+   $this->addJsPlugin(new JsPlugin_JQuery());
+   if($this->edit == true){
+      print("<h2>".$this->_('Úprava panelu')."</h2>");
+   } else {
+      print("<h2>".$this->_('Nový panel')."</h2>");
+   }
+   $this->form->panel_template->setSubLabel('<span id="panelInfoText"></span>');
+   if($this->form->haveElement('icon_delete')){
+      $this->form->icon_delete->setSubLabel('<img src="'.Panel::getIconDir().$this->panelIcon.'" alt="panel icon" />&nbsp;'.$this->panelIcon);
+   }
+   if($this->form->haveElement('background_delete')){
+      $this->form->background_delete->setSubLabel($this->panelbackImg);
+   }
+   print ($this->form);
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $('select#panel_panel_cat').change(function(){
+         getPanels();
+      });
+
+      $('select#panel_panel_template').change(function(){
+         loadPanellInfo();
+      });
+
+      function getPanels(){
+         $.ajax({
+            //         type: "POST",
+            //         cache: false,
+            url: '<?=$this->link()->clear()->route('getPanels');?>?id='+$('select#panel_panel_cat').val(),
+            dataType: "json",
+            success: function(data) {
+               if(data.code == true){
+                  $('select#panel_panel_template').html(null);
+                  for(var i=0; i < data.data.length; i++){
+                     $('select#panel_panel_template').append('<option value="'+data.data[i]+'">'+data.data[i]+'</option>');
+                  }
+                  $('select#panel_panel_template').val(selectedPanel);
+               } else {
+               }
+            },
+            error : function(){
+            }
+         });
+         loadPanellInfo();
+      }
+
+      function loadPanellInfo(){
+         $.ajax({
+            url: '<?=$this->link()->clear()->route('getPanelInfo');?>?id='
+               +$('select#panel_panel_cat').val()+'&tplname='+$('select#panel_panel_template').val(),
+            dataType: "json",
+            success: function(data) {
+               if(data.code == true){
+                  $('span#panelInfoText').html(data.data);
+               } else {
+               }
+            }
+         });
+      }
+      var selectedPanel = '<?=$this->panelTplSel?>';
+      $(document).ready(function(){
+         getPanels();
+      });
+      /* ]]> */
+   </script>
+</div>
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
