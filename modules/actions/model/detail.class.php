@@ -122,7 +122,7 @@ class Actions_Model_Detail extends Model_PDO {
               ." FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
               ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
-              ." WHERE (action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+              ." WHERE ((action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey) OR (action.".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey))"
               ." AND (action.".self::COLUMN_ID_CAT." = :idcat)"
               ." LIMIT 0, 1");
       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
