@@ -1,0 +1,19 @@
+ul.smlmenu_ulroot ul {
+   clear: both;
+   height: 1.65em;
+   width: 100%;
+}
+ul.smlmenu_ulroot li {
+   display: block;
+   float: left;
+}
+ul.smlmenu_ulroot li a {
+   font-weight: bold;
+   color: black;
+}
+ul.smlmenu_ulroot li a img {
+   border: none;
+}
+ul.smlmenu_ulroot a.smlmenu_hover {}
+ul.smlmenu_ulroot li a.smlmenu_selected {}
+ul.smlmenu_ulroot li a.smlmenu_actual {}

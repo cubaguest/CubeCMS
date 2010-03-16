@@ -1,0 +1,64 @@
+<?//<desc>Panel seznam nadcházejících akcí</desc>
+//if(!empty ($this->movies)) {
+$icon = null;
+if($this->panelObj()->getIcon() != null) {
+   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+}
+$backImg = null;
+if($this->panelObj()->getBackImage() != null) {
+   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+}
+if($this->rssLink != null) {?>
+<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+   <?}?>
+<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
+<div class="panelMovies" style="<?=$backImg?>">
+   <?
+   while ($movie = $this->movies->fetch()) {
+      $time = new DateTime($movie->{CinemaProgram_Model_Detail::COL_T_TIME});?>
+   <p>
+         <?
+//         if($movie->{CinemaProgram_Model_Detail::COL_T_DATE} != date('Y-m-d')){
+         $date = new DateTime($movie->{CinemaProgram_Model_Detail::COL_T_DATE});
+         print(vve_date('%L %d.%m.', $date).'&nbsp;');
+//         }
+         print($time->format('G:i'))
+                 ?>
+   </p>
+   <p class="panelMovieName">
+      <a href="<?=$this->link()->route('detail', array('id' => $movie->{CinemaProgram_Model_Detail::COL_ID},
+                    'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME})));?>"
+         title="<?=$movie->{CinemaProgram_Model_Detail::COL_NAME}?>">
+               <?
+               print($movie->{CinemaProgram_Model_Detail::COL_NAME});
+               if($movie->{CinemaProgram_Model_Detail::COL_NAME_ORIG} != null) {
+                  print('<br /><span style="font-style: italic">('.$movie->{CinemaProgram_Model_Detail::COL_NAME}.')</span>');
+               }
+               ?>
+      </a>
+   </p>
+   <p class="panelMoviePrice"><?=$movie->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min/<?=$movie->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč</p>
+      <?
+      if($movie->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {
+         ?>
+   <p class="image" style="width: 100%; overflow: hidden;">
+      <a href="<?=$this->link()->route('detail', array('id' => $movie->{CinemaProgram_Model_Detail::COL_ID},
+                       'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME})));?>"
+         title="<?=$movie->{CinemaProgram_Model_Detail::COL_NAME}?>">
+         <img style="width: 100%;"
+              src="<?=$this->webdatadir.$movie->{CinemaProgram_Model_Detail::COL_IMAGE}?>"
+              alt="<?=$this->_('titulní obrázek filmu').' '
+                            .htmlspecialchars($movie->{CinemaProgram_Model_Detail::COL_NAME})?>"/>
+      </a>
+   </p>
+         <?
+      }?>
+   <br />
+      <?
+   }?>
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>
+<?//}?>

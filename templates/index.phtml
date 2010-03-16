@@ -1,0 +1,180 @@
+<?// detekce IE 6 a menších
+$this->setPVar('IE',false);
+if(preg_match('/(?i)msie [1-6]/',$_SERVER['HTTP_USER_AGENT']) AND !isset ($_COOKIE['show_ie_warning'])) {
+   $this->setPVar('IE',true);
+}
+print ('<?xml version="1.0" encoding="utf-8"?>');
+?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locale::getLang()?>" lang="<?=Locale::getLang()?>">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="author" content="Jakub Matas" />
+      <meta name="keywords" content="<?=htmlspecialchars($this->pageKeywords)?>" />
+      <meta name="description" content="<?=htmlspecialchars($this->pageDesc)?>" />
+      <?if(Auth::isLoginStatic()) {?>
+      <meta http-equiv="cache-control" content="no-cache" />
+      <meta http-equiv="pragma" content="no-cache" />
+      <meta http-equiv="pragma" content="-1" />
+      <?}?>
+      <meta name="Robots" content="index,follow" />
+
+      <title><?print(VVE_WEB_NAME);?>{*-PAGE_TITLE-*}</title>
+
+      <base href="<?=Url_Link::getMainWebDir()?>" />
+      <?//feedy RSS
+      $model = new Model_Category();
+      $cats = $model->getCategoryList();
+      $link = new Url_Link(true);
+      foreach ($cats as $cat){
+         if($cat[Model_Category::COLUMN_FEEDS] != true) continue;
+         $link->category($cat[Model_Category::COLUMN_URLKEY])
+                 ->file(str_replace("{type}", 'rss', constant(ucfirst($cat[Model_Category::COLUMN_MODULE])
+                         ."_Routes::FEED_FILE")));
+         ?>
+      <link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat[Model_Category::COLUMN_CAT_LABEL]?>"
+            href="<?=$link?>" />
+      <?}?>
+
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
+      <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
+
+      <!--[if lte IE 6]>
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
+      <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
+      <![endif]-->
+
+      {*-STYLESHEETS-*}
+      {*-JAVASCRIPTS-*}
+      <?//Menu styly tady protože se přidává JsPlugin Jquery?>
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
+      <script type="text/javascript" src="jscripts/smoothmenu/ddsmoothmenu.js">
+         /***********************************************
+          * Smooth Navigational Menu- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+          * This notice MUST stay intact for legal use
+          * Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+          ***********************************************/   
+      </script>
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         ddsmoothmenu.init({
+            mainmenuid: "smoothmenu1",
+            orientation: "h",
+            classname: "ddsmoothmenu",
+            contentsource: "markup"});
+         /* ]]> */
+      </script>
+      <script type="text/javascript" src="jscripts/enginehelpers.js"></script>
+   </head>
+   <body id="pageTop">
+      <? //NavigationMenu_View::listView(); ?>
+      <div id="bodywrap">
+
+         <div id="headwrap">
+            <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
+            <div id="menuBox">
+               <!--<div>
+                  <form id="menuSearch" method="get" action="<?=$this->l()->clear(true);?>">
+                     <p>
+                        <input type="text" size="12" maxlength="50" name="search" value="<?=rawurldecode($this->get('search',null,false))?>" />
+                        <input type="submit" value="<?=_("Hledej")?>" />
+                     </p>
+                  </form>
+               </div>-->
+               <div id="menuMain">
+                  <? $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
+               </div>
+               <hr class="separator" />
+            </div>
+
+            <div id="pageHeader">
+            </div>
+
+         </div><!-- headwrap -->
+         <div id="colswrap">
+
+            <div id="col1wrap" class="column">
+               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['left'])) echo " col1pad_plusright";?>">
+                  <? $this->includeTpl("messages.phtml", true);
+                  $this->includeTpl("navigation.phtml", true);
+                  $icon = null;
+                  if(Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
+                     $icon = '<img src="'.Category::getCatIconDir().Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON}.'" alt="'.Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON}.'" />';
+                  }
+                  ?>
+                  <h1><?=$icon?>{*-PAGE_HEADLINE-*}</h1>
+                  <?if($this->pageNotFound) {
+                     $this->includeTpl("error404.phtml", true);
+                  } else if($this->specialPage) {
+                        $this->includeTplObj($this->specialPageTpl);
+                     } else {
+                        $this->includeTpl("modules.phtml", true);
+                     }
+                  ?>
+                  <hr class="separator" />
+               </div><!-- col1pad -->
+            </div><!-- col1wrap -->
+
+            <? // levy panel ?>
+            <div id="col2wrap" class="column">
+               <div id="col2pad">
+                  <?
+                  if(!empty($this->panels['left'])) {
+                     foreach ($this->panels['left'] as $panelL) {?>
+                  <div class="panel panelLeft">
+                           <?$this->includeTplObj($panelL);?>
+                  </div>
+                     <?}
+                  }?>
+                  <hr class="separator" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+
+            <? // pravy panel?>
+            <div id="col3wrap" class="column">
+               <div id="col3pad">
+                  <?
+                  if(!empty($this->panels['right'])) {
+                     foreach ($this->panels['right'] as $panelR) {?>
+                  <div class="panel panelRight">
+                           <?$this->includeTplObj($panelR);?>
+                  </div>
+                     <?}
+                  }?>
+                  <hr class="separator" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+
+            <div class="reseter">&nbsp;</div>
+         </div><!-- colswrap -->
+
+         <div class="reseter">&nbsp;</div>
+         <div id="footwrap">
+            <?
+            if(!empty($this->panels['bottom'])) {
+               foreach ($this->panels['bottom'] as $panelB) {?>
+            <div class="panel" style="float:left; width: 200px;">
+                     <?$this->includeTplObj($panelB);?>
+            </div>
+               <?}
+            }?>
+            <hr class="reseter" />
+            <?//$this->includeTpl("login.phtml", true);//je v panelu?>
+            <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=_("mapa stránek")?>"><?=_("mapa stránek")?></a>
+            <hr class="separator" />
+         </div><!-- footwrap -->
+      </div><!-- bodywrap /-->
+      <div id="debug">
+         <?
+         if(VVE_DEBUG_LEVEL >= 2) {
+            print ("Run functions: ".xdebug_get_function_count()."<br />");
+            print ("Memory: ".xdebug_memory_usage()."<br />");
+            print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");
+            print ("Index time: ".xdebug_time_index()."<br />");
+            print ("Exec time: ".$this->execTime."s<br />");
+         }
+         ?>
+      </div>
+   </body>
+</html>

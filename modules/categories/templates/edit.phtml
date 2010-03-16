@@ -1,0 +1,58 @@
+<div>
+   <style type="text/css">
+      .moduleParamsTable thead{
+         border-bottom: 1px solid silver;
+      }
+      .moduleParamsTable .paramDefValue {
+         text-align: center;
+      }
+      .moduleLabel {
+         background-color: white;
+         border: 1px solid silver;
+         padding: 3px;
+      }
+   </style>
+   <?
+// do titulku
+   if($this->edit) {
+      $this->addPageTitle($this->_('úprava kategorie').' '.$this->catName);
+      $this->addPageHeadline($this->_('úprava kategorie').' '.$this->catName);
+   } else {
+      $this->addPageTitle($this->_('přidání kategorie'));
+      $this->addPageHeadline($this->_('přidání kategorie'));
+   }
+// donastavení formuláře
+   $this->form->priority->html()->setAttrib('size', 4);
+
+   $this->form->module->htmlSubLabel()->addContent('<span style="font-weight:bold;">'.$this->_('Popis').':</span><div id="moduleNameDoc"></div>', true);
+
+   $this->addJsPlugin(new JsPlugin_JQuery());
+   ?>
+
+   <h2><?=$this->_('Úprava detailu kategorie');?></h2>
+   <?=$this->form?>
+   <?
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         loadDoc();
+      });
+
+      $('#categorymodule').change(function(){
+         loadDoc();
+      });
+
+      function loadDoc(){
+         $('#moduleNameDoc').load('<?=$this->link()->route('moduleDoc')?>?module='+$('#categorymodule').val()+' .moduleLabel');
+      }
+      /* ]]> */
+   </script>
+
+   <?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+   <br/>
+   <br/>
+   <h2><?=$this->_('Úprava panelů kategorie');?></h2>
+
+   <?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+</div>

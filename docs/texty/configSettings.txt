@@ -1,0 +1,4 @@
+Debugovací režimy: volba DEBUG_LEVEL
+	1 - normální
+	2 - kompilace šablon vždy
+	3 - kompilace šablony vždy a vystup obsahu šablony 

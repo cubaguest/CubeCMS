@@ -1,0 +1,21 @@
+<div>
+   <?
+// donastavení formuláře
+   $this->form->panel_order->html()->setAttrib('size', 4);
+   $this->addJsPlugin(new JsPlugin_JQuery());
+   if($this->edit == true){
+      print("<h2>".$this->_('Úprava panelu')."</h2>");
+   } else {
+      print("<h2>".$this->_('Nový panel')."</h2>");
+   }
+   
+   if($this->form->haveElement('icon_delete')){
+      $this->form->icon_delete->setSubLabel('<img src="'.Panel_Obj::getIconDir().$this->panelIcon.'" alt="panel icon" />&nbsp;'.$this->panelIcon);
+   }
+   if($this->form->haveElement('background_delete')){
+      $this->form->background_delete->setSubLabel($this->panelbackImg);
+   }
+   print ($this->form);
+   ?>
+</div>
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>

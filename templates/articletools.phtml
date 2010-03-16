@@ -1,0 +1,32 @@
+<div class="tools">
+<?if(isset($vars['lastEditTime'])) {
+   if(($vars['lastEditTime'] instanceof DateTime) == false) {
+      $vars['lastEditTime'] = new DateTime($vars['lastEditTime']);
+   }?>
+<br />
+<p>
+      <?=_('Naposled upraveno')?>&nbsp;<?=strftime("%x %X", $vars['lastEditTime']->format("U"))?>
+      <?if(isset($vars['lastEditUser'])) {?>
+   &nbsp;<?=_('uživatelem')?>&nbsp;<span style="font-style: italic"><?=$vars['lastEditUser']?></span>,
+         <?}
+   if(isset($vars['showed'])) {
+      print (_('zobrazeno').":&nbsp;".$vars['showed']."&times;");
+   }?>
+
+</p>
+   <?}?>
+<div class="donwload">
+   <h2><?=_('Stáhnout')?></h2>
+   <?if(isset($vars['linkToPdf']) OR isset($vars['linkToTxt'])) { ?>
+      <?if(isset($vars['linkToPdf'])) { ?>
+         <a href="<?=$vars['linkToPdf']?>" title="<?=_('Stáhnout')?> pdf">pdf</a>&nbsp;
+         <?}?>
+      <?if(isset($vars['linkToTxt'])) { ?>
+         <a href="<?=$vars['linkToTxt']?>" title="<?=_('Stáhnout')?> txt">txt</a>&nbsp;
+         <?}?>
+      <?}?>
+</div>
+   <?if(isset($vars['shares'])) {?>
+      <?=$vars['shares'] // sdílení?>
+   <?}?>
+</div>

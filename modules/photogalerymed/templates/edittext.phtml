@@ -1,0 +1,29 @@
+<?
+$this->addCssFile("style.css");
+
+if($this->edit){
+   $this->addPageTitle($this->_('úprava galerie'));
+   $this->addPageHeadline($this->_('úprava galerie'));
+} else {
+   $this->addPageTitle($this->_('přidání galerie'));
+   $this->addPageHeadline($this->_('přidání galerie'));
+}
+
+?>
+<div id="editTextForm">
+   <?
+
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 10)->addClass("mceEditor");
+   $tinymce = new JsPlugin_TinyMce();
+   $tinymce->setCfgParam('theme', 'advancedsimple');
+   $this->addJsPlugin($tinymce);
+
+   print ($this->form);
+   ?>
+</div>
+<?
+if($this->edit){
+   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('detail')));
+} else {
+   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route()));
+}

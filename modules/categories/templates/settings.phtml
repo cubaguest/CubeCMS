@@ -1,0 +1,15 @@
+<?
+$this->addPageTitle($this->_('úprava parametrů kategorie').' '.$this->catName);
+$this->addPageHeadline($this->_('úprava parametrů kategorie').' '.$this->catName);
+
+if($this->includeTpl != null){
+   $this->includeTplObj($this->includeTpl);
+} else if($this->form == null) {
+   print ($this->_('Kategorie nemá žádné nastavení'));
+} else {
+   print ($this->form);
+}
+
+$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()));
+
+?>

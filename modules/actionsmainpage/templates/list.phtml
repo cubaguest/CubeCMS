@@ -1,0 +1,157 @@
+<?
+$this->addPageHeadline($this->category->getName());
+
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addWidgentTabs();
+$this->addJsPlugin($jQuery);
+$this->addJsPlugin(new JsPlugin_PiroBox());
+?>
+
+<div>
+   <?
+   $step = 1;
+   $printType = true;
+   $someImages = false;
+   while ($row = $this->actions->fetch()) {
+      if($step > (int)$this->count) break; // pokud je počet vyskočíme
+      $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
+      // obrázky
+      $photosModel = new PhotoGalery_Model_Images();
+      $countImages = $photosModel->getCountImages($row->{Actions_Model_Detail::COLUMN_ID_CAT},
+              $row->{Actions_Model_Detail::COLUMN_ID});
+
+      // text připravujeme
+      $curDate = new DateTime();
+      $curTimeStamp = $curDate->format("U");
+      $startDate = new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START});
+      $startTimeStamp = $startDate->format("U");
+      if($row->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+         $stopDate = new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP});
+      } else {
+         $stopDate = new DateTime();
+      }
+      $stopTimeStamp = $stopDate->format("U");
+      if((int)$curTimeStamp >= (int)$startTimeStamp AND (int)$curTimeStamp <= (int)$stopTimeStamp) {
+         $type = 'Aktuální výstava';
+      } else {
+         $type = 'Připravujeme';
+      }
+      ?>
+   <div>
+         <?if($printType) {?>
+      <p><?=$type;?></p>
+            <?}?>
+      <h2><a href="<?=$this->link()->category($row->curlkey)
+                        ->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
+             ><?=$subLabel?></a></h2>
+            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+      <p>
+               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+      </p>
+            <?}?>
+      <p>
+            <?
+            $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
+            $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+            print ($startDate);
+            if($startDate != $stopDate AND $row->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+               print ("&nbsp;&mdash;&nbsp;");
+               print ($stopDate);
+            }
+            if($row->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00'|null) {
+               $time = new DateTime($row->{Actions_Model_Detail::COLUMN_TIME});
+               print (",&nbsp;".$time->format("G:i"));
+            }
+            if($row->{Actions_Model_Detail::COLUMN_PLACE} != null) {
+               print ',&nbsp;'.$row->{Actions_Model_Detail::COLUMN_PLACE};
+            }
+            if((int)$row->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
+            }
+            if((int)$row->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
+            }
+            ?>
+      </p>
+      <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
+      <p><?=$row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+            <?}?>
+      <div class="actionTabs">
+            <?if($countImages > 0) {?>
+         <ul>
+            <li><a href="#actionText_<?=$step?>"><?=$this->_('Text')?></a></li>
+            <li><a href="#actionImages_<?=$step?>"><?=$this->_('Fotky')?></a></li>
+         </ul>
+               <?}?>
+         <div id="actionText_<?=$step?>"><!-- SOF TEXT -->
+
+            <p>
+                  <?
+                  if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+                     print (vve_tpl_image_tag($this->category()->getModule()->getDataDir()
+                             .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                             .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
+                  }
+                  ?>
+                  <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
+            </p>
+         </div>
+            <?if($countImages > 0) {
+               $someImages = true;
+               $images = $photosModel->getImages($row->{Actions_Model_Detail::COLUMN_ID_CAT},
+                       $row->{Actions_Model_Detail::COLUMN_ID});
+               if($row->{Model_Category::COLUMN_DATADIR} != null) {
+                  $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
+                          .$row->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR
+                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].URL_SEPARATOR;
+               } else {
+                  $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
+                          .$row->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR
+                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].URL_SEPARATOR;
+               }
+               ?>
+         <div id="actionImages_<?=$step?>">
+                  <?while ($image = $images->fetch()) {?>
+            <a class="pirobox_gall" href="<?=$datadir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+               title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+               <img src="<?=$datadir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+                    alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+            </a>
+                     <?}?>
+         </div>
+               <?}?>
+         <p style="text-align: right">
+            <a href="<?=$this->link()->category($row->curlkey)->route('detail',
+                          array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+               title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+         </p>
+      </div>
+   </div>
+   <hr class="reseter" />
+      <?
+      $step++;
+   }?>
+   <?if($someImages) {?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(".actionTabs").tabs({});
+
+      $(document).ready(function(){
+         $().piroBox({
+            my_speed: 300, //animation speed
+            bg_alpha: 0.8, //background opacity
+            radius: 4, //caption rounded corner
+            scrollImage : false, // true == image follows the page _|_ false == image remains in the same open position
+            // in some cases of very large images or long description could be useful.
+            slideShow : 'slideshow', // true == slideshow on, false == slideshow off
+            slideSpeed : 3, //slideshow
+            pirobox_next : 'piro_next', // Nav buttons -> piro_next == inside piroBox , piro_next_out == outside piroBox
+            pirobox_prev : 'piro_prev', // Nav buttons -> piro_prev == inside piroBox , piro_prev_out == outside piroBox
+            close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
+         });
+      });
+      /* ]]> */
+   </script>
+      <?}?>
+</div>

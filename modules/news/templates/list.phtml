@@ -1,0 +1,58 @@
+<?
+$this->addCssFile("style.css");
+
+if($this->top === true) {
+   $this->addPageTitle($this->_('nejčtenější články'));
+   $this->addPageHeadline($this->_('nejčtenější články'));
+}
+?>
+<div class="articlesList">
+<p style="text-align:right">
+   <?=$this->_('Řadit podle')?>:&nbsp;
+   <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
+   <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenějších')?></a>
+   &nbsp;&brvbar;&nbsp;
+   <a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
+</p>
+   <?if(!empty ($this->articles)) {
+      foreach ($this->articles as $article) {
+         $showClass = $public = null;
+         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
+            $showClass = 'noPublicArticle';
+            $public = $this->_('Nezveřejněn');
+         }
+         $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+         ?>
+   <div class="<?=$showClass?>">
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+            <span class="smallFont">
+             <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+         </a><?='<span class="smallFont">'.$public.'</span>'?>
+      </h2>
+            <?print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
+      <hr class="reseter" />
+      <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
+      <p style="text-align:right;">
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+      </p>
+      <br />
+   </div>
+     <?}
+      print $this->scrollComp;
+      print $this->feedsComp;
+   } else {
+      print ($this->_('Není vložen žádný článek'));
+   }?>
+
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('add_article', $this->_("Přidat článek"),
+          $this->link()->route('add'),
+          $this->_("Přidat nový článek"), "page_add.png");
+      $this->includeTplObj($toolbox);
+   }
+   ?>
+</div>

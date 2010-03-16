@@ -1,0 +1,36 @@
+<div class="guestBook">
+   <?
+   while ($row = $this->books->fetch()) {?>
+   <div class="guestBookItem" style="position: relative;">
+      <p>
+         <em><?=vve_date('%x %X', new DateTime($row->{GuestBook_Model_Detail::COL_DATE_ADD}))?></em>
+            <?=$row->{GuestBook_Model_Detail::COL_NICK}?>
+      </p>
+         <?
+         if($row->{GuestBook_Model_Detail::COL_WWW} != null) {?>
+      <p>
+         <a href="<?=$row->{GuestBook_Model_Detail::COL_WWW}?>"
+            title="<?=$row->{GuestBook_Model_Detail::COL_WWW}?>"><?=$row->{GuestBook_Model_Detail::COL_WWW}?></a>
+      </p>
+            <?
+         }?>
+      <p><?=$row->{GuestBook_Model_Detail::COL_TEXT}?></p>
+         <?
+         if($this->category()->getRights()->isWritable()) {
+            $toolbox = new Template_Toolbox();
+            $toolbox->addTool('guestbook_item_delete', $this->_("Smazat"),
+                    $this->link(), $this->_("Smazat položku"), "page_delete.png",
+                    'guestbook_item_id', (int)$row->{GuestBook_Model_Detail::COL_ID},
+                    $this->_('Opravdu smazat položku ?'));
+            $this->includeTplObj($toolbox);
+         }
+         ?>
+
+   </div>
+   <hr />
+      <?
+   }
+   print ($this->scrollComp);
+   ?>
+
+</div>

@@ -1,0 +1,656 @@
+@CHARSET "UTF-8";
+/* SOF RESET */
+/* v1.0 | 20080212 */
+
+/* prvky:   - jsou znepoužitelněny*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, input, select, textarea,
+table, caption, tbody, tfoot, thead, tr, th, td {
+   margin: 0;
+   padding: 0;
+   border: 0;
+   outline: 0;
+   font-size: 10pt;
+   /*vertical-align: baseline; /* Ověřit v IE */
+   background: transparent;
+}
+body {
+   /*line-height: 1;*/
+}
+ol, ul {
+   list-style: none;
+}
+blockquote, q {
+   quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+   content: '';
+   content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+   outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+   text-decoration: none;
+}
+del {
+   text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+   border-collapse: collapse;
+   border-spacing: 0;
+}
+/* EOF RESET */
+
+
+/* Základní nastavení layoutu */
+html,body {
+   border: 0px none;
+   margin: 0px;
+   padding: 0px;
+   font-family: "Tahoma", "Arial", sans-serif !important;
+   text-align: left;
+   /*font-size: 62.5% !important;*/
+   background: url('../images/backshadow.png') fixed top center white repeat-y;
+}
+
+body {
+   /*background-color: white;  purple tone for outer space */
+}
+
+/* boxy */
+.left_float {
+   float: left;
+}
+
+.right_float {
+   float: right;
+}
+
+.align_right {
+   text-align: right;
+}
+
+/* resetovač */
+.reseter {
+   border: 0px none;
+   margin: 0px;
+   padding: 0px;
+   float: none;
+   clear: both;
+   width: 0px;
+   height: 0px;
+   line-height: 0px;
+   font-size: 0px;
+}
+
+.separator {
+   display: none;
+   visibility: hidden;
+}
+
+.hidden {
+   display:none;
+}
+
+#bodywrap {
+   min-width: 600px; /* slušné prohlížeče */
+   max-width: 1000px;
+   /*width: 1000px;*/
+   border: 0px none;
+   margin: 0px auto 0px auto;
+   padding: 0px;
+   overflow: hidden;
+}
+
+#headwrap { /*background-color: #007070;*/
+            /*background-color: #007070;*/
+}
+
+#footwrap { /*background-color: #c0c0c0;*/
+            text-align: left;
+            background-color: white;
+}
+
+#colswrap {
+   width: 100%;
+   /* MSIE needs at least width definition to cut extra margin/padding trick */
+   overflow: hidden;
+   /* hide margin/padding trick in well-CSS browsers = true Gecko based */
+   background-color: transparent;
+   /* setting background color will cover container 'footer' */
+}
+
+.column {
+   float: left;
+   /*padding-bottom: 20000px;*/
+   /* trik z One True Layout pro srovnání výšky sloupců */
+   /*margin-bottom: -20000px; /* aby měly všechny sloupce stejnou výšku */
+}
+
+#col1wrap {
+   width: 100%;
+   /* define colum across whole space to be basic structure */
+   /*background-color: #e0ffe0;*/
+}
+
+#col1pad {
+   padding: 5px 5px 5px 5px;
+   /* padding to move test from column on the left */
+   /* padding to move test from column on the right */
+   /*margin-left: 0px;
+	margin-right: 0px;*/
+   /*overflow: hidden;*/
+   position: relative;
+}
+
+.col1pad_plusleft{
+   margin-left: 180px;
+}
+
+.col1pad_plusright{
+   margin-right: 180px;
+}
+
+#col2wrap {
+   width: 180px;
+   margin-left: -100%;  /*position column to the left side*/
+   /*margin-left: -1000px; /*background-color: #ffe0e0;*/
+}
+
+#col2pad {
+   /*overflow: auto;*/
+   padding: 10px 2px 0px 6px;
+}
+
+#col3wrap {
+   width: 180px;
+   margin-left: -180px;
+   /* negative self width to place column to the most right place */
+   /*background-color: #e0e0ff;*/
+}
+
+#col3pad {
+   /*overflow: auto;*/
+   padding: 10px 4px 0px 4px;
+}
+
+
+/* uprava prvku globalne */
+h1 {
+   font-size: 12pt;
+   color: black;
+}
+
+h2, h2 a {
+   font-size: 14pt;
+}
+
+h3 a {
+}
+
+a {
+   text-decoration: none;
+   border: none;
+   color: #007070;
+   /*color: black;*/
+}
+
+a:link {
+   text-decoration: none;
+   border: none;
+   color: #007070;
+}
+
+a:visited {
+   text-decoration: none;
+   border: none;
+   /* color: #003b70; */
+}
+
+a:active {
+   text-decoration: none;
+   border: none
+}
+
+a:hover {
+   text-decoration: underline;
+   border: none
+}
+
+span[title] {
+   border-bottom: 1px dashed gray;
+}
+
+/* Hlášky */
+.message {
+   font-size: small;
+   padding: 5px 5px 5px 40px;
+   background-repeat: no-repeat;
+   background-position: 11px 50%;
+   margin-bottom: 5px;
+   /*font-weight: 600;*/
+}
+.message p {
+   margin-bottom:3px;
+   border-top: 1px solid gray;
+}
+.message p:first-child {
+   border: none;
+}
+
+#infoMessages {
+   border-bottom: 2px #b7dcff solid;
+   border-top: 2px #b7dcff solid;
+   background-color: #cce6ff;
+}
+
+#errMessages {
+   border-bottom: 2px #ffc7c0 solid;
+   border-top: 2px #ffc7c0 solid;
+   background-color: #ffe3e0;
+}
+
+#coreErrMessage {
+   border-bottom: 2px #ffa095 solid;
+   border-top: 2px #ffa095 solid;
+   background-color: #ffb2a9;
+}
+
+/* formulařové prvky */
+.requiredElem {
+   color:maroon;
+}
+
+.formErrorLabel {
+   color:red;
+}
+
+.formError {
+   background-color: #f4d0d0;
+}
+
+a.formLinkLang {
+   color: #999999;
+}
+
+a.formLinkSelLang {
+   color: black;
+   font-weight:bold;
+   background-color:#cccccc;
+   border-style: solid;
+   border-width: 1px 1px 0 1px;
+   border-color: #666666;
+   padding: 0 2px;
+}
+
+/* tabulka formuláře */
+fieldset, .formTable {
+   background-color: #c7e0f9;
+   width: 96%;
+   margin-bottom: 10px;
+   /*border: 1px solid gray;*/
+}
+
+fieldset p.formGroupText {
+   padding: 5px;
+}
+
+fieldset legend {
+   background-color: #c7e0f9;
+   padding: 0 5px;
+   border: 1px solid gray;
+   border-bottom: none;
+}
+
+.formTable td, .formTableGroup td, .formTable th, .formTableGroup th {
+   padding: 5px;
+}
+
+.formTable th.formLabels, .formTableGroup th.formLabels {
+   width: 100px;
+   text-align:right;
+}
+
+.formTable td.formControlls {
+}
+
+input, button, textarea {
+   border: 1px solid #0f6572;
+   background-color: #e1ebec;
+   font-size: 10pt;
+   font-family: "Tahoma", "Arial", sans-serif;
+}
+
+input[type="image"] {
+   border: 0;
+   background-color:transparent;
+}
+
+input[type="submit"]:hover, button[type="submit"]:hover {
+   background-color: #007070;
+   color: white;
+}
+
+input[type="button"]:hover {
+   background-color: #007070;
+   color: white;
+}
+
+input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_button button[type="submit"]:hover  {
+   background-color: #c1272d;
+   color: white;
+}
+
+/*Pro tinyMCE*/
+.textarea_tinymce {
+   width: 100%;
+}
+
+/* Panel s editací */
+.toolbox {
+   background: orange;
+   border: olive 1px solid;
+   position: absolute;
+   top: 5px;
+   right: 10px;
+   width: auto;
+   height: auto;
+   padding: 2px 2px 2px 2px;
+   background-repeat: no-repeat;
+}
+
+.toolbox input {
+   background:none;
+   border:none;
+   color:gray;
+   cursor: pointer;
+   text-align:left;
+   padding: 0 0 0 16px;
+   background-repeat: no-repeat;
+}
+
+.toolbox form input[type="hidden"] {
+   display:none;
+}
+
+.toolbox form input[type="image"] {
+   vertical-align:bottom;
+}
+
+.toolbox form input[type="submit"]:hover {
+   background:none;
+   background-repeat: no-repeat;
+   color: black;
+}
+/* EOF Panel s editací */
+
+/* odkaz zpět */
+.button_back {
+   display: block;
+   text-align: center;
+   margin-bottom: 5px;
+}
+/* EOF back */
+
+/* SOF main content */
+#col1pad>div {
+   /*background-color:white;*/
+}
+
+/* EOF Main Content */
+/* SOF Panels Content */
+
+div.panel {
+   background-color: #cfcfd0;
+   border: 1px solid #006666;
+   margin-bottom: 10px;
+}
+div.panel p.panelLabel {
+   font-weight: bold;
+}
+
+div.panel p.panelLabel img {
+   height: 16px;
+}
+
+div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
+   text-align:right;
+}
+/* EOF Panels Content */
+
+/* SOF Sitemap Content */
+.sitemapList li {
+   margin-left:20px;
+}
+/* EOF sitemap Content */
+
+.note {
+   font-size: 8pt;
+   padding-bottom: 5px;
+}
+
+/* komentáře */
+.comment_add_table {
+   width: 100%;
+   font-size: 10pt;
+}
+
+.comment_add_table textarea {
+   width: 100%;
+}
+
+.comment_user_foto {
+   /*display: inline;*/
+   float: left;
+   padding: 8px 8px 8px 8px;
+
+}
+
+.comment_correct {
+   clear: left;
+   height: 0px;
+}
+.comment_text {
+   /*margin-bottom: auto;*/
+   padding: 8px 8px 8px 8px;
+   text-align: justify;
+   /*float: right;*/
+}
+.comment_text li{
+   margin-left: 16px;
+}
+
+/* Menu */
+.hlavicka_menu {
+   color: white;
+   padding-top: 2px;
+   padding-bottom: 2px;
+   font-weight: bold;
+}
+
+.hlavicka_menu a:link {
+   color: #DFEDED;
+}
+
+.hlavicka_menu a:visited {
+   color: #DFEDED;
+}
+
+.hlavicka_menu a:hover {
+   color: white;
+}
+
+.hlavicka_menu a:visited {
+
+}
+
+#menu_1 {
+   float: left;
+   padding: 1px;
+   padding-left: 3px;
+}
+
+#menu_2 {
+   text-align: right;
+   padding: 1px;
+   padding-right: 3px;
+}
+
+/* prvky levého a pravého menu a panely */
+.menu_bar {
+   border: 1px solid #0f6572;
+   background-color: white;
+   margin: 0 5px 10px 5px;
+   font-size: 9pt;
+}
+
+.menu_bar h3 {
+   background-color: #007070;
+   color: white;
+   padding: 2px 0 2px 4px;
+   font-size: 10pt;
+}
+
+.menu_bar_obsah {
+   margin: 5px;
+   font-size: 9pt;
+}
+
+.text_panel {
+   padding: 5px 5px 5px 5px;
+}
+
+/* Styl pro vnitrek boxu */
+/* obal text */
+.moduleBox {
+   position: relative;
+   border: 1px solid #0f6572;
+   /*width: 100%;*/
+   margin-bottom: 10px;
+   background-color: white;
+   padding: 7px;
+}
+
+.moduleBox>div {
+
+}
+
+/* Jazykové taby */
+/* TABS content */
+.ui-tabs-hide { display: none; }
+
+.ui-tabs-selected { background-color: white; }
+
+ul.langMenu {
+   margin-bottom:2px;
+   /*background-color: white;*/
+}
+
+
+ul.langMenu li {
+   display: inline;
+   border-width: 1px 1px 0 1px;
+   border-color: black;
+   border-style: solid;
+   padding: 3px;
+}
+
+ul.langMenu li a img {
+   padding-right: 3px;
+}
+
+.normal ul {
+   margin: 0;
+}
+
+
+ul.ui-tabs-panel {
+   margin-bottom: 0px;
+   border-width: 1px;
+   border-color: black;
+   border-style: none;
+}
+
+.contentBox {
+   position: relative;
+}
+/* EOF Jazykové taby */
+
+
+/* scrolovátka */
+.scroll_main {
+   text-align: center;
+   background-color: white;
+}
+
+.scroll_main a {
+}
+
+.scroll_main table {
+   width: 98%;
+   padding-left: 10px;
+   padding-right: 10px;
+   margin: 0 auto;
+   background-color: white;
+}
+
+
+.scroll_main p {
+   vertical-align: 4px;
+   /*font-size: 12pt;*/
+   display: inline;
+   /* font-weight: bold;*/
+}
+
+/* Uživatelské soubory */
+.userFiles table, .userImages table {
+   width: 100%;
+   border: 1px solid #0f6572;
+}
+
+#uploadFileButton {
+   cursor: pointer;
+}
+
+/* Tabulkový obsah */
+.tabcontent {
+   border: 1px solid black;
+   padding: 5px;
+}
+
+/* SOF navigtion menu */
+.navigationMenu {
+   background-color: white;
+   border-bottom: 1px solid gray;
+   padding: 2px;
+}
+
+.navigationMenu #subdomains {
+   float:left;
+}
+.navigationMenu #projects {
+   float:right;
+}
+
+.navigationMenu li {
+   float:left;
+   padding: 2px;
+}
+.navigationMenu li img {
+   vertical-align:bottom;
+}
+/* EOF navigtion menu */

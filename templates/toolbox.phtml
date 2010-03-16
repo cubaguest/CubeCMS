@@ -1,0 +1,36 @@
+<?
+if(!defined('VVE_TOOLBOX_ICON_SIZE')) define('VVE_TOOLBOX_ICON_SIZE', 16);
+?>
+<div class="toolbox">
+   <?
+   foreach ($this->getTools() as $tool) {?>
+   <form method="post" action="<?=$tool['link'];?>"
+      <?if($tool['message'] != null) {?>onsubmit="return (confirm('<?=$tool["message"]?>'));"<?}?>>
+               <?
+               if($tool['nameHidden'] != null) {?>
+      <input type="hidden" value="<?=$tool['valueHidden'];?>" name="<?=$tool['nameHidden'];?>" />
+         <?}?>
+      <!--<input type="image" src="images/toolbox/<?=$tool['icon'];?>" name="<?=$tool['name'];?>"
+             value="<?=$tool['value'];?>" title="<?=$tool['title'];?>" />-->
+      <p>
+         <?
+         if(is_int($tool['icon'])) {?>
+      <input type="submit" name="<?=$tool['name'];?>" value="<?=$tool['value'];?>"
+             title="<?=$tool['title'];?>" style="background-image: url('images/toolbox/icons.png'); background-position: 0 <?=$tool['icon']*VVE_TOOLBOX_ICON_SIZE-VVE_TOOLBOX_ICON_SIZE;?>px" />
+                <?} else {?>
+      <input type="submit" name="<?=$tool['name'];?>" value="<?=$tool['value'];?>"
+             title="<?=$tool['title'];?>" style="background-image: url('images/icons/<?=$tool['icon'];?>')" />
+         <?}?>
+      </p>
+   </form>
+   <?}?>
+</div>
+
+<script type="text/javascript">
+   $("div.toolbox").css({opacity: 0.3});
+   $("div.toolbox").hover(
+   function(){$(this).fadeTo(100, 1);},
+   function(){$(this).fadeTo(300, 0.5);}
+);
+
+</script>

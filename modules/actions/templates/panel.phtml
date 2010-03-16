@@ -1,0 +1,62 @@
+<?//<desc>Panel seznam nadcházejících akcí</desc>
+if(!empty ($this->actions)) {
+   $icon = null;
+   if($this->panelObj()->getIcon() != null) {
+      $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+   }
+   $backImg = null;
+   if($this->panelObj()->getBackImage() != null) {
+      $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+   }
+   if($this->rssLink != null) {?>
+<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+         <?}?>
+<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
+<div class="panelActions" style="<?=$backImg?>">
+      <?
+      $step = 1;
+         foreach ($this->actions AS $row){
+         // podnadpis
+         if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
+            print(new Html_Element('p', $row->{Actions_Model_Detail::COLUMN_SUBANME}));
+         }?>
+   <p><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+         title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
+         ><?=$row->{Actions_Model_Detail::COLUMN_NAME}?></a></p>
+            <?
+            // čas a datum
+            $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
+            $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+            $timeStr = $startDate;
+            if($startDate != $stopDate AND $row->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+               $timeStr .= " - ".$stopDate;
+            }
+            if($row->{Actions_Model_Detail::COLUMN_TIME} != NULL) {
+               $timeStr .= ', '.preg_replace("/:[0-9]+$/", null, $row->{Actions_Model_Detail::COLUMN_TIME});
+            }
+            print(new Html_Element('p', $timeStr));
+            // cena
+            if ($row->{Actions_Model_Detail::COLUMN_PRICE} != null
+                    AND $row->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
+               printf('<p>'.$this->_('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč').'</p>',
+                       $row->{Actions_Model_Detail::COLUMN_PRICE},
+                       $row->{Actions_Model_Detail::COLUMN_PREPRICE});
+            } else if($row->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
+               printf('<p>'.$this->_('cena: <span title="V předporodeji">%s</span> Kč').'</p>',
+                       $row->{Actions_Model_Detail::COLUMN_PREPRICE});
+            } else if($row->{Actions_Model_Detail::COLUMN_PRICE} != null) {
+               printf('<p>'.$this->_('cena: <span title="Na místě">%s</span> Kč').'</p>',
+                       $row->{Actions_Model_Detail::COLUMN_PRICE});
+            }
+
+            if($step == $this->count) {
+               break;
+            };
+      $step++;
+   }?>
+</div>
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>
+   <?}?>

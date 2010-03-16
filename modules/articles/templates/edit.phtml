@@ -1,0 +1,29 @@
+<?
+$this->addCssFile("style.css");
+// do titulku
+if($this->edit) {
+   $this->addPageTitle($this->_('úprava článku'));
+   $this->addPageTitle($this->catName);
+   $this->addPageHeadline($this->_('úprava článku'));
+   $this->addPageHeadline($this->catName);
+} else {
+   $this->addPageTitle($this->_('přidání článku'));
+   $this->addPageHeadline($this->_('přidání článku'));
+}
+// donastavení formuláře
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+
+$tinymce = new JsPlugin_TinyMce();
+$tinymce->setCfgParam('theme', 'full');
+$this->addJsPlugin($tinymce);
+
+?>
+
+<div id="editArticleForm">
+   <?print($this->form);?>
+   <?if($this->edit === true){
+      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));
+   } else {
+      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
+   }?>
+</div>

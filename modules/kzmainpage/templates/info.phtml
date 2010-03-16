@@ -1,0 +1,53 @@
+<?
+$this->addCssFile('style.css');
+?>
+<div>
+   <?
+//   var_dump($this->infos);
+   foreach ($this->infos as $key => $info) {?>
+   <div class="mainPageBoxWrapper">
+      <div class="mainPageBox box<?=$info['name']?>">
+         <a href="<?=$info['data']->weburl?>" title="<?=$info['data']->webname?>"><?=$info['data']->webname?></a>
+         <h2><a href="<?=$info['data']->url?>" title="<?=$info['data']->name?>"><?=$info['data']->name?></a></h2>
+            <?//var_dump($info['data']->image);
+            if (isset ($info['data']->image)) { ?>
+          <!--<img src="" />-->
+            <img style="width: 100%;" src="<?=$info['data']->image?>" alt="image for <?=$info['data']->name?>" />
+               <?} else {?>
+          <!--<img src="" />-->
+               <?}?>
+         <p class="boxShortText">
+               <?=$info['data']->shorttext?>
+         </p>
+            <?
+            $price = null;
+            if (isset ($info['data']->price) AND isset ($info['data']->preprice)) {
+               $price = sprintf($this->_('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč'), $info['data']->price, $info['data']->preprice);
+            } else if(isset ($info['data']->preprice)) {
+               $price = sprintf($this->_('cena: <span title="V předporodeji">%s</span> Kč'), $info['data']->preprice);
+            } else if(isset ($info['data']->price)) {
+               $price = sprintf($this->_('cena: <span title="Na místě">%s</span> Kč'), $info['data']->price);
+            }
+            if($price != null) {?>
+         <p class="boxPrice"><?=$price?></p>
+               <?}?>
+      </div>
+   </div>
+
+      <?}?>
+
+   <?
+   if($this->category()->getRights()->isWritable()) {
+      $toolbox = new Template_Toolbox();
+      $toolbox->addTool('edit_items', $this->_("Upravit položky"),
+              $this->link()->route('edititems'),
+              $this->_("Upravit zobrazené položky"), "page_edit.png");
+      // Není implementované (asij není ani třeba)
+//      if($this->category()->getRights()->isControll()) {
+//         $toolbox->addTool('edit_urls', $this->_("Upravit adresy"),
+//          $this->link()->route('editurls'),
+//          $this->_("Upravit nastavení adres pro podweby"), "link_edit.png");
+//      }
+      $this->includeTplObj($toolbox);
+   }?>
+</div>

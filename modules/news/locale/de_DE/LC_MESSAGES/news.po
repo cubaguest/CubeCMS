@@ -1,0 +1,101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-03-30 10:03+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: action.class.php:12
+msgid "pridani-novinky"
+msgstr ""
+
+#: controler.class.php:139
+msgid "Novinku se nepodařilo smazat, zřejmně špatně přenesené id"
+msgstr ""
+
+#: controler.class.php:141
+msgid "Novinka byla smazána"
+msgstr ""
+
+#: controler.class.php:177 controler.class.php:217
+msgid "Novinku se nepodařilo uložit, chyba při ukládání."
+msgstr ""
+
+#: controler.class.php:179 controler.class.php:219
+msgid "Novinka byla uložena"
+msgstr ""
+
+#: panel.class.php:50
+msgid "Další novinky"
+msgstr ""
+
+#: panel.class.php:51
+msgid "Více"
+msgstr ""
+
+#: view.class.php:6 view.class.php:34
+msgid "Přidat novinku"
+msgstr ""
+
+#: view.class.php:17
+msgid "Novinky"
+msgstr ""
+
+#: view.class.php:26
+msgid "Vše"
+msgstr ""
+
+#: view.class.php:27
+msgid "Zobrazit novinku"
+msgstr ""
+
+#: view.class.php:37
+msgid "Upravit"
+msgstr ""
+
+#: view.class.php:41
+msgid "Smazat"
+msgstr ""
+
+#: view.class.php:42
+msgid "Smazat novinku"
+msgstr ""
+
+#: view.class.php:61 view.class.php:75 view.class.php:82 view.class.php:107
+msgid "Zpět na seznam"
+msgstr ""
+
+#: view.class.php:71 view.class.php:72 view.class.php:73
+msgid "Přidání novinky"
+msgstr ""
+
+#: view.class.php:89
+msgid "Popis"
+msgstr ""
+
+#: view.class.php:90
+msgid "Text"
+msgstr ""
+
+#: view.class.php:92
+msgid "Obnovit"
+msgstr ""
+
+#: view.class.php:93
+msgid "Uložit"
+msgstr ""
+
+#: view.class.php:103 view.class.php:104 view.class.php:105
+msgid "Úprava novinky"
+msgstr ""

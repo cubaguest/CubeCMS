@@ -1,0 +1,83 @@
+<?
+$this->addPageTitle(sprintf($this->_('Strana %s'), $this->page));
+?>
+<div>
+   <?if($this->text != false) {?>
+   <div>
+         <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
+   </div>
+      <?}?>
+
+   <?while ($row = $this->actions->fetch()) {
+      if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
+      else $class = 'nonPublicAction';
+      $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
+      if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
+         $subLabel = '<span class="articleSubLabel">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
+      }
+      if($row->{Model_Category::COLUMN_DATADIR} != null) {
+         $dataDir = AppCore::getAppWebDir().VVE_DATA_DIR.URL_SEPARATOR
+                 .$row->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR;
+      } else {
+         $dataDir = AppCore::getAppWebDir().VVE_DATA_DIR.URL_SEPARATOR
+                 .$row->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR;
+      }
+
+      $actionLink = $this->link()->clear()->category($row->curlkey)->route('detail',
+              array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}));
+
+      ?>
+   <div class="<?=$class?>">
+      <h2><a href="<?=$actionLink?>"
+             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
+             ><?=$subLabel?></a></h2>
+            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+      <p>
+               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+      </p>
+            <?}?>
+      <p>
+            <?
+            $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
+            $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+            print ($startDate);
+            if($startDate != $stopDate AND $row->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+               print ("&nbsp;&mdash;&nbsp;");
+               print ($stopDate);
+            }
+            if($row->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00'|null) {
+               $time = new DateTime($row->{Actions_Model_Detail::COLUMN_TIME});
+               print (",&nbsp;".$time->format("G:i"));
+            }
+            if($row->{Actions_Model_Detail::COLUMN_PLACE} != null) {
+               print ',&nbsp;'.$row->{Actions_Model_Detail::COLUMN_PLACE};
+            }
+            if((int)$row->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
+            }
+            if((int)$row->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
+            }
+            ?>
+      </p>
+         <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
+      <p><?=$row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+            <?}?>
+      <p>
+            <?
+            if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+               print (vve_tpl_image_tag($dataDir.$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                       .DIRECTORY_SEPARATOR.$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
+            }
+            ?>
+            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
+      </p>
+      <p style="text-align: right">
+         <a href="<?=$actionLink?>" title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+      </p>
+   </div>
+
+      <?}
+   print ($this->scrollComp);
+   ?>
+</div>

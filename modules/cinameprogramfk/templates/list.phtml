@@ -1,0 +1,103 @@
+<?
+$this->addPageTitle(sprintf($this->_('Program filmového klubu pro rok %s'),$this->currentYear));
+$this->setPageHeadline(sprintf($this->_('Program filmového klubu pro rok %s'),$this->currentYear));
+
+$cM = vve_date('%F');
+vve_to_ascii($cM);
+?>
+<div>
+   <?if(!empty ($this->movies)) {?>
+   <a href="<?=$this->link().'#'.$cM?>" title="<?=$this->_('přejít na aktuální film')?>"><?=$this->_('přejít na aktuální film')?></a>
+   <br />
+   <br />
+      <?$isNull = true;
+      $curMonth = null;
+//   while ($row = $this->movies->fetch()){
+      foreach ($this->movies as $row) {
+         $isNull = false;
+         $m = vve_date('%F', new DateTime($row->{CinemaProgram_Model_Detail::COL_T_DATE}));
+         vve_to_ascii($m);
+         if($curMonth != $m) {
+            print ('<a name="'.$m.'"></a>');
+            $curMonth = $m;
+         }
+      ?>
+   <div class="">
+      <p>
+               <?
+               print(vve_date('%L, %d.%m', new DateTime($row->{CinemaProgram_Model_Detail::COL_T_DATE}))
+                               .'&nbsp;'.vve_date('%G:%i', new DateTime($row->{CinemaProgram_Model_Detail::COL_T_TIME})));
+      ?>
+      </p>
+      <h2>
+               <?
+               print ($row->{CinemaProgram_Model_Detail::COL_NAME});
+      if($row->{CinemaProgram_Model_Detail::COL_NAME_ORIG} != null) {?>
+         <span style="font-style: italic">(<?=$row->{CinemaProgram_Model_Detail::COL_NAME_ORIG}?>)</span>
+         <?}?>
+      </h2>
+            <?
+      if($row->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {?>
+      <p style="float: left; margin: 0 1em 0.5em 0">
+                  <?=vve_tpl_image_tag(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$this->datadir
+                 .DIRECTORY_SEPARATOR.$row->{CinemaProgram_Model_Detail::COL_IMAGE},null,200);?>
+      </p>
+      <p>
+                  <?}?>
+               <?
+               print ($this->_('Mládeži').":&nbsp;");
+               if($row->{CinemaProgram_Model_Detail::COL_ACCESS} != 0) {
+                  print $this->_('přístupno od')."&nbsp;".$row->{CinemaProgram_Model_Detail::COL_ACCESS}."&nbsp;".$this->_('let');
+               } else {
+                  print $this->_('přístupno');
+      }?>
+         <br />
+               <?
+               print ($this->_('Znění').":&nbsp;");
+               switch ($row->{CinemaProgram_Model_Detail::COL_VERSION}) {
+                  case 'origwsubtitles':
+                     print ($this->_('originální s titulky'));
+                     break;
+                  case 'original':
+                     print ($this->_('originální'));
+                     break;
+                  case 'dabbing':
+                     print ($this->_('český dabbing'));
+                     break;
+                  case 'czech':
+                  default:
+                     print ($this->_('česky'));
+                     break;
+      }?>
+         <br />
+               <?=$this->_('Stopáž')?>:&nbsp;<?=$row->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min<br />
+      <?=$this->_('Cena')?>:&nbsp;<?=$row->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč<br />
+
+      </p>
+      <hr class="reseter"/>
+      <?=$row->{CinemaProgram_Model_Detail::COL_LABEL}?>
+      <p>
+      <?if($row->{CinemaProgram_Model_Detail::COL_CSFDID} != 0) {?>
+         <a href="http://www.csfd.cz/film/<?=$row->{CinemaProgram_Model_Detail::COL_CSFDID}
+                 ."-".vve_cr_url_key($row->{CinemaProgram_Model_Detail::COL_NAME})?>"
+            title="ČSFD" target="_blank"><img src="<?=vve_get_tpl_file('icons_logos/logo-csfd.png',
+                             VVE_TPL_FILE_IMAGE)?>" alt="čsfd logo" /></a>
+                     <?}?>
+      <?if($row->{CinemaProgram_Model_Detail::COL_IMDBID} != 0) {?>
+         <a href="http://www.imdb.com/title/tt<?=$row->{CinemaProgram_Model_Detail::COL_IMDBID}
+                 ."-".vve_cr_url_key($row->{CinemaProgram_Model_Detail::COL_NAME})?>"
+            title="IMDB" target="_blank"><img src="<?=vve_get_tpl_file('icons_logos/logo-imdb.png',
+                             VVE_TPL_FILE_IMAGE)?>" alt="imdb logo" /></a>
+                     <?}?>
+      <?if($row->{CinemaProgram_Model_Detail::COL_CRITIQUE} != null) {?>
+         <a href="<?=$row->{CinemaProgram_Model_Detail::COL_CRITIQUE}?>"
+            title="<?=$this->_('Recenze')?>" target="_blank"><?=$this->_('Recenze')?></a>
+         <?}?>
+      </p>
+   </div>
+         <?}
+} else {?>
+   <br />
+   <p><?=$this->_('Źádný film není promítán ve filmovém klubu');?></p>
+   <?}?>
+</div>

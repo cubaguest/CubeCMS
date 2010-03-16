@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-23 12:30+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: controller.class.php:26 controller.class.php:29
+#, php-format
+msgid "+ %s year"
+msgid_plural "+ %s years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: controller.class.php:27 controller.class.php:30
+#, php-format
+msgid "- %s year"
+msgid_plural "+ %s years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: controller.class.php:32 controller.class.php:35
+#, php-format
+msgid "+ %s month"
+msgid_plural "+ %s months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: controller.class.php:33 controller.class.php:36
+#, php-format
+msgid "- %s month"
+msgid_plural "+ %s months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: controller.class.php:39 controller.class.php:42
+#, php-format
+msgid "+ %s day"
+msgid_plural "+ %s days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: controller.class.php:40 controller.class.php:43
+#, php-format
+msgid "- %s day"
+msgid_plural "+ %s days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: controller.class.php:73
+msgid "Popis"
+msgstr ""
+
+#: controller.class.php:77
+msgid "Uložit"
+msgstr ""
+
+#: controller.class.php:84
+msgid "Úvodní text byl uložen"
+msgstr ""
+
+#: templates/addgoto.phtml:1
+msgid "Přidat do:"
+msgstr ""
+
+#: templates/archive.phtml:2 templates/archive.phtml:3
+msgid "Archiv"
+msgstr ""
+
+#: templates/archive.phtml:15
+msgid "Seznam"
+msgstr ""
+
+#: templates/archive.phtml:43
+msgid "zobraz"
+msgstr ""
+
+#: templates/list.phtml:51
+#, php-format
+msgid "Vstupné: %d Kč"
+msgstr ""
+
+#: templates/list.phtml:54
+#, php-format
+msgid "V předprodeji: %d Kč"
+msgstr ""
+
+#: templates/list.phtml:71 templates/panel_actual.phtml:69
+#: templates/panel.phtml:60
+msgid "Více"
+msgstr ""
+
+#: templates/list.phtml:84 templates/list.phtml:86
+msgid "Upravit úvodní text"
+msgstr ""
+
+#: templates/list.phtml:88
+msgid "Přidat akci"
+msgstr ""
+
+#: templates/list.phtml:90
+msgid "Přidat novou akci"
+msgstr ""
+
+#: templates/panel_actual.phtml:43
+msgid "titulní obrázek akce"
+msgstr ""
+
+#: templates/panel_actual.phtml:54 templates/panel.phtml:41
+#, php-format
+msgid ""
+"cena: <span title=\"Na místě\">%s</span>&nbsp;/&nbsp;<span title=\"V "
+"předprodeji\">%s</span> Kč"
+msgstr ""
+
+#: templates/panel_actual.phtml:58 templates/panel.phtml:45
+#, php-format
+msgid "cena: <span title=\"V předporodeji\">%s</span> Kč"
+msgstr ""
+
+#: templates/panel_actual.phtml:61 templates/panel.phtml:48
+#, php-format
+msgid "cena: <span title=\"Na místě\">%s</span> Kč"
+msgstr ""

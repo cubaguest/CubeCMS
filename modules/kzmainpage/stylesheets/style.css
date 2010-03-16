@@ -1,0 +1,34 @@
+/* 
+    Document   : style
+    Created on : 29.1.2010, 14:21:44
+    Author     : jakub
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.mainPageBoxWrapper {
+   width: 32%;
+   float: left;
+   margin: 0;padding: 0;
+   border: 0;
+   height: 250px;
+}
+
+.mainPageBox {
+   margin: 5px;
+   border: 1px solid silver;
+}
+
+.mainPageBox p.boxShortText, .mainPageBox p.boxPrice {
+   padding: 2px 5px;
+}
+
+.mainPageBox p.boxPrice {
+   text-align: right;
+}
+

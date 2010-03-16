@@ -1,0 +1,71 @@
+<?php
+header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+header( 'Cache-Control: post-check=0, pre-check=0', false );
+header( 'Pragma: no-cache' ); 
+if(!empty ($this->files)) {?>
+<div id="filesHeader">
+   <p class="filePreview">&nbsp;ikona</p>
+   <p class="fileName">název</p>
+   <p class="fileActions">úpravy</p>
+</div>
+<ul id="filesSelectable">
+      <?
+      foreach ($this->files as $file) {
+         if($file['size'] < 1024) {
+            $file['size'] = ($file['size']);
+            $k = " B";
+         }
+         if($file['size'] >= 1024) {
+            $file['size'] = ($file['size'] / 1024);
+            $k = " kB";
+         }
+         if($file['size'] >= 1024) {
+            $file['size'] = ($file['size'] / 1024);
+            $k = " MB";
+         }
+         ?>
+   <li class="file<?if($this->editable) print(' dragableFile');?>">
+      <p class="filePreview">
+         <span file="<?=$file['path'].$file['name']?>">
+                  <?if($file['type'] == 'image') {
+                      print(vve_tpl_image_tag($file['path'].$file['name']."?".time(), $file['name'], 75, 75));
+                     } else {
+                     if(file_exists(AppCore::getAppLibDir().'images/mime/'.$file['mime'].'.png')) {
+                        $image = AppCore::getAppLibDir().'images/mime/'.$file['mime'].'.png';
+                     } else {
+                        $image = AppCore::getAppLibDir().'images/mime/unknown.png';
+                     }
+                     print(vve_tpl_image_tag($image, 'mime icon', 75, 75));
+                     ?>
+                     <?}?>
+         </span>
+      </p>
+      <p class="fileName">
+         <span class="name"><?=$file['name']?></span><br/>
+         <span class="fileLabel">Velikost:&nbsp;<?printf("%.2f %s", $file['size'], $k)?></span><br />
+               <?if($file['type'] == 'image') {?>
+         <span class="fileLabel">Rozměry:&nbsp;<?=$file['width'].' x '.$file['height']?>px</span><br />
+                  <?}?>
+         <span class="fileLabel">Mime typ:&nbsp;<?=$file['mime']?></span>
+      </p>
+      <p class="fileActions">
+               <?
+               if($this->editable == true) {
+                  if($file['type'] == 'image') {?>
+         <input type="image" src="../../../images/icons/image_edit.png"
+                title="Upravit obrázek" onclick="FileBrowserFilesFunctions.imageEdit('<?=$file['name']?>', '<?=$file['path']?>')" />
+                            <?}?>
+         <input type="image" src="../../../images/icons/page_edit.png"
+                title="Přejmenovat soubor" onclick="FileBrowserFilesFunctions.renameFile('<?=$file['name']?>')" />
+         <input type="image" src="../../../images/icons/delete.png"
+                title="Smazat soubor" onclick="FileBrowserFilesFunctions.removeFile('<?=$file['name']?>')" />
+                  <?}?>
+      </p>
+   </li>
+         <?}?>
+</ul>
+   <?} else {?>
+<div><?=_("Adresář je prázdný")?></div>
+   <?}?>

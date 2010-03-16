@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<webs>
+   <web listurl="http://localhost/vve6/specialni/akce/featuredlist.xml"
+      actualurl="http://localhost/vve6/specialni/akce/current.xml" boxname="mklub">M-klub</web>
+   <web listurl="http://localhost/vve6/specialni/akce-s-galerii/featuredlist.xml"
+      actualurl="http://localhost/vve6/specialni/akce-s-galerii/current.xml" boxname="sklub">S-klub</web>
+   <web listurl="http://localhost/vve6/specialni/akce/featuredlist.xml"
+      actualurl="http://localhost/vve6/specialni/akce/current.xml" boxname="kino">Kino</web>
+</webs>

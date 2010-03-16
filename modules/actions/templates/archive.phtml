@@ -1,0 +1,100 @@
+<?
+$this->addPageTitle($this->_('Archiv'));
+$this->setPageHeadline($this->category()->getName().' - '.$this->_('Archiv'));
+
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addWidgentAccordion();
+$this->addJsPlugin($jQuery);
+
+$model = new Actions_Model_List();
+$actions = $model->getAllActions($this->category()->getId(), !$this->category()->getRights()->isWritable());
+
+?>
+<div>
+   <p style="text-align: right">
+      <a href="<?=$this->link()->route()?>" title="<?=$this->_('Seznam')?>"><?=$this->_('Seznam')?></a>
+   </p>
+   <div id="actionsArchiveList">
+      <? $prevYear = null;
+      while ($row = $actions->fetch()) {
+         $date = new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START});
+         $year = $date->format("Y");
+         if($year == $prevYear) continue;
+         $prevYear = $year;?>
+      <h2 class="actionYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
+      <div>
+         <table cellpadding="0" cellspacing="0">
+               <?$curAct = $model->getActions($this->category()->getId(),
+                       new DateTime($year.'-1-1'), new DateTime($year.'-12-31'),
+//                       mktime(0, 0, 0, 1, 1, $year), mktime(23, 59, 59, 12, 31, $year),
+                       !$this->category()->getRights()->isWritable());
+               $prevMounth = null;
+               while ($rowY = $curAct->fetch()) {
+                  $class = null;
+                  if(!$rowY->{Actions_Model_Detail::COLUMN_PUBLIC}) {
+                     $class = 'nonPublicAction';
+                  }
+                  $dateStartO = new DateTime($rowY->{Actions_Model_Detail::COLUMN_DATE_START});
+                  $dateStop = null;
+                  if($rowY->{Actions_Model_Detail::COLUMN_DATE_STOP} != null){
+                     $dateStopO = new DateTime($rowY->{Actions_Model_Detail::COLUMN_DATE_STOP});
+                     $dateStop = vve_date("%x", $dateStopO);
+                  }
+                  $startDate = vve_date("%x", $dateStartO);
+                  $mounth = vve_date("%F", $dateStartO);
+                  $mounthNum = $dateStartO->format("Y_m");
+                  if($mounth != $prevMounth) {
+                     $prevMounth = $mounth;?>
+            <tr>
+               <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?=$mounthNum?>');"
+                                  title="<?=$this->_('zobraz')." ".$mounth?>">
+                     <img src="<?=vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
+                          alt="expand" />&nbsp;<?=$mounth?></a></td>
+            </tr>
+                     <?}?>
+            <tr class="mounth_<?=$mounthNum?>" style="display: none;">
+               <td><span style="padding-left: 1em;"><?=$startDate?></span></td>
+               <td>
+                        <?if($dateStop !== null) {
+                           print ("&nbsp;&mdash;&nbsp;");
+                           print ($dateStop);
+                        }?>
+               </td>
+               <td>
+                  &nbsp;&nbsp;
+                  <a href="<?=$this->link()->route('detail',
+                                   array('urlkey' => $rowY->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+                     title="<?=$rowY->{Articles_Model_Detail::COLUMN_NAME}?>"
+                     ><?print ($rowY->{Articles_Model_Detail::COLUMN_NAME});?></a>
+               </td>
+            </tr>
+                  <?}?>
+         </table>
+      </div>
+         <?}?>
+   </div>
+   <hr class="reseter" />
+</div>
+<script type="text/javascript">
+
+   $(function() {
+      $("#actionsArchiveList").accordion({
+         collapsible: true,
+         autoHeight: false,
+         active: '.year<?=date('Y')?>'
+      });
+   });
+
+   function showMonth(aObj, cls){
+      $(cls).toggle(0,
+      function(){
+         if($(this).is(":hidden")){
+            $(aObj).children("img").attr('src', 'images/buttons/expand2.gif');
+         } else {
+            $(aObj).children("img").attr('src', 'images/buttons/collapse2.gif');
+         }
+      }
+   );
+      return false;
+   }
+</script>

@@ -1,0 +1,56 @@
+<div id="IEWarning">
+   <strong>Používáte zastaralý prohlížeč (<?print(date('Y')-2001)?> let)</strong>
+   <div>
+      Pro&nbsp;lepší uživatelský komfort, rychlejší prohlížení stránek a bezpečnost Vašeho počítače
+      doporučujeme upgrade na&nbsp;novější verzi nebo přechod na&nbsp;jiný typ prohlížeče.<br />
+      Se starým prohlížečem se mohou útočníci jednoduše dostat k&nbsp;datům na Vašem pevném
+      disku a&nbsp;to i&nbsp;k&nbsp;uloženým heslům.
+   </div>
+   <br />
+   <div>
+      <strong>Přejděte na novější prohlížeč:</strong><br />
+      <br class="reseter" />
+      <a href="http://www.microsoft.com/cze/windows/internet-explorer/" title="Internet Explorer 8"
+         onclick="return ! window.open(this.href);"
+         style="display: block;float: left; padding-right: 10px; width: 60px; text-align: center">
+         <img src="images/browsers/ie.png" alt="Internet Explorer logo" /><br />
+         Internet Explorer
+      </a>
+      <a href="http://www.mozilla.com/<?=Locale::getLang()?>/" title="Mozilla Firefox"
+         onclick="return ! window.open(this.href);"
+         style="display: block;float: left; padding-right: 10px; width: 60px; text-align: center">
+         <img src="images/browsers/firefox.png" alt="Mozilla Firefox logo" /><br />
+         Mozilla Firefox
+      </a>
+      <a href="http://www.opera.com/" title="Opera" onclick="return ! window.open(this.href);"
+         style="display: block;float: left; padding-right: 10px; width: 60px; text-align: center">
+         <img src="images/browsers/opera.png" alt="Opera logo" /><br />
+         Opera
+      </a>
+      <a href="http://www.google.com/chrome/" title="Google Chrome" onclick="return ! window.open(this.href);"
+         style="display: block;float: left; padding-right: 10px; width: 60px; text-align: center">
+         <img src="images/browsers/chrome.png" alt="Google Chrome logo" /><br />
+         Google Chrome
+      </a>
+      <a href="http://www.apple.com/safari/" title="Safari" onclick="return ! window.open(this.href);"
+         style="display: block;float: left; padding-right: 10px; width: 60px; text-align: center">
+         <img src="images/browsers/safari.png" alt="Apple Safari logo" />
+         Safari
+      </a>
+   </div>
+   <hr class="reseter" />
+   <br />
+   <p style="text-align: right;">
+      <a href="<?=$this->link()?>" title="Již nezobrazovat" onclick="return disableIEMessage()">Již nezobrazovat</a>
+   </p>
+</div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   function disableIEMessage(){
+      var today = new Date();
+      var expire = new Date();
+      expire.setTime(today.getTime() + 3600000*24*30);
+      document.cookie = "show_ie_warning=true"+";expires="+expire.toGMTString();
+   }
+   /* ]]> */
+</script>

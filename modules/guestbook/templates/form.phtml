@@ -1,0 +1,37 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<a href="#" title="<?=$this->_('Přidat příspěvek')?>" id="toggleForm"><?=$this->_('Přidat příspěvek')?></a>
+<br />
+<div id="guestbookForm">
+   <?
+
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7)->addClass("mceEditorSimple");
+
+
+   $tinymce2 = new JsPlugin_TinyMce();
+   $tinymce2->setCfgParam('theme', JsPlugin_TinyMce::TINY_THEME_SIMPLE_2);
+   $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
+   $this->addJsPlugin($tinymce2);
+
+   print ($this->form);
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      var antiSpam = function() {
+         a = document.getElementById("answer_captcha");
+         a.value = parseInt(a.value) + 1;
+         setTimeout("antiSpam()", 1000);
+      }
+      antiSpam();
+      <?if($this->showFrom != true){?>
+      $('#guestbookForm').hide();
+      <?}?>
+      $('#toggleForm').click(function(){
+         $('#guestbookForm').toggle();
+         return false;
+      });
+      /* ]]> */
+   </script>
+</div>
+<br />
