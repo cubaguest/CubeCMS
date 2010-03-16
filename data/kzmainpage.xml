@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<boxes xmlns="http://www.vveframework.eu/v6/boxes" xml:lang="cs">
- <box url="http://localhost/vve6/specialni/akce/current.xml" type="actual">mklub</box>
- <box url="http://localhost/vve6/specialni/akce/Nase-tricka.xml" type="selected">mklub</box>
- <box url="http://localhost/vve6/specialni/akce/current.xml" type="actual">sklub</box>
-</boxes>
