@@ -126,7 +126,7 @@ class Filesystem_File {
       else if($file instanceof Form_Element_File){
          $elem = $file->getValues();
          $this->fileName = $elem['name'];
-         $this->fileDir = new Filesystem_Dir($elem['dir']);
+         $this->fileDir = new Filesystem_Dir($elem['path']);
          $this->fileMimeType = $elem['type'];
       } else {
          if($dir == null) {
@@ -215,7 +215,7 @@ class Filesystem_File {
     */
    public function getName($withDir = false) {
       $return = $this->fileName;
-      if($withDir) {
+      if($withDir == true) {
          $return = $this->getDir().$return;
       }
       return $return;
