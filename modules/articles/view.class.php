@@ -18,7 +18,7 @@ class Articles_View extends View {
    }
 
    public function archiveView() {
-      $this->template()->addTplFile("archive.phtml");
+      $this->template()->addTplFile("archive.phtml",'articles');
    }
 
    /**
