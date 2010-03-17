@@ -4,6 +4,7 @@ class Actionswgal_Controller extends Actions_Controller {
    public function showController(){
       parent::showController();
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
+      if($this->view()->action == false) return false;
       $ctr->setOption('idArt', $this->view()->action->{Actions_Model_Detail::COLUMN_ID});
       $ctr->setOption('subdir', $this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR);
       $ctr->mainController();
