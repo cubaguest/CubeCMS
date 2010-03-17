@@ -7,7 +7,7 @@ class Actions_Routes extends Routes {
       // přidání akce
       $this->addRoute('add', "add", 'add', "add/");
       // archiv akcí
-      $this->addRoute('archive', "archiv", 'archive', "archiv/");
+      $this->addRoute('archive', "archive", 'archive', "archive/");
       // akce podle datumů
       $this->addRoute('normaldate',  "(?:(?P<day>[0-3]?[0-9]{1})/(?P<month>[0-1]?[0-9]{1})/(?P<year>[0-9]{4}))?", 'main','{day}/{month}/{year}/');
       // export xml
