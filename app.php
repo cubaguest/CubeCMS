@@ -840,12 +840,10 @@ class AppCore {
          }
          if(!file_exists(AppCore::getAppLibDir().self::MODULES_DIR.DIRECTORY_SEPARATOR
             .$catObj->getModule()->getName().DIRECTORY_SEPARATOR.'sitemap.class.php')) {
-               $sitemap = new SiteMap($catObj, $routes, $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},
-                    $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY});
+               $sitemap = new SiteMap($catObj, $routes,false);
          } else {
             $sClassName = ucfirst($catObj->getModule()->getName()).'_Sitemap';
-            $sitemap = new $sClassName($catObj, $routes, $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},
-                    $category->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY});
+            $sitemap = new $sClassName($catObj, $routes,false);
          }
          $sitemap->run();
          $catArr[$catObj->getId()] = $sitemap->createMapArray();

@@ -32,6 +32,11 @@ class SiteMap {
    const SITEMAP_SITE_DEFAULT_PRIORITY = 0.5;
 
    /**
+    * Počet záznamů na stránku se zkráceným výpisem
+    */
+   const SHORT_NUM_RECORD_PER_CAT = 10;
+
+   /**
     * Pole s položkami
     * @var array
     */
@@ -62,13 +67,19 @@ class SiteMap {
    private $category = null;
 
    /**
+    * Jestli se tvoří mapa celého webu
+    * @var bool
+    */
+   private $isFullSitemap = true;
+
+   /**
     * Konstruktor -- vytvoří prostředí pro práci se sitemap
     *
     * @param Module -- objekt modulu
     */
-   function __construct(Category $category, Routes $routes) {
+   function __construct(Category $category, Routes $routes, $isFull = true) {
       $this->category = $category;
-
+      $this->isFullSitemap = $isFull;
       $link = new Url_Link_Module();
       $link->setModuleRoutes($routes);
       $link->category($this->category()->getUrlKey());
@@ -228,6 +239,14 @@ class SiteMap {
       $retArr['items'] = $this->items;
       array_push(self::$itemsAll, $retArr);
       return $retArr;
+   }
+
+   /**
+    * Metoda vrací jestli se jedná o plnou mapu, nebo zkrácenou
+    * @return boolean
+    */
+   public function isFull(){
+      return $this->isFullSitemap;
    }
 
    public function  __destruct() {
