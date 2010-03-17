@@ -164,5 +164,16 @@ class Filesystem_Dir {
       }
       return true;
    }
+
+   /**
+    * Metoda kontroluje jestli zadaný adresář existuje
+    * @return boolean -- true pokud adresář existuje
+    */
+   public function exist(){
+      if(file_exists($this->getDir()) AND is_dir($this->getDir())){
+         return true;
+      }
+      return false;
+   }
 }
 ?>
