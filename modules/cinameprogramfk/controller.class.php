@@ -34,6 +34,38 @@ class CinameProgramFk_Controller extends Controller {
       $this->view()->currentYear = $curentYear;
    }
 
+   public function editTextController() {
+      $this->checkWritebleRights();
+
+      $form = new Form("text_");
+      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea->setLangs();
+      $form->addElement($textarea);
+
+      $model = new Text_Model_Detail();
+      $text = $model->getText($this->category()->getId());
+      if($text != false) {
+         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      }
+
+      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $form->addElement($submit);
+
+      if($form->isValid()) {
+         try {
+            $model->saveText($form->text->getValues(), null,
+                    null, $this->category()->getId());
+            $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+            $this->link()->route()->reload();
+         } catch (PDOException $e) {
+            new CoreErrors($e);
+         }
+      }
+
+      // view
+      $this->view()->template()->form = $form;
+   }
+
    public static function settingsController(&$settings,Form &$form) {
    }
 }

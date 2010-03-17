@@ -6,6 +6,12 @@ $cM = vve_date('%F');
 vve_to_ascii($cM);
 ?>
 <div>
+   <?if($this->text != null) {?>
+   <div>
+         <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
+   </div>
+   <br />
+   <?}?>
    <?if(!empty ($this->movies)) {?>
    <a href="<?=$this->link().'#'.$cM?>" title="<?=$this->_('přejít na aktuální film')?>"><?=$this->_('přejít na aktuální film')?></a>
    <br />
@@ -100,4 +106,9 @@ vve_to_ascii($cM);
    <br />
    <p><?=$this->_('Źádný film není promítán ve filmovém klubu');?></p>
    <?}?>
+   <?
+   if($this->toolbox != null){
+      $this->includeTplObj($this->toolbox);
+   }
+   ?>
 </div>
