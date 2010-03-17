@@ -7,6 +7,8 @@ class CinemaProgram_Controller extends Controller {
    const IMDB_LINK_ID = 'http://www.imdb.com/title/tt{ID}/';
    const CSFD_LINK_ID = 'http://www.csfd.cz/film/{ID}-nazev-filmu/';
 
+   const MAX_IMAGE_WIDTH = 300;
+
    /**
     * Kontroler pro zobrazení textu
     */
@@ -98,9 +100,10 @@ class CinemaProgram_Controller extends Controller {
       $form->removeElement('image_del');
       if($form->isValid()) {
          $model = new CinemaProgram_Model_Detail();
-         $imgName = null;
          if($form->image->getValues() !== null) {
             $image = new Filesystem_File_Image($form->image, $this->getModule()->getDataDir());
+            $image->resampleImage(self::MAX_IMAGE_WIDTH);
+            $image->save();
             $imgName = $image->getName();
          }
 
@@ -185,6 +188,8 @@ class CinemaProgram_Controller extends Controller {
          }
          if($form->image->getValues() !== null) {
             $image = new Filesystem_File_Image($form->image, $this->getModule()->getDataDir());
+            $image->resampleImage(self::MAX_IMAGE_WIDTH);
+            $image->save();
             $imgName = $image->getName();
          }
 
