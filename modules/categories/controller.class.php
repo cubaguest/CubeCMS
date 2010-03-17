@@ -211,7 +211,9 @@ class Categories_Controller extends Controller {
             // pokud byl předtím definován dojde k přesunu
             if($cat[Model_Category::COLUMN_DATADIR] != null) {
                $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$cat[Model_Category::COLUMN_DATADIR]);
-               $dir->rename($datadir);
+               if($dir->exist()){
+                  $dir->rename($datadir);
+               }
                unset ($dir);
             }
          }
