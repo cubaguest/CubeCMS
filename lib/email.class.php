@@ -166,7 +166,7 @@ class Email {
     * @param File $file -- objekt souboru
     * @return Email -- vrací sebe
     */
-   public function addAttachment(File $file) {
+   public function addAttachment(Filesystem_File $file) {
       array_push($this->mailAttachments, $file);
       return $this;
    }
@@ -209,7 +209,7 @@ class Email {
 
       // Tělo zprávy e-mailu
 //      $mail .= "\n".$this->mailContent."\n\n";
-      $mail .= $this->mailContent;
+      $mail .= $this->mailContent."\r\n";
 
       // přidání příloh
       foreach ($this->mailAttachments as $attachment) {
