@@ -654,7 +654,8 @@ class Form_Element implements Form_Element_Interface {
 //   }
 
    public function  __toString() {
-      return (string)$this->render();
+//      return (string)$this->render();
+      return (string)$this->controll();
    }
 
    /**
