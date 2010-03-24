@@ -1,0 +1,9 @@
+<div>
+   <strong><?=$this->_('volba struktury')?></strong><br />
+   <?
+   print($this->formType->renderStart());
+   print($this->formType->type->controll());
+   print($this->formType->change->controll());
+   print($this->formType->renderEnd());
+   ?>
+</div>

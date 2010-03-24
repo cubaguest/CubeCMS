@@ -19,75 +19,71 @@ class Text_Model_Detail extends Model_PDO {
    const COLUMN_TEXT = 'text';
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_LABEL = 'label';
-   const COLUMN_TEXT_PANEL = 'text_panel';
 
    /**
     * Metoda provede načtení textu z db
     *
     * @return string -- načtený text
     */
-   public function getText($idCat) {
+   public function getText($idCat, $subkey = null) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
-             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idCat)");
-      $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->execute();
+             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idCat AND text.".self::COLUMN_SUBKEY." = :subkey)");
+//      $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
+//      if($subkey == null){
+//         $dbst->bindParam(':subkey', $subkey, PDO::PARAM_NULL);
+//      } else {
+//         $dbst->bindParam(':subkey', $subkey, PDO::PARAM_STR);
+//      }
+      $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subkey));
 
       $cl = new Model_LangContainer();
       $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
       return $dbst->fetch();
    }
 
-   public function saveText($texts, $label, $panelText, $idCat, $subKey = 'NULL') {
+   public function saveText($texts, $label, $idCat, $subKey = NULL) {
       // zjištění jestli existuje záznam
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CATEGORY." = :idCat AND ".self::COLUMN_SUBKEY." = :subkey)");
-      //      if($subKey === null) {
-      $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
-      //      } else {
-      //         $dbst->bindValue(':subkey', $subKey);
-      //      }
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->execute();
+//      $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
+//      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
+      $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subKey));
       $count = $dbst->rowCount();
-      //      $count = $dbst->fetch();
-      //      $count = $count[0];
-      //          exit;
+
       // globalní prvky
       $dbc = new Db_PDO();
-      $this->setIUValues(array(self::COLUMN_TEXT => $texts, self::COLUMN_SUBKEY => $subKey,
+      $this->setIUValues(array(self::COLUMN_TEXT => $texts,
          self::COLUMN_TEXT_CLEAR => vve_strip_tags($texts)));
 
       if($label !== null) {
          $this->setIUValues(array(self::COLUMN_LABEL => $label));
       }
-      if($panelText !== null) {
-         $this->setIUValues(array(self::COLUMN_TEXT_PANEL => $panelText));
-      }
 
       if($count != 0) {
          // je už uloženo
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-                 ." SET ".$this->getUpdateValues()." WHERE ".self::COLUMN_ID_CATEGORY." = ".(int)$idCat);
+                 ." SET ".$this->getUpdateValues()
+                 ." WHERE (".self::COLUMN_ID_CATEGORY." = :idCat AND ".self::COLUMN_SUBKEY." = :subkey)");
          //             ." WHERE ".self::COLUMN_ID_CATEGORY." = :category");
          //$dbst->bindParam(1, $idCat, PDO::PARAM_INT);
-         $dbst->execute();
+         $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subKey));
       } else {
          // není uloženo
-         $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat));
+         $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat, self::COLUMN_SUBKEY => $subKey));
          $dbc->query("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
                  ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
          return $dbc->lastInsertId();
       }
    }
 
-   public function getLastChange($idCat) {
+   public function getLastChange($idCat, $subKey = null) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE ".self::COLUMN_ID_CATEGORY." = :idcategory");
-      $dbst->bindParam(':idcategory', $idCat);
-      $dbst->execute();
+              ." WHERE (".self::COLUMN_ID_CATEGORY." = :idcategory AND ".self::COLUMN_SUBKEY." = :subkey)");
+//      $dbst->bindParam(':idcategory', $idCat);
+      $dbst->execute(array(':idcategory' => $idCat, ':subkey' => $subKey));
       $fetch = $dbst->fetchObject();
       if($fetch == false) {
          return false;

@@ -4,11 +4,16 @@
  */
 
 class Text_Controller extends Controller {
+   const TEXT_MAIN_KEY = 'main';
+   const TEXT_PANEL_KEY = 'panel';
 /**
  * Kontroler pro zobrazení textu
  */
    public function mainController() {
       //		Kontrola práv
+      $model = new Text_Model_Detail();
+      // text
+      $this->view()->text = $model->getText(Category::getSelectedCategory()->getId(),self::TEXT_MAIN_KEY);
       $this->checkReadableRights();
    }
 
@@ -21,7 +26,7 @@ class Text_Controller extends Controller {
       $form = new Form("text_");
       
       $label = new Form_Element_Text('label', $this->_('Nadpis'));
-      $label->setSubLabel($this->_('Doplní se k nadpisu kategorie a stránky'));
+      $label->setSubLabel($this->_('Doplní se namísto nadpisu stránky'));
       $label->setLangs();
       $form->addElement($label);
 
@@ -30,17 +35,11 @@ class Text_Controller extends Controller {
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
       $form->addElement($textarea);
 
-      $textareaPanel = new Form_Element_TextArea('paneltext', $this->_("Text panelu"));
-      $textareaPanel->setSubLabel($this->_('Je zobrazen v panelu, pokud je panel zapnut'));
-      $textareaPanel->setLangs();
-      $form->addElement($textareaPanel);
-
       $model = new Text_Model_Detail();
-      $text = $model->getText($this->category()->getId());
+      $text = $model->getText($this->category()->getId(), self::TEXT_MAIN_KEY);
       if($text != false){
          $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
          $form->label->setValues($text->{Text_Model_Detail::COLUMN_LABEL});
-         $form->paneltext->setValues($text->{Text_Model_Detail::COLUMN_TEXT_PANEL});
       }
 
       $submit = new Form_Element_Submit('send', $this->_("Uložit"));
@@ -49,19 +48,49 @@ class Text_Controller extends Controller {
       if($form->isValid()){
          try {
             $model->saveText($form->text->getValues(), $form->label->getValues(),
-               $form->paneltext->getValues(), $this->category()->getId());
+                    $this->category()->getId(), self::TEXT_MAIN_KEY);
             $this->infoMsg()->addMessage($this->_('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
             new CoreErrors($e);
          }
       }
-
       // view
       $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile("textedit.phtml");
-      $this->view()->template()->addCssFile("style.css");
-      //
+   }
+
+   /**
+    * Kontroler pro editaci textu
+    */
+   public function editPanelController() {
+      $this->checkWritebleRights();
+
+      $form = new Form("text_");
+
+      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea->setLangs();
+      $form->addElement($textarea);
+
+      $model = new Text_Model_Detail();
+      $text = $model->getText($this->category()->getId(), self::TEXT_PANEL_KEY);
+      if($text != false){
+         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      }
+
+      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $form->addElement($submit);
+
+      if($form->isValid()){
+         try {
+            $model->saveText($form->text->getValues(), null, $this->category()->getId(),self::TEXT_PANEL_KEY);
+            $this->infoMsg()->addMessage($this->_('Text panelu byl uložen'));
+            $this->link()->route()->reload();
+         } catch (PDOException $e) {
+            new CoreErrors($e);
+         }
+      }
+      // view
+      $this->view()->template()->form = $form;
    }
 
    public function textController() {}

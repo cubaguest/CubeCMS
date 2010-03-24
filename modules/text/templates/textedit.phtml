@@ -4,20 +4,10 @@ $this->addPageHeadline($this->_('úprava textu'));
 ?>
 <div id="editTextForm">
    <?
-
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 20)->addClass("mceEditor");
-   $this->form->paneltext->html()->setAttrib('cols', 50)->setAttrib('rows', 10)->addClass("mceEditorSimple");
-
-
    $tinymce = new JsPlugin_TinyMce();
    $tinymce->setCfgParam('theme', 'full');
    $this->addJsPlugin($tinymce);
-
-   $tinymce2 = new JsPlugin_TinyMce();
-   $tinymce2->setCfgParam('theme', 'advancedsimple');
-   $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
-   $this->addJsPlugin($tinymce2);
-
    print ($this->form);
    ?>
 </div>

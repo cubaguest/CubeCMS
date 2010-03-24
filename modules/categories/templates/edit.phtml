@@ -15,11 +15,21 @@
    <?
 // do titulku
    if($this->edit) {
-      $this->addPageTitle($this->_('úprava kategorie').' '.$this->catName);
-      $this->addPageHeadline($this->_('úprava kategorie').' '.$this->catName);
+      if($this->adminMenu == true){
+         $this->addPageTitle($this->_('úprava administrační kategorie').' '.$this->catName);
+         $this->addPageHeadline($this->_('úprava administrační kategorie').' '.$this->catName);
+      } else {
+         $this->addPageTitle($this->_('úprava kategorie').' '.$this->catName);
+         $this->addPageHeadline($this->_('úprava kategorie').' '.$this->catName);
+      }
    } else {
-      $this->addPageTitle($this->_('přidání kategorie'));
-      $this->addPageHeadline($this->_('přidání kategorie'));
+      if($this->adminMenu == true){
+         $this->addPageTitle($this->_('přidání administrační kategorie'));
+         $this->addPageHeadline($this->_('přidání administrační kategorie'));
+      } else {
+         $this->addPageTitle($this->_('přidání kategorie'));
+         $this->addPageHeadline($this->_('přidání kategorie'));
+      }
    }
 // donastavení formuláře
    $this->form->priority->html()->setAttrib('size', 4);

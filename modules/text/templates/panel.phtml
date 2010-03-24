@@ -10,7 +10,7 @@ if($this->panelObj()->getBackImage() != null){
 ?>
 <p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
 <div class="panelText" style="<?=$backImg?>">
-   <?=$this->shortText->{Text_Model_Detail::COLUMN_TEXT_PANEL}?><br />
+   <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?><br />
 </div>
 <p class="panelLinkMore">
    <a href="<?=$this->link()?>"

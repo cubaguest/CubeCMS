@@ -426,7 +426,6 @@ class AppCore {
          $pathFull = implode('/', $pathDirs);
          unset ($pathDirs[count($pathDirs)-1]);
          $pathShort = implode('/', $pathDirs);
-
          if(file_exists(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.$file)) {
             require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.$file;
          } else if(file_exists(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR
@@ -445,7 +444,12 @@ class AppCore {
          .DIRECTORY_SEPARATOR.$pathShort.DIRECTORY_SEPARATOR.$moduleFile)) {
             require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
                             .DIRECTORY_SEPARATOR.$pathShort.DIRECTORY_SEPARATOR.$moduleFile;
+         } else if(file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR
+         .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile)) {
+            require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
+                            .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile;
          } else {
+//            var_dump($file, $classL, $pathDirs, $moduleFile, $pathFull, $pathShort);
             trigger_error(_("Chybějící třída").": ".$classOrigName." ".$file." module-file: ".$moduleFile);
          }
       }
@@ -508,7 +512,7 @@ class AppCore {
    /**
     * Metoda vytvoří hlavní menu aplikace
     */
-   public function createMainMenu() {
+   public function createMenus() {
       Menu_Main::factory();
       try {
          if(!file_exists(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR . DIRECTORY_SEPARATOR
@@ -530,6 +534,15 @@ class AppCore {
       } catch (Exception $e ) {
          new CoreErrors($e);
       }
+      // inicializace admin menu
+      if(Auth::isLogin()){
+         Menu_Admin::factory();
+         $menu = new Menu_Admin();
+         $menu->controller();
+         $menu->view();
+         $this->coreTpl->menuAdminObj = $menu->template();
+      }
+
    }
 
    /**
@@ -946,7 +959,7 @@ class AppCore {
          // Globální inicializace proměných do šablony
          $this->initialWebSettings();
          //vytvoření hlavního menu
-         $this->createMainMenu();
+         $this->createMenus();
 
          if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_ENGINE_PAGE
                  AND !AppCore::isErrorPage()) {

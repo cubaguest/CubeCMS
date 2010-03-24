@@ -1,11 +1,4 @@
 <?
-$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-
-$catModel = new Model_Category();
-$menu->setCategories($catModel->getCategoryList(true));
-
-
-
 define('SECTION_EDTI_LABEL', $this->_('Upravit'));
 define('SECTION_REMOVE_LABEL', $this->_('Smazat'));
 define('SECTION_SETTINGS_LABEL', $this->_('Upravit parametry'));
@@ -71,11 +64,13 @@ function vveSectionsRenderFunc($menuArr, $link) {
 }
 ?>
 <div>
+   <?$this->includeTpl('structtype.phtml');?>
+
    <?//sekce?>
    <h2><?=$this->_("Struktura stránek")?></h2>
    <div id="sections">
       <table style="width: 98%">
-         <?=vveSectionsRenderFunc($menu, $this->link())?>
+         <?=vveSectionsRenderFunc($this->structure, $this->link())?>
       </table>
    </div>
    <br />

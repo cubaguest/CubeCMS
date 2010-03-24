@@ -1,19 +1,17 @@
 <?
-$model = new Text_Model_Detail();
-$text = $model->getText(Category::getSelectedCategory()->getId());
-if($text != false) {
-   if($text->{Text_Model_Detail::COLUMN_LABEL} != '') {
-      $this->addPageTitle($text->{Text_Model_Detail::COLUMN_LABEL});
-      $this->addPageHeadline($text->{Text_Model_Detail::COLUMN_LABEL});
-   }
-   $text = $text->{Text_Model_Detail::COLUMN_TEXT};
-} else {
-   $text = $this->_("Text nebyl definován, vytvoříte jej v administraci");
+if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABEL} != null) {
+   $this->addPageTitle($this->text->{Text_Model_Detail::COLUMN_LABEL});
+   $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
 }
-
 ?>
 <div>
-   <?=$text?>
+   <?
+   if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
+      echo ($this->text->{Text_Model_Detail::COLUMN_TEXT});
+   } else {
+      echo ($this->_("Text nebyl definován, vytvoříte jej v administraci"));
+   }
+   ?>
 </div>
 <? $this->addJsPlugin(new JsPlugin_PiroBox())?>
    <script type="text/javascript">
@@ -36,12 +34,5 @@ if($text != false) {
 </script>
 <?
 
-//}
-if($this->category()->getRights()->isWritable()) {
-   $toolbox = new Template_Toolbox();
-   $toolbox->addTool('edit_text', $this->_("Upravit"),
-           $this->link()->route('edit'),
-           $this->_("Upravit text"), "page_edit.png");
-   $this->includeTplObj($toolbox);
-}
+if($this->toolbox != null) $this->includeTplObj($this->toolbox);
 ?>

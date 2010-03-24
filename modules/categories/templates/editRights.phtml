@@ -1,0 +1,57 @@
+<?
+?>
+<div>
+   <?=$this->form->renderStart();?>
+   <table style="table-layout: fixed; width: 90%">
+      <tr>
+         <th><?=$this->_('Kategorie')?></th>
+         <th style="width: 100px; overflow: hidden; padding-right: 10px;">
+           <?=$this->_('Výchozí práva')?>
+         </th>
+      <?
+      $groups = $this->groups->fetchAll(PDO::FETCH_OBJ);
+      foreach ($groups as $row) {
+         ?>
+         <th style="width: 100px; padding-right: 10px;">
+            <?=$row->{Model_Users::COLUMN_GROUP_LABEL}?>
+         </th>
+      <?}?>
+      </tr>
+      <?
+      foreach ($this->list as $cat) {?>
+      <tr>
+         <td><?=$cat->getName()?></td>
+         <td>
+         <?
+            $this->form->right->setValues($cat->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT});
+            $this->form->right->setDimensional(array($cat->getId(), 'default'));
+            print ($this->form->right->controll());
+         ?>
+         </td>
+         <?
+         $rightsData = $this->modelRights->getRights($cat->getId());
+         $rights = array();
+         while ($rr = $rightsData->fetchObject()) {
+            $rights[$rr->{Model_Users::COLUMN_GROUP_ID}] = $rr->{Model_Rights::COLUMN_RIGHT};
+         }
+         foreach ($groups as $grp) {?>
+            <td>
+            <?
+            if(isset ($rights[$grp->{Model_Users::COLUMN_GROUP_ID}])){
+               $this->form->right->setValues($rights[$grp->{Model_Users::COLUMN_GROUP_ID}]);
+            } else {
+               $this->form->right->setValues($cat->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT});
+            }
+            $this->form->right->setDimensional(array($cat->getId(), $grp->{Model_Users::COLUMN_GROUP_ID}));
+            print ($this->form->right->controll());
+            ?>
+            </td>
+         <?
+         }
+         ?>
+      </tr>
+      <?}?>
+   </table>
+   <p align="right"><?=$this->form->send->controll();?></p>
+   <?=$this->form->renderEnd();?>
+</div>

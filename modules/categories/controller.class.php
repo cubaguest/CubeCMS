@@ -5,12 +5,21 @@
  */
 
 class Categories_Controller extends Controller {
+   const MODULE_SPEC_FILE = 'spicifikation.html';
+
    private $categoriesArray = array();
 
-   const MODULE_SPEC_FILE = 'spicifikation.html';
+   /**
+    * jestli se pracuje se strukturou administračního menu
+    * @var bool
+    */
+   private $adminStructure = false;
 
    public function mainController() {
       $this->checkWritebleRights();
+
+      $this->formStructType();
+
       $formDelete = new Form('category_');
 
       $elemId = new Form_Element_Hidden('id');
@@ -20,7 +29,7 @@ class Categories_Controller extends Controller {
       $formDelete->addElement($submitDel);
 
       if($formDelete->isValid()) {
-         $categories = unserialize(VVE_CATEGORIES_STRUCTURE);
+         $categories = Category_Structure::getStructure($this->adminStructure);
          // načtení kategorie (nutné pro vyčištění)
          $cM = new Model_Category();
          $cat = $cM->getCategoryById($formDelete->id->getValues());
@@ -40,7 +49,7 @@ class Categories_Controller extends Controller {
 
          // mažeme kategorii ze struktury
          $categories->removeCat($formDelete->id->getValues());
-         $categories->saveStructure();
+         $categories->saveStructure($this->adminStructure);
          $this->infoMsg()->addMessage($this->_("Kategorie byla smazána"));
 
          $this->link()->route()->reload();
@@ -60,9 +69,7 @@ class Categories_Controller extends Controller {
 
       if($formMove->isValid()) {
          $id = $formMove->id->getValues();
-         $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-         //         $menu = new Category_Structure(0);
-
+         $menu = Category_Structure::getStructure($this->adminStructure);
          try {
             $parent = $menu->getCategory($menu->getCategory($id)->getParentId());
             if($formMove->move_to->getValues() == 'up') {
@@ -71,13 +78,19 @@ class Categories_Controller extends Controller {
                $parent->swapChild($parent->getChild($id), $parent->nextChild($parent->getChild($id)));
             }
 
-            $menu->saveStructure();
+            $menu->saveStructure($this->adminStructure);
             $this->infoMsg()->addMessage($this->_("Pozice byla změněna"));
             $this->link()->route()->reload();
          } catch (Exception $e) {
             new CoreErrors($e);
          }
       }
+
+      $menu = Category_Structure::getStructure($this->adminStructure);
+
+      $catModel = new Model_Category();
+      $menu->setCategories($catModel->getCategoryList(true));
+      $this->view()->structure = $menu;
    }
 
    public function showController() {
@@ -111,6 +124,7 @@ class Categories_Controller extends Controller {
 
    public function editController() {
       $this->checkWritebleRights();
+      $this->checkStructType();
 
       $form = $this->createForm();
 
@@ -124,7 +138,7 @@ class Categories_Controller extends Controller {
       $form->description->setValues($cat[Model_Category::COLUMN_DESCRIPTION]);
       // nadřazená kategorie
 
-      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+      $menu = Category_Structure::getStructure($this->adminStructure);
       $catModel = new Model_Category();
       $menu->setCategories($catModel->getCategoryList(true));
 
@@ -252,16 +266,18 @@ class Categories_Controller extends Controller {
 
          // uprava struktury
          if($form->parent_cat->getValues() != $selCat->getParentId()) {
-            $menuRepair = unserialize(VVE_CATEGORIES_STRUCTURE);
+            $menuRepair = Category_Structure::getStructure($this->adminStructure);
             $cat = $menuRepair->getCategory($this->getRequest('categoryid'));
             $menuRepair->removeCat($this->getRequest('categoryid'));
             $menuRepair->addChild($cat, $form->parent_cat->getValues());
-            $menuRepair->saveStructure();
+            $menuRepair->saveStructure($this->adminStructure);
          }
 
          // vytvoření tabulek
-         $modelDbSupport = new Model_Module();
-         $modelDbSupport->installModuleTable($form->module->getValues());
+         // instalace
+         $mInsClass = ucfirst($form->module->getValues()).'_Install';
+         $mInstall = new $mInsClass();
+         $mInstall->installModule();
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
          //         $this->link()->route('detail', array('categoryid' => $this->getRequest('categoryid')))->reload();
@@ -275,12 +291,14 @@ class Categories_Controller extends Controller {
    }
 
    public function addController() {
+      $this->checkWritebleRights();
+      $this->checkStructType();
       $form = $this->createForm();
 
       $form->show_in_menu->setValues(true);
 
       // kategorie
-      $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+      $menu = Category_Structure::getStructure($this->adminStructure);
       $catModel = new Model_Category();
       $menu->setCategories($catModel->getCategoryList(true));
 
@@ -358,14 +376,15 @@ class Categories_Controller extends Controller {
          }
          // po uložení vložíme do struktury
          if($lastId !== false) {
-            $menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+            $menu = Category_Structure::getStructure($this->adminStructure);
             $menu->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
-            $menu->saveStructure();
+            $menu->saveStructure($this->adminStructure);
          }
 
-         // vytvoření tabulek
-         $modelDbSupport = new Model_Module();
-         $modelDbSupport->installModuleTable($form->module->getValues());
+         // instalace
+         $mInsClass = ucfirst($form->module->getValues()).'_Install';
+         $mInstall = new $mInsClass();
+         $mInstall->installModule();
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
          $this->link()->route()->reload();
@@ -602,6 +621,41 @@ class Categories_Controller extends Controller {
       }
 
       $this->view()->form = $form;
+   }
+
+   private function checkStructType() {
+      if(isset ($_SESSION['structAdmin']) AND $_SESSION['structAdmin'] == true) {
+         $this->adminStructure = true;
+      }
+      $this->view()->adminMenu = $this->adminStructure;
+   }
+
+   private function formStructType() {
+      $this->checkStructType();
+
+      // from pro změnu main/admin
+      $formType = new Form('struc_type_');
+      $elemTypeSel = new Form_Element_Select('type', $this->_('Typ struktury'));
+      $elemTypeSel->setOptions(array($this->_('Hlavní menu') => 'main',
+         $this->_('Administrační menu') => 'admin'));
+      if($this->adminStructure === true){
+         $elemTypeSel->setValues('admin');
+      }
+      $formType->addElement($elemTypeSel);
+
+      $elemTypeSubmit = new Form_Element_Submit('change',$this->_('Změnit'));
+      $formType->addElement($elemTypeSubmit);
+
+      if($formType->isValid()){
+         if($formType->type->getValues() == 'admin'){
+            $_SESSION['structAdmin'] = true;
+         } else {
+            $_SESSION['structAdmin'] = false;
+            unset ($_SESSION['structAdmin']);
+         }
+         $this->link()->reload();
+      }
+      $this->view()->formType = $formType;
    }
 }
 

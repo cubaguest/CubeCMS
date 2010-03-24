@@ -187,15 +187,18 @@
          if(!$this->edit) {}
             ?>
          <table class="formTableGroup" id="dateRowsTable">
-               <?foreach ($vals as $i => $val) {?>
+               <?
+               $this->form->date->html()->setAttrib('size', 10);
+               $this->form->date->html()->addClass('datepicker');
+               $this->form->time->html()->setAttrib('size', 5);
+               foreach ($vals as $i => $val) {?>
             <tr>
                <th class="formLabels">
                         <?print($this->form->date->label())?>
                </th>
                <td class="formControlls">
                         <?
-                        $this->form->date->html()->setAttrib('size', 10);
-                        $this->form->date->html()->addClass('datepicker');
+
                         $this->form->date->setDimensional($i);
                         print($this->form->date->controll())
                             ?>
@@ -204,7 +207,7 @@
                         <?=$this->form->time->label()?>
                </th>
                <td>
-                        <?$this->form->time->html()->setAttrib('size', 5);
+                        <?
 //                        $this->form->time->html()->setAttrib('onChange', 'return checkTime(this)');
                         $this->form->time->setDimensional($i);
                         print($this->form->time->controll())?>
