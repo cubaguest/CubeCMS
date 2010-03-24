@@ -1,0 +1,29 @@
+<?
+if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABEL} != null){
+   $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
+}
+?>
+<div>
+   <?if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null){?>
+   <div class=""><?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
+   <?}?>
+   <br />
+   <?
+   if($this->unreg == true){?>
+      <strong><?=$this->_('Zrušení registrace e-mailu')?></strong><br />
+   <? } else {?>
+      <strong><?=$this->_('Registrace e-mailu')?></strong><br />
+   <?}?>
+   <?
+   print($this->newMailForm->renderStart());
+   print($this->newMailForm->mail->controll());
+   print($this->newMailForm->send->controll());
+   print($this->newMailForm->renderEnd());
+
+   if($this->toolbox != null) $this->includeTplObj($this->toolbox);
+   ?>
+      <br />
+      <a href="<?=$this->link()->route('unregistration');?>"
+         title="<?=$this->_('Zrušit registraci e-mailu')?>"
+         ><?=$this->_('Zrušit registraci e-mailu')?></a>
+</div>

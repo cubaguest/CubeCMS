@@ -1,0 +1,62 @@
+<?
+$this->addPageHeadline($this->_('Seznam registrovaných e-mailových adres'));
+$this->addPageTitle($this->_('Seznam registrovaných e-mailových adres'));
+
+$this->addJsPlugin(new JsPlugin_DataTables());
+?>
+<div>
+   <h2><?=$this->_('Seznam registrovaných e-mailů')?></h2>
+   <?
+   $this->formRemove->html()->setAttrib('onsubmit', 'return confirm(\''.$this->_('Odstranit označené').'?\');');
+   echo($this->formRemove->renderStart());
+   ?>
+   <table id="tableMails" style="width: 100%;">
+      <thead>
+		<tr>
+         <th>E-mail</th>
+			<th style="width: 140px"><?=$this->_('Přidáno')?></th>
+         <th style="width: 140px"><?=$this->_('odstranit')?></th>
+		</tr>
+	</thead>
+   <tbody>
+      <?foreach ($this->mails as $mail) {?>
+      <tr>
+         <td><a href="mailto:<?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL}?>"
+                title="<?=$this->_('Poslat email')?>"
+                ><?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL}?></a></td>
+         <td><?=vve_date("%x", new DateTime($mail->{NewsLetter_Model_Mails::COLUMN_DATE_ADD}))?></td>
+         <td align="center">
+         <?
+         $this->formRemove->id->setValues(false);
+         $this->formRemove->id->setDimensional($mail->{NewsLetter_Model_Mails::COLUMN_ID});
+         echo $this->formRemove->id->controll();
+                 ?>
+         </td>
+      </tr>
+      <?}?>
+   </tbody>
+   </table>
+   <hr class="reseter" />
+   <p><?echo($this->formRemove->remove->controll());?></p>
+   <?echo($this->formRemove->renderEnd());?>
+      <script type="text/javascript" charset="utf-8">
+			$(document).ready(function() {
+				$('#tableMails').dataTable( {
+					"oLanguage": {
+						"sLengthMenu": "<?=$this->_('Zobrazit _MENU_ záznamů na stránku')?>",
+						"sZeroRecords": "<?=$this->_('Nic nenalezeno')?>",
+						"sInfo": "<?=$this->_('Zobrazeno od _START_ do _END_ z _TOTAL_ záznamů')?>",
+						"sInfoEmtpy": "<?=$this->_('Zobrazeno 0 z 0 záznamů')?>",
+						"sInfoFiltered": "(<?=$this->_('filtrováno z _MAX_ celkových záznamů')?>)"
+					}
+				} );
+			} );
+		</script>
+   <br />
+   <h2><?=$this->_('Export adres')?></h2>
+   <a href="<?=$this->link()->route('export',array('output' => 'txt'))?>">txt</a>
+   <a href="<?=$this->link()->route('export',array('output' => 'csv'))?>">csv</a>
+   <br />
+   <br />
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route(null)));?>
+</div>

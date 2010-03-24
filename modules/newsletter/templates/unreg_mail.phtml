@@ -1,0 +1,16 @@
+<?
+//   $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
+?>
+<div>
+   <strong><?=$this->_('Zrušení registrace e-mailu')?></strong><br />
+   <?
+   print($this->unregMailForm->renderStart());
+   print($this->unregMailForm->mail->controll());
+   print($this->unregMailForm->send->controll());
+   print($this->unregMailForm->renderEnd());
+
+//   if($this->toolbox != null) $this->includeTplObj($this->toolbox);
+   ?>
+   <br />
+   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route(null), 'text' => $this->_('Zpět na registraci')));?>
+</div>
