@@ -48,6 +48,16 @@ class Model_DbSupport extends Model_PDO {
       $dbst->execute();
       return $dbst;
    }
+
+   /**
+    * Metoda spustí zadaný sql dotaz na db
+    * @param string $sql -- SQL dotaz
+    * @return PDOStatement
+    */
+   public function runSQL($sql) {
+      $pdo = new Db_PDO();
+      return $pdo->query($sql);
+   }
 }
 
 ?>
