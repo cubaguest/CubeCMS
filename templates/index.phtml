@@ -65,9 +65,16 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
             contentsource: "markup"});
          /* ]]> */
       </script>
+      <?if(Auth::isLogin()){?>
+      <link rel="stylesheet" type="text/css" href="stylesheets/style-admin.css" />
+      <script type="text/javascript" src="jscripts/admin/menu.js"></script>
+      <?}?>
       <script type="text/javascript" src="jscripts/enginehelpers.js"></script>
    </head>
    <body id="pageTop">
+      <? // admin menu
+      if($this->menuAdminObj != null) $this->includeTplObj($this->menuAdminObj);
+      ?>
       <? //NavigationMenu_View::listView(); ?>
       <div id="bodywrap">
 

@@ -20,12 +20,6 @@ class Menu_Main {
    private $template = null;
 
    /**
-    * Pole s aktuální cestou
-    * @var array
-    */
-   private $currentPath = array();
-
-   /**
     * Objekt s menu
     * @var Category_Structure
     */
@@ -45,6 +39,10 @@ class Menu_Main {
     * Metoda provede inicializaci menu
     */
    public static function factory() {
+//      $newAdminMenu = new Category_Structure(0);
+//      $newAdminMenu->addChild(new Category_Structure(1));
+//      $newAdminMenu->saveStructure();
+//      var_dump($newAdminMenu);
       // načtení menu z
       self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
       $catModel = new Model_Category();

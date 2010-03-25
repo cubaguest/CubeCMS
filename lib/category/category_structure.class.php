@@ -307,14 +307,20 @@ class Category_Structure implements Iterator {
       return $this->catObj;
    }
 
-   public function saveStructure($structure = null) {
-      if($structure == null) {
-         $model = new Model_Config();
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($this));
+   public function saveStructure($admin = false) {
+      $model = new Model_Config();
+      if($admin === true){
+         $model->saveCfg('ADMIN_MENU_STRUCTURE', serialize($this));
       } else {
-         $model = new Model_Config();
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($structure));
+         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($this));
       }
+   }
+
+   public static function getStructure($admin = false){
+      if($admin === true){
+         return unserialize(VVE_ADMIN_MENU_STRUCTURE);
+      }
+      return unserialize(VVE_CATEGORIES_STRUCTURE);
    }
 
    /**

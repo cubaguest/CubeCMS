@@ -1,0 +1,26 @@
+<?
+// funkce pro render menu
+function vveAdminMenuRenderFunc($menuArr, $link, $ulParam) {
+   print ("<ul ".$ulParam.">\n");
+   foreach ($menuArr as $key => $item) {
+      print ("<li>");
+      if(!$item->isEmpty()) {
+         print ('<a href="#">'.$item->getCatObj()->getLabel().'</a>'."");
+         vveAdminMenuRenderFunc($item, $link, null);
+      } else {
+         print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
+                         .$item->getCatObj()->getLabel().'</a>'."");
+      }
+
+      print ("</li>\n");
+   }
+   print ("</ul>\n");
+}
+?>
+
+<!-- Halvni menu sekce v menu  -->
+<div id="adminMenuWrapper">
+      <?=vveAdminMenuRenderFunc($this->menu, $this->link(), 'class="dropdown"')?>
+</div>
+<div id="adminMenuHeight"></div>
+<hr class="reseter" />
