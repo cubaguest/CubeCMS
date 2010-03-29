@@ -348,7 +348,10 @@ class Filesystem_File {
     * @return integer -- velikost souboru
     */
    private function locateFileSize() {
-      return @filesize($this->getName(true));
+      if($this->exist()){
+         return @filesize($this->getName(true));
+      }
+      return -1;
    }
 
    /**
@@ -363,7 +366,10 @@ class Filesystem_File {
          $ext = strtolower(array_pop($fileArray));
          if (function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME);
-            $this->fileMimeType = finfo_file($finfo, $this->getName(true));
+            $mimetype = finfo_file($finfo, $this->getName(true));
+            // odstranění utf-8 pokud existuje
+            $mime = explode(';', $mimetype);
+            $this->fileMimeType = $mime[0];
             finfo_close($finfo);
          }
          else if (array_key_exists($ext, self::$mimeTypes)) {
