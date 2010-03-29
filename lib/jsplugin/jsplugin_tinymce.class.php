@@ -131,6 +131,11 @@ class JsPlugin_TinyMce extends JsPlugin {
    const W_DIRS_FILE = 'dirs.xml';
 
    /**
+    * Název souboru s externími šablonami
+    */
+   const EXTERNAL_TEMPLATES_FILE = 'tinymce_templates.js';
+
+   /**
     * Pole s konfigurací pluginu
     * @var array
     */
@@ -143,8 +148,9 @@ class JsPlugin_TinyMce extends JsPlugin {
            'textarea_trigger' => "convert_this",
            'external_image_list_url' => null,
            'external_link_list_url' => null,
-           'template_external_list_url' => null,
-           'template_replace_values' => array()
+//           'template_external_list_url' => null,
+           'template_replace_values' => array(),
+           'root_element' => true
    );
 
 
@@ -158,12 +164,12 @@ class JsPlugin_TinyMce extends JsPlugin {
            'entity_encoding' => 'raw',
            //'encoding' => 'xml',
            'category_id' => null,
-           'force_br_newlines' => true,
+//           'force_br_newlines' => true, // dělá bordel, nejde vkládat další prvky
            'document_base_url' => null,
            'remove_script_host' => false,
            'content_css' => null,
            'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|name|align|frameborder|scrolling]',
-//           'forced_root_block' => false,
+           'forced_root_block' => 'p',
            'theme_advanced_toolbar_location' => 'top',
            'theme_advanced_toolbar_align' => 'left',
            'theme_advanced_statusbar_location' => 'bottom',
@@ -265,6 +271,9 @@ class JsPlugin_TinyMce extends JsPlugin {
             break;
       }
       $cfgFile->setParam('editor_selector', $this->config['editor_selector']);
+      if($this->config['root_element'] == false){
+         $cfgFile->setParam('root_element', 'false');
+      }
       $this->addFile($cfgFile);
    }
 
@@ -281,6 +290,9 @@ class JsPlugin_TinyMce extends JsPlugin {
          $params['editor_selector'] = rawurldecode($_GET['editor_selector']);
       } else {
          $params['editor_selector'] = $this->getCfgParam('editor_selector');
+      }
+      if(isset ($_GET['root_element']) AND $_GET['root_element'] == 'false') {
+         $params['forced_root_block'] = false;
       }
       if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
       Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
@@ -327,6 +339,10 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    public function settingsAdvanced1View() {
       $params = array_merge($this->defaultParams, $this->advParams, $this->advanced1Params);
+      // externí šablony
+      if(file_exists(Template::faceDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE)){
+         $params['template_external_list_url'] = Template::face(false).Template::TEMPLATES_DIR.URL_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE;
+      }
       $params = $this->setBasicOptions($params);
       $content = $this->cfgFileHeader();
       $content .= $this->generateParamsForFile($params);
@@ -353,6 +369,11 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    public function settingsFullView() {
       $params = array_merge($this->defaultParams, $this->advParams, $this->advancedFullParams);
+      // externí šablony
+      if(file_exists(Template::faceDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE)){
+         $params['template_external_list_url'] = Template::face(false).Template::TEMPLATES_DIR.URL_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE;
+      }
+
       $params = array_merge($params, $this->advancedFullParams);
       $params = $this->setBasicOptions($params);
 
