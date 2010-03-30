@@ -355,49 +355,6 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
    color: white;
 }
 
-/*Pro tinyMCE*/
-.textarea_tinymce {
-   width: 100%;
-}
-
-/* Panel s editací */
-.toolbox {
-   background: orange;
-   border: olive 1px solid;
-   position: absolute;
-   top: 5px;
-   right: 10px;
-   width: auto;
-   height: auto;
-   padding: 2px 2px 2px 2px;
-   background-repeat: no-repeat;
-}
-
-.toolbox input {
-   background:none;
-   border:none;
-   color:gray;
-   cursor: pointer;
-   text-align:left;
-   padding: 0 0 0 16px;
-   background-repeat: no-repeat;
-}
-
-.toolbox form input[type="hidden"] {
-   display:none;
-}
-
-.toolbox form input[type="image"] {
-   vertical-align:bottom;
-}
-
-.toolbox form input[type="submit"]:hover {
-   background:none;
-   background-repeat: no-repeat;
-   color: black;
-}
-/* EOF Panel s editací */
-
 /* odkaz zpět */
 .button_back {
    display: block;
