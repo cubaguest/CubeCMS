@@ -62,6 +62,12 @@ class Locale {
                                    "pl" => "pl_PL ");
 
    /**
+    * Pole s podobnými jazyky (je použito při výchozím nasatvení jazyku)
+    * @var <type> 
+    */
+   private static $similaryLangs = array('cs' => 'sk', 'sk' => 'cs');
+
+   /**
     * Pole se všemi názvy jazyků
     *
     * @var array
@@ -126,15 +132,10 @@ class Locale {
          // pokud nebyl jazyk nastaven při prohlížení
          if($session->isEmpty(self::SESSION_LANG)){
             // načteme jazyk klienta a zjistíme, jestli existuje mutace aplikace
-            $lang = self::getLangsByClient();
-            if($lang !== false){
-               self::$selectLang = $lang;
-            } else {
-               self::$selectLang = self::$defaultLang;
-            }
+            self::$selectLang = self::getLangsByClient();
             $session->add(self::SESSION_LANG, self::$selectLang);
             if(self::$selectLang != self::$defaultLang){
-               $link = new Links();
+               $link = new Url_Link();
                $link->lang(self::$selectLang)->reload();
             }
          }
@@ -193,28 +194,39 @@ class Locale {
     * @todo -- optimalizovat
     */
    public static function getLangsByClient() {
+      $retLang = self::getDefaultLang();
       if(isset ($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
          $clientString = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
          // odstraníme mezery KHTML, webkit
          $clientString = str_replace(" ", "", $clientString);
          // rozdělit na jazyky
          $clientLangs = Explode(",", $clientString);
-         $langs = array();
+         // zkrácení jazyků
+         function langs_strings_repair(&$lang, $key){
+            $match = array();
+            preg_match('/([a-z]{2,3})/', $lang, $match);
+            $lang = $match[1];
+         }
+         array_walk($clientLangs, 'langs_strings_repair');
+         // test existence primárního jazyka
+         if($clientLangs[0] == self::getDefaultLang()) return self::getDefaultLang();
+         // test podobnoti
+         if(isset (self::$similaryLangs[$clientLangs[0]])
+                 AND in_array(self::$similaryLangs[$clientLangs[0]], self::getAppLangs())){
+            return self::$similaryLangs[$clientLangs[0]];
+         }
+         // volba podle klienta
          $match = array();
          foreach ($clientLangs as $lang) {
-            preg_match('/([a-z]{2,3})/', $lang, $match);
-            if (in_array($match[1], self::getAppLangs())) {
-               return $match[1];
-            }
-         //         $langs[] = preg_replace('/^!([a-z]{2,3})(.*)$/', 'd', $lang);
+            if (in_array($lang, self::getAppLangs())) return $lang;
          }
-      } else {
-         return self::getDefaultLang();
       }
-      return false;
+      return $retLang;
    }
 
-
+   private function shortLangStrings(){
+      
+   }
 
    /**
     * Metoda nastaví názvy jazyků jayzyky
