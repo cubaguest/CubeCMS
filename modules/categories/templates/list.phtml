@@ -64,10 +64,9 @@ function vveSectionsRenderFunc($menuArr, $link) {
 }
 ?>
 <div>
-   <?$this->includeTpl('structtype.phtml');?>
-
    <?//sekce?>
    <h2><?=$this->_("Struktura stránek")?></h2>
+   <?$this->includeTpl('structtype.phtml');?><br />
    <div id="sections">
       <table style="width: 98%">
          <?=vveSectionsRenderFunc($this->structure, $this->link())?>
