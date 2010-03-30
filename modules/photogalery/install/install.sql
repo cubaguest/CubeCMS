@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}photogalery_images` (
   `file` varchar(200) NOT NULL,
   `name_cs` varchar(300) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `desc_cs` varchar(1000) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `name_sk` varchar(300) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `desc_sk` varchar(1000) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `name_en` varchar(300) DEFAULT NULL,
   `desc_en` varchar(1000) DEFAULT NULL,
   `name_de` varchar(300) DEFAULT NULL,
