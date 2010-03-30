@@ -15,15 +15,7 @@ class NewsLetter_Controller extends Controller {
    const PARAM_NEW_MAIL_REG_TEXT_USER = 'newmail_registered_text_user';
 
    public function mainController() {
-      $newMailForm = new Form('regmail_');
-
-      $elemMail = new Form_Element_Text('mail', $this->_('E-mail'));
-      $elemMail->addValidation(new Form_Validator_NotEmpty());
-      $elemMail->addValidation(new Form_Validator_Email());
-      $newMailForm->addElement($elemMail);
-
-      $elemSend = new Form_Element_Submit('send', $this->_('Registrovat'));
-      $newMailForm->addElement($elemSend);
+      $newMailForm = $this->createRegForm();
 
       if($newMailForm->isValid()) {
          $mailsM = new NewsLetter_Model_Mails();
@@ -74,6 +66,19 @@ class NewsLetter_Controller extends Controller {
       $this->view()->text = $textModel->getText($this->category()->getId(), self::TEXT_MAIN_KEY);
 
       $this->view()->newMailForm = $newMailForm;
+   }
+
+   private function createRegForm(){
+      $newMailForm = new Form('regmail_');
+
+      $elemMail = new Form_Element_Text('mail', $this->_('E-mail'));
+      $elemMail->addValidation(new Form_Validator_NotEmpty());
+      $elemMail->addValidation(new Form_Validator_Email());
+      $newMailForm->addElement($elemMail);
+
+      $elemSend = new Form_Element_Submit('send', $this->_('Registrovat'));
+      $newMailForm->addElement($elemSend);
+      return $newMailForm;
    }
 
    private static function getNewMailText($type = self::PARAM_NEW_MAIL_REG_TEXT_USER) {
@@ -201,6 +206,61 @@ class NewsLetter_Controller extends Controller {
       }
 
       $this->view()->unregMailForm = $unregMailForm;
+   }
+
+   public function registerController(){
+      $newMailForm = $this->createRegForm();
+      $data = array('code' => false, 'message' => null);
+
+      if($newMailForm->isValid()) {
+         $mailsM = new NewsLetter_Model_Mails();
+         $newMail = $newMailForm->mail->getValues();
+         // načtení existujících emailů pro okntrolu existence
+         if(!$mailsM->isSavedMails($this->category()->getId(), $newMail)) {
+            $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR'], $this->category()->getId());
+            // pokud se má odeslat mail správci
+            if($this->category()->getParam(self::PARAM_NEW_MAIL_REG_NOTICE, true) == true) {
+               // email webmasterovi
+               $emailComp = new Email();
+               $emailComp->addAddress($this->getRecipientEmailAddress());
+               $emailComp->setSubject($this->category()->getParam(self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN,
+                       self::getNewMailText(self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN)).' '.VVE_WEB_NAME);
+               // přepis hodnot
+               $emailComp->setContent(str_replace(
+                       array("%date%", '%email%', '%ip%', '%webname%', '%weblink%','%unregaddress%'),
+                       array(vve_date("%x"), $newMail, $_SERVER['REMOTE_ADDR'],
+                       VVE_WEB_NAME, Url_Request::getBaseWebDir(),
+                       $this->link()->route('unregistration')->param('mail', $newMail)),
+                       $this->category()->getParam(self::PARAM_NEW_MAIL_REG_TEXT_ADMIN,
+                       self::getNewMailText(self::PARAM_NEW_MAIL_REG_TEXT_ADMIN))));
+               $emailComp->sendMail();
+            }
+            // email registrovanému
+            $emailComp = new Email();
+            $emailComp->addAddress($newMail);
+            $emailComp->setSubject($this->category()->getParam(self::PARAM_NEW_MAIL_REG_SUBJECT,
+                    self::getNewMailText(self::PARAM_NEW_MAIL_REG_SUBJECT)).' '.VVE_WEB_NAME);
+            // přepis hodnot
+            $emailComp->setContent(str_replace(
+                    array("%date%", '%email%', '%ip%', '%webname%', '%weblink%','%unregaddress%'),
+                    array(vve_date("%x"), $newMail, $_SERVER['REMOTE_ADDR'],
+                    VVE_WEB_NAME, Url_Request::getBaseWebDir(),
+                    $this->link()->route('unregistration')->param('mail', $newMail)),
+                    $this->category()->getParam(self::PARAM_NEW_MAIL_REG_TEXT_USER,
+                    self::getNewMailText(self::PARAM_NEW_MAIL_REG_TEXT_USER))));
+            $emailComp->sendMail();
+            $data['code'] = true;
+            $data['message'] = $this->_('Váš e-mail byl uložen');
+         } else {
+            $data['code'] = false;
+            $data['message'] = $this->_('Váš e-mail byl již jednou uložen');
+         }
+      } else {
+         $data['code'] = false;
+         $data['message'] = $this->errMsg()->getMessages();
+      }
+
+      $this->view()->data = $data;
    }
 
    /**

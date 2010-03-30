@@ -1,0 +1,60 @@
+<?
+$icon = null;
+if($this->panelObj()->getIcon() != null){
+   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+}
+$backImg = null;
+if($this->panelObj()->getBackImage() != null){
+   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+}
+
+$this->form->html()->addClass('regMailForm');
+?>
+<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
+<div class="panelText" style="<?=$backImg?>">
+   <p>
+      <?=$this->_('Registrace k odběru novinek e-mailem')?>
+   </p>
+   <div>
+   <?echo $this->form->renderStart();?>
+      <?
+      echo $this->form->mail->label().'<br />';
+      echo $this->form->mail->controll().'<br />';?>
+      <p>
+      <?echo $this->form->send->controll()?><br />
+      </p>
+      <?echo $this->form->renderEnd();?>
+   </div>
+</div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $('form.regMailForm').submit(function(){
+      var jform = $(this);
+      showLoadBox(jform);
+      $.ajax({
+         type: "POST",
+         cache: false,
+         url: '<?=$this->link()->clear()->route('register');?>',
+         data: jform.serialize(),
+         dataType: "json",
+         success: function(data) {
+            if(data.code == true){
+               infoMsg(data.message);
+            } else {
+               errMsg(data.message);
+            }
+            hideLoadBox();
+         },
+         error : function(){
+            hideLoadBox();
+         }
+      });
+      return false;
+   });
+   /* ]]> */
+</script>
+
+<p class="panelLinkMore">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>

@@ -52,5 +52,9 @@ class NewsLetter_View extends View {
    public function unregistrationMailView() {
       $this->template()->addTplFile('unreg_mail.phtml');
    }
+
+   public function registerView(){
+      print (json_encode($this->data));
+   }
 }
 ?>
