@@ -85,8 +85,16 @@ class CinemaProgram_View extends View {
       $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
       $xml->writeAttribute('xml:lang', Locale::getLang());
       // informace o webu
-      $xml->writeElement('webname', VVE_WEB_NAME);
-      $xml->writeElement('weburl', Url_Link::getMainWebDir());
+      $xml->startElement('web');
+      $xml->writeAttribute('link', Url_Link::getMainWebDir());
+      $xml->writeRaw(VVE_WEB_NAME);
+      $xml->endElement();
+      // kategorie
+      $xml->startElement('category'); // sof article
+      $xml->writeAttribute('link', $this->link()->clear());
+      $xml->writeRaw($this->category()->getName());
+      $xml->endElement();
+
 
       // informace o článku/akci
       if($movie != null) {

@@ -13,65 +13,75 @@ class KzMainPage_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
 
-      $websXml = new SimpleXMLElement(file_get_contents(AppCore::getAppWebDir()
-              .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_FILE));
+      $cntFile = new Filesystem_File_Text(self::XML_WEBS_FILE, AppCore::getAppWebDir()
+      .VVE_DATA_DIR.DIRECTORY_SEPARATOR);
 
-      // načítání jednotlivých adres
       $infos = array();
-      foreach ($websXml->box as $box) {
-         if((string)$box['url'] == NULL OR (string)$box['url'] == '' OR !vve_url_exists((string)$box['url'])) continue;
-         $cnt = file_get_contents((string)$box['url']);
-         // načtení obsahu
-         try {
-            $webDataXml = new SimpleXMLElement($cnt);
-            $b = array('data' => $webDataXml, 'name' => (string)$box);
-            array_push($infos, $b);
-         } catch (Exception $exc) {
-            continue;
-         }
+      if($cntFile->exist()){
+         $websXml = new SimpleXMLElement($cntFile->getContent());
 
+         // načítání jednotlivých adre
+         foreach ($websXml->box as $box) {
+            if((string)$box['url'] == NULL OR (string)$box['url'] == '' OR !vve_url_exists((string)$box['url'])) continue;
+            $cnt = file_get_contents((string)$box['url']);
+            // načtení obsahu
+            try {
+               $webDataXml = new SimpleXMLElement($cnt);
+               $b = array('data' => $webDataXml, 'name' => (string)$box);
+               array_push($infos, $b);
+            } catch (Exception $exc) {
+               continue;
+            }
+
+         }
       }
       $this->view()->infos = $infos;
    }
 
    public function edititemsController() {
       $this->checkWritebleRights();
-      $websApisXml = new SimpleXMLElement(file_get_contents(AppCore::getAppWebDir()
-              .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_SETTINGS_FILE));
+      $fileApis = new Filesystem_File_Text(self::XML_WEBS_SETTINGS_FILE, AppCore::getAppWebDir()
+      .VVE_DATA_DIR.DIRECTORY_SEPARATOR);
 
-      // načítání jednotlivých adres
       $webs = array();
       $boxApis = array();
-      foreach ($websApisXml->web as $web) {
-         $boxApis[(string)$web] = (string)$web['boxname'];
+      if($fileApis->exist()){
+         $websApisXml = new SimpleXMLElement($fileApis->getContent());
 
+         // načítání jednotlivých adre
+         foreach ($websApisXml->web as $web) {
+            if(!vve_url_exists((string)$web['listurl']) AND !vve_url_exists((string)$web['actualurl'])) continue; // kontrola url
+            $boxApis[(string)$web] = (string)$web['boxname'];
 
-         $box = (string)$web['boxname'];
-         if(!isset ($webs[$box])) $webs[$box]
-                    = array('name' => (string)$web, 'options' => array(),
+            $box = (string)$web['boxname'];
+            if(!isset ($webs[$box])) $webs[$box]
+            = array('name' => (string)$web, 'options' => array(),
                        'actualurl' => (string)$web['actualurl']);
-         $cnt = file_get_contents((string)$web['listurl']);
-         // načtení seznamu
-         $webDataXml = new SimpleXMLElement($cnt);
-         // procházení seznamu článků
-         foreach ($webDataXml->article as $article) {
-            $date = new DateTime((string)$article['date']);
-            $time = vve_date("%Y - %B", $date);
-            if(!isset ($webs[$box]['options'][$time])) {
-               $webs[$box]['options'][$time] = array();
+            $cnt = file_get_contents((string)$web['listurl']);
+            // načtení seznamu
+            $webDataXml = new SimpleXMLElement($cnt);
+            // procházení seznamu článků
+            foreach ($webDataXml->article as $article) {
+               $date = new DateTime((string)$article['date']);
+               $time = vve_date("%Y - %B", $date);
+               if(!isset ($webs[$box]['options'][$time])) {
+                  $webs[$box]['options'][$time] = array();
+               }
+               $webs[$box]['options'][$time][(string)$article->name.' - '.vve_date("%x",$date)] = (string)$article->url;
             }
-            $webs[$box]['options'][$time][(string)$article->name.' - '.vve_date("%x",$date)] = (string)$article->url;
          }
       }
       $this->view()->websApis = $webs;
 
       // načítání uložených boxů
-      $websXml = new SimpleXMLElement(file_get_contents(AppCore::getAppWebDir()
-              .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_FILE));
+      $websSavedFile = new Filesystem_File_Text(self::XML_WEBS_FILE, AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR);
       $currentBoxes = array();
-      foreach ($websXml->box as $box) {
-         array_push($currentBoxes, $box);
-//         $currentBoxes[(string) $box] = $box;
+
+      if($websSavedFile->exist()){
+         $websXml = new SimpleXMLElement($websSavedFile->getContent());
+         foreach ($websXml->box as $box) {
+            array_push($currentBoxes, $box);
+         }
       }
       $this->view()->curBoxes = $currentBoxes;
 
@@ -102,7 +112,7 @@ class KzMainPage_Controller extends Controller {
 
       if($form->isValid()) {
          $xml = new XMLWriter();
-//         $xml->openURI('php://output');
+         //         $xml->openURI('php://output');
          $xml->openMemory();
          // hlavička
          $xml->startDocument('1.0', 'UTF-8');
@@ -116,9 +126,6 @@ class KzMainPage_Controller extends Controller {
          $boxes = $form->api->getValues();
          $types = $form->sel->getValues();
          $urls = $form->sel_article->getValues();
-
-         
-
          foreach ($boxes as $key => $box) {
             $xml->startElement('box'); // SOF article
             if($types[$key] == 'selected'){
@@ -132,10 +139,8 @@ class KzMainPage_Controller extends Controller {
          }
          $xml->endElement(); // eof article
          $xml->endDocument(); //EOF document
-//var_dump($xml->outputMemory());flush();exit;
-//         var_dump($xml->outputMemory());flush();exit();
          file_put_contents(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                 .self::XML_WEBS_FILE, $xml->outputMemory());
+         .self::XML_WEBS_FILE, $xml->outputMemory());
 
          $this->infoMsg()->addMessage($this->_('Rozložení boxů bylo uloženo'));
          $this->link()->route()->reload();
@@ -147,16 +152,14 @@ class KzMainPage_Controller extends Controller {
    public function loadArticlesController() {
       $this->checkWritebleRights();
       $websApisXml = new SimpleXMLElement(file_get_contents(AppCore::getAppWebDir()
-              .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_SETTINGS_FILE));
+      .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_SETTINGS_FILE));
 
-      // načítání jednotlivých adres
+      // načítání jednotlivých adre
       $articles = array();
       foreach ($websApisXml->web as $web) {
          if((string)$web['boxname'] != $this->getRequestParam('type')) continue;
-
          // načtení seznamu
          $webDataXml = new SimpleXMLElement(file_get_contents((string)$web['listurl']));
-         var_dump($webDataXml);
          // procházení seznamu článků
          foreach ($webDataXml->article as $article) {
             $date = new DateTime((string)$article['date']);
