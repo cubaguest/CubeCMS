@@ -80,28 +80,28 @@ class ActionsList_View extends View {
    }
 
    public function currentActXmlView() {
+      $xml = new XMLWriter();
+      $xml->openURI('php://output');
+      // hlavička
+      $xml->startDocument('1.0', 'UTF-8');
+      $xml->setIndent(4);
+
+      // rss hlavička
+      $xml->startElement('article'); // SOF article
+      $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
+      $xml->writeAttribute('xml:lang', Locale::getLang());
+      // informace o webu
+      $xml->startElement('web');
+      $xml->writeAttribute('link', Url_Link::getMainWebDir());
+      $xml->writeRaw(VVE_WEB_NAME);
+      $xml->endElement();
+      // kategorie
+      $xml->startElement('category'); // sof article
+      $xml->writeAttribute('link', $this->link()->clear());
+      $xml->writeRaw($this->category()->getName());
+      $xml->endElement();
+
       if($this->action != null) {
-         $xml = new XMLWriter();
-         $xml->openURI('php://output');
-         // hlavička
-         $xml->startDocument('1.0', 'UTF-8');
-         $xml->setIndent(4);
-
-         // rss hlavička
-         $xml->startElement('article'); // SOF article
-         $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
-         $xml->writeAttribute('xml:lang', Locale::getLang());
-         // informace o webu
-         $xml->startElement('web');
-         $xml->writeAttribute('link', Url_Link::getMainWebDir());
-         $xml->writeRaw(VVE_WEB_NAME);
-         $xml->endElement();
-         // kategorie
-         $xml->startElement('category'); // sof article
-         $xml->writeAttribute('link', $this->link()->clear());
-         $xml->writeRaw($this->category()->getName());
-         $xml->endElement();
-
          // informace o článku/akci
          $xml->writeElement('name', $this->action->{Actions_Model_Detail::COLUMN_NAME});
          $xml->writeElement('url', $this->link()->category($this->action->curlkey)->route('detail',
@@ -115,22 +115,22 @@ class ActionsList_View extends View {
             $xml->writeElement('preprice', $this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
          }
          if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-            if($this->action->{Model_Category::COLUMN_DATADIR} != null){
+            if($this->action->{Model_Category::COLUMN_DATADIR} != null) {
                $dataDir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
-               .$this->action->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR;
+                       .$this->action->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR;
             } else {
                $dataDir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
-               .$this->action->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR;
+                       .$this->action->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR;
             }
 
             $xml->writeElement('image', $dataDir.$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()]
                     .URL_SEPARATOR.$this->action->{Actions_Model_Detail::COLUMN_IMAGE});
          }
-         $xml->endElement(); // eof article
-         $xml->endDocument(); //EOF document
-
-         $xml->flush();
       }
+      $xml->endElement(); // eof article
+      $xml->endDocument(); //EOF document
+
+      $xml->flush();
    }
 }
 

@@ -1,5 +1,6 @@
 <?php
 class ActionsList_Controller extends Controller {
+   const PARAM_CATEGORY_IDS = 'catsid';
    /**
     * Kontroler pro zobrazení novinek
     */
@@ -44,7 +45,8 @@ class ActionsList_Controller extends Controller {
             break;
       }
       $acM = new Actions_Model_List();
-      $actions = $acM->getActionsByCatIds($currentDateO, $dateNext,$this->category()->getModule()->getParam('catsid', array(0)),
+      $actions = $acM->getActionsByCatIds($currentDateO, $dateNext,
+              $this->category()->getModule()->getParam(self::PARAM_CATEGORY_IDS, array(0)),
               !$this->getRights()->isWritable());
 
       $this->view()->actions = $actions;
@@ -108,7 +110,7 @@ class ActionsList_Controller extends Controller {
       $this->checkReadableRights();
       $this->view()->type = $this->getRequest('type', 'rss');
 
-      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
+      $ids = explode(',', $this->category()->getModule()->getParam(self::PARAM_CATEGORY_IDS, '0'));
 
       $acM = new Actions_Model_List();
       $actions = $acM->getActionsByAddedByCatIds($ids, VVE_FEED_NUM);
@@ -119,7 +121,7 @@ class ActionsList_Controller extends Controller {
       $this->checkWritebleRights();
       $catM = new Model_Category();
 
-      $ids =  $this->category()->getParam('catsid', null);
+      $ids =  $this->category()->getParam(self::PARAM_CATEGORY_IDS, null);
       $catsArr = array();
       foreach ($ids as $idc) {
          $cat = $catM->getCategoryById($idc);
@@ -132,7 +134,7 @@ class ActionsList_Controller extends Controller {
 
    public function featuredListController() {
       $model = new Actions_Model_List();
-      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
+      $ids = explode(',', $this->category()->getModule()->getParam(self::PARAM_CATEGORY_IDS, '0'));
       $toDate = new DateTime();
       $toDate->modify("+6 month");
       $this->view()->actions = $model->getActionsByCatIds(new DateTime(), $toDate, $ids);
@@ -141,17 +143,15 @@ class ActionsList_Controller extends Controller {
 
    public function currentActController() {
       $model = new Actions_Model_List();
-      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
+      $ids = $this->category()->getModule()->getParam(self::PARAM_CATEGORY_IDS, array(0));
       $toTime = new DateTime();
       $toTime->modify('+1 month');
       $actions = $model->getActionsByCatIds(new DateTime(), $toTime, $ids);
-
       $this->view()->action = $actions->fetch();
-//      if($this->view()->action === false) return false;
    }
 
    public static function settingsController(&$settings,Form &$form) {
-      Actions_Controller::settingsController($settings, $form);
+      Actions_Controller::settingsController(&$settings, &$form);
       $catM = new Model_Category();
       $modules = array('actions', 'actionswgal');
       $results = array();
@@ -166,9 +166,9 @@ class ActionsList_Controller extends Controller {
       $elemSelectedCategories->setOptions($results);
       $elemSelectedCategories->setMultiple();
       $form->addElement($elemSelectedCategories,'basic');
-
-      if(isset($settings['catsid'])) {
-         $form->catsid->setValues($settings['catsid']);
+      
+      if(isset($settings[self::PARAM_CATEGORY_IDS])) {
+         $form->catsid->setValues($settings[self::PARAM_CATEGORY_IDS]);
       }
 
       // odebrání elementů týkajících se obrázků
@@ -176,7 +176,7 @@ class ActionsList_Controller extends Controller {
       $form->removeElement('img_height');
 
       if($form->isValid()) {
-         $settings['catsid'] = $form->catsid->getValues();
+         $settings[self::PARAM_CATEGORY_IDS] = $form->catsid->getValues();
       }
    }
 }
