@@ -494,7 +494,7 @@ class Actions_Controller extends Controller {
          if($form->type->getValues() != self::DEFAULT_TIMEWINDOW_TYPE){
             $settings['type'] = $form->type->getValues();
          } else {
-            unset ($settings['type']);
+            $settings['type'] = self::DEFAULT_TIMEWINDOW_TYPE;
          }
       }
    }
