@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Počítač: localhost
--- Vygenerováno: Neděle 28. března 2010, 12:52
+-- Vygenerováno: Neděle 28. března 2010, 12:51
 -- Verze MySQL: 5.1.37
 -- Verze PHP: 5.2.10-2ubuntu6.4
 
@@ -25,6 +25,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Struktura tabulky `vypecky_categories`
 --
 
+DROP TABLE IF EXISTS `vypecky_categories`;
 CREATE TABLE IF NOT EXISTS `vypecky_categories` (
   `id_category` smallint(3) NOT NULL AUTO_INCREMENT,
   `module` varchar(20) DEFAULT NULL,
@@ -92,6 +93,7 @@ INSERT INTO `vypecky_categories` (`id_category`, `module`, `data_dir`, `urlkey_c
 -- Struktura tabulky `vypecky_config`
 --
 
+DROP TABLE IF EXISTS `vypecky_config`;
 CREATE TABLE IF NOT EXISTS `vypecky_config` (
   `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(50) NOT NULL,
@@ -171,6 +173,7 @@ INSERT INTO `vypecky_config` (`id_config`, `key`, `label`, `value`, `values`, `p
 -- Struktura tabulky `vypecky_groups`
 --
 
+DROP TABLE IF EXISTS `vypecky_groups`;
 CREATE TABLE IF NOT EXISTS `vypecky_groups` (
   `id_group` smallint(3) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID skupiny',
   `name` varchar(15) DEFAULT NULL COMMENT 'Nazev skupiny',
@@ -198,6 +201,7 @@ INSERT INTO `vypecky_groups` (`id_group`, `name`, `label`, `used`, `default_righ
 -- Struktura tabulky `vypecky_modules_instaled`
 --
 
+DROP TABLE IF EXISTS `vypecky_modules_instaled`;
 CREATE TABLE IF NOT EXISTS `vypecky_modules_instaled` (
   `id_module` smallint(6) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) CHARACTER SET utf8 NOT NULL,
@@ -216,6 +220,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_modules_instaled` (
 -- Struktura tabulky `vypecky_panels`
 --
 
+DROP TABLE IF EXISTS `vypecky_panels`;
 CREATE TABLE IF NOT EXISTS `vypecky_panels` (
   `id_panel` smallint(3) NOT NULL AUTO_INCREMENT,
   `id_cat` smallint(5) NOT NULL DEFAULT '0' COMMENT 'id kategorie panelu',
@@ -246,6 +251,7 @@ INSERT INTO `vypecky_panels` (`id_panel`, `id_cat`, `id_show_cat`, `position`, `
 -- Struktura tabulky `vypecky_rights`
 --
 
+DROP TABLE IF EXISTS `vypecky_rights`;
 CREATE TABLE IF NOT EXISTS `vypecky_rights` (
   `id_right` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_category` smallint(6) NOT NULL,
@@ -319,6 +325,7 @@ INSERT INTO `vypecky_rights` (`id_right`, `id_category`, `id_group`, `right`) VA
 -- Struktura tabulky `vypecky_shares`
 --
 
+DROP TABLE IF EXISTS `vypecky_shares`;
 CREATE TABLE IF NOT EXISTS `vypecky_shares` (
   `id_share` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `link` varchar(300) NOT NULL,
@@ -349,6 +356,7 @@ INSERT INTO `vypecky_shares` (`id_share`, `link`, `icon`, `name`) VALUES
 -- Struktura tabulky `vypecky_texts`
 --
 
+DROP TABLE IF EXISTS `vypecky_texts`;
 CREATE TABLE IF NOT EXISTS `vypecky_texts` (
   `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
   `id_item` smallint(5) unsigned NOT NULL,
@@ -387,6 +395,7 @@ CREATE TABLE IF NOT EXISTS `vypecky_texts` (
 -- Struktura tabulky `vypecky_users`
 --
 
+DROP TABLE IF EXISTS `vypecky_users`;
 CREATE TABLE IF NOT EXISTS `vypecky_users` (
   `id_user` smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID uzivatele',
   `username` varchar(20) NOT NULL COMMENT 'Uzivatelske jmeno',
