@@ -141,12 +141,11 @@ class Actions_Model_List extends Model_PDO {
               ." = cat.".Model_Category::COLUMN_CAT_ID
               ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." IN (".$this->generateSQLIN($idCats)."))"
               . $whereP // public
-              ." AND ( (ISNULL(".Actions_Model_Detail::COLUMN_TIME.") AND ".Actions_Model_Detail::COLUMN_DATE_START." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
-              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND ".Actions_Model_Detail::COLUMN_TIME." >= CURTIME())"
+              ." AND ( (ISNULL(`".Actions_Model_Detail::COLUMN_TIME."`) AND ".Actions_Model_Detail::COLUMN_DATE_START." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
+              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND `".Actions_Model_Detail::COLUMN_TIME."` >= CURTIME())"
               ." OR (".Actions_Model_Detail::COLUMN_DATE_START." > :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
               ." OR (".Actions_Model_Detail::COLUMN_DATE_STOP." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_STOP." <= :dateStop) )"
-              ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC, ".Actions_Model_Detail::COLUMN_TIME." ASC");
-
+              ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC, `".Actions_Model_Detail::COLUMN_TIME."` ASC");
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindValue(':dateStart', $fromTime->format('Y-m-d'), PDO::PARAM_STR);
       $dbst->bindValue(':dateStop', $toTime->format('Y-m-d'), PDO::PARAM_STR);
