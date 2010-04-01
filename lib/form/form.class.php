@@ -51,17 +51,6 @@ class Form implements ArrayAccess {
    private $isValid = null;
 
    /**
-    * Metoda obsahuje pořet elementů, které byly validovány (interní využití pro cache)
-    * @var int
-    */
-   private $validatedElements = null;
-   /**
-    * Type metody kterou bude formmulář odeslán
-    * @var string
-    */
-   private $sendMethod = 'post';
-
-   /**
     * Objekt odkazu na akci pro formulář
     * @var Url_Link
     */
@@ -121,7 +110,9 @@ class Form implements ArrayAccess {
          }
          // pokud patří do skupiny
          else {
-            if(empty ($grp['elements'])){continue;};
+            if(empty ($grp['elements'])) {
+               continue;
+            };
             $formContent .= $d->render();
             $d = clone $decorator;
             $groupCnt = null;
@@ -283,18 +274,17 @@ class Form implements ArrayAccess {
          }
          if($this->isSend != true) {
             foreach ($this->elements as $element) {
-               if($element instanceof Form_Element_Submit OR 
-                  $element instanceof Form_Element_SubmitImage) {
-                  if($element->isSend()) {
-                     $element->populate();
-                     $this->isSend = true;
-                     break;
-                  }
+               if(($element instanceof Form_Element_Submit
+                 OR $element instanceof Form_Element_SubmitImage)
+                 AND $element->isSend()) {
+                  $element->populate();
+                  $this->isSend = true;
+                  break;
                }
             }
          }
-         if($this->isSend == true) $this->populate();
       }
+      if($this->isSend == true) $this->populate();
       return $this->isSend;
    }
 
@@ -303,9 +293,7 @@ class Form implements ArrayAccess {
     * @return booleant -- true pokud je formulář v pořádku
     */
    public function isValid() {
-      if($this->isSend != true) {
-         $this->isSend();
-      }
+      $this->isSend();
       return $this->isValid;
    }
 
@@ -315,13 +303,15 @@ class Form implements ArrayAccess {
    public function populate() {
       $this->isValid = true;
       foreach ($this->elements as $name => $element) {
-         $element->populate();
-         $element->validate();
-         if(!$element->isValid()) {
-            $this->isValid = false;
-            continue;
+         if(!$element->isPopulated()){
+            $element->populate();
+            $element->validate();
+            if(!$element->isValid()) {
+               $this->isValid = false;
+               continue;
+            }
+            $element->filter();
          }
-         $element->filter();
       }
       $this->isPopulated = true;
    }

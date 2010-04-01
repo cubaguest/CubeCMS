@@ -170,6 +170,7 @@ class Form_Element implements Form_Element_Interface {
       $this->validators[get_class($validator)] = $validator;
       // doplnění popisků k validaci
       $validator->addHtmlElementParams($this);
+      $this->isPopulated = false;
    }
 
    /**
@@ -180,6 +181,7 @@ class Form_Element implements Form_Element_Interface {
       $this->filters[get_class($filter)] = $filter;
       // doplnění popisků k validaci
       $filter->addHtmlElementParams($this);
+      $this->isPopulated = false;
    }
 
    /**
@@ -381,6 +383,7 @@ class Form_Element implements Form_Element_Interface {
     * metoda zkorntroluje jestli je prvek prázdný
     * @param array/string $array -- pole nebo řetězec
     * @return boolean -- true pro prázdný prvek
+    * @todo Je to k něčemu???
     */
    private function checkEmpty($array) {
       if(is_array($array)) {
@@ -423,6 +426,7 @@ class Form_Element implements Form_Element_Interface {
 
    /**
     * Metodda provede přefiltrování obsahu elementu
+    * @param boolean $newFilter -- (option true) jestli se má znovu přefiltrovat
     */
    public function filter($newFilter = false) {
       if($this->isFiltered == false OR $newFilter == true) {
