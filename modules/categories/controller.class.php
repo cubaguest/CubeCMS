@@ -615,7 +615,6 @@ class Categories_Controller extends Controller {
             }
          }
          $categoryM->saveCatParams($this->getRequest('categoryid'), serialize($settings));
-
          $this->infoMsg()->addMessage($this->_('Uloženo'));
          $this->link()->route()->reload();
       }
