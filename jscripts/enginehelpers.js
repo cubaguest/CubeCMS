@@ -1,4 +1,24 @@
+function vveShowMessages(dataObj){
+   clearInfoMsg();
+   if(typeof(dataObj.infomsg) == 'object'){
+      for(var i=0; i < dataObj.infomsg.length; i++){
+         infoMsg(dataObj.infomsg[i], false);
+      }
+   } else if(typeof(dataObj.infomsg) == 'string'){
+      infoMsg(dataObj.infomsg);
+   }
+   clearErrMsg();
+   if(typeof(dataObj.errmsg) == 'object'){
+      for(var y=0; y < dataObj.errmsg.length; y++){
+         errMsg(dataObj.errmsg[y], false);
+      }
+   } else if(typeof(dataObj.infomsg) == 'string'){
+      errMsg(dataObj.errmsg);
+   }
+}
+
 function infoMsg(msg, clear){
+   if(msg == null) return;
    if(typeof (clear) == 'undefined') clear = true;
    if(clear == true){
       clearInfoMsg();
@@ -10,7 +30,12 @@ function clearInfoMsg(){
    $('#infoMessages').html(null).hide();
 }
 
+function clearErrMsg(){
+   $('#errMessages').html(null).hide();
+}
+
 function errMsg(msg, clear){
+   if(msg == null) return;
    if(typeof (clear) == 'undefined') clear = true;
    if(clear == true){
       $('#errMessages').html(null);
