@@ -57,7 +57,6 @@ class Template_Output {
       } else {
          self::$outputType = $outputType;
       }
-      self::prepareHeaders();
       if(in_array($outputType, self::$txtOutputTypes)){
          self::$isBinaryOutput = false;
       }
@@ -69,6 +68,7 @@ class Template_Output {
    private static function prepareHeaders() {
       switch (self::$outputType) {
          case "json":
+            self::addHeader('Content-type: application/json; charset=utf-8');
             break;
          case "xml":
             self::addHeader('Content-type: text/xml; charset=utf-8');
@@ -132,6 +132,7 @@ class Template_Output {
     * Metoda odešle hlavičky
     */
    public static function sendHeaders() {
+      self::prepareHeaders();
       foreach (self::$headers as $header) {
          header($header);
       }
@@ -154,6 +155,14 @@ class Template_Output {
     */
    public static function isBinaryOutput(){
       return self::$isBinaryOutput;
+   }
+
+   /**
+    * Metoda nastavní typ výstupu
+    * @param string $type -- typ výstupu (xhtml, json, txt, atd.)
+    */
+   public static function setOutputType($type) {
+      self::$outputType = $type;
    }
 }
 ?>
