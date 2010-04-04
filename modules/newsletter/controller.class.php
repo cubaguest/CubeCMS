@@ -143,24 +143,6 @@ class NewsLetter_Controller extends Controller {
 
       $model = new NewsLetter_Model_Mails();
 
-      $formRem = new Form('removeMails_');
-
-      $elemCheckbox = new Form_Element_Checkbox('id');
-      $elemCheckbox->setDimensional();
-      $formRem->addElement($elemCheckbox);
-
-      $elemRemove = new Form_Element_Submit('remove',$this->_('odstranit označené'));
-      $formRem->addElement($elemRemove);
-
-      if($formRem->isValid()) {
-         if($formRem->id->getValues() != false) {
-            $model->deleteMails(array_keys($formRem->id->getValues()));
-         }
-         $this->infoMsg()->addMessage($this->_('Označené adresy byly smazány'));
-         $this->link()->reload();
-      }
-
-      $this->view()->formRemove = $formRem;
       $this->view()->mails = $model->getMails($this->category()->getId());
    }
 
@@ -346,6 +328,71 @@ class NewsLetter_Controller extends Controller {
          $settings[self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN] = $form->newm_reg_subject_admin->getValues();
          $settings[self::PARAM_NEW_MAIL_REG_TEXT_ADMIN] = $form->newm_reg_text_admin->getValues();
       }
+   }
+
+   public function deleteMailsController() {
+      $this->checkWritebleRights();
+      if(isset($_REQUEST['select_item'])){
+         $model = new NewsLetter_Model_Mails();
+         $model->deleteMails(array_keys($_REQUEST['select_item']));
+         $this->infoMsg()->addMessage($this->_('Označené adresy byly smazány'));
+         $this->respond()->setStatus(true);
+      } else {
+         $this->errMsg()->addMessage($this->_('Nebyla vabrána žádná položka'));
+         $this->respond()->setStatus(false);
+      }
+   }
+
+   public function sendMailController() {
+      $this->checkWritebleRights();
+
+      $model = new NewsLetter_Model_Mails();
+
+      $formSendMail = new Form('sendmail_');
+
+      $elemRecipients = new Form_Element_TextArea('recipients', $this->_('Příjemci'));
+      if(isset($_REQUEST['select_item'])){
+         $rec = null;
+         $mails = $model->getMailsByIds(array_keys($_REQUEST['select_item']));
+         foreach ($mails as $value) {
+            $rec .= $value->{NewsLetter_Model_Mails::COLUMN_MAIL}.';';
+         }
+         $elemRecipients->setValues(substr($rec, 0, strlen($rec)-1));
+      }
+
+      $elemRecipients->addValidation(new Form_Validator_NotEmpty());
+      $elemRecipients->addFilter(new Form_Filter_RemoveWhiteChars());
+      $elemRecipients->setSubLabel($this->_('E-mailové adresy oddělené středníkem'));
+      $formSendMail->addElement($elemRecipients);
+
+      $elemSubject = new Form_Element_Text('subject', $this->_('Předmět'));
+      $elemSubject->addValidation(new Form_Validator_NotEmpty());
+      $formSendMail->addElement($elemSubject);
+
+      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText->addValidation(new Form_Validator_NotEmpty());
+      $formSendMail->addElement($elemText);
+
+      $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
+      $formSendMail->addElement($elemSubmit);
+
+      if($formSendMail->isValid()){
+         $mails = explode(';', $formSendMail->recipients->getValues());
+
+         $mailObj = new Email(true);
+
+         $mailObj->setSubject($formSendMail->subject->getValues());
+         $mailObj->setContent($formSendMail->text->getValues());
+         $mailObj->addAddress($mails);
+
+         $mailObj->sendMail();
+
+         $this->infoMsg()->addMessage($this->_('E-mail byl odeslán'));
+         $this->link()->route('list')->reload();
+      }
+
+      $this->view()->form = $formSendMail;
+
    }
 }
 

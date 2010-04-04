@@ -126,63 +126,13 @@ class NewsLetter_Model_Mails extends Model_PDO {
       return $dbst->execute(array(':idcat' => $idc, ':mail' => $email));
    }
 
-   /**
-    * Metoda vymaže články podle zadaného id kategorie
-    * @param int $id -- id kategorie
-    */
-   public function deleteArticleByCat($id) {
+   public function getMailsByIds($ids) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
-          ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
-      $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+         ." WHERE (".self::COLUMN_ID." IN (".$this->generateSQLIN($ids)."))");
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
       $dbst->execute();
-      return $dbst;
-   }
-
-   /**
-    * Metoda nastaví změnu článku
-    * @param int $id -- id článku
-    */
-   public function setLastChange($idArt) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-          ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
-          ." WHERE (".self::COLUMN_ID." = :idart)");
-      $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
-      return $dbst->execute();
-   }
-
-   /**
-    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
-    * @param integer $idCat
-    * @param string $string
-    * @param bool $publicOnly
-    * @return PDOStatement
-    */
-   public function search($idCat, $string, $publicOnly = true){
-      $dbc = new Db_PDO();
-      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locale::getLang();
-      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
-
-      $wherePub = null;
-      if($publicOnly){
-         $wherePub = ' AND '.Articles_Model_Detail::COLUMN_PUBLIC.' = 1';
-      }
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
-              .' + MATCH('.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(Articles_Model_Detail::DB_TABLE)
-              .' WHERE MATCH('.$clabel.', '.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.Articles_Model_Detail::COLUMN_ID_CATEGORY.'` = :idCat'
-              .$wherePub // Public articles
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
+      return $dbst->fetchAll();
    }
 }
 

@@ -6,16 +6,12 @@ $this->addJsPlugin(new JsPlugin_DataTables());
 ?>
 <div>
    <h2><?=$this->_('Seznam registrovaných e-mailů')?></h2>
-   <?
-   $this->formRemove->html()->setAttrib('onsubmit', 'return confirm(\''.$this->_('Odstranit označené').'?\');');
-   echo($this->formRemove->renderStart());
-   ?>
    <table id="tableMails" style="width: 100%;">
       <thead>
 		<tr>
          <th>E-mail</th>
 			<th style="width: 140px"><?=$this->_('Přidáno')?></th>
-         <th style="width: 140px"><?=$this->_('odstranit')?></th>
+         <th style="width: 140px"><?=$this->_('Označit')?></th>
 		</tr>
 	</thead>
    <tbody>
@@ -26,22 +22,26 @@ $this->addJsPlugin(new JsPlugin_DataTables());
                 ><?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL}?></a></td>
          <td><?=vve_date("%x", new DateTime($mail->{NewsLetter_Model_Mails::COLUMN_DATE_ADD}))?></td>
          <td align="center">
-         <?
-         $this->formRemove->id->setValues(false);
-         $this->formRemove->id->setDimensional($mail->{NewsLetter_Model_Mails::COLUMN_ID});
-         echo $this->formRemove->id->controll();
-                 ?>
+            <input type="checkbox" name="select_item[<?=$mail->{NewsLetter_Model_Mails::COLUMN_ID}?>]" />
          </td>
       </tr>
       <?}?>
    </tbody>
    </table>
    <hr class="reseter" />
-   <p><?echo($this->formRemove->remove->controll());?></p>
-   <?echo($this->formRemove->renderEnd());?>
+   <div>
+      <strong><?=$this->_('Označené')?>:</strong>&nbsp;
+      <button type="submit" name="delete_items" title="<?=$this->_('Smazat označené')?>"
+              value="<?=$this->_('Smazat')?>"><?=$this->_('Smazat')?></button>&nbsp;
+      <form id="sendmail_form" action="<?=$this->link()->route('sendMail')?>" method="post" style="display: inline">
+      <input type="hidden" name="sendmail_items" value="" />
+      <input type="submit" name="sendmail_getform" title="<?=$this->_('Poslat e-mail označeným')?>"
+              value="<?=$this->_('Poslat e-mail')?>" />&nbsp;
+   </form>
+   </div>
       <script type="text/javascript" charset="utf-8">
 			$(document).ready(function() {
-				$('#tableMails').dataTable( {
+				var $table = $('#tableMails').dataTable( {
 					"oLanguage": {
 						"sLengthMenu": "<?=$this->_('Zobrazit _MENU_ záznamů na stránku')?>",
 						"sZeroRecords": "<?=$this->_('Nic nenalezeno')?>",
@@ -49,8 +49,56 @@ $this->addJsPlugin(new JsPlugin_DataTables());
 						"sInfoEmtpy": "<?=$this->_('Zobrazeno 0 z 0 záznamů')?>",
 						"sInfoFiltered": "(<?=$this->_('filtrováno z _MAX_ celkových záznamů')?>)"
 					}
-				} );
-			} );
+				});
+
+            $('button[name=delete_items]').click(function(){
+               var $items = getItems();
+               if($items.length == 0){
+                  errMsg('<?=$this->_('Nebyla vybrána žádná položka')?>');
+                  return false;
+               }
+               if(!confirm('<?=$this->_('Smazat označené?')?>')){return false;}
+
+               $.ajax({url: '<?=$this->link()->route('deleteMails')?>',
+                  data : $items.serialize(),
+                  success: function(data) {
+                     if(data.status == true){//delete items
+                        var $items = getSelectedItems();
+                        $items.each(function(index){
+                           if($(this).is(':checked')){
+                              $table.fnDeleteRow(index);
+                           }
+                        });
+                     }
+                     vveShowMessages(data);
+                  }
+               });
+
+            });
+            // serializace označených emailů
+            $('form#sendmail_form').submit(function(){
+               var $items = getTableItems();
+               if($items.length == 0){
+                  errMsg('<?=$this->_('Nebyla vybrána žádná položka')?>');
+                  return false;
+               }
+
+               $items.each(function(){
+                  if($(this).is(':checked')){
+                     var item = $(this).clone().hide();
+                     $('form#sendmail_form').append(item);
+                  }
+               });
+               
+               
+            });
+
+         function getTableItems(){
+//            return $('#tableMails input[type=checkbox]:checked');
+            return $('input[type=checkbox]', $table.fnGetNodes());
+//            return $('input[type=checkbox]', $table.fnGetNodes());
+         }
+			});
 		</script>
    <br />
    <h2><?=$this->_('Export adres')?></h2>

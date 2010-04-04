@@ -39,6 +39,9 @@ class NewsLetter_View extends View {
             }
             $csv->flush();
             break;
+         case 'json':
+            $result = json_encode($this->mails);
+            break;
          case 'txt':
          default:
             foreach ($this->mails as $mail) {
@@ -46,7 +49,7 @@ class NewsLetter_View extends View {
             }
             break;
       }
-      print($result);
+      echo($result);
    }
 
    public function unregistrationMailView() {
@@ -55,6 +58,12 @@ class NewsLetter_View extends View {
 
    public function registerView(){
       print (json_encode($this->data));
+   }
+
+   public function deleteMailsView() {}
+
+   public function sendMailView() {
+      $this->template()->addTplFile('sendmail.phtml');
    }
 }
 ?>
