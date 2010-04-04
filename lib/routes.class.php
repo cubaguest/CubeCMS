@@ -12,6 +12,9 @@
  */
 
 class Routes {
+   const RESPOND_NORMAL = 'normal';
+   const RESPOND_AJAX = 'ajax';
+
 /**
  * Pole s cestami
  * @var array
@@ -71,7 +74,7 @@ class Routes {
     * Metoda přidává cestu do seznamu cest
     * @param string -- název cesty
     */
-   final public function addRoute($name, $regexp, $action, $replacement) {
+   final public function addRoute($name, $regexp, $action, $replacement, $respondType = self::RESPOND_NORMAL) {
       $rege = addcslashes($regexp, '/');
 
       // přidání povinného parametru
@@ -88,7 +91,17 @@ class Routes {
           'route' => $regexp,
           'actionCtrl' => $act['method'],
           'actionClass' => $act['class'],
-          'replacement' => $replacement);
+          'replacement' => $replacement,
+          'respondType' =>  $respondType
+         );
+   }
+
+   /**
+    * Metoda vrací typ odpovědi nastavené pro danou cestu (konstanty RESPOND_)
+    * @return const RESPOND_
+    */
+   final public function getRespondType(){
+      return $this->routes[$this->selectedRoute]['respondType'];
    }
 
    /**

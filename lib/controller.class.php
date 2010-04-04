@@ -68,6 +68,12 @@ abstract class Controller {
    protected $moduleName = null;
 
    /**
+    * Objekt odpovědi na ajax požadavek
+    * @var Ajax_Data_Respond
+    */
+   private $moduleRespond = null;
+
+   /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
     * @param Category $category -- obejkt kategorie
@@ -390,6 +396,10 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @param string $outputType -- typ výstupu
     */
    final public function runCtrlAction($actionName, $outputType) {
+      if($this->routes()->getRespondType() == Routes::RESPOND_AJAX){
+         $this->moduleRespond = new Ajax_Data_Respond(); // objekt odpovědi na požadavek
+      }
+
       if(!method_exists($this, $actionName.'Controller')) {
          trigger_error(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
                  $actionName, $this->module()->getName()));
@@ -412,7 +422,21 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
          $this->view()->{$viewName}();
       } else {
          AppCore::setErrorPage(true);
+         return false;
       }
+
+      if($this->routes()->getRespondType() == Routes::RESPOND_AJAX){
+         // výpis respond
+         echo $this->moduleRespond;
+      }
+   }
+
+   /**
+    * Metoda vrací objekt požadavku (pouze pro ajax požadavky a požadavky na moduly)
+    * @return Ajax_Data_Respond
+    */
+   final public function respond(){
+      return $this->moduleRespond;
    }
 
    /**
