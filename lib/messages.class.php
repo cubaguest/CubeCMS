@@ -172,10 +172,17 @@ class Messages {
       return $string;
    }
 
+   /**
+    * Metoda vymaže uložené zprávy
+    */
    public function eraseSavedMessages() {
       if($this->saveTarget == "session"){
          unset($_SESSION[$this->saveTargetName]);
       }
+   }
+
+   public function setSaveStatus($save = true){
+      $this->defaultSaveMessages = $save;
    }
 }
 ?>
