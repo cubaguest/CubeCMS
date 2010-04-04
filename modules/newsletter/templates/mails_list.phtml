@@ -11,7 +11,11 @@ $this->addJsPlugin(new JsPlugin_DataTables());
 		<tr>
          <th>E-mail</th>
 			<th style="width: 140px"><?=$this->_('Přidáno')?></th>
-         <th style="width: 140px"><?=$this->_('Označit')?></th>
+         <th style="width: 140px">
+            <?=$this->_('Označit')?>&nbsp;
+            (<a href="#" id="selectAll" title="<?=$this->_('vše')?>" ><?=$this->_('vše')?></a>,&nbsp;
+            <a href="#" id="selectNon" title="<?=$this->_('nic')?>" ><?=$this->_('nic')?></a>)
+         </th>
 		</tr>
 	</thead>
    <tbody>
@@ -89,8 +93,15 @@ $this->addJsPlugin(new JsPlugin_DataTables());
                      $('form#sendmail_form').append(item);
                   }
                });
-               
-               
+            });
+
+            $('a#selectAll').click(function(){
+               getTableItems().attr('checked', true);
+               return false;
+            });
+            $('a#selectNon').click(function(){
+               getTableItems().attr('checked', false);
+               return false;
             });
 
          function getTableItems(){
