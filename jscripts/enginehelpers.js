@@ -43,7 +43,8 @@ function errMsg(msg, clear){
    $('#errMessages').prepend("<p>"+msg+"</p>").show();
 }
 
-function showLoadBox(box){
+function showLoadBox(box, timeout){
+   if(typeof(timeout) == "undefined"){timeout = 5000;}
    var jbox = $(box);
    var overBox = $('<div id="loadingBox" style="background-color: white; \n\
 text-align:center;">\n\
@@ -58,6 +59,7 @@ text-align:center;">\n\
    var parentBox = $(box).parent('div,p');
    parentBox.css('position', 'relative').prepend(overBox.hide());
    parentBox.children('#loadingBox').fadeTo(500, 0.5);
+   setTimeout("hideLoadBox()", timeout); // zrušení
 }
 
 function hideLoadBox(){
