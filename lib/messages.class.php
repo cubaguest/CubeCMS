@@ -93,7 +93,7 @@ class Messages {
     * @param boolean -- jesli se má zpráva uložit
     */
    function addMessage($messageText, $save = null){
-      if($save === true OR $this->defaultSaveMessages === true){
+      if($save === true OR ($save !== false AND $this->defaultSaveMessages === true)){
          if(!in_array($messageText, $this->messagesForSave)){
             array_push($this->messagesForSave, $messageText);
             $this->saveMessages();
@@ -145,6 +145,10 @@ class Messages {
          if($this->saveTarget == "session"){
             $_SESSION[$this->saveTargetName] = $this->messagesForSave;
          }
+      } else {
+         if($this->saveTarget == "session"){
+            unset($_SESSION[$this->saveTargetName]);
+         }
       }
    }
 
@@ -181,7 +185,17 @@ class Messages {
       }
    }
 
-   public function setSaveStatus($save = true){
+   public function changeSaveStatus($save = true){
+      if($save === true){
+         // přenos zpráv pro uložení do normálních
+         $this->messagesForSave = array_merge($this->messagesForSave, $this->messages);
+         $this->messages = array();
+         $this->saveMessages();
+      } else {
+         $this->messages = array_merge($this->messages, $this->messagesForSave);
+         $this->messagesForSave = array();
+         $this->saveMessages();
+      }
       $this->defaultSaveMessages = $save;
    }
 }
