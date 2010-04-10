@@ -99,7 +99,7 @@ class Url_Request {
     * Ostatní parametry v URL
     * @var string
     */
-   private $parmas = null;
+   private $params = null;
 
    /**
     * Parametr jazyka v URL
@@ -112,6 +112,12 @@ class Url_Request {
     * @var string
     */
    private $outputType = 'html';
+
+   /**
+    * Proměnná obsahuje jestli se jedná o požadavek typu XHR
+    * @var boolean
+    */
+   private static $isXHRRequest = false;
 
    /**
     * Konstruktor
@@ -143,6 +149,9 @@ class Url_Request {
       self::$baseWebUrl=self::$transferProtocol.self::$serverName
           .substr(self::$scriptName, 0, $positionLastChar).self::URL_SEPARATOR;
       self::$webUrl = str_replace(self::$baseWebUrl, '', self::$fullUrl);
+      if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+          self::$isXHRRequest = true;
+      }
    }
 
    /**
@@ -161,7 +170,6 @@ class Url_Request {
       $validRequest = false;
       // jesli se zpracovává soubor modulu
       if($this->parseSpecialPageUrl() OR $this->parseSupportServiceUrl()
-//          OR $this->parseModuleUrl()
           OR $this->parseComponentUrl()
           OR $this->parseJsPluginUrl() OR $this->parseNormalUrl()
           OR $this->parseModuleStaticUrl()) {
@@ -177,8 +185,8 @@ class Url_Request {
    }
 
    /**
-    * Meto zjišťuje, zda se jedná o Normální URL nebo pro SupportedServices
-    * (eplugin, jsplugin, sitemap atd.)
+    * Meto zjišťuje, zda se jedná o Normální URL nebo URl jiného typu
+    * (component, jsplugin, sitemap atd.)
     * @return boolean true pokud se jedná o normální url
     */
    private function parseNormalUrl() {
@@ -217,11 +225,14 @@ class Url_Request {
                      $this->urlType = self::URL_TYPE_MODULE_REQUEST;
                      $this->outputType = $fileMatchs['ext'];
                      $this->pageFull = false;
+                  } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stráánku :-)
+                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                     $this->pageFull = false;
                   }
                   // jinak se jednná o kategorii
                   $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
                   $this->moduleUrlPart = $matches['other'];
-                  $this->parmas = $matches['params'];
+                  $this->params = $matches['params'];
                   $return = true;
                   break;
                }
@@ -241,7 +252,6 @@ class Url_Request {
       foreach ($regexps as $regex) {
          $matches = array();
          if(preg_match($regex, self::$webUrl, $matches) != 0) {
-//            var_dump($matches);
             if(isset ($matches['output'])) {
                $this->outputType = $matches['output'];
             }
@@ -281,29 +291,6 @@ class Url_Request {
    }
 
    /**
-    * Metoda zkontroluje jesli se nejedná o url k akci modulu (např. při ajax requestu)
-    */
-   private function parseModuleUrl() {
-//      $matches = array();//(?:(?P<lang>[a-z]{2})\/)?
-////      if(!preg_match("/module\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[\/a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
-////      if(!preg_match("/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[\/a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
-//      if(!preg_match("/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[\/a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
-         return false;
-//      }
-//      $this->category = $matches['category'];
-//      $this->name = $matches['category'];
-//      $this->action = $matches['action'];
-//      $this->outputType = $matches['output'];
-//      $this->lang = $matches['lang'];
-//      if(isset ($matches['params'])) {
-//         $this->parmas = $matches['params'];
-//      }
-//      $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-//      $this->pageFull = false;
-//      return true;
-   }
-
-   /**
     * Metoda zkontroluje jesli se nejedná o url k statické akci modulu (např. při ajax requestu)
     */
    private function parseModuleStaticUrl() {
@@ -317,7 +304,7 @@ class Url_Request {
       $this->outputType = $matches['output'];
       $this->lang = $matches['lang'];
       if(isset ($matches['params'])) {
-         $this->parmas = $matches['params'];
+         $this->params = $matches['params'];
       }
       $this->urlType = self::URL_TYPE_MODULE_STATIC_REQUEST;
       $this->pageFull = false;
@@ -338,7 +325,7 @@ class Url_Request {
       $this->outputType = $matches['output'];
       $this->lang = $matches['lang'];
       if(isset ($matches['params'])) {
-         $this->parmas = $matches['params'];
+         $this->params = $matches['params'];
       }
       $this->urlType = self::URL_TYPE_COMPONENT_REQUEST;
       $this->pageFull = false;
@@ -361,7 +348,7 @@ class Url_Request {
       $this->outputType = $matches['output'];
       $this->lang = $matches['lang'];
       if(isset ($matches['params'])) {
-         $this->parmas = $matches['params'];
+         $this->params = $matches['params'];
       }
       $this->urlType = self::URL_TYPE_JSPLUGIN_REQUEST;
       $this->pageFull = false;
@@ -397,7 +384,7 @@ class Url_Request {
     * @return string
     */
    public function getUrlParams() {
-      return $this->parmas;
+      return $this->params;
    }
 
    /**
@@ -438,6 +425,14 @@ class Url_Request {
     */
    public static function getBaseWebDir() {
       return self::$baseWebUrl;
+   }
+
+   /**
+    * Metoda vrací jestli se jedná o požadavek typu XHR (ajax)
+    * @return boolean
+    */
+   public static function isXHRRequest() {
+      return self::$isXHRRequest;
    }
 }
 ?>
