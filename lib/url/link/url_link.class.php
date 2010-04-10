@@ -313,7 +313,8 @@ class Url_Link {
     * @param string -- externí odkaz na který se má přesměrovat (option)
     */
    public function reload($link = null) {
-      if (!headers_sent()) {
+      if(Url_Request::isXHRRequest()){ // u XHR není nutný reload
+      } else if (!headers_sent()) {
          if($link == null) {
             header("Location: ".(string)$this);
          } else {
