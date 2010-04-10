@@ -1,0 +1,22 @@
+<?
+$this->form->html()->setAttrib('id', 'sendpokusForm');
+$this->addJsPlugin(new JsPlugin_JQuery());
+
+echo $this->form;
+?>
+<div id="sendValues">
+   <?=$this->send?>
+</div>
+<script type="text/javascript">
+   $('#sendpokusForm').submit(function(){
+      $.ajax({type: "POST",
+         url: "<?=$this->link()->route('ajax')?>",
+         data: $(this).serialize(),
+         success: function(data){
+            vveShowMessages(data);
+            $('#sendValues').html(data.send);
+         }
+      });
+      return false;
+   });
+</script>
