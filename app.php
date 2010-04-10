@@ -682,8 +682,15 @@ class AppCore {
             //					Vytvoření objektu kontroleru
             $controller = new $controllerClassName(self::getCategory(), $routes);
             $controller->runCtrlAction($routes->getActionName(), self::$urlRequest->getOutputType());
-
-            if(in_array(self::$urlRequest->getOutputType(), Template_Output::getHtmlTypes())){
+            if(AppCore::getUrlRequest()->isXHRRequest() AND $routes->getRespondClass() != null){
+               // render odpovědi pro XHR
+               $class = $routes->getRespondClass();
+               $respond = new $class();
+               // přenos dat z šablony do dat odeslaných v respond
+               $respond->setData($controller->_getTemplateObj()->getTemplateVars());
+               $respond->renderRespond();
+            } else if(in_array(self::$urlRequest->getOutputType(), Template_Output::getHtmlTypes())){
+               // render normálního výpisu
                $controller->_getTemplateObj()->renderTemplate();
             }
          } catch (Exception $e ) {
