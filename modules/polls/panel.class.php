@@ -1,28 +1,32 @@
 <?php
 class Polls_Panel extends Panel {
    const DEFAULT_NUM_POLLS = 1;
-	
+
 	public function panelController() {
-      $formVoteMulti = $this->createFormVoteMulti();
-      $formVoteSingle = $this->createFormVoteSingle();
-      $this->template()->formmulti = $formVoteMulti;
-      $this->template()->formsingle = $formVoteSingle;
-   }
-	
-	public function panelView() {
       $model = new Polls_Model_Detail();
       $poll = $model->getPolls($this->category()->getId(), 0, $this->panelObj()->getParam('num', self::DEFAULT_NUM_POLLS));
       $this->template()->poll = $poll->fetch();
       if($this->template()->poll === false) return false;
+
       $this->template()->voted = false;
       $votedPolls = array();
       if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls'])){
          $votedPolls = unserialize($_COOKIE[VVE_SESSION_NAME.'_polls']);
-         if(isset ($votedPolls[$this->template()->poll->{Polls_Model_Detail::COL_ID}])){
+         if(isset ($votedPolls[$this->template()->poll->{Polls_Model_Detail::COL_ID}])
+            OR $this->template()->poll->{Polls_Model_Detail::COL_ACTIVE} != true){
             $this->template()->voted = true;
          }
       }
+      if($this->template()->voted == false){
+         if($this->template()->poll->{Polls_Model_Detail::COL_IS_MULTI} == true){
+            $this->template()->formmulti = $this->createFormVoteMulti();
+         } else {
+            $this->template()->formsingle = $this->createFormVoteSingle();
+         }
+      }
+   }
 
+   public function panelView() {
 		$this->template()->addTplFile("panel.phtml");
 		$this->template()->addCssFile("style.css");
 	}

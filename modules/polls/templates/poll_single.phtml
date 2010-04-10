@@ -27,7 +27,6 @@ print($this->formsingle->renderStart());// SOF form?>
    print ($this->formsingle->vote->controll());
    ?>
    <br />
-   <span class="loader" style="display:none"><img src="images/progress.gif" alt="Loading..." width="16" /></span>
    <span class="pollNumVotes"><?printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model_Detail::COL_VOTES});?></span>
 </div>
 <?=$this->formsingle->renderEnd()// EOF form?>

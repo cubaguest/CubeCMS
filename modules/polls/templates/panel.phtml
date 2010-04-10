@@ -1,10 +1,10 @@
 <?
 $icon = null;
-if($this->panelObj()->getIcon() != null){
+if($this->panelObj()->getIcon() != null) {
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
 }
 $backImg = null;
-if($this->panelObj()->getBackImage() != null){
+if($this->panelObj()->getBackImage() != null) {
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
@@ -14,67 +14,36 @@ if($this->panelObj()->getBackImage() != null){
       <?=$this->poll->{Polls_Model_Detail::COL_QUESTION}?>
    </p>
    <div>
-      <?if($this->poll->{Polls_Model_Detail::COL_ACTIVE} == true AND $this->voted == false) {
-         // více možností
-         if ($this->poll->{Polls_Model_Detail::COL_IS_MULTI} == true) {
-            // více možností
-            $this->formmulti->html()->addClass('pollVoteFormP');
-            $pollTpl = new Template_Module($this->link(), $this->category());
-            $pollTpl->addTplFile('poll_multi.phtml');
-            $pollTpl->formmulti = $this->formmulti;
-            $pollTpl->poll = $this->poll;
-            print ($pollTpl);
-         } else {
-            // jedna možnost
-            $this->formsingle->html()->addClass('pollVoteFormP');
-            $pollTpl = new Template_Module($this->link(), $this->category());
-            $pollTpl->addTplFile('poll_single.phtml');
-            $pollTpl->formsingle = $this->formsingle;
-            $pollTpl->poll = $this->poll;
-            print ($pollTpl);
-         }
+      <?
+      if ($this->formmulti != null) {
+      // více možností
+         $this->formmulti->html()->addClass('pollVoteForm');
+         $pollTpl = new Template_Module($this->link(), $this->category());
+         $pollTpl->addTplFile('poll_multi.phtml');
+         $pollTpl->formmulti = $this->formmulti;
+         $pollTpl->poll = $this->poll;
+         echo ($pollTpl);
+      } else if($this->formsingle != null) {
+         // jedna možnost
+         $this->formsingle->html()->addClass('pollVoteForm');
+         $pollTpl = new Template_Module($this->link(), $this->category());
+         $pollTpl->addTplFile('poll_single.phtml');
+         $pollTpl->formsingle = $this->formsingle;
+         $pollTpl->poll = $this->poll;
+         echo ($pollTpl);
       } else {
-         // jenom, zobrazení?>
-         <?
+         // jenom, zobrazení
          $pollTpl = new Template_Module($this->link(), $this->category());
          $pollTpl->addTplFile('poll_read.phtml');
          $pollTpl->poll = $this->poll;
-         print ($pollTpl);
+         echo ($pollTpl);
       }?>
    </div>
 </div>
-<script type="text/javascript">
-   /* <![CDATA[ */
-   $('form.pollVoteFormP').submit(function(){
-      var jform = $(this);
-      showLoadBox(jform);
-      $.ajax({
-         type: "POST",
-         cache: false,
-         url: '<?=$this->link()->clear()->route('voteajax');?>',
-         data: jform.serialize(),
-         dataType: "json",
-         success: function(data) {
-            if(data.code == true){
-               var dat = $(data.data);
-               dat.find('span.pollNumVotes').prepend();
-               jform.parent().html(dat); // zobrazení dat
-               infoMsg(data.message);
-            } else {
-               errMsg(data.message);
-            }
-            hideLoadBox();
-         },
-         error : function(){
-            hideLoadBox();
-         }
-      });
-      //         $(this).find('img.loader').hide();
-      return false;
-   });
-   /* ]]> */
-</script>
-
+<?
+// vložení skriptu pro ajax
+$this->includeTpl('voteScript.phtml');
+?>
 <p class="panelLinkMore">
    <a href="<?=$this->link()?>"
       title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>

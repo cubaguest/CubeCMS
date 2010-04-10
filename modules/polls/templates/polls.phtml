@@ -51,40 +51,9 @@
 
    if($somePoll == true) {
       $jQuery = new JsPlugin_JQuery();
-      $jQuery->addPluginAjaxForm();
       $this->addJsPlugin($jQuery);
-      ?>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $('form.pollVoteForm').submit(function(){
-         var jform = $(this);
-         showLoadBox(jform);
-         $.ajax({
-            type: "POST",
-            cache: false,
-            url: '<?=$this->link()->clear()->route('voteajax');?>',
-            data: jform.serialize(),
-            dataType: "json",
-            success: function(data) {
-               if(data.code == true){
-                  hideLoadBox();
-                  var pjform = jform.parent(); // zobrazení dat
-                  jform.remove();
-                  pjform.append($(data.data));
-                  infoMsg(data.message);
-               } else {
-                  errMsg(data.message);
-               }
-            },
-            error : function(){
-               hideLoadBox();
-            }
-         });
-         return false;
-      });
-      /* ]]> */
-   </script>
-      <?
+      // vložení skriptu pro ajax
+      $this->includeTpl('voteScript.phtml');
    } else {?>
    <p><?=$this->_('Žádná anketa není vložena')?></p>
    <?}?>

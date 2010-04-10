@@ -28,6 +28,7 @@ class Polls_Controller extends Controller {
       // hlasování s jednou volbou
       if($formVoteSingle->isValid()) {
          $poll = $model->getPoll($formVoteSingle->id_poll->getValues());
+         $this->view()->id = $formVoteSingle->id_poll->getValues();
          if($poll == false) {
             $this->errMsg()->addMessage($this->_('Hlasování v neexistující anketě'));
          } else if(isset ($votedPolls[$formVoteSingle->id_poll->getValues()])){
@@ -45,17 +46,19 @@ class Polls_Controller extends Controller {
       } else
       // hlasování s více volbami
          if($formVoteMulti->isValid()) {
+            $this->view()->id = $formVoteMulti->id_poll->getValues();
             $poll = $model->getPoll($formVoteMulti->id_poll->getValues());
+            $selected = $formVoteMulti->answer->getValues();
             if($poll == false) {
                $this->errMsg()->addMessage($this->_('Hlasování v neexistující anketě'));
-            }  else if(isset ($votedPolls[$formVoteSingle->id_poll->getValues()])){
+            } else if(isset ($votedPolls[$formVoteMulti->id_poll->getValues()])){
                $this->errMsg()->addMessage($this->_('V této anketě jste již hlasoval'));
+            } else if($selected == null){
+               $this->errMsg()->addMessage($this->_('Nebyla vybrána žádná volba'));
             } else {
                $votedPolls[$formVoteMulti->id_poll->getValues()] = true;
                setcookie(VVE_SESSION_NAME.'_polls', serialize($votedPolls),$cokieExpire,'/');
-
                $data = unserialize($poll->{Polls_Model_Detail::COL_DATA});
-               $selected = $formVoteMulti->answer->getValues();
                foreach ($selected as $id => $dat) {
                   $data[$id]['count']++;
                }
@@ -74,13 +77,13 @@ class Polls_Controller extends Controller {
 
          if($delForm->isValid()) {
             $model->deletePoll($delForm->id->getValues());
-
-
             $this->infoMsg()->addMessage($this->_('Anketa byla smazána'));
             $this->link()->rmParam()->reload();
          }
-
       }
+
+      // pokud je XHR vyskoč
+      if(Url_Request::isXHRRequest()) return true;
 
       $this->view()->formmulti = $formVoteMulti;
       $this->view()->formsingle = $formVoteSingle;
@@ -97,6 +100,17 @@ class Polls_Controller extends Controller {
               $scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
 
       $this->view()->scrollComp = $scrollComponent;
+   }
+
+   public function pollDataController(){
+      $this->checkReadableRights();
+      $id = $this->getRequestParam('id', null);
+      if($id != null){
+         $model = new Polls_Model_Detail();
+         $this->view()->poll = $model->getPoll($id);
+      } else {
+         $this->view()->poll = null;
+      }
    }
 
    public function addController() {
@@ -206,81 +220,6 @@ class Polls_Controller extends Controller {
       $form->addElement($elemSubmit);
 
       return $form;
-   }
-
-   public function voteController() {
-      $this->checkReadableRights();
-      $model = new Polls_Model_Detail();
-
-      $sendData = array();
-
-      $votedPolls = array();
-      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls'])){
-         $votedPolls = unserialize($_COOKIE[VVE_SESSION_NAME.'_polls']);
-      }
-
-      $cokieExpire = time()+60*60*24*$this->category()->getModule()->getParam('cookiedays', self::DEFAULT_COOKIE_DAYS);
-
-      $formS = $this->createFormVoteSingle();
-      $formM = $this->createFormVoteMulti();
-
-      $sendData['code'] = false;
-      if($formS->isValid()) {
-         $sendData['code'] = true;
-         $poll = $model->getPoll($formS->id_poll->getValues());
-         if($poll == false) {
-            $sendData['message'] = $this->_('Hlasování v neexistující anketě');
-            $sendData['code'] = false;
-         } else if(isset ($votedPolls[$formS->id_poll->getValues()])){
-            $sendData['message'] = $this->_($this->_('V této anketě jste již hlasoval'));
-            $sendData['code'] = false;
-            $this->view()->poll = $model->getPoll($formS->id_poll->getValues());
-         } else {
-            $data = unserialize($poll->{Polls_Model_Detail::COL_DATA});
-            if(!isset ($data[$formS->answer->getValues()])) {
-               $sendData['message'] = $this->_('Chyba při hlasování, nebyla vybrána žádná volba');
-               $sendData['code'] = false;
-            } else {
-               $votedPolls[$formS->id_poll->getValues()] = true;
-               setcookie(VVE_SESSION_NAME.'_polls', serialize($votedPolls),$cokieExpire,'/');
-               $data[$formS->answer->getValues()]['count']++;
-               $model->savePollData($formS->id_poll->getValues(), serialize($data));
-               $sendData['message'] = $this->_('Váš hlas byl přijat');
-               $this->view()->poll = $model->getPoll($formS->id_poll->getValues());
-            }
-         }
-      } else if($formM->isValid()) {
-         $sendData['code'] = true;
-         $poll = $model->getPoll($formM->id_poll->getValues());
-         if($poll == false) {
-            $sendData['message'] = $this->_('Hlasování v neexistující anketě');
-            $sendData['code'] = false;
-         } else if(isset ($votedPolls[$formM->id_poll->getValues()])){
-            $sendData['message'] = $this->_($this->_('V této anketě jste již hlasoval'));
-            $sendData['code'] = false;
-            $this->view()->poll = $model->getPoll($formM->id_poll->getValues());
-         } else {
-            $votedPolls[$formM->id_poll->getValues()] = true;
-            setcookie(VVE_SESSION_NAME.'_polls', serialize($votedPolls),$cokieExpire,'/');
-            $data = unserialize($poll->{Polls_Model_Detail::COL_DATA});
-            $selected = $formM->answer->getValues();
-            if(!empty ($selected)) {
-               foreach ($selected as $id => $dat) {
-                  if(!isset ($data[$id])) {
-                     $sendData['message'] = $this->_('Chyba při hlasování');
-                     $sendData['code'] = false;
-                  }
-                  $data[$id]['count']++;
-               }
-            }
-            $model->savePollData($formM->id_poll->getValues(), serialize($data));
-            $sendData['message'] = $this->_('Váš hlas byl přijat');
-            $this->view()->poll = $model->getPoll($formM->id_poll->getValues());
-         }
-      }
-      
-      $this->view()->sendData = $sendData;
-      sleep(2);
    }
 
    private function createFormVoteSingle() {

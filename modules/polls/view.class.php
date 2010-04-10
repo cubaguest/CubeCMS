@@ -18,13 +18,11 @@ class Polls_View extends View {
       $this->addView();
    }
 
-   public function voteView() {
-      $data = $this->sendData;
-      if($this->poll != false) {
+   public function pollDataView() {
+      if($this->poll != false AND $this->poll != null) {
          $this->template()->addTplFile('poll_read.phtml');
-         $data['data'] = (string)$this->template();
+         $this->pollData = (string)$this->template();
       }
-      print (json_encode($data));
    }
 }
 
