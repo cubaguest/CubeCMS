@@ -203,7 +203,6 @@ class Template_Module extends Template {
             }
          }
       }
-//      $contents = ob_get_flush();
       $contents = ob_get_clean();
       return $contents;
    }

@@ -297,8 +297,7 @@ class Template {
 //            }
          }
       }
-      $cnt = ob_get_contents();
-      ob_end_clean();
+      $cnt = ob_get_clean();
       return $cnt;
    }
 
@@ -308,7 +307,7 @@ class Template {
     */
    public function renderTemplate() {
       // zastavení výpisu buferu
-      print ($this);
+      echo ($this);
    }
 
    /**
@@ -336,16 +335,11 @@ class Template {
     * @param Template $tplObj -- objekt šablony
     * @param array $vars -- pole s proměnýmy, přenesenými přímo do objektu
     */
-   final public function includeTplObj($tplObj, $vars = array()) {
-      if($tplObj instanceof Eplugin) {
-         $tpl = $tplObj->template();
-      } else {
-         $tpl = $tplObj;
-      }
+   final public function includeTplObj(Template $tplObj, $vars = array()) {
       foreach ($vars as $key => $value) {
-         $tpl->{$key} = $value;
+         $tplObj->{$key} = $value;
       }
-      $tpl->renderTemplate();
+      $tplObj->renderTemplate();
    }
 
    /**
