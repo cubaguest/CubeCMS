@@ -1,16 +1,29 @@
 <?
-//   $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
+$this->addJsPlugin(new JsPlugin_JQuery());
 ?>
 <div>
    <strong><?=$this->_('Zrušení registrace e-mailu')?></strong><br />
    <?
-   print($this->unregMailForm->renderStart());
-   print($this->unregMailForm->mail->controll());
-   print($this->unregMailForm->send->controll());
-   print($this->unregMailForm->renderEnd());
-
-//   if($this->toolbox != null) $this->includeTplObj($this->toolbox);
+   $this->unregMailForm->html()->setAttrib('id', 'unregisterMail');
+   echo($this->unregMailForm->renderStart());
+   echo($this->unregMailForm->mail->controll());
+   echo($this->unregMailForm->send->controll());
+   echo($this->unregMailForm->renderEnd());
    ?>
    <br />
    <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route(null), 'text' => $this->_('Zpět na registraci')));?>
 </div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $('form#unregisterMail').submit(function(){
+      $.ajax({type: "POST",
+         url: "<?=$this->link()->route('unregistration')?>",
+         data: $(this).serialize(),
+         success: function(data){
+            vveShowMessages(data);
+         }
+      });
+      return false;
+   });
+   /* ]]> */
+</script>

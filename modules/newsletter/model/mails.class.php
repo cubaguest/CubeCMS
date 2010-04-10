@@ -11,14 +11,14 @@ class NewsLetter_Model_Mails extends Model_PDO {
    const COLUMN_ID = 'id_mail';
    const COLUMN_MAIL = 'mail';
    const COLUMN_IP = 'ip_address';
-   const COLUMN_ID_CAT = 'id_category';
+//   const COLUMN_ID_CAT = 'id_category';
    const COLUMN_DATE_ADD = 'date_add';
    const COLUMN_GROUP = 'group';
 
    /**
     * Metoda uloží mail do db
     */
-   public function saveMail($mail, $ip, $idCat, $id = null) {
+   public function saveMail($mail, $ip, $id = null) {
       $dbc = new Db_PDO();
 
       if($id !== null) {
@@ -27,13 +27,9 @@ class NewsLetter_Model_Mails extends Model_PDO {
          $dbst->bindParam(':id', $id, PDO::PARAM_INT);
          $dbst->bindParam(':mail', $mail, PDO::PARAM_STR);
       } else {
-         if($idCat == 0){
-            throw new InvalidArgumentException($this->_('Při ukládání nového e-mailu musí být zadáno id kategorie'), 1);
-         }
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-             ." (`".self::COLUMN_ID_CAT."`, `".self::COLUMN_MAIL."`, `".self::COLUMN_IP."`)"
-             ." VALUES (:idcat, :mail, :ipaddr)");
-         $dbst->bindValue(':idcat', $idCat, PDO::PARAM_INT);
+             ." (`".self::COLUMN_MAIL."`, `".self::COLUMN_IP."`)"
+             ." VALUES (:mail, :ipaddr)");
          $dbst->bindValue(':mail', $mail, PDO::PARAM_STR);
          $dbst->bindValue(':ipaddr', $ip, PDO::PARAM_STR);
       }
@@ -63,18 +59,16 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @param int -- (100) kolik řádků se má vypsat
     * @return PDOStatement -- statement s maily
     */
-   public function getMails($idcat, $fromRow = null, $numRows = 100) {
+   public function getMails($fromRow = null, $numRows = 100) {
       $dbc = new Db_PDO();
       if($fromRow === null){
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-         ." WHERE (".self::COLUMN_ID_CAT." = :idcat)");
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
       } else {
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-         ." WHERE (".self::COLUMN_ID_CAT." = :idcat LIMIT :fromrow, :numrows)");
+         ." LIMIT :fromrow, :numrows)");
          $dbst->bindParam(':fromrow', $fromRow, PDO::PARAM_INT);
          $dbst->bindParam(':numrows', $numRows, PDO::PARAM_INT);
       }
-      $dbst->bindParam(':idcat', $idcat, PDO::PARAM_INT);
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       $dbst->execute();
       return $dbst->fetchAll();
@@ -86,11 +80,10 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @param int -- id článku
     * @return PDOStatement -- pole s článkem
     */
-   public function isSavedMails($idCat, $mail) {
+   public function isSavedMails($mail) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT COUNT(".self::COLUMN_ID.") AS count FROM ".Db_PDO::table(self::DB_TABLE)
-         ." WHERE (".self::COLUMN_ID_CAT." = :idcat AND ".self::COLUMN_MAIL." = :mail)");
-      $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
+         ." WHERE (".self::COLUMN_MAIL." = :mail)");
       $dbst->bindParam(':mail', $mail, PDO::PARAM_STR);
       $dbst->execute();
       $res = $dbst->fetch();
@@ -119,11 +112,11 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @param integer $idc -- id kategorie
     * @param string $email -- email
     */
-   public function deleteMail($idc, $email) {
+   public function deleteMail($email) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE (".self::COLUMN_MAIL ." = :mail AND ".self::COLUMN_ID_CAT ." = :idcat)");
-      return $dbst->execute(array(':idcat' => $idc, ':mail' => $email));
+          ." WHERE (".self::COLUMN_MAIL ." = :mail)");
+      return $dbst->execute(array(':mail' => $email));
    }
 
    public function getMailsByIds($ids) {

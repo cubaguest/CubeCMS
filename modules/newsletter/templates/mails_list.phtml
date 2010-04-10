@@ -56,7 +56,7 @@ $this->addJsPlugin(new JsPlugin_DataTables());
 				});
 
             $('button[name=delete_items]').click(function(){
-               var $items = getItems();
+               var $items = getTableItems();
                if($items.length == 0){
                   errMsg('<?=$this->_('Nebyla vybrána žádná položka')?>');
                   return false;

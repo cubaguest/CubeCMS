@@ -2,19 +2,16 @@
 if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABEL} != null){
    $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
 }
+$this->addJsPlugin(new JsPlugin_JQuery());
 ?>
 <div>
    <?if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null){?>
    <div class=""><?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
    <?}?>
    <br />
+   <strong><?=$this->_('Registrace e-mailu')?></strong><br />
    <?
-   if($this->unreg == true){?>
-      <strong><?=$this->_('Zrušení registrace e-mailu')?></strong><br />
-   <? } else {?>
-      <strong><?=$this->_('Registrace e-mailu')?></strong><br />
-   <?}?>
-   <?
+   $this->newMailForm->html()->setAttrib('id', 'registerNewMail');
    print($this->newMailForm->renderStart());
    print($this->newMailForm->mail->controll());
    print($this->newMailForm->send->controll());
@@ -27,3 +24,17 @@ if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABE
          title="<?=$this->_('Zrušit registraci e-mailu')?>"
          ><?=$this->_('Zrušit registraci e-mailu')?></a>
 </div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $('form#registerNewMail').submit(function(){
+      $.ajax({type: "POST",
+         url: "<?=$this->link()->route('normal')?>",
+         data: $(this).serialize(),
+         success: function(data){
+            vveShowMessages(data);
+         }
+      });
+      return false;
+   });
+   /* ]]> */
+</script>

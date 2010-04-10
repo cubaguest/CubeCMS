@@ -21,8 +21,8 @@ class NewsLetter_Controller extends Controller {
          $mailsM = new NewsLetter_Model_Mails();
          $newMail = $newMailForm->mail->getValues();
          // načtení existujících emailů pro okntrolu existence
-         if(!$mailsM->isSavedMails($this->category()->getId(), $newMail)) {
-            $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR'], $this->category()->getId());
+         if(!$mailsM->isSavedMails($newMail)) {
+            $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR']);
             // pokud se má odeslat mail správci
             if($this->category()->getParam(self::PARAM_NEW_MAIL_REG_NOTICE, true) == true) {
                // email webmasterovi
@@ -143,13 +143,13 @@ class NewsLetter_Controller extends Controller {
 
       $model = new NewsLetter_Model_Mails();
 
-      $this->view()->mails = $model->getMails($this->category()->getId());
+      $this->view()->mails = $model->getMails();
    }
 
    public function listMailsExportController() {
       $this->checkWritebleRights();
       $model = new NewsLetter_Model_Mails();
-      $this->view()->mails = $model->getMails($this->category()->getId());
+      $this->view()->mails = $model->getMails();
       $this->view()->type = $this->getRequest('output', 'txt');
    }
 
@@ -174,19 +174,18 @@ class NewsLetter_Controller extends Controller {
 
       if($unregMailForm->isValid()) {
          $model = new NewsLetter_Model_Mails();
-         $model->deleteMail($this->category()->getId(), $unregMailForm->mail->getValues());
+         $model->deleteMail($unregMailForm->mail->getValues());
          $this->infoMsg()->addMessage(sprintf($this->_('E-mailové adrese %s byla zrušena registrace'), $unregMailForm->mail->getValues()));
          $this->link()->reload();
       }
-
+      // odregistrace přes url adresu
       $email = $this->getRequestParam('mail', null);
       if($email !== null) {
          $model = new NewsLetter_Model_Mails();
-         $model->deleteMail($this->category()->getId(), $email);
+         $model->deleteMail($email);
          $this->infoMsg()->addMessage(sprintf($this->_('E-mailové adrese %s byla zrušena registrace'), $email));
          $this->link()->rmParam()->reload();
       }
-
       $this->view()->unregMailForm = $unregMailForm;
    }
 
@@ -199,7 +198,7 @@ class NewsLetter_Controller extends Controller {
          $newMail = $newMailForm->mail->getValues();
          // načtení existujících emailů pro okntrolu existence
          if(!$mailsM->isSavedMails($this->category()->getId(), $newMail)) {
-            $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR'], $this->category()->getId());
+            $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR']);
             // pokud se má odeslat mail správci
             if($this->category()->getParam(self::PARAM_NEW_MAIL_REG_NOTICE, true) == true) {
                // email webmasterovi
@@ -336,20 +335,15 @@ class NewsLetter_Controller extends Controller {
          $model = new NewsLetter_Model_Mails();
          $model->deleteMails(array_keys($_REQUEST['select_item']));
          $this->infoMsg()->addMessage($this->_('Označené adresy byly smazány'));
-         $this->respond()->setStatus(true);
       } else {
          $this->errMsg()->addMessage($this->_('Nebyla vabrána žádná položka'));
-         $this->respond()->setStatus(false);
       }
    }
 
    public function sendMailController() {
       $this->checkWritebleRights();
-
       $model = new NewsLetter_Model_Mails();
-
       $formSendMail = new Form('sendmail_');
-
       $elemRecipients = new Form_Element_TextArea('recipients', $this->_('Příjemci'));
       if(isset($_REQUEST['select_item'])){
          $rec = null;
@@ -378,21 +372,15 @@ class NewsLetter_Controller extends Controller {
 
       if($formSendMail->isValid()){
          $mails = explode(';', $formSendMail->recipients->getValues());
-
          $mailObj = new Email(true);
-
          $mailObj->setSubject($formSendMail->subject->getValues());
          $mailObj->setContent($formSendMail->text->getValues());
          $mailObj->addAddress($mails);
-
          $mailObj->sendMail();
-
          $this->infoMsg()->addMessage($this->_('E-mail byl odeslán'));
          $this->link()->route('list')->reload();
       }
-
       $this->view()->form = $formSendMail;
-
    }
 }
 
