@@ -175,6 +175,11 @@ class Email {
     * Metoda odešle email
     */
    public function sendMail() {
+      // kontrola adresy příjemce a předmětu
+      if(empty ($this->mailAddress) OR $this->mailSubject == null){
+         throw new CoreException(_('Nebyla zadána cílová adresa nebo předmět emailu'));
+      }
+
       // předmět
       $encodedSubject="=?$this->mailCharset?B?".base64_encode($this->mailSubject)."?=\n";
       // tělo emailu
@@ -183,8 +188,9 @@ class Email {
       $headers = $this->createHeaders();
 
       foreach ($this->mailAddress as $address) {
+         if($address == null) continue;
          if(!mail($address, $encodedSubject, $mailContent, $headers)){
-            throw new CoreException(sprintf(_('Chyba při odesílání emailu na adresu %s'),$address));
+            throw new CoreException(sprintf(_('Chyba při odesílání emailu na adresu "%s"'),$address));
          }
       }
       return true;
