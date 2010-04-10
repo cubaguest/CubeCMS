@@ -396,10 +396,6 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     * @param string $outputType -- typ výstupu
     */
    final public function runCtrlAction($actionName, $outputType) {
-      if($this->routes()->getRespondType() == Routes::RESPOND_AJAX){
-         $this->moduleRespond = new Ajax_Data_Respond(); // objekt odpovědi na požadavek
-      }
-
       if(!method_exists($this, $actionName.'Controller')) {
          trigger_error(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
                  $actionName, $this->module()->getName()));
@@ -411,23 +407,19 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
          $viewName = $actionName.ucfirst($outputType).'View';
       } else if(method_exists($this->view(), $actionName.'View')) {
          $viewName = $actionName.'View';
-      } else {
-         trigger_error(sprintf(_("Action Viewer \"%sView\" nebo \"%s\" v modulu \"%s\" nebyl implementován"),
-                 $actionName, $actionName.ucfirst($outputType).'View', $this->module()->getName()));
       }
+//      else {
+//         trigger_error(sprintf(_("Action Viewer \"%sView\" nebo \"%s\" v modulu \"%s\" nebyl implementován"),
+//                 $actionName, $actionName.ucfirst($outputType).'View', $this->module()->getName()));
+//      }
 
       // spuštění Viewru
       if($this->{$actionName.'Controller'}() !== false AND $viewName != null) {
          // pokud je kontrolel v pořádku spustíme view
          $this->view()->{$viewName}();
       } else {
-         AppCore::setErrorPage(true);
-         return false;
-      }
-
-      if($this->routes()->getRespondType() == Routes::RESPOND_AJAX){
-         // výpis respond
-         echo $this->moduleRespond;
+//         AppCore::setErrorPage(true);
+//         return false;
       }
    }
 
