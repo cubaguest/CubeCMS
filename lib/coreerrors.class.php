@@ -142,5 +142,27 @@ class CoreErrors {
          $err['message'],$err['file'],$err['line']);
       }
    }
+
+   public static function eraseErrors() {
+      self::$exceptionsArray = array();
+      self::$errorsArray = array();
+   }
+
+   /**
+    * Metoda vrací hednorozměrné pole určené pro tisk
+    * @return array
+    */
+   public static function getErrorsInArrayForPrint(){
+      $re = array();
+      foreach (self::$exceptionsArray as $exception) {
+         $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",get_class($exception),$exception->getCode(),
+         $exception->getMessage(),$exception->getFile(),$exception->getLine());
+      }
+      foreach (self::$errorsArray as $err) {
+         sprintf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",$err['name'],$err['code'],
+         $re [] = $err['message'],$err['file'],$err['line']);
+      }
+      return $re;
+   }
 }
 ?>

@@ -18,6 +18,12 @@ class XHR_Respond_VVEAPI extends XHR_Respond {
       $retData = $this->data;
       $retData['infomsg'] = AppCore::getInfoMessages()->getMessages();
       $retData['errmsg'] = AppCore::getUserErrors()->getMessages();
+      if(VVE_DEBUG_LEVEL > 0 AND !CoreErrors::isEmpty()){
+         $coreErrors = (array)CoreErrors::getErrorsInArrayForPrint();
+         // převedení core errors na stringy
+         $retData['errmsg'] = array_merge($retData['errmsg'], $coreErrors);
+         CoreErrors::eraseErrors(); // není třeba je již vypisovat
+      }
 
       Template_Output::setOutputType('json');
       return json_encode($retData);
