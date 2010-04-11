@@ -1,11 +1,11 @@
 <?
 $this->addPageHeadline($this->_('Seznam registrovaných e-mailových adres'));
 $this->addPageTitle($this->_('Seznam registrovaných e-mailových adres'));
-
+$this->addCssFile('style.css');
 $this->addJsPlugin(new JsPlugin_DataTables());
 ?>
 <div>
-   <h2><?=$this->_('Seznam registrovaných e-mailů')?></h2>
+   <h2><?=$this->_('E-maily')?></h2>
    <table id="tableMails" style="width: 100%;">
       <thead>
 		<tr>
