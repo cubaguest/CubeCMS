@@ -26,7 +26,7 @@ var FileBrowserDialogue = {
       // close popup window
       tinyMCEPopup.close();
    }
-}
+};
 
 var FileBrowserFunctions = {
    cmsURL : null,
@@ -71,7 +71,7 @@ var FileBrowserFunctions = {
          });
       }
    }
-}
+};
 
 var FileBrowserFilesFunctions = {
    currentFilePath : null,
@@ -160,8 +160,7 @@ var FileBrowserFilesFunctions = {
             });
          }
       });
-      // CTRL
-      // ONE CLICK
+      // CTRL + ONE CLICK
       $("li.file").click(function (event) {
          if(event.metaKey == false){
             FileBrowserFilesFunctions.selectedFiles = new Array();
@@ -169,7 +168,7 @@ var FileBrowserFilesFunctions = {
             if(!$(this).hasClass('fileSelected')){
                $(this).addClass('fileSelected');
                FileBrowserFilesFunctions.addSelFile($(this).find('span.name').text(),
-                  $(this).children('p.filePreview').find('img').attr('src'));
+                  $(this).children('p.filePreview').find('span').attr('file'));
             }
          } else {
             if($(this).hasClass('fileSelected')){
@@ -181,11 +180,6 @@ var FileBrowserFilesFunctions = {
                   $(this).children('p.filePreview').find('img').attr('src'));
             }
          }
-
-      //         $('#actualFile').html($(this).children("p").children('span.name').text());
-      //         FileBrowserFilesFunctions.currentFilePath = $(this).children('p.filePreview')
-      //         .children('span').attr('file');
-
       });
       // HOVER
       $("li.file").mouseover(function () {
@@ -342,7 +336,7 @@ var FileBrowserFilesFunctions = {
       }
    }
    
-}
+};
 
 var FileBrowserDirsFunctions = {
    parentNodePath : null,
@@ -590,4 +584,4 @@ var FileBrowserDirsFunctions = {
          alert("Musíte označit adresář");
       }
    }
-}
+};
