@@ -2,7 +2,7 @@
 <p><?printf($this->_('Nalezeno %s výsledků'),count($this->results))?></p>
 <?
 //foreach ($this->results as $result) {
-for ($i = $this->start; $i < $this->stop; $i++) {
+for ($i = (int)$this->start; $i < $this->stop; $i++) {
 if(!isset ($this->results[$i])) break;
 $result = $this->results[$i];?>
 <h3>
