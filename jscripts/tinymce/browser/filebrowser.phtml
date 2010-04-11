@@ -1,9 +1,9 @@
 <?php
-header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-header( 'Cache-Control: post-check=0, pre-check=0', false );
-header( 'Pragma: no-cache' );
+//header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+//header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+//header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+//header( 'Cache-Control: post-check=0, pre-check=0', false );
+//header( 'Pragma: no-cache' );
 // vatvoření základních url
 
 //kontrola zadání sesion pokud není je spojení odmítnuto
@@ -19,16 +19,18 @@ $pluginUrl = "http://".$_SERVER['HTTP_HOST'].$str."jsplugin/tinymce/cat-".$_GET[
 
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta http-equiv="cache-control" content="no-cache" />
+<!--<meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="pragma" content="no-cache" />
-<meta http-equiv="pragma" content="-1" />
+<meta http-equiv="pragma" content="-1" />-->
 <script type="text/javascript" src="../tiny_mce_popup.js"></script>
 <script type="text/javascript" src="../../jquery/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="../../jquery/jquery.cookie.js"></script>
 <script type="text/javascript" src="../../jquery/jquery.hotkeys.js"></script>
-<script type="text/javascript" src="../../jquery/jquery-ui-1.7.UICore.min.js"></script>
-<script type="text/javascript" src="../../jquery/jquery-ui-1.7.Draggable.min.js"></script>
-<script type="text/javascript" src="../../jquery/jquery-ui-1.7.Droppable.min.js"></script>
+<script type="text/javascript" src="../../jquery/jquery.ui.core.min.js"></script>
+<script type="text/javascript" src="../../jquery/jquery.ui.widget.min.js"></script>
+<script type="text/javascript" src="../../jquery/jquery.ui.mouse.min.js"></script>
+<script type="text/javascript" src="../../jquery/jquery.ui.draggable.min.js"></script>
+<script type="text/javascript" src="../../jquery/jquery.ui.droppable.min.js"></script>
 <!--<script type="text/javascript" src="../../jquery/jquery-ui-1.7.Selectable.min.js"></script>-->
 <script type="text/javascript" src="../../jquerytree/jquery.tree.min.js"></script>
 <script type="text/javascript" src="../../jquerytree/plugins/jquery.tree.contextmenu.js"></script>
