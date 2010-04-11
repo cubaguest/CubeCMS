@@ -16,6 +16,7 @@
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME_DIR = 'base';
    const JQUERY_VERSION = '1.4.2';
+   const JQUERY_UI_VERSION = '1.8';
 
    /**
     * Pole s konfigurací pluginu
@@ -41,140 +42,223 @@ class JsPlugin_JQuery extends JsPlugin {
 
   /**
    * Metoda přidá jádro pro efekty UI
+   * @return JsPlugin_JQuery
    */
   public function addUICore() {
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.UICore.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.core.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
-    $this->addFile(new JsPlugin_CssFile("ui.theme.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.core.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.core.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.theme.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
   /**
+   * Metoda přidá widgent UI - widget (základní pro dialog a ostatní věci)
+   * @return JsPlugin_JQuery
+   */
+  public function addUIWidget() {
+    //deps
+    $this->addUICore();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.widget.min.js"));
+    return $this;
+  }
+
+  /**
+   * Metoda přidá část UI - mouse (pro práci s myší)
+   * @return JsPlugin_JQuery
+   */
+  public function addUIMouse() {
+    //deps
+    $this->addUICore();
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.mouse.min.js"));
+    return $this;
+  }
+
+  /**
+   * Metoda přidá část UI - position (pro práci s pozicemi boxů)
+   * @return JsPlugin_JQuery
+   */
+  public function addUIPosition() {
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.position.min.js"));
+    return $this;
+  }
+
+
+  /**
    * Metoda přidá efekty UI - draggable (přesunování)
+   * @return JsPlugin_JQuery
    */
   public function addUIDraggable() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Draggable.min.js"));
+    $this->addUIWidget();
+    $this->addUIMouse();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.draggable.min.js"));
     return $this;
   }
 
   /**
    * Metoda přidá efekty UI - droppable (odstraňování)
+   * @return JsPlugin_JQuery
    */
   public function addUIDroppable() {
     //deps
     $this->addUICore();
     $this->addUIDraggable();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Droppable.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.droppable.min.js"));
     return $this;
   }
 
   /**
    * Metoda přidá efekty UI - resizable (zěna velikosti)
+   * @return JsPlugin_JQuery
    */
   public function addUIResizable() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Resizable.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.resizable.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addUIMouse();
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.resizable.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.resizable.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
   /**
    * Metoda přidá efekty UI - selectable (označování)
+   * @return JsPlugin_JQuery
    */
   public function addUISelectable() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Selectable.min.js"));
+    $this->addUIMouse();
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.selectable.min.js"));
     return $this;
   }
 
   /**
    * Metoda přidá efekty UI - sortable (řazení)
+   * @return JsPlugin_JQuery
    */
   public function addUISortable() {
     //deps
     $this->addUICore();
-    $this->addUIDraggable();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Sortable.min.js"));
+    $this->addUIMouse();
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.sortable.min.js"));
     return $this;
   }
 
   /*
-   * Widgents
+   * Widgets
    */
 
   /**
    * Metoda přidá widgent UI - accordion (roztahování boxů)
+   * @return JsPlugin_JQuery
    */
-  public function addWidgentAccordion() {
+  public function addUIAccordion() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Accordion.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.accordion.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.accordion.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.accordion.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    return $this;
+  }
+
+
+  /**
+   * Metoda přidá widgent UI - button
+   * @return JsPlugin_JQuery
+   */
+  public function addUIButton() {
+    //deps
+    $this->addUICore();
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.button.min.js"));
     return $this;
   }
 
   /**
-   * Metoda přidá widgent UI - dialog (box dialogu)
+   * Metoda přidá widgent UI - autocomplete
+   * @return JsPlugin_JQuery
    */
-  public function addWidgentDialog() {
+  public function addUIAutoComplete() {
     //deps
     $this->addUICore();
-    $this->addUIDraggable();
-    $this->addUIResizable();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Dialog.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.dialog.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addUIWidget();
+    $this->addUIPosition();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.autocomplete.min.js"));
     return $this;
   }
 
   /**
-   * Metoda přidá widgent UI - slider (posunovač)
+   * Metoda přidá widget UI - dialog (box dialogu)
+   * @return JsPlugin_JQuery
    */
-  public function addWidgentSlider() {
+  public function addUIDialog() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Slider.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.slider.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addUIWidget();
+    $this->addUIPosition();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.dialog.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.dialog.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    return $this;
+  }
+
+  /**
+   * Metoda přidá widget UI - slider (posunovač)
+   * @return JsPlugin_JQuery
+   */
+  public function addUISlider() {
+    //deps
+    $this->addUICore();
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.slider.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.slider.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
   /**
    * Metoda přidá widgent UI - tabs (tabulka boxů - záložky)
+   * @return JsPlugin_JQuery
    */
-  public function addWidgentTabs() {
+  public function addUITabs() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Tabs.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.tabs.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.tabs.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.tabs.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
   /**
    * Metoda přidá widgent UI - datepicker (box s výběrem data)
+   * @return JsPlugin_JQuery
    */
-  public function addWidgentDatepicker() {
+  public function addUIDatepicker() {
     //deps
     $this->addUICore();
+    $this->addUIWidget();
     /**
      * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
      */
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Datepicker.min.js"));
-    $this->addFile(new JsPlugin_JsFile("ui.datepicker-".Locale::getLang().".js",false,'ui/i18n/'));
-    $this->addFile(new JsPlugin_CssFile("ui.datepicker.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker.min.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-".Locale::getLang().".js",false,'ui/i18n/'));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.datepicker.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
   /**
    * Metoda přidá widgent UI - progressbar (pregress bar)
+   * @return JsPlugin_JQuery
    */
-  public function addWidgentProgressBar() {
+  public function addUIProgressBar() {
     //deps
     $this->addUICore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.Progressbar.min.js"));
-    $this->addFile(new JsPlugin_CssFile("ui.progressbar.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+    $this->addUIWidget();
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.progressbar.min.js"));
+    $this->addFile(new JsPlugin_CssFile("jquery.ui.progressbar.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }
 
@@ -184,20 +268,21 @@ class JsPlugin_JQuery extends JsPlugin {
 
   /**
    * Metoda přidá efekt UI - core (jádro efektů)
+   * @return JsPlugin_JQuery
    */
-  public function addEffectCore() {
-    //deps
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.EffectsCore.min.js"));
+  public function addUIEffectCore() {
+    $this->addFile(new JsPlugin_JsFile("jquery.effects.core.min.js"));
     return $this;
   }
 
   /**
-   * Metoda přidá efekty UI - all (všechny efekty)
+   * Metoda přidá efekty UI - vybraný efekt
+   * @param string $efectName -- název efektu
+   * @return JsPlugin_JQuery
    */
-  public function addEffectAll() {
-    //deps
-    $this->addEffectCore();
-    $this->addFile(new JsPlugin_JsFile("jquery-ui-1.7.EffectAll.min.js"));
+  public function addUIEffect($efectName) {
+     $this->addUIEffectCore();
+    $this->addFile(new JsPlugin_JsFile("jquery.effects.".$efectName.".min.js"));
     return $this;
   }
 
@@ -207,14 +292,25 @@ class JsPlugin_JQuery extends JsPlugin {
 
   /**
    * Metoda přidá plugin pro práci s cookie
+   * @return JsPlugin_JQuery
    */
   public function addPluginCookie() {
-    $this->addFile(new JsPlugin_JsFile("jquery-cookie.packed.js"));
+    $this->addFile(new JsPlugin_JsFile("jquery.cookie.min.js"));
+    return $this;
+  }
+
+  /**
+   * Metoda přidá plugin pro práci s metadaty
+   * @return JsPlugin_JQuery
+   */
+  public function addPluginMetadata() {
+    $this->addFile(new JsPlugin_JsFile("jquery.metadata.min.js"));
     return $this;
   }
 
   /**
    * Metoda přidá plugin pro ajax upload souborů
+   * @return JsPlugin_JQuery
    */
   public function addPluginAjaxUploadFile() {
     $this->addFile(new JsPlugin_JsFile("ajaxupload.2.8.js"));
@@ -223,17 +319,10 @@ class JsPlugin_JQuery extends JsPlugin {
 
   /**
    * Metoda přidá plugin OpacityRollover
+   * @return JsPlugin_JQuery
    */
   public function addPluginOpacityRollOver() {
     $this->addFile(new JsPlugin_JsFile("jquery.opacityrollover.js"));
-    return $this;
-  }
-
-  /**
-   * Metoda přidá plugin pro práci s formuláři přes ajax requesty
-   */
-  public function addPluginAjaxForm() {
-    $this->addFile(new JsPlugin_JsFile("jquery.form.min.js"));
     return $this;
   }
 }
