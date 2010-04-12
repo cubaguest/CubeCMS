@@ -146,6 +146,21 @@ class Photogalerymed_Controller extends Articles_Controller {
       $ctr->editphotoController();
    }
 
+   public function exportArticleController(){
+      $this->checkReadableRights();
+      $model= new Articles_Model_Detail();
+      $article = $model->getArticle($this->getRequest('urlkey'));
+      if($article === false) return false;
+
+      $modelPhotos = new PhotoGalery_Model_Images();
+      $this->view()->article = $article;
+      $this->view()->images = $modelPhotos->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID});
+
+      // adresáře k fotkám
+      $this->view()->subdir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->view()->subdir);
+   }
+
    public static function settingsController(&$settings,Form &$form) {
       parent::settingsController($settings, $form);
       Photogalery_Controller::settingsController($settings, $form);

@@ -18,7 +18,7 @@ class Articles_Routes extends Routes {
       $this->addRoute('current', "current.(?P<output>(?:xml))", 'currentArticle', 'current.{output}');
       // exporty
       $this->addRoute('exportFeed', "(?P<type>(?:rss)|(?:atom)).xml", 'exportFeed', self::FEED_FILE);
-      $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml))", 'exportArticle','{urlkey}.{output}');
+      $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml)|(?:html))", 'exportArticle','{urlkey}.{output}');
 
 
       $this->addRoute('normal', null, 'main', null);

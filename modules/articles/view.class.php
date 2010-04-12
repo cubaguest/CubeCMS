@@ -137,6 +137,10 @@ class Articles_View extends View {
       $this->createArticleXml();
    }
 
+   public function exportArticleHtmlView() {
+      $this->template()->addTplFile('contentdetail.phtml');
+   }
+
    public function lastListXmlView() {
       $xml = new XMLWriter();
       $xml->openURI('php://output');

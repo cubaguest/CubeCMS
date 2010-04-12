@@ -91,6 +91,10 @@ class Photogalerymed_View extends Articles_View {
    
    public function checkFileView() {}
    public function uploadFileView() {}
+
+   public function exportArticleHtmlView() {
+      $this->template()->addTplFile('contentdetail.phtml');
+   }
 }
 
 ?>

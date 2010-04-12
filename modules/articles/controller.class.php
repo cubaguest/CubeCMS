@@ -298,9 +298,7 @@ class Articles_Controller extends Controller {
       $modle= new Articles_Model_Detail();
       $article = $modle->getArticle($this->getRequest('urlkey'));
       if($article === false) return false;
-
       $this->view()->article = $article;
-
    }
 
    /**
