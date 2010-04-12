@@ -7,6 +7,8 @@ class Articles_Routes extends Routes {
       $this->addRoute('top', "top", 'top', 'top/');
       $this->addRoute('archive', "archive", 'archive', 'archive/');
 
+      $this->addRoute('content', "content.html", 'content', 'content.html');
+
       
       $this->addRoute('add', "add", 'add', "add/");
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');

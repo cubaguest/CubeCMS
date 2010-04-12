@@ -28,6 +28,16 @@ class Articles_Controller extends Controller {
       $this->link()->backInit();
    }
 
+   public function contentController(){
+      //		Kontrola práv
+      $this->checkReadableRights();
+
+      // načtení článků
+      $artModel = new Articles_Model_List();
+      $articles = $artModel->getList($this->category()->getId(),0,100,!$this->rights()->isWritable());
+      $this->view()->articles = $articles;
+   }
+
    /**
     * Kontroler pro zobrazení novinek
     */

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `edit_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_user_last_edit` smallint(6) DEFAULT NULL,
   `viewed` smallint(6) NOT NULL DEFAULT '0',
-  `name_cs` varchar(400) DEFAULT NULL CHARACTER SET utf8 COLLATE utf8_czech_ci,
+  `name_cs` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL ,
   `text_cs` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `text_clear_cs` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `urlkey_cs` varchar(100) DEFAULT NULL,

@@ -2,7 +2,6 @@
 class Articles_View extends View {
    public function mainView() {
       $this->template()->addTplFile("list.phtml");
-      $this->template()->addCssFile("style.css");
       $feeds = new Component_Feed();
       $feeds->setConfig('feedLink', $this->link()->clear()->route('export'));
       $feeds->setConfig('urlArgName', "{type}");
@@ -11,6 +10,11 @@ class Articles_View extends View {
 
    public function topView() {
       $this->mainView();
+   }
+
+   public function contentView() {
+      $this->template()->addTplFile("contentlist.phtml");
+      echo $this->template();
    }
 
    public function showView() {
