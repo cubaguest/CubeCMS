@@ -7,6 +7,11 @@ class Photogalerymed_View extends Articles_View {
       $this->template()->addTplFile("list.phtml");
    }
 
+   public function contentView() {
+      $this->template()->addTplFile("contentlist.phtml");
+      echo $this->template();
+   }
+
    public function edittextView() {
       $this->template()->addTplFile("edittext.phtml");
    }

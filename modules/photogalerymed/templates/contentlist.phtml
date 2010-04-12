@@ -1,0 +1,40 @@
+<?
+$modelImages = new PhotoGalery_Model_Images();
+?>
+<div class="galeriesList">
+   <?if(!empty ($this->articles)) {
+      foreach ($this->articles as $article) {
+         $noPClass = $noPubllic = null;
+         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
+            $noPClass = 'noPublicGalery';
+            $noPubllic = '<span class="smallFont">'.$this->_('Nezveřejněno').'</span>';
+         }
+         $addDate = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+         ?>
+   <div class="<?=$noPClass?>">
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+            <span class="smallFont"><?=strftime("%x %X", $addDate->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+         </a><?=$noPubllic?>
+      </h2>
+      <?
+      $images = $modelImages->getImages($this->category()->getId(), 
+              $article->{Articles_Model_Detail::COLUMN_ID},
+              $this->category()->getParam('imagesinlist', Photogalerymed_Controller::DEFAULT_IMAGES_IN_LIST));
+      while ($row = $images->fetch()) {?>
+      <img alt="<?=$row->{PhotoGalery_Model_Images::COLUMN_NAME}?>" 
+           src="<?=$this->category()->getModule()->getDataDir(true).
+              $article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+              .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL
+              .URL_SEPARATOR.$row->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
+      <?}?>
+
+            <?echo $article->{Articles_Model_Detail::COLUMN_TEXT}?>
+      <hr class="reseter" />
+      <br />
+   </div>
+     <?}
+   } else {
+      print ($this->_('Není vložena žádná galerie'));
+   }?>
+</div>
