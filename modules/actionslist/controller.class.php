@@ -134,7 +134,7 @@ class ActionsList_Controller extends Controller {
 
    public function featuredListController() {
       $model = new Actions_Model_List();
-      $ids = explode(',', $this->category()->getModule()->getParam(self::PARAM_CATEGORY_IDS, '0'));
+      $ids = $this->category()->getModule()->getParam(self::PARAM_CATEGORY_IDS, array(0));
       $toDate = new DateTime();
       $toDate->modify("+6 month");
       $this->view()->actions = $model->getActionsByCatIds(new DateTime(), $toDate, $ids);
