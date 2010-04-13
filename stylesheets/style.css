@@ -16,7 +16,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
    padding: 0;
    border: 0;
    outline: 0;
-   font-size: 10pt;
+   font-size: 98%;
    /*vertical-align: baseline; /* Ověřit v IE */
    background: transparent;
 }
@@ -191,12 +191,12 @@ body {
 
 /* uprava prvku globalne */
 h1 {
-   font-size: 12pt;
+   font-size: large;
    color: black;
 }
 
 h2, h2 a {
-   font-size: 14pt;
+   font-size: medium;
 }
 
 h3 a {
@@ -331,7 +331,7 @@ fieldset legend {
 input, button, textarea {
    border: 1px solid #0f6572;
    background-color: #e1ebec;
-   font-size: 10pt;
+   font-size: small;
    font-family: "Tahoma", "Arial", sans-serif;
 }
 
@@ -396,99 +396,8 @@ div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
 /* EOF sitemap Content */
 
 .note {
-   font-size: 8pt;
+   font-size: xx-small;
    padding-bottom: 5px;
-}
-
-/* komentáře */
-.comment_add_table {
-   width: 100%;
-   font-size: 10pt;
-}
-
-.comment_add_table textarea {
-   width: 100%;
-}
-
-.comment_user_foto {
-   /*display: inline;*/
-   float: left;
-   padding: 8px 8px 8px 8px;
-
-}
-
-.comment_correct {
-   clear: left;
-   height: 0px;
-}
-.comment_text {
-   /*margin-bottom: auto;*/
-   padding: 8px 8px 8px 8px;
-   text-align: justify;
-   /*float: right;*/
-}
-.comment_text li{
-   margin-left: 16px;
-}
-
-/* Menu */
-.hlavicka_menu {
-   color: white;
-   padding-top: 2px;
-   padding-bottom: 2px;
-   font-weight: bold;
-}
-
-.hlavicka_menu a:link {
-   color: #DFEDED;
-}
-
-.hlavicka_menu a:visited {
-   color: #DFEDED;
-}
-
-.hlavicka_menu a:hover {
-   color: white;
-}
-
-.hlavicka_menu a:visited {
-
-}
-
-#menu_1 {
-   float: left;
-   padding: 1px;
-   padding-left: 3px;
-}
-
-#menu_2 {
-   text-align: right;
-   padding: 1px;
-   padding-right: 3px;
-}
-
-/* prvky levého a pravého menu a panely */
-.menu_bar {
-   border: 1px solid #0f6572;
-   background-color: white;
-   margin: 0 5px 10px 5px;
-   font-size: 9pt;
-}
-
-.menu_bar h3 {
-   background-color: #007070;
-   color: white;
-   padding: 2px 0 2px 4px;
-   font-size: 10pt;
-}
-
-.menu_bar_obsah {
-   margin: 5px;
-   font-size: 9pt;
-}
-
-.text_panel {
-   padding: 5px 5px 5px 5px;
 }
 
 /* Styl pro vnitrek boxu */
@@ -505,48 +414,6 @@ div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
 .moduleBox>div {
 
 }
-
-/* Jazykové taby */
-/* TABS content */
-.ui-tabs-hide { display: none; }
-
-.ui-tabs-selected { background-color: white; }
-
-ul.langMenu {
-   margin-bottom:2px;
-   /*background-color: white;*/
-}
-
-
-ul.langMenu li {
-   display: inline;
-   border-width: 1px 1px 0 1px;
-   border-color: black;
-   border-style: solid;
-   padding: 3px;
-}
-
-ul.langMenu li a img {
-   padding-right: 3px;
-}
-
-.normal ul {
-   margin: 0;
-}
-
-
-ul.ui-tabs-panel {
-   margin-bottom: 0px;
-   border-width: 1px;
-   border-color: black;
-   border-style: none;
-}
-
-.contentBox {
-   position: relative;
-}
-/* EOF Jazykové taby */
-
 
 /* scrolovátka */
 .scroll_main {
@@ -568,25 +435,8 @@ ul.ui-tabs-panel {
 
 .scroll_main p {
    vertical-align: 4px;
-   /*font-size: 12pt;*/
    display: inline;
    /* font-weight: bold;*/
-}
-
-/* Uživatelské soubory */
-.userFiles table, .userImages table {
-   width: 100%;
-   border: 1px solid #0f6572;
-}
-
-#uploadFileButton {
-   cursor: pointer;
-}
-
-/* Tabulkový obsah */
-.tabcontent {
-   border: 1px solid black;
-   padding: 5px;
 }
 
 /* SOF navigtion menu */

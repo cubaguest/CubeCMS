@@ -75,6 +75,11 @@ ul.dropdown li:hover > ul { visibility: visible; }
    opacity: 0.3;
 }
 
+.toolbox form p {
+   padding: 0 !important;
+   margin: 0 !important
+}
+
 .toolbox input {
    background:none;
    border:none;
@@ -99,3 +104,50 @@ ul.dropdown li:hover > ul { visibility: visible; }
    color: black;
 }
 /* EOF Panel s editací */
+
+/* Jazykové taby */
+/* TABS content */
+.ui-tabs-hide { display: none; }
+
+.ui-tabs-selected { background-color: white; }
+
+ul.langMenu {
+   margin-bottom:2px;
+   /*background-color: white;*/
+}
+
+
+ul.langMenu li {
+   display: inline;
+   border-width: 1px 1px 0 1px;
+   border-color: black;
+   border-style: solid;
+   padding: 3px;
+}
+
+ul.langMenu li a img {
+   padding-right: 3px;
+}
+
+.normal ul {
+   margin: 0;
+}
+
+
+ul.ui-tabs-panel {
+   margin-bottom: 0px;
+   border-width: 1px;
+   border-color: black;
+   border-style: none;
+}
+
+.contentBox {
+   position: relative;
+}
+/* EOF Jazykové taby */
+
+/* tabulky */
+.valuesTable {
+   background-color: white;
+   border: 1px solid gray;
+}
