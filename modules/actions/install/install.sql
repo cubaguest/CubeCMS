@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}actions` (
   `text_sk` text CHARACTER SET utf8 COLLATE utf8_slovak_ci NOT NULL,
   `text_clear_sk` text CHARACTER SET utf8 COLLATE utf8_slovak_ci,
   `urlkey_sk` varchar(200) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
-  `note_cs` varchar(500) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `note_sk` varchar(500) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `name_en` varchar(50) DEFAULT NULL,
   `subname_en` varchar(200) DEFAULT NULL,
   `text_en` text,
