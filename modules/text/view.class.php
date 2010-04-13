@@ -21,6 +21,10 @@ class Text_View extends View {
    }
    /*EOF mainView*/
 
+   public function contentView() {
+      echo (string)$this->text->{Text_Model_Detail::COLUMN_TEXT};
+   }
+
    public function editView() {
       $this->template()->addTplFile("textedit.phtml");
    }

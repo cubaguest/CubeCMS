@@ -11,10 +11,14 @@ class Text_Controller extends Controller {
  */
    public function mainController() {
       //		Kontrola práv
+      $this->checkReadableRights();
       $model = new Text_Model_Detail();
       // text
       $this->view()->text = $model->getText(Category::getSelectedCategory()->getId(),self::TEXT_MAIN_KEY);
-      $this->checkReadableRights();
+   }
+
+   public function contentController() {
+      $this->mainController();
    }
 
    /**
