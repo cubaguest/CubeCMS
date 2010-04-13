@@ -8,6 +8,14 @@ class KzMainPage_View extends View {
    public function mainView() {
       $this->template()->setPVar('panelsOff', true);
       $this->template()->addTplFile("info.phtml");
+
+      if($this->rights()->isWritable()){
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_items', $this->_("Upravit položky"),
+              $this->link()->route('edititems'),
+              $this->_("Upravit zobrazené položky"), "page_edit.png");
+         $this->toolbox = $toolbox;
+      }
    }
 
    public function edititemsView(){
