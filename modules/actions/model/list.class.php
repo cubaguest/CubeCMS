@@ -132,8 +132,10 @@ class Actions_Model_List extends Model_PDO {
       }
 
       $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()
-              ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE
-              ." ,user.".Model_Users::COLUMN_USERNAME
+              ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE.","
+              ." user.".Model_Users::COLUMN_USERNAME.","
+              ." IF(stop_date, ABS(DATEDIFF(start_date,:dateStart)), DATEDIFF(start_date, :dateStart)) AS delta_days,"
+              ." IF(actions.`time`,actions.`time`, '23:59:59') AS timeord"
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
@@ -145,7 +147,7 @@ class Actions_Model_List extends Model_PDO {
               ." OR (".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND `".Actions_Model_Detail::COLUMN_TIME."` >= CURTIME())"
               ." OR (".Actions_Model_Detail::COLUMN_DATE_START." > :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
               ." OR (".Actions_Model_Detail::COLUMN_DATE_STOP." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_STOP." <= :dateStop) )"
-              ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC, `".Actions_Model_Detail::COLUMN_TIME."` ASC");
+              ." ORDER BY delta_days ASC, ".Actions_Model_Detail::COLUMN_DATE_START." ASC, `".Actions_Model_Detail::COLUMN_TIME."` ASC, timeord ASC");
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindValue(':dateStart', $fromTime->format('Y-m-d'), PDO::PARAM_STR);
       $dbst->bindValue(':dateStop', $toTime->format('Y-m-d'), PDO::PARAM_STR);
@@ -258,7 +260,8 @@ class Actions_Model_List extends Model_PDO {
               ." = cat.".Model_Category::COLUMN_CAT_ID
               ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." IN (".$in."))"
               ." AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)"
-              ." AND ((".Actions_Model_Detail::COLUMN_DATE_START." >= CURDATE() AND ".Actions_Model_Detail::COLUMN_TIME." >= CURTIME())"
+              ." AND ((".Actions_Model_Detail::COLUMN_DATE_START." >= CURDATE())"
+//              ." AND ((".Actions_Model_Detail::COLUMN_DATE_START." >= CURDATE() AND ".Actions_Model_Detail::COLUMN_TIME." >= CURTIME())"
               ." OR (".Actions_Model_Detail::COLUMN_DATE_START." >= DATE_ADD(CURDATE(), INTERVAL 1 DAY)))"
               ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC, ".Actions_Model_Detail::COLUMN_TIME." ASC");
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
