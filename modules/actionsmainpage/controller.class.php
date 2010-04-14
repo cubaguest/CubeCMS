@@ -22,50 +22,6 @@ class ActionsMainPage_Controller extends Controller {
       $this->view()->actions = $actions;
    }
 
-   // RSS
-//   public function exportController() {
-//      $this->checkReadableRights();
-//      $this->view()->type = $this->getRequest('type', 'rss');
-//
-//      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
-//
-//      $acM = new Actions_Model_List();
-//      $actions = $acM->getActionsByAddedByCatIds($ids, VVE_FEED_NUM);
-//      $this->view()->actions = $actions;
-//   }
-//
-//   public function listCatAddController(){
-//      $this->checkWritebleRights();
-//      $catM = new Model_Category();
-//
-//      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
-//      $catsArr = array();
-//      foreach ($ids as $idc){
-//          $cat = $catM->getCategoryById($idc);
-//          array_push($catsArr, array('name' => $cat->{Model_Category::COLUMN_CAT_LABEL},
-//                  'url' => $this->link()->category($cat->{Model_Category::COLUMN_URLKEY})->route('add')));
-//      }
-//      $this->view()->categories = $catsArr;
-//
-//   }
-//
-//   public function featuredListController() {
-//      $model = new Actions_Model_List();
-//      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
-//      $toDate = new DateTime();
-//      $toDate->modify("+6 month");
-//      $this->view()->actions = $model->getActionsByCatIds(new DateTime(), $toDate, $ids);
-//      if($this->view()->action === false) return false;
-//   }
-//
-//   public function currentActController() {
-//      $model = new Actions_Model_List();
-//      $ids = explode(',', $this->category()->getModule()->getParam('catids', '0'));
-//      $actions = $model->getActionsByCatIds(time(), time()+3600*24*30, $ids);
-//
-//      $this->view()->action = $actions->fetch();
-////      if($this->view()->action === false) return false;
-//   }
    public static function settingsController(&$settings,Form &$form) {
       $catM = new Model_Category();
       $modules = array('actions', 'actionswgal');
