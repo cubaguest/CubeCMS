@@ -13,53 +13,20 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
-class Form_Element_Submit extends Form_Element implements Form_Element_Interface {
+class Form_Element_Button extends Form_Element_Submit implements Form_Element_Interface {
    protected function init() {
       $this->htmlElement = new Html_Element('input');
-      $this->html()->setAttrib('type', 'submit');
-//      $this->htmlElementLabel = new Html_Element('label');
+      $this->html()->setAttrib('type', 'button');
    }
-
-   /**
-    * Metoda naplní prvek
-    */
-//   public function populate() {
-//      if(isset ($_REQUEST[$this->getName()])){
-//         $this->setValues($_REQUEST[$this->getName()]);
-//      }
-//      $this->isPopulated = true;
-//   }
-
-   /**
-    * Metoda vrací jestli je potvrzovací tlačítko validní (odesláno)
-    * @return boolean -- true pokud je odesláno
-    */
-//   public function isValid() {
-//      return $this->isSend();
-//   }
 
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
    public function controll() {
-      
-//      $this->html()->setAttrib('name', $this->getName());
+      $this->html()->setAttrib('type', 'button');
       $this->setValues($this->getLabel());
-//      return $this->html();
       return parent::controll();
-   }
-
-   /**
-    * Metoda vrací label
-    * @return string
-    */
-   public function label() {
-      return null;
-   }
-
-   public function  __toString() {
-      return (string)$this->controll();
    }
 }
 ?>
