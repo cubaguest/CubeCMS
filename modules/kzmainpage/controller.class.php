@@ -6,6 +6,8 @@
 class KzMainPage_Controller extends Controller {
    const XML_WEBS_FILE = 'kzmainpage.xml';
    const XML_WEBS_SETTINGS_FILE = 'kzmainpagesettings.xml';
+   const CACHED_FILE = 'kzmainpage.tmp';
+   const DEFAULT_CACHED_HOURS = 5;
    /**
     * Kontroler pro zobrazení textu
     */
@@ -13,27 +15,35 @@ class KzMainPage_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
 
-      $cntFile = new Filesystem_File_Text(self::XML_WEBS_FILE, AppCore::getAppWebDir()
-      .VVE_DATA_DIR.DIRECTORY_SEPARATOR);
+      $cachedFile = new Filesystem_File_Text(self::CACHED_FILE, AppCore::getAppCacheDir());
+      $cachedSec = $this->category()->getParam('cached_hours', self::DEFAULT_CACHED_HOURS)*60*60;
 
-      $infos = array();
-      if($cntFile->exist()){
-         $websXml = new SimpleXMLElement($cntFile->getContent());
+      if($cachedFile->exist() == false OR $cachedFile->changeTime()+$cachedSec < time()) {
+         $cntFile = new Filesystem_File_Text(self::XML_WEBS_FILE, AppCore::getAppWebDir()
+                         .VVE_DATA_DIR.DIRECTORY_SEPARATOR);
 
-         // načítání jednotlivých adre
-         foreach ($websXml->box as $box) {
-            if((string)$box['url'] == NULL OR (string)$box['url'] == '' OR !vve_url_exists((string)$box['url'])) continue;
-            $cnt = file_get_contents((string)$box['url']);
-            // načtení obsahu
-            try {
-               $webDataXml = new SimpleXMLElement($cnt);
-               $b = array('data' => $webDataXml, 'name' => (string)$box);
-               array_push($infos, $b);
-            } catch (Exception $exc) {
-               continue;
+         $infos = array();
+         if($cntFile->exist()) {
+            $websXml = new SimpleXMLElement($cntFile->getContent());
+            // načítání jednotlivých adre
+            $api = new Component_Api_VVEArticle();
+            foreach ($websXml->box as $box) {
+               if((string)$box['url'] == NULL OR (string)$box['url'] == '' OR !vve_url_exists((string)$box['url'])) continue;
+               $cnt = file_get_contents((string)$box['url']);
+               // načtení obsahu
+               try {
+                  $api->setContent($cnt);
+                  $b = array('data' => $api->getArray(), 'name' => (string)$box);
+                  array_push($infos, $b);
+               } catch (Exception $exc) {
+                  continue;
+               }
             }
-
          }
+         // uložíme do cache
+         $cachedFile->setContent(serialize($infos));
+      } else {
+         $infos = unserialize($cachedFile->getContent());
       }
       $this->view()->infos = $infos;
    }
@@ -41,11 +51,11 @@ class KzMainPage_Controller extends Controller {
    public function edititemsController() {
       $this->checkWritebleRights();
       $fileApis = new Filesystem_File_Text(self::XML_WEBS_SETTINGS_FILE, AppCore::getAppWebDir()
-      .VVE_DATA_DIR.DIRECTORY_SEPARATOR);
+                      .VVE_DATA_DIR.DIRECTORY_SEPARATOR);
 
       $webs = array();
       $boxApis = array();
-      if($fileApis->exist()){
+      if($fileApis->exist()) {
          $websApisXml = new SimpleXMLElement($fileApis->getContent());
 
          // načítání jednotlivých adre
@@ -55,7 +65,7 @@ class KzMainPage_Controller extends Controller {
 
             $box = (string)$web['boxname'];
             if(!isset ($webs[$box])) $webs[$box]
-            = array('name' => (string)$web, 'options' => array(),
+                       = array('name' => (string)$web, 'options' => array(),
                        'actualurl' => (string)$web['actualurl']);
             $cnt = file_get_contents((string)$web['listurl']);
             // načtení seznamu
@@ -77,7 +87,7 @@ class KzMainPage_Controller extends Controller {
       $websSavedFile = new Filesystem_File_Text(self::XML_WEBS_FILE, AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR);
       $currentBoxes = array();
 
-      if($websSavedFile->exist()){
+      if($websSavedFile->exist()) {
          $websXml = new SimpleXMLElement($websSavedFile->getContent());
          foreach ($websXml->box as $box) {
             array_push($currentBoxes, $box);
@@ -128,7 +138,7 @@ class KzMainPage_Controller extends Controller {
          $urls = $form->sel_article->getValues();
          foreach ($boxes as $key => $box) {
             $xml->startElement('box'); // SOF article
-            if($types[$key] == 'selected'){
+            if($types[$key] == 'selected') {
                $xml->writeAttribute('url',$urls[$key]);
             } else {
                $xml->writeAttribute('url',$webs[$boxes[$key]]['actualurl']);
@@ -140,9 +150,10 @@ class KzMainPage_Controller extends Controller {
          $xml->endElement(); // eof article
          $xml->endDocument(); //EOF document
          file_put_contents(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-         .self::XML_WEBS_FILE, $xml->outputMemory());
+                 .self::XML_WEBS_FILE, $xml->outputMemory());
 
          $this->infoMsg()->addMessage($this->_('Rozložení boxů bylo uloženo'));
+         $this->clearCacheFile();
          $this->link()->route()->reload();
       }
 
@@ -152,7 +163,7 @@ class KzMainPage_Controller extends Controller {
    public function loadArticlesController() {
       $this->checkWritebleRights();
       $websApisXml = new SimpleXMLElement(file_get_contents(AppCore::getAppWebDir()
-      .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_SETTINGS_FILE));
+              .VVE_DATA_DIR.DIRECTORY_SEPARATOR.self::XML_WEBS_SETTINGS_FILE));
 
       // načítání jednotlivých adre
       $articles = array();
@@ -171,6 +182,34 @@ class KzMainPage_Controller extends Controller {
          }
       }
       $this->view()->articles = $articles;
+   }
+
+   /**
+    * Metoda vymaže soubor z cache
+    */
+   private static function clearCacheFile() {
+      $cachedFile = new Filesystem_File_Text(self::CACHED_FILE, AppCore::getAppCacheDir());
+      $cachedFile->remove();
+   }
+
+   /**
+    * Metoda pro nastavení modulu
+    */
+   public static function settingsController(&$settings,Form &$form) {
+      $form->addGroup('basic', 'Základní nasatvení');
+
+      $elemCachedHours = new Form_Element_Text('cahce', 'Počet hodin kešování obsahu titulní strany');
+      $elemCachedHours->setSubLabel('Výchozí: '.self::DEFAULT_CACHED_HOURS.' hod.');
+      $elemCachedHours->addValidation(new Form_Validator_IsNumber());
+      $form->addElement($elemCachedHours, 'basic');
+
+      if(isset($settings['cached_hours'])) {
+         $form->cahce->setValues($settings['cached_hours']);
+      }
+      // znovu protože mohl být už jednou validován bez těchto hodnot
+      if($form->isValid()) {
+         $settings['cahced_hours'] = $form->cache->getValues();
+      }
    }
 }
 

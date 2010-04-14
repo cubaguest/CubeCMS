@@ -7,30 +7,30 @@ $this->addCssFile('style.css');
    foreach ($this->infos as $key => $info) {?>
    <div class="mainPageBoxWrapper">
       <div class="mainPageBox box<?=$info['name']?>">
-         <?if($info['data']->web['link'] == Url_Link::getMainWebDir()){ // pokud je lokální ?>
-            <a href="<?=$info['data']->category['link']?>" title="<?=$info['data']->category?>"><?=$info['data']->category?></a>
+         <?if($info['data']['web']['url'] == Url_Link::getMainWebDir()){ // pokud je lokální ?>
+            <a href="<?=$info['data']['category']['url']?>" title="<?=$info['data']['category']['name']?>"><?=$info['data']['category']['name']?></a>
          <? } else {?>
-            <a href="<?=$info['data']->web['link']?>" title="<?=$info['data']->web?>"><?=$info['data']->web?></a>
+            <a href="<?=$info['data']['web']['url']?>" title="<?=$info['data']['web']['name']?>"><?=$info['data']['web']['name']?></a>
          <? }?>
-            <h2><a href="<?=$info['data']->url?>" title="<?=$info['data']->name?>"><?=$info['data']->name?></a></h2>
+            <h2><a href="<?=$info['data']['article']['url']?>" title="<?=$info['data']['article']['name']?>"><?=$info['data']['article']['name']?></a></h2>
             <?//var_dump($info['data']->image);
-            if (isset ($info['data']->image)) { ?>
+            if (isset ($info['data']['article']['image'])) { ?>
           <!--<img src="" />-->
-            <img style="width: 100%;" src="<?=$info['data']->image?>" alt="image for <?=$info['data']->name?>" />
+            <img style="width: 100%;" src="<?=$info['data']['article']['image']?>" alt="image for <?=$info['data']['article']['name']?>" />
                <?} else {?>
           <!--<img src="" />-->
                <?}?>
          <p class="boxShortText">
-               <?=$info['data']->shorttext?>
+               <?=$info['data']['article']['text']?>
          </p>
             <?
             $price = null;
-            if (isset ($info['data']->price) AND isset ($info['data']->preprice)) {
-               $price = sprintf($this->_('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč'), $info['data']->price, $info['data']->preprice);
-            } else if(isset ($info['data']->preprice)) {
-               $price = sprintf($this->_('cena: <span title="V předporodeji">%s</span> Kč'), $info['data']->preprice);
-            } else if(isset ($info['data']->price)) {
-               $price = sprintf($this->_('cena: <span title="Na místě">%s</span> Kč'), $info['data']->price);
+            if (isset ($info['data']['data']['price']) AND isset ($info['data']['data']['preprice'])) {
+               $price = sprintf($this->_('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč'), $info['data']['data']['price'], $info['data']['data']['preprice']);
+            } else if(isset ($info['data']['data']['preprice'])) {
+               $price = sprintf($this->_('cena: <span title="V předporodeji">%s</span> Kč'), $info['data']['data']['preprice']);
+            } else if(isset ($info['data']['data']['price'])) {
+               $price = sprintf($this->_('cena: <span title="Na místě">%s</span> Kč'), $info['data']['data']['price']);
             }
             if($price != null) {?>
          <p class="boxPrice"><?=$price?></p>

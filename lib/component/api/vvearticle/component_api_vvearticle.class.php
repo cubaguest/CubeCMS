@@ -21,19 +21,19 @@ class Component_Api_VVEArticle extends Component {
     * Pole s popisem webu
     * @var array
     */
-   private $web = array('name' => null, 'link' => null);
+   private $web = array('name' => null, 'url' => null);
 
    /**
     * Pole s popisem kategorie
     * @var array
     */
-   private $category = array('name' => null, 'link' => null);
+   private $category = array('name' => null, 'url' => null);
 
    /**
     * Pole s konfiguračními hodnotami
     * @var array
     */
-   private $article = array('name' => null, 'link' => null, 'text' => null, 'image' => null);
+   private $article = array('name' => null, 'url' => null, 'text' => null, 'image' => null);
 
    /**
     * Objekt s XMl
@@ -54,7 +54,7 @@ class Component_Api_VVEArticle extends Component {
     */
    public function setWebName($name, $link) {
       $this->web['name'] = $name;
-      $this->web['link'] = $link;
+      $this->web['url'] = $link;
    }
 
    /**
@@ -64,7 +64,7 @@ class Component_Api_VVEArticle extends Component {
     */
    public function setCategory($name, $link) {
       $this->category['name'] = $name;
-      $this->category['link'] = $link;
+      $this->category['url'] = $link;
    }
 
    /**
@@ -74,7 +74,7 @@ class Component_Api_VVEArticle extends Component {
     */
    public function setArticle($name, $link, $text, $image = null) {
       $this->article['name'] = $name;
-      $this->article['link'] = $link;
+      $this->article['url'] = $link;
       $this->article['text'] = $text;
       $this->article['image'] = $image;
    }
@@ -93,7 +93,17 @@ class Component_Api_VVEArticle extends Component {
     * @param string $cnt
     */
    public function setContent($cnt) {
-
+      $xml = new SimpleXMLElement($cnt);
+      $this->setWebName((string)$xml->web->name, (string)$xml->web->url);
+      $this->setCategory((string)$xml->category->name, (string)$xml->category->url);
+      $img = null;
+      if(isset ($xml->image)){
+         $img = (string)$xml->image;
+      }
+      $this->setArticle((string)$xml->name, (string)$xml->url, (string)$xml->text, $img);
+      if(isset ($xml->data)){
+         $this->data = (array)$xml->data;
+      }
    }
 
    /**
@@ -137,13 +147,13 @@ class Component_Api_VVEArticle extends Component {
       $this->xml->writeAttribute('xml:lang', Locale::getLang());
       // informace o webu
       $this->xml->startElement('web');
-      $this->xml->writeAttribute('link', $this->web['link']);
-      $this->xml->writeRaw($this->web['name']);
+      $this->xml->writeElement('name', $this->web['name']);
+      $this->xml->writeElement('url', $this->web['url']);
       $this->xml->endElement();
       // kategorie
       $this->xml->startElement('category'); // sof article
-      $this->xml->writeAttribute('link', $this->category['link']);
-      $this->xml->writeRaw($this->category['name']);
+      $this->xml->writeElement('name', $this->category['name']);
+      $this->xml->writeElement('url', $this->category['url']);
       $this->xml->endElement();
 
       // informace o článku/akci
@@ -152,7 +162,6 @@ class Component_Api_VVEArticle extends Component {
             $this->xml->writeElement($key, $value);
          }
       }
-
       if(!empty ($this->data)){
          $this->xml->startElement('data');
          foreach ($this->data as $key => $data){

@@ -122,50 +122,29 @@ class Actions_View extends View {
    }
 
    protected function createActionXml($action) {
-      $xml = new XMLWriter();
-      $xml->openURI('php://output');
-      // hlavička
-      $xml->startDocument('1.0', 'UTF-8');
-      $xml->setIndent(4);
+      $api = new Component_Api_VVEArticle();
 
-      // rss hlavička
-      $xml->startElement('article'); // SOF article
-      $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
-      $xml->writeAttribute('xml:lang', Locale::getLang());
-      // informace o webu
-      $xml->startElement('web');
-      $xml->writeAttribute('link', Url_Link::getMainWebDir());
-      $xml->writeRaw(VVE_WEB_NAME);
-      $xml->endElement();
-      // kategorie
-      $xml->startElement('category'); // sof article
-      $xml->writeAttribute('link', $this->link()->clear());
-      $xml->writeRaw($this->category()->getName());
-      $xml->endElement();
+      $api->setCategory($this->category()->getName(), $this->link()->clear());
 
-      // informace o článku/akci
-      $xml->writeElement('name', $action->{Actions_Model_Detail::COLUMN_NAME});
-      $xml->writeElement('url', $this->link()->route('detail',
-              array('urlkey'=>$action->{Actions_Model_Detail::COLUMN_URLKEY})));
-      $xml->writeElement('shorttext', vve_tpl_truncate(vve_strip_tags(
-              $action->{Actions_Model_Detail::COLUMN_TEXT}),400));
+      $img = null;
+      if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null){
+         $img = $this->category()->getModule()->getDataDir(true)
+                  .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()]
+                  .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE};
+      }
+
+      $api->setArticle($action->{Actions_Model_Detail::COLUMN_NAME},
+              $this->link()->route('detail', array('urlkey'=>$action->{Actions_Model_Detail::COLUMN_URLKEY})),
+              vve_tpl_truncate(vve_strip_tags($action->{Actions_Model_Detail::COLUMN_TEXT}),400),$img);
+
       if((int)$action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-         $xml->writeElement('price', $action->{Actions_Model_Detail::COLUMN_PRICE});
+         $api->setData('price', $action->{Actions_Model_Detail::COLUMN_PRICE});
       }
       if((int)$action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-         $xml->writeElement('preprice', $action->{Actions_Model_Detail::COLUMN_PREPRICE});
-      }
-      if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-         $xml->writeElement('image', $this->category()->getModule()->getDataDir(true)
-                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()].URL_SEPARATOR
-                 .$action->{Actions_Model_Detail::COLUMN_IMAGE});
+         $api->setData('preprice', $action->{Actions_Model_Detail::COLUMN_PREPRICE});
       }
 
-
-      $xml->endElement(); // eof article
-      $xml->endDocument(); //EOF document
-
-      $xml->flush();
+      $api->flush();
    }
    /**
     * Viewer pro editaci novinky

@@ -174,40 +174,15 @@ class Articles_View extends View {
     * @param Object $article
     */
    protected function createArticleXml() {
+      $api = new Component_Api_VVEArticle();
+      $api->setCategory($this->category()->getName(), $this->link()->clear());
       $article = $this->article;
-      $xml = new XMLWriter();
-      $xml->openURI('php://output');
-      // hlavička
-      $xml->startDocument('1.0', 'UTF-8');
-      $xml->setIndent(4);
-
-      // rss hlavička
-      $xml->startElement('article'); // SOF article
-      $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
-      $xml->writeAttribute('xml:lang', Locale::getLang());
-      // informace o webu
-      $xml->startElement('web');
-      $xml->writeAttribute('link', Url_Link::getMainWebDir());
-      $xml->writeRaw(VVE_WEB_NAME);
-      $xml->endElement();
-      // kategorie
-      $xml->startElement('category'); // sof article
-      $xml->writeAttribute('link', $this->link()->clear());
-      $xml->writeRaw($this->category()->getName());
-      $xml->endElement();
-
-      // informace o článku/akci
       if($article != null OR $article != false){
-      $xml->writeElement('name', $article->{Articles_Model_Detail::COLUMN_NAME});
-      $xml->writeElement('url', $this->link()->route('detail',
-              array('urlkey'=>$article->{Articles_Model_Detail::COLUMN_URLKEY})));
-      $xml->writeElement('shorttext', vve_tpl_truncate(vve_strip_tags(
-              $article->{Articles_Model_Detail::COLUMN_TEXT}),400));
+         $api->setArticle($article->{Articles_Model_Detail::COLUMN_NAME},
+             $this->link()->route('detail', array('urlkey'=>$article->{Articles_Model_Detail::COLUMN_URLKEY})),
+             vve_tpl_truncate(vve_strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}),400));
       }
-      $xml->endElement(); // eof article
-      $xml->endDocument(); //EOF document
-
-      $xml->flush();
+      $api->flush();
    }
 }
 

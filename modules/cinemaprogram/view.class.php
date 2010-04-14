@@ -74,53 +74,32 @@ class CinemaProgram_View extends View {
    }
 
    protected function createMovieXml($movie) {
-      $xml = new XMLWriter();
-      $xml->openURI('php://output');
-      // hlavička
-      $xml->startDocument('1.0', 'UTF-8');
-      $xml->setIndent(4);
+      $api = new Component_Api_VVEArticle();
 
-      // rss hlavička
-      $xml->startElement('article'); // SOF article
-      $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
-      $xml->writeAttribute('xml:lang', Locale::getLang());
-      // informace o webu
-      $xml->startElement('web');
-      $xml->writeAttribute('link', Url_Link::getMainWebDir());
-      $xml->writeRaw(VVE_WEB_NAME);
-      $xml->endElement();
-      // kategorie
-      $xml->startElement('category'); // sof article
-      $xml->writeAttribute('link', $this->link()->clear());
-      $xml->writeRaw($this->category()->getName());
-      $xml->endElement();
-
+      $api->setCategory($this->category()->getName(), $this->link()->clear());
 
       // informace o článku/akci
       if($movie != null) {
-         $xml->writeElement('name', $movie->{CinemaProgram_Model_Detail::COL_NAME});
-         $xml->writeElement('url', $this->link()->route('detail',
-                 array('id'=>$movie->{CinemaProgram_Model_Detail::COL_ID},
-                 'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME}))));
-         $xml->writeElement('shorttext', vve_tpl_truncate($movie->{CinemaProgram_Model_Detail::COL_LABEL_CLEAR},200));
-         if((int)$movie->{CinemaProgram_Model_Detail::COL_PRICE} != null|0) {
-            $xml->writeElement('price', $movie->{CinemaProgram_Model_Detail::COL_PRICE});
-         }
+         $img = null;
          if($movie->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {
-            $xml->writeElement('image', $this->category()->getModule()->getDataDir(true)
-                    .$movie->{CinemaProgram_Model_Detail::COL_IMAGE});
+            $img = $this->category()->getModule()->getDataDir(true)
+                    .$movie->{CinemaProgram_Model_Detail::COL_IMAGE};
+         }
+
+         $api->setArticle($movie->{CinemaProgram_Model_Detail::COL_NAME},
+                 $this->link()->route('detail', array('id'=>$movie->{CinemaProgram_Model_Detail::COL_ID},
+                 'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME}))),
+                  vve_tpl_truncate($movie->{CinemaProgram_Model_Detail::COL_LABEL_CLEAR},200), $img);
+
+         if((int)$movie->{CinemaProgram_Model_Detail::COL_PRICE} != null|0) {
+            $api->setData('price', $movie->{CinemaProgram_Model_Detail::COL_PRICE});
          }
       }
-
-
-      $xml->endElement(); // eof article
-      $xml->endDocument(); //EOF document
-
-      $xml->flush();
+      $api->flush();
    }
 
    public function currentMovieXmlView() {
-      $c = $this->createMovieXml($this->movie);
+      $this->createMovieXml($this->movie);
    }
 }
 
