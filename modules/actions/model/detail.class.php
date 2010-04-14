@@ -143,7 +143,7 @@ class Actions_Model_Detail extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_PUBLIC." = 1)"
-              ." AND ((".self::COLUMN_DATE_START." >= CURDATE()"
+              ." AND ((".self::COLUMN_DATE_START." >= CURDATE())"
               ." OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_DATE_START." < CURDATE()))"
               ." ORDER BY start_date, time LIMIT 0, 1");
       $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
