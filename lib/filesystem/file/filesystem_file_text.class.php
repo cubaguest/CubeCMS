@@ -42,5 +42,14 @@ class Filesystem_File_Text extends Filesystem_File {
 		}
 		return null;
 	}
+
+   /**
+    * Metoda uloží obsah do souboru
+    * @param string $cnt -- obsah
+    * @param int $flags -- flag viz. funkce file_put_contents
+    */
+   public function setContent($cnt, $flags = 0){
+      return file_put_contents($this->getName(true), $cnt, $flags);
+   }
 }
 ?>
