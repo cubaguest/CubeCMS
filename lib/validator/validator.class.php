@@ -11,25 +11,45 @@
  */
 
 class Validator {
+   /**
+    * Proměná s výsledkem validátoru
+    * @var boolean
+    */
+   protected $isValid = true;
+
+   /**
+    * Proměná s hodnotou
+    * @var mixed
+    */
+   protected $values = null;
+
 	/**
 	 * Konstruktor nastaví základní parametry
 	 */
-	final public function  __construct() {}
+	public function  __construct($values = null) {
+      $this->setValues($values);
+   }
 
-	/**
-	 * Metoda vrací objekt s informačními zprávami
-	 * @return Messages -- objekt zpráv
-	 */
-	final public function infoMsg() {
-      return AppCore::getInfoMessages();
-	}
+   /**
+    * Metoda nastaví hodnoty pro validaci
+    * @param <type> $values
+    */
+   final public function setValues($values){
+      $this->values = $values;
+   }
 
-	/**
-	 * Metoda vrací objekt s chybovými zprávami
-	 * @return Messages -- objekt zpráv
-	 */
-	final public function errMsg() {
-      return AppCore::getUserErrors();
-	}
+   /**
+    * Metoda vrací jestli je validátor validní
+    * @return boolean
+    */
+   final public function isValid() {
+      $this->validate();
+      return $this->isValid;
+   }
+
+   /**
+    * Metoda provede validaci
+    */
+   public function validate() {}
 }
 ?>
