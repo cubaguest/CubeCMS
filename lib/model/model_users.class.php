@@ -230,6 +230,21 @@ class Model_Users extends Model_PDO {
    }
 
    /**
+    * Metoda změní heslo pro zadaného uživatele
+    * @param int $iduser -- id uživatele
+    * @param string $newPass -- nové heslo
+    * @return PDOStatement
+    */
+   public function changeUserPassword($iduser, $newPass) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
+                ." `".self::COLUMN_PASSWORD."` = :password"
+                ." WHERE (".self::COLUMN_ID." = :iduser)");
+      $dbst->execute(array(':iduser' => $iduser, ':password' => Auth::cryptPassword($newPass)));
+      return $dbst;
+   }
+
+   /**
     * Metoda vrací název tabulky s uživateli (včetně prefixu)
     * @return string -- název tabulky
     */
