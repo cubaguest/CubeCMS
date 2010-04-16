@@ -440,5 +440,13 @@ class Filesystem_File {
    public function setRights($mode) {
       @chmod($this->getName(true), $mode);
    }
+
+   /**
+    * Metoda vrátí objekt DateTime s poslední změnou souboru
+    * @return int -- poslední změna timestamp
+    */
+   public function changeTime(){
+      return (int)filectime($this->getName(true));
+   }
 }
 ?>
