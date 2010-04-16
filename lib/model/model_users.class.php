@@ -64,10 +64,10 @@ class Model_Users extends Model_PDO {
     */
    public function getUserById($id) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT user.*, grp.".self::COLUMN_ID_GROUP." FROM ".self::getUsersTable()." AS user
-             JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP
-          ." = grp.".self::COLUMN_ID_GROUP."
-             WHERE (user.".self::COLUMN_ID." = ".$dbc->quote((int)$id).")");
+      $dbst = $dbc->query("SELECT user.*, grp.".self::COLUMN_ID_GROUP.", grp.name AS ".self::COLUMN_GROUP_NAME
+          ." FROM ".self::getUsersTable()." AS user"
+          ." JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP." = grp.".self::COLUMN_ID_GROUP
+          ." WHERE (user.".self::COLUMN_ID." = ".$dbc->quote((int)$id).")");
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_OBJ);
