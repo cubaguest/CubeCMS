@@ -1,0 +1,39 @@
+<div>
+   <h2><?=$this->_('Informace o účtu')?></h2>
+   <table>
+      <tr>
+         <th width="100"><?=$this->_('Login')?></th>
+         <td width="300"><?=$this->user->{Model_Users::COLUMN_USERNAME}?></td>
+      </tr>
+      <tr>
+         <th><?=$this->_('Jméno')?></th>
+         <td><?=$this->user->{Model_Users::COLUMN_NAME}?></td>
+      </tr>
+      <tr>
+         <th><?=$this->_('Přijmení')?></th>
+         <td><?=$this->user->{Model_Users::COLUMN_SURNAME}?></td>
+      </tr>
+      <tr>
+         <th><?=$this->_('Skupina')?></th>
+         <td><?=$this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
+      </tr>
+      <tr>
+         <th><?=$this->_('E-maily')?></th>
+         <td><?=$this->user->{Model_Users::COLUMN_MAIL}?></td>
+      </tr>
+      <tr>
+         <th><?=$this->_('Poznámky')?></th>
+         <td><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
+      </tr>
+   </table>
+</div>
+<br />
+<div id="userButtons">
+   <?$this->includeTpl('logout.phtml')?>
+   <form action="<?=$this->l()->route('changePasswd');?>" method="get">
+      <input type="submit" value="<?=$this->_('Změnit heslo');?>" />
+   </form>
+   <form action="<?=$this->l()->route('changeUser');?>" method="get">
+      <input type="submit" value="<?=$this->_('Změnit údaje');?>" />
+   </form>
+</div>

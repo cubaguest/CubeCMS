@@ -5,7 +5,8 @@
  */
 class Login_Routes extends Routes {
 	function initRoutes() {
-      $this->addRoute('changepasswd', 'changepasswd', 'changepasswd', 'changepasswd/');
+      $this->addRoute('changePasswd', 'changepasswd', 'changePasswd', 'changepasswd/');
+      $this->addRoute('changeUser', 'changeuser', 'changeUser', 'changeuser/');
       $this->addRoute('normal', null, 'main', null);
 	}
 }

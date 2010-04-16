@@ -1,51 +1,29 @@
-<h2><?=$this->_('Změna hesla');?></h2>
-<div class="edit_form">
-   <form method="post" action="<?=$this->l();?>">
-      <table>
-         <tbody>
-            <tr>
-               <td width="150px"><label for="passwd_old"><?=$this->_('Staré heslo');?></label>:</td>
-               <td>
-                  <input type="password" name="passwd_old" id="passwd_old" size="20" maxlength="20" alt="<?=$this->_('Staré heslo');?>" />
-               </td>
-            </tr>
-            <tr>
-               <td><label for="passwd_new"><?=$this->_('Nové heslo');?></label>:</td>
-               <td>
-                  <input type="password" name="passwd_new" id="passwd_new" size="20" maxlength="20" alt="<?=$this->_('Nové heslo');?>" />
-               </td>
-            </tr>
-            <tr>
-               <td><label for="passwd_new_confirm"><?=$this->_('Nové heslo');?></label>:</td>
-               <td>
-                  <input type="password" name="passwd_new_confirm" id="passwd_new_confirm" size="20" maxlength="20" />
-               </td>
-            </tr>
-            <tr>
-               <td colspan="2"  align="right">
-                  <input type="submit" name="passwd_change" value="<?=$this->_('Změnit');?>" />
-               </td>
-            </tr>
-            <tr>
-               <td><input type="button" value="<?=$this->_('Generovat heslo');?>" onclick="suggestPassword()" /></td>
-               <td><input type="text" name="generated_pw" id="generated_pw" /></td>
-            </tr>
-         </tbody>
-      </table>
-   </form>
+<?
+$this->addPageTitle($this->_('Účet').' '.VVE_PAGE_TITLE_SEPARATOR.' '.$this->_('Změna hesla'));
+$this->addPageHeadline($this->_('Změna hesla'));
+$this->form->gener->htmlSubLabel()->addContent('<a href="#" onclick="suggestPassword(); return false;">'.$this->_('obnovit').'</a>'
+        .'&nbsp;&nbsp;&nbsp;<a href="#" onclick="copyPassword(); return false;">'.$this->_('kopírovat').'</a>', true);
+echo $this->form;
+?>
+
    <?
    print new Html_Element_Script('function suggestPassword() {
    var pwchars = "abcdefhjmnpqrstuvwxyz23456789ABCDEFGHJKLMNPQRSTUVWYXZ";
    var passwordlength;    // do we want that to be dynamic?  no, keep it simple :)
    passwordlength = Math.round(Math.random()*6)+6;
-   var passwd = document.getElementById(\'generated_pw\');
+   var passwd = document.getElementById(\'pass_gener\');
    passwd.value = \'\';
 
    for ( i = 0; i < passwordlength; i++ ){
       passwd.value += pwchars.charAt( Math.floor( Math.random() * pwchars.length ) )
    }
    return passwd.value;
-}');
+   };
+   function copyPassword() {
+      document.getElementById(\'pass_new1\').value = document.getElementById(\'pass_gener\').value;
+      document.getElementById(\'pass_new2\').value = document.getElementById(\'pass_gener\').value;
+   }
+suggestPassword();
+');
    ?>
-
-</div>
+<?$this->includeTpl("buttonback.phtml", true);?>

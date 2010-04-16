@@ -26,3 +26,8 @@
 .login_form_module div table td input[type="text"], .login_form_module div table td input[type="password"]{
 	/*width: 100%;*/
 }
+
+#userButtons form {
+   display: inline;
+   padding-right: 5px;
+}
