@@ -306,12 +306,12 @@ class Form implements ArrayAccess {
          if(!$element->isPopulated()){
             $element->populate();
             $element->validate();
-            if(!$element->isValid()) {
-               $this->isValid = false;
-               continue;
-            }
-            $element->filter();
          }
+         if(!$element->isValid()) {
+            $this->isValid = false;
+            continue;
+         }
+         $element->filter();
       }
       $this->isPopulated = true;
    }
