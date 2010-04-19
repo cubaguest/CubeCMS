@@ -25,10 +25,11 @@ class NewsLetter_Controller extends Controller {
          if(!$mailsM->isSavedMails($newMail)) {
             $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR']);
             // pokud se má odeslat mail správci
-            if($this->category()->getParam(self::PARAM_NEW_MAIL_REG_NOTICE, true) == true) {
+            $mailsAdm = $this->getRecipientEmailAddress();
+            if($this->category()->getParam(self::PARAM_NEW_MAIL_REG_NOTICE, true) == true AND !empty ($mailsAdm)) {
                // email webmasterovi
                $emailComp = new Email();
-               $emailComp->addAddress($this->getRecipientEmailAddress());
+               $emailComp->addAddress($mailsAdm);
                $emailComp->setSubject($this->category()->getParam(self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN,
                        self::getNewMailText(self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN)).' '.VVE_WEB_NAME);
                // přepis hodnot
@@ -89,10 +90,10 @@ class NewsLetter_Controller extends Controller {
                     .'ze stránek "%webname%"'."\r\n".' Registrace proběhla z IP adresy %ip%.';
             break;
          case self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN:
-            return 'Nová registroce k odběru novinek';
+            return 'Nová registrace k odběru novinek';
             break;
          case self::PARAM_NEW_MAIL_REG_SUBJECT:
-            return 'Registroce k odběru novinek ze stránek';
+            return 'Registrace k odběru novinek ze stránek';
             break;
          case self::PARAM_NEW_MAIL_REG_TEXT_USER:
          default:
@@ -170,7 +171,7 @@ class NewsLetter_Controller extends Controller {
          $user = $modelusers->getUserById($id);
          $mails = array_merge($mails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
       }
-
+      $mails = array_unique($mails);
       return $mails;
    }
 
@@ -292,7 +293,7 @@ class NewsLetter_Controller extends Controller {
 
       $form->addGroup('admins', 'Administrátorská nastavení');
       // odeslání upozornění
-      $elemCheckAdminNotice = new Form_Element_Checkbox('admin_notice', 'Odesílat uporonění správci');
+      $elemCheckAdminNotice = new Form_Element_Checkbox('admin_notice', 'Odesílat upozornění správcům');
       if(!isset ($settings[self::PARAM_NEW_MAIL_REG_NOTICE])) {
          $elemCheckAdminNotice->setValues(true);
       } else {
