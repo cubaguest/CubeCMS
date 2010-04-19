@@ -13,6 +13,7 @@ class NewsLetter_Controller extends Controller {
    const PARAM_NEW_MAIL_REG_SUBJECT_ADMIN = 'newmail_registered_subject_admin';
    const PARAM_NEW_MAIL_REG_TEXT_ADMIN = 'newmail_registered_text_admin';
    const PARAM_NEW_MAIL_REG_TEXT_USER = 'newmail_registered_text_user';
+   const PARAM_ADMINS = 'newmail_admins';
 
    public function mainController() {
       $newMailForm = $this->createRegForm();
@@ -157,8 +158,20 @@ class NewsLetter_Controller extends Controller {
     * Metoda vrací emaily pro příjemce nových adres z nastaavení
     */
    private function getRecipientEmailAddress() {
+      $mails = array();
       $str = $this->category()->getParam(self::PARAM_NEW_MAIL_REG_ADMIN_RECIPIENTS, null);
-      return explode(';', $str);
+      $mails = explode(';', $str);
+
+      $usersId = $this->category()->getParam(self::PARAM_ADMINS, array());
+
+      $modelusers = new Model_Users();
+
+      foreach ($usersId as $id) {
+         $user = $modelusers->getUserById($id);
+         $mails = array_merge($mails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
+      }
+
+      return $mails;
    }
 
    public function unregistrationMailController() {
@@ -201,7 +214,7 @@ class NewsLetter_Controller extends Controller {
             $mailsM->saveMail($newMail, $_SERVER['REMOTE_ADDR']);
             // pokud se má odeslat mail správci
             if($this->category()->getParam(self::PARAM_NEW_MAIL_REG_NOTICE, true) == true) {
-               // email webmasterovi
+               // email webmasterům
                $emailComp = new Email();
                $emailComp->addAddress($this->getRecipientEmailAddress());
                $emailComp->setSubject($this->category()->getParam(self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN,
@@ -248,7 +261,8 @@ class NewsLetter_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    public static function settingsController(&$settings,Form &$form) {
-      $form->addGroup('basic', 'Základní nasatvení');
+      $form->addGroup('users', 'Uživatelsáé nastavení');
+
 
       // předmět uživatel
       $elemNMSub = new Form_Element_Text('newm_reg_subject_user', 'Předmět');
@@ -260,7 +274,7 @@ class NewsLetter_Controller extends Controller {
       } else {
          $elemNMSub->setValues($settings[self::PARAM_NEW_MAIL_REG_SUBJECT]);
       }
-      $form->addElement($elemNMSub,'basic');
+      $form->addElement($elemNMSub,'users');
 
       // text uživatel
       $elemNMTextUser = new Form_Element_TextArea('newm_reg_text_user', 'Text e-mailu pro uživatele');
@@ -274,8 +288,9 @@ class NewsLetter_Controller extends Controller {
       } else {
          $elemNMTextUser->setValues($settings[self::PARAM_NEW_MAIL_REG_TEXT_USER]);
       }
-      $form->addElement($elemNMTextUser,'basic');
+      $form->addElement($elemNMTextUser,'users');
 
+      $form->addGroup('admins', 'Administrátorská nastavení');
       // odeslání upozornění
       $elemCheckAdminNotice = new Form_Element_Checkbox('admin_notice', 'Odesílat uporonění správci');
       if(!isset ($settings[self::PARAM_NEW_MAIL_REG_NOTICE])) {
@@ -283,15 +298,35 @@ class NewsLetter_Controller extends Controller {
       } else {
          $elemCheckAdminNotice->setValues($settings[self::PARAM_NEW_MAIL_REG_NOTICE]);
       }
-      $form->addElement($elemCheckAdminNotice,'basic');
+      $form->addElement($elemCheckAdminNotice,'admins');
 
       // maily správců
       $elemEamilRec = new Form_Element_TextArea('emails_rec', 'Adresy správců');
-      $elemEamilRec->setSubLabel('E-mailové  adresy příjemcu, kterým chodí nově registrované adresy. Může jich být více a jsou odděleny středníkem.');
-      $form->addElement($elemEamilRec,'basic');
+      $elemEamilRec->setSubLabel('E-mailové  adresy správců, kterým chodí upozornění
+na nově registrované adresy. Může jich být více a jsou odděleny středníkem. Místo tohoto boxu
+lze využít následující select s výběrem již existujících uživatelů.');
+      $form->addElement($elemEamilRec,'admins');
 
-      if(isset($settings['emails_rec'])) {
-         $form->emails_rec->setValues($settings['emails_rec']);
+      if(isset($settings[self::PARAM_NEW_MAIL_REG_ADMIN_RECIPIENTS])) {
+         $form->emails_rec->setValues($settings[self::PARAM_NEW_MAIL_REG_ADMIN_RECIPIENTS]);
+      }
+
+      $elemAdmins = new Form_Element_Select('admins', 'Správci');
+      // načtení uživatelů
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->getUsersList();
+      $usersIds = array();
+      foreach ($users as $user) {
+         $usersIds[$user[Model_Users::COLUMN_USERNAME]] = $user[Model_Users::COLUMN_ID];
+      }
+      $elemAdmins->setOptions($usersIds);
+      $elemAdmins->setMultiple();
+      $elemAdmins->html()->setAttrib('size', 4);
+      
+      $form->addElement($elemAdmins, 'admins');
+
+      if(isset($settings[self::PARAM_ADMINS])) {
+         $form->admins->setValues($settings[self::PARAM_ADMINS]);
       }
 
       // předmět admin
@@ -303,7 +338,7 @@ class NewsLetter_Controller extends Controller {
       } else {
          $elemNMSubAdm->setValues($settings[self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN]);
       }
-      $form->addElement($elemNMSubAdm,'basic');
+      $form->addElement($elemNMSubAdm,'admins');
       // text admin
       $elemNMTextAdmin = new Form_Element_TextArea('newm_reg_text_admin', 'Text e-mailu pro admina');
       $elemNMTextAdmin->setSubLabel('Text emailu poslaný správci. Nahrazovaná slova: '
@@ -316,7 +351,7 @@ class NewsLetter_Controller extends Controller {
       } else {
          $elemNMTextAdmin->setValues($settings[self::PARAM_NEW_MAIL_REG_TEXT_ADMIN]);
       }
-      $form->addElement($elemNMTextAdmin,'basic');
+      $form->addElement($elemNMTextAdmin,'admins');
 
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
@@ -326,6 +361,7 @@ class NewsLetter_Controller extends Controller {
          $settings[self::PARAM_NEW_MAIL_REG_NOTICE] = $form->admin_notice->getValues();
          $settings[self::PARAM_NEW_MAIL_REG_SUBJECT_ADMIN] = $form->newm_reg_subject_admin->getValues();
          $settings[self::PARAM_NEW_MAIL_REG_TEXT_ADMIN] = $form->newm_reg_text_admin->getValues();
+         $settings[self::PARAM_ADMINS] = $form->admins->getValues();
       }
    }
 
