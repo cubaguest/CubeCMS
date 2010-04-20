@@ -115,8 +115,9 @@ class Login_Controller extends Controller {
 
       if($form->isSend()){
          // kontrola emailových adres
-         $mails = preg_replace('/[^a-z0-9;.@_-]*/i', '', $form->emails->getValues()); // bílé znaky
-         $mails = explode(';', $mails);
+//         $mailsClean = preg_replace('/[^a-z0-9;.@_-]*/i', '', $form->emails->getValues()); // bílé znaky
+         $mailsClean = preg_replace('/\s+/i', '', $form->emails->getValues()); // bílé znaky
+         $mails = explode(';', $mailsClean);
 
          $validMails = true;
          $validator = new Validator_EMail();
@@ -134,8 +135,8 @@ class Login_Controller extends Controller {
 
       if($form->isValid()){
          $model->saveUser(Auth::getUserName(), $form->name->getValues(),
-                 $form->surname->getValues(), $user->{Model_Users::COLUMN_PASSWORD},
-                 $user->{Model_Users::COLUMN_ID_GROUP}, $form->emails->getValues(),
+                 $form->surname->getValues(), null,
+                 $user->{Model_Users::COLUMN_ID_GROUP}, $mailsClean,
                  $form->note->getValues(), $user->{Model_Users::COLUMN_BLOCKED}, Auth::getUserId());
          $this->infoMsg()->addMessage($this->_('Změny byly uloženy'));
          $this->link()->route()->reload();
@@ -143,13 +144,6 @@ class Login_Controller extends Controller {
 
       $this->view()->form = $form;
    }
-	
-	/**
-	 * Metoda zašifruje heslo
-	 */
-	private function cryptPasswd($passwd) {
-		return md5($passwd);
-	}
 }
 
 ?>
