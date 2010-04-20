@@ -85,7 +85,7 @@ class ActionsList_Controller extends Controller {
 
       if($form->isValid()) {
          $textM = new Text_Model_Detail();
-         $textM->saveText($form->text->getValues(), null, null, $this->category()->getId());
+         $textM->saveText($form->text->getValues(), null, $this->category()->getId());
 
          $this->infoMsg()->addMessage($this->_('Úvodní text byl uložen'));
          $this->link()->route()->reload();

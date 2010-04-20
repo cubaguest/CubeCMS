@@ -53,8 +53,7 @@ class CinameProgramFk_Controller extends Controller {
 
       if($form->isValid()) {
          try {
-            $model->saveText($form->text->getValues(), null,
-                    null, $this->category()->getId());
+            $model->saveText($form->text->getValues(), null, $this->category()->getId());
             $this->infoMsg()->addMessage($this->_('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {

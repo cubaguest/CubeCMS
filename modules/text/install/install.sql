@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
   `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
   `id_item` smallint(5) unsigned NOT NULL,
-  `subkey` varchar(30) NOT NULL DEFAULT 'NULL',
+  `subkey` varchar(30) NOT NULL DEFAULT 'nokey',
   `label_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `text_cs` mediumtext CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `text_clear_cs` mediumtext CHARACTER SET utf8 COLLATE utf8_czech_ci,

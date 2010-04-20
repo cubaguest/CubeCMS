@@ -1,18 +1,14 @@
 <?
 $this->addCssFile("style.css");
 
-$model = new Text_Model_Detail();
-$text = $model->getText(Category::getSelectedCategory()->getId());
-
-
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
 
 ?>
 <div class="imagesList">
-   <?if($text != null) {?>
+   <?if($this->text != null) {?>
    <div>
-         <?=$text->{Text_Model_Detail::COLUMN_TEXT}?>
+         <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
    <br />
    <?}?>

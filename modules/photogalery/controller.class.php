@@ -38,6 +38,9 @@ class Photogalery_Controller extends Controller {
 
       $this->view()->subdir = $this->getOption('subdir', null);
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
+
+      $model = new Text_Model_Detail();
+      $this->view()->text = $model->getText($this->category()->getId());
    }
 
    public function edittextController() {
@@ -59,8 +62,7 @@ class Photogalery_Controller extends Controller {
 
       if($form->isValid()) {
          try {
-            $model->saveText($form->text->getValues(), null,
-                    null, $this->category()->getId());
+            $model->saveText($form->text->getValues(), null, $this->category()->getId());
             $this->infoMsg()->addMessage($this->_('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {

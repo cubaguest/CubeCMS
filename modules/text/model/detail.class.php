@@ -20,42 +20,40 @@ class Text_Model_Detail extends Model_PDO {
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_LABEL = 'label';
 
+   const DEFAULT_SUBKEY = 'nokey';
+
    /**
     * Metoda provede načtení textu z db
     *
     * @return string -- načtený text
     */
-   public function getText($idCat, $subkey = null) {
+   public function getText($idCat, $subkey = self::DEFAULT_SUBKEY) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
-             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idCat AND text.".self::COLUMN_SUBKEY." = :subkey)");
-//      $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
-//      if($subkey == null){
-//         $dbst->bindParam(':subkey', $subkey, PDO::PARAM_NULL);
-//      } else {
-//         $dbst->bindParam(':subkey', $subkey, PDO::PARAM_STR);
-//      }
-      $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subkey));
+             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idc AND text.".self::COLUMN_SUBKEY." = :subkey)");
+      $dbst->bindValue(':subkey', $subkey, PDO::PARAM_STR);
+      $dbst->bindValue(':idc', $idCat, PDO::PARAM_INT);
+      $dbst->execute();
 
       $cl = new Model_LangContainer();
       $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
       return $dbst->fetch();
    }
 
-   public function saveText($texts, $label, $idCat, $subKey = NULL) {
+   public function saveText($texts, $label, $idCat, $subKey = self::DEFAULT_SUBKEY) {
       // zjištění jestli existuje záznam
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CATEGORY." = :idCat AND ".self::COLUMN_SUBKEY." = :subkey)");
-//      $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
-//      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subKey));
+      $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
+      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
+      $dbst->execute();
       $count = $dbst->rowCount();
 
       // globalní prvky
       $dbc = new Db_PDO();
       $this->setIUValues(array(self::COLUMN_TEXT => $texts,
-         self::COLUMN_TEXT_CLEAR => vve_strip_tags($texts)));
+              self::COLUMN_TEXT_CLEAR => vve_strip_tags($texts)));
 
       if($label !== null) {
          $this->setIUValues(array(self::COLUMN_LABEL => $label));
@@ -66,8 +64,6 @@ class Text_Model_Detail extends Model_PDO {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".$this->getUpdateValues()
                  ." WHERE (".self::COLUMN_ID_CATEGORY." = :idCat AND ".self::COLUMN_SUBKEY." = :subkey)");
-         //             ." WHERE ".self::COLUMN_ID_CATEGORY." = :category");
-         //$dbst->bindParam(1, $idCat, PDO::PARAM_INT);
          $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subKey));
       } else {
          // není uloženo
@@ -78,7 +74,7 @@ class Text_Model_Detail extends Model_PDO {
       }
    }
 
-   public function getLastChange($idCat, $subKey = null) {
+   public function getLastChange($idCat, $subKey = self::DEFAULT_SUBKEY) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CATEGORY." = :idcategory AND ".self::COLUMN_SUBKEY." = :subkey)");
