@@ -143,6 +143,7 @@ class Login_Controller extends Controller {
       }
 
       $this->view()->form = $form;
+      $this->view()->linkBack = $this->link()->route();
    }
 }
 
