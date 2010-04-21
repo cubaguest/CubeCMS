@@ -26,12 +26,12 @@ class KzMainPage_Controller extends Controller {
          if($cntFile->exist()) {
             $websXml = new SimpleXMLElement($cntFile->getContent());
             // načítání jednotlivých adre
-            $api = new Component_Api_VVEArticle();
             foreach ($websXml->box as $box) {
                if((string)$box['url'] == NULL OR (string)$box['url'] == '' OR !vve_url_exists((string)$box['url'])) continue;
                $cnt = file_get_contents((string)$box['url']);
-               // načtení obsahu
+               $api = new Component_Api_VVEArticle();
                try {
+               // načtení obsahu
                   $api->setContent($cnt);
                   $b = array('data' => $api->getArray(), 'name' => (string)$box);
                   array_push($infos, $b);
