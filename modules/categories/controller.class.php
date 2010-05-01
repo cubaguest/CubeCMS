@@ -91,6 +91,7 @@ class Categories_Controller extends Controller {
       $catModel = new Model_Category();
       $menu->setCategories($catModel->getCategoryList(true));
       $this->view()->structure = $menu;
+      $this->view()->adminStructure = $this->adminStructure;
    }
 
    public function showController() {
@@ -209,8 +210,14 @@ class Categories_Controller extends Controller {
          // zjištění jestli je možné vytvoři feedy
          $classRName = ucfirst($form->module->getValues())."_Routes::FEEDS";
          $feeds = false;
-         if(constant($classRName) != null) {
-            $feeds = true;
+         if(PHP_VERSION_ID > 5.3){ // PHP 5.3 do blbne s constant
+            if(defined($classRName) != null) {
+               $feeds = true;
+            }
+         } else {
+            if(constant($classRName) != null) {
+               $feeds = true;
+            }
          }
 
          $datadir = null;
@@ -334,9 +341,16 @@ class Categories_Controller extends Controller {
          // zjištění jestli je možné vytvoři feedy
          $classRName = ucfirst($form->module->getValues())."_Routes::FEEDS";
          $feeds = false;
-         if(constant($classRName) != null) {
-            $feeds = true;
+         if(PHP_VERSION_ID > 5.3){ // PHP 5.3 do blbne s constant
+            if(defined($classRName) != null) {
+               $feeds = true;
+            }
+         } else {
+            if(constant($classRName) != null) {
+               $feeds = true;
+            }
          }
+
 
 
          $icon = null;

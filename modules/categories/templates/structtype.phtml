@@ -1,9 +1,14 @@
 <div>
    <strong><?=$this->_('volba struktury')?></strong><br />
    <?
-   print($this->formType->renderStart());
-   print($this->formType->type->controll());
-   print($this->formType->change->controll());
-   print($this->formType->renderEnd());
+   echo($this->formType->renderStart());
+   echo($this->formType->type->controll());
+   echo($this->formType->change->controll());
+   echo($this->formType->renderEnd());
    ?>
+   <p>
+   <?=($this->_("Určuje která struktura se upravuje. Hlavní menu je halvní menu
+      stránky a celá struktura stránek. Administrační menu umožňuje úpravu administračního menu (šedé nahoře stránky). "));?>
+   <strong><?=$this->_("Pozor úprava administračního menu může ovlivnit chování celých stránek!")?></strong>
+   </p>
 </div>

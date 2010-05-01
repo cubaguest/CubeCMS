@@ -1,4 +1,6 @@
 <?
+$this->addCssFile("style.css");
+
 define('SECTION_EDTI_LABEL', $this->_('Upravit'));
 define('SECTION_REMOVE_LABEL', $this->_('Smazat'));
 define('SECTION_SETTINGS_LABEL', $this->_('Upravit parametry'));
@@ -64,15 +66,18 @@ function vveSectionsRenderFunc($menuArr, $link) {
 }
 ?>
 <div>
-   <?//sekce?>
+   <?//sekce
+   $typeClass = 'mainStruct';
+   if($this->adminStructure == true) {$typeClass = 'adminStruct';}
+   ?>
    <h2><?=$this->_("Struktura stránek")?></h2>
-   <?$this->includeTpl('structtype.phtml');?><br />
-   <div id="sections">
+   <div id="sections" class="<?=$typeClass?>">
       <table style="width: 98%">
          <?=vveSectionsRenderFunc($this->structure, $this->link())?>
       </table>
    </div>
    <br />
+   <?$this->includeTpl('structtype.phtml');?><br />
    <br />
    <script type="text/javascript">
       function submitRemoveCat(msg){

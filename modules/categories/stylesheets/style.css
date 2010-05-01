@@ -1,4 +1,12 @@
 @CHARSET "UTF-8";
+.mainStruct {
+
+}
+
+.adminStruct {
+   background-color: #ffcccc;
+}
+
 #sections li {
    list-style-type:disc;
 }
