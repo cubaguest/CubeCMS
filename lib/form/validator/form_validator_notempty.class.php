@@ -68,23 +68,21 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                   if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())) {
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
-//                     return false;
                   }
                } else {
                   if($elemObj->getUnfilteredValues() == null OR $elemObj->getUnfilteredValues() == "") {
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
-//                     return false;
                   }
                }
             }
             break;
          // input checkbox
          case 'Form_Element_Checkbox':
+         case 'Form_Element_File':
             if($elemObj->getUnfilteredValues() == false) {
                $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                $this->isValid = false;
-//               return false;
             }
             break;
          default:
