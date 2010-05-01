@@ -59,7 +59,7 @@ class Template_ModuleStatic extends Template_Module {
     */
    public function addJsFile($jsfile, $engine = false) {
       //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(eregi('http://[a-zA-Z_.]+', $jsfile)){
+      if(preg_match('/^http[s]?:\/\//', $jsfile)){
          self::addJS($jsfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->getModuleName(), false);
@@ -81,7 +81,7 @@ class Template_ModuleStatic extends Template_Module {
     * @return Template -- objekt sebe
     */
    public function addCssFile($cssfile, $engine = false) {
-      if(eregi('http://[a-zA-Z_.]+', $cssfile)){
+      if(preg_match('/^http[s]?:\/\//', $cssfile)){
          self::addCss($jsfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $this->getModuleName(), false);

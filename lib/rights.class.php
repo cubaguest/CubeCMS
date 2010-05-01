@@ -34,13 +34,17 @@ class Rights {
       $rigths = array('read'=> false,
                       'write' => false,
                       'controll' => false);
-		if (ereg("^r[cw-]{2}$", $r)){
+      $matches = array();
+      if(preg_match('/^([r-]{1})([w-]{1})([c-]{1})$/', $r, $matches) != 1){
+         throw new UnexpectedValueException(_("Špatně předaný parametr práv ke kategorii"));
+      }
+		if ($matches[1] == 'r'){
          $rigths['read'] = true;
 		}
-		if (ereg("^[r-]w[c-]$", $r)){
+		if ($matches[2] == 'w'){
          $rigths['write'] = true;
 		}
-		if (ereg("^[rw-]{2}c$", $r)){
+		if ($matches[3] == 'c'){
          $rigths['controll'] = true;
 		};
       return $rigths;

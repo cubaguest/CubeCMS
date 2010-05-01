@@ -71,7 +71,7 @@ class Template_JsPlugin extends Template {
     */
    public function addJsFile($jsfile, $engine = false) {
       //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(eregi('http://[a-zA-Z_.]+', $jsfile)){
+      if(preg_match('/^http[s]?:\/\//', $jsfile)){
          self::addJS($jsfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($jsfile, $this->jsPlugin()->getName(), false);
@@ -93,7 +93,7 @@ class Template_JsPlugin extends Template {
     * @return Template -- objekt sebe
     */
    public function addCssFile($cssfile, $engine = false) {
-      if(eregi('http://[a-zA-Z_.]+', $cssfile)){
+      if(preg_match('/^http[s]?:\/\//', $cssfile)){
          self::addCss($jsfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($cssfile, $this->jsPlugin()->getName(), false);

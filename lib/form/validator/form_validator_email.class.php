@@ -26,8 +26,6 @@ class Form_Validator_Email extends Form_Validator implements Form_Validator_Inte
    }
 
    public function validate(Form_Element $elemObj) {
-      $name = '[-a-z0-9!#$%&\'*+/=?^_`{|}~]'; // znaky tvořící uživatelské jméno
-      $domain = '[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])'; // jedna komponenta domény
       switch (get_class($elemObj)) {
          // input text
          case 'Form_Element_Text':
@@ -35,7 +33,8 @@ class Form_Validator_Email extends Form_Validator implements Form_Validator_Inte
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getUnfilteredValues() != null AND !eregi("^$name+(\\.$name+)*@($domain?\\.)+$domain\$", $elemObj->getUnfilteredValues())){
+               $mailValidatro = new Validator_EMail($elemObj->getUnfilteredValues());
+               if($elemObj->getUnfilteredValues() != null AND !$mailValidatro->isValid()){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }

@@ -370,7 +370,7 @@ class Template {
     */
    public function addJsFile($jsfile) {
       //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(eregi('http://[a-zA-Z_.]+', $jsfile)) {
+      if(preg_match('/^http[s]?:\/\//', $jsfile)){
          Template::addJS($jsfile);
       } else {
          $filePath = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);

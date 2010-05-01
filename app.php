@@ -196,13 +196,15 @@ class AppCore {
          $version = explode('.',PHP_VERSION);
          define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
       }
-      set_magic_quotes_runtime(false); // magic quotes OFF !!
-      if(get_magic_quotes_gpc() === 1){
-         // odstranněí všech backslashes
-         function magicQuotes_awStripslashes(&$value, $key) {$value = stripslashes($value);}
-         $gpc = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST, &$_SERVER);
-         array_walk_recursive($gpc, 'magicQuotes_awStripslashes');
-         //trigger_error("Magic quotes is Enable, please disable this feature");
+      if(PHP_VERSION_ID < 5.3){
+         set_magic_quotes_runtime(false); // magic quotes OFF !!
+         if(get_magic_quotes_gpc() === 1){
+            // odstranněí všech backslashes
+            function magicQuotes_awStripslashes(&$value, $key) {$value = stripslashes($value);}
+            $gpc = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST, &$_SERVER);
+            array_walk_recursive($gpc, 'magicQuotes_awStripslashes');
+            //trigger_error("Magic quotes is Enable, please disable this feature");
+         }
       }
       require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
 

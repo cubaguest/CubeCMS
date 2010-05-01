@@ -244,7 +244,8 @@ class Model_PDO extends Model {
          if($createArray) {
             foreach ($array as $key => $var) {
                $matches = array();
-               if(eregi('^([a-zA-Z0-9_]*)'.$separator.'([a-zA-Z0-9]*)$', $key, $matches)
+//               if(eregi('^([a-zA-Z0-9_]*)'.$separator.'([a-zA-Z0-9]*)$', $key, $matches)
+               if(preg_match('/^([a-z0-9_]*)'.$separator.'([a-z0-9]*)$/i', $key, $matches)
                        AND in_array($matches[1], $columns)) {
                   if(!isset ($array[$matches[1]])) {
                      $array[$matches[1]] = array();

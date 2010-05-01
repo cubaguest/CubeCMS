@@ -190,16 +190,14 @@ class JsPlugin_TinyMce extends JsPlugin {
     * @var array
     */
    private $advanced1Params = array(
-           'plugins' => 'safari,style,table,save,advhr,advimage,advlink,emotions,iespell,
-              inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,
-              paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template',
-           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,
-              justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,|,preview,fullscreen,template',
-           'theme_advanced_buttons2' => 'cut,copy,paste,pastetext,|,search,replace,|,bullist,numlist,|,
-              outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,cleanup,code,|,inserttime,|,forecolor, backcolor',
-           'theme_advanced_buttons3' => 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,
-              emotions,image,media,|,ltr,rtl');
-
+           'plugins' => 'safari,style,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template',
+//      'theme_advanced_buttons1' => "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,formatselect,styleselect,fontselect,fontsizeselect",
+           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,|,preview,fullscreen,template',
+           'theme_advanced_buttons2' => 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,cleanup,code,|,forecolor, backcolor',
+//           'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,|,forecolor,backcolor,|,removeformat,cleanup,visualaid",
+           'theme_advanced_buttons3' => 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,image,media,|,ltr,rtl'
+//           'theme_advanced_buttons3' => "tablecontrols,|,insertdate,inserttime,|,hr,charmap,sub,sup,|,image,emotions,iespell,media,advhr,|,ltr,rtl"
+   );
    /**
     * Parametry pro ořezané advanced THEME
     * @var array
@@ -226,13 +224,9 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    private $advancedFullParams = array(
            'plugins' => "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
-//           'theme_advanced_buttons1' => "newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
            'theme_advanced_buttons1' => "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,formatselect,styleselect,fontselect,fontsizeselect",
-//           'theme_advanced_buttons1' => "newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontsizeselect",
-//           'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,|,cleanup,help,code,|,forecolor,backcolor",
            'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,|,forecolor,backcolor,|,removeformat,cleanup,visualaid",
            'theme_advanced_buttons3' => "tablecontrols,|,insertdate,inserttime,|,hr,charmap,sub,sup,|,image,emotions,iespell,media,advhr,|,ltr,rtl",
-//           'theme_advanced_buttons4' => "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertdate,inserttime,preview,fullscreen,|,newdocument,|,print"
            'theme_advanced_buttons4' => "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,newdocument,|,preview,print,fullscreen,code"
    );
 
@@ -484,7 +478,7 @@ class JsPlugin_TinyMce extends JsPlugin {
       $array = array();
       $it = new DirectoryIterator($path);
       foreach ($it as $itFile) {
-         if($itFile->isDir() AND !$itFile->isDot() AND !ereg("^\.", $itFile->getFileName())) {
+         if($itFile->isDir() AND !$itFile->isDot() AND preg_match("/^\./", $itFile->getFileName()) != 1) {
             $arr = $this->loadDir($itFile->getPath().DIRECTORY_SEPARATOR.$itFile->getFileName());
             $array[$itFile->getFileName()]['childs'] = $arr;
             $array[$itFile->getFileName()]['path'] = str_replace(AppCore::getAppWebDir(),

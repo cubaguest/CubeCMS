@@ -17,10 +17,11 @@ class Validator_Time extends Validator {
 	 * @return string -- vrací datum v ISO podobě nebo false
 	 */
 	public function checkDate($date, $timestam = false) {
-		if (ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$date, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locale::getLang() != 'en'){
+      $regs = array();
+		if (preg_match("/([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})/",$date, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locale::getLang() != 'en'){
 			$date = $regs[2].self::ISO_DATE_SEPARATOR.$regs[1].self::ISO_DATE_SEPARATOR.$regs[3];
 			$time = mktime(null,null,null,$regs[2],$regs[1],$regs[3]);
-		} else if (ereg ("([0-9]{1,2})/([0-9]{1,2})/([0-9]{4})",$date, $regs) AND checkdate ($regs[1], $regs[2], $regs[3])){
+		} else if (preg_match ("/([0-9]{1,2})/([0-9]{1,2})/([0-9]{4})/",$date, $regs) AND checkdate ($regs[1], $regs[2], $regs[3])){
 			$date = $regs[1].self::ISO_DATE_SEPARATOR.$regs[2].self::ISO_DATE_SEPARATOR.$regs[3];
 			$time = mktime(null,null,null,$regs[1],$regs[2],$regs[3]);
 		} else {

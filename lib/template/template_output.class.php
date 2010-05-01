@@ -145,7 +145,7 @@ class Template_Output {
     * Metoda vrcí html typy výstupu (přípony souborů)
     * @return array
     */
-   public static static function getHtmlTypes(){
+   public static function getHtmlTypes(){
       return self::$htmlOutputTypes;
    }
 

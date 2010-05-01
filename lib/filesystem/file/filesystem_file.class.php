@@ -201,7 +201,7 @@ class Filesystem_File {
     */
    private function parsePathFile($string) {
       $regep = array();
-      if(eregi('^(.*/)([^'.DIRECTORY_SEPARATOR.']*)$', $string, $regep)) {
+      if(preg_match('/^(.*/)([^'.DIRECTORY_SEPARATOR.']*)$/', $string, $regep)) {
          return $regep;
       }
       return false;
@@ -340,6 +340,7 @@ class Filesystem_File {
     * @return boolean -- true pokud soubor existuje
     */
    public function exist() {
+      if($this->getName() == null) return false; // protože pokud není soubor kontroluje adresář a ten existuje
       return file_exists($this->getName(true));
    }
 
@@ -411,7 +412,8 @@ class Filesystem_File {
       }
       //rozdělení názvu souboru na název a příponu
       $file_ext = array();
-      eregi('^([^.]*).(.*)$', strtolower($newFileName), $file_ext);
+//      preg_match('/^([^.]*).([a-z0-9_]+)$/', strtolower($newFileName), $file_ext);
+      preg_match('/^[^.]*\.((?:tar\.)?[a-z0-9_]+)$/', strtolower($newFileName), $file_ext);
       $file_name_short = $file_ext[1];
       $file_name_extension = $file_ext[2];
       //odstraneni nepovolenych zanků a složení dohromady

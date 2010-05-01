@@ -49,14 +49,14 @@ class Form_Element_File extends Form_Element {
                move_uploaded_file($_FILES[$this->getName()]["tmp_name"],
                    $dir . $saveFileName);
                // vatvoření pole s informacemi o souboru
-               $this->unfilteredValues = array('name' => $saveFileName,
+               $this->values = array('name' => $saveFileName,
                    'path' => $dir,
                    'size' => $_FILES[$this->getName()]["size"],
                    'type' => $this->getMimeType($dir.$_FILES[$this->getName()]["name"]),
                    'extension' => $this->getExtension($_FILES[$this->getName()]["name"]));
 //               array_push($this->values, $file);
             } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
-                  $this->unfilteredValues = null;
+                  $this->values = null;
                } else {
                   $this->creteUploadError($_FILES[$this->getName()]['error'], $_FILES[$this->getName()]['name']);
                }
@@ -64,6 +64,8 @@ class Form_Element_File extends Form_Element {
       } else {
          $this->values = null;
       }
+      $this->unfilteredValues = $this->values;
+      $this->isPopulated = true;
    }
 
    /**
@@ -143,6 +145,10 @@ class Form_Element_File extends Form_Element {
     * @return string
     */
    public function controll() {
+      $this->html()->clearContent();
+      if(!$this->isValid AND $this->isPopulated) {
+         $this->html()->addClass('formError');
+      }
    // tady bude if při multilang
       $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'file');
@@ -167,10 +173,13 @@ class Form_Element_File extends Form_Element {
    /**
     * Metoda naplní ovjekt typu file
     * @param string $className -- název třídy která se má vytvořit
+    * @return Filesystem_File -- objekt douboru
     * @todo -- dořešit
     */
-   public function createFileObject($className) {
-      if(!class_exists($className)){
+   public function createFileObject(Filesystem_File $className = null) {
+      if($className === null){
+         $className = "Filesystem_File";
+      } else if(!class_exists($className)){
          throw new UnexpectedValueException(sprintf(_('Třídu %s se nepodařilo načíst'),$className), 1);
       }
 
