@@ -28,8 +28,9 @@
       $this->includeTpl('ie6browser.phtml',true);
    }
    if(!empty ($this->moduleErrors)) {
+      echo("<strong>"._("Chyba:")."</strong>");
       foreach ($this->moduleErrors as $error) {
-         print ("<p>"._("Chyba:")." ".$error ."</p>");
+         print ("<p>".$error ."</p>");
       }
    }?>
    <hr class="reseter" />
