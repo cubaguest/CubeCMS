@@ -186,4 +186,49 @@ function vve_url_exists($url){
     return (bool)preg_match('/^HTTP\/\d\.\d\s+(200|301|302)/', $headers[0]);
 }
 
+/**
+ * Funkce vloží požadovanou hodnotu do pole na danou pozici
+ * @param array $array -- pole kde se má prvek vložit
+ * @param int $pos -- pozice na kterou se má prvek vložit (začíná se od 0)
+ * @param mixed $val -- hodnota pro vložení
+ * @param string $valkey -- (option) pokud není zadáno použije se první volný index
+ *
+ * @return array -- upravené pole, v případě chyby false
+ */
+function vve_array_insert($array, $pos, $val, $valkey = null){
+    $array2 = array_splice($array,$pos);
+    if($valkey == null){
+      $array[] = $val;
+    } else {
+      $array[$valkey] = $val;
+    }
+    $array = array_merge($array,$array2);
+
+    return $array;
+}
+
+/**
+ * Funkce vloží požadovanou hodnotu do pole za dany klíč
+ * @param array $array -- pole kde se má prvek vložit
+ * @param string $pos -- pozice na kterou se má prvek vložit (klíč)
+ * @param mixed $val -- hodnota pro vložení
+ * @param string $valkey -- (option) pokud není zadáno použije se první volný index
+ * @param string $pos -- (option) (after|before) jestli se má prvek vložit před daný klíč nebo zaněj
+ *
+ * @return array -- upravené pole, v případě chyby false
+ */
+function vve_array_insert_by_key($array, $key, $val, $valkey = null, $sort = 'after'){
+    $pos = 0;
+    foreach ($array as $lkey => $lval){
+       if($lkey == $key) break;
+       $pos++;
+    }
+    if($sort == 'after'){
+      $array = vve_array_insert($array, $pos+1, $val, $valkey);
+    } else {
+       $array = vve_array_insert($array, $pos, $val, $valkey);
+    }
+    return $array;
+}
+
 ?>
