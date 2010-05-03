@@ -1,0 +1,37 @@
+<?
+//$this->addCssFile("style.css");
+?>
+<div class="bandsList">
+   <?if(!empty ($this->bands)) {
+      foreach ($this->bands as $band) {
+         $showClass = null;
+         if($band->{Bands_Model::COLUMN_PUBLIC} == 0) {
+            $showClass = 'article-list-no-public';
+         }
+         ?>
+   <div class="article-list bands-list <?=$showClass?>">
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $band->{Bands_Model::COLUMN_URLKEY}))?>"
+             title="<?=htmlspecialchars($band->{Bands_Model::COLUMN_NAME})?>"><?=htmlspecialchars($band->{Bands_Model::COLUMN_NAME})?>&nbsp;
+         </a>
+      </h2>
+      <div class="article-list-box-image bands-list-box-image">
+                  <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+                          .$band->{Bands_Model::COLUMN_IMAGE}, $band->{Bands_Model::COLUMN_IMAGE}, 200, 150);?>
+      </div>
+
+            <?print vve_tpl_truncate(strip_tags($band->{Bands_Model::COLUMN_TEXT}), 640);?>
+      <hr class="reseter" />
+      <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$band->{Bands_Model::COLUMN_SHOWED}?>&times;</p>
+      <p style="text-align:right;">
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $band->{Bands_Model::COLUMN_URLKEY}))?>"
+            title="<?=$band->{Bands_Model::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+      </p>
+      <br />
+   </div>
+         <?}
+      echo $this->scrollComp;
+   } else {
+      echo ($this->_('Není vložena žádná kapela'));
+   }?>
+   <?=$this->toolbox;// TOOLBOXY?>
+</div>

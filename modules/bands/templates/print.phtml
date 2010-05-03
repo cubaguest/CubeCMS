@@ -1,0 +1,19 @@
+<?
+$this->addPageTitle($this->band->{Bands_Model::COLUMN_NAME});
+$this->addPageHeadline($this->band->{Bands_Model::COLUMN_NAME});
+?>
+<div class="article-detail band-detail">
+   <div class="article-detail-box-image bands-detail-box-image">
+      <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+        . $this->band->{Bands_Model::COLUMN_IMAGE}, $this->band->{Bands_Model::COLUMN_IMAGE}, 200, 150); ?>
+      </div>
+      <?=$this->band->{Bands_Model::COLUMN_TEXT}?>
+      <hr class="reseter" />
+      <hr />
+      <?
+      $this->includeTpl('articletools.phtml', true, array(
+    'lastEditTime' => $this->band->{Bands_Model::COLUMN_EDIT_TIME},
+    'lastEditUser' => $this->band->{Model_Users::COLUMN_USERNAME},
+    'showed' => $this->band->{Bands_Model::COLUMN_SHOWED}));
+   ?>
+</div>
