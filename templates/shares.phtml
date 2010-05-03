@@ -1,5 +1,4 @@
-<p>
-<?=_('Sdílej')?>:
+<strong><?=_('Sdílej')?>:</strong>
 <?while ($service = $this->shares->fetch()) {?>
 <a href="<?=str_replace($this->search, $this->replacement, $service->{Component_Share_Model::COLUM_LINK})?>"
    title="<?=$service->{Component_Share_Model::COLUM_NAME}?>">
@@ -11,4 +10,3 @@
       <?}?>
 </a>
 <?}?>
-</p>
