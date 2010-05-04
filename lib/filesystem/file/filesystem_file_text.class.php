@@ -9,7 +9,6 @@
  * @author        $Author: jakub $ $Date: 2009-07-07 22:17:18 +0200 (Út, 07 čec 2009) $
  *                $LastChangedBy: jakub $ $LastChangedDate: 2009-07-07 22:17:18 +0200 (Út, 07 čec 2009) $
  * @abstract 		Třída pro obsluhu souborů
- * @todo          Doimplementovat metody "move" a "rename"
  */
 
 class Filesystem_File_Text extends Filesystem_File {

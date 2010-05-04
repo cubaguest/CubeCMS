@@ -9,7 +9,6 @@
  * @author			$Author$ $Date$
  *						$LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro vytvoření hlavního menu
- * @todo          Předělat načítání SQL položek do modelu
  */
 
 class Menu_Main {

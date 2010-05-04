@@ -9,7 +9,6 @@
  * @author			$Author: jakub $ $Date: 2010-01-30 12:33:17 +0100 (Sat, 30 Jan 2010) $
  *						$LastChangedBy: jakub $ $LastChangedDate: 2010-01-30 12:33:17 +0100 (Sat, 30 Jan 2010) $
  * @abstract 		Třída pro vytvoření hlavního menu
- * @todo          Předělat načítání SQL položek do modelu
  */
 
 class Menu_Admin extends Menu_Main {

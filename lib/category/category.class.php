@@ -9,7 +9,6 @@
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu zvolené kategorie
- * @todo          Odstranit názvy sloupců, mají být v modelu kategorie
  */
 
 class Category {
@@ -254,7 +253,7 @@ class Category {
     * @return boolena -- true pokud jsou panely individuální
     */
    public function isIndividualPanels() {
-      return $this->category->{Model_Category::COLUMN_INDIVIDUAL_PANELS};
+      return (bool)$this->category->{Model_Category::COLUMN_INDIVIDUAL_PANELS};
    }
 
    /**
