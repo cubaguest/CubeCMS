@@ -42,13 +42,11 @@ class Model_Panel extends Model_PDO {
     * @return bool -- jestli byl záznam uložen nebo id posledního vloženého záznamu
     */
    public function savePanel($idCat, $pPosition, $name, $icon = null, $backImage = null,
-           $order = 0, $idPanel = null, $idShowCat = null) {
+           $order = 0, $idShowCat = null, $idPanel = null) {
       $this->setIUValues(array(self::COLUMN_ID_CAT => $idCat, self::COLUMN_POSITION => $pPosition,
               self::COLUMN_NAME => $name, self::COLUMN_ORDER => $order,
-              'icon' => $icon, self::COLUMN_BACK_IMAGE => $backImage));
-      if($idShowCat !== null) {
-         $this->setIUValues(array(self::COLUMN_ID_SHOW_CAT => $idShowCat));
-      }
+              'icon' => $icon, self::COLUMN_BACK_IMAGE => $backImage,
+              self::COLUMN_ID_SHOW_CAT => $idShowCat));
 
       $dbc = new Db_PDO();
       // ukládá se nový
@@ -91,19 +89,20 @@ class Model_Panel extends Model_PDO {
                  ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
                  .Model_Rights::COLUMN_ID_CATEGORY." = cat.".Model_Category::COLUMN_CAT_ID
                  ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
-                 ." AND (panel.".self::COLUMN_ID_SHOW_CAT." = ".$idCat.")"
+                 ." AND (panel.".self::COLUMN_ID_SHOW_CAT." = :idcat)"
                  ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." DESC");
          $dbst->bindValue(":idgrp",AppCore::getAuth()->getGroupId() , PDO::PARAM_INT);
       } else {
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
          JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat.".Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
-                 ." WHERE (panel.".self::COLUMN_ID_SHOW_CAT." = ".$idCat.")"
+                 ." WHERE (panel.".self::COLUMN_ID_SHOW_CAT." = :idcat)"
                  ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." DESC");
       }
 
+      $dbst->bindValue(':idcat', $idCat, PDO::PARAM_INT);
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      return $dbst;
+      return $dbst->fetchAll();
    }
 
    public function getPanel($idPanel) {

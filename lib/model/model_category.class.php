@@ -178,6 +178,34 @@ class Model_Category extends Model_PDO {
    }
 
    /**
+    * Metoda načte všechny kategorie
+    * @param bool $allCategories -- jestli mají být vráceny všechny kategorie
+    * bez ohledu na práva (POZOR!! bezpečnostní riziko)
+    * @return PDOStatement -- objekt s daty
+    */
+   public function getCategoriesWithIndPanels() {
+         $dbc = new Db_PDO();
+         $whereMenu = null;
+
+         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+                 ." WHERE ".self::COLUMN_INDIVIDUAL_PANELS." = 1"
+                 ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+
+         $dbst->execute();
+         $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+
+//         $cats = array();
+//         //      foreach ($categories as $row) {
+//         while($row = $dbst->fetch()) {
+//            $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
+//         }
+//         if($allCategories === false) {
+//            $this->catList = $cats;
+//         }
+         return $dbst->fetchAll();
+   }
+
+   /**
     * Metoda uloží novou kategorii
     * @param <type> $name
     * @param <type> $alt

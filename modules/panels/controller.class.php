@@ -5,6 +5,8 @@
  */
 
 class Panels_Controller extends Controller {
+   private $editForm = null;
+
    public function mainController() {
       $this->checkWritebleRights();
 
@@ -56,37 +58,46 @@ class Panels_Controller extends Controller {
          $this->link()->reload();
       }
       // view
-      $this->view()->panelM = $model;
+      $this->view()->gobalpanels = $model->getPanelsList(0,false);;
+
+      // načtení individuálních panelů
+      $modelCat = new Model_Category();
+      $this->view()->individualPanelCats = $modelCat->getCategoriesWithIndPanels();
+
+
    }
 
    public function addController() {
       $this->checkWritebleRights();
 
-      $form = $this->createEditForm();
+      if($this->editForm == null){
+         $this->editForm = $this->createEditForm();
+      }
       // odstranění checkboxů
-      $form->removeElement('icon_delete');
-      $form->removeElement('background_delete');
+      $this->editForm->removeElement('icon_delete');
+      $this->editForm->removeElement('background_delete');
 
-      if($form->isValid()) {
+      if($this->editForm->isValid()) {
          $icon = null;
-         if($form->icon->getValues() != null) {
-            $f = $form->icon->getValues();
+         if($this->editForm->icon->getValues() != null) {
+            $f = $this->editForm->icon->getValues();
             $icon = $f['name'];
          }
          $backImage = null;
-         if($form->background->getValues() != null) {
-            $f = $form->background->getValues();
+         if($this->editForm->background->getValues() != null) {
+            $f = $this->editForm->background->getValues();
             $backImage = $f['name'];
          }
 
          $panelM = new Model_Panel();
-         $panelM->savePanel($form->panel_cat->getValues(), $form->panel_box->getValues(), 
-                 $form->panel_name->getValues(), $icon, $backImage, $form->panel_order->getValues());
+         $panelM->savePanel($this->editForm->panel_cat->getValues(), $this->editForm->panel_box->getValues(),
+                 $this->editForm->panel_name->getValues(), $icon, $backImage, 
+                 $this->editForm->panel_order->getValues(), $this->editForm->panel_show_cat->getValues());
 
          $this->infoMsg()->addMessage($this->_('Panel byl uložen'));
          $this->link()->route()->reload();
       }
-      $this->view()->form = $form;
+      $this->view()->form = $this->editForm;
    }
 
    public function editController(){
@@ -101,6 +112,7 @@ class Panels_Controller extends Controller {
       $form->panel_box->setValues($panel->{Model_Panel::COLUMN_POSITION});
       $form->panel_order->setValues($panel->{Model_Panel::COLUMN_ORDER});
       $form->panel_name->setValues($panel->{Model_Panel::COLUMN_NAME});
+      $form->panel_show_cat->setValues($panel->{Model_Panel::COLUMN_ID_SHOW_CAT});
       if($panel->{Model_Panel::COLUMN_ICON} == null){
          $form->removeElement('icon_delete');
       }
@@ -142,7 +154,7 @@ class Panels_Controller extends Controller {
 
          $model->savePanel($form->panel_cat->getValues(), $form->panel_box->getValues(), $form->panel_name->getValues(),
                  $icon, $backImage, $form->panel_order->getValues(),
-                 $form->id->getValues());
+                 $this->editForm->panel_show_cat->getValues(), $form->id->getValues());
          $this->infoMsg()->addMessage($this->_('Panel byl uložen'));
          $this->link()->route()->reload();
       }
@@ -174,6 +186,24 @@ class Panels_Controller extends Controller {
       $panelCategory = new Form_Element_Select('panel_cat', $this->_('Panel kategorie'));
       $panelCategory->setOptions($catArr);
       $form->addElement($panelCategory,'settings');
+
+      // panel zobrazit u kategorie
+      $showCat = array ();
+
+      $individualPanelsCats = $catModel->getCategoriesWithIndPanels();
+      $arr = array();
+      foreach ($individualPanelsCats as $cat) {
+         $arr[(string)$cat->{Model_Category::COLUMN_CAT_LABEL}] = $cat->{Model_Category::COLUMN_CAT_ID};
+      }
+      ksort($arr); // řazení
+      $showCat = array_merge(array ($this->_('Globálně') => 0),$arr);
+
+
+      $panelShowCategory = new Form_Element_Select('panel_show_cat', $this->_('Určení pro'));
+      $panelShowCategory->setOptions($showCat);
+      $panelShowCategory->setSubLabel($this->_('Pokud je nastaveno globálně, panel je
+         zobrazen u všech kategorií, v opačném případě pouze u vybrané kategorie'));
+      $form->addElement($panelShowCategory,'settings');
 
       $panelType = new Form_Element_Select('panel_box', $this->_('Box panelu'));
       $panelType->setOptions($panelPositions);
@@ -276,7 +306,16 @@ class Panels_Controller extends Controller {
       $this->view()->data = $data;
    }
 
-      public function panelSettingsController(){
+   public function getListPanelsController(){
+      $this->checkWritebleRights();
+
+      $model = new Model_Panel();
+
+      $this->view()->panels = $model->getPanelsList($this->getRequestParam('idc', 0));
+
+   }
+
+   public function panelSettingsController(){
       $this->checkWritebleRights();
 
       $panelM = new Model_Panel();
