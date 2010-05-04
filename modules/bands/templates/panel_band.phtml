@@ -13,7 +13,7 @@ if($this->panelObj()->getBackImage() != null){
    <a href="<?=$this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
       title="<?=htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"
       ><strong><?=$this->band->{Bands_Model::COLUMN_NAME}?></strong></a>
-   <div class="panel-box-image bands-panel-box-image">
+   <div class="panel-box-content-image">
       <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
         . $this->band->{Bands_Model::COLUMN_IMAGE}, $this->band->{Bands_Model::COLUMN_IMAGE}, 170); ?>
    </div>
