@@ -176,7 +176,7 @@ class Form_Element_File extends Form_Element {
     * @return Filesystem_File -- objekt douboru
     * @todo -- dořešit
     */
-   public function createFileObject(Filesystem_File $className = null) {
+   public function createFileObject($className = null) {
       if($className === null){
          $className = "Filesystem_File";
       } else if(!class_exists($className)){
