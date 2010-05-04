@@ -167,7 +167,7 @@ body {
 
 #col2wrap {
    width: 180px;
-   margin-left: -100%;  /*position column to the left side*/
+   margin-left: -100%;  position column to the left side
    /*margin-left: -1000px; /*background-color: #ffe0e0;*/
 }
 
@@ -363,9 +363,32 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 }
 /* EOF back */
 
+/* SOF main content  NEW!!! */
+.article-list {}
+.article-list-box-image, .article-detail-box-image {
+   float: left;
+   padding: 0 10px 10px 0;
+}
+.article-list-no-public, .article-detail-no-public {
+   background-color: #666666;
+   color: #ffffff;
+}
+
+/* EOF main content NEW!!! */
+
+/* SOF panel content NEW!!! */
+.panel-box-label {}
+.panel-box-content {}
+.panel-box-content-image {}
+.panel-box-link-more {
+   text-align: right;
+}
+
+/* EOF panel content NEW!!! */
+
+
 /* SOF main content */
 #col1pad>div {
-   /*background-color:white;*/
 }
 
 /* EOF Main Content */
