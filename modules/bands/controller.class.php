@@ -54,7 +54,7 @@ class Bands_Controller extends Controller {
 
          if($deleteForm->isValid()) {
             // výmaz obr
-            $file = new Filesystem_File($band->{Bands_Model::COLUMN_ID}, $this->category()->getModule()->getDataDir());
+            $file = new Filesystem_File($band->{Bands_Model::COLUMN_IMAGE}, $this->category()->getModule()->getDataDir());
             $file->remove();
 
             $model->deleteBand($deleteForm->id->getValues());
