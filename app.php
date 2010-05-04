@@ -695,8 +695,18 @@ class AppCore {
             $respond->setData($controller->_getTemplateObj()->getTemplateVars());
             $respond->renderRespond();
          } else if(in_array(self::$urlRequest->getOutputType(), Template_Output::getHtmlTypes())){
+            /*
+             * TODO -- tohle by se mělo dořešit, protože není jisté jestli tu má být vůbec render
+             */
             // render normálního výpisu
-            $controller->_getTemplateObj()->renderTemplate();
+            if(Template_Core::getMainIndexTpl() == Template_Core::INDEX_DEFAULT_TEMPLATE){
+               $controller->_getTemplateObj()->renderTemplate();
+            } else {
+               // render při změně indexu
+               $this->coreTpl = new Template_Core();
+               $this->coreTpl->module = $controller->_getTemplateObj();
+               $this->renderTemplate();
+            }
          }
       } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST) {
          // načtení a kontrola cest u modulu

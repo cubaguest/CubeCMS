@@ -15,18 +15,23 @@ class Template_Core extends Template {
    /**
     * Výchozí šablona systému
     */
-   const DEFAULT_INDEX_TEMPLATE = 'index.phtml';
+   const INDEX_DEFAULT_TEMPLATE = 'index.phtml';
+
+   /**
+    * Šablona systému pro výstup v html (tisk)
+    */
+   const INDEX_PRINT_TEMPLATE = 'index_print.phtml';
 
    /**
     * Šablona pro ajax requesty v iframe
     */
-   const AJAXIFRAME_INDEX_TEMPLATE = 'ajax_iframe_index.phtml';
+   const INDEX_AJAXIFRAME_TEMPLATE = 'ajax_iframe_index.phtml';
 
    /**
     * Nastavená šablony systému
     * @var string
     */
-   private static $indexFile = self::DEFAULT_INDEX_TEMPLATE;
+   private static $indexFile = self::INDEX_DEFAULT_TEMPLATE;
 
    /**
     * Konstruktor
@@ -111,7 +116,7 @@ class Template_Core extends Template {
       // odstranění všech proměnných
       $contents = preg_replace('/\{\*\-[A-Za-z0-9_-]+-\*\}/', '', $contents);
       ob_clean();
-      print ((string)$contents);
+      return ((string)$contents);
    }
 
    /**

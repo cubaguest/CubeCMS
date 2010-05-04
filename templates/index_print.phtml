@@ -1,0 +1,38 @@
+<?
+// detekce IE 6 a menších
+$this->setPVar('IE', false);
+if (preg_match('/(?i)msie [1-6]/', $_SERVER['HTTP_USER_AGENT']) AND ! isset($_COOKIE['show_ie_warning'])) {
+   $this->setPVar('IE', true);
+}
+print ('<?xml version="1.0" encoding="utf-8"?>');?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locale::getLang()?>" lang="<?=Locale::getLang()?>">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="author" content="Jakub Matas" />
+      <meta name="keywords" content="<?=htmlspecialchars($this->pageKeywords)?>" />
+      <meta name="description" content="<?=htmlspecialchars($this->pageDesc)?>" />
+      <meta name="Robots" content="index,follow" />
+      <title><? print(VVE_WEB_NAME); ?>{*-PAGE_TITLE-*}</title>
+      <base href="<?=Url_Link::getMainWebDir() ?>" />
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-print.css') ?>" />
+      {*-STYLESHEETS-*}
+      {*-JAVASCRIPTS-*}
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         function printpage() {window.print();}
+         /* ]]> */
+      </script>
+   </head>
+   <body id="pageTop" onload="printpage();">
+      <div id="body">
+         <h1>{*-PAGE_HEADLINE-*}</h1>
+         <hr/>
+<? $this->includeTpl("modules.phtml", true); ?>
+         <hr class="reseter" />
+         <div id="foot">
+            <?=_('Odkaz: ') . $this->link(); ?>
+         </div><!-- footwrap -->
+      </div><!-- bodywrap /-->
+   </body>
+</html>
