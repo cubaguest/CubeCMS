@@ -5,6 +5,8 @@
 class Bands_Model extends Model_PDO {
    const DB_TABLE = 'bands';
 
+   const CLIPS_SEPARATOR = ';';
+
    /**
     * Názvy sloupců v databázi
     */
@@ -12,6 +14,7 @@ class Bands_Model extends Model_PDO {
    const COLUMN_TEXT = 'text';
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_IMAGE = 'image';
+   const COLUMN_CLIPS = 'clips';
    const COLUMN_URLKEY = 'urlkey';
    const COLUMN_ADD_TIME = 'add_time';
    const COLUMN_EDIT_TIME = 'edit_time';
@@ -27,10 +30,17 @@ class Bands_Model extends Model_PDO {
     * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveBand($name, $text, $urlKey, $image, $public = true, $id = null) {
+   public function saveBand($name, $text, $urlKey, $image, $clips, $public = true, $id = null) {
       // generování unikátního klíče
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID ,$id);
+
+      if(!empty ($clips) AND is_array($clips)){
+         $clips = implode(self::CLIPS_SEPARATOR, $clips);
+      }
+      if(empty ($clips) OR $clips == null){
+         $clips = null;
+      }
 
       $dbc = new Db_PDO();
       if($id !== null) {
@@ -38,7 +48,7 @@ class Bands_Model extends Model_PDO {
                  ." SET ".self::COLUMN_NAME."= :name, ".self::COLUMN_TEXT."= :text, "
                  .self::COLUMN_TEXT_CLEAR."= :textclear, ".self::COLUMN_URLKEY."= :urlkey, "
                  .self::COLUMN_EDIT_TIME."= :edittime, ".self::COLUMN_PUBLIC."= :public, "
-                 .self::COLUMN_ID_USER_LAST_EDIT."= :iduser";
+                 .self::COLUMN_CLIPS."= :clips, ".self::COLUMN_ID_USER_LAST_EDIT."= :iduser";
          if($image != null) {
             $sql .= ", ".self::COLUMN_IMAGE."= :image";
          }
@@ -50,6 +60,7 @@ class Bands_Model extends Model_PDO {
          $dbst->bindValue(':name', $name, PDO::PARAM_STR);
          $dbst->bindValue(':text', $text, PDO::PARAM_STR);
          $dbst->bindValue(':textclear', vve_strip_tags($text), PDO::PARAM_STR);
+         $dbst->bindValue(':clips', $clips, PDO::PARAM_STR|PDO::PARAM_NULL);
          $dbst->bindValue(':urlkey', $urlKey, PDO::PARAM_STR);
          $dbst->bindValue(':edittime', date("Y-m-d H:i:s"), PDO::PARAM_STR);
          $dbst->bindValue(':public', $public, PDO::PARAM_BOOL);
@@ -63,12 +74,14 @@ class Bands_Model extends Model_PDO {
                  ."(".self::COLUMN_NAME.",". self::COLUMN_TEXT.","
                  .self::COLUMN_TEXT_CLEAR.",". self::COLUMN_URLKEY.","
                  .self::COLUMN_ADD_TIME.",". self::COLUMN_PUBLIC.","
-                 .self::COLUMN_IMAGE.",". self::COLUMN_ID_USER_LAST_EDIT.")"
-                 ." VALUES (:name, :text, :textclear, :urlkey, :addtime, :public, :image, :iduser)");
+                 .self::COLUMN_IMAGE.",". self::COLUMN_CLIPS.","
+                 .self::COLUMN_ID_USER_LAST_EDIT.")"
+                 ." VALUES (:name, :text, :textclear, :urlkey, :addtime, :public, :image, :clips :iduser)");
 
          $dbst->bindValue(':name', $name, PDO::PARAM_STR);
          $dbst->bindValue(':text', $text, PDO::PARAM_STR);
          $dbst->bindValue(':textclear', vve_strip_tags($text), PDO::PARAM_STR);
+         $dbst->bindValue(':clips', $clips, PDO::PARAM_STR|PDO::PARAM_NULL);
          $dbst->bindValue(':urlkey', $urlKey, PDO::PARAM_STR);
          $dbst->bindValue(':addtime', date("Y-m-d H:i:s"), PDO::PARAM_STR);
          $dbst->bindValue(':public', $public, PDO::PARAM_BOOL);
@@ -190,17 +203,51 @@ class Bands_Model extends Model_PDO {
    }
 
    /**
+    * Metoda provede náhodný výběr klipu
+    * @return <type>
+    */
+   public function getRandomCLip() {
+      $retClip = null;
+
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT ".self::COLUMN_CLIPS." FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE (ISNULL(".self::COLUMN_CLIPS.") = 0)"
+              ." ORDER BY RAND() LIMIT 0, 1");
+      $dbst->execute();
+      $fetch = $dbst->fetchObject();
+      if($fetch != false){
+         $clipsArr = explode(self::CLIPS_SEPARATOR, (string)$fetch->{self::COLUMN_CLIPS});
+         $retClip = $clipsArr[rand(0, count($clipsArr)-1)];
+      }
+
+      return $retClip;
+   }
+
+   /**
+    * Metoda provede náhodný výběr skupiny
+    * @return Object
+    */
+   public function getRandomBand() {
+      $retBand = null;
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." ORDER BY RAND() LIMIT 0, 1");
+      $dbst->execute();
+      return $dbst->fetchObject();
+   }
+
+   /**
     * Metoda vymaže články podle zadaného id kategorie
     * @param int $id -- id kategorie
     */
-   public function deleteArticleByCat($id) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
-              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
-      $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
-      $dbst->execute();
-      return $dbst;
-   }
+//   public function deleteArticleByCat($id) {
+//      $dbc = new Db_PDO();
+//      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
+//              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
+//      $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
+//      $dbst->execute();
+//      return $dbst;
+//   }
 
    /**
     * Metoda nastaví změnu článku

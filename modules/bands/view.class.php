@@ -23,7 +23,7 @@ class Bands_View extends View {
                  $this->_("Upravit zobrazenou skupinu"), "page_edit.png");
          $toolbox->addTool('band_delete', $this->_("Smazat"),
                  $this->link(), $this->_("Smazat zobrazenou skupinu"), "page_delete.png",
-                 'article_id', (int)$this->band->{Bands_Model::COLUMN_ID},
+                 'band_id', (int)$this->band->{Bands_Model::COLUMN_ID},
                  $this->_('Opravdu smazat skupinu?'));
          $this->toolbox = $toolbox;
       }

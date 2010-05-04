@@ -44,6 +44,7 @@ class Bands_Controller extends Controller {
       $model->addShowCount($band->{Bands_Model::COLUMN_ID});
       if($this->category()->getRights()->isWritable()
               OR $this->category()->getRights()->isControll()) {
+
          $deleteForm = new Form('band_');
          $feId = new Form_Element_Hidden('id');
          $feId->addValidation(new Form_Validator_IsNumber());
@@ -52,9 +53,17 @@ class Bands_Controller extends Controller {
          $deleteForm->addElement($feSubmit);
 
          if($deleteForm->isValid()) {
+            // výmaz obr
+            $file = new Filesystem_File($band->{Bands_Model::COLUMN_ID}, $this->category()->getModule()->getDataDir());
+            $file->remove();
+
             $model->deleteBand($deleteForm->id->getValues());
+
+            $this->infoMsg()->addMessage($this->_('Skupina byla smazána'));
             $this->link()->route()->rmParam()->reload();
          }
+
+
       }
       // komponenta pro vypsání odkazů na sdílení
       $shares = new Component_Share();
@@ -80,9 +89,16 @@ class Bands_Controller extends Controller {
          $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
                  $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), true);
          $image->save();
+
+         // výběr clipů youtube
+         $clips = array();
+         preg_match_all('/data="(https?:\/\/www.youtube.com[^"]*)"/', $addForm->text->getValues(), $clips);
+         if(isset ($clips[1])) $clips = $clips[1];
+         else $clips = null;
+
          $model = new Bands_Model();
          $lastId = $model->saveBand($addForm->name->getValues(), $addForm->text->getValues(),
-                 $addForm->urlkey->getValues(), $image->getName(), $addForm->public->getValues());
+                 $addForm->urlkey->getValues(), $image->getName(), $clips, $addForm->public->getValues());
          $band = $model->getBandById($lastId);
          $this->infoMsg()->addMessage($this->_('Skupina byla uložena'));
          $this->link()->route('detail',array('urlkey' => $band->{Bands_Model::COLUMN_URLKEY}))->reload();
@@ -125,8 +141,14 @@ class Bands_Controller extends Controller {
             $newImg = $image->getName();
          }
 
+         // výběr clipů youtube
+         $clips = array();
+         preg_match_all('/data="(https?:\/\/www.youtube.com[^"]*)"/', $editForm->text->getValues(), $clips);
+         if(isset ($clips[1])) $clips = $clips[1];
+         else $clips = null;
+
          $model->saveBand($editForm->name->getValues(), $editForm->text->getValues(),
-                 $editForm->urlkey->getValues(), $newImg,
+                 $editForm->urlkey->getValues(), $newImg, $clips,
                  $editForm->public->getValues(), $band->{Bands_Model::COLUMN_ID});
          $this->infoMsg()->addMessage($this->_('Uloženo'));
          // nahrání nové verze článku (kvůli url klíči)

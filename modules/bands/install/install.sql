@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}bands` (
   `text` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `image` varchar(100) DEFAULT NULL,
   `text_clear` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
+  `clips` varchar(1000) DEFAULT NULL,
   `urlkey` varchar(100) DEFAULT NULL,
   `public` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_band`),

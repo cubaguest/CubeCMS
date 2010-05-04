@@ -1,0 +1,40 @@
+<?
+$icon = null;
+if($this->panelObj()->getIcon() != null) {
+   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+}
+$backImg = null;
+if($this->panelObj()->getBackImage() != null) {
+   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+}
+?>
+
+<p class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
+<div class="panel-box-content" style="<?=$backImg?>">
+   <?
+   $width = 170; // ZDE MĚNIT VELIKOST !!!
+   $height = ceil($width/4*3);
+   ?>
+   <!--[if !IE]> -->
+   <object id="flash" type="application/x-shockwave-flash"  height="<?=$height?>" width="<?=$width?>"
+           data="<?=$this->clip?>&hl=cs_CZ&fs=1&rel=0">
+      <!-- <![endif]-->
+
+      <!--[if IE]>
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"
+        width="<?=$width?>" height="<?=$height?>">
+      <!--><!--dgx-->
+      <param name="movie" value="<?=$this->clip?>&hl=cs_CZ&fs=1&rel=0" />
+      <param name="allowFullScreen" value="true" />
+      <param name="allowscriptaccess" value="always" />
+      <param name="menu" value="false" />
+      <p>Prosím nainstalijte si Adobe Flash Player</p>
+   </object>
+   <!-- <![endif]-->
+
+</div>
+<p class="panel-box-link-more">
+   <a href="<?=$this->link()?>"
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+</p>
