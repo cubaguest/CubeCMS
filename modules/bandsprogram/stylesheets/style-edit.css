@@ -1,0 +1,34 @@
+ul.program {
+   margin: 0;
+   padding: 0;
+}
+
+ul.program li {
+   margin: 0;
+   padding: 2px;
+   list-style: none;
+   font-weight: bold;
+}
+ul.program .ui-icon {
+   float: left;
+}
+
+ul.program .ui-icon.move {
+   cursor: move;
+}
+
+ul.program .itemLabel {
+   display: block;
+   float: left;
+   width: 80px;
+}
+
+.startTime {
+   float: left;
+   width: 50px;
+}
+
+.itemButtons {
+   float: right;
+   height: 16px;
+}

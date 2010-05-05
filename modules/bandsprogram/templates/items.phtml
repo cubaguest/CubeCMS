@@ -1,0 +1,105 @@
+<?
+// třídy
+$this->form->time->html()->addClass('prgItemTime')->setAttrib('size', 5);
+$this->form->bandid->html()->addClass('prgItemBand');
+$this->form->textlong->html()->setAttrib('cols', 45)->setAttrib('rows',1);
+
+switch ($this->type) {
+   case 'band':?>
+      <?// BAND?>
+      <li class="itemBand ui-state-default ui-corner-top ui-corner-bottom">
+         <span class="startTime">00:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         <span class="itemLabel">Skupina</span>&nbsp;čas:&nbsp;<?=$this->form
+              ->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         skupina:&nbsp;
+         <?=$this->form->bandid->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="itemButtons">
+            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         </span>
+         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('band')->controll()?>
+         <hr class="reseter"/>
+      </li>
+      <?
+      break;
+   case "day":?>
+      <?// DAY?>
+      <li  class="itemDay ui-widget-header ui-corner-top ui-corner-bottom">
+         <span class="startTime">12:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         <span class="itemLabel">Den</span>
+         &nbsp;čas:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         název:&nbsp;<?=$this->form->text->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="itemButtons">
+            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         </span>
+         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('day')->controll()?>
+         <hr class="reseter"/>
+      </li>
+      <?
+      break;
+   case "note":?>
+      <?// NOTE?>
+      <li class="itemNote ui-widget-content ui-corner-top ui-corner-bottom">
+         <span class="startTime">--:--</span>
+         <span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         <span class="itemLabel">Poznámka</span>
+         <?=$this->form->textlong->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="itemButtons">
+            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         </span>
+         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('note')->controll()?>
+         <hr class="reseter"/>
+      </li>
+      <?
+      break;
+   case "other":?>
+      <?// OTHER?>
+      <li class="itemOther ui-state-default ui-corner-top ui-corner-bottom">
+         <span class="startTime">00:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         <span class="itemLabel">Jiné</span>
+         &nbsp;čas:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         název:&nbsp;<?=$this->form->text->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="itemButtons">
+            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         </span>
+         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('other')->controll()?>
+         <hr class="reseter"/>
+      </li>
+      <?
+      break;
+   case "space":?>
+      <?// SPACE?>
+      <li class="itemNote ui-widget-content ui-corner-top ui-corner-bottom">
+         <span class="startTime">--:--</span>
+         <span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         <span class="itemLabel">Mezera</span>
+         <span class="itemButtons">
+            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         </span>
+         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('space')->controll()?>
+         <hr class="reseter"/>
+      </li>
+      <?
+      break;
+   case "stage":?>
+      <?// STAGE?>
+      <li class="itemStage ui-state-hover ui-corner-top ui-corner-bottom">
+         <span class="startTime">12:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         &nbsp;čas:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="itemLabel">Stage</span>
+         název:&nbsp;<?=$this->form->text->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="itemButtons">
+            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         </span>
+         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('stage')->controll()?>
+         <hr class="reseter"/>
+      </li>
+      <?
+      break;
+   default:?>
+      <li class="ui-state-error">
+         <strong><?=$this->_("Neplatný typ prvku programu!");?></strong>
+      </li>
+      <?
+      break;
+}
+?>

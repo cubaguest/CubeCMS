@@ -1,0 +1,25 @@
+.bandsprogram-content li {
+   padding: 5px 0;
+   clear: left;
+}
+
+.bandsprogram-content .programText, .bandsprogram-content .programSpace {
+   margin-left: 50px;
+}
+
+.bandsprogram-content .programDayText {
+   font-weight: bold;
+   font-size: large;
+}
+.bandsprogram-content .programStageText {
+   font-weight: bold;
+   font-size: medium;
+}
+
+.bandsprogram-content .programTime {
+   float: left;
+}
+
+.bandsprogram-content .programNote {
+   color: silver;
+}

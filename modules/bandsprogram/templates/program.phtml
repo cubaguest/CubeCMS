@@ -1,0 +1,83 @@
+<?
+$this->addPageTitle($this->_('Program'));
+$this->addPageHeadline($this->_('Program'));
+
+$this->addCssFile("style.css");
+?>
+<div class="article-detail-content bandsprogram-content">
+   <?if($this->currentProgram != null){?>
+   <ul>
+   <?
+   $curTime = new DateTime();
+   foreach ($this->currentProgram as $item) {?>
+      <?
+      switch ($item['type']) {
+         case 'day':?>
+            <li class="programItem programDay">
+            <p class="programText programDayText"><?=$item->text?></p>
+            </li>
+            <?
+            $curTime = new DateTime($item->time);
+            break;
+         case 'stage':?>
+            <li class="programItem programStage">
+            <p class="programText programStageText"><?=$item->text?></p>
+            </li>
+            <?
+            $curTime = new DateTime($item->time);
+            break;
+         case 'band':?>
+            <li class="programItem programBand">
+            <p class="programTime"><?=$curTime->format("G:i");?></p>
+            <p class="programText programBandText">
+               <a href="<?=$this->bands[(int)$item->bandid]['link']?>"
+                  title="<?=$this->bands[(int)$item->bandid]['name'].' - '.$this->_('přejít')?>"
+                  ><?=$this->bands[(int)$item->bandid]['name']?></a>
+            </p>
+            </li>
+            <?
+            // parsing času
+            $matches = array();
+            preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
+            $curTime->modify(sprintf('+ %s hours %s minutes', $matches[1],$matches[2]));
+            break;
+         case 'other':?>
+            <li class="programItem programOther">
+            <p class="programTime"><?=$curTime->format("G:i");?></p>
+            <p class="programText programOtherText"><?=$item->text?></p>
+            </li>
+            <?
+            // parsing času
+            $matches = array();
+            preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
+            $curTime->modify(sprintf('+ %s hours %s minutes', $matches[1],$matches[2]));
+            break;
+         case 'note':?>
+            <li class="programItem programNote">
+            <p class="programText programNoteText"><?=$item->text?></p>
+            </li>
+            <?
+            break;
+         case 'space':?>
+            <li class="programItem programSpace"><hr /></li>
+            <?
+            break;
+      }
+   }?>
+   </ul>
+   <br />
+   <?
+   if($this->hideArtTools != true){
+      $this->includeTpl('articletools.phtml', true, array(
+         'linkToPdf' => $this->link()->route('exportProgram', array('output' => 'pdf'))->rmparam(),
+         'linkToHtml' => $this->link()->route('exportProgram', array('output' => 'html'))->rmparam(),
+         'shares' => $this->shares));
+   }
+   ?>
+   <?
+   } else {
+      echo $this->_('Program nebyl definován');
+   }?>
+
+   <?=$this->toolbox;// TOOLBOXY?>
+</div>
