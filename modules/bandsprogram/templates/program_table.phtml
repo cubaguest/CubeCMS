@@ -1,0 +1,102 @@
+<?
+$this->addPageTitle($this->_('Program'));
+$this->addPageHeadline($this->_('Program'));
+
+$this->addCssFile("style.css");
+
+$cellH = $headerCellH = 30; // 30 minut je výška
+$loops = 15;
+$min_px = 1; // poměr minuta-px
+?>
+<div class="article-detail-content bandsprogram-content">
+   <?if($this->currentProgram != null){
+      foreach ($this->currentProgram as $day) {
+         $dayStartTime = new DateTime($day['time']);
+         $countStages = count($day->stage);
+         ?>
+   <div class="program-day">
+      <h2><?echo ($day['text']);?></h2>
+      <div class="program-table-wrapper">
+      <?// generování dabulky?>
+      <table class="program-table">
+         <thead>
+         <th></th>
+         <?foreach ($day->stage as $stage) {
+            echo "<th>".$stage['name']."</th>";
+         }?>
+         </thead>
+         <tbody>
+            <? //for ($y = 0; $y < $loops; $y++){
+               $toTime = date("G", strtotime($day['totime']));
+               do {
+               ?>
+            <tr>
+               <td valign="top"><?=$dayStartTime->format("G:i");?></td>
+               <?
+               for($x = 0; $x < $countStages; $x++){
+                  echo "<td></td>";
+               }
+               ?>
+            </tr>
+            <?
+            } while ($curHour = $dayStartTime->modify('+ '.$cellH.' minutes')->format("G") != $toTime);
+            //}
+            ?>
+         </tbody>
+
+      </table>
+      <?//generování divů
+      // výps stagů
+      $currStageIndex = 1;
+      $dST = new DateTime($day['time']);
+      reset($day);
+      foreach ($day as $stage) {
+         foreach ($stage->item as $item) {
+            $toppos = $headerCellH;
+            $height = 0;
+            $startTime = new DateTime($item->time);
+            $deltaTime = new DateTime($item->lenght);
+            // umístění od vrchu
+            $toppos += ( ($startTime->format('H') - $dST->format('H'))*60
+                    +($startTime->format('i') - $dST->format('i')) )*$min_px;
+            $lenghtMin = $deltaTime->format('H')*60+$deltaTime->format('i');
+            unset ($deltaTime);
+            $height += $lenghtMin*$min_px;
+            ?>
+            <div class="program-item program-item-column-<?=$currStageIndex?>" 
+                 style="<?printf('top: %dpx; height: %dpx;',$toppos,$height);?>">
+               <?
+               echo $startTime->format("G:i")." - ".$startTime->modify('+ '.$lenghtMin.' minutes')->format("G:i")."<br>";
+               if($item['type'] == 'band'){
+                  echo '<a href="'.$this->bands[(int)$item->bandid]['link'].'"
+                     title="'.$this->bands[(int)$item->bandid]['name'].'">'.$this->bands[(int)$item->bandid]['name']."</a>";
+                  $this->bands[(int)$item->bandid]['link'];
+               } else if($item['type'] == 'other'){
+                  echo $item->text;
+               }
+               ?>
+            </div>
+         <?
+         }
+         $currStageIndex++;
+      }
+      ?>
+      </div>
+   </div>
+   <hr />
+   <?}
+   
+   if($this->hideArtTools != true){
+      $this->includeTpl('articletools.phtml', true, array(
+         'linkToPdf' => $this->link()->route('exportProgram', array('output' => 'pdf'))->rmparam(),
+         'linkToHtml' => $this->link()->route('exportProgram', array('output' => 'html'))->rmparam(),
+         'shares' => $this->shares));
+   }
+   ?>
+   <?
+   } else {
+      echo $this->_('Program nebyl definován');
+   }?>
+
+   <?=$this->toolbox;// TOOLBOXY?>
+</div>

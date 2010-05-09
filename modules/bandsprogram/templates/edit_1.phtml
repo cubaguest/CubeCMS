@@ -1,0 +1,202 @@
+<?
+$this->addCssFile("style-edit.css");
+$this->addPageTitle($this->_('Program'));
+$this->addPageHeadline($this->_('Program'));
+
+// donastavení formu
+$this->form->html()->setAttrib('id', 'formProgram');
+
+$this->itemIndex = 0;
+
+?>
+
+<div class="article-list">
+   <?=$this->form->renderStart();?>
+   <ul class="program">
+      <?// tady vakreslení existujících položek
+      foreach ($this->currentProgram as $item) {
+         $this->type = $item['type'];
+         // dopočet hodnot
+         if(isset ($item->time)){
+            $this->form->time->setValues($item->time);
+         }
+
+         if(isset ($item->bandid)){
+            $this->form->bandid->setValues($item->bandid);
+         }
+
+         if(isset ($item->text) AND $item['type'] == 'note'){
+            $this->form->textlong->setValues($item->text);
+         } else if(isset ($item->text)){
+            $this->form->text->setValues($item->text);
+         }
+
+         $this->includeTpl('items.phtml'); // šablona
+         $this->itemIndex++; // další index
+      }
+      ?>
+   </ul>
+   <br />
+   <p>
+      <label for="programSelTypeAdd"><?=$this->_("Přidat")?>:</label>&nbsp;
+      <select name="addtype" id="programSelTypeAdd">
+         <optgroup label="<?=$this->_("Položky");?>">
+            <option value="band"><?=$this->_("Skupinu");?></option>
+            <option value="other"><?=$this->_("Jiné");?></option>
+            <option value="note"><?=$this->_("Poznámka");?></option>
+            <option value="space"><?=$this->_("Mezera");?></option>
+         </optgroup>
+         <optgroup label="<?=$this->_("Rozdělení");?>">
+            <option value="day"><?=$this->_("Den");?></option>
+            <option value="stage"><?=$this->_("Stage");?></option>
+         </optgroup>
+      </select>
+      <input name="add" type="button" value="<?=$this->_("Přidat")?>" />
+      <input name="refresh" type="button" value="<?=$this->_("Přepočítat")?>" />
+      <?=$this->form->save->controll();?>
+   </p>
+   <?echo $this->form->renderEnd();?>
+   <hr class="reseter" />
+</div>
+
+<?
+$jQuery = new JsPlugin_JQuery();
+$jQuery->setCfgParam("theme", "ui-lightness");
+$jQuery->addUISortable();
+$this->addJsPlugin($jQuery);
+$this->addJsPlugin(new JsPlugin_TextAreaAutoResize());
+?>
+
+<script type="text/javascript">
+   /* <![CDATA[ */
+   var itemIndex = <?=$this->itemIndex?>;
+   $(document).ready(function(){
+      $form = $('form#formProgram');
+      $tpl = $('ul#tpl');
+//      recalculateTimes();
+
+      $("ul.program", $form).sortable({
+         forcePlaceholderSize: true ,
+         forceHelperSize : true,
+         start: function() {},
+         stop: function() {
+//            recalculateTimes();
+         }
+      });
+
+      $('textarea.program_textlong_class').autoResize(); // autoresize
+
+      // tlačítko pro přidání položky
+      $('input[name=add]', $form).click(function(){
+         var type = $("select[name=addtype]", $form).val();
+
+         $.get('<?=$this->link()->route('programItem')?>',
+         { type: type, index: itemIndex },
+         function(data){
+            $('ul.program', $form).append(data);
+            itemIndex++;
+            recalculateTimes();
+            $("ul.program", $form).sortable( "refresh" );
+            $('textarea.program_textlong_class').autoResize(); // autoresize
+         });
+         // nastavíme seznam
+         $("select[name=addtype]", $form).val("band");
+         return false;
+      });
+      // manuální přepočet
+//      $("input[name=refresh]", $form).click(function(){recalculateTimes();return false;});
+
+      // live eventy pro update
+//      $('input.daystart').live("focusout", function(){
+//         var $this = $(this);
+//         if(checkTime($this.val())) return;
+//         $this.parent("li").children("p.startTime").text($this.val());
+//         recalculateTimes();
+//      });
+
+      $('a.buttonRemove', $form).live("click", function(){
+         if(confirm("Smazat?") == false) return false;
+         $(this).parents("li").slideUp(200, function(){
+            $(this).remove();
+         });
+//         recalculateTimes();
+         return false;
+      });
+
+//      $('input.prgItemTime', $form).live("focusout", function(){
+//         var $this = $(this);
+//         if(checkTime($this.val()) == false) return;
+//         recalculateTimes();
+//      });
+
+      $form.submit(function(){
+         $('input[type=text]', $form).removeClass("formError");
+         $('textarea', $form).removeClass("formError");
+         var allOk = true;
+         $('.text', $form).each(function(){
+            if($(this).val() == ""){
+               allOk = false;
+               $(this).addClass("formError");
+               return;
+            }
+         });
+         if(allOk == true){
+            $('input.prgItemTime', $form).each(function(){
+               if($(this).val() == ""){
+                  allOk = false;
+                  $(this).addClass("formError");
+                  return;
+               }
+            });
+         }
+
+         if(allOk == false){
+            alert("Nebyly vyplněny všechny položky (název, poznámka,..)");
+            return false;
+         }
+      });
+   });
+
+   // funkce pro přepočet prvků
+//   var curTime = new Date();
+//   function recalculateTimes(){
+//      curTime = new Date();
+//      $('ul li', $form).each(function(index, element){
+//         var $obj = $(this);
+//
+//         if($obj.hasClass("itemDay") || $obj.hasClass("itemBand")
+//            || $obj.hasClass("itemOther")|| $obj.hasClass("itemStage")){
+//            var value = $obj.children("input.prgItemTime").val();
+//            // rozparsujeme datum na části
+//            if(checkTime(value) == false) return false;
+//            var datereg = /^([0-9]{1,2}):([0-9]{1,2})$/;
+//            var parts = value.match(datereg);
+//         }
+//
+//         if($obj.hasClass("itemDay") || $obj.hasClass("itemStage")){
+//            curTime = new Date();
+//            curTime.setHours(parts[1], parts[2]);
+//            $('.startTime', $obj).text(curTimeToStr());
+//         } else if($obj.hasClass("itemBand") || $obj.hasClass("itemOther")) {
+//            $('.startTime', $obj).text(curTimeToStr());
+//            curTime.setHours(curTime.getHours()+parseInt(parts[1]),
+//            curTime.getMinutes()+parseInt(parts[2]));
+//         }
+//      });
+//   }
+
+   function checkTime(val){
+      var datereg = /^([0-9]{1,2}):([0-9]{1,2})$/;
+      return datereg.test(val);
+   }
+
+   // funkce převede date obj na řetězec času HH:mm
+   function curTimeToStr(){
+      var minutes = curTime.getMinutes();
+      minutes=((minutes < 10) ? "0" : "") + minutes; // minuty s nulou
+      return curTime.getHours().toString()+":"+minutes;
+   }
+   /* ]]> */
+</script>
+<? echo $this->toolbox; // TOOLBOX ?>
+<?$this->includeTpl("buttonback.phtml", true);?>

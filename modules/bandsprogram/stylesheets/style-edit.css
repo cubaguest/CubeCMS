@@ -1,34 +1,47 @@
-ul.program {
+ul.program-days-list {
    margin: 0;
    padding: 0;
 }
 
-ul.program li {
+ul.program-days-list ul {
+   min-height: 1em;
+}
+
+ul.program-days-list li {
    margin: 0;
    padding: 2px;
    list-style: none;
    font-weight: bold;
 }
-ul.program .ui-icon {
+
+ul.program-days-list .ui-icon {
    float: left;
 }
+/* itemy */
+ul.program-days-list .program-item-day {
+   margin-bottom: 10px;
+}
 
-ul.program .ui-icon.move {
+ul.program-days-list .program-button-move {
    cursor: move;
 }
 
-ul.program .itemLabel {
+ul.program-days-list .program-item-label {
    display: block;
    float: left;
-   width: 80px;
+   width: 60px;
 }
 
-.startTime {
+/*ul.program-days-list .itemStage, ul.program-days-list .itemDay {
+   margin-top: 20px;
+}*/
+
+/*.startTime {
    float: left;
    width: 50px;
-}
+}*/
 
-.itemButtons {
+.program-item-buttons {
    float: right;
    height: 16px;
 }

@@ -1,7 +1,7 @@
 <?php
 class BandsProgram_View extends View {
    public function mainView() {
-      $this->template()->addTplFile("program.phtml");
+      $this->template()->addTplFile("program_table.phtml");
 
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox();
@@ -26,7 +26,7 @@ class BandsProgram_View extends View {
    public function exportProgramHtmlView(){
       Template_Core::setMainIndexTpl(Template_Core::INDEX_PRINT_TEMPLATE);
       $this->hideArtTools = true;
-      $this->template()->addTplFile("program.phtml");
+      $this->template()->addTplFile("program_linear.phtml");
    }
 
    public function exportProgramPdfView(){
@@ -42,11 +42,9 @@ class BandsProgram_View extends View {
 
    /**
     * Metoda vytvoří pdf soubor
-    * @param Object $article -- článek
     * @return Component_Tcpdf
     */
    protected function createPdf() {
-      $article = $this->article;
       // komponenta TcPDF
       $c = new Component_Tcpdf();
       // vytvoření pdf objektu
@@ -65,49 +63,74 @@ class BandsProgram_View extends View {
       $c->pdf()->Ln();
 
       $mainW = 150;
+      $cell1 = 30;
 
-      $curTime = new DateTime($item->time);
-      foreach ($this->currentProgram as $item) {
-         switch ($item['type']) {
-            case 'day':
-               $c->pdf()->SetFillColor(220,217,26);
-               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+5);
-               $c->pdf()->MultiCell($mainW, 9,$item->text, 'B', 'L', 1, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
-               $curTime = new DateTime($item->time);
-               break;
-            case 'stage':
-               $c->pdf()->SetFillColor(220,217,26);
-               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+1);
-               $c->pdf()->MultiCell($mainW, 7, $item->text, 'B', 'L', 1, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
-               $curTime = new DateTime($item->time);
-               break;
-            case 'band':
+//      $curTime = new DateTime($item->time);
+      foreach ($this->currentProgram as $day) {
+         $c->pdf()->SetFillColor(220,217,26);
+         $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+5);
+         $c->pdf()->MultiCell($mainW, 9,$day['text'], 'B', 'L', 0, 1, VVE_PDF_MARGIN_LEFT+$cell1, '', true);
+
+         foreach ($day->stage as $stage) {
+            $c->pdf()->SetFillColor(220,217,26);
+            $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+1);
+            $c->pdf()->MultiCell($mainW, 7, $stage['name'], 'B', 'L', 1, 1, VVE_PDF_MARGIN_LEFT+$cell1, '', true);
+
+            foreach ($stage->item as $item) {
+               $startTime = new DateTime($item->time);
+               $deltaTime = new DateTime($item->lenght);
+               $lenghtMin = $deltaTime->format('H')*60+$deltaTime->format('i');
                $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
-               $c->pdf()->MultiCell(20, 5, $curTime->format("G:i"), 0, 'L', 0, 0, VVE_PDF_MARGIN_LEFT, '', true);
-               $c->pdf()->MultiCell($mainW, 5, $this->bands[(int)$item->bandid]['name'], 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
-               // parsing času
-               $matches = array();
-               preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
-               $curTime->modify(sprintf('+ %s hours %s minutes', $matches[1],$matches[2]));
-               break;
-            case 'other':
-               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
-               $c->pdf()->MultiCell(20, 5, $curTime->format("G:i"), 0, 'L', 0, 0, VVE_PDF_MARGIN_LEFT, '', true);
-               $c->pdf()->MultiCell($mainW, 5, $item->text, 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
-               // parsing času
-               $matches = array();
-               preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
-               $curTime->modify(sprintf('+ %s hours %s minutes', $matches[1],$matches[2]));
-               break;
-            case 'note':
-               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'I', VVE_PDF_FONT_SIZE_MAIN-2);
-               $c->pdf()->MultiCell($mainW, 5, $item->text, 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
-               break;
-            case 'space':
-               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'I', VVE_PDF_FONT_SIZE_MAIN-2);
-               $c->pdf()->MultiCell($mainW, 5, "", 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
-               break;
+               $c->pdf()->MultiCell($cell1, 5, $startTime->format("G:i")." - ".$startTime->modify('+ '.$lenghtMin.' minutes')->format("G:i"), 0, 'L', 0, 0, VVE_PDF_MARGIN_LEFT, '', true);
+               if($item['type'] == 'band'){
+                  $c->pdf()->MultiCell($mainW, 5, $this->bands[(int)$item->bandid]['name'], 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+$cell1, '', true);
+               } else if($item['type'] == 'other'){
+                  $c->pdf()->MultiCell($mainW, 5, $item->text, 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+$cell1, '', true);
+               }
+
+            }
          }
+
+//         switch ($item['type']) {
+//            case 'day':
+//               $c->pdf()->SetFillColor(220,217,26);
+//               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+5);
+//               $c->pdf()->MultiCell($mainW, 9,$item->text, 'B', 'L', 1, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
+//               $curTime = new DateTime($item->time);
+//               break;
+//            case 'stage':
+//               $c->pdf()->SetFillColor(220,217,26);
+//               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+1);
+//               $c->pdf()->MultiCell($mainW, 7, $item->text, 'B', 'L', 1, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
+//               $curTime = new DateTime($item->time);
+//               break;
+//            case 'band':
+//               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
+//               $c->pdf()->MultiCell(20, 5, $curTime->format("G:i"), 0, 'L', 0, 0, VVE_PDF_MARGIN_LEFT, '', true);
+//               $c->pdf()->MultiCell($mainW, 5, $this->bands[(int)$item->bandid]['name'], 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
+//               // parsing času
+//               $matches = array();
+//               preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
+//               $curTime->modify(sprintf('+ %s hours %s minutes', $matches[1],$matches[2]));
+//               break;
+//            case 'other':
+//               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
+//               $c->pdf()->MultiCell(20, 5, $curTime->format("G:i"), 0, 'L', 0, 0, VVE_PDF_MARGIN_LEFT, '', true);
+//               $c->pdf()->MultiCell($mainW, 5, $item->text, 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
+//               // parsing času
+//               $matches = array();
+//               preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
+//               $curTime->modify(sprintf('+ %s hours %s minutes', $matches[1],$matches[2]));
+//               break;
+//            case 'note':
+//               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'I', VVE_PDF_FONT_SIZE_MAIN-2);
+//               $c->pdf()->MultiCell($mainW, 5, $item->text, 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
+//               break;
+//            case 'space':
+//               $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'I', VVE_PDF_FONT_SIZE_MAIN-2);
+//               $c->pdf()->MultiCell($mainW, 5, "", 0, 'L', 0, 1, VVE_PDF_MARGIN_LEFT+20, '', true);
+//               break;
+//         }
       }
       return $c;
    }

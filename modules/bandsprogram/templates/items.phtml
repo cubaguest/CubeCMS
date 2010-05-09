@@ -1,52 +1,53 @@
 <?
 // třídy
 $this->form->time->html()->addClass('prgItemTime')->setAttrib('size', 5);
+$this->form->lenght->html()->addClass('prgItemLenght')->setAttrib('size', 5);
 $this->form->bandid->html()->addClass('prgItemBand');
 $this->form->textlong->html()->setAttrib('cols', 45)->setAttrib('rows',1);
 
 switch ($this->type) {
    case 'band':?>
       <?// BAND?>
-      <li class="itemBand ui-state-default ui-corner-top ui-corner-bottom">
-         <span class="startTime">00:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-         <span class="itemLabel">Skupina</span>&nbsp;čas:&nbsp;<?=$this->form
-              ->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+      <li class="program-item-band ui-state-default ui-corner-top ui-corner-bottom">
+         <span class="ui-icon ui-icon-arrowthick-2-n-s program-button-move"></span>
+         <span class="program-item-label">Skupina</span>
          skupina:&nbsp;
          <?=$this->form->bandid->setDimensional($this->itemIndex)->controll()?>&nbsp;
-         <span class="itemButtons">
-            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         od:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         délka:&nbsp;<?=$this->form->lenght->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="program-item-buttons">
+            <a href="#" class="ui-icon ui-icon-closethick program-button-remove"></a>
          </span>
          <?=$this->form->type->setDimensional($this->itemIndex)->setValues('band')->controll()?>
          <hr class="reseter"/>
       </li>
       <?
+      $this->itemIndex++; // další index
       break;
    case "day":?>
       <?// DAY?>
-      <li  class="itemDay ui-widget-header ui-corner-top ui-corner-bottom">
-         <span class="startTime">12:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-         <span class="itemLabel">Den</span>
-         &nbsp;čas:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+      <li class="program-item-day ui-widget-header ui-corner-top ui-corner-bottom">
+         <span class="ui-icon ui-icon-arrowthick-2-n-s program-button-move"></span>
+         <span class="program-item-label">Den</span>
          název:&nbsp;<?=$this->form->text->setDimensional($this->itemIndex)->controll()?>&nbsp;
-         <span class="itemButtons">
-            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         od:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         do:&nbsp;<?=$this->form->lenght->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="program-item-buttons">
+            <a href="#" class="ui-icon ui-icon-closethick program-button-remove"></a>
          </span>
          <?=$this->form->type->setDimensional($this->itemIndex)->setValues('day')->controll()?>
-         <hr class="reseter"/>
-      </li>
-      <?
-      break;
-   case "note":?>
-      <?// NOTE?>
-      <li class="itemNote ui-widget-content ui-corner-top ui-corner-bottom">
-         <span class="startTime">--:--</span>
-         <span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-         <span class="itemLabel">Poznámka</span>
-         <?=$this->form->textlong->setDimensional($this->itemIndex)->controll()?>&nbsp;
-         <span class="itemButtons">
-            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
-         </span>
-         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('note')->controll()?>
+         <input type="button" name="programAddStage" value="<?=$this->_('Přidat stage')?>" />
+         <ul class="program-stages-list">
+            <?// TADY load stages
+            $this->itemIndex++; // další index
+            foreach ($this->stages as $stage){
+               $this->type = 'stage';
+               $this->items = $stage->item;
+               $this->form->text->setValues($stage['name']);
+               $this->includeTpl('items.phtml');
+            }
+            ?>
+         </ul>
          <hr class="reseter"/>
       </li>
       <?
@@ -54,43 +55,46 @@ switch ($this->type) {
    case "other":?>
       <?// OTHER?>
       <li class="itemOther ui-state-default ui-corner-top ui-corner-bottom">
-         <span class="startTime">00:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-         <span class="itemLabel">Jiné</span>
-         &nbsp;čas:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+         <span class="program-item-label">Jiné</span>
          název:&nbsp;<?=$this->form->text->setDimensional($this->itemIndex)->controll()?>&nbsp;
-         <span class="itemButtons">
-            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
+         od:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         délka:&nbsp;<?=$this->form->lenght->setDimensional($this->itemIndex)->controll()?>&nbsp;
+         <span class="program-item-buttons">
+            <a href="#" class="ui-icon ui-icon-closethick program-button-remove"></a>
          </span>
          <?=$this->form->type->setDimensional($this->itemIndex)->setValues('other')->controll()?>
          <hr class="reseter"/>
       </li>
       <?
-      break;
-   case "space":?>
-      <?// SPACE?>
-      <li class="itemNote ui-widget-content ui-corner-top ui-corner-bottom">
-         <span class="startTime">--:--</span>
-         <span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-         <span class="itemLabel">Mezera</span>
-         <span class="itemButtons">
-            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
-         </span>
-         <?=$this->form->type->setDimensional($this->itemIndex)->setValues('space')->controll()?>
-         <hr class="reseter"/>
-      </li>
-      <?
+      $this->itemIndex++; // další index
       break;
    case "stage":?>
       <?// STAGE?>
-      <li class="itemStage ui-state-hover ui-corner-top ui-corner-bottom">
-         <span class="startTime">12:00</span><span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-         &nbsp;čas:&nbsp;<?=$this->form->time->setDimensional($this->itemIndex)->controll()?>&nbsp;
-         <span class="itemLabel">Stage</span>
+      <li class="program-item-stage ui-state-hover ui-corner-top ui-corner-bottom">
+         <span class="ui-icon ui-icon-arrowthick-2-n-s program-button-move"></span>
+         <span class="program-item-label">Stage</span>
          název:&nbsp;<?=$this->form->text->setDimensional($this->itemIndex)->controll()?>&nbsp;
-         <span class="itemButtons">
-            <a href="#" class="ui-icon ui-icon-closethick buttonRemove"></a>
-         </span>
+         <label><?=$this->_('Přidat');?></label>:&nbsp;
          <?=$this->form->type->setDimensional($this->itemIndex)->setValues('stage')->controll()?>
+         <span class="program-item-buttons">
+            <a href="#" class="ui-icon ui-icon-closethick program-button-remove"></a>
+         </span>
+         <input type="button" name="programAddBand" value="<?=$this->_('skupinu')?>" />&nbsp;
+         <input type="button" name="programAddOther" value="<?=$this->_('jiné')?>" />
+         <ul class="program-items-list">
+            <?// TADY load bands and other
+            $this->itemIndex++; // další index
+            foreach ($this->items as $item){
+               $this->type = $item['type'];
+               $this->form->text->setValues($item->text);
+               $this->form->time->setValues($item->time);
+               $this->form->lenght->setValues($item->lenght);
+               $this->form->bandid->setValues($item->bandid);
+               $this->includeTpl('items.phtml');
+            }
+            ?>
+         </ul>
          <hr class="reseter"/>
       </li>
       <?

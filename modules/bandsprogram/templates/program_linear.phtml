@@ -1,0 +1,52 @@
+<?
+$this->addPageTitle($this->_('Program'));
+$this->addPageHeadline($this->_('Program'));
+
+$this->addCssFile("style.css");
+?>
+<div class="article-detail-content bandsprogram-content">
+   <?if($this->currentProgram != null){
+   foreach ($this->currentProgram as $day) {
+      echo "<h2>".$day['text']."</h2>";
+      foreach ($day->stage as $stage) {?>
+         <h3><?=$stage['name']?></h3>
+         <ul>
+            <?foreach ($stage->item as $item) {
+               echo "<li>";
+               $startTime = new DateTime($item->time);
+               $deltaTime = new DateTime($item->lenght);
+               $lenghtMin = $deltaTime->format('H')*60+$deltaTime->format('i');
+               echo $startTime->format("G:i")." - ".$startTime->modify('+ '.$lenghtMin.' minutes')->format("G:i")."&nbsp;&nbsp;&nbsp;";
+               if($item['type'] == "band"){
+                  echo '<a href="'.$this->bands[(int)$item->bandid]['link'].'"
+                     title="'.$this->bands[(int)$item->bandid]['name'].'">'.$this->bands[(int)$item->bandid]['name']."</a>";
+                  $this->bands[(int)$item->bandid]['link'];
+               } else if($item['type'] == 'other'){
+                  echo $item->text;
+               }
+               echo "</li>";
+            }?>
+         </ul>
+
+<?
+      }
+
+   }
+?>
+
+
+
+   <br />
+   <?
+   if($this->hideArtTools != true){
+      $this->includeTpl('articletools.phtml', true, array(
+         'linkToPdf' => $this->link()->route('exportProgram', array('output' => 'pdf'))->rmparam(),
+         'linkToHtml' => $this->link()->route('exportProgram', array('output' => 'html'))->rmparam(),
+         'shares' => $this->shares));
+   }
+   } else {
+      echo $this->_('Program nebyl definován');
+   }?>
+
+   <?=$this->toolbox;// TOOLBOXY?>
+</div>

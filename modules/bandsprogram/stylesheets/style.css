@@ -1,4 +1,47 @@
-.bandsprogram-content li {
+.program-day {
+}
+
+.program-table-wrapper {
+   position: relative;
+}
+
+table.program-table {
+   /*border: 1px solid gray;*/
+}
+
+table.program-table td, table.program-table th {
+   /*border: 1px solid gray;*/
+   /*padding: 2px;*/
+   height: 30px;
+   width: 100px;
+}
+
+.program-item {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100px;
+   height: 30px;
+}
+
+.program-item-column-1 {
+   left: 100px;
+   background-color: red;
+}
+.program-item-column-2 {
+   left: 200px;
+   background-color: green;
+}
+.program-item-column-3 {
+   left: 300px;
+   background-color: aqua;
+}
+.program-item-column-4 {
+   left: 400px;
+   background-color: orange;
+}
+
+/*.bandsprogram-content li {
    padding: 5px 0;
    clear: left;
 }
@@ -22,4 +65,4 @@
 
 .bandsprogram-content .programNote {
    color: silver;
-}
+}*/
