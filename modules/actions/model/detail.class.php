@@ -143,12 +143,11 @@ class Actions_Model_Detail extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_PUBLIC." = 1)"
-              ." AND ((".self::COLUMN_DATE_START." >= CURDATE())"
-              ." OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_DATE_START." < CURDATE()))"
-              ." ORDER BY start_date, time LIMIT 0, 1");
+              ." AND ((ISNULL(".self::COLUMN_DATE_STOP.") AND ".self::COLUMN_DATE_START." >= CURDATE())"
+              ." OR (ISNULL(".self::COLUMN_DATE_STOP.") = 0 AND ".self::COLUMN_DATE_START." < CURDATE() AND ".self::COLUMN_DATE_STOP." > CURDATE()))"
+              ." ORDER BY ".self::COLUMN_DATE_START.", `".self::COLUMN_TIME."` LIMIT 0, 1");
       $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
       $dbst->execute();
-
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       return $dbst->fetch();
    }
