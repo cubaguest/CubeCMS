@@ -198,17 +198,17 @@ class KzMainPage_Controller extends Controller {
    public static function settingsController(&$settings,Form &$form) {
       $form->addGroup('basic', 'Základní nasatvení');
 
-      $elemCachedHours = new Form_Element_Text('cahce', 'Počet hodin kešování obsahu titulní strany');
+      $elemCachedHours = new Form_Element_Text('cache', 'Počet hodin kešování obsahu titulní strany');
       $elemCachedHours->setSubLabel('Výchozí: '.self::DEFAULT_CACHED_HOURS.' hod.');
       $elemCachedHours->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemCachedHours, 'basic');
 
       if(isset($settings['cached_hours'])) {
-         $form->cahce->setValues($settings['cached_hours']);
+         $form->cache->setValues($settings['cached_hours']);
       }
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
-         $settings['cahced_hours'] = $form->cache->getValues();
+         $settings['cached_hours'] = $form->cache->getValues();
       }
    }
 }
