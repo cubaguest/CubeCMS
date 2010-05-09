@@ -535,7 +535,7 @@ class Form_Element implements Form_Element_Interface {
          if($this->isDimensional()) {
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
             $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
-            if(is_array($values)) {
+            if(is_array($values) AND isset($values[$this->dimensional])) {
                $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
             } else {
                $this->html()->setAttrib('value', htmlspecialchars((string)$values));

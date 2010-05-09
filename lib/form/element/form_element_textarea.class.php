@@ -61,8 +61,12 @@ class Form_Element_TextArea extends Form_Element_Text {
             $this->html()->setAttrib('name', $this->getName());
             $this->html()->setAttrib('id', $this->getName());
          }
-         //         $this->html()->setAttrib('type', 'text');
-         $this->html()->addContent(htmlspecialchars($values));
+         $this->html()->clearContent(); // vymazání obsahu elementu jinak se duplikuje
+         if(is_array($values) AND isset($values[$this->dimensional])) {
+            $this->html()->addContent((string)$values[$this->dimensional]);
+         } else {
+            $this->html()->addContent((string)$values);
+         }
       }
       return $this->html();
    }
