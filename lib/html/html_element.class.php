@@ -166,6 +166,16 @@ class Html_Element {
    }
 
    /**
+    * Metoda odstraní atribut z elementu
+    * @param string $name -- název atributu
+    * @return Html_Element -- sám sebe
+    */
+   public function removeAttrib($name) {
+      unset ($this->attribs[$name]);
+      return $this;
+   }
+
+   /**
     * Metoda přidá zadanou třídu do elementu
     * @param string $class -- název třídy
     * @return Form_Element
