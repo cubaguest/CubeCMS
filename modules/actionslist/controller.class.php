@@ -151,7 +151,7 @@ class ActionsList_Controller extends Controller {
    }
 
    public static function settingsController(&$settings,Form &$form) {
-      Actions_Controller::settingsController(&$settings, &$form);
+      Actions_Controller::settingsController($settings, $form);
       $catM = new Model_Category();
       $modules = array('actions', 'actionswgal');
       $results = array();
