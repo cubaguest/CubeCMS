@@ -360,24 +360,33 @@ class Filesystem_File {
     * @return string -- mime type
     */
    private function locateMimeType() {
-      if($this->fileMimeType === null) {
-      //      $file = $this->fileName;
-         $fileArray = @explode('.',$this->getName());
-         $ext = strtolower(array_pop($fileArray));
-         if (function_exists('finfo_open')) {
-            $finfo = finfo_open(FILEINFO_MIME);
-            $mimetype = finfo_file($finfo, $this->getName(true));
-            // odstranění utf-8 pokud existuje
-            $mime = explode(';', $mimetype);
-            $this->fileMimeType = $mime[0];
-            finfo_close($finfo);
-         }
-         else if (array_key_exists($ext, self::$mimeTypes)) {
+      $fileArray = @explode('.',$this->getName());
+      $ext = strtolower(array_pop($fileArray));
+      if($this->exist()) {
+         if($this->fileMimeType === null) {
+            //      $file = $this->fileName;
+            if (function_exists('finfo_open')) {
+               $finfo = finfo_open(FILEINFO_MIME);
+               $mimetype = finfo_file($finfo, $this->getName(true));
+               // odstranění utf-8 pokud existuje
+               $mime = explode(';', $mimetype);
+               $this->fileMimeType = $mime[0];
+               finfo_close($finfo);
+            }
+            else if (array_key_exists($ext, self::$mimeTypes)) {
                $this->fileMimeType = self::$mimeTypes[$ext];
             }
             else {
                $this->fileMimeType = 'application/octet-stream';
             }
+         }
+      } else {
+         // tady ujištění typu podle přípony
+         if(isset (self::$mimeTypes[$ext])){
+            $this->fileMimeType = self::$mimeTypes[$ext];
+         } else {
+            $this->fileMimeType = 'application/octet-stream';
+         }
       }
    }
 
