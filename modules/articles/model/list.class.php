@@ -125,6 +125,35 @@ class Articles_Model_List extends Model_PDO {
       }
       return false;
    }
+
+   /**
+    * Metoda vrací pole se všemi články
+    * @return array -- pole článků
+    */
+   public function getListByCats($idCats, $num = 10, $onlyPublic = true) {
+      $dbc = new Db_PDO();
+      if($onlyPublic) {
+         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_PUBLIC." = 1)";
+      } else {
+         $wherePub = null;
+      }
+      $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME.", cats.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()." AS curlkey"
+              ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
+              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." = user.".Model_Users::COLUMN_ID
+              ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cats ON article.".Articles_Model_Detail::COLUMN_ID_CATEGORY
+              ." = cats.".Model_Category::COLUMN_CAT_ID
+              ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." IN (".$this->generateSQLIN($idCats)."))"
+              . $wherePub // public
+              ." ORDER BY article.".Articles_Model_Detail::COLUMN_ADD_TIME." DESC"
+              ." LIMIT 0, :rowCount ");
+      
+      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->bindValue(':rowCount', (int)$num, PDO::PARAM_INT);
+      $dbst->execute();
+
+      return $dbst->fetchAll();
+   }
 }
 
 ?>
