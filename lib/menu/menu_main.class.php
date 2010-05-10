@@ -42,6 +42,7 @@ class Menu_Main {
 //      $newAdminMenu->addChild(new Category_Structure(1));
 //      $newAdminMenu->saveStructure();
 //      var_dump($newAdminMenu);
+//      return;
       // načtení menu z
       self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
       $catModel = new Model_Category();

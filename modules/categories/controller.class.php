@@ -87,10 +87,11 @@ class Categories_Controller extends Controller {
       }
 
       $menu = Category_Structure::getStructure($this->adminStructure);
-
-      $catModel = new Model_Category();
-      $menu->setCategories($catModel->getCategoryList(true));
-      $this->view()->structure = $menu;
+      if($menu != false) {
+         $catModel = new Model_Category();
+         $menu->setCategories($catModel->getCategoryList(true));
+         $this->view()->structure = $menu;
+      }
       $this->view()->adminStructure = $this->adminStructure;
    }
 
@@ -306,8 +307,10 @@ class Categories_Controller extends Controller {
 
       // kategorie
       $menu = Category_Structure::getStructure($this->adminStructure);
-      $catModel = new Model_Category();
-      $menu->setCategories($catModel->getCategoryList(true));
+      if($menu != false){
+         $catModel = new Model_Category();
+         $menu->setCategories($catModel->getCategoryList(true));
+      }
 
       $this->catsToArrayForForm($menu);
       $form->parent_cat->setOptions($this->categoriesArray);

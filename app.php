@@ -996,8 +996,10 @@ class AppCore {
             $this->coreTpl->categoryId = Category::getSelectedCategory()->getId();
             // zpracovávní modulu
             $this->runModule();
-            $this->coreTpl->setPVar('CURRENT_CATEGORY_PATH',
+            if(Menu_Main::getMenuObj() != null){ // kontrola prázdného menu
+               $this->coreTpl->setPVar('CURRENT_CATEGORY_PATH',
                     Menu_Main::getMenuObj()->getPath(Category::getSelectedCategory()->getId()));
+            }
          }
 
          // =========	spuštění panelů

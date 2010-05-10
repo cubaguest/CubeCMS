@@ -23,7 +23,7 @@ class Menu_Admin extends Menu_Main {
     */
    public static function factory() {
 //      $newAdminMenu = new Category_Structure(0);
-//      $newAdminMenu->addChild(new Category_Structure(100));
+//      $newAdminMenu->addChild(new Category_Structure(1));
 //      $newAdminMenu->saveStructure(true);
 //      var_dump($newAdminMenu);
 

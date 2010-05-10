@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.2.2.1deb1
+-- version 3.3.2deb1
 -- http://www.phpmyadmin.net
 --
 -- Počítač: localhost
--- Vygenerováno: Pátek 05. března 2010, 12:45
--- Verze MySQL: 5.1.37
--- Verze PHP: 5.2.10-2ubuntu6.4
+-- Vygenerováno: Pondělí 10. května 2010, 14:28
+-- Verze MySQL: 5.1.41
+-- Verze PHP: 5.3.2-1ubuntu4
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -19,11 +19,12 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Struktura tabulky `{PREFIX}_categories`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_categories`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_categories` (
   `id_category` smallint(3) NOT NULL AUTO_INCREMENT,
   `module` varchar(20) DEFAULT NULL,
   `data_dir` varchar(100) DEFAULT NULL,
-  `urlkey_cs` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `urlkey_cs` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
   `label_cs` varchar(50) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `alt_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `urlkey_en` varchar(100) DEFAULT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_categories` (
   `description_en` varchar(500) DEFAULT NULL,
   `keywords_de` varchar(200) DEFAULT NULL,
   `description_de` varchar(500) DEFAULT NULL,
+  `ser_params` varchar(1000) DEFAULT NULL,
   `params` varchar(200) DEFAULT NULL,
   `protected` tinyint(1) NOT NULL DEFAULT '0',
   `priority` smallint(2) NOT NULL DEFAULT '0',
@@ -52,31 +54,33 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_categories` (
   `feeds` tinyint(1) NOT NULL DEFAULT '0',
   `icon` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_category`),
-  UNIQUE KEY `urlkey_cs` (`urlkey_cs`),
-  UNIQUE KEY `urlkey_en` (`urlkey_en`),
-  UNIQUE KEY `urlkey_de` (`urlkey_de`),
   FULLTEXT KEY `label_cs` (`label_cs`),
   FULLTEXT KEY `label_en` (`label_en`),
   FULLTEXT KEY `label_de` (`label_de`),
   FULLTEXT KEY `description_cs` (`description_cs`),
   FULLTEXT KEY `description_en` (`description_en`),
   FULLTEXT KEY `description_de` (`description_de`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=101 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}_categories`
 --
 
-INSERT INTO `{PREFIX}_categories` (`id_category`, `module`, `data_dir`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `params`, `protected`, `priority`, `active`, `individual_panels`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`, `changed`, `default_right`, `feeds`, `icon`) VALUES
-(1, 'categories', NULL, 'administrace/kategorie', 'Kategorie', NULL, 'administration/categories', 'Categories', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 1, 0, 'never', 0, 1, 0, '2010-02-01 12:59:18', '---', 0, NULL),
-(2, 'text', NULL, 'administrace', 'Administrace', 'Kategorie pro administraci prostředí', NULL, NULL, NULL, NULL, NULL, NULL, 'Administration', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-02-01 12:59:05', '---', 0, NULL),
-(3, 'login', NULL, 'login', 'Účet', 'Stránka s přihlašovacím dialogem', NULL, NULL, NULL, NULL, NULL, NULL, 'login account', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 1, '2010-02-02 00:24:54', 'r--', 0, NULL),
-(4, 'configuration', NULL, 'administrace/nastaveni-systemu', 'Nastavení systému', 'Konfigurace systémových nasatvení', NULL, NULL, NULL, NULL, NULL, NULL, 'settings nastavení', 'Kategorie je určena pro editaci nastavení celého enginu', NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-02-01 13:00:56', '---', 0, NULL),
-(8, 'text', NULL, 'kontakt', 'kontakt', 'Kontaktní informace kina svět', NULL, NULL, NULL, NULL, NULL, NULL, 'kontakt, telefon, adresa, mapa', 'Kontaktní informace na pracovníky kina, adresa a mapa', NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'yearly', 0.6, 1, 0, '2010-02-01 15:54:33', 'r--', 0, NULL),
-(9, 'search', NULL, 'search', 'hledání', 'hledání na Kinosvět', NULL, NULL, NULL, NULL, NULL, NULL, 'hledání', 'Hledání na stránkách Kinasvět', NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 0, 0, '2010-02-02 00:24:48', 'r--', 0, NULL),
-(10, 'panels', NULL, 'administrace/nastaveni-panelu', 'nastavení panelů', 'Nastavení jednotlivých panelů', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-02-01 16:09:20', '---', 0, NULL);
-
-
+INSERT INTO `{PREFIX}_categories` (`id_category`, `module`, `data_dir`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `ser_params`, `params`, `protected`, `priority`, `active`, `individual_panels`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`, `changed`, `default_right`, `feeds`, `icon`) VALUES
+(1, 'categories', NULL, 'admin/struktura/kategorie', 'kategorie', NULL, 'administration/categories', 'Categories', NULL, '', '', '', NULL, NULL, NULL, NULL, '', '', NULL, '', 1, 0, 1, 0, 'never', 0, 1, 1, '2010-05-10 14:18:05', '---', 0, NULL),
+(2, 'login', 'ucet', 'ucet', 'účet', NULL, 'account', 'account', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 1, '2010-05-10 14:12:36', 'r--', 0, NULL),
+(3, 'empty', NULL, 'admin/struktura', 'struktura', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:17:47', '---', 0, NULL),
+(4, 'panels', NULL, 'admin/struktura/panely', 'panely', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:17:55', '---', 0, NULL),
+(5, 'empty', NULL, 'admin/uzivatele', 'uživatelé', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:17:17', '---', 0, NULL),
+(6, 'users', NULL, 'admin/uzivatele/uzivatele-a-skupiny', 'uživatelé a skupiny', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:17:29', '---', 0, NULL),
+(7, 'empty', NULL, 'admin/nastaveni', 'nastavení', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:18:51', '---', 0, NULL),
+(8, 'configuration', 'nastaveni-systemu', 'admin/nastaveni/nastaveni-systemu', 'nastavení systému', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:21:27', '---', 0, NULL),
+(9, 'empty', NULL, 'admin/sprava', 'správa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:20:44', '---', 0, NULL),
+(10, 'services', 'system', 'admin/sprava/system', 'systém', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:21:15', '---', 0, NULL),
+(11, 'empty', NULL, 'admin/informace', 'informace', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:22:07', '---', 0, NULL),
+(12, 'phpinfo', 'php-info', 'admin/informace/php-info', 'PHP info', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:22:38', '---', 0, NULL),
+(13, 'text', 'hlaseni-chyb', 'admin/informace/hlaseni-chyb', 'hlášení chyb', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:23:21', '---', 0, NULL),
+(100, 'text', 'uvod', 'uvod', 'úvod', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 10, 1, 0, 'always', 1, 1, 0, '2010-05-10 14:27:50', 'r--', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -84,6 +88,7 @@ INSERT INTO `{PREFIX}_categories` (`id_category`, `module`, `data_dir`, `urlkey_
 -- Struktura tabulky `{PREFIX}_config`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_config`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_config` (
   `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(50) NOT NULL,
@@ -94,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_config` (
   `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
   PRIMARY KEY (`id_config`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=60 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=63 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}_config`
@@ -104,18 +109,21 @@ INSERT INTO `{PREFIX}_config` (`id_config`, `key`, `label`, `value`, `values`, `
 (1, 'DEFAULT_ID_GROUP', NULL, '2', NULL, 0, 'number'),
 (2, 'DEFAULT_GROUP_NAME', NULL, 'guest', NULL, 0, 'string'),
 (3, 'DEFAULT_USER_NAME', NULL, 'anonym', NULL, 0, 'string'),
-(4, 'APP_LANGS', NULL, 'cs', 'cs;en;de;ru;sk', 0, 'listmulti'),
+(4, 'APP_LANGS', NULL, 'cs;en', 'cs;en;de;ru;sk', 0, 'listmulti'),
 (5, 'DEFAULT_APP_LANG', NULL, 'cs', 'cs;en;de;ru;sk', 0, 'list'),
 (6, 'IMAGES_DIR', NULL, 'images', NULL, 0, 'string'),
 (7, 'IMAGES_LANGS_DIR', NULL, 'langs', NULL, 0, 'string'),
-(8, 'DEBUG_LEVEL', NULL, '1', NULL, 0, 'number'),
+(8, 'DEBUG_LEVEL', NULL, '2', NULL, 0, 'number'),
 (9, 'TEMPLATE_FACE', NULL, 'default', NULL, 0, 'string'),
 (10, 'SITEMAP_PERIODE', NULL, 'weekly', NULL, 0, 'string'),
 (11, 'SEARCH_RESULT_LENGHT', NULL, '300', NULL, 0, 'number'),
 (12, 'SEARCH_HIGHLIGHT_TAG', NULL, 'strong', NULL, 0, 'string'),
-(13, 'SESSION_NAME', NULL, 'web_cookie', NULL, 0, 'string'),
-(14, 'WEB_NAME', NULL, 'Web name', NULL, 0, 'string'),
-(15, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:4:{i:3;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:3:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"2";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"2";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:1:"2";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object'),
+(13, 'SESSION_NAME', NULL, '{PREFIX}_cookie', NULL, 0, 'string'),
+(14, 'WEB_NAME', NULL, 'Vepřové Výpečky', NULL, 0, 'string'),
+(61, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"100";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object'),
+(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}_', '', 0, 'string'),
+(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}_navigation_panel', NULL, 0, 'string'),
+(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}_shares', NULL, 0, 'string'),
 (21, 'PAGE_TITLE_SEPARATOR', NULL, '|', NULL, 0, 'string'),
 (16, 'NAVIGATION_SEPARATOR', NULL, '::', NULL, 0, 'string'),
 (17, 'HEADLINE_SEPARATOR', NULL, ' - ', NULL, 0, 'string'),
@@ -145,16 +153,15 @@ INSERT INTO `{PREFIX}_config` (`id_config`, `key`, `label`, `value`, `values`, `
 (44, 'PDF_FONT_MONOSPACED', 'Název pevného fontu', 'courier', NULL, 0, 'string'),
 (45, 'PDF_IMAGE_SCALE_RATIO', 'Zvětšení obrázků ve výstupním pdf', '1', NULL, 0, 'string'),
 (46, 'HEAD_MAGNIFICATION', 'zvětšovací poměr nadpisů', '1.1', NULL, 0, 'string'),
-(51, 'WEB_DESCRIPTION', 'Popis stránek', 'New Web Name', NULL, 0, 'string'),
+(51, 'WEB_DESCRIPTION', 'Popis stránek', 'Testovací stránky VVE enginu verze 6.0', NULL, 0, 'string'),
 (50, 'FEED_NUM', 'Poček generovaných rss/atom kanálů', '10', NULL, 0, 'number'),
 (52, 'WEB_MASTER_NAME', 'Jméno webmastera', 'Jakub Matas', NULL, 0, 'string'),
 (53, 'WEB_MASTER_EMAIL', 'E-mail webmastera', 'jakubmatas@gmail.com', NULL, 0, 'string'),
 (54, 'FEED_TTL', 'Počet minut kešování kanálu', '30', NULL, 0, 'number'),
 (55, 'WEB_COPYRIGHT', 'Copyright poznámka k webu ({Y} - nahrazeno rokem)', 'Obsah toho webu je licencován podle ... Žádná s jeho částí nesmí být použita bez vědomí webmastera. Copyrigth {Y}', NULL, 0, 'string'),
 (56, 'SEARCH_ARTICLE_REL_MULTIPLIER', 'Násobič pro relevanci nadpisu článku (1 - nekonečno)', '5', NULL, 0, 'number'),
-(57, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}_', '', 0, 'string'),
-(58, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', NULL, NULL, 0, 'string'),
-(59, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', NULL, NULL, 0, 'string');
+(57, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:6:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"5";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"6";s:28:"\0Category_Structure\0idParent";s:1:"5";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:3;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"7";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";s:1:"7";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:2:"11";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"12";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"13";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object'),
+(62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Vepřové Výpečky Titulní strana', NULL, 0, 'string');
 
 -- --------------------------------------------------------
 
@@ -162,6 +169,7 @@ INSERT INTO `{PREFIX}_config` (`id_config`, `key`, `label`, `value`, `values`, `
 -- Struktura tabulky `{PREFIX}_groups`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_groups`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_groups` (
   `id_group` smallint(3) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID skupiny',
   `name` varchar(15) DEFAULT NULL COMMENT 'Nazev skupiny',
@@ -169,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_groups` (
   `used` tinyint(1) NOT NULL DEFAULT '1',
   `default_right` varchar(3) NOT NULL,
   PRIMARY KEY (`id_group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}_groups`
@@ -177,8 +185,26 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_groups` (
 
 INSERT INTO `{PREFIX}_groups` (`id_group`, `name`, `label`, `used`, `default_right`) VALUES
 (1, 'admin', 'Administrátor', 1, 'rwc'),
-(2, 'guest', 'Host', 1, 'r--'),
-(3, 'user', 'Uživatel', 1, 'r--');
+(2, 'guest', 'Host', 1, 'r--');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}_modules_instaled`
+--
+
+DROP TABLE IF EXISTS `{PREFIX}_modules_instaled`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}_modules_instaled` (
+  `id_module` smallint(6) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) CHARACTER SET utf8 NOT NULL,
+  `version` float NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_module`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+--
+-- Vypisuji data pro tabulku `{PREFIX}_modules_instaled`
+--
+
 
 -- --------------------------------------------------------
 
@@ -186,22 +212,23 @@ INSERT INTO `{PREFIX}_groups` (`id_group`, `name`, `label`, `used`, `default_rig
 -- Struktura tabulky `{PREFIX}_panels`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_panels`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_panels` (
   `id_panel` smallint(3) NOT NULL AUTO_INCREMENT,
   `id_cat` smallint(5) NOT NULL DEFAULT '0' COMMENT 'id kategorie panelu',
   `id_show_cat` smallint(5) unsigned DEFAULT '0' COMMENT 'id kategorie ve které se má daný panel zobrazit',
-  `pname_cs` varchar(40) DEFAULT NULL,
-  `pname_en` varchar(40) DEFAULT NULL,
-  `pname_de` varchar(40) DEFAULT NULL,
   `position` varchar(20) NOT NULL DEFAULT '' COMMENT 'Název boxu do kterého panel patří',
   `porder` smallint(5) NOT NULL DEFAULT '0' COMMENT 'Řazení panelu',
   `pparams` varchar(1000) DEFAULT NULL,
   `icon` varchar(100) DEFAULT NULL,
   `background` varchar(100) DEFAULT NULL,
+  `pname_cs` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `pname_en` varchar(100) DEFAULT NULL,
+  `pname_de` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_panel`),
   KEY `id_cat` (`id_cat`),
   KEY `id_show_cat` (`id_show_cat`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}_panels`
@@ -211,38 +238,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_panels` (
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_photogalery_images`
---
-
-CREATE TABLE IF NOT EXISTS `{PREFIX}_photogalery_images` (
-  `id_photo` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `id_article` smallint(5) unsigned DEFAULT NULL,
-  `id_category` smallint(5) unsigned NOT NULL,
-  `file` varchar(200) NOT NULL,
-  `name_cs` varchar(300) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
-  `desc_cs` varchar(1000) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
-  `name_en` varchar(300) DEFAULT NULL,
-  `desc_en` varchar(1000) DEFAULT NULL,
-  `name_de` varchar(300) DEFAULT NULL,
-  `desc_de` varchar(1000) DEFAULT NULL,
-  `ord` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `edit_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_photo`),
-  KEY `id_category` (`id_category`),
-  KEY `id_article` (`id_article`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Vypisuji data pro tabulku `{PREFIX}_photogalery_images`
---
-
-
--- --------------------------------------------------------
-
---
 -- Struktura tabulky `{PREFIX}_rights`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_rights`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_rights` (
   `id_right` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_category` smallint(6) NOT NULL,
@@ -250,7 +249,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_rights` (
   `right` enum('---','r--','-w-','--c','rw-','-wc','r-c','rwc') NOT NULL DEFAULT 'r--',
   PRIMARY KEY (`id_right`),
   KEY `id_category` (`id_category`,`id_group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=237 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=197 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}_rights`
@@ -258,43 +257,33 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_rights` (
 
 INSERT INTO `{PREFIX}_rights` (`id_right`, `id_category`, `id_group`, `right`) VALUES
 (1, 1, 1, 'rwc'),
-(192, 2, 1, 'rwc'),
-(193, 2, 2, '---'),
-(194, 2, 3, '---'),
-(200, 4, 3, '---'),
-(5, 1, 2, '---'),
-(6, 1, 3, '---'),
-(199, 4, 2, '---'),
-(197, 3, 3, 'rw-'),
-(196, 3, 2, 'r--'),
-(195, 3, 1, 'rwc'),
-(198, 4, 1, 'rwc'),
-(207, 8, 1, 'rwc'),
-(208, 8, 2, 'r--'),
-(209, 9, 1, 'rwc'),
-(210, 9, 2, 'r--'),
-(211, 10, 1, 'rwc'),
-(212, 10, 2, '---');
-
--- --------------------------------------------------------
-
---
--- Struktura tabulky `{PREFIX}_search_apis`
---
-
-CREATE TABLE IF NOT EXISTS `{PREFIX}_search_apis` (
-  `id_api` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `id_category` smallint(5) unsigned NOT NULL,
-  `url` varchar(200) NOT NULL,
-  `api` varchar(20) NOT NULL,
-  `name` varchar(200) DEFAULT NULL,
-  PRIMARY KEY (`id_api`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Vypisuji data pro tabulku `{PREFIX}_search_apis`
---
-
+(6, 1, 2, '---'),
+(186, 9, 2, '---'),
+(192, 12, 2, '---'),
+(191, 12, 1, 'rwc'),
+(185, 9, 1, 'rwc'),
+(176, 6, 2, '---'),
+(175, 6, 1, 'rwc'),
+(190, 11, 2, '---'),
+(184, 8, 2, '---'),
+(170, 5, 2, '---'),
+(169, 5, 1, 'rwc'),
+(196, 100, 2, 'r--'),
+(189, 11, 1, 'rwc'),
+(183, 8, 1, 'rwc'),
+(164, 4, 2, '---'),
+(163, 4, 1, 'rwc'),
+(195, 100, 1, 'rwc'),
+(194, 13, 2, '---'),
+(188, 10, 2, '---'),
+(182, 7, 2, '---'),
+(156, 3, 2, '---'),
+(155, 3, 1, 'rwc'),
+(193, 13, 1, 'rwc'),
+(187, 10, 1, 'rwc'),
+(181, 7, 1, 'rwc'),
+(150, 2, 2, 'r--'),
+(149, 2, 1, 'rwc');
 
 -- --------------------------------------------------------
 
@@ -302,6 +291,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_search_apis` (
 -- Struktura tabulky `{PREFIX}_shares`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_shares`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_shares` (
   `id_share` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `link` varchar(300) NOT NULL,
@@ -332,10 +322,11 @@ INSERT INTO `{PREFIX}_shares` (`id_share`, `link`, `icon`, `name`) VALUES
 -- Struktura tabulky `{PREFIX}_texts`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_texts`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_texts` (
   `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
   `id_item` smallint(5) unsigned NOT NULL,
-  `subkey` varchar(30) NOT NULL DEFAULT 'NULL',
+  `subkey` varchar(30) NOT NULL DEFAULT 'nokey',
   `label_cs` varchar(200) DEFAULT NULL,
   `text_cs` mediumtext,
   `text_clear_cs` mediumtext,
@@ -359,12 +350,18 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_texts` (
   FULLTEXT KEY `text_clear_cs` (`text_clear_cs`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
+--
+-- Vypisuji data pro tabulku `{PREFIX}_texts`
+--
+
+
 -- --------------------------------------------------------
 
 --
 -- Struktura tabulky `{PREFIX}_users`
 --
 
+DROP TABLE IF EXISTS `{PREFIX}_users`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}_users` (
   `id_user` smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID uzivatele',
   `username` varchar(20) NOT NULL COMMENT 'Uzivatelske jmeno',
@@ -379,12 +376,13 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_users` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_user`,`username`),
   KEY `id_group` (`id_group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=28 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}_users`
 --
 
 INSERT INTO `{PREFIX}_users` (`id_user`, `username`, `password`, `id_group`, `name`, `surname`, `mail`, `note`, `blocked`, `foto_file`, `deleted`) VALUES
-(1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1, 'Jakub', 'Matas', 'jakubmatas@gmail.com', 'administrátor', 0, NULL, 0),
-(2, 'guest', '', 2, 'host', 'host', '', 'host systému', 0, NULL, 0);
+(1, 'admin', '35675e68f4b5af7b995d9205ad0fc43842f16450', 1, 'Jakub', 'Matas', 'jakubmatas@gmail.com', 'administrátor', 0, NULL, 0),
+(2, 'guest', '', 2, 'host', 'host', '', 'host systému', 0, NULL, 0),
+(3, 'cuba', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1, 'Jakub', 'Matas', 'jakubmatas@gmail.com', 'Normální uživatel', 0, 'cuba1.jpg', 0);

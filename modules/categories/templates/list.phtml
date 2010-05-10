@@ -73,7 +73,11 @@ function vveSectionsRenderFunc($menuArr, $link) {
    <h2><?=$this->_("Struktura stránek")?></h2>
    <div id="sections" class="<?=$typeClass?>">
       <table style="width: 98%">
-         <?=vveSectionsRenderFunc($this->structure, $this->link())?>
+         <?
+         if($this->structure != null){
+            echo vveSectionsRenderFunc($this->structure, $this->link());
+         }
+         ?>
       </table>
    </div>
    <br />
