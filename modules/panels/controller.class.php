@@ -154,7 +154,7 @@ class Panels_Controller extends Controller {
 
          $model->savePanel($form->panel_cat->getValues(), $form->panel_box->getValues(), $form->panel_name->getValues(),
                  $icon, $backImage, $form->panel_order->getValues(),
-                 $this->editForm->panel_show_cat->getValues(), $form->id->getValues());
+                 $form->panel_show_cat->getValues(), $form->id->getValues());
          $this->infoMsg()->addMessage($this->_('Panel byl uložen'));
          $this->link()->route()->reload();
       }
