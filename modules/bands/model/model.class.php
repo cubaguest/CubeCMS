@@ -76,7 +76,7 @@ class Bands_Model extends Model_PDO {
                  .self::COLUMN_ADD_TIME.",". self::COLUMN_PUBLIC.","
                  .self::COLUMN_IMAGE.",". self::COLUMN_CLIPS.","
                  .self::COLUMN_ID_USER_LAST_EDIT.")"
-                 ." VALUES (:name, :text, :textclear, :urlkey, :addtime, :public, :image, :clips :iduser)");
+                 ." VALUES (:name, :text, :textclear, :urlkey, :addtime, :public, :image, :clips, :iduser)");
 
          $dbst->bindValue(':name', $name, PDO::PARAM_STR);
          $dbst->bindValue(':text', $text, PDO::PARAM_STR);
@@ -86,7 +86,7 @@ class Bands_Model extends Model_PDO {
          $dbst->bindValue(':addtime', date("Y-m-d H:i:s"), PDO::PARAM_STR);
          $dbst->bindValue(':public', $public, PDO::PARAM_BOOL);
          $dbst->bindValue(':image', $image, PDO::PARAM_STR);
-         $dbst->bindValue(':iduser', Auth::getUserId(), PDO::PARAM_INT);
+         $dbst->bindValue(':iduser', (int)Auth::getUserId(), PDO::PARAM_INT);
          $dbst->execute();
 
          return $dbc->lastInsertId();
