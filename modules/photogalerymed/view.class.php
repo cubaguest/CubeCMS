@@ -4,6 +4,14 @@ class Photogalerymed_View extends Articles_View {
     * Inicializace
     */
    public function mainView() {
+      if($this->category()->getRights()->isWritable()) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('add_galery', $this->_("Přidat galerii"),
+                 $this->link()->route('add'),
+                 $this->_("Přidat galerii"), "image_add.png");
+         $this->template()->toolbox = $toolbox;
+      }
+
       $this->template()->addTplFile("list.phtml");
    }
 
@@ -16,6 +24,20 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function showView() {
+      if($this->category()->getRights()->isWritable()) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_galery', $this->_("Upravit galerii"),
+                 $this->link()->route('edittext', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+                 $this->_("Upravit galerii"), "page_edit.png");
+         $toolbox->addTool('edit_images', $this->_("Upravit fotky"),
+                 $this->link()->route('editphotos', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
+                 $this->_("Upravit fotky galerie"), "image_edit.png");
+         $toolbox->addTool('article_delete', $this->_("Smazat"),
+                 $this->link(), $this->_("Smazat zobrazenou galerii"), "page_delete.png",
+                 'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
+                 $this->_('Opravdu smazat galerii?'));
+         $this->template()->toolbox = $toolbox;
+      }
       $this->template()->addTplFile("detail.phtml");
    }
 
@@ -66,7 +88,11 @@ class Photogalerymed_View extends Articles_View {
                  .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
-         if($sizes[0] > 80/0.27){ $width = 80; } else { $width = $sizes[0]*0.27; } // převody mezi px<>mm
+         if($sizes[0] > 80/0.27) {
+            $width = 80;
+         } else {
+            $width = $sizes[0]*0.27;
+         } // převody mezi px<>mm
 
          $c->pdf()->Image($this->category()->getModule()->getDataDir()
                  .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
@@ -87,9 +113,13 @@ class Photogalerymed_View extends Articles_View {
       // výstup
       $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
    }
-   
-   public function checkFileView() {}
-   public function uploadFileView() {}
+
+   public function checkFileView() {
+
+   }
+   public function uploadFileView() {
+
+   }
 
    public function exportArticleHtmlView() {
       $this->template()->addTplFile('contentdetail.phtml');
