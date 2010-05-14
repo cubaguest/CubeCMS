@@ -255,7 +255,8 @@ class Photogalery_Controller extends Controller {
          $imageF = new Filesystem_File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $this->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
          $imageF->cropAndSave($this->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL.DIRECTORY_SEPARATOR,
-                 self::SMALL_WIDTH, self::SMALL_HEIGHT,
+                 $this->category()->getParam('small_width',self::SMALL_WIDTH),
+                 $this->category()->getParam('small_height',self::SMALL_HEIGHT),
                  $editForm->start_x->getValues(), $editForm->start_y->getValues(),
                  $editForm->width->getValues(), $editForm->height->getValues());
          $this->infoMsg()->addMessage($this->_('Miniatura byla upravena'));

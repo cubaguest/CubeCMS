@@ -32,8 +32,8 @@ $this->addJsPlugin(new JsPlugin_JCrop());
          <tr>
             <td>
                <h2><?=$this->_('Náhled')?></h2>
-               <p id="preview" style="overflow:hidden; width:<?=Photogalery_Controller::SMALL_WIDTH?>px;
-                  height:<?=Photogalery_Controller::SMALL_WIDTH?>px;">
+               <p id="preview" style="overflow:hidden; width:<?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH)?>px;
+                  height:<?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT)?>px;">
                   <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM
                                .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>"
                        alt="<?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
@@ -64,7 +64,7 @@ $this->addJsPlugin(new JsPlugin_JCrop());
             <th class="formLabels"></th>
             <td class="formControlls">
                <?
-               $this->form->width->setValues(Photogalery_Controller::SMALL_WIDTH);
+               $this->form->width->setValues($this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH));
                print($this->form->width->controll())
                        ?>
             </td>
@@ -73,7 +73,7 @@ $this->addJsPlugin(new JsPlugin_JCrop());
             <th class="formLabels"></th>
             <td class="formControlls">
                <?
-               $this->form->height->setValues(Photogalery_Controller::SMALL_HEIGHT);
+               $this->form->height->setValues($this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT));
                print($this->form->height->controll())
                        ?>
             </td>
@@ -98,8 +98,8 @@ $this->addJsPlugin(new JsPlugin_JCrop());
    <script type="text/javascript">
       /* <![CDATA[ */
       function showPreview(coords){
-         var rx = <?=Photogalery_Controller::SMALL_WIDTH;?>;
-         var ry = <?=Photogalery_Controller::SMALL_HEIGHT;?>;
+         var rx = <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>;
+         var ry = <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?>;
          if (parseInt(coords.w) > 0){
             var rx = rx/coords.w;
             var ry = ry/coords.h;
@@ -122,9 +122,11 @@ $this->addJsPlugin(new JsPlugin_JCrop());
             $('#cropImage img').Jcrop({
                onChange: showPreview,
                onSelect: showPreview,
-               minSize: [ <?=Photogalery_Controller::SMALL_WIDTH;?>, <?=Photogalery_Controller::SMALL_HEIGHT;?> ],
-               setSelect: [ 0, 0, <?=Photogalery_Controller::SMALL_WIDTH;?>, <?=Photogalery_Controller::SMALL_HEIGHT;?> ],
-               aspectRatio: 1
+               minSize: [ <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>,
+                  <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?> ],
+               setSelect: [ 0, 0, <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>,
+                  <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?> ]
+                        ,aspectRatio: <?=str_replace(',', '.', round($this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH)/$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT),2))?>
             });
          });
 
