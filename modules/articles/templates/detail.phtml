@@ -11,12 +11,6 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
 ?>
 
 <div>
-   <!--<h2><?=htmlspecialchars($this->article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;-->
-   <div class="smallFont"><?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
-          ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
-   </div>
-   <!--</h2>-->
    <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />
    <script type="text/javascript">
@@ -45,18 +39,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
               'shares' => $this->shares));?>
    
    <?
-   if($this->category()->getRights()->isControll() OR
-       ($this->category()->getRights()->isWritable() AND
-       $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_article', $this->_("Upravit"),
-          $this->link()->route('edit'),
-          $this->_("Upravit zobrazený článek"), "page_edit.png");
-      $toolbox->addTool('article_delete', $this->_("Smazat"),
-          $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
-          'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
-          $this->_('Opravdu smazat článek?'));
-      $this->includeTplObj($toolbox);
-   }?>
+   echo $this->toolbox;
+   ?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true);?>

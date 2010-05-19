@@ -2,14 +2,31 @@
 class News_View extends Articles_View {
    public function mainView() {
       $this->template()->addTplFile("list.phtml");
-////      $this->template()->addFile("tpl://list.phtml");
-////      $this->template()->addFile("tpl://articles/list.phtml");
-////      $this->template()->addFile("css://style.css");
-////      $this->template()->addFile("js://functions.js");
+      if($this->category()->getRights()->isWritable()) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('add_article', $this->_("Přidat aktualitu"),
+            $this->link()->route('add'),
+            $this->_("Přidat novou aktulitu"), "page_add.png");
+         $this->toolbox = $toolbox;
+      }
    }
 
    public function showView() {
       $this->template()->addTplFile("detail.phtml", 'articles');
+
+      if($this->category()->getRights()->isControll() OR
+              ($this->category()->getRights()->isWritable() AND
+                      $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_article', $this->_("Upravit"),
+                 $this->link()->route('edit'),
+                 $this->_("Upravit zobrazenou aktualitu"), "page_edit.png");
+         $toolbox->addTool('article_delete', $this->_("Smazat"),
+                 $this->link(), $this->_("Smazat zobrazenou aktualitu"), "page_delete.png",
+                 'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
+                 $this->_('Opravdu smazat aktualitu?'));
+         $this->template()->toolbox = $toolbox;
+      }
    }
 
    public function archiveView() {

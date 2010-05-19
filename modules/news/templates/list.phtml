@@ -47,12 +47,6 @@ if($this->top === true) {
    }?>
 
    <?
-   if($this->category()->getRights()->isWritable()) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('add_article', $this->_("Přidat článek"),
-          $this->link()->route('add'),
-          $this->_("Přidat nový článek"), "page_add.png");
-      $this->includeTplObj($toolbox);
-   }
+   echo $this->toolbox;
    ?>
 </div>

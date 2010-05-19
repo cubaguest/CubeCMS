@@ -6,6 +6,14 @@ class Articles_View extends View {
       $feeds->setConfig('feedLink', $this->link()->clear()->route('export'));
       $feeds->setConfig('urlArgName', "{type}");
       $this->template()->feedsComp = $feeds;
+
+      if($this->category()->getRights()->isWritable()) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('add_article', $this->_("Přidat článek"),
+                 $this->link()->route('add'),
+                 $this->_("Přidat nový článek"), "page_add.png");
+         $this->template()->toolbox = $toolbox;
+      }
    }
 
    public function topView() {
@@ -18,7 +26,21 @@ class Articles_View extends View {
    }
 
    public function showView() {
-      $this->template()->addTplFile("detail.phtml");
+      $this->template()->addTplFile("detail.phtml", 'articles');
+
+      if($this->category()->getRights()->isControll() OR
+              ($this->category()->getRights()->isWritable() AND
+                      $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
+         $toolbox = new Template_Toolbox();
+         $toolbox->addTool('edit_article', $this->_("Upravit"),
+                 $this->link()->route('edit'),
+                 $this->_("Upravit zobrazený článek"), "page_edit.png");
+         $toolbox->addTool('article_delete', $this->_("Smazat"),
+                 $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
+                 'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
+                 $this->_('Opravdu smazat článek?'));
+         $this->template()->toolbox = $toolbox;
+      }
    }
 
    public function archiveView() {
@@ -58,7 +80,7 @@ class Articles_View extends View {
       exit();
    }
 
-   protected function pdfFileCacheName(){
+   protected function pdfFileCacheName() {
       return md5($this->article->{Articles_Model_Detail::COLUMN_ID}
               .'_'.(string)$this->article->{Articles_Model_Detail::COLUMN_TEXT_CLEAR}).'.pdf';
    }
@@ -177,10 +199,10 @@ class Articles_View extends View {
       $api = new Component_Api_VVEArticle();
       $api->setCategory($this->category()->getName(), $this->link()->clear());
       $article = $this->article;
-      if($article != null OR $article != false){
+      if($article != null OR $article != false) {
          $api->setArticle($article->{Articles_Model_Detail::COLUMN_NAME},
-             $this->link()->route('detail', array('urlkey'=>$article->{Articles_Model_Detail::COLUMN_URLKEY})),
-             vve_tpl_truncate(vve_strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}),400));
+                 $this->link()->route('detail', array('urlkey'=>$article->{Articles_Model_Detail::COLUMN_URLKEY})),
+                 vve_tpl_truncate(vve_strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}),400));
       }
       $api->flush();
    }
