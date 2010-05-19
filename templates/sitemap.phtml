@@ -12,7 +12,7 @@ function vveRenderMap($menuArr, $link, $catsArr) {
           foreach ($catsArr[$item->getCatObj()->getId()]['items'] as $itemArt) {
             print ('<li><a href="'.$itemArt['loc'].'">'.$itemArt['name'].'</a></li>');
          }
-         print ("</ul>\n<br />");
+         print ("</ul>\n");
       }
 
       if(!$item->isEmpty()){
@@ -20,7 +20,7 @@ function vveRenderMap($menuArr, $link, $catsArr) {
       }
       print ("</li>\n");
    }
-   print ("</ul><br />\n");
+   print ("</ul>\n");
 }
 ?>
 
