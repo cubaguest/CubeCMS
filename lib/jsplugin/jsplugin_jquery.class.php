@@ -28,7 +28,11 @@ class JsPlugin_JQuery extends JsPlugin {
 
 	protected function setFiles() {
 //		Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("jquery-".self::JQUERY_VERSION.".min.js"));
+      if(defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1){
+         $this->addFile("http://ajax.googleapis.com/ajax/libs/jquery/".self::JQUERY_VERSION."/jquery.min.js");
+      } else {
+         $this->addFile(new JsPlugin_JsFile("jquery-".self::JQUERY_VERSION.".min.js"));
+      }
 	}
 	
 	/**

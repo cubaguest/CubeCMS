@@ -117,10 +117,12 @@ abstract class JsPlugin {
 
 	/**
 	 * Metoda přídává css soubor js pluginu
-	 * @param string -- název css souboru
+	 * @param string -- název souboru nebo JsPlugin_File
 	 */
-	final protected function addFile(JsPlugin_File $file){
-      $file->setPluginName($this->jsPluginName);
+	final protected function addFile($file){
+      if($file instanceof JsPlugin_File){
+         $file->setPluginName($this->jsPluginName);
+      }
 		array_push($this->filesArray, $file);
 	}
 	
