@@ -102,7 +102,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
          <div id="colswrap">
 
             <div id="col1wrap" class="column">
-               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['left'])) echo " col1pad_plusright";?>">
+               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['right'])) echo " col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);
                   $icon = null;
