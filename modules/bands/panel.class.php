@@ -15,7 +15,8 @@ class Bands_Panel extends Panel {
             break;
          case 'randclip':
          default:
-            $this->template()->clip = $model->getRandomCLip();
+            $this->template()->band = $model->getRandomCLip();
+            if($this->template()->band == null) return false;
             $this->template()->addTplFile('panel_clip.phtml');
             break;
       }

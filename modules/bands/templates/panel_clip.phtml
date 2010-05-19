@@ -15,9 +15,11 @@ if($this->panelObj()->getBackImage() != null) {
    $width = 170; // ZDE MĚNIT VELIKOST !!!
    $height = ceil($width/4*3);
    ?>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"><?=$this->band->{Bands_Model::COLUMN_NAME}?></a>
    <!--[if !IE]> -->
    <object id="flash" type="application/x-shockwave-flash"  height="<?=$height?>" width="<?=$width?>"
-           data="<?=$this->clip?>&hl=cs_CZ&fs=1&rel=0">
+           data="<?=$this->band->{Bands_Model::COLUMN_CLIPS}?>&hl=cs_CZ&fs=1&rel=0">
       <!-- <![endif]-->
 
       <!--[if IE]>
@@ -25,7 +27,7 @@ if($this->panelObj()->getBackImage() != null) {
         codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"
         width="<?=$width?>" height="<?=$height?>">
       <!--><!--dgx-->
-      <param name="movie" value="<?=$this->clip?>&hl=cs_CZ&fs=1&rel=0" />
+      <param name="movie" value="<?=$this->band->{Bands_Model::COLUMN_CLIPS}?>&hl=cs_CZ&fs=1&rel=0" />
       <param name="allowFullScreen" value="true" />
       <param name="allowscriptaccess" value="always" />
       <param name="menu" value="false" />
@@ -35,6 +37,6 @@ if($this->panelObj()->getBackImage() != null) {
 
 </div>
 <p class="panel-box-link-more">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"><?=$this->_('Více')?></a>
 </p>

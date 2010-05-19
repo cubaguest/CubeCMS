@@ -210,17 +210,17 @@ class Bands_Model extends Model_PDO {
       $retClip = null;
 
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT ".self::COLUMN_CLIPS." FROM ".Db_PDO::table(self::DB_TABLE)
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (ISNULL(".self::COLUMN_CLIPS.") = 0)"
               ." ORDER BY RAND() LIMIT 0, 1");
       $dbst->execute();
       $fetch = $dbst->fetchObject();
       if($fetch != false){
          $clipsArr = explode(self::CLIPS_SEPARATOR, (string)$fetch->{self::COLUMN_CLIPS});
-         $retClip = $clipsArr[rand(0, count($clipsArr)-1)];
+         $fetch->{self::COLUMN_CLIPS} = $clipsArr[rand(0, count($clipsArr)-1)];
       }
 
-      return $retClip;
+      return $fetch;
    }
 
    /**
@@ -269,26 +269,24 @@ class Bands_Model extends Model_PDO {
     * @param bool $publicOnly
     * @return PDOStatement
     */
-   public function search($idCat, $string, $publicOnly = true) {
+   public function search($string, $publicOnly = true) {
       $dbc = new Db_PDO();
-      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locale::getLang();
-      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+      $clabel = self::COLUMN_NAME;
+      $ctext = self::COLUMN_TEXT_CLEAR;
 
       $wherePub = null;
       if($publicOnly) {
-         $wherePub = ' AND '.Articles_Model_Detail::COLUMN_PUBLIC.' = 1';
+         $wherePub = ' AND '.self::COLUMN_PUBLIC.' = 1';
       }
 
       $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
               .' + MATCH('.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(Articles_Model_Detail::DB_TABLE)
+              .' FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE MATCH('.$clabel.', '.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.Articles_Model_Detail::COLUMN_ID_CATEGORY.'` = :idCat'
               .$wherePub // Public articles
               .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
               .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring) DESC');
 
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
       $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->execute();
