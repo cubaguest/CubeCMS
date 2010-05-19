@@ -20,10 +20,12 @@ $min_px = 1; // poměr minuta-px
       <?// generování dabulky?>
       <table class="program-table">
          <thead>
-         <th></th>
+         <tr>
+            <th></th>
          <?foreach ($day->stage as $stage) {
             echo "<th>".$stage['name']."</th>";
          }?>
+         </tr>
          </thead>
          <tbody>
             <? //for ($y = 0; $y < $loops; $y++){
@@ -52,6 +54,7 @@ $min_px = 1; // poměr minuta-px
       reset($day);
       foreach ($day as $stage) {
          foreach ($stage->item as $item) {
+            if($item['type'] == 'band' AND !isset ($this->bands[(int)$item->bandid]))continue;
             $toppos = $headerCellH;
             $height = 0;
             $startTime = new DateTime($item->time);

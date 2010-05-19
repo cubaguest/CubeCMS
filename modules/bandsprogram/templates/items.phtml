@@ -40,11 +40,13 @@ switch ($this->type) {
          <ul class="program-stages-list">
             <?// TADY load stages
             $this->itemIndex++; // další index
+            if($this->stages != null){
             foreach ($this->stages as $stage){
                $this->type = 'stage';
                $this->items = $stage->item;
                $this->form->text->setValues($stage['name']);
                $this->includeTpl('items.phtml');
+            }
             }
             ?>
          </ul>
@@ -85,6 +87,7 @@ switch ($this->type) {
          <ul class="program-items-list">
             <?// TADY load bands and other
             $this->itemIndex++; // další index
+            if($this->items != null){
             foreach ($this->items as $item){
                $this->type = $item['type'];
                $this->form->text->setValues($item->text);
@@ -92,6 +95,7 @@ switch ($this->type) {
                $this->form->lenght->setValues($item->lenght);
                $this->form->bandid->setValues($item->bandid);
                $this->includeTpl('items.phtml');
+            }
             }
             ?>
          </ul>
