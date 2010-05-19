@@ -359,6 +359,8 @@ class Template {
             } else {
                Template::addCss($file->getName());
             }
+         } else {
+            Template::addJS($file);
          }
       }
    }
