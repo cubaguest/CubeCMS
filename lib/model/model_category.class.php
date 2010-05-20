@@ -99,9 +99,13 @@ class Model_Category extends Model_PDO {
     */
    public function getCategoryById($id) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat
-             WHERE (cat.".self::COLUMN_CAT_ID." = :idcat) LIMIT 0, 1");
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+             ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+             .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+             ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+             ." AND (cat.".self::COLUMN_CAT_ID." = :idcat) LIMIT 0, 1");
       $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
+      $dbst->bindValue(':idgrp', AppCore::getAuth()->getGroupId() , PDO::PARAM_INT);
       $dbst->setFetchMode(PDO::FETCH_INTO, new Model_LangContainer());
       $dbst->execute();
 
