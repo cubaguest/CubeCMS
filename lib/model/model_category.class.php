@@ -155,14 +155,11 @@ class Model_Category extends Model_PDO {
             $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
 
          } else {
-            $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat".
-                    " ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+            $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
+                    ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
+                    .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+                    ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
          }
-//      if($this->catList != null AND  $allCategories == true) {
-//
-//
-//         return $this->catList;
-//      }
          $dbst->execute();
          $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
 
