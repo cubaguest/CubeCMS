@@ -5,7 +5,7 @@
 class Bands_Model extends Model_PDO {
    const DB_TABLE = 'bands';
 
-   const CLIPS_SEPARATOR = ';';
+   const CLIPS_SEPARATOR = ';;';
 
    /**
     * Názvy sloupců v databázi
