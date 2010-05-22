@@ -173,7 +173,7 @@ class Component {
     * @return Url_Link -- objekt odkazů
     */
    protected function pageLink() {
-      return $this->componentLink;
+      return $this->pageLink;
    }
 
    /**
