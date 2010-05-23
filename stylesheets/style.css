@@ -369,10 +369,11 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
    float: left;
    padding: 0 10px 10px 0;
 }
-.article-list-no-public, .article-detail-no-public {
+.article-list-no-public, .article-detail-no-public, .comment-nopublic {
    background-color: #666666;
    color: #ffffff;
 }
+.article-detail-content, .article-list-content {}
 
 /* EOF main content NEW!!! */
 
@@ -484,3 +485,23 @@ div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
    vertical-align:bottom;
 }
 /* EOF navigtion menu */
+
+/* SOF komentare */
+
+.comments-comment {
+   margin-bottom: 5px;
+   border: 1px solid silver;
+}
+
+.comments-tools {
+   float: right;
+   text-align: right;
+}
+.comments-tools form {
+   float: left;
+}
+.comments-censored-text {
+   background-color: silver;
+   font-size: xx-small;
+}
+/* EOF komentare */
