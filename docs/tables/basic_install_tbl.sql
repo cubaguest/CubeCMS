@@ -16,11 +16,11 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_categories`
+-- Struktura tabulky `{PREFIX}categories`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_categories`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_categories` (
+DROP TABLE IF EXISTS `{PREFIX}categories`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}categories` (
   `id_category` smallint(3) NOT NULL AUTO_INCREMENT,
   `module` varchar(20) DEFAULT NULL,
   `data_dir` varchar(100) DEFAULT NULL,
@@ -63,10 +63,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_categories` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=101 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_categories`
+-- Vypisuji data pro tabulku `{PREFIX}categories`
 --
 
-INSERT INTO `{PREFIX}_categories` (`id_category`, `module`, `data_dir`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `ser_params`, `params`, `protected`, `priority`, `active`, `individual_panels`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`, `changed`, `default_right`, `feeds`, `icon`) VALUES
+INSERT INTO `{PREFIX}categories` (`id_category`, `module`, `data_dir`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `ser_params`, `params`, `protected`, `priority`, `active`, `individual_panels`, `sitemap_changefreq`, `sitemap_priority`, `show_in_menu`, `show_when_login_only`, `changed`, `default_right`, `feeds`, `icon`) VALUES
 (1, 'categories', NULL, 'admin/struktura/kategorie', 'kategorie', NULL, 'administration/categories', 'Categories', NULL, '', '', '', NULL, NULL, NULL, NULL, '', '', NULL, '', 1, 0, 1, 0, 'never', 0, 1, 1, '2010-05-10 14:18:05', '---', 0, NULL),
 (2, 'login', 'ucet', 'ucet', 'účet', NULL, 'account', 'account', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 1, '2010-05-10 14:12:36', 'r--', 0, NULL),
 (3, 'empty', NULL, 'admin/struktura', 'struktura', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, 0, '2010-05-10 14:17:47', '---', 0, NULL),
@@ -85,11 +85,11 @@ INSERT INTO `{PREFIX}_categories` (`id_category`, `module`, `data_dir`, `urlkey_
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_config`
+-- Struktura tabulky `{PREFIX}config`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_config`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_config` (
+DROP TABLE IF EXISTS `{PREFIX}config`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}config` (
   `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(50) NOT NULL,
   `label` varchar(1000) DEFAULT NULL,
@@ -102,10 +102,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_config` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=63 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_config`
+-- Vypisuji data pro tabulku `{PREFIX}config`
 --
 
-INSERT INTO `{PREFIX}_config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`) VALUES
+INSERT INTO `{PREFIX}config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`) VALUES
 (1, 'DEFAULT_ID_GROUP', NULL, '2', NULL, 0, 'number'),
 (2, 'DEFAULT_GROUP_NAME', NULL, 'guest', NULL, 0, 'string'),
 (3, 'DEFAULT_USER_NAME', NULL, 'anonym', NULL, 0, 'string'),
@@ -118,12 +118,12 @@ INSERT INTO `{PREFIX}_config` (`id_config`, `key`, `label`, `value`, `values`, `
 (10, 'SITEMAP_PERIODE', NULL, 'weekly', NULL, 0, 'string'),
 (11, 'SEARCH_RESULT_LENGHT', NULL, '300', NULL, 0, 'number'),
 (12, 'SEARCH_HIGHLIGHT_TAG', NULL, 'strong', NULL, 0, 'string'),
-(13, 'SESSION_NAME', NULL, '{PREFIX}_cookie', NULL, 0, 'string'),
+(13, 'SESSION_NAME', NULL, '{PREFIX}cookie', NULL, 0, 'string'),
 (14, 'WEB_NAME', NULL, 'Vepřové Výpečky', NULL, 0, 'string'),
 (61, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"100";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object'),
-(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}_', '', 0, 'string'),
-(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}_navigation_panel', NULL, 0, 'string'),
-(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}_shares', NULL, 0, 'string'),
+(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}', '', 0, 'string'),
+(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}navigation_panel', NULL, 0, 'string'),
+(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}shares', NULL, 0, 'string'),
 (21, 'PAGE_TITLE_SEPARATOR', NULL, '|', NULL, 0, 'string'),
 (16, 'NAVIGATION_SEPARATOR', NULL, '::', NULL, 0, 'string'),
 (17, 'HEADLINE_SEPARATOR', NULL, ' - ', NULL, 0, 'string'),
@@ -166,11 +166,11 @@ INSERT INTO `{PREFIX}_config` (`id_config`, `key`, `label`, `value`, `values`, `
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_groups`
+-- Struktura tabulky `{PREFIX}groups`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_groups`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_groups` (
+DROP TABLE IF EXISTS `{PREFIX}groups`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}groups` (
   `id_group` smallint(3) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID skupiny',
   `name` varchar(15) DEFAULT NULL COMMENT 'Nazev skupiny',
   `label` varchar(100) DEFAULT NULL,
@@ -180,21 +180,21 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_groups` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_groups`
+-- Vypisuji data pro tabulku `{PREFIX}groups`
 --
 
-INSERT INTO `{PREFIX}_groups` (`id_group`, `name`, `label`, `used`, `default_right`) VALUES
+INSERT INTO `{PREFIX}groups` (`id_group`, `name`, `label`, `used`, `default_right`) VALUES
 (1, 'admin', 'Administrátor', 1, 'rwc'),
 (2, 'guest', 'Host', 1, 'r--');
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_modules_instaled`
+-- Struktura tabulky `{PREFIX}modules_instaled`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_modules_instaled`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_modules_instaled` (
+DROP TABLE IF EXISTS `{PREFIX}modules_instaled`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}modules_instaled` (
   `id_module` smallint(6) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) CHARACTER SET utf8 NOT NULL,
   `version` float NOT NULL DEFAULT '1',
@@ -202,18 +202,18 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_modules_instaled` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_modules_instaled`
+-- Vypisuji data pro tabulku `{PREFIX}modules_instaled`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_panels`
+-- Struktura tabulky `{PREFIX}panels`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_panels`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_panels` (
+DROP TABLE IF EXISTS `{PREFIX}panels`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}panels` (
   `id_panel` smallint(3) NOT NULL AUTO_INCREMENT,
   `id_cat` smallint(5) NOT NULL DEFAULT '0' COMMENT 'id kategorie panelu',
   `id_show_cat` smallint(5) unsigned DEFAULT '0' COMMENT 'id kategorie ve které se má daný panel zobrazit',
@@ -231,18 +231,18 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_panels` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_panels`
+-- Vypisuji data pro tabulku `{PREFIX}panels`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_rights`
+-- Struktura tabulky `{PREFIX}rights`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_rights`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_rights` (
+DROP TABLE IF EXISTS `{PREFIX}rights`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}rights` (
   `id_right` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_category` smallint(6) NOT NULL,
   `id_group` smallint(6) NOT NULL,
@@ -252,10 +252,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_rights` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=197 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_rights`
+-- Vypisuji data pro tabulku `{PREFIX}rights`
 --
 
-INSERT INTO `{PREFIX}_rights` (`id_right`, `id_category`, `id_group`, `right`) VALUES
+INSERT INTO `{PREFIX}rights` (`id_right`, `id_category`, `id_group`, `right`) VALUES
 (1, 1, 1, 'rwc'),
 (6, 1, 2, '---'),
 (186, 9, 2, '---'),
@@ -288,11 +288,11 @@ INSERT INTO `{PREFIX}_rights` (`id_right`, `id_category`, `id_group`, `right`) V
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_shares`
+-- Struktura tabulky `{PREFIX}shares`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_shares`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_shares` (
+DROP TABLE IF EXISTS `{PREFIX}shares`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}shares` (
   `id_share` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `link` varchar(300) NOT NULL,
   `icon` varchar(100) NOT NULL,
@@ -301,10 +301,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_shares` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_shares`
+-- Vypisuji data pro tabulku `{PREFIX}shares`
 --
 
-INSERT INTO `{PREFIX}_shares` (`id_share`, `link`, `icon`, `name`) VALUES
+INSERT INTO `{PREFIX}shares` (`id_share`, `link`, `icon`, `name`) VALUES
 (1, 'http://www.linkuj.cz/?id=linkuj&amp;url={URL}&amp;title={TITLE}', 'http://linkuj.cz/img/linkuj_icon.gif', 'linkuj.cz'),
 (2, 'http://www.jagg.cz/bookmarks.php?action=add&amp;address={URL}&amp;title={TITLE}', 'http://www.jagg.cz/icon.png', 'jagg.cz'),
 (3, 'http://vybrali.sme.sk/submit.php?url={URL}', 'http://zena.sme.sk/storm/imgs/toolbar/doasdf_c.gif', 'vybrali.sme.sk'),
@@ -317,13 +317,36 @@ INSERT INTO `{PREFIX}_shares` (`id_share`, `link`, `icon`, `name`) VALUES
 (10, 'http://www.bookmarky.cz/a.php?cmd=add&amp;url={URL}&amp;title={TITLE}', 'http://www.bookmarky.cz/bookmarky16x16.gif', 'bookmarky.cz');
 
 -- --------------------------------------------------------
+--
+-- Struktura tabulky `comments`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}comments` (
+  `id_comment` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id_category` smallint(6) NOT NULL,
+  `id_article` smallint(6) NOT NULL,
+  `id_parent` smallint(6) DEFAULT '0',
+  `nick` varchar(100) NOT NULL,
+  `comment` varchar(500) NOT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT '1',
+  `censored` tinyint(1) NOT NULL DEFAULT '0',
+  `corder` smallint(6) NOT NULL DEFAULT '1',
+  `level` smallint(6) NOT NULL DEFAULT '0',
+  `time_add` datetime NOT NULL,
+  `ip_address` varchar(15) DEFAULT NULL,
+  PRIMARY KEY (`id_comment`),
+  KEY `id_category` (`id_category`,`id_article`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+-- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_texts`
+-- Struktura tabulky `{PREFIX}texts`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_texts`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_texts` (
+DROP TABLE IF EXISTS `{PREFIX}texts`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
   `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
   `id_item` smallint(5) unsigned NOT NULL,
   `subkey` varchar(30) NOT NULL DEFAULT 'nokey',
@@ -351,18 +374,18 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_texts` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_texts`
+-- Vypisuji data pro tabulku `{PREFIX}texts`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}_users`
+-- Struktura tabulky `{PREFIX}users`
 --
 
-DROP TABLE IF EXISTS `{PREFIX}_users`;
-CREATE TABLE IF NOT EXISTS `{PREFIX}_users` (
+DROP TABLE IF EXISTS `{PREFIX}users`;
+CREATE TABLE IF NOT EXISTS `{PREFIX}users` (
   `id_user` smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID uzivatele',
   `username` varchar(20) NOT NULL COMMENT 'Uzivatelske jmeno',
   `password` varchar(100) DEFAULT NULL COMMENT 'Heslo',
@@ -379,10 +402,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}_users` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=28 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}_users`
+-- Vypisuji data pro tabulku `{PREFIX}users`
 --
 
-INSERT INTO `{PREFIX}_users` (`id_user`, `username`, `password`, `id_group`, `name`, `surname`, `mail`, `note`, `blocked`, `foto_file`, `deleted`) VALUES
+INSERT INTO `{PREFIX}users` (`id_user`, `username`, `password`, `id_group`, `name`, `surname`, `mail`, `note`, `blocked`, `foto_file`, `deleted`) VALUES
 (1, 'admin', '35675e68f4b5af7b995d9205ad0fc43842f16450', 1, 'Jakub', 'Matas', 'jakubmatas@gmail.com', 'administrátor', 0, NULL, 0),
 (2, 'guest', '', 2, 'host', 'host', '', 'host systému', 0, NULL, 0),
 (3, 'cuba', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1, 'Jakub', 'Matas', 'jakubmatas@gmail.com', 'Normální uživatel', 0, 'cuba1.jpg', 0);
