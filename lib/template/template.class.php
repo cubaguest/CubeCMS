@@ -14,6 +14,7 @@
 require_once 'tplmodifiers.php';
 require_once 'template_items.php';
 require_once 'template_functions.php';
+require_once 'template_postfilters.php';
 
 class Template {
    /**
