@@ -1,0 +1,15 @@
+<div class="comments-list">
+   <?
+   echo _('<span class="comments-label"><strong>Komentáře ('.$this->countComments.'):</strong></span>');
+   if(!empty ($this->comments)) {
+      foreach ($this->comments as $comment) {
+         $this->includeTpl('comments/item.phtml',true, array('comment' => $comment));
+      }
+   } else {
+      echo _('<p>Není uložen žádný komentář</p>');
+   }
+   ?>
+   <?if($this->isClosed == true) {
+      echo _('<p>Diskuze byla uzavřena</p>');
+   }?>
+</div>

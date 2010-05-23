@@ -1,0 +1,17 @@
+<div class="comments-form-add" id="addComment">
+   <strong><?=_('Přidání komentáře')?></strong>
+   <p id="comment-reaction-label"></p>
+   <?
+   $this->formAdd->comment->html()->setAttrib('rows', 5)->setAttrib('cols', 70);
+   echo $this->formAdd;
+   echo _('Povolené značky XHTML').': a, br, em, strong, sub, sup, ul, li, ol';
+   ?>
+</div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   function selectParent(id, nick,text){
+      document.getElementById('comment_parent').value = id;
+      document.getElementById('comment-reaction-label').innerHTML = '<?=_('Reakce na: ')?>'+nick+': '+text.toString();
+   }
+   /* ]]> */
+</script>
