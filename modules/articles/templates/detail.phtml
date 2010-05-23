@@ -36,10 +36,13 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
       'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
               'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
               'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
-              'shares' => $this->shares));?>
+              'shares' => $this->shares));
    
-   <?
+   echo '<br />';
+   $this->includeTpl("buttonback.phtml", true);
+   echo '<br />';
    echo $this->toolbox;
+   echo $this->comments;
    ?>
 </div>
-<?$this->includeTpl("buttonback.phtml", true);?>
+
