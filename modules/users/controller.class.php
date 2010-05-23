@@ -130,7 +130,6 @@ class Users_Controller extends Controller {
 
       $this->view()->template()->userName = $user->{Model_Users::COLUMN_USERNAME};
       $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile('edituser.phtml');
    }
 
    /**
@@ -154,7 +153,6 @@ class Users_Controller extends Controller {
       }
 
       $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile('edituser.phtml');
    }
 
    /**
@@ -223,6 +221,7 @@ class Users_Controller extends Controller {
 
 
    public function addGroupController() {
+      $this->checkControllRights();
       $uModel = new Model_Users();
       $form = $this->createGroupForm();
 
@@ -258,7 +257,26 @@ class Users_Controller extends Controller {
       }
 
       $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile('editgroup.phtml');
+   }
+
+   public function editgroupController(){
+      $this->checkControllRights();
+
+      $uModel = new Model_Users();
+      $group = $uModel->getGroupById($this->getRequest('id'));
+      if($group == false) return false;
+
+      $form = $this->createGroupForm();
+
+      $form->name->setValues($group->{Model_Users::COLUMN_GROUP_NAME});
+      $form->label->setValues($group->{Model_Users::COLUMN_GROUP_LABEL});
+
+      if($form->isValid()){
+         $uModel->saveGroup($form->name->getValues(), $form->label->getValues(), $this->getRequest('id'));
+         $this->infoMsg()->addMessage($this->_('Skupina byla uložena a přidělena práva k ní'));
+         $this->link()->route()->reload();
+      }
+      $this->view()->template()->form = $form;
    }
 
    /**

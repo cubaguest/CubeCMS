@@ -198,18 +198,10 @@ class Model_Users extends Model_PDO {
              ." VALUES (:name, :label)");
       } else {
       // existující skupina
-//         $passSql = null;
-//         if($password != null){
-//            $passSql = "`".self::COLUMN_PASSWORD."` = ".$dbc->quote(Auth::cryptPassword($password)).",";
-//         }
-//
-//         $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
-//                ." `".self::COLUMN_USERNAME."` = :username, `".self::COLUMN_NAME."` = :name,"
-//                ." `".self::COLUMN_SURNAME."` = :surname, ".$passSql
-//                ." `".self::COLUMN_ID_GROUP."` = :idgrp, `".self::COLUMN_MAIL."` = :mail,"
-//                ." `".self::COLUMN_NOTE."` = :note, `".self::COLUMN_BLOCKED."` = :blocked"
-//                ." WHERE (".self::COLUMN_ID." = :iduser)");
-//         $dbst->bindValue(':iduser', $id);
+         $dbst = $dbc->prepare("UPDATE ".self::getGroupsTable(). " SET"
+                ." `name` = :name, `".self::COLUMN_GROUP_LABEL."` = :label"
+                ." WHERE (".self::COLUMN_GROUP_ID." = :idgrp)");
+          $dbst->bindValue(':idgrp', (int)$id, PDO::PARAM_INT);
       }
 
       $dbst->bindValue(':name', $name);

@@ -14,11 +14,21 @@ class Users_View extends View {
 	public function showView() {
 	}
 	
-	public function editView() {
+	public function edituserView() {
+      $this->template()->addTplFile('edituser.phtml');
 	}
 	
-	public function addView() {
+	public function adduserView() {
+      $this->template()->addTplFile('edituser.phtml');
 	}
+
+   public function addGroupView() {
+      $this->template()->addTplFile('editgroup.phtml');
+   }
+   
+   public function editGroupView() {
+      $this->template()->addTplFile('editgroup.phtml');
+   }
 	
 }
 
