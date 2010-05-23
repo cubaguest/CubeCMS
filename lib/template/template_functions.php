@@ -1,8 +1,13 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
-*/
+/**
+ * Soubor se specielními funkcemi, určenými do šablon
+ *
+ * @copyright  	Copyright (c) 2008-2009 Jakub Matas
+ * @version    	$Id: $ VVE6.0.0 $Revision: $
+ * @author        $Author: $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate:  $
+ * @abstract 		Funkce
+ */
 
 define('VVE_TPL_FILE_IMAGE', 'image');
 
