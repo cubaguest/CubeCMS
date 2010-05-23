@@ -1,6 +1,7 @@
 <?php
 class Articles_Controller extends Controller {
    const DEFAULT_ARTICLES_IN_PAGE = 5;
+   const DEFAULT_CLOSED_COMMENTS_DAYS = 0;
    /**
     * Kontroler pro zobrazení novinek
     */
@@ -125,6 +126,29 @@ class Articles_Controller extends Controller {
       
       // odkaz zpět
       $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
+
+      // diskuse
+      if($this->category()->getParam('discussion_allow', false) == true){
+         $compComments = new Component_Comments();
+         $compComments->setConfig(Component_Comments::PARAM_ID_ARTICLE,
+                 $article->{Articles_Model_Detail::COLUMN_ID});
+         $compComments->setConfig(Component_Comments::PARAM_ID_CATEGORY,
+                 $this->category()->getId());
+         $compComments->setConfig(Component_Comments::PARAM_ADMIN,
+                 $this->category()->getRights()->isControll());
+         $compComments->setConfig(Component_Comments::PARAM_NEW_ARE_PUBLIC, 
+                 !$this->category()->getParam('discussion_not_public', false));
+         // uzavření diskuze
+         if($this->category()->getParam('discussion_closed', self::DEFAULT_CLOSED_COMMENTS_DAYS) != 0){
+            $timeAdd = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+            $t = $timeAdd->format('U')
+                    +$this->category()->getParam('discussion_closed', 0)*24*60*60;
+            if($t < time()){
+               $compComments->setConfig(Component_Comments::PARAM_CLOSED, true);
+            }
+         }
+         $this->view()->comments = $compComments;
+      }
    }
 
    /**
@@ -339,9 +363,34 @@ class Articles_Controller extends Controller {
       if(isset($settings['scroll'])) {
          $form->scroll->setValues($settings['scroll']);
       }
+
+      $form->addGroup('discussion', 'Diskuse');
+
+      $elemAllowComments = new Form_Element_Checkbox('discussion_allow', 'Diskuse zapnuta');
+      $form->addElement($elemAllowComments, 'discussion');
+      if(isset($settings['discussion_allow'])) {
+         $form->discussion_allow->setValues($settings['discussion_allow']);
+      }
+
+      $elemCommentsNotPublic = new Form_Element_Checkbox('discussion_not_public',
+              'Příspěvky čekají na schválení');
+      $form->addElement($elemCommentsNotPublic, 'discussion');
+      if(isset($settings['discussion_not_public'])) {
+         $form->discussion_not_public->setValues($settings['discussion_not_public']);
+      }
+
+      $elemCommentsClosed = new Form_Element_Text('discussion_closed',
+              'Zavřít diskuzi po dnech');
+      $elemCommentsClosed->addValidation(new Form_Validator_IsNumber());
+      $elemCommentsClosed->setSubLabel('Výchozí: diskuse nejsou uzavírány');
+       $form->addElement($elemCommentsClosed, 'discussion');
+
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scroll'] = $form->scroll->getValues();
+         $settings['discussion_allow'] = $form->discussion_allow->getValues();
+         $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
+         $settings['discussion_closed'] = $form->discussion_closed->getValues();
       }
    }
 }
