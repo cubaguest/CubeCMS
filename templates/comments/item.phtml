@@ -11,20 +11,20 @@ if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false) $class = 'co
    <div class="comments-tools">
       <form action="<?=$this->pageLink()?>" method="post">
          <p>
-            <input type="hidden" name="comment_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
+            <input type="hidden" name="comment_public_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
                <?if($comment->{Component_Comments_Model::COL_PUBLIC} == false) {?>
-            <input type="image" name="comment_public" title="<?echo _('Zveřejnit');?>"
+            <input type="image" name="comment_public_public" title="<?echo _('Zveřejnit');?>"
                    src="<?=Template::getFileDir('icons/comment_add.png', Template::IMAGES_DIR, false,true)?>" />
                          <?} else {?>
-            <input type="image" name="comment_public" title="<?echo _('Zrušit Zveřejnění');?>"
+            <input type="image" name="comment_public_public" title="<?echo _('Zrušit Zveřejnění');?>"
                    src="<?=Template::getFileDir('icons/comment_delete.png', Template::IMAGES_DIR, false,true)?>" />
                          <?}?>
          </p>
       </form>
       <form action="<?=$this->pageLink()?>" method="post">
          <p>
-            <input type="hidden" name="comment_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
-            <input type="image" name="comment_censored" title="<?if($comment->{Component_Comments_Model::COL_CENSORED} == false)
+            <input type="hidden" name="comment_censore_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
+            <input type="image" name="comment_censore_censored" title="<?if($comment->{Component_Comments_Model::COL_CENSORED} == false)
                          echo _('Centurovat'); else echo _('Zrušit cenzuru');?>"
                    src="<?=Template::getFileDir('icons/comment_error.png', Template::IMAGES_DIR, false,true)?>" />
          </p>
