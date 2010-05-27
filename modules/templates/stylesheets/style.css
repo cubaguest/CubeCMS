@@ -1,0 +1,4 @@
+@CHARSET "UTF-8";
+.module-templates-list table form {
+   display: inline;
+}

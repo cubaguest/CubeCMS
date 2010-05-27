@@ -1,0 +1,45 @@
+<?
+$this->addCssFile('style.css');
+
+$this->addJsPlugin(new JsPlugin_DataTables());
+
+?>
+<div class="articles-list module-templates-list">
+   <?if(!empty ($this->templates)) {?>
+   <table>
+      <thead>
+         <tr>
+            <th width="150"><?=$this->_('Název')?></th>
+            <th width="300"><?=$this->_('Obsah')?></th>
+            <th width="50"><?=$this->_('Typ')?></th>
+            <th width="60"></th>
+         </tr>
+      </thead>
+   <?
+      foreach ($this->templates as $template) {?>
+      <tr>
+         <td><?=$template->{Templates_Model::COLUMN_NAME}?></td>
+         <td><span class="templates-tpl-short-cnt" title="<?=htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT})?>"
+                ><?=vve_tpl_truncate(htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT}), 100)?></span></td>
+         <td><?=$template->{Templates_Model::COLUMN_TYPE}?></td>
+         <td>
+            <?/*<a href="<?=$this->link()?>#preview" title="<?=$this->_('Náhled v novém okně')?>"
+               ><img src="<?=Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" alt="preview" /></a>*/?>
+            <form action="<?=$this->link()->route('edit', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post">
+               <input type="image" name="tpl_edit_go" value="" src="<?=Template::getFileDir('icons/page_edit.png', Template::IMAGES_DIR, false,true)?>" />
+            </form>
+            <form action="<?=$this->link()->route()?>" method="post" onsubmit="return confirm('<?=$this->_('Oprvadu smazat šablonu &quot;'.$template->{Templates_Model::COLUMN_NAME}.'&quot; ?')?>');">
+               <input type="hidden" name="tpl_del_id" value="<?=$template->{Templates_Model::COLUMN_ID}?>" />
+               <input type="image" name="tpl_del_save" value="" src="<?=Template::getFileDir('icons/page_delete.png', Template::IMAGES_DIR, false,true)?>" />
+            </form>
+         </td>
+      </tr>
+     <?}?>
+   </table>
+   <?
+   } else {
+      print ($this->_('Není vložena žádná šablona'));
+   }
+   echo $this->toolbox;
+   ?>
+</div>
