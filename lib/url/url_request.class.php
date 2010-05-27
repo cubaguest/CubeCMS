@@ -169,7 +169,7 @@ class Url_Request {
    public function checkUrlType() {
       $validRequest = false;
       // jesli se zpracovává soubor modulu
-      if($this->parseSpecialPageUrl() OR $this->parseSupportServiceUrl()
+      if($this->parseSupportServiceUrl()
           OR $this->parseComponentUrl()
           OR $this->parseJsPluginUrl() OR $this->parseNormalUrl()
           OR $this->parseModuleStaticUrl()) {
@@ -246,44 +246,21 @@ class Url_Request {
     * Metoda zkontroluje jesli se nejedná o specialní stránky obsažené v enginu
     * (hledání, sitemap, atd)
     */
-   private function parseSpecialPageUrl() {
-      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?\?(?P<name>search)=(?P<action>.*)/i',
-         '/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(html)+)/i');
-      foreach ($regexps as $regex) {
-         $matches = array();
-         if(preg_match($regex, self::$webUrl, $matches) != 0) {
-            if(isset ($matches['output'])) {
-               $this->outputType = $matches['output'];
-            }
-            if(isset ($matches['action'])) {
-               $this->outputType = $matches['action'];
-            }
-            $this->name = $matches['name'];
-            $this->urlType = self::URL_TYPE_ENGINE_PAGE;
-            return true;
-         }
-      }
-      return false;
-   }
-
-   /**
-    * Metoda zkontroluje jesli se nejedná o specialní stránky obsažené v enginu
-    * (hledání, sitemap, atd)
-    */
    private function parseSupportServiceUrl() {
-      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(xml|txt)+)/i');
+      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(xml|txt|html)+)/i');
       foreach ($regexps as $regex) {
          $matches = array();
          if(preg_match($regex, self::$webUrl, $matches) != 0) {
+            $this->pageFull = false;
             if(isset ($matches['output'])) {
                $this->outputType = $matches['output'];
+               if($matches['output'] == 'html') $this->pageFull = true;
             }
             if(isset ($matches['action'])) {
                $this->outputType = $matches['action'];
             }
             $this->name = $matches['name'];
             $this->urlType = self::URL_TYPE_SUPPORT_SERVICE;
-            $this->pageFull = false;
             return true;
          }
       }
