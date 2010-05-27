@@ -333,10 +333,8 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    public function settingsAdvanced1View() {
       $params = array_merge($this->defaultParams, $this->advParams, $this->advanced1Params);
-      // externí šablony
-      if(file_exists(Template::faceDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE)){
-         $params['template_external_list_url'] = Template::face(false).Template::TEMPLATES_DIR.URL_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE;
-      }
+      $this->addTemplatesFile($params);
+      
       $params = $this->setBasicOptions($params);
       $content = $this->cfgFileHeader();
       $content .= $this->generateParamsForFile($params);
@@ -363,10 +361,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    public function settingsFullView() {
       $params = array_merge($this->defaultParams, $this->advParams, $this->advancedFullParams);
-      // externí šablony
-      if(file_exists(Template::faceDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE)){
-         $params['template_external_list_url'] = Template::face(false).Template::TEMPLATES_DIR.URL_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE;
-      }
+      $this->addTemplatesFile($params);
 
       $params = array_merge($params, $this->advancedFullParams);
       $params = $this->setBasicOptions($params);
@@ -441,6 +436,15 @@ class JsPlugin_TinyMce extends JsPlugin {
    private function cfgFileFooter() {
       $footer = "});\n";
       return $footer;
+   }
+
+   /**
+    * Metoda přidá do parametrů soubor se šablonami
+    * @param array $params -- parametry
+    */
+   private function addTemplatesFile(&$params) {
+      $link = new Url_Link_JsPlugin($this);
+      $params['template_external_list_url'] = $link->action('templates', 'js');
    }
 
    /*
@@ -1122,6 +1126,46 @@ class JsPlugin_TinyMce extends JsPlugin {
          }
       }
       $this->sendJsonData(array('code' => $code, 'message' => $message));
+   }
+
+   /**
+    * Metoda pro vrácení seznamu šablon
+    *
+    * var tinyMCETemplateList = [
+    * // Name, URL, Description
+    * ["Simple snippet", "templates/snippet1.htm", "Simple HTML snippet."],
+    * ["Layout", "templates/layout1.htm", "HTML Layout."]
+    * ];
+    * @see http://wiki.moxiecode.com/index.php/TinyMCE:Plugins/template#Example_of_an_external_list
+    */
+   public function templatesView(){
+      // header
+      print('var tinyMCETemplateList = ['."\n");
+      // načtení externích
+      if(file_exists(Template::faceDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE)){
+         $externalTpls = file_get_contents(Template::faceDir().Template::TEMPLATES_DIR.URL_SEPARATOR.self::EXTERNAL_TEMPLATES_FILE);
+         $matches = array();
+         preg_match_all('/\[[^][]+\]/', $externalTpls, $matches);
+         foreach ($matches[0] as $extFile) {
+            print ($extFile.",\n");
+         }
+      }
+      // šablony z modulu
+      $modelTpl = new Templates_Model();
+      $tpllist = $modelTpl->getTemplates(Templates_Model::TEMPLATE_TYPE_TEXT);
+      if(!empty ($tpllist)){
+         // link
+         $link = new Url_Link_ModuleStatic();
+         $link->module('templates')->action('template', 'html');
+         $tplstr = null;
+         foreach ($tpllist as $tpl) {
+            $tplstr .= '["'.$tpl->{Templates_Model::COLUMN_NAME}.'", "'
+            .$link->param('id', $tpl->{Templates_Model::COLUMN_ID}).'", "'.$tpl->{Templates_Model::COLUMN_DESC}."\"],\n";
+         }
+         print (substr($tplstr, 0, strlen($tplstr)-2)."\n");
+      }
+      //end
+      print('];'."\n");
    }
 }
 ?>
