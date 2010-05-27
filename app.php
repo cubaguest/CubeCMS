@@ -715,10 +715,11 @@ class AppCore {
          $methodName = self::$urlRequest->getAction().'Controller';
          $methodNameV = self::$urlRequest->getAction().'View';
          if(method_exists($className,$methodName)) {
-            call_user_func($className."::".$methodName);
-            if(method_exists($classNameV,$methodNameV)) {
-               call_user_func($classNameV."::".$methodNameV);
+            $result = call_user_func($className."::".$methodName);
+            if($result !== false AND method_exists($classNameV,$methodNameV)) {
+               $result = call_user_func($classNameV."::".$methodNameV);
             }
+            if($result === false) AppCore::setErrorPage(true);
          } else {
             trigger_error(sprintf(_('Neimplementovaná statická akce "%s" modulu'),$className."::".$methodName));
          }
