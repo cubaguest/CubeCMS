@@ -90,6 +90,12 @@ class JsPlugin_TinyMce extends JsPlugin {
    const PARAM_SECTION = 'sec';
 
    /**
+    * Parametr s typem šablon
+    */
+   const PARAM_TPL_TYPE = 'templates_type';
+
+
+   /**
     * Název pole s iconami (bez čísla!!!)
     */
    const ICONS_ROWS_NAME = 'theme_advanced_buttons';
@@ -148,9 +154,9 @@ class JsPlugin_TinyMce extends JsPlugin {
            'textarea_trigger' => "convert_this",
            'external_image_list_url' => null,
            'external_link_list_url' => null,
-//           'template_external_list_url' => null,
            'template_replace_values' => array(),
-           'root_element' => true
+           'root_element' => true,
+           'templates_type' => Templates_Model::TEMPLATE_TYPE_TEXT
    );
 
 
@@ -203,8 +209,8 @@ class JsPlugin_TinyMce extends JsPlugin {
     * @var array
     */
    private $advancedSimpleParams = array(
-           'plugins' => 'safari,inlinepopups,searchreplace,contextmenu,paste,advimage,advlink,media',
-           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,pastetext,pasteword,|,bullist,numlist,|,search,|,link,unlink,|,undo,redo,code,|,image,media',
+           'plugins' => 'safari,inlinepopups,searchreplace,contextmenu,paste,advimage,advlink,media,template',
+           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,pastetext,pasteword,|,bullist,numlist,|,search,|,link,unlink,|,undo,redo,code,|,image,media,|,template',
            'theme_advanced_buttons2' => null,
            'theme_advanced_buttons3' => null);
 
@@ -265,6 +271,7 @@ class JsPlugin_TinyMce extends JsPlugin {
             break;
       }
       $cfgFile->setParam('editor_selector', $this->config['editor_selector']);
+      $cfgFile->setParam('tpl_type', $this->config['templates_type']);
       if($this->config['root_element'] == false){
          $cfgFile->setParam('root_element', 'false');
       }
@@ -348,6 +355,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    public function settingsAdvancedSimpleView() {
       $params = array_merge($this->defaultParams, $this->advParams, $this->advancedSimpleParams);
+      $this->addTemplatesFile($params);
       $params = $this->setBasicOptions($params);
       $content = $this->cfgFileHeader();
       $content .= $this->generateParamsForFile($params);
@@ -444,7 +452,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    private function addTemplatesFile(&$params) {
       $link = new Url_Link_JsPlugin($this);
-      $params['template_external_list_url'] = $link->action('templates', 'js');
+      $params['template_external_list_url'] = $link->action('templates', 'js')->param('tpl_type', rawurlencode($_GET['tpl_type']));
    }
 
    /*
@@ -1152,10 +1160,12 @@ class JsPlugin_TinyMce extends JsPlugin {
       }
       // šablony z modulu
       $modelTpl = new Templates_Model();
-      $tpllist = $modelTpl->getTemplates(Templates_Model::TEMPLATE_TYPE_TEXT);
+
+      $tpllist = $modelTpl->getTemplates(rawurldecode($_GET['tpl_type']));
+
       if(!empty ($tpllist)){
          // link
-         $link = new Url_Link_ModuleStatic();
+         $link = new Url_Link_ModuleStatic(true);
          $link->module('templates')->action('template', 'html');
          $tplstr = null;
          foreach ($tpllist as $tpl) {
