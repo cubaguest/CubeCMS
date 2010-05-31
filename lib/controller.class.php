@@ -365,14 +365,14 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
          throw new BadMethodCallException(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
          $this->routes()->getActionName(), $this->module()->getName()), 1);
       }
+      // spuštění kontroleru
+      $ctrlResult = $this->{$this->routes()->getActionName().'Controller'}();
 
       if($this->actionViewer === null) {
          $viewName = $this->routes()->getActionName().'View';
       } else {
          $viewName = $this->actionViewer.'View';
       }
-      // spuštění kontroleru
-      $ctrlResult = $this->{$this->routes()->getActionName().'Controller'}();
 
       if(method_exists($this->view(), $viewName) AND $ctrlResult !== false) {
          // spuštění všech kontrolerů komponent
