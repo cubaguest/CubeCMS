@@ -164,5 +164,13 @@ class Template_Output {
    public static function setOutputType($type) {
       self::$outputType = $type;
    }
+
+   /**
+    * Metoda nastaví že stránky bude určena ke stažení
+    * @param string $fileName -- název souboru
+    */
+   public static function setDownload($fileName) {
+      self::addHeader('Content-Disposition: attachment; filename="'.$fileName.'"');
+   }
 }
 ?>
