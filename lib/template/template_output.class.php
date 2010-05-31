@@ -39,7 +39,7 @@ class Template_Output {
     * Pole s typy pro které se budou odesílat hlavičky jako html
     * @var array
     */
-   private static $txtOutputTypes = array('php','html','xhtml','phtml','php3', 'txt', 'js', 'json', 'xml','csv');
+   private static $txtOutputTypes = array('php','html','xhtml','phtml','php3', 'txt', 'js', 'json', 'xml','csv','vcf');
 
    /**
     * Proměná určuje jestli se jedná o binární výstup
@@ -88,6 +88,9 @@ class Template_Output {
             break;
          case "csv":
             self::addHeader('Content-type: text/x-csv; charset=utf-8');
+            break;
+         case "vcf":
+            self::addHeader('Content-Type: text/x-vcard; charset=utf-8');
             break;
          case "js":
             self::addHeader("Content-type: application/x-javascript; charset=utf-8");
