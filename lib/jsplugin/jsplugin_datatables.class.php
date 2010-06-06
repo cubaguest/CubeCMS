@@ -12,7 +12,7 @@
  */
 
 class JsPlugin_DataTables extends JsPlugin {
-   protected $config = array();
+   protected $config = array('plugins-files' => array());
 
 	protected function initJsPlugin() {
       $this->setJsPluginName('jquerydatatables');
@@ -24,6 +24,14 @@ class JsPlugin_DataTables extends JsPlugin {
 		$this->addFile(new JsPlugin_CssFile('datatables.css'));
 		//		Přidání js soubrů pluginu
 		$this->addFile(new JsPlugin_JsFile("jquery.dataTables.min.js"));
+      foreach ($this->getCfgParam('plugins-files') as $plugin){
+         $this->addFile($plugin);
+      }
 	}
+
+   public function addHiddenNodesPlugin() {
+      array_push($this->config['plugins-files'],
+              new JsPlugin_JsFile("gethiddennodes.plugin.js", false, 'plugins/'));
+   }
 }
 ?>
