@@ -301,6 +301,14 @@ class AppCore {
    }
 
    /**
+    * Metoda vrací cestu k datovému adresáři aplikace
+    * @return string
+    */
+   public static function getAppDataDir() {
+      return self::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR;
+   }
+   
+   /**
     * Metoda vrací cestu k cache adresáři aplikace
     * @return string
     */
