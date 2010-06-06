@@ -219,16 +219,10 @@ class Email {
 
       // přidání příloh
       foreach ($this->mailAttachments as $attachment) {
-//         $attachment = new File();
-//         $fileatt = "priloha/$name.$pripona"; // Cesta k souboru
-//         $fileatt_type = "$contentType"; // Typ souboru
-//         $fileatt_name = $_FILES["priloha"]["name"]; // Název souboru připojeného k e-mailu v příloze
-
-         $file = fopen($attachment->getNameInput(true),'rb');
+         $file = fopen($attachment->getName(true),'rb');
          $data = fread($file,$attachment->getFileSize());
          fclose($file);
          $data = chunk_split(base64_encode($data));
-
          $mail .= "--{$this->mimeBoundary}\n" .
                   "Content-Type: {$attachment->getMimeType()};\n" .
                   " name=\"{$attachment->getName()}\"\n" .
