@@ -94,13 +94,13 @@ class Model_PDO extends Model {
 
    /**
     * Metoda provede genrování url klíčů
-    * @param <type> $urlKeys
-    * @param <type> $table
-    * @param <type> $alternative
-    * @param <type> $columnName
-    * @param <type> $columnId
-    * @param <type> $id
-    * @return <type>
+    * @param array/string $urlKeys -- pole s předanými klíči
+    * @param string $table -- název tabulky
+    * @param array/string $alternative -- pole s alternativními klíči
+    * @param string $columnName -- název sloupce s url klíči
+    * @param string $columnId -- název sloupce s id
+    * @param int $id -- id uloženého záznamu
+    * @return array/string -- vygenerované klíče
     */
    protected function generateUrlKeys($urlKeys, $table, $alternative, $columnName = 'urlkey', $columnId = 'id',$id = null) {
       // načteme všechny klíče z tabulky
