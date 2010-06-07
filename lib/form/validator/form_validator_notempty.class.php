@@ -85,6 +85,12 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                $this->isValid = false;
             }
             break;
+         case 'Form_Element_Select':
+            if(count($elemObj->getUnfilteredValues()) == 0){
+               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+               $this->isValid = false;
+            }
+            break;
          default:
             break;
       }
