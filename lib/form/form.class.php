@@ -13,7 +13,7 @@
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract      Třída pro obsluhu formulářů
  */
-class Form implements ArrayAccess {
+class Form implements ArrayAccess, Iterator {
    /**
     * Prefix pro všechny prvky ve formuláři
     * @var string
@@ -51,12 +51,6 @@ class Form implements ArrayAccess {
    private $isValid = null;
 
    /**
-    * Objekt odkazu na akci pro formulář
-    * @var Url_Link
-    */
-   private $formAction = null;
-
-   /**
     * Objekt elementu, do kterého bude formlář vykreslen
     * @var Html_Element
     */
@@ -73,13 +67,13 @@ class Form implements ArrayAccess {
     * @var Form_Element_Hidden
     */
    private $elementCheckForm = null;
+
    /**
     * Konstruktor vytváří objekt formuláře
     * @param string $prefix -- (option) prefix pro formulářové prvky
     */
    function __construct($prefix = null) {
       $this->formPrefix = $prefix;
-      $this->formAction = new Url_Link();
       $this->htmlElement = new Html_Element('form');
       $this->setAction(new Url_Link_Module());
       $this->setSendMethod();
@@ -256,6 +250,46 @@ class Form implements ArrayAccess {
       unset ($this->elements[$name]);
    }
 
+   /**
+    * Metoda přesune iterátor na začátek a vrátí první element
+    * @return Form_Element
+    */
+   function rewind() {
+      return reset($this->elements);
+   }
+
+   /**
+    * Metoda vrací aktuální element
+    * @return Form_Element
+    */
+   function current() {
+      return current($this->elements);
+   }
+
+   /**
+    * Metoda vrací aktuální klíč elementu (název)
+    * @return string
+    */
+   function key() {
+      return key($this->elements);
+   }
+
+   /**
+    * Metoda vrátí následující element
+    * @return Form_Element
+    */
+   function next() {
+      return next($this->elements);
+   }
+
+   /**
+    * Metoda zjišťuje jestli je element validní, tj. jestli existuje
+    * @return <type>
+    */
+   function valid() {
+      return key($this->elements) !== null;
+   }
+
    /*
     * Metody zajišťující kontrolu a odeslání formuláře
    */
@@ -362,7 +396,15 @@ class Form implements ArrayAccess {
     * @todo
     */
    public function getSendMethod() {
-      return $this->getAttrib('method');
+      return $this->html()->getAttrib('method');
+   }
+
+   /**
+    * Metoda prací prefix formuláře
+    * @return string
+    */
+   public function getPrefix(){
+      return $this->formPrefix;
    }
 
    /**
@@ -420,6 +462,7 @@ class Form implements ArrayAccess {
     * @param string $name -- název skupiny - pro zařazování
     * @param string $label -- název skupiny - její název při renderu
     * @param string $text -- text ke skupině - popisný text ke skupině
+    * @return string -- název skupiny
     */
    public function addGroup($name, $label = null, $text = null) {
       if(!isset ($this->elementsGroups[$name])) {
@@ -427,6 +470,7 @@ class Form implements ArrayAccess {
          $this->elementsGroups[$name]['label'] = $label;
          $this->elementsGroups[$name]['text'] = $text;
       }
+      return $name;
    }
 
    /*
@@ -453,6 +497,15 @@ class Form implements ArrayAccess {
    public function html() {
       return $this->htmlElement;
    }
+
+   /**
+    * Metoda vrací element formulářového checkeru
+    * @return Form_Element_Hidden
+    */
+   public function getFormChecker() {
+      return $this->elementCheckForm;
+   }
+
 
    /*
      * Podpůrné metody
