@@ -7,14 +7,15 @@
  * @author        $Author: jakub $ $Date: 2009-07-07 22:59:50 +0200 (Út, 07 čec 2009) $
  *                $LastChangedBy: jakub $ $LastChangedDate: 2009-07-07 22:59:50 +0200 (Út, 07 čec 2009) $
  * @abstract 		Třída pro validaci emailové adresy
+ * @see           http://fightingforalostcause.net/misc/2006/compare-email-regex.php
  */
 class Validator_EMail extends Validator {
 
    public function validate() {
-      $name = '[-a-z0-9!#$%&\'*+/=?^_`{|}~]'; // znaky tvořící uživatelské jméno
-      $domain = '[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])'; // jedna komponenta domény
-      if(preg_match("/^$name+(\\.$name+)*@($domain?\\.)+$domain\$/", $this->values)) {
+      if(!preg_match("/^([\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+\.)*[\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+@((((([a-z0-9]{1}[a-z0-9\-]{0,62}[a-z0-9]{1})|[a-z])\.)+[a-z]{2,6})|(\d{1,3}\.){3}\d{1,3}(\:\d{1,5})?)$/i", $this->values)) {
          $this->isValid = false;
+      } else {
+         $this->isValid = true;
       }
    }
 }
