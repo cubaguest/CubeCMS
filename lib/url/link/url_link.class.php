@@ -349,15 +349,11 @@ class Url_Link {
     *
     */
    protected function _init() {
-   //      if(!$this->onlyWebRoot) {
       $this->lang = self::$currentlang;
       $this->category = self::$currentCategory;
       $this->route = self::$currentRoute;
       $this->file = self::$currentFile;
       $this->paramsArray = self::$currentParams;
-   //         $this->paramsNormalArray = self::$currentParamsNormalArray;
-   //         $this->mediaType = Url_Request::getCurrentMediaUrlPart();
-   //      }
    }
 
    /*
