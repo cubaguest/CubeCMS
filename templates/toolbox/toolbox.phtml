@@ -1,0 +1,73 @@
+<div class="toolbox">
+   <? foreach ($this->getTools() as $tool) {?>
+      <div class="toolbox-tool">
+      <?
+         $formOnSubmit = null;
+         if($tool->getConfirmMessage() != null){
+            $formOnSubmit .= 'return confirm(\''.$tool->getConfirmMessage().'\');';
+         }
+         $class = get_class($tool);
+         switch ($class) {
+            case 'Template_Toolbox2_Tool_PostRedirect':
+               ?>
+         <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>">
+                  <img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"
+                  /><input class="toolbox-tool-button" type="submit" name="<?=$tool->getName() ?>_button"
+                     value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
+                  <?
+                  $addVal = $tool->getSubmitValues();
+                  foreach ($addVal as $key => $value) {
+                     echo "<input type=\"hidden\" name=\"$key\" value=\"" . (string) $value . "\" />";
+                  }?>
+               </form>
+               <?
+               break;
+            case 'Template_Toolbox2_Tool_Form':
+               ?>
+               <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>">
+                  <img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"/><?
+               
+               foreach ($tool->getForm() as $element) {
+                  if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
+                     ?><input class="toolbox-tool-button" type="submit" name="<?=$element->getName()?>"
+                         value="<?=$element->getLabel()?>" title="<?=$element->getLabel() ?>" /><?
+                  } else if($element instanceof Form_Element_Hidden) {
+                     ?><input type="hidden" name="<?=$element->getName();?>" value="<?=$element->getValues() ?>" /><?
+                  }
+               }
+                  ?><input type="hidden" name="<?=$tool->getForm()->getFormChecker()->getName();?>" value="<?=$tool->getForm()->getFormChecker()->getValues() ?>" /><?
+               ?></form><?
+               break;
+            default:
+//               var_dump($tool);
+               echo "nepodporovaný nástroj";
+               break;
+         }
+      ?>
+        </div>
+      <? } ?>
+  </div>
+<?if(!defined('VVE_TOOLBOX_SHOW_SCRIPT_RENDERED')) {?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+      $("div.toolbox").css({opacity: 0.3});
+      $("div.toolbox").parent().css({position: 'relative'});
+      $("div.toolbox").hover(
+         function(){
+            $(this).fadeTo(100, 1);
+            $(this).css('z-index', 100);
+            $(this).parent().addClass('toolbox-active-content');
+         },
+         function(){
+            $(this).fadeTo(300, 0.5);
+            $(this).css('z-index', 5);
+            $(this).parent().removeClass('toolbox-active-content');
+         }
+      );
+   });
+   /* ]]> */
+</script>
+<?
+   define('VVE_TOOLBOX_SHOW_SCRIPT_RENDERED', true);
+} ?>
