@@ -152,8 +152,9 @@ function vve_tpl_image_tag($imagePath, $alt = null, $mw = false, $mh = false, $c
             }
          }
          // převod zpět na adresu serveru
-         $imagePath = str_replace(AppCore::getAppWebDir(), Url_Request::getBaseWebDir(), $imagePath);
-         $imagePath = str_replace(AppCore::getAppLibDir(), Url_Request::getBaseWebDir(), $imagePath);
+         $imagePath = str_replace(array(AppCore::getAppWebDir(), AppCore::getAppLibDir()),
+                 Url_Request::getBaseWebDir(), $imagePath);
+//         $imagePath = str_replace(AppCore::getAppLibDir(), Url_Request::getBaseWebDir(), $imagePath);
          return("<img src=\"".$imagePath.$matches[2]."\" alt=\"{$alt}\" width=\"{$w}\" height=\"{$h}\" {$class}{$others}/>");
       }
    }
