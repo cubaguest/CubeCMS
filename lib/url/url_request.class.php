@@ -247,20 +247,23 @@ class Url_Request {
     * (hledání, sitemap, atd)
     */
    private function parseSupportServiceUrl() {
-      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>sitemap).(?P<output>(xml|txt|html)+)/i');
+      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>(?:sitemap|rss)).(?P<output>(xml|txt|html)+)/i');
       foreach ($regexps as $regex) {
          $matches = array();
          if(preg_match($regex, self::$webUrl, $matches) != 0) {
             $this->pageFull = false;
+            $this->urlType = self::URL_TYPE_SUPPORT_SERVICE;
             if(isset ($matches['output'])) {
                $this->outputType = $matches['output'];
-               if($matches['output'] == 'html') $this->pageFull = true;
+               if($matches['output'] == 'html'){
+                  $this->pageFull = true;
+                  $this->urlType = self::URL_TYPE_ENGINE_PAGE;
+               }
             }
             if(isset ($matches['action'])) {
                $this->outputType = $matches['action'];
             }
             $this->name = $matches['name'];
-            $this->urlType = self::URL_TYPE_SUPPORT_SERVICE;
             return true;
          }
       }
@@ -402,6 +405,14 @@ class Url_Request {
     */
    public static function getBaseWebDir() {
       return self::$baseWebUrl;
+   }
+
+   /**
+    * Metoda vrací aktuální celou url
+    * @return string
+    */
+   public static function getCurrentUrl() {
+      return self::$transferProtocol.self::$serverName.$_SERVER['REQUEST_URI'];
    }
 
    /**

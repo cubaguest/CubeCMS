@@ -34,6 +34,11 @@ class AppCore {
    const MODULES_DIR = "modules";
 
    /**
+    * Konstanta s adresářem s dokumentací
+    */
+   const DOCS_DIR = "docs";
+
+   /**
     * Adresář s knihovnami enginu
     */
    const ENGINE_LIB_DIR = 'lib';
@@ -846,6 +851,9 @@ class AppCore {
          case 'sitemap':
             $this->runSitemapPage();
             break;
+         case 'rss':
+            $this->runRssListPage();
+            break;
          default:
             break;
       }
@@ -897,6 +905,41 @@ class AppCore {
       }
       $sitemapTpl->catArr = $catArr;
       $this->coreTpl->specialPageTpl = $sitemapTpl;
+   }
+
+   /**
+    * Metoda spouští generování stránky se seznamem rss kanálů webu
+    */
+   public function runRssListPage() {
+      $rssTpl = new Template(new Url_Link(true));
+      $rssTpl->addTplFile('rss_list.phtml');
+      $rssTpl->setPVar('CURRENT_CATEGORY_PATH', array(_('přehled rss exportů')));
+
+//      // načtení kategorií a podle nich vytahání a vytvoření pododkazů
+//      $cats = new Model_Category();
+//      $categories = $cats->getCategoryList();
+//
+//      $catArr = array();
+//      foreach ($categories as $category) {
+//         $catObj = new Category(null, false, $category);
+//         $routesClassName = ucfirst($catObj->getModule()->getName()).'_Routes';
+//         if(!class_exists($routesClassName)) {
+//            $routes = new Routes(null);
+//         } else {
+//            $routes = new $routesClassName(null);
+//         }
+//         if(!file_exists(AppCore::getAppLibDir().self::MODULES_DIR.DIRECTORY_SEPARATOR
+//            .$catObj->getModule()->getName().DIRECTORY_SEPARATOR.'sitemap.class.php')) {
+//               $sitemap = new SiteMap($catObj, $routes,false);
+//         } else {
+//            $sClassName = ucfirst($catObj->getModule()->getName()).'_Sitemap';
+//            $sitemap = new $sClassName($catObj, $routes,false);
+//         }
+//         $sitemap->run();
+//         $catArr[$catObj->getId()] = $sitemap->createMapArray();
+//      }
+//      $sitemapTpl->catArr = $catArr;
+      $this->coreTpl->specialPageTpl = $rssTpl;
    }
 
    /**
