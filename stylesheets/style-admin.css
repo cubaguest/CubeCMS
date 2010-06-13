@@ -103,6 +103,21 @@ ul.dropdown li:hover > ul { visibility: visible; }
    background-repeat: no-repeat;
    color: black;
 }
+ /* NEW TOOLBOX 2 */
+ .toolbox-tool {
+    line-height: 16px;
+}
+
+ input.toolbox-tool-button {
+    vertical-align: 2px;
+    padding: 0;
+}
+
+.toolbox-active-content {
+   background-color: #f0efef;
+/*   border: 2px solid gray;*/
+}
+
 /* EOF Panel s editací */
 
 /* Jazykové taby */

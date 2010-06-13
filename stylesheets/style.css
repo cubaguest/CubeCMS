@@ -365,15 +365,25 @@ input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_butt
 
 /* SOF main content  NEW!!! */
 .article-list {}
-.article-list-box-image, .article-detail-box-image {
+.article-list-record {
+   margin-bottom: 15px;
+}
+.article-list-record-box-image, .article-detail-box-image {
    float: left;
+   width: 150px;
+   text-align: center;
+}
+.article-list-record-box-image img, .article-detail-box-image img {
    padding: 0 10px 10px 0;
 }
-.article-list-no-public, .article-detail-no-public, .comment-nopublic {
+
+.article-list-record-no-public, .article-detail-no-public, .comment-nopublic {
    background-color: #666666;
    color: #ffffff;
 }
-.article-detail-content, .article-list-content {}
+.article-detail-content, .article-list-record-content {}
+
+.article-form-edit {}
 
 /* EOF main content NEW!!! */
 
