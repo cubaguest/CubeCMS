@@ -11,6 +11,7 @@
 
  class Module_Install {
     const MODULE_INSTALL_DIR = 'install';
+    const VERSION_FILE = 'version.txt';
 
     protected $depModules = array();
 
@@ -18,9 +19,18 @@
 
     protected $moduleTablesPrefix = '{PREFIX}';
 
+    protected $version = array('major' => 1, 'minor' => 0);
+
     public function  __construct() {
        $tmp = explode('_', get_class($this));
        $this->moduleName = strtolower($tmp[0]);
+
+       // načtení verze
+       $verStr = file_get_contents(AppCore::getAppWebDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$this->moduleName.DIRECTORY_SEPARATOR.AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.self::VERSION_FILE);
+       $versionArr = explode('.', $verStr);
+       $this->version['major'] = $versionArr[0];
+       $this->version['minor'] = $versionArr[1];
     }
 
     /**
@@ -35,9 +45,14 @@
         * i verzi instalovaného modulu při update, tak aby se popřípadě upravili potřebné parametry 
         */
 
-       $this->installDepModules();
-       $this->install();
-       //$this->update();
+       $model = new Model_Module();
+       if($model->isModuleInstaled($this->moduleName) == false){
+         $this->installDepModules();
+         $this->install();
+         $model->registerInstaledModule($this->moduleName, $this->version['major'], $this->version['minor']);
+       } else {
+         $this->update();
+       }
     }
 
     /**

@@ -10,7 +10,12 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s moduly
  */
 
-class Model_Module extends Model {
+class Model_Module extends Model_PDO {
+   const DB_TABLE = 'modules_instaled';
+
+   const COLUMN_NAME = 'name';
+   const COLUMN_VERSION_MAJOR = 'version_major';
+   const COLUMN_VERSION_MINOR = 'version_minor';
 
 /**
  * Metoda načte moduly
@@ -47,6 +52,36 @@ class Model_Module extends Model {
          $dbc = new Db_PDO();
          return $dbc->exec($sqlQuery);
       }
+   }
+
+   /**
+    * MEtoda zjišťuje jestli je daný modul instalován
+    * @param string $name -- název modulu
+    * @return bool -- true pokud je již modul instalován
+    */
+   public function isModuleInstaled($name) {
+      $dbc = new Db_PDO();
+      // kontrola jestli místo již neexistuje
+      $dbst = $dbc->prepare("SELECT COUNT(*) AS count FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE ".self::COLUMN_NAME." = :name");
+      $dbst->execute(array(':name' => $name));
+      $counter = $dbst->fetchObject();
+
+      if($counter->count == 0){
+         return false;
+      }
+      return true;
+   }
+
+
+   public function registerInstaledModule($name, $vMajor = 1, $vMinor = 0) {
+      $dbc = new Db_PDO();
+
+      $dbst = $dbc->prepare('INSERT INTO '.Db_PDO::table(self::DB_TABLE)." "
+                 ."(".self::COLUMN_NAME.", ".self::COLUMN_VERSION_MAJOR.", ".self::COLUMN_VERSION_MINOR.")"
+                 ." VALUES (:name, :vmajor, :vminor)");
+
+      return $dbst->execute(array(':name' => $name, ':vmajor' => $vMajor, ':vminor' => $vMinor));
    }
 }
 ?>

@@ -164,6 +164,18 @@ INSERT INTO `{PREFIX}config` (`id_config`, `key`, `label`, `value`, `values`, `p
 (62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Vepřové Výpečky Titulní strana', NULL, 0, 'string');
 
 -- --------------------------------------------------------
+--
+-- Struktura tabulky `{PREFIX}modules_instaled`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}modules_instaled` (
+  `id_module` smallint(6) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) CHARACTER SET utf8 NOT NULL,
+  `version_major` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `version_minor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id_module`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
 -- Struktura tabulky `{PREFIX}groups`
