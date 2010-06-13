@@ -142,8 +142,10 @@ abstract class JsPlugin {
     * @return array of JsPlugin_JsFile -- pole souborů
 	 */
 	final public function getAllFiles(){
+      $addFiles = $this->filesArray;
+      $this->filesArray = array();
       $this->setFiles();
-      return $this->filesArray;
+      return array_merge($this->filesArray, $addFiles);
 	}
 	
 	/**
