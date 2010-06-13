@@ -25,7 +25,7 @@ class Template_Core extends Template {
    /**
     * Šablona pro ajax requesty v iframe
     */
-   const INDEX_AJAXIFRAME_TEMPLATE = 'ajax_iframe_index.phtml';
+   const INDEX_AJAXIFRAME_TEMPLATE = 'index_ajax_iframe.phtml';
 
    /**
     * Nastavená šablony systému
@@ -82,24 +82,24 @@ class Template_Core extends Template {
       $contents = str_replace('{*-JAVASCRIPTS-*}', $jscripts, $contents);
 
       // doplníme titulek stránky
-      $title = null;
-      if(is_array(Template::pVar('CURRENT_CATEGORY_PATH'))){
-         $arr = array_merge(Template::pVar('CURRENT_CATEGORY_PATH'), self::$pageTitle);
+      $arr = self::$pageTitle;
+      // pokud je titulek nastavíme jej
+      $link = new Url_Link(true);
+      if(Url_Request::getCurrentUrl() == (string)$link->category()){
+         array_push($arr, VVE_MAIN_PAGE_TITLE);
       } else {
-         $arr = self::$pageTitle;
+         array_push($arr, Category::getSelectedCategory()->getName());
+         array_push($arr, VVE_WEB_NAME);
       }
+      $title = null;
       foreach ($arr as $subtitle) {
-         $title .= ' '.VVE_PAGE_TITLE_SEPARATOR.' '.(string)$subtitle;
+         $title .= (string)$subtitle.' '.VVE_PAGE_TITLE_SEPARATOR.' ';
       }
-      $contents = str_replace('{*-PAGE_TITLE-*}', $title, $contents);
+      $title = substr($title, 0, strlen($title)-strlen(VVE_PAGE_TITLE_SEPARATOR)-2);
+      $contents = str_replace('{*-PAGE_TITLE-*}', htmlspecialchars($title), $contents);
 
       // doplníme hlavní nadpis stránky
       $headline = self::$pageHeadline;
-//      foreach (self::$pageHeadline as $line) {
-//         $headline .= (string)$line.VVE_HEADLINE_SEPARATOR;
-//      }
-
-//      $headline = substr($headline, 0, strlen($headline)-strlen(VVE_HEADLINE_SEPARATOR));
       $contents = str_replace('{*-PAGE_HEADLINE-*}', $headline, $contents);
 
       // dovypsání CoreErrors
