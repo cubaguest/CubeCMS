@@ -1,0 +1,15 @@
+<?
+// do titulku
+if($this->edit) {
+   $this->addPageTitle(sprintf($this->_('úprava e-mailu %s v adresáři'),null));
+   $this->addPageHeadline(sprintf($this->_('úprava e-mailu %s v adresáři'),null));
+} else {
+   $this->addPageTitle($this->_('přidání e-mailu do adresáře'));
+   $this->addPageHeadline($this->_('přidání e-mailu do adresáře'));
+}
+?>
+
+<div id="editArticleForm">
+   <?print($this->form);?>
+   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route()));?>
+</div>
