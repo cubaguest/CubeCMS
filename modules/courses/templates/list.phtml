@@ -1,0 +1,98 @@
+<?
+if($this->isAllList == true){
+   $this->addPageTitle($this->_('Seznam všech kurzů'));
+   $this->addPageHeadline($this->_('Seznam všech kurzů'));
+} else {
+   
+}
+
+?>
+
+<style type="text/css">
+   .table td {
+      border: 1px solid silver;
+   }
+   .table td {
+      padding: 4px;
+   }
+</style>
+<div class="article-list module-courses-list">
+   <?if(!empty ($this->courses)) {?>
+   <table class="table">
+      <thead>
+         <tr>
+            <th width="300"><?=$this->_('název')?></th>
+            <th width="100"><?=$this->_('termín')?></th>
+            <th><?=$this->_('délka')?></th>
+            <th><?=$this->_('cena')?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?
+      foreach ($this->courses as $course) {?>
+         <tr>
+            <td>
+               <?
+               if($course->{Courses_Model_Courses::COLUMN_IS_NEW} == true){?>
+               <img src="images/icons/new-16x16.png" alt="new" width="16"/>
+               <?
+               }
+               
+               if($course->{Courses_Model_Courses::COLUMN_TEXT_SHORT} != null
+                  OR $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT} != ''){
+                  $title = trim(strip_tags($course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}));
+               } else {
+                  $title = $course->{Courses_Model_Courses::COLUMN_NAME};
+               }
+               
+               ?>
+               <a href="<?=$this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
+                  title="<?=htmlspecialchars($title)?>"
+                  ><?=$course->{Courses_Model_Courses::COLUMN_NAME}?></a>
+            </td>
+            <td align="center">
+               <?
+               echo vve_date("%x", new DateTime($course->{Courses_Model_Courses::COLUMN_DATE_START}));
+               if($course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null){
+                  echo '<br /> - <br />'.vve_date("%x", new DateTime($course->{Courses_Model_Courses::COLUMN_DATE_STOP}));
+               }
+               ?>
+            </td>
+            <td align="center">
+               <?if($course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != null){
+                  echo $course->{Courses_Model_Courses::COLUMN_HOURS_LEN}.' '.$this->_('hodin');
+               }?>
+            </td>
+            <td align="right">
+               <?if($course->{Courses_Model_Courses::COLUMN_PRICE} != null){
+                  echo number_format($course->{Courses_Model_Courses::COLUMN_PRICE}, 0, ',', ' ').' '.$this->_('Kč');
+               }?>
+            </td>
+         </tr>
+
+
+     <?}?>
+
+      </tbody>
+   </table>
+   <br />
+   <?
+   if($this->isAllList == true){?>
+   <a href="<?=$this->link()->route(null);?>" title="<?=$this->_('Seznam aktuálních kurzů');?>"
+      ><?=$this->_('Seznam aktuálních kurzů');?></a>
+   <?
+   } else {?>
+   <a href="<?=$this->link()->route('listAllCourses');?>" title="<?=$this->_('Seznam všech kurzů');?>"
+      ><?=$this->_('Seznam všech kurzů');?></a>
+   <?
+   }
+   ?>
+   <?
+   } else {
+      print ($this->_('Není vložen žádný kurz'));
+   }?>
+
+   <?
+   echo $this->toolbox;
+   ?>
+</div>

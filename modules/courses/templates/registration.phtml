@@ -1,0 +1,245 @@
+<?
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+?>
+<style type="text/css">
+   .course-regform-item {
+      padding: 5px;
+      clear: left;
+      position: relative;
+   }
+
+   .course-regform-item-label {
+      float: left;
+      width: 200px;
+   }
+
+   .course-regform-item-help {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 400px;
+      padding: 5px;
+      margin-top: 5px;
+      border: 1px solid #c77405;
+      background-color: #F3D673;
+      width: 150px;
+      z-index: 10;
+   }
+   .course-regform-item-help span {
+      background-image: url('images/icons/resultset_previous.png');
+      position: absolute;
+      top: 0px;
+      left: -12px;
+      width: 19px;
+      height: 16px;
+      display: block;
+   }
+
+</style>
+
+<div class="module-courses-registration">
+   <h2><?=$this->_('Závazná registrace')?></h2>
+   <?// <form>
+   echo $this->formReg->renderStart();?>
+
+   <fieldset>
+      <legend><?=$this->_('Základní informace')?></legend>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->name->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->name->label();
+         echo $this->formReg->name->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Vaše ctěné jméno')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->surname->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->surname->label();
+         echo $this->formReg->surname->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Vaše přijmení')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->degree->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->degree->label();
+         echo $this->formReg->degree->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Váš titul (Ing., Mgr., ...)')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->grade->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->grade->label();
+         echo $this->formReg->grade->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('např. sociální pracovník, vedoucí K-centra, nezaměstnaný')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->practiceLength->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->practiceLength->label();
+         echo $this->formReg->practiceLength->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Jak dlouho vykonáváte praxi v daném oboru. Počet roků a pouze číslo.')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->phone->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->phone->label();
+         echo $this->formReg->phone->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Váš telefon (mobilní, pevná linka)')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->mail->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->mail->label();
+         echo $this->formReg->mail->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Vaše e-mailová adresa')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->regNewsletter->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->regNewsletter->label();
+         echo $this->formReg->regNewsletter->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Chcete, aby Vám chodili novinky na e-mail?')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->note->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->note->label();
+         $this->formReg->note->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
+         echo $this->formReg->note->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Napište nám další Vaše požadavky či připomínky')?><span />
+         </span>
+      </div>
+   </fieldset>
+
+   <fieldset>
+      <legend><?=$this->_('Fakturační údaje')?></legend>
+      <div class="course-regform-item">
+         <?
+         $this->formReg->payType->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->payType->label();
+         echo $this->formReg->payType->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Jak si přejete hradit platbu za kurz?')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item course-regform-pay-org">
+         <?
+         $this->formReg->orgName->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->orgName->label();
+         $this->formReg->orgName->html()->setAttrib('size', 57);
+         echo $this->formReg->orgName->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Název organizace pro kterou pracujete')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item course-regform-pay-org">
+         <?
+         $this->formReg->orgAddress->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->orgAddress->label();
+         $this->formReg->orgAddress->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
+         echo $this->formReg->orgAddress->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Adresa organizace')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item course-regform-pay-org">
+         <?
+         $this->formReg->orgICO->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->orgICO->label();
+         echo $this->formReg->orgICO->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('IČO organizace')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item course-regform-pay-org">
+         <?
+         $this->formReg->orgPhone->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->orgPhone->label();
+         echo $this->formReg->orgPhone->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Telefon do arganizace')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item course-regform-pay-private">
+         <?
+         $this->formReg->privateAddress->htmlLabel()->addClass('course-regform-item-label');
+         echo $this->formReg->privateAddress->label();
+         $this->formReg->privateAddress->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
+         echo $this->formReg->privateAddress->Controll();
+         ?>
+         <span class="course-regform-item-help">
+            <?=$this->_('Vaše adresa, která bude použita pro fakturaci')?><span />
+         </span>
+      </div>
+      <div class="course-regform-item">
+         <?
+         echo $this->formReg->send->Controll();
+         ?>
+      </div>
+   </fieldset>
+   <?// </form>
+   echo $this->formReg->renderEnd();
+//   echo $this->formReg;
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         function regFormChangePay(){
+            var selPay = $('input[name=course_reg_payType]:checked').val();
+            if(selPay == 'organisation'){
+               $('div.course-regform-pay-org').show();
+               $('div.course-regform-pay-private').hide();
+            } else {
+               $('div.course-regform-pay-private').show();
+               $('div.course-regform-pay-org').hide();
+            }
+         }
+         regFormChangePay();
+         $('input[name=course_reg_payType]').change(function(){
+            regFormChangePay();
+         });
+
+         $('.course-regform-item input, .course-regform-item textarea').focus(function(){
+            var $help = $(this).parent().children('span.course-regform-item-help');
+            $help.css('left', $(this).width()+230);
+            $help.show();
+         });
+         $('.course-regform-item input, .course-regform-item textarea').blur(function(){
+            var $help = $(this).parent().children('span.course-regform-item-help').fadeOut(200);
+         });
+      });
+      /* ]]> */
+   </script>
+</div>

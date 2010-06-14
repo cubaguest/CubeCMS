@@ -1,0 +1,20 @@
+<? // detail článku pouze jako html 
+$addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+$editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
+?>
+<div>
+   <h2><?=htmlspecialchars($this->article->{Articles_Model_Detail::COLUMN_NAME})?></h2>
+   <div class="smallFont"><?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
+          ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
+      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
+   </div>
+   <!--</h2>-->
+   <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
+   <hr class="reseter" />
+   <?$this->includeTpl('articletools.phtml', true, array(
+      'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
+              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
+              'shares' => $this->shares));?>
+   
+</div>

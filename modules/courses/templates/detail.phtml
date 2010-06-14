@@ -1,0 +1,106 @@
+<?
+// načtení detailu
+$this->addPageTitle($this->course->{Courses_Model_Courses::COLUMN_NAME});
+$this->addPageHeadline($this->course->{Courses_Model_Courses::COLUMN_NAME});
+
+
+$dateStart = new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_START});
+if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
+   $dateStop = new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP});
+}
+?>
+<style type="text/css">
+   .module-courses-detail-params .course-param, .course-lecturer-name {
+      font-weight: bold;
+      margin-right: 1em;
+   }
+   .module-courses-detail-params li {
+      list-style-type: circle;
+      margin-left: 2em;
+   }
+</style>
+<div class="module-courses-detail">
+   <?
+   echo $this->course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}.'<br />';
+   if($this->courseImage != null){?>
+      <img style="float: right; width: 150px;" src="<?=$this->courseImage?>" alt="obrázek kurzu <?=$this->course->{Courses_Model_Courses::COLUMN_NAME}?>" />
+   <?
+   }
+   ?>
+   <ul class="module-courses-detail-params">
+      <li>
+         <?
+         echo '<span class="course-param">'.$this->_('Termín kurzu') . ":</span>";
+         echo vve_date("%x", new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_START}));
+         if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
+            echo ' - ' . vve_date("%x", new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP}));
+         }
+         ?>
+      </li>
+      <li>
+         <?
+         echo '<span class="course-param">'.$this->_('Místo konání') . ":</span>";
+         echo $this->course->{Courses_Model_Courses::COLUMN_PLACE};
+         ?>
+      </li>
+      <?
+         if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != null) {
+            echo '<li>'
+            . '<span class="course-param">'. $this->_('Délka kurzu') . ":</span>"
+            . $this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} . '&nbsp;' . $this->_('hodin')
+            . '</li>';
+         }
+      ?>
+      <?
+         if ($this->course->{Courses_Model_Courses::COLUMN_PRICE} != null) {
+            echo '<li>'
+            . '<span class="course-param">'. $this->_('Cena kurzu') . ":</span>"
+            . number_format($this->course->{Courses_Model_Courses::COLUMN_PRICE},0,',',' ') . '&nbsp;' . $this->_('Kč')
+            . '</li>';
+         }
+      ?>
+      <li>
+         <?
+         echo '<span class="course-param">'.$this->_('Kapacita') . ":</span>";
+         echo $this->course->{Courses_Model_Courses::COLUMN_SEATS} . '&nbsp;' . $this->_('míst');
+         ?>
+      </li>
+      <li>
+         <?
+         echo '<span class="course-param">'.$this->_('Volných') . ":</span>";
+         echo $this->freeSeats . '&nbsp;' . $this->_('míst');
+         ?>
+      </li>
+      </ul>
+      <br />
+
+      <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT} ?>
+         <hr class="reseter" />
+         <br />
+         <h2><?=$this->_('Lektoři kurzu')?></h2>
+         <?
+         foreach ($this->lecturers as $lecturer) {?>
+         <p style="float: left">
+            <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
+            .  Lecturers_Controller::DATA_DIR.URL_SEPARATOR.$lecturer->{Lecturers_Model::COLUMN_IMAGE}?>" alt="" />
+         </p>
+         <span class="course-lecturer-name">
+         <?
+         if($lecturer->{Lecturers_Model::COLUMN_DEGREE} != null)
+            echo $lecturer->{Lecturers_Model::COLUMN_DEGREE}.' &nbsp;';
+         echo $lecturer->{Lecturers_Model::COLUMN_NAME}.'&nbsp;';
+         echo $lecturer->{Lecturers_Model::COLUMN_SURNAME};
+         ?>
+            </span><br />
+            <?=$lecturer->{Lecturers_Model::COLUMN_TEXT};?>
+         <hr class="reseter" />
+         <br />
+         <?
+         }?>
+   <?
+         $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route(), 'text' => $this->_('Zpět na seznam kurzů')));
+         echo '<br />';
+         echo $this->toolbox;
+   ?>
+</div>
+

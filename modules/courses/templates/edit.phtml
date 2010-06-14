@@ -1,0 +1,62 @@
+<?
+$this->addCssFile("style.css");
+// do titulku
+if($this->edit) {
+   $this->addPageTitle($this->_('úprava kurzu'));
+   $this->addPageHeadline($this->_('úprava kurzu'));
+} else {
+   $this->addPageTitle($this->_('přidání kurzu'));
+   $this->addPageHeadline($this->_('přidání kurzu'));
+}
+// donastavení formuláře
+$this->form->textShort->html()->setAttrib('cols', 80)->setAttrib('rows', 10)->addClass("mceEditorSimple");
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+
+$tinymce = new JsPlugin_TinyMce();
+$tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
+$tinymce->setCfgParam('editor_selector', 'mceEditor');
+$this->addJsPlugin($tinymce);
+
+$tinySimple = new JsPlugin_TinyMce();
+$tinySimple->setCfgParam('editor_selector', 'mceEditorSimple');
+$tinySimple->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_SIMPLE_2);
+$this->addJsPlugin($tinySimple);
+
+
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addUIDatepicker();
+$jQuery->addUIAutoComplete();
+
+$this->addJsPlugin($jQuery);
+
+// doplnění obrázku
+if($this->courseImage != null){
+   $this->form->deleteImg->setSubLabel($this->_('Uloženo').':<br /><img src="'
+        .$this->courseImage.'" height="50" />');
+}
+
+
+?>
+<div id="editArticleForm">
+   <?print($this->form);?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         $.datepicker.setDefaults(['<?=Locale::getLang()?>'] ) ;
+         $("input[name=course_dateStart]").datepicker();
+         $("input[name=course_dateStop]").datepicker();
+
+         $("#course_place").autocomplete({
+            source: "<?=$this->link()->route('placesList')?>",
+            minLength: 2
+         });
+
+      });
+      /* ]]> */
+   </script>
+   <?if($this->edit === true){
+      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));
+   } else {
+      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
+   }?>
+</div>

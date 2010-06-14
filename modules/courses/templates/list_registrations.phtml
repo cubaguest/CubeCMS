@@ -1,0 +1,172 @@
+<?
+// načtení detailu
+$this->addPageTitle($this->_('Registrace ke kurzu') . ' "' . $this->course->{Courses_Model_Courses::COLUMN_NAME} . '"');
+$this->addPageHeadline($this->_('Registrace ke kurzu') . ' "' . $this->course->{Courses_Model_Courses::COLUMN_NAME} . '"');
+?>
+
+<style type="text/css">
+   .module-courses-registration {
+      border: 1px solid silver;
+      padding: 3px;
+      margin-bottom: 3px;
+   }
+   .registration-detail-label {
+      float: left;
+      width: 200px;
+      font-weight: bold;
+   }
+   .registration-detail-tools {
+      float: right;
+   }
+
+   .module-courses-registrations-list-controlls {
+      margin-bottom: 5px;
+   }
+</style>
+<div class="article-list module-courses-registrations-list">
+   <? if (!empty($this->registrations)) {
+ ?>
+      <p class="module-courses-registrations-list-controlls">
+         <a class="registrations-expand-all-button" href="<?=$this->link() ?>#"
+         title="<?=$this->_('Rozbalit vše'); ?>"
+         ><img src="<?=Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand"
+            />&nbsp;<?=$this->_('Rozbalit vše'); ?></a>&nbsp;
+      <a class="registrations-collapse-all-button" href="<?=$this->link() ?>#"
+         title="<?=$this->_('Sbalit vše'); ?>"
+         ><img src="<?=Template::getFileDir('icons/collapse.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand"
+            />&nbsp;<?=$this->_('Sbalit vše'); ?></a>
+
+   </p>
+   <? foreach ($this->registrations as $registration) {
+ ?>
+      <div class="module-courses-registration">
+         <div class="registration-detail-tools">
+            <?
+            $this->formCancel->html()->setAttrib('onsubmit', 'return confirm(\''.$this->_('Opravdu zušit registraci?').'\');');
+            echo $this->formCancel->renderStart();
+            echo "<p>";
+            $this->formCancel->id->setValues($registration->{Courses_Model_Registrations::COLUMN_ID});
+            echo $this->formCancel->id->controll();
+            $this->formCancel->submit->setImage(Template::getFileDir('icons/user_delete.png', Template::IMAGES_DIR, false, true));
+            echo $this->formCancel->submit->controll();
+            echo "</p>";
+            echo $this->formCancel->renderEnd();
+
+            ?>
+            
+<!--         <form action="<?=$this->link()?>" method="post" onsubmit="return confirm('<?=$this->_('Opravdu zušit registraci?')?>');">
+            <p>
+               <input type="hidden"
+            </p>   
+         </form>-->
+      </div>
+      <a href="<?=$this->link() ?>#" class="registration-name">
+         <img src="<?=Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand" />
+         <?
+         if ($registration->{Courses_Model_Registrations::COLUMN_DEGREE} != null) {
+            echo $registration->{Courses_Model_Registrations::COLUMN_DEGREE} . '&nbsp;';
+         }
+         echo $registration->{Courses_Model_Registrations::COLUMN_NAME} . '&nbsp;';
+         echo $registration->{Courses_Model_Registrations::COLUMN_SURNAME} . '&nbsp;';
+         ?>
+      </a>
+      <div class="module-courses-registration-detail">
+<!--         <table>
+            <tr>
+               <th width="200"><?=$this->_('Pracovní zařazení');
+         ?></th>
+               <td><?=$registration->{Courses_Model_Registrations::COLUMN_GRADE}
+         ?></td>
+               <th width="200"><?=$this->_('Pracovní zařazení');
+         ?></th>
+               <td><?=$registration->{Courses_Model_Registrations::COLUMN_GRADE}
+         ?></td>
+            </tr>
+         </table>-->
+
+         <span class="registration-detail-label"><?=$this->_('Pracovní zařazení'); ?>:</span>
+         <?=$registration->{Courses_Model_Registrations::COLUMN_GRADE}
+         ?><br />
+         <span class="registration-detail-label"><?=$this->_('Délka praxe');
+         ?>:</span>
+         <?=$registration->{Courses_Model_Registrations::COLUMN_PRACTICE_LENGHT} ?><br />
+         <span class="registration-detail-label"><?=$this->_('Telefon'); ?>:</span>
+         <?=$registration->{Courses_Model_Registrations::COLUMN_PHONE} ?><br />
+         <span class="registration-detail-label"><?=$this->_('E-mail'); ?>:</span>
+         <?=$registration->{Courses_Model_Registrations::COLUMN_MAIL} ?><br />
+         <br />
+         <span class="registration-detail-label"><?=$this->_('Kurz je hrazen');
+         ?>:</span>
+            <?
+            if ($registration->{Courses_Model_Registrations::COLUMN_PAY_TYPE} == Courses_Controller::PAY_TYPE_ORGANISATION) {
+               echo $this->_('Organizací') . '<br />';
+            } else {
+               echo $this->_('Soukromě') . '<br />';
+            }
+            ?>
+         <br/>
+         <p>
+<? if ($registration->{Courses_Model_Registrations::COLUMN_PAY_TYPE} == Courses_Controller::PAY_TYPE_ORGANISATION) { ?>
+
+               <span class="registration-detail-label"><?=$this->_('Název organizace'); ?>:</span>
+                  <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_NAME} ?><br />
+            <span class="registration-detail-label"><?=$this->_('Adresa rganizace'); ?>:</span>
+               <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_ADDR} ?><br />
+            <span class="registration-detail-label"><?=$this->_('IČO organizace'); ?>:</span>
+               <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_ICO} ?><br />
+            <span class="registration-detail-label"><?=$this->_('Telefon do organizace'); ?>:</span>
+               <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_PHONE} ?><br />
+<? } else { ?>
+            <span class="registration-detail-label"><?=$this->_('Adresa'); ?>:</span>
+               <?=$registration->{Courses_Model_Registrations::COLUMN_PRIVATE_ADDR} ?><br />
+   <?
+         }
+   ?>
+               </p>
+            </div>
+         </div>
+<?
+      }
+      $jQuery = new JsPlugin_JQuery();
+      $this->addJsPlugin($jQuery);
+?>
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         $(document).ready(function(){
+            $('.module-courses-registration-detail').hide();
+
+            $('a.registration-name').click(function(){
+               if($(this).data('hidden') == true){
+                  $(this).data('hidden', false)
+                  $(this).next('div.module-courses-registration-detail').slideUp(200);
+                  $('img', this).attr('src', '<?=Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>');
+               } else {
+                  $(this).data('hidden', true)
+                  $(this).next('div.module-courses-registration-detail').slideDown(200);
+                  $('img', this).attr('src', '<?=Template::getFileDir('icons/collapse.gif', Template::IMAGES_DIR, false, true) ?>');
+               }
+               return false;
+            });
+
+            $('a.registrations-expand-all-button').click(function(){   
+               $('a.registration-name').click();
+               return false;
+            });   
+            $('a.registrations-collapse-all-button').click(function(){   
+               $('a.registration-name').click();
+               return false;
+            });   
+                     
+         });
+         /* ]]> */
+      </script>
+<?
+   } else {
+      print ($this->_('K tomuto kurzu není připojena žádná registrace'));
+   }
+?>
+</div>
+ <?
+$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detailCourse'), 'text' => $this->_('Zpět na detail kurzu')));
+?>
+
