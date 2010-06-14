@@ -1,0 +1,38 @@
+<?
+//$this->addCssFile("style.css");
+// do titulku
+if($this->edit) {
+   $this->addPageTitle(sprintf($this->_('úprava lektora "%s"'),$this->lecturer->{Lecturers_Model::COLUMN_NAME}.' '.$this->lecturer->{Lecturers_Model::COLUMN_SURNAME}));
+   $this->addPageHeadline(sprintf($this->_('úprava lektora "%s"'),$this->lecturer->{Lecturers_Model::COLUMN_NAME}.' '.$this->lecturer->{Lecturers_Model::COLUMN_SURNAME}));
+
+   // přidáme obrázek do popisku
+//   $img = new Html_Element('img');
+//   $img->setAttrib('src', $this->category()->getModule()->getDataDir(true).$this->band->{Bands_Model::COLUMN_IMAGE})
+//   ->setAttrib('alt' , $this->band->{Bands_Model::COLUMN_IMAGE})->setAttrib('height', 40);
+
+
+
+} else {
+   $this->addPageTitle($this->_('přidání lektora'));
+   $this->addPageHeadline($this->_('přidání lektora'));
+}
+// donastavení formuláře
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+$this->form->degree->html()->setAttrib('size', 5);
+
+$tinymce = new JsPlugin_TinyMce();
+$tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+$this->addJsPlugin($tinymce);
+
+if(isset ($this->form->imgdel)){
+   $this->form->imgdel->setSubLabel($this->_('Uložen portrét:').'<br /><img src="'.$this->category()->getModule()->getDataDir(true).$this->lecturer->{Lecturers_Model::COLUMN_IMAGE}
+   .'" alt="'.$this->lecturer->{Lecturers_Model::COLUMN_IMAGE}.'" width="100" />');
+}
+?>
+
+<div class="article-form-edit">
+   <?
+   print($this->form);
+   $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
+   ?>
+</div>
