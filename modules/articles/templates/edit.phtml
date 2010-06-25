@@ -11,15 +11,21 @@ if($this->edit) {
    $this->addPageHeadline($this->_('přidání článku'));
 }
 // donastavení formuláře
+$this->form->annotation->html()->setAttrib('cols', 80)->setAttrib('rows', 5)->addClass("mceEditorSimple");
 $this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
 
-$tinymce = new JsPlugin_TinyMce();
-$tinymce->setCfgParam('theme', 'full');
-$this->addJsPlugin($tinymce);
+$tinySimple = new JsPlugin_TinyMce();
+$tinySimple->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+$tinySimple->setCfgParam('editor_selector', 'mceEditorSimple');
+$this->addJsPlugin($tinySimple);
 
+$tinymce = new JsPlugin_TinyMce();
+$tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
+$tinymce->setCfgParam('editor_selector', 'mceEditor');
+$this->addJsPlugin($tinymce);
 ?>
 
-<div id="editArticleForm">
+<div id="article-edit-form">
    <?print($this->form);?>
    <?if($this->edit === true){
       $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));

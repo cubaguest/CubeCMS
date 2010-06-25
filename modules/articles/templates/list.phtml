@@ -6,7 +6,7 @@ if($this->top === true) {
    $this->addPageHeadline($this->_('nejčtenější články'));
 }
 ?>
-<div class="articlesList">
+<div class="article-list">
 <p style="text-align:right">
    <?=$this->_('Řadit podle')?>:&nbsp;
    <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
@@ -37,10 +37,13 @@ if($this->top === true) {
       <div class="imageBox">
                   <?=vve_tpl_image_tag($out[1], "article title image", 80, 80);?>
       </div>
-            <?}?>
-
-            <?//print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
-            <?print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
+            <?}
+            if($article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
+               echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};
+            } else {
+               echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);
+            }
+            ?>
       <hr class="reseter" />
       <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">

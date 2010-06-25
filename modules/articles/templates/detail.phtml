@@ -10,7 +10,12 @@ $addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME}
 $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
 ?>
 
-<div>
+<div class="article-detail">
+   <?
+   if($this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
+   <div class="article-detail-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
+   <br />
+   <?}?>
    <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />
    <script type="text/javascript">
@@ -44,5 +49,6 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    echo $this->toolbox;
    echo $this->comments;
    ?>
+
 </div>
 

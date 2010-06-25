@@ -209,6 +209,7 @@ class Articles_Controller extends Controller {
 
       $editForm->name->setValues($article->{Articles_Model_Detail::COLUMN_NAME});
       $editForm->text->setValues($article->{Articles_Model_Detail::COLUMN_TEXT});
+      $editForm->annotation->setValues($article->{Articles_Model_Detail::COLUMN_ANNOTATION});
       $editForm->urlkey->setValues($article->{Articles_Model_Detail::COLUMN_URLKEY});
       $editForm->art_id->setValues($article->{Articles_Model_Detail::COLUMN_ID});
       $editForm->public->setValues($article->{Articles_Model_Detail::COLUMN_PUBLIC});
@@ -239,7 +240,7 @@ class Articles_Controller extends Controller {
       if($form->art_id == null) $idart = null;
       else $idart = $form->art_id->getValues();
       $model = new Articles_Model_Detail();
-      $lastId = $model->saveArticle($names, $form->text->getValues(), $urlkeys,
+      $lastId = $model->saveArticle($names, $form->text->getValues(), $form->annotation->getValues(), $urlkeys,
               $this->category()->getId(), Auth::getUserId(),$form->public->getValues(),$idart);
 
       $this->infoMsg()->addMessage($this->_('Uloženo'));
@@ -276,6 +277,10 @@ class Articles_Controller extends Controller {
       $iName->setLangs();
       $iName->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
       $form->addElement($iName);
+
+      $iAnnot = new Form_Element_TextArea('annotation', $this->_('Anotace'));
+      $iAnnot->setLangs();
+      $form->addElement($iAnnot);
 
       $iText = new Form_Element_TextArea('text', $this->_('Text'));
       $iText->setLangs();
@@ -353,7 +358,7 @@ class Articles_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    public static function settingsController(&$settings,Form &$form) {
-      $form->addGroup('basic', 'Základní nasatvení');
+      $form->addGroup('basic', 'Základní nastavení');
 
       $elemScroll = new Form_Element_Text('scroll', 'Počet článků na stránku');
       $elemScroll->setSubLabel('Výchozí: '.self::DEFAULT_ARTICLES_IN_PAGE.' článků');

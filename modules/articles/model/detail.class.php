@@ -10,6 +10,7 @@ class Articles_Model_Detail extends Model_PDO {
  */
    const COLUMN_NAME = 'name';
    const COLUMN_TEXT = 'text';
+   const COLUMN_ANNOTATION = 'annotation';
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_URLKEY = 'urlkey';
    const COLUMN_ADD_TIME = 'add_time';
@@ -28,13 +29,14 @@ class Articles_Model_Detail extends Model_PDO {
     * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveArticle($name, $text, $urlKey, $idCat = 0, $idUser = 0, $public = true, $id = null) {
+   public function saveArticle($name, $text, $annotation, $urlKey, $idCat = 0, $idUser = 0, $public = true, $id = null) {
       // generování unikátního klíče
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID,$id);
 
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
+          self::COLUMN_ANNOTATION => $annotation,
              self::COLUMN_URLKEY => $urlKey, self::COLUMN_PUBLIC => $public,
             self::COLUMN_TEXT_CLEAR => vve_strip_tags($text)));
 
@@ -53,15 +55,6 @@ class Articles_Model_Detail extends Model_PDO {
             throw new InvalidArgumentException($this->_('Při ukládání nového článku musí být zadáno id'), 1);
          }
          // unikátní klíč
-//         $dbc = new Db_PDO();
-//         // načtu všechny existující url klíče
-//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)."
-//             WHERE (".self::COLUMN_ID_CATEGORY." = '".$idCat."')");
-//
-//         while($row = $dbst->fetch()){
-//            $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
-//         }
-
          $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat,
                self::COLUMN_ID_USER => $idUser,
                self::COLUMN_ADD_TIME => date("Y-m-d H:i:s")));
