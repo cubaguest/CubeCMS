@@ -9,6 +9,9 @@ class ArticlesList_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
 
+      // načtení textu
+      $text = $this->loadText();
+      $this->view()->text = $text->{Text_Model_Detail::COLUMN_TEXT};
       // načtení článků
       $artModel = new Articles_Model_List();
 
@@ -16,6 +19,39 @@ class ArticlesList_Controller extends Controller {
               $this->category()->getParam('scroll', self::DEFAULT_ARTICLES_IN_PAGE));
 
       $this->view()->articles = $articles;
+   }
+
+      public function editTextController() {
+      $this->checkControllRights();
+      $form = new Form('modlabel');
+
+      $elemText = new Form_Element_TextArea('text', $this->_('Popis'));
+      $elemText->setLangs();
+      $form->addElement($elemText);
+
+      $elemS = new Form_Element_Submit('save', $this->_('Uložit'));
+      $form->addElement($elemS);
+
+      if($form->isValid()) {
+         $textM = new Text_Model_Detail();
+         $textM->saveText($form->text->getValues(), null, $this->category()->getId());
+
+         $this->infoMsg()->addMessage($this->_('Úvodní text byl uložen'));
+         $this->link()->route()->reload();
+      }
+
+      // načtení textu
+      $text = $this->loadText();
+      if($text != false) {
+         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      }
+      $this->view()->form = $form;
+   }
+
+   private function loadText() {
+      $textM = new Text_Model_Detail();
+      $text = $textM->getText($this->category()->getId());
+      return $text;
    }
 
    /**

@@ -1,0 +1,24 @@
+<?
+// nasatvení maximálního kontextu
+Template::setPVar('MAX_CONTENT', true);
+
+// do titulku
+if($this->edit) {
+   $this->addPageTitle($this->_('úprava textu k seznamu článků'));
+   $this->addPageHeadline($this->_('úprava textu k seznamu článků'));
+}
+// donastavení formuláře
+$this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 15)->addClass("mceEditor");
+
+$tinymce = new JsPlugin_TinyMce();
+$tinymce->setCfgParam('theme',  JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+$this->addJsPlugin($tinymce);
+
+?>
+
+<div id="editActionsLabelForm">
+   <?print($this->form);?>
+</div>
+<?
+$this->includeTpl('buttonback.phtml', true);
+?>

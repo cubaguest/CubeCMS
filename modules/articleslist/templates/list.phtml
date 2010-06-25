@@ -1,3 +1,7 @@
+<?if($this->text != null){?>
+<div class="article-list-text"><?echo (string)$this->text?></div>
+<br />
+<?}?>
 <div class="article-list">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
@@ -38,3 +42,4 @@
       print ($this->_('Není vložen žádný článek'));
    }?>
 </div>
+<?echo $this->toolbox;?>
