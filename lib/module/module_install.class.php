@@ -64,9 +64,14 @@
 
     /**
      * Metoda pro update modulu
+     * @param int $fromVersion -- původní verze
+     * @param int $toVersion -- nová verze
      */
-    public function update() {
-
+    public function update($fromVersion, $toVersion) {
+       // update tabulky
+       $model = new Model_Module();
+       $ver = explode('.', $toVersion);
+       $model->registerUpdatedModule($this->moduleName, $ver[0], $ver[1]);
     }
 
     /**

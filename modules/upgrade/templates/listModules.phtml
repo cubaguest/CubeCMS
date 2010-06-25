@@ -1,0 +1,30 @@
+<h1><?=$this->_('Seznam instalovaných modulů')?></h1>
+<table>
+   <thead>
+      <tr>
+         <th width="150"><?=$this->_('Název modulu')?></th>
+         <th width="80"><?=$this->_('instalovaná verze')?></th>
+         <th width="80"><?=$this->_('aktuální verze')?></th>
+      </tr>
+   </thead>
+   <tbody>
+      <?foreach ($this->modules as $module) {?>
+      <tr style="<?if($module['upgrade'] == true) echo "background-color: red;" ?>">
+         <td><?=$module['name']?></td>
+         <td><?=$module['inst_ver']?></td>
+         <td><?=$module['avail_ver']?></td>
+      </tr>
+      <?}?>
+   </tbody>
+</table>
+<br />
+<div>
+   <?
+   if($this->allowUpgrade === true){
+      echo $this->formUpgrade->renderStart();
+      echo $this->formUpgrade->save->Controll();
+      echo $this->formUpgrade->renderEnd();
+   }
+   ?>
+
+</div>

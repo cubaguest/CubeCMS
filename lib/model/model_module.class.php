@@ -83,5 +83,23 @@ class Model_Module extends Model_PDO {
 
       return $dbst->execute(array(':name' => $name, ':vmajor' => $vMajor, ':vminor' => $vMinor));
    }
+
+   public function registerUpdatedModule($name, $vMajor = 1, $vMinor = 0) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare('UPDATE '.Db_PDO::table(self::DB_TABLE)." "
+                 ." SET ".self::COLUMN_VERSION_MAJOR." = :vmajor, ".self::COLUMN_VERSION_MINOR." = :vminor"
+                 ." WHERE ".self::COLUMN_NAME." = :name");
+      return $dbst->execute(array(':name' => $name, ':vmajor' => $vMajor, ':vminor' => $vMinor));
+   }
+
+   public function getInstalledModules() {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." ORDER BY ".self::COLUMN_NAME." DESC");
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->execute();
+
+      return $dbst;
+   }
 }
 ?>
