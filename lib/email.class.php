@@ -186,7 +186,7 @@ class Email {
       $mailContent = $this->createMail();
       // hlavičky
       $headers = $this->createHeaders();
-
+      $this->mailAddress = array_unique($this->mailAddress);
       foreach ($this->mailAddress as $address) {
          if($address == null) continue;
          if(!mail($address, $encodedSubject, $mailContent, $headers)){
