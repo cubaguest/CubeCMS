@@ -627,7 +627,7 @@ class Categories_Controller extends Controller {
       if($form != null AND $form->isValid()){
          // čištění nulových hodnot
          foreach ($settings as $key => $option){
-            if($option === null OR empty ($option) OR $option === 0){
+            if(!is_bool($option) AND ($option === null OR empty ($option) OR $option === 0)){
                unset($settings[$key]);
             }
          }
