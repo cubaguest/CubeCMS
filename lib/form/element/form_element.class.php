@@ -130,6 +130,16 @@ class Form_Element implements Form_Element_Interface {
    protected $renderedId = 1;
 
    /**
+    * Název css třídy, která se přidává ke chybnému elementu
+    * @var string
+    */
+   public static $cssClasses = array('error' => 'form-error',
+                                     'validations' => 'form-box-validations',
+                                     'langLink' => 'form-link-lang',
+                                     'langLinkSel' => 'form-link-lang-sel',
+                                     'elemContainer' => 'form-elem-container');
+
+      /**
     * Konstruktor elemntu
     * @param string $name -- název elemntu
     * @param string $label -- popis elemntu
@@ -454,7 +464,7 @@ class Form_Element implements Form_Element_Interface {
       $elem = clone $this->htmlLabel();
       $elem->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
-         $elem->addClass('formErrorLabel');
+         $elem->addClass(self::$cssClasses['error']);
       }
       if($this->formElementLabel !== null) {
          $elem->addContent($this->formElementLabel.":");
@@ -505,7 +515,7 @@ class Form_Element implements Form_Element_Interface {
    public function controll() {
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
-         $this->html()->addClass('formError');
+         $this->html()->addClass(self::$cssClasses['error']);
       }
       $values = $this->getUnfilteredValues();
       $this->html()->addClass($this->getName()."_class");
@@ -526,7 +536,7 @@ class Form_Element implements Form_Element_Interface {
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             }
             $this->html()->setAttrib('lang', $langKey);
-            $container->addClass("elem_container_class");
+            $container->addClass(self::$cssClasses['elemContainer']);
             $container->setAttrib('lang', $langKey);
             $cnt .= $container;
          }
@@ -572,7 +582,7 @@ class Form_Element implements Form_Element_Interface {
          }
          $labels = substr($labels, 0, strlen($labels)-2).")";
          $this->htmlValidLabel()->addContent($labels);
-         $this->htmlValidLabel()->addClass('formValidationLabel');
+         $this->htmlValidLabel()->addClass(self::$cssClasses['validations']);
          return $this->htmlValidLabel();
       }
       return null;
@@ -588,13 +598,13 @@ class Form_Element implements Form_Element_Interface {
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $a = new Html_Element('a', $langLabel);
             $a->setAttrib('href', "#");
-            $a->addClass("formLinkLang");
+            $a->addClass(self::$cssClasses['langLink']);
             if($this->isDimensional()) {
                $a->setAttrib('id', $this->getName()."_".$this->dimensional."_lang_link_".$langKey);
             } else {
                $a->setAttrib('id', $this->getName()."_lang_link_".$langKey);
             }
-            $a->addClass("elem_lang_link");
+//            $a->addClass("elem_lang_link");
             $a->setAttrib('onclick', "return formElemSwitchLang(this,'".$langKey."');");
             $a->setAttrib('title', $langLabel);
             $a->setAttrib('lang', $langKey);
@@ -612,53 +622,7 @@ class Form_Element implements Form_Element_Interface {
       return null;
    }
 
-   /**
-    * Metoda vyrenderuje celý element i s popiskem
-    * @param string $type -- typ renderu (table,null,...)
-    */
-//   public function render($type = "table") {
-//      $string = null;
-//      switch ($type) {
-//         case 'table':
-//         default:
-//            $tr = new Html_Element('tr');
-//            $td1 = new Html_Element('th');
-//            $td1->setAttrib('allign', 'right');
-//            $td1->setAttrib('width', 100);
-//            $td1->addContent($this->label());
-//            $tr->addContent($td1);
-//            // kontrolní element
-//            $td2 = new Html_Element('td');
-//            $td2->addContent($this->labelLangs());
-//            $td2->addContent($this->controll());
-//            $td2->addContent($this->scripts());
-//            // popisky k validátorům
-//            $td2->addContent($this->labelValidations());
-//            $tr->addContent($td2);
-//            $string = $tr;
-//            break;
-//      }
-//      return (string)$string;
-//   }
-
-   /**
-    * Metoda upraví vlastnost prvku u vykreslení
-    * @param string $type -- typ parametru, který se má upravit
-    * @param mixed $value -- hodnota parametru
-    * @todo -- asij nebude třeba
-    */
-//   public function setRender($type, $size = 30) {
-//      switch ($type) {
-//         case 'size':
-//            $this->html()->setAttrib('size', $size);
-//            break;
-//         default:
-//            break;
-//      }
-//   }
-
    public function  __toString() {
-//      return (string)$this->render();
       return (string)$this->controll();
    }
 

@@ -271,38 +271,11 @@ span[title] {
 }
 
 /* formulařové prvky */
-.requiredElem {
-   color:maroon;
-}
-
-.formErrorLabel {
-   color:red;
-}
-
-.formError {
-   background-color: #f4d0d0;
-}
-
-a.formLinkLang {
-   color: #999999;
-}
-
-a.formLinkSelLang {
-   color: black;
-   font-weight:bold;
-   background-color:#cccccc;
-   border-style: solid;
-   border-width: 1px 1px 0 1px;
-   border-color: #666666;
-   padding: 0 2px;
-}
-
 /* tabulka formuláře */
 fieldset, .formTable {
    background-color: #c7e0f9;
    width: 96%;
    margin-bottom: 10px;
-   /*border: 1px solid gray;*/
 }
 
 fieldset p.formGroupText {
@@ -316,6 +289,69 @@ fieldset legend {
    border-bottom: none;
 }
 
+input, button, textarea {
+   border: 1px solid #555555;
+   background-color: #e2e2e2;
+   font-size: small;
+   font-family: "Tahoma", "Arial", sans-serif;
+}
+
+input:focus, textarea:focus, input.form-required:focus, textarea.form-required:focus {
+   background-color: whitesmoke;
+}
+
+input[type="image"] {
+   border: 0;
+   background-color:transparent;
+}
+
+input[type="submit"], button[type="submit"], input[type="button"] {
+   background-color: white;
+   padding: 0 3px;
+}
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover {
+   background-color: green;
+   color: white;
+}
+
+input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_button button[type="submit"]:hover  {
+   background-color: #c1272d;
+   color: white;
+}
+
+.form-required {
+   color:maroon;
+}
+
+input.form-required, textarea.form-required {
+   background-position: right top;
+   background-image: url('../images/form_required.png');
+   background-repeat: no-repeat;
+   color: black;
+}
+
+label.form-error {
+   color:red;
+}
+
+input.form-error, textarea.form-error {
+   background-color: #f4d0d0;
+}
+
+a.form-link-lang {
+   color: #999999;
+}
+
+a.form-link-lang-sel {
+   color: black;
+   font-weight:bold;
+   background-color:#cccccc;
+   border-style: solid;
+   border-width: 1px 1px 0 1px;
+   border-color: #666666;
+   padding: 0 2px;
+}
+
 .formTable td, .formTableGroup td, .formTable th, .formTableGroup th {
    padding: 5px;
 }
@@ -326,33 +362,6 @@ fieldset legend {
 }
 
 .formTable td.formControlls {
-}
-
-input, button, textarea {
-   border: 1px solid #0f6572;
-   background-color: #e1ebec;
-   font-size: small;
-   font-family: "Tahoma", "Arial", sans-serif;
-}
-
-input[type="image"] {
-   border: 0;
-   background-color:transparent;
-}
-
-input[type="submit"]:hover, button[type="submit"]:hover {
-   background-color: #007070;
-   color: white;
-}
-
-input[type="button"]:hover {
-   background-color: #007070;
-   color: white;
-}
-
-input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_button button[type="submit"]:hover  {
-   background-color: #c1272d;
-   color: white;
 }
 
 /* odkaz zpět */

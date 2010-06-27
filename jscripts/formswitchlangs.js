@@ -3,24 +3,24 @@ function formElemSwitchLang(linkObj, lang){
    var parent = $(linkObj).parent("td");
 
    parent.find('label[lang]').hide();
-   parent.find(".elem_container_class[lang]").hide();
+   parent.find(".form-elem-container[lang]").hide();
    // odznačení
-   parent.find("a.formLinkSelLang").removeClass('formLinkSelLang');
+   parent.find("a.form-link-lang-sel").removeClass('form-link-lang-sel');
 
-   $(linkObj).addClass('formLinkSelLang');
+   $(linkObj).addClass('form-link-lang-sel');
    parent.find("label[lang="+lang+"]").show();
-   parent.find(".elem_container_class[lang="+lang+"]").show();
+   parent.find(".form-elem-container[lang="+lang+"]").show();
    return false;
 }
 
 function formShowOnlyLang(lang){
    // zkrytí všech
    $("form label[lang]").hide();
-   $("form .elem_container_class[lang]").hide();
+   $("form .form-elem-container[lang]").hide();
    // odznačení
-   $("form a.formLinkSelLang").removeClass('formLinkSelLang');
+   $("form a.form-link-lang-sel").removeClass('form-link-lang-sel');
 
-   $("form a[lang="+lang+"]").addClass('formLinkSelLang');
+   $("form a[lang="+lang+"]").addClass('form-link-lang-sel');
    $("form label[lang="+lang+"]").show();
-   $("form .elem_container_class[lang="+lang+"]").show();
+   $("form .form-elem-container[lang="+lang+"]").show();
 }

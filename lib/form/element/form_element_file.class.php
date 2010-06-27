@@ -107,7 +107,9 @@ class Form_Element_File extends Form_Element {
    private function getMimeType($file) {
       // for php 5.3 or finfo extension
       if(function_exists('finfo_open')) {
-         $finfo = new finfo(FILEINFO_MIME, "/usr/share/misc/magic");
+         // todo doladit pod win platformu (není validní cesta)
+         $finfo = new finfo(FILEINFO_MIME);
+//         $finfo = new finfo(FILEINFO_MIME, "/usr/share/misc/magic");
          if (!$finfo) {
             trigger_error("Opening fileinfo database failed");
             exit();

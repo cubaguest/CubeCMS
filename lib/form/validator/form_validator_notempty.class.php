@@ -17,6 +17,11 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
  */
    private $columsNotEmpty = array();
 
+   /**
+    * Proměnná s název css třídy, která se přidá ke každému elementu
+    * @var string
+    */
+   public static $cssClass = 'form-required';
 
    public function  __construct($errMsg = null, $columsNotEmpty = null) {
       if($errMsg == null) {
@@ -35,7 +40,8 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->htmlLabel()->addClass('requiredElem');
+      $element->htmlLabel()->addClass(self::$cssClass);
+      $element->html()->addClass(self::$cssClass);
       $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
    }
 
@@ -52,7 +58,6 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                   if($retu !== true){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
                      $this->isValid = false;
-//                     return false;
                   }
                }
                // pokud mají být vyplněny všechny sloupce
@@ -60,7 +65,6 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                   if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())){
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
-//                     return false;
                   }
                }
             } else {
