@@ -75,7 +75,11 @@ class Templates_Controller extends Controller {
                  $form->type->getValues(), $this->getRequest('id'));
 
          $this->infoMsg()->addMessage($this->_('Uloženo'));
-         $this->link()->route()->reload();
+         if($form->goback->getValues() == true){
+            $this->link()->route()->reload();
+         } else {
+            $this->link()->reload();
+         }
       }
 
       $this->view()->form = $form;
@@ -109,11 +113,30 @@ class Templates_Controller extends Controller {
       $iType->setOptions($t);
       $form->addElement($iType);
 
+      $redirElem = new Form_Element_Checkbox('goback', $this->_('Přejít zpět na seznam'));
+      $form->addElement($redirElem);
+
       $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $form->addElement($iSubmit);
 
       return $form;
    }
+
+   public function previewController() {
+      $this->checkControllRights();
+
+      $model = new Templates_Model();
+
+      $tplObj = $model->getTemplate($this->getRequest('id'));
+
+      if($tplObj == false) return false;
+
+
+      $this->view()->tpl = $tplObj;
+      // odkaz zpět
+      $this->view()->linkBack = $this->link()->route();
+   }
+
 
    public static function templateController(){
       $id = (int)$_GET[self::GET_PARAM_ID]; // ověřit jestli to nemá být stripslashes

@@ -46,6 +46,10 @@ class Templates_View extends View {
       $this->addView();
    }
 
+   public function previewView() {
+      $this->template()->addTplFile('preview.phtml');
+   }
+
    public static function templateView(){
       echo (Templates_View::$tpl->{Templates_Model::COLUMN_CONTENT});
    }

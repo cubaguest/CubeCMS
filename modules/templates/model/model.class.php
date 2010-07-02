@@ -36,11 +36,16 @@ class Templates_Model extends Model_PDO {
       $dbc = new Db_PDO();
 
       if($id !== null) {
-//         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-//          ." SET ".$this->getUpdateValues()
-//          ." WHERE ".self::COLUMN_ID." = :id");
-//         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-//         return $dbst->execute();
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+          ." SET ".self::COLUMN_CONTENT." = :content,".self::COLUMN_DESC.' = :descrip,'
+                 .self::COLUMN_NAME.' = :name, '.self::COLUMN_TYPE." = :type"
+          ." WHERE ".self::COLUMN_ID." = :id");
+         $dbst->bindValue(':name',$name, PDO::PARAM_STR);
+         $dbst->bindValue(':descrip',$desc, PDO::PARAM_STR);
+         $dbst->bindValue(':content',$content, PDO::PARAM_STR);
+         $dbst->bindValue(':type',$type, PDO::PARAM_STR);
+         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+         return $dbst->execute();
       } else {
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
                  ." (".self::COLUMN_NAME.", ".self::COLUMN_DESC.", ".self::COLUMN_CONTENT.", ".self::COLUMN_TYPE.") "
