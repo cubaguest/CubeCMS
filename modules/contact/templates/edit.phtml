@@ -5,7 +5,7 @@
    $this->formEdit->textPanel->html()->setAttrib('cols', 80)->setAttrib('rows', 10)->addClass("mceEditorSimple");
 
    $tinymce = new JsPlugin_TinyMce();
-   $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
+   $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_FULL);
    $tinymce->setCfgParam('editor_selector', 'mceEditor');
    $this->addJsPlugin($tinymce);
 
