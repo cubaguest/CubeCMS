@@ -1,8 +1,8 @@
 <?php
 
 class Lecturers_Controller extends Controller {
-   const DEFAULT_IMAGE_WIDTH = 150;
-   const DEFAULT_IMAGE_HEIGHT = 150;
+   const DEFAULT_IMAGE_WIDTH = 90;
+   const DEFAULT_IMAGE_HEIGHT = 120;
    const DEFAULT_IMAGE_CROP = false;
 
    const DATA_DIR = 'lecturers';
@@ -146,7 +146,6 @@ class Lecturers_Controller extends Controller {
       $form->addElement($iSurName, 'basic');
 
       $iDegree = new Form_Element_Text('degree', $this->_('Titul'));
-      $iDegree->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iDegree, 'basic');
 
       $iText = new Form_Element_TextArea('text', $this->_('Popis'));

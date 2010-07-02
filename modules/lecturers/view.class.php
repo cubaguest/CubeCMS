@@ -33,23 +33,6 @@ class Lecturers_View extends View {
       }
    }
 
-//   public function showView() {
-//      $this->template()->addTplFile("detail.phtml");
-//
-//      if($this->category()->getRights()->isControll() OR
-//              ($this->category()->getRights()->isWritable())) {
-//         $toolbox = new Template_Toolbox();
-//         $toolbox->addTool('band_edit', $this->_("Upravit"),
-//                 $this->link()->route('edit'),
-//                 $this->_("Upravit zobrazenou skupinu"), "page_edit.png");
-//         $toolbox->addTool('band_delete', $this->_("Smazat"),
-//                 $this->link(), $this->_("Smazat zobrazenou skupinu"), "page_delete.png",
-//                 'band_id', (int)$this->band->{Bands_Model::COLUMN_ID},
-//                 $this->_('Opravdu smazat skupinu?'));
-//         $this->toolbox = $toolbox;
-//      }
-//   }
-
    /**
     * Viewer pro přidání článku
     */
@@ -63,6 +46,8 @@ class Lecturers_View extends View {
    public function editView() {
       $this->edit = true;
       $this->addView();
+      // cestak obrázků
+      $this->imagePath = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.Lecturers_Controller::DATA_DIR.URL_SEPARATOR;
    }
 }
 

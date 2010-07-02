@@ -25,7 +25,7 @@ $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEM
 $this->addJsPlugin($tinymce);
 
 if(isset ($this->form->imgdel)){
-   $this->form->imgdel->setSubLabel($this->_('Uložen portrét:').'<br /><img src="'.$this->category()->getModule()->getDataDir(true).$this->lecturer->{Lecturers_Model::COLUMN_IMAGE}
+   $this->form->imgdel->setSubLabel($this->_('Uložen portrét:').'<br /><img src="'.$this->imagePath.$this->lecturer->{Lecturers_Model::COLUMN_IMAGE}
    .'" alt="'.$this->lecturer->{Lecturers_Model::COLUMN_IMAGE}.'" width="100" />');
 }
 ?>
