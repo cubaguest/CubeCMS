@@ -24,7 +24,7 @@ class Form_Element_TextArea extends Form_Element_Text {
     */
    public function controll() {
       if(!$this->isValid AND $this->isPopulated) {
-         $this->html()->addClass('formError');
+         $this->html()->addClass(Form_Element::$cssClasses['error']);
       }
 
       $values = $this->getUnfilteredValues();
@@ -47,7 +47,7 @@ class Form_Element_TextArea extends Form_Element_Text {
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
                $this->html()->addContent(htmlspecialchars($values[$langKey]));
             }
-            $container->addClass("elem_container_class");
+            $container->addClass(Form_Element::$cssClasses['elemContainer']);
             $container->setAttrib('lang', $langKey);
 
             $cnt .= $container;
