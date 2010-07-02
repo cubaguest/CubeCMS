@@ -11,7 +11,7 @@
             case 'Template_Toolbox2_Tool_PostRedirect':
                ?>
          <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>">
-                  <img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"
+            <div><img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"
                   /><input class="toolbox-tool-button" type="submit" name="<?=$tool->getName() ?>_button"
                      value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
                   <?
@@ -19,13 +19,14 @@
                   foreach ($addVal as $key => $value) {
                      echo "<input type=\"hidden\" name=\"$key\" value=\"" . (string) $value . "\" />";
                   }?>
+                  </div>
                </form>
                <?
                break;
             case 'Template_Toolbox2_Tool_Form':
                ?>
                <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>">
-                  <img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"/><?
+                  <div><img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"/><?
                
                foreach ($tool->getForm() as $element) {
                   if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
@@ -36,7 +37,7 @@
                   }
                }
                   ?><input type="hidden" name="<?=$tool->getForm()->getFormChecker()->getName();?>" value="<?=$tool->getForm()->getFormChecker()->getValues() ?>" /><?
-               ?></form><?
+               ?></div></form><?
                break;
             default:
 //               var_dump($tool);
