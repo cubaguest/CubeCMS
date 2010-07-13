@@ -4,14 +4,13 @@ if(preg_match('/(?i)msie [1-6]/',$_SERVER['HTTP_USER_AGENT']) AND !isset ($_COOK
    $this->setPVar('IE',true);
 }
 print ('<?xml version="1.0" encoding="utf-8"?>');
-?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locale::getLang()?>" lang="<?=Locale::getLang()?>">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <meta name="author" content="Jakub Matas" />
-      <meta name="keywords" content="<?=htmlspecialchars($this->pageKeywords)?>" />
-      <meta name="description" content="<?=htmlspecialchars($this->pageDesc)?>" />
+      <meta name="keywords" content="{*-PAGE_KEYWORDS-*}" />
+      <meta name="description" content="{*-PAGE_DESCRIPTION-*}" />
       <?if(Auth::isLoginStatic()) {?>
       <meta http-equiv="cache-control" content="no-cache" />
       <meta http-equiv="pragma" content="no-cache" />

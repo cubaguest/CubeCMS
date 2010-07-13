@@ -34,10 +34,32 @@ class Template_Core extends Template {
    private static $indexFile = self::INDEX_DEFAULT_TEMPLATE;
 
    /**
+    * Proměnná s titulkem stránky
+    * @var array
+    */
+   private static $pageTitle = array();
+
+   /**
+    * Popisek stránky
+    * @var string
+    */
+   private static $pageDescription = null;
+
+   /**
+    * Klíčová slova stránky
+    * @var string
+    */
+   private static $pageKeywords = null;
+
+   /**
     * Konstruktor
     */
    function  __construct() {
       ob_start();
+      self::setPageDescription(Category::getSelectedCategory()
+         ->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
+      self::setPageKeywords(Category::getSelectedCategory()
+         ->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
       parent::__construct(new Url_Link());
    }
 
@@ -91,13 +113,18 @@ class Template_Core extends Template {
          array_push($arr, Category::getSelectedCategory()->getName());
          array_push($arr, VVE_WEB_NAME);
       }
-      $title = null;
-      foreach ($arr as $subtitle) {
-         $title .= (string)$subtitle.' '.VVE_PAGE_TITLE_SEPARATOR.' ';
-      }
+      $title = implode(' '.VVE_PAGE_TITLE_SEPARATOR.' ', $arr);
+      
       $title = substr($title, 0, strlen($title)-strlen(VVE_PAGE_TITLE_SEPARATOR)-2);
       $contents = str_replace('{*-PAGE_TITLE-*}', htmlspecialchars($title), $contents);
-
+      // keywords
+      if(self::$pageKeywords != null){
+         $contents = str_replace('{*-PAGE_KEYWORDS-*}', htmlspecialchars(self::$pageKeywords), $contents);
+      }
+      // description
+      if(self::$pageDescription != null){
+         $contents = str_replace('{*-PAGE_DESCRIPTION-*}', htmlspecialchars(self::$pageDescription), $contents);
+      }
       // doplníme hlavní nadpis stránky
       $headline = self::$pageHeadline;
       $contents = str_replace('{*-PAGE_HEADLINE-*}', $headline, $contents);
@@ -113,8 +140,9 @@ class Template_Core extends Template {
          $contents = str_replace('{*-CORE_ERRORS-*}', $errContents, $contents);
       }
 
-      // odstranění všech proměnných
-      $contents = preg_replace('/\{\*\-[A-Za-z0-9_-]+-\*\}/', '', $contents);
+      // odstranění všech proměnných a prázdných meta tagů
+      $contents = preg_replace(array('/\{\*\-[A-Z0-9_-]+\-\*\}/e', '/<meta(.+?)content="" ?\/>/e'), array(null, null), $contents);
+
       ob_clean();
       return ((string)$contents);
    }
@@ -133,6 +161,59 @@ class Template_Core extends Template {
     */
    public static function setMainIndexTpl($tplFile){
       self::$indexFile = $tplFile;
+   }
+
+   /**
+    * Metoda nastavuje titulek stránky (zatím nefunkční)
+    * @param string $title -- titulek stránky
+    * @param bool $merge -- jestli se má titulek připojit k již nasatvenému
+    */
+   public static function addToPageTitle($title) {
+      array_push(self::$pageTitle, $title);
+   }
+
+   /**
+    * Metoda vrací titulek stránky
+    * @return string
+    */
+   public static function getPageTitle() {
+      return self::$pageTitle;
+   }
+
+     /**
+    * Metoda nastavuje klíčová slova stránky
+    * @param string $title -- klíčová slova stránky
+    */
+   public static function setPageKeywords($keywords) {
+      if($keywords != null|''){
+         self::$pageKeywords = (string)$keywords;
+      }
+   }
+
+   /**
+    * Metoda vrací klíčová slova stránky
+    * @return string
+    */
+   public static function getPageKeyword() {
+      return self::$pageKeywords;
+   }
+
+     /**
+    * Metoda nasatvuje popisek stránky
+    * @param string $title -- popisek stránky
+    */
+   public static function setPageDescription($desc) {
+      if($desc != null|''){
+         self::$pageDescription = (string)$desc;
+      }
+   }
+
+   /**
+    * Metoda vrací popisek stránky
+    * @return string
+    */
+   public static function getPageDescription() {
+      return self::$pageDescription;
    }
 
 }

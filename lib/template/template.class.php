@@ -106,12 +106,6 @@ class Template {
    protected static $pageHeadline = null;
 
    /**
-    * Proměná s názvem titulku okna
-    * @var array
-    */
-   protected static $pageTitle = array();
-
-   /**
     * Objekt s odkazem pro danou šablonu
     * @var Url_Link
     */
@@ -217,8 +211,8 @@ class Template {
     * Metoda přidá text k titulku pro článek
     * @param string $text -- název článek
     */
-   final public static function addPageTitle($text) {
-      array_push(self::$pageTitle, $text);
+   public static function addPageTitle($text) {
+      Template_Core::addToPageTitle($text);
    }
 
    /**
