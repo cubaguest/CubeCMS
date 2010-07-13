@@ -162,8 +162,7 @@ class Auth {
 	 */
 	private function _logInNow() {
 		$return = false;
-		
-		if (isset($_POST["login_submit"])){
+		if (isset($_POST["login_submit"]) OR isset ($_POST['login_submit_x'])){
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
 				AppCore::getUserErrors()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
