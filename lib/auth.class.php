@@ -202,7 +202,7 @@ class Auth {
 	 */
 	private function _logOutNow() {
 		$return = false;
-		if(isset($_POST["logout_submit"])){
+		if(isset($_POST["logout_submit"]) OR isset ($_POST['logout_submit_x'])){
 			$this->session->add(self::USER_IS_LOGIN, false);
 			self::$login = false;
 			session_destroy();
