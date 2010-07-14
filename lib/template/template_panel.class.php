@@ -37,5 +37,13 @@ class Template_Panel extends Template_Module {
    public function panelObj(){
       return $this->panelObj;
    }
+
+   /**
+    * Metoda vrací objekt panelu
+    * @return Panel_Obj -- objekt panelu
+    */
+   public function panel() {
+      return $this->panelObj;
+   }
 }
 ?>
