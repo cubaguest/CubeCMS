@@ -5,11 +5,16 @@
    <div class="article-list-record module-lecturers-list-record">
       <h2 id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
          <?
-         if($lecturer->{Lecturers_Model::COLUMN_DEGREE} != null){
-            echo $lecturer->{Lecturers_Model::COLUMN_DEGREE}.' ';
+         $degree = $lecturer->{Lecturers_Model::COLUMN_DEGREE};
+         if($degree != null){
+            echo $degree;
+            if($degree[strlen($degree)-1] != '.'){
+               echo '.';
+            }
+            echo ' ';
          }
-         echo $lecturer->{Lecturers_Model::COLUMN_NAME}.' ';
-         echo $lecturer->{Lecturers_Model::COLUMN_SURNAME};
+         echo $lecturer->{Lecturers_Model::COLUMN_SURNAME}.' ';
+         echo $lecturer->{Lecturers_Model::COLUMN_NAME};
          ?>
       </h2>
       <div class="article-list-record-content">

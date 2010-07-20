@@ -96,7 +96,7 @@ class Lecturers_Controller extends Controller {
 
       if ($editForm->isValid()) {
          $imgName = $lecturer->{Lecturers_Model::COLUMN_IMAGE};
-         if ($editForm->image->getValues() != null OR $editForm->imgdel->getValues() == true) {
+         if ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true)) {
             // smaže se původní
             $oldImg = new Filesystem_File($lecturer->{Lecturers_Model::COLUMN_IMAGE}, $this->category()->getModule()->getDataDir());
             $oldImg->remove();
