@@ -13,6 +13,7 @@ class ArticlesList_View extends View {
       }
    }
    public function editTextView() {
+      Template::setPVar('LAYOUT_MAX_CONTENT', true);
       $this->template()->addTplFile('edittext.phtml');
    }
 }
