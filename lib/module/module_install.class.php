@@ -13,6 +13,8 @@
     const MODULE_INSTALL_DIR = 'install';
     const VERSION_FILE = 'version.txt';
 
+    const FILE_SQL_UPGRADE = 'upgrade_{from}_{to}.sql';
+
     protected $depModules = array();
 
     protected $moduleName = null;
@@ -72,6 +74,14 @@
        $model = new Model_Module();
        $ver = explode('.', $toVersion);
        $model->registerUpdatedModule($this->moduleName, $ver[0], $ver[1]);
+
+       $fileName = preg_replace(array('/{from}/', '/{to}/'), array($fromVersion, $toVersion),
+               self::FILE_SQL_UPGRADE);
+
+       $file = new Filesystem_File_Text($fileName, $this->getInstallDir().$file,false);
+       if($file->exist()){
+         $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
+       }
     }
 
     /**
