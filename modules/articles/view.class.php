@@ -103,7 +103,7 @@ class Articles_View extends View {
       // ---------------------------------------------------------
       $c->pdf()->setHeaderFont(array(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN-2));
       $c->pdf()->setHeaderData('', 0, VVE_WEB_NAME." - ".$this->category()->getLabel()
-              ." - ".$article->{Articles_Model_Detail::COLUMN_NAME}
+              ." - ".vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME}, 70)
               , strftime("%x")." - ".$this->link()->route('detail'));
 
       // add a page
