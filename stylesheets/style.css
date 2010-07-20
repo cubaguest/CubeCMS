@@ -314,7 +314,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
    color: white;
 }
 
-input[type="reset"]:hover, .delete_form input[type="submit"]:hover, .delete_button button[type="submit"]:hover  {
+input[type="reset"]:hover, .delete_form input[type="submit"]:hover,
+.delete_button button[type="submit"]:hover, input.button-delete:hover  {
    background-color: #c1272d;
    color: white;
 }
