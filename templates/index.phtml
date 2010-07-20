@@ -72,7 +72,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
    </head>
    <body id="pageTop">
       <? // admin menu
-      if($this->menuAdminObj != null) $this->includeTplObj($this->menuAdminObj);
+      if($this->menuAdminObj != null AND !$this->menuAdminObj->menu->isEmpty()) $this->includeTplObj($this->menuAdminObj);
       ?>
       <? //NavigationMenu_View::listView(); ?>
       <div id="bodywrap">
