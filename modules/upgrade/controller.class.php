@@ -25,7 +25,7 @@ class Upgrade_Controller extends Controller {
          $m['name'] = $module->{Model_Module::COLUMN_NAME};
          $m['inst_ver'] = $module->{Model_Module::COLUMN_VERSION_MAJOR}.'.'.$module->{Model_Module::COLUMN_VERSION_MINOR};
          $m['avail_ver'] = $vers;
-         if($m['inst_ver'] == $m['avail_ver']){
+         if((float)$m['inst_ver'] >= (float)$m['avail_ver']){
             $m['upgrade'] = false;
          } else {
             $isUpgradeAvailable = true;
