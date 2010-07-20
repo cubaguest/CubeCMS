@@ -66,7 +66,7 @@ class Courses_Model_Registrations extends Model_PDO {
       $dbst->bindValue(':surname', $surname, PDO::PARAM_STR);
       $dbst->bindValue(':degree', $degree, PDO::PARAM_STR);
       $dbst->bindValue(':grade', $grade, PDO::PARAM_STR);
-      $dbst->bindValue(':pracLen', $practiceLength, PDO::PARAM_INT);
+      $dbst->bindValue(':pracLen', $practiceLength, PDO::PARAM_STR);
       $dbst->bindValue(':phone', $phone, PDO::PARAM_STR);
       $dbst->bindValue(':mail', $mail, PDO::PARAM_STR|PDO::PARAM_NULL);
       $dbst->bindValue(':note', $note, PDO::PARAM_STR|PDO::PARAM_NULL);

@@ -51,9 +51,6 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->name->label();
          echo $this->formReg->name->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Vaše ctěné jméno')?><span />
-         </span>
       </div>
       <div class="course-regform-item">
          <?
@@ -61,9 +58,6 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->surname->label();
          echo $this->formReg->surname->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Vaše přijmení')?><span />
-         </span>
       </div>
       <div class="course-regform-item">
          <?
@@ -71,9 +65,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->degree->label();
          echo $this->formReg->degree->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Váš titul (Ing., Mgr., ...)')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('Váš titul (např. Mgr., DiS., Bc.)')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -81,9 +75,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->grade->label();
          echo $this->formReg->grade->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('např. sociální pracovník, vedoucí K-centra, nezaměstnaný')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('např. sociální pracovník, pedagog, student')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -91,9 +85,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->practiceLength->label();
          echo $this->formReg->practiceLength->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Jak dlouho vykonáváte praxi v daném oboru. Počet roků a pouze číslo.')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('jak dlouhou máte praxi v souvislosti s Vaším pracovním zařazením (např. 5 let, 7 měsíců...)')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -101,9 +95,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->phone->label();
          echo $this->formReg->phone->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Váš telefon (mobilní, pevná linka)')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('kontaktní telefon na Vás (pro případ sdělení náhlých změn těsně před kurzem, nefunkční email apod.)')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -111,9 +105,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->mail->label();
          echo $this->formReg->mail->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Vaše e-mailová adresa')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('Vaše emailová adresa, na kterou Vám potvrdíme přijetí přihlášky a budou zaslány bližší informace před konáním kurzu')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -121,9 +115,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->regNewsletter->label();
          echo $this->formReg->regNewsletter->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Chcete, aby Vám chodili novinky na e-mail?')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('(pokud chcete na uvedený e-mail získávat novinky o připravovaných kurzech, mimořádných slevách apod., zaškrtněte toto tlačítko)')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -132,9 +126,9 @@ $this->addJsPlugin($jQuery);
          $this->formReg->note->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
          echo $this->formReg->note->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Napište nám další Vaše požadavky či připomínky')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('Vaše poznámky či požadavky vztahující se ke kurzu (např. jako student bych chtěl požádat o studentskou slevu, uvedená praxe se vztahuje k době mého studia, nyní jsem nastoupila nově do zaměstnání, kde pracuji jako terénní pracovnice, fakturu prosím zašlete na tuto adresu: Jarní 5, která je odlišná od fakturační, předem děkuji)')?>
+         </p>
       </div>
    </fieldset>
 
@@ -146,9 +140,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->payType->label();
          echo $this->formReg->payType->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Jak si přejete hradit platbu za kurz?')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('pokud Vás na kurz vysílá Vaše organizace a bude jej za Vás hradit, ponechte zatrženou možnost. V případě, že se kurzu účastníte jako soukromá osoba, zaškrtněte prosím tlačítko Soukromě')?>
+         </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
          <?
@@ -157,9 +151,9 @@ $this->addJsPlugin($jQuery);
          $this->formReg->orgName->html()->setAttrib('size', 57);
          echo $this->formReg->orgName->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Název organizace pro kterou pracujete')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('název Vaší organizace s uvedením její právní formy (a.s., o.s., ...)')?>
+         </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
          <?
@@ -168,9 +162,9 @@ $this->addJsPlugin($jQuery);
          $this->formReg->orgAddress->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
          echo $this->formReg->orgAddress->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Adresa organizace')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('adresa sídla Vaší organizace, na kterou bude vystavena a zaslána faktura ke kurzu')?>
+         </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
          <?
@@ -178,9 +172,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->orgICO->label();
          echo $this->formReg->orgICO->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('IČO organizace')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('IČ Vaší organizace')?>
+         </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
          <?
@@ -188,9 +182,9 @@ $this->addJsPlugin($jQuery);
          echo $this->formReg->orgPhone->label();
          echo $this->formReg->orgPhone->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Telefon do arganizace')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('kontaktní telefon do Vaší organizace pro případ řešení nesrovnalostí na faktuře apod.')?>
+         </p>
       </div>
       <div class="course-regform-item course-regform-pay-private">
          <?
@@ -199,9 +193,9 @@ $this->addJsPlugin($jQuery);
          $this->formReg->privateAddress->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
          echo $this->formReg->privateAddress->Controll();
          ?>
-         <span class="course-regform-item-help">
-            <?=$this->_('Vaše adresa, která bude použita pro fakturaci')?><span />
-         </span>
+         <p class="course-regform-item-help">
+            <?=$this->_('Vaše adresa, na kterou bude vystavena a zaslána faktura ke kurzu')?>
+         </p>
       </div>
       <div class="course-regform-item">
          <?
@@ -216,28 +210,43 @@ $this->addJsPlugin($jQuery);
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         function regFormChangePay(){
-            var selPay = $('input[name=course_reg_payType]:checked').val();
-            if(selPay == 'organisation'){
-               $('div.course-regform-pay-org').show();
-               $('div.course-regform-pay-private').hide();
-            } else {
-               $('div.course-regform-pay-private').show();
-               $('div.course-regform-pay-org').hide();
-            }
+         $('.course-regform-item-help').append('<span></span>');
+
+         function regFormChangePay($obj){
+//            var selPay = $('input[name=course_reg_payType]:checked').val();
+            var selPay = $obj.val();
+            switch (selPay) {
+               case 'organisation':
+                  $('div.course-regform-pay-org').show();
+                  $('div.course-regform-pay-private').hide();
+                  break;
+               default:
+                  $('div.course-regform-pay-private').show();
+                  $('div.course-regform-pay-org').hide();
+         	}
          }
-         regFormChangePay();
-         $('input[name=course_reg_payType]').change(function(){
-            regFormChangePay();
+         regFormChangePay($('input[name=course_reg_payType]:checked'));
+
+         $('input[name=course_reg_payType]').click(function(){
+            regFormChangePay($(this));
+            $(this).focus();
          });
 
+         $('input[type=checkbox]').click(function(){$(this).focus()});
+
          $('.course-regform-item input, .course-regform-item textarea').focus(function(){
-            var $help = $(this).parent().children('span.course-regform-item-help');
-            $help.css('left', $(this).width()+230);
+            var $help = $(this).parent().children('p.course-regform-item-help');
+//            alert($(this).attr('type'));
+            if($(this).attr('type') == 'radio'){
+               $help.css('left', 400);
+            } else {
+               $help.css('left', $(this).width()+230);
+            }
             $help.show();
          });
+
          $('.course-regform-item input, .course-regform-item textarea').blur(function(){
-            var $help = $(this).parent().children('span.course-regform-item-help').fadeOut(200);
+            var $help = $(this).parent().children('p.course-regform-item-help').hide();
          });
       });
       /* ]]> */

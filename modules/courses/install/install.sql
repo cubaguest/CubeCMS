@@ -2,8 +2,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}courses` (
   `id_course` smallint(6) NOT NULL AUTO_INCREMENT,
   `url_key` varchar(100) COLLATE utf8_czech_ci DEFAULT NULL,
   `name` varchar(100) COLLATE utf8_czech_ci DEFAULT NULL,
+  `keywords` varchar(200) COLLATE utf8_czech_ci DEFAULT NULL,
+  `description` varchar(300) COLLATE utf8_czech_ci DEFAULT NULL,
   `text_short` varchar(500) COLLATE utf8_czech_ci DEFAULT NULL,
   `text` text COLLATE utf8_czech_ci,
+  `text_private` text COLLATE utf8_czech_ci,
   `text_clear` text COLLATE utf8_czech_ci,
   `date_start` date DEFAULT NULL,
   `date_stop` date DEFAULT NULL,
@@ -19,10 +22,25 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}courses` (
   `deleted` tinyint(1) DEFAULT '0',
   `id_user` smallint(5) unsigned NOT NULL,
   `allow_registration` tinyint(1) DEFAULT '0',
+  `rss_feed` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_course`,`id_user`),
   UNIQUE KEY `url_key` (`url_key`),
   KEY `fk_tb_users_id_user` (`id_user`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci AUTO_INCREMENT=1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}courses_has_users`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}courses_has_users` (
+  `id_user` smallint(6) NOT NULL,
+  `id_course` smallint(6) NOT NULL,
+  PRIMARY KEY (`id_user`,`id_course`),
+  KEY `fk_tb_users_id_user` (`id_user`),
+  KEY `fk_tb_courses_id_course` (`id_course`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
 -- --------------------------------------------------------
 
@@ -49,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}courses_registrations` (
   `surname` varchar(45) COLLATE utf8_czech_ci NOT NULL,
   `degree` varchar(3) COLLATE utf8_czech_ci DEFAULT NULL,
   `grade` varchar(100) COLLATE utf8_czech_ci DEFAULT NULL COMMENT 'Pracovní zařazení',
-  `practice_lenght` smallint(6) DEFAULT '0',
+  `practice_lenght` varchar(10) COLLATE utf8_czech_ci DEFAULT NULL,
   `phone` varchar(16) COLLATE utf8_czech_ci DEFAULT NULL,
   `email` varchar(100) COLLATE utf8_czech_ci DEFAULT NULL,
   `note` varchar(400) COLLATE utf8_czech_ci DEFAULT NULL,
@@ -66,8 +84,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}courses_registrations` (
   KEY `fk_tb_courses_registrations_tb_courses` (`id_course`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
 --
--- Struktura tabulky `vypecky_lecturers_has_courses`
+-- Struktura tabulky `{PREFIX}lecturers_has_courses`
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}lecturers_has_courses` (

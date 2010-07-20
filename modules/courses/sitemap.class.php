@@ -3,18 +3,19 @@ class Courses_SiteMap extends SiteMap {
 	public function run() {
       $coursesM = new Courses_Model_Courses();
       // kategorie
-      $this->addCategoryItem(new DateTime($coursesM->getLastChange()));
+      $this->addCategoryItem($coursesM->getLastChange());
       // články
       if($this->isFull()){
-         $articles = $articleModel->getListAll($this->category()->getId());
+         $courses = $coursesM->getCourses();
       } else {
-         $articles = $articleModel->getList($this->category()->getId(),0,self::SHORT_NUM_RECORD_PER_CAT);
+         $courses = $coursesM->getCourses(0,self::SHORT_NUM_RECORD_PER_CAT);
       }
 
-      while ($article = $articles->fetch()) {
-         $this->addItem($this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
-            $article->{Articles_Model_Detail::COLUMN_NAME},
-            new DateTime($article->{Articles_Model_Detail::COLUMN_EDIT_TIME}));
+      foreach ($courses as $course) {
+         $this->addItem($this->link()->route('detail', array(
+             'urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY})),
+            $course->{Courses_Model_Courses::COLUMN_NAME},
+            new DateTime($course->{Courses_Model_Courses::COLUMN_TIME_EDIT}));
       }
       $this->addArchiveLink();
 	}

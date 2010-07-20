@@ -1,8 +1,9 @@
 <?
 // načtení detailu
-$this->addPageTitle($this->course->{Courses_Model_Courses::COLUMN_NAME});
+Template_Core::addToPageTitle($this->course->{Courses_Model_Courses::COLUMN_NAME});
 $this->addPageHeadline($this->course->{Courses_Model_Courses::COLUMN_NAME});
-
+Template_Core::setPageKeywords($this->course->{Courses_Model_Courses::COLUMN_KEYWORDS});
+Template_Core::setPageDescription($this->course->{Courses_Model_Courses::COLUMN_DESCRIPTION});
 
 $dateStart = new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_START});
 if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
@@ -75,15 +76,26 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
       <br />
 
       <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT} ?>
-         <hr class="reseter" />
-         <br />
-         <h2><?=$this->_('Lektoři kurzu')?></h2>
-         <?
-         foreach ($this->lecturers as $lecturer) {?>
+      <hr class="reseter" />
+      <br />
+
+      <?if($this->isPrivate === true AND $this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} != null){?>
+      <h2><?=$this->_('Neveřejná data');?></h2>
+      <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} ?>
+      <hr class="reseter" />
+      <br />
+      <?}?>
+
+      <h2><?=$this->_('Lektoři kurzu')?></h2>
+      <?
+         foreach ($this->lecturers as $lecturer) {
+            if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){
+            ?>
          <p style="float: left">
             <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
             .  Lecturers_Controller::DATA_DIR.URL_SEPARATOR.$lecturer->{Lecturers_Model::COLUMN_IMAGE}?>" alt="" />
          </p>
+         <?}?>
          <span class="course-lecturer-name">
          <?
          if($lecturer->{Lecturers_Model::COLUMN_DEGREE} != null)
@@ -101,6 +113,9 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
          $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route(), 'text' => $this->_('Zpět na seznam kurzů')));
          echo '<br />';
          echo $this->toolbox;
+      if($this->course->{Courses_Model_Courses::COLUMN_ALLOW_REG} == true AND $this->freeSeats > 0){
+         $this->includeTpl("registration.phtml");
+      }
    ?>
 </div>
 

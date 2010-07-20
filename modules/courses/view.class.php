@@ -31,9 +31,6 @@ class Courses_View extends View {
 
    public function showCourseView() {
       $this->template()->addTplFile("detail.phtml");
-      if($this->course->{Courses_Model_Courses::COLUMN_ALLOW_REG} == true AND $this->freeSeats > 0){
-         $this->template()->addTplFile("registration.phtml");
-      }
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
 
@@ -91,8 +88,27 @@ class Courses_View extends View {
 
    public function registrationsCourseView() {
       $this->template()->addTplFile("list_registrations.phtml");
+   }
+   
+   public function exportFeedView() {
+      $feed = new Component_Feed(true);
 
+      $feed->setConfig('type', $this->type);
+      $feed->setConfig('css', 'rss.css');
+      $feed->setConfig('title', $this->category()->getName());
+      $feed->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
+      $feed->setConfig('link', $this->link());
+      foreach ($this->courses as $course) {
+         $desc = $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT};
 
+         $feed->addItem($course->{Courses_Model_Courses::COLUMN_NAME}, $desc,
+                 $this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY})),
+                 new DateTime($course->{Courses_Model_Courses::COLUMN_TIME_ADD}),
+                 $course->{Model_Users::COLUMN_USERNAME}, null, null,
+                 $course->{Courses_Model_Courses::COLUMN_URLKEY}."_".$course->{Courses_Model_Courses::COLUMN_ID});
+         
+      }
+      $feed->flush();
    }
 
 }

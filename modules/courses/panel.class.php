@@ -1,33 +1,30 @@
 <?php
-class Articles_Panel extends Panel {
-   const DEFAULT_NUM_ARTICLES = 3;
+class Courses_Panel extends Panel {
+   const DEFAULT_NUM_COURSES = 3;
    const DEFAULT_TYPE = 'list';
 
    public function panelController() {
+      $this->category()->getModule()->setDataDir(Courses_Controller::DATA_DIR);
    }
 
    public function panelView() {
-      $artM = new Articles_Model_List();
+      $coursesM = new Courses_Model_Courses();
       switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
-         case 'top':
-            $this->template()->topArticles = $artM->getListTop($this->category()->getId(), 0,
-                    $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES));
-            $this->template()->addTplFile('panel_top.phtml');
+         case 'random':
             break;
          case 'list':
          default:
-            $this->template()->newArticles = $artM->getList($this->category()->getId(), 0,
-                    $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES));
+            $this->template()->courses = $coursesM->getCoursesFromDate(new DateTime(), 0,
+                    $this->panelObj()->getParam('num',self::DEFAULT_NUM_COURSES));
             $this->template()->addTplFile('panel.phtml');
             break;
       }
-      $this->template()->rssLink = $this->link()->route('exportFeed', array('type' => 'rss'));
-
+      $this->template()->courseImagesPath = $this->category()->getModule()->getDataDir(true);
    }
 
    public static function settingsController(&$settings,Form &$form) {
-      $elemNum = new Form_Element_Text('num', 'Počet článků v panelu');
-      $elemNum->setSubLabel('Výchozí: '.self::DEFAULT_NUM_ARTICLES.'');
+      $elemNum = new Form_Element_Text('num', 'Počet kurzů v panelu');
+      $elemNum->setSubLabel('Výchozí: '.self::DEFAULT_NUM_COURSES.'');
       $elemNum->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemNum,'basic');
 
@@ -36,7 +33,7 @@ class Articles_Panel extends Panel {
       }
 
       $elemType = new Form_Element_Select('type', 'Typ panelu');
-      $types = array('Seznam' => 'list', 'Seznam - Nejčtenější' => 'top');
+      $types = array('Seznam' => 'list', 'Náhodný' => 'random');
       $elemType->setOptions($types);
       $elemType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TYPE, $types).'');
       $form->addElement($elemType,'basic');

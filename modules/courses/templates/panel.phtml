@@ -7,15 +7,13 @@ $backImg = null;
 if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
-
-if($this->rssLink != null){?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-<?}?>
+?>
 <p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
 <div style="<?=$backImg?>">
-   <?foreach ($this->newArticles as $article) {?>
-   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-      title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
+   <?foreach ($this->courses as $course) {?>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($course->{Courses_Model_Courses::COLUMN_NAME})?>"><?=vve_tpl_truncate($course->{Courses_Model_Courses::COLUMN_NAME},25)?></a><br />
+      <p><?=$course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}?></p>
    <?}?>
 </div>
 <p class="panelLinkMore">
