@@ -12,6 +12,11 @@ if($this->edit) {
 $this->form->textShort->html()->setAttrib('cols', 80)->setAttrib('rows', 10)->addClass("mceEditorSimple");
 $this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
 $this->form->textPrivate->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+$this->form->name->html()->setAttrib('size', 70);
+$this->form->place->html()->setAttrib('size', 70);
+$this->form->urlkey->html()->setAttrib('size', 70);
+$this->form->metaKeywords->html()->setAttrib('size', 70);
+$this->form->metaDesc->html()->setAttrib('cols', 73)->setAttrib('rows', 3);
 
 $tinymce = new JsPlugin_TinyMce();
 $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
