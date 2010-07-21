@@ -197,14 +197,23 @@ class Articles_Model_Detail extends Model_PDO {
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
           ." WHERE (".Articles_Model_Detail::COLUMN_ID ." = :id)");
       $dbst->bindParam(':id', $idArticle, PDO::PARAM_INT);
-      return $dbst->execute();
+      $dbst->execute();
+
+      // smažeme předchozí spojení článek <> privátní uživatel
+      $this->deleteArticlePrivateUsersConnections($idArticle);
    }
 
    /**
     * Metoda vymaže články podle zadaného id kategorie
     * @param int $id -- id kategorie
+    * @todo - patří dodělat mazání privátních uživatelů
     */
    public function deleteArticleByCat($id) {
+      $modelList = new Articles_Model_List();
+      $articles = $modelList->getList($id, 0, 10000, false);
+      while ($article = $articles->fetch()) {
+         $this->deleteArticlePrivateUsersConnections($article->{self::COLUMN_ID});
+      }
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
           ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
