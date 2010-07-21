@@ -217,6 +217,21 @@ class Articles_Controller extends Controller {
 
       $editForm->name->setValues($article->{Articles_Model_Detail::COLUMN_NAME});
       $editForm->text->setValues($article->{Articles_Model_Detail::COLUMN_TEXT});
+      if($editForm->haveElement('textPrivate')){
+         $editForm->textPrivate->setValues($article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE});
+         // přidání uživatelů
+         $users = $model->getArticlePrivateUsers($article->{Articles_Model_Detail::COLUMN_ID});
+         $selected = array();
+         foreach ($users as $user) {
+            array_push($selected, $user->{Articles_Model_Detail::COLUMN_A_H_U_ID_USER});
+         }
+         $editForm->privateUsers->setValues($selected);
+         unset ($selected);
+         unset ($users);
+
+      }
+      $editForm->metaKeywords->setValues($article->{Articles_Model_Detail::COLUMN_KEYWORDS});
+      $editForm->metaDesc->setValues($article->{Articles_Model_Detail::COLUMN_DESCRIPTION});
       $editForm->annotation->setValues($article->{Articles_Model_Detail::COLUMN_ANNOTATION});
       $editForm->urlkey->setValues($article->{Articles_Model_Detail::COLUMN_URLKEY});
       $editForm->art_id->setValues($article->{Articles_Model_Detail::COLUMN_ID});
@@ -321,7 +336,8 @@ class Articles_Controller extends Controller {
          while ($user = $usersList->fetchObject()) {
             $ePrivateUsers->setOptions(
                  array($user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}
-                 ." ".$user->{Model_Users::COLUMN_SURNAME} => $user->{Model_Users::COLUMN_ID}), true);
+                 ." ".$user->{Model_Users::COLUMN_SURNAME}.' - '.$user->{Model_Users::COLUMN_GROUP_NAME}
+                 => $user->{Model_Users::COLUMN_ID}), true);
          }
          $form->addElement($ePrivateUsers, $fGrpPrivate);
 
