@@ -357,7 +357,8 @@ class Courses_Controller extends Controller {
       while ($user = $usersList->fetchObject()) {
          $ePrivateUsers->setOptions(
                  array($user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}
-                 ." ".$user->{Model_Users::COLUMN_SURNAME} => $user->{Model_Users::COLUMN_ID}), true);
+                 ." ".$user->{Model_Users::COLUMN_SURNAME}.' - '.$user->{Model_Users::COLUMN_GROUP_NAME}
+                 => $user->{Model_Users::COLUMN_ID}), true);
       }
       $form->addElement($ePrivateUsers, $fGrpPrivate);
 
