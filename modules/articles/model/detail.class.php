@@ -42,7 +42,12 @@ class Articles_Model_Detail extends Model_PDO {
       // generování unikátního klíče
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID,$id);
-
+      if($textPrivate == null){
+         $textPrivate = array();
+         foreach (Locale::getAppLangs() as $code) {
+            $textPrivate[$code] = null;
+         }
+      }
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
          self::COLUMN_TEXT_PRIVATE => $textPrivate, self::COLUMN_KEYWORDS => $keywords,

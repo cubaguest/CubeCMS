@@ -84,7 +84,7 @@ class Photogalerymed_Controller extends Articles_Controller {
     * @param <type> $urlkeys
     * @param <type> $form
     */
-   protected function saveArticle($names, $urlkeys, $form, $article=null) {
+   protected function saveArticle($names, $urlkeys,Form $form, $article=null) {
       // přejmenování adresáře
       $retu = parent::saveArticle($names, $urlkeys, $form, $article);
 
