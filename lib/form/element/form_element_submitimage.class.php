@@ -43,7 +43,7 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
     */
    public function populate() {
       if(isset ($_REQUEST[$this->getName()])){
-         $this->values = $_REQUEST[$this->getName()];
+         $this->values = array('x' => 0, 'y' => 0);
       } else if(isset ($_REQUEST[$this->getName().'_x']) AND isset ($_REQUEST[$this->getName().'_y'])) {
          $this->values = array('x' => $_REQUEST[$this->getName().'_x'],
                          'y' => $_REQUEST[$this->getName().'_y']);
