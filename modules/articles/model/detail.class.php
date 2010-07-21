@@ -59,6 +59,7 @@ class Articles_Model_Detail extends Model_PDO {
           ." SET ".$this->getUpdateValues()
           ." WHERE ".self::COLUMN_ID." = :id");
          $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+         $dbst->execute();
       } else {
          if($idCat == 0){
             throw new InvalidArgumentException($this->_('Při ukládání nového článku musí být zadáno id'), 1);
@@ -81,8 +82,8 @@ class Articles_Model_Detail extends Model_PDO {
          foreach ($idPrivateUsers as $idU) {
             $this->saveArticlePrivateUsersConnect($id, $idU);
          }
-      }
-      return $id;
+     }
+     return $id;
    }
 
    public function saveArticlePrivateUsersConnect($idArticle, $idUser) {

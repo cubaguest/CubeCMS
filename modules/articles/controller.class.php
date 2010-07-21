@@ -259,13 +259,13 @@ class Articles_Controller extends Controller {
     * @param <type> $urlkeys
     * @param <type> $form
     */
-   protected function saveArticle($names, $urlkeys, $form, $article=null) {
+   protected function saveArticle($names, $urlkeys,Form $form, $article=null) {
       if($form->art_id == null) $idart = null;
       else $idart = $form->art_id->getValues();
 
       $textPrivate = null;
       $idPrivateUsers = array();
-      if($this->category()->getParam('allow_private_zone', false) == true){
+      if($form->haveElement('textPrivate') == true){
          $textPrivate = $form->textPrivate->getValues();
          $idPrivateUsers = $form->privateUsers->getValues();
       }
