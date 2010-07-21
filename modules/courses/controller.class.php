@@ -86,8 +86,6 @@ class Courses_Controller extends Controller {
          $this->view()->isPrivate = true;
       }
 
-      flush();
-
       if ($this->category()->getRights()->isWritable()) {
          $formDelete = new Form('course_delete_');
 
