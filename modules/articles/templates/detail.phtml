@@ -1,8 +1,15 @@
 <? // načtení detailu
-$this->addCssFile("style.css");
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
-$this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
-
+$h1 = $this->article->{Articles_Model_Detail::COLUMN_NAME};
+//$this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
+if((string)$this->article->{Articles_Model_Detail::COLUMN_KEYWORDS} != null){
+   Template_Core::setPageKeywords($this->article->{Articles_Model_Detail::COLUMN_KEYWORDS});
+}
+if((string)$this->article->{Articles_Model_Detail::COLUMN_DESCRIPTION} != null){
+   Template_Core::setPageDescription($this->article->{Articles_Model_Detail::COLUMN_DESCRIPTION});
+} else if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
+   Template_Core::setPageDescription($this->article->{Articles_Model_Detail::COLUMN_ANNOTATION});
+}
 
 $piroBox = new JsPlugin_PiroBox();
 $this->addJsPlugin($piroBox);
@@ -11,6 +18,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
 ?>
 
 <div class="article-detail">
+   <h1><?=$h1?></h1>
    <?
    if($this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
    <div class="article-detail-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
@@ -18,6 +26,11 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    <?}?>
    <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />
+   <?if($this->allowPrivate === true){?>
+      <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}?>
+      <hr class="reseter" />
+   <?}?>
+   <br />
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
@@ -41,6 +54,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
       'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
               'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
               'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
+              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
               'shares' => $this->shares));
    
    echo '<br />';

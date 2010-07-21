@@ -4,6 +4,7 @@
  */
 class Articles_Model_Detail extends Model_PDO {
    const DB_TABLE = 'articles';
+   const DB_TABLE_ART_HAS_PRIVATE_USERS = 'articles_has_private_users';
 
 /**
  * Názvy sloupců v databázi
@@ -12,6 +13,9 @@ class Articles_Model_Detail extends Model_PDO {
    const COLUMN_TEXT = 'text';
    const COLUMN_ANNOTATION = 'annotation';
    const COLUMN_TEXT_CLEAR = 'text_clear';
+   const COLUMN_TEXT_PRIVATE = 'text_private';
+   const COLUMN_KEYWORDS = 'keywords';
+   const COLUMN_DESCRIPTION = 'description';
    const COLUMN_URLKEY = 'urlkey';
    const COLUMN_ADD_TIME = 'add_time';
    const COLUMN_EDIT_TIME = 'edit_time';
@@ -22,6 +26,9 @@ class Articles_Model_Detail extends Model_PDO {
    const COLUMN_SHOWED = 'viewed';
    const COLUMN_PUBLIC = 'public';
 
+   const COLUMN_A_H_U_ID_ARTICLE = 'id_article';
+   const COLUMN_A_H_U_ID_USER = 'id_user';
+
    /**
     * Metoda uloží novinku do db
     *
@@ -29,16 +36,19 @@ class Articles_Model_Detail extends Model_PDO {
     * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveArticle($name, $text, $annotation, $urlKey, $idCat = 0, $idUser = 0, $public = true, $id = null) {
+   public function saveArticle($name, $text, $annotation, $urlKey, $keywords, $description, $idCat = 0,
+           $idUser = 0, $public = true, $id = null, $textPrivate = null,
+           $idPrivateUsers = array(), $image = null) {
       // generování unikátního klíče
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID,$id);
 
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
-          self::COLUMN_ANNOTATION => $annotation,
-             self::COLUMN_URLKEY => $urlKey, self::COLUMN_PUBLIC => $public,
-            self::COLUMN_TEXT_CLEAR => vve_strip_tags($text)));
+         self::COLUMN_TEXT_PRIVATE => $textPrivate, self::COLUMN_KEYWORDS => $keywords,
+         self::COLUMN_DESCRIPTION => $description, self::COLUMN_ANNOTATION => $annotation,
+         self::COLUMN_URLKEY => $urlKey, self::COLUMN_PUBLIC => $public,
+         self::COLUMN_TEXT_CLEAR => vve_strip_tags($text)));
 
       $dbc = new Db_PDO();
 
@@ -49,7 +59,6 @@ class Articles_Model_Detail extends Model_PDO {
           ." SET ".$this->getUpdateValues()
           ." WHERE ".self::COLUMN_ID." = :id");
          $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-         return $dbst->execute();
       } else {
          if($idCat == 0){
             throw new InvalidArgumentException($this->_('Při ukládání nového článku musí být zadáno id'), 1);
@@ -62,8 +71,63 @@ class Articles_Model_Detail extends Model_PDO {
          $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
              ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
 
-         return $dbc->lastInsertId();
+         $id = $dbc->lastInsertId();
       }
+
+      // smažeme předchozí spojení článek <> privátní uživatel
+      $this->deleteArticlePrivateUsersConnections($id);
+
+      if(!empty ($idPrivateUsers)){
+         foreach ($idPrivateUsers as $idU) {
+            $this->saveArticlePrivateUsersConnect($id, $idU);
+         }
+      }
+      return $id;
+   }
+
+   public function saveArticlePrivateUsersConnect($idArticle, $idUser) {
+      // smažeme předchozí spojení
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)." "
+                 ."(".self::COLUMN_A_H_U_ID_ARTICLE.",". self::COLUMN_A_H_U_ID_USER.")"
+                 ." VALUES (:idArticle, :idUser)");
+      $dbst->execute(array(":idArticle" => $idArticle, ':idUser' => $idUser));
+   }
+
+   public function deleteArticlePrivateUsersConnections($idArticle) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)
+          ." WHERE (".self::COLUMN_A_H_U_ID_ARTICLE ." = :idArticle)");
+      $dbst->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+      return $dbst->execute();
+   }
+
+   /**
+    * Metoda vrací kurzu podle zadaného klíče
+    *
+    * @param string -- url klíč kurzu
+    * @return PDOStatement -- pole s kurzem
+    */
+   public function getArticlePrivateUsers($ida) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)
+         ." WHERE (".self::COLUMN_A_H_U_ID_ARTICLE." = :ida)");
+      $dbst->execute(array(':ida' => (int)$ida));
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      return $dbst->fetchAll();
+   }
+
+   public function isPrivateUser($idUser, $idArticle) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)
+                 ." WHERE (".self::COLUMN_A_H_U_ID_ARTICLE ." = :idUser)"
+              ." AND (".self::COLUMN_A_H_U_ID_USER ." = :idArticle)");
+      $dbst->execute(array(':idUser' => $idUser, ':idArticle' => $idArticle));
+      $count = $dbst->fetch();
+      if($count[0] != 0){
+         return true;
+      }
+      return false;
    }
 
    /**

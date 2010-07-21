@@ -127,6 +127,12 @@ class Articles_View extends View {
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
       $c->pdf()->writeHTML((string)$article->{Articles_Model_Detail::COLUMN_TEXT}, true, 0, true, 10);
 
+      // pokud je private přidáme jej
+      if($this->allowPrivate){
+         $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
+         $c->pdf()->writeHTML((string)$article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}, true, 0, true, 10);
+      }
+
       return $c;
    }
 

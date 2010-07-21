@@ -149,6 +149,14 @@ class Articles_Controller extends Controller {
          }
          $this->view()->comments = $compComments;
       }
+
+      // private zone
+      $this->view()->allowPrivate = false;
+      if($this->category()->getParam('allow_private_zone', false) == true
+              AND (Auth::getGroupName() == 'admin' OR
+              $artM->isPrivateUser(Auth::getUserId(), $article->{Articles_Model_Detail::COLUMN_ID}))){
+         $this->view()->allowPrivate = true;
+      }
    }
 
    /**
@@ -179,8 +187,8 @@ class Articles_Controller extends Controller {
          $urlkeys = $addForm->urlkey->getValues();
          $names = $addForm->name->getValues();
          $urlkeys = $this->createUrlKey($urlkeys, $names);
-         $model = new Articles_Model_Detail();
          $lasId = $this->saveArticle($names, $urlkeys, $addForm);
+         $model = new Articles_Model_Detail();
          $art = $model->getArticleById($lasId);
          $this->infoMsg()->addMessage($this->_('Uloženo'));
          $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
@@ -239,9 +247,19 @@ class Articles_Controller extends Controller {
    protected function saveArticle($names, $urlkeys, $form, $article=null) {
       if($form->art_id == null) $idart = null;
       else $idart = $form->art_id->getValues();
+
+      $textPrivate = null;
+      $idPrivateUsers = array();
+      if($this->category()->getParam('allow_private_zone', false) == true){
+         $textPrivate = $form->textPrivate->getValues();
+         $idPrivateUsers = $form->privateUsers->getValues();
+      }
+
       $model = new Articles_Model_Detail();
       $lastId = $model->saveArticle($names, $form->text->getValues(), $form->annotation->getValues(), $urlkeys,
-              $this->category()->getId(), Auth::getUserId(),$form->public->getValues(),$idart);
+              $form->metaKeywords->getValues(), $form->metaDesc->getValues(),
+              $this->category()->getId(), Auth::getUserId(),$form->public->getValues(),$idart,
+              $textPrivate, $idPrivateUsers);
 
       $this->infoMsg()->addMessage($this->_('Uloženo'));
       return $lastId;
@@ -273,31 +291,71 @@ class Articles_Controller extends Controller {
    protected function createForm() {
       $form = new Form('ardicle_');
 
+      $fGrpTexts = $form->addGroup('texts', $this->_('Texty'));
+
       $iName = new Form_Element_Text('name', $this->_('Nadpis'));
       $iName->setLangs();
       $iName->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
-      $form->addElement($iName);
+      $form->addElement($iName, $fGrpTexts);
 
       $iAnnot = new Form_Element_TextArea('annotation', $this->_('Anotace'));
       $iAnnot->setLangs();
-      $form->addElement($iAnnot);
+      $form->addElement($iAnnot, $fGrpTexts);
 
       $iText = new Form_Element_TextArea('text', $this->_('Text'));
       $iText->setLangs();
       if($this->getOption('textEmpty', false) == false) {
          $iText->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
       }
-      $form->addElement($iText);
+      $form->addElement($iText, $fGrpTexts);
+
+      if($this->category()->getParam('allow_private_zone', false) == true){
+         $fGrpPrivate = $form->addGroup('privateZone', $this->_('Privátní zóna'),
+                 $this->_('Položky vyditelné pouze určitým uživatelům. Administrátorům jsou tyto informace vždy viditelné.'));
+
+         $ePrivateUsers = new Form_Element_Select('privateUsers', $this->_('Uživatelé'));
+         $ePrivateUsers->setMultiple(true);
+
+         $modelUsers = new Model_Users();
+         $usersList = $modelUsers->getUsersList();
+         while ($user = $usersList->fetchObject()) {
+            $ePrivateUsers->setOptions(
+                 array($user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}
+                 ." ".$user->{Model_Users::COLUMN_SURNAME} => $user->{Model_Users::COLUMN_ID}), true);
+         }
+         $form->addElement($ePrivateUsers, $fGrpPrivate);
+
+         $iPrivateText = new Form_Element_TextArea('textPrivate', $this->_('Text'));
+         $iPrivateText->setLangs();
+         $form->addElement($iPrivateText, $fGrpPrivate);
+      }
+
+      $fGrpParams = $form->addGroup('params', $this->_('Parametry'));
+
+//      $eImage = new Form_Element_File('image', $this->_('Obrázek'));
+//      $eImage->addValidation(new Form_Validator_FileExtension('jpg'));
+//      $eImage->setUploadDir($this->category()->getModule()->getDataDir());
+//      $form->addElement($eImage, $fGrpParams);
 
       $iUrlKey = new Form_Element_Text('urlkey', $this->_('Url klíč'));
       $iUrlKey->setLangs();
       $iUrlKey->setSubLabel($this->_('Pokud není klíč zadán, je generován automaticky'));
-      $form->addElement($iUrlKey);
+      $form->addElement($iUrlKey, $fGrpParams);
+
+      $iKeywords = new Form_Element_Text('metaKeywords', $this->_('Klíčová slova'));
+      $iKeywords->setLangs();
+      $iKeywords->setSubLabel($this->_('Pokud nesjou zadány, jsou použiti z kategorie'));
+      $form->addElement($iKeywords, $fGrpParams);
+
+      $iDesc = new Form_Element_TextArea('metaDesc', $this->_('Popisek'));
+      $iDesc->setLangs();
+      $iDesc->setSubLabel($this->_('Pokud není zadán, je použit z kategorie'));
+      $form->addElement($iDesc, $fGrpParams);
 
       $iPub = new Form_Element_Checkbox('public', $this->_('Veřejný'));
       $iPub->setSubLabel($this->_('Veřejný - viditelný všem návštěvníkům'));
       $iPub->setValues(true);
-      $form->addElement($iPub);
+      $form->addElement($iPub, $fGrpParams);
 
       $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $form->addElement($iSubmit);
@@ -328,6 +386,14 @@ class Articles_Controller extends Controller {
       $article = $modle->getArticle($this->getRequest('urlkey'));
       if($article === false) return false;
       $this->view()->article = $article;
+
+      // private zone
+      $this->view()->allowPrivate = false;
+      if($this->category()->getParam('allow_private_zone', false) == true
+              AND (Auth::getGroupName() == 'admin' OR
+              $artM->isPrivateUser(Auth::getUserId(), $article->{Articles_Model_Detail::COLUMN_ID}))){
+         $this->view()->allowPrivate = true;
+      }
    }
 
    /**
@@ -390,12 +456,24 @@ class Articles_Controller extends Controller {
       $elemCommentsClosed->setSubLabel('Výchozí: diskuse nejsou uzavírány');
        $form->addElement($elemCommentsClosed, 'discussion');
 
+      $fGrpPrivate = $form->addGroup('privateZone', 'Privátní zóna', "Privátní zóna povoluje
+         vložení textů, které jsou viditelné pouze vybraným uživatelům. U každého článku tak
+         vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům.");
+
+      $elemAllowPrivateZone = new Form_Element_Checkbox('allow_private_zone',
+              'Povolit privátní zónu');
+      $form->addElement($elemAllowPrivateZone, $fGrpPrivate);
+      if(isset($settings['allow_private_zone'])) {
+         $form->allow_private_zone->setValues($settings['allow_private_zone']);
+      }
+
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scroll'] = $form->scroll->getValues();
          $settings['discussion_allow'] = $form->discussion_allow->getValues();
          $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
          $settings['discussion_closed'] = $form->discussion_closed->getValues();
+         $settings['allow_private_zone'] = $form->allow_private_zone->getValues();
       }
    }
 }
