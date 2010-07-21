@@ -201,7 +201,7 @@ class Courses_Controller extends Controller {
       $iIdElem->setValues($course->{Courses_Model_Courses::COLUMN_ID});
       $editForm->addElement($iIdElem);
 
-      // přidání uživaatelů
+      // přidání uživatelů
       $users = $model->getCourseUsers($course->{Courses_Model_Courses::COLUMN_ID});
       $selected = array();
       foreach ($users as $user) {
@@ -871,6 +871,12 @@ class Courses_Controller extends Controller {
       $this->view()->type = $this->getRequest('type', 'rss');
       $model = new Courses_Model_Courses();
       $this->view()->courses = $model->getCoursesForFeed(VVE_FEED_NUM);
+
+      $lecturers = array();
+      foreach ($this->view()->courses as $course) {
+         $lecturers[$course->{Courses_Model_Courses::COLUMN_ID}] = $model->getLecturers($course->{Courses_Model_Courses::COLUMN_ID});
+      }
+      $this->view()->lecturers = $lecturers;
    }
 
    /**

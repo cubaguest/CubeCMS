@@ -302,6 +302,7 @@ class Courses_Model_Courses extends Model_PDO {
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE_LECTURERS_HAS_COURSES)." AS l_has_c"
               ." JOIN ".Db_PDO::table(Lecturers_Model::DB_TABLE)." AS tb_l ON tb_l.".Lecturers_Model::COLUMN_ID." = l_has_c.".self::COLUMN_L_H_C_ID_LECTURER
               ." WHERE tb_l.".Lecturers_Model::COLUMN_DELETED." = 0 AND l_has_c.".self::COLUMN_L_H_C_ID_COURSE." = :idc"
+              ." ORDER BY ".Lecturers_Model::COLUMN_SURNAME
               );
 
       $dbst->execute(array(':idc' => $idc));

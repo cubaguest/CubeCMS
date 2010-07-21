@@ -99,7 +99,37 @@ class Courses_View extends View {
       $feed->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
       $feed->setConfig('link', $this->link());
       foreach ($this->courses as $course) {
-         $desc = $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT};
+         $desc = null;
+         // datum
+         $desc .= "<strong>Konání kurzu:</strong> ".vve_date("%x", new DateTime($course->{Courses_Model_Courses::COLUMN_DATE_START}));
+         if($course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null){
+            $desc .= ' - '.vve_date("%x", new DateTime($course->{Courses_Model_Courses::COLUMN_DATE_STOP}));
+         }
+         $desc .= '<br />';
+
+         // cena
+         if($course->{Courses_Model_Courses::COLUMN_PRICE} != null|0){
+            $desc .= "<strong>Cena:</strong> ".$course->{Courses_Model_Courses::COLUMN_PRICE}." Kč<br /> ";
+         }
+
+         // místo
+         $desc .= "<strong>Místo konání:</strong> ".$course->{Courses_Model_Courses::COLUMN_PLACE}."<br /> ";
+
+         // lektoři
+         $desc .= "<strong>Lektoři:</strong><br />";
+         foreach ($this->lecturers[$course->{Courses_Model_Courses::COLUMN_ID}] as $lecturer) {
+            $degree = $lecturer->{Lecturers_Model::COLUMN_DEGREE};
+            if($degree != null){
+               $desc .=  $degree;
+               if($degree[strlen($degree)-1] != '.'){
+                  $desc .=  '.';
+               }
+               $desc .=  ' ';
+            }
+            $desc .= $lecturer->{Lecturers_Model::COLUMN_SURNAME}." ".$lecturer->{Lecturers_Model::COLUMN_NAME}."<br />";
+         }
+
+         $desc .= $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT};
 
          $feed->addItem($course->{Courses_Model_Courses::COLUMN_NAME}, $desc,
                  $this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY})),
