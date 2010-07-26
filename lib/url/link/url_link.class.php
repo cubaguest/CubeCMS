@@ -397,16 +397,14 @@ class Url_Link {
       $paramsArr= array();
       // odstrannění otazníku na začátku
       if($params != null) {
-         $tmpParamsArray = array();
-         $tmpParamsArray = explode('&', $params);
-         // projití všech parametrů
-         foreach ($tmpParamsArray as $fullParam) {
-            $tmpParam = explode('=', $fullParam);
-            // kontrola, jestli je parametr zadán správně
-            if(isset($tmpParam[0]) AND isset($tmpParam[1])) {
-               $paramsArr[$tmpParam[0]] = urldecode($tmpParam[1]);
+         $paramsArr = $_GET;
+         $paramsArr['pepa'] = urlencode('pepíček celý ');
+         if(!function_exists('urlDecodeParam')){
+            function urlDecodeParam(&$param, $key) {
+               $param = urldecode($param);
             }
          }
+         array_walk_recursive($paramsArr, 'urlDecodeParam');
       }
       return $paramsArr;
    }
