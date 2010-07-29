@@ -44,7 +44,9 @@ function errMsg(msg, clear){
 }
 
 function showLoadBox(box, timeout){
-   if(typeof(timeout) == "undefined"){timeout = 5000;}
+   if(typeof(timeout) == "undefined"){
+      timeout = 5000;
+   }
    var jbox = $(box);
    var overBox = $('<div id="loadingBox" style="background-color: white; \n\
 text-align:center;">\n\
@@ -66,4 +68,15 @@ function hideLoadBox(){
    $('#loadingBox').fadeOut(500,function(){
       $('#loadingBox').remove();
    })
+}
+
+function vveLoadImage(src, callback){
+   var cacheImage = document.createElement('img');
+   //set the onload method before the src is called otherwise will fail to be called in IE
+   cacheImage.onload = function(){
+      if ($.isFunction(callback)) {
+         callback.call(cacheImage);
+      }
+   }
+   cacheImage.src = src;
 }
