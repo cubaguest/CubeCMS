@@ -1,0 +1,55 @@
+<?
+$this->addPageTitle($this->_('seznam odeslaných emailů'));
+$this->addPageHeadline($this->_('seznam odeslaných emailů'));
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addUIAccordion();
+$this->addJsPlugin($jQuery);
+?>
+
+<?=$this->includeTpl('navigation.phtml');?>
+<div class="module-mails-list-mails">
+   <?foreach ($this->mails as $mail) {?>
+   <h2><a href="#" title="<?=$this->_('Dateil mailu')?>"
+          ><?=$mail->{Mails_Model_SendMails::COLUMN_SUBJECT}.'&nbsp;-&nbsp;'
+          .vve_date('%x %X', new DateTime($mail->{Mails_Model_SendMails::COLUMN_DATE}))?></a></h2>
+   <div class="mail-detail">
+      <h3><?=$this->_('Příjemci')?></h3>
+      <div class="mail-recipients">
+         <?
+         $recs = explode(Mails_Model_SendMails::RECORD_SEPARATOR, $mail->{Mails_Model_SendMails::COLUMN_RECIPIENTS});
+         foreach ($recs as $rec) {?>
+            <a href="<?=$this->link()->clear()->param('mail', $rec)?>"
+               title="<?=$this->_('Odeslat e-mail na adresu').' '.$rec;?>"><?=$rec?></a>, 
+         <?}
+         ?>
+      </div>
+      <h3><?=$this->_('Obsah')?></h3>
+      <div class="mail-content">
+         <?=$mail->{Mails_Model_SendMails::COLUMN_CONTENT}?>
+      </div>
+      <?if($mail->{Mails_Model_SendMails::COLUMN_ATTACHMENTS} != null){?>
+      <div class="mail-attachments">
+         <?=$mail->{Mails_Model_SendMails::COLUMN_ATTACHMENTS}?>
+      </div>
+      <?}?>
+      <br />
+      <div class="mail-tools">
+         <a href="<?=$this->link()->route('composeMail')->param('sendmail',
+                 $mail->{Mails_Model_SendMails::COLUMN_ID})?>"
+            ><?=$this->_('Poslat znovu')?></a>
+      </div>
+   </div>
+   <?
+}
+?>
+   <script type="text/javascript">
+   /* <![CDATA[ */
+      $(function() {
+         $(".module-mails-list-mails").accordion();
+      });
+   /* ]]> */
+	</script>
+</div>
+<?
+echo $this->scrollComp;
+?>

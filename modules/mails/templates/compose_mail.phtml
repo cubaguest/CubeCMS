@@ -15,7 +15,7 @@ $this->addPageHeadline($this->_('odeslání e-mailu'));
       <tr>
          <td>
          <?echo $this->form->recipients->label()?><br />
-         <? $this->form->recipients->html()->setAttrib('cols', 60);
+         <? $this->form->recipients->html()->setAttrib('cols', 60)->setAttrib('rows', 5);
          echo $this->form->recipients->controll();?>
          <?echo $this->form->recipients->sublabel()?>
          <br />
@@ -30,16 +30,21 @@ $this->addPageHeadline($this->_('odeslání e-mailu'));
          </td>
       </tr>
       <tr>
-         <td>
-         <?echo $this->form->text->label()?><br />
+         <td>lkabel
+         <?echo $this->form->text->label()?>
+            <strong><?=$this->_('Edotir')?>:&nbsp;</strong>
+            <a href="<?=$this->link()?>#disableEditor"
+            onclick="toggleEditor('sendmail_text');"
+            title="<?=$this->_('vypnout/zapnout editor')?>"><?=$this->_('OFF/ON')?></a>
+            <br />
          <?
          $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40)->addClass('mceEditorSimple');
          echo $this->form->text->controll();?>
          <br />
          <strong><?=$this->_('Edotir')?>:&nbsp;</strong>
-         <a href="<?=$this->link()?>#disableEditor" 
+<!--         <a href="<?=$this->link()?>#disableEditor"
             onclick="toggleEditor('sendmail_text');"
-            title="<?=$this->_('vypnout/zapnout editor')?>"><?=$this->_('OFF/ON')?></a>
+            title="<?=$this->_('vypnout/zapnout editor')?>"><?=$this->_('OFF/ON')?></a>-->
          <br />
          <br />
          </td>
@@ -69,4 +74,4 @@ $this->addPageHeadline($this->_('odeslání e-mailu'));
 }
 </script>
 <br />
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route('list')));?>
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->clear()));?>

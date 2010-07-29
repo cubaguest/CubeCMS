@@ -6,30 +6,28 @@
 
 class Mails_View extends View {
 	public function mainView() {
-      $this->template()->addTplFile('mails_list.phtml');
+      $this->template()->addTplFile('main.phtml');
       // toolbox
-      if($this->rights()->isWritable()){
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_mail',$this->_('Přidat mail'),
-                 $this->link()->route('add_address'), $this->_('Přidat mail do knihy adres'), 'mail_add.png');
-         $this->toolbox = $toolbox;
-      }
+//      if($this->rights()->isWritable()){
+//         $toolbox = new Template_Toolbox();
+//         $toolbox->addTool('add_mail',$this->_('Přidat mail'),
+//                 $this->link()->route('add_address'), $this->_('Přidat mail do knihy adres'), 'mail_add.png');
+//         $this->toolbox = $toolbox;
+//      }
+      $this->page = 'main';
 	}
 
    public function listMailsView() {
-      $this->template()->addTplFile('mails_list.phtml');
+      $this->template()->addTplFile('main.phtml');
    }
 
    public function addMailView() {
-      $this->template()->addTplFile('edit_mail.phtml');
    }
 
    public function editMailView() {
-      $this->addMailView();
-      $this->edit = true;
    }
 
-   public function exportView() {
+   public function listMailsExportView() {
       $result = null;
       switch ($this->type) {
          case Mails_Controller::EXPORT_CSV:
@@ -53,9 +51,10 @@ class Mails_View extends View {
 //            Template_Output::setDownload('list.txt');
             Template_Output::sendHeaders();
             foreach ($this->mails as $mail) {
-               $result .= $mail['mail'];
-               if($mail['name'] != null) $result .= ' '.$mail['name'];
-               if($mail['surname'] != null) $result .= ' '.$mail['surname'];
+               $result .= $mail->{Mails_Model_Addressbook::COLUMN_MAIL};
+               if($mail->{Mails_Model_Addressbook::COLUMN_NAME} != null) $result .= ' '.$mail->{Mails_Model_Addressbook::COLUMN_NAME};
+               if($mail->{Mails_Model_Addressbook::COLUMN_SURNAME} != null) $result .= ' '.$mail->{Mails_Model_Addressbook::COLUMN_SURNAME};
+               if($mail->{Mails_Model_Addressbook::COLUMN_NOTE} != null) $result .= ' '.$mail->{Mails_Model_Addressbook::COLUMN_NOTE};
                $result .= "\n";
             }
             break;
@@ -67,8 +66,22 @@ class Mails_View extends View {
 
    public function deleteMailsView() {}
 
-   public function composeMailView() {
-      $this->template()->addTplFile('compose_mail.phtml');
+   public function addressBookView() {
+      $this->template()->addTplFile('addressbook.phtml');
+      $this->page = 'addressbook';
+   }
+
+   public function sendMailsListView() {
+      $this->template()->addTplFile('list_mails.phtml');
+      $this->page = 'sendMailsList';
+   }
+
+   public function addressListView(){
+      echo json_encode($this->respond);
+   }
+
+   public function groupsListView(){
+      echo json_encode($this->groups);
    }
 }
 ?>

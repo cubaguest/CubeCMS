@@ -1,0 +1,21 @@
+<?//Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true)?>
+<div>
+      <strong><?=$this->_('Přejít na');?>:</strong>&nbsp;
+      <?//if($this->page != 'main'){?>
+         <a href="<?=$this->link()->clear()->route()?>" title="<?=$this->_('Vytvořit e-mail')?>"
+            ><img src="<?=vve_get_tpl_file('icons/email_edit.png', VVE_TPL_FILE_IMAGE)?>" 
+               alt="icon send mail" />&nbsp;<?=$this->_('Vytvořit e-mail')?></a>
+      <?//}
+      //if($this->page != 'addressbook'){?>
+         <a href="<?=$this->link()->clear()->route('addressBook')?>" title="<?=$this->_('Adresář')?>"
+            ><img src="<?=vve_get_tpl_file('icons/book_addresses.png', VVE_TPL_FILE_IMAGE)?>"
+               alt="icon send mail" />&nbsp;<?=$this->_('Adresář')?></a>&nbsp;
+      <?//}
+      //if($this->page != 'sendMailsList'){?>
+         <a href="<?=$this->link()->clear()->route('sendMailsList')?>" title="<?=$this->_('Odesláné e-maily')?>"
+            ><img src="<?=vve_get_tpl_file('icons/email_go.png', VVE_TPL_FILE_IMAGE)?>"
+               alt="icon send mail" />&nbsp;<?=$this->_('Odesláné e-maily')?></a>
+      <?//}
+      ?>
+</div>
+<br />
