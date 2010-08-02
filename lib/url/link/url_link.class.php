@@ -217,10 +217,10 @@ class Url_Link {
    public function param($name, $value = null) {
       if($value !== null) {
          if(!is_array($name)) {
-            $this->paramsArray[$name] = rawurlencode($value);
+            $this->paramsArray[$name] = $value;
          } else {
             foreach ($name as $key => $val) {
-               $this->paramsArray[$key] = rawurlencode($val);
+               $this->paramsArray[$key] = $val;
             }
          }
       } else {
@@ -255,7 +255,7 @@ class Url_Link {
     */
    public function getParam($name, $defValue = null) {
       if(isset ($_GET[$name])){
-         return rawurldecode($_GET[$name]);
+         return urldecode($_GET[$name]);
       } else {
          return $defValue;
       }
@@ -398,7 +398,6 @@ class Url_Link {
       // odstrannění otazníku na začátku
       if($params != null) {
          $paramsArr = $_GET;
-         $paramsArr['pepa'] = urlencode('pepíček celý ');
          if(!function_exists('urlDecodeParam')){
             function urlDecodeParam(&$param, $key) {
                $param = urldecode($param);
