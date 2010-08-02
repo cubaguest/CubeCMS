@@ -153,6 +153,7 @@ class Component_Scroll extends Component {
     * Vnitřní metoda vypočítá startovací pozici záznamu
     */
    private function countStartRecord() {
+      $this->setConfig(self::CONFIG_START_RECORD, 0);
       if($this->getConfig(self::CONFIG_CNT_ALL_RECORDS) > $this->getRecordsOnPage()) {
          if($this->getConfig(self::CONFIG_BACKWARD) == false) {
             $this->setConfig(self::CONFIG_START_RECORD, ($this->selectPage-1)*$this->getRecordsOnPage());
