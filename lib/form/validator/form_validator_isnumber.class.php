@@ -32,16 +32,18 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      switch ($this->numberType) {
-         case 'float':
-            $element->addValidationConditionLabel(_("desetiné číslo"));
-            break;
-         case 'int':
-         default:
-            $element->addValidationConditionLabel(_("celé číslo"));
-            break;
+      if($element instanceof Form_Element_Text
+         OR $element instanceof Form_Element_TextArea){
+         switch ($this->numberType) {
+            case 'float':
+               $element->addValidationConditionLabel(_("desetiné číslo"));
+               break;
+            case 'int':
+            default:
+               $element->addValidationConditionLabel(_("celé číslo"));
+               break;
+         }
       }
-      
    }
 
    public function validate(Form_Element $elemObj) {
