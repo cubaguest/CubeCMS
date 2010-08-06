@@ -303,7 +303,7 @@ class Url_Link {
     * @param string $lang -- aktuální jazyk
     */
    public static function setLang($lang) {
-      if(Locale::getDefaultLang() != $lang){
+      if(Locales::getDefaultLang() != $lang){
          self::$currentlang = $lang;
       }
    }
@@ -312,13 +312,13 @@ class Url_Link {
     * Metoda nastavuje znovunahrání stránky
     * @param string -- externí odkaz na který se má přesměrovat (option)
     */
-   public function reload($link = null) {
+   public function reload($link = null, $code = 302) {
       if(Url_Request::isXHRRequest()){ // u XHR není nutný reload
       } else if (!headers_sent()) {
          if($link == null) {
-            header("Location: ".(string)$this);
+            header("Location: ".(string)$this, true, $code);
          } else {
-            header("Location: ".(string)$link);
+            header("Location: ".(string)$link, true, $code);
          }
          exit;
       } else {
