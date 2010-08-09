@@ -33,7 +33,7 @@ abstract class Controller {
 
    /**
     * Objket pro lokalizaci
-    * @var Locale
+    * @var Locales
     */
    public $locale = null;
 
@@ -95,10 +95,10 @@ abstract class Controller {
       // locales
       // pokud se jedná o zděděný kontroler tak nasatvíme na locales děděného kontroleru
       if(get_parent_class($this) != 'Controller'){
-         $this->locale = new Locale(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
+         $this->locale = new Locales(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
          $this->localeDomain = strtolower($this->moduleName);
       } else {
-         $this->locale = new Locale(strtolower($this->moduleName));
+         $this->locale = new Locales(strtolower($this->moduleName));
          $this->localeDomain = strtolower($this->moduleName);
       }
 
@@ -217,10 +217,13 @@ abstract class Controller {
     * @param string $name -- název parametru
     * @param mixed $def -- výchozí hodnota vrácená pokud nebyl parametr přenesen
     * @return mixed -- hodnota parametru
+    * @todo dodělat rekurzivní kontrolu
     */
    final public function getRequestParam($name, $def = null) {
-      if(isset ($_REQUEST[$name])) {
+      if(isset ($_REQUEST[$name]) AND !is_array($_REQUEST[$name])) {
          return rawurldecode($_REQUEST[$name]);
+      } else if(isset ($_REQUEST[$name])) {
+         return $_REQUEST[$name];
       } else {
          return $def;
       }
@@ -228,7 +231,7 @@ abstract class Controller {
 
    /**
     * Metoda vrací objekt lokalizace
-    * @return Locale
+    * @return Locales
     */
    final public function locale() {
       return $this->locale;
@@ -305,7 +308,7 @@ abstract class Controller {
       if(!$this->rights()->isReadable()) {
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
 kategorii nebo jste byl(a) odhlášen(a)"), true);
-         $this->link(true)->reload();
+         $this->link(true)->reload(null, 401);
       }
    }
    /**
@@ -314,7 +317,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
    final public function checkWritebleRights() {
       if(!$this->rights()->isWritable()) {
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
-kategorii nebo jste byl(a) odhlášen(a)"), true);
+kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
          $this->link(true)->reload();
       }
    }
@@ -324,7 +327,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
    final public function checkControllRights() {
       if(!$this->rights()->isControll()) {
          $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
-kategorii nebo jste byl(a) odhlášen(a)"), true);
+kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
          $this->link(true)->reload();
       }
    }
