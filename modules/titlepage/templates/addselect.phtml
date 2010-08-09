@@ -1,0 +1,14 @@
+<?
+$this->addCssFile("style.css");
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+?>
+
+<?=$this->_('Přidat položku typu')?>:<br />
+<ul id="title-page-select-additem">
+   <?foreach ($this->addItems as $item) {?>
+   <li>
+      <a href="<?=$item['link'];?>" title="<?=$item['title'];?>"><?=$item['name'];?></a>&nbsp;-&nbsp;<?=$item['desc'];?>
+   </li>
+   <?}?>
+</ul>
+

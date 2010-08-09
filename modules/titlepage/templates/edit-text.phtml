@@ -1,0 +1,13 @@
+<h1><?=$this->_('Úprava položky s textem')?></h1>
+<?
+
+$tinySimple = new JsPlugin_TinyMce();
+$tinySimple->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
+$tinySimple->setCfgParam('editor_selector', 'mceEditorSimple');
+$this->addJsPlugin($tinySimple);
+
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 5)->addClass("mceEditorSimple");
+echo $this->form;
+?>
+
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('editList')));?>

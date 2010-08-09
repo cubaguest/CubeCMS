@@ -1,0 +1,78 @@
+@CHARSET "UTF-8";
+#items-editlist-form li.ui-widget, #items-editlist-form li.ui-state-highlight, #title-page-items li.item {
+   margin: 0 2px 2px 0;
+   float: left;
+   width: 266px;
+   height: 400px;
+   overflow: hidden;
+}
+#items-editlist-form li.ui-widget object, #items-editlist-form li.ui-state-highlight object, #title-page-items li.item object {
+   width: 100%;
+   height: 100%;
+}
+#items-editlist-form li.ui-widget img, #items-editlist-form li.ui-state-highlight img, #title-page-items li.item img {
+   width: 100%;
+}
+
+#title-page-items li.item {
+   border: 1px solid silver;
+}
+
+#items-editlist-form li.columns-2, #title-page-items li.columns-2 {
+   width: 534px
+}
+
+#items-editlist-form li.columns-3, #title-page-items li.columns-3 {
+   width: 804px
+}
+
+#items-editlist-form li.rows-2, #title-page-items li.rows-2 {
+   height: 804px
+}
+
+#items-editlist-form .ui-widget-header {
+   cursor: move;
+}
+
+#items-editlist-form .title-bar-right .ui-icon {
+   float: right;
+   cursor: pointer;
+   background-color: transparent;
+   border: none;
+   padding: 0;
+}
+
+#items-editlist-form .button-add .ui-icon {
+   float: left;
+}
+
+#items-editlist-form .title-bar-left {
+}
+
+#items-editlist-form div.item-content {
+   height: 378px;
+}
+#items-editlist-form li.rows-2 div.item-content {
+   height: 780px;
+}
+#items-editlist-form .ui-state-highlight {
+   height: 200px;
+   border: none;
+}
+
+
+/* itemy */
+.title-page-submenu-list {
+}
+
+/* add select */
+#title-page-select-additem li {
+   margin: 5px 0;
+   padding: 5px;
+   border: 1px solid silver;
+}
+#title-page-select-additem li a {
+   display: block;
+   float: left;
+   width: 90px;
+}

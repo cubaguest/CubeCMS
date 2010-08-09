@@ -1,0 +1,39 @@
+<? // načtení detailu
+//$this->addPageTitle(null);
+$this->addCssFile("style.css");
+?>
+<div id="items-list">
+   <h1><?=$this->_('Titulní strana');?></h1>
+   <ul id="title-page-items">
+      <?  foreach ($this->list as $item) {
+         switch ($item['type']) {
+                  case TitlePage_Controller::ITEM_TYPE_TEXT:
+                     $tpl = 'item-text.phtml';
+                     break;
+                  case TitlePage_Controller::ITEM_TYPE_MENU:
+                     $tpl = 'item-menu.phtml';
+                     break;
+                  case TitlePage_Controller::ITEM_TYPE_VIDEO:
+                     $tpl = 'item-video.phtml';
+                     break;
+                  case TitlePage_Controller::ITEM_TYPE_ARTICLE:
+                     $tpl = 'item-article.phtml';
+                     break;
+                  default:
+                     break;
+               }
+         ?>
+      <li id="item_<?=$item['id']?>" class="item columns-<?=$item['cols']?>">
+         <div class="ui-widget-content item-content">
+            <?
+            $this->item = $item;
+            $this->includeTpl($tpl);
+            ?>
+         </div>
+      </li>
+      <?}?>
+   </ul>
+   <hr class="reseter" />
+   <?echo $this->toolbox;?>
+</div>
+

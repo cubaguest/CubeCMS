@@ -1,0 +1,7 @@
+<h1><?=$this->_('Úprava položky s videem')?></h1>
+<?
+$this->form->videoObj->html()->setAttrib('rows', 6)->setAttrib('cols', 70);
+echo $this->form;
+?>
+
+<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('editList')));?>

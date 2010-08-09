@@ -1,0 +1,10 @@
+<?
+if($this->item['name'] != null){
+   echo '<h2>'.$this->item['name'].'</h2>';
+}
+if($this->item['image'] != null){?>
+<img src="<?=$this->category()->getModule()->getDataDir(true).$this->item['image']?>" alt="<?=$this->item['image']?>"/>
+<?
+}
+echo $this->item['data'];
+?>
