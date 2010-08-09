@@ -179,7 +179,7 @@ class Articles_View extends View {
       // rss hlavička
       $xml->startElement('articles'); // SOF article
       $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/featuredarticles');
-      $xml->writeAttribute('xml:lang', Locale::getLang());
+      $xml->writeAttribute('xml:lang', Locales::getLang());
 
       while ($row = $this->articles->fetch()) {
          $date = new DateTime($row->{Articles_Model_Detail::COLUMN_ADD_TIME});

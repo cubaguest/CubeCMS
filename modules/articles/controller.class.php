@@ -310,7 +310,7 @@ class Articles_Controller extends Controller {
 
       $iName = new Form_Element_Text('name', $this->_('Nadpis'));
       $iName->setLangs();
-      $iName->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $iName->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($iName, $fGrpTexts);
 
       $iAnnot = new Form_Element_TextArea('annotation', $this->_('Anotace'));
@@ -320,7 +320,7 @@ class Articles_Controller extends Controller {
       $iText = new Form_Element_TextArea('text', $this->_('Text'));
       $iText->setLangs();
       if($this->getOption('textEmpty', false) == false) {
-         $iText->addValidation(New Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+         $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       }
       $form->addElement($iText, $fGrpTexts);
 

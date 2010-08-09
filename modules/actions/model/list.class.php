@@ -130,7 +130,7 @@ class Actions_Model_List extends Model_PDO {
          $whereP = null;
       }
 
-      $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()
+      $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE.","
               ." user.".Model_Users::COLUMN_USERNAME.","
               ." ABS(DATEDIFF(".Actions_Model_Detail::COLUMN_DATE_START.",:dateStart)) AS delta_days,"
@@ -170,7 +170,7 @@ class Actions_Model_List extends Model_PDO {
     */
    public function getActionsListByCatIds($fromDate, $idCats, $fromRow = 0, $numRows = 100, $past = true) {
       $dbc = new Db_PDO();
-      $sql = "SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()
+      $sql = "SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON actions.".Actions_Model_Detail::COLUMN_ID_CAT
@@ -232,7 +232,7 @@ class Actions_Model_List extends Model_PDO {
     */
    public function getActionsByAddedByCatIds($idCats, $num = 10) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()
+      $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey ,user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
@@ -262,7 +262,7 @@ class Actions_Model_List extends Model_PDO {
          $in .= $dbc->quote($idC, PDO::PARAM_INT).',';
       }
       $in = substr($in, 0, strlen($in)-1);
-      $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()
+      $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON actions.".Actions_Model_Detail::COLUMN_ID_CAT

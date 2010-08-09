@@ -90,7 +90,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
                   <?
                   if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
                      print (vve_tpl_image_tag($this->category()->getModule()->getDataDir()
-                             .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                             .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                              .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
                   }
                   ?>
@@ -104,11 +104,11 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
                if($row->{Model_Category::COLUMN_DATADIR} != null) {
                   $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
                           .$row->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR
-                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].URL_SEPARATOR;
+                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].URL_SEPARATOR;
                } else {
                   $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
                           .$row->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR
-                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].URL_SEPARATOR;
+                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].URL_SEPARATOR;
                }
                ?>
          <div id="actionImages_<?=$step?>">

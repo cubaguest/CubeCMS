@@ -210,7 +210,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    private $advancedSimpleParams = array(
            'plugins' => 'safari,inlinepopups,searchreplace,contextmenu,paste,advimage,advlink,media,template',
-           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,pastetext,pasteword,|,bullist,numlist,|,search,|,link,unlink,|,undo,redo,code,|,image,media,|,template',
+           'theme_advanced_buttons1' => 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,pastetext,pasteword,|,bullist,numlist,outdent,indent,|,search,|,link,unlink,|,undo,redo,code,|,image,media,|,template',
            'theme_advanced_buttons2' => null,
            'theme_advanced_buttons3' => null);
 
@@ -284,7 +284,7 @@ class JsPlugin_TinyMce extends JsPlugin {
     */
    private function setBasicOptions(&$params) {
       $params['document_base_url'] = Url_Request::getBaseWebDir();
-      $params['language'] = Locale::getLang();
+      $params['language'] = Locales::getLang();
       $params['category_id'] = AppCore::getCategory()->getId();
       $params['sessionid'] = Sessions::getSessionId();
       if(isset ($_GET['editor_selector'])) {

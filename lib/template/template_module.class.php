@@ -16,7 +16,7 @@
 class Template_Module extends Template {
 /**
  * Objekt pro lokalizaci v modulu
- * @var Locale
+ * @var Locales
  */
    protected $locale = null;
 
@@ -34,12 +34,12 @@ class Template_Module extends Template {
    function  __construct(Url_Link_Module $link, Category $category) {
       parent::__construct($link);
       $this->category = $category;
-      $this->locale = new Locale($category->getModule()->getName());
+      $this->locale = new Locales($category->getModule()->getName());
    }
 
    /**
     * Metoda vrací objekt lokalizace
-    * @return Locale
+    * @return Locales
     */
    final public function locale() {
       return $this->locale;

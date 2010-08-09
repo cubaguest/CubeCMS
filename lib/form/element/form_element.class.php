@@ -246,7 +246,7 @@ class Form_Element implements Form_Element_Interface {
     */
    public function setLangs($langs = null) {
       if($langs == null) {
-         $langs = Locale::getAppLangsNames();
+         $langs = Locales::getAppLangsNames();
       }
       $this->isMultilang = true;
       $this->langs = $langs;

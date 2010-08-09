@@ -32,7 +32,7 @@ class Component_Tcpdf extends Component {
       // jazykové nastavení
       require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
                       .'nonvve'.DIRECTORY_SEPARATOR."tcpdf".DIRECTORY_SEPARATOR."lang"
-                      .DIRECTORY_SEPARATOR.Locale::getLang().".php";
+                      .DIRECTORY_SEPARATOR.Locales::getLang().".php";
 
       // nastavení pro šablony
 //      require_once Template::faceDir().'config'.DIRECTORY_SEPARATOR."tcpdf.conf.php";
@@ -135,7 +135,7 @@ class Component_Tcpdf extends Component {
       // PAGE META DESCRIPTORS --------------------------------------
       $tcpdfLangSet['a_meta_charset'] = 'UTF-8';
       $tcpdfLangSet['w_page'] = _('strana');
-      switch (Locale::getLang()){
+      switch (Locales::getLang()){
          case 'cs':
             $tcpdfLangSet['a_meta_language'] = 'cs';
             $tcpdfLangSet['a_meta_dir'] = 'ltr';

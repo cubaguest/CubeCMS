@@ -73,7 +73,7 @@ class Actionswgal_View extends Actions_View {
 
             while ($image = $images->fetch()) {
                $sizes = getimagesize($this->category()->getModule()->getDataDir()
-                       .$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                       .$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                        .Photogalery_Controller::DIR_MEDIUM
                        .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
@@ -84,7 +84,7 @@ class Actionswgal_View extends Actions_View {
                } // převody mezi px<>mm
 
                $c->pdf()->Image($this->category()->getModule()->getDataDir()
-                       .$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                       .$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                        .Photogalery_Controller::DIR_MEDIUM.DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE},
                        $coll*100+VVE_PDF_MARGIN_LEFT, '', $width);
 

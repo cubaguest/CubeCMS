@@ -13,7 +13,7 @@
 class Template_File_Phtml extends Template_File {
    /**
     * Objekt pro lokalizaci v modulu
-    * @var Locale
+    * @var Locales
     */
    protected $locale = null;
 
@@ -27,7 +27,7 @@ class Template_File_Phtml extends Template_File {
 
    /**
     * Metoda vrací objekt lokalizace
-    * @return Locale
+    * @return Locales
     */
    final public function locale() {
    }

@@ -143,7 +143,7 @@ class Form implements ArrayAccess, Iterator {
       if($this->formIsMultilang) {
          Template::addJsPlugin(new JsPlugin_JQuery());
          Template::addJS(Url_Request::getBaseWebDir().'jscripts/formswitchlangs.js');
-         $script = new Html_Element_Script('formShowOnlyLang(\''.Locale::getLang().'\');');
+         $script = new Html_Element_Script('formShowOnlyLang(\''.Locales::getLang().'\');');
       }
       return $script;
    }

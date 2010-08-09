@@ -115,14 +115,14 @@ class Actions_Model_Detail extends Model_PDO {
    public function getAction($urlKey, $idCat) {
       $dbc = new Db_PDO();
 //      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-//              ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey)"
+//              ." WHERE (".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey)"
 //              ." LIMIT 0, 1");
 
       $dbst = $dbc->prepare("SELECT action.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
               ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
-              ." WHERE ((action.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey) OR (action.".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey))"
+              ." WHERE ((action.".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey) OR (action.".self::COLUMN_URLKEY."_".Locales::getDefaultLang()." = :urlkey))"
               ." AND (action.".self::COLUMN_ID_CAT." = :idcat)"
               ." LIMIT 0, 1");
       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
@@ -169,10 +169,10 @@ class Actions_Model_Detail extends Model_PDO {
     */
    public function search($idCat, $string, $publicOnly = true) {
       $dbc = new Db_PDO();
-      $clabel = self::COLUMN_NAME.'_'.Locale::getLang();
-      $sublabel = self::COLUMN_SUBANME.'_'.Locale::getLang();
+      $clabel = self::COLUMN_NAME.'_'.Locales::getLang();
+      $sublabel = self::COLUMN_SUBANME.'_'.Locales::getLang();
       $author = self::COLUMN_AUTHOR;
-      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
       $cplace = self::COLUMN_PLACE;
 
       $wherePub = null;

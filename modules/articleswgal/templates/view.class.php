@@ -58,14 +58,14 @@ class ArticlesWGal_View extends Articles_View {
 
       while ($image = $images->fetch()) {
          $sizes = getimagesize($this->category()->getModule()->getDataDir()
-                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                  .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
          if($sizes[0] > 80/0.27){ $width = 80; } else { $width = $sizes[0]*0.27; } // převody mezi px<>mm
 
          $c->pdf()->Image($this->category()->getModule()->getDataDir()
-                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                  .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $coll*100+VVE_PDF_MARGIN_LEFT, '', $width);

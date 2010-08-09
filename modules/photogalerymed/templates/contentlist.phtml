@@ -24,7 +24,7 @@ $modelImages = new PhotoGalery_Model_Images();
       while ($row = $images->fetch()) {?>
       <img alt="<?=$row->{PhotoGalery_Model_Images::COLUMN_NAME}?>" 
            src="<?=$this->category()->getModule()->getDataDir(true).
-              $article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+              $article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL
               .URL_SEPARATOR.$row->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
       <?}?>

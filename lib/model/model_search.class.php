@@ -31,11 +31,11 @@ class Model_Search extends Model_Db {
       ->join(array('cat' => Db::table(Model_Category::DB_TABLE)), array(Model_Module::COLUMN_ITEM_CAT_ID,
          'items' => Model_Module::COLUMN_ITEM_CAT_ID), null,
             array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
-               .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
-               .'_'.Locale::getDefaultLang().")",
+               .'_'.Locales::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
+               .'_'.Locales::getDefaultLang().")",
                Model_Category::COLUMN_CAT_ALT => "IFNULL(cat.".Model_Category::COLUMN_CAT_ALT_ORIG
-               .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_ALT_ORIG
-               .'_'.Locale::getDefaultLang().")", Model_Category::COLUMN_CAT_ID))
+               .'_'.Locales::getLang().", cat.".Model_Category::COLUMN_CAT_ALT_ORIG
+               .'_'.Locales::getDefaultLang().")", Model_Category::COLUMN_CAT_ID))
       ->where("items.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, "r__", Db::OPERATOR_LIKE)
       ->group('modules.'.Model_Module::COLUMN_ID_MODULE);
       return $this->getDb()->fetchObjectArray($sqlSelect);
@@ -52,11 +52,11 @@ class Model_Search extends Model_Db {
       ->join(array('cat' => Db::table(Model_Category::DB_TABLE)), array(Model_Module::COLUMN_ITEM_CAT_ID,
          'item' => Model_Module::COLUMN_ITEM_CAT_ID), null,
             array(Model_Category::COLUMN_CAT_LABEL => "IFNULL(cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
-               .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
-               .'_'.Locale::getDefaultLang().")",
+               .'_'.Locales::getLang().", cat.".Model_Category::COLUMN_CAT_LABEL_ORIG
+               .'_'.Locales::getDefaultLang().")",
                Model_Category::COLUMN_CAT_ALT => "IFNULL(cat.".Model_Category::COLUMN_CAT_ALT_ORIG
-               .'_'.Locale::getLang().", cat.".Model_Category::COLUMN_CAT_ALT_ORIG
-               .'_'.Locale::getDefaultLang().")", Model_Category::COLUMN_CAT_ID))
+               .'_'.Locales::getLang().", cat.".Model_Category::COLUMN_CAT_ALT_ORIG
+               .'_'.Locales::getDefaultLang().")", Model_Category::COLUMN_CAT_ID))
       ->where("item.".Rights::RIGHTS_GROUPS_TABLE_PREFIX.$userNameGroup, "r__", Db::OPERATOR_LIKE);
 
       $modulesArray = array();

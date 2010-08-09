@@ -35,7 +35,7 @@ class CinemaProgram_View extends View {
             // rss hlavička
             $xml->startElement('articles'); // SOF article
             $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/featuredarticles');
-            $xml->writeAttribute('xml:lang', Locale::getLang());
+            $xml->writeAttribute('xml:lang', Locales::getLang());
 
             while ($row = $this->movies->fetch()) {
                $time = new DateTime();

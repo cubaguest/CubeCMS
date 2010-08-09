@@ -44,7 +44,7 @@ class Articles_Model_Detail extends Model_PDO {
               self::COLUMN_URLKEY, self::COLUMN_ID,$id);
       if($textPrivate == null){
          $textPrivate = array();
-         foreach (Locale::getAppLangs() as $code) {
+         foreach (Locales::getAppLangs() as $code) {
             $textPrivate[$code] = null;
          }
       }
@@ -144,8 +144,8 @@ class Articles_Model_Detail extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET ".self::COLUMN_SHOWED." = ".self::COLUMN_SHOWED."+1"
-          ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey"
-          ." OR ".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey2)");
+          ." WHERE (".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey"
+          ." OR ".self::COLUMN_URLKEY."_".Locales::getDefaultLang()." = :urlkey2)");
       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
       $dbst->bindParam(':urlkey2', $urlKey, PDO::PARAM_STR);
       return $dbst->execute();
@@ -163,8 +163,8 @@ class Articles_Model_Detail extends Model_PDO {
          ." FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
          ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".self::COLUMN_ID_USER
          ." = user.".Model_Users::COLUMN_ID
-         ." WHERE (article.".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey"
-         ." OR article.".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey2)".
+         ." WHERE (article.".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey"
+         ." OR article.".self::COLUMN_URLKEY."_".Locales::getDefaultLang()." = :urlkey2)".
           " LIMIT 0, 1");
        $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
        $dbst->bindParam(':urlkey2', $urlKey, PDO::PARAM_STR);
@@ -249,8 +249,8 @@ class Articles_Model_Detail extends Model_PDO {
     */
    public function search($idCat, $string, $publicOnly = true){
       $dbc = new Db_PDO();
-      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locale::getLang();
-      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locales::getLang();
+      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
 
       $wherePub = null;
       if($publicOnly){

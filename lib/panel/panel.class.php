@@ -28,7 +28,7 @@ abstract class Panel {
 
    /**
     * Objket pro lokalizaci
-    * @var Locale
+    * @var Locales
     */
    private $locale = null;
 
@@ -65,7 +65,7 @@ abstract class Panel {
       $link->clear(true)->category($this->category()->getUrlKey());
       $this->link = $link;
       // locales
-      $this->locale = new Locale($category->getModule()->getName());
+      $this->locale = new Locales($category->getModule()->getName());
       $this->template = new Template_Panel(clone $this->link, $this->category, $this->panelObj);
    }
 
@@ -169,7 +169,7 @@ abstract class Panel {
 
    /**
     * Metoda vrací objekt lokalizace
-    * @return Locale
+    * @return Locales
     */
    final public function locale() {
       return $this->locale;

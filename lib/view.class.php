@@ -19,7 +19,7 @@ abstract class View {
 
    /**
     * Objekt s pro lokalizaci
-    * @var Locale
+    * @var Locales
     */
    private $locale = null;
 
@@ -46,7 +46,7 @@ abstract class View {
 
       $this->link = $link;
       $this->category = $category;
-      $this->locale = new Locale($category->getModule()->getName());
+      $this->locale = new Locales($category->getModule()->getName());
       //		inicializace viewru
       $this->init();
    }
@@ -157,8 +157,8 @@ abstract class View {
    }
 
    /**
-    * Metoda vrací objekt Locale pro překlady
-    * @return Locale -- objek lokalizace
+    * Metoda vrací objekt Locales pro překlady
+    * @return Locales -- objek lokalizace
     */
    final public function locale() {
       return $this->locale;

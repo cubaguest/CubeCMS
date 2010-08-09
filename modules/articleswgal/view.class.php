@@ -44,7 +44,7 @@ class ArticlesWGal_View extends Articles_View {
          $img = null;
          if($image != false) {
             $img = $this->category()->getModule()->getDataDir(true)
-                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getLang()]
+                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getLang()]
                  .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                  .$image->{PhotoGalery_Model_Images::COLUMN_FILE};
          }
@@ -85,7 +85,7 @@ class ArticlesWGal_View extends Articles_View {
 
          while ($image = $this->images->fetch()) {
             $sizes = getimagesize($this->category()->getModule()->getDataDir()
-                    .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                    .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                     .Photogalery_Controller::DIR_MEDIUM
                     .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
@@ -96,7 +96,7 @@ class ArticlesWGal_View extends Articles_View {
             } // převody mezi px<>mm
 
             $c->pdf()->Image($this->category()->getModule()->getDataDir()
-                    .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                    .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                     .Photogalery_Controller::DIR_MEDIUM.DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE},
                     $coll*100+VVE_PDF_MARGIN_LEFT, '', $width);
 

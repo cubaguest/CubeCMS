@@ -17,7 +17,7 @@ $this->setPageTitle($this->_('Uprava kategorie').' '.$category->{Model_Category:
          <th width="200"><?=$this->_('Název')?></th>
          <td>
             <?
-            foreach (Locale::getAppLangsNames() as $langKey => $langName) {?>
+            foreach (Locales::getAppLangsNames() as $langKey => $langName) {?>
             <strong><?=$langName?>:&nbsp;</strong>
                <?
                if($category[Model_Category::COLUMN_CAT_LABEL][$langKey] != null) {
@@ -32,7 +32,7 @@ $this->setPageTitle($this->_('Uprava kategorie').' '.$category->{Model_Category:
          <th width="100"><?=$this->_('Url')?></th>
          <td>
             <?
-            foreach (Locale::getAppLangsNames() as $langKey => $langName) {?>
+            foreach (Locales::getAppLangsNames() as $langKey => $langName) {?>
             <strong><?=$langName?>:&nbsp;</strong>
                <?
                if($category[Model_Category::COLUMN_URLKEY][$langKey] != null) {
@@ -62,7 +62,7 @@ $this->setPageTitle($this->_('Uprava kategorie').' '.$category->{Model_Category:
          <th width="100"><?=$this->_('Klíčová slova')?></th>
          <td>
             <?
-            foreach (Locale::getAppLangsNames() as $langKey => $langName) {?>
+            foreach (Locales::getAppLangsNames() as $langKey => $langName) {?>
             <strong><?=$langName?>:&nbsp;</strong>
                <?
                if($category[Model_Category::COLUMN_KEYWORDS][$langKey] != null) {
@@ -77,7 +77,7 @@ $this->setPageTitle($this->_('Uprava kategorie').' '.$category->{Model_Category:
          <th width="100"><?=$this->_('Popis')?></th>
          <td>
             <?
-            foreach (Locale::getAppLangsNames() as $langKey => $langName) {?>
+            foreach (Locales::getAppLangsNames() as $langKey => $langName) {?>
             <strong><?=$langName?>:&nbsp;</strong>
                <?
                if($category[Model_Category::COLUMN_DESCRIPTION][$langKey] != null) {

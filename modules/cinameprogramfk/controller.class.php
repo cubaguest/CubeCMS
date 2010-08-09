@@ -18,7 +18,7 @@ class CinameProgramFk_Controller extends Controller {
       if($cat->{Model_Category::COLUMN_DATADIR} != null){
          $this->view()->datadir = $cat->{Model_Category::COLUMN_DATADIR};
       } else {
-         $this->view()->datadir = $cat[Model_Category::COLUMN_URLKEY][Locale::getDefaultLang()];
+         $this->view()->datadir = $cat[Model_Category::COLUMN_URLKEY][Locales::getDefaultLang()];
       }
 
       $curentYear = $day = $this->getRequest('year', date('Y'));

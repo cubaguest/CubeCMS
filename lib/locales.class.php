@@ -13,7 +13,7 @@
  * @internal      Last ErrorCode 2
  */
 
-class Locale {
+class Locales {
    /**
     * Oddělovač jazyků v konfiguračním souboru
     * @var string
@@ -354,7 +354,7 @@ class Locale {
     */
    public static function getLangLabel($langShor) {
       if(in_array($langShor, self::$appLangs)){
-         $lang = Locale::getAppLangsNames();
+         $lang = Locales::getAppLangsNames();
          return array($langShor => $lang[$langShor]);
       } else {
          return false;

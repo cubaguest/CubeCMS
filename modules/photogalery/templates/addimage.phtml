@@ -30,7 +30,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
          'width'			:	'105', //width of your browse button file
          'sizeLimit'	:	'5120000',  //remove this to set no limit on upload size
 //         'simUploadLimit' : '1', //remove this to set no limit on simultaneous uploads
-         //'buttonImg' : 'images/browse_<?=Locale::getLang()?>.png',
+         //'buttonImg' : 'images/browse_<?=Locales::getLang()?>.png',
          'buttonText': '<?=$this->_('Vybrat obrázky')?>',
          'cancelImg' : 'images/cancel.png',
          'fileDesc'  : 'images',
@@ -50,7 +50,7 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
             $('#mainftpQueue').hide();
             $('#allfiles').load(location.href+" #allfiles>*","",function(){
                //alert(location.href+" #allfiles>*");
-               formShowOnlyLang('<?=Locale::getLang()?>');
+               formShowOnlyLang('<?=Locales::getLang()?>');
             });
             $('#infoMessages').append("<p><?=$this->_('Obrázky byly nahrány')?></p>").show();
 

@@ -125,7 +125,7 @@ class BandsProgram_Controller extends Controller {
          $xml->setIndent(4);
          $xml->startElement('program'); // obal
          $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/program');
-         $xml->writeAttribute('xml:lang', Locale::getLang());
+         $xml->writeAttribute('xml:lang', Locales::getLang());
          // days
          foreach ($outputArray as $day) {
             $xml->startElement('day');

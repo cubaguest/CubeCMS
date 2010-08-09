@@ -1,15 +1,13 @@
 <?php
 /**
- * Třída JsPluginu TabContent.
- * Třída slouží pro práci se záložkovým menu (tj. boxy se záložkovým 
- * přepínáním obsahu). Je úzce zpata z šablonou.
- * //TODO dodělat tvorbu scriptu pro spuštění, tak aby se dal vložit přímo do šablony a ghenerován byl zde.
+ * Třída JsPluginu JQuery a jeho komponent.
+ * Třída slouží pro javascriptů JQuery
  *
  * @copyright  	Copyright (c) 2009 Jakub Matas
  * @version    	$Id$ VVE3.3.0 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
- * @abstract 		Třída JsPluginu pro záložkový box
+ * @abstract 		Třída JsPluginu pro JQuery
  * @link          http://jquery.com/
  */
 
@@ -248,7 +246,7 @@ class JsPlugin_JQuery extends JsPlugin {
      * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
      */
     $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker.min.js"));
-    $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-".Locale::getLang().".js",false,'ui/i18n/'));
+    $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-".Locales::getLang().".js",false,'ui/i18n/'));
     $this->addFile(new JsPlugin_CssFile("jquery.ui.datepicker.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
     return $this;
   }

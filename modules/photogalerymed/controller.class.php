@@ -27,7 +27,7 @@ class Photogalerymed_Controller extends Articles_Controller {
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $this->view()->article->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $ctr->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $ctr->mainController();
 
       // adresáře k fotkám
@@ -44,12 +44,12 @@ class Photogalerymed_Controller extends Articles_Controller {
       $artM = new Articles_Model_Detail();
       // smazání fotek
       $photogalCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $photogalCtrl->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $photogalCtrl->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $photogalCtrl->deleteImages($idArticle);
       unset ($photogalCtrl);
 
       //odstranění adresáře s fotkama
-      $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir().$this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+      $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir().$this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
       $dir->rmDir();
 
       $artM->deleteArticle($idArticle);
@@ -92,11 +92,11 @@ class Photogalerymed_Controller extends Articles_Controller {
          $model = new Articles_Model_Detail();
          $newArticle = $model->getArticleById($article->{Articles_Model_Detail::COLUMN_ID});
 
-         if($article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
-                 != $newArticle[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]) {
+         if($article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                 != $newArticle[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]) {
             $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir()
-                            .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
-            $dir->rename($urlkeys[Locale::getDefaultLang()]);
+                            .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
+            $dir->rename($urlkeys[Locales::getDefaultLang()]);
          }
       }
 
@@ -110,7 +110,7 @@ class Photogalerymed_Controller extends Articles_Controller {
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
       $ctr->editphotosController();
 
@@ -131,7 +131,7 @@ class Photogalerymed_Controller extends Articles_Controller {
 
       if($art !== false) {
          $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-         $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR);
+         $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
          $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
       }
       $ctr->uploadFileController();
@@ -142,7 +142,7 @@ class Photogalerymed_Controller extends Articles_Controller {
       $art = $artModel->getArticle($this->getRequest('urlkey'));
       if($art == false) return false;
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $ctr->editphotoController();
    }
 
@@ -157,7 +157,7 @@ class Photogalerymed_Controller extends Articles_Controller {
       $this->view()->images = $modelPhotos->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID});
 
       // adresáře k fotkám
-      $this->view()->subdir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->subdir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->view()->subdir);
    }
 

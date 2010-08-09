@@ -28,8 +28,8 @@ $this->addJsPlugin($jQuery);
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $.datepicker.setDefaults(['<?=Locale::getLang()?>'] ) ;
-         //$.datepicker.regional['<?=Locale::getLang()?>']
+         $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
+         //$.datepicker.regional['<?=Locales::getLang()?>']
          $("input[name=action_date_start]").datepicker();
          $("input[name=action_date_stop]").datepicker();
       });

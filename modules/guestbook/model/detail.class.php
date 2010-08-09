@@ -68,6 +68,30 @@ class GuestBook_Model_Detail extends Model_PDO {
       return $dbst;
    }
 
+   /**
+    * Metoda provede načtení seznamu příspěvků
+    *
+    * @return string -- načtený text
+    */
+   public function getListAll($fromRow, $rowsCount = 100, $deleted = false) {
+      $dbc = new Db_PDO();
+      if($deleted === false) {
+         $whereDel = " WHERE (".self::COL_DELETED." = 0)";
+      } else {
+         $whereDel = null;
+      }
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              . $whereDel // deleted
+              ." ORDER BY ".self::COL_DATE_ADD." DESC"
+              ." LIMIT :fromRow, :rowCount ");
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->bindValue(':fromRow', (int)$fromRow, PDO::PARAM_INT);
+      $dbst->bindValue(':rowCount', (int)$rowsCount, PDO::PARAM_INT);
+      $dbst->execute();
+
+      return $dbst;
+   }
+
    public function saveBook($idCat, $email, $text, $nick, $www = null, $idBook = null) {
       $dbc = new Db_PDO();
       
@@ -173,8 +197,8 @@ class GuestBook_Model_Detail extends Model_PDO {
     */
    public function search($idCat, $string) {
       $dbc = new Db_PDO();
-      $clabel = self::COLUMN_LABEL.'_'.Locale::getLang();
-      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+      $clabel = self::COLUMN_LABEL.'_'.Locales::getLang();
+      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
 
       $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2).' * MATCH(`'.$clabel.'`) AGAINST (:sstring)'
               .' + MATCH(`'.$ctext.'`) AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION

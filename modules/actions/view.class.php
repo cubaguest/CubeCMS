@@ -99,18 +99,18 @@ class Actions_View extends View {
       // obrázek
       if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
          $sizes = getimagesize($this->category()->getModule()->getDataDir()
-                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                  .DIRECTORY_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE});
 //         $c->pdf()->Cell(0, $sizes['heigth']);
          $c->pdf()->writeHTML('<img src="'.$this->category()->getModule()->getDataDir(true)
-                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                  .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE}.'" width="200" />', true, 0, true, 0);
          $c->pdf()->Ln();
 //         print ('<img src="'.$this->category()->getModule()->getDataDir(true)
-//                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+//                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
 //                 .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE}.'" />');
 //         $c->pdf()->Image($this->category()->getModule()->getDataDir()
-//                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+//                 .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
 //                 .DIRECTORY_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE});
 //         flush();exit();
       }
@@ -129,7 +129,7 @@ class Actions_View extends View {
       $img = null;
       if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null){
          $img = $this->category()->getModule()->getDataDir(true)
-                  .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()]
+                  .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()]
                   .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE};
       }
 
@@ -198,7 +198,7 @@ class Actions_View extends View {
             // rss hlavička
             $xml->startElement('articles'); // SOF article
             $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/featuredarticles');
-            $xml->writeAttribute('xml:lang', Locale::getLang());
+            $xml->writeAttribute('xml:lang', Locales::getLang());
 
             while ($row = $this->actions->fetch()) {
                $xml->startElement('article'); // sof article

@@ -223,7 +223,7 @@ class Categories_Controller extends Controller {
 
          $datadir = null;
          if($form->datadir->getValues() == null){
-            $datadir = $urlkey[Locale::getDefaultLang()];
+            $datadir = $urlkey[Locales::getDefaultLang()];
             $last = strrpos($datadir,URL_SEPARATOR);
             if($last !== false){
                $datadir = substr($datadir,$last+1);
@@ -365,7 +365,7 @@ class Categories_Controller extends Controller {
          // pokud není datadir tak jej nastavíme
 //         $datadir = vve_cr_safe_file_name($form->datadir->getValues());
          if($form->datadir->getValues() == null){
-            $dataDir = $urlkey[Locale::getDefaultLang()];
+            $dataDir = $urlkey[Locales::getDefaultLang()];
             $last = strrpos($dataDir,URL_SEPARATOR);
             if($last !== false){
                $dataDir = substr($dataDir,$last+1);
@@ -422,7 +422,7 @@ class Categories_Controller extends Controller {
       // název kategorie
       $catName = new Form_Element_Text('name', $this->_('Název'));
       $catName->setLangs();
-      $catName->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $catName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($catName, 'labels');
 
       // popisek kategorie

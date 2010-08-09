@@ -443,7 +443,7 @@ class Links {
     */
    public static function checkLangUrlRequest($lang) {
       if(eregi('^([a-zA-Z]{2})$', $lang)) {
-         Locale::setLang($lang);
+         Locales::setLang($lang);
          self::$currentlang = $lang;
          return true;
       }

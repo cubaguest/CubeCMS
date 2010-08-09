@@ -15,19 +15,20 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
  */
    private $values = array();
 
-   /**
-    * Jestli se má vytvářet pole jazyků nebo vybrat zvolený jazyk
-    * @var bool
-    */
-   private $allLangs = false;
+   private $langColums = array();
+
+   private $checkAllColums = true;
 
    /**
     * Konstruktor
     * @param bool $allLangs -- jestli má být vytvořeno pole se všemi jazyky,
     * nebo jen výchozí jazyk
     */
-   function  __construct($allLangs = false) {
-      $this->allLangs = $allLangs;
+   function  __construct($colums = array()) {
+      $this->langColums = $colums;
+//      if(empty ($colums) == false){
+//         $this->checkAllColums = false;
+//      }
    }
 
    /**
@@ -36,14 +37,18 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
     * @param mixed $value -- hodnota prvku
     */
    public function  __set($name,  $value) {
-      $matches = array();
-      if ((bool)preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {
-         if(!isset ($this->values[$matches[1]])
+//      if($this->checkAllColums == true){
+         $matches = array();
+         if ((bool)preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {
+            if(!isset ($this->values[$matches[1]])
              OR !($this->values[$matches[1]] instanceof Model_LangContainer_LangColumn)) {
-            $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
+               $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
+            }
+            $this->values[$matches[1]]->addValue($matches[2], $value);
          }
-         $this->values[$matches[1]]->addValue($matches[2], $value);
-      }
+//      } else {
+////
+//      }
       $this->values[$name] = $value;
    }
 

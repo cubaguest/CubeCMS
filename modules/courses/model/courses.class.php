@@ -338,8 +338,8 @@ class Courses_Model_Courses extends Model_PDO {
     */
    public function search($idCat, $string, $publicOnly = true){
       $dbc = new Db_PDO();
-      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locale::getLang();
-      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locale::getLang();
+      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locales::getLang();
+      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
 
       $wherePub = null;
       if($publicOnly){

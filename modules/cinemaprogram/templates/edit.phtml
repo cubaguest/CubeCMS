@@ -266,8 +266,8 @@
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $.datepicker.setDefaults(['<?=Locale::getLang()?>'] ) ;
-         //$.datepicker.regional['<?=Locale::getLang()?>']
+         $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
+         //$.datepicker.regional['<?=Locales::getLang()?>']
          $("input.datepicker").datepicker();
       });
       var lastId = <?=$lastId?>;

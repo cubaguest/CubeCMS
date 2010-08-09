@@ -28,7 +28,7 @@ class Template_ModuleStatic extends Template_Module {
    function  __construct(Url_Link_ModuleRequest $link, $moduleName) {
       Template::__construct($link);
       $this->moduleName = $moduleName;
-      $this->locale = new Locale($moduleName);
+      $this->locale = new Locales($moduleName);
    }
 
    /**

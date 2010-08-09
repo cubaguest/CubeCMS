@@ -40,7 +40,7 @@ $imagesM = new PhotoGalery_Model_Images();
       <div class="imageBox" style="float:left; margin-right: 10px;">
                   <?//=vve_tpl_image_tag(, "article title image", 80);?>
          <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
-                          .$article[Articles_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+                          .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                           .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                           .$mainImage->{PhotoGalery_Model_Images::COLUMN_FILE},
                           $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 235,null, 'articleImage');?>

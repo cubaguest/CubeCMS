@@ -107,7 +107,7 @@ class Actions_Controller extends Controller {
       $shares->setConfig('url', (string)$this->link());
       $shares->setConfig('title', $this->view()->action->{Actions_Model_Detail::COLUMN_NAME});
       $this->view()->shares=$shares;
-      $this->view()->imagesDir=$this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()];
+      $this->view()->imagesDir=$this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()];
    }
 
    protected function deleteAction($action) {
@@ -121,11 +121,11 @@ class Actions_Controller extends Controller {
       if($file->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
          $fileObj = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
                  $this->category()->getModule()->getDataDir()
-                         .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+                         .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
          $fileObj->delete();
       }
       // smazání adresáře
-      $dir = $this->category()->getModule()->getDataDir().$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()];
+      $dir = $this->category()->getModule()->getDataDir().$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()];
       if(file_exists($dir) AND is_dir($dir)) {
          $dir = new Filesystem_Dir($dir);
          $dir->rmDir();
@@ -187,7 +187,7 @@ class Actions_Controller extends Controller {
          // přesunutí obrázku akce do správného adresáře
          if($form->image->getValues() != null) {
             $fileObj = new Filesystem_File($file, AppCore::getAppCacheDir());
-            $fileObj->move($this->category()->getModule()->getDataDir().$act[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+            $fileObj->move($this->category()->getModule()->getDataDir().$act[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
             $image = new Filesystem_File_Image($fileObj);
             $image->resampleImage(self::MAIN_IMAGE_WIDTH, self::MAIN_IMAGE_HEIGHT,true);
             $image->save();
@@ -257,7 +257,7 @@ class Actions_Controller extends Controller {
                  AND $file != null) {
             $fileR = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
                     $this->category()->getModule()->getDataDir()
-                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
             $fileR->remove();
             unset ($fileR);
             $file = null;
@@ -268,7 +268,7 @@ class Actions_Controller extends Controller {
             $file = $f['name'];
             $fileObj = new Filesystem_File($file, AppCore::getAppCacheDir());
             $fileObj->move($this->category()->getModule()->getDataDir()
-                    .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+                    .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
             $image = new Filesystem_File_Image($fileObj);
             $image->resampleImage(self::MAIN_IMAGE_WIDTH, self::MAIN_IMAGE_HEIGHT,true);
             $image->save();
@@ -286,13 +286,13 @@ class Actions_Controller extends Controller {
          $actionNew = $model->getActionById($action->{Actions_Model_Detail::COLUMN_ID});
 
          // přejmenování složky
-         if($action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
-                 != $actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]
+         if($action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                 != $actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
             AND file_exists($this->category()->getModule()->getDataDir()
-                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()])) {
+                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()])) {
             $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir()
-                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
-            $dir->rename($actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()]);
+                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
+            $dir->rename($actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
          }
 
          $this->infoMsg()->addMessage($this->_('Akce byla uložena'));
@@ -317,7 +317,7 @@ class Actions_Controller extends Controller {
 
       $eName = new Form_Element_Text('name', $this->_('Název'));
       $eName->setLangs();
-      $eName->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $eName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($eName);
 
       $esName = new Form_Element_Text('subname', $this->_('Pod název'));
@@ -329,7 +329,7 @@ class Actions_Controller extends Controller {
 
       $eText = new Form_Element_TextArea('text', $this->_('Text'));
       $eText->setLangs();
-      $eText->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $eText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($eText);
 
       $eNote = new Form_Element_Text('note', $this->_('Poznámka'));

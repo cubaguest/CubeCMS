@@ -5,3 +5,43 @@ Testovací modul s různými pokusy.
    <a href="<?=$this->link()->route('ajax')?>">Test AJAX a odeslání formu</a><br />
    <a href="<?=$this->link()->route('messages')?>">Test hlášek</a><br />
 </p>
+
+Benchmarky:<br />
+<?
+$rounds = 10000;
+//		inicializace stratovacího času
+echo "regexp<br/>";
+List ($usec, $sec) = Explode (' ', microtime());
+$startTime=((float)$sec + (float)$usec);
+
+echo $startTime;
+for ($index = 0; $index < $rounds; $index++) {
+   $matches = array();
+   preg_match("/^(.*)_([a-z]{2})$/i", 'label_cs', $matches);
+}
+List ($usec, $sec) = Explode (' ', microtime());
+$endTime = ((float)$sec + (float)$usec);
+
+echo " > ".$endTime." celkem: ".round($endTime-$startTime, 4)."<br/>";
+
+
+
+echo "unserialize<br/>";
+List ($usec, $sec) = Explode (' ', microtime());
+$startTime=((float)$sec + (float)$usec);
+echo $startTime;
+$arr = array('cs' => 'česky', 'en' => 'anglicky');
+$serArr = serialize($arr);
+
+$rounds = $rounds/4;
+
+for ($index = 0; $index < $rounds; $index++) {
+   unserialize($serArr);
+}
+List ($usec, $sec) = Explode (' ', microtime());
+$endTime = ((float)$sec + (float)$usec);
+
+echo " > ".$endTime." celkem: ".round($endTime-$startTime, 4)."<br/>";
+
+
+?>

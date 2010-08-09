@@ -67,7 +67,7 @@ $this->addPageHeadline($this->category->getName().' - '.vve_date("%x", $this->da
             <?
             if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
                print (vve_tpl_image_tag($this->category()->getModule()->getDataDir()
-                       .$row[Actions_Model_Detail::COLUMN_URLKEY][Locale::getDefaultLang()].DIRECTORY_SEPARATOR
+                       .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                        .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
             }
             ?>

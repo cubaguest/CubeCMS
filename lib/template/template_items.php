@@ -19,7 +19,7 @@ function crSelectDate($name, $time = null, $yearOffsetPlus = 10, $yearOffsetMinu
    $params['name'] = $name;
    $params['format'] = strtoupper($format);
    if($format == null) {
-      switch (Locale::getLang()) {
+      switch (Locales::getLang()) {
          case "cs":
             $params['format'] = "DMY";
             break;

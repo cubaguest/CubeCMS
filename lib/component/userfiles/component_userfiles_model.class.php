@@ -51,7 +51,7 @@ class Component_UserFiles_Model extends Model_PDO {
              INNER JOIN ".Db_PDO::table(Model_Module::DB_TABLE_MODULES)." AS module ON cat.".self::COLUMN_MODULE_ID
              ." = module.".Model_Module::COLUMN_ID_MODULE."
              WHERE (cat.".self::COLUMN_CAT_GROUP_PREFIX.$userNameGroup." LIKE 'r__')
-             AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
+             AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locales::getLang()
             ." = ".$dbc->quote($catKey).") LIMIT 0, 1");
       } else {
          $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat

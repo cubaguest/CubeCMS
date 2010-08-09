@@ -196,7 +196,7 @@ class Polls_Controller extends Controller {
 
       $elemQuestion = new Form_Element_Text('question',$this->_('Otázka'));
 //      $elemQuestion->setLangs();
-      $elemQuestion->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang()));
+      $elemQuestion->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $form->addElement($elemQuestion);
 
       $elemMulti = new Form_Element_Checkbox('multianswer',$this->_('Více odpovědí'));

@@ -93,7 +93,7 @@ class Url_Link_Component extends Url_Link {
    public function  __toString() {
       if($this->isOnlyComponentAction) {
          return Url_Request::getBaseWebDir().self::URL_PART.URL_SEPARATOR
-         .strtolower($this->componentName).URL_SEPARATOR.Locale::getLang()
+         .strtolower($this->componentName).URL_SEPARATOR.Locales::getLang()
          .URL_SEPARATOR.self::$currentCategory.URL_SEPARATOR.$this->actionName.'.'.$this->outputType;
       } else {
          return parent::__toString();

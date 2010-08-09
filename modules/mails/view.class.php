@@ -21,12 +21,6 @@ class Mails_View extends View {
       $this->template()->addTplFile('main.phtml');
    }
 
-   public function addMailView() {
-   }
-
-   public function editMailView() {
-   }
-
    public function listMailsExportView() {
       $result = null;
       switch ($this->type) {
@@ -64,8 +58,6 @@ class Mails_View extends View {
       exit();
    }
 
-   public function deleteMailsView() {}
-
    public function addressBookView() {
       $this->template()->addTplFile('addressbook.phtml');
       $this->page = 'addressbook';
@@ -78,10 +70,6 @@ class Mails_View extends View {
 
    public function addressListView(){
       echo json_encode($this->respond);
-   }
-
-   public function groupsListView(){
-      echo json_encode($this->groups);
    }
 }
 ?>

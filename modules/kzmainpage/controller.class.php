@@ -131,7 +131,7 @@ class KzMainPage_Controller extends Controller {
          // rss hlavička
          $xml->startElement('boxes'); // SOF article
          $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/boxes');
-         $xml->writeAttribute('xml:lang', Locale::getLang());
+         $xml->writeAttribute('xml:lang', Locales::getLang());
 
          $boxes = $form->api->getValues();
          $types = $form->sel->getValues();

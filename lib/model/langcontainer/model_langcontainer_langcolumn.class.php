@@ -113,12 +113,12 @@ class Model_LangContainer_LangColumn implements ArrayAccess, Countable {
     * @return string -- řetězec
     */
    public function  __toString() {
-      if(gettype($this->values[Locale::getLang()]) == 'string'
-        AND $this->values[Locale::getLang()] != ''|null) {
-         return $this->values[Locale::getLang()];
-      } else if(gettype($this->values[Locale::getDefaultLang()]) == 'string'
-        AND $this->values[Locale::getDefaultLang()] != ''|null) {
-         return $this->values[Locale::getDefaultLang()];
+      if(gettype($this->values[Locales::getLang()]) == 'string'
+        AND $this->values[Locales::getLang()] != ''|null) {
+         return $this->values[Locales::getLang()];
+      } else if(gettype($this->values[Locales::getDefaultLang()]) == 'string'
+        AND $this->values[Locales::getDefaultLang()] != ''|null) {
+         return $this->values[Locales::getDefaultLang()];
       } else {
          return (string)null;
       }

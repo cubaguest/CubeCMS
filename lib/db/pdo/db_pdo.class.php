@@ -61,6 +61,7 @@ class Db_PDO extends PDO {
             // TODO dodělat vytváření podle zadaných hodnot
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+//         $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Db_PDO_Statement')); // overload
       } catch (PDOException $e) {
          new CoreErrors($e);
       }

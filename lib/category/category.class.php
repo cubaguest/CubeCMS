@@ -117,7 +117,7 @@ class Category {
       if($this->category->{Model_Category::COLUMN_DATADIR} != null){
          $this->module->setDataDir($this->category->{Model_Category::COLUMN_DATADIR});
       } else {
-         $datadir = $this->category[Model_Category::COLUMN_URLKEY][Locale::getDefaultLang()];
+         $datadir = $this->category[Model_Category::COLUMN_URLKEY][Locales::getDefaultLang()];
          $last = strrpos($datadir,URL_SEPARATOR);
          if($last !== false){
             $datadir = substr($datadir,$last+1);

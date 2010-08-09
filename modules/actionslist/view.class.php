@@ -58,7 +58,7 @@ class ActionsList_View extends View {
             // rss hlavička
             $xml->startElement('articles'); // SOF article
             $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/featuredarticles');
-            $xml->writeAttribute('xml:lang', Locale::getLang());
+            $xml->writeAttribute('xml:lang', Locales::getLang());
 
             while ($row = $this->actions->fetch()) {
                $xml->startElement('article'); // sof article
@@ -90,7 +90,7 @@ class ActionsList_View extends View {
             $dataDir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
             .$this->action->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR;
 
-            $img  = $dataDir.$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()]
+            $img  = $dataDir.$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()]
                     .URL_SEPARATOR.$this->action->{Actions_Model_Detail::COLUMN_IMAGE};
          }
 

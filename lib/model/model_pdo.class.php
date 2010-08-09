@@ -258,12 +258,12 @@ class Model_PDO extends Model {
             }
          } else {
             foreach ($columns as $columnKey => &$column) {
-               if($array[$column.$separator.Locale::getLang()] != '') {
-                  $content = $array[$column.$separator.Locale::getLang()];
+               if($array[$column.$separator.Locales::getLang()] != '') {
+                  $content = $array[$column.$separator.Locales::getLang()];
                }
                // použití výchozího jazyka
                else {
-                  $content = $array[$column.$separator.Locale::getDefaultLang()];
+                  $content = $array[$column.$separator.Locales::getDefaultLang()];
                }
                // určení indexu sloupce
                if(!is_int($columnKey)) {

@@ -249,12 +249,12 @@ class AppCore {
       Template::factory();
 
       //inicializace lokalizace
-      Locale::factory();
+      Locales::factory();
 
       //		inicializace sessions
       Sessions::factory(VVE_SESSION_NAME);
       // výběr jazyka a locales
-      Locale::selectLang();
+      Locales::selectLang();
       //		Inicializace chybových hlášek
       $this->_initMessagesAndErrors();
 
@@ -583,16 +583,16 @@ class AppCore {
       $this->coreTpl->userIsLogin = Auth::isLogin();
       $this->coreTpl->userLoginUsername = Auth::getUserName();
       // Přiřazení jazykového pole
-      $this->coreTpl->setPVar("appLangsNames", Locale::getAppLangsNames());
+      $this->coreTpl->setPVar("appLangsNames", Locales::getAppLangsNames());
       // Vytvoření odkazů s jazyky
       $langs = array();
-      $langNames = Locale::getAppLangsNames();
+      $langNames = Locales::getAppLangsNames();
       $link = new Url_Link();
-      foreach (Locale::getAppLangs() as $langKey => $lang) {
+      foreach (Locales::getAppLangs() as $langKey => $lang) {
          $langArr = array();
          $langArr['name'] = $lang;
          $langArr['label'] = $langNames[$lang];
-         if($lang != Locale::getDefaultLang()) {
+         if($lang != Locales::getDefaultLang()) {
             $langArr['link'] = (string)$link->lang($lang);
          } else {
             $langArr['link'] = (string)$link->lang();
@@ -604,7 +604,7 @@ class AppCore {
       unset($langArr);
       $this->coreTpl->setPVar("appLangs", $langs);
       unset($langs);
-      $this->coreTpl->setPVar("appLang", Locale::getLang());
+      $this->coreTpl->setPVar("appLang", Locales::getLang());
    }
 
    /**
@@ -616,6 +616,8 @@ class AppCore {
       List ($usec, $sec) = Explode (' ', microtime());
       $endTime = ((float)$sec + (float)$usec);
       $this->coreTpl->execTime = round($endTime-$this->_startTime, 4);
+//      file_put_contents(AppCore::getAppWebDir().'logs'.DIRECTORY_SEPARATOR.'time.log',
+//              $this->coreTpl->execTime."\n", FILE_APPEND); // export rychlosti
       $this->coreTpl->countAllSqlQueries = Db_PDO::getCountQueries();
       $this->coreTpl->addTplFile(Template_Core::getMainIndexTpl(), true);
       // render šablony
@@ -994,7 +996,7 @@ class AppCore {
             ob_start();
          }
       }
-      Locale::setLang(self::$urlRequest->getUrlLang());
+      Locales::setLang(self::$urlRequest->getUrlLang());
 
       // načtení kategorie
       self::$category = new Category(self::$urlRequest->getCategory(),true);

@@ -36,7 +36,7 @@ class Text_Controller extends Controller {
 
       $textarea = new Form_Element_TextArea('text', $this->_("Text"));
       $textarea->setLangs();
-      $textarea->addValidation(new Form_Validator_NotEmpty(null, Locale::getDefaultLang(true)));
+      $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea);
 
       $model = new Text_Model_Detail();

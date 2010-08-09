@@ -179,7 +179,7 @@ class Url_Request {
          Url_Link::setCategory($this->getCategory());
          Url_Link_Module::setRoute($this->getModuleUrlPart());
          Url_Link::setParams($this->getUrlParams());
-         Locale::setLang($this->getUrlLang());
+         Locales::setLang($this->getUrlLang());
          Url_Link::setLang($this->getUrlLang());
       }
    }
@@ -201,8 +201,8 @@ class Url_Request {
       if(preg_match("/^(?:(?P<lang>[a-z]{2})\/)?(?P<url>.*)/", self::$fullUrl, $match) ){
          if(!empty ($match)) {
             $this->lang = $match['lang'];
-            Locale::setLang($this->lang);
-            Url_Link::setLang(Locale::getLang());
+            Locales::setLang($this->lang);
+            Url_Link::setLang(Locales::getLang());
             $return = true;
          }
       }

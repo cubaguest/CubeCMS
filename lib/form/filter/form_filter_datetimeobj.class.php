@@ -43,7 +43,7 @@ class Form_Filter_DateTimeObj extends Form_Filter {
       } else {
          // filtr podle jazyka
 //         $matches = array();
-//         switch (Locale::getLang()) {
+//         switch (Locales::getLang()) {
 //               // f: d.m.Y
 //            case 'cs':
 //                  preg_match("/^(?P<day>[0-9]{1,2}).(?P<mounth>[0-9]{1,2}).(?P<year>[0-9]{4})$/", $variable, $matches);

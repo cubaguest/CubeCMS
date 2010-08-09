@@ -87,7 +87,7 @@ class PhotoGalery_Model_Images extends Model_PDO {
       if($name != null) {
          //vatvoření pole s popisky
          if(!is_array($name)) {
-            $langs = Locale::getAppLangs();
+            $langs = Locales::getAppLangs();
             $names = array();
             foreach ($langs as $l) {
                $names[$l]=$name;

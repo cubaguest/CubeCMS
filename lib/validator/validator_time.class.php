@@ -18,7 +18,7 @@ class Validator_Time extends Validator {
 	 */
 	public function checkDate($date, $timestam = false) {
       $regs = array();
-		if (preg_match("/([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})/",$date, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locale::getLang() != 'en'){
+		if (preg_match("/([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})/",$date, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locales::getLang() != 'en'){
 			$date = $regs[2].self::ISO_DATE_SEPARATOR.$regs[1].self::ISO_DATE_SEPARATOR.$regs[3];
 			$time = mktime(null,null,null,$regs[2],$regs[1],$regs[3]);
 		} else if (preg_match ("/([0-9]{1,2})/([0-9]{1,2})/([0-9]{4})/",$date, $regs) AND checkdate ($regs[1], $regs[2], $regs[3])){

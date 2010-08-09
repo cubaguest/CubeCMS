@@ -20,7 +20,7 @@ class ActionsList_Panel extends Panel {
             }
 
             $this->template()->datadir = $dataDir.$this->template()
-                    ->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()].URL_SEPARATOR;
+                    ->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()].URL_SEPARATOR;
             break;
          case 'list':
          default:

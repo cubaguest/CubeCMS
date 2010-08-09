@@ -70,8 +70,8 @@ class Model_Category extends Model_PDO {
          ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
          .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
              ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
-             ." AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locale::getLang()
-             ." = :catkey OR cat.".self::COLUMN_URLKEY.'_'.Locale::getDefaultLang()
+             ." AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locales::getLang()
+             ." = :catkey OR cat.".self::COLUMN_URLKEY.'_'.Locales::getDefaultLang()
              ." = :catkey2) LIMIT 0, 1");
 
          $dbst->bindValue(":catkey", $catKey);
@@ -88,8 +88,9 @@ class Model_Category extends Model_PDO {
       }
       $dbst->execute();
 
-      $dbst->setFetchMode(PDO::FETCH_INTO, new Model_LangContainer());
-      return $dbst->fetch();
+      $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
+      $return =  $dbst->fetch();
+      return $return;
    }
 
    /**
@@ -106,7 +107,7 @@ class Model_Category extends Model_PDO {
              ." AND (cat.".self::COLUMN_CAT_ID." = :idcat) LIMIT 0, 1");
       $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
       $dbst->bindValue(':idgrp', AppCore::getAuth()->getGroupId() , PDO::PARAM_INT);
-      $dbst->setFetchMode(PDO::FETCH_INTO, new Model_LangContainer());
+      $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
       $dbst->execute();
 
       return $dbst->fetch();
@@ -129,7 +130,7 @@ class Model_Category extends Model_PDO {
           ." = ".$dbc->quote($catId).") LIMIT 0, 1");
       $dbst->execute();
 
-      $dbst->setFetchMode(PDO::FETCH_INTO, new Model_LangContainer());
+      $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
       return $dbst->fetch();
 
    }
@@ -155,17 +156,17 @@ class Model_Category extends Model_PDO {
                     ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp"
                     ." AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'"
                     .$whereMenu.")"
-                    ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+                    ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locales::getLang().") DESC");
             $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
 
          } else {
             $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
                     ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
                     .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
-                    ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+                    ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locales::getLang().") DESC");
          }
          $dbst->execute();
-         $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+         $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
 
          $cats = array();
          //      foreach ($categories as $row) {
@@ -190,10 +191,10 @@ class Model_Category extends Model_PDO {
 
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
                  ." WHERE ".self::COLUMN_INDIVIDUAL_PANELS." = 1"
-                 ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locale::getLang().") DESC");
+                 ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locales::getLang().") DESC");
 
          $dbst->execute();
-         $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+         $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
 
 //         $cats = array();
 //         //      foreach ($categories as $row) {
@@ -302,8 +303,8 @@ class Model_Category extends Model_PDO {
 
    public function search($string){
       $dbc = new Db_PDO();
-      $clabel = self::COLUMN_CAT_LABEL.'_'.Locale::getLang();
-      $ctext = self::COLUMN_DESCRIPTION.'_'.Locale::getLang();
+      $clabel = self::COLUMN_CAT_LABEL.'_'.Locales::getLang();
+      $ctext = self::COLUMN_DESCRIPTION.'_'.Locales::getLang();
 
       $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1).' * MATCH(cat.'.$clabel.') AGAINST (:sstring)'
               .' + MATCH(cat.'.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION

@@ -144,7 +144,7 @@ class Component_Api_VVEArticle extends Component {
       // rss hlavička
       $this->xml->startElement('article'); // SOF article
       $this->xml->writeAttribute('xmlns','http://www.vveframework.eu/v6');
-      $this->xml->writeAttribute('xml:lang', Locale::getLang());
+      $this->xml->writeAttribute('xml:lang', Locales::getLang());
       // informace o webu
       $this->xml->startElement('web');
       $this->xml->writeElement('name', $this->web['name']);

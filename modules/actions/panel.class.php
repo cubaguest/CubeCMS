@@ -15,7 +15,7 @@ class Actions_Panel extends Panel {
             if ($actions === false) return false;
             $this->template()->action = $actions;
             $this->template()->datadir = $this->category()->getModule()->getDataDir(true)
-                    .$this->template()->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()].URL_SEPARATOR;
+                    .$this->template()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()].URL_SEPARATOR;
             break;
          case 'featured':
             $model = new Actions_Model_List();
@@ -25,7 +25,7 @@ class Actions_Panel extends Panel {
             $this->template()->action = $actions->fetch();
             if ($this->template()->action === false) return false;
             $this->template()->datadir = $this->category()->getModule()->getDataDir(true)
-                    .$this->template()->action[Actions_Model_Detail::COLUMN_URLKEY][Locale::getLang()].URL_SEPARATOR;
+                    .$this->template()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()].URL_SEPARATOR;
             break;
          case 'list':
          default:

@@ -42,7 +42,7 @@ class Articles_Model_List extends Model_PDO {
               . $wherePub // public
               ." ORDER BY ".Articles_Model_Detail::COLUMN_ADD_TIME." DESC"
               ." LIMIT :fromRow, :rowCount ");
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+      $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer', array(Articles_Model_Detail::COLUMN_NAME));
       $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
       $dbst->bindValue(':fromRow', (int)$fromRow, PDO::PARAM_INT);
       $dbst->bindValue(':rowCount', (int)$rowsCount, PDO::PARAM_INT);
@@ -137,7 +137,7 @@ class Articles_Model_List extends Model_PDO {
       } else {
          $wherePub = null;
       }
-      $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME.", cats.".Model_Category::COLUMN_URLKEY.'_'.Locale::getLang()." AS curlkey"
+      $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME.", cats.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()." AS curlkey"
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
               ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
