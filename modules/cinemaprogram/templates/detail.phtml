@@ -13,8 +13,13 @@ $m = $this->movie;
             <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir()
                     .$m->{CinemaProgram_Model_Detail::COL_IMAGE},null,200);?>
       </p>
-      <p>
             <?}?>
+      <p>
+         <?
+         if($m->{CinemaProgram_Model_Detail::COL_TYPE} != null) {
+            echo ($this->_('Typ promítání').":&nbsp;".$m->{CinemaProgram_Model_Detail::COL_TYPE});
+         }?>
+         <br />
          <?
          print ($this->_('Mládeži').":&nbsp;");
          if($m->{CinemaProgram_Model_Detail::COL_ACCESS} != 0) {

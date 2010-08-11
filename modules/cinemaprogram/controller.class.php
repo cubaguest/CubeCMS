@@ -109,7 +109,7 @@ class CinemaProgram_Controller extends Controller {
 
          $instId = $model->saveMovie($form->name->getValues(), $form->label->getValues(),
                  $form->price->getValues(), $form->length->getValues(), $form->type->getValues(),
-                 $form->originalname->getValues(), $form->filmclub->getValues(),
+                 $form->originalname->getValues(), $form->filmtype->getValues(), $form->filmclub->getValues(),
                  $form->access->getValues(), $form->imdbid->getValues(), 
                  $form->csfdid->getValues(), $imgName, $form->critique->getValues(),
                  $form->orderlink->getValues());
@@ -195,7 +195,7 @@ class CinemaProgram_Controller extends Controller {
 
          $model->saveMovie($form->name->getValues(), $form->label->getValues(),
                  $form->price->getValues(), $form->length->getValues(), $form->type->getValues(),
-                 $form->originalname->getValues(),
+                 $form->originalname->getValues(),$form->filmtype->getValues(),
                  $form->filmclub->getValues(), $form->access->getValues(),
                  $form->imdbid->getValues(), $form->csfdid->getValues(),
                  $imgName, $form->critique->getValues(), $form->orderlink->getValues(), $this->getRequest('id'));
@@ -299,6 +299,10 @@ class CinemaProgram_Controller extends Controller {
 
       $elemFilmClub = new Form_Element_Checkbox('filmclub', $this->_('Filmový klub'));
       $form->addElement($elemFilmClub,'filmshowdetail');
+
+      $elemMovieType = new Form_Element_Select('filmtype', $this->_('Typ promítání'));
+      $elemMovieType->setOptions(array('Normální' => null, '2D' => '2D', '3D' => '3D'));
+      $form->addElement($elemMovieType,'filmshowdetail');
 
       $accesibility = array(_('Žádná') => 0, 12 => 12, 15 => 15, 18 => 18);
       $elemAcces = new Form_Element_Select('access', $this->_('Věková hranice'));

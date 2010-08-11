@@ -31,6 +31,7 @@ class CinemaProgram_Model_Detail extends Model_PDO {
    const COL_CRITIQUE = 'critique';
    const COL_ORDER_LINK = 'orderlink';
    const COL_CHANGE = 'changed';
+   const COL_TYPE = 'type';
 
    const COL_T_ID = 'id_time';
    const COL_T_ID_M = 'id_movie';
@@ -86,14 +87,14 @@ class CinemaProgram_Model_Detail extends Model_PDO {
    }
 
    public function saveMovie($name, $label, $price, $length, $version,
-           $origname = null, $filmClub = false,
+           $origname = null, $type = null, $filmClub = false,
            $access = 0, $imdbid = null, $csfdid = null, $image = null, $critique = null, $orderlink=null, $id = null) {
       $dbc = new Db_PDO();
 
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET `".self::COL_NAME."` = :name, `".self::COL_LABEL."` = :label, `".self::COL_LABEL_CLEAR."` = :label_c,"
-          ." `".self::COL_PRICE."` = :price, `".self::COL_LENGTH."` = :length,"
+          ." `".self::COL_PRICE."` = :price, `".self::COL_LENGTH."` = :length, `".self::COL_TYPE."` = :type,"
           ." `".self::COL_VERSION."` = :version, `".self::COL_NAME_ORIG."` = :origname,"
           ." `".self::COL_FC."` = :filmclub, `".self::COL_ACCESS."` = :access,"
           ." `".self::COL_IMDBID."` = :imdbid, `".self::COL_CSFDID."` = :csfdid,"
@@ -101,6 +102,7 @@ class CinemaProgram_Model_Detail extends Model_PDO {
           ." WHERE ".self::COL_ID." = :idmovie");
          $dbst->bindValue(':name', $name, PDO::PARAM_STR);
          $dbst->bindValue(':label', $label, PDO::PARAM_STR);
+         $dbst->bindValue(':type', $type, PDO::PARAM_STR|PDO::PARAM_NULL);
          $dbst->bindValue(':label_c', strip_tags($label), PDO::PARAM_STR);
          $dbst->bindValue(':price', $price, PDO::PARAM_INT);
          $dbst->bindValue(':length', $length, PDO::PARAM_INT);
@@ -120,15 +122,16 @@ class CinemaProgram_Model_Detail extends Model_PDO {
                  ."  (`".self::COL_NAME."`, `".self::COL_NAME_ORIG."`, `"
                  .self::COL_FC."`, `".self::COL_LABEL."`, `".self::COL_LABEL_CLEAR."`,`".self::COL_PRICE."`,`".self::COL_LENGTH
                  ."`,`".self::COL_ACCESS."`,`".self::COL_VERSION."`,`".self::COL_IMDBID."`,`".self::COL_CSFDID
-                 ."`,`".self::COL_IMAGE."`,`".self::COL_CRITIQUE."`,`".self::COL_ORDER_LINK."`)"
+                 ."`,`".self::COL_IMAGE."`,`".self::COL_CRITIQUE."`,`".self::COL_ORDER_LINK."`,`".self::COL_TYPE."`)"
                  ." VALUES (:name, :nameorig, :fc, :lab, :lab_c, :price, :leng, :access,".
-                 " :vers, :imdbid, :csfdid, :img, :critique, :orderlink)");
-         
+                 " :vers, :imdbid, :csfdid, :img, :critique, :orderlink, :type)");
+
          $dbst->bindValue(':price', $price, PDO::PARAM_INT);
          $dbst->bindValue(':leng', $length, PDO::PARAM_INT);
          $dbst->bindValue(':imdbid', $imdbid, PDO::PARAM_INT);
          $dbst->bindValue(':csfdid', $csfdid, PDO::PARAM_INT);
          $dbst->bindValue(':name', $name, PDO::PARAM_STR);
+         $dbst->bindValue(':type', $type, PDO::PARAM_STR|PDO::PARAM_NULL);
          $dbst->bindValue(':img', $image, PDO::PARAM_STR);
          $dbst->bindValue(':access', $access, PDO::PARAM_STR);
          $dbst->bindValue(':nameorig', $origname, PDO::PARAM_STR);

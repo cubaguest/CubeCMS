@@ -84,6 +84,14 @@ while ($time = $this->times->fetch()) {
                   </p>
                               <?}?>
                   <p>
+                     <?
+                     echo ($this->_('Typ promítání').":&nbsp;");
+                     if($m->{CinemaProgram_Model_Detail::COL_TYPE} != null) {
+                        echo ($m->{CinemaProgram_Model_Detail::COL_TYPE});
+                     } else {
+                        echo ($this->_('Normální'));
+                     }?>
+                     <br />
                               <?
                               print ($this->_('Mládeži').":&nbsp;");
                               if($m->{CinemaProgram_Model_Detail::COL_ACCESS} != 0) {
