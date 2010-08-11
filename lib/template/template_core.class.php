@@ -114,9 +114,7 @@ class Template_Core extends Template {
          array_push($arr, VVE_WEB_NAME);
       }
       $title = implode(' '.VVE_PAGE_TITLE_SEPARATOR.' ', $arr);
-      
-      $title = substr($title, 0, strlen($title)-strlen(VVE_PAGE_TITLE_SEPARATOR)-2);
-      $contents = str_replace('{*-PAGE_TITLE-*}', htmlspecialchars($title), $contents);
+      $contents = str_replace('{*-PAGE_TITLE-*}', $title, $contents);
       // keywords
       if(self::$pageKeywords != null){
          $contents = str_replace('{*-PAGE_KEYWORDS-*}', htmlspecialchars(self::$pageKeywords), $contents);
