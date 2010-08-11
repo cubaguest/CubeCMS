@@ -86,8 +86,12 @@ class CinemaProgram_View extends View {
                     .$movie->{CinemaProgram_Model_Detail::COL_IMAGE};
          }
 
-         $api->setArticle($movie->{CinemaProgram_Model_Detail::COL_NAME},
-                 $this->link()->route('detail', array('id'=>$movie->{CinemaProgram_Model_Detail::COL_ID},
+         $name = $movie->{CinemaProgram_Model_Detail::COL_NAME};
+         if($movie->{CinemaProgram_Model_Detail::COL_TYPE} == '3D'){
+            $name .= ' (3D)';
+         }
+
+         $api->setArticle($name,$this->link()->route('detail', array('id'=>$movie->{CinemaProgram_Model_Detail::COL_ID},
                  'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME}))),
                   vve_tpl_truncate($movie->{CinemaProgram_Model_Detail::COL_LABEL_CLEAR},200), $img);
 
