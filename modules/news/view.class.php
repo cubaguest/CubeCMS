@@ -4,7 +4,7 @@ class News_View extends Articles_View {
       $this->template()->addTplFile("list.phtml");
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_article', $this->_("Přidat aktualitu"),
+         $toolbox->addTool('add_article', $this->_("Přidat novinku"),
             $this->link()->route('add'),
             $this->_("Přidat novou aktulitu"), "page_add.png");
          $this->toolbox = $toolbox;
@@ -20,9 +20,9 @@ class News_View extends Articles_View {
          $toolbox = new Template_Toolbox();
          $toolbox->addTool('edit_article', $this->_("Upravit"),
                  $this->link()->route('edit'),
-                 $this->_("Upravit zobrazenou aktualitu"), "page_edit.png");
+                 $this->_("Upravit zobrazenou novinku"), "page_edit.png");
          $toolbox->addTool('article_delete', $this->_("Smazat"),
-                 $this->link(), $this->_("Smazat zobrazenou aktualitu"), "page_delete.png",
+                 $this->link(), $this->_("Smazat zobrazenou novinku"), "page_delete.png",
                  'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
                  $this->_('Opravdu smazat aktualitu?'));
          $this->template()->toolbox = $toolbox;
