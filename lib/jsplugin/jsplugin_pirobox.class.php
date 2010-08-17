@@ -13,7 +13,7 @@
 
 class JsPlugin_PiroBox extends JsPlugin {
    protected $config = array(
-   'theme' => 'black');
+   'theme' => 'white');
 
 	protected function initJsPlugin() {
       
@@ -24,7 +24,7 @@ class JsPlugin_PiroBox extends JsPlugin {
 //		Přidání css stylu
 		$this->addFile(new JsPlugin_CssFile($this->getCfgParam('theme').'/style.css'));
 		//		Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("piroBox.1_2_min.js"));
+		$this->addFile(new JsPlugin_JsFile("pirobox.min.js"));
 	}
 }
 ?>
