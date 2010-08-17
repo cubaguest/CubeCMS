@@ -166,7 +166,7 @@ class Articles_View extends View {
    }
 
    public function exportArticleHtmlView() {
-      $this->template()->addTplFile('contentdetail.phtml');
+      $this->template()->addTplFile('contentdetail.phtml', 'articles');
    }
 
    public function lastListXmlView() {
