@@ -1,13 +1,11 @@
 <?
 $this->addCssFile("style.css");
-
 $this->addPageTitle($this->_('úprava miniatury'));
-$this->addPageHeadline($this->_('úprava miniatury'));
-
 $this->addJsPlugin(new JsPlugin_JCrop());
 ?>
 <?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('editimages')));?>
-<div id="editPhotoForm">
+<h1><?=$this->_('úprava miniatury');?></h1>
+<div class="main-content-form-edit">
    <table class="formTable">
       <tr>
          <td>
@@ -18,7 +16,6 @@ $this->addJsPlugin(new JsPlugin_JCrop());
          </td>
       </tr>
    </table>
-
    <form action="<?=$this->form->getAction()?>" method="post">
       <table class="formTable">
          <tr>

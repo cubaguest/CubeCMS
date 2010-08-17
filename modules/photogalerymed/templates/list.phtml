@@ -2,22 +2,24 @@
 $this->addCssFile("style.css");
 $modelImages = new PhotoGalery_Model_Images();
 ?>
-<div class="galeriesList">
+<h1><?echo $this->category()->getName();?></h1>
+<div class="main-content-list">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $noPClass = $noPubllic = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
-            $noPClass = 'noPublicGalery';
-            $noPubllic = '<span class="smallFont">'.$this->_('Nezveřejněno').'</span>';
+            $noPClass = 'main-content-no-public';
+            $noPubllic = $this->_('Nezveřejněno');
          }
          $addDate = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
-   <div class="<?=$noPClass?>">
+   <div class="main-content-list-record <?=$noPClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
-            <span class="smallFont"><?=strftime("%x %X", $addDate->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a><?=$noPubllic?>
+            <span class="font-small"><?=strftime("%x %X", $addDate->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+         </a><span class="font-small"><?=$noPubllic?></span>
       </h2>
+      <div class="main-content-list-record-images">
       <?
       $images = $modelImages->getImages($this->category()->getId(), 
               $article->{Articles_Model_Detail::COLUMN_ID},
@@ -29,8 +31,7 @@ $modelImages = new PhotoGalery_Model_Images();
               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL
               .URL_SEPARATOR.$row->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
       <?}?>
-
-            <?//print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
+      </div>
       <hr class="reseter" />
       <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">

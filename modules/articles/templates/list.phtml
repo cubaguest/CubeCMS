@@ -3,10 +3,13 @@ $this->addCssFile("style.css");
 
 if($this->top === true) {
    $this->addPageTitle($this->_('nejčtenější články'));
-   $this->addPageHeadline($this->_('nejčtenější články'));
+   $h1 = $this->category()->getName().' - '.$this->_('nejčtenější');
+} else {
+   $h1 = $this->category()->getName();
 }
 ?>
-<div class="article-list">
+<h1><?=$h1;?></h1>
+<div class="main-content-list">
 <p style="text-align:right">
    <?=$this->_('Řadit podle')?>:&nbsp;
    <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
@@ -18,39 +21,36 @@ if($this->top === true) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
-            $showClass = 'noPublicArticle';
+            $showClass = 'main-content-no-public';
             $public = $this->_('Nezveřejněn');
          }
          $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
-   <div class="<?=$showClass?>">
+   <div class="main-content-list-record <?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
-            <span class="smallFont">
+            <span class="font-small">
              <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a><?='<span class="smallFont">'.$public.'</span>'?>
+         </a><span class="font-small"><?=$public?></span>
       </h2>
-            <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
-            $out = array();
-            preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model_Detail::COLUMN_TEXT}, $out);
-            if(!empty ($out) AND $out[1] != '0') {?>
-      <div class="imageBox">
-                  <?=vve_tpl_image_tag($out[1], "article title image", 80, 80);?>
-      </div>
-            <?}
-            if($article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
-               echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};
-            } else {
-               echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);
-            }
-            ?>
+      <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
+      $out = array();
+      preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model_Detail::COLUMN_TEXT}, $out);
+      if(!empty ($out) AND $out[1] != '0') {?>
+         <div class="main-content-list-record-image"><?=vve_tpl_image_tag($out[1], "article title image", 140, 100);?></div>
+      <?}?>
+         <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
+            <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
+         <?} else {?>
+            <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
+         <?}?>
       <hr class="reseter" />
       <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
             title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
       </p>
-      <br />
+      <hr class="reseter" />
    </div>
      <?}
       print $this->scrollComp;

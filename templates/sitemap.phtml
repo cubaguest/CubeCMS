@@ -23,10 +23,10 @@ function vveRenderMap($menuArr, $link, $catsArr) {
    print ("</ul>\n");
 }
 ?>
-
-<!-- Halvni menu sekce v menu  -->
 <h1><?=_("Mapa stránek")?></h1>
-<div class="sitemapList">
-   <?=vveRenderMap($this->categories, $this->link(), $this->catArr)?>
-   <br style="clear: left" />
+<div class="main-content-detail">
+   <div class="main-content-text page-sitemap">
+      <?=vveRenderMap($this->categories, $this->link(), $this->catArr)?>
+      <hr class="reseter" />
+   </div>
 </div>

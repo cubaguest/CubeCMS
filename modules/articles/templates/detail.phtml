@@ -17,12 +17,10 @@ $addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME}
 $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
 ?>
 
-<div class="article-detail">
-   <h1><?=$h1?></h1>
-   <?
-   if($this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
-   <div class="article-detail-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
-   <br />
+<h1><?=$h1?></h1>
+<div class="main-content-detail">
+   <?if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
+   <div class="main-content-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
    <?}?>
    <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
    <hr class="reseter" />

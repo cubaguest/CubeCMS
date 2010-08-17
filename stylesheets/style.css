@@ -235,6 +235,10 @@ span[title] {
    border-bottom: 1px dashed gray;
 }
 
+.font-small, .note {
+   font-size: x-small;
+}
+
 /* Hlášky */
 .message {
    font-size: small;
@@ -374,26 +378,43 @@ a.form-link-lang-sel {
 /* EOF back */
 
 /* SOF main content  NEW!!! */
-.article-list {}
-.article-list-record {
-   margin-bottom: 15px;
-}
-.article-list-record-box-image, .article-detail-box-image {
+.main-content {} /* Hlavní obsah stránky */
+.main-content-list, .main-content-detail {} /* Seznamový obsah stránky */
+.main-content-list-record {
+   margin-bottom: 1em;
+} /* prvek v seznamu */
+.main-content-no-public, .comment-nopublic {
+   background-color: #dddddd;
+} /* nazveřejněný obsah */
+.main-content-list-record-image, .main-content-image {
    float: left;
    width: 150px;
    text-align: center;
+} /* obrázek v prvku v seznamu */
+.main-content-list-record-image img, .main-content-image img {
+   padding: 0 10px 0px 0;
 }
-.article-list-record-box-image img, .article-detail-box-image img {
-   padding: 0 10px 10px 0;
-}
+.main-content-list-record-images {} /* Obrázky v seznamu */
 
-.article-list-record-no-public, .article-detail-no-public, .comment-nopublic {
-   background-color: #666666;
-   color: #ffffff;
-}
-.article-detail-content, .article-list-record-content {}
+.main-content-list-record-text, .main-content-list-record-annotation {
+   padding: 0 0 0.7em 0;
+} /* text v prvku v seznamu */
+.main-content-annotation {
+   background-color: #fdf5ce;
+   padding: 5px;
+   margin-bottom: 1em;
+} /* Anotace k textu */
+.main-content-image {} /* obrázek v hlavním obsahu */
+.main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
+.main-content-text {} /* text v hlavním obsahu */
 
-.article-form-edit {}
+.main-content-form-edit {} /* Třída pro editační formulář */
+
+/* archiv */
+.main-content-archive {}/* Hlavní obsah archivu */
+.main-content-archive-year {}/* rok v archivu */
+.main-content-archive-year-content {}/* obsah roku v archivu */
+.main-content-archive-item {}/* položka v archivu */
 
 /* EOF main content NEW!!! */
 
@@ -407,14 +428,7 @@ a.form-link-lang-sel {
 
 /* EOF panel content NEW!!! */
 
-
-/* SOF main content */
-#col1pad>div {
-}
-
-/* EOF Main Content */
 /* SOF Panels Content */
-
 div.panel {
    background-color: #cfcfd0;
    border: 1px solid #006666;

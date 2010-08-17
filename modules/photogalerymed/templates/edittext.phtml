@@ -1,23 +1,20 @@
 <?
 $this->addCssFile("style.css");
-
 if($this->edit){
    $this->addPageTitle($this->_('úprava galerie'));
-   $this->addPageHeadline($this->_('úprava galerie'));
+   $h1 = $this->_('úprava galerie');
 } else {
    $this->addPageTitle($this->_('přidání galerie'));
-   $this->addPageHeadline($this->_('přidání galerie'));
+   $h1 = $this->_('přidání galerie');
 }
-
 ?>
-<div id="editTextForm">
+<h1><?echo $h1;?></h1>
+<div class="main-content-form-edit">
    <?
-
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 10)->addClass("mceEditor");
    $tinymce = new JsPlugin_TinyMce();
    $tinymce->setCfgParam('theme', 'advancedsimple');
    $this->addJsPlugin($tinymce);
-
    print ($this->form);
    ?>
 </div>

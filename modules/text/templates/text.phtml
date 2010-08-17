@@ -1,10 +1,14 @@
 <?
 if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABEL} != null) {
    $this->addPageTitle($this->text->{Text_Model_Detail::COLUMN_LABEL});
-   $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
+   $h1 = $this->text->{Text_Model_Detail::COLUMN_LABEL};
+} else {
+   $h1 = $this->category()->getName();
 }
 ?>
-<div>
+<h1><?=$h1;?></h1>
+<div class="main-content-detail">
+<div class="main-content-text">
    <?
    if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
       echo ($this->text->{Text_Model_Detail::COLUMN_TEXT});
@@ -12,6 +16,7 @@ if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABE
       echo ($this->_("Text nebyl definován, vytvoříte jej v administraci"));
    }
    ?>
+</div>
 </div>
 <?
 if($this->text != null AND strpos((string)$this->text->{Text_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false){

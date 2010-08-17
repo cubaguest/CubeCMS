@@ -97,13 +97,14 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
                   <? $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);
                   $icon = null;
-                  if(Template::pVar('HEADLINE_ICON') !== null){
+                  if(Template::pVar('HEADLINE_ICON') !== null){ // tohle asi mrsknout jinam do zvláštní šablony a loadovat  modulů
                      $icon = '<img src="'.Template::pVar('HEADLINE_ICON').'" alt="'.Template::pVar('HEADLINE_ICON').'" />';
                   } else if(Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
                      $icon = '<img src="'.Category::getCatIconDir().Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON}.'" alt="'.Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON}.'" />';
                   }
                   ?>
-                  <h1><?=$icon?>{*-PAGE_HEADLINE-*}</h1>
+<!--                  <h1><?=$icon?>{*-PAGE_HEADLINE-*}</h1>-->
+                  <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
                   <?if($this->pageNotFound) {
                      $this->includeTpl("error404.phtml", true);
                   } else if($this->specialPage) {
@@ -113,6 +114,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
                      }
                   ?>
                   <hr class="separator" />
+                  </div>
                </div><!-- col1pad -->
             </div><!-- col1wrap -->
 

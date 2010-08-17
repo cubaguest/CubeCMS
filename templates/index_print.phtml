@@ -26,9 +26,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');?>
    </head>
    <body id="pageTop" onload="printpage();">
       <div id="body">
-         <h1>{*-PAGE_HEADLINE-*}</h1>
-         <hr/>
-<? $this->includeTpl("modules.phtml", true); ?>
+         <? $this->includeTpl("modules.phtml", true); ?>
          <hr class="reseter" />
          <div id="foot">
             <?=_('Odkaz: ') . $this->link(); ?>

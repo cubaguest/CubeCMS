@@ -4,11 +4,10 @@ $this->addCssFile("style.css");
 if($this->edit) {
    $this->addPageTitle($this->_('úprava novinky'));
    $this->addPageTitle($this->catName);
-   $this->addPageHeadline($this->_('úprava novinky'));
-   $this->addPageHeadline($this->catName);
+   $h1 = $this->_('úprava novinky').' '.$this->catName;
 } else {
-   $this->addPageTitle($this->_('přidání novinky'));
-   $this->addPageHeadline($this->_('přidání novinky'));
+   $h1 = $this->_('přidání novinky');
+   $this->addPageTitle($h1);
 }
 // donastavení formuláře
 $this->form->name->html()->setAttrib('size', 72);
@@ -26,8 +25,8 @@ $tinymce->setCfgParam('theme', JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
 $this->addJsPlugin($tinymce);
 
 ?>
-
-<div id="editArticleForm">
+<h1><?=$h1;?></h1>
+<div class="main-content-form-edit">
    <?print($this->form);?>
    <?if($this->edit === true){
       $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));

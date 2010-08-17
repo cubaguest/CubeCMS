@@ -3,11 +3,14 @@ $this->addCssFile("style.css");
 
 if($this->top === true) {
    $this->addPageTitle($this->_('nejčtenější články'));
-   $this->addPageHeadline($this->_('nejčtenější články'));
+   $h1 = $this->category()->getName().' - '.$this->_('nejčtenější');
+} else {
+   $h1 = $this->category()->getName();
 }
 $imagesM = new PhotoGalery_Model_Images();
 ?>
-<div class="articlesList">
+<h1><?=$h1;?></h1>
+<div class="main-content-list">
 <p style="text-align:right">
    <?=$this->_('Řadit podle')?>:&nbsp;
    <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
@@ -19,43 +22,45 @@ $imagesM = new PhotoGalery_Model_Images();
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
-            $showClass = 'noPublicArticle';
-            $public = $this->_('Nezveřejněn');
+            $showClass = 'main-content-no-public';
+            $public = $this->_('Nezveřejněno');
          }
          $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          // hlavní obrázek
          $mainImage = $imagesM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID},1)->fetch();
 
          ?>
-   <div class="<?=$showClass?>">
+   <div class="main-content-list-record <?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
-            <span class="smallFont">
+            <span class="font-small">
              <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a><?='<span class="smallFont">'.$public.'</span>'?>
+         </a><?='<span class="font-small">'.$public.'</span>'?>
       </h2>
             <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
             if($mainImage != false) {
                ?>
-      <div class="imageBox" style="float:left; margin-right: 10px;">
+      <div class="main-content-list-record-image">
                   <?//=vve_tpl_image_tag(, "article title image", 80);?>
          <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
                           .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                           .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                           .$mainImage->{PhotoGalery_Model_Images::COLUMN_FILE},
-                          $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 235,null, 'articleImage');?>
+                          $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 140, 100);?>
       </div>
             <?}?>
-
-            <?//print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
-            <?print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
+      <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
+         <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
+      <?} else if((string)$article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
+         <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
+      <?}?>
       <hr class="reseter" />
       <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
             title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
       </p>
-      <br />
+      <hr class="reseter" />
    </div>
      <?}
       print $this->scrollComp;

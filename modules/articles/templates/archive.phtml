@@ -1,36 +1,38 @@
-<? // načtení detailu
+<?
+// načtení detailu
 $this->addPageTitle($this->_('Archiv'));
-$this->addPageHeadline($this->_('Archiv'));
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 ?>
-<div>
-   <div id="articlesArchiveList">
-      <?
-      foreach ($this->articles as $year => $rows) {?>
-      <h2 class="archiveYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
-      <div class="">
+<h1><?= $this->_('Archiv'); ?></h1>
+<div class="main-content-archive">
+   <? foreach ($this->articles as $year => $rows) {?>
+      <h2 class="main-content-archive-year year<?= $year ?>"><a href="#"><?= $year ?></a></h2>
+      <div class="main-content-archive-year-content">
          <ul>
-         <?foreach ($rows as $row){?>
-            <li>
-               <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-                  title="<?=$row->{Articles_Model_Detail::COLUMN_NAME}?>"><?=$row->{Articles_Model_Detail::COLUMN_NAME}?></a>
+         <?foreach ($rows as $row) {
+            $title = $row->{Articles_Model_Detail::COLUMN_NAME};
+            if ((string) $row->{Articles_Model_Detail::COLUMN_ANNOTATION} != null) {
+               $title = strip_tags($row->{Articles_Model_Detail::COLUMN_ANNOTATION});
+            }?>
+            <li class="main-content-archive-item">
+               <a href="<?= $this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY})) ?>"
+                  title="<?= htmlspecialchars($title)?>"><?= $row->{Articles_Model_Detail::COLUMN_NAME} ?></a>
             </li>
-         <?}?>
-         </ul>
-      </div>
-      <?}?>
+            <? } ?>
+      </ul>
+   </div>
+   <? } ?>
    </div>
    <hr class="reseter" />
    <script type="text/javascript">
 
       $(function() {
-         $("#articlesArchiveList").accordion({
+         $(".main-content-archive").accordion({
             collapsible: true
          });
       });
    </script>
-</div>
-<?$this->includeTpl("buttonback.phtml", true);?>
+<? $this->includeTpl("buttonback.phtml", true); ?>

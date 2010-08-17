@@ -2,37 +2,29 @@
 $this->addCssFile("style.css");
 
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
-$this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
+$h1 = $this->article->{Articles_Model_Detail::COLUMN_NAME};
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
-$addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME});
-$editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
 ?>
-<div>
-   <p>
-      <?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
-              ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
-   </p>
+<h1><?=$h1?></h1>
+<div class="main-content-detail">
    <?if($this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
-   <div class="photogaleryMedText">
-         <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
-   </div>
-   <br />
-      <?}?>
-
+   <div class="main-content-text"><?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?></div>
+   <?}?>
    <!-- Start Advanced Gallery Html Containers -->
-   <div class="photogaleryMedImages">
-      <?while ($image = $this->images->fetch()) {
-         ?>
-      <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+   <div class="main-content-images"><?
+      $images = $this->images->fetchAll();
+      if(count($images) == 1) {$class = 'pirobox';}
+      else {$class = 'pirobox_gall';}
+      foreach ($images as $image) {
+         ?><a class="<?=$class?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
                     .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
-      </a>
-         <?}?>
-   </div>
+         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
+         ><img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
+                         /></a><?
+         }
+         ?></div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
    <?$this->includeTpl('articletools.phtml', true, array(
@@ -40,7 +32,6 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailpdf'),
            'shares' => $this->shares));?>
-
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
@@ -57,11 +48,8 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
             close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
          });
       });
-
       /* ]]> */
    </script>
-   <?
-   echo $this->toolbox;
-   ?>
+   <?echo $this->toolbox;?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>

@@ -1,22 +1,21 @@
 <?
 $this->addCssFile("style.css");
-
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
-
 ?>
-<div class="imagesList">
+<h1><?echo $this->category()->getName();?></h1>
+<div class="main-content-detail">
    <?if($this->text != null) {?>
-   <div>
-         <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
-   </div>
-   <br />
+      <div class="main-content-text"><?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
    <?}?>
-
    <!-- Start Advanced Gallery Html Containers -->
-   <div class="navigation-container">
-      <?while ($image = $this->images->fetch()) {
-         ?><a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+   <div class="main-content-images">
+      <?
+      $images = $this->images->fetchAll();
+      if(count($images) == 1) {$class = 'pirobox';}
+      else {$class = 'pirobox_gall';}
+      foreach ($images as $image) {
+         ?><a class="<?echo $class;?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
                 .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
          title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
          ><img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
@@ -25,7 +24,6 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
-
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
@@ -42,7 +40,6 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
             close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
          });
       });
-
       /* ]]> */
    </script>
    <?

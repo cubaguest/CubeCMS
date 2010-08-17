@@ -1,33 +1,28 @@
-<div class="articlesList">
+<div class="main-content-list">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0) {
-            $showClass = 'noPublicArticle';
-            $public = $this->_('Nezveřejněn');
+            $showClass = 'main-content-no-public';
+            $public = $this->_('Nezveřejněno');
          }
          $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
-   <div class="<?=$showClass?>">
+   <div class="main-content-list-record <?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
-            <span class="smallFont">
+            <span class="font-small">
                      <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a><?='<span class="smallFont">'.$public.'</span>'?>
+         </a><?='<span class="font-small">'.$public.'</span>'?>
       </h2>
             <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
             $out = array();
             preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model_Detail::COLUMN_TEXT}, $out);
             if(!empty ($out) AND $out[1] != '0') {?>
-      <div class="imageBox">
-                  <?=vve_tpl_image_tag($out[1], "article title image", 80, 80);?>
-      </div>
+      <div class="main-content-image"><?=vve_tpl_image_tag($out[1], "article title image", 130, 100);?></div>
                <?}?>
-
-            <?//print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
-            <?echo $article->{Articles_Model_Detail::COLUMN_TEXT};?>
+      <div class="main-content-text"><?echo $article->{Articles_Model_Detail::COLUMN_TEXT};?></div>
       <hr class="reseter" />
-      <br />
    </div>
          <?}
    } else {
