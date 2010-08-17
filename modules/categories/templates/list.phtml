@@ -17,7 +17,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
    $cycle = 0;
    //   $level = $menuArr->getLevel();
    foreach ($menuArr as $key => $item) {$cycle++?>
-<tr><td>
+<tr class="list-item"><td>
       <span class="sec"><?=str_repeat('&nbsp;', ($item->getLevel())*6).$item?></span>
       <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=$item?>">link</a>
       ID:<?=$item->getId()?>
@@ -53,42 +53,37 @@ function vveSectionsRenderFunc($menuArr, $link) {
             <?}?>
    </td>
 </tr>
-<tr>
-   <td colspan="2"><hr /></td>
-</tr>
       <?
       if(!$item->isEmpty()) {
          vveSectionsRenderFunc($item, $link);
       }
       $first = false;
    }
-//   print ("</ul>\n");
 }
 ?>
-<div>
+<h1><?=$this->_("Struktura stránek")?></h1>
+<div class="main-content-detail">
    <?//sekce
    $typeClass = 'mainStruct';
    if($this->adminStructure == true) {$typeClass = 'adminStruct';}
    ?>
-   <h2><?=$this->_("Struktura stránek")?></h2>
    <div id="sections" class="<?=$typeClass?>">
       <table style="width: 98%">
-         <?
-         if($this->structure != null){
+         <?if($this->structure != null){
             echo vveSectionsRenderFunc($this->structure, $this->link());
-         }
-         ?>
+         }?>
       </table>
    </div>
    <br />
    <?$this->includeTpl('structtype.phtml');?><br />
    <br />
    <script type="text/javascript">
+      /* <![CDATA[ */
       function submitRemoveCat(msg){
          return confirm('<?=$this->_('Opravdu smazat kategorii: ')?>'+msg+'?');
       }
+      /* ]]> */
    </script>
-
    <?
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();

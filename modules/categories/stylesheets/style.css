@@ -1,6 +1,5 @@
 @CHARSET "UTF-8";
 .mainStruct {
-
 }
 
 .adminStruct {
@@ -21,4 +20,23 @@
 
 #sections .sec {
    font-weight: bold;
+}
+.list-item td {
+   border-bottom: 1px solid gray;
+   padding: 5px;
+}
+.list-item:hover {
+   background-color: #fdf5ce;
+}
+
+.moduleParamsTable thead{
+   border-bottom: 1px solid silver;
+}
+.moduleParamsTable .paramDefValue {
+   text-align: center;
+}
+.moduleLabel {
+   background-color: white;
+   border: 1px solid silver;
+   padding: 3px;
 }
