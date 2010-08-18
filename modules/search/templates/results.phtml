@@ -1,10 +1,15 @@
-<h2><?=$this->_('Výsledky hledání')?>:</h2>
-<p><?printf($this->_('Nalezeno %s výsledků'),count($this->results))?></p>
+<br />
+<h2><?=$this->_('Výsledky hledání')?>:&nbsp;<span class="font-small"><?printf($this->_('Nalezeno %s výsledků'),count($this->results))?></span></h2>
+<div class="main-content-list">
 <?
 //foreach ($this->results as $result) {
 for ($i = (int)$this->start; $i < $this->stop; $i++) {
 if(!isset ($this->results[$i])) break;
-$result = $this->results[$i];?>
+$result = $this->results[$i];
+$class = 'record-odd';
+if($i % 2 != 0) $class = 'record-even';
+?>
+<div class="main-content-list-record <?=$class?>">
 <h3>
    <? // pokud se jedná o jiný web
    if($result[Search::R_I_WEB_NAME] != VVE_WEB_NAME){?>
@@ -31,7 +36,8 @@ $result = $this->results[$i];?>
 <p>
    <a href="<?=$result[Search::R_I_LINK]?>" title="<?=$this->_('Přejít na adresu')?>"><?=$result[Search::R_I_LINK]?></a>
 </p>
-<br />
+</div>
 <?}
 print $this->scrollComp;
 ?>
+</div>

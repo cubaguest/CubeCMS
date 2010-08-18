@@ -1,6 +1,8 @@
-<?
-?>
-<div class="searchApiList">
+<h1><?=$this->_('Nastavení hledání');?></h1>
+<div class="main-content-detail">
+   <p><?=$this->_('Zde lze přidávat další podstránky, ve kterých se má hledat.');?></p>
+   <br/>
+   <div class="main-content-form-edit">
    <h2><?=$this->_('Uložené API');?></h2>
    <table style="width: 95%" cellpadding="0" cellspacing="0">
       <tr>
@@ -33,16 +35,14 @@
       <tr>
          <td colspan="3"><?=$this->_('Žádné API není přidáno')?></td>
       </tr>
-            
             <?}?>
-
    </table>
    <br />
    <h2><?=$this->_('Přidání API');?></h2>
    <?print($this->formAdd);?>
-
    <h2><?=$this->_('Popis API');?></h2>
    <?print($this->apiLabels);?>
-
+   </div>
+   <br />
 </div>
 <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()->route()));?>

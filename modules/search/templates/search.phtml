@@ -1,5 +1,7 @@
-<div>
-   <div style="text-align: center">
+<?$this->addCssFile('style.css');?>
+<h1><?=$this->category()->getName();?></h1>
+<div class="main-content-detail">
+   <div class="search-box">
       <form method="get" action="<?=$this->link()?>">
          <label for="search_string"><?=$this->_('Hledat')?>:&nbsp;</label>
          <input id="search_string" type="text" size="35" name="q" value="<?=$this->searchString?>" />
@@ -22,7 +24,7 @@
          <input type="submit" value="<?=$this->_('Hledat')?>" />
       </form>
    </div>
-   <br />
+</div>
    <?
    if($this->search === true) $this->includeTpl('results.phtml');
    ?>
@@ -34,4 +36,3 @@
           $this->_("Upravit parametry hledání"), "magnifier_zoom_in.png");
       $this->includeTplObj($toolbox);
    }?>
-</div>
