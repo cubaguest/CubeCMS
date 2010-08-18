@@ -111,7 +111,7 @@ class Search_Controller extends Controller {
          .$cat[Model_Category::COLUMN_MODULE].DIRECTORY_SEPARATOR.'search.class.php')) continue;
 
          // objekt kategorie
-         $catObj = new Category(null, true, $cat);
+         $catObj = new Category(null, false, $cat);
          // jméno třídy hledání
          $sClassName = ucfirst($catObj->getModule()->getName())."_Search";
 
