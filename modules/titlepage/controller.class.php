@@ -4,6 +4,8 @@ class TitlePage_Controller extends Controller {
    const ITEM_TYPE_MENU = 'menu';
    const ITEM_TYPE_VIDEO = 'video';
    const ITEM_TYPE_ARTICLE = 'articles';
+   const ITEM_TYPE_ARTICLEWGAL = 'articleswgal';
+   const ITEM_TYPE_ACTION = 'action';
    const ITEM_TYPE_NEWS = 'news';
 
       /**
@@ -27,6 +29,7 @@ class TitlePage_Controller extends Controller {
 
       $itemsList = array();
       foreach ($items as $item) {
+         $data = null;
          $link = $title = $image = $nameCat = null;
          $linkCat = $this->link()->clear();
          $name = unserialize($item->{TitlePage_Model_Items::COLUMN_NAME});
@@ -46,6 +49,7 @@ class TitlePage_Controller extends Controller {
                if(empty ($data)) continue;
                break;
             case self::ITEM_TYPE_ARTICLE:
+            case self::ITEM_TYPE_ARTICLEWGAL:
             case self::ITEM_TYPE_NEWS:
                if($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN} != 0){ // aktuální
                   $modelArticles = new Articles_Model_Detail();
@@ -74,6 +78,80 @@ class TitlePage_Controller extends Controller {
                $title = $article->{Articles_Model_Detail::COLUMN_NAME};
                $nameCat = $cat->{Model_Category::COLUMN_CAT_LABEL};
 
+               // pokud je galerie s článkem
+               if($item->{TitlePage_Model_Items::COLUMN_TYPE} == self::ITEM_TYPE_ARTICLEWGAL){
+                  $modelPhoto = new PhotoGalery_Model_Images();
+                  $images = $modelPhoto->getImages($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY},
+                     $article->{Articles_Model_Detail::COLUMN_ID}, 1)->fetchObject();
+                  if($images != false){
+                     $image = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$cat->{Model_Category::COLUMN_DATADIR}
+                     .URL_SEPARATOR.$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                     .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
+                     .$images->{PhotoGalery_Model_Images::COLUMN_FILE};
+                  }
+                  unset ($images);
+               }
+               // pokud je článek a obsahuje obrázek, použijeme ten
+               else if ($item->{TitlePage_Model_Items::COLUMN_TYPE} == self::ITEM_TYPE_ARTICLE
+                  OR $item->{TitlePage_Model_Items::COLUMN_TYPE} == self::ITEM_TYPE_NEWS){
+                  $dom = new DOMDocument();
+                  $dom->loadHTML((string)$article->{Articles_Model_Detail::COLUMN_TEXT});
+                  $xml = simplexml_import_dom($dom);
+                  $images = $xml->xpath('//img');
+                  if(!empty ($images)){
+                     $image = $images[0]['src'];
+                  }
+               }
+               unset ($cat);
+               unset ($article);
+               if(empty ($data)) continue;
+               break;
+            case self::ITEM_TYPE_ACTION:
+               if($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN} != 0){ // aktuální
+                  $modelActions = new Actions_Model_Detail();
+                  $action = $modelActions->getActionById($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN});
+               } else { // vybraný
+                  $modelActions = new Actions_Model_List();
+                  $action = $modelActions->getFeaturedActions($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY})->fetch();
+               }
+
+               $modelCat = new Model_Category();
+               $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+
+               $link = new Url_Link_Module(true);
+               $link->setModuleRoutes(new Actions_Routes(AppCore::getUrlRequest()));
+
+               $linkCat = $link->category($cat->{Model_Category::COLUMN_URLKEY});
+               $link = $linkCat->route('detail', array('urlkey' => $action->{Actions_Model_Detail::COLUMN_URLKEY}));
+
+//               if((string)$ac ->{Actions_Model_Detail::::COLUMN_ANNOTATION} != null){
+//                  $data = $article->{Articles_Model_Detail::COLUMN_ANNOTATION};
+//               } else {
+                  $data = strip_tags($action->{Actions_Model_Detail::COLUMN_TEXT}, '<a><strong><em>');
+//               }
+
+               $title = $action->{Actions_Model_Detail::COLUMN_NAME};
+               $nameCat = $cat->{Model_Category::COLUMN_CAT_LABEL};
+
+               if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null){
+                  $image = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$cat->{Model_Category::COLUMN_DATADIR}
+                     .URL_SEPARATOR.$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                     .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE};
+               }
+
+               // pokud je galerie s článkem
+//               if($item->{TitlePage_Model_Items::COLUMN_TYPE} == self::ITEM_TYPE_ARTICLEWGAL){
+//                  $modelPhoto = new PhotoGalery_Model_Images();
+//                  $images = $modelPhoto->getImages($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY},
+//                     $article->{Articles_Model_Detail::COLUMN_ID}, 1)->fetchObject();
+//                  $image = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$cat->{Model_Category::COLUMN_DATADIR}
+//                     .URL_SEPARATOR.$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+//                     .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
+//                     .$images->{PhotoGalery_Model_Images::COLUMN_FILE};
+//                  unset ($images);
+//               }
+               unset ($cat);
+               unset ($article);
                if(empty ($data)) continue;
                break;
             default:
@@ -126,11 +204,23 @@ class TitlePage_Controller extends Controller {
             'title' => $this->_('Přidání položky s článkem'),
             'desc' => $this->_('Přidání položky s existujícím článkem v systému')
          ),
+         self::ITEM_TYPE_ARTICLEWGAL => array(
+            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ARTICLEWGAL)),
+            'name' => $this->_('Článek s galerií'),
+            'title' => $this->_('Přidání položky s článkem s galerií'),
+            'desc' => $this->_('Přidání položky s existujícím článkem s galerií v systému')
+         ),
          self::ITEM_TYPE_NEWS => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_NEWS)),
             'name' => $this->_('Novinka'),
-            'title' => $this->_('Přidání položky a novinkou'),
+            'title' => $this->_('Přidání položky s novinkou'),
             'desc' => $this->_('Přidání položky s existující novinkou v systému')
+         ),
+         self::ITEM_TYPE_ACTION => array(
+            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ACTION)),
+            'name' => $this->_('Akce'),
+            'title' => $this->_('Přidání položky s akcí'),
+            'desc' => $this->_('Přidání položky s existující akcí v systému')
          )
       );
 
@@ -149,10 +239,10 @@ class TitlePage_Controller extends Controller {
             $this->editItemMenuCtrl();
             break;
          case self::ITEM_TYPE_ARTICLE:
-            $this->editItemArticleCtrl(null, self::ITEM_TYPE_ARTICLE);
-            break;
          case self::ITEM_TYPE_NEWS:
-            $this->editItemArticleCtrl(null, self::ITEM_TYPE_NEWS);
+         case self::ITEM_TYPE_ARTICLEWGAL:
+         case self::ITEM_TYPE_ACTION:
+            $this->editItemArticleCtrl(null, $this->getRequest('type'));
             break;
          default:
             return false;
@@ -176,6 +266,9 @@ class TitlePage_Controller extends Controller {
             break;
          case self::ITEM_TYPE_ARTICLE:
             $this->editItemArticleCtrl($item, self::ITEM_TYPE_ARTICLE);
+            break;
+         case self::ITEM_TYPE_ARTICLEWGAL:
+            $this->editItemArticleCtrl($item, self::ITEM_TYPE_ARTICLEWGAL);
             break;
          case self::ITEM_TYPE_NEWS:
             $this->editItemArticleCtrl($item, self::ITEM_TYPE_NEWS);
@@ -215,6 +308,7 @@ class TitlePage_Controller extends Controller {
       $form->addElement($elemImage);
       
       $id = null;
+      $image = null;
       if($item != null){
          $id=$item->{TitlePage_Model_Items::COLUMN_ID};
          $form->name->setValues(unserialize($item->{TitlePage_Model_Items::COLUMN_NAME}));
@@ -222,6 +316,7 @@ class TitlePage_Controller extends Controller {
          $form->columns->setValues($item->{TitlePage_Model_Items::COLUMN_COLUMNS});
          // pokud je obrázek přidáme element s checkboxem pro odstranění
          if($item->{TitlePage_Model_Items::COLUMN_IMAGE} != null){
+            $image = $item->{TitlePage_Model_Items::COLUMN_IMAGE};
             $elemDelImg = new Form_Element_Checkbox('delimg', $this->_('Smazat obrázek'));
             $elemDelImg->setSubLabel(sprintf($this->_('Uložen obrázek: %s'),$item->{TitlePage_Model_Items::COLUMN_IMAGE}));
             $form->addElement($elemDelImg);
@@ -232,7 +327,6 @@ class TitlePage_Controller extends Controller {
       $form->addElement($elemSubmit);
 
       if($form->isValid()){
-         $image = null;
          // mazání
          if($form->image->getValues() != null OR ($form->haveElement('delimg') AND $form->delimg->getValues() == true)){
             $file = new Filesystem_File($item->{TitlePage_Model_Items::COLUMN_IMAGE}, $this->category()->getModule()->getDataDir());
@@ -296,7 +390,7 @@ class TitlePage_Controller extends Controller {
 
       if($form->isValid()){
          // ulož
-         $modelItems->saveItem(self::ITEM_TYPE_VIDEO, strip_tags($form->videoObj->getValues(),'<object><param>'),
+         $modelItems->saveItem(self::ITEM_TYPE_VIDEO, strip_tags($form->videoObj->getValues(),'<object><param><embed>'),
                  $this->category()->getId(), serialize($form->name->getValues()),
                  $image, $form->columns->getValues(),$id);
 
@@ -383,16 +477,27 @@ class TitlePage_Controller extends Controller {
    private function editItemArticleCtrl($item = null, $type = self::ITEM_TYPE_ARTICLE) {
       $form = new Form('article_item_');
 
+      $catEmptyMsg = $this->_('Není vytvořena žádná kategorie pro požadovaný panel');
       switch ($type) {
+         case self::ITEM_TYPE_ACTION:
+            $module = 'actions';
+            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s akcí');
+            break;
          case self::ITEM_TYPE_NEWS:
             $module = 'news';
+            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s novinkami');
+            break;
+         case self::ITEM_TYPE_ARTICLEWGAL:
+            $module = 'articleswgal';
+            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s články');
             break;
          case self::ITEM_TYPE_ARTICLE:
          default:
+            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s články');
             $module = 'articles';
             break;
       }
-      $this->view()->type = self::ITEM_TYPE_ARTICLE; // typ editace
+      $this->view()->type = $type; // typ editace
       $modelItems = new TitlePage_Model_Items();
 
       $elemName = new Form_Element_Text('name', $this->_('Název'));
@@ -403,11 +508,11 @@ class TitlePage_Controller extends Controller {
       $elemCategory->addValidation(new Form_Validator_IsNumber());
       $elemCategory->addValidation(new Form_Validator_NotEmpty());
       $modelCat = new Model_Category();
-      $cats = $modelCat->getCategoryListByModule($module);
-      if($cats == false){
-         $this->errMsg()->addMessage($this->_('Není vytvořena žádná kategorie s články'));
+      $cats = $modelCat->getCategoryListByModule($module)->fetchAll();
+      if(empty ($cats)){
+         $this->errMsg()->addMessage($catEmptyMsg);
+         return false;
       }
-      $cats = $cats->fetchAll();
       foreach ($cats as $cat) {
          $elemCategory->setOptions(array(vve_tpl_truncate((string)$cat->{Model_Category::COLUMN_CAT_LABEL},100) => $cat->{Model_Category::COLUMN_CAT_ID}),true);
       }
@@ -418,13 +523,15 @@ class TitlePage_Controller extends Controller {
       $elemArticle->addValidation(new Form_Validator_NotEmpty());
 
       if($item != null){
-         $arts = $this->getArticles($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+         $this->getListController($type, $item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+         $arts = $this->view()->list;
       } else {
-         $arts = $this->getArticles(reset($cats)->{Model_Category::COLUMN_CAT_ID});
+         $this->getListController($type, reset($cats)->{Model_Category::COLUMN_CAT_ID});
+         $arts = $this->view()->list;
       }
       $elemArticle->setOptions(array($this->_('Aktuální - naposledy přidaný') => 0),true);
       foreach ($arts as $art) {
-         $elemArticle->setOptions(array(vve_tpl_truncate((string)$art->{Articles_Model_Detail::COLUMN_NAME},100) => $art->{Articles_Model_Detail::COLUMN_ID}),true);
+         $elemArticle->setOptions(array((string)$art['text'] => $art['id']),true);
       }
       $form->addElement($elemArticle);
 
@@ -456,23 +563,32 @@ class TitlePage_Controller extends Controller {
       $this->view()->form = $form;
    }
 
-   private function getArticles($idCat) {
-      $model = new Articles_Model_List();
-      $articles = $model->getList($idCat, 0, 100);
-      return $articles->fetchAll();
-   }
-
-   public function getArticlesListController() {
+   public function getListController($type = self::ITEM_TYPE_ARTICLE, $idc = 0) {
       $this->checkWritebleRights();
+      $idc = $this->getRequestParam('idc', $idc);
+
       $result = array();
-      switch ($this->getRequestParam('type')) {
+      switch ($this->getRequestParam('type', $type)) {
          case self::ITEM_TYPE_ARTICLE:
+         case self::ITEM_TYPE_ARTICLEWGAL:
          case self::ITEM_TYPE_NEWS:
+            array_push($result,array('id' => 0, 'text' => $this->_('Aktuální - naposledy přidaný')));
             $modelArticles = new Articles_Model_List();
-            $articles = $this->getArticles($this->getRequestParam('idc'));
+            $articles = $modelArticles->getList($idc, 0, 100)->fetchAll();
             foreach ($articles as $art) {
-               array_push($result, array('id' => $art->{Articles_Model_Detail::COLUMN_ID},
+               array_push($result, array('id' => (int)$art->{Articles_Model_Detail::COLUMN_ID},
                        'text' => vve_tpl_truncate((string)$art->{Articles_Model_Detail::COLUMN_NAME},100)));
+            }
+            break;
+         case self::ITEM_TYPE_ACTION:
+            array_push($result,array('id' => 0, 'text' => $this->_('Aktuální')));
+            $modelActions = new Actions_Model_List();
+            $toTime = new DateTime();
+            $toTime->modify('+ 1 year');
+            $actions = $modelActions->getActions($idc, new DateTime(), $toTime)->fetchAll();
+            foreach ($actions as $act) {
+               array_push($result, array('id' => (int)$act->{Actions_Model_Detail::COLUMN_ID},
+                       'text' => vve_tpl_truncate((string)$act->{Actions_Model_Detail::COLUMN_NAME},100)));
             }
             break;
          default:
