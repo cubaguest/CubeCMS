@@ -20,7 +20,7 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
       margin-left: 2em;
    }
 </style>
-<div class="module-courses-detail">
+<div class="main-content-detail module-courses-detail">
    <?
    echo $this->course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}.'<br />';
    if($this->courseImage != null){?>
@@ -74,14 +74,17 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
       </li>
       </ul>
       <br />
-
-      <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT} ?>
+      <div class="main-content-text">
+         <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT} ?>
+      </div>
       <hr class="reseter" />
       <br />
 
       <?if($this->isPrivate === true AND $this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} != null){?>
       <h2><?=$this->_('Neveřejná data');?></h2>
-      <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} ?>
+      <div class="main-content-text">
+         <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} ?>
+      </div>
       <hr class="reseter" />
       <br />
       <?}?>

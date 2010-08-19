@@ -129,7 +129,6 @@ class Courses_Controller extends Controller {
 
          $urlkeys = $addForm->urlkey->getValues();
          $names = $addForm->name->getValues();
-
          $idC = $model->saveCourse($addForm->name->getValues(), $addForm->textShort->getValues(),
                          $addForm->text->getValues(), $addForm->textPrivate->getValues(),
                          $addForm->urlkey->getValues(),
@@ -139,7 +138,7 @@ class Courses_Controller extends Controller {
                          $addForm->seats->getValues(), $addForm->seatsBlocked->getValues(),
                          $addForm->isNew->getValues(), $addForm->allowReg->getValues(),
                          $imgName, $addForm->lecturers->getValues(), $addForm->privateUsers->getValues(),
-                         $editForm->allowFeed->getValues());
+                         $addForm->allowFeed->getValues());
 
          $newCours = $model->getCourseById($idC);
 

@@ -80,10 +80,9 @@ class Courses_Model_Courses extends Model_PDO {
                  .self::COLUMN_SEATS.",". self::COLUMN_SEATS_BLOCKED.","
                  .self::COLUMN_IS_NEW.",". self::COLUMN_ALLOW_REG.",". self::COLUMN_IMAGE.","
                  .self::COLUMN_ID_USER.", ".self::COLUMN_FEED.")"
-                 ." VALUES (:name, :textShort, :text, :textPrivate, :textClear, :urlkey, :metaDesc, :keywords"
+                 ." VALUES (:name, :textShort, :text, :textPrivate, :textClear, :urlkey, :metaDesc, :keywords,"
                  ." :dateStart, :dateStop, :price, :place, :hoursLen, :seats,"
-                 ." :seatsBlocked, :isNew, :allowReg, :image, :idUser, :isFeed"
-                 .")");
+                 ." :seatsBlocked, :isNew, :allowReg, :image, :idUser, :isFeed".")");
       }
       $dbst->bindValue(':name', $name, PDO::PARAM_STR);
       $dbst->bindValue(':textShort', $textShort, PDO::PARAM_STR);
