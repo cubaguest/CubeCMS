@@ -189,7 +189,9 @@ class Actions_Controller extends Controller {
             $fileObj = new Filesystem_File($file, AppCore::getAppCacheDir());
             $fileObj->move($this->category()->getModule()->getDataDir().$act[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
             $image = new Filesystem_File_Image($fileObj);
-            $image->resampleImage(self::MAIN_IMAGE_WIDTH, self::MAIN_IMAGE_HEIGHT,true);
+            $image->resampleImage($this->category()->getParam('img_width', self::MAIN_IMAGE_WIDTH),
+               $this->category()->getParam('img_height', self::MAIN_IMAGE_HEIGHT),
+               $this->category()->getParam('img_crop', true));
             $image->save();
             unset ($fileObj);
          }
@@ -270,7 +272,9 @@ class Actions_Controller extends Controller {
             $fileObj->move($this->category()->getModule()->getDataDir()
                     .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
             $image = new Filesystem_File_Image($fileObj);
-            $image->resampleImage(self::MAIN_IMAGE_WIDTH, self::MAIN_IMAGE_HEIGHT,true);
+            $image->resampleImage($this->category()->getParam('img_width', self::MAIN_IMAGE_WIDTH),
+               $this->category()->getParam('img_height', self::MAIN_IMAGE_HEIGHT),
+               $this->category()->getParam('img_crop', true));
             $image->save();
             unset ($fileObj,$image);
          }
@@ -482,6 +486,13 @@ class Actions_Controller extends Controller {
          $form->img_height->setValues($settings['img_height']);
       }
 
+      $elemCropI = new Form_Element_Checkbox('img_crop', 'Ořezávat titulní obrázek');
+      $elemCropI->setValues(true);
+      $form->addElement($elemCropI, 'images');
+      if(isset($settings['img_crop'])) {
+         $form->img_crop->setValues($settings['img_crop']);
+      }
+
       if(isset($settings['type'])) {
          $form->type->setValues($settings['type']);
       } else {
@@ -490,6 +501,9 @@ class Actions_Controller extends Controller {
 
       if($form->isValid()) {
          $settings['time'] = $form->time->getValues();
+         $settings['img_width'] = $form->img_width->getValues();
+         $settings['img_height'] = $form->img_height->getValues();
+         $settings['img_crop'] = $form->img_crop->getValues();
          // protože je vždy hodnota
          if($form->type->getValues() != self::DEFAULT_TIMEWINDOW_TYPE){
             $settings['type'] = $form->type->getValues();
