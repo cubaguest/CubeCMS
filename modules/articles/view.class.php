@@ -3,7 +3,7 @@ class Articles_View extends View {
    public function mainView() {
       $this->template()->addTplFile("list.phtml");
       $feeds = new Component_Feed();
-      $feeds->setConfig('feedLink', $this->link()->clear()->route('export'));
+      $feeds->setConfig('feedLink', $this->link()->clear()->route('exportFeed'));
       $feeds->setConfig('urlArgName', "{type}");
       $this->template()->feedsComp = $feeds;
 
@@ -109,7 +109,7 @@ class Articles_View extends View {
       // add a page
       $c->pdf()->AddPage();
       // nadpis
-      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN+2);
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN-2);
       $name = "<h1>".$article->{Articles_Model_Detail::COLUMN_NAME}
               ."</h1>";
       $c->pdf()->writeHTML($name, true, 0, true, 0);
@@ -118,11 +118,17 @@ class Articles_View extends View {
 
       // datum autor
       $date = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
-      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'BI', VVE_PDF_FONT_SIZE_MAIN);
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'BI', VVE_PDF_FONT_SIZE_MAIN-2);
       $author = "<p>(".strftime("%x", $date->format("U"))
               ." - ".$article->{Model_Users::COLUMN_USERNAME}.")</p>";
       $c->pdf()->writeHTML($author, true, 0, true, 0);
 //      $c->pdf()->Ln();
+
+      if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
+         $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
+         $c->pdf()->writeHTML((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION}, true, 0, true, 10);
+         $c->pdf()->Ln();
+      }
 
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
       $c->pdf()->writeHTML((string)$article->{Articles_Model_Detail::COLUMN_TEXT}, true, 0, true, 10);
@@ -138,22 +144,23 @@ class Articles_View extends View {
 
    public function exportFeedView() {
       $feed = new Component_Feed(true);
-
       $feed ->setConfig('type', $this->type);
       $feed ->setConfig('css', 'rss.css');
       $feed ->setConfig('title', $this->category()->getName());
       $feed ->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
       $feed ->setConfig('link', $this->link());
-
       while ($article = $this->template()->articles->fetch()) {
-         $feed->addItem($article->{Articles_Model_Detail::COLUMN_NAME},
-                 $article->{Articles_Model_Detail::COLUMN_TEXT},
+         if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
+            $text = (string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION};
+         } else {
+            $text = (string)$article->{Articles_Model_Detail::COLUMN_TEXT};
+         }
+         $feed->addItem($article->{Articles_Model_Detail::COLUMN_NAME}, $text,
                  $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
                  new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}),
                  $article->{Model_Users::COLUMN_USERNAME}, null, null,
                  $article->{Articles_Model_Detail::COLUMN_URLKEY}."_".$article->{Articles_Model_Detail::COLUMN_ID});
       }
-
       $feed->flush();
    }
 
