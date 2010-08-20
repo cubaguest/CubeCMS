@@ -4,11 +4,10 @@ $this->addCssFile("style.css");
 if($this->edit) {
    $this->addPageTitle($this->_('úprava akce'));
    $this->addPageTitle($this->catName);
-   $this->addPageHeadline($this->_('úprava akce'));
-   $this->addPageHeadline($this->catName);
+   $h1 = $this->_('úprava akce').' '.$this->catName;
 } else {
    $this->addPageTitle($this->_('přidání akce'));
-   $this->addPageHeadline($this->_('přidání akce'));
+   $h1 = $this->_('přidání akce');
 }
 // donastavení formuláře
 $this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
@@ -22,20 +21,17 @@ $jQuery->addUIDatepicker();
 $this->addJsPlugin($jQuery);
 
 ?>
-
-<div id="editArticleForm">
+<h1><?=$h1?></h1>
+<div class="main-content-form-edit" id="editArticleForm">
    <?print($this->form);?>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
          $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
-         //$.datepicker.regional['<?=Locales::getLang()?>']
          $("input[name=action_date_start]").datepicker();
          $("input[name=action_date_stop]").datepicker();
       });
       /* ]]> */
    </script>
 </div>
-<?
-   $this->includeTpl('buttonback.phtml', true);
-?>
+<?$this->includeTpl('buttonback.phtml', true);?>

@@ -11,13 +11,13 @@ $imagesM = new PhotoGalery_Model_Images();
 ?>
 <h1><?=$h1;?></h1>
 <div class="main-content-list">
-<p style="text-align:right">
+   <div class="main-content-tools">
    <?=$this->_('Řadit podle')?>:&nbsp;
    <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
    <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenějších')?></a>
    &nbsp;&brvbar;&nbsp;
    <a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
-</p>
+   </div>
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
@@ -55,11 +55,11 @@ $imagesM = new PhotoGalery_Model_Images();
          <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
       <?}?>
       <hr class="reseter" />
-      <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
-      <p style="text-align:right;">
+      <div class="main-content-showed"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
+      <div class="main-content-link-more">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
-      </p>
+            title="<?=$this->_("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+      </div>
       <hr class="reseter" />
    </div>
      <?}

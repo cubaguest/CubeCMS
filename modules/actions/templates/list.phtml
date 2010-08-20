@@ -1,40 +1,40 @@
 <?
 $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
 //$this->addPageHeadline(strftime("%x", $this->dateFrom).' - '.strftime("%x", $this->dateTo));
-$this->addPageHeadline($this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
 
 ?>
-<div class="actionsList">
+<h1><?=$this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
+<div class="main-content-list">
    <?
    if($this->text != false) {?>
-   <div>
+   <div class="main-content-text">
          <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
       <?}?>
 
-   <div style="text-align: right">
+   <div class="main-content-tools">
       <a href="<?=$this->link()->route('archive')?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
    </div>
 
    <?while ($row = $this->actions->fetch()) {
       if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
-      else $class = 'nonPublicAction';
+      else $class = 'main-content-no-public';
       $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
       if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
-         $subLabel = '<span class="articleSubLabel">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
+         $subLabel = '<span class="">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
       }
 
       ?>
-   <div class="<?=$class?>">
+   <div class="main-content-list-record <?=$class?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
              ><?=$subLabel?></a></h2>
             <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
-      <p>
+      <div class="main-content-text">
                <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
-      </p>
+      </div>
             <?}?>
-      <p>
+      <div class="main-content-text">
             <?
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -57,34 +57,31 @@ $this->addPageHeadline($this->category->getName().' - '.vve_date("%x", $this->da
                printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
             }
             ?>
-      </p>
+      </div>
          <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-      <p>
-               <?=$row->{Actions_Model_Detail::COLUMN_NOTE}?>
-      </p>
+      <div class="main-content-text">
+          <?=$row->{Actions_Model_Detail::COLUMN_NOTE}?>
+      </div>
             <?}?>
-      <p>
-            <?
-            if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-               print (vve_tpl_image_tag($this->category()->getModule()->getDataDir()
-                       .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
-                       .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
-            }
-            ?>
+      <?if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
+         <div class="main-content-image">
+         <?echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+              .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
+              .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));?>
+         </div>
+      <?}?>
+      <div class="main-content-text">
             <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
-      </p>
-      <p style="text-align: right">
+      </div>
+      <p class="main-content-link-more">
          <a href="<?=$this->link()->route('detail',
                        array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
             title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
       </p>
    </div>
-
       <?}?>
-
    &laquo;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;
    <a href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&raquo;
-
    <?
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();

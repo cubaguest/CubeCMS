@@ -32,11 +32,11 @@ $tinymce->setCfgParam('editor_selector', 'mceEditor');
 $this->addJsPlugin($tinymce);
 ?>
 
-<div id="article-edit-form">
+<div class="main-content-form-edit" id="article-edit-form">
    <?print($this->form);?>
-   <?if($this->edit === true){
-      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));
-   } else {
-      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
-   }?>
 </div>
+<?if($this->edit === true){
+   $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));
+} else {
+   $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
+}?>

@@ -1,21 +1,14 @@
 <?
 // do titulku
-if($this->edit) {
-   $this->addPageTitle($this->_('úprava textu k akcím'));
-   $this->addPageHeadline($this->_('úprava textu k akcím'));
-}
+$this->addPageTitle($this->_('úprava textu k akcím'));
 // donastavení formuláře
 $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 15)->addClass("mceEditor");
-
 $tinymce = new JsPlugin_TinyMce();
 $tinymce->setCfgParam('theme',  JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
 $this->addJsPlugin($tinymce);
-
 ?>
-
-<div id="editActionsLabelForm">
-   <?print($this->form);?>
+<h1><?=$this->_('úprava textu k akcím');?></h1>
+<div class="main-content-form-edit">
+   <?echo($this->form);?>
 </div>
-<?
-$this->includeTpl('buttonback.phtml', true);
-?>
+<?$this->includeTpl('buttonback.phtml', true);?>

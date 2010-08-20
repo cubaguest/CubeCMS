@@ -205,14 +205,14 @@ h3 a {
 a {
    text-decoration: none;
    border: none;
-   color: #007070;
+/*   color: #007070;*/
    /*color: black;*/
 }
 
 a:link {
    text-decoration: none;
    border: none;
-   color: #007070;
+/*   color: #007070;*/
 }
 
 a:visited {
@@ -379,9 +379,20 @@ a.form-link-lang-sel {
 
 /* SOF main content  NEW!!! */
 .main-content {} /* Hlavní obsah stránky */
-.main-content-list, .main-content-detail {} /* Seznamový obsah stránky */
+.main-content-list, .main-content-detail, .main-content-comments {} /* Seznamový obsah stránky */
+.main-content-link-more {
+   text-align: right;
+} /* Odkaz více */
+.main-content-showed {
+   float: left;
+} /* Text s počtem zobrazení */
+.main-content-comments {} /* box s komentáři */
 .main-content-list-record {
-   margin-bottom: 1em;
+   margin-bottom: 0.5em;
+   padding: 5px;
+   border-bottom-style: solid;
+   border-bottom-width: 1px;
+   border-bottom-color: #8ca1c2;
 } /* prvek v seznamu */
 .main-content-no-public, .comment-nopublic {
    background-color: #dddddd;
@@ -395,7 +406,7 @@ a.form-link-lang-sel {
    padding: 0 10px 0px 0;
 }
 .main-content-list-record-images {} /* Obrázky v seznamu */
-
+.main-content-list-record-date {} /* datum u novinky atd */
 .main-content-list-record-text, .main-content-list-record-annotation {
    padding: 0 0 0.7em 0;
 } /* text v prvku v seznamu */
@@ -404,6 +415,9 @@ a.form-link-lang-sel {
    padding: 5px;
    margin-bottom: 1em;
 } /* Anotace k textu */
+.main-content-tools {
+   text-align: right;
+} /* linky u článku, řazení, archiv*/
 .main-content-image {} /* obrázek v hlavním obsahu */
 .main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
 .main-content-text {} /* text v hlavním obsahu */
@@ -415,6 +429,11 @@ a.form-link-lang-sel {
 .main-content-archive-year {}/* rok v archivu */
 .main-content-archive-year-content {}/* obsah roku v archivu */
 .main-content-archive-item {}/* položka v archivu */
+
+.record-even {
+   background-color: #d4e3ff;
+}
+.record-odd {}
 
 /* EOF main content NEW!!! */
 

@@ -6,7 +6,7 @@ $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?= $this->_('Archiv'); ?></h1>
+<h1><?= $this->category()->getName().' - '.$this->_('Archiv'); ?></h1>
 <div class="main-content-archive">
    <? foreach ($this->articles as $year => $rows) {?>
       <h2 class="main-content-archive-year year<?= $year ?>"><a href="#"><?= $year ?></a></h2>

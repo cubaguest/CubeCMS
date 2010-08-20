@@ -1,15 +1,15 @@
 <? // načtení detailu
 $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
-$this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
 ?>
-<div>
+<h1><?=$this->action->{Actions_Model_Detail::COLUMN_NAME}?></h1>
+<div class="main-content-detail">
    <?if($this->action->{Actions_Model_Detail::COLUMN_SUBANME} != null) {?>
-   <p><?=$this->action->{Actions_Model_Detail::COLUMN_SUBANME}?></p>
-      <?}?>
+   <div class="main-content-text"><?=$this->action->{Actions_Model_Detail::COLUMN_SUBANME}?></div>
+   <?}?>
    <?if($this->action->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
-   <p><?=$this->action->{Actions_Model_Detail::COLUMN_AUTHOR}?></p>
+   <div class="main-content-text"><?=$this->action->{Actions_Model_Detail::COLUMN_AUTHOR}?></div>
       <?}?>
-   <p>
+   <div class="main-content-text">
       <?
       $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_START}));
       $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -32,20 +32,19 @@ $this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
          printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
       }
       ?>
-   </p>
+   </div>
    <?if($this->action->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-   <p>
-         <?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?>
-   </p>
+   <div class="main-content-text"><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></div>
       <?}?>
-   <?
-   if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-      print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->imagesDir.DIRECTORY_SEPARATOR
-              .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', null,null, 'actionImage'));
-   }
-   ?>
-
+   <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
+   <div class="main-content-image">
+      <?echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->imagesDir.DIRECTORY_SEPARATOR
+              .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', null,null, 'actionImage'));?>
+   </div>
+   <?}?>
+   <div class="main-content-text">
    <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
+   </div>
    <hr class="reseter" />
    <?$this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
