@@ -89,7 +89,7 @@ class Model_Module extends Model_PDO {
       $dbst = $dbc->prepare('UPDATE '.Db_PDO::table(self::DB_TABLE)." "
                  ." SET ".self::COLUMN_VERSION_MAJOR." = :vmajor, ".self::COLUMN_VERSION_MINOR." = :vminor"
                  ." WHERE ".self::COLUMN_NAME." = :name");
-      return $dbst->execute(array(':name' => $name, ':vmajor' => $vMajor, ':vminor' => $vMinor));
+      return $dbst->execute(array(':name' => $name, ':vmajor' => (int)$vMajor, ':vminor' => (int)$vMinor));
    }
 
    public function getInstalledModules() {
