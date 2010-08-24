@@ -69,10 +69,8 @@ class Install_Module {
    public function update($fromVersion, $toVersion) {
       // update tabulky
       $model = new Model_Module();
-      $ver = explode('.', $toVersion);
-
-      $currentVer = (float) $fromVersion;
-      while ($currentVer < (float) $toVersion) {
+      for ($currentVer = (float)$fromVersion; round($currentVer,1) < round((float)$toVersion,1); $currentVer+=0.1) {
+//      while ($currentVer < (float) $toVersion) {
          $fileName = preg_replace(array('/{from}/', '/{to}/'), 
                  array(number_format($currentVer, 1, '.', ''), number_format($currentVer+0.1, 1, '.', '')),
                          self::FILE_SQL_UPGRADE);
@@ -80,9 +78,11 @@ class Install_Module {
          if ($file->exist()) {
             $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
          }
-         $currentVer = $currentVer + 0.1;
+//         $currentVer = $currentVer + 0.1;
+         $matches = array();
+         preg_match('/([0-9]+)[.,]?([0-9]?)/', (float)$currentVer+0.1, $matches);
+         $model->registerUpdatedModule($this->moduleName, $matches[1], $matches[2]);
       }
-      $model->registerUpdatedModule($this->moduleName, $ver[0], $ver[1]);
    }
 
    /**

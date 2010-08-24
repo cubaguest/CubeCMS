@@ -40,30 +40,28 @@ class Install_Core {
          new CoreErrors(new CoreException(sprintf(_('Downgrade verze %s na verzi %s nelze provádět'),number_format((float)VVE_VERSION,1,'.',''), number_format((float)AppCore::ENGINE_VERSION,1,'.',''))));
          return;
       }
-      $currentVer = (float)VVE_VERSION;
-      while ($currentVer < (float)AppCore::ENGINE_VERSION) {
+      $modelCfg = new Model_Config();
+      echo $currentVer.' > '.$newVer.'<br />';
+
+      for ($currentVer = (float)VVE_VERSION; round($currentVer,1) < round(AppCore::ENGINE_VERSION,1); $currentVer+=0.1) {
          /* php update */
-         $phpFileName = preg_replace(array('/{from}/', '/{to}/'),
-                 array(number_format($currentVer, 1, '.', ''), number_format($currentVer+0.1, 1, '.', '')),
-                         self::FILE_PHP_UPGRADE);
+         $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array(number_format($currentVer, 1, '.', ''),
+            number_format($currentVer+0.1, 1, '.', '')), self::FILE_PHP_UPGRADE);
          if(file_exists($this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR
             .self::CORE_UPGRADE_PHP_DIR.DIRECTORY_SEPARATOR.$phpFileName)){
             include $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR
                .self::CORE_UPGRADE_PHP_DIR.DIRECTORY_SEPARATOR.$phpFileName;
          }
          /* sql update */
-         $sqlFileName = preg_replace(array('/{from}/', '/{to}/'),
-                 array(number_format($currentVer, 1, '.', ''), number_format($currentVer+0.1, 1, '.', '')),
-                         self::FILE_SQL_UPGRADE);
+         $sqlFileName = preg_replace(array('/{from}/', '/{to}/'), array(number_format($currentVer, 1, '.', ''),
+            number_format($currentVer+0.1, 1, '.', '')), self::FILE_SQL_UPGRADE);
          $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir()
             .self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.self::CORE_UPGRADE_SQL_DIR.DIRECTORY_SEPARATOR, false);
          if ($file->exist()) {
             $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
          }
-         $currentVer = $currentVer + 0.1;
+         $modelCfg->saveCfg('VERSION', number_format((float)$currentVer+0.1,1,'.',''));
       }
-      $modelCfg = new Model_Config();
-      $modelCfg->saveCfg('VERSION', AppCore::ENGINE_VERSION);
       AppCore::getInfoMessages()->addMessage(_('Jádro bylo aktualizováno na verzi').' '.number_format((float)AppCore::ENGINE_VERSION,1,'.',''));
       // reload nové verze
       $link = new Url_Link(true);
