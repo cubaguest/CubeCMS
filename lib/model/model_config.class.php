@@ -27,6 +27,12 @@ class Model_Config extends Model_PDO {
    const COLUMN_TYPE = 'type';
    const COLUMN_LABEL = 'label';
 
+   const TYPE_STRING = 'string';
+   const TYPE_NUMBER = 'number';
+   const TYPE_BOOL = 'bool';
+   const TYPE_LIST = 'list';
+   const TYPE_LIST_MULTI = 'listmulti';
+   const TYPE_SER_DATA = 'ser_object';
 
    /**
     * Metoda načte konfigurační volby (pro načtení do enginu)
@@ -43,9 +49,25 @@ class Model_Config extends Model_PDO {
       return $dbst;
    }
 
-   public function saveCfg($key,$value) {
+   public function saveCfg($key,$value, $type = self::TYPE_STRING, $label = null, $protected = true) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)." SET `value` = :val WHERE `key` = :key");
+
+      $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
+         ." WHERE `".self::COLUMN_KEY."` = :key");
+      $dbst->execute(array(':key' => $key));
+      $count = $dbst->fetch();
+
+      if($count[0] == 0){
+         $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
+            ." (`".self::COLUMN_KEY."`,`". self::COLUMN_VALUE."`,`". self::COLUMN_TYPE."`,`"
+            . self::COLUMN_LABEL."`,`". self::COLUMN_PROTECTED."`)"
+            ." VALUES (:key, :val, :type, :label, :protected)");
+         $dbst->bindValue(':type', $type, PDO::PARAM_STR);
+         $dbst->bindValue(':label', $label, PDO::PARAM_STR|PDO::PARAM_NULL);
+         $dbst->bindValue(':protected', $protected, PDO::PARAM_BOOL);
+      } else {
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)." SET `value` = :val WHERE `key` = :key");
+      }
       $dbst->bindValue(':key', $key, PDO::PARAM_STR);
       $dbst->bindValue(':val', $value, PDO::PARAM_STR);
       return $dbst->execute();
@@ -72,5 +94,6 @@ class Model_Config extends Model_PDO {
       $dbst->execute();
       return $dbst->fetchObject();
    }
+
 }
 ?>
