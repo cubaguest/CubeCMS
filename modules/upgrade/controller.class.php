@@ -9,7 +9,7 @@ class Upgrade_Controller extends Controller {
 
    public function mainController() {
       $this->checkControllRights();
-
+      /* Upgrade modulů */
       $isUpgradeAvailable = false;
 
       // načtení instalovaných modulů
