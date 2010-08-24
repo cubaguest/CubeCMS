@@ -22,7 +22,7 @@ class AppCore {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '6.0.0';
+   const ENGINE_VERSION = 6.1;
    /**
     * Obsahuje hlavní soubor aplikace
     */
@@ -244,6 +244,7 @@ class AppCore {
 
       //		inicializace URL
       Url_Request::factory();
+      
 
       // inicializace Šablonovacího systému
       Template::factory();
@@ -257,6 +258,8 @@ class AppCore {
       Locales::selectLang();
       //		Inicializace chybových hlášek
       $this->_initMessagesAndErrors();
+      // kontrola verze
+      $this->checkCoreVersion();
 
       //autorizace přístupu
       $this->_initAuth();
@@ -428,6 +431,21 @@ class AppCore {
                define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), $cfg[Model_Config::COLUMN_VALUE]);
             }
          }
+      }
+   }
+
+   private function checkCoreVersion(){
+      /* Upgrade jádra */
+      if(defined('VVE_VERSION') AND VVE_VERSION != self::ENGINE_VERSION){ // kvůli neexistenci předchozí detekce
+         $core = new Install_Core();
+         $core->upgrade();
+      } else if(!defined('VVE_VERSION')) {
+         $settings = new Model_Config();
+         $settings->saveCfg('VERSION', self::ENGINE_VERSION, Model_Config::TYPE_STRING, 'Verze jádra', true);
+         $link = new Url_Link(true);
+         self::getInfoMessages()->addMessage(_('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!'));
+         $link->clear(true)->reload();
+      } else {
       }
    }
 
