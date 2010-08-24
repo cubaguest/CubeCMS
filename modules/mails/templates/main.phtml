@@ -1,9 +1,8 @@
 <?
-$this->addPageHeadline($this->_('Vytvořit e-mail'));
 $this->addPageTitle($this->_('Vytvořit e-mail'));
 $this->addCssFile('style.css');
 ?>
-
+<h1><?=$this->category()->getName().' - '.$this->_('vytvořit e-mail')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div id="mails-send-mail-form">
    <?
@@ -42,41 +41,44 @@ $this->addCssFile('style.css');
                   <?}?>
                </ul>
                <div id="tabs-mails-addressbook">
+                  <label for="mails-addressbook"><?=$this->_('Všechny adresy v adresáři')?>:</label><br />
                   <select name="mails-addressbook" class="mail-selected" id="mails-addressbook">
-                     <? foreach ($this->mailsAddressBook as $mail) {
- ?>
-                        <option value="<?=$mail->{Mails_Model_Addressbook::COLUMN_MAIL} ?>">
-                        <?
+                     <option value="">---</option>
+                     <? foreach ($this->mailsAddressBook as $mail) {?>
+                        <option value="<?=$mail->{Mails_Model_Addressbook::COLUMN_MAIL} ?>"><?
                         if ($mail->{Mails_Model_Addressbook::COLUMN_SURNAME} != null) {
-//                           echo "&lt;&nbsp;";
                            echo $mail->{Mails_Model_Addressbook::COLUMN_SURNAME} . "&nbsp;";
                            echo $mail->{Mails_Model_Addressbook::COLUMN_NAME};
-//                           echo "&nbsp;&gt;&nbsp;";
                            echo "&nbsp;-&nbsp;";
                         }
                         echo $mail->{Mails_Model_Addressbook::COLUMN_MAIL};
-                        ?>
-                     </option>
-                     <?
-                     }
-                     ?>
+                        ?></option>
+                     <?}?>
                   </select>
-                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
+                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" /><br />
+                  <label for="mails-addressbook-groups"><?=$this->_('E-maily ze skupiny')?>:</label><br />
+                  <select name="mails-addressbook-groups" id="mails-addressbook-groups">
+                     <option value="">---</option>
+                     <?foreach ($this->mailsGroups as $grp) {
+                        ?><option value="<?=$grp->{Mails_Model_Groups::COLUMN_ID}?>"><?=$grp->{Mails_Model_Groups::COLUMN_NAME}?></option><?
+                     }?>
+                  </select>
+                  <input type="button" value="<?=$this->_('Přidat')?>" name="button-add-group" /><br />
                </div>
                <div id="tabs-mails-users">
                   <?foreach ($this->mailsUsers as $gname => $grp) {
                      $gnameAscii = vve_to_ascii($gname);
                      ?>
                   <div>
-
                   <label for="mails-users-grp-<?=$gnameAscii?>"><?=$this->_('Skupina').':&nbsp;'.$gname?></label><br />
                   <select name="mails-users" class="mail-selected" id="mails-users-grp-<?=$gnameAscii?>">
+                     <option value="">---</option>
                      <?foreach ($grp as $mail) {
                         if($mail->{Model_Users::COLUMN_MAIL} == null) continue;
                         $m = explode(';', $mail->{Model_Users::COLUMN_MAIL});
                         ?>
-                        <option value="<?=$m[0];?>">
-                        <?
+                        <option value="<?=$m[0];?>"><?
                            echo "&lt;&nbsp;";
                         if ($mail->{Model_Users::COLUMN_SURNAME} != null) {
                            echo $mail->{Model_Users::COLUMN_SURNAME} . "&nbsp;";
@@ -85,10 +87,10 @@ $this->addCssFile('style.css');
                            echo $mail->{Model_Users::COLUMN_USERNAME};
                            echo "&nbsp;&gt;&nbsp;";
                         echo $mail->{Mails_Model_Addressbook::COLUMN_MAIL};
-                        ?>
-                     </option>
+                        ?></option>
                      <?}?>
                   </select>
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
                   <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
                   </div>
                   <?}?>
@@ -96,12 +98,14 @@ $this->addCssFile('style.css');
                   <?if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
                <div id="tabs-mails-newsletter">
                   <select name="mails-newsletters" class="mail-selected" id="mails-newsletters">
+                     <option value="">---</option>
                      <?foreach ($this->mailsNewsLetter as $mail) {?>
-                        <option value="<?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL};?>">
-                        <?echo $mail->{NewsLetter_Model_Mails::COLUMN_MAIL};?>
-                     </option>
+                        <option value="<?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL};?>"><?
+                        echo $mail->{NewsLetter_Model_Mails::COLUMN_MAIL};
+                        ?></option>
                      <?}?>
                   </select>
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
                   <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
                </div>
                   <?}?>
@@ -109,15 +113,16 @@ $this->addCssFile('style.css');
                <div id="tabs-mails-guestbook">
                   <select name="mails-guestbook" class="mail-selected" id="mails-guestbook">
                      <?foreach ($this->mailsGuestbook as $mail) {?>
-                     <option value="<?=$mail->{GuestBook_Model_Detail::COL_EMAIL};?>">
-                        <?
+                     <option value="">---</option>
+                     <option value="<?=$mail->{GuestBook_Model_Detail::COL_EMAIL};?>"><?
                         echo "&lt;&nbsp;";
                         echo $mail->{GuestBook_Model_Detail::COL_NICK};
                         echo "&nbsp;&gt;&nbsp;";
-                        echo $mail->{GuestBook_Model_Detail::COL_EMAIL};?>
-                     </option>
+                        echo $mail->{GuestBook_Model_Detail::COL_EMAIL};
+                     ?></option>
                      <?}?>
                   </select>
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
                   <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
                </div>
                   <?}?>
@@ -170,24 +175,36 @@ $this->addCssFile('style.css');
       else tinyMCE.execCommand('mceRemoveControl', false, id);
       return false;
    }
+   var mails = new Array;
+
+   function writeMails(){$('#sendmail_recipients').text(mails.join('; '));}
+
+   function addMail(mail){
+      if(mail != '' && mail != null && $.inArray(mail, mails) == -1){
+         mails.push(mail);
+      }
+      writeMails();
+   }
 
    $(function() {
-      function addMailToRec(mail){
-         $('#sendmail_recipients').text($('#sendmail_recipients').text()+mail+', ');
-      }
-
-      $("#address-tabs").tabs({
-         collapsible: true,
-         selected: -1
-      });
-
-      $('select.mail-selected').change(function(){
-         addMailToRec($(this).val());
-      });
-      
+      $("#address-tabs").tabs({collapsible: true,selected: -1});
       $('input.button-add-all').click(function(){
-         $(this).parent('div').children('select').children('option').each(function() {
-            addMailToRec($(this).val());
+         $(this).parent('div').children('select.mail-selected').children('option').each(function() {
+            addMail($(this).val());
+         });
+      });
+      $('input.button-add').click(function(){addMail($(this).parent('div').children('select').val());});
+      $('input[name=button-add-group]').click(function(){
+         $.ajax({
+            type: "GET",
+            cache : false,
+            url:'<?=$this->link()->route('addressList');?>',
+            data : ({idgrp : $('select[name=mails-addressbook-groups]').val()}),
+            success: function(data){
+               $.each(data.rows, function(index, value) {
+                  addMail(value.cell[0]);
+               });
+            }
          });
       });
    });

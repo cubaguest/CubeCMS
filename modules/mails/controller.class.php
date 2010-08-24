@@ -15,6 +15,7 @@ class Mails_Controller extends Controller {
    const RECIPIENTS_MAILS_SEPARATOR = ',';
 
    const NUM_ROWS_IN_TABLE = 15;
+   const NUM_ROWS_IN_GRPTABLE = 5;
    const NUM_MAIL_IN_LIST = 30;
 
    public function mainController() {
@@ -118,21 +119,29 @@ class Mails_Controller extends Controller {
       $this->view()->mailsUsers = $users;
       unset ($users);
 
+      // načteme skupiny z adresář
+      $modelGrps = new Mails_Model_Groups();
+      $this->view()->mailsGroups = $modelGrps->getGroups();
+      unset ($modelGrps);
+
    }
 
    public function addressListController() {
       $this->checkReadableRights();
       // objekt komponenty JGrid
       $jqGrid = new Component_JqGrid();
+      $jqGrid->request()->setDefaultOrderField(Mails_Model_Addressbook::COLUMN_MAIL);
       $modelAddresBook = new Mails_Model_Addressbook();
 
       if ($jqGrid->request()->isSearch()) {
          
       } else {
-         $jqGrid->respond()->setRecords($modelAddresBook->getCount());
+         $count = $modelAddresBook->getCount((int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL));
+         $jqGrid->respond()->setRecords($count);
 
-         $book = $modelAddresBook->getMails(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
-                         $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
+         $book = $modelAddresBook->getMails((int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+            ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
+            $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
          foreach ($book as $mail) {
             array_push($jqGrid->respond()->rows, array('id' => $mail->{Mails_Model_Addressbook::COLUMN_ID},
                 'cell' => array(
@@ -140,6 +149,30 @@ class Mails_Controller extends Controller {
                     $mail->{Mails_Model_Addressbook::COLUMN_NAME},
                     $mail->{Mails_Model_Addressbook::COLUMN_SURNAME},
                     $mail->{Mails_Model_Addressbook::COLUMN_NOTE}
+                    ))
+            );
+         }
+      }
+      $this->view()->respond = $jqGrid->respond();
+   }
+
+   public function groupsListController() {
+      $this->checkReadableRights();
+      // objekt komponenty JGrid
+      $jqGrid = new Component_JqGrid();
+      $modelGroups = new Mails_Model_Groups();
+
+      if ($jqGrid->request()->isSearch()) {
+
+      } else {
+         $jqGrid->respond()->setRecords($modelGroups->getCount());
+         $fromRow = ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage();
+         $groups = $modelGroups->getGroups($fromRow,$jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
+         foreach ($groups as $grp) {
+            array_push($jqGrid->respond()->rows, array('id' => $grp->{Mails_Model_Groups::COLUMN_ID},
+                'cell' => array(
+                    $grp->{Mails_Model_Groups::COLUMN_NAME},
+                    $grp->{Mails_Model_Groups::COLUMN_NOTE}
                     ))
             );
          }
@@ -172,8 +205,8 @@ class Mails_Controller extends Controller {
             $validatorMail = new Validator_EMail($jqGridReq->mail);
 
             if ($validatorMail->isValid()) {
-               $adrModel->saveMail($jqGridReq->mail, $jqGridReq->name, $jqGridReq->surname,
-                       $jqGridReq->note);
+               $adrModel->saveMail($jqGridReq->mail, $jqGridReq->idg, $jqGridReq->name,
+                  $jqGridReq->surname, $jqGridReq->note);
                $this->infoMsg()->addMessage($this->_('Kontakt by uložen'));
             } else {
                $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
@@ -183,8 +216,8 @@ class Mails_Controller extends Controller {
             // validace mailu
             $validatorMail = new Validator_EMail($jqGridReq->mail);
             if ($validatorMail->isValid()) {
-               $adrModel->saveMail($jqGridReq->mail, $jqGridReq->name, $jqGridReq->surname,
-                       $jqGridReq->note, $jqGridReq->id);
+               $adrModel->saveMail($jqGridReq->mail, $jqGridReq->idg, $jqGridReq->name,
+                  $jqGridReq->surname, $jqGridReq->note, $jqGridReq->id);
                $this->infoMsg()->addMessage($this->_('Kontakt by uložen'));
             } else {
                $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
@@ -195,6 +228,46 @@ class Mails_Controller extends Controller {
                $adrModel->deleteMail((int)$id);
             }
             $this->infoMsg()->addMessage($this->_('Vybrané kontakty byly smazány'));
+            break;
+         default:
+            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            break;
+      }
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
+      } else {
+         $this->view()->allOk = false;
+      }
+   }
+
+   public function editGroupController() {
+      $this->checkWritebleRights();
+      $model = new Mails_Model_Groups();
+
+      // část komponenty jqgrid pro formy
+      $jqGridReq = new Component_JqGrid_FormRequest();
+      switch ($jqGridReq->getRequest()) {
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
+            $model->save($jqGridReq->name, $jqGridReq->note);
+            $this->infoMsg()->addMessage($this->_('Skupina byla uložena'));
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
+            if((int)$jqGridReq->id != 0){
+               $adrModel->save($jqGridReq->name, $jqGridReq->note, $jqGridReq->id);
+               $this->infoMsg()->addMessage($this->_('Skupina byla uložena'));
+            } else {
+               $this->errMsg()->addMessage($this->_('Skupinu všechny nelze upravovat'));
+            }
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
+            if((int)$jqGridReq->id != 0){
+               foreach ($jqGridReq->getIds() as $id) {
+                  $model->deleteGroup((int)$id);
+               }
+               $this->infoMsg()->addMessage($this->_('Vybrané skupiny byly smazány'));
+            } else {
+               $this->errMsg()->addMessage($this->_('Skupinu všechny nelze smazat'));
+            }
             break;
          default:
             $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));

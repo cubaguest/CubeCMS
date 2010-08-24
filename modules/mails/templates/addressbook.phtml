@@ -1,38 +1,131 @@
 <?
-$this->addPageHeadline($this->_('Adresář'));
 $this->addPageTitle($this->_('Adresář'));
 
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addUITabs();
+$this->addJsPlugin($jQuery);
 ?>
+<h1><?=$this->category()->getName().' - '.$this->_('adresář')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
-<div>
+<div class="main-content-detail">
+   <table id="table-addressbook-groups"></table>
+   <div id="table-addressbook-groups-toolbar"></div>
+   <div id="table-addressbook-groups-pager"></div>
+   <hr class="reseter" />
+   <br />
    <table id="table-addressbook"></table>
-   <div id="table-addressbook-toolbar">
-   </div>
+   <div id="table-addressbook-toolbar"></div>
    <div id="table-addressbook-pager"></div>
    <hr class="reseter" />
    <br />
-   <h2><?=$this->_('Import adres'); ?></h2>
-<?
+   <h2><?=$this->_('Operace s e-maily')?></h2>
+   <div id="mails-tools" style="width: 540px;">
+	<ul>
+		<li><a href="#mails-export">Export</a></li>
+		<li><a href="#mails-import">Import</a></li>
+	</ul>
+	<div id="mails-export">
+		<?
    echo $this->formImport->renderStart();
    echo $this->formImport->file->label();
+//   echo '<br />';
    echo $this->formImport->file->controll();
+   echo '<br />';
    echo $this->formImport->separator->label();
    $this->formImport->separator->html()->setAttrib('size', 1);
    echo $this->formImport->separator->controll();
+   echo '<br />';
    echo $this->formImport->import->controll();
    echo $this->formImport->renderEnd();
 ?>
+	</div>
+	<div id="mails-import">
+		<p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
+	</div>
+</div>
    <br />
-   <h2>Export adres</h2>
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
       $(document).ready(function() {
+         var groupsGrid = $("#table-addressbook-groups").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url:'<?=$this->link()->route('groupsList');?>',
+            datatype: "json",
+            colNames:['Název', 'Poznámka'],
+            colModel:[
+               {name:'name',index:'<?=  Mails_Model_Groups::COLUMN_NAME?>',
+                  width:200,editable:true,editoptions:{size:25},
+                  formoptions:{ rowpos:1, label: "<?=$this->_('Název')?>", elmprefix:"(*)"},
+                  editrules:{required:true}},
+               {name:'note',index:'<?=  Mails_Model_Groups::COLUMN_NOTE?>', width:100,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
+            ],
+            rowNum:<?=Mails_Controller::NUM_ROWS_IN_GRPTABLE;?>,
+            rowList:[<?=Mails_Controller::NUM_ROWS_IN_GRPTABLE;?>,<?=Mails_Controller::NUM_ROWS_IN_GRPTABLE*2;?>,<?=Mails_Controller::NUM_ROWS_IN_GRPTABLE*4;?>,<?=Mails_Controller::NUM_ROWS_IN_GRPTABLE*10;?>],
+            pager: '#table-addressbook-groups-pager',
+            sortname: '<?=Mails_Model_Groups::COLUMN_NAME?>',
+            caption:"Skupiny",
+            height: 120,
+            width : 550,
+            editurl:"<?=$this->link()->route('editGroup')?>",
+            loadComplete : function(){
+               jQuery("#table-addressbook-groups").jqGrid('setSelection', $('#table-addressbook-groups tr:first').attr('id'), true);
+            },
+            onSelectRow: function(ids) {
+               var data;
+               if(ids != null) {
+                  jQuery("#table-addressbook").jqGrid('setGridParam',{url:"<?=$this->link()->route('addressList');?>?idgrp="+ids,page:1});
+                  jQuery("#table-addressbook").jqGrid('setCaption',"E-maily skupiny: "
+                     +jQuery("#table-addressbook-groups").jqGrid('getRowData',+ids).name).trigger('reloadGrid');
+               }
+            }
+         });
+         // úpravy
+         jQuery("#table-addressbook-groups").jqGrid('navGrid','#table-addressbook-groups-pager',
+            {view:false}, //options
+            {height:200,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
+               bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>",
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {height:150,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options
+               bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },  // del options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true,
+               msg: "<?=$this->_('Opravdu smazat skupinu? <br/>Smazání smaže také e-maily uložení v ní.')?>",
+               afterSubmit : function(respond, postdata){
+                  jQuery("#table-addressbook").jqGrid('clearGridData',true);
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {closeOnEscape:true}, // search options
+            {height:120,jqModal:true,closeOnEscape:true} // view options
+         );
+         
          // seznam emailů
          var addressGrid = $("#table-addressbook").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url:'<?=$this->link()->route('addressList');?>',
+            url:'<?=$this->link()->route('addressList');?>?idgrp=0',
             datatype: "json",
             colNames:['E-mail', 'Jméno', 'Přijmení','Poznámka'],
             colModel:[
@@ -50,11 +143,10 @@ $this->addJsPlugin($jsJqGrid);
             rowNum:<?=Mails_Controller::NUM_ROWS_IN_TABLE;?>,
             rowList:[<?=Mails_Controller::NUM_ROWS_IN_TABLE;?>,<?=Mails_Controller::NUM_ROWS_IN_TABLE*2;?>,<?=Mails_Controller::NUM_ROWS_IN_TABLE*4;?>,<?=Mails_Controller::NUM_ROWS_IN_TABLE*10;?>],
             pager: '#table-addressbook-pager',
-            sortname: 'mail',
-//            multiselect: true,
-            caption:"e-maily",
+            sortname: '<?=Mails_Model_Addressbook::COLUMN_MAIL?>',
+            caption:"E-maily skupiny",
             height: 350,
-//            toolbar: [true,"top"],
+            width : 550,
             editurl:"<?=$this->link()->route('editMail')?>"
          });
          // úpravy
@@ -70,9 +162,16 @@ $this->addJsPlugin($jsJqGrid);
                   }
                   return [res.allOk,msg];
                }
-            }, 
+            },
             {height:150,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options
                bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               beforeSubmit : function(postdata, formid){
+                  if($("#table-addressbook-groups").getGridParam('selrow') == null){
+                     return[false,'<?=$this->_('Nelze přidávat pokud není vybrána skupina')?>'];
+                  }
+                  postdata.idg = $("#table-addressbook-groups").getGridParam('selrow');
+                  return [true]
+               },
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -106,8 +205,9 @@ $this->addJsPlugin($jsJqGrid);
             title: "<?=$this->_('Poslat e-mail označenému')?>",
             position:"last"
          });
-      })
-         ;
+         
+         $('#mails-tools').tabs({collapsible: true,selected: -1});
+      });
       /* ]]> */
       </script>
    </div>

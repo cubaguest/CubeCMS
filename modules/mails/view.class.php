@@ -71,5 +71,8 @@ class Mails_View extends View {
    public function addressListView(){
       echo json_encode($this->respond);
    }
+   public function groupsListView(){
+      echo json_encode($this->respond);
+   }
 }
 ?>
