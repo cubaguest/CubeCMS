@@ -202,6 +202,7 @@ class Form_Element implements Form_Element_Interface {
     * @return Form_Element
     */
    public function setValues($values, $key = null) {
+      $this->isFiltered = false;
       if($key === null) {
          $this->unfilteredValues = $values;
       } else {
