@@ -52,7 +52,7 @@ class Template_Output {
     * @param string $outputType -- typ odesílaných dat (xhtml, js, css, json, ...)
     */
    public static function factory($outputType) {
-      if($outputType == null AND $outputType == "") {
+      if(empty ($outputType)) {
          self::$outputType = "xhtml";
       } else {
          self::$outputType = $outputType;
