@@ -1,8 +1,5 @@
 <?php
 class Articles_Routes extends Routes {
-   const FEEDS = true; // podle tohohle se generují feedy
-   const FEED_FILE = '{type}.xml';
-
    function initRoutes() {
       $this->addRoute('top', "top", 'top', 'top/');
       $this->addRoute('archive', "archive", 'archive', 'archive/');
@@ -17,7 +14,6 @@ class Articles_Routes extends Routes {
       $this->addRoute('lastlist', "lastlist.(?P<output>(?:xml))", 'lastList', 'lastlist.{output}');
       $this->addRoute('current', "current.(?P<output>(?:xml))", 'currentArticle', 'current.{output}');
       // exporty
-      $this->addRoute('exportFeed', "(?P<type>(?:rss)|(?:atom)).xml", 'exportFeed', self::FEED_FILE);
       $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml)|(?:html))", 'exportArticle','{urlkey}.{output}');
 
 

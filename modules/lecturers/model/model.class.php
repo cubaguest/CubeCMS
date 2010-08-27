@@ -12,6 +12,7 @@ class Lecturers_Model extends Model_PDO {
    const COLUMN_NAME = 'name';
    const COLUMN_SURNAME = 'surname';
    const COLUMN_DEGREE = 'degree';
+   const COLUMN_DEGREE_AFTER = 'degree_after';
    const COLUMN_TEXT = 'text';
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_IMAGE = 'image';
@@ -24,42 +25,37 @@ class Lecturers_Model extends Model_PDO {
     * @param array -- pole s textem článku
     * @param boolean -- id uživatele
     */
-   public function saveLecturer($name, $surname, $degree, $text, $image, $id = null) {
+   public function saveLecturer($name, $surname, $degree, $degreeAfter, $text, $image, $id = null) {
 
       $dbc = new Db_PDO();
       if($id !== null) {
-         $sql = "UPDATE ".Db_PDO::table(self::DB_TABLE)
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_NAME."= :name, ".self::COLUMN_SURNAME."= :surname, "
-                 .self::COLUMN_DEGREE."= :degree, ".self::COLUMN_TEXT."= :text, "
+                 .self::COLUMN_DEGREE."= :degree, ".self::COLUMN_DEGREE_AFTER."= :degreeAfter, "
+                 .self::COLUMN_TEXT."= :text, "
                  .self::COLUMN_TEXT_CLEAR."= :textclear, ".self::COLUMN_IMAGE."= :image"
-                 ." WHERE ".self::COLUMN_ID." = :id";
-
-         $dbst = $dbc->prepare($sql);
+                 ." WHERE ".self::COLUMN_ID." = :id");
 
          $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-         $dbst->bindValue(':name', $name, PDO::PARAM_STR);
-         $dbst->bindValue(':surname', $surname, PDO::PARAM_STR);
-         $dbst->bindValue(':degree', $degree, PDO::PARAM_STR|PDO::PARAM_NULL);
-         $dbst->bindValue(':text', $text, PDO::PARAM_STR);
-         $dbst->bindValue(':textclear', vve_strip_tags($text), PDO::PARAM_STR);
-         $dbst->bindValue(':image', $image, PDO::PARAM_STR|PDO::PARAM_NULL);
-         return $dbst->execute();
       } else {
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)." "
                  ."(".self::COLUMN_NAME.",". self::COLUMN_SURNAME.","
-                 .self::COLUMN_DEGREE.",". self::COLUMN_IMAGE.","
+                 .self::COLUMN_DEGREE.",". self::COLUMN_DEGREE_AFTER.",". self::COLUMN_IMAGE.","
                  .self::COLUMN_TEXT.",". self::COLUMN_TEXT_CLEAR.")"
-                 ." VALUES (:name, :surname, :degree, :image, :text, :textclear)");
-         $dbst->bindValue(':name', $name, PDO::PARAM_STR);
-         $dbst->bindValue(':surname', $surname, PDO::PARAM_STR);
-         $dbst->bindValue(':degree', $degree, PDO::PARAM_STR|PDO::PARAM_NULL);
-         $dbst->bindValue(':text', $text, PDO::PARAM_STR);
-         $dbst->bindValue(':textclear', vve_strip_tags($text), PDO::PARAM_STR);
-         $dbst->bindValue(':image', $image, PDO::PARAM_STR|PDO::PARAM_NULL);
-         $dbst->execute();
-
-         return $dbc->lastInsertId();
+                 ." VALUES (:name, :surname, :degree, :degreeAfter, :image, :text, :textclear)");
       }
+      $dbst->bindValue(':name', $name, PDO::PARAM_STR);
+      $dbst->bindValue(':surname', $surname, PDO::PARAM_STR);
+      $dbst->bindValue(':degree', $degree, PDO::PARAM_STR|PDO::PARAM_NULL);
+      $dbst->bindValue(':degreeAfter', $degreeAfter, PDO::PARAM_STR|PDO::PARAM_NULL);
+      $dbst->bindValue(':text', $text, PDO::PARAM_STR);
+      $dbst->bindValue(':textclear', vve_strip_tags($text), PDO::PARAM_STR);
+      $dbst->bindValue(':image', $image, PDO::PARAM_STR|PDO::PARAM_NULL);
+
+      $dbst->execute();
+      if($id === null) $id = $dbc->lastInsertId();
+
+      return $id;
    }
 
    /**

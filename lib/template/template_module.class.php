@@ -128,11 +128,12 @@ class Template_Module extends Template {
     * @param string $name -- název šablony
     * @param boolean $engine -- (option) jestli se jedná o šablonu enginu
     */
-   public function includeTpl($name, $engine = false, $vars = null) {
+   public function includeTpl($name, $engine = false, $vars = null, $module = null) {
+      if($module === null) $module = $this->category()->getModule()->getName();
       if($engine){
          $path = parent::getFileDir($name, self::TEMPLATES_DIR,true);
       } else {
-         $path = self::getFileDir($name, self::TEMPLATES_DIR, $this->category()->getModule()->getName(),true);
+         $path = self::getFileDir($name, self::TEMPLATES_DIR, $module,true);
       }
       include $path.$name;
       unset ($vars);

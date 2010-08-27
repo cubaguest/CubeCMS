@@ -17,6 +17,8 @@ $this->addCssFile("style.css");
                      $tpl = 'item-video.phtml';
                      break;
                   case TitlePage_Controller::ITEM_TYPE_ARTICLE:
+                  case TitlePage_Controller::ITEM_TYPE_ARTICLEWGAL:
+                  case TitlePage_Controller::ITEM_TYPE_NEWS:
                      $tpl = 'item-article.phtml';
                      break;
                   default:

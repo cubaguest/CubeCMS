@@ -15,8 +15,10 @@ class NewsLetter_Controller extends Controller {
    const PARAM_NEW_MAIL_REG_TEXT_USER = 'newmail_registered_text_user';
    const PARAM_ADMINS = 'newmail_admins';
 
+   const NUM_ROWS_IN_TABLE = 15;
+
    public function mainController() {
-      $newMailForm = $this->createRegForm();
+      $newMailForm = $this->createMailForm();
 
       if($newMailForm->isValid()) {
          $mailsM = new NewsLetter_Model_Mails();
@@ -70,7 +72,7 @@ class NewsLetter_Controller extends Controller {
       $this->view()->newMailForm = $newMailForm;
    }
 
-   private function createRegForm(){
+   private function createMailForm(){
       $newMailForm = new Form('regmail_');
 
       $elemMail = new Form_Element_Text('mail', $this->_('E-mail'));
@@ -78,7 +80,10 @@ class NewsLetter_Controller extends Controller {
       $elemMail->addValidation(new Form_Validator_Email());
       $newMailForm->addElement($elemMail);
 
-      $elemSend = new Form_Element_Submit('send', $this->_('Registrovat'));
+      $elemCancelReg = new Form_Element_Checkbox('unreg', $this->_('Zrušit registraci'));
+      $newMailForm->addElement($elemCancelReg);
+
+      $elemSend = new Form_Element_Submit('send', $this->_('Odeslat'));
       $newMailForm->addElement($elemSend);
       return $newMailForm;
    }
@@ -140,12 +145,95 @@ class NewsLetter_Controller extends Controller {
       $this->view()->form = $form;
    }
 
+//   public function listRegMailsController() {
+//      $this->checkWritebleRights();
+//
+////      $model = new NewsLetter_Model_Mails();
+////
+////      $this->view()->mails = $model->getMails();
+//   }
+
    public function listMailsController() {
       $this->checkWritebleRights();
 
+      // objekt komponenty JGrid
+      $jqGrid = new Component_JqGrid();
       $model = new NewsLetter_Model_Mails();
 
-      $this->view()->mails = $model->getMails();
+      if ($jqGrid->request()->isSearch()) {
+
+      } else {
+         $jqGrid->respond()->setRecords($model->getCount());
+
+         $book = $model->getMails(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
+                         $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
+         foreach ($book as $mail) {
+            $blocked = false;
+            if($mail->{NewsLetter_Model_Mails::COLUMN_BLOCKED} == 1){
+               $blocked = $this->_('Ano');
+            }
+
+
+            array_push($jqGrid->respond()->rows, array('id' => $mail->{NewsLetter_Model_Mails::COLUMN_ID},
+                'cell' => array(
+                    $mail->{NewsLetter_Model_Mails::COLUMN_MAIL},
+                    vve_date('%x %X', new DateTime($mail->{NewsLetter_Model_Mails::COLUMN_DATE_ADD})),
+                    $mail->{NewsLetter_Model_Mails::COLUMN_IP},
+//                    (bool)$mail->{NewsLetter_Model_Mails::COLUMN_BLOCKED}
+                    (bool)$mail->{NewsLetter_Model_Mails::COLUMN_BLOCKED}
+                    ))
+            );
+         }
+      }
+      $this->view()->respond = $jqGrid->respond();
+   }
+
+   public function mailEditController() {
+      $this->checkWritebleRights();
+      $model = new NewsLetter_Model_Mails();
+
+      // část komponenty jqgrid pro formy
+      $jqGridReq = new Component_JqGrid_FormRequest();
+      switch ($jqGridReq->getRequest()) {
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
+            // validace mailu
+            $validatorMail = new Validator_EMail($jqGridReq->mail);
+
+            if ($validatorMail->isValid()) {
+//               $adrModel->saveMail($jqGridReq->mail, $jqGridReq->name, $jqGridReq->surname,
+//                       $jqGridReq->note);
+               $this->infoMsg()->addMessage($this->_('E-mail by uložen'));
+            } else {
+               $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
+            }
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
+            // validace mailu
+            $validatorMail = new Validator_EMail($jqGridReq->mail);
+            if ($validatorMail->isValid()) {
+               $blocked = false;
+               if($jqGridReq->blocked == "true") $blocked = true;
+               $model->saveMail($jqGridReq->mail, $jqGridReq->id, $blocked);
+               $this->infoMsg()->addMessage($this->_('E-mail by uložen'));
+            } else {
+               $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
+            }
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
+            foreach ($jqGridReq->getIds() as $id) {
+//               $adrModel->deleteMail((int)$id);
+            }
+            $this->infoMsg()->addMessage($this->_('Vybrané e-maily byly smazány'));
+            break;
+         default:
+            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            break;
+      }
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
+      } else {
+         $this->view()->allOk = false;
+      }
    }
 
    public function listMailsExportController() {
@@ -175,6 +263,11 @@ class NewsLetter_Controller extends Controller {
       return $mails;
    }
 
+   public function changeMailStatusController($mail = null) {
+      
+   }
+
+
    public function unregistrationMailController() {
       $unregMailForm = new Form('unregmail_');
 
@@ -196,7 +289,7 @@ class NewsLetter_Controller extends Controller {
       $email = $this->getRequestParam('mail', null);
       if($email !== null) {
          $model = new NewsLetter_Model_Mails();
-         $model->deleteMail($email);
+//         $model->deleteMail($email);
          $this->infoMsg()->addMessage(sprintf($this->_('E-mailové adrese %s byla zrušena registrace'), $email));
          $this->link()->rmParam()->reload();
       }

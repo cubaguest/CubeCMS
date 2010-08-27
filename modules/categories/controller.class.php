@@ -153,6 +153,7 @@ class Categories_Controller extends Controller {
       $form->parent_cat->setValues($selCat->getParentId());
 
       $form->module->setValues($cat[Model_Category::COLUMN_MODULE]);
+      $form->feedexp->setValues($cat[Model_Category::COLUMN_FEEDS]);
       $form->datadir->setValues($cat[Model_Category::COLUMN_DATADIR]);
       $form->urlkey->setValues($cat[Model_Category::COLUMN_URLKEY]);
       $form->priority->setValues($cat[Model_Category::COLUMN_PRIORITY]);
@@ -209,16 +210,11 @@ class Categories_Controller extends Controller {
          }
 
          // zjištění jestli je možné vytvoři feedy
-         $classRName = ucfirst($form->module->getValues())."_Routes::FEEDS";
          $feeds = false;
-         if(PHP_VERSION_ID > 5.3){ // PHP 5.3 do blbne s constant
-            if(defined($classRName) != null) {
-               $feeds = true;
-            }
-         } else {
-            if(constant($classRName) != null) {
-               $feeds = true;
-            }
+         if($form->feedexp->getValues() == true
+            AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$form->module->getValues().DIRECTORY_SEPARATOR.'rss.class.php')){
+             $feeds = true;
          }
 
          $datadir = null;
@@ -342,19 +338,12 @@ class Categories_Controller extends Controller {
          }
 
          // zjištění jestli je možné vytvoři feedy
-         $classRName = ucfirst($form->module->getValues())."_Routes::FEEDS";
          $feeds = false;
-         if(PHP_VERSION_ID > 5.3){ // PHP 5.3 do blbne s constant
-            if(defined($classRName) != null) {
-               $feeds = true;
-            }
-         } else {
-            if(constant($classRName) != null) {
-               $feeds = true;
-            }
+         if($form->feedexp->getValues() == true
+            AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$form->module->getValues().DIRECTORY_SEPARATOR.'rss.class.php')){
+             $feeds = true;
          }
-
-
 
          $icon = null;
          if($form->icon->getValues() != null) {
@@ -475,6 +464,11 @@ class Categories_Controller extends Controller {
       $catModule = new Form_Element_Select('module', $this->_('Modul'));
       $catModule->setOptions($options);
       $form->addElement($catModule, 'settings');
+
+      $catFeedExp = new Form_Element_Checkbox('feedexp', $this->_('Povolit export zdrojů'));
+      $catFeedExp->setSubLabel($this->_('Pokud modul podporuje export RSS/ATOM zdrojů'));
+      $catFeedExp->setValues(true);
+      $form->addElement($catFeedExp, 'settings');
 
       $catDataDir = new Form_Element_Text('datadir', $this->_('Adresář s daty'));
       $catDataDir->setSubLabel($this->_('Název datového adresář (ne cestu). Do něj budou ukládány všechyn soubory modulu.

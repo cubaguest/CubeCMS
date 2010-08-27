@@ -1,7 +1,6 @@
 <?
 // načtení detailu
 Template_Core::addToPageTitle($this->course->{Courses_Model_Courses::COLUMN_NAME});
-$this->addPageHeadline($this->course->{Courses_Model_Courses::COLUMN_NAME});
 Template_Core::setPageKeywords($this->course->{Courses_Model_Courses::COLUMN_KEYWORDS});
 Template_Core::setPageDescription($this->course->{Courses_Model_Courses::COLUMN_DESCRIPTION});
 
@@ -20,6 +19,7 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
       margin-left: 2em;
    }
 </style>
+<h1><?=$this->course->{Courses_Model_Courses::COLUMN_NAME}?></h1>
 <div class="main-content-detail module-courses-detail">
    <?
    echo $this->course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}.'<br />';
@@ -91,7 +91,8 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
 
       <h2><?=$this->_('Lektoři kurzu')?></h2>
       <?
-         foreach ($this->lecturers as $lecturer) {
+      $this->includeTpl('onlylist.phtml', false, array('lecturers' => $this->lecturers,'hE' => 'span', 'hEClass' => 'course-lecturer-name'), 'lecturers');
+         /*foreach ($this->lecturers as $lecturer) {
             if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){
             ?>
          <p style="float: left">
@@ -111,7 +112,8 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
          <hr class="reseter" />
          <br />
          <?
-         }?>
+         }*/
+         ?>
    <?
          $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route(), 'text' => $this->_('Zpět na seznam kurzů')));
          echo '<br />';

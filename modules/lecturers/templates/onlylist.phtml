@@ -1,0 +1,44 @@
+   <?
+   function printDegree($degree) {
+   if ($degree != null) {
+      echo $degree;
+      if ($degree[strlen($degree) - 1] != '.') {
+         echo '.';
+      }
+      echo '&nbsp;';
+   }
+}
+   if(!empty ($vars['lecturers'])) {
+      foreach ($vars['lecturers'] as $lecturer) {
+         ?>
+   <div class="article-list-record module-lecturers-list-record">
+      <<?=$vars['hE']?> class="<?=$vars['hEClass']?>" id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
+         <?
+         printDegree($lecturer->{Lecturers_Model::COLUMN_DEGREE});
+         echo $lecturer->{Lecturers_Model::COLUMN_NAME}.'&nbsp;';
+         echo $lecturer->{Lecturers_Model::COLUMN_SURNAME}.'&nbsp;';
+         printDegree($lecturer->{Lecturers_Model::COLUMN_DEGREE_AFTER});
+         ?>
+      </<?=$vars['hE']?>>
+      <div class="article-list-record-content">
+         <?if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){?>
+         <div class="article-list-record-box-image module-lecturers-list-record-box-image">
+                  <?=vve_tpl_image_tag(AppCore::getAppDataDir().Lecturers_Controller::DATA_DIR.DIRECTORY_SEPARATOR
+                          .$lecturer->{Lecturers_Model::COLUMN_IMAGE}, $lecturer->{Lecturers_Model::COLUMN_IMAGE}, 140);?>
+         </div>
+         <?}?>
+         <?echo $lecturer->{Lecturers_Model::COLUMN_TEXT};?>
+         <?
+         if($this->toolboxEdit != null){
+            $this->toolboxEdit->lecture_edit->setAction($this->link()->route('edit', array('id' => $lecturer->{Lecturers_Model::COLUMN_ID})));
+            $this->toolboxEdit->lecture_del_->getForm()->id->setValues($lecturer->{Lecturers_Model::COLUMN_ID});
+            echo $this->toolboxEdit;
+         }
+         ?>
+      <hr class="reseter" />
+      </div>
+   </div>
+         <?}
+   } else {
+      echo ($this->_('Není vložen žádný lektor'));
+   }?>

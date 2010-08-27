@@ -1,21 +1,25 @@
 <?
 // funkce pro render menu
-define('LANG_ARTICLES', _('Články'));
 function vveRenderMap($menuArr, $link, $catsArr) {
    print ("<ul>\n");
    foreach ($menuArr as $key => $item) {
       print ("<li>");
-      print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
-         .$item->getCatObj()->getLabel().'</a>'."");
-      if(isset ($catsArr[$item->getCatObj()->getId()]) AND !empty ($catsArr[$item->getCatObj()->getId()]['items'])){
-          print ("<ul>\n");
-          foreach ($catsArr[$item->getCatObj()->getId()]['items'] as $itemArt) {
-            print ('<li><a href="'.$itemArt['loc'].'">'.$itemArt['name'].'</a></li>');
+      print ('<a href="' . $link->clear()->category($item->getCatObj()->getUrlKey()) . '">'
+         . $item->getCatObj()->getLabel() . '</a>' . "");
+      if (isset($catsArr[$item->getCatObj()->getId()]) AND !empty($catsArr[$item->getCatObj()->getId()]['items'])) {
+         print ("<ul>\n");
+         foreach ($catsArr[$item->getCatObj()->getId()]['items'] as $itemArt) {
+            print ('<li><a href="' . $itemArt['loc'] . '">' . $itemArt['name'] . '</a></li>');
+         }
+         if($catsArr[$item->getCatObj()->getId()]['linkmore'] != null){
+            echo '<a href="'.$catsArr[$item->getCatObj()->getId()]['linkmore']['loc'].'" title="'
+               .$catsArr[$item->getCatObj()->getId()]['linkmore']['name'].'">'
+               .$catsArr[$item->getCatObj()->getId()]['linkmore']['name'].'</a>';
          }
          print ("</ul>\n");
       }
 
-      if(!$item->isEmpty()){
+      if (!$item->isEmpty()) {
          vveRenderMap($item, $link, $catsArr);
       }
       print ("</li>\n");
@@ -23,10 +27,10 @@ function vveRenderMap($menuArr, $link, $catsArr) {
    print ("</ul>\n");
 }
 ?>
-<h1><?=_("Mapa stránek")?></h1>
+<h1><?= _("Mapa stránek") ?></h1>
 <div class="main-content-detail">
    <div class="main-content-text page-sitemap">
-      <?=vveRenderMap($this->categories, $this->link(), $this->catArr)?>
+<?= vveRenderMap($this->categories, $this->link(), $this->catArr) ?>
       <hr class="reseter" />
    </div>
 </div>

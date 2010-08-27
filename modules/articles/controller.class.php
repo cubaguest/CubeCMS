@@ -388,14 +388,6 @@ class Articles_Controller extends Controller {
       $model->deleteArticleByCat($category->getId());
    }
 
-   // RSS
-   public function exportFeedController() {
-      $this->checkReadableRights();
-      $this->view()->type = $this->getRequest('type', 'rss');
-      $model = new Articles_Model_List();
-      $this->view()->articles = $model->getList($this->category()->getId(), 0, VVE_FEED_NUM);
-   }
-
    public function exportArticleController(){
       $this->checkReadableRights();
       $modle= new Articles_Model_Detail();

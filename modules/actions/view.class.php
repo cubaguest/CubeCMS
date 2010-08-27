@@ -5,7 +5,11 @@ class Actions_View extends View {
 
 
    public function mainView() {
-      $this->template()->addTplFile("list.phtml");
+      $feeds = new Component_Feed();
+      $feeds->setConfig('feedLink', $this->link()->clear());
+      $this->template()->feedsComp = $feeds;
+      
+      $this->template()->addTplFile("list.phtml", 'actions');
    }
 
    public function showView() {
@@ -150,39 +154,7 @@ class Actions_View extends View {
     * Viewer pro editaci novinky
     */
    public function editView() {
-      $this->template()->addTplFile('edit.phtml');
-   }
-
-   public function exportView() {
-      $feed = new Component_Feed(true);
-
-      $feed ->setConfig('type', $this->type);
-      $feed ->setConfig('title', $this->category()->getName());
-      $feed ->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
-      $feed ->setConfig('link', $this->link());
-
-      while ($action = $this->actions->fetch()) {
-
-         $dateTimeStr = null;
-         $dateTimeStr = ': '.vve_date("%x", new DateTime($action->{Actions_Model_Detail::COLUMN_DATE_START}));
-         $stopDate = vve_date("%x", new DateTime($action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
-         if($startDate != $stopDate AND $action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
-            $dateTimeStr .= ' - '.$stopDate;
-         }
-         if($action->{Actions_Model_Detail::COLUMN_TIME} != null) {
-            $time = new DateTime($action->{Actions_Model_Detail::COLUMN_TIME});
-            $dateTimeStr .= ' - '.$time->format("G:i");
-         }
-
-         $feed->addItem($action->{Actions_Model_Detail::COLUMN_NAME}.$dateTimeStr,$action->{Actions_Model_Detail::COLUMN_TEXT},
-                 $this->link()->route('detail', array('urlkey' => $action->{Actions_Model_Detail::COLUMN_URLKEY})),
-                 new DateTime($action->{Actions_Model_Detail::COLUMN_ADDED}),
-                 $action->{Model_Users::COLUMN_USERNAME},null,null,
-                 $action->{Actions_Model_Detail::COLUMN_URLKEY}."_".$action->{Actions_Model_Detail::COLUMN_ID}."_".
-                 $action->{Actions_Model_Detail::COLUMN_CHANGED});
-      }
-
-      $feed->flush();
+      $this->template()->addTplFile('edit.phtml', 'actions');
    }
 
    public function featuredListView() {

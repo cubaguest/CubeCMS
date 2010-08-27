@@ -427,14 +427,6 @@ class Actions_Controller extends Controller {
       return $text;
    }
 
-   // RSS
-   public function exportController() {
-      $this->checkReadableRights();
-      $this->view()->type = $this->getRequest('type', 'rss');
-      $model = new Actions_Model_List();
-      $this->view()->actions = $model->getActionsByAdded($this->category()->getId(), VVE_FEED_NUM);
-   }
-
    public function featuredListController() {
       $model = new Actions_Model_List();
 

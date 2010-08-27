@@ -41,7 +41,12 @@ class TitlePage_View extends View {
             $this->template()->addTplFile('edit-video.phtml');
             break;
          case TitlePage_Controller::ITEM_TYPE_ARTICLE:
+         case TitlePage_Controller::ITEM_TYPE_ARTICLEWGAL:
+         case TitlePage_Controller::ITEM_TYPE_NEWS:
             $this->template()->addTplFile('edit-article.phtml');
+            break;
+         case TitlePage_Controller::ITEM_TYPE_ACTION:
+            $this->template()->addTplFile('edit-action.phtml');
             break;
          default:
             break;

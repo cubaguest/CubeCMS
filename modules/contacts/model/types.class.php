@@ -12,8 +12,8 @@ class Contacts_Model_Types extends Model_Db {
 
    public function getContactTypes(){
       $select = $this->getDb()->select()->table($this->module()->getDbTable(2), 'types')
-      ->colums(array(self::COLUMN_NAME => "IFNULL(".self::COLUMN_NAME.'_'.Locale::getLang().", "
-            .self::COLUMN_NAME.'_'.Locale::getDefaultLang().")", self::COLUMN_ID))
+      ->colums(array(self::COLUMN_NAME => "IFNULL(".self::COLUMN_NAME.'_'.Locales::getLang().", "
+            .self::COLUMN_NAME.'_'.Locales::getDefaultLang().")", self::COLUMN_ID))
       ->order(self::COLUMN_NAME);
 
       return $this->getDb()->fetchAll($select);

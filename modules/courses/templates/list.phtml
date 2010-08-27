@@ -1,13 +1,11 @@
 <?
 if($this->isAllList == true){
    $this->addPageTitle($this->_('Seznam všech kurzů'));
-   $this->addPageHeadline($this->_('Seznam všech kurzů'));
+   $h1 = $this->_('Seznam všech kurzů');
 } else {
-   
+   $h1 = $this->_('Seznam aktuálních kurzů');
 }
-
 ?>
-
 <style type="text/css">
    .table td {
       border: 1px solid silver;
@@ -16,6 +14,7 @@ if($this->isAllList == true){
       padding: 4px;
    }
 </style>
+<h1><?=$h1?></h1>
 <div class="main-content-list module-courses-list">
    <?if(!empty ($this->courses)) {?>
    <table class="table">
@@ -37,14 +36,12 @@ if($this->isAllList == true){
                <img src="images/icons/new-16x16.png" alt="new" width="16"/>
                <?
                }
-               
                if($course->{Courses_Model_Courses::COLUMN_TEXT_SHORT} != null
                   OR $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT} != ''){
                   $title = trim(strip_tags($course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}));
                } else {
                   $title = $course->{Courses_Model_Courses::COLUMN_NAME};
                }
-               
                ?>
                <a href="<?=$this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
                   title="<?=htmlspecialchars($title)?>"
@@ -69,30 +66,22 @@ if($this->isAllList == true){
                }?>
             </td>
          </tr>
-
-
      <?}?>
-
       </tbody>
    </table>
    <br />
    <?
-   if($this->isAllList == true){?>
+   } else {
+      print ($this->_('Není vložen žádný kurz'));
+   }?>
+   <?if($this->isAllList == true){?>
    <a href="<?=$this->link()->route(null);?>" title="<?=$this->_('Seznam aktuálních kurzů');?>"
       ><?=$this->_('Seznam aktuálních kurzů');?></a>
    <?
    } else {?>
    <a href="<?=$this->link()->route('listAllCourses');?>" title="<?=$this->_('Seznam všech kurzů');?>"
       ><?=$this->_('Seznam všech kurzů');?></a>
-   <?
-   }
-   ?>
-   <?
-   } else {
-      print ($this->_('Není vložen žádný kurz'));
-   }?>
-
-   <?
+   <?}
    echo $this->toolbox;
    ?>
 </div>

@@ -283,27 +283,133 @@ class Mails_Controller extends Controller {
    public function addressBookController() {
       $this->checkWritebleRights();
 
-      // IMPORT
+      $modelGrps = new Mails_Model_Groups();
+      $grps = $modelGrps->getGroups();
+      $this->view()->idSelGrp = $grps[0]->{Mails_Model_Groups::COLUMN_ID}; // kvůli načtení mailů z první skupiny
+
+      /* IMPORT */
       $formImport = new Form('mails_import_');
+      $formImportGrpBasic = $formImport->addGroup('basic', $this->_('Základní'));
+      $formImportGrpAdv = $formImport->addGroup('advanced', $this->_('Pokročilé'));
 
       $eFile = new Form_Element_File('file', $this->_('Soubor (*.csv)'));
       $eFile->addValidation(new Form_Validator_FileExtension('csv'));
-      $formImport->addElement($eFile);
+      $formImport->addElement($eFile, $formImportGrpBasic);
 
-      $eSeparator = new Form_Element_Text('separator', $this->_('Oddělovač'));
-      $eSeparator->addValidation(new Form_Validator_NotEmpty());
-      $eSeparator->setValues(';');
-      $formImport->addElement($eSeparator);
+
+      $eGroup = new Form_Element_Select('group', $this->_('Skupina'));
+      $formImport->addElement($eGroup, $formImportGrpBasic);
 
       $eImport = new Form_Element_Submit('import', $this->_('Nahrát'));
-      $formImport->addElement($eImport);
+      $formImport->addElement($eImport, $formImportGrpBasic);
+
+//      $eSeparator = new Form_Element_Text('separator', $this->_('Oddělovač'));
+//      $eSeparator->addValidation(new Form_Validator_NotEmpty());
+//      $eSeparator->setValues(';');
+//      $formImport->addElement($eSeparator, $formImportGrpAdv);
+      
+//      $eSkipFirst = new Form_Element_Checkbox('skipfirst', $this->_('Přeskočit první řádek'));
+//      $formImport->addElement($eSkipFirst, $formImportGrpAdv);
+
+//      $eNumColls = new Form_Element_Text('cools', $this->_('počet sloupců'));
+//      $eNumColls->setValues(1);
+//      $formImport->addElement($eNumColls);
+      
+      foreach ($grps as $grp) {
+         $formImport->group->setOptions(array($grp->{Mails_Model_Groups::COLUMN_NAME} => $grp->{Mails_Model_Groups::COLUMN_ID}), true);
+      }
 
       if ($formImport->isValid()) {
-
+         $modelMails = new Mails_Model_Addressbook();
+         $file = $formImport->file->createFileObject('Filesystem_File_Text');
+         $mails = $file->getContent();
+         
+         $mailsArr = explode("\n", $mails);
+         $numImports = 0;
+         foreach ($mailsArr as $mail) {
+            if(empty($mail)) continue;
+            $modelMails->saveMail($mail, $formImport->group->getValues());
+            $numImports++;
+         }
+         $this->infoMsg()->addMessage(sprintf($this->_('Adresy byly importovány. Celkem bylo importováno %s záznamů.'),$numImports));
+         $this->link()->reload();
       }
       $this->view()->formImport = $formImport;
 
+      /* EXPORT */
+      $formExport = new Form('mails_export_');
+      $formExportGrpBasic = $formExport->addGroup('basic',  $this->_('Základní'));
+      $formExportGrpAdv = $formExport->addGroup('advanced',  $this->_('Pokročilé'));
 
+      $eGroup = new Form_Element_Select('group', $this->_('Skupina'));
+
+      $eGroup->setOptions(array($this->_('Vše') => Mails_Model_Groups::GROUP_ID_ALL), true);
+      foreach ($grps as $grp) {
+         $eGroup->setOptions(array($grp->{Mails_Model_Groups::COLUMN_NAME} => $grp->{Mails_Model_Groups::COLUMN_ID}), true);
+      }
+      $formExport->addElement($eGroup, $formExportGrpBasic);
+
+
+      $eSubmit = new Form_Element_Submit('export', $this->_('Export'));
+      $formExport->addElement($eSubmit, $formExportGrpBasic);
+
+      $eAddHeaders = new Form_Element_Checkbox('addheader', $this->_('Přidat názvy sloupců'));
+      $eAddHeaders->setValues(true);
+      $formExport->addElement($eAddHeaders, $formExportGrpAdv);
+
+      $eExportType = new Form_Element_Select('type', $this->_('Typ'));
+      $eExportType->setOptions(array('csv' => 'csv', 'txt' => 'txt'));
+      $formExport->addElement($eExportType, $formExportGrpAdv);
+
+      $eCsvSep = new Form_Element_Text('csvsep', $this->_('Oddělovač hodnot'));
+      $eCsvSep->setValues(',');
+      $eCsvSep->addValidation(new Form_Validator_NotEmpty());
+      $formExport->addElement($eCsvSep, $formExportGrpAdv);
+
+      if($formExport->isValid()){
+         $modelMails = new Mails_Model_Addressbook();
+         $mails = $modelMails->getMails($formExport->group->getValues());
+         switch ($formExport->type->getValues()) {
+            case 'csv':
+               $comCsv = new Component_CSV();
+               $comCsv->setConfig(Component_CSV::CFG_CELL_SEPARATOR, $formExport->csvsep->getValues());
+               $comCsv->setConfig(Component_CSV::CFG_FLUSH_FILE, 'mails-'.date('Y-m-d').'.csv');
+               if($formExport->addheader->getValues() == true){
+                  $comCsv->setCellLabels(array($this->_('Jméno'),$this->_('Přijmení'),$this->_('E-mail'),$this->_('Poznámka')));
+               }
+               foreach ($mails as $mail) {
+                  $comCsv->addRow(array(
+                     $mail->{Mails_Model_Addressbook::COLUMN_NAME},
+                     $mail->{Mails_Model_Addressbook::COLUMN_SURNAME},
+                     $mail->{Mails_Model_Addressbook::COLUMN_MAIL},
+                     $mail->{Mails_Model_Addressbook::COLUMN_NOTE}
+                  ));
+               }
+               $comCsv->flush();
+               break;
+            case 'txt':
+               $buffer = null;
+               foreach ($mails as $mail) {
+                  $buffer .= $mail->{Mails_Model_Addressbook::COLUMN_MAIL}."\r\n";
+               }
+               Template_Output::factory('txt');
+               Template_Output::setDownload('mails-'.date('Y-m-d').'.txt');
+               Template_Output::sendHeaders();
+               echo $buffer;
+               flush();
+               exit();
+               break;
+            default:
+               $this->errMsg()->addMessage($this->_('Nepodporovaný typ exportu'));
+               break;
+         }
+
+         $compCsv = new Component_CSV();
+
+
+
+      }
+      $this->view()->formExport = $formExport;
 
       $this->view()->linkBack = $this->link()->route()->rmParam();
    }

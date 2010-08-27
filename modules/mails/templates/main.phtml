@@ -24,20 +24,21 @@ $this->addCssFile('style.css');
             <? $this->form->recipients->html()->setAttrib('cols', 90)->setAttrib('rows', 5);
             echo $this->form->recipients->controll(); ?>
             <? echo $this->form->recipients->sublabel() ?>
+            <br />
          </td>
       </tr>
       <tr>
          <td>
-            <label><?=$this->_('Přidat e-mail z') ?>:</label>&nbsp;(<?=$this->_('Stačí vybrat položku a ta je automaticky nakopírována do příjemců')?>).
+            <label><?=$this->_('Přidat e-mail z') ?>:</label>
             <div id="address-tabs">
                <ul>
-                  <li><a href="#tabs-mails-addressbook"><?=$this->_('Adresář') ?></a></li>
-                  <li><a href="#tabs-mails-users"><?=$this->_('Uživatelé') ?></a></li>
+                  <li><a href="#tabs-mails-addressbook"><?=$this->_('Adresáře') ?></a></li>
+                  <li><a href="#tabs-mails-users"><?=$this->_('Uživatelů systému') ?></a></li>
                   <?if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
-                     <li><a href="#tabs-mails-newsletter"><?=$this->_('Adresy z NewsLetteru') ?></a></li>
+                     <li><a href="#tabs-mails-newsletter"><?=$this->_('NewsLetteru') ?></a></li>
                   <?}?>
                   <?if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
-                     <li><a href="#tabs-mails-guestbook"><?=$this->_('Adresy z knihy návštěv') ?></a></li>
+                     <li><a href="#tabs-mails-guestbook"><?=$this->_('Knihy návštěv') ?></a></li>
                   <?}?>
                </ul>
                <div id="tabs-mails-addressbook">
@@ -57,7 +58,7 @@ $this->addCssFile('style.css');
                   </select>
                   <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
                   <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" /><br />
-                  <label for="mails-addressbook-groups"><?=$this->_('E-maily ze skupiny')?>:</label><br />
+                  <label for="mails-addressbook-groups"><?=$this->_('Adresy ze skupiny')?>:</label><br />
                   <select name="mails-addressbook-groups" id="mails-addressbook-groups">
                      <option value="">---</option>
                      <?foreach ($this->mailsGroups as $grp) {

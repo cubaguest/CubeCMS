@@ -80,9 +80,13 @@ $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->
       </p>
    </div>
       <?}?>
-   &laquo;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;
-   <a href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&raquo;
+   &laquo;&nbsp;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"
+     ><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;<a
+     href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&nbsp;&raquo;
+   <br/>
+   <br/>
    <?
+   echo $this->feedsComp;
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('add_action', $this->_("Přidat akci"),

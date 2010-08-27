@@ -59,6 +59,7 @@ class Lecturers_Controller extends Controller {
          $model->saveLecturer($addForm->name->getValues(),
                          $addForm->surname->getValues(),
                          $addForm->degree->getValues(),
+                         $addForm->degreeAfter->getValues(),
                          $addForm->text->getValues(),
                          $imgName);
          
@@ -92,6 +93,7 @@ class Lecturers_Controller extends Controller {
       $editForm->name->setValues($lecturer->{Lecturers_Model::COLUMN_NAME});
       $editForm->surname->setValues($lecturer->{Lecturers_Model::COLUMN_SURNAME});
       $editForm->degree->setValues($lecturer->{Lecturers_Model::COLUMN_DEGREE});
+      $editForm->degreeAfter->setValues($lecturer->{Lecturers_Model::COLUMN_DEGREE_AFTER});
       $editForm->text->setValues($lecturer->{Lecturers_Model::COLUMN_TEXT});
 
       if ($editForm->isValid()) {
@@ -117,6 +119,7 @@ class Lecturers_Controller extends Controller {
          $model->saveLecturer($editForm->name->getValues(),
                          $editForm->surname->getValues(),
                          $editForm->degree->getValues(),
+                         $editForm->degreeAfter->getValues(),
                          $editForm->text->getValues(),
                          $imgName, $lecturer->{Lecturers_Model::COLUMN_ID});
                          
@@ -147,6 +150,9 @@ class Lecturers_Controller extends Controller {
 
       $iDegree = new Form_Element_Text('degree', $this->_('Titul'));
       $form->addElement($iDegree, 'basic');
+
+      $iDegreeA = new Form_Element_Text('degreeAfter', $this->_('Titul za jménem'));
+      $form->addElement($iDegreeA, 'basic');
 
       $iText = new Form_Element_TextArea('text', $this->_('Popis'));
       $iText->addValidation(New Form_Validator_NotEmpty());

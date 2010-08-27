@@ -1,3 +1,7 @@
 #address-tabs .ui-tabs-nav a {
    padding: 3px;
 }
+
+#mails-import-form-table td, #mails-import-form-table th {
+   padding: 3px;
+}

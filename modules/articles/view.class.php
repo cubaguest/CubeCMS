@@ -3,8 +3,7 @@ class Articles_View extends View {
    public function mainView() {
       $this->template()->addTplFile("list.phtml");
       $feeds = new Component_Feed();
-      $feeds->setConfig('feedLink', $this->link()->clear()->route('exportFeed'));
-      $feeds->setConfig('urlArgName', "{type}");
+      $feeds->setConfig('feedLink', $this->link()->clear());
       $this->template()->feedsComp = $feeds;
 
       if($this->category()->getRights()->isWritable()) {
@@ -140,28 +139,6 @@ class Articles_View extends View {
       }
 
       return $c;
-   }
-
-   public function exportFeedView() {
-      $feed = new Component_Feed(true);
-      $feed ->setConfig('type', $this->type);
-      $feed ->setConfig('css', 'rss.css');
-      $feed ->setConfig('title', $this->category()->getName());
-      $feed ->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
-      $feed ->setConfig('link', $this->link());
-      while ($article = $this->template()->articles->fetch()) {
-         if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
-            $text = (string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION};
-         } else {
-            $text = (string)$article->{Articles_Model_Detail::COLUMN_TEXT};
-         }
-         $feed->addItem($article->{Articles_Model_Detail::COLUMN_NAME}, $text,
-                 $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
-                 new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}),
-                 $article->{Model_Users::COLUMN_USERNAME}, null, null,
-                 $article->{Articles_Model_Detail::COLUMN_URLKEY}."_".$article->{Articles_Model_Detail::COLUMN_ID});
-      }
-      $feed->flush();
    }
 
    public function currentArticleView() {

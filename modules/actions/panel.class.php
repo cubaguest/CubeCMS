@@ -37,7 +37,7 @@ class Actions_Panel extends Panel {
             $this->template()->count = $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS);
             break;
       }
-      $this->template()->rssLink = $this->link()->route('export', array('type' => 'rss'));
+      $this->template()->rssLink = $this->link()->route('feed', array('type' => 'rss'));
 	}
 
    public static function settingsController(&$settings,Form &$form) {

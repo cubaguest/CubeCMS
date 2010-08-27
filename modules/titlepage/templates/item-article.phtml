@@ -4,5 +4,8 @@ if($this->item['name'] != null){?>
 <?} else {?>
 <h2><a href="<?=$this->item['link']?>" title="<?=$this->_('Přejít na').' '.$this->item['title']?>"><?=vve_tpl_truncate($this->item['title'], 70);?></a></h2>
 <?}
+if($this->item['image'] != null){?>
+<img src="<?=$this->item['image']?>" alt="<?=$this->item['image']?>"/>
+<?}
 echo $this->item['data'];
 ?>

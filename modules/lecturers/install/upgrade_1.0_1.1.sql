@@ -1,0 +1,1 @@
+ALTER TABLE `{PREFIX}lecturers` ADD COLUMN `degree_after` VARCHAR(10) NULL DEFAULT NULL  AFTER `degree` ;

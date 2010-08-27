@@ -8,7 +8,7 @@ class TitlePage_Routes extends Routes {
       $this->addRoute('editList', "edit", 'editList','edit/');
       $this->addRoute('changePosition', "changepos.php", 'changePosition','changepos.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('deleteItem', "deleteitem.php", 'deleteItem','deleteitem.php', 'XHR_Respond_VVEAPI');
-      $this->addRoute('getArticlesList', "getartlist.php", 'getArticlesList','getartlist.php', 'XHR_Respond_VVEAPI');
+      $this->addRoute('getList', "getlist.php", 'getList','getlist.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('normal', null, 'main', null);
 	}
 }

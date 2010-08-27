@@ -32,9 +32,10 @@ class SiteMap {
    const SITEMAP_SITE_DEFAULT_PRIORITY = 0.5;
 
    /**
-    * Počet záznamů na stránku se zkráceným výpisem
+    * Pole se všemi položkami
+    * @var array
     */
-   const SHORT_NUM_RECORD_PER_CAT = 10;
+   private static $itemsAll = array();
 
    /**
     * Pole s položkami
@@ -43,16 +44,23 @@ class SiteMap {
    private $items = array();
 
    /**
-    * Pole se všemi položkami
-    * @var array
-    */
-   private static $itemsAll = array();
-
-   /**
     * Pole s parametry kategorie
     * @var array
     */
    private $catItem = array();
+
+   /**
+    * adresa pro link k "více"
+    * @var string
+    */
+   private $linkMore = null;
+
+   /**
+    * Maximalní počet prvků
+    * @var int
+    */
+   private static $maxItems = 20;
+
 
    /**
     * Proměná obsahuje objekt odkazu
@@ -67,19 +75,12 @@ class SiteMap {
    private $category = null;
 
    /**
-    * Jestli se tvoří mapa celého webu
-    * @var bool
-    */
-   private $isFullSitemap = true;
-
-   /**
     * Konstruktor -- vytvoří prostředí pro práci se sitemap
     *
     * @param Module -- objekt modulu
     */
-   function __construct(Category $category, Routes $routes, $isFull = true) {
+   function __construct(Category $category, Routes $routes) {
       $this->category = $category;
-      $this->isFullSitemap = $isFull;
       $link = new Url_Link_Module();
       $link->setModuleRoutes($routes);
       $link->category($this->category()->getUrlKey());
@@ -113,17 +114,10 @@ class SiteMap {
     */
    public function addItem($url, $name, DateTime $lastChange = null, $frequency = null ,$priorityDown = 1.0000) {
    // pokud je datum v budoucnosti nastavím aktuální
-      $item = array('loc' => (string)$url,'name' => $name);
-//      if($lastChange > time()) {
-//         $lastChange = time();
-//      }
-
+      $item = array('loc' => (string)$url,'name' => (string)$name);
       if($lastChange !== null|false) {
-//         $date = new DateTime(date(DATE_ISO8601,(int)$lastChange));
-//         $lastChange = $date->format('c');
          $item['lastmod'] = $lastChange->format('c');
       }
-
       if($frequency != null) {
          $item['changefreq'] = $frequency;
       }
@@ -135,15 +129,28 @@ class SiteMap {
    /**
     * Metoda přidává položku kategorie do siteampy
     *
-    * @param integer -- čas poslední změny (timestamp)
-    * @param float -- (option) o kolik se má snížit priorita článků
+    * @param DateTime -- čas poslední změny
     */
-   public function addCategoryItem(DateTime $lastChange) {
-      $this->catItem = array('loc' => (string)$this->link(),
+   public function setCategoryLink(DateTime $lastChange) {
+      $this->catItem = array(
+          'loc' => (string)$this->link(),
           'lastmod' => $lastChange->format('c'),
           'changefreq' => $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ},
           'priority'=>$this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY},
-          'name' => $this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_LABEL});
+          'name' => (string)$this->category()->getCatDataObj()->{Model_Category::COLUMN_CAT_LABEL});
+   }
+   
+   /**
+    * Metoda přidává položku s archivem
+    *
+    * @param string -- odkaz na archiv
+    * @param string -- (option) název položky další
+    */
+   public function setLinkMore($url, $name = null) {
+      if($name == null) $name = _('další');
+      $this->linkMore = array(
+          'loc' => (string)$url,
+          'name' => (string)$name);
    }
 
    /**
@@ -152,6 +159,14 @@ class SiteMap {
     */
    public function link() {
       return clone $this->link;
+   }
+
+   /**
+    * Metoda vrací maximální počet záznamů
+    * @return int
+    */
+   public function getMaxItems() {
+      return self::$maxItems;
    }
 
    /**
@@ -211,9 +226,17 @@ class SiteMap {
 
    /**
     * Metoda přidá hlavní stránku
+    * @deprecated
     */
    public static function addMainPage() {
       array_push(self::$itemsAll, array('cat' => array('loc' => (string)Url_Request::getBaseWebDir())));
+   }
+
+   /**
+    * Metoda přidá stránku
+    */
+   public static function addPage($url, $name) {
+      array_push(self::$itemsAll, array('cat' => array('loc' => (string)$url, 'name' => $name)));
    }
 
    /**
@@ -232,32 +255,41 @@ class SiteMap {
 
    /**
     * Metoda vrací pole článků
+    * @deprecated
     */
    public function createMapArray() {
       $retArr = array();
       $retArr['cat'] = $this->catItem;
       $retArr['items'] = $this->items;
+      $retArr['linkmore'] = $this->linkMore;
       array_push(self::$itemsAll, $retArr);
       return $retArr;
    }
 
    /**
-    * Metoda vrací jestli se jedná o plnou mapu, nebo zkrácenou
-    * @return boolean
+    * Destruktor ulkoží všechny itemy do pole s položkami
     */
-   public function isFull(){
-      return $this->isFullSitemap;
-   }
-
-   public function  __destruct() {
-      $this->createMapArray();
+   public function __destruct(){
+      self::$itemsAll[$this->category()->getId()] = array(
+         'cat' => $this->catItem,
+         'items' => $this->items,
+         'linkmore' => $this->linkMore
+      );
    }
 
    /**
     * Metoda vrací pole článků
     */
-   public static function getCurrentItemsArray() {
+   public static function getItems() {
       return self::$itemsAll;
+   }
+
+   /**
+    * Metoda nastaví maximální počet prvků v mapě
+    * @param int $count
+    */
+   public static function setMaxItems($count) {
+      self::$maxItems = $count;
    }
 }
 ?>

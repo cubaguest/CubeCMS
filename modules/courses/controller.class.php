@@ -8,6 +8,7 @@ class Courses_Controller extends Controller {
    const PARAM_SEND_ADMIN_NOTIF = 'admin_notif';
    const PARAM_ADMINS = 'admins';
    const PARAM_OTHER_RECIPIENS = 'other_recipients';
+   const PARAM_NEWSLETTER_MAIL_GRP = 'newsletter_mail_grp';
 
    const DEFAULT_IMG_WIDTH = 400;
    const DEFAULT_IMG_HEIGHT = 300;
@@ -252,17 +253,6 @@ class Courses_Controller extends Controller {
 
          $this->infoMsg()->addMessage($this->_('Kurz byl uložen'));
          $this->link()->route('detailCourse', array('urlkey' => $newCours->{Courses_Model_Courses::COLUMN_URLKEY}))->reload();
-
-         // generování url klíče
-//         $urlkeys = $editForm->urlkey->getValues();
-//         $names = $editForm->name->getValues();
-//         $urlkeys = $this->createUrlKey($urlkeys, $names);
-//
-//         $id = $this->saveArticle($names, $urlkeys, $editForm, $course);
-//         // nahrání nové verze článku (kvůli url klíči)
-//         $newCours = $model->getCourseById($id);
-//
-//         $this->link()->route('detail',array('urlkey' => $newCours->{Courses_Model_Courses::COLUMN_URLKEY}))->reload();
       }
       $this->view()->form = $editForm;
       $this->view()->edit = true;
@@ -484,8 +474,9 @@ class Courses_Controller extends Controller {
 
          // pokud je registrace k newsletteru, přidáme jej
          if ($regForm->regNewsletter->getValues() == true) {
-            $modelNewsLetter = new NewsLetter_Model_Mails();
-            $modelNewsLetter->saveMail($regForm->mail->getValues(), $_SERVER['REMOTE_ADDR']);
+            $modelMails = new Mails_Model_Addressbook();
+            $modelMails->saveMail($regForm->mail->getValues(), $this->category()->getParam(self::PARAM_NEWSLETTER_MAIL_GRP, Mails_Model_Groups::GROUP_ID_DEFAULT));
+            unset ($modelMails);
          }
 
          $course = $this->view()->course;
@@ -504,13 +495,24 @@ class Courses_Controller extends Controller {
          $mailXmlCnt->endElement();
 
          // úvod
-         $mailXmlCnt->writeRaw('Byla registrována přihláška ke kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+//         $mailXmlCnt->writeRaw('Byla registrována přihláška ke kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+         $mailXmlCnt->writeRaw('Toto je automatická odpověď. Byla registrována přihláška ke kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+
          $mailXmlCnt->startElement('a');
          $mailXmlCnt->writeAttribute('href', Url_Link::getMainWebDir());
          $mailXmlCnt->writeAttribute('title', VVE_WEB_NAME);
-         $mailXmlCnt->writeRaw(VVE_WEB_NAME.".");
+         $mailXmlCnt->writeRaw(VVE_WEB_NAME);
          $mailXmlCnt->endElement();
+         $mailXmlCnt->writeRaw('.');
          $mailXmlCnt->writeElement('br');
+         $mailXmlCnt->writeElement('br');
+
+         $mailXmlCnt->writeRaw('V případě dalších dotazů či uplatnění slev vám co nejdříve odpovíme. Podrobné informace o kurzu a fakturu obdržíte zhruba 14 dní před začátkem kurzu.');
+         $mailXmlCnt->writeElement('br');
+         $mailXmlCnt->writeRaw('Těšíme se na viděnou.');
+         $mailXmlCnt->writeElement('br');
+         $mailXmlCnt->writeElement('br');
+
          // odkaz na kurz
          $mailXmlCnt->writeRaw('Detail kurzu naleznete ');
          $mailXmlCnt->startElement('a');
@@ -527,7 +529,7 @@ class Courses_Controller extends Controller {
          $mailXmlCnt->startElement('tr'); // sof tr
          $mailXmlCnt->startElement('th'); // sof th
          $mailXmlCnt->writeAttribute('colspan', 2);
-         $mailXmlCnt->writeRaw('Detail kurzu');
+         $mailXmlCnt->writeRaw('Info o kurzu');
          $mailXmlCnt->endElement(); // eof th
          $mailXmlCnt->endElement(); // eof tr
          // název
@@ -779,7 +781,7 @@ class Courses_Controller extends Controller {
             $mail->addAddress($this->getAdminAddreses());
          }
          $mail->sendMail();
-         $this->infoMsg()->addMessage($this->_('Registace byla uložena. Na Váš e-mail byly odeslány detail rezervace'));
+         $this->infoMsg()->addMessage($this->_('Registace byla uložena. Na Váš e-mail byly odeslány detail registrace. Pokud Vám nedojdou na uvedenou e-mailovou adresu žádné informace, prosím kontaktujte nás.'));
          $this->link()->reload();
       }
 
@@ -863,20 +865,6 @@ class Courses_Controller extends Controller {
       $this->view()->places = $model->getPlaces($searched);
    }
 
-   // RSS
-   public function exportFeedController() {
-      $this->checkReadableRights();
-      $this->view()->type = $this->getRequest('type', 'rss');
-      $model = new Courses_Model_Courses();
-      $this->view()->courses = $model->getCoursesForFeed(VVE_FEED_NUM);
-
-      $lecturers = array();
-      foreach ($this->view()->courses as $course) {
-         $lecturers[$course->{Courses_Model_Courses::COLUMN_ID}] = $model->getLecturers($course->{Courses_Model_Courses::COLUMN_ID});
-      }
-      $this->view()->lecturers = $lecturers;
-   }
-
    /**
     * Metoda pro nastavení modulu
     */
@@ -921,11 +909,30 @@ lze využít následující výběr již existujících uživatelů.');
          $form->admins->setValues($settings[self::PARAM_ADMINS]);
       }
 
+      $formGrpNewsletter = $form->addGroup('newsletter', 'Nastavení registrace newsletteru');
+
+      $modelMailsGroups = new Mails_Model_Groups();
+      $groups = $modelMailsGroups->getGroups();
+
+      $elemMailsGroups = new Form_Element_Select('newsletterGroup', 'Skupina v adresáři s maily');
+
+      foreach ($groups as $group) {
+         $elemMailsGroups->setOptions(array($group->{Mails_Model_Groups::COLUMN_NAME} => $group->{Mails_Model_Groups::COLUMN_ID}), true);
+      }
+      $form->addElement($elemMailsGroups, $formGrpNewsletter);
+
+      if(isset ($settings[self::PARAM_NEWSLETTER_MAIL_GRP])){
+         $form->newsletterGroup->setValues($settings[self::PARAM_NEWSLETTER_MAIL_GRP]);
+      } else {
+         $form->newsletterGroup->setValues(Mails_Model_Groups::GROUP_ID_DEFAULT);
+      }
+
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
          $settings[self::PARAM_SEND_ADMIN_NOTIF] = $form->admin_notice->getValues();
          $settings[self::PARAM_ADMINS] = $form->admins->getValues();
          $settings[self::PARAM_OTHER_RECIPIENS] = $form->emails_rec->getValues();
+         $settings[self::PARAM_NEWSLETTER_MAIL_GRP] = $form->newsletterGroup->getValues();
       }
    }
 

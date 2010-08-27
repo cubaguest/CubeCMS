@@ -1,10 +1,10 @@
 <?
 $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
-$this->addPageHeadline($this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
 
 if($this->category()->getRights()->isWritable()) {?>
 <div id="gotoAddList" style="display: none"></div>
    <?}?>
+<h1><?=$this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo);?></h1>
 <div>
    <?if($this->text != false){?>
    <div>

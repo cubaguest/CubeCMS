@@ -14,40 +14,29 @@ class NewsLetter_Model_Mails extends Model_PDO {
 //   const COLUMN_ID_CAT = 'id_category';
    const COLUMN_DATE_ADD = 'date_add';
    const COLUMN_GROUP = 'group';
+   const COLUMN_BLOCKED = 'blocked';
 
    /**
     * Metoda uloží mail do db
     */
-   public function saveMail($mail, $ip, $id = null) {
+   public function saveMail($mail, $id = null, $blocked = false) {
       $dbc = new Db_PDO();
 
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-          ." SET ".self::COLUMN_MAIL.' = :mail WHERE '.self::COLUMN_ID.' = :id');
-         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-         $dbst->bindParam(':mail', $mail, PDO::PARAM_STR);
+          ." SET ".self::COLUMN_MAIL." = :mail,".self::COLUMN_BLOCKED." = :blocked"
+                 ." WHERE ".self::COLUMN_ID.' = :id');
+         $dbst->bindValue(':id', $id, PDO::PARAM_INT);
+         $dbst->bindValue(':mail', $mail, PDO::PARAM_STR);
+         $dbst->bindValue(':blocked', (int)$blocked, PDO::PARAM_BOOL);
       } else {
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-             ." (`".self::COLUMN_MAIL."`, `".self::COLUMN_IP."`)"
-             ." VALUES (:mail, :ipaddr)");
+             ." (`".self::COLUMN_MAIL."`, `".self::COLUMN_IP."`, `".self::COLUMN_BLOCKED."`)"
+             ." VALUES (:mail, :ipaddr, :blocked)");
          $dbst->bindValue(':mail', $mail, PDO::PARAM_STR);
-         $dbst->bindValue(':ipaddr', $ip, PDO::PARAM_STR);
+         $dbst->bindValue(':ipaddr', $_SERVER['REMOTE_ADDR'], PDO::PARAM_STR);
+         $dbst->bindValue(':blocked', (int)$blocked, PDO::PARAM_BOOL);
       }
-      return $dbst->execute();
-   }
-
-   /**
-    * Metoda přičte přečtení článku
-    * @return string $urlkey -- url klíč článku
-    */
-   public function addShowCount($urlKey) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-          ." SET ".self::COLUMN_SHOWED." = ".self::COLUMN_SHOWED."+1"
-          ." WHERE (".self::COLUMN_URLKEY."_".Locale::getLang()." = :urlkey"
-          ." OR ".self::COLUMN_URLKEY."_".Locale::getDefaultLang()." = :urlkey2)");
-      $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
-      $dbst->bindParam(':urlkey2', $urlKey, PDO::PARAM_STR);
       return $dbst->execute();
    }
 
@@ -65,7 +54,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
       } else {
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-         ." LIMIT :fromrow, :numrows)");
+         ." LIMIT :fromrow, :numrows");
          $dbst->bindParam(':fromrow', $fromRow, PDO::PARAM_INT);
          $dbst->bindParam(':numrows', $numRows, PDO::PARAM_INT);
       }
@@ -119,6 +108,22 @@ class NewsLetter_Model_Mails extends Model_PDO {
       return $dbst->execute(array(':mail' => $email));
    }
 
+   /**
+    * Metoda změní blokaci zadaného mailu (podle názvu nebo id)
+    * @param string/int $email -- email nebo id
+    */
+   public function changeMailStatus($email) {
+      $dbc = new Db_PDO();
+      if(is_numeric($email)){
+         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+            ." SET ".self::COLUMN_BLOCKED." = ".self::COLUMN_BLOCKED."+1"
+            ." WHERE (".self::COLUMN_ID." = :idmail");
+         $dbst->bindValue(':idmail', (int)$email, PDO::PARAM_INT);
+      } else {
+      }
+      return $dbst->execute();
+   }
+
    public function getMailsByIds($ids) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
@@ -126,6 +131,18 @@ class NewsLetter_Model_Mails extends Model_PDO {
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       $dbst->execute();
       return $dbst->fetchAll();
+   }
+
+   /**
+    * Metoda vrací počet článků
+    *
+    * @return integer -- počet článků
+    */
+   public function getCount() {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE));
+      $count = $dbst->fetch();
+      return $count[0];
    }
 }
 

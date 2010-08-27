@@ -15,7 +15,7 @@ $tinymce->setCfgParam('theme',  JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
 $this->addJsPlugin($tinymce);
 
 ?>
-
+<h1><?=$this->_('Úprava úvodního textu kategorie').' '.$this->category()->getName();?></h1>
 <div id="editActionsLabelForm">
    <?print($this->form);?>
 </div>

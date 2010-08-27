@@ -59,20 +59,15 @@ class Photogalerymed_View extends Articles_View {
       $this->template()->addTplFile("editphoto.phtml", 'photogalery');
    }
 
-   public function showPdfView() {
-      // načtení článku
-      $artM = new Articles_Model_Detail();
-      $article = $artM->getArticle($this->urlkey);
-
+   protected function createPdf() {
+      $article = $this->article;
       if($article == false) return false;
-      $c = $this->createPdf($article);
+      $c = parent::createPdf();
 
       // doplnění fotek
       $photosM = new PhotoGalery_Model_Images();
       $images = $photosM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID});
-
-
-      $c->pdf()->AddPage();
+//      $c->pdf()->AddPage();
       // nadpis
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN);
       $c->pdf()->writeHTML("<h2>".$this->_('Fotky')."</h2>", true, 0, true, 0);
@@ -111,7 +106,7 @@ class Photogalerymed_View extends Articles_View {
          }
       }
       // výstup
-      $c->flush($article->{Articles_Model_Detail::COLUMN_URLKEY}.'.pdf');
+      return $c;
    }
 
    public function checkFileView() {

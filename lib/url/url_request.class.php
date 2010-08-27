@@ -8,6 +8,7 @@
  * @author			$Author$ $Date$
  *						$LastChangedBy$ $LastChangedDate$
  * @abstract		Třída pro obsluhu Url adres
+ * @todo          Přepsat na statickou třídu
  */
 class Url_Request {
 /**
@@ -17,11 +18,17 @@ class Url_Request {
 
    const URL_TYPE_NORMAL = 'normal';
    const URL_TYPE_ENGINE_PAGE = 'specialpage';
+   const URL_TYPE_CORE_MODULE = 'coremodule';
    const URL_TYPE_MODULE_REQUEST = 'module';
+   const URL_TYPE_MODULE_RSS = 'modulerss';
    const URL_TYPE_MODULE_STATIC_REQUEST = 'modules';
    const URL_TYPE_COMPONENT_REQUEST = 'component';
    const URL_TYPE_JSPLUGIN_REQUEST = 'jsplugin';
    const URL_TYPE_SUPPORT_SERVICE = 'supportservice';
+
+   const URL_FILE_RSS = 'rss.xml';
+   const URL_FILE_ATOM = 'atom.xml';
+
 
    /**
     * jestli se jedná o normální url nebo url s podpůrnými službami
@@ -133,7 +140,9 @@ class Url_Request {
    //		Vytvoření url
       $fullUrl = $_SERVER['REQUEST_URI'];
       self::$scriptName = $_SERVER["SCRIPT_NAME"];
-//      $serverName = $_SERVER["SERVER_NAME"]; server_name udává bez www
+      // base request
+//      $baseDir = str_replace('index.php', '', self::$scriptName);
+//      self::$requestUrl = str_replace($baseDir, '', $fullUrl);
       $serverName = $_SERVER["HTTP_HOST"];
       if(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null){
          $fullUrl = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', $fullUrl);
@@ -169,7 +178,7 @@ class Url_Request {
    public function checkUrlType() {
       $validRequest = false;
       // jesli se zpracovává soubor modulu
-      if($this->parseSupportServiceUrl()
+      if($this->parseCoreModuleUrl()
           OR $this->parseComponentUrl()
           OR $this->parseJsPluginUrl() OR $this->parseNormalUrl()
           OR $this->parseModuleStaticUrl()) {
@@ -221,11 +230,21 @@ class Url_Request {
                if(preg_match($regexp, $match['url'], $matches)) {
                   // pokud obsahuje soubor
                   $fileMatchs = array();
-                  if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
+                  if($matches['other'] == self::URL_FILE_RSS){
+                     $this->urlType = self::URL_TYPE_MODULE_RSS;
+                     $this->name = 'rss';
+                     $this->outputType = 'xml';
+                     $this->pageFull = false;
+                  } else if($matches['other'] == self::URL_FILE_ATOM){
+                     $this->urlType = self::URL_TYPE_MODULE_RSS;
+                     $this->name = 'atom';
+                     $this->outputType = 'xml';
+                     $this->pageFull = false;
+                  } else if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
                      $this->urlType = self::URL_TYPE_MODULE_REQUEST;
                      $this->outputType = $fileMatchs['ext'];
                      $this->pageFull = false;
-                  } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stráánku :-)
+                  } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
                      $this->urlType = self::URL_TYPE_MODULE_REQUEST;
                      $this->pageFull = false;
                   }
@@ -246,28 +265,29 @@ class Url_Request {
     * Metoda zkontroluje jesli se nejedná o specialní stránky obsažené v enginu
     * (hledání, sitemap, atd)
     */
-   private function parseSupportServiceUrl() {
-      $regexps = array('/^(?:(?P<lang>[a-z]{2})\/)?(?P<name>(?:sitemap|rss)).(?P<output>(xml|txt|html)+)/i');
-      foreach ($regexps as $regex) {
-         $matches = array();
-         if(preg_match($regex, self::$webUrl, $matches) != 0) {
-            $this->pageFull = false;
-            $this->urlType = self::URL_TYPE_SUPPORT_SERVICE;
-            if(isset ($matches['output'])) {
-               $this->outputType = $matches['output'];
-               if($matches['output'] == 'html'){
-                  $this->pageFull = true;
-                  $this->urlType = self::URL_TYPE_ENGINE_PAGE;
-               }
-            }
-            if(isset ($matches['action'])) {
-               $this->outputType = $matches['action'];
-            }
-            $this->name = $matches['name'];
-            return true;
+   private function parseCoreModuleUrl() {
+      $return = false;
+      $match = array('url' => null);
+      if(preg_match("/^(?:(?P<lang>[a-z]{2})\/)?(?P<url>.*)/", self::$fullUrl, $match) ){
+         if(!empty ($match)) {
+            $this->lang = $match['lang'];
+            Locales::setLang($this->lang);
+            Url_Link::setLang(Locales::getLang());
          }
       }
-      return false;
+      $regexp = '/^(?P<name>(?:sitemap|rss)).(?P<output>(xml|txt|html)+)/i';
+      $matches = array();
+      if(preg_match($regexp, $match['url'], $matches) != 0) {
+         $this->pageFull = false;
+         $this->urlType = self::URL_TYPE_CORE_MODULE;
+         $this->outputType = $matches['output'];
+         $this->category = $matches['name'];
+         if($matches['output'] == 'html'){
+            $this->pageFull = true;
+         }
+         $return = true;
+      }
+   return $return;
    }
 
    /**
@@ -318,7 +338,6 @@ class Url_Request {
     */
    private function parseJsPluginUrl() {
       $matches = array();
-//      if(!preg_match("/jsplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
       if(!preg_match("/jsplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?cat-(?P<category>[0-9]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
@@ -413,6 +432,14 @@ class Url_Request {
     */
    public static function getCurrentUrl() {
       return self::$transferProtocol.self::$serverName.$_SERVER['REQUEST_URI'];
+   }
+
+   /**
+    * Metoda vrací část s požadavkem
+    * @return string
+    */
+   public static function getRequestUrl() {
+      return self::$fullUrl;
    }
 
    /**

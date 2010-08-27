@@ -1,11 +1,19 @@
 <?
 $this->addCssFile("style.css");
+$this->addJsPlugin(new JsPlugin_JQuery());
 
 define('SECTION_EDTI_LABEL', $this->_('Upravit'));
 define('SECTION_REMOVE_LABEL', $this->_('Smazat'));
 define('SECTION_SETTINGS_LABEL', $this->_('Upravit parametry'));
 define('SECTION_MOVEUP_LABEL', $this->_('Nahoru'));
 define('SECTION_MOVEDOWN_LABEL', $this->_('Dolu'));
+define('SECTION_GOTO_CAT_LABEL', $this->_('Přejít na'));
+define('SECTION_SHOW_DETAIL_LABEL', $this->_('Zobrazit detail'));
+define('SECTION_MODULE_LABEL', $this->_('Modul'));
+define('SECTION_LABEL_LABEL', $this->_('Popisek'));
+define('SECTION_IND_PANELS_LABEL', $this->_('Individuální panely'));
+define('SECTION_YES_LABEL', $this->_('Ano'));
+define('SECTION_NO_LABEL', $this->_('Ne'));
 
 // funkce pro render menu
 function vveSectionsRenderFunc($menuArr, $link) {
@@ -17,10 +25,29 @@ function vveSectionsRenderFunc($menuArr, $link) {
    $cycle = 0;
    //   $level = $menuArr->getLevel();
    foreach ($menuArr as $key => $item) {$cycle++?>
-<tr class="list-item"><td>
-      <span class="sec"><?=str_repeat('&nbsp;', ($item->getLevel())*6).$item?></span>
-      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=$item?>">link</a>
-      ID:<?=$item->getId()?>
+<tr class="list-item"><td style="padding-left: <?=$item->getLevel()*30?>px;">
+      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=$item?>"><span class="sec"><?=$item?></span></a>
+      <?
+      if($item->getCatObj()->haveFeed()){?>
+      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?=Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" />
+      </a>
+      <?}
+      ?>&nbsp;ID:<?=$item->getId()?>
+      <a href="<?=$link?>" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">dateil</a>
+      <div class="category-params">
+         <table>
+            <tr>
+               <th><?=SECTION_MODULE_LABEL?>:</th>
+               <td><?=$item->getCatObj()->getModule()->getName()?></td>
+            </tr>
+            <tr>
+               <th><?=SECTION_IND_PANELS_LABEL?>:</th>
+               <td><?
+               echo $item->getCatObj()->isIndividualPanels() == true ? SECTION_YES_LABEL : SECTION_NO_LABEL;
+                  ?></td>
+            </tr>
+         </table>
+      </div>
    </td><td width="110">
       <form method="post" action="<?=$link2->route('settings',array('categoryid' => $item->getId()))?>" style="display:inline;">
          <input type="image" src="<?=vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
@@ -82,6 +109,11 @@ function vveSectionsRenderFunc($menuArr, $link) {
       function submitRemoveCat(msg){
          return confirm('<?=$this->_('Opravdu smazat kategorii: ')?>'+msg+'?');
       }
+
+      $('.button-show-detail').click(function(){
+         $(this).next('div').toggle();
+         return false;
+      });
       /* ]]> */
    </script>
    <?

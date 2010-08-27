@@ -10,7 +10,7 @@ echo $this->form;
       $('select#article_item_category_id').change(function(){
          var idc = $(this).val();
          $.ajax({
-            type: "POST", url: "<?=$this->link()->route('getArticlesList')?>",
+            type: "POST", url: "<?=$this->link()->route('getList')?>",
                data: ({idc : idc, type : '<?=TitlePage_Controller::ITEM_TYPE_ARTICLE?>'}),
                success : function(msg){
                   $('select#article_item_article_id').html(null);

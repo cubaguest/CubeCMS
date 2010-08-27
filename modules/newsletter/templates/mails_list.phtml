@@ -2,120 +2,133 @@
 $this->addPageHeadline($this->_('Seznam registrovaných e-mailových adres'));
 $this->addPageTitle($this->_('Seznam registrovaných e-mailových adres'));
 $this->addCssFile('style.css');
-$this->addJsPlugin(new JsPlugin_DataTables());
+
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+//$jsJqGrid->setCellEdit();
+//$jsJqGrid->setInLineEdit();
+$this->addJsPlugin($jsJqGrid);
 ?>
 <div>
-   <h2><?=$this->_('E-maily')?></h2>
-   <table id="tableMails" style="width: 100%;">
-      <thead>
-		<tr>
-         <th>E-mail</th>
-			<th style="width: 140px"><?=$this->_('Přidáno')?></th>
-         <th style="width: 140px">
-            <?=$this->_('Označit')?>&nbsp;
-            (<a href="#" id="selectAll" title="<?=$this->_('vše')?>" ><?=$this->_('vše')?></a>,&nbsp;
-            <a href="#" id="selectNon" title="<?=$this->_('nic')?>" ><?=$this->_('nic')?></a>)
-         </th>
-		</tr>
-	</thead>
-   <tbody>
-      <?foreach ($this->mails as $mail) {?>
-      <tr>
-         <td><a href="mailto:<?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL}?>"
-                title="<?=$this->_('Poslat email')?>"
-                ><?=$mail->{NewsLetter_Model_Mails::COLUMN_MAIL}?></a></td>
-         <td><?=vve_date("%x", new DateTime($mail->{NewsLetter_Model_Mails::COLUMN_DATE_ADD}))?></td>
-         <td align="center">
-            <input type="checkbox" name="select_item[<?=$mail->{NewsLetter_Model_Mails::COLUMN_ID}?>]" />
-         </td>
-      </tr>
-      <?}?>
-   </tbody>
-   </table>
-   <hr class="reseter" />
-   <div>
-      <strong><?=$this->_('Označené')?>:</strong>&nbsp;
-      <button type="submit" name="delete_items" title="<?=$this->_('Smazat označené')?>"
-              value="<?=$this->_('Smazat')?>"><?=$this->_('Smazat')?></button>&nbsp;
-      <form id="sendmail_form" action="<?=$this->link()->route('sendMail')?>" method="post" style="display: inline">
-      <input type="hidden" name="sendmail_items" value="" />
-      <input type="submit" name="sendmail_getform" title="<?=$this->_('Poslat e-mail označeným')?>"
-              value="<?=$this->_('Poslat e-mail')?>" />&nbsp;
-   </form>
+   <h2><?=$this->_('Uložené adresy')?></h2>
+   <table id="table-newsletters"></table>
+   <div id="table-newsletters-toolbar">
    </div>
-      <script type="text/javascript" charset="utf-8">
-			$(document).ready(function() {
-				var $table = $('#tableMails').dataTable( {
-					"oLanguage": {
-						"sLengthMenu": "<?=$this->_('Zobrazit _MENU_ záznamů na stránku')?>",
-						"sZeroRecords": "<?=$this->_('Nic nenalezeno')?>",
-						"sInfo": "<?=$this->_('Zobrazeno od _START_ do _END_ z _TOTAL_ záznamů')?>",
-						"sInfoEmtpy": "<?=$this->_('Zobrazeno 0 z 0 záznamů')?>",
-						"sInfoFiltered": "(<?=$this->_('filtrováno z _MAX_ celkových záznamů')?>)"
-					}
-				});
-
-            $('button[name=delete_items]').click(function(){
-               var $items = getTableItems();
-               if($items.length == 0){
-                  errMsg('<?=$this->_('Nebyla vybrána žádná položka')?>');
-                  return false;
-               }
-               if(!confirm('<?=$this->_('Smazat označené?')?>')){return false;}
-
-               $.ajax({url: '<?=$this->link()->route('deleteMails')?>',
-                  data : $items.serialize(),
-                  success: function(data) {
-                     if(data.status == true){//delete items
-                        var $items = getSelectedItems();
-                        $items.each(function(index){
-                           if($(this).is(':checked')){
-                              $table.fnDeleteRow(index);
-                           }
-                        });
-                     }
-                     vveShowMessages(data);
-                  }
-               });
-
-            });
-            // serializace označených emailů
-            $('form#sendmail_form').submit(function(){
-               var $items = getTableItems();
-               if($items.length == 0){
-                  errMsg('<?=$this->_('Nebyla vybrána žádná položka')?>');
-                  return false;
-               }
-
-               $items.each(function(){
-                  if($(this).is(':checked')){
-                     var item = $(this).clone().hide();
-                     $('form#sendmail_form').append(item);
-                  }
-               });
-            });
-
-            $('a#selectAll').click(function(){
-               getTableItems().attr('checked', true);
-               return false;
-            });
-            $('a#selectNon').click(function(){
-               getTableItems().attr('checked', false);
-               return false;
-            });
-
-         function getTableItems(){
-//            return $('#tableMails input[type=checkbox]:checked');
-            return $('input[type=checkbox]', $table.fnGetNodes());
-//            return $('input[type=checkbox]', $table.fnGetNodes());
-         }
-			});
-		</script>
+   <div id="table-newsletters-pager"></div>
+   <hr class="reseter" />
    <br />
+
+
+
    <h2><?=$this->_('Export adres')?></h2>
    <a href="<?=$this->link()->route('export',array('output' => 'txt'))?>">txt</a>
    <a href="<?=$this->link()->route('export',array('output' => 'csv'))?>">csv</a>
    <br />
    <br />
+   <script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      $(document).ready(function() {
+         function checkboxFormater(ellvalue, options, rowObject){
+            var input = '<input type="checkbox" '
+               +'id="'+options.gid+'-blocked-id-'+options.rowId+'" '
+            +'class="'+options.gid+'-block-checkbox" '
+            +'mail="'+rowObject[0]+'" ';
+            if(ellvalue == true){
+               input += 'checked="checked" '
+            }
+            input += '/>';
+            return input;
+         }
+
+         // seznam emailů
+         var addressGrid = $("#table-newsletters").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url:'<?=$this->link()->route('listMails');?>',
+            datatype: "json",
+            searchoptions: { sopt: ['eq','ne','in', 'ni'] },
+            colNames:['E-mail', 'Přidáno', 'IP adresa','Blokován'],
+            colModel:[
+               {name:'mail',index:'<?=NewsLetter_Model_Mails::COLUMN_MAIL?>',
+                  width:200,editable:true,editoptions:{size:25},
+                  formoptions:{ rowpos:1, label: "<?=$this->_('E-mail')?>", elmprefix:"(*)"},
+                  editrules:{required:true}},
+               {name:'dateAdd',index:'<?=NewsLetter_Model_Mails::COLUMN_DATE_ADD?>',
+                  width:140,editable:false},
+               {name:'ipaddress',index:'<?=NewsLetter_Model_Mails::COLUMN_IP?>',
+                  width:120,editable:false},
+               {name:'blocked',index:'<?=NewsLetter_Model_Mails::COLUMN_BLOCKED?>',
+                  width:60,sortable:true,
+//                  formatter: "checkbox", formatoptions: {disabled : false, idName:'myid'},
+                  formatter: checkboxFormater,
+                  formoptions:{ rowpos:2, label: "<?=$this->_('Blokace')?>"},
+                  editable: true, edittype:"checkbox",
+                  editoptions: {
+                     value: "true:false"
+                   }
+                }
+            ],
+            rowNum:<?=NewsLetter_Controller::NUM_ROWS_IN_TABLE;?>,
+            rowList:[<?=Mails_Controller::NUM_ROWS_IN_TABLE;?>,<?=Mails_Controller::NUM_ROWS_IN_TABLE*2;?>,<?=Mails_Controller::NUM_ROWS_IN_TABLE*4;?>,<?=Mails_Controller::NUM_ROWS_IN_TABLE*10;?>],
+            pager: '#table-newsletters-pager',
+            sortname: 'mail',
+            multiselect: true,
+            caption:"e-maily",
+            height: 350,
+            editurl:"<?=$this->link()->route('mailEdit')?>"
+         });
+         // úpravy
+         jQuery("#table-newsletters").jqGrid('navGrid','#table-newsletters-pager',
+//            {view:false}, //options
+            {edit:true,add:true,del:true}, //options
+            {
+               height:130,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,
+               viewPagerButtons:false,// edit options
+               bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>",closeAfterEdit: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {height:130,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options
+               bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },  // del options
+            {reloadAfterSubmit:false,jqModal:true, closeOnEscape:true,
+               afterSubmit : function(respond, postdata){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {closeOnEscape:true} // search options
+         );
+
+         $('.table-newsletters-block-checkbox').live('change',function(){
+            $.ajax({
+               type: "POST",
+               url: '<?=$this->link()->route()?>',
+               data: ({id : this.getAttribute('id')}),
+               success: function(){
+                  alert( "reload table");
+               }
+            });
+         });
+      })
+         ;
+      /* ]]> */
+      </script>
 <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route(null)));?>
 </div>

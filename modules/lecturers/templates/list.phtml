@@ -1,43 +1,5 @@
 <div class="article-list module-lecturers-list">
-   <?if(!empty ($this->lecturers)) {
-      foreach ($this->lecturers as $lecturer) {
-         ?>
-   <div class="article-list-record module-lecturers-list-record">
-      <h2 id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
-         <?
-         $degree = $lecturer->{Lecturers_Model::COLUMN_DEGREE};
-         if($degree != null){
-            echo $degree;
-            if($degree[strlen($degree)-1] != '.'){
-               echo '.';
-            }
-            echo ' ';
-         }
-         echo $lecturer->{Lecturers_Model::COLUMN_SURNAME}.' ';
-         echo $lecturer->{Lecturers_Model::COLUMN_NAME};
-         ?>
-      </h2>
-      <div class="article-list-record-content">
-         <?if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){?>
-         <div class="article-list-record-box-image module-lecturers-list-record-box-image">
-                  <?=vve_tpl_image_tag(AppCore::getAppDataDir().Lecturers_Controller::DATA_DIR.DIRECTORY_SEPARATOR
-                          .$lecturer->{Lecturers_Model::COLUMN_IMAGE}, $lecturer->{Lecturers_Model::COLUMN_IMAGE}, 140);?>
-         </div>
-         <?}?>
-         <?echo $lecturer->{Lecturers_Model::COLUMN_TEXT};?>
-         <?
-         if($this->toolboxEdit != null){
-            $this->toolboxEdit->lecture_edit->setAction($this->link()->route('edit', array('id' => $lecturer->{Lecturers_Model::COLUMN_ID})));
-            $this->toolboxEdit->lecture_del_->getForm()->id->setValues($lecturer->{Lecturers_Model::COLUMN_ID});
-            echo $this->toolboxEdit;
-         }
-         ?>
-      <hr class="reseter" />
-      </div>
-   </div>
-         <?}
-   } else {
-      echo ($this->_('Není vložen žádný lektor'));
-   }?>
+<?
+$this->includeTpl('onlylist.phtml', false, array('lecturers' => $this->lecturers,'hE' => 'h2', 'hEClass' => 'course-lecturer-name'), 'lecturers');?>
 </div>
    <?=$this->toolbox;// TOOLBOXY?>

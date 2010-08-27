@@ -25,6 +25,13 @@
    border-bottom: 1px solid gray;
    padding: 5px;
 }
+.list-item td table td {
+   border: none;
+   padding: 1px;
+}
+.list-item td table th {
+   width: 200px;
+}
 .list-item:hover {
    background-color: #fdf5ce;
 }
@@ -39,4 +46,8 @@
    background-color: white;
    border: 1px solid silver;
    padding: 3px;
+}
+
+.category-params {
+   display: none;
 }

@@ -13,7 +13,7 @@ class NewsLetter_View extends View {
          $toolbox->addTool('edit_text',$this->_('Upravit úvodní text'),
                  $this->link()->route('edittext'), $this->_('Upravit úvodní text'), 'page_edit.png');
          $toolbox->addTool('registered_mails',$this->_('Registrované adresy'),
-                 $this->link()->route('list'), $this->_('Správa registrovaných emailových adres'), 'page_edit.png');
+                 $this->link()->route('listRegMails'), $this->_('Správa registrovaných emailových adres'), 'page_edit.png');
 //         $toolbox->addTool('edit_mail_text',$this->_('Uprvit text e-mailu'),
 //                 $this->link()->route('edit-mail-text'), $this->_('Úprava textu adesílaného emailu'), 'page_edit.png');
 
@@ -25,7 +25,7 @@ class NewsLetter_View extends View {
       $this->template()->addTplFile('edit_text.phtml');
    }
 
-   public function listMailsView() {
+   public function listRegMailsView() {
       $this->template()->addTplFile('mails_list.phtml');
    }
 
@@ -64,6 +64,10 @@ class NewsLetter_View extends View {
 
    public function sendMailView() {
       $this->template()->addTplFile('sendmail.phtml');
+   }
+
+   public function listMailsView() {
+      echo json_encode($this->respond);
    }
 }
 ?>

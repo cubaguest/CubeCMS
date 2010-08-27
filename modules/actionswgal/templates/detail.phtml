@@ -1,6 +1,5 @@
 <? // načtení detailu
 $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
-$this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUITabs();
@@ -10,7 +9,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 $photosModel = new PhotoGalery_Model_Images();
 $countImages = $photosModel->getCountImages($this->category()->getId(), $this->action->{Actions_Model_Detail::COLUMN_ID});
 ?>
-
+<h1><?=$this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
 <div>
    <!--<h2><?=htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>&nbsp;-->
    <!--</h2>-->
@@ -28,7 +27,7 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
          <?}?>
       <div id="actionText"><!-- SOF TEXT -->
          <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-            print (vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->imagesDir.DIRECTORY_SEPARATOR
+            print (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->imagesDir.DIRECTORY_SEPARATOR
                     .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));
          }?>
 

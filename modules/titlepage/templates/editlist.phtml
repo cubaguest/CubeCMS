@@ -27,7 +27,12 @@ $this->addJsPlugin($jQuery);
                      $tpl = 'item-video.phtml';
                      break;
                   case TitlePage_Controller::ITEM_TYPE_ARTICLE:
+                  case TitlePage_Controller::ITEM_TYPE_NEWS:
+                  case TitlePage_Controller::ITEM_TYPE_ARTICLEWGAL:
                      $tpl = 'item-article.phtml';
+                     break;
+                  case TitlePage_Controller::ITEM_TYPE_ACTION:
+                     $tpl = 'item-action.phtml';
                      break;
                   default:
                      break;

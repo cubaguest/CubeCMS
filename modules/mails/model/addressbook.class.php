@@ -41,7 +41,7 @@ class Mails_Model_Addressbook extends Model_PDO {
     * Metoda vrací pole objektů s uloženými maily
     * @return array
     */
-   public function getMails($idGrp = Mails_Model_Groups::GROUP_ID_DEFAULT, $fromRow = 0, $rows = 100, $orderBy = self::COLUMN_SURNAME, $order = 'ASC') {
+   public function getMails($idGrp = Mails_Model_Groups::GROUP_ID_DEFAULT, $fromRow = 0, $rows = 10000, $orderBy = self::COLUMN_SURNAME, $order = 'ASC') {
       $dbc = new Db_PDO();
       if($idGrp == Mails_Model_Groups::GROUP_ID_ALL){
          $dbst = $dbc->prepare("SELECT tm.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tm"

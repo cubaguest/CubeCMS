@@ -72,9 +72,9 @@ class ContactModel extends DbModel {
       $sqlSelect = $this->getDb()->select()
       ->table($this->getModule()->getDbTable(), 'contact')
       ->colums(array(self::COLUMN_CONTACT_NAME =>"IFNULL(".self::COLUMN_CONTACT_NAME.'_'
-            .Locale::getLang().",".self::COLUMN_CONTACT_NAME.'_'.Locale::getDefaultLang().")",
-            self::COLUMN_CONTACT_TEXT =>"IFNULL(".self::COLUMN_CONTACT_TEXT.'_'.Locale::getLang()
-            .",".self::COLUMN_CONTACT_TEXT.'_'.Locale::getDefaultLang().")",
+            .Locales::getLang().",".self::COLUMN_CONTACT_NAME.'_'.Locales::getDefaultLang().")",
+            self::COLUMN_CONTACT_TEXT =>"IFNULL(".self::COLUMN_CONTACT_TEXT.'_'.Locales::getLang()
+            .",".self::COLUMN_CONTACT_TEXT.'_'.Locales::getDefaultLang().")",
             self::COLUMN_CONTACT_ID, self::COLUMN_CONTACT_FILE, self::COLUMN_CONTACT_ID_CITY))
       ->join(array('city' => $this->getModule()->getDbTable(3)), array('contact' => self::COLUMN_CONTACT_ID_CITY,
             self::COLUMN_ID_CITY), null, self::COLUMN_CITY_NAME)

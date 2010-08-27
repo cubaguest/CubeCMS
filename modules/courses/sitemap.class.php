@@ -3,27 +3,17 @@ class Courses_SiteMap extends SiteMap {
 	public function run() {
       $coursesM = new Courses_Model_Courses();
       // kategorie
-      $this->addCategoryItem($coursesM->getLastChange());
+      $this->setCategoryLink($coursesM->getLastChange());
       // články
-      if($this->isFull()){
-         $courses = $coursesM->getCourses();
-      } else {
-         $courses = $coursesM->getCourses(0,self::SHORT_NUM_RECORD_PER_CAT);
-      }
+      $courses = $coursesM->getCourses(0, $this->getMaxItems());
 
       foreach ($courses as $course) {
-         $this->addItem($this->link()->route('detail', array(
+         $this->addItem($this->link()->route('detailCourse', array(
              'urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY})),
             $course->{Courses_Model_Courses::COLUMN_NAME},
             new DateTime($course->{Courses_Model_Courses::COLUMN_TIME_EDIT}));
       }
-      $this->addArchiveLink();
+      $this->setLinkMore($this->link()->route('listAllCourses'), _('všechny'));
 	}
-
-   public function addArchiveLink() {
-      if(!$this->isFull()){
-         $this->addItem($this->link()->route('listAllCourses'),_('další...'));
-      }
-   }
 }
 ?>

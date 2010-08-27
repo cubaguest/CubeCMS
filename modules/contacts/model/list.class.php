@@ -12,15 +12,15 @@ class Contacts_Model_List extends Model_Db {
       $sqlSelect = $this->getDb()->select()
       ->table($this->module()->getDbTable(), 'cont')
       ->colums(array(Contacts_Model_Detail::COLUMN_CONTACT_NAME =>"IFNULL(cont.".Contacts_Model_Detail::COLUMN_CONTACT_NAME.'_'
-            .Locale::getLang().",cont.".Contacts_Model_Detail::COLUMN_CONTACT_NAME.'_'.Locale::getDefaultLang().")",
-            Contacts_Model_Detail::COLUMN_CONTACT_TEXT =>"IFNULL(cont.".Contacts_Model_Detail::COLUMN_CONTACT_TEXT.'_'.Locale::getLang()
-            .",cont.".Contacts_Model_Detail::COLUMN_CONTACT_TEXT.'_'.Locale::getDefaultLang().")",
+            .Locales::getLang().",cont.".Contacts_Model_Detail::COLUMN_CONTACT_NAME.'_'.Locales::getDefaultLang().")",
+            Contacts_Model_Detail::COLUMN_CONTACT_TEXT =>"IFNULL(cont.".Contacts_Model_Detail::COLUMN_CONTACT_TEXT.'_'.Locales::getLang()
+            .",cont.".Contacts_Model_Detail::COLUMN_CONTACT_TEXT.'_'.Locales::getDefaultLang().")",
             Db::COLUMN_ALL))
       ->join(array('type' => $this->module()->getDbTable(2)),
          array('cont' => Contacts_Model_Detail::COLUMN_CONTACT_ID_TYPE,
             Contacts_Model_Types::COLUMN_ID), Db::JOIN_LEFT,
          array(Contacts_Model_Types::COLUMN_NAME =>"IFNULL(type.".Contacts_Model_Types::COLUMN_NAME.'_'
-            .Locale::getLang().",type.".Contacts_Model_Types::COLUMN_NAME.'_'.Locale::getDefaultLang().")"))
+            .Locales::getLang().",type.".Contacts_Model_Types::COLUMN_NAME.'_'.Locales::getDefaultLang().")"))
       ->where('cont.'.Contacts_Model_Detail::COLUMN_CONTACT_ID_ITEM, $this->module()->getId())
       ->order(Contacts_Model_Detail::COLUMN_CONTACT_PRYORITY, Db::ORDER_DESC)
       ->order(Contacts_Model_Detail::COLUMN_CONTACT_NAME, Db::ORDER_ASC);

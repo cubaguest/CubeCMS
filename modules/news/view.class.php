@@ -1,6 +1,10 @@
 <?php
 class News_View extends Articles_View {
    public function mainView() {
+      $feeds = new Component_Feed();
+      $feeds->setConfig('feedLink', $this->link()->clear());
+      $this->template()->feedsComp = $feeds;
+      
       $this->template()->addTplFile("list.phtml");
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox();

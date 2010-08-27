@@ -1,0 +1,1 @@
+ALTER TABLE `{PREFIX}titlepage_items` CHANGE COLUMN `type` `type` VARCHAR(20) NOT NULL DEFAULT 'text';

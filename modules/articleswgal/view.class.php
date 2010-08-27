@@ -4,7 +4,7 @@ class ArticlesWGal_View extends Articles_View {
     * Inicializace
     */
    public function mainView() {
-      $this->template()->addTplFile("list.phtml");
+      parent::mainView();
    }
 
    public function showView() {

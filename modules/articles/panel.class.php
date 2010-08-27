@@ -21,7 +21,7 @@ class Articles_Panel extends Panel {
             $this->template()->addTplFile('panel.phtml');
             break;
       }
-      $this->template()->rssLink = $this->link()->route('exportFeed', array('type' => 'rss'));
+      $this->template()->rssLink = $this->link()->route('feed', array('type' => 'rss'));
 
    }
 

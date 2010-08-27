@@ -1,11 +1,7 @@
 <?php
 class Actionswgal_View extends Actions_View {
-   public function init() {
-   }
-
-
    public function mainView() {
-      $this->template()->addTplFile("list.phtml", 'actions');
+      parent::mainView();
    }
 
    public function showView() {
@@ -33,24 +29,8 @@ class Actionswgal_View extends Actions_View {
 
    }
 
-
-
    public function archiveView() {
       $this->template()->addTplFile("archive.phtml", 'actions');
-   }
-
-   /**
-    * Viewer pro přidání novinky
-    */
-   public function addView() {
-      $this->editView();
-   }
-
-   /**
-    * Viewer pro editaci novinky
-    */
-   public function editView() {
-      $this->template()->addTplFile('edit.phtml', 'actions');
    }
 
    public function showDataView() {
