@@ -102,7 +102,7 @@ class Install_Core {
    }
 
    protected function replaceDBPrefix($cnt) {
-      return str_replace($this->moduleTablesPrefix, VVE_DB_PREFIX, $cnt);
+      return str_replace($this->tablesPrefix, VVE_DB_PREFIX, $cnt);
    }
 
 }
