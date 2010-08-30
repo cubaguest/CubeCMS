@@ -333,6 +333,7 @@ class Url_Link {
     */
    public function clear($withOutCategory = false) {
       $this->rmParam();
+      $this->file(null);
       $this->route = null;
       if($withOutCategory) {
          $this->category();
