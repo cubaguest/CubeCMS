@@ -20,6 +20,7 @@ class Rss {
       $this->category = $category;
       $this->link = new Url_Link_Module(true);
       $this->link->setModuleRoutes($routes);
+      $this->link->clear(true)->category($category->getUrlKey());
       $this->setRssComp(new Component_Feed());
    }
 

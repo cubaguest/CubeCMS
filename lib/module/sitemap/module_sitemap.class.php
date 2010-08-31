@@ -9,7 +9,7 @@
  * @abstract 		Třída pro obsluhu mapy stránek
  */
 class Module_Sitemap extends Module_Core {
-   public function runController() {
+   public function runController($type) {
       // nastavení
       if(AppCore::getUrlRequest()->getOutputType() == 'html' AND defined('VVE_CM_SITEMAP_MAX_ITEMS_PAGE')){//tohle se může oddělat s verzí 6.2
          SiteMap::setMaxItems((int)VVE_CM_SITEMAP_MAX_ITEMS_PAGE);

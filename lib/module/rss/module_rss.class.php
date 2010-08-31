@@ -10,24 +10,31 @@
  * @abstract 		Třída pro obsluhu mapy stránek
  */
 class Module_Rss extends Module_Core {
-
    private $links = array();
-
-   public function runController() {
-      switch (AppCore::getUrlRequest()->getOutputType()) {
+   public function runController($type) {
+      switch ($type) {
          case 'xml':
             $model = new Model_Category();
             $cats = $model->getCategoryList();
-            $link = new Url_Link(true);
-            $link->clear(true);
-            // to samé jak v core pro rss
+            $rssComp = new Component_Feed();
             foreach ($cats as $cat) {
-               if ($cat[Model_Category::COLUMN_FEEDS] != true) continue;
-               
-               
+               if ($cat->{Model_Category::COLUMN_FEEDS} != true) continue;
+               // načtení a kontrola cest u modulu
+               $routesClassName = ucfirst($cat->{Model_Category::COLUMN_MODULE}).'_Routes';
+               if(!class_exists($routesClassName)) {
+                  throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu cest (routes) modulu \"%s\"."),
+                  $cat->{Model_Category::COLUMN_MODULE}), 10);
+               }
+               //	Vytvoření objektu s cestama modulu
+               $routes = new $routesClassName(null);
+               $rssClassName = ucfirst($cat->{Model_Category::COLUMN_MODULE}).'_Rss';
+               $rssCore = new $rssClassName(new Category_Core($cat->{Model_Category::COLUMN_URLKEY},
+                  false, $cat), $routes);
+               $rssCore->setRssComp($rssComp);
+               $rssCore->runController();
             }
-
-
+            $rssComp->setConfig('title', null);
+            $rssComp->flush();
             break;
          default:
             $model = new Model_Category();

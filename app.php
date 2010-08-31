@@ -685,9 +685,15 @@ class AppCore {
     * Metoda spouští rss export na modulu
     */
    public function runModuleRss() {
+      if(self::$category->haveFeed() == false){
+         AppCore::setErrorPage(true);
+         return false;
+      }
+
       if(!file_exists(AppCore::getAppLibDir().self::MODULES_DIR.DIRECTORY_SEPARATOR
          .self::getCategory()->getModule()->getName().DIRECTORY_SEPARATOR.'rss.class.php')){
-         return false;
+         throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu pro zpracování rss zdroje modulu \"%s\"."),
+         self::getCategory()->getModule()->getName()), 10);
       }
 
       // načtení a kontrola cest u modulu
@@ -860,7 +866,7 @@ class AppCore {
       } else {
          $ctrl = new Module_ErrPage();
       }
-      $ctrl->runController();
+      $ctrl->runController(self::$urlRequest->getOutputType());
       // view metoda
       $viewM = 'run'.ucfirst(self::$urlRequest->getOutputType()).'View';
       if(method_exists($ctrl, $viewM) AND self::$urlRequest->getOutputType() != 'html'){

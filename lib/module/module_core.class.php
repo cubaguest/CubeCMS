@@ -28,7 +28,7 @@ class Module_Core {
       return $this->name;
    }
 
-   public function runController() {
+   public function runController($type) {
 
    }
 
