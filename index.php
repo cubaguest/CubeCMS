@@ -7,9 +7,12 @@ date_default_timezone_set('Europe/Prague');
 /**
  * Vložení hlavní třídy aplikace
  */
-require_once ('./app.php');
-AppCore::setAppMainLibDir(realpath(dirname(__FILE__)));
-AppCore::setAppMainDir(realpath(dirname(__FILE__)));
-AppCore::createApp();
-
+if(!file_exists('data/lock.tmp')){
+   require_once ('./app.php');
+   AppCore::setAppMainLibDir(realpath(dirname(__FILE__)));
+   AppCore::setAppMainDir(realpath(dirname(__FILE__)));
+   AppCore::createApp();
+} else {
+   include 'templates/update.phtml';
+}
 ?>
