@@ -76,15 +76,30 @@ class Component_Feed extends Component {
             break;
       }
       $feed->flush();
-      flush();
-      exit();
+//      flush();
+//      exit();
    }
 
    /**
+    * Metoda provede seřazení výsledků podle data
+    */
+   private function sortFeed() {
+      usort($this->feeds, array($this, "cmp"));
+   }
+   // Compare function
+   private function cmp($a, $b) {
+      if ($a['pubDate']->format("U") == $b['pubDate']->format("U")) {
+            return 0;
+        }
+        return ($a['pubDate']->format("U") < $b['pubDate']->format("U")) ? +1 : -1;
+   }
+
+      /**
     * Metoda vytvoří kanál typu rss v2
     * @return XMLWriter
     */
    private function createRssFeed() {
+      $this->sortFeed();
       $feed = new XMLWriter();
       $feed->openURI('php://output');
       // hlavička
@@ -104,12 +119,16 @@ class Component_Feed extends Component {
 
       $feed->startElement("channel"); // SOF chanel
       //-------------------- SOF HEADER ---------------------------
-      $feed->writeElement('title',  VVE_WEB_NAME." - ".$this->getConfig('title'));
+      if($this->getConfig('title') != null){
+         $feed->writeElement('title',  VVE_WEB_NAME." - ".$this->getConfig('title'));
+      } else {
+         $feed->writeElement('title',  VVE_MAIN_PAGE_TITLE);
+      }
       $feed->writeElement('description', $this->getConfig('desc'));
       if(VVE_WEB_COPYRIGHT != null) {
          $feed->writeElement('copyright', str_replace('{Y}', date("Y"), VVE_WEB_COPYRIGHT));
       }
-      $feed->writeElement('language', Locale::getLang());
+      $feed->writeElement('language', Locales::getLang());
 
       $feed->writeElement('docs', "http://www.rssboard.org/rss-specification");
 
@@ -123,7 +142,7 @@ class Component_Feed extends Component {
 
       $feed->writeElement('ttl', VVE_FEED_TTL);
       $feed->writeElement('pubDate', gmdate("D, d M Y H:i:s")." GMT");
-      $feed->writeElement('generator', AppCore::ENGINE_NAME." ".AppCore::ENGINE_VERSION);
+      $feed->writeElement('generator', AppCore::ENGINE_NAME." ".number_format(AppCore::ENGINE_VERSION,1,'.', ''));
       $feed->writeElement('webMaster', VVE_WEB_MASTER_EMAIL." (".VVE_WEB_MASTER_NAME.")");
 
       if($this->getConfig('image') != null) {
@@ -139,7 +158,10 @@ class Component_Feed extends Component {
       }
       //----------------- EOF HEADER ------------------------------
       //----------------- ITEMS ------------------------------
+      $feedsNum = $this->getConfig('numFeeds');
+      $step = 0;
       foreach ($this->feeds as $item) {
+         if($step == $feedsNum) break;
          $feed->startElement("item");// SOF item
          $feed->writeElement('title', $item['title']);
          $feed->writeElement('link', $item['link']);
@@ -159,7 +181,7 @@ class Component_Feed extends Component {
             $feed->endElement(); // EOF category
          }
          $feed->endElement(); // EOF item
-
+         $step++;
       }
       //------------------- EOF ITEMS ---------------------------
 
@@ -185,11 +207,15 @@ class Component_Feed extends Component {
       // rss hlavička
       $feed->startElement('feed'); // SOF feed
       $feed->writeAttribute('xmlns','http://www.w3.org/2005/Atom');
-         $feed->writeAttribute('xml:lang', Locale::getLang());
+         $feed->writeAttribute('xml:lang', Locales::getLang());
 
 
       //-------------------- SOF HEADER ---------------------------
-      $feed->writeElement('title', VVE_WEB_NAME." - ".$this->getConfig('title'));
+      if($this->getConfig('title') != null){
+         $feed->writeElement('title',  VVE_WEB_NAME." - ".$this->getConfig('title'));
+      } else {
+         $feed->writeElement('title',  VVE_MAIN_PAGE_TITLE);
+      }
       $feed->writeAttribute('type', "text");
       $feed->writeElement('subtitle', $this->getConfig('desc')."test");
       $feed->writeAttribute('type', "text");
@@ -226,7 +252,10 @@ class Component_Feed extends Component {
 //      }
       //----------------- EOF HEADER ------------------------------
       //----------------- ITEMS ------------------------------
+      $feedsNum = $this->getConfig('numFeeds');
+      $step = 0;
       foreach ($this->feeds as $item) {
+         if($step == $feedsNum) break;
          $feed->startElement("entry");// SOF item
          $feed->writeElement('title', $item['title']);
 
@@ -259,7 +288,7 @@ class Component_Feed extends Component {
 //         <content type="xhtml" xml:lang="en"   xml:base="http://diveintomark.org/">
          $feed->startElement('content');
             $feed->writeAttribute('type', 'xhtml');
-//            $feed->writeAttribute('xml:lang', Locale::getLang());
+//            $feed->writeAttribute('xml:lang', Locales::getLang());
 //            $feed->writeAttribute('xml:base', "http://diveintomark.org/");
             $feed->startElement('div');
                $feed->writeAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
@@ -274,7 +303,7 @@ class Component_Feed extends Component {
 //            $feed->endElement(); // EOF category
 //         }
          $feed->endElement(); // EOF item
-
+         $step++;
       }
       //------------------- EOF ITEMS ---------------------------
 
@@ -310,8 +339,8 @@ class Component_Feed extends Component {
     * Metoda pro výpis komponenty
     */
    public function mainView() {
-      $this->template()->linkRss = str_replace($this->getConfig('urlArgName'), 'rss', (string)$this->getConfig('feedLink'));
-      $this->template()->linkAtom = str_replace($this->getConfig('urlArgName'), 'atom', (string)$this->getConfig('feedLink'));
+      $this->template()->linkRss = (string)$this->getConfig('feedLink').Url_Request::URL_FILE_RSS;
+      $this->template()->linkAtom =(string)$this->getConfig('feedLink').Url_Request::URL_FILE_ATOM;
       $this->template()->addTplFile($this->getConfig('tpl_file'));
       
    }
