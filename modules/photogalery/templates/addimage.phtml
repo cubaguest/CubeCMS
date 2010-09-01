@@ -16,7 +16,13 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
          </div>
       </form>
    </div>
+   <p><?=$this->_('Doporučená maximální velikost souboru je 2MB. Pokud je soubor větší, nemusí se
+správně nebo vůbec provést změna velikosti obrázku z&nbsp;důvodu nedostatku paměti na serveru. 
+(Obrázek je měněn po jednotlivých bodech.)');?></p>
+   <br />
 </div>
+   <?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('detail')));?>
+<br />
 <script type="text/javascript">
    /* <![CDATA[ */
    jQuery(document).ready(function() {
@@ -63,4 +69,3 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
    });
    /* ]]> */
 </script>
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('detail')));?>
