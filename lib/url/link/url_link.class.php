@@ -439,7 +439,10 @@ class Url_Link {
     */
    protected function getCategory() {
       if($this->category != null) {
-         return $this->category.Url_Request::URL_SEPARATOR;
+         if(strpos($this->category,'.') === false){
+            return $this->category.Url_Request::URL_SEPARATOR;
+         }
+         return $this->category;
       } else {
          return null;
       }
