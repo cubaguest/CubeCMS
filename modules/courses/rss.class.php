@@ -45,8 +45,7 @@ class Courses_Rss extends Rss {
          $this->getRssComp()->addItem($course->{Courses_Model_Courses::COLUMN_NAME}, $desc,
                  $this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY})),
                  new DateTime($course->{Courses_Model_Courses::COLUMN_TIME_ADD}),
-                 $course->{Model_Users::COLUMN_USERNAME}, null, null,
-                 $course->{Courses_Model_Courses::COLUMN_URLKEY}."_".$course->{Courses_Model_Courses::COLUMN_ID});
+                 $course->{Model_Users::COLUMN_USERNAME}, null, null);
 
       }
    }

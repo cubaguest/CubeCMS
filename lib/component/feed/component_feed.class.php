@@ -38,7 +38,7 @@ class Component_Feed extends Component {
 
    public function addItem($title, $desc, $link,DateTime $pubDate, $author = null, $authorEmail = null, $category = null,
            $guid = null, $source = null, $enclosure = null) {
-      if($guid == null) $guid = $link;
+//      if($guid == null) $guid = $link;
       // doplnění odkazů do linků na obrázky
       vve_create_full_url_path($desc);
 
@@ -132,10 +132,15 @@ class Component_Feed extends Component {
 
       $feed->writeElement('docs', "http://www.rssboard.org/rss-specification");
 
-      $feed->writeElement('link', $this->getConfig('link')->clear());
+      $link = $this->getConfig('link');
+      $feed->writeElement('link', $link->clear());
 
       $feed->startElement("atom:link");
-      $feed->writeAttribute("href", $this->getConfig('link'));
+      if($link instanceof Url_Link_Module){
+         $feed->writeAttribute("href", $link->route('feed', array('type' => 'rss')));
+      } else {
+         $feed->writeAttribute("href", $link->category()->file(Url_Request::URL_FILE_RSS));
+      }
       $feed->writeAttribute("rel", "self");
       $feed->writeAttribute("type", "application/rss+xml");
       $feed->endElement();
@@ -166,7 +171,11 @@ class Component_Feed extends Component {
          $feed->writeElement('title', $item['title']);
          $feed->writeElement('link', $item['link']);
          $feed->writeElement('description', strip_tags($item['desc'], self::RSS_AVAIL_TAGS));
-         $feed->writeElement('guid', $item['guid']);
+         if($item['guid'] != null){
+            $feed->writeElement('guid', $item['guid']);
+         } else {
+            $feed->writeElement('guid', $item['link']);
+         }
          if($item['authorEmail'] != null) {
             $feed->writeElement('author', $item['authorEmail']);
          } else {

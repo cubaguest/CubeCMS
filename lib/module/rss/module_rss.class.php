@@ -10,10 +10,11 @@
  * @abstract 		Třída pro obsluhu mapy stránek
  */
 class Module_Rss extends Module_Core {
-   private $links = array();
+   private $links = arraY();
    public function runController($type) {
       switch ($type) {
          case 'xml':
+            $this->links;
             $model = new Model_Category();
             $cats = $model->getCategoryList();
             $rssComp = new Component_Feed();
@@ -33,6 +34,7 @@ class Module_Rss extends Module_Core {
                $rssCore->setRssComp($rssComp);
                $rssCore->runController();
             }
+            $rssComp->setConfig('link', $this->link());
             $rssComp->setConfig('title', null);
             $rssComp->flush();
             break;

@@ -14,10 +14,14 @@ class Module_Core {
    private $name = null;
    private $template = null;
    private $link = null;
+   private $category = null;
 
-   public function __construct() {
+
+   public function __construct(Category_Core $moduleCategory) {
       $this->link = new Url_Link();
       $this->template = new Template($this->link);
+      $this->category = $moduleCategory;
+      $this->link->category($moduleCategory->getUrlKey());
    }
 
    /**

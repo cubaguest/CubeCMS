@@ -703,7 +703,7 @@ class AppCore {
          self::getCategory()->getModule()->getName()), 10);
       }
       //	Vytvoření objektu s cestama modulu
-      $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart());
+      $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart(),self::getCategory());
 
       $rssClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Rss';
       $rssCore = new $rssClassName(self::getCategory(), $routes);
@@ -862,9 +862,9 @@ class AppCore {
    public function runCoreModule() {
       $className = 'Module_'.ucfirst(self::$category->getModule()->getName());
       if(!AppCore::isErrorPage() AND class_exists($className)){
-         $ctrl = new $className();
+         $ctrl = new $className(self::$category);
       } else {
-         $ctrl = new Module_ErrPage();
+         $ctrl = new Module_ErrPage(self::$category);
       }
       $ctrl->runController(self::$urlRequest->getOutputType());
       // view metoda

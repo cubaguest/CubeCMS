@@ -16,6 +16,8 @@ class Rss {
 
    private $link = null;
 
+   private $type = 'rss';
+
    function __construct(Category_Core $category, Routes $routes) {
       $this->category = $category;
       $this->link = new Url_Link_Module(true);
@@ -61,8 +63,8 @@ class Rss {
       $this->getRssComp()->setConfig('title', $this->category()->getName());
       $this->getRssComp()->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
       $this->getRssComp()->setConfig('link', $this->link());
-      $this->getRssComp() ->setConfig('type', $this->type);
-      $this->getRssComp() ->setConfig('css', 'rss.css');
+      $this->getRssComp()->setConfig('type', $this->type);
+      $this->getRssComp()->setConfig('css', 'rss.css');
    }
 
 }

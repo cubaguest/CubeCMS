@@ -10,7 +10,8 @@ class Actions_Rss extends Rss {
          $dateTimeStr = null;
          $dateTimeStr = ': '.vve_date("%x", new DateTime($action->{Actions_Model_Detail::COLUMN_DATE_START}));
          $stopDate = vve_date("%x", new DateTime($action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
-         if($startDate != $stopDate AND $action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+         if($action->{Actions_Model_Detail::COLUMN_DATE_START} != $action->{Actions_Model_Detail::COLUMN_DATE_STOP}
+            AND $action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
             $dateTimeStr .= ' - '.$stopDate;
          }
          if($action->{Actions_Model_Detail::COLUMN_TIME} != null) {
@@ -21,9 +22,7 @@ class Actions_Rss extends Rss {
          $this->getRssComp()->addItem($action->{Actions_Model_Detail::COLUMN_NAME}.$dateTimeStr,$action->{Actions_Model_Detail::COLUMN_TEXT},
                  $this->link()->route('detail', array('urlkey' => $action->{Actions_Model_Detail::COLUMN_URLKEY})),
                  new DateTime($action->{Actions_Model_Detail::COLUMN_ADDED}),
-                 $action->{Model_Users::COLUMN_USERNAME},null,null,
-                 $action->{Actions_Model_Detail::COLUMN_URLKEY}."_".$action->{Actions_Model_Detail::COLUMN_ID}."_".
-                 $action->{Actions_Model_Detail::COLUMN_CHANGED});
+                 $action->{Model_Users::COLUMN_USERNAME},null,null);
       }
    }
 }

@@ -13,8 +13,7 @@ class Articles_Rss extends Rss {
          $this->getRssComp()->addItem($article->{Articles_Model_Detail::COLUMN_NAME}, $text,
                  $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
                  new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}),
-                 $article->{Model_Users::COLUMN_USERNAME}, null, null,
-                 $article->{Articles_Model_Detail::COLUMN_URLKEY}."_".$article->{Articles_Model_Detail::COLUMN_ID});
+                 $article->{Model_Users::COLUMN_USERNAME}, null, null);
       }
    }
 }

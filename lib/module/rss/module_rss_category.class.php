@@ -24,6 +24,7 @@ class Module_Rss_Category extends Category_Core {
       // Je třeba více?
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
       $category->{Model_Category::COLUMN_MODULE} = 'rss';
+      $category->{Model_Category::COLUMN_URLKEY} = 'rss.html';
       $category->{Model_Category::COLUMN_CAT_LABEL} = _('Přehled rss kanálů');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
       $category->{Model_Category::COLUMN_DESCRIPTION} = _('Kompletní rss kanálů vyvedených ze stránek');
