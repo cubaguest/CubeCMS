@@ -32,6 +32,7 @@ class Form_Validator_MinLength extends Form_Validator implements Form_Validator_
    public function validate(Form_Element $elemObj) {
       switch (get_class($elemObj)) {
          case 'Form_Element_Text':
+         case 'Form_Element_TextArea':
          case 'Form_Element_Password':
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 

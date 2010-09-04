@@ -11,16 +11,19 @@
  */
 class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_Interface {
 
-/**
+   const TYPE_INT = 1;
+   const TYPE_FLOAT = 2;
+
+   /**
  * O jaký druh čísla se jedná
  * @var string
  */
-   private $numberType = 'int';
+   private $numberType = 1;
 
 
-   public function  __construct($errMsg = null, $numberType = 'int') {
+   public function  __construct($errMsg = null, $numberType = self::TYPE_INT) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" ne ve správném formátu"));
+         parent::__construct(_("Položka \"%s\" ne ve správném číselném formátu"));
       } else {
          parent::__construct($errMsg);
       }
@@ -52,41 +55,36 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
          case 'Form_Element_Text':
          case 'Form_Element_TextArea':
          case 'Form_Element_Password':
-            if($elemObj->isMultiLang()) {
-               // pokud se kontrolují jen některé sloupce
-//               if(!empty ($this->columsNotEmpty)){
-//                  $retu = $this->checkEmptyValues($elemObj->getValues(), $this->columsNotEmpty);
-//                  if($retu !== true){
-//                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
-//                     return false;
-//                  }
-//               }
-//               // pokud mají být vyplněny všechny sloupce
-//               else {
-//                  if(!$this->checkEmptyAllValues($elemObj->getValues())){
-//                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-//                     return false;
-//                  }
-//               }
+            if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
+
             } else {
-//               if($elemObj->getValues() == null OR $elemObj->getValues() == "") {
-//                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-//                  return false;
-//               }
+               if($this->checkNumber($elemObj->getUnfilteredValues()) == false){
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  return false;
+               }
             }
-            break;
-         // input checkbox
-         case 'Form_Element_Checkbox':
-//            if($elemObj->getValues() == false) {
-//               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-//               return false;
-//            }
             break;
          default:
             break;
       }
       return true;
 
+   }
+
+
+   public function checkNumber($number) {
+      switch ($this->numberType) {
+         case self::TYPE_INT:
+            return ctype_digit($number);
+            break;
+         case self::TYPE_FLOAT:
+
+            break;
+         default :
+            $this->errMessage = _('Nepodporovaný typ validace čísla');
+            break;
+      }
+      return false;
    }
 }
 ?>
