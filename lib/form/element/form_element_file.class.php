@@ -52,8 +52,8 @@ class Form_Element_File extends Form_Element {
                $this->values = array('name' => $saveFileName,
                    'path' => $dir,
                    'size' => $_FILES[$this->getName()]["size"],
-                   'type' => $this->getMimeType($dir.$_FILES[$this->getName()]["name"]),
-                   'extension' => $this->getExtension($_FILES[$this->getName()]["name"]));
+                   'type' => $this->getMimeType($dir.$saveFileName),
+                   'extension' => $this->getExtension($saveFileName));
 //               array_push($this->values, $file);
             } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
                   $this->values = null;
