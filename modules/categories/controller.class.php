@@ -540,7 +540,7 @@ class Categories_Controller extends Controller {
       $catSitemapPriority = new Form_Element_Text('sitemap_priority', $this->_('Priorita kategorie v sitemap'));
       $catSitemapPriority->setSubLabel('0 - 1, čím větší, tím výše kategorie bude');
       $catSitemapPriority->setValues(0);
-      $catSitemapPriority->addValidation(New Form_Validator_IsNumber(null, 'float'));
+      $catSitemapPriority->addValidation(New Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
       $form->addElement($catSitemapPriority, 'sitemap');
 
       // frekvence změny
@@ -549,6 +549,7 @@ class Categories_Controller extends Controller {
               $this->_('Ročně') => 'yearly', $this->_('Nikdy') => 'never');
       $catSitemapChangeFrequency = new Form_Element_Select('sitemap_frequency', $this->_('Frekvence změn'));
       $catSitemapChangeFrequency->setOptions($freqOptions);
+      $catSitemapChangeFrequency->setValues('yearly');
       $form->addElement($catSitemapChangeFrequency, 'sitemap');
 
 

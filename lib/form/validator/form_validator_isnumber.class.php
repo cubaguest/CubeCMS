@@ -78,7 +78,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
             return ctype_digit($number);
             break;
          case self::TYPE_FLOAT:
-
+            return true;
             break;
          default :
             $this->errMessage = _('Nepodporovaný typ validace čísla');
