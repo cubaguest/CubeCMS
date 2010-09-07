@@ -156,7 +156,8 @@ class JsPlugin_TinyMce extends JsPlugin {
            'external_link_list_url' => null,
            'template_replace_values' => array(),
            'root_element' => true,
-           'templates_type' => Templates_Model::TEMPLATE_TYPE_TEXT
+           'templates_type' => Templates_Model::TEMPLATE_TYPE_TEXT,
+           'relative_urls' => true
    );
 
 
@@ -275,6 +276,9 @@ class JsPlugin_TinyMce extends JsPlugin {
       if($this->config['root_element'] == false){
          $cfgFile->setParam('root_element', 'false');
       }
+      if($this->config['relative_urls'] == false){
+         $cfgFile->setParam('relative_urls', 'false');
+      }
       $this->addFile($cfgFile);
    }
 
@@ -294,6 +298,9 @@ class JsPlugin_TinyMce extends JsPlugin {
       }
       if(isset ($_GET['root_element']) AND $_GET['root_element'] == 'false') {
          $params['forced_root_block'] = false;
+      }
+      if(isset ($_GET['relative_urls']) AND $_GET['relative_urls'] == 'false') {
+         $params['relative_urls'] = false;
       }
       if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
       Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
