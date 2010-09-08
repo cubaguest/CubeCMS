@@ -22,7 +22,7 @@ class AppCore {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = 6.2;
+   const ENGINE_VERSION = 6.3;
    /**
     * Obsahuje hlavní soubor aplikace
     */
@@ -233,8 +233,25 @@ class AppCore {
       //	přidání adresáře pro načítání knihoven
       set_include_path('./lib/' . PATH_SEPARATOR . get_include_path());
 
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'coreException.class.php');
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'moduleException.class.php');
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'dbException.class.php');
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badClassException.class.php');
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
+      // soubor s globálními funkcemi, které nejsou součástí php, ale časem by mohly být
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . 'functions' . DIRECTORY_SEPARATOR . 'functions.php');
+
       //načtení potřebných knihoven
-      $this->_loadLibraries();
+//      $this->_loadLibraries();
+      spl_autoload_register(array('AppCore', '_loadLibraries'));
 
       // inicializace db konektoru
       $this->_initDb();
@@ -456,12 +473,12 @@ class AppCore {
     * Metoda načte potřebné knihovny
     * @todo refaktoring nutný
     */
-   private function _loadLibraries() {
+   public static function _loadLibraries($classOrigName) {
       /**
        * Funkce slouží pro automatické načítání potřebných tříd
        * @param string -- název třídy
        */
-      function __autoload($classOrigName) {
+//      function __autoload($classOrigName) {
          $file = strtolower($classOrigName).'.class.php';
          $classL = strtolower($classOrigName);
          $pathDirs = explode('_', $classL);
@@ -492,26 +509,12 @@ class AppCore {
             require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
                             .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile;
          } else {
+            return false;
 //            var_dump($file, $classL, $pathDirs, $moduleFile, $pathFull, $pathShort);
-            trigger_error(_("Chybějící třída").": ".$classOrigName." ".$file." module-file: ".$moduleFile);
+//            trigger_error(_("Chybějící třída").": ".$classOrigName." ".$file." module-file: ".$moduleFile);
          }
-      }
+//      }
       //		knihovny pro práci s chybami
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'coreException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'moduleException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'dbException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badClassException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
-      // soubor s globálními funkcemi, které nejsou součástí php, ale časem by mohly být
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . 'functions' . DIRECTORY_SEPARATOR . 'functions.php');
    }
 
    /**
