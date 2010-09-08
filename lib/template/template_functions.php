@@ -194,4 +194,29 @@ function vve_tpl_date($format, $timestamp = null) {
    return vve_date($format, $timestamp);
 }
 
+/**
+ * Funkce vrátí řetězec flash objektem (validovaným)
+ * @param string $flashUrl -- adresa k flashi
+ * @param int $w -- šířka
+ * @param int $h -- výška
+ * @param string $alternateStr -- alternativní string
+ * @param array $params -- pole s dalšími parametry předanými parametry vkládanými do objektu (parametry param)
+ * @return string 
+ */
+function vve_tpl_flash($flashUrl, $w, $h, $alternateStr = '<p>This is <b>alternative</b> content.</p>', $params = array()) {
+   $flashStr = null;
+   $defParams = array(
+      'menu' => 'false',
+      'loop' => 'true'
+   );
+   $params = array_merge($defParams, $params);
+
+   $flashStr .= '<!--[if !IE]> --><object type="application/x-shockwave-flash" data="'.$flashUrl.'" width="'.$w.'" height="'.$h.'"><!-- <![endif]--><!--[if IE]><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0"  width="'.$w.'" height="'.$h.'"><param name="movie" value="'.$flashUrl.'" /><!--><!--dgx-->';
+   foreach ($params as $key => $value) {
+      $flashStr .= '<param name="'.$key.'" value="'.(string)$value.'" />';
+   }
+   $flashStr .= $alternateStr;
+   $flashStr .= '</object><!-- <![endif]-->';
+   return $flashStr;
+}
 ?>
