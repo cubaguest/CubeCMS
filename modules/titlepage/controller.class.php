@@ -5,12 +5,13 @@ class TitlePage_Controller extends Controller {
    const ITEM_TYPE_VIDEO = 'video';
    const ITEM_TYPE_ARTICLE = 'articles';
    const ITEM_TYPE_ARTICLEWGAL = 'articleswgal';
-   const ITEM_TYPE_ACTION = 'action';
+   const ITEM_TYPE_ACTION = 'actions';
+   const ITEM_TYPE_ACTIONWGAL = 'actionswgal';
    const ITEM_TYPE_NEWS = 'news';
 
-      /**
-    * Kontroler pro zobrazení novinek
-    */
+   const IMAGE_W = 600;
+   const IMAGE_H = 225;
+
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
@@ -29,8 +30,8 @@ class TitlePage_Controller extends Controller {
 
       $itemsList = array();
       foreach ($items as $item) {
-         $data = null;
-         $link = $title = $image = $nameCat = null;
+         $data = $link = $title = $image = $imageAlt = $nameCat = null;
+         $dataObj = new Object();
          $linkCat = $this->link()->clear();
          $name = unserialize($item->{TitlePage_Model_Items::COLUMN_NAME});
          $name = $name[Locales::getLang()];
@@ -39,9 +40,10 @@ class TitlePage_Controller extends Controller {
             case self::ITEM_TYPE_MENU:
                $data = unserialize($item->{TitlePage_Model_Items::COLUMN_DATA});
                $data = $data[Locales::getLang()];
+               $dataObj = $dataObj;
                if(empty ($data)) continue;
                if($item->{TitlePage_Model_Items::COLUMN_IMAGE} != null) {
-                  $image = $item->{TitlePage_Model_Items::COLUMN_IMAGE};
+                  $image = $imageAlt = $item->{TitlePage_Model_Items::COLUMN_IMAGE};
                }
                break;
             case self::ITEM_TYPE_VIDEO:
@@ -59,6 +61,7 @@ class TitlePage_Controller extends Controller {
                   $article = $modelArticles->getList($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY}, 0, 1);
                   $article = $article->fetch();
                }
+               $dataObj = $article;
 
                $modelCat = new Model_Category();
                $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
@@ -88,6 +91,7 @@ class TitlePage_Controller extends Controller {
                      .URL_SEPARATOR.$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                      .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                      .$images->{PhotoGalery_Model_Images::COLUMN_FILE};
+                     $imageAlt = $images->{PhotoGalery_Model_Images::COLUMN_FILE};
                   }
                   unset ($images);
                }
@@ -100,6 +104,7 @@ class TitlePage_Controller extends Controller {
                   $images = $xml->xpath('//img');
                   if(!empty ($images)){
                      $image = $images[0]['src'];
+                     $imageAlt = basename($images[0]['src']);
                   }
                }
                unset ($cat);
@@ -107,6 +112,7 @@ class TitlePage_Controller extends Controller {
                if(empty ($data)) continue;
                break;
             case self::ITEM_TYPE_ACTION:
+            case self::ITEM_TYPE_ACTIONWGAL:
                if($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN} != 0){ // aktuální
                   $modelActions = new Actions_Model_Detail();
                   $action = $modelActions->getActionById($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN});
@@ -114,6 +120,7 @@ class TitlePage_Controller extends Controller {
                   $modelActions = new Actions_Model_List();
                   $action = $modelActions->getFeaturedActions($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY})->fetch();
                }
+               $dataObj = $action;
 
                $modelCat = new Model_Category();
                $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
@@ -132,26 +139,28 @@ class TitlePage_Controller extends Controller {
 
                $title = $action->{Actions_Model_Detail::COLUMN_NAME};
                $nameCat = $cat->{Model_Category::COLUMN_CAT_LABEL};
-
                if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null){
                   $image = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$cat->{Model_Category::COLUMN_DATADIR}
                      .URL_SEPARATOR.$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                      .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE};
+                  $imageAlt = $action->{Actions_Model_Detail::COLUMN_IMAGE};
                }
 
-               // pokud je galerie s článkem
-//               if($item->{TitlePage_Model_Items::COLUMN_TYPE} == self::ITEM_TYPE_ARTICLEWGAL){
-//                  $modelPhoto = new PhotoGalery_Model_Images();
-//                  $images = $modelPhoto->getImages($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY},
-//                     $article->{Articles_Model_Detail::COLUMN_ID}, 1)->fetchObject();
-//                  $image = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$cat->{Model_Category::COLUMN_DATADIR}
-//                     .URL_SEPARATOR.$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-//                     .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
-//                     .$images->{PhotoGalery_Model_Images::COLUMN_FILE};
-//                  unset ($images);
-//               }
+               // pokud je akce s galerí a akce nemá titulní obrázek
+               if($item->{TitlePage_Model_Items::COLUMN_TYPE} == self::ITEM_TYPE_ACTIONWGAL
+                  AND $image == null){
+                  $modelPhoto = new PhotoGalery_Model_Images();
+                  $images = $modelPhoto->getImages($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY},
+                     $action->{Actions_Model_Detail::COLUMN_ID}, 1)->fetchObject();
+                  $image = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$cat->{Model_Category::COLUMN_DATADIR}
+                     .URL_SEPARATOR.$action[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                     .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
+                     .$images->{PhotoGalery_Model_Images::COLUMN_FILE};
+                  $imageAlt = $images->{PhotoGalery_Model_Images::COLUMN_FILE};
+                  unset ($images);
+               }
                unset ($cat);
-               unset ($article);
+               unset ($action);
                if(empty ($data)) continue;
                break;
             default:
@@ -166,7 +175,9 @@ class TitlePage_Controller extends Controller {
                                       'nameCat' => $nameCat,
                                       'title' => $title,
                                       'image' => $image,
+                                      'imageAlt' => $imageAlt,
                                       'data' => $data,
+                                      'dataObj' => $dataObj,
                                       'cols' => $item->{TitlePage_Model_Items::COLUMN_COLUMNS},
                                       'link' => (string)$link,
                                       'linkCat' => (string)$linkCat,
@@ -221,6 +232,12 @@ class TitlePage_Controller extends Controller {
             'name' => $this->_('Akce'),
             'title' => $this->_('Přidání položky s akcí'),
             'desc' => $this->_('Přidání položky s existující akcí v systému')
+         ),
+         self::ITEM_TYPE_ACTIONWGAL => array(
+            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ACTIONWGAL)),
+            'name' => $this->_('Akce s galerií'),
+            'title' => $this->_('Přidání položky s akcí s galerií'),
+            'desc' => $this->_('Přidání položky s existující akcí s galerií v systému')
          )
       );
 
@@ -242,6 +259,7 @@ class TitlePage_Controller extends Controller {
          case self::ITEM_TYPE_NEWS:
          case self::ITEM_TYPE_ARTICLEWGAL:
          case self::ITEM_TYPE_ACTION:
+         case self::ITEM_TYPE_ACTIONWGAL:
             $this->editItemArticleCtrl(null, $this->getRequest('type'));
             break;
          default:
@@ -265,13 +283,11 @@ class TitlePage_Controller extends Controller {
             $this->editItemMenuCtrl($item);
             break;
          case self::ITEM_TYPE_ARTICLE:
-            $this->editItemArticleCtrl($item, self::ITEM_TYPE_ARTICLE);
-            break;
          case self::ITEM_TYPE_ARTICLEWGAL:
-            $this->editItemArticleCtrl($item, self::ITEM_TYPE_ARTICLEWGAL);
-            break;
          case self::ITEM_TYPE_NEWS:
-            $this->editItemArticleCtrl($item, self::ITEM_TYPE_NEWS);
+         case self::ITEM_TYPE_ACTION:
+         case self::ITEM_TYPE_ACTIONWGAL:
+            $this->editItemArticleCtrl($item, $item->{TitlePage_Model_Items::COLUMN_TYPE});
             break;
          default:
             return false;
@@ -339,6 +355,10 @@ class TitlePage_Controller extends Controller {
             $imgObj = $form->image->createFileObject('Filesystem_File_Image');
             // není resize
 //            $imgObj = new Filesystem_File_Image();
+            $imgObj->resampleImage($this->category()->getParam('image_w', self::IMAGE_W),
+               $this->category()->getParam('image_h', self::IMAGE_H),
+               $this->category()->getParam('image_crop', true));
+            $imgObj->save();
             $image = $imgObj->getName();
             unset ($imgObj);
          }
@@ -483,6 +503,10 @@ class TitlePage_Controller extends Controller {
             $module = 'actions';
             $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s akcí');
             break;
+         case self::ITEM_TYPE_ACTIONWGAL:
+            $module = 'actionswgal';
+            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s akcí s fotogalerií');
+            break;
          case self::ITEM_TYPE_NEWS:
             $module = 'news';
             $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s novinkami');
@@ -566,7 +590,6 @@ class TitlePage_Controller extends Controller {
    public function getListController($type = self::ITEM_TYPE_ARTICLE, $idc = 0) {
       $this->checkWritebleRights();
       $idc = $this->getRequestParam('idc', $idc);
-
       $result = array();
       switch ($this->getRequestParam('type', $type)) {
          case self::ITEM_TYPE_ARTICLE:
@@ -581,7 +604,8 @@ class TitlePage_Controller extends Controller {
             }
             break;
          case self::ITEM_TYPE_ACTION:
-            array_push($result,array('id' => 0, 'text' => $this->_('Aktuální')));
+         case self::ITEM_TYPE_ACTIONWGAL:
+            array_push($result,array('id' => 0, 'text' => $this->_('Aktuální - naposledy přidaný')));
             $modelActions = new Actions_Model_List();
             $toTime = new DateTime();
             $toTime->modify('+ 1 year');
@@ -627,6 +651,38 @@ class TitlePage_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    public static function settingsController(&$settings,Form &$form) {
+      $form->addGroup('basic', 'Základní nastavení');
+
+      $form->addGroup('images', 'Nastavení obrázků');
+
+      $elemSW = new Form_Element_Text('image_w', 'Šířka titulního obrázku (px)');
+      $elemSW->addValidation(new Form_Validator_IsNumber());
+      $elemSW->setSubLabel('Výchozí: '.self::IMAGE_W.'px');
+      $form->addElement($elemSW, 'images');
+      if(isset($settings['image_w'])) {
+         $form->image_w->setValues($settings['image_w']);
+      }
+
+      $elemSH = new Form_Element_Text('image_h', 'Výška titulního obrázku (px)');
+      $elemSH->addValidation(new Form_Validator_IsNumber());
+      $elemSH->setSubLabel('Výchozí: '.self::IMAGE_H.'px');
+      $form->addElement($elemSH, 'images');
+      if(isset($settings['image_h'])) {
+         $form->image_h->setValues($settings['image_h']);
+      }
+
+      $elemCropImg = new Form_Element_Checkbox('image_crop', 'Titulní obrázek ořezat');
+      $elemCropImg->setValues(true);
+      if(isset($settings['image_crop'])) {
+         $form->image_crop->setValues($settings['image_crop']);
+      }
+      $form->addElement($elemCropImg, 'images');
+
+      if($form->isValid()){
+         $settings['image_w'] = $form->image_w->getValues();
+         $settings['image_h'] = $form->image_h->getValues();
+         $settings['image_crop'] = $form->image_crop->getValues();
+      }
    }
 }
 ?>

@@ -2,9 +2,11 @@
 if($this->item['name'] != null){
    echo '<h2>'.$this->item['name'].'</h2>';
 }
-if($this->item['image'] != null){?>
-<img src="<?=$this->category()->getModule()->getDataDir(true).$this->item['image']?>" alt="<?=$this->item['image']?>"/>
-<?
+if($this->item['image'] != null AND strpos($this->item['image'],'http') === false){?>
+<img src="<?=$this->category()->getModule()->getDataDir(true).$this->item['image']?>" alt="<?=$this->item['image']?>"/><?
+} else if($this->item['image'] != null) {?>
+<img src="<?=$this->item['image']?>" alt="<?=$this->item['imageAlt']?>"/><?
+
 }
 echo $this->item['data'];
 ?>

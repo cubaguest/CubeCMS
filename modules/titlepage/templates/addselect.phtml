@@ -1,9 +1,10 @@
 <?
 $this->addCssFile("style.css");
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
+$this->addPageTitle($this->_('přidání položky'));
 ?>
-
-<?=$this->_('Přidat položku typu')?>:<br />
+<h1><?=$this->category()->getLabel().' - '.$this->_('přidání položky')?> </h1>
+<?=$this->_('Výběr typů položek')?>:<br />
 <ul id="title-page-select-additem">
    <?foreach ($this->addItems as $item) {?>
    <li>

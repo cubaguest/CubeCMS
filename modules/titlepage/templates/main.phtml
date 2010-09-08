@@ -21,6 +21,10 @@ $this->addCssFile("style.css");
                   case TitlePage_Controller::ITEM_TYPE_NEWS:
                      $tpl = 'item-article.phtml';
                      break;
+                  case TitlePage_Controller::ITEM_TYPE_ACTION:
+                  case TitlePage_Controller::ITEM_TYPE_ACTIONWGAL:
+                     $tpl = 'item-action.phtml';
+                     break;
                   default:
                      break;
                }

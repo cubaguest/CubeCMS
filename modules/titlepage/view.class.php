@@ -46,6 +46,7 @@ class TitlePage_View extends View {
             $this->template()->addTplFile('edit-article.phtml');
             break;
          case TitlePage_Controller::ITEM_TYPE_ACTION:
+         case TitlePage_Controller::ITEM_TYPE_ACTIONWGAL:
             $this->template()->addTplFile('edit-action.phtml');
             break;
          default:
