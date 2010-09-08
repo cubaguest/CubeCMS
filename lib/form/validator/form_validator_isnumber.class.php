@@ -23,7 +23,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
 
    public function  __construct($errMsg = null, $numberType = self::TYPE_INT) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" ne ve správném číselném formátu"));
+         parent::__construct(_("Položka \"%s\" není ve správném číselném formátu"));
       } else {
          parent::__construct($errMsg);
       }
@@ -39,9 +39,11 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
          OR $element instanceof Form_Element_TextArea){
          switch ($this->numberType) {
             case 'float':
+            case self::TYPE_FLOAT:
                $element->addValidationConditionLabel(_("desetiné číslo"));
                break;
             case 'int':
+            case self::TYPE_INT:
             default:
                $element->addValidationConditionLabel(_("celé číslo"));
                break;
@@ -58,7 +60,8 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($this->checkNumber($elemObj->getUnfilteredValues()) == false){
+               if($elemObj->getUnfilteredValues() != null AND
+                       $this->checkNumber($elemObj->getUnfilteredValues()) == false){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
@@ -75,9 +78,11 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
    public function checkNumber($number) {
       switch ($this->numberType) {
          case self::TYPE_INT:
+         case 'int':
             return ctype_digit($number);
             break;
          case self::TYPE_FLOAT:
+         case 'float':
             return true;
             break;
          default :

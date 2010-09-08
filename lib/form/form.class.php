@@ -327,7 +327,9 @@ class Form implements ArrayAccess, Iterator {
     * @return booleant -- true pokud je formulář v pořádku
     */
    public function isValid() {
-      $this->isSend();
+      if($this->isSend()){
+         $this->validate();
+      }
       return $this->isValid;
    }
 
@@ -335,19 +337,28 @@ class Form implements ArrayAccess, Iterator {
     * Metoda provede naplnění všech prvků ve formuláři a jejich validaci
     */
    public function populate() {
+      $this->isPopulated = false;
+      foreach ($this->elements as $name => $element) {
+         if(!$element->isPopulated()){
+            $element->populate();
+         }
+      }
+      $this->isPopulated = true;
+   }
+
+   public function validate() {
       $this->isValid = true;
       foreach ($this->elements as $name => $element) {
          if(!$element->isPopulated()){
             $element->populate();
-            $element->validate();
          }
+         $element->validate();
          if(!$element->isValid()) {
             $this->isValid = false;
             continue;
          }
          $element->filter();
       }
-      $this->isPopulated = true;
    }
 
    /**

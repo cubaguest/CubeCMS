@@ -184,6 +184,15 @@ class Form_Element implements Form_Element_Interface {
    }
 
    /**
+    * Metoda odebere elemntu pravidlo pro validace
+    * @param string $validator -- název validátoru
+    */
+   final public function removeValidation($validator) {
+      unset ($this->validators[$validator]);
+      $this->isPopulated = false;
+   }
+
+   /**
     * Metoda přidá elemntu filtr, který upraví výstup elementu
     * @param Form_Filter_Interface $filter -- typ filtru
     */
