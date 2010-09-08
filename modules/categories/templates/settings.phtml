@@ -1,7 +1,8 @@
 <?
 $this->addPageTitle($this->_('úprava parametrů kategorie').' '.$this->catName);
-$this->addPageHeadline($this->_('úprava parametrů kategorie').' '.$this->catName);
-
+?>
+<h1><?=$this->_('Úprava parametrů kategorie').' "'.$this->catName.'"'?></h1>
+<?
 if($this->includeTpl != null){
    $this->includeTplObj($this->includeTpl);
 } else if($this->form == null) {
