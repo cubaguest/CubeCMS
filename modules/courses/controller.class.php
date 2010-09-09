@@ -794,7 +794,9 @@ class Courses_Controller extends Controller {
    private function getAdminAddreses() {
       $mails = array();
       $str = $this->category()->getParam(self::PARAM_OTHER_RECIPIENS, null);
-      $mails = explode(';', $str);
+      if($str != null){
+         $mails = explode(';', $str);
+      }
       $usersId = $this->category()->getParam(self::PARAM_ADMINS, array());
 
       $modelusers = new Model_Users();
