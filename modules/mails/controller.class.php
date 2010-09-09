@@ -26,7 +26,7 @@ class Mails_Controller extends Controller {
       $elemRecipients = new Form_Element_TextArea('recipients', $this->_('Příjemci'));
 
       $elemRecipients->addValidation(new Form_Validator_NotEmpty());
-      $elemRecipients->addFilter(new Form_Filter_RemoveWhiteChars());
+//      $elemRecipients->addFilter(new Form_Filter_RemoveWhiteChars());
       $elemRecipients->setSubLabel($this->_('E-mailové adresy oddělené čárkou'));
       $formSendMail->addElement($elemRecipients);
 
@@ -41,6 +41,10 @@ class Mails_Controller extends Controller {
       $elemFile = new Form_Element_File('file', $this->_('Příloha'));
       $elemFile->setUploadDir(AppCore::getAppCacheDir());
       $formSendMail->addElement($elemFile);
+
+      $elemSendBatch = new Form_Element_Checkbox('sendBatch', $this->_('Odeslat každému příjemci zvlášť'));
+      $elemSendBatch->setValues(false);
+      $formSendMail->addElement($elemSendBatch);
 
       $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
       $formSendMail->addElement($elemSubmit);
@@ -77,8 +81,26 @@ class Mails_Controller extends Controller {
             $mailObj->addAttachment($file);
             array_push($attachments, $file->getName());
          }
-         $mailObj->addAddress($recipAddresses);
-         $mailObj->sendMail();
+
+         // adresy
+//         $mailObj->addAddress($recipAddresses);
+         $recStr = $formSendMail->recipients->getValues();
+         $matches = array();
+         preg_match_all('/(?:"(?P<name>[^"]*)"[^<]*)?<(?P<mail>[^>]*)>/i', $recStr, $matches);
+
+         foreach ($matches['mail'] as $key => $mail) {
+            if($matches['name'][$key] == '' OR $matches['name'][$key] == null ){
+               $mailObj->addAddress($mail);
+            } else {
+               $mailObj->addAddress($mail, $matches['name'][$key]);
+            }
+         }
+
+         if($formSendMail->sendBatch->getValues() == true){
+            $mailObj->batchSend();
+         } else {
+            $mailObj->send();
+         }
          // uložíme email do db
          $modelSMails->saveMail($formSendMail->subject->getValues(), $formSendMail->text->getValues(),
                  $recipAddresses, Auth::getUserId(), $attachments);
@@ -427,6 +449,13 @@ class Mails_Controller extends Controller {
       $this->view()->scrollComp = $compScroll;
       $this->view()->linkBack = $this->link()->route()->rmParam();
    }
+
+   public function searchMailController() {
+      $model = new Mails_Model_Addressbook();
+
+      $this->view()->mails = $model->searchMail($this->getRequestParam('q'));
+   }
+
 
    /**
     * Metoda pro nastavení modulu

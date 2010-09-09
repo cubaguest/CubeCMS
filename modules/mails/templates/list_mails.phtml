@@ -18,7 +18,7 @@ $this->addJsPlugin($jQuery);
          $recs = explode(Mails_Model_SendMails::RECORD_SEPARATOR, $mail->{Mails_Model_SendMails::COLUMN_RECIPIENTS});
          foreach ($recs as $rec) {?>
             <a href="<?=$this->link()->clear()->param('mail', $rec)?>"
-               title="<?=$this->_('Odeslat e-mail na adresu').' '.$rec;?>"><?=$rec?></a>, 
+               title="<?=$this->_('Odeslat e-mail na adresu').' '.htmlspecialchars($rec);?>"><?=htmlspecialchars($rec)?></a>,
          <?}
          ?>
       </div><br />
@@ -46,7 +46,10 @@ $this->addJsPlugin($jQuery);
    <script type="text/javascript">
    /* <![CDATA[ */
       $(function() {
-         $(".module-mails-list-mails").accordion();
+         $(".module-mails-list-mails").accordion({
+            active : false,
+            autoHeight: false
+         });
       });
    /* ]]> */
 	</script>

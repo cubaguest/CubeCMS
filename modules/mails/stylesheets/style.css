@@ -5,3 +5,9 @@
 #mails-import-form-table td, #mails-import-form-table th {
    padding: 3px;
 }
+
+.ui-autocomplete {
+   width: 300px;
+   max-height: 200px;
+   overflow: auto;
+}

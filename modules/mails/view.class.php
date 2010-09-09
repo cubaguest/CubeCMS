@@ -74,5 +74,9 @@ class Mails_View extends View {
    public function groupsListView(){
       echo json_encode($this->respond);
    }
+
+   public function searchMailView(){
+//      echo json_encode($this->mails);
+   }
 }
 ?>

@@ -75,6 +75,22 @@ class Mails_Model_Addressbook extends Model_PDO {
    }
 
    /**
+    * Metoda vrací objekt s maily podle hledaného řetězce
+    * @return Object
+    */
+   public function searchMail($search) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
+              .' WHERE '.self::COLUMN_NAME." LIKE :str"
+              .' OR '.self::COLUMN_SURNAME." LIKE :str"
+              .' OR '.self::COLUMN_MAIL." LIKE :str"
+              );
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->execute(array(':str' => '%'.$search.'%'));
+      return $dbst->fetchAll();
+   }
+
+   /**
     * metoda vymaže mail z db
     * @param int/string $id -- id mailu nebo mail
     */
