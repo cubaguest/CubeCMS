@@ -115,7 +115,7 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
          }*/
          ?>
    <?
-         $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route(), 'text' => $this->_('Zpět na seznam kurzů')));
+         $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()->route(), 'text' => $this->_('Zpět na seznam kurzů')));
          echo '<br />';
          echo $this->toolbox;
       if($this->course->{Courses_Model_Courses::COLUMN_ALLOW_REG} == true AND $this->freeSeats > 0){
