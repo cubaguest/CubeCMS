@@ -782,7 +782,7 @@ class Courses_Controller extends Controller {
          }
          $mail->sendMail();
          $this->infoMsg()->addMessage($this->_('Registace byla uložena. Na Váš e-mail byly odeslány detail registrace. Pokud Vám nedojdou na uvedenou e-mailovou adresu žádné informace, prosím kontaktujte nás.'));
-         $this->link()->reload();
+         $this->link()->param('registration', 'true')->reload();
       }
 
       $this->view()->formReg = $regForm;
