@@ -83,11 +83,10 @@ class Mails_Controller extends Controller {
          }
 
          // adresy
-//         $mailObj->addAddress($recipAddresses);
          $recStr = $formSendMail->recipients->getValues();
          $matches = array();
-         preg_match_all('/(?:"(?P<name>[^"]*)"[^<]*)?<(?P<mail>[^>]*)>/i', $recStr, $matches);
-
+         preg_match_all('/(?:"(?P<name>[^"]*)")?[< .,]*(?P<mail>[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4})/i', $recStr, $matches);
+//         var_dump($recStr);var_dump($matches['mail']);flush();exit();
          foreach ($matches['mail'] as $key => $mail) {
             if($matches['name'][$key] == '' OR $matches['name'][$key] == null ){
                $mailObj->addAddress($mail);
