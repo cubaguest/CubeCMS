@@ -139,6 +139,20 @@ class Model_Panel extends Model_PDO {
       $dbst->bindValue(':idpanel', $panelId, PDO::PARAM_INT);
       return $dbst->execute();
    }
+
+   /**
+    * Metoda vrací jestli má kategorie nějaké panely
+    * @param int $idc -- id kategorie
+    * @return bool -- true pokud má panely
+    */
+   public function havePanels($idc) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE (".self::COLUMN_ID_CAT." = :idc)");
+      $dbst->execute(array(':idc'=> (int)$idc));
+      if($dbst->fetchObject() === false) return false;
+      return true;
+   }
 }
 
 ?>
