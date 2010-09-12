@@ -85,6 +85,10 @@ class Text_Model extends Model_PDO {
          $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
          $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
          $dbst->execute();
+         $data = $dbst->fetchObject();
+
+//         var_dump($data);flush();exit();
+
          $count = $dbst->rowCount();
 
          
@@ -95,6 +99,7 @@ class Text_Model extends Model_PDO {
                             . " SET " . $this->getUpdateValues()
                             . " WHERE (" . self::COLUMN_ID_CATEGORY . " = :idCat AND " . self::COLUMN_SUBKEY . " = :subkey)");
             $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subKey));
+            $id = $data->{self::COLUMN_ID};
          } else {
             // není uloženo
             $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat, self::COLUMN_SUBKEY => $subKey));

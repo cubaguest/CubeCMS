@@ -24,3 +24,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
   FULLTEXT KEY `text_clear_en` (`text_clear_en`),
   FULLTEXT KEY `text_clear_cs` (`text_clear_cs`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}texts_has_private_users` (
+  `id_user` smallint(6) NOT NULL,
+  `id_text` smallint(6) NOT NULL,
+  PRIMARY KEY (`id_user`,`id_article`),
+  KEY `fk_tb_users_id_user` (`id_user`),
+  KEY `fk_tb_texts_id_text` (`id_text`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

@@ -8,30 +8,34 @@ if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABE
 ?>
 <h1><?=$h1;?></h1>
 <div class="main-content-detail">
-<div class="main-content-text">
-   <?
-   if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
-      echo ($this->text->{Text_Model_Detail::COLUMN_TEXT});
-   } else {
-      echo ($this->_("Text nebyl definován, vytvoříte jej v administraci"));
-   }
+   <div class="main-content-text"><?
+      if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
+         echo ($this->text->{Text_Model_Detail::COLUMN_TEXT});
+      } else {
+         echo ($this->_("Text nebyl definován, vytvoříte jej v administraci"));
+      }
+      echo $this->toolbox;
    ?>
-</div>
+   </div><?
+   if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
+   ?>
+   <div class="main-content-text">
+   <?
+   if($this->textPrivate != null) echo $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT};
+   echo $this->toolboxPrivate;
+   ?>
+   </div>
+<?}
+?>
 </div>
 <?
-if($this->text != null AND strpos((string)$this->text->{Text_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false){
+if(($this->text != null AND strpos((string)$this->text->{Text_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false)
+   OR ($this->textPrivate != null AND strpos((string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false)){
 $this->addJsPlugin(new JsPlugin_PiroBox())?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){
-         $().piroBox({
-            slideShow : true, // true == slideshow on, false == slideshow off
-            slideSpeed : 3 //slideshow
-         });
-      });
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
 </script>
 <?}
-
-if($this->toolbox != null) $this->includeTplObj($this->toolbox);
 ?>

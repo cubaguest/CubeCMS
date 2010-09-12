@@ -1,8 +1,9 @@
 <?
-$this->addPageTitle($this->_('úprava textu panelu'));
-$this->addPageHeadline($this->_('úprava textu panelu'));
+$str = $this->_('úprava textu panelu');
+$this->addPageTitle($str);
 ?>
-<div id="editTextForm">
+<h1><?=$str?></h1>
+<div class="main-content-form-edit" id="text-edit-form">
    <?
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 20)->addClass("mceEditorSimple");
    $tinymce2 = new JsPlugin_TinyMce();
@@ -12,8 +13,4 @@ $this->addPageHeadline($this->_('úprava textu panelu'));
    print ($this->form);
    ?>
 </div>
-<?
-$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
-
-
-
+<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
