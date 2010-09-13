@@ -279,7 +279,9 @@ span[title] {
 fieldset, .formTable {
    background-color: #c7e0f9;
    width: 96%;
-   margin-bottom: 10px;
+   margin: 5px;
+   border: 1px solid gray;
+   border-left: 1px solid gray;
 }
 
 fieldset p.formGroupText {
@@ -287,10 +289,16 @@ fieldset p.formGroupText {
 }
 
 fieldset legend {
-   background-color: #c7e0f9;
-   padding: 0 5px;
+   padding: 2px 5px;
    border: 1px solid gray;
    border-bottom: none;
+   border-top-left-radius: 7px;
+   -moz-border-radius-topleft: 7px;
+   border-top-right-radius: 7px;
+   -moz-border-radius-topright: 7px;
+    background: transparent url('../images/legend_back.png') top left repeat-x;
+    font-weight: bold;
+    margin-left: -1px;
 }
 
 input, button, textarea, select {
@@ -420,7 +428,12 @@ a.form-link-lang-sel {
 } /* linky u článku, řazení, archiv*/
 .main-content-image {} /* obrázek v hlavním obsahu */
 .main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
-.main-content-text {} /* text v hlavním obsahu */
+.main-content-text {
+   min-height: 20px;
+} /* text v hlavním obsahu */
+.main-content-text p {
+   margin-bottom: 1em;
+}
 .main-content-text ul li ul {
    margin-left: 30px;
 } /* text v hlavním obsahu */
