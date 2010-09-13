@@ -75,7 +75,7 @@ class Courses_Controller extends Controller {
       $this->view()->lecturers = $courseModel->getLecturers($this->view()->course->{Courses_Model_Courses::COLUMN_ID});
 
       // pokud je volno přidáme registraci
-      if ($this->view()->freeSeats > 0) {
+      if ($this->view()->freeSeats > 0 AND strtotime($this->view()->course->{Courses_Model_Courses::COLUMN_DATE_START}) > strtotime("now")) {
          $this->courseRegistration();
       }
 
