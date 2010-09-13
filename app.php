@@ -598,6 +598,7 @@ class AppCore {
       //	Hlavni promene strany
       $this->coreTpl->debug = VVE_DEBUG_LEVEL;
       $this->coreTpl->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
+      $this->coreTpl->categoryId = Category::getSelectedCategory()->getId();
       // Přiřazení jazykového pole
       $this->coreTpl->setPVar("appLangsNames", Locales::getAppLangsNames());
       // Vytvoření odkazů s jazyky
@@ -646,7 +647,6 @@ class AppCore {
     * Metoda spouští moduly
     */
    public function runModule() {
-      $this->coreTpl->categoryId = Category::getSelectedCategory()->getId();
       try {
          // načtení a kontrola cest u modulu
          $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
@@ -675,8 +675,9 @@ class AppCore {
          }
          //					Vytvoření objektu kontroleru
          $controller = new $controllerClassName(self::getCategory(), $routes);
+         unset ($routes);
          $controller->runCtrl();
-
+         $this->coreTpl = new Template_Core();
          // přiřazení šablony do výstupu
          $this->coreTpl->module = $controller->_getTemplateObj();
       } catch (Exception $e) {
@@ -876,6 +877,7 @@ class AppCore {
          $ctrl->{$viewM}();
       } else {
          $ctrl->runView();
+         $this->coreTpl = new Template_Core();
          $this->coreTpl->module = $ctrl->template();
       }
    }
@@ -935,7 +937,7 @@ class AppCore {
       $className = 'Module_'.ucfirst(self::$urlRequest->getCategory()).'_Category';
       if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){
          self::$category = new $className(self::$urlRequest->getCategory(),true);
-         unset ($className);
+         
       } else if(
 //         self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND
          ((self::$urlRequest->getRequestUrl() == '' AND self::$urlRequest->getCategory() == null)
@@ -948,6 +950,7 @@ class AppCore {
          Url_Link::setCategory(self::$category->getUrlKey());
          AppCore::setErrorPage(true);
       }
+      unset ($className);
 
       if(!self::$urlRequest->isFullPage()) {
          // vynulování chyby, protože chybová stránka je výchozí stránka
@@ -987,14 +990,8 @@ class AppCore {
       }
       if(self::$urlRequest->isFullPage() 
          OR (AppCore::isErrorPage() AND self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_RSS)){
-//      } else {
-         // je zpracovávána stránka aplikace
-         $this->coreTpl = new Template_Core();
-
          // Globální inicializace proměných do šablony
          $this->initialWebSettings();
-         //vytvoření hlavního menu
-         $this->createMenus();
 
          if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND !AppCore::isErrorPage()) {
             // zpracovávní modulu
@@ -1010,7 +1007,11 @@ class AppCore {
             // zpracování stránky enginu (sitemap, rss, error, atd.)
             $this->runCoreModule();
          }
-
+         if(($this->coreTpl instanceof Template_Core) == false){
+            $this->coreTpl = new Template_Core();
+         }
+         //vytvoření hlavního menu
+         $this->createMenus();
          // =========	spuštění panelů
          $this->runPanels();
 
