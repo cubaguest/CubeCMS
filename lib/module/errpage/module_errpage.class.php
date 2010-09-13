@@ -18,6 +18,8 @@ class Module_ErrPage extends Module_Core {
             Template_Output::addHeader("HTTP/1.0 404 Not Found");
             break;
       }
+
+      Log::msg('Nenalezení stránky: '.new Url_Link(), __CLASS__);
    }
 
    public function runView() {

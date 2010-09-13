@@ -280,6 +280,14 @@ abstract class Controller {
    }
 
    /**
+    * Metoda zaloguje událost
+    * @param string  $msg -- Zpráva (nemusí mít překlad)
+    */
+   final public function log($msg) {
+      Log_Module::msg($msg, $this->module()->getName(), $this->category()->getLabel());
+   }
+
+      /**
     * Metoda volaná při destrukci objektu
     */
    function __destruct() {

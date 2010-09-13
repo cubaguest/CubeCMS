@@ -69,6 +69,7 @@ class Text_Controller extends Controller {
          try {
             $model->saveText($form->text->getValues(), $form->label->getValues(),
                     $this->category()->getId(), self::TEXT_MAIN_KEY);
+            $this->log('úprava textu');
             $this->infoMsg()->addMessage($this->_('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
@@ -103,6 +104,7 @@ class Text_Controller extends Controller {
       if($form->isValid()){
          try {
             $model->saveText($form->text->getValues(), null, $this->category()->getId(),self::TEXT_PANEL_KEY);
+            $this->log('Úprava textu panelu');
             $this->infoMsg()->addMessage($this->_('Text panelu byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
@@ -171,6 +173,7 @@ class Text_Controller extends Controller {
       if($form->isValid()){
          $id = $model->saveText($form->text->getValues(), null,
                     $this->category()->getId(), self::TEXT_PRIVATE_KEY);
+         $this->log('Úprava privátního textu');
          // uložíme skupiny
          $modelPrivate->saveGroupsConnect($id, $form->groups->getValues());
          // uložíme uživatele
