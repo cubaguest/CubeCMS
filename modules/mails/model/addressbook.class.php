@@ -132,5 +132,82 @@ class Mails_Model_Addressbook extends Model_PDO {
       $count = $dbst->fetch();
       return $count[0];
    }
+
+   /**
+    *
+    * @param string $str
+    * @param <type> $idGrp
+    * @param <type> $column
+    * @param <type> $oper -- operace eq - aqual, ne - not equal, cn - contain ,nc - not contain
+    * @return <type>
+    */
+   public function searchCount($str, $idGrp = Mails_Model_Groups::GROUP_ID_ALL, $column = self::COLUMN_MAIL, $oper = 'cn') {
+      $this->isValidColumn($column, array(self::COLUMN_MAIL, self::COLUMN_NAME, self::COLUMN_SURNAME, self::COLUMN_NOTE));
+
+      $dbc = new Db_PDO();
+      $where = null;
+      $where .= self::COLUMN_ID_GRP." = :idGrp";
+      switch ($oper) {
+         case 'eq':
+            $where .= " AND ".$column." = :str";
+            break;
+         case 'ne':
+            $where .= " AND ".$column." != :str";
+            break;
+         case 'nc':
+            $where .= " AND ".$column." NOT LIKE :str";
+            $str = "%".$str."%";
+            break;
+         case 'cn':
+         default:
+            $where .= " AND ".$column." LIKE :str";
+            $str = "%".$str."%";
+            break;
+      }
+
+      $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
+         ." WHERE ".$where);
+      $dbst->execute(array(':idGrp' => (int)$idGrp, ':str' => $str));
+      $count = $dbst->fetch();
+      return $count[0];
+   }
+
+   public function search($str, $idGrp = Mails_Model_Groups::GROUP_ID_ALL, $column = self::COLUMN_MAIL, $oper = 'cn',
+      $fromRow = 0, $rows = 10000, $orderColumn = self::COLUMN_MAIL, $ord = 'ASC') {
+      $this->isValidColumn($column, array(self::COLUMN_MAIL, self::COLUMN_NAME, self::COLUMN_SURNAME, self::COLUMN_NOTE));
+      $this->isValidOrder($ord);
+
+      $dbc = new Db_PDO();
+      $where = null;
+      $where .= self::COLUMN_ID_GRP." = :idGrp";
+      switch ($oper) {
+         case 'eq':
+            $where .= " AND ".$column." = :str";
+            break;
+         case 'ne':
+            $where .= " AND ".$column." != :str";
+            break;
+         case 'nc':
+            $where .= " AND ".$column." NOT LIKE :str";
+            $str = "%".$str."%";
+            break;
+         case 'cn':
+         default:
+            $where .= " AND ".$column." LIKE :str";
+            $str = "%".$str."%";
+            break;
+      }
+      $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
+         .' WHERE '.$where.' ORDER BY '.$orderColumn.' '.$ord
+         ." LIMIT :fromRow, :rows");
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->bindValue(':str', $str, PDO::PARAM_STR);
+      $dbst->bindValue(':idGrp', $idGrp, PDO::PARAM_INT);
+      $dbst->bindValue(':fromRow', $fromRow, PDO::PARAM_INT);
+      $dbst->bindValue(':rows', $rows, PDO::PARAM_INT);
+
+      $dbst->execute();
+      return $dbst->fetchAll();
+   }
 }
 ?>

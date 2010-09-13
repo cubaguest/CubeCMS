@@ -43,6 +43,7 @@ $this->addJsPlugin($jQuery);
    <br />
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
+      var selectedGroupId = 0;
       $(document).ready(function() {
          var groupsGrid = $("#table-addressbook-groups").jqGrid({
             ajaxGridOptions : {type:"POST"},
@@ -73,6 +74,10 @@ $this->addJsPlugin($jQuery);
                   jQuery("#table-addressbook").jqGrid('setCaption',"E-maily skupiny: "
                      +jQuery("#table-addressbook-groups").jqGrid('getRowData',ids).name).trigger('reloadGrid');
                }
+//               jQuery("#table-addressbook").searchGrid().clearSearch();
+//               jQuery("#table-addressbook").searchGrid().clearSearch().hide();
+               jQuery("#fbox_table-addressbook").searchFilter().reset();
+//               $("#table-addressbook").setGridParam({search:false,searchdata: {},page:1}).trigger("reloadGrid");
             }
          });
          // úpravy
@@ -112,7 +117,7 @@ $this->addJsPlugin($jQuery);
                   return [res.allOk,msg];
                }
             },
-            {closeOnEscape:true}, // search options
+            {closeOnEscape:true, sopt : ['eq','ne','cn','nc']}, // search options
             {height:120,jqModal:true,closeOnEscape:true} // view options
          );
          
@@ -141,7 +146,10 @@ $this->addJsPlugin($jQuery);
             caption:"E-maily skupiny",
             height: 350,
             width : 550,
-            editurl:"<?=$this->link()->route('editMail')?>"
+            editurl:"<?=$this->link()->route('editMail')?>",
+//            loadComplete : function(){
+//               addressGrid.FilterForm.reset();
+//            }
          });
          // úpravy
          jQuery("#table-addressbook").jqGrid('navGrid','#table-addressbook-pager',
@@ -189,7 +197,7 @@ $this->addJsPlugin($jQuery);
                   return [res.allOk,msg];
                }
             },
-            {closeOnEscape:true}, // search options
+            {closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']}, // search options
             {height:120,jqModal:true,closeOnEscape:true} // view options
          ).navSeparatorAdd("#table-addressbook-pager")
             .navButtonAdd('#table-addressbook-pager',{
@@ -203,7 +211,6 @@ $this->addJsPlugin($jQuery);
             title: "<?=$this->_('Poslat e-mail označenému')?>",
             position:"last"
          });
-         
          $('#mails-tools').tabs({collapsible: true,selected: -1});
       });
       /* ]]> */

@@ -153,26 +153,39 @@ class Mails_Controller extends Controller {
       $jqGrid = new Component_JqGrid();
       $jqGrid->request()->setDefaultOrderField(Mails_Model_Addressbook::COLUMN_MAIL);
       $modelAddresBook = new Mails_Model_Addressbook();
-
+      $count = 0;
+      // search
       if ($jqGrid->request()->isSearch()) {
-         
+         $count = $modelAddresBook->searchCount($jqGrid->request()->searchString(),
+            (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+            $jqGrid->request()->searchField());
+         $jqGrid->respond()->setRecords($count);
+
+         $book = $modelAddresBook->search($jqGrid->request()->searchString(),
+            (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+            $jqGrid->request()->searchField(),$jqGrid->request()->searchType(),
+            ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
+            $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
       } else {
+      // list
          $count = $modelAddresBook->getCount((int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL));
          $jqGrid->respond()->setRecords($count);
 
          $book = $modelAddresBook->getMails((int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
             ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
             $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
-         foreach ($book as $mail) {
-            array_push($jqGrid->respond()->rows, array('id' => $mail->{Mails_Model_Addressbook::COLUMN_ID},
-                'cell' => array(
-                    $mail->{Mails_Model_Addressbook::COLUMN_MAIL},
-                    $mail->{Mails_Model_Addressbook::COLUMN_NAME},
-                    $mail->{Mails_Model_Addressbook::COLUMN_SURNAME},
-                    $mail->{Mails_Model_Addressbook::COLUMN_NOTE}
-                    ))
-            );
-         }
+      }
+      // out
+      
+      foreach ($book as $mail) {
+         array_push($jqGrid->respond()->rows, array('id' => $mail->{Mails_Model_Addressbook::COLUMN_ID},
+             'cell' => array(
+                 $mail->{Mails_Model_Addressbook::COLUMN_MAIL},
+                 $mail->{Mails_Model_Addressbook::COLUMN_NAME},
+                 $mail->{Mails_Model_Addressbook::COLUMN_SURNAME},
+                 $mail->{Mails_Model_Addressbook::COLUMN_NOTE}
+                 ))
+         );
       }
       $this->view()->respond = $jqGrid->respond();
    }
