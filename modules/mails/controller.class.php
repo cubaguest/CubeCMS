@@ -158,7 +158,7 @@ class Mails_Controller extends Controller {
       if ($jqGrid->request()->isSearch()) {
          $count = $modelAddresBook->searchCount($jqGrid->request()->searchString(),
             (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
-            $jqGrid->request()->searchField());
+            $jqGrid->request()->searchField(),$jqGrid->request()->searchType());
          $jqGrid->respond()->setRecords($count);
 
          $book = $modelAddresBook->search($jqGrid->request()->searchString(),
