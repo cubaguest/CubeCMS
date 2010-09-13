@@ -22,7 +22,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    <?if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
    <div class="main-content-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
    <?}?>
-   <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
+   <div class="main-content-text"><?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?></div>
    <hr class="reseter" />
    <?if($this->allowPrivate === true){?>
       <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}?>
@@ -31,9 +31,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    <br />
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){
-         $().piroBox({slideShow : true, slideSpeed : 3});
-      });
+      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
       /* ]]> */
    </script>
    <?$this->includeTpl('articletools.phtml', true, array(
