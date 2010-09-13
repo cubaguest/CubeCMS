@@ -17,8 +17,6 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
 
    private $langColums = array();
 
-   private $checkAllColums = true;
-
    /**
     * Konstruktor
     * @param bool $allLangs -- jestli má být vytvořeno pole se všemi jazyky,
@@ -26,9 +24,6 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
     */
    function  __construct($colums = array()) {
       $this->langColums = $colums;
-//      if(empty ($colums) == false){
-//         $this->checkAllColums = false;
-//      }
    }
 
    /**
@@ -37,18 +32,14 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
     * @param mixed $value -- hodnota prvku
     */
    public function  __set($name,  $value) {
-//      if($this->checkAllColums == true){
          $matches = array();
-         if ((bool)preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {
+         if (strpos($name,'_') > 3 AND (bool)preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {// jazykové podtržítko je většinou na více jak 3tím znaku
             if(!isset ($this->values[$matches[1]])
              OR !($this->values[$matches[1]] instanceof Model_LangContainer_LangColumn)) {
                $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
             }
             $this->values[$matches[1]]->addValue($matches[2], $value);
          }
-//      } else {
-////
-//      }
       $this->values[$name] = $value;
    }
 
