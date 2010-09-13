@@ -23,10 +23,18 @@ class Component_JqGrid_JsPlugin extends JsPlugin {
 //		Přidání css stylu
 		$this->addFile(new JsPlugin_CssFile('css/ui.jqgrid.css'));
 		//		Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("i18n/grid.locale-".Locale::getLang().".js"));
+		$this->addFile(new JsPlugin_JsFile("i18n/grid.locale-".Locales::getLang().".js"));
 		$this->addFile(new JsPlugin_JsFile("jquery.jqGrid.min.js"));
 //		$this->addFile(new JsPlugin_JsFile("jquery.jqgrid.loader.js"));
 	}
+
+   public function setCellEdit() {
+      $this->addFile(new JsPlugin_JsFile("grid.celledit.min.js"));
+   }
+
+   public function setInLineEdit() {
+      $this->addFile(new JsPlugin_JsFile("grid.inlinedit.min.js"));
+   }
 }
 /*
  * Rozdělit do částí:

@@ -45,6 +45,5 @@ class Component_JqGrid extends Component {
    public function mainView() {
       $this->template()->addJsPlugin(new Component_JqGrid_JsPlugin());
    }
-
 }
 ?>
