@@ -289,8 +289,10 @@ class Model_PDO extends Model {
     * @return bool
     */
    protected function isValidOrder($ord) {
-      if($ord != 'ASC' AND $ord != 'DESC') return false;
-      return true;
+      $ord = strtoupper($ord);
+      if($ord != 'ASC' AND $ord != 'DESC') {
+         throw new UnexpectedValueException(sprintf(_('Neplatný typ řazení "%s" pro sql dotaz. Možné hodnoty jsou ASC/DESC'), $ord));
+      }
    }
 
    /**
@@ -300,8 +302,9 @@ class Model_PDO extends Model {
     * @return bool
     */
    protected function isValidColumn($column, $columns) {
-      if(in_array($column, $columns)) return false;
-      return true;
+      if(!in_array($column, $columns)){
+         throw new UnexpectedValueException(sprintf(_('Neplatný sloupce "%s" v sql dotazu. Možné hodnoty jsou "%s"'), $column, implode(', ', $columns)));
+      }
    }
 }
 ?>
