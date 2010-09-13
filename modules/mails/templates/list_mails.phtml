@@ -3,15 +3,21 @@ $this->addPageTitle($this->_('seznam odeslaných emailů'));
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
+$this->addCssFile('style.css');
 ?>
 <h1><?=$this->category()->getName().' - '.$this->_('odeslané e-maily')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
-<div class="module-mails-list-mails">
+<div id="module-mail-list" class="module-mails-list-mails">
    <?foreach ($this->mails as $mail) {?>
    <h2><a href="#" title="<?=$this->_('Dateil mailu')?>"
           ><?=$mail->{Mails_Model_SendMails::COLUMN_SUBJECT}.'&nbsp;-&nbsp;'
           .vve_date('%x %X', new DateTime($mail->{Mails_Model_SendMails::COLUMN_DATE}))?></a></h2>
    <div class="mail-detail">
+      <div class="mail-tools"><a href="<?=$this->link()->route('composeMail')->param('sendmail',
+                 $mail->{Mails_Model_SendMails::COLUMN_ID})?>"
+            ><img src="<?=vve_get_tpl_file('icons/email_resend.png', VVE_TPL_FILE_IMAGE)?>"
+                alt="icon send mail" />&nbsp;<?=$this->_('Poslat znovu')?></a>
+      </div>
       <h3><?=$this->_('Příjemci')?></h3>
       <div class="mail-recipients">
          <?
@@ -34,10 +40,10 @@ $this->addJsPlugin($jQuery);
       </div>
       <?}?>
       <br />
-      <div class="mail-tools">
-         <a href="<?=$this->link()->route('composeMail')->param('sendmail',
+      <div class="mail-tools"><a href="<?=$this->link()->route('composeMail')->param('sendmail',
                  $mail->{Mails_Model_SendMails::COLUMN_ID})?>"
-            ><?=$this->_('Poslat znovu')?></a>
+            ><img src="<?=vve_get_tpl_file('icons/email_resend.png', VVE_TPL_FILE_IMAGE)?>"
+                alt="icon send mail" />&nbsp;<?=$this->_('Poslat znovu')?></a>
       </div>
    </div>
    <?

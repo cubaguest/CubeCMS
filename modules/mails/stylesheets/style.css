@@ -11,3 +11,20 @@
    max-height: 200px;
    overflow: auto;
 }
+
+#module-mail-list .ui-accordion-header a {
+   padding-top: 2px;
+   padding-bottom: 2px;
+}
+
+.mail-content {
+   height: 250px;
+   overflow: auto;
+}
+.mail-tools {
+   margin: 0.3em 0;
+}
+.mail-detail.ui-accordion-content {
+   padding-top: 0px;
+
+}
