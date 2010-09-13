@@ -428,9 +428,7 @@ a.form-link-lang-sel {
 } /* linky u článku, řazení, archiv*/
 .main-content-image {} /* obrázek v hlavním obsahu */
 .main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
-.main-content-text {
-   min-height: 20px;
-} /* text v hlavním obsahu */
+.main-content-text {} /* text v hlavním obsahu */
 .main-content-text p {
    margin-bottom: 1em;
 }
