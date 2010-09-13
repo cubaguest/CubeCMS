@@ -282,5 +282,26 @@ class Model_PDO extends Model {
       }
       return $array;
    }
+
+   /**
+    * Metoda vrací jestli je správný systém řazení
+    * @param string $ord -- ASC / DESC
+    * @return bool
+    */
+   protected function isValidOrder($ord) {
+      if($ord != 'ASC' AND $ord != 'DESC') return false;
+      return true;
+   }
+
+   /**
+    * Metoda zjišťuje jestli je validní název sloupce
+    * @param string $column -- název sloupce
+    * @param array $columns -- pole sloupců
+    * @return bool
+    */
+   protected function isValidColumn($column, $columns) {
+      if(in_array($column, $columns)) return false;
+      return true;
+   }
 }
 ?>
