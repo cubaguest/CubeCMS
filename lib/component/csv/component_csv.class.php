@@ -11,6 +11,11 @@
  */
 
 class Component_CSV extends Component {
+   const CFG_CELL_SEPARATOR = 'cell_separator';
+   const CFG_ROW_SEPARATOR = 'row_separator';
+   const CFG_FLUSH_FILE = 'file';
+   const QUOTE = '"';
+
    /**
     * Pole s prvky
     * @var array
@@ -27,7 +32,10 @@ class Component_CSV extends Component {
     * Pole s konfiguračními hodnotami
     * @var array
     */
-   protected $config = array('separator' => ';');
+   protected $config = array(self::CFG_CELL_SEPARATOR => ',',
+                             self::CFG_ROW_SEPARATOR => "\r\n",
+                             self::CFG_FLUSH_FILE => 'file.csv'
+      );
 
    /**
     * Metoda přidá řádek do  tabulky
@@ -59,6 +67,8 @@ class Component_CSV extends Component {
     */
    public function flush() {
       $out = new Template_Output();
+      $out->factory('csv');
+      $out->setDownload($this->getConfig(self::CFG_FLUSH_FILE));
       $out->sendHeaders();
       echo($this->createstring());
       flush();
@@ -71,21 +81,35 @@ class Component_CSV extends Component {
     */
    private function createstring() {
       $return = null;
-      foreach ($this->data as $row) {
-         $cellStr = null;
-         foreach ($row as $cell) {
-            // pokud obsahuje oddělovač dá se do uvozovek
-            if(strpos($cell, $needle) !== false){
-               $cellStr .= '"'.$cell.'"'.$this->getConfig('separator');
-            } else {
-               $cellStr .= $cell.$this->getConfig('separator');
-            }
-         }
-         $return .= substr($cellStr,0,strlen($cellStr)-1)."\n";
+      if(!empty ($this->labels)){
+         $labels = $this->labels;
+         array_walk($labels, array(&$this, 'applyQuotes'));
+         $return .= implode($this->getConfig(self::CFG_CELL_SEPARATOR), $labels).$this->getConfig(self::CFG_ROW_SEPARATOR);
+      }
+      $data = $this->data;
+      array_walk_recursive($data, array(&$this, 'applyQuotes'));
+      foreach ($data as $row) {
+         $return .= implode($this->getConfig(self::CFG_CELL_SEPARATOR), $row).$this->getConfig(self::CFG_ROW_SEPARATOR);
       };
 
       return $return;
    }
+
+   private function applyQuotes(&$item, $key) {
+      // zdvojení uvozovek
+      if(strpos($item, self::QUOTE)){
+         $item = str_replace(self::QUOTE, self::QUOTE.self::QUOTE, $item);
+      }
+
+      if(ctype_digit($item)){
+         $item = $item;
+      } else if(!empty ($item)){
+         $item = self::QUOTE.$item.self::QUOTE;
+      } else {
+         $item = null;
+      }
+   }
+
 
    /**
     * Metoda pro výpis komponenty
