@@ -23,6 +23,12 @@ class AppCore {
     * Verze enginu
     */
    const ENGINE_VERSION = 6.3;
+
+   /**
+    * Revize Enginu
+    */
+   const ENGINE_REVISION = 1;
+
    /**
     * Obsahuje hlavní soubor aplikace
     */
