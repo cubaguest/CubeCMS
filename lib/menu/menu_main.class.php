@@ -44,9 +44,11 @@ class Menu_Main {
 //      var_dump($newAdminMenu);
 //      return;
       // načtení menu z
-      self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-      $catModel = new Model_Category();
-      self::$menu->setCategories($catModel->getCategoryList(false,true));
+      if(self::$menu == null){
+         self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
+         $catModel = new Model_Category();
+         self::$menu->setCategories($catModel->getCategoryList(false,true));
+      }
    }
 
    protected function init() {}
