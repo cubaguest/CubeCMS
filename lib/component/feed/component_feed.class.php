@@ -230,7 +230,11 @@ class Component_Feed extends Component {
       $feed->writeAttribute('type', "text");
 
       $feed->startElement('link');
-         $feed->writeAttribute('href', $this->getConfig('link'));
+      if($this->getConfig('link') instanceof Url_Link_Module){
+         $feed->writeAttribute("href", $this->getConfig('link')->route('feed', array('type' => 'atom')));
+      } else {
+         $feed->writeAttribute("href", $this->getConfig('link')->category()->file(Url_Request::URL_FILE_ATOM));
+      }
          $feed->writeAttribute('rel', "self");
          $feed->writeAttribute('type', "application/atom+xml");
       $feed->endElement();
