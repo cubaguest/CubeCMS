@@ -17,6 +17,33 @@ class Text_Controller extends Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
+//      $model = new Text_Model();
+//      $modelPrivate = new Text_Model_Private();
+//      // text
+//      $text = $model->getText($this->category()->getId(),self::TEXT_MAIN_KEY);
+//
+//      if($this->category()->getParam(self::PARAM_ALLOW_PRIVATE, false)== true AND Auth::isLogin()){
+//         $textPrivate = $model->getText($this->category()->getId(),self::TEXT_PRIVATE_KEY);
+//
+//         if(Auth::getGroupName() == 'admin' OR $modelPrivate->haveGroup($textPrivate->{Text_Model::COLUMN_ID}, Auth::getGroupId())
+//            OR $modelPrivate->haveUser($textPrivate->{Text_Model::COLUMN_ID}, Auth::getUserId())){
+//               $this->view()->textPrivate = $textPrivate;
+//         }
+//      }
+//      $this->view()->text = $text;
+      $this->exportTextController();
+
+      // komponenta pro vypsání odkazů na sdílení
+      $shares = new Component_Share();
+      $shares->setConfig('url', (string)$this->link()->rmParam());
+      $shares->setConfig('title', $this->category()->getName());
+
+      $this->view()->shares=$shares;
+   }
+
+   public function exportTextController() {
+      $this->checkReadableRights();
+
       $model = new Text_Model();
       $modelPrivate = new Text_Model_Private();
       // text
@@ -31,7 +58,9 @@ class Text_Controller extends Controller {
          }
       }
       $this->view()->text = $text;
+
    }
+
 
    public function contentController() {
       $this->mainController();

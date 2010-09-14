@@ -9,6 +9,7 @@ class Text_Routes extends Routes {
       $this->addRoute('editPrivate', "editprivate", 'editPrivate', 'editprivate/');
       $this->addRoute('editpanel', "editpanel", 'editPanel', 'editpanel/');
       $this->addRoute('content', "content.html", 'content', 'content.phtml');
+      $this->addRoute('detailExport', "text\.(?P<output>(?:pdf)|(?:xml)|(?:html))", 'exportText','text.{output}');
       $this->addRoute('normal', null, 'main', null);
 	}
 }

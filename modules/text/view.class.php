@@ -64,6 +64,64 @@ class Text_View extends View {
       }
       print ($text);
    }
+
+   public function exportTextHtmlView() {
+      $this->template()->addTplFile('texthtml.phtml');
+   }
+
+   public function exportTextPdfView() {
+      // pokud není uložen mezivýstup
+      $fileName = md5($this->category()->getUrlKey()).'.pdf';;
+      if(!file_exists(AppCore::getAppCacheDir().$fileName)) {
+         $c = $this->createPdf();
+         $c->pdf()->Output(AppCore::getAppCacheDir().$fileName, 'F');
+      }
+      Template_Output::addHeader('Content-Disposition: attachment; filename="'
+              .$this->category()->getUrlKey().'.pdf"');
+      Template_Output::sendHeaders();
+      // send Output
+      $fp = fopen(AppCore::getAppCacheDir().$fileName,"r");
+      while (! feof($fp)) {
+         $buff = fread($fp,4096);
+         print $buff;
+      }
+      exit();
+   }
+
+   protected function createPdf() {
+      $text = $this->text;
+      // komponenta TcPDF
+      $c = new Component_Tcpdf();
+      // vytvoření pdf objektu
+      $c->pdf()->SetTitle($this->category()->getName());
+      $c->pdf()->SetSubject(VVE_WEB_NAME." - ".$this->category()->getName());
+      $c->pdf()->SetKeywords($this->category()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
+
+      // ---------------------------------------------------------
+      $c->pdf()->setHeaderFont(array(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN-2));
+      $c->pdf()->setHeaderData('', 0, VVE_WEB_NAME." - ".$this->category()->getName(),
+         strftime("%x")." - ".$this->link());
+
+      // add a page
+      $c->pdf()->AddPage();
+      // nadpis
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN-2);
+      $name = "<h1>".$this->category()->getName()."</h1>";
+      $c->pdf()->writeHTML($name, true, 0, true, 0);
+
+      $c->pdf()->Ln();
+
+      $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
+      $c->pdf()->writeHTML((string)$text->{Text_Model::COLUMN_TEXT}, true, 0, true, 10);
+
+      // pokud je private přidáme jej
+      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
+         $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN);
+         $c->pdf()->writeHTML((string)$text->{Text_Model::COLUMN_TEXT}, true, 0, true, 10);
+      }
+
+      return $c;
+   }
 }
 
 ?>
