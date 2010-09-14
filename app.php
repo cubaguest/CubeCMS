@@ -833,7 +833,7 @@ class AppCore {
             $panelCat->getModule()->getName()), 10);
          }
          //					Vytvoření objektu kontroleru
-         $routes = new $routesClassName(null);
+         $routes = new $routesClassName(null,$panelCat);
          $controllerClassName = ucfirst($panelCat->getModule()->getName()).'_Panel';
          if(!class_exists($controllerClassName)) {
             throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' controleru panelu modulu."),
