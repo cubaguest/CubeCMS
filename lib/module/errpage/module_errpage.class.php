@@ -19,7 +19,7 @@ class Module_ErrPage extends Module_Core {
             break;
       }
 
-      Log::msg('Nenalezení stránky: '.new Url_Link(), __CLASS__);
+      Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
    }
 
    public function runView() {
