@@ -67,7 +67,9 @@ $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->
          <div class="main-content-image">
          <?echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
               .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
-              .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));?>
+              .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image',
+                 $this->category()->getParam('img_width',  Actions_Controller::MAIN_IMAGE_WIDTH),
+                 $this->category()->getParam('img_height',Actions_Controller::MAIN_IMAGE_HEIGHT), 'actionImage'));?>
          </div>
       <?}?>
       <div class="main-content-text">
