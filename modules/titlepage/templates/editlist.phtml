@@ -96,10 +96,11 @@ $this->addJsPlugin($jQuery);
             $.ajax({
                type: "POST", url: "<?=$this->link()->route('deleteItem')?>",
                data: $form.serialize(),
-               success : function(){
+               success : function(data){
                   $li.animate({opacity:0}, 300, function(){
                      $(this).remove();
                   });
+                  vveShowMessages(data);
                }
             });
             return false;

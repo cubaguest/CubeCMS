@@ -6,15 +6,15 @@ class TitlePage_Model_Items extends Model_PDO {
    const DB_TABLE = 'titlepage_items';
 
 
-   const COLUMN_ID = 'id_item';
+   const COLUMN_ID = 'id-item';
    const COLUMN_ORDER = 'order';
    const COLUMN_COLUMNS = 'columns';
    const COLUMN_TYPE = 'type';
    const COLUMN_DATA = 'data';
    const COLUMN_NAME = 'name';
    const COLUMN_IMAGE = 'image';
-   const COLUMN_ID_CATEGORY = 'id_category';
-   const COLUMN_ID_EXTERN = 'id_external';
+   const COLUMN_ID_CATEGORY = 'id-category';
+   const COLUMN_ID_EXTERN = 'id-external';
 
 
    
@@ -38,7 +38,7 @@ class TitlePage_Model_Items extends Model_PDO {
             ." SET `".self::COLUMN_NAME."` = :name,"." `".self::COLUMN_DATA."` = :data,"
             ." `".self::COLUMN_IMAGE."` = :image, `".self::COLUMN_COLUMNS."` = :columns,"
             ." `".self::COLUMN_ID_CATEGORY."` = :idcat, `".self::COLUMN_ID_EXTERN."` = :idext"
-            ." WHERE ".self::COLUMN_ID." = :id");
+            ." WHERE `".self::COLUMN_ID."` = :id");
          $dbst->bindValue(':id', (int)$id, PDO::PARAM_INT);
       } else {
          // počet - řadí se na konec
@@ -49,8 +49,8 @@ class TitlePage_Model_Items extends Model_PDO {
 
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
              ." (".self::COLUMN_DATA.", ".self::COLUMN_TYPE.", "
-             ." ".self::COLUMN_NAME.", "." ".self::COLUMN_COLUMNS.", "
-             ." ".self::COLUMN_ID_CATEGORY.", "." ".self::COLUMN_ID_EXTERN.", "
+             ." `".self::COLUMN_NAME."`, `".self::COLUMN_COLUMNS."`, "
+             ." `".self::COLUMN_ID_CATEGORY."`, `".self::COLUMN_ID_EXTERN."`, "
              ." `".self::COLUMN_ORDER."`, `".self::COLUMN_IMAGE."`)"
              ." VALUES (:data, :type, :name, :columns, :idcat, :idext, :order, :image)");
          $dbst->bindValue(':order', (int)$count+1, PDO::PARAM_INT);
@@ -76,11 +76,11 @@ class TitlePage_Model_Items extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT tbi.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tbi"
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS tbc"
-              ." ON tbc.".Model_Category::COLUMN_CAT_ID." = tbi.".self::COLUMN_ID_CATEGORY
-              ." JOIN ".Model_Rights::getRightsTable()." AS tbr ON tbr."
-              .Model_Rights::COLUMN_ID_CATEGORY." = tbc.".Model_Category::COLUMN_CAT_ID
-              ." WHERE (tbr.".Model_Rights::COLUMN_ID_GROUP." = :idgrp"
-              ." AND tbr.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
+              ." ON tbc.`".Model_Category::COLUMN_CAT_ID."` = tbi.`".self::COLUMN_ID_CATEGORY."`"
+              ." JOIN ".Model_Rights::getRightsTable()." AS tbr "
+              ."ON tbr.`".Model_Rights::COLUMN_ID_CATEGORY."` = tbc.`".Model_Category::COLUMN_CAT_ID."`"
+              ." WHERE (tbr.`".Model_Rights::COLUMN_ID_GROUP."` = :idgrp"
+              ." AND tbr.`".Model_Rights::COLUMN_RIGHT."` LIKE 'r__')"
               ." ORDER BY `".self::COLUMN_ORDER."` ASC"
               );
 //      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
@@ -98,7 +98,7 @@ class TitlePage_Model_Items extends Model_PDO {
 
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET `".self::COLUMN_ORDER."` = :pos"
-          ." WHERE ".self::COLUMN_ID." = :id");
+          ." WHERE `".self::COLUMN_ID."` = :id");
       foreach ($positions as $pos => $id) {
          $dbst->bindValue(':pos', $pos+1, PDO::PARAM_INT);
          $dbst->bindParam(':id', $id, PDO::PARAM_INT);
@@ -113,7 +113,7 @@ class TitlePage_Model_Items extends Model_PDO {
       $dbc = new Db_PDO();
 
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE ".self::COLUMN_ID." = :id");
+          ." WHERE `".self::COLUMN_ID."` = :id");
       $dbst->bindParam(':id', $id, PDO::PARAM_INT);
       $dbst->execute();
 
@@ -123,13 +123,13 @@ class TitlePage_Model_Items extends Model_PDO {
    public function getItem($id) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-         ." WHERE (".self::COLUMN_ID." = :id)");
+         ." WHERE (`".self::COLUMN_ID."` = :id)");
       $dbst->execute(array(':id' => (int)$id));
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetch();
    }
 
-
+   /* Konec items? */
 
 
    /**

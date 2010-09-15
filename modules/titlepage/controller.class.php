@@ -579,7 +579,7 @@ class TitlePage_Controller extends Controller {
          // ulož
          $modelItems->saveItem($type, null,
                  $form->category_id->getValues(), serialize($form->name->getValues()),
-                 $image, $form->columns->getValues(),$id, $form->article_id->getValues());
+                 null, $form->columns->getValues(),$id, $form->article_id->getValues());
 
          $this->infoMsg()->addMessage($this->_('Položka byla uložena'));
          $this->link()->route('editList')->reload();
@@ -636,7 +636,7 @@ class TitlePage_Controller extends Controller {
       $this->checkWritebleRights();
       $modelItems = new TitlePage_Model_Items();
       $modelItems->deleteItem($this->getRequestParam('delete_id'));
-      $this->infoMsg()->addMessage($this->_('Prvek byl smazán'));
+      $this->infoMsg()->addMessage($this->_('Položka byla smazána'));
       $this->link()->route('editList')->reload();
    }
 
