@@ -61,7 +61,8 @@ class Contact_Controller extends Controller {
          $mail->addAddress($formQuestion->mail->getValues());
          // maily adminů
          $str = $this->category()->getParam(self::PARAM_OTHER_RECIPIENTS, null);
-         $mails = explode(';', $str);
+         $mails = array();
+         if($str != null) $mails = explode(';', $str);
          $usersId = $this->category()->getParam(self::PARAM_ADMIN_RECIPIENTS, array());
 
          $modelusers = new Model_Users();
