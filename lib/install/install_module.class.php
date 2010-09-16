@@ -66,11 +66,15 @@ class Install_Module {
     * @param int $fromVersion -- původní verze
     * @param int $toVersion -- nová verze
     */
-   public function update($fromVersion, $toVersion) {
-      // update tabulky
+   public function update() {
       $model = new Model_Module();
+      $module = $model->getModule($this->moduleName);
+      $fromVersion = (float)$module->{Model_Module::COLUMN_VERSION_MAJOR}.'.'.$module->{Model_Module::COLUMN_VERSION_MINOR};
+      $toVersion = (float)file_get_contents(AppCore::getAppWebDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+                 .$module->{Model_Module::COLUMN_NAME}.DIRECTORY_SEPARATOR
+                 .AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.self::VERSION_FILE);;
+
       for ($currentVer = (float)$fromVersion; round($currentVer,1) < round((float)$toVersion,1); $currentVer+=0.1) {
-//      while ($currentVer < (float) $toVersion) {
          $fileName = preg_replace(array('/{from}/', '/{to}/'), 
                  array(number_format($currentVer, 1, '.', ''), number_format($currentVer+0.1, 1, '.', '')),
                          self::FILE_SQL_UPGRADE);
@@ -78,7 +82,6 @@ class Install_Module {
          if ($file->exist()) {
             $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
          }
-//         $currentVer = $currentVer + 0.1;
          $matches = array();
          preg_match('/([0-9]+)[.,]?([0-9]?)/', (float)$currentVer+0.1, $matches);
          $model->registerUpdatedModule($this->moduleName, $matches[1], $matches[2]);
