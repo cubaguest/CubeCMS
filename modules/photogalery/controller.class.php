@@ -186,8 +186,8 @@ class Photogalery_Controller extends Controller {
          $file = $addFile->getValues();
          $image = new Filesystem_File_Image($file['name'], $this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_ORIGINAL);
          $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL,
-                 $this->category()->getParam('small_width', self::SMALL_WIDTH),
-                 $this->category()->getParam('small_height', self::SMALL_HEIGHT), true);
+                 $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
+                 $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), true);
          $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM,
                  $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
                  $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT));
@@ -255,8 +255,8 @@ class Photogalery_Controller extends Controller {
          $imageF = new Filesystem_File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $this->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
          $imageF->cropAndSave($this->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL.DIRECTORY_SEPARATOR,
-                 $this->category()->getParam('small_width',self::SMALL_WIDTH),
-                 $this->category()->getParam('small_height',self::SMALL_HEIGHT),
+                 $this->category()->getParam('small_width',VVE_IMAGE_THUMB_W),
+                 $this->category()->getParam('small_height',VVE_IMAGE_THUMB_H),
                  $editForm->start_x->getValues(), $editForm->start_y->getValues(),
                  $editForm->width->getValues(), $editForm->height->getValues());
          $this->infoMsg()->addMessage($this->_('Miniatura byla upravena'));
@@ -279,7 +279,7 @@ class Photogalery_Controller extends Controller {
 
       $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
       $elemSW->addValidation(new Form_Validator_IsNumber());
-      $elemSW->setSubLabel('Výchozí: '.self::SMALL_WIDTH.'px');
+      $elemSW->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_W.'px');
       $form->addElement($elemSW, 'images');
       if(isset($settings['small_width'])) {
          $form->small_width->setValues($settings['small_width']);
@@ -287,7 +287,7 @@ class Photogalery_Controller extends Controller {
 
       $elemSH = new Form_Element_Text('small_height', 'Výška miniatury (px)');
       $elemSH->addValidation(new Form_Validator_IsNumber());
-      $elemSH->setSubLabel('Výchozí: '.self::SMALL_HEIGHT.'px');
+      $elemSH->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_H.'px');
       $form->addElement($elemSH, 'images');
       if(isset($settings['small_height'])) {
          $form->small_height->setValues($settings['small_height']);
