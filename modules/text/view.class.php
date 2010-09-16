@@ -66,6 +66,7 @@ class Text_View extends View {
    }
 
    public function exportTextHtmlView() {
+      Template_Core::setMainIndexTpl(Template_Core::INDEX_PRINT_TEMPLATE);
       $this->template()->addTplFile('texthtml.phtml');
    }
 
