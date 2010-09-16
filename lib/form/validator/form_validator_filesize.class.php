@@ -43,7 +43,12 @@ class Form_Validator_FileSize extends Form_Validator implements Form_Validator_I
          // input text
          case 'Form_Element_File':
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
-
+               foreach ($values as $file){
+                  if($file['size'] > ($this->fileSize*1024)) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(), $this->fileSize));
+                  return false;
+               }
+               }
             } else {
                if($values['size'] > ($this->fileSize*1024)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(), $this->fileSize));

@@ -19,7 +19,6 @@ class Form_Element_File extends Form_Element {
  * @var string
  */
    private $uploadDir = null;
-
    /**
     * Konstruktor elemntu
     * @param string $name -- název elemntu
@@ -39,7 +38,29 @@ class Form_Element_File extends Form_Element {
       if(isset ($_FILES[$this->getName()])) {
       //         $this->values = $_FILES[$this->getName()];
          if($this->isMultiLang() OR $this->isDimensional()) {
+            $dir = new Filesystem_Dir($this->uploadDir);
+            $dir->checkDir();
 
+            $files = array();
+            foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
+               if ($_FILES[$this->getName()]['error'][$key] == UPLOAD_ERR_OK) {
+                  $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"][$key]);
+                  // kontrola adresáře
+                  move_uploaded_file($_FILES[$this->getName()]["tmp_name"][$key],
+                     $dir . $saveFileName);
+                  // vatvoření pole s informacemi o souboru
+                  $files[] = array('name' => $saveFileName,
+                     'path' => $dir,
+                     'size' => $_FILES[$this->getName()]["size"][$key],
+                     'type' => $this->getMimeType($dir . $saveFileName),
+                     'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION));
+               } else if ($_FILES[$this->getName()]['error'][$key] == UPLOAD_ERR_NO_FILE) {
+                  $files[] = false;
+               } else {
+                  $this->creteUploadError($_FILES[$this->getName()]['error'][$key], $_FILES[$this->getName()]['name'][$key]);
+               }
+            }
+            $this->values = $files;
          } else {
             if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_OK) {
                $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"]);
@@ -53,13 +74,13 @@ class Form_Element_File extends Form_Element {
                    'path' => $dir,
                    'size' => $_FILES[$this->getName()]["size"],
                    'type' => $this->getMimeType($dir.$saveFileName),
-                   'extension' => $this->getExtension($saveFileName));
+                   'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION));
 //               array_push($this->values, $file);
             } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
-                  $this->values = null;
-               } else {
-                  $this->creteUploadError($_FILES[$this->getName()]['error'], $_FILES[$this->getName()]['name']);
-               }
+               $this->values = null;
+            } else {
+               $this->creteUploadError($_FILES[$this->getName()]['error'], $_FILES[$this->getName()]['name']);
+            }
          }
       } else {
          $this->values = null;
@@ -152,12 +173,17 @@ class Form_Element_File extends Form_Element {
          $this->html()->addClass('formError');
       }
    // tady bude if při multilang
-      $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'file');
-
       if($this->isDimensional()){
-         $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+         $this->html()->setAttrib('multiple', 'multiple');
+         if($this->dimensional == null){
+            $this->html()->setAttrib('id', $this->getName()."_".$this->renderedId);
+         } else {
+            $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+         }
+         $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']');
       } else {
+         $this->html()->setAttrib('name', $this->getName());
          $this->html()->setAttrib('id', $this->getName());
       }
       $this->html()->setAttrib('value', $this->getUnfilteredValues());
@@ -185,7 +211,14 @@ class Form_Element_File extends Form_Element {
          throw new UnexpectedValueException(sprintf(_('Třídu %s se nepodařilo načíst'),$className), 1);
       }
 
-      $fileObj = new $className($this->values['name'], $this->uploadDir);
+      if(isset($this->values['name'])){// pokud je jeden soubor
+         $fileObj = new $className($this->values['name'], $this->uploadDir);
+      } else {
+         $fileObj = array();
+         foreach ($this->values as $file) {
+            $fileObj[] = new $className($file['name'], $this->uploadDir);
+         }
+      }
       return $fileObj;
    }
 }

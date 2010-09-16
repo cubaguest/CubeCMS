@@ -61,7 +61,12 @@ class Form_Validator_FileType extends Form_Validator implements Form_Validator_I
          // input text
          case 'Form_Element_File':
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
-
+               foreach ($values as $file){
+                  if(!in_array($file['type'], $this->types)) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  return false;
+               }
+               }
             } else {
                if(!in_array($values['type'], $this->types)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));

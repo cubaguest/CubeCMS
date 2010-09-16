@@ -1,13 +1,13 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of form_validate_noemptyclass
+ * Třída formulářového validátoru pro mime typ souboru
  *
- * @author jakub
+ * @copyright  	Copyright (c) 2010 Jakub Matas
+ * @version    	$Id: $ VVE 6.4 $Revision:  $
+ * @author        $Author:  $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
+ * @abstract      Třída validátoru souboru podle mime typu
+ * @todo          Dořešit co se správně uploadovanými soubory
  */
 class Form_Validator_FileMimeType extends Form_Validator implements Form_Validator_Interface {
    /**
@@ -34,13 +34,8 @@ class Form_Validator_FileMimeType extends Form_Validator implements Form_Validat
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $mimes = null;
-      foreach ($this->mimeTypes as $type) {
-         $mimes .= $type.", ";
-      }
-      $mimes = substr($mimes, 0, strlen($mimes)-2);
-
-      $element->addValidationConditionLabel(sprintf(_("soubor typu %s"),$mimes));
+      $element->html()->setAttrib('accept', implode(', ', $this->mimeTypes));
+      $element->addValidationConditionLabel(sprintf(_("soubor typu %s"),  implode(', ', $this->mimeTypes)));
    }
 
    public function validate(Form_Element $elemObj) {
@@ -52,7 +47,12 @@ class Form_Validator_FileMimeType extends Form_Validator implements Form_Validat
          // input text
          case 'Form_Element_File':
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
-
+               foreach ($values as $file){
+                  if(!in_array($file['type'], $this->mimeTypes)) {
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     return false;
+                  }
+               }
             } else {
                if(!in_array($values['type'], $this->mimeTypes)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));

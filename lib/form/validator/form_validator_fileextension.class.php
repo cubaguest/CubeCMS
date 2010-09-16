@@ -53,7 +53,13 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
          // input text
          case 'Form_Element_File':
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
-
+               foreach ($values as $file){
+                  if(!in_array($file['extension'], $this->extensions)) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  $this->isValid = false;
+                  return false;
+               }
+               }
             } else {
                if(!in_array($values['extension'], $this->extensions)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
@@ -66,7 +72,6 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
             break;
       }
       return true;
-
    }
 }
 ?>

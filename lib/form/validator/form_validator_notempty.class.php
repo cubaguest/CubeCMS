@@ -41,7 +41,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
     */
    public function addHtmlElementParams(Form_Element $element) {
       $element->htmlLabel()->addClass(self::$cssClass);
-      $element->html()->addClass(self::$cssClass);
+      $element->html()->setAttrib('required', 'true')->addClass(self::$cssClass);
       $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
    }
 
