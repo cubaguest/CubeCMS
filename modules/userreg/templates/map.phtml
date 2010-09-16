@@ -1,0 +1,16 @@
+<h2 id="contact-map-headline"><?=$this->_('Mapa jak se knám dostanete')?></h2>
+<?
+$url = 'http://maps.google.com/maps/api/staticmap?';
+
+if($this->urlParams != null) {
+   $url .= $this->urlParams;
+}
+
+$url .= '&size=500x300&maptype=roadmap&sensor=false';
+
+if($this->markers != null) {
+   $url .= '&'.$this->markers;
+}
+//echo $url;
+?>
+<div class="contact-map"><img src="<?echo $url?>" alt="<?=$this->_('Mapa')?>"/></div>
