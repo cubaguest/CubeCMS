@@ -150,6 +150,7 @@ class Articles_View extends View {
    }
 
    public function exportArticleHtmlView() {
+      Template_Core::setMainIndexTpl(Template_Core::INDEX_PRINT_TEMPLATE);
       $this->template()->addTplFile('contentdetail.phtml', 'articles');
    }
 
