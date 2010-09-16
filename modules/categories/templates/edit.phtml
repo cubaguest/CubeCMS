@@ -30,7 +30,15 @@ $this->addCssFile("style.css");
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){loadDoc();});
+      $(document).ready(function(){
+         loadDoc();
+         
+            $('#categoryparent_cat').change(function(){
+               if($('#categoryurlkey_<?=  Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->_('Upravit také URL adresu?')?>')){
+                  $('.categoryurlkey_class').val(null);
+               }
+            });
+      });
       $('#categorymodule').change(function(){loadDoc();});
       function loadDoc(){
          $('#moduleNameDoc').load('<?=$this->link()->route('moduleDoc')?>?module='+$('#categorymodule').val()+' .moduleLabel');

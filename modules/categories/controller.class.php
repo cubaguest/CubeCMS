@@ -224,10 +224,11 @@ class Categories_Controller extends Controller {
             if($last !== false){
                $datadir = substr($datadir,$last+1);
             }
-         } else if($form->datadir->getValues() != $cat[Model_Category::COLUMN_DATADIR]) {
+//         } else if($form->datadir->getValues() != $cat[Model_Category::COLUMN_DATADIR]) {
+         } else {
             $datadir = vve_cr_safe_file_name($form->datadir->getValues());
             // pokud byl předtím definován dojde k přesunu
-            if($cat[Model_Category::COLUMN_DATADIR] != null) {
+            if($cat[Model_Category::COLUMN_DATADIR] != $datadir) {
                $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$cat[Model_Category::COLUMN_DATADIR]);
                if($dir->exist()){
                   $dir->rename($datadir);
@@ -284,6 +285,8 @@ class Categories_Controller extends Controller {
          $mInstall->installModule();
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
+//         var_dump($cat);flush();
+//         $this->log('Upravena kategorie "'.$cat[Model_Category::COLUMN_CAT_LABEL][Locales::getDefaultLang()].'"');
          //         $this->link()->route('detail', array('categoryid' => $this->getRequest('categoryid')))->reload();
          $this->link()->route()->reload();
 
@@ -310,6 +313,12 @@ class Categories_Controller extends Controller {
 
       $this->catsToArrayForForm($menu);
       $form->parent_cat->setOptions($this->categoriesArray);
+
+      $elemGoSet = new Form_Element_Checkbox('gotoSettings', $this->_('Přejít na nastavení kategorie'));
+      $elemGoSet->setSubLabel($this->_('Každá kategorie má podle zvoleného modulu další nastavení. Např: modul "articles" má počet článků na stránku.'));
+      $elemGoSet->setValues(true);
+
+      $form->addElement($elemGoSet);
 
       if($form->isValid()) {
          // vygenerování url klíče
@@ -391,9 +400,15 @@ class Categories_Controller extends Controller {
          $mInsClass = ucfirst($form->module->getValues()).'_Install';
          $mInstall = new $mInsClass();
          $mInstall->installModule();
-
+         $this->log('Přidána nová kategorie "'.$names[Locales::getDefaultLang()].'"');
          $this->infoMsg()->addMessage('Kategorie byla uložena');
-         $this->link()->route()->reload();
+//         var_dump($form->gotoSettings->getValues());flush();
+         if($form->gotoSettings->getValues() == true){
+            $this->link()->route('settings', array('categoryid' => $lastId))->reload();
+         } else {
+            $this->link()->route()->reload();
+         }
+
       }
 
       $this->view()->template()->form = $form;
@@ -615,7 +630,7 @@ class Categories_Controller extends Controller {
          $form = null;
       } else {
          $form->addGroup('buttons');
-         $elemSend = new Form_Element_Submit('send', 'Odeslat');
+         $elemSend = new Form_Element_Submit('send', 'Uložit');
          $form->addElement($elemSend, 'buttons');
       }
 
