@@ -26,6 +26,7 @@ class XHR_Respond_VVEAPI extends XHR_Respond {
       }
 
       Template_Output::setOutputType('json');
+      Template_Output::sendHeaders();
       return json_encode($retData);
    }
 }

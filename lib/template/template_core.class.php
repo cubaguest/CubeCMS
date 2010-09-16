@@ -78,8 +78,13 @@ class Template_Core extends Template {
     */
    public function   __toString() {
    // zastavení výpisu buferu
-      ob_start();
-      print(parent::__toString());
+      if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
+         isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
+         ob_start("ob_gzhandler");
+      } else {
+         ob_start();
+      }
+      echo(parent::__toString());
       $contents = ob_get_contents();
 
       //vytvoříme pole css souborů

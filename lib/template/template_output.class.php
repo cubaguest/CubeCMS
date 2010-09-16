@@ -106,13 +106,6 @@ class Template_Output {
 //            self::addHeader("Content-type: application/xhtml+xml");
             break;
       }
-      if(Auth::isLogin()) {
-         self::addHeader( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-         self::addHeader( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-         self::addHeader( 'Cache-Control: no-store, no-cache, must-revalidate' );
-         self::addHeader( 'Cache-Control: post-check=0, pre-check=0', false );
-         self::addHeader( 'Pragma: no-cache' );
-      }
    }
 
    /**
@@ -141,6 +134,15 @@ class Template_Output {
       }
       if(self::$cntLenght !== null) {
          header("Content-Length: ".self::$cntLenght);
+      }
+      if(Auth::isLogin()) {
+         header('Cache-Control: store, no-cache, must-revalidate' );
+         header('Cache-Control: post-check=0, pre-check=0', false );
+         header("Cache-Control: max-age=1, s-maxage=1", false);
+         header("ETag: PUB" . time());
+         header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10) . " GMT");
+         header("Expires: " . gmdate("D, d M Y H:i:s", time() + 5) . " GMT");
+         header("Pragma: no-cache");
       }
    }
    

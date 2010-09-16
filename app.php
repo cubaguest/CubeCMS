@@ -646,7 +646,8 @@ class AppCore {
       $this->coreTpl->countAllSqlQueries = Db_PDO::getCountQueries();
       $this->coreTpl->addTplFile(Template_Core::getMainIndexTpl(), true);
       // render šablony
-      print($this->coreTpl);
+      Template_Output::sendHeaders();
+      echo($this->coreTpl);
    }
 
    /**
@@ -719,6 +720,7 @@ class AppCore {
       $rssCore = new $rssClassName(self::getCategory(), $routes);
 
       $rssCore->runController();
+      Template_Output::sendHeaders();
       $rssCore->runView();
    }
 
@@ -767,6 +769,7 @@ class AppCore {
             $respond = new $class();
             // přenos dat z šablony do dat odeslaných v respond
             $respond->setData($controller->_getTemplateObj()->getTemplateVars());
+//            Template_Output::sendHeaders();
             $respond->renderRespond();
          } else if(in_array(self::$urlRequest->getOutputType(), Template_Output::getHtmlTypes())){
             /*
@@ -895,6 +898,7 @@ class AppCore {
       $pluginName = 'JsPlugin_'.ucfirst(self::$urlRequest->getName());
       $jsPlugin = new $pluginName();
       // vytvoření souboru
+      Template_Output::sendHeaders();
       $jsPlugin->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
               self::$urlRequest->getOutputType());
    }
@@ -931,14 +935,14 @@ class AppCore {
       self::$urlRequest = new Url_Request();
       // zapnutí buferu podle výstupu
       Template_Output::factory(self::$urlRequest->getOutputType());
-      if(!Template_Output::isBinaryOutput()){
-         if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
-            isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
-            ob_start("ob_gzhandler");
-         } else {
-            ob_start();
-         }
-      }
+//      if(!Template_Output::isBinaryOutput()){
+//         if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
+//            isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
+//            ob_start("ob_gzhandler");
+//         } else {
+//            ob_start();
+//         }
+//      }
       // načtení kategorie
       $className = 'Module_'.ucfirst(self::$urlRequest->getCategory()).'_Category';
       if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){
@@ -1030,19 +1034,22 @@ class AppCore {
          //	render šablony
          $this->renderTemplate();
       }
-      if(!Template_Output::isBinaryOutput()){
-         $content = ob_get_contents();
-         // odeslání potřebných hlaviček a délky řetězců
-         Template_Output::setContentLenght(strlen($content));
-      }
+//      if(!Template_Output::isBinaryOutput()){
+//         $content = ob_get_contents();
+//         // odeslání potřebných hlaviček a délky řetězců
+//         Template_Output::setContentLenght(strlen($content));
+//      }
       // odeslání hlaviček
-      Template_Output::sendHeaders();
+//      echo "sendheaders";
+//      Template_Output::sendHeaders();
+//      var_dump(headers_sent());
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_stop_trace')){
          xdebug_stop_trace();
       }
-      if(!Template_Output::isBinaryOutput()){
-         ob_end_flush();
-      }
+//      if(!Template_Output::isBinaryOutput()){
+//         ob_end_flush();
+//         //echo $content;
+//      }
       return true;
    }
 }

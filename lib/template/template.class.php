@@ -281,15 +281,15 @@ class Template {
     * @return string -- vygenerovaný řetězec z šablon
     */
    public function  __toString() {
-      ob_start();
-//      $this->renderTemplate();
+      if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
+        isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
+         ob_start("ob_gzhandler");
+      } else {
+         ob_start();
+      }
       foreach ($this->templateFiles as $file) {
          if(file_exists($file)) {
-//            try {
-               include $file;
-//            } catch (Exception $e) {
-//               new CoreErrors($e);
-//            }
+            include $file;
          }
       }
       $cnt = ob_get_clean();
