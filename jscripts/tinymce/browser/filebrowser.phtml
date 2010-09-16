@@ -207,7 +207,7 @@ $pluginUrl = "http://".$_SERVER['HTTP_HOST'].$str."jsplugin/tinymce/cat-".$_GET[
                   target="upload_target" onsubmit="FileBrowserFilesFunctions.startUpload();"
                   style="display:inline;">
                <label for="newfile">Nahrát soubor:</label>
-               <input id="newfile" name="newf_File" type="file" />
+               <input id="newfile" name="newf_File[]" type="file" multiple="multiple" required="required" />
                <input id="newfileDir" name="newf_Dir" type="hidden" value="" />
                <input id="newfileType" name="newf_ListType" type="hidden" value="" />
                <input type="submit" name="newf_Upload" value="Nahrát" />

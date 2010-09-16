@@ -158,6 +158,7 @@ class JsPlugin_TinyMce extends JsPlugin {
            'root_element' => true,
            'templates_type' => Templates_Model::TEMPLATE_TYPE_TEXT,
            'relative_urls' => true
+//           ,'plugins' => array()
    );
 
 
@@ -279,6 +280,11 @@ class JsPlugin_TinyMce extends JsPlugin {
       if($this->config['relative_urls'] == false){
          $cfgFile->setParam('relative_urls', 'false');
       }
+//      if(!empty ($this->config['plugins'])){
+//         foreach ($this->config['plugins'] as $key => $plg) {
+//            $cfgFile->setParam('plugins['.$key.']', $plg);
+//         }
+//      }
       $this->addFile($cfgFile);
    }
 
@@ -310,8 +316,18 @@ class JsPlugin_TinyMce extends JsPlugin {
       }
       $params['skin'] = $this->getCfgParam('skin');
       $params['skin_variant'] = $this->getCfgParam('skin_variant');
-//'skin' => "o2k7",
-//   'skin_variant' => "black",
+//      if(isset ($_GET['plugins'])){
+//         foreach ($_GET['plugins'] as $plg){
+//            $params['plugins'] .= ','.$plg;
+//            $params['theme_advanced_buttons4'] .= ','.$plg;
+//         }
+//      }
+//      if(isset ($_GET['plugins'])){
+//         foreach ($_GET['plugins'] as $plg){
+//            $params['plugins'] .= ','.$plg;
+//            $params['theme_advanced_buttons4'] .= ','.$plg;
+//         }
+//      }
       return $params;
    }
 
@@ -844,6 +860,7 @@ class JsPlugin_TinyMce extends JsPlugin {
          $form = new Form('newf_');
 
          $file = new Form_Element_File('File');
+         $file->setDimensional();
          $validNoEmpty = new Form_Validator_NotEmpty();
          $file->addValidation($validNoEmpty);
 
