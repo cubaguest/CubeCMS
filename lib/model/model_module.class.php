@@ -38,6 +38,14 @@ class Model_Module extends Model_PDO {
       return $directories;
    }
 
+   public function getModule($name) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
+              ." WHERE ".self::COLUMN_NAME." = :name");
+      $dbst->execute(array(':name' => $name));
+      return $dbst->fetchObject();
+   }
+
    /**
     * Metoda pro provedení sql příkazu (externího)
     * @param string $sql
