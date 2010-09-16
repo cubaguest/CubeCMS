@@ -12,6 +12,7 @@
 class Install_Module {
    const MODULE_INSTALL_DIR = 'install';
    const VERSION_FILE = 'version.txt';
+   const INSTALL_FILE_SQL = 'install.sql';
 
    const FILE_SQL_UPGRADE = 'upgrade_{from}_{to}.sql';
 
@@ -58,7 +59,10 @@ class Install_Module {
     * metoda pro instalaci modulu
     */
    public function install() {
-
+      $file = $this->getSQLFileContent(self::INSTALL_FILE_SQL);
+      if($file != null){
+         $this->runSQLCommand($this->replaceDBPrefix($file));
+      }
    }
 
    /**
@@ -97,7 +101,7 @@ class Install_Module {
       $model->runSQL($SQL);
    }
 
-   protected function getSQLFileContent($file = 'install.sql') {
+   protected function getSQLFileContent($file = self::INSTALL_FILE_SQL) {
       if (file_exists($this->getInstallDir() . $file)) {
          return file_get_contents($this->getInstallDir() . $file);
       } else {
