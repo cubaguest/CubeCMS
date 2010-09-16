@@ -47,14 +47,22 @@ class Model_Users extends Model_PDO {
     * @param string $username -- uživatelské jméno
     */
    public function getUser($username, $blockedUsers = false) {
+      $where = null;
+      if($blockedUsers === false){
+         $where = ' AND user.".self::COLUMN_BLOCKED." = :blocked';
+      }
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT *, grp.name AS gname FROM ".self::getUsersTable()." AS user
              JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP
           ." = grp.".self::COLUMN_ID_GROUP."
-             WHERE (user.".self::COLUMN_USERNAME." = :username AND user.".self::COLUMN_BLOCKED." = :blocked)");
+             WHERE (user.".self::COLUMN_USERNAME." = :username".$where.")");
+
 
       $dbst->bindValue(':username', $username, PDO::PARAM_STR);
-      $dbst->bindValue(':blocked', $blockedUsers, PDO::PARAM_BOOL);
+
+      if($blockedUsers === false){
+         $dbst->bindValue(':blocked', $blockedUsers, PDO::PARAM_BOOL);
+      }
 
       $dbst->execute();
 
