@@ -19,7 +19,7 @@ foreach ($this->panels as $key => $panel) {
    </td>
    <td><?=$panel->{Model_Panel::COLUMN_POSITION}?></td>
    <td>
-      <form method="post" action="<?=$this->link()?>" style="display:inline;">
+      <form method="post" action="<?=$this->link()->clear()?>" style="display:inline;">
          <input type="text" name="panel_position" value="<?=$panel->{Model_Panel::COLUMN_ORDER}?>" style="width: 30px" size="4" />
          <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
          <input type="image" src="<?=vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>"
