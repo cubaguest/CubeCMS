@@ -46,12 +46,16 @@ class Model_Users extends Model_PDO {
     * Metoda načte uživatele podle uživatelského jména
     * @param string $username -- uživatelské jméno
     */
-   public function getUser($username) {
+   public function getUser($username, $blockedUsers = false) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT *, grp.name AS gname FROM ".self::getUsersTable()." AS user
+      $dbst = $dbc->prepare("SELECT *, grp.name AS gname FROM ".self::getUsersTable()." AS user
              JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP
           ." = grp.".self::COLUMN_ID_GROUP."
-             WHERE (user.".self::COLUMN_USERNAME." = ".$dbc->quote($username)." AND user.".self::COLUMN_BLOCKED." = 0)");
+             WHERE (user.".self::COLUMN_USERNAME." = :username AND user.".self::COLUMN_BLOCKED." = :blocked)");
+
+      $dbst->bindValue(':username', $username, PDO::PARAM_STR);
+      $dbst->bindValue(':blocked', $blockedUsers, PDO::PARAM_BOOL);
+
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_OBJ);
