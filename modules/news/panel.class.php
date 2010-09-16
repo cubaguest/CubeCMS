@@ -8,8 +8,8 @@ class News_Panel extends Panel {
       $artM = new Articles_Model_List();
       $this->template()->newArticles = $artM->getList($this->category()->getId(),0,
               $this->panelObj()->getParam('num', self::DEFAULT_NUM));
-      $this->template()->rssLink = $this->link()->route('exportFeed', array('type' => 'rss'));
-		$this->template()->addTplFile("panel.phtml");
+      $this->template()->rssLink = $this->link()->route('feed', array('type' => 'rss'));
+      $this->template()->addTplFile("panel.phtml");
 	}
 
    public static function settingsController(&$settings,Form &$form) {
