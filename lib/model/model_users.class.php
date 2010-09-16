@@ -49,7 +49,7 @@ class Model_Users extends Model_PDO {
    public function getUser($username, $blockedUsers = false) {
       $where = null;
       if($blockedUsers === false){
-         $where = ' AND user.".self::COLUMN_BLOCKED." = :blocked';
+         $where = ' AND user.'.self::COLUMN_BLOCKED.' = :blocked';
       }
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT *, grp.name AS gname FROM ".self::getUsersTable()." AS user
