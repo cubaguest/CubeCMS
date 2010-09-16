@@ -11,7 +11,7 @@
  */
 class Log_Module extends Log {
 
-   public static function msg($message, $module, $categorName = null) {
+   public static function msg($message, $module = null, $categorName = null) {
       self::save('m: '.$module.' cat: '.$categorName.' user: '.Auth::getUserName().' msg: '.$message, 'module');
    }
 }
