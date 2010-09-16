@@ -184,7 +184,8 @@ class Auth {
 							//TODO není dodělána práce s fotkou
 //							$_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
 						}
-						$return = true;
+                  Log::msg(_('Uživatel byl přihlášen'), null, self::$userName);
+                  $return = true;
 					} else {
                   AppCore::getUserErrors()->addMessage(_("Bylo zadáno špatné heslo."));
 					}
@@ -207,7 +208,7 @@ class Auth {
 			self::$login = false;
 			session_destroy();
 			$return = true;
-					
+			Log::msg(_('Uživatel byl odhlášen'), null, self::$userName);
 			$link = new Url_Link();
          $link->reload();
 		}
