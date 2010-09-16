@@ -3,10 +3,9 @@ $jQ = new JsPlugin_JQuery();
 $this->addJsPlugin($jQ);
 ?>
 <h1><?= $this->category()->getName() ?></h1>
-<? if ($this->text != null) {
- ?>
-   <div class="main-content-text"><? echo $this->text->{Text_Model::COLUMN_TEXT} ?></div>
-<? } ?>
+<?if ($this->text != null) {
+ ?><div class="main-content-text"><? echo $this->text;?></div><?
+}?>
 <div class="main-content-form-edit" id="userreg-reg-form">
    <?
    echo $this->formReg; 

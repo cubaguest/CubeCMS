@@ -269,11 +269,11 @@ class UserReg_Controller extends Controller {
    /**
     * controller pro úpravu textu
     */
-   public function editController() {
+   public function editTextController() {
       $this->checkWritebleRights();
       $modelText = new Text_Model();
 
-      $formEdit = new Form('contact_edit');
+      $formEdit = new Form('text_edit');
 
       $elemText = new Form_Element_TextArea('text', $this->_('Text přihlášky'));
       $elemText->addValidation(new Form_Validator_NotEmpty());

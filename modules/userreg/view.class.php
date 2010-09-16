@@ -7,7 +7,7 @@ class UserReg_View extends View {
          $toolbox = new Template_Toolbox2();
 
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('text_edit', $this->_("Upravit text"),
-               $this->link()->route('edit'));
+               $this->link()->route('editText'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit úvodní text'));
          $toolbox->addTool($toolEdit);
 
@@ -38,11 +38,12 @@ class UserReg_View extends View {
     * Viewer pro editaci novinky
     */
    public function editTextView() {
+      $this->headline = $this->_('Úprava úvodního textu');
       $this->template()->addTplFile('edit_text.phtml');
    }
 
    public function editWelcomeView() {
-      $this->headline = $this->_('Úprava uvítacího text');
+      $this->headline = $this->_('Úprava uvítacího textu');
       $this->template()->addTplFile('edit_text.phtml');
    }
 
