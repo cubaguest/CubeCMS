@@ -49,7 +49,8 @@ class Upgrade_Controller extends Controller {
                $instObjName = ucfirst($module['name']).'_Install';
                $instObj = new $instObjName;
 //             $instObj = new Articles_Install();
-               $instObj->update($module['inst_ver'], $module['avail_ver']);
+               $instObj->update();
+//               $instObj->update($module['inst_ver'], $module['avail_ver']);
             }
          }
          $this->infoMsg()->addMessage($this->_('Povýšení proběhlo úspěšně'));
