@@ -94,8 +94,9 @@ class Form implements ArrayAccess, Iterator {
       if($decorator == null) {
          $decorator = new Form_Decorator();
       }
+      $html = clone $this->html();
 
-      $formContent = null;
+         $formContent = null;
       $d = clone $decorator;
       foreach ($this->elementsGroups as $key => $grp) {
          // pokud element není ve skupině
@@ -128,11 +129,11 @@ class Form implements ArrayAccess, Iterator {
          }
       }
       $formContent .= $d->render();
-      $this->html()->addContent(new Html_Element('p', $this->elementCheckForm->controll()));
-      $this->html()->addContent($formContent);
-      $this->html()->addContent($this->scripts());
+      $html->addContent(new Html_Element('p', $this->elementCheckForm->controll()));
+      $html->addContent($formContent);
+      $html->addContent($this->scripts());
 
-      return (string)$this->html();
+      return (string)$html;
    }
 
    /**
