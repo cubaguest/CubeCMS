@@ -769,7 +769,6 @@ class AppCore {
             $respond = new $class();
             // přenos dat z šablony do dat odeslaných v respond
             $respond->setData($controller->_getTemplateObj()->getTemplateVars());
-//            Template_Output::sendHeaders();
             $respond->renderRespond();
          } else if(in_array(self::$urlRequest->getOutputType(), Template_Output::getHtmlTypes())){
             /*
