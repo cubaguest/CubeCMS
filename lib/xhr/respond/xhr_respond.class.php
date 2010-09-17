@@ -15,6 +15,8 @@ class XHR_Respond {
     */
    protected $data = null;
 
+   protected $outputType = 'xhtml';
+
    /**
     * Konstruktor vytváří základní odkaz
     */
@@ -49,7 +51,9 @@ class XHR_Respond {
     * Metoda provede render odpovědi
     */
    public function renderRespond() {
-      print $this;
+      Template_Output::setOutputType($this->outputType);
+      Template_Output::sendHeaders();
+      echo $this;
    }
 }
 ?>
