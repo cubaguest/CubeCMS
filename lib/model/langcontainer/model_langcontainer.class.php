@@ -33,12 +33,20 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
     */
    public function  __set($name,  $value) {
          $matches = array();
-         if (strpos($name,'_') > 3 AND (bool)preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {// jazykové podtržítko je většinou na více jak 3tím znaku
-            if(!isset ($this->values[$matches[1]])
-             OR !($this->values[$matches[1]] instanceof Model_LangContainer_LangColumn)) {
-               $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
+//         if ($name[strlen($name)-3] == '_' AND (bool) preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {// jazykové podtržítko je většinou na 3tím znaku
+         if ($name[strlen($name)-3] == '_') {// jazykové podtržítko je většinou na 3tím znaku
+            $coll = substr($name, 0, strrpos($name, '_'));
+            $lang = substr($name, strrpos($name, '_')+1);
+            if(!isset ($this->values[$coll])
+             OR !($this->values[$coll] instanceof Model_LangContainer_LangColumn)) {
+               $this->values[$coll] = new Model_LangContainer_LangColumn();
             }
-            $this->values[$matches[1]]->addValue($matches[2], $value);
+            $this->values[$coll]->addValue($lang, $value);
+//            if(!isset ($this->values[$matches[1]])
+//             OR !($this->values[$matches[1]] instanceof Model_LangContainer_LangColumn)) {
+//               $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
+//            }
+//            $this->values[$matches[1]]->addValue($matches[2], $value);
          }
       $this->values[$name] = $value;
    }
