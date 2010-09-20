@@ -399,7 +399,7 @@ class Articles_Controller extends Controller {
       $this->view()->allowPrivate = false;
       if($this->category()->getParam('allow_private_zone', false) == true
               AND (Auth::getGroupName() == 'admin' OR
-              $artM->isPrivateUser(Auth::getUserId(), $article->{Articles_Model_Detail::COLUMN_ID}))){
+              $modle->isPrivateUser(Auth::getUserId(), $article->{Articles_Model_Detail::COLUMN_ID}))){
          $this->view()->allowPrivate = true;
       }
    }
