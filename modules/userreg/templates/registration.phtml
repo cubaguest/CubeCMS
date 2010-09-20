@@ -17,9 +17,9 @@ $this->addJsPlugin($jQ);
       var $loader = $('<span />').addClass('imput-loader').append('&nbsp;').css('display' ,'none');
       $loader.append($('<img />').attr('src', 'images/progress_small.gif'));
       var $status = $('<span />').addClass('username-status');
-      $('#regusername').after($status).after($loader);
+      $('.regusername_class').after($status).after($loader);
 
-      $('#regusername').keydown(function(event){
+      $('.regusername_class').keydown(function(event){
 //         alert(event.keyCode);
          if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 116 || event.keyCode == 27 || event.keyCode == 16
             || event.keyCode == 37 || event.keyCode == 39 || event.keyCode == 109  ) {
@@ -31,7 +31,7 @@ $this->addJsPlugin($jQ);
          }
       });
 
-      $('#regusername').keyup(function(event){
+      $('.regusername_class').keyup(function(event){
          var $input = $(this);
          var userName = $(this).val();
          if(userName.length >= 5 && ((event.keyCode >= 48 && event.keyCode <= 90)
@@ -43,7 +43,7 @@ $this->addJsPlugin($jQ);
             $input.removeClass('form-error');
 
             $.ajax({
-               type: "POST", url: "<?= $this->link()->route('checkUserName') ?>",
+               type: "POST", url: "<?= $this->link()->route('checkUserName') ?>", cache: false,
                data: {username: userName},
                success: function(data){
                   $status.html('&nbsp;');
