@@ -73,6 +73,7 @@ class Model_Users extends Model_PDO {
    /**
     * Metoda načte uživatele podle id uživatele
     * @param int $id -- id uživatele
+    * @return Object
     */
    public function getUserById($id) {
       $dbc = new Db_PDO();
@@ -138,7 +139,7 @@ class Model_Users extends Model_PDO {
       return $dbst;
    }
 
-   public function saveUser($username,$name,$surname, $password,$group, $email,$note,$blocked, $id = null) {
+   public function saveUser($username,$name,$surname, $password,$group, $email,$note,$blocked = false, $id = null) {
       $dbc = new Db_PDO();
       if($id === null) {
       // nový uživatel
@@ -172,9 +173,10 @@ class Model_Users extends Model_PDO {
       $dbst->bindValue(':mail', $email);
       $dbst->bindValue(':note', $note);
       $dbst->bindValue(':blocked', $blocked, PDO::PARAM_BOOL);
-
       $dbst->execute();
-      return $dbst;
+
+      if($id == null) $id = $dbc->lastInsertId();
+      return (int)$id;
    }
 
    /**
