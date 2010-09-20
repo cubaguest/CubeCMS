@@ -330,7 +330,7 @@ class UserReg_Controller extends Controller {
    public function checkUserNameController($username = null) {
       $this->checkReadableRights();
 
-      if($username == null) $username = $_POST['username'];
+      if($username === null) $username = $_POST['username'];
 
       $modelUsers = new Model_Users();
       $modelQueue = new UserReg_Model_Queue();
