@@ -37,14 +37,14 @@ class Form_Element_TextArea extends Form_Element_Text {
             $this->html()->setAttrib('lang', $langKey);
             if($this->isDimensional()){
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional.'_'.$langKey);
-               $container->setAttrib('id', $this->getName()."_".$this->dimensional.'_container_'.$langKey);
+               $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_'.$langKey);
+               $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
 //               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
                $this->html()->addContent(htmlspecialchars($values[$this->dimensional][$langKey]));
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
-               $container->setAttrib('id', $this->getName().'_container_'.$langKey);
+               $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId.'_'.$langKey);
+               $container->setAttrib('id', $this->getName().'_'.$this->renderedId.'_container_'.$langKey);
                $this->html()->addContent(htmlspecialchars($values[$langKey]));
             }
             $container->addClass(Form_Element::$cssClasses['elemContainer']);
@@ -56,10 +56,11 @@ class Form_Element_TextArea extends Form_Element_Text {
       } else {
          if($this->isDimensional()){
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-            $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
          } else {
             $this->html()->setAttrib('name', $this->getName());
-            $this->html()->setAttrib('id', $this->getName());
+            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+            $this->renderedId++;
          }
          $this->html()->clearContent(); // vymazání obsahu elementu jinak se duplikuje
          if(is_array($values) AND isset($values[$this->dimensional])) {

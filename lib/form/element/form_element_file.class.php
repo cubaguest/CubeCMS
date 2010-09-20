@@ -179,13 +179,14 @@ class Form_Element_File extends Form_Element {
          if($this->dimensional == null){
             $this->html()->setAttrib('id', $this->getName()."_".$this->renderedId);
          } else {
-            $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
          }
          $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']');
       } else {
          $this->html()->setAttrib('name', $this->getName());
-         $this->html()->setAttrib('id', $this->getName());
+         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
       }
+      $this->renderedId++;
       $this->html()->setAttrib('value', $this->getUnfilteredValues());
       return $this->html();
    }

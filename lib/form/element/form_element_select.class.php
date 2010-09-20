@@ -78,16 +78,16 @@ class Form_Element_Select extends Form_Element {
          } else {
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
          }
-         $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
       } else {
-         $this->html()->setAttrib('id', $this->getName());
+         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
          if($this->isMultiple) {
             $this->html()->setAttrib('name', $this->getName().'[]');
          } else {
             $this->html()->setAttrib('name', $this->getName());
          }
-         
       }
+      $this->renderedId++;
       
       if($this->isMultiple) {
          $this->html()->setAttrib('multiple', 'multiple');

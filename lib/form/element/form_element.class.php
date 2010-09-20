@@ -488,11 +488,11 @@ class Form_Element implements Form_Element_Interface {
          $cnt = $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             if($this->isDimensional()) {
-               $elem->setAttrib('for', $this->getName()."_".$this->dimensional.'_'.$langKey);
+               $elem->setAttrib('for', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_'.$langKey);
                $elem->setAttrib('id', $this->getName()."_".$this->dimensional.'_label_'.$langKey);
                $elem->setAttrib('lang', $langKey);
             } else {
-               $elem->setAttrib('for', $this->getName().'_'.$langKey);
+               $elem->setAttrib('for', $this->getName().'_'.$this->renderedId.'_'.$langKey);
                $elem->setAttrib('id', $this->getName().'_label_'.$langKey);
                $elem->setAttrib('lang', $langKey);
             }
@@ -501,9 +501,9 @@ class Form_Element implements Form_Element_Interface {
          return $cnt;
       } else {
          if(!$this->isDimensional()) {
-            $elem->setAttrib('for', $this->getName());
+            $elem->setAttrib('for', $this->getName().'_'.$this->renderedId);
          } else {
-            $elem->setAttrib('for', $this->getName()."_".$this->dimensional);
+            $elem->setAttrib('for', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
          }
       }
       return (string)$elem;
@@ -536,12 +536,12 @@ class Form_Element implements Form_Element_Interface {
             $container = new Html_Element('p', $this->html());
             if($this->isDimensional()) {
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional.'_'.$langKey);
+               $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_'.$langKey);
                $this->html()->setAttrib('value', htmlspecialchars($values[$this->dimensional][$langKey]));
-               $container->setAttrib('id', $this->getName()."_".$this->dimensional.'_container_'.$langKey);
+               $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName().'_'.$langKey);
+               $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId.'_'.$langKey);
                $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             }
@@ -554,7 +554,7 @@ class Form_Element implements Form_Element_Interface {
       } else {
          if($this->isDimensional()) {
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-            $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
             if(is_array($values) AND isset($values[$this->dimensional])) {
                $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
             } else {
@@ -562,9 +562,10 @@ class Form_Element implements Form_Element_Interface {
             }
          } else {
             $this->html()->setAttrib('name', $this->getName());
-            $this->html()->setAttrib('id', $this->getName());
+            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
             $this->html()->setAttrib('value', htmlspecialchars((string)$values));
          }
+         $this->renderedId++;
          return $this->html();
       }
    }

@@ -75,10 +75,10 @@ class Form_Element_Checkbox extends Form_Element {
    public function controll() {
       if($this->isDimensional()) {
          $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-         $this->html()->setAttrib('id', $this->getName()."_".$this->dimensional);
+         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
       } else {
          $this->html()->setAttrib('name', $this->getName());
-         $this->html()->setAttrib('id', $this->getName());
+         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
       }
 
       $values = $this->getUnfilteredValues();
@@ -93,11 +93,11 @@ class Form_Element_Checkbox extends Form_Element {
 
       $l = new Html_Element('label', $this->getLabel());
       if($this->isDimensional()) {
-         $l->setAttrib('for', $this->getName()."_".$this->dimensional);
+         $l->setAttrib('for', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
       } else {
-         $l->setAttrib('for', $this->getName());
+         $l->setAttrib('for', $this->getName().'_'.$this->renderedId);
       }
-
+      $this->renderedId++;
       return $this->html();
    }
 }
