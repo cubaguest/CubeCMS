@@ -130,8 +130,8 @@ class Model_ORM extends Model_PDO {
     * @param string $collname -- název sloupce
     */
    protected function setPk($collname) {
-      $this->pKey = &$this->tableStructure[$collname];
-      $this->pKey['pk'] = true;
+      $this->pKey = $collname;
+      $this->tableStructure[$collname]['pk'] = true;
    }
 
    /**
@@ -173,7 +173,7 @@ class Model_ORM extends Model_PDO {
             $record = $this->getRow(array($pk => $value), $order);
       } else if($pk !== null) {
          // jenom pk
-         $record = $this->getRow(array($this->pKey['name'] => $pk), $order);
+         $record = $this->getRow(array($this->pKey => $pk), $order);
       } else {
          // čistý record
          $record = new Model_ORM_Record($this->tableStructure);
@@ -350,11 +350,11 @@ class Model_ORM extends Model_PDO {
       if($pk instanceof Model_ORM_Record){
          // asi vatáhnout pk (bude muset být uloženo v rekordu)
          $dbst = $dbc->prepare('DELETE FROM '.$this->getTableName()
-            .' WHERE `'.$this->pKey['name'].'` = :pk');
-         $dbst->bindValue(':pk', $pk->getPK(), $this->pKey['pdoparam']);
+            .' WHERE `'.$this->pKey.'` = :pk');
+         $dbst->bindValue(':pk', $pk->getPK(), $this->tableStructure[$this->pKey]['pdoparam']);
       } else {
          $dbst = $dbc->prepare('DELETE FROM '.$this->getTableName()
-            .' WHERE `'.$this->pKey['name'].'` = :pk');
+            .' WHERE `'.$this->pKey.'` = :pk');
          $dbst->bindParam(':pk', $pk, $this->tableStructure[$this->pKey]['pdoparam']);
       }
       return $dbst->execute();
