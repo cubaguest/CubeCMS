@@ -426,6 +426,9 @@ a.form-link-lang-sel {
 .main-content-tools {
    text-align: right;
 } /* linky u článku, řazení, archiv*/
+.main-content-note {} /* poznámka */
+.main-content-dates {} /* datumy */
+.main-content-other {} /* ostatní */
 .main-content-image {} /* obrázek v hlavním obsahu */
 .main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
 .main-content-text {} /* text v hlavním obsahu */
@@ -452,8 +455,14 @@ a.form-link-lang-sel {
 /* EOF main content NEW!!! */
 
 /* SOF panel content NEW!!! */
-.panel-box-label {}
-.panel-box-content {}
+.panel-box {}
+.panel-box-label {
+   font-weight: bold;
+}
+.panel-box-content {
+   border: 1px solid gray;
+   padding: 2px;
+}
 .panel-box-content-image {}
 .panel-box-link-more {
    text-align: right;
@@ -461,24 +470,12 @@ a.form-link-lang-sel {
 
 /* EOF panel content NEW!!! */
 
-/* SOF Panels Content */
-div.panel {
-   background-color: #cfcfd0;
-   border: 1px solid #006666;
-   margin-bottom: 10px;
+/* SOF Article tools */
+.article-tools {
+   border-top: 1px solid gray;
+   margin-top: 1em;
 }
-div.panel p.panelLabel {
-   font-weight: bold;
-}
-
-div.panel p.panelLabel img {
-   height: 16px;
-}
-
-div.panelLeft .panelLinkMore,div.panelRight .panelLinkMore {
-   text-align:right;
-}
-/* EOF Panels Content */
+/* EOF Article tools */
 
 /* SOF Sitemap Content */
 .sitemapList li {
