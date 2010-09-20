@@ -17,9 +17,14 @@
    padding-bottom: 2px;
 }
 
-.mail-content {
-   height: 250px;
+* html div.mail-recipients, * html div.mail-content {
+   height: expression( this.scrollHeight > 250 ? "250px" : "auto" ); /* sets max-height for IE */
+}
+div.mail-recipients, div.mail-content {
+   max-height: 250px; /* sets max-height value for all standards-compliant browsers */
    overflow: auto;
+   background-color: #e9e8e8;
+   padding: 3px;
 }
 .mail-tools {
    margin: 0.3em 0;
