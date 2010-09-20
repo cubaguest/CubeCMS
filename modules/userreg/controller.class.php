@@ -215,7 +215,18 @@ class UserReg_Controller extends Controller {
       } else {
          $modelUsers = new Model_Users();
 
-         $modelUsers->saveUser($data->{UserReg_Model_Queue::COLUMN_USERNAME},
+         $username = $data->{UserReg_Model_Queue::COLUMN_USERNAME};
+         $count = 1;
+         while ($modelUsers->getUser($username) != false){
+            $username = (string)$data->{UserReg_Model_Queue::COLUMN_USERNAME}.$count;
+            $count++;
+            if($count > 100){
+               $this->errMsg()->addMessage($this->_('Toto uživatelské jméno a všech jeho 100 podob je již obsazeno. Vyplňte prosím znovu registraci s jiným uživatelským jménem.'));
+               return;
+            }
+         }
+
+         $modelUsers->saveUser($username,
             $data->{UserReg_Model_Queue::COLUMN_NAME}, $data->{UserReg_Model_Queue::COLUMN_SURNAME},
             $data->{UserReg_Model_Queue::COLUMN_PASS}, $this->category()->getParam(self::PARAM_TARGET_ID_GROUP),
             $data->{UserReg_Model_Queue::COLUMN_MAIL}, $data->{UserReg_Model_Queue::COLUMN_PHONE_NUMBER}, false);
