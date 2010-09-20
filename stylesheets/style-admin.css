@@ -117,31 +117,19 @@ ul.dropdown li:hover > ul { visibility: visible; }
  .toolbox-tool {
     line-height: 16px;
 }
-
  input.toolbox-tool-button {
     vertical-align: 2px;
     padding: 0;
 }
-
 .toolbox-active-content {
    background-color: #f0efef;
-/*   border: 2px solid gray;*/
 }
-
 /* EOF Panel s editací */
-
 /* Jazykové taby */
 /* TABS content */
 .ui-tabs-hide { display: none; }
-
 .ui-tabs-selected { background-color: white; }
-
-ul.langMenu {
-   margin-bottom:2px;
-   /*background-color: white;*/
-}
-
-
+ul.langMenu {margin-bottom:2px;}
 ul.langMenu li {
    display: inline;
    border-width: 1px 1px 0 1px;
@@ -149,15 +137,13 @@ ul.langMenu li {
    border-style: solid;
    padding: 3px;
 }
-
 ul.langMenu li a img {
    padding-right: 3px;
 }
 
-.normal ul {
+/*.normal ul {
    margin: 0;
-}
-
+}*/
 
 ul.ui-tabs-panel {
    margin-bottom: 0px;
@@ -165,23 +151,50 @@ ul.ui-tabs-panel {
    border-color: black;
    border-style: none;
 }
-
-.contentBox {
-   position: relative;
-}
 /* EOF Jazykové taby */
-
 /* tabulky */
 .valuesTable {
    background-color: white;
    border: 1px solid gray;
 }
-
 /* donastavení kontentu při editaci */
 .main-content-text {
    min-height: 40px;
    min-height:40px;
   height:auto !important;
   height:40px;
-
 } /* text v hlavním obsahu */
+
+ul.module-navigation {
+   border-bottom: 1px solid silver;
+   padding:4px 5px;
+   margin-bottom: 5px;
+}
+li.module-navigation-tab {
+   display: inline;
+   font-weight: bold;
+   font-size: 10px;
+}
+li.module-navigation-tab a {
+   color:#000000;
+   padding-top:4px;
+   position:relative;
+   top:1px;
+   background-color:#e3e3e3;
+   border-color: #989FA9;
+   border-style:solid solid none;
+   border-width:1px;
+   color:#666666;
+   margin-right:0;
+   padding:3px 4px;
+   text-decoration:none;
+}
+li.module-navigation-tab a img {
+   top: 5px;
+   position: relative;
+   margin-right: 4px;
+}
+li.module-navigation-tab-selected a {
+   border-bottom:1px solid #FFFFFF;
+   background-color:#FFFFFF;
+}
