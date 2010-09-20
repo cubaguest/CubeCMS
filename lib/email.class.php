@@ -65,7 +65,7 @@ class Email {
     * @param string $from -- adresa pro odesílání
     * @return Email -- vrací sebe
     */
-   public function setFrom($address, $name) {
+   public function setFrom($address, $name=null) {
       $this->message->setFrom($address, $name);
       return $this;
    }
