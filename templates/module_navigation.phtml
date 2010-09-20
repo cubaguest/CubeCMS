@@ -1,0 +1,19 @@
+<ul class="module-navigation">
+<?
+$curLink = new Url_Link();
+$curLink = (string)$curLink;
+foreach ($this->items as $name => $link) {
+   $icon = null;
+   if(is_array($link)){
+      $icon = $link['icon'];
+      $link = $link['link'];
+   }
+   ?>
+   <li class="module-navigation-tab <?if($curLink == (string)$link) echo 'module-navigation-tab-selected';?>"
+       ><a href="<?=$link?>" title="<?=_('Přejít na').' '.$name?>"><?
+   if($icon != null){?><img src="<?=vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>"
+               alt="icon <?=$icon?>" /><?}?><?=$name?></a></li>
+<?
+}
+?>
+</ul>
