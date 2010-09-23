@@ -19,11 +19,14 @@ class Component_JqGrid_FormRequest extends Object implements ArrayAccess, Counta
    private $ids = array();
    private $requestData = null;
 
+   private $index = null;
+
    public function __construct() {
       if (isset($_POST[self::REQUEST_TYPE])) {
          $this->isRequest = true;
          $this->type = $_POST[self::REQUEST_TYPE];
          $this->requestData = $_POST;
+         $this->checkDataTypes();
          unset($this->requestData[self::REQUEST_TYPE]);
       }
    }
@@ -117,23 +120,35 @@ class Component_JqGrid_FormRequest extends Object implements ArrayAccess, Counta
     */
    public function rewind() {
       reset($this->requestData);
-    }
+   }
 
-    public function current() {
+   public function current() {
       return current($this->requestData);
-    }
+   }
 
-    public function key() {
+   public function key() {
       return key($this->requestData);
-    }
+   }
 
-    public function next() {
+   public function next() {
       next($this->requestData);
-    }
+   }
 
-    public function valid() {
-        return $this->current() !== false;
-    }
+   public function valid() {
+      return ! is_null(key($this->requestData));
+   }
+
+   private function checkDataTypes() {
+      foreach ($this->requestData as $key => $data) {
+         if(ctype_digit($data)){
+            $this->requestData[$key] = (int)$data;
+         } else if($data == 'true'){
+            $this->requestData[$key] = true;
+         } else if($data == 'false'){
+            $this->requestData[$key] = false;
+         } 
+      }
+   }
 
 }
 ?>
