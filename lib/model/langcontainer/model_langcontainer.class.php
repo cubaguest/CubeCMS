@@ -140,7 +140,7 @@ class Model_LangContainer implements ArrayAccess, Countable, Iterator {
     }
 
     public function valid() {
-        return $this->current() !== false;
+       return ! is_null(key($this->values));
     }
 }
 ?>
