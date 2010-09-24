@@ -91,8 +91,13 @@ class Text_Controller extends Controller {
          $form->label->setValues($text->{Text_Model_Detail::COLUMN_LABEL});
       }
 
-      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $submit = new Form_Element_SaveCancel('send');
       $form->addElement($submit);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()){
          try {
@@ -127,8 +132,13 @@ class Text_Controller extends Controller {
          $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
       }
 
-      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $submit = new Form_Element_SaveCancel('send');
       $form->addElement($submit);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()){
          try {
@@ -195,8 +205,13 @@ class Text_Controller extends Controller {
 
       $form->addElement($elemUsers, $grpAccess);
 
-      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $submit = new Form_Element_SaveCancel('send');
       $form->addElement($submit);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()){
          $id = $model->saveText($form->text->getValues(), null,
