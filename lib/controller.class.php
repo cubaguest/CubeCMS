@@ -419,19 +419,15 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
       } else if(method_exists($this->view(), $actionName.'View')) {
          $viewName = $actionName.'View';
       }
-//      else {
-//         trigger_error(sprintf(_("Action Viewer \"%sView\" nebo \"%s\" v modulu \"%s\" nebyl implementován"),
-//                 $actionName, $actionName.ucfirst($outputType).'View', $this->module()->getName()));
-//      }
-
       // spuštění Viewru
-      if($this->{$actionName.'Controller'}() !== false AND $viewName != null) {
-         // pokud je kontrolel v pořádku spustíme view
-         $this->view()->{$viewName}();
-      } else {
-//         AppCore::setErrorPage(true);
-//         return false;
+      if($this->{$actionName.'Controller'}() === false) {
+         return false;
       }
+      // pokud je kontrolel v pořádku spustíme view
+      if($viewName != null){
+         $this->view()->{$viewName}();
+      }
+      return true;
    }
 
    /**
