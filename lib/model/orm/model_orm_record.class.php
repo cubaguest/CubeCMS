@@ -14,13 +14,20 @@
 class Model_ORM_Record {
    protected $columns = array();
 
+   protected $externColumns = array();
+
    protected $pKeyValue = null;
 
    protected $fromDb = false;
 
    public function  __construct($columns, $fromDb = false) {
-      $this->columns = $columns;
       $this->fromDb = $fromDb;
+      if($fromDb == true){
+         foreach ($columns as &$col) {
+            unset ($col['valueLoaded']);
+         }
+      }
+      $this->columns = $columns;
    }
 
    /**
@@ -29,23 +36,33 @@ class Model_ORM_Record {
     * @param <type> $value
     */
    public function  __set($collName, $value) {
-      if($this->columns[$collName]['lang'] == true){
-         if (preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {
+      if(!isset ($this->columns[$collName])){
+         // tady detekce jazyka
+
+         $this->externColumns[$collName] = $value; // externí sloupce, např. s joinů
+
+//         if (preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {
 //            if(!isset ($this->values[$matches[1]])
 //             OR !($this->values[$matches[1]] instanceof Model_LangContainer_LangColumn)) {
 //               $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
 //            }
 //            $this->values[$matches[1]]->addValue($matches[2], $value);
-         }
+//         }
       } else {
-         // tady kontroly sloupců
-         if($this->fromDb == true){
+         // tady kontroly sloupců a přetypování na správné hodnoty
+         if($this->fromDb == true AND !isset ($this->columns[$collName]['valueLoaded'])){
+            if($this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL){
+               $value = (bool)$value;
+            } else if($this->columns[$collName]['pdoparam'] == PDO::PARAM_INT){
+               $value = (int)$value;
+            }
+
             $this->columns[$collName]['valueLoaded'] = $value;
          }
          $this->columns[$collName]['value'] = $value;
-      }
-      if($this->columns[$collName]['pk'] == true){// primary key
-         $this->pKeyValue = $value;
+         if($this->columns[$collName]['pk'] == true){// primary key (jazykové nejsou pk)
+            $this->pKeyValue = $value;
+         }
       }
    }
 
@@ -56,7 +73,12 @@ class Model_ORM_Record {
     */
    public function  __get($collName) {
       // tady kontroly sloupců
-      return $this->columns[$collName]['value'];
+      if(isset ($this->columns[$collName])){
+         return $this->columns[$collName]['value'];
+      } else if(isset ($this->externColumns[$collName])){
+         return $this->externColumns[$collName];
+      }
+      return null;
    }
 
    public function getPK() {
@@ -76,6 +98,20 @@ class Model_ORM_Record {
          return true;
       }
       return false;
+   }
+
+   public function mapArray($array) {
+//      var_dump($array);flush();
+      foreach ($array as $column => $value) {
+//         echo "col: ".$column.' val: '.$value.', ';
+         // zde asij kontroly typů
+         if(is_array($value) OR is_object($value)){
+            $value = serialize($value);
+         }
+         if(isset ($this->columns[$column])){
+            $this->columns[$column]['value'] = $value;
+         }
+      }
    }
 }
 ?>
