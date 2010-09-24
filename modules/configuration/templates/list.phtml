@@ -1,11 +1,9 @@
 <?
 $model = new Model_Config();
 $list = $model->getList();
-
 ?>
-<div>
-   <?//sekce?>
-   <h2><?=$this->_("Struktura stránek")?></h2>
+<h1><?=$this->category()->getName();?></h1>
+<div class="main-content-list">
    <div id="sections">
       <table class="valuesTable">
          <tr>

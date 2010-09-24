@@ -1,27 +1,17 @@
 <div>
 <?
 // do titulku
-   $this->addPageTitle($this->_('úprava volby'));
-   $this->addPageTitle($this->option->{Model_Config::COLUMN_KEY});
-   $this->addPageHeadline($this->_('úprava volby'));
-   $this->addPageHeadline($this->option->{Model_Config::COLUMN_KEY});
-// donastavení formuláře
-//$this->form->priority->html()->setAttrib('size', 4);
-//
-//$this->form->module->htmlSubLabel()->addContent('<br /><p id="moduleNameDoc"></p>', true);
-//$this->form->moduleParams->htmlSubLabel()->addContent('<br /><a id="getModuleParams" href="">doc</a><p id="moduleDoc"></p>', true);
-
-//$this->addJsPlugin(new JsPlugin_JQuery());
+$h = $this->_('úprava volby').' '.$this->option->{Model_Config::COLUMN_KEY};
+$this->addPageTitle($h);
 ?>
-
-<p><?=$this->option->{Model_Config::COLUMN_LABEL}?></p>
-<?=$this->form?>
+<h1><?=$h?></h1>
+<div class="main-content-form-edit">
+   <?=$this->form?>
+</div>
 
 
 <script type="text/javascript">
    /* <![CDATA[ */
    /* ]]> */
 </script>
-
-<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
 </div>

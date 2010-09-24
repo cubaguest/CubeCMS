@@ -67,8 +67,13 @@ class Configuration_Controller extends Controller {
       }
       $form->addElement($elem);
       
-      $submit = new Form_Element_Submit('send', $this->_('Odeslat'));
-      $form->addElement($submit);
+      $submitButton = new Form_Element_SaveCancel('send');
+      $form->addElement($submitButton);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()){
          $saveValue = null;
