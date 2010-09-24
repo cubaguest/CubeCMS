@@ -320,6 +320,7 @@ class Url_Link {
          } else {
             header("Location: ".(string)$link, true, $code);
          }
+         Template_Output::sendHeaders();
          exit;
       } else {
          throw new Exception(_("Hlavičky stránky byly již odeslány"));
