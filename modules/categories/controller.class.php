@@ -181,6 +181,11 @@ class Categories_Controller extends Controller {
          $form->addElement($elemDelIcon, 'settings');
       }
 
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+
       // odeslání formuláře
       if($form->isValid()) {
          // vygenerování url klíče
@@ -319,6 +324,10 @@ class Categories_Controller extends Controller {
       $elemGoSet->setValues(true);
 
       $form->addElement($elemGoSet);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()) {
          // vygenerování url klíče
@@ -569,7 +578,9 @@ class Categories_Controller extends Controller {
 
 
       // tlačítko odeslat
-      $submitButton = new Form_Element_Submit('send', $this->_('Uložit'));
+//      $submitButton = new Form_Element_Submit('send', $this->_('Uložit'));
+//      $form->addElement($submitButton);
+      $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
 
       return $form;
