@@ -729,6 +729,7 @@ class AppCore {
     */
    public function runModuleOnly() {
       if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_REQUEST) {
+         ob_start();
          // spuštění modulu
          try {
             if(!self::getCategory() instanceof Category_Core OR self::getCategory()->getCatDataObj() == null) {
@@ -758,7 +759,7 @@ class AppCore {
             }
             //					Vytvoření objektu kontroleru
             $controller = new $controllerClassName(self::getCategory(), $routes);
-            $controller->runCtrlAction($routes->getActionName(), self::$urlRequest->getOutputType());
+            $ret =  $controller->runCtrlAction($routes->getActionName(), self::$urlRequest->getOutputType());
          } catch (Exception $e ) {
             new CoreErrors($e);
             return false;
@@ -784,6 +785,12 @@ class AppCore {
                $this->renderTemplate();
             }
          }
+         Template_Output::sendHeaders();
+         ob_end_flush();
+//         if(VVE_DEBUG_LEVEL > 2 AND !CoreErrors::isEmpty()){
+//            var_dump(CoreErrors::getErrors());
+//         }
+         return $ret;
       } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST) {
          // načtení a kontrola cest u modulu
          $className = ucfirst(self::$urlRequest->getName()).'_Controller';
