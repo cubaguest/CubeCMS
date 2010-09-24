@@ -9,7 +9,7 @@
  * @abstract 		Třída s modelem pro práci s uživateli
  */
 
-class Model_Users extends Model_PDO {
+class Model_Users extends Model_ORM {
 /**
  * Název tabulky s uživateli
  */
@@ -33,7 +33,7 @@ class Model_Users extends Model_PDO {
    const COLUMN_MAIL       = 'mail';
    const COLUMN_NOTE       = 'note';
    const COLUMN_BLOCKED    = 'blocked';
-   const COLUMN_FOTO_FILE  = 'foto_file';
+   const COLUMN_FOTO_FILE  = 'foto_file'; // dyť není v db?
    const COLUMN_DELETED    = 'deleted';
 
 
@@ -41,6 +41,25 @@ class Model_Users extends Model_PDO {
    const COLUMN_GROUP_ID    = 'id_group';
    const COLUMN_GROUP_NAME    = 'gname';
    const COLUMN_GROUP_LABEL    = 'label';
+
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_us');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_USERNAME, array('datatype' => 'varchar(50)', 'nn' => true, 'uq' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PASSWORD, array('datatype' => 'varchar(50)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_SURNAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_BLOCKED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_DELETED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_FOTO_FILE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
+
+      $this->setPk(self::COLUMN_ID);
+      $this->addForeignKey('tgroups', self::COLUMN_ID_GROUP, 'Model_Groups');
+   }
 
    /**
     * Metoda načte uživatele podle uživatelského jména
@@ -123,6 +142,39 @@ class Model_Users extends Model_PDO {
           ." ORDER BY users.".self::COLUMN_ID);
       $dbst->execute();
       return $dbst;
+   }
+
+   public function getCount($idgrp = null){
+      $dbc = new Db_PDO();
+      $sql = "SELECT COUNT(*) FROM ".$this->getUsersTable();
+      if($idgrp !== null) $sql .= " WHERE ".self::COLUMN_ID_GROUP." = :idGrp";
+      $dbst = $dbc->prepare($sql);
+      $dbst->execute(array(':idGrp' => $idgrp));
+      $count = $dbst->fetch();
+      return $count[0];
+   }
+
+   public function getUsers($fromRow = 0 , $rows = 1000, $orderCol = self::COLUMN_ID, $order = 'ASC', $idgrp = null) {
+      $this->isValidColumn($orderCol, array(self::COLUMN_ID, self::COLUMN_NAME, self::COLUMN_SURNAME, self::COLUMN_USERNAME,
+         self::COLUMN_MAIL, self::COLUMN_NOTE, self::COLUMN_BLOCKED));
+      $this->isValidOrder($order);
+
+      $dbc = new Db_PDO();
+
+      $sql = "SELECT tu.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tu";
+      if($idgrp !== null) $sql .=" WHERE ".self::COLUMN_ID_GROUP." = :idGrp"; // GRP
+      $sql .=" ORDER BY `".strtoupper($orderCol)."` ".strtoupper($order).", ".self::COLUMN_ID." ASC"
+      ." LIMIT :fromRow, :rows";
+
+      $dbst = $dbc->prepare($sql);
+
+      if($idgrp !== null) $dbst->bindValue(':idGrp', (int)$idgrp, PDO::PARAM_INT); // GRP
+
+      $dbst->bindValue(':fromRow', (int)$fromRow, PDO::PARAM_INT);
+      $dbst->bindValue(':rows', (int)$rows, PDO::PARAM_INT);
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->execute();
+      return $dbst->fetchAll();
    }
 
    /**

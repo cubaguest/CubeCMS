@@ -67,20 +67,26 @@ class Model_Category extends Model_PDO {
       $dbc = new Db_PDO();
       if($catKey != null) {
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
-         ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
-         .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+         ." JOIN ".Model_Rights::getRightsTable()." AS rights"
+         //." ON rights.".Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+         ." USING (".self::COLUMN_CAT_ID.")"
              ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
-             ." AND (cat.".self::COLUMN_ACTIVE." = 1) AND (cat.".self::COLUMN_URLKEY.'_'.Locales::getLang()
-             ." = :catkey OR cat.".self::COLUMN_URLKEY.'_'.Locales::getDefaultLang()
-             ." = :catkey2) LIMIT 0, 1");
+             ." AND (cat.".self::COLUMN_ACTIVE." = 1)"
+         // zde se načíta kategorie podle url, pokud není tak se použije def lang
+             ." AND (cat.".self::COLUMN_URLKEY.'_'.Locales::getLang()." = :catkey"
+//             ." OR cat.".self::COLUMN_URLKEY.'_'.Locales::getDefaultLang()." = :catkey2"
+            .")"
+         
+         ." LIMIT 0, 1");
 
          $dbst->bindValue(":catkey", $catKey);
-         $dbst->bindValue(":catkey2", $catKey);
+         //$dbst->bindValue(":catkey2", $catKey);
          $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
       } else {
             $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
-         ." JOIN ".Model_Rights::getRightsTable()." AS rights ON rights."
-         .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+         ." JOIN ".Model_Rights::getRightsTable()." AS rights"
+         //." ON rights.".Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
+         ." USING (".self::COLUMN_CAT_ID.")"
          ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
          ." ORDER BY cat.".self::COLUMN_PRIORITY." DESC LIMIT 0, 1");
       

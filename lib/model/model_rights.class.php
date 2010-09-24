@@ -9,7 +9,7 @@
  * @abstract 		Třída s modelem pro práci s uživateli
  */
 
-class Model_Rights extends Model_PDO {
+class Model_Rights extends Model_ORM {
 /**
  * Název tabulky s uživateli
  */
@@ -23,6 +23,18 @@ class Model_Rights extends Model_PDO {
    const COLUMN_ID_CATEGORY   = 'id_category';
    const COLUMN_ID_GROUP   = 'id_group';
    const COLUMN_RIGHT   = 'right';
+
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_r');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_RIGHT, array('datatype' => 'varchar(3)', 'pdoparam' => PDO::PARAM_STR, 'default' => '---')); // měl by být enum
+
+      $this->setPk(self::COLUMN_ID);
+      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');
+   }
 
    /**
     * Metoda načte kategori, pokud je zadán klíč je načtena určitá, pokud ne je
