@@ -36,7 +36,7 @@ class Form implements ArrayAccess, Iterator {
     * Proměná obsahuje jestli byl formulář odeslán
     * @var boolean
     */
-   private $isSend = false;
+   private $isSend = null;
 
    /**
     * Jestli byl formulář naplněn
@@ -67,6 +67,9 @@ class Form implements ArrayAccess, Iterator {
     * @var Form_Element_Hidden
     */
    private $elementCheckForm = null;
+
+   private $submitElement = null;
+
 
    /**
     * Konstruktor vytváří objekt formuláře
@@ -307,6 +310,17 @@ class Form implements ArrayAccess, Iterator {
             $this->elementCheckForm->filter();
             $this->isSend = true;
          }
+         if($this->submitElement instanceof Form_Element_SaveCancel AND $this->submitElement->isSend()){
+              $this->submitElement->populate();
+              if($this->submitElement->getValues() == true){
+                 $this->isSend = true;
+              } else {
+                 $this->isSend = false;
+                 $this->isPopulated = false;
+                 $this->isValid = false;
+                 return true;
+              }
+         }
          if($this->isSend != true) {
             foreach ($this->elements as $element) {
                if(($element instanceof Form_Element_Submit
@@ -328,7 +342,10 @@ class Form implements ArrayAccess, Iterator {
     * @return booleant -- true pokud je formulář v pořádku
     */
    public function isValid() {
-      if($this->isSend()){
+      if($this->isSend === null){
+         $this->isSend();
+      }
+      if($this->isSend == true){
          $this->validate();
       }
       return $this->isValid;
@@ -445,6 +462,10 @@ class Form implements ArrayAccess, Iterator {
       // pokud je soubor přidám do formu že se bude přenášet po částech
       if($element instanceof Form_Element_File) {
          $this->html()->setAttrib("enctype", "multipart/form-data");
+      }
+      // pokud je submit, přidáme ho do elementu pro submiting
+      if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage OR $element instanceof Form_Element_SaveCancel) {
+         $this->submitElement = &$this->elements[$name];
       }
    }
 
