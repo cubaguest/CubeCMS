@@ -1,0 +1,6 @@
+<?
+$this->items = array(
+   'Uživatelé' => array('link' => (string)$this->link()->route(), 'icon' => 'user.png'),
+   'Skupiny' => array('link' => (string)$this->link()->route('groups'), 'icon' => 'group.png'),
+   );
+$this->includeTpl('module_navigation.phtml', true);?>

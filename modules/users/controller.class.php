@@ -15,296 +15,308 @@ class Users_Controller extends Controller {
       $this->checkControllRights();
       $model = new Model_Users();
 
-      /*
-       * Odstranění uživatele
-      */
-      $formRemove = new Form('user_');
-      $elemId = new Form_Element_Hidden('id');
-      $formRemove->addElement($elemId);
-      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
-      $formRemove->addElement($elemSub);
+      $this->view()->groups = $model->getGroups();
 
-      if($formRemove->isValid()) {
-         $user = $model->getUserById($formRemove->id->getValues());
-         $model->deleteUser($formRemove->id->getValues());
-         $this->infoMsg()->addMessage($this->_(sprintf('Uživatel "%s" byl smazán', $user->{Model_Users::COLUMN_USERNAME})));
-         $this->link()->reload();
-      }
+//      /*
+//       * Odstranění uživatele
+//      */
+//      $formRemove = new Form('user_');
+//      $elemId = new Form_Element_Hidden('id');
+//      $formRemove->addElement($elemId);
+//      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
+//      $formRemove->addElement($elemSub);
+//
+//      if($formRemove->isValid()) {
+//         $user = $model->getUserById($formRemove->id->getValues());
+//         $model->deleteUser($formRemove->id->getValues());
+//         $this->infoMsg()->addMessage($this->_(sprintf('Uživatel "%s" byl smazán', $user->{Model_Users::COLUMN_USERNAME})));
+//         $this->link()->reload();
+//      }
+//
+//      /*
+//       * Odstranění skupiny
+//      */
+//      $formRemoveGr = new Form('group_');
+//      $elemId = new Form_Element_Hidden('id');
+//      $formRemoveGr->addElement($elemId);
+//      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
+//      $formRemoveGr->addElement($elemSub);
+//
+//      if($formRemoveGr->isValid()) {
+//         $group = $model->getGroupById($formRemoveGr->id->getValues());
+//         $model->deleteGroup($formRemoveGr->id->getValues());
+//         // smazání všech práv k dané skupině
+//         $rModel = new Model_Rights();
+//         $rModel->deleteRightsByGrID($formRemoveGr->id->getValues());
+//
+//         /**
+//          * Odstranění gloválních dat
+//          */
+//         if(VVE_USE_GLOBAL_ACCOUNTS === true) {
+//            $array = explode(';', VVE_USE_GLOBAL_ACCOUNTS_TB_PREFIXES);
+//            if(!empty ($array)) {
+//               foreach ($array as $tblPrefix) {
+//                  $rModel->deleteRightsByGrID($formRemoveGr->id->getValues(), $tblPrefix);
+//               }
+//            }
+//         }
+//
+//         $this->infoMsg()->addMessage($this->_(sprintf('Skupina "%s" byla smazána', $group->{Model_Users::COLUMN_GROUP_NAME})));
+//         $this->link()->reload();
+//      }
+//
+//      /*
+//       * Změna uživatelského statusu
+//      */
+//      $formEnable = new Form('userstatus_');
+//
+//      $elemId = new Form_Element_Hidden('id');
+//      $formEnable->addElement($elemId);
+//      $elemStat = new Form_Element_Hidden('status');
+//      $formEnable->addElement($elemStat);
+//
+//      $elemSub = new Form_Element_SubmitImage('change', $this->_('Změnit'));
+//      $formEnable->addElement($elemSub);
+//
+//      if($formEnable->isValid()) {
+//         if($formEnable->status->getValues() == 'enable') {
+//            $model->enableUser($formEnable->id->getValues());
+//            $this->infoMsg()->addMessage($this->_('Uživatel byl aktivován'));
+//         } else if($formEnable->status->getValues() == 'disable') {
+//            $model->disableUser($formEnable->id->getValues());
+//            $this->infoMsg()->addMessage($this->_('Uživatel byl deaktivován'));
+//         }
+//         $this->link()->reload();
+//      }
+   }
 
-      /*
-       * Odstranění skupiny
-      */
-      $formRemoveGr = new Form('group_');
-      $elemId = new Form_Element_Hidden('id');
-      $formRemoveGr->addElement($elemId);
-      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
-      $formRemoveGr->addElement($elemSub);
+   public function groupsController() {
+      $this->checkControllRights();
 
-      if($formRemoveGr->isValid()) {
-         $group = $model->getGroupById($formRemoveGr->id->getValues());
-         $model->deleteGroup($formRemoveGr->id->getValues());
-         // smazání všech práv k dané skupině
-         $rModel = new Model_Rights();
-         $rModel->deleteRightsByGrID($formRemoveGr->id->getValues());
+   }
 
-         /**
-          * Odstranění gloválních dat
-          */
-         if(VVE_USE_GLOBAL_ACCOUNTS === true) {
-            $array = explode(';', VVE_USE_GLOBAL_ACCOUNTS_TB_PREFIXES);
-            if(!empty ($array)) {
-               foreach ($array as $tblPrefix) {
-                  $rModel->deleteRightsByGrID($formRemoveGr->id->getValues(), $tblPrefix);
-               }
-            }
+
+   public function usersListController() {
+      $this->checkReadableRights();
+      // objekt komponenty JGrid
+      $jqGrid = new Component_JqGrid();
+      $jqGrid->request()->setDefaultOrderField(Model_Users::COLUMN_ID);
+      $modelUsers = new Model_Users();
+      $modelUsers->order(array($jqGrid->request()->orderField => $jqGrid->request()->order))->join('tgroups');
+      // search
+      if ($jqGrid->request()->isSearch()) {
+         switch ($jqGrid->request()->searchType()) {
+            case Component_JqGrid_Request::SEARCH_EQUAL:
+               $modelUsers->where(Model_Users::COLUMN_GROUP_ID.' = :idg AND '.$jqGrid->request()->searchField().' = :str',
+                  array('str' => $jqGrid->request()->searchString(), 'idg' => (int)$this->getRequestParam('idgrp', 1)));
+               break;
+            case Component_JqGrid_Request::SEARCH_NOT_EQUAL:
+               $modelUsers->where(Model_Users::COLUMN_GROUP_ID.' = :idg AND '.$jqGrid->request()->searchField().' != :str',
+                  array('str' => $jqGrid->request()->searchString(), 'idg' => (int)$this->getRequestParam('idgrp', 1)));
+               break;
+            case Component_JqGrid_Request::SEARCH_NOT_CONTAIN:
+               $modelUsers->where(Model_Users::COLUMN_GROUP_ID.' = :idg AND '.$jqGrid->request()->searchField().' NOT LIKE :str',
+                  array('str' => '%'.$jqGrid->request()->searchString().'%', 'idg' => (int)$this->getRequestParam('idgrp', 1)));
+               break;
+            case Component_JqGrid_Request::SEARCH_CONTAIN:
+            default:
+               $modelUsers->where(Model_Users::COLUMN_GROUP_ID.' = :idg AND '.$jqGrid->request()->searchField().' LIKE :str',
+                  array('str' => '%'.$jqGrid->request()->searchString().'%', 'idg' => (int)$this->getRequestParam('idgrp', 1)));
+               break;
          }
 
-         $this->infoMsg()->addMessage($this->_(sprintf('Skupina "%s" byla smazána', $group->{Model_Users::COLUMN_GROUP_NAME})));
-         $this->link()->reload();
+//         $jqGrid->respond()->setRecords($modelUsers->count());
+//         $users = $modelUsers->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)
+//            ->records();
+      } else { // list
+         $modelUsers->where(Model_Users::COLUMN_GROUP_ID, (int)$this->getRequestParam('idgrp', 1));
       }
-
-      /*
-       * Změna uživatelského statusu
-      */
-      $formEnable = new Form('userstatus_');
-
-      $elemId = new Form_Element_Hidden('id');
-      $formEnable->addElement($elemId);
-      $elemStat = new Form_Element_Hidden('status');
-      $formEnable->addElement($elemStat);
-
-      $elemSub = new Form_Element_SubmitImage('change', $this->_('Změnit'));
-      $formEnable->addElement($elemSub);
-
-      if($formEnable->isValid()) {
-         if($formEnable->status->getValues() == 'enable') {
-            $model->enableUser($formEnable->id->getValues());
-            $this->infoMsg()->addMessage($this->_('Uživatel byl aktivován'));
-         } else if($formEnable->status->getValues() == 'disable') {
-            $model->disableUser($formEnable->id->getValues());
-            $this->infoMsg()->addMessage($this->_('Uživatel byl deaktivován'));
-         }
-         $this->link()->reload();
+      $jqGrid->respond()->setRecords($modelUsers->count());
+      $users = $modelUsers->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)->records();
+      // out
+      foreach ($users as $user) {
+         if($user->{Model_Users::COLUMN_BLOCKED} == 1) $blstr = true;
+         else $blstr = false;
+         array_push($jqGrid->respond()->rows, array('id' => $user->{Model_Users::COLUMN_ID},
+             'cell' => array(
+                 $user->{Model_Users::COLUMN_ID},
+                 $user->{Model_Users::COLUMN_NAME},
+                 $user->{Model_Users::COLUMN_SURNAME},
+                 $user->{Model_Users::COLUMN_USERNAME},
+                 null, // pass
+                 $user->{Model_Users::COLUMN_MAIL},
+                 $blstr,
+                 $user->{Model_Users::COLUMN_NOTE},
+                 $user->{Model_Groups::COLUMN_NAME}
+                 )));
       }
+      $this->view()->respond = $jqGrid->respond();
    }
 
-   /**
-    * Metoda pro zobrazení detailu zástupce
-    */
-   public function showController() {
-   }
-
-   /**
-    * Metoda pro úpravu
-    */
-   public function edituserController() {
-      $this->checkControllRights();
-      $mUser = new Model_Users();
-      $user = $mUser->getUserById($this->getRequest('id'));
-
-
-      $form = $this->createUserForm($user->{Model_Users::COLUMN_USERNAME});
-
-      $elemID = new Form_Element_Hidden('iduser');
-      $elemID->setValues($this->getRequest('id'));
-      $form->addElement($elemID);
-
-
-      $form->username->setValues($user->{Model_Users::COLUMN_USERNAME});
-      $form->name->setValues($user->{Model_Users::COLUMN_NAME});
-      $form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
-      $form->group->setValues($user->{Model_Users::COLUMN_ID_GROUP});
-      $form->email->setValues($user->{Model_Users::COLUMN_MAIL});
-      $form->note->setValues($user->{Model_Users::COLUMN_NOTE});
-      $form->blocked->setValues($user->{Model_Users::COLUMN_BLOCKED});
-
-      if($form->isValid()) {
-         $m = new Model_Users();
-         $m->saveUser($form->username->getValues(),$form->name->getValues(),
-                 $form->surname->getValues(), $form->password->getValues(),$form->group->getValues(),
-                 $form->email->getValues(),$form->note->getValues(),$form->blocked->getValues(),$this->getRequest('id'));
-
-         $this->infoMsg()->addMessage($this->_(sprintf('Uživatel %s byl uložen', $form->username->getValues())));
-         $this->link()->route()->reload();
+   public function groupsListController() {
+      $this->checkReadableRights();
+      // objekt komponenty JGrid
+      $jqGrid = new Component_JqGrid();
+      $jqGrid->request()->setDefaultOrderField(Model_Users::COLUMN_ID);
+      $modelGrps = new Model_Groups();
+      // search
+      if ($jqGrid->request()->isSearch()) {
+//         $count = $modelAddresBook->searchCount($jqGrid->request()->searchString(),
+//            (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+//            $jqGrid->request()->searchField(),$jqGrid->request()->searchType());
+//         $jqGrid->respond()->setRecords($count);
+//
+//         $book = $modelAddresBook->search($jqGrid->request()->searchString(),
+//            (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+//            $jqGrid->request()->searchField(),$jqGrid->request()->searchType(),
+//            ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
+//            $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
+      } else {
+      // list
+         $jqGrid->respond()->setRecords($modelGrps->count());
+         $groups = $modelGrps->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)
+            ->order(array($jqGrid->request()->orderField => $jqGrid->request()->order))
+            ->records();
       }
-
-      $this->view()->template()->userName = $user->{Model_Users::COLUMN_USERNAME};
-      $this->view()->template()->form = $form;
-   }
-
-   /**
-    * Metoda pro přidávání uživatelů
-    */
-   public function adduserController() {
-      $this->checkControllRights();
-      $form = $this->createUserForm();
-      // heslo je nutné
-      $form->password->addValidation(new Form_Validator_NotEmpty());
-
-
-      if($form->isValid()) {
-         $m = new Model_Users();
-         $m->saveUser($form->username->getValues(),$form->name->getValues(),
-                 $form->surname->getValues(), $form->password->getValues(),$form->group->getValues(),
-                 $form->email->getValues(),$form->note->getValues(),$form->blocked->getValues());
-
-         $this->infoMsg()->addMessage($this->_(sprintf('Uživatel %s byl uložen', $form->username->getValues())));
-         $this->link()->route()->reload();
+      // out
+      foreach ($groups as $grp) {
+         array_push($jqGrid->respond()->rows, array('id' => $grp->{Model_Groups::COLUMN_ID},
+             'cell' => array(
+                 $grp->{Model_Groups::COLUMN_ID},
+                 $grp->{Model_Groups::COLUMN_NAME},
+                 $grp->{Model_Groups::COLUMN_LABEL}
+                 )));
       }
-
-      $this->view()->template()->form = $form;
+      $this->view()->respond = $jqGrid->respond();
    }
 
-   /**
-    * Metoda vytvoří formulář pro úpravu uživatele
-    * @return Form
-    */
-   private function createUserForm($username = null) {
+   public function editUserController() {
+      $this->checkWritebleRights();
       $model = new Model_Users();
-      $form = new Form('user_');
-
-      $elemUsername = new Form_Element_Text('username', $this->_('Uživatelské jméno'));
-      $elemUsername->addValidation(new Form_Validator_NotEmpty());
-
-      $users = $model->getUsersList();
-      $usedUsers = array();
-      while ($u = $users->fetchObject()) {
-         if($username != $u->{Model_Users::COLUMN_USERNAME}) {
-            array_push($usedUsers, $u->{Model_Users::COLUMN_USERNAME});
-         }
-      }
-      $elemUsername->addValidation(new Form_Validator_NotInArray($usedUsers));
-      $form->addElement($elemUsername);
-
-      $elemName = new Form_Element_Text('name', $this->_('Jméno'));
-      $elemName->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($elemName);
-
-      $elemSurName = new Form_Element_Text('surname', $this->_('Přijmení'));
-      $elemSurName->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($elemSurName);
-
-      $elemPass1 = new Form_Element_Password('password', $this->_('Heslo'));
-      $elemPass1->addValidation(new Form_Validator_Length(5));
-      $form->addElement($elemPass1);
-
-      $groups = $model->getGroups();
-
-      $grps = array();
-      while ($group = $groups->fetchObject()) {
-         if($group->{Model_Users::COLUMN_GROUP_LABEL} != null) $grname = $group->{Model_Users::COLUMN_GROUP_LABEL};
-         else $grname = $group->{Model_Users::COLUMN_GROUP_NAME};
-         $grps[$grname] = $group->{Model_Users::COLUMN_ID_GROUP};
-      }
-
-      $elemGrp = new Form_Element_Select('group', $this->_('Skupina'));
-      $elemGrp->addValidation(new Form_Validator_NotEmpty());
-      $elemGrp->setOptions($grps);
-      $form->addElement($elemGrp);
-
-      $elemEmail = new Form_Element_Text('email', $this->_('E-mail'));
-      $elemEmail->addValidation(new Form_Validator_Email());
-      $form->addElement($elemEmail);
-
-      $elemNote = new Form_Element_TextArea('note', $this->_('Poznámky'));
-      $form->addElement($elemNote);
-
-      $elemBlock = new Form_Element_Checkbox('blocked', $this->_('Blokován'));
-      $form->addElement($elemBlock);
-
-
-      $submit = new Form_Element_Submit('send', $this->_('Odeslat'));
-      $form->addElement($submit);
-
-      return $form;
-   }
-
-
-   public function addGroupController() {
-      $this->checkControllRights();
-      $uModel = new Model_Users();
-      $form = $this->createGroupForm();
-
-      if($form->isValid()) {
-         $idGroup = $uModel->saveGroup($form->name->getValues(), $form->label->getValues());
-         // vytvoření práv pro všechny kategorie
-         $catModel = new Model_Category();
-         $categories = $catModel->getCategoryList(true);
-
-         $modelR = new Model_Rights();
-         foreach ($categories as $category) {
-            $modelR->saveRight($category[Model_Category::COLUMN_DEF_RIGHT], $idGroup, $category[Model_Category::COLUMN_CAT_ID]);
-         }
-
-         //pokud je globa_account tak projití celé databáze a přidělení práv na všechny weby
-         // nutná také kontrola jestli daný web má nasatveno global_account
-         if(VVE_USE_GLOBAL_ACCOUNTS === true) {
-            $array = explode(';', VVE_USE_GLOBAL_ACCOUNTS_TB_PREFIXES);
-            if(!empty ($array)) {
-               $modelDb = new Model_DbSupport();
-               foreach ($array as $tblPrefix) {
-                  $categories = $modelDb->getTableContent($tblPrefix.Model_Category::DB_TABLE);
-                  while ($cat = $categories->fetch()) {
-                     $modelR->saveRight($cat->{Model_Category::COLUMN_DEF_RIGHT},
-                             $idGroup, $cat->{Model_Category::COLUMN_CAT_ID}, $tblPrefix);
-                  }
-               }
+      $this->view()->allOk = false;
+      // část komponenty jqgrid pro formy
+      $jqGridReq = new Component_JqGrid_FormRequest();
+      switch ($jqGridReq->getRequest()) {
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
+            $jqGridReq->id = null;
+            if($jqGridReq->{Model_Users::COLUMN_PASSWORD} == null){
+               $this->errMsg()->addMessage($this->_('Při přidání uživatele heslo musí být zadáno'));
+               return;
             }
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
+            // kontrola položek
+            if($jqGridReq->{Model_Users::COLUMN_USERNAME} == null
+               OR $jqGridReq->{Model_Users::COLUMN_NAME} == null
+               OR $jqGridReq->{Model_Users::COLUMN_SURNAME} == null){
+               $this->errMsg()->addMessage($this->_('Nebyly zadány všechny povinné údaje'));
+               return;
+            }
+            // validace názvu
+            if(!preg_match('/^[a-zA-Z0-9@._-]+$/', $jqGridReq->{Model_Users::COLUMN_USERNAME})){
+               $this->errMsg()->addMessage($this->_('Už. jméno obsahuje nepovolené znaky<br /> (mezera, diakritika)'));
+               return;
+            }
+            // validace mailu
+            $validatorMail = new Validator_EMail($jqGridReq->{Model_Users::COLUMN_MAIL});
+            if ($jqGridReq->{Model_Users::COLUMN_MAIL} != null AND !$validatorMail->isValid()) {
+               $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
+               return;
+            }
+            // validace username
+            $record = $model->record($jqGridReq->id);
+            if($record->{Model_Users::COLUMN_USERNAME} != $jqGridReq->{Model_Users::COLUMN_USERNAME} AND $this->userExist($jqGridReq->{Model_Users::COLUMN_USERNAME})){
+               $this->errMsg()->addMessage($this->_('Uživatelské jméno je již obsazeno'));
+               return;
+            }
+            if($jqGridReq->{Model_Users::COLUMN_PASSWORD} == null){
+               unset ($jqGridReq->{Model_Users::COLUMN_PASSWORD});
+            } else {
+               $jqGridReq->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($jqGridReq->{Model_Users::COLUMN_PASSWORD});
+            }
+            $record->mapArray($jqGridReq);
+            $model->save($record);
+            $this->infoMsg()->addMessage($this->_('Uživatel byl uložen'));
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
+            foreach ($jqGridReq->getIds() as $id) {
+               $model->delete($id);
+            }
+            $this->infoMsg()->addMessage($this->_('Vybraní uživatelé byli smazáni'));
+            break;
+         default:
+            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            break;
+      }
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
+      }
+   }
+
+   public function blockUserController() {
+      $this->checkWritebleRights();
+      $model = new Model_Users();
+      $record = $model->record($this->getRequestParam('id'));
+      if($record != false){
+         if($this->getRequestParam('blocked') == 'true'){
+            $record->{Model_Users::COLUMN_BLOCKED} = true;
+         } else {
+            $record->{Model_Users::COLUMN_BLOCKED} = false;
          }
-
-         $this->infoMsg()->addMessage($this->_('Skupina byla uložena a přidělena práva k ní'));
-         $this->link()->route()->reload();
+         $model->save($record);
       }
-
-      $this->view()->template()->form = $form;
+      $this->infoMsg()->addMessage($this->_('Status byl změněn'));
    }
 
-   public function editgroupController(){
-      $this->checkControllRights();
-
-      $uModel = new Model_Users();
-      $group = $uModel->getGroupById($this->getRequest('id'));
-      if($group == false) return false;
-
-      $form = $this->createGroupForm();
-
-      $form->name->setValues($group->{Model_Users::COLUMN_GROUP_NAME});
-      $form->label->setValues($group->{Model_Users::COLUMN_GROUP_LABEL});
-
-      if($form->isValid()){
-         $uModel->saveGroup($form->name->getValues(), $form->label->getValues(), $this->getRequest('id'));
-         $this->infoMsg()->addMessage($this->_('Skupina byla uložena a přidělena práva k ní'));
-         $this->link()->route()->reload();
+   public function editGroupController() {
+      $this->checkWritebleRights();
+      $model = new Model_Groups();
+      $this->view()->allOk = false;
+      // část komponenty jqgrid pro formy
+      $jqGridReq = new Component_JqGrid_FormRequest();
+      switch ($jqGridReq->getRequest()) {
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
+            $jqGridReq->id = null;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
+            // kontrola položek
+            if($jqGridReq->{Model_Groups::COLUMN_NAME} == null){
+               $this->errMsg()->addMessage($this->_('Nebyly zadány všechny povinné údaje'));
+               return;
+            }
+            // validace názvu
+            if(!preg_match('/^[a-zA-Z0-9_-]+$/', $jqGridReq->{Model_Groups::COLUMN_NAME})){
+               $this->errMsg()->addMessage($this->_('Název obsahuje nepovolené znaky<br /> (pouze: a-z; A-Z; 0-9; _; -)'));
+               return;
+            }
+            $record = $model->record($jqGridReq->id);
+            $record->mapArray($jqGridReq);
+            $model->save($record);
+            $this->infoMsg()->addMessage($this->_('Skpina byla uložena'));
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
+            foreach ($jqGridReq->getIds() as $id) {
+               $model->delete($id);
+            }
+            $this->infoMsg()->addMessage($this->_('Vybrané skupiny byly smazány'));
+            break;
+         default:
+            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            break;
       }
-      $this->view()->template()->form = $form;
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
+      }
    }
 
-   /**
-    * Metoda pro vytvoření formuláře skupiny
-    * @return Form
-    */
-   private function createGroupForm() {
-      $form = new Form('group_');
-
-      $elemName = new Form_Element_Text('name', $this->_('Název skupiny'));
-      $elemName->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($elemName);
-
-      $elemLabel = new Form_Element_TextArea('label', $this->_('Popis skupiny'));
-      $form->addElement($elemLabel);
-
-      // pole s typy práv
-//      $rightsTypes = array('r--'=>'r--', '-w-'=>'-w-', '--c'=>'--c', 'rw-'=>'rw-',
-//          'r-c'=>'r-c', '-wc'=>'-wc', 'rwc'=>'rwc', '---' => '---');
-//      $catGrpRigths = new Form_Element_Select('def_status', $this->_("Výchozí práva"));
-//      $catGrpRigths->setOptions($rightsTypes);
-//      $form->addElement($catGrpRigths);
-
-      $elemSubmit = new Form_Element_Submit('send', $this->_('odeslat'));
-      $form->addElement($elemSubmit);
-
-      return $form;
+   public static function userExist($username) {
+      $modelU = new Model_Users();
+      
+      return (bool)$modelU->where(Model_Users::COLUMN_USERNAME,$username)->record();
    }
+
+   public static function createUniqueUsername($username) {
+
+   }
+
 }
 
 ?>
