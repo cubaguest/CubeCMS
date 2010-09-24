@@ -1,3 +1,6 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
 <ul class="module-navigation">
 <?
 $curLink = new Url_Link();
@@ -12,8 +15,25 @@ foreach ($this->items as $name => $link) {
    <li class="module-navigation-tab <?if($curLink == (string)$link) echo 'module-navigation-tab-selected';?>"
        ><a href="<?=$link?>" title="<?=_('Přejít na').' '.$name?>"><?
    if($icon != null){?><img src="<?=vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>"
-               alt="icon <?=$icon?>" /><?}?><?=$name?></a></li>
+               alt="icon <?=$icon?>" /><?}?><span><?=$name?></span></a></li>
 <?
 }
 ?>
 </ul>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $('.module-navigation-tab').not('.module-navigation-tab-selected').find('span').css('display', 'none');
+   $(document).ready(function(){
+      $('.module-navigation-tab').hover(function(){
+         if($(this).hasClass('module-navigation-tab-selected')) return;
+         $(this).find('span').css('display', 'inline');
+
+      }, function(){
+         if($(this).hasClass('module-navigation-tab-selected')) return;
+         setTimeout(function(obj){
+            $(obj).find('span').css('display', 'none');
+         }, 500, this);
+      });
+   });
+   /* ]]> */
+</script>
