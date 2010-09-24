@@ -45,6 +45,7 @@ class XHR_Respond {
       $retData = $this->data;
       $retData['infomsg'] = AppCore::getInfoMessages()->getMessages();
       $retData['errmsg'] = AppCore::getUserErrors()->getMessages();
+      return 'respond';
    }
 
    /**
@@ -52,7 +53,6 @@ class XHR_Respond {
     */
    public function renderRespond() {
       Template_Output::setOutputType($this->outputType);
-      Template_Output::sendHeaders();
       echo $this;
    }
 }
