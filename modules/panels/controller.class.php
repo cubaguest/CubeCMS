@@ -77,6 +77,11 @@ class Panels_Controller extends Controller {
       $this->editForm->removeElement('icon_delete');
       $this->editForm->removeElement('background_delete');
 
+      if($this->editForm->isSend() AND $this->editForm->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+
       if($this->editForm->isValid()) {
          $icon = null;
          if($this->editForm->icon->getValues() != null) {
@@ -123,6 +128,11 @@ class Panels_Controller extends Controller {
       $elemId = new Form_Element_Hidden('id');
       $elemId->setValues($panel->{Model_Panel::COLUMN_ID});
       $form->addElement($elemId);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()){
          $icon = $panel->{Model_Panel::COLUMN_ICON};
@@ -236,8 +246,8 @@ class Panels_Controller extends Controller {
       $elemBackDelete = new Form_Element_Checkbox('background_delete', $this->_('Smazat pozadí')."?");
       $form->addElement($elemBackDelete,'view');
 
-      $submit = new Form_Element_Submit('send', $this->_('Uložit'));
-      $form->addElement($submit);
+      $submitButton = new Form_Element_SaveCancel('send');
+      $form->addElement($submitButton);
 
       return $form;
    }

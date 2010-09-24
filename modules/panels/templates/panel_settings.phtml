@@ -1,7 +1,11 @@
 <?
-$this->addPageTitle($this->_('úprava parametrů panelu').' '.$this->catName);
-$this->addPageHeadline($this->_('úprava parametrů panelu').' '.$this->catName);
+$h = $this->_('úprava parametrů panelu').' '.$this->catName;
+$this->addPageTitle($h);
+?>
 
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit">
+<?
 if($this->includeTpl != null){
    $this->includeTplObj($this->includeTpl);
 } else if($this->form == null) {
@@ -9,7 +13,6 @@ if($this->includeTpl != null){
 } else {
    print ($this->form);
 }
-
 $this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()));
-
 ?>
+</div>

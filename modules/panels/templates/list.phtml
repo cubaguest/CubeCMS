@@ -1,4 +1,5 @@
-<div>
+<h1><?=$this->category()->getName();?></h1>
+<div class="main-content-detail">
    <?
    $linkajaxPanelInfo = new Url_Link_ModuleRequest();
    ?>
@@ -46,22 +47,13 @@
          <tbody></tbody>
       </table>
    </div>
-
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
          loadPanels();
-
-   $('button[name=selectCatPanels]').click(function(){
-      loadPanels();
-      return false;
-   });
-   $('select[name=catsList]').change(function(){
-      loadPanels();
-      return false;
-   });
+         $('button[name=selectCatPanels]').click(function(){loadPanels();return false;});
+         $('select[name=catsList]').change(function(){loadPanels();return false;});
       });
-
       function loadPanels(){
          showLoadBox($('table#indCatPanelsList'));
          $.ajax({
@@ -75,7 +67,6 @@
       /* ]]> */
    </script>
       <?}?>
-
    <? echo $this->toolbox;?>
 </div>
 
