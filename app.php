@@ -22,7 +22,7 @@ class AppCore {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = 6.3;
+   const ENGINE_VERSION = 6.4;
 
    /**
     * Revize Enginu
@@ -462,6 +462,7 @@ class AppCore {
     */
    private function checkCoreVersion(){
       /* Upgrade jádra */
+      // upgrade
       if(defined('VVE_VERSION') AND VVE_VERSION != self::ENGINE_VERSION){ // kvůli neexistenci předchozí detekce
          $core = new Install_Core();
          $core->upgrade();
@@ -472,6 +473,11 @@ class AppCore {
          self::getInfoMessages()->addMessage(_('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!'));
          $link->clear(true)->reload();
       } else {
+      }
+      // update
+      if(defined('VVE_REVISION') AND VVE_REVISION != self::ENGINE_REVISION){ // kvůli neexistenci předchozí detekce
+         $core = new Install_Core();
+         $core->update();
       }
    }
 
