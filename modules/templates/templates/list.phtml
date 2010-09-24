@@ -1,10 +1,8 @@
 <?
 $this->addCssFile('style.css');
-
-$this->addJsPlugin(new JsPlugin_DataTables());
-
 ?>
-<div class="articles-list module-templates-list">
+<h1><?=$this->category()->getName();?></h1>
+<div class="main-content-list module-templates-list">
    <?if(!empty ($this->templates)) {?>
    <table>
       <thead>

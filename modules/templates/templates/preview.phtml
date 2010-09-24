@@ -1,16 +1,13 @@
 <?
-$this->addPageTitle($this->_('Náhled šablony').' '.$this->tpl->{Templates_Model::COLUMN_NAME});
-$this->addPageHeadline($this->_('Náhled šablony').' "'.$this->tpl->{Templates_Model::COLUMN_NAME}.'"');
-
+$h = $this->_('Náhled šablony').' '.$this->tpl->{Templates_Model::COLUMN_NAME};
+$this->addPageTitle($h);
 ?>
-
-<p>
-   <a
-        href="<?=$this->link()?>" title="<?echo $this->_('Obnovit náhled')?>"
+<h1><?=$h;?></h1>
+<div class="main-content-detail">
+   <a href="<?=$this->link()->param('time', time())?>" title="<?echo $this->_('Obnovit náhled')?>"
       ><img src="<?=Template::getFileDir('icons/page_refresh.png', Template::IMAGES_DIR, false,true)?>"
         alt="icon reload" />&nbsp;<?echo $this->_('Obnovit náhled')?></a>
-</p>
-
+</div>
 <?
 switch ($this->previewType) {
    case 'normal':
@@ -18,5 +15,7 @@ switch ($this->previewType) {
       $this->includeTpl('preview_normal.phtml');
       break;
 }
-$this->includeTpl("buttonback.phtml", true);
 ?>
+<?
+$this->linkBack = $this->link()->clear();
+$this->includeTpl("buttonback.phtml", true);?>

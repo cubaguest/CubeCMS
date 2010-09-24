@@ -14,24 +14,6 @@ class Templates_View extends View {
       }
    }
 
-   public function showView() {
-      $this->template()->addTplFile("detail.phtml", 'articles');
-
-      if($this->category()->getRights()->isControll() OR
-              ($this->category()->getRights()->isWritable() AND
-                      $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_article', $this->_("Upravit"),
-                 $this->link()->route('edit'),
-                 $this->_("Upravit zobrazený článek"), "page_edit.png");
-         $toolbox->addTool('article_delete', $this->_("Smazat"),
-                 $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
-                 'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
-                 $this->_('Opravdu smazat článek?'));
-         $this->template()->toolbox = $toolbox;
-      }
-   }
-
    /**
     * Viewer pro přidání článku
     */

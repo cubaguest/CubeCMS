@@ -39,6 +39,11 @@ class Templates_Controller extends Controller {
       $this->checkWritebleRights();
       $addForm = $this->createForm();
 
+      if($addForm->isSend() AND $addForm->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+
       if($addForm->isValid()) {
          $model = new Templates_Model();
          $model->saveTemplate($addForm->name->getValues(), $addForm->desc->getValues(), $addForm->content->getValues(),
@@ -69,6 +74,11 @@ class Templates_Controller extends Controller {
       $form->content->setValues($tpl->{Templates_Model::COLUMN_CONTENT});
       $form->type->setValues($tpl->{Templates_Model::COLUMN_TYPE});
       $form->desc->setValues($tpl->{Templates_Model::COLUMN_DESC});
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()) {
          $model->saveTemplate($form->name->getValues(), $form->desc->getValues(), $form->content->getValues(),
@@ -116,8 +126,8 @@ class Templates_Controller extends Controller {
       $redirElem = new Form_Element_Checkbox('goback', $this->_('Přejít zpět na seznam'));
       $form->addElement($redirElem);
 
-      $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
-      $form->addElement($iSubmit);
+      $submitButton = new Form_Element_SaveCancel('send');
+      $form->addElement($submitButton);
 
       return $form;
    }

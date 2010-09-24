@@ -1,12 +1,11 @@
 <?
 // do titulku
 if($this->edit) {
-   $this->addPageTitle($this->_('úprava šablony'));
-   $this->addPageHeadline($this->_('úprava šablony'));
+   $h = $this->_('úprava šablony');
 } else {
-   $this->addPageTitle($this->_('přidání šablony'));
-   $this->addPageHeadline($this->_('přidání šablony'));
+   $h = $this->_('přidání šablony');
 }
+$this->addPageTitle($h);
 // donastavení formuláře
 $this->form->content->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
 
@@ -19,21 +18,18 @@ $tinymce->setCfgParam('theme', 'full');
 $this->addJsPlugin($tinymce);
 
 ?>
-
-<div id="editArticleForm">
+<h1><?=$h?></h1>
+<div class="main-content-form-edit">
    <?
    print($this->form);
    $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
    ?>
 </div>
 <script type="text/javascript">
-function toggleEditor(id) {
    /* <![CDATA[ */
-   if (!tinyMCE.get(id)){
-      tinyMCE.execCommand('mceAddControl', false, id);
-   } else {
-      tinyMCE.execCommand('mceRemoveControl', false, id);
+   function toggleEditor(id) {
+      if (!tinyMCE.get(id)){tinyMCE.execCommand('mceAddControl', false, id);}
+      else {tinyMCE.execCommand('mceRemoveControl', false, id);}
    }
-}
 /* ]]> */
 </script>
