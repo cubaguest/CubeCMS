@@ -6,12 +6,14 @@ class Articles_View extends View {
       $feeds->setConfig('feedLink', $this->link()->clear());
       $this->template()->feedsComp = $feeds;
 
-      if($this->category()->getRights()->isWritable()) {
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_article', $this->_("Přidat článek"),
-                 $this->link()->route('add'),
-                 $this->_("Přidat nový článek"), "page_add.png");
-         $this->template()->toolbox = $toolbox;
+      if($this->rights()->isControll()) {
+         $toolbox = new Template_Toolbox2();
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_article', $this->_("Přidat článek"),
+         $this->link()->route('add'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat nový článek'));
+         $toolbox->addTool($toolAdd);
+
+         $this->toolbox = $toolbox;
       }
    }
 
