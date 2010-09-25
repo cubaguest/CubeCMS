@@ -112,8 +112,13 @@ class Contact_Controller extends Controller {
       }
       $formEdit->addElement($elemTextPanel);
 
-      $elemSave = new Form_Element_Submit('save', $this->_('Uložit'));
-      $formEdit->addElement($elemSave);
+      $submitButton = new Form_Element_SaveCancel('send');
+      $formEdit->addElement($submitButton);
+
+      if($formEdit->isSend() AND $formEdit->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if($formEdit->isValid()){
          $modelText->saveText($formEdit->text->getValues(), null, $this->category()->getId(), self::TEXT_KEY_MAIN);
