@@ -1,4 +1,5 @@
 @CHARSET "UTF-8";
+@import "style-layout.css";
 /* SOF RESET */
 /* v1.0 | 20080212 */
 
@@ -71,19 +72,6 @@ body {
    /*background-color: white;  purple tone for outer space */
 }
 
-/* boxy */
-.left_float {
-   float: left;
-}
-
-.right_float {
-   float: right;
-}
-
-.align_right {
-   text-align: right;
-}
-
 /* resetovač */
 .reseter {
    border: 0px none;
@@ -97,97 +85,9 @@ body {
    font-size: 0px;
 }
 
-.separator {
-   display: none;
-   visibility: hidden;
-}
-
 .hidden {
    display:none;
 }
-
-#bodywrap {
-   min-width: 600px; /* slušné prohlížeče */
-   max-width: 1000px;
-   /*width: 1000px;*/
-   border: 0px none;
-   margin: 0px auto 0px auto;
-   padding: 0px;
-   overflow: hidden;
-}
-
-#headwrap { /*background-color: #007070;*/
-            /*background-color: #007070;*/
-}
-
-#footwrap { /*background-color: #c0c0c0;*/
-            text-align: left;
-            background-color: white;
-}
-
-#colswrap {
-   width: 100%;
-   /* MSIE needs at least width definition to cut extra margin/padding trick */
-   overflow: hidden;
-   /* hide margin/padding trick in well-CSS browsers = true Gecko based */
-   background-color: transparent;
-   /* setting background color will cover container 'footer' */
-}
-
-.column {
-   float: left;
-   /*padding-bottom: 20000px;*/
-   /* trik z One True Layout pro srovnání výšky sloupců */
-   /*margin-bottom: -20000px; /* aby měly všechny sloupce stejnou výšku */
-}
-
-#col1wrap {
-   width: 100%;
-   /* define colum across whole space to be basic structure */
-   /*background-color: #e0ffe0;*/
-}
-
-#col1pad {
-   padding: 5px 5px 5px 5px;
-   /* padding to move test from column on the left */
-   /* padding to move test from column on the right */
-   /*margin-left: 0px;
-	margin-right: 0px;*/
-   /*overflow: hidden;*/
-   position: relative;
-}
-
-.col1pad_plusleft{
-   margin-left: 180px;
-}
-
-.col1pad_plusright{
-   margin-right: 180px;
-}
-
-#col2wrap {
-   width: 180px;
-   margin-left: -100%;  position column to the left side
-   /*margin-left: -1000px; /*background-color: #ffe0e0;*/
-}
-
-#col2pad {
-   /*overflow: auto;*/
-   padding: 10px 2px 0px 6px;
-}
-
-#col3wrap {
-   width: 180px;
-   margin-left: -180px;
-   /* negative self width to place column to the most right place */
-   /*background-color: #e0e0ff;*/
-}
-
-#col3pad {
-   /*overflow: auto;*/
-   padding: 10px 4px 0px 4px;
-}
-
 
 /* uprava prvku globalne */
 h1 {
@@ -306,6 +206,9 @@ input, button, textarea, select {
    background-color: #e2e2e2;
    font-size: small;
    font-family: "Tahoma", "Arial", sans-serif;
+}
+input.button-cancel:hover, input[type="submit"].button-cancel:hover {
+   background-color: #ff6666;
 }
 
 input:focus, textarea:focus, input.form-required:focus, textarea.form-required:focus {

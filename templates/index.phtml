@@ -62,7 +62,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
       <link rel="stylesheet" type="text/css" href="stylesheets/style-admin.css" />
       <script type="text/javascript" src="jscripts/admin/menu.js"></script>
       <?}?>
-      <script type="text/javascript" src="jscripts/enginehelpers.js"></script>
+      <script type="text/javascript" src="jscripts/enginehelpers.min.js"></script>
    </head>
    <body id="pageTop">
       <? // admin menu
@@ -107,7 +107,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
                         $this->includeTpl("modules.phtml", true);
                      }
                   ?>
-                  <hr class="separator" />
+                  <hr class="reseter" />
                   </div>
                </div><!-- col1pad -->
             </div><!-- col1wrap -->
@@ -123,7 +123,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
                   </div>
                      <?}
                   }?>
-                  <hr class="separator" />
+                  <hr class="reseter" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
 
@@ -138,7 +138,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
                   </div>
                      <?}
                   }?>
-                  <hr class="separator" />
+                  <hr class="reseter" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
 
@@ -159,7 +159,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
             <?//$this->includeTpl("login.phtml", true);//je v panelu?>
             <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=_("Mapa stránek")?>"><?=_("Mapa stránek")?></a>&nbsp;
             <a href="<?=$this->link()->clear(true)->file('rss.html');?>" title="<?=_("Přehled rss zdrojů")?>"><?=_("Rss kanály")?></a>
-            <hr class="separator" />
+            <hr class="reseter" />
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->
       <div id="debug">
