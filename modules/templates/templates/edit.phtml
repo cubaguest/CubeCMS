@@ -9,7 +9,7 @@ $this->addPageTitle($h);
 // donastavení formuláře
 $this->form->content->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
 
-$linkDisableEdit = '<a href="javascript:toggleEditor(\'template_content\');" id="template-disable-editor-button">'.$this->_('Vvpnout / zapnout editor').'</a>';
+$linkDisableEdit = '<a href="javascript:toggleEditor(\'template_content_1\');" id="template-disable-editor-button">'.$this->_('Vvpnout / zapnout editor').'</a>';
 $this->form->content->setSubLabel($linkDisableEdit);
 
 
@@ -22,7 +22,6 @@ $this->addJsPlugin($tinymce);
 <div class="main-content-form-edit">
    <?
    print($this->form);
-   $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
    ?>
 </div>
 <script type="text/javascript">

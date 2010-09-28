@@ -5,12 +5,14 @@ class Templates_View extends View {
    public function mainView() {
       $this->template()->addTplFile("list.phtml");
 
-      if($this->category()->getRights()->isWritable()) {
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_template', $this->_("Přidat šablonu"),
-                 $this->link()->route('add'),
-                 $this->_("Přidat novou šablonu"), "page_add.png");
-         $this->template()->toolbox = $toolbox;
+      if($this->rights()->isControll()) {
+         $toolbox = new Template_Toolbox2();
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_template', $this->_("Přidat šablonu"),
+         $this->link()->route('add'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou šablonu'));
+         $toolbox->addTool($toolAdd);
+
+         $this->toolbox = $toolbox;
       }
    }
 

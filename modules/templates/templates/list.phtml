@@ -23,7 +23,7 @@ $this->addCssFile('style.css');
          <td>
             <?/*<a href="<?=$this->link()?>#preview" title="<?=$this->_('Náhled v novém okně')?>"
                ><img src="<?=Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" alt="preview" /></a>*/?>
-            <form action="<?=$this->link()->route('preview', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post">
+            <form action="<?=$this->link()->route('preview', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post" onsubmit="window.open(this.action); return false; //openWindow(this.action)">
                <input type="image" name="tpl_preview_go" value="" title="<?=$this->_('náhled')?>"
                       src="<?=Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" />
             </form>
