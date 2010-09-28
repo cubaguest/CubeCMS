@@ -116,7 +116,6 @@ class Filesystem_File {
     * parsovat z názvu souboru)
     */
    function __construct($file, $dir = null, $reportErrors = true) {
-//      if($file == null) throw new UnexpectedValueException(_('Nulový soubor'));
       // Pokud je vložen objekt File
       if($file instanceof Filesystem_File) {
          $this->fileDir = new Filesystem_Dir($file->getDir());
@@ -130,11 +129,9 @@ class Filesystem_File {
       } else {
          if($dir == null) {
             // rozparsování cesty a soubou u tmp
-            $arr = $this->parsePathFile($file);
-            if($arr != false) {
-               $this->fileName = $arr[2];
-               $this->fileDir = new Filesystem_Dir($arr[1]);
-            }
+            $path_parts = pathinfo($file);
+            $this->fileName = $path_parts['basename'];
+            $this->fileDir = new Filesystem_Dir($path_parts['dirname']);
          }
          else {
             $this->fileName = $file;
@@ -360,8 +357,7 @@ class Filesystem_File {
     * @return string -- mime type
     */
    private function locateMimeType() {
-      $fileArray = @explode('.',$this->getName());
-      $ext = strtolower(array_pop($fileArray));
+      $path_parts = pathinfo($this->getName(true));
       if($this->exist()) {
          if($this->fileMimeType === null) {
             //      $file = $this->fileName;
@@ -373,8 +369,8 @@ class Filesystem_File {
                $this->fileMimeType = $mime[0];
                finfo_close($finfo);
             }
-            else if (array_key_exists($ext, self::$mimeTypes)) {
-               $this->fileMimeType = self::$mimeTypes[$ext];
+            else if (array_key_exists($path_parts['extension'], self::$mimeTypes)) {
+               $this->fileMimeType = self::$mimeTypes[$path_parts['extension']];
             }
             else {
                $this->fileMimeType = 'application/octet-stream';
