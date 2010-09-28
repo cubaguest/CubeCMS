@@ -80,3 +80,16 @@ function vveLoadImage(src, callback){
    }
    cacheImage.src = src;
 }
+
+$(document).ready(function(){
+      $("div.toolbox").css({opacity: 0.3});
+      $("div.toolbox").parent('div').css({position: 'relative'});
+      $("div.toolbox").parent().hover(
+      function(){
+         $(this).children('div.toolbox').fadeTo(100, 1).show().css('z-index', 100).parent().addClass('toolbox-active-content');
+      },
+      function(){
+         $(this).children('div.toolbox').fadeTo(300, 0).hide().css('z-index', 5).parent().removeClass('toolbox-active-content');
+      }
+   );
+});
