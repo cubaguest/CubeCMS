@@ -176,6 +176,15 @@ class Template_Core extends Template {
    }
 
    /**
+    * Metoda nastavuje titulek stránky (zatím nefunkční)
+    * @param string $title -- titulek stránky
+    * @param bool $merge -- jestli se má titulek připojit k již nasatvenému
+    */
+   public static function setPageTitle($title) {
+      self::$pageTitle = array($title);
+   }
+
+   /**
     * Metoda vrací titulek stránky
     * @return string
     */
