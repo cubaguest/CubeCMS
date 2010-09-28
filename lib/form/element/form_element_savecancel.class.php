@@ -11,6 +11,8 @@
 class Form_Element_SaveCancel extends Form_Element {
    private $labels = array();
 
+   private $enableCancelControll = true;
+
 
    protected function init() {
       $this->htmlElement = new Html_Element('input');
@@ -24,6 +26,11 @@ class Form_Element_SaveCancel extends Form_Element {
          $this->labels = $this->getLabel();
       }
    }
+
+   public function setCancelControll($param = true) {
+      $this->enableCancelControll = $param;
+   }
+
 
    public function populate() {
       parent::populate();
@@ -42,10 +49,14 @@ class Form_Element_SaveCancel extends Form_Element {
       
       $this->setValues($this->labels[0]);
       $this->html()->clearClasses();
+      $this->html()->removeAttrib('onclick');
       $this->html()->addClass('button-save');
       $ctrlSave = (string)parent::controll();
       $this->setValues($this->labels[1]);
       $this->html()->clearClasses();
+      if($this->enableCancelControll == true){
+         $this->html()->setAttrib('onclick', 'return confirm(\''._('Opravdu zrušit změny?').'\')');
+      }
       $this->html()->addClass('button-cancel');
       $ctrlCancel = (string)parent::controll();
       return $ctrlSave.$ctrlCancel;
