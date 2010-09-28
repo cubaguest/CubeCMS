@@ -109,8 +109,13 @@ class Template_Module extends Template {
    public function addCssFile($cssfile, $engine = false) {
       if(preg_match('/^http[s]?:\/\//', $cssfile)){
          self::addCss($cssfile);
-      } else if(!$engine) {
+      } else if($engine === false) { // pokud je false, je použit aktuální modul
          $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $this->category->getModule()->getName(), false);
+         if($filePath != null){
+            self::addCss($filePath.$cssfile);
+         }
+      } else if(is_string($engine)) { // pokud je předán název modulu
+         $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $engine, false);
          if($filePath != null){
             self::addCss($filePath.$cssfile);
          }
