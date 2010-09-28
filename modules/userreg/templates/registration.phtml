@@ -3,14 +3,17 @@ $jQ = new JsPlugin_JQuery();
 $this->addJsPlugin($jQ);
 ?>
 <h1><?= $this->category()->getName() ?></h1>
-<?if ($this->text != null) {
- ?><div class="main-content-text"><? echo $this->text;?></div><?
-}?>
+<div class="main-content-text"><?
+   if ($this->text != null) {
+      echo $this->text;
+   }
+   echo $this->toolboxText;
+?></div>
 <div class="main-content-form-edit" id="userreg-reg-form">
    <?
-   echo $this->formReg; 
+   echo $this->formReg;
+   echo $this->toolboxForm;
    ?>
-<?= $this->toolbox; ?>
 </div>
 <script type="text/javascript">
    $(document).ready(function(){

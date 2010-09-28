@@ -10,7 +10,9 @@ class UserReg_View extends View {
                $this->link()->route('editText'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit úvodní text'));
          $toolbox->addTool($toolEdit);
+         $this->toolboxText = $toolbox;
 
+         $toolbox = new Template_Toolbox2();
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('welcome_edit', $this->_("Upravit uvítací text"),
                $this->link()->route('editWelcome'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text po úspěšné registraci'));
@@ -21,7 +23,7 @@ class UserReg_View extends View {
          $toolEditM->setIcon('page_edit.png')->setTitle($this->_('Upravit registrační e-mail'));
          $toolbox->addTool($toolEditM);
 
-         $this->toolbox = $toolbox;
+         $this->toolboxForm = $toolbox;
       }
       $this->template()->addTplFile("registration.phtml");
    }
