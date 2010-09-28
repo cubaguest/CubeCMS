@@ -2,8 +2,8 @@
 //$this->addPageTitle(null);
 $this->addCssFile("style.css");
 ?>
-<div id="items-list">
-   <h1><?=$this->_('Titulní strana');?></h1>
+<h1><?=$this->_('Titulní strana');?></h1>
+<div class="main-content-detail" id="items-list">
    <ul id="title-page-items">
       <?  foreach ($this->list as $item) {
          switch ($item['type']) {
