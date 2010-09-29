@@ -13,12 +13,15 @@ class Categories_Controller extends Controller {
     * jestli se pracuje se strukturou administračního menu
     * @var bool
     */
-   private $adminStructure = false;
+   private $isMainStruct = true;
 
    public function mainController() {
       $this->checkWritebleRights();
 
-      $this->formStructType();
+      $this->setMainStruct(true);
+      if($this->routes()->getActionName() != 'main'){
+         $this->setMainStruct(false);
+      }
 
       $formDelete = new Form('category_');
 
@@ -29,7 +32,7 @@ class Categories_Controller extends Controller {
       $formDelete->addElement($submitDel);
 
       if($formDelete->isValid()) {
-         $categories = Category_Structure::getStructure($this->adminStructure);
+         $categories = Category_Structure::getStructure(!$this->isMainStruct());
          // načtení kategorie (nutné pro vyčištění)
          $cM = new Model_Category();
          $cat = $cM->getCategoryById($formDelete->id->getValues());
@@ -49,10 +52,10 @@ class Categories_Controller extends Controller {
 
          // mažeme kategorii ze struktury
          $categories->removeCat($formDelete->id->getValues());
-         $categories->saveStructure($this->adminStructure);
+         $categories->saveStructure(!$this->isMainStruct());
          $this->infoMsg()->addMessage($this->_("Kategorie byla smazána"));
-
-         $this->link()->route()->reload();
+         $this->log('Smazána kategorie :"'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
+         $this->gotoBack();
       }
 
       // form pro posun
@@ -68,8 +71,8 @@ class Categories_Controller extends Controller {
       $formMove->addElement($submitMove);
 
       if($formMove->isValid()) {
+         $menu = Category_Structure::getStructure(!$this->isMainStruct());
          $id = $formMove->id->getValues();
-         $menu = Category_Structure::getStructure($this->adminStructure);
          try {
             $parent = $menu->getCategory($menu->getCategory($id)->getParentId());
             if($formMove->move_to->getValues() == 'up') {
@@ -78,55 +81,33 @@ class Categories_Controller extends Controller {
                $parent->swapChild($parent->getChild($id), $parent->nextChild($parent->getChild($id)));
             }
 
-            $menu->saveStructure($this->adminStructure);
+            $menu->saveStructure(!$this->isMainStruct());
             $this->infoMsg()->addMessage($this->_("Pozice byla změněna"));
-            $this->link()->route()->reload();
+            $cM = new Model_Category();
+            $cat = $cM->getCategoryById($id);
+            $this->log('Upravena pozice kategorie "'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
+            $this->gotoBack();
          } catch (Exception $e) {
             new CoreErrors($e);
          }
       }
 
-      $menu = Category_Structure::getStructure($this->adminStructure);
+      $menu = Category_Structure::getStructure(!$this->isMainStruct());
       if($menu != false) {
          $catModel = new Model_Category();
          $menu->setCategories($catModel->getCategoryList(true));
          $this->view()->structure = $menu;
       }
-      $this->view()->adminStructure = $this->adminStructure;
+      $this->view()->isMainMenu = $this->isMainStruct();
    }
 
-   public function showController() {
-      $this->checkReadableRights();
+   public function adminMenuController() {
+      $this->mainController();
 
-      $form = new Form('category_');
-      $elemIdCat = new Form_Element_Hidden('id');
-      $form->addElement($elemIdCat);
-      $submit = new Form_Element_Submit('delete');
-      $form->addElement($submit);
-
-      if($form->isValid()) {
-         $model = new Model_Category();
-         $cat = $model->getCategoryById($form->id->getValues());
-         //mazání ikony
-         if($cat->{Model_Category::COLUMN_ICON} != null){
-            $file = new Filesystem_File($cat->{Model_Category::COLUMN_ICON},
-                    AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                            .Category::CATEGORY_ICONS_DIR.DIRECTORY_SEPARATOR);
-            $file->delete();
-         }
-
-         $model->deleteCategory($form->id->getValues());
-         $this->infoMsg()->addMessage($this->_('Kategorie byla smzána'));
-         $this->link()->clear()->reload();
-      }
-
-      // nastavení viewru
-      $this->view()->template()->cat = $this->getRequest('categoryid');
    }
 
    public function editController() {
       $this->checkWritebleRights();
-      $this->checkStructType();
 
       $form = $this->createForm();
 
@@ -140,7 +121,7 @@ class Categories_Controller extends Controller {
       $form->description->setValues($cat[Model_Category::COLUMN_DESCRIPTION]);
       // nadřazená kategorie
 
-      $menu = Category_Structure::getStructure($this->adminStructure);
+      $menu = Category_Structure::getStructure(!$this->isMainStruct());
       $catModel = new Model_Category();
       $menu->setCategories($catModel->getCategoryList(true));
 
@@ -183,7 +164,7 @@ class Categories_Controller extends Controller {
 
       if($form->isSend() AND $form->send->getValues() == false){
          $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
-         $this->link()->route()->reload();
+         $this->gotoBack();
       }
 
       // odeslání formuláře
@@ -276,11 +257,11 @@ class Categories_Controller extends Controller {
 
          // uprava struktury
          if($form->parent_cat->getValues() != $selCat->getParentId()) {
-            $menuRepair = Category_Structure::getStructure($this->adminStructure);
+            $menuRepair = Category_Structure::getStructure(!$this->isMainStruct());
             $cat = $menuRepair->getCategory($this->getRequest('categoryid'));
             $menuRepair->removeCat($this->getRequest('categoryid'));
             $menuRepair->addChild($cat, $form->parent_cat->getValues());
-            $menuRepair->saveStructure($this->adminStructure);
+            $menuRepair->saveStructure(!$this->isMainStruct());
          }
 
          // vytvoření tabulek
@@ -290,10 +271,12 @@ class Categories_Controller extends Controller {
          $mInstall->installModule();
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
-//         var_dump($cat);flush();
-//         $this->log('Upravena kategorie "'.$cat[Model_Category::COLUMN_CAT_LABEL][Locales::getDefaultLang()].'"');
-         //         $this->link()->route('detail', array('categoryid' => $this->getRequest('categoryid')))->reload();
-         $this->link()->route()->reload();
+         $this->log('Upravena kategorie "'.$cat[Model_Category::COLUMN_CAT_LABEL][Locales::getDefaultLang()].'"');
+         if($form->gotoSettings->getValues() == true){
+            $this->link()->route('settings', array('categoryid' => $this->getRequest('categoryid')))->reload();
+         } else {
+            $this->gotoBack();
+         }
 
       }
 
@@ -304,13 +287,13 @@ class Categories_Controller extends Controller {
 
    public function addController() {
       $this->checkWritebleRights();
-      $this->checkStructType();
       $form = $this->createForm();
 
       $form->show_in_menu->setValues(true);
+      $form->gotoSettings->setValues(true);
 
       // kategorie
-      $menu = Category_Structure::getStructure($this->adminStructure);
+      $menu = Category_Structure::getStructure(!$this->isMainStruct());
       if($menu != false){
          $catModel = new Model_Category();
          $menu->setCategories($catModel->getCategoryList(true));
@@ -319,14 +302,8 @@ class Categories_Controller extends Controller {
       $this->catsToArrayForForm($menu);
       $form->parent_cat->setOptions($this->categoriesArray);
 
-      $elemGoSet = new Form_Element_Checkbox('gotoSettings', $this->_('Přejít na nastavení kategorie'));
-      $elemGoSet->setSubLabel($this->_('Každá kategorie má podle zvoleného modulu další nastavení. Např: modul "articles" má počet článků na stránku.'));
-      $elemGoSet->setValues(true);
-
-      $form->addElement($elemGoSet);
-
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->link()->route()->reload();
+         $this->gotoBack();
       }
 
       if($form->isValid()) {
@@ -400,9 +377,9 @@ class Categories_Controller extends Controller {
          }
          // po uložení vložíme do struktury
          if($lastId !== false) {
-            $menu = Category_Structure::getStructure($this->adminStructure);
+            $menu = Category_Structure::getStructure(!$this->isMainStruct());
             $menu->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
-            $menu->saveStructure($this->adminStructure);
+            $menu->saveStructure(!$this->isMainStruct());
          }
 
          // instalace
@@ -415,7 +392,7 @@ class Categories_Controller extends Controller {
          if($form->gotoSettings->getValues() == true){
             $this->link()->route('settings', array('categoryid' => $lastId))->reload();
          } else {
-            $this->link()->route()->reload();
+            $this->gotoBack();
          }
 
       }
@@ -583,6 +560,11 @@ class Categories_Controller extends Controller {
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
 
+      $elemGoSet = new Form_Element_Checkbox('gotoSettings', $this->_('Přejít na nastavení kategorie'));
+      $elemGoSet->setSubLabel($this->_('Každá kategorie má podle zvoleného modulu další nastavení. Např: modul "articles" má počet článků na stránku.'));
+
+      $form->addElement($elemGoSet);
+
       return $form;
    }
 
@@ -647,7 +629,7 @@ class Categories_Controller extends Controller {
 
       if($form != null AND $form->isSend() AND $form->send->getValues() == false){
          $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
-         $this->link()->route()->reload();
+         $this->gotoBack();
       }
 
       if($form != null AND $form->isValid()){
@@ -658,46 +640,48 @@ class Categories_Controller extends Controller {
             }
          }
          $categoryM->saveCatParams($this->getRequest('categoryid'), serialize($settings));
-         $this->infoMsg()->addMessage($this->_('Uloženo'));
-         $this->link()->route()->reload();
+         $this->infoMsg()->addMessage(sprintf($this->_('Nastavení kategorie "%s" bylo uloženo'),$cat->{Model_Category::COLUMN_CAT_LABEL}));
+         $this->log('Upraveno nastavení kategorie "'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
+         if($this->isMainStruct()){
+            $this->link()->route()->reload();
+         } else {
+            $this->link()->route('adminMenu')->reload();
+         }
+      } else if($form == null) {
+         if($this->infoMsg()->isEmpty() == false){
+            $this->infoMsg()->addMessage($this->_('Kategorie byla uložena'));
+         }
+         $this->infoMsg()->addMessage($this->_('Kategorie neobsahuje žádná nastavení'));
+         $this->gotoBack();
       }
 
       $this->view()->form = $form;
    }
 
-   private function checkStructType() {
+   private function isMainStruct() {
       if(isset ($_SESSION['structAdmin']) AND $_SESSION['structAdmin'] == true) {
-         $this->adminStructure = true;
+         return false;
       }
-      $this->view()->adminMenu = $this->adminStructure;
+      return true;
    }
 
-   private function formStructType() {
-      $this->checkStructType();
-
-      // from pro změnu main/admin
-      $formType = new Form('struc_type_');
-      $elemTypeSel = new Form_Element_Select('type', $this->_('Typ struktury'));
-      $elemTypeSel->setOptions(array($this->_('Hlavní menu') => 'main',
-         $this->_('Administrační menu') => 'admin'));
-      if($this->adminStructure === true){
-         $elemTypeSel->setValues('admin');
+   private function setMainStruct($main = true) {
+      if($main === true){
+         $_SESSION['structAdmin'] = false;
+         $this->isMainStruct = true;
+         unset ($_SESSION['structAdmin']);
+      } else {
+         $this->isMainStruct = false;
+         $_SESSION['structAdmin'] = true;
       }
-      $formType->addElement($elemTypeSel);
+   }
 
-      $elemTypeSubmit = new Form_Element_Submit('change',$this->_('Změnit'));
-      $formType->addElement($elemTypeSubmit);
-
-      if($formType->isValid()){
-         if($formType->type->getValues() == 'admin'){
-            $_SESSION['structAdmin'] = true;
-         } else {
-            $_SESSION['structAdmin'] = false;
-            unset ($_SESSION['structAdmin']);
-         }
-         $this->link()->reload();
+   private function gotoBack() {
+      if($this->isMainStruct()){
+         $this->link()->route()->reload();
+      } else {
+         $this->link()->route('adminMenu')->reload();
       }
-      $this->view()->formType = $formType;
    }
 }
 

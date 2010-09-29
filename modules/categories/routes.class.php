@@ -10,6 +10,7 @@ class Categories_Routes extends Routes {
       $this->addRoute('edit', "category-::categoryid::/edit/", 'edit','category-{categoryid}/edit/');
       $this->addRoute('settings', "category-::categoryid::/settings/", 'catSettings','category-{categoryid}/settings/');
       $this->addRoute('detail', "category-::categoryid::/", 'show','category-{categoryid}/');
+      $this->addRoute('adminMenu', "adminmenu/", 'adminMenu','adminmenu/');
 
       $this->addRoute('normal', null, 'main', null);
 	}

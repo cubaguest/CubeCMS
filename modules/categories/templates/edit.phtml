@@ -32,18 +32,14 @@ $this->addCssFile("style.css");
       /* <![CDATA[ */
       $(document).ready(function(){
          loadDoc();
-         
-            $('#categoryparent_cat').change(function(){
-               if($('#categoryurlkey_<?=  Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->_('Upravit také URL adresu?')?>')){
-                  $('.categoryurlkey_class').val(null);
-               }
-            });
+         $('select[name=categoryparent_cat]').change(function(){
+            if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->_('Upravit také URL adresu?')?>')){
+               $('.categoryurlkey_class').val(null);
+            }
+         });
       });
-      $('#categorymodule').change(function(){loadDoc();});
-      function loadDoc(){
-         $('#moduleNameDoc').load('<?=$this->link()->route('moduleDoc')?>?module='+$('#categorymodule').val()+' .moduleLabel');
-      }
+      $('select[name=categorymodule]').change(function(){loadDoc();$('input[name=categorygotoSettings]').attr('checked',true);});
+      function loadDoc(){$('#moduleNameDoc').load('<?=$this->link()->route('moduleDoc')?>?module='+$('select[name=categorymodule]').val()+' .moduleLabel');}
       /* ]]> */
    </script>
 </div>
-<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>

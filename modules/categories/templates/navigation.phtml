@@ -1,0 +1,7 @@
+<?
+$this->items = array(
+   $this->_('Hlavní menu') => array('link' => (string)$this->link()->route(), 'icon' => 'application_home.png'),
+   $this->_('Administrační menu') => array('link' => (string)$this->link()->route('adminMenu'), 'icon' => 'application_lightning.png'),
+   );
+$this->includeTpl('module_navigation.phtml', true);
+?>

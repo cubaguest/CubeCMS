@@ -14,6 +14,11 @@ define('SECTION_LABEL_LABEL', $this->_('Popisek'));
 define('SECTION_IND_PANELS_LABEL', $this->_('Individuální panely'));
 define('SECTION_YES_LABEL', $this->_('Ano'));
 define('SECTION_NO_LABEL', $this->_('Ne'));
+define('SECTION_MODULE_DATADIR', $this->_('Datový adresář'));
+define('SECTION_RIGHTS', $this->_('Výchozí práva'));
+define('SECTION_TITLE', $this->_('Popis'));
+define('SECTION_DESC', $this->_('Popis vyhledávače'));
+define('SECTION_SHOW_IN_MENU', $this->_('Zobrazeno v menu'));
 
 // funkce pro render menu
 function vveSectionsRenderFunc($menuArr, $link) {
@@ -45,6 +50,28 @@ function vveSectionsRenderFunc($menuArr, $link) {
                <td><?
                echo $item->getCatObj()->isIndividualPanels() == true ? SECTION_YES_LABEL : SECTION_NO_LABEL;
                   ?></td>
+            </tr>
+            <tr>
+               <th><?=SECTION_SHOW_IN_MENU?>:</th>
+               <td><?
+               echo $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_CAT_SHOW_IN_MENU} == true ? SECTION_YES_LABEL : SECTION_NO_LABEL;
+                  ?></td>
+            </tr>
+            <tr>
+               <th><?=SECTION_MODULE_DATADIR?>:</th>
+               <td><?=$item->getCatObj()->getModule()->getDataDir(true)?></td>
+            </tr>
+            <tr>
+               <th><?=SECTION_RIGHTS?>:</th>
+               <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT};?></td>
+            </tr>
+            <tr>
+               <th><?=SECTION_TITLE?>:</th>
+               <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_CAT_ALT};?></td>
+            </tr>
+            <tr>
+               <th><?=SECTION_DESC?>:</th>
+               <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};?></td>
             </tr>
          </table>
       </div>
@@ -89,10 +116,14 @@ function vveSectionsRenderFunc($menuArr, $link) {
 }
 ?>
 <h1><?=$this->_("Struktura stránek")?></h1>
+<?=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail">
    <?//sekce
    $typeClass = 'mainStruct';
-   if($this->adminStructure == true) {$typeClass = 'adminStruct';}
+   if($this->isMainMenu != true) {
+      $typeClass = 'adminStruct';
+      echo '<p><strong>'.$this->_("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
+   }
    ?>
    <div id="sections" class="<?=$typeClass?>">
       <table style="width: 98%">
@@ -102,7 +133,6 @@ function vveSectionsRenderFunc($menuArr, $link) {
       </table>
    </div>
    <br />
-   <?$this->includeTpl('structtype.phtml');?><br />
    <br />
    <script type="text/javascript">
       /* <![CDATA[ */
@@ -117,13 +147,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
       /* ]]> */
    </script>
    <?
-   if($this->category()->getRights()->isWritable()) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('add_category', $this->_("Přidat kategorii"),
-          $this->link()->route('add'),
-          $this->_("Přidat novou kategorii"), "application_add.png");
-      $this->includeTplObj($toolbox);
-   }
+   echo $this->toolbox;
    ?>
 </div>
 
