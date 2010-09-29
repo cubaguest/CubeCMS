@@ -105,13 +105,13 @@ class Photogalerymed_Controller extends Articles_Controller {
 
       $artModel = new Articles_Model_Detail();
       $art = $artModel->getArticle($this->getRequest('urlkey'));
+      if($art == false) return false;
       // TOHLE chce dořešit, prasárna, ale ve 4 ráno nic nenapadne
       if($this->category()->getRights()->isControll() OR
-         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $this->article->{Articles_Model_Detail::COLUMN_ID_USER})) {
+         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $art->{Articles_Model_Detail::COLUMN_ID_USER})) {
       } else {
          return false;
       }
-      if($art == false) return false;
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
