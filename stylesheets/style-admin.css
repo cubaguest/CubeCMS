@@ -159,7 +159,7 @@ ul.ui-tabs-panel {
    border: 1px solid gray;
 }
 /* donastavení kontentu při editaci */
-.main-content-text {
+.main-content-text, .main-content-images {
    min-height: 40px;
   height:auto !important;
   height:40px;
