@@ -5,9 +5,14 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 ?>
 <h1><?echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
-   <?if($this->text != null) {?>
-      <div class="main-content-text"><?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
-   <?}?>
+      <div class="main-content-text"><?
+   if($this->text != null) {
+      echo $this->text->{Text_Model_Detail::COLUMN_TEXT};
+   } else if($this->category()->getRights()->isWritable()) {
+      echo $this->_('Text nebyl definován');
+   }
+   echo $this->toolboxText;
+   ?></div>
    <!-- Start Advanced Gallery Html Containers -->
    <div class="main-content-images">
       <?
@@ -20,7 +25,10 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
          title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
          ><img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                      .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
-                     /></a><?}?>
+                     /></a><?
+        }
+        echo $this->toolboxImages;
+        ?>
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />

@@ -15,11 +15,4 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
       <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}?>
       <hr class="reseter" />
    <?}?>
-   <?$this->includeTpl('articletools.phtml', true, array(
-      'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
-              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
-              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
-              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
-              'shares' => $this->shares));?>
-   
 </div>

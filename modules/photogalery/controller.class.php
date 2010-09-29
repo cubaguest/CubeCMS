@@ -18,8 +18,8 @@ class Photogalery_Controller extends Controller {
    const SMALL_WIDTH = 140;
    const SMALL_HEIGHT = 140;
 
-   const MEDIUM_WIDTH = 600;
-   const MEDIUM_HEIGHT = 400;
+   const MEDIUM_WIDTH = VVE_DEFAULT_PHOTO_W;
+   const MEDIUM_HEIGHT = VVE_DEFAULT_PHOTO_H;
 
    public function init() {
       $this->setOption('idArt', $this->category()->getId());
@@ -75,7 +75,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->addTplFile("edittext.phtml");
    }
 
-   public function editphotosController($delImgCallBackFunc = null) {
+   public function editphotosController(Url_Link $backLink = null) {
       $this->checkWritebleRights();
 
       $imagesM = new PhotoGalery_Model_Images();
@@ -92,6 +92,11 @@ class Photogalery_Controller extends Controller {
       $editForm->addElement($imgName);
       $imgOrd = new Form_Element_Text('ord', $this->_('Pořadí'));
       $editForm->addElement($imgOrd);
+      $imgRotation = new Form_Element_Select('rotate', $this->_('Otočit do leva'));
+      $imgRotation->setOptions(array('0°' => 0, '90°' => 90, '180°' => 180, '270°' => 270));
+      $imgRotation->setValues(0);
+      $editForm->addElement($imgRotation);
+
       $imgDesc = new Form_Element_TextArea('desc', $this->_('Popis'));
       $imgDesc->setLangs();
       $editForm->addElement($imgDesc);
@@ -100,8 +105,17 @@ class Photogalery_Controller extends Controller {
       $imgId = new Form_Element_Hidden('id');
       $editForm->addElement($imgId);
 
-      $submit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $submit = new Form_Element_SaveCancel('save', array($this->_('Uložit'), $this->_('Zavřít')));
+      $submit->setCancelControll(false);
       $editForm->addElement($submit);
+
+      if($editForm->isSend() AND $submit->getValues() == false){
+         if($backLink === null){
+            $this->link()->route()->reload();
+         } else {
+            $backLink->reload();
+         }
+      }
 
       if($editForm->isValid()) {
          $names = $editForm->name->getValues();
@@ -116,6 +130,19 @@ class Photogalery_Controller extends Controller {
                // ukládají změny
                $imagesM->saveImage($this->category()->getId(), $this->getOption('idArt'),
                        null, $names[$id], $descs[$id],$orders[$id],$id);
+               // rotace pokud je
+               if($editForm->rotate->getValues($id) != 0){
+                  $file = $imagesM->getImage($id)->{PhotoGalery_Model_Images::COLUMN_FILE};
+                  $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
+                     .$this->getOption('subdir', null).Photogalery_Controller::DIR_MEDIUM);
+                  $image->rotateImage($editForm->rotate->getValues($id));
+                  $image->save();
+                  $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
+                     .$this->getOption('subdir', null).Photogalery_Controller::DIR_SMALL);
+                  $image->rotateImage($editForm->rotate->getValues($id));
+                  $image->save();
+                  unset ($image);
+               }
             }
          }
 
@@ -192,10 +219,14 @@ class Photogalery_Controller extends Controller {
                  $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
                  $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT));
 
-         // uloženhí do db
+         // zjistíme pořadí
          $imagesM = new PhotoGalery_Model_Images();
+
+         $count = (int)$imagesM->getCountImages($this->category()->getId(), $addForm->idArt->getValues());
+
+         // uloženhí do db
          $imagesM->saveImage($this->category()->getId(), $addForm->idArt->getValues(),
-                 $image->getName(), $image->getName());
+                 $image->getName(), $image->getName(), null, $count+1);
 
       }
       return $addForm;
@@ -248,8 +279,12 @@ class Photogalery_Controller extends Controller {
       $elemGoBack->setValues(true);
       $editForm->addElement($elemGoBack);
 
-      $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSubmit = new Form_Element_SaveCancel('save');
       $editForm->addElement($elemSubmit);
+
+      if($editForm->isSend() AND $elemSubmit->getValues() == false){
+         $this->link()->route('editphotos')->reload();
+      }
 
       if($editForm->isValid()) {
          $imageF = new Filesystem_File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE},

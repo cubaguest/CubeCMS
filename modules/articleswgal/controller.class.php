@@ -51,7 +51,7 @@ class ArticlesWGal_Controller extends Articles_Controller {
       $dir->rmDir();
 
       $artM->deleteArticle($idArticle);
-      $this->infoMsg()->addMessage($this->_('Galerie byla smazána'));
+      $this->infoMsg()->addMessage($this->_('Článek s galerií byl smazán'));
    }
 
    /**
@@ -109,7 +109,7 @@ class ArticlesWGal_Controller extends Articles_Controller {
       $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
       $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->editphotosController();
+      $ctr->editphotosController($this->link()->route('detail', array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY})));
 
       $this->view()->template()->article = $art;
    }

@@ -85,9 +85,8 @@ class Photogalerymed_Controller extends Articles_Controller {
     * @param <type> $form
     */
    protected function saveArticle($names, $urlkeys,Form $form, $article=null) {
-      // přejmenování adresáře
       $retu = parent::saveArticle($names, $urlkeys, $form, $article);
-
+      // přejmenování adresáře
       if($article !== null) {
          $model = new Articles_Model_Detail();
          $newArticle = $model->getArticleById($article->{Articles_Model_Detail::COLUMN_ID});
@@ -99,20 +98,26 @@ class Photogalerymed_Controller extends Articles_Controller {
             $dir->rename($urlkeys[Locales::getDefaultLang()]);
          }
       }
-
       return $retu;
    }
 
    public function editphotosController() {
+
       $artModel = new Articles_Model_Detail();
       $art = $artModel->getArticle($this->getRequest('urlkey'));
+      // TOHLE chce dořešit, prasárna, ale ve 4 ráno nic nenapadne
+      if($this->category()->getRights()->isControll() OR
+         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $this->article->{Articles_Model_Detail::COLUMN_ID_USER})) {
+      } else {
+         return false;
+      }
       if($art == false) return false;
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
       $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->editphotosController();
+      $ctr->editphotosController($this->link()->route('detail', array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY})));
 
       $this->view()->template()->article = $art;
    }

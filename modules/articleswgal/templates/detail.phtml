@@ -11,7 +11,8 @@ $images = $this->images->fetchAll();
 <h1><?=$this->article->{Articles_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
-   <div class="main-content-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
+         <div class="main-content-annotation"><?echo $this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?>
+   </div>
    <?}?>
    <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
    if(!empty ($images) AND $images != false) {?>
@@ -28,12 +29,14 @@ $images = $this->images->fetchAll();
    <?if((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT} != null){?>
       <div class="main-content-text">
          <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
+         <?echo $this->toolboxMain;?>
       </div>
       <hr class="reseter" />
    <?}?>
    <?if($this->allowPrivate === true){?>
       <div class="main-content-text">
          <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}?>
+         <?echo $this->toolboxPrivate;?>
       </div>
       <hr class="reseter" />
    <?}?>
@@ -51,7 +54,8 @@ $images = $this->images->fetchAll();
          <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                          .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
       </a>
-         <?}?>
+         <?}
+      echo $this->toolboxImages;?>
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
@@ -70,20 +74,5 @@ $images = $this->images->fetchAll();
 
       /* ]]> */
    </script>
-   <?
-   if($this->category()->getRights()->isWritable()) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_galery', $this->_("Upravit článek"),
-              $this->link()->route('edit', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-              $this->_("Upravit galerii"), "page_edit.png");
-      $toolbox->addTool('edit_images', $this->_("Upravit fotky"),
-              $this->link()->route('editphotos', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-              $this->_("Upravit fotky galerie"), "image_edit.png");
-      $toolbox->addTool('article_delete', $this->_("Smazat"),
-              $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
-              'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
-              $this->_('Opravdu smazat článek?'));
-      $this->includeTplObj($toolbox);
-   }?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>

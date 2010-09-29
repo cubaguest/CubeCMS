@@ -2,8 +2,12 @@
 $this->addCssFile("style.css");
 $this->addPageTitle($this->_('úprava miniatury'));
 $this->addJsPlugin(new JsPlugin_JCrop());
+
+// zjištění velikosti obrázku
+$sizes = getimagesize($this->category()->getModule()->getDataDir(false).$this->subdir.Photogalery_Controller::DIR_MEDIUM
+                       .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE});
+
 ?>
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('editimages')));?>
 <h1><?=$this->_('úprava miniatury');?></h1>
 <div class="main-content-form-edit">
    <table class="formTable">
@@ -21,9 +25,8 @@ $this->addJsPlugin(new JsPlugin_JCrop());
          <tr>
             <td id="cropImage">
                <p><?=$this->_('Myší vyberte oblast ze které se má vytvořit miniatura')?></p>
-               <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->subdir.Photogalery_Controller::DIR_MEDIUM
-                       .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
-                       $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
+               <img width="500" class="edit-image-preview" src="<?=$this->category()->getModule()->getDataDir(true).$this->subdir.Photogalery_Controller::DIR_MEDIUM
+                       .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="image <?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE};?>" />
             </td>
          </tr>
          <tr>
@@ -95,28 +98,28 @@ $this->addJsPlugin(new JsPlugin_JCrop());
    <script type="text/javascript">
       /* <![CDATA[ */
       function showPreview(coords){
-         var rx = <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>;
-         var ry = <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?>;
+         var rw = <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>;
+         var rh = <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?>;
          if (parseInt(coords.w) > 0){
-            var rx = rx/coords.w;
-            var ry = ry/coords.h;
+            var rw = rw/coords.w;
+            var rh = rh/coords.h;
 
             $('#preview img').css({
-               width: Math.round(rx * $("#cropImage img").attr('width')) + 'px',
-               height: Math.round(ry * $("#cropImage img").attr('height')) + 'px',
-               marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-               marginTop: '-' + Math.round(ry * coords.y) + 'px'
+               width: Math.round(rw * <?=$sizes[0]?>) + 'px',
+               height: Math.round(rh * <?=$sizes[1]?>) + 'px',
+               marginLeft: '-' + Math.round(rw * coords.x) + 'px',
+               marginTop: '-' + Math.round(rh * coords.y) + 'px'
             });
          }
-         $('#image_start_x').val(coords.x);
-         $('#image_start_y').val(coords.y);
-         $('#image_width').val(coords.w);
-         $('#image_height').val(coords.h);
+         $('input[name=image_start_x]').val(coords.x);
+         $('input[name=image_start_y]').val(coords.y);
+         $('input[name=image_width]').val(coords.w);
+         $('input[name=image_height]').val(coords.h);
       };
-
       jQuery(document).ready(function() {
          $(function(){
             $('#cropImage img').Jcrop({
+               trueSize: [<?=$sizes[0]?>,<?=$sizes[1];?>],
                onChange: showPreview,
                onSelect: showPreview,
                minSize: [ <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>,
@@ -131,4 +134,3 @@ $this->addJsPlugin(new JsPlugin_JCrop());
       /* ]]> */
    </script>
 </div>
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('editphotos')));?>

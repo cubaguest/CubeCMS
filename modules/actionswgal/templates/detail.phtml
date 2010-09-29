@@ -2,7 +2,6 @@
 $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
 
 $jQuery = new JsPlugin_JQuery();
-$jQuery->addUITabs();
 $this->addJsPlugin($jQuery);
 $this->addJsPlugin(new JsPlugin_PiroBox());
 
@@ -10,29 +9,16 @@ $photosModel = new PhotoGalery_Model_Images();
 $countImages = $photosModel->getCountImages($this->category()->getId(), $this->action->{Actions_Model_Detail::COLUMN_ID});
 ?>
 <h1><?=$this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
-<div>
-   <!--<h2><?=htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>&nbsp;-->
-   <!--</h2>-->
-   <!--<p>
-      <a href="<?=$this->link()->route('detail')?>"><?=$this->_('Text')?></a>
-      <a href="<?=$this->link()->route('detailPhotos')?>"><?=$this->_('Fotky')?></a>
-   </p>-->
+<div class="main-content-detail">
+   <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
+   <div class="main-content-image" id="actionText"><!-- SOF TEXT -->
+      <?echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->imagesDir.DIRECTORY_SEPARATOR
+          .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));?>
+   </div>
+   <?}?>
 
-   <div id="actionTabs">
-      <?if($countImages > 0) {?>
-      <ul>
-         <li><a href="#actionText"><?=$this->_('Text')?></a></li>
-         <li><a href="#actionImages"><?=$this->_('Fotky')?></a></li>
-      </ul>
-         <?}?>
-      <div id="actionText"><!-- SOF TEXT -->
-         <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-            print (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->imagesDir.DIRECTORY_SEPARATOR
-                    .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));
-         }?>
-
-         <p>
-            <span style="font-weight: bold">
+   <div class="main-content-annotation">
+      <p class="main-content-dates">
                <?
                $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_START}));
                $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -45,8 +31,8 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
                   $time = new DateTime($this->action->{Actions_Model_Detail::COLUMN_TIME});
                   print (",&nbsp;".$time->format("G:i"));
                }?>
-            </span>
-            <span>
+            </p>
+            <p class="main-content-other">
                <?
                if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null) {
                   print ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
@@ -57,18 +43,18 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
                if((int)$this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
                   printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
                }?>
-            </span>
-         </p>
+            </p>
          <?if($this->action->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-         <p><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+         <p class="action-note"><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></p>
             <?}?>
          <br />
-
+   </div>
+   <div class="main-content-text">
          <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
          <hr class="reseter" />
-      </div> <!-- EOF TEXT -->
+   </div>
       <?if($countImages > 0) {?>
-      <div id="actionImages"><!-- SOF IMAGES -->
+   <div class="main-content-images" id="actionImages"><!-- SOF IMAGES -->
             <?while ($image = $this->images->fetch()) {?>
          <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                           .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
@@ -79,31 +65,14 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
          </a>
                <?}?>
       </div>
-         <?}?>
-   </div>
-   <?if($countImages > 0) {?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $("#actionTabs").tabs({});
-
-      $(document).ready(function(){
-         $().piroBox({
-            my_speed: 300, //animation speed
-            bg_alpha: 0.8, //background opacity
-            radius: 4, //caption rounded corner
-            scrollImage : false, // true == image follows the page _|_ false == image remains in the same open position
-            // in some cases of very large images or long description could be useful.
-            slideShow : 'slideshow', // true == slideshow on, false == slideshow off
-            slideSpeed : 3, //slideshow
-            pirobox_next : 'piro_next', // Nav buttons -> piro_next == inside piroBox , piro_next_out == outside piroBox
-            pirobox_prev : 'piro_prev', // Nav buttons -> piro_prev == inside piroBox , piro_prev_out == outside piroBox
-            close_all : '.piro_close' // add class .piro_overlay(with comma)if you want overlay click close piroBox
-         });
-      });
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
       <?}?>
    <hr class="reseter" />
+   <?$this->includeTpl("buttonback.phtml", true);?>
 
    <?//$this->includeTpl('tools.phtml')?>
    <?$this->includeTpl('articletools.phtml', true, array(
@@ -111,7 +80,6 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
            'shares' => $this->shares));?>
-   <br />
    <?
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
@@ -129,4 +97,3 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
    }
    ?>
 </div>
-<?$this->includeTpl("buttonback.phtml", true);?>

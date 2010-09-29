@@ -32,15 +32,19 @@ class Articles_View extends View {
       if($this->category()->getRights()->isControll() OR
               ($this->category()->getRights()->isWritable() AND
                       $this->article->{Articles_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_article', $this->_("Upravit"),
-                 $this->link()->route('edit'),
-                 $this->_("Upravit zobrazený článek"), "page_edit.png");
-         $toolbox->addTool('article_delete', $this->_("Smazat"),
-                 $this->link(), $this->_("Smazat zobrazený článek"), "page_delete.png",
-                 'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
-                 $this->_('Opravdu smazat článek?'));
-         $this->template()->toolbox = $toolbox;
+
+         $toolbox = new Template_Toolbox2();
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit"),
+         $this->link()->route('edit'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text'));
+         $toolbox->addTool($toolEdit);
+
+         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
+         $tooldel->setIcon('page_edit.png')->setTitle($this->_('Smazat'))
+            ->setConfirmMeassage($this->_('Opravdu smazat článek?'));
+         $toolbox->addTool($tooldel);
+
+         $this->toolbox = $toolbox;
       }
    }
 

@@ -100,21 +100,24 @@ class Articles_Controller extends Controller {
       
       $artM->addShowCount($this->getRequest('urlkey'));
 
-      if($this->category()->getRights()->isWritable()
-              OR $this->category()->getRights()->isControll()) {
+      if($this->category()->getRights()->isWritable() OR
+              ($this->category()->getRights()->isWritable() AND
+                      $this->view()->article->{Articles_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
          $deleteForm = new Form('article_');
 
          $feId = new Form_Element_Hidden('id');
          $feId->addValidation(new Form_Validator_IsNumber());
+         $feId->setValues($this->view()->article->{Articles_Model_Detail::COLUMN_ID});
          $deleteForm->addElement($feId);
 
-         $feSubmit = new Form_Element_Submit('delete');
+         $feSubmit = new Form_Element_Submit('delete', $this->_('Smazat'));
          $deleteForm->addElement($feSubmit);
 
          if($deleteForm->isValid()) {
             $this->deleteArticle($deleteForm->id->getValues());
             $this->link()->route()->rmParam()->reload();
          }
+         $this->view()->formDelete = $deleteForm;
       }
 
       // komponenta pro vypsání odkazů na sdílení

@@ -2,14 +2,11 @@
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
-   $this->addPageTitle($this->_('úprava článku'));
-   $this->addPageTitle($this->catName);
-   $this->addPageHeadline($this->_('úprava článku'));
-   $this->addPageHeadline($this->catName);
+   $h = $this->_('úprava článku').' '.$this->catName;
 } else {
-   $this->addPageTitle($this->_('přidání článku'));
-   $this->addPageHeadline($this->_('přidání článku'));
+   $h = $this->_('přidání článku');
 }
+$this->addPageTitle($h);
 // donastavení formuláře
 $this->form->name->html()->setAttrib('size', 72);
 $this->form->urlkey->html()->setAttrib('size', 72);
@@ -31,7 +28,7 @@ $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEM
 $tinymce->setCfgParam('editor_selector', 'mceEditor');
 $this->addJsPlugin($tinymce);
 ?>
-
+<h1><?=$h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
    <?print($this->form);?>
 </div>

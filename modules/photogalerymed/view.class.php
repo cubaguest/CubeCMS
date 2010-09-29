@@ -24,19 +24,29 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function showView() {
-      if($this->category()->getRights()->isWritable()) {
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('edit_galery', $this->_("Upravit galerii"),
-                 $this->link()->route('edittext', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-                 $this->_("Upravit galerii"), "page_edit.png");
-         $toolbox->addTool('edit_images', $this->_("Upravit fotky"),
-                 $this->link()->route('editphotos', array('urlkey' => $this->article->{Articles_Model_Detail::COLUMN_URLKEY})),
-                 $this->_("Upravit fotky galerie"), "image_edit.png");
-         $toolbox->addTool('article_delete', $this->_("Smazat"),
-                 $this->link(), $this->_("Smazat zobrazenou galerii"), "page_delete.png",
-                 'article_id', (int)$this->article->{Articles_Model_Detail::COLUMN_ID},
-                 $this->_('Opravdu smazat galerii?'));
-         $this->template()->toolbox = $toolbox;
+      if($this->category()->getRights()->isControll() OR
+         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $this->article->{Articles_Model_Detail::COLUMN_ID_USER})) {
+         $toolbox = new Template_Toolbox2();
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit text"),
+         $this->link()->route('edittext'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text galerie'));
+         $toolbox->addTool($toolEdit);
+         
+         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
+         $tooldel->setIcon('page_edit.png')->setTitle($this->_('Smazat galerii'))
+            ->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
+         $toolbox->addTool($tooldel);
+
+         $this->toolboxMain = $toolbox;
+
+         $toolbox = new Template_Toolbox2();
+         $tool = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit fotky"),
+         $this->link()->route('editphotos'));
+         $tool->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky galerie'));
+         $toolbox->addTool($tool);
+
+         $this->toolboxImages = $toolbox;
+
       }
       $this->template()->addTplFile("detail.phtml");
    }
@@ -48,10 +58,7 @@ class Photogalerymed_View extends Articles_View {
    public function editphotosView() {
       $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
               ." - ".$this->_('úprava obrázků'));
-      $this->template()->addPageHeadline($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
-              ." - ".$this->_('úprava obrázků'));
       $this->template()->addTplFile('addimage.phtml', 'photogalery');
-//      $this->template()->addTplFile('testaddform.phtml', 'photogalery');
       $this->template()->addTplFile('editphotos.phtml', 'photogalery');
    }
 

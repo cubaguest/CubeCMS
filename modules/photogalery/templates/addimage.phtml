@@ -1,71 +1,108 @@
 <?
-$this->addJsPlugin(new JsPlugin_Uploadify());
+$this->addJsPlugin(new JsPlugin_SWFUpload());
+$this->addJsPlugin(new JsPlugin_PiroBox());
+$this->addCssFile("style.css", 'photogalery');
 ?>
-<h1><?=$this->_('Přidání obrázku');?></h1>
+<h1><?= $this->_('Úprava obrázků z').' '.$this->category()->getName();?></h1>
+<h2><?=$this->_('Přidání obrázků')?></h2>
 <div class="main-content-form-edit">
-   <span id="loader" style="display:none"><img src="images/progress.gif" alt="Loading..." width="16" /></span>
-   <div id="sidebar">
-      <!-- form to be replaced by uploadify -->
-      <form id="mainftp" method="post" action="<?=$this->link()?>" enctype="multipart/form-data">
-         <div>
-         <? print ($this->addForm->image->label());
-         print ($this->addForm->image->labelValidations());
-         print ($this->addForm->idArt->controll());
-         print ($this->addForm->image->controll());
-         print ($this->addForm->send->controll()); ?>
-         </div>
-      </form>
+   <div class="swfupload-control">
+      <span id="spanButtonPlaceholder"></span>
+         <p id="queuestatus" ></p>
+         <ol id="upload-files-log"></ol>
    </div>
-   <p><?=$this->_('Doporučená maximální velikost souboru je 2MB. Pokud je soubor větší, nemusí se
+   <br />
+   <p><?= $this->_('Doporučená maximální velikost souboru je 2MB. Pokud je soubor větší, nemusí se
 správně nebo vůbec provést změna velikosti obrázku z&nbsp;důvodu nedostatku paměti na serveru. 
-(Obrázek je měněn po jednotlivých bodech.)');?></p>
-   <br />
+(Obrázek je měněn po jednotlivých bodech.)'); ?></p><br />
 </div>
-   <?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('detail')));?>
-<br />
 <script type="text/javascript">
    /* <![CDATA[ */
-   jQuery(document).ready(function() {
-      $('#mainftp').uploadify({
-         'uploader'	: 'jscripts/jqueryuploadify/uploadify.swf',
-         'script'    : '<?=$this->link()->route('uploadFile');?>',
-         'checkScript' : '<?=$this->link()->route('checkFile');?>',
-         'multi'			: true,
-         'auto'			: true,
-         'height'		:	'32', //height of your browse button file
-         'width'			:	'105', //width of your browse button file
-         'sizeLimit'	:	'5120000',  //remove this to set no limit on upload size
-//         'simUploadLimit' : '1', //remove this to set no limit on simultaneous uploads
-         //'buttonImg' : 'images/browse_<?=Locales::getLang()?>.png',
-         'buttonText': '<?=$this->_('Vybrat obrázky')?>',
-         'cancelImg' : 'images/cancel.png',
-         'fileDesc'  : 'images',
-         'fileExt'   : '*.jpg;*.jpeg;*.png;*.gif;*.JPG',
-         'fileDataName' : 'addimage_image',
-         'scriptData' : {'sessionid': '<?=session_id();?>', 'addimage_send' : 'send', 'addimage_idArt' : <?=$this->addForm->idArt->getUnfilteredValues()?>},
-         onProgress: function() {
-            $('#loader').show();
-            $('#mainftpQueue').show();
-         },
-         onSelect : function(){
-            $('#errMessages').empty().hide();
-            $('#infoMessages').empty().hide();
-         },
-         onAllComplete: function() {
-            $('#loader').hide();
-            $('#mainftpQueue').hide();
-            $('#allfiles').load(location.href+" #allfiles>*","",function(){
-               //alert(location.href+" #allfiles>*");
-               formShowOnlyLang('<?=Locales::getLang()?>');
-            });
-            $('#infoMessages').append("<p><?=$this->_('Obrázky byly nahrány')?></p>").show();
-
-            //location.reload(); //uncomment this line if youw ant to refresh the whole page instead of just the #allfiles div
-         },
-         onError : function(event,queueID,fileObj,errObj){
-            $('#errMessages').append('<p><?=$this->_('Obrázek')?> '+fileObj.name+' <?=$this->_("se nepodařilo nahrát")?></p>').show();
-         }
+   $(document).ready(function() {
+      $('.swfupload-control').swfupload({
+         // Backend Settings
+         upload_url: "<?= $this->link()->route('uploadFile'); ?>",    // Relative to the SWF file (or you can use absolute paths)
+         file_post_name: "addimage_image",
+         post_params: {'sessionid': '<?= session_id(); ?>', 'addimage_send' : 'send', 'addimage_idArt' : <?= $this->addForm->idArt->getUnfilteredValues() ?>},
+         file_size_limit : "2048", // 100MB
+//       file_types : "*.jpg;*.jpeg;*.png;*.gif;*.JPG,*.JPEG",
+         file_types_description : "<?=$this->_('Obrázky');?>",
+         file_upload_limit : "50",
+         file_queue_limit : 0,
+         button_image_url : "<?=Url_Request::getBaseWebDir()?>/images/upload_cs.png", // Relative to the SWF file
+         button_placeholder_id : "spanButtonPlaceholder",
+         button_width: 61,
+         button_height: 22,
+         debug: <?if(VVE_DEBUG_LEVEL > 1){echo "true";}else{echo "false";};?>,
+         // Flash Settings
+         flash_url : "<?=Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload.swf"
       });
+
+      // assign our event handlers
+      $('.swfupload-control')
+      .bind('fileQueued', function(event, file){
+         var listitem='<li id="'+file.id+'" >'+
+         '<em>'+file.name+'</em> ('+Math.round(file.size/1024)+' KB) <span class="progressvalue" ></span><span class="status" ><?=$this->_('Odesílám')?></span>'+
+         '<div class="progressbar" ><div class="progress" ></div></div><span class="cancel" >&nbsp;</span>'+
+         '</li>';
+         $('#upload-files-log').append(listitem);
+         $('li#'+file.id+' .cancel').bind('click', function(){ //Remove from queue on cancel click
+            var swfu = $.swfupload.getInstance('.swfupload-control');
+            swfu.cancelUpload(file.id);
+            $('li#'+file.id).slideUp('fast');
+         });
+         // start the upload once a file is queued
+         $(this).swfupload('startUpload');
+      })
+      .bind('uploadComplete', function(event, file){
+         // start the upload (if more queued) once an upload is complete
+         $(this).swfupload('startUpload');
+      })
+      .bind('fileQueueError', function(event, file, errorCode, message){
+         alert('<?=$this->_('Velikost souboru')?> '+file.name+' <?=$this->_('je větší než povolený limit')?>');
+      })
+      .bind('fileDialogComplete', function(event, numFilesSelected, numFilesQueued){
+         $('#queuestatus').text('<?=$this->_('Vybráno souborů')?>: '+numFilesSelected+' / <?=$this->_('Zařazeno souborů')?>: '+numFilesQueued);
+      })
+      .bind('uploadStart', function(event, file){
+         $('#upload-files-log li#'+file.id).find('p.status').text('<?=$this->_('Nahrávám')?>...');
+         $('#upload-files-log li#'+file.id).find('span.progressvalue').text('0%');
+         $('#upload-files-log li#'+file.id).find('span.cancel').hide();
+      })
+      .bind('uploadProgress', function(event, file, bytesLoaded){
+         //Show Progress
+         var percentage=Math.round((bytesLoaded/file.size)*100);
+         $('#upload-files-log li#'+file.id).find('div.progress').css('width', percentage+'%');
+         $('#upload-files-log li#'+file.id).find('span.progressvalue').text(percentage+'% ');
+      })
+      .bind('uploadSuccess', function(event, file, serverData){
+         $('#upload-files-log li#'+file.id).animate({opacity:0}, 300, function(){$(this).remove()});
+         $('#allfiles').load(location.href+" #allfiles>*","",function(){
+            formShowOnlyLang('<?= Locales::getLang() ?>');
+            $().piroBox({slideShow : true,slideSpeed : 3});
+         });
+      });
+      // označení všech obrázků
+      $('#button-check-all-images').live('click',function(){
+         $('input.button-check-delete-image').each(function(){$(this).click();checkCheckbox(this);});
+         return false;
+      });
+      /* zešednutí  */
+      $('input.button-check-delete-image').live('click', function(){
+         checkCheckbox(this);
+      });
+      $('input.button-check-delete-image').each(function(){checkCheckbox(this);});
+
+      // pirobox
+      $().piroBox({slideShow : true,slideSpeed : 3});
    });
+
+   function checkCheckbox(obj){
+      if($(obj).is(':checked')){
+         $(obj).parents('tr').css({opacity : 0.3});
+      } else {
+         $(obj).parents('tr').css({opacity : 1});
+      }
+   }
    /* ]]> */
 </script>

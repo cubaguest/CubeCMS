@@ -18,7 +18,7 @@ class Actionswgal_Controller extends Actions_Controller {
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('idArt', $action->{Actions_Model_Detail::COLUMN_ID});
       $ctr->setOption('subdir', $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $ctr->editphotosController();
+      $ctr->editphotosController($this->link()->back($this->link()->route(), 1));
       // odkaz zpět
       $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
    }

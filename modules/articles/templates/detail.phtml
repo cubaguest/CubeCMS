@@ -34,6 +34,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
       $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
       /* ]]> */
    </script>
+   <?$this->includeTpl("buttonback.phtml", true);?><br />
    <?$this->includeTpl('articletools.phtml', true, array(
       'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
               'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
@@ -44,7 +45,6 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    ?>
 <br />
 </div>
-<?$this->includeTpl("buttonback.phtml", true);?>
 <br />
 <?echo $this->comments;?>
 

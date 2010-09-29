@@ -8,9 +8,12 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 ?>
 <h1><?=$h1?></h1>
 <div class="main-content-detail">
-   <?if($this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
-   <div class="main-content-text"><?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?></div>
-   <?}?>
+   <div class="main-content-text"><?
+   if($this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {
+      echo $this->article->{Articles_Model_Detail::COLUMN_TEXT};
+   }
+   echo $this->toolboxMain;
+   ?></div>
    <!-- Start Advanced Gallery Html Containers -->
    <div class="main-content-images"><?
       $images = $this->images->fetchAll();
@@ -24,6 +27,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
                          .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
                          /></a><?
          }
+         echo $this->toolboxImages;
          ?></div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
@@ -42,6 +46,5 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
       });
       /* ]]> */
    </script>
-   <?echo $this->toolbox;?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>
