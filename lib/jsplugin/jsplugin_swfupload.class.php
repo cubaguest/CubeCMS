@@ -18,12 +18,8 @@ class JsPlugin_SWFUpload extends JsPlugin {
 	protected function setFiles() {
       $this->addDependJsPlugin(new JsPlugin_JQuery());
 		//		Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("swfupload.js"));
-//		$this->addFile(new JsPlugin_JsFile("swfupload.speed.js"));
-//		$this->addFile(new JsPlugin_JsFile("swfupload.queue.js"));
-//		$this->addFile(new JsPlugin_JsFile("swfupload.proxy.js"));
-//		$this->addFile(new JsPlugin_JsFile("swfupload.cookies.js"));
-		$this->addFile(new JsPlugin_JsFile("jquery.swfupload.js"));
+		$this->addFile(new JsPlugin_JsFile("swfupload.js"));// min verze nejede správně
+		$this->addFile(new JsPlugin_JsFile("jquery.swfupload.min.js"));
 	}
 }
 ?>
