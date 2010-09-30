@@ -38,12 +38,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
            'shares' => $this->shares));?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){
-         $().piroBox({
-            slideShow : true, // true == slideshow on, false == slideshow off
-            slideSpeed : 3, //slideshow
-         });
-      });
+      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
       /* ]]> */
    </script>
 </div>
