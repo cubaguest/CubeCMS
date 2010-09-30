@@ -16,6 +16,9 @@
 }
 
 #swfupload-control p{ margin:10px 5px; font-size:0.9em; }
+#swfupload-control object {
+   z-index: 10 !important;
+}
 #upload-files-log{
    margin:0; padding:0; width:90%;
 }

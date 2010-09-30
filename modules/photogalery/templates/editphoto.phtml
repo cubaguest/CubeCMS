@@ -14,8 +14,8 @@ $sizes = getimagesize($this->category()->getModule()->getDataDir(false).$this->s
       <tr>
          <td>
             <p><?=$this->_('Aktuální miniatura')?></p>
-            <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir().$this->subdir.Photogalery_Controller::DIR_SMALL
-                    .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
+            <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL
+                    .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
                     $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
          </td>
       </tr>
@@ -25,8 +25,8 @@ $sizes = getimagesize($this->category()->getModule()->getDataDir(false).$this->s
          <tr>
             <td id="cropImage">
                <p><?=$this->_('Myší vyberte oblast ze které se má vytvořit miniatura')?></p>
-               <img width="500" class="edit-image-preview" src="<?=$this->category()->getModule()->getDataDir(true).$this->subdir.Photogalery_Controller::DIR_MEDIUM
-                       .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="image <?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE};?>" />
+               <img width="500" class="edit-image-preview" src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM
+                       .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="image <?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE};?>" />
             </td>
          </tr>
          <tr>

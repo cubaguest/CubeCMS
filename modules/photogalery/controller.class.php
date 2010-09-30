@@ -237,10 +237,14 @@ class Photogalery_Controller extends Controller {
     */
    public function uploadFileController() {
       $this->checkWritebleRights();
+      $this->view()->allOk = false;
       if($this->savePhotoForm()->isValid()) {
-         echo "1";
+         $this->infoMsg()->addMessage($this->_('Obrázek byl uložen'));
       } else {
-         echo $this->_('Neplatný typ souboru');
+         $this->errMsg()->addMessage($this->_('Chyba při nahrávání, asy nebyl vybrán obrázek, nebo byl poškozen.'));
+      }
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
       }
    }
 
