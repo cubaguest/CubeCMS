@@ -418,7 +418,6 @@ class Locales {
     * @return bool
     */
    public static function isLang($lang) {
-      var_dump(self::$appLangs);
       return in_array($lang, self::$appLangs);
    }
 }
