@@ -5,6 +5,7 @@ class Login_Panel extends Panel {
 	}
 	
 	public function panelView() {
+      $this->template()->currentLink = (string)new Url_Link();
       $this->template()->addTplFile("panel.phtml");
 	}
 }

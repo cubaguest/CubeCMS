@@ -8,9 +8,9 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div style="<?=$backImg?>">
-<form method="post" action="<?=$this->l();?>">
+<p class="panel-box-label"><?=$icon?><a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
+<div class="panel-box-content" style="<?=$backImg?>">
+<form method="post" action="<?=$this->currentLink;?>">
    <p>
       <? if(!Auth::isLoginStatic()){?>
       <label for="panel_login_username"><?=$this->_('Jméno')?></label><br />
