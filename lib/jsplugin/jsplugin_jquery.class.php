@@ -12,18 +12,53 @@
  * @link          http://jquery.com/
  */
 class JsPlugin_JQuery extends JsPlugin {
-   const BASE_THEME_DIR = 'base';
+   const BASE_THEME = 'base';
    const JQUERY_VERSION = '1.4.2';
    const JQUERY_UI_VERSION = '1.8.5';
+
+   const FACE_THEME_DIR = 'jqueryui';
+
+   private static $globalTheme = self::BASE_THEME;
 
    /**
     * Pole s konfigurací pluginu
     * @var array
     */
-   protected $config = array('theme' => self::BASE_THEME_DIR);
+   protected $config = array('theme' => self::BASE_THEME);
 
    protected function initJsPlugin() {
-      
+      if(defined('VVE_JQUERY_THEME')){
+         self::$globalTheme = VVE_JQUERY_THEME;
+         $this->setCfgParam('theme', VVE_JQUERY_THEME);
+      }
+   }
+
+   /**
+    * Metoda nastaví globální téma pro JQueryUI
+    * @param string $theme -- název tématu
+    */
+   public static function getTheme($theme) {
+      self::$globalTheme = $theme;
+   }
+
+   /**
+    * Metoda vrací adresář k tématu
+    * @return string
+    */
+   public static function getThemeDir($theme){
+      if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.Template::face()
+         .DIRECTORY_SEPARATOR.self::FACE_THEME_DIR.DIRECTORY_SEPARATOR.$theme)){
+         return Template::face(false).self::FACE_THEME_DIR.URL_SEPARATOR.$theme.URL_SEPARATOR;
+      }
+      return 'ui/themes/'.$theme.URL_SEPARATOR;
+   }
+
+   private function addCss($css) {
+//      if(VVE_DEBUG_LEVEL <= 1){
+//         $this->addFile(new JsPlugin_CssFile("jquery-ui-all.css", false, self::getThemeDir($this->getCfgParam('theme'))));
+//      } else {
+         $this->addFile(new JsPlugin_CssFile("jquery.ui.$css.css", false, self::getThemeDir($this->getCfgParam('theme'))));
+//      }
    }
 
    protected function setFiles() {
@@ -55,8 +90,8 @@ class JsPlugin_JQuery extends JsPlugin {
          $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
       } else {
          $this->addFile(new JsPlugin_JsFile("jquery.ui.core.min.js"));
-         $this->addFile(new JsPlugin_CssFile("jquery.ui.core.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
-         $this->addFile(new JsPlugin_CssFile("jquery.ui.theme.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+         $this->addCss('core');
+         $this->addCss('theme');
       }
       return $this;
    }
@@ -140,7 +175,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUIMouse();
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.resizable.min.js"));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.resizable.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('resizable.css');
       return $this;
    }
 
@@ -189,7 +224,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.accordion.min.js"));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.accordion.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('accordion.css');
       return $this;
    }
 
@@ -234,7 +269,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUIWidget();
       $this->addUIPosition();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.dialog.min.js"));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.dialog.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('dialog.css');
       return $this;
    }
 
@@ -249,7 +284,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.slider.min.js"));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.slider.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('slider.css');
       return $this;
    }
 
@@ -264,7 +299,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.tabs.min.js"));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.tabs.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('tabs.css');
       return $this;
    }
 
@@ -283,7 +318,7 @@ class JsPlugin_JQuery extends JsPlugin {
        */
       $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker.min.js"));
       $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.datepicker.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('datepicker.css');
       return $this;
    }
 
@@ -298,7 +333,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.progressbar.min.js"));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.progressbar.css", false, 'ui/themes/' . $this->getCfgParam('theme') . URL_SEPARATOR));
+      $this->addCss('progressbar.css');
       return $this;
    }
 

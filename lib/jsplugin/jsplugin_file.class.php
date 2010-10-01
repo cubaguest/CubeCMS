@@ -45,10 +45,12 @@ class JsPlugin_File {
       $this->virtualFile = $virtual;
       if($virtual){
          $this->dir = Url_Request::getBaseWebDir()."jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
-//         $this->dir = "jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
       } else {
-         $this->dir = Url_Request::getBaseWebDir().JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
-//         $this->dir = JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
+         if(strstr($dir, 'http') === false){
+            $this->dir = Url_Request::getBaseWebDir().JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
+         } else { // celá adresa
+            $this->dir = $dir;
+         }
       }
 	}
 	

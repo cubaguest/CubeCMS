@@ -11,21 +11,22 @@
  */
 
 class JsPlugin_JQueryCSS extends JsPlugin {
-   const BASE_THEME_DIR = 'base';
-
    /**
     * Pole s konfigurací pluginu
     * @var array
     */
-   protected $config = array('theme' => self::BASE_THEME_DIR);
+   protected $config = array('theme' => JsPlugin_JQuery::BASE_THEME);
 
 	protected function initJsPlugin() {
       $this->setJsPluginName('jquery');
+      if(defined('VVE_JQUERY_THEME')){
+         $this->setCfgParam('theme', VVE_JQUERY_THEME);
+      }
    }
 
 	protected function setFiles() {
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.core.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
-      $this->addFile(new JsPlugin_CssFile("jquery.ui.theme.css",false,'ui/themes/'.$this->getCfgParam('theme').URL_SEPARATOR));
+      $this->addFile(new JsPlugin_CssFile("jquery.ui.core.css",false,  JsPlugin_JQuery::getThemeDir($this->getCfgParam('theme'))));
+      $this->addFile(new JsPlugin_CssFile("jquery.ui.theme.css",false, JsPlugin_JQuery::getThemeDir($this->getCfgParam('theme'))));
 	}
 }
 ?>
