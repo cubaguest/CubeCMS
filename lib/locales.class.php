@@ -411,5 +411,15 @@ class Locales {
    public static function isMultilang() {
       return self::$isMultilang;
    }
+
+   /**
+    * Metoda zkišťuje jestli je zadaný jazyk jazykem aplikace
+    * @param string $lang -- jazyková zkratka (cs, en, ...)
+    * @return bool
+    */
+   public static function isLang($lang) {
+      var_dump(self::$appLangs);
+      return in_array($lang, self::$appLangs);
+   }
 }
 ?>
