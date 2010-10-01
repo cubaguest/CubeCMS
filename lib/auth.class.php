@@ -93,7 +93,7 @@ class Auth {
 				//Zdařilé přihlášení, uložení detailu o uživateli do session
 				$this->_saveUserDetailToSession();
             $link = new Url_Link();
-            $link->reload();
+            $link->reload('http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
 			}
 		} else {
          //	načtení detailů
@@ -209,6 +209,7 @@ class Auth {
 			session_destroy();
 			$return = true;
 			Log::msg(_('Uživatel byl odhlášen'), null, self::$userName);
+         AppCore::getInfoMessages()->addMessage(_('Byl jste úspěšně odhlášen'));
 			$link = new Url_Link();
          $link->reload();
 		}
