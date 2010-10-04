@@ -1,13 +1,15 @@
 <?
 $this->addCssFile("style.css");
 $this->addJsPlugin(new JsPlugin_JQuery());
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+$this->addJsPlugin(new JsPlugin_TreeTable());
 
 define('SECTION_EDTI_LABEL', $this->_('Upravit'));
 define('SECTION_REMOVE_LABEL', $this->_('Smazat'));
 define('SECTION_SETTINGS_LABEL', $this->_('Upravit parametry'));
 define('SECTION_MOVEUP_LABEL', $this->_('Nahoru'));
 define('SECTION_MOVEDOWN_LABEL', $this->_('Dolu'));
-define('SECTION_GOTO_CAT_LABEL', $this->_('Přejít na'));
+define('SECTION_GOTO_CAT_LABEL', $this->_('Přejít'));
 define('SECTION_SHOW_DETAIL_LABEL', $this->_('Zobrazit detail'));
 define('SECTION_MODULE_LABEL', $this->_('Modul'));
 define('SECTION_LABEL_LABEL', $this->_('Popisek'));
@@ -29,16 +31,24 @@ function vveSectionsRenderFunc($menuArr, $link) {
    $count = $menuArr->count();
    $cycle = 0;
    //   $level = $menuArr->getLevel();
-   foreach ($menuArr as $key => $item) {$cycle++?>
-<tr class="list-item"><td style="padding-left: <?=$item->getLevel()*30?>px;">
-      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=$item?>"><span class="sec"><?=$item?></span></a>
+   foreach ($menuArr as $key => $item) {
+      $cycle++;
+      $class = null;
+      if($item->getParentId() != 0){// pokud není kořen
+         $class = 'child-of-node-'.$item->getParentId();
+      }
+      ?><tr id="node-<?=$item->getId();?>" class="ui-widget-header list-item <?=$class;?>">
+         <td class="cat-first-coll">
+      <span class="sec"><?=$item?></span>
       <?
+      echo langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY});
       if($item->getCatObj()->haveFeed()){?>
-      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?=Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" />
-      </a>
+      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?=Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" /></a>
       <?}
       ?>&nbsp;ID:<?=$item->getId()?>
-      <a href="<?=$link?>" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">dateil</a>
+      <a href="" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">detail</a>&nbsp;
+      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=SECTION_GOTO_CAT_LABEL?>"><?=SECTION_GOTO_CAT_LABEL?></a>
+
       <div class="category-params">
          <table>
             <tr>
@@ -75,7 +85,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
             </tr>
          </table>
       </div>
-   </td><td width="110">
+         </td><td width="110" valign="top">
       <form method="post" action="<?=$link2->route('settings',array('categoryid' => $item->getId()))?>" style="display:inline;">
          <input type="image" src="<?=vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="category_settings" title="<?=SECTION_SETTINGS_LABEL?>" />
@@ -118,15 +128,19 @@ function vveSectionsRenderFunc($menuArr, $link) {
 <h1><?=$this->_("Struktura stránek")?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail">
+   <p><?=$this->_('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
    <?//sekce
    $typeClass = 'mainStruct';
+   $id = 'categories-table';
    if($this->isMainMenu != true) {
+      $id = 'admin-categories-table';
       $typeClass = 'adminStruct';
       echo '<p><strong>'.$this->_("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
    }
    ?>
+   <hr />
    <div id="sections" class="<?=$typeClass?>">
-      <table style="width: 98%">
+      <table id="<?=$id?>" style="width: 98%">
          <?if($this->structure != null){
             echo vveSectionsRenderFunc($this->structure, $this->link());
          }?>
@@ -134,14 +148,31 @@ function vveSectionsRenderFunc($menuArr, $link) {
    </div>
    <br />
    <br />
+   <?
+   ?>
    <script type="text/javascript">
       /* <![CDATA[ */
+      $('#<?=$id?>').treeTable({
+         clickableNodeNames : true,
+         indent: 15
+      });
+
       function submitRemoveCat(msg){
          return confirm('<?=$this->_('Opravdu smazat kategorii: ')?>'+msg+'?');
       }
 
-      $('.button-show-detail').click(function(){
-         $(this).next('div').toggle();
+      $('a.button-show-detail').click(function(){
+         var $div = $(this).parent('td').children('div.category-params');
+         $div.toggle();
+         if($div.is(':hidden')){
+            $(this).parent('td').parent('tr').removeClass('ui-widget-content');
+         } else {
+            $(this).parent('td').parent('tr').addClass('ui-widget-content');
+         }
+//         $(this).parent('td').children('div.category-params').toggle(function(){
+//         }, function(){
+//            alert('hide');
+//         });
          return false;
       });
       /* ]]> */

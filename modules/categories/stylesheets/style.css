@@ -1,25 +1,6 @@
 @CHARSET "UTF-8";
-.mainStruct {
-}
-
-.adminStruct {
-   background-color: #ffcccc;
-}
-
-#sections li {
-   list-style-type:disc;
-}
-
-#sections li {
-   list-style-type:disc;
-}
-
-#sections ul {
-   margin-left: 20px;
-}
-
-#sections .sec {
-   font-weight: bold;
+.list-item td.cat-first-coll {
+   padding-left: 19px;
 }
 .list-item td {
    border-bottom: 1px solid gray;
@@ -33,10 +14,10 @@
    width: 200px;
 }
 .list-item:hover {
-   background-color: #fdf5ce;
+/*   background-color: #fdf5ce;*/
 }
 
-.moduleParamsTable thead{
+.moduleParamsTable thead {
    border-bottom: 1px solid silver;
 }
 .moduleParamsTable .paramDefValue {
@@ -50,4 +31,10 @@
 
 .category-params {
    display: none;
+   margin-top: 1em;
+}
+
+#admin-categories-table .ui-widget-header {
+   background-image: none;
+   background-color: #ff9999;
 }
