@@ -30,9 +30,18 @@
    </div>
    <br />
    <?}?>
-<?if(isset($vars['shares'])) {?>
-   <?=$vars['shares'] // sdílení?>
-   <?}?>
+<?
+// sdílení
+if(isset($this->shares)){$vars['shares'] = $this->shares;}
+if(isset ($vars['shares']) AND $vars['shares'] instanceof Component_Share){
+   echo $vars['shares'];
+} else if(isset ($vars['shares']) AND is_array($vars['shares'])) {
+   $shares = new Component_Share();
+   $shares->setConfig('url', (string)$vars['shares']['url']);
+   $shares->setConfig('title', (string)$vars['shares']['title']);
+   echo $shares;
+}
+?>
    <br />
    <br />
    <iframe src="http://www.facebook.com/widgets/like.php?href=<?=urlencode($this->link());?>" scrolling="no" frameborder="0" style="border:none; width:450px; height:80px"></iframe>
