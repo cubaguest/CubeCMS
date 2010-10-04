@@ -158,10 +158,6 @@ ul.langMenu li a img {
    padding-right: 3px;
 }
 
-/*.normal ul {
-   margin: 0;
-}*/
-
 ul.ui-tabs-panel {
    margin-bottom: 0px;
    border-width: 1px;
@@ -217,3 +213,4 @@ li.module-navigation-tab-selected a {
    border-bottom:1px solid #FFFFFF;
    background-color:#FFFFFF;
 }
+.lang-image {padding-right: 2px; width: 18px; height: 12px;}
