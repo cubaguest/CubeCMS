@@ -270,6 +270,7 @@ class Users_Controller extends Controller {
    public function editGroupController() {
       $this->checkWritebleRights();
       $model = new Model_Groups();
+      $modelR = new Model_Rights();
       $this->view()->allOk = false;
       // část komponenty jqgrid pro formy
       $jqGridReq = new Component_JqGrid_FormRequest();
@@ -289,12 +290,26 @@ class Users_Controller extends Controller {
             }
             $record = $model->record($jqGridReq->id);
             $record->mapArray($jqGridReq);
-            $model->save($record);
+            $grpId = $model->save($record);
+            // projití všech kategorií a vytvoření default práv pro danou skupinu
+            if($jqGridReq->id == null){ // vyloučíme editaci
+               $modelCats = new Model_Category();
+               $cats = $modelCats->getCategoryList(true);
+               foreach ($cats as $cat) {
+                  $rightRec = $modelR->newRecord();
+                  $rightRec->{Model_Rights::COLUMN_ID_CATEGORY} = $cat->{Model_Category::COLUMN_CAT_ID};
+                  $rightRec->{Model_Rights::COLUMN_ID_GROUP} = $grpId;
+                  $rightRec->{Model_Rights::COLUMN_RIGHT} = $cat->{Model_Category::COLUMN_DEF_RIGHT};
+                  $modelR->save($rightRec);
+               }
+            }
             $this->infoMsg()->addMessage($this->_('Skpina byla uložena'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
+            $modelR;
             foreach ($jqGridReq->getIds() as $id) {
                $model->delete($id);
+               $modelR->where(Model_Rights::COLUMN_ID_GROUP, $id)->delete(); // delete all rights
             }
             $this->infoMsg()->addMessage($this->_('Vybrané skupiny byly smazány'));
             break;
