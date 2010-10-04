@@ -17,18 +17,27 @@ class Template_Toolbox2 extends Template {
     */
    const ICONS_DIR = 'icons';
 
+   const ICON_PEN = 'pencil.png';
+   const ICON_WRENCH = 'wrench.png';
+   const ICON_IMAGE_WRENCH = 'image_wrench.png';
+   const ICON_ADD = 'add.png';
+   const ICON_DELETE = 'delete.png';
+
+
    /**
     * Pole s nástroji
     * @var array
     */
    private $tools = array();
 
+   private $icon = self::ICON_WRENCH;
+
    /**
     * Konstruktor, vytvoří základní šablonu pro nástroje.
     */
    public function  __construct() {
       parent::__construct(new Url_Link());
-      $this->createTemplate();
+//      $this->createTemplate();
    }
 
    /**
@@ -92,15 +101,28 @@ class Template_Toolbox2 extends Template {
    }
 
    /**
+    * Metoda nastaví ikonu toolboxu
+    * @param string $icon -- název souboru s ikonou
+    */
+   public function setIcon($icon) {
+      $this->icon = $icon;
+   }
+
+   /**
     * Metoda vytvoří šablonu
     */
    private function createTemplate() {
+      $this->toolboxIcon = $this->icon;
       $this->addTplFile("toolbox/toolbox.phtml", true);
       $this->addJsPlugin(new JsPlugin_JQuery());
 
       $this->iconsDir = Url_Request::getBaseWebDir().Template::IMAGES_DIR.URL_SEPARATOR.self::ICONS_DIR.URL_SEPARATOR;
    }
 
+   public function  __toString() {
+      $this->createTemplate();
+      return parent::__toString();
+   }
    /**
     * Metoda přidá do šablony nástroj
     * @param Template_Toolbox2_Tool $tool -- nástroj

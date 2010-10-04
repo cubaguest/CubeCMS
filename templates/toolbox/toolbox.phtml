@@ -1,3 +1,4 @@
+<a class="toolbox-button" href="" title="Otevřít nástroje"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" /></a>
 <div class="toolbox">
    <? foreach ($this->getTools() as $tool) {?>
       <div class="toolbox-tool">
@@ -40,35 +41,10 @@
                ?></div></form><?
                break;
             default:
-//               var_dump($tool);
                echo "nepodporovaný nástroj";
                break;
          }
       ?>
-        </div>
-      <? } ?>
-  </div>
-<?if(!defined('VVE_TOOLBOX_SHOW_SCRIPT_RENDERED')) {?>
-<script type="text/javascript">
-   /* <![CDATA[ */
-//   $(document).ready(function(){
-//      $("div.toolbox").css({opacity: 0.3});
-//      $("div.toolbox").parent('div').css({position: 'relative'});
-//      $("div.toolbox").hover(
-//         function(){
-//            $(this).fadeTo(100, 1);
-//            $(this).css('z-index', 100);
-//            $(this).parent().addClass('toolbox-active-content');
-//         },
-//         function(){
-//            $(this).fadeTo(300, 0.5);
-//            $(this).css('z-index', 5);
-//            $(this).parent().removeClass('toolbox-active-content');
-//         }
-//      );
-//   });
-   /* ]]> */
-</script>
-<?
-   define('VVE_TOOLBOX_SHOW_SCRIPT_RENDERED', true);
-} ?>
+      </div>
+   <? } ?>
+</div>

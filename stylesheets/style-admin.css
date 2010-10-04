@@ -71,26 +71,26 @@ ul.dropdown li:hover > ul { visibility: visible; }
    width: 100%;
 }
 
-/* Panel s editací */
+/* SOF ToolBox Panel s editací */
 .toolbox {
    background: orange;
    border: olive 1px solid;
    position: absolute;
-   top: -10px;
-   right: 10px;
-   width: auto;
+   top: 0px;
+   right: 0px;
+/*   width: auto;*/
    height: auto;
    padding: 2px 2px 2px 2px;
    background-repeat: no-repeat;
-   opacity: 0.3;
+/*   opacity: 0.3;*/
    display: none;
+   z-index: 3;
 }
 
 .toolbox form p {
    padding: 0 !important;
    margin: 0 !important
 }
-
 .toolbox input {
    background:none;
    border:none;
@@ -100,32 +100,48 @@ ul.dropdown li:hover > ul { visibility: visible; }
    padding: 0 0 0 16px;
    background-repeat: no-repeat;
 }
-
 .toolbox form input[type="hidden"] {
    display:none;
 }
-
 .toolbox form input[type="image"] {
    vertical-align:bottom;
 }
-
 .toolbox form input[type="submit"]:hover {
    background:none;
    background-repeat: no-repeat;
 /*   color: black;*/
 }
- /* NEW TOOLBOX 2 */
- .toolbox-tool {
+
+/* NEW TOOLBOX 2 */
+a.toolbox-button {
+   display: block;
+   position: absolute;
+   top: 1px;
+   right: 1px;
+/*   background-image: url('../images/toolbox-but-back.png');*/
+   width: 20px;
+   height: 20px;
+   background-color: white;
+}
+.toolbox-button img {
+/*   border: 1px solid transparent;
+   border-bottom: none;*/
+   padding: 1px;
+}
+.toolbox-button-hover img {
+/*   border-color: #e3e3e3;*/
+}
+.toolbox-tool {
     line-height: 16px;
 }
- input.toolbox-tool-button {
+input.toolbox-tool-button {
     vertical-align: 2px;
     padding: 0;
 }
-.toolbox-active-content {
-   background-color: #f0efef;
+.toolbox-active-content, .toolbox-button-hover {
+   background-color: #e3e3e3;
 }
-/* EOF Panel s editací */
+/* EOF ToolBox Panel s editací */
 /* Jazykové taby */
 /* TABS content */
 .ui-tabs-hide { display: none; }
@@ -159,10 +175,10 @@ ul.ui-tabs-panel {
    border: 1px solid gray;
 }
 /* donastavení kontentu při editaci */
-.main-content-text, .main-content-images {
-   min-height: 40px;
+.main-content-text, .main-content-images, .main-content-list {
+/*  min-height: 40px;
   height:auto !important;
-  height:40px;
+  height:40px;*/
 } /* text v hlavním obsahu */
 
 ul.module-navigation {
