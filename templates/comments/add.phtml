@@ -11,21 +11,21 @@
 <script type="text/javascript">
    /* <![CDATA[ */
    function selectParent(id, nick,text){
-      document.getElementById('comment_new_parent').value = id;
-      document.getElementById('comment-reaction-label').innerHTML = '<?=_('Reakce na: ')?>'+nick+': '+text.toString();
+      document.getElementById('comment_new_parent_1').value = id;
+      document.getElementById('comment-reaction-label').innerHTML = '<?=_('Reakce na: ')?>'+nick+' - '+text.toString();
    }
    // vypnutí submitu
    var ccTime = <?=$this->ctTime?>;
-   document.getElementById('comment_new_add').disabled = 'disabled';
-   document.getElementById('comment_new_add').value = ccTime+'s';
+   document.getElementById('comment_new_add_1').disabled = 'disabled';
+   document.getElementById('comment_new_add_1').value = ccTime+'s';
 
    function timedCount() {
       ccTime--;
       if(ccTime == 0){
-         document.getElementById('comment_new_add').disabled = '';
-         document.getElementById('comment_new_add').value = '<?=_('Uložit')?>';
+         document.getElementById('comment_new_add_1').disabled = '';
+         document.getElementById('comment_new_add_1').value = '<?=_('Uložit')?>';
       } else {
-         document.getElementById('comment_new_add').value = ccTime+'s';
+         document.getElementById('comment_new_add_1').value = ccTime+'s';
          t=setTimeout("timedCount()",1000);
       }
    }

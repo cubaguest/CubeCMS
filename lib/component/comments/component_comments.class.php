@@ -48,8 +48,6 @@ class Component_Comments extends Component {
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
    public function mainController() {
-
-
       // form pro přidání
       $addForm = new Form('comment_new_');
       $elemNick = new Form_Element_Text('nick', _('Nick'));
@@ -77,7 +75,6 @@ class Component_Comments extends Component {
          if(!isset ($_SESSION['comment_captcha_time']) OR
                  ($_SESSION['comment_captcha_time']+$this->getConfig(self::PARAM_CAPTCHA_TIME) > time())) {
             $this->errMsg()->addMessage(_('Komentář byl odeslán příliš rychle nebo nebyl odeslán kontrolní čas'));
-            $this->errMsg()->addMessage($_SESSION['comment_captcha_time']+$this->getConfig(self::PARAM_CAPTCHA_TIME).' > '.time());
          } else {
             $isPublic = false;
             if($this->getConfig(self::PARAM_NEW_ARE_PUBLIC) == true

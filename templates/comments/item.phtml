@@ -6,10 +6,10 @@ if(isset ($vars['comment'])){
 $class = null;
 if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false) $class = 'comment-nopublic';
 ?>
-<div class="comments-comment <?echo $class?>" style="margin-left: <?echo ($comment->{Component_Comments_Model::COL_LEVEL}*$margin)?>px;">
+<div id="comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" class="comments-comment <?echo $class?>" style="margin-left: <?echo ($comment->{Component_Comments_Model::COL_LEVEL}*$margin)?>px;">
    <?if($this->admin != null) {?>
    <div class="comments-tools">
-      <form action="<?=$this->pageLink()?>" method="post">
+      <form action="<?=$this->pageLink()?>#comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" method="post">
          <p>
             <input type="hidden" name="comment_public_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
                <?if($comment->{Component_Comments_Model::COL_PUBLIC} == false) {?>
@@ -21,7 +21,7 @@ if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false) $class = 'co
                          <?}?>
          </p>
       </form>
-      <form action="<?=$this->pageLink()?>" method="post">
+      <form action="<?=$this->pageLink()?>#comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" method="post">
          <p>
             <input type="hidden" name="comment_censore_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
             <input type="image" name="comment_censore_censored" title="<?if($comment->{Component_Comments_Model::COL_CENSORED} == false)
@@ -44,7 +44,7 @@ if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false) $class = 'co
    <?if($this->isClosed == false) {?>
    <p>
       <a href="<?=$this->pageLink()?>#addComment" onclick="selectParent(<?=$comment->{Component_Comments_Model::COL_ID}
-                    ?>, '<?=$comment->{Component_Comments_Model::COL_NICK}?>', '<?=vve_tpl_truncate($comment->{Component_Comments_Model::COL_COMMENT},20);?>');"><?=_('Reagovat')?></a>
+                    ?>, '<?=$comment->{Component_Comments_Model::COL_NICK}?>', '<?=vve_tpl_truncate($comment->{Component_Comments_Model::COL_COMMENT},40);?>');"><?=_('Reagovat')?></a>
    </p>
       <?}?>
 </div>
