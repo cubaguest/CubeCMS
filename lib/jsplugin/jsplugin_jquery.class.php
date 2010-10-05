@@ -175,7 +175,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUIMouse();
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.resizable.min.js"));
-      $this->addCss('resizable.css');
+      $this->addCss('resizable');
       return $this;
    }
 
@@ -224,7 +224,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.accordion.min.js"));
-      $this->addCss('accordion.css');
+      $this->addCss('accordion');
       return $this;
    }
 
@@ -269,7 +269,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUIWidget();
       $this->addUIPosition();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.dialog.min.js"));
-      $this->addCss('dialog.css');
+      $this->addCss('dialog');
       return $this;
    }
 
@@ -284,7 +284,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.slider.min.js"));
-      $this->addCss('slider.css');
+      $this->addCss('slider');
       return $this;
    }
 
@@ -299,7 +299,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.tabs.min.js"));
-      $this->addCss('tabs.css');
+      $this->addCss('tabs');
       return $this;
    }
 
@@ -318,7 +318,7 @@ class JsPlugin_JQuery extends JsPlugin {
        */
       $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker.min.js"));
       $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
-      $this->addCss('datepicker.css');
+      $this->addCss('datepicker');
       return $this;
    }
 
@@ -333,7 +333,7 @@ class JsPlugin_JQuery extends JsPlugin {
          return;
       $this->addUIWidget();
       $this->addFile(new JsPlugin_JsFile("jquery.ui.progressbar.min.js"));
-      $this->addCss('progressbar.css');
+      $this->addCss('progressbar');
       return $this;
    }
 
