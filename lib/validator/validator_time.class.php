@@ -22,14 +22,15 @@ class Validator_Time extends Validator {
    public function  validate() {
       switch ($this->type) {
          case self::DATE:
-            $this->isValid = $this->checkDate($this->values);
+            $this->checkDate($this->values);
             break;
          case self::TIME:
          default:
-            $this->isValid = $this->checkTime($this->values);
+            $this->checkTime($this->values);
             break;
       }
    }
+   
    /**
 	 * Metoda testuje zadané datum, pokud je v pořádku je vráceno v ISO podobe YYYY-MM-DD
 	 * @param string -- kontrolované datum
@@ -38,16 +39,19 @@ class Validator_Time extends Validator {
 	 */
    private function checkDate() {
       $regs = array();
-		if (preg_match("/([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})/", $this->values, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locales::getLang() != 'en'){
+      $this->isValid = false;
+      // czech and sk dd.mm.yyyy
+		if (preg_match("/([1-3]?[0-9])\.(1?[0-9])\.([0-9]{4})/", $this->values, $regs) AND checkdate ($regs[2], $regs[1], $regs[3]) AND Locales::getLang() != 'en'){
 //			$date = $regs[2].self::ISO_DATE_SEPARATOR.$regs[1].self::ISO_DATE_SEPARATOR.$regs[3];
 //			$time = mktime(null,null,null,$regs[2],$regs[1],$regs[3]);
          $this->isValid = true;
-		} else if (preg_match ("/([0-9]{1,2})/([0-9]{1,2})/([0-9]{4})/",$this->values, $regs) AND checkdate ($regs[1], $regs[2], $regs[3])){
+		}
+      // eng mm/dd/yyyy
+      else if (preg_match ("/(1?[0-9])[\/-]([1-3]?[0-9])[\/-]([0-9]{4})/",$this->values, $regs) AND checkdate ($regs[1], $regs[2], $regs[3])){
 //			$date = $regs[1].self::ISO_DATE_SEPARATOR.$regs[2].self::ISO_DATE_SEPARATOR.$regs[3];
 //			$time = mktime(null,null,null,$regs[1],$regs[2],$regs[3]);
          $this->isValid = true;
 		}
-      $this->isValid = false;
 	}
 
 	/**
@@ -56,6 +60,7 @@ class Validator_Time extends Validator {
 	 */
    private function checkTime() {
 		$nums = explode(self::TIME_SEAPRATOR, $this->values, 2);
+      $this->isValid = true;
 //		Jestli se jedná o hodinu
 		if(!isset($nums[0]) OR $nums[0] < 0 OR $nums[0] > 23){
          $this->isValid = false;
@@ -64,7 +69,6 @@ class Validator_Time extends Validator {
 		if(!isset($nums[1]) OR $nums[1] < 0 OR $nums[1] > 59){
          $this->isValid = false;
 		}
-      $this->isValid = true;
 	}
 }
 ?>
