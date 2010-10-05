@@ -33,9 +33,11 @@ class Validator {
    /**
     * Metoda nastaví hodnoty pro validaci
     * @param <type> $values
+    * @return Validator
     */
    final public function setValues($values){
       $this->values = $values;
+      return $this;
    }
 
    /**
