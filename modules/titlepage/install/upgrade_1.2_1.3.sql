@@ -1,0 +1,1 @@
+ALTER TABLE `{PREFIX}titlepage_items` CHANGE COLUMN `name` `name` VARCHAR(500) NULL DEFAULT NULL  ;

@@ -62,6 +62,11 @@ $this->addJsPlugin($jQuery);
          </div>
          <div class="ui-widget-content item-content">
             <?
+            if((string)$item['nameCat'] != null){
+               echo $this->_('Kategorie').':&nbsp;'.'<a href="'.$item['linkCat'].'" title="'.$item['nameCat'].'">'.$item['nameCat'].'</a>';
+            } else {
+               echo $this->_('Kategorie').':&nbsp;'.$this->category()->getName();
+            }
             $this->item = $item;
             $this->includeTpl($tpl);
             ?>

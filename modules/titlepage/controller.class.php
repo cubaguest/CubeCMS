@@ -34,21 +34,24 @@ class TitlePage_Controller extends Controller {
          $dataObj = new Object();
          $linkCat = $this->link()->clear();
          $name = unserialize($item->{TitlePage_Model_Items::COLUMN_NAME});
-         $name = $name[Locales::getLang()];
+         if(isset ($name[Locales::getLang()])){
+            $name = $name[Locales::getLang()];
+         } else {
+            $name = null;
+         }
          switch ($item->{TitlePage_Model_Items::COLUMN_TYPE}) {
             case self::ITEM_TYPE_TEXT:
             case self::ITEM_TYPE_MENU:
-               $data = unserialize($item->{TitlePage_Model_Items::COLUMN_DATA});
-               $data = $data[Locales::getLang()];
-               $dataObj = $dataObj;
-               if(empty ($data)) continue;
+               $d = unserialize($item->{TitlePage_Model_Items::COLUMN_DATA});
+               if(isset ($d[Locales::getLang()]))
+                  $data = $d[Locales::getLang()];
+               $dataObj = $d;
                if($item->{TitlePage_Model_Items::COLUMN_IMAGE} != null) {
                   $image = $imageAlt = $item->{TitlePage_Model_Items::COLUMN_IMAGE};
                }
                break;
             case self::ITEM_TYPE_VIDEO:
                $data = $item->{TitlePage_Model_Items::COLUMN_DATA};
-               if(empty ($data)) continue;
                break;
             case self::ITEM_TYPE_ARTICLE:
             case self::ITEM_TYPE_ARTICLEWGAL:
@@ -61,10 +64,17 @@ class TitlePage_Controller extends Controller {
                   $article = $modelArticles->getList($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY}, 0, 1);
                   $article = $article->fetch();
                }
+               if($article == false OR (string)$article->{Articles_Model_Detail::COLUMN_URLKEY} == null){
+                  /* zde odstranit zastaralý item (asi pořešit pokud je více jazyků) */
+                  continue;
+               }
+
                $dataObj = $article;
 
                $modelCat = new Model_Category();
                $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+
+               if($cat == false OR (string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue; // nepřeložená kategorie nemá url
 
                $link = new Url_Link_Module(true);
                $link->setModuleRoutes(new Articles_Routes(AppCore::getUrlRequest()));
@@ -75,7 +85,7 @@ class TitlePage_Controller extends Controller {
                if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
                   $data = $article->{Articles_Model_Detail::COLUMN_ANNOTATION};
                } else {
-                  $data = strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}, '<a><strong><em>');
+                  $data = strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}, VVE_SHORT_TEXT_TAGS);
                }
 
                $title = $article->{Articles_Model_Detail::COLUMN_NAME};
@@ -109,7 +119,6 @@ class TitlePage_Controller extends Controller {
                }
                unset ($cat);
                unset ($article);
-               if(empty ($data)) continue;
                break;
             case self::ITEM_TYPE_ACTION:
             case self::ITEM_TYPE_ACTIONWGAL:
@@ -120,10 +129,14 @@ class TitlePage_Controller extends Controller {
                   $modelActions = new Actions_Model_List();
                   $action = $modelActions->getFeaturedActions($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY})->fetch();
                }
+               if($action == false) continue; /* To samé co pro články */
+
                $dataObj = $action;
 
                $modelCat = new Model_Category();
                $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+
+               if($cat == false OR (string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue; // nepřeložená kategorie nemá url
 
                $link = new Url_Link_Module(true);
                $link->setModuleRoutes(new Actions_Routes(AppCore::getUrlRequest()));
@@ -161,12 +174,11 @@ class TitlePage_Controller extends Controller {
                }
                unset ($cat);
                unset ($action);
-               if(empty ($data)) continue;
                break;
             default:
                break;
          }
-
+         if(empty ($data)) continue;
 
          array_push($itemsList, array('itemObj' => $item,
                                       'id' => $item->{TitlePage_Model_Items::COLUMN_ID},
