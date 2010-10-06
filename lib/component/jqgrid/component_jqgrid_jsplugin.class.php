@@ -35,6 +35,10 @@ class Component_JqGrid_JsPlugin extends JsPlugin {
    public function setInLineEdit() {
       $this->addFile(new JsPlugin_JsFile("grid.inlinedit.min.js"));
    }
+
+   public function addSubgridSupport() {
+		$this->addFile(new JsPlugin_JsFile("grid.subgrid.js"));
+   }
 }
 /*
  * Rozdělit do částí:
