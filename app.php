@@ -955,16 +955,18 @@ class AppCore {
 //            ob_start();
 //         }
 //      }
-      // načtení kategorie
+      if(self::$urlRequest->getUrlLang() != null AND Locales::isLang(self::$urlRequest->getUrlLang())){
+         $reqUrl = str_replace(self::$urlRequest->getUrlLang().URL_SEPARATOR, null, self::$urlRequest->getRequestUrl());
+      } else {
+         $reqUrl = self::$urlRequest->getRequestUrl();
+      }
+      $catUrl = self::$urlRequest->getCategory();
+
       $className = 'Module_'.ucfirst(self::$urlRequest->getCategory()).'_Category';
-      if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){
+      // načtení kategorie
+      if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
          self::$category = new $className(self::$urlRequest->getCategory(),true);
-         
-      } else if(
-//         self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND
-         ((self::$urlRequest->getRequestUrl() == '' AND self::$urlRequest->getCategory() == null)
-            OR (self::$urlRequest->getRequestUrl() != '' AND self::$urlRequest->getCategory ()!= null))
-         ) {
+      } else if( ( ($reqUrl == '' AND $catUrl == null) OR ($reqUrl != '' AND $catUrl != null)) ) {
          self::$category = new Category(self::$urlRequest->getCategory(),true);
          Url_Link::setCategory(self::$category->getUrlKey());
       } else { // Chyba stránky
