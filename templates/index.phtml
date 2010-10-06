@@ -3,7 +3,7 @@ $this->setPVar('IE',false);
 if(preg_match('/(?i)msie [1-6]/',$_SERVER['HTTP_USER_AGENT']) AND !isset ($_COOKIE['show_ie_warning'])) {
    $this->setPVar('IE',true);
 }
-print ('<?xml version="1.0" encoding="utf-8"?>');
+echo ('<?xml version="1.0" encoding="utf-8"?>');
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
    <head>
@@ -12,9 +12,7 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
       <meta name="keywords" content="{*-PAGE_KEYWORDS-*}" />
       <meta name="description" content="{*-PAGE_DESCRIPTION-*}" />
       <meta name="Robots" content="index,follow" />
-
       <title>{*-PAGE_TITLE-*}</title>
-
       <base href="<?=Url_Link::getMainWebDir()?>" />
       <?//feedy RSS
       $model = new Model_Category();
@@ -22,22 +20,17 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
       $link = new Url_Link(true);
       foreach ($cats as $cat){
          if($cat[Model_Category::COLUMN_FEEDS] != true) continue;
-         $link->category($cat[Model_Category::COLUMN_URLKEY])
-                 ->file('rss.xml');
-         ?>
-      <link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat[Model_Category::COLUMN_CAT_LABEL]?>"
-            href="<?=$link?>" />
-      <?}?>
-
+         $link->category($cat[Model_Category::COLUMN_URLKEY])->file('rss.xml');
+         ?><link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat[Model_Category::COLUMN_CAT_LABEL]?>"
+            href="<?=$link?>" /><?
+      }?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
       <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
-
       <!--[if lte IE 6]>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
-
       {*-STYLESHEETS-*}
       {*-JAVASCRIPTS-*}
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
@@ -61,8 +54,12 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
       <?if(Auth::isLogin()){?>
       <link rel="stylesheet" type="text/css" href="stylesheets/style-admin.css" />
       <script type="text/javascript" src="jscripts/admin/menu.js"></script>
-      <?}?>
-      <script type="text/javascript" src="jscripts/enginehelpers.min.js"></script>
+      <?}
+      if(VVE_DEBUG_LEVEL > 1){
+         echo '<script type="text/javascript" src="jscripts/enginehelpers.js"></script>';
+      } else {
+         echo '<script type="text/javascript" src="jscripts/enginehelpers.min.js"></script>';
+      }?>
    </head>
    <body id="pageTop">
       <? // admin menu
@@ -70,7 +67,6 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
       ?>
       <? //NavigationMenu_View::listView(); ?>
       <div id="bodywrap">
-
          <div id="headwrap">
             <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
             <div id="menuBox">
@@ -79,13 +75,10 @@ print ('<?xml version="1.0" encoding="utf-8"?>');
                </div>
                <hr class="separator" />
             </div>
-
             <div id="pageHeader">
             </div>
-
          </div><!-- headwrap -->
          <div id="colswrap">
-
             <div id="col1wrap" class="column">
                <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['right'])) echo " col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
