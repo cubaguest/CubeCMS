@@ -48,9 +48,8 @@ function showLoadBox(box, timeout){
       timeout = 5000;
    }
    var jbox = $(box);
-   var overBox = $('<div id="loadingBox" style="background-color: white; \n\
-text-align:center;">\n\
-<img src="images/progress.gif" alt="Loading..." /></div>').css({
+   var overBox = $('<div id="loadingBox" style="background-color: white; text-align:center;"><img src="images/progress.gif" alt="Loading..." /></div>')
+   .css({
       position : 'absolute',
       top : 0,
       left : 0,
@@ -82,14 +81,35 @@ function vveLoadImage(src, callback){
 }
 
 $(document).ready(function(){
-      $("div.toolbox").css({opacity: 0.3});
+//      $("div.toolbox").css({opacity: 0.3});
       $("div.toolbox").parent('div').css({position: 'relative'});
-      $("div.toolbox").parent().hover(
-      function(){
-         $(this).children('div.toolbox').fadeTo(100, 1).show().css('z-index', 100).parent().addClass('toolbox-active-content');
-      },
-      function(){
-         $(this).children('div.toolbox').fadeTo(300, 0).hide().css('z-index', 5).parent().removeClass('toolbox-active-content');
-      }
+      $("a.toolbox-button").click(function(){
+         var $toolbox = $(this).css({'z-index': 1}).next('div.toolbox').clone(true);
+         $('body').append($toolbox);
+         $toolbox.css({
+            opacity: 1,
+            top: $(this).offset().top,
+            left: $(this).offset().left-$toolbox.width()+16,
+            width : $toolbox.width()
+         }).show().mousemove();
+         return false;
+      });
+      $("a.toolbox-button").hover(function(){
+         $(this).css({'z-index': 3}).addClass('toolbox-button-hover').parent().addClass('toolbox-active-content');
+      }, function(){
+         if($('body>div.toolbox').length == 0){
+            $(this).css({'z-index': 1}).removeClass('toolbox-button-hover').parent().removeClass('toolbox-active-content');
+         }
+      });
+      $("div.toolbox").hover(
+         function(){
+            $(this).css({'z-index':10000, opacity:1}).show();
+         },
+         function(){
+            $('.toolbox-active-content').removeClass('toolbox-active-content');
+            $(this).animate({opacity:0}, 500, function(){
+               $(this).remove();
+            });
+         }
    );
 });
