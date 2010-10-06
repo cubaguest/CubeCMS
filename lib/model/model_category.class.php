@@ -161,7 +161,7 @@ class Model_Category extends Model_PDO {
                     .Model_Rights::COLUMN_ID_CATEGORY." = cat.".self::COLUMN_CAT_ID
                     ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp"
                     ." AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'"
-                    .$whereMenu.")"
+                    .$whereMenu." AND ".self::COLUMN_URLKEY.'_'.Locales::getLang()." IS NOT NULL)"
                     ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locales::getLang().") DESC");
             $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
 
