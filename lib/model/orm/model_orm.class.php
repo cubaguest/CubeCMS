@@ -24,15 +24,15 @@ class Model_ORM extends Model_PDO {
 
    protected $tableName = null;
 
-   protected $tableShort = null;
+   protected $tableShortName = null;
 
    private $tableStructure = array();
-
-   private $tableRelations = array();
 
    private $pKey = null;
 
    private $foreignKeys = array();
+
+   private $getAllLangs = true;
 
    private $defaultColumnParams = array(
       'datatype' => 'VARCHAR(45)', // typ sloupce
@@ -49,7 +49,8 @@ class Model_ORM extends Model_PDO {
       'readonly' => false,
       'value' => false,
       'valueLoaded' => false,
-      'name' => null
+      'name' => null,
+      'extern' => false // externí sloupec
    );
 
    protected $limit = array('from' => null, 'rows' => null);
@@ -167,7 +168,18 @@ class Model_ORM extends Model_PDO {
     * @todo NEFUNGUJE !!!
     */
    protected function addRelatioManyToMany($column, $modelName, $modelColumn) {
-      array_push($this->relationsOneToMany, array('column' => $column, 'model' => $modelName, 'modelcolumn' => $modelColumn));
+      array_push($this->relations, array('type' => 'manyToMany','column' => $column, 'model' => $modelName, 'modelColumn' => $modelColumn));
+   }
+
+   /**
+    * Přidá relaci 1:1 na jiný model
+    * @param string $column -- název sloupce v tomto modelu
+    * @param string $modelName -- název připojeného modelu
+    * @param string $modelColumn -- název sloupce v připojeném modelu
+    * @todo NEFUNGUJE !!!
+    */
+   protected function addRelatioOneToOne($column, $modelName, $modelColumn) {
+      array_push($this->relations, array('type' => 'oneToOne','column' => $column, 'model' => $modelName, 'modelColumn' => $modelColumn));
    }
 
    /**
@@ -183,7 +195,7 @@ class Model_ORM extends Model_PDO {
     * Metoda nastavuje název tabulky
     * @param string $tablename -- název tabulky bez prefixu
     */
-   protected function  setTableName($tablename, $short = null) {
+   protected function setTableName($tablename, $short = null) {
       $this->tableName = Db_PDO::table($tablename);
       if($short == null){
          $short = 't_';
@@ -221,6 +233,22 @@ class Model_ORM extends Model_PDO {
     */
    public function getColumns() {
       return $this->tableStructure;
+   }
+
+   /**
+    * Metoda vrací jestli se vybírají všechny jazyky aplikace nebo jenom aktuální
+    * @return bool
+    */
+   public function isSelectAllLangs() {
+      return $this->getAllLangs;
+   }
+
+   /**
+    * Metoda nasatvuje, které jazyky se mají vybírat, jestli všechny, nebo jen aktuální jazyk
+    * @param bool $all -- true pro všechny
+    */
+   public function setSelectAllLangs($all = true) {
+      $this->getAllLangs = $all;
    }
 
    /*
@@ -263,9 +291,9 @@ class Model_ORM extends Model_PDO {
       if($obj == null) $obj = $this;
 
       $dbc = new Db_PDO();
-      $sql = 'SELECT '. $obj->createSQLSelectColumns().' FROM `'.$obj->getTableName().'` AS '.$this->tableShortName;
+      $sql = 'SELECT '. $obj->createSQLSelectColumns().' FROM `'.$obj->getTableName().'` AS '.$this->getTableShortName();
 
-      $this->createSQLJoins($sql);
+      $obj->createSQLJoins($sql);
       $obj->createSQLWhere($sql, $this->getTableShortName());
       $obj->createSQLOrder($sql);
       $obj->createSQLLimi($sql);
@@ -284,19 +312,17 @@ class Model_ORM extends Model_PDO {
     * @param int $rows -- počet záznamů
     * @param string/array $conds -- podmínky
     * @param array $orders -- řazení
-    * @return <type>
+    * @return array of Model_ORM_Record
     */
    public function records() {
       $dbc = new Db_PDO();
-      $sql = 'SELECT '. $this->createSQLSelectColumns().' FROM `'.$this->getTableName().'` AS '.$this->tableShortName;
+      $sql = 'SELECT '. $this->createSQLSelectColumns().' FROM `'.$this->getTableName().'` AS '.$this->getTableShortName();
 
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName());// where
       $this->createSQLOrder($sql);// order
       $this->createSQLLimi($sql);// limit
-
       $dbst = $dbc->prepare($sql);
-      
       $this->bindSQLWhere($dbst);// where values
       $this->bindSQLLimit($dbst);// limit values
       
@@ -308,8 +334,8 @@ class Model_ORM extends Model_PDO {
 
    public function count() {
       $dbc = new Db_PDO();
-      $sql = 'SELECT COUNT(*) AS cnt FROM `'.$this->getTableName().'` AS '.$this->tableShortName;
-      $this->createSQLWhere($sql, $this->tableShortName);
+      $sql = 'SELECT COUNT(*) AS cnt FROM `'.$this->getTableName().'` AS '.$this->getTableShortName();
+      $this->createSQLWhere($sql, $this->getTableShortName());
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);
       $dbst->execute();
@@ -328,10 +354,15 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-//            var_dump($params);
-            if($params['value'] == $params['valueLoaded']) continue;
+            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
-
+               foreach (Locales::getAppLangs() as $lang) {
+                  if($params['aliasFor'] === null){
+                     array_push($colsStr, '`'.$colname.'_'.$lang.'` = :'.$colname.'_'.$lang.'');
+                  } else {
+                     array_push($colsStr, '`'.$params['aliasFor'].'_'.$lang.'` = :'.$colname.'_'.$lang.'');
+                  }
+               }
             } else {
                if($params['aliasFor'] === null){
                   array_push($colsStr, '`'.$colname.'` = :'.$colname.'');
@@ -343,14 +374,15 @@ class Model_ORM extends Model_PDO {
          if(empty ($colsStr)) return $returnPk; // žádné změny se neukládájí
          $dbst = $dbc->prepare($sql.' SET '.  implode(',', $colsStr)
             .' WHERE `'.$this->pKey.'` = :pkey');
-
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['value'] == $params['valueLoaded']) continue;
+            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
-
+               foreach (Locales::getAppLangs() as $lang) {
+                  $dbst->bindValue(':'.$colname.'_'.$lang, $value[$lang], $params['pdoparam']);
+               }
             } else {
                // date clumns
                if($value instanceof DateTime){
@@ -371,26 +403,34 @@ class Model_ORM extends Model_PDO {
          $colsStr = array(); $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['value'] == $params['valueLoaded']) continue;
+            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
-
+               foreach (Locales::getAppLangs() as $lang) {
+                  if($params['aliasFor'] === null){
+                     array_push($colsStr, '`'.$colname.'_'.$lang.'`');
+                  } else {
+                     array_push($colsStr, '`'.$params['aliasFor'].'_'.$lang.'`');
+                  }
+                  array_push($bindParamStr, ':'.$colname.'_'.$lang);
+               }
             } else {
                if($params['aliasFor'] === null){
                   array_push($colsStr, '`'.$colname.'`');
                } else {
                   array_push($colsStr, '`'.$params['aliasFor'].'`');
                }
-
                array_push($bindParamStr, ':'.$colname);
             }
          }
          $dbst = $dbc->prepare($sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['value'] == $params['valueLoaded']) continue;
+            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
-
+               foreach (Locales::getAppLangs() as $lang) {
+                  $dbst->bindValue(':'.$colname.'_'.$lang, $value[$lang], $params['pdoparam']);
+               }
             } else {
                // date clumns
                if($value instanceof DateTime){
@@ -434,10 +474,6 @@ class Model_ORM extends Model_PDO {
            
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);
-//      var_dump($pkValue);
-//      var_dump($sql);
-//      var_dump($this->whereBindValues);
-//      exit();
       $ret = $dbst->execute();
       $this->deleteRelations($pkValue); // vymazat přidružení
       return $ret;
@@ -542,11 +578,20 @@ class Model_ORM extends Model_PDO {
    protected function createSQLSelectColumns() {
       $columns = array();
       foreach ($this->tableStructure as $columnName => $params) {
-         if($params['aliasFor'] == null){
-            array_push($columns, '`'.$this->tableShortName.'`.`'.$columnName.'`');
-         } else {
-            array_push($columns, '`'.$this->tableShortName.'`.`'.$params['aliasFor'].'` AS '.$columnName);
+         if($params['lang'] == false){// není jazyk
+            if($params['aliasFor'] == null){
+               array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'`');
+            } else {
+               array_push($columns, '`'.$this->getTableShortName().'`.`'.$params['aliasFor'].'` AS '.$columnName);
+            }
+         } else if($this->getAllLangs == true) { // více jazyčné sloupce
+            foreach (Locales::getAppLangs() as $key => $value) {
+               array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.$value.'`');
+            }
+         } else { // pouze aktuální jazykový sloupec
+            array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.Locales::getLang().'` AS '.$columnName);
          }
+
       }
       $columns = $this->createSQLSelectJoinColumns($columns);
       $tableCols = implode(',', $columns);
@@ -575,10 +620,19 @@ class Model_ORM extends Model_PDO {
             $this->joinString .= $part; // uložení do joinstring
 
             // samotné vytvoření sloupců
+            $modelCols = $model->getColumns();
             if(!empty($this->joins[$tbName]['columns'])){ // jen vybrané sloupce
-
+               foreach ($this->joins[$tbName]['columns'] as $alias => $coll) {
+                  if(!is_int($alias)){ // is alias
+                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$coll.'` AS '.$alias);
+                  } else if($modelCols[$coll]['aliasFor'] != null) { // is alias from model
+                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$modelCols[$coll]['aliasFor'].'` AS '.$coll);
+                  } else {
+                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$coll.'`');
+                  }
+               }
             } else { // všechny sloupce z tabulky kromě pk
-               foreach ($model->getColumns() as $name => $params) {
+               foreach ($modelCols as $name => $params) {
                   if($params['pk'] == true) continue;
                   if($params['aliasFor'] == null){
                      array_push($columns, '`'.$model->getTableShortName().'`.`'.$name.'`');
@@ -612,7 +666,7 @@ class Model_ORM extends Model_PDO {
       if(!empty ($this->orders)){
          $ords = array();
          foreach ($this->orders as $col => $val) {
-            if(strtoupper($val) != 'ASC' AND strtoupper($val) != 'DESC') throw new UnexpectedValueException (sprintf (_('Nepodporovaný typ řazení "%s"'), $val));
+            if(!is_int($col) AND strtoupper($val) != 'ASC' AND strtoupper($val) != 'DESC') throw new UnexpectedValueException (sprintf (_('Nepodporovaný typ řazení "%s"'), $val));
             // kontrola sloupce jestli existuje
             // pokud obsahuje tečku jedná se o zápis s prefixem tabulky a ten se vkládá přímo
             if(is_int($col)){// pokud je jenom sloupce je ASC
@@ -621,10 +675,14 @@ class Model_ORM extends Model_PDO {
             }
             if(strpos($val,'.') === false){ // pokud není předána zkratka s tabulkou
                if(isset ($this->tableStructure[$col])){
+                  $colName = $col;
+                  if($this->tableStructure[$col]['lang'] == true){
+                     $colName = $col.'_'.Locales::getLang();
+                  }
                   if($this->tableStructure[$col]['aliasFor'] != null){
-                     array_push($ords, '`'.$this->tableShortName.'`.`'.$this->tableStructure[$col]['aliasFor'].'` '.strtoupper($val));
+                     array_push($ords, '`'.$this->getTableShortName().'`.`'.$this->tableStructure[$col]['aliasFor'].'` '.strtoupper($val));
                   } else {
-                     array_push($ords, '`'.$this->tableShortName.'`.`'.$col.'` '.strtoupper($val));
+                     array_push($ords, '`'.$this->getTableShortName().'`.`'.$colName.'` '.strtoupper($val));
                   }
                } else {
                   array_push($ords, '`'.$col.'` '.strtoupper($val));
@@ -647,8 +705,14 @@ class Model_ORM extends Model_PDO {
          $parts = explode(' ', $this->where);
          foreach ($parts as $value) {
             if($tbShorName != null AND isset ($this->tableStructure[$value])){
+               if($this->tableStructure[$value]['lang'] == true){
+                  $value = $value.'_'.Locales::getLang();
+               }
                $retWhere .= '`'.$tbShorName.'`.`'.$value.'` ';
             } else if(isset ($this->tableStructure[$value])){
+               if($this->tableStructure[$value]['lang'] == true){
+                  $value = $value.'_'.Locales::getLang();
+               }
                $retWhere .= '`'.$value.'` ';
             } else if(strpos($value, '.')) {
             // doplnění uvozovek u cizích sloupců
@@ -674,8 +738,8 @@ class Model_ORM extends Model_PDO {
     */
    protected function bindSQLLimit(PDOStatement &$stmt) {
       if($this->limit['from'] !== null){
-         $stmt->bindValue(':fromRow', $this->limit['from'], PDO::PARAM_INT);
-         $stmt->bindValue(':rows', $this->limit['rows'], PDO::PARAM_INT);
+         $stmt->bindValue(':fromRow', (int)$this->limit['from'], PDO::PARAM_INT);
+         $stmt->bindValue(':rows', (int)$this->limit['rows'], PDO::PARAM_INT);
       }
    }
 

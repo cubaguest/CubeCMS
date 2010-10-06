@@ -119,10 +119,13 @@ class Model_ORM_LangCell implements ArrayAccess, Countable {
       if(gettype($this->values[Locales::getLang()]) == 'string'
         AND $this->values[Locales::getLang()] != ''|null) {
          return $this->values[Locales::getLang()];
-      } else if(gettype($this->values[Locales::getDefaultLang()]) == 'string'
-        AND $this->values[Locales::getDefaultLang()] != ''|null) {
-         return $this->values[Locales::getDefaultLang()];
-      } else {
+      }
+      // vrací se výchozí jazyk -- není protože jazyk může být vybrán jenom jeden
+//      else if(gettype($this->values[Locales::getDefaultLang()]) == 'string'
+//        AND $this->values[Locales::getDefaultLang()] != ''|null) {
+//         return $this->values[Locales::getDefaultLang()];
+//      }
+      else {
          return (string)null;
       }
    }

@@ -11,7 +11,7 @@
  * @abstract 		Abstraktní třída pro vytvoření modelu pro práci s databází
  */
 
-class Model_ORM_Record {
+class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    protected $columns = array();
 
    protected $externColumns = array();
@@ -38,16 +38,18 @@ class Model_ORM_Record {
    public function  __set($collName, $value) {
       if(!isset ($this->columns[$collName])){
          // tady detekce jazyka
-
-         $this->externColumns[$collName] = $value; // externí sloupce, např. s joinů
-
-//         if (preg_match("/^(.*)_([a-z]{2})$/i", $name, $matches)) {
-//            if(!isset ($this->values[$matches[1]])
-//             OR !($this->values[$matches[1]] instanceof Model_LangContainer_LangColumn)) {
-//               $this->values[$matches[1]] = new Model_LangContainer_LangColumn();
-//            }
-//            $this->values[$matches[1]]->addValue($matches[2], $value);
-//         }
+         if ($collName[strlen($collName)-3] == '_') {
+            $lang = substr($collName, strrpos($collName, '_')+1);
+            $collName = substr($collName, 0, strrpos($collName, '_'));
+            if(!($this->columns[$collName]['value'] instanceof Model_ORM_LangCell)) {
+               $this->columns[$collName]['value'] = new Model_ORM_LangCell();
+               $this->columns[$collName]['valueLoaded'] = new Model_ORM_LangCell();
+            }
+            $this->columns[$collName]['value']->addValue($lang, $value);
+            $this->columns[$collName]['valueLoaded']->addValue($lang, $value);
+         } else {
+            $this->columns[$collName] = array('value' => $value, 'valueLoaded' => $value, 'extern' => true); // externí sloupce, např. s joinů
+         }
       } else {
          // tady kontroly sloupců a přetypování na správné hodnoty
          if($this->fromDb == true AND !isset ($this->columns[$collName]['valueLoaded'])){
@@ -75,9 +77,10 @@ class Model_ORM_Record {
       // tady kontroly sloupců
       if(isset ($this->columns[$collName])){
          return $this->columns[$collName]['value'];
-      } else if(isset ($this->externColumns[$collName])){
-         return $this->externColumns[$collName];
       }
+//      else if(isset ($this->externColumns[$collName])){
+//         return $this->externColumns[$collName];
+//      }
       return null;
    }
 
@@ -113,5 +116,74 @@ class Model_ORM_Record {
          }
       }
    }
+
+   /* implementace rozhraní */
+
+   /**
+    * Metoda pro nastavení hodnoty prvku při přístupu přes pole
+    * @param string $offset -- název proměnné
+    * @param mixed $value -- hodnota prvku
+    */
+   public function offsetSet($offset, $value) {
+      $this->__set($offset, $value);
+   }
+
+   /**
+    * Metoda zjišťuje existenci prvku při přístupu přes pole
+    * @param string $offset -- název proměnné
+    * @return boolean
+    */
+   public function offsetExists($offset) {
+      return isset ($this->columns[$offset]);
+   }
+
+   /**
+    * Metoda odstranění prvku při přístupu přes pole
+    * @param string $offset -- název prvku
+    */
+   public function offsetUnset($offset) {
+      unset ($this->columns[$offset]);
+   }
+
+   /**
+    * Metoda pro vrácení hodnoty prvku při přístupu přes pole
+    * @param string $offset -- název proměnné
+    * @return mixed -- hodnota prvku
+    */
+   public function offsetGet($offset) {
+      return $this->__get($offset);
+   }
+
+   /**
+    * Metoda pro počítání prvků
+    * @return int -- počet prvků
+    */
+   public function count() {
+      return count($this->columns);
+   }
+
+   /**
+    * Metody pro posun po prvcích pomocí foreach
+    */
+   public function rewind() {
+      reset($this->columns);
+    }
+
+    public function current() {
+      return current($this->columns);
+    }
+
+    public function key() {
+      return key($this->columns);
+    }
+
+    public function next() {
+      next($this->columns);
+    }
+
+    public function valid() {
+       return ! is_null(key($this->columns));
+    }
+
 }
 ?>
