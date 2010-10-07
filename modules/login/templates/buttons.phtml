@@ -1,0 +1,11 @@
+<div id="userButtons">
+   <form method="post" action="<?= $this->link(); ?>">
+      <input id="login_submit" type="submit" name="logout_submit" value="<?= $this->_('Odhlásit'); ?>" />
+   </form>
+   <form action="<?= $this->l()->route('changePasswd'); ?>" method="get">
+      <input type="submit" value="<?= $this->_('Změnit heslo'); ?>" />
+   </form>
+   <form action="<?= $this->l()->route('changeUser'); ?>" method="get">
+      <input type="submit" value="<?= $this->_('Změnit údaje'); ?>" />
+   </form>
+</div>
