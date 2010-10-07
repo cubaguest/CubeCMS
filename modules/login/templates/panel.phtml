@@ -24,7 +24,7 @@ if($this->panelObj()->getBackImage() != null){
              onblur="if (this.value == '') { this.value = 'Password'; }"/><br />
       <input id="login_submit" type="submit" name="login_submit" value="<?=$this->_('přihlásit')?>" />
       <? } else { ?>
-      <?=$this->_('Jste přihlášen')?><br />
+      <?=$this->_('Přihlášen')?>: <a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=Auth::getUserName()?></a><br />
       <input id="login_submit" type="submit" name="logout_submit" value="<?=$this->_('odhlásit')?>" />
       <? } ?>
    </p>

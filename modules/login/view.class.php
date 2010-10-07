@@ -9,9 +9,8 @@ class Login_View extends View {
       if(Auth::isLoginStatic()){
          $this->template()->addTplFile("user.phtml");
       } else {
-         $this->template()->addTplFile("login.phtml");
+         $this->template()->addTplFile("login.phtml", 'login');
       }
-		$this->template()->addCssFile("style.css");
 	}
 	
 	/**
@@ -29,13 +28,16 @@ class Login_View extends View {
 	 * Viewwer pro zobrazení změny hesla
 	 */
 	public function changepasswdView() {
-		$this->template()->addTplFile("changepsswd.phtml");
+		$this->template()->addTplFile("changepsswd.phtml", 'login');
 	}
 
    public function changeUserView() {
       $this->template()->addTplFile("edituser.phtml");
    }
-	
+
+   public function newPasswordView() {
+      $this->template()->addTplFile('newpass.phtml', 'login');
+   }
 }
 
 ?>

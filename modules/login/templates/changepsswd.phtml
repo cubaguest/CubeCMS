@@ -1,17 +1,18 @@
 <?
-$this->addPageTitle($this->_('Účet').' '.VVE_PAGE_TITLE_SEPARATOR.' '.$this->_('Změna hesla'));
-$this->addPageHeadline($this->_('Změna hesla'));
+$h = $this->_('Změna hesla');
+$this->addPageTitle($h);
 $this->form->gener->htmlSubLabel()->addContent('<a href="#" onclick="suggestPassword(); return false;">'.$this->_('obnovit').'</a>'
         .'&nbsp;&nbsp;&nbsp;<a href="#" onclick="copyPassword(); return false;">'.$this->_('kopírovat').'</a>', true);
-echo $this->form;
 ?>
-
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit">
+   <?echo $this->form;?>
    <?
-   print new Html_Element_Script('function suggestPassword() {
+   echo new Html_Element_Script('function suggestPassword() {
    var pwchars = "abcdefhjmnpqrstuvwxyz23456789ABCDEFGHJKLMNPQRSTUVWYXZ";
    var passwordlength;    // do we want that to be dynamic?  no, keep it simple :)
    passwordlength = Math.round(Math.random()*6)+6;
-   var passwd = document.getElementById(\'pass_gener\');
+   var passwd = document.getElementById(\'pass_gener_1\');
    passwd.value = \'\';
 
    for ( i = 0; i < passwordlength; i++ ){
@@ -20,10 +21,10 @@ echo $this->form;
    return passwd.value;
    };
    function copyPassword() {
-      document.getElementById(\'pass_new1\').value = document.getElementById(\'pass_gener\').value;
-      document.getElementById(\'pass_new2\').value = document.getElementById(\'pass_gener\').value;
+      document.getElementById(\'pass_new1_1\').value = document.getElementById(\'pass_gener_1\').value;
+      document.getElementById(\'pass_new2_1\').value = document.getElementById(\'pass_gener_1\').value;
    }
 suggestPassword();
 ');
-   ?>
-<?$this->includeTpl("buttonback.phtml", true);?>
+?>
+</div>

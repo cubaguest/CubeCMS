@@ -27,6 +27,7 @@ class Model_Users extends Model_ORM {
    const COLUMN_ID         = 'id_user';
    const COLUMN_USERNAME   = 'username';
    const COLUMN_PASSWORD   = 'password';
+   const COLUMN_PASSWORD_RESTORE   = 'password_restore';
    const COLUMN_ID_GROUP   = 'id_group';
    const COLUMN_NAME       = 'name';
    const COLUMN_SURNAME    = 'surname';
@@ -49,6 +50,7 @@ class Model_Users extends Model_ORM {
       $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_USERNAME, array('datatype' => 'varchar(50)', 'nn' => true, 'uq' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_PASSWORD, array('datatype' => 'varchar(50)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PASSWORD_RESTORE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_SURNAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_BLOCKED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));

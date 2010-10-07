@@ -1,5 +1,8 @@
-<div>
-   <h2><?=$this->_('Informace o účtu')?></h2>
+<?
+$this->addCssFile("style.css");
+?>
+<h1><?=$this->_('Informace o účtu')?></h1>
+<div class="main-content-detail">
    <table>
       <tr>
          <th width="100"><?=$this->_('Login')?></th>
@@ -26,14 +29,16 @@
          <td><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
    </table>
-</div>
-<br />
-<div id="userButtons">
-   <?$this->includeTpl('logout.phtml')?>
-   <form action="<?=$this->l()->route('changePasswd');?>" method="get">
-      <input type="submit" value="<?=$this->_('Změnit heslo');?>" />
-   </form>
-   <form action="<?=$this->l()->route('changeUser');?>" method="get">
-      <input type="submit" value="<?=$this->_('Změnit údaje');?>" />
-   </form>
+   <br />
+   <div id="userButtons">
+      <form method="post" action="<?=$this->link();?>">
+         <input id="login_submit" type="submit" name="logout_submit" value="<?=$this->_('Odhlásit');?>" />
+      </form>
+      <form action="<?=$this->l()->route('changePasswd');?>" method="get">
+         <input type="submit" value="<?=$this->_('Změnit heslo');?>" />
+      </form>
+      <form action="<?=$this->l()->route('changeUser');?>" method="get">
+         <input type="submit" value="<?=$this->_('Změnit údaje');?>" />
+      </form>
+   </div>
 </div>
