@@ -2,24 +2,23 @@
 #login-form {
 	text-align: center;
 }
-
 #login-form div {
    margin: 0px auto;
    padding: 100px 0;
 	width: 300px;
 	text-align: left;
 }
-
 #login-form div p b {
 	vertical-align: top;
 }
-
 #login-form div table {
 	width: 100%;
 	border: 1px solid #007070;
 }
-
 #userButtons form {
    display: inline;
    padding-right: 5px;
+}
+#user-dateil table th, #user-dateil table td {
+   padding: 2px 4px;
 }

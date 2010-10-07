@@ -162,7 +162,8 @@ class Login_Controller extends Controller {
          if($form->restore->getValues() == false){
             $this->link()->route()->reload();
          }
-         if($modelUsr->where(Model_Users::COLUMN_USERNAME, $form->username->getValues())->record() == false){
+         if($form->username->getValues() != null AND
+            $modelUsr->where(Model_Users::COLUMN_USERNAME, $form->username->getValues())->record() == false){
             $eUsername->setError($this->_('Zadané uživatelské jméno neexistuje'));
          }
       }

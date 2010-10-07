@@ -1,32 +1,33 @@
 <?
 $this->addCssFile("style.css");
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
 <h1><?=$this->_('Informace o účtu')?></h1>
-<div class="main-content-detail">
+<div class="main-content-detail" id="user-dateil">
    <table>
       <tr>
-         <th width="100"><?=$this->_('Login')?></th>
-         <td width="300"><?=$this->user->{Model_Users::COLUMN_USERNAME}?></td>
+         <th class="ui-widget-header" width="200"><?=$this->_('Uživatelké jméno')?></th>
+         <td class="ui-widget-content" width="300"><?=$this->user->{Model_Users::COLUMN_USERNAME}?></td>
       </tr>
       <tr>
-         <th><?=$this->_('Jméno')?></th>
-         <td><?=$this->user->{Model_Users::COLUMN_NAME}?></td>
+         <th class="ui-widget-header"><?=$this->_('Jméno')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NAME}?></td>
       </tr>
       <tr>
-         <th><?=$this->_('Přijmení')?></th>
-         <td><?=$this->user->{Model_Users::COLUMN_SURNAME}?></td>
+         <th class="ui-widget-header"><?=$this->_('Přijmení')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_SURNAME}?></td>
       </tr>
       <tr>
-         <th><?=$this->_('Skupina')?></th>
-         <td><?=$this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
+         <th class="ui-widget-header"><?=$this->_('Skupina')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
       </tr>
       <tr>
-         <th><?=$this->_('E-maily')?></th>
-         <td><?=$this->user->{Model_Users::COLUMN_MAIL}?></td>
+         <th class="ui-widget-header"><?=$this->_('E-maily')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_MAIL}?></td>
       </tr>
       <tr>
-         <th><?=$this->_('Poznámky')?></th>
-         <td><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
+         <th class="ui-widget-header"><?=$this->_('Poznámky')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
    </table>
    <br />
