@@ -14,6 +14,9 @@
  * @abstract      Třída pro obsluhu formulářů
  */
 class Form implements ArrayAccess, Iterator {
+   const GRP_POS_END = 1;
+   const GRP_POS_BEGIN = 2;
+
    /**
     * Prefix pro všechny prvky ve formuláři
     * @var string
@@ -497,11 +500,26 @@ class Form implements ArrayAccess, Iterator {
     * @param string $text -- text ke skupině - popisný text ke skupině
     * @return string -- název skupiny
     */
-   public function addGroup($name, $label = null, $text = null) {
+   public function addGroup($name, $label = null, $text = null, $after = self::GRP_POS_END) {
       if(!isset ($this->elementsGroups[$name])) {
-         $this->elementsGroups[$name]['elements'] = array();
-         $this->elementsGroups[$name]['label'] = $label;
-         $this->elementsGroups[$name]['text'] = $text;
+         if($after == self::GRP_POS_END){ // na konec
+            $this->elementsGroups[$name]['elements'] = array();
+            $this->elementsGroups[$name]['label'] = $label;
+            $this->elementsGroups[$name]['text'] = $text;
+         } else {
+            if($after == self::GRP_POS_BEGIN){ // na začátek
+               $endPart = array_splice($this->elementsGroups,0);
+               $this->addGroup($name, $label, $text);
+               $this->elementsGroups = array_merge($this->elementsGroups, $endPart);
+               unset ($endPart);
+            } else { // za skupinu
+               $position = array_search($after, array_keys($this->elementsGroups))+1; // after
+               $endPart = array_splice($this->elementsGroups, $position);
+               $this->addGroup($name, $label, $text);
+               $this->elementsGroups = array_merge($this->elementsGroups, $endPart);
+               unset ($endPart);
+            }
+         }
       }
       return $name;
    }
