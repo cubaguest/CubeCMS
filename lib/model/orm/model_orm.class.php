@@ -354,7 +354,8 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+            if(!is_object($params['value']) AND !is_array($params['value'])
+               AND $params['extern'] == false AND $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
                   if($params['aliasFor'] === null){
@@ -374,10 +375,12 @@ class Model_ORM extends Model_PDO {
          if(empty ($colsStr)) return $returnPk; // žádné změny se neukládájí
          $dbst = $dbc->prepare($sql.' SET '.  implode(',', $colsStr)
             .' WHERE `'.$this->pKey.'` = :pkey');
+
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+            if(!is_object($params['value']) AND !is_array($params['value'])
+               AND $params['extern'] == false AND $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -403,7 +406,8 @@ class Model_ORM extends Model_PDO {
          $colsStr = array(); $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+            if(!is_object($params['value']) AND !is_array($params['value'])
+               AND $params['extern'] == false AND $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
                   if($params['aliasFor'] === null){
@@ -425,7 +429,8 @@ class Model_ORM extends Model_PDO {
          $dbst = $dbc->prepare($sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if($params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+            if(!is_object($params['value']) AND !is_array($params['value'])
+               AND $params['extern'] == false AND $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
                foreach (Locales::getAppLangs() as $lang) {
