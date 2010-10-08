@@ -18,6 +18,13 @@ class JsPlugin_JQuery extends JsPlugin {
 
    const FACE_THEME_DIR = 'jqueryui';
 
+   public static $GoogleCDNThemes = array(
+      'base', 'black-tie', 'blitzer', 'cupertino', 'dark-hive', 'dot-luv', 'eggplant', 'excite-bike', 'flick', 'hot-sneaks', 'humanity',
+      'le-frog', 'mint-choc', 'overcast', 'pepper-grinder', 'redmond', 'smoothness', 'south-street', 'start', 'sunny', 'swanky-purse',
+      'trontastic', 'ui-darkness', 'ui-lightness', 'vader'
+   );
+
+
    private static $globalTheme = self::BASE_THEME;
 
    /**
@@ -54,12 +61,22 @@ class JsPlugin_JQuery extends JsPlugin {
    }
 
    private function addCss($css) {
-//      if(VVE_DEBUG_LEVEL <= 1){
-//         $this->addFile(new JsPlugin_CssFile("jquery-ui-all.css", false, self::getThemeDir($this->getCfgParam('theme'))));
+      // NOT wok correctly
+//      if(defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1 AND in_array($this->getCfgParam('theme'), self::$GoogleCDNThemes)){
+//         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/themes/".$this->getCfgParam('theme')."/jquery-ui.css");
 //      } else {
          $this->addFile(new JsPlugin_CssFile("jquery.ui.$css.css", false, self::getThemeDir($this->getCfgParam('theme'))));
 //      }
    }
+
+   private function addJs($name) {
+      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1) {
+         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
+      } else {
+         $this->addFile(new JsPlugin_JsFile("jquery.ui.$name.min.js"));
+      }
+   }
+
 
    protected function setFiles() {
 //		Přidání js soubrů pluginu
@@ -86,13 +103,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUICore() {
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1) {
-         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
-      } else {
-         $this->addFile(new JsPlugin_JsFile("jquery.ui.core.min.js"));
-         $this->addCss('core');
-         $this->addCss('theme');
-      }
+      $this->addJs('core');
+      $this->addCss('core');
+      $this->addCss('theme');
       return $this;
    }
 
@@ -103,9 +116,7 @@ class JsPlugin_JQuery extends JsPlugin {
    public function addUIWidget() {
       //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.widget.min.js"));
+      $this->addJs("widget");
       return $this;
    }
 
@@ -116,10 +127,8 @@ class JsPlugin_JQuery extends JsPlugin {
    public function addUIMouse() {
       //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.mouse.min.js"));
+      $this->addJs("mouse");
       return $this;
    }
 
@@ -128,9 +137,7 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIPosition() {
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.position.min.js"));
+      $this->addJs("position");
       return $this;
    }
 
@@ -139,13 +146,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIDraggable() {
-      //deps
-      $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
       $this->addUIMouse();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.draggable.min.js"));
+      $this->addJs("draggable");
       return $this;
    }
 
@@ -154,12 +157,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIDroppable() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIDraggable();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.droppable.min.js"));
+      $this->addJs("droppable");
       return $this;
    }
 
@@ -168,13 +168,10 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIResizable() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIMouse();
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.resizable.min.js"));
+      $this->addJs("resizable");
       $this->addCss('resizable');
       return $this;
    }
@@ -184,13 +181,10 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUISelectable() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIMouse();
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.selectable.min.js"));
+      $this->addJs("selectable");
       return $this;
    }
 
@@ -199,13 +193,10 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUISortable() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIMouse();
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.sortable.min.js"));
+      $this->addJs("sortable");
       return $this;
    }
 
@@ -218,12 +209,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIAccordion() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.accordion.min.js"));
+      $this->addJs("accordion");
       $this->addCss('accordion');
       return $this;
    }
@@ -233,12 +221,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIButton() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.button.min.js"));
+      $this->addJs("button");
       return $this;
    }
 
@@ -247,13 +232,10 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIAutoComplete() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
       $this->addUIPosition();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.autocomplete.min.js"));
+      $this->addJs("autocomplete");
       return $this;
    }
 
@@ -262,13 +244,10 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIDialog() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
       $this->addUIPosition();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.dialog.min.js"));
+      $this->addJs("dialog");
       $this->addCss('dialog');
       return $this;
    }
@@ -278,12 +257,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUISlider() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.slider.min.js"));
+      $this->addJs("slider");
       $this->addCss('slider');
       return $this;
    }
@@ -293,12 +269,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUITabs() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.tabs.min.js"));
+      $this->addJs("tabs");
       $this->addCss('tabs');
       return $this;
    }
@@ -308,15 +281,12 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIDatepicker() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
       /**
        * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
        */
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker.min.js"));
+      $this->addJs("datepicker");
       $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
       $this->addCss('datepicker');
       return $this;
@@ -327,12 +297,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIProgressBar() {
-      //deps
       $this->addUICore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
       $this->addUIWidget();
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.progressbar.min.js"));
+      $this->addJs("progressbar");
       $this->addCss('progressbar');
       return $this;
    }
@@ -346,9 +313,7 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIEffectCore() {
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
-      $this->addFile(new JsPlugin_JsFile("jquery.effects.core.min.js"));
+      $this->addJs("effects.core");
       return $this;
    }
 
@@ -359,9 +324,7 @@ class JsPlugin_JQuery extends JsPlugin {
     */
    public function addUIEffect($efectName) {
       $this->addUIEffectCore();
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1)
-         return;
-      $this->addFile(new JsPlugin_JsFile("jquery.effects." . $efectName . ".min.js"));
+      $this->addJs("effects." . $efectName);
       return $this;
    }
 
