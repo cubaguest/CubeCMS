@@ -24,8 +24,9 @@ class Configuration_Controller extends Controller {
 
       switch ($opt->{Model_Config::COLUMN_TYPE}) {
          case 'number':
-            $elem = new Form_Element_TextArea('value', $this->_('Hodnota'));
+            $elem = new Form_Element_Text('value', $this->_('Hodnota'));
             $elem->addValidation(new Form_Validator_IsNumber());
+            $elem->setValues($opt->{Model_Config::COLUMN_VALUE});
             break;
          case 'bool':
             $elem = new Form_Element_Radio('value', $this->_('Hodnota'));
