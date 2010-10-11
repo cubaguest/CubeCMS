@@ -27,7 +27,7 @@ class AppCore {
    /**
     * Revize Enginu
     */
-   const ENGINE_REVISION = 3;
+   const ENGINE_REVISION = 4;
 
    /**
     * Obsahuje hlavní soubor aplikace
