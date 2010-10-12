@@ -1,19 +1,62 @@
 <?php
 class Actions_View extends View {
-   public function init() {
+   public function mainView() {
+      $this->template()->addTplFile("list.phtml", 'actions');
+
+      $this->createListToolbox();
+
+      if($this->text == false AND $this->rights()->isControll()){
+         $this->text = new stdClass();
+         $this->text->{Text_Model::COLUMN_TEXT} = $this->_('Žádný text nebyl vložen. (Tento text vidí pouze uživatel s neomezenými právy.)');
+      }
    }
 
+   protected function createListToolbox() {
+      if($this->rights()->isWritable()) {
+         if($this->rights()->isControll()) {
+            $toolbox = new Template_Toolbox2();
+            $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
+            $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit text"),
+            $this->link()->route('editlabel'));
+            $toolAdd->setIcon('page_edit.png')->setTitle($this->_('Upravit úvodní text'));
+            $toolbox->addTool($toolAdd);
+            $this->toolboxText = $toolbox;
+         }
 
-   public function mainView() {
-      $feeds = new Component_Feed();
-      $feeds->setConfig('feedLink', $this->link()->clear());
-      $this->template()->feedsComp = $feeds;
-      
-      $this->template()->addTplFile("list.phtml", 'actions');
+         $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->_("Přidat akci"),
+         $this->link()->route('add'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou akci'));
+         $toolbox->addTool($toolAdd);
+         $this->toolbox = $toolbox;
+
+      }
    }
 
    public function showView() {
+      $this->createDetailToolbox();
       $this->template()->addTplFile("detail.phtml");
+   }
+
+   protected function createDetailToolbox() {
+      if($this->category()->getRights()->isControll() OR
+              ($this->category()->getRights()->isWritable() AND
+                      $this->action->{Actions_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
+         $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_action', $this->_("Upravit"),
+         $this->link()->route('edit'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit akci'));
+         $toolbox->addTool($toolEdit);
+
+         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
+         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat'))
+            ->setConfirmMeassage($this->_('Opravdu smazat akci?'));
+         $toolbox->addTool($tooldel);
+
+         $this->toolbox = $toolbox;
+      }
    }
 
    public function archiveView() {

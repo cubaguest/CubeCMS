@@ -1,11 +1,16 @@
 <?php
 class Actionswgal_View extends Actions_View {
-   public function mainView() {
-      parent::mainView();
-   }
-
    public function showView() {
       $this->template()->addTplFile("detail.phtml");
+      $this->createDetailToolbox();
+      if($this->toolbox instanceof Template_Toolbox2){
+         $this->toolboxPhotos = new Template_Toolbox2();
+         $this->toolboxPhotos->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
+         $toolPhotos = new Template_Toolbox2_Tool_PostRedirect('edit_action_photos', 
+            $this->_("Upravit fotky"), $this->link()->route('editphotos'));
+         $toolPhotos->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky k akci'));
+         $this->toolboxPhotos->addTool($toolPhotos);
+      }
    }
 
    public function showPhotosView() {

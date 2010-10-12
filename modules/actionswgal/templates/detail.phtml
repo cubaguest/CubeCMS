@@ -11,12 +11,11 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
 <h1><?=$this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
    <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
-   <div class="main-content-image" id="actionText"><!-- SOF TEXT -->
+   <div class="main-content-image"><!-- SOF TEXT -->
       <?echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->imagesDir.DIRECTORY_SEPARATOR
           .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));?>
    </div>
    <?}?>
-
    <div class="main-content-annotation">
       <p class="main-content-dates">
                <?
@@ -24,18 +23,18 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
                $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
                print ($startDate);
                if($startDate != $stopDate AND $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
-                  print ("&nbsp;&mdash;&nbsp;");
-                  print ($stopDate);
+                  echo ("&nbsp;&mdash;&nbsp;");
+                  echo ($stopDate);
                }
                if($this->action->{Actions_Model_Detail::COLUMN_TIME} != null) {
                   $time = new DateTime($this->action->{Actions_Model_Detail::COLUMN_TIME});
-                  print (",&nbsp;".$time->format("G:i"));
+                  echo (",&nbsp;".$time->format("G:i"));
                }?>
             </p>
             <p class="main-content-other">
                <?
                if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null) {
-                  print ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
+                  echo ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
                }
                if((int)$this->action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
                   printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PRICE});
@@ -50,10 +49,14 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
          <br />
    </div>
    <div class="main-content-text">
-         <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
+         <?
+         echo $this->action->{Actions_Model_Detail::COLUMN_TEXT};
+         ?>
          <hr class="reseter" />
    </div>
       <?if($countImages > 0) {?>
+   <br />
+   <h2><?=$this->_('Fotografie k akci')?></h2>
    <div class="main-content-images" id="actionImages"><!-- SOF IMAGES -->
             <?while ($image = $this->images->fetch()) {?>
          <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
@@ -63,7 +66,9 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
                                .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
                  alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
          </a>
-               <?}?>
+               <?}
+         echo $this->toolboxPhotos;
+         ?>
       </div>
    <script type="text/javascript">
       /* <![CDATA[ */
@@ -72,28 +77,13 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
    </script>
       <?}?>
    <hr class="reseter" />
-   <?$this->includeTpl("buttonback.phtml", true);?>
+   <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->_('Zpět na seznam')));?>
 
    <?//$this->includeTpl('tools.phtml')?>
    <?$this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
-           'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
-           'shares' => $this->shares));?>
-   <?
-   if($this->category()->getRights()->isWritable()) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_action', $this->_("Upravit akci"),
-              $this->link()->route('edit'),
-              $this->_("Upravit zobrazenou akci"), "page_edit.png");
-      $toolbox->addTool('edit_photos', $this->_("Upravit fotky"),
-              $this->link()->route('editphotos'),
-              $this->_("Upravit fotky zobrazené akce"), "image_edit.png");
-      $toolbox->addTool('action_delete', $this->_("Smazat akci"),
-              $this->link(), $this->_("Smazat zobrazenou akci"), "page_delete.png",
-              'action_id', (int)$this->action->{Articles_Model_Detail::COLUMN_ID},
-              $this->_('Opravdu smazat akci?'));
-      $this->includeTplObj($toolbox);
-   }
+           'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf'))));
+   echo $this->toolbox;
    ?>
 </div>

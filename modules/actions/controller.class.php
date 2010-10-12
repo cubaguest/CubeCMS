@@ -95,11 +95,12 @@ class Actions_Controller extends Controller {
          $elemId = new Form_Element_Hidden('id');
          $delForm->addElement($elemId);
 
-         $elemSubmit = new Form_Element_SubmitImage('delete');
+         $elemSubmit = new Form_Element_Submit('delete', $this->_('Smazat'));
          $delForm->addElement($elemSubmit);
          if($delForm->isValid()) {
             $this->deleteAction($this->view()->action);
          }
+         $this->view()->formDelete = $delForm;
       }
 
       // komponenta pro vypsání odkazů na sdílení
@@ -163,6 +164,11 @@ class Actions_Controller extends Controller {
               AND ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
          $form->date_stop->setError($this->_('Končné datum končí dříve než datum zčátku'));
       }
+
+      if($form->isSend() AND $form->save->getValues() == false){
+          $this->link()->route()->reload();
+      }
+
       if($form->isValid()) {
          $model = new Actions_Model_Detail();
 
@@ -249,6 +255,10 @@ class Actions_Controller extends Controller {
       if($form->isSend() AND $form->date_stop->getValues() != null
               AND ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
          $form->date_stop->setError($this->_('Končné datum končí dříve než datum zčátku'));
+      }
+
+      if($form->isSend() AND $form->save->getValues() == false){
+          $this->link()->route('detail')->reload();
       }
 
       if($form->isValid()) {
@@ -388,7 +398,7 @@ class Actions_Controller extends Controller {
       $ePub->setValues(true);
       $form->addElement($ePub);
 
-      $eSub = new Form_Element_Submit('save', $this->_('Uložit'));
+      $eSub = new Form_Element_SaveCancel('save');
       $form->addElement($eSub);
 
       return $form;
@@ -402,8 +412,12 @@ class Actions_Controller extends Controller {
       $elemText->setLangs();
       $form->addElement($elemText);
 
-      $elemS = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemS = new Form_Element_SaveCancel('save');
       $form->addElement($elemS);
+      
+      if($form->isSend() AND $form->save->getValues() == false){
+          $this->link()->route()->reload();
+      }
 
       if($form->isValid()) {
          $textM = new Text_Model_Detail();
