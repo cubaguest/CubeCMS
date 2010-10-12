@@ -50,7 +50,8 @@ $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
    <?$this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
-           'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf'))));?>
+           'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
+           'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model_Detail::COLUMN_NAME})));?>
 
    <?
    echo $this->toolbox;
