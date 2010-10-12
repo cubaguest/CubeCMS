@@ -708,22 +708,38 @@ class Model_ORM extends Model_PDO {
       if($this->where != null){
          $retWhere = ' WHERE (';
          $parts = explode(' ', $this->where);
-         foreach ($parts as $value) {
-            if($tbShorName != null AND isset ($this->tableStructure[$value])){
-               if($this->tableStructure[$value]['lang'] == true){
-                  $value = $value.'_'.Locales::getLang();
+         foreach ($parts as $coll) {
+            /**
+             * @todo optimalizace na zbytečné znaky
+             */
+
+            // přetypování (použití např. u jazyků či změnu hodnoty)
+            $retype = null;
+            if(strpos($coll, '(') == 0){ // musí být na začátku před řetězcem
+               $retype = array();
+               preg_match('/^\(([a-z]+)\)(.*)$/i', $coll,$retype);
+               if(isset ($retype[1])){
+                  $coll = $retype[2];
+                  $retype = $retype[1];
                }
-               $retWhere .= '`'.$tbShorName.'`.`'.$value.'` ';
-            } else if(isset ($this->tableStructure[$value])){
-               if($this->tableStructure[$value]['lang'] == true){
-                  $value = $value.'_'.Locales::getLang();
+            }
+            if(isset ($this->tableStructure[$coll])){
+               if($this->tableStructure[$coll]['lang'] == true AND $retype == null){
+                  $coll = $coll.'_'.Locales::getLang();
+               } else if($this->tableStructure[$coll]['lang'] == true AND Locales::isLang($retype)) {
+                  $coll = $coll.'_'.$retype;
                }
-               $retWhere .= '`'.$value.'` ';
-            } else if(strpos($value, '.')) {
+               // pokud je prefix tabulky
+               if($tbShorName != null){
+                  $retWhere .= '`'.$tbShorName.'`.`'.$coll.'` ';
+               } else {
+                  $retWhere .= '`'.$coll.'` ';
+               }
+            } else if(strpos($coll, '.')) {
             // doplnění uvozovek u cizích sloupců
-               $retWhere .= preg_replace('/([a-z_-]+)\.([a-z_-]+)/i', '`\1`.`\2`', $value);
+               $retWhere .= preg_replace('/([a-z_-]+)\.([a-z_-]+)/i', '`\1`.`\2`', $coll);
             } else {
-               $retWhere .= $value.' ';
+               $retWhere .= $coll.' ';
             }
          }
          $retWhere .= ')';
