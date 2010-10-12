@@ -225,7 +225,7 @@ fieldset legend {
    color: white;
 }
 
-#bodywrap input[type="reset"]:hover, .delete_form input[type="submit"]:hover,
+#bodywrap input[type="reset"]:hover, .delete_form input[type="submit"]:hover, #bodywrap input.button-cancel:hover,
 .delete_button button[type="submit"]:hover, input.button-delete:hover  {
    background-color: #c1272d;
    color: white;
@@ -306,7 +306,7 @@ a.form-link-lang-sel {
 } /* nazveřejněný obsah */
 .main-content-list-record-image, .main-content-image {
    float: left;
-   width: 150px;
+/*   width: 150px;*/
    text-align: center;
 } /* obrázek v prvku v seznamu */
 .main-content-list-record-image img, .main-content-image img {
@@ -345,6 +345,9 @@ a.form-link-lang-sel {
 .main-content-archive-year {}/* rok v archivu */
 .main-content-archive-year-content {}/* obsah roku v archivu */
 .main-content-archive-item {}/* položka v archivu */
+.main-content-archive-dateadd {
+   font-style: italic;
+} /* datum přidání položky */
 
 .record-even {
    background-color: #d4e3ff;
