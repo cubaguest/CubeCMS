@@ -1,9 +1,13 @@
 <?
 $this->addCssFile("style.css");
+$this->includeTpl('sortLabel.phtml',false,null,'articles');
+$h1 = $this->category()->getName().$this->sortText;
 $modelImages = new PhotoGalery_Model_Images();
 ?>
-<h1><?echo $this->category()->getName();?></h1>
+<h1><?=$h1;?></h1>
 <div class="main-content-list">
+   <?=$this->includeTpl('sort.phtml',false,null,'articles')?>
+   <div class="main-content-list-records">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $noPClass = $noPubllic = null;
@@ -39,15 +43,21 @@ $modelImages = new PhotoGalery_Model_Images();
             title="<?=$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
       </p>
       <br />
-   </div>
-     <?}
-      print $this->scrollComp;
-      print $this->feedsComp;
+      </div>
+     <?}?>
+     <?
+      echo $this->scrollComp;
    } else {
-      print ($this->_('Není vložena žádná galerie'));
-   }?>
-
-   <?
+      echo ($this->_('Není vložena žádná galerie'));
+   }
    echo $this->toolbox;
+   ?>
+   </div>
+   <?
+   // rss ikony
+   $feeds = new Component_Feed();
+   $feeds->setConfig('feedLink', $this->link()->clear());
+   $feeds->mainView();
+   echo $feeds;
    ?>
 </div>

@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `id_article` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `id_cat` smallint(5) unsigned NOT NULL,
   `id_user` smallint(5) unsigned DEFAULT '1',
-  `add_time` datetime NOT NULL,
-  `edit_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `add_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `edit_time` datetime NULL,
   `is_user_last_edit` smallint(6) DEFAULT NULL,
   `viewed` smallint(6) NOT NULL DEFAULT '0',
   `name_cs` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   FULLTEXT KEY `text_clear_cs` (`text_clear_cs`),
   FULLTEXT KEY `text_clear_en` (`text_clear_en`),
   FULLTEXT KEY `text_clear_de` (`text_clear_de`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 

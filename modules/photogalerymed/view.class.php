@@ -4,14 +4,11 @@ class Photogalerymed_View extends Articles_View {
     * Inicializace
     */
    public function mainView() {
-      if($this->category()->getRights()->isWritable()) {
-         $toolbox = new Template_Toolbox();
-         $toolbox->addTool('add_galery', $this->_("Přidat galerii"),
-                 $this->link()->route('add'),
-                 $this->_("Přidat galerii"), "image_add.png");
-         $this->template()->toolbox = $toolbox;
+      $this->createListToolbox();
+      if($this->toolbox instanceof Template_Toolbox2){
+         $this->toolbox->add_article->setLabel($this->_('Přidat galerii'));
+         $this->toolbox->add_article->setTitle($this->_('Přidat novou galerii'));
       }
-
       $this->template()->addTplFile("list.phtml");
    }
 
@@ -24,30 +21,38 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function showView() {
-      if($this->category()->getRights()->isControll() OR
-         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $this->article->{Articles_Model_Detail::COLUMN_ID_USER})) {
-         $toolbox = new Template_Toolbox2();
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit text"),
-         $this->link()->route('edittext'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text galerie'));
-         $toolbox->addTool($toolEdit);
-         
-         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $tooldel->setIcon('page_edit.png')->setTitle($this->_('Smazat galerii'))
-            ->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
-         $toolbox->addTool($tooldel);
+      $this->createDetailToolbox();
 
-         $this->toolboxMain = $toolbox;
+      if($this->toolbox instanceof Template_Toolbox2){
+         $this->toolbox->article_->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
 
          $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
          $tool = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit fotky"),
          $this->link()->route('editphotos'));
          $tool->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky galerie'));
          $toolbox->addTool($tool);
-
          $this->toolboxImages = $toolbox;
-
       }
+
+//      if($this->category()->getRights()->isControll() OR
+//         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $this->article->{Articles_Model_Detail::COLUMN_ID_USER})) {
+//         $toolbox = new Template_Toolbox2();
+//         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit text"),
+//         $this->link()->route('edittext'));
+//         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text galerie'));
+//         $toolbox->addTool($toolEdit);
+//
+//         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
+//         $tooldel->setIcon('page_edit.png')->setTitle($this->_('Smazat galerii'))
+//            ->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
+//         $toolbox->addTool($tooldel);
+//
+//         $this->toolboxMain = $toolbox;
+//
+//         
+//
+//      }
       $this->template()->addTplFile("detail.phtml");
    }
 

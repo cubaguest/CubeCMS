@@ -8,9 +8,9 @@ class Articles_SiteMap extends SiteMap {
       $articles = $articleModel->getList($this->category()->getId(),0, $this->getMaxItems());
 
       while ($article = $articles->fetch()) {
-         $this->addItem($this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY})),
-            $article->{Articles_Model_Detail::COLUMN_NAME},
-            new DateTime($article->{Articles_Model_Detail::COLUMN_EDIT_TIME}));
+         $this->addItem($this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY})),
+            $article->{Articles_Model::COLUMN_NAME},
+            new DateTime($article->{Articles_Model::COLUMN_EDIT_TIME}));
       }
       $this->setLinkMore($this->link()->route('archive'), _('archiv'));
 	}

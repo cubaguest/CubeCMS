@@ -1,20 +1,10 @@
 <?php
-class News_Panel extends Panel {
-   const DEFAULT_NUM = 3;
-	public function panelController() {
-	}
-
-	public function panelView() {
-      $artM = new Articles_Model_List();
-      $this->template()->newArticles = $artM->getList($this->category()->getId(),0,
-              $this->panelObj()->getParam('num', self::DEFAULT_NUM));
-      $this->template()->rssLink = $this->link()->route('feed', array('type' => 'rss'));
-      $this->template()->addTplFile("panel.phtml");
-	}
+class News_Panel extends Articles_Panel {
+   const DEFAULT_NUM_ARTICLES = 3;
 
    public static function settingsController(&$settings,Form &$form) {
       $elemNum = new Form_Element_Text('num', 'Počet novinek v seznamu');
-      $elemNum->setSubLabel('Výchozí: '.self::DEFAULT_NUM.'');
+      $elemNum->setSubLabel('Výchozí: '.self::DEFAULT_NUM_ARTICLES.'');
       $elemNum->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemNum,'basic');
 

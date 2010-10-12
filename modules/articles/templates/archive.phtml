@@ -7,19 +7,24 @@ $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 ?>
 <h1><?= $this->category()->getName().' - '.$this->_('Archiv'); ?></h1>
+<div class="main-content-tools">
+   <a href="<?=$this->link()->route();?>" title="<?$this->_('Přejít na seznam článků')?>"><?=$this->_('Seznam')?></a>
+</div>
 <div class="main-content-archive">
    <? foreach ($this->articles as $year => $rows) {?>
       <h2 class="main-content-archive-year year<?= $year ?>"><a href="#"><?= $year ?></a></h2>
       <div class="main-content-archive-year-content">
          <ul>
          <?foreach ($rows as $row) {
-            $title = $row->{Articles_Model_Detail::COLUMN_NAME};
-            if ((string) $row->{Articles_Model_Detail::COLUMN_ANNOTATION} != null) {
-               $title = strip_tags($row->{Articles_Model_Detail::COLUMN_ANNOTATION});
-            }?>
+            $title = $row->{Articles_Model::COLUMN_NAME};
+            if ((string) $row->{Articles_Model::COLUMN_ANNOTATION} != null) {
+               $title = strip_tags($row->{Articles_Model::COLUMN_ANNOTATION});
+            }
+            $date = new DateTime($row->{Articles_Model::COLUMN_ADD_TIME});
+            ?>
             <li class="main-content-archive-item">
-               <a href="<?= $this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY})) ?>"
-                  title="<?= htmlspecialchars($title)?>"><?= $row->{Articles_Model_Detail::COLUMN_NAME} ?></a>
+               <a href="<?= $this->link()->route('detail', array('urlkey' => $row->{Articles_Model::COLUMN_URLKEY})) ?>"
+                  title="<?= htmlspecialchars($title)?>"><?= $row->{Articles_Model::COLUMN_NAME} ?></a>&nbsp;&nbsp;<span class="main-content-archive-dateadd">(<?=vve_date("%x", $date);?>)</span>
             </li>
             <? } ?>
       </ul>
@@ -35,4 +40,3 @@ $this->addJsPlugin($jQuery);
          });
       });
    </script>
-<? $this->includeTpl("buttonback.phtml", true); ?>

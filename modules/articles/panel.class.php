@@ -7,22 +7,22 @@ class Articles_Panel extends Panel {
    }
 
    public function panelView() {
-      $artM = new Articles_Model_List();
+      $artM = new Articles_Model();
       switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
          case 'top':
-            $this->template()->topArticles = $artM->getListTop($this->category()->getId(), 0,
-                    $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES));
+            $artM->order(array(Articles_Model::COLUMN_SHOWED => Model_ORM::ORDER_ASC));
             $this->template()->addTplFile('panel_top.phtml');
             break;
          case 'list':
          default:
-            $this->template()->newArticles = $artM->getList($this->category()->getId(), 0,
-                    $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES));
+            $artM->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC));
             $this->template()->addTplFile('panel.phtml');
             break;
       }
-      $this->template()->rssLink = $this->link()->route('feed', array('type' => 'rss'));
-
+      $this->template()->articles = $artM->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = :pub',
+         array('idc' => $this->category()->getId(), 'pub' => true))
+         ->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES))->records();
+      $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
 
    public static function settingsController(&$settings,Form &$form) {

@@ -1,6 +1,7 @@
 <?php
-/*
+/**
  * Třída modelu s listem Novinek
+ * @deprecated -- není nutná stačí přistupovat pře orm record
 */
 class Articles_Model_List extends Model_PDO {
    /**

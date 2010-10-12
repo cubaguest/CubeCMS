@@ -1,22 +1,12 @@
 <?
 $this->addCssFile("style.css");
-
-if($this->top === true) {
-   $h1 = $this->category()->getName().' - '.$this->_('nejčtenější');
-   $this->addPageTitle($h1);
-} else {
-   $h1 = $this->category()->getName();
-}
+$this->includeTpl('sortLabel.phtml',false, null, 'articles');
+$h1 = $this->category()->getName().$this->sortText;
 ?>
 <h1><?=$h1?></h1>
 <div class="main-content-list">
-   <div class="main-content-tools">
-   <?=$this->_('Řadit podle')?>:&nbsp;
-   <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
-   <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenějších')?></a>
-   &nbsp;&brvbar;&nbsp;
-   <a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
-   </div>
+   <?=$this->includeTpl('sort.phtml',false, null, 'articles')?>
+   <div class="main-content-list-records">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
@@ -24,13 +14,12 @@ if($this->top === true) {
             $showClass = 'main-content-no-public';
             $public = $this->_('Nezveřejněn');
          }
-         $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
    <div class="main-content-list-record <?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
             <span class="font-small">
-             <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+             <?=  vve_date("%x %X", new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a><?='<span class="font-small">'.$public.'</span>'?>
       </h2>
       <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
@@ -46,13 +35,17 @@ if($this->top === true) {
       </div>
    </div>
      <?}
-      print $this->scrollComp;
-      print $this->feedsComp;
+      echo $this->scrollComp;
    } else {
-      print ($this->_('Není vložen žádný článek'));
-   }?>
-
+      echo ($this->_('Není vložen žádný příspěvek'));
+   }
+   echo $this->toolbox;?>
+   </div>
    <?
-   echo $this->toolbox;
+      // rss ikony
+   $feeds = new Component_Feed();
+   $feeds->setConfig('feedLink', $this->link()->clear());
+   $feeds->mainView();
+   echo $feeds;
    ?>
 </div>

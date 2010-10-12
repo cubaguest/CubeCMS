@@ -1,33 +1,30 @@
 <? // načtení detailu
-$this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
-$h1 = $this->article->{Articles_Model_Detail::COLUMN_NAME};
-//$this->addPageHeadline($this->article->{Articles_Model_Detail::COLUMN_NAME});
-if((string)$this->article->{Articles_Model_Detail::COLUMN_KEYWORDS} != null){
-   Template_Core::setPageKeywords($this->article->{Articles_Model_Detail::COLUMN_KEYWORDS});
+$this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
+$h1 = $this->article->{Articles_Model::COLUMN_NAME};
+//$this->addPageHeadline($this->article->{Articles_Model::COLUMN_NAME});
+if((string)$this->article->{Articles_Model::COLUMN_KEYWORDS} != null){
+   Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
 }
-if((string)$this->article->{Articles_Model_Detail::COLUMN_DESCRIPTION} != null){
-   Template_Core::setPageDescription($this->article->{Articles_Model_Detail::COLUMN_DESCRIPTION});
-} else if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
-   Template_Core::setPageDescription($this->article->{Articles_Model_Detail::COLUMN_ANNOTATION});
+if((string)$this->article->{Articles_Model::COLUMN_DESCRIPTION} != null){
+   Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_DESCRIPTION});
+} else if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){
+   Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_ANNOTATION});
 }
 
 $piroBox = new JsPlugin_PiroBox();
 $this->addJsPlugin($piroBox);
-$addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME});
-$editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
+$addDate = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
+$editDate = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 
 <h1><?=$h1?></h1>
 <div class="main-content-detail">
-   <?if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
-   <div class="main-content-annotation"><?=$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
+   <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
+   <div class="main-content-annotation"><?=$this->article->{Articles_Model::COLUMN_ANNOTATION};?></div>
    <?}?>
-   <div class="main-content-text"><?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?></div>
+   <div class="main-content-text"><?=$this->article->{Articles_Model::COLUMN_TEXT}.$this->toolbox?></div>
    <hr class="reseter" />
-   <?if($this->allowPrivate === true){?>
-      <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}?>
-      <hr class="reseter" />
-   <?}?>
+   <?$this->includeTpl('privateText.phtml');?>
    <br />
    <script type="text/javascript">
       /* <![CDATA[ */
@@ -36,12 +33,12 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    </script>
    <?$this->includeTpl("buttonback.phtml", true);?><br />
    <?$this->includeTpl('articletools.phtml', true, array(
-      'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
+      'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
               'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
               'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
               'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
-              'shares' => $this->shares));
-   echo $this->toolbox;
+              'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
+//   echo $this->toolbox;
    ?>
 <br />
 </div>

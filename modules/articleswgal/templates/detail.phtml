@@ -20,7 +20,7 @@ $images = $this->images->fetchAll();
          <?
          $randImage = reset($images);
          print (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
-                 .$this->subdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
+                 .$this->websubdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                  .$randImage->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $randImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 130, 100));
          ?>
@@ -33,14 +33,7 @@ $images = $this->images->fetchAll();
       </div>
       <hr class="reseter" />
    <?}?>
-   <?if($this->allowPrivate === true){?>
-      <div class="main-content-text">
-         <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT_PRIVATE}?>
-         <?echo $this->toolboxPrivate;?>
-      </div>
-      <hr class="reseter" />
-   <?}?>
-
+   <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
    <!-- Start Advanced Gallery Html Containers -->
    <div class="main-content-images">
       <?

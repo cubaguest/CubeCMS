@@ -12,11 +12,11 @@ if($this->rssLink != null){?>
 <a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
 <?}?>
 <p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<span class="panelSubLabel"><a href="<?=$this->link()->route('top');?>" title="<?=$this->_('Nejčtenější')?>"><?=$this->_('Nejčtenější')?></a></span>
+<span class="panelSubLabel"><a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_TOP);?>" title="<?=$this->_('Nejčtenější')?>"><?=$this->_('Nejčtenější')?></a></span>
 <div style="<?=$backImg?>">
-   <?foreach ($this->topArticles as $article) {?>
-   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-      title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
+   <?foreach ($this->articles as $article) {?>
+   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+      title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model::COLUMN_NAME},25)?></a><br />
    <?
    }
    ?>

@@ -1,0 +1,16 @@
+<?
+if(isset ($_GET[Articles_Routes::URL_PARAM_SORT])) {
+   switch ($_GET[Articles_Routes::URL_PARAM_SORT]) {
+      case Articles_Controller::SORT_ALPHABET:
+         $this->sortText = '&nbsp;-&nbsp;'.$this->_('řazeno podle abecedy');
+         break;
+      case Articles_Controller::SORT_TOP:
+         $this->sortText = '&nbsp;-&nbsp;'.$this->_('řazeno podle zobrazení');
+         break;
+      case Articles_Controller::SORT_DATE:
+      default:
+         $this->sortText = '&nbsp;-&nbsp;'.$this->_('řazeno podle datumu');
+         break;
+   }
+}
+?>

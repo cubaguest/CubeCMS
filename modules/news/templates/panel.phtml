@@ -12,7 +12,7 @@ if($this->panelObj()->getBackImage() != null){
 <a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
 <?}?>
 <div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<?while ($new = $this->newArticles->fetch()) {?>
+<?  foreach ($this->articles as $new) {?>
    <div class="panel-box-content">
    <div class="panel-box-label-article"><a href="<?=$this->link()->route('detail', array('urlkey' => $new->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
       title="<?=htmlspecialchars($new->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($new->{Articles_Model_Detail::COLUMN_NAME},30)?></a></div>

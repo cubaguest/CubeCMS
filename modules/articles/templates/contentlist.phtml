@@ -2,26 +2,26 @@
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
-         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0) {
+         if($article->{Articles_Model::COLUMN_PUBLIC} == 0) {
             $showClass = 'main-content-no-public';
             $public = $this->_('Nezveřejněno');
          }
-         $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+         $editTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          ?>
    <div class="main-content-list-record <?=$showClass?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+             title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>&nbsp;
             <span class="font-small">
                      <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a><?='<span class="font-small">'.$public.'</span>'?>
       </h2>
             <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
             $out = array();
-            preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model_Detail::COLUMN_TEXT}, $out);
+            preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model::COLUMN_TEXT}, $out);
             if(!empty ($out) AND $out[1] != '0') {?>
       <div class="main-content-image"><?=vve_tpl_image_tag($out[1], "article title image", 130, 100);?></div>
                <?}?>
-      <div class="main-content-text"><?echo $article->{Articles_Model_Detail::COLUMN_TEXT};?></div>
+      <div class="main-content-text"><?echo $article->{Articles_Model::COLUMN_TEXT};?></div>
       <hr class="reseter" />
    </div>
          <?}
