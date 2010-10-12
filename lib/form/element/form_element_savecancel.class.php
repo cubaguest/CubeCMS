@@ -9,7 +9,7 @@
  * @abstract      Třída pro obsluhu skupiny elementů
  */
 class Form_Element_SaveCancel extends Form_Element {
-   private $labels = array();
+   protected $formElementLabel = array();
 
    private $enableCancelControll = true;
 
@@ -18,12 +18,12 @@ class Form_Element_SaveCancel extends Form_Element {
       $this->htmlElement = new Html_Element('input');
       $this->html()->setAttrib('type', 'submit');
       if($this->getLabel() == null){
-         $this->labels = array(_('Uložit'),_('Zrušit'));
+         $this->formElementLabel = array(_('Uložit'),_('Zrušit'));
       } else {
          if(!is_array($this->getLabel())){
             throw new UnexpectedValueException(_('Pro skupinu elementů SaveCancel musí být label zadán jako pole se dvěma popiskama'));
          }
-         $this->labels = $this->getLabel();
+         $this->formElementLabel = $this->getLabel();
       }
    }
 
@@ -34,10 +34,10 @@ class Form_Element_SaveCancel extends Form_Element {
 
    public function populate() {
       parent::populate();
-      if($this->unfilteredValues == $this->labels[0]){
-         $this->unfilteredValues = $this->values = true;
-      } else {
+      if($this->unfilteredValues == $this->formElementLabel[1]){
          $this->unfilteredValues = $this->values = false;
+      } else {
+         $this->unfilteredValues = $this->values = true;
       }
 
    }
@@ -47,12 +47,12 @@ class Form_Element_SaveCancel extends Form_Element {
     */
    public function controll() {
       
-      $this->setValues($this->labels[0]);
+      $this->setValues($this->formElementLabel[0]);
       $this->html()->clearClasses();
       $this->html()->removeAttrib('onclick');
       $this->html()->addClass('button-save');
       $ctrlSave = (string)parent::controll();
-      $this->setValues($this->labels[1]);
+      $this->setValues($this->formElementLabel[1]);
       $this->html()->clearClasses();
       if($this->enableCancelControll == true){
          $this->html()->setAttrib('onclick', 'return confirm(\''._('Opravdu zrušit změny?').'\')');
