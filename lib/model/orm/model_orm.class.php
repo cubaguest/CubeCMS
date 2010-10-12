@@ -375,6 +375,7 @@ class Model_ORM extends Model_PDO {
          if(empty ($colsStr)) return $returnPk; // žádné změny se neukládájí
          $dbst = $dbc->prepare($sql.' SET '.  implode(',', $colsStr)
             .' WHERE `'.$this->pKey.'` = :pkey');
+      
 
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
@@ -389,14 +390,13 @@ class Model_ORM extends Model_PDO {
             } else {
                // date clumns
                if($value instanceof DateTime){
-                  if($params['datatype'] == 'date'){
-                     $value = $value->format('Y-m-d');
-                  }
+                  $value = $this->createDateTimeStr($value, $params['datatype']);
                }
                $dbst->bindValue(':'.$colname, $value, $params['pdoparam']);
             }
          }
          $dbst->execute();
+
 
          $returnPk = $record->getPK();
 
@@ -439,8 +439,8 @@ class Model_ORM extends Model_PDO {
             } else {
                // date clumns
                if($value instanceof DateTime){
-                  if($params['datatype'] == 'date'){
-                     $value = $value->format('Y-m-d');
+                  if($value instanceof DateTime){
+                     $value = $this->createDateTimeStr($value, $params['datatype']);
                   }
                }
                $dbst->bindValue(':'.$colname, $value, $params['pdoparam']);
@@ -779,6 +779,28 @@ class Model_ORM extends Model_PDO {
             }
          }
       }
+   }
+
+   /**
+    * Metoda vytvoří řetězec pro ščasový objekt k uložení do db
+    * @param DateTime $dateTimeObj -- časový objekt
+    * @param $datatype -- datový typ výstupu (date, time, datetime)
+    * @return string -- vytvořený řetězec
+    */
+   protected function createDateTimeStr(DateTime $dateTimeObj, $datatype) {
+      switch ($datatype) {
+         case 'date':
+            $value = $dateTimeObj->format('Y-m-d');
+            break;
+         case 'time':
+            $value = $dateTimeObj->format('H:i:s');
+            break;
+         case 'datetime':
+         default:
+            $value = $dateTimeObj->format('Y-m-d H:i:s');
+            break;
+      }
+      return $value;
    }
 
    /* Pomocné metody */
