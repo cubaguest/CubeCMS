@@ -11,8 +11,10 @@ class Login_Controller extends Controller {
 	 */
 	const PASSWD_MIN_LENGTH = 5;
 	const PASSWD_MAX_LENGTH = 8;
-	
-	public function mainController() {
+
+   protected $form;
+   
+   public function mainController() {
       $model = new Model_Users();
 
       $this->view()->user = $model->getUserById(Auth::getUserId());
@@ -23,6 +25,7 @@ class Login_Controller extends Controller {
 	 */
 	public function changePasswdController() {
 		$this->checkWritebleRights();
+      $model = new Model_Users();
 
       $form = new Form('pass_');
       $form->html()->setAttrib('autocomplete', 'off');
@@ -54,8 +57,7 @@ class Login_Controller extends Controller {
             $this->link()->route()->reload();
          }
 
-         $model = new Model_Users();
-         $user = $model->getUserById(Auth::getUserId());
+         $user = $model->record(Auth::getUserId());
          // kontrola starého hesla
          if(Auth::cryptPassword($form->current->getValues()) != $user->{Model_Users::COLUMN_PASSWORD}){
             $form->current->setError($this->_('Špatně zadané aktuální heslo'));
@@ -67,8 +69,9 @@ class Login_Controller extends Controller {
       }
 
       if($form->isValid()){
-         $model = new Model_Users();
-         $model->changeUserPassword(Auth::getUserId(), $form->new1->getValues());
+         $user = $model->record(Auth::getUserId());
+         $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($form->new1->getValues());
+         $model->save($user);
          $this->infoMsg()->addMessage($this->_("Heslo bylo úspěšně změněno"));
    		$this->link()->route()->reload();
       }
@@ -80,66 +83,63 @@ class Login_Controller extends Controller {
       $this->checkWritebleRights();
 
       $model = new Model_Users();
-      $user = $model->getUserById(Auth::getUserId());
+      $user = $model->record(Auth::getUserId());
 
-      $form = new Form('user_');
+      $this->createEditUserForm(); // vytvoříme instanci formu
+      $this->form->name->setValues($user->{Model_Users::COLUMN_NAME});
+      $this->form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
+      $this->form->email->setValues($user->{Model_Users::COLUMN_MAIL});
+      $this->form->note->setValues($user->{Model_Users::COLUMN_NOTE});
+      unset ($model);
+
+      if($this->form->isSend() AND $this->form->save->getValues() == false){
+         $this->link()->route()->reload();
+      }
+
+      if($this->form->isValid()){
+         $this->saveUser();
+         $this->infoMsg()->addMessage($this->_('Změny byly uloženy'));
+         $this->link()->route()->reload();
+      }
+      $this->view()->form = $this->form;
+   }
+
+   protected function createEditUserForm() {
+      $this->form = new Form('user_');
+
+      $fGrpBase = $this->form->addGroup('base', $this->_('Základní informace'));
 
       $elemName = new Form_Element_Text('name', $this->_('Jméno'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
-      $elemName->setValues($user->{Model_Users::COLUMN_NAME});
-      $form->addElement($elemName);
+      $this->form->addElement($elemName, $fGrpBase);
 
       $elemSurName = new Form_Element_Text('surname', $this->_('Přijmení'));
       $elemSurName->addValidation(new Form_Validator_NotEmpty());
-      $elemSurName->setValues($user->{Model_Users::COLUMN_SURNAME});
-      $form->addElement($elemSurName);
+      $this->form->addElement($elemSurName, $fGrpBase);
 
       $elemEmails = new Form_Element_Text('email', $this->_('Email'));
       $elemEmails->addValidation(new Form_Validator_NotEmpty());
       $elemEmails->addValidation(new Form_Validator_Email());
-      $elemEmails->setValues($user->{Model_Users::COLUMN_MAIL});
-      $form->addElement($elemEmails);
+      $this->form->addElement($elemEmails, $fGrpBase);
 
+      $fGrpOther = $this->form->addGroup('other', $this->_('Ostatní'));
       $elemNote = new Form_Element_TextArea('note', $this->_('Poznámky'));
-      $elemNote->setValues($user->{Model_Users::COLUMN_NOTE});
-      $form->addElement($elemNote);
+      $this->form->addElement($elemNote, $fGrpOther);
 
       $elemSubmit = new Form_Element_SaveCancel('save');
-      $form->addElement($elemSubmit);
-
-      if($form->isSend() AND $form->save->getValues() == false){
-         // kontrola emailových adres
-//         $mailsClean = preg_replace('/[^a-z0-9;.@_-]*/i', '', $form->emails->getValues()); // bílé znaky
-//         $mailsClean = preg_replace('/\s+/i', '', $form->emails->getValues()); // bílé znaky
-//         $mails = explode(';', $mailsClean);
-//
-//         $validMails = true;
-//         $validator = new Validator_EMail();
-//         foreach ($mails as $mail) {
-//            $validator->setValues($mail);
-//            if(!$validator->isValid()){
-//               $validMails = false;
-//               break;
-//            }
-//         }
-//         if($validMails == false){
-//            $form->emails->setError($this->_('E-mailové adresy byly špatně zadány'));
-//         }
-         $this->link()->route()->reload();
-      }
-
-
-      if($form->isValid()){
-         $model->saveUser(Auth::getUserName(), $form->name->getValues(),
-                 $form->surname->getValues(), null,
-                 $user->{Model_Users::COLUMN_ID_GROUP}, $form->email->getValues(),
-                 $form->note->getValues(), $user->{Model_Users::COLUMN_BLOCKED}, Auth::getUserId());
-         $this->infoMsg()->addMessage($this->_('Změny byly uloženy'));
-         $this->link()->route()->reload();
-      }
-
-      $this->view()->form = $form;
+      $this->form->addElement($elemSubmit);
    }
+
+   protected function saveUser() {
+      $modelUser = new Model_Users();
+      $user = $modelUser->record(Auth::getUserId());
+      $user->{Model_Users::COLUMN_NAME} = $this->form->name->getValues();
+      $user->{Model_Users::COLUMN_SURNAME} = $this->form->surname->getValues();
+      $user->{Model_Users::COLUMN_MAIL} = $this->form->email->getValues();
+      $user->{Model_Users::COLUMN_NOTE} = $this->form->note->getValues();
+      $modelUser->save($user);
+   }
+
 
    public function newPasswordController() {
       $this->checkReadableRights();
