@@ -203,10 +203,6 @@ fieldset legend {
    font-size: small;
    font-family: "Tahoma", "Arial", sans-serif;
 }
-#bodywrap input.button-cancel:hover, input[type="submit"].button-cancel:hover {
-   background-color: #ff6666;
-}
-
 #bodywrap input:focus, textarea:focus, input.form-required:focus, textarea.form-required:focus {
    background-color: whitesmoke;
 }
