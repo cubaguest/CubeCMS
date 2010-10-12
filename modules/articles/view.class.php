@@ -31,6 +31,7 @@ class Articles_View extends View {
               ($this->category()->getRights()->isWritable() AND
                       $this->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {
          $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit"),
          $this->link()->route('edit'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text'));
