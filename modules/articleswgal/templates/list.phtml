@@ -1,23 +1,13 @@
 <?
 $this->addCssFile("style.css");
-
-if($this->top === true) {
-   $this->addPageTitle($this->_('nejčtenější články'));
-   $h1 = $this->category()->getName().' - '.$this->_('nejčtenější');
-} else {
-   $h1 = $this->category()->getName();
-}
+$this->includeTpl('sortLabel.phtml',false,null,'articles');
+$h1 = $this->category()->getName().$this->sortText;
 $imagesM = new PhotoGalery_Model_Images();
 ?>
 <h1><?=$h1;?></h1>
 <div class="main-content-list">
-   <div class="main-content-tools">
-   <?=$this->_('Řadit podle')?>:&nbsp;
-   <a href="<?=$this->link()->route()->rmParam()?>" title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a>
-   <a href="<?=$this->link()->route('top')->rmParam()?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenějších')?></a>
-   &nbsp;&brvbar;&nbsp;
-   <a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
-   </div>
+   <?=$this->includeTpl('sort.phtml',false,null,'articles')?>
+   <div class="main-content-list-records">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
@@ -40,15 +30,14 @@ $imagesM = new PhotoGalery_Model_Images();
             <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
             if($mainImage != false) {
                ?>
-      <div class="main-content-list-record-image">
-                  <?//=vve_tpl_image_tag(, "article title image", 80);?>
-         <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+      <div class="main-content-list-record-image"><?
+         echo vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
                           .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                           .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                           .$mainImage->{PhotoGalery_Model_Images::COLUMN_FILE},
-                          $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 140, 100);?>
-      </div>
-            <?}?>
+                          $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 140, 100);
+         ?></div><?
+         }?>
       <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
          <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
       <?} else if((string)$article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
@@ -63,11 +52,18 @@ $imagesM = new PhotoGalery_Model_Images();
       <hr class="reseter" />
    </div>
      <?}
-      print $this->scrollComp;
-      print $this->feedsComp;
+      echo $this->scrollComp;
    } else {
-      print ($this->_('Není vložen žádný článek'));
+      echo ($this->_('Není vložen žádný článek'));
    }
    echo $this->toolbox;
+   ?>
+   </div>
+   <?
+   // rss ikony
+   $feeds = new Component_Feed();
+   $feeds->setConfig('feedLink', $this->link()->clear());
+   $feeds->mainView();
+   echo $feeds;
    ?>
 </div>

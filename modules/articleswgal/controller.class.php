@@ -60,9 +60,9 @@ class ArticlesWGal_Controller extends Articles_Controller {
     * @param <type> $urlkeys
     * @param <type> $form
     */
-   protected function saveArticle($names, $urlkeys,Form $form, $article=null) {
+   protected function saveArticle($names, $urlkeys,Form $form, Model_ORM_Record $article=null) {
       // přejmenování adresáře
-      $retu = parent::saveArticle($names, $urlkeys, $form, $article);
+      $id = parent::saveArticle($names, $urlkeys, $form, $article);
 
       if($article !== null) {
          $model = new Articles_Model_Detail();
@@ -77,7 +77,7 @@ class ArticlesWGal_Controller extends Articles_Controller {
          }
       }
 
-      return $retu;
+      return $id;
    }
 
    public function exportArticleController(){

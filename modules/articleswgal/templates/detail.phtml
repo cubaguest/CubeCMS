@@ -4,8 +4,6 @@ $this->addCssFile("style.css");
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
-$addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME});
-$editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
 $images = $this->images->fetchAll();
 ?>
 <h1><?=$this->article->{Articles_Model_Detail::COLUMN_NAME};?></h1>
@@ -26,17 +24,18 @@ $images = $this->images->fetchAll();
          ?>
    </div>
    <?}?>
-   <?if((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT} != null){?>
-      <div class="main-content-text">
+   <div class="main-content-text">
+      <?if((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT} != null){?>
          <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
-         <?echo $this->toolboxMain;?>
-      </div>
+      <?}?>
+      <?echo $this->toolbox;?>
       <hr class="reseter" />
-   <?}?>
+   </div>
    <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
    <!-- Start Advanced Gallery Html Containers -->
    <div class="main-content-images">
       <?
+      if(count($images) == 0) echo $this->_('Galerie neobsahuje žádný obrázek.');
       if(count($images) == 1) {$class = 'pirobox';}
       else {$class = 'pirobox_gall';}
       foreach ($images as $image) {
@@ -57,14 +56,13 @@ $images = $this->images->fetchAll();
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
            'linkToHtml' => $this->link()->route('detailExport',array('output' => 'html')),
-           'shares' => $this->shares));?>
+           'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));?>
 
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
          $().piroBox({slideShow : true,slideSpeed : 3});
       });
-
       /* ]]> */
    </script>
 </div>

@@ -14,7 +14,7 @@ if($this->rssLink != null){?>
 <p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
 <span class="panelSubLabel"><a href="<?=$this->link()->route('top');?>" title="<?=$this->_('Nejčtenější')?>"><?=$this->_('Nejčtenější')?></a></span>
 <div style="<?=$backImg?>">
-   <?foreach ($this->topArticles as $article) {?>
+   <?foreach ($this->articles as $article) {?>
    <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
       title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
    <?
