@@ -158,5 +158,9 @@ class Component_Comments extends Component {
       return $this->model->getCountComments($this->getConfig(self::PARAM_ID_CATEGORY),
               $this->getConfig(self::PARAM_ID_ARTICLE));
    }
+
+   public function deleteAll() {
+
+   }
 }
 ?>
