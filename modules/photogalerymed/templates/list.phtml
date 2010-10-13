@@ -3,6 +3,7 @@ $this->addCssFile("style.css");
 $this->includeTpl('sortLabel.phtml',false,null,'articles');
 $h1 = $this->category()->getName().$this->sortText;
 $modelImages = new PhotoGalery_Model_Images();
+echo $this->toolbox;
 ?>
 <h1><?=$h1;?></h1>
 <div class="main-content-list">
@@ -50,7 +51,6 @@ $modelImages = new PhotoGalery_Model_Images();
    } else {
       echo ($this->_('Není vložena žádná galerie'));
    }
-   echo $this->toolbox;
    ?>
    </div>
    <?

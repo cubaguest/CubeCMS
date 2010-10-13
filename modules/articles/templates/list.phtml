@@ -2,7 +2,7 @@
 $this->addCssFile("style.css");
 $this->includeTpl('sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
-
+echo $this->toolbox;
 ?>
 <h1><?=$h1;?></h1>
 <div class="main-content-list">
@@ -53,7 +53,7 @@ $h1 = $this->category()->getName().$this->sortText;
    } else {
       echo ($this->_('Není vložen žádný článek'));
    }
-   echo $this->toolbox;?>
+   ?>
    </div>
    <?
    // rss ikony

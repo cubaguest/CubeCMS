@@ -18,9 +18,3 @@ if($this->edit){
    print ($this->form);
    ?>
 </div>
-<?
-if($this->edit){
-   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('detail')));
-} else {
-   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route()));
-}

@@ -35,25 +35,6 @@ class Photogalerymed_View extends Articles_View {
          $toolbox->addTool($tool);
          $this->toolboxImages = $toolbox;
       }
-
-//      if($this->category()->getRights()->isControll() OR
-//         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $this->article->{Articles_Model_Detail::COLUMN_ID_USER})) {
-//         $toolbox = new Template_Toolbox2();
-//         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit text"),
-//         $this->link()->route('edittext'));
-//         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text galerie'));
-//         $toolbox->addTool($toolEdit);
-//
-//         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-//         $tooldel->setIcon('page_edit.png')->setTitle($this->_('Smazat galerii'))
-//            ->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
-//         $toolbox->addTool($tooldel);
-//
-//         $this->toolboxMain = $toolbox;
-//
-//         
-//
-//      }
       $this->template()->addTplFile("detail.phtml");
    }
 

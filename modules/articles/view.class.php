@@ -19,7 +19,15 @@ class Articles_View extends View {
 
    public function showView() {
       $this->template()->addTplFile("detail.phtml", 'articles');
-
+      //$this->addPageHeadline($this->article->{Articles_Model::COLUMN_NAME});
+      if ((string) $this->article->{Articles_Model::COLUMN_KEYWORDS} != null) {
+         Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
+      }
+      if ((string) $this->article->{Articles_Model::COLUMN_DESCRIPTION} != null) {
+         Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_DESCRIPTION});
+      } else if ((string) $this->article->{Articles_Model::COLUMN_ANNOTATION} != null) {
+         Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_ANNOTATION});
+      }
       $this->createDetailToolbox();
    }
 
@@ -35,6 +43,12 @@ class Articles_View extends View {
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit článek"), $this->link()->route('edit'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit článek'));
          $toolbox->addTool($toolEdit);
+
+         if($this->formPublic instanceof Form){
+            $tooldel = new Template_Toolbox2_Tool_Form($this->formPublic);
+            $tooldel->setIcon('page_preview.png')->setTitle($this->_('Zveřejnit článek'));
+            $toolbox->addTool($tooldel);
+         }
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat článek'))

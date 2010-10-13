@@ -7,6 +7,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 
 $photosModel = new PhotoGalery_Model_Images();
 $countImages = $photosModel->getCountImages($this->category()->getId(), $this->action->{Actions_Model_Detail::COLUMN_ID});
+echo $this->toolbox;
 ?>
 <h1><?=$this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
@@ -85,6 +86,5 @@ $countImages = $photosModel->getCountImages($this->category()->getId(), $this->a
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
            'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model_Detail::COLUMN_NAME})));
-   echo $this->toolbox;
    ?>
 </div>

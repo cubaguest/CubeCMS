@@ -24,9 +24,13 @@ class Photogalerymed_Controller extends Articles_Controller {
    public function showController() {
       $this->checkReadableRights();
       $this->setOption('deleteMsg', $this->_('Galerie byla smazána'));
+      $this->setOption('publicMsg', $this->_('Galerie byla zveřejněna'));
       if(parent::showController() === false) return false;
       if($this->view()->formDelete instanceof Form){
          $this->view()->formDelete->delete->setLabel($this->_('Smazat galerii'));
+      }
+      if($this->view()->formPublic instanceof Form){
+         $this->view()->formPublic->public->setLabel($this->_('Zveřejnit galerii'));
       }
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());

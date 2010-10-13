@@ -1,7 +1,7 @@
 <?
 $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
 //$this->addPageHeadline(strftime("%x", $this->dateFrom).' - '.strftime("%x", $this->dateTo));
-
+echo $this->toolbox; // tolbox pro přidání
 ?>
 <h1><?=$this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
 <div class="main-content-list">
@@ -93,7 +93,6 @@ $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->
       <hr class="reseter"/>
       </div>
       <?}
-      echo $this->toolbox; // tolbox pro přidání
       ?>
    </div>
    &laquo;&nbsp;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"

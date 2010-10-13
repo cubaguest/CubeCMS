@@ -170,6 +170,20 @@ class Articles_Controller extends Controller {
             $this->link()->route()->rmParam()->reload();
          }
          $this->view()->formDelete = $deleteForm;
+
+         if($this->view()->article->{Articles_Model::COLUMN_PUBLIC} == false){
+            $formPublic = new Form('art_pub_');
+            $feSubmit = new Form_Element_Submit('public', $this->_('Zveřejnit článek'));
+            $formPublic->addElement($feSubmit);
+            if($formPublic->isValid()){
+               $record = $artM->record($this->view()->article->{Articles_Model::COLUMN_ID});
+               $record->{Articles_Model::COLUMN_PUBLIC} = true;
+               $artM->save($record);
+               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->_('Článek byl zveřejněn')));
+               $this->link()->reload();
+            }
+            $this->view()->formPublic = $formPublic;
+         }
       }
 
       // odkaz zpět

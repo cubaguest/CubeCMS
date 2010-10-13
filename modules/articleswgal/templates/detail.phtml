@@ -5,6 +5,7 @@ $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
 $images = $this->images->fetchAll();
+echo $this->toolbox;
 ?>
 <h1><?=$this->article->{Articles_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
@@ -28,7 +29,6 @@ $images = $this->images->fetchAll();
       <?if((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT} != null){?>
          <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
       <?}?>
-      <?echo $this->toolbox;?>
       <hr class="reseter" />
    </div>
    <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
