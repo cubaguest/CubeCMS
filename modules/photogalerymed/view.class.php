@@ -25,6 +25,7 @@ class Photogalerymed_View extends Articles_View {
 
       if($this->toolbox instanceof Template_Toolbox2){
          $this->toolbox->article_->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
+         $this->toolbox->edit_article->setTitle($this->_('Upravit galerii'))->setLabel($this->_('Upravit galerii'));
 
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
