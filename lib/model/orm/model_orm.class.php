@@ -300,7 +300,7 @@ class Model_ORM extends Model_PDO {
       $dbst = $dbc->prepare($sql);
       $obj->bindSQLWhere($dbst);
       $obj->bindSQLLimit($dbst);
-      
+
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
       return $dbst->fetch();
@@ -325,7 +325,7 @@ class Model_ORM extends Model_PDO {
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);// where values
       $this->bindSQLLimit($dbst);// limit values
-      
+
       $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
       $dbst->execute();
       $r = $dbst->fetchAll();
@@ -335,6 +335,7 @@ class Model_ORM extends Model_PDO {
    public function count() {
       $dbc = new Db_PDO();
       $sql = 'SELECT COUNT(*) AS cnt FROM `'.$this->getTableName().'` AS '.$this->getTableShortName();
+      $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName());
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);
@@ -375,7 +376,7 @@ class Model_ORM extends Model_PDO {
          if(empty ($colsStr)) return $returnPk; // žádné změny se neukládájí
          $dbst = $dbc->prepare($sql.' SET '.  implode(',', $colsStr)
             .' WHERE `'.$this->pKey.'` = :pkey');
-      
+
 
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
@@ -476,7 +477,7 @@ class Model_ORM extends Model_PDO {
       if($pk == null AND $this->where == null){return true;} // pokud není podmínka nemažeme, na smazání kompletní tabulky bude flush()
 
       $this->createSQLWhere($sql);
-           
+
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);
       $ret = $dbst->execute();
@@ -513,7 +514,7 @@ class Model_ORM extends Model_PDO {
     * Metoda přidává limit
     * @param int $fromRow -- od řádku
     * @param int $rows -- řádků
-    * @return Model_ORM 
+    * @return Model_ORM
     */
    public function limit($fromRow, $rows) {
       $this->limit['from'] = $fromRow;
@@ -604,6 +605,7 @@ class Model_ORM extends Model_PDO {
    }
 
    protected function createSQLSelectJoinColumns($columns) {
+      $this->joinString = null; //reset
       if(!empty ($this->joins) AND !empty ($this->foreignKeys)){
          foreach ($this->joins as $tbName => $join) {
             $model = new $this->foreignKeys[$tbName]['modelName']();
@@ -748,6 +750,7 @@ class Model_ORM extends Model_PDO {
    }
 
    protected function createSQLJoins(&$sql) {
+      if($this->joinString == null) $this->createSQLSelectJoinColumns(array());// provede vytvoření sloupců
       $sql .= $this->joinString; // je vytvořen v přípravě sloupců
    }
 
