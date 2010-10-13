@@ -17,14 +17,15 @@ $addDate = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
 $editDate = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 
-<h1><?=$h1?></h1>
+<h1><?echo $h1; if($this->article->{Articles_Model::COLUMN_PUBLIC} == false)echo $this->_(' - nezveřejněno');?></h1>
+
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
    <div class="main-content-annotation"><?=$this->article->{Articles_Model::COLUMN_ANNOTATION};?></div>
    <?}?>
    <div class="main-content-text"><?=$this->article->{Articles_Model::COLUMN_TEXT}.$this->toolbox?></div>
    <hr class="reseter" />
-   <?$this->includeTpl('privateText.phtml');?>
+   <?$this->includeTpl('privateText.phtml', false,null,'articles');?>
    <br />
    <script type="text/javascript">
       /* <![CDATA[ */
