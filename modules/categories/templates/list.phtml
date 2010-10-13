@@ -124,6 +124,8 @@ function vveSectionsRenderFunc($menuArr, $link) {
       $first = false;
    }
 }
+
+echo $this->toolbox;
 ?>
 <h1><?=$this->_("Struktura stránek")?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
@@ -177,8 +179,5 @@ function vveSectionsRenderFunc($menuArr, $link) {
       });
       /* ]]> */
    </script>
-   <?
-   echo $this->toolbox;
-   ?>
 </div>
 
