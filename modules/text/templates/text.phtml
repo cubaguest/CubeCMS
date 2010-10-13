@@ -26,7 +26,7 @@ if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABE
 //              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
               'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
               'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
-              'shares' => $this->shares));
+              'shares' => array('url' => $this->link(), 'title' => $this->category()->getName())));
    }
    ?>
 </div>
