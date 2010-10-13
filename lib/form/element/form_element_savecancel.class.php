@@ -11,7 +11,7 @@
 class Form_Element_SaveCancel extends Form_Element {
    protected $formElementLabel = array();
 
-   private $enableCancelControll = true;
+   private $cancelConfirmMsg = true;
 
 
    protected function init() {
@@ -27,18 +27,29 @@ class Form_Element_SaveCancel extends Form_Element {
       }
    }
 
-   public function setCancelControll($param = true) {
-      $this->enableCancelControll = $param;
+   public function setCancelConfirm($param = true) {
+      $this->cancelConfirmMsg = $param;
    }
 
+   /**
+    * Metoda vrací jestli byl element vůbec odeslán
+    * @return bool
+    */
+   public function isSend() {
+      if(isset ($_REQUEST[$this->getName().'_ok']) OR isset ($_REQUEST[$this->getName().'_cancel'])){
+         return true;
+      }
+      return false;
+   }
 
    public function populate() {
-      parent::populate();
-      if($this->unfilteredValues == $this->formElementLabel[1]){
-         $this->unfilteredValues = $this->values = false;
+      if(isset ($_REQUEST[$this->getName().'_ok'])) {
+         $this->values = true;
       } else {
-         $this->unfilteredValues = $this->values = true;
+         $this->values = false;
       }
+      $this->unfilteredValues = $this->values;
+      $this->isPopulated = true;
 
    }
    /**
@@ -46,20 +57,27 @@ class Form_Element_SaveCancel extends Form_Element {
     * @return string
     */
    public function controll() {
-      
       $this->setValues($this->formElementLabel[0]);
       $this->html()->clearClasses();
       $this->html()->removeAttrib('onclick');
       $this->html()->addClass('button-save');
-      $ctrlSave = (string)parent::controll();
+      $ctrlSave = clone parent::controll();
+      $this->renderedId--;
+      $ctrlSave->setAttrib('name', $this->getName().'_ok');
+      $ctrlSave->setAttrib('id', $this->getName().'_ok_'.$this->renderedId);
+
       $this->setValues($this->formElementLabel[1]);
       $this->html()->clearClasses();
-      if($this->enableCancelControll == true){
+      if($this->cancelConfirmMsg == true){
          $this->html()->setAttrib('onclick', 'return confirm(\''._('Opravdu zrušit změny?').'\')');
       }
       $this->html()->addClass('button-cancel');
-      $ctrlCancel = (string)parent::controll();
-      return $ctrlSave.$ctrlCancel;
+      $ctrlCancel = clone parent::controll();
+      $this->renderedId--;
+      $ctrlCancel->setAttrib('name', $this->getName().'_cancel');
+      $ctrlCancel->setAttrib('id', $this->getName().'_cancel_'.$this->renderedId);
+      $this->renderedId++;
+      return (string)$ctrlSave.(string)$ctrlCancel;
    }
 
    /**
