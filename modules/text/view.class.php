@@ -10,6 +10,7 @@ class Text_View extends View {
 
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
 
          $toolET = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_('Upravit text'),
                  $this->link()->route('edit'));
@@ -26,6 +27,7 @@ class Text_View extends View {
 
          if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
             $toolboxP = new Template_Toolbox2();
+            $toolboxP->setIcon(Template_Toolbox2::ICON_PEN);
             $toolETP = new Template_Toolbox2_Tool_PostRedirect('edit_textprivate', $this->_('Upravit privátní text'),
                  $this->link()->route('editPrivate'));
             $toolETP->setIcon('page_edit.png')->setTitle($this->_("Upravit privátní text"));
