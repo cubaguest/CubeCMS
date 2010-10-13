@@ -18,7 +18,7 @@ $images = $this->images->fetchAll();
          <?
          $randImage = reset($images);
          print (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
-                 .$this->websubdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
+                 .$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                  .$randImage->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $randImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 130, 100));
          ?>

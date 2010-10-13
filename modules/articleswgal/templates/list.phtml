@@ -33,7 +33,7 @@ $imagesM = new PhotoGalery_Model_Images();
       <div class="main-content-list-record-image"><?
          echo vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
                           .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                          .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
+                          .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                           .$mainImage->{PhotoGalery_Model_Images::COLUMN_FILE},
                           $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 140, 100);
          ?></div><?
