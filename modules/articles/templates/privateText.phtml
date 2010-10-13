@@ -3,10 +3,10 @@ if ($this->privateText == true) {
    echo '<div class="main-content-text">';
    if ((string) $this->article->{Articles_Model::COLUMN_TEXT_PRIVATE} == null AND $this->toolboxPrivate != null) {
       echo $this->_('Privátní text nebyl definován');
-      echo $this->toolboxPrivate;
    } else if ((string) $this->article->{Articles_Model::COLUMN_TEXT_PRIVATE} != null) {
       echo $this->article->{Articles_Model::COLUMN_TEXT_PRIVATE};
    }
+   echo $this->toolboxPrivate;
    echo '<hr class="reseter" /></div>';
 }
 ?>
