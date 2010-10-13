@@ -13,10 +13,10 @@ echo $this->form;
             type: "POST", url: "<?=$this->link()->route('getList')?>",
                data: ({idc : idc, type : '<?=TitlePage_Controller::ITEM_TYPE_ACTION?>'}),
                success : function(msg){
-                  $('select#article_item_article_id').html(null);
+                  $('select[name=article_item_article_id]').html(null);
                   $.each(msg.list, function(key, value){
                      var opt = $('<option></option>').text(value.text).val(value.id);
-                     $('select#article_item_article_id').append(opt);
+                     $('select[name=article_item_article_id]').append(opt);
                   });
                }
             });
