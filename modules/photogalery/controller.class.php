@@ -105,11 +105,15 @@ class Photogalery_Controller extends Controller {
       $imgId = new Form_Element_Hidden('id');
       $editForm->addElement($imgId);
 
+      $eGoBack = new Form_Element_Checkbox('goBack', $this->_('Zavřít'));
+      $eGoBack->setValues(false);
+      $editForm->addElement($eGoBack);
+
       $submit = new Form_Element_SaveCancel('save', array($this->_('Uložit'), $this->_('Zavřít')));
-      $submit->setCancelControll(false);
+      $submit->setCancelConfirm(false);
       $editForm->addElement($submit);
 
-      if($editForm->isSend() AND $submit->getValues() == false){
+      if($editForm->isSend() AND $editForm->save->getValues() == false){
          if($backLink === null){
             $this->link()->route()->reload();
          } else {
@@ -147,7 +151,15 @@ class Photogalery_Controller extends Controller {
          }
 
          $this->infoMsg()->addMessage($this->_('Obrázky byly uloženy'));
-         $this->link()->reload();
+         if($editForm->goBack->getValues() == true){
+            if($backLink === null){
+               $this->link()->route()->reload();
+            } else {
+               $backLink->reload();
+            }
+         } else {
+            $this->link()->reload();
+         }
       }
 
       // odkaz na editaci obrázku

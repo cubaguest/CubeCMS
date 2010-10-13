@@ -13,9 +13,9 @@ class Photogalery_View extends View {
 
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
-         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Spravovat obrázky"),
+         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit fotky"),
          $this->link()->route('editphotos'));
-         $toolEditText->setIcon('image_edit.png')->setTitle($this->_('Spravovat kolekci obrázků'));
+         $toolEditText->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky'));
          $toolbox->addTool($toolEditText);
 
          $this->toolboxImages = $toolbox;
