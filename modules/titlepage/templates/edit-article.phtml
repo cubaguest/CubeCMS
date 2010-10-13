@@ -7,7 +7,7 @@ echo $this->form;
 ?>
 <script type="text/javascript">
    $(document).ready(function(){
-      $('select#article_item_category_id').change(function(){
+      $('select[name=article_item_category_id]').change(function(){
          var idc = $(this).val();
          $.ajax({
             type: "POST", url: "<?=$this->link()->route('getList')?>",
