@@ -161,7 +161,7 @@ class Articles_Controller extends Controller {
          $feId->setValues($this->view()->article->{Articles_Model::COLUMN_ID});
          $deleteForm->addElement($feId);
 
-         $feSubmit = new Form_Element_Submit('delete', $this->_('Smazat'));
+         $feSubmit = new Form_Element_Submit('delete', $this->_('Smazat článek'));
          $deleteForm->addElement($feSubmit);
 
          if($deleteForm->isValid()) {

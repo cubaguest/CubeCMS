@@ -31,14 +31,13 @@ class Articles_View extends View {
               ($this->category()->getRights()->isWritable() AND
                       $this->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {
          $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit"),
-         $this->link()->route('edit'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text'));
+         $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit článek"), $this->link()->route('edit'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit článek'));
          $toolbox->addTool($toolEdit);
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat'))
+         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat článek'))
             ->setConfirmMeassage($this->_('Opravdu smazat článek?'));
          $toolbox->addTool($tooldel);
 
@@ -47,9 +46,9 @@ class Articles_View extends View {
          if($this->category()->getParam(Articles_Controller::PARAM_PRIVATE_ZONE, false) == true){
             $toolboxP = new Template_Toolbox2();
             $toolboxP->setIcon(Template_Toolbox2::ICON_PEN);
-            $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_articlepr', $this->_("Upravit"),
+            $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_articlepr', $this->_("Upravit privátní text"),
             $this->link()->route('editPrivate'));
-            $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit text'));
+            $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit privátní text'));
             $toolboxP->addTool($toolEdit);
             $this->toolboxPrivate = $toolboxP;
          }
