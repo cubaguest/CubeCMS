@@ -33,7 +33,7 @@ if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false) $class = 'co
       <?}?>
    <span><strong><?=$comment->{Component_Comments_Model::COL_NICK}?></strong>&nbsp;<?=vve_date('%X %G:%i', new DateTime($comment->{Component_Comments_Model::COL_TIME_ADD}))?></span>
    <?if($comment->{Component_Comments_Model::COL_CENSORED} != true) {?>
-   <p><?=Template_Postfilters::emoticons($comment->{Component_Comments_Model::COL_COMMENT})?></p>
+   <p><?=$this->filter($comment->{Component_Comments_Model::COL_COMMENT},'emoticons')?></p>
       <?} else {
       echo '<p>'._('Komentář by centurován.').'</p>';
       if($this->admin != null) {

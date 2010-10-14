@@ -3,3 +3,34 @@
 
 .pirobox {
 }
+
+.image-left {
+   float: left;
+   padding: 0 5px 5px 0;
+}
+.image-right {
+   float: right;
+   padding: 0 0 5px 5px;
+}
+
+/* SOF file extension */
+.file-icon {
+   padding-left: 18px;
+   background-color: transparent;
+   background-position: center left;
+   background-image: url('../../../images/files/txt.gif');
+   background-repeat: no-repeat;
+}
+.file-pdf {
+   background-image: url('../../../images/files/pdf.gif');
+}
+.file-doc {
+   background-image: url('../../../images/files/doc.gif');
+}
+.file-xls {
+   background-image: url('../../../images/files/xls.gif');
+}
+.file-docx {
+   background-image: url('../../../images/files/docx.gif');
+}
+/* EOF file extension */

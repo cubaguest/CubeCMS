@@ -15,6 +15,7 @@ require_once 'tplmodifiers.php';
 require_once 'template_items.php';
 require_once 'template_functions.php';
 require_once 'template_postfilters.php';
+require_once 'template_outputfilters.php'; // filtry výstupu
 
 class Template {
    /**
@@ -544,6 +545,27 @@ class Template {
     */
    public function getTemplateVars(){
       return  $this->privateVars;
+   }
+
+   /**
+    * Metoda provede filtraci podle zadaných filtrů
+    * @param string $text -- content
+    * @param array/string $filters -- pole filtrů
+    * @return string -- přefiltrovaný text
+    */
+   public function filter($text, $filters){
+      if(is_string($filters)) $filters = array($filters);
+      foreach ($filters as $filter) {
+         if(function_exists('vve_filter_'.$filter)){
+            $filter = 'vve_filter_'.$filter;
+         } else if(function_exists($filter)){
+         } else {
+            throw new BadFunctionCallException(_('Volán nedefinovaný výstupní filtr.'));
+         }
+         $text = $filter($text, $this->link, $this);
+      }
+
+      return $text;
    }
 }
 ?>
