@@ -136,7 +136,7 @@ class Articles_Controller extends Controller {
             array('urlkey' => $this->getRequest('urlkey'), 'idusr' => Auth::getUserId()));
       }
 
-
+      $artM->join('t_usr');
       $article = $artM->record();
 
 
