@@ -53,7 +53,6 @@ class Articles_Controller extends Controller {
             $this->link()->rmParam(Articles_Routes::URL_PARAM_SORT);
             break;
       }
-
       $articles = $artModel->join('t_usr', array(Model_Users::COLUMN_USERNAME))->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
 
       $this->view()->scrollComp = $scrollComponent;
@@ -136,7 +135,7 @@ class Articles_Controller extends Controller {
             array('urlkey' => $this->getRequest('urlkey'), 'idusr' => Auth::getUserId()));
       }
 
-      $artM->join('t_usr');
+      $artM->join('t_usr_last', array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)->join('t_usr', array('usernameCreated' => Model_Users::COLUMN_USERNAME));
       $article = $artM->record();
 
 
@@ -297,6 +296,11 @@ class Articles_Controller extends Controller {
       $article = $model->where(Articles_Model::COLUMN_URLKEY, $this->getRequest('urlkey'))->record();
 
       $editForm->name->setValues($article->{Articles_Model::COLUMN_NAME});
+//      var_dump($article->{Articles_Model::COLUMN_NAME});
+//      var_dump($article->{Articles_Model::COLUMN_NAME});
+//      var_dump($article->{Articles_Model::COLUMN_NAME});
+//      flush();
+
       $editForm->text->setValues($article->{Articles_Model::COLUMN_TEXT});
       $editForm->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
       $editForm->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
@@ -414,7 +418,10 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_KEYWORDS} = $form->metaKeywords->getValues();
       $artRecord->{Articles_Model::COLUMN_DESCRIPTION} = $form->metaDesc->getValues();
       $artRecord->{Articles_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-      $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
+      if($artRecord == null){
+         $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
+      }
+      $artRecord->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
       $artRecord->{Articles_Model::COLUMN_PUBLIC} = $form->public->getValues();
       $artRecord->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
 

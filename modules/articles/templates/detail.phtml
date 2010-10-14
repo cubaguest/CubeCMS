@@ -22,9 +22,17 @@ echo $this->toolbox;
       /* ]]> */
    </script>
    <?$this->includeTpl("buttonback.phtml", true);?><br />
-   <?$this->includeTpl('articletools.phtml', true, array(
+   <?
+   if($this->article->{Model_Users::COLUMN_USERNAME} != null){
+      $username = $this->article->{Model_Users::COLUMN_USERNAME};
+   } else {
+      $username = $this->article->usernameCreated;
+   }
+
+   $this->includeTpl('articletools.phtml', true, array(
       'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
-              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+              'lastEditUser' => $username,
+              'createdByUser' => $this->article->usernameCreated,
               'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
               'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
               'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
