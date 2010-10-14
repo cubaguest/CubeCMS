@@ -355,7 +355,7 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -381,7 +381,7 @@ class Model_ORM extends Model_PDO {
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-           if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
+           if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
@@ -407,7 +407,7 @@ class Model_ORM extends Model_PDO {
          $colsStr = array(); $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -430,7 +430,7 @@ class Model_ORM extends Model_PDO {
          $dbst = $dbc->prepare($sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
@@ -609,6 +609,7 @@ class Model_ORM extends Model_PDO {
       if(!empty ($this->joins) AND !empty ($this->foreignKeys)){
          foreach ($this->joins as $tbName => $join) {
             $model = new $this->foreignKeys[$tbName]['modelName']();
+            $tableName = uniqid($model->getTableShortName());
             if(($model instanceof Model_ORM) == false) throw new Exception('unexpectec value of model');
             // vytváření SQL pro joiny je tu kvůli kešování
             $part = null;
@@ -618,11 +619,12 @@ class Model_ORM extends Model_PDO {
                   $part .= ' LEFT ';
                   break;
             }
-            $part .= 'JOIN '.$model->getTableName().' AS '.$model->getTableShortName();
+            $part .= 'JOIN '.$model->getTableName().' AS '.$tableName;
             if($this->foreignKeys[$tbName]['modelColumn'] == null OR $this->foreignKeys[$tbName]['modelColumn'] == $this->foreignKeys[$tbName]['column']){ // USING
-               $part .= ' USING (`'.$this->foreignKeys[$tbName]['column'].'`)';
+               $part .= ' ON (`'.$tableName.'`.`'.$this->foreignKeys[$tbName]['column'].'` = `'.$this->getTableShortName().'`.`'.$this->foreignKeys[$tbName]['column'].'`)';
+//               $part .= ' USING (`'.$this->foreignKeys[$tbName]['column'].'`)';
             } else {
-               $part .= ' ON (`'.$model->getTableShortName().'`.`'.$this->foreignKeys[$tbName]['modelColumn'].'` = `'.$this->getTableShortName().'`.`'.$this->foreignKeys[$tbName]['column'].'`)';
+               $part .= ' ON (`'.$tableName.'`.`'.$this->foreignKeys[$tbName]['modelColumn'].'` = `'.$this->getTableShortName().'`.`'.$this->foreignKeys[$tbName]['column'].'`)';
             }
             $this->joinString .= $part; // uložení do joinstring
 
@@ -631,20 +633,20 @@ class Model_ORM extends Model_PDO {
             if(!empty($this->joins[$tbName]['columns'])){ // jen vybrané sloupce
                foreach ($this->joins[$tbName]['columns'] as $alias => $coll) {
                   if(!is_int($alias)){ // is alias
-                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$coll.'` AS '.$alias);
+                     array_push($columns, '`'.$tableName.'`.`'.$coll.'` AS '.$alias);
                   } else if($modelCols[$coll]['aliasFor'] != null) { // is alias from model
-                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$modelCols[$coll]['aliasFor'].'` AS '.$coll);
+                     array_push($columns, '`'.$tableName.'`.`'.$modelCols[$coll]['aliasFor'].'` AS '.$coll);
                   } else {
-                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$coll.'`');
+                     array_push($columns, '`'.$tableName.'`.`'.$coll.'`');
                   }
                }
             } else { // všechny sloupce z tabulky kromě pk
                foreach ($modelCols as $name => $params) {
                   if($params['pk'] == true) continue;
                   if($params['aliasFor'] == null){
-                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$name.'`');
+                     array_push($columns, '`'.$tableName.'`.`'.$name.'`');
                   } else {
-                     array_push($columns, '`'.$model->getTableShortName().'`.`'.$params['aliasFor'].'` AS '.$name);
+                     array_push($columns, '`'.$tableName.'`.`'.$params['aliasFor'].'` AS '.$name);
                   }
                }
             }
