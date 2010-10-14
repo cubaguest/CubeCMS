@@ -355,7 +355,7 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if(is_object($params['value']) OR is_array($params['value'])
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -381,7 +381,7 @@ class Model_ORM extends Model_PDO {
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-           if(is_object($params['value']) OR is_array($params['value'])
+           if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
@@ -407,7 +407,7 @@ class Model_ORM extends Model_PDO {
          $colsStr = array(); $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if(is_object($params['value']) OR is_array($params['value'])
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -430,7 +430,7 @@ class Model_ORM extends Model_PDO {
          $dbst = $dbc->prepare($sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if(is_object($params['value']) OR is_array($params['value'])
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR is_array($params['value'])
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
