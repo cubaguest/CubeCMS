@@ -24,6 +24,8 @@ class Model_ORM extends Model_PDO {
 
    protected $tableName = null;
 
+   protected $dbName =  VVE_DB_NAME;
+
    protected $tableShortName = null;
 
    private $tableStructure = array();
@@ -207,6 +209,22 @@ class Model_ORM extends Model_PDO {
       $this->tableShortName = $short;
    }
 
+   /**
+    * Metoda nastaví název databáze
+    * @param string $dbName
+    */
+   protected function setDbName($dbName) {
+      $this->dbName = $dbName;
+   }
+
+   /**
+    * Metoda vrací název databáze
+    * @return string
+    */
+   protected function getDbName() {
+      return $this->dbName;
+   }
+
    /*
     * Metody pro vrácení informací o modelu
     */
@@ -291,8 +309,7 @@ class Model_ORM extends Model_PDO {
       if($obj == null) $obj = $this;
 
       $dbc = new Db_PDO();
-      $sql = 'SELECT '. $obj->createSQLSelectColumns().' FROM `'.$obj->getTableName().'` AS '.$this->getTableShortName();
-
+      $sql = 'SELECT '. $obj->createSQLSelectColumns().' FROM `'.$this->getDbName().'`.`'.$obj->getTableName().'` AS '.$this->getTableShortName();
       $obj->createSQLJoins($sql);
       $obj->createSQLWhere($sql, $this->getTableShortName());
       $obj->createSQLOrder($sql);
@@ -316,7 +333,7 @@ class Model_ORM extends Model_PDO {
     */
    public function records() {
       $dbc = new Db_PDO();
-      $sql = 'SELECT '. $this->createSQLSelectColumns().' FROM `'.$this->getTableName().'` AS '.$this->getTableShortName();
+      $sql = 'SELECT '. $this->createSQLSelectColumns().' FROM `'.$this->getDbName().'`.`'.$this->getTableName().'` AS '.$this->getTableShortName();
 
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName());// where
@@ -334,7 +351,7 @@ class Model_ORM extends Model_PDO {
 
    public function count() {
       $dbc = new Db_PDO();
-      $sql = 'SELECT COUNT(*) AS cnt FROM `'.$this->getTableName().'` AS '.$this->getTableShortName();
+      $sql = 'SELECT COUNT(*) AS cnt FROM `'.$this->getDbName().'`.`'.$this->getTableName().'` AS '.$this->getTableShortName();
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName());
       $dbst = $dbc->prepare($sql);
@@ -355,7 +372,9 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
+            if(!isset ($params['lang'])) $params['lang'] = false;
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) 
+               OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -381,7 +400,9 @@ class Model_ORM extends Model_PDO {
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-           if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
+           if(!isset ($params['lang'])) $params['lang'] = false;
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+               OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
@@ -407,7 +428,9 @@ class Model_ORM extends Model_PDO {
          $colsStr = array(); $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
+            if(!isset ($params['lang'])) $params['lang'] = false;
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+               OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -430,7 +453,9 @@ class Model_ORM extends Model_PDO {
          $dbst = $dbc->prepare($sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) OR (is_array($params['value'] AND $params['lang'] == false))
+            if(!isset ($params['lang'])) $params['lang'] = false;
+            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+               OR (is_array($params['value'] AND $params['lang'] == false))
                OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             $value = $params['value'];
             if($params['lang'] == true){
