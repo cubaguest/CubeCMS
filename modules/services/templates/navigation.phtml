@@ -1,0 +1,7 @@
+<?
+$this->items = array(
+   'Diskový prostor' => array('link' => (string)$this->link()->route(), 'icon' => 'user.png'),
+   'Databáze' => array('link' => (string)$this->link()->route('database'), 'icon' => 'group.png'),
+   'Záloha' => array('link' => (string)$this->link()->route('backup'), 'icon' => 'group.png')
+   );
+$this->includeTpl('module_navigation.phtml', true);?>

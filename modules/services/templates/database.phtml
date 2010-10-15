@@ -1,0 +1,67 @@
+<?
+$this->addPageTitle($this->_('Databáze'));
+//$this->addCssFile('style.css');
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+?>
+<h1><?=$this->_('Databáze');?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+
+<div class="main-content-detail">
+   <table id="table-tables"></table>
+   <div id="table-tables-pager"></div>
+   <hr class="reseter" />
+   <br />
+   <?
+//   $this->formOptimizeDbTables->html()->setAttrib('style', 'display:inline;');
+   echo $this->formOptimizeDbTables->renderStart();
+   echo $this->formOptimizeDbTables->optimise->controll();
+   echo $this->formOptimizeDbTables->renderEnd();
+   ?>
+   <br />
+   <?
+//   $this->formRepairDbTables->html()->setAttrib('style', 'display:inline;');
+   echo $this->formRepairDbTables->renderStart();
+   echo $this->formRepairDbTables->repair->controll();
+   echo $this->formRepairDbTables->renderEnd();
+   ?>
+</div>
+<?
+?>
+<script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      var selectedGroupId = 0;
+      $(document).ready(function() {
+         var addressGrid = $("#table-tables").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('tablesList');?>',
+            datatype: "json",
+            colNames:['<?=$this->_('Název')?>', '<?=$this->_('Řádků')?>', '<?=$this->_('Velikost (B)')?>', '<?=$this->_('Kolace')?>', '<?=$this->_('Engine')?>', '<?=$this->_('Kontrola')?>'],
+            colModel:[
+               {name:'<?=Model_Tables::COL_TABLE_NAME?>',index:'<?=Model_Tables::COL_TABLE_NAME?>', width:200,editable:false},
+               {name:'<?=Model_Tables::COL_TABLE_ROWS?>',index:'<?=Model_Tables::COL_TABLE_ROWS?>', width:100,editable:false},
+               {name:'<?=Model_Tables::COL_DATA_LENGTH?>',index:'<?=Model_Tables::COL_DATA_LENGTH?>', width:100,editable:false},
+               {name:'<?=Model_Tables::COL_TABLE_COLLATION?>',index:'<?=Model_Tables::COL_TABLE_COLLATION?>', width:100,editable:false},
+               {name:'<?=Model_Tables::COL_ENGINE?>',index:'<?=Model_Tables::COL_ENGINE?>', width:100,editable:false},
+               {name:'check',index:'check', width:100,sortable:false, editable:false},
+            ],
+            rowNum:20,
+            rowList:[10,20,40,100],
+            pager: '#table-tables-pager',
+            sortname: '<?=Model_Tables::COL_TABLE_NAME?>',
+            caption:"Tabulky v databázi",
+            height: 350,
+            width : 650
+         });
+         addressGrid.jqGrid('navGrid','#table-tables-toolbar',{edit:false,add:false,del:false});
+//         // úpravy
+         jQuery("#table-tables").jqGrid('navGrid','#table-tables-pager',
+            {view:false, edit:false, add:false, del:false},
+            {closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']}, // search options
+            {height:120,jqModal:true,closeOnEscape:true} // view options
+         );
+      });
+      /* ]]> */
+      </script>
