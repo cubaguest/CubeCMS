@@ -197,8 +197,12 @@ class Model_ORM extends Model_PDO {
     * Metoda nastavuje název tabulky
     * @param string $tablename -- název tabulky bez prefixu
     */
-   protected function setTableName($tablename, $short = null) {
-      $this->tableName = Db_PDO::table($tablename);
+   protected function setTableName($tablename, $short = null, $addPrefix = true) {
+      if($addPrefix == true){
+         $this->tableName = Db_PDO::table($tablename);
+      } else {
+         $this->tableName = $tablename;
+      }
       if($short == null){
          $short = 't_';
          $parts = explode('_', $tablename);
