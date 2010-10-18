@@ -3,6 +3,7 @@ class Contact_View extends View {
    public function mainView() {
       if($this->rights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
 
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('contact_edit', $this->_("Upravit kontakt"),
                  $this->link()->route('edit'));

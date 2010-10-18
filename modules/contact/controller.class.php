@@ -7,6 +7,7 @@ class Contact_Controller extends Controller {
    const PARAM_MAP_TYPE_IMAGE = 'image';
    const PARAM_MAP_TYPE_IFRAME = 'iframe';
    const PARAM_FORM = 'form';
+   const PARAM_FORM_SUBJECTS = 'formsub';
    const PARAM_ADMIN_RECIPIENTS = 'admin_rec';
    const PARAM_OTHER_RECIPIENTS = 'other_rec';
 
@@ -38,9 +39,23 @@ class Contact_Controller extends Controller {
       $elemMail->addValidation(new Form_Validator_Email());
       $formQuestion->addElement($elemMail);
 
+      $subs = array();
+      if($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) != null){
+         $elemSubjectDef = new Form_Element_Select('subjectDef', $this->_('Téma'));
+         $subs = explode(';', $this->category()->getParam(self::PARAM_FORM_SUBJECTS));
+         $elemSubjectDef->setOptions(array($this->_('< Vlastní předmět >') => 0), true);
+         foreach ($subs as $key => $sub) {
+            $elemSubjectDef->setOptions(array(preg_replace('/<.*>/', '', $sub) => $key+1), true); // +1 protože první je vlastní
+         }
+         $formQuestion->addElement($elemSubjectDef);
+      }
+
       $elemSubject = new Form_Element_Text('subject', $this->_('Předmět'));
-      $elemSubject->addValidation(new Form_Validator_NotEmpty());
+      if($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) == null){
+         $elemSubject->addValidation(new Form_Validator_NotEmpty());
+      }
       $formQuestion->addElement($elemSubject);
+
 
       $elemText = new Form_Element_TextArea('text', $this->_('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
@@ -49,36 +64,54 @@ class Contact_Controller extends Controller {
       $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
       $formQuestion->addElement($elemSubmit);
 
+      if($formQuestion->haveElement('subjectDef') AND $formQuestion->isSend()
+         AND $formQuestion->subjectDef->getValues() == 0 AND $formQuestion->subject->getValues() == null){
+          $formQuestion->subject->setError($this->_('Musí být zadán předmět zprávy.'));
+      }
+
       if($formQuestion->isValid()){
          $model = new Contact_Model_Questions();
          $model->saveQuestion($formQuestion->name->getValues(), $formQuestion->mail->getValues(), 
              $formQuestion->subject->getValues(), $formQuestion->text->getValues());
 
-         // odeslání emailu
-         $mail = new Email();
-         $mail->setSubject($formQuestion->subject->getValues());
-         $mail->setContent($formQuestion->text->getValues());
-         $mail->addAddress($formQuestion->mail->getValues());
-         // maily adminů
-         $str = $this->category()->getParam(self::PARAM_OTHER_RECIPIENTS, null);
-         $mails = array();
-         if($str != null) $mails = explode(';', $str);
-         $usersId = $this->category()->getParam(self::PARAM_ADMIN_RECIPIENTS, array());
+         $adminMails = array();
 
-         $modelusers = new Model_Users();
+         $subject = $formQuestion->subject->getValues();
 
-         foreach ($usersId as $id) {
-            $user = $modelusers->getUserById($id);
-            $mails = array_merge($mails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
+         if($formQuestion->haveElement('subjectDef') AND (int)$formQuestion->subjectDef->getValues() > 0){
+            $subject = preg_replace('/<.*>/', '', $subs[(int)$formQuestion->subjectDef->getValues()-1]);
+            //vytažení emailu, pokud je
+            $matches = array();
+            if(preg_match('/<(.*)>/', $subs[(int)$formQuestion->subjectDef->getValues()-1], $matches) !== 0){
+               $adminMails[] = $matches[1];
+            }
          }
 
-         $mail->addAddress($mails);
+         // odeslání emailu
+         $mail = new Email();
+         $mail->setSubject($subject);
+         $mail->setContent($formQuestion->text->getValues());
+         //$mail->addAddress($formQuestion->mail->getValues()); // odesílat?
+
+         if(empty($adminMails)){ // pokud je prázdný výtahneme nasatvené maily
+            // maily adminů - předané
+            $str = $this->category()->getParam(self::PARAM_OTHER_RECIPIENTS, null);
+            if($str != null) $adminMails = explode(';', $str);
+            // maily adminů - z uživatelů
+            $usersId = $this->category()->getParam(self::PARAM_ADMIN_RECIPIENTS, array());
+            $modelusers = new Model_Users();
+            foreach ($usersId as $id) {
+               $user = $modelusers->getUserById($id);
+               $adminMails = array_merge($adminMails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
+            }
+         }
+         $mail->addAddress($adminMails);
+
          $mail->sendMail();
 
          $this->infoMsg()->addMessage($this->_('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
          $this->link()->reload();
       }
-
       $this->view()->formQuestion = $formQuestion;
    }
 
@@ -193,6 +226,15 @@ class Contact_Controller extends Controller {
          $form->formEnabled->setValues($settings[self::PARAM_FORM]);
       }
 
+      $elemFormSubjects = new Form_Element_TextArea('formSub', 'Předměty zpráv');
+      $elemFormSubjects->setSubLabel(htmlspecialchars('Předdefinované předměty zprávy, odělené středníkem. Pokud je za zprávo email ve špičatých závorkách, je odeslán dotaz na něj. např.: dotaz na zboží<jmeno@email.cz>'));
+      $elemFormSubjects->html()->setAttrib('cols', 50)->setAttrib('rows', 5);
+      $form->addElement($elemFormSubjects, $grpForm);
+      if(isset($settings[self::PARAM_FORM_SUBJECTS])) {
+         $form->formSub->setValues($settings[self::PARAM_FORM_SUBJECTS]);
+      }
+
+
       $grpAdmin = $form->addGroup('admins', 'Nastavení příjemců',
               'Nastavení příjemců odeslaných dotazů z kontaktního formuláře');
 
@@ -233,6 +275,7 @@ lze využít následující výběr již existujících uživatelů.');
          $settings[self::PARAM_MAP_TYPE] = $form->ggMapType->getValues();
 
          $settings[self::PARAM_FORM] = $form->formEnabled->getValues();
+         $settings[self::PARAM_FORM_SUBJECTS] = $form->formSub->getValues();
 
          $settings[self::PARAM_ADMIN_RECIPIENTS] = $form->admins->getValues();
          $settings[self::PARAM_OTHER_RECIPIENTS] = $form->otherRec->getValues();
