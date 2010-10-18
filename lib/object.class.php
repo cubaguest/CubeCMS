@@ -2,5 +2,7 @@
 /**
  * Prototyp objektu
  */
-class Object {}
+class Object {
+   public function  __get($name) {return null;}
+}
 ?>
