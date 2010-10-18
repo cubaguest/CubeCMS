@@ -138,6 +138,9 @@ class Articles_Controller extends Controller {
       $artM->join('t_usr_last', array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)->join('t_usr', array('usernameCreated' => Model_Users::COLUMN_USERNAME));
       $article = $artM->record();
 
+      if((string)$article->{Model_Users::COLUMN_USERNAME} == null){
+         $article->{Model_Users::COLUMN_USERNAME} = $article->usernameCreated;
+      }
 
       if($article == false) {
          AppCore::setErrorPage(true);
