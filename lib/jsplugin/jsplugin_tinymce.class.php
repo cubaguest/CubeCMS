@@ -157,7 +157,8 @@ class JsPlugin_TinyMce extends JsPlugin {
            'template_replace_values' => array(),
            'root_element' => true,
            'templates_type' => Templates_Model::TEMPLATE_TYPE_TEXT,
-           'relative_urls' => true
+           'relative_urls' => true,
+           'height' => 'auto'
 //           ,'plugins' => array()
    );
 
@@ -181,7 +182,10 @@ class JsPlugin_TinyMce extends JsPlugin {
            'theme_advanced_toolbar_location' => 'top',
            'theme_advanced_toolbar_align' => 'left',
            'theme_advanced_statusbar_location' => 'bottom',
-           'theme_advanced_resizing' => 'true');
+           'theme_advanced_resizing' => 'true',
+//           'height' => 'auto',
+           'width' => 400
+      );
 
    private $advParams = array(
            'external_image_list_url' => null,
@@ -280,6 +284,9 @@ class JsPlugin_TinyMce extends JsPlugin {
       if($this->config['relative_urls'] == false){
          $cfgFile->setParam('relative_urls', 'false');
       }
+      if($this->config['height'] != 'auto'){
+         $cfgFile->setParam('height', $this->config['height']);
+      }
 //      if(!empty ($this->config['plugins'])){
 //         foreach ($this->config['plugins'] as $key => $plg) {
 //            $cfgFile->setParam('plugins['.$key.']', $plg);
@@ -304,6 +311,9 @@ class JsPlugin_TinyMce extends JsPlugin {
       }
       if(isset ($_GET['root_element']) AND $_GET['root_element'] == 'false') {
          $params['forced_root_block'] = false;
+      }
+      if(isset ($_GET['height'])) {
+         $params['height'] = (int)$_GET['height'];
       }
       if(isset ($_GET['relative_urls']) AND $_GET['relative_urls'] == 'false') {
          $params['relative_urls'] = false;
