@@ -3,6 +3,10 @@
    text-align:justify;
 }
 
+.course-not-in-list-row td {
+   background-color: #f2f1f1;
+}
+
 .articlesList>div {
    margin-bottom: 1em;
 }

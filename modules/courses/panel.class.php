@@ -14,7 +14,7 @@ class Courses_Panel extends Panel {
             break;
          case 'list':
          default:
-            $this->template()->courses = $coursesM->getCoursesFromDate(new DateTime(), 0,
+            $this->template()->courses = $coursesM->getCoursesFromDate(new DateTime(), true, 0,
                     $this->panelObj()->getParam('num',self::DEFAULT_NUM_COURSES));
             $this->template()->addTplFile('panel.phtml');
             break;

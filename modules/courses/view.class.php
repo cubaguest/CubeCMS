@@ -7,9 +7,9 @@ class Courses_View extends View {
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
 
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('course_add', $this->_('Přidat kurs'),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('course_add', $this->_('Přidat položku'),
                  $this->link()->route('addCourse'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_("Přidat nového kurzu"));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->_("Přidání nové položky"));
          $toolbox->addTool($toolAdd);
          $this->template()->toolbox = $toolbox;
       }
@@ -34,19 +34,19 @@ class Courses_View extends View {
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
 
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('course_reg_list', $this->_('Registrace ke kurzu'),
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('course_reg_list', $this->_('Registrace k položce'),
                  $this->link()->route('registrationsCourse'));
          $toolEdit->setIcon('page_gear.png')->setTitle($this->_("Zobrazit registrace tohoto kurzu"));
          $toolbox->addTool($toolEdit);
          
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('course_edit', $this->_('Upravit kurz'),
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('course_edit', $this->_('Upravit položku'),
                  $this->link()->route('editCourse'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->_("Úprava toho kurzu"));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->_("Úprava této položky"));
          $toolbox->addTool($toolEdit);
 
          $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
          $toolDelete->setIcon('page_delete.png');
-         $toolDelete->setConfirmMeassage($this->_('Opravdu smazat kurz?'));
+         $toolDelete->setConfirmMeassage($this->_('Opravdu smazat položku?'));
          $toolbox->addTool($toolDelete);
 
          $this->template()->toolbox = $toolbox;

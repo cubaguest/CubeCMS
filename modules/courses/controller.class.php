@@ -4,6 +4,10 @@ class Courses_Controller extends Controller {
    const PAY_TYPE_ORGANISATION = 'organisation';
    const PAY_TYPE_PRIVATE = 'private';
 
+   const TYPE_COURSE = 'kurz';
+   const TYPE_CONFERENTION = 'konf';
+   const TYPE_SEMINARE = 'semin';
+   
    const PARAM_SEND_ADMIN_NOTIF_DEFAULT = true;
    const PARAM_SEND_ADMIN_NOTIF = 'admin_notif';
    const PARAM_ADMINS = 'admins';
@@ -27,13 +31,13 @@ class Courses_Controller extends Controller {
       $this->checkReadableRights();
 
       $model = new Courses_Model_Courses();
-      $this->view()->courses = $model->getCoursesFromDate(new DateTime());
+      $this->view()->courses = $model->getCoursesFromDate(new DateTime(), !$this->category()->getRights()->isWritable());
    }
 
    public function listAllCoursesController() {
       $this->checkReadableRights();
       $model = new Courses_Model_Courses();
-      $this->view()->courses = $model->getCourses();
+      $this->view()->courses = $model->getCourses(!$this->category()->getRights()->isWritable());
    }
 
    public function archiveController() {
@@ -94,13 +98,13 @@ class Courses_Controller extends Controller {
          $eId->setValues($this->view()->course->{Courses_Model_Courses::COLUMN_ID});
          $formDelete->addElement($eId);
 
-         $eDelete = new Form_Element_SubmitImage('delete', $this->_('Smazat kurz'));
+         $eDelete = new Form_Element_SubmitImage('delete', $this->_('Smazat položku'));
          $formDelete->addElement($eDelete);
 
          if ($formDelete->isValid()) {
             $courseModel->deleteCourse($formDelete->id->getValues());
 
-            $this->infoMsg()->addMessage($this->_('Kurz byl smazán'));
+            $this->infoMsg()->addMessage($this->_('Položka byla smazána'));
             $this->link()->route()->reload();
          }
          $this->view()->formDelete = $formDelete;
@@ -137,13 +141,13 @@ class Courses_Controller extends Controller {
                          $addForm->dateStart->getValues(), $addForm->dateStop->getValues(),
                          $addForm->price->getValues(), $addForm->hourseLen->getValues(), $addForm->place->getValues(),
                          $addForm->seats->getValues(), $addForm->seatsBlocked->getValues(),
-                         $addForm->isNew->getValues(), $addForm->allowReg->getValues(),
+                         $addForm->isNew->getValues(), $addForm->inList->getValues(), $addForm->allowReg->getValues(), $addForm->type->getValues(),
                          $imgName, $addForm->lecturers->getValues(), $addForm->privateUsers->getValues(),
                          $addForm->allowFeed->getValues());
 
          $newCours = $model->getCourseById($idC);
 
-         $this->infoMsg()->addMessage($this->_('Kurz byl uložen'));
+         $this->infoMsg()->addMessage($this->_('Položka byla uložena'));
          $this->link()->route('detail', array('urlkey' => $newCours->{Courses_Model_Courses::COLUMN_URLKEY}))->reload();
       }
 
@@ -188,7 +192,9 @@ class Courses_Controller extends Controller {
       $editForm->lecturers->setValues($idl);
       $editForm->urlkey->setValues($course->{Courses_Model_Courses::COLUMN_URLKEY});
       $editForm->allowReg->setValues($course->{Courses_Model_Courses::COLUMN_ALLOW_REG});
+      $editForm->type->setValues($course->{Courses_Model_Courses::COLUMN_TYPE});
       $editForm->isNew->setValues($course->{Courses_Model_Courses::COLUMN_IS_NEW});
+      $editForm->inList->setValues($course->{Courses_Model_Courses::COLUMN_IN_LIST});
       $editForm->metaDesc->setValues($course->{Courses_Model_Courses::COLUMN_DESCRIPTION});
       $editForm->metaKeywords->setValues($course->{Courses_Model_Courses::COLUMN_KEYWORDS});
       $editForm->allowFeed->setValues((bool)$course->{Courses_Model_Courses::COLUMN_FEED});
@@ -244,14 +250,14 @@ class Courses_Controller extends Controller {
                  $editForm->dateStart->getValues(), $editForm->dateStop->getValues(),
                  $editForm->price->getValues(), $editForm->hourseLen->getValues(), $editForm->place->getValues(),
                  $editForm->seats->getValues(), $editForm->seatsBlocked->getValues(),
-                 $editForm->isNew->getValues(), $editForm->allowReg->getValues(),
+                 $editForm->isNew->getValues(), $editForm->inList->getValues(), $editForm->allowReg->getValues(), $editForm->type->getValues(),
                  $imgName, $editForm->lecturers->getValues(), $editForm->privateUsers->getValues(),
                  $editForm->allowFeed->getValues(),
                  $course->{Courses_Model_Courses::COLUMN_ID});
 
          $newCours = $model->getCourseById($course->{Courses_Model_Courses::COLUMN_ID});
 
-         $this->infoMsg()->addMessage($this->_('Kurz byl uložen'));
+         $this->infoMsg()->addMessage($this->_('Položky byla uložena'));
          $this->link()->route('detailCourse', array('urlkey' => $newCours->{Courses_Model_Courses::COLUMN_URLKEY}))->reload();
       }
       $this->view()->form = $editForm;
@@ -330,8 +336,17 @@ class Courses_Controller extends Controller {
       $eAllowReg->setValues(true);
       $form->addElement($eAllowReg, $fGrpParams);
 
-      $eIsNew = new Form_Element_Checkbox('isNew', $this->_('Označit kurz jako Nový'));
+      $eIsNew = new Form_Element_Checkbox('isNew', $this->_('Označit jako Nový'));
       $form->addElement($eIsNew, $fGrpParams);
+      
+      $eShow = new Form_Element_Checkbox('inList', $this->_('Zobrazit v seznamu'));
+      $eShow->setValues(true);
+      $form->addElement($eShow, $fGrpParams);
+      
+      $eType = new Form_Element_Select('type', $this->_('Typ kurzu'));
+      $eType->setOptions(array('Kurz' => self::TYPE_COURSE, 'Konference' => self::TYPE_CONFERENTION, 'Seminář' => self::TYPE_SEMINARE));
+      $form->addElement($eType, $fGrpParams);
+
 
       $fGrpPrivate = $form->addGroup('private', $this->_('Privátní část'),
               $this->_('Položky vyditelné pouze určitým uživatelům. Administrátorům jsou tyto informace vždy viditelné.'));
@@ -375,8 +390,7 @@ class Courses_Controller extends Controller {
       $eAllowFeed = new Form_Element_Checkbox('allowFeed', $this->_('Povolit RSS export'));
       $eAllowFeed->setValues(false);
       $form->addElement($eAllowFeed, $fGrpOther);
-
-
+      
       $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
       $form->addElement($iSubmit);
 
@@ -425,8 +439,18 @@ class Courses_Controller extends Controller {
       $regForm->addElement($eNote, $basicGrp);
 
       $payGroup = $regForm->addGroup('pay', $this->_('Fakturační údaje'));
-
-      $ePay = new Form_Element_Radio('payType', $this->_('Kurz hrazen'));
+      switch ($this->view()->course->{Courses_Model_Courses::COLUMN_TYPE}) {
+         case self::TYPE_CONFERENTION:
+            $label = $this->_('Konference hrazena');
+            break;
+         case self::TYPE_SEMINARE:
+            $label = $this->_('Seminář hrazen');
+            break;
+         default:
+            $label = $this->_('Kurz hrazen');
+            break;
+      }
+      $ePay = new Form_Element_Radio('payType', $label);
       $payTypes = array($this->_('Organizací') => self::PAY_TYPE_ORGANISATION,
           $this->_('Soukromě') => self::PAY_TYPE_PRIVATE);
       $ePay->setOptions($payTypes);
@@ -495,8 +519,17 @@ class Courses_Controller extends Controller {
          $mailXmlCnt->endElement();
 
          // úvod
-//         $mailXmlCnt->writeRaw('Byla registrována přihláška ke kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
-         $mailXmlCnt->writeRaw('Toto je automatická odpověď. Byla registrována přihláška ke kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+         switch ($this->view()->course->{Courses_Model_Courses::COLUMN_TYPE}) {
+         case self::TYPE_CONFERENTION:
+            $mailXmlCnt->writeRaw('Toto je automatická odpověď. Byla registrována přihláška ke konferenci "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+            break;
+         case self::TYPE_SEMINARE:
+            $mailXmlCnt->writeRaw('Toto je automatická odpověď. Byla registrována přihláška k semináři "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+            break;
+         default:
+            $mailXmlCnt->writeRaw('Toto je automatická odpověď. Byla registrována přihláška ke kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'" ze stránek ');
+            break;
+      }
 
          $mailXmlCnt->startElement('a');
          $mailXmlCnt->writeAttribute('href', Url_Link::getMainWebDir());
@@ -514,7 +547,18 @@ class Courses_Controller extends Controller {
          $mailXmlCnt->writeElement('br');
 
          // odkaz na kurz
-         $mailXmlCnt->writeRaw('Detail kurzu naleznete ');
+         switch ($this->view()->course->{Courses_Model_Courses::COLUMN_TYPE}) {
+            case self::TYPE_CONFERENTION:
+               $mailXmlCnt->writeRaw('Detail konference naleznete ');
+               break;
+            case self::TYPE_SEMINARE:
+               $mailXmlCnt->writeRaw('Detail semináře naleznete ');
+               break;
+            default:
+               $mailXmlCnt->writeRaw('Detail kurzu naleznete ');
+               break;
+         }
+         
          $mailXmlCnt->startElement('a');
          $mailXmlCnt->writeAttribute('href', $this->link());
          $mailXmlCnt->writeAttribute('title', $course->{Courses_Model_Courses::COLUMN_NAME});
@@ -773,7 +817,17 @@ class Courses_Controller extends Controller {
          $mail->setContent($cnt);
          unset ($mailXmlCnt);
          // předmět
-         $mail->setSubject('Registrace do kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'"');
+         switch ($this->view()->course->{Courses_Model_Courses::COLUMN_TYPE}) {
+            case self::TYPE_CONFERENTION:
+               $mail->setSubject('Registrace do konference "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'"');
+               break;
+            case self::TYPE_SEMINARE:
+               $mail->setSubject('Registrace do semináře "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'"');
+               break;
+            default:
+               $mail->setSubject('Registrace do kurzu "'.$course->{Courses_Model_Courses::COLUMN_NAME}.'"');
+               break;
+         }
          // příjemci
          $mail->addAddress($regForm->mail->getValues()); // form
          if($this->category()->getParam(self::PARAM_SEND_ADMIN_NOTIF, self::PARAM_SEND_ADMIN_NOTIF_DEFAULT) == true){

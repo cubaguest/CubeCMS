@@ -1,4 +1,5 @@
 <?
+$this->addCssFile('style.css');
 if($this->isAllList == true){
    $this->addPageTitle($this->_('Seznam všech kurzů'));
    $h1 = $this->_('Seznam všech kurzů');
@@ -29,7 +30,7 @@ if($this->isAllList == true){
       <tbody>
       <?
       foreach ($this->courses as $course) {?>
-         <tr>
+         <tr class="<?if($course->{Courses_Model_Courses::COLUMN_IN_LIST} == false) echo 'course-not-in-list-row'?>">
             <td>
                <?
                if($course->{Courses_Model_Courses::COLUMN_IS_NEW} == true){?>
@@ -45,7 +46,10 @@ if($this->isAllList == true){
                ?>
                <a href="<?=$this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
                   title="<?=htmlspecialchars($title)?>"
-                  ><?=$course->{Courses_Model_Courses::COLUMN_NAME}?></a>
+                  ><?=$course->{Courses_Model_Courses::COLUMN_NAME}?></a><?
+                  if($course->{Courses_Model_Courses::COLUMN_TYPE} == Courses_Controller::TYPE_CONFERENTION) echo ' (konference)';
+                  else if($course->{Courses_Model_Courses::COLUMN_TYPE} == Courses_Controller::TYPE_SEMINARE) echo ' (seminář)';
+                  ?>
             </td>
             <td align="center">
                <?

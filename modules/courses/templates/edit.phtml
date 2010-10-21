@@ -2,11 +2,11 @@
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
-   $this->addPageTitle($this->_('úprava kurzu'));
-   $this->addPageHeadline($this->_('úprava kurzu'));
+   $h = $this->_('Úprava položky');
+   $this->addPageTitle($h);
 } else {
-   $this->addPageTitle($this->_('přidání kurzu'));
-   $this->addPageHeadline($this->_('přidání kurzu'));
+   $h = $this->_('Přidání položky');
+   $this->addPageTitle($h);
 }
 // donastavení formuláře
 $this->form->textShort->html()->setAttrib('cols', 80)->setAttrib('rows', 10)->addClass("mceEditorSimple");
@@ -43,6 +43,7 @@ if($this->courseImage != null){
 
 
 ?>
+<h1><?=$h?></h1>
 <div id="editArticleForm">
    <?print($this->form);?>
    <script type="text/javascript">

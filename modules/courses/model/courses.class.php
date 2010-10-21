@@ -11,6 +11,7 @@ class Courses_Model_Courses extends Model_PDO {
     * Názvy sloupců v databázi
     */
    const COLUMN_ID = 'id_course';
+   const COLUMN_TYPE = 'type';
    const COLUMN_ID_USER = 'id_user';
    const COLUMN_URLKEY = 'url_key';
    const COLUMN_NAME = 'name';
@@ -34,6 +35,7 @@ class Courses_Model_Courses extends Model_PDO {
    const COLUMN_DESCRIPTION = 'description';
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_FEED = 'rss_feed';
+   const COLUMN_IN_LIST = 'show_in_list';
 
    const COLUMN_L_H_C_ID_COURSE = 'id_course';
    const COLUMN_L_H_C_ID_LECTURER = 'id_lecturer';
@@ -50,7 +52,7 @@ class Courses_Model_Courses extends Model_PDO {
     */
    public function saveCourse($name, $textShort, $text, $textPrivate, $urlKey, $desc, $keywords,
       DateTime $dateStart, $dateStop, $price, $hours, $place, $seats, $seatsBlocked,
-           $isNew, $allowReg, $image, $idLecturers, $idUsers, $isFeed, $id = null) {
+           $isNew, $inList, $allowReg, $type, $image, $idLecturers, $idUsers, $isFeed, $id = null) {
       // generování unikátního klíče
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID ,$id);
@@ -65,8 +67,8 @@ class Courses_Model_Courses extends Model_PDO {
                  .self::COLUMN_DATE_STOP."= :dateStop, ".self::COLUMN_PRICE."= :price, "
                  .self::COLUMN_PLACE."= :place, ".self::COLUMN_HOURS_LEN."= :hoursLen, "
                  .self::COLUMN_SEATS."= :seats, ".self::COLUMN_SEATS_BLOCKED."= :seatsBlocked, "
-                 .self::COLUMN_IS_NEW."= :isNew, ".self::COLUMN_ALLOW_REG."= :allowReg, "
-                 .self::COLUMN_FEED."= :isFeed, ".self::COLUMN_TEXT_PRIVATE."= :textPrivate, "
+                 .self::COLUMN_IS_NEW."= :isNew, ".self::COLUMN_IN_LIST."= :isShowed, ".self::COLUMN_ALLOW_REG."= :allowReg, "
+                 .self::COLUMN_TYPE."= :type, ".self::COLUMN_FEED."= :isFeed, ".self::COLUMN_TEXT_PRIVATE."= :textPrivate, "
                  .self::COLUMN_IMAGE."= :image, ".self::COLUMN_ID_USER."= :idUser"
                   ." WHERE ".self::COLUMN_ID." = :idc");
          $dbst->bindParam(':idc', $id, PDO::PARAM_INT);
@@ -78,17 +80,17 @@ class Courses_Model_Courses extends Model_PDO {
                  .self::COLUMN_DATE_START.",". self::COLUMN_DATE_STOP.","
                  .self::COLUMN_PRICE.",". self::COLUMN_PLACE.",". self::COLUMN_HOURS_LEN.","
                  .self::COLUMN_SEATS.",". self::COLUMN_SEATS_BLOCKED.","
-                 .self::COLUMN_IS_NEW.",". self::COLUMN_ALLOW_REG.",". self::COLUMN_IMAGE.","
+                 .self::COLUMN_IS_NEW.",".self::COLUMN_IN_LIST.",". self::COLUMN_ALLOW_REG.",". self::COLUMN_TYPE.",". self::COLUMN_IMAGE.","
                  .self::COLUMN_ID_USER.", ".self::COLUMN_FEED.")"
                  ." VALUES (:name, :textShort, :text, :textPrivate, :textClear, :urlkey, :metaDesc, :keywords,"
                  ." :dateStart, :dateStop, :price, :place, :hoursLen, :seats,"
-                 ." :seatsBlocked, :isNew, :allowReg, :image, :idUser, :isFeed".")");
+                 ." :seatsBlocked, :isNew, :isShowed, :allowReg, :type, :image, :idUser, :isFeed".")");
       }
       $dbst->bindValue(':name', $name, PDO::PARAM_STR);
       $dbst->bindValue(':textShort', $textShort, PDO::PARAM_STR);
       $dbst->bindValue(':text', $text, PDO::PARAM_STR);
       $dbst->bindValue(':textPrivate', $textPrivate, PDO::PARAM_STR);
-      $dbst->bindValue(':textClear', vve_strip_tags($text), PDO::PARAM_STR);
+      $dbst->bindValue(':textClear', vve_strip_tags($text.' '.$textShort), PDO::PARAM_STR);
       $dbst->bindValue(':urlkey', $urlKey, PDO::PARAM_STR);
       $dbst->bindValue(':metaDesc', $desc, PDO::PARAM_STR);
       $dbst->bindValue(':keywords', $keywords, PDO::PARAM_STR);
@@ -104,7 +106,9 @@ class Courses_Model_Courses extends Model_PDO {
       $dbst->bindValue(':seats', (int)$seats, PDO::PARAM_INT);
       $dbst->bindValue(':seatsBlocked', (int)$seatsBlocked, PDO::PARAM_INT);
       $dbst->bindValue(':isNew', (bool)$isNew, PDO::PARAM_BOOL);
+      $dbst->bindValue(':isShowed', (bool)$inList, PDO::PARAM_BOOL);
       $dbst->bindValue(':allowReg', (bool)$allowReg, PDO::PARAM_BOOL);
+      $dbst->bindValue(':type', $type, PDO::PARAM_STR);
       $dbst->bindValue(':image', $image, PDO::PARAM_STR|PDO::PARAM_NULL);
       $dbst->bindValue(':idUser', Auth::getUserId(), PDO::PARAM_INT);
       $dbst->bindValue(':isFeed', (bool)$isFeed, PDO::PARAM_INT);
@@ -218,14 +222,22 @@ class Courses_Model_Courses extends Model_PDO {
     *
     * @return PDOStatement -- pole s kurzy
     */
-   public function getCourses($fromRow = 0, $numRows = 500) {
+   public function getCourses($onlyVisible = true, $fromRow = 0, $numRows = 500, $type = null) {
       $dbc = new Db_PDO();
+      
+      $where = null;
+      if($onlyVisible == true) $where .= " AND ".self::COLUMN_IN_LIST." = 1";
+      if($type != null) $where .= ' AND '.self::COLUMN_TYPE.' = :type';
+      
+      
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE ".self::COLUMN_DELETED." = 0"
+              ." WHERE ".self::COLUMN_DELETED." = 0".$where
                       ." ORDER BY ".self::COLUMN_DATE_START." ASC"
           ." LIMIT :fromRow, :numRows");
       $dbst->bindValue(':fromRow', $fromRow, PDO::PARAM_INT);
       $dbst->bindValue(':numRows', $numRows, PDO::PARAM_INT);
+      if($type != null) $dbst->bindValue(':type', $type, PDO::PARAM_STR);
+      
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetchAll();
@@ -240,7 +252,7 @@ class Courses_Model_Courses extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT tc.*, tu.".Model_Users::COLUMN_USERNAME." FROM ".Db_PDO::table(self::DB_TABLE)." AS tc"
               ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS tu ON tu.".Model_Users::COLUMN_ID." = tc.".self::COLUMN_ID_USER
-              ." WHERE tc.".self::COLUMN_DELETED." = 0 AND tc.".self::COLUMN_FEED." = 1"
+              ." WHERE tc.".self::COLUMN_DELETED." = 0 AND tc.".self::COLUMN_FEED." = 1 AND ".self::COLUMN_IN_LIST." = 1"
               ." ORDER BY tc.".self::COLUMN_DATE_START." ASC"
               ." LIMIT 0, :numRows");
       $dbst->bindValue(':numRows', (int)$numRows, PDO::PARAM_INT);
@@ -254,15 +266,22 @@ class Courses_Model_Courses extends Model_PDO {
     *
     * @return PDOStatement -- pole s kurzy
     */
-   public function getCoursesFromDate(DateTime $date, $fromRow = 0, $numRows = 500) {
+   public function getCoursesFromDate(DateTime $date, $onlyVisible = true, $fromRow = 0, $numRows = 500, $type = null) {
       $dbc = new Db_PDO();
+      
+      $where = null;
+      if($onlyVisible == true) $where .= " AND ".self::COLUMN_IN_LIST." = 1";
+      if($type != null) $where .= ' AND '.self::COLUMN_TYPE.' = :type';
+      
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE ".self::COLUMN_DELETED." = 0 AND ".self::COLUMN_DATE_START." >= :dates"
+              ." WHERE ".self::COLUMN_DELETED." = 0 AND ".self::COLUMN_DATE_START." >= :dates".$where
               ." ORDER BY ".self::COLUMN_DATE_START." ASC"
           ." LIMIT :fromRow, :numRows");
       $dbst->bindValue(':dates', $date->format('Y-m-d'), PDO::PARAM_STR);
       $dbst->bindValue(':fromRow', (int)$fromRow, PDO::PARAM_INT);
       $dbst->bindValue(':numRows', (int)$numRows, PDO::PARAM_INT);
+      if($type != null) $dbst->bindValue(':type', $type, PDO::PARAM_STR);
+      
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetchAll();
@@ -335,26 +354,14 @@ class Courses_Model_Courses extends Model_PDO {
     * @param bool $publicOnly
     * @return PDOStatement
     */
-   public function search($idCat, $string, $publicOnly = true){
+   public function search($idCat, $string){
       $dbc = new Db_PDO();
-      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locales::getLang();
-      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
-
-      $wherePub = null;
-      if($publicOnly){
-         $wherePub = ' AND '.Articles_Model_Detail::COLUMN_PUBLIC.' = 1';
-      }
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
-              .' + MATCH('.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(Articles_Model_Detail::DB_TABLE)
-              .' WHERE MATCH('.$clabel.', '.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.Articles_Model_Detail::COLUMN_ID_CATEGORY.'` = :idCat'
-              .$wherePub // Public articles
+      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COLUMN_NAME.') AGAINST (:sstring)'
+              .' + MATCH('.self::COLUMN_TEXT_CLEAR.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
+              .' FROM '.Db_PDO::table(self::DB_TABLE)
+              .' WHERE MATCH('.self::COLUMN_NAME.', '.self::COLUMN_TEXT_CLEAR.') AGAINST (:sstring IN BOOLEAN MODE)'
               .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
+              .' * MATCH('.self::COLUMN_NAME.') AGAINST (:sstring) + MATCH('.self::COLUMN_TEXT_CLEAR.') AGAINST (:sstring) DESC');
       $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->execute();

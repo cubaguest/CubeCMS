@@ -8,6 +8,19 @@ $dateStart = new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_STA
 if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
    $dateStop = new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP});
 }
+// který typ
+switch ($this->course->{Courses_Model_Courses::COLUMN_TYPE}) {
+   case Courses_Controller::TYPE_CONFERENTION:
+      $type = 'konference';
+      break;
+   case Courses_Controller::TYPE_SEMINARE:
+      $type = 'semináře';
+      break;
+   default:
+      $type = 'kurzu';
+      break;
+}
+
 ?>
 <style type="text/css">
    .module-courses-detail-params .course-param, .course-lecturer-name {
@@ -31,7 +44,7 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
    <ul class="module-courses-detail-params">
       <li>
          <?
-         echo '<span class="course-param">'.$this->_('Termín kurzu') . ":</span>";
+         echo '<span class="course-param">'.$this->_('Termín ').$type . ":</span>";
          echo vve_date("%x", new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_START}));
          if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
             echo ' - ' . vve_date("%x", new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP}));
@@ -45,21 +58,22 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
          ?>
       </li>
       <?
-         if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != null) {
+         if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != 0) {
             echo '<li>'
-            . '<span class="course-param">'. $this->_('Délka kurzu') . ":</span>"
+            . '<span class="course-param">'. $this->_('Délka ').$type . ":</span>"
             . $this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} . '&nbsp;' . $this->_('hodin')
             . '</li>';
          }
       ?>
       <?
-         if ($this->course->{Courses_Model_Courses::COLUMN_PRICE} != null) {
+         if ($this->course->{Courses_Model_Courses::COLUMN_PRICE} != 0) {
             echo '<li>'
-            . '<span class="course-param">'. $this->_('Cena kurzu') . ":</span>"
+            . '<span class="course-param">'. $this->_('Cena ').$type . ":</span>"
             . number_format($this->course->{Courses_Model_Courses::COLUMN_PRICE},0,',',' ') . '&nbsp;' . $this->_('Kč')
             . '</li>';
          }
-      ?>
+      if($this->course->{Courses_Model_Courses::COLUMN_SEATS} != 0){
+         ?>
       <li>
          <?
          echo '<span class="course-param">'.$this->_('Kapacita') . ":</span>";
@@ -72,6 +86,9 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
          echo $this->freeSeats . '&nbsp;' . $this->_('míst');
          ?>
       </li>
+      <?
+      }
+      ?>
       </ul>
       <br />
       <div class="main-content-text">
@@ -89,7 +106,7 @@ if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
       <br />
       <?}?>
 
-      <h2><?=$this->_('Lektoři kurzu')?></h2>
+      <h2><?=$this->_('Lektoři ').$type?></h2>
       <?
       $this->includeTpl('onlylist.phtml', false, array('lecturers' => $this->lecturers,'hE' => 'span', 'hEClass' => 'course-lecturer-name'), 'lecturers');
          /*foreach ($this->lecturers as $lecturer) {
