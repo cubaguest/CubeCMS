@@ -35,7 +35,8 @@ class Email {
    private $mailer = null;
 
    private $message = null;
-
+   
+   private $iconvParams = array();
 
    /**
     * Konstruktor. Vytvoří objekt emailu
@@ -52,12 +53,26 @@ class Email {
          $transport = Swift_MailTransport::newInstance();
       }
       $this->mailer = Swift_Mailer::newInstance($transport);
-      $this->message = Swift_Message::newInstance(null);
+      $this->message = Swift_Message::newInstance();
+      $this->message->setEncoder(Swift_Encoding::get8BitEncoding());
+      switch (Locales::getLang()) {
+         case 'cs': // many czech people use very old mail interface
+            $this->message->setCharset('iso-8859-2');
+            $this->iconvParams = array('UTF-8', 'iso-8859-2//TRANSLIT');
+            break;
+         default:
+            break;
+      }
       if(VVE_NOREPLAY_MAIL != null) {
          $this->message->setFrom(VVE_NOREPLAY_MAIL);
       } else {
          $this->message->setFrom('noreplay@'.$_SERVER['SERVER_NAME']);
       }
+   }
+   
+   private function safeStr($str) {
+      if(empty ($this->iconvParams)) return $str;
+      return iconv($this->iconvParams[0], $this->iconvParams[1], $content);
    }
 
    /**
@@ -76,7 +91,7 @@ class Email {
     * @return Email -- vrací sebe
     */
    public function setSubject($subject) {
-      $this->message->setSubject($subject);
+      $this->message->setSubject($this->safeStr($subject));
       return $this;
    }
 
@@ -92,9 +107,9 @@ class Email {
          $cntType = 'text/html';
       }
       if($merge){
-         $this->message->setBody($this->message->getBody().$content, $cntType);
+         $this->message->setBody($this->message->getBody().$this->safeStr($content), $cntType);
       } else {
-         $this->message->setBody($content, $cntType);
+         $this->message->setBody($this->safeStr($content), $cntType);
       }
       return $this;
    }
