@@ -53,16 +53,16 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       } else {
          // tady kontroly sloupců a přetypování na správné hodnoty
          if($this->fromDb == true AND !isset ($this->columns[$collName]['valueLoaded'])){
-            if($this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL){
+            if(isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL){
                $value = (bool)$value;
-            } else if($this->columns[$collName]['pdoparam'] == PDO::PARAM_INT){
+            } else if(isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_INT){
                $value = (int)$value;
             }
 
             $this->columns[$collName]['valueLoaded'] = $value;
          }
          $this->columns[$collName]['value'] = $value;
-         if($this->columns[$collName]['pk'] == true){// primary key (jazykové nejsou pk)
+         if(isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true){// primary key (jazykové nejsou pk)
             $this->pKeyValue = $value;
          }
       }

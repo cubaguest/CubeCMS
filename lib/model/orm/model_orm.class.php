@@ -52,7 +52,8 @@ class Model_ORM extends Model_PDO {
       'value' => false,
       'valueLoaded' => false,
       'name' => null,
-      'extern' => false // externí sloupec
+      'extern' => false, // externí sloupec
+      'fulltext' => false // FULLTEXT na sloupci
    );
 
    protected $limit = array('from' => null, 'rows' => null);
@@ -67,6 +68,8 @@ class Model_ORM extends Model_PDO {
 
 
    protected $relations = array();
+
+   protected $selectedColumns = array();
 
    public function  __construct() {
       parent::__construct();
@@ -326,7 +329,7 @@ class Model_ORM extends Model_PDO {
       $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
       return $dbst->fetch();
    }
-
+   
    /**
     * Metoda vrací záznamy z db
     * @param int $fromRow -- od záznamu
@@ -422,8 +425,6 @@ class Model_ORM extends Model_PDO {
             }
          }
          $dbst->execute();
-
-
          $returnPk = $record->getPK();
 
       } else {
@@ -433,9 +434,11 @@ class Model_ORM extends Model_PDO {
          // create query
          foreach ($record->getColumns() as $colname => $params) {
             if(!isset ($params['lang'])) $params['lang'] = false;
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+            if($params['extern'] == true OR $params['pk'] == true
+               OR (is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
                OR (is_array($params['value'] AND $params['lang'] == false))
-               OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+//               OR $params['value'] == $params['valueLoaded']
+            ) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
                   if($params['aliasFor'] === null){
@@ -458,9 +461,23 @@ class Model_ORM extends Model_PDO {
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
             if(!isset ($params['lang'])) $params['lang'] = false;
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+            if($params['extern'] == true OR $params['pk'] == true
+               OR (is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
                OR (is_array($params['value'] AND $params['lang'] == false))
-               OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+//               OR $params['value'] == $params['valueLoaded']
+               ) continue;
+
+            if($params['value'] === false){
+               switch ((string)$params['default']) {
+                  case 'CURRENT_TIMESTAMP':
+                     $params['value'] = new DateTime();
+                     echo 'date';
+                     break;
+                  default:
+                     $params['value'] = $params['default'];
+                     break;
+               }
+            }
             $value = $params['value'];
             if($params['lang'] == true){
                foreach (Locales::getAppLangs() as $lang) {
@@ -570,7 +587,12 @@ class Model_ORM extends Model_PDO {
     * @param array $bindValues -- pole s předanými hodnotami - reference
     * @return Model_ORM
     */
-   public function where($cond, $bindValues = null) {
+   public function where($cond = null, $bindValues = null, $append = false) {
+      // vymaz
+      if($cond === null) {
+         $this->where = null;
+         $this->whereBindValues = array();
+      }
       if($bindValues === null){ // pokud je jenom hodnota bere se primary key
          $bindValues = array('col' => $cond);
          $cond = $this->pKey.' = :col';
@@ -579,8 +601,13 @@ class Model_ORM extends Model_PDO {
          $cond = $cond.' = :col';
          $bindValues = array('col' => $bindValues);
       }
-      $this->where = $cond;
-      $this->whereBindValues = $bindValues;
+      if($append == false){
+         $this->where = $cond;
+         $this->whereBindValues = $bindValues;
+      } else {
+         $this->where = $this->where.' '.$cond;
+         $this->whereBindValues = array_merge($this->whereBindValues, $bindValues);
+      }
       return $this;
    }
 
@@ -589,6 +616,15 @@ class Model_ORM extends Model_PDO {
       return $this;
    }
 
+   /**
+    * Metoda nastaví, které sloupce se budou vybírat
+    * @param array $columnsArr -- pole se sloupci
+    * @return Model_ORM -- sám sebe
+    */
+   public function columns($columnsArr) {
+      $this->selectedColumns = $columnsArr;
+      return $this;
+   }
 
    /**
     * Metoda provede výmaz hodnot s přidružených tabulek
@@ -612,21 +648,44 @@ class Model_ORM extends Model_PDO {
     */
    protected function createSQLSelectColumns() {
       $columns = array();
-      foreach ($this->tableStructure as $columnName => $params) {
-         if($params['lang'] == false){// není jazyk
-            if($params['aliasFor'] == null){
-               array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'`');
-            } else {
-               array_push($columns, '`'.$this->getTableShortName().'`.`'.$params['aliasFor'].'` AS '.$columnName);
+      if(empty ($this->selectedColumns)){ // není vybrán žádný sloupec
+         foreach ($this->tableStructure as $columnName => $params) {
+            if($params['lang'] == false){// není jazyk
+               if($params['aliasFor'] == null){
+                  array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'`');
+               } else {
+                  array_push($columns, '`'.$this->getTableShortName().'`.`'.$params['aliasFor'].'` AS '.$columnName);
+               }
+            } else if($this->getAllLangs == true) { // více jazyčné sloupce
+               foreach (Locales::getAppLangs() as $key => $value) {
+                  array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.$value.'`');
+               }
+            } else { // pouze aktuální jazykový sloupec
+               array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.Locales::getLang().'` AS '.$columnName);
             }
-         } else if($this->getAllLangs == true) { // více jazyčné sloupce
-            foreach (Locales::getAppLangs() as $key => $value) {
-               array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.$value.'`');
-            }
-         } else { // pouze aktuální jazykový sloupec
-            array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.Locales::getLang().'` AS '.$columnName);
          }
-
+      } else { // sloupce jsou vybrány
+         foreach ($this->selectedColumns as $alias => $columnName) {
+            if(!isset ($this->tableStructure[$columnName])){ // není colum z této tabulky nebo se jedná o funkci
+               if(is_int($alias)){
+                  array_push($columns, ''.$columnName.'');
+               } else {
+                  array_push($columns, ''.$columnName.' AS '.$alias);
+               }
+            } else if($this->tableStructure[$colName]['lang'] == false){// není jazyk
+               if($this->tableStructure[$colName]['aliasFor'] == null){
+                  array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'`');
+               } else {
+                  array_push($columns, '`'.$this->getTableShortName().'`.`'.$this->tableStructure[$colName]['aliasFor'].'` AS '.$columnName);
+               }
+            } else if($this->getAllLangs == true) { // více jazyčné sloupce
+               foreach (Locales::getAppLangs() as $key => $value) {
+                  array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.$value.'`');
+               }
+            } else { // pouze aktuální jazykový sloupec
+               array_push($columns, '`'.$this->getTableShortName().'`.`'.$columnName.'_'.Locales::getLang().'` AS '.$columnName);
+            }
+         }
       }
       $columns = $this->createSQLSelectJoinColumns($columns);
       $tableCols = implode(',', $columns);
