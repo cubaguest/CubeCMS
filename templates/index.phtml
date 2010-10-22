@@ -21,10 +21,10 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       foreach ($cats as $cat){
          if($cat[Model_Category::COLUMN_FEEDS] != true) continue;
          $link->category($cat[Model_Category::COLUMN_URLKEY])->file('rss.xml');
-         ?><link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat[Model_Category::COLUMN_CAT_LABEL]?>"
-            href="<?=$link?>" /><?
+         ?><link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat[Model_Category::COLUMN_CAT_LABEL]?>" href="<?=$link?>" />
+      <?
       }?>
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
+<link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
       <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
       <?if(VVE_DEBUG_LEVEL > 0){ echo '<link rel="stylesheet" type="text/css" href="'.$this->style('style-debug.css').'" />'; }?>
