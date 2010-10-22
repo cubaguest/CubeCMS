@@ -86,27 +86,16 @@ class Template_Core extends Template {
       }
       echo(parent::__toString());
       $contents = ob_get_contents();
-
-      //vytvoříme pole css souborů
-      $cssfiles = null;
-      foreach (Template::getStylesheets() as $css) {
-         $elem = new Html_Element('link');
-         $elem->setAttrib('rel', "stylesheet");
-         $elem->setAttrib('type', "text/css");
-         $elem->setAttrib('href', $css);
-         $cssfiles .= $elem;
-      }
-      $contents = str_replace('{*-STYLESHEETS-*}', $cssfiles, $contents);
-
-      //vytvoříme pole javascriptů
-      $jscripts = null;
-      foreach (Template::getJavascripts() as $js) {
-         $elem = new Html_Element('script');
-         $elem->setAttrib('src', $js);
-         $elem->setAttrib('type', "text/javascript");
-         $jscripts .= $elem;
-      }
-      $contents = str_replace('{*-JAVASCRIPTS-*}', $jscripts, $contents);
+      // css
+      $css = Template::getStylesheets();
+      array_walk($css, create_function('&$i,$k','$i = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$i\" />\n";'));
+      $cssfiles = implode('', $css);
+      unset ($css);
+      // js
+      $js = Template::getJavascripts();
+      array_walk($js, create_function('&$i,$k','$i = "<script type=\"text/javascript\" src=\"$i\"></script>\n";'));
+      $jscripts = implode('', $js);
+      unset ($js);
 
       // doplníme titulek stránky
       $arr = self::$pageTitle;
@@ -115,37 +104,55 @@ class Template_Core extends Template {
       if(Url_Request::getCurrentUrl() == (string)$link->category()){
          array_push($arr, VVE_MAIN_PAGE_TITLE);
       } else {
+         //@todo možná dávat celou cestu ke kategorii
          array_push($arr, Category::getSelectedCategory()->getName());
          array_push($arr, VVE_WEB_NAME);
       }
       $title = implode(' '.VVE_PAGE_TITLE_SEPARATOR.' ', $arr);
-      $contents = str_replace('{*-PAGE_TITLE-*}', $title, $contents);
-      // keywords
-      if(self::$pageKeywords != null){
-         $contents = str_replace('{*-PAGE_KEYWORDS-*}', htmlspecialchars(self::$pageKeywords), $contents);
-      }
-      // description
-      if(self::$pageDescription != null){
-         $contents = str_replace('{*-PAGE_DESCRIPTION-*}', htmlspecialchars(self::$pageDescription), $contents);
-      }
-      // doplníme hlavní nadpis stránky
-      $headline = self::$pageHeadline;
-      $contents = str_replace('{*-PAGE_HEADLINE-*}', $headline, $contents);
 
       // dovypsání CoreErrors
-      if(!CoreErrors::isEmpty()){
+      $errCnt = null;
+      if(!CoreErrors::isEmpty() AND VVE_DEBUG_LEVEL > 0){
          $tpl = new Template(new Url_Link(true));
          $tpl->addTplFile('coreerrors.phtml');
          ob_start();
          $tpl->renderTemplate();
-         $errContents = ob_get_contents();
+         $errCnt = ob_get_contents();
          ob_end_clean();
-         $contents = str_replace('{*-CORE_ERRORS-*}', $errContents, $contents);
       }
 
-      // odstranění všech proměnných a prázdných meta tagů
-      $contents = preg_replace(array('/\{\*\-[A-Z0-9_-]+\-\*\}/e', '/<meta(.+?)content="" ?\/>/e'), array(null, null), $contents);
-
+      // replacements vars
+      $contents = preg_replace(array(
+         // basic
+         '/\{\*-STYLESHEETS-\*\}/',
+         '/\{\*-JAVASCRIPTS-\*\}/',
+         // basic meta
+         '/\{\*-PAGE_TITLE-\*\}/',
+         '/\{\*-PAGE_KEYWORDS-\*\}/',
+         '/\{\*-PAGE_DESCRIPTION-\*\}/',
+         '/\{\*-PAGE_HEADLINE-\*\}/',
+         // CORE ERRORS
+         '/\{\*-CORE_ERRORS-\*\}/',
+         //  remove not used vars
+         '/\{\*\-[A-Z0-9_-]+\-\*\}/',
+         // remove empty meta tags
+         '/[ ]*<meta name="[a-z]+" content="" ?\/>\n/i'
+         ), array(
+         // basic
+         $cssfiles,
+         $jscripts,
+         // basic meta
+         $title,
+         htmlspecialchars(strip_tags(self::$pageKeywords)),
+         htmlspecialchars(strip_tags(self::$pageDescription)),
+         htmlspecialchars(strip_tags(self::$pageHeadline)),
+         // CORE ERRORS
+         $errCnt,
+         //  remove not used vars
+         '',
+         // remove empty meta tags
+         ''
+         ), $contents);
       ob_clean();
       return ((string)$contents);
    }
@@ -197,7 +204,7 @@ class Template_Core extends Template {
     * @param string $title -- klíčová slova stránky
     */
    public static function setPageKeywords($keywords) {
-      if($keywords != null|''){
+      if((string)$keywords != null){
          self::$pageKeywords = (string)$keywords;
       }
    }
@@ -215,7 +222,7 @@ class Template_Core extends Template {
     * @param string $title -- popisek stránky
     */
    public static function setPageDescription($desc) {
-      if($desc != null|''){
+      if((string)$desc != null){
          self::$pageDescription = (string)$desc;
       }
    }
