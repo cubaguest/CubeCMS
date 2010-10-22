@@ -9,7 +9,7 @@
  * @abstract    Třída pro vytvoření modelu pro práci s komentáři
  */
 
-class Component_Comments_Model extends Model_PDO {
+class Component_Comments_Model extends Model_ORM {
    /**
     * Tabulka s detaily
     */
@@ -32,88 +32,75 @@ class Component_Comments_Model extends Model_PDO {
    const COL_TIME_ADD	= 'time_add';
    const COL_IP_ADDRESS	= 'ip_address';
 
-   public function saveComment($nick, $comment, $idCat, $idArt, $idParent = 0, $public = true) {
-      $dbc = new Db_PDO();
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_comments');
 
-      $tbl = $dbc->table(self::DB_TABLE);
-      $order = 1;
-      $level = 0;
+      $this->addColumn(self::COL_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COL_ID_ART, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COL_ID_PARENT, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COL_ID_CAT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COL_NICK, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COL_COMMENT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COL_PUBLIC, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COL_CENSORED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COL_ORDER, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
+      $this->addColumn(self::COL_LEVEL, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
 
-      $dbc->query("LOCK TABLES $tbl WRITE");
-      $whereCatArt = self::COL_ID_CAT." = :idcat AND ".self::COL_ID_ART." = :idart";
+      $this->addColumn(self::COL_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COL_IP_ADDRESS, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => $_SERVER['REMOTE_ADDR']));
 
-      // rodič
-      $dbstParent = $dbc->prepare("SELECT ".self::COL_ORDER.",".self::COL_LEVEL." FROM $tbl WHERE ".self::COL_ID." = :idp");
-      $dbstParent->execute(array(':idp' => (int)$idParent));
-      if($idParent != 0 AND $row = $dbstParent->fetch()) {
-         $dbstParent = $dbc->prepare("SELECT MIN(".self::COL_ORDER.")-1, ".$row[1]."+1 "
-                 ."FROM $tbl WHERE ".self::COL_ORDER." > :rorder AND ".self::COL_LEVEL." <= :rlevel AND $whereCatArt");
-
-         $dbstParent->execute(array(':idcat' => $idCat,':idart' => $idArt, ':rorder' => $row[0], ':rlevel'=> $row[1]));
-         $row = $dbstParent->fetch();
-         if((int)$row[0] > 0) {// bude se vkládat doprostřed tabulky, posunout následující záznamy
-            print ('update');
-            $dbstParent = $dbc->prepare("UPDATE $tbl SET ".self::COL_ORDER." = ".self::COL_ORDER."+1 "
-                    ."WHERE ".self::COL_ORDER." > :curord AND $whereCatArt");
-            $dbstParent->execute(array(':idcat' => $idCat, ':idart' => $idArt, ':curord' => $row[0]));
-
-         } else {
-            $dbstParent = $dbc->query("SELECT MAX(".self::COL_ORDER."),".$row[1]." FROM $tbl");
-            $row = $dbstParent->fetch();
-         }
-         if($row != false) {
-            $order = (int)$row[0];
-            $level = (int)$row[1];
-         }
-
-      } else { // neni reakce
-         $dbstParent = $dbc->prepare("SELECT MAX(`".self::COL_ORDER."`) FROM $tbl WHERE $whereCatArt");
-         $dbstParent->execute(array(':idcat' => $idCat, ':idart' => $idArt));
-         $row = $dbstParent->fetch();
-         if($row != false) {
-            $order = (int)$row[0];
-         }
-      }
-      $dbstIns = $dbc->prepare("INSERT INTO $tbl (".self::COL_ID_CAT.",".self::COL_ID_ART.",".self::COL_ID_PARENT.","
-              .self::COL_ORDER.",".self::COL_LEVEL.","
-              .self::COL_NICK.",".self::COL_COMMENT.",".self::COL_TIME_ADD.",".self::COL_IP_ADDRESS.",".self::COL_PUBLIC.") "
-              ."VALUES (:idcat, :idart, :idparent, :corder, :clevel, :nick, :comment, NOW(), :ipaddr, :public)");
-      $dbstIns->bindValue(':idcat', $idCat, PDO::PARAM_INT);
-      $dbstIns->bindValue(':idart', $idArt, PDO::PARAM_INT);
-      $dbstIns->bindValue(':idparent', $idParent, PDO::PARAM_INT);
-      $dbstIns->bindValue(':corder', $order+1, PDO::PARAM_INT);
-      $dbstIns->bindValue(':clevel', $level, PDO::PARAM_INT);
-      $dbstIns->bindValue(':nick', $nick, PDO::PARAM_STR);
-      $dbstIns->bindValue(':comment', $comment, PDO::PARAM_STR);
-      $dbstIns->bindValue(':ipaddr', $_SERVER['REMOTE_ADDR'], PDO::PARAM_STR);
-      $dbstIns->bindValue(':public', $public, PDO::PARAM_BOOL);
-
-      $dbstIns->execute();
-
-      $dbc->query("UNLOCK TABLES");
+      $this->setPk(self::COL_ID);
    }
 
-   /**
-    * Metoda načte všechny sdílení
-    * @return PDOStatement
-    */
-   public function getComments($idCat, $idArt, $onlyPublic = true) {
+   public function  save(Model_ORM_Record $record) {
       $dbc = new Db_PDO();
-      if($onlyPublic == true) {
-         $dbst = $dbc->prepare("SELECT * FROM ".$dbc->table(self::DB_TABLE)
-                 ." WHERE ".self::COL_ID_CAT." = :idcat AND ".self::COL_ID_ART." = :idart"
-                 ." AND ".self::COL_PUBLIC." = 1"
-                 ." ORDER BY ".self::COL_ORDER);
-         $dbst->execute(array(':idcat' => $idCat, ':idart' => $idArt));
-      } else {
-         $dbst = $dbc->prepare("SELECT * FROM ".$dbc->table(self::DB_TABLE)
-                 ." WHERE ".self::COL_ID_CAT." = :idcat AND ".self::COL_ID_ART." = :idart"
-                 ." ORDER BY ".self::COL_ORDER);
-         $dbst->execute(array(':idcat' => $idCat, ':idart' => $idArt));
-      }
+//      $dbc->query("LOCK TABLES {$this->getTableName()} WRITE");
+//      $dbc->beginTransaction();
 
-      $dbst->setFetchMode(PDO::FETCH_OBJ);
-      return $dbst->fetchAll();
+      // posun pouze pokud je přidán nový
+      if($record->isNew()){
+         $tbl = $dbc->table(self::DB_TABLE);
+         // není rodič
+         if((int)$record->{self::COL_ID_PARENT} == 0){
+            $record->{self::COL_ID_PARENT} = 0;
+            $order = $this->columns(array('max' => 'MAX('.self::COL_ORDER.')'))
+               ->where(self::COL_ID_CAT.' = :idc AND '.self::COL_ID_ART.' = :ida', array('idc' => $record->{self::COL_ID_CAT}, 'ida' => $record->{self::COL_ID_ART}))
+               ->record();
+            $record->{self::COL_ORDER} = 1;
+            if($order->max != null){
+               $record->{self::COL_ORDER} = $order->max+1;
+            }
+         }
+         // je rodič
+         else {
+            // zjištění pořadí a hloubky příspěvku, na který se reaguje
+            $parent = $this->where(self::COL_ID.' = :id', array('id' => $record->{self::COL_ID_PARENT}))->record();
+            // zjištění pořadí příspěvku, na jehož místo se bude vkládat - první následující s menší nebo stejnou hloubkou jako rodič
+            $replacedComment = $this->columns(array('min' => 'MIN('.self::COL_ORDER.')-1', self::COL_ID, self::COL_LEVEL, self::COL_ORDER))
+               ->where(self::COL_ID_CAT.' = :idc AND '.self::COL_ID_ART.' = :ida AND '.self::COL_ORDER.' > :rorder AND '.self::COL_LEVEL.' <= :rlevel',
+                  array('idc' => $record->{self::COL_ID_CAT}, 'ida' => $record->{self::COL_ID_ART},
+                     'rorder' => $parent->{self::COL_ORDER}, 'rlevel' => $parent->{self::COL_LEVEL}))->record();
+           if($replacedComment->min > 0){// bude se vkládat doprostřed tabulky, posunout následující záznamy
+              $stmt = $dbc->prepare("UPDATE $tbl SET ".self::COL_ORDER." = ".self::COL_ORDER."+1 "
+                       ."WHERE ".self::COL_ORDER." > :curord AND ".self::COL_ID_CAT.' = :idc AND '.self::COL_ID_ART.' = :ida');
+              $stmt->bindValue('curord', $replacedComment->min, PDO::PARAM_INT);
+              $stmt->bindValue('idc', $record->{self::COL_ID_CAT}, PDO::PARAM_INT);
+              $stmt->bindValue('ida', $record->{self::COL_ID_ART}, PDO::PARAM_INT);
+              $stmt->execute();
+              $record->{self::COL_ORDER} =  $replacedComment->min+1; // řadíme za rodiče
+           } else { // bude se vkládat na konec tabulky
+               $order = $this->columns(array('max' => 'MAX('.self::COL_ORDER.')'))
+                  ->where(self::COL_ID_CAT.' = :idc AND '.self::COL_ID_ART.' = :ida', array('idc' => $record->{self::COL_ID_CAT}, 'ida' => $record->{self::COL_ID_ART}))
+                  ->record();
+               $record->{self::COL_ORDER} = $order->max+1;
+           }
+           $record->{self::COL_LEVEL} =  $parent->{self::COL_LEVEL}+1;
+         }
+      }
+      // uložíme komentář
+      parent::save($record);
+//      $dbc->query("UNLOCK TABLES");
+//      $dbc->commit();
    }
 
    public function changePublic($idComment) {
@@ -129,16 +116,5 @@ class Component_Comments_Model extends Model_PDO {
       $dbst->execute(array(':idc' => $idComment));
 
    }
-
-   public function getCountComments($idCat, $idArt){
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT COUNT(".self::COL_ID.") AS cnt FROM ".$dbc->table(self::DB_TABLE)
-                 ." WHERE ".self::COL_ID_CAT." = :idcat AND ".self::COL_ID_ART." = :idart"
-              ." AND ".self::COL_PUBLIC." = 1");
-      $dbst->execute(array(':idcat' => $idCat, ':idart' => $idArt));
-      $cnt = $dbst->fetchObject();
-      return $cnt->cnt;
-   }
-
 }
 ?>

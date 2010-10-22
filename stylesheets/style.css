@@ -453,6 +453,9 @@ a.form-link-lang-sel {
 .comments-comment {
    margin-bottom: 5px;
    border: 1px solid silver;
+   border-radius: 5px;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
 }
 
 .comments-tools {
@@ -465,5 +468,11 @@ a.form-link-lang-sel {
 .comments-censored-text {
    background-color: silver;
    font-size: xx-small;
+}
+.comment-notviewed {
+   box-shadow: 0px 0px 5px #000000;
+   -webkit-box-shadow: 0px 0px 5px #000000;
+   -moz-box-shadow: 0px 0px 5px #000000;
+   border: 1px solid #FFE7A1;
 }
 /* EOF komentare */

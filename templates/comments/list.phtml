@@ -1,6 +1,8 @@
 <div class="comments-list">
    <?
-   echo _('<span class="comments-label"><strong>Komentáře ('.$this->countComments.'):</strong></span>');
+   echo '<span class="comments-label"><strong>';
+   printf(_('Komentáře (%s), nové: (%s).'),$this->countComments, $this->unreaded);
+   echo '</strong></span>';
    if(!empty ($this->comments)) {
       foreach ($this->comments as $comment) {
          $this->includeTpl('comments/item.phtml',true, array('comment' => $comment));

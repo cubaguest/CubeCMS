@@ -3,41 +3,34 @@ $margin = 15;
 if(isset ($vars['comment'])){
    $comment = $vars['comment'];
 }
-$class = null;
-if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false) $class = 'comment-nopublic';
+$classes = null;
+if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false){
+   $classes .= ' comment-nopublic';
+}
+if(!$comment->viewed){
+   $classes .= ' comment-notviewed';
+}
+
 ?>
-<div id="comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" class="comments-comment <?echo $class?>" style="margin-left: <?echo ($comment->{Component_Comments_Model::COL_LEVEL}*$margin)?>px;">
-   <?if($this->admin != null) {?>
-   <div class="comments-tools">
-      <form action="<?=$this->pageLink()?>#comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" method="post">
-         <p>
-            <input type="hidden" name="comment_public_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
-               <?if($comment->{Component_Comments_Model::COL_PUBLIC} == false) {?>
-            <input type="image" name="comment_public_public" title="<?echo _('Zveřejnit');?>"
-                   src="<?=Template::getFileDir('icons/comment_add.png', Template::IMAGES_DIR, false,true)?>" />
-                         <?} else {?>
-            <input type="image" name="comment_public_public" title="<?echo _('Zrušit Zveřejnění');?>"
-                   src="<?=Template::getFileDir('icons/comment_delete.png', Template::IMAGES_DIR, false,true)?>" />
-                         <?}?>
-         </p>
-      </form>
-      <form action="<?=$this->pageLink()?>#comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" method="post">
-         <p>
-            <input type="hidden" name="comment_censore_id" value="<?=$comment->{Component_Comments_Model::COL_ID}?>" />
-            <input type="image" name="comment_censore_censored" title="<?if($comment->{Component_Comments_Model::COL_CENSORED} == false)
-                         echo _('Centurovat'); else echo _('Zrušit cenzuru');?>"
-                   src="<?=Template::getFileDir('icons/comment_error.png', Template::IMAGES_DIR, false,true)?>" />
-         </p>
-      </form>
-   </div>
-      <?}?>
+<div id="comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" class="comments-comment<?echo $classes?>" style="margin-left: <?echo ($comment->{Component_Comments_Model::COL_LEVEL}*$margin)?>px;">
+      <?if($this->toolboxComment instanceof Template_Toolbox2){
+         if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false){
+            $this->toolboxComment->comment_public_->setIcon('comment_add.png');
+         } else {
+            $this->toolboxComment->comment_public_->setIcon('comment_delete.png');
+         }      
+         // id
+         $this->toolboxComment->comment_censore_->getForm()->id->setValues($comment->{Component_Comments_Model::COL_ID});
+         $this->toolboxComment->comment_public_->getForm()->id->setValues($comment->{Component_Comments_Model::COL_ID});
+         echo $this->toolboxComment;
+      }?>
    <span><strong><?=$comment->{Component_Comments_Model::COL_NICK}?></strong>&nbsp;<?=vve_date('%X %G:%i', new DateTime($comment->{Component_Comments_Model::COL_TIME_ADD}))?></span>
    <?if($comment->{Component_Comments_Model::COL_CENSORED} != true) {?>
-   <p><?=$this->filter($comment->{Component_Comments_Model::COL_COMMENT},'emoticons')?></p>
-      <?} else {
+      <p><?=nl2br($this->filter($comment->{Component_Comments_Model::COL_COMMENT},array('emoticons')),true)?></p>
+   <?} else {
       echo '<p>'._('Komentář by centurován.').'</p>';
       if($this->admin != null) {
-         echo '<p class="comments-censored-text">'.$comment->{Component_Comments_Model::COL_COMMENT}.'</p>';
+         echo '<p class="comments-censored-text">'.nl2br($comment->{Component_Comments_Model::COL_COMMENT},true).'</p>';
 
       }
    }?>

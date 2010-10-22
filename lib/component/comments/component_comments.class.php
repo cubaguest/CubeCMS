@@ -17,6 +17,8 @@ class Component_Comments extends Component {
    const PARAM_ADMIN = 'admin';
    const PARAM_ALLOW_TAGS = 'allowed_tags';
    const PARAM_CAPTCHA_TIME = 'ctime';
+   const PARAM_MAX_CHARS = 'chars';
+   const COOKIE_VIEWED = 'viewed';
 
    protected $config = array(self::PARAM_ID_ARTICLE => 0,
            self::PARAM_ID_CATEGORY => 0,
@@ -24,16 +26,20 @@ class Component_Comments extends Component {
            self::PARAM_CLOSED => false,
            self::PARAM_ADMIN => false,
            self::PARAM_CAPTCHA_TIME => 15,
+           self::PARAM_MAX_CHARS => 500,
            self::PARAM_ALLOW_TAGS => array('a','br','em','strong','sub',
               'sup','ul','li','ol')
    );
 
    private $model = null;
+   
+   private $cookieName = 'viewed_c';
 
    /**
     * Metoda inicializace, je spuštěna pří vytvoření objektu
     */
    protected function init() {
+      $this->cookieName = VVE_SESSION_NAME.'_c';
       $this->model = new Component_Comments_Model();
    }
 
@@ -43,11 +49,45 @@ class Component_Comments extends Component {
    public function runCtrlPart() {
    }
 
+   private function saveViewedComments($arrayids) {
+      setcookie($this->cookieName, implode(',', $arrayids), time()+60*60*24*365); // na rok uložíme cookie
+   }
+   
+   private function getViewedComments() {
+      if(isset ($_COOKIE[$this->cookieName])) return explode(',', $_COOKIE[$this->cookieName]);
+      return array();
+   }
+
+
    /**
     * Spuštění pluginu
     * @param mixed $params -- parametry epluginu (pokud je třeba)
     */
    public function mainController() {
+      // načtení komentářů
+      $this->model->where(Component_Comments_Model::COL_ID_CAT.' = :idc AND '.Component_Comments_Model::COL_ID_ART.' = :ida',
+         array('idc' => $this->getConfig(self::PARAM_ID_CATEGORY), 'ida' => $this->getConfig(self::PARAM_ID_ARTICLE)));
+      if($this->getConfig(self::PARAM_ADMIN) != true){
+         $this->model->where('AND '.Component_Comments_Model::COL_PUBLIC.' = 1', array(), true);
+      }
+      $this->model->order(array(Component_Comments_Model::COL_ORDER => Model_ORM::ORDER_ASC));
+      $this->template()->comments = $this->model->records();
+      $this->template()->countComments = $this->model->count();
+      $this->template()->unreaded = count($this->template()->comments);
+      
+      // projití komentářu a uložení neviděných
+      $commViewedForSave = array();
+      $commViewed = $this->getViewedComments();
+      foreach ($this->template()->comments as &$comment) {
+         $comment->viewed = false;
+         if(!empty ($commViewed) AND in_array($comment->{Component_Comments_Model::COL_ID},$commViewed)){
+            $comment->viewed = true;
+            $this->template()->unreaded--;
+         }
+         array_push($commViewedForSave, $comment->{Component_Comments_Model::COL_ID});
+      }
+      $this->saveViewedComments($commViewedForSave);
+      
       // form pro přidání
       $addForm = new Form('comment_new_');
       $elemNick = new Form_Element_Text('nick', _('Nick'));
@@ -60,7 +100,7 @@ class Component_Comments extends Component {
 
       $elemText = new Form_Element_TextArea('comment', _('komentář'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
-      $elemText->addValidation(new Form_Validator_Length(10, 200));
+      $elemText->addValidation(new Form_Validator_Length(10, $this->getConfig(self::PARAM_MAX_CHARS)));
       $elemText->addFilter(new Form_Filter_StripTags($this->getConfig(self::PARAM_ALLOW_TAGS)));
       $addForm->addElement($elemText);
 
@@ -76,18 +116,27 @@ class Component_Comments extends Component {
                  ($_SESSION['comment_captcha_time']+$this->getConfig(self::PARAM_CAPTCHA_TIME) > time())) {
             $this->errMsg()->addMessage(_('Komentář byl odeslán příliš rychle nebo nebyl odeslán kontrolní čas'));
          } else {
-            $isPublic = false;
-            if($this->getConfig(self::PARAM_NEW_ARE_PUBLIC) == true
-                    OR $this->getConfig(self::PARAM_ADMIN) == true) {
-               $isPublic = true;
-            }
-            $string = $addForm->comment->getValues();
-            $this->model->saveComment(htmlspecialchars($addForm->nick->getValues()), $string,
-                    $this->getConfig(self::PARAM_ID_CATEGORY), $this->getConfig(self::PARAM_ID_ARTICLE),
-                    $addForm->parent->getValues(),$isPublic);
+            $comment = $this->model->newRecord();
 
             if($this->getConfig(self::PARAM_NEW_ARE_PUBLIC) == true
                     OR $this->getConfig(self::PARAM_ADMIN) == true) {
+               $comment->{Component_Comments_Model::COL_PUBLIC} = true;
+            }
+            $comment->{Component_Comments_Model::COL_COMMENT} = $addForm->comment->getValues();
+            $comment->{Component_Comments_Model::COL_NICK} = htmlspecialchars($addForm->nick->getValues());
+            $comment->{Component_Comments_Model::COL_ID_CAT} = $this->getConfig(self::PARAM_ID_CATEGORY);
+            $comment->{Component_Comments_Model::COL_ID_ART} = $this->getConfig(self::PARAM_ID_ARTICLE);
+
+            $comment->{Component_Comments_Model::COL_ID_PARENT} = $addForm->parent->getValues();
+
+            $id = $this->model->save($comment);
+            
+            // uložení do zobrazených 
+            $commViewedForSave = $this->getViewedComments();
+            $commViewedForSave[] = $id;
+            $this->saveViewedComments($commViewedForSave);
+
+            if($comment->{Component_Comments_Model::COL_PUBLIC} == true) {
                $this->infoMsg()->addMessage(_('Komentář byl uložen'));
             } else {
                $this->infoMsg()->addMessage(_('Komentář byl uložen a čeká na schválení'));
@@ -105,7 +154,7 @@ class Component_Comments extends Component {
       $elemId->addValidation(new Form_Validator_IsNumber());
       $formCensore->addElement($elemId);
 
-      $elemCensore = new Form_Element_SubmitImage('censored');
+      $elemCensore = new Form_Element_Submit('censored',_('Změnit cenzůru'));
       $formCensore->addElement($elemCensore);
 
       if($formCensore->isValid()) {
@@ -113,7 +162,7 @@ class Component_Comments extends Component {
          $this->infoMsg()->addMessage(_('Komentáři byla změněna cenzůra'));
          $this->pageLink()->reload();
       }
-      $this->template->formCensore = $formCensore;
+      $this->template()->formCensore = $formCensore;
 
       // zveřejnění
       $formPublic = new Form('comment_public_');
@@ -121,15 +170,15 @@ class Component_Comments extends Component {
       $elemId->addValidation(new Form_Validator_IsNumber());
       $formPublic->addElement($elemId);
 
-      $elemPublicB = new Form_Element_SubmitImage('public');
+      $elemPublicB = new Form_Element_Submit('public', _('Změnit zveřejnění'));
       $formPublic->addElement($elemPublicB);
 
       if($formPublic->isValid()) {
          $this->model->changePublic($formPublic->id->getValues());
-         $this->infoMsg()->addMessage(_('Komentáři byla změněna publikace'));
+         $this->infoMsg()->addMessage(_('Komentáři bylo změněno zveřejnění'));
          $this->pageLink()->reload();
       }
-      $this->template->formPublic = $formPublic;
+      $this->template()->formPublic = $formPublic;
    }
 
    /**
@@ -137,13 +186,26 @@ class Component_Comments extends Component {
     * @param integer -- id šablony (jakékoliv)
     */
    public function mainView() {
-      $this->template()->comments = $this->model->getComments($this->getConfig(self::PARAM_ID_CATEGORY),
-              $this->getConfig(self::PARAM_ID_ARTICLE), !$this->getConfig(self::PARAM_ADMIN));
+      // toolbox
+      if($this->getConfig(self::PARAM_ADMIN) == true){
+         $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         // zveřejnění
+         $toolPublic = new Template_Toolbox2_Tool_Form($this->template()->formPublic);
+         $toolPublic->setIcon('comment.png');
+         $toolbox->addTool($toolPublic);
+         // cenzura
+         $toolCensore = new Template_Toolbox2_Tool_Form($this->template()->formCensore);
+         $toolCensore->setIcon('comment_error.png');
+         $toolbox->addTool($toolCensore);
+         
+         $this->template()->toolboxComment = $toolbox;
+      }
+
       $this->template()->isClosed = $this->getConfig(self::PARAM_CLOSED);
       $this->template()->admin = $this->getConfig(self::PARAM_ADMIN);
-      $this->template()->countComments = $this->model->getCountComments($this->getConfig(self::PARAM_ID_CATEGORY),
-              $this->getConfig(self::PARAM_ID_ARTICLE));
       $this->template()->addTplFile('comments/list.phtml');
+      
       if($this->getConfig(self::PARAM_CLOSED) == false) {
          $this->template()->addTplFile('comments/add.phtml');
       }
