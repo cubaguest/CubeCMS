@@ -138,14 +138,15 @@ class Articles_Controller extends Controller {
       $artM->join('t_usr_last', array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)->join('t_usr', array('usernameCreated' => Model_Users::COLUMN_USERNAME));
       $article = $artM->record();
 
-      if((string)$article->{Model_Users::COLUMN_USERNAME} == null){
+
+      if($article == false) {
+         return false;
+      }
+
+      if((string)$article->{Model_Users::COLUMN_USERNAME} == null){ // username po vytvoření
          $article->{Model_Users::COLUMN_USERNAME} = $article->usernameCreated;
       }
 
-      if($article == false) {
-         AppCore::setErrorPage(true);
-         return false;
-      }
       $this->view()->article=$article;
       // přičtení zobrazení pokud není admin
       if($this->rights()->isControll() == false AND $article->{Articles_Model::COLUMN_ID_USER} != Auth::getUserId()){
@@ -510,12 +511,11 @@ class Articles_Controller extends Controller {
 
       $iKeywords = new Form_Element_Text('metaKeywords', $this->_('Klíčová slova'));
       $iKeywords->setLangs();
-      $iKeywords->setSubLabel($this->_('Pokud nesjou zadány, jsou použiti z kategorie'));
       $form->addElement($iKeywords, $fGrpParams);
 
       $iDesc = new Form_Element_TextArea('metaDesc', $this->_('Popisek'));
       $iDesc->setLangs();
-      $iDesc->setSubLabel($this->_('Pokud není zadán, je použit z kategorie'));
+      $iDesc->setSubLabel($this->_('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
       $form->addElement($iDesc, $fGrpParams);
 
       $iPub = new Form_Element_Checkbox('public', $this->_('Veřejný'));

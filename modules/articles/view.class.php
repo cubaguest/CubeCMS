@@ -19,7 +19,6 @@ class Articles_View extends View {
 
    public function showView() {
       $this->template()->addTplFile("detail.phtml", 'articles');
-      //$this->addPageHeadline($this->article->{Articles_Model::COLUMN_NAME});
       if ((string) $this->article->{Articles_Model::COLUMN_KEYWORDS} != null) {
          Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
       }
