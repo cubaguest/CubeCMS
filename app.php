@@ -17,7 +17,7 @@ class AppCore {
    /**
     * Název enginu
     */
-   const ENGINE_NAME = 'VVE';
+   const ENGINE_NAME = 'Cube CMS';
 
    /**
     * Verze enginu
