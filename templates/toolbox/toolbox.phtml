@@ -1,19 +1,27 @@
-<a class="toolbox-button" href="" title="Otevřít nástroje"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" /></a>
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+?>
+<a class="toolbox-button ui-state-default ui-corner-all" href="" title="Otevřít nástroje"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
 <div class="toolbox">
    <? foreach ($this->getTools() as $tool) {?>
-      <div class="toolbox-tool">
+      <div class="toolbox-tool ui-state-default">
       <?
          $formOnSubmit = null;
          if($tool->getConfirmMessage() != null){
             $formOnSubmit .= 'return confirm(\''.$tool->getConfirmMessage().'\');';
          }
          $class = get_class($tool);
+         $image = null;
+         if($tool->getIcon() != null){
+            $image = '<img src="'.$this->iconsDir . $tool->getIcon().'" alt="icon '.$tool->getIcon().'" />';
+         }
+         
          switch ($class) {
             case 'Template_Toolbox2_Tool_PostRedirect':
                ?>
          <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>">
-            <div><img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"
-                  /><input class="toolbox-tool-button" type="submit" name="<?=$tool->getName() ?>_button"
+            <div><?=$image;?><input class="toolbox-tool-button ui-state-default" type="submit" name="<?=$tool->getName() ?>_button"
                      value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
                   <?
                   $addVal = $tool->getSubmitValues();
@@ -27,11 +35,11 @@
             case 'Template_Toolbox2_Tool_Form':
                ?>
                <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>">
-                  <div><img src="<?=$this->iconsDir . $tool->getIcon() ?>" alt="icon <?=$tool->getIcon() ?>"/><?
+                  <div><?=$image;?><?
                
                foreach ($tool->getForm() as $element) {
                   if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
-                     ?><input class="toolbox-tool-button" type="submit" name="<?=$element->getName()?>"
+                     ?><input class="toolbox-tool-button ui-state-default" type="submit" name="<?=$element->getName()?>"
                          value="<?=$element->getLabel()?>" title="<?=$element->getLabel() ?>" /><?
                   } else if($element instanceof Form_Element_Hidden) {
                      ?><input type="hidden" name="<?=$element->getName();?>" value="<?=$element->getValues() ?>" /><?
