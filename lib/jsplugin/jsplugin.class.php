@@ -35,8 +35,11 @@ abstract class JsPlugin {
 	 * @var string
 	 */
 	protected $jsPluginName = null;
-	
-	/**
+   
+   protected $jsFilesDir = null;
+
+
+   /**
 	 * Pole s parametry JsPluginu
 	 * @var array
 	 */
@@ -59,6 +62,7 @@ abstract class JsPlugin {
 	 */
 	final public function __construct(){
       $this->setJsPluginName(str_ireplace(__CLASS__.'_', '', get_class($this)));
+      $this->jsFilesDir = $this->jsPluginName;
 //      $this->setFiles();
       $this->initJsPlugin();
 	}
@@ -69,6 +73,14 @@ abstract class JsPlugin {
     */
    public function setJsPluginName($name) {
       $this->jsPluginName = $name;
+   }
+   
+   /**
+    * Metoda nastaví adresář s js soubory JsPluginu
+    * @param string $name -- název adresáře ve složce jscripts
+    */
+   public function setJsFilesDir($name) {
+      $this->jsFilesDir = $name;
    }
 
    /**
@@ -120,8 +132,10 @@ abstract class JsPlugin {
 	 * @param string -- název souboru nebo JsPlugin_File
 	 */
 	final protected function addFile($file){
-      if($file instanceof JsPlugin_File){
+      if($file instanceof JsPlugin_File AND $file->isVirtual() == true){
          $file->setPluginName($this->jsPluginName);
+      } else if($file instanceof JsPlugin_File AND $file->isVirtual() == false){
+         $file->setPluginName($this->jsFilesDir);
       }
 		array_push($this->filesArray, $file);
 	}
