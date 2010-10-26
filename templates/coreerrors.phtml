@@ -5,7 +5,7 @@
    <p>
             <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
             <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?><br />
-            <? if(VVE_DEBUG_ELEVE > 1) {
+            <? if(VVE_DEBUG_LEVEL > 1) {
                foreach ($error["trace"] as $err) {?>
                   <?=$err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
                   echo _("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;"._("řádek").": ".$err["line"];?>
