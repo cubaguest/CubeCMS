@@ -58,7 +58,7 @@ class Email {
       switch (Locales::getLang()) {
          case 'cs': // many czech people use very old mail interface
             $this->message->setCharset('iso-8859-2');
-            $this->iconvParams = array('UTF-8', 'iso-8859-2//TRANSLIT');
+            $this->iconvParams = array(0 => 'UTF-8', 1 => 'iso-8859-2//TRANSLIT');
             break;
          default:
             break;
@@ -72,7 +72,7 @@ class Email {
    
    private function safeStr($str) {
       if(empty ($this->iconvParams)) return $str;
-      return iconv($this->iconvParams[0], $this->iconvParams[1], $content);
+      return iconv($this->iconvParams[0], $this->iconvParams[1], $str);
    }
 
    /**
