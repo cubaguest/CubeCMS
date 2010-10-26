@@ -18,7 +18,7 @@ class JsPlugin_JQueryCSS extends JsPlugin {
    protected $config = array('theme' => JsPlugin_JQuery::BASE_THEME);
 
 	protected function initJsPlugin() {
-      $this->setJsPluginName('jquery');
+      $this->setJsFilesDir('jquery');
       if(defined('VVE_JQUERY_THEME')){
          $this->setCfgParam('theme', VVE_JQUERY_THEME);
       }

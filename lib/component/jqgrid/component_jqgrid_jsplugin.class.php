@@ -13,7 +13,7 @@
 
 class Component_JqGrid_JsPlugin extends JsPlugin {
 	protected function initJsPlugin() {
-      $this->setJsPluginName('jqgrid');
+      $this->setJsFilesDir('jqgrid');
 	}
 	
 	protected function setFiles() {
