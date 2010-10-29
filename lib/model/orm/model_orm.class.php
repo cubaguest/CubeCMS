@@ -36,7 +36,7 @@ class Model_ORM extends Model_PDO {
 
    private $getAllLangs = true;
 
-   private $defaultColumnParams = array(
+   private static $defaultColumnParams = array(
       'datatype' => 'VARCHAR(45)', // typ sloupce
       'pdoparam' => PDO::PARAM_STR, // typ sloupce (PDO::PARAM_)
       'nn' => false, // non null
@@ -53,6 +53,7 @@ class Model_ORM extends Model_PDO {
       'valueLoaded' => false,
       'name' => null,
       'extern' => false, // externí sloupec
+      'changed' => 0, // INTERNAL -- check if column is changed
       'fulltext' => false // FULLTEXT na sloupci
    );
 
@@ -141,7 +142,15 @@ class Model_ORM extends Model_PDO {
          }
       }
       $params['name'] = $name;
-      $this->tableStructure[$name] = array_merge($this->defaultColumnParams, $params);
+      $this->tableStructure[$name] = array_merge(self::$defaultColumnParams, $params);
+   }
+
+   /**
+    * Metodav rací pole s výchozími parametry sloupce
+    * @return array
+    */
+   public static function getDefaultColumnParams() {
+      return self::$defaultColumnParams;
    }
 
    /**
@@ -379,10 +388,11 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
+//            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+//               OR (is_array($params['value'] AND $params['lang'] == false))
+//               OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+            if($params['extern'] == true OR $params['changed'] != 1) continue;
             if(!isset ($params['lang'])) $params['lang'] = false;
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false ) 
-               OR (is_array($params['value'] AND $params['lang'] == false))
-               OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
                   if($params['aliasFor'] === null){
@@ -402,16 +412,19 @@ class Model_ORM extends Model_PDO {
          if(empty ($colsStr)) return $returnPk; // žádné změny se neukládájí
          $dbst = $dbc->prepare($sql.' SET '.  implode(',', $colsStr)
             .' WHERE `'.$this->pKey.'` = :pkey');
-
+//      var_dump($sql.' SET '.  implode(',', $colsStr) .' WHERE `'.$this->pKey.'` = :pkey');flush();
 
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-           if(!isset ($params['lang'])) $params['lang'] = false;
-            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
-               OR (is_array($params['value'] AND $params['lang'] == false))
-               OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+//            if((is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+//               OR (is_array($params['value'] AND $params['lang'] == false))
+//               OR $params['extern'] == true OR $params['value'] == $params['valueLoaded']) continue;
+            if($params['extern'] == true OR $params['changed'] != 1) continue;
+            if(!isset ($params['lang'])) $params['lang'] = false;
             $value = $params['value'];
+//            echo $colname;
+//            var_dump($value);flush();
             if($params['lang'] == true){
                foreach (Locales::getAppLangs() as $lang) {
                   $dbst->bindValue(':'.$colname.'_'.$lang, $value[$lang], $params['pdoparam']);
@@ -434,11 +447,12 @@ class Model_ORM extends Model_PDO {
          // create query
          foreach ($record->getColumns() as $colname => $params) {
             if(!isset ($params['lang'])) $params['lang'] = false;
-            if($params['extern'] == true OR $params['pk'] == true
-               OR (is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
-               OR (is_array($params['value'] AND $params['lang'] == false))
-//               OR $params['value'] == $params['valueLoaded']
-            ) continue;
+//            if($params['extern'] == true OR $params['pk'] == true
+//               OR (is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+//               OR (is_array($params['value'] AND $params['lang'] == false))
+////               OR $params['value'] == $params['valueLoaded']
+//            ) continue;
+            if($params['extern'] == true OR $params['changed'] != 1) continue;
             if($params['lang'] === true){
                foreach (Locales::getAppLangs() as $lang) {
                   if($params['aliasFor'] === null){
@@ -461,12 +475,12 @@ class Model_ORM extends Model_PDO {
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
             if(!isset ($params['lang'])) $params['lang'] = false;
-            if($params['extern'] == true OR $params['pk'] == true
-               OR (is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
-               OR (is_array($params['value'] AND $params['lang'] == false))
-//               OR $params['value'] == $params['valueLoaded']
-               ) continue;
-
+//            if($params['extern'] == true OR $params['pk'] == true
+//               OR (is_object($params['value']) AND ($params['value'] instanceof DateTime) == false )
+//               OR (is_array($params['value'] AND $params['lang'] == false))
+////               OR $params['value'] == $params['valueLoaded']
+//               ) continue;
+            if($params['extern'] == true OR $params['changed'] != 1) continue;
             if($params['value'] === false){
                switch ((string)$params['default']) {
                   case 'CURRENT_TIMESTAMP':

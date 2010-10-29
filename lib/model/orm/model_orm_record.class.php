@@ -22,11 +22,6 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
 
    public function  __construct($columns, $fromDb = false) {
       $this->fromDb = $fromDb;
-      if($fromDb == true){
-         foreach ($columns as &$col) {
-            unset ($col['valueLoaded']);
-         }
-      }
       $this->columns = $columns;
    }
 
@@ -36,6 +31,11 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     * @param <type> $value
     */
    public function  __set($collName, $value) {
+      // kontrola jestli byla provedena změna
+      if(isset ($this->columns[$collName]) AND
+         ((is_object($value) AND spl_object_hash($value) == spl_object_hash($this->columns[$collName]['value']))
+         OR $value == $this->columns[$collName]['value'])) return;
+
       if(!isset ($this->columns[$collName])){
          // tady detekce jazyka
          if ($collName[strlen($collName)-3] == '_') {
@@ -43,28 +43,31 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             $collName = substr($collName, 0, strrpos($collName, '_'));
             if(!($this->columns[$collName]['value'] instanceof Model_ORM_LangCell)) {
                $this->columns[$collName]['value'] = new Model_ORM_LangCell();
-               $this->columns[$collName]['valueLoaded'] = new Model_ORM_LangCell();
             }
             $this->columns[$collName]['value']->addValue($lang, $value);
-            $this->columns[$collName]['valueLoaded']->addValue($lang, $value);
          } else {
-            $this->columns[$collName] = array('value' => $value, 'valueLoaded' => $value, 'extern' => true); // externí sloupce, např. s joinů
+            // externí sloupce, např. s joinů
+            $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
+            $this->columns[$collName]['value'] = $value;
          }
       } else {
          // tady kontroly sloupců a přetypování na správné hodnoty
-         if($this->fromDb == true AND !isset ($this->columns[$collName]['valueLoaded'])){
-            if(isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL){
-               $value = (bool)$value;
-            } else if(isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_INT){
-               $value = (int)$value;
-            }
 
-            $this->columns[$collName]['valueLoaded'] = $value;
+         if(isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL){
+            $value = (bool)$value;
+         } else if(isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_INT){
+            $value = (int)$value;
          }
+
          $this->columns[$collName]['value'] = $value;
          if(isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true){// primary key (jazykové nejsou pk)
             $this->pKeyValue = $value;
          }
+      }
+      if($this->fromDb == true AND $this->columns[$collName]['changed'] == 0){
+         $this->columns[$collName]['changed'] = -1;
+      } else {
+         $this->columns[$collName]['changed'] = 1;
       }
    }
 
@@ -112,7 +115,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             $value = serialize($value);
          }
          if(isset ($this->columns[$column])){
-            $this->columns[$column]['value'] = $value;
+            $this->$column = $value;
          }
       }
    }
