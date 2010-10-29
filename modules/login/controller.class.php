@@ -169,27 +169,23 @@ class Login_Controller extends Controller {
       }
 
       if($form->isValid()){
-         $user = $modelUsr->where(Model_Users::COLUMN_USERNAME, $form->username->getValues())->record();
+         $user = $modelUsr->where(Model_Users::COLUMN_USERNAME.' = :uname', array('uname' => $form->username->getValues()))->record();
 
          $mail = explode(';', $user->{Model_Users::COLUMN_MAIL});
 
          $email = new Email(false);
-         $email->setFrom($mail[0], $user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
+         $email->addAddress($mail[0], $user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
          $email->setSubject($this->_('Obnova zapomenutého hesla'));
 
-         $cnt = $this->_("Vazeny uzivateli,\n zasilame Vam vyzadanou zmenu hesla.\n
-Pokud jste tento email nevygeneroval Vy, jedna se nejspise\n
-o omyl jineho uzivatele a muzete tedy tento email klidne\n
-ignorovat.\n");
+         $cnt = $this->_("Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\n");
          $newPass = self::generatePassword();
          $cnt .= "\n".  $this->_('Heslo').': '.$newPass."\n\n";
-         $cnt .= $this->_("S pozdravem\ntým").' '.VVE_WEB_NAME;
+         $cnt .= $this->_("S pozdravem\nTým").' '.VVE_WEB_NAME;
          $email->setContent($cnt);
          $email->send();
 
-         // need release 6.4 r4 or higer
-         if(defined('Model_Users::COLUMN_PASSWORD_RESTORE')){
-            $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = $newPass;
+         if(defined('Model_Users::COLUMN_PASSWORD_RESTORE')){// need release 6.4 r4 or higer
+            $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = Auth::cryptPassword($newPass);
          } else {
             $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($newPass);
          }
@@ -206,8 +202,9 @@ ignorovat.\n");
    public static function generatePassword() {
       $string = null;
       $letters = array_merge(range('A', 'Z'), range('a', 'z'),range(0, 9));
-      for ($index = self::PASSWD_MIN_LENGTH; $index <= self::PASSWD_MAX_LENGTH; $index++) {
-         $string .= $letters[rand(0, count($letters))];
+      $numLetters = round(rand(self::PASSWD_MIN_LENGTH, self::PASSWD_MAX_LENGTH));
+      for ($index = 0; $index < $numLetters; $index++) {
+         $string .= $letters[rand(0, count($letters)-1)];
       }
       return $string; 
    }
