@@ -78,7 +78,9 @@ class Configuration_Controller extends Controller {
 
       if($form->isValid()){
          $saveValue = null;
-         if($form->value instanceof Form_Element_TextArea OR $form->value instanceof Form_Element_Radio){
+         if($form->value instanceof Form_Element_TextArea 
+            OR $form->value instanceof Form_Element_Text
+            OR $form->value instanceof Form_Element_Radio){
             $saveValue = $form->value->getValues();
          } else if($form->value instanceof Form_Element_Select){
             $vals = $form->value->getValues();
