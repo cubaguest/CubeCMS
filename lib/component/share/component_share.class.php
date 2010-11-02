@@ -45,7 +45,7 @@ class Component_Share extends Component {
       $this->template()->shares = $m->getShares();
       
       $this->template()->search = array('{URL}', '{TITLE}');
-      $this->template()->replacement = array(rawurlencode($this->getConfig('url')), rawurlencode($this->getConfig('title')));
+      $this->template()->replacement = array(urlencode($this->getConfig('url')), urlencode($this->getConfig('title')));
 
       $this->template()->addTplFile($this->getConfig('tpl_file'));
    }
