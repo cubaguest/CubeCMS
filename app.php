@@ -908,7 +908,12 @@ class AppCore {
     */
    public function runJsPlugin() {
       $pluginName = 'JsPlugin_'.ucfirst(self::$urlRequest->getName());
-      $jsPlugin = new $pluginName();
+      if(class_exists($pluginName)){
+         $jsPlugin = new $pluginName();
+      } else if(class_exists(ucfirst(self::$urlRequest->getName()))){
+         $pluginName = ucfirst(self::$urlRequest->getName());
+         $jsPlugin = new $pluginName();
+      }
       // vytvoření souboru
       Template_Output::sendHeaders();
       $jsPlugin->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
@@ -1048,22 +1053,9 @@ class AppCore {
          //	render šablony
          $this->renderTemplate();
       }
-//      if(!Template_Output::isBinaryOutput()){
-//         $content = ob_get_contents();
-//         // odeslání potřebných hlaviček a délky řetězců
-//         Template_Output::setContentLenght(strlen($content));
-//      }
-      // odeslání hlaviček
-//      echo "sendheaders";
-//      Template_Output::sendHeaders();
-//      var_dump(headers_sent());
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_stop_trace')){
          xdebug_stop_trace();
       }
-//      if(!Template_Output::isBinaryOutput()){
-//         ob_end_flush();
-//         //echo $content;
-//      }
       return true;
    }
 }
