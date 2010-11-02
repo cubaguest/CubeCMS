@@ -55,7 +55,9 @@ class Filesystem_Dir {
 	 *
 	 * @param string -- adresář
 	 */
-   public function createDir($path){
+   public function createDir($path = null){
+      if($path == null) $path = $this->getDir();
+
       if(!@mkdir($path, 0777, true)){
          throw new CoreException(sprintf(_('Adresáři "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),$path), 2);
       }
