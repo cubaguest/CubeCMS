@@ -68,7 +68,7 @@ class Component {
       $this->componentName = str_ireplace(__CLASS__.'_', '', get_class($this));
       $this->componentLink =  new Url_Link_Component($this->componentName);
       $this->pageLink =  new Url_Link();
-      $this->componentLink->category(Category::getSelectedCategory()->getUrlKey());
+      $this->componentLink->category(Category::getSelectedCategory()->getId());
       $this->init();
       if(!$runOnly) {
          $this->template = new Template_Component($this->componentLink, $this->pageLink);
@@ -123,17 +123,25 @@ class Component {
       $this->init();
 
       $this->pluginParams = $params;
-      if(method_exists($this, $actionName.ucfirst($outputType).'Controller') AND
-          method_exists($this, $actionName.ucfirst($outputType).'View')) {
+      if(method_exists($this, $actionName.ucfirst($outputType).'Controller')) {
          $this->{$actionName.ucfirst($outputType).'Controller'}();
+      } else if(method_exists($this, $actionName.'Controller')) {
+         $this->{$actionName.'Controller'}();
+      } else {
+         trigger_error(sprintf(_('Neimplementováný kontroler "%s" Componenty "%s"'), $actionName, $this->componentName));
+      }
+      // view
+      Template_Output::sendHeaders();
+      if(method_exists($this, $actionName.ucfirst($outputType).'View')) {
          $this->{$actionName.ucfirst($outputType).'View'}();
-      } else if(method_exists($this, $actionName.'Controller') AND
-             method_exists($this, $actionName.'View')) {
-            $this->{$actionName.'Controller'}();
-            $this->{$actionName.'View'}();
-         } else {
-            trigger_error(_('Neimplementována metoda Componenty'));
-         }
+      } else if(method_exists($this, $actionName.'View')){
+         $this->{$actionName.'View'}();
+      } else {
+         // výstup přes XHR respond api
+         $respond = new XHR_Respond_VVEAPI();
+         $respond->setData($this->template()->getTemplateVars());
+         $respond->renderRespond();
+      }
    }
 
    /**
