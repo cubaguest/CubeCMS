@@ -73,22 +73,22 @@ class Component_Tcpdf extends Component {
        * path for PDF fonts
        * use K_PATH_MAIN.'fonts/old/' for old non-UTF8 fonts
        */
-      define ('K_PATH_FONTS', AppCore::getAppLibDir() . 'fonts/tcpdf/');
+      define ('K_PATH_FONTS', AppCore::getAppLibDir() . 'fonts'.DIRECTORY_SEPARATOR.'tcpdf'.DIRECTORY_SEPARATOR);
 
       /**
        * cache directory for temporary files (full path)
        */
-      define ('K_PATH_CACHE', AppCore::getAppWebDir().'cache/');
+      define ('K_PATH_CACHE', AppCore::getAppWebDir().'cache'.DIRECTORY_SEPARATOR);
 
       /**
        * cache directory for temporary files (url path)
        */
-      define ('K_PATH_URL_CACHE', K_PATH_URL.'cache/');
+      define ('K_PATH_URL_CACHE', K_PATH_URL.'cache'.DIRECTORY_SEPARATOR);
 
       /**
        *images directory
        */
-      define ('K_PATH_IMAGES', Template::faceDir().'images/pdf/');
+      define ('K_PATH_IMAGES', Template::faceDir().'images'.DIRECTORY_SEPARATOR.'pdf'.DIRECTORY_SEPARATOR);
 
       /**
        * blank image
