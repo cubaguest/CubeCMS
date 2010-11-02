@@ -167,11 +167,13 @@ class Auth {
 				AppCore::getUserErrors()->addMessage(_("Byly zadány prázdné údaje"));
 			} else {
             $model = new Model_Users();
-            $userResult = $model->getUser(htmlentities($_POST["login_username"],ENT_QUOTES));
+            $userResult = $model->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => htmlentities($_POST["login_username"],ENT_QUOTES)))->record();
 				if (!($userResult)){
 					AppCore::getUserErrors()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
 				} else {
-					if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD}){
+					if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD}
+               OR ($userResult->{Model_Users::COLUMN_PASSWORD_RESTORE} != null 
+                  AND Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD_RESTORE})){
 						//	Uspesne prihlaseni do systemu
 						self::$login = true;
 						self::$userName = $userResult->{Model_Users::COLUMN_USERNAME};
@@ -184,6 +186,14 @@ class Auth {
 							//TODO není dodělána práce s fotkou
 //							$_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
 						}
+                  // pokud je použito obnovné heslo uožíme jej
+                  if(Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $userResult->{Model_Users::COLUMN_PASSWORD_RESTORE}){
+                     $userResult->{Model_Users::COLUMN_PASSWORD} = $userResult->{Model_Users::COLUMN_PASSWORD_RESTORE};
+                     $userResult->{Model_Users::COLUMN_PASSWORD_RESTORE} = null;
+                     $model->save($userResult);
+                     AppCore::getInfoMessages()->addMessage(_("Nové heslo bylo nastaveno."));
+                     Log::msg(_('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
+                  }
                   Log::msg(_('Uživatel byl přihlášen'), null, self::$userName);
                   $return = true;
 					} else {
