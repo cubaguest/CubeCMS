@@ -34,8 +34,10 @@ class Sessions {
 		//Nastaveni session
       if($_SERVER['SERVER_NAME'] != 'localhost' AND preg_match("/^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" .
             "(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$/", $_SERVER['SERVER_NAME']) == 0){
-         session_set_cookie_params(3600, '/', substr($_SERVER['HTTP_HOST'],strpos($_SERVER['HTTP_HOST'],".")+1));
+         session_set_cookie_params(VVE_LOGIN_TIME, '/', substr($_SERVER['HTTP_HOST'],strpos($_SERVER['HTTP_HOST'],".")+1));
          
+      } else {
+         session_set_cookie_params(VVE_LOGIN_TIME);
       }
 		session_regenerate_id(); // ochrana před Session Fixation
 		// 	Nastaveni limutu pro automaticke odhlaseni
