@@ -378,8 +378,8 @@ class Filesystem_File {
          }
       } else {
          // tady ujištění typu podle přípony
-         if(isset (self::$mimeTypes[$ext])){
-            $this->fileMimeType = self::$mimeTypes[$ext];
+         if(isset (self::$mimeTypes[$path_parts['extension']])){
+            $this->fileMimeType = self::$mimeTypes[$path_parts['extension']];
          } else {
             $this->fileMimeType = 'application/octet-stream';
          }
