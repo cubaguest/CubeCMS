@@ -121,6 +121,14 @@ class Template_Core extends Template {
          ob_end_clean();
       }
 
+      // desc a keywords pokud nejsou zadány, vyberou se z kategorie
+      if(self::$pageDescription == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION} != null){
+         self::$pageDescription = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};
+      }
+      if(self::$pageKeywords == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS} != null){
+         self::$pageKeywords = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS};
+      }
+
       // replacements vars
       $contents = preg_replace(array(
          // basic
