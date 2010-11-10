@@ -148,7 +148,7 @@ class Html_Element {
     * @return Html_Element -- vrací sám sebe
     */
    public function setAttrib($name, $value = null) {
-      if($value == null){
+      if($value === null){
          unset ($this->attribs[$name]);
       } else {
          $this->attribs[$name] = $value;
