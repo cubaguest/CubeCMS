@@ -67,7 +67,6 @@ class Form_Element_Radio extends Form_Element {
          }
          if($optVal == false) $optVal = 0;
          $opt->setAttrib('value', (string)$optVal);
-         Debug::log($this->unfilteredValues, $optVal);
          if(($this->unfilteredValues !== false AND $this->unfilteredValues !== null AND $this->unfilteredValues == $optVal)
             OR ($this->unfilteredValues === null AND $first == true) ) {
             $opt->setAttrib('checked', 'checked');
