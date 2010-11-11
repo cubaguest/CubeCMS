@@ -97,7 +97,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             }
             break;
          case 'Form_Element_Radio':
-            if($elemObj->getUnfilteredValues() == null){
+            if($elemObj->getUnfilteredValues() === false){
                $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                $this->isValid = false;
             }

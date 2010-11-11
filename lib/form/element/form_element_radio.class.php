@@ -36,6 +36,16 @@ class Form_Element_Radio extends Form_Element {
       return $this;
    }
 
+   public function populate() {
+      if(isset ($_REQUEST[$this->getName()])) {
+         $this->values = $_REQUEST[$this->getName()];
+      } else {
+         $this->values = false;
+      }
+      $this->unfilteredValues = $this->values;
+      $this->isPopulated = true;
+   }
+
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
@@ -57,7 +67,9 @@ class Form_Element_Radio extends Form_Element {
          }
          if($optVal == false) $optVal = 0;
          $opt->setAttrib('value', (string)$optVal);
-         if(($this->unfilteredValues !== null AND $this->unfilteredValues == $optVal) OR ($this->unfilteredValues === null AND $first == true) ) {
+         Debug::log($this->unfilteredValues, $optVal);
+         if(($this->unfilteredValues !== false AND $this->unfilteredValues !== null AND $this->unfilteredValues == $optVal)
+            OR ($this->unfilteredValues === null AND $first == true) ) {
             $opt->setAttrib('checked', 'checked');
          }
          $first = false;
