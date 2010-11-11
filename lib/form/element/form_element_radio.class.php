@@ -37,16 +37,6 @@ class Form_Element_Radio extends Form_Element {
    }
 
    /**
-    * Metoda nastaví volbu že se dají vybírat více prvků
-    * @param $multiple -- true pro povolení více voleb
-    * @return Form_Element_Select -- sám sebe
-    */
-//   public function setMultiple($multiple = true) {
-//      $this->isMultiple = $multiple;
-//      return $this;
-//   }
-
-   /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
@@ -65,20 +55,21 @@ class Form_Element_Radio extends Form_Element {
             $opt->setAttrib('name', $this->getName());
             $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$this->renderedId);
          }
-            $opt->setAttrib('value', $optVal);
-            if(($this->unfilteredValues == $optVal) OR (empty ($this->unfilteredValues) AND $first == true)) {
-               $opt->setAttrib('checked', 'checked');
-            }
-            $first = false;
-            $group .= (string)$opt;
-            $l = new Html_Element('label', $optLabel);
-            if($this->isDimensional()) {
-               $l->setAttrib('for', $this->getName().'_'.$i.'_'.$this->renderedId.'_'.$this->dimensional);
-            } else {
-               $l->setAttrib('for', $this->getName().'_'.$i.'_'.$this->renderedId);
-            }
-            $group .= $l;
-            $group .= new Html_Element('br');
+         if($optVal == false) $optVal = 0;
+         $opt->setAttrib('value', (string)$optVal);
+         if(($this->unfilteredValues !== null AND $this->unfilteredValues == $optVal) OR ($this->unfilteredValues === null AND $first == true) ) {
+            $opt->setAttrib('checked', 'checked');
+         }
+         $first = false;
+         $group .= (string)$opt;
+         $l = new Html_Element('label', $optLabel);
+         if($this->isDimensional()) {
+            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$this->renderedId.'_'.$this->dimensional);
+         } else {
+            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$this->renderedId);
+         }
+         $group .= $l;
+         $group .= new Html_Element('br');
          $i++;
       }
       $this->renderedId++;
