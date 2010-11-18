@@ -103,19 +103,20 @@ abstract class Controller {
       }
 
       //	Vytvoření objektu pohledu
-      $this->viewObj = $view;
-      $this->initView();
+      if($view !== null){
+         $this->viewObj = $view;
+      } else {
+         $this->initView();
+      }
 
       // Inicializace kontroleru modulu
       $this->init();
    }
 
    private function initView() {
-      if($this->viewObj === null) {
-         //	Načtení třídy View
-         $viewClassName = ucfirst($this->moduleName).'_View';
-         $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
-      }
+      //	Načtení třídy View
+      $viewClassName = ucfirst($this->moduleName).'_View';
+      $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
    }
 
    /**
