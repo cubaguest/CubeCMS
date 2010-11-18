@@ -206,6 +206,9 @@ class AppCore {
       if(!defined('PHP_VERSION_ID')){
          $version = explode('.',PHP_VERSION);
          define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+         define('PHP_MAJOR_VERSION',   $version[0]);
+         define('PHP_MINOR_VERSION',   $version[1]);
+         define('PHP_RELEASE_VERSION', $version[2]);
       }
 //      if(PHP_VERSION_ID < 5.3){ // protože existují kreténi, kteří mají na php 5.3 zapnuté magic quotes
 //         set_magic_quotes_runtime(false); // magic quotes OFF !!
@@ -423,6 +426,11 @@ class AppCore {
    private function _initCore() {
       // nastavení mb kodování na UTF protože celá aplikace pracuje s UTF
       mb_internal_encoding("UTF-8");
+      // max upload Limit
+      $max_upload = (int)(ini_get('upload_max_filesize'));
+      $max_post = (int)(ini_get('post_max_size'));
+      $memory_limit = (int)(ini_get('memory_limit'));
+      define('VVE_MAX_UPLOAD_SIZE', min($max_upload, $max_post, $memory_limit));
    }
 
    /**
@@ -925,10 +933,10 @@ class AppCore {
     */
    public function runComponent() {
       $componentName = 'Component_'.ucfirst(self::$urlRequest->getName());
-      $component = new $componentName();
-      $component->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
-              self::$urlRequest->getOutputType());
-   }
+         $component = new $componentName();
+         $component->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
+            self::$urlRequest->getOutputType());
+      }
 
    /**
     * Metoda načte soubor se specialními vlastnostmi přenesenými do šablony,
