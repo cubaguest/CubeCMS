@@ -53,7 +53,9 @@ class XHR_Respond {
     */
    public function renderRespond() {
       Template_Output::setOutputType($this->outputType);
+      Template_Output::sendHeaders();
       echo $this;
+      exit(); // remove on comlete integration of throws
    }
 }
 ?>
