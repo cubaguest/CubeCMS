@@ -95,7 +95,7 @@ class Model_Category extends Model_PDO {
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
-      $return =  $dbst->fetch();
+      $return =  $dbst->fetch(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE);
       return $return;
    }
 
@@ -116,7 +116,7 @@ class Model_Category extends Model_PDO {
       $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
       $dbst->execute();
 
-      return $dbst->fetch();
+      return $dbst->fetch(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE);
    }
 
 
@@ -137,7 +137,7 @@ class Model_Category extends Model_PDO {
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
-      return $dbst->fetch();
+      return $dbst->fetch(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE);
 
    }
 
@@ -176,7 +176,7 @@ class Model_Category extends Model_PDO {
 
          $cats = array();
          //      foreach ($categories as $row) {
-         while($row = $dbst->fetch()) {
+         while($row = $dbst->fetch(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE)) {
             $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
          }
          if($allCategories === false) {
@@ -202,15 +202,7 @@ class Model_Category extends Model_PDO {
          $dbst->execute();
          $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
 
-//         $cats = array();
-//         //      foreach ($categories as $row) {
-//         while($row = $dbst->fetch()) {
-//            $cats[$row->{Model_Category::COLUMN_CAT_ID}] = $row;
-//         }
-//         if($allCategories === false) {
-//            $this->catList = $cats;
-//         }
-         return $dbst->fetchAll();
+         return $dbst->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
    }
 
    /**
