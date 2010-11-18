@@ -1,0 +1,1 @@
+UPDATE `{PREFIX}articles` SET `is_user_last_edit`='1' WHERE `is_user_last_edit` IS NULL;
