@@ -22,11 +22,13 @@ class Model_ORM extends Model_PDO {
    const JOIN_OUTER = 3;
    const JOIN_CROSS = 4;
 
-   protected $tableName = null;
+   protected static $tableName = null;
 
-   protected $dbName =  VVE_DB_NAME;
+   protected static $tableShortName = null;
 
-   protected $tableShortName = null;
+   protected static $dbName =  VVE_DB_NAME;
+
+   protected static $dbEngine =  'MyISAM';
 
    private $tableStructure = array();
 
@@ -47,6 +49,8 @@ class Model_ORM extends Model_PDO {
       'pk' => false,
       'lang' => false,
       'comment' => null,
+      'characterset' => 'utf8',
+      'collate' => 'utf8_general_ci',
       'lenght' => null,
       'readonly' => false,
       'value' => false,
@@ -82,7 +86,10 @@ class Model_ORM extends Model_PDO {
     */
 
    protected function _initTable() {
-      $this->setTableName(self::DB_TABLE);
+      if(self::$tableName == null){
+         self::$tableName = self::DB_TABLE;
+      }
+      $this->setTableName(self::$tableName);
    }
 
    /**
@@ -142,7 +149,9 @@ class Model_ORM extends Model_PDO {
          }
       }
       $params['name'] = $name;
-      $this->tableStructure[$name] = array_merge(self::$defaultColumnParams, $params);
+      $defParams = self::$defaultColumnParams;
+      unset ($defParams['default']); // unset becouse default is no need't when is not set
+      $this->tableStructure[$name] = array_merge($defParams, $params);
    }
 
    /**
@@ -211,9 +220,9 @@ class Model_ORM extends Model_PDO {
     */
    protected function setTableName($tablename, $short = null, $addPrefix = true) {
       if($addPrefix == true){
-         $this->tableName = Db_PDO::table($tablename);
+         self::$tableName = Db_PDO::table($tablename);
       } else {
-         $this->tableName = $tablename;
+         self::$tableName = $tablename;
       }
       if($short == null){
          $short = 't_';
@@ -222,7 +231,7 @@ class Model_ORM extends Model_PDO {
             $short .= $part[0];
          }
       }
-      $this->tableShortName = $short;
+      self::$tableShortName = $short;
    }
 
    /**
@@ -230,7 +239,7 @@ class Model_ORM extends Model_PDO {
     * @param string $dbName
     */
    protected function setDbName($dbName) {
-      $this->dbName = $dbName;
+      self::$dbName = $dbName;
    }
 
    /**
@@ -238,7 +247,23 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    protected function getDbName() {
-      return $this->dbName;
+      return self::$dbName;
+   }
+
+   /**
+    * Metoda nastaví engine tabulky (MyISAM, InnoDB)
+    * @param string $dbEngine
+    */
+   public function setDbEngine($dbEngine) {
+      self::$dbEngine = $dbEngine;
+   }
+
+   /**
+    * Metoda vrací název databáze (MyISAM, InnoDB)
+    * @return string
+    */
+   public function getDbEngine() {
+      return self::$dbEngine;
    }
 
    /*
@@ -250,7 +275,7 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    public function getTableName() {
-      return $this->tableName;
+      return self::$tableName;
    }
 
    /**
@@ -258,7 +283,7 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    public function getTableShortName() {
-      return $this->tableShortName;
+      return self::$tableShortName;
    }
 
    /**
@@ -336,7 +361,7 @@ class Model_ORM extends Model_PDO {
 
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
-      return $dbst->fetch();
+      return $dbst->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
    }
    
    /**
@@ -361,7 +386,7 @@ class Model_ORM extends Model_PDO {
 
       $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
       $dbst->execute();
-      $r = $dbst->fetchAll();
+      $r = $dbst->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
       return $r;
    }
 
@@ -481,11 +506,10 @@ class Model_ORM extends Model_PDO {
 ////               OR $params['value'] == $params['valueLoaded']
 //               ) continue;
             if($params['extern'] == true OR $params['changed'] != 1) continue;
-            if($params['value'] === false){
+            if(isset($params['default']) AND $params['value'] === false AND $params['changed'] != 1){
                switch ((string)$params['default']) {
                   case 'CURRENT_TIMESTAMP':
                      $params['value'] = new DateTime();
-                     echo 'date';
                      break;
                   default:
                      $params['value'] = $params['default'];
@@ -716,6 +740,12 @@ class Model_ORM extends Model_PDO {
             // vytváření SQL pro joiny je tu kvůli kešování
             $part = null;
             switch ($join['type']) {
+               case self::JOIN_CROSS:
+                  $part .= ' CROSS ';
+                  break;
+               case self::JOIN_RIGHT:
+                  $part .= ' RIGHT ';
+                  break;
                case self::JOIN_LEFT:
                default:
                   $part .= ' LEFT ';
