@@ -324,7 +324,7 @@ class Filesystem_File {
     * @return boolean -- true pokud byl soubor odstraněn
     */
    public function delete() {
-      if(!$this->exist() OR is_dir($this->getName(true)) OR !@unlink($this->getName(true))) {
+      if(!$this->exist() OR is_dir($this->getName(true)) OR !unlink($this->getName(true))) {
             new CoreErrors(new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getName())));
 //            throw new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému dir: "%s"'), $this->getName(), $this->getDir()));
       }
