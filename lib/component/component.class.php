@@ -123,18 +123,26 @@ class Component {
       $this->init();
 
       $this->pluginParams = $params;
-      if(method_exists($this, $actionName.ucfirst($outputType).'Controller')) {
-         $this->{$actionName.ucfirst($outputType).'Controller'}();
-      } else if(method_exists($this, $actionName.'Controller')) {
-         $this->{$actionName.'Controller'}();
-      } else {
-         trigger_error(sprintf(_('Neimplementováný kontroler "%s" Componenty "%s"'), $actionName, $this->componentName));
+      ob_start();
+      try {
+         if (method_exists($this, $actionName . ucfirst($outputType) . 'Controller')) {
+            $this->{$actionName . ucfirst($outputType) . 'Controller'} ( );
+         } else if (method_exists($this, $actionName . 'Controller')) {
+            $this->{$actionName . 'Controller'} ();
+         } else {
+            throw new Exception(sprintf(_('Neimplementováný kontroler "%s" Componenty "%s"'), $actionName, $this->componentName));
+         }
+      } catch (Exception $exc) {
+         new CoreErrors($exc);
       }
+      ob_end_clean();
+
       // view
-      Template_Output::sendHeaders();
       if(method_exists($this, $actionName.ucfirst($outputType).'View')) {
+         Template_Output::sendHeaders();
          $this->{$actionName.ucfirst($outputType).'View'}();
       } else if(method_exists($this, $actionName.'View')){
+         Template_Output::sendHeaders();
          $this->{$actionName.'View'}();
       } else {
          // výstup přes XHR respond api
@@ -223,7 +231,7 @@ class Component {
     * @todo ??????
     */
    final public function renderComponent() {
-      print ($this);
+      echo ($this);
    }
 
    public function  __toString() {
