@@ -155,12 +155,19 @@ class CoreErrors {
    public static function getErrorsInArrayForPrint(){
       $re = array();
       foreach (self::$exceptionsArray as $exception) {
-         $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",get_class($exception),$exception->getCode(),
-         $exception->getMessage(),$exception->getFile(),$exception->getLine());
+         if(VVE_DEBUG_LEVEL > 2) {
+               $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d"),get_class($exception),$exception->getCode(),
+                  $exception->getMessage(),$exception->getFile(),$exception->getLine());
+         } else {
+            $re [] = $exception->getMessage();
+         }
       }
       foreach (self::$errorsArray as $err) {
-         sprintf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",$err['name'],$err['code'],
-         $re [] = $err['message'],$err['file'],$err['line']);
+         if(VVE_DEBUG_LEVEL > 2) {
+            $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d"),$err['name'],$err['code'], $err['message'],$err['file'],$err['line']);
+         } else {
+            $re [] = $err['message'];
+         }
       }
       return $re;
    }
