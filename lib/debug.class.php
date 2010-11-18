@@ -19,7 +19,21 @@ class Debug {
          echo '</div>';
          flush();
       }
-      
+   }
+
+   public static function table($array) {
+      echo '<div class="debug-log" style="margin-top: 30px;">';// admin menu
+      echo '<table border="1" cellspacing="5" cellpadding="2">';
+      foreach ($array as $row) {
+         echo '<tr>';
+         foreach ($row as $value) {
+            echo '<td>'.$value.'</td>';
+         }
+         echo '</tr>';
+      }
+      echo '</table>';
+      echo '</div>';
+      flush();
    }
 }
 ?>
