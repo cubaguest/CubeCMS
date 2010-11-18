@@ -53,8 +53,7 @@ class Category extends Category_Core {
       }
       //		Pokud nebyla načtena žádná kategorie
       if(empty($catArray)) {
-      //         AppCore::setErrorPage();
-         $this->category = false;
+         $this->category = new Module_ErrPage_Category();
          return false;
       } else {
          $this->category = $catArray;
