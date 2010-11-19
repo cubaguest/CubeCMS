@@ -6,9 +6,6 @@ $this->addPageTitle($str);
 <div class="main-content-form-edit" id="text-edit-form">
    <?
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40)->addClass("mceEditor");
-   $tinymce = new JsPlugin_TinyMce();
-   $tinymce->setCfgParam('theme', 'full');
-   $this->addJsPlugin($tinymce);
-   print ($this->form);
+   echo ($this->form);
    ?>
 </div>

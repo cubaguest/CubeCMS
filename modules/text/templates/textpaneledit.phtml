@@ -5,11 +5,7 @@ $this->addPageTitle($str);
 <h1><?=$str?></h1>
 <div class="main-content-form-edit" id="text-edit-form">
    <?
-   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 20)->addClass("mceEditorSimple");
-   $tinymce2 = new JsPlugin_TinyMce();
-   $tinymce2->setCfgParam('theme', 'advancedsimple');
-   $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
-   $this->addJsPlugin($tinymce2);
-   print ($this->form);
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 20);
+   echo ($this->form);
    ?>
 </div>

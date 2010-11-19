@@ -9,6 +9,8 @@ class Text_Controller extends Controller {
    const TEXT_PRIVATE_KEY = 'private';
 
    const PARAM_ALLOW_PRIVATE = 'allow_private';
+   const PARAM_ALLOW_WYSIWYG = 'allow_wysiwyg';
+   const PARAM_ALLOW_SCRIPT_IN_TEXT = 'allow_script';
 
 
    /**
@@ -31,7 +33,7 @@ class Text_Controller extends Controller {
       if($this->category()->getParam(self::PARAM_ALLOW_PRIVATE, false)== true AND Auth::isLogin()){
          $textPrivate = $model->getText($this->category()->getId(),self::TEXT_PRIVATE_KEY);
 
-         if(Auth::getGroupName() == 'admin' OR $modelPrivate->haveGroup($textPrivate->{Text_Model::COLUMN_ID}, Auth::getGroupId())
+         if($this->category()->getRights()->isControll() OR $modelPrivate->haveGroup($textPrivate->{Text_Model::COLUMN_ID}, Auth::getGroupId())
             OR $modelPrivate->haveUser($textPrivate->{Text_Model::COLUMN_ID}, Auth::getUserId())){
                $this->view()->textPrivate = $textPrivate;
          }
@@ -54,6 +56,7 @@ class Text_Controller extends Controller {
       $form = new Form("text_");
       
       $label = new Form_Element_Text('label', $this->_('Nadpis'));
+      $label->addFilter(new Form_Filter_StripTags());
       $label->setSubLabel($this->_('Doplní se namísto nadpisu stránky'));
       $label->setLangs();
       $form->addElement($label);
@@ -80,7 +83,15 @@ class Text_Controller extends Controller {
 
       if($form->isValid()){
          try {
-            $model->saveText($form->text->getValues(), $form->label->getValues(),
+            // odtranění script, nebezpečných tagů a komentřů
+            $text = vve_strip_html_comment($form->text->getValues());
+            if($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false){
+               foreach ($text as $lang => $t) {
+                  $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
+               }
+            }
+
+            $model->saveText($text, $form->label->getValues(),
                     $this->category()->getId(), self::TEXT_MAIN_KEY);
             $this->log('úprava textu');
             $this->infoMsg()->addMessage($this->_('Text byl uložen'));
@@ -121,6 +132,13 @@ class Text_Controller extends Controller {
 
       if($form->isValid()){
          try {
+            // odtranění script, nebezpečných tagů a komentřů
+            $text = vve_strip_html_comment($form->text->getValues());
+            if($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false){
+               foreach ($text as $lang => $t) {
+                  $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
+               }
+            }
             $model->saveText($form->text->getValues(), null, $this->category()->getId(),self::TEXT_PANEL_KEY);
             $this->log('Úprava textu panelu');
             $this->infoMsg()->addMessage($this->_('Text panelu byl uložen'));
@@ -193,15 +211,26 @@ class Text_Controller extends Controller {
       }
 
       if($form->isValid()){
-         $id = $model->saveText($form->text->getValues(), null,
-                    $this->category()->getId(), self::TEXT_PRIVATE_KEY);
-         $this->log('Úprava privátního textu');
-         // uložíme skupiny
-         $modelPrivate->saveGroupsConnect($id, $form->groups->getValues());
-         // uložíme uživatele
-         $modelPrivate->saveUsersConnect($id, $form->users->getValues());
-         $this->infoMsg()->addMessage($this->_('Privátní text byl uložen'));
-         $this->link()->route()->reload();
+         try {
+            // odtranění script, nebezpečných tagů a komentřů
+            $text = vve_strip_html_comment($form->text->getValues());
+            if ($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false) {
+               foreach ($text as $lang => $t) {
+                  $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
+               }
+            }
+            $id = $model->saveText($form->text->getValues(), null,
+                  $this->category()->getId(), self::TEXT_PRIVATE_KEY);
+            $this->log('Úprava privátního textu');
+            // uložíme skupiny
+            $modelPrivate->saveGroupsConnect($id, $form->groups->getValues());
+            // uložíme uživatele
+            $modelPrivate->saveUsersConnect($id, $form->users->getValues());
+            $this->infoMsg()->addMessage($this->_('Privátní text byl uložen'));
+            $this->link()->route()->reload();
+         } catch (PDOException $exc) {
+            new CoreErrors($e);
+         }
       }
       // view
       $this->view()->form = $form;
@@ -210,6 +239,24 @@ class Text_Controller extends Controller {
    public function textController() {}
 
    public static function  settingsController(&$settings, Form &$form) {
+      $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
+
+      $elemAllowWysiwyg = new Form_Element_Checkbox('allow_wysiwyg', 'Povolit wysiwyg editor');
+      $elemAllowWysiwyg->setValues(true);
+      if(isset($settings[self::PARAM_ALLOW_WYSIWYG])) {
+         $elemAllowWysiwyg->setValues($settings[self::PARAM_ALLOW_WYSIWYG]);
+      }
+
+      $form->addElement($elemAllowWysiwyg, $fGrpEditSet);
+
+      $elemAllowScripts = new Form_Element_Checkbox('allow_script', 'Povolit scripty v textu');
+      $elemAllowScripts->setSubLabel('Umožňuje vkládání javascriptů přímo do textu. POZOR! Lze tak vložit útočníkův kód do stránek. (Filtrují se všechny javascripty.)');
+      $elemAllowScripts->setValues(false);
+      if(isset($settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT])) {
+         $elemAllowScripts->setValues($settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT]);
+      }
+      $form->addElement($elemAllowScripts, $fGrpEditSet);
+
       $fGrpPrivate = $form->addGroup('privateZone', 'Privátní zóna', "Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každého článku tak
          vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům.");
@@ -224,6 +271,8 @@ class Text_Controller extends Controller {
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings[self::PARAM_ALLOW_PRIVATE] = $form->allow_private_zone->getValues();
+         $settings[self::PARAM_ALLOW_WYSIWYG] = $form->allow_wysiwyg->getValues();
+         $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
       }
    }
 }

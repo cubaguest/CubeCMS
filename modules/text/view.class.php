@@ -8,6 +8,30 @@ class Text_View extends View {
    public function mainView() {
       $this->template()->addTplFile("text.phtml");
 
+      // text nebyl zadán
+      if($this->text == false){
+         $this->text = new Object();
+         $this->text->{Text_Model_Detail::COLUMN_TEXT} = null;
+         if($this->category()->getRights()->isWritable()){
+            $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->_('Text nebyl vytvořen. Upravíte jej v administraci.');
+         }
+      } else {
+         $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model_Detail::COLUMN_TEXT}, array('anchors','filesicons'));
+      }
+      
+      // private  text
+      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
+         if($this->textPrivate == false OR strip_tags((string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT}) == null){
+            $this->textPrivate = new Object();
+            $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = null;
+            if($this->category()->getRights()->isWritable()){
+               $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->_('Privátní text nebyl vytvořen. Upravíte jej v administraci.');
+            }
+         }
+         $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->template()->filter(
+            (string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT}, array('anchors','filesicons'));
+      }
+
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
@@ -45,14 +69,41 @@ class Text_View extends View {
    }
 
    public function editView() {
+      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_WYSIWYG, true) == true){
+         // TinyMCE
+         $this->form->text->html()->addClass("mceEditor");
+         $this->tinyMCE = new Component_TinyMCE();
+         $settings = new Component_TinyMCE_Settings_Advanced();
+         $settings->setSetting('height', '600');
+         $this->tinyMCE->setEditorSettings($settings);
+         $this->tinyMCE->mainView();
+      }
+
       $this->template()->addTplFile("textedit.phtml");
    }
 
    public function editPrivateView() {
+      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_WYSIWYG, true) == true){
+         // TinyMCE
+         $this->form->text->html()->addClass("mceEditor");
+         $this->tinyMCE = new Component_TinyMCE();
+         $settings = new Component_TinyMCE_Settings_Advanced();
+         $settings->setSetting('height', '600');
+         $this->tinyMCE->setEditorSettings($settings);
+         $this->tinyMCE->mainView();
+      }
       $this->template()->addTplFile("textprivateedit.phtml");
    }
 
    public function editPanelView() {
+      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_WYSIWYG, true) == true){
+         // TinyMCE
+         $this->form->text->html()->addClass("mceEditorSimple");
+         $this->tinyMCE = new Component_TinyMCE();
+         $settings = new Component_TinyMCE_Settings_AdvSimple();
+         $this->tinyMCE->setEditorSettings($settings);
+         $this->tinyMCE->mainView();
+      }
       $this->template()->addTplFile("textpaneledit.phtml");
    }
    // EOF edittextView

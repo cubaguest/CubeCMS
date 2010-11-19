@@ -7,19 +7,14 @@ if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABE
 }
 ?>
 <h1><?=$h1;?></h1>
-<div class="main-content-detail"><?
-      if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
-         ?><div class="main-content-text"><?echo ($this->text->{Text_Model_Detail::COLUMN_TEXT}).$this->toolbox;?></div><?
-   } else {?>
-         <div class="main-content-text"><?
-         echo ($this->_("<p>Text nebyl definován, vytvoříte jej v administraci</p>")).$this->toolbox;
-         ?></div><?
-      }?>
-   <?if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){?>
-   <div class="main-content-text"><?if($this->textPrivate != null) echo $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT};
+<div class="main-content-detail">
+   <div class="main-content-text"><?echo ($this->filter($this->text->{Text_Model_Detail::COLUMN_TEXT},'emoticons')).$this->toolbox;?></div>
+   <?if($this->textPrivate != false AND (string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} != null){
+      ?><div class="main-content-text"><?
+      echo $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT};
       echo $this->toolboxPrivate;
-   ?></div>
-   <?}
+   ?></div><?
+   }
    if($this->text != false){
          $this->includeTpl('articletools.phtml', true, array(
             'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
