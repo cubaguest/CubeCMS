@@ -241,7 +241,7 @@ function vve_strip_html_comment($str){
          $str[$key] = vve_strip_html_comment($s);
       }
    } else {
-      $str = preg_replace('/<!--(.*)-->/', '', $str);
+      $str = preg_replace('/<!--(.|\s)*?-->/', '', $str);
    }
    return $str;
 }
