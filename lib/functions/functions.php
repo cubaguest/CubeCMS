@@ -231,4 +231,18 @@ function vve_array_insert_by_key($array, $key, $val, $valkey = null, $sort = 'af
     return $array;
 }
 
+/**
+ * Funcke odstraní html komentáře
+ * @param mixed $str -- řetězec nebo pole
+ */
+function vve_strip_html_comment($str){
+   if(is_array($str)){
+      foreach ($str as $key => $s) {
+         $str[$key] = vve_strip_html_comment($s);
+      }
+   } else {
+      $str = preg_replace('/<!--(.*)-->/', '', $str);
+   }
+   return $str;
+}
 ?>
