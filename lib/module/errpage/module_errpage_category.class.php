@@ -23,6 +23,7 @@ class Module_ErrPage_Category extends Category_Core {
       $category = new Object();
       // Je třeba více?
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
+      $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
       $category->{Model_Category::COLUMN_MODULE} = 'errpage';
       $category->{Model_Category::COLUMN_CAT_LABEL} = _('Chyba');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
