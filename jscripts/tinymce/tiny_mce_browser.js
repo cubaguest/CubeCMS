@@ -10,7 +10,7 @@ function vveTinyMCEFileBrowser (field_name, url, type, win) {
          +'&sessionid='+tinyMCE.activeEditor.getParam('sessionid'),
       title : 'File Browser',
       width : 750,  // Your dimensions may differ - toy around with them!
-      height : 400,
+      height : 470,
       resizable : "yes",
       inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
       close_previous : "no"
