@@ -23,6 +23,7 @@ class Module_Rss_Category extends Category_Core {
       $category = new Object();
       // Je třeba více?
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
+      $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
       $category->{Model_Category::COLUMN_MODULE} = 'rss';
       $category->{Model_Category::COLUMN_URLKEY} = 'rss.html';
       $category->{Model_Category::COLUMN_CAT_LABEL} = _('Přehled rss kanálů');

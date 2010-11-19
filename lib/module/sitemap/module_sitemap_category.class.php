@@ -23,6 +23,7 @@ class Module_Sitemap_Category extends Category_Core {
       $category = new Object();
       // Je třeba více?
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
+      $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
       $category->{Model_Category::COLUMN_MODULE} = 'sitemap';
       $category->{Model_Category::COLUMN_CAT_LABEL} = _('Mapa stránek');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
