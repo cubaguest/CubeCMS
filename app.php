@@ -915,17 +915,24 @@ class AppCore {
     * Metoda spustí akci nad JsPluginem
     */
    public function runJsPlugin() {
-      $pluginName = 'JsPlugin_'.ucfirst(self::$urlRequest->getName());
-      if(class_exists($pluginName)){
-         $jsPlugin = new $pluginName();
-      } else if(class_exists(ucfirst(self::$urlRequest->getName()))){
-         $pluginName = ucfirst(self::$urlRequest->getName());
-         $jsPlugin = new $pluginName();
+      try {
+         $pluginName = 'JsPlugin_' . ucfirst(self::$urlRequest->getName());
+         if (class_exists($pluginName)) {
+            $jsPlugin = new $pluginName();
+         } else if (class_exists(ucfirst(self::$urlRequest->getName()))) {
+            $pluginName = ucfirst(self::$urlRequest->getName());
+            $jsPlugin = new $pluginName();
+         } else {
+            throw new UnexpectedValueException(_('Neexistující JsPlugin'));
+         }
+         // vytvoření souboru
+         Template_Output::sendHeaders();
+         $jsPlugin->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
+            self::$urlRequest->getOutputType());
+      } catch (Exception $exc) {
+         echo $exc->getMessage();
       }
-      // vytvoření souboru
-      Template_Output::sendHeaders();
-      $jsPlugin->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
-              self::$urlRequest->getOutputType());
+      exit();
    }
 
    /**
