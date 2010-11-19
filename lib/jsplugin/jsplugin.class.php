@@ -43,7 +43,7 @@ abstract class JsPlugin {
 	 * Pole s parametry JsPluginu
 	 * @var array
 	 */
-	private $pluginParams = array();
+   protected $pluginParams = array();
 	
    /**
     * Pole s konfigurací pluginu
@@ -117,13 +117,17 @@ abstract class JsPlugin {
 	 * Metoda pro spuštění akce JsPluginu
 	 */
 	public function runAction($actionName, $params, $outputType){
-      $this->pluginParams = $params;
-      if(method_exists($this, $actionName.ucfirst($outputType).'View')){
-         $this->{$actionName.ucfirst($outputType).'View'}();
-      } else if(method_exists($this, $actionName.'View')) {
-         $this->{$actionName.'View'}();
-      } else {
-         trigger_error(_('Neimplementována metoda JsPluginu'));
+      try {
+         $this->pluginParams = $params;
+         if (method_exists($this, $actionName . ucfirst($outputType) . 'View')) {
+            $this->{$actionName . ucfirst($outputType) . 'View'} ( );
+         } else if (method_exists($this, $actionName . 'View')) {
+            $this->{$actionName . 'View'} ();
+         } else {
+            throw new UnexpectedValueException(_('Neimplementována metoda JsPluginu'));
+         }
+      } catch (Exception $exc) {
+         echo $exc->getTraceAsString();
       }
    }
 

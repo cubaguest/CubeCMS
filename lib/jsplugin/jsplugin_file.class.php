@@ -87,18 +87,22 @@ class JsPlugin_File {
 
    /**
     * Metoda nastavuje a rozparsuje parametry souboru z řetězce
-    * @param string $params -- parametry v řetězci
+    * @param string/array $params -- parametry v řetězci nebo pole s parametry
     */
    public function setParams($params) {
 		if($params != null){
-			$tmpParamsArray = array();
-			$tmpParamsArray = explode(Url_Link::URL_PARAMETRES_SEPARATOR_IN_URL, $params);
-			foreach ($tmpParamsArray as $fullParam) {
-				$tmpParam = explode(Url_Link::URL_SEP_PARAM_VALUE, $fullParam);
-				if(isset($tmpParam[0]) AND isset($tmpParam[1])){
-               $this->fileParams[rawurldecode($tmpParam[0])] = rawurldecode($tmpParam[1]);
-				}
-			}
+			if(is_array($params)){
+            $this->fileParams = array_merge($this->fileParams, $params);
+         } else {
+            $tmpParamsArray = array();
+      		$tmpParamsArray = explode(Url_Link::URL_PARAMETRES_SEPARATOR_IN_URL, $params);
+   			foreach ($tmpParamsArray as $fullParam) {
+               $tmpParam = explode(Url_Link::URL_SEP_PARAM_VALUE, $fullParam);
+            	if(isset($tmpParam[0]) AND isset($tmpParam[1])){
+                  $this->fileParams[rawurldecode($tmpParam[0])] = rawurldecode($tmpParam[1]);
+      			}
+   			}
+         }
 		};
    }
 

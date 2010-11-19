@@ -13,9 +13,9 @@
  */
 
 class Url_Link_Component extends Url_Link {
-/**
- * Část URL s komponentou
- */
+   /**
+    * Část URL s komponentou
+    */
    const URL_PART = 'component';
 
    /**
@@ -82,9 +82,6 @@ class Url_Link_Component extends Url_Link {
       $this->lang = self::$currentlang;
       $this->category = self::$currentCategory;
       $this->paramsArray = self::$currentParams;
-   //         $this->paramsNormalArray = self::$currentParamsNormalArray;
-   //         $this->mediaType = Url_Request::getCurrentMediaUrlPart();
-   //      }
    }
 
    /*
@@ -94,18 +91,11 @@ class Url_Link_Component extends Url_Link {
       if($this->isOnlyComponentAction) {
          return Url_Request::getBaseWebDir().self::URL_PART.URL_SEPARATOR
          .strtolower($this->componentName).URL_SEPARATOR.Locales::getLang()
-         .URL_SEPARATOR.self::$currentCategory.URL_SEPARATOR.$this->actionName.'.'.$this->outputType;
+         .URL_SEPARATOR.$this->category.URL_SEPARATOR.$this->actionName.'.'.$this->outputType;
       } else {
          return parent::__toString();
       }
    }
-
-/**
- * Metoda převede objekt na řetězec
- *
- * @return string -- objekt jako řetězec
- */
-
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");
 //echo("SERVER_NAME: ".$_SERVER["SERVER_NAME"]."<br>");
