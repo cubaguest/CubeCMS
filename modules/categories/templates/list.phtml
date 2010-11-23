@@ -83,6 +83,21 @@ function vveSectionsRenderFunc($menuArr, $link) {
                <th><?=SECTION_DESC?>:</th>
                <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};?></td>
             </tr>
+            <tr>
+               <th>Url:</th>
+               <td><?
+                  foreach ($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY} as $lang => $urlkey){
+                     if($urlkey == null) continue;
+                     if($lang != Locales::getDefaultLang()) $link3->lang($lang); // default language needn't have definition in URL
+                     $l = (string)$link3->clear()->category($urlkey);
+                     echo '<a href="'.$l.'" title="'.SECTION_GOTO_CAT_LABEL.'">';
+                     echo '<img src="images/langs/small/'.$lang.'.png" alt="'.$lang.'" class="lang-image" />&nbsp;';
+                     echo $l;
+                     echo '</a>';
+                     echo '<br />';
+                  }
+               ?></td>
+            </tr>
          </table>
       </div>
          </td><td width="110" valign="top">
