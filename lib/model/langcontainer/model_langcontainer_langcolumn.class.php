@@ -8,7 +8,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro vytvoření objektu pro přístup k datům
  */
-class Model_LangContainer_LangColumn implements ArrayAccess, Countable {
+class Model_LangContainer_LangColumn implements ArrayAccess, Countable, Iterator {
 /**
  * Pole s prvky objektu
  * @var array
@@ -122,6 +122,46 @@ class Model_LangContainer_LangColumn implements ArrayAccess, Countable {
       } else {
          return (string)null;
       }
+   }
+
+   /**
+    * Přesun ukazettele na tačátek pole
+    * @return string
+    */
+   public function rewind() {
+      return reset($this->values);
+   }
+
+   /**
+    * Vrací aktuální prvek
+    * @return string
+    */
+   public function current() {
+      return current($this->values);
+   }
+
+   /**
+    * Vrací jazykový název aktuálního prvku
+    * @return string
+    */
+   public function key() {
+      return key($this->values);
+   }
+
+   /**
+    * Vrací následující prvek
+    * @return string
+    */
+   public function next() {
+      return next($this->values);
+   }
+
+   /**
+    * Testuje jestli je prvek validní
+    * @return bool
+    */
+   public function valid() {
+      return key($this->values) !== null;
    }
 }
 ?>
