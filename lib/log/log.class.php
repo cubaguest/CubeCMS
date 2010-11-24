@@ -12,12 +12,12 @@
 class Log {
    const LOG_DIR = 'logs';
 
-   public static function msg($message, $file = null, $user = null) {
+   public static function msg($message, $file = null, $user = null, $targetLog = 'core') {
       $str = null;
       if($file != null) $str .= 'source: '.$file;
       if($user != null) $str .= ' user: '.$user;
       $str .= ' msg: '.$message;
-      self::save($str, 'core');
+      self::save($str, $targetLog);
    }
    
    protected static function save($str, $log) {
