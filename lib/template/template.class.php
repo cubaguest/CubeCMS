@@ -467,7 +467,7 @@ class Template {
             $return = Url_Request::getBaseWebDir().$dir.URL_SEPARATOR;
          }
       } else {
-         trigger_error(sprintf(_('Soubor "%s" nebyl nalezen'), $file));
+         trigger_error(sprintf(_('Soubor "%s %s" nebyl nalezen'), $dir, $file));
       }
       if($withFile == true){
          $return .= $file;
