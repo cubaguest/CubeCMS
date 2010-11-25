@@ -27,7 +27,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
 
    protected $defaultButtons = array(
       'theme_advanced_buttons1' => array('bold','italic','underline','strikethrough','|','justifyleft','justifycenter',
-         'justifyright','justifyfull','formatselect','fontselect','fontsizeselect','|','preview','fullscreen','template'),
+         'justifyright','justifyfull','formatselect','styleselect','fontsizeselect','|','preview','fullscreen','template'),
       'theme_advanced_buttons2' => array('cut','copy','paste','pastetext','pasteword','|','search','replace','|','bullist',
          'numlist','|','outdent','indent','blockquote','|','undo','redo','|','link','unlink','anchor','cleanup','code','|','forecolor','backcolor'),
       'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap',
