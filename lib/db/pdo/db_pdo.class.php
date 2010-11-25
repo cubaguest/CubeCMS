@@ -58,10 +58,9 @@ class Db_PDO extends PDO {
 
          }
          else {
-            // TODO dodělat vytváření podle zadaných hodnot
+            call_user_method_array('__construct', $this, func_get_args());
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//         $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Db_PDO_Statement')); // overload
       } catch (PDOException $e) {
          new CoreErrors($e);
       }
@@ -72,12 +71,6 @@ class Db_PDO extends PDO {
     * @return Db Konektory k danému databázovému stroji
     */
    public static function factory() {
-//      self::$serverName = AppCore::sysConfig()->getOptionValue("dbserver", self::CONFIG_DB_SECTION);
-//      self::$userName = AppCore::sysConfig()->getOptionValue("dbuser", self::CONFIG_DB_SECTION);
-//      self::$userPassword = AppCore::sysConfig()->getOptionValue("dbpasswd", self::CONFIG_DB_SECTION);
-//      self::$dbName = AppCore::sysConfig()->getOptionValue("dbname", self::CONFIG_DB_SECTION);
-//      self::$tablePrefix = AppCore::sysConfig()->getOptionValue("tbprefix", self::CONFIG_DB_SECTION);
-//      self::$connectorType = AppCore::sysConfig()->getOptionValue("dbhandler", self::CONFIG_DB_SECTION);
       self::$serverName = VVE_DB_SERVER;
       self::$userName = VVE_DB_USER;
       self::$userPassword = VVE_DB_PASSWD;
