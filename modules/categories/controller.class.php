@@ -191,7 +191,7 @@ class Categories_Controller extends Controller {
             } else if($variable == null AND $names[$lang] != null) {
                $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($names[$lang]));
             } else {
-               $urlkey[$lang] = vve_cr_url_key(strtolower($variable));
+               $urlkey[$lang] = vve_cr_url_key(strtolower($variable), false);
             }
          }
 
@@ -328,7 +328,7 @@ class Categories_Controller extends Controller {
             } else if($variable == null) {
                $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($names[$lang]));
             } else {
-               $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($variable));
+               $urlkey[$lang] = $urlPath.vve_cr_url_key(strtolower($variable), false);
             }
          }
 
