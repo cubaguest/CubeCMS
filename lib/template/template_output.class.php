@@ -135,8 +135,10 @@ class Template_Output {
       if(self::$cntLenght !== null) {
          header("Content-Length: ".self::$cntLenght);
       }
+      header('Cache-Control: public, no-cache' );
+      header('Cache-Control: max-age=60', false );
       if(Auth::isLogin()) {
-         header('Cache-Control: store, no-cache, must-revalidate' );
+         header('Cache-Control: store, no-cache, must-revalidate' ); //private, 
          header('Cache-Control: post-check=0, pre-check=0', false );
          header("Cache-Control: max-age=1, s-maxage=1", false);
          header("ETag: PUB" . time());
