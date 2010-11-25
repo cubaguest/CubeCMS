@@ -13,7 +13,7 @@ class Model_Session extends Model_ORM {
    /**
     * Název tabulky
     */
-   protected static $tableName = 'sessions';
+   protected $tableName = 'sessions';
 
    /**
     * Názvy sloupců v db tabulce
@@ -27,7 +27,7 @@ class Model_Session extends Model_ORM {
    const COLUMN_ID_USER    = 'id_user';
 
    protected function  _initTable() {
-      $this->setTableName(self::$tableName, 't_ses');
+      $this->setTableName($this->tableName, 't_ses');
 
       $this->addColumn(self::COLUMN_KEY, array('datatype' => 'varchar', 'nn' => true, 'pk' => true, 'uq' => true));
       $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'blob', 'pdoparam' => PDO::PARAM_STR));

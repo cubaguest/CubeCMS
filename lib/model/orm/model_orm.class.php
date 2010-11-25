@@ -22,13 +22,13 @@ class Model_ORM extends Model_PDO {
    const JOIN_OUTER = 3;
    const JOIN_CROSS = 4;
 
-   protected static $tableName = null;
+   protected $tableName = null;
 
-   protected static $tableShortName = null;
+   protected $tableShortName = null;
 
-   protected static $dbName =  VVE_DB_NAME;
+   protected $dbName =  VVE_DB_NAME;
 
-   protected static $dbEngine =  'MyISAM';
+   protected $dbEngine =  'MyISAM';
 
    private $tableStructure = array();
 
@@ -86,10 +86,10 @@ class Model_ORM extends Model_PDO {
     */
 
    protected function _initTable() {
-      if(self::$tableName == null){
-         self::$tableName = self::DB_TABLE;
+      if($this->tableName == null){
+         $this->tableName = self::DB_TABLE;
       }
-      $this->setTableName(self::$tableName);
+      $this->setTableName($this->tableName);
    }
 
    /**
@@ -226,9 +226,9 @@ class Model_ORM extends Model_PDO {
     */
    protected function setTableName($tablename, $short = null, $addPrefix = true) {
       if($addPrefix == true){
-         self::$tableName = Db_PDO::table($tablename);
+         $this->tableName = Db_PDO::table($tablename);
       } else {
-         self::$tableName = $tablename;
+         $this->tableName = $tablename;
       }
       if($short == null){
          $short = 't_';
@@ -237,7 +237,7 @@ class Model_ORM extends Model_PDO {
             $short .= $part[0];
          }
       }
-      self::$tableShortName = $short;
+      $this->tableShortName = $short;
    }
 
    /**
@@ -245,7 +245,7 @@ class Model_ORM extends Model_PDO {
     * @param string $dbName
     */
    protected function setDbName($dbName) {
-      self::$dbName = $dbName;
+      $this->dbName = $dbName;
    }
 
    /**
@@ -253,7 +253,7 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    protected function getDbName() {
-      return self::$dbName;
+      return $this->dbName;
    }
 
    /**
@@ -261,7 +261,7 @@ class Model_ORM extends Model_PDO {
     * @param string $dbEngine
     */
    public function setDbEngine($dbEngine) {
-      self::$dbEngine = $dbEngine;
+      $this->dbEngine = $dbEngine;
    }
 
    /**
@@ -269,7 +269,7 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    public function getDbEngine() {
-      return self::$dbEngine;
+      return $this->dbEngine;
    }
 
    /*
@@ -281,7 +281,7 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    public function getTableName() {
-      return self::$tableName;
+      return $this->tableName;
    }
 
    /**
@@ -289,7 +289,7 @@ class Model_ORM extends Model_PDO {
     * @return string
     */
    public function getTableShortName() {
-      return self::$tableShortName;
+      return $this->tableShortName;
    }
 
    /**
