@@ -27,7 +27,7 @@ class AppCore {
    /**
     * Revize Enginu
     */
-   const ENGINE_REVISION = 4;
+   const ENGINE_REVISION = 5;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -199,6 +199,9 @@ class AppCore {
     * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
     */
    private function __construct() {
+      //		inicializace stratovacího času
+      List ($usec, $sec) = Explode (' ', microtime());
+      $this->_startTime=((float)$sec + (float)$usec);
       //		Definice globálních konstant
       define('URL_SEPARATOR', '/');
       define('VVE_APP_IS_RUN', true);
@@ -220,46 +223,17 @@ class AppCore {
             //trigger_error("Magic quotes is Enable, please disable this feature");
          }
 //      }
-
+      // base cfg file
       require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
-
-
-      //		inicializace stratovacího času
-      List ($usec, $sec) = Explode (' ', microtime());
-      $this->_startTime=((float)$sec + (float)$usec);
-
+      // base classes
+      $this->_initBaseClasses();
       // inicializace parametrů jádra a php
       $this->_initCore();
-
-      //	nastavení hlavního adresáře aplikace
-      /*
-         * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
-      */
-//      $direName = dirname(__FILE__); // OLD version + dává někdy špatný výsledek
-//      $realPath = realpath($direName); // OLD version + dává někdy špatný výsledek
-      // $realPath = dirname(__FILE__); // ověřit v php 5.3.0 lze použít __DIR__
 
       //	přidání adresáře pro načítání knihoven
       set_include_path('./lib/' . PATH_SEPARATOR . get_include_path());
 
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'coreException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'moduleException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'dbException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badClassException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
-      // soubor s globálními funkcemi, které nejsou součástí php, ale časem by mohly být
-      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-                      . 'functions' . DIRECTORY_SEPARATOR . 'functions.php');
-
       //načtení potřebných knihoven
-//      $this->_loadLibraries();
       spl_autoload_register(array('AppCore', '_loadLibraries'));
 
       // inicializace db konektoru
@@ -267,28 +241,18 @@ class AppCore {
 
       // načtení systémového konfiguračního souboru
       $this->_initConfig();
-
+      //		inicializace sessions
+      Session::factory();
       //		inicializace URL
       Url_Request::factory();
-      
-
-      // inicializace Šablonovacího systému
-      Template::factory();
-
       //inicializace lokalizace
       Locales::factory();
-
-      //		inicializace sessions
-      Sessions::factory(VVE_SESSION_NAME);
+      // inicializace Šablonovacího systému
+      Template::factory();
       // výběr jazyka a locales
       Locales::selectLang();
       //		Inicializace chybových hlášek
       $this->_initMessagesAndErrors();
-      // kontrola verze
-      $this->checkCoreVersion();
-
-      //autorizace přístupu
-      $this->_initAuth();
       //Spuštění jádra aplikace
       $this->runCore();
    }
@@ -393,14 +357,6 @@ class AppCore {
    }
 
    /**
-    * Metoda vrací objekt autorizace
-    * @return Auth -- objekt autorizace
-    */
-   public static function getAuth() {
-      return self::$auth;
-   }
-
-   /**
     * Metoda vrací objekt url požadavku
     * @return Url_Request  -- objekt autorizace
     */
@@ -424,6 +380,7 @@ class AppCore {
     * Metoda inicializuje základní nastavení jádra systému
     */
    private function _initCore() {
+      date_default_timezone_set('Europe/Prague');
       // nastavení mb kodování na UTF protože celá aplikace pracuje s UTF
       mb_internal_encoding("UTF-8");
       // max upload Limit
@@ -434,15 +391,33 @@ class AppCore {
    }
 
    /**
+    * Metoda načte základní třídy
+    */
+   private function _initBaseClasses() {
+      // exceptions
+//      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+//                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'coreException.class.php');
+//      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+//                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'moduleException.class.php');
+//      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+//                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'dbException.class.php');
+//      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+//                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badClassException.class.php');
+//      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+//                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'badFileException.class.php');
+//      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+//                      . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . 'imageException.class.php');
+      // soubor s globálními funkcemi, které nejsou součástí php, ale časem by mohly být
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'log.class.php'); // loger
+      require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
+                      . 'functions' . DIRECTORY_SEPARATOR . 'functions.php');
+   }
+
+   /**
     * Metoda inicializuje připojení k databázi
     */
    private function _initDb() {
-      try {
-         // inicializace PDO
-         Db_PDO::factory();
-      } catch (PDOException $e) {
-         new CoreErrors($e);
-      }
+      Db_PDO::factory();
    }
 
    /**
@@ -529,9 +504,8 @@ class AppCore {
             require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
                             .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile;
          } else {
+            Log::msg(sprintf(_('Nelze nahrát třídu %s'), $classOrigName), $file);
             return false;
-//            var_dump($file, $classL, $pathDirs, $moduleFile, $pathFull, $pathShort);
-//            trigger_error(_("Chybějící třída").": ".$classOrigName." ".$file." module-file: ".$moduleFile);
          }
 //      }
       //		knihovny pro práci s chybami
@@ -541,18 +515,17 @@ class AppCore {
     * Metoda inicializuje objekty pro práci s hláškami
     */
    private function _initMessagesAndErrors() {
+      if(VVE_DEBUG_LEVEL > 0){
+         error_reporting(-1);
+         ini_set('display_errors', 1);
+      } else {
+         error_reporting(E_ERROR|E_WARNING|E_PARSE);
+         ini_set('display_errors', 0);
+      }
       set_error_handler('CoreErrors::errorHandler');
       //		Vytvoření objektu pro práci se zprávami
       self::$messages = new Messages('session', 'messages', true);
       self::$userErrors = new Messages('session', 'errors');
-   }
-
-   /**
-    * Metoda ověřuje autorizaci přístupu
-    * @deprecated -- odstranit, lze přistupovat přímo přes statické funkceS
-    */
-   private function _initAuth() {
-      self::$auth = new Auth();
    }
 
    /*
@@ -964,6 +937,12 @@ class AppCore {
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
+      // kontrola verze enginu
+      $this->checkCoreVersion();
+      
+      // provedení autorizace
+      Auth::authenticate();
+
       self::$urlRequest = new Url_Request();
       // zapnutí buferu podle výstupu
       Template_Output::factory(self::$urlRequest->getOutputType());

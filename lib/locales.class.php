@@ -127,13 +127,12 @@ class Locales {
     * Metoda nastaví aplikaci pro zvolený jazyk
     */
    public static function selectLang() {
-      $session = new Sessions();
       if(self::$selectLang == null){
          // pokud nebyl jazyk nastaven při prohlížení
-         if($session->isEmpty(self::SESSION_LANG)){
+         if(!isset ($_SESSION[self::SESSION_LANG])){
             // načteme jazyk klienta a zjistíme, jestli existuje mutace aplikace
             self::$selectLang = self::getLangsByClient();
-            $session->add(self::SESSION_LANG, self::$selectLang);
+            $_SESSION[self::SESSION_LANG] = self::$selectLang;
             if(self::$selectLang != self::$defaultLang){
                $link = new Url_Link();
                $link->lang(self::$selectLang)->reload();
@@ -142,7 +141,7 @@ class Locales {
          // jazyk klienta byl zjištěn a nastaven
          else {
             self::$selectLang = self::$defaultLang;
-            $session->add(self::SESSION_LANG, self::$selectLang);
+            $_SESSION[self::SESSION_LANG] = self::$selectLang;
          }
       } else {
          if(!self::isAppLang(self::$selectLang)){
@@ -151,10 +150,10 @@ class Locales {
                   _('Zvolený jazyk není v aplikaci implementován'),1));
          }
          
-         if(self::$selectLang != $session->get(self::SESSION_LANG)){
-            $session->add(self::SESSION_LANG, self::$selectLang);
+         if(self::$selectLang != $_SESSION[self::SESSION_LANG]){
+            $_SESSION[self::SESSION_LANG]= self::$selectLang;
          } else {
-            self::$selectLang = $session->get(self::SESSION_LANG);
+            self::$selectLang = $_SESSION[self::SESSION_LANG];
          }
       }
       // Doplnění jazyků
@@ -222,10 +221,6 @@ class Locales {
          }
       }
       return $retLang;
-   }
-
-   private function shortLangStrings(){
-      
    }
 
    /**

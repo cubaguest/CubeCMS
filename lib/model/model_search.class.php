@@ -21,7 +21,7 @@ class Model_Search extends Model_Db {
     * @return array -- pole modulů
     */
    public function getModules() {
-      $userNameGroup = AppCore::getAuth()->getGroupName();
+      $userNameGroup = Auth::getGroupName();
 
       $sqlSelect = $this->getDb()->select()->table(Db::table(Model_Module::DB_TABLE_MODULES), 'modules')
       ->colums(Db::COLUMN_ALL)
@@ -45,7 +45,7 @@ class Model_Search extends Model_Db {
     * Metoda načte všechny items a zařadí je do modulů s kategorií
     */
    public function getItems() {
-      $userNameGroup = AppCore::getAuth()->getGroupName();
+      $userNameGroup = Auth::getGroupName();
 
       $sqlSelect = $this->getDb()->select()->table(Db::table(Model_Module::DB_TABLE_ITEMS), 'item')
       ->colums(array(Model_Module::COLUMN_ID_MODULE, self::COLUMN_ID_ITEM))

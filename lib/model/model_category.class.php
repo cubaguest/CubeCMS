@@ -62,7 +62,7 @@ class Model_Category extends Model_PDO {
     * @param string $catKey -- (option) klíč kategorie
     */
    public function getCategory($catKey = null) {
-      $userNameGroup = AppCore::getAuth()->getGroupName();
+      $userNameGroup = Auth::getGroupName();
 
       $dbc = new Db_PDO();
       if($catKey != null) {
@@ -81,7 +81,7 @@ class Model_Category extends Model_PDO {
 
          $dbst->bindValue(":catkey", $catKey);
          //$dbst->bindValue(":catkey2", $catKey);
-         $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+         $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
       } else {
             $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
          ." JOIN ".Model_Rights::getRightsTable()." AS rights"
@@ -90,7 +90,7 @@ class Model_Category extends Model_PDO {
          ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
          ." ORDER BY cat.".self::COLUMN_PRIORITY." DESC LIMIT 0, 1");
       
-         $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+         $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
       }
       $dbst->execute();
 
@@ -112,7 +112,7 @@ class Model_Category extends Model_PDO {
              ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
              ." AND (cat.".self::COLUMN_CAT_ID." = :idcat) LIMIT 0, 1");
       $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
-      $dbst->bindValue(':idgrp', AppCore::getAuth()->getGroupId() , PDO::PARAM_INT);
+      $dbst->bindValue(':idgrp', Auth::getGroupId() , PDO::PARAM_INT);
       $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_LangContainer');
       $dbst->execute();
 
@@ -163,7 +163,7 @@ class Model_Category extends Model_PDO {
                     ." AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'"
                     .$whereMenu." AND ".self::COLUMN_URLKEY.'_'.Locales::getLang()." IS NOT NULL)"
                     ." ORDER BY LENGTH(".self::COLUMN_URLKEY."_".Locales::getLang().") DESC");
-            $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+            $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
 
          } else {
             $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS cat"
@@ -316,7 +316,7 @@ class Model_Category extends Model_PDO {
               .' * MATCH(cat.'.$clabel.') AGAINST (:sstring) + MATCH(cat.'.$ctext.') AGAINST (:sstring) DESC');
 
       $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+      $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
       $dbst->bindValue(":rightstr", "r__", PDO::PARAM_STR);
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->execute();

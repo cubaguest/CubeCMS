@@ -91,7 +91,7 @@ class Model_Panel extends Model_PDO {
                  ." WHERE (rights.".Model_Rights::COLUMN_ID_GROUP." = :idgrp AND rights.".Model_Rights::COLUMN_RIGHT." LIKE 'r__')"
                  ." AND (panel.".self::COLUMN_ID_SHOW_CAT." = :idcat)"
                  ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." DESC");
-         $dbst->bindValue(":idgrp",AppCore::getAuth()->getGroupId() , PDO::PARAM_INT);
+         $dbst->bindValue(":idgrp",Auth::getGroupId() , PDO::PARAM_INT);
       } else {
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
          JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat.".Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
