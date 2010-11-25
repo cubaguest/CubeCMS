@@ -84,7 +84,7 @@ class TitlePage_Model_Items extends Model_PDO {
               ." ORDER BY `".self::COLUMN_ORDER."` ASC"
               );
 //      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->bindValue(":idgrp", AppCore::getAuth()->getGroupId(), PDO::PARAM_INT);
+      $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
       $dbst->setFetchMode(PDO::FETCH_OBJ);
 //      var_dump($dbst);flush();
 //      print_r($dbst);flush();
