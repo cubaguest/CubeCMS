@@ -132,6 +132,12 @@ class Model_ORM extends Model_PDO {
             case 'longtext':
             case 'mediumtext':
             case 'char':
+            case 'blob':
+            case 'longblob':
+            case 'mediumblob':
+            case 'tinyblob':
+            case 'binary':
+            case 'varbinary':
                $params['pdoparam'] = PDO::PARAM_STR;
                break;
             case 'bool':
@@ -406,7 +412,7 @@ class Model_ORM extends Model_PDO {
    public function save(Model_ORM_Record $record) {
       $dbc = new Db_PDO();
       $returnPk = $record->getPK();
-      if($record->getPK() != null){
+      if(!$record->isNew()){
          // UPDATE
          $sql = 'UPDATE '.$this->getTableName();
 
@@ -435,8 +441,9 @@ class Model_ORM extends Model_PDO {
             }
          }
          if(empty ($colsStr)) return $returnPk; // žádné změny se neukládájí
-         $dbst = $dbc->prepare($sql.' SET '.  implode(',', $colsStr)
-            .' WHERE `'.$this->pKey.'` = :pkey');
+         $sqlStr = $sql.' SET '.  implode(',', $colsStr).' WHERE `'.$this->pKey.'` = :pkey';
+         $dbst = $dbc->prepare($sqlStr);
+         Log::msg($sqlStr, 'UPDATE', null, 'sql');
 //      var_dump($sql.' SET '.  implode(',', $colsStr) .' WHERE `'.$this->pKey.'` = :pkey');flush();
 
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
@@ -464,7 +471,7 @@ class Model_ORM extends Model_PDO {
          }
          $dbst->execute();
          $returnPk = $record->getPK();
-
+         
       } else {
          // INSERT
          $sql = "INSERT INTO ". $this->getTableName();
@@ -496,7 +503,9 @@ class Model_ORM extends Model_PDO {
                array_push($bindParamStr, ':'.$colname);
             }
          }
-         $dbst = $dbc->prepare($sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')');
+         $sqlStr = $sql.' ('.  implode(',', $colsStr).') VALUES ('.  implode(',', $bindParamStr).')';
+         $dbst = $dbc->prepare($sqlStr);
+         Log::msg($sqlStr, 'INSERT', null, 'sql');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
             if(!isset ($params['lang'])) $params['lang'] = false;
@@ -543,7 +552,7 @@ class Model_ORM extends Model_PDO {
     * @param mixed $pk<p>
     * pKey - hodnota primárního klíče</p>
     * <p>Model_ORM_Record - objekt záznamu</p>
-    * @return bool
+    * @return int -- počet smazaných záznamů
     */
    public function delete($pk = null) {
       $dbc = new Db_PDO();
@@ -558,15 +567,17 @@ class Model_ORM extends Model_PDO {
       } else if(isset ($this->whereBindValues['col'])) {
          $pkValue = $this->whereBindValues['col'];
       }
-      if($pk == null AND $this->where == null){return true;} // pokud není podmínka nemažeme, na smazání kompletní tabulky bude flush()
+      if($pk == null AND $this->where == null){return 0;} // pokud není podmínka nemažeme, na smazání kompletní tabulky bude flush()
 
       $this->createSQLWhere($sql);
-
       $dbst = $dbc->prepare($sql);
+      Log::msg($sql, 'DELETE', null, 'sql');
       $this->bindSQLWhere($dbst);
       $ret = $dbst->execute();
-      $this->deleteRelations($pkValue); // vymazat přidružení
-      return $ret;
+      if(isset ($pkValue)){ // if $pkey is not defined
+         $this->deleteRelations($pkValue); // vymazat přidružení
+      }
+      return $dbst->rowCount();
    }
 
    /*
@@ -630,12 +641,10 @@ class Model_ORM extends Model_PDO {
       if($cond === null) {
          $this->where = null;
          $this->whereBindValues = array();
-      }
-      if($bindValues === null){ // pokud je jenom hodnota bere se primary key
+      } else if($bindValues === null){ // pokud je jenom hodnota bere se primary key
          $bindValues = array('col' => $cond);
          $cond = $this->pKey.' = :col';
-      }
-      if($bindValues != null AND !is_array($bindValues)){
+      } else if($bindValues != null AND !is_array($bindValues)){
          $cond = $cond.' = :col';
          $bindValues = array('col' => $bindValues);
       }

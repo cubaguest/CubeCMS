@@ -103,10 +103,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     * @return bool
     */
    public function isNew() {
-      if($this->pKeyValue == null){
-         return true;
-      }
-      return false;
+      return !$this->fromDb;
    }
 
    public function mapArray($array) {
