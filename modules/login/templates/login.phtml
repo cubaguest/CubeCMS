@@ -18,8 +18,11 @@ $this->addCssFile("style.css");
                <td align="right"><input type="password" name="login_passwd" maxlength="20" id="passwd_panel" size="22" value="" /></td>
             </tr>
             <tr>
-               <td colspan="2" align="right">
+               <td>
                   <a href="<?= $this->link()->route('newPassword') ?>" title="<?= $this->_('Obnovit zapomenuté heslo') ?>"><?= $this->_('Zapomenuté heslo') ?></a>
+               </td>
+               <td colspan="2" align="right">
+                  <label><?=$this->_('trvale')?></label>&nbsp;<input type="checkbox" name="login_permanent" />&nbsp;
                   <input id="login_submit" type="submit" name="login_submit" value="<?= $this->_('Přihlásit'); ?>" />
                </td>
             </tr>
