@@ -9,9 +9,10 @@ class Text_Controller extends Controller {
    const TEXT_PRIVATE_KEY = 'private';
 
    const PARAM_ALLOW_PRIVATE = 'allow_private';
-   const PARAM_ALLOW_WYSIWYG = 'allow_wysiwyg';
+   const PARAM_EDITOR_TYPE = 'editor';
    const PARAM_ALLOW_SCRIPT_IN_TEXT = 'allow_script';
-
+   const PARAM_TPL_MAIN = 'tplmain';
+   const PARAM_TPL_PANEL = 'tplpanel';
 
    /**
  * Kontroler pro zobrazení textu
@@ -41,7 +42,6 @@ class Text_Controller extends Controller {
       $this->view()->text = $text;
 
    }
-
 
    public function contentController() {
       $this->mainController();
@@ -236,18 +236,45 @@ class Text_Controller extends Controller {
       $this->view()->form = $form;
    }
 
-   public function textController() {}
-
    public static function  settingsController(&$settings, Form &$form) {
+      $fGrpViewSet = $form->addGroup('viewSettings', 'Nastavení vzhledu');
+
+      $componentTpls = new Component_ViewTpl();
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'text');
+
+      $elemTplMain = new Form_Element_Select('tplMain', 'Hlavní šablona');
+      $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
+      if(isset($settings[self::PARAM_TPL_MAIN])) {
+         $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
+      }
+      $form->addElement($elemTplMain, $fGrpViewSet);
+
+
+      $elemTplPanel = new Form_Element_Select('tplPanel', 'Šablona panelu');
+      $elemTplPanel->setSubLabel('Šablone nemusí být nastavena pokud panel není zapnut.');
+      $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
+      if(isset($settings[self::PARAM_TPL_PANEL])) {
+         $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
+      }
+      $form->addElement($elemTplPanel, $fGrpViewSet);
+
+      unset ($componentTpls);
+
       $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
 
-      $elemAllowWysiwyg = new Form_Element_Checkbox('allow_wysiwyg', 'Povolit wysiwyg editor');
-      $elemAllowWysiwyg->setValues(true);
-      if(isset($settings[self::PARAM_ALLOW_WYSIWYG])) {
-         $elemAllowWysiwyg->setValues($settings[self::PARAM_ALLOW_WYSIWYG]);
+      $elemEditorType = new Form_Element_Select('editor_type', 'Typ editoru');
+      $elemEditorType->setOptions(array(
+         'žádný (pouze textová oblast)' => 'none',
+         'jednoduchý (Wysiwyg)' => 'simple',
+         'pokročilý (Wysiwyg)' => 'advanced',
+         'kompletní (Wysiwyg)' => 'full'
+      ));
+      $elemEditorType->setValues('advanced');
+      if(isset($settings[self::PARAM_EDITOR_TYPE])) {
+         $elemEditorType->setValues($settings[self::PARAM_EDITOR_TYPE]);
       }
 
-      $form->addElement($elemAllowWysiwyg, $fGrpEditSet);
+      $form->addElement($elemEditorType, $fGrpEditSet);
 
       $elemAllowScripts = new Form_Element_Checkbox('allow_script', 'Povolit scripty v textu');
       $elemAllowScripts->setSubLabel('Umožňuje vkládání javascriptů přímo do textu. POZOR! Lze tak vložit útočníkův kód do stránek. (Filtrují se všechny javascripty.)');
@@ -271,8 +298,10 @@ class Text_Controller extends Controller {
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings[self::PARAM_ALLOW_PRIVATE] = $form->allow_private_zone->getValues();
-         $settings[self::PARAM_ALLOW_WYSIWYG] = $form->allow_wysiwyg->getValues();
+         $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
          $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
+         $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
+         $settings[self::PARAM_TPL_PANEL] = $form->tplPanel->getValues();
       }
    }
 }

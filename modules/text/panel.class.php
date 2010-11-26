@@ -9,7 +9,7 @@ class Text_Panel extends Panel {
       $textM = new Text_Model_Detail();
       $this->template()->text = $textM->getText($this->category()->getId(),self::TEXT_PANEL_KEY);
       if($this->template()->text == false) return false;
-		$this->template()->addTplFile("panel.phtml");
+      $this->template()->addFile('tpl://'.$this->category()->getParam('tplpanel', "panel.phtml"));
 	}
 }
 ?>

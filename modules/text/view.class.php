@@ -6,8 +6,7 @@
 
 class Text_View extends View {
    public function mainView() {
-      $this->template()->addTplFile("text.phtml");
-
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'text.phtml'));
       // text nebyl zadán
       if($this->text == false){
          $this->text = new Object();
@@ -62,60 +61,52 @@ class Text_View extends View {
          $this->template()->toolbox = $toolbox;
       }
    }
-   /*EOF mainView*/
 
    public function contentView() {
       echo (string)$this->text->{Text_Model_Detail::COLUMN_TEXT};
    }
 
    public function editView() {
-      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_WYSIWYG, true) == true){
-         // TinyMCE
-         $this->form->text->html()->addClass("mceEditor");
-         $this->tinyMCE = new Component_TinyMCE();
-         $settings = new Component_TinyMCE_Settings_Advanced();
-         $settings->setSetting('height', '600');
-         $this->tinyMCE->setEditorSettings($settings);
-         $this->tinyMCE->mainView();
-      }
-
+      $this->h1 = sprintf($this->_('úprava textu "%s"'), $this->category()->getName());
+      Template_Core::setPageTitle($this->h1);
+      $this->addTinyMCE();
       $this->template()->addTplFile("textedit.phtml");
    }
 
    public function editPrivateView() {
-      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_WYSIWYG, true) == true){
-         // TinyMCE
-         $this->form->text->html()->addClass("mceEditor");
-         $this->tinyMCE = new Component_TinyMCE();
-         $settings = new Component_TinyMCE_Settings_Advanced();
-         $settings->setSetting('height', '600');
-         $this->tinyMCE->setEditorSettings($settings);
-         $this->tinyMCE->mainView();
-      }
-      $this->template()->addTplFile("textprivateedit.phtml");
+      $this->editView();
+      $this->h1 = sprintf($this->_('úprava privátního textu "%s"'), $this->category()->getName());
+      Template_Core::setPageTitle($this->h1);
    }
 
    public function editPanelView() {
-      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_WYSIWYG, true) == true){
-         // TinyMCE
-         $this->form->text->html()->addClass("mceEditorSimple");
-         $this->tinyMCE = new Component_TinyMCE();
-         $settings = new Component_TinyMCE_Settings_AdvSimple();
-         $this->tinyMCE->setEditorSettings($settings);
-         $this->tinyMCE->mainView();
-      }
-      $this->template()->addTplFile("textpaneledit.phtml");
+      $this->editView();
+      $this->h1 = sprintf($this->_('úprava textu panelu "%s"'), $this->category()->getName());
+      Template_Core::setPageTitle($this->h1);
    }
-   // EOF edittextView
-   public function textHtmlView() {
-      $model = new Text_Model_Detail();
-      $text = $model->getText(Category::getSelectedCategory()->getId());
-      if($text != false) {
-         $text = $text->{Text_Model_Detail::COLUMN_TEXT};
-      } else {
-         $text = $this->_("Text nebyl definován, vytvoříte jej v administraci");
+
+   private function addTinyMCE() {
+      $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
+      if($type == 'none') return;
+      $this->form->text->html()->addClass("mceEditor");
+      $this->tinyMCE = new Component_TinyMCE();
+      switch ($type) {
+         case 'simple':
+            $settings = new Component_TinyMCE_Settings_AdvSimple();
+            $settings->setSetting('editor_selector', 'mceEditor');
+            break;
+         case 'full':
+            // TinyMCE
+            $settings = new Component_TinyMCE_Settings_Full();
+            break;
+         case 'advanced':
+         default:
+            $settings = new Component_TinyMCE_Settings_Advanced();
+            break;
       }
-      print ($text);
+      $settings->setSetting('height', '600');
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
    }
 
    public function exportTextHtmlView() {
