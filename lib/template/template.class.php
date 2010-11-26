@@ -504,33 +504,71 @@ class Template {
    }
 
    /**
-    * Metoda vloží požadovný soubor ze zadanéého zdroje
+    * Metoda pro přímé vložení souvboru do šablony
+    * @param string $res -- zdroj souboru viz. addFile()
+    */
+   public function includeFile($res){
+      $this->addFile($res, true);
+   }
+
+   /**
+    * Metoda vloží požadovný soubor ze zadaného zdroje
     * @param string $resource
     * @todo dodělat a dořešit
+    * Formáty:
+    * tpl://file.phtml -- tpl file from current module
+    * css://file.css -- css file from current module
+    * js://file.js -- javascript file from current module
+    * tpl://module:file.phtml -- tpl file from defined module
+    * css://module:file.css -- css file from defined module
+    * tpl://engine:file.phtml -- tpl file from engine
+    * css://engine:file.css -- css file from engine
+    * http://www.text.com/stylesheets/style.css -- externí css soubor
+    *
+    * Pokud je za souborem parametr "?original" vloží se originální soubor (ne z faces)
     */
-   public function addFile($resource) {
-      /*
-       * Formáty:
-       * tpl://file -- tpl file from current module
-       * css://file -- css file from current module
-       * js://file -- javascript file from current module
-       * tpl://module/file -- tpl file from defined module
-       * css://module/file -- css file from defined module
-       *
-      */
+   public function addFile($resource, $directInclude = false) {
       $matches = array();
-      if(preg_match('/^(?:(?P<res>[a-z]+):\/\/)(?:(?P<module>[a-z.]+)\/)?(?:(?P<file>[a-z.]+))/', $resource, $matches)) {
+      if(preg_match('/^(?P<res>tpl|css|js|http|https):\/\/(?:(?P<module>[a-z_-]+):)?(?P<filepath>(?:[a-z0-9_\/.-]*\/)?(?P<file>[^.]+\.(?P<ext>[^?#]+)))(?:[?#](?P<params>[a-z0-9_.=&#-]+))?$/i', $resource, $matches) == 1) {
+         $original = false;
+         if(isset ($matches['params']) AND $matches['params'] == 'original'){
+            $original == true;
+         }
          switch ($matches['res']) {
             case 'tpl':
-               
+               if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
+                  $filePath = $this->getTplPathFromEngine($matches['file'], $original);
+               } else {
+                  $filePath = $this->getTplPathFromModule($matches['file'], $matches['module'], $original);
+               }
+               if($directInclude == true){
+                  include $filePath;
+               } else {
+                  array_push($this->templateFiles, $filePath);
+               }
                break;
             case 'css':
-            
+               if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
+                  $filePath = $this->getLinkPathFromEngine($matches['file'], self::STYLESHEETS_DIR, $original);
+               } else {
+                  $filePath = $this->getLinkPathFromModule($matches['file'], $matches['module'], self::STYLESHEETS_DIR, $original);
+               }
+               Template::addCss($filePath);
                break;
             case 'js':
-            
+               if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
+                  $filePath = $this->getLinkPathFromEngine($matches['file'], self::JAVASCRIPTS_DIR, $original);
+               } else {
+                  $filePath = $this->getLinkPathFromModule($matches['file'], $matches['module'], self::JAVASCRIPTS_DIR, $original);
+               }
+               Template::addJs($filePath);
                break;
             default:
+               // detekujeme koncovku souboru
+               if(isset ($matches['ext']) AND ($matches['ext'] == 'css' OR $matches['ext'] == 'js')){
+                  $func = 'add'.ucfirst($matches['ext']);
+                  Template::$func($resource);
+               }
                break;
          }
          
@@ -538,6 +576,106 @@ class Template {
          throw new UnexpectedValueException(_('Nepodporovaný typ zdroje'));
       }
    }
+
+   /**
+    * Metoda přidá šablonu z enginu
+    * @param <type> $file
+    * @param <type> $original
+    * @return absolutní cesta k souboru
+    */
+   protected function getTplPathFromEngine($file, $original = false) {
+      $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
+      $faceDir = Template::faceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      $parentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir);
+      $mainDir = AppCore::getAppLibDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+
+      if($original == false AND file_exists($faceDir.$file)){ // soubor z face webu
+         $path = $faceDir.$file;
+      } else if($original == false AND file_exists($parentFaceDir.$file)) { // soubor z nadřazeného face (subdomains)
+         $path = $parentFaceDir.$file;
+      } else if(file_exists($mainDir.$file)) { // soubor v knihovnách
+         $path = $mainDir.$file;
+      } else {
+         throw new Template_Exception(sprintf(_('Soubor "%s %s" nebyl nalezen'), $mainDir, $file));
+      }
+      return $path;
+   }
+   
+   /**
+    * Metoda přidá šablonu z modulu
+    * @param <type> $file
+    * @param <type> $module
+    * @param <type> $original
+    * @return absolutní cesta k souboru
+    */
+   protected function getTplPathFromModule($file, $module, $original = false) {
+      $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
+      $faceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      $parentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir);
+      $mainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+
+      $path = null;
+      if($original == false AND file_exists($faceDir.$file)){ // soubor z face webu
+         $path = $faceDir.$file;
+      } else if($original == false AND file_exists($parentFaceDir.$file)) { // soubor z nadřazeného face (subdomains)
+         $path = $parentFaceDir.$file;
+      } else if(file_exists($mainDir.$file)) { // soubor v knihovnách
+         $path = $mainDir.$file;
+      } else {
+         throw new Template_Exception(sprintf(_('Soubor "%s %s" nebyl nalezen'), $mainDir, $file));
+      }
+      return $path;
+   }
+
+   /**
+    * Metoda vrací cestu k souboru CSS nebo JS
+    * @param <type> $file
+    * @param <type> $type -- typ souboru (jeho adresář) self::STYLESHEETS_DIR nebo self::JAVASCRIPTS_DIR
+    * @param <type> $original
+    */
+   protected function getLinkPathFromEngine($file, $type = self::STYLESHEETS_DIR, $original = false) {
+      $rpFaceDir = Template::faceDir().$type.DIRECTORY_SEPARATOR;
+      $rpParentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $rpFaceDir);
+      $rpMainDir = AppCore::getAppLibDir().$type.DIRECTORY_SEPARATOR;
+      $path = null;
+      if($original == false AND file_exists($rpFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))){ // soubor z face webu
+         $path = Template::face(false).AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+      } else if($original == false AND file_exists($rpParentFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor z nadřazeného face (subdomains)
+         $path = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null,Template::face(false))
+            .AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+      } else if(file_exists($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
+         $path = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+      } else {
+         throw new Template_Exception(sprintf(_('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
+      }
+      return $path;
+   }
+
+   /**
+    * Metoda vrací cestu k souboru CSS nebo JS
+    * @param <type> $file
+    * @param <type> $module
+    * @param <type> $type -- typ souboru (jeho adresář) self::STYLESHEETS_DIR nebo self::JAVASCRIPTS_DIR
+    * @param <type> $original
+    */
+   protected function getLinkPathFromModule($file, $module, $type = self::STYLESHEETS_DIR, $original = false) {
+      $rpFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
+      $rpParentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $rpFaceDir);
+      $rpMainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
+      $path = null;
+      if($original == false AND file_exists($rpFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))){ // soubor z face webu
+         $path = Template::face(false).AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+      } else if($original == false AND file_exists($rpParentFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor z nadřazeného face (subdomains)
+         $path = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null,Template::face(false))
+            .AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+      } else if(file_exists($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
+         $path = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+      } else {
+         throw new Template_Exception(sprintf(_('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
+      }
+      return $path;
+   }
+
 
    /**
     * Metoda vrací všechny proměnné šablony

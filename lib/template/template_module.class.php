@@ -200,6 +200,7 @@ class Template_Module extends Template {
       foreach ($this->templateFiles as $file) {
          if(file_exists($file)){
             try {
+               // jaký modul je vkládán a podle toho se změní locales
                $strpos = strpos($file, 'modules/')+8;
                $module = substr($file, $strpos, strpos($file, "/templates") - $strpos);
                $this->locale()->setDomain($module);
@@ -211,6 +212,16 @@ class Template_Module extends Template {
       }
       $contents = ob_get_clean();
       return $contents;
+   }
+
+   /**
+    * Metoda přidá soubor do šablony
+    * @param <type> $resource
+    * @param <type> $directInclude
+    */
+   public function  addFile($resource, $directInclude = false) {
+      // přidání názvu modulu do tpl pokud tam není
+      parent::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->category()->getModule()->getName().':' , $resource), $directInclude);
    }
 }
 ?>
