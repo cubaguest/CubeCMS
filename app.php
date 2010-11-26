@@ -241,6 +241,10 @@ class AppCore {
 
       // načtení systémového konfiguračního souboru
       $this->_initConfig();
+      //		Inicializace chybových hlášek
+      $this->_initMessagesAndErrors();
+      // kontrola verze enginu
+      $this->checkCoreVersion();
       //		inicializace sessions
       Session::factory();
       //		inicializace URL
@@ -251,8 +255,6 @@ class AppCore {
       Template::factory();
       // výběr jazyka a locales
       Locales::selectLang();
-      //		Inicializace chybových hlášek
-      $this->_initMessagesAndErrors();
       //Spuštění jádra aplikace
       $this->runCore();
    }
@@ -937,8 +939,6 @@ class AppCore {
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
-      // kontrola verze enginu
-      $this->checkCoreVersion();
       
       // provedení autorizace
       Auth::authenticate();
