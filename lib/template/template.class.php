@@ -639,12 +639,12 @@ class Template {
       $rpMainDir = AppCore::getAppLibDir().$type.DIRECTORY_SEPARATOR;
       $path = null;
       if($original == false AND file_exists($rpFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))){ // soubor z face webu
-         $path = Template::face(false).AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+         $path = Template::face(false).AppCore::MODULES_DIR.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
       } else if($original == false AND file_exists($rpParentFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor z nadřazeného face (subdomains)
          $path = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null,Template::face(false))
-            .AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+            .AppCore::MODULES_DIR.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
       } else if(file_exists($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
-         $path = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+         $path = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
       } else {
          throw new Template_Exception(sprintf(_('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
