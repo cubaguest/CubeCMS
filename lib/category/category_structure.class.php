@@ -4,7 +4,7 @@
  *
  * @author jakub
  */
-class Category_Structure implements Iterator {
+class Category_Structure implements Iterator, Countable {
    private $level = 0;
    private $id = null;
    private $idParent = null;
@@ -73,17 +73,25 @@ class Category_Structure implements Iterator {
       return $this->idParent;
    }
 
-   public function getPath($idCat, $retArray = array()) {
+   public function getPath($idCat, $retArray = array(), $onlyId = false) {
       if($this->getId() == $idCat){
-         array_push($retArray, $this);
+         if($onlyId){
+            array_push($retArray, (int)$this->getId());
+         } else {
+            array_push($retArray, $this);
+         }
          return $retArray;
       }
       $newArr = $retArray;
       if($this->getCatObj() !== null){
-         array_push($newArr, $this);
+         if($onlyId){
+            array_push($newArr, (int)$this->getId());
+         } else {
+            array_push($newArr, $this);
+         }
       }
       foreach ($this->childrens as $child) {
-         $ret = $child->getPath($idCat, $newArr);
+         $ret = $child->getPath($idCat, $newArr, $onlyId);
          if($ret !== false){
             return $ret;
          }
