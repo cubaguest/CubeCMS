@@ -349,8 +349,9 @@ class Panels_Controller extends Controller {
       } else {
          $settings = array();
       }
-
+      $settings['_module'] = $cat->{Model_Category::COLUMN_MODULE};
       call_user_func_array($func, array(&$settings, &$form));
+      unset($settings['_module']);
 
       // pokud je formulář prázdný
       if($md5FormEmpty == md5(serialize($form))){
