@@ -349,7 +349,7 @@ class Panels_Controller extends Controller {
       } else {
          $settings = array();
       }
-      $settings['_module'] = $cat->{Model_Category::COLUMN_MODULE};
+      $settings['_module'] = $panel->{Model_Category::COLUMN_MODULE};
       call_user_func_array($func, array(&$settings, &$form));
       unset($settings['_module']);
 
