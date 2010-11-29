@@ -45,7 +45,8 @@ class Component_ViewTpl extends Component {
       if(isset ($this->tpls[$name])){
          return $this->tpls[$name];
       }
-      return array();
+      $arr = array();
+      return $arr;
    }
 
    public function  __isset($name) {
