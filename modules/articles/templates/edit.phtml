@@ -11,11 +11,11 @@ $this->addPageTitle($h);
 $this->form->name->html()->setAttrib('size', 72);
 $this->form->urlkey->html()->setAttrib('size', 72);
 $this->form->metaKeywords->html()->setAttrib('size', 72);
-$this->form->annotation->html()->setAttrib('cols', 70)->setAttrib('rows', 5)->addClass("mceEditorSimple");
+$this->form->annotation->html()->setAttrib('cols', 70)->setAttrib('rows', 5);
 $this->form->metaDesc->html()->setAttrib('cols', 70)->setAttrib('rows', 3);
-$this->form->text->html()->setAttrib('cols', 70)->setAttrib('rows', 30)->addClass("mceEditor");
+$this->form->text->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 if($this->form->haveElement('textPrivate')){
-   $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30)->addClass("mceEditor");
+   $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 }
 
 $tinySimple = new JsPlugin_TinyMce();

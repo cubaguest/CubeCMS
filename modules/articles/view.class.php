@@ -1,7 +1,7 @@
 <?php
 class Articles_View extends View {
    public function mainView() {
-      $this->template()->addTplFile("list.phtml");
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'articles:list.phtml'));
       $this->createListToolbox();
    }
 
@@ -18,7 +18,7 @@ class Articles_View extends View {
    }
 
    public function showView() {
-      $this->template()->addTplFile("detail.phtml", 'articles');
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_DETAIL, 'articles:detail.phtml'));
       if ((string) $this->article->{Articles_Model::COLUMN_KEYWORDS} != null) {
          Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
       }
@@ -39,19 +39,19 @@ class Articles_View extends View {
                       $this->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit článek"), $this->link()->route('edit'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit článek'));
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit položku"), $this->link()->route('edit'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit položku'));
          $toolbox->addTool($toolEdit);
 
          if($this->formPublic instanceof Form){
             $tooldel = new Template_Toolbox2_Tool_Form($this->formPublic);
-            $tooldel->setIcon('page_preview.png')->setTitle($this->_('Zveřejnit článek'));
+            $tooldel->setIcon('page_preview.png')->setTitle($this->_('Zveřejnit položku'));
             $toolbox->addTool($tooldel);
          }
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat článek'))
-            ->setConfirmMeassage($this->_('Opravdu smazat článek?'));
+         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat položku'))
+            ->setConfirmMeassage($this->_('Opravdu smazat položku?'));
          $toolbox->addTool($tooldel);
 
          $this->toolbox = $toolbox;
@@ -72,23 +72,24 @@ class Articles_View extends View {
       if($this->rights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_article', $this->_("Přidat článek"),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_article', $this->_("Přidat položku"),
          $this->link()->route('add'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat nový článek'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou položku'));
          $toolbox->addTool($toolAdd);
          $this->toolbox = $toolbox;
       }
    }
 
    public function archiveView() {
-      $this->template()->addTplFile("archive.phtml",'articles');
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_ARCHIVE, 'articles:archive.phtml'));
    }
 
    /**
     * Viewer pro přidání článku
     */
    public function addView() {
-      $this->template()->addTplFile("edit.phtml", 'articles');
+      $this->addTinyMCE();
+      $this->template()->addFile('tpl://articles:edit.phtml');
    }
 
    /**
@@ -98,8 +99,47 @@ class Articles_View extends View {
       $this->addView();
    }
 
+   private function addTinyMCE() {
+      if($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, 'advanced') == 'none') return;
+      if($this->form->haveElement('text')){
+         $this->form->text->html()->addClass("mceEditor");
+      }
+      if($this->form->haveElement('textPrivate')){
+         $this->form->textPrivate->html()->addClass("mceEditor");
+      }
+      $this->tinyMCE = new Component_TinyMCE();
+      switch ($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, 'advanced')) {
+         case 'simple':
+            $settings = new Component_TinyMCE_Settings_AdvSimple();
+            $settings->setSetting('editor_selector', 'mceEditor');
+            break;
+         case 'full':
+            // TinyMCE
+            $settings = new Component_TinyMCE_Settings_Full();
+            break;
+         case 'advanced':
+         default:
+            $settings = new Component_TinyMCE_Settings_Advanced();
+            break;
+      }
+      $settings->setSetting('height', '600');
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
+      
+      if($this->form->haveElement('annotation')){
+         $this->form->annotation->html()->addClass("mceEditorSimple");
+         $this->tinyMCES = new Component_TinyMCE();
+         $settingsS = new Component_TinyMCE_Settings_AdvSimple();
+         $settingsS->setSetting('editor_selector', 'mceEditorSimple');
+         $this->tinyMCES->setEditorSettings($settingsS);
+         $this->tinyMCES->mainView();
+      }
+
+   }
+
    public function editPrivateView() {
-       $this->template()->addTplFile("editPrivate.phtml", 'articles');
+      $this->addTinyMCE();
+      $this->template()->addFile('tpl://articles:editPrivate.phtml');
    }
 
    public function exportArticlePdfView() {
@@ -193,7 +233,7 @@ class Articles_View extends View {
 
    public function exportArticleHtmlView() {
       Template_Core::setMainIndexTpl(Template_Core::INDEX_PRINT_TEMPLATE);
-      $this->template()->addTplFile('contentdetail.phtml', 'articles');
+      $this->template()->addFile('tpl://articles:contentdetail.phtml');
    }
 
    public function lastListXmlView() {

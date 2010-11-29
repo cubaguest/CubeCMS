@@ -2,26 +2,27 @@
 class Articles_Panel extends Panel {
    const DEFAULT_NUM_ARTICLES = 3;
    const DEFAULT_TYPE = 'list';
+   const PARAM_TPL_PANEL = 'tplpanel';
+
 
    public function panelController() {
-   }
-
-   public function panelView() {
       $artM = new Articles_Model();
       switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
          case 'top':
             $artM->order(array(Articles_Model::COLUMN_SHOWED => Model_ORM::ORDER_ASC));
-            $this->template()->addTplFile('panel_top.phtml');
             break;
          case 'list':
          default:
             $artM->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC));
-            $this->template()->addTplFile('panel.phtml');
             break;
       }
       $this->template()->articles = $artM->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = :pub',
          array('idc' => $this->category()->getId(), 'pub' => true))
          ->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES))->records();
+   }
+
+   public function panelView() {
+      $this->template()->addFile('tpl://'.$this->category()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml'));
       $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
 
@@ -35,8 +36,19 @@ class Articles_Panel extends Panel {
          $form->num->setValues($settings['num']);
       }
 
-      $elemType = new Form_Element_Select('type', 'Typ panelu');
-      $types = array('Seznam' => 'list', 'Seznam - Nejčtenější' => 'top');
+      // šablony
+      $componentTpls = new Component_ViewTpl();
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
+
+      $elemTplPanel = new Form_Element_Select('tplPanel', 'Šablona panelu');
+      $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
+      if(isset($settings[self::PARAM_TPL_PANEL])) {
+         $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
+      }
+      $form->addElement($elemTplPanel, 'basic');
+
+      $elemType = new Form_Element_Select('type', 'Řazení');
+      $types = array('Podle data' => 'list', 'Podle počtu přečtění' => 'top');
       $elemType->setOptions($types);
       $elemType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TYPE, $types).'');
       $form->addElement($elemType,'basic');
@@ -47,6 +59,7 @@ class Articles_Panel extends Panel {
 
       if($form->isValid()) {
          $settings['num'] = $form->num->getValues();
+         $settings[self::PARAM_TPL_PANEL] = $form->tplPanel->getValues();
          // protože je vždy hodnota
          if($form->type->getValues() != self::DEFAULT_TYPE){
             $settings['type'] = $form->type->getValues();

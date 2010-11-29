@@ -4,7 +4,7 @@
  */
 class Articles_Model extends Model_ORM {
    const DB_TABLE = 'articles';
-   const DB_TABLE_ART_HAS_PRIVATE_USERS = 'articles_has_private_users';
+   const DB_TABLE_ART_HAS_PRIVATE_USERS = 'articles_has_private_users'; // @deprecated use Articles_Model_PrivateUsers::getTableName()
 
 /**
  * Názvy sloupců v databázi

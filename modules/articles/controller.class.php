@@ -5,6 +5,11 @@ class Articles_Controller extends Controller {
 
    const PARAM_SORT = 'sort';
    const PARAM_PRIVATE_ZONE = 'private';
+   const PARAM_EDITOR_TYPE = 'editor';
+
+   const PARAM_TPL_LIST = 'tpllist';
+   const PARAM_TPL_DETAIL = 'tpldet';
+   const PARAM_TPL_ARCHIVE = 'tplarchive';
 
    const DEFAULT_SORT = 'date';
 
@@ -53,6 +58,14 @@ class Articles_Controller extends Controller {
             $this->link()->rmParam(Articles_Routes::URL_PARAM_SORT);
             break;
       }
+
+      if($this->category()->getParam('scroll', self::DEFAULT_ARTICLES_IN_PAGE) == 0){
+         $numRows = 1000;
+      } else {
+         $numRows = $scrollComponent->getRecordsOnPage();
+      }
+
+
       $articles = $artModel->join('t_usr', array(Model_Users::COLUMN_USERNAME))->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
 
       $this->view()->scrollComp = $scrollComponent;
@@ -164,25 +177,25 @@ class Articles_Controller extends Controller {
          $feId->setValues($this->view()->article->{Articles_Model::COLUMN_ID});
          $deleteForm->addElement($feId);
 
-         $feSubmit = new Form_Element_Submit('delete', $this->_('Smazat článek'));
+         $feSubmit = new Form_Element_Submit('delete', $this->_('Smazat položku'));
          $deleteForm->addElement($feSubmit);
 
          if($deleteForm->isValid()) {
             $this->deleteArticle($deleteForm->id->getValues());
-            $this->infoMsg()->addMessage($this->getOption('deleteMsg', $this->_('Článek byl smazán')));
+            $this->infoMsg()->addMessage($this->getOption('deleteMsg', $this->_('Položka byl smazán')));
             $this->link()->route()->rmParam()->reload();
          }
          $this->view()->formDelete = $deleteForm;
 
          if($this->view()->article->{Articles_Model::COLUMN_PUBLIC} == false){
             $formPublic = new Form('art_pub_');
-            $feSubmit = new Form_Element_Submit('public', $this->_('Zveřejnit článek'));
+            $feSubmit = new Form_Element_Submit('public', $this->_('Zveřejnit položku'));
             $formPublic->addElement($feSubmit);
             if($formPublic->isValid()){
                $record = $artM->record($this->view()->article->{Articles_Model::COLUMN_ID});
                $record->{Articles_Model::COLUMN_PUBLIC} = true;
                $artM->save($record);
-               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->_('Článek byl zveřejněn')));
+               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->_('položka byla zveřejněna')));
                $this->link()->reload();
             }
             $this->view()->formPublic = $formPublic;
@@ -579,16 +592,60 @@ class Articles_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    public static function settingsController(&$settings,Form &$form) {
-      $form->addGroup('basic', 'Základní nastavení');
+      $fGrpView = $form->addGroup('view', 'Nastavení vzhledu');
 
-      $elemScroll = new Form_Element_Text('scroll', 'Počet článků na stránku');
-      $elemScroll->setSubLabel('Výchozí: '.self::DEFAULT_ARTICLES_IN_PAGE.' článků');
+      $elemScroll = new Form_Element_Text('scroll', 'Počet položek na stránku');
+      $elemScroll->setSubLabel('Výchozí: '.self::DEFAULT_ARTICLES_IN_PAGE.' položek. Pokud je zadána 0 budou vypsány všechny položky');
       $elemScroll->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemScroll,'basic');
+      $form->addElement($elemScroll, $fGrpView);
 
       if(isset($settings['scroll'])) {
          $form->scroll->setValues($settings['scroll']);
       }
+      
+      // šablony
+      $componentTpls = new Component_ViewTpl();
+
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
+
+      $elemTplList = new Form_Element_Select('tplList', 'Šablona seznamu');
+      $elemTplList->setOptions(array_flip($componentTpls->getTpls('list')));
+      if(isset($settings[self::PARAM_TPL_LIST])) {
+         $elemTplList->setValues($settings[self::PARAM_TPL_LIST]);
+      }
+      $form->addElement($elemTplList, $fGrpView);
+
+      $elemTplDetail = new Form_Element_Select('tplDetail', 'Šablona detailu');
+      $elemTplDetail->setOptions(array_flip($componentTpls->getTpls('detail')));
+      if(isset($settings[self::PARAM_TPL_DETAIL])) {
+         $elemTplDetail->setValues($settings[self::PARAM_TPL_DETAIL]);
+      }
+      $form->addElement($elemTplDetail, $fGrpView);
+
+      $elemTplArchive = new Form_Element_Select('tplArchive', 'Šablona archivu');
+      $elemTplArchive->setOptions(array_flip($componentTpls->getTpls('archive')));
+      if(isset($settings[self::PARAM_TPL_ARCHIVE])) {
+         $elemTplArchive->setValues($settings[self::PARAM_TPL_ARCHIVE]);
+      }
+      $form->addElement($elemTplArchive, $fGrpView);
+
+      unset ($componentTpls);
+
+      $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
+
+      $elemEditorType = new Form_Element_Select('editor_type', 'Typ editoru');
+      $elemEditorType->setOptions(array(
+         'žádný (pouze textová oblast)' => 'none',
+         'jednoduchý (Wysiwyg)' => 'simple',
+         'pokročilý (Wysiwyg)' => 'advanced',
+         'kompletní (Wysiwyg)' => 'full'
+      ));
+      $elemEditorType->setValues('advanced');
+      if(isset($settings[self::PARAM_EDITOR_TYPE])) {
+         $elemEditorType->setValues($settings[self::PARAM_EDITOR_TYPE]);
+      }
+
+      $form->addElement($elemEditorType, $fGrpEditSet);
 
       $form->addGroup('discussion', 'Diskuse');
 
@@ -612,7 +669,7 @@ class Articles_Controller extends Controller {
        $form->addElement($elemCommentsClosed, 'discussion');
 
       $fGrpPrivate = $form->addGroup('privateZone', 'Privátní zóna', "Privátní zóna povoluje
-         vložení textů, které jsou viditelné pouze vybraným uživatelům. U každého článku tak
+         vložení textů, které jsou viditelné pouze vybraným uživatelům. U každé položky tak
          vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům.");
 
       $elemAllowPrivateZone = new Form_Element_Checkbox('allow_private_zone',
@@ -629,6 +686,9 @@ class Articles_Controller extends Controller {
          $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
          $settings['discussion_closed'] = $form->discussion_closed->getValues();
          $settings[self::PARAM_PRIVATE_ZONE] = (bool)$form->allow_private_zone->getValues();
+         $settings[self::PARAM_TPL_LIST] = $form->tplList->getValues();
+         $settings[self::PARAM_TPL_DETAIL] = $form->tplDetail->getValues();
+         $settings[self::PARAM_TPL_ARCHIVE] = $form->tplArchive->getValues();
       }
    }
 }

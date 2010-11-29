@@ -24,7 +24,7 @@ $this->addJsPlugin($jQuery);
             ?>
             <li class="main-content-archive-item">
                <a href="<?= $this->link()->route('detail', array('urlkey' => $row->{Articles_Model::COLUMN_URLKEY})) ?>"
-                  title="<?= htmlspecialchars($title)?>"><?= $row->{Articles_Model::COLUMN_NAME} ?></a>&nbsp;&nbsp;<span class="main-content-archive-dateadd">(<?=vve_date("%x", $date);?>)</span>
+                  title="<?= htmlspecialchars($title)?>"><?=htmlspecialchars($row->{Articles_Model::COLUMN_NAME});?></a>&nbsp;&nbsp;<span class="main-content-archive-dateadd">(<?=vve_date("%x", $date);?>)</span>
             </li>
             <? } ?>
       </ul>
