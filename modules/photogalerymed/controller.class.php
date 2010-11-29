@@ -179,7 +179,7 @@ class Photogalerymed_Controller extends Articles_Controller {
       $elemImgList = new Form_Element_Text('imagesinlist', 'Počet obrázků v seznamu');
       $elemImgList->setSubLabel('Výchozí: '.self::DEFAULT_IMAGES_IN_LIST.' obrázků');
       $elemImgList->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemImgList,'basic');
+      $form->addElement($elemImgList,'view');
 
       if(isset($settings['imagesinlist'])) {
          $form->imagesinlist->setValues($settings['imagesinlist']);

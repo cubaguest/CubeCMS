@@ -9,15 +9,11 @@ class Photogalerymed_View extends Articles_View {
          $this->toolbox->add_article->setLabel($this->_('Přidat galerii'));
          $this->toolbox->add_article->setTitle($this->_('Přidat novou galerii'));
       }
-      $this->template()->addTplFile("list.phtml");
-   }
-
-   public function contentView() {
-      $this->template()->addTplFile("contentlist.phtml");
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalerymed_Controller::PARAM_TPL_LIST, 'list.phtml'));
    }
 
    public function edittextView() {
-      $this->template()->addTplFile("edittext.phtml");
+      $this->template()->addFile('tpl://edittext.phtml');
    }
 
    public function showView() {
@@ -35,22 +31,22 @@ class Photogalerymed_View extends Articles_View {
          $toolbox->addTool($tool);
          $this->toolboxImages = $toolbox;
       }
-      $this->template()->addTplFile("detail.phtml");
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalerymed_Controller::PARAM_TPL_DETAIL, 'detail.phtml'));
    }
 
    public function addView() {
-      $this->template()->addTplFile('edittext.phtml');
+      $this->editView();
    }
 
    public function editphotosView() {
       $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
               ." - ".$this->_('úprava obrázků'));
-      $this->template()->addTplFile('addimage.phtml', 'photogalery');
-      $this->template()->addTplFile('editphotos.phtml', 'photogalery');
+      $this->template()->addFile('tpl://photogalery:addimage.phtml');
+      $this->template()->addFile('tpl://photogalery:editphotos.phtml');
    }
 
    public function editphotoView() {
-      $this->template()->addTplFile("editphoto.phtml", 'photogalery');
+      $this->template()->addFile('tpl://photogalery:editphoto.phtml');
    }
 
    protected function createPdf() {
@@ -111,7 +107,7 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function exportArticleHtmlView() {
-      $this->template()->addTplFile('contentdetail.phtml');
+      $this->template()->addFile('tpl://contentdetail.phtml');
    }
 }
 
