@@ -248,16 +248,6 @@ class Text_Controller extends Controller {
          $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
       }
       $form->addElement($elemTplMain, $fGrpViewSet);
-
-
-      $elemTplPanel = new Form_Element_Select('tplPanel', 'Šablona panelu');
-      $elemTplPanel->setSubLabel('Šablone nemusí být nastavena pokud panel není zapnut.');
-      $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
-      if(isset($settings[self::PARAM_TPL_PANEL])) {
-         $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
-      }
-      $form->addElement($elemTplPanel, $fGrpViewSet);
-
       unset ($componentTpls);
 
       $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
@@ -301,7 +291,6 @@ class Text_Controller extends Controller {
          $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
          $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
          $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
-         $settings[self::PARAM_TPL_PANEL] = $form->tplPanel->getValues();
       }
    }
 }
