@@ -88,6 +88,7 @@ class Articles_View extends View {
     * Viewer pro přidání článku
     */
    public function addView() {
+      Template_Module::setEdit(true);
       $this->addTinyMCE();
       $this->template()->addFile('tpl://articles:edit.phtml');
    }
@@ -138,6 +139,7 @@ class Articles_View extends View {
    }
 
    public function editPrivateView() {
+      Template_Module::setEdit(true);
       $this->addTinyMCE();
       $this->template()->addFile('tpl://articles:editPrivate.phtml');
    }

@@ -23,6 +23,7 @@ class Photogalery_View extends View {
    }
 
    public function editphotosView() {
+      Template_Module::setEdit(true);
       $this->template()->addPageTitle($this->_('úprava obrázků'));
       $this->template()->addPageHeadline($this->_('úprava obrázků'));
 
@@ -40,6 +41,7 @@ class Photogalery_View extends View {
    }
 
    public function editphotoView() {
+      Template_Module::setEdit(true);
       $this->template()->addTplFile("editphoto.phtml");
    }
 }

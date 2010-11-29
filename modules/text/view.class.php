@@ -67,6 +67,7 @@ class Text_View extends View {
    }
 
    public function editView() {
+      Template_Module::setEdit(true);
       $this->h1 = sprintf($this->_('úprava textu "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
       $this->addTinyMCE();

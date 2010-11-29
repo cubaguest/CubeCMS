@@ -13,6 +13,7 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function edittextView() {
+      Template_Module::setEdit(true);
       $this->template()->addFile('tpl://edittext.phtml');
    }
 
@@ -39,6 +40,7 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function editphotosView() {
+      Template_Module::setEdit(true);
       $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
               ." - ".$this->_('úprava obrázků'));
       $this->template()->addFile('tpl://photogalery:addimage.phtml');
@@ -46,6 +48,7 @@ class Photogalerymed_View extends Articles_View {
    }
 
    public function editphotoView() {
+      Template_Module::setEdit(true);
       $this->template()->addFile('tpl://photogalery:editphoto.phtml');
    }
 
