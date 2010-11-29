@@ -27,6 +27,12 @@ class Template_Module extends Template {
    private $category = null;
 
    /**
+    * Jestli je daná stránka editační
+    * @var bool
+    */
+   private static $isEdidting = false;
+
+   /**
     * KOnstruktor vytvoří objekt šablony pro modul
     * @param Url_Link_Module $link -- objekt odkazu
     * @param Category $category -- objekt kategorie
@@ -222,6 +228,22 @@ class Template_Module extends Template {
    public function  addFile($resource, $directInclude = false) {
       // přidání názvu modulu do tpl pokud tam není
       parent::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->category()->getModule()->getName().':' , $resource), $directInclude);
+   }
+
+   /**
+    * Metoda vrací jestli se daná stránka edituje
+    * @return bool
+    */
+   public static function isEdit() {
+      return self::$isEdidting;
+   }
+
+   /**
+    * Metoda nastavuje jestli se edituje
+    * @param bool $edit -- true pro zapnutí
+    */
+   public static function setEdit($edit = false) {
+      self::$isEdidting = $edit;
    }
 }
 ?>
