@@ -33,7 +33,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    public function  __set($collName, $value) {
       // kontrola jestli byla provedena změna
       if(isset ($this->columns[$collName]) AND $this->columns[$collName]['changed'] != 0) {
-         if((is_object($value) AND spl_object_hash($value) == spl_object_hash($this->columns[$collName]['value']))
+         if((is_object($value) AND is_object($this->columns[$collName]['value']) AND spl_object_hash($value) == spl_object_hash($this->columns[$collName]['value']))
             OR $value == $this->columns[$collName]['value']){
             return;
          }
