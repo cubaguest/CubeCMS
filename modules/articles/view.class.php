@@ -27,6 +27,9 @@ class Articles_View extends View {
       } else if ((string) $this->article->{Articles_Model::COLUMN_ANNOTATION} != null) {
          Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_ANNOTATION});
       }
+      if($this->category()->getParam(Articles_Controller::PARAM_DISABLE_LIST, false)){ // pokud není list přidáme tlačítko pro přidání položky
+         $this->createListToolbox();
+      }
       $this->createDetailToolbox();
    }
 
@@ -37,24 +40,25 @@ class Articles_View extends View {
       if($this->category()->getRights()->isControll() OR
               ($this->category()->getRights()->isWritable() AND
                       $this->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         if(($this->toolbox instanceof Template_Toolbox2) == false){
+            $this->toolbox = new Template_Toolbox2();
+         }
+
+         $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit položku"), $this->link()->route('edit'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit položku'));
-         $toolbox->addTool($toolEdit);
+         $this->toolbox->addTool($toolEdit);
 
          if($this->formPublic instanceof Form){
             $tooldel = new Template_Toolbox2_Tool_Form($this->formPublic);
             $tooldel->setIcon('page_preview.png')->setTitle($this->_('Zveřejnit položku'));
-            $toolbox->addTool($tooldel);
+            $this->toolbox->addTool($tooldel);
          }
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat položku'))
             ->setConfirmMeassage($this->_('Opravdu smazat položku?'));
-         $toolbox->addTool($tooldel);
-
-         $this->toolbox = $toolbox;
+         $this->toolbox->addTool($tooldel);
 
          if($this->category()->getParam(Articles_Controller::PARAM_PRIVATE_ZONE, false) == true){
             $toolboxP = new Template_Toolbox2();
@@ -70,13 +74,12 @@ class Articles_View extends View {
 
    protected function createListToolbox() {
       if($this->rights()->isWritable()) {
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
+         $this->toolbox = new Template_Toolbox2();
+         $this->toolbox->setIcon(Template_Toolbox2::ICON_ADD);
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_article', $this->_("Přidat položku"),
          $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou položku'));
-         $toolbox->addTool($toolAdd);
-         $this->toolbox = $toolbox;
+         $this->toolbox->addTool($toolAdd);
       }
    }
 

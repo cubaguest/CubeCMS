@@ -22,6 +22,21 @@ echo $this->toolbox;
       /* ]]> */
    </script>
    <?$this->includeTpl("buttonback.phtml", true);?><br />
+   <?if($this->articles != null){?>
+   <form name="gotoart" action="<?=$this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
+      <p>
+         <label><?=$this->_('Přejít na')?></label>
+         <select id="gotoArtLinkSel">
+            <?foreach ($this->articles as $article) {?>
+            <option value="<?=$this->link()->route('detail', array('urlkey' => (string)$article->{Articles_Model::COLUMN_URLKEY}));?>">
+            <?=vve_tpl_truncate((string)$article->{Articles_Model::COLUMN_NAME}, 100)?>
+            </option>
+            <?}?>
+         </select>
+         <input type="submit" value="<?=$this->_('Přejít')?>" />
+      </p>
+   </form>
+   <?}?>
    <?
    $this->includeTpl('articletools.phtml', true, array(
       'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},

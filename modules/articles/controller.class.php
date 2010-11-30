@@ -6,6 +6,7 @@ class Articles_Controller extends Controller {
    const PARAM_SORT = 'sort';
    const PARAM_PRIVATE_ZONE = 'private';
    const PARAM_EDITOR_TYPE = 'editor';
+   const PARAM_DISABLE_LIST = 'dislist';
 
    const PARAM_TPL_LIST = 'tpllist';
    const PARAM_TPL_DETAIL = 'tpldet';
@@ -37,11 +38,15 @@ class Articles_Controller extends Controller {
             array('idusr' => Auth::getUserId(), 'idc' => $this->category()->getId()));
       }
 
-      $scrollComponent = new Component_Scroll();
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $artModel->count());
+      $numRows = 0;
+      $scrollComponent = null;
+      if($this->category()->getParam('scroll', self::DEFAULT_ARTICLES_IN_PAGE) != 0){
+         $scrollComponent = new Component_Scroll();
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $artModel->count());
 
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
               $this->category()->getParam('scroll', self::DEFAULT_ARTICLES_IN_PAGE));
+      }
 
       // order
       switch ($this->getRequestParam(Articles_Routes::URL_PARAM_SORT, $this->category()->getParam(self::PARAM_SORT, self::DEFAULT_SORT))) {
@@ -59,17 +64,20 @@ class Articles_Controller extends Controller {
             break;
       }
 
-      if($this->category()->getParam('scroll', self::DEFAULT_ARTICLES_IN_PAGE) == 0){
-         $numRows = 1000;
-      } else {
-         $numRows = $scrollComponent->getRecordsOnPage();
+      $artModel->join('t_usr', array(Model_Users::COLUMN_USERNAME));
+      if($scrollComponent instanceof Component_Scroll){
+         $artModel->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
 
-
-      $articles = $artModel->join('t_usr', array(Model_Users::COLUMN_USERNAME))->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
-
       $this->view()->scrollComp = $scrollComponent;
-      $this->view()->articles = $articles;
+      $this->view()->articles = $artModel->records();
+
+      // pokud je seznam vypnut provede se redirect na detail prvního článku
+      if($this->routes()->getActionName() == 'main' AND $this->category()->getParam(self::PARAM_DISABLE_LIST, false) AND $this->view()->articles != false){
+         $first = reset($this->view()->articles);
+         $this->link()->route('detail', array('urlkey' => (string)$first->{Articles_Model::COLUMN_URLKEY}))->reload();
+      }
+
       // odkaz zpět
       $this->link()->backInit();
    }
@@ -239,6 +247,11 @@ class Articles_Controller extends Controller {
                array('idA' => $article->{Articles_Model::COLUMN_ID}, 'idU' => Auth::getUserId()))->record() != false){
             $this->view()->privateText = true;
          }
+      }
+
+      // seznam pokud není list
+      if($this->category()->getParam(self::PARAM_DISABLE_LIST, false)){
+         $this->mainController();
       }
    }
 
@@ -602,6 +615,18 @@ class Articles_Controller extends Controller {
       if(isset($settings['scroll'])) {
          $form->scroll->setValues($settings['scroll']);
       }
+      // řazení
+      $elemSort = new Form_Element_Select('sort', 'Řadit podle');
+      $elemSort->setOptions(array(
+         'Času přidání' => self::SORT_DATE,
+         'Abecedy' => self::SORT_ALPHABET,
+         'Počtu zhlédnutí' => self::SORT_TOP
+      ));
+      if(isset($settings[self::PARAM_SORT])) {
+         $elemSort->setValues($settings[self::PARAM_SORT]);
+      }
+      $form->addElement($elemSort, $fGrpView);
+
       
       // šablony
       $componentTpls = new Component_ViewTpl();
@@ -631,6 +656,13 @@ class Articles_Controller extends Controller {
 
       unset ($componentTpls);
 
+      $elemDisableList = new Form_Element_Checkbox('disableList', 'Vypnout úvodní seznam');
+      $elemDisableList->setSubLabel('Pokud je list vypnut, stránka je automaticky přesměrována na první položku. V detailu je pak načten seznam položek.');
+      if(isset($settings[self::PARAM_DISABLE_LIST])) {
+         $form->disableList->setValues($settings[self::PARAM_DISABLE_LIST]);
+      }
+      $form->addElement($elemDisableList, $fGrpView);
+
       $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
 
       $elemEditorType = new Form_Element_Select('editor_type', 'Typ editoru');
@@ -644,7 +676,6 @@ class Articles_Controller extends Controller {
       if(isset($settings[self::PARAM_EDITOR_TYPE])) {
          $elemEditorType->setValues($settings[self::PARAM_EDITOR_TYPE]);
       }
-
       $form->addElement($elemEditorType, $fGrpEditSet);
 
       $form->addGroup('discussion', 'Diskuse');
@@ -682,6 +713,8 @@ class Articles_Controller extends Controller {
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scroll'] = $form->scroll->getValues();
+         $settings[self::PARAM_SORT] = $form->sort->getValues();
+         $settings[self::PARAM_DISABLE_LIST] = $form->disableList->getValues();
          $settings['discussion_allow'] = $form->discussion_allow->getValues();
          $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
          $settings['discussion_closed'] = $form->discussion_closed->getValues();
