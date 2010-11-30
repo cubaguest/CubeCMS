@@ -65,7 +65,7 @@ class Component_ViewTpl extends Component {
          include_once Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
             .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
       }
-      if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)})
+      if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)}) AND empty ($this->tpls)
          AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
          .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor s modulu
          include_once AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
