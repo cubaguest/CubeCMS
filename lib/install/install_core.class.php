@@ -62,7 +62,7 @@ class Install_Core {
          $modelCfg->saveCfg('VERSION', number_format((float)$currentVer+0.1,1,'.',''));
       }
 
-      AppCore::getInfoMessages()->addMessage(sprintf(_('Jádro bylo aktualizováno na verzi %s revize %s'),number_format((float)AppCore::ENGINE_VERSION,1,'.',''), 1));
+      echo(sprintf(_('Jádro bylo aktualizováno na verzi %s revize %s'),number_format((float)AppCore::ENGINE_VERSION,1,'.',''), 1));
       // reload nové verze
       $link = new Url_Link(true);
       $link->clear(true)->reload();
@@ -97,7 +97,7 @@ class Install_Core {
       }
 
 
-      AppCore::getInfoMessages()->addMessage(sprintf(_('Jádro bylo aktualizováno na revizi %s verze %s'), AppCore::ENGINE_REVISION, number_format((float)AppCore::ENGINE_VERSION,1,'.','')));
+      echo sprintf(_('Jádro bylo aktualizováno na revizi %s verze %s'), AppCore::ENGINE_REVISION, number_format((float)AppCore::ENGINE_VERSION,1,'.',''));
       // reload nové verze
       $link = new Url_Link(true);
       $link->clear(true)->reload();

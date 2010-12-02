@@ -241,12 +241,12 @@ class AppCore {
 
       // načtení systémového konfiguračního souboru
       $this->_initConfig();
-      //		Inicializace chybových hlášek
-      $this->_initMessagesAndErrors();
       // kontrola verze enginu
       $this->checkCoreVersion();
       //		inicializace sessions
       Session::factory();
+      //		Inicializace chybových hlášek
+      $this->_initMessagesAndErrors();
       //		inicializace URL
       Url_Request::factory();
       //inicializace lokalizace
@@ -385,6 +385,9 @@ class AppCore {
       date_default_timezone_set('Europe/Prague');
       // nastavení mb kodování na UTF protože celá aplikace pracuje s UTF
       mb_internal_encoding("UTF-8");
+      iconv_set_encoding('input_encoding', 'UTF-8');
+      iconv_set_encoding('output_encoding', 'UTF-8');
+      iconv_set_encoding('internal_encoding', 'UTF-8');
       // max upload Limit
       $max_upload = (int)(ini_get('upload_max_filesize'));
       $max_post = (int)(ini_get('post_max_size'));
@@ -455,7 +458,7 @@ class AppCore {
          $settings = new Model_Config();
          $settings->saveCfg('VERSION', self::ENGINE_VERSION, Model_Config::TYPE_STRING, 'Verze jádra', true);
          $link = new Url_Link(true);
-         self::getInfoMessages()->addMessage(_('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!'));
+         echo ('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!');
          $link->clear(true)->reload();
       } else {
       }
