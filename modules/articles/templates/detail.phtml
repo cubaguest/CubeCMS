@@ -21,7 +21,6 @@ echo $this->toolbox;
       $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
       /* ]]> */
    </script>
-   <?$this->includeTpl("buttonback.phtml", true);?><br />
    <?if($this->articles != null){?>
    <form name="gotoart" action="<?=$this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
       <p>
@@ -36,8 +35,10 @@ echo $this->toolbox;
          <input type="submit" value="<?=$this->_('Přejít')?>" />
       </p>
    </form>
-   <?}?>
-   <?
+   <?} else {
+      $this->includeTpl("buttonback.phtml", true);
+   }
+   echo "<br />";
    $this->includeTpl('articletools.phtml', true, array(
       'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
               'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},

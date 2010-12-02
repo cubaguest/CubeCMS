@@ -659,7 +659,7 @@ class Articles_Controller extends Controller {
       $elemDisableList = new Form_Element_Checkbox('disableList', 'Vypnout úvodní seznam');
       $elemDisableList->setSubLabel('Pokud je list vypnut, stránka je automaticky přesměrována na první položku. V detailu je pak načten seznam položek.');
       if(isset($settings[self::PARAM_DISABLE_LIST])) {
-         $form->disableList->setValues($settings[self::PARAM_DISABLE_LIST]);
+         $elemDisableList->setValues($settings[self::PARAM_DISABLE_LIST]);
       }
       $form->addElement($elemDisableList, $fGrpView);
 
