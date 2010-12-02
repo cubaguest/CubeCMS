@@ -155,11 +155,16 @@ class Categories_Controller extends Controller {
          }
       }
 
-      // přidání checkboxu pro odstranění ikony
+      // přidání checkboxu pro odstranění ikony a pozadí
       if($cat->{Model_Category::COLUMN_ICON} != null) {
          $elemDelIcon = new Form_Element_Checkbox('delete_icon', $this->_('Smazat ikonu'));
          $elemDelIcon->setSubLabel($this->_('Nahrán soubor:')." ".$cat->{Model_Category::COLUMN_ICON});
          $form->addElement($elemDelIcon, 'settings');
+      }
+      if($cat->{Model_Category::COLUMN_BACKGROUND} != null) {
+         $elemDelBack = new Form_Element_Checkbox('delete_background', $this->_('Smazat pozadí'));
+         $elemDelBack->setSubLabel($this->_('Nahrán soubor:')." ".$cat->{Model_Category::COLUMN_BACKGROUND});
+         $form->addElement($elemDelBack, 'settings');
       }
 
       if($form->isSend() AND $form->send->getValues() == false){
@@ -227,14 +232,28 @@ class Categories_Controller extends Controller {
          $icon = $cat->{Model_Category::COLUMN_ICON};
          if($icon != null AND ($form->icon->getValues() != null OR
                          ($form->haveElement('delete_icon') AND $form->delete_icon->getValues() == true))) {
-            $file = new Filesystem_File($cat->{Model_Category::COLUMN_ICON},
+            $file = new Filesystem_File($cat->{Model_Category::COLUMN_BACKGROUND},
                     AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                            .Category::CATEGORY_ICONS_DIR.DIRECTORY_SEPARATOR);
+                            .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
             $file->delete();
          }
          if($form->icon->getValues() != null) {
             $f = $form->icon->getValues();
             $icon = $f['name'];
+         }
+
+         // background
+         $background = $cat->{Model_Category::COLUMN_BACKGROUND};
+         if($background != null AND ($form->background->getValues() != null OR
+                         ($form->haveElement('delete_background') AND $form->delete_background->getValues() == true))) {
+            $file = new Filesystem_File($cat->{Model_Category::COLUMN_BACKGROUND},
+                    AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
+                            .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
+            $file->delete();
+         }
+         if($form->background->getValues() != null) {
+            $f = $form->background->getValues();
+            $background = $f['name'];
          }
 
          // kategorie
@@ -244,7 +263,7 @@ class Categories_Controller extends Controller {
                  $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
                  $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
                  $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds, $datadir, $icon);
+                 $form->rights_default->getValues(), $feeds, $datadir, $icon, $background);
 
          // práva
          $usrModel = new Model_Users();
@@ -345,6 +364,11 @@ class Categories_Controller extends Controller {
             $f = $form->icon->getValues();
             $icon = $f['name'];
          }
+         $background = null;
+         if($form->background->getValues() != null) {
+            $f = $form->background->getValues();
+            $background = $f['name'];
+         }
 
          // pokud není datadir tak jej nastavíme
 //         $datadir = vve_cr_safe_file_name($form->datadir->getValues());
@@ -364,7 +388,7 @@ class Categories_Controller extends Controller {
                  $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
                  $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
                  $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds, $dataDir,$icon);
+                 $form->rights_default->getValues(), $feeds, $dataDir,$icon,$background);
 
          // práva
          $usrModel = new Model_Users();
@@ -503,9 +527,15 @@ class Categories_Controller extends Controller {
 
       $elemIcon = new  Form_Element_File('icon', $this->_('Ikona'));
       $elemIcon->setUploadDir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-              .Category::CATEGORY_ICONS_DIR.DIRECTORY_SEPARATOR);
+              .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
       $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemIcon,'settings');
+
+      $elemBackImage = new  Form_Element_File('background', $this->_('Pozadí'));
+      $elemBackImage->setUploadDir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
+              .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
+      $elemBackImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
+      $form->addElement($elemBackImage,'settings');
 
       // práva
       $form->addGroup('rights', $this->_('Práva'), $this->_('Nastavení práv ke kategorii'));

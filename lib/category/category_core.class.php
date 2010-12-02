@@ -15,7 +15,7 @@ class Category_Core {
    /**
     * Název adresáře s ikonou kategorie
     */
-   const CATEGORY_ICONS_DIR = 'categories/icons';
+   const CATEGORY_IMAGES_DIR = 'categories/images';
 /**
  * Odělovač parametrů v pramaterech kategorie
  * @var string
@@ -220,7 +220,15 @@ class Category_Core {
     * @return string
     */
    public static function getCatIconDir() {
-      return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.self::CATEGORY_ICONS_DIR.URL_SEPARATOR;
+      return self::getCatImagesDir();
+   }
+
+   /**
+    * Metoda vrací adresář s obrázky kategorií
+    * @return string
+    */
+   public static function getCatImagesDir() {
+      return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.self::CATEGORY_IMAGES_DIR.URL_SEPARATOR;
    }
 }
 ?>
