@@ -114,7 +114,7 @@ class Model_Panel extends Model_PDO {
       $dbst->bindValue(':idpanel', $idPanel, PDO::PARAM_INT);
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      return $dbst->fetch(PDO::FETCH_CLASS, 'Model_LangContainer');
+      return $dbst->fetch(PDO::FETCH_CLASS);
    }
 
    public function deletePanel($id) {
