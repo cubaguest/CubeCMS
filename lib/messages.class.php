@@ -62,10 +62,6 @@ class Messages {
       //		Nastavení ukládání zpráv
       $this->setSaveTarget($saveTarget, $saveTargetName);
       $this->defaultSaveMessages = $saveDefault;
-      if($saveTarget == 'session' AND !isset ($_SESSION[$this->saveTargetName])){
-          $_SESSION[$this->saveTargetName] = array();
-      }
-
       $this->getSavedMessages();
    }
 
@@ -83,6 +79,8 @@ class Messages {
       if($this->saveTarget == "session" AND isset ($_SESSION[$this->saveTargetName])
               AND is_array($_SESSION[$this->saveTargetName])){
          $this->messages = array_merge($this->messages,$_SESSION[$this->saveTargetName]);
+      } else if($this->saveTarget == "session") {
+         $_SESSION[$this->saveTargetName] = array();
       }
    }
 
