@@ -78,8 +78,6 @@ class Auth {
 				self::setDefaultUserParams();
 			}
 		} else {
-         //	načtení detailů
-			self::setUserDetailFromSession();
 			//Uživatel se odhlásil
 			if(self::logOutNow()){
 				self::setDefaultUserParams();
