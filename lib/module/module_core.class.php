@@ -32,7 +32,7 @@ class Module_Core {
       return $this->name;
    }
 
-   public function runController($type) {
+   public function runController() {
 
    }
 

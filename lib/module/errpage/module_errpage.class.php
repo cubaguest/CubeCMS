@@ -11,7 +11,7 @@
 class Module_ErrPage extends Module_Core {
    private static $code = 404;
 
-   public function runController($type) {
+   public function runController() {
       switch ($this->getCode()) {
          case 404:
          default:
