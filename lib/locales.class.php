@@ -242,7 +242,9 @@ class Locales {
    private static function setLocalesEnv() {
       //	nastavení gettext a locales
       //putenv("LANG=".self::getLocale(self::getLang()));
-      setlocale(LC_ALL, self::getLocale(self::getLang()));
+      if(setlocale(LC_ALL, self::getLocale(self::getLang())) == false){
+         throw new DomainException(sprintf(_('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
+      }
       bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, AppCore::getAppLibDir().self::GETTEXT_DEFAULT_LOCALES_DIR);
       textdomain(self::GETTEXT_DEFAULT_DOMAIN);
    }
