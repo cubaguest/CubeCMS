@@ -44,15 +44,18 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `description_de` varchar(300) DEFAULT NULL,
   `public` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_article`),
-  UNIQUE KEY `urlkey_cs` (`urlkey_cs`),
-  UNIQUE KEY `urlkey_en` (`urlkey_en`),
-  UNIQUE KEY `urlkey_de` (`urlkey_de`),
+  KEY `urlkey_cs` (`urlkey_cs`),
+  KEY `urlkey_en` (`urlkey_en`),
+  KEY `urlkey_de` (`urlkey_de`),
+  KEY `urlkey_sk` (`urlkey_sk`),
   FULLTEXT KEY `label_cs` (`name_cs`),
   FULLTEXT KEY `label_en` (`name_en`),
   FULLTEXT KEY `lebal_de` (`name_de`),
+  FULLTEXT KEY `lebal_sk` (`name_sk`),
   FULLTEXT KEY `text_clear_cs` (`text_clear_cs`),
   FULLTEXT KEY `text_clear_en` (`text_clear_en`),
   FULLTEXT KEY `text_clear_de` (`text_clear_de`)
+  FULLTEXT KEY `text_clear_sk` (`text_clear_sk`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
