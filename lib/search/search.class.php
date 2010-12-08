@@ -244,7 +244,7 @@ class Search {
       }
       // zvýraznění
       function prepareResults(&$text, $key, $words) {
-         $text[Search::R_I_TEXT] = preg_replace($words['regexps'], "<b>\\1</b>", $text[Search::R_I_TEXT]);
+         $text[Search::R_I_TEXT] = preg_replace($words['regexps'], "<".VVE_SEARCH_HIGHLIGHT_TAG.">\\1</".VVE_SEARCH_HIGHLIGHT_TAG.">", $text[Search::R_I_TEXT]);
       }
       array_walk($results, 'prepareResults', array('words' => self::$searchWords ,'regexps' => $searchWordsRegexps));
       return $results;
