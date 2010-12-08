@@ -77,7 +77,14 @@ class Template_Core extends Template {
     * @return string -- vygenerovaný řetězec z šablon
     */
    public function   __toString() {
-   // zastavení výpisu buferu
+      // odeslání hlaviček
+      try {
+         Template_Output::sendHeaders();
+      } catch (BadMethodCallException $exc) {
+         CoreErrors::addException($exc);
+      }
+
+      // zastavení výpisu buferu
       if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
          isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
          ob_start("ob_gzhandler");

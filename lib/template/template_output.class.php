@@ -21,7 +21,7 @@ class Template_Output {
     * Pole s hlavičkami, připravenými k odeslání
     * @var array
     */
-   private static $headers = array();
+   public static $headers = array();
 
    /**
     * Obsahuje délku výstupu pro hlavičku
@@ -112,8 +112,8 @@ class Template_Output {
     * Metoda přidá zadaou hlavičku k odesílaným hlavičkám
     * @param string $header
     */
-   public static function addHeader($header) {
-      array_push(self::$headers, $header);
+   public static function addHeader($header, $replace = true, $httpResponseCode = 200) {
+      array_push(self::$headers, array('header' => $header, 'replace' => $replace, 'code' => $httpResponseCode));
    }
 
    /**
@@ -129,22 +129,30 @@ class Template_Output {
     */
    public static function sendHeaders() {
       self::prepareHeaders();
-      foreach (self::$headers as $header) {
-         header($header);
-      }
-      if(self::$cntLenght !== null) {
-         header("Content-Length: ".self::$cntLenght);
-      }
-      header('Cache-Control: public, no-cache' );
-      header('Cache-Control: max-age=60', false );
-      if(Auth::isLogin()) {
-         header('Cache-Control: store, no-cache, must-revalidate' ); //private, 
-         header('Cache-Control: post-check=0, pre-check=0', false );
-         header("Cache-Control: max-age=1, s-maxage=1", false);
-         header("ETag: PUB" . time());
-         header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10) . " GMT");
-         header("Expires: " . gmdate("D, d M Y H:i:s", time() + 5) . " GMT");
-         header("Pragma: no-cache");
+      if(!headers_sent()){
+         foreach (self::$headers as $header) {
+            if($header['code'] == 200){
+               header($header['header'], $header['replace']);
+            } else {
+               header($header['header'], $header['replace'], $header['code']);
+            }
+         }
+         if(self::$cntLenght !== null) {
+            header("Content-Length: ".self::$cntLenght);
+         }
+         header('Cache-Control: public, no-cache' );
+         header('Cache-Control: max-age=60', false );
+         if(Auth::isLogin()) {
+            header('Cache-Control: store, no-cache, must-revalidate' ); //private,
+            header('Cache-Control: post-check=0, pre-check=0', false );
+            header("Cache-Control: max-age=1, s-maxage=1", false);
+            header("ETag: PUB" . time());
+            header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10) . " GMT");
+            header("Expires: " . gmdate("D, d M Y H:i:s", time() + 5) . " GMT");
+            header("Pragma: no-cache");
+         }
+      } else {
+         throw new BadMethodCallException(_('Hlavičky již byly odeslány'));
       }
    }
    

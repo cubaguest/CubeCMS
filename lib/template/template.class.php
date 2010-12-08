@@ -537,9 +537,9 @@ class Template {
          switch ($matches['res']) {
             case 'tpl':
                if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
-                  $filePath = $this->getTplPathFromEngine($matches['file'], $original);
+                  $filePath = $this->getTplPathFromEngine($matches['filepath'], $original);
                } else {
-                  $filePath = $this->getTplPathFromModule($matches['file'], $matches['module'], $original);
+                  $filePath = $this->getTplPathFromModule($matches['filepath'], $matches['module'], $original);
                }
                if($directInclude == true){
                   include $filePath;
