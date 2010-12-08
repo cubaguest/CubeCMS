@@ -55,10 +55,18 @@ class Text_View extends View {
                  $this->link()->route('editPrivate'));
             $toolETP->setIcon('page_edit.png')->setTitle($this->_("Upravit privátní text"));
             $toolboxP->addTool($toolETP);
-            $this->template()->toolboxPrivate = $toolboxP;
+            $this->toolboxPrivate = $toolboxP;
          }
 
-         $this->template()->toolbox = $toolbox;
+         $this->toolbox = $toolbox;
+
+         if($this->category()->getRights()->isControll()){
+            $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->_("Nastavení"),
+            $this->link()->route(Routes::MODULE_SETTINGS));
+            $toolEView->setIcon('wrench.png')->setTitle($this->_('Upravit nastavení kategorie'));
+            $this->toolbox->addTool($toolEView);
+         }
       }
    }
 

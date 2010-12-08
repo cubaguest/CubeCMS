@@ -80,6 +80,12 @@ class Articles_View extends View {
          $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou položku'));
          $this->toolbox->addTool($toolAdd);
+         if($this->category()->getRights()->isControll()){
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->_("Nastavení"),
+            $this->link()->route(Routes::MODULE_SETTINGS));
+            $toolEView->setIcon('wrench.png')->setTitle($this->_('Upravit nastavení kategorie'));
+            $this->toolbox->addTool($toolEView);
+         }
       }
    }
 

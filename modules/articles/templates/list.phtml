@@ -4,7 +4,7 @@ $this->includeTpl('sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
 echo $this->toolbox;
 ?>
-<h1><?=$h1;?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-list">
    <?=$this->includeTpl('sort.phtml')?>
    <div class="main-content-list-records">

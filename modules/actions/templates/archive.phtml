@@ -9,7 +9,7 @@ $model = new Actions_Model_List();
 $actions = $model->getAllActions($this->category()->getId(), !$this->category()->getRights()->isWritable());
 
 ?>
-<h1><?=$this->category()->getName().' - '.$this->_('Archiv')?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName().' - '.$this->_('Archiv');;?></h1>
 <div class="main-content-archive">
    <div class="main-content-tools">
       <a href="<?=$this->link()->route()?>" title="<?=$this->_('Seznam')?>"><?=$this->_('Seznam')?></a>

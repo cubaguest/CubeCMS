@@ -93,10 +93,6 @@ class Actionswgal_View extends Actions_View {
             break;
       }
    }
-
-   public function editLabelView() {
-      $this->template()->addTplFile('editlabel.phtml','actions');
-   }
 }
 
 ?>

@@ -195,5 +195,22 @@ class Search_Controller extends Controller {
       $this->view()->formDel = $formDelete;
       $this->view()->apis = $model->getApis($this->category()->getId());
    }
+
+   public static function settingsController(&$settings,Form &$form) {
+      $fGrpView = $form->addGroup('view', 'Nastavení vzhledu');
+
+      $elemScroll = new Form_Element_Text('scroll', 'Počet položek na stránku');
+      $elemScroll->setSubLabel('Výchozí: 5 položek. Pokud je zadána 0 budou vypsány všechny položky');
+      $elemScroll->addValidation(new Form_Validator_IsNumber());
+      $form->addElement($elemScroll, $fGrpView);
+
+      if(isset($settings['scroll'])) {
+         $form->scroll->setValues($settings['scroll']);
+      }
+      // znovu protože mohl být už jednou validován bez těchto hodnot
+      if($form->isValid()) {
+         $settings['scroll'] = $form->scroll->getValues();
+      }
+   }
 }
 ?>

@@ -76,7 +76,7 @@ class Articles_Controller extends Controller {
       if($this->routes()->getActionName() == 'main' AND $this->category()->getParam(self::PARAM_DISABLE_LIST, false) AND $this->view()->articles != false){
          $first = reset($this->view()->articles);
          $this->link()->route('detail', array('urlkey' => (string)$first->{Articles_Model::COLUMN_URLKEY}))->reload();
-      }
+}
 
       // odkaz zpět
       $this->link()->backInit();
@@ -604,7 +604,7 @@ class Articles_Controller extends Controller {
    /**
     * Metoda pro nastavení modulu
     */
-   public static function settingsController(&$settings,Form &$form) {
+   protected function settings(&$settings,Form &$form) {
       $fGrpView = $form->addGroup('view', 'Nastavení vzhledu');
 
       $elemScroll = new Form_Element_Text('scroll', 'Počet položek na stránku');

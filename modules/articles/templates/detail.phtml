@@ -6,7 +6,7 @@ $this->addJsPlugin($piroBox);
 echo $this->toolbox;
 ?>
 
-<h1><?echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_PUBLIC} == false)echo $this->_(' - nezveřejněno');?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_PUBLIC} == false)echo $this->_(' - nezveřejněno');?></h1>
 
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>

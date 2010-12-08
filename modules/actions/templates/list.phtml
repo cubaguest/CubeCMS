@@ -3,7 +3,7 @@ $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->
 //$this->addPageHeadline(strftime("%x", $this->dateFrom).' - '.strftime("%x", $this->dateTo));
 echo $this->toolbox; // tolbox pro přidání
 ?>
-<h1><?=$this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
 <div class="main-content-list">
    <?
    if($this->text != false) {?>

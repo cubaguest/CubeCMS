@@ -325,7 +325,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
    }
 
-   public static function settingsController(&$settings,Form &$form) {
+   protected function settings(&$settings,Form &$form) {
       $form->addGroup('images', 'Nastavení obrázků');
 
       $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
@@ -360,8 +360,6 @@ class Photogalery_Controller extends Controller {
          $form->medium_height->setValues($settings['medium_height']);
       }
       
-      // znovu protože už mohl být jednou odeslán
-
       if($form->isValid()){
          $settings['small_width'] = $form->small_width->getValues();
          $settings['small_height'] = $form->small_height->getValues();

@@ -9,7 +9,7 @@ $photosModel = new PhotoGalery_Model_Images();
 $countImages = $photosModel->getCountImages($this->category()->getId(), $this->action->{Actions_Model_Detail::COLUMN_ID});
 echo $this->toolbox;
 ?>
-<h1><?=$this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
    <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
    <div class="main-content-image"><!-- SOF TEXT -->

@@ -1,5 +1,7 @@
-<?$this->addCssFile('style.css');?>
-<h1><?=$this->category()->getName();?></h1>
+<?
+$this->addCssFile('style.css');
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
    <div class="search-box">
       <form method="get" action="<?=$this->link()?>">
@@ -26,13 +28,8 @@
    </div>
 </div>
    <?
-   if($this->search === true) $this->includeTpl('results.phtml');
+   if($this->search === true) $this->includeFile('tpl://results.phtml');
    ?>
    <?
-   if($this->category()->getRights()->isControll()) {
-      $toolbox = new Template_Toolbox();
-      $toolbox->addTool('edit_search', $this->_("Upravit hledání"),
-          $this->link()->route('editsapi'),
-          $this->_("Upravit parametry hledání"), "magnifier_zoom_in.png");
-      $this->includeTplObj($toolbox);
-   }?>
+   echo $this->toolbox;
+   ?>

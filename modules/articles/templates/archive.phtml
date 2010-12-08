@@ -1,12 +1,13 @@
 <?
 // načtení detailu
-$this->addPageTitle($this->_('Archiv'));
+$h1 = $this->category()->getName().' - '.$this->_('Archiv');
+Template_Core::setPageTitle($h1);
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?= $this->category()->getName().' - '.$this->_('Archiv'); ?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1; ?></h1>
 <div class="main-content-tools">
    <a href="<?=$this->link()->route();?>" title="<?$this->_('Přejít na seznam článků')?>"><?=$this->_('Seznam')?></a>
 </div>

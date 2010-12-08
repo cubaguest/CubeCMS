@@ -68,9 +68,10 @@ class Actionswgal_Controller extends Actions_Controller {
       $ctr->uploadFileController();
    }
 
-   public static function settingsController(&$settings,Form &$form) {
-      parent::settingsController($settings, $form);
-      Photogalery_Controller::settingsController($settings, $form);
+   protected function settings(&$settings,Form &$form) {
+      parent::settings($settings, $form);
+      $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
+      $phCtrl->viewSettingsController();
    }
 }
 ?>

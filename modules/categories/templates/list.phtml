@@ -47,7 +47,7 @@ function vveSectionsRenderFunc($menuArr, $link) {
       <?}
       ?>&nbsp;ID:<?=$item->getId()?>
       <a href="" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">detail</a>&nbsp;
-      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())?>" title="<?=SECTION_GOTO_CAT_LABEL?>"><?=SECTION_GOTO_CAT_LABEL?></a>
+      <a href="<?=$link3->clear()->lang()->category($item->getCatObj()->getUrlKey())?>" title="<?=SECTION_GOTO_CAT_LABEL?>"><?=SECTION_GOTO_CAT_LABEL?></a>
 
       <div class="category-params">
          <table>

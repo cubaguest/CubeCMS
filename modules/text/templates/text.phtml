@@ -6,7 +6,7 @@ if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABE
    $h1 = $this->category()->getName();
 }
 ?>
-<h1><?=$h1;?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-detail">
    <div class="main-content-text"><?echo ($this->filter($this->text->{Text_Model_Detail::COLUMN_TEXT},'emoticons')).$this->toolbox;?></div>
    <?if($this->textPrivate != false AND (string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} != null){

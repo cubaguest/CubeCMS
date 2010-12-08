@@ -454,13 +454,11 @@ class Actions_Controller extends Controller {
 //      if($this->view()->action === false) return false;
    }
 
-   public static function settingsController(&$settings,Form &$form) {
-      $form->addGroup('basic', 'Základní nasatvení časového okna');
-
+   protected function settings(&$settings,Form &$form) {
       $elemTimeWindow = new Form_Element_Text('time', 'Délka časového okna');
       $elemTimeWindow->setSubLabel('Udává délku časového okna, pomocí kterého se vybírají zobrazené akce.<br /> Výchozí: '.self::DEFAULT_TIMEWINDOW.'');
       $elemTimeWindow->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemTimeWindow,'basic');
+      $form->addElement($elemTimeWindow,'view');
 
       if(isset($settings['time'])) {
          $form->time->setValues($settings['time']);
@@ -470,7 +468,7 @@ class Actions_Controller extends Controller {
       $types = array('Den' => 'day', 'Měsíc' => 'month', 'Rok' => 'year');
       $elemTimeWindowType->setOptions($types);
       $elemTimeWindowType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TIMEWINDOW_TYPE, $types).'');
-      $form->addElement($elemTimeWindowType,'basic');
+      $form->addElement($elemTimeWindowType,'view');
 
 
       $form->addGroup('images', 'Nastavení obrázků');

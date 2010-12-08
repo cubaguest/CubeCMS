@@ -155,18 +155,6 @@ class Categories_Controller extends Controller {
          }
       }
 
-      // přidání checkboxu pro odstranění ikony a pozadí
-      if($cat->{Model_Category::COLUMN_ICON} != null) {
-         $elemDelIcon = new Form_Element_Checkbox('delete_icon', $this->_('Smazat ikonu'));
-         $elemDelIcon->setSubLabel($this->_('Nahrán soubor:')." ".$cat->{Model_Category::COLUMN_ICON});
-         $form->addElement($elemDelIcon, 'settings');
-      }
-      if($cat->{Model_Category::COLUMN_BACKGROUND} != null) {
-         $elemDelBack = new Form_Element_Checkbox('delete_background', $this->_('Smazat pozadí'));
-         $elemDelBack->setSubLabel($this->_('Nahrán soubor:')." ".$cat->{Model_Category::COLUMN_BACKGROUND});
-         $form->addElement($elemDelBack, 'settings');
-      }
-
       if($form->isSend() AND $form->send->getValues() == false){
          $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
          $this->gotoBack();
@@ -228,34 +216,6 @@ class Categories_Controller extends Controller {
             }
          }
 
-         // ikona
-         $icon = $cat->{Model_Category::COLUMN_ICON};
-         if($icon != null AND ($form->icon->getValues() != null OR
-                         ($form->haveElement('delete_icon') AND $form->delete_icon->getValues() == true))) {
-            $file = new Filesystem_File($cat->{Model_Category::COLUMN_BACKGROUND},
-                    AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                            .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
-            $file->delete();
-         }
-         if($form->icon->getValues() != null) {
-            $f = $form->icon->getValues();
-            $icon = $f['name'];
-         }
-
-         // background
-         $background = $cat->{Model_Category::COLUMN_BACKGROUND};
-         if($background != null AND ($form->background->getValues() != null OR
-                         ($form->haveElement('delete_background') AND $form->delete_background->getValues() == true))) {
-            $file = new Filesystem_File($cat->{Model_Category::COLUMN_BACKGROUND},
-                    AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                            .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
-            $file->delete();
-         }
-         if($form->background->getValues() != null) {
-            $f = $form->background->getValues();
-            $background = $f['name'];
-         }
-
          // kategorie
          $categoryModel = new Model_Category();
          $categoryModel->saveEditCategory($this->getRequest('categoryid'), $form->name->getValues(),$form->alt->getValues(),
@@ -263,7 +223,7 @@ class Categories_Controller extends Controller {
                  $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
                  $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
                  $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds, $datadir, $icon, $background);
+                 $form->rights_default->getValues(), $feeds, $datadir);
 
          // práva
          $usrModel = new Model_Users();
@@ -359,19 +319,7 @@ class Categories_Controller extends Controller {
              $feeds = true;
          }
 
-         $icon = null;
-         if($form->icon->getValues() != null) {
-            $f = $form->icon->getValues();
-            $icon = $f['name'];
-         }
-         $background = null;
-         if($form->background->getValues() != null) {
-            $f = $form->background->getValues();
-            $background = $f['name'];
-         }
-
          // pokud není datadir tak jej nastavíme
-//         $datadir = vve_cr_safe_file_name($form->datadir->getValues());
          if($form->datadir->getValues() == null){
             $dataDir = $urlkey[Locales::getDefaultLang()];
             $last = strrpos($dataDir,URL_SEPARATOR);
@@ -388,7 +336,7 @@ class Categories_Controller extends Controller {
                  $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
                  $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
                  $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds, $dataDir,$icon,$background);
+                 $form->rights_default->getValues(), $feeds, $dataDir);
 
          // práva
          $usrModel = new Model_Users();
@@ -525,18 +473,6 @@ class Categories_Controller extends Controller {
       $catShowOnlyWhenLogin = new Form_Element_Checkbox('show_when_login_only', $this->_('Zobrazit pouze při přihlášení'));
       $form->addElement($catShowOnlyWhenLogin, 'settings');
 
-      $elemIcon = new  Form_Element_File('icon', $this->_('Ikona'));
-      $elemIcon->setUploadDir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-              .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
-      $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($elemIcon,'settings');
-
-      $elemBackImage = new  Form_Element_File('background', $this->_('Pozadí'));
-      $elemBackImage->setUploadDir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-              .Category::CATEGORY_IMAGES_DIR.DIRECTORY_SEPARATOR);
-      $elemBackImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($elemBackImage,'settings');
-
       // práva
       $form->addGroup('rights', $this->_('Práva'), $this->_('Nastavení práv ke kategorii'));
       $grModel = new Model_Users();
@@ -627,67 +563,16 @@ class Categories_Controller extends Controller {
 
    public function catSettingsController(){
       $this->checkWritebleRights();
-
       $categoryM = new Model_Category();
       $cat = $categoryM->getCategoryById($this->getRequest('categoryid'));
       if($cat === false) return false;
       $this->view()->catName = $cat->{Model_Category::COLUMN_CAT_LABEL};
       $this->view()->moduleName = $cat->{Model_Category::COLUMN_MODULE};
-
-      $func = array(ucfirst($cat->{Model_Category::COLUMN_MODULE}).'_Controller','settingsController');
-
-      $form = new Form('settings_');
-      $form->addGroup('basic', 'Základní nasatvení');
-      $md5FormEmpty = md5(serialize($form));
-
-      if($cat->{Model_Category::COLUMN_PARAMS}!= null){
-         $settings = unserialize($cat->{Model_Category::COLUMN_PARAMS});
-      } else {
-         $settings = array();
-      }
-
-      $settings['_module'] = $cat->{Model_Category::COLUMN_MODULE};
-      call_user_func_array($func, array(&$settings, &$form));
-      unset($settings['_module']);
-
-      // pokud je formulář prázdný
-      if($md5FormEmpty == md5(serialize($form))){
-         $form = null;
-      } else {
-         $form->addGroup('buttons');
-         $submitButton = new Form_Element_SaveCancel('send');
-         $form->addElement($submitButton, 'buttons');
-      }
-
-      if($form != null AND $form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
-         $this->gotoBack();
-      }
-
-      if($form != null AND $form->isValid()){
-         // čištění nulových hodnot
-         foreach ($settings as $key => $option){
-            if(!is_bool($option) AND ($option === null OR empty ($option) OR $option === 0)){
-               unset($settings[$key]);
-            }
-         }
-         $categoryM->saveCatParams($this->getRequest('categoryid'), serialize($settings));
-         $this->infoMsg()->addMessage(sprintf($this->_('Nastavení kategorie "%s" bylo uloženo'),$cat->{Model_Category::COLUMN_CAT_LABEL}));
-         $this->log('Upraveno nastavení kategorie "'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
-         if($this->isMainStruct()){
-            $this->link()->route()->reload();
-         } else {
-            $this->link()->route('adminMenu')->reload();
-         }
-      } else if($form == null) {
-         if($this->infoMsg()->isEmpty() == false){
-            $this->infoMsg()->addMessage($this->_('Kategorie byla uložena'));
-         }
-         $this->infoMsg()->addMessage($this->_('Kategorie neobsahuje žádná nastavení'));
-         $this->gotoBack();
-      }
-
-      $this->view()->form = $form;
+      $ctrlClass = ucfirst($cat->{Model_Category::COLUMN_MODULE}).'_Controller';
+      $viewClass = ucfirst($cat->{Model_Category::COLUMN_MODULE}).'_View';
+      $ctrl = new $ctrlClass(new Category(null, false, $cat), $this->routes(), $this->view(), $this->link());
+      $ctrl->viewSettingsController();
+      $this->view()->mview = $ctrl->view();
    }
 
    private function isMainStruct() {

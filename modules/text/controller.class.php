@@ -236,8 +236,8 @@ class Text_Controller extends Controller {
       $this->view()->form = $form;
    }
 
-   public static function  settingsController(&$settings, Form &$form) {
-      $fGrpViewSet = $form->addGroup('viewSettings', 'Nastavení vzhledu');
+   public function settings($settings, Form $form) {
+      $fGrpViewSet = $form->addGroup('view', 'Nastavení vzhledu');
 
       $componentTpls = new Component_ViewTpl();
       $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'text');

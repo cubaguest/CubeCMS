@@ -40,15 +40,7 @@ class Categories_View extends View {
    }
 
    public function catSettingsView() {
-
-      $this->template()->addTplFile('settings.phtml');
-      if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-            . $this->moduleName . DIRECTORY_SEPARATOR . Template::TEMPLATES_DIR
-            . DIRECTORY_SEPARATOR . 'settings.phtml')) {
-         $tpl = new Template_Module($this->link(), $this->category());
-         $tpl->addTplFile('settings.phtml', $this->moduleName);
-         $this->includeTpl = $tpl;
-      }
+      $this->mview->viewSettingsView();
    }
 
 }

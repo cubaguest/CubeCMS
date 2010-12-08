@@ -7,7 +7,7 @@ class Actions_View extends View {
 
       if($this->text == false AND $this->rights()->isControll()){
          $this->text = new stdClass();
-         $this->text->{Text_Model::COLUMN_TEXT} = $this->_('Žádný text nebyl vložen. (Tento text vidí pouze uživatel s neomezenými právy.)');
+         $this->text->{Text_Model::COLUMN_TEXT} = $this->_('Žádný text nebyl vytvořen.');
       }
    }
 
@@ -29,6 +29,13 @@ class Actions_View extends View {
          $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou akci'));
          $toolbox->addTool($toolAdd);
+         if($this->category()->getRights()->isControll()){
+            $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $toolSet = new Template_Toolbox2_Tool_PostRedirect('settings', $this->_("Nastavení"),
+            $this->link()->route('settings'));
+            $toolSet->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->_('Upravit nastavení'));
+            $toolbox->addTool($toolSet);
+         }
          $this->toolbox = $toolbox;
 
       }
@@ -61,6 +68,17 @@ class Actions_View extends View {
 
    public function archiveView() {
       $this->template()->addTplFile("archive.phtml");
+   }
+
+   private function addTinyMCE() {
+      if($this->form->haveElement('text')){
+         $this->form->text->html()->addClass("mceEditor");
+      }
+      $this->tinyMCE = new Component_TinyMCE();
+      $settings = new Component_TinyMCE_Settings_Advanced();
+      $settings->setSetting('height', '600');
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
    }
 
    /**
@@ -197,7 +215,8 @@ class Actions_View extends View {
     * Viewer pro editaci novinky
     */
    public function editView() {
-      $this->template()->addTplFile('edit.phtml', 'actions');
+      $this->addTinyMCE();
+      $this->template()->addFile('tpl://actions:edit.phtml');
    }
 
    public function featuredListView() {
@@ -241,7 +260,8 @@ class Actions_View extends View {
    }
 
    public function editLabelView() {
-      $this->template()->addTplFile('editlabel.phtml');
+      $this->addTinyMCE();
+      $this->template()->addFile('tpl://actions:editlabel.phtml');
    }
 }
 
