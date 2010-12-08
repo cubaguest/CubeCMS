@@ -79,7 +79,7 @@ abstract class Controller {
     * @param Category $category -- obejkt kategorie
     * @param Routes $routes -- objekt cest pro daný modul
     */
-   public final function __construct(Category $category, Routes $routes, View $view = null) {
+   public final function __construct(Category $category, Routes $routes, View $view = null, Url_Link_Module $link = null) {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
       $this->category = $category;
       $this->routes = $routes;
@@ -88,9 +88,11 @@ abstract class Controller {
       $className = get_class($this);
       $this->moduleName = substr($className, 0, strpos($className,'_'));
 
-      $link = new Url_Link_Module();
-      $link->setModuleRoutes($routes);
-      $link->category($this->category()->getUrlKey());
+      if($link == null){
+         $link = new Url_Link_Module();
+         $link->setModuleRoutes($routes);
+         $link->category($this->category()->getUrlKey());
+      }
       $this->link = $link;
       // locales
       // pokud se jedná o zděděný kontroler tak nasatvíme na locales děděného kontroleru
@@ -297,6 +299,7 @@ abstract class Controller {
    /**
     * Metoda změní výchozí actionViewer pro danou akci na zadaný viewer
     * @param string -- název actionViewru
+    * @deprecated používat setView()
     */
    final public function changeActionView($newActionView) {
       $this->actionViewer = $newActionView;
@@ -465,12 +468,122 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
     */
    public static function clearOnRemove(Category $category) {}
 
-   /**
-    * Metoda pro vatvoření formuláře pro nastavení modulu a ajeho zpracování
-    * @param array $settings -- pole s parametry
-    * @return array -- fomulár a pole s parametry
-    */
-   public static function settingsController(&$settings,Form &$form) {
+   public function viewSettingsController() {
+      $this->checkControllRights();
+
+      $form = new Form('settings_');
+      $grpBasic = $form->addGroup('basic', _('Základní nastavení'));
+      $grpView = $form->addGroup('view', _('Nastavení vzhledu'));
+
+
+      if($this->category()->getCatDataObj()->{Model_Category::COLUMN_PARAMS}!= null){
+         $settings = unserialize($this->category()->getCatDataObj()->{Model_Category::COLUMN_PARAMS});
+      } else {
+         $settings = array();
+      }
+
+      $settings['_module'] = $this->category()->getModule()->getName();
+
+      if(method_exists($this, 'settings')){
+         $this->settings($settings, $form);
+      } else if(method_exists(ucfirst($this->category()->getModule()->getName()).'_Controller','settingsController')) {
+         $func = array(ucfirst($this->category()->getModule()->getName()).'_Controller','settingsController');
+         call_user_func_array($func, array(&$settings, &$form));
+      }
+
+      unset($settings['_module']);
+
+      // ostatní nastavení
+      /* IKONA */
+      $elemIcon = new  Form_Element_File('icon', _('Ikona'));
+      $elemIcon->setUploadDir(Category::getImageDir(Category::DIR_ICON, true));
+      $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
+      $form->addElement($elemIcon,$grpView);
+
+      /* IKONA uploadnutá */
+      $elemIconImageSelect = new Form_Element_Select('iconUploaded', _('Přiřazená ikona'));
+      $elemIconImageSelect->setOptions(array( _('Žádná') => 'none'));
+      if(file_exists(Category::getImageDir(Category::DIR_ICON, true))){
+         $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_ICON, true));
+         foreach ($dirIterator as $item) {
+            if($item->isDir() OR $item->isDot()) continue;
+            $elemIconImageSelect->setOptions(array($item->getFilename() => $item->getFilename()), true);
+         }
+      }
+      if($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
+         $elemIconImageSelect->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
+      }
+      $form->addElement($elemIconImageSelect, $grpView);
+      /* POZADÍ */
+      $elemBackImage = new  Form_Element_File('background', _('Pozadí'));
+      $elemBackImage->setUploadDir(Category::getImageDir(Category::DIR_BACKGROUND, true));
+      $elemBackImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
+      $form->addElement($elemBackImage,$grpView);
+      /* POZADÍ uploadnuté */
+      $elemBackImageSelect = new Form_Element_Select('backgroundUploaded', _('Přiřazené pozadí'));
+      $elemBackImageSelect->setOptions(array( _('Žádné') => 'none'));
+      if(file_exists(Category::getImageDir(Category::DIR_BACKGROUND, true))){
+         $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_BACKGROUND, true));
+         foreach ($dirIterator as $item) {
+            if($item->isDir() OR $item->isDot()) continue;
+            $elemBackImageSelect->setOptions(array($item->getFilename() => $item->getFilename()), true);
+         }
+      }
+      if($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND} != null){
+         $elemBackImageSelect->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND});
+      }
+      $form->addElement($elemBackImageSelect, $grpView);
+      /* BUTTONS SAVE AND CANCEL */
+      $submitButton = new Form_Element_SaveCancel('send');
+      $form->addElement($submitButton);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage(_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+      
+      if($form->isValid()){
+         // čištění nulových hodnot
+         foreach ($settings as $key => $option){
+            if($option === null OR $option === ''){
+               unset($settings[$key]);
+            }
+         }
+
+         $categoryM = new Model_Category();
+         $catRec = $categoryM->record($this->category()->getId());
+
+         // ikona
+         if($form->iconUploaded->getValues() == 'none' AND $form->icon->getValues() == null) {
+            $catRec->{Model_Category::COLUMN_ICON} = null;
+         } else if($form->icon->getValues() != null) {
+            $f = $form->icon->getValues();
+            $catRec->{Model_Category::COLUMN_ICON} = $f['name'];
+         } else if($form->iconUploaded->getValues() != 'none'){
+            $catRec->{Model_Category::COLUMN_ICON} = $form->iconUploaded->getValues();
+         }
+
+         // background
+         if($form->backgroundUploaded->getValues() == 'none' AND $form->background->getValues() == null) {
+            $catRec->{Model_Category::COLUMN_BACKGROUND} = null;
+         } else if($form->background->getValues() != null) {
+            $f = $form->background->getValues();
+            $catRec->{Model_Category::COLUMN_BACKGROUND} = $f['name'];
+         } else if($form->backgroundUploaded->getValues() != 'none'){
+            $catRec->{Model_Category::COLUMN_BACKGROUND} = $form->backgroundUploaded->getValues();
+         }
+
+         /* serializace volitelných parametrů */
+         $catRec->{Model_Category::COLUMN_PARAMS} = serialize($settings);
+
+         $categoryM->save($catRec);
+         $this->infoMsg()->addMessage(_('Nastavení bylo uloženo'));
+         $this->log('Upraveno nastavení kategorie "'.$this->category()->getName().'"');
+         $this->link()->route()->reload();
+      }
+
+      $this->view()->form = $form;
+
    }
 }
 ?>

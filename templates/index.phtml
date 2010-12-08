@@ -63,12 +63,16 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          echo '<script type="text/javascript" src="jscripts/enginehelpers.min.js"></script>';
       }?>
    </head>
-   <body id="pageTop">
+   <body id="pageTop" >
       <? // admin menu
       if($this->menuAdminObj != null AND !$this->menuAdminObj->menu->isEmpty()) $this->includeTplObj($this->menuAdminObj);
       ?>
       <? //NavigationMenu_View::listView(); ?>
-      <div id="bodywrap">
+      <div id="bodywrap" style="<?
+                    $back = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND};
+                    if($back != null){
+                       echo "background-image: url('".Category::getImageDir(Category::DIR_BACKGROUND).$back."')"; }
+                  ?>">
          <div id="headwrap">
             <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
             <div id="menuBox">
@@ -85,14 +89,10 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['right'])) echo " col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);
-                  $icon = null;
-                  if(Template::pVar('HEADLINE_ICON') !== null){ // tohle asi mrsknout jinam do zvláštní šablony a loadovat  modulů
-                     $icon = '<img src="'.Template::pVar('HEADLINE_ICON').'" alt="'.Template::pVar('HEADLINE_ICON').'" />';
-                  } else if(Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
-                     $icon = '<img src="'.Category::getCatIconDir().Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON}.'" alt="'.Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON}.'" />';
+                  if(VVE_DEBUG_LEVEL > 0){
+                     Debug::printDebug();
                   }
                   ?>
-<!--                  <h1><?=$icon?>{*-PAGE_HEADLINE-*}</h1>-->
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
                   <?if($this->pageNotFound) {
                      $this->includeTpl("error404.phtml", true);

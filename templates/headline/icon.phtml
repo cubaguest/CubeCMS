@@ -1,0 +1,16 @@
+<?
+$icon = $alt = null;
+if (Template::pVar('HEADLINE_ICON') !== null) { // tohle asi mrsknout jinam do zvláštní šablony a loadovat  modulů
+   $icon = $alt = Template::pVar('HEADLINE_ICON');
+   if(Template::pVar('HEADLINE_ICON_ALT') !== null){
+      $alt = Template::pVar('HEADLINE_ICON_ALT');
+   }
+} else if (Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null) {
+   $icon = Category::getImageDir(Category::DIR_ICON).Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON};
+   $alt = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON};
+}
+
+if($icon != null){
+   echo '<img src="' . $icon . '" alt="' . $alt . '" />';
+}
+?>

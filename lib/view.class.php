@@ -183,5 +183,9 @@ abstract class View {
    final public function ngettext($message1, $message2, $int) {
       return $this->locale()->ngettext($message1, $message2, $int);
    }
+
+   final public function viewSettingsView() {
+      $this->template()->addFile('tpl://engine:vsettings.phtml');
+   }
 }
 ?>
