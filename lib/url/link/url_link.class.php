@@ -313,18 +313,15 @@ class Url_Link {
     * @param string -- externí odkaz na který se má přesměrovat (option)
     */
    public function reload($link = null, $code = 302) {
-      if(Url_Request::isXHRRequest()){ // u XHR není nutný reload
-      } else if (!headers_sent()) {
-         if($link == null) {
-            header("Location: ".(string)$this, true, $code);
+      if(!Url_Request::isXHRRequest()){ // u XHR není nutný reload
+         if ($link == null) {
+            Template_Output::addHeader("Location: " . (string)$this, true);
          } else {
-            header("Location: ".(string)$link, true, $code);
+            Template_Output::addHeader("Location: " . (string)$link, true);
          }
          Template_Output::sendHeaders();
-         exit;
-      } else {
-         throw new Exception(_("Hlavičky stránky byly již odeslány"));
-         flush();
+         session_commit(); // při více přesměrování se ztrácí info a err messages
+         die;
       }
    }
 
