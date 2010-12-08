@@ -11,44 +11,92 @@
  * @todo          nutný refaktoring
  */
 
-class Model_Category extends Model_PDO {
+class Model_Category extends Model_ORM {
 /**
  * Tabulka s detaily
  */
    const DB_TABLE = 'categories';
+   protected $tableName = 'categories';
 
    /**
     * Názvy sloupců v db tabulce
     * @var string
     */
-   const COLUMN_CAT_LABEL 	= 'label';
-   const COLUMN_CAT_ALT 	= 'alt';
-   const COLUMN_CAT_ID		= 'id_category';
-   const COLUMN_CAT_ID_PARENT		= 'id_parent';
-   const COLUMN_ICON	= 'icon';
-   const COLUMN_BACKGROUND	= 'background';
+   const COLUMN_ID		= 'id_category';
+//   const COLUMN_ID_GROUP	= 'id_group';
+   const COLUMN_NAME 	= 'label';
+   const COLUMN_ALT 	= 'alt';
+   const COLUMN_URLKEY	= 'urlkey';
    const COLUMN_MODULE	= 'module';
    const COLUMN_DATADIR	= 'data_dir';
-   const COLUMN_URLKEY	= 'urlkey';
    const COLUMN_INDIVIDUAL_PANELS	= 'individual_panels';
-   const COLUMN_PARAMS_OLD	= 'params';
+   const COLUMN_SHOW_IN_MENU	= 'show_in_menu';
+   const COLUMN_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';
    const COLUMN_PARAMS	= 'ser_params';
-   const COLUMN_CAT_SHOW_IN_MENU	= 'show_in_menu';
-   const COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';
-   const COLUMN_CAT_PROTECTED	= 'protected';
+   const COLUMN_PARAMS_OLD	= 'params';
+//   const COLUMN_PROTECTED	= 'protected';
    const COLUMN_PRIORITY	= 'priority';
    const COLUMN_DEF_RIGHT	= 'default_right';
-   const COLUMN_ID_GROUP	= 'id_group';
    const COLUMN_ACTIVE = 'active';
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_DESCRIPTION = 'description';
-   const COLUMN_ORDER = 'order';
-   const COLUMN_LEVEL = 'level';
+//   const COLUMN_ORDER = 'order';
+//   const COLUMN_LEVEL = 'level';
    const COLUMN_CHANGED = 'changed';
    const COLUMN_FEEDS = 'feeds';
+   const COLUMN_ICON	= 'icon';
+   const COLUMN_BACKGROUND	= 'background';
 
-   const COLUMN_CAT_SITEMAP_CHANGE_FREQ = 'sitemap_changefreq';
-   const COLUMN_CAT_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority';
+   const COLUMN_SITEMAP_CHANGE_FREQ = 'sitemap_changefreq';
+   const COLUMN_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority';
+
+   const COLUMN_CAT_LABEL 	= 'label'; // @deprecated
+   const COLUMN_CAT_ALT 	= 'alt';// @deprecated
+   const COLUMN_CAT_ID		= 'id_category';// @deprecated
+   const COLUMN_CAT_ID_PARENT		= 'id_parent';// @deprecated
+   const COLUMN_CAT_SHOW_IN_MENU	= 'show_in_menu';// @deprecated
+   const COLUMN_CAT_PROTECTED	= 'protected';// @deprecated
+   const COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY 	= 'show_when_login_only';// @deprecated
+   const COLUMN_CAT_SITEMAP_CHANGE_FREQ = 'sitemap_changefreq'; // @deprecated
+   const COLUMN_CAT_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority'; // @deprecated
+
+   protected function  _initTable() {
+      $this->setTableName($this->tableName, 't_cats');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_ALT, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_MODULE, array('datatype' => 'varchar(30)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DATADIR, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+
+      $this->addColumn(self::COLUMN_INDIVIDUAL_PANELS, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_SHOW_IN_MENU, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+      $this->addColumn(self::COLUMN_SHOW_WHEN_LOGIN_ONLY, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+
+      $this->addColumn(self::COLUMN_PARAMS, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_PRIORITY, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      // def_right má být ebnum, bohužel zatím není implementovaný v ORM
+      $this->addColumn(self::COLUMN_DEF_RIGHT, array('datatype' => 'varchar(3)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'r--'));
+      $this->addColumn(self::COLUMN_ACTIVE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+
+      $this->addColumn(self::COLUMN_KEYWORDS, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DESCRIPTION, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+
+      $this->addColumn(self::COLUMN_CHANGED, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+
+      $this->addColumn(self::COLUMN_FEEDS, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+
+      $this->addColumn(self::COLUMN_ICON, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_BACKGROUND, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+
+      // opět enum
+      $this->addColumn(self::COLUMN_SITEMAP_CHANGE_FREQ, array('datatype' => 'varchar(10)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'yearly'));
+      $this->addColumn(self::COLUMN_SITEMAP_CHANGE_PRIORITY, array('datatype' => 'float', 'pdoparam' => PDO::PARAM_STR, 'default' => 0));
+
+      $this->setPk(self::COLUMN_ID);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Rights', Model_Rights::COLUMN_ID_CATEGORY);
+   }
 
    /**
     * Pole s kategoriemi
@@ -221,7 +269,7 @@ class Model_Category extends Model_PDO {
     */
    public function saveNewCategory($name, $alt, $module, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
-       $sitemapFrequency, $defRight, $feeds, $dataDir = null, $icon = null, $background = null) {
+       $sitemapFrequency, $defRight, $feeds, $dataDir = null) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt, self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
@@ -232,7 +280,7 @@ class Model_Category extends Model_PDO {
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
           self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency,
           self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds,
-          self::COLUMN_DATADIR => $dataDir, self::COLUMN_ICON => $icon, self::COLUMN_BACKGROUND => $background));
+          self::COLUMN_DATADIR => $dataDir));
 
       $dbc = new Db_PDO();
       $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
@@ -257,7 +305,7 @@ class Model_Category extends Model_PDO {
     */
    public function saveEditCategory($id, $name, $alt, $module, $keywords, $description, $urlkey,
        $priority, $inidividualPanels, $showInMenu, $showWhenLoginOnly, $sitemapPriority,
-       $sitemapFrequency, $defRight, $feeds, $dataDir = null, $icon = null, $background = null) {
+       $sitemapFrequency, $defRight, $feeds, $dataDir = null) {
 
       $this->setIUValues(array(self::COLUMN_CAT_LABEL => $name,
           self::COLUMN_CAT_ALT => $alt,self::COLUMN_INDIVIDUAL_PANELS => $inidividualPanels,
@@ -268,7 +316,7 @@ class Model_Category extends Model_PDO {
           self::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY => $sitemapPriority,
           self::COLUMN_CAT_SITEMAP_CHANGE_FREQ => $sitemapFrequency,
           self::COLUMN_DEF_RIGHT => $defRight, self::COLUMN_FEEDS => $feeds,
-          self::COLUMN_DATADIR => $dataDir, self::COLUMN_ICON => $icon, self::COLUMN_BACKGROUND => $background));
+          self::COLUMN_DATADIR => $dataDir));
 
       $dbc = new Db_PDO();
       return $dbc->exec("UPDATE ".Db_PDO::table(self::DB_TABLE)
