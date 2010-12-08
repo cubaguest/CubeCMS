@@ -303,7 +303,7 @@ class JsPlugin_TinyMce extends JsPlugin {
       $params['document_base_url'] = Url_Request::getBaseWebDir();
       $params['language'] = Locales::getLang();
       $params['category_id'] = AppCore::getCategory()->getId();
-      $params['sessionid'] = Sessions::getSessionId();
+      $params['sessionid'] = Session::getSessionId();
       if(isset ($_GET['editor_selector'])) {
          $params['editor_selector'] = rawurldecode($_GET['editor_selector']);
       } else {
