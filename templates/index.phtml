@@ -1,7 +1,12 @@
-<?// detekce IE 6 a menších
-$this->setPVar('IE',false);
-if(preg_match('/(?i)msie [1-6]/',$_SERVER['HTTP_USER_AGENT']) AND !isset ($_COOKIE['show_ie_warning'])) {
-   $this->setPVar('IE',true);
+<?// detekce IE
+Template::setPVar('IE',false);
+$matches = array();
+if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
+   Template::setPVar('IE_WARN',false);
+   if((int)$matches[1] < 7 AND !isset ($_COOKIE['show_ie_warning'])){
+      Template::setPVar('IE_WARN',true);
+   }
+   Template::setPVar('IE',true);
 }
 echo ('<?xml version="1.0" encoding="utf-8"?>');
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

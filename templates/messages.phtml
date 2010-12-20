@@ -19,12 +19,12 @@
 
 <? // chyby modulu?>
 <div class="message" id="errMessages" style="
-    <?if(empty ($this->moduleErrors) AND Template::pVar('IE') == false) {?>
+    <?if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) {?>
      display: none;
         <?}?>
      background-image: url('<?=vve_get_tpl_file('icons/error.png', VVE_TPL_FILE_IMAGE)?>')">
    <?
-   if(Template::pVar('IE') == true){
+   if(Template::pVar('IE_WARN') == true){
       $this->includeTpl('ie6browser.phtml',true);
    }
    if(!empty ($this->moduleErrors)) {
