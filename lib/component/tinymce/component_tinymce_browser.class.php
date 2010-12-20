@@ -72,9 +72,12 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $dataDir = substr(AppCore::getAppDataDir(),0,-1);
       $currDirRealPath = $dataDir . str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $reqDir);
 
-      $items = array();
+      if(!file_exists($currDirRealPath) || !is_dir($currDirRealPath)){
+         throw new UnexpectedValueException(sprintf(_('Adresář %s neexistuje'), '/'.VVE_DATA_DIR.$reqDir));
+      }
       $dirIter = new DirectoryIterator($currDirRealPath);
 
+      $items = array();
       foreach ($dirIter as $item) {
          if($item->getFilename() == '.' OR $item->isLink() // odkaz, kořen, aktulání dir, acl file
             OR ($item->getFilename() == '..' AND $reqDir == URL_SEPARATOR)
@@ -338,6 +341,30 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
                $file->delete();
                $this->infoMsg()->addMessage(sprintf(_('Soubor "%s" byl smazán '), $item[1]));
             }
+         } catch (UnexpectedValueException $exc) {
+            $this->errMsg()->addMessage($exc->getMessage());
+         }
+      }
+      sleep(1);
+   }
+   // kontroler pro přejmenování
+   public function renameController()
+   {
+      $this->checkRights();
+      if(!isset ($_POST['items'])){
+         throw new UnexpectedValueException(_('Nebyl předán parametr se seznamem položek'));
+      }
+      foreach ($_POST['items'] as $item) {
+         $path = substr(AppCore::getAppDataDir(),0,-1).str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $item[0]);
+         try {
+            if($item[1] == '..') throw new UnexpectedValueException(_('Nadřazený adresář nelze přejmenovat'));
+            $this->chekWritableDir($path);
+            $newName = vve_cr_safe_file_name($item[2]);
+
+            if(!rename($path.$item[1], $path.$newName)){
+               throw new UnexpectedValueException(sprintf(_('Položku %s se nepodařilo přejmenovat'), $item[1]));
+            }
+            $this->infoMsg()->addMessage(sprintf(_('Položka %s byla přejmenována na %s '), $item[1], $newName));
          } catch (UnexpectedValueException $exc) {
             $this->errMsg()->addMessage($exc->getMessage());
          }
