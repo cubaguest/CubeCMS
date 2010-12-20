@@ -75,7 +75,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             <div style="float: left" class="swfupload-control"><span id="spanButtonPlaceholder"></span></div>
             <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=VVE_MAX_UPLOAD_SIZE?>MB
             <div style="float: right">
-               <input id="buttonGoHome" type="image" src="../../../images/icons/house_go.png" title="Přejít domů" onclick="FileBrowser.goHome()" />
+               <input id="buttonGoPublic" type="image" src="../../../images/icons/folder_star.png" title="Přejít do veřejné složky" onclick="FileBrowser.goPublic()" />
+               <input id="buttonGoHome" type="image" src="../../../images/icons/house.png" title="Přejít do osobní složky" onclick="FileBrowser.goHome()" />
                <span class="buttons-separator">&nbsp;</span>
                <input id="buttonCreateDir" class="buttons" type="image" src="../../../images/icons/folder_add.png"
                       title="Vytvořit složku" onclick="FileBrowser.createDir()" />

@@ -40,7 +40,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
    tinyMCE.activeEditor.windowManager.open({
       file : "./component/tinymce_browser/{CATID}/browser.php",
       title : "Cube File Browser", width : 750, height : 500, resizable : "yes", inline : "yes",  close_previous : "no"
-   }, { window : win,input : field_name,listType : type,cat : tinyMCE.activeEditor.getParam(\'category_id\') });
+   }, { window : win,input : field_name,listType : type,cat : tinyMCE.activeEditor.getParam(\'category_id\'), url:url });
    return false;
    }';
 

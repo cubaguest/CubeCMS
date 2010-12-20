@@ -7,6 +7,12 @@ var FileBrowserDialogue = {
       FileBrowserDialogue.listType = tinyMCEPopup.getWindowArg("listType");
       FileBrowserDialogue.win = tinyMCEPopup.getWindowArg("window");
       FileBrowserDialogue.category = tinyMCEPopup.getWindowArg("cat");
+      var path = tinyMCEPopup.getWindowArg("url");
+      if(path != ""){
+         var regex = /data(\/.*\/)[a-z0-9._-]+/i;
+         var matches = path.match(regex);
+         FileBrowser.currentDir = matches[1];
+      }
       FileBrowser.init();
    },
    submitFile : function () {
@@ -30,7 +36,7 @@ var FileBrowserDialogue = {
 var FileBrowser = {
    cmsURL : null,
    cmsPluginUrl : null,
-   currentDir : 'home',
+   currentDir : null,
    baseUrl : null,
    iconsDir : 'images/files/',
    uploadLink : null,
@@ -85,8 +91,10 @@ var FileBrowser = {
       this.extendJQ();
       this.cmsURL = window.location.toString().replace('browser.php', ''); // remove browser action of component
       this.cmsPluginUrl = this.cmsURL+"jscripts/tinymce/";
-      // load previous path
-      this.currentDir = this.loadPath();
+      if(this.currentDir == null){
+         // load previous path
+         this.currentDir = this.loadPath();
+      }
       // UPLOAD POST PARAMS
       this.uploadFilesPosParams = {
          sessionid: FileBrowser.sessionId,
@@ -419,53 +427,61 @@ var FileBrowser = {
          var selectedItemPath = FileBrowser.getSelected().data('realpath');
          // clear box
          FileBrowser.$itemsBox.html('');
-         $.each(data.items, function(){
-            var $item = $('<a>');
-            $item
+         if(typeof(data.items) != "undefined"){
+            $.each(data.items, function(){
+               var $item = $('<a>');
+               $item
 //            .append($('<input name="selected" value="'+this.name+'" type="checkbox" />'))
-            .append(this.name)
-            .attr({
-               title : this.name,
-               href : this.realpath
-            }).data(this);
+               .append(this.name)
+               .attr({
+                  title : this.name,
+                  href : this.realpath
+               }).data(this);
 
-            if(this.type == 'dir') {
-               $item.addClass('dir');
-               if(this.info.type == 'home'){
-                  $item.addClass('dir-home');
-               } else if(this.info.type == 'public'){
-                  $item.addClass('dir-pub');
-               }
-               if(this.access.write == true) $item.addClass('dir-writable');
-            } else if(this.type == 'dot'){
-               $item.addClass('dir');
-               $item.addClass('dir-up');
-            } else {
+               if(this.type == 'dir') {
+                  $item.addClass('dir');
+                  if(this.info.type == 'home'){
+                     $item.addClass('dir-home');
+                  } else if(this.info.type == 'public'){
+                     $item.addClass('dir-pub');
+                  }
+                  if(this.access.write == true) $item.addClass('dir-writable');
+               } else if(this.type == 'dot'){
+                  $item.addClass('dir');
+                  $item.addClass('dir-up');
+               } else {
             // file
-               $item.addClass('file')
-                  .css('background-image', 'url('+FileBrowser.baseUrl+FileBrowser.iconsDir+this.info.type+'_icon.png)');
-               if(this.access.write == true) $item.addClass('file-writable');
-            }
-            FileBrowser.$itemsBox.append($('<li></li>').append($item));
-         });
+                  $item.addClass('file')
+                     .css('background-image', 'url('+FileBrowser.baseUrl+FileBrowser.iconsDir+this.info.type+'_icon.png)');
+                  if(this.access.write == true) $item.addClass('file-writable');
+               }
+               FileBrowser.$itemsBox.append($('<li></li>').append($item));
+            });
 
-         FileBrowser.writable = data.writable;
-         if(FileBrowser.currentDir == data.current && typeof(selectedItemPath) != 'undefined'){ // same dir
-            var elem = FileBrowser.$itemsBox.find('a[href="'+selectedItemPath+'"]');
-            if(elem.length > 0) {elem.click();}
-            else {
+            FileBrowser.writable = data.writable;
+            if(FileBrowser.currentDir == data.current && typeof(selectedItemPath) != 'undefined'){ // same dir
+               var elem = FileBrowser.$itemsBox.find('a[href="'+selectedItemPath+'"]');
+               if(elem.length > 0) {elem.click();}
+               else {
+                  FileBrowser.$itemsBox.children('li:first a').click();// select first item
+               }
+            } else { // jiný adresář
                FileBrowser.$itemsBox.children('li:first a').click();// select first item
+               FileBrowser.storePath(data.current);
             }
-         } else { // jiný adresář
-            FileBrowser.$itemsBox.children('li:first a').click();// select first item
-            FileBrowser.storePath(data.current);
+            FileBrowser.currentDir = data.current;
+            $('#currentPath').text(data.current);
+         } else {
+            FileBrowser.goPublic();
          }
-         FileBrowser.currentDir = data.current;
-         $('#currentPath').text(data.current);
       });
    },
    goHome : function(){
       this.currentDir = 'home';
+      this.load();
+   },
+   goPublic : function(){
+      this.currentDir = '/public/';
       this.load();
    },
    storePath : function(path){
@@ -478,7 +494,7 @@ var FileBrowser = {
       document.cookie = value;
    },
    loadPath : function(){
-      if (document.cookie.length>0){
+      if (document.cookie.length>0 && FileBrowser.currentDir == null){
          var c_start = document.cookie.indexOf(cookieName+"=");
          if (c_start!=-1){
             c_start=c_start + cookieName.length+1;
@@ -487,7 +503,7 @@ var FileBrowser = {
             return unescape(document.cookie.substring(c_start,c_end));
          }
       }
-      return 'home';
+      return '/public/';
    },
    // funkce pro obsluhu vytváření, mazání
    createDir : function(){
@@ -516,6 +532,27 @@ var FileBrowser = {
          });
       }
       return;
+   },
+   renameItems : function(){
+      var items = new Array;
+      var newName = "";
+      this.getMarked().each(function(){
+         var data = $(this).data();
+         if(data.type != 'dot' && data.access.write == true) {
+            // zeptáme se na každý nový název
+            newName = window.prompt("Přejmenovat na", data.name);
+            if(newName != null && newName != "" && newName != data.name){
+               items.push(new Array(data.path,data.name, newName));
+            }
+         }
+      });
+      if(items.length > 0){
+         FileBrowser.showWorking();
+         this.request('rename', {items : items}, function(){
+            FileBrowser.hideWorking();
+            FileBrowser.load();
+         });
+      }
    },
    // Schránka
    clipboardCut : function(){
