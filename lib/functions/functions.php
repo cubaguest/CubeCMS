@@ -66,7 +66,7 @@ function vve_cr_safe_file_name($string) {
    } else {
       $string = vve_to_ascii($string);
       $string = preg_replace("/[ ]{1,}/", "-", $string);
-      $string = preg_replace("/[()\"\'!?,]?/", "", $string);
+      $string = preg_replace("/[\/()\"\'!?,]?/", "", $string);
    }
    return $string;
 }
