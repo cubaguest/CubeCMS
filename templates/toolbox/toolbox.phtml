@@ -2,7 +2,7 @@
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
-<a class="toolbox-button ui-state-default ui-corner-all" href="" title="Otevřít nástroje"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
+<a class="toolbox-button ui-state-default ui-corner-all" href="" title="<?$this->tr('Otevřít nástroje')?>"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
 <div class="toolbox">
    <? foreach ($this->getTools() as $tool) {?>
       <div class="toolbox-tool ui-state-default">
@@ -49,7 +49,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                ?></div></form><?
                break;
             default:
-               echo "nepodporovaný nástroj";
+               echo $this->tr("nepodporovaný nástroj");
                break;
          }
       ?>

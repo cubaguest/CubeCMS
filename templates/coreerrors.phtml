@@ -4,11 +4,11 @@
       foreach ($errors as $error) {?>
    <p>
             <?=$error["name"]?>: (<i><?=$error["code"]?></i>) <b><?=$error["message"]?></b>
-            <?=_("soubor")?>: <?=$error["file"]?>, <?=_("řádek")?>: <?=$error["line"]?><br />
+            <?=$this->tr("soubor")?>: <?=$error["file"]?>, <?=$this->tr("řádek")?>: <?=$error["line"]?><br />
             <? if(VVE_DEBUG_LEVEL > 1) {
                foreach ($error["trace"] as $err) {?>
                   <?=$err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
-                  echo _("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;"._("řádek").": ".$err["line"];?>
+                  echo $this->tr("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;".$this->tr("řádek").": ".$err["line"];?>
       <br />
                <?}
             }?>

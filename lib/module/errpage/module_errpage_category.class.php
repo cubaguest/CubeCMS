@@ -25,9 +25,9 @@ class Module_ErrPage_Category extends Category_Core {
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
       $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
       $category->{Model_Category::COLUMN_MODULE} = 'errpage';
-      $category->{Model_Category::COLUMN_CAT_LABEL} = _('Chyba');
+      $category->{Model_Category::COLUMN_CAT_LABEL} = $this->tr('Chyba');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
-      $category->{Model_Category::COLUMN_DESCRIPTION} = _('Chybová stránka');
+      $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Chybová stránka');
       $category->{Model_Category::COLUMN_KEYWORDS} = null;
       if(defined('VVE_CM_ERR_CAT_ICON')){
          $category->{Model_Category::COLUMN_ICON} = VVE_CM_ERR_CAT_ICON;

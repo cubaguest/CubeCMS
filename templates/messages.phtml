@@ -28,7 +28,7 @@
       $this->includeTpl('ie6browser.phtml',true);
    }
    if(!empty ($this->moduleErrors)) {
-      echo("<strong>"._("Chyba:")."</strong>");
+      echo("<strong>".$this->tr("Chyba:")."</strong>");
       foreach ($this->moduleErrors as $error) {
          print ("<p>".$error ."</p>");
       }

@@ -78,7 +78,8 @@ class Component_Scroll extends Component {
            self::CONFIG_CNT_ALL_RECORDS => 0,
            self::CONFIG_START_RECORD => null,
            self::CONFIG_START_PAGE => self::PAGE_FIRST,
-           'tpl_file' => 'scroll.phtml');
+           'tpl_file' => 'scroll.phtml',
+           'ajaxBox' => null);
 
    /**
     * Metoda inicializace, je spuštěna pří vytvoření objektu
@@ -190,6 +191,7 @@ class Component_Scroll extends Component {
       $this->template()->selectedPage = $this->selectPage;
       $this->template()->countAllPages = $this->countAllPages;
       $this->template()->addTplFile($this->getConfig('tpl_file'));
+      $this->template()->ajaxBox = $this->getConfig('ajaxBox');
    }
 
    /**

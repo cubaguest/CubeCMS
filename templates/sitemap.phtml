@@ -27,7 +27,7 @@ function vveRenderMap($menuArr, $link, $catsArr) {
    print ("</ul>\n");
 }
 ?>
-<h1><?= _("Mapa stránek") ?></h1>
+<h1><?= $this->tr("Mapa stránek") ?></h1>
 <div class="main-content-detail">
    <div class="main-content-text page-sitemap">
 <?= vveRenderMap($this->categories, $this->link(), $this->catArr) ?>

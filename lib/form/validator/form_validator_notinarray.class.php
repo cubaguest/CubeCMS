@@ -15,7 +15,7 @@ class Form_Validator_NotInArray extends Form_Validator implements Form_Validator
 
    public function  __construct($array, $errMsg = null) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" s hodnotou \"%s\" je již obsazena"));
+         parent::__construct($this->tr('Položka "%s" s hodnotou "%s" je již obsazena'));
       } else {
          parent::__construct($errMsg);
       }

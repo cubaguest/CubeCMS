@@ -1,4 +1,4 @@
-<h1><?=_('Seznam rss zdrojů');?></h1>
+<h1><?=$this->tr('Seznam rss zdrojů');?></h1>
 <div class="main-content-detail">
    <div class="main-content-text page-rsslist">
 <?if(count($this->sources) > 0){?>
@@ -8,21 +8,21 @@
    <tr>
       <th width="200"><?=$source['name']?></th>
       <td><a href="<?=$source['link']?>"
-             title="<?=_('Zdroj k').' '.$source['name']?>"><?=$source['link']?></a></td>
+             title="<?=$this->tr('Zdroj k').' '.$source['name']?>"><?=$source['link']?></a></td>
    </tr>
    <?}?>
    <tr>
       <td colspan="2"><br /></td>
    </tr>
    <tr>
-      <th><?=_('Přehled všech kategorií')?></th>
+      <th><?=$this->tr('Přehled všech kategorií')?></th>
       <td><a href="<?=$this->sourcesAll?>"
-             title="<?=_('Zdroj ke všem kategoriím')?>"><?=$this->sourcesAll;?></a></td>
+             title="<?=$this->tr('Zdroj ke všem kategoriím')?>"><?=$this->sourcesAll;?></a></td>
    </tr>
 </table>
 
 <?} else {
-   echo '<p>'._('Stránka neobsahuje žádný rss zdroj.').'</p>';
+   echo '<p>'.$this->tr('Stránka neobsahuje žádný rss zdroj.').'</p>';
 }?>
    </div>
 </div>

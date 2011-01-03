@@ -11,7 +11,7 @@
  * @deprecated    Nastavení systému se převádí na konstanty
  */
 
-class Config {
+class Config extends TrObject {
 	/**
 	 * Název sekce s tabulkami v databázi
 	 * @var string
@@ -46,7 +46,7 @@ class Config {
 	private function _initConfigFile() {
       try {
          if (!file_exists($this->_configFile)){
-            throw new BadFileException(sprintf(_('Nepodařilo se otevřít konfigurační soubor "%s"'),
+            throw new BadFileException(sprintf($this->tr('Nepodařilo se otevřít konfigurační soubor "%s"'),
                $this->_configFile), 101);
          }
          $xml = simplexml_load_file($this->_configFile);
@@ -92,16 +92,16 @@ class Config {
       try {
          if($parentKey == null){
             if(!isset($this->_configArray[$option])){
-               throw new InvalidArgumentException(sprintf(_("Volba %s není definována"), $option), 2);
+               throw new InvalidArgumentException(sprintf($this->tr("Volba %s není definována"), $option), 2);
             }
             return $this->_configArray[$option];
          } else {
             if(!isset($this->_configArray[$parentKey])){
-               throw new InvalidArgumentException(sprintf(_("Sekce %s není definována"), $parentKey), 3);
+               throw new InvalidArgumentException(sprintf($this->tr("Sekce %s není definována"), $parentKey), 3);
             }
 
             if(!isset($this->_configArray[$parentKey][$option])){
-               throw new InvalidArgumentException(sprintf(_("Volba %s v sekci %s není definována"),
+               throw new InvalidArgumentException(sprintf($this->tr("Volba %s v sekci %s není definována"),
                   $option, $parentKey), 4);
             }
             return $this->_configArray[$parentKey][$option];

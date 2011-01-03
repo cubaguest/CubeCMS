@@ -26,9 +26,9 @@ class Module_Rss_Category extends Category_Core {
       $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
       $category->{Model_Category::COLUMN_MODULE} = 'rss';
       $category->{Model_Category::COLUMN_URLKEY} = 'rss.html';
-      $category->{Model_Category::COLUMN_CAT_LABEL} = _('Přehled rss kanálů');
+      $category->{Model_Category::COLUMN_CAT_LABEL} = $this->tr('Přehled rss kanálů');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
-      $category->{Model_Category::COLUMN_DESCRIPTION} = _('Kompletní rss kanálů vyvedených ze stránek');
+      $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Kompletní rss kanálů vyvedených ze stránek');
       $category->{Model_Category::COLUMN_KEYWORDS} = null;
       if(defined('VVE_CM_RSS_CAT_ICON')){
          $category->{Model_Category::COLUMN_ICON} = VVE_CM_RSS_CAT_ICON;

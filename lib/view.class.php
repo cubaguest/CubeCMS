@@ -10,7 +10,7 @@
  * @abstract 		Abstraktní třída kontroleru modulu
  */
 
-abstract class View {
+abstract class View extends TrObject {
    /**
     * Objekt pro práci s šablonovacím systémem
     * @var Template
@@ -41,9 +41,9 @@ abstract class View {
     * @param Url_Link_Module $link -- objekt odkazů modulu
     * @param Category $category --  objekt kategorie
     */
-   function __construct(Url_Link_Module $link, Category $category) {
+   function __construct(Url_Link_Module $link, Category $category, Translator $trs) {
       $this->template = new Template_Module($link, $category);
-
+      $this->template->setTranslator($trs);
       $this->link = $link;
       $this->category = $category;
       $this->locale = new Locales($category->getModule()->getName());
@@ -72,9 +72,6 @@ abstract class View {
     * @return mixed -- hodnota proměnné
     */
    public function  __get($name) {
-      if(!isset($this->template()->{$name})){
-         $this->template()->$name = null;
-      }
       return $this->template()->$name;
    }
 
@@ -186,6 +183,23 @@ abstract class View {
 
    final public function viewSettingsView() {
       $this->template()->addFile('tpl://engine:vsettings.phtml');
+   }
+
+   /**
+    * Metoda vrací objekt překladatele
+    * @return Translator
+    */
+   public function translator() {
+      return $this->template->translator();
+   }
+
+   /**
+    * Přímá metoda pro překlad
+    * @param mixed $str -- řetězec nebo pole pro překlady
+    * @param int $count -- (nepovinné) počet, podle kterého se volí překlad
+    */
+   public function tr($str, $count = 0) {
+      return $this->translator()->tr($str, $count);
    }
 }
 ?>

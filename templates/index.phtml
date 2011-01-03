@@ -157,8 +157,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             }?>
             <hr class="reseter" />
             <?//$this->includeTpl("login.phtml", true);//je v panelu?>
-            <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=_("Mapa stránek")?>"><?=_("Mapa stránek")?></a>&nbsp;
-            <a href="<?=$this->link()->clear(true)->file('rss.html');?>" title="<?=_("Přehled rss zdrojů")?>"><?=_("Rss kanály")?></a>
+            <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=$this->tr("Mapa stránek")?>"><?=$this->tr("Mapa stránek")?></a>&nbsp;
+            <a href="<?=$this->link()->clear(true)->file('rss.html');?>" title="<?=$this->tr("Přehled rss zdrojů")?>"><?=$this->tr("Rss kanály")?></a>
             <hr class="reseter" />
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->

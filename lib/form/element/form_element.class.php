@@ -8,7 +8,7 @@
  *                $LastChangedBy: jakub $ $LastChangedDate: 2009-06-14 15:52:19 +0000 (Sun, 14 Jun 2009) $
  * @abstract      Třída pro obsluhu formulářů
  */
-class Form_Element implements Form_Element_Interface {
+class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Název elementu
     * @var string

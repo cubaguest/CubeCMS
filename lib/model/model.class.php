@@ -11,7 +11,7 @@
  * @abstract 		Abstraktní třída pro vytvoření modelu
  */
 
-abstract class Model {
+abstract class Model extends TrObject {
    /**
     * KOnstruktor vytvoří objekt modelu
     * @param Module_Sys $sys -- systémové informace

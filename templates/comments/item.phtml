@@ -28,7 +28,7 @@ if(!$comment->viewed){
    <?if($comment->{Component_Comments_Model::COL_CENSORED} != true) {?>
       <p><?=nl2br($this->filter($comment->{Component_Comments_Model::COL_COMMENT},array('emoticons')),true)?></p>
    <?} else {
-      echo '<p>'._('Komentář by centurován.').'</p>';
+      echo '<p>'.$this->tr('Komentář by cenzurován.').'</p>';
       if($this->admin != null) {
          echo '<p class="comments-censored-text">'.nl2br($comment->{Component_Comments_Model::COL_COMMENT},true).'</p>';
 
@@ -37,7 +37,7 @@ if(!$comment->viewed){
    <?if($this->isClosed == false) {?>
    <p>
       <a href="<?=$this->pageLink()?>#addComment" onclick="selectParent(<?=$comment->{Component_Comments_Model::COL_ID}
-                    ?>, '<?=$comment->{Component_Comments_Model::COL_NICK}?>', '<?=vve_tpl_truncate($comment->{Component_Comments_Model::COL_COMMENT},40);?>');"><?=_('Reagovat')?></a>
+                    ?>, '<?=$comment->{Component_Comments_Model::COL_NICK}?>', '<?=vve_tpl_truncate($comment->{Component_Comments_Model::COL_COMMENT},40);?>');"><?=$this->tr('Reagovat')?></a>
    </p>
       <?}?>
 </div>

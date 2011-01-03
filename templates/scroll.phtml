@@ -7,7 +7,7 @@
 <? //Sipka na zacatek
    if($this->activeButtonBegin){
       ?>
-      <a href="<?=$this->pageLink()->param('page', '1')?>" title="<?_("Začátek")?>">
+      <a href="<?=$this->pageLink()->rmParam('page')?>" title="<?=$this->tr("Začátek")?>">
       |&lt;
       </a>
    <?} else {?>
@@ -17,36 +17,48 @@
 
 <? //Sipka na předchozí
    if($this->activeButtonPrevious){?>
-      <a href="<?=$this->pageLink()->param('page', $this->selectedPage-1)?>" title="<?_("Předchozí")?>">
-         <span>&lt;&nbsp;<?=_("Předchozí")?></span>
+      <a href="<?=$this->pageLink()->param('page', $this->selectedPage-1)?>" title="<?=$this->tr("Předchozí")?>">
+         <span>&lt;&nbsp;<?=$this->tr("Předchozí")?></span>
       </a>
    <?} else {?>
-      <span>&lt;&nbsp;<?=_("Předchozí")?></span>
+      <span>&lt;&nbsp;<?=$this->tr("Předchozí")?></span>
    <?}?>
 </td>
 <td align="center">
-   <? foreach ($this->pagesLeftSideArray as $number) {?>
-      &nbsp;<a href="<?=$this->pageLink()->param('page', $number);?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
+   <? foreach ($this->pagesLeftSideArray as $number) {
+      if($number == 1){
+         $link = $this->pageLink()->rmParam('page');
+      } else {
+         $link = $this->pageLink()->param('page', $number);
+      }
+      ?>
+      &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
    <?}?>
    [&nbsp;<?=$this->selectedPage.'/'.$this->countAllPages?>&nbsp;]
-   <? foreach ($this->pagesRightSideArray as $number) {?>
-      &nbsp;<a href="<?=$this->pageLink()->param('page', $number);?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
+   <? foreach ($this->pagesRightSideArray as $number) {
+      if($number == 1){
+         $link = $this->pageLink()->rmParam('page');
+      } else {
+         $link = $this->pageLink()->param('page', $number);
+      }
+      ?>
+      &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
    <?}?>
 </td>
 <td width="100" align="right">
 <? //Sipka na další
    if($this->activeButtonNext){?>
-      <a href="<?=$this->pageLink()->param('page', $this->selectedPage+1)?>" title="<?_("Další")?>">
-         <span><?=_("Další")?>&nbsp;&gt;</span>
+      <a href="<?=$this->pageLink()->param('page', $this->selectedPage+1)?>" title="<?=$this->tr("Další")?>">
+         <span><?=$this->tr("Další")?>&nbsp;&gt;</span>
       </a>
    <?} else {?>
       
-      <span><?=_("Další")?>&nbsp;&gt;</span>
+      <span><?=$this->tr("Další")?>&nbsp;&gt;</span>
    <?}?>
    &#032;&#032;
 <? //Sipka na konec
    if($this->activeButtonEnd){?>
-      <a href="<?=$this->pageLink()->param('page', $this->countAllPages)?>" title="<?_("Konec")?>">
+      <a href="<?=$this->pageLink()->param('page', $this->countAllPages)?>" title="<?=$this->tr("Konec")?>">
       &gt;|
       </a>
    <?} else {?>
@@ -55,5 +67,20 @@
 </td>
 </tr>
 </table>
+<?/*
+//if($this->ajaxBox != null){
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<script type="text/javascript">
+$('.scroll_main a').click(function(){
+   $('.main-content').load(this.href+" .main-content", function(){
+      alert('loaded');
+   });
+   return false;
+});
+</script>
+<?
+//}*/
+?>
 </div>
 <?}?>

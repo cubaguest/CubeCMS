@@ -11,7 +11,7 @@
 class Form_Validator_Url extends Form_Validator implements Form_Validator_Interface {
    public function  __construct($errMsg = null) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" není korektní adresa"));
+         parent::__construct($this->tr('Položka "%s" není korektní adresa'));
       } else {
          parent::__construct($errMsg);
       }
@@ -22,7 +22,7 @@ class Form_Validator_Url extends Form_Validator implements Form_Validator_Interf
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->addValidationConditionLabel(_('např: http://www.google.cz'));
+      $element->addValidationConditionLabel($this->tr('např: http://www.google.cz'));
    }
 
    public function validate(Form_Element $elemObj) {

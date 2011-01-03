@@ -24,7 +24,7 @@ class Module_Rss extends Module_Core {
                // načtení a kontrola cest u modulu
                $routesClassName = ucfirst($cat->{Model_Category::COLUMN_MODULE}).'_Routes';
                if(!class_exists($routesClassName)) {
-                  throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu cest (routes) modulu \"%s\"."),
+                  throw new BadClassException(sprintf($this->tr("Nepodařilo se načíst třídu cest (routes) modulu \"%s\"."),
                   $cat->{Model_Category::COLUMN_MODULE}), 10);
                }
                //	Vytvoření objektu s cestama modulu
@@ -58,7 +58,7 @@ class Module_Rss extends Module_Core {
    }
 
    public function runView() {
-      $this->template()->setPVar('CURRENT_CATEGORY_PATH', array(_('Přehled rss zdrojů')));
+      $this->template()->setPVar('CURRENT_CATEGORY_PATH', array($this->tr('Přehled rss zdrojů')));
       $this->template()->addTplFile('rss.phtml');
       $this->template()->sources = $this->links;
 

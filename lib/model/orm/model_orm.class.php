@@ -150,7 +150,7 @@ class Model_ORM extends Model_PDO {
                $params['pdoparam'] = PDO::PARAM_STMT;
                break;
             default:
-               throw new UnexpectedValueException(sprintf(_('Nepodporovaný datový typ sloupce "%s"'), $name));
+               throw new UnexpectedValueException(sprintf($this->tr('Nepodporovaný datový typ sloupce "%s"'), $name));
                break;
          }
       }
@@ -816,7 +816,7 @@ class Model_ORM extends Model_PDO {
       if(!empty ($this->orders)){
          $ords = array();
          foreach ($this->orders as $col => $val) {
-            if(!is_int($col) AND strtoupper($val) != 'ASC' AND strtoupper($val) != 'DESC') throw new UnexpectedValueException (sprintf (_('Nepodporovaný typ řazení "%s"'), $val));
+            if(!is_int($col) AND strtoupper($val) != 'ASC' AND strtoupper($val) != 'DESC') throw new UnexpectedValueException (sprintf ($this->tr('Nepodporovaný typ řazení "%s"'), $val));
             // kontrola sloupce jestli existuje
             // pokud obsahuje tečku jedná se o zápis s prefixem tabulky a ten se vkládá přímo
             if(is_int($col)){// pokud je jenom sloupce je ASC
@@ -933,7 +933,7 @@ class Model_ORM extends Model_PDO {
                   $pdoParam = PDO::PARAM_STR;
                   break;
                default:
-                  throw new UnexpectedValueException(sprintf(_('Nepovolená hodnota "%s" v předanám paramteru'),gettype($val)));
+                  throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'),gettype($val)));
                   break;
             }
             if($stmt->bindParam(':'.$name, $this->whereBindValues[$name], $pdoParam) === false){ // nefunguje při některých where, ale proč??

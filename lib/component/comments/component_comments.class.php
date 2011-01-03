@@ -90,7 +90,7 @@ class Component_Comments extends Component {
       
       // form pro přidání
       $addForm = new Form('comment_new_');
-      $elemNick = new Form_Element_Text('nick', _('Nick'));
+      $elemNick = new Form_Element_Text('nick', $this->tr('Nick'));
       $elemNick->addValidation(new Form_Validator_NotEmpty());
       if(Auth::isLogin()) {
          $elemNick->setValues(Auth::getUserName());
@@ -98,7 +98,7 @@ class Component_Comments extends Component {
 
       $addForm->addElement($elemNick);
 
-      $elemText = new Form_Element_TextArea('comment', _('komentář'));
+      $elemText = new Form_Element_TextArea('comment', $this->tr('komentář'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $elemText->addValidation(new Form_Validator_Length(10, $this->getConfig(self::PARAM_MAX_CHARS)));
       $elemText->addFilter(new Form_Filter_StripTags($this->getConfig(self::PARAM_ALLOW_TAGS)));
@@ -108,13 +108,13 @@ class Component_Comments extends Component {
       $elemRe->setValues(0);
       $addForm->addElement($elemRe);
 
-      $elemAdd = new Form_Element_Submit('add', _('Uložit'));
+      $elemAdd = new Form_Element_Submit('add', $this->tr('Uložit'));
       $addForm->addElement($elemAdd);
 
       if($addForm->isValid()) {
          if(!isset ($_SESSION['comment_captcha_time']) OR
                  ($_SESSION['comment_captcha_time']+$this->getConfig(self::PARAM_CAPTCHA_TIME) > time())) {
-            $this->errMsg()->addMessage(_('Komentář byl odeslán příliš rychle nebo nebyl odeslán kontrolní čas'));
+            $this->errMsg()->addMessage($this->tr('Komentář byl odeslán příliš rychle nebo nebyl odeslán kontrolní čas'));
          } else {
             $comment = $this->model->newRecord();
 
@@ -137,9 +137,9 @@ class Component_Comments extends Component {
             $this->saveViewedComments($commViewedForSave);
 
             if($comment->{Component_Comments_Model::COL_PUBLIC} == true) {
-               $this->infoMsg()->addMessage(_('Komentář byl uložen'));
+               $this->infoMsg()->addMessage($this->tr('Komentář byl uložen'));
             } else {
-               $this->infoMsg()->addMessage(_('Komentář byl uložen a čeká na schválení'));
+               $this->infoMsg()->addMessage($this->tr('Komentář byl uložen a čeká na schválení'));
             }
             $this->pageLink()->reload();
          }
@@ -154,12 +154,12 @@ class Component_Comments extends Component {
       $elemId->addValidation(new Form_Validator_IsNumber());
       $formCensore->addElement($elemId);
 
-      $elemCensore = new Form_Element_Submit('censored',_('Změnit cenzůru'));
+      $elemCensore = new Form_Element_Submit('censored',$this->tr('Změnit cenzůru'));
       $formCensore->addElement($elemCensore);
 
       if($formCensore->isValid()) {
          $this->model->changeCensored($formCensore->id->getValues());
-         $this->infoMsg()->addMessage(_('Komentáři byla změněna cenzůra'));
+         $this->infoMsg()->addMessage($this->tr('Komentáři byla změněna cenzůra'));
          $this->pageLink()->reload();
       }
       $this->template()->formCensore = $formCensore;
@@ -170,12 +170,12 @@ class Component_Comments extends Component {
       $elemId->addValidation(new Form_Validator_IsNumber());
       $formPublic->addElement($elemId);
 
-      $elemPublicB = new Form_Element_Submit('public', _('Změnit zveřejnění'));
+      $elemPublicB = new Form_Element_Submit('public', $this->tr('Změnit zveřejnění'));
       $formPublic->addElement($elemPublicB);
 
       if($formPublic->isValid()) {
          $this->model->changePublic($formPublic->id->getValues());
-         $this->infoMsg()->addMessage(_('Komentáři bylo změněno zveřejnění'));
+         $this->infoMsg()->addMessage($this->tr('Komentáři bylo změněno zveřejnění'));
          $this->pageLink()->reload();
       }
       $this->template()->formPublic = $formPublic;

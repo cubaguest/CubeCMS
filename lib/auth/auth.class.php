@@ -12,7 +12,7 @@
  * @todo          Dodělat načítání z modelu a převést taknázvy sloupců do modelu
  */
 
-class Auth {
+class Auth extends TrObject {
 	/**
 	 * Konstanty označující informace o uživateli
 	 * @var string
@@ -147,12 +147,13 @@ class Auth {
 	private static function logInNow() {
 		$return = false;
 		if (isset($_POST["login_submit"]) OR isset ($_POST['login_submit_x'])){
+         $tr = new Translator();
 			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
-				AppCore::getUserErrors()->addMessage(_("Byly zadány prázdné údaje"));
+				AppCore::getUserErrors()->addMessage($tr->tr("Byly zadány prázdné údaje"));
 			} else {
             $user = self::getUser(htmlentities($_POST["login_username"],ENT_QUOTES));
 				if (!$user){
-					AppCore::getUserErrors()->addMessage(_("Nepodařilo se přihlásit. Zřejmně váš účet neexistuje."));
+					AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
 				} else {
 					if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD}
                OR ($user->{Model_Users::COLUMN_PASSWORD_RESTORE} != null
@@ -176,10 +177,10 @@ class Auth {
                      $model = new Model_Users();
                      $model->save($user);
                      unset ($model);
-                     AppCore::getInfoMessages()->addMessage(_("Nové heslo bylo nastaveno."));
-                     Log::msg(_('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
+                     AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
+                     Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
                   }
-                  Log::msg(_('Uživatel byl přihlášen'), null, self::$userName);
+                  Log::msg($tr->tr('Uživatel byl přihlášen'), null, self::$userName);
                   // permanent login
                   if(isset ($_POST['login_permanent']) AND $_POST['login_permanent'] == 'on'){
                      setcookie(VVE_SESSION_NAME.'_pl', self::$userName.'|'.self::getBrowserIdent(), time()+self::PERMANENT_COOKIE_EXPIRE,'/');
@@ -190,7 +191,7 @@ class Auth {
                   die(); // not needn't
                   return true;
 					} else {
-                  AppCore::getUserErrors()->addMessage(_("Bylo zadáno špatné heslo."));
+                  AppCore::getUserErrors()->addMessage($tr->tr("Bylo zadáno špatné heslo."));
 					}
 				}
 			}
@@ -209,8 +210,8 @@ class Auth {
 			self::$login = false;
 			session_destroy();
 			$return = true;
-			Log::msg(_('Uživatel byl odhlášen'), null, self::$userName);
-         AppCore::getInfoMessages()->addMessage(_('Byl jste úspěšně odhlášen'));
+			Log::msg($this->tr('Uživatel byl odhlášen'), null, self::$userName);
+         AppCore::getInfoMessages()->addMessage($this->tr('Byl jste úspěšně odhlášen'));
          setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/'); // remove permament cookie
 			$link = new Url_Link();
          $link->reload();
@@ -238,7 +239,7 @@ class Auth {
             return true;
          }
          setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5); // remove permament cookie
-         Log::msg(sprintf(_('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
+         Log::msg(sprintf($this->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
       }
       return false;
    }

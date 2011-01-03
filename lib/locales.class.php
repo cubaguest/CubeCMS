@@ -13,7 +13,7 @@
  * @internal      Last ErrorCode 2
  */
 
-class Locales {
+class Locales extends TrObject {
    /**
     * Oddělovač jazyků v konfiguračním souboru
     * @var string
@@ -55,11 +55,11 @@ class Locales {
     * @var array
     */
    private static $locales = array("cs" => "cs_CZ.UTF-8",
-                                   "en" => "en_US",
-                                   "de" => "de_DE",
+                                   "en" => "en_US.UTF-8",
+                                   "de" => "de_DE.UTF-8",
                                    "sk" => "sk_SK.UTF-8",
-                                   "ru" => "ru_RU",
-                                   "pl" => "pl_PL ");
+                                   "ru" => "ru_RU.UTF-8",
+                                   "pl" => "pl_PL.UTF-8 ");
 
    /**
     * Pole s podobnými jazyky (je použito při výchozím nasatvení jazyku)
@@ -146,11 +146,11 @@ class Locales {
       } else {
          if(!self::isAppLang(self::$selectLang)){
             self::$selectLang = self::$defaultLang;
-            new CoreErrors(new UnexpectedValueException(
-                  _('Zvolený jazyk není v aplikaci implementován'),1));
+            $tr = new Translator();
+            new CoreErrors(new UnexpectedValueException( $tr->tr('Zvolený jazyk není v aplikaci implementován'),1));
          }
          
-         if(self::$selectLang != $_SESSION[self::SESSION_LANG]){
+         if(!isset ($_SESSION[self::SESSION_LANG]) OR self::$selectLang != $_SESSION[self::SESSION_LANG]){
             $_SESSION[self::SESSION_LANG]= self::$selectLang;
          } else {
             self::$selectLang = $_SESSION[self::SESSION_LANG];
@@ -228,12 +228,13 @@ class Locales {
     * //TODO dořešit přidávání více jazyků
     */
    private static function _setLangTranslations(){
-      self::$localesNames = array("cs" => _('Česky'),
-                                  "en" => _('Anglicky'),
-                                  "de" => _('Německy'),
-                                  "ru" => _('Rusky'),
-                                  "sk" => _('Slovensky'),
-                                  "pl" => _('Polsky'));
+      $tr = new Translator();
+      self::$localesNames = array("cs" => $tr->tr('Česky'),
+                                  "en" => $tr->tr('Anglicky'),
+                                  "de" => $tr->tr('Německy'),
+                                  "ru" => $tr->tr('Rusky'),
+                                  "sk" => $tr->tr('Slovensky'),
+                                  "pl" => $tr->tr('Polsky'));
    }
 
    /**
@@ -243,7 +244,8 @@ class Locales {
       //	nastavení gettext a locales
       //putenv("LANG=".self::getLocale(self::getLang()));
       if(setlocale(LC_ALL, self::getLocale(self::getLang())) == false){
-         throw new DomainException(sprintf(_('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
+         $tr = new Translator();
+         throw new DomainException(sprintf($tr->tr('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
       }
       bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, AppCore::getAppLibDir().self::GETTEXT_DEFAULT_LOCALES_DIR);
       textdomain(self::GETTEXT_DEFAULT_DOMAIN);

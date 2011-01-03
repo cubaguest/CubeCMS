@@ -12,7 +12,7 @@ class Form_Validator_Time extends Form_Validator implements Form_Validator_Inter
 
    public function  __construct($errMsg = null) {
       if($errMsg == null) {
-         parent::__construct(_('Nebyl vyplněn korektní čas v položce "%s"'));
+         parent::__construct($this->tr('Nebyl vyplněn korektní čas v položce "%s"'));
       } else {
          parent::__construct($errMsg);
       }
@@ -23,7 +23,7 @@ class Form_Validator_Time extends Form_Validator implements Form_Validator_Inter
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-       $element->addValidationConditionLabel(_("HH:MM nebo HH:MM:SS"));
+       $element->addValidationConditionLabel($this->tr("HH:MM nebo HH:MM:SS"));
    }
 
    public function validate(Form_Element $elemObj) {
@@ -44,7 +44,7 @@ class Form_Validator_Time extends Form_Validator implements Form_Validator_Inter
                   return false;
                }
             } else {
-               throw new RuntimeException(_('Neimplementovaná Validace času'));
+               throw new RuntimeException($this->tr('Neimplementovaná Validace času'));
             }
       }
       return true;

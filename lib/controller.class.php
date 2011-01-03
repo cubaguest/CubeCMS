@@ -12,7 +12,7 @@
  * @abstract 		Abstraktní třída kontroleru modulu
  */
 
-abstract class Controller {
+abstract class Controller extends TrObject {
    /**
     * Název nového actionViewru
     * @var string
@@ -95,8 +95,10 @@ abstract class Controller {
       }
       $this->link = $link;
       // locales
+      $this->setTranslator(new Translator_Module($this->moduleName));
       // pokud se jedná o zděděný kontroler tak nasatvíme na locales děděného kontroleru
       if(get_parent_class($this) != 'Controller'){
+         $this->translator()->apppendDomain(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
          $this->locale = new Locales(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
          $this->localeDomain = strtolower($this->moduleName);
       } else {
@@ -118,7 +120,7 @@ abstract class Controller {
    private function initView() {
       //	Načtení třídy View
       $viewClassName = ucfirst($this->moduleName).'_View';
-      $this->viewObj = new $viewClassName(clone $this->link(), $this->category());
+      $this->viewObj = new $viewClassName(clone $this->link(), $this->category(), $this->translator());
    }
 
    /**

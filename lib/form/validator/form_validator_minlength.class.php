@@ -17,7 +17,7 @@ class Form_Validator_MinLength extends Form_Validator implements Form_Validator_
       if($message != null) {
          parent::__construct($message);
       } else {
-         parent::__construct(_("\"%s\" je příliš krátký"));
+         parent::__construct($this->tr('"%s" je příliš krátký'));
       }
    }
 
@@ -26,7 +26,7 @@ class Form_Validator_MinLength extends Form_Validator implements Form_Validator_
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->addValidationConditionLabel(sprintf(_("min. %s znaků"), $this->min));
+      $element->addValidationConditionLabel(sprintf($this->tr("min. %s znaků"), $this->min));
    }
 
    public function validate(Form_Element $elemObj) {

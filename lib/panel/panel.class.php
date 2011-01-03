@@ -13,7 +13,7 @@
  * @todo				Není implementována práce s chybami
  */
 
-abstract class Panel {
+abstract class Panel extends TrObject {
    /**
     * Objekt šablony
     * @var Template_Module
@@ -59,6 +59,8 @@ abstract class Panel {
       $this->category = $category;
       $this->panelObj = new Panel_Obj($category->getCatDataObj());
       $this->routes = $routes;
+      // locales
+      $this->setTranslator(new Translator_Module($category->getModule()->getName()));
 
       $link = new Url_Link_Module();
       $link->setModuleRoutes($routes);
@@ -67,6 +69,7 @@ abstract class Panel {
       // locales
       $this->locale = new Locales($category->getModule()->getName());
       $this->template = new Template_Panel(clone $this->link, $this->category, $this->panelObj);
+      $this->template->setTranslator($this->translator());
    }
 
    /**

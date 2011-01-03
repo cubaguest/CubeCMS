@@ -23,7 +23,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
 
    public function  __construct($errMsg = null, $numberType = self::TYPE_INT) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" není ve správném číselném formátu"));
+         parent::__construct($this->tr('Položka "%s" není ve správném číselném formátu'));
       } else {
          parent::__construct($errMsg);
       }
@@ -40,12 +40,12 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
          switch ($this->numberType) {
             case 'float':
             case self::TYPE_FLOAT:
-               $element->addValidationConditionLabel(_("desetiné číslo"));
+               $element->addValidationConditionLabel($this->tr("desetiné číslo"));
                break;
             case 'int':
             case self::TYPE_INT:
             default:
-               $element->addValidationConditionLabel(_("celé číslo"));
+               $element->addValidationConditionLabel($this->tr("celé číslo"));
                break;
          }
       }
@@ -86,7 +86,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
             return true;
             break;
          default :
-            $this->errMessage = _('Nepodporovaný typ validace čísla');
+            $this->errMessage = $this->tr('Nepodporovaný typ validace čísla');
             break;
       }
       return false;

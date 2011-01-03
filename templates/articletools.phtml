@@ -4,12 +4,12 @@
          $vars['lastEditTime'] = new DateTime($vars['lastEditTime']);
       }?>
    <div>
-         <?=_('Naposled upraveno')?>&nbsp;<?=strftime("%x %X", $vars['lastEditTime']->format("U"))?>
+         <?=$this->tr('Naposled upraveno')?>&nbsp;<?=strftime("%x %X", $vars['lastEditTime']->format("U"))?>
          <?if(isset($vars['lastEditUser'])) {?>
-      &nbsp;<?=_('uživatelem')?>&nbsp;<span style="font-style: italic"><?=$vars['lastEditUser']?></span>,
+      &nbsp;<?=$this->tr('uživatelem')?>&nbsp;<span style="font-style: italic"><?=$vars['lastEditUser']?></span>,
             <?}
          if(isset($vars['showed'])) {
-            print (_('zobrazeno').":&nbsp;".$vars['showed']."&times;");
+            echo ($this->tr('zobrazeno').":&nbsp;".$vars['showed']."&times;");
          }?>
 
    </div>
@@ -17,15 +17,15 @@
    <?}?>
    <?if(isset($vars['linkToPdf']) OR isset($vars['linkToTxt'])) { ?>
    <div class="donwload">
-      <strong><?=_('Stáhnout')?>:</strong>
+      <strong><?=$this->tr('Stáhnout')?>:</strong>
       <?if(isset($vars['linkToPdf'])) { ?>
-   <a href="<?=$vars['linkToPdf']?>" title="<?=_('Stáhnout')?> pdf">pdf (tisk)</a>&nbsp;
+   <a href="<?=$vars['linkToPdf']?>" title="<?=$this->tr('Stáhnout')?> pdf"><?=$this->tr('pdf (tisk)')?></a>&nbsp;
          <?}?>
       <?if(isset($vars['linkToTxt'])) { ?>
-   <a href="<?=$vars['linkToTxt']?>" title="<?=_('Stáhnout')?> txt">txt</a>&nbsp;
+   <a href="<?=$vars['linkToTxt']?>" title="<?=$this->tr('Stáhnout')?> txt"><?=$this->tr('txt')?></a>&nbsp;
          <?}?>
       <?if(isset($vars['linkToHtml'])) { ?>
-   <a href="<?=$vars['linkToHtml']?>" title="<?=_('Stáhnout')?> html">html (tisk)</a>&nbsp;
+   <a href="<?=$vars['linkToHtml']?>" title="<?=$this->tr('Stáhnout')?> html"><?=$this->tr('html (tisk)')?></a>&nbsp;
          <?}?>
    </div>
    <br />

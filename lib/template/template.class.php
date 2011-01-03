@@ -17,7 +17,7 @@ require_once 'template_functions.php';
 require_once 'template_postfilters.php';
 require_once 'template_outputfilters.php'; // filtry výstupu
 
-class Template {
+class Template extends TrObject {
    /**
     * Názvem adresáře se vzhledy
     */

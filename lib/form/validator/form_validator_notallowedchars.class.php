@@ -23,7 +23,7 @@ class Form_Validator_NotAllowedChars extends Form_Validator implements Form_Vali
       }
       $this->notAllowedChars = $chars;
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" obsahuje nepovolené znaky"));
+         parent::__construct($this->tr('Položka "%s" obsahuje nepovolené znaky'));
       } else {
          parent::__construct($errMsg);
       }
@@ -34,7 +34,7 @@ class Form_Validator_NotAllowedChars extends Form_Validator implements Form_Vali
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->htmlValidLabel()->addContent(' '.sprintf(_("(nepovolené znaky: %s )"), $this->getChars()));
+      $element->htmlValidLabel()->addContent(' '.sprintf($this->tr("(nepovolené znaky: %s )"), $this->getChars()));
    }
 
    public function validate(Form_Element $elemObj) {

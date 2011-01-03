@@ -22,7 +22,7 @@ class Module_Sitemap extends Module_Core {
       $cats = new Model_Category();
       $categories = $cats->getCategoryList();
 
-      SiteMap::addPage(Url_Link::getMainWebDir(), _('Hlavní stránka'));
+      SiteMap::addPage(Url_Link::getMainWebDir(), $this->tr('Hlavní stránka'));
       foreach ($categories as $category) {
          $catObj = new Category(null, false, $category);
          $routesClassName = ucfirst($catObj->getModule()->getName()).'_Routes';
@@ -45,7 +45,7 @@ class Module_Sitemap extends Module_Core {
    }
 
    public function runView() {
-      $this->template()->setPVar('CURRENT_CATEGORY_PATH', array(_('mapa stránek')));
+      $this->template()->setPVar('CURRENT_CATEGORY_PATH', array($this->tr('mapa stránek')));
       $this->template()->categories = Menu_Main::getMenuObj();
       $this->template()->catArr = SiteMap::getItems();
       $this->template()->addTplFile('sitemap.phtml');

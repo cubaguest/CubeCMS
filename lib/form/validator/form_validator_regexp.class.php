@@ -16,7 +16,7 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
 
    public function  __construct($regexp='//', $errMsg = null) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" nevyhovuje zadanému regulérnímu výrazu"));
+         parent::__construct($this->tr('Položka "%s" nevyhovuje zadanému regulérnímu výrazu'));
       } else {
          parent::__construct($errMsg);
       }

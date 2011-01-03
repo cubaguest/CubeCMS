@@ -12,7 +12,7 @@
  * @todo 			implementovat generování názvu souborů pro zvolenou komponentu
  */
 
-class Component {
+class Component extends TrObject {
 /**
  * Výchozí cesta s šablonama
  * @var string
@@ -130,7 +130,7 @@ class Component {
          } else if (method_exists($this, $actionName . 'Controller')) {
             $this->{$actionName . 'Controller'} ();
          } else {
-            throw new Exception(sprintf(_('Neimplementováný kontroler "%s" Componenty "%s"'), $actionName, $this->componentName));
+            throw new Exception(sprintf($this->tr('Neimplementováný kontroler "%s" Componenty "%s"'), $actionName, $this->componentName));
          }
       } catch (Exception $exc) {
          new CoreErrors($exc);

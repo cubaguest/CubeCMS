@@ -11,7 +11,7 @@
  * @abstract 		Třída pro obsluhu zvolené kategorie
  */
 
-class Category_Core {
+class Category_Core extends TrObject {
    /**
     * Název adresáře s ikonou kategorie
     */

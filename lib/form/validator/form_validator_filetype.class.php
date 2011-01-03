@@ -32,7 +32,7 @@ class Form_Validator_FileType extends Form_Validator implements Form_Validator_I
       $this->types = $types;
 
       if($errMsg == null) {
-         parent::__construct(_("V položce \"%s\" nebyl odeslán povolený typ souboru"));
+         parent::__construct($this->tr('V položce "%s" nebyl odeslán povolený typ souboru'));
       } else {
          parent::__construct($errMsg);
       }
@@ -49,7 +49,7 @@ class Form_Validator_FileType extends Form_Validator implements Form_Validator_I
       }
       $mimes = substr($mimes, 0, strlen($mimes)-2);
 
-      $element->addValidationConditionLabel(sprintf(_("soubor typu %s"),$mimes));
+      $element->addValidationConditionLabel(sprintf($this->tr("soubor typu %s"),$mimes));
    }
 
    public function validate(Form_Element $elemObj) {

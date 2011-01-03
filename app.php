@@ -12,8 +12,8 @@
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  * @internal   Last ErrorCode 22
  */
-
-class AppCore {
+include_once './lib/trobject.class.php';
+class AppCore extends TrObject {
    /**
     * Název enginu
     */
@@ -246,7 +246,7 @@ class AppCore {
     * není povolen clone
     */
    public function __clone() {
-      throw new BadMethodCallException(_('Není povoleno inicializovat více jak jednu třídu aplikace'), 1);
+      throw new BadMethodCallException($this->tr('Není povoleno inicializovat více jak jednu třídu aplikace'));
    }
 
    /*
@@ -262,7 +262,7 @@ class AppCore {
       if (null === self::$_coreInstance) {
          self::$_coreInstance = new self();
       } else {
-         throw new BadMethodCallException(_('Objekt aplikace byl již vytvořen'), 2);
+         throw new BadMethodCallException($this->tr('Objekt aplikace byl již vytvořen'));
       }
       return self::$_coreInstance;
    }
@@ -491,7 +491,8 @@ class AppCore {
             require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
                             .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile;
          } else {
-            Log::msg(sprintf(_('Nelze nahrát třídu %s'), $classOrigName), $file);
+            $tr = new Translator();
+            Log::msg(sprintf($tr->tr('Nelze nahrát třídu %s'), $classOrigName), $file);
             return false;
          }
 //      }
@@ -551,7 +552,7 @@ class AppCore {
          }
          require_once $menuFile;
          if(!class_exists("Menu", false)) {
-            throw new BadClassException(_('Třídu pro tvorbu menu se nepodařilo načíst'),6);
+            throw new BadClassException($this->tr('Třídu pro tvorbu menu se nepodařilo načíst'),6);
          }
          $menu = new Menu();
          $menu->controller();
@@ -642,7 +643,7 @@ class AppCore {
          // načtení a kontrola cest u modulu
          $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
          if(!class_exists($routesClassName)) {
-            throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' cest (routes) modulu."),
+            throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" cest (routes) modulu.'),
             self::getCategory()->getModule()->getName()), 10);
          }
          //					Vytvoření objektu kontroleru
@@ -661,7 +662,7 @@ class AppCore {
             $controllerClassName = ucfirst($routes->getClassName()).'_Controller';
          }
          if(!class_exists($controllerClassName)) {
-            throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' controleru modulu."),
+            throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" controlleru modulu.'),
             self::getCategory()->getModule()->getName()), 10);
          }
          //					Vytvoření objektu kontroleru
@@ -687,14 +688,14 @@ class AppCore {
 
       if(!file_exists(AppCore::getAppLibDir().self::MODULES_DIR.DIRECTORY_SEPARATOR
          .self::getCategory()->getModule()->getName().DIRECTORY_SEPARATOR.'rss.class.php')){
-         throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu pro zpracování rss zdroje modulu \"%s\"."),
+         throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu pro zpracování rss zdroje modulu "%s"'),
          self::getCategory()->getModule()->getName()), 10);
       }
 
       // načtení a kontrola cest u modulu
       $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
       if(!class_exists($routesClassName)) {
-         throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu cest (routes) modulu \"%s\"."),
+         throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu cest (routes) modulu "%s".'),
          self::getCategory()->getModule()->getName()), 10);
       }
       //	Vytvoření objektu s cestama modulu
@@ -717,13 +718,13 @@ class AppCore {
          // spuštění modulu
          try {
             if(!self::getCategory() instanceof Category_Core OR self::getCategory()->getCatDataObj() == null) {
-               throw new CoreException(sprintf(_("Špatně zadaný požadavek \"%s\" na modul"),
+               throw new CoreException(sprintf($this->tr('Špatně zadaný požadavek "%s" na modul'),
                self::$urlRequest->getAction().'.'.self::$urlRequest->getOutputType()));
             }
             // načtení a kontrola cest u modulu
             $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
             if(!class_exists($routesClassName)) {
-               throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu cest (routes) modulu \"%s\"."),
+               throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu cest (routes) modulu "%s".'),
                self::getCategory()->getModule()->getName()), 10);
             }
             //	Vytvoření objektu s cestama modulu
@@ -734,14 +735,14 @@ class AppCore {
             if(!$routes->getActionName()) {
                AppCore::setErrorPage();
                return false;
-               throw new BadRequestException(_('Neplatná akce modulu'));
+               throw new BadRequestException($this->tr('Neplatná akce modulu'));
             }
             // načtení kontroleru
             $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
             if(!class_exists($controllerClassName)) {
-               trigger_error(sprintf(_("Nepodařilo se načíst třídu controleru modulu \"%s\"."),
+               trigger_error(sprintf($this->tr('Nepodařilo se načíst třídu controlleru modulu "%s".'),
                        self::getCategory()->getModule()->getName()), 10);
-//               throw new BadClassException(sprintf(_('Nepodařilo se načíst třídu \"%s\" controleru modulu."'), $controllerClassName));
+//               throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" controleru modulu.'), $controllerClassName));
             }
             //					Vytvoření objektu kontroleru
             $controller = new $controllerClassName(self::getCategory(), $routes);
@@ -793,7 +794,7 @@ class AppCore {
             }
             if($result === false) AppCore::setErrorPage(true);
          } else {
-            trigger_error(sprintf(_('Neimplementovaná statická akce "%s" modulu'),$className."::".$methodName));
+            trigger_error(sprintf($this->tr('Neimplementovaná statická akce "%s" modulu'),$className."::".$methodName));
          }
       }
    }
@@ -828,14 +829,14 @@ class AppCore {
             // načtení a kontrola cest u modulu
             $routesClassName = ucfirst($panelCat->getModule()->getName()) . '_Routes';
             if (!class_exists($routesClassName)) {
-               throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' cest (routes) modulu."),
+               throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" cest (routes) modulu.'),
                      $panelCat->getModule()->getName()), 10);
             }
             //					Vytvoření objektu kontroleru
             $routes = new $routesClassName(null, $panelCat);
             $controllerClassName = ucfirst($panelCat->getModule()->getName()) . '_Panel';
             if (!class_exists($controllerClassName)) {
-               throw new BadClassException(sprintf(_("Nepodařilo se načíst třídu '%s' controleru panelu modulu."),
+               throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" controlleru panelu modulu.'),
                      self::getCategory()->getModule()->getName()), 10);
             }
 
@@ -901,7 +902,7 @@ class AppCore {
             $pluginName = ucfirst(self::$urlRequest->getName());
             $jsPlugin = new $pluginName();
          } else {
-            throw new UnexpectedValueException(_('Neexistující JsPlugin'));
+            throw new UnexpectedValueException($this->tr('Neexistující JsPlugin'));
          }
          // vytvoření souboru
          Template_Output::sendHeaders();
@@ -953,10 +954,14 @@ class AppCore {
          Url_Request::factory();
          //inicializace lokalizace
          Locales::factory();
+         // provedení autorizace
+         Auth::authenticate();
+         // výběr jazyka a locales
+         self::$urlRequest = new Url_Request();
+//         Locales::setLang(self::$urlRequest->getUrlLang());
+         Locales::selectLang();
          // inicializace Šablonovacího systému
          Template::factory();
-         // výběr jazyka a locales
-         Locales::selectLang();
       } catch (Exception $exc) {
          echo $exc->getTraceAsString();
          die ();
@@ -966,10 +971,7 @@ class AppCore {
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
 
-      // provedení autorizace
-      Auth::authenticate();
-         
-      self::$urlRequest = new Url_Request();
+      
       // zapnutí buferu podle výstupu
       Template_Output::factory(self::$urlRequest->getOutputType());
 //      if(!Template_Output::isBinaryOutput()){
@@ -1000,7 +1002,6 @@ class AppCore {
             AppCore::setErrorPage(true);
          }
          unset ($className);
-
       if(!self::$urlRequest->isFullPage()) {
          // vynulování chyby, protože chybová stránka je výchozí stránka
          AppCore::setErrorPage(false);
@@ -1029,7 +1030,7 @@ class AppCore {
          }
          if(self::$urlRequest->getUrlType() != Url_Request::URL_TYPE_MODULE_RSS){
             if(AppCore::isErrorPage()) {
-               trigger_error(_("Neplatný požadavek na aplikaci"), E_USER_ERROR);
+               trigger_error($this->tr("Neplatný požadavek na aplikaci"), E_USER_ERROR);
             }
             // render chyb
             if(!CoreErrors::isEmpty()) {

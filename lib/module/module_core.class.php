@@ -9,7 +9,7 @@
  *                $LastChangedBy: jakub $ $LastChangedDate: 2010-01-18 14:17:32 +0100 (Po, 18 led 2010) $
  * @abstract 		Třída pro obsluhu vlastností modulu
  */
-class Module_Core {
+class Module_Core extends TrObject {
 
    private $name = null;
    private $template = null;

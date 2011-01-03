@@ -135,7 +135,7 @@ class Model_PDO extends Model {
             $step++;
          }
          $urlKeys = $newKey;
-         if($step ==  1000) trigger_error(_('Chyba při vytváření URL klíče'));
+         if($step ==  1000) trigger_error($this->tr('Chyba při vytváření URL klíče'));
       }
       return $urlKeys;
    }
@@ -180,7 +180,7 @@ class Model_PDO extends Model {
    protected function createValuesArray($name, $val, $separator = '_') {
       $returnArray = array();
       if(func_num_args()%2 != 0) {
-         throw new InvalidArgumentException(_('Nebyl předán potřebný počet argumentů'),1);
+         throw new InvalidArgumentException($this->tr('Nebyl předán potřebný počet argumentů'),1);
       }
       $argv = func_get_args();
       //         Skáčeme po dvou, protože první je sloupec a adruhý je hodnota
@@ -291,7 +291,7 @@ class Model_PDO extends Model {
    protected function isValidOrder($ord) {
       $ord = strtoupper($ord);
       if($ord != 'ASC' AND $ord != 'DESC') {
-         throw new UnexpectedValueException(sprintf(_('Neplatný typ řazení "%s" pro sql dotaz. Možné hodnoty jsou ASC/DESC'), $ord));
+         throw new UnexpectedValueException(sprintf($this->tr('Neplatný typ řazení "%s" pro sql dotaz. Možné hodnoty jsou ASC/DESC'), $ord));
       }
    }
 
@@ -303,7 +303,7 @@ class Model_PDO extends Model {
     */
    protected function isValidColumn($column, $columns) {
       if(!in_array($column, $columns)){
-         throw new UnexpectedValueException(sprintf(_('Neplatný sloupce "%s" v sql dotazu. Možné hodnoty jsou "%s"'), $column, implode(', ', $columns)));
+         throw new UnexpectedValueException(sprintf($this->tr('Neplatný sloupce "%s" v sql dotazu. Možné hodnoty jsou "%s"'), $column, implode(', ', $columns)));
       }
    }
 }

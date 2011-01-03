@@ -20,7 +20,7 @@ class Form_Validator_FileSize extends Form_Validator implements Form_Validator_I
       $this->fileSize = $size;
 
       if($errMsg == null) {
-         parent::__construct(_("V položce \"%s\" byl odeslán soubor větší než %sKB"));
+         parent::__construct($this->tr('V položce "%s" byl odeslán soubor větší než %sKB'));
       } else {
          parent::__construct($errMsg);
       }
@@ -31,7 +31,7 @@ class Form_Validator_FileSize extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->addValidationConditionLabel(sprintf(_("soubor maximální velikostí %sKB"),$this->fileSize));
+      $element->addValidationConditionLabel(sprintf($this->tr("soubor maximální velikostí %sKB"),$this->fileSize));
    }
 
    public function validate(Form_Element $elemObj) {

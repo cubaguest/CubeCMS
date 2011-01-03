@@ -12,7 +12,7 @@ class Form_Validator_Date extends Form_Validator implements Form_Validator_Inter
 
    public function  __construct($errMsg = null, $beforeDate = null, $afterDate = null) {
       if($errMsg == null) {
-         parent::__construct(_('Nebylo vyplněno korektní datum v položce "%s"'));
+         parent::__construct($this->tr('Nebylo vyplněno korektní datum v položce "%s"'));
       } else {
          parent::__construct($errMsg);
       }
@@ -49,7 +49,7 @@ class Form_Validator_Date extends Form_Validator implements Form_Validator_Inter
                   return false;
                }
             } else {
-               throw new RuntimeException(_('Neimplementovaná Validace Data'));
+               throw new RuntimeException($this->tr('Neimplementovaná Validace Data'));
             }
       }
       return true;

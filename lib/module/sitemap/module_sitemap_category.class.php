@@ -25,9 +25,9 @@ class Module_Sitemap_Category extends Category_Core {
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
       $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
       $category->{Model_Category::COLUMN_MODULE} = 'sitemap';
-      $category->{Model_Category::COLUMN_CAT_LABEL} = _('Mapa stránek');
+      $category->{Model_Category::COLUMN_CAT_LABEL} = $this->tr('Mapa stránek');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
-      $category->{Model_Category::COLUMN_DESCRIPTION} = _('Kompletní mapa stránek');
+      $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Kompletní mapa stránek');
       $category->{Model_Category::COLUMN_KEYWORDS} = null;
       if(defined('VVE_CM_SITEMAP_CAT_ICON')){
          $category->{Model_Category::COLUMN_ICON} = VVE_CM_SITEMAP_CAT_ICON;

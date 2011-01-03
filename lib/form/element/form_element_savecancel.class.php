@@ -18,10 +18,10 @@ class Form_Element_SaveCancel extends Form_Element {
       $this->htmlElement = new Html_Element('input');
       $this->html()->setAttrib('type', 'submit');
       if($this->getLabel() == null){
-         $this->formElementLabel = array(_('Uložit'),_('Zrušit'));
+         $this->formElementLabel = array($this->tr('Uložit'),$this->tr('Zrušit'));
       } else {
          if(!is_array($this->getLabel())){
-            throw new UnexpectedValueException(_('Pro skupinu elementů SaveCancel musí být label zadán jako pole se dvěma popiskama'));
+            throw new UnexpectedValueException($this->tr('Pro skupinu elementů SaveCancel musí být label zadán jako pole se dvěma popiskama'));
          }
          $this->formElementLabel = $this->getLabel();
       }
@@ -69,7 +69,7 @@ class Form_Element_SaveCancel extends Form_Element {
       $this->setValues($this->formElementLabel[1]);
       $this->html()->clearClasses();
       if($this->cancelConfirmMsg == true){
-         $this->html()->setAttrib('onclick', 'return confirm(\''._('Opravdu zrušit změny?').'\')');
+         $this->html()->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
       }
       $this->html()->addClass('button-cancel');
       $ctrlCancel = clone parent::controll();

@@ -13,7 +13,7 @@ foreach ($this->items as $name => $link) {
    }
    ?>
    <li class="module-navigation-tab <?if($curLink == (string)$link) echo 'module-navigation-tab-selected';?>"
-       ><a href="<?=$link?>" title="<?=_('Přejít na').' '.$name?>"><?
+       ><a href="<?=$link?>" title="<?=$this->tr('Přejít na').' '.$name?>"><?
    if($icon != null){?><img src="<?=vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>"
                alt="icon <?=$icon?>" /><?}?><span><?=$name?></span></a></li>
 <?

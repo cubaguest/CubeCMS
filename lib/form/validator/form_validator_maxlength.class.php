@@ -17,7 +17,7 @@ class Form_Validator_MaxLength extends Form_Validator implements Form_Validator_
       if($message != null) {
          parent::__construct($message);
       } else {
-         parent::__construct(_("\"%s\" je příliš dlouhý, maximálně %s znaků"));
+         parent::__construct($this->tr('"%s" je příliš dlouhý, maximálně %s znaků'));
       }
    }
 
@@ -26,7 +26,7 @@ class Form_Validator_MaxLength extends Form_Validator implements Form_Validator_
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->addValidationConditionLabel(sprintf(_("max. %s znaků"), $this->max));
+      $element->addValidationConditionLabel(sprintf($this->tr("max. %s znaků"), $this->max));
    }
 
    public function validate(Form_Element $elemObj) {

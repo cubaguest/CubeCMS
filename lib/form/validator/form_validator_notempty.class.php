@@ -25,7 +25,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
 
    public function  __construct($errMsg = null, $columsNotEmpty = null) {
       if($errMsg == null) {
-         parent::__construct(_("Nebyla vyplněna povinná položka \"%s\""));
+         parent::__construct($this->tr('Nebyla vyplněna povinná položka "%s"'));
       } else {
          parent::__construct($errMsg);
       }
@@ -43,7 +43,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
       $element->htmlLabel()->addClass(self::$cssClass);
 //      $element->html()->setAttrib('required', 'true')->addClass(self::$cssClass);
       $element->html()->addClass(self::$cssClass);
-      $element->htmlLabel()->setAttrib('title', _('prvek je povinný'));
+      $element->htmlLabel()->setAttrib('title', $this->tr('prvek je povinný'));
    }
 
    public function validate(Form_Element $elemObj) {

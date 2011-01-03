@@ -36,7 +36,7 @@ class Module_ErrPage extends Module_Core {
       switch ($this->getCode()) {
          case 404:
          default :
-            echo _('CHYBA: Stránka nenalezena');
+            echo $this->tr('CHYBA: Stránka nenalezena');
             break;
       }
    }

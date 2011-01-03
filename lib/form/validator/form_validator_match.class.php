@@ -17,7 +17,7 @@ class Form_Validator_Match extends Form_Validator implements Form_Validator_Inte
       if($message != null) {
          parent::__construct($message);
       } else {
-         parent::__construct(_("\"%s\" musí obsahovat hodnotu \"%s\""));
+         parent::__construct($this->tr('"%s" musí obsahovat hodnotu "%s"'));
       }
    }
 

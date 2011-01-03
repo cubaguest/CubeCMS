@@ -8,7 +8,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Abstraktní třída validátoru
  */
-abstract class Form_Validator implements Form_Validator_Interface {
+abstract class Form_Validator extends TrObject implements Form_Validator_Interface {
    protected $errMessage = null;
 
    /**

@@ -11,7 +11,7 @@
 class Form_Validator_Email extends Form_Validator implements Form_Validator_Interface {
    public function  __construct($errMsg = null) {
       if($errMsg == null) {
-         parent::__construct(_("Položka \"%s\" není korektní emailová adresa"));
+         parent::__construct($this->tr('Položka "%s" není korektní emailová adresa'));
       } else {
          parent::__construct($errMsg);
       }
@@ -22,7 +22,7 @@ class Form_Validator_Email extends Form_Validator implements Form_Validator_Inte
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->addValidationConditionLabel(_('např: info@domena.cz'));
+      $element->addValidationConditionLabel($this->tr('např: info@domena.cz'));
    }
 
    public function validate(Form_Element $elemObj) {

@@ -1,17 +1,17 @@
 <div class="comments-list">
    <?
    echo '<span class="comments-label"><strong>';
-   printf(_('Komentáře (%s), nové: (%s).'),$this->countComments, $this->unreaded);
+   printf($this->tr('Komentáře (%s), nové: (%s).'),$this->countComments, $this->unreaded);
    echo '</strong></span>';
    if(!empty ($this->comments)) {
       foreach ($this->comments as $comment) {
          $this->includeTpl('comments/item.phtml',true, array('comment' => $comment));
       }
    } else {
-      echo _('<p>Není uložen žádný komentář</p>');
+      echo $this->tr('<p>Není uložen žádný komentář</p>');
    }
    ?>
    <?if($this->isClosed == true) {
-      echo _('<p>Diskuze byla uzavřena</p>');
+      echo $this->tr('<p>Diskuze byla uzavřena</p>');
    }?>
 </div>

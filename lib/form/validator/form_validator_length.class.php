@@ -24,7 +24,7 @@ class Form_Validator_Length extends Form_Validator implements Form_Validator_Int
       if($message != null) {
          parent::__construct($message);
       } else {
-         parent::__construct(_("\"%s\" nemá požadovanou délku"));
+         parent::__construct($this->tr('"%s" nemá požadovanou délku'));
       }
    }
 
@@ -34,15 +34,15 @@ class Form_Validator_Length extends Form_Validator implements Form_Validator_Int
     */
    public function addHtmlElementParams(Form_Element $element) {
       if($this->min === null) {
-         $element->addValidationConditionLabel(sprintf(_("max. %s znaků"), $this->max));
+         $element->addValidationConditionLabel(sprintf($this->tr("max. %s znaků"), $this->max));
          $element->html()->setAttrib('maxlength', $this->max);
       } else if($this->max === null) {
-         $element->addValidationConditionLabel(sprintf(_("min. %s znaků"), $this->min));
+         $element->addValidationConditionLabel(sprintf($this->tr("min. %s znaků"), $this->min));
       } else if($this->min == $this->max) {
-         $element->addValidationConditionLabel(sprintf(_("%s znaků"), $this->max));
+         $element->addValidationConditionLabel(sprintf($this->tr("%s znaků"), $this->max));
          $element->html()->setAttrib('maxlength', $this->max);
       } else {
-         $element->addValidationConditionLabel(sprintf(_("%s - %s znaků"),$this->min, $this->max));
+         $element->addValidationConditionLabel(sprintf($this->tr("%s - %s znaků"),$this->min, $this->max));
          $element->html()->setAttrib('maxlength', $this->max);
       }
    }
@@ -57,11 +57,11 @@ class Form_Validator_Length extends Form_Validator implements Form_Validator_Int
             } else {
                if($elemObj->getUnfilteredValues() != null AND !is_null($this->max)
                   AND strlen($elemObj->getUnfilteredValues()) > $this->max) {
-                  $this->errMsg()->addMessage(sprintf(_("\"%s\" je příliš dlouhý"), $elemObj->getLabel()));
+                  $this->errMsg()->addMessage(sprintf($this->tr('"%s" je příliš dlouhý'), $elemObj->getLabel()));
                   return false;
                } else if($elemObj->getUnfilteredValues() != null
                   AND !is_null($this->min) AND strlen($elemObj->getUnfilteredValues()) < $this->min) {
-                  $this->errMsg()->addMessage(sprintf(_("\"%s\" je příliš krátký"), $elemObj->getLabel()));
+                  $this->errMsg()->addMessage(sprintf($this->tr('"%s" je příliš krátký'), $elemObj->getLabel()));
                   return false;
                }
             }

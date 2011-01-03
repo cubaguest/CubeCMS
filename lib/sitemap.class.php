@@ -12,7 +12,7 @@
  * @abstract 		Třída pro tvorbu sitemap
  */
 
-class SiteMap {
+class SiteMap extends TrObject {
 /**
  * Proměné s názvy četností změn
  * @var string
@@ -85,6 +85,10 @@ class SiteMap {
       $link->setModuleRoutes($routes);
       $link->category($this->category()->getUrlKey());
       $this->link = $link;
+      $this->setTranslator(new Translator_Module($this->category()->getModule()->getName()));
+      if(get_parent_class($this) != 'SiteMap'){
+         $this->translator()->apppendDomain(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
+      }
    }
 
    /**
@@ -147,7 +151,7 @@ class SiteMap {
     * @param string -- (option) název položky další
     */
    public function setLinkMore($url, $name = null) {
-      if($name == null) $name = _('další');
+      if($name == null) $name = $this->tr('další');
       $this->linkMore = array(
           'loc' => (string)$url,
           'name' => (string)$name);
