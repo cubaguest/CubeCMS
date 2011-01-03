@@ -30,22 +30,22 @@ class Login_Controller extends Controller {
       $form = new Form('pass_');
       $form->html()->setAttrib('autocomplete', 'off');
 
-      $elemPassCur = new Form_Element_Password('current', $this->_('Staré heslo'));
+      $elemPassCur = new Form_Element_Password('current', $this->tr('Staré heslo'));
       $elemPassCur->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemPassCur);
 
-      $elemPassN1 = new Form_Element_Text('new1', $this->_('Nové heslo'));
+      $elemPassN1 = new Form_Element_Text('new1', $this->tr('Nové heslo'));
       $elemPassN1->addValidation(new Form_Validator_NotEmpty());
       $elemPassN1->addValidation(new Form_Validator_MinLength(5));
       $form->addElement($elemPassN1);
 
-      $elemPassN2 = new Form_Element_Text('new2', $this->_('Nové heslo'));
+      $elemPassN2 = new Form_Element_Text('new2', $this->tr('Nové heslo'));
       $elemPassN2->addValidation(new Form_Validator_NotEmpty());
       $elemPassN2->addValidation(new Form_Validator_MinLength(5));
-      $elemPassN2->setSubLabel($this->_('Potvrzení hesla'));
+      $elemPassN2->setSubLabel($this->tr('Potvrzení hesla'));
       $form->addElement($elemPassN2);
 
-      $elemPassGener = new Form_Element_Text('gener', $this->_('Generované'));
+      $elemPassGener = new Form_Element_Text('gener', $this->tr('Generované'));
       $form->addElement($elemPassGener);
 
       $elemSubmit = new Form_Element_SaveCancel('change');
@@ -60,11 +60,11 @@ class Login_Controller extends Controller {
          $user = $model->record(Auth::getUserId());
          // kontrola starého hesla
          if(Auth::cryptPassword($form->current->getValues()) != $user->{Model_Users::COLUMN_PASSWORD}){
-            $form->current->setError($this->_('Špatně zadané aktuální heslo'));
+            $form->current->setError($this->tr('Špatně zadané aktuální heslo'));
          }
 
          if($form->new1->getValues() != $form->new2->getValues()){
-            $form->new1->setError($this->_('Nová hesla se neshodují'));
+            $form->new1->setError($this->tr('Nová hesla se neshodují'));
          }
       }
 
@@ -72,7 +72,7 @@ class Login_Controller extends Controller {
          $user = $model->record(Auth::getUserId());
          $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($form->new1->getValues());
          $model->save($user);
-         $this->infoMsg()->addMessage($this->_("Heslo bylo úspěšně změněno"));
+         $this->infoMsg()->addMessage($this->tr("Heslo bylo úspěšně změněno"));
    		$this->link()->route()->reload();
       }
 
@@ -98,7 +98,7 @@ class Login_Controller extends Controller {
 
       if($this->form->isValid()){
          $this->saveUser();
-         $this->infoMsg()->addMessage($this->_('Změny byly uloženy'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly uloženy'));
          $this->link()->route()->reload();
       }
       $this->view()->form = $this->form;
@@ -107,23 +107,23 @@ class Login_Controller extends Controller {
    protected function createEditUserForm() {
       $this->form = new Form('user_');
 
-      $fGrpBase = $this->form->addGroup('base', $this->_('Základní informace'));
+      $fGrpBase = $this->form->addGroup('base', $this->tr('Základní informace'));
 
-      $elemName = new Form_Element_Text('name', $this->_('Jméno'));
+      $elemName = new Form_Element_Text('name', $this->tr('Jméno'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $this->form->addElement($elemName, $fGrpBase);
 
-      $elemSurName = new Form_Element_Text('surname', $this->_('Přijmení'));
+      $elemSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
       $elemSurName->addValidation(new Form_Validator_NotEmpty());
       $this->form->addElement($elemSurName, $fGrpBase);
 
-      $elemEmails = new Form_Element_Text('email', $this->_('Email'));
+      $elemEmails = new Form_Element_Text('email', $this->tr('Email'));
       $elemEmails->addValidation(new Form_Validator_NotEmpty());
       $elemEmails->addValidation(new Form_Validator_Email());
       $this->form->addElement($elemEmails, $fGrpBase);
 
-      $fGrpOther = $this->form->addGroup('other', $this->_('Ostatní'));
-      $elemNote = new Form_Element_TextArea('note', $this->_('Poznámky'));
+      $fGrpOther = $this->form->addGroup('other', $this->tr('Ostatní'));
+      $elemNote = new Form_Element_TextArea('note', $this->tr('Poznámky'));
       $this->form->addElement($elemNote, $fGrpOther);
 
       $elemSubmit = new Form_Element_SaveCancel('save');
@@ -151,11 +151,11 @@ class Login_Controller extends Controller {
 
       $form = new Form('newpass_');
 
-      $eUsername = new Form_Element_Text('username', $this->_('Uživatelské jméno'));
+      $eUsername = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
       $eUsername->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($eUsername);
 
-      $elemSubmit = new Form_Element_SaveCancel('restore', array($this->_('Zaslat'), _('Zrušit')));
+      $elemSubmit = new Form_Element_SaveCancel('restore', array($this->tr('Zaslat'), $this->tr('Zrušit')));
       $form->addElement($elemSubmit);
 
       if($form->isSend()){
@@ -164,7 +164,7 @@ class Login_Controller extends Controller {
          }
          if($form->username->getValues() != null AND
             $modelUsr->where(Model_Users::COLUMN_USERNAME, $form->username->getValues())->record() == false){
-            $eUsername->setError($this->_('Zadané uživatelské jméno neexistuje'));
+            $eUsername->setError($this->tr('Zadané uživatelské jméno neexistuje'));
          }
       }
 
@@ -175,12 +175,12 @@ class Login_Controller extends Controller {
 
          $email = new Email(false);
          $email->addAddress($mail[0], $user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
-         $email->setSubject($this->_('Obnova zapomenutého hesla'));
+         $email->setSubject($this->tr('Obnova zapomenutého hesla'));
 
-         $cnt = $this->_("Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\n");
+         $cnt = $this->tr("Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\n");
          $newPass = self::generatePassword();
-         $cnt .= "\n".  $this->_('Heslo').': '.$newPass."\n\n";
-         $cnt .= $this->_("S pozdravem\nTým").' '.VVE_WEB_NAME;
+         $cnt .= "\n".  $this->tr('Heslo').': '.$newPass."\n\n";
+         $cnt .= $this->tr("S pozdravem\nTým").' '.VVE_WEB_NAME;
          $email->setContent($cnt);
          $email->send();
 
@@ -192,7 +192,7 @@ class Login_Controller extends Controller {
          $modelUsr->save($user);
 
          $this->log(sprintf('Změna hesla uživatele %s', $form->username->getValues()));
-         $this->infoMsg()->addMessage($this->_('Nově vygenerované heslo bylo zasláno na Váš e-mail'));
+         $this->infoMsg()->addMessage($this->tr('Nově vygenerované heslo bylo zasláno na Váš e-mail'));
          $this->link()->route()->reload();
       }
       

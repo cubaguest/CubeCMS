@@ -2,31 +2,31 @@
 $this->addCssFile("style.css");
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
-<h1><?=$this->_('Informace o účtu')?></h1>
+<h1><?=$this->tr('Informace o účtu')?></h1>
 <div class="main-content-detail" id="user-dateil">
    <table>
       <tr>
-         <th class="ui-widget-header" width="200"><?=$this->_('Uživatelké jméno')?></th>
+         <th class="ui-widget-header" width="200"><?=$this->tr('Uživatelké jméno')?></th>
          <td class="ui-widget-content" width="300"><?=$this->user->{Model_Users::COLUMN_USERNAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->_('Jméno')?></th>
+         <th class="ui-widget-header"><?=$this->tr('Jméno')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->_('Přijmení')?></th>
+         <th class="ui-widget-header"><?=$this->tr('Přijmení')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_SURNAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->_('Skupina')?></th>
+         <th class="ui-widget-header"><?=$this->tr('Skupina')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->_('E-maily')?></th>
+         <th class="ui-widget-header"><?=$this->tr('E-maily')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_MAIL}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->_('Poznámky')?></th>
+         <th class="ui-widget-header"><?=$this->tr('Poznámky')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
    </table>

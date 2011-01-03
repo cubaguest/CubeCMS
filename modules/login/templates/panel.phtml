@@ -13,20 +13,20 @@ if($this->panelObj()->getBackImage() != null){
 <form method="post" action="<?=$this->currentLink;?>">
    <p>
       <? if(!Auth::isLoginStatic()){?>
-      <label for="panel_login_username"><?=$this->_('Jméno')?></label><br />
+      <label for="panel_login_username"><?=$this->tr('Jméno')?></label><br />
       <input id="panel_login_username" class="login_input" type="text" 
              name="login_username" maxlength="20" size="15" value="_intranet_login"
              onclick="if (this.value == '_intranet_login') { this.value = ''; }"
              onblur="if (this.value == '') { this.value = '_intranet_login'; }"/><br />
-      <label for="panel_login__passwd"><?=$this->_('Heslo')?></label><br />
+      <label for="panel_login__passwd"><?=$this->tr('Heslo')?></label><br />
       <input id="panel_login__passwd" type="password" name="login_passwd" maxlength="20" 
              size="15" value="Password" onclick="if (this.value == 'Password') { this.value = ''; }"
              onblur="if (this.value == '') { this.value = 'Password'; }"/><br />
-      <label><?=$this->_('Trvalé přihlášení')?></label>&nbsp;<input type="checkbox" name="login_permanent" />&nbsp;<br />
-      <input id="login_submit" type="submit" name="login_submit" value="<?=$this->_('přihlásit')?>" />
+      <label><?=$this->tr('Trvalé přihlášení')?></label>&nbsp;<input type="checkbox" name="login_permanent" />&nbsp;<br />
+      <input id="login_submit" type="submit" name="login_submit" value="<?=$this->tr('přihlásit')?>" />
       <? } else { ?>
-      <?=$this->_('Přihlášen')?>: <a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=Auth::getUserName()?></a><br />
-      <input id="login_submit" type="submit" name="logout_submit" value="<?=$this->_('odhlásit')?>" />
+      <?=$this->tr('Přihlášen')?>: <a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=Auth::getUserName()?></a><br />
+      <input id="login_submit" type="submit" name="logout_submit" value="<?=$this->tr('odhlásit')?>" />
       <? } ?>
    </p>
 </form>

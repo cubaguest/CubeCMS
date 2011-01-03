@@ -1,0 +1,53 @@
+<?php
+$singular = 
+array (
+  'Přihlášení' => 'Login',
+  'Jméno' => 'Name',
+  'Heslo' => 'Password',
+  'Obnovit zapomenuté heslo' => 'Recover lost password',
+  'Zapomenuté heslo' => 'Forgotten Password',
+  'trvale' => 'permanently',
+  'Přihlásit' => 'Login',
+  'Změna hesla' => 'Change Password',
+  'obnovit' => 'restore',
+  'kopírovat' => 'copy',
+  'Změna údajů' => 'Change data',
+  'Informace o účtu' => 'Account Information',
+  'Uživatelké jméno' => 'User Name',
+  'Přijmení' => 'Surname',
+  'Skupina' => 'Group',
+  'E-maily' => 'E-mail',
+  'Poznámky' => 'Comments',
+  'Odhlásit' => 'Logout',
+  'Trvalé přihlášení' => 'Remember me',
+  'přihlásit' => 'Login',
+  'Přihlášen' => 'Logged',
+  'odhlásit' => 'logout',
+  'Nové heslo Vám bude zasláno na e-mail uvedený v účtu. Pokud
+         Vám heslo nebude sedět, můžete si jej změnit ve Vašem účtu.' => 'A new password will be sent to the e-mail address specified in your account. If your password does not fit, you can change it in your account.',
+  'Změnit heslo' => 'Change Password',
+  'Změnit údaje' => 'Change details',
+  'Staré heslo' => 'Old Password',
+  'Nové heslo' => 'New password',
+  'Potvrzení hesla' => 'Confirm Password',
+  'Generované' => 'Generated',
+  'Špatně zadané aktuální heslo' => 'Incorrectly entered your current password',
+  'Nová hesla se neshodují' => 'New passwords do not match',
+  'Heslo bylo úspěšně změněno' => 'The password was successfully changed',
+  'Změny byly uloženy' => 'Changes saved',
+  'Základní informace' => 'Basic information',
+  'Email' => 'Email',
+  'Ostatní' => 'Other',
+  'Uživatelské jméno' => 'Username',
+  'Zaslat' => 'Send',
+  'Zrušit' => 'Cancel',
+  'Zadané uživatelské jméno neexistuje' => 'The username does not exist',
+  'Obnova zapomenutého hesla' => 'Forgotten Password Recovery',
+  'Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\\\\n' => 'Dear users, \nwe send you recover the password change. \nIf You Did not you this email, one is likely to mislead another user, and you can ignore this email. \n',
+  'S pozdravem\nTým' => 'Sincerely, \n Team',
+  'Nově vygenerované heslo bylo zasláno na Váš e-mail' => 'The newly generated password has been sent to your e-mail',
+);
+$plural = 
+array (
+);
+?>

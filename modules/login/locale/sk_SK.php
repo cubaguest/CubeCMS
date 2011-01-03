@@ -1,0 +1,53 @@
+<?php
+$singular = 
+array (
+  'Přihlášení' => 'Prihlásenie',
+  'Jméno' => 'Meno',
+  'Heslo' => 'Heslo',
+  'Obnovit zapomenuté heslo' => 'Obnoviť zabudnuté heslo',
+  'Zapomenuté heslo' => 'Zabudnuté heslo',
+  'trvale' => 'trvalo',
+  'Přihlásit' => 'Prihlásiť',
+  'Změna hesla' => 'Zmena hesla',
+  'obnovit' => 'obnoviť',
+  'kopírovat' => 'kopírovať',
+  'Změna údajů' => 'Zmena údajov',
+  'Informace o účtu' => 'Informácie o účte',
+  'Uživatelké jméno' => 'Užívateľské meno',
+  'Přijmení' => 'Priezvisko',
+  'Skupina' => 'Skupina',
+  'E-maily' => 'E-maily',
+  'Poznámky' => 'Poznámky',
+  'Odhlásit' => 'Odhlásiť',
+  'Trvalé přihlášení' => 'Trvalé prihlásenie',
+  'přihlásit' => 'prihlásiť',
+  'Přihlášen' => 'Prihlásený',
+  'odhlásit' => 'odhlásiť',
+  'Nové heslo Vám bude zasláno na e-mail uvedený v účtu. Pokud
+         Vám heslo nebude sedět, můžete si jej změnit ve Vašem účtu.' => 'Nové heslo Vám bude zaslané na e-mail uvedený v účte. Ak Vám heslo nebude sedieť, môžete si ho zmeniť vo Vašom účte.',
+  'Změnit heslo' => 'Zmeniť heslo',
+  'Změnit údaje' => 'Zmeniť údaje',
+  'Staré heslo' => 'Staré heslo',
+  'Nové heslo' => 'Nové heslo',
+  'Potvrzení hesla' => 'Potvrdenie hesla',
+  'Generované' => 'Generované',
+  'Špatně zadané aktuální heslo' => 'Zle zadané aktuálne heslo',
+  'Nová hesla se neshodují' => 'Nová heslá sa nezhodujú',
+  'Heslo bylo úspěšně změněno' => 'Heslo bolo úspešne zmenené',
+  'Změny byly uloženy' => 'Zmeny boli uložené',
+  'Základní informace' => 'Základné informácie',
+  'Email' => 'Email',
+  'Ostatní' => 'Ostatné',
+  'Uživatelské jméno' => 'Užívateľské meno',
+  'Zaslat' => 'Zaslať',
+  'Zrušit' => 'Zrušiť',
+  'Zadané uživatelské jméno neexistuje' => 'Zadané užívateľské meno neexistuje',
+  'Obnova zapomenutého hesla' => 'Obnova zabudnutého hesla',
+  'Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\n' => 'Vážený užívateľ, \n zasielame Vam požadované zmeny hesla. \nAk ste tento email nevygeneroval Vy, jedna sa pravdepodobne \n o omyl ineho uzívateľov a mozete tento email ignorovať. \n',
+  'S pozdravem\nTým' => 'S pozdravom \n Tým',
+  'Nově vygenerované heslo bylo zasláno na Váš e-mail' => 'Novo vygenerované heslo bolo zaslané na Váš e-mail',
+);
+$plural = 
+array (
+);
+?>
