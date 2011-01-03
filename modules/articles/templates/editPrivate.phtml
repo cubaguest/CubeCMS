@@ -1,7 +1,7 @@
 <?
 $this->addCssFile("style.css");
 // do titulku
-$h = $this->_('úprava privátního textu článku').' '.$this->article->{Articles_Model::COLUMN_NAME};
+$h = $this->tr('úprava privátního textu článku').' '.$this->article->{Articles_Model::COLUMN_NAME};
 $this->addPageTitle($h);
 // donastavení formuláře
 $this->form->textPrivate->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");

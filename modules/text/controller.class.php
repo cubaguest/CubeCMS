@@ -55,13 +55,13 @@ class Text_Controller extends Controller {
 
       $form = new Form("text_");
       
-      $label = new Form_Element_Text('label', $this->_('Nadpis'));
+      $label = new Form_Element_Text('label', $this->tr('Nadpis'));
       $label->addFilter(new Form_Filter_StripTags());
-      $label->setSubLabel($this->_('Doplní se namísto nadpisu stránky'));
+      $label->setSubLabel($this->tr('Doplní se namísto nadpisu stránky'));
       $label->setLangs();
       $form->addElement($label);
 
-      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea);
@@ -77,7 +77,7 @@ class Text_Controller extends Controller {
       $form->addElement($submit);
 
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
@@ -94,7 +94,7 @@ class Text_Controller extends Controller {
             $model->saveText($text, $form->label->getValues(),
                     $this->category()->getId(), self::TEXT_MAIN_KEY);
             $this->log('úprava textu');
-            $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+            $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
             new CoreErrors($e);
@@ -112,7 +112,7 @@ class Text_Controller extends Controller {
 
       $form = new Form("text_");
 
-      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
       $form->addElement($textarea);
 
@@ -126,7 +126,7 @@ class Text_Controller extends Controller {
       $form->addElement($submit);
 
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
@@ -141,7 +141,7 @@ class Text_Controller extends Controller {
             }
             $model->saveText($form->text->getValues(), null, $this->category()->getId(),self::TEXT_PANEL_KEY);
             $this->log('Úprava textu panelu');
-            $this->infoMsg()->addMessage($this->_('Text panelu byl uložen'));
+            $this->infoMsg()->addMessage($this->tr('Text panelu byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
             new CoreErrors($e);
@@ -159,9 +159,9 @@ class Text_Controller extends Controller {
       
       $form = new Form("text_");
 
-      $grpText = $form->addGroup('text', $this->_('Text'));
+      $grpText = $form->addGroup('text', $this->tr('Text'));
 
-      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
       $form->addElement($textarea, $grpText);
 
@@ -170,9 +170,9 @@ class Text_Controller extends Controller {
          $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
       }
 
-      $grpAccess = $form->addGroup('access', $this->_('Přístupy'), $this->_('Uživatelé nebo skupiny které uvidí privátní text. Stačí vybrat skupinu.'));
+      $grpAccess = $form->addGroup('access', $this->tr('Přístupy'), $this->tr('Uživatelé nebo skupiny které uvidí privátní text. Stačí vybrat skupinu.'));
       // groups
-      $elemGroups = new Form_Element_Select('groups', $this->_('Skupiny'));
+      $elemGroups = new Form_Element_Select('groups', $this->tr('Skupiny'));
       $elemGroups->setMultiple(true);
       $groups = $modelUsers->getGroups()->fetchAll(PDO::FETCH_OBJ);
       foreach ($groups as $grp) {
@@ -186,7 +186,7 @@ class Text_Controller extends Controller {
       }
       $form->addElement($elemGroups, $grpAccess);
       // users
-      $elemUsers = new Form_Element_Select('users', $this->_('Uživatelé'));
+      $elemUsers = new Form_Element_Select('users', $this->tr('Uživatelé'));
       $elemUsers->setMultiple(true);
       $users = $modelUsers->getUsersList()->fetchAll(PDO::FETCH_OBJ);
       foreach ($users as $usr) {
@@ -206,7 +206,7 @@ class Text_Controller extends Controller {
       $form->addElement($submit);
 
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
@@ -226,7 +226,7 @@ class Text_Controller extends Controller {
             $modelPrivate->saveGroupsConnect($id, $form->groups->getValues());
             // uložíme uživatele
             $modelPrivate->saveUsersConnect($id, $form->users->getValues());
-            $this->infoMsg()->addMessage($this->_('Privátní text byl uložen'));
+            $this->infoMsg()->addMessage($this->tr('Privátní text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $exc) {
             new CoreErrors($e);
@@ -237,12 +237,12 @@ class Text_Controller extends Controller {
    }
 
    public function settings($settings, Form $form) {
-      $fGrpViewSet = $form->addGroup('view', 'Nastavení vzhledu');
+      $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
       $componentTpls = new Component_ViewTpl();
       $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'text');
 
-      $elemTplMain = new Form_Element_Select('tplMain', 'Hlavní šablona');
+      $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
       $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
       if(isset($settings[self::PARAM_TPL_MAIN])) {
          $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
@@ -250,14 +250,14 @@ class Text_Controller extends Controller {
       $form->addElement($elemTplMain, $fGrpViewSet);
       unset ($componentTpls);
 
-      $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
+      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 
-      $elemEditorType = new Form_Element_Select('editor_type', 'Typ editoru');
+      $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
       $elemEditorType->setOptions(array(
-         'žádný (pouze textová oblast)' => 'none',
-         'jednoduchý (Wysiwyg)' => 'simple',
-         'pokročilý (Wysiwyg)' => 'advanced',
-         'kompletní (Wysiwyg)' => 'full'
+         $this->tr('žádný (pouze textová oblast)') => 'none',
+         $this->tr('jednoduchý (Wysiwyg)') => 'simple',
+         $this->tr('pokročilý (Wysiwyg)') => 'advanced',
+         $this->tr('kompletní (Wysiwyg)') => 'full'
       ));
       $elemEditorType->setValues('advanced');
       if(isset($settings[self::PARAM_EDITOR_TYPE])) {
@@ -266,20 +266,20 @@ class Text_Controller extends Controller {
 
       $form->addElement($elemEditorType, $fGrpEditSet);
 
-      $elemAllowScripts = new Form_Element_Checkbox('allow_script', 'Povolit scripty v textu');
-      $elemAllowScripts->setSubLabel('Umožňuje vkládání javascriptů přímo do textu. POZOR! Lze tak vložit útočníkův kód do stránek. (Filtrují se všechny javascripty.)');
+      $elemAllowScripts = new Form_Element_Checkbox('allow_script', $this->tr('Povolit scripty v textu'));
+      $elemAllowScripts->setSubLabel($this->tr('Umožňuje vkládání javascriptů přímo do textu. POZOR! Lze tak vložit útočníkův kód do stránek. (Filtrují se všechny javascripty.)'));
       $elemAllowScripts->setValues(false);
       if(isset($settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT])) {
          $elemAllowScripts->setValues($settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT]);
       }
       $form->addElement($elemAllowScripts, $fGrpEditSet);
 
-      $fGrpPrivate = $form->addGroup('privateZone', 'Privátní zóna', "Privátní zóna povoluje
+      $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každého článku tak
-         vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům.");
+         vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům."));
 
       $elemAllowPrivateZone = new Form_Element_Checkbox('allow_private_zone',
-              'Povolit privátní zónu');
+              $this->tr('Povolit privátní zónu'));
       $form->addElement($elemAllowPrivateZone, $fGrpPrivate);
       if(isset($settings[self::PARAM_ALLOW_PRIVATE])) {
          $form->allow_private_zone->setValues($settings[self::PARAM_ALLOW_PRIVATE]);

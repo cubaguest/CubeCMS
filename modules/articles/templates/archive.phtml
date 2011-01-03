@@ -1,6 +1,6 @@
 <?
 // načtení detailu
-$h1 = $this->category()->getName().' - '.$this->_('Archiv');
+$h1 = $this->category()->getName().' - '.$this->tr('Archiv');
 Template_Core::setPageTitle($h1);
 
 $jQuery = new JsPlugin_JQuery();
@@ -9,7 +9,7 @@ $this->addJsPlugin($jQuery);
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1; ?></h1>
 <div class="main-content-tools">
-   <a href="<?=$this->link()->route();?>" title="<?$this->_('Přejít na seznam článků')?>"><?=$this->_('Seznam')?></a>
+   <a href="<?=$this->link()->route();?>" title="<?$this->tr('Přejít na seznam článků')?>"><?=$this->tr('Seznam')?></a>
 </div>
 <div class="main-content-archive">
    <? foreach ($this->articles as $year => $rows) {?>

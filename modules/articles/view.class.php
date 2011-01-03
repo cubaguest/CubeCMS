@@ -45,27 +45,27 @@ class Articles_View extends View {
          }
 
          $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->_("Upravit položku"), $this->link()->route('edit'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit položku'));
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->tr("Upravit položku"), $this->link()->route('edit'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit položku'));
          $this->toolbox->addTool($toolEdit);
 
          if($this->formPublic instanceof Form){
             $tooldel = new Template_Toolbox2_Tool_Form($this->formPublic);
-            $tooldel->setIcon('page_preview.png')->setTitle($this->_('Zveřejnit položku'));
+            $tooldel->setIcon('page_preview.png')->setTitle($this->tr('Zveřejnit položku'));
             $this->toolbox->addTool($tooldel);
          }
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat položku'))
-            ->setConfirmMeassage($this->_('Opravdu smazat položku?'));
+         $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat položku'))
+            ->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
          $this->toolbox->addTool($tooldel);
 
          if($this->category()->getParam(Articles_Controller::PARAM_PRIVATE_ZONE, false) == true){
             $toolboxP = new Template_Toolbox2();
             $toolboxP->setIcon(Template_Toolbox2::ICON_PEN);
-            $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_articlepr', $this->_("Upravit privátní text"),
+            $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_articlepr', $this->tr("Upravit privátní text"),
             $this->link()->route('editPrivate'));
-            $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit privátní text'));
+            $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit privátní text'));
             $toolboxP->addTool($toolEdit);
             $this->toolboxPrivate = $toolboxP;
          }
@@ -76,14 +76,14 @@ class Articles_View extends View {
       if($this->rights()->isWritable()) {
          $this->toolbox = new Template_Toolbox2();
          $this->toolbox->setIcon(Template_Toolbox2::ICON_ADD);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_article', $this->_("Přidat položku"),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_article', $this->tr("Přidat položku"),
          $this->link()->route('add'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou položku'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou položku'));
          $this->toolbox->addTool($toolAdd);
          if($this->category()->getRights()->isControll()){
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->_("Nastavení"),
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
             $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon('wrench.png')->setTitle($this->_('Upravit nastavení kategorie'));
+            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
             $this->toolbox->addTool($toolEView);
          }
       }

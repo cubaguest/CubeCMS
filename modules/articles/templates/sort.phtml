@@ -1,7 +1,7 @@
 <div class="main-content-tools">
-   <?=$this->_('Řadit podle')?>:&nbsp;<a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_DATE)?>"
-   title="<?=$this->_('Nejnovější články')?>"><?=$this->_('Nejnovějších')?></a
-   >&nbsp;<a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_TOP)?>" title="<?=$this->_('Nejčtenější články')?>"><?=$this->_('Nejčtenějších')?></a
-   >&nbsp;<a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_ALPHABET)?>" title="<?=$this->_('Články podle abecedy')?>"><?=$this->_('Abecedně')?></a
-   >&nbsp;&brvbar;&nbsp;<a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
+   <?=$this->tr('Řadit podle')?>:&nbsp;<a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_DATE)?>"
+   title="<?=$this->tr('Nejnovější články')?>"><?=$this->tr('Nejnovějších')?></a
+   >&nbsp;<a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_TOP)?>" title="<?=$this->tr('Nejčtenější články')?>"><?=$this->tr('Nejčtenějších')?></a
+   >&nbsp;<a href="<?=$this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_ALPHABET)?>" title="<?=$this->tr('Články podle abecedy')?>"><?=$this->tr('Abecedně')?></a
+   >&nbsp;&brvbar;&nbsp;<a href="<?=$this->link()->route('archive')->rmParam()?>" title="<?=$this->tr('Archiv')?>"><?=$this->tr('Archiv')?></a>
    </div>

@@ -12,7 +12,7 @@ class Text_View extends View {
          $this->text = new Object();
          $this->text->{Text_Model_Detail::COLUMN_TEXT} = null;
          if($this->category()->getRights()->isWritable()){
-            $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->_('Text nebyl vytvořen. Upravíte jej v administraci.');
+            $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
          }
       } else {
          $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model_Detail::COLUMN_TEXT}, array('anchors','filesicons'));
@@ -24,7 +24,7 @@ class Text_View extends View {
             $this->textPrivate = new Object();
             $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = null;
             if($this->category()->getRights()->isWritable()){
-               $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->_('Privátní text nebyl vytvořen. Upravíte jej v administraci.');
+               $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->tr('Privátní text nebyl vytvořen. Upravíte jej v administraci.');
             }
          }
          $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->template()->filter(
@@ -35,25 +35,25 @@ class Text_View extends View {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
 
-         $toolET = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_('Upravit text'),
+         $toolET = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr('Upravit text'),
                  $this->link()->route('edit'));
-         $toolET->setIcon('page_edit.png')->setTitle($this->_("Upravit text"));
+         $toolET->setIcon('page_edit.png')->setTitle($this->tr("Upravit text"));
          $toolbox->addTool($toolET);
 
          $modelP = new Model_Panel();
          if($modelP->havePanels($this->category()->getId()) == true){
-            $toolEP = new Template_Toolbox2_Tool_PostRedirect('edit_textpanel', $this->_('Upravit text panelu'),
+            $toolEP = new Template_Toolbox2_Tool_PostRedirect('edit_textpanel', $this->tr('Upravit text panelu'),
                  $this->link()->route('editpanel'));
-            $toolEP->setIcon('page_edit.png')->setTitle($this->_("Upravit text v panel"));
+            $toolEP->setIcon('page_edit.png')->setTitle($this->tr("Upravit text v panel"));
             $toolbox->addTool($toolEP);
          }
 
          if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
             $toolboxP = new Template_Toolbox2();
             $toolboxP->setIcon(Template_Toolbox2::ICON_PEN);
-            $toolETP = new Template_Toolbox2_Tool_PostRedirect('edit_textprivate', $this->_('Upravit privátní text'),
+            $toolETP = new Template_Toolbox2_Tool_PostRedirect('edit_textprivate', $this->tr('Upravit privátní text'),
                  $this->link()->route('editPrivate'));
-            $toolETP->setIcon('page_edit.png')->setTitle($this->_("Upravit privátní text"));
+            $toolETP->setIcon('page_edit.png')->setTitle($this->tr("Upravit privátní text"));
             $toolboxP->addTool($toolETP);
             $this->toolboxPrivate = $toolboxP;
          }
@@ -62,9 +62,9 @@ class Text_View extends View {
 
          if($this->category()->getRights()->isControll()){
             $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->_("Nastavení"),
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
             $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon('wrench.png')->setTitle($this->_('Upravit nastavení kategorie'));
+            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
             $this->toolbox->addTool($toolEView);
          }
       }
@@ -76,7 +76,7 @@ class Text_View extends View {
 
    public function editView() {
       Template_Module::setEdit(true);
-      $this->h1 = sprintf($this->_('úprava textu "%s"'), $this->category()->getName());
+      $this->h1 = sprintf($this->tr('úprava textu "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
       $this->addTinyMCE();
       $this->template()->addTplFile("textedit.phtml");
@@ -84,13 +84,13 @@ class Text_View extends View {
 
    public function editPrivateView() {
       $this->editView();
-      $this->h1 = sprintf($this->_('úprava privátního textu "%s"'), $this->category()->getName());
+      $this->h1 = sprintf($this->tr('úprava privátního textu "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
    }
 
    public function editPanelView() {
       $this->editView();
-      $this->h1 = sprintf($this->_('úprava textu panelu "%s"'), $this->category()->getName());
+      $this->h1 = sprintf($this->tr('úprava textu panelu "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
    }
 

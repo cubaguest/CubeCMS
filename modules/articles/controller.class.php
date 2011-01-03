@@ -185,25 +185,25 @@ class Articles_Controller extends Controller {
          $feId->setValues($this->view()->article->{Articles_Model::COLUMN_ID});
          $deleteForm->addElement($feId);
 
-         $feSubmit = new Form_Element_Submit('delete', $this->_('Smazat položku'));
+         $feSubmit = new Form_Element_Submit('delete', $this->tr('Smazat položku'));
          $deleteForm->addElement($feSubmit);
 
          if($deleteForm->isValid()) {
             $this->deleteArticle($deleteForm->id->getValues());
-            $this->infoMsg()->addMessage($this->getOption('deleteMsg', $this->_('Položka byl smazán')));
+            $this->infoMsg()->addMessage($this->getOption('deleteMsg', $this->tr('Položka byl smazán')));
             $this->link()->route()->rmParam()->reload();
          }
          $this->view()->formDelete = $deleteForm;
 
          if($this->view()->article->{Articles_Model::COLUMN_PUBLIC} == false){
             $formPublic = new Form('art_pub_');
-            $feSubmit = new Form_Element_Submit('public', $this->_('Zveřejnit položku'));
+            $feSubmit = new Form_Element_Submit('public', $this->tr('Zveřejnit položku'));
             $formPublic->addElement($feSubmit);
             if($formPublic->isValid()){
                $record = $artM->record($this->view()->article->{Articles_Model::COLUMN_ID});
                $record->{Articles_Model::COLUMN_PUBLIC} = true;
                $artM->save($record);
-               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->_('položka byla zveřejněna')));
+               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->tr('položka byla zveřejněna')));
                $this->link()->reload();
             }
             $this->view()->formPublic = $formPublic;
@@ -300,7 +300,7 @@ class Articles_Controller extends Controller {
          $art = $model->record($lasId);
 
 //         var_dump($art);flush();exit();
-         $this->infoMsg()->addMessage($this->_('Uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
                  array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
@@ -367,10 +367,10 @@ class Articles_Controller extends Controller {
 
       $form = new Form('art_priv_text_');
 
-      $fGrpPrivate = $form->addGroup('privateZone', $this->_('Privátní zóna'),
-              $this->_('Položky vyditelné pouze určitým uživatelům. Administrátorům jsou tyto informace vždy viditelné.'));
+      $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'),
+              $this->tr('Položky vyditelné pouze určitým uživatelům. Administrátorům jsou tyto informace vždy viditelné.'));
 
-      $ePrivateUsers = new Form_Element_Select('privateUsers', $this->_('Uživatelé'));
+      $ePrivateUsers = new Form_Element_Select('privateUsers', $this->tr('Uživatelé'));
       $ePrivateUsers->setMultiple(true);
 
       $modelUsers = new Model_Users();
@@ -393,7 +393,7 @@ class Articles_Controller extends Controller {
       unset ($selected);
       $form->addElement($ePrivateUsers, $fGrpPrivate);
 
-      $iPrivateText = new Form_Element_TextArea('textPrivate', $this->_('Text'));
+      $iPrivateText = new Form_Element_TextArea('textPrivate', $this->tr('Text'));
       $iPrivateText->setLangs();
       $iPrivateText->setValues($article->{Articles_Model::COLUMN_TEXT_PRIVATE});
       $form->addElement($iPrivateText, $fGrpPrivate);
@@ -418,7 +418,7 @@ class Articles_Controller extends Controller {
             $modelArtPrivUsers->save($newRec);
          }
 
-         $this->infoMsg()->addMessage($this->_('Privátní text byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Privátní text byl uložen'));
          $this->link()->route('detail')->reload();
       }
 
@@ -456,7 +456,7 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
 
       $lastId = $model->save($artRecord);
-      $this->infoMsg()->addMessage($this->_('Uloženo'));
+      $this->infoMsg()->addMessage($this->tr('Uloženo'));
       return $lastId;
    }
 
@@ -505,47 +505,47 @@ class Articles_Controller extends Controller {
    protected function createForm() {
       $form = new Form('ardicle_');
 
-      $fGrpTexts = $form->addGroup('texts', $this->_('Texty'));
+      $fGrpTexts = $form->addGroup('texts', $this->tr('Texty'));
 
-      $iName = new Form_Element_Text('name', $this->_('Nadpis'));
+      $iName = new Form_Element_Text('name', $this->tr('Nadpis'));
       $iName->setLangs();
       $iName->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($iName, $fGrpTexts);
 
-      $iAnnot = new Form_Element_TextArea('annotation', $this->_('Anotace'));
+      $iAnnot = new Form_Element_TextArea('annotation', $this->tr('Anotace'));
       $iAnnot->setLangs();
       $form->addElement($iAnnot, $fGrpTexts);
 
-      $iText = new Form_Element_TextArea('text', $this->_('Text'));
+      $iText = new Form_Element_TextArea('text', $this->tr('Text'));
       $iText->setLangs();
       if($this->getOption('textEmpty', false) == false) {
          $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       }
       $form->addElement($iText, $fGrpTexts);
 
-      $fGrpParams = $form->addGroup('params', $this->_('Parametry'));
+      $fGrpParams = $form->addGroup('params', $this->tr('Parametry'));
 
-//      $eImage = new Form_Element_File('image', $this->_('Obrázek'));
+//      $eImage = new Form_Element_File('image', $this->tr('Obrázek'));
 //      $eImage->addValidation(new Form_Validator_FileExtension('jpg'));
 //      $eImage->setUploadDir($this->category()->getModule()->getDataDir());
 //      $form->addElement($eImage, $fGrpParams);
 
-      $iUrlKey = new Form_Element_Text('urlkey', $this->_('Url klíč'));
+      $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $iUrlKey->setLangs();
-      $iUrlKey->setSubLabel($this->_('Pokud není klíč zadán, je generován automaticky'));
+      $iUrlKey->setSubLabel($this->tr('Pokud není klíč zadán, je generován automaticky'));
       $form->addElement($iUrlKey, $fGrpParams);
 
-      $iKeywords = new Form_Element_Text('metaKeywords', $this->_('Klíčová slova'));
+      $iKeywords = new Form_Element_Text('metaKeywords', $this->tr('Klíčová slova'));
       $iKeywords->setLangs();
       $form->addElement($iKeywords, $fGrpParams);
 
-      $iDesc = new Form_Element_TextArea('metaDesc', $this->_('Popisek'));
+      $iDesc = new Form_Element_TextArea('metaDesc', $this->tr('Popisek'));
       $iDesc->setLangs();
-      $iDesc->setSubLabel($this->_('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
+      $iDesc->setSubLabel($this->tr('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
       $form->addElement($iDesc, $fGrpParams);
 
-      $iPub = new Form_Element_Checkbox('public', $this->_('Veřejný'));
-      $iPub->setSubLabel($this->_('Veřejný - viditelný všem návštěvníkům'));
+      $iPub = new Form_Element_Checkbox('public', $this->tr('Veřejný'));
+      $iPub->setSubLabel($this->tr('Veřejný - viditelný všem návštěvníkům'));
       $iPub->setValues(true);
       $form->addElement($iPub, $fGrpParams);
 
@@ -605,10 +605,10 @@ class Articles_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    protected function settings(&$settings,Form &$form) {
-      $fGrpView = $form->addGroup('view', 'Nastavení vzhledu');
+      $fGrpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
-      $elemScroll = new Form_Element_Text('scroll', 'Počet položek na stránku');
-      $elemScroll->setSubLabel('Výchozí: '.self::DEFAULT_ARTICLES_IN_PAGE.' položek. Pokud je zadána 0 budou vypsány všechny položky');
+      $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet položek na stránku'));
+      $elemScroll->setSubLabel(sprintf($this->tr('Výchozí: %s položek. Pokud je zadána 0 budou vypsány všechny položky'),'.self::DEFAULT_ARTICLES_IN_PAGE.'));
       $elemScroll->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemScroll, $fGrpView);
 
@@ -616,11 +616,11 @@ class Articles_Controller extends Controller {
          $form->scroll->setValues($settings['scroll']);
       }
       // řazení
-      $elemSort = new Form_Element_Select('sort', 'Řadit podle');
+      $elemSort = new Form_Element_Select('sort', $this->tr('Řadit podle'));
       $elemSort->setOptions(array(
-         'Času přidání' => self::SORT_DATE,
-         'Abecedy' => self::SORT_ALPHABET,
-         'Počtu zhlédnutí' => self::SORT_TOP
+         $this->tr('Času přidání') => self::SORT_DATE,
+         $this->tr('Abecedy') => self::SORT_ALPHABET,
+         $this->tr('Počtu zhlédnutí') => self::SORT_TOP
       ));
       if(isset($settings[self::PARAM_SORT])) {
          $elemSort->setValues($settings[self::PARAM_SORT]);
@@ -633,21 +633,21 @@ class Articles_Controller extends Controller {
 
       $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
 
-      $elemTplList = new Form_Element_Select('tplList', 'Šablona seznamu');
+      $elemTplList = new Form_Element_Select('tplList', $this->tr('Šablona seznamu'));
       $elemTplList->setOptions(array_flip($componentTpls->getTpls('list')));
       if(isset($settings[self::PARAM_TPL_LIST])) {
          $elemTplList->setValues($settings[self::PARAM_TPL_LIST]);
       }
       $form->addElement($elemTplList, $fGrpView);
 
-      $elemTplDetail = new Form_Element_Select('tplDetail', 'Šablona detailu');
+      $elemTplDetail = new Form_Element_Select('tplDetail', $this->tr('Šablona detailu'));
       $elemTplDetail->setOptions(array_flip($componentTpls->getTpls('detail')));
       if(isset($settings[self::PARAM_TPL_DETAIL])) {
          $elemTplDetail->setValues($settings[self::PARAM_TPL_DETAIL]);
       }
       $form->addElement($elemTplDetail, $fGrpView);
 
-      $elemTplArchive = new Form_Element_Select('tplArchive', 'Šablona archivu');
+      $elemTplArchive = new Form_Element_Select('tplArchive', $this->tr('Šablona archivu'));
       $elemTplArchive->setOptions(array_flip($componentTpls->getTpls('archive')));
       if(isset($settings[self::PARAM_TPL_ARCHIVE])) {
          $elemTplArchive->setValues($settings[self::PARAM_TPL_ARCHIVE]);
@@ -656,21 +656,21 @@ class Articles_Controller extends Controller {
 
       unset ($componentTpls);
 
-      $elemDisableList = new Form_Element_Checkbox('disableList', 'Vypnout úvodní seznam');
-      $elemDisableList->setSubLabel('Pokud je list vypnut, stránka je automaticky přesměrována na první položku. V detailu je pak načten seznam položek.');
+      $elemDisableList = new Form_Element_Checkbox('disableList', $this->tr('Vypnout úvodní seznam'));
+      $elemDisableList->setSubLabel($this->tr('Pokud je list vypnut, stránka je automaticky přesměrována na první položku. V detailu je pak načten seznam položek.'));
       if(isset($settings[self::PARAM_DISABLE_LIST])) {
          $elemDisableList->setValues($settings[self::PARAM_DISABLE_LIST]);
       }
       $form->addElement($elemDisableList, $fGrpView);
 
-      $fGrpEditSet = $form->addGroup('editSettings', 'Nastavení úprav');
+      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 
-      $elemEditorType = new Form_Element_Select('editor_type', 'Typ editoru');
+      $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
       $elemEditorType->setOptions(array(
-         'žádný (pouze textová oblast)' => 'none',
-         'jednoduchý (Wysiwyg)' => 'simple',
-         'pokročilý (Wysiwyg)' => 'advanced',
-         'kompletní (Wysiwyg)' => 'full'
+         $this->tr('žádný (pouze textová oblast)') => 'none',
+         $this->tr('jednoduchý (Wysiwyg)') => 'simple',
+         $this->tr('pokročilý (Wysiwyg)') => 'advanced',
+         $this->tr('kompletní (Wysiwyg)') => 'full'
       ));
       $elemEditorType->setValues('advanced');
       if(isset($settings[self::PARAM_EDITOR_TYPE])) {
@@ -678,33 +678,33 @@ class Articles_Controller extends Controller {
       }
       $form->addElement($elemEditorType, $fGrpEditSet);
 
-      $form->addGroup('discussion', 'Diskuse');
+      $form->addGroup('discussion', $this->tr('Diskuse'));
 
-      $elemAllowComments = new Form_Element_Checkbox('discussion_allow', 'Diskuse zapnuta');
+      $elemAllowComments = new Form_Element_Checkbox('discussion_allow', $this->tr('Diskuse zapnuta'));
       $form->addElement($elemAllowComments, 'discussion');
       if(isset($settings['discussion_allow'])) {
          $form->discussion_allow->setValues($settings['discussion_allow']);
       }
 
       $elemCommentsNotPublic = new Form_Element_Checkbox('discussion_not_public',
-              'Příspěvky čekají na schválení');
+              $this->tr('Příspěvky čekají na schválení'));
       $form->addElement($elemCommentsNotPublic, 'discussion');
       if(isset($settings['discussion_not_public'])) {
          $form->discussion_not_public->setValues($settings['discussion_not_public']);
       }
 
       $elemCommentsClosed = new Form_Element_Text('discussion_closed',
-              'Zavřít diskuzi po dnech');
+              $this->tr('Zavřít diskuzi po dnech'));
       $elemCommentsClosed->addValidation(new Form_Validator_IsNumber());
-      $elemCommentsClosed->setSubLabel('Výchozí: diskuse nejsou uzavírány');
+      $elemCommentsClosed->setSubLabel($this->tr('Výchozí: diskuse nejsou uzavírány'));
        $form->addElement($elemCommentsClosed, 'discussion');
 
-      $fGrpPrivate = $form->addGroup('privateZone', 'Privátní zóna', "Privátní zóna povoluje
+      $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každé položky tak
-         vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům.");
+         vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům."));
 
       $elemAllowPrivateZone = new Form_Element_Checkbox('allow_private_zone',
-              'Povolit privátní zónu');
+              $this->tr('Povolit privátní zónu'));
       $form->addElement($elemAllowPrivateZone, $fGrpPrivate);
       if(isset($settings[self::PARAM_PRIVATE_ZONE])) {
          $form->allow_private_zone->setValues($settings[self::PARAM_PRIVATE_ZONE]);

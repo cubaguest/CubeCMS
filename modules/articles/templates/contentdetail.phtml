@@ -4,9 +4,9 @@ $editDate = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 <h1><?=htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME})?></h1>
 <div class="print-detail">
-   <div class="font-small"><?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
-          ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
+   <div class="font-small"><?=$this->tr('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
+          ."&nbsp;".$this->tr('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
+      <?=$this->tr('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
    </div><br />
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
    <div class="main-content-annotation"><?=$this->article->{Articles_Model::COLUMN_ANNOTATION};?></div><br />

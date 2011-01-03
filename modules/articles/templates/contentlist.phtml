@@ -4,7 +4,7 @@
          $showClass = $public = null;
          if($article->{Articles_Model::COLUMN_PUBLIC} == 0) {
             $showClass = 'main-content-no-public';
-            $public = $this->_('Nezveřejněno');
+            $public = $this->tr('Nezveřejněno');
          }
          $editTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          ?>
@@ -26,6 +26,6 @@
    </div>
          <?}
    } else {
-      print ($this->_('Není vložen žádný článek'));
+      print ($this->tr('Není vložen žádný článek'));
    }?>
 </div>

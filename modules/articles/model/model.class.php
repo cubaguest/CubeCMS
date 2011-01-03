@@ -97,7 +97,7 @@ class Articles_Model extends Model_ORM {
          $dbst->execute();
       } else {
          if($idCat == 0){
-            throw new InvalidArgumentException($this->_('Při ukládání nového článku musí být zadáno id'), 1);
+            throw new InvalidArgumentException($this->tr('Při ukládání nového článku musí být zadáno id'), 1);
          }
          // unikátní klíč
          $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat,
@@ -301,6 +301,28 @@ class Articles_Model extends Model_ORM {
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->execute();
       return $dbst;
+   }
+
+   /**
+    * Metoda vrací poslední změnu článků v dané kategorii
+    * @param int $id -- id kategorie
+    * @return int -- timestamp
+    */
+   public function getLastChange($id, $onlyPublic = true) {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT ".Articles_Model_Detail::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
+              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_PUBLIC." = :onlyPublic)"
+              ." ORDER BY ".Articles_Model_Detail::COLUMN_EDIT_TIME." DESC"
+              ." LIMIT 0, 1");
+      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+      $dbst->bindValue(':onlyPublic', (int)$onlyPublic, PDO::PARAM_INT);
+      $dbst->execute();
+
+      $fetch = $dbst->fetchObject();
+      if($fetch != false) {
+         return $fetch->et;
+      }
+      return false;
    }
 }
 

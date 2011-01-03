@@ -6,7 +6,7 @@ $this->addJsPlugin($piroBox);
 echo $this->toolbox;
 ?>
 
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_PUBLIC} == false)echo $this->_(' - nezveřejněno');?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_PUBLIC} == false)echo $this->tr(' - nezveřejněno');?></h1>
 
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
@@ -24,7 +24,7 @@ echo $this->toolbox;
    <?if($this->articles != null){?>
    <form name="gotoart" action="<?=$this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
       <p>
-         <label><?=$this->_('Přejít na')?></label>
+         <label><?=$this->tr('Přejít na')?></label>
          <select id="gotoArtLinkSel">
             <?foreach ($this->articles as $article) {?>
             <option value="<?=$this->link()->route('detail', array('urlkey' => (string)$article->{Articles_Model::COLUMN_URLKEY}));?>">
@@ -32,7 +32,7 @@ echo $this->toolbox;
             </option>
             <?}?>
          </select>
-         <input type="submit" value="<?=$this->_('Přejít')?>" />
+         <input type="submit" value="<?=$this->tr('Přejít')?>" />
       </p>
    </form>
    <?} else {

@@ -1,18 +1,21 @@
 <?php
 class Articles_SiteMap extends SiteMap {
 	public function run() {
-      $articleModel = new Articles_Model_List();
       // kategorie
-      $this->setCategoryLink(new DateTime($articleModel->getLastChange($this->category()->getId())));
-      // články
-      $articles = $articleModel->getList($this->category()->getId(),0, $this->getMaxItems());
+      $model = new Articles_Model();
+      $this->setCategoryLink(new DateTime($model->getLastChange($this->category()->getId())));
+      $records = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = 1 AND '
+         .Articles_Model::COLUMN_URLKEY.' IS NOT NULL',
+         array('idc' => $this->category()->getId()))
+         ->limit(0, $this->getMaxItems())->records();
 
-      while ($article = $articles->fetch()) {
-         $this->addItem($this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY})),
-            $article->{Articles_Model::COLUMN_NAME},
-            new DateTime($article->{Articles_Model::COLUMN_EDIT_TIME}));
+      foreach ($records as $record) {
+         $this->addItem($this->link()->route('detail', array('urlkey' => $record->{Articles_Model::COLUMN_URLKEY})),
+            $record->{Articles_Model::COLUMN_NAME},
+            new DateTime($record->{Articles_Model::COLUMN_EDIT_TIME}));
       }
-      $this->setLinkMore($this->link()->route('archive'), _('archiv'));
+
+      $this->setLinkMore($this->link()->route('archive'), $this->tr('Archiv'));
 	}
 }
 ?>
