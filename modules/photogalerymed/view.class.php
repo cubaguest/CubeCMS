@@ -35,10 +35,6 @@ class Photogalerymed_View extends Articles_View {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalerymed_Controller::PARAM_TPL_DETAIL, 'detail.phtml'));
    }
 
-   public function addView() {
-      $this->editView();
-   }
-
    public function editphotosView() {
       Template_Module::setEdit(true);
       $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
