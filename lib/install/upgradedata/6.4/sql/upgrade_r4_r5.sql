@@ -1,4 +1,6 @@
 INSERT INTO `{PREFIX}config` (`key`, `label`, `value`, `protected`, `type`) VALUES
+('IMAGE_THUMB_W', 'Výchozí šířka miniatury', '150', NULL, 0, 'number'),
+('IMAGE_THUMB_H', 'Výchozí výška miniatury', '150', NULL, 0, 'number'),
 ('IMAGE_THUMB_CROP', 'Ořezávat miniatury', true, 0, 'bool');
 
 -- tabulka pro sessions
