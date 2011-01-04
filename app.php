@@ -952,6 +952,10 @@ class AppCore extends TrObject {
          $this->_initMessagesAndErrors();
          //		inicializace URL
          Url_Request::factory();
+         /*
+          * TODO: Tohle se musí doladit, protožwe to je začarovaný kruch.
+          * Locales závisí na URL_Requestu a url request zívisí na auth a auth na locales
+          */
          //inicializace lokalizace
          Locales::factory();
          // provedení autorizace

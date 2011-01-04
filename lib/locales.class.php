@@ -273,10 +273,13 @@ class Locales extends TrObject {
     * @param string -- jazyk (cs, en, de, ...)
     */
    public static function getLangLocale($lang = null) {
-      if($lang == null){
-         $lang =  self::$selectLang;
+      $l = self::getDefaultLang();
+      if($lang != null){
+         $l = $lang;
+      } else if(self::$selectLang != null){
+         $l = self::$selectLang;
       }
-      $locale = self::$locales[$lang];
+      $locale = self::$locales[$l];
       // odstranění za tečkou
       $locale = preg_replace("/\.[\w-]+/i", '', $locale);
       return $locale;
