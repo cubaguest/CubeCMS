@@ -1,19 +1,23 @@
 <?php
 class Articles_Rss extends Rss {
    public function  runController() {
-      $model = new Articles_Model_List();
-      $articles = $model->getList($this->category()->getId(), 0, VVE_FEED_NUM);
+      $model = new Articles_Model();
+      $records = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = 1 AND '
+         .Articles_Model::COLUMN_URLKEY.' IS NOT NULL',
+         array('idc' => $this->category()->getId()))
+         ->limit(0, VVE_FEED_NUM)->records();
 
-      while ($article = $articles->fetch()) {
-         if((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null){
-            $text = (string)$article->{Articles_Model::COLUMN_ANNOTATION};
+      foreach ($records as $record) {
+         if((string)$record->{Articles_Model::COLUMN_ANNOTATION} != null){
+            $text = (string)$record->{Articles_Model::COLUMN_ANNOTATION};
          } else {
-            $text = (string)$article->{Articles_Model::COLUMN_TEXT};
+            $text = (string)$record->{Articles_Model::COLUMN_TEXT};
          }
-         $this->getRssComp()->addItem($article->{Articles_Model::COLUMN_NAME}, $text,
-                 $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY})),
-                 new DateTime($article->{Articles_Model::COLUMN_ADD_TIME}),
-                 $article->{Model_Users::COLUMN_USERNAME}, null, null);
+
+         $this->getRssComp()->addItem($record->{Articles_Model::COLUMN_NAME}, $text,
+                 $this->link()->route('detail', array('urlkey' => $record->{Articles_Model::COLUMN_URLKEY})),
+                 new DateTime($record->{Articles_Model::COLUMN_ADD_TIME}),
+                 $record->{Model_Users::COLUMN_USERNAME}, null, null);
       }
    }
 }
