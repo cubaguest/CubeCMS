@@ -12,8 +12,7 @@
 class Module_Rss extends Module_Core {
    private $links = arraY();
    public function runController() {
-      $type = 'xml';
-      switch ($type) {
+      switch (AppCore::getUrlRequest()->getOutputType()) {
          case 'xml':
             $this->links;
             $model = new Model_Category();
