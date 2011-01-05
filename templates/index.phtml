@@ -130,6 +130,13 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             <? // pravy panel?>
             <div id="col3wrap" class="column">
                <div id="col3pad">
+                  <div id="langs">
+                     <?foreach (Template::pVar('appLangs') as $lang) {
+                        $class = null;
+                        if($lang['name'] == Locales::getLang()) $class = 'selected';
+                        ?><a href="<?=$lang['link'];?>" title="<?=$lang['label'];?>" class="<?=$class?>"><?=$lang['name'];?></a>&nbsp;<?
+                     }?>
+                  </div>
                   <?
                   if(!empty($this->panels['right'])) {
                      foreach ($this->panels['right'] as $panelR) {?>
