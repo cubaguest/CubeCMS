@@ -598,24 +598,23 @@ class AppCore extends TrObject {
       $this->getCoreTpl()->setPVar("appLangsNames", Locales::getAppLangsNames());
       // Vytvoření odkazů s jazyky
       $langs = array();
-      $langNames = Locales::getAppLangsNames();
-      if(count($langNames) > 1){
-         $link = new Url_Link();
-         foreach (Locales::getAppLangs() as $langKey => $lang) {
-            $langArr = array();
-            $langArr['name'] = $lang;
-            $langArr['label'] = $langNames[$lang];
-            if($lang != Locales::getDefaultLang()) {
-               $langArr['link'] = (string)$link->lang($lang);
+      if(Locales::isMultilang()){
+         $link = new Url_Link(true);
+         foreach (Locales::getAppLangsNames() as $langKey => $label) {
+            $langArr = array(
+               'name' => $langKey,
+               'label' => $label,
+            );
+            if($langKey != Locales::getDefaultLang()) {
+               $langArr['link'] = (string)$link->clear(true)->lang($langKey);
             } else {
-               $langArr['link'] = (string)$link->lang();
+               $langArr['link'] = (string)$link->clear(true)->lang();
             }
             array_push($langs, $langArr);
          }
          unset($link);
          unset($langArr);
       }
-      unset($langNames);
       $this->getCoreTpl()->setPVar("appLangs", $langs);
       unset($langs);
       $this->getCoreTpl()->setPVar("appLang", Locales::getLang());
