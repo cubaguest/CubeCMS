@@ -700,7 +700,11 @@ class Template extends TrObject {
          } else {
             throw new BadFunctionCallException(_('Volán nedefinovaný výstupní filtr.'));
          }
-         $text = $filter($text, $this->link, $this);
+          if(is_array($filter)){
+            $text = $filter[0]($text, $this->link, $this, $filter[1]);
+         } else {
+            $text = $filter($text, $this->link, $this);
+         }
       }
 
       return $text;
