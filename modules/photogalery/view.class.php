@@ -29,7 +29,7 @@ class Photogalery_View extends View {
 
       $this->template()->addTplFile("addimage.phtml");
 //      $this->template()->addTplFile("testAddform.phtml");
-      $this->template()->addTplFile("editphotos.phtml");
+//      $this->template()->addTplFile("editphotos.phtml");
 
    }
 

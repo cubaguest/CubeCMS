@@ -40,7 +40,6 @@ class Photogalerymed_View extends Articles_View {
       $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
               ." - ".$this->_('úprava obrázků'));
       $this->template()->addFile('tpl://photogalery:addimage.phtml');
-      $this->template()->addFile('tpl://photogalery:editphotos.phtml');
    }
 
    public function editphotoView() {

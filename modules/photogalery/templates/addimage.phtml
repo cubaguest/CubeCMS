@@ -4,8 +4,8 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 $this->addCssFile("style.css", 'photogalery');
 ?>
 <h1><?= $this->_('Úprava obrázků z').' '.$this->category()->getName();?></h1>
-<h2><?=$this->_('Přidání obrázků')?></h2>
 <div class="main-content-form-edit">
+   <h2><?=$this->_('Přidání obrázků')?></h2>
    <div class="swfupload-control">
       <strong><?=$this->_('Obrázky')?>:</strong>&nbsp;<span id="spanButtonPlaceholder"></span>&nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /><br />
       <p class="note"><?= $this->_('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
@@ -15,6 +15,7 @@ $this->addCssFile("style.css", 'photogalery');
       <ol id="upload-files-log"></ol>
 
    </div>
+   <?$this->includeFile('tpl://photogalery:editphotos.phtml')?>
 </div>
 <br/>
 <script type="text/javascript">
