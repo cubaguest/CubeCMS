@@ -30,43 +30,43 @@ class Contact_Controller extends Controller {
 
       $formQuestion = new Form('contact_question_');
 
-      $elemName = new Form_Element_Text('name', $this->_('Jméno a přijmení'));
+      $elemName = new Form_Element_Text('name', $this->tr('Jméno a přijmení'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $formQuestion->addElement($elemName);
 
-      $elemMail = new Form_Element_Text('mail', $this->_('Váš e-mail'));
+      $elemMail = new Form_Element_Text('mail', $this->tr('Váš e-mail'));
       $elemMail->addValidation(new Form_Validator_NotEmpty());
       $elemMail->addValidation(new Form_Validator_Email());
       $formQuestion->addElement($elemMail);
 
       $subs = array();
       if($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) != null){
-         $elemSubjectDef = new Form_Element_Select('subjectDef', $this->_('Téma'));
+         $elemSubjectDef = new Form_Element_Select('subjectDef', $this->tr('Téma'));
          $subs = explode(';', $this->category()->getParam(self::PARAM_FORM_SUBJECTS));
-         $elemSubjectDef->setOptions(array($this->_('< Vlastní předmět >') => 0), true);
+         $elemSubjectDef->setOptions(array($this->tr('< Vlastní předmět >') => 0), true);
          foreach ($subs as $key => $sub) {
             $elemSubjectDef->setOptions(array(preg_replace('/<.*>/', '', $sub) => $key+1), true); // +1 protože první je vlastní
          }
          $formQuestion->addElement($elemSubjectDef);
       }
 
-      $elemSubject = new Form_Element_Text('subject', $this->_('Předmět'));
+      $elemSubject = new Form_Element_Text('subject', $this->tr('Předmět'));
       if($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) == null){
          $elemSubject->addValidation(new Form_Validator_NotEmpty());
       }
       $formQuestion->addElement($elemSubject);
 
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $formQuestion->addElement($elemText);
 
-      $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
+      $elemSubmit = new Form_Element_Submit('send', $this->tr('Odeslat'));
       $formQuestion->addElement($elemSubmit);
 
       if($formQuestion->haveElement('subjectDef') AND $formQuestion->isSend()
          AND $formQuestion->subjectDef->getValues() == 0 AND $formQuestion->subject->getValues() == null){
-          $formQuestion->subject->setError($this->_('Musí být zadán předmět zprávy.'));
+          $formQuestion->subject->setError($this->tr('Musí být zadán předmět zprávy.'));
       }
 
       if($formQuestion->isValid()){
@@ -109,7 +109,7 @@ class Contact_Controller extends Controller {
 
          $mail->sendMail();
 
-         $this->infoMsg()->addMessage($this->_('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
+         $this->infoMsg()->addMessage($this->tr('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
          $this->link()->reload();
       }
       $this->view()->formQuestion = $formQuestion;
@@ -124,8 +124,8 @@ class Contact_Controller extends Controller {
 
       $formEdit = new Form('contact_edit');
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text kontaktu'));
-      $elemText->addValidation(new Form_Validator_NotEmpty());
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text kontaktu'));
+      $elemText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $elemText->setLangs();
 
       // naplníme pokud je čím
@@ -135,9 +135,9 @@ class Contact_Controller extends Controller {
       }
       $formEdit->addElement($elemText);
 
-      $elemTextPanel = new Form_Element_TextArea('textPanel', $this->_('Text panelu'));
+      $elemTextPanel = new Form_Element_TextArea('textPanel', $this->tr('Text panelu'));
       $elemTextPanel->setLangs();
-      $elemTextPanel->setSubLabel($this->_('Pokud není vyplněn, zkusí se použít první odstavec typu adresa z hlavního textu.'));
+      $elemTextPanel->setSubLabel($this->tr('Pokud není vyplněn, zkusí se použít první odstavec typu adresa z hlavního textu.'));
       // naplníme pokud je čím
       $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_PANEL);
       if($text != false){
@@ -149,7 +149,7 @@ class Contact_Controller extends Controller {
       $formEdit->addElement($submitButton);
 
       if($formEdit->isSend() AND $formEdit->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
@@ -170,7 +170,7 @@ class Contact_Controller extends Controller {
             if(!empty ($textsPSave)){
                $modelText->saveText($textsPSave, null, $this->category()->getId(), self::TEXT_KEY_PANEL);
             }
-         $this->infoMsg()->addMessage($this->_('Text kontaktu byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Text kontaktu byl uložen'));
          $this->link()->route()->reload();
       }
 
