@@ -1,22 +1,28 @@
-<h2><?=$this->_('Seznam uložených obrázků')?></h2>
+<?
+$this->addJsPlugin(new JsPlugin_SWFUpload());
+$this->addJsPlugin(new JsPlugin_PiroBox());
+$this->addCssFile("style.css", 'photogalery');
+?>
+<h1><?= $this->tr('Úprava obrázků z').' '.$this->category()->getName();?></h1>
+<?$this->includeFile('tpl://photogalery:addimage.phtml')?>
+<h2><?=$this->tr('Seznam uložených obrázků')?></h2>
    <div id="allfiles">
       <form method="post" action="<?=$this->link()?>">
          <div style="text-align: right; padding: 10px;">
-            <a href="#" title="<?=$this->_('Změnit označení pro smazání')?>" id="button-check-all-images"><?=$this->_('Změnit označení')?></a>
+            <a href="#" title="<?=$this->tr('Změnit označení pro smazání')?>" id="button-check-all-images"><?=$this->tr('Změnit označení')?></a>
             <?
             echo $this->editForm->save->controll();
-//            echo ($this->editForm->goBack->controll());
             ?>
          </div>
          <div id="edit-photos-list">
             <table style="width:100%;">
             <?$step = 0;
-            while ($image = $this->images->fetch()) {
+            foreach ($this->images as $image) {
                $step++;?>
             <tr id="file-<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>">
                <td style="width: 75px">
                   <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
-               .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" class="pirobox_gall" title="<?=$this->_('Zobrazit náhled')?>"><img
+               .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" class="pirobox_gall" title="<?=$this->tr('Zobrazit náhled')?>"><img
                         src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                .$image->{PhotoGalery_Model_Images::COLUMN_FILE}.'?time='.time()?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" width="70"
                   /></a>
@@ -70,7 +76,7 @@
             <tr>
                <td colspan="3" style="border-bottom: 1px solid gray">
                   <a href="<?=$this->link()->route('editphoto',array('id' => $image->{PhotoGalery_Model_Images::COLUMN_ID}))?>"
-                     title="<?=$this->_('Upravit miniaturu')?>"><?=$this->_('Upravit miniaturu')?></a>
+                     title="<?=$this->tr('Upravit miniaturu')?>"><?=$this->tr('Upravit miniaturu')?></a>
                </td>
             </tr>
             <?}?>

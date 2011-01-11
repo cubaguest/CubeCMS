@@ -34,7 +34,7 @@ class Photogalery_Controller extends Controller {
 
       $modelImages = new PhotoGalery_Model_Images();
       $this->view()->images = $modelImages->getImages($this->category()->getId(),
-              $this->getOption('idArt'));
+              $this->getOption('idArt'))->fetchAll();
 
       $this->view()->subdir = $this->getOption('subdir', null);
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
@@ -45,9 +45,9 @@ class Photogalery_Controller extends Controller {
 
    public function edittextController() {
       $this->checkWritebleRights();
-
+      
       $form = new Form("text_");
-      $textarea = new Form_Element_TextArea('text', $this->_("Text"));
+      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
       $form->addElement($textarea);
 
@@ -57,13 +57,17 @@ class Photogalery_Controller extends Controller {
          $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
       }
 
-      $submit = new Form_Element_Submit('send', $this->_("Uložit"));
+      $submit = new Form_Element_SaveCancel('send');
       $form->addElement($submit);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->link()->route()->reload();
+      }
 
       if($form->isValid()) {
          try {
             $model->saveText($form->text->getValues(), null, $this->category()->getId());
-            $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+            $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
             new CoreErrors($e);
@@ -72,7 +76,6 @@ class Photogalery_Controller extends Controller {
 
       // view
       $this->view()->template()->form = $form;
-      $this->view()->template()->addTplFile("edittext.phtml");
    }
 
    public function editphotosController(Url_Link $backLink = null) {
@@ -82,34 +85,34 @@ class Photogalery_Controller extends Controller {
 
       $addForm = $this->savePhotoForm();
       if($addForm->isValid()) {
-         $this->infoMsg()->addMessage($this->_('Obrázek byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Obrázek byl uložen'));
          $this->link()->reload();
       }
 
       $editForm = new Form('editimage_');
-      $imgName = new Form_Element_Text('name', $this->_('Název'));
+      $imgName = new Form_Element_Text('name', $this->tr('Název'));
       $imgName->setLangs();
       $editForm->addElement($imgName);
-      $imgOrd = new Form_Element_Text('ord', $this->_('Pořadí'));
+      $imgOrd = new Form_Element_Text('ord', $this->tr('Pořadí'));
       $editForm->addElement($imgOrd);
-      $imgRotation = new Form_Element_Select('rotate', $this->_('Otočit do leva'));
+      $imgRotation = new Form_Element_Select('rotate', $this->tr('Otočit do leva'));
       $imgRotation->setOptions(array('0°' => 0, '90°' => 90, '180°' => 180, '270°' => 270));
       $imgRotation->setValues(0);
       $editForm->addElement($imgRotation);
 
-      $imgDesc = new Form_Element_TextArea('desc', $this->_('Popis'));
+      $imgDesc = new Form_Element_TextArea('desc', $this->tr('Popis'));
       $imgDesc->setLangs();
       $editForm->addElement($imgDesc);
-      $imgDel = new Form_Element_Checkbox('delete', $this->_('Smazat'));
+      $imgDel = new Form_Element_Checkbox('delete', $this->tr('Smazat'));
       $editForm->addElement($imgDel);
       $imgId = new Form_Element_Hidden('id');
       $editForm->addElement($imgId);
 
-      $eGoBack = new Form_Element_Checkbox('goBack', $this->_('Zavřít'));
+      $eGoBack = new Form_Element_Checkbox('goBack', $this->tr('Zavřít'));
       $eGoBack->setValues(false);
       $editForm->addElement($eGoBack);
 
-      $submit = new Form_Element_SaveCancel('save', array($this->_('Uložit'), $this->_('Zavřít')));
+      $submit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zavřít')));
       $submit->setCancelConfirm(false);
       $editForm->addElement($submit);
 
@@ -150,7 +153,7 @@ class Photogalery_Controller extends Controller {
             }
          }
 
-         $this->infoMsg()->addMessage($this->_('Obrázky byly uloženy'));
+         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
          if($editForm->goBack->getValues() == true){
             if($backLink === null){
                $this->link()->route()->reload();
@@ -166,7 +169,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->template()->linkImageCrop = $this->link()->route('editphoto',
               array('id' => '%s'));
 
-      $this->view()->template()->images = $imagesM->getImages($this->category()->getId(), $this->getOption('idArt'));
+      $this->view()->template()->images = $imagesM->getImages($this->category()->getId(), $this->getOption('idArt'))->fetchAll();
       $this->view()->template()->addForm = $addForm;
       $this->view()->template()->editForm = $editForm;
       $this->view()->template()->idArt = $this->getOption('idArt');
@@ -208,7 +211,7 @@ class Photogalery_Controller extends Controller {
 
    private function savePhotoForm() {
       $addForm = new Form('addimage_');
-      $addFile = new Form_Element_File('image', $this->_('Obrázek'));
+      $addFile = new Form_Element_File('image', $this->tr('Obrázek'));
       $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $addFile->setUploadDir($this->category()->getModule()->getDataDir()
               .$this->getOption('subdir', null).self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
@@ -218,7 +221,7 @@ class Photogalery_Controller extends Controller {
       $idArt->setValues($this->getOption('idArt'));
       $addForm->addElement($idArt);
 
-      $addSubmit = new Form_Element_Submit('send',$this->_('Odeslat'));
+      $addSubmit = new Form_Element_Submit('send',$this->tr('Odeslat'));
       $addForm->addElement($addSubmit);
 
       if($addForm->isValid()) {
@@ -251,9 +254,9 @@ class Photogalery_Controller extends Controller {
       $this->checkWritebleRights();
       $this->view()->allOk = false;
       if($this->savePhotoForm()->isValid()) {
-         $this->infoMsg()->addMessage($this->_('Obrázek byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Obrázek byl uložen'));
       } else {
-         $this->errMsg()->addMessage($this->_('Chyba při nahrávání, asy nebyl vybrán obrázek, nebo byl poškozen.'));
+         $this->errMsg()->addMessage($this->tr('Chyba při nahrávání, asy nebyl vybrán obrázek, nebo byl poškozen.'));
       }
       if ($this->errMsg()->isEmpty()) {
          $this->view()->allOk = true;
@@ -291,7 +294,7 @@ class Photogalery_Controller extends Controller {
       $elemH = new Form_Element_Hidden('height');
       $editForm->addElement($elemH);
 
-      $elemGoBack = new Form_Element_Checkbox('goBack', $this->_('Přejít po uložení zpět'));
+      $elemGoBack = new Form_Element_Checkbox('goBack', $this->tr('Přejít po uložení zpět'));
       $elemGoBack->setValues(true);
       $editForm->addElement($elemGoBack);
 
@@ -310,7 +313,7 @@ class Photogalery_Controller extends Controller {
                  $this->category()->getParam('small_height',VVE_IMAGE_THUMB_H),
                  $editForm->start_x->getValues(), $editForm->start_y->getValues(),
                  $editForm->width->getValues(), $editForm->height->getValues());
-         $this->infoMsg()->addMessage($this->_('Miniatura byla upravena'));
+         $this->infoMsg()->addMessage($this->tr('Miniatura byla upravena'));
          if($editForm->goBack->getValues() == true) {
             $this->link()->route('editphotos')->reload();
          } else {

@@ -1,6 +1,6 @@
 <?
 $this->addCssFile("style.css");
-$this->addPageTitle($this->_('úprava miniatury'));
+$this->addPageTitle($this->tr('úprava miniatury'));
 $this->addJsPlugin(new JsPlugin_JCrop());
 
 // zjištění velikosti obrázku
@@ -8,12 +8,12 @@ $sizes = getimagesize($this->category()->getModule()->getDataDir(false).$this->s
                        .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
 ?>
-<h1><?=$this->_('úprava miniatury');?></h1>
+<h1><?=$this->tr('úprava miniatury');?></h1>
 <div class="main-content-form-edit">
    <table class="formTable">
       <tr>
          <td>
-            <p><?=$this->_('Aktuální miniatura')?></p>
+            <p><?=$this->tr('Aktuální miniatura')?></p>
             <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL
                     .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
                     $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
@@ -24,14 +24,14 @@ $sizes = getimagesize($this->category()->getModule()->getDataDir(false).$this->s
       <table class="formTable">
          <tr>
             <td id="cropImage">
-               <p><?=$this->_('Myší vyberte oblast ze které se má vytvořit miniatura')?></p>
+               <p><?=$this->tr('Myší vyberte oblast ze které se má vytvořit miniatura')?></p>
                <img width="500" class="edit-image-preview" src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM
                        .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="image <?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE};?>" />
             </td>
          </tr>
          <tr>
             <td>
-               <h2><?=$this->_('Náhled')?></h2>
+               <h2><?=$this->tr('Náhled')?></h2>
                <p id="preview" style="overflow:hidden; width:<?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH)?>px;
                   height:<?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT)?>px;">
                   <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM

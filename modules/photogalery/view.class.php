@@ -5,16 +5,16 @@ class Photogalery_View extends View {
       if($this->category()->getRights()->isWritable()) {
          $this->toolboxText = new Template_Toolbox2();
          $this->toolboxText->setIcon(Template_Toolbox2::ICON_PEN);
-         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit text"),
+         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit text"),
          $this->link()->route('edittext'));
-         $toolEditText->setIcon('page_edit.png')->setTitle($this->_('Upravit text galerie'));
+         $toolEditText->setIcon('page_edit.png')->setTitle($this->tr('Upravit text galerie'));
          $this->toolboxText->addTool($toolEditText);
 
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
-         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit fotky"),
+         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit fotky"),
          $this->link()->route('editphotos'));
-         $toolEditText->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky'));
+         $toolEditText->setIcon('image_edit.png')->setTitle($this->tr('Upravit fotky'));
          $toolbox->addTool($toolEditText);
 
          if($this->category()->getRights()->isControll()){
@@ -31,13 +31,9 @@ class Photogalery_View extends View {
 
    public function editphotosView() {
       Template_Module::setEdit(true);
-      $this->template()->addPageTitle($this->_('úprava obrázků'));
-      $this->template()->addPageHeadline($this->_('úprava obrázků'));
-
-      $this->template()->addTplFile("addimage.phtml");
-//      $this->template()->addTplFile("testAddform.phtml");
-//      $this->template()->addTplFile("editphotos.phtml");
-
+      $this->template()->addPageTitle($this->tr('úprava obrázků'));
+      $this->template()->addPageHeadline($this->tr('úprava obrázků'));
+      $this->template()->addTplFile("editphotos.phtml");
    }
 
    public function uploadFileView() {
@@ -50,6 +46,22 @@ class Photogalery_View extends View {
    public function editphotoView() {
       Template_Module::setEdit(true);
       $this->template()->addTplFile("editphoto.phtml");
+   }
+
+   private function addTinyMCE() {
+      $this->form->text->html()->addClass("mceEditor");
+      $this->tinyMCE = new Component_TinyMCE();
+      $settings = new Component_TinyMCE_Settings_AdvSimple();
+      $settings->setSetting('editor_selector', 'mceEditor');
+      $settings->setSetting('height', '600');
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
+   }
+
+   public function edittextView() {
+      Template_Module::setEdit(true);
+      $this->addTinyMCE();
+      $this->template()->addFile("tpl://edittext.phtml");
    }
 }
 

@@ -1,17 +1,11 @@
 <?
-$this->addCssFile("style.css");
-
-$this->addPageTitle($this->_('úprava textu'));
-$this->addPageHeadline($this->_('úprava textu'));
+$h1 = $this->tr('úprava textu kategorie').' '.$this->category()->getName();
+$this->addPageTitle($h1);
 ?>
+<h1><?=$h1;?></h1>
 <div class="main-content-form-edit">
    <?
-   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 10)->addClass("mceEditor");
-   $tinymce = new JsPlugin_TinyMce();
-   $tinymce->setCfgParam('theme', 'advancedsimple');
-   $this->addJsPlugin($tinymce);
-   print ($this->form);
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 10);
+   echo ($this->form);
    ?>
 </div>
-<?
-$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>
