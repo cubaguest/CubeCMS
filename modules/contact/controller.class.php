@@ -90,6 +90,7 @@ class Contact_Controller extends Controller {
          // odeslání emailu
          $mail = new Email();
          $mail->setSubject($subject);
+         $mail->setFrom($formQuestion->mail->getValues());
          $mail->setContent($formQuestion->text->getValues());
          //$mail->addAddress($formQuestion->mail->getValues()); // odesílat?
 
