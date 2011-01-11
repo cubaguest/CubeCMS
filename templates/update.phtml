@@ -1,13 +1,74 @@
-<?echo '<?xml version="1.0" encoding="UTF-8"?>';?>
+<?
+if($maintenanceTitle == null){
+   $maintenanceTitle =
+   'Aktualizace systému';
+}
+if($maintenanceMessage == null){
+   $maintenanceMessage =
+   'Systém usilovně aktualizujeme na novější verzi.<br />
+   Zkuste prosím přijít později.<br /><br />
+   Tým Cube-Studio';
+}
+setlocale(LC_ALL, 'cs_CZ.UTF-8');
+echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <title>Aktualizace</title>
-    </head>
-    <body>
-        <p>
-            Systém se momentálně aktualizuje. Prosíme o strpení.<br />
-        </p>
-    </body>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <title><?= $maintenanceTitle ?></title>
+      <style type="text/css">
+         body, html {
+            font-size: 90%;
+         }
+
+         h1 {
+            font-size: large;
+         }
+         #mainBoxWrap {
+            margin: 100px auto auto auto;
+            width: 462px;
+         }
+         #mainBox {
+            -moz-box-shadow: 0 0 3px 3px #888;
+            -webkit-box-shadow: 0 0 3px 3px #888;
+            box-shadow: 0 0 3px 3px #888;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            border: 1px solid gray;
+            background-color: #fcfcfc;
+         }
+         #mainBox p, #mainBox h1 {
+            padding: 8px;
+            margin: 0;
+         }
+         p.mainBoxText {
+            border-top: 1px solid gray;
+            background-color: #f7f7f7;
+         }
+         p.mainBoxContact {
+            border-top: 1px solid gray;
+         }
+         .mainImage {
+            display: block;
+         }
+         .small {
+            font-size: x-small;
+         }
+
+      </style>
+   </head>
+   <body>
+      <div id="mainBoxWrap">
+      <div id="mainBox">
+         <h1><?= $maintenanceTitle; ?></h1>
+         <img class="mainImage" alt="maintance" src="images/maintenance.gif" />
+         <p class="mainBoxText"><?= $maintenanceMessage ?></p>
+         <?if($maintenanceDeadTime != null){?>
+         <p class="mainBoxText"><strong>Předpokládaný čas opětovného spuštění:</strong>&nbsp;<?=$maintenanceDeadTime;?></p>
+         <?}?>
+         <p class="mainBoxContact"><strong>Kontakt:</strong><br /><?= $maintenanceContact ?><br />
+            <span class="small">Kontaktujte nás pouze v nutných případech.</span> </p>
+      </div>
+      </div>
+   </body>
 </html>
