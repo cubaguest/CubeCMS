@@ -180,7 +180,7 @@ class Contact_Controller extends Controller {
    /**
     * Metoda pro nastavení modulu
     */
-   public static function settingsController(&$settings,Form &$form) {
+   public function settings(&$settings,Form &$form) {
       $grpMap = $form->addGroup('map', 'Nastavení mapy', 'Nastavení typu, souřadnic
          a klíče pro použití mapy z Google Maps API.Dokumentace:<a
          href="http://code.google.com/intl/cs-CZ/apis/maps/documentation/staticmaps/"
