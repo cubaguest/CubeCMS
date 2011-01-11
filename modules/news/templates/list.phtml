@@ -13,7 +13,7 @@ echo $this->toolbox;
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
             $showClass = 'main-content-no-public';
-            $public = $this->_('Nezveřejněn');
+            $public = $this->tr('Nezveřejněn');
          }
          ?>
    <div class="main-content-list-record <?=$showClass?>">
@@ -29,16 +29,16 @@ echo $this->toolbox;
          <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
       <?}?>
       <hr class="reseter" />
-      <div class="main-content-showed"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
+      <div class="main-content-showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
       <div class="main-content-link-more">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$this->_("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+            title="<?=$this->tr("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("Více")?>&nbsp;]</a>
       </div>
    </div>
      <?}
       echo $this->scrollComp;
    } else {
-      echo ($this->_('Není vložen žádný příspěvek'));
+      echo ($this->tr('Není vložen žádný příspěvek'));
    }
    ?>
    </div>

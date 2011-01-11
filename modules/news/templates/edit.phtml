@@ -2,11 +2,11 @@
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
-   $this->addPageTitle($this->_('úprava novinky'));
+   $this->addPageTitle($this->tr('úprava novinky'));
    $this->addPageTitle($this->catName);
-   $h1 = $this->_('úprava novinky').' '.$this->catName;
+   $h1 = $this->tr('úprava novinky').' '.$this->catName;
 } else {
-   $h1 = $this->_('přidání novinky');
+   $h1 = $this->tr('přidání novinky');
    $this->addPageTitle($h1);
 }
 // donastavení formuláře

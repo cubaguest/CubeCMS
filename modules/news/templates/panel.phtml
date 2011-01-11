@@ -18,9 +18,9 @@ if($this->panelObj()->getBackImage() != null){
       title="<?=htmlspecialchars($new->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($new->{Articles_Model_Detail::COLUMN_NAME},30)?></a></div>
          <?=vve_tpl_truncate(strip_tags($new->{Articles_Model_Detail::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150)?>
    <div class="panel-box-link-more"><a href="<?=$this->link()->route('detail', array('urlkey'=> $new->{Articles_Model_Detail::COLUMN_URLKEY}));?>"
-      title="<?=htmlspecialchars($new->{Articles_Model_Detail::COLUMN_NAME})?>"><?=$this->_('Více')?></a>
+      title="<?=htmlspecialchars($new->{Articles_Model_Detail::COLUMN_NAME})?>"><?=$this->tr('Více')?></a>
    </div>
    </div>
 <?}?>
 <div class="panel-box-link-more"><a href="<?=$this->link()?>"
-         title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více novinek')?></a></div>
+         title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více novinek')?></a></div>
