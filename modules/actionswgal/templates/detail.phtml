@@ -38,10 +38,10 @@ echo $this->toolbox;
                   echo ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
                }
                if((int)$this->action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-                  printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PRICE});
+                  printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PRICE});
                }
                if((int)$this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-                  printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
+                  printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
                }?>
             </p>
          <?if($this->action->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
@@ -57,9 +57,9 @@ echo $this->toolbox;
    </div>
       <?if($countImages > 0) {?>
    <br />
-   <h2><?=$this->_('Fotografie k akci')?></h2>
+   <h2><?=$this->tr('Fotografie k akci')?></h2>
    <div class="main-content-images" id="actionImages"><!-- SOF IMAGES -->
-            <?while ($image = $this->images->fetch()) {?>
+            <?foreach ($this->images as $image) {?>
          <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                           .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
             title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
@@ -78,9 +78,7 @@ echo $this->toolbox;
    </script>
       <?}?>
    <hr class="reseter" />
-   <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->_('Zpět na seznam')));?>
-
-   <?//$this->includeTpl('tools.phtml')?>
+   <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
    <?$this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},

@@ -1,30 +1,29 @@
 <?php
 class Actionswgal_View extends Actions_View {
    public function showView() {
-      $this->template()->addTplFile("detail.phtml");
+      $this->template()->addFile("tpl://detail.phtml");
       $this->createDetailToolbox();
       if($this->toolbox instanceof Template_Toolbox2){
          $this->toolboxPhotos = new Template_Toolbox2();
          $this->toolboxPhotos->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
          $toolPhotos = new Template_Toolbox2_Tool_PostRedirect('edit_action_photos', 
-            $this->_("Upravit fotky"), $this->link()->route('editphotos'));
-         $toolPhotos->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky k akci'));
+            $this->tr("Upravit fotky"), $this->link()->route('editphotos'));
+         $toolPhotos->setIcon('image_edit.png')->setTitle($this->tr('Upravit fotky k akci'));
          $this->toolboxPhotos->addTool($toolPhotos);
       }
    }
 
    public function showPhotosView() {
-      $this->template()->addTplFile("listPhotos.phtml");
+      $this->template()->addFile("tpl://listPhotos.phtml");
       $this->showView();
    }
 
    public function editphotosView() {
-      $this->template()->addTplFile("addimage.phtml", 'photogalery');
-      $this->template()->addTplFile("editphotos.phtml", 'photogalery');
+      $this->template()->addFile("tpl://photogalery:editphotos.phtml");
    }
 
    public function editphotoView() {
-      $this->template()->addTplFile("editphoto.phtml", 'photogalery');
+      $this->template()->addFile("tpl://photogalery:editphoto.phtml");
    }
 
    public function uploadFileView() {
@@ -35,7 +34,7 @@ class Actionswgal_View extends Actions_View {
    }
 
    public function archiveView() {
-      $this->template()->addTplFile("archive.phtml", 'actions');
+      $this->template()->addFile("tpl://actions:archive.phtml", 'actions');
    }
 
    public function showDataView() {

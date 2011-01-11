@@ -33,7 +33,7 @@ class Actionswgal_Controller extends Actions_Controller {
       // smazání akce
       $this->deleteActionData($action);
               
-      $this->infoMsg()->addMessage(sprintf($this->_('Akce "%s" byla smazána', $this->getLocaleDomain()), $action->{Actions_Model_Detail::COLUMN_NAME}));
+      $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána', $this->getLocaleDomain()), $action->{Actions_Model_Detail::COLUMN_NAME}));
       $this->view()->linkBack->reload();
    }
 
@@ -71,7 +71,7 @@ class Actionswgal_Controller extends Actions_Controller {
    protected function settings(&$settings,Form &$form) {
       parent::settings($settings, $form);
       $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
-      $phCtrl->viewSettingsController();
+      $phCtrl->settings($settings, $form);
    }
 }
 ?>
