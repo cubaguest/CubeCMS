@@ -326,10 +326,6 @@ class Articles_Controller extends Controller {
       $article = $model->where(Articles_Model::COLUMN_URLKEY, $this->getRequest('urlkey'))->record();
 
       $editForm->name->setValues($article->{Articles_Model::COLUMN_NAME});
-//      var_dump($article->{Articles_Model::COLUMN_NAME});
-//      var_dump($article->{Articles_Model::COLUMN_NAME});
-//      var_dump($article->{Articles_Model::COLUMN_NAME});
-//      flush();
 
       $editForm->text->setValues($article->{Articles_Model::COLUMN_TEXT});
       $editForm->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
@@ -342,6 +338,8 @@ class Articles_Controller extends Controller {
       if($editForm->isSend() AND $editForm->save->getValues() == false){
          $this->link()->route('detail')->reload();
       }
+      $this->view()->form = $editForm;
+      $this->view()->edit = true;
 
       if($editForm->isValid()) {
          // generování url klíče
@@ -349,14 +347,18 @@ class Articles_Controller extends Controller {
          $names = $editForm->name->getValues();
          $urlkeys = $this->createUrlKey($urlkeys, $names, $article->{Articles_Model::COLUMN_ID});
 
+         $oldDir = $article->{Articles_Model::COLUMN_URLKEY}[Locales::getDefaultLang()];
+         $newDir = $urlkeys[Locales::getDefaultLang()];
+         // přesun adresáře pokud existuje
+         if($oldDir != $newDir AND is_dir($this->category()->getModule()->getDataDir().$oldDir)){
+            rename($this->category()->getModule()->getDataDir().$oldDir, $this->category()->getModule()->getDataDir().$newDir);
+         }
          $this->saveArticle($names, $urlkeys, $editForm, $article);
          // nahrání nové verze článku (kvůli url klíči)
          $article = $model->getArticleById($editForm->art_id->getValues());
          $this->link()->route('detail',array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
 
-      $this->view()->form = $editForm;
-      $this->view()->edit = true;
    }
 
    public function editPrivateController() {
