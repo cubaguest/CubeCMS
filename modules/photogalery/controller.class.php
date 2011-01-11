@@ -226,10 +226,10 @@ class Photogalery_Controller extends Controller {
          $image = new Filesystem_File_Image($file['name'], $this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_ORIGINAL);
          $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL,
                  $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
-                 $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), true);
+                 $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), $this->category()->getParam('small_crop', true));
          $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM,
                  $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
-                 $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT));
+                 $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT), $this->category()->getParam('medium_crop', false));
 
          // zjistíme pořadí
          $imagesM = new PhotoGalery_Model_Images();
@@ -325,7 +325,7 @@ class Photogalery_Controller extends Controller {
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
    }
 
-   protected function settings(&$settings,Form &$form) {
+   public function settings(&$settings,Form &$form) {
       $form->addGroup('images', 'Nastavení obrázků');
 
       $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
@@ -344,6 +344,13 @@ class Photogalery_Controller extends Controller {
          $form->small_height->setValues($settings['small_height']);
       }
 
+      $elemSC = new Form_Element_Checkbox('small_crop', 'Ořezávat miniatury');
+      $elemSC->setValues(true);
+      if(isset($settings['small_crop'])) {
+         $elemSC->setValues($settings['small_crop']);
+      }
+      $form->addElement($elemSC, 'images');
+
       $elemW = new Form_Element_Text('medium_width', 'Šířka obrázku (px)');
       $elemW->addValidation(new Form_Validator_IsNumber());
       $elemW->setSubLabel('Výchozí: '.self::MEDIUM_WIDTH.'px');
@@ -359,12 +366,21 @@ class Photogalery_Controller extends Controller {
       if(isset($settings['medium_height'])) {
          $form->medium_height->setValues($settings['medium_height']);
       }
+
+      $elemC = new Form_Element_Checkbox('medium_crop', 'Ořezávat obrázky');
+      $elemC->setValues(false);
+      if(isset($settings['medium_crop'])) {
+         $elemC->setValues($settings['medium_crop']);
+      }
+      $form->addElement($elemC, 'images');
       
       if($form->isValid()){
          $settings['small_width'] = $form->small_width->getValues();
          $settings['small_height'] = $form->small_height->getValues();
+         $settings['small_crop'] = $form->small_crop->getValues();
          $settings['medium_width'] = $form->medium_width->getValues();
          $settings['medium_height'] = $form->medium_height->getValues();
+         $settings['medium_crop'] = $form->medium_crop->getValues();
       }
    }
 }
