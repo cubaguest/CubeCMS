@@ -1,5 +1,4 @@
 <?
-$this->addCssFile("style.css");
 $this->includeTpl('sortLabel.phtml',false,null,'articles');
 $h1 = $this->category()->getName().$this->sortText;
 $modelImages = new PhotoGalery_Model_Images();
@@ -14,7 +13,7 @@ echo $this->toolbox;
          $noPClass = $noPubllic = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
             $noPClass = 'main-content-no-public';
-            $noPubllic = $this->_('Nezveřejněno');
+            $noPubllic = $this->tr('Nezveřejněno');
          }
          $addDate = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
@@ -38,10 +37,10 @@ echo $this->toolbox;
       <?}?>
       </div>
       <hr class="reseter" />
-      <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
+      <p style="float:left;"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+            title="<?=$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
       </p>
       <br />
       </div>
@@ -49,7 +48,7 @@ echo $this->toolbox;
      <?
       echo $this->scrollComp;
    } else {
-      echo ($this->_('Není vložena žádná galerie'));
+      echo ($this->tr('Není vložena žádná galerie'));
    }
    ?>
    </div>

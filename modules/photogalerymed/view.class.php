@@ -6,29 +6,24 @@ class Photogalerymed_View extends Articles_View {
    public function mainView() {
       $this->createListToolbox();
       if($this->toolbox instanceof Template_Toolbox2){
-         $this->toolbox->add_article->setLabel($this->_('Přidat galerii'));
-         $this->toolbox->add_article->setTitle($this->_('Přidat novou galerii'));
+         $this->toolbox->add_article->setLabel($this->tr('Přidat galerii'));
+         $this->toolbox->add_article->setTitle($this->tr('Přidat novou galerii'));
       }
       $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalerymed_Controller::PARAM_TPL_LIST, 'list.phtml'));
-   }
-
-   public function edittextView() {
-      Template_Module::setEdit(true);
-      $this->template()->addFile('tpl://edittext.phtml');
    }
 
    public function showView() {
       $this->createDetailToolbox();
 
       if($this->toolbox instanceof Template_Toolbox2){
-         $this->toolbox->article_->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
-         $this->toolbox->edit_article->setTitle($this->_('Upravit galerii'))->setLabel($this->_('Upravit galerii'));
+         $this->toolbox->article_->setConfirmMeassage($this->tr('Opravdu smazat galerii?'));
+         $this->toolbox->edit_article->setTitle($this->tr('Upravit galerii'))->setLabel($this->tr('Upravit galerii'));
 
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
-         $tool = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit fotky"),
+         $tool = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->tr("Upravit fotky"),
          $this->link()->route('editphotos'));
-         $tool->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky galerie'));
+         $tool->setIcon('image_edit.png')->setTitle($this->tr('Upravit fotky galerie'));
          $toolbox->addTool($tool);
          $this->toolboxImages = $toolbox;
       }
@@ -38,8 +33,8 @@ class Photogalerymed_View extends Articles_View {
    public function editphotosView() {
       Template_Module::setEdit(true);
       $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
-              ." - ".$this->_('úprava obrázků'));
-      $this->template()->addFile('tpl://photogalery:addimage.phtml');
+              ." - ".$this->tr('úprava obrázků'));
+      $this->template()->addFile('tpl://photogalery:editphotos.phtml');
    }
 
    public function editphotoView() {
@@ -58,7 +53,7 @@ class Photogalerymed_View extends Articles_View {
 //      $c->pdf()->AddPage();
       // nadpis
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN);
-      $c->pdf()->writeHTML("<h2>".$this->_('Fotky')."</h2>", true, 0, true, 0);
+      $c->pdf()->writeHTML("<h2>".$this->tr('Fotky')."</h2>", true, 0, true, 0);
       $c->pdf()->Ln(5);
       // přibalení obrázků s galerie
 

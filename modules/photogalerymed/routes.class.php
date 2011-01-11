@@ -2,7 +2,6 @@
 class Photogalerymed_Routes extends Articles_Routes {
 	function initRoutes() {
       parent::initRoutes();
-      $this->addRoute('edittext', "::urlkey::/edittext", 'edit','{urlkey}/edittext/');
       $this->addRoute('editphoto', "::urlkey::/editphotos/editphoto-::id::", 'editphoto','{urlkey}/editphotos/editphoto-{id}/');
       $this->addRoute('editphotos', "::urlkey::/editphotos", 'editphotos','{urlkey}/editphotos/');
 

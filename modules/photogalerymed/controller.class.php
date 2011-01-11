@@ -23,14 +23,14 @@ class Photogalerymed_Controller extends Articles_Controller {
 
    public function showController() {
       $this->checkReadableRights();
-      $this->setOption('deleteMsg', $this->_('Galerie byla smazána'));
-      $this->setOption('publicMsg', $this->_('Galerie byla zveřejněna'));
+      $this->setOption('deleteMsg', $this->tr('Galerie byla smazána'));
+      $this->setOption('publicMsg', $this->tr('Galerie byla zveřejněna'));
       if(parent::showController() === false) return false;
       if($this->view()->formDelete instanceof Form){
-         $this->view()->formDelete->delete->setLabel($this->_('Smazat galerii'));
+         $this->view()->formDelete->delete->setLabel($this->tr('Smazat galerii'));
       }
       if($this->view()->formPublic instanceof Form){
-         $this->view()->formPublic->public->setLabel($this->_('Zveřejnit galerii'));
+         $this->view()->formPublic->public->setLabel($this->tr('Zveřejnit galerii'));
       }
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
@@ -73,7 +73,7 @@ class Photogalerymed_Controller extends Articles_Controller {
       $this->setOption('actionAfterAdd', 'editphotos');
 
       parent::addController();
-      $this->view()->form->save->setLabel(array($this->_('Pokračovat'), $this->_('Zrušit')));
+      $this->view()->form->save->setLabel(array($this->tr('Pokračovat'), $this->tr('Zrušit')));
    }
 
    /**
@@ -172,7 +172,7 @@ class Photogalerymed_Controller extends Articles_Controller {
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->view()->subdir);
    }
 
-   protected function settings(&$settings,Form &$form) {
+   public function settings(&$settings,Form &$form) {
       $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
       $phCtrl->settings($settings, $form);
 
