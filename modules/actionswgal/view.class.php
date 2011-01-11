@@ -34,7 +34,7 @@ class Actionswgal_View extends Actions_View {
    }
 
    public function archiveView() {
-      $this->template()->addFile("tpl://actions:archive.phtml", 'actions');
+      $this->template()->addFile("tpl://actions:archive.phtml");
    }
 
    public function showDataView() {
