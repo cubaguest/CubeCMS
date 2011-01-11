@@ -206,12 +206,13 @@ class Auth extends TrObject {
 	private static function logOutNow() {
 		$return = false;
 		if(isset($_POST["logout_submit"]) OR isset ($_POST['logout_submit_x'])){
+         $tr = new Translator();
 			$_SESSION[self::USER_IS_LOGIN] = false;
 			self::$login = false;
 			session_destroy();
 			$return = true;
-			Log::msg($this->tr('Uživatel byl odhlášen'), null, self::$userName);
-         AppCore::getInfoMessages()->addMessage($this->tr('Byl jste úspěšně odhlášen'));
+			Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::$userName);
+         AppCore::getInfoMessages()->addMessage($tr->tr('Byl jste úspěšně odhlášen'));
          setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/'); // remove permament cookie
 			$link = new Url_Link();
          $link->reload();
