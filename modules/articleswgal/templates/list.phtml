@@ -1,20 +1,20 @@
 <?
 $this->addCssFile("style.css");
-$this->includeTpl('sortLabel.phtml',false,null,'articles');
+$this->includeFile('tpl://articles:sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
 $imagesM = new PhotoGalery_Model_Images();
 echo $this->toolbox;
 ?>
 <h1><?=$h1;?></h1>
 <div class="main-content-list">
-   <?=$this->includeTpl('sort.phtml',false,null,'articles')?>
+   <?=$this->includeFile('tpl://articles:sort.phtml')?>
    <div class="main-content-list-records">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
             $showClass = 'main-content-no-public';
-            $public = $this->_('Nezveřejněno');
+            $public = $this->tr('Nezveřejněno');
          }
          $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          // hlavní obrázek
@@ -45,17 +45,17 @@ echo $this->toolbox;
          <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
       <?}?>
       <hr class="reseter" />
-      <div class="main-content-showed"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
+      <div class="main-content-showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
       <div class="main-content-link-more">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$this->_("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+            title="<?=$this->tr("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
       </div>
       <hr class="reseter" />
    </div>
      <?}
       echo $this->scrollComp;
    } else {
-      echo ($this->_('Není vložen žádný článek'));
+      echo ($this->tr('Není vložen žádný článek'));
    }
    ?>
    </div>

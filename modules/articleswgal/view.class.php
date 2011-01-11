@@ -20,16 +20,15 @@ class ArticlesWGal_View extends Articles_View {
          $toolbox->addTool($tool);
          $this->toolboxImages = $toolbox;
       }
-      $this->template()->addTplFile("detail.phtml");
+      $this->template()->addFile("tpl://detail.phtml");
    }
 
    public function editphotosView() {
-      $this->template()->addTplFile('addimage.phtml', 'photogalery');
-      $this->template()->addTplFile('editphotos.phtml', 'photogalery');
+      $this->template()->addFile('tpl://photogalery:editphotos.phtml');
    }
 
    public function editphotoView() {
-      $this->template()->addTplFile("editphoto.phtml", 'photogalery');
+      $this->template()->addFile("tpl://photogalery:editphoto.phtml");
    }
 
    public function checkFileView() {

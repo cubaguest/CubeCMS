@@ -51,7 +51,7 @@ class ArticlesWGal_Controller extends Articles_Controller {
       $dir->rmDir();
 
       $artM->deleteArticle($idArticle);
-      $this->infoMsg()->addMessage($this->_('Článek s galerií byl smazán'));
+      $this->infoMsg()->addMessage($this->tr('Článek s galerií byl smazán'));
    }
 
    /**
@@ -143,11 +143,13 @@ class ArticlesWGal_Controller extends Articles_Controller {
       $ctr->editphotoController();
    }
 
-   public static function settingsController(&$settings,Form &$form) {
-      parent::settingsController($settings, $form);
-      Photogalery_Controller::settingsController($settings, $form);
+   public function settings(&$settings,Form &$form) {
+      $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
+      $phCtrl->settings($settings, $form);
+      
+      parent::settings($settings, $form);
 
-      $elemImgList = new Form_Element_Text('imagesinlist', 'Počet obrázků v seznamu');
+      $elemImgList = new Form_Element_Text('imagesinlist', $this->tr('Počet obrázků v seznamu'));
       $elemImgList->setSubLabel('Výchozí: '.self::DEFAULT_IMAGES_IN_LIST.' obrázků');
       $elemImgList->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgList,'basic');
