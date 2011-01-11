@@ -173,10 +173,10 @@ class Photogalerymed_Controller extends Articles_Controller {
    }
 
    protected function settings(&$settings,Form &$form) {
-      parent::settings($settings, $form);
-
       $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
-      $phCtrl->viewSettingsController();
+      $phCtrl->settings($settings, $form);
+
+      parent::settings($settings, $form);
 
       $elemImgList = new Form_Element_Text('imagesinlist', 'Počet obrázků v seznamu');
       $elemImgList->setSubLabel('Výchozí: '.self::DEFAULT_IMAGES_IN_LIST.' obrázků');
