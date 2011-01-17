@@ -22,12 +22,12 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = 6.4;
+   const ENGINE_VERSION = 7;
 
    /**
     * Revize Enginu
     */
-   const ENGINE_REVISION = 5;
+   const ENGINE_RELEASE = 0;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -198,7 +198,8 @@ class AppCore extends TrObject {
     * Konstruktor objektu AppCore
     * @todo prověřit, protože né vždy se správně přiřadí cesta, pravděpodobně BUG php
     */
-   private function __construct() {
+   private function __construct()
+   {
       //		inicializace stratovacího času
       List ($usec, $sec) = Explode (' ', microtime());
       $this->_startTime=((float)$sec + (float)$usec);
@@ -245,7 +246,8 @@ class AppCore extends TrObject {
     * Třída je singleton
     * není povolen clone
     */
-   public function __clone() {
+   public function __clone()
+   {
       throw new BadMethodCallException($this->tr('Není povoleno inicializovat více jak jednu třídu aplikace'));
    }
 
@@ -258,7 +260,8 @@ class AppCore extends TrObject {
     *
     * @return AppCore
     */
-   public static function getInstance() {
+   public static function getInstance()
+   {
       if (null === self::$_coreInstance) {
          self::$_coreInstance = new self();
       } else {
@@ -271,7 +274,8 @@ class AppCore extends TrObject {
     * Metoda vrací adresář aplikace
     * @return string -- adresář aplikace
     */
-   public static function getAppWebDir() {
+   public static function getAppWebDir()
+   {
       return self::$_appWebDir;
    }
 
@@ -279,7 +283,8 @@ class AppCore extends TrObject {
     * Metoda vrací adresář aplikace s knihovnami
     * @return string -- adresář aplikace s knihovnami
     */
-   public static function getAppLibDir() {
+   public static function getAppLibDir()
+   {
       return self::$_appLibDir;
    }
 
@@ -287,7 +292,8 @@ class AppCore extends TrObject {
     * Metoda vrací cestu k datovému adresáři aplikace
     * @return string
     */
-   public static function getAppDataDir() {
+   public static function getAppDataDir()
+   {
       return self::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR;
    }
    
@@ -295,7 +301,8 @@ class AppCore extends TrObject {
     * Metoda vrací cestu k cache adresáři aplikace
     * @return string
     */
-   public static function getAppCacheDir() {
+   public static function getAppCacheDir()
+   {
       return self::getAppWebDir().self::ENGINE_CACHE_DIR.DIRECTORY_SEPARATOR;
    }
 
@@ -304,7 +311,8 @@ class AppCore extends TrObject {
     * pokud již instance existuje, bude vyhozena vyjímka
     * Instance aplikace je singleton
     */
-   public static function createApp() {
+   public static function createApp()
+   {
       self::getInstance();
    }
 
@@ -312,7 +320,8 @@ class AppCore extends TrObject {
     * Metoda nastavuje že má být zobrazena chybová stránka 404
     * @param boolean $var (option) zapne chybovou stránku
     */
-   public static function setErrorPage($var = true) {
+   public static function setErrorPage($var = true)
+   {
       self::$isErrorPage = $var;
    }
 
@@ -320,7 +329,8 @@ class AppCore extends TrObject {
     * Metooda vrací jestli je nastaveny chybová stránka 404
     * @return boolean -- true pokud je zobrazena
     */
-   public static function isErrorPage() {
+   public static function isErrorPage()
+   {
       return self::$isErrorPage;
    }
 
@@ -328,7 +338,8 @@ class AppCore extends TrObject {
     * Metoda vrací objekt pro zprávy modulů
     * @return Messages -- objekt zpráv
     */
-   public static function &getInfoMessages() {
+   public static function &getInfoMessages()
+   {
       return self::$messages;
    }
 
@@ -336,7 +347,8 @@ class AppCore extends TrObject {
     * Metoda vrací objekt pro chybové zprávy modulů
     * @return Messages -- objekt zpráv
     */
-   public static function &getUserErrors() {
+   public static function &getUserErrors()
+   {
       return self::$userErrors;
    }
 
@@ -344,7 +356,8 @@ class AppCore extends TrObject {
     * Metoda vrací objekt url požadavku
     * @return Url_Request  -- objekt autorizace
     */
-   public static function getUrlRequest() {
+   public static function getUrlRequest()
+   {
       return self::$urlRequest;
    }
 
@@ -352,7 +365,8 @@ class AppCore extends TrObject {
     * Metoda vrací objekt hlavní kategorie
     * @return Category
     */
-   public static function getCategory() {
+   public static function getCategory()
+   {
       return self::$category;
    }
 
@@ -363,7 +377,8 @@ class AppCore extends TrObject {
    /**
     * Metoda inicializuje základní nastavení jádra systému
     */
-   private function _initCore() {
+   private function _initCore()
+   {
       // base classes
       $this->_initBaseClasses();
       
@@ -384,7 +399,8 @@ class AppCore extends TrObject {
    /**
     * Metoda načte základní třídy
     */
-   private function _initBaseClasses() {
+   private function _initBaseClasses()
+   {
       // exceptions
       $exFiles = array('coreException','dbException','badClassException','badFileException',
          'imageException','badRequestException', 'controllerException');
@@ -401,7 +417,8 @@ class AppCore extends TrObject {
    /**
     * Metoda inicializuje připojení k databázi
     */
-   private function _initDb() {
+   private function _initDb()
+   {
       Db_PDO::factory();
    }
 
@@ -409,7 +426,8 @@ class AppCore extends TrObject {
     * Metoda inicializuje konfiguraci s konfiguračního souboru
     *
     */
-   private function _initConfig() {
+   private function _initConfig()
+   {
       $cfgModel = new Model_Config();
       $cfgVals = $cfgModel->getConfigStat();
       while ($cfg = $cfgVals->fetch()) {
@@ -428,22 +446,20 @@ class AppCore extends TrObject {
    /**
     * Metoda provádí kontrolu verze jádra
     */
-   private function checkCoreVersion(){
+   private function checkCoreVersion()
+   {
       /* Upgrade jádra */
       // upgrade
       if(defined('VVE_VERSION') AND VVE_VERSION != self::ENGINE_VERSION){ // kvůli neexistenci předchozí detekce
          $core = new Install_Core();
          $core->upgrade();
       } else if(!defined('VVE_VERSION')) {
-         $settings = new Model_Config();
-         $settings->saveCfg('VERSION', self::ENGINE_VERSION, Model_Config::TYPE_STRING, 'Verze jádra', true);
-         $link = new Url_Link(true);
-         echo ('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!');
-         $link->clear(true)->reload();
+         $core = new Install_Core();
+         $core->upgradeToMain();
       } else {
       }
       // update
-      if(defined('VVE_REVISION') AND VVE_REVISION != self::ENGINE_REVISION){ // kvůli neexistenci předchozí detekce
+      if(defined('VVE_RELEASE') AND VVE_RELEASE != self::ENGINE_RELEASE){ // kvůli neexistenci předchozí detekce
          $core = new Install_Core();
          $core->update();
       }
@@ -453,7 +469,8 @@ class AppCore extends TrObject {
     * Metoda načte potřebné knihovny
     * @todo refaktoring nutný
     */
-   public static function _loadLibraries($classOrigName) {
+   public static function _loadLibraries($classOrigName)
+   {
       /**
        * Funkce slouží pro automatické načítání potřebných tříd
        * @param string -- název třídy
@@ -502,7 +519,8 @@ class AppCore extends TrObject {
    /**
     * Metoda inicializuje objekty pro práci s hláškami
     */
-   private function _initMessagesAndErrors() {
+   private function _initMessagesAndErrors()
+   {
       if(VVE_DEBUG_LEVEL > 0){
          error_reporting(-1);
          ini_set('display_errors', 1);
@@ -514,6 +532,9 @@ class AppCore extends TrObject {
       //		Vytvoření objektu pro práci se zprávami
       self::$messages = new Messages('session', 'messages', true);
       self::$userErrors = new Messages('session', 'errors');
+
+      // hlášky pro upgrade a update
+      Install_Core::addUpgradeMessages();
    }
 
    /*
@@ -524,7 +545,8 @@ class AppCore extends TrObject {
     * Metoda nastavuje hlavní adresář aplikace
     * @param string -- hlavní adresář aplikace
     */
-   public static function setAppMainDir($appMainDir) {
+   public static function setAppMainDir($appMainDir)
+   {
       self::$_appWebDir = $appMainDir.DIRECTORY_SEPARATOR;
    }
 
@@ -532,14 +554,16 @@ class AppCore extends TrObject {
     * Metoda nastavuje hlavní adresář s knihovnami aplikace
     * @param string -- hlavní adresář s knihovnami aplikace
     */
-   public static function setAppMainLibDir($appMainLibDir) {
+   public static function setAppMainLibDir($appMainLibDir)
+   {
       self::$_appLibDir = $appMainLibDir.DIRECTORY_SEPARATOR;
    }
 
    /**
     * Metoda vytvoří hlavní menu aplikace
     */
-   public function createMenus() {
+   public function createMenus()
+   {
       Menu_Main::factory();
       try {
          if(!file_exists(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR . DIRECTORY_SEPARATOR
@@ -579,7 +603,8 @@ class AppCore extends TrObject {
     * Metoda vrací objekt core šablony. pokud nění vytvořena pokusí se ji vytvořit
     * @return Template_Core
     */
-   public function getCoreTpl() {
+   public function getCoreTpl()
+   {
       if(!($this->coreTpl instanceof Template_Core)){
          $this->coreTpl = new Template_Core();
       }
@@ -589,7 +614,8 @@ class AppCore extends TrObject {
    /**
     * Metoda přiřadí do šablony hlavní proměnné systému
     */
-   public function assignMainVarsToTemplate() {
+   public function assignMainVarsToTemplate()
+   {
       //	Hlavni promene strany
       $this->getCoreTpl()->debug = VVE_DEBUG_LEVEL;
       $this->getCoreTpl()->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
@@ -624,7 +650,8 @@ class AppCore extends TrObject {
     * metoda vyrenderuje šablonu
     * @todo Předělat, protože se nekontroluje existence jiných typů médií
     */
-   public function renderTemplate() {
+   public function renderTemplate()
+   {
       //		načtení doby zpracovávání aplikace
       List ($usec, $sec) = Explode(' ', microtime());
       $endTime = ((float) $sec + (float) $usec);
@@ -637,7 +664,8 @@ class AppCore extends TrObject {
    /**
     * Metoda spouští moduly
     */
-   public function runModule() {
+   public function runModule()
+   {
       try {
          // načtení a kontrola cest u modulu
          $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
@@ -679,7 +707,8 @@ class AppCore extends TrObject {
    /**
     * Metoda spouští rss export na modulu
     */
-   public function runModuleRss() {
+   public function runModuleRss()
+   {
       if(self::$category->haveFeed() == false){
          AppCore::setErrorPage(true);
          return false;
@@ -711,7 +740,8 @@ class AppCore extends TrObject {
    /**
     * Metoda spustí samotný požadavek na modul, např generování listu v xml souboru
     */
-   public function runModuleOnly() {
+   public function runModuleOnly()
+   {
       if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_REQUEST) {
          ob_start();
          // spuštění modulu
@@ -803,7 +833,8 @@ class AppCore extends TrObject {
     * @param string $side -- jaký panel je spuštěn (left, right, bottom, top, ...)
     * @todo dodělat implementaci ostatních pozic panelů
     */
-   public function runPanels() {
+   public function runPanels()
+   {
       $this->coreTpl->panels = array();
       // vygenerování pole pro šablony panelů
       $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
@@ -852,7 +883,8 @@ class AppCore extends TrObject {
    /**
     * Metoda přiřadí chyby do šablony
     */
-   public function assignCoreErrorsToTpl() {
+   public function assignCoreErrorsToTpl()
+   {
       $this->coreTpl->coreErrors = CoreErrors::getErrors();
       $this->coreTpl->coreErrorsEmpty = CoreErrors::isEmpty();
    }
@@ -860,7 +892,8 @@ class AppCore extends TrObject {
    /**
     * Metoda přiřadí zprávy šablonovacího systému
     */
-   public function assignMessagesToTpl() {
+   public function assignMessagesToTpl()
+   {
       $this->getCoreTpl()->messages = self::getInfoMessages()->getMessages();
       $this->getCoreTpl()->moduleErrors = self::getUserErrors()->getMessages();
       // výmaz uložených zpráv (kvůli requestů je tady)
@@ -871,7 +904,8 @@ class AppCore extends TrObject {
    /**
     * Metoda spouští kód pro generování specielních stránek
     */
-   public function runCoreModule() {
+   public function runCoreModule()
+   {
       $className = 'Module_'.ucfirst(self::$category->getModule()->getName());
       if(class_exists($className)){
          $ctrl = new $className(self::$category);
@@ -892,7 +926,8 @@ class AppCore extends TrObject {
    /**
     * Metoda spustí akci nad JsPluginem
     */
-   public function runJsPlugin() {
+   public function runJsPlugin()
+   {
       try {
          $pluginName = 'JsPlugin_' . ucfirst(self::$urlRequest->getName());
          if (class_exists($pluginName)) {
@@ -916,7 +951,8 @@ class AppCore extends TrObject {
    /**
     * Metoda pro spuštění akce na componentě
     */
-   public function runComponent() {
+   public function runComponent()
+   {
       $componentName = 'Component_'.ucfirst(self::$urlRequest->getName());
          $component = new $componentName();
          // z komponenty patří výstup zde
@@ -929,7 +965,8 @@ class AppCore extends TrObject {
     * které jsou jednotné pro celý web
     * @todo předělat pro načítání z adresáře Webu, ne knihoven
     */
-   private function initialWebSettings() {
+   private function initialWebSettings()
+      {
       $fileName = 'initial'.ucfirst(self::$urlRequest->getOutputType()).'.php';
       if(file_exists(AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName)) {
          require AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName;
@@ -939,7 +976,8 @@ class AppCore extends TrObject {
    /**
     * Hlavní metoda provádění aplikace
     */
-   public function runCore() {
+   public function runCore()
+   {
       // načtení systémového konfiguračního souboru
       try {
          $this->_initConfig();
@@ -952,8 +990,8 @@ class AppCore extends TrObject {
          //		inicializace URL
          Url_Request::factory();
          /*
-          * TODO: Tohle se musí doladit, protožwe to je začarovaný kruch.
-          * Locales závisí na URL_Requestu a url request zívisí na auth a auth na locales
+          * TODO: Tohle se musí doladit, protože to je začarovaný kruch.
+          * Locales závisí na URL_Requestu a URL_Request zívisí na Auth a Auth na Locales
           */
          //inicializace lokalizace
          Locales::factory();

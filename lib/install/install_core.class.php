@@ -11,102 +11,131 @@
  */
 class Install_Core {
    const CORE_INSTALL_DIR = 'install';
-   const CORE_UPGRADE_DIR = 'upgradedata';
+   const CORE_UPGRADE_DIR = 'upgrade';
    const CORE_UPGRADE_SQL_DIR = 'sql';
    const CORE_UPGRADE_PHP_DIR = 'php';
 
-   const FILE_SQL_UPGRADE = 'upgrade_{from}_{to}.sql';
-   const FILE_PHP_UPGRADE = 'upgrade_{from}_{to}.php';
+   const FILE_SQL_UPGRADE = 'upgrade_{from}_to_{to}.sql';
+   const FILE_PHP_UPGRADE = 'upgrade_{from}_to_{to}.php';
+
+   const FILE_SQL_PATCH = 'patch_{to}.sql';
+   const FILE_PHP_PATCH = 'patch_{to}.php';
 
    protected $tablesPrefix = '{PREFIX}';
    protected $version = array('major' => 6, 'minor' => 0, 'build' => 0); // začíná se od verze 6.0.0
 
-   public function __construct() {
+   public function __construct()
+   {
    }
 
    /**
     * metoda pro instalaci modulu
     */
-   public function install() {
+   public function install()
+   {
 
    }
 
    /**
-    * Metoda pro upgrade jádra
+    * Metoda provede upgrade verze
     */
-   public function upgrade() {
+   public function upgrade()
+   {
       // kontrola downgrade
-      if((float)VVE_VERSION > (float)AppCore::ENGINE_VERSION ){
-         new CoreErrors(new CoreException(sprintf(_('Downgrade verze %s na verzi %s nelze provádět'),number_format((float)VVE_VERSION,1,'.',''), number_format((float)AppCore::ENGINE_VERSION,1,'.',''))));
+      if(VVE_VERSION > AppCore::ENGINE_VERSION ){
+         echo sprintf(_('Downgrade verze %s na verzi %s nelze provádět'),VVE_VERSION, AppCore::ENGINE_VERSION).'<br />';
          return;
       }
       $modelCfg = new Model_Config();
 
-      for ($currentVer = (float)VVE_VERSION; round($currentVer,1) < round(AppCore::ENGINE_VERSION,1); $currentVer+=0.1) {
-         /* php update */
-         $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array(number_format($currentVer, 1, '.', ''),
-            number_format($currentVer+0.1, 1, '.', '')), self::FILE_PHP_UPGRADE);
-         if(file_exists($this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR
-            .self::CORE_UPGRADE_PHP_DIR.DIRECTORY_SEPARATOR.$phpFileName)){
-            include $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR
-               .self::CORE_UPGRADE_PHP_DIR.DIRECTORY_SEPARATOR.$phpFileName;
-         }
-         /* sql update */
-         $sqlFileName = preg_replace(array('/{from}/', '/{to}/'), array(number_format($currentVer, 1, '.', ''),
-            number_format($currentVer+0.1, 1, '.', '')), self::FILE_SQL_UPGRADE);
-         $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir()
-            .self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.self::CORE_UPGRADE_SQL_DIR.DIRECTORY_SEPARATOR, false);
-         if ($file->exist()) {
-            $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
-         }
-         $modelCfg->saveCfg('VERSION', number_format((float)$currentVer+0.1,1,'.',''));
-      }
+      $currentVer = (int)VVE_VERSION;
+      try {
+         while ($currentVer != AppCore::ENGINE_VERSION) {
+            /* php update */
+            $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_PHP_UPGRADE);
 
-      echo(sprintf(_('Jádro bylo aktualizováno na verzi %s revize %s'),number_format((float)AppCore::ENGINE_VERSION,1,'.',''), 1));
-      // reload nové verze
-      $link = new Url_Link(true);
-      $link->clear(true)->reload();
+
+            if (file_exists($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName)) {
+               include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName;
+            }
+
+            /* sql update */
+            $sqlFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_SQL_UPGRADE);
+
+            $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR, false);
+            if ($file->exist()) {
+               $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
+            }
+            $modelCfg->saveCfg('VERSION', $currentVer + 1);
+
+            $currentVer++; // loop na další verzi
+         }
+      } catch (Exception $exc) {
+         echo "<br/><strong>Chyba při upgradu!!!</strong><br />";
+         echo '<pre>'.$exc->getTraceAsString().'</pre>';
+         echo '<pre>'.htmlspecialchars($this->replaceDBPrefix($file->getContent())).'</pre>';
+
+         die;
+      }
+      $this->installComplete(sprintf(_('Jádro bylo aktualizováno na verzi %s release %s'), AppCore::ENGINE_VERSION, 0));
    }
 
-   public function update() {
+   /**
+    * Metoda provede update releasu
+    * @return <type>
+    */
+   public function update()
+   {
       // kontrola downgrade
-      if(VVE_REVISION > AppCore::ENGINE_REVISION ){
-         new CoreErrors(new CoreException(sprintf(_('Downgrade revize %s na revizi %s nelze provádět'),VVE_REVISION, AppCore::ENGINE_REVISION)));
+      if(VVE_RELEASE > AppCore::ENGINE_RELEASE ){
+         echo sprintf(_('Downgrade revize %s na revizi %s nelze provádět'),VVE_RELEASE, AppCore::ENGINE_RELEASE);
+         return;
+      } else if(VVE_RELEASE == AppCore::ENGINE_RELEASE ){
          return;
       }
       $modelCfg = new Model_Config();
 
-      $versionDir = (string)number_format((float)AppCore::ENGINE_VERSION,1,'.','');
-      for ($currentVer = VVE_REVISION; $currentVer < AppCore::ENGINE_REVISION; $currentVer++) {
+      $versionDir = (string)AppCore::ENGINE_VERSION;
+
+      $currentRelease = VVE_RELEASE;
+      while ($currentRelease != AppCore::ENGINE_RELEASE) {
          /* php update */
-         $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array('r'.$currentVer,'r'.$currentVer+1), self::FILE_PHP_UPGRADE);
-         if(file_exists($this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR
-            .self::CORE_UPGRADE_PHP_DIR.DIRECTORY_SEPARATOR.$phpFileName)){
-            include $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR
-               .self::CORE_UPGRADE_PHP_DIR.DIRECTORY_SEPARATOR.$phpFileName;
+         $phpFileName = preg_replace('/{to}/', $currentRelease+1, self::FILE_PHP_PATCH);
+         if(file_exists($this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR.$phpFileName)){
+            include $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR.$phpFileName;
          }
+
          /* sql update */
-         $sqlFileName = preg_replace(array('/{from}/', '/{to}/'), array('r'.$currentVer,'r'.($currentVer+1)), self::FILE_SQL_UPGRADE);
-         $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir()
-            .self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR.self::CORE_UPGRADE_SQL_DIR.DIRECTORY_SEPARATOR, false);
+         $sqlFileName = preg_replace('/{to}/', $currentRelease+1, self::FILE_SQL_PATCH);
+         $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR, false);
          if ($file->exist()) {
             $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
          }
 
-         $modelCfg->saveCfg('REVISION', $currentVer+1);
+         $modelCfg->saveCfg('RELEASE', $currentRelease+1);
+         $currentRelease++;
       }
-
-
-      echo sprintf(_('Jádro bylo aktualizováno na revizi %s verze %s'), AppCore::ENGINE_REVISION, number_format((float)AppCore::ENGINE_VERSION,1,'.',''));
-      // reload nové verze
-      $link = new Url_Link(true);
-      $link->clear(true)->reload();
+      $this->installComplete(sprintf(_('Jádro bylo aktualizováno na verzi %s release %s'), AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
    }
+
+   /**
+    * Metoda provede upgrade na verzi, kterou lze aktualizovat
+    */
+   public function upgradeToMain()
+   {
+      $settings = new Model_Config();
+      $settings->saveCfg('VERSION', 6, Model_Config::TYPE_STRING, 'Verze jádra', true);
+      echo ('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!');
+      header('Location: http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+      die();
+   }
+
 
    /**
     * metoda vrátí instalovanou verzi jádra
     */
-   public function getInstaledVersion() {
+   public function getInstaledVersion()
+   {
 
    }
 
@@ -114,12 +143,14 @@ class Install_Core {
     * Metoda pro instalaci SQL patchů
     * @param string $SQL -- SQL patch
     */
-   protected function runSQLCommand($SQL) {
+   protected function runSQLCommand($SQL)
+   {
       $model = new Model_DbSupport();
       $model->runSQL($SQL);
    }
 
-   protected function getSQLFileContent($file = 'install.sql') {
+   protected function getSQLFileContent($file = 'install.sql')
+   {
       if (file_exists($this->getInstallDir() . $file)) {
          return file_get_contents($this->getInstallDir() . $file);
       } else {
@@ -127,17 +158,35 @@ class Install_Core {
       }
    }
 
+   private function installComplete($msg)
+   {
+      setcookie('upgrade', $msg, time() + 3600);
+      header('Location: http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+      die ();
+   }
+
+
    /**
     * Metoda nastaví název datového adresáře
     * @return string
     */
-   public function getInstallDir() {
+   public function getInstallDir()
+   {
       return AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
       . self::CORE_INSTALL_DIR . DIRECTORY_SEPARATOR;
    }
 
-   protected function replaceDBPrefix($cnt) {
+   protected function replaceDBPrefix($cnt)
+   {
       return str_replace($this->tablesPrefix, VVE_DB_PREFIX, $cnt);
+   }
+
+   public static function addUpgradeMessages()
+   {
+      if(isset ($_COOKIE['upgrade'])){
+         AppCore::getInfoMessages()->addMessage($_COOKIE['upgrade'], false);
+         setcookie('upgrade', '', time() - 3600);
+      }
    }
 
 }
