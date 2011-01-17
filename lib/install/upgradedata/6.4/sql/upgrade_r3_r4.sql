@@ -1,1 +1,0 @@
-ALTER TABLE `{PREFIX}users` ADD COLUMN `password_restore` VARCHAR(100) NULL DEFAULT NULL AFTER `password` ;
