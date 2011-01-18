@@ -30,7 +30,7 @@ class Lecturers_Controller extends Controller {
             $model->deleteLecturer($formDel->id->getValues());
 
             $this->infoMsg()->addMessage($this->_('Lektor byl smazán'));
-            $this->link()->reload();
+            $this->link()->rmParam()->reload();
          }
          $this->view()->formDelete = $formDel;
       }
