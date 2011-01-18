@@ -4,6 +4,7 @@ class Lecturers_Controller extends Controller {
    const DEFAULT_IMAGE_WIDTH = 90;
    const DEFAULT_IMAGE_HEIGHT = 120;
    const DEFAULT_IMAGE_CROP = false;
+   const DEFAULT_RECORDS_ON_PAGE = 10;
 
    const DATA_DIR = 'lecturers';
 
@@ -33,7 +34,21 @@ class Lecturers_Controller extends Controller {
          }
          $this->view()->formDelete = $formDel;
       }
-      $lecturers = $model->getList();
+
+      $scrollComponent = null;
+      if($this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE) != 0){
+         $scrollComponent = new Component_Scroll();
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->getCount());
+
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
+              $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE));
+
+         $lecturers = $model->getList($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
+      } else {
+         $lecturers = $model->getList();
+      }
+
+      $this->view()->compScroll = $scrollComponent;
       $this->view()->lecturers = $lecturers;
    }
 
@@ -181,6 +196,12 @@ class Lecturers_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    public static function settingsController(&$settings, Form &$form) {
+      $eOnPage = new Form_Element_Text('numOnPage', 'Počet lektorů na stránku');
+      $eOnPage->addValidation(new Form_Validator_IsNumber());
+      $eOnPage->setSubLabel(sprintf('Výchozí: %s lektorů na stránku', self::DEFAULT_RECORDS_ON_PAGE));
+      $form->addElement($eOnPage, 'view');
+
+
       $form->addGroup('images', 'Nasatvení obrázků');
 
       $elemImgW = new Form_Element_Text('imgw', 'Šířka portrétu');
@@ -205,11 +226,16 @@ class Lecturers_Controller extends Controller {
       if (isset($settings['cropimg'])) {
          $form->imgh->setValues($settings['cropimg']);
       }
+
+      if (isset($settings['recordsonpage'])) {
+         $form->numOnPage->setValues($settings['recordsonpage']);
+      }
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
          $settings['imgw'] = $form->imgw->getValues();
          $settings['imgh'] = $form->imgh->getValues();
          $settings['cropimg'] = $form->cropimg->getValues();
+         $settings['recordsonpage'] = $form->numOnPage->getValues();
       }
    }
 

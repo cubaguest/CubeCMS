@@ -63,15 +63,9 @@ class Lecturers_Model extends Model_PDO {
     *
     * @return integer -- počet
     */
-   public function getCount($onlyPublic = true) {
+   public function getCount() {
       $dbc = new Db_PDO();
-      if($onlyPublic) {
-         $dbst = $dbc->query("SELECT COUNT(".self::COLUMN_ID.")"
-                 ." FROM ".Db_PDO::table(self::DB_TABLE)
-                 ." WHERE (".self::COLUMN_PUBLIC." = 1)");
-      } else {
-         $dbst = $dbc->query("SELECT COUNT(".self::COLUMN_ID.") FROM ".Db_PDO::table(self::DB_TABLE));
-      }
+      $dbst = $dbc->query("SELECT COUNT(".self::COLUMN_ID.")"." FROM ".Db_PDO::table(self::DB_TABLE)." WHERE (".self::COLUMN_DELETED." = 0)");
       $count = $dbst->fetch();
       return $count[0];
    }

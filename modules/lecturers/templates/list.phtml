@@ -2,4 +2,7 @@
 <?
 $this->includeTpl('onlylist.phtml', false, array('lecturers' => $this->lecturers,'hE' => 'h2', 'hEClass' => 'course-lecturer-name'), 'lecturers');?>
 </div>
-   <?=$this->toolbox;// TOOLBOXY?>
+<?
+   echo $this->compScroll;
+   echo $this->toolbox;// TOOLBOXY
+?>
