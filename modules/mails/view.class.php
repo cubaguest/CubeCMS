@@ -17,6 +17,11 @@ class Mails_View extends View {
       $this->page = 'main';
 	}
 
+   public function sendMailsQueueView()
+   {
+      $this->template()->addTplFile('mailsqueue.phtml');
+   }
+
    public function listMailsView() {
       $this->template()->addTplFile('main.phtml');
    }

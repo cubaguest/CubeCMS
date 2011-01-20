@@ -1,6 +1,7 @@
 <?
 $this->items = array(
    $this->_('Vytvořit e-mail') => array('link' => (string)$this->link()->route(), 'icon' => 'email_edit.png'),
+   $this->_('Fronta odesílání') => array('link' => (string)$this->link()->route('sendMailsQueue'), 'icon' => 'cog.png'),
    $this->_('Adresář') => array('link' => (string)$this->link()->route('addressBook'), 'icon' => 'book_addresses.png'),
    $this->_('Odesláné e-maily') => array('link' => (string)$this->link()->route('sendMailsList'), 'icon' => 'email_go.png')
    );

@@ -1,0 +1,130 @@
+<?
+$this->addPageTitle($this->_('Fronta odesílání e-mailů'));
+$this->addCssFile('style.css');
+?>
+<h1><?=$this->_('Fronta odesílání e-mailů')?></h1>
+<?=$this->includeTpl('navigation.phtml');?>
+<div>
+<div id="mails-queue-buttons">
+<?
+if($this->formSend != null){
+   $this->formSend->html()->setAttrib('name', 'form-send-queue');
+   echo $this->formSend->renderStart();
+   echo $this->formSend->send->controll();
+   echo $this->formSend->renderEnd();
+
+   echo $this->formClear->renderStart();
+   $this->formClear->html()->setAttrib('name', 'form-clear-queue');
+   $this->formClear->clear->html()->addClass('button-cancel');
+   echo $this->formClear->clear->controll();
+   echo $this->formClear->renderEnd();
+}
+?>
+</div>
+   <table id="mails-queue">
+   <tr id="mails-queue-table-header">
+      <th width="400">e-mail</th>
+      <th>status</th>
+   </tr>
+   <?
+   if(!empty ($this->queue)){
+      foreach ($this->queue as $mail) {?>
+   <tr class="mail-row">
+      <td class="mail-row-data">
+         <?
+         if($mail->{Mails_Model_SendQueue::COLUMN_NAME} != null){
+            echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_NAME}.' <'.$mail->{Mails_Model_SendQueue::COLUMN_MAIL}.'>');
+         } else {
+            echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_MAIL});
+         }
+         ?>
+         <input type="hidden" value="<?=$mail->{Mails_Model_SendQueue::COLUMN_ID};?>" name="mail-id" />
+      </td>
+      <td class="mail-row-status"></td>
+   </tr>
+      <?}
+   } else {?>
+   <tr>
+      <td colspan="2"><?=$this->_('Fronta je prázdná');?></td>
+   </tr>
+   <?}?>
+</table>
+<br />
+<div id="mails-queue-buttons">
+<?
+if($this->formSend != null){
+   $this->formSend->html()->setAttrib('name', 'form-send-queue');
+   echo $this->formSend->renderStart();
+   echo $this->formSend->send->controll();
+   echo $this->formSend->renderEnd();
+
+   echo $this->formClear->renderStart();
+   $this->formClear->html()->setAttrib('name', 'form-clear-queue');
+   $this->formClear->clear->html()->addClass('button-cancel');
+   echo $this->formClear->clear->controll();
+   echo $this->formClear->renderEnd();
+}
+?>
+   <br />
+   <br />
+   <label><?echo $this->_('Odstranit z adresáře adresy, které se nepodařilo doručit');?></label>
+<?
+if($this->formRemUnedlivered != null){
+   $this->formRemUnedlivered->html()->setAttrib('name', 'form-remove-undelivered');
+   echo $this->formRemUnedlivered->renderStart();
+   $this->formRemUnedlivered->remove->html()->addClass('button-cancel');
+   echo $this->formRemUnedlivered->remove->controll();
+   echo $this->formRemUnedlivered->renderEnd();
+}?>
+</div>
+
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(function() {
+      var $statusImg = $('<img />').attr({
+         src : 'images/progress_small.gif',
+         alt : 'zpracovávám'
+      });
+      // bind submit
+      $('form[name=form-send-queue]').submit(function(){
+         // remova all statuses
+         $('#mails-queue td.mail-row-status').html('');
+
+         $('#mails-queue tr.mail-row').each(function(){
+            var $thisrow = $(this);
+            $.ajax({
+               type: "POST",
+               context: $thisrow,
+               cache : false,
+               url:'<?=$this->link()->route('sendMail');?>',
+               data : ({
+                  id : $('input[name=mail-id]', $thisrow).val()
+               }),
+               beforeSend : function(){
+                  // obrázek pro zpracování
+                  $('td.mail-row-status', this).append($statusImg.clone());
+               },
+               success: function(data){
+                  if(data.status == 'OK'){
+                     $('td.mail-row-status', this).html('<span class="mail-send-result mail-send-result-ok">OK '+data.msg+'</span>');
+                     $(this).delay(1000).hide(500, function(){$(this).remove();});
+
+                  } else if(data.status == 'ERR'){
+                     $('td.mail-row-status', this).html('<span class="mail-send-result mail-send-result-err">Chyba '+data.msg+'</span>');
+                  }
+               }
+            });
+
+         });
+         return false;
+      });
+
+      $('form[name=form-remove-undelivered]').submit(function(){
+         return confirm('<?=$this->_('Opravdu smazat ')?>');
+      });
+
+   });
+      
+   /* ]]> */
+</script>
+</div>

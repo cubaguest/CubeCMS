@@ -33,3 +33,26 @@ div.mail-recipients, div.mail-content {
    padding-top: 0px;
 
 }
+
+#mails-queue {
+   width: 98%;
+}
+#mails-queue td {
+   border-bottom: 1px solid gray;
+   padding: 2px 0;
+}
+
+#mails-queue-buttons form,
+#mails-queue-buttons p {
+   display: inline;
+}
+
+.mail-send-result {
+   font-weight: bold;
+}
+.mail-send-result-ok {
+   color: #006600;
+}
+.mail-send-result-err {
+   color: #EE0000;
+}

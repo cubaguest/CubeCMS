@@ -18,12 +18,14 @@ $this->addCssFile('style.css');
    $jQ->addUIAutoComplete();
    $this->addJsPlugin($jQ);
    ?>
-   <? echo $this->form->renderStart(); ?>
+   <?
+   $this->form->html()->setAttrib('id', 'mail-send-form');
+   echo $this->form->renderStart(); ?>
    <table>
       <tr>
          <td>
             <? echo $this->form->recipients->label() ?><br />
-            <? $this->form->recipients->html()->setAttrib('cols', 90)->setAttrib('rows', 5);
+            <? $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5);
             echo $this->form->recipients->controll(); ?>
             <? echo $this->form->recipients->sublabel() ?>
             <br />
@@ -148,7 +150,7 @@ $this->addCssFile('style.css');
          </td>
       </tr>
       <tr>
-         <td align="right">
+         <td align="">
             <? echo $this->form->send->controll() ?>
          </td>
       </tr>
@@ -157,6 +159,17 @@ $this->addCssFile('style.css');
             <?
             echo $this->form->sendBatch->label();
             echo $this->form->sendBatch->controll();
+            ?>
+            <br />
+            <br />
+         </td>
+      </tr>
+      <tr>
+         <td>
+            <?
+            echo $this->form->sendQueue->label();
+            echo $this->form->sendQueue->controll();
+            echo $this->form->sendQueue->subLabel();
             ?>
             <br />
             <br />
@@ -227,7 +240,7 @@ $this->addCssFile('style.css');
             success: function(data){
                $.each(data.rows, function(index, value) {
                   var str = '';
-                  if(value.cell[2] != null){
+                  if(value.cell[2] != null && value.cell[2] != ''){
                      str += '"'+value.cell[1]+' '+value.cell[2]+'" ';
                   }
                   str += '<'+value.cell[0]+'>';
@@ -269,6 +282,21 @@ $this->addCssFile('style.css');
 				return false;
 			}
 		});
+
+      // Odeslání pomocí ajaxu
+//      $('#mail-send-form').submit(function(){
+//         var mailsStr = $('textarea[name=sendmail_recipients]').val();
+//         if(mailsStr.length == 0){
+//            alert('Nebyla zadána žádná e-mailová adresa');
+//         }
+//         // regexp pro výběr emailů
+//         var mailRegex = new RegExp(/(?:(?:"[\w-\s]+")|(?:[\w-]+(?:\.[\w-]+)*)|(?:"[\w-\s]+")(?:[\w-]+(?:\.[\w-]+)*))(?:@(?:(?:[\w-]+\.)*\w[\w-]{0,66})\.(?:[a-z]{2,6}(?:?:\.[a-z]{2})?))|(?:@\[?(?:(?:25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?)/gi);
+//
+//
+//         return false;
+//
+//      });
+
    });
    /* ]]> */
 </script>

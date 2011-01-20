@@ -25,6 +25,7 @@ $this->addJsPlugin($jQuery);
 	<ul>
 		<li><a href="#mails-export">Export</a></li>
 		<li><a href="#mails-import">Import</a></li>
+		<li><a href="#mails-utilities">Nástroje</a></li>
 	</ul>
 	<div id="mails-export">
       <?
@@ -37,6 +38,13 @@ $this->addJsPlugin($jQuery);
 //      $this->formImport->separator->html()->setAttrib('size', 1);
       echo $this->formImport;
       echo $this->_('Podporován je momentálně soubor pouze s e-mailovými adresami.');
+      ?>
+	</div>
+	<div id="mails-utilities">
+      <?
+//      $this->formImport->separator->html()->setAttrib('size', 1);
+      echo '<h3>'.$this->_('Odstranění duplicitních emailů z adresáře.').'</h3>';
+      echo $this->formRemoveDuplicity;
       ?>
 	</div>
 </div>

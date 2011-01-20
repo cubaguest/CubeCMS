@@ -18,8 +18,13 @@ class Mails_Controller extends Controller {
    const NUM_ROWS_IN_GRPTABLE = 5;
    const NUM_MAIL_IN_LIST = 30;
 
-   public function mainController() {
+   const MSG_FILE_NAME = 'mmails_msg.cache';
+
+   public function mainController()
+   {
       $this->checkControllRights();
+      $isHtmlMail = true;
+
       $modelSMails = new Mails_Model_SendMails();
 
       $formSendMail = new Form('sendmail_');
@@ -43,8 +48,13 @@ class Mails_Controller extends Controller {
       $formSendMail->addElement($elemFile);
 
       $elemSendBatch = new Form_Element_Checkbox('sendBatch', $this->_('Odeslat každému příjemci zvlášť'));
-      $elemSendBatch->setValues(false);
+      $elemSendBatch->setValues(true);
       $formSendMail->addElement($elemSendBatch);
+
+      $elemSendQueue = new Form_Element_Checkbox('sendQueue', $this->_('Zařadit odesílání do fronty'));
+      $elemSendQueue->setValues(true);
+      $elemSendQueue->setSubLabel($this->_('Obchází vypršení doby zpracování stránky a umožní odeslání velkému počtu příjemcům. Mail je odesílán vždy jen jednomu příjemci.'));
+      $formSendMail->addElement($elemSendQueue);
 
       $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
       $formSendMail->addElement($elemSubmit);
@@ -70,7 +80,7 @@ class Mails_Controller extends Controller {
       if ($formSendMail->isValid()) {
          $recipAddresses = explode(self::RECIPIENTS_MAILS_SEPARATOR, $formSendMail->recipients->getValues());
 
-         $mailObj = new Email(true);
+         $mailObj = new Email($isHtmlMail);
          $mailObj->setSubject($formSendMail->subject->getValues());
          $mailObj->setContent($formSendMail->text->getValues());
 
@@ -88,24 +98,43 @@ class Mails_Controller extends Controller {
          preg_match_all('/(?:"(?P<name>[^"]*)")?[< .,]*(?P<mail>[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4})/i', $recStr, $matches);
 //         var_dump($recStr);var_dump($matches['mail']);flush();exit();
          foreach ($matches['mail'] as $key => $mail) {
-            if($matches['name'][$key] == '' OR $matches['name'][$key] == null ){
+            if($matches['name'][$key] == '' OR $matches['name'][$key] == null OR $matches['name'][$key] == ' ' ){
                $mailObj->addAddress($mail);
             } else {
                $mailObj->addAddress($mail, $matches['name'][$key]);
             }
          }
 
-         if($formSendMail->sendBatch->getValues() == true){
-            $mailObj->batchSend();
-         } else {
-            $mailObj->send();
-         }
          // uložíme email do db
          $modelSMails->saveMail($formSendMail->subject->getValues(), $formSendMail->text->getValues(),
                  $recipAddresses, Auth::getUserId(), $attachments);
 
-         $this->infoMsg()->addMessage($this->_('E-mail byl odeslán'));
-         $this->link()->route()->rmParam()->reload();
+         if($formSendMail->sendQueue->getValues() != true){
+            if($formSendMail->sendBatch->getValues() == true){
+               $mailObj->batchSend();
+            } else {
+               $mailObj->send();
+            }
+            $this->infoMsg()->addMessage($this->_('E-mail byl odeslán'));
+            $this->link()->route()->rmParam()->reload();
+         } else {
+            // create tmp file with message
+            file_put_contents(AppCore::getAppCacheDir().self::MSG_FILE_NAME, serialize($mailObj->getMessage()), FILE_BINARY);
+
+            $_SESSION['mailsQueue'] = array(
+               'ishtml' => $isHtmlMail,
+               'sendbatch' => $formSendMail->sendBatch->getValues(),
+               'recipients' => $mailObj->getAddresses()
+            );
+
+            // uložení adrwes do fronty v db
+            $modelQ = new Mails_Model_SendQueue();
+            $modelQ->truncateModel();
+            $modelQ->addMails($mailObj->getAddresses());
+
+            $this->infoMsg()->addMessage($this->_('E-mail byl zařazen do fronty pro odeslání'));
+            $this->link()->route('sendMailsQueue')->rmParam()->reload();
+         }
       }
       $this->view()->form = $formSendMail;
 
@@ -145,6 +174,111 @@ class Mails_Controller extends Controller {
       $this->view()->mailsGroups = $modelGrps->getGroups();
       unset ($modelGrps);
 
+   }
+
+   public function sendMailsQueueController()
+   {
+      $this->checkReadableRights();
+
+      if(isset ($_SESSION['mailsQueue'])){
+         $qInfo = $_SESSION['mailsQueue'];
+         $mailObj = new Email(true);
+         // obnova zprávy
+         $msgObj = unserialize(file_get_contents(AppCore::getAppCacheDir().self::MSG_FILE_NAME, FILE_BINARY));
+
+         $modelQ = new Mails_Model_SendQueue();
+
+         $this->view()->queue = $modelQ->getMails();
+
+         /* FORM odeslání fronty */
+         $formSend = new Form('send-queue');
+         $eSend = new Form_Element_Submit('send', $this->_('spustit odesílání'));
+         $formSend->addElement($eSend);
+         if($formSend->isValid()){
+//         $mailObj->setMessage($msgObj);
+         // odeslání bez ajaxu
+         }
+         $this->view()->formSend = $formSend;
+
+         /* FORM vyčištění fronty */
+         $formClear = new Form('clear-queue');
+         $eSend = new Form_Element_Submit('clear', $this->_('vyčistit'));
+         $formClear->addElement($eSend);
+         if($formClear->isValid()){
+            unset ($_SESSION['mailsQueue']);
+            $modelQ->truncateModel();
+            if(file_exists(AppCore::getAppCacheDir().self::MSG_FILE_NAME)){
+               unlink(AppCore::getAppCacheDir().self::MSG_FILE_NAME);
+            }
+            $this->infoMsg()->addMessage($this->_('Fronta byla vyčištěna'));
+            $this->link()->route()->rmParam()->reload();
+         }
+         $this->view()->formClear = $formClear;
+
+         /* FORM odstranění mailů na které se nedaří doručit */
+         $formRemoveUndeliverable = new Form('remove-ndeliverable');
+         $eRemove = new Form_Element_Submit('remove', $this->_('odstranit'));
+         $formRemoveUndeliverable->addElement($eRemove);
+         if($formRemoveUndeliverable->isValid()){
+            $mails = $modelQ->getUndeliverable();
+            
+            $modelA = new Mails_Model_Addressbook();
+            foreach ($mails as $umail) {
+               $modelA->deleteMail($umail->{Mails_Model_SendQueue::COLUMN_MAIL});
+            }
+
+//            unset ($_SESSION['mailsQueue']);
+//            $modelQ->truncateModel();
+//            if(file_exists(AppCore::getAppCacheDir().self::MSG_FILE_NAME)){
+//               unlink(AppCore::getAppCacheDir().self::MSG_FILE_NAME);
+//            }
+            $this->infoMsg()->addMessage($this->_('Adresy na které se nepodařilo doručit byly odstraněny z adresáře.'));
+            $this->link()->reload();
+         }
+         $this->view()->formRemUnedlivered = $formRemoveUndeliverable;
+      }
+   }
+
+   public function sendMailController()
+   {
+      $this->checkReadableRights();
+
+      if(!isset ($_SESSION['mailsQueue'])){
+         $this->errMsg()->addMessage($this->_('Pokus o odeslání prázdné fronty'));
+         return;
+      }
+      $sData = $_SESSION['mailsQueue'];
+      $mailObj = new Email($sData['ishtml']);
+      $modelQ = new Mails_Model_SendQueue();
+      $id = $this->getRequestParam('id');
+
+      $msgObj = unserialize(file_get_contents(AppCore::getAppCacheDir().self::MSG_FILE_NAME, FILE_BINARY));
+      $mailData = $modelQ->getMail($id);
+
+      if($mailData == null){
+         $this->errMsg()->addMessage($this->_('Odeslání neexistujícího mailu z fronty'));
+      }
+
+//      if($sData['sendbatch'] == true){
+      $mailObj->addAddress($mailData->{Mails_Model_SendQueue::COLUMN_MAIL}, $mailData->{Mails_Model_SendQueue::COLUMN_NAME});
+//      } else {
+//      }
+
+      $mailObj->setMessage($msgObj);
+
+      $failures = array();
+      if(!$mailObj->send($failures)){
+         $this->view()->status = 'ERR';
+         $this->view()->msg = 'Nelze odeslat';
+         $modelQ->setUndeliverable($id);
+         $this->errMsg()->addMessage(sprintf($this->_('Zpráva s adresou %s byla odmítnuta.'), $failures[0]));
+      } else {
+         $this->view()->msg = 'Odesláno';
+         $this->view()->status = 'OK';
+         // odstranění mailu z fronty
+         $modelQ->deleteMail($id);
+         $this->infoMsg()->addMessage(sprintf($this->_('Zpráva s adresou %s byla odeslána.'), $mailData->{Mails_Model_SendQueue::COLUMN_MAIL}));
+      }
    }
 
    public function addressListController() {
@@ -445,6 +579,15 @@ class Mails_Controller extends Controller {
       }
       $this->view()->formExport = $formExport;
 
+      $formRemoveDuplicity = new Form('remduplicity');
+      $eSubmit = new Form_Element_Submit('remove', $this->_('Odstranit'));
+      $formRemoveDuplicity->addElement($eSubmit);
+
+      if($formRemoveDuplicity->isValid()){
+
+      }
+      $this->view()->formRemoveDuplicity = $formRemoveDuplicity;
+
       $this->view()->linkBack = $this->link()->route()->rmParam();
    }
 
@@ -467,7 +610,6 @@ class Mails_Controller extends Controller {
 
       $this->view()->mails = $model->searchMail($this->getRequestParam('q'));
    }
-
 
    /**
     * Metoda pro nastavení modulu
