@@ -14,12 +14,14 @@ class Debug {
    private static $tables = array();
 
    public static function log() {
-      self::$vars = array_merge(self::$vars, func_get_args());
+      $args = func_get_args();
+      self::$vars = array_merge(self::$vars, $args);
    }
 
    public static function printImmediately() {
       echo '<div class="debug-log" style="margin-top: 30px;">';// admin menu
-      foreach (func_get_args() as $arg) {
+      $args = func_get_args();
+      foreach ($args as $arg) {
          var_dump($arg);
       }
       echo '</div>';
@@ -27,7 +29,8 @@ class Debug {
    }
 
    public static function table($array) {
-      self::$vars = array_merge(self::$vars, func_get_args());
+      $args = func_get_args();
+      self::$vars = array_merge(self::$vars, $args);
    }
 
    public static function printDebug(){
