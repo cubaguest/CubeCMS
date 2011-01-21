@@ -236,7 +236,7 @@ class Text_Controller extends Controller {
       $this->view()->form = $form;
    }
 
-   public function settings($settings, Form $form) {
+   public function settings(&$settings, Form &$form) {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
       $componentTpls = new Component_ViewTpl();
@@ -282,9 +282,8 @@ class Text_Controller extends Controller {
               $this->tr('Povolit privátní zónu'));
       $form->addElement($elemAllowPrivateZone, $fGrpPrivate);
       if(isset($settings[self::PARAM_ALLOW_PRIVATE])) {
-         $form->allow_private_zone->setValues($settings[self::PARAM_ALLOW_PRIVATE]);
+         $form->allow_private_zone->setValues((bool)$settings[self::PARAM_ALLOW_PRIVATE]);
       }
-
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings[self::PARAM_ALLOW_PRIVATE] = $form->allow_private_zone->getValues();
