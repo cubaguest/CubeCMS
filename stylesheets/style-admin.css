@@ -191,6 +191,9 @@ ul.module-navigation {
    margin: 0;
    margin-bottom: 5px;
 }
+ul.module-navigation li {
+   margin-left: 0;
+}
 li.module-navigation-tab {
    display: inline;
    font-weight: bold;
