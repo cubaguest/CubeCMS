@@ -66,6 +66,9 @@ class Courses_View extends View {
     */
    public function addCourseView() {
       $this->template()->addTplFile("edit.phtml");
+      $this->addTinyMCE($this->form, 'textShort', 'simple', 'mceEditorSimple');
+      $this->addTinyMCE($this->form, 'text', 'full');
+      $this->addTinyMCE($this->form, 'textPrivate', 'full');
    }
 
    /**
@@ -77,6 +80,32 @@ class Courses_View extends View {
          $this->courseImage = $this->category()->getModule()->getDataDir(true).$this->courseImage;
       }
       $this->edit = true;
+   }
+
+   private function addTinyMCE($form, $formElement, $theme, $selector = 'mceEditor')
+   {
+      if($form->haveElement($formElement)){
+         $form->{$formElement}->html()->addClass($selector);
+      }
+      $this->tinyMCE = new Component_TinyMCE();
+      switch ($theme) {
+         case 'simple':
+            $settings = new Component_TinyMCE_Settings_AdvSimple();
+            break;
+         case 'full':
+            // TinyMCE
+            $settings = new Component_TinyMCE_Settings_Full();
+            $settings->setSetting('height', '600');
+            break;
+         case 'advanced':
+         default:
+            $settings = new Component_TinyMCE_Settings_Advanced();
+            $settings->setSetting('height', '600');
+            break;
+      }
+      $settings->setSetting('editor_selector', $selector);
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
    }
 
    public function placesListView() {

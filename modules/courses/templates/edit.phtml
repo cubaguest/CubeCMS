@@ -9,25 +9,14 @@ if($this->edit) {
    $this->addPageTitle($h);
 }
 // donastavení formuláře
-$this->form->textShort->html()->setAttrib('cols', 80)->setAttrib('rows', 10)->addClass("mceEditorSimple");
-$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
-$this->form->textPrivate->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+$this->form->textShort->html()->setAttrib('cols', 80)->setAttrib('rows', 10);
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
+$this->form->textPrivate->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
 $this->form->name->html()->setAttrib('size', 70);
 $this->form->place->html()->setAttrib('size', 70);
 $this->form->urlkey->html()->setAttrib('size', 70);
 $this->form->metaKeywords->html()->setAttrib('size', 70);
 $this->form->metaDesc->html()->setAttrib('cols', 73)->setAttrib('rows', 3);
-
-$tinymce = new JsPlugin_TinyMce();
-$tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
-$tinymce->setCfgParam('editor_selector', 'mceEditor');
-$this->addJsPlugin($tinymce);
-
-$tinySimple = new JsPlugin_TinyMce();
-$tinySimple->setCfgParam('editor_selector', 'mceEditorSimple');
-$tinySimple->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_SIMPLE_2);
-$this->addJsPlugin($tinySimple);
-
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIDatepicker();
@@ -37,11 +26,8 @@ $this->addJsPlugin($jQuery);
 
 // doplnění obrázku
 if($this->courseImage != null){
-   $this->form->deleteImg->setSubLabel($this->_('Uloženo').':<br /><img src="'
-        .$this->courseImage.'" height="50" />');
+   $this->form->deleteImg->setSubLabel($this->_('Uloženo').':<br /><img src="'.$this->courseImage.'" height="50" />');
 }
-
-
 ?>
 <h1><?=$h?></h1>
 <div id="editArticleForm">
@@ -61,9 +47,4 @@ if($this->courseImage != null){
       });
       /* ]]> */
    </script>
-   <?if($this->edit === true){
-      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detailCourse')));
-   } else {
-      $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
-   }?>
 </div>

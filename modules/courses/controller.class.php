@@ -118,6 +118,10 @@ class Courses_Controller extends Controller {
       $this->checkWritebleRights();
       $addForm = $this->createCourseForm();
 
+      if($addForm->isSend() AND $addForm->save->getValues() == false){
+         $this->link()->route()->reload();
+      }
+
       if ($addForm->isValid()) {
          $model = new Courses_Model_Courses();
 
@@ -134,8 +138,8 @@ class Courses_Controller extends Controller {
 
          $urlkeys = $addForm->urlkey->getValues();
          $names = $addForm->name->getValues();
-         $idC = $model->saveCourse($addForm->name->getValues(), $addForm->textShort->getValues(),
-                         $addForm->text->getValues(), $addForm->textPrivate->getValues(),
+         $idC = $model->saveCourse($addForm->name->getValues(), vve_strip_html_comment($addForm->textShort->getValues()),
+                         vve_strip_html_comment($addForm->text->getValues()), vve_strip_html_comment($addForm->textPrivate->getValues()),
                          $addForm->urlkey->getValues(),
                          $addForm->metaDesc->getValues(), $addForm->metaKeywords->getValues(),
                          $addForm->dateStart->getValues(), $addForm->dateStop->getValues(),
@@ -222,6 +226,10 @@ class Courses_Controller extends Controller {
          $editForm->addElement($eDelteImg, 'other');
       }
 
+      if($editForm->isSend() AND $editForm->save->getValues() == false){
+         $this->link()->route('detailCourse')->reload();
+      }
+
       if ($editForm->isValid()) {
          // smazání obrázku
          $imgName = $course->{Courses_Model_Courses::COLUMN_IMAGE};
@@ -243,8 +251,8 @@ class Courses_Controller extends Controller {
          // generování url klíče
          $urlkeys = $editForm->urlkey->getValues();
          $names = $editForm->name->getValues();
-         $model->saveCourse($editForm->name->getValues(), $editForm->textShort->getValues(),
-                 $editForm->text->getValues(), $editForm->textPrivate->getValues(),
+         $model->saveCourse($editForm->name->getValues(), vve_strip_html_comment($editForm->textShort->getValues()),
+                 vve_strip_html_comment($editForm->text->getValues()), vve_strip_html_comment($editForm->textPrivate->getValues()),
                  $editForm->urlkey->getValues(),
                  $editForm->metaDesc->getValues(), $editForm->metaKeywords->getValues(),
                  $editForm->dateStart->getValues(), $editForm->dateStop->getValues(),
@@ -391,7 +399,7 @@ class Courses_Controller extends Controller {
       $eAllowFeed->setValues(false);
       $form->addElement($eAllowFeed, $fGrpOther);
       
-      $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
 
       return $form;
@@ -454,6 +462,7 @@ class Courses_Controller extends Controller {
       $payTypes = array($this->_('Organizací') => self::PAY_TYPE_ORGANISATION,
           $this->_('Soukromě') => self::PAY_TYPE_PRIVATE);
       $ePay->setOptions($payTypes);
+      $ePay->setValues(self::PAY_TYPE_ORGANISATION);
       $regForm->addElement($ePay, $payGroup);
 
       $eOrgName = new Form_Element_Text('orgName', $this->_('Název'));
@@ -485,6 +494,7 @@ class Courses_Controller extends Controller {
          }
       }
 
+      // kontrola času odeslání
       if ($regForm->isValid()) {
          $model = new Courses_Model_Registrations();
 
