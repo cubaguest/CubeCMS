@@ -12,7 +12,7 @@ abstract class Component_TinyMCE_Settings {
       'theme' => 'simple',
       'mode' => "specific_textareas",
       'skin' => "o2k7",
-      'skin_variant' => "black",
+      'skin_variant' => "silver",
       'editor_selector' => 'mceEditor',
       'root_element' => true,
       'relative_urls' => true,
@@ -118,7 +118,7 @@ abstract class Component_TinyMCE_Settings {
       $this->mergeUserSettings();
       // remove empty and null values
       foreach ($this->settings as $key => $value) {
-         if($value == null) unset ($this->settings[$key]);
+         if($value === null) unset ($this->settings[$key]);
       }
       // plugins
       $this->mergeUserPlugins(); // spojení uživatelksých buttonu
@@ -164,6 +164,11 @@ abstract class Component_TinyMCE_Settings {
     */
    private function mergeUserSettings(){
       $settings = $_GET;
+      foreach ($settings as $key => $value) {
+         if($value == '0' OR $value == '1'){
+            $settings[$key] = (bool)$value;
+         }
+      }
       unset($settings['set']);
       unset($settings['buttons']);
       unset($settings['plugins']);
