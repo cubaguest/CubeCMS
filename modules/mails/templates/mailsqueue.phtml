@@ -67,9 +67,9 @@ if($this->formSend != null){
 ?>
    <br />
    <br />
-   <label><?echo $this->_('Odstranit z adresáře adresy, které se nepodařilo doručit');?></label>
 <?
 if($this->formRemUnedlivered != null){
+   echo '<label>'.$this->_('Odstranit z adresáře adresy, které se nepodařilo doručit').'</label>';
    $this->formRemUnedlivered->html()->setAttrib('name', 'form-remove-undelivered');
    echo $this->formRemUnedlivered->renderStart();
    $this->formRemUnedlivered->remove->html()->addClass('button-cancel');

@@ -78,25 +78,24 @@ class Mails_Controller extends Controller {
       }
 
       if ($formSendMail->isValid()) {
-         $recipAddresses = explode(self::RECIPIENTS_MAILS_SEPARATOR, $formSendMail->recipients->getValues());
-
          $mailObj = new Email($isHtmlMail);
-         $mailObj->setSubject($formSendMail->subject->getValues());
-         $mailObj->setContent($formSendMail->text->getValues());
+
+         $recipAddresses = explode(self::RECIPIENTS_MAILS_SEPARATOR, $formSendMail->recipients->getValues());
 
          // pokud je soubor bude připojen
          $attachments = array();
+         $attachFile = null;
          if ($formSendMail->file->getValues() != null) {
             $file = $formSendMail->file->createFileObject("Filesystem_File");
-            $mailObj->addAttachment($file);
             array_push($attachments, $file->getName());
+            $attachFile = $file->getName();
+            unset ($file);
          }
 
          // adresy
          $recStr = $formSendMail->recipients->getValues();
          $matches = array();
          preg_match_all('/(?:"(?P<name>[^"]*)")?[< .,]*(?P<mail>[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4})/i', $recStr, $matches);
-//         var_dump($recStr);var_dump($matches['mail']);flush();exit();
          foreach ($matches['mail'] as $key => $mail) {
             if($matches['name'][$key] == '' OR $matches['name'][$key] == null OR $matches['name'][$key] == ' ' ){
                $mailObj->addAddress($mail);
@@ -110,6 +109,11 @@ class Mails_Controller extends Controller {
                  $recipAddresses, Auth::getUserId(), $attachments);
 
          if($formSendMail->sendQueue->getValues() != true){
+            $mailObj->setSubject($formSendMail->subject->getValues());
+            $mailObj->setContent($formSendMail->text->getValues());
+
+            $mailObj->addAttachment(AppCore::getAppCacheDir().$attachFile);
+
             if($formSendMail->sendBatch->getValues() == true){
                $mailObj->batchSend();
             } else {
@@ -119,10 +123,11 @@ class Mails_Controller extends Controller {
             $this->link()->route()->rmParam()->reload();
          } else {
             // create tmp file with message
-            file_put_contents(AppCore::getAppCacheDir().self::MSG_FILE_NAME, serialize($mailObj->getMessage()), FILE_BINARY);
-
             $_SESSION['mailsQueue'] = array(
+               'message' => $formSendMail->text->getValues(),
+               'subject' => $formSendMail->subject->getValues(),
                'ishtml' => $isHtmlMail,
+               'attachment' => $attachFile,
                'sendbatch' => $formSendMail->sendBatch->getValues(),
                'recipients' => $mailObj->getAddresses()
             );
@@ -195,21 +200,23 @@ class Mails_Controller extends Controller {
          $eSend = new Form_Element_Submit('send', $this->_('spustit odesílání'));
          $formSend->addElement($eSend);
          if($formSend->isValid()){
-//         $mailObj->setMessage($msgObj);
-         // odeslání bez ajaxu
+            // odeslání bez ajaxu
          }
          $this->view()->formSend = $formSend;
+         // data pro odeslání
+         $sData = $_SESSION['mailsQueue'];
 
          /* FORM vyčištění fronty */
          $formClear = new Form('clear-queue');
          $eSend = new Form_Element_Submit('clear', $this->_('vyčistit'));
          $formClear->addElement($eSend);
          if($formClear->isValid()){
-            unset ($_SESSION['mailsQueue']);
             $modelQ->truncateModel();
-            if(file_exists(AppCore::getAppCacheDir().self::MSG_FILE_NAME)){
-               unlink(AppCore::getAppCacheDir().self::MSG_FILE_NAME);
+            if($_SESSION['mailsQueue']['attachment'] != null
+               AND file_exists(AppCore::getAppCacheDir().$_SESSION['mailsQueue']['attachment'])){
+               unlink(AppCore::getAppCacheDir().$_SESSION['mailsQueue']['attachment']);
             }
+            unset ($_SESSION['mailsQueue']);
             $this->infoMsg()->addMessage($this->_('Fronta byla vyčištěna'));
             $this->link()->route()->rmParam()->reload();
          }
@@ -227,11 +234,11 @@ class Mails_Controller extends Controller {
                $modelA->deleteMail($umail->{Mails_Model_SendQueue::COLUMN_MAIL});
             }
 
-//            unset ($_SESSION['mailsQueue']);
-//            $modelQ->truncateModel();
-//            if(file_exists(AppCore::getAppCacheDir().self::MSG_FILE_NAME)){
-//               unlink(AppCore::getAppCacheDir().self::MSG_FILE_NAME);
-//            }
+            unset ($_SESSION['mailsQueue']);
+            $modelQ->truncateModel();
+            if($sData['attachment'] != null AND file_exists(AppCore::getAppCacheDir().$sData['attachment'])){
+               unlink(AppCore::getAppCacheDir().$sData['attachment']);
+            }
             $this->infoMsg()->addMessage($this->_('Adresy na které se nepodařilo doručit byly odstraněny z adresáře.'));
             $this->link()->reload();
          }
@@ -249,10 +256,16 @@ class Mails_Controller extends Controller {
       }
       $sData = $_SESSION['mailsQueue'];
       $mailObj = new Email($sData['ishtml']);
+      $mailObj->setContent($sData['message']);
+      $mailObj->setSubject($sData['subject']);
+
+      if($sData['attachment'] != null){
+         $mailObj->addAttachment(AppCore::getAppCacheDir().$sData['attachment']);
+      }
+
       $modelQ = new Mails_Model_SendQueue();
       $id = $this->getRequestParam('id');
 
-      $msgObj = unserialize(file_get_contents(AppCore::getAppCacheDir().self::MSG_FILE_NAME, FILE_BINARY));
       $mailData = $modelQ->getMail($id);
 
       if($mailData == null){
@@ -261,10 +274,7 @@ class Mails_Controller extends Controller {
 
 //      if($sData['sendbatch'] == true){
       $mailObj->addAddress($mailData->{Mails_Model_SendQueue::COLUMN_MAIL}, $mailData->{Mails_Model_SendQueue::COLUMN_NAME});
-//      } else {
 //      }
-
-      $mailObj->setMessage($msgObj);
 
       $failures = array();
       if(!$mailObj->send($failures)){

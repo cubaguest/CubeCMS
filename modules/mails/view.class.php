@@ -7,14 +7,16 @@
 class Mails_View extends View {
 	public function mainView() {
       $this->template()->addTplFile('main.phtml');
-      // toolbox
-//      if($this->rights()->isWritable()){
-//         $toolbox = new Template_Toolbox();
-//         $toolbox->addTool('add_mail',$this->_('Přidat mail'),
-//                 $this->link()->route('add_address'), $this->_('Přidat mail do knihy adres'), 'mail_add.png');
-//         $this->toolbox = $toolbox;
-//      }
       $this->page = 'main';
+
+      $this->form->text->html()->addClass("mceEditor");
+      $this->tinyMCE = new Component_TinyMCE();
+      $this->tinyMCE->setTplsList(Component_TinyMCE::TPL_LIST_SYSTEM_MAIL);
+      $settings = new Component_TinyMCE_Settings_Advanced();
+      $settings->setSetting('height', '600');
+      $settings->setSetting('relative_urls', false);
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
 	}
 
    public function sendMailsQueueView()

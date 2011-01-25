@@ -6,13 +6,6 @@ $this->addCssFile('style.css');
 <?=$this->includeTpl('navigation.phtml');?>
 <div id="mails-send-mail-form">
    <?
-   $tinymce = new JsPlugin_TinyMce();
-   $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
-   $tinymce->setCfgParam('editor_selector', 'mceEditorSimple');
-   $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_TPL_TYPE, Templates_Model::TEMPLATE_TYPE_MAIL);
-   $tinymce->setCfgParam('relative_urls', false);
-   $this->addJsPlugin($tinymce);
-
    $jQ = new JsPlugin_JQuery();
    $jQ->addUITabs();
    $jQ->addUIAutoComplete();
