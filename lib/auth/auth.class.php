@@ -240,7 +240,8 @@ class Auth extends TrObject {
             return true;
          }
          setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5); // remove permament cookie
-         Log::msg(sprintf($this->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
+         $tr = new Translator();
+         Log::msg(sprintf($tr->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
       }
       return false;
    }
