@@ -22,7 +22,14 @@ class Lecturers_View extends View {
          $toolDelete->setIcon('user_delete.png');
          $toolDelete->setConfirmMeassage($this->_('Opravdu smazat lektora?'));
          $toolboxEdit->addTool($toolDelete);
-
+         
+         if($this->category()->getRights()->isControll()){
+            $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+            $this->link()->route(Routes::MODULE_SETTINGS));
+            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
+            $this->toolbox->addTool($toolEView);
+         }
 //         $toolDelete = new Template_Toolbox2_Tool_PostConfirm('lecturer_delete', $this->_('Smazat lektora'));
 //         $toolDelete->setIcon('user_delete.png')->setTitle($this->_('Smazat lektora'));
 //         $toolDelete->setSubmitValue('lecturer_id', 0);
@@ -38,6 +45,7 @@ class Lecturers_View extends View {
     */
    public function addView() {
       $this->template()->addTplFile("edit.phtml");
+      $this->addTinyMCE();
    }
 
    /**
@@ -48,6 +56,18 @@ class Lecturers_View extends View {
       $this->addView();
       // cestak obrázků
       $this->imagePath = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.Lecturers_Controller::DATA_DIR.URL_SEPARATOR;
+   }
+
+   private function addTinyMCE() {
+      if($this->form->haveElement('text')){
+         $this->form->text->html()->addClass("mceEditor");
+      }
+      $this->tinyMCE = new Component_TinyMCE();
+      $settings = new Component_TinyMCE_Settings_Advanced();
+      $settings = new Component_TinyMCE_Settings_AdvSimple2();
+      $settings->setSetting('height', '600');
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
    }
 }
 

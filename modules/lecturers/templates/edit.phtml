@@ -17,12 +17,8 @@ if($this->edit) {
    $this->addPageHeadline($this->_('přidání lektora'));
 }
 // donastavení formuláře
-$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
 $this->form->degree->html()->setAttrib('size', 5);
-
-$tinymce = new JsPlugin_TinyMce();
-$tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
-$this->addJsPlugin($tinymce);
 
 if(isset ($this->form->imgdel)){
    $this->form->imgdel->setSubLabel($this->_('Uložen portrét:').'<br /><img src="'.$this->imagePath.$this->lecturer->{Lecturers_Model::COLUMN_IMAGE}
