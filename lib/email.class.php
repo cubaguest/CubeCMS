@@ -148,9 +148,13 @@ class Email {
     * @param File $file -- objekt souboru
     * @return Email -- vrací sebe
     */
-   public function addAttachment(Filesystem_File $file)
+   public function addAttachment($file)
    {
-      $this->message->attach(Swift_Attachment::fromPath($file->getName(true)));
+      if($file instanceof Filesystem_File){
+         $this->message->attach(Swift_Attachment::fromPath($file->getName(true)));
+      } else {
+         $this->message->attach(Swift_Attachment::fromPath($file));
+      }
       return $this;
    }
 
