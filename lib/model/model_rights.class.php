@@ -33,7 +33,8 @@ class Model_Rights extends Model_ORM {
       $this->addColumn(self::COLUMN_RIGHT, array('datatype' => 'varchar(3)', 'pdoparam' => PDO::PARAM_STR, 'default' => '---')); // měl by být enum
 
       $this->setPk(self::COLUMN_ID);
-      $this->addForeignKey('tgroups',self::COLUMN_ID_GROUP, 'Model_Groups');
+      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');
+      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Category');
    }
 
    /**
