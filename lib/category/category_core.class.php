@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Třída obsluhuje práci se zvolenou kategorií, její hlavní reprezentace.
  * Třída umožňuje základní přístu k vlastnostem kategorie a volbu jejího
@@ -10,7 +11,6 @@
  *                $LastChangedBy: jakub $ $LastChangedDate: 2010-08-09 08:40:37 +0200 (Po, 09 srp 2010) $
  * @abstract 		Třída pro obsluhu zvolené kategorie
  */
-
 class Category_Core extends TrObject {
    /**
     * Název adresáře s ikonou kategorie
@@ -20,10 +20,10 @@ class Category_Core extends TrObject {
    const DIR_BACKGROUND = 'backgrounds';
 
 
-/**
- * Odělovač parametrů v pramaterech kategorie
- * @var string
- */
+   /**
+    * Odělovač parametrů v pramaterech kategorie
+    * @var string
+    */
    const CAT_PARAMS_SEPARATOR = ';';
 
    /**
@@ -31,31 +31,26 @@ class Category_Core extends TrObject {
     * @var Object
     */
    protected $category = null;
-
    /**
     * Proměná obsahuje jestli je vybraná kategorie jako hlavní kategorie
     * @var boolean
     */
    protected $categoryIsDefault = false;
-
    /**
     * Objekt hlavní kategorie
     * @var Category
     */
    protected static $selectedCategory = null;
-
    /**
     * Objekt s právy kategorie
     * @var Rights
     */
    protected $categoryRights = null;
-
    /**
     * Objekt modulu
     * @var Module
     */
    protected $module = null;
-
    /**
     * Pole s parametry kategorie
     * @var array
@@ -67,9 +62,10 @@ class Category_Core extends TrObject {
     * @string/int $catKey --  klíč nebo id kategorie
     * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
     */
-   public function  __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null) {
+   public function __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null)
+   {
       $this->category = $categoryDataObj;
-      if($isSelectedCategory) {
+      if ($isSelectedCategory) {
          self::$selectedCategory = $this;
       }
       $this->module = new Module($catKey, null);
@@ -80,9 +76,10 @@ class Category_Core extends TrObject {
    /**
     * Metoda načte práva ke kategorii
     */
-   public function loadRights() {
+   public function loadRights()
+   {
       // admin může vše
-      if(Auth::getUserName() == 'admin'){
+      if (Auth::getUserName() == 'admin') {
          $this->categoryRights->addRight('rwc');
       } else {
          $this->categoryRights->addRight('r--');
@@ -93,7 +90,8 @@ class Category_Core extends TrObject {
     * Metoda vrací true pokud vybraná kategorie je výchozí kategorií
     * @return boolean -- true pokud je výchozí kategorie
     */
-   public function isDefault() {
+   public function isDefault()
+   {
       return $this->categoryIsDefault;
    }
 
@@ -103,8 +101,9 @@ class Category_Core extends TrObject {
     * @param mixed $defaultParam -- výchozí hodnota
     * @return string -- parametr
     */
-   public function getParam($param, $defaultParam = null) {
-      if(isset($this->catParams[$param])){
+   public function getParam($param, $defaultParam = null)
+   {
+      if (isset($this->catParams[$param])) {
          return $this->catParams[$param];
       } else {
          return $defaultParam;
@@ -117,7 +116,8 @@ class Category_Core extends TrObject {
     * @param mixed $defaultParam -- výchozí hodnota
     * @return string -- parametr
     */
-   public function setParam($param, $value) {
+   public function setParam($param, $value)
+   {
       $this->catParams[$param] = $value;
       $catModel = new Model_Category();
       $catModel->saveCatParams($this->getId(), serialize($this->catParams));
@@ -127,7 +127,8 @@ class Category_Core extends TrObject {
     * Metoda vrací jestli kategorie má feed export
     * @return bool
     */
-   public function haveFeed() {
+   public function haveFeed()
+   {
       return false;
    }
 
@@ -136,7 +137,8 @@ class Category_Core extends TrObject {
     * @return string -- název kategorie
     * @deprecated -- použít getName
     */
-   public function getLabel() {
+   public function getLabel()
+   {
       return $this->getName();
    }
 
@@ -144,25 +146,28 @@ class Category_Core extends TrObject {
     * Metoda vrací název kategorie
     * @return string -- název kategorie
     */
-   public function getName() {
-      return (string)$this->category->{Model_Category::COLUMN_CAT_LABEL};
+   public function getName()
+   {
+      return (string) $this->category->{Model_Category::COLUMN_CAT_LABEL};
    }
 
    /**
     * Metoda vrací id kategorie
     * @return integer -- id kategorie
     */
-   public function getId() {
-      return (int)$this->category->{Model_Category::COLUMN_CAT_ID};
+   public function getId()
+   {
+      return (int) $this->category->{Model_Category::COLUMN_CAT_ID};
    }
 
    /**
     * Metoda vrací urlkey kategorie
     * @return string -- urlkey kategorie
     */
-   public function getUrlKey() {
-      if(isset ($this->category->{Model_Category::COLUMN_URLKEY})) {
-         return (string)$this->category->{Model_Category::COLUMN_URLKEY};
+   public function getUrlKey()
+   {
+      if (isset($this->category->{Model_Category::COLUMN_URLKEY})) {
+         return (string) $this->category->{Model_Category::COLUMN_URLKEY};
       } else {
          return null;
       }
@@ -172,16 +177,18 @@ class Category_Core extends TrObject {
     * Metoda vrací jesli jsou pro danou kategorii individuální panely
     * @return boolena -- true pokud jsou panely individuální
     */
-   public function isIndividualPanels() {
-      return (bool)$this->category->{Model_Category::COLUMN_INDIVIDUAL_PANELS};
+   public function isIndividualPanels()
+   {
+      return (bool) $this->category->{Model_Category::COLUMN_INDIVIDUAL_PANELS};
    }
 
    /**
     * Metoda vrací jestli se jedná o validní kategorii
     * @return bool
     */
-   public function isValid() {
-      if(empty ($this->category)) {
+   public function isValid()
+   {
+      if (empty($this->category)) {
          return false;
       }
       return true;
@@ -191,7 +198,8 @@ class Category_Core extends TrObject {
     * Metoda vrací práva ke kategorii
     * @return Rights
     */
-   public function getRights() {
+   public function getRights()
+   {
       return $this->categoryRights;
    }
 
@@ -199,7 +207,8 @@ class Category_Core extends TrObject {
     * Metoda vrací objekt hlavní kategorie
     * @return Category
     */
-   public static function getSelectedCategory() {
+   public static function getSelectedCategory()
+   {
       return self::$selectedCategory;
    }
 
@@ -207,7 +216,8 @@ class Category_Core extends TrObject {
     * Metoda vrací objekt modulu pro zadanou kategorii
     * @return Module
     */
-   public function getModule() {
+   public function getModule()
+   {
       return $this->module;
    }
 
@@ -215,7 +225,8 @@ class Category_Core extends TrObject {
     * Metoda vrací objekt data kategorie (nejčastěji načtené přes model)
     * @return Object
     */
-   public function getCatDataObj() {
+   public function getCatDataObj()
+   {
       return $this->category;
    }
 
@@ -223,7 +234,8 @@ class Category_Core extends TrObject {
     * Metoda vrací adresář s ikonami kategorií
     * @return string
     */
-   public static function getCatIconDir() {
+   public static function getCatIconDir()
+   {
       return self::getImageDir(self::DIR_ICON, false);
    }
 
@@ -233,12 +245,14 @@ class Category_Core extends TrObject {
     * @param bool $realpath -- jestli má být vrácena reálná cesta nebo url adresa
     * @return string -- adresář
     */
-   public static function getImageDir($type = self::DIR_ICON, $realpath = false) {
-      if($realpath){
-         return AppCore::getAppDataDir().self::DIR_IMAGES.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
+   public static function getImageDir($type = self::DIR_ICON, $realpath = false)
+   {
+      if ($realpath) {
+         return AppCore::getAppDataDir() . self::DIR_IMAGES . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR;
       } else {
-         return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.self::DIR_IMAGES.URL_SEPARATOR.$type.URL_SEPARATOR;
+         return Url_Request::getBaseWebDir() . VVE_DATA_DIR . URL_SEPARATOR . self::DIR_IMAGES . URL_SEPARATOR . $type . URL_SEPARATOR;
       }
    }
+
 }
 ?>
