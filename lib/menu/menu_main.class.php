@@ -47,7 +47,7 @@ class Menu_Main {
       if(self::$menu == null){
          self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
          $catModel = new Model_Category();
-         self::$menu->setCategories($catModel->getCategoryList(false,true));
+         self::$menu->setCategories($catModel->getCategoryList());
       }
    }
 

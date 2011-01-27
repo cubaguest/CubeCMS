@@ -31,7 +31,7 @@ class Menu_Admin extends Menu_Main {
       if(defined('VVE_ADMIN_MENU_STRUCTURE')){
          self::$menu = unserialize(VVE_ADMIN_MENU_STRUCTURE);
          $catModel = new Model_Category();
-         self::$menu->setCategories($catModel->getCategoryList(false,true));
+         self::$menu->setCategories($catModel->getCategoryList());
       }
    }
    public function view() {
