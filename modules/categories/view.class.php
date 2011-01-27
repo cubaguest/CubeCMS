@@ -11,9 +11,9 @@ class Categories_View extends View {
       if($this->rights()->isControll()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_category', $this->_("Přidat kategorii"),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_category', $this->tr("Přidat kategorii"),
          $this->link()->route('add'));
-         $toolAdd->setIcon('application_add.png')->setTitle($this->_('Přidat novou kategorii'));
+         $toolAdd->setIcon('application_add.png')->setTitle($this->tr('Přidat novou kategorii'));
          $toolbox->addTool($toolAdd);
          $this->toolbox = $toolbox;
       }

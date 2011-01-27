@@ -53,7 +53,7 @@ class Categories_Controller extends Controller {
          // mažeme kategorii ze struktury
          $categories->removeCat($formDelete->id->getValues());
          $categories->saveStructure(!$this->isMainStruct());
-         $this->infoMsg()->addMessage($this->_("Kategorie byla smazána"));
+         $this->infoMsg()->addMessage($this->tr("Kategorie byla smazána"));
          $this->log('Smazána kategorie :"'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
          $this->gotoBack();
       }
@@ -71,18 +71,18 @@ class Categories_Controller extends Controller {
       $formMove->addElement($submitMove);
 
       if($formMove->isValid()) {
-         $menu = Category_Structure::getStructure(!$this->isMainStruct());
+         $structure = Category_Structure::getStructure(!$this->isMainStruct());
          $id = $formMove->id->getValues();
          try {
-            $parent = $menu->getCategory($menu->getCategory($id)->getParentId());
+            $parent = $structure->getCategory($structure->getCategory($id)->getParentId());
             if($formMove->move_to->getValues() == 'up') {
                $parent->swapChild($parent->getChild($id), $parent->prevChild($parent->getChild($id)));
             } else {
                $parent->swapChild($parent->getChild($id), $parent->nextChild($parent->getChild($id)));
             }
 
-            $menu->saveStructure(!$this->isMainStruct());
-            $this->infoMsg()->addMessage($this->_("Pozice byla změněna"));
+            $structure->saveStructure(!$this->isMainStruct());
+            $this->infoMsg()->addMessage($this->tr("Pozice byla změněna"));
             $cM = new Model_Category();
             $cat = $cM->getCategoryById($id);
             $this->log('Upravena pozice kategorie "'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
@@ -92,13 +92,15 @@ class Categories_Controller extends Controller {
          }
       }
 
-      $menu = Category_Structure::getStructure(!$this->isMainStruct());
-      if($menu != false) {
+      $structure = Category_Structure::getStructure(!$this->isMainStruct());
+      $structure->withHidden(true);
+      if($structure != false) {
          $catModel = new Model_Category();
-         $menu->setCategories($catModel->getCategoryList(true));
-         $this->view()->structure = $menu;
+         $structure->setCategories($catModel->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
+         $this->view()->structure = $structure;
       }
       $this->view()->isMainMenu = $this->isMainStruct();
+      Debug::log(Auth::getGroupName());
    }
 
    public function adminMenuController() {
@@ -112,40 +114,37 @@ class Categories_Controller extends Controller {
       $form = $this->createForm();
 
       // načtení dat z modelu
-      $model = new Model_Category();
-      $cat = $model->getCategoryWoutRights($this->getRequest('categoryid'));
+      $categoryModel = new Model_Category();
+      $record = $categoryModel->record($this->getRequest('categoryid'));
 
-      $form->name->setValues($cat[Model_Category::COLUMN_CAT_LABEL]);
-      $form->alt->setValues($cat[Model_Category::COLUMN_CAT_ALT]);
-      $form->keywords->setValues($cat[Model_Category::COLUMN_KEYWORDS]);
-      $form->description->setValues($cat[Model_Category::COLUMN_DESCRIPTION]);
+      $form->name->setValues($record->{Model_Category::COLUMN_CAT_LABEL});
+      $form->alt->setValues($record->{Model_Category::COLUMN_CAT_ALT});
+      $form->keywords->setValues($record->{Model_Category::COLUMN_KEYWORDS});
+      $form->description->setValues($record->{Model_Category::COLUMN_DESCRIPTION});
       // nadřazená kategorie
 
-      $menu = Category_Structure::getStructure(!$this->isMainStruct());
-      $catModel = new Model_Category();
-      $menu->setCategories($catModel->getCategoryList(true));
+      $structure = Category_Structure::getStructure(!$this->isMainStruct());
+      $structure->withHidden(true);
+      $structure->setCategories($categoryModel->getCategoryList());
 
-      $selCat = $menu->getCategory($this->getRequest('categoryid'));
-      $menu->removeCat($this->getRequest('categoryid'));
-
-      $this->catsToArrayForForm($menu);
-
+      $selCat = $structure->getCategory($this->getRequest('categoryid'));
+      $structure->removeCat($this->getRequest('categoryid'));
+      $this->catsToArrayForForm($structure);
       $form->parent_cat->setOptions($this->categoriesArray);
       $form->parent_cat->setValues($selCat->getParentId());
 
-      $form->module->setValues($cat[Model_Category::COLUMN_MODULE]);
-      $form->feedexp->setValues($cat[Model_Category::COLUMN_FEEDS]);
-      $form->datadir->setValues($cat[Model_Category::COLUMN_DATADIR]);
-      $form->urlkey->setValues($cat[Model_Category::COLUMN_URLKEY]);
-      $form->priority->setValues($cat[Model_Category::COLUMN_PRIORITY]);
-      $form->individual_panels->setValues($cat[Model_Category::COLUMN_INDIVIDUAL_PANELS]);
-      $form->show_when_login_only->setValues($cat[Model_Category::COLUMN_CAT_SHOW_WHEN_LOGIN_ONLY]);
-      $form->show_in_menu->setValues($cat[Model_Category::COLUMN_CAT_SHOW_IN_MENU]);
-      $form->sitemap_priority->setValues($cat[Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY]);
-      $form->sitemap_frequency->setValues($cat[Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ]);
+      $form->module->setValues($record->{Model_Category::COLUMN_MODULE});
+      $form->feedexp->setValues($record->{Model_Category::COLUMN_FEEDS});
+      $form->datadir->setValues($record->{Model_Category::COLUMN_DATADIR});
+      $form->urlkey->setValues($record->{Model_Category::COLUMN_URLKEY});
+      $form->priority->setValues($record->{Model_Category::COLUMN_PRIORITY});
+      $form->individual_panels->setValues($record->{Model_Category::COLUMN_INDIVIDUAL_PANELS});
+      $form->visibility->setValues($record->{Model_Category::COLUMN_VISIBILITY});
+      $form->sitemap_priority->setValues($record->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY});
+      $form->sitemap_frequency->setValues($record->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ});
 
       // práva
-      $form->rights_default->setValues($cat[Model_Category::COLUMN_DEF_RIGHT]);
+      $form->rights_default->setValues($record->{Model_Category::COLUMN_DEF_RIGHT});
       $rModel = new Model_Rights();
       $rights = $rModel->getRights($this->getRequest('categoryid'));
       if($rights !== false) {
@@ -156,14 +155,14 @@ class Categories_Controller extends Controller {
       }
 
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->gotoBack();
       }
 
       // odeslání formuláře
       if($form->isValid()) {
          // vygenerování url klíče
-         $path = $menu->getPath($form->parent_cat->getValues());
+         $path = $structure->getPath($form->parent_cat->getValues());
          $urlkey = $form->urlkey->getValues();
          $names = $form->name->getValues();
          $p = end($path);
@@ -203,12 +202,11 @@ class Categories_Controller extends Controller {
             if($last !== false){
                $datadir = substr($datadir,$last+1);
             }
-//         } else if($form->datadir->getValues() != $cat[Model_Category::COLUMN_DATADIR]) {
          } else {
             $datadir = vve_cr_safe_file_name($form->datadir->getValues());
             // pokud byl předtím definován dojde k přesunu
-            if($cat[Model_Category::COLUMN_DATADIR] != $datadir) {
-               $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$cat[Model_Category::COLUMN_DATADIR]);
+            if($record->{Model_Category::COLUMN_DATADIR} != $datadir) {
+               $dir = new Filesystem_Dir(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$record->{Model_Category::COLUMN_DATADIR});
                if($dir->exist()){
                   $dir->rename($datadir);
                }
@@ -216,14 +214,22 @@ class Categories_Controller extends Controller {
             }
          }
 
-         // kategorie
-         $categoryModel = new Model_Category();
-         $categoryModel->saveEditCategory($this->getRequest('categoryid'), $form->name->getValues(),$form->alt->getValues(),
-                 $form->module->getValues(), $form->keywords->getValues(),
-                 $form->description->getValues(),$urlkey,$form->priority->getValues(),$form->individual_panels->getValues(),
-                 $form->show_in_menu->getValues(),$form->show_when_login_only->getValues(),
-                 $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds, $datadir);
+         $record->{Model_Category::COLUMN_NAME} = $form->name->getValues();
+         $record->{Model_Category::COLUMN_ALT} = $form->alt->getValues();
+         $record->{Model_Category::COLUMN_MODULE} = $form->module->getValues();
+         $record->{Model_Category::COLUMN_KEYWORDS} = $form->keywords->getValues();
+         $record->{Model_Category::COLUMN_DESCRIPTION} = $form->description->getValues();
+         $record->{Model_Category::COLUMN_URLKEY} = $urlkey;
+         $record->{Model_Category::COLUMN_PRIORITY} = $form->priority->getValues();
+         $record->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = $form->individual_panels->getValues();
+         $record->{Model_Category::COLUMN_VISIBILITY} = $form->visibility->getValues();
+         $record->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY} = $form->sitemap_priority->getValues();
+         $record->{Model_Category::COLUMN_SITEMAP_CHANGE_FREQ} = $form->sitemap_frequency->getValues();
+         $record->{Model_Category::COLUMN_DEF_RIGHT} = $form->rights_default->getValues();
+         $record->{Model_Category::COLUMN_FEEDS} = $feeds;
+         $record->{Model_Category::COLUMN_DATADIR} = $datadir;
+
+         $categoryModel->save($record);
 
          // práva
          $usrModel = new Model_Users();
@@ -250,7 +256,7 @@ class Categories_Controller extends Controller {
          $mInstall->installModule();
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
-         $this->log('Upravena kategorie "'.$cat[Model_Category::COLUMN_CAT_LABEL][Locales::getDefaultLang()].'"');
+         $this->log('Upravena kategorie "'.$record[Model_Category::COLUMN_NAME][Locales::getDefaultLang()].'"');
          if($form->gotoSettings->getValues() == true){
             $this->link()->route('settings', array('categoryid' => $this->getRequest('categoryid')))->reload();
          } else {
@@ -261,24 +267,23 @@ class Categories_Controller extends Controller {
 
       $this->view()->template()->form = $form;
       $this->view()->template()->edit = true;
-      $this->view()->template()->catName = $cat->{Model_Category::COLUMN_CAT_LABEL};
+      $this->view()->template()->catName = $record->{Model_Category::COLUMN_CAT_LABEL};
    }
 
    public function addController() {
       $this->checkWritebleRights();
+      $categoryModel = new Model_Category();
       $form = $this->createForm();
 
-      $form->show_in_menu->setValues(true);
       $form->gotoSettings->setValues(true);
 
       // kategorie
-      $menu = Category_Structure::getStructure(!$this->isMainStruct());
-      if($menu != false){
-         $catModel = new Model_Category();
-         $menu->setCategories($catModel->getCategoryList(true));
+      $structure = Category_Structure::getStructure(!$this->isMainStruct());
+      $structure->withHidden(true);
+      if($structure != false){
+         $structure->setCategories($categoryModel->getCategoryList());
       }
-
-      $this->catsToArrayForForm($menu);
+      $this->catsToArrayForForm($structure);
       $form->parent_cat->setOptions($this->categoriesArray);
 
       if($form->isSend() AND $form->send->getValues() == false){
@@ -287,7 +292,7 @@ class Categories_Controller extends Controller {
 
       if($form->isValid()) {
          // vygenerování url klíče
-         $path = $menu->getPath($form->parent_cat->getValues());
+         $path = $structure->getPath($form->parent_cat->getValues());
 
          $urlkey = $form->urlkey->getValues();
          $names = $form->name->getValues();
@@ -330,13 +335,24 @@ class Categories_Controller extends Controller {
             $dataDir = vve_cr_safe_file_name($form->datadir->getValues());
          }
 
-         $categoryModel = new Model_Category();
-         $lastId = $categoryModel->saveNewCategory($form->name->getValues(),$form->alt->getValues(),
-                 $form->module->getValues(), $form->keywords->getValues(),
-                 $form->description->getValues(), $urlkey, $form->priority->getValues(), $form->individual_panels->getValues(),
-                 $form->show_in_menu->getValues(), $form->show_when_login_only->getValues(),
-                 $form->sitemap_priority->getValues(),$form->sitemap_frequency->getValues(),
-                 $form->rights_default->getValues(), $feeds, $dataDir);
+         $record = $categoryModel->newRecord();
+
+         $record->{Model_Category::COLUMN_NAME} = $form->name->getValues();
+         $record->{Model_Category::COLUMN_ALT} = $form->alt->getValues();
+         $record->{Model_Category::COLUMN_MODULE} = $form->module->getValues();
+         $record->{Model_Category::COLUMN_KEYWORDS} = $form->keywords->getValues();
+         $record->{Model_Category::COLUMN_DESCRIPTION} = $form->description->getValues();
+         $record->{Model_Category::COLUMN_URLKEY} = $urlkey;
+         $record->{Model_Category::COLUMN_PRIORITY} = $form->priority->getValues();
+         $record->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = $form->individual_panels->getValues();
+         $record->{Model_Category::COLUMN_VISIBILITY} = $form->visibility->getValues();
+         $record->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY} = $form->sitemap_priority->getValues();
+         $record->{Model_Category::COLUMN_SITEMAP_CHANGE_FREQ} = $form->sitemap_frequency->getValues();
+         $record->{Model_Category::COLUMN_DEF_RIGHT} = $form->rights_default->getValues();
+         $record->{Model_Category::COLUMN_FEEDS} = $feeds;
+         $record->{Model_Category::COLUMN_DATADIR} = $dataDir;
+
+         $lastId = $categoryModel->save($record);
 
          // práva
          $usrModel = new Model_Users();
@@ -349,9 +365,9 @@ class Categories_Controller extends Controller {
          }
          // po uložení vložíme do struktury
          if($lastId !== false) {
-            $menu = Category_Structure::getStructure(!$this->isMainStruct());
-            $menu->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
-            $menu->saveStructure(!$this->isMainStruct());
+            $newStructure = Category_Structure::getStructure(!$this->isMainStruct());
+            $newStructure->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
+            $newStructure->saveStructure(!$this->isMainStruct());
          }
 
          // instalace
@@ -380,35 +396,35 @@ class Categories_Controller extends Controller {
    private function createForm() {
       $form = new Form('category');
 
-      $form->addGroup('labels', $this->_('Popisky'), $this->_('Název a popisek kategorie'));
+      $form->addGroup('labels', $this->tr('Popisky'), $this->tr('Název a popisek kategorie'));
       // název kategorie
-      $catName = new Form_Element_Text('name', $this->_('Název'));
+      $catName = new Form_Element_Text('name', $this->tr('Název'));
       $catName->setLangs();
       $catName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($catName, 'labels');
 
       // popisek kategorie
-      $catAlt = new Form_Element_Text('alt', $this->_('Popisek'));
+      $catAlt = new Form_Element_Text('alt', $this->tr('Popisek'));
       $catAlt->setLangs();
       $form->addElement($catAlt, 'labels');
 
       // keywords
-      $catKeywords = new Form_Element_Text('keywords', $this->_('Klíčová slova'));
+      $catKeywords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
       $catKeywords->setLangs();
-      $catKeywords->setSubLabel($this->_('Pro vyhledávače'));
+      $catKeywords->setSubLabel($this->tr('Pro vyhledávače'));
       $form->addElement($catKeywords, 'labels');
 
       // description
-      $catDescription = new Form_Element_TextArea('description', $this->_('Popis kategorie'));
+      $catDescription = new Form_Element_TextArea('description', $this->tr('Popis kategorie'));
       $catDescription->setLangs();
-      $catDescription->setSubLabel($this->_('Pro vyhledávače'));
+      $catDescription->setSubLabel($this->tr('Pro vyhledávače'));
       $form->addElement($catDescription, 'labels');
 
       // SETTINGS
-      $form->addGroup('settings', $this->_('Nastavení'), $this->_('Položky související s nastavením kategorie'));
+      $form->addGroup('settings', $this->tr('Nastavení'), $this->tr('Položky související s nastavením kategorie'));
 
       // kaegorie
-      $catSections = new Form_Element_Select('parent_cat', $this->_('Nadřazená kategorie'));
+      $catSections = new Form_Element_Select('parent_cat', $this->tr('Nadřazená kategorie'));
       $form->addElement($catSections, 'settings');
 
       // moduly
@@ -434,28 +450,28 @@ class Categories_Controller extends Controller {
       ksort($options);
 
 
-      $catModule = new Form_Element_Select('module', $this->_('Modul'));
+      $catModule = new Form_Element_Select('module', $this->tr('Modul'));
       $catModule->setOptions($options);
       $form->addElement($catModule, 'settings');
 
-      $catFeedExp = new Form_Element_Checkbox('feedexp', $this->_('Povolit export zdrojů'));
-      $catFeedExp->setSubLabel($this->_('Pokud modul podporuje export RSS/ATOM zdrojů'));
+      $catFeedExp = new Form_Element_Checkbox('feedexp', $this->tr('Povolit export zdrojů'));
+      $catFeedExp->setSubLabel($this->tr('Pokud modul podporuje export RSS/ATOM zdrojů'));
       $catFeedExp->setValues(true);
       $form->addElement($catFeedExp, 'settings');
 
-      $catDataDir = new Form_Element_Text('datadir', $this->_('Adresář s daty'));
-      $catDataDir->setSubLabel($this->_('Název datového adresář (ne cestu). Do něj budou ukládány všechyn soubory modulu.
+      $catDataDir = new Form_Element_Text('datadir', $this->tr('Adresář s daty'));
+      $catDataDir->setSubLabel($this->tr('Název datového adresář (ne cestu). Do něj budou ukládány všechyn soubory modulu.
          Pokud zůstane prázdný, použije se název modulu. POZOR! změna tohoto parametru může zapříčinit ztrátu dat!'));
       $form->addElement($catDataDir, 'labels');
 
       // url klíč kategorie
-      $catUrlKey = new Form_Element_Text('urlkey', $this->_('Url klíč'));
+      $catUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $catUrlKey->setLangs();
-      $catUrlKey->setSubLabel($this->_('Pokud není zadán, je url klíč generován automaticky'));
+      $catUrlKey->setSubLabel($this->tr('Pokud není zadán, je url klíč generován automaticky'));
       $form->addElement($catUrlKey,'settings');
 
       // priorita
-      $catPriority = new Form_Element_Text('priority', $this->_('Priorita kategorie'));
+      $catPriority = new Form_Element_Text('priority', $this->tr('Priorita kategorie'));
       $catPriority->setSubLabel('Čím větší tím bude kategorie vybrána jako výchozí');
       $catPriority->addValidation(New Form_Validator_IsNumber());
       $catPriority->addValidation(New Form_Validator_Length(1, 4));
@@ -463,18 +479,28 @@ class Categories_Controller extends Controller {
       $form->addElement($catPriority, 'settings');
 
       // panely
-      $catLeftPanel = new Form_Element_Checkbox('individual_panels', $this->_('Panely'));
-      $catLeftPanel->setSubLabel(_('Zapnutí individuálního nastavení panelů'));
+      $catLeftPanel = new Form_Element_Checkbox('individual_panels', $this->tr('Panely'));
+      $catLeftPanel->setSubLabel($this->tr('Zapnutí individuálního nastavení panelů'));
       $form->addElement($catLeftPanel, 'settings');
 
-      $catShowInMenu = new Form_Element_Checkbox('show_in_menu', $this->_('Zobrazit v menu'));
-      $form->addElement($catShowInMenu, 'settings');
+//      $catShowInMenu = new Form_Element_Checkbox('show_in_menu', $this->tr('Zobrazit v menu'));
+//      $form->addElement($catShowInMenu, 'settings');
+//
+//      $catShowOnlyWhenLogin = new Form_Element_Checkbox('show_when_login_only', $this->tr('Zobrazit pouze při přihlášení'));
+//      $form->addElement($catShowOnlyWhenLogin, 'settings');
+      $catVisibility = new Form_Element_Select('visibility', $this->tr('Viditelnost'));
+      $catVisibility->setOptions(array(
+         $this->tr('Všem') => Model_Category::VISIBILITY_ALL,
+         $this->tr('Pouze přihlášeným') => Model_Category::VISIBILITY_WHEN_LOGIN,
+         $this->tr('Pouze nepřihlášeným') => Model_Category::VISIBILITY_WHEN_NOT_LOGIN,
+         $this->tr('Pouze administrátorům') => Model_Category::VISIBILITY_WHEN_ADMIN,
+         $this->tr('Nikomu') => Model_Category::VISIBILITY_HIDDEN,
+         ));
+      $form->addElement($catVisibility, 'settings');
 
-      $catShowOnlyWhenLogin = new Form_Element_Checkbox('show_when_login_only', $this->_('Zobrazit pouze při přihlášení'));
-      $form->addElement($catShowOnlyWhenLogin, 'settings');
 
       // práva
-      $form->addGroup('rights', $this->_('Práva'), $this->_('Nastavení práv ke kategorii'));
+      $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii'));
       $grModel = new Model_Users();
       $groups = $grModel->getGroups();
 
@@ -483,7 +509,7 @@ class Categories_Controller extends Controller {
               'r-c'=>'r-c', '-wc'=>'-wc', 'rwc'=>'rwc', '---' => '---');
 
       // výchozí práva kategorie
-      $catGrpRigths = new Form_Element_Select('rights_default', $this->_('Výchozí práva'));
+      $catGrpRigths = new Form_Element_Select('rights_default', $this->tr('Výchozí práva'));
       $catGrpRigths->setOptions($rightsTypes);
       $form->addElement($catGrpRigths, 'rights');
 
@@ -494,40 +520,40 @@ class Categories_Controller extends Controller {
             $grName = $group->{Model_Users::COLUMN_GROUP_NAME};
          }
          $catGrpRigths = new Form_Element_Select('group_'.$group->{Model_Users::COLUMN_GROUP_NAME},
-                 sprintf($this->_("Skupina\n \"%s\""), $grName));
+                 sprintf($this->tr("Skupina\n \"%s\""), $grName));
          $catGrpRigths->setOptions($rightsTypes);
          $catGrpRigths->setValues(reset($rightsTypes));
          $form->addElement($catGrpRigths, 'rights');
       }
 
-      $form->addGroup('sitemap', $this->_('Mapa stránek'), $this->_('Nastavení mapy stránek pro vyhledávače'));
+      $form->addGroup('sitemap', $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
 
       // nastvaení SITEMAPS
       // priorita
-      $catSitemapPriority = new Form_Element_Text('sitemap_priority', $this->_('Priorita kategorie v sitemap'));
+      $catSitemapPriority = new Form_Element_Text('sitemap_priority', $this->tr('Priorita kategorie v sitemap'));
       $catSitemapPriority->setSubLabel('0 - 1, čím větší, tím výše kategorie bude');
       $catSitemapPriority->setValues(0);
       $catSitemapPriority->addValidation(New Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
       $form->addElement($catSitemapPriority, 'sitemap');
 
       // frekvence změny
-      $freqOptions = array($this->_('Vždy') => 'always', $this->_('každou hodinu') => 'hourly',
-              $this->_('Denně') => 'daily', $this->_('Týdně') => 'weekly', $this->_('Měsíčně') => 'monthly',
-              $this->_('Ročně') => 'yearly', $this->_('Nikdy') => 'never');
-      $catSitemapChangeFrequency = new Form_Element_Select('sitemap_frequency', $this->_('Frekvence změn'));
+      $freqOptions = array($this->tr('Vždy') => 'always', $this->tr('každou hodinu') => 'hourly',
+              $this->tr('Denně') => 'daily', $this->tr('Týdně') => 'weekly', $this->tr('Měsíčně') => 'monthly',
+              $this->tr('Ročně') => 'yearly', $this->tr('Nikdy') => 'never');
+      $catSitemapChangeFrequency = new Form_Element_Select('sitemap_frequency', $this->tr('Frekvence změn'));
       $catSitemapChangeFrequency->setOptions($freqOptions);
       $catSitemapChangeFrequency->setValues('yearly');
       $form->addElement($catSitemapChangeFrequency, 'sitemap');
 
 
       // tlačítko odeslat
-//      $submitButton = new Form_Element_Submit('send', $this->_('Uložit'));
+//      $submitButton = new Form_Element_Submit('send', $this->tr('Uložit'));
 //      $form->addElement($submitButton);
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
 
-      $elemGoSet = new Form_Element_Checkbox('gotoSettings', $this->_('Přejít na nastavení kategorie'));
-      $elemGoSet->setSubLabel($this->_('Každá kategorie má podle zvoleného modulu další nastavení. Např: modul "articles" má počet článků na stránku.'));
+      $elemGoSet = new Form_Element_Checkbox('gotoSettings', $this->tr('Přejít na nastavení kategorie'));
+      $elemGoSet->setSubLabel($this->tr('Každá kategorie má podle zvoleného modulu další nastavení. Např: modul "articles" má počet článků na stránku.'));
 
       $form->addElement($elemGoSet);
 
@@ -541,7 +567,7 @@ class Categories_Controller extends Controller {
                          (string)$categories->getCatObj()->getLabel()]
                  = (string)$categories->getCatObj()->getId();
       } else {
-         $this->categoriesArray[$this->_('Kořen')] = 0;
+         $this->categoriesArray[$this->tr('Kořen')] = 0;
       }
       if(!$categories->isEmpty()) {
          foreach ($categories as $cat) {
@@ -556,7 +582,7 @@ class Categories_Controller extends Controller {
          $this->view()->doc = file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
                  .$this->getRequestParam('module').DIRECTORY_SEPARATOR.'docs'.DIRECTORY_SEPARATOR.self::MODULE_SPEC_FILE);
       } else {
-         $this->view()->doc = $this->_('Dokumentace k modulu neexistuje');
+         $this->view()->doc = $this->tr('Dokumentace k modulu neexistuje');
       }
    }
 

@@ -3,19 +3,19 @@ $this->addCssFile("style.css");
 // do titulku
    if($this->edit) {
       if($this->adminMenu == true){
-         $this->addPageTitle($this->_('úprava administrační kategorie').' '.$this->catName);
-         echo ('<h1>'.$this->_('úprava administrační kategorie').' "'.$this->catName.'"</h1>');
+         $this->addPageTitle($this->tr('úprava administrační kategorie').' '.$this->catName);
+         echo ('<h1>'.$this->tr('úprava administrační kategorie').' "'.$this->catName.'"</h1>');
       } else {
-         $this->addPageTitle($this->_('úprava kategorie').' '.$this->catName);
-         echo ('<h1>'.$this->_('úprava kategorie').' "'.$this->catName.'"</h1>');
+         $this->addPageTitle($this->tr('úprava kategorie').' '.$this->catName);
+         echo ('<h1>'.$this->tr('úprava kategorie').' "'.$this->catName.'"</h1>');
       }
    } else {
       if($this->adminMenu == true){
-         $this->addPageTitle($this->_('přidání administrační kategorie'));
-         echo ('<h1>'.$this->_('přidání administrační kategorie').'</h1>');
+         $this->addPageTitle($this->tr('přidání administrační kategorie'));
+         echo ('<h1>'.$this->tr('přidání administrační kategorie').'</h1>');
       } else {
-         $this->addPageTitle($this->_('přidání kategorie'));
-         echo ('<h1>'.$this->_('přidání kategorie').'</h1>');
+         $this->addPageTitle($this->tr('přidání kategorie'));
+         echo ('<h1>'.$this->tr('přidání kategorie').'</h1>');
       }
    }
 
@@ -24,7 +24,7 @@ $this->addCssFile("style.css");
    <?
 // donastavení formuláře
    $this->form->priority->html()->setAttrib('size', 4);
-   $this->form->module->htmlSubLabel()->addContent('<span style="font-weight:bold;">'.$this->_('Popis').':</span><div id="moduleNameDoc"></div>', true);
+   $this->form->module->htmlSubLabel()->addContent('<span style="font-weight:bold;">'.$this->tr('Popis').':</span><div id="moduleNameDoc"></div>', true);
    $this->addJsPlugin(new JsPlugin_JQuery());
    echo $this->form;
    ?>
@@ -33,7 +33,7 @@ $this->addCssFile("style.css");
       $(document).ready(function(){
          loadDoc();
          $('select[name=categoryparent_cat]').change(function(){
-            if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->_('Upravit také URL adresu?')?>')){
+            if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->tr('Upravit také URL adresu?')?>')){
                $('.categoryurlkey_class').val(null);
             }
          });

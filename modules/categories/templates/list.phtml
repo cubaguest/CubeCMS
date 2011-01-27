@@ -4,23 +4,28 @@ $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addJsPlugin(new JsPlugin_TreeTable());
 
-define('SECTION_EDTI_LABEL', $this->_('Upravit'));
-define('SECTION_REMOVE_LABEL', $this->_('Smazat'));
-define('SECTION_SETTINGS_LABEL', $this->_('Upravit parametry'));
-define('SECTION_MOVEUP_LABEL', $this->_('Nahoru'));
-define('SECTION_MOVEDOWN_LABEL', $this->_('Dolu'));
-define('SECTION_GOTO_CAT_LABEL', $this->_('Přejít'));
-define('SECTION_SHOW_DETAIL_LABEL', $this->_('Zobrazit detail'));
-define('SECTION_MODULE_LABEL', $this->_('Modul'));
-define('SECTION_LABEL_LABEL', $this->_('Popisek'));
-define('SECTION_IND_PANELS_LABEL', $this->_('Individuální panely'));
-define('SECTION_YES_LABEL', $this->_('Ano'));
-define('SECTION_NO_LABEL', $this->_('Ne'));
-define('SECTION_MODULE_DATADIR', $this->_('Datový adresář'));
-define('SECTION_RIGHTS', $this->_('Výchozí práva'));
-define('SECTION_TITLE', $this->_('Popis'));
-define('SECTION_DESC', $this->_('Popis vyhledávače'));
-define('SECTION_SHOW_IN_MENU', $this->_('Zobrazeno v menu'));
+define('SECTION_EDTI_LABEL', $this->tr('Upravit'));
+define('SECTION_REMOVE_LABEL', $this->tr('Smazat'));
+define('SECTION_SETTINGS_LABEL', $this->tr('Upravit parametry'));
+define('SECTION_MOVEUP_LABEL', $this->tr('Nahoru'));
+define('SECTION_MOVEDOWN_LABEL', $this->tr('Dolu'));
+define('SECTION_GOTO_CAT_LABEL', $this->tr('Přejít'));
+define('SECTION_SHOW_DETAIL_LABEL', $this->tr('Zobrazit detail'));
+define('SECTION_MODULE_LABEL', $this->tr('Modul'));
+define('SECTION_LABEL_LABEL', $this->tr('Popisek'));
+define('SECTION_IND_PANELS_LABEL', $this->tr('Individuální panely'));
+define('SECTION_YES_LABEL', $this->tr('Ano'));
+define('SECTION_NO_LABEL', $this->tr('Ne'));
+define('SECTION_MODULE_DATADIR', $this->tr('Datový adresář'));
+define('SECTION_RIGHTS', $this->tr('Výchozí práva'));
+define('SECTION_TITLE', $this->tr('Popis'));
+define('SECTION_DESC', $this->tr('Popis vyhledávače'));
+define('SECTION_VISIBILITY', $this->tr('Viditelné'));
+define('SECTION_VISIBILITY_ALL', $this->tr('Všem'));
+define('SECTION_VISIBILITY_HIDDEN', $this->tr('Nikomu'));
+define('SECTION_VISIBILITY_WHEN_LOG', $this->tr('Pouze přihlášeným'));
+define('SECTION_VISIBILITY_WHEN_NOT_LOG', $this->tr('Pouze nepřihlášeným'));
+define('SECTION_VISIBILITY_WHEN_ADMIN', $this->tr('Pouze administrátorům'));
 
 // funkce pro render menu
 function vveSectionsRenderFunc($menuArr, $link) {
@@ -62,9 +67,26 @@ function vveSectionsRenderFunc($menuArr, $link) {
                   ?></td>
             </tr>
             <tr>
-               <th><?=SECTION_SHOW_IN_MENU?>:</th>
+               <th><?=SECTION_VISIBILITY?>:</th>
                <td><?
-               echo $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_CAT_SHOW_IN_MENU} == true ? SECTION_YES_LABEL : SECTION_NO_LABEL;
+               switch ($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_VISIBILITY}) {
+                  case Model_Category::VISIBILITY_HIDDEN:
+                     echo SECTION_VISIBILITY_HIDDEN;
+                     break;
+                  case Model_Category::VISIBILITY_WHEN_ADMIN:
+                     echo SECTION_VISIBILITY_WHEN_ADMIN;
+                     break;
+                  case Model_Category::VISIBILITY_WHEN_LOGIN:
+                     echo SECTION_VISIBILITY_WHEN_LOG;
+                     break;
+                  case Model_Category::VISIBILITY_WHEN_NOT_LOGIN:
+                     echo SECTION_VISIBILITY_WHEN_NOT_LOG;
+                     break;
+                  case Model_Category::VISIBILITY_ALL:
+                  default:
+                     echo SECTION_VISIBILITY_ALL;
+                     break;
+               }
                   ?></td>
             </tr>
             <tr>
@@ -142,17 +164,17 @@ function vveSectionsRenderFunc($menuArr, $link) {
 
 echo $this->toolbox;
 ?>
-<h1><?=$this->_("Struktura stránek")?></h1>
+<h1><?=$this->tr("Struktura stránek")?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail">
-   <p><?=$this->_('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
+   <p><?=$this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
    <?//sekce
    $typeClass = 'mainStruct';
    $id = 'categories-table';
    if($this->isMainMenu != true) {
       $id = 'admin-categories-table';
       $typeClass = 'adminStruct';
-      echo '<p><strong>'.$this->_("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
+      echo '<p><strong>'.$this->tr("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
    }
    ?>
    <hr />
@@ -175,7 +197,7 @@ echo $this->toolbox;
       });
 
       function submitRemoveCat(msg){
-         return confirm('<?=$this->_('Opravdu smazat kategorii: ')?>'+msg+'?');
+         return confirm('<?=$this->tr('Opravdu smazat kategorii: ')?>'+msg+'?');
       }
 
       $('a.button-show-detail').click(function(){

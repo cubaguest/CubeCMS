@@ -1,12 +1,12 @@
 <?
-$this->addPageTitle($this->_('úprava parametrů kategorie').' '.$this->catName);
+$this->addPageTitle($this->tr('úprava parametrů kategorie').' '.$this->catName);
 ?>
-<h1><?=$this->_('Úprava parametrů kategorie').' "'.$this->catName.'"'?></h1>
+<h1><?=$this->tr('Úprava parametrů kategorie').' "'.$this->catName.'"'?></h1>
 <?
 if($this->includeTpl != null){
    $this->includeTplObj($this->includeTpl);
 } else if($this->form == null) {
-   print ($this->_('Kategorie nemá žádné nastavení'));
+   print ($this->tr('Kategorie nemá žádné nastavení'));
 } else {
    print ($this->form);
 }
