@@ -187,9 +187,6 @@ class Mails_Controller extends Controller {
 
       if(isset ($_SESSION['mailsQueue'])){
          $qInfo = $_SESSION['mailsQueue'];
-         $mailObj = new Email(true);
-         // obnova zprávy
-         $msgObj = unserialize(file_get_contents(AppCore::getAppCacheDir().self::MSG_FILE_NAME, FILE_BINARY));
 
          $modelQ = new Mails_Model_SendQueue();
 
@@ -200,6 +197,7 @@ class Mails_Controller extends Controller {
          $eSend = new Form_Element_Submit('send', $this->_('spustit odesílání'));
          $formSend->addElement($eSend);
          if($formSend->isValid()){
+            $mailObj = new Email(true);
             // odeslání bez ajaxu
          }
          $this->view()->formSend = $formSend;
