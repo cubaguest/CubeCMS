@@ -64,7 +64,7 @@ class Articles_Controller extends Controller {
             break;
       }
 
-      $artModel->join('t_usr', array(Model_Users::COLUMN_USERNAME));
+      $artModel->joinFK(Articles_Model::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME));
       if($scrollComponent instanceof Component_Scroll){
          $artModel->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
@@ -156,7 +156,8 @@ class Articles_Controller extends Controller {
             array('urlkey' => $this->getRequest('urlkey'), 'idusr' => Auth::getUserId()));
       }
 
-      $artM->join('t_usr_last', array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)->join('t_usr', array('usernameCreated' => Model_Users::COLUMN_USERNAME));
+      $artM->joinFK(Articles_Model::COLUMN_ID_USER_LAST_EDIT, array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)
+         ->joinFK(Articles_Model::COLUMN_ID_USER, array('usernameCreated' => Model_Users::COLUMN_USERNAME));
       $article = $artM->record();
 
 

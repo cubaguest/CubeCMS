@@ -53,10 +53,12 @@ class Articles_Model extends Model_ORM {
 
 
       $this->setPk(self::COLUMN_ID);
-      $this->addForeignKey('t_cats', self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      
+      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
+      $this->addForeignKey(self::COLUMN_ID_USER_LAST_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
+      
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Articles_Model_PrivateUsers', Articles_Model_PrivateUsers::COLUMN_A_H_U_ID_ARTICLE);
-      $this->addForeignKey('t_usr', self::COLUMN_ID_USER, 'Model_Users');
-      $this->addForeignKey('t_usr_last', self::COLUMN_ID_USER_LAST_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
    }
 
    /**
