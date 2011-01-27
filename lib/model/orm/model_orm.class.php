@@ -22,6 +22,13 @@ class Model_ORM extends Model_PDO {
    const JOIN_OUTER = 3;
    const JOIN_CROSS = 4;
 
+   /**
+    * FETCH konstanty
+    */
+   const FETCH_LANG_CLASS = 16384;
+   const FETCH_PKEY_AS_ARR_KEY = 32768;
+
+
    protected $tableName = null;
 
    protected $tableShortName = null;
@@ -84,7 +91,6 @@ class Model_ORM extends Model_PDO {
    /**
     * Metody pro nasatvení modelu
     */
-
    protected function _initTable() {
       if($this->tableName == null){
          $this->tableName = self::DB_TABLE;
@@ -175,8 +181,8 @@ class Model_ORM extends Model_PDO {
     * @param string $modelName - název modelu připojené tabulky
     * @param string $externColumn - název sloupce připojené tabulky
     */
-   protected function addForeignKey($tbName, $column, $modelName, $externColumn = null) {
-      $this->foreignKeys[$tbName] = array('column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'columns' => null);
+   protected function addForeignKey($column, $modelName, $externColumn = null) {
+      $this->foreignKeys[$column] = array('column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn);
    }
 
    /**
@@ -364,9 +370,14 @@ class Model_ORM extends Model_PDO {
       $dbst = $dbc->prepare($sql);
       $obj->bindSQLWhere($dbst);
       $obj->bindSQLLimit($dbst);
-
-      $dbst->execute();
-      $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
+      $r = false;
+      try {
+         $dbst->execute();
+         $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
+      } catch (PDOException $exc) {
+         CoreErrors::addException($exc);
+//         AppCore::getUserErrors()->addMessage('SQL: '.$sql);
+      }
       return $dbst->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
    }
    
@@ -378,7 +389,7 @@ class Model_ORM extends Model_PDO {
     * @param array $orders -- řazení
     * @return array of Model_ORM_Record
     */
-   public function records() {
+   public function records($params = self::FETCH_LANG_CLASS) {
       $dbc = new Db_PDO();
       $sql = 'SELECT '. $this->createSQLSelectColumns().' FROM `'.$this->getDbName().'`.`'.$this->getTableName().'` AS '.$this->getTableShortName();
 
@@ -389,10 +400,30 @@ class Model_ORM extends Model_PDO {
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);// where values
       $this->bindSQLLimit($dbst);// limit values
+      $r = false;
+      try {
+         if($params == self::FETCH_LANG_CLASS OR $params == self::FETCH_PKEY_AS_ARR_KEY){
+            $dbst->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+            $dbst->execute();
+            $r = $dbst->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+         } else {
+            $dbst->setFetchMode($params);
+            $dbst->execute();
+            $r = $dbst->fetchAll($params);
+         }
 
-      $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
-      $dbst->execute();
-      $r = $dbst->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+         if ($params == self::FETCH_PKEY_AS_ARR_KEY AND $r != false) {
+            $newR = array();
+            foreach ($r as $record) {
+               $newR[$record->getPK()] = $record;
+            }
+            $r = $newR;
+         }
+      } catch (PDOException $exc) {
+         CoreErrors::addException($exc);
+         AppCore::getUserErrors()->addMessage('SQL: '.$sql);
+      }
+
       return $r;
    }
 
@@ -408,6 +439,21 @@ class Model_ORM extends Model_PDO {
       if($r == false) return 0;
       return (int)$r->cnt;
    }
+
+   /**
+    * Varcí SQL dotaz pro výběr
+    * @return string
+    */
+   public function getSQLQuery()
+   {
+      $sql = 'SELECT '. $this->createSQLSelectColumns().' FROM `'.$this->getDbName().'`.`'.$this->getTableName().'` AS '.$this->getTableShortName();
+      $this->createSQLJoins($sql);
+      $this->createSQLWhere($sql, $this->getTableShortName());// where
+      $this->createSQLOrder($sql);// order
+      $this->createSQLLimi($sql);// limit
+      return $sql;
+   }
+
 
    public function save(Model_ORM_Record $record) {
       $dbc = new Db_PDO();
@@ -658,8 +704,43 @@ class Model_ORM extends Model_PDO {
       return $this;
    }
 
-   public function join($tbName, $columns = null, $joinType = self::JOIN_LEFT) {
-      $this->joins[$tbName] = array('type' => $joinType, 'columns' => $columns);
+//   public function join($tbName, $columns = null, $joinType = self::JOIN_LEFT) {
+//      'column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'columns' => null
+//      $joinParams = array('column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'columns' => null);
+
+//      array_push($this->joins, array('tablename' => $tbName, 'type' => $joinType, 'columns' => $columns));
+//      return $this;
+//   }
+
+   public function joinFK($colname, $columns = null, $joinType = self::JOIN_LEFT, $with = null) {
+      $fk = $this->foreignKeys[$colname];
+      if($fk['modelColumn'] == null) $fk['modelColumn'] = $fk['column'];
+
+      $tAlias = $fk['modelName'];
+      if(is_array($colname)){
+         $tAlias = key($colname);
+         $colname = current($colname);
+      }
+
+      $joinParams = array('column' => $fk['column'], 'modelName' => $fk['modelName'], 'modelColumn' => $fk['modelColumn'],
+         'columns' => $columns, 'type' => $joinType, 'with' => $with, 'tableAlias' => $tAlias);
+      array_push($this->joins, $joinParams);
+      return $this;
+   }
+
+   public function join($column, $modelName, $modelColumn = null, $columns = null, $joinType = self::JOIN_LEFT, $with = null) {
+      if($modelColumn == null) $modelColumn = $column;
+      
+      $tAlias = $modelName;
+      if(is_array($modelName)){
+         $tAlias = key($modelName);
+         $modelName = current($modelName);
+      }
+
+      $joinParams = array('column' => $column, 'modelName' => $modelName, 'modelColumn' => $modelColumn,
+         'columns' => $columns, 'type' => $joinType, 'with' => $with, 'tableAlias' => $tAlias);
+      array_push($this->joins, $joinParams);
+
       return $this;
    }
 
@@ -735,17 +816,25 @@ class Model_ORM extends Model_PDO {
          }
       }
       $columns = $this->createSQLSelectJoinColumns($columns);
-      $tableCols = implode(',', $columns);
+      $tableCols = implode(', ', $columns);
       return $tableCols;
    }
 
    protected function createSQLSelectJoinColumns($columns) {
       $this->joinString = null; //reset
-      if(!empty ($this->joins) AND !empty ($this->foreignKeys)){
-         foreach ($this->joins as $tbName => $join) {
-            $model = new $this->foreignKeys[$tbName]['modelName']();
-            $tableName = uniqid($model->getTableShortName());
-            if(($model instanceof Model_ORM) == false) throw new Exception('unexpectec value of model');
+      if(!empty ($this->joins)){
+         foreach ($this->joins as $join) {
+            if(!class_exists($join['modelName'])) throw new Exception($this->tr ('Neplatný parametr s modelem'));
+
+            $model = new $join['modelName']();
+
+            if($join['tableAlias'] == null){
+               $tableName = uniqid($model->getTableShortName());
+            } else {
+               $tableName = $join['tableAlias'];
+            }
+
+
             // vytváření SQL pro joiny je tu kvůli kešování
             $part = null;
             switch ($join['type']) {
@@ -761,18 +850,13 @@ class Model_ORM extends Model_PDO {
                   break;
             }
             $part .= 'JOIN '.$model->getTableName().' AS '.$tableName;
-            if($this->foreignKeys[$tbName]['modelColumn'] == null OR $this->foreignKeys[$tbName]['modelColumn'] == $this->foreignKeys[$tbName]['column']){ // USING
-               $part .= ' ON (`'.$tableName.'`.`'.$this->foreignKeys[$tbName]['column'].'` = `'.$this->getTableShortName().'`.`'.$this->foreignKeys[$tbName]['column'].'`)';
-//               $part .= ' USING (`'.$this->foreignKeys[$tbName]['column'].'`)';
-            } else {
-               $part .= ' ON (`'.$tableName.'`.`'.$this->foreignKeys[$tbName]['modelColumn'].'` = `'.$this->getTableShortName().'`.`'.$this->foreignKeys[$tbName]['column'].'`)';
-            }
+            $part .= ' ON (`'.$tableName.'`.`'.$join['modelColumn'].'` = `'.$this->getTableShortName().'`.`'.$join['column'].'`)';
             $this->joinString .= $part; // uložení do joinstring
 
             // samotné vytvoření sloupců
             $modelCols = $model->getColumns();
-            if(!empty($this->joins[$tbName]['columns'])){ // jen vybrané sloupce
-               foreach ($this->joins[$tbName]['columns'] as $alias => $coll) {
+            if(!empty($join['columns'])){ // jen vybrané sloupce
+               foreach ($join['columns'] as $alias => $coll) {
                   if(!is_int($alias)){ // is alias
                      array_push($columns, '`'.$tableName.'`.`'.$coll.'` AS '.$alias);
                   } else if($modelCols[$coll]['aliasFor'] != null) { // is alias from model
@@ -815,31 +899,78 @@ class Model_ORM extends Model_PDO {
    protected function createSQLOrder(&$sql) {
       if(!empty ($this->orders)){
          $ords = array();
-         foreach ($this->orders as $col => $val) {
-            if(!is_int($col) AND strtoupper($val) != 'ASC' AND strtoupper($val) != 'DESC') throw new UnexpectedValueException (sprintf ($this->tr('Nepodporovaný typ řazení "%s"'), $val));
-            // kontrola sloupce jestli existuje
+         foreach ($this->orders as $col => $order) {
+//            if(!is_int($col) AND strtoupper($val) != 'ASC' AND strtoupper($val) != 'DESC') throw new UnexpectedValueException (sprintf ($this->tr('Nepodporovaný typ řazení "%s"'), $val));
             // pokud obsahuje tečku jedná se o zápis s prefixem tabulky a ten se vkládá přímo
             if(is_int($col)){// pokud je jenom sloupce je ASC
-               $col = $val;
-               $val = 'ASC';
+               $col = $order;
+               $order = 'ASC';
             }
-            if(strpos($val,'.') === false){ // pokud není předána zkratka s tabulkou
-               if(isset ($this->tableStructure[$col])){
-                  $colName = $col;
-                  if($this->tableStructure[$col]['lang'] == true){
-                     $colName = $col.'_'.Locales::getLang();
-                  }
-                  if($this->tableStructure[$col]['aliasFor'] != null){
-                     array_push($ords, '`'.$this->getTableShortName().'`.`'.$this->tableStructure[$col]['aliasFor'].'` '.strtoupper($val));
+            // parsování
+            /* Array
+            (
+               [0] => FUNC(table.column+5)
+               [1] => FUNC
+               [2] => table
+               [3] => column
+               [4] => +5 // aditional
+            ) */
+            $matches = array();
+            $ordStr = null;
+            if(preg_match('/^(?:([a-zA-Z ]+)?\()?(?:([a-zA-Z0-9_-]+)\.)?([a-zA-Z0-9_]+)([ 0-9\/*+-]+)?\)?$/i', $col, $matches)){
+               // tb prefix
+               if($matches[2] == null){
+                  $ordStr .= '`'.$this->getTableShortName().'`.';
+               } else {
+                  $ordStr .= '`'.$matches[2].'`.';
+               }
+               // coll
+               if(isset ($this->tableStructure[$matches[3]])){
+                  if($this->tableStructure[$matches[3]]['aliasFor'] != null){
+                     $column = $this->tableStructure[$matches[3]]['aliasFor'];
                   } else {
-                     array_push($ords, '`'.$this->getTableShortName().'`.`'.$colName.'` '.strtoupper($val));
+                     $column = $matches[3];
+                     if($this->tableStructure[$matches[3]]['lang'] == true){
+                        $column .= '_'.Locales::getLang();
+                     }
                   }
                } else {
-                  array_push($ords, '`'.$col.'` '.strtoupper($val));
+                  $column = $matches[3];
                }
-            } else {
-               array_push($ords, preg_replace('/([a-z_-]+)\.([a-z_-]+)/i', '`\1`.`\2`', $col).' '.strtoupper($val));
+
+               $ordStr .= '`'.$column.'`';
+               // dopočty
+               if(isset ($matches[4]) AND $matches[4] != null){
+                  $ordStr .= $matches[4];
+               }
+               // funkce
+               if($matches[1] != null){
+                  $ordStr = strtoupper($matches[1]).'('.$ordStr.')';
+               }
+               // order
+               $ordStr .= ' '.  strtoupper($order);
+
+               array_push($ords, $ordStr);
             }
+
+//            if(strpos($val,'.') === false){ // pokud není předána zkratka s tabulkou
+//               // kontrola sloupce jestli existuje
+//               if(isset ($this->tableStructure[$col])){
+//                  $colName = $col;
+//                  if($this->tableStructure[$col]['lang'] == true){
+//                     $colName = $col.'_'.Locales::getLang();
+//                  }
+//                  if($this->tableStructure[$col]['aliasFor'] != null){
+//                     array_push($ords, '`'.$this->getTableShortName().'`.`'.$this->tableStructure[$col]['aliasFor'].'` '.strtoupper($val));
+//                  } else {
+//                     array_push($ords, '`'.$this->getTableShortName().'`.`'.$colName.'` '.strtoupper($val));
+//                  }
+//               } else {
+//                  array_push($ords, '`'.$col.'` '.strtoupper($val));
+//               }
+//            } else {
+//               array_push($ords, preg_replace('/([a-z_-]+)\.([a-z_-]+)/i', '`\1`.`\2`', $col).' '.strtoupper($val));
+//            }
          }
          $sql .= ' ORDER BY '.implode(',', $ords);
       }
