@@ -257,7 +257,7 @@ class Auth extends TrObject {
 
    private static function getUser($username) {
       $model = new Model_Users();
-      return $model->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))->record();
+      return $model->joinFK(Model_Users::COLUMN_GROUP_ID)->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))->record();
    }
 
    /**
