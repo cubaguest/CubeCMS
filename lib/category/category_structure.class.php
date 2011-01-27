@@ -11,6 +11,8 @@ class Category_Structure implements Iterator, Countable {
    private $catObj = null;
    private $childrens = array();
 
+   private $withHidden = false;
+
    /**
     * Konstruktor pro vytvoření objektu se sekcemi
     * @param array $labels -- pole s popisy s jazyky
@@ -108,12 +110,27 @@ class Category_Structure implements Iterator, Countable {
          $this->catObj = new Category(null, false, $catArray[$this->getId()]);
       }
       foreach ($this->childrens as $key => $child) {
-         if(isset ($catArray[$child->getId()])) {
-            $child->setCategories($catArray);
+         $child->withHidden($this->withHidden);
+         if(isset ($catArray[$child->getId()])
+            AND ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL OR $this->withHidden
+               OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN)
+               OR (Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_LOGIN)
+               OR (Auth::getGroupName() == 'admin' AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN)
+               )) {
+               $child->setCategories($catArray);
          } else {
             unset ($this->childrens[$key]);
          }
       }
+   }
+
+   /**
+    * Metoda nastaví jestli se mají i zkryté kategorie
+    * @param bool $hidden
+    */
+   public function withHidden($hidden = false)
+   {
+      $this->withHidden = $hidden;
    }
 
    /**
@@ -324,6 +341,11 @@ class Category_Structure implements Iterator, Countable {
       }
    }
 
+   /**
+    * Metoda vrací strukturu kategorií
+    * @param bool $admin -- true pro vrácení struktury admin menu
+    * @return Category_Structure
+    */
    public static function getStructure($admin = false){
       if($admin === true){
          return unserialize(VVE_ADMIN_MENU_STRUCTURE);
