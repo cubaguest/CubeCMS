@@ -60,7 +60,7 @@ class Model_Users extends Model_ORM {
       $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
 
       $this->setPk(self::COLUMN_ID);
-      $this->addForeignKey('tgroups', self::COLUMN_ID_GROUP, 'Model_Groups');
+      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');
    }
 
    /**
