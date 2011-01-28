@@ -20,29 +20,14 @@ class Navigation_Controller extends Controller {
    {
       //		Kontrola práv
       $this->checkReadableRights();
-
       $menu = Category_Structure::getStructure();
       if ($menu != false) {
          $catModel = new Model_Category();
-         $catModel->join(Model_Category::COLUMN_CAT_ID, array('t_r' => 'Model_Rights'), null,
-                  array(Model_Rights::COLUMN_ID_GROUP, Model_Rights::COLUMN_RIGHT))
-               ->where('t_r.' . Model_Rights::COLUMN_ID_GROUP . ' = :idgrp'
-                  .' AND t_r.' . Model_Rights::COLUMN_RIGHT . " LIKE 'r__'"
-                  .' AND '.Model_Category::COLUMN_URLKEY.' IS NOT NULL',
-                  array("idgrp" => Auth::getGroupId()));
          
-         $records = $catModel->records();
-         if($records != false){
-            $cats = array();
-            foreach ($records as $record) {
-               $cats[$record->{Model_Category::COLUMN_CAT_ID}] = $record;
-            }
-            unset($records);
-            $menu->setCategories($cats);
-            $childs = $menu->getCategory($this->category()->getId())->getChildrens();
-            $newMenu = $this->recursive($menu->getCategory($this->category()->getId()));
-            $this->view()->structure = $newMenu;
-         }
+         $menu->setCategories($catModel->getCategoryList());
+         $childs = $menu->getCategory($this->category()->getId())->getChildrens();
+         $newMenu = $this->recursive($menu->getCategory($this->category()->getId()));
+         $this->view()->structure = $newMenu;
       }
 
       // načtení textu
