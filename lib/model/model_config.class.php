@@ -10,7 +10,7 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s moduly
  */
 
-class Model_Config extends Model_PDO {
+class Model_Config extends Model_ORM {
 /**
  * Tabulka s detaily
  */
@@ -34,66 +34,18 @@ class Model_Config extends Model_PDO {
    const TYPE_LIST_MULTI = 'listmulti';
    const TYPE_SER_DATA = 'ser_object';
 
-   /**
-    * Metoda načte konfigurační volby (pro načtení do enginu)
-    * @return PDOStatement -- konfigurační volby
-    * @todo -- pokoumat jestli by nebylo lepší mít i global config pro některé volby
-    */
-   public function getConfigStat() {
-      $dbc = new Db_PDO();
-//      if(VVE_USE_GLOBAL_CONFIGS){
-//         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE).", ".VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE);
-//      } else {
-         $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
-//      }
-      return $dbst;
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_cfg');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_KEY, array('datatype' => 'varchar(50)', 'nn' => true, 'uq' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_VALUES, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_PROTECTED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'string')); // ENUM
+
+      $this->setPk(self::COLUMN_ID);
    }
-
-   public function saveCfg($key,$value, $type = self::TYPE_STRING, $label = null, $protected = true) {
-      $dbc = new Db_PDO();
-
-      $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
-         ." WHERE `".self::COLUMN_KEY."` = :key");
-      $dbst->execute(array(':key' => $key));
-      $count = $dbst->fetch();
-
-      if($count[0] == 0){
-         $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-            ." (`".self::COLUMN_KEY."`,`". self::COLUMN_VALUE."`,`". self::COLUMN_TYPE."`,`"
-            . self::COLUMN_LABEL."`,`". self::COLUMN_PROTECTED."`)"
-            ." VALUES (:key, :val, :type, :label, :protected)");
-         $dbst->bindValue(':type', $type, PDO::PARAM_STR);
-         $dbst->bindValue(':label', $label, PDO::PARAM_STR|PDO::PARAM_NULL);
-         $dbst->bindValue(':protected', $protected, PDO::PARAM_BOOL);
-      } else {
-         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)." SET `value` = :val WHERE `key` = :key");
-      }
-      $dbst->bindValue(':key', $key, PDO::PARAM_STR);
-      $dbst->bindValue(':val', $value, PDO::PARAM_STR);
-      return $dbst->execute();
-   }
-
-   public function getList() {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE (".self::COLUMN_PROTECTED." = 0)"
-          ." ORDER BY `".self::COLUMN_KEY."` ASC");
-
-      $dbst->setFetchMode(PDO::FETCH_OBJ);
-      $dbst->execute();
-
-      return $dbst;
-   }
-
-   public function getOption($id) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE (".self::COLUMN_ID." = :id)");
-      $dbst->bindValue(":id", $id, PDO::PARAM_INT);
-
-      $dbst->execute();
-      return $dbst->fetchObject();
-   }
-
 }
 ?>
