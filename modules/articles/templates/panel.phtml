@@ -16,7 +16,7 @@ if($this->rssLink != null){?>
    <div class="panel-box-label-article"><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
                                             title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"
                                             ><?=vve_tpl_truncate($article->{Articles_Model::COLUMN_NAME},25)?></a></div>
-   <?=vve_tpl_truncate(strip_tags($article->{Articles_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150)?>
+   <?=  vve_tpl_xhtml_cut(strip_tags($article->{Articles_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150)?>
    <div class="panel-box-link-more"><a href="<?=$this->link()->route('detail', array('urlkey'=> $article->{Articles_Model::COLUMN_URLKEY}));?>"
       title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=$this->tr('Více')?></a>
    </div>
