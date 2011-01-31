@@ -66,7 +66,17 @@ class Routes {
    public function checkRoutes() {
       foreach ($this->routes as $routeName => $route) {
          $matches = array();
-         if(preg_match("/^".(string)$route['regexp']."\/?$/i", $this->urlRequest, $matches)) {
+         $rege = preg_replace(array(
+            "/::([a-z0-9_-]+)::/",
+            "/:\?:([a-z0-9_-]+):\?:/",
+            "/\//",
+         ), array(
+            "(?P<$1>[a-z0-9_-]+)",
+            "(?:(?P<$1>[a-z0-9_-]+)\/?)?",
+            "/?",
+         ), (string)$route['regexp']);
+
+         if(preg_match("/^".$rege."\/?$/i", $this->urlRequest, $matches)) {
             $this->selectedRoute = $routeName;
             foreach ($matches as $key => $value) {
                if(is_int($key)) unset ($matches[$key]);
@@ -83,15 +93,11 @@ class Routes {
     */
    final public function addRoute($name, $regexp, $action, $replacement, $respondClass = null) {
       $rege = addcslashes($regexp, '/');
-
-      // přidání povinného parametru
-      $rege = preg_replace("/::([a-z0-9_-]+)::/", "(?P<$1>[a-z0-9_-]+)", $rege);
-      // přidání nepovinných parametrů
-      $rege = preg_replace("/:\?:([a-z0-9_-]+):\?:/", "(?:(?P<$1>[a-z0-9_-]+)\/?)?", $rege);
-      $rege = preg_replace("/\//", "/?", $rege);
-      $act = array();
+      $act = array('method' => $action, 'class' => null);
       // jestli bude existovat externí napojení
-      preg_match("/(?:(?P<class>\w+)::)?(?P<method>\w+)/", $action, $act);
+      if(strpos($action, '::') !== false){
+         preg_match("/(?:(?P<class>\w+)::)?(?P<method>\w+)/", $action, $act);
+      }
 
       $this->routes[$name] = array('name' => $name,
           'regexp' => $rege,
