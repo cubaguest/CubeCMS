@@ -10,7 +10,7 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s panely
  */
 
-class Model_Panel extends Model_PDO {
+class Model_Panel extends Model_ORM {
    /**
     * Tabulka s detaily
     */
@@ -26,9 +26,27 @@ class Model_Panel extends Model_PDO {
    const COLUMN_ORDER = 'porder';
    const COLUMN_POSITION    = 'position';
    const COLUMN_PARAMS    = 'pparams';
-   const COLUMN_TPL    = 'template';
-   const COLUMN_ICON    = 'picon';
+//   const COLUMN_TPL    = 'template';
+   const COLUMN_ICON    = 'icon';
    const COLUMN_BACK_IMAGE    = 'background';
+
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_panels');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_CAT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID_SHOW_CAT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_POSITION, array('datatype' => 'varchar(20)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_PARAMS, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_ICON, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_BACK_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+
+      $this->setPk(self::COLUMN_ID);
+      $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_ID);
+      $this->addForeignKey(self::COLUMN_ID_SHOW_CAT, 'Model_Category', Model_Category::COLUMN_ID);
+   }
 
    /**
     * Metoda uloží panel
@@ -79,7 +97,7 @@ class Model_Panel extends Model_PDO {
     * @param bool $withRights -- jestli mají být načtený pouze kategorie na které ma uživatel práva
     * @return PDOStatement -- objekt s daty
     */
-   public function getPanelsList($idCat = 0, $withRights = true) {
+   public function getPanelsList($idCat = 0, $withRights = false) {
       $dbc = new Db_PDO();
 
       if($withRights) {
@@ -103,6 +121,21 @@ class Model_Panel extends Model_PDO {
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->execute();
       return $dbst->fetchAll(PDO::FETCH_CLASS, 'Model_LangContainer');
+   }
+
+   public function setTagetCategory($idCat = 0) {
+      $obj = clone $this;
+      $obj = new $this();
+      $obj->setSelectAllLangs(false);
+      $obj
+         ->joinFK(array('t_cat' => self::COLUMN_ID_CAT))
+         ->join(array('t_cat' => Model_Category::COLUMN_ID), array('t_r' => 'Model_Rights'), 
+            Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_ID_CATEGORY,Model_Rights::COLUMN_RIGHT))
+         ->groupBy(array('t_cat' => Model_Category::COLUMN_ID))
+         ->where(self::COLUMN_ID_SHOW_CAT." = :idc AND t_r.".Model_Rights::COLUMN_ID_GROUP." = :idgrp"
+            ." AND t_r.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'", array('idc' => $idCat, 'idgrp' => Auth::getGroupId()))
+         ->order(array(self::COLUMN_POSITION, self::COLUMN_ORDER => Model_ORM::ORDER_DESC));
+      return $obj;
    }
 
    public function getPanel($idPanel) {
