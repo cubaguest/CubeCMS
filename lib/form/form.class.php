@@ -13,7 +13,7 @@
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract      Třída pro obsluhu formulářů
  */
-class Form implements ArrayAccess, Iterator {
+class Form extends TrObject implements ArrayAccess, Iterator {
    const GRP_POS_END = 1;
    const GRP_POS_BEGIN = 2;
 
@@ -71,6 +71,9 @@ class Form implements ArrayAccess, Iterator {
     */
    private $elementCheckForm = null;
 
+   private $elementToken = null;
+
+
    private $submitElement = null;
 
 
@@ -85,6 +88,8 @@ class Form implements ArrayAccess, Iterator {
       $this->setSendMethod();
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
+      $this->elementToken = new Form_Element_Hidden('_'.$prefix.'_token');
+      $this->elementToken->setValues(Token::getToken());
    }
 
    public function  __toString() {
@@ -135,7 +140,7 @@ class Form implements ArrayAccess, Iterator {
          }
       }
       $formContent .= $d->render();
-      $html->addContent(new Html_Element('p', $this->elementCheckForm->controll()));
+      $html->addContent(new Html_Element('p', $this->elementCheckForm->controll().(string)$this->elementToken->controll()));
       $html->addContent($formContent);
       $html->addContent($this->scripts());
 
@@ -201,7 +206,7 @@ class Form implements ArrayAccess, Iterator {
     */
    public function renderStart() {
       $cnt = $this->html()->__toStringBegin();
-      $cnt .= new Html_Element('p', $this->elementCheckForm->controll());
+      $cnt .= new Html_Element('p', (string)$this->elementCheckForm->controll().(string)$this->elementToken->controll());
       return $cnt;
    }
 
@@ -308,6 +313,16 @@ class Form implements ArrayAccess, Iterator {
     */
    public function isSend() {
       if($this->isSend != true) { // pokud nebyl odeslán
+         // kontrola tokenu
+         if($this->elementToken->isSend()){
+            $this->elementToken->populate();
+            if(!Token::check($this->elementToken->getValues())){ // neodpovídající token
+               throw new UnexpectedValueException($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));
+//               AppCore::getUserErrors()->addMessage($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));
+               return false;
+            }
+         }
+         // kontrola check prvku
          if($this->elementCheckForm->isSend() AND $this->elementCheckForm->getValues() != null) {
             $this->elementCheckForm->populate();
             $this->elementCheckForm->filter();
