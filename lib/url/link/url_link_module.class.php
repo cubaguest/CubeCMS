@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Třída pro práci s odkazy.
  * Třída pro tvorbu a práci s odkazy aplikace, umožňuje jejich pohodlnou
@@ -8,11 +9,11 @@
  * @copyright  	Copyright (c) 2009 Jakub Matas
  * @version    	$Id: url_link.class.php 646 2009-08-28 13:44:00Z jakub $ VVE3.9.4 $Revision: 646 $
  * @author			$Author: jakub $ $Date: 2009-08-28 15:44:00 +0200 (Pá, 28 srp 2009) $
- *						$LastChangedBy: jakub $ $LastChangedDate: 2009-08-28 15:44:00 +0200 (Pá, 28 srp 2009) $
+ * 						$LastChangedBy: jakub $ $LastChangedDate: 2009-08-28 15:44:00 +0200 (Pá, 28 srp 2009) $
  * @abstract 		Třída pro práci s odkazy
  */
-
 class Url_Link_Module extends Url_Link {
+
    /**
     * Objekt s cestami modulu
     * @var Routes
@@ -30,26 +31,23 @@ class Url_Link_Module extends Url_Link {
     *
     * @return Url_Link_Module -- objket Links
     */
-   public function route($name = null, $params = array()) {
-      
-      if($name == null) {
+   public function route($name = null, $params = array())
+   {
+      if ($name == null) {
          $this->route = null;
       } else {
          $route = $this->routes->getRoute($name);
          $routeReplacement = $route['replacement'];
-         if($routeReplacement != null|'') {
+         if ($routeReplacement != null | '') {
             $params = array_merge($this->routes->getRouteParams(), $params);
             foreach ($params as $pname => $pvalue) {
-               $routeReplacement = preg_replace("/{".$pname."}/i", $pvalue, $routeReplacement);
-//               if(isset ($defRoutes[$pname])){
-//                  unset ($defRoutes[$pname]);
-//               }
+               $routeReplacement = str_replace("{" . $pname . "}", $pvalue, $routeReplacement);
             }
-
             // odstranění nepovinných parametrů, které nebyly zadány
-            $routeReplacement = preg_replace("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "", $routeReplacement);
-            // odstranění nevyplněných nepovinných parametrů
-            $routeReplacement = preg_replace("/[()]+/i", "", $routeReplacement);
+            $routeReplacement = preg_replace(
+                  array("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "/[()]+/i"),
+                  array("", ""),
+                  $routeReplacement);
             $this->route = $routeReplacement;
          } else {
             $this->route = $route['regexp'];
@@ -62,7 +60,8 @@ class Url_Link_Module extends Url_Link {
     * Metoda odstraní všechny parametry v odkazu
     * @return Url_Link_Module -- sám sebe
     */
-   public function clear($withOutCategory = false) {
+   public function clear($withOutCategory = false)
+   {
       $this->route()->rmParam();
       parent::clear($withOutCategory);
       return $this;
@@ -76,7 +75,8 @@ class Url_Link_Module extends Url_Link {
     * Metoda inicializuje odkazy
     *
     */
-   protected function _init() {
+   protected function _init()
+   {
       $this->lang = self::$currentlang;
       $this->category = self::$currentCategory;
       $this->route = self::$currentRoute;
@@ -87,7 +87,8 @@ class Url_Link_Module extends Url_Link {
     * Metoda přidá cesty do objektu linků
     * @param Routes $routes -- cesty modulu
     */
-   public function setModuleRoutes(Routes $routes) {
+   public function setModuleRoutes(Routes $routes)
+   {
       $this->routes = $routes;
    }
 
@@ -95,13 +96,14 @@ class Url_Link_Module extends Url_Link {
     * Metoda vrací objekt s cestami modulu
     * @return Routes
     */
-   public function getRoutes(){
+   public function getRoutes()
+   {
       return $this->routes;
    }
+
    /*
     * MAGICKÉ METODY
     */
-
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");
 //echo("SERVER_NAME: ".$_SERVER["SERVER_NAME"]."<br>");
