@@ -102,7 +102,7 @@ class Users_Controller extends Controller {
       $jqGrid = new Component_JqGrid();
       $jqGrid->request()->setDefaultOrderField(Model_Users::COLUMN_ID);
       $modelUsers = new Model_Users();
-      $modelUsers->order(array($jqGrid->request()->orderField => $jqGrid->request()->order))->join('tgroups');
+      $modelUsers->order(array($jqGrid->request()->orderField => $jqGrid->request()->order))->joinFK(Model_Users::COLUMN_ID_GROUP);
       // search
       if ($jqGrid->request()->isSearch()) {
          switch ($jqGrid->request()->searchType()) {
