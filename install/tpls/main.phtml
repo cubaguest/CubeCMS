@@ -1,0 +1,37 @@
+<?
+
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>Instalace Cube-CMS krok <?=$step;?></title>
+        <link rel="stylesheet" type="text/css" href="tpls/style.css" />
+    </head>
+    <body>
+       <form action="<?=$currentLink?>" method="post">
+       <div id="main-contect">
+          <div id="main-header">
+             <p id="header-install-step">krok <?=$step;?></p>
+             <p>Instalace systému Cube-CMS</p>
+          </div>
+          <div id="main-page-content">
+             <?if($errMsg != null){?>
+             <div id="error-message-box">CHYBA: <?echo $errMsg?></div>
+             <?}?>
+             <? include './tpls/'.$tplFile;?>
+          </div>
+          <div id="main-page-buttons">
+             <input type="button" name="reload" value="Obnovit" onclick="window.location.href='<?=$currentLink;?>'" />
+             <input type="submit" name="next" value="<?echo $buttonNextTitle?>" />
+          </div>
+          <div id="main-footer">
+             <p>
+                Prosíme, čtěte pozorně všechny instrukce. Za případné chyby neručíme. Cube-Studio.cz
+             </p>
+          </div>
+       </div>
+       </form>
+    </body>
+</html>

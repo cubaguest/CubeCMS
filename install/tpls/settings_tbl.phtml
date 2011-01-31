@@ -1,0 +1,36 @@
+<table id="php-status">
+<?foreach ($infoItems as $item) {
+   if($item['status'] != 'group'){?>
+   <tr>
+      <td class="check-item-name"><?echo $item['name'];?></td>
+      <td class="check-item-status"><?
+      switch ($item['status']) {
+         case 'err':
+            echo '<span class="status-err">CHYBA</span>';
+            break;
+         case 'warn':
+            echo '<span class="status-warn">Warování</span>';
+            break;
+         case 'ok':
+         default:
+            echo '<span class="status-ok">OK</span>';
+            break;
+      }?>
+      </td>
+   </tr>
+   <?
+   } else {?>
+   <tr>
+      <th colspan="2" class="check-item-groupname"><?echo $item['name'];?></th>
+   </tr>
+   <?}?>
+
+   <?if($item['info'] != null){?>
+   <tr>
+      <td class="check-item-info" colspan="2"><?echo $item['info'];?></td>
+   </tr>
+   <?}?>
+<?}?>
+</table>
+
+

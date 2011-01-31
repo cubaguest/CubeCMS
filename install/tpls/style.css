@@ -1,0 +1,144 @@
+/* SOF RESET */
+/* v1.0 | 20080212 */
+
+/* prvky:   - jsou znepoužitelněny*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, input, select, textarea,
+table, caption, tbody, tfoot, thead, tr, th, td {
+   margin: 0;
+   padding: 0;
+   border: 0;
+   outline: 0;
+   font-size: 98%;
+   /*vertical-align: baseline; /* Ověřit v IE */
+   background: transparent;
+}
+body {
+   /*line-height: 1;*/
+}
+ol, ul {
+   list-style: none;
+}
+blockquote, q {
+   quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+   content: '';
+   content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+   outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+   text-decoration: none;
+}
+del {
+   text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+   border-collapse: collapse;
+   border-spacing: 0;
+}
+/* EOF RESET */
+
+
+body, html {
+   text-align: center;
+}
+
+#main-contect {
+   width: 800px;
+   margin: 20px auto 0 auto;
+   text-align: left;
+   border: 1px solid gray;
+}
+
+#main-header, #main-page-content, #main-footer, #main-page-buttons {
+   padding: 3px;
+   border-bottom: 1px solid gray;
+}
+#main-page-content {
+   height: 600px;
+   overflow: auto;
+}
+#error-message-box {
+   background-color: #f4d0d0;
+   font-weight: bold;
+   border: 1px solid #b81900;
+   padding: 3px;
+}
+#main-page-buttons {
+   text-align: right;
+}
+input {
+   border: 1px solid silver;
+}
+input[type=submit]:hover {
+   background-color: #006600;
+   color: white;
+}
+#main-header {
+   font-size: large;
+}
+#main-footer {
+   border: none;
+   font-size: x-small;
+}
+
+#header-install-step {
+   float: right;
+   width: 70px;
+}
+
+/* STATUSY */
+table#php-status {
+   width: 98%;
+   border: 1px solid silver;
+}
+table#php-status td, table#php-status th {
+   padding: 3px;
+   border-bottom: 1px solid silver;
+}
+.check-item-name {
+   width: auto;
+}
+.check-item-status {
+   width: 80px;
+   text-align: center;
+   font-weight: bold;
+}
+.check-item-groupname {
+   background-color: #feeebd;
+}
+
+.check-item-info {
+   color: gray;
+   font-size: x-small;
+}
+
+.status-warn {
+   color: #0074c7;
+   font-weight: bold;
+}
+.status-ok {
+   color: #006600;
+   font-weight: bold;
+}
+.status-err {
+   color: #b81900;
+   font-weight: bold;
+}
+
