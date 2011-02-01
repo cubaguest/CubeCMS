@@ -24,26 +24,12 @@ class Form_Element_Checkbox extends Form_Element {
     */
    public function populate() {
       parent::populate();
-      $this->checkValRecurs($this->values);
-      if($this->values == null){
-         $this->values = false;
+      if(is_array($this->values)){
+         $this->values = filter_var_array($this->values, FILTER_VALIDATE_BOOLEAN);
+      } else {
+         $this->values = filter_var($this->values, FILTER_VALIDATE_BOOLEAN);
       }
       $this->unfilteredValues = $this->values;
-   }
-   /**
-    * @todo dořešit
-    * @param <type> $arr
-    */
-   private function checkValRecurs(&$arr) {
-      if(is_array($arr)){
-         foreach ($arr as &$var) {
-            $this->checkValRecurs($var);
-         }
-      } else {
-         if($arr == 'on'){
-            $arr = true;
-         }
-      }
    }
 
    /**
@@ -52,19 +38,11 @@ class Form_Element_Checkbox extends Form_Element {
     * @return mixed -- hodnota prvku
     */
    public function getValues($key = null) {
-      if(!is_null($this->unfilteredValues) AND $key == null){
+      if($key == null){
          return $this->unfilteredValues;
-      } else if(!is_null($this->unfilteredValues) AND isset ($this->unfilteredValues[$key])) {
+      } else if(isset ($this->unfilteredValues[$key])) {
          return $this->unfilteredValues[$key];
       }
-//      if($key !== null AND isset($this->values[$key])){
-//         return true;
-//      } else if($key === null AND isset ($this->values) AND $this->values !== false) {
-//         return true;
-//      }
-//      else if($key !== null AND is_array($this->values) AND !isset($this->values[$key])) {
-//         return false;
-//      }
       return false;
    }
 

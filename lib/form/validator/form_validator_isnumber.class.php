@@ -11,23 +11,37 @@
  */
 class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_Interface {
 
-   const TYPE_INT = 1;
-   const TYPE_FLOAT = 2;
+   const TYPE_INT = FILTER_VALIDATE_INT;
+   const TYPE_FLOAT = FILTER_VALIDATE_FLOAT;
 
    /**
  * O jaký druh čísla se jedná
  * @var string
  */
-   private $numberType = 1;
+   private $numberType = self::TYPE_INT;
 
+   private $min = null;
 
-   public function  __construct($errMsg = null, $numberType = self::TYPE_INT) {
+   private $max = null;
+
+   /**
+    * Validátor čísla
+    * @param string $errMsg -- chybová zpráva, která se má zobrazit
+    * @param int $numberType -- typ čísla (konstanta TYPE_XXX nebo konstanta FILTER_VALIDATE_INT x FILTER_VALIDATE_FLOAT)
+    * @param int/float $min -- minimální velikost čísla (pouze INT)
+    * @param int/float $max -- maximální velikost čísla (pouze INT)
+    */
+   public function  __construct($errMsg = null, $numberType = self::TYPE_INT, $min = null, $max = null) {
+      if($numberType == 'float') {$numberType = FILTER_VALIDATE_FLOAT;}
+      else if($numberType == 'int') {$numberType = FILTER_VALIDATE_INT;}
       if($errMsg == null) {
          parent::__construct($this->tr('Položka "%s" není ve správném číselném formátu'));
       } else {
          parent::__construct($errMsg);
       }
       $this->numberType = $numberType;
+      $this->min = $min;
+      $this->max = $max;
    }
 
    /**
@@ -35,33 +49,39 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      if($element instanceof Form_Element_Text
-         OR $element instanceof Form_Element_TextArea){
-         switch ($this->numberType) {
-            case 'float':
-            case self::TYPE_FLOAT:
-               $element->addValidationConditionLabel($this->tr("desetiné číslo"));
-               break;
-            case 'int':
-            case self::TYPE_INT:
-            default:
-               $element->addValidationConditionLabel($this->tr("celé číslo"));
-               break;
+      $addStr = null;
+      if($this->numberType == FILTER_VALIDATE_INT AND $this->min !== null AND $this->max !== null){
+         $addStr = $this->tr(sprintf(' mezi %s a %s', $this->min, $this->max));
+      } else if($this->numberType == FILTER_VALIDATE_INT AND $this->min !== null){
+         $addStr = $this->tr(sprintf(' větší než %s', $this->min));
+      } else if($this->numberType == FILTER_VALIDATE_INT AND $this->max !== null){
+         $addStr = $this->tr(sprintf(' menší než %s', $this->max));
+      }
+      // sublabel
+      if($element instanceof Form_Element_Text OR $element instanceof Form_Element_TextArea){
+         if($this->numberType == FILTER_VALIDATE_FLOAT) {
+            $element->addValidationConditionLabel($this->tr("desetiné číslo"));
+         } else {
+            $element->addValidationConditionLabel($this->tr("celé číslo").$addStr);
          }
       }
    }
 
    public function validate(Form_Element $elemObj) {
+      if($elemObj->getUnfilteredValues() == null) return true;// nekontrolujeme prázdý řetězec to je na validátoru notEmpty
       switch (get_class($elemObj)) {
       // input text
          case 'Form_Element_Text':
          case 'Form_Element_TextArea':
          case 'Form_Element_Password':
+            $filterOptions = array('options' => array());
+            if($this->min !== null) $filterOptions['options']['min_range'] = $this->min;
+            if($this->max !== null) $filterOptions['options']['max_range'] = $this->max;
+
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if($elemObj->getUnfilteredValues() != null AND
-                       $this->checkNumber($elemObj->getUnfilteredValues()) == false){
+               if (filter_var($elemObj->getUnfilteredValues(), $this->numberType, $filterOptions) === false) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
@@ -72,24 +92,6 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
       }
       return true;
 
-   }
-
-
-   public function checkNumber($number) {
-      switch ($this->numberType) {
-         case self::TYPE_INT:
-         case 'int':
-            return ctype_digit($number);
-            break;
-         case self::TYPE_FLOAT:
-         case 'float':
-            return true;
-            break;
-         default :
-            $this->errMessage = $this->tr('Nepodporovaný typ validace čísla');
-            break;
-      }
-      return false;
    }
 }
 ?>
