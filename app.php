@@ -13,6 +13,7 @@
  * @internal   Last ErrorCode 22
  */
 include_once './lib/trobject.class.php';
+include_once './lib/debug.class.php';
 class AppCore extends TrObject {
    /**
     * Název enginu
@@ -27,7 +28,7 @@ class AppCore extends TrObject {
    /**
     * Revize Enginu
     */
-   const ENGINE_RELEASE = 0;
+   const ENGINE_RELEASE = 1;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -429,15 +430,14 @@ class AppCore extends TrObject {
    private function _initConfig()
    {
       $cfgModel = new Model_Config();
-      $cfgVals = $cfgModel->getConfigStat();
-      while ($cfg = $cfgVals->fetch()) {
-         if(!defined('VVE_'.$cfg[Model_Config::COLUMN_KEY])) {
-            if($cfg[Model_Config::COLUMN_VALUE] == 'true') {
-               define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), true);
-            } else if($cfg[Model_Config::COLUMN_VALUE] == 'false') {
-               define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), false);
+      foreach ($cfgModel->records(PDO::FETCH_OBJ) as $record) {
+         if(!defined('VVE_'.$record->{Model_Config::COLUMN_KEY})) {
+            if($record->{Model_Config::COLUMN_VALUE} == 'true') {
+               define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), true);
+            } else if($record->{Model_Config::COLUMN_VALUE} == 'false') {
+               define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), false);
             } else {
-               define(strtoupper('VVE_'.$cfg[Model_Config::COLUMN_KEY]), $cfg[Model_Config::COLUMN_VALUE]);
+               define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), $record->{Model_Config::COLUMN_VALUE});
             }
          }
       }
@@ -566,19 +566,7 @@ class AppCore extends TrObject {
    {
       Menu_Main::factory();
       try {
-         if(!file_exists(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR . DIRECTORY_SEPARATOR
-         . 'menu.class.php')) {
-            $menuFile = AppCore::getAppLibDir().AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-                    . 'menu.class.php';
-         } else {
-            $menuFile = AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR . DIRECTORY_SEPARATOR
-                    . 'menu.class.php';
-         }
-         require_once $menuFile;
-         if(!class_exists("Menu", false)) {
-            throw new BadClassException($this->tr('Třídu pro tvorbu menu se nepodařilo načíst'),6);
-         }
-         $menu = new Menu();
+         $menu = new Menu_Main();
          $menu->controller();
          $menu->view();
          $this->getCoreTpl()->menuObj = $menu->template();
@@ -701,7 +689,7 @@ class AppCore extends TrObject {
          $this->coreTpl->module = $controller->_getTemplateObj();
       } catch (Exception $e) {
          new CoreErrors($e);
-   }
+      }
    }
 
    /**
@@ -844,12 +832,16 @@ class AppCore extends TrObject {
       $panelsM = new Model_Panel();
       // výběr jestli se zpracovávají individuální panely nebo globální
       if(self::$category->isIndividualPanels()) {
-         $panels = $panelsM->getPanelsList(self::$category->getId());
+         $panels = $panelsM->setTagetCategory(self::$category->getId())->records();
       } else {
-         $panels = $panelsM->getPanelsList();
+         $panels = $panelsM->setTagetCategory()->records();
       }
-
+      
       foreach ($panels as $panel) {
+         // pokud je panel vypnut přeskočíme zracování
+         if(!isset ($this->coreTpl->panels[(string) $panel->{Model_Panel::COLUMN_POSITION}])){
+            continue;
+         }
          try {
             $panelCat = new Category(null, false, $panel);
             if (!file_exists(AppCore::getAppLibDir() . self::MODULES_DIR . DIRECTORY_SEPARATOR
@@ -1007,7 +999,7 @@ class AppCore extends TrObject {
          echo $exc->getTraceAsString();
          die ();
       }
-
+      
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
@@ -1032,17 +1024,17 @@ class AppCore extends TrObject {
 
       $className = 'Module_'.ucfirst(self::$urlRequest->getCategory()).'_Category';
       // načtení kategorie
-         if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
-            self::$category = new $className(self::$urlRequest->getCategory(),true);
-         } else if( ( ($reqUrl == '' AND $catUrl == null) OR ($reqUrl != '' AND $catUrl != null)) ) {
-            self::$category = new Category(self::$urlRequest->getCategory(),true);
-            Url_Link::setCategory(self::$category->getUrlKey());
-         } else { // Chyba stránky
-            self::$category = new Module_ErrPage_Category(self::$urlRequest->getCategory(),true);
-            Url_Link::setCategory(self::$category->getUrlKey());
-            AppCore::setErrorPage(true);
-         }
-         unset ($className);
+      if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
+         self::$category = new $className(self::$urlRequest->getCategory(),true);
+      } else if( ( ($reqUrl == '' AND $catUrl == null) OR ($reqUrl != '' AND $catUrl != null)) ) {
+         self::$category = new Category(self::$urlRequest->getCategory(),true);
+         Url_Link::setCategory(self::$category->getUrlKey());
+      } else { // Chyba stránky
+         self::$category = new Module_ErrPage_Category(self::$urlRequest->getCategory(),true);
+         Url_Link::setCategory(self::$category->getUrlKey());
+         AppCore::setErrorPage(true);
+      }
+      unset ($className);
       if(!self::$urlRequest->isFullPage()) {
          // vynulování chyby, protože chybová stránka je výchozí stránka
          AppCore::setErrorPage(false);
