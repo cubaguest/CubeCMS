@@ -335,10 +335,12 @@ class Category_Structure implements Iterator, Countable {
    public function saveStructure($admin = false) {
       $model = new Model_Config();
       if($admin === true){
-         $model->saveCfg('ADMIN_MENU_STRUCTURE', serialize($this));
+         $record = $model->where(Model_Config::COLUMN_KEY, 'ADMIN_MENU_STRUCTURE')->record();
       } else {
-         $model->saveCfg('CATEGORIES_STRUCTURE', serialize($this));
+         $record = $model->where(Model_Config::COLUMN_KEY, 'CATEGORIES_STRUCTURE')->record();
       }
+      $record->{Model_Config::COLUMN_VALUE} = serialize($this);
+      $model->save($record);
    }
 
    /**
