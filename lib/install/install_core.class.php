@@ -47,6 +47,7 @@ class Install_Core {
          return;
       }
       $modelCfg = new Model_Config();
+      $record = $modelCfg->where(Model_Config::COLUMN_KEY, 'VERSION')->record();
 
       $currentVer = (int)VVE_VERSION;
       try {
@@ -66,7 +67,8 @@ class Install_Core {
             if ($file->exist()) {
                $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
             }
-            $modelCfg->saveCfg('VERSION', $currentVer + 1);
+            $record->{Model_Config::COLUMN_VALUE} = $currentVer + 1;
+            $modelCfg->save($record);
 
             $currentVer++; // loop na další verzi
          }
@@ -94,7 +96,7 @@ class Install_Core {
          return;
       }
       $modelCfg = new Model_Config();
-
+      $record = $modelCfg->where(Model_Config::COLUMN_KEY, 'RELEASE')->record();
       $versionDir = (string)AppCore::ENGINE_VERSION;
 
       $currentRelease = VVE_RELEASE;
@@ -112,7 +114,8 @@ class Install_Core {
             $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
          }
 
-         $modelCfg->saveCfg('RELEASE', $currentRelease+1);
+         $record->{Model_Config::COLUMN_VALUE} = $currentVer + 1;
+         $modelCfg->save($record);
          $currentRelease++;
       }
       $this->installComplete(sprintf(_('Jádro bylo aktualizováno na verzi %s release %s'), AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
@@ -124,7 +127,12 @@ class Install_Core {
    public function upgradeToMain()
    {
       $settings = new Model_Config();
-      $settings->saveCfg('VERSION', 6, Model_Config::TYPE_STRING, 'Verze jádra', true);
+      $record = $modelCfg->where(Model_Config::COLUMN_KEY, 'VERSION')->record();
+      if($record == false) $record = $settings->newRecord();
+      $record->{Model_Config::COLUMN_VALUE} = 6;
+      $record->{Model_Config::COLUMN_TYPE} = Model_Config::TYPE_STRING;
+      $record->{Model_Config::COLUMN_LABEL} = 'Verze jádra';
+      $record->{Model_Config::COLUMN_PROTECTED} = true;
       echo ('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!');
       header('Location: http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
       die();
