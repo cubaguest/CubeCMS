@@ -9,7 +9,11 @@ class GuestBook_Controller extends Controller {
    const DEFAULT_NUM_ON_PAGE = 15;
 
    const MIN_SEC_FOR_HUMAN = 10;
-/**
+
+   const PARAM_CAPCHA_SEC = 'capchasec';
+
+
+   /**
  * Kontroler pro zobrazení textu
  */
    public function mainController() {
@@ -56,17 +60,16 @@ class GuestBook_Controller extends Controller {
 
       if($form->isSend()){
          $this->view()->showFrom = true;
+         if($form->captcha->getValues() < self::MIN_SEC_FOR_HUMAN){
+            $elemCaptcha->setError($this->_('Příliš rychlé odeslání příspěvku, pravděpodobně SPAM'));
+         }
       }
 
       if($form->isValid()){
-         if($form->isSend() AND $form->captcha->getValues() < self::MIN_SEC_FOR_HUMAN){
-            $this->errMsg()->addMessage($this->_('Příliš rychlé odeslání příspěvku, pravděpodobně SPAM'));
-         } else {
-            $model->saveBook($this->category()->getId(), $form->email->getValues(),
-                    $form->text->getValues(), $form->nick->getValues(),$form->www->getValues());
-            $this->infoMsg()->addMessage($this->_('Příspěvek byl uložen'));
-            $this->link()->reload();
-         }
+         $model->saveBook($this->category()->getId(), $form->email->getValues(),
+                 $form->text->getValues(), $form->nick->getValues(),$form->www->getValues());
+         $this->infoMsg()->addMessage($this->_('Příspěvek byl uložen'));
+         $this->link()->reload();
       }
 
       if($this->rights()->isWritable()){
@@ -77,7 +80,7 @@ class GuestBook_Controller extends Controller {
          $elemId->addValidation(new Form_Validator_IsNumber());
          $delForm->addElement($elemId);
 
-         $elemSubDel = new Form_Element_SubmitImage('delete');
+         $elemSubDel = new Form_Element_Submit('delete', $this->_('Smazat'));
          $delForm->addElement($elemSubDel);
 
          if($delForm->isValid()){
@@ -85,6 +88,7 @@ class GuestBook_Controller extends Controller {
             $this->infoMsg()->addMessage($this->_('Položka byla smazána'));
             $this->link()->reload();
          }
+         $this->view()->formDel = $delForm;
       }
 
       // načtení příspěvků

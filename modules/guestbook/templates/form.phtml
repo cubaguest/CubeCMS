@@ -1,34 +1,48 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
+<h1><?=$this->category()->getName();?></h1>
 <a href="#" title="<?=$this->_('Přidat příspěvek')?>" id="toggleForm"><?=$this->_('Přidat příspěvek')?></a>
 <br />
-<div id="guestbookForm">
+<div id="guestbookNewItemForm">
    <?
-
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7)->addClass("mceEditorSimple");
-
-
    $tinymce2 = new JsPlugin_TinyMce();
    $tinymce2->setCfgParam('theme', JsPlugin_TinyMce::TINY_THEME_SIMPLE_2);
    $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
    $this->addJsPlugin($tinymce2);
-
-   print ($this->form);
+//   $this->form->send->html()->setAttrib('disabled','disabled');
+   echo ($this->form);
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */
+      var sendButt = document.getElementById("answer_send_1");
+      var sendButtText = sendButt.value;
+      var seconds = <?=$this->category()->getParam(GuestBook_Controller::PARAM_CAPCHA_SEC, GuestBook_Controller::MIN_SEC_FOR_HUMAN);?>;
+      // disable button and set timeout
+      sendButt.disabled = true;
+      sendButt.value = seconds;
+
       var antiSpam = function() {
-         a = document.getElementById("answer_captcha");
+         a = document.getElementById("answer_captcha_1");
          a.value = parseInt(a.value) + 1;
+         // remove time
+         if(sendButt.disabled == true){
+            if(parseInt(sendButt.value) > 1){
+               sendButt.value = parseInt(sendButt.value)-1;
+            } else {
+               sendButt.value = sendButtText;
+               sendButt.disabled = false;
+            }
+         }
          setTimeout("antiSpam()", 1000);
       }
       antiSpam();
       <?if($this->showFrom != true){?>
-      $('#guestbookForm').hide();
+      $('#guestbookNewItemForm').hide();
       <?}?>
       $('#toggleForm').click(function(){
-         $('#guestbookForm').toggle();
+         $('#guestbookNewItemForm').toggle();
          return false;
       });
       /* ]]> */
