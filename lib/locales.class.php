@@ -242,10 +242,14 @@ class Locales extends TrObject {
     */
    private static function setLocalesEnv() {
       //	nastavení gettext a locales
-      //putenv("LANG=".self::getLocale(self::getLang()));
-      if(setlocale(LC_ALL, self::getLocale(self::getLang())) == false){
+      $locale = self::getLocale(self::getLang());
+      if(SERVER_PLATFORM == 'WIN'){
+         $locale = 'czech'; // Windows potřebují jiný druh
+      }
+      if(setlocale(LC_ALL, $locale) == false){
          $tr = new Translator();
-         throw new DomainException(sprintf($tr->tr('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
+//         throw new DomainException(sprintf($tr->tr('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
+         trigger_error(sprintf($tr->tr('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
       }
       bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, AppCore::getAppLibDir().self::GETTEXT_DEFAULT_LOCALES_DIR);
       textdomain(self::GETTEXT_DEFAULT_DOMAIN);

@@ -71,13 +71,14 @@ class Session {
     * @param string $sessionName -- název session do ketré se bude ukládat
     */
    public static function factory() {
-
-      session_set_save_handler(array('Session', 'open'),
+      if(SERVER_PLATFORM == 'UNIX'){
+         session_set_save_handler(array('Session', 'open'),
                          array('Session', 'close'),
                          array('Session', 'read'),
                          array('Session', 'write'),
                          array('Session', 'destroy'),
                          array('Session', 'gc'));
+      }
 
       ini_set('session.cookie_lifetime',  VVE_LOGIN_TIME);
       ini_set('session.gc_maxlifetime',  VVE_LOGIN_TIME);

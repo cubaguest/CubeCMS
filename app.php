@@ -225,6 +225,11 @@ class AppCore extends TrObject {
             //trigger_error("Magic quotes is Enable, please disable this feature");
          }
 //      }
+      if(strtoupper (substr(PHP_OS, 0,3)) != 'WIN' ) {
+         define('SERVER_PLATFORM', 'UNIX');
+      } else {
+         define('SERVER_PLATFORM', 'WIN');
+      }
       // base cfg file
       require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
       // inicializace parametrů jádra a php
