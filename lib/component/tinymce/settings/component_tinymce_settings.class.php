@@ -2,7 +2,7 @@
 /**
  * Třída pro vytvoření požadavku pro naplnění jqgrid
  */
-abstract class Component_TinyMCE_Settings {
+abstract class Component_TinyMCE_Settings extends TrObject {
    const SETTING_EXTERNAL_TPL_LIST = 'template_external_list_url';
 
 
@@ -202,6 +202,8 @@ abstract class Component_TinyMCE_Settings {
                $v = $paramValue;
             } else if(strpos ($paramValue, "function") !== false) { // je vložena funkce
                $v = str_replace('{CATID}', Category::getSelectedCategory()->getId(),(string)$paramValue);
+            } else if($paramValue[0] == '[') {
+               $v = $paramValue;
             } else {
                $v = "\"".$paramValue."\"";
             }

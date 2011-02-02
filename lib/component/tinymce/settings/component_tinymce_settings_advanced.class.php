@@ -18,21 +18,26 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_toolbar_align' => 'left',
       'theme_advanced_statusbar_location' => 'bottom',
       'theme_advanced_resizing' => 'true',
-      'entity_encoding' => 'raw'
+      'entity_encoding' => 'raw',
+      'theme_advanced_blockformats' => "p,h2,h3,h4,h5,h6,address,blockquote,code",// not h1,div,dt,dd,samp
+      'valid_styles' => "'*' : 'color,font-size,font-weight,font-style,text-decoration,background-colo'}",
+      'tab_focus' => ':prev,:next',
+
    );
 
-   protected $defaultPlugins = array('safari','style','table','save','advhr','advimage','advlink','emotions','iespell',
-      'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste','directionality',
-      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap');
+   protected $defaultPlugins = array('safari','style','table','save','advhr','advimage','advlink','emotions','iespell','tabfocus',
+      'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality',
+      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap', 
+      'imgalign', 'imgpreview' // Cube-CMS plugins
+      );
 
    protected $defaultButtons = array(
       'theme_advanced_buttons1' => array('bold','italic','underline','strikethrough','|','justifyleft','justifycenter',
-         'justifyright','justifyfull','formatselect','styleselect','fontsizeselect','|','preview','fullscreen','template'),
+         'justifyright','justifyfull','formatselect','styleselect','undo','redo','|','preview','fullscreen'/*,'fontsizeselect'*/),
       'theme_advanced_buttons2' => array('cut','copy','paste','pastetext','pasteword','|','search','replace','|','bullist',
-         'numlist','|','outdent','indent','blockquote','|','undo','redo','|','link','unlink','anchor','cleanup','code','|','forecolor','backcolor'),
-      'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap',
-         'emotions','image','imgmap','media','|','ltr','rtl'),
-      'theme_advanced_buttons4' => array()
+         'numlist','|','outdent','indent','blockquote','|','link','unlink','anchor','cleanup','code','|','forecolor','backcolor'),
+      'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap'),
+      'theme_advanced_buttons4' => array('image','imgmap','|','imgal','imgar', '|', 'imgpreview', '|', 'emotions','media','template') // Cube-CMS buttons
    );
 
    private $fileBrowserFunction = 'function vveTinyMCEFileBrowser (field_name, url, type, win) {
@@ -46,6 +51,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
 
 
    public function  __construct() {
+      $this->addStyleFormats();
       parent::__construct();
       $this->settingName = 'advanced';
       // fileBrowser
@@ -61,6 +67,15 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       }
       
       $this->settings = array_merge($this->settings, $this->advSettings);
+   }
+
+   private function addStyleFormats()
+   {
+      if(file_exists(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js')){
+         $this->advSettings['style_formats'] = file_get_contents(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js');
+      } else if(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js'){
+         $this->advSettings['style_formats'] = file_get_contents(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js');
+      }
    }
 }
 ?>
