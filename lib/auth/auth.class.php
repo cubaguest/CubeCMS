@@ -162,7 +162,7 @@ class Auth extends TrObject {
 						self::$login = true;
 						self::$userName = $user->{Model_Users::COLUMN_USERNAME};
 						self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
-						self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
+						self::$userGroupName = $user->gname;
 						self::$userId = $user->{Model_Users::COLUMN_ID};
 						self::$userMail = $user->{Model_Users::COLUMN_MAIL};
 						
@@ -257,7 +257,9 @@ class Auth extends TrObject {
 
    private static function getUser($username) {
       $model = new Model_Users();
-      return $model->joinFK(Model_Users::COLUMN_GROUP_ID)->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))->record();
+      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID, array('gname' => Model_Groups::COLUMN_NAME))
+         ->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))->record();
+      return $rec;
    }
 
    /**
