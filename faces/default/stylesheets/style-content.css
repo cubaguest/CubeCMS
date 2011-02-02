@@ -13,24 +13,21 @@
    padding: 0 0 5px 5px;
 }
 
-/* SOF file extension */
-.file-icon {
-   padding-left: 18px;
-   background-color: transparent;
-   background-position: center left;
-   background-image: url('../../../images/files/txt.gif');
-   background-repeat: no-repeat;
+/* CONTENT sytyl */
+
+body, html {
+/*   font-size: 10px;*/
+   font-family: "Tahoma", "Arial", sans-serif !important;
 }
-.file-pdf {
-   background-image: url('../../../images/files/pdf.gif');
+body.mceContentBody {
+   font-size: 100% !important;
+   font-family: "Tahoma", "Arial", sans-serif !important;
 }
-.file-doc {
-   background-image: url('../../../images/files/doc.gif');
+p,h2,h3,h4 {
+   margin-bottom: 5px;
 }
-.file-xls {
-   background-image: url('../../../images/files/xls.gif');
+
+.note {
+   font-size: x-small;
+   border-top: 1px solid silver;
 }
-.file-docx {
-   background-image: url('../../../images/files/docx.gif');
-}
-/* EOF file extension */

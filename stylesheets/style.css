@@ -17,7 +17,8 @@ table, caption, tbody, tfoot, thead, tr, th, td {
    padding: 0;
    border: 0;
    outline: 0;
-   font-size: 98%;
+/*   font-size: 98%;*/
+   font-size: 100%;
    /*vertical-align: baseline; /* Ověřit v IE */
    background: transparent;
 }
@@ -62,9 +63,7 @@ html,body {
    border: 0px none;
    margin: 0px;
    padding: 0px;
-   font-family: "Tahoma", "Arial", sans-serif !important;
    text-align: left;
-   /*font-size: 62.5% !important;*/
    background: url('../images/backshadow.png') fixed top center white repeat-y;
 }
 
@@ -381,26 +380,6 @@ a.form-link-lang-sel {
 }
 /* EOF sitemap Content */
 
-.note {
-   font-size: xx-small;
-   padding-bottom: 5px;
-}
-
-/* Styl pro vnitrek boxu */
-/* obal text */
-.moduleBox {
-   position: relative;
-   border: 1px solid #0f6572;
-   /*width: 100%;*/
-   margin-bottom: 10px;
-   background-color: white;
-   padding: 7px;
-}
-
-.moduleBox>div {
-
-}
-
 /* scrolovátka */
 .scroll_main {
    text-align: center;
@@ -476,3 +455,20 @@ a.form-link-lang-sel {
    border: 1px solid #FFE7A1;
 }
 /* EOF komentare */
+
+/* SOF file extension */
+.file-icon {
+   padding-left: 18px;
+   background-color: transparent;
+   background-position: center left;
+   background-image: url('../../../images/files/txt.gif');
+   background-repeat: no-repeat;
+}
+.file-pdf {background-image: url('../../../images/files/pdf.gif');}
+.file-doc {background-image: url('../../../images/files/doc.gif');}
+.file-xls {background-image: url('../../../images/files/xls.gif');}
+.file-docx {background-image: url('../../../images/files/docx.gif');}
+.file-zip {background-image: url('../../../images/files/zip.gif');}
+.file-rar {background-image: url('../../../images/files/rar.gif');}
+.file-avi {background-image: url('../../../images/files/avi.gif');}
+/* EOF file extension */
