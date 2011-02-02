@@ -172,7 +172,6 @@ class Session {
          self::$sessionRecord->{Model_Session::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
          self::$sessionRecord->{Model_Session::COLUMN_CREATED} = new DateTime();
       }
-      self::$sessionRecord->{Model_Session::COLUMN_ID_USER} = Auth::getUserId();
       self::$sessionRecord->{Model_Session::COLUMN_UPDATED} = new DateTime();
       $model->save(self::$sessionRecord);
       return true;
