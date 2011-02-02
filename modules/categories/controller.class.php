@@ -100,7 +100,6 @@ class Categories_Controller extends Controller {
          $this->view()->structure = $structure;
       }
       $this->view()->isMainMenu = $this->isMainStruct();
-      Debug::log(Auth::getGroupName());
    }
 
    public function adminMenuController() {
