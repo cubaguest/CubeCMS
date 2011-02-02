@@ -233,14 +233,17 @@ class Filesystem_File_Image extends Filesystem_File {
             $newImage = imagecreatetruecolor($width, $height);
             // Zapnutí alfy, tj průhlednost
             imagealphablending($newImage, false);
-            imagesavealpha($newImage, true);
+            imagesavealpha($newImage, true);//                     d d s s  d       d        s                  s
             if(!imagecopyresampled($newImage, $this->workingImage, 0,0,0,0, $width, $height, $this->imageWidth, $this->imageHeight)) {
                if($this->reportErrors())
                   throw new UnexpectedValueException(_('Chyba při resamplování obrázku'), 3);
                $this->isError = true;
             }
          } else {
-         //			Ořezání obrázku do jedné velikosti
+            // pokud je obrázek v menším rozměru než výsledný, změnšíme ořezávanou plochu
+            if($maxWidth > $this->imageWidth) $maxWidth = $this->imageWidth;
+            if($maxHeight > $this->imageHeight) $maxHeight = $this->imageHeight;
+            //			Ořezání obrázku do jedné velikosti
             $scale = (($maxWidth / $this->imageWidth) >= ($maxHeight / $this->imageHeight)) ? ($maxWidth / $this->imageWidth) : ($maxHeight / $this->imageHeight); // vyber vetsi pomer a zkus to nejak dopasovat...
             $newW = $maxWidth/$scale;    // jak by mel byt zdroj velky (pro poradek :)
             $newH = $maxHeight/$scale;
