@@ -611,7 +611,7 @@ class Articles_Controller extends Controller {
       $fGrpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
       $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet položek na stránku'));
-      $elemScroll->setSubLabel(sprintf($this->tr('Výchozí: %s položek. Pokud je zadána 0 budou vypsány všechny položky'),'.self::DEFAULT_ARTICLES_IN_PAGE.'));
+      $elemScroll->setSubLabel(sprintf($this->tr('Výchozí: %s položek. Pokud je zadána 0 budou vypsány všechny položky'),self::DEFAULT_ARTICLES_IN_PAGE));
       $elemScroll->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemScroll, $fGrpView);
 
@@ -715,7 +715,7 @@ class Articles_Controller extends Controller {
 
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
-         $settings['scroll'] = $form->scroll->getValues();
+         $settings['scroll'] = (int)$form->scroll->getValues();
          $settings[self::PARAM_SORT] = $form->sort->getValues();
          $settings[self::PARAM_DISABLE_LIST] = $form->disableList->getValues();
          $settings['discussion_allow'] = $form->discussion_allow->getValues();
