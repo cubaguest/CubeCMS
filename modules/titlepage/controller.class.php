@@ -662,7 +662,7 @@ class TitlePage_Controller extends Controller {
    /**
     * Metoda pro nastavení modulu
     */
-   public static function settingsController(&$settings,Form &$form) {
+   public function settings(&$settings,Form &$form) {
       $form->addGroup('basic', 'Základní nastavení');
 
       $form->addGroup('images', 'Nastavení obrázků');
@@ -685,10 +685,10 @@ class TitlePage_Controller extends Controller {
 
       $elemCropImg = new Form_Element_Checkbox('image_crop', 'Titulní obrázek ořezat');
       $elemCropImg->setValues(true);
+      $form->addElement($elemCropImg, 'images');
       if(isset($settings['image_crop'])) {
          $form->image_crop->setValues($settings['image_crop']);
       }
-      $form->addElement($elemCropImg, 'images');
 
       if($form->isValid()){
          $settings['image_w'] = $form->image_w->getValues();
