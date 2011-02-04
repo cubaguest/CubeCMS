@@ -147,7 +147,8 @@ class Courses_Controller extends Controller {
                          $addForm->seats->getValues(), $addForm->seatsBlocked->getValues(),
                          $addForm->isNew->getValues(), $addForm->inList->getValues(), $addForm->allowReg->getValues(), $addForm->type->getValues(),
                          $imgName, $addForm->lecturers->getValues(), $addForm->privateUsers->getValues(),
-                         $addForm->allowFeed->getValues());
+                         $addForm->allowFeed->getValues(), $addForm->akredMPSV->getValues(),$addForm->akredMSMT->getValues(),
+                         $addForm->targetGroups->getValues(),$addForm->timeStart->getValues() );
 
          $newCours = $model->getCourseById($idC);
 
@@ -186,6 +187,11 @@ class Courses_Controller extends Controller {
       $editForm->seats->setValues($course->{Courses_Model_Courses::COLUMN_SEATS});
       $editForm->seatsBlocked->setValues($course->{Courses_Model_Courses::COLUMN_SEATS_BLOCKED});
       $editForm->place->setValues($course->{Courses_Model_Courses::COLUMN_PLACE});
+
+      $editForm->akredMPSV->setValues($course->{Courses_Model_Courses::COLUMN_AKREDIT_MPSV});
+      $editForm->akredMSMT->setValues($course->{Courses_Model_Courses::COLUMN_AKREDIT_MSMT});
+      $editForm->targetGroups->setValues($course->{Courses_Model_Courses::COLUMN_TAGRT_GROUPS});
+      $editForm->timeStart->setValues($course->{Courses_Model_Courses::COLUMN_TIME_START});
 
       // načtení lektorů
       $lecturers = $model->getLecturers($course->{Courses_Model_Courses::COLUMN_ID});
@@ -261,6 +267,8 @@ class Courses_Controller extends Controller {
                  $editForm->isNew->getValues(), $editForm->inList->getValues(), $editForm->allowReg->getValues(), $editForm->type->getValues(),
                  $imgName, $editForm->lecturers->getValues(), $editForm->privateUsers->getValues(),
                  $editForm->allowFeed->getValues(),
+                 $editForm->akredMPSV->getValues(),$editForm->akredMSMT->getValues(),
+                 $editForm->targetGroups->getValues(),$editForm->timeStart->getValues(),
                  $course->{Courses_Model_Courses::COLUMN_ID});
 
          $newCours = $model->getCourseById($course->{Courses_Model_Courses::COLUMN_ID});
@@ -306,6 +314,10 @@ class Courses_Controller extends Controller {
       $eDateStart->addFilter(new Form_Filter_DateTimeObj());
       $form->addElement($eDateStart, $fGrpParams);
 
+      $eTimeStart = new Form_Element_Text('timeStart', $this->_('Předpokládaný čas začátku'));
+      $eTimeStart->addValidation(new Form_Validator_Time());
+      $form->addElement($eTimeStart, $fGrpParams);
+
       $ePrice = new Form_Element_Text('price', $this->_('Cena (Kč)'));
       $ePrice->addValidation(new Form_Validator_IsNumber());
       $form->addElement($ePrice, $fGrpParams);
@@ -327,6 +339,9 @@ class Courses_Controller extends Controller {
       $ePlace->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($ePlace, $fGrpParams);
 
+      $itargetGroups = new Form_Element_Text('targetGroups', $this->_('Cílové skupiny'));
+      $form->addElement($itargetGroups, $fGrpParams);
+
       $eLecturers = new Form_Element_Select('lecturers', $this->_('Lektoři'));
       $eLecturers->setMultiple(true);
 
@@ -339,6 +354,12 @@ class Courses_Controller extends Controller {
       }
       $eLecturers->addValidation(new Form_Validator_NotEmpty($this->_('Musí být vybrán alespoň jeden lektor')));
       $form->addElement($eLecturers, $fGrpParams);
+
+      $iAkredMPSV = new Form_Element_Text('akredMPSV', $this->_('Akreditace MPSV'));
+      $form->addElement($iAkredMPSV, $fGrpParams);
+
+      $iAkredMSMT = new Form_Element_Text('akredMSMT', $this->_('Akreditace MŠMT'));
+      $form->addElement($iAkredMSMT, $fGrpParams);
 
       $eAllowReg = new Form_Element_Checkbox('allowReg', $this->_('Povolit registraci'));
       $eAllowReg->setValues(true);

@@ -9,14 +9,17 @@ if($this->edit) {
    $this->addPageTitle($h);
 }
 // donastavení formuláře
-$this->form->textShort->html()->setAttrib('cols', 80)->setAttrib('rows', 10);
-$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
-$this->form->textPrivate->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
-$this->form->name->html()->setAttrib('size', 70);
-$this->form->place->html()->setAttrib('size', 70);
-$this->form->urlkey->html()->setAttrib('size', 70);
-$this->form->metaKeywords->html()->setAttrib('size', 70);
-$this->form->metaDesc->html()->setAttrib('cols', 73)->setAttrib('rows', 3);
+$this->form->textShort->html()->setAttrib('cols', 70)->setAttrib('rows', 10);
+$this->form->text->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
+$this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
+$this->form->name->html()->setAttrib('size', 60);
+$this->form->place->html()->setAttrib('size', 60);
+$this->form->targetGroups->html()->setAttrib('size', 60);
+$this->form->akredMPSV->html()->setAttrib('size', 60);
+$this->form->akredMSMT->html()->setAttrib('size', 60);
+$this->form->urlkey->html()->setAttrib('size', 60);
+$this->form->metaKeywords->html()->setAttrib('size', 60);
+$this->form->metaDesc->html()->setAttrib('cols', 63)->setAttrib('rows', 3);
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIDatepicker();

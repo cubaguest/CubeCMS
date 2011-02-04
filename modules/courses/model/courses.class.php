@@ -36,6 +36,10 @@ class Courses_Model_Courses extends Model_PDO {
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_FEED = 'rss_feed';
    const COLUMN_IN_LIST = 'show_in_list';
+   const COLUMN_AKREDIT_MPSV = 'akreditace_mpsv';
+   const COLUMN_AKREDIT_MSMT = 'akreditace_msmt';
+   const COLUMN_TAGRT_GROUPS = 'target_groups';
+   const COLUMN_TIME_START = 'time_start';
 
    const COLUMN_L_H_C_ID_COURSE = 'id_course';
    const COLUMN_L_H_C_ID_LECTURER = 'id_lecturer';
@@ -52,7 +56,7 @@ class Courses_Model_Courses extends Model_PDO {
     */
    public function saveCourse($name, $textShort, $text, $textPrivate, $urlKey, $desc, $keywords,
       DateTime $dateStart, $dateStop, $price, $hours, $place, $seats, $seatsBlocked,
-           $isNew, $inList, $allowReg, $type, $image, $idLecturers, $idUsers, $isFeed, $id = null) {
+           $isNew, $inList, $allowReg, $type, $image, $idLecturers, $idUsers, $isFeed, $akredMpsv, $akredMsmt, $targetGroups, $timeStart, $id = null) {
       // generování unikátního klíče
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID ,$id);
@@ -69,7 +73,9 @@ class Courses_Model_Courses extends Model_PDO {
                  .self::COLUMN_SEATS."= :seats, ".self::COLUMN_SEATS_BLOCKED."= :seatsBlocked, "
                  .self::COLUMN_IS_NEW."= :isNew, ".self::COLUMN_IN_LIST."= :isShowed, ".self::COLUMN_ALLOW_REG."= :allowReg, "
                  .self::COLUMN_TYPE."= :type, ".self::COLUMN_FEED."= :isFeed, ".self::COLUMN_TEXT_PRIVATE."= :textPrivate, "
-                 .self::COLUMN_IMAGE."= :image, ".self::COLUMN_ID_USER."= :idUser"
+                 .self::COLUMN_IMAGE."= :image, ".self::COLUMN_ID_USER."= :idUser,"
+                 .self::COLUMN_AKREDIT_MPSV."= :akredmpsv, ".self::COLUMN_AKREDIT_MSMT."= :akredmsmt,"
+                 .self::COLUMN_TAGRT_GROUPS."= :targetgroups, ".self::COLUMN_TIME_START."= :timestart"
                   ." WHERE ".self::COLUMN_ID." = :idc");
          $dbst->bindParam(':idc', $id, PDO::PARAM_INT);
       } else {
@@ -81,10 +87,12 @@ class Courses_Model_Courses extends Model_PDO {
                  .self::COLUMN_PRICE.",". self::COLUMN_PLACE.",". self::COLUMN_HOURS_LEN.","
                  .self::COLUMN_SEATS.",". self::COLUMN_SEATS_BLOCKED.","
                  .self::COLUMN_IS_NEW.",".self::COLUMN_IN_LIST.",". self::COLUMN_ALLOW_REG.",". self::COLUMN_TYPE.",". self::COLUMN_IMAGE.","
-                 .self::COLUMN_ID_USER.", ".self::COLUMN_FEED.")"
+                 .self::COLUMN_ID_USER.", ".self::COLUMN_FEED.","
+                 .self::COLUMN_AKREDIT_MPSV.",". self::COLUMN_AKREDIT_MSMT.",". self::COLUMN_TAGRT_GROUPS.",". self::COLUMN_TIME_START.")"
                  ." VALUES (:name, :textShort, :text, :textPrivate, :textClear, :urlkey, :metaDesc, :keywords,"
                  ." :dateStart, :dateStop, :price, :place, :hoursLen, :seats,"
-                 ." :seatsBlocked, :isNew, :isShowed, :allowReg, :type, :image, :idUser, :isFeed".")");
+                 ." :seatsBlocked, :isNew, :isShowed, :allowReg, :type, :image, :idUser, :isFeed,"
+                 ." :akredmpsv, :akredmsmt, :targetgroups, :timestart)");
       }
       $dbst->bindValue(':name', $name, PDO::PARAM_STR);
       $dbst->bindValue(':textShort', $textShort, PDO::PARAM_STR);
@@ -113,6 +121,11 @@ class Courses_Model_Courses extends Model_PDO {
       $dbst->bindValue(':idUser', Auth::getUserId(), PDO::PARAM_INT);
       $dbst->bindValue(':isFeed', (bool)$isFeed, PDO::PARAM_INT);
 
+      $dbst->bindValue(':akredmpsv', $akredMpsv, PDO::PARAM_STR|PDO::PARAM_NULL);
+      $dbst->bindValue(':akredmsmt', $akredMsmt, PDO::PARAM_STR|PDO::PARAM_NULL);
+      $dbst->bindValue(':targetgroups', $targetGroups, PDO::PARAM_STR|PDO::PARAM_NULL);
+      $dbst->bindValue(':timestart', $timeStart, PDO::PARAM_STR|PDO::PARAM_NULL);
+
       $dbst->execute();
 
       if($id == null){
@@ -135,7 +148,7 @@ class Courses_Model_Courses extends Model_PDO {
       // uložení místa
       $modlePlaces = new Courses_Model_Places();
       $modlePlaces->savePlace($place);
-      
+
       return $id;
    }
 
@@ -224,12 +237,12 @@ class Courses_Model_Courses extends Model_PDO {
     */
    public function getCourses($onlyVisible = true, $fromRow = 0, $numRows = 500, $type = null) {
       $dbc = new Db_PDO();
-      
+
       $where = null;
       if($onlyVisible == true) $where .= " AND ".self::COLUMN_IN_LIST." = 1";
       if($type != null) $where .= ' AND '.self::COLUMN_TYPE.' = :type';
-      
-      
+
+
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_DELETED." = 0".$where
                       ." ORDER BY ".self::COLUMN_DATE_START." ASC"
@@ -237,7 +250,7 @@ class Courses_Model_Courses extends Model_PDO {
       $dbst->bindValue(':fromRow', $fromRow, PDO::PARAM_INT);
       $dbst->bindValue(':numRows', $numRows, PDO::PARAM_INT);
       if($type != null) $dbst->bindValue(':type', $type, PDO::PARAM_STR);
-      
+
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetchAll();
@@ -268,11 +281,11 @@ class Courses_Model_Courses extends Model_PDO {
     */
    public function getCoursesFromDate(DateTime $date, $onlyVisible = true, $fromRow = 0, $numRows = 500, $type = null) {
       $dbc = new Db_PDO();
-      
+
       $where = null;
       if($onlyVisible == true) $where .= " AND ".self::COLUMN_IN_LIST." = 1";
       if($type != null) $where .= ' AND '.self::COLUMN_TYPE.' = :type';
-      
+
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_DELETED." = 0 AND ".self::COLUMN_DATE_START." >= :dates".$where
               ." ORDER BY ".self::COLUMN_DATE_START." ASC"
@@ -281,7 +294,7 @@ class Courses_Model_Courses extends Model_PDO {
       $dbst->bindValue(':fromRow', (int)$fromRow, PDO::PARAM_INT);
       $dbst->bindValue(':numRows', (int)$numRows, PDO::PARAM_INT);
       if($type != null) $dbst->bindValue(':type', $type, PDO::PARAM_STR);
-      
+
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetchAll();

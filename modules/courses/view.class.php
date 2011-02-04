@@ -67,8 +67,8 @@ class Courses_View extends View {
    public function addCourseView() {
       $this->template()->addTplFile("edit.phtml");
       $this->addTinyMCE($this->form, 'textShort', 'simple', 'mceEditorSimple');
-      $this->addTinyMCE($this->form, 'text', 'full');
-      $this->addTinyMCE($this->form, 'textPrivate', 'full');
+      $this->addTinyMCE($this->form, 'text', 'advanced');
+      $this->addTinyMCE($this->form, 'textPrivate', 'advanced');
    }
 
    /**

@@ -51,43 +51,37 @@ switch ($this->course->{Courses_Model_Courses::COLUMN_TYPE}) {
          }
          ?>
       </li>
-      <li>
-         <?
-         echo '<span class="course-param">'.$this->_('Místo konání') . ":</span>";
-         echo $this->course->{Courses_Model_Courses::COLUMN_PLACE};
-         ?>
-      </li>
-      <?
-         if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != 0) {
+      <?if($this->course->{Courses_Model_Courses::COLUMN_TIME_START} != null){?>
+      <li><? echo '<span class="course-param">'.$this->_('Předpokládaný čas začátku') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TIME_START}; ?></li>
+      <?}?>
+      <li><?echo '<span class="course-param">'.$this->_('Místo konání') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_PLACE};?></li>
+      <?if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != 0) {
             echo '<li>'
             . '<span class="course-param">'. $this->_('Délka ').$type . ":</span>"
             . $this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} . '&nbsp;' . $this->_('hodin')
             . '</li>';
-         }
-      ?>
-      <?
-         if ($this->course->{Courses_Model_Courses::COLUMN_PRICE} != 0) {
+      }
+      if ($this->course->{Courses_Model_Courses::COLUMN_PRICE} != 0) {
             echo '<li>'
             . '<span class="course-param">'. $this->_('Cena ').$type . ":</span>"
             . number_format($this->course->{Courses_Model_Courses::COLUMN_PRICE},0,',',' ') . '&nbsp;' . $this->_('Kč')
             . '</li>';
-         }
-      if($this->course->{Courses_Model_Courses::COLUMN_SEATS} != 0){
-         ?>
-      <li>
-         <?
-         echo '<span class="course-param">'.$this->_('Kapacita') . ":</span>";
-         echo $this->course->{Courses_Model_Courses::COLUMN_SEATS} . '&nbsp;' . $this->_('míst');
-         ?>
-      </li>
-      <li>
-         <?
-         echo '<span class="course-param">'.$this->_('Volných') . ":</span>";
-         echo $this->freeSeats . '&nbsp;' . $this->_('míst');
-         ?>
-      </li>
-      <?
       }
+      if($this->course->{Courses_Model_Courses::COLUMN_SEATS} != 0){?>
+      <li><?echo '<span class="course-param">'.$this->_('Kapacita') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_SEATS} . '&nbsp;' . $this->_('míst');?></li>
+      <li><?echo '<span class="course-param">'.$this->_('Volných') . ":</span>" . $this->freeSeats . '&nbsp;' . $this->_('míst');?></li>
+      <?}
+      // akreditace
+      if($this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MPSV} != null){?>
+      <li><? echo '<span class="course-param">'.$this->_('Akreditace MPSV') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MPSV}; ?></li>
+      <?}
+      if($this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MSMT} != null){?>
+      <li><? echo '<span class="course-param">'.$this->_('Akreditace MŠMT') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MSMT}; ?></li>
+      <?}
+      if($this->course->{Courses_Model_Courses::COLUMN_TAGRT_GROUPS} != null){?>
+      <li><? echo '<span class="course-param">'.$this->_('Cílové skupiny') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TAGRT_GROUPS}; ?></li>
+      <?}
+
       ?>
       </ul>
       <br />
