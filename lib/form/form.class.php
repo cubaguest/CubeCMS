@@ -72,7 +72,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    private $elementCheckForm = null;
 
    private $elementToken = null;
-
+   private $tokenIsOk = false;
 
    private $submitElement = null;
 
@@ -88,8 +88,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->setSendMethod();
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
-      $this->elementToken = new Form_Element_Hidden('_'.$prefix.'_token');
-      
+      $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
    }
 
    public function  __toString() {
@@ -102,7 +101,6 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    private function createToken()
    {
       $token = Token::getToken();
-      Debug::log($token);
       $this->elementToken->setValues($token);
    }
 
@@ -367,13 +365,14 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $this->isSend();
       }
       // kontrola tokenu
-      if($this->elementToken->isSend()){
+      if($this->tokenIsOk != true AND $this->elementToken->isSend()){
          $this->elementToken->populate();
          if(!Token::check($this->elementToken->getValues())){ // neodpovídající token
-            throw new UnexpectedValueException($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));
-//            AppCore::getUserErrors()->addMessage($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));
+//            throw new UnexpectedValueException($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));
+            AppCore::getUserErrors()->addMessage($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));
             return false;
          }
+         $this->tokenIsOk = true;
       }
       if($this->isSend == true){
          $this->validate();
