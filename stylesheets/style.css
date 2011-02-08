@@ -170,105 +170,113 @@ span[title] {
 }
 
 /* formulařové prvky */
-/* tabulka formuláře */
-fieldset, .formTable {
-   background-color: #c7e0f9;
-   width: 96%;
-   margin: 5px;
-   border: 1px solid gray;
-   border-left: 1px solid gray;
-}
-
-fieldset p.formGroupText {
-   padding: 5px;
-}
-
-fieldset legend {
-   padding: 2px 5px;
-   border: 1px solid gray;
-   border-bottom: none;
-   border-top-left-radius: 7px;
-   -moz-border-radius-topleft: 7px;
-   border-top-right-radius: 7px;
-   -moz-border-radius-topright: 7px;
-    background: transparent url('../images/legend_back.png') top left repeat-x;
-    font-weight: bold;
-    margin-left: -1px;
-}
-
-#bodywrap input, button, textarea, select {
-   border: 1px solid #555555;
-   background-color: #e2e2e2;
+input, button, textarea, select, a.form-button {
+   border: 1px solid #bbbbbb;
+   background-color: #ffffff;
+   padding: 1px;
    font-size: small;
-   font-family: "Tahoma", "Arial", sans-serif;
 }
-#bodywrap input:focus, textarea:focus, input.form-required:focus, textarea.form-required:focus {
-   background-color: whitesmoke;
-}
-
-#bodywrap input[type="image"] {
+input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
    background-color:transparent;
 }
-
-#bodywrap input[type="submit"], button[type="submit"], input[type="button"] {
-   background-color: white;
-   padding: 0 3px;
+input[type="submit"], input[type="reset"], input[type="button"], button[type="submit"], input[type="button"], a.form-button {
+   -moz-border-radius: 3px;
+   border-radius: 3px;
+   padding: 1px 3px;
+   color: black;
 }
-#bodywrap input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover {
-   background-color: green;
-   color: white;
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, button:hover, a.form-button:hover {
+   background: #fff7d4 url('../images/forms/buttons_back.gif') 0 0 repeat-x;
+   text-decoration: none;
 }
-
-#bodywrap input[type="reset"]:hover, .delete_form input[type="submit"]:hover, #bodywrap input.button-cancel:hover,
-.delete_button button[type="submit"]:hover, input.button-delete:hover  {
-   background-color: #c1272d;
-   color: white;
+input[type="submit"]:hover, button[type="submit"]:hover {
+   background-color: #a7fead;
+   background-position: 0 -20px;
 }
-
-.form-required {
-   color:maroon;
+input.button-cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover {
+   background-color: #f57676;
+   background-position: 0 -40px;
 }
-
-#bodywrap input.form-required, textarea.form-required {
+input.form-required, textarea.form-required {
    background-position: right top;
    background-image: url('../images/form_required.png');
    background-repeat: no-repeat;
-   color: black;
 }
-
-#bodywrap label.form-error {
+label.form-error {
    color:red;
 }
-
-#bodywrap input.form-error, textarea.form-error {
+input.form-error, textarea.form-error {
    background-color: #f4d0d0;
 }
 
-a.form-link-lang {
-   color: #999999;
+/* tabulka formuláře */
+form fieldset {
+   position: relative;
+   width: 100%;
+   float: left;
+   clear: both;
+   background-color: #eeeeee;
+   border: 1px solid #bbbbbb;
+}
+form fieldset p {
+   padding: 0; margin: 0;
+}
+form fieldset.fieldset-alt table.form-table {
+   margin-top: 26px;
+}
+form fieldset legend {
+   background: transparent url('../images/forms/legend_back.gif') top left repeat-x;
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+}
+*+html form fieldset legend { /* IE 7 hack */
+   left: -7px;
+}
+form fieldset legend span {
+   font-weight: bold;
+   float: left;
+   display: block;
+   padding: 5px 10px 5px 5px;
+   font-size: 14px;
+}
+form fieldset legend span.form-legend-text {
+   font-weight: normal;
+   font-size: 10px;
+   padding: 7px 0 0 0;
+}
+form fieldset .form-table {
+   table-layout:fixed;
+   width: 100%;
+}
+form .form-table td, form .form-table-group td, form .form-table th, form .form-table-group th {
+   padding: 3px;
+   vertical-align: top;
+}
+form .form-table td table td { /* tinymce broken layout */
+   padding: 0;
 }
 
-a.form-link-lang-sel {
-   color: black;
-   font-weight:bold;
-   background-color:#cccccc;
-   border-style: solid;
-   border-width: 1px 1px 0 1px;
-   border-color: #666666;
-   padding: 0 2px;
+form th.form-labels {
+   width: 85px;
+   text-align:left;
+   font-size: 12px;
+   padding: 5px 0 5px 5px;
+   word-wrap: break-word;
 }
-
-.formTable td, .formTableGroup td, .formTable th, .formTableGroup th {
-   padding: 5px;
+form .form-table p.form-sub-label, form .form-table p.form-box-validations {
+   font-size: x-small;
 }
-
-.formTable th.formLabels, .formTableGroup th.formLabels {
-   width: 100px;
-   text-align:right;
+.form-required {
+   color:maroon;
 }
-
-.formTable td.formControlls {
+input[type="text"], input[type="password"], form .form-table .form-element-short {
+   width: 200px;
+}
+textarea, form .form-table .form-element-long {
+   width: 450px;
 }
 
 /* odkaz zpět */

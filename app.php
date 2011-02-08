@@ -689,9 +689,8 @@ class AppCore extends TrObject {
          $controller = new $controllerClassName(self::getCategory(), $routes);
          unset ($routes);
          $controller->runCtrl();
-         $this->coreTpl = new Template_Core();
          // přiřazení šablony do výstupu
-         $this->coreTpl->module = $controller->_getTemplateObj();
+         $this->getCoreTpl()->module = $controller->_getTemplateObj();
       } catch (Exception $e) {
          new CoreErrors($e);
       }
@@ -789,8 +788,7 @@ class AppCore extends TrObject {
                $controller->_getTemplateObj()->renderTemplate();
             } else {
                // render při změně indexu
-               $this->coreTpl = new Template_Core();
-               $this->coreTpl->module = $controller->_getTemplateObj();
+               $this->getCoreTpl()->module = $controller->_getTemplateObj();
                $this->renderTemplate();
             }
          } else {
@@ -915,8 +913,12 @@ class AppCore extends TrObject {
       if(method_exists($ctrl, $viewM) AND self::$urlRequest->getOutputType() != 'html'){
          $ctrl->{$viewM}();
       } else {
-         $ctrl->runView();
-         $this->getCoreTpl()->module = $ctrl->template();
+          $ctrl->runView();
+          if(!AppCore::getUrlRequest()->isXHRRequest()){
+            $this->getCoreTpl()->module = $ctrl->template();
+          } else {
+            $ctrl->template()->renderTemplate();
+          }
       }
    }
 

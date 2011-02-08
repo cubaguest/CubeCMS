@@ -114,45 +114,44 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $decorator = new Form_Decorator();
       }
       $html = clone $this->html();
+      $this->createToken();
+      $html->addContent(new Html_Element('p', $this->elementCheckForm->controll().(string)$this->elementToken->controll()));
 
-         $formContent = null;
+      $prevGrp = null;
       $d = clone $decorator;
-      foreach ($this->elementsGroups as $key => $grp) {
+      $grps = $this->elementsGroups;
+      while (list($key, $grp) = each($grps)) {
+//      foreach ($this->elementsGroups as $key => $grp) { // nelze použít protože nejde využít funkcí next/prev na poli
          // pokud element není ve skupině
          if(!is_array($grp)) {
+            $next = true;
+            // zařazení elementu do skupiny
             $d->addElement($this->elements[$key]);
+            // aktuální prvek z pole - curent dává následující, ne na který se ukazuje
+            $next = current($grps);
+            // pokud je další pole nabo není element, ukončíme skupinu
+            if($next === false OR is_array($next)){ // konec nebo další je skupina
+               $html->addContent((string)$d);
+               $d = clone $decorator;
+            }
          }
          // pokud patří do skupiny
          else {
-            if(empty ($grp['elements'])) {
-               continue;
+            // pokud je skupina prázdná
+            if(!empty ($grp['elements'])) {
+            // render elementů do skupiny
+               foreach ($grp['elements'] as $key2 => $elemName) {
+                  $d->addElement($this->elements[$key2]);
+               }
+               $d->setGroupName($grp['label']);
+               $d->setGroupText($grp['text']);
+
+               $html->addContent((string)$d);
+               $d = clone $decorator;
             };
-            $formContent .= $d->render();
-            $d = clone $decorator;
-            $groupCnt = null;
-            foreach ($grp['elements'] as $key2 => $elemName) {
-               $d->addElement($this->elements[$key2]);
-            }
-            $filedset = new Html_Element('fieldset');
-            if($grp['label'] != null) {
-               $filedset->addContent(new Html_Element('legend', $grp['label']));
-            }
-            if($grp['text'] != null) {
-               $p = new Html_Element('p', $grp['text']);
-               $p->addClass('formGroupText');
-               $filedset->addContent($p);
-            }
-            $filedset->addContent($d->render(true));
-            $formContent .= $filedset;
-            $d = clone $decorator;
          }
       }
-      $formContent .= $d->render();
-      $this->createToken();
-      $html->addContent(new Html_Element('p', $this->elementCheckForm->controll().(string)$this->elementToken->controll()));
-      $html->addContent($formContent);
       $html->addContent($this->scripts());
-
       return (string)$html;
    }
 
@@ -163,8 +162,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $script = null;
       if($this->formIsMultilang) {
          Template::addJsPlugin(new JsPlugin_JQuery());
-         Template::addJS(Url_Request::getBaseWebDir().'jscripts/formswitchlangs.js');
-         $script = new Html_Element_Script('formShowOnlyLang(\''.Locales::getLang().'\');');
+         Template::addJS(Url_Request::getBaseWebDir().'jscripts/enginehelpers.js');
+//         $script = new Html_Element_Script('formShowOnlyLang(\''.Locales::getLang().'\');');
+//         $script = null;
       }
       return $script;
    }

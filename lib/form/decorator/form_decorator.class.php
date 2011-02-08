@@ -1,32 +1,36 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- * Třída pro tvorbu dekorátoru formuláře
+ * Třída dekorátoru formuláře (tato dřída upsahuje implementaci dekorátoru pomocí
+ * tabulek. Jejím děděním lze dekorátor upravit)
  *
- * @author cuba
+ * @copyright  	Copyright (c) 2011 Jakub Matas
+ * @version    	$Id: $ VVE 7.1 $Revision: $
+ * @author        $Author: $ $Date: $
+ *                $LastChangedBy: $ $LastChangedDate: $
+ * @abstract      Třída dekorátoru pro formulář
  */
 class Form_Decorator {
-   private $decoration = array('wrap' => 'table',
-   'wrapclass' => 'formTable',
-   'wrapgroupclass' => 'formTableGroup',
-   'rowwrap' => 'tr',
-   'labelwrap' => 'th',
-   'labelwrapclass' => 'formLabels',
-   'sublabelclass' => 'formSubLabels',
-   'ctrlwrap' => 'td',
-   'ctrlwrapclass' => 'formControlls',
-   'newline' => false,
-   'labelcontent' => array('label'),
-   'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations', 'subLabel'),
-   'labelwrapwidth' => 100,
-   'ctrlwrapwidth' => 400,
-   'hiddenClass' => 'hidden');
 
+   private $decoration = array('wrap' => 'table',
+      'wrapclass' => 'form-table',
+      'wrapgroupclass' => 'form-table form-table-group',
+      'grouplabelclass' => 'form-group-text',
+      'rowwrap' => 'tr',
+      'labelwrap' => 'th',
+      'labelwrapclass' => 'form-labels',
+      'sublabelclass' => 'form-sub-label',
+      'ctrlwrap' => 'td',
+      'ctrlwrapclass' => 'form-controlls',
+      'newline' => false,
+      'labelcontent' => array('label'),
+      'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations', 'subLabel'), // název metod pro render
+      'labelwrapwidth' => 100,
+      'ctrlwrapwidth' => 400,
+      'hiddenClass' => 'hidden');
    private $content = null;
+   private $groupText = null;
+   private $groupName = null;
 
    /**
     * Konstruktor vytvoří obal
@@ -42,16 +46,18 @@ class Form_Decorator {
     * </ul>
     * </p>
     */
-   public function  __construct($decoration = null) {
-      if($decoration != null) {
+   public function __construct($decoration = null)
+   {
+      if ($decoration != null) {
          $this->decoration = array_merge($this->decoration, $decoration);
       }
    }
 
-   public function addElement(Form_Element $element) {
+   public function addElement(Form_Element $element)
+   {
       $row = new Html_Element($this->decoration['rowwrap']);
 
-      if($element instanceof Form_Element_Hidden) {
+      if ($element instanceof Form_Element_Hidden) {
          $row->addClass($this->decoration['hiddenClass']);
       }
 
@@ -65,16 +71,14 @@ class Form_Decorator {
 
       $cellCtrl = new Html_Element($this->decoration['ctrlwrap']);
       // sublabel
-      if(!$element->htmlSubLabel()->isEmpty()) {
-         $element->htmlSubLabel()->addClass($this->decoration['sublabelclass']);
-      }
+      $element->htmlSubLabel()->addClass($this->decoration['sublabelclass']);
+
       foreach ($this->decoration['ctrlcontent'] as $type) {
          $cellCtrl->addContent($element->{$type}());
       }
       // skripty pro práci s prvky
       $cellCtrl->addContent($element->scripts());
       $cellCtrl->addClass($this->decoration['ctrlwrapclass']);
-      //      $cellCtrl->setAttrib('width', $this->decoration['ctrlwrapwidth']);
       $row->addContent($cellCtrl);
       $this->content .= $row;
    }
@@ -83,18 +87,59 @@ class Form_Decorator {
     * Metoda vygeneruje řádek pro formulář
     * @return Html_Element -- objekt Html_elementu
     */
-   public function render($createGroupClass = false) {
-      if($this->content != null) {
+   public function render($createGroupClass = false)
+   {
+      if ($this->content != null) {
          $dec = new Html_Element($this->decoration['wrap'], $this->content);
-         if($createGroupClass) {
+         if ($createGroupClass) {
             $dec->addClass($this->decoration['wrapgroupclass']);
          } else {
             $dec->addClass($this->decoration['wrapclass']);
          }
-         return $dec;
+         $field = new Html_Element('fieldset');
+         if ($this->groupName != null) {
+            $field->addClass('fieldset-alt');
+            $name = new Html_Element('span', $this->groupName);
+            $text = new Html_Element('span', $this->groupText);
+            $field->addContent(new Html_Element('legend', $name->addClass('form-legend-name') . $text->addClass('form-legend-text')));
+         }
+         $field->addContent($dec);
+         return (string) $field;
       } else {
          return null;
       }
    }
+
+   /**
+    * Metoda nastaví název skupiny
+    * @param string $name -- tag legend
+    * @return Form_Decorator 
+    */
+   public function setGroupName($name)
+   {
+      $this->groupName = $name;
+      return $this;
+   }
+
+   /**
+    * Metoda nastaví popisek skupiny
+    * @param string $text -- popisek uvnitře fieldsetu
+    * @return Form_Decorator
+    */
+   public function setGroupText($text)
+   {
+      $this->groupText = $text;
+      return $this;
+   }
+
+   /**
+    * Magická metoda vrátí obsah dekorátoru jako řetězec
+    * @return string (nejčastěji fieldset)
+    */
+   public function __toString()
+   {
+      return $this->render();
+   }
+
 }
 ?>

@@ -130,11 +130,12 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    protected $renderedId = 1;
 
    /**
-    * Název css třídy, která se přidává ke chybnému elementu
-    * @var string
+    * Název css tříd, která se přidávají k elementům
+    * @var array
     */
    public static $cssClasses = array('error' => 'form-error',
                                      'validations' => 'form-box-validations',
+                                     'langLinkContainer' => 'form-link-lang-container',
                                      'langLink' => 'form-link-lang',
                                      'langLinkSel' => 'form-link-lang-sel',
                                      'elemContainer' => 'form-elem-container');
@@ -607,6 +608,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if($this->isMultilang() AND count($this->langs) > 1) {
          $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
+//            $a = new Html_Element('a', new Html_Element('span', $langLabel));
             $a = new Html_Element('a', $langLabel);
             $a->setAttrib('href', "#");
             $a->addClass(self::$cssClasses['langLink']);
@@ -615,13 +617,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             } else {
                $a->setAttrib('id', $this->getName()."_lang_link_".$langKey);
             }
-//            $a->addClass("elem_lang_link");
-            $a->setAttrib('onclick', "return formElemSwitchLang(this,'".$langKey."');");
+            $a->setAttrib('lang', $langKey);
+//            $a->setAttrib('onclick', "return formElemSwitchLang(this,'".$langKey."');");
             $a->setAttrib('title', $langLabel);
             $a->setAttrib('lang', $langKey);
             $langButtons .= $a;
          }
-         return $langButtons.(new Html_Element('br'));
+         $container = new Html_Element('p', $langButtons);
+         return $container->addClass(self::$cssClasses['langLinkContainer']);
       }
       return null;
    }

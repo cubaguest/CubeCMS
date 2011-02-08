@@ -1,7 +1,7 @@
-/* jen pro test */
+/* jen pro pořádek */
 body, html {padding: 0; margin: 0;}
 
-/* BASIC wrapper */
+/* BASIC ADMIN MENU wrapper */
 #adminMenuWrapper {
    background-color: #dadada;
    position: fixed;
@@ -21,7 +21,7 @@ body, html {padding: 0; margin: 0;}
    margin: 0;
    padding: 0;
 }
-/* LEVEL ONE */
+/* ADMIN MENU LEVEL ONE */
 ul.dropdown, ul.dropdown ul {
    position: relative;
    list-style: none;
@@ -42,7 +42,7 @@ ul.dropdown li a { display: block; padding: 2px 8px; border-right: 1px solid #33
 ul.dropdown li:last-child a { border-right: none; } /* Doesn't work in IE */
 ul.dropdown li.hover, ul.dropdown li:hover { background: #F3D673; color: black; position: relative; }
 ul.dropdown li.hover a { color: black; }
-/* LEVEL TWO */
+/* ADMIN MENU LEVEL TWO */
 ul.dropdown ul {
    width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0;
    border: 1px solid gray;
@@ -57,7 +57,6 @@ ul.dropdown ul li {
    border-bottom: 1px solid silver;
    float: none;
    /* IE 7 */
-   /*display: inline; width: 100%;*/
 }
 
 /* IE 6 & 7 Needs Inline Block */
@@ -66,7 +65,7 @@ ul.dropdown ul li a { border-right: none; width: 90%; display: inline-block; }
 ul.dropdown ul ul { left: 100%; top: 0; }
 ul.dropdown li:hover > ul { visibility: visible; }
 
-/*Pro tinyMCE*/
+/* For tinyMCE - max width*/
 .textarea_tinymce {
    width: 100%;
 }
@@ -78,28 +77,23 @@ ul.dropdown li:hover > ul { visibility: visible; }
    position: absolute;
    top: 0px;
    right: 0px;
-/*   width: auto;*/
    height: auto;
-/*   padding: 2px 2px 2px 2px;*/
    background-repeat: no-repeat;
-/*   opacity: 0.3;*/
    display: none;
    z-index: 3;
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;
    border-radius: 4px;
 }
-
 .toolbox form p {
    padding: 0 !important;
    margin: 0 !important
 }
-.toolbox-tool input {
+.toolbox-tool input[type="submit"] {
    background:none;
    border:none !important;
    cursor: pointer;
    text-align:left;
-/*   padding: 0 0 0 16px;*/
    background-repeat: no-repeat;
 }
 .toolbox form input[type="hidden"] {
@@ -109,18 +103,14 @@ ul.dropdown li:hover > ul { visibility: visible; }
    vertical-align:bottom;
 }
 .toolbox form input[type="submit"]:hover {
-/*   background:none;*/
-/*   background-repeat: no-repeat;*/
+   color: black;
 }
-
 a.toolbox-button {
    display: block;
    position: absolute;
    top: 1px;
    right: 1px;
-/*   background-color: #F7E300;*/
    border-width: 1px;
-/*   opacity: 0.7;*/
    overflow: hidden;
    line-height: 5px;
 }
@@ -135,25 +125,49 @@ a.toolbox-button img {
 .toolbox-tool img {
    vertical-align:-2px;
 }
-/*.toolbox-tool-hover {
-   background-color: orange;
-   color: white;
-}*/
-
 .toolbox-active-content {
    background-color: #e3e3e3;
 }
 /* EOF ToolBox Panel s editací */
-/* SOF ToolBox Button */
-
-
-/* EOF ToolBox Button */
 
 /* Jazykové taby */
+p.form-link-lang-container {
+   margin: 0;
+   padding: 2px 3px;
+   padding-right: 0;
+   border: 1px solid #bbbbbb;
+   border-bottom: 0px solid transparent;
+   float: left;
+   background-color: #eeeeee;
+}
+.form-elem-container { /*form-link-lang-container need clearfix */
+   clear: left;
+}
+a.form-link-lang {
+   color: black;
+   font-size: 12px;
+   border: 1px solid #bbbbbb;
+   padding: 3px;
+   margin-right: 3px;
+   display: block;
+   float: left;
+   background: transparent url('../images/forms/langs_back.gif') 0 0 repeat-x;
+   -moz-border-radius: 2px;
+   border-radius: 2px;
+}
+a.form-link-lang:hover, a.form-link-lang-sel:hover, a.form-link-lang:focus, a.form-link-lang-sel:focus {
+   background-position: 0 -20px;
+   text-decoration: none;
+}
+
+a.form-link-lang-sel {
+   background-position: 0 -40px;
+}
+
 /* TABS content */
-.ui-tabs-hide { display: none; }
-.ui-tabs-selected { background-color: white; }
-ul.langMenu {margin-bottom:2px;}
+/*.ui-tabs-hide { display: none; }*/
+/*.ui-tabs-selected { background-color: white; }*/
+/*ul.langMenu {margin-bottom:2px;}
 ul.langMenu li {
    display: inline;
    border-width: 1px 1px 0 1px;
@@ -163,25 +177,22 @@ ul.langMenu li {
 }
 ul.langMenu li a img {
    padding-right: 3px;
-}
+}*/
 
-ul.ui-tabs-panel {
+/*ul.ui-tabs-panel {
    margin-bottom: 0px;
    border-width: 1px;
    border-color: black;
    border-style: none;
-}
+}*/
 /* EOF Jazykové taby */
 /* tabulky */
-.valuesTable {
+/*.valuesTable {
    background-color: white;
    border: 1px solid gray;
-}
+}*/
 /* donastavení kontentu při editaci */
 .main-content-text, .main-content-images, .main-content-list {
-/*  min-height: 40px;
-  height:auto !important;
-  height:40px;*/
    border-width: 0;
 } /* text v hlavním obsahu */
 

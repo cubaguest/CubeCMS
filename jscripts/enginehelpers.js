@@ -81,6 +81,29 @@ function vveLoadImage(src, callback){
 }
 
 $(document).ready(function(){
+   // select first language
+   $('.form-link-lang-container a:first-child').trigger('click', [false]);
+   // when language is changed
+   $('.form-link-lang-container a.form-link-lang').live('click',function(event, focus){
+      if(typeof focus == 'undefined') focus = true;
+      var lang = this.lang;
+      $(this).parent('p').find('a').removeClass('form-link-lang-sel');
+      $(this).addClass('form-link-lang-sel');
+      // vybereme prvek, který obsahuje inputy
+      var $container = $(this).closest('*:has(p[lang])');
+      $('p[lang]', $container).hide();
+      var p = $('p[lang="'+lang+'"]', $container).show();
+      if(focus) {
+         p.find('input,textarea,select').focus();
+      }
+      // zobrazení popisku k elementu
+      $container = $(this).closest('*:has(label[lang])')[0];
+      $('label[lang]', $container).hide();
+      $('label[lang="'+lang+'"]', $container).show();
+      return false;
+   });
+
+
    $("div.toolbox").parent('div').css({position: 'relative'});
    $(".toolbox-tool").hover(function(){
       $(this).addClass('ui-state-highlight');
