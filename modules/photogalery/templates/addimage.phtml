@@ -1,14 +1,19 @@
 <div class="main-content-form-edit">
-   <h2><?=$this->tr('Přidání obrázků')?></h2>
-   <div class="swfupload-control">
-      <strong><?=$this->tr('Obrázky')?>:</strong>&nbsp;<span id="spanButtonPlaceholder"></span>&nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /><br />
-      <p class="note"><?= $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
-      může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
-      Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
-      <span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span>
-      <ol id="upload-files-log"></ol>
-
-   </div>
+   <form action="<?=$this->link()?>" method="post">
+      <fieldset class="fieldset-alt">
+         <legend><span><?=$this->tr('Přidání obrázků')?></span></legend>
+         <br />
+         <br />
+         <div class="swfupload-control">
+         <p><strong><?=$this->tr('Obrázky')?>:</strong>&nbsp;<span id="spanButtonPlaceholder"></span>&nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /><br /></p>
+         <p class="note"><?= $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
+         může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
+         Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
+         <p><span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span></p>
+         <ol id="upload-files-log"></ol>
+      </div>
+      </fieldset>
+   </form>
 </div>
 <br/>
 <script type="text/javascript">
@@ -86,10 +91,14 @@
       })
       .bind('uploadSuccess', function(event, file, serverData){
          $('#upload-files-log li#'+file.id).animate({opacity:0}, 300, function(){$(this).remove()});
-         $('#allfiles').load(location.href+" #allfiles>*","",function(){
-            formShowOnlyLang('<?= Locales::getLang() ?>');
-            $().piroBox({slideShow : true,slideSpeed : 3});
-         });
+         // null queue reload cnt
+         var stat = $.swfupload.getInstance('.swfupload-control').getStats();
+         if(stat.files_queued == 0){
+            $('#edit-photos-list').load(location.href+" #edit-photos-list>*","",function(){
+               $('#edit-photos-list p.form-link-lang-container a:first-child').trigger('click', false);
+               $().piroBox({slideShow : true,slideSpeed : 3});
+            });
+         }
       });
       // označení všech obrázků
       $('#button-check-all-images').live('click',function(){
@@ -106,8 +115,10 @@
    function checkCheckbox(obj){
       if($(obj).is(':checked')){
          $(obj).parents('tr').css({opacity : 0.3});
+         $(obj).parents('tr').prev('tr').css({opacity : 0.3});
       } else {
          $(obj).parents('tr').css({opacity : 1});
+         $(obj).parents('tr').prev('tr').css({opacity : 1});
       }
    }
    /* ]]> */

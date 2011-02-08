@@ -1,23 +1,12 @@
-.inputImages>td {
-   border: 1px solid black;
-}
-
-/* seznam fotek */
-#galeryPhotos .galeryPhoto {
-   display: block;
-   position: relative;
-   float: left;
-   margin: 1px;
-}
 /* seznam fotek mazani */
-
-.edit-image-preview {
-/*   width: 100%;*/
+input.editimage_ord_class {
+   width: 40px;
 }
 
-#swfupload-control p{ margin:10px 5px; font-size:0.9em; }
-#swfupload-control object {
+.swfupload-control p{ margin:10px 5px; font-size:0.9em; }
+.swfupload-control object {
    z-index: 10 !important;
+   vertical-align: bottom;
 }
 #upload-files-log{
    margin:0; padding:0; width:90%;
@@ -35,4 +24,16 @@
    height: 500px;
    overflow: auto;
    background-color: whitesmoke;
+}
+
+#edit-photos-list table {
+   table-layout: fixed;
+}
+#edit-photos-list table td {
+   vertical-align: top;
+   padding: 3px;
+}
+
+#edit-photos-list table textarea {
+   width: 250px;
 }

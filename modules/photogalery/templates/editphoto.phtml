@@ -4,133 +4,138 @@ $this->addPageTitle($this->tr('úprava miniatury'));
 $this->addJsPlugin(new JsPlugin_JCrop());
 
 // zjištění velikosti obrázku
-$sizes = getimagesize($this->category()->getModule()->getDataDir(false).$this->subdir.Photogalery_Controller::DIR_MEDIUM
-                       .DIRECTORY_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE});
-
+$sizes = getimagesize($this->category()->getModule()->getDataDir(false) . $this->subdir . Photogalery_Controller::DIR_MEDIUM
+      . DIRECTORY_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE});
 ?>
-<h1><?=$this->tr('úprava miniatury');?></h1>
+<h1><?= $this->tr('úprava miniatury'); ?></h1>
 <div class="main-content-form-edit">
-   <table class="formTable">
+<?
+echo $this->form->renderStart();
+?>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?= $this->tr('Aktuální miniatura') ?></span></legend>
+      <table class="form-table">
+         <tr>
+            <td>
+               <?= vve_tpl_image_tag($this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_SMALL
+                     . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
+                     $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH) ?>
+            </td>
+         </tr>
+      </table>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?= $this->tr('Výběr') ?></span><span class="form-legend-text"><?= $this->tr('Myší vyberte oblast ze které se má vytvořit miniatura') ?></span></legend>
+   <table class="form-table">
       <tr>
-         <td>
-            <p><?=$this->tr('Aktuální miniatura')?></p>
-            <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL
-                    .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
-                    $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH)?>
+         <td id="cropImage">
+            <img width="500" class="edit-image-preview" src="<?= $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
+               . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" alt="image <?= $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}; ?>" />
          </td>
       </tr>
    </table>
-   <form action="<?=$this->form->getAction()?>" method="post">
-      <table class="formTable">
-         <tr>
-            <td id="cropImage">
-               <p><?=$this->tr('Myší vyberte oblast ze které se má vytvořit miniatura')?></p>
-               <img width="500" class="edit-image-preview" src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM
-                       .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" alt="image <?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE};?>" />
-            </td>
-         </tr>
-         <tr>
-            <td>
-               <h2><?=$this->tr('Náhled')?></h2>
-               <p id="preview" style="overflow:hidden; width:<?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH)?>px;
-                  height:<?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT)?>px;">
-                  <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM
-                               .URL_SEPARATOR.$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>"
-                       alt="<?=$this->image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
-               </p>
-            </td>
-         </tr>
-      </table>
-      <table class="formTable">
-         <tr class="hidden">
-            <th class="formLabels"></th>
-            <td class="formControlls">
-               <?
-               $this->form->start_x->setValues(0);
-               print($this->form->start_x->controll());
-               ?>
-            </td>
-         </tr>
-         <tr class="hidden">
-            <th class="formLabels"></th>
-            <td class="formControlls">
-               <?
-               $this->form->start_y->setValues(0);
-               print($this->form->start_y->controll())
-                       ?>
-            </td>
-         </tr>
-         <tr class="hidden">
-            <th class="formLabels"></th>
-            <td class="formControlls">
-               <?
-               $this->form->width->setValues($this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH));
-               print($this->form->width->controll())
-                       ?>
-            </td>
-         </tr>
-         <tr class="hidden">
-            <th class="formLabels"></th>
-            <td class="formControlls">
-               <?
-               $this->form->height->setValues($this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT));
-               print($this->form->height->controll())
-                       ?>
-            </td>
-         </tr>
-         <tr>
-            <th class="formLabels"></th>
-            <td class="formControlls">
-               <?=$this->form->save->controll()?>
-            </td>
-         </tr>
-         <tr>
-            <td class="formLabels">
-               <?=$this->form->goBack->label()."<br />";?>
-            </td>
-            <td class="formControlls">
-               <?=$this->form->goBack->controll();?>
-            </td>
-         </tr>
-         </tbody>
-      </table>
-   </form>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      function showPreview(coords){
-         var rw = <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>;
-         var rh = <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?>;
-         if (parseInt(coords.w) > 0){
-            var rw = rw/coords.w;
-            var rh = rh/coords.h;
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?= $this->tr('Náhled') ?></span></legend>
+   <table class="form-table">
+      <tr>
+         <td>
+            <h2></h2>
+            <p id="preview" style="overflow:hidden; width:<?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH) ?>px;
+               height:<?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT) ?>px;">
+               <img src="<?= $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
+                    . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>"
+                    alt="<?= $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" />
+            </p>
+         </td>
+      </tr>
+   </table>
+   </fieldset>
+   <fieldset>
+   <table class="form-table">
+      <tbody>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->start_x->setValues(0);
+            print($this->form->start_x->controll());
+            ?>
+         </td>
+      </tr>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->start_y->setValues(0);
+            print($this->form->start_y->controll())
+            ?>
+         </td>
+      </tr>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->width->setValues($this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH));
+            print($this->form->width->controll())
+            ?>
+         </td>
+      </tr>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->height->setValues($this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT));
+            echo ($this->form->height->controll());
+            ?>
+         </td>
+      </tr>
+      <tr>
+         <th class="form-labels"></th>
+         <td class="form-controlls"><?= $this->form->save->controll() ?></td>
+      </tr>
+      <tr>
+         <td class="form-labels"></td>
+         <td class="form-controlls"><?= $this->form->goBack->label(); ?><?= $this->form->goBack->controll(); ?></td>
+      </tr>
+      </tbody>
+   </table>
+</fieldset>
+<?echo $this->form->renderEnd();?>
+<script type="text/javascript">
+/* <![CDATA[ */
+   function showPreview(coords){
+      var rw = <?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH); ?>;
+      var rh = <?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT); ?>;
+      if (parseInt(coords.w) > 0){
+         var rw = rw/coords.w;
+         var rh = rh/coords.h;
 
-            $('#preview img').css({
-               width: Math.round(rw * <?=$sizes[0]?>) + 'px',
-               height: Math.round(rh * <?=$sizes[1]?>) + 'px',
-               marginLeft: '-' + Math.round(rw * coords.x) + 'px',
-               marginTop: '-' + Math.round(rh * coords.y) + 'px'
-            });
-         }
-         $('input[name=image_start_x]').val(coords.x);
-         $('input[name=image_start_y]').val(coords.y);
-         $('input[name=image_width]').val(coords.w);
-         $('input[name=image_height]').val(coords.h);
-      };
-      jQuery(document).ready(function() {
-         $(function(){
-            $('#cropImage img').Jcrop({
-               trueSize: [<?=$sizes[0]?>,<?=$sizes[1];?>],
-               onChange: showPreview,
-               onSelect: showPreview,
-               minSize: [ <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>,
-                  <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?> ],
-               setSelect: [ 0, 0, <?=$this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH);?>,
-                  <?=$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT);?> ]
-                        ,aspectRatio: <?=str_replace(',', '.', round($this->category()->getParam('small_width',Photogalery_Controller::SMALL_WIDTH)/$this->category()->getParam('small_height',Photogalery_Controller::SMALL_HEIGHT),2))?>
-            });
+         $('#preview img').css({
+            width: Math.round(rw * <?= $sizes[0] ?>) + 'px',
+            height: Math.round(rh * <?= $sizes[1] ?>) + 'px',
+            marginLeft: '-' + Math.round(rw * coords.x) + 'px',
+            marginTop: '-' + Math.round(rh * coords.y) + 'px'
          });
+      }
+      $('input[name=image_start_x]').val(coords.x);
+      $('input[name=image_start_y]').val(coords.y);
+      $('input[name=image_width]').val(coords.w);
+      $('input[name=image_height]').val(coords.h);
+   };
 
+   $(document).ready(function() {
+      $('#cropImage img').Jcrop({
+         trueSize: [<?= $sizes[0] ?>,<?= $sizes[1]; ?>],
+         onChange: showPreview,
+         onSelect: showPreview,
+         minSize: [ <?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH); ?>,
+            <?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT); ?> ],
+         setSelect: [ 0, 0, <?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH); ?>,
+            <?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT); ?> ],
+         aspectRatio: <?= str_replace(',', '.', round($this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH) / $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT), 2)) ?>
       });
-      /* ]]> */
+   });
+/* ]]> */
    </script>
 </div>
