@@ -8,12 +8,12 @@ if($this->edit) {
 }
 $this->addPageTitle($h);
 // donastavení formuláře
-$this->form->name->html()->setAttrib('size', 72);
-$this->form->urlkey->html()->setAttrib('size', 72);
-$this->form->metaKeywords->html()->setAttrib('size', 72);
-$this->form->annotation->html()->setAttrib('cols', 70)->setAttrib('rows', 5);
-$this->form->metaDesc->html()->setAttrib('cols', 70)->setAttrib('rows', 3);
-$this->form->text->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
+$this->form->name->html()->setAttrib('size', 60)->addClass('form-element-long');
+$this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long');
+$this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element-long');
+$this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
+$this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
+$this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
 if($this->form->haveElement('textPrivate')){
    $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 }
