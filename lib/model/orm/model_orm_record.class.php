@@ -44,6 +44,11 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          if ($collName[strlen($collName) - 3] == '_') {
             $lang = substr($collName, strrpos($collName, '_') + 1);
             $collName = substr($collName, 0, strrpos($collName, '_'));
+
+            if(!isset ($this->columns[$collName])){ // není sloupce z této tabulky
+               $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
+               $this->columns[$collName]['extern'] = true;
+            }
             if (!($this->columns[$collName]['value'] instanceof Model_ORM_LangCell)) {
                $this->columns[$collName]['value'] = new Model_ORM_LangCell();
             }
