@@ -14,6 +14,7 @@
 class JsPlugin_JCrop extends JsPlugin {
 	protected function initJsPlugin() {
       $this->setJsPluginName('jqueryjcrop');
+      $this->setJsFilesDir('jqueryjcrop');
 	}
 	
 	protected function setFiles() {
