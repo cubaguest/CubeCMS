@@ -360,6 +360,9 @@ textarea, form .form-table .form-element-long {
 /* EOF main content NEW!!! */
 
 /* SOF panel content NEW!!! */
+.panel {
+   overflow: hidden;
+}
 .panel-box {}
 .panel-box-label {
    font-weight: bold;

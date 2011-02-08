@@ -119,7 +119,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                   <?
                   if(!empty($this->panels['left'])) {
                      foreach ($this->panels['left'] as $panelL) {?>
-                  <div class="panel panelLeft">
+                  <div class="panel panel-left">
                            <?$this->includeTplObj($panelL);?>
                   </div>
                      <?}
@@ -141,7 +141,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                   <?
                   if(!empty($this->panels['right'])) {
                      foreach ($this->panels['right'] as $panelR) {?>
-                  <div class="panel panelRight">
+                  <div class="panel panel-right">
                            <?$this->includeTplObj($panelR);?>
                   </div>
                      <?}
