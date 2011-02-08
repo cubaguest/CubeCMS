@@ -12,13 +12,13 @@ if($this->edit) {
 $this->form->textShort->html()->setAttrib('cols', 70)->setAttrib('rows', 10);
 $this->form->text->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
-$this->form->name->html()->setAttrib('size', 60);
-$this->form->place->html()->setAttrib('size', 60);
-$this->form->targetGroups->html()->setAttrib('size', 60);
-$this->form->akredMPSV->html()->setAttrib('size', 60);
-$this->form->akredMSMT->html()->setAttrib('size', 60);
-$this->form->urlkey->html()->setAttrib('size', 60);
-$this->form->metaKeywords->html()->setAttrib('size', 60);
+$this->form->name->html()->addClass('form-element-long');
+$this->form->place->html()->addClass('form-element-long');
+$this->form->targetGroups->html()->addClass('form-element-long');
+$this->form->akredMPSV->html()->addClass('form-element-long');
+$this->form->akredMSMT->html()->addClass('form-element-long');
+$this->form->urlkey->html()->addClass('form-element-long');
+$this->form->metaKeywords->html()->addClass('form-element-long');
 $this->form->metaDesc->html()->setAttrib('cols', 63)->setAttrib('rows', 3);
 
 $jQuery = new JsPlugin_JQuery();
