@@ -282,7 +282,7 @@ class Url_Request {
          $this->urlType = self::URL_TYPE_CORE_MODULE;
          $this->outputType = $matches['output'];
          $this->category = $matches['name'];
-         if($matches['output'] == 'html'){
+         if($matches['output'] == 'html' AND !self::isXHRRequest()){
             $this->pageFull = true;
          }
          $return = true;
