@@ -13,7 +13,7 @@
 
 class JsPlugin_PiroBox extends JsPlugin {
    protected $config = array(
-   'theme' => 'white');
+   'theme' => VVE_PIROBOX_THEME);
 
 	protected function initJsPlugin() {
       
