@@ -1,5 +1,5 @@
 /*
- * SMLMenu 0.0.2
+ * SMLMenu 0.0.3
  * http://www.vveframework.eu/jquery/smlmenu
  *
  * Copyright (c) 2010 Jakub Matas (vypecky.info)
@@ -23,7 +23,7 @@
          // position relative of container
          $(this).css('position', 'relative').addClass('smlmenu_root');
          $ulroot.addClass('smlmenu_ulroot').find('ul').hide();
-         $(this).height($ulroot.height());
+//         $(this).height($ulroot.height());
          var $as = $('a[href=#]', $ulroot);
          if(this.$settings.image != null){
             var $img = $('<img />').attr({src: this.$settings.image, alt : ''});
@@ -47,8 +47,11 @@
       $parent.find('ul').hide();
       $parent.find('a').removeClass(settings.selClass);
       $(this).addClass(settings.selClass);
-      var numParents = $(this).parents('ul').length+1;
-      $('div.smlmenu_root').animate({height: numParents*$ul.height()}, settings.showDelay);
+      var h = $ul.height();
+      $(this).parents('ul').each(function(){
+         h += $(this).height();
+      });
+      $('div.smlmenu_root').animate({height: h}, settings.showDelay);
       $ul.setSubMenuPosition().show();
 //      $ul.setSubMenuPosition().slideDown(settings.showDelay);
       return false;
