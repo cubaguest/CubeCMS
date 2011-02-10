@@ -435,6 +435,7 @@ class AppCore extends TrObject {
    private function _initConfig()
    {
       $cfgModel = new Model_Config();
+      $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE));
       foreach ($cfgModel->records(PDO::FETCH_OBJ) as $record) {
          if(!defined('VVE_'.$record->{Model_Config::COLUMN_KEY})) {
             if($record->{Model_Config::COLUMN_VALUE} == 'true') {

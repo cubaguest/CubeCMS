@@ -22,7 +22,6 @@ class Install_Core {
    const FILE_PHP_PATCH = 'patch_{to}.php';
 
    protected $tablesPrefix = '{PREFIX}';
-   protected $version = array('major' => 6, 'minor' => 0, 'build' => 0); // začíná se od verze 6.0.0
 
    public function __construct()
    {
@@ -47,7 +46,7 @@ class Install_Core {
          return;
       }
       $modelCfg = new Model_Config();
-      $record = $modelCfg->where(Model_Config::COLUMN_KEY, 'VERSION')->record();
+      $record = $modelCfg->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->where(Model_Config::COLUMN_KEY, 'VERSION')->record();
 
       $currentVer = (int)VVE_VERSION;
       try {
@@ -96,7 +95,8 @@ class Install_Core {
          return;
       }
       $modelCfg = new Model_Config();
-      $record = $modelCfg->where(Model_Config::COLUMN_KEY, 'RELEASE')->record();
+      $modelCfg->where(Model_Config::COLUMN_KEY, 'RELEASE')->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE));
+      $record = $modelCfg->record();
       $versionDir = (string)AppCore::ENGINE_VERSION;
 
       $currentRelease = VVE_RELEASE;
@@ -113,8 +113,7 @@ class Install_Core {
          if ($file->exist()) {
             $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
          }
-
-         $record->{Model_Config::COLUMN_VALUE} = $currentVer + 1;
+         $record->{Model_Config::COLUMN_VALUE} = $currentRelease + 1;
          $modelCfg->save($record);
          $currentRelease++;
       }
@@ -126,13 +125,17 @@ class Install_Core {
     */
    public function upgradeToMain()
    {
-      $settings = new Model_Config();
-      $record = $modelCfg->where(Model_Config::COLUMN_KEY, 'VERSION')->record();
-      if($record == false) $record = $settings->newRecord();
+      $modelCfg = new Model_Config();
+      $record = $modelCfg
+         ->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))
+         ->where(Model_Config::COLUMN_KEY, 'VERSION')
+         ->record();
+      if($record == false) $record = $modelCfg->newRecord();
       $record->{Model_Config::COLUMN_VALUE} = 6;
       $record->{Model_Config::COLUMN_TYPE} = Model_Config::TYPE_STRING;
       $record->{Model_Config::COLUMN_LABEL} = 'Verze jádra';
       $record->{Model_Config::COLUMN_PROTECTED} = true;
+      $modelCfg->save($record);
       echo ('Jádro bylo násilně aktualizováno na novou verzi. Kontaktuje webmastera, protože nemusí pracovat správně!');
       header('Location: http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
       die();
