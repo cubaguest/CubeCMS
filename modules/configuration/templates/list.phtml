@@ -1,34 +1,58 @@
+<?
+$jqui = new JsPlugin_JQuery();
+//$jqui->addUIAccordion();
+
+$this->addJsPlugin($jqui);
+$jqcss = new JsPlugin_JQueryCSS();
+$this->addJsPlugin($jqcss);
+
+$this->addCssFile("style.css");
+?>
 <h1><?=$this->category()->getName();?></h1>
 <div class="main-content main-content-form-edit">
    <div id="sections">
-      <table class="valuesTable">
-         <tr>
-            <th width="220" style=""><?=$this->tr('Klíč')?></th>
-            <th width="300"><?=$this->tr('Popis')?></th>
-            <th width="100"><?=$this->tr('Hodnota')?></th>
-            <th width="50"><?=$this->tr('Operace')?></th>
-         </tr>
-         <?foreach ($this->list as $row) {?>
-         <tr>
-            <td><p style="width: 200px; overflow: auto;"><?=$row->{Model_Config::COLUMN_KEY}?></p></td>
-            <td><?=$row->{Model_Config::COLUMN_LABEL}?></td>
-            <td><?=$row->{Model_Config::COLUMN_VALUE}?></td>
-            <td>
-               <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{Model_Config::COLUMN_ID}))?>" style="display:inline;">
-                  <input type="image" src="<?=vve_get_tpl_file('icons/plugin_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                         value="edit" name="category_edit" title="<?=$this->tr('Upravit')?>" />
-               </form>
-            </td>
-         </tr>
-         <?}?>
-      </table>
+      <?foreach ($this->list as $section) {?>
+      <h2 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all"><a class="head" href="<?=$this->link()?>#" title="Rozbalit"><img
+               src="<?= vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>" alt="toggle" /><?=$section['name'];?></a></h2>
+      <div class="section">
+         <p><?=$section['desc'];?></p>
+         <table class="valuesTable">
+            <?foreach ($section['options'] as $option) {?>
+            <tr>
+               <th class="header-cell" colspan="2"><?if($option->{Model_Config::COLUMN_LABEL} != null){echo $option->{Model_Config::COLUMN_LABEL};} else {echo '<em>('.$this->tr('Bez popisu').')</em>';}?>
+                  <form method="post" action="<?=$this->link()->route('edit', array('id' => $option->{Model_Config::COLUMN_ID}))?>">
+                     <p><input type="image" src="<?=vve_get_tpl_file('icons/wrench.png', VVE_TPL_FILE_IMAGE)?>"
+                         value="edit" name="category_edit" title="<?=$this->tr('Upravit')?>" /></p>
+                  </form>
+               </th>
+            </tr>
+            <tr class="end-row">
+               <td width="200" class="key-cell"><?=$option->{Model_Config::COLUMN_KEY}?></td>
+               <td><?=$option->{Model_Config::COLUMN_VALUE}?></td>
+            </tr>
+            <?}?>
+         </table>
+      </div>
+      <?}?>
    </div>
    <br />
    <br />
    <script type="text/javascript">
-      function submitRemoveCfgValue(msg){
-         return confirm('<?=$this->tr('Opravdu smazat kategorii: ')?>'+msg+'?');
-      }
+      $(document).ready(function(){
+         $('.section').toggle();
+
+      	$('#sections a.head').click(function() {
+            var $cnt = $(this).parent().next();
+            if($cnt.is(':hidden')) {
+               $cnt.show();
+               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
+            } else {
+               $cnt.hide();
+               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
+            }
+            return false;
+         });//.next().hide();
+      });
    </script>
 </div>
 

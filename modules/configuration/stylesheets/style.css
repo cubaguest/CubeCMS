@@ -1,0 +1,24 @@
+div.section {
+/*   padding: 10px;*/
+}
+
+div.section table {
+   table-layout: fixed;
+   border: 1px solid silver;
+   width: 100%;
+}
+div.section table th, div.section table td {
+   padding: 3px;
+}
+div.section table em {
+   font-size: x-small;
+}
+div.section table .header-cell form {
+   float: right;
+}
+div.section table .key-cell {
+   word-wrap: break-word;
+}
+div.section table .end-row {
+   border-bottom: 1px solid silver;
+}

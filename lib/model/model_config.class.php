@@ -20,6 +20,7 @@ class Model_Config extends Model_ORM {
     * slouce v db
     */
    const COLUMN_ID = 'id_config';
+   const COLUMN_ID_GROUP = 'id_group';
    const COLUMN_KEY = 'key';
    const COLUMN_VALUE = 'value';
    const COLUMN_VALUES = 'values';
@@ -38,6 +39,7 @@ class Model_Config extends Model_ORM {
       $this->setTableName(self::DB_TABLE, 't_cfg');
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'default' => 1));
       $this->addColumn(self::COLUMN_KEY, array('datatype' => 'varchar(50)', 'nn' => true, 'uq' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
@@ -46,6 +48,8 @@ class Model_Config extends Model_ORM {
       $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'string')); // ENUM
 
       $this->setPk(self::COLUMN_ID);
+
+      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_ConfigGroups', Model_ConfigGroups::COLUMN_ID);
    }
 }
 ?>

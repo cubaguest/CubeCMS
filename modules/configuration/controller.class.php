@@ -10,9 +10,26 @@ class Configuration_Controller extends Controller {
    public function mainController() {
       $this->checkWritebleRights();
       // nastavení viewru
-      $model = new Model_Config();
+      $modelCfg = new Model_Config();
 
-      $this->view()->list = $model->where(Model_Config::COLUMN_PROTECTED, 0)->records(PDO::FETCH_OBJ);
+      $modelCfg->joinFK(Model_Config::COLUMN_ID_GROUP, array('gname' => Model_ConfigGroups::COLUMN_NAME, 'gdesc' => Model_ConfigGroups::COLUMN_DESC))
+         ->where(Model_Config::COLUMN_PROTECTED.' != 1 AND '.Model_Config::COLUMN_ID_GROUP.' != 1', array())
+         ->order(array(Model_Config::COLUMN_ID_GROUP, 'ISNULL('.Model_Config::COLUMN_LABEL.')', Model_Config::COLUMN_LABEL));
+
+      $records = $modelCfg->records();
+      $sorted = array();
+      foreach ($records as $record) {
+         if(!isset ($sorted[$record->{Model_Config::COLUMN_ID_GROUP}])){
+            $sorted[$record->{Model_Config::COLUMN_ID_GROUP}] = array(
+               'name' => $record->{Model_ConfigGroups::COLUMN_NAME},
+               'desc' => $record->{Model_ConfigGroups::COLUMN_DESC},
+               'options' => array(),
+            );
+         }
+         array_push($sorted[$record->{Model_Config::COLUMN_ID_GROUP}]['options'], $record);
+      }
+
+      $this->view()->list = $sorted;
    }
 
    public function editController() {
