@@ -870,10 +870,16 @@ class Model_ORM extends Model_PDO {
                   $this->getTableShortName(), $columnName, null, $params['lang'], $params['aliasFor']));
          }
       } else { // sloupce jsou vybrány
+         if(!in_array($this->pKey, $this->selectedColumns)){
+         // pokud není pk přidáme jej
+            array_push($columns, $this->createSelectColumnString(
+                     $this->getTableShortName(), $this->pKey, null, false, $this->tableStructure[$this->pKey]['aliasFor']));
+         }
          foreach ($this->selectedColumns as $alias => $columnName) {
             if (isset($this->tableStructure[$columnName])) {
                array_push($columns, $this->createSelectColumnString(
                      $this->getTableShortName(), $columnName, $alias, $this->tableStructure[$columnName]['lang'], $this->tableStructure[$columnName]['aliasFor']));
+               if($columnName == $this->pKey) $pkAdded = true;
             } else { // není colum z této tabulky nebo se jedná o funkci
                if (is_int($alias)) {
                   array_push($columns, '' . $columnName . '');
@@ -881,25 +887,6 @@ class Model_ORM extends Model_PDO {
                   array_push($columns, '' . $columnName . ' AS ' . $alias);
                }
             }
-/*            if (!isset($this->tableStructure[$columnName])) { // není colum z této tabulky nebo se jedná o funkci
-//               if (is_int($alias)) {
-//                  array_push($columns, '' . $columnName . '');
-//               } else {
-//                  array_push($columns, '' . $columnName . ' AS ' . $alias);
-//               }
-//            } else if ($this->tableStructure[$colName]['lang'] == false) {// není jazyk
-//               if ($this->tableStructure[$colName]['aliasFor'] == null) {
-//                  array_push($columns, '`' . $this->getTableShortName() . '`.`' . $columnName . '`');
-//               } else {
-//                  array_push($columns, '`' . $this->getTableShortName() . '`.`' . $this->tableStructure[$colName]['aliasFor'] . '` AS ' . $columnName);
-//               }
-//            } else if ($this->getAllLangs == true) { // více jazyčné sloupce
-//               foreach (Locales::getAppLangs() as $key => $value) {
-//                  array_push($columns, '`' . $this->getTableShortName() . '`.`' . $columnName . '_' . $value . '`');
-//               }
-//            } else { // pouze aktuální jazykový sloupec
-//               array_push($columns, '`' . $this->getTableShortName() . '`.`' . $columnName . '_' . Locales::getLang() . '` AS ' . $columnName);
-//            }*/
          }
       }
       $columns = $this->createSQLSelectJoinColumns($columns);
