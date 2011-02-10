@@ -873,7 +873,7 @@ class Model_ORM extends Model_PDO {
          foreach ($this->selectedColumns as $alias => $columnName) {
             if (isset($this->tableStructure[$columnName])) {
                array_push($columns, $this->createSelectColumnString(
-                     $this->getTableShortName(), $columnName, $alias, $params['lang'], $params['aliasFor']));
+                     $this->getTableShortName(), $columnName, $alias, $this->tableStructure[$columnName]['lang'], $this->tableStructure[$columnName]['aliasFor']));
             } else { // není colum z této tabulky nebo se jedná o funkci
                if (is_int($alias)) {
                   array_push($columns, '' . $columnName . '');
