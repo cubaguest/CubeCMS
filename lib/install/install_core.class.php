@@ -95,29 +95,35 @@ class Install_Core {
          return;
       }
       $modelCfg = new Model_Config();
-      $modelCfg->where(Model_Config::COLUMN_KEY, 'RELEASE')->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE));
+      $modelCfg->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->where(Model_Config::COLUMN_KEY, 'RELEASE');
       $record = $modelCfg->record();
+      
       $versionDir = (string)AppCore::ENGINE_VERSION;
-
       $currentRelease = VVE_RELEASE;
       while ($currentRelease != AppCore::ENGINE_RELEASE) {
-         /* php update */
-         $phpFileName = preg_replace('/{to}/', $currentRelease+1, self::FILE_PHP_PATCH);
-         if(file_exists($this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR.$phpFileName)){
-            include $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR.$phpFileName;
-         }
+         try {
+            /* php update */
+            $phpFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_PHP_PATCH);
+            if (file_exists($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName)) {
+               include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName;
+            }
 
-         /* sql update */
-         $sqlFileName = preg_replace('/{to}/', $currentRelease+1, self::FILE_SQL_PATCH);
-         $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir().self::CORE_UPGRADE_DIR.DIRECTORY_SEPARATOR.$versionDir.DIRECTORY_SEPARATOR, false);
-         if ($file->exist()) {
-            $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
+            /* sql update */
+            $sqlFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_SQL_PATCH);
+            $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR, false);
+            if ($file->exist()) {
+               $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
+            }
+            $record->{Model_Config::COLUMN_VALUE} = $currentRelease + 1;
+            $modelCfg->save($record);
+         } catch (Exception $exc) {
+            echo 'ERROR: Chyba při aktualizaci<br />';
+            echo $exc->getTraceAsString();
+            die ();
          }
-         $record->{Model_Config::COLUMN_VALUE} = $currentRelease + 1;
-         $modelCfg->save($record);
          $currentRelease++;
       }
-      $this->installComplete(sprintf(_('Jádro bylo aktualizováno na verzi %s release %s'), AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
+      $this->installComplete(sprintf('Jádro bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
    }
 
    /**
