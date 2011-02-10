@@ -100,8 +100,15 @@ class Form_Decorator {
          if ($this->groupName != null) {
             $field->addClass('fieldset-alt');
             $name = new Html_Element('span', $this->groupName);
-            $text = new Html_Element('span', $this->groupText);
-            $field->addContent(new Html_Element('legend', $name->addClass('form-legend-name') . $text->addClass('form-legend-text')));
+            $addcnt = null;
+            if(mb_strlen($this->groupText) <= 80){
+               $text = new Html_Element('span', $this->groupText);
+               $field->addContent(new Html_Element('legend', $name->addClass('form-legend-name') . $text->addClass('form-legend-text')));
+            } else {
+               $field->addContent(new Html_Element('legend', $name->addClass('form-legend-name')));
+               $text = new Html_Element('p', $this->groupText);
+               $field->addContent($text->addClass('form-legend-text'));
+            }
          }
          $field->addContent($dec);
          return (string) $field;
