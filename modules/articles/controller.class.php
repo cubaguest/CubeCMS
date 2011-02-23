@@ -150,10 +150,12 @@ class Articles_Controller extends Controller {
       $artM = new Articles_Model();
 
       if($this->rights()->isControll() == true){
-         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $this->getRequest('urlkey')));
+         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc', 
+            array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()));
       } else {
-         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND ('.Articles_Model::COLUMN_PUBLIC.' = 1 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr )',
-            array('urlkey' => $this->getRequest('urlkey'), 'idusr' => Auth::getUserId()));
+         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+            .'AND ('.Articles_Model::COLUMN_PUBLIC.' = 1 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr )',
+            array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey'), 'idusr' => Auth::getUserId()));
       }
 
       $artM->joinFK(Articles_Model::COLUMN_ID_USER_LAST_EDIT, array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)
@@ -324,17 +326,19 @@ class Articles_Controller extends Controller {
 
       // načtení dat
       $model = new Articles_Model();
-      $article = $model->where(Articles_Model::COLUMN_URLKEY, $this->getRequest('urlkey'))->record();
+      $article = $model->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc', 
+            array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
 
-      $editForm->name->setValues($article->{Articles_Model::COLUMN_NAME});
-
-      $editForm->text->setValues($article->{Articles_Model::COLUMN_TEXT});
-      $editForm->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
-      $editForm->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
-      $editForm->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
-      $editForm->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
-      $editForm->art_id->setValues($article->{Articles_Model::COLUMN_ID});
-      $editForm->public->setValues($article->{Articles_Model::COLUMN_PUBLIC});
+      if($article !=false){
+         $editForm->name->setValues($article->{Articles_Model::COLUMN_NAME});
+         $editForm->text->setValues($article->{Articles_Model::COLUMN_TEXT});
+         $editForm->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
+         $editForm->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
+         $editForm->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
+         $editForm->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
+         $editForm->art_id->setValues($article->{Articles_Model::COLUMN_ID});
+         $editForm->public->setValues($article->{Articles_Model::COLUMN_PUBLIC});
+      }
 
       if($editForm->isSend() AND $editForm->save->getValues() == false){
          $this->link()->route('detail')->reload();
@@ -366,7 +370,8 @@ class Articles_Controller extends Controller {
       $this->checkWritebleRights(); // tady kontrola práv k článku ne tohle
 
       $modelArt = new Articles_Model();
-      $article = $modelArt->where(Articles_Model::COLUMN_URLKEY, $this->getRequest('urlkey'))->record();
+      $article = $modelArt->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc', 
+            array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
 
       $form = new Form('art_priv_text_');
 
