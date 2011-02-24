@@ -38,10 +38,14 @@ class Db_PDO extends PDO {
          if(func_num_args() == 0) {
             switch (self::$connectorType) {
                case 'mysqli':
-               //(self::$_serverName, self::$_userName, self::$_userPassword, self::$_dbName, self::$_tablePrefix);
                   parent::__construct("mysql:host=".self::$serverName.";dbname=".self::$dbName,
-                          self::$userName, self::$userPassword, array(PDO::ATTR_PERSISTENT => true));
-                  $this->exec('SET CHARACTER SET utf8; SET character_set_connection = utf8;');
+                          self::$userName, self::$userPassword, array(
+                             //PDO::ATTR_PERSISTENT => true,  vytváří zacyklení db
+                             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+                  ));
+                  // musí být rozděleno, protože v php 5.2 to dohromady dělá problémy
+                  $this->exec('SET CHARACTER SET utf8;');
+                  $this->exec('SET character_set_connection = utf8;');
                   break;
                case 'pgsql':
                   parent::__construct("pgsql:dbname=".self::$dbName.";host=".self::$serverName,
@@ -61,7 +65,8 @@ class Db_PDO extends PDO {
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       } catch (PDOException $e) {
-         throw new PDOException("Nelze se připojit k databázi, prosíme zkuste to za chvíli znovu. <br />Pokud i přesto se stránku nepodaří načíst kontaktujte webmastera.");
+         throw new PDOException("Nelze se připojit k databázi nebo připojení neproběhlo korektně. \n"
+            ."Prosíme zkuste to za chvíli znovu. \nPokud i přesto se stránku nepodaří načíst kontaktujte webmastera.");
       }
    }
 
