@@ -14,12 +14,12 @@ class Token_Store_Session implements Token_Store {
    const TOKENS_SES_NAME = 'tokens';
    const TOKEN_EXPIRE = 3600; // 1hour
 
-      public static function check($token)
+      public function check($token)
    {
       return isset ($_SESSION[self::TOKENS_SES_NAME][$token]);
    }
 
-   public static function save($token)
+   public function save($token)
    {
       if(!isset ($_SESSION[self::TOKENS_SES_NAME])){
          $_SESSION[self::TOKENS_SES_NAME] = array();
@@ -27,14 +27,14 @@ class Token_Store_Session implements Token_Store {
       $_SESSION[self::TOKENS_SES_NAME][$token] = time()+self::TOKEN_EXPIRE; // platnost 1h
    }
 
-   public static function delete($token)
+   public function delete($token)
    {
       if(isset ($_SESSION[self::TOKENS_SES_NAME][$token])){
          unset ($_SESSION[self::TOKENS_SES_NAME][$token]);
       }
    }
 
-   public static function gc()
+   public function gc()
    {
       if(isset ($_SESSION[self::TOKENS_SES_NAME])){
          foreach ($_SESSION[self::TOKENS_SES_NAME] as $token => $exp) {

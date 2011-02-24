@@ -11,15 +11,26 @@
  */
 
 class Token {
+   /**
+    * Objekt s uloženými tokeny
+    * @var Token_Store
+    */
+   private static $tokenStore = null;
+
+
    public static function getToken()
    {
-      $token = self::generateToken();
       $classStoreName = 'Token_Store_'.ucfirst(VVE_TOKENS_STORE);
+      if(self::$tokenStore == null){
+         self::$tokenStore = new $classStoreName();
+      }
+      
+      $token = self::generateToken();
       // náhodně provedem gc
       if(rand(1, 10) == 1){
-         $classStoreName::gc();
+         self::$tokenStore->gc();
       }
-      $classStoreName::save($token);
+      self::$tokenStore->save($token);
       return $token;
    }
 
@@ -31,9 +42,13 @@ class Token {
    public static function check($token, $delete = true)
    {
       $classStoreName = 'Token_Store_'.ucfirst(VVE_TOKENS_STORE);
-      $ok = $classStoreName::check($token);
+      if(self::$tokenStore == null){
+         self::$tokenStore = new $classStoreName();
+      }
+      
+      $ok = self::$tokenStore->check($token);
       if($delete){
-         $classStoreName::delete($token);
+         self::$tokenStore->delete($token);
       }
       return $ok;
    }
