@@ -134,6 +134,12 @@ $(document).ready(function(){
          $('.toolbox-active-content').removeClass('toolbox-active-content');
          $(this).animate({opacity:0}, 500, function(){$(this).remove();});
       });
+   // open external link in new window
+   $("a.link-external").click(function(){
+      window.open(this.href);
+      return false;
+   });   
+      
 });
 // move toolbox with document when scrolling
 $(document).scroll(function(){
