@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   FULLTEXT KEY `lebal_sk` (`name_sk`),
   FULLTEXT KEY `text_clear_cs` (`text_clear_cs`),
   FULLTEXT KEY `text_clear_en` (`text_clear_en`),
-  FULLTEXT KEY `text_clear_de` (`text_clear_de`)
+  FULLTEXT KEY `text_clear_de` (`text_clear_de`),
   FULLTEXT KEY `text_clear_sk` (`text_clear_sk`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
