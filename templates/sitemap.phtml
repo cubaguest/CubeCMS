@@ -12,9 +12,9 @@ function vveRenderMap($menuArr, $link, $catsArr) {
             print ('<li><a href="' . $itemArt['loc'] . '">' . $itemArt['name'] . '</a></li>');
          }
          if($catsArr[$item->getCatObj()->getId()]['linkmore'] != null){
-            echo '<a href="'.$catsArr[$item->getCatObj()->getId()]['linkmore']['loc'].'" title="'
+            echo '<li><a href="'.$catsArr[$item->getCatObj()->getId()]['linkmore']['loc'].'" title="'
                .$catsArr[$item->getCatObj()->getId()]['linkmore']['name'].'">'
-               .$catsArr[$item->getCatObj()->getId()]['linkmore']['name'].'</a>';
+               .$catsArr[$item->getCatObj()->getId()]['linkmore']['name'].'</a></li>';
          }
          print ("</ul>\n");
       }
