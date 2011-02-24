@@ -1004,7 +1004,11 @@ class AppCore extends TrObject {
          // inicializace Šablonovacího systému
          Template::factory();
       } catch (Exception $exc) {
-         echo $exc->getTraceAsString();
+         if(strtolower($_SERVER['SERVER_NAME']) == 'localhost' OR strtolower($_SERVER['SERVER_NAME']) == '127.0.0.1'){
+            echo $exc->getTraceAsString();
+         } else {
+            echo $exc->getMessage();
+         }
          die ();
       }
       

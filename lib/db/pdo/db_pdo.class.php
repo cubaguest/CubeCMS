@@ -61,7 +61,7 @@ class Db_PDO extends PDO {
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       } catch (PDOException $e) {
-         new CoreErrors($e);
+         throw new PDOException("Nelze se připojit k databázi, prosíme zkuste to za chvíli znovu. <br />Pokud i přesto se stránku nepodaří načíst kontaktujte webmastera.");
       }
    }
 
