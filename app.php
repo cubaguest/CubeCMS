@@ -435,8 +435,11 @@ class AppCore extends TrObject {
    private function _initConfig()
    {
       $cfgModel = new Model_Config();
-      $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE));
-      foreach ($cfgModel->records(PDO::FETCH_OBJ) as $record) {
+      $recs = $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->records(PDO::FETCH_OBJ);
+      if($recs == false){
+			throw new unexpectedValueException($this->tr("Nepodařilo se načíst konfiguraci. Chyba připojení k DB?"));
+      }
+      foreach ($recs as $record) {
          if(!defined('VVE_'.$record->{Model_Config::COLUMN_KEY})) {
             if($record->{Model_Config::COLUMN_VALUE} == 'true') {
                define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), true);
@@ -1007,7 +1010,7 @@ class AppCore extends TrObject {
          if(strtolower($_SERVER['SERVER_NAME']) == 'localhost' OR strtolower($_SERVER['SERVER_NAME']) == '127.0.0.1'){
             echo $exc->getTraceAsString();
          } else {
-            echo $exc->getMessage();
+            echo nl2br($exc->getMessage());
          }
          die ();
       }
