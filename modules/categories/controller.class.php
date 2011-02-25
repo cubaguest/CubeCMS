@@ -563,7 +563,7 @@ class Categories_Controller extends Controller {
       // pokud je hlavní kategorie
       if($categories->getLevel() != 0) {
          $this->categoriesArray[str_repeat('&nbsp;', $categories->getLevel()*3).
-                         (string)$categories->getCatObj()->getLabel()]
+                         (string)$categories->getCatObj()->getLabel().' - id: '.$categories->getCatObj()->getId()]
                  = (string)$categories->getCatObj()->getId();
       } else {
          $this->categoriesArray[$this->tr('Kořen')] = 0;

@@ -28,10 +28,12 @@ class Categories_View extends View {
    }
 
    public function editView() {
+      Template_Module::setEdit(true);
       $this->template()->addTplFile('edit.phtml');
    }
 
    public function addView() {
+      Template_Module::setEdit(true);
       $this->editView();
    }
 
@@ -40,6 +42,7 @@ class Categories_View extends View {
    }
 
    public function catSettingsView() {
+      Template_Module::setEdit(true);
       $this->mview->viewSettingsView();
    }
 
