@@ -17,10 +17,7 @@ function vveAdminMenuRenderFunc($menuArr, $link, $ulParam) {
    print ("</ul>\n");
 }
 ?>
-
 <!-- Halvni menu sekce v menu  -->
 <div id="adminMenuWrapper">
       <?=vveAdminMenuRenderFunc($this->menu, $this->link(), 'class="dropdown"')?>
 </div>
-<div id="adminMenuHeight"></div>
-<hr class="reseter" />
