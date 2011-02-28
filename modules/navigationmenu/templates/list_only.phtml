@@ -11,7 +11,8 @@ $listProjects = $model->getProjectsList()->fetchAll();
       <?foreach ($listSubdomains as $row) {?>
       <li>
          <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>">
+            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>" <?if($row->{NavigationMenu_Models_List::COL_FOLLOW} == false){echo 'rel="nofollow"';}?> 
+            <?if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true){echo 'class="link-external"';}?>>
             <?
             if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
          <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
@@ -28,7 +29,8 @@ $listProjects = $model->getProjectsList()->fetchAll();
       <?foreach ($listProjects as $row) {?>
       <li>
          <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>">
+            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>" <?if($row->{NavigationMenu_Models_List::COL_FOLLOW} == false){echo 'rel="nofollow"';}?> 
+            <?if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true){echo 'class="link-external"';}?>>
             <?
             if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
          <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
