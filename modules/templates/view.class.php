@@ -21,6 +21,14 @@ class Templates_View extends View {
     */
    public function addView() {
       $this->template()->addTplFile("edit.phtml");
+      // Editor
+      $this->form->content->html()->addClass("mceEditor");
+      $this->tinyMCE = new Component_TinyMCE();
+      $settings = new Component_TinyMCE_Settings_Full();
+      
+      $settings->setSetting('height', '600');
+      $this->tinyMCE->setEditorSettings($settings);
+      $this->tinyMCE->mainView();
    }
 
    /**
