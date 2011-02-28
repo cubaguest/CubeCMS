@@ -158,33 +158,25 @@ a.form-link-lang-sel {
    background-position: 0 -40px;
 }
 
-/* TABS content */
-/*.ui-tabs-hide { display: none; }*/
-/*.ui-tabs-selected { background-color: white; }*/
-/*ul.langMenu {margin-bottom:2px;}
-ul.langMenu li {
-   display: inline;
-   border-width: 1px 1px 0 1px;
-   border-color: black;
-   border-style: solid;
-   padding: 3px;
+/* SOF QuickTool Toolbox */
+#quicktool-toolbox {
+   float: right;
+   height: 20px;
+   line-height: 20px;
 }
-ul.langMenu li a img {
-   padding-right: 3px;
-}*/
+#quicktool-toolbox a {
+   display: block;
+   float: left;
+   height: 20px;
+}
+#quicktool-toolbox a img {
+   padding: 2px;
+}
+#quicktool-toolbox a:hover {
+   background-color: #bbbbbb;
+}
+/* EOF QuickTool Toolbox */
 
-/*ul.ui-tabs-panel {
-   margin-bottom: 0px;
-   border-width: 1px;
-   border-color: black;
-   border-style: none;
-}*/
-/* EOF Jazykové taby */
-/* tabulky */
-/*.valuesTable {
-   background-color: white;
-   border: 1px solid gray;
-}*/
 /* donastavení kontentu při editaci */
 .main-content-text, .main-content-images, .main-content-list {
    border-width: 0;

@@ -19,5 +19,6 @@ function vveAdminMenuRenderFunc($menuArr, $link, $ulParam) {
 ?>
 <!-- Halvni menu sekce v menu  -->
 <div id="adminMenuWrapper">
-      <?=vveAdminMenuRenderFunc($this->menu, $this->link(), 'class="dropdown"')?>
+   <?=vveAdminMenuRenderFunc($this->menu, $this->link(), 'class="dropdown"')?>
+   <?QuickTools_View::renderTools();?>
 </div>
