@@ -1,0 +1,9 @@
+<?
+if($this->tools != false){?>
+<div id="quicktool-toolbox">
+   <?foreach ($this->tools as $tool) {
+      ?><a href="<?=$tool->{QuickTools_Model::COLUMN_URL}?>" title="<?=$tool->{QuickTools_Model::COLUMN_NAME};?>"
+         ><img src="<?=Url_Request::getBaseWebDir().$tool->{QuickTools_Model::COLUMN_ICON}?>" alt="<?=$tool->{QuickTools_Model::COLUMN_ICON}?>" 
+            /></a><?}?>
+</div>
+<?}?>

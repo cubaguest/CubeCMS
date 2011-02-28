@@ -1,0 +1,25 @@
+<?
+// do titulku
+if($this->edit) {
+   $h = $this->tr('úprava nástroje').' '.$this->name;
+} else {
+   $h = $this->tr('přidání nástroje');
+}
+$this->addPageTitle($h);
+
+$this->addJsPlugin(new JsPlugin_JQueryDropDown());
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="quicktool-edit-form">
+   <?echo $this->form;?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $("select[name=tool_icon] option").each(function(){
+            $(this).attr('title', '<?=Url_Request::getBaseWebDir();?>'+$(this).val());
+         });
+         // create drop down
+         $("select[name=tool_icon]").msDropDown();
+      });
+      
+   </script>
+</div>
