@@ -453,6 +453,8 @@ class Courses_Controller extends Controller {
 
       $ePhone = new Form_Element_Text('phone', $this->_('Telefon'));
       $ePhone->addValidation(new Form_Validator_NotEmpty());
+      $ePhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK, $this->tr('Telefon nebyl zadán ve správném formátu (+420 123 456 789).')));
+      $ePhone->setSubLabel($this->tr('Telefon ve formátu +420123456789 nebo +421 123456789'));
       $regForm->addElement($ePhone, $basicGrp);
 
       $eMail = new Form_Element_Text('mail', $this->_('E-mail'));
@@ -517,11 +519,12 @@ class Courses_Controller extends Controller {
 
       // kontrola času odeslání
       if ($regForm->isValid()) {
+         $phone = preg_replace('/\s*/m', '', $regForm->phone->getValues());
          $model = new Courses_Model_Registrations();
 
          $model->saveRegistration($idc, $regForm->name->getValues(), $regForm->surname->getValues(),
                  $regForm->degree->getValues(), $regForm->grade->getValues(),
-                 $regForm->practiceLength->getValues(), $regForm->phone->getValues(),
+                 $regForm->practiceLength->getValues(), $phone,
                  $regForm->mail->getValues(), $regForm->note->getValues(),
                  $regForm->payType->getValues(), $regForm->orgName->getValues(),
                  $regForm->orgAddress->getValues(), $regForm->orgICO->getValues(),
@@ -715,7 +718,7 @@ class Courses_Controller extends Controller {
          $mailXmlCnt->writeRaw('Telefon:');
          $mailXmlCnt->endElement(); // eof th
          $mailXmlCnt->startElement('td'); // sof td
-         $mailXmlCnt->writeRaw($regForm->phone->getValues());
+         $mailXmlCnt->writeRaw($phone);
          $mailXmlCnt->endElement(); // eof td
          $mailXmlCnt->endElement(); // eof tr
          // email
