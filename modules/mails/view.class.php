@@ -17,15 +17,18 @@ class Mails_View extends View {
       $settings->setSetting('relative_urls', false);
       $this->tinyMCE->setEditorSettings($settings);
       $this->tinyMCE->mainView();
+      Template_Module::setEdit(true);
 	}
 
    public function sendMailsQueueView()
    {
       $this->template()->addTplFile('mailsqueue.phtml');
+      Template_Module::setEdit(true);
    }
 
    public function listMailsView() {
       $this->template()->addTplFile('main.phtml');
+      Template_Module::setEdit(true);
    }
 
    public function listMailsExportView() {
@@ -68,11 +71,13 @@ class Mails_View extends View {
    public function addressBookView() {
       $this->template()->addTplFile('addressbook.phtml');
       $this->page = 'addressbook';
+      Template_Module::setEdit(true);
    }
 
    public function sendMailsListView() {
       $this->template()->addTplFile('list_mails.phtml');
       $this->page = 'sendMailsList';
+      Template_Module::setEdit(true);
    }
 
    public function addressListView(){
