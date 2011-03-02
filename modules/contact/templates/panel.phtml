@@ -7,14 +7,12 @@ $backImg = null;
 if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
+$this->text = vve_remove_empty_tags($this->text);
+if($this->text != null){
 ?>
-<p class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
+<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
 <div class="panel-box-content" style="<?=$backImg?>">
-   <address>
-        <?echo $this->text?>
-   </address>
+   <div class="panel-box-text"><address><?echo vve_remove_empty_tags($this->text);?></address></div>
 </div>
-<p class="panel-box-link-more">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
-</p>
+<div class="panel-box-link-more"><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a></div>
+<?}?>
