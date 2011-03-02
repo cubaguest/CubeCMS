@@ -183,6 +183,7 @@ abstract class View extends TrObject {
 
    final public function viewSettingsView() {
       $this->template()->addFile('tpl://engine:vsettings.phtml');
+      Template_Module::setEdit(true);
    }
 
    /**
