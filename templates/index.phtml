@@ -92,7 +92,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          </div><!-- headwrap -->
          <div id="colswrap">
             <div id="col1wrap" class="column">
-               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!empty($this->panels['right'])) echo " col1pad_plusright";?>">
+               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit() AND !empty($this->panels['right'])) echo " col1pad_plusright";?>">
                   <? $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);
                   if(VVE_DEBUG_LEVEL > 0){
@@ -128,7 +128,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
 
-            <? // pravy panel?>
+            <? // pravy panel
+            if(!Template_Module::isEdit()){?>
             <div id="col3wrap" class="column">
                <div id="col3pad">
                   <div id="langs">
@@ -149,6 +150,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                   <hr class="reseter" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
+            <?}?>
 
             <div class="reseter">&nbsp;</div>
          </div><!-- colswrap -->
