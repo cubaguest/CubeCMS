@@ -17,6 +17,7 @@ class Categories_View extends View {
          $toolbox->addTool($toolAdd);
          $this->toolbox = $toolbox;
       }
+      Template_Module::setEdit(true);
    }
 
    public function adminMenuView() {
@@ -33,7 +34,6 @@ class Categories_View extends View {
    }
 
    public function addView() {
-      Template_Module::setEdit(true);
       $this->editView();
    }
 
