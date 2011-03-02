@@ -17,10 +17,12 @@ class Panels_View extends View {
          $toolbox->addTool($toolAdd);
          $this->toolbox = $toolbox;
       }
+      Template_Module::setEdit(true);
    }
 
    public function addView() {
       $this->template()->addTplFile('edit.phtml');
+      Template_Module::setEdit(true);
    }
 
    public function editView() {
@@ -45,11 +47,12 @@ class Panels_View extends View {
          $tpl->addTplFile('panel_settings.phtml', $this->moduleName);
          $this->includeTpl = $tpl;
       }
-
+      Template_Module::setEdit(true);
    }
 
    public function getListPanelsView(){
       $this->template()->addTplFile('listtpl.phtml');
+      Template_Module::setEdit(true);
    }
 }
 

@@ -358,10 +358,15 @@ class Panels_Controller extends Controller {
          $form = null;
       } else {
          $form->addGroup('buttons');
-         $elemSend = new Form_Element_Submit('send', 'Odeslat');
+         $elemSend = new Form_Element_SaveCancel('send');
          $form->addElement($elemSend, 'buttons');
       }
 
+      if($form != null AND $form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+      
       if($form != null AND $form->isValid()){
          // čištění nulových hodnot
          foreach ($settings as $key => $option){

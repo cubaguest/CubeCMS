@@ -1,16 +1,5 @@
 @CHARSET "UTF-8";
-#sections li {
-   list-style-type:disc;
-}
-
-#sections li {
-   list-style-type:disc;
-}
-
-#sections ul {
-   margin-left: 20px;
-}
-
-#sections .sec {
-   font-weight: bold;
-}
+.panels-list {width: 100%;}
+.panels-list td, .panels-list th { padding: 2px;}
+.panel-tb-category {}
+.panel-tb-box, .panel-tb-order, .panel-tb-actions { width: 100px;}

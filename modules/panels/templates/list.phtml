@@ -1,5 +1,8 @@
 <?
 echo $this->toolbox;
+$this->addCssFile('style.css');
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
 <h1><?=$this->category()->getName();?></h1>
 <div class="main-content-detail">
@@ -8,16 +11,19 @@ echo $this->toolbox;
    ?>
    <h2><?=$this->_('Seznam globálních panelů');?></h2>
    <br />
-   <table>
-      <tr>
-         <th width="200"><?=$this->_('kategorie')?></th>
-         <th width="100"><?=$this->_('box')?></th>
-         <th width="90"><?=$this->_('pořadí')?></th>
-         <th width="60"><?=$this->_('akce')?></th>
-      </tr>
-      <?
-      $this->panels = $this->gobalpanels;
+   <table class="panels-list">
+      <thead>
+         <tr class="ui-widget-header">
+            <th scope="col" class="panel-tb-category"><?=$this->tr('kategorie')?></th>
+            <th scope="col" class="panel-tb-box"><?=$this->tr('box')?></th>
+            <th scope="col" class="panel-tb-order"><?=$this->tr('pořadí')?></th>
+            <th scope="col" class="panel-tb-actions"><?=$this->tr('akce')?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?$this->panels = $this->gobalpanels;
       $this->includeTpl('listtpl.phtml', false, array('panels' => $this->gobalpanels));?>
+      </tbody>
    </table>
    <br />
    <br />
@@ -35,16 +41,13 @@ echo $this->toolbox;
    <button name="selectCatPanels"><?=$this->_('Vybrat')?></button>
    <br />
    <div><!-- kvuli loadboxu-->
-      <table id="indCatPanelsList">
-         <thead id="indCatPanelsListHeader">
+      <table class="panels-list" id="indCatPanelsList">
+         <thead class="ui-widget-header" id="indCatPanelsListHeader">
             <tr>
-               <th width="200"><?=$this->_('kategorie')?></th>
-               <th width="100"><?=$this->_('box')?></th>
-               <th width="90"><?=$this->_('pořadí')?></th>
-               <th width="60"><?=$this->_('akce')?></th>
-            </tr>
-            <tr>
-               <td colspan="4"><hr/></td>
+               <th scope="col" class="panel-tb-category"><?=$this->tr('kategorie')?></th>
+               <th scope="col" class="panel-tb-box"><?=$this->tr('box')?></th>
+               <th scope="col" class="panel-tb-order"><?=$this->tr('pořadí')?></th>
+               <th scope="col" class="panel-tb-actions"><?=$this->tr('akce')?></th>
             </tr>
          </thead>
          <tbody></tbody>
