@@ -1,57 +1,48 @@
 <?
-$this->addPageTitle($this->_('úprava e-mailu registrace'));
+$this->addPageTitle($this->tr('úprava e-mailu registrace'));
 ?>
-<h1><?echo $this->_('úprava e-mailu registrace');?></h1>
+<h1><?echo $this->tr('úprava e-mailu registrace');?></h1>
 <div class="main-content-detail main-content-form-edit contact-form-edit">
    <?
    // donastavení formuláře
-   $this->form->text_email->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
-
-   $tinymce = new JsPlugin_TinyMce();
-   $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_FULL);
-   $tinymce->setCfgParam('editor_selector', 'mceEditor');
-   $tinymce->setCfgParam('relative_urls', false);
-//   $tinymce->setCfgParam('plugins', array('replacement'));
-//   $tinymce->setCfgParam('replacementurl', $this->link()->route('varList'));
-   $this->addJsPlugin($tinymce);
-
-
+   $this->form->text_mail->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
    echo $this->form;
    ?>
-   <table class="formTable">
+   <form action="<?=$this->link()?>" method="post">
+      <fieldset class="fieldset-alt">
+         <legend><?=$this->tr('Proměnné, které se přepisují')?></legend> 
+         <table class="form-table">
          <tr>
-            <th colspan="2"><?=$this->_('Proměnné, které se přepisují:')?></th>
+            <td class="form-labels">{REG_COMPLETE_LINK}</td>
+            <td><?=$this->tr('Odkaz na dokončení registrace')?></td>
+            <td class="form-controlls"><button name="add" type="button" value="{REG_COMPLETE_LINK}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->tr('Vložit')?></button></td>
          </tr>
          <tr>
-            <td class="formLabels">{REG_COMPLETE_LINK}</td>
-            <td><?=$this->_('Odkaz na dokončení registrace')?></td>
-            <td class="formControlls"><button name="add" type="button" value="{REG_COMPLETE_LINK}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->_('Vložit')?></button></td>
+            <td class="form-labels">{REG_LINK_EXPIRE}</td>
+            <td><?=$this->tr('Datum a čes vypršení odkazu pro dokončení registrace')?></td>
+            <td class="form-controlls"><button name="add" type="button" value="{REG_LINK_EXPIRE}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->tr('Vložit')?></button></td>
          </tr>
          <tr>
-            <td class="formLabels">{REG_LINK_EXPIRE}</td>
-            <td><?=$this->_('Datum a čes vypršení odkazu pro dokončení registrace')?></td>
-            <td class="formControlls"><button name="add" type="button" value="{REG_LINK_EXPIRE}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->_('Vložit')?></button></td>
+            <td class="form-labels">{WEB_NAME}</td>
+            <td class="form-controlls"><?=$this->tr('Název stránek')?></td>
+            <td class="form-controlls"><button name="add" type="button" value="{WEB_NAME}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->tr('Vložit')?></button></td>
          </tr>
          <tr>
-            <td class="formLabels">{WEB_NAME}</td>
-            <td class="formControlls"><?=$this->_('Název stránek')?></td>
-            <td class="formControlls"><button name="add" type="button" value="{WEB_NAME}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->_('Vložit')?></button></td>
+            <td class="form-labels">{WEB_LINK}</td>
+            <td class="form-controlls"><?=$this->tr('Odkaz na stránky')?></td>
+            <td class="form-controlls"><button name="add" type="button" value="{WEB_LINK}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->tr('Vložit')?></button></td>
          </tr>
          <tr>
-            <td class="formLabels">{WEB_LINK}</td>
-            <td class="formControlls"><?=$this->_('Odkaz na stránky')?></td>
-            <td class="formControlls"><button name="add" type="button" value="{WEB_LINK}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->_('Vložit')?></button></td>
+            <td class="form-labels">{USER_DATA}</td>
+            <td class="form-controlls"><?=$this->tr('Detail registrace')?></td>
+            <td class="form-controlls"><button name="add" type="button" value="{USER_DATA}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->tr('Vložit')?></button></td>
          </tr>
          <tr>
-            <td class="formLabels">{USER_DATA}</td>
-            <td class="formControlls"><?=$this->_('Detail registrace')?></td>
-            <td class="formControlls"><button name="add" type="button" value="{USER_DATA}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->_('Vložit')?></button></td>
-         </tr>
-         <tr>
-            <td class="formLabels">{DATE}</td>
-            <td class="formControlls"><?=$this->_('Datum registrace')?></td>
-            <td class="formControlls"><button name="add" type="button" value="{DATE}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->_('Vložit')?></button></td>
+            <td class="form-labels">{DATE}</td>
+            <td class="form-controlls"><?=$this->tr('Datum registrace')?></td>
+            <td class="form-controlls"><button name="add" type="button" value="{DATE}" onclick="tinyMCE.execCommand('mceInsertContent', false, this.value);return false;"><?=$this->tr('Vložit')?></button></td>
          </tr>
       </table>
+      </fieldset>
+   </form>
 </div>
-<? $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear())); ?>

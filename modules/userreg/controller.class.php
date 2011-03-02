@@ -34,63 +34,63 @@ class UserReg_Controller extends Controller {
       }
 
       $formReg = new Form('reg');
-      $formGrpAccount = $formReg->addGroup('account', $this->_('Účet'));
+      $formGrpAccount = $formReg->addGroup('account', $this->tr('Účet'));
 
-      $elemUsername = new Form_Element_Text('username', $this->_('Uživatelské jméno'));
+      $elemUsername = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
       $elemUsername->addValidation(new Form_Validator_NotEmpty());
       $elemUsername->addValidation(new Form_Validator_MinLength(5));
-      $elemUsername->addValidation(new Form_Validator_Regexp('/^[a-zA-Z0-9_-]+$/', $this->_('Uživatelské jméno obsahuje nepovolené znaky.')));
-      $elemUsername->setSubLabel($this->_('pouze písmena, číslice a znaky: "_-"'));
+      $elemUsername->addValidation(new Form_Validator_Regexp('/^[a-zA-Z0-9_-]+$/', $this->tr('Uživatelské jméno obsahuje nepovolené znaky.')));
+      $elemUsername->setSubLabel($this->tr('pouze písmena, číslice a znaky: "_-"'));
 
 
       $formReg->addElement($elemUsername, $formGrpAccount);
 
-      $elemPass = new Form_Element_Password('pass', $this->_('Heslo'));
+      $elemPass = new Form_Element_Password('pass', $this->tr('Heslo'));
       $elemPass->addValidation(new Form_Validator_NotEmpty());
       $elemPass->addValidation(new Form_Validator_MinLength(5));
       $formReg->addElement($elemPass, $formGrpAccount);
 
-      $elemPassControll = new Form_Element_Password('passctrl', $this->_('Heslo (kontrola)'));
+      $elemPassControll = new Form_Element_Password('passctrl', $this->tr('Heslo (kontrola)'));
       $elemPassControll->addValidation(new Form_Validator_NotEmpty());
 //      $elemPassControll->addValidation(new Form_Validator_MinLength(5));
       $formReg->addElement($elemPassControll, $formGrpAccount);
 
 
-      $formGrpContact = $formReg->addGroup('contact', $this->_('Kontaktní údaje'));
-      $elemName = new Form_Element_Text('name', $this->_('Jméno'));
+      $formGrpContact = $formReg->addGroup('contact', $this->tr('Kontaktní údaje'));
+      $elemName = new Form_Element_Text('name', $this->tr('Jméno'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $formReg->addElement($elemName, $formGrpContact);
 
-      $elemName = new Form_Element_Text('surname', $this->_('Přijmení'));
+      $elemName = new Form_Element_Text('surname', $this->tr('Přijmení'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $formReg->addElement($elemName, $formGrpContact);
 
-      $elemMail = new Form_Element_Text('mail', $this->_('E-mail'));
+      $elemMail = new Form_Element_Text('mail', $this->tr('E-mail'));
       $elemMail->addValidation(new Form_Validator_NotEmpty());
       $elemMail->addValidation(new Form_Validator_Email());
       $formReg->addElement($elemMail, $formGrpContact);
 
-      $elemPhone = new Form_Element_Text('phone', $this->_('Telefon'));
-      $elemPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK, $this->_('Špatně zadané telefonní číslo')));
+      $elemPhone = new Form_Element_Text('phone', $this->tr('Telefon'));
+      $elemPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK, $this->tr('Špatně zadané telefonní číslo')));
       $formReg->addElement($elemPhone, $formGrpContact);
 
-      $elemCondAgree = new Form_Element_Checkbox('condAgree', $this->category()->getParam(self::PARAM_COND_AGREE, $this->_('Souhlasím se zpracováním údajů')));
-      $elemCondAgree->addValidation(new Form_Validator_Match(true, $this->_('Musíte souhlasit s podmínkami')));
+      $elemCondAgree = new Form_Element_Checkbox('condAgree', $this->category()->getParam(self::PARAM_COND_AGREE, $this->tr('Souhlasím se zpracováním údajů')));
+      $elemCondAgree->addValidation(new Form_Validator_Match(true, $this->tr('Musíte souhlasit s podmínkami')));
       $elemCondAgree->setValues(true);
       $formReg->addElement($elemCondAgree);
 
-      $elemSubmit = new Form_Element_Submit('send', $this->_('Registrovat'));
+      $elemSubmit = new Form_Element_Submit('send', $this->tr('Registrovat'));
       $formReg->addElement($elemSubmit);
 
       // kontrola stejného hesla
       if ($formReg->isSend()) {
          if ($formReg->pass->getValues() != $formReg->passctrl->getValues()) {
-            $elemPassControll->setError($this->_('Hesla se neshodují'));
+            $elemPassControll->setError($this->tr('Hesla se neshodují'));
          }
 
          $this->checkUserNameController($formReg->username->getValues());
          if ($this->view()->isFree == false) {
-            $elemUsername->setError($this->_('Zvolené uživatelské jméno je již obsazeno.'));
+            $elemUsername->setError($this->tr('Zvolené uživatelské jméno je již obsazeno.'));
          }
       }
 
@@ -110,10 +110,10 @@ class UserReg_Controller extends Controller {
             }
 
             $userData = null;
-            $userData .= $this->_('Login') . ': ' . $formReg->username->getValues() . '<br/>';
-            $userData .= $this->_('Jméno') . ': ' . $formReg->name->getValues() . '<br/>';
-            $userData .= $this->_('Přijmení') . ': ' . $formReg->surname->getValues() . '<br/>';
-            $userData .= $this->_('Mail') . ': ' . $formReg->mail->getValues() . '<br/>';
+            $userData .= $this->tr('Login') . ': ' . $formReg->username->getValues() . '<br/>';
+            $userData .= $this->tr('Jméno') . ': ' . $formReg->name->getValues() . '<br/>';
+            $userData .= $this->tr('Přijmení') . ': ' . $formReg->surname->getValues() . '<br/>';
+            $userData .= $this->tr('Mail') . ': ' . $formReg->mail->getValues() . '<br/>';
 
             $text = str_replace(
                   array('{REG_COMPLETE_LINK}',
@@ -132,12 +132,12 @@ class UserReg_Controller extends Controller {
                   $text);
 
             $mail = new Email(true);
-            $mail->setSubject($this->_('Registrace na stránkách') . ' ' . VVE_WEB_NAME);
+            $mail->setSubject($this->tr('Registrace na stránkách') . ' ' . VVE_WEB_NAME);
             $mail->addAddress($formReg->mail->getValues());
             $mail->setContent($text);
             $mail->send();
 
-            $this->infoMsg()->addMessage($this->_('Registrace proběhla úspěšně.'));
+            $this->infoMsg()->addMessage($this->tr('Registrace proběhla úspěšně.'));
             $this->link()->clear()->route('welcome')->reload();
          } else {
             /*
@@ -161,10 +161,10 @@ class UserReg_Controller extends Controller {
             }
 
             $userData = null;
-            $userData .= $this->_('Login') . ': ' . $formReg->username->getValues() . '<br/>';
-            $userData .= $this->_('Jméno') . ': ' . $formReg->name->getValues() . '<br/>';
-            $userData .= $this->_('Přijmení') . ': ' . $formReg->surname->getValues() . '<br/>';
-            $userData .= $this->_('Mail') . ': ' . $formReg->mail->getValues() . '<br/>';
+            $userData .= $this->tr('Login') . ': ' . $formReg->username->getValues() . '<br/>';
+            $userData .= $this->tr('Jméno') . ': ' . $formReg->name->getValues() . '<br/>';
+            $userData .= $this->tr('Přijmení') . ': ' . $formReg->surname->getValues() . '<br/>';
+            $userData .= $this->tr('Mail') . ': ' . $formReg->mail->getValues() . '<br/>';
 
             $expire = new DateTime();
             $expire->modify('+' . $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE) . ' hours');
@@ -178,7 +178,7 @@ class UserReg_Controller extends Controller {
                      '{DATE}',
                      '{WEB_LINK}'),
                   array('<a href="' . $this->link()->route('completeReg')->param('id', $hash)
-                     . '" title="' . $this->_('Dokončení registrace') . '">'
+                     . '" title="' . $this->tr('Dokončení registrace') . '">'
                      . $this->link()->route('completeReg')->param('id', $hash) . '</a>',
                      vve_date('%x %X', $expire),
                      VVE_WEB_NAME,
@@ -189,12 +189,12 @@ class UserReg_Controller extends Controller {
                   $text);
 
             $mail = new Email(true);
-            $mail->setSubject($this->_('Registrace na stránkách') . ' ' . VVE_WEB_NAME);
+            $mail->setSubject($this->tr('Registrace na stránkách') . ' ' . VVE_WEB_NAME);
             $mail->addAddress($formReg->mail->getValues());
             $mail->setContent($text);
             $mail->send();
 
-            $this->infoMsg()->addMessage(sprintf($this->_('Registrace byla zařazena. Na zadané emailové adrese "%s" nalezenete informace pro dokončení registrace.'), $formReg->mail->getValues()));
+            $this->infoMsg()->addMessage(sprintf($this->tr('Registrace byla zařazena. Na zadané emailové adrese "%s" nalezenete informace pro dokončení registrace.'), $formReg->mail->getValues()));
             $this->link()->reload();
          }
       }
@@ -211,7 +211,7 @@ class UserReg_Controller extends Controller {
       $data = $model->getRegistration($this->getRequestParam('id'));
 
       if ($data == false) {
-         $this->errMsg()->addMessage($this->_('Požadované registraci již vypršela platnost nebo nebyla vytvořena. Pokuste se zaregistrovat znovu.'));
+         $this->errMsg()->addMessage($this->tr('Požadované registraci již vypršela platnost nebo nebyla vytvořena. Pokuste se zaregistrovat znovu.'));
       } else {
          $modelUsers = new Model_Users();
 
@@ -221,7 +221,7 @@ class UserReg_Controller extends Controller {
             $username = (string)$data->{UserReg_Model_Queue::COLUMN_USERNAME}.$count;
             $count++;
             if($count > 100){
-               $this->errMsg()->addMessage($this->_('Toto uživatelské jméno a všech jeho 100 podob je již obsazeno. Vyplňte prosím znovu registraci s jiným uživatelským jménem.'));
+               $this->errMsg()->addMessage($this->tr('Toto uživatelské jméno a všech jeho 100 podob je již obsazeno. Vyplňte prosím znovu registraci s jiným uživatelským jménem.'));
                return;
             }
          }
@@ -233,7 +233,7 @@ class UserReg_Controller extends Controller {
 
          $model->remove($this->getRequestParam('id'));
 
-         $this->infoMsg()->addMessage($this->_('Registrace proběhla úspěšně.'));
+         $this->infoMsg()->addMessage($this->tr('Registrace proběhla úspěšně.'));
          $this->link()->clear()->route('welcome')->reload();
       }
    }
@@ -255,9 +255,9 @@ class UserReg_Controller extends Controller {
       $modelText = new Text_Model();
       $formEdit = new Form('mailreg_edit');
       // text emailu
-      $elemTextEmail = new Form_Element_TextArea('text_email', $this->_('Text emailu'));
-      $elemTextEmail->addValidation(new Form_Validator_NotEmpty());
+      $elemTextEmail = new Form_Element_TextArea('text_mail', $this->tr('Text emailu'));
       $elemTextEmail->setLangs();
+      $elemTextEmail->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       // naplníme pokud je čím
       $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_MAIL_REG);
       if ($text != false) {
@@ -265,13 +265,18 @@ class UserReg_Controller extends Controller {
       }
       $formEdit->addElement($elemTextEmail);
 
-      $eS = new Form_Element_Submit('save', $this->_('Uložit'));
-      $formEdit->addElement($eS);
+      $elemSave = new Form_Element_SaveCancel('save');
+      $formEdit->addElement($elemSave);
+
+      if($formEdit->isSend() AND $formEdit->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
 
       if ($formEdit->isValid()) {
-         $modelText->saveText($formEdit->text_email->getValues(), null,
+         $modelText->saveText($formEdit->text_mail->getValues(), null,
             $this->category()->getId(), self::TEXT_KEY_MAIL_REG);
-         $this->infoMsg()->addMessage($this->_('Text registračního e-mailu byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Text registračního e-mailu byl uložen'));
          $this->link()->route()->reload();
       }
       $this->view()->form = $formEdit;
@@ -286,7 +291,7 @@ class UserReg_Controller extends Controller {
 
       $formEdit = new Form('text_edit');
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text přihlášky'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text přihlášky'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $elemText->setLangs();
 
@@ -297,12 +302,17 @@ class UserReg_Controller extends Controller {
       }
       $formEdit->addElement($elemText);
 
-      $elemSave = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSave = new Form_Element_SaveCancel('save');
       $formEdit->addElement($elemSave);
 
+      if($formEdit->isSend() AND $formEdit->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+      
       if ($formEdit->isValid()) {
          $modelText->saveText($formEdit->text->getValues(), null, $this->category()->getId(), self::TEXT_KEY_MAIN);
-         $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
          $this->link()->route()->reload();
       }
 
@@ -315,7 +325,7 @@ class UserReg_Controller extends Controller {
 
       $formEdit = new Form('contact_edit');
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text přihlášky'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $elemText->setLangs();
 
@@ -326,12 +336,17 @@ class UserReg_Controller extends Controller {
       }
       $formEdit->addElement($elemText);
 
-      $elemSave = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSave = new Form_Element_SaveCancel('save');
       $formEdit->addElement($elemSave);
 
+      if($formEdit->isSend() AND $formEdit->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+      
       if ($formEdit->isValid()) {
          $modelText->saveText($formEdit->text->getValues(), null, $this->category()->getId(), self::TEXT_KEY_WELCOME);
-         $this->infoMsg()->addMessage($this->_('Text byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
          $this->link()->route()->reload();
       }
 
@@ -350,10 +365,10 @@ class UserReg_Controller extends Controller {
       $userQ = $modelQueue->getUser($username);
 
       $this->view()->isFree = false;
-         $this->view()->msg = $this->_('obsazené');
+         $this->view()->msg = $this->tr('obsazené');
       if($user === false AND $userQ === false){
          $this->view()->isFree = true;
-         $this->view()->msg = $this->_('volné');
+         $this->view()->msg = $this->tr('volné');
       }
    }
 

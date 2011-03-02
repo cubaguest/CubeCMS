@@ -1,13 +1,13 @@
 <?
 $jQ = new JsPlugin_JQuery();
 $this->addJsPlugin($jQ);
+echo $this->toolboxText;
 ?>
 <h1><?= $this->category()->getName() ?></h1>
 <div class="main-content-text"><?
    if ($this->text != null) {
       echo $this->text;
    }
-   echo $this->toolboxText;
 ?></div>
 <div class="main-content-form-edit" id="userreg-reg-form">
    <?

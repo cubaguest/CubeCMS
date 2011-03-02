@@ -5,14 +5,8 @@ $this->addPageTitle($this->headline);
 <div class="main-content-detail main-content-form-edit contact-form-edit">
    <?
    // donastavení formuláře
-   $this->formEdit->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
-
-   $tinymce = new JsPlugin_TinyMce();
-   $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_FULL);
-   $tinymce->setCfgParam('editor_selector', 'mceEditor');
-   $this->addJsPlugin($tinymce);
+   $this->formEdit->text->html()->setAttrib('cols', 60)->setAttrib('rows', 30);
 
    echo $this->formEdit;
    ?>
 </div>
-<? $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear())); ?>
