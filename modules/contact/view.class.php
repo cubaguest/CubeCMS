@@ -32,6 +32,7 @@ class Contact_View extends View {
       $this->addTinyMCE('mceEditor');
       $this->formEdit->textPanel->html()->addClass("mceEditorSimple");
       $this->addTinyMCE('mceEditorSimple');
+      Template_Module::setEdit(true);
    }
 
    private function addTinyMCE($selector) {
