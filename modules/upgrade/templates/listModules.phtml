@@ -1,15 +1,19 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+$this->addCssFile('style.css');
+?>
 <h2><?=$this->_('Seznam instalovaných modulů')?></h2>
-<table>
+<table class="modules-list">
    <thead>
-      <tr>
-         <th width="150"><?=$this->_('Název modulu')?></th>
-         <th width="80"><?=$this->_('instalovaná verze')?></th>
-         <th width="80"><?=$this->_('aktuální verze')?></th>
+      <tr class="ui-widget-header">
+         <th scope="col" class="modules-tb-name"><?=$this->_('Název modulu')?></th>
+         <th scope="col" class="modules-tb-version"><?=$this->_('instalovaná verze')?></th>
+         <th scope="col" class="modules-tb-version"><?=$this->_('aktuální verze')?></th>
       </tr>
    </thead>
    <tbody>
       <?foreach ($this->modules as $module) {?>
-      <tr style="<?if($module['upgrade'] == true) echo "background-color: red;" ?>">
+      <tr class="ui-widget-content ui-state-default<?if($module['upgrade'] == true) echo " ui-state-error" ?>">
          <td><?=$module['name']?></td>
          <td><?=$module['inst_ver']?></td>
          <td><?=$module['avail_ver']?></td>
