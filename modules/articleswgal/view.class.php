@@ -25,10 +25,12 @@ class ArticlesWGal_View extends Articles_View {
 
    public function editphotosView() {
       $this->template()->addFile('tpl://photogalery:editphotos.phtml');
+      Template_Module::setEdit(true);
    }
 
    public function editphotoView() {
       $this->template()->addFile("tpl://photogalery:editphoto.phtml");
+      Template_Module::setEdit(true);
    }
 
    public function checkFileView() {
