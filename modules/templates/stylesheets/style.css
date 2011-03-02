@@ -1,4 +1,7 @@
 @CHARSET "UTF-8";
-.module-templates-list table form {
-   display: inline;
-}
+.module-templates-list table form {display: inline;}
+.templates-list {width: 100%;}
+.templates-list td, .templates-list th { padding: 2px;}
+.template-tb-name {width: 25%;}
+.template-tb-cnt {}
+.template-tb-type, .template-tb-actions {width: 80px;}

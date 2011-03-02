@@ -14,6 +14,7 @@ class Templates_View extends View {
 
          $this->toolbox = $toolbox;
       }
+      Template_Module::setEdit(true);
    }
 
    /**
@@ -29,6 +30,7 @@ class Templates_View extends View {
       $settings->setSetting('height', '600');
       $this->tinyMCE->setEditorSettings($settings);
       $this->tinyMCE->mainView();
+      Template_Module::setEdit(true);
    }
 
    /**
@@ -40,6 +42,7 @@ class Templates_View extends View {
 
    public function previewView() {
       $this->template()->addTplFile('preview.phtml');
+      Template_Module::setEdit(true);
    }
 
    public static function templateView(){

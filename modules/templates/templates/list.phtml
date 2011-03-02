@@ -1,21 +1,23 @@
 <?
 $this->addCssFile('style.css');
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+echo $this->toolbox;
 ?>
 <h1><?=$this->category()->getName();?></h1>
 <div class="main-content-list module-templates-list">
    <?if(!empty ($this->templates)) {?>
-   <table>
+   <table class="templates-list">
       <thead>
-         <tr>
-            <th width="150"><?=$this->_('Název')?></th>
-            <th width="300"><?=$this->_('Obsah')?></th>
-            <th width="50"><?=$this->_('Typ')?></th>
-            <th width="60"></th>
+         <tr class="ui-widget-header">
+            <th class="template-tb-name"><?=$this->_('Název')?></th>
+            <th class="template-tb-cnt"><?=$this->_('Obsah')?></th>
+            <th class="template-tb-type"><?=$this->_('Typ')?></th>
+            <th class="template-tb-actions"></th>
          </tr>
       </thead>
    <?
       foreach ($this->templates as $template) {?>
-      <tr>
+      <tr class="ui-widget-content ui-state-default">
          <td><?=$template->{Templates_Model::COLUMN_NAME}?></td>
          <td><span class="templates-tpl-short-cnt" title="<?=htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT})?>"
                 ><?=vve_tpl_truncate(htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT}), 100)?></span></td>
@@ -44,6 +46,5 @@ $this->addCssFile('style.css');
    } else {
       print ($this->_('Není vložena žádná šablona'));
    }
-   echo $this->toolbox;
    ?>
 </div>
