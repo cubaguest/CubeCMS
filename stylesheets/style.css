@@ -134,6 +134,9 @@ span[title] {
 .font-small, .note {
    font-size: x-small;
 }
+.ui-widget { /* ui-widgent má normálně 1.1em */
+   font-size: 100% !important;
+}
 /* Hlášky */
 .message {
    font-size: small;
