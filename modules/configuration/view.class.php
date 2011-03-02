@@ -7,10 +7,12 @@
 class Configuration_View extends View {
    public function mainView() {
       $this->template()->addTplFile('list.phtml');
+      Template_Module::setEdit(true);
    }
 
    public function editView() {
       $this->template()->addTplFile('edit.phtml');
+      Template_Module::setEdit(true);
    }
 }
 
