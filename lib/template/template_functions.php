@@ -238,4 +238,14 @@ function langsImages($text, $path = 'images/langs/small') {
    }
    return $string;
 }
+
+/**
+ * Funkce odstraní prázdné tagy kromě nepárových
+ * @param string $text -- text
+ * @return string
+ */ 
+function vve_remove_empty_tags($text)
+{
+   return preg_replace('/<(?!input|br|img|meta|hr|\/)[^>]*>\s*<\/[^>]*>/i', '', $text);
+}
 ?>
