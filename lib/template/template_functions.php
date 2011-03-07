@@ -226,17 +226,28 @@ function vve_tpl_flash($flashUrl, $w, $h, $alternateStr = '<p>This is <b>alterna
  * @param string $imagesPath -- (option) cesta k obrázkům
  * @return string
  */
-function langsImages($text, $path = 'images/langs/small') {
+function langsImages($text, $path = 'images/langs/small/') {
    if(!Locales::isMultilang()) return null;
    if(($text instanceof Model_ORM_LangCell) == false
       AND ($text instanceof Model_LangContainer_LangColumn) == false) throw new UnexpectedValueException(_('Byl předán špatný typ jazykového kontejneru pro text'));
    $string = null;
    foreach (Locales::getAppLangs() as $lang) {
       if($text[$lang] != null){
-         $string .= '<img src="'.$path.URL_SEPARATOR.$lang.'.png" alt="'.$lang.'" class="lang-image" />';
+         $string .= vve_tpl_lang_image($lang, $path);
       }
    }
    return $string;
+}
+
+/**
+ * Funkce vrací obrázek pro daný jazyk
+ * @param string $lang -- jazyková zkratka
+ * @param string $path -- cesta k obrázkům
+ * @return string tag img
+ */
+function vve_tpl_lang_image($lang = null, $path = 'images/langs/small/'){
+   if($lang == null) $lang = Locales::getDefaultLang();
+   return '<img src="'.$path.$lang.'.png" alt="'.$lang.' flag" class="lang-image" />';
 }
 
 /**
