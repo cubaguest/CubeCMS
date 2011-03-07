@@ -79,7 +79,7 @@ OR `key` = 'SMTP_SERVER' OR `key` = 'SMTP_SERVER_PORT' OR `key` = 'SMTP_SERVER_U
 OR `key` = 'NOREPLAY_MAIL';
 
 -- images
-UPDATE `{PREFIX}config` SET `id_group` = @grp_exports WHERE `key` = 'USE_IMAGEMAGICK'
+UPDATE `{PREFIX}config` SET `id_group` = @grp_images WHERE `key` = 'USE_IMAGEMAGICK'
 OR `key` = 'IMAGE_THUMB_W' OR `key` = 'IMAGE_THUMB_H' OR `key` = 'DEFAULT_PHOTO_W' OR `key` = 'DEFAULT_PHOTO_H' OR `key` = 'STORE_ORIGINAl_FILES' OR `key` = 'IMAGE_THUMB_CROP' OR `key` = '' OR `key` = ''
 OR `key` = '' OR `key` = '' OR `key` = '';
 
