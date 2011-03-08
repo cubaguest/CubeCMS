@@ -1052,10 +1052,16 @@ class Model_ORM extends Model_PDO {
     */
    protected function createSelectColumnString($tbPrefix, $columnName, $alias = null, $isLang = false, $columnOrigName = null)
    {
+//  Example of args
+//  0 => string 'Model_Groups_1' (length=14)
+//  1 => string 'gname' (length=5)
+//  2 => null
+//  3 => boolean false
+//  4 => string 'name' (length=4)
       $alias = is_int($alias) ? null : $alias;
       if ($isLang == false) {// není jazyk
          if ($columnOrigName != null){
-            $alias = $alias == null ? null : $columnName;
+            $alias = $alias == null ? $columnName : $alias;
             $columnName = $columnOrigName;
          }
          if ($alias == null) {
