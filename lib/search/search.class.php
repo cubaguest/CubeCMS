@@ -63,10 +63,12 @@ class Search {
     */
    private static $resultLen = VVE_SEARCH_RESULT_LENGHT;
 
+   private $baseRelev = 0;
+
    /**
     * Konstruktor
     */
-   public function  __construct(Category $category = null) {
+   public function  __construct(Category $category = null, $baseRelevance = 0) {
       if($category !== null) {
          $this->category = $category;
          $this->link = new Url_Link_Module(true);
@@ -78,6 +80,7 @@ class Search {
          $this->link = new Url_Link(true);
          $this->link->category();
       }
+      $this->baseRelev = $baseRelevance;
    }
    
    /**
@@ -99,7 +102,7 @@ class Search {
               self::R_I_NAME => $name,
               self::R_I_LINK => (string)$url,
               self::R_I_TEXT => $this->createShortText((string)$text),
-              self::R_I_RELEVATION => $relevance,
+              self::R_I_RELEVATION => $relevance+$this->baseRelev,
               self::R_I_CAT_NAME => $catName,
               self::R_I_CAT_LINK => (string)$catLink,
               self::R_I_WEB_LINK => (string)$this->link()->clear(true),
@@ -161,6 +164,15 @@ class Search {
    /**
     * Metoda vrací objekt kategorie
     * @return Category
+    */
+   public function category() {
+      return $this->category;
+   }
+
+   /**
+    * Metoda vrací objekt kategorie
+    * @return Category
+    * @deprecated see category()
     */
    public function getCategory() {
       return $this->category;

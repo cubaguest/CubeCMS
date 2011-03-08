@@ -78,7 +78,7 @@ class Model_Category extends Model_ORM {
       $this->setTableName($this->tableName, 't_cats');
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1));
       $this->addColumn(self::COLUMN_ALT, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_MODULE, array('datatype' => 'varchar(30)', 'pdoparam' => PDO::PARAM_STR));
@@ -94,7 +94,7 @@ class Model_Category extends Model_ORM {
       $this->addColumn(self::COLUMN_ACTIVE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
 
       $this->addColumn(self::COLUMN_KEYWORDS, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_DESCRIPTION, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DESCRIPTION, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
 
       $this->addColumn(self::COLUMN_CHANGED, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
@@ -327,32 +327,6 @@ class Model_Category extends Model_ORM {
             . " WHERE (" . self::COLUMN_CAT_ID . " = :idcat)");
       $dbst->bindParam(':idcat', $idCategory, PDO::PARAM_INT);
       return $dbst->execute();
-   }
-
-   public function search($string)
-   {
-      $dbc = new Db_PDO();
-      $clabel = self::COLUMN_CAT_LABEL . '_' . Locales::getLang();
-      $ctext = self::COLUMN_DESCRIPTION . '_' . Locales::getLang();
-
-      $dbst = $dbc->prepare('SELECT *, (' . round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER + 1) . ' * MATCH(cat.' . $clabel . ') AGAINST (:sstring)'
-            . ' + MATCH(cat.' . $ctext . ') AGAINST (:sstring)) as ' . Search::COLUMN_RELEVATION
-            . ' FROM ' . Db_PDO::table(self::DB_TABLE) . ' as cat'
-            . " LEFT JOIN " . Model_Rights::getRightsTable() . " AS rights ON rights." . Model_Rights::COLUMN_ID_CATEGORY . " = cat." . self::COLUMN_CAT_ID
-            . ' WHERE MATCH(cat.' . $clabel . ', cat.' . $ctext . ') AGAINST (:sstring IN BOOLEAN MODE)'
-//              .' AND (rights.'.Model_Rights::COLUMN_ID_GROUP.' = :idgrp AND rights.'.Model_Rights::COLUMN_RIGHT.' LIKE :rightstr)'
-            . ' AND rights.' . Model_Rights::COLUMN_RIGHT . ' LIKE :rightstr'
-            . ' GROUP BY cat.' . self::COLUMN_CAT_ID
-            . ' ORDER BY ' . round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER + 1)
-            . ' * MATCH(cat.' . $clabel . ') AGAINST (:sstring) + MATCH(cat.' . $ctext . ') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
-      $dbst->bindValue(":rightstr", "r__", PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-
-      return $dbst;
    }
 
    /**

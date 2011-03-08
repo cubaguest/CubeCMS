@@ -57,7 +57,8 @@ class Model_ORM extends Model_PDO {
       'name' => null,
       'extern' => false, // externí sloupec
       'changed' => 0, // INTERNAL -- check if column is changed
-      'fulltext' => false // FULLTEXT na sloupci
+      'fulltext' => false, // FULLTEXT na sloupci
+      'fulltextRel' => 1, // relevance sloupce FULLTEXTu
    );
    protected $limit = array('from' => null, 'rows' => null);
    protected $orders = array();
@@ -321,10 +322,12 @@ class Model_ORM extends Model_PDO {
    /**
     * Metoda nasatvuje, které jazyky se mají vybírat, jestli všechny, nebo jen aktuální jazyk
     * @param bool $all -- true pro všechny
+    * @return Model_ORM
     */
    public function setSelectAllLangs($all = true)
    {
       $this->getAllLangs = $all;
+      return $this;
    }
 
    /*
@@ -643,6 +646,93 @@ class Model_ORM extends Model_PDO {
          $this->deleteRelations($pkValue); // vymazat přidružení
       }
       return $dbst->rowCount();
+   }
+
+   /**
+    * Metoda vrací záznamy z fulltext hledání v modelu
+    * @param string $string -- řetězec, který se má hledat
+    * @todo implementovat načítání pouze zvolených sloupců
+    */
+   public function search($string, $allLangs = false, $fetchParams = self::FETCH_LANG_CLASS)
+   {
+      $this->setSelectAllLangs($allLangs);
+//      if(empty ($cols)){
+      $cols = $this->tableStructure;
+//      } else {
+//         foreach ($this->selectedColumns as $key => $value) {
+//
+//         }
+//      $cols = $this->selectedColumns;
+//      }
+      // vybrání sloupců a vytvoření podřetězců
+      $selectParts = array();
+      $whereParts = array();
+      foreach ($cols as $name => $params) {
+         if($params['fulltext'] == false) continue;
+         // jak se bude sloupce jmenovat (aliasy)
+         if($params['aliasFor'] != null ){
+            $name = $params['aliasFor'];
+         }
+         // pokud je jazykový přidají se přípony pro vybraný jazyk
+         if($params['lang'] == true){
+            $name .= '_'.Locales::getLang();
+         }
+         // select - není nutný, protože řazení je výchozí podle relevance
+         array_push($selectParts, '('.  round($params['fulltextRel']).' * MATCH (`'.$this->getTableShortName().'`. `'.$name.'`) AGAINST (:searchString) )');
+         // where
+         array_push($whereParts, '`'.$this->getTableShortName().'`.`'.$name.'`');
+      }
+      // nesmí být prázdné vyhledávání
+      if(empty ($selectParts) OR empty ($whereParts)){
+         throw new OutOfRangeException($this->tr('Model nepodporuje vyhledávání pomocí fultextu'));
+      }
+
+      $sql = 'SELECT ' . $this->createSQLSelectColumns().', '.implode(' + ', $selectParts).' AS '.Search::COLUMN_RELEVATION
+         .' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+
+      $this->order(array(Search::COLUMN_RELEVATION => self::ORDER_DESC));
+
+      $this->createSQLJoins($sql);
+
+      $this->whereBindValues['searchString'] = $string;
+      $this->where = ' MATCH ('. implode(',', $whereParts).') AGAINST (:searchString IN BOOLEAN MODE) AND ' . $this->where;
+
+      $this->createSQLWhere($sql, $this->getTableShortName()); // where
+      $this->createSQLGroupBy($sql); // group by
+      $this->createSQLOrder($sql); // order
+      $this->createSQLLimi($sql); // limit
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare($sql);
+      $this->bindSQLWhere($dbst); // where values
+      $this->bindSQLLimit($dbst); // limit values
+      
+      $r = false;
+      try {
+         if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+            $dbst->execute();
+            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+         } else {
+            $dbst->setFetchMode($fetchParams);
+            $dbst->execute();
+            $r = $dbst->fetchAll($fetchParams);
+         }
+
+         if ($fetchParams == self::FETCH_PKEY_AS_ARR_KEY AND $r != false) {
+            $newR = array();
+            foreach ($r as $record) {
+               $newR[$record->getPK()] = $record;
+            }
+            $r = $newR;
+         }
+      } catch (PDOException $exc) {
+         CoreErrors::addException($exc);
+         if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+            AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+         }
+      }
+
+      return $r;
    }
 
    /*
@@ -992,12 +1082,16 @@ class Model_ORM extends Model_PDO {
          $cols = array();
          foreach ($this->groupby as $tbAlias => $column) {
             if(is_int($tbAlias)){
-               array_push($cols, '`'.$this->getTableShortName().'`.`'.$column.'`');
+               if(isset($this->tableStructure[$column])){ // sloupce z tohoto modelu
+                  array_push($cols, '`'.$this->getTableShortName().'`.`'.$column.'`');
+               } else {
+                  array_push($cols, '`'.$column.'`');
+               }
             } else {
                array_push($cols, '`'.$tbAlias.'`.`'.$column.'`');
             }
          }
-         $sql .= ' GROUP BY'.  implode(',', $cols);
+         $sql .= ' GROUP BY '.  implode(',', $cols);
       }
    }
 
@@ -1041,7 +1135,9 @@ class Model_ORM extends Model_PDO {
             if (preg_match('/^(?:([a-zA-Z ]+)?\()?(?:([a-zA-Z0-9_-]+)\.)?([a-zA-Z0-9_]+)([ 0-9\/*+-]+)?\)?$/i', $col, $matches)) {
                // tb prefix
                if ($matches[2] == null) {
-                  $ordStr .= '`' . $this->getTableShortName() . '`.';
+                  if(isset ($this->tableStructure[$matches[3]])){ // pokud je sloupec této tabulky
+                     $ordStr .= '`' . $this->getTableShortName() . '`.';
+                  }
                } else {
                   $ordStr .= '`' . $matches[2] . '`.';
                }
