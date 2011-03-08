@@ -1,6 +1,6 @@
 <?php
 class Search_Controller extends Controller {
-   public static $apis = array('VVE verze 6' => 'vve_6', 'Google API' => 'google');
+   public static $apis = array('Cube CMS verze 6/7' => 'vve_7');
 
 
    public function mainController() {
@@ -91,34 +91,54 @@ class Search_Controller extends Controller {
       $catM = new Model_Category();
 
       // hledání v kategoríích
-      $catResults = $catM->search($string);
+      $catResults = $catM->join(Model_Category::COLUMN_CAT_ID, array('right_tb'=> 'Model_Rights'), Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_RIGHT))
+         ->where('right_tb.'.Model_Rights::COLUMN_ID_GROUP." = :idgrp AND right_tb.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'", array('idgrp' => Auth::getGroupId()))
+         ->search($string);
+
 
       $searchMain = new Search();
-      while ($result = $catResults->fetch()) {
-         $searchMain->addResult(null, null, $result->{Model_Category::COLUMN_DESCRIPTION},
+      $catRelevantion = array();
+      if($catResults != false){
+         foreach ($catResults as $result) {
+            $searchMain->addResult(null, null, $result->{Model_Category::COLUMN_DESCRIPTION},
                  $result->{Search::COLUMN_RELEVATION},
                  $result->{Model_Category::COLUMN_CAT_LABEL},
                  $searchMain->link()->category($result->{Model_Category::COLUMN_URLKEY}));
+            $catRelevantion[$result->{Model_Category::COLUMN_CAT_ID}] = $result->{Search::COLUMN_RELEVATION};
+         }
       }
       unset ($searchMain);
 
-
-      // načtení všech kategorií
-      $categories = $catM->getCategoryList();
+      // načtení všech kategorií, ke kterým má uživatel práva
+      $catM = new Model_Category();
+      $categories = $catM->join(Model_Category::COLUMN_CAT_ID, array('right_tb'=> 'Model_Rights'), Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_RIGHT))
+         ->where('right_tb.'.Model_Rights::COLUMN_ID_GROUP." = :idgrp AND right_tb.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'", array('idgrp' => Auth::getGroupId()))
+         ->setSelectAllLangs(false)->records();
       foreach ($categories as $cat) {
          // kontrola souboru (jestli modul má vyhledávání)
          if(!file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-         .$cat[Model_Category::COLUMN_MODULE].DIRECTORY_SEPARATOR.'search.class.php')) continue;
+         .$cat->{Model_Category::COLUMN_MODULE}.DIRECTORY_SEPARATOR.'search.class.php')) continue;
 
          // objekt kategorie
          $catObj = new Category(null, false, $cat);
          // jméno třídy hledání
          $sClassName = ucfirst($catObj->getModule()->getName())."_Search";
 
-         $search = new $sClassName($catObj);
+         $baseRel = 0;
+         if(isset ($catRelevantion[$catObj->getId()])){
+            $baseRel = $catRelevantion[$catObj->getId()];
+         }
+
+         $search = new $sClassName($catObj, $baseRel);
          $search->runSearch();
       }
    }
+
+   private function searchOnlyCat($string, $idc)
+   {
+      
+   }
+
 
    private function searchExtSource($string, $apis) {
       /*

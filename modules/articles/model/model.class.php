@@ -36,7 +36,7 @@ class Articles_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_ID_USER_LAST_EDIT, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
       $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'nn' => true, 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'nn' => true, 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT_PRIVATE, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -270,39 +270,6 @@ class Articles_Model extends Model_ORM {
           ." WHERE (".self::COLUMN_ID." = :idart)");
       $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
       return $dbst->execute();
-   }
-
-   /**
-    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
-    * @param integer $idCat
-    * @param string $string
-    * @param bool $publicOnly
-    * @return PDOStatement
-    */
-   public function search($idCat, $string, $publicOnly = true){
-      $dbc = new Db_PDO();
-      $clabel = Articles_Model_Detail::COLUMN_NAME.'_'.Locales::getLang();
-      $ctext = Articles_Model_Detail::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
-
-      $wherePub = null;
-      if($publicOnly){
-         $wherePub = ' AND '.Articles_Model_Detail::COLUMN_PUBLIC.' = 1';
-      }
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
-              .' + MATCH('.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(Articles_Model_Detail::DB_TABLE)
-              .' WHERE MATCH('.$clabel.', '.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.Articles_Model_Detail::COLUMN_ID_CATEGORY.'` = :idCat'
-              .$wherePub // Public articles
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
    }
 
    /**

@@ -28,14 +28,20 @@ if($i % 2 != 0) $class = 'record-even';
    <?if($result[Search::R_I_NAME] != null){?>
    &nbsp;&raquo;&nbsp;<a href="<?=$result[Search::R_I_LINK]?>" title="<?=$result[Search::R_I_NAME]?>"><?=$result[Search::R_I_NAME]?></a>
    <?}
-}?>
+}
+?>
 </h3>
 <div>
+   <?if(VVE_DEBUG_LEVEL >= 1){?><p class="font-small">relevantion:&nbsp;<?=round($result[Search::R_I_RELEVATION], 2)?></p><?}?>
    <?=$result[Search::R_I_TEXT]?>
 </div>
-<p>
+<p><?
+if($result[Search::R_I_LINK] != null){?>
    <a href="<?=$result[Search::R_I_LINK]?>" title="<?=$this->_('Přejít na adresu')?>"><?=$result[Search::R_I_LINK]?></a>
-</p>
+<?} else {?>
+   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=$this->_('Přejít na adresu')?>"><?=$result[Search::R_I_CAT_LINK]?></a>
+<?}
+?></p>
 </div>
 <?}
 print $this->scrollComp;
