@@ -314,7 +314,7 @@ class Locales extends TrObject {
 
    /**
     * Metoda vrací pole jazyků aplikace
-    * @return array -- pole jazyků aplikace
+    * @return array -- pole jazyků aplikace např. array(0 => 'cs', 1 => 'en', ...)
     */
    public static function getAppLangs() {
       return self::$appLangs;
