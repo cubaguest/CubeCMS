@@ -184,6 +184,7 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     *
     * @param array -- pole parametrů
     * @return string -- řetězec s generovaným souborem
+    * @todo Kompletně přepsat systém generace konfigu, tohle stojí za hovno
     */
    private function generateJsSettings($params) {
       $content = null;
@@ -202,7 +203,7 @@ abstract class Component_TinyMCE_Settings extends TrObject {
                $v = $paramValue;
             } else if(strpos ($paramValue, "function") !== false) { // je vložena funkce
                $v = str_replace('{CATID}', Category::getSelectedCategory()->getId(),(string)$paramValue);
-            } else if($paramValue[0] == '[') {
+            } else if($paramValue[0] == '[' OR strpos ($paramValue, "{") !== false) {
                $v = $paramValue;
             } else {
                $v = "\"".$paramValue."\"";

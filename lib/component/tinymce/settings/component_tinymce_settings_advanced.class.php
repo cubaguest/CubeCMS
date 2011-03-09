@@ -20,7 +20,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_resizing' => 'true',
       'entity_encoding' => 'raw',
       'theme_advanced_blockformats' => "p,h2,h3,h4,h5,h6,address,blockquote,code",// not h1,div,dt,dd,samp
-      'valid_styles' => "'*' : 'color,font-size,font-weight,font-style,text-decoration,background-colo'}",
+      'valid_styles' => "{'*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align'}",
       'tab_focus' => ':prev,:next',
       'width' => 520,
 
