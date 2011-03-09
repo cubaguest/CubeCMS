@@ -1,17 +1,14 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
+echo $this->toolbox;
 ?>
 <h1><?=$this->category()->getName();?></h1>
+<div class="main-content-detail">
 <a href="#" title="<?=$this->_('Přidat příspěvek')?>" id="toggleForm"><?=$this->_('Přidat příspěvek')?></a>
 <br />
 <div id="guestbookNewItemForm">
    <?
-   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7)->addClass("mceEditorSimple");
-   $tinymce2 = new JsPlugin_TinyMce();
-   $tinymce2->setCfgParam('theme', JsPlugin_TinyMce::TINY_THEME_SIMPLE_2);
-   $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
-   $this->addJsPlugin($tinymce2);
-//   $this->form->send->html()->setAttrib('disabled','disabled');
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7);
    echo ($this->form);
    ?>
    <script type="text/javascript">
@@ -47,5 +44,9 @@ $this->addJsPlugin(new JsPlugin_JQuery());
       });
       /* ]]> */
    </script>
+   </div>
 </div>
+<hr class="reseter" />
 <br />
+<?=$this->includeFile('tpl://list.phtml');?>
+

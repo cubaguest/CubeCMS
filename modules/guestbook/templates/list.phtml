@@ -1,19 +1,18 @@
 <div class="guestbook-items main-content-list">
-   <?
-   while ($row = $this->books->fetch()) {?>
+   <?foreach ($this->books as $row) {?>
    <div class="guestbook-item main-content-list-record">
       <div class="main-content-list-record-date">
-         <em><?=vve_date('%x %X', new DateTime($row->{GuestBook_Model_Detail::COL_DATE_ADD}))?></em>
-            <?=$row->{GuestBook_Model_Detail::COL_NICK}?>
+         <em><?=vve_date('%x %X', new DateTime($row->{GuestBook_Model::COLUMN_DATE_ADD}))?></em>
+            <?=htmlspecialchars($row->{GuestBook_Model::COLUMN_NICK})?>
       </div>
          <?
-         if($row->{GuestBook_Model_Detail::COL_WWW} != null) {
-            ?><div class="main-content-text"><a href="<?=$row->{GuestBook_Model_Detail::COL_WWW}?>"
-            title="<?=$row->{GuestBook_Model_Detail::COL_WWW}?>"><?=$row->{GuestBook_Model_Detail::COL_WWW}?></a></div><?
+         if($row->{GuestBook_Model::COLUMN_WWW} != null) {
+            ?><div class="main-content-text"><a href="<?=$row->{GuestBook_Model::COLUMN_WWW}?>"
+            title="<?=$row->{GuestBook_Model::COLUMN_WWW}?>"><?=htmlspecialchars($row->{GuestBook_Model::COLUMN_WWW})?></a></div><?
          }?>
-            <div class="main-content-text"><?=$row->{GuestBook_Model_Detail::COL_TEXT}?></div>
+            <div class="main-content-text"><?=$row->{GuestBook_Model::COLUMN_TEXT}?></div>
          <?if($this->toolboxItem instanceof Template_Toolbox2){
-            $this->toolboxItem->guestbook_item_->getForm()->id->setValues((int)$row->{GuestBook_Model_Detail::COL_ID});
+            $this->toolboxItem->guestbook_item_->getForm()->id->setValues((int)$row->{GuestBook_Model::COLUMN_ID});
             echo $this->toolboxItem;
          }?>
    </div>

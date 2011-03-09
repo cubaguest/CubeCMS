@@ -8,7 +8,6 @@ class GuestBook_View extends View {
 
    public function mainView() {
       $this->template()->addTplFile('form.phtml');
-      $this->template()->addTplFile('list.phtml');
 
       if ($this->category()->getRights()->isWritable()) {
          // toolbox pro item
@@ -19,32 +18,27 @@ class GuestBook_View extends View {
 //            $toolRemove->getForm()->id->setValues((int)$row->{GuestBook_Model_Detail::COL_ID});
          $toolbox->addTool($toolRemove);
          $this->toolboxItem = $toolbox;
+         if($this->category()->getRights()->isControll()){
+            $this->toolbox = new Template_Toolbox2();
+            $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+            $this->link()->route(Routes::MODULE_SETTINGS));
+            $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
+            $this->toolbox->addTool($toolEView);
+         }
+      }
+
+      // add tinymce
+      if($this->category()->getParam(GuestBook_Controller::PARAM_WISIWIG_EDITOR, true) == true){
+         $this->form->text->html()->addClass("mceEditor");
+         $this->tinyMCE = new Component_TinyMCE();
+         $settings = new Component_TinyMCE_Settings_AdvSimple2();
+         $settings->setSetting('editor_selector', 'mceEditor');
+         $this->tinyMCE->setEditorSettings($settings);
+         $this->tinyMCE->mainView();
       }
    }
 
    /* EOF mainView */
-
-   public function exportFeedView() {
-      $feed = new Component_Feed(true);
-
-      $feed->setConfig('type', $this->type);
-      $feed->setConfig('css', 'rss.css');
-      $feed->setConfig('title', $this->category()->getName());
-      $feed->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
-      $feed->setConfig('link', $this->link());
-
-      $model = new GuestBook_Model_Detail();
-      $items = $model->getList($this->category()->getId(), 0, VVE_FEED_NUM);
-
-      while ($item = $items->fetch()) {
-         $feed->addItem(null, $item->{GuestBook_Model_Detail::COL_TEXT},
-            null, new DateTime($item->{GuestBook_Model_Detail::COL_DATE_ADD}),
-            $item->{GuestBook_Model_Detail::COL_NICK}, null, null,
-            $item->{GuestBook_Model_Detail::COL_ID});
-      }
-
-      $feed->flush();
-   }
-
 }
 ?>

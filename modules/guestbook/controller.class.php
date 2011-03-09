@@ -11,6 +11,7 @@ class GuestBook_Controller extends Controller {
    const MIN_SEC_FOR_HUMAN = 10;
 
    const PARAM_CAPCHA_SEC = 'capchasec';
+   const PARAM_WISIWIG_EDITOR = 'weditor';
 
 
    /**
@@ -20,7 +21,7 @@ class GuestBook_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
 
-      $model = new GuestBook_Model_Detail();
+      $model = new GuestBook_Model();
 
       $form = new Form('answer_');
 
@@ -47,7 +48,7 @@ class GuestBook_Controller extends Controller {
               $this->category()->getParam('mintextchars', self::DEFAULT_MIN_TEXT_CHARS)));
       $elemText->addValidation(new Form_Validator_MaxLength(
               $this->category()->getParam('maxtextchars', self::DEFAULT_MAX_TEXT_CHARS)));
-      $elemText->addFilter(new Form_Filter_StripTags(array('span', 'strong', 'em', 'a', 'img')));
+      $elemText->addFilter(new Form_Filter_HTMLPurify('p[style],span[style],a[href|title],strong,em,img[src|alt],br'));
       $form->addElement($elemText);
 
       $elemCaptcha = new Form_Element_Hidden('captcha');
@@ -58,19 +59,39 @@ class GuestBook_Controller extends Controller {
       $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
       $form->addElement($elemSubmit);
 
+      // u přihlášených vypneme chapchu
+      if(Auth::isLogin()){
+         $form->nick->setValues(Auth::getUserName());
+         $form->email->setValues(Auth::getUserMail());
+         $this->category()->setParam(self::PARAM_CAPCHA_SEC, 0);
+      }
+
       if($form->isSend()){
          $this->view()->showFrom = true;
-         if($form->captcha->getValues() < self::MIN_SEC_FOR_HUMAN){
-            $elemCaptcha->setError($this->_('Příliš rychlé odeslání příspěvku, pravděpodobně SPAM'));
+         if($form->captcha->getValues() < $this->category()->getParam(self::PARAM_CAPCHA_SEC, self::MIN_SEC_FOR_HUMAN)){
+            $elemCaptcha->setError($this->_('Příliš rychlé odeslání příspěvku, pravděpodobně SPAM!'));
+            $this->log('Guestbook SPAM from IP: '.$_SERVER['REMOTE_ADDR']);
          }
       }
 
       if($form->isValid()){
-         $model->saveBook($this->category()->getId(), $form->email->getValues(),
-                 $form->text->getValues(), $form->nick->getValues(),$form->www->getValues());
+         $newItem = $model->newRecord();
+//         $newItem->{GuestBook_Model::COLUMN_DATE_ADD} = new DateTime();
+         $newItem->{GuestBook_Model::COLUMN_ID_CAT} = $this->category()->getId();
+         $newItem->{GuestBook_Model::COLUMN_NICK} = $form->nick->getValues();
+         $newItem->{GuestBook_Model::COLUMN_WWW} = $form->www->getValues();
+         $newItem->{GuestBook_Model::COLUMN_TEXT} = $form->text->getValues();
+//         $newItem->{GuestBook_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
+         $newItem->{GuestBook_Model::COLUMN_EMAIL} = $form->email->getValues();
+         $newItem->{GuestBook_Model::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
+         if(isset ($_SERVER['HTTP_USER_AGENT'])){
+            $newItem->{GuestBook_Model::COLUMN_CLIENT} = $_SERVER['HTTP_USER_AGENT'];
+         }
+         $model->save($newItem);
          $this->infoMsg()->addMessage($this->_('Příspěvek byl uložen'));
          $this->link()->reload();
       }
+      $this->view()->form = $form;
 
       if($this->rights()->isWritable()){
          $delForm = new Form('guestbook_item_');
@@ -84,7 +105,7 @@ class GuestBook_Controller extends Controller {
          $delForm->addElement($elemSubDel);
 
          if($delForm->isValid()){
-            $model->deleteItem($delForm->id->getValues());
+            $model->delete($delForm->id->getValues());
             $this->infoMsg()->addMessage($this->_('Položka byla smazána'));
             $this->link()->reload();
          }
@@ -92,34 +113,25 @@ class GuestBook_Controller extends Controller {
       }
 
       // načtení příspěvků
+      $model->where(GuestBook_Model::COLUMN_ID_CAT.' = :idc AND '.GuestBook_Model::COLUMN_DELETED.' = 0',
+         array('idc' => $this->category()->getId()))->order(array(GuestBook_Model::COLUMN_DATE_ADD => Model_ORM::ORDER_DESC));
       $scrollComponent = new Component_Scroll();
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,
-              $model->getCount($this->category()->getId()));
-
+      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->count());
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
               $this->category()->getParam('scroll', self::DEFAULT_NUM_ON_PAGE));
 
-      $this->view()->books = $model->getList($this->category()->getId(),
-              $scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
+      $this->view()->books = $model->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
       $this->view()->scrollComp = $scrollComponent;
-
-      $this->view()->form = $form;
-
-   }
-
-   public function exportFeedController(){
-      $this->checkReadableRights();
-      $this->view()->type = $this->getRequest('type', 'rss');
    }
 
    /**
     * Metoda pro nastavení modulu
     */
-   public static function settingsController(&$settings,Form &$form) {
-      $form->addGroup('basic', 'Základní nasatvení');
+   public function settings(&$settings, Form &$form) {
+      $form->addGroup('basic');
 
-      $elemScroll = new Form_Element_Text('scroll', 'Počet příspěvků na stránku');
-      $elemScroll->setSubLabel('Výchozí: '.self::DEFAULT_NUM_ON_PAGE.' příspěvků');
+      $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet příspěvků na stránku'));
+      $elemScroll->setSubLabel($this->tr(sprintf('Výchozí: %s příspěvků', self::DEFAULT_NUM_ON_PAGE)));
       $elemScroll->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemScroll,'basic');
 
@@ -127,8 +139,8 @@ class GuestBook_Controller extends Controller {
          $form->scroll->setValues($settings['scroll']);
       }
 
-      $elemMinChars = new Form_Element_Text('mintextchars', 'Minimální počet znaků textu');
-      $elemMinChars->setSubLabel('Výchozí: '.self::DEFAULT_MIN_TEXT_CHARS.' znaků');
+      $elemMinChars = new Form_Element_Text('mintextchars', $this->tr('Minimální počet znaků textu'));
+      $elemMinChars->setSubLabel($this->tr(sprintf('Výchozí: %S znaků', self::DEFAULT_MIN_TEXT_CHARS)));
       $elemMinChars->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemMinChars,'basic');
 
@@ -136,8 +148,8 @@ class GuestBook_Controller extends Controller {
          $form->mintextchars->setValues($settings['mintextchars']);
       }
 
-      $elemMaxChars = new Form_Element_Text('maxtextchars', 'Maximální počet znaků textu');
-      $elemMaxChars->setSubLabel('Výchozí: '.self::DEFAULT_MAX_TEXT_CHARS.' znaků');
+      $elemMaxChars = new Form_Element_Text('maxtextchars', $this->tr('Maximální počet znaků textu'));
+      $elemMaxChars->setSubLabel($this->tr(sprintf('Výchozí: %s znaků', self::DEFAULT_MAX_TEXT_CHARS)));
       $elemMaxChars->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemMaxChars,'basic');
 
@@ -145,11 +157,32 @@ class GuestBook_Controller extends Controller {
          $form->maxtextchars->setValues($settings['maxtextchars']);
       }
 
+      $fGrpNewItem = $form->addGroup('newitem', $this->tr('Přidání příspěvku'));
+
+      $elemWEditor = new Form_Element_Checkbox('weditor', $this->tr('Zapnout wisiwig editor'));
+      $elemWEditor->setValues(true);
+      $elemWEditor->setSubLabel($this->tr('Pokud je wisiwig editor vypnut, jsou automaticky odstraněnny všechny html tagy.'));
+      $form->addElement($elemWEditor, $fGrpNewItem);
+      if(isset($settings[self::PARAM_WISIWIG_EDITOR])) {
+         $form->weditor->setValues($settings[self::PARAM_WISIWIG_EDITOR]);
+      }
+
+      $elemCapchaSec = new Form_Element_Text('capchatime', $this->tr('Po kolika sekundách lze formulář odeslat'));
+      $elemCapchaSec->setSubLabel($this->tr(sprintf('Výchozí: %s sekund (obrana proti spamu). Pokud je 0, kontrola je vypnuta.', self::MIN_SEC_FOR_HUMAN)));
+      $elemCapchaSec->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $form->addElement($elemCapchaSec, $fGrpNewItem);
+
+      if(isset($settings[self::PARAM_CAPCHA_SEC])) {
+         $form->maxtextchars->setValues($settings[self::PARAM_CAPCHA_SEC]);
+      }
+
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scroll'] = $form->scroll->getValues();
          $settings['maxtextchars'] = $form->maxtextchars->getValues();
          $settings['mintextchars'] = $form->mintextchars->getValues();
+         $settings[self::PARAM_WISIWIG_EDITOR] = $form->weditor->getValues();
+         $settings[self::PARAM_CAPCHA_SEC] = $form->capchatime->getValues();
       }
    }
 }

@@ -1,30 +1,9 @@
 <?php
-/*
+/**
  * Třída modelu s detailem textu
- * 
+ * @deprecated use Guestbook_Model
 */
-class GuestBook_Model_Detail extends Model_PDO {
-   /**
-    * Tabulka s detaily
-    */
-   const DB_TABLE = 'guestbook';
-
-   /**
-    * Názvy sloupců v db
-    * @var string
-    */
-   const COL_ID = 'id_book';
-   const COL_ID_CAT = 'id_category';
-   const COL_SUBJECT = 'subject';
-   const COL_EMAIL = 'email';
-   const COL_NICK = 'nick';
-   const COL_WWW = 'www';
-   const COL_TEXT = 'text';
-   const COL_IP = 'ip_address';
-   const COL_CLIENT = 'client';
-   const COL_DATE_ADD = 'date_add';
-   const COL_DELETED = 'deleted';
-
+class GuestBook_Model_Detail extends GuestBook_Model {
    /**
     * Metoda provede načtení textu z db
     *
@@ -195,26 +174,26 @@ class GuestBook_Model_Detail extends Model_PDO {
     * @param string $string -- hledaný řetězec
     * @return PDOStatement
     */
-   public function search($idCat, $string) {
-      $dbc = new Db_PDO();
-      $clabel = self::COLUMN_LABEL.'_'.Locales::getLang();
-      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2).' * MATCH(`'.$clabel.'`) AGAINST (:sstring)'
-              .' + MATCH(`'.$ctext.'`) AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE MATCH(`'.$clabel.'`, `'.$ctext.'`) AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.self::COLUMN_ID_CATEGORY.'` = :idCat'
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2)
-              .' * MATCH(`'.$clabel.'`) AGAINST (:sstring) + MATCH(`'.$ctext.'`) AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-
-      return $dbst->fetch();
-   }
+//   public function search($idCat, $string) {
+//      $dbc = new Db_PDO();
+//      $clabel = self::COLUMN_LABEL.'_'.Locales::getLang();
+//      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
+//
+//      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2).' * MATCH(`'.$clabel.'`) AGAINST (:sstring)'
+//              .' + MATCH(`'.$ctext.'`) AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
+//              .' FROM '.Db_PDO::table(self::DB_TABLE)
+//              .' WHERE MATCH(`'.$clabel.'`, `'.$ctext.'`) AGAINST (:sstring IN BOOLEAN MODE)'
+//              .' AND `'.self::COLUMN_ID_CATEGORY.'` = :idCat'
+//              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2)
+//              .' * MATCH(`'.$clabel.'`) AGAINST (:sstring) + MATCH(`'.$ctext.'`) AGAINST (:sstring) DESC');
+//
+//      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
+//      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
+//      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+//      $dbst->execute();
+//
+//      return $dbst->fetch();
+//   }
 }
 
 ?>
