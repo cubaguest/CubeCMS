@@ -12,16 +12,19 @@ class Category_Structure implements Iterator, Countable {
    private $childrens = array();
 
    private $withHidden = false;
+   public $type = 'main';
 
    /**
     * Konstruktor pro vytvoření objektu se sekcemi
     * @param array $labels -- pole s popisy s jazyky
     */
-   public function  __construct($id) {
+   public function  __construct($id)
+   {
       $this->id = $id;
    }
 
-   protected function setLevel($level) {
+   protected function setLevel($level)
+   {
       $this->level = $level;
    }
 
@@ -29,7 +32,8 @@ class Category_Structure implements Iterator, Countable {
     * Metoda nastaví id rodiče
     * @param int $id
     */
-   protected function setParentId($id) {
+   protected function setParentId($id)
+   {
       $this->idParent = $id;
    }
 
@@ -37,7 +41,8 @@ class Category_Structure implements Iterator, Countable {
     * Metoda vrací id sekce
     * @return int -- id
     */
-   public function getId() {
+   public function getId()
+   {
       return $this->id;
    }
 
@@ -45,7 +50,8 @@ class Category_Structure implements Iterator, Countable {
     * Metoda vrací level (zanoření) sekce
     * @return int -- level
     */
-   public function getLevel() {
+   public function getLevel()
+   {
       return $this->level;
    }
 
@@ -53,11 +59,13 @@ class Category_Structure implements Iterator, Countable {
     * Metoda vrací pole potomků
     * @return array -- potomci
     */
-   public function getChildrens() {
+   public function getChildrens()
+   {
       return $this->childrens;
    }
 
-   public function render() {
+   public function render()
+   {
       if($this->level != 0) { // vynecháme ROOT kategorii
          $str = str_repeat('&nbsp;', $this->level*3);
 //         print ($str." cat ".$this->catObj->label." - id: ".$this->catObj->id_category." level: ".$this->level."<br/>");
@@ -71,11 +79,13 @@ class Category_Structure implements Iterator, Countable {
     * Metoda vrací id nadřazené sekce
     * @return int
     */
-   public function getParentId() {
+   public function getParentId()
+   {
       return $this->idParent;
    }
 
-   public function getPath($idCat, $retArray = array(), $onlyId = false) {
+   public function getPath($idCat, $retArray = array(), $onlyId = false)
+      {
       if($this->getId() == $idCat){
          if($onlyId){
             array_push($retArray, (int)$this->getId());
@@ -105,17 +115,19 @@ class Category_Structure implements Iterator, Countable {
     * Metoda nastaví kategorie a odstraní nepoužité kategorie a sekce
     * @param array $catArray -- pole s kategoriemi
     */
-   public function setCategories($catArray) {
+   public function setCategories($catArray)
+   {
       if(isset ($catArray[$this->getId()]) AND $this->level != 0) {
          $this->catObj = new Category(null, false, $catArray[$this->getId()]);
       }
       foreach ($this->childrens as $key => $child) {
          $child->withHidden($this->withHidden);
          if(isset ($catArray[$child->getId()])
-            AND ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL OR $this->withHidden
-               OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN)
-               OR (Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_LOGIN)
-               OR (Auth::getGroupName() == 'admin' AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN)
+            AND ($this->withHidden // všechny zkryté bez rozdílu
+               OR ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL) // viditelné všem
+               OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
+               OR (Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
+               OR (Auth::getGroupName() == 'admin' AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
                )) {
                $child->setCategories($catArray);
          } else {
@@ -137,7 +149,8 @@ class Category_Structure implements Iterator, Countable {
     * Metoda zjišťuje jestli je sekce prázdná
     * @return boolean -- true pokud je prázdný
     */
-   public function isEmpty() {
+   public function isEmpty()
+   {
       return empty ($this->childrens);
    }
 
@@ -146,23 +159,39 @@ class Category_Structure implements Iterator, Countable {
     * @param id rodiče $idParent
     * @param mixed $child -- sekce nebo kategorie
     */
-   public function addChild(Category_Structure $child, $idParent = null) {
-      if($idParent == null OR $idParent == $this->getId()) {
+   public function addChild(Category_Structure $child, $idParent = 0, $pos = -1)
+   {
+      if($idParent == 0 OR $idParent == $this->getId()) {
          $child->setParentId($this->getId());
          $child->setLevel($this->level+1);
          // přepočet ostatních levelů
          if(!$child->isEmpty()){
             $this->recalculateLevels($child, $child->getLevel());
          }
-         array_push($this->childrens, $child);
+         // přidání na konec
+         if($pos == -1 OR $pos >= count($this->childrens)){
+            array_push($this->childrens, $child);
+         }
+         // přidání na požadovanou pozici
+         else {
+            /**
+             * Nejde pouze pomocí array_splice
+             * @see http://www.php.net/manual/en/function.array-splice.php#41118
+             */
+            $firstPart = array_slice($this->childrens, 0, $pos);
+            $secondPart = array_slice($this->childrens, $pos);
+            $insertPart = array($child);
+            $this->childrens = array_merge($firstPart, $insertPart, $secondPart);
+         }
       } else {
          foreach ($this->childrens as $key => $variable) {
-            $variable->addChild($child, $idParent);
+            $variable->addChild($child, $idParent, $pos);
          }
       }
    }
 
-   private function recalculateLevels($obj, $newLevel){
+   private function recalculateLevels($obj, $newLevel)
+      {
       foreach ($obj->getChildrens() as $child) {
          $child->setLevel($newLevel+1);
          if(!$child->isEmpty()){
@@ -175,7 +204,8 @@ class Category_Structure implements Iterator, Countable {
     * Metoda odstraní kategorii podle zadaného id pořadí
     * @param int $idCat -- id kategoorie
     */
-   public function removeCat($idCat) {
+   public function removeCat($idCat)
+   {
       foreach ($this->childrens as $key => $child) {
          if($child->getId() == $idCat){
             unset ($this->childrens[$key]);
@@ -190,7 +220,8 @@ class Category_Structure implements Iterator, Countable {
     * @param int $idCat -- id kategorie
     * @return Category_Structure
     */
-   public function getCategory($idCat) {
+   public function getCategory($idCat)
+   {
       if($this->getId() == $idCat) {
          return $this;
       }
@@ -206,41 +237,18 @@ class Category_Structure implements Iterator, Countable {
    }
 
    /**
-    * Metoda přesune potomka třídy nahoru nebo dolu
+    * Metoda přesune potomka třídy na danou pozici
     * @param integer $idParent -- id potomka
     * @param integer $key -- klíč v poli
     * @param string $moveTo -- jestli nahoru nebo dolu ('up','down')
     */
-//   public function moveChild($id, $moveTo = 'down') {
-//      $keyUp = null;
-//      foreach ($this->childrens as $key => $child) {
-//         if($child->getId() == $id){
-//            if($moveTo == 'down') {
-//
-//            } else if($moveTo == 'up') {
-//               $tmpChild = $this->childrens[$keyUp];
-//               $this->childrens[$keyUp] = $child;
-//               $this->childrens[$key] = $tmpChild;
-//            } else {
-//               new UnexpectedValueException(_('Nočekávaná hodnota pro posun'), 1);
-//            }
-//            return true;
-//         }
-//         $keyUp = $key;
-//      }
-//      return false;
-//   }
-
-   public function swapChild($child1, $child2) {
-      if($child1 instanceof Category_Structure AND $child2 instanceof Category_Structure){
-         $ch1Key = $this->getChildKey($child1);
-         $ch2Key = $this->getChildKey($child2);
-         $tmpChild = $this->childrens[$ch2Key];
-         $this->childrens[$ch2Key] = $this->childrens[$ch1Key];
-         $this->childrens[$ch1Key] = $tmpChild;
-      } else {
-         throw new InvalidArgumentException(_('Pro změnu nebyly předány platní potomci'), 2);
-      }
+   public function moveChild($pos, $newPos = -1)
+   {
+      $ch1Key = $this->getChildKey($child1);
+      $ch2Key = $this->getChildKey($child2);
+      $tmpChild = $this->childrens[$ch2Key];
+      $this->childrens[$ch2Key] = $this->childrens[$ch1Key];
+      $this->childrens[$ch1Key] = $tmpChild;
    }
 
    /**
@@ -248,7 +256,8 @@ class Category_Structure implements Iterator, Countable {
     * @param int $id -- id potomka
     * @return int -- klíč v poli
     */
-   private function getChildKey($schild) {
+   private function getChildKey($schild)
+   {
       reset($this->childrens);
       while ($child = current($this->childrens)) {
          if ($child->getId() == $schild->getId()) {
@@ -259,7 +268,8 @@ class Category_Structure implements Iterator, Countable {
       return false;
    }
 
-   public function prevChild(Category_Structure $schild) {
+   public function prevChild(Category_Structure $schild)
+   {
       reset($this->childrens);
       while ($child = current($this->childrens)) {
          if ($child->getId() == $schild->getId()) {
@@ -274,7 +284,8 @@ class Category_Structure implements Iterator, Countable {
       return null;
    }
 
-   public function nextChild(Category_Structure $schild) {
+   public function nextChild(Category_Structure $schild)
+   {
       reset($this->childrens);
       while ($child = current($this->childrens)) {
          if ($child->getId() == $schild->getId()) {
@@ -289,7 +300,8 @@ class Category_Structure implements Iterator, Countable {
       return null;
    }
 
-   public function getChild($id) {
+   public function getChild($id)
+   {
       foreach ($this->childrens as $child) {
          if($child->getId() == $id){
             return $child;
@@ -300,41 +312,49 @@ class Category_Structure implements Iterator, Countable {
 
 
    // methods implements Iterator
-   public function current() {
+   public function current()
+   {
       return current($this->childrens);
    }
 
-   public function key() {
+   public function key()
+   {
       return key($this->childrens);
    }
 
-   public function next() {
+   public function next()
+   {
       return next($this->childrens);
    }
 
-   public function rewind() {
+   public function rewind()
+   {
       return reset($this->childrens);
    }
 
-   public function valid() {
+   public function valid()
+   {
       return key($this->childrens) !== null;
    }
 
-   public function count() {
+   public function count()
+   {
       return count($this->childrens);
    }
 
    /**
     * Metoda vrací objekt kategorie načtený z db
-    * @return Object
+    * @return Category_Core
     */
-   public function getCatObj() {
+   public function getCatObj()
+   {
       return $this->catObj;
    }
 
-   public function saveStructure($admin = false) {
+   public function saveStructure()
+   {
       $model = new Model_Config();
-      if($admin === true){
+      if($this->type == 'admin'){
          $record = $model->where(Model_Config::COLUMN_KEY, 'ADMIN_MENU_STRUCTURE')->record();
       } else {
          $record = $model->where(Model_Config::COLUMN_KEY, 'CATEGORIES_STRUCTURE')->record();
@@ -348,23 +368,28 @@ class Category_Structure implements Iterator, Countable {
     * @param bool $admin -- true pro vrácení struktury admin menu
     * @return Category_Structure
     */
-   public static function getStructure($admin = false){
+   public static function getStructure($admin = false)
+   {
       if($admin === true){
-         return unserialize(VVE_ADMIN_MENU_STRUCTURE);
+         $struct = unserialize(VVE_ADMIN_MENU_STRUCTURE);
+         $struct->type = 'admin';
+      } else {
+         $struct = unserialize(VVE_CATEGORIES_STRUCTURE);
       }
-      return unserialize(VVE_CATEGORIES_STRUCTURE);
+      return $struct;
    }
 
    /**
     * Magická metoda pro výpis
     * @return string
     */
-   public function  __toString() {
-      if($this->getLevel() != 0){
+   public function  __toString()
+   {
+      if($this->getLevel() != 0 AND $this->getCatObj() instanceof Category_Core){
          return (string)$this->getCatObj()->getLabel();
       }
       $string = null;
-      return $string;
+      return (string)$string;
    }
 }
 ?>
