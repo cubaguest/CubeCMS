@@ -135,7 +135,7 @@ $(document).ready(function(){
          $(this).animate({opacity:0}, 500, function(){$(this).remove();});
       });
    // open external link in new window
-   $("a.link-external").click(function(){
+   $("a.link-external").live('click',function(){
       window.open(this.href);
       return false;
    });   
