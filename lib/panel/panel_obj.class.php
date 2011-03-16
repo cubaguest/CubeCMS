@@ -48,7 +48,7 @@ class Panel_Obj {
     * Obrázek pozadí panelu
     * @var string
     */
-   private $panelBackImg = null;
+   private $panelImg = null;
 
    /**
     * Konstruktor
@@ -66,7 +66,7 @@ class Panel_Obj {
       }
       $this->panelIcon = $panelData->{Model_Panel::COLUMN_ICON};
       $this->panelId = (int)$panelData->{Model_Panel::COLUMN_ID};
-      $this->panelBackImg = $panelData->{Model_Panel::COLUMN_BACK_IMAGE};
+      $this->panelImg = $panelData->{Model_Panel::COLUMN_IMAGE};
    }
 
    /**
@@ -120,11 +120,19 @@ class Panel_Obj {
    }
 
    /**
-    * Metoda vrací id kategorie
-    * @return integer -- id kategorie
+    * Metoda vrací obrázek panelu
+    * @return string -- název souboru s obrázkem panelu nebo null
     */
    public function getBackImage() {
-      return $this->panelBackImg;
+      return $this->getImage();
+   }
+
+   /**
+    * Metoda vrací obrázek panelu
+    * @return string -- název souboru s obrázkem panelu nebo null
+    */
+   public function getImage() {
+      return $this->panelImg;
    }
 
    /**
@@ -146,6 +154,14 @@ class Panel_Obj {
     * @return string
     */
    final static function getBackImgDir($http = true) {
+      return self::getImgDir($http);
+   }
+
+   /**
+    * Metoda vrcí adresář s obrázkem panelu
+    * @return string
+    */
+   final static function getImgDir($http = true) {
       if($http){
          return Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.self::DATA_DIR
             .URL_SEPARATOR;

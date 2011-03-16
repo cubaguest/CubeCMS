@@ -27,8 +27,9 @@ class Model_Panel extends Model_ORM {
    const COLUMN_POSITION    = 'position';
    const COLUMN_PARAMS    = 'pparams';
 //   const COLUMN_TPL    = 'template';
-   const COLUMN_ICON    = 'icon';
-   const COLUMN_BACK_IMAGE    = 'background';
+   const COLUMN_ICON    = 'picon';
+   const COLUMN_BACK_IMAGE    = 'pbackground';
+   const COLUMN_IMAGE    = 'pbackground';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_panels');
@@ -40,46 +41,12 @@ class Model_Panel extends Model_ORM {
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_POSITION, array('datatype' => 'varchar(20)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_PARAMS, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
-      $this->addColumn(self::COLUMN_ICON, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
-      $this->addColumn(self::COLUMN_BACK_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_ICON, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'aliasFor' => 'icon'));
+      $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'aliasFor' => 'background'));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_SHOW_CAT, 'Model_Category', Model_Category::COLUMN_ID);
-   }
-
-   /**
-    * Metoda uloží panel
-    * @param int $idCat -- id kategorie ke které panel patří
-    * @param string $pPosition -- pozice panelu (název boxu)
-    * @param array $name -- název panelu
-    * @param int $order -- pořadí panelu
-    * @param int $idPanel -- id panelu
-    * @param int $idShowCat -- id kategorie ve které má být panel zobrazen (požije se pouze
-    * u kategorií s individuáním nasatvením panelů)
-    * @return bool -- jestli byl záznam uložen nebo id posledního vloženého záznamu
-    */
-   public function savePanel($idCat, $pPosition, $name, $icon = null, $backImage = null,
-           $order = 0, $idShowCat = null, $idPanel = null) {
-      $this->setIUValues(array(self::COLUMN_ID_CAT => $idCat, self::COLUMN_POSITION => $pPosition,
-              self::COLUMN_NAME => $name, self::COLUMN_ORDER => $order,
-              'icon' => $icon, self::COLUMN_BACK_IMAGE => $backImage,
-              self::COLUMN_ID_SHOW_CAT => $idShowCat));
-
-      $dbc = new Db_PDO();
-      // ukládá se nový
-      if($idPanel === null) {
-         $dbc->exec("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-                 ." ".$this->getInsertLabels()." VALUES ".$this->getInsertValues());
-         return $dbc->lastInsertId();
-      } else {
-         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-                 ." SET ".$this->getUpdateValues()
-                 ." WHERE ".self::COLUMN_ID." = :id");
-
-         return $dbst->execute(array(':id' => $idPanel));
-         return true;
-      }
    }
 
    public function savePanelPos($idPanel, $newPos) {
