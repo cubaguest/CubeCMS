@@ -11,12 +11,12 @@ if($this->edit == true){
 // donastavení formuláře
    $this->form->panel_order->html()->setAttrib('size', 4);
    $this->addJsPlugin(new JsPlugin_JQuery());
-   
+
    if($this->form->haveElement('icon_delete')){
-      $this->form->icon_delete->setSubLabel('<img src="'.Panel_Obj::getIconDir().$this->panelIcon.'" alt="panel icon" />&nbsp;'.$this->panelIcon);
+      $this->form->icon_delete->setSubLabel('<img src="'.Panel_Obj::getIconDir(true).$this->panelIcon.'" alt="panel icon" />&nbsp;'.$this->panelIcon);
    }
-   if($this->form->haveElement('background_delete')){
-      $this->form->background_delete->setSubLabel($this->panelbackImg);
+   if($this->form->haveElement('image_delete')){
+      $this->form->image_delete->setSubLabel('<a href="'.Panel_Obj::getImgDir(true).$this->panelbackImg.'" title="'.$this->tr("Adresa obrázku").'">'.$this->panelbackImg.'</a>');
    }
    echo ($this->form);
    ?>

@@ -20,7 +20,7 @@ class Panels_Controller extends Controller {
       $formRemove->addElement($elemSubmit);
 
       if($formRemove->isValid()){
-         $panel = $model->getPanel($formRemove->id->getValues());
+         $panel = $model->record($formRemove->id->getValues());
 
          // smazání souborů
          if($panel->{Model_Panel::COLUMN_ICON} != null){
@@ -36,9 +36,9 @@ class Panels_Controller extends Controller {
             $file->delete();
          }
 
-         $model->deletePanel($formRemove->id->getValues());
+         $model->delete($formRemove->id->getValues());
 
-         $this->infoMsg()->addMessage($this->_('Panel byl odstraněn'));
+         $this->infoMsg()->addMessage($this->tr('Panel byl odstraněn'));
          $this->link()->reload();
       }
       $formPriority = new Form('panel_');
@@ -53,8 +53,10 @@ class Panels_Controller extends Controller {
       $formPriority->addElement($elemSubmit);
 
       if($formPriority->isValid()){
-         $model->savePanelPos($formPriority->id->getValues(), $formPriority->position->getValues());
-         $this->infoMsg()->addMessage($this->_('Pozice byla uložena'));
+         $panel = $model->record($formPriority->id->getValues());
+         $panel->{Model_Panel::COLUMN_ORDER} = $formPriority->position->getValues();
+         $model->save($panel);
+         $this->infoMsg()->addMessage($this->tr('Pozice byla uložena'));
          $this->link()->reload();
       }
       // view
@@ -70,36 +72,40 @@ class Panels_Controller extends Controller {
    public function addController() {
       $this->checkWritebleRights();
 
-      if($this->editForm == null){
-         $this->editForm = $this->createEditForm();
-      }
+      $this->createEditForm();
       // odstranění checkboxů
       $this->editForm->removeElement('icon_delete');
       $this->editForm->removeElement('background_delete');
 
       if($this->editForm->isSend() AND $this->editForm->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
       if($this->editForm->isValid()) {
-         $icon = null;
+         $model = new Model_Panel();
+         $panel = $model->newRecord();
+         // ikona
          if($this->editForm->icon->getValues() != null) {
             $f = $this->editForm->icon->getValues();
-            $icon = $f['name'];
+            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
          }
-         $backImage = null;
-         if($this->editForm->background->getValues() != null) {
-            $f = $this->editForm->background->getValues();
-            $backImage = $f['name'];
+         // obrázek
+         if($this->editForm->image->getValues() != null) {
+            $f = $this->editForm->image->getValues();
+            $panel->{Model_Panel::COLUMN_IMAGE} = $f['name'];
          }
 
-         $panelM = new Model_Panel();
-         $panelM->savePanel($this->editForm->panel_cat->getValues(), $this->editForm->panel_box->getValues(),
-                 $this->editForm->panel_name->getValues(), $icon, $backImage, 
-                 $this->editForm->panel_order->getValues(), $this->editForm->panel_show_cat->getValues());
 
-         $this->infoMsg()->addMessage($this->_('Panel byl uložen'));
+         $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
+         $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
+         $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
+         $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
+         $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = $this->editForm->panel_show_cat->getValues();
+
+         $model->save($panel);
+         $this->log(sprintf('Přidán nový panel %s kategorie %s do aplikace', $panel->{Model_Panel::COLUMN_NAME}, $panel->{Model_Panel::COLUMN_ID_CAT}));
+         $this->infoMsg()->addMessage($this->tr('Panel byl uložen'));
          $this->link()->route()->reload();
       }
       $this->view()->form = $this->editForm;
@@ -108,70 +114,72 @@ class Panels_Controller extends Controller {
    public function editController(){
       $this->checkWritebleRights();
       $model = new Model_Panel();
-      $panel = $model->getPanel($this->getRequest('id'));
+      $panel = $model->record($this->getRequest('id'));
       if($panel == false) return false;
 
-      $form = $this->createEditForm();
+      $this->createEditForm();
 
-      $form->panel_cat->setValues($panel->{Model_Panel::COLUMN_ID_CAT});
-      $form->panel_box->setValues($panel->{Model_Panel::COLUMN_POSITION});
-      $form->panel_order->setValues($panel->{Model_Panel::COLUMN_ORDER});
-      $form->panel_name->setValues($panel->{Model_Panel::COLUMN_NAME});
-      $form->panel_show_cat->setValues($panel->{Model_Panel::COLUMN_ID_SHOW_CAT});
+      $this->editForm->panel_cat->setValues($panel->{Model_Panel::COLUMN_ID_CAT});
+      $this->editForm->panel_box->setValues($panel->{Model_Panel::COLUMN_POSITION});
+      $this->editForm->panel_order->setValues($panel->{Model_Panel::COLUMN_ORDER});
+      $this->editForm->panel_name->setValues($panel->{Model_Panel::COLUMN_NAME});
+      $this->editForm->panel_show_cat->setValues($panel->{Model_Panel::COLUMN_ID_SHOW_CAT});
       if($panel->{Model_Panel::COLUMN_ICON} == null){
-         $form->removeElement('icon_delete');
+         $this->editForm->removeElement('icon_delete');
       }
-      if($panel->{Model_Panel::COLUMN_BACK_IMAGE} == null){
-         $form->removeElement('background_delete');
+      if($panel->{Model_Panel::COLUMN_IMAGE} == null){
+         $this->editForm->removeElement('image_delete');
       }
 
       $elemId = new Form_Element_Hidden('id');
       $elemId->setValues($panel->{Model_Panel::COLUMN_ID});
-      $form->addElement($elemId);
+      $this->editForm->addElement($elemId);
 
-      if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+      if($this->editForm->isSend() AND $this->editForm->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
-      if($form->isValid()){
-         $icon = $panel->{Model_Panel::COLUMN_ICON};
-         if($icon != null AND ($form->icon->getValues() != null
-                 OR ($form->haveElement('icon_delete') AND $form->icon_delete->getValues() == true))){
-            $file = new Filesystem_File($icon, AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                    .Panel_Obj::DATA_DIR.DIRECTORY_SEPARATOR.Panel_Obj::ICONS_DIR);
+      if($this->editForm->isValid()){
+         // ikona
+         if($panel->{Model_Panel::COLUMN_ICON} != null AND ($this->editForm->icon->getValues() != null
+                 OR ($this->editForm->haveElement('icon_delete') AND $this->editForm->icon_delete->getValues() == true))){
+            $file = new Filesystem_File($icon, Panel_Obj::getIconDir(false));
             if($file->exist()) $file->delete();
-            $icon = null;
+            $panel->{Model_Panel::COLUMN_ICON} = null;
          }
-         if($form->icon->getValues() != null) {
-            $f = $form->icon->getValues();
-            $icon = $f['name'];
+         if($this->editForm->icon->getValues() != null) {
+            $f = $this->editForm->icon->getValues();
+            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
          }
-
-         $backImage = $panel->{Model_Panel::COLUMN_BACK_IMAGE};
-         if($backImage != null AND ($form->background->getValues() != null
-                 OR ($form->haveElement('background_delete') AND $form->background_delete->getValues() == true))){
-            $file = new Filesystem_File($backImage,
-                    AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR
-                    .Panel_Obj::DATA_DIR);
+         // pozadí
+         if($panel->{Model_Panel::COLUMN_IMAGE} != null AND ($this->editForm->image->getValues() != null
+                 OR ($this->editForm->haveElement('image_delete') AND $this->editForm->image_delete->getValues() == true))){
+            $file = new Filesystem_File($image, Panel_Obj::getImgDir(false));
             $file->delete();
-            $backImage = null;
+            $panel->{Model_Panel::COLUMN_IMAGE} = null;
          }
-         if($form->background->getValues() != null) {
-            $f = $form->background->getValues();
-            $backImage = $f['name'];
+         if($this->editForm->image->getValues() != null) {
+            $f = $this->editForm->image->getValues();
+            $panel->{Model_Panel::COLUMN_IMAGE} = $f['name'];
          }
 
-         $model->savePanel($form->panel_cat->getValues(), $form->panel_box->getValues(), $form->panel_name->getValues(),
-                 $icon, $backImage, $form->panel_order->getValues(),
-                 $form->panel_show_cat->getValues(), $form->id->getValues());
-         $this->infoMsg()->addMessage($this->_('Panel byl uložen'));
+         $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
+         $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
+         $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
+         $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
+         $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = $this->editForm->panel_show_cat->getValues();
+
+         $model->save($panel);
+
+         $this->log(sprintf('Přidán nový panel %s kategorie %s do aplikace', $panel->{Model_Panel::COLUMN_NAME}, $panel->{Model_Panel::COLUMN_ID_CAT}));
+         $this->infoMsg()->addMessage($this->tr('Panel byl uložen'));
          $this->link()->route()->reload();
       }
 
       $this->view()->panelIcon = $panel->{Model_Panel::COLUMN_ICON};
       $this->view()->panelbackImg = $panel->{Model_Panel::COLUMN_BACK_IMAGE};
-      $this->view()->form = $form;
+      $this->view()->form = $this->editForm;
    }
 
    private function createEditForm() {
@@ -191,9 +199,9 @@ class Panels_Controller extends Controller {
       ksort($catArr);//řazení
 
       $form = new Form('panel_');
-      $form->addGroup('settings', $this->_('Základní'), $this->_('Přiřazení panelu ke kategorii a jeho umístění'));
+      $form->addGroup('settings', $this->tr('Základní'), $this->tr('Přiřazení panelu ke kategorii a jeho umístění'));
 
-      $panelCategory = new Form_Element_Select('panel_cat', $this->_('Panel kategorie'));
+      $panelCategory = new Form_Element_Select('panel_cat', $this->tr('Panel kategorie'));
       $panelCategory->setOptions($catArr);
       $form->addElement($panelCategory,'settings');
 
@@ -206,50 +214,51 @@ class Panels_Controller extends Controller {
          $arr[(string)$cat->{Model_Category::COLUMN_CAT_LABEL}] = $cat->{Model_Category::COLUMN_CAT_ID};
       }
       ksort($arr); // řazení
-      $showCat = array_merge(array ($this->_('Globálně') => 0),$arr);
+      $showCat = array_merge(array ($this->tr('Globálně') => 0),$arr);
 
 
-      $panelShowCategory = new Form_Element_Select('panel_show_cat', $this->_('Určení pro'));
+      $panelShowCategory = new Form_Element_Select('panel_show_cat', $this->tr('Určení pro'));
       $panelShowCategory->setOptions($showCat);
-      $panelShowCategory->setSubLabel($this->_('Pokud je nastaveno globálně, panel je
+      $panelShowCategory->setSubLabel($this->tr('Pokud je nastaveno globálně, panel je
          zobrazen u všech kategorií, v opačném případě pouze u vybrané kategorie'));
       $form->addElement($panelShowCategory,'settings');
 
-      $panelType = new Form_Element_Select('panel_box', $this->_('Box panelu'));
+      $panelType = new Form_Element_Select('panel_box', $this->tr('Box panelu'));
       $panelType->setOptions($panelPositions);
       $form->addElement($panelType,'settings');
 
-      $panelOrder = new Form_Element_Text('panel_order', $this->_('Řazení panelu'));
+      $panelOrder = new Form_Element_Text('panel_order', $this->tr('Řazení panelu'));
       $panelOrder->setValues(0);
       $form->addElement($panelOrder,'settings');
 
-      $form->addGroup('view', $this->_('Vzhled'), $this->_('Nastavení názvu, pozadí a ikony panelu'));
+      $form->addGroup('view', $this->tr('Vzhled'), $this->tr('Nastavení názvu, pozadí a ikony panelu'));
 
-      $panelName = new Form_Element_Text('panel_name', $this->_('Název panelu'));
+      $panelName = new Form_Element_Text('panel_name', $this->tr('Název panelu'));
       $panelName->setLangs();
-      $panelName->setSubLabel($this->_('Pokud není název zvolen, je použit název kategorie'));
+      $panelName->setSubLabel($this->tr('Pokud není název zvolen, je použit název kategorie'));
       $form->addElement($panelName,'view');
 
-      $elemIcon = new  Form_Element_File('icon', $this->_('Ikona'));
+      $elemIcon = new  Form_Element_File('icon', $this->tr('Ikona'));
       $elemIcon->setUploadDir(Panel_Obj::getIconDir(false));
       $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemIcon,'view');
 
-      $elemIconDelete = new Form_Element_Checkbox('icon_delete', $this->_('Smazat ikonu')."?");
+      $elemIconDelete = new Form_Element_Checkbox('icon_delete', $this->tr('Smazat ikonu')."?");
       $form->addElement($elemIconDelete,'view');
 
-      $elemBack = new  Form_Element_File('background', $this->_('Pozadí'));
-      $elemBack->setUploadDir(Panel_Obj::getBackImgDir(false));
-      $elemBack->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($elemBack,'view');
+      $elemImage = new  Form_Element_File('image', $this->tr('Obrázek panelu'));
+      $elemImage->setSubLabel($this->tr('Obrázek panelu nebo pozadí dle vytvořené šablony.'));
+      $elemImage->setUploadDir(Panel_Obj::getImgDir(false));
+      $elemImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
+      $form->addElement($elemImage,'view');
 
-      $elemBackDelete = new Form_Element_Checkbox('background_delete', $this->_('Smazat pozadí')."?");
-      $form->addElement($elemBackDelete,'view');
+      $elemImageDelete = new Form_Element_Checkbox('image_delete', $this->tr('Smazat obrázek?'));
+      $form->addElement($elemImageDelete,'view');
 
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
 
-      return $form;
+      $this->editForm = $form;
    }
 
    private function catsToArrayForForm($categories) {
@@ -259,7 +268,7 @@ class Panels_Controller extends Controller {
                          (string)$categories->getCatObj()->{Model_Category::COLUMN_CAT_LABEL}]
                  = (string)$categories->getCatObj()->{Model_Category::COLUMN_CAT_ID};
       } else {
-         $this->categoriesArray[$this->_('Kořen')] = 0;
+         $this->categoriesArray[$this->tr('Kořen')] = 0;
       }
       if(!$categories->isEmpty()) {
          foreach ($categories as $cat) {
@@ -304,7 +313,7 @@ class Panels_Controller extends Controller {
    public function getPanelInfoController() {
       $catModel = new Model_Category();
       $cat = $catModel->getCategoryById($this->getRequestParam('id'));
-      $data = array('code' => true, 'data' => $this->_('Žádné informace'));
+      $data = array('code' => true, 'data' => $this->tr('Žádné informace'));
 
       $cnt = file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR
               .DIRECTORY_SEPARATOR.$cat[Model_Category::COLUMN_MODULE]
@@ -363,7 +372,7 @@ class Panels_Controller extends Controller {
       }
 
       if($form != null AND $form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
       
@@ -376,7 +385,7 @@ class Panels_Controller extends Controller {
          }
          $panelM->saveParams($this->getRequest('id'), serialize($settings));
 
-         $this->infoMsg()->addMessage($this->_('Uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->route()->reload();
       }
 
