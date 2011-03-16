@@ -210,7 +210,7 @@ class Model_Category extends Model_ORM {
                   .' AND t_r.' . Model_Rights::COLUMN_RIGHT . " LIKE 'r__'"
                   .' AND '.Model_Category::COLUMN_URLKEY.' IS NOT NULL',
                   array("idgrp" => Auth::getGroupId()))
-            ->order(array('LENGTH ('.self::COLUMN_URLKEY.')' => 'DESC'));
+            ->order(array('LENGTH('.self::COLUMN_URLKEY.')' => 'DESC'));
 
          self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
       }
