@@ -86,7 +86,7 @@ array (
   'Anglicky' => 'Anglicky',
   'Německy' => 'Nemecky',
   'Rusky' => 'Rusky',
-  'Slovensky' => 'Slovenské',
+  'Slovensky' => 'Slovensky',
   'Polsky' => 'Poľsky',
   'Nepodporované Locales %s.' => 'Nepodporované Locales %s.',
   'Mapa stránek' => 'Mapa stránok',
