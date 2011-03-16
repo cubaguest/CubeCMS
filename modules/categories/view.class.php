@@ -7,16 +7,16 @@
 class Categories_View extends View {
 
    public function mainView() {
-      $this->template()->addTplFile('list.phtml');
-      if($this->rights()->isControll()) {
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_category', $this->tr("Přidat kategorii"),
-         $this->link()->route('add'));
-         $toolAdd->setIcon('application_add.png')->setTitle($this->tr('Přidat novou kategorii'));
-         $toolbox->addTool($toolAdd);
-         $this->toolbox = $toolbox;
-      }
+      $this->template()->addTplFile('structure.phtml');
+//      if($this->rights()->isControll()) {
+//         $toolbox = new Template_Toolbox2();
+//         $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
+//         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_category', $this->tr("Přidat kategorii"),
+//         $this->link()->route('add'));
+//         $toolAdd->setIcon('application_add.png')->setTitle($this->tr('Přidat novou kategorii'));
+//         $toolbox->addTool($toolAdd);
+//         $this->toolbox = $toolbox;
+//      }
       Template_Module::setEdit(true);
    }
 
@@ -46,5 +46,12 @@ class Categories_View extends View {
       $this->mview->viewSettingsView();
    }
 
+   /**
+    * Načtení info o kategorie
+    */
+   public function getCatInfoView()
+   {
+      $this->template()->addFile('tpl://catinfo.phtml');
+   }
 }
 ?>

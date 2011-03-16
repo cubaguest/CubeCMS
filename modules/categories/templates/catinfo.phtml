@@ -1,0 +1,83 @@
+<input type="hidden" name="id_cat" value="<?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?>" />
+<table>
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Názvy (s jazyky)');?>:</th></tr>
+   <?foreach ($this->catInfo[Model_Category::COLUMN_NAME] as $lang => $name) {
+      if($name != null){?><tr class="ui-widget-content ui-state-default"><td><?=  htmlspecialchars($name);?></td><td class="cell-lang"><?=vve_tpl_lang_image($lang)?></td></tr><?}
+   }?>
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Adresy URL (s jazyky)');?>:</th></tr>
+   <?
+   $link = new Url_Link(true);
+   foreach ($this->catInfo[Model_Category::COLUMN_URLKEY] as $lang => $key) {
+      if($key != null){?><tr class="ui-widget-content ui-state-default"><td>
+            <a href="<?=$link->lang($lang)->category($key);?>" title="<?=$this->tr('Otevřít v novém okně')?>"
+               class="link-external"><?=$key?></a></td><td class="cell-lang"><?='&nbsp;'.vve_tpl_lang_image($lang)?></td></tr><?}
+   }?>
+</table>
+<br />
+<table>
+   <tr class="single-row">
+      <th class="ui-widget-header"><?=$this->tr('Modul');?></th>
+      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_MODULE};?></td>
+   </tr>
+   <tr class="single-row">
+      <th class="ui-widget-header"><?=$this->tr('ID');?></th>
+      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?></td>
+   </tr>
+   <tr>
+      <th class="ui-widget-header"><?=$this->tr('Viditelné');?></th>
+      <td class="ui-widget-content ui-state-default">
+         <select name="cat_visibility">
+            <?foreach ($this->visTypes as $type => $label) {?>
+            <option value="<?=$type?>" <?if($this->catInfo->{Model_Category::COLUMN_VISIBILITY} == $type) echo 'selected="selected"'?>><?=$label?></option>
+            <?}?>
+         </select>
+     </td>
+   </tr>
+   <tr>
+      <th class="ui-widget-header"><?=$this->tr('Individuální rozložení panelů');?></th>
+      <td class="ui-widget-content ui-state-default"><input type="checkbox" name="cat_ind_panels"
+      <?if($this->catInfo->{Model_Category::COLUMN_INDIVIDUAL_PANELS} == true) echo 'checked="checked"';?> /></td>
+   </tr>
+   <tr>
+      <th class="ui-widget-header"><?=$this->tr('Výchozí práva');?></th>
+      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_DEF_RIGHT};?></td>
+   </tr>
+<!--   <tr>
+      <th class="ui-widget-header"><?=$this->tr('');?></th>
+      <td class="ui-widget-content ui-state-default"></td>
+   </tr>-->
+</table>
+<br />
+<table>
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Datový adresář');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?=VVE_DATA_DIR.'/'.$this->catInfo->{Model_Category::COLUMN_DATADIR}.'/'?></td></tr>
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Popis');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
+      echo (string)$this->catInfo->{Model_Category::COLUMN_ALT} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_ALT};
+   ?></td></tr>
+
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Popis (vyhledávač)');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
+   echo (string)$this->catInfo->{Model_Category::COLUMN_DESCRIPTION} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_DESCRIPTION};
+   ?></td></tr>
+
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Klíčová slova (vyhledávač)');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
+   echo (string)$this->catInfo->{Model_Category::COLUMN_KEYWORDS} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_KEYWORDS};
+   ?></td></tr>
+</table>
+<br />
+<table>
+   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Práva skupin');?>:</th></tr>
+   <?  foreach ($this->catRights as $right) {?>
+   <tr class="single-row">
+      <th scope="row" class="ui-widget-header"><?=$right->{Model_Groups::COLUMN_NAME};?></th>
+      <td class="ui-widget-content ui-state-default"><?=$right->{Model_Rights::COLUMN_RIGHT};?></td>
+   </tr>
+   <?}?>
+</table>
+<br />
+<?
+
+?>
+

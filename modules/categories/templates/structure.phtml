@@ -1,0 +1,156 @@
+<?
+$this->addCssFile("style.css");
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+$this->addJsPlugin(new JsPlugin_JsTree());
+
+function vveCatsRenderFunc($menuArr) {
+   echo '<ul>';
+   foreach ($menuArr as $key => $item) {
+      echo '<li id="cat-id-'.$item->getCatObj()->getId().'">';
+      echo '<a href="#">'.htmlspecialchars($item).'&nbsp;'.langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}).' - '.$item->getCatObj()->getId().'</a>';
+      if(!$item->isEmpty()) {
+         vveCatsRenderFunc($item);
+      }
+      echo '</li>';
+   }
+   echo '</ul>';
+}
+
+
+// funkce pro render menu
+echo $this->toolbox;
+?>
+
+<h1><?=$this->tr("Struktura stránek")?></h1>
+<?=$this->includeTpl('navigation.phtml');?>
+<div class="main-content-detail">
+   <p><?=$this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
+   <?//sekce
+   $typeClass = 'mainStruct';
+   $id = 'categories-table';
+   if($this->isMainMenu != true) {
+      $id = 'admin-categories-table';
+      $typeClass = 'adminStruct';
+      echo '<p><strong>'.$this->tr("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
+   }
+   ?>
+   <hr />
+   <div id="category-buttons">
+      <form method="post" action="<?=$this->link()->route('add')?>" style="display:inline;">
+         <input type="submit" value="<?=$this->tr('Přidat')?>" name="category_add" />
+      </form>
+      <form name="form-edit" method="post" action="<?=$this->link()->route('edit',array('categoryid' => '{ID}'))?>" style="display:inline;">
+         <input type="submit" value="<?=$this->tr('Upravit')?>" name="category_edit" />
+      </form>
+      <form name="form-settings" method="post" action="<?=$this->link()->route('settings',array('categoryid' => '{ID}'))?>" style="display:inline;">
+         <input type="submit" value="<?=$this->tr('Nastavit')?>" name="category_settings"  />
+      </form>
+      <form name="form-delete" method="post" action="<?=$this->link()?>" style="display:inline;">
+         <input class="button-cancel" type="submit" value="<?=$this->tr('Smazat')?>" name="category_delete"  />
+         <input type="hidden" value="" name="category_id" />
+      </form>
+      <label title="<?=$this->tr('Upravít URL adresy kategorie a podkategorií.')?>"
+             for="checkbox-regen-url"><?=$this->tr('Upravit URL adresy při přesunu')?></label>
+      <input id="checkbox-regen-url" type="checkbox" name="cat_regenerate_urls" checked="checked"
+             title="<?=$this->tr('Upravít URL adresy kategorie a podkategorií.')?>" />
+   </div>
+   <br />
+   <div id="category-structure-wrap">
+      <div id="category-structure" class="<?=$typeClass?>"><?if($this->structure != null){echo vveCatsRenderFunc($this->structure);}?></div>
+   </div>
+   <div id="category-info"><div></div></div>
+   <hr class="reseter" />
+   <div class="note">
+      <?=$this->tr('Nápověda');?>
+      <ul>
+         <li><?=$this->tr('Při vybrání kategorie se napravo zobrazí její vlastnosti.')?></li>
+         <li><?=$this->tr('Jednotlivé kategorie lze přesunovat pouze myší.')?></li>
+         <li><?=$this->tr('Pořadí v menu se aplikuje až po znovunačtení stránky.')?></li>
+         <li><?=$this->tr('')?></li>
+      </ul>
+   </div>
+   <br />
+   <br />
+   <?
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      function getIdCat(str){
+         return str.match(/cat-id-(\d+)/)[1];
+      }
+
+      $(document).ready(function(){
+         $("#category-structure")
+         .bind('select_node.jstree', function(e, node){
+            showLoadBox('#category-info div');
+            var idc = getIdCat($(node.rslt.obj).attr('id'));
+            $.ajax({
+               type: "GET", url: "<?=$this->link()->route("getCatInfo")?>",
+               data: {idc : idc},
+               success: function(data){
+                  $('#category-info div').html(data);
+                  hideLoadBox();
+               }
+            });
+         })
+         .bind('move_node.jstree', function(e, node){
+            var newPos = {
+               idc : 0,parent : 0,position : 0,regenerate : false
+            };
+            newPos.idc = getIdCat($(node.rslt.o).attr('id'));
+            if(node.rslt.cr != -1){newPos.parent = getIdCat($(node.rslt.cr).attr('id'));}
+            newPos.position = node.rslt.cp;
+            if($('input[name=cat_regenerate_urls]').is(':checked')){newPos.regenerate = true;}
+            showLoadBox('#category-info div');
+            $.ajax({
+               type: "POST", url: "<?=$this->link()->route("moveCat")?>",
+               data: newPos,
+               success: function(data){
+                  hideLoadBox();
+               }
+            });
+         })
+         .jstree({core : {html_titles : true,auto_save : true}, ui : {select_limit : 1}, plugins : [ "themes", "html_data", "ui", "cookies", "dnd", "crrm" ]});
+      });
+      // změna panelů
+      $('input[name=cat_ind_panels]').live('change', function(){
+         var sendData = {enabled : false,idc : $(this).parents('div#category-info').find('input[name=id_cat]').val()};
+         if($(this).is(":checked")){sendData.enabled = true;}
+         $.ajax({type: "POST", url: "<?=$this->link()->route("changeIndPanels")?>",data: sendData,
+            success: function(msg){}})
+      });
+      // změna visibility
+      $('select[name=cat_visibility]').live('change', function(){
+         var sendData = {idc : $(this).parents('div#category-info').find('input[name=id_cat]').val(),value : $(this).val()};
+         $.ajax({type: "POST", url: "<?=$this->link()->route("changeVisibility")?>",
+            data: sendData, success: function(msg){}})
+      });
+      // editace a nasatvení
+      $('form[name=form-edit], form[name=form-settings]').submit(function(){
+         // doplnění id
+         var idstr = $('#category-structure').jstree("get_selected").attr('id');
+         if(typeof(idstr) != "undefined"){
+            var id = getIdCat(idstr);
+            this.action = decodeURI(this.action).replace('{ID}', id);
+            return true;
+         }
+         return false;
+      });
+      // mazání
+      $('form[name=form-delete]').submit(function(){
+         var node = $('#category-structure').jstree("get_selected");
+         if(node.length == 0) return false;
+         var q = '<?=$this->tr('Oprvadu odstranit kategorii "%s"? (Odstraní se také její potomci.)')?>';
+         q = q.replace('%s', node.text());
+         if(confirm(q)){
+            // doplnění id
+            $('input[name=category_id]').val(getIdCat(node.attr('id')));
+            return true;
+         }
+         return false;
+      });
+      /* ]]> */
+   </script>
+</div>
+

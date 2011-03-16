@@ -33,8 +33,38 @@
    display: none;
    margin-top: 1em;
 }
+.sec {cursor: pointer;}
 
 #admin-categories-table .ui-widget-header {
    background-image: none;
    background-color: #ff9999;
 }
+
+/* new */
+#category-structure-wrap {
+   float: left;
+   width: 60%;
+}
+#category-structure {
+/*   width: 400px;*/
+   border: 1px solid gray;
+   overflow: auto;
+   background-color: transparent;
+}
+
+#category-info {
+/*   width: 300px;*/
+   width: 40%;
+   overflow: auto;
+}
+#category-info div {
+   margin-left: 10px;
+}
+#category-info table { width: 100%; font-size: 70%;}
+#category-info td, #category-info th {padding: 2px;}
+#category-info td.cell-lang {width: 30px; text-align: right;}
+#category-info tr.single-row th {width: 100px;}
+
+
+#category-info label { font-weight: bold;}
+#category-info p { margin-left: 10px;}

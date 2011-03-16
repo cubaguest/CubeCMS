@@ -43,18 +43,16 @@ function vveSectionsRenderFunc($menuArr, $link) {
          $class = 'child-of-node-'.$item->getParentId();
       }
       ?><tr id="node-<?=$item->getId();?>" class="ui-widget-header list-item <?=$class;?>">
-         <td class="cat-first-coll">
-      <span class="sec"><?=$item?></span>
-      <?
-      echo langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY});
-      if($item->getCatObj()->haveFeed()){?>
-      <a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?=Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" /></a>
-      <?}
-      ?>&nbsp;ID:<?=$item->getId()?>
-      <a href="" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">detail</a>&nbsp;
-      <a href="<?=$link3->clear()->lang()->category($item->getCatObj()->getUrlKey())?>" title="<?=SECTION_GOTO_CAT_LABEL?>"><?=SECTION_GOTO_CAT_LABEL?></a>
-
+      <td class="cat-first-coll">
+<!--         <div class="category-header">-->
+            <span class="sec"><?=$item?></span>
+            <?echo langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY});
+               if($item->getCatObj()->haveFeed()){?><a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?=Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" /></a><?}?>&nbsp;ID:<?=$item->getId()?>
+            <a href="" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">detail</a>&nbsp;
+            <a href="<?=$link3->clear()->lang()->category($item->getCatObj()->getUrlKey())?>" title="<?=SECTION_GOTO_CAT_LABEL?>"><?=SECTION_GOTO_CAT_LABEL?></a>
+<!--      </div>-->
       <div class="category-params">
+         <input type="hidden" name="id_cat" value="<?=$item->getCatObj()->getId();?>" />
          <table>
             <tr>
                <th><?=SECTION_MODULE_LABEL?>:</th>
@@ -62,9 +60,9 @@ function vveSectionsRenderFunc($menuArr, $link) {
             </tr>
             <tr>
                <th><?=SECTION_IND_PANELS_LABEL?>:</th>
-               <td><?
-               echo $item->getCatObj()->isIndividualPanels() == true ? SECTION_YES_LABEL : SECTION_NO_LABEL;
-                  ?></td>
+               <td>
+                  <input type="checkbox" name="change_ind_panels" <?if($item->getCatObj()->isIndividualPanels() == true) echo 'checked="checked"';?> />
+               </td>
             </tr>
             <tr>
                <th><?=SECTION_VISIBILITY?>:</th>
@@ -192,7 +190,7 @@ echo $this->toolbox;
    <script type="text/javascript">
       /* <![CDATA[ */
       $('#<?=$id?>').treeTable({
-         clickableNodeNames : true,
+         clickableNodeNames : false,
          indent: 15
       });
 
@@ -213,6 +211,25 @@ echo $this->toolbox;
 //            alert('hide');
 //         });
          return false;
+      });
+      $('span.sec').click(function(){$(this).prev('span').click();});
+      $('input[name=change_ind_panels]').change(function(){
+         var sendData = {
+            enabled : false,
+            idc : $(this).parents('div.category-params').find('input[name=id_cat]').val()
+         };
+
+         if($(this).is(":checked")){
+            sendData.enabled = true;
+         }
+         $.ajax({
+            type: "POST", url: "<?=$this->link()->route("changeIndPanels")?>",
+            data: sendData,
+            success: function(msg){
+//               alert( "Data Saved: " + msg );
+            }
+         })
+
       });
       /* ]]> */
    </script>
