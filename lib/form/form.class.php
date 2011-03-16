@@ -120,8 +120,8 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $prevGrp = null;
       $d = clone $decorator;
       $grps = $this->elementsGroups;
+      reset($grps);
       while (list($key, $grp) = each($grps)) {
-//      foreach ($this->elementsGroups as $key => $grp) { // nelze použít protože nejde využít funkcí next/prev na poli
          // pokud element není ve skupině
          if(!is_array($grp)) {
             $next = true;
@@ -468,10 +468,10 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    /**
     * Metoda přidá element do formuláře
     * @param Form_Element $element -- objetk formulářového elementu
-    * @param integer $group -- priorita (vhodné při řazení)
-    * @todo dodělat přiřazení priority prvkům kvůli vykreslení v šabloě
+    * @param string $group -- řetězec označující skupinu (např. z metody addGroup())
+    * @param int $position -- na kterou pozici se má element přidat (pokud je -1 tak se vloží na konec)
     */
-   public function addElement(Form_Element $element, $group = null) {
+   public function addElement(Form_Element $element, $group = null, $position = -1) {
       $name = $element->getName();
       $this->elements[$name] = $element;
       $this->elements[$name]->setPrefix($this->formPrefix);
@@ -485,7 +485,21 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          if(!isset ($this->elementsGroups[$group])) {
             $this->addGroup($group);
          }
-         $this->elementsGroups[$group]['elements'][$name] = $this->elements[$name]->getName();
+
+         if($position == -1){
+            $this->elementsGroups[$group]['elements'][$name] = $this->elements[$name]->getName();
+         } else {
+         /**
+          * Nejde pouze pomocí array_splice
+          * @see http://www.php.net/manual/en/function.array-splice.php#41118
+          */
+            $firstPart = array_slice($this->elementsGroups[$group]['elements'], 0, $position);
+            $secondPart = array_slice($this->elementsGroups[$group]['elements'], $position);
+            $insertPart = array($name => $this->elements[$name]->getName());
+            $this->elementsGroups[$group]['elements'] = array_merge($firstPart, $insertPart, $secondPart);
+//            $this->elementsGroups[$group]['elements'][$name] = $this->elements[$name]->getName();
+         }
+
       }
 
       // pokud je soubor přidám do formu že se bude přenášet po částech
@@ -563,7 +577,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param Form_Decorator $decorator -- objekt Form dekorátoru
     */
    public function render(Form_Decorator $decorator = null) {
-      print ($this->creatString($decorator));
+      echo ($this->creatString($decorator));
    }
 
    /**
