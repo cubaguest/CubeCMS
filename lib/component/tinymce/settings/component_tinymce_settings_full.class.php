@@ -3,7 +3,13 @@
  * Třída pro vytvoření požadavku pro naplnění jqgrid
  */
 class Component_TinyMCE_Settings_Full extends Component_TinyMCE_Settings_Advanced {
-   protected $defaultPlugins = array('safari','spellchecker','pagebreak','style','layer','table','save','advhr','advimage','advlink','emotions','iespell','inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste','directionality','fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template');
+   protected $defaultPlugins = array('safari','spellchecker','pagebreak','style',
+       'layer','table','save','advhr','advimage','advlink','emotions','iespell',
+       'inlinepopups','insertdatetime','preview','media','searchreplace','print',
+       'contextmenu','paste','directionality','fullscreen','noneditable','visualchars',
+       'nonbreaking','xhtmlxtras','template','imgmap', 
+      'imgalign', 'imgpreview' // Cube-CMS plugins
+      );
 
    protected $defaultButtons = array(
      'theme_advanced_buttons1' => array("bold","italic","underline","strikethrough","|","justifyleft","justifycenter",
@@ -15,7 +21,7 @@ class Component_TinyMCE_Settings_Full extends Component_TinyMCE_Settings_Advance
         "image","emotions","iespell","media","advhr","|","ltr","rtl"),
      'theme_advanced_buttons4' => array("insertlayer","moveforward","movebackward","absolute","|","styleprops","|",
         "cite","abbr","acronym","del","ins","attribs","|","visualchars","nonbreaking","template","blockquote","pagebreak","|",
-        "newdocument","|","preview","print","fullscreen","code")
+        "newdocument","|","preview","print","fullscreen","code",'|','imgal','imgar', '|', 'imgpreview')
    );
 
    public function  __construct() {
