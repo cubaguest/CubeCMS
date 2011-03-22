@@ -186,6 +186,9 @@ class Url_Request {
          $validRequest = true;
          AppCore::setErrorPage(false);
          Url_Link::setCategory($this->getCategory());
+         if($this->getUrlType() == self::URL_TYPE_CORE_MODULE){
+            Url_Link::setCategory($this->getCategory().'.'.$this->getOutputType());
+         }
          Url_Link_Module::setRoute($this->getModuleUrlPart());
          Url_Link::setParams($this->getUrlParams());
          Locales::setLang($this->getUrlLang());
