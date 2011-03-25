@@ -483,11 +483,11 @@ textarea, form .form-table .form-element-long {
    background-image: url('../../../images/files/txt.gif');
    background-repeat: no-repeat;
 }
-.file-pdf {background-image: url('../../../images/files/pdf.gif');}
-.file-doc {background-image: url('../../../images/files/doc.gif');}
-.file-xls {background-image: url('../../../images/files/xls.gif');}
-.file-docx {background-image: url('../../../images/files/docx.gif');}
-.file-zip {background-image: url('../../../images/files/zip.gif');}
-.file-rar {background-image: url('../../../images/files/rar.gif');}
-.file-avi {background-image: url('../../../images/files/avi.gif');}
+.file-pdf {background-image: url('../images/files/pdf.gif');}
+.file-doc {background-image: url('../images/files/doc.gif');}
+.file-xls {background-image: url('../images/files/xls.gif');}
+.file-docx {background-image: url('../images/files/docx.gif');}
+.file-zip {background-image: url('../images/files/zip.gif');}
+.file-rar {background-image: url('../images/files/rar.gif');}
+.file-avi {background-image: url('../images/files/avi.gif');}
 /* EOF file extension */
