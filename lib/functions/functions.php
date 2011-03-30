@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Soubor s globálními funkcemi, použitelnými v celém frameworku. každá funkce
  * začíná prefixem vve_ např. vve_názevfunkce
@@ -9,7 +10,8 @@
  * @param string $string -- řětezec pro převedení
  * @return string -- převedený řetězec
  */
-function vve_to_ascii(&$string) {
+function vve_to_ascii(&$string)
+{
 //   $string = strtr($string,
 //           Array(
 //           "á"=>'a',"â"=>'a',"ă"=>'a',"ä"=>'a',"č"=>'c',"ć"=>'c',"ç"=>'c',
@@ -33,20 +35,21 @@ function vve_to_ascii(&$string) {
  * @param string/array $string -- řetězec nebo pole pro převedení
  * @return string/array -- řetězec nebo pole s převedenými znaky
  */
-function vve_cr_url_key($string, $removeSlashes = true) {
-   if(is_null($string)) {
+function vve_cr_url_key($string, $removeSlashes = true)
+{
+   if (is_null($string)) {
       return $string;
-   } else if(is_array($string)) {
+   } else if (is_array($string)) {
       foreach ($string as $key => $variable) {
          $string[$key] = vve_cr_url_key($variable);
       }
    } else {
       $string = vve_to_ascii(strip_tags($string));
       $slashes = null;
-      if($removeSlashes){
+      if ($removeSlashes) {
          $slashes = '\/';
       }
-      $regexp = array('/[^a-z0-9\/ _-]+/i', '/[ '.$slashes.'-]+/', '/[\/]+/');
+      $regexp = array('/[^a-z0-9\/ _-]+/i', '/[ ' . $slashes . '-]+/', '/[\/]+/');
       $replacements = array('', '-', URL_SEPARATOR);
       $string = preg_replace($regexp, $replacements, $string);
    }
@@ -58,8 +61,9 @@ function vve_cr_url_key($string, $removeSlashes = true) {
  * @param string/array $string -- řetězec nebo pole pro převedení
  * @return string/array -- řetězec nebo pole s převedenými znaky
  */
-function vve_cr_safe_file_name($string) {
-   if(is_array($string)) {
+function vve_cr_safe_file_name($string)
+{
+   if (is_array($string)) {
       foreach ($string as $key => $variable) {
          $string[$key] = vve_cr_safe_file_name($variable);
       }
@@ -77,7 +81,8 @@ function vve_cr_safe_file_name($string) {
  * @param string $delimiter -- oddělovač
  * @return array -- pole s hodnotami
  */
-function vve_parse_cfg_value($value, $delimiter = ';') {
+function vve_parse_cfg_value($value, $delimiter = ';')
+{
    $arr = $retArr = array();
    $arr = explode($delimiter, $value);
 
@@ -94,8 +99,9 @@ function vve_parse_cfg_value($value, $delimiter = ';') {
  * @param string $atrName -- (option) název atribut, který se má opravovat (default: src a href)
  * @return string -- řetězec s opravenou adresou
  */
-function vve_create_full_url_path(&$string, $atrNames = 'src|href') {
-   $string = preg_replace('/(src|href)="(?!http)([^"]+)"/i', '\\1="'.Url_Link::getMainWebDir().'\\2"', $string);
+function vve_create_full_url_path(&$string, $atrNames = 'src|href')
+{
+   $string = preg_replace('/(src|href)="(?!http)([^"]+)"/i', '\\1="' . Url_Link::getMainWebDir() . '\\2"', $string);
    return $string;
 }
 
@@ -104,8 +110,9 @@ function vve_create_full_url_path(&$string, $atrNames = 'src|href') {
  * @param mixed $value -- samotný řetězec nebo pole
  * @return mixed -- řětezce nebo pole bez html tagů
  */
-function vve_strip_tags($value) {
-   if(is_array($value)) {
+function vve_strip_tags($value)
+{
+   if (is_array($value)) {
       foreach ($value as $key => $val) {
          $value[$key] = vve_strip_tags($val);
       }
@@ -139,38 +146,39 @@ function vve_strip_tags($value) {
  * <p>%x - Preferred date representation based on locale, without the time - Example: 02/05/09 for February 5, 2009</p>
  * <p>%X - Preferred time representation based on locale, without the date - Example: 03:59:16 or 15:59:16</p>
  */
-function vve_date($format, $timestamp = null) {
-   if($timestamp instanceof DateTime) {
+function vve_date($format, $timestamp = null)
+{
+   if ($timestamp instanceof DateTime) {
       $timestamp = $timestamp->format("U");
-   } else if($timestamp === null) {
+   } else if ($timestamp === null) {
       $timestamp = time();
    }
 
    $replacementArray = array(
-           '%d' => array('func' => 'date', 'param' =>'j'),
-           '%D' => array('func' => 'date', 'param' =>'d'),
-           '%l' => array('func' => 'strftime', 'param' =>'%a'),
-           '%L' => array('func' => 'strftime', 'param' =>'%A'),
-           '%m' => array('func' => 'date', 'param' =>'n'),
-           '%M' => array('func' => 'date', 'param' =>'m'),
-           '%f' => array('func' => 'strftime', 'param' =>'%b'),
-           '%b' => array('func' => 'strftime', 'param' =>'%b'),
-           '%F' => array('func' => 'strftime', 'param' =>'%B'),
-           '%B' => array('func' => 'strftime', 'param' =>'%B'),
-           '%x' => array('func' => 'strftime', 'param' =>'%x'),
-           '%X' => array('func' => 'strftime', 'param' =>'%X'),
-           '%Y' => array('func' => 'date', 'param' =>'Y'),
-           '%y' => array('func' => 'date', 'param' =>'y'),
-           '%G' => array('func' => 'date', 'param' =>'G'),
-           '%H' => array('func' => 'date', 'param' =>'H'),
-           '%g' => array('func' => 'date', 'param' =>'g'),
-           '%h' => array('func' => 'date', 'param' =>'h'),
-           '%i' => array('func' => 'date', 'param' =>'i'),
-           '%s' => array('func' => 'date', 'param' =>'s')
+      '%d' => array('func' => 'date', 'param' => 'j'),
+      '%D' => array('func' => 'date', 'param' => 'd'),
+      '%l' => array('func' => 'strftime', 'param' => '%a'),
+      '%L' => array('func' => 'strftime', 'param' => '%A'),
+      '%m' => array('func' => 'date', 'param' => 'n'),
+      '%M' => array('func' => 'date', 'param' => 'm'),
+      '%f' => array('func' => 'strftime', 'param' => '%b'),
+      '%b' => array('func' => 'strftime', 'param' => '%b'),
+      '%F' => array('func' => 'strftime', 'param' => '%B'),
+      '%B' => array('func' => 'strftime', 'param' => '%B'),
+      '%x' => array('func' => 'strftime', 'param' => '%x'),
+      '%X' => array('func' => 'strftime', 'param' => '%X'),
+      '%Y' => array('func' => 'date', 'param' => 'Y'),
+      '%y' => array('func' => 'date', 'param' => 'y'),
+      '%G' => array('func' => 'date', 'param' => 'G'),
+      '%H' => array('func' => 'date', 'param' => 'H'),
+      '%g' => array('func' => 'date', 'param' => 'g'),
+      '%h' => array('func' => 'date', 'param' => 'h'),
+      '%i' => array('func' => 'date', 'param' => 'i'),
+      '%s' => array('func' => 'date', 'param' => 's')
    );
 
    foreach ($replacementArray as $str => $func) {
-      $format = str_replace($str, call_user_func_array($func['func'], array($func['param'], (int)$timestamp)), $format);
+      $format = str_replace($str, call_user_func_array($func['func'], array($func['param'], (int) $timestamp)), $format);
    }
    return $format;
 }
@@ -180,9 +188,10 @@ function vve_date($format, $timestamp = null) {
  * @param string $url -- url adresa
  * @return bool -- true pokud existuje
  */
-function vve_url_exists($url){
-    $headers = @get_headers($url);
-    return (bool)preg_match('/^HTTP\/\d\.\d\s+(200|301|302)/', $headers[0]);
+function vve_url_exists($url)
+{
+   $headers = @get_headers($url);
+   return (bool) preg_match('/^HTTP\/\d\.\d\s+(200|301|302)/', $headers[0]);
 }
 
 /**
@@ -194,16 +203,17 @@ function vve_url_exists($url){
  *
  * @return array -- upravené pole, v případě chyby false
  */
-function vve_array_insert($array, $pos, $val, $valkey = null){
-    $array2 = array_splice($array,$pos);
-    if($valkey == null){
+function vve_array_insert($array, $pos, $val, $valkey = null)
+{
+   $array2 = array_splice($array, $pos);
+   if ($valkey == null) {
       $array[] = $val;
-    } else {
+   } else {
       $array[$valkey] = $val;
-    }
-    $array = array_merge($array,$array2);
+   }
+   $array = array_merge($array, $array2);
 
-    return $array;
+   return $array;
 }
 
 /**
@@ -216,26 +226,29 @@ function vve_array_insert($array, $pos, $val, $valkey = null){
  *
  * @return array -- upravené pole, v případě chyby false
  */
-function vve_array_insert_by_key($array, $key, $val, $valkey = null, $sort = 'after'){
-    $pos = 0;
-    foreach ($array as $lkey => $lval){
-       if($lkey == $key) break;
-       $pos++;
-    }
-    if($sort == 'after'){
-      $array = vve_array_insert($array, $pos+1, $val, $valkey);
-    } else {
-       $array = vve_array_insert($array, $pos, $val, $valkey);
-    }
-    return $array;
+function vve_array_insert_by_key($array, $key, $val, $valkey = null, $sort = 'after')
+{
+   $pos = 0;
+   foreach ($array as $lkey => $lval) {
+      if ($lkey == $key)
+         break;
+      $pos++;
+   }
+   if ($sort == 'after') {
+      $array = vve_array_insert($array, $pos + 1, $val, $valkey);
+   } else {
+      $array = vve_array_insert($array, $pos, $val, $valkey);
+   }
+   return $array;
 }
 
 /**
  * Funcke odstraní html komentáře
  * @param mixed $str -- řetězec nebo pole
  */
-function vve_strip_html_comment($str){
-   if(is_array($str)){
+function vve_strip_html_comment($str)
+{
+   if (is_array($str)) {
       foreach ($str as $key => $s) {
          $str[$key] = vve_strip_html_comment($s);
       }
@@ -244,4 +257,21 @@ function vve_strip_html_comment($str){
    }
    return $str;
 }
+
+/**
+ * Funkce rozparsuje a převede hodnotu velikosti na bajty
+ * @param string $param -- řetězec s velikostí (např.: 5M => 5*1024*1024, 2k => 2*1024, ...)
+ */
+function vve_parse_size($str)
+{
+   $val = trim($str);
+   $last = strtolower($str[strlen($str) - 1]);
+   switch ($last) {
+      case 'g': $val *= 1024;
+      case 'm': $val *= 1024;
+      case 'k': $val *= 1024;
+   }
+   return $val;
+}
+
 ?>
