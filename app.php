@@ -396,9 +396,9 @@ class AppCore extends TrObject {
       iconv_set_encoding('internal_encoding', 'UTF-8');
       ini_set("default_charset", "utf-8");
       // max upload Limit
-      $max_upload = (int)(ini_get('upload_max_filesize'));
-      $max_post = (int)(ini_get('post_max_size'));
-      $memory_limit = (int)(ini_get('memory_limit'));
+      $max_upload = vve_parse_size(ini_get('upload_max_filesize'));
+      $max_post = vve_parse_size(ini_get('post_max_size'));
+      $memory_limit = vve_parse_size(ini_get('memory_limit'));
       define('VVE_MAX_UPLOAD_SIZE', min($max_upload, $max_post, $memory_limit));
    }
 
@@ -774,7 +774,7 @@ class AppCore extends TrObject {
             $ret =  $controller->runCtrlAction($routes->getActionName(), self::$urlRequest->getOutputType());
          } catch (Exception $e ) {
             new CoreErrors($e);
-            return false;
+//            return false;
          }
          if(AppCore::getUrlRequest()->isXHRRequest() AND $routes->getRespondClass() != null){
             // render odpovědi pro XHR
@@ -843,7 +843,7 @@ class AppCore extends TrObject {
       } else {
          $panels = $panelsM->setTagetCategory()->records();
       }
-      
+
       foreach ($panels as $panel) {
          // pokud je panel vypnut přeskočíme zracování
          if(!isset ($this->coreTpl->panels[(string) $panel->{Model_Panel::COLUMN_POSITION}])){
