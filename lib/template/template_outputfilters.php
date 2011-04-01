@@ -86,6 +86,6 @@ function vve_filter_protectemails($cnt){
  * @return string
  */
 function vve_filter_filesicons($cnt){
-   return preg_replace('/(href="[^\.]+\.)(pdf|txt|doc|docx|xls|zip|rar|avi)"/i','\\1\\2" class="file-icon file-\\2"',$cnt);
+   return preg_replace('/(href="[^\.]+\.)(pdf|txt|ods|ots|doc|dot|docx|xls|ods|ots|zip|rar|avi|mpg|wmv)"/i','\\1\\2" class="file-icon file-\\2"',$cnt);
 }
 ?>
