@@ -274,4 +274,22 @@ function vve_parse_size($str)
    return $val;
 }
 
+/**
+ * Funkce vytvoří řetězec s velikostí souboru a přípony G/M/K
+ * @param int $size -- velikost v Bajtech
+ * @param int $round -- počet desetiných míst (def.: 1)
+ * @return string
+ */
+function vve_create_size_str($size, $round = 1)
+{
+   if($size > 1073741824){
+      return round($size/1073741824,$round)." GB";
+   } else if($size > 1048576){
+      return round($size/1048576,$round)." MB";
+   } else if($size > 1024) {
+      return round($size/1024,$round)." KB";
+   } else {
+      return $size." B";
+   }
+}
 ?>
