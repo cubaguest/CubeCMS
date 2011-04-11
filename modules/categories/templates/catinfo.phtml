@@ -8,7 +8,7 @@
    <?
    $link = new Url_Link(true);
    foreach ($this->catInfo[Model_Category::COLUMN_URLKEY] as $lang => $key) {
-      if($key != null){?><tr class="ui-widget-content ui-state-default"><td>
+      if($key != null){?><tr class="ui-widget-content ui-state-default"><td class="editable">
             <a href="<?=$link->lang($lang)->category($key);?>" title="<?=$this->tr('Otevřít v novém okně')?>"
                class="link-external"><?=$key?></a></td><td class="cell-lang"><?='&nbsp;'.vve_tpl_lang_image($lang)?></td></tr><?}
    }?>

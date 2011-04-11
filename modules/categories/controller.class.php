@@ -96,7 +96,11 @@ class Categories_Controller extends Controller {
       $structure->withHidden(true);
       if ($structure != false) {
          $catModel = new Model_Category();
-         $structure->setCategories($catModel->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
+         $structure->setCategories($catModel
+            ->join(Model_Category::COLUMN_CAT_ID, "Model_Rights", Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_RIGHT))
+            ->groupBy(array(Model_Category::COLUMN_CAT_ID))
+            ->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
+//         $structure->setCategories($catModel->getCategoryList());
          $this->view()->structure = $structure;
       }
       $this->view()->isMainMenu = $this->isMainStruct();
@@ -772,7 +776,7 @@ class Categories_Controller extends Controller {
             }
          }
 
-         // potomci kategorie
+         // potomci kategorie (všechny i vnořené v další potomcích)
          $childs = $this->getCategoryChildrens($movedCat);
 
          if(!empty ($childs)){

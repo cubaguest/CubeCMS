@@ -80,19 +80,24 @@ echo $this->toolbox;
          return str.match(/cat-id-(\d+)/)[1];
       }
 
-      $(document).ready(function(){
-         $("#category-structure")
-         .bind('select_node.jstree', function(e, node){
-            showLoadBox('#category-info div');
-            var idc = getIdCat($(node.rslt.obj).attr('id'));
-            $.ajax({
-               type: "GET", url: "<?=$this->link()->route("getCatInfo")?>",
+      // načte informace o kategorii a vloží do boxu
+      function loadCatinfo(idc){
+         showLoadBox('#category-info div');
+         $.ajax({
+               type: "GET", url: "<?=$this->link()->route("getCatInfo")?>", cache : false, 
                data: {idc : idc},
                success: function(data){
                   $('#category-info div').html(data);
                   hideLoadBox();
                }
             });
+      }
+
+      $(document).ready(function(){
+         $("#category-structure")
+         .bind('select_node.jstree', function(e, node){
+            var idc = getIdCat($(node.rslt.obj).attr('id'));
+            loadCatinfo(idc);
          })
          .bind('move_node.jstree', function(e, node){
             var newPos = {
@@ -102,12 +107,13 @@ echo $this->toolbox;
             if(node.rslt.cr != -1){newPos.parent = getIdCat($(node.rslt.cr).attr('id'));}
             newPos.position = node.rslt.cp;
             if($('input[name=cat_regenerate_urls]').is(':checked')){newPos.regenerate = true;}
-            showLoadBox('#category-info div');
+            showLoadBox('#category-structure');
             $.ajax({
                type: "POST", url: "<?=$this->link()->route("moveCat")?>",
                data: newPos,
                success: function(data){
                   hideLoadBox();
+                  loadCatinfo(newPos.idc);
                }
             });
          })
@@ -150,6 +156,22 @@ echo $this->toolbox;
          }
          return false;
       });
+      // úprava url klíče
+      $('td.editable').live('click', function(){
+         if($('input', this).length == 0){
+            var cnt = $('a',this).text();
+            $(this).find('a').hide();
+            var $input = $('<input />').attr({ type : 'text', name : 'newvalue' }).val(cnt);
+            $(this).append($input);
+            $input.focus();
+         }
+      });
+      $('td.editable input').live('focusout', function(){
+            var cnt = $(this).val();
+            $(this).prev('a').text(cnt).show();
+            $(this).remove();
+      });
+
       /* ]]> */
    </script>
 </div>
