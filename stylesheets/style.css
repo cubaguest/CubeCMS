@@ -173,7 +173,7 @@ span[title] {
 }
 
 /* formulařové prvky */
-input, button, textarea, select, a.form-button {
+input, button, textarea, select, a.form-button, .button {
    border: 1px solid #bbbbbb;
    background-color: #ffffff;
    padding: 1px;
@@ -183,13 +183,14 @@ input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
    background-color:transparent;
 }
-input[type="submit"], input[type="reset"], input[type="button"], button[type="submit"], input[type="button"], a.form-button {
+input[type="submit"], input[type="reset"], input[type="button"], button, input[type="button"], a.form-button, .button {
    -moz-border-radius: 3px;
    border-radius: 3px;
    padding: 1px 3px;
    color: black;
+   cursor: pointer;
 }
-input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, button:hover, a.form-button:hover {
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, button:hover, a.form-button:hover, .button:hover {
    background: #fff7d4 url('../images/forms/buttons_back.gif') 0 0 repeat-x;
    text-decoration: none;
 }
@@ -197,7 +198,7 @@ input[type="submit"]:hover, button[type="submit"]:hover {
    background-color: #a7fead;
    background-position: 0 -20px;
 }
-input.button-cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover {
+input.button-cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover, .button-cancel:hover {
    background-color: #f57676;
    background-position: 0 -40px;
 }
@@ -212,7 +213,19 @@ label.form-error {
 input.form-error, textarea.form-error {
    background-color: #f4d0d0;
 }
-
+.button {
+   padding: 2px 4px;
+   margin-right: 4px;
+   position: relative;
+   float: left;
+}
+.button div {
+   position: relative;
+   float: left;
+}
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+   font-size: 0.8em !important;
+}
 /* tabulka formuláře */
 form fieldset {
    position: relative;
@@ -476,18 +489,24 @@ textarea, form .form-table .form-element-long {
 /* EOF komentare */
 
 /* SOF file extension */
-.file-icon {
+.file-icon, .dir-icon {
    padding-left: 18px;
    background-color: transparent;
    background-position: center left;
-   background-image: url('../../../images/files/txt.gif');
+   background-image: url('../images/files/txt.gif');
    background-repeat: no-repeat;
 }
 .file-pdf {background-image: url('../images/files/pdf.gif');}
-.file-doc {background-image: url('../images/files/doc.gif');}
-.file-xls {background-image: url('../images/files/xls.gif');}
-.file-docx {background-image: url('../images/files/docx.gif');}
+.file-doc, .file-docx, .file-dot, .file-odt, .file-ott {background-image: url('../images/files/doc.gif');}
+.file-xls, .file-xlt, .file-ods, .file-ots {
+   background-image: url('../images/files/xls.gif');
+}
 .file-zip {background-image: url('../images/files/zip.gif');}
 .file-rar {background-image: url('../images/files/rar.gif');}
-.file-avi {background-image: url('../images/files/avi.gif');}
+.file-avi, .file-wmv, .file-mpg, .file-flv, .file-swf {background-image: url('../images/files/avi.gif');}
+.file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd
+{background-image: url('../images/files/jpg.gif');}
+.dir-icon {
+   background-image: url('../images/icons/folder.png');
+}
 /* EOF file extension */
