@@ -12,6 +12,9 @@
       foreach ($structure as $item) {
          $retStr .= '<li>'
             .'<a href="'.$item['link'].'" title="'.M_NAVIGATION_GOTO.' '.htmlspecialchars($item['name']).'">'.htmlspecialchars($item['name']).'</a>';
+            if(!empty ($item['label'])){
+               $retStr .= '<br />'.$item['label'];
+            }
             if(!empty ($item['childs'])){
                $retStr .= navRenderStruvcutre($item['childs'], $level+1);
             }
