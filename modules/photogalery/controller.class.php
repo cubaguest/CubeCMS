@@ -14,6 +14,9 @@ class Photogalery_Controller extends Controller {
    const DIR_SMALL = 'small';
    const DIR_MEDIUM = 'medium';
    const DIR_ORIGINAL = 'original';
+   
+   const PARAM_TPL_MAIN = 'tplmain';
+   const PARAM_EDITOR_TYPE = 'editor';
 
    const SMALL_WIDTH = 140;
    const SMALL_HEIGHT = 140;
@@ -329,6 +332,35 @@ class Photogalery_Controller extends Controller {
    }
 
    public function settings(&$settings,Form &$form) {
+      $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
+      
+      $componentTpls = new Component_ViewTpl();
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'text');
+
+      $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
+      $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
+      if(isset($settings[self::PARAM_TPL_MAIN])) {
+         $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
+      }
+      $form->addElement($elemTplMain, $fGrpViewSet);
+      unset ($componentTpls);
+      
+      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
+
+      $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
+      $elemEditorType->setOptions(array(
+         $this->tr('žádný (pouze textová oblast)') => 'none',
+         $this->tr('jednoduchý (Wysiwyg)') => 'simple',
+         $this->tr('pokročilý (Wysiwyg)') => 'advanced',
+         $this->tr('kompletní (Wysiwyg)') => 'full'
+      ));
+      $elemEditorType->setValues('advanced');
+      if(isset($settings[self::PARAM_EDITOR_TYPE])) {
+         $elemEditorType->setValues($settings[self::PARAM_EDITOR_TYPE]);
+      }
+
+      $form->addElement($elemEditorType, $fGrpEditSet);
+      
       $form->addGroup('images', 'Nastavení obrázků');
 
       $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
@@ -384,6 +416,8 @@ class Photogalery_Controller extends Controller {
          $settings['medium_width'] = $form->medium_width->getValues();
          $settings['medium_height'] = $form->medium_height->getValues();
          $settings['medium_crop'] = $form->medium_crop->getValues();
+         $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
+         $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
       }
    }
 }
