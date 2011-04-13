@@ -28,7 +28,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
 
    protected $defaultPlugins = array('safari','style','table','save','advhr','advimage','advlink','emotions','iespell','tabfocus',
       'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality',
-      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap', 
+      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists','autoresize',
       'imgalign', 'imgpreview' // Cube-CMS plugins
       );
 
@@ -37,7 +37,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
          'justifyright','justifyfull','formatselect','styleselect','undo','redo','|','preview','fullscreen'/*,'fontsizeselect'*/),
       'theme_advanced_buttons2' => array('cut','copy','paste','pastetext','pasteword','|','search','replace','|','bullist',
          'numlist','|','outdent','indent','blockquote','|','link','unlink','anchor','cleanup','code','|','forecolor','backcolor'),
-      'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap'),
+      'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap','|', 'styleprops'),
       'theme_advanced_buttons4' => array('image','imgmap','|','imgal','imgar', '|', 'imgpreview', '|', 'emotions','media','template') // Cube-CMS buttons
    );
 
