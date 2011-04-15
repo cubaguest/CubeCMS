@@ -455,9 +455,9 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
             if (defined('VVE_IMAGE_THUMB_CROP')) $crop = VVE_IMAGE_THUMB_CROP; // Cube CMS 6.4r5 or higer
             $image->saveAs($dirSmall, VVE_IMAGE_THUMB_W, VVE_IMAGE_THUMB_H, $crop, $fileName);
             // only if is bigger
-            if ($image->getOriginalWidth() >= VVE_DEFAULT_PHOTO_W OR $image->getOriginalHeight() >= VVE_DEFAULT_PHOTO_H) {
+//            if ($image->getOriginalWidth() >= VVE_DEFAULT_PHOTO_W OR $image->getOriginalHeight() >= VVE_DEFAULT_PHOTO_H) {
                $image->saveAs($dirMed, VVE_DEFAULT_PHOTO_W, VVE_DEFAULT_PHOTO_H, false, $fileNameMed);
-            }
+//            }
          } catch (UnexpectedValueException $exc) {
             $this->errMsg()->addMessage(sprintf('Obrázek %s se nepodařilo vytvořit.', $file));
          }
