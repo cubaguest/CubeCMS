@@ -143,7 +143,7 @@ class Articles_Controller extends Controller {
       if($this->rights()->isControll()){
          $m->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc ', array('idc' => $this->category()->getId()));
       } else {
-         $m->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = 1', array('idc' => $this->category()->getId()));
+         $m->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_CONCEPT.' = 0', array('idc' => $this->category()->getId()));
       }
       $articlesAll = $m->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC))->records();
       $articles = array();

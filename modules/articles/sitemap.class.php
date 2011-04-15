@@ -4,8 +4,9 @@ class Articles_SiteMap extends SiteMap {
       // kategorie
       $model = new Articles_Model();
       $this->setCategoryLink(new DateTime($model->getLastChange($this->category()->getId())));
-      $records = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = 1 AND '
-         .Articles_Model::COLUMN_URLKEY.' IS NOT NULL',
+      $records = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_CONCEPT.' = 0 '
+         .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL'
+         .' AND '.Articles_Model::COLUMN_ADD_TIME.' <= NOW()',
          array('idc' => $this->category()->getId()))
          ->limit(0, $this->getMaxItems())->records();
 

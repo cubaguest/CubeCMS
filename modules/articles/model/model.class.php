@@ -84,7 +84,7 @@ class Articles_Model extends Model_ORM {
       $this->setIUValues(array(self::COLUMN_NAME => $name,self::COLUMN_TEXT => $text,
          self::COLUMN_TEXT_PRIVATE => $textPrivate, self::COLUMN_KEYWORDS => $keywords,
          self::COLUMN_DESCRIPTION => $description, self::COLUMN_ANNOTATION => $annotation,
-         self::COLUMN_URLKEY => $urlKey, self::COLUMN_PUBLIC => $public,
+         self::COLUMN_URLKEY => $urlKey, self::COLUMN_CONCEPT => $public,
          self::COLUMN_TEXT_CLEAR => vve_strip_tags($text)));
 
       $dbc = new Db_PDO();
@@ -280,7 +280,7 @@ class Articles_Model extends Model_ORM {
    public function getLastChange($id, $onlyPublic = true) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT ".Articles_Model_Detail::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_PUBLIC." = :onlyPublic)"
+              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_CONCEPT." = :onlyPublic)"
               ." ORDER BY ".Articles_Model_Detail::COLUMN_EDIT_TIME." DESC"
               ." LIMIT 0, 1");
       $dbst->bindParam(':id', $id, PDO::PARAM_INT);

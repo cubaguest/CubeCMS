@@ -11,9 +11,9 @@ echo $this->toolbox;
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
-         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
-            $showClass = 'main-content-no-public';
-            $public = $this->tr('Nezveřejněn');
+         if($article->{Articles_Model_Detail::COLUMN_CONCEPT} == 1){
+            $showClass = 'main-content-concept';
+            $public = $this->tr('Koncept');
          }
          ?>
    <div class="main-content-list-record <?=$showClass?>">

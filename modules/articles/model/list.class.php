@@ -15,7 +15,7 @@ class Articles_Model_List extends Model_PDO {
          $dbst = $dbc->query("SELECT COUNT(".Articles_Model_Detail::COLUMN_ID.")"
                  ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
                  ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = '".$idCat."')"
-                 ." AND (".Articles_Model_Detail::COLUMN_PUBLIC." = 1)");
+                 ." AND (".Articles_Model_Detail::COLUMN_CONCEPT." = 0)");
       } else {
          $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
                  ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = '".$idCat."')");

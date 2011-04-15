@@ -5,7 +5,7 @@ $modelImages = new PhotoGalery_Model_Images();
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $noPClass = $noPubllic = null;
-         if($article->{Articles_Model_Detail::COLUMN_PUBLIC} == 0){
+         if($article->{Articles_Model_Detail::COLUMN_CONCEPT} == 1){
             $noPClass = 'noPublicGalery';
             $noPubllic = '<span class="smallFont">'.$this->_('Nezveřejněno').'</span>';
          }
