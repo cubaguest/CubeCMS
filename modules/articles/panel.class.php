@@ -16,8 +16,8 @@ class Articles_Panel extends Panel {
             $artM->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC));
             break;
       }
-      $this->template()->articles = $artM->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_PUBLIC.' = :pub',
-         array('idc' => $this->category()->getId(), 'pub' => true))
+      $this->template()->articles = $artM->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_CONCEPT.' = 0 AND '.Articles_Model::COLUMN_ADD_TIME.' <= NOW()',
+         array('idc' => $this->category()->getId()))
          ->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_ARTICLES))->records();
    }
 
