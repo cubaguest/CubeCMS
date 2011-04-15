@@ -11,9 +11,9 @@ echo $this->toolbox;
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
-         if($article->{Articles_Model::COLUMN_PUBLIC} == 0){
-            $showClass = 'main-content-no-public';
-            $public = $this->tr('Nezveřejněno').'&nbsp;';
+         if($article->{Articles_Model::COLUMN_CONCEPT} == true){
+            $showClass = 'main-content-concept';
+            $public = $this->tr('Koncept').'&nbsp;';
          }
          $editTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          ?>

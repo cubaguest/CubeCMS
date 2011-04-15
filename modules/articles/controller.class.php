@@ -22,20 +22,37 @@ class Articles_Controller extends Controller {
     * Kontroler pro zobrazení novinek
     */
    public function mainController() {
-      //		Kontrola práv
+      //        Kontrola práv
       $this->checkReadableRights();
 
       // načtení článků
       $artModel = new Articles_Model();
       $query = $artModel;
-      if($this->category()->getRights()->isControll() == true){
+      if($this->category()->getRights()->isControll()){
          $artModel->setSelectAllLangs(true);
          $query->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc'
             ,array('idc' => $this->category()->getId()));
+      } else if($this->category()->getRights()->isWritable()){
+         $query->where(
+            // články který nejsou koncepty nebo je napsal uživatel
+            '('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr) '
+            // články jsoupřidány po aktuálním času nebo je napsal uživatel
+            .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
+            // kategorie a vyplněný urlkey
+            .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
+            
+            array(
+            'idusr' => Auth::getUserId(),
+            'idusr2' => Auth::getUserId(),
+            'idc' => $this->category()->getId()));
       } else {
-         $query->where('('.Articles_Model::COLUMN_PUBLIC.' = 1 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr) AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc'
-            .' AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL',
-            array('idusr' => Auth::getUserId(), 'idc' => $this->category()->getId()));
+         $query->where(Articles_Model::COLUMN_CONCEPT.' = 0 '
+            .'AND '.Articles_Model::COLUMN_ADD_TIME.' < NOW() '
+            .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
+            
+            array('idc' => $this->category()->getId()));
       }
 
       $numRows = 0;
@@ -83,7 +100,7 @@ class Articles_Controller extends Controller {
    }
 
    public function contentController(){
-      //		Kontrola práv
+      //        Kontrola práv
       $this->checkReadableRights();
 
       // načtení článků
@@ -96,7 +113,7 @@ class Articles_Controller extends Controller {
     * Kontroler pro zobrazení novinek
     */
    public function topController() {
-      //		Kontrola práv
+      //        Kontrola práv
       $this->checkReadableRights();
       // načtení článků
       $artModel = new Articles_Model_List();
@@ -149,13 +166,20 @@ class Articles_Controller extends Controller {
 
       $artM = new Articles_Model();
 
-      if($this->rights()->isControll() == true){
-         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc', 
+      if($this->rights()->isControll()){
+         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()));
+      } else if($this->rights()->isWritable()){
+         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+            .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
+            .'AND ('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr )',
+            array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey'),
+            'idusr' => Auth::getUserId(), 'idusr2' => Auth::getUserId()));
       } else {
          $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
-            .'AND ('.Articles_Model::COLUMN_PUBLIC.' = 1 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr )',
-            array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey'), 'idusr' => Auth::getUserId()));
+            .'AND ('.Articles_Model::COLUMN_CONCEPT.' = 0 ) '
+            .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW())',
+            array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey')));
       }
 
       $artM->joinFK(Articles_Model::COLUMN_ID_USER_LAST_EDIT, array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)
@@ -198,15 +222,15 @@ class Articles_Controller extends Controller {
          }
          $this->view()->formDelete = $deleteForm;
 
-         if($this->view()->article->{Articles_Model::COLUMN_PUBLIC} == false){
+         if($this->view()->article->{Articles_Model::COLUMN_CONCEPT} == true){
             $formPublic = new Form('art_pub_');
-            $feSubmit = new Form_Element_Submit('public', $this->tr('Zveřejnit položku'));
+            $feSubmit = new Form_Element_Submit('public', $this->tr('Zveřejnit'));
             $formPublic->addElement($feSubmit);
             if($formPublic->isValid()){
                $record = $artM->record($this->view()->article->{Articles_Model::COLUMN_ID});
-               $record->{Articles_Model::COLUMN_PUBLIC} = true;
+               $record->{Articles_Model::COLUMN_CONCEPT} = false;
                $artM->save($record);
-               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->tr('položka byla zveřejněna')));
+               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->tr('U položky byl zrušek koncept')));
                $this->link()->reload();
             }
             $this->view()->formPublic = $formPublic;
@@ -225,7 +249,7 @@ class Articles_Controller extends Controller {
                  $this->category()->getId());
          $compComments->setConfig(Component_Comments::PARAM_ADMIN,
                  $this->category()->getRights()->isControll());
-         $compComments->setConfig(Component_Comments::PARAM_NEW_ARE_PUBLIC, 
+         $compComments->setConfig(Component_Comments::PARAM_NEW_ARE_PUBLIC,
                  !$this->category()->getParam('discussion_not_public', false));
          // uzavření diskuze
          if($this->category()->getParam('discussion_closed', self::DEFAULT_CLOSED_COMMENTS_DAYS) != 0){
@@ -277,7 +301,7 @@ class Articles_Controller extends Controller {
 
    public function showPdfController() {
       $this->checkReadableRights();
-      
+
       $this->view()->urlkey = $this->getRequest('urlkey');
    }
 
@@ -326,7 +350,7 @@ class Articles_Controller extends Controller {
 
       // načtení dat
       $model = new Articles_Model();
-      $article = $model->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc', 
+      $article = $model->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
 
       if($article !=false){
@@ -337,7 +361,9 @@ class Articles_Controller extends Controller {
          $editForm->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
          $editForm->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
          $editForm->art_id->setValues($article->{Articles_Model::COLUMN_ID});
-         $editForm->public->setValues($article->{Articles_Model::COLUMN_PUBLIC});
+         $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
+         $editForm->created_date->setValues(vve_date('%x',$addTime));
+         $editForm->created_time->setValues(vve_date('%X',$addTime));
       }
 
       if($editForm->isSend() AND $editForm->save->getValues() == false){
@@ -370,7 +396,7 @@ class Articles_Controller extends Controller {
       $this->checkWritebleRights(); // tady kontrola práv k článku ne tohle
 
       $modelArt = new Articles_Model();
-      $article = $modelArt->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc', 
+      $article = $modelArt->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
 
       $form = new Form('art_priv_text_');
@@ -456,11 +482,21 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_KEYWORDS} = $form->metaKeywords->getValues();
       $artRecord->{Articles_Model::COLUMN_DESCRIPTION} = $form->metaDesc->getValues();
       $artRecord->{Articles_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-      if($artRecord == null){
-         $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
+      if($artRecord->getPk() == null){
+         if($form->haveElement('creatorId')){
+            $artRecord->{Articles_Model::COLUMN_ID_USER} = $form->creatorId->getValues();
+         } else {
+            $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
+         }
       }
+      $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
+
+      // add time
+      $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
+      $artRecord->{Articles_Model::COLUMN_ADD_TIME} = $addDateTime;
+      
+      
       $artRecord->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
-      $artRecord->{Articles_Model::COLUMN_PUBLIC} = $form->public->getValues();
       $artRecord->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
 
       $lastId = $model->save($artRecord);
@@ -552,10 +588,38 @@ class Articles_Controller extends Controller {
       $iDesc->setSubLabel($this->tr('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
       $form->addElement($iDesc, $fGrpParams);
 
-      $iPub = new Form_Element_Checkbox('public', $this->tr('Veřejný'));
-      $iPub->setSubLabel($this->tr('Veřejný - viditelný všem návštěvníkům'));
-      $iPub->setValues(true);
-      $form->addElement($iPub, $fGrpParams);
+      // pokud jsou práva pro kontrolu, přidám položku s uživateli, kterí mohou daný článek vytvořit
+      if($this->category()->getRights()->isControll()){
+         $eCreator = new Form_Element_Select('creatorId', $this->tr('Položka vytvořena uživatelem'));
+         $modelUsers = new Model_Users();
+         foreach ($modelUsers->records() as $user){
+            $name = $user->{Model_Users::COLUMN_USERNAME};
+            $name .= ' ('.$user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME}.')';
+            $eCreator->setOptions(array($name => $user->{Model_Users::COLUMN_ID}),true);
+         }
+         $eCreator->setValues(Auth::getUserId());
+         $form->addElement($eCreator, $fGrpParams);
+      }
+
+      $fGrpPublic = $form->addgroup('public', $this->tr('Paramtry zveřejnění a vytvoření'));
+
+      $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
+      $iConcept->setSubLabel($this->tr('Pokud je položka koncept, je viditelná pouze autorovi a administrátorům.'));
+      $iConcept->setValues(false);
+      $form->addElement($iConcept, $fGrpPublic);
+
+      $eCreatedDate = new Form_Element_Text('created_date', $this->tr('Datum vytvoření'));
+      $eCreatedDate->setValues(vve_date("%x"));
+      $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
+      $eCreatedDate->addValidation(new Form_Validator_Date());
+      $form->addElement($eCreatedDate, $fGrpPublic);
+
+      $eCreatedTime = new Form_Element_Text('created_time', $this->tr('Čas vytvoření'));
+      $eCreatedTime->setValues(vve_date("%X"));
+      $eCreatedTime->addValidation(new Form_Validator_NotEmpty());
+      $eCreatedTime->addValidation(new Form_Validator_Time());
+      $form->addElement($eCreatedTime, $fGrpPublic);
+
 
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
@@ -635,7 +699,7 @@ class Articles_Controller extends Controller {
       }
       $form->addElement($elemSort, $fGrpView);
 
-      
+
       // šablony
       $componentTpls = new Component_ViewTpl();
 
