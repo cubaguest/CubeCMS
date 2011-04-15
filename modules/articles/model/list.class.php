@@ -31,7 +31,7 @@ class Articles_Model_List extends Model_PDO {
    public function getList($idCat, $fromRow = 0, $rowsCount = 100, $onlyPublic = true) {
       $dbc = new Db_PDO();
       if($onlyPublic) {
-         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_PUBLIC." = 1)";
+         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
          $wherePub = null;
       }
@@ -58,7 +58,7 @@ class Articles_Model_List extends Model_PDO {
    public function getListAll($idCat, $onlyPublic = true) {
       $dbc = new Db_PDO();
       if($onlyPublic) {
-         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_PUBLIC." = 1)";
+         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
          $wherePub = null;
       }
@@ -83,7 +83,7 @@ class Articles_Model_List extends Model_PDO {
    public function getListTop($idCat, $fromRow = 0, $rowsCount = 100, $onlyPublic = true) {
       $dbc = new Db_PDO();
       if($onlyPublic) {
-         $whereP = " AND (article.".Articles_Model_Detail::COLUMN_PUBLIC." = 1)";
+         $whereP = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
          $whereP = null;
       }
@@ -113,11 +113,11 @@ class Articles_Model_List extends Model_PDO {
    public function getLastChange($id, $onlyPublic = true) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT ".Articles_Model_Detail::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_PUBLIC." = :onlyPublic)"
+              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_CONCEPT." = :onlyPublic)"
               ." ORDER BY ".Articles_Model_Detail::COLUMN_EDIT_TIME." DESC"
               ." LIMIT 0, 1");
       $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-      $dbst->bindValue(':onlyPublic', (int)$onlyPublic, PDO::PARAM_INT);
+      $dbst->bindValue(':onlyPublic', (int)!$onlyPublic, PDO::PARAM_INT);
       $dbst->execute();
 
       $fetch = $dbst->fetchObject();
@@ -134,7 +134,7 @@ class Articles_Model_List extends Model_PDO {
    public function getListByCats($idCats, $num = 10, $onlyPublic = true) {
       $dbc = new Db_PDO();
       if($onlyPublic) {
-         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_PUBLIC." = 1)";
+         $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
          $wherePub = null;
       }
