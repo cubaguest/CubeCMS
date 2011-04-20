@@ -37,7 +37,7 @@ echo $this->toolbox;
    ?>
    <hr />
    <div id="category-buttons">
-      <form method="post" action="<?=$this->link()->route('add')?>" style="display:inline;">
+      <form name="form-add" method="post" action="<?=$this->link()->route('add')?>" style="display:inline;">
          <input type="submit" value="<?=$this->tr('Přidat')?>" name="category_add" />
       </form>
       <form name="form-edit" method="post" action="<?=$this->link()->route('edit',array('categoryid' => '{ID}'))?>" style="display:inline;">
@@ -132,7 +132,7 @@ echo $this->toolbox;
          $.ajax({type: "POST", url: "<?=$this->link()->route("changeVisibility")?>",
             data: sendData, success: function(msg){}})
       });
-      // editace a nasatvení
+      // editace a nastavení
       $('form[name=form-edit], form[name=form-settings]').submit(function(){
          // doplnění id
          var idstr = $('#category-structure').jstree("get_selected").attr('id');
@@ -142,6 +142,16 @@ echo $this->toolbox;
             return true;
          }
          return false;
+      });
+      // přidání kategorie (pokud je vybraná přidáme id)
+      $('form[name=form-add]').submit(function(){
+         // doplnění id
+         var idstr = $('#category-structure').jstree("get_selected").attr('id');
+         if(typeof(idstr) != "undefined"){
+            var id = getIdCat(idstr);
+            this.action = '<?=$this->link()->route('add')?>?id='+id;
+         }
+         return true;
       });
       // mazání
       $('form[name=form-delete]').submit(function(){

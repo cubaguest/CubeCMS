@@ -298,6 +298,12 @@ class Categories_Controller extends Controller {
       }
       $this->catsToArrayForForm($structure);
       $form->parent_cat->setOptions($this->categoriesArray);
+      
+      $form->module->setValues('text');
+      $form->group_admin->setValues('rwc');
+      if($this->getRequestParam('id', 0) != 0){
+         $form->parent_cat->setValues($this->getRequestParam('id',0));
+      }
 
       if ($form->isSend() AND $form->send->getValues() == false) {
          $this->gotoBack();
