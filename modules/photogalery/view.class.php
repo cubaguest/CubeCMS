@@ -1,7 +1,7 @@
 <?php
 class Photogalery_View extends View {
    public function mainView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'list.phtml'));
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalery_Controller::PARAM_TPL_MAIN, 'list.phtml'));
       if($this->category()->getRights()->isWritable()) {
          $this->toolboxText = new Template_Toolbox2();
          $this->toolboxText->setIcon(Template_Toolbox2::ICON_PEN);
@@ -49,7 +49,7 @@ class Photogalery_View extends View {
    }
 
    private function addTinyMCE() {
-      $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
+      $type = $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced');
       if($type == 'none') return;
       $this->form->text->html()->addClass("mceEditor");
       $this->tinyMCE = new Component_TinyMCE();

@@ -335,7 +335,7 @@ class Photogalery_Controller extends Controller {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
       
       $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'text');
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'photogalery');
 
       $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
       $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
