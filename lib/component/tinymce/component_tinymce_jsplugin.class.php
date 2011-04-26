@@ -24,7 +24,11 @@ class Component_TinyMCE_JsPlugin extends JsPlugin {
    }
 
    protected function setFiles() {
-      $this->addFile(new JsPlugin_JsFile("tiny_mce.js"));
+//       if(VVE_DEBUG_LEVEL == 0){
+         $this->addFile(new JsPlugin_JsFile("tiny_mce.js"));
+//       } else {
+//          $this->addFile(new JsPlugin_JsFile("tiny_mce_src.js"));
+//       }
       $this->getSettingFile()->setParams($this->getSettings()->getParamsForUrl());
       $this->addFile($this->getSettingFile());
    }
@@ -87,6 +91,48 @@ class Component_TinyMCE_JsPlugin extends JsPlugin {
    public function tplsSystemMailView(){
       $list = new Component_TinyMCE_TPLList_SystemMail();
       echo $list;
+   }
+   
+   /**
+    * Metoda pro vrácení seznamu externích odkazů
+    */
+   public function listView()
+   {
+      $type = isset($_GET['type']) ? (int)$_GET['type'] : Component_TinyMCE::LINK_LIST_ALL;
+      $listType = isset($_GET['listtype']) ? $_GET['listtype'] : Component_TinyMCE_List::LIST_TYPE_LINK;
+      
+      $items = array();
+      
+      if(($type-Component_TinyMCE::LINK_LIST_MEDIA) >= 0) {
+         $type = $type-Component_TinyMCE::LINK_LIST_MEDIA;
+         $images = new Component_TinyMCE_List_Medias();
+         $items = array_merge($items, $images->getItems());
+      }
+      
+      if(($type-Component_TinyMCE::LINK_LIST_IMAGES) >= 0) {
+         $type = $type-Component_TinyMCE::LINK_LIST_IMAGES;
+
+         $images = new Component_TinyMCE_List_Images();
+         $items = array_merge($items, $images->getItems());
+      }
+      
+      if(($type-Component_TinyMCE::LINK_LIST_FILES) >= 0) {
+         $type = $type-Component_TinyMCE::LINK_LIST_FILES;
+         
+         $files = new Component_TinyMCE_List_Files();
+         $items = array_merge($items, $files->getItems());
+      }
+      
+      if(($type-Component_TinyMCE::LINK_LIST_CATEGORIES) >= 0) {
+         $type = $type-Component_TinyMCE::LINK_LIST_CATEGORIES;
+         
+         $cats = new Component_TinyMCE_List_Categories();
+         $items = array_merge($items, $cats->getItems());
+      }
+      
+//      echo $type;
+//      $list = new Component_TinyMCE_LinkList_Files();
+      echo Component_TinyMCE_List::tinyMceString($items, $listType);
    }
 }
 ?>

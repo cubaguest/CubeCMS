@@ -4,6 +4,9 @@
  */
 abstract class Component_TinyMCE_Settings extends TrObject {
    const SETTING_EXTERNAL_TPL_LIST = 'template_external_list_url';
+   const SETTING_EXTERNAL_LINK_LIST = 'external_link_list_url';
+   const SETTING_EXTERNAL_IMAGE_LIST = 'external_image_list_url';
+   const SETTING_EXTERNAL_MEDIA_LIST = 'external_media_list_url';
 
 
    protected $settingName = null;
@@ -112,7 +115,7 @@ abstract class Component_TinyMCE_Settings extends TrObject {
       $this->buttons['theme_advanced_buttons'.$row] = $buttons;
    }
 
-   final public function  __toString() {
+   public function  __toString() {
       $cnt = "tinyMCE.init({\n";
       // uživ změny
       $this->mergeUserSettings();

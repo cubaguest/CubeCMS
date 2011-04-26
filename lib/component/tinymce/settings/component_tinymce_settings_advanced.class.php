@@ -10,6 +10,9 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'external_link_list_url' => null,
       'template_replace_values' => array(),
       'template_external_list_url' => null,
+      'external_link_list_url' => null,
+      'external_image_list_url' => null,
+      'external_media_list_url' => null,
       'remove_script_host' => false,
       'content_css' => null,
       'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|name|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
@@ -20,15 +23,15 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_resizing' => 'true',
       'entity_encoding' => 'raw',
       'theme_advanced_blockformats' => "p,h2,h3,h4,h5,h6,address,blockquote,code",// not h1,div,dt,dd,samp
-      'valid_styles' => "{'*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align'}",
+      'valid_styles' => "{'*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align', 'table' : 'margin-left,margin-right'}",
       'tab_focus' => ':prev,:next',
       'width' => 520,
 
    );
 
    protected $defaultPlugins = array('safari','style','table','save','advhr','advimage','advlink','emotions','iespell','tabfocus',
-      'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality',
-      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists','autoresize',
+      'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality','autoresize',
+      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists',
       'imgalign', 'imgpreview' // Cube-CMS plugins
       );
 
