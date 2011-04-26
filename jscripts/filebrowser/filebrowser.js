@@ -11,7 +11,9 @@ var FileBrowserDialogue = {
       if(path != ""){
          var regex = /data(\/.*\/)[a-z0-9._-]+/i;
          var matches = path.match(regex);
-         FileBrowser.currentDir = matches[1];
+         if(matches){
+            FileBrowser.currentDir = matches[1];
+         }
       }
       FileBrowser.init();
    },
