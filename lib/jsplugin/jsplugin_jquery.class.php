@@ -13,8 +13,8 @@
  */
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME = 'base';
-   const JQUERY_VERSION = '1.4.4';
-   const JQUERY_UI_VERSION = '1.8.5';
+   const JQUERY_VERSION = '1.5.2';
+   const JQUERY_UI_VERSION = '1.8.12';
 
    const FACE_THEME_DIR = 'jqueryui';
 
