@@ -1,6 +1,64 @@
 @CHARSET "UTF-8";
-.news {
-	background-color: white;
-	border: 1px solid black;
-	margin-bottom: 10px;
+#datastorage-structure table { width: 100%;}
+#datastorage-structure table tr.hidden-item { display: none;}
+#datastorage-structure table td { padding: 2px;}
+#datastorage-structure table .file-selection
+{
+   width: 20px;
 }
+#datastorage-structure table .file-actions {width: 65px;}
+#datastorage-structure table .file-mtime {width: 85px;}
+#datastorage-structure table .sort-label-asc,
+#datastorage-structure table .sort-label-desc {
+   text-decoration: underline;
+   padding-right: 10px;
+}
+#datastorage-structure table .sort-label-desc {
+   background: transparent url('../../../images/buttons/order_desc.png') center right no-repeat;
+}
+#datastorage-structure table .sort-label-asc {
+   background: transparent url('../../../images/buttons/order_asc.png') center right no-repeat;
+   padding-right: 10px;
+}
+#datastorage-buttons form,
+#datastorage-buttons form p,
+#datastorage-structure form,
+#datastorage-structure form p,
+#datastorage-buttons object,
+#datastorage-buttons input
+{
+   display: inline;
+}
+#datastorage-buttons .action-details
+{
+   margin-top: 5px;
+}
+
+#drop-file-container {
+   display: none;
+}
+
+#drop-file-container {}
+#drop-file-container span {
+   padding: 5px 0;
+    display:block;
+    text-align: center;
+}
+.qq-upload-drop-area-active {background:#FF7171;}
+#upload-queue {
+   padding: 5px 0;
+   display: none;
+}
+#upload-queue div {padding: 2px;}
+
+#upload-list {padding:2px; list-style:none; height: 100px; overflow: auto;}
+#upload-list li { margin:0; padding:0; line-height:15px; font-size:12px;}
+.qq-upload-file, .qq-upload-spinner, .qq-upload-size, .qq-upload-cancel, .qq-upload-failed-text {margin-right: 7px;}
+
+.qq-upload-file {}
+.qq-upload-spinner {display:inline-block; background: url("../../../images/progress_small.gif"); width:12px; height:12px; vertical-align:text-bottom;}
+.qq-upload-size,.qq-upload-cancel {font-size:11px;}
+
+.qq-upload-success {background-color: #ddffdd;}
+.qq-upload-fail {background-color: #FF7171;}
+.qq-upload-fail .qq-upload-failed-text {display:inline;}
