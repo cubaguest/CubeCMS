@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS `{PREFIX}datastore_files` (
-  `id_file` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
+  `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
   `id_item` smallint(5) unsigned NOT NULL,
   `subkey` varchar(30) NOT NULL DEFAULT 'nokey',
   `label_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -24,3 +24,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}datastore_files` (
   FULLTEXT KEY `text_clear_en` (`text_clear_en`),
   FULLTEXT KEY `text_clear_cs` (`text_clear_cs`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}texts_has_private_users` (
+  `id_user` smallint(6) NOT NULL,
+  `id_text` smallint(6) NOT NULL,
+  PRIMARY KEY (`id_user`,`id_article`),
+  KEY `fk_tb_users_id_user` (`id_user`),
+  KEY `fk_tb_texts_id_text` (`id_text`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
