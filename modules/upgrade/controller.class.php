@@ -19,7 +19,7 @@ class Upgrade_Controller extends Controller {
 
       $mList = array();
       foreach ($modules as $module) {
-         $vers = file_get_contents(AppCore::getAppWebDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+         $vers = file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
                  .$module->{Model_Module::COLUMN_NAME}.DIRECTORY_SEPARATOR
                  .AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.self::VERSION_FILE);
          $m['name'] = $module->{Model_Module::COLUMN_NAME};
