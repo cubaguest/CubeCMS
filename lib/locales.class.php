@@ -63,7 +63,7 @@ class Locales extends TrObject {
 
    /**
     * Pole s podobnými jazyky (je použito při výchozím nasatvení jazyku)
-    * @var <type> 
+    * @var <type>
     */
    private static $similaryLangs = array('cs' => 'sk', 'sk' => 'cs');
 
@@ -149,7 +149,7 @@ class Locales extends TrObject {
             $tr = new Translator();
             new CoreErrors(new UnexpectedValueException( $tr->tr('Zvolený jazyk není v aplikaci implementován'),1));
          }
-         
+
          if(!isset ($_SESSION[self::SESSION_LANG]) OR self::$selectLang != $_SESSION[self::SESSION_LANG]){
             $_SESSION[self::SESSION_LANG]= self::$selectLang;
          } else {
@@ -275,6 +275,7 @@ class Locales extends TrObject {
    /**
     * Metoda vrací zvolené locales pro zadaný jazyk
     * @param string -- jazyk (cs, en, de, ...)
+    * @todo doladit aby tam nebylo UTF-8
     */
    public static function getLangLocale($lang = null) {
       $l = self::getDefaultLang();
@@ -283,7 +284,11 @@ class Locales extends TrObject {
       } else if(self::$selectLang != null){
          $l = self::$selectLang;
       }
-      $locale = self::$locales[$l];
+      if(isset(self::$locales[$l.'.UTF-8'])){
+         $locale = self::$locales[$l.'.UTF-8'];
+      } else {
+         $locale = self::$locales[$l];
+      }
       // odstranění za tečkou
       $locale = preg_replace("/\.[\w-]+/i", '', $locale);
       return $locale;
@@ -353,7 +358,7 @@ class Locales extends TrObject {
    public static function getLang() {
       return self::$selectLang;
    }
-   
+
    /**
     * Metoda vrací pole s vypraným jazykem
     * @param string $langShor -- zkratka jazyka
