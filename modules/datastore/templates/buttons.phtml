@@ -1,0 +1,46 @@
+<div id="datastorage-buttons">
+   <div id="file-uploader" class="button">
+      <noscript>
+         <form action="" method="post" enctype="">
+            <input type="file" name="upload" />
+            <input type="submit" name="<?=$this->tr('Nahrát');?>" />
+         </form>
+		</noscript>
+   </div>
+   <?
+   // new dir
+   echo $this->formCreateDir->html()->setAttrib('id', 'create-directory');
+   echo $this->formCreateDir->renderStart();
+   echo '<p>'.$this->formCreateDir->name;
+   echo $this->formCreateDir->submit.'</p>';
+   echo $this->formCreateDir->renderEnd();
+   ?>
+   <?
+   // delete items
+   echo $this->formDeleteItems->html()->setAttrib('id', 'delete-items');
+   echo $this->formDeleteItems->renderStart();
+   echo '<p>'.$this->formDeleteItems->names;
+   $this->formDeleteItems->submit->html()->addClass('button-cancel');
+   echo $this->formDeleteItems->submit.'</p>';
+   echo $this->formDeleteItems->renderEnd();
+   ?>
+   <input type="submit" name="open-move-items" value="Přesunout"/>
+   <div id="drop-file-container" class="ui-widget-content"><span><?=$this->tr('Zde upusťte soubor')?></span></div>
+   <div id="upload-queue" class="ui-widget action-details">
+      <div class="ui-widget-header">
+         <strong><?=$this->tr("Fronta odesílání")?>:</strong>&nbsp;
+         <button onclick="clearUploadQueue();" title="<?=$this->tr('Vyčistit');?>" class="button-cancel"><?=$this->tr('Vyčistit');?></button>
+      </div>
+      <ul id="upload-list" class="ui-widget-content"></ul>
+   </div>
+   <div id="move-items" class="ui-widget action-details">
+      <div class="ui-widget-header">
+         <strong><?=$this->tr("Přesun položek")?>:</strong>&nbsp;
+      </div>
+      <?
+      $this->formMoveItems->html()->setAttrib('id', 'move-items');
+      echo $this->formMoveItems;
+      ?>
+      <hr class="reseter" />
+   </div>
+</div>
