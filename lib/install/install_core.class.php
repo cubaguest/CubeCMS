@@ -95,9 +95,18 @@ class Install_Core {
          return;
       }
       $modelCfg = new Model_Config();
-      $modelCfg->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->where(Model_Config::COLUMN_KEY, 'RELEASE');
-      $record = $modelCfg->record();
-      
+      $record = $modelCfg->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->where(Model_Config::COLUMN_KEY, 'RELEASE')->record();
+      if($record == false){ // release není v databázi
+         $record = $modelCfg->newRecord();
+         $record->{Model_Config::COLUMN_KEY} = 'RELEASE';
+         $record->{Model_Config::COLUMN_VALUE} = 0;
+         $record->{Model_Config::COLUMN_PROTECTED} = true;
+         $record->{Model_Config::COLUMN_LABEL} = 'verze release';
+         $record->{Model_Config::COLUMN_TYPE} = 'number';
+         $modelCfg->save($record);
+         $record = $modelCfg->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->where(Model_Config::COLUMN_KEY, 'RELEASE')->record();
+      }
+
       $versionDir = (string)AppCore::ENGINE_VERSION;
       $currentRelease = VVE_RELEASE;
       while ($currentRelease != AppCore::ENGINE_RELEASE) {

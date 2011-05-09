@@ -13,11 +13,11 @@
 
 class JsPlugin_File {
 	/**
-	 * Název souboru 
+	 * Název souboru
 	 * @var string
 	 */
 	private $file = null;
-	
+
 	/**
 	 * Pole s parametry js souboru
 	 * @var array
@@ -46,14 +46,14 @@ class JsPlugin_File {
       if($virtual){
          $this->dir = Url_Request::getBaseWebDir()."jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
       } else {
-         if(strstr($dir, 'http') === false){
-            $this->dir = Url_Request::getBaseWebDir().JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
-         } else { // celá adresa
+         if(strncmp ($file, 'http', 4) == 0){// celá adresa
             $this->dir = $dir;
+         } else {
+            $this->dir = Url_Request::getBaseWebDir(true).JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;
          }
       }
 	}
-	
+
 	/**
 	 * Metoda vrací všechny parametry jako pole
 	 * @return array -- pole parametrů
@@ -61,7 +61,7 @@ class JsPlugin_File {
 	public function getParams(){
 		return $this->fileParams;
 	}
-	
+
 	/**
 	 * Metoda převede soubor na řetězec a přidá za něj parametry
 	 *
@@ -143,7 +143,7 @@ class JsPlugin_File {
          return $this->file;
       }
    }
-   
+
    /**
     * Metoda vrací název souboru
     * @return string -- název souboru

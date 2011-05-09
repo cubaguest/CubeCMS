@@ -79,7 +79,7 @@ abstract class Controller extends TrObject {
     * @param Category $category -- obejkt kategorie
     * @param Routes $routes -- objekt cest pro daný modul
     */
-   public final function __construct(Category $category, Routes $routes, View $view = null, Url_Link_Module $link = null) {
+   public final function __construct(Category_Core $category, Routes $routes, View $view = null, Url_Link_Module $link = null) {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
       $this->category = $category;
       $this->routes = $routes;

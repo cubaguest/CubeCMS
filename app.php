@@ -12,8 +12,8 @@
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  * @internal   Last ErrorCode 22
  */
-include_once './lib/trobject.class.php';
-include_once './lib/debug.class.php';
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'trobject.class.php';
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'debug.class.php';
 class AppCore extends TrObject {
    /**
     * Název enginu
@@ -28,7 +28,7 @@ class AppCore extends TrObject {
    /**
     * Revize Enginu
     */
-   const ENGINE_RELEASE = 2;
+   const ENGINE_RELEASE = 3;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -236,7 +236,7 @@ class AppCore extends TrObject {
       $this->_initCore();
 
       //	přidání adresáře pro načítání knihoven
-      set_include_path('./lib/' . PATH_SEPARATOR . get_include_path());
+      set_include_path(AppCore::getAppLibDir().self::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
 
       //načtení potřebných knihoven
       spl_autoload_register(array('AppCore', '_loadLibraries'));
@@ -302,7 +302,7 @@ class AppCore extends TrObject {
    {
       return self::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR;
    }
-   
+
    /**
     * Metoda vrací cestu k cache adresáři aplikace
     * @return string
@@ -387,7 +387,7 @@ class AppCore extends TrObject {
    {
       // base classes
       $this->_initBaseClasses();
-      
+
       date_default_timezone_set('Europe/Prague');
       // nastavení mb kodování na UTF protože celá aplikace pracuje s UTF
       mb_internal_encoding("UTF-8");
@@ -434,8 +434,9 @@ class AppCore extends TrObject {
     */
    private function _initConfig()
    {
-      $cfgModel = new Model_Config();
-      $recs = $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->records(PDO::FETCH_OBJ);
+      $cfgModel = new Model_ConfigGlobal();
+//       $recs = $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->records(PDO::FETCH_OBJ);
+      $recs = $cfgModel->mergedConfigValues()->records(PDO::FETCH_OBJ);
       if($recs == false){
 			throw new unexpectedValueException($this->tr("Nepodařilo se načíst konfiguraci. Chyba připojení k DB?"));
       }
@@ -468,7 +469,10 @@ class AppCore extends TrObject {
       } else {
       }
       // update
-      if(defined('VVE_RELEASE') AND VVE_RELEASE != self::ENGINE_RELEASE){ // kvůli neexistenci předchozí detekce
+      if(!defined('VVE_RELEASE')){
+         define('VVE_RELEASE', 0);
+      }
+      if(VVE_RELEASE != self::ENGINE_RELEASE){ // kvůli neexistenci předchozí detekce
          $core = new Install_Core();
          $core->update();
       }
@@ -583,7 +587,7 @@ class AppCore extends TrObject {
          new CoreErrors($e);
       }
       // inicializace admin menu
-      if(Auth::isLogin()){
+      if(Auth::isLogin() && Auth::isAdmin()){
          try {
             Menu_Admin::factory();
             $menu = new Menu_Admin();
@@ -1014,12 +1018,12 @@ class AppCore extends TrObject {
          }
          die ();
       }
-      
+
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
 
-      
+
       // zapnutí buferu podle výstupu
       Template_Output::factory(self::$urlRequest->getOutputType());
 //      if(!Template_Output::isBinaryOutput()){
@@ -1042,7 +1046,11 @@ class AppCore extends TrObject {
       if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
          self::$category = new $className(self::$urlRequest->getCategory(),true);
       } else if( ( ($reqUrl == '' AND $catUrl == null) OR ($reqUrl != '' AND $catUrl != null)) ) {
-         self::$category = new Category(self::$urlRequest->getCategory(),true);
+         if(!self::$urlRequest->isAdminCategory()){
+            self::$category = new Category(self::$urlRequest->getCategory(),true);
+         } else {
+            self::$category = new Category_Admin(self::$urlRequest->getCategory(),true);
+         }
          Url_Link::setCategory(self::$category->getUrlKey());
       } else { // Chyba stránky
          self::$category = new Module_ErrPage_Category(self::$urlRequest->getCategory(),true);

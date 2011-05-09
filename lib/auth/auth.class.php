@@ -25,6 +25,7 @@ class Auth extends TrObject {
 	const USER_LOGIN_TIME	= 'logintime';
 	const USER_IS_LOGIN		= 'login';
 	const USER_LOGIN_ADDRESS= 'ip_address';
+	const USER_ADMIN_GROUP  = 'admin_grp';
 
    const PERMANENT_COOKIE_EXPIRE = 2678400; // 31*24*60*60
 
@@ -63,6 +64,12 @@ class Auth extends TrObject {
 	 * @var string
 	 */
 	private static $userMail = null;
+	
+	/**
+	 * Uživatel je Admin
+	 * @var string
+	 */
+	private static $userIsAdmin = false;
 
 	/**
 	 * Konstruktor, provádí autorizaci
@@ -111,6 +118,7 @@ class Auth extends TrObject {
 		self::$userId = $_SESSION[self::USER_ID];
 		self::$userGroupId = $_SESSION[self::USER_ID_GROUP];
 		self::$userGroupName = $_SESSION[self::USER_GROUP_NAME];
+		self::$userIsAdmin = $_SESSION[self::USER_ADMIN_GROUP];
 
       if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
          setcookie(VVE_SESSION_NAME.'_pl', $_COOKIE[VVE_SESSION_NAME.'_pl'], time()+self::PERMANENT_COOKIE_EXPIRE,'/');
@@ -124,6 +132,7 @@ class Auth extends TrObject {
 		self::$userGroupId = VVE_DEFAULT_ID_GROUP;
 		self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
 		self::$userName = VVE_DEFAULT_USER_NAME;
+		self::$userIsAdmin = false;
 	}
 	
 	/**
@@ -138,6 +147,7 @@ class Auth extends TrObject {
 		$_SESSION[self::USER_LOGIN_ADDRESS] = $_SERVER['REMOTE_ADDR'];
 		$_SESSION[self::USER_LOGIN_TIME] = time();
 		$_SESSION[self::USER_IS_LOGIN] = true;
+		$_SESSION[self::USER_ADMIN_GROUP] = self::$userIsAdmin;
 	}
 	
 	/**
@@ -165,7 +175,8 @@ class Auth extends TrObject {
 						self::$userGroupName = $user->gname;
 						self::$userId = $user->{Model_Users::COLUMN_ID};
 						self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-						
+						self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+
 						if($user->{Model_Users::COLUMN_FOTO_FILE} != null){
 							//TODO není dodělána práce s fotkou
 //							$_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
@@ -236,6 +247,7 @@ class Auth extends TrObject {
       		self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
          	self::$userId = $user->{Model_Users::COLUMN_ID};
             self::$userMail = $user->{Model_Users::COLUMN_MAIL};
+            self::$userIsAdmin = $user->{Model_Groups::COLUMN_IS_ADMIN};
             self::saveUserDetailToSession();
             return true;
          }
@@ -257,7 +269,7 @@ class Auth extends TrObject {
 
    private static function getUser($username) {
       $model = new Model_Users();
-      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID, array('gname' => Model_Groups::COLUMN_NAME))
+      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID, array('gname' => Model_Groups::COLUMN_NAME, Model_Groups::COLUMN_IS_ADMIN))
          ->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))->record();
       return $rec;
    }
@@ -318,6 +330,14 @@ class Auth extends TrObject {
 	 */
 	public static function getUserMail() {
 		return self::$userMail;
+	}
+	
+	/**
+	 * Metoda vrací jestli je uživatele administrátor
+	 * @return bool -- true pokud je administrator
+	 */
+	public static function isAdmin() {
+		return self::$userIsAdmin;
 	}
 
    /**

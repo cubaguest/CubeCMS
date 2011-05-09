@@ -32,10 +32,14 @@ ul.dropdown li {
 }
 ul.dropdown a:hover { color: #000; }
 ul.dropdown a:active { color: #ffa500; }
-ul.dropdown li a { display: block; padding: 2px 8px; border-right: 1px solid #333; color: #222; }
+ul.dropdown li a { display: block; padding: 3px 8px 2px; border-right: 1px solid #333; color: #222; }
 ul.dropdown li:last-child a { border-right: none; } /* Doesn't work in IE */
+ul.dropdown li.adminmenu-user-item, ul.dropdown li.adminmenu-user-item ul li {background-color: #B9D3E6;}
+ul.dropdown li.adminmenu-user-item li.hover, ul.dropdown li.adminmenu-user-item li:hover,
+ul.dropdown li.adminmenu-user-item.hover, ul.dropdown li.adminmenu-user-item:hover,
 ul.dropdown li.hover, ul.dropdown li:hover { background: #F3D673; color: black; position: relative; }
 ul.dropdown li.hover a { color: black; }
+
 /* ADMIN MENU LEVEL TWO */
 ul.dropdown ul {
    width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0;
@@ -78,6 +82,7 @@ ul.dropdown li:hover > ul { visibility: visible; }
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;
    border-radius: 4px;
+   text-align: left;
 }
 .toolbox form p {
    padding: 0 !important;
@@ -107,6 +112,7 @@ a.toolbox-button {
    border-width: 1px;
    overflow: hidden;
    line-height: 5px;
+   padding: 0;
 }
 a.toolbox-button img {
    padding: 2px;

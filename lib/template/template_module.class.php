@@ -37,7 +37,7 @@ class Template_Module extends Template {
     * @param Url_Link_Module $link -- objekt odkazu
     * @param Category $category -- objekt kategorie
     */
-   function  __construct(Url_Link_Module $link, Category $category) {
+   function  __construct(Url_Link_Module $link, Category_Core $category) {
       parent::__construct($link);
       $this->category = $category;
       $this->locale = new Locales($category->getModule()->getName());
@@ -74,14 +74,14 @@ class Template_Module extends Template {
     * @param boolean $type -- jestli se jedná o šablonu enginu nebo název modulu
     */
    public function addTplFile($name, $type = null) {
-         if($type === null){
-            $path = self::getFileDir($name, self::TEMPLATES_DIR, $this->category->getModule()->getName(),true);
-            array_push($this->templateFiles, $path.$name);
-         } else if($type === true){
-            array_push($this->templateFiles, parent::getFileDir($name, self::TEMPLATES_DIR, false).$name);
-         } else if(is_string($type)){
-            array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR, $type,true).$name);
-         }
+      if($type === null){
+         $this->addFile('tpl://'.$name);
+      } else if($type === true){
+         $this->addFile('tpl://engine:'.$name);
+      } else if(is_string($type)){
+         $this->addFile('tpl://'.$type.':'.$name);
+      }
+      return $this;
    }
 
    /**
@@ -90,19 +90,10 @@ class Template_Module extends Template {
     * @return Template -- objekt sebe
     */
    public function addJsFile($jsfile, $engine = false) {
-      //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(preg_match('/^http[s]?:\/\//', $jsfile)){
-         self::addJS($jsfile);
-      } else if(!$engine) {
-         $filePath = self::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->category->getModule()->getName(), false);
-         if($filePath != null){
-            self::addJS($filePath.$jsfile);
-         }
+      if($engine){
+         parent::addJsFile('engine:'.$jsfile);
       } else {
-         $filePath = parent::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);
-         if($filePath != null){
-            self::addJS($filePath.$jsfile);
-         }
+         parent::addJsFile($this->category()->getModule()->getName().':'.$jsfile);
       }
       return $this;
    }
@@ -110,26 +101,13 @@ class Template_Module extends Template {
    /**
     * Metoda přidá zadaný css soubor do stylů stránky
     * @param string $cssfile -- css soubor
-    * @return Template -- objekt sebe
+    * @return Template_Module -- objekt sebe
     */
    public function addCssFile($cssfile, $engine = false) {
-      if(preg_match('/^http[s]?:\/\//', $cssfile)){
-         self::addCss($cssfile);
-      } else if($engine === false) { // pokud je false, je použit aktuální modul
-         $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $this->category->getModule()->getName(), false);
-         if($filePath != null){
-            self::addCss($filePath.$cssfile);
-         }
-      } else if(is_string($engine)) { // pokud je předán název modulu
-         $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $engine, false);
-         if($filePath != null){
-            self::addCss($filePath.$cssfile);
-         }
+      if($engine){
+         parent::addCssFile('engine:'.$cssfile);
       } else {
-         $filePath = parent::getFileDir($cssfile, Template::STYLESHEETS_DIR, false);
-         if($filePath!=null){
-            self::addCss($filePath.$cssfile);
-         }
+         parent::addCssFile($this->category()->getModule()->getName().':'.$cssfile);
       }
       return $this;
    }
@@ -142,11 +120,10 @@ class Template_Module extends Template {
    public function includeTpl($name, $engine = false, $vars = null, $module = null) {
       if($module === null) $module = $this->category()->getModule()->getName();
       if($engine){
-         $path = parent::getFileDir($name, self::TEMPLATES_DIR,true);
+         $this->includeFile('tpl://engine:'.$name);
       } else {
-         $path = self::getFileDir($name, self::TEMPLATES_DIR, $module,true);
+         $this->includeFile('tpl://'.$module.':'.$name);
       }
-      include $path.$name;
       unset ($vars);
    }
 
@@ -172,7 +149,7 @@ class Template_Module extends Template {
              $ret = Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face
              .URL_SEPARATOR.AppCore::MODULES_DIR.URL_SEPARATOR.$moduleName.URL_SEPARATOR.$dir.URL_SEPARATOR;
           }
-      } 
+      }
       // pokud se šablona loaduje z jiného faces (např nadřazeného webu)
       else if(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null AND $dir == self::TEMPLATES_DIR
               AND file_exists(str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir).$file)) {
@@ -200,23 +177,32 @@ class Template_Module extends Template {
     * @return string -- vygenerovaný řetězec z šablon
     */
    public function  __toString() {
-      // zastavení výpisu buferu
-      ob_start();
-      ob_clean();
-      foreach ($this->templateFiles as $file) {
-         if(file_exists($file)){
-            try {
-               // jaký modul je vkládán a podle toho se změní locales
-               $strpos = strpos($file, 'modules/')+8;
-               $module = substr($file, $strpos, strpos($file, "/templates") - $strpos);
-               $this->locale()->setDomain($module);
-               include $file;
-            } catch (Exception $e) {
-               new CoreErrors($e);
+//       ob_start();
+//       var_dump($this);
+//       $hash = md5(ob_get_clean());
+//       $fileTmp = AppCore::getAppCacheDir().$hash.'.html';
+//       if(!is_file($fileTmp)){
+         // zastavení výpisu buferu
+         ob_start();
+         ob_clean();
+         foreach ($this->templateFiles as $file) {
+            if(file_exists($file)){
+               try {
+                  // jaký modul je vkládán a podle toho se změní locales
+                  $strpos = strpos($file, 'modules/')+8;
+                  $module = substr($file, $strpos, strpos($file, "/templates") - $strpos);
+                  $this->locale()->setDomain($module);
+                  include $file;
+               } catch (Exception $e) {
+                  new CoreErrors($e);
+               }
             }
          }
-      }
-      $contents = ob_get_clean();
+         $contents = ob_get_clean();
+//          file_put_contents($fileTmp, $contents, LOCK_EX);
+//       } else {
+//          $contents = file_get_contents($fileTmp);
+//       }
       return $contents;
    }
 

@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<adminmenu>
+   <section>
+      <name lang="cs">Struktura</name>
+      <name lang="en">Structure</name>
+      <item id="1">
+         <name lang="cs">Kategorie</name>
+         <name lang="en">Categories</name>
+         <urlkey lang="en">admin/structure/categories</urlkey>
+         <urlkey lang="cs">admin/struktura/kategorie</urlkey>
+         <module>categories</module>
+      </item>
+      <item id="2">
+         <name lang="cs">Panely</name>
+         <name lang="en">Panels</name>
+         <urlkey lang="cs">admin/struktura/panely</urlkey>
+         <urlkey lang="en">admin/structure/panels</urlkey>
+         <module>panels</module>
+      </item>
+   </section>
+   <section>
+      <name lang="cs">Účty</name>
+      <name lang="en">Accounts</name>
+      <item id="3">
+         <name lang="cs">Uživatelé a skupiny</name>
+         <name lang="en">Users and Groups</name>
+         <urlkey lang="cs">admin/ucty/uzivatele-a-skupiny</urlkey>
+         <urlkey lang="en">admin/accounts/user-and-groups</urlkey>
+         <module>users</module>
+      </item>
+   </section>
+   <section>
+      <name lang="cs">Systém</name>
+      <name lang="en">System</name>
+      <item id="4">
+         <name lang="cs">Nastavení systému</name>
+         <name lang="en">System settings</name>
+         <urlkey lang="cs">admin/system/nastaveni-systemu</urlkey>
+         <urlkey lang="en">admin/system/system-settings</urlkey>
+         <module>configuration</module>
+      </item>
+      <item id="5">
+         <name lang="cs">Služby</name>
+         <name lang="en">Services</name>
+         <urlkey lang="cs">admin/system/sprava</urlkey>
+         <urlkey lang="en">admin/system/management</urlkey>
+         <module>services</module>
+      </item>
+      <item id="6">
+         <name lang="cs">Upgrade</name>
+         <name lang="en">Upgrade</name>
+         <urlkey lang="cs">admin/system/upgrade</urlkey>
+         <urlkey lang="en">admin/system/upgrade</urlkey>
+         <module>upgrade</module>
+      </item>
+      <item id="7" disabled="true">
+         <name lang="cs">Plánování úloh</name>
+         <name lang="en">Cron tab</name>
+         <urlkey lang="cs">admin/system/cron-tab</urlkey>
+         <urlkey lang="en">admin/system/cron-tab</urlkey>
+         <module>crontab</module>
+      </item>
+      <item id="8" disabled="true">
+         <name lang="cs">Překlad statických textů</name>
+         <name lang="en">Translate statics texts</name>
+         <urlkey lang="cs">admin/system/preklady</urlkey>
+         <urlkey lang="en">admin/system/translation</urlkey>
+         <module>trstatictexts</module>
+      </item>
+   </section>
+   <section>
+      <name lang="cs">Obsah</name>
+      <name lang="en">Content</name>
+      <item id="9">
+         <name lang="cs">Šablony</name>
+         <name lang="en">Templates</name>
+         <urlkey lang="cs">admin/content/sablony</urlkey>
+         <urlkey lang="en">admin/content/templates</urlkey>
+         <module>templates</module>
+      </item>
+      <item id="10">
+         <name lang="cs">Maily</name>
+         <name lang="en">Mails</name>
+         <urlkey lang="cs">admin/content/maily</urlkey>
+         <urlkey lang="en">admin/content/mails</urlkey>
+         <module>mails</module>
+      </item>
+      <item id="11">
+         <name lang="cs">Panel rychlých nástrojů</name>
+         <name lang="en">Quick-Tools panel</name>
+         <urlkey lang="cs">admin/content/rychle-nastroje</urlkey>
+         <urlkey lang="en">admin/content/quicktools</urlkey>
+         <module>quicktools</module>
+      </item>
+   </section>
+   <section>
+      <name lang="cs">Informace</name>
+      <name lang="en">Information</name>
+      <item id="12">
+         <name lang="cs">PHP info</name>
+         <name lang="en">PHP info</name>
+         <urlkey lang="cs">admin/info/php-info</urlkey>
+         <urlkey lang="en">admin/info/php-info</urlkey>
+         <module>phpinfo</module>
+      </item>
+      <item id="13">
+         <name lang="cs">Chyby / požadavky / náměty</name>
+         <name lang="en">Bugs / requests / suggestions</name>
+         <urlkey lang="cs">admin/info/hlaseni-chyb</urlkey>
+         <urlkey lang="en">admin/info/bugreport</urlkey>
+         <params>a:2:{s:3:"url";s:95:"https://spreadsheets.google.com/spreadsheet/viewform?formkey=dG1VSFQ4Wm5Ja0VKbUNHTGpLMFZIVXc6MQ";s:4:"code";s:3:"301";}</params>
+         <module>redirect</module>
+      </item>
+      <item id="14">
+         <name lang="cs">Nápověda</name>
+         <name lang="en">Help - only in Czech</name>
+         <urlkey lang="cs">admin/info/napoveda</urlkey>
+         <urlkey lang="cs">admin/info/help</urlkey>
+         <module>redirect</module>
+         <params>a:2:{s:3:"url";s:90:"https://docs.google.com/document/d/1JOj7JThWEIwWiwWtRl--aLOsXNtPfxGMkucnEe77mBM/edit?hl=cs";s:4:"code";s:3:"301";}</params>
+      </item>
+   </section>
+   <item id="15">
+      <name lang="cs">Účet</name>
+      <name lang="en">Account</name>
+      <urlkey lang="cs">ucet</urlkey>
+      <urlkey lang="en">account</urlkey>
+      <module>login</module>
+   </item>
+</adminmenu>

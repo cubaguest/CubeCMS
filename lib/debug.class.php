@@ -8,14 +8,28 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu debug
  */
+//require_once('FirePHPCore/FirePHP.class.php');
 class Debug {
+   /**
+    * Časovač
+    * @var <type>
+    */
+   private static $times = 100;
+
    private static $vars = array();
 
    private static $tables = array();
 
    public static function log() {
       $args = func_get_args();
-      self::$vars = array_merge(self::$vars, $args);
+//      if(!class_exists('FirePHP')){
+         self::$vars = array_merge(self::$vars, $args);
+//      } else {
+//         $firephp = FirePHP::getInstance(true);
+//         foreach ($args as $arg) {
+//            $firephp->log($arg);
+//         }
+//      }
    }
 
    public static function printImmediately() {
@@ -30,7 +44,14 @@ class Debug {
 
    public static function table($array) {
       $args = func_get_args();
-      self::$vars = array_merge(self::$vars, $args);
+      if(!class_exists('FirePHP')){
+         self::$vars = array_merge(self::$vars, $args);
+      } else {
+         $firephp = FirePHP::getInstance(true);
+         foreach ($args as $key => $arg) {
+            $firephp->table('DEBUG TABLE '.$key+1, $args);
+         }
+      }
    }
 
    public static function printDebug(){
@@ -58,6 +79,17 @@ class Debug {
          }
          echo '</div>';
       }
+   }
+
+   public static function timerStart()
+   {
+      self::$times = microtime();
+   }
+
+   public static function timerStop($msg = null)
+   {
+      $t = microtime() - self::$times;
+      array_push(self::$vars, 'Timer: '.$msg.' '.$t);
    }
 }
 ?>

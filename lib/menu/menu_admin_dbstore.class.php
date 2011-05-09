@@ -14,26 +14,30 @@
 class Menu_Admin extends Menu_Main {
    /**
     * Objekt s admin menu
-    * @var SimpleXMLElement
+    * @var Category_Structure
     */
-   public static $menu = array();
+   public static $menu = null;
 
    /**
     * Metoda provede inicializaci menu
     */
    public static function factory() {
-      $model = new Model_CategoryAdm();
-      self::$menu = $model->getStructure();
+//      $newAdminMenu = new Category_Structure(0);
+//      $newAdminMenu->addChild(new Category_Structure(1));
+//      $newAdminMenu->saveStructure(true);
+//      var_dump($newAdminMenu);
+
+      // načtení menu z
+      if(defined('VVE_ADMIN_MENU_STRUCTURE')){
+         self::$menu = unserialize(VVE_ADMIN_MENU_STRUCTURE);
+         $catModel = new Model_Category();
+         self::$menu->setCategories($catModel->getCategoryList());
+      }
    }
    public function view() {
       $this->template()->menu = self::$menu;
       $this->template()->addTplFile("menu_admin.phtml", true);
       $this->template()->addJsPlugin(new JsPlugin_JQuery());
-   }
-
-   public static function isAdminCategory($urlkey)
-   {
-      return false;
    }
 }
 ?>

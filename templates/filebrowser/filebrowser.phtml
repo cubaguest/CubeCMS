@@ -29,7 +29,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       FileBrowser.uploadLink = '<?=$this->uploadLink?>';
       FileBrowser.baseUrl = '<?=Url_Request::getBaseWebDir();?>';
       FileBrowser.sessionId = '<?=session_id()?>';
-      FileBrowser.listType = 'fil';
+      FileBrowser.listType = '<?=Component_TinyMCE_Browser::LIST_TYPE_FILES?>';
       tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
    });
    var imageBigSizeW = <?=VVE_DEFAULT_PHOTO_W?>;
@@ -73,7 +73,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <td>
          <div>
             <div style="float: left" class="swfupload-control"><span id="spanButtonPlaceholder"></span></div>
-            <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=VVE_MAX_UPLOAD_SIZE?>MB
+            <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=vve_create_size_str(VVE_MAX_UPLOAD_SIZE)?>
             <div style="float: right">
                <input id="buttonGoPublic" type="image" src="../../../images/icons/folder_star.png" title="Přejít do veřejné složky" onclick="FileBrowser.goPublic()" />
                <input id="buttonGoHome" type="image" src="../../../images/icons/house.png" title="Přejít do osobní složky" onclick="FileBrowser.goHome()" />

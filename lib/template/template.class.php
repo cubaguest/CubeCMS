@@ -269,12 +269,16 @@ class Template extends TrObject {
    /**
     * Metoda přidá požadovaný soubor šablony do výstupu
     * @param string $name -- název souboru
+    * @return Template
     */
    public function addTplFile($name) {
-      $file = self::getFileDir($name, self::TEMPLATES_DIR, true).$name;
-      if(!in_array($file, $this->templateFiles)){
-         array_push($this->templateFiles, $file);
-      }
+      $this->addFile('tpl://'.$name);
+      return $this;
+
+//       $file = self::getFileDir($name, self::TEMPLATES_DIR, true).$name;
+//       if(!in_array($file, $this->templateFiles)){
+//          array_push($this->templateFiles, $file);
+//       }
    }
 
    /**
@@ -289,8 +293,12 @@ class Template extends TrObject {
          ob_start();
       }
       foreach ($this->templateFiles as $file) {
-         if(file_exists($file)) {
-            include $file;
+         try {
+            if(is_file($file)) {
+               include $file;
+            }
+         } catch(Exception $e) {
+            new CoreErrors($e);
          }
       }
       $cnt = ob_get_clean();
@@ -349,9 +357,10 @@ class Template extends TrObject {
             Template::addJS($file);
          } else if($file instanceof JsPlugin_CssFile) {
             // pokud existuje css soubor u faces, vložíme ten
-            if(file_exists(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
-            .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
-               Template::addCss(Url_Request::getBaseWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true).DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
+            if(is_file(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
+               .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
+                  Template::addCss(Url_Request::getBaseWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
+                  .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
             } else {
                Template::addCss($file->getName());
             }
@@ -367,14 +376,10 @@ class Template extends TrObject {
     * @return Template -- objekt sebe
     */
    public function addJsFile($jsfile) {
-      //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(preg_match('/^http[s]?:\/\//', $jsfile)){
+      if(strncmp ($jsfile, 'http', 4) == 0){
          Template::addJS($jsfile);
       } else {
-         $filePath = Template::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);
-         if($filePath != null) {
-            Template::addJS($filePath.$jsfile);
-         }
+         $this->addFile('js://'.$jsfile);
       }
       return $this;
    }
@@ -385,9 +390,10 @@ class Template extends TrObject {
     * @return Template -- objekt sebe
     */
    public function addCssFile($cssfile) {
-      $filePath = Template::getFileDir($cssfile, Template::STYLESHEETS_DIR, false);
-      if($filePath != null) {
-         Template::addCss($filePath.$cssfile);
+      if(strncmp ($cssfile, 'http', 4) == 0){
+         Template::addJS($cssfile);
+      } else {
+         $this->addFile('css://'.$cssfile);
       }
       return $this;
    }
@@ -571,7 +577,7 @@ class Template extends TrObject {
                }
                break;
          }
-         
+
       } else {
          throw new UnexpectedValueException(_('Nepodporovaný typ zdroje'));
       }
@@ -585,22 +591,24 @@ class Template extends TrObject {
     */
    protected function getTplPathFromEngine($file, $original = false) {
       $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
-      $faceDir = Template::faceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
-      $parentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir);
+      $faceDir = $parentFaceDir = Template::faceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      if(VVE_SUB_SITE_DIR != null){
+         $parentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
+      }
       $mainDir = AppCore::getAppLibDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
 
-      if($original == false AND file_exists($faceDir.$file)){ // soubor z face webu
+      if($original == false AND is_file($faceDir.$file)){ // soubor z face webu
          $path = $faceDir.$file;
-      } else if($original == false AND file_exists($parentFaceDir.$file)) { // soubor z nadřazeného face (subdomains)
+      } else if($original == false AND VVE_SUB_SITE_DIR != null AND is_file($parentFaceDir.$file)) { // soubor z nadřazeného face (subdomains)
          $path = $parentFaceDir.$file;
-      } else if(file_exists($mainDir.$file)) { // soubor v knihovnách
+      } else if(is_file($mainDir.$file)) { // soubor v knihovnách
          $path = $mainDir.$file;
       } else {
          throw new Template_Exception(sprintf(_('Soubor "%s %s" nebyl nalezen'), $mainDir, $file));
       }
       return $path;
    }
-   
+
    /**
     * Metoda přidá šablonu z modulu
     * @param <type> $file
@@ -610,16 +618,36 @@ class Template extends TrObject {
     */
    protected function getTplPathFromModule($file, $module, $original = false) {
       $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
-      $faceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
-      $parentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir);
+      $faceDir = $parentFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      if(VVE_SUB_SITE_DIR != null){
+         $parentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
+      }
       $mainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+/*
+$file:
+string 'main.phtml' (length=10)
+string 'panel.phtml' (length=10)
+
+$faceDir:
+string '/var/www/vve6/faces/default/modules/text/templates/' (length=56)
+/var/www/vve6/subdomain/faces/default/modules/text/templates/
+
+$parentFaceDir:
+string '/var/www/vve6/faces/default/modules/text/templates/' (length=56)
+/var/www/vve6/subdomain/faces/default/modules/text/templates/
+
+$mainDir:
+string '/var/www/vve6/modules/text/templates/' (length=42)
+/var/www/vve6/modules/text/templates/
+*/
+//       Debug::log($file, $faceDir, $parentFaceDir, $mainDir);
 
       $path = null;
-      if($original == false AND file_exists($faceDir.$file)){ // soubor z face webu
+      if($original == false AND is_file($faceDir.$file)){ // soubor z face webu
          $path = $faceDir.$file;
-      } else if($original == false AND file_exists($parentFaceDir.$file)) { // soubor z nadřazeného face (subdomains)
+      } else if($original == false AND VVE_SUB_SITE_DIR != null AND is_file($parentFaceDir.$file)) { // soubor z nadřazeného face (subdomains)
          $path = $parentFaceDir.$file;
-      } else if(file_exists($mainDir.$file)) { // soubor v knihovnách
+      } else if(is_file($mainDir.$file)) { // soubor v knihovnách
          $path = $mainDir.$file;
       } else {
          throw new Template_Exception(sprintf(_('Soubor "%s %s" nebyl nalezen'), $mainDir, $file));
@@ -634,17 +662,24 @@ class Template extends TrObject {
     * @param <type> $original
     */
    protected function getLinkPathFromEngine($file, $type = self::STYLESHEETS_DIR, $original = false) {
-      $rpFaceDir = Template::faceDir().$type.DIRECTORY_SEPARATOR;
-      $rpParentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $rpFaceDir);
+      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
+      $rpFaceDir = $rpParentFaceDir = Template::faceDir().$type.DIRECTORY_SEPARATOR;
+      if(VVE_SUB_SITE_DIR != null){
+         $rpParentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $rpFaceDir);
+      }
       $rpMainDir = AppCore::getAppLibDir().$type.DIRECTORY_SEPARATOR;
       $path = null;
-      if($original == false AND file_exists($rpFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))){ // soubor z face webu
-         $path = Template::face(false).$type.URL_SEPARATOR.$file;
-      } else if($original == false AND file_exists($rpParentFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor z nadřazeného face (subdomains)
-         $path = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null,Template::face(false))
-            .$type.URL_SEPARATOR.$file;
-      } else if(file_exists($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
-         $path = Url_Request::getBaseWebDir().$type.URL_SEPARATOR.$file;
+
+      if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
+         $path = Template::face(false).$type.'/'.$file;
+      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+         $path = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false)).$type.'/'.$file;
+      } else if(is_file($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
+         if(VVE_SUB_SITE_DOMAIN == null){
+            $path = Url_Request::getBaseWebDir().$type.'/'.$file;
+         } else {
+            $path = Url_Request::getBaseWebDir(true).$type.'/'.$file;
+         }
       } else {
          throw new Template_Exception(sprintf(_('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
@@ -659,17 +694,26 @@ class Template extends TrObject {
     * @param <type> $original
     */
    protected function getLinkPathFromModule($file, $module, $type = self::STYLESHEETS_DIR, $original = false) {
-      $rpFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
-      $rpParentFaceDir = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $rpFaceDir);
+      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
+      $rpFaceDir = $rpParentFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
+      if(VVE_SUB_SITE_DIR != null){
+         $rpParentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $rpFaceDir);
+      }
       $rpMainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
       $path = null;
-      if($original == false AND file_exists($rpFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))){ // soubor z face webu
-         $path = Template::face(false).AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
-      } else if($original == false AND file_exists($rpParentFaceDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor z nadřazeného face (subdomains)
-         $path = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null,Template::face(false))
-            .AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
-      } else if(file_exists($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
-         $path = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.URL_SEPARATOR.$module.URL_SEPARATOR.$type.URL_SEPARATOR.$file;
+
+      if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
+         $path = Template::face(false).AppCore::MODULES_DIR.'/'.$module.'/'.$type.'/'.$file;
+      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+
+         $path = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true),Template::face(false)).AppCore::MODULES_DIR.'/'.$module.'/'.$type.'/'.$file;
+
+      } else if(is_file($rpMainDir.$file)) { // soubor v knihovnách
+         if(VVE_SUB_SITE_DOMAIN == null){
+            $path = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.'/'.$module.'/'.$type.'/'.$file;
+         } else {
+            $path = Url_Request::getBaseWebDir(true).AppCore::MODULES_DIR.'/'.$module.'/'.$type.'/'.$file;
+         }
       } else {
          throw new Template_Exception(sprintf(_('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }

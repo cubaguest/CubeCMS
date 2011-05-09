@@ -19,6 +19,9 @@ class Form_Element_File extends Form_Element {
  * @var string
  */
    private $uploadDir = null;
+
+   private $overWrite = false;
+
    /**
     * Konstruktor elemntu
     * @param string $name -- název elemntu
@@ -27,12 +30,13 @@ class Form_Element_File extends Form_Element {
    public function  __construct($name, $label = null, $prefix = null) {
       parent::__construct($name, $label,$prefix);
       $this->setUploadDir(AppCore::getAppCacheDir());
+      $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
    }
 
    /**
     * Metoda naplní element
     * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
-    * @todo dodělat vytváření unikátních názvů souborů
+    * @todo dodělat vytváření unikátních názvů souborů a overwrite
     */
    public function populate() {
       if(isset ($_FILES[$this->getName()])) {
@@ -75,7 +79,6 @@ class Form_Element_File extends Form_Element {
                    'size' => $_FILES[$this->getName()]["size"],
                    'type' => $this->getMimeType($dir.$saveFileName),
                    'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION));
-//               array_push($this->values, $file);
             } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
                $this->values = null;
             } else {
@@ -197,6 +200,17 @@ class Form_Element_File extends Form_Element {
     */
    public function setUploadDir($dir) {
       $this->uploadDir = $dir;
+   }
+
+   /**
+    * Metoda nastaví jestli se má soubor popřípadě přepsat nebo vytvořit nový název
+    * @param bool $overwrite -- true pro přepsání
+    * @return Form_Element_File
+    */
+   public function setOverWrite($overwrite = false)
+   {
+      $this->overWrite = $overwrite;
+      return $this;
    }
 
    /**

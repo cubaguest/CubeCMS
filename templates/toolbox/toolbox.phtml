@@ -14,9 +14,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          $class = get_class($tool);
          $image = null;
          if($tool->getIcon() != null){
-            $image = '<img src="'.$this->iconsDir . $tool->getIcon().'" alt="icon '.$tool->getIcon().'" />';
+           $image = '<img src="'.$this->iconsDir . $tool->getIcon().'" alt="icon '.$tool->getIcon().'" />';
          }
-         
+
          switch ($class) {
             case 'Template_Toolbox2_Tool_PostRedirect':
                ?>
@@ -36,7 +36,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                ?>
                <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>">
                   <div><?=$image;?><?
-               
+
                foreach ($tool->getForm() as $element) {
                   if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
                      ?><input class="toolbox-tool-button ui-state-default" type="submit" name="<?=$element->getName()?>"

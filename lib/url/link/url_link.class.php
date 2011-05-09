@@ -371,7 +371,7 @@ class Url_Link {
       }
       if($this->category != null) {
          $returnString.=$this->getCategory();
-      }      
+      }
       if($this->getRoute() != null) {
          $returnString.=$this->getRoute();
       }
@@ -425,7 +425,7 @@ class Url_Link {
     */
    protected function getLang() {
       if($this->lang != null) {
-         return $this->lang.Url_Request::URL_SEPARATOR;
+         return $this->lang.'/';
       } else {
          return null;
       }
@@ -438,7 +438,7 @@ class Url_Link {
    protected function getCategory() {
       if($this->category != null) {
          if(strpos($this->category,'.') === false){
-            return $this->category.Url_Request::URL_SEPARATOR;
+            return $this->category.'/';
          }
          return $this->category;
       } else {

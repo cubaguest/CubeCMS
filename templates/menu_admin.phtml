@@ -1,20 +1,29 @@
 <?
 // funkce pro render menu
-function vveAdminMenuRenderFunc($menuArr, $link, $ulParam) {
-   print ("<ul ".$ulParam.">\n");
+function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
+   echo ("<ul ".$ulParam.">\n");
    foreach ($menuArr as $key => $item) {
-      print ("<li>");
-      if(!$item->isEmpty()) {
-         print ('<a href="#">'.$item->getCatObj()->getLabel().'</a>'."");
-         vveAdminMenuRenderFunc($item, $link, null);
+      if($item['type']){
+         echo ("<li class=\"adminmenu-user-item\">");
       } else {
-         print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
-                         .$item->getCatObj()->getLabel().'</a>'."");
+         echo ("<li>");
       }
+      $name = $item->xpath('name[@lang="cs"]');
+      $name = $name[0];
 
-      print ("</li>\n");
+      $urlkey = $item->xpath('urlkey[@lang="cs"]');
+      if($urlkey != false){
+         $urlkey = $urlkey[0];
+      }
+      if($key == 'section') {
+         echo ('<a href="#">'.$name.'</a>'."");
+         vveAdminMenuRenderFunc($item->item, $link, null);
+      } else {
+         echo ('<a href="'.$link->clear()->category($urlkey).'">'.$name.'</a>'."");
+      }
+      echo ("</li>\n");
    }
-   print ("</ul>\n");
+   echo ("</ul>\n");
 }
 ?>
 <!-- Halvni menu sekce v menu  -->

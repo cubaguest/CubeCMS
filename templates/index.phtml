@@ -8,6 +8,7 @@ if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
    }
    Template::setPVar('IE',true);
 }
+// $this->addFile('css://style.css');
 echo ('<?xml version="1.0" encoding="utf-8"?>');
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
@@ -43,15 +44,16 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       {*-JAVASCRIPTS-*}
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
-      <script type="text/javascript" src="jscripts/smoothmenu/ddsmoothmenu.js">
+      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/smoothmenu/ddsmoothmenu.js">
          /***********************************************
           * Smooth Navigational Menu- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
           * This notice MUST stay intact for legal use
           * Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
-          ***********************************************/   
+          ***********************************************/
       </script>
       <script type="text/javascript">
          /* <![CDATA[ */
+         document.domain = 'cube.cz<??>';
          ddsmoothmenu.init({
             mainmenuid: "smoothmenu1",
             orientation: "h",
@@ -60,18 +62,18 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          /* ]]> */
       </script>
       <?if(Auth::isLogin()){?>
-      <link rel="stylesheet" type="text/css" href="stylesheets/style-admin.css" />
-      <script type="text/javascript" src="jscripts/admin/menu.js"></script>
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-admin.css')?>" />
+      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/admin/menu.js"></script>
       <?}
       if(VVE_DEBUG_LEVEL > 1){
-         echo '<script type="text/javascript" src="jscripts/enginehelpers.js"></script>';
+         echo '<script type="text/javascript" src="'.Url_Request::getBaseWebDir(true).'jscripts/enginehelpers.js"></script>';
       } else {
-         echo '<script type="text/javascript" src="jscripts/enginehelpers.min.js"></script>';
+         echo '<script type="text/javascript" src="'.Url_Request::getBaseWebDir(true).'jscripts/enginehelpers.min.js"></script>';
       }?>
    </head>
    <body id="pageTop" >
       <? // admin menu
-      if($this->menuAdminObj != null AND !$this->menuAdminObj->menu->isEmpty()) $this->includeTplObj($this->menuAdminObj);
+      if($this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) $this->includeTplObj($this->menuAdminObj);
       ?>
       <? //NavigationMenu_View::listView(); ?>
       <div id="bodywrap" style="<?

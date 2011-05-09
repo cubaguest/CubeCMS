@@ -71,7 +71,7 @@ class Template_JsPlugin extends Template {
     */
    public function addJsFile($jsfile, $engine = false) {
       //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(preg_match('/^http[s]?:\/\//', $jsfile)){
+      if(strncmp ($jsfile, 'http', 4) == 0){
          self::addJS($jsfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($jsfile, $this->jsPlugin()->getName(), false);
@@ -93,7 +93,7 @@ class Template_JsPlugin extends Template {
     * @return Template -- objekt sebe
     */
    public function addCssFile($cssfile, $engine = false) {
-      if(preg_match('/^http[s]?:\/\//', $cssfile)){
+      if(strncmp ($cssfile, 'http', 4) == 0){
          self::addCss($jsfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($cssfile, $this->jsPlugin()->getName(), false);
@@ -124,15 +124,15 @@ class Template_JsPlugin extends Template {
       $mainDir = AppCore::getAppLibDir().JsPlugin::JSPLUGINS_BASE_DIR.DIRECTORY_SEPARATOR.$pluginName.DIRECTORY_SEPARATOR;
       $ret = null;
       // pokud existuje soubor ve vzhledu
-      if(file_exists($faceDir.$file)) {
+      if(is_file($faceDir.$file)) {
           if($realpath){
              $faceDir;
           } else {
              $ret = Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR
           .AppCore::ENGINE_TEMPLATE_DIR.URL_SEPARATOR.JsPlugin::VIRTUAL_DIR_PREFIX.URL_SEPARATOR.$pluginName.URL_SEPARATOR;
           }
-         
-      } else if(file_exists($mainDir.$file)) {
+
+      } else if(is_file($mainDir.$file)) {
          if($realpath){
             $ret = $mainDir;
          } else {

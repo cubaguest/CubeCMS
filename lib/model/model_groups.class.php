@@ -18,6 +18,7 @@ class Model_Groups extends Model_ORM {
    const COLUMN_ID    = 'id_group';
    const COLUMN_NAME    = 'gname';
    const COLUMN_LABEL    = 'label';
+   const COLUMN_IS_ADMIN    = 'admin';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE);
@@ -25,6 +26,8 @@ class Model_Groups extends Model_ORM {
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'aliasFor' => 'name'));
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_IS_ADMIN, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+
 
       $this->setPk(self::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Users', Model_Users::COLUMN_GROUP_ID);

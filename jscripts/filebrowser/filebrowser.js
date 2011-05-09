@@ -36,7 +36,6 @@ var FileBrowserDialogue = {
 };
 
 var FileBrowser = {
-   cmsURL : null,
    cmsPluginUrl : null,
    currentDir : null,
    baseUrl : null,
@@ -91,8 +90,7 @@ var FileBrowser = {
    },
    init : function(){
       this.extendJQ();
-      this.cmsURL = window.location.toString().replace('browser.php', ''); // remove browser action of component
-      this.cmsPluginUrl = this.cmsURL+"jscripts/tinymce/";
+      this.cmsPluginUrl = window.location.toString().replace('browser.php', 'jscripts/tinymce/');
       if(this.currentDir == null){
          // load previous path
          this.currentDir = this.loadPath();
@@ -100,7 +98,7 @@ var FileBrowser = {
       // UPLOAD POST PARAMS
       this.uploadFilesPosParams = {
          sessionid: FileBrowser.sessionId,
-         'upload_send' : 'send', 
+         'upload_send' : 'send',
          path: FileBrowser.currentDir,
          list : FileBrowser.listType
       };
@@ -111,7 +109,7 @@ var FileBrowser = {
          upload_url: FileBrowser.uploadLink,    // Relative to the SWF file (or you can use absolute paths)
          file_post_name: "upload_file",
          post_params: FileBrowser.uploadFilesPosParams,
-         file_size_limit : (maxUploadFileSize*1024)-1024, // global upload size - 1KB
+         file_size_limit : (maxUploadFileSize/1024), // global upload size - 1KB
          file_types : FileBrowser.getFileTypes(),
          file_types_description : "files",
          file_upload_limit : 150,
@@ -121,12 +119,12 @@ var FileBrowser = {
          button_width: 61,
          button_height: 22,
          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-//         debug: true,
+        debug: true,
          // Flash Settings
          flash_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload.swf",
          flash9_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload_fp9.swf"
       });
-      
+
       // assign our event handlers
       $('.swfupload-control')
       .bind('fileQueued', function(event, file){
@@ -299,7 +297,7 @@ var FileBrowser = {
                $sizes.append('<br /><strong>Obázek je příliš velký pro vložení do stránky!!!. Doporučujeme zmenšit alespoň na '+imageBigSizeW+'x'+imageBigSizeH+' px.</strong><br />');
             }
             $infoBox.append($sizes);
-            
+
             // action box
             var $abox = $('<p></p>');
 
@@ -394,7 +392,7 @@ var FileBrowser = {
    },
    request : function(action, postValues, sucessfunc, errfunc){
       $.ajax({
-         type : 'POST', data : postValues, url : FileBrowser.cmsURL+action+'.php',
+         type : 'POST', data : postValues, url : window.location.toString().replace('browser.php', action+'.php'),
          cache : false,
 //         async : false,
          success: function(data){

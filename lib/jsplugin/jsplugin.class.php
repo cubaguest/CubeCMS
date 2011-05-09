@@ -118,7 +118,7 @@ abstract class JsPlugin {
 	 */
 	public function runAction($actionName, $params, $outputType){
       try {
-         $this->pluginParams = $params;
+         $this->pluginParams = $params; /* tady se předávají parametry z url, nemělo by tu být spíš $_GET? */
          if (method_exists($this, $actionName . ucfirst($outputType) . 'View')) {
             $this->{$actionName . ucfirst($outputType) . 'View'} ( );
          } else if (method_exists($this, $actionName . 'View')) {

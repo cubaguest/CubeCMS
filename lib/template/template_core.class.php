@@ -1,7 +1,7 @@
 <?php
 /**
  * Třída pro práci s šablonami modulu.
- * Třida obsahuje vrstvu mezi šablonovacím systémem a samotným pohledem (viewrem). 
+ * Třida obsahuje vrstvu mezi šablonovacím systémem a samotným pohledem (viewrem).
  * Umožňuje všechny základní operace při volbě a plnění šablony a jejímu zobrazení.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
@@ -69,7 +69,12 @@ class Template_Core extends Template {
     * @return string -- cesta k souboru
     */
    public function style($name) {
-      return parent::getFileDir($name, self::STYLESHEETS_DIR, false).$name;
+      $path = null;
+      try {
+          $path = $this->getLinkPathFromEngine($name);
+      } catch(Template_Exception $e) {
+      }
+      return $path;
    }
 
    /**

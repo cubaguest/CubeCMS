@@ -45,11 +45,12 @@ class Template_ModuleStatic extends Template_Module {
     * @param boolean $engine -- jestli se jedná o šablonu enginu
     */
    public function addTplFile($name, $engine = false) {
-         if(!$engine){
-            array_push($this->templateFiles, self::getFileDir($name, self::TEMPLATES_DIR, $this->getModuleName(),true).$name);
-         } else {
-            array_push($this->templateFiles, parent::getFileDir($name, self::TEMPLATES_DIR, false).$name);
-         }
+      if(!$engine){
+         parent::addTplFile($name, $this->getModuleName());
+      } else {
+         parent::addTplFile($name, true);
+      }
+      return $this;
    }
 
    /**
@@ -58,19 +59,10 @@ class Template_ModuleStatic extends Template_Module {
     * @return Template -- objekt sebe
     */
    public function addJsFile($jsfile, $engine = false) {
-      //konttrola jestli se nejedná o URL adresu (vzdálený soubor)
-      if(preg_match('/^http[s]?:\/\//', $jsfile)){
-         self::addJS($jsfile);
-      } else if(!$engine) {
-         $filePath = self::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, $this->getModuleName(), false);
-         if($filePath != null){
-            self::addJS($filePath.$jsfile);
-         }
+      if($engine){
+         parent::addJsFile('engine:'.$jsfile);
       } else {
-         $filePath = parent::getFileDir($jsfile, Template::JAVASCRIPTS_DIR, false);
-         if($filePath != null){
-            self::addJS($filePath.$jsfile);
-         }
+         parent::addJsFile($this->getModuleName().':'.$jsfile);
       }
       return $this;
    }
@@ -81,20 +73,22 @@ class Template_ModuleStatic extends Template_Module {
     * @return Template -- objekt sebe
     */
    public function addCssFile($cssfile, $engine = false) {
-      if(preg_match('/^http[s]?:\/\//', $cssfile)){
-         self::addCss($jsfile);
-      } else if(!$engine) {
-         $filePath = self::getFileDir($cssfile, self::STYLESHEETS_DIR, $this->getModuleName(), false);
-         if($filePath != null){
-            self::addCss($filePath.$cssfile);
-         }
+      if($engine){
+         parent::addCssFile('engine:'.$cssfile);
       } else {
-         $filePath = parent::getFileDir($cssfile, Template::STYLESHEETS_DIR, false);
-         if($filePath!=null){
-            self::addCss($filePath.$cssfile);
-         }
+         parent::addCssFile($this->getModuleName().':'.$cssfile);
       }
       return $this;
+   }
+
+   /**
+    * Metoda přidá soubor do šablony
+    * @param <type> $resource
+    * @param <type> $directInclude
+    */
+   public function  addFile($resource, $directInclude = false) {
+      // přidání názvu modulu do tpl pokud tam není
+      Template::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->getModuleName().':' , $resource), $directInclude);
    }
 }
 ?>

@@ -13,7 +13,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'external_link_list_url' => null,
       'external_image_list_url' => null,
       'external_media_list_url' => null,
-      'remove_script_host' => false,
+      'remove_script_host' => true,
       'content_css' => null,
       'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|name|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
       'forced_root_block' => 'p',
@@ -63,22 +63,33 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
          $this->advSettings['file_browser_callback'] = $this->fileBrowserFunction;
       }
       // css
-      if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
-      Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
-         $this->advSettings['content_css'] = Template::face(false).Template::STYLESHEETS_DIR.URL_SEPARATOR.'style-content.css';
+      if(is_file(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
+         Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
+
+         $this->advSettings['content_css'] = Template::face(false).Template::STYLESHEETS_DIR.'/style-content.css';
+      } else if(VVE_SUB_SITE_DIR != null AND is_file(AppCore::getAppLibDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
+         Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
+
+         $this->advSettings['content_css'] = Url_Request::getBaseWebDir(true).Template::FACES_DIR.'/'.Template::face().'/'.Template::STYLESHEETS_DIR.'/style-content.css';
       } else {
-         $this->advSettings['content_css'] = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css';
+         $this->advSettings['content_css'] = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
       }
-      
+
       $this->settings = array_merge($this->settings, $this->advSettings);
    }
 
    private function addStyleFormats()
    {
-      if(file_exists(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js')){
+      if(is_file(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js')){
          $this->advSettings['style_formats'] = file_get_contents(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js');
-      } else if(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js'){
+      } else if(is_file(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js')){
          $this->advSettings['style_formats'] = file_get_contents(Template::faceDir().'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js');
+      } else if(VVE_SUB_SITE_DIR != null AND is_file(str_replace(VVE_SUB_SITE_DIR.DIRECTORY_SEPARATOR, null, Template::faceDir()).'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js')){
+
+         $this->advSettings['style_formats'] = file_get_contents(str_replace(VVE_SUB_SITE_DIR.DIRECTORY_SEPARATOR, null, Template::faceDir()).'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles.js');
+      } else if(VVE_SUB_SITE_DIR != null AND is_file(str_replace(VVE_SUB_SITE_DIR.DIRECTORY_SEPARATOR, null, Template::faceDir()).'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js')){
+
+         $this->advSettings['style_formats'] = file_get_contents(str_replace(VVE_SUB_SITE_DIR.DIRECTORY_SEPARATOR, null, Template::faceDir()).'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js');
       }
    }
 }

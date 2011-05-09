@@ -38,26 +38,29 @@ class Model_ORM extends Model_PDO {
    private $foreignKeys = array();
    private $getAllLangs = true;
    private static $defaultColumnParams = array(
+      // parametry v db
       'datatype' => 'VARCHAR(45)', // typ sloupce
-      'pdoparam' => PDO::PARAM_STR, // typ sloupce (PDO::PARAM_)
       'nn' => false, // non null
       'default' => null, // default value
       'aliasFor' => null, // alias sloupce
       'ai' => false,
       'uq' => false,
       'pk' => false,
-      'lang' => false,
+//      'index' => false,
       'comment' => null,
       'characterset' => 'utf8',
       'collate' => 'utf8_general_ci',
       'lenght' => null,
       'readonly' => false,
-      'value' => false,
-      'valueLoaded' => false,
       'name' => null,
+      'fulltext' => false, // FULLTEXT na sloupci
+      // ostatní parametry
       'extern' => false, // externí sloupec
       'changed' => 0, // INTERNAL -- check if column is changed
-      'fulltext' => false, // FULLTEXT na sloupci
+      'pdoparam' => PDO::PARAM_STR, // typ sloupce (PDO::PARAM_)
+      'lang' => false,
+      'value' => false,
+      'valueLoaded' => false,
       'fulltextRel' => 1, // relevance sloupce FULLTEXTu
    );
    protected $limit = array('from' => null, 'rows' => null);
@@ -69,6 +72,11 @@ class Model_ORM extends Model_PDO {
    private $joinString = null;
    protected $relations = array();
    protected $selectedColumns = array();
+   /**
+    * aktuální dotaz
+    * @var string/PDOStatement
+    */
+   protected $currentSql = null;
 
    public function __construct()
    {
@@ -371,16 +379,25 @@ class Model_ORM extends Model_PDO {
       if ($obj == null)
          $obj = $this;
 
-      $dbc = new Db_PDO();
-      $sql = 'SELECT ' . $obj->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $obj->getTableName() . '` AS ' . $this->getTableShortName();
-      $obj->createSQLJoins($sql);
-      $obj->createSQLWhere($sql, $this->getTableShortName());
-      $obj->createSQLOrder($sql);
-      $obj->createSQLLimi($sql);
-      $dbst = $dbc->prepare($sql);
-//      Debug::log($sql, $this->whereBindValues);
-      $obj->bindSQLWhere($dbst);
-      $obj->bindSQLLimit($dbst);
+      if($this->currentSql == null){
+         $dbc = new Db_PDO();
+         $sql = 'SELECT ' . $obj->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $obj->getTableName() . '` AS ' . $this->getTableShortName();
+         $obj->createSQLJoins($sql);
+         $obj->createSQLWhere($sql, $this->getTableShortName());
+         $obj->createSQLOrder($sql);
+         $obj->createSQLLimi($sql);
+         $dbst = $dbc->prepare($sql);
+   //      Debug::log($sql, $this->whereBindValues);
+         $obj->bindSQLWhere($dbst);
+         $obj->bindSQLLimit($dbst);
+      } else if($this->currentSql instanceof PDOStatement) {
+         $dbst = $this->currentSql;
+         $this->currentSql = null;
+      } else {
+         $dbc = new Db_PDO();
+         $dbst = $dbc->prepare($this->currentSql);
+         $this->currentSql = null;
+      }
       $r = false;
       try {
          $r = false;
@@ -412,18 +429,26 @@ class Model_ORM extends Model_PDO {
     */
    public function records($fetchParams = self::FETCH_LANG_CLASS)
    {
-      $dbc = new Db_PDO();
-      $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
-
-      $this->createSQLJoins($sql);
-      $this->createSQLWhere($sql, $this->getTableShortName()); // where
-      $this->createSQLGroupBy($sql); // group by
-      $this->createSQLOrder($sql); // order
-      $this->createSQLLimi($sql); // limit
-      $dbst = $dbc->prepare($sql);
+      if($this->currentSql == null){
+         $dbc = new Db_PDO();
+         $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         $this->createSQLJoins($sql);
+         $this->createSQLWhere($sql, $this->getTableShortName()); // where
+         $this->createSQLGroupBy($sql); // group by
+         $this->createSQLOrder($sql); // order
+         $this->createSQLLimi($sql); // limit
+         $dbst = $dbc->prepare($sql);
 //      Debug::log($sql, $this->whereBindValues);
-      $this->bindSQLWhere($dbst); // where values
-      $this->bindSQLLimit($dbst); // limit values
+         $this->bindSQLWhere($dbst); // where values
+         $this->bindSQLLimit($dbst); // limit values
+      } else if($this->currentSql instanceof PDOStatement) {
+         $dbst = $this->currentSql;
+         $this->currentSql = null;
+      } else {
+         $dbc = new Db_PDO();
+         $dbst = $dbc->prepare($this->currentSql);
+         $this->currentSql = null;
+      }
       $r = false;
       try {
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
@@ -705,7 +730,7 @@ class Model_ORM extends Model_PDO {
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst); // where values
       $this->bindSQLLimit($dbst); // limit values
-      
+
       $r = false;
       try {
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
@@ -1137,7 +1162,7 @@ class Model_ORM extends Model_PDO {
               ) */
             $matches = array();
             $ordStr = null;
-            
+
             if (preg_match('/^(?:([a-zA-Z ]+)?\()?(?:([a-zA-Z0-9_-]+)\.)?([a-zA-Z0-9_]+)([ 0-9\/*+-]+)?\)?$/i', $col, $matches)) {
                // tb prefix
                if ($matches[2] == null) {

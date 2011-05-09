@@ -71,6 +71,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    private $elementCheckForm = null;
 
+   private $protectForm = true;
    private $elementToken = null;
    private $tokenIsOk = false;
 
@@ -81,14 +82,17 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * Konstruktor vytváří objekt formuláře
     * @param string $prefix -- (option) prefix pro formulářové prvky
     */
-   function __construct($prefix = null) {
+   function __construct($prefix = null, $protectForm = true) {
       $this->formPrefix = $prefix;
       $this->htmlElement = new Html_Element('form');
       $this->setAction(new Url_Link_Module());
       $this->setSendMethod();
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
-      $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
+      if($protectForm){
+         $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
+      }
+      $this->protectForm = $protectForm;
    }
 
    public function  __toString() {
@@ -326,7 +330,6 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          // kontrola check prvku
          if($this->elementCheckForm->isSend() AND $this->elementCheckForm->getValues() != null) {
             $this->elementCheckForm->populate();
-            $this->elementCheckForm->filter();
             $this->isSend = true;
          }
          if($this->submitElement instanceof Form_Element_SaveCancel AND $this->submitElement->isSend()){
@@ -340,6 +343,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
                  return true;
               }
          }
+         // kontrola ostatní submit elementů
          if($this->isSend != true) {
             foreach ($this->elements as $element) {
                if(($element instanceof Form_Element_Submit
@@ -365,7 +369,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $this->isSend();
       }
       // kontrola tokenu
-      if($this->tokenIsOk != true AND $this->elementToken->isSend()){
+      if($this->protectForm && $this->tokenIsOk != true && $this->elementToken->isSend()){
          $this->elementToken->populate();
          if(!Token::check($this->elementToken->getValues())){ // neodpovídající token
 //            throw new UnexpectedValueException($this->tr('Odeslán nesprávný token, pravděpodobně útok CSRF'));

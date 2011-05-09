@@ -98,7 +98,7 @@ class Form_Element_Select extends Form_Element {
             $opt = new Html_Element('optgroup');
             $opt->setAttrib('label', $optLabel);
             foreach ($optVal as $optLabel2 => $optVal2) {
-               $optChild = new Html_Element('option', htmlspecialchars($optLabel2, ENT_QUOTES));
+               $optChild = new Html_Element('option', str_replace(' ', '&nbsp;', htmlspecialchars($optLabel2, ENT_QUOTES)));
                $optChild->setAttrib('value', (string)$optVal2);
                if($values == $optVal2 OR (is_array($values) AND in_array($optVal2, $values))) {
                   $optChild->setAttrib('selected', 'selected');
@@ -106,7 +106,7 @@ class Form_Element_Select extends Form_Element {
                $opt->addContent($optChild);
             }
          } else {
-            $opt = new Html_Element('option', htmlspecialchars($optLabel, ENT_QUOTES));
+            $opt = new Html_Element('option', str_replace(' ', '&nbsp;', htmlspecialchars($optLabel, ENT_QUOTES)));
             $opt->setAttrib('value', (string)$optVal);
             if($values == $optVal OR (is_array($values) AND in_array($optVal, $values))) {
                $opt->setAttrib('selected', 'selected');

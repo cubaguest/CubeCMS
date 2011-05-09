@@ -79,7 +79,7 @@ class Category_Core extends TrObject {
    public function loadRights()
    {
       // admin může vše
-      if (Auth::getUserName() == 'admin') {
+      if (Auth::isAdmin()) {
          $this->categoryRights->addRight('rwc');
       } else {
          $this->categoryRights->addRight('r--');

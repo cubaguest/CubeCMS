@@ -26,7 +26,7 @@ class Install_Module {
       $this->moduleName = strtolower($tmp[0]);
 
       // načtení verze
-      $verStr = file_get_contents(AppCore::getAppWebDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+      $verStr = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
                       . $this->moduleName . DIRECTORY_SEPARATOR . AppCore::DOCS_DIR . DIRECTORY_SEPARATOR . self::VERSION_FILE);
       $versionArr = explode('.', $verStr);
       $this->version['major'] = $versionArr[0];
@@ -42,7 +42,7 @@ class Install_Module {
       /* zjištění jestli je modul již instalován, pokud ne provede se install()
        * pokud ano provede se update()
        * Asi řešit přes tabulku s insstalovanými moduly, protože je třeba kontrolovat
-       * i verzi instalovaného modulu při update, tak aby se popřípadě upravili potřebné parametry 
+       * i verzi instalovaného modulu při update, tak aby se popřípadě upravili potřebné parametry
        */
 
       $model = new Model_Module();
@@ -74,12 +74,12 @@ class Install_Module {
       $model = new Model_Module();
       $module = $model->getModule($this->moduleName);
       $fromVersion = (float)$module->{Model_Module::COLUMN_VERSION_MAJOR}.'.'.$module->{Model_Module::COLUMN_VERSION_MINOR};
-      $toVersion = (float)file_get_contents(AppCore::getAppWebDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+      $toVersion = (float)file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
                  .$module->{Model_Module::COLUMN_NAME}.DIRECTORY_SEPARATOR
                  .AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.self::VERSION_FILE);;
 
       for ($currentVer = (float)$fromVersion; round($currentVer,1) < round((float)$toVersion,1); $currentVer+=0.1) {
-         $fileName = preg_replace(array('/{from}/', '/{to}/'), 
+         $fileName = preg_replace(array('/{from}/', '/{to}/'),
                  array(number_format($currentVer, 1, '.', ''), number_format($currentVer+0.1, 1, '.', '')),
                          self::FILE_SQL_UPGRADE);
          $file = new Filesystem_File_Text($fileName, $this->getInstallDir(), false);

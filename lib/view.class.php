@@ -41,7 +41,7 @@ abstract class View extends TrObject {
     * @param Url_Link_Module $link -- objekt odkazů modulu
     * @param Category $category --  objekt kategorie
     */
-   function __construct(Url_Link_Module $link, Category $category, Translator $trs) {
+   function __construct(Url_Link_Module $link, Category_Core $category, Translator $trs) {
       $this->template = new Template_Module($link, $category);
       $this->template->setTranslator($trs);
       $this->link = $link;

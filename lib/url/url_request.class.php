@@ -14,8 +14,6 @@ class Url_Request {
 /**
  * Oddělovač částí URL adresy
  */
-   const URL_SEPARATOR = '/';
-
    const URL_TYPE_NORMAL = 'normal';
    const URL_TYPE_ENGINE_PAGE = 'specialpage';
    const URL_TYPE_CORE_MODULE = 'coremodule';
@@ -73,16 +71,16 @@ class Url_Request {
    private static $baseWebUrl = null;
 
    /**
+    * Základní URL adresa aplikace bez subdomény
+    * @var string
+    */
+   private static $baseMainWebUrl = null;
+
+   /**
     * Adresa serveru (např. www.seznam.cz)
     * @var string
     */
    private static $serverName = null;
-
-   /**
-    * Jméno scriptu
-    * @var string
-    */
-   private static $scriptName = null;
 
    /**
     * Název kategorie požadavku
@@ -121,6 +119,12 @@ class Url_Request {
    private $outputType = 'html';
 
    /**
+    * jestli se jedná o admin kategorii
+    * @var bool
+    */
+   private $isAdminCat = false;
+
+   /**
     * Proměnná obsahuje jestli se jedná o požadavek typu XHR
     * @var boolean
     */
@@ -139,24 +143,24 @@ class Url_Request {
    public static function factory() {
    //		Vytvoření url
       $fullUrl = $_SERVER['REQUEST_URI'];
-      self::$scriptName = $_SERVER["SCRIPT_NAME"];
-      // base request
-//      $baseDir = str_replace('index.php', '', self::$scriptName);
-//      self::$requestUrl = str_replace($baseDir, '', $fullUrl);
-      $serverName = $_SERVER["HTTP_HOST"];
-      if(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null){
-         $fullUrl = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', $fullUrl);
-         self::$scriptName = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, '', self::$scriptName);
+      $scriptName = $_SERVER["SCRIPT_NAME"];
+      self::$serverName = $_SERVER["HTTP_HOST"];
+
+      if(VVE_SUB_SITE_DOMAIN != null AND VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND == true){
+            $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
+            $scriptName = str_replace(VVE_SUB_SITE_DOMAIN, '', $scriptName);
       }
-      self::$serverName = $serverName;
-      //		Najdeme co je cesta k aplikaci a co je předaná url
-      self::$fullUrl = substr($fullUrl, strpos(self::$scriptName, AppCore::APP_MAIN_FILE));
+
+      //		Vytvoříme základní URL cestu k aplikaci
+      self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strrpos($scriptName, '/')).'/';
+      if(VVE_SUB_SITE_DOMAIN != null){
+         self::$baseMainWebUrl = str_replace(self::$serverName, str_replace(VVE_SUB_SITE_DOMAIN.'.', null, self::$serverName), self::$baseWebUrl);
+      }
+//    Najdeme co je cesta k aplikaci a co je předaná url
+      self::$fullUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
       // odstraníme dvojté lomítka
       self::$fullUrl = preg_replace('/[\/]{2,}/', '/', self::$fullUrl);
-      //		Vytvoříme základní URL cestu k aplikaci
-      $positionLastChar=strrpos(self::$scriptName, self::URL_SEPARATOR);
-      self::$baseWebUrl=self::$transferProtocol.self::$serverName
-          .substr(self::$scriptName, 0, $positionLastChar).self::URL_SEPARATOR;
+
       self::$webUrl = str_replace(self::$baseWebUrl, '', self::$fullUrl);
       if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
           self::$isXHRRequest = true;
@@ -220,43 +224,89 @@ class Url_Request {
       }
       if(!empty ($match['url'])) {
          $return = false;
-         // načtení kategorií
-         $modelCat = new Model_Category();
-         $categories = $modelCat->getCategoryList();
-         foreach ($categories as $key => $cat) {
-            if((string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue;
-            if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
-               $matches = array();
-               $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
-                   ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
+         if(strpos($match['url'], 'admin') !== 0){ // pokud je obsaženo jako první slovo admin > jedná se o admin kategorii a není nutné procházen normální
+            // načtení kategorií
+            $modelCat = new Model_Category();
+            $categories = $modelCat->getCategoryList();
+            unset($modelCat);
+            foreach ($categories as $cat) {
+               if((string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue;
+               if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
+                  $matches = array();
+                  $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
+                     ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
 
-               if(preg_match($regexp, $match['url'], $matches)) {
-                  // pokud obsahuje soubor
-                  $fileMatchs = array();
-                  if($matches['other'] == self::URL_FILE_RSS){
-                     $this->urlType = self::URL_TYPE_MODULE_RSS;
-                     $this->name = 'rss';
-                     $this->outputType = 'xml';
-                     $this->pageFull = false;
-                  } else if($matches['other'] == self::URL_FILE_ATOM){
-                     $this->urlType = self::URL_TYPE_MODULE_RSS;
-                     $this->name = 'atom';
-                     $this->outputType = 'xml';
-                     $this->pageFull = false;
-                  } else if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
-                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                     $this->outputType = $fileMatchs['ext'];
-                     $this->pageFull = false;
-                  } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
-                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                     $this->pageFull = false;
+                  if(preg_match($regexp, $match['url'], $matches)) {
+                     // pokud obsahuje soubor
+                     $fileMatchs = array();
+                     if($matches['other'] == self::URL_FILE_RSS){
+                        $this->urlType = self::URL_TYPE_MODULE_RSS;
+                        $this->name = 'rss';
+                        $this->outputType = 'xml';
+                        $this->pageFull = false;
+                     } else if($matches['other'] == self::URL_FILE_ATOM){
+                        $this->urlType = self::URL_TYPE_MODULE_RSS;
+                        $this->name = 'atom';
+                        $this->outputType = 'xml';
+                        $this->pageFull = false;
+                     } else if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
+                        $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                        $this->outputType = $fileMatchs['ext'];
+                        $this->pageFull = false;
+                     } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
+                        $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                        $this->pageFull = false;
+                     }
+                     // jinak se jednná o kategorii
+                     $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
+                     $this->moduleUrlPart = $matches['other'];
+                     $this->params = $matches['params'];
+                     $return = true;
+                     break;
                   }
-                  // jinak se jednná o kategorii
-                  $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
-                  $this->moduleUrlPart = $matches['other'];
-                  $this->params = $matches['params'];
-                  $return = true;
-                  break;
+               }
+            }
+         }
+
+         // kontrola admin kategorie
+         if(Auth::isAdmin()){
+            $model = new Model_CategoryAdm();
+            $cats = $model->getCategoryList();
+            unset($model);
+            foreach ($cats as $cat) {
+               if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
+                  $matches = array();
+                  $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
+                  if(preg_match($regexp, $match['url'], $matches)) {
+                     // pokud obsahuje soubor
+                     $fileMatchs = array();
+                     /*if($matches['other'] == self::URL_FILE_RSS){
+                        $this->urlType = self::URL_TYPE_MODULE_RSS;
+                        $this->name = 'rss';
+                        $this->outputType = 'xml';
+                        $this->pageFull = false;
+                     } else if($matches['other'] == self::URL_FILE_ATOM){
+                        $this->urlType = self::URL_TYPE_MODULE_RSS;
+                        $this->name = 'atom';
+                        $this->outputType = 'xml';
+                        $this->pageFull = false;
+                     } else*/
+                     if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
+                        $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                        $this->outputType = $fileMatchs['ext'];
+                        $this->pageFull = false;
+                     } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
+                        $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                        $this->pageFull = false;
+                     }
+                     // jinak se jednná o kategorii
+                     $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
+                     $this->moduleUrlPart = $matches['other'];
+                     $this->params = $matches['params'];
+                     $this->isAdminCat = true;
+                     $return = true;
+                     break;
+                  }
                }
             }
          }
@@ -422,10 +472,21 @@ class Url_Request {
    }
 
    /**
+    * Metoda vrací jestli se zpracovává admin kategorie
+    * @return bool -- true pokud je admin kategorie
+    */
+   public function isAdminCategory() {
+      return $this->isAdminCat;
+   }
+
+   /**
     * Metoda vrací základní URL cestu k aplikaci
     * @return string
     */
-   public static function getBaseWebDir() {
+   public static function getBaseWebDir($returnMainWeb = false) {
+      if($returnMainWeb){
+         return self::$baseMainWebUrl;
+      }
       return self::$baseWebUrl;
    }
 

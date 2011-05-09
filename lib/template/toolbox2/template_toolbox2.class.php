@@ -116,7 +116,7 @@ class Template_Toolbox2 extends Template {
       $this->addTplFile("toolbox/toolbox.phtml", true);
       $this->addJsPlugin(new JsPlugin_JQuery());
 
-      $this->iconsDir = Url_Request::getBaseWebDir().Template::IMAGES_DIR.URL_SEPARATOR.self::ICONS_DIR.URL_SEPARATOR;
+      $this->iconsDir = Url_Request::getBaseWebDir(true).Template::IMAGES_DIR.URL_SEPARATOR.self::ICONS_DIR.URL_SEPARATOR;
    }
 
    public function  __toString() {
