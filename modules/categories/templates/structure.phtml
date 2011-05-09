@@ -23,7 +23,7 @@ echo $this->toolbox;
 ?>
 
 <h1><?=$this->tr("Struktura stránek")?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<?//=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail">
    <p><?=$this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
    <?//sekce
@@ -84,7 +84,7 @@ echo $this->toolbox;
       function loadCatinfo(idc){
          showLoadBox('#category-info div');
          $.ajax({
-               type: "GET", url: "<?=$this->link()->route("getCatInfo")?>", cache : false, 
+               type: "GET", url: "<?=$this->link()->route("getCatInfo")?>", cache : false,
                data: {idc : idc},
                success: function(data){
                   $('#category-info div').html(data);

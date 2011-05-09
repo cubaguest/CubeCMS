@@ -6,6 +6,7 @@
  */
 class Categories_Controller extends Controller {
    const MODULE_SPEC_FILE = 'spicifikation.html';
+   const MODULE_ADMIN_FILE = 'admin';
 
    private $categoriesArray = array();
    /**
@@ -19,9 +20,9 @@ class Categories_Controller extends Controller {
       $this->checkWritebleRights();
 
       $this->setMainStruct(true);
-      if ($this->routes()->getActionName() != 'main') {
-         $this->setMainStruct(false);
-      }
+//       if ($this->routes()->getActionName() != 'main') {
+//          $this->setMainStruct(false);
+//       }
 
       $formDelete = new Form('category_');
 
@@ -39,7 +40,7 @@ class Categories_Controller extends Controller {
 
          // vymažeme práva
          $rModel = new Model_Rights();
-         $rModel->deleteCatRights($formDelete->id->getValues());
+         $rModel->deleteRightsByCatID($formDelete->id->getValues());
 
          // mažeme kategorii z DB
          $cM->deleteCategory($formDelete->id->getValues());
@@ -57,40 +58,6 @@ class Categories_Controller extends Controller {
          $this->log('Smazána kategorie :"' . $cat->{Model_Category::COLUMN_CAT_LABEL} . '"');
          $this->gotoBack();
       }
-
-      // form pro posun
-//      $formMove = new Form('item_');
-//
-//      $elemID = new Form_Element_Hidden('id');
-//      $formMove->addElement($elemID);
-//
-//      $moveTo = new Form_Element_Hidden('move_to');
-//      $formMove->addElement($moveTo);
-//
-//      $submitMove = new Form_Element_SubmitImage('move');
-//      $formMove->addElement($submitMove);
-//
-//      if($formMove->isValid()) {
-//         $structure = Category_Structure::getStructure(!$this->isMainStruct());
-//         $id = $formMove->id->getValues();
-//         try {
-//            $parent = $structure->getCategory($structure->getCategory($id)->getParentId());
-//            if($formMove->move_to->getValues() == 'up') {
-//               $parent->swapChild($parent->getChild($id), $parent->prevChild($parent->getChild($id)));
-//            } else {
-//               $parent->swapChild($parent->getChild($id), $parent->nextChild($parent->getChild($id)));
-//            }
-//
-//            $structure->saveStructure(!$this->isMainStruct());
-//            $this->infoMsg()->addMessage($this->tr("Pozice byla změněna"));
-//            $cM = new Model_Category();
-//            $cat = $cM->getCategoryById($id);
-//            $this->log('Upravena pozice kategorie "'.$cat->{Model_Category::COLUMN_CAT_LABEL}.'"');
-//            $this->gotoBack();
-//         } catch (Exception $e) {
-//            new CoreErrors($e);
-//         }
-//      }
 
       $structure = Category_Structure::getStructure(!$this->isMainStruct());
       $structure->withHidden(true);
@@ -298,7 +265,7 @@ class Categories_Controller extends Controller {
       }
       $this->catsToArrayForForm($structure);
       $form->parent_cat->setOptions($this->categoriesArray);
-      
+
       $form->module->setValues('text');
       $form->group_admin->setValues('rwc');
       if($this->getRequestParam('id', 0) != 0){
@@ -398,7 +365,7 @@ class Categories_Controller extends Controller {
          $this->infoMsg()->addMessage('Kategorie byla uložena');
 //         var_dump($form->gotoSettings->getValues());flush();
          if ($form->gotoSettings->getValues() == true) {
-            $this->link()->route('settings', array('categoryid' => $lastId))->reload();
+            $this->link()->param('id')->route('settings', array('categoryid' => $lastId))->reload();
          } else {
             $this->gotoBack();
          }
@@ -450,8 +417,11 @@ class Categories_Controller extends Controller {
       // moduly
       $moduleModel = new Model_Module();
       $modules = $moduleModel->getModules();
-      $options = null;
+      $options = array();
       foreach ($modules as $module) {
+         if($module[0] == '.' OR is_file(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+               . $module . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_ADMIN_FILE)) continue;
+
          $moduleName = null;
          // pokud existuje dokumentace tak načteme název modulu
          if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
@@ -584,7 +554,7 @@ class Categories_Controller extends Controller {
    {
       // pokud je hlavní kategorie
       if ($categories->getLevel() != 0) {
-         $this->categoriesArray[str_repeat('&nbsp;', $categories->getLevel() * 3) .
+         $this->categoriesArray[str_repeat('.', $categories->getLevel() * 3) .
             (string) $categories->getCatObj()->getLabel() . ' - id: ' . $categories->getCatObj()->getId()]
             = (string) $categories->getCatObj()->getId();
       } else {
@@ -626,31 +596,31 @@ class Categories_Controller extends Controller {
 
    private function isMainStruct()
    {
-      if (isset($_SESSION['structAdmin']) AND $_SESSION['structAdmin'] == true) {
-         return false;
-      }
+//       if (isset($_SESSION['structAdmin']) AND $_SESSION['structAdmin'] == true) {
+//          return false;
+//       }
       return true;
    }
 
    private function setMainStruct($main = true)
    {
-      if ($main === true) {
-         $_SESSION['structAdmin'] = false;
-         $this->isMainStruct = true;
-         unset($_SESSION['structAdmin']);
-      } else {
-         $this->isMainStruct = false;
-         $_SESSION['structAdmin'] = true;
-      }
+//       if ($main === true) {
+//          $_SESSION['structAdmin'] = false;
+//          $this->isMainStruct = true;
+//          unset($_SESSION['structAdmin']);
+//       } else {
+//          $this->isMainStruct = false;
+//          $_SESSION['structAdmin'] = true;
+//       }
    }
 
    private function gotoBack()
    {
-      if ($this->isMainStruct()) {
-         $this->link()->route()->reload();
-      } else {
-         $this->link()->route('adminMenu')->reload();
-      }
+//       if ($this->isMainStruct()) {
+         $this->link()->route()->param('id')->reload();
+//       } else {
+//          $this->link()->route('adminMenu')->param('id')->reload();
+//       }
    }
 
    public function changeIndPanelsController()
