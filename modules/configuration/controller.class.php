@@ -14,7 +14,7 @@ class Configuration_Controller extends Controller {
 
       $modelCfg->joinFK(Model_Config::COLUMN_ID_GROUP, array('gname' => Model_ConfigGroups::COLUMN_NAME, 'gdesc' => Model_ConfigGroups::COLUMN_DESC))
          ->where(Model_Config::COLUMN_PROTECTED.' != 1 AND '.Model_Config::COLUMN_ID_GROUP.' != 1', array())
-         ->order(array(Model_Config::COLUMN_ID_GROUP, 'ISNULL('.Model_Config::COLUMN_LABEL.')', Model_Config::COLUMN_LABEL));
+         ->order(array(Model_Config::COLUMN_ID_GROUP, Model_Config::COLUMN_KEY));//, 'ISNULL('.Model_Config::COLUMN_LABEL.')'
 
       $records = $modelCfg->records();
       $sorted = array();
@@ -86,7 +86,7 @@ class Configuration_Controller extends Controller {
             break;
       }
       $form->addElement($elem);
-      
+
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
 
@@ -96,7 +96,7 @@ class Configuration_Controller extends Controller {
       }
 
       if($form->isValid()){
-         if($form->value instanceof Form_Element_TextArea 
+         if($form->value instanceof Form_Element_TextArea
             OR $form->value instanceof Form_Element_Text
             OR $form->value instanceof Form_Element_Radio){
             $opt->{Model_Config::COLUMN_VALUE} = $form->value->getValues();
