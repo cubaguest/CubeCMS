@@ -14,7 +14,7 @@ class Component_TinyMCE_TPLList_System extends Component_TinyMCE_TPLList {
       // šablony z modulu
       $modelTpl = new Templates_Model();
 
-      $tpllist = $modelTpl->getTemplates($this->tplGroup);
+      $tpllist = $modelTpl->where(Templates_Model::COLUMN_TYPE, $this->tplGroup)->records();
       if(!empty ($tpllist)){
          // link
          $link = new Url_Link_ModuleStatic(true);
