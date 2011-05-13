@@ -2,7 +2,7 @@
 /*
  * Třída modelu detailem šablon
 */
-class Templates_Model extends Model_PDO {
+class Templates_Model extends Model_ORM {
    const TEMPLATE_TYPE_TEXT = 'text';
    const TEMPLATE_TYPE_MAIL = 'mail';
 
@@ -24,38 +24,21 @@ class Templates_Model extends Model_PDO {
     */
    public static $tplTypes = array(Templates_Model::TEMPLATE_TYPE_TEXT, Templates_Model::TEMPLATE_TYPE_MAIL);
 
-   /**
-    * Metoda uloží šablonu do db
-    *
-    * @param string -- nadpis šablony
-    * @param string -- obsahe šablony
-    * @param string -- type šablony (text,mail, ...) (option def Templates_Model::TEMPLATE_TYPE_TEXT)
-    * @param int -- id šablony
-    */
-   public function saveTemplate($name, $desc, $content, $type = self::TEMPLATE_TYPE_TEXT, $id = null) {
-      $dbc = new Db_PDO();
-
-      if($id !== null) {
-         $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-          ." SET ".self::COLUMN_CONTENT." = :content,".self::COLUMN_DESC.' = :descrip,'
-                 .self::COLUMN_NAME.' = :name, '.self::COLUMN_TYPE." = :type"
-          ." WHERE ".self::COLUMN_ID." = :id");
-         $dbst->bindValue(':name',$name, PDO::PARAM_STR);
-         $dbst->bindValue(':descrip',$desc, PDO::PARAM_STR);
-         $dbst->bindValue(':content',$content, PDO::PARAM_STR);
-         $dbst->bindValue(':type',$type, PDO::PARAM_STR);
-         $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-         return $dbst->execute();
+   protected function  _initTable() {
+      if(defined('VVE_MAIN_SITE_TABLE_PREFIX') && VVE_MAIN_SITE_TABLE_PREFIX != null){
+         $this->setTableName(VVE_MAIN_SITE_TABLE_PREFIX.self::DB_TABLE, 't_us', false);
       } else {
-         $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
-                 ." (".self::COLUMN_NAME.", ".self::COLUMN_DESC.", ".self::COLUMN_CONTENT.", ".self::COLUMN_TYPE.") "
-                 ."VALUES (:name, :descrip, :content, :type)");
-         $dbst->bindValue(':name',$name, PDO::PARAM_STR);
-         $dbst->bindValue(':descrip',$desc, PDO::PARAM_STR);
-         $dbst->bindValue(':content',$content, PDO::PARAM_STR);
-         $dbst->bindValue(':type',$type, PDO::PARAM_STR);
-         return $dbst->execute();
+         $this->setTableName(self::DB_TABLE, 't_us');
       }
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
+      $this->addColumn(self::COLUMN_DESC, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_CONTENT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'nn' => true, 'default' => false));
+      $this->addColumn(self::COLUMN_ADD_TIME, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(10)', 'pdoparam' => PDO::PARAM_STR, 'default' => self::TEMPLATE_TYPE_TEXT));
+
+      $this->setPk(self::COLUMN_ID);
    }
 
    /**
@@ -63,6 +46,7 @@ class Templates_Model extends Model_PDO {
     *
     * @param int -- id šablony
     * @return Object -- pole s šablonou
+    * @deprecated - Use ORM!
     */
    public function getTemplate($id) {
       $dbc = new Db_PDO();
@@ -73,36 +57,6 @@ class Templates_Model extends Model_PDO {
       $dbst->execute();
 
       return $dbst->fetchObject();
-   }
-
-   public function getTemplates($type = null) {
-      $dbc = new Db_PDO();
-      if($type == null) {
-         $dbst = $dbc->prepare(
-//                 'IF EXISTS (SHOW TABLES LIKE \''.$dbc->table(self::DB_TABLE).'\') THEN'.
-                 ' SELECT * FROM '.$dbc->table(self::DB_TABLE));
-      } else {
-         $dbst = $dbc->prepare('SELECT * FROM '.$dbc->table(self::DB_TABLE)
-                 .' WHERE '.self::COLUMN_TYPE.' = :type');
-         $dbst->bindValue(':type', $type, PDO::PARAM_STR);
-
-      }
-      $dbst->execute();
-      $dbst->setFetchMode(PDO::FETCH_OBJ);
-      return $dbst->fetchAll();
-   }
-
-   /**
-    * Metoda smaže zadanou šablonu
-    * @param integer $id
-    * @return bool
-    */
-   public function deleteTemplate($id) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
-          ." WHERE (".self::COLUMN_ID ." = :id)");
-      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-      return $dbst->execute();
    }
 }
 

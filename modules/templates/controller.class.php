@@ -23,7 +23,7 @@ class Templates_Controller extends Controller {
          $this->link()->reload();
       }
 
-      $this->view()->templates = $model->getTemplates();
+      $this->view()->templates = $model->records();
    }
 
    public function showController() {
@@ -46,8 +46,13 @@ class Templates_Controller extends Controller {
 
       if($addForm->isValid()) {
          $model = new Templates_Model();
-         $model->saveTemplate($addForm->name->getValues(), $addForm->desc->getValues(), $addForm->content->getValues(),
-                 $addForm->type->getValues());
+         $tpl = $model->newRecord();
+         $tpl->{Templates_Model::COLUMN_NAME} = $addForm->name->getValues();
+         $tpl->{Templates_Model::COLUMN_DESC} = $addForm->desc->getValues();
+         $tpl->{Templates_Model::COLUMN_CONTENT} = $addForm->content->getValues();
+         $tpl->{Templates_Model::COLUMN_TYPE} = $addForm->type->getValues();
+
+         $model->save($tpl);
 
          $this->infoMsg()->addMessage($this->_('Uloženo'));
          $this->link()->route()->reload();
@@ -66,7 +71,7 @@ class Templates_Controller extends Controller {
 
       $form = $this->createForm();
 
-      $tpl = $model->getTemplate($this->getRequest('id'));
+      $tpl = $model->where($this->getRequest('id'))->record();
 
       if($tpl == false) return false;
 
@@ -81,8 +86,12 @@ class Templates_Controller extends Controller {
       }
 
       if($form->isValid()) {
-         $model->saveTemplate($form->name->getValues(), $form->desc->getValues(), $form->content->getValues(),
-                 $form->type->getValues(), $this->getRequest('id'));
+         $tpl->{Templates_Model::COLUMN_NAME} = $form->name->getValues();
+         $tpl->{Templates_Model::COLUMN_DESC} = $form->desc->getValues();
+         $tpl->{Templates_Model::COLUMN_CONTENT} = $form->content->getValues();
+         $tpl->{Templates_Model::COLUMN_TYPE} = $form->type->getValues();
+
+         $model->save($tpl);
 
          $this->infoMsg()->addMessage($this->_('Uloženo'));
          if($form->goback->getValues() == true){
@@ -137,7 +146,7 @@ class Templates_Controller extends Controller {
 
       $model = new Templates_Model();
 
-      $tplObj = $model->getTemplate($this->getRequest('id'));
+      $tplObj = $model->where($this->getRequest('id'))->record();
 
       if($tplObj == false) return false;
 
@@ -150,9 +159,8 @@ class Templates_Controller extends Controller {
 
    public static function templateController(){
       $id = (int)$_GET[self::GET_PARAM_ID]; // ověřit jestli to nemá být stripslashes
-
       $model = new Templates_Model();
-      Templates_View::$tpl = $model->getTemplate($id);
+      Templates_View::$tpl = $model->where($id)->record();
 
       if(Templates_View::$tpl == false) return false;
    }
