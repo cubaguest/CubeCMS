@@ -356,14 +356,7 @@ class Template extends TrObject {
          if($file instanceof JsPlugin_JsFile) {
             Template::addJS($file);
          } else if($file instanceof JsPlugin_CssFile) {
-            // pokud existuje css soubor u faces, vložíme ten
-            if(is_file(AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
-               .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false))) {
-                  Template::addCss(Url_Request::getBaseWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.Template::face(true)
-                  .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$file->getName(false));
-            } else {
-               Template::addCss($file->getName());
-            }
+            Template::addCss($file);
          } else {
             Template::addJS($file);
          }
@@ -463,10 +456,9 @@ class Template extends TrObject {
             $return = Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR.$dir.URL_SEPARATOR;
          }
       } // pokud se šablona loaduje z jiného faces (např nadřazeného webu)
-      else if(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null AND $dir == self::TEMPLATES_DIR
-              AND file_exists(str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir).$file)) {
-            $return = str_replace(VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND, null, $faceDir);
-      } else if(file_exists($mainDir.$file)) {
+      else if(VVE_SUB_SITE_DIR != null AND $dir == self::TEMPLATES_DIR AND is_file(str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir).$file)) {
+            $return = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
+      } else if(is_file($mainDir.$file)) {
          if($realpath) {
             $return = $mainDir;
          } else {
