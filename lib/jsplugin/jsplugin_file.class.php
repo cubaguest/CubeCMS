@@ -46,7 +46,7 @@ class JsPlugin_File {
       if($virtual){
          $this->dir = Url_Request::getBaseWebDir()."jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
       } else {
-         if(strncmp ($file, 'http', 4) == 0){// celá adresa
+         if(strncmp ($dir, 'http', 4) == 0){// celá adresa
             $this->dir = $dir;
          } else {
             $this->dir = Url_Request::getBaseWebDir(true).JsPlugin::JSPLUGINS_BASE_DIR."/JSPLUGINNAME/".$dir;

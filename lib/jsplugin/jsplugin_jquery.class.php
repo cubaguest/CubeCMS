@@ -44,7 +44,7 @@ class JsPlugin_JQuery extends JsPlugin {
     * Metoda nastaví globální téma pro JQueryUI
     * @param string $theme -- název tématu
     */
-   public static function getTheme($theme) {
+   public static function setTheme($theme) {
       self::$globalTheme = $theme;
    }
 
@@ -53,11 +53,16 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return string
     */
    public static function getThemeDir($theme){
-      if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.Template::face()
-         .DIRECTORY_SEPARATOR.self::FACE_THEME_DIR.DIRECTORY_SEPARATOR.$theme)){
-         return Template::face(false).self::FACE_THEME_DIR.URL_SEPARATOR.$theme.URL_SEPARATOR;
+      // cur face
+      if(is_dir(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.Template::face().DIRECTORY_SEPARATOR.self::FACE_THEME_DIR.DIRECTORY_SEPARATOR.$theme)){
+         return Url_Request::getBaseWebDir().Template::FACES_DIR.'/'.Template::face(true).'/'.self::FACE_THEME_DIR.'/'.$theme.'/';
       }
-      return 'ui/themes/'.$theme.URL_SEPARATOR;
+      // main site face
+      else if(VVE_SUB_SITE_DIR != null AND is_dir(AppCore::getAppLibDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.Template::face().DIRECTORY_SEPARATOR.self::FACE_THEME_DIR.DIRECTORY_SEPARATOR.$theme)){
+         return Url_Request::getBaseWebDir(true).Template::FACES_DIR.'/'.Template::face(true).'/'.self::FACE_THEME_DIR.'/'.$theme.'/';
+      }
+      // main css file
+      return Url_Request::getBaseWebDir(true).self::JSPLUGINS_BASE_DIR.'/jquery/ui/themes/'.$theme.'/';
    }
 
    private function addCss($css) {
@@ -91,7 +96,7 @@ class JsPlugin_JQuery extends JsPlugin {
     * Metda vytvoří výchozí konfigurační soubor
     */
    protected function generateFile(JsPlugin_JsFile $file) {
-      
+
    }
 
    /**
