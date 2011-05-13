@@ -36,6 +36,8 @@ class Model_Users extends Model_ORM {
    const COLUMN_BLOCKED    = 'blocked';
    const COLUMN_FOTO_FILE  = 'foto_file'; // dyť není v db?
    const COLUMN_DELETED    = 'deleted';
+   const COLUMN_CREATED    = 'created';
+   const COLUMN_LAST_LOGIN    = 'last_login';
 
 
 
@@ -58,6 +60,8 @@ class Model_Users extends Model_ORM {
       $this->addColumn(self::COLUMN_FOTO_FILE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_CREATED, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_LAST_LOGIN, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');

@@ -27,9 +27,13 @@ class Model_ConfigGlobal extends Model_Config {
    /* SELECT * FROM
       (SELECT `key`, `value` FROM vypecky_config UNION ALL SELECT `key`, `value` FROM cubecms_global_config) AS t
       GROUP BY t.`key`*/
+//       if($dbc->exec("SELECT * FROM `information_schema`.`tables` WHERE `TABLE_SCHEMA` = '" . $this->getDbName() . "' AND `TABLE_SCHEMA` = '. $this->getTableName() .'")){
+//
+//       }
 
       $this->currentSql = 'SELECT * FROM (SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'` FROM '.$this->mainTable.' UNION ALL SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'`'
          .' FROM `'.$this->getTableName().'`) AS t GROUP BY t.`'.self::COLUMN_KEY.'`';
+
       return $this;
    }
 }
