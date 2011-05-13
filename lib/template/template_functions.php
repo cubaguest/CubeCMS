@@ -201,7 +201,7 @@ function vve_tpl_date($format, $timestamp = null) {
  * @param int $h -- výška
  * @param string $alternateStr -- alternativní string
  * @param array $params -- pole s dalšími parametry předanými parametry vkládanými do objektu (parametry param)
- * @return string 
+ * @return string
  */
 function vve_tpl_flash($flashUrl, $w, $h, $alternateStr = '<p>This is <b>alternative</b> content.</p>', $params = array()) {
    $flashStr = null;
@@ -245,8 +245,9 @@ function langsImages($text, $path = 'images/langs/small/') {
  * @param string $path -- cesta k obrázkům
  * @return string tag img
  */
-function vve_tpl_lang_image($lang = null, $path = 'images/langs/small/'){
+function vve_tpl_lang_image($lang = null, $path = null){
    if($lang == null) $lang = Locales::getDefaultLang();
+   if($path == null) $path = Url_Request::getBaseWebDir(true).'images/langs/small/';
    return '<img src="'.$path.$lang.'.png" alt="'.$lang.' flag" class="lang-image" />';
 }
 
@@ -254,7 +255,7 @@ function vve_tpl_lang_image($lang = null, $path = 'images/langs/small/'){
  * Funkce odstraní prázdné tagy kromě nepárových
  * @param string $text -- text
  * @return string
- */ 
+ */
 function vve_remove_empty_tags($text)
 {
    return preg_replace('/<(?!input|br|img|meta|hr|\/)[^>]*>\s*<\/[^>]*>/i', '', $text);
