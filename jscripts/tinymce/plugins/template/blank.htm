@@ -3,7 +3,9 @@
 	<title>blank_page</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<script type="text/javascript">
-		parent.TemplateDialog.loadCSSFiles(document);
+      var d = window.location.href.match(/mce_rdomain=([^&]+)/);
+      if(d != null) document.domain = d[1]
+      parent.TemplateDialog.loadCSSFiles(document);
 	</script>
 </head>
 <body id="mceTemplatePreview" class="mceContentBody">
