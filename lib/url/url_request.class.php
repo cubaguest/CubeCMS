@@ -146,7 +146,7 @@ class Url_Request {
       $scriptName = $_SERVER["SCRIPT_NAME"];
       self::$serverName = $_SERVER["HTTP_HOST"];
 
-      if(VVE_SUB_SITE_DOMAIN != null AND VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND == true){
+      if(VVE_SUB_SITE_DOMAIN != null AND VVE_SUB_SITE_USE_HTACCESS == true){
             $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
             $scriptName = str_replace(VVE_SUB_SITE_DOMAIN, '', $scriptName);
       }
@@ -154,7 +154,7 @@ class Url_Request {
       //		Vytvoříme základní URL cestu k aplikaci
       self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strrpos($scriptName, '/')).'/';
       if(VVE_SUB_SITE_DOMAIN != null){
-         self::$baseMainWebUrl = str_replace(self::$serverName, str_replace(VVE_SUB_SITE_DOMAIN.'.', null, self::$serverName), self::$baseWebUrl);
+         self::$baseMainWebUrl = str_replace(self::$serverName, str_replace(VVE_SUB_SITE_DOMAIN.'.', 'www.', self::$serverName), self::$baseWebUrl);
       }
 //    Najdeme co je cesta k aplikaci a co je předaná url
       self::$fullUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
@@ -231,6 +231,7 @@ class Url_Request {
             unset($modelCat);
             foreach ($categories as $cat) {
                if((string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue;
+//                Debug::log($match['url']);
                if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
                   $matches = array();
                   $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
