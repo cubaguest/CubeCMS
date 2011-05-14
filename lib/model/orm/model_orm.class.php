@@ -681,14 +681,7 @@ class Model_ORM extends Model_PDO {
    public function search($string, $allLangs = false, $fetchParams = self::FETCH_LANG_CLASS)
    {
       $this->setSelectAllLangs($allLangs);
-//      if(empty ($cols)){
       $cols = $this->tableStructure;
-//      } else {
-//         foreach ($this->selectedColumns as $key => $value) {
-//
-//         }
-//      $cols = $this->selectedColumns;
-//      }
       // vybrání sloupců a vytvoření podřetězců
       $selectParts = array();
       $whereParts = array();
@@ -720,7 +713,11 @@ class Model_ORM extends Model_PDO {
       $this->createSQLJoins($sql);
 
       $this->whereBindValues['searchString'] = $string;
-      $this->where = ' MATCH ('. implode(',', $whereParts).') AGAINST (:searchString IN BOOLEAN MODE) AND ' . $this->where;
+      $sqlWhere = ' MATCH ('. implode(',', $whereParts).') AGAINST (:searchString IN BOOLEAN MODE)';
+      if($this->where != null){
+         $sqlWhere .=  'AND ' . $this->where;
+      }
+      $this->where = $sqlWhere;
 
       $this->createSQLWhere($sql, $this->getTableShortName()); // where
       $this->createSQLGroupBy($sql); // group by
