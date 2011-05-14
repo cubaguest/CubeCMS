@@ -1,10 +1,11 @@
 CREATE TABLE IF NOT EXISTS `{PREFIX}courses` (
   `id_course` smallint(6) NOT NULL AUTO_INCREMENT,
+  `type` varchar(15) COLLATE utf8_czech_ci DEFAULT 'kurz',
   `url_key` varchar(100) COLLATE utf8_czech_ci DEFAULT NULL,
   `name` varchar(100) COLLATE utf8_czech_ci DEFAULT NULL,
   `keywords` varchar(200) COLLATE utf8_czech_ci DEFAULT NULL,
-  `description` varchar(300) COLLATE utf8_czech_ci DEFAULT NULL,
-  `text_short` varchar(500) COLLATE utf8_czech_ci DEFAULT NULL,
+  `description` text COLLATE utf8_czech_ci,
+  `text_short` text COLLATE utf8_czech_ci,
   `text` text COLLATE utf8_czech_ci,
   `text_private` text COLLATE utf8_czech_ci,
   `text_clear` text COLLATE utf8_czech_ci,
@@ -16,16 +17,23 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}courses` (
   `hours_lenght` smallint(6) DEFAULT NULL,
   `seats` smallint(6) DEFAULT '0',
   `seats_blocked` smallint(6) DEFAULT '0',
-  `place` varchar(300) COLLATE utf8_czech_ci DEFAULT NULL,
+  `place` text COLLATE utf8_czech_ci,
   `image` varchar(65) COLLATE utf8_czech_ci DEFAULT NULL,
   `is_new` tinyint(1) DEFAULT '0',
   `deleted` tinyint(1) DEFAULT '0',
-  `id_user` smallint(5) unsigned NOT NULL,
+  `id_user` smallint(5) unsigned NOT NULL DEFAULT '0',
   `allow_registration` tinyint(1) DEFAULT '0',
   `rss_feed` tinyint(1) NOT NULL DEFAULT '0',
+  `show_in_list` tinyint(1) NOT NULL DEFAULT '1',
+  `akreditace_mpsv` varchar(45) COLLATE utf8_czech_ci DEFAULT NULL,
+  `akreditace_msmt` varchar(45) COLLATE utf8_czech_ci DEFAULT NULL,
+  `target_groups` varchar(45) COLLATE utf8_czech_ci DEFAULT NULL,
+  `time_start` time DEFAULT NULL,
   PRIMARY KEY (`id_course`,`id_user`),
   UNIQUE KEY `url_key` (`url_key`),
-  KEY `fk_tb_users_id_user` (`id_user`)
+  KEY `fk_tb_users_id_user` (`id_user`),
+  FULLTEXT KEY `name` (`name`),
+  FULLTEXT KEY `text_clear` (`text_clear`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci AUTO_INCREMENT=1;
 
 -- --------------------------------------------------------

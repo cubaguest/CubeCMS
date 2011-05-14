@@ -2,7 +2,7 @@
 /*
  * Třída modelu detailem článku
  */
-class Courses_Model_Courses extends Model_PDO {
+class Courses_Model_Courses extends Model_ORM {
    const DB_TABLE = 'courses';
    const DB_TABLE_LECTURERS_HAS_COURSES = 'lecturers_has_courses';
    const DB_TABLE_COURSES_HAS_USERS = 'courses_has_users';
@@ -46,6 +46,50 @@ class Courses_Model_Courses extends Model_PDO {
 
    const COLUMN_C_H_U_ID_COURSE = 'id_course';
    const COLUMN_C_H_U_ID_USER = 'id_user';
+
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_course');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(15)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => 'kurz'));
+      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
+      $this->addColumn(self::COLUMN_TEXT_SHORT, array('datatype' => 'varchar(700)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT_PRIVATE, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_DATE_START, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
+      $this->addColumn(self::COLUMN_DATE_STOP, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_TIME_EDIT, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PRICE, array('datatype' => 'smallint(6)', 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_HOURS_LEN, array('datatype' => 'smallint(6)', 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_SEATS, array('datatype' => 'smallint(6)', 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_SEATS_BLOCKED, array('datatype' => 'smallint(6)', 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_PLACE, array('datatype' => 'varchar(600)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_IS_NEW, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_DELETED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_ALLOW_REG, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+      $this->addColumn(self::COLUMN_FEED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+      $this->addColumn(self::COLUMN_IN_LIST, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+      $this->addColumn(self::COLUMN_AKREDIT_MPSV, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_AKREDIT_MSMT, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TAGRT_GROUPS, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TIME_START, array('datatype' => 'time', 'pdoparam' => PDO::PARAM_STR));
+
+      $this->addColumn(self::COLUMN_KEYWORDS, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DESCRIPTION, array('datatype' => 'varchar(700)', 'pdoparam' => PDO::PARAM_STR));
+
+
+      $this->setPk(self::COLUMN_ID);
+
+//       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
+
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Courses_Model_Registrations', Courses_Model_Registrations::COLUMN_ID_COURSE);
+   }
 
    /**
     * Metoda uloží novinku do db
@@ -358,27 +402,6 @@ class Courses_Model_Courses extends Model_PDO {
          return new DateTime((string)$fetch->et);
       }
       return false;
-   }
-
-   /**
-    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
-    * @param integer $idCat
-    * @param string $string
-    * @param bool $publicOnly
-    * @return PDOStatement
-    */
-   public function search($idCat, $string){
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COLUMN_NAME.') AGAINST (:sstring)'
-              .' + MATCH('.self::COLUMN_TEXT_CLEAR.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE MATCH('.self::COLUMN_NAME.', '.self::COLUMN_TEXT_CLEAR.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * MATCH('.self::COLUMN_NAME.') AGAINST (:sstring) + MATCH('.self::COLUMN_TEXT_CLEAR.') AGAINST (:sstring) DESC');
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
    }
 }
 
