@@ -86,9 +86,9 @@ class Template_ModuleStatic extends Template_Module {
     * @param <type> $resource
     * @param <type> $directInclude
     */
-   public function  addFile($resource, $directInclude = false) {
+   public function  addFile($resource, $directInclude = false, $vars = null) {
       // přidání názvu modulu do tpl pokud tam není
-      Template::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->getModuleName().':' , $resource), $directInclude);
+      Template::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->getModuleName().':' , $resource), $directInclude, $vars);
    }
 }
 ?>

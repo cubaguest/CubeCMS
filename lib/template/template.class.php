@@ -505,8 +505,8 @@ class Template extends TrObject {
     * Metoda pro přímé vložení souvboru do šablony
     * @param string $res -- zdroj souboru viz. addFile()
     */
-   public function includeFile($res){
-      $this->addFile($res, true);
+   public function includeFile($res, $vars = null){
+      $this->addFile($res, true, $vars);
    }
 
    /**
@@ -525,7 +525,7 @@ class Template extends TrObject {
     *
     * Pokud je za souborem parametr "?original" vloží se originální soubor (ne z faces)
     */
-   public function addFile($resource, $directInclude = false) {
+   public function addFile($resource, $directInclude = false, $vars = null) {
       $matches = array();
       if(preg_match('/^(?P<res>tpl|css|js|http|https):\/\/(?:(?P<module>[a-z_-]+):)?(?P<filepath>(?:[a-z0-9_\/.-]*\/)?(?P<file>[^.]+\.(?P<ext>[^?#]+)))(?:[?#](?P<params>[a-z0-9_.=&#-]+))?$/i', $resource, $matches) == 1) {
          $original = false;

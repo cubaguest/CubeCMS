@@ -120,9 +120,9 @@ class Template_Module extends Template {
    public function includeTpl($name, $engine = false, $vars = null, $module = null) {
       if($module === null) $module = $this->category()->getModule()->getName();
       if($engine){
-         $this->includeFile('tpl://engine:'.$name);
+         $this->includeFile('tpl://engine:'.$name, $vars);
       } else {
-         $this->includeFile('tpl://'.$module.':'.$name);
+         $this->includeFile('tpl://'.$module.':'.$name, $vars);
       }
       unset ($vars);
    }
@@ -211,9 +211,9 @@ class Template_Module extends Template {
     * @param <type> $resource
     * @param <type> $directInclude
     */
-   public function  addFile($resource, $directInclude = false) {
+   public function  addFile($resource, $directInclude = false, $vars = null) {
       // přidání názvu modulu do tpl pokud tam není
-      parent::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->category()->getModule()->getName().':' , $resource), $directInclude);
+      parent::addFile(preg_replace('/^(tpl|css|js):\/\/(?![a-z]+:)/i', '\\1://'.$this->category()->getModule()->getName().':' , $resource), $directInclude, $vars);
    }
 
    /**
