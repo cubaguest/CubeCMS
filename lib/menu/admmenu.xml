@@ -115,7 +115,7 @@
          <name lang="cs">Nápověda</name>
          <name lang="en">Help - only in Czech</name>
          <urlkey lang="cs">admin/info/napoveda</urlkey>
-         <urlkey lang="cs">admin/info/help</urlkey>
+         <urlkey lang="en">admin/info/help</urlkey>
          <module>redirect</module>
          <params>a:2:{s:3:"url";s:90:"https://docs.google.com/document/d/1JOj7JThWEIwWiwWtRl--aLOsXNtPfxGMkucnEe77mBM/edit?hl=cs";s:4:"code";s:3:"301";}</params>
       </item>
