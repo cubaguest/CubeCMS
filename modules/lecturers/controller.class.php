@@ -16,6 +16,29 @@ class Lecturers_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       $model = new Lecturers_Model();
+      $model->where(Lecturers_Model::COLUMN_DELETED.' = 0', array())->order(array(
+          Lecturers_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
+          Lecturers_Model::COLUMN_NAME => Model_ORM::ORDER_ASC,
+      ));
+
+      if($this->getRequestParam('sid', null) != null){
+         $all = $model->records();
+         $page = 1;
+         $counter = 1;
+         foreach($all as $l) {
+            if($counter > $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE)){
+               $counter = 1;
+               $page++;
+            }
+            if($l->{Lecturers_Model::COLUMN_ID} == $this->getRequestParam('sid')){
+               $this->link()->param(Component_Scroll::GET_PARAM, $page)->anchor('lecturer-'.$l->{Lecturers_Model::COLUMN_ID})
+               ->rmParam('sid')->reload();
+            }
+            $counter++;
+         }
+
+
+      }
 
       if($this->category()->getRights()->isWritable()){
          $formDel = new Form('lecture_del_');
@@ -27,7 +50,7 @@ class Lecturers_Controller extends Controller {
          $formDel->addElement($elemSubmit);
 
          if($formDel->isValid()){
-            $model->deleteLecturer($formDel->id->getValues());
+            $model->delete($formDel->id->getValues());
 
             $this->infoMsg()->addMessage($this->_('Lektor byl smazán'));
             $this->link()->rmParam()->reload();
@@ -38,18 +61,16 @@ class Lecturers_Controller extends Controller {
       $scrollComponent = null;
       if($this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE) != 0){
          $scrollComponent = new Component_Scroll();
-         $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->getCount());
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->count());
 
          $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
               $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE));
 
-         $lecturers = $model->getList($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
-      } else {
-         $lecturers = $model->getList();
+         $model->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
 
       $this->view()->compScroll = $scrollComponent;
-      $this->view()->lecturers = $lecturers;
+      $this->view()->lecturers = $model->records();
    }
 
    /**
@@ -64,7 +85,7 @@ class Lecturers_Controller extends Controller {
          if ($addForm->image->getValues() != null) {
             $image = $addForm->image->createFileObject('Filesystem_File_Image');
             $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
-                    $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), 
+                    $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
                     $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP));
             $image->save();
             $imgName = $image->getName();
@@ -77,7 +98,7 @@ class Lecturers_Controller extends Controller {
                          $addForm->degreeAfter->getValues(),
                          $addForm->text->getValues(),
                          $imgName);
-         
+
          $this->infoMsg()->addMessage($this->_('Lektor byl uložen'));
          $this->link()->route()->reload();
       }
@@ -120,7 +141,7 @@ class Lecturers_Controller extends Controller {
             unset ($oldImg);
             $imgName = null;
          }
-         
+
          if ($editForm->image->getValues() != null) {
             $image = $editForm->image->createFileObject('Filesystem_File_Image');
             $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
@@ -137,7 +158,7 @@ class Lecturers_Controller extends Controller {
                          $editForm->degreeAfter->getValues(),
                          $editForm->text->getValues(),
                          $imgName, $lecturer->{Lecturers_Model::COLUMN_ID});
-                         
+
          $this->infoMsg()->addMessage($this->_('Uloženo'));
          $this->link()->route()->reload();
       }
@@ -178,7 +199,7 @@ class Lecturers_Controller extends Controller {
       $iImage->setUploadDir(AppCore::getAppDataDir().self::DATA_DIR.DIRECTORY_SEPARATOR);
       $form->addElement($iImage, 'image');
 
-      $iSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
 
       return $form;
@@ -189,7 +210,7 @@ class Lecturers_Controller extends Controller {
     * @param Category $category
     */
    public static function clearOnRemove(Category $category) {
-     
+
    }
 
    /**

@@ -1,17 +1,8 @@
 <?
-//$this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
    $this->addPageTitle(sprintf($this->_('úprava lektora "%s"'),$this->lecturer->{Lecturers_Model::COLUMN_NAME}.' '.$this->lecturer->{Lecturers_Model::COLUMN_SURNAME}));
    $this->addPageHeadline(sprintf($this->_('úprava lektora "%s"'),$this->lecturer->{Lecturers_Model::COLUMN_NAME}.' '.$this->lecturer->{Lecturers_Model::COLUMN_SURNAME}));
-
-   // přidáme obrázek do popisku
-//   $img = new Html_Element('img');
-//   $img->setAttrib('src', $this->category()->getModule()->getDataDir(true).$this->band->{Bands_Model::COLUMN_IMAGE})
-//   ->setAttrib('alt' , $this->band->{Bands_Model::COLUMN_IMAGE})->setAttrib('height', 40);
-
-
-
 } else {
    $this->addPageTitle($this->_('přidání lektora'));
    $this->addPageHeadline($this->_('přidání lektora'));
@@ -28,7 +19,6 @@ if(isset ($this->form->imgdel)){
 
 <div class="article-form-edit">
    <?
-   print($this->form);
-   $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));
+   echo($this->form);
    ?>
 </div>

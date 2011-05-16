@@ -2,7 +2,7 @@
 /*
  * Třída modelu detailem článku
 */
-class Lecturers_Model extends Model_PDO {
+class Lecturers_Model extends Model_ORM {
    const DB_TABLE = 'lecturers';
 
    /**
@@ -17,6 +17,22 @@ class Lecturers_Model extends Model_PDO {
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_IMAGE = 'image';
    const COLUMN_DELETED = 'deleted';
+
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_lect');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(20)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
+      $this->addColumn(self::COLUMN_SURNAME, array('datatype' => 'varchar(20)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
+      $this->addColumn(self::COLUMN_DEGREE, array('datatype' => 'varchar(10)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DEGREE_AFTER, array('datatype' => 'varchar(10)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(45)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DELETED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->setPk(self::COLUMN_ID);
+//       $this->addRelatioOneToMany(self::COLUMN_ID, 'Articles_Model_PrivateUsers', course::COLUMN_A_H_U_ID_ARTICLE);
+   }
 
    /**
     * Metoda uloží novinku do db
@@ -160,19 +176,6 @@ class Lecturers_Model extends Model_PDO {
    }
 
    /**
-    * Metoda vymaže články podle zadaného id kategorie
-    * @param int $id -- id kategorie
-    */
-//   public function deleteArticleByCat($id) {
-//      $dbc = new Db_PDO();
-//      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
-//              ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
-//      $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
-//      $dbst->execute();
-//      return $dbst;
-//   }
-
-   /**
     * Metoda nastaví změnu článku
     * @param int $id -- id článku
     */
@@ -183,37 +186,6 @@ class Lecturers_Model extends Model_PDO {
               ." WHERE (".self::COLUMN_ID." = :idart)");
       $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
       return $dbst->execute();
-   }
-
-   /**
-    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
-    * @param integer $idCat
-    * @param string $string
-    * @param bool $publicOnly
-    * @return PDOStatement
-    */
-   public function search($string, $publicOnly = true) {
-      $dbc = new Db_PDO();
-      $clabel = self::COLUMN_NAME;
-      $ctext = self::COLUMN_TEXT_CLEAR;
-
-      $wherePub = null;
-      if($publicOnly) {
-         $wherePub = ' AND '.self::COLUMN_PUBLIC.' = 1';
-      }
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.$clabel.') AGAINST (:sstring)'
-              .' + MATCH('.$ctext.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE MATCH('.$clabel.', '.$ctext.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .$wherePub // Public articles
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$ctext.') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
    }
 }
 

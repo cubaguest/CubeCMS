@@ -11,7 +11,7 @@
    if(!empty ($vars['lecturers'])) {
       foreach ($vars['lecturers'] as $lecturer) {
          ?>
-   <div class="article-list-record module-lecturers-list-record">
+   <div class="article-list-record module-lecturers-list-record" id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
       <<?=$vars['hE']?> class="<?=$vars['hEClass']?>" id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
          <?
          printDegree($lecturer->{Lecturers_Model::COLUMN_DEGREE});
