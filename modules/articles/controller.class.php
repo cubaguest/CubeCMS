@@ -41,7 +41,7 @@ class Articles_Controller extends Controller {
             // kategorie a vyplněný urlkey
             .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
-            
+
             array(
             'idusr' => Auth::getUserId(),
             'idusr2' => Auth::getUserId(),
@@ -51,7 +51,7 @@ class Articles_Controller extends Controller {
             .'AND '.Articles_Model::COLUMN_ADD_TIME.' < NOW() '
             .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
-            
+
             array('idc' => $this->category()->getId()));
       }
 
@@ -251,6 +251,8 @@ class Articles_Controller extends Controller {
                  $this->category()->getRights()->isControll());
          $compComments->setConfig(Component_Comments::PARAM_NEW_ARE_PUBLIC,
                  !$this->category()->getParam('discussion_not_public', false));
+         $compComments->setConfig(Component_Comments::PARAM_FACEBOOK,
+                 $this->category()->getParam('discussion_fcb', false));
          // uzavření diskuze
          if($this->category()->getParam('discussion_closed', self::DEFAULT_CLOSED_COMMENTS_DAYS) != 0){
             $timeAdd = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
@@ -494,8 +496,8 @@ class Articles_Controller extends Controller {
       // add time
       $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
       $artRecord->{Articles_Model::COLUMN_ADD_TIME} = $addDateTime;
-      
-      
+
+
       $artRecord->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
       $artRecord->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
 
@@ -758,6 +760,12 @@ class Articles_Controller extends Controller {
          $form->discussion_allow->setValues($settings['discussion_allow']);
       }
 
+      $elemFcbComments = new Form_Element_Checkbox('discussion_fcb', $this->tr('Použít Facebook diskusi'));
+      $form->addElement($elemFcbComments, 'discussion');
+      if(isset($settings['discussion_fcb'])) {
+         $form->discussion_fcb->setValues($settings['discussion_fcb']);
+      }
+
       $elemCommentsNotPublic = new Form_Element_Checkbox('discussion_not_public',
               $this->tr('Příspěvky čekají na schválení'));
       $form->addElement($elemCommentsNotPublic, 'discussion');
@@ -788,6 +796,7 @@ class Articles_Controller extends Controller {
          $settings[self::PARAM_SORT] = $form->sort->getValues();
          $settings[self::PARAM_DISABLE_LIST] = $form->disableList->getValues();
          $settings['discussion_allow'] = $form->discussion_allow->getValues();
+         $settings['discussion_fcb'] = $form->discussion_fcb->getValues();
          $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
          $settings['discussion_closed'] = $form->discussion_closed->getValues();
          $settings[self::PARAM_PRIVATE_ZONE] = (bool)$form->allow_private_zone->getValues();
