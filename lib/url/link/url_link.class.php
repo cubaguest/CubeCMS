@@ -104,6 +104,18 @@ class Url_Link {
    protected static $currentFile = null;
 
    /**
+    * Kotva který se má zobrazit
+    * @var string
+    */
+   protected $anchor = null;
+
+   /**
+    * Kotva který se má zobrazit
+    * @var string
+    */
+   protected static $currentAnchor = null;
+
+   /**
     * Konstruktor nastaví základní adresy a přenosový protokol
     * @param boolean $clear -- (option) true pokud má být vrácen čistý link jenom s kategorií(pokud je vybrána) a jazykem
     * @param boolean $onlyWebRoot -- (option) true pokud má být vráce naprosto čistý link (web root)
@@ -279,6 +291,15 @@ class Url_Link {
    }
 
    /**
+    * Metoda nastaví aktuální kotvu
+    * @param string $anchor -- název kotvy
+    */
+   public function anchor($anchor = null) {
+      $this->anchor = $anchor;
+      return $this;
+   }
+
+   /**
     * Metoda nastaví parametry (přepíše původní)
     * @param string/array $params -- pole nebo řetězec parametrů
     */
@@ -333,6 +354,7 @@ class Url_Link {
       $this->rmParam();
       $this->file(null);
       $this->route = null;
+      $this->anchor = null;
       if($withOutCategory) {
          $this->category();
       }
@@ -353,6 +375,7 @@ class Url_Link {
       $this->route = self::$currentRoute;
       $this->file = self::$currentFile;
       $this->paramsArray = self::$currentParams;
+      $this->anchor = self::$currentAnchor;
    }
 
    /*
@@ -381,6 +404,9 @@ class Url_Link {
       //        Parsovatelné parametry
       if(!empty ($this->paramsArray)) {
          $returnString.=$this->getParams();
+      }
+      if($this->anchor != null) {
+         $returnString.=$this->getAnchor();
       }
       $returnString = $this->repairUrl($returnString);
       return $returnString;
@@ -465,6 +491,18 @@ class Url_Link {
    protected function getFile() {
       if($this->file != null) {
          return $this->file;
+      } else {
+         return null;
+      }
+   }
+
+   /**
+    * Metoda vrací část s kotvou v url
+    * @param string -- kotva
+    */
+   protected function getAnchor() {
+      if($this->anchor != null) {
+         return '#'.$this->anchor;
       } else {
          return null;
       }
