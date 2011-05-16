@@ -436,9 +436,13 @@ class AppCore extends TrObject {
    {
       $cfgModel = new Model_ConfigGlobal();
 //       $recs = $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->records(PDO::FETCH_OBJ);
-      $recs = $cfgModel->mergedConfigValues()->records(PDO::FETCH_OBJ);
-      if($recs == false){
-			throw new unexpectedValueException($this->tr("Nepodařilo se načíst konfiguraci. Chyba připojení k DB?"));
+      $recs = $cfgModel->mergedConfigValues()->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->records(PDO::FETCH_OBJ);
+      if($recs == false){ // asi není vytvořena tabulka s globalním nastavením
+         $cfgModel = new Model_Config();
+         $recs = $cfgModel->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->records(PDO::FETCH_OBJ);
+         if($recs == false){
+            throw new unexpectedValueException($this->tr("Nepodařilo se načíst konfiguraci. Chyba připojení k DB?"));
+         }
       }
       foreach ($recs as $record) {
          if(!defined('VVE_'.$record->{Model_Config::COLUMN_KEY})) {

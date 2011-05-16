@@ -21,6 +21,10 @@ class Install_Core {
    const FILE_SQL_PATCH = 'patch_{to}.sql';
    const FILE_PHP_PATCH = 'patch_{to}.php';
 
+   const SQL_MAIN_SITE_UPDATE = 'UPDATE_MAIN_SITE';
+   const SQL_SUB_SITE_UPDATE = 'UPDATE_SUB_SITE';
+   const SQL_SITE_END_UPDATE = 'END_UPDATE';
+
    protected $tablesPrefix = '{PREFIX}';
 
    public function __construct()
@@ -55,28 +59,64 @@ class Install_Core {
             $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_PHP_UPGRADE);
 
 
-            if (file_exists($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName)) {
+            if (is_file($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName)) {
                include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName;
             }
 
             /* sql update */
-            $sqlFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_SQL_UPGRADE);
+            $sqlFile = $this->getInstallDir() . $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR
+               . preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_SQL_UPGRADE);
 
-            $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR, false);
-            if ($file->exist()) {
-               $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
+            if(is_file($sqlFile)){
+               $handle = @fopen($sqlFile, "r");
+               if ($handle) {
+                  $update = 'all';
+                  $sql = null;
+                  $m = str_repeat('-', 2);
+
+                  while (($buffer = fgets($handle)) !== false) {
+                     if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_MAIN_SITE_UPDATE)){
+                        $update = 'main';
+                        $sql .= $m.' UPDATING '. $update .' ' .$m ."\n";
+                     } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SUB_SITE_UPDATE)){
+                        $update = 'sub';
+                        $sql .= $m . ' UPDATING '. $update .' ' . $m ."\n";
+                     } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SITE_END_UPDATE)){
+                        $sql .= $m.' ENDING '. $update .' '. $m ."\n";
+                        $update = 'all';
+                     } else {
+                        if($buffer != null && ($update == 'all' || (VVE_SUB_SITE_DIR == null && $update == 'main' ) || (VVE_SUB_SITE_DIR != null && $update == 'sub' ) )){
+                           $sql .= $buffer;
+                        } else {
+                           $sql .= $m.' SKIPING '. $update .' '. $m ."\n";
+//                            $sql .= '-- '.$buffer;
+                        }
+                     }
+                  }
+//                   echo nl2br("-- SQL Update :\n ".$sql);
+                  $this->runSQLCommand($this->replaceDBPrefix($sql));
+
+                  if (!feof($handle)) {
+                     echo "Error: unexpected fgets() fail\n";
+                  }
+
+                  fclose($handle);
+               }
             }
+
+
             $record->{Model_Config::COLUMN_VALUE} = $currentVer + 1;
             $modelCfg->save($record);
 
             $currentVer++; // loop na další verzi
          }
       } catch (Exception $exc) {
-         echo "<br/><strong>Chyba při upgradu!!!</strong><br />";
-         echo '<pre>'.$exc->getTraceAsString().'</pre>';
-         echo '<pre>'.htmlspecialchars($this->replaceDBPrefix($file->getContent())).'</pre>';
-
-         die;
+         echo 'ERROR: Chyba při upgradu<br />';
+         echo $exc->getMessage().'<br />';
+         echo 'SQL: '.nl2br($sql).'<br />';
+         echo "DEBUG: <br/ >";
+         echo $exc->getTraceAsString();
+         die ();
       }
       $this->installComplete(sprintf(_('Jádro bylo aktualizováno na verzi %s release %s'), AppCore::ENGINE_VERSION, 0));
    }
@@ -113,25 +153,72 @@ class Install_Core {
          try {
             /* php update */
             $phpFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_PHP_PATCH);
-            if (file_exists($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName)) {
+            if (is_file($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName)) {
                include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName;
             }
 
             /* sql update */
-            $sqlFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_SQL_PATCH);
-            $file = new Filesystem_File_Text($sqlFileName, $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR, false);
-            if ($file->exist()) {
-               $this->runSQLCommand($this->replaceDBPrefix($file->getContent()));
+            $sqlFile = $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR
+               . preg_replace('/{to}/', $currentRelease + 1, self::FILE_SQL_PATCH);
+
+            if(is_file($sqlFile)){
+               $handle = @fopen($sqlFile, "r");
+               if ($handle) {
+                  $update = 'all';
+                  $sql = null;
+                  $m = str_repeat('-', 2);
+
+                  while (($buffer = fgets($handle)) !== false) {
+                     if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_MAIN_SITE_UPDATE)){
+                        $update = 'main';
+                        $sql .= $m.' UPDATING '. $update ."\n";
+                     } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SUB_SITE_UPDATE)){
+                        $update = 'sub';
+                        $sql .= $m . ' UPDATING '. $update."\n";
+                     } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SITE_END_UPDATE)){
+                        $sql .= $m.' ENDING '. $update."\n";
+                        $update = 'all';
+                     } else if($buffer != null) {
+                        if($update == 'all' ||
+                        (defined('VVE_SUB_SITE_DIR') && ((!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR == null && $update == 'main' )
+                                                     || (!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR != null && $update == 'sub' ) ) )
+                        // for old subdomain htaccess
+                        || (defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && ((VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND == null && $update == 'main' )
+                                                                          || (VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null && $update == 'sub' )) )
+                                                                          ){
+                           $sql .= $buffer;
+                        } else {
+                           $sql .= $m.' SKIPING '. $update  ."\n";
+//                            $sql .= '-- '.$buffer;
+                        }
+                     }
+                  }
+//                   echo nl2br("-- SQL Update :\n ".$sql);die();
+                  $sql = $this->replaceDBPrefix($sql);
+//                   echo $sql;
+                  $this->runSQLCommand($sql);
+
+                  if (!feof($handle)) {
+                     echo "Error: unexpected fgets() fail\n";
+                  }
+
+                  fclose($handle);
+               }
             }
+
             $record->{Model_Config::COLUMN_VALUE} = $currentRelease + 1;
             $modelCfg->save($record);
          } catch (Exception $exc) {
             echo 'ERROR: Chyba při aktualizaci<br />';
+            echo $exc->getMessage().'<br />';
+            echo 'SQL: '.nl2br($sql).'<br />';
+            echo "DEBUG: <br/ >";
             echo $exc->getTraceAsString();
             die ();
          }
          $currentRelease++;
       }
+//       die();
       $this->installComplete(sprintf('Jádro bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
    }
 
@@ -172,7 +259,11 @@ class Install_Core {
    protected function runSQLCommand($SQL)
    {
       $model = new Model_DbSupport();
-      $model->runSQL($SQL);
+      $stmt = $model->runSQL($SQL);
+      if(!$stmt){
+         var_dump($stmt->errorInfo());
+         throw new PDOException('Undefined SQL error.');
+      }
    }
 
    protected function getSQLFileContent($file = 'install.sql')
