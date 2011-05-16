@@ -30,7 +30,7 @@ class Articles_Controller extends Controller {
       $query = $artModel;
       if($this->category()->getRights()->isControll()){
          $artModel->setSelectAllLangs(true);
-         $query->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc'
+         $query->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
             ,array('idc' => $this->category()->getId()));
       } else if($this->category()->getRights()->isWritable()){
          $query->where(
