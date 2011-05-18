@@ -46,13 +46,17 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             $pos = strrpos($collName, '_');
             $lang = substr($collName, $pos + 1,$collLen-1-$pos);
             $collName = substr($collName, 0, $pos);
-
             if(!isset ($this->columns[$collName])){ // není sloupce z této tabulky
                $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
                $this->columns[$collName]['extern'] = true;
             }
             if (!($this->columns[$collName]['value'] instanceof Model_ORM_LangCell)) {
                $this->columns[$collName]['value'] = new Model_ORM_LangCell();
+               if ($this->fromDb == true AND ($this->columns[$collName]['changed'] == 0)) {
+                  $this->columns[$collName]['changed'] = -1;
+               } else {
+                  $this->columns[$collName]['changed'] = 1;
+               }
             }
             $this->columns[$collName]['value']->addValue($lang, $value);
          } else {
@@ -73,11 +77,11 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          if (isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true) {// primary key (jazykové nejsou pk)
             $this->pKeyValue = $value;
          }
-      }
-      if ($this->fromDb == true AND $this->columns[$collName]['changed'] == 0) {
-         $this->columns[$collName]['changed'] = -1;
-      } else {
-         $this->columns[$collName]['changed'] = 1;
+         if ($this->fromDb == true AND ($this->columns[$collName]['changed'] == 0)) {
+            $this->columns[$collName]['changed'] = -1;
+         } else {
+            $this->columns[$collName]['changed'] = 1;
+         }
       }
    }
 

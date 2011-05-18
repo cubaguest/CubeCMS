@@ -56,7 +56,7 @@ class Model_ORM extends Model_PDO {
       'fulltext' => false, // FULLTEXT na sloupci
       // ostatní parametry
       'extern' => false, // externí sloupec
-      'changed' => 0, // INTERNAL -- check if column is changed
+      'changed' => 0, // INTERNAL -- check if column is changed: 0 - is new cell; -1 - cell is loaded from db; 1 - cell is updated in app;
       'pdoparam' => PDO::PARAM_STR, // typ sloupce (PDO::PARAM_)
       'lang' => false,
       'value' => false,
@@ -499,7 +499,11 @@ class Model_ORM extends Model_PDO {
     */
    public function getSQLQuery()
    {
-      $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+      if($this->currentSql == null){
+         $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+      } else {
+         $sql = $this->currentSql;
+      }
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName()); // where
       $this->createSQLOrder($sql); // order
@@ -518,7 +522,7 @@ class Model_ORM extends Model_PDO {
          $colsStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if ($params['extern'] == true OR $params['changed'] != 1)
+            if ($params['extern'] == true OR $params['changed'] < 1)
                continue;
             if (!isset($params['lang']))
                $params['lang'] = false;
@@ -548,7 +552,7 @@ class Model_ORM extends Model_PDO {
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if ($params['extern'] == true OR $params['changed'] != 1)
+            if ($params['extern'] == true OR $params['changed'] < 1)
                continue;
             if (!isset($params['lang']))
                $params['lang'] = false;
