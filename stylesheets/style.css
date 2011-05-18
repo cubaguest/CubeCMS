@@ -385,7 +385,7 @@ textarea, form .form-table .form-element-long {
    overflow: hidden;
 }
 .panel-box {}
-.panel-box-label {
+.panel-box-label, .panel-box-content-label {
    font-weight: bold;
 }
 .panel-box-content {
