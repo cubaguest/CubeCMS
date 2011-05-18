@@ -1,5 +1,5 @@
 <?php
-/** 
+/**
  * Třída Komponenty pro práci se scrolováním stránek.
  * Třída obsahuje metody pro práci s posunováním stránek. Je určena hlavně
  * ke posunování mezi více stránkami (např. novinky). Obsahuje také vlastní šablonu,
@@ -57,6 +57,11 @@ class Component_Scroll extends Component {
    const PAGE_LAST = 'last';
 
    /**
+    * Název aprametru se stránkou
+    */
+   const GET_PARAM = 'page';
+
+   /**
     * Aktuální stránka
     *
     * @var integer
@@ -69,7 +74,7 @@ class Component_Scroll extends Component {
     */
    private $countAllPages = 0;
 
-   protected $config = array('page_param' => 'page',
+   protected $config = array('page_param' => self::GET_PARAM,
            self::CONFIG_RECORDS_ON_PAGE => 10,
            'disable_prevnext_before_end' => true,
            self::CONFIG_BACKWARD => false,
