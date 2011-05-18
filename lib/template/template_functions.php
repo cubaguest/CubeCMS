@@ -36,21 +36,21 @@ function vve_get_tpl_file($file, $type) {
  * @link http://www.root.cz/clanky/php-zkraceni-textu-s-xhtml-znackami/
  */
 function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...') {
-   $strLen = strlen($s);
+   $strLen = mb_strlen($s);
    $length = 0;
    $tags = array(); // dosud neuzavřené značky
-   for ($i=0; $i < strlen($s) && $length < $limit; $i++) {
+   for ($i=0; $i < mb_strlen($s) && $length < $limit; $i++) {
       switch ($s{$i}) {
 
          case '<':
          // načtení značky
             $start = $i+1;
-            while ($i < strlen($s) && $s{$i} != '>' && !ctype_space($s{$i})) {
+            while ($i < mb_strlen($s) && $s{$i} != '>' && !ctype_space($s{$i})) {
                $i++;
             }
-            $tag = substr($s, $start, $i - $start);
+            $tag = mb_substr($s, $start, $i - $start);
             // přeskočení případných atributů
-            while ($i < strlen($s) && $s{$i} != '>') {
+            while ($i < mb_strlen($s) && $s{$i} != '>') {
                $i++;
             }
             if ($s{$start} == '/') { // uzavírací značka
@@ -62,7 +62,7 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...') {
 
          case '&':
             $length++;
-            while ($i < strlen($s) && $s{$i} != ';') {
+            while ($i < mb_strlen($s) && $s{$i} != ';') {
                $i++;
             }
             break;
@@ -72,7 +72,7 @@ function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...') {
 
       }
    }
-   $s = substr($s, 0, $i);
+   $s = mb_substr($s, 0, $i);
    if($strLen > $limit) {
       $s .= $delimiter;
    }
