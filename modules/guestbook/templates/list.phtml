@@ -1,5 +1,5 @@
 <div class="guestbook-items main-content-list">
-   <?foreach ($this->books as $row) {?>
+   <?foreach ($this->posts as $row) {?>
    <div class="guestbook-item main-content-list-record">
       <div class="main-content-list-record-date">
          <em><?=vve_date('%x %X', new DateTime($row->{GuestBook_Model::COLUMN_DATE_ADD}))?></em>
@@ -10,7 +10,7 @@
             ?><div class="main-content-text"><a href="<?=$row->{GuestBook_Model::COLUMN_WWW}?>"
             title="<?=$row->{GuestBook_Model::COLUMN_WWW}?>"><?=htmlspecialchars($row->{GuestBook_Model::COLUMN_WWW})?></a></div><?
          }?>
-            <div class="main-content-text"><?=$row->{GuestBook_Model::COLUMN_TEXT}?></div>
+            <div class="main-content-text"><?=$this->filter($row->{GuestBook_Model::COLUMN_TEXT}, array('emoticons', 'anchors'))?></div>
          <?if($this->toolboxItem instanceof Template_Toolbox2){
             $this->toolboxItem->guestbook_item_->getForm()->id->setValues((int)$row->{GuestBook_Model::COLUMN_ID});
             echo $this->toolboxItem;
