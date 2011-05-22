@@ -1,0 +1,33 @@
+#php_value memory_limit 48M
+
+RewriteEngine On
+RewriteRule ^config/config\.php$ / [R=permanent,L]
+
+# RewriteCond $1 ^jscripts/
+# RewriteCond %{REQUEST_FILENAME} !-f
+# Rewriterule ^jscripts/(.*) http://www.cube.cz/jscripts/$1 [R,L]
+# RewriteCond $1 ^jscripts/
+# RewriteCond %{REQUEST_FILENAME} !-f
+# Rewriterule (.*) http://www.cube.cz/$1 [R,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule ^jscripts/(.*)$ http://www.cube.cz/jscripts/$1 [R=301,L,QSA]
+
+RewriteCond $1 ^images/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube.cz/$1 [L]
+RewriteCond $1 ^data/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube.cz/$1 [L]
+RewriteCond $1 ^stylesheets/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube.cz/$1 [L]
+
+
+RewriteCond %{REQUEST_URI} !\.[[:alnum:]]+$
+RewriteRule ^(.+[^/])$ /$1/ [L,R=301,QSA]
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ ./index.php [NC,L]
