@@ -28,11 +28,12 @@ class GuestBook_Panel extends Panel {
       $form->addElement($elemNum,'basic');
 
       if(isset($settings[self::PARAM_NUM_POSTS])) {
-         $form->num->setValues($settings['self::PARAM_NUM_POSTS']);
+         $form->num->setValues($settings[self::PARAM_NUM_POSTS]);
       }
 
       $elemLeaveMessage = new Form_Element_Checkbox('leavemsg', 'Zobrazit "zanechat vzkaz"');
       $form->addElement($elemLeaveMessage, 'basic');
+      $form->leavemsg->setValues(true);
 
       if(isset($settings[self::PARAM_SHOW_LEAVE_MESSAGE])) {
          $form->leavemsg->setValues((bool)$settings[self::PARAM_SHOW_LEAVE_MESSAGE]);

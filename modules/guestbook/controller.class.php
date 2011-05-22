@@ -94,7 +94,7 @@ class GuestBook_Controller extends Controller {
          }
          $model->save($newItem);
          $this->infoMsg()->addMessage($this->_('Příspěvek byl uložen'));
-         $this->link()->reload();
+         $this->link()->param('s')->reload();
       }
       $this->view()->form = $form;
 

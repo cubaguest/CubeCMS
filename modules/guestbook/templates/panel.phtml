@@ -17,7 +17,6 @@ if($this->panelObj()->getBackImage() != null){
          <?=$this->filter(vve_tpl_xhtml_cut(strip_tags($post->{GuestBook_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150), array('emoticons'))?>
          </div>
       <?}?>
-      </div>
    <?}?>
    <?
    if($this->leaveMsg){?>
