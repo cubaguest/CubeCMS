@@ -15,6 +15,26 @@ BEGIN
    END IF;
 END;
 
+/*
+DELIMITER $$
+--
+-- Procedury
+--
+CREATE DEFINER=`podaneruce`@`localhost` PROCEDURE `checkCatColumns`()
+BEGIN
+   IF NOT EXISTS (SELECT NULL FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME='label_sk' AND TABLE_NAME='ies_categories') THEN
+      ALTER TABLE `ies_categories`
+         ADD COLUMN `urlkey_sk` VARCHAR(100) CHARACTER SET 'utf8' COLLATE 'utf8_slovak_ci' NULL DEFAULT NULL  AFTER `alt_cs` ,
+         ADD COLUMN `label_sk` VARCHAR(200) CHARACTER SET 'utf8' COLLATE 'utf8_slovak_ci' NULL DEFAULT NULL  AFTER `urlkey_sk` ,
+         ADD COLUMN `alt_sk` VARCHAR(200) CHARACTER SET 'utf8' COLLATE 'utf8_slovak_ci' NULL DEFAULT NULL  AFTER `label_sk` ,
+         ADD COLUMN `keywords_sk` VARCHAR(200) CHARACTER SET 'utf8' COLLATE 'utf8_slovak_ci' NULL DEFAULT NULL  AFTER `description_cs` ,
+         ADD COLUMN `description_sk` VARCHAR(500) CHARACTER SET 'utf8' COLLATE 'utf8_slovak_ci' NULL DEFAULT NULL  AFTER `keywords_sk` ,
+         CHANGE COLUMN `urlkey_cs` `urlkey_cs` VARCHAR(100) CHARACTER SET 'utf8' COLLATE 'utf8_czech_ci' NULL DEFAULT NULL,
+         ADD FULLTEXT INDEX `label_sk` (`label_sk`), ADD FULLTEXT INDEX `description_sk` (`description_sk`) ;
+   END IF;
+END$$
+DELIMITER ;*/
+
 CALL checkCatColumns();
 /* DROP PROCEDURE IF EXISTS checkCatColumns;
 
@@ -43,6 +63,23 @@ INSERT INTO `cubecms_global_config` SELECT * FROM `{PREFIX}config` WHERE
 `key` != 'VERSION' AND
 `key` != 'RELEASE';
 
+
+/* tabulka s podweby */
+CREATE TABLE IF NOT EXISTS `{PREFIX}sub_sites` (
+  `id_site` smallint(6) NOT NULL AUTO_INCREMENT,
+  `domain` varchar(20) NOT NULL,
+  `dir` varchar(20) NOT NULL,
+  `table_prefix` varchar(20) NOT NULL,
+  PRIMARY KEY (`id_site`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}sub_sites_admin_groups` (
+  `id_site` smallint(6) NOT NULL,
+  `id_group` int(11) NOT NULL,
+  KEY `id_site` (`id_site`,`id_group`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='tabulka propojení podwebů se skupinami adminů';
+
+
 /* END_UPDATE */
 
 /* delete old non global settings (same as insert in main) */
@@ -67,8 +104,10 @@ CHANGE `label_en` `label_en` VARCHAR( 200 ) CHARACTER SET utf8 COLLATE utf8_gene
 CHANGE `label_de` `label_de` VARCHAR( 200 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
 CHANGE `label_sk` `label_sk` VARCHAR( 200 ) CHARACTER SET utf8 COLLATE utf8_slovak_ci NULL DEFAULT NULL;
 
-/* add admin flags to groups */
-ALTER TABLE `{PREFIX}groups` ADD `admin` BOOLEAN NOT NULL DEFAULT '0';
+/* add admin flags to groups and subsites */
+ALTER TABLE `{PREFIX}groups`
+ADD `admin` BOOLEAN NOT NULL DEFAULT '0';
+-- ,ADD `admin_subsites` VARCHAR( 200 ) NULL DEFAULT NULL
 UPDATE `{PREFIX}groups` SET `admin` = '1' WHERE `id_group` = 1;
 
 
@@ -84,7 +123,7 @@ INSERT INTO `{PREFIX}config` (`key`, `label`, `value`, `protected`, `type`, `id_
 /* END_UPDATE */
 
 /* remove old settings */
-DELETE FROM `{PREFIX}config` WHERE `key` = 'USE_SUBDOMAIN_HTACCESS_WORKAROUND';
+DELETE FROM `{PREFIX}config` WHERE `key` = 'USE_SUBDOMAIN_HTACCESS_WORKAROUND' OR `key` = 'SMTP_SERVER_ENCRYPT';
 
 /* UPDATE_MAIN_SITE */
 INSERT INTO `cubecms_global_config` (`key`, `label`, `value`, `protected`, `type`, `id_group`) VALUES
@@ -95,7 +134,8 @@ INSERT INTO `cubecms_global_config` (`key`, `label`, `value`, `protected`, `type
 ('SUB_SITE_DOMAIN', 'Doména podstránek', NULL, false, 'string', 1),
 ('SUB_SITE_DIR', 'Adresár s podstránkami', NULL, false, 'string', 1),
 ('SUB_SITE_USE_HTACCESS', 'Jestli je pro subdomény použit htaccess', false, false, 'bool', 1),
-('MAIN_SITE_TABLE_PREFIX', 'Prefix tabulek hlavních stránek (některé moduly využívají globální tabulky)', NULL, false, 'string', 1);
+('MAIN_SITE_TABLE_PREFIX', 'Prefix tabulek hlavních stránek (některé moduly využívají globální tabulky)', NULL, false, 'string', 1),
+('SMTP_SERVER_ENCRYPT', 'Šifrování spojení k SMTP serveru (tls, ssl)', NULL, false, 'string', 6);
 /* END_UPDATE */
 
 /* indexy pro urlkey */
