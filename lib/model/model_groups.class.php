@@ -32,8 +32,9 @@ class Model_Groups extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Users', Model_Users::COLUMN_GROUP_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Rights', Model_Rights::COLUMN_ID_GROUP);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_SubSitesAdminGroups', Model_SubSitesAdminGroups::COLUMN_ID_GROUP);
    }
-   
+
    /**
     * Metoda vrací název tabulky se skupinami (včetně prefixu)
     * @return string -- název tabulky

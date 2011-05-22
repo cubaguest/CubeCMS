@@ -27,7 +27,11 @@ class Model_Session extends Model_ORM {
    const COLUMN_ID_USER    = 'id_user';
 
    protected function  _initTable() {
-      $this->setTableName($this->tableName, 't_ses');
+      if(VVE_USE_GLOBAL_ACCOUNTS != true){
+         $this->setTableName($this->tableName, 't_ses');
+      } else {
+         $this->setTableName(VVE_GLOBAL_TABLES_PREFIX.$this->tableName, 't_ses', false);
+      }
 
       $this->addColumn(self::COLUMN_KEY, array('datatype' => 'varchar', 'nn' => true, 'pk' => true, 'uq' => true));
       $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'blob', 'pdoparam' => PDO::PARAM_STR));
