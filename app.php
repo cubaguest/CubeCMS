@@ -991,15 +991,17 @@ class AppCore extends TrObject {
    {
       // načtení systémového konfiguračního souboru
       try {
+         // config
          $this->_initConfig();
+         // inicializace URL
+         Url_Request::factory();
          // kontrola verze enginu
          $this->checkCoreVersion();
          //		inicializace sessions
          Session::factory();
          //		Inicializace chybových hlášek
          $this->_initMessagesAndErrors();
-         //		inicializace URL
-         Url_Request::factory();
+
          /*
           * TODO: Tohle se musí doladit, protože to je začarovaný kruch.
           * Locales závisí na URL_Requestu a URL_Request zívisí na Auth a Auth na Locales
