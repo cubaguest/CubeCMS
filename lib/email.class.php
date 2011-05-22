@@ -35,7 +35,7 @@ class Email {
    private $mailer = null;
 
    private $message = null;
-   
+
    private $iconvParams = array();
 
    /**
@@ -46,7 +46,12 @@ class Email {
    {
       $this->isHtmlMail = $htmlMail;
       if(VVE_SMTP_SERVER != null){
-         $transport = Swift_SmtpTransport::newInstance(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT);
+         if(defined("VVE_SMTP_SERVER_ENCRYPT") AND VVE_SMTP_SERVER_ENCRYPT != null){
+            Debug::log(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT, VVE_SMTP_SERVER_ENCRYPT, VVE_SMTP_SERVER_USERNAME, VVE_SMTP_SERVER_PASSWORD);
+            $transport = Swift_SmtpTransport::newInstance(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT, VVE_SMTP_SERVER_ENCRYPT);
+         } else {
+            $transport = Swift_SmtpTransport::newInstance(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT);
+         }
          if(VVE_SMTP_SERVER_USERNAME != null){
             $transport->setUsername(VVE_SMTP_SERVER_USERNAME)->setPassword(VVE_SMTP_SERVER_PASSWORD);
          }
@@ -56,7 +61,7 @@ class Email {
       $this->mailer = Swift_Mailer::newInstance($transport);
       $this->setMessage(Swift_Message::newInstance());
    }
-   
+
    private function safeStr($str)
    {
       if(empty ($this->iconvParams)) return $str;
