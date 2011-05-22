@@ -77,6 +77,12 @@ class Url_Request {
    private static $baseMainWebUrl = null;
 
    /**
+    * Doména bez www (domain.com)
+    * @var string
+    */
+   private static $domain = 'localhost';
+
+   /**
     * Adresa serveru (např. www.seznam.cz)
     * @var string
     */
@@ -146,15 +152,22 @@ class Url_Request {
       $scriptName = $_SERVER["SCRIPT_NAME"];
       self::$serverName = $_SERVER["HTTP_HOST"];
 
-      if(VVE_SUB_SITE_DOMAIN != null AND VVE_SUB_SITE_USE_HTACCESS == true){
-            $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
-            $scriptName = str_replace(VVE_SUB_SITE_DOMAIN, '', $scriptName);
+      if(self::$serverName != 'localhost'){
+         $matches = array();
+         preg_match("/[^\.\/]+\.[^\.\/]+$/", self::$serverName, $matches);
+         self::$domain = $matches[0];
+      }
+
+      if(VVE_SUB_SITE_DOMAIN != null AND VVE_SUB_SITE_USE_HTACCESS == true){ // Only if Htacces subdomain workarround
+         // @TODO Work corectly?
+         $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
+         $scriptName = str_replace(VVE_SUB_SITE_DOMAIN, '', $scriptName);
       }
 
       //		Vytvoříme základní URL cestu k aplikaci
       self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strrpos($scriptName, '/')).'/';
       if(VVE_SUB_SITE_DOMAIN != null){
-         self::$baseMainWebUrl = str_replace(self::$serverName, str_replace(VVE_SUB_SITE_DOMAIN.'.', 'www.', self::$serverName), self::$baseWebUrl);
+         self::$baseMainWebUrl = str_replace(self::$serverName, 'www.'.self::$domain, self::$baseWebUrl);
       }
 //    Najdeme co je cesta k aplikaci a co je předaná url
       self::$fullUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
@@ -505,6 +518,14 @@ class Url_Request {
     */
    public static function getRequestUrl() {
       return self::$fullUrl;
+   }
+
+   /**
+    * Metoda vrací hlavní doménu
+    * @return string
+    */
+   public static function getDomain() {
+      return self::$domain;
    }
 
    /**
