@@ -375,11 +375,11 @@ class Panels_Controller extends Controller {
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
-      
+
       if($form != null AND $form->isValid()){
          // čištění nulových hodnot
          foreach ($settings as $key => $option){
-            if($option === null OR empty ($option) OR $option === 0){
+            if($option === null OR $option === ''){
                unset($settings[$key]);
             }
          }
