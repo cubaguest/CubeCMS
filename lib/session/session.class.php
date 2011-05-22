@@ -3,13 +3,13 @@
 /**
  * Třída pro práci se $_SESSIONS.
  * Třída umožňuje základní přístupy k Sessions, jejich vytváření, mazání, aktualizaci atd.
- * 
+ *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id: session_base.class.php -1   $ VVE3.9.4 $Revision: -1 $
  * @author        $Author: $ $Date: $
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro práci se SESSIONS
- * 
+ *
  * @todo          dodělat! není skoro implementována
  */
 class Session {
@@ -36,7 +36,7 @@ class Session {
 
    /**
     * Metoda uloží proměnou do session
-    * 
+    *
     * @param string $name -- název proměné
     * @param mixed $value -- hodnota proměné
     */
@@ -96,19 +96,17 @@ class Session {
       }
 
       //Nastaveni session
-      if ($_SERVER['SERVER_NAME'] != 'localhost' AND preg_match("/^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" .
-            "(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$/", $_SERVER['SERVER_NAME']) == 0) {
-         session_set_cookie_params(VVE_LOGIN_TIME, '/', substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'], ".") + 1));
+      if (Url_Request::getDomain() != 'localhost'){
+         session_set_cookie_params(VVE_LOGIN_TIME, '/', '.'.Url_Request::getDomain());
       } else {
-         session_set_cookie_params(VVE_LOGIN_TIME);
+         session_set_cookie_params(VVE_LOGIN_TIME, '/');
       }
       session_name(VVE_SESSION_NAME);
-//      register_shutdown_function('session_write_close'); // save session after script close
       session_start();
       // cookie params
       $cookieParams = session_get_cookie_params();
       if(isset ($_COOKIE[VVE_SESSION_NAME])){
-         setcookie(VVE_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path']);
+         setcookie(VVE_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path'], '.'.Url_Request::getDomain());
       }
    }
 
