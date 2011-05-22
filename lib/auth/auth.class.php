@@ -1,9 +1,9 @@
 <?php
 /**
  * Třída pro autorizaci.
- * Třída obsluhuje přihlášení/odhlášení uživatele a práci s vlastnostmi (jméno, email, 
- * id, skupinu, atd.) přihlášeného uživatele. 
- * 
+ * Třída obsluhuje přihlášení/odhlášení uživatele a práci s vlastnostmi (jméno, email,
+ * id, skupinu, atd.) přihlášeného uživatele.
+ *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id$ VVE3.9.4 $Revision$
  * @author        $Author$ $Date$
@@ -26,6 +26,7 @@ class Auth extends TrObject {
 	const USER_IS_LOGIN		= 'login';
 	const USER_LOGIN_ADDRESS= 'ip_address';
 	const USER_ADMIN_GROUP  = 'admin_grp';
+	const USER_SUPER_ADMIN_GROUP  = 'sadmin_grp';
 
    const PERMANENT_COOKIE_EXPIRE = 2678400; // 31*24*60*60
 
@@ -64,12 +65,18 @@ class Auth extends TrObject {
 	 * @var string
 	 */
 	private static $userMail = null;
-	
+
 	/**
 	 * Uživatel je Admin
 	 * @var string
 	 */
 	private static $userIsAdmin = false;
+
+	/**
+	 * Uživatel je SuperAdmin
+	 * @var string
+	 */
+	private static $userIsSuperAdmin = false;
 
 	/**
 	 * Konstruktor, provádí autorizaci
@@ -119,12 +126,13 @@ class Auth extends TrObject {
 		self::$userGroupId = $_SESSION[self::USER_ID_GROUP];
 		self::$userGroupName = $_SESSION[self::USER_GROUP_NAME];
 		self::$userIsAdmin = $_SESSION[self::USER_ADMIN_GROUP];
+		self::$userIsSuperAdmin = $_SESSION[self::USER_SUPER_ADMIN_GROUP];
 
       if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
          setcookie(VVE_SESSION_NAME.'_pl', $_COOKIE[VVE_SESSION_NAME.'_pl'], time()+self::PERMANENT_COOKIE_EXPIRE,'/');
       }
 	}
-	
+
 	/**
 	 * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
 	 */
@@ -133,8 +141,9 @@ class Auth extends TrObject {
 		self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
 		self::$userName = VVE_DEFAULT_USER_NAME;
 		self::$userIsAdmin = false;
+		self::$userIsSuperAdmin = false;
 	}
-	
+
 	/**
 	 * metoda ukládá parametry uživatele do session
 	 */
@@ -148,8 +157,9 @@ class Auth extends TrObject {
 		$_SESSION[self::USER_LOGIN_TIME] = time();
 		$_SESSION[self::USER_IS_LOGIN] = true;
 		$_SESSION[self::USER_ADMIN_GROUP] = self::$userIsAdmin;
+		$_SESSION[self::USER_SUPER_ADMIN_GROUP] = self::$userIsSuperAdmin;
 	}
-	
+
 	/**
 	 * Metoda ověří přihlašovací údaje a přihlásí uživatele do aplikace
 	 * @return boolean -- true pokud se uživatele podařilo přihlásit
@@ -176,6 +186,7 @@ class Auth extends TrObject {
 						self::$userId = $user->{Model_Users::COLUMN_ID};
 						self::$userMail = $user->{Model_Users::COLUMN_MAIL};
 						self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+						self::$userIsSuperAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
 
 						if($user->{Model_Users::COLUMN_FOTO_FILE} != null){
 							//TODO není dodělána práce s fotkou
@@ -194,7 +205,7 @@ class Auth extends TrObject {
                   Log::msg($tr->tr('Uživatel byl přihlášen'), null, self::$userName);
                   // permanent login
                   if(isset ($_POST['login_permanent']) AND $_POST['login_permanent'] == 'on'){
-                     setcookie(VVE_SESSION_NAME.'_pl', self::$userName.'|'.self::getBrowserIdent(), time()+self::PERMANENT_COOKIE_EXPIRE,'/');
+                     setcookie(VVE_SESSION_NAME.'_pl', self::$userName.'|'.self::getBrowserIdent(), time()+self::PERMANENT_COOKIE_EXPIRE,'/', '.'.Url_Request::getDomain());
                   }
                   self::saveUserDetailToSession();
                   $link = new Url_Link();
@@ -224,7 +235,7 @@ class Auth extends TrObject {
 			$return = true;
 			Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::$userName);
          AppCore::getInfoMessages()->addMessage($tr->tr('Byl jste úspěšně odhlášen'));
-         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/'); // remove permament cookie
+         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/', '.cube.cz'); // remove permament cookie
 			$link = new Url_Link();
          $link->reload();
 		}
@@ -248,10 +259,11 @@ class Auth extends TrObject {
          	self::$userId = $user->{Model_Users::COLUMN_ID};
             self::$userMail = $user->{Model_Users::COLUMN_MAIL};
             self::$userIsAdmin = $user->{Model_Groups::COLUMN_IS_ADMIN};
+            self::$userIsSuperAdmin = $user->{Model_Groups::COLUMN_IS_ADMIN};
             self::saveUserDetailToSession();
             return true;
          }
-         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5); // remove permament cookie
+         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5, '/', '.'.Url_Request::getDomain()); // remove permament cookie
          $tr = new Translator();
          Log::msg(sprintf($tr->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
       }
@@ -282,7 +294,7 @@ class Auth extends TrObject {
 	public static function isLogin() {
 		return self::$login;
 	}
-	
+
 	/**
 	 * Metoda vrací jestli je uživatel přihlášen
 	 * @return boolean -- true pokud je uživatel přihlášen
@@ -291,7 +303,7 @@ class Auth extends TrObject {
 	public static function isLoginStatic() {
 		return self::$login;
 	}
-	
+
 	/**
 	 * Metoda vrací název skupiny ve které je uživatel
 	 * @return string -- název skupiny
@@ -299,7 +311,7 @@ class Auth extends TrObject {
 	public static function getGroupName() {
 		return self::$userGroupName;
 	}
-	
+
 	/**
 	 * Metoda vrací id skupiny ve které je uživatel
 	 * @return integer -- id skupiny
@@ -307,7 +319,7 @@ class Auth extends TrObject {
 	public static function getGroupId() {
 		return self::$userGroupId;
 	}
-	
+
 	/**
 	 * Metoda vrací id uživatele
 	 * @return integer -- id uživatele
@@ -315,7 +327,7 @@ class Auth extends TrObject {
 	public static function getUserId() {
 		return self::$userId;
 	}
-	
+
 	/**
 	 * Metoda vrací název uživatele
 	 * @return string -- název uživatele
@@ -323,7 +335,7 @@ class Auth extends TrObject {
 	public static function getUserName() {
 		return self::$userName;
 	}
-	
+
 	/**
 	 * Metoda vrací mail uživatele
 	 * @return string -- mail uživatele
@@ -331,13 +343,21 @@ class Auth extends TrObject {
 	public static function getUserMail() {
 		return self::$userMail;
 	}
-	
+
 	/**
 	 * Metoda vrací jestli je uživatele administrátor
 	 * @return bool -- true pokud je administrator
 	 */
 	public static function isAdmin() {
 		return self::$userIsAdmin;
+	}
+
+	/**
+	 * Metoda vrací jestli je uživatele super administrátor
+	 * @return bool -- true pokud je super administrator
+	 */
+	public static function isSuperAdmin() {
+		return self::$userIsSuperAdmin;
 	}
 
    /**
