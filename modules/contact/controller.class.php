@@ -71,7 +71,7 @@ class Contact_Controller extends Controller {
 
       if($formQuestion->isValid()){
          $model = new Contact_Model_Questions();
-         $model->saveQuestion($formQuestion->name->getValues(), $formQuestion->mail->getValues(), 
+         $model->saveQuestion($formQuestion->name->getValues(), $formQuestion->mail->getValues(),
              $formQuestion->subject->getValues(), $formQuestion->text->getValues());
 
          $adminMails = array();
@@ -107,11 +107,15 @@ class Contact_Controller extends Controller {
             }
          }
          $mail->addAddress($adminMails);
+         try {
 
          $mail->sendMail();
 
          $this->infoMsg()->addMessage($this->tr('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
          $this->link()->reload();
+         } catch (Exception $e){
+            new CoreErrors($e);
+         }
       }
       $this->view()->formQuestion = $formQuestion;
    }
@@ -201,7 +205,7 @@ class Contact_Controller extends Controller {
       if(isset($settings[self::PARAM_MAP_URL_PARAMS])) {
          $form->ggMapUrlParams->setValues($settings[self::PARAM_MAP_URL_PARAMS]);
       }
-      
+
       $elemGGMapPoints = new Form_Element_Text('ggMapPoints', 'Souřadnice');
       $elemGGMapPoints->setSubLabel('Obrázek: část url s markery. např: markers=color:red|label:H|49.471847,17.969363<br />
          U vloženého rámu není nutné, protože informace o bodech jsou přímo v adrese mapy.');
@@ -241,7 +245,7 @@ class Contact_Controller extends Controller {
 
       // maily správců
       $elemEamilRec = new Form_Element_TextArea('otherRec', 'Adresy správců');
-      $elemEamilRec->setSubLabel('E-mailové adresy správců, kterým chodí dotazy. 
+      $elemEamilRec->setSubLabel('E-mailové adresy správců, kterým chodí dotazy.
 Může jich být více a jsou odděleny středníkem. Místo tohoto boxu
 lze využít následující výběr již existujících uživatelů.');
       $form->addElement($elemEamilRec, $grpAdmin);
