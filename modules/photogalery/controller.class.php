@@ -143,14 +143,35 @@ class Photogalery_Controller extends Controller {
                // rotace pokud je
                if($editForm->rotate->getValues($id) != 0){
                   $file = $imagesM->getImage($id)->{PhotoGalery_Model_Images::COLUMN_FILE};
+                  /**
+                   * Otočí se original a znovu se vytvoří miniatury
+                   */
                   $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
-                     .$this->getOption('subdir', null).Photogalery_Controller::DIR_MEDIUM);
+                     .$this->getOption('subdir', null).Photogalery_Controller::DIR_ORIGINAL);
                   $image->rotateImage($editForm->rotate->getValues($id));
                   $image->save();
-                  $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
-                     .$this->getOption('subdir', null).Photogalery_Controller::DIR_SMALL);
-                  $image->rotateImage($editForm->rotate->getValues($id));
-                  $image->save();
+                  
+                  $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir().
+                     $this->getOption('subdir', null).self::DIR_ORIGINAL);
+                  $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL,
+                     $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
+                     $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), 
+                     $this->category()->getParam('small_crop', true));
+                  
+                  $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM,
+                     $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
+                     $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT), 
+                     $this->category()->getParam('medium_crop', false));
+
+                  
+//                   $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
+//                      .$this->getOption('subdir', null).Photogalery_Controller::DIR_MEDIUM);
+//                   $image->rotateImage($editForm->rotate->getValues($id));
+//                   $image->save();
+//                   $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
+//                      .$this->getOption('subdir', null).Photogalery_Controller::DIR_SMALL);
+//                   $image->rotateImage($editForm->rotate->getValues($id));
+//                   $image->save();
                   unset ($image);
                }
             }
