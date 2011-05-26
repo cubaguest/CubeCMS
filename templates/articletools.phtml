@@ -8,9 +8,13 @@
          <?if(isset($vars['lastEditUser'])) {?>
       &nbsp;<?=$this->tr('uživatelem')?>&nbsp;<span style="font-style: italic"><?=$vars['lastEditUser']?></span>,
             <?}
+         if(isset($vars['createdByUser'])) {
+            printf($this->tr('Vytvořil: %s.'),$vars['createdByUser']);
+         }
          if(isset($vars['showed'])) {
             echo ($this->tr('zobrazeno').":&nbsp;".$vars['showed']."&times;");
-         }?>
+         }
+         ?>
 
    </div>
    <br />
