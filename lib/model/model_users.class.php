@@ -46,7 +46,11 @@ class Model_Users extends Model_ORM {
    const COLUMN_GROUP_LABEL    = 'label';
 
    protected function  _initTable() {
-      $this->setTableName(self::DB_TABLE, 't_us');
+   if(VVE_USE_GLOBAL_ACCOUNTS === true) {
+         $this->setTableName(VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE, 't_us', false);
+      } else {
+         $this->setTableName(self::DB_TABLE, 't_us');
+      }
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
@@ -110,30 +114,6 @@ class Model_Users extends Model_ORM {
 
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetch();
-   }
-
-   /**
-    * Metoda načte skupinu podle id
-    * @param int $id -- id skupiny
-    */
-   public function getGroupById($id) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT *, name AS gname FROM ".self::getGroupsTable()
-             ." WHERE (".self::COLUMN_GROUP_ID." = :idgrp)");
-      $dbst->bindValue(':idgrp', $id, PDO::PARAM_INT);
-      $dbst->execute();
-
-      $dbst->setFetchMode(PDO::FETCH_OBJ);
-      return $dbst->fetch();
-   }
-
-   /**
-    * Metoda vrací seznam skupin v systému
-    * @return PDOStatement
-    */
-   public function getGroups() {
-      $dbc = new Db_PDO();
-      return $dbc->query("SELECT *, name AS gname FROM ".self::getGroupsTable());
    }
 
    /**
@@ -275,38 +255,6 @@ class Model_Users extends Model_ORM {
           . " WHERE ".self::COLUMN_ID." = ".$dbc->quote((int)$id));
    }
 
-   public function saveGroup($name,$label, $id = null) {
-      $dbc = new Db_PDO();
-      if($id === null) {
-      // nová skupina
-         $dbst = $dbc->prepare("INSERT INTO ".self::getGroupsTable()
-             ." (`name`, `".self::COLUMN_GROUP_LABEL."`)"
-             ." VALUES (:name, :label)");
-      } else {
-      // existující skupina
-         $dbst = $dbc->prepare("UPDATE ".self::getGroupsTable(). " SET"
-                ." `name` = :name, `".self::COLUMN_GROUP_LABEL."` = :label"
-                ." WHERE (".self::COLUMN_GROUP_ID." = :idgrp)");
-          $dbst->bindValue(':idgrp', (int)$id, PDO::PARAM_INT);
-      }
-
-      $dbst->bindValue(':name', $name);
-      $dbst->bindValue(':label', $label);
-
-      $dbst->execute();
-      return $dbc->lastInsertId();
-   }
-
-   /**
-    * Metoda smaže skupinu z db
-    * @param int $id -- id skupiny
-    */
-   public function deleteGroup($id) {
-      $dbc = new Db_PDO();
-      return $dbc->query("DELETE FROM ".self::getGroupsTable()
-          . " WHERE ".self::COLUMN_GROUP_ID." = ".$dbc->quote((int)$id));
-   }
-
    /**
     * Metoda změní heslo pro zadaného uživatele
     * @param int $iduser -- id uživatele
@@ -320,31 +268,6 @@ class Model_Users extends Model_ORM {
                 ." WHERE (".self::COLUMN_ID." = :iduser)");
       $dbst->execute(array(':iduser' => $iduser, ':password' => Auth::cryptPassword($newPass)));
       return $dbst;
-   }
-
-   /**
-    * Metoda vrací název tabulky s uživateli (včetně prefixu)
-    * @return string -- název tabulky
-    */
-   public static function getUsersTable() {
-      if(VVE_USE_GLOBAL_ACCOUNTS === true) {
-         return VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE;
-      } else {
-         return Db_PDO::table(self::DB_TABLE);
-      }
-
-   }
-
-   /**
-    * Metoda vrací název tabulky se skupinami (včetně prefixu)
-    * @return string -- název tabulky
-    */
-   public static function getGroupsTable() {
-      if(VVE_USE_GLOBAL_ACCOUNTS === true) {
-         return VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE_GROUPS;
-      } else {
-         return Db_PDO::table(self::DB_TABLE_GROUPS);
-      }
    }
 }
 ?>
