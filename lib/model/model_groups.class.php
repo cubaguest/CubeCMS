@@ -21,7 +21,11 @@ class Model_Groups extends Model_ORM {
    const COLUMN_IS_ADMIN    = 'admin';
 
    protected function  _initTable() {
-      $this->setTableName(self::DB_TABLE);
+      if(VVE_USE_GLOBAL_ACCOUNTS === true) {
+         $this->setTableName(VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE, 't_grp', false);
+      } else {
+         $this->setTableName(self::DB_TABLE, 't_grp');
+      }
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'aliasFor' => 'name'));
