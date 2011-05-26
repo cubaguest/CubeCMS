@@ -18,7 +18,7 @@ $grpsArr = array();
       <select id="select-group-id" name="sel_group">
          <?foreach ($this->groups as $grp) {
             $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
-            ?><option value="<?=$grp[Model_Groups::COLUMN_ID]?>" title="<?=$grp[Model_Groups::COLUMN_NAME]?>"><?=$grp[Model_Groups::COLUMN_NAME].' - '.$grp[Model_Groups::COLUMN_LABEL]?></option><?
+            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
          }
          ?>
       </select>

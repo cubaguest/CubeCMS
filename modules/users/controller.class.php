@@ -13,9 +13,9 @@ class Users_Controller extends Controller {
 
    public function mainController() {
       $this->checkControllRights();
-      $model = new Model_Users();
+      $model = new Model_Groups();
 
-      $this->view()->groups = $model->getGroups();
+      $this->view()->groups = $model->records();
 
 //      /*
 //       * Odstranění uživatele
