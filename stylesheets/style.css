@@ -325,7 +325,7 @@ textarea, form .form-table .form-element-long {
    border-bottom-width: 1px;
    border-bottom-color: #8ca1c2;
 } /* prvek v seznamu */
-.main-content-no-public, .comment-nopublic {
+.main-content-no-public, .main-content-concept, .comment-nopublic {
    background-color: #dddddd;
 } /* nazveřejněný obsah */
 .main-content-list-record-image, .main-content-image {
