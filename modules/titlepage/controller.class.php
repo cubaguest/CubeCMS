@@ -57,12 +57,13 @@ class TitlePage_Controller extends Controller {
             case self::ITEM_TYPE_ARTICLEWGAL:
             case self::ITEM_TYPE_NEWS:
                if($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN} != 0){ // aktuální
-                  $modelArticles = new Articles_Model_Detail();
-                  $article = $modelArticles->getArticleById($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN});
+                  $modelArticles = new Articles_Model();
+                  $article = $modelArticles->joinFK(Articles_Model::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME))
+                  ->record($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN});
                } else { // vybraný
-                  $modelArticles = new Articles_Model_List();
-                  $article = $modelArticles->getList($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY}, 0, 1);
-                  $article = $article->fetch();
+                  $modelArticles = new Articles_Model();
+                  $article = $modelArticles->joinFK(Articles_Model::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME))
+                  ->limit(0,1)->order(array(Articles_Model::COLUMN_ADD_TIME))->record();
                }
                if($article == false OR (string)$article->{Articles_Model_Detail::COLUMN_URLKEY} == null){
                   /* zde odstranit zastaralý item (asi pořešit pokud je více jazyků) */
