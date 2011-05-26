@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `text_private_de` text,
   `keywords_de` varchar(200) DEFAULT NULL,
   `description_de` varchar(300) DEFAULT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '1',
+  `concept` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
