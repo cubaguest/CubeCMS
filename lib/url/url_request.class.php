@@ -153,9 +153,17 @@ class Url_Request {
       self::$serverName = $_SERVER["HTTP_HOST"];
 
       if(self::$serverName != 'localhost'){
-         $matches = array();
-         preg_match("/[^\.\/]+\.[^\.\/]+$/", self::$serverName, $matches);
-         self::$domain = $matches[0];
+         /**
+          * address: www.test.cube-studio.cz
+          * preg: cube-studio.cz
+          * strpos: test.cube-studio.cz
+          */
+//         $matches = array();
+//         preg_match("/[^\.\/]+\.[^\.\/]+$/", self::$serverName, $matches);
+//         self::$domain = $matches[0];
+         $pos = strpos(self::$serverName, '.');
+         self::$domain = substr(self::$serverName, $pos+1);
+
       }
 
       if(VVE_SUB_SITE_DOMAIN != null AND VVE_SUB_SITE_USE_HTACCESS == true){ // Only if Htacces subdomain workarround
