@@ -156,8 +156,8 @@ class Mails_Controller extends Controller {
 
       // guestbook
       if ($modelModules->isModuleInstaled('guestbook') == true) {
-         $modelGuestBook = new GuestBook_Model_Detail();
-         $this->view()->mailsGuestbook = $modelGuestBook->getListAll(0, 10000)->fetchAll(PDO::FETCH_OBJ);
+         $modelGuestBook = new GuestBook_Model();
+         $this->view()->mailsGuestbook = $modelGuestBook->groupBy(GuestBook_Model::COLUMN_EMAIL)->records(PDO::FETCH_OBJ);
       }
 
       // uživatelé systému

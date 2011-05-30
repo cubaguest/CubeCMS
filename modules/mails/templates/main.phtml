@@ -252,10 +252,11 @@ $this->addCssFile('style.css');
                var list = new Array();
                $.each(data.mails, function(){
                   var str = '';
-                  if(this.surname != null || this.surname == ''){
+                  if( this.name != null && this.name != '' ){
                      str += '"'+this.name+' '+this.surname+'" ';
                   }
-                  str += '&lt;'+this.mail+'&gt;';
+//                  str += '&lt;'+this.mail+'&gt;';
+                  str += '<'+this.mail+'>';
                   list.push(str)
                });
                response(list);
