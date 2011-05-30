@@ -76,11 +76,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}sites` (
 /* main site */
 INSERT INTO `{PREFIX}sites` (`domain`, `is_main`) VALUES ('www', 1);
 
-CREATE TABLE IF NOT EXISTS `{PREFIX}sites_admin_groups` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}sites_groups` (
   `id_site` smallint(6) NOT NULL,
   `id_group` int(11) NOT NULL,
   KEY `id_site` (`id_site`,`id_group`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='tabulka propojení podwebů se skupinami adminů';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='tabulka propojení webů se skupinami adminů';
 
 
 /* END_UPDATE */
