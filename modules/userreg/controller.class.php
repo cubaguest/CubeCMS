@@ -390,14 +390,18 @@ class UserReg_Controller extends Controller {
       // maily správců
       $elemTGroups = new Form_Element_Select('groupId', 'Cílová skupina');
       // načtení uživatelů
-      $modelUsers = new Model_Users();
-      $groups = $modelUsers->getGroups();
+      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
+      $groupsModel = new Model_Groups();
+      $groupsModel->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
+         ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
+         ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
       $grpsIds = array();
-      foreach ($groups as $grp) {
-         if ($grp[Model_Users::COLUMN_GROUP_ID] == VVE_DEFAULT_ID_GROUP) {
+      
+      foreach ($groupsModel->records() as $grp) {
+         if ($grp->{Model_Groups::COLUMN_ID} == VVE_DEFAULT_ID_GROUP) {
             $elemTGroups->setValues(VVE_DEFAULT_ID_GROUP);
          }
-         $grpsIds[$grp[Model_Users::COLUMN_GROUP_NAME] . ' - ' . $grp[Model_Users::COLUMN_GROUP_LABEL]] = $grp[Model_Users::COLUMN_GROUP_ID];
+         $grpsIds[$grp->{Model_Groups::COLUMN_NAME} . ' - ' . $grp->{Model_Groups::COLUMN_LABEL}] = $grp->{Model_Groups::COLUMN_ID};
       }
       $elemTGroups->setOptions($grpsIds);
       if (isset($settings[self::PARAM_TARGET_ID_GROUP])) {
