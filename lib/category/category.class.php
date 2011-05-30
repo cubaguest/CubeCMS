@@ -43,11 +43,14 @@ class Category extends Category_Core {
    // zjistíme jestli nemáme načtená data
       if($catDataObj === null) {
          $catModel = new Model_Category();
-         if(!is_numeric($catKey)){
-            $catArray = $catModel->getCategory($catKey);
+         if(is_int($catKey)){
+            $catModel->setGroupPermissions()->where('AND '.Model_Category::COLUMN_ID .' = :id', array('id' => (int)$catKey), true);
+         } else if($catKey != null) {
+            $catModel->setGroupPermissions()->where('AND '.Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey), true);
          } else {
-            $catArray = $catModel->getCategoryById($catKey);
+            $catModel->setGroupPermissions()->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
          }
+         $catArray = $catModel->record();
       } else {
          $catArray = $catDataObj;
       }
@@ -84,7 +87,7 @@ class Category extends Category_Core {
     */
    public function loadRights() {
       // admin může vše
-      if(Auth::getUserName() == 'admin'){
+      if(Auth::isAdmin()){
          $this->categoryRights->addRight('rwc');
       } else {
          $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});

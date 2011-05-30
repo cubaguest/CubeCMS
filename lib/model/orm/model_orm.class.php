@@ -182,7 +182,10 @@ class Model_ORM extends Model_PDO {
     */
    protected function addForeignKey($column, $modelName, $externColumn = null)
    {
-      $this->foreignKeys[$column] = array('column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn);
+      // pokud má sloupce alias
+      $columnReal = $column;
+      if($this->tableStructure[$column]['aliasFor'] != null) $columnReal = $this->tableStructure[$column]['aliasFor'];
+      $this->foreignKeys[$column] = array('column' => $columnReal, 'modelName' => $modelName, 'modelColumn' => $externColumn);
    }
 
    /**
@@ -387,7 +390,6 @@ class Model_ORM extends Model_PDO {
          $obj->createSQLOrder($sql);
          $obj->createSQLLimi($sql);
          $dbst = $dbc->prepare($sql);
-   //      Debug::log($sql, $this->whereBindValues);
          $obj->bindSQLWhere($dbst);
          $obj->bindSQLLimit($dbst);
       } else if($this->currentSql instanceof PDOStatement) {
@@ -858,9 +860,10 @@ class Model_ORM extends Model_PDO {
     * @param array $columns -- (optional) pole se sloupci
     * @param int $joinType -- (optional) typ joinu (Model_ORM konstanta)
     * @param string $with -- (optional) další parametry co se připojí k joinu
+    * @param array $withValues -- (optional) hodnoty přidaných parametrů připojených k joinu
     * @return Model_ORM
     */
-   public function joinFK($colname, $columns = null, $joinType = self::JOIN_LEFT, $with = null)
+   public function joinFK($colname, $columns = null, $joinType = self::JOIN_LEFT, $with = null, $withValues = array())
    {
       $newIndex = count($this->joins);
       /* FK
@@ -880,15 +883,14 @@ class Model_ORM extends Model_PDO {
          $fk = $this->foreignKeys[$colname];
          $t2Alias = $fk['modelName'] . '_' . ($newIndex + 1);
       }
-      if ($fk['modelColumn'] == null)
-         $fk['modelColumn'] = $fk['column'];
+
+      if ($fk['modelColumn'] == null) $fk['modelColumn'] = $fk['column'];
 
       $joinParams = array(
          'column1' => $fk['column'], 'table1Alias' => $tAlias, // tento model
          'model2' => $fk['modelName'], 'column2' => $fk['modelColumn'], 'table2Alias' => $t2Alias, // připojený model
          'columns' => $columns, 'type' => $joinType, 'with' => $with);
       $this->joins[$newIndex] = $joinParams;
-//      Debug::log($this->joins);
       return $this;
    }
 
@@ -900,9 +902,10 @@ class Model_ORM extends Model_PDO {
     * @param array $columns -- (optional) pole se sloupci
     * @param int $joinType -- (optional) typ joinu (Model_ORM konstanta)
     * @param string $with -- (optional) další parametry co se připojí k joinu
+    * @param array $withValues -- (optional) hodnoty přidaných parametrů připojených k joinu (název > hodnota)
     * @return Model_ORM
     */
-   public function join($model1Column, $model2Name, $model2Column = null, $columns = null, $joinType = self::JOIN_LEFT, $with = null)
+   public function join($model1Column, $model2Name, $model2Column = null, $columns = null, $joinType = self::JOIN_LEFT, $with = null, $withValues = array())
    {
       $newIndex = count($this->joins);
       $model1Alias = $this->getTableShortName();
@@ -923,7 +926,7 @@ class Model_ORM extends Model_PDO {
       $joinParams = array(
          'column1' => $model1Column, 'table1Alias' => $model1Alias,
          'model2' => $model2Name, 'column2' => $model2Column, 'table2Alias' => $model2Alias,
-         'columns' => $columns, 'type' => $joinType, 'with' => $with);
+         'columns' => $columns, 'type' => $joinType, 'with' => $with, 'withValues' => $withValues);
       array_push($this->joins, $joinParams);
       return $this;
    }
@@ -1028,6 +1031,7 @@ class Model_ORM extends Model_PDO {
             if (!class_exists($join['model2']))
                throw new Exception($this->tr('Neplatný parametr s modelem'));
             $model2 = new $join['model2']();
+            $modelCols = $model2->getColumns();
             // vytváření SQL pro joiny je tu kvůli kešování
             $part = null;
             switch ($join['type']) {
@@ -1046,10 +1050,26 @@ class Model_ORM extends Model_PDO {
                   break;
             }
             $part .= 'JOIN ' . $model2->getTableName() . ' AS ' . $join['table2Alias'];
-            $part .= ' ON (`' . $join['table2Alias'] . '`.`' . $join['column2'] . '` = `' . $join['table1Alias'] . '`.`' . $join['column1'] . '`)';
+            $part .= ' ON (`' . $join['table2Alias'] . '`.`' . $join['column2'] . '` = `' . $join['table1Alias'] . '`.`' . $join['column1'] . '` ';
+            if($join['with'] != null){ // další parametry v joinu
+               $add = $join['with'];
+               if(!empty($join['withValues'])){
+                  $pdodriver = new Db_PDO();
+                  foreach($join['withValues'] as $key => $value) {
+//                      if(is_int($value)){
+                        $add = str_replace(':'.$key, $pdodriver->quote($value), $add);
+//                      } else {
+//                         str_replace(':'.$key, PDO::quote($value));
+//                      }
+                  }
+               }
+               $part .= $add;
+            }
+
+            $part .= ')';
             $this->joinString .= $part; // uložení do joinstring
             // samotné vytvoření sloupců
-            $modelCols = $model2->getColumns();
+
             if (empty($join['columns'])) { // jen vybrané sloupce
                foreach ($modelCols as $name => $params) {
                   if ($params['pk'] == true)// všechny sloupce z tabulky kromě pk
@@ -1058,7 +1078,8 @@ class Model_ORM extends Model_PDO {
                }
             } else {
                foreach ($join['columns'] as $alias => $coll) {
-                  array_push($columns, $this->createSelectColumnString($join['table2Alias'], $coll, $alias, $modelCols[$coll]['lang'], $modelCols[$coll]['aliasFor']));
+                  array_push($columns, $this->createSelectColumnString($join['table2Alias'], $coll, $alias,
+                  isset($modelCols[$coll]) ? $modelCols[$coll]['lang'] : false, isset($modelCols[$coll]) ? $modelCols[$coll]['aliasFor'] : null));
                }
             }
             unset($model2);
@@ -1090,10 +1111,14 @@ class Model_ORM extends Model_PDO {
             $alias = $alias == null ? $columnName : $alias;
             $columnName = $columnOrigName;
          }
-         if ($alias == null) {
+         if(preg_match('/[a-z ]+\(/i', $columnName) == 0){ // kontrola jestli není funkce
             $colString = '`' . $tbPrefix . '`.`' . $columnName . '`';
          } else {
-            $colString = '`' . $tbPrefix . '`.`' . $columnName . '` AS ' . $alias;
+            $colString = $columnName;
+         }
+
+         if ($alias != null) {
+            $colString .= ' AS `' . $alias.'`';
          }
       } else if ($this->getAllLangs == true) { // více jazyčné sloupce
          $cols = array();

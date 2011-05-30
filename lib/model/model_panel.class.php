@@ -20,6 +20,7 @@ class Model_Panel extends Model_ORM {
     * Konstanty s názzvy sloupců
     */
    const COLUMN_ID = 'id_panel';
+//    const COLUMN_ID_CAT = 'id_category';
    const COLUMN_ID_CAT = 'id_cat';
    const COLUMN_ID_SHOW_CAT = 'id_show_cat';
    const COLUMN_NAME = 'pname';
@@ -90,19 +91,18 @@ class Model_Panel extends Model_ORM {
       return $dbst->fetchAll(PDO::FETCH_CLASS, 'Model_LangContainer');
    }
 
-   public function setTagetCategory($idCat = 0) {
-      $obj = clone $this;
-      $obj = new $this();
-      $obj->setSelectAllLangs(false);
-      $obj
-         ->joinFK(array('t_cat' => self::COLUMN_ID_CAT))
-         ->join(array('t_cat' => Model_Category::COLUMN_ID), array('t_r' => 'Model_Rights'), 
-            Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_ID_CATEGORY,Model_Rights::COLUMN_RIGHT))
-         ->groupBy(array('t_cat' => Model_Category::COLUMN_ID))
-         ->where(self::COLUMN_ID_SHOW_CAT." = :idc AND t_r.".Model_Rights::COLUMN_ID_GROUP." = :idgrp"
-            ." AND t_r.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'", array('idc' => $idCat, 'idgrp' => Auth::getGroupId()))
-         ->order(array(self::COLUMN_POSITION, self::COLUMN_ORDER => Model_ORM::ORDER_DESC));
-      return $obj;
+   public function setGroupPermissions() {
+      $this->setSelectAllLangs(false);
+      $this->joinFK(array('t_cat' => self::COLUMN_ID_CAT))
+         ->join(array('t_cat' => Model_Category::COLUMN_ID),
+                array('t_r' => 'Model_Rights'), Model_Rights::COLUMN_ID_CATEGORY,
+                array('right' => 'IFNULL(`t_r`.`right`,  `t_cat`.`default_right`)',
+                  Model_Category::COLUMN_ID => 'IFNULL(t_r.'.Model_Rights::COLUMN_ID_CATEGORY.',  `t_cat`.'.Model_Category::COLUMN_ID.')'),
+                self::JOIN_LEFT,
+                ' AND t_r.'.Model_Rights::COLUMN_ID_GROUP . ' = :idgrp',
+                array('idgrp' => (int)Auth::getGroupId()));
+      $this->where("IFNULL( t_r.".Model_Rights::COLUMN_RIGHT." ,  t_cat.".Model_Category::COLUMN_DEF_RIGHT."  ) LIKE 'r__'", array());
+      return $this;
    }
 
    public function getPanel($idPanel) {

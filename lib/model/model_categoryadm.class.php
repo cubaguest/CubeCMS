@@ -24,7 +24,7 @@ class Model_CategoryAdm extends Model_File {
       if(self::$structure === null){
          self::$structure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.'menu'.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
          // user struct
-         if(is_file(AppCore::getAppLibDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE)){
+         if(is_file(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE)){
             $userStructure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
             $this->appendSimplexml(self::$structure, $userStructure);
          }

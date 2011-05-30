@@ -845,12 +845,15 @@ class AppCore extends TrObject {
          $this->coreTpl->panels[$panel] = array();
       }
       $panelsM = new Model_Panel();
+      $panelsM->setGroupPermissions()->order(array(Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC));
+
       // výběr jestli se zpracovávají individuální panely nebo globální
       if(self::$category->isIndividualPanels()) {
-         $panels = $panelsM->setTagetCategory(self::$category->getId())->records();
+         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = :idc", array('idc' => self::$category->getId()), true);
       } else {
-         $panels = $panelsM->setTagetCategory()->records();
+         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = 0", array(), true);
       }
+      $panels = $panelsM->records();
 
       foreach ($panels as $panel) {
          // pokud je panel vypnut přeskočíme zracování
@@ -859,6 +862,7 @@ class AppCore extends TrObject {
          }
          try {
             $panelCat = new Category(null, false, $panel);
+
             if (!file_exists(AppCore::getAppLibDir() . self::MODULES_DIR . DIRECTORY_SEPARATOR
                   . $panelCat->getModule()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')) {
                continue;
