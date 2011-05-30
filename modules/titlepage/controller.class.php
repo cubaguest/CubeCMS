@@ -73,7 +73,7 @@ class TitlePage_Controller extends Controller {
                $dataObj = $article;
 
                $modelCat = new Model_Category();
-               $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+               $cat = $modelCat->record($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
 
                if($cat == false OR (string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue; // nepřeložená kategorie nemá url
 
@@ -335,7 +335,7 @@ class TitlePage_Controller extends Controller {
       $elemImage->addValidation(New Form_Validator_FileExtension(array('jpg', 'png')));
       $elemImage->setUploadDir($this->category()->getModule()->getDataDir());
       $form->addElement($elemImage);
-      
+
       $id = null;
       $image = null;
       if($item != null){
@@ -375,7 +375,7 @@ class TitlePage_Controller extends Controller {
             $image = $imgObj->getName();
             unset ($imgObj);
          }
-   
+
          $modelItems = new TitlePage_Model_Items();
          // ulož
          $modelItems->saveItem(self::ITEM_TYPE_TEXT, serialize($form->text->getValues()),
@@ -387,7 +387,7 @@ class TitlePage_Controller extends Controller {
       }
       $this->view()->form = $form;
    }
-   
+
    // kontroler pro editaci videa
    private function editItemVideoCtrl($item = null){
       $form = new Form('text_item_');
@@ -640,7 +640,7 @@ class TitlePage_Controller extends Controller {
       $this->checkWritebleRights();
 
       $modelItems = new TitlePage_Model_Items();
-      
+
       $modelItems->setPositions($this->getRequestParam('item'));
       $this->infoMsg()->addMessage($this->_('Pozice byla uložena'));
    }
