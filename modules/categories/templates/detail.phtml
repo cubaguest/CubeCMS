@@ -3,9 +3,6 @@
 $model = new Model_Category();
 $category = $model->getCategoryWoutRights($this->cat);
 // model se skupinami
-$grModel = new Model_Users();
-$groups = $grModel->getGroups();
-
 // TODO přepracovat
 $this->setPageTitle($this->_('Uprava kategorie').' '.$category->{Model_Category::COLUMN_CAT_LABEL});
 //var_dump($category);

@@ -118,11 +118,15 @@ class Categories_Controller extends Controller {
       // práva
       $form->rights_default->setValues($record->{Model_Category::COLUMN_DEF_RIGHT});
       $rModel = new Model_Rights();
-      $rights = $rModel->getRights($this->getRequest('categoryid'));
+      $rights = $rModel->joinFK(Model_Rights::COLUMN_ID_GROUP, array(Model_Groups::COLUMN_NAME))
+         ->where(Model_Rights::COLUMN_ID_CATEGORY.' = :idc AND '.Model_Groups::COLUMN_IS_ADMIN.' = 0', 
+            array('idc' => $this->getRequest('categoryid')))->records();
       if ($rights !== false) {
-         while ($right = $rights->fetchObject()) {
-            $grName = 'group_' . $right->{Model_Users::COLUMN_GROUP_NAME};
-            $form->{$grName}->setValues($right->{Model_Rights::COLUMN_RIGHT});
+         foreach ($rights as $right) {
+            $grName = 'group_' . $right->{Model_Groups::COLUMN_NAME};
+            if($form->haveElement($grName)){
+               $form->{$grName}->setValues($right->{Model_Rights::COLUMN_RIGHT});
+            }
          }
       }
 
@@ -212,13 +216,7 @@ class Categories_Controller extends Controller {
          $categoryModel->save($record);
 
          // práva
-         $usrModel = new Model_Users();
-         $groups = $usrModel->getGroups();
-         while ($group = $groups->fetchObject()) {
-            $grName = 'group_' . $group->{Model_Users::COLUMN_GROUP_NAME};
-            $right = $form->{$grName}->getValues();
-            $rModel->saveRight($right, $group->{Model_Users::COLUMN_ID_GROUP}, $this->getRequest('categoryid'));
-         }
+         $this->assignRights($this->getRequest('categoryid'), $form);
 
          // uprava struktury
          if ($form->parent_cat->getValues() != $selCat->getParentId()) {
@@ -267,7 +265,6 @@ class Categories_Controller extends Controller {
       $form->parent_cat->setOptions($this->categoriesArray);
 
       $form->module->setValues('text');
-      $form->group_admin->setValues('rwc');
       if($this->getRequestParam('id', 0) != 0){
          $form->parent_cat->setValues($this->getRequestParam('id',0));
       }
@@ -342,14 +339,8 @@ class Categories_Controller extends Controller {
          $lastId = $categoryModel->save($record);
 
          // práva
-         $usrModel = new Model_Users();
-         $rModel = new Model_Rights();
-         $groups = $usrModel->getGroups();
-         while ($group = $groups->fetchObject()) {
-            $grName = 'group_' . $group->{Model_Users::COLUMN_GROUP_NAME};
-            $right = $form->{$grName}->getValues();
-            $rModel->saveRight($right, $group->{Model_Users::COLUMN_ID_GROUP}, $lastId);
-         }
+         $this->assignRights($lastId, $form);
+         
          // po uložení vložíme do struktury
          if ($lastId !== false) {
             $newStructure = Category_Structure::getStructure(!$this->isMainStruct());
@@ -373,6 +364,44 @@ class Categories_Controller extends Controller {
 
       $this->view()->template()->form = $form;
       $this->view()->template()->edit = false;
+   }
+
+   private function getGroups()
+   {
+      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
+//      Debug::log($domain);
+      
+      $groupsModel = new Model_Groups();
+      $groupsModel->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
+         ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
+         ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
+      
+//      echo($domain);
+//      echo($groupsModel->getSQLQuery());
+      $groups = $groupsModel->records();
+//      foreach ($groups as $g){
+//         Debug::log($g->{Model_Groups::COLUMN_NAME});
+//      }
+      return $groups;
+   }
+
+   private function assignRights($idc, $form)
+   {
+      $rModel = new Model_Rights();
+      foreach ($this->getGroups() as $group) {
+         $grName = 'group_' . $group->{Model_Groups::COLUMN_NAME};
+         if($form->haveElement($grName)){
+            $right = $form->{$grName}->getValues();
+         } else if($group->{Model_Groups::COLUMN_IS_ADMIN}) {
+            $right = 'rwc';
+         } else {
+            $right = 'r--';
+         }
+            
+//         var_dump("Assign $right to id: {$group->{Model_Groups::COLUMN_ID}} {$group->{Model_Groups::COLUMN_NAME}}");flush();
+         $rModel->saveRight($right, $group->{Model_Groups::COLUMN_ID}, $idc);
+      }
+//      die();
    }
 
    /**
@@ -490,9 +519,7 @@ class Categories_Controller extends Controller {
 
 
       // práva
-      $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii'));
-      $grModel = new Model_Users();
-      $groups = $grModel->getGroups();
+      $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii (r - čtení, w - zápis, c - úplná kontrola)'));
 
       // pole s typy práv
       $rightsTypes = array('r--' => 'r--', '-w-' => '-w-', '--c' => '--c', 'rw-' => 'rw-',
@@ -501,16 +528,16 @@ class Categories_Controller extends Controller {
       // výchozí práva kategorie
       $catGrpRigths = new Form_Element_Select('rights_default', $this->tr('Výchozí práva'));
       $catGrpRigths->setOptions($rightsTypes);
+      $catGrpRigths->setSubLabel($this->tr('Výchozí práva pro nově přidané skupiny a všechny ostatní uživatele'));
       $form->addElement($catGrpRigths, 'rights');
 
-      while ($group = $groups->fetchObject()) {
-         if ($group->{Model_Users::COLUMN_GROUP_LABEL} != null) {
-            $grName = $group->{Model_Users::COLUMN_GROUP_LABEL};
-         } else {
-            $grName = $group->{Model_Users::COLUMN_GROUP_NAME};
-         }
-         $catGrpRigths = new Form_Element_Select('group_' . $group->{Model_Users::COLUMN_GROUP_NAME},
-               sprintf($this->tr("Skupina\n \"%s\""), $grName));
+      foreach ($this->getGroups() as $group) {
+         // admin nenní nutné vyplňovat má vždy rwc
+         if ($group->{Model_Groups::COLUMN_IS_ADMIN} == true) continue;
+         
+         $catGrpRigths = new Form_Element_Select('group_' . $group->{Model_Groups::COLUMN_NAME},
+               sprintf($this->tr("Skupina\n \"%s\""), $group->{Model_Groups::COLUMN_NAME}));
+         $catGrpRigths->setSubLabel(sprintf($this->tr("Skupina\n \"%s\""), $group->{Model_Groups::COLUMN_LABEL}));
          $catGrpRigths->setOptions($rightsTypes);
          $catGrpRigths->setValues(reset($rightsTypes));
          $form->addElement($catGrpRigths, 'rights');
@@ -582,7 +609,7 @@ class Categories_Controller extends Controller {
    {
       $this->checkWritebleRights();
       $categoryM = new Model_Category();
-      $cat = $categoryM->getCategoryById($this->getRequest('categoryid'));
+      $cat = $categoryM->record($this->getRequest('categoryid'));
       if ($cat === false)
          return false;
       $this->view()->catName = $cat->{Model_Category::COLUMN_CAT_LABEL};

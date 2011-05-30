@@ -1,3 +1,24 @@
+<?
+function tplCatTrRights(Translator $translator, $right)
+{
+   $out = null;
+   if($right[0] == 'r'){
+      $out .= $translator->tr('čtení').', ';
+   }
+   if($right[1] == 'w'){
+      $out .= $translator->tr('zápis').', ';
+   }
+   if($right[2] == 'c'){
+      $out .= $translator->tr('plný přístup').', ';
+   }
+   if($out == null){
+      $out .= $translator->tr('Nemá přidělena žádná práva').' ';
+   }
+   
+   return $out.'('.$right.')';
+}
+
+?>
 <input type="hidden" name="id_cat" value="<?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?>" />
 <table>
    <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Názvy (s jazyky)');?>:</th></tr>
@@ -55,8 +76,14 @@
    <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
       echo (string)$this->catInfo->{Model_Category::COLUMN_ALT} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_ALT};
    ?></td></tr>
-
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Popis (vyhledávač)');?>:</th></tr>
+<!--   Vyhledávač -->
+   <tr><th class="ui-widget-header" colspan="2">
+      <?=$this->tr('Popis (vyhledávač)');?>:
+ <!--     <?foreach (Locales::getAppLangsNames() as $lang => $desc) {?>
+         <a href="<?=$this->link()->clear()->anchor('desc_'.$lang)?>" title="<?=$this->tr('Zobraz ').$desc?>" class=""><?=vve_tpl_lang_image($lang)?></a>
+      <?}?>-->
+   </th></tr>
+   
    <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
    echo (string)$this->catInfo->{Model_Category::COLUMN_DESCRIPTION} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_DESCRIPTION};
    ?></td></tr>
@@ -72,7 +99,7 @@
    <?  foreach ($this->catRights as $right) {?>
    <tr class="single-row">
       <th scope="row" class="ui-widget-header"><?=$right->{Model_Groups::COLUMN_NAME};?></th>
-      <td class="ui-widget-content ui-state-default"><?=$right->{Model_Rights::COLUMN_RIGHT};?></td>
+      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator, $right->{Model_Rights::COLUMN_RIGHT});?> </td>
    </tr>
    <?}?>
 </table>
