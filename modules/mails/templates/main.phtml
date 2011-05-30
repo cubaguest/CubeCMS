@@ -217,7 +217,7 @@ $this->addCssFile('style.css');
          });
       });
       $('input.button-add').click(function(){
-         $(this).parent('div').children('select').children('option:selected').each(function(){
+         $(this).parent('div').children('select#mails-addressbook').children('option:selected').each(function(){
             addMail($(this).val());
          });
       });

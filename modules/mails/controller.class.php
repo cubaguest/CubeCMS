@@ -164,11 +164,16 @@ class Mails_Controller extends Controller {
       $this->view()->mailsUsers = array();
       $modelUsers = new Model_Users();
       $users = array();
-      $usrtTmp = $modelUsers->getUsersWithMails()->fetchAll(PDO::FETCH_OBJ);
+//      $usrtTmp = $modelUsers->getUsersWithMails()->fetchAll(PDO::FETCH_OBJ);
+      $usrtTmp = $modelUsers->joinFK(Model_Users::COLUMN_GROUP_ID)
+         ->where(Model_Users::COLUMN_MAIL.' IS NOT NULL AND '.Model_Users::COLUMN_MAIL.' != \'\' ', array())
+         ->records(PDO::FETCH_OBJ);
       foreach ($usrtTmp as $user) {
-         if(!isset ($users[(string)$user->{Model_Users::COLUMN_GROUP_NAME}]))
-            $users[$user->{Model_Users::COLUMN_GROUP_NAME}] = array();
-         array_push($users[$user->{Model_Users::COLUMN_GROUP_NAME}], $user);
+         $gKey = $user->{Model_Groups::COLUMN_LABEL} .' ('.$user->{Model_Groups::COLUMN_NAME}.')';
+         if(!isset ($users[$gKey])){
+            $users[$gKey] = array();
+         }
+         array_push($users[$gKey], $user);
       }
       unset ($usrtTmp);
       $this->view()->mailsUsers = $users;
