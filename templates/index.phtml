@@ -61,7 +61,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             contentsource: "markup"});
          /* ]]> */
       </script>
-      <?if(Auth::isLogin()){?>
+      <?if(Auth::isAdmin()){?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-admin.css')?>" />
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/admin/menu.js"></script>
       <?}
@@ -73,7 +73,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
    </head>
    <body id="pageTop" >
       <? // admin menu
-      if($this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) $this->includeTplObj($this->menuAdminObj);
+      if(Auth::isAdmin() AND $this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) $this->includeTplObj($this->menuAdminObj);
       ?>
       <? //NavigationMenu_View::listView(); ?>
       <div id="bodywrap" style="<?
