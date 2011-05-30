@@ -25,25 +25,25 @@ $this->addJsPlugin($jQuery);
             ajaxGridOptions : {type:"POST"},
             url: '<?=$this->link()->route('groupsList');?>',
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Popis')?>', '<?=$this->tr('Administrátor')?>', '<?=$this->tr('Podweby')?>'],
+            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Popis')?>', '<?=$this->tr('Admin')?>', '<?=$this->tr('Omezení na domény')?>'],
             colModel:[
                {name:'<?=Model_Groups::COLUMN_ID?>',index:'<?=Model_Groups::COLUMN_ID?>',
                   width:33,editable:false},
-               {name:'<?=Model_Groups::COLUMN_NAME?>',index:'<?=Model_Groups::COLUMN_NAME?>', width:100,editable:true,editoptions:{size:20},
+               {name:'<?=Model_Groups::COLUMN_NAME?>',index:'<?=Model_Groups::COLUMN_NAME?>', width:130,editable:true,editoptions:{size:20},
                   formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', width:300,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
+               {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
                   formoptions:{ rowpos:3, label: "<?=$this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'<?=Model_Groups::COLUMN_IS_ADMIN?>',index:'<?=Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
 //                   formatoptions:{disabled: false, 'class' : 'blockUser'},
-                  width:110,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
-                  ,dataEvents: [ {  type: 'change',fn: function(e) {if($(this).is(':checked')){$('#subsites').removeAttr('disabled');} else {$('#subsites').attr('disabled', true);}} } ]
+                  width:60,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
+//                   ,dataEvents: [ {  type: 'change',fn: function(e) {if($(this).is(':checked')){$('#subsites').removeAttr('disabled');} else {$('#subsites').attr('disabled', true);}} } ]
                   },
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Administrátor')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
-                     {name:'subsites',index:'subsites', width:100, editable: true, edittype:"select", editoptions: {
-                     value: <?=json_encode($this->subsites)?>,
+                  formoptions:{ rowpos:4, label: "<?=$this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'sites',index:'sites', width:170, editable: true, edittype:"select", editoptions: {
+                     value: <?=json_encode($this->sites)?>,
                      multiple: true, size: 3
                   },
-                  formoptions:{ rowpos:5, label: "<?=$this->_('Administrátor<br />pouze pro<br />domény')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:5, label: "<?=$this->_('Uživatel<br />pouze pro<br />domény')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
             ],
             rowNum:20,
             rowList:[10,20,40,100],
@@ -69,13 +69,11 @@ $this->addJsPlugin($jQuery);
                   return [res.allOk,msg];
                },
                afterShowForm : function(formid){
-                  var data = groupsGrid.getCell(groupsGrid.jqGrid('getGridParam','selrow'), 'subsites');
+                  var data = groupsGrid.getCell(groupsGrid.jqGrid('getGridParam','selrow'), 'sites');
                   if(data != false || data != null){
                      data = data.split(';');
                      data.pop();
-                     $('#subsites option').each(function(){
-                        console.log($(this).text());
-                        console.log($.inArray($(this).text(),data));
+                     $('#sites option').each(function(){
                         if($.inArray($(this).text(),data) != -1){
                            $(this).attr('selected', 'selected');
                         } else {
@@ -83,8 +81,6 @@ $this->addJsPlugin($jQuery);
                         }
                      });
                   }
-                  if($('#admin').is(':checked')){$('#subsites').removeAttr('disabled');} else {$('#subsites').attr('disabled', true);}
-                  console.log(data);
                },
             },
             {height:300,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options

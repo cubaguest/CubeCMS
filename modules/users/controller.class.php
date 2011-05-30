@@ -92,12 +92,12 @@ class Users_Controller extends Controller {
 
    public function groupsController() {
       $this->checkControllRights();
-      $model = new Model_SubSites();
-
-      foreach ($model->records() as $subsite) {
-         $subsites[$subsite->{Model_SubSites::COLUMN_ID}] = $subsite->{Model_SubSites::COLUMN_DOMAIN};
+      $model = new Model_Sites();
+      $sites = array();
+      foreach ($model->records() as $site) {
+         $sites[$site->{Model_Sites::COLUMN_ID}] = $site->{Model_Sites::COLUMN_DOMAIN};
       }
-      $this->view()->subsites = $subsites;
+      $this->view()->sites = $sites;
    }
 
 
@@ -179,18 +179,18 @@ class Users_Controller extends Controller {
       } else {
       // list
 
-         if(Auth::isSuperAdmin()){
+//          if(Auth::isSuperAdmin()){
             // vidí všechny administrátory
             $jqGrid->respond()->setRecords($modelGrps->count());
             $modelGrps->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)
                ->order(array($jqGrid->request()->orderField => $jqGrid->request()->order));
-         } else {
-            // vidí pouze adminy, kteří jsou přiřazeni k této subdoméně
+//          } else {
+//             vidí pouze adminy, kteří jsou přiřazeni k této subdoméně
 
-         }
+//          }
          // skupiny s připojeným modelem subsites
-//             ->join(Model_Groups::COLUMN_ID, array('t_ssag' => 'Model_SubSitesAdminGroups'), Model_SubSitesAdminGroups::COLUMN_ID_GROUP, array(Model_SubSitesAdminGroups::COLUMN_ID_SITE))
-//             ->join(array('t_ssag' => Model_SubSitesAdminGroups::COLUMN_ID_SITE), 'Model_SubSites', Model_SubSites::COLUMN_ID, array(Model_SubSites::COLUMN_DOMAIN))
+//             ->join(Model_Groups::COLUMN_ID, array('t_ssag' => 'Model_SitesAdminGroups'), Model_SitesAdminGroups::COLUMN_ID_GROUP, array(Model_SitesAdminGroups::COLUMN_ID_SITE))
+//             ->join(array('t_ssag' => Model_SitesAdminGroups::COLUMN_ID_SITE), 'Model_SubSites', Model_SubSites::COLUMN_ID, array(Model_SubSites::COLUMN_DOMAIN))
 
          $groups = $modelGrps->records();
       }
@@ -202,17 +202,15 @@ class Users_Controller extends Controller {
          $substr = "";
          $subIds = array();
 
-         if($grp->{Model_Groups::COLUMN_IS_ADMIN} == true){
-            $modelSubSites = new Model_SubSites();
-            $subsites = $modelSubSites->join(Model_SubSites::COLUMN_ID, 'Model_SubSitesAdminGroups', Model_SubSitesAdminGroups::COLUMN_ID_SITE, false)
-            ->where(Model_SubSitesAdminGroups::COLUMN_ID_GROUP.' = :idgrp', array('idgrp' => $grp->{Model_Groups::COLUMN_ID}))
+         $modelSubSites = new Model_Sites();
+         $subsites = $modelSubSites->join(Model_Sites::COLUMN_ID, 'Model_SitesGroups', Model_SitesGroups::COLUMN_ID_SITE, false)
+            ->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idgrp', array('idgrp' => $grp->{Model_Groups::COLUMN_ID}))
             ->records();
 
-            if($subsites != false){
-               foreach($subsites as $site) {
-                  $substr .= $site->{Model_SubSites::COLUMN_DOMAIN}.';';
-                  array_push($subIds, $site->{Model_SubSites::COLUMN_DOMAIN});
-               }
+         if($subsites != false){
+            foreach($subsites as $site) {
+               $substr .= $site->{Model_Sites::COLUMN_DOMAIN}.';';
+               array_push($subIds, $site->{Model_Sites::COLUMN_DOMAIN});
             }
          }
          array_push($jqGrid->respond()->rows, array('id' => $grp->{Model_Groups::COLUMN_ID},
@@ -328,33 +326,35 @@ class Users_Controller extends Controller {
             $record = $model->record($jqGridReq->id);
             $record->mapArray($jqGridReq);
 
-            // smazání starých skupin <--> subsite
-            $modelSubSitesAdmins = new Model_SubSitesAdminGroups();
-            $modelSubSitesAdmins->where(Model_SubSitesAdminGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $jqGridReq->id))->delete(); // SECURITY ISSUE pokud vloží nesprávníé id vytvoří superadmina
-
             // uživatel je admin
             if($jqGridReq->admin == true){
-               // namapování subdomén
-               if(Auth::isSuperAdmin()){ // super admin má přístup ke všem doménaám a vytváří administrátory
-                  $this->infoMsg()->addMessage('superadmin');
-                  if($jqGridReq->subsites != null){
-                     $subdomainsIds = explode(',',$jqGridReq->subsites);
 
-                     $recordSA = $modelSubSitesAdmins->newRecord();
-                     $recordSA->{Model_SubSitesAdminGroups::COLUMN_ID_GROUP} = $jqGridReq->id;
-                     foreach($subdomainsIds as $sId) {
-                         $recordSA->{Model_SubSitesAdminGroups::COLUMN_ID_SITE} = $sId;
-                         $modelSubSitesAdmins->save($recordSA);
-                     }
-                     $this->infoMsg()->addMessage('subdomains');
-                  } else {
-                     // domény zůstanou prázdné protože prázdné subdomény znamená superadmin
-                  }
-               } else { // normální admin přidává administrátora pouze k aktuální subsite
-                  $this->infoMsg()->addMessage('subsite admin');
-
-               }
             }
+
+            // namapování subdomén
+//             if(Auth::isSuperAdmin()){ // super admin má přístup ke všem doménaám a vytváří administrátory
+
+//             } else { // normální admin přidává administrátora pouze k aktuální subsite
+//             }
+
+            // smazání starých skupin <--> site
+            $modelSitesGroups = new Model_SitesGroups();
+            $modelSitesGroups->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $jqGridReq->id))->delete(); // SECURITY ISSUE pokud vloží nesprávníé id vytvoří superadmin
+
+            if($jqGridReq->sites != null){
+               $subdomainsIds = explode(',',$jqGridReq->sites);
+
+               $recordSA = $modelSitesGroups->newRecord();
+               $recordSA->{Model_SitesGroups::COLUMN_ID_GROUP} = $jqGridReq->id;
+               foreach($subdomainsIds as $sId) {
+                  $recordSA->{Model_SitesGroups::COLUMN_ID_SITE} = $sId;
+                  $modelSitesGroups->save($recordSA);
+                  $this->infoMsg()->addMessage('saved id '.$sId);
+               }
+            } else {
+               // domény zůstanou prázdné protože prázdné subdomény znamená superadmin
+            }
+
 
             $grpId = $model->save($record);
 //             projití všech kategorií a vytvoření default práv pro danou skupinu
