@@ -1,7 +1,7 @@
 <?
 $this->addJsPlugin(new JsPlugin_SWFUpload());
 $this->addJsPlugin(new JsPlugin_PiroBox());
-$this->addCssFile("style.css", 'photogalery');
+$this->addFile("css://photogalery:style.css");
 ?>
 <h1><?= $this->tr('Úprava obrázků z').' '.$this->category()->getName();?></h1>
 <?$this->includeFile('tpl://photogalery:addimage.phtml')?>
