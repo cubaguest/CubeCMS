@@ -40,6 +40,12 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         document.domain = '<?=Url_Request::getDomain();?>';
+         document.lang = '<?=Locales::getLang()?>';
+         /* ]]> */
+      </script>
       {*-STYLESHEETS-*}
       {*-JAVASCRIPTS-*}
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
@@ -53,7 +59,6 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       </script>
       <script type="text/javascript">
          /* <![CDATA[ */
-         document.domain = 'cube.cz<??>';
          ddsmoothmenu.init({
             mainmenuid: "smoothmenu1",
             orientation: "h",
