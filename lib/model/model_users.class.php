@@ -163,20 +163,6 @@ class Model_Users extends Model_ORM {
       return $dbst->fetchAll();
    }
 
-   /**
-    * Metoda vrací seznam uživatelů v systému s e-maily
-    * @return PDOStatement
-    */
-   public function getUsersWithMails() {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT users.*, grps.name AS gname FROM ".self::getUsersTable()." AS users"
-          ." JOIN ".self::getGroupsTable()." AS grps ON users.".self::COLUMN_ID_GROUP." = grps.".self::COLUMN_ID_GROUP
-          ." WHERE ISNULL(users.".self::COLUMN_MAIL.") = 0 AND users.".self::COLUMN_MAIL." != ''"
-          ." ORDER BY users.".self::COLUMN_ID);
-      $dbst->execute();
-      return $dbst;
-   }
-
    public function saveUser($username,$name,$surname, $password,$group, $email,$note,$blocked = false, $id = null) {
       $dbc = new Db_PDO();
       if($id === null) {
