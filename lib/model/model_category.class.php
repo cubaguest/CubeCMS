@@ -109,7 +109,7 @@ class Model_Category extends Model_ORM {
 
       $this->setPk(self::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Rights', Model_Rights::COLUMN_ID_CATEGORY);
-      $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Panels', Model_Panel::COLUMN_ID_CAT);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Panel', Model_Panel::COLUMN_ID_CAT);
    }
 
    /**
