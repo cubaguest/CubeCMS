@@ -51,7 +51,9 @@ class Routes {
       if($category != null AND $category->haveFeed()){
          $this->addRoute('feed', null, 'main', '{type}.xml');
       }
-      $this->addRoute('normal', null, 'main', null); // základní cesta
+      if(!isset ($this->routes['normal'])){
+         $this->addRoute('normal', null, 'main', null); // základní cesta
+      }
    }
 
    /**
