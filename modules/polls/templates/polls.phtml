@@ -1,20 +1,28 @@
-<div>
+<?
+$this->addFile("css://style.css");
+$h1 = $this->category()->getName();
+echo $this->toolbox;
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<div class="main-content-list">
+   <div class="main-content-list-records">
    <?
-   $somePoll = false;
-   while ($poll = $this->polls->fetch()) {
-      $somePoll = true;?>
-   <h2><?=$poll->{Polls_Model_Detail::COL_QUESTION}?></h2>
-   <div style="position: relative">
-         <?if($poll->{Polls_Model_Detail::COL_ACTIVE} == true AND !isset ($this->votedPolls[$poll->{Polls_Model_Detail::COL_ID}])) {
+   if(!empty ($this->polls)){
+   foreach ($this->polls as $poll) {
+   ?>
+   <div class="main-content-list-record">
+   <h2><?=$poll->{Polls_Model::COLUMN_QUESTION}?></h2>
+      <div style="position: relative" id="poll_<?=$poll->{Polls_Model::COLUMN_ID}?>">
+         <?if($poll->{Polls_Model::COLUMN_ACTIVE} == true AND !isset ($this->votedPolls[$poll->{Polls_Model::COLUMN_ID}])) {
             // více možností
-            if ($poll->{Polls_Model_Detail::COL_IS_MULTI} == true) {
+            if ($poll->{Polls_Model::COLUMN_IS_MULTI} == true) {
                $this->formmulti->html()->addClass('pollVoteForm');
                // více možností
                $pollTpl = new Template_Module($this->link(), $this->category());
                $pollTpl->addTplFile('poll_multi.phtml');
                $pollTpl->formmulti = $this->formmulti;
                $pollTpl->poll = $poll;
-               print ($pollTpl);
+               echo ($pollTpl);
             } else {
                // jedna možnost
                $this->formsingle->html()->addClass('pollVoteForm');
@@ -22,7 +30,7 @@
                $pollTpl->addTplFile('poll_single.phtml');
                $pollTpl->formsingle = $this->formsingle;
                $pollTpl->poll = $poll;
-               print ($pollTpl);
+               echo ($pollTpl);
             }
          } else {
             // jenom, zobrazení?>
@@ -30,26 +38,20 @@
             $pollTpl = new Template_Module($this->link(), $this->category());
             $pollTpl->addTplFile('poll_read.phtml');
             $pollTpl->poll = $poll;
-            print ($pollTpl);
+            echo ($pollTpl);
          }
-         if($this->category()->getRights()->isWritable()) {
-            $toolbox = new Template_Toolbox();
-            $toolbox->addTool('poll_edit', $this->_("Upravit anketu"),
-                    $this->link()->route('edit',array('id' => (int)$poll->{Polls_Model_Detail::COL_ID})),
-                    $this->_("Upravit anketu"), "film_edit.png");
-            $toolbox->addTool('poll_delete', $this->_("Smazat anketu"),
-                    $this->link(), $this->_("Smazat anketu"), "film_delete.png",
-                    'poll_id', (int)$poll->{Polls_Model_Detail::COL_ID},
-                    $this->_('Opravdu smazat anketu?'));
-            $this->includeTplObj($toolbox);
-         }?>
+         ?>
+      </div>
+      <?
+      if($this->toolboxPoll instanceof Template_Toolbox2){
+         $this->toolboxPoll->poll_edit->setAction($this->link()->route('edit', array('id' => $poll->{Polls_Model::COLUMN_ID})));
+         echo $this->toolboxPoll;
+      }
+      ?>
    </div>
-   <br/>
       <?
    }
-   print $this->scrollComp; // skrolery
-
-   if($somePoll == true) {
+   echo $this->scrollComp; // skrolery
       $jQuery = new JsPlugin_JQuery();
       $this->addJsPlugin($jQuery);
       // vložení skriptu pro ajax
@@ -58,11 +60,4 @@
    <p><?=$this->_('Žádná anketa není vložena')?></p>
    <?}?>
 </div>
-<?
-if($this->category()->getRights()->isWritable()) {
-   $toolbox = new Template_Toolbox();
-   $toolbox->addTool('add_poll', $this->_("Přidat anketu"),
-           $this->link()->route('add'),
-           $this->_("Přidat novou anketu"), "page_add.png");
-   $this->includeTplObj($toolbox);
-}?>
+</div>

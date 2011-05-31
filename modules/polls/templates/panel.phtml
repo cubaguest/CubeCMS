@@ -1,42 +1,34 @@
 <?
+$this->addFile("css://style.css");
+if(empty ($this->poll)) return;
 $icon = null;
-if($this->panelObj()->getIcon() != null) {
+if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
 }
 $backImg = null;
-if($this->panelObj()->getBackImage() != null) {
+if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div class="panelText" style="<?=$backImg?>">
-   <p>
-      <?=$this->poll->{Polls_Model_Detail::COL_QUESTION}?>
+<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
+<div class="panel-box-content" style="<?=$backImg?>">
+   <p class="panel-box-label-article">
+      <?=$this->poll->{Polls_Model::COLUMN_QUESTION}?>
    </p>
    <div>
       <?
+      $this->subkey = '_p';
       if ($this->formmulti != null) {
       // více možností
          $this->formmulti->html()->addClass('pollVoteForm');
-         $pollTpl = new Template_Module($this->link(), $this->category());
-         $pollTpl->addTplFile('poll_multi.phtml');
-         $pollTpl->formmulti = $this->formmulti;
-         $pollTpl->poll = $this->poll;
-         echo ($pollTpl);
+         $this->includeFile('tpl://poll_multi.phtml');
       } else if($this->formsingle != null) {
          // jedna možnost
          $this->formsingle->html()->addClass('pollVoteForm');
-         $pollTpl = new Template_Module($this->link(), $this->category());
-         $pollTpl->addTplFile('poll_single.phtml');
-         $pollTpl->formsingle = $this->formsingle;
-         $pollTpl->poll = $this->poll;
-         echo ($pollTpl);
+         $this->includeFile('tpl://poll_multi.phtml');
       } else {
          // jenom, zobrazení
-         $pollTpl = new Template_Module($this->link(), $this->category());
-         $pollTpl->addTplFile('poll_read.phtml');
-         $pollTpl->poll = $this->poll;
-         echo ($pollTpl);
+         $this->includeFile('tpl://poll_read.phtml');
       }?>
    </div>
 </div>
@@ -44,7 +36,7 @@ if($this->panelObj()->getBackImage() != null) {
 // vložení skriptu pro ajax
 $this->includeTpl('voteScript.phtml');
 ?>
-<p class="panelLinkMore">
+<div class="panel-box-link-more">
    <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
-</p>
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
+</div>

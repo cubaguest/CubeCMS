@@ -3,30 +3,7 @@
  * Třída modelu s detailem textu
  * 
 */
-class Polls_Model_Detail extends Model_PDO {
-   /**
-    * Tabulka s detaily
-    */
-   const DB_TABLE = 'polls';
-   const DB_TABLE_VOTAR = 'polls_votar_users';
-
-   /**
-    * Názvy sloupců v db
-    * @var string
-    */
-   const COL_ID         = 'id_poll';
-   const COL_ID_CAT     = 'id_category';
-   const COL_QUESTION   = 'question';
-   const COL_IS_MULTI   = 'is_multi';
-   const COL_ACTIVE     = 'active';
-   const COL_DATA       = 'data';
-   const COL_VOTES      = 'votes';
-   const COL_DATE       = 'date';
-
-   const COL_V_ID_POLL     = 'id_poll';
-   const COL_V_USER_IDEN   = 'user_identification';
-   const COL_V_ID_USER     = 'id_user';
-
+class Polls_Model_Detail extends Polls_Model {
    public function getPoll($id) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)

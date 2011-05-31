@@ -1,41 +1,51 @@
-<div>
-   <!--<form action="<?$this->form->getAction()?>" method="post">-->
+<?
+// do titulku
+if($this->edit) {
+   $h = $this->tr('úprava ankety').' '.$this->name;
+} else {
+   $h = $this->tr('přidání ankety');
+}
+$this->addPageTitle($h);
+
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="article-edit-form">
    <?=$this->form->renderStart()?>
       <fieldset>
-         <table id="answerForm" class="formTableGroup">
+         <table id="answerForm"  class="form-table">
             <tr>
-               <th class="formLabels">
+               <th class="form-labels">
                   <?=$this->form->question->label();?>
                </th>
-               <td class="formControlls">
+               <td class="form-controlls">
                   <?=$this->form->question->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
-               <th class="formLabels">
+               <th class="form-labels">
                   <?=$this->form->multianswer->label();?>
                </th>
-               <td class="formControlls">
+               <td class="form-controlls">
                   <?=$this->form->multianswer->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
-               <th class="formLabels">
+               <th class="form-labels">
                   <?=$this->form->active->label();?>
                </th>
-               <td class="formControlls">
+               <td class="form-controlls">
                   <?=$this->form->active->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <?if(isset($this->form->clear)){?>
             <tr>
-               <th class="formLabels">
+               <th class="form-labels">
                   <?=$this->form->clear->label();?>
                </th>
-               <td class="formControlls">
+               <td class="form-controlls">
                   <?=$this->form->clear->controllAll();?>
                   <span></span>
                </td>
@@ -48,32 +58,30 @@
             foreach ($vals as $i => $val) {
                $this->form->answer->setDimensional($i);?>
             <tr id="pollAnswer_<?=$i?>" class="pollAnswer">
-               <th class="formLabels">
-                  <?print($this->form->answer->label())?>
+               <th class="form-labels">
+                  <?echo($this->form->answer->label())?>
                </th>
-               <td class="formControlls">
+               <td class="form-controlls">
                      <?
                      $this->form->answer->html()->setAttrib('size', 20);
-                     print($this->form->answer->controll());
-                     // hidden
-//                     $this->form->dateDeleted->setDimensional($i);
-//                     $this->form->dateDeleted->setValues('false');
-//                     print($this->form->dateDeleted->controll());
+                     echo($this->form->answer->controll());
                   ?>
-                  <a href="#" onclick="return deleteAnswerRow(this);" title="<?=$this->_('Odstranit řádek')?>">
-                     <img src="<?=vve_get_tpl_file('icons/delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" />
-                  </a>
+                  <a href="<?=$this->link()?>#delete-row" onclick="return deleteAnswerRow(this);" title="<?=$this->_('Odstranit řádek')?>"
+                     class="form-row-action-icon"><img src="<?=vve_get_tpl_file('icons/delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" /></a>
                </td>
             </tr>
             <?}?>
             <tr>
-               <td colspan="2">
-                  <a href="#" onclick="return addAnswerRow();" title="<?=$this->_('Přidat odpověď')?>"><?=$this->_('Přidat odpověď')?></a>
+               <td></td>
+               <td>
+                  <a class="form-row-action-icon" href="<?=$this->link()?>#add-row" onclick="return addAnswerRow();" title="<?=$this->_('Přidat odpověď')?>">
+                     <img src="<?=vve_get_tpl_file('icons/add.png', VVE_TPL_FILE_IMAGE)?>" alt="add" />&nbsp;<?=$this->_('Přidat odpověď')?>
+                  </a>
                </td>
             </tr>
             <tr>
-               <th class="formLabels"></th>
-               <td class="formControlls">
+               <th class="form-labels"></th>
+               <td class="form-controlls">
                   <?=$this->form->send->controllAll();?>
                   <span></span>
                </td>
@@ -106,5 +114,4 @@
       }
       /* ]]> */
    </script>
-   <?=$this->includeTpl('buttonback.phtml', true)?>
 </div>

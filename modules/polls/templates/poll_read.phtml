@@ -1,5 +1,5 @@
 <?// vypočty
-$data = unserialize($this->poll->{Polls_Model_Detail::COL_DATA});
+$data = unserialize($this->poll->{Polls_Model::COLUMN_DATA});
 $maxVote = 0;
 $allVotes = 0;
 foreach ($data as $key => $vote) {
@@ -16,4 +16,4 @@ foreach ($data as $key => $vote) {
       <span class="pollNumbers"><?printf('%d %% (%d)',$pr ,$answer['count'])?></span>
    </p>
       <?}?>
-   <span class="pollNumVotes"><?printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model_Detail::COL_VOTES});?></span>
+   <span class="pollNumVotes"><?printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model::COLUMN_VOTES});?></span>
