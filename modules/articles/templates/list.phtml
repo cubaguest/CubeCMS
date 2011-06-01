@@ -7,6 +7,12 @@ echo $this->toolbox;
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-list">
    <?=$this->includeTpl('sort.phtml')?>
+   <?if((string)$this->text->{Text_Model::COLUMN_TEXT} != null AND !isset($_GET[Component_Scroll::GET_PARAM]) AND !isset($_GET[Articles_Controller::PARAM_SORT])){?>
+   <div class="main-content-text">
+      <?=$this->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','emoticons'))?>
+      <hr class="reseter" />
+   </div>   
+   <?}?>
    <div class="main-content-list-records">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {

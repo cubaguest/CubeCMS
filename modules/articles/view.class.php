@@ -3,6 +3,11 @@ class Articles_View extends View {
    public function mainView() {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'articles:list.phtml'));
       $this->createListToolbox();
+      
+//      if($this->rights()->isControll() AND $this->text == false){
+//         $this->text = new Object();
+//         $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl definován. Vytvoříte jej pomocí nastrojů editace.');
+//      }
    }
 
    public function topView() {
@@ -82,6 +87,11 @@ class Articles_View extends View {
          $this->toolbox->addTool($toolAdd);
          if($this->category()->getRights()->isControll()){
             $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $toolETView = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit text"),
+            $this->link()->route('edittext'));
+            $toolETView->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text'));
+            $this->toolbox->addTool($toolETView);
+            
             $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
             $this->link()->route(Routes::MODULE_SETTINGS));
             $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
@@ -110,8 +120,13 @@ class Articles_View extends View {
       $this->addView();
    }
 
-   private function addTinyMCE() {
-      if($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, 'advanced') == 'none') return;
+   public function editTextView() {
+      $this->addTinyMCE('simple');
+      $this->template()->addFile('tpl://articles:edittext.phtml');
+   }
+   
+   private function addTinyMCE($theme = 'advanced') {
+      if($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, $theme) == 'none') return;
       if($this->form->haveElement('text')){
          $this->form->text->html()->addClass("mceEditor");
       }
@@ -119,7 +134,7 @@ class Articles_View extends View {
          $this->form->textPrivate->html()->addClass("mceEditor");
       }
       $this->tinyMCE = new Component_TinyMCE();
-      switch ($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, 'advanced')) {
+      switch ($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, $theme)) {
          case 'simple':
             $settings = new Component_TinyMCE_Settings_AdvSimple();
             $settings->setSetting('editor_selector', 'mceEditor');

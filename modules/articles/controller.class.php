@@ -97,6 +97,9 @@ class Articles_Controller extends Controller {
 
       // odkaz zpět
       $this->link()->backInit();
+      
+      // načtení úvodního textu
+      $this->view()->text = $this->loadText();
    }
 
    public function contentController(){
@@ -462,6 +465,48 @@ class Articles_Controller extends Controller {
       $this->view()->article = $article;
    }
 
+   public function editTextController() {
+      $this->checkControllRights();
+      $form = new Form('list_text_');
+
+      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText->setLangs();
+      $form->addElement($elemText);
+
+      $elemS = new Form_Element_SaveCancel('save');
+      $form->addElement($elemS);
+
+      if($form->isValid()) {
+         $textM = new Text_Model();
+         
+         $text = $this->loadText();
+         $text->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
+         $text->{Text_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues()); 
+         $text->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+         
+         $textM->save($text);
+
+         $this->infoMsg()->addMessage($this->_('Úvodní text byl uložen'));
+         $this->link()->route()->reload();
+      }
+
+      // načtení textu
+      $text = $this->loadText();
+      if($text != false) {
+         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      }
+      $this->view()->form = $form;
+   }
+   
+   private function loadText() {
+      $textM = new Text_Model();
+      $text = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' =>  $this->category()->getId()))->record();
+      if($text != false){
+         return $text;
+      }
+      return $textM->newRecord();
+   }
+   
    /**
     * Uložení samotného článku
     * @param <type> $names
