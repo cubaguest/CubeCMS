@@ -476,6 +476,11 @@ class Articles_Controller extends Controller {
       $elemS = new Form_Element_SaveCancel('save');
       $form->addElement($elemS);
 
+      if($form->isSend() AND $form->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Úpravy textu byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+      
       if($form->isValid()) {
          $textM = new Text_Model();
          
