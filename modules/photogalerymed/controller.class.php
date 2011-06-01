@@ -34,8 +34,8 @@ class Photogalerymed_Controller extends Articles_Controller {
       }
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $this->view()->article->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $ctr->setOption('idArt', $this->view()->article->{Articles_Model::COLUMN_ID});
+      $ctr->setOption('subdir', $this->view()->article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $ctr->mainController();
 
       // adresáře k fotkám
@@ -113,18 +113,18 @@ class Photogalerymed_Controller extends Articles_Controller {
       if($art == false) return false;
       // TOHLE chce dořešit, prasárna, ale ve 4 ráno nic nenapadne
       if($this->category()->getRights()->isControll() OR
-         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $art->{Articles_Model_Detail::COLUMN_ID_USER})) {
+         ($this->category()->getRights()->isWritable() AND Auth::getUserId() == $art->{Articles_Model::COLUMN_ID_USER})) {
       } else {
          return false;
       }
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $art->{Articles_Model_Detail::COLUMN_EDIT_TIME} = new DateTime();
-      $art->{Articles_Model_Detail::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
+      $ctr->setOption('idArt', $art->{Articles_Model::COLUMN_ID});
+      $ctr->setOption('subdir', $art[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $art->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
+      $art->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
       $artModel->save($art);
-      $ctr->editphotosController($this->link()->route('detail', array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY})));
+      $ctr->editphotosController($this->link()->route('detail', array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY})));
       $this->view()->article = $art;
    }
 
@@ -134,41 +134,40 @@ class Photogalerymed_Controller extends Articles_Controller {
    }
 
    public function uploadFileController() {
-      $artModel = new Articles_Model_Detail();
-//      $art = $artModel->getArticleById((int)$this->getRequestParam('addimage_idArt'));
-      $art = $artModel->getArticle($this->getRequest('urlkey'));
+      $artModel = new Articles_Model();
+      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($art == false) return false;
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
 
       if($art !== false) {
-         $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-         $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-         $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
+         $ctr->setOption('idArt', $art->{Articles_Model::COLUMN_ID});
+         $ctr->setOption('subdir', $art[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
+         $artModel->setLastChange($art->{Articles_Model::COLUMN_ID});
       }
       $ctr->uploadFileController();
    }
 
    public function editphotoController() {
-      $artModel = new Articles_Model_Detail();
-      $art = $artModel->getArticle($this->getRequest('urlkey'));
+      $artModel = new Articles_Model();
+      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($art == false) return false;
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $ctr->setOption('subdir', $art[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
       $ctr->editphotoController();
    }
 
    public function exportArticleController(){
       $this->checkReadableRights();
-      $model= new Articles_Model_Detail();
-      $article = $model->getArticle($this->getRequest('urlkey'));
+      $model= new Articles_Model();
+      $article = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($article === false) return false;
 
       $modelPhotos = new PhotoGalery_Model_Images();
       $this->view()->article = $article;
-      $this->view()->images = $modelPhotos->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID});
+      $this->view()->images = $modelPhotos->getImages($this->category()->getId(), $article->{Articles_Model::COLUMN_ID});
 
       // adresáře k fotkám
-      $this->view()->subdir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->subdir = $this->view()->article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->view()->subdir);
    }
 

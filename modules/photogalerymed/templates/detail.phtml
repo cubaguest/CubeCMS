@@ -1,6 +1,6 @@
 <?
-$this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
-$h1 = $this->article->{Articles_Model_Detail::COLUMN_NAME};
+$this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
+$h1 = $this->article->{Articles_Model::COLUMN_NAME};
 // jquery galerka
 $this->addJsPlugin(new JsPlugin_PiroBox());
 echo $this->toolbox;
@@ -8,8 +8,8 @@ echo $this->toolbox;
 <h1><?=$h1?></h1>
 <div class="main-content-detail">
    <div class="main-content-text"><?
-   if((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {
-      echo $this->article->{Articles_Model_Detail::COLUMN_TEXT};
+   if((string)$this->article->{Articles_Model::COLUMN_TEXT} != null) {
+      echo $this->article->{Articles_Model::COLUMN_TEXT};
    } else if($this->category()->getRights()->isWritable()) {
       echo '<p>'.$this->tr('Źádný text galerie nebyl vyplněn. (Tento text vidí pouze oprávněný uživatel.)').'</p><br />';
    }
@@ -35,7 +35,7 @@ echo $this->toolbox;
    <hr class="reseter" />
    <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route()));?>
    <?$this->includeTpl('articletools.phtml', true, array(
-           'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
+           'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
            'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));?>

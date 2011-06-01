@@ -1,17 +1,17 @@
 <?
-$addDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_ADD_TIME});
-$editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME});
+$addDate = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
+$editDate = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 <div>
-   <h2><?echo htmlspecialchars($this->article->{Articles_Model_Detail::COLUMN_NAME})?></h2>
+   <h2><?echo htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME})?></h2>
    <p>
       <?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
               ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;
+      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
    </p>
-   <?if($this->article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
+   <?if($this->article->{Articles_Model::COLUMN_TEXT} != null) {?>
    <div class="photogaleryMedText">
-         <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
+         <?=$this->article->{Articles_Model::COLUMN_TEXT}?>
    </div>
    <br />
       <?}?>
@@ -28,7 +28,7 @@ $editDate = new DateTime($this->article->{Articles_Model_Detail::COLUMN_EDIT_TIM
    </div>
    <hr class="reseter" />
    <?$this->includeTpl('articletools.phtml', true, array(
-           'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
+           'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailpdf'),
            'shares' => $this->shares));?>

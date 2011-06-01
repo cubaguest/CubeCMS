@@ -32,7 +32,7 @@ class Photogalerymed_View extends Articles_View {
 
    public function editphotosView() {
       Template_Module::setEdit(true);
-      $this->template()->addPageTitle($this->template()->article->{Articles_Model_Detail::COLUMN_NAME}
+      $this->template()->addPageTitle($this->template()->article->{Articles_Model::COLUMN_NAME}
               ." - ".$this->tr('úprava obrázků'));
       $this->template()->addFile('tpl://photogalery:editphotos.phtml');
    }
@@ -49,7 +49,7 @@ class Photogalerymed_View extends Articles_View {
 
       // doplnění fotek
       $photosM = new PhotoGalery_Model_Images();
-      $images = $photosM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID});
+      $images = $photosM->getImages($this->category()->getId(), $article->{Articles_Model::COLUMN_ID});
 //      $c->pdf()->AddPage();
       // nadpis
       $c->pdf()->SetFont(VVE_PDF_FONT_NAME_MAIN, 'B', VVE_PDF_FONT_SIZE_MAIN);
@@ -62,7 +62,7 @@ class Photogalerymed_View extends Articles_View {
 
       while ($image = $images->fetch()) {
          $sizes = getimagesize($this->category()->getModule()->getDataDir()
-                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                 .$article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()]
                  .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE});
 
@@ -73,7 +73,7 @@ class Photogalerymed_View extends Articles_View {
          } // převody mezi px<>mm
 
          $c->pdf()->Image($this->category()->getModule()->getDataDir()
-                 .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                 .$article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()]
                  .DIRECTORY_SEPARATOR.Photogalery_Controller::DIR_MEDIUM
                  .DIRECTORY_SEPARATOR.$image->{PhotoGalery_Model_Images::COLUMN_FILE},
                  $coll*100+VVE_PDF_MARGIN_LEFT, '', $width);

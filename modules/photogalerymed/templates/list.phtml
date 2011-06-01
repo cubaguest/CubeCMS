@@ -11,36 +11,36 @@ echo $this->toolbox;
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $noPClass = $noPubllic = null;
-         if($article->{Articles_Model_Detail::COLUMN_CONCEPT} == 1){
+         if($article->{Articles_Model::COLUMN_CONCEPT} == 1){
             $noPClass = 'main-content-concept';
             $noPubllic = $this->tr('Koncept');
          }
-         $addDate = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
+         $addDate = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          ?>
    <div class="main-content-list-record <?=$noPClass?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+             title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>&nbsp;
             <span class="font-small"><?=strftime("%x %X", $addDate->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a><span class="font-small"><?=$noPubllic?></span>
       </h2>
       <div class="main-content-list-record-images">
       <?
       $images = $modelImages->getImages($this->category()->getId(), 
-              $article->{Articles_Model_Detail::COLUMN_ID},
+              $article->{Articles_Model::COLUMN_ID},
               $this->category()->getParam('imagesinlist', Photogalerymed_Controller::DEFAULT_IMAGES_IN_LIST));
       while ($row = $images->fetch()) {?>
       <img alt="<?=$row->{PhotoGalery_Model_Images::COLUMN_NAME}?>" 
            src="<?=$this->category()->getModule()->getDataDir(true).
-              $article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+              $article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()]
               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL
               .URL_SEPARATOR.$row->{PhotoGalery_Model_Images::COLUMN_FILE}?>" />
       <?}?>
       </div>
       <hr class="reseter" />
-      <p style="float:left;"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
+      <p style="float:left;"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+            title="<?=$article->{Articles_Model::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
       </p>
       <br />
       </div>
