@@ -939,6 +939,7 @@ class Model_ORM extends Model_PDO {
     */
    public function groupBy($cols, $merge = false)
    {
+      if(!is_array($cols)) $cols = array($cols);
       if(!$merge){
          $this->groupby = $cols;
       } else {
@@ -1070,13 +1071,13 @@ class Model_ORM extends Model_PDO {
             $this->joinString .= $part; // uložení do joinstring
             // samotné vytvoření sloupců
 
-            if (empty($join['columns'])) { // jen vybrané sloupce
+            if ($join['columns'] === null) { // jen vybrané sloupce
                foreach ($modelCols as $name => $params) {
                   if ($params['pk'] == true)// všechny sloupce z tabulky kromě pk
                      continue;
                   array_push($columns, $this->createSelectColumnString($join['table2Alias'], $name, null, $params['lang'], $params['aliasFor']));
                }
-            } else {
+            } else if(is_array($join['columns']) AND !empty ($join['columns'])) {
                foreach ($join['columns'] as $alias => $coll) {
                   array_push($columns, $this->createSelectColumnString($join['table2Alias'], $coll, $alias,
                   isset($modelCols[$coll]) ? $modelCols[$coll]['lang'] : false, isset($modelCols[$coll]) ? $modelCols[$coll]['aliasFor'] : null));
