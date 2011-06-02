@@ -7,16 +7,16 @@ echo $this->toolbox;
 ?>
 
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');
-if($this->category()->getRights()->isControll()){
+/*if($this->category()->getRights()->isControll()){
    echo vve_tpl_show_text_langs($this->article->{Articles_Model::COLUMN_URLKEY});
-}?>
+}*/?>
 </h1>
 
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
-   <div class="main-content-annotation"><?=$this->article->{Articles_Model::COLUMN_ANNOTATION};?></div>
+   <div class="main-content-annotation"><?=$this->filter((string)$this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));?></div>
    <?}?>
-   <div class="main-content-text"><?=$this->article->{Articles_Model::COLUMN_TEXT}?></div>
+   <div class="main-content-text"><?=$this->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'))?></div>
    <hr class="reseter" />
    <?$this->includeTpl('privateText.phtml', false,null,'articles');?>
    <br />

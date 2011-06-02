@@ -65,9 +65,10 @@ class Articles_View extends View {
             ->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
          $this->toolbox->addTool($tooldel);
          
-//          $toollang = new Template_Toolbox2_Tool_Selector();
-//          $toollang->setIcon('page_edit.png')->setTitle($this->tr('Změnit jazyk'));
-//          $this->toolbox->addTool($toollang);
+         if($this->article != false){
+            $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->article->{Articles_Model::COLUMN_TEXT});
+            $this->toolbox->addTool($toolLangLoader);
+         }
 
          if($this->category()->getParam(Articles_Controller::PARAM_PRIVATE_ZONE, false) == true){
             $toolboxP = new Template_Toolbox2();
@@ -78,6 +79,13 @@ class Articles_View extends View {
             $toolboxP->addTool($toolEdit);
             $this->toolboxPrivate = $toolboxP;
          }
+         
+         if(isset ($_GET['l']) AND isset ($this->article[Articles_Model::COLUMN_TEXT][$_GET['l']])){
+            $l = $_GET['l'];
+            $this->article->{Articles_Model::COLUMN_TEXT} = $this->article[Articles_Model::COLUMN_TEXT][$l];
+            $this->article->{Articles_Model::COLUMN_NAME} = $this->article[Articles_Model::COLUMN_NAME][$l];
+         }
+         $this->article->{Articles_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('anchors'));
       }
    }
 
