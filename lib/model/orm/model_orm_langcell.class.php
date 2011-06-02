@@ -39,7 +39,7 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @return mixed
     */
    public function  &__get($name) {
-      return stripcslashes($this->values[$name]);
+      return $this->values[$name];
    }
 
    /**
@@ -74,7 +74,7 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @return boolean
     */
    public function offsetExists($offset) {
-      return isset($this->container[$offset]);
+      return isset($this->values[$offset]);
    }
 
    /**
