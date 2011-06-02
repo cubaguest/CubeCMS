@@ -29,9 +29,11 @@ class Text_Controller extends Controller {
       $model = new Text_Model();
       $modelPrivate = new Text_Model_Private();
       // text
-      $text = $model->getText($this->category()->getId(),self::TEXT_MAIN_KEY);
-
-      if($this->category()->getParam(self::PARAM_ALLOW_PRIVATE, false)== true AND Auth::isLogin()){
+      $text = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_MAIN_KEY))
+         ->record();
+      
+      if($text != false AND $this->category()->getParam(self::PARAM_ALLOW_PRIVATE, false)== true AND Auth::isLogin()){
          $textPrivate = $model->getText($this->category()->getId(),self::TEXT_PRIVATE_KEY);
 
          if($this->category()->getRights()->isControll() OR $modelPrivate->haveGroup($textPrivate->{Text_Model::COLUMN_ID}, Auth::getGroupId())

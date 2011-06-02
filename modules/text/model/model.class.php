@@ -3,7 +3,7 @@
  * Třída modelu s detailem textu
  * 
 */
-class Text_Model extends Model_PDO {
+class Text_Model extends Model_ORM {
    /**
     * Tabulka s detaily
     */
@@ -23,6 +23,29 @@ class Text_Model extends Model_PDO {
 
    const DEFAULT_SUBKEY = 'nokey';
 
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_texts');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+//      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+//      $this->addColumn(self::COLUMN_ID_USER_LAST_EDIT, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
+      $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_SUBKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => 'nokey'));
+      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(300)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_CHANGED_TIME, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+//      $this->addColumn(self::COLUMN_CHANGED_TIME, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR));
+//      $this->addColumn(self::COLUMN_SHOWED, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      
+      $this->setPk(self::COLUMN_ID);
+      
+      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+//      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
+//      $this->addForeignKey(self::COLUMN_ID_USER_LAST_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
+//      $this->addRelatioOneToMany(self::COLUMN_ID, 'Text_Model_PrivateUsers', Text_Model_PrivateUsers::COLUMN_T_H_U_ID_TEXT);
+   }
+   
    /**
     * Metoda provede načtení textu z db podle kategorie a subklíče
     *
@@ -131,33 +154,6 @@ class Text_Model extends Model_PDO {
       } else {
          return $fetch->tm;
       }
-   }
-
-   /**
-    * Metoda provede hledání textu
-    * @param integer $idCat -- id kategorie
-    * @param string $string -- hledaný řetězec
-    * @return PDOStatement
-    */
-   public function search($idCat, $string) {
-      $dbc = new Db_PDO();
-      $clabel = self::COLUMN_LABEL.'_'.Locales::getLang();
-      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2).' * MATCH(`'.$clabel.'`) AGAINST (:sstring)'
-              .' + MATCH(`'.$ctext.'`) AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE MATCH(`'.$clabel.'`, `'.$ctext.'`) AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.self::COLUMN_ID_CATEGORY.'` = :idCat'
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER/2)
-              .' * MATCH(`'.$clabel.'`) AGAINST (:sstring) + MATCH(`'.$ctext.'`) AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-
-      return $dbst->fetch();
    }
 }
 

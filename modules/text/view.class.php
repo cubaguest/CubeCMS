@@ -7,30 +7,7 @@
 class Text_View extends View {
    public function mainView() {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'text.phtml'));
-      // text nebyl zadán
-      if($this->text == false){
-         $this->text = new Object();
-         $this->text->{Text_Model_Detail::COLUMN_TEXT} = null;
-         if($this->category()->getRights()->isWritable()){
-            $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
-         }
-      } else {
-         $this->text->{Text_Model_Detail::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model_Detail::COLUMN_TEXT}, array('anchors','filesicons'));
-      }
       
-      // private  text
-      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
-         if($this->textPrivate == false OR strip_tags((string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT}) == null){
-            $this->textPrivate = new Object();
-            $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = null;
-            if($this->category()->getRights()->isWritable()){
-               $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->tr('Privátní text nebyl vytvořen. Upravíte jej v administraci.');
-            }
-         }
-         $this->textPrivate->{Text_Model_Detail::COLUMN_TEXT} = $this->template()->filter(
-            (string)$this->textPrivate->{Text_Model_Detail::COLUMN_TEXT}, array('anchors','filesicons'));
-      }
-
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
@@ -67,11 +44,50 @@ class Text_View extends View {
             $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
             $this->toolbox->addTool($toolEView);
          }
+         if($this->text != false){
+            $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->text->{Text_Model::COLUMN_TEXT});
+            $this->toolbox->addTool($toolLangLoader);
+         }
+      }
+      
+      // text nebyl zadán
+      if($this->text == false){
+         $this->text = new Object();
+         $this->text->{Text_Model::COLUMN_TEXT} = null;
+         if($this->category()->getRights()->isWritable()){
+            $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
+         }
+      } else {
+         if(isset ($_GET['l']) AND isset ($this->text[Text_Model::COLUMN_TEXT][$_GET['l']])){
+            $l = $_GET['l'];
+            $this->text->{Text_Model::COLUMN_TEXT} = $this->text[Text_Model::COLUMN_TEXT][$l];
+            if($this->text[Text_Model::COLUMN_LABEL][$l] != null){
+               $this->text->{Text_Model::COLUMN_LABEL} = $this->text[Text_Model::COLUMN_LABEL][$l];
+            } else {
+               $obj = Category::getSelectedCategory()->getCatDataObj();
+               $this->text->{Text_Model::COLUMN_LABEL} = $obj[Model_Category::COLUMN_NAME][$l];
+            }
+            unset ($obj);
+         }
+         $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','filesicons'));
+      }
+      
+      // private  text
+      if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
+         if($this->textPrivate == false OR strip_tags((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}) == null){
+            $this->textPrivate = new Object();
+            $this->textPrivate->{Text_Model::COLUMN_TEXT} = null;
+            if($this->category()->getRights()->isWritable()){
+               $this->textPrivate->{Text_Model::COLUMN_TEXT} = $this->tr('Privátní text nebyl vytvořen. Upravíte jej v administraci.');
+            }
+         }
+         $this->textPrivate->{Text_Model::COLUMN_TEXT} = $this->template()->filter(
+            (string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, array('anchors','filesicons'));
       }
    }
 
    public function contentView() {
-      echo (string)$this->text->{Text_Model_Detail::COLUMN_TEXT};
+      echo (string)$this->text->{Text_Model::COLUMN_TEXT};
    }
 
    public function editView() {
