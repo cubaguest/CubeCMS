@@ -48,6 +48,19 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                   ?><input type="hidden" name="<?=$tool->getForm()->getFormChecker()->getName();?>" value="<?=$tool->getForm()->getFormChecker()->getValues() ?>" /><?
                ?></div></form><?
                break;
+            case 'Template_Toolbox2_Tool_LangLoader':
+               ?>
+               <div style="font-size: small;"><?=$image?>
+               <?
+               echo $this->tr('Ukaž');
+               $link = new Url_Link();
+                  foreach($tool->getLangs() as $key => $lang){?>
+                     <a class="toolbox-changelang-button" href="<?if(Locales::getLang() != $key){ echo $link->param('l', $key); } else {echo $link->param('l');}?>" 
+                        title="<?=$lang?>"><img src="images/langs/small/<?=$key?>.png" /></a>
+                  <?}?>
+               </div>
+               <?
+               break;
             default:
                echo $this->tr("nepodporovaný nástroj");
                break;

@@ -225,15 +225,28 @@ function vve_tpl_flash($flashUrl, $w, $h, $alternateStr = '<p>This is <b>alterna
  * @param Model_ORM_LangCell $text -- objekt jazyka
  * @param string $imagesPath -- (option) cesta k obrázkům
  * @return string
+ * @deprecated use vve_tpl_show_text_langs() function
  */
 function langsImages($text, $path = 'images/langs/small/') {
+   return vve_tpl_show_text_langs($text, $path);
+}
+
+/**
+ * Funkce vykreslí obrázky jazyků, které jsou vyplněny v textu (pokud web není vícejazyčný, nevykreslí se nic)
+ * @param Model_ORM_LangCell $text -- objekt jazyka
+ * @param string $imagesPath -- (option) cesta k obrázkům
+ * @return string
+ */
+function vve_tpl_show_text_langs($text, $path = null)
+{
    if(!Locales::isMultilang()) return null;
-   if(($text instanceof Model_ORM_LangCell) == false
-      AND ($text instanceof Model_LangContainer_LangColumn) == false) throw new UnexpectedValueException(_('Byl předán špatný typ jazykového kontejneru pro text'));
    $string = null;
-   foreach (Locales::getAppLangs() as $lang) {
-      if($text[$lang] != null){
-         $string .= vve_tpl_lang_image($lang, $path);
+   if(($text instanceof Model_ORM_LangCell) OR ($text instanceof Model_LangContainer_LangColumn)){
+//      throw new UnexpectedValueException(_('Byl předán špatný typ jazykového kontejneru pro text'));
+      foreach (Locales::getAppLangs() as $lang) {
+         if($text[$lang] != null){
+            $string .= vve_tpl_lang_image($lang, $path);
+         }
       }
    }
    return $string;
@@ -260,4 +273,5 @@ function vve_remove_empty_tags($text)
 {
    return preg_replace('/<(?!input|br|img|meta|hr|\/)[^>]*>\s*<\/[^>]*>/i', '', $text);
 }
+
 ?>

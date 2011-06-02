@@ -299,7 +299,28 @@ input[type="text"], input[type="password"], form .form-table .form-element-short
 textarea, form .form-table .form-element-long {
    width: 450px;
 }
-
+.form-row-action-icon {
+   height: 16px;
+}
+#loadingBox {
+/*   background-color: white;*/
+   text-align:center;
+   z-index: 10001;
+   padding-top: 30%;
+   background-image: url('../images/bg_w_70.png');
+}
+#loadingBox .loader-w {
+   text-align: left;
+   display: block;
+   margin: 0 auto;
+   width: 100px;
+   border: 1px solid gray;
+   background: white url('../images/ajax-loader.gif') 3px 3px no-repeat;
+   padding: 2px 2px 2px 23px;
+   -moz-box-shadow:0 0 2px #000000;
+   -webkit-box-shadow:0 0 2px #000000;
+   box-shadow:0 0 2px #000000;
+}
 /* odkaz zpět */
 .button_back {
    display: block;
