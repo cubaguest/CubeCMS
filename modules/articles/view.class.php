@@ -64,6 +64,10 @@ class Articles_View extends View {
          $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat položku'))
             ->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
          $this->toolbox->addTool($tooldel);
+         
+//          $toollang = new Template_Toolbox2_Tool_Selector();
+//          $toollang->setIcon('page_edit.png')->setTitle($this->tr('Změnit jazyk'));
+//          $this->toolbox->addTool($toollang);
 
          if($this->category()->getParam(Articles_Controller::PARAM_PRIVATE_ZONE, false) == true){
             $toolboxP = new Template_Toolbox2();

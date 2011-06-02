@@ -6,7 +6,11 @@ $this->addJsPlugin($piroBox);
 echo $this->toolbox;
 ?>
 
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');
+if($this->category()->getRights()->isControll()){
+   echo vve_tpl_show_text_langs($this->article->{Articles_Model::COLUMN_URLKEY});
+}?>
+</h1>
 
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
