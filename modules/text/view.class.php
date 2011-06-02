@@ -48,16 +48,7 @@ class Text_View extends View {
             $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->text->{Text_Model::COLUMN_TEXT});
             $this->toolbox->addTool($toolLangLoader);
          }
-      }
-      
-      // text nebyl zadán
-      if($this->text == false){
-         $this->text = new Object();
-         $this->text->{Text_Model::COLUMN_TEXT} = null;
-         if($this->category()->getRights()->isWritable()){
-            $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
-         }
-      } else {
+         
          if(isset ($_GET['l']) AND isset ($this->text[Text_Model::COLUMN_TEXT][$_GET['l']])){
             $l = $_GET['l'];
             $this->text->{Text_Model::COLUMN_TEXT} = $this->text[Text_Model::COLUMN_TEXT][$l];
@@ -69,6 +60,16 @@ class Text_View extends View {
             }
             unset ($obj);
          }
+      }
+      
+      // text nebyl zadán
+      if($this->text == false){
+         $this->text = new Object();
+         $this->text->{Text_Model::COLUMN_TEXT} = null;
+         if($this->category()->getRights()->isWritable()){
+            $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
+         }
+      } else {
          $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','filesicons'));
       }
       
