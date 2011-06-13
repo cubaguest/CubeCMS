@@ -14,7 +14,7 @@ class Photogalery_Controller extends Controller {
    const DIR_SMALL = 'small';
    const DIR_MEDIUM = 'medium';
    const DIR_ORIGINAL = 'original';
-   
+
    const PARAM_TPL_MAIN = 'tplmain';
    const PARAM_EDITOR_TYPE = 'editor';
 
@@ -42,20 +42,24 @@ class Photogalery_Controller extends Controller {
       $this->view()->subdir = $this->getOption('subdir', null);
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->getOption('subdir', null));
 
-      $model = new Text_Model_Detail();
-      $this->view()->text = $model->getText($this->category()->getId());
+      $model = new Text_Model();
+      $this->view()->text = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY))
+         ->record();
    }
 
    public function edittextController() {
       $this->checkWritebleRights();
-      
+
       $form = new Form("text_");
       $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
       $form->addElement($textarea);
 
-      $model = new Text_Model_Detail();
-      $text = $model->getText($this->category()->getId());
+      $model = new Text_Model();
+      $text = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY))
+         ->record();
       if($text != false) {
          $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
       }
@@ -69,7 +73,7 @@ class Photogalery_Controller extends Controller {
 
       if($form->isValid()) {
          try {
-            $model->saveText($form->text->getValues(), null, $this->category()->getId());
+            $model->saveText($form->text->getValues(), Text_Controller::TEXT_MAIN_KEY, $this->category()->getId());
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
@@ -150,20 +154,20 @@ class Photogalery_Controller extends Controller {
                      .$this->getOption('subdir', null).Photogalery_Controller::DIR_ORIGINAL);
                   $image->rotateImage($editForm->rotate->getValues($id));
                   $image->save();
-                  
+
                   $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir().
                      $this->getOption('subdir', null).self::DIR_ORIGINAL);
                   $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_SMALL,
                      $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
-                     $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), 
+                     $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H),
                      $this->category()->getParam('small_crop', true));
-                  
+
                   $image->saveAs($this->category()->getModule()->getDataDir().$this->getOption('subdir', null).self::DIR_MEDIUM,
                      $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
-                     $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT), 
+                     $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT),
                      $this->category()->getParam('medium_crop', false));
 
-                  
+
 //                   $image = new Filesystem_File_Image($file, $this->category()->getModule()->getDataDir(false)
 //                      .$this->getOption('subdir', null).Photogalery_Controller::DIR_MEDIUM);
 //                   $image->rotateImage($editForm->rotate->getValues($id));
@@ -354,7 +358,7 @@ class Photogalery_Controller extends Controller {
 
    public function settings(&$settings,Form &$form) {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
-      
+
       $componentTpls = new Component_ViewTpl();
       $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'photogalery');
 
@@ -365,7 +369,7 @@ class Photogalery_Controller extends Controller {
       }
       $form->addElement($elemTplMain, $fGrpViewSet);
       unset ($componentTpls);
-      
+
       $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 
       $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
@@ -381,7 +385,7 @@ class Photogalery_Controller extends Controller {
       }
 
       $form->addElement($elemEditorType, $fGrpEditSet);
-      
+
       $form->addGroup('images', 'Nastavení obrázků');
 
       $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
@@ -429,7 +433,7 @@ class Photogalery_Controller extends Controller {
          $elemC->setValues($settings['medium_crop']);
       }
       $form->addElement($elemC, 'images');
-      
+
       if($form->isValid()){
          $settings['small_width'] = $form->small_width->getValues();
          $settings['small_height'] = $form->small_height->getValues();
