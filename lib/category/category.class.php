@@ -26,8 +26,8 @@ class Category extends Category_Core {
          $this->loadCat(null, $categoryDataObj);
          $this->categoryIsDefault = true;
       }
-      if(!empty ($this->category)) {
-         $this->categoryRights = new Rights();
+      $this->categoryRights = new Rights();
+      if($this->isValid()) {
          $this->loadRights();
       }
       if($isSelectedCategory) {
@@ -50,16 +50,14 @@ class Category extends Category_Core {
          } else {
             $catModel->setGroupPermissions()->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
          }
-         $catArray = $catModel->record();
+         $this->category = $catModel->record();
       } else {
-         $catArray = $catDataObj;
+         $this->category = $catDataObj;
       }
       //		Pokud nebyla načtena žádná kategorie
-      if(empty($catArray)) {
-         $this->category = new Module_ErrPage_Category();
-         return false;
-      } else {
-         $this->category = $catArray;
+      if($this->category == null) {
+//         $this->isValid = false;
+         return;
       }
       // vytvoření objektu Modulu
       if($this->category->{Model_Category::COLUMN_PARAMS} != null){

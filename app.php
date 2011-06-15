@@ -1062,7 +1062,8 @@ class AppCore extends TrObject {
             self::$category = new Category_Admin(self::$urlRequest->getCategory(),true);
          }
          Url_Link::setCategory(self::$category->getUrlKey());
-      } else { // Chyba stránky
+      } 
+      if((self::$category instanceof Category_Core == false) OR !self::$category->isValid()){ // Chyba stránky
          self::$category = new Module_ErrPage_Category(self::$urlRequest->getCategory(),true);
          Url_Link::setCategory(self::$category->getUrlKey());
          AppCore::setErrorPage(true);

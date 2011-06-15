@@ -94,7 +94,7 @@ class Category_Core extends TrObject {
    {
       return $this->categoryIsDefault;
    }
-
+   
    /**
     * Metoda vrací požadovaný parametr
     * @param string $param -- index parametru
