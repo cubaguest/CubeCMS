@@ -24,6 +24,23 @@ class Photogalery_View extends View {
             $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
             $this->toolboxText->addTool($toolEView);
          }
+         
+         if($this->text != false){
+            $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->text->{Text_Model::COLUMN_TEXT});
+            $this->toolboxText->addTool($toolLangLoader);
+         }
+         
+         if(isset ($_GET['l']) AND isset ($this->text[Text_Model::COLUMN_TEXT][$_GET['l']])){
+            $l = $_GET['l'];
+            $this->text->{Text_Model::COLUMN_TEXT} = $this->text[Text_Model::COLUMN_TEXT][$l];
+            if($this->text[Text_Model::COLUMN_LABEL][$l] != null){
+               $this->text->{Text_Model::COLUMN_LABEL} = $this->text[Text_Model::COLUMN_LABEL][$l];
+            } else {
+               $obj = Category::getSelectedCategory()->getCatDataObj();
+               $this->text->{Text_Model::COLUMN_LABEL} = $obj[Model_Category::COLUMN_NAME][$l];
+               unset ($obj);
+            }
+         }
 
          $this->toolboxImages = $toolbox;
       }

@@ -73,7 +73,7 @@ class Photogalery_Controller extends Controller {
 
       if($form->isValid()) {
          try {
-            $model->saveText($form->text->getValues(), Text_Controller::TEXT_MAIN_KEY, $this->category()->getId());
+            $model->saveText($form->text->getValues(), null, $this->category()->getId(), Text_Controller::TEXT_MAIN_KEY);
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {

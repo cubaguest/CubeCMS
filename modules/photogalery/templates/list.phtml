@@ -13,7 +13,10 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
    }
    echo $this->toolboxText;
    ?></div>
-   <!-- Start Advanced Gallery Html Containers -->
+   <?
+   $images = $this->images;
+   if(count($images) != 0){
+   ?>
    <div class="main-content-images">
       <?
       $images = $this->images;
@@ -30,7 +33,15 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
         echo $this->toolboxImages;
         ?>
    </div>
-   <!-- End Gallery Html Containers -->
+    <?
+   } else if($this->toolboxImages != null){?>
+   <div class="admin-info-text">
+      <?
+      echo $this->tr('Galerie neobsahuje žádný obrázek.');
+      echo $this->toolboxImages;
+      ?>
+   </div>
+   <?}?>
    <hr class="reseter" />
    <script type="text/javascript">
       /* <![CDATA[ */
