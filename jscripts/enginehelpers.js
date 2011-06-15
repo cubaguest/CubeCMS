@@ -48,18 +48,21 @@ function showLoadBox(box, timeout){
       timeout = 5000;
    }
    var jbox = $(box);
-   var overBox = $('<div id="loadingBox" style="background-color: white; text-align:center;"><img src="images/progress.gif" alt="Loading..." /></div>')
+   var parentBox = $(box).parent('div,p');
+//   var overBox = $('<div id="loadingBox"><img src="images/progress.gif" alt="Loading..." /></div>')
+   var overBox = $('<div id="loadingBox"><div class="loader-w"><span class="loader-text">loading...</span></div>')
    .css({
       position : 'absolute',
       top : 0,
       left : 0,
       opacity : 0,
-      width : jbox.width(),
-      height : jbox.height()
+      width : jbox.width()+parseInt(parentBox.css('padding-left'))+parseInt(parentBox.css('padding-right'))
+                          +parseInt(jbox.css('margin-left'))+parseInt(jbox.css('margin-right')),
+      height : jbox.height()+parseInt(parentBox.css('padding-top'))+parseInt(parentBox.css('padding-bottom'))
+                          +parseInt(jbox.css('margin-top'))+parseInt(jbox.css('margin-bottom'))
    });
-   var parentBox = $(box).parent('div,p');
    parentBox.css('position', 'relative').prepend(overBox.hide());
-   parentBox.children('#loadingBox').fadeTo(500, 0.5);
+   parentBox.children('#loadingBox').fadeTo(500, 1);
    setTimeout("hideLoadBox()", timeout); // zrušení
 }
 
@@ -80,30 +83,12 @@ function vveLoadImage(src, callback){
    cacheImage.src = src;
 }
 
-$(document).ready(function(){
-   // select first language
-   $('.form-link-lang-container a:first-child').trigger('click', [false]);
-   // when language is changed
-   $('.form-link-lang-container a.form-link-lang').live('click',function(event, focus){
-      if(typeof focus == 'undefined') focus = true;
-      var lang = this.lang;
-      $(this).parent('p').find('a').removeClass('form-link-lang-sel');
-      $(this).addClass('form-link-lang-sel');
-      // vybereme prvek, který obsahuje inputy
-      var $container = $(this).closest('*:has(p[lang])');
-      $('p[lang]', $container).hide();
-      var p = $('p[lang="'+lang+'"]', $container).show();
-      if(focus) {
-         p.find('input,textarea,select').focus();
-      }
-      // zobrazení popisku k elementu
-      $container = $(this).closest('*:has(label[lang])')[0];
-      $('label[lang]', $container).hide();
-      $('label[lang="'+lang+'"]', $container).show();
-      return false;
-   });
-
-
+function initToolboxEvents(){
+   /**
+    * Initializa all button only once
+    */
+   var toolboxButtons = $('a.toolbox-button');
+   
    $("div.toolbox").parent('div').css({position: 'relative'});
    $(".toolbox-tool").hover(function(){
       $(this).addClass('ui-state-highlight');
@@ -133,23 +118,72 @@ $(document).ready(function(){
       function(){
          $('.toolbox-active-content').removeClass('toolbox-active-content');
          $(this).animate({opacity:0}, 500, function(){$(this).remove();});
+   });
+   
+   // move toolbox with document when scrolling
+   
+   $(document).scroll(function(){
+      var top = $(this).scrollTop();
+      toolboxButtons.each(function(){
+   //      $('#toolbox-pos').html($(this).offset().left);
+         var $container = $(this).parent();
+         if($container.offset().top < top+30 && top < $container.offset().top+$container.height()-30){
+            $('#toolbox-pos').html(top+"<br />"+$(this).offset().left);
+            $(this).css({
+               position : "fixed",
+               top: 30,
+               left: $(this).offset().left
+            });
+         } else {
+            $(this).css({
+               position : "absolute",
+               top: 1,
+               right: 1, left : "auto"
+            
+            });
+            $('#toolbox-pos').html(top+"<br />moving stop");
+         }
       });
+   });
+}
+
+$(document).ready(function(){
+   // select first language
+   $('.form-link-lang-container a:first-child').trigger('click', [false]);
+   // when language is changed
+   $('.form-link-lang-container a.form-link-lang').live('click',function(event, focus){
+      if(typeof focus == 'undefined') focus = true;
+      var lang = this.lang;
+      $(this).parent('p').find('a').removeClass('form-link-lang-sel');
+      $(this).addClass('form-link-lang-sel');
+      // vybereme prvek, který obsahuje inputy
+      var $container = $(this).closest('*:has(p[lang])');
+      $('p[lang]', $container).hide();
+      var p = $('p[lang="'+lang+'"]', $container).show();
+      if(focus) {
+         p.find('input,textarea,select').focus();
+      }
+      // zobrazení popisku k elementu
+      $container = $(this).closest('*:has(label[lang])')[0];
+      $('label[lang]', $container).hide();
+      $('label[lang="'+lang+'"]', $container).show();
+      return false;
+   });
+
+   initToolboxEvents();
+   
    // open external link in new window
    $("a.link-external").live('click',function(){
       window.open(this.href);
       return false;
-   });   
-      
-});
-// move toolbox with document when scrolling
-$(document).scroll(function(){
-   var top = $(this).scrollTop()+30;
-   $('a.toolbox-button').each(function(){
-      var $container = $(this).parent();
-      if($container.offset().top < top && top < $container.offset().top+$container.height()-10){
-         $(this).css({top: top-$container.offset().top});
-      } else if($container.offset().top > top){
-         $(this).css({top: 0});
-      }
    });
+   // načítání jazykových mutací
+   $('a.toolbox-changelang-button').live('click', function(){
+      showLoadBox('.main-content');
+      $('.main-content').load(this.href, function(){
+         hideLoadBox();
+         initToolboxEvents();
+      });
+      return false;
+   });   
 });
