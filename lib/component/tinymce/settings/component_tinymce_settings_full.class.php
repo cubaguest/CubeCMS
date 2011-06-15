@@ -8,7 +8,7 @@ class Component_TinyMCE_Settings_Full extends Component_TinyMCE_Settings_Advance
        'inlinepopups','insertdatetime','preview','media','searchreplace','print',
        'contextmenu','paste','directionality','fullscreen','noneditable','visualchars',
        'nonbreaking','xhtmlxtras','template','imgmap', 
-      'imgalign', 'imgpreview' // Cube-CMS plugins
+      'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins
       );
 
    protected $defaultButtons = array(
@@ -18,7 +18,7 @@ class Component_TinyMCE_Settings_Full extends Component_TinyMCE_Settings_Advance
         "bullist","numlist","|","outdent","indent","blockquote","|","undo","redo","|","link","unlink","anchor","|",
         "forecolor","backcolor","|","removeformat","cleanup","visualaid"),
      'theme_advanced_buttons3' => array("tablecontrols","|","insertdate","inserttime","|","hr","charmap","sub","sup","|",
-        "image","emotions","iespell","media","advhr","|","ltr","rtl"),
+        "image",'cubephotogalery',"emotions","iespell","media","advhr","|","ltr","rtl"),
      'theme_advanced_buttons4' => array("insertlayer","moveforward","movebackward","absolute","|","styleprops","|",
         "cite","abbr","acronym","del","ins","attribs","|","visualchars","nonbreaking","template","blockquote","pagebreak","|",
         "newdocument","|","preview","print","fullscreen","code",'|','imgal','imgar', '|', 'imgpreview')

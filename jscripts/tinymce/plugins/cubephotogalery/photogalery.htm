@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#cubephotogalery_dlg.dialog_title}</title>
+	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="../../utils/mctabs.js"></script>
+	<script type="text/javascript" src="../../utils/form_utils.js"></script>
+	<script type="text/javascript" src="../../utils/validate.js"></script>
+	<script type="text/javascript" src="../../utils/editable_selects.js"></script>
+	<script type="text/javascript" src="../../../swfupload/swfupload.js"></script>
+	<script type="text/javascript" src="js/photogalery.js"></script>
+	<link href="css/photogalery.css" rel="stylesheet" type="text/css" />
+</head>
+<body id="cubephotogalery" style="display: none" role="application" aria-labelledby="app_title">
+	<span id="app_title" style="display:none">{#cubephotogalery_dlg.dialog_title}</span>
+	<form onsubmit="CubePhotogaleryDialog.insert();return false;" action="#"> 
+      <span id="swfUButtonPlaceholder"></span>
+		<div class="tabs">
+			<ul>
+				<li id="general_tab" class="current" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');CubePhotogaleryDialog.showSWFUButton();" onmousedown="return false;">{#cubephotogalery_dlg.tab_general}</a></span></li>
+				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');CubePhotogaleryDialog.hideSWFUButton();" onmousedown="return false;">{#cubephotogalery_dlg.tab_advanced}</a></span></li>
+				<li id="html_tab" aria-controls="html_panel"><span><a href="javascript:mcTabs.displayTab('html_tab','html_panel');CubePhotogaleryDialog.hideSWFUButton();" onmousedown="return false;">{#cubephotogalery_dlg.tab_html}</a></span></li>
+			</ul>
+		</div>
+
+		<div class="panel_wrapper">
+			<div id="general_panel" class="panel current">
+				<fieldset>
+						<legend>{#cubephotogalery_dlg.general}</legend>
+						<table role="presentation" class="properties">
+							<tr>
+								<td><label for="galery_name">{#cubephotogalery_dlg.galery_name}</label></td>
+								<td><input id="galery_name" name="galery_name" type="text" value="" /></td>
+                        <td>
+                           <select id="galery_name_type" name="galery_name_type">
+                              <option value="h2" selected="selected">h2</option>
+                              <option value="h3">h3</option>
+                              <option value="h4">h4</option>
+                           </select>
+                        </td>
+							</tr>
+							<tr>
+								<td class="column1"><label>{#cubephotogalery_dlg.images}</label></td>
+                        <td colspan="2"><input id="btnUpload" type="button" style="width: 100px; height: 22px; font-size: 8pt;" value="{#cubephotogalery_dlg.select_images}">
+                        {#cubephotogalery_dlg.selected_images}: <span id="filesSelected">0</span></td>
+							</tr>
+							<tr> 
+								<td class="column1"><label for="dir_name">{#cubephotogalery_dlg.dir_name}</label></td> 
+								<td colspan="2"><input id="dir_name" name="dir_name" type="text" value="" /></td> 
+							</tr> 
+						</table>
+				</fieldset>
+
+				<fieldset>
+					<legend>{#cubephotogalery_dlg.uploadstatus}</legend>
+					<table role="presentation" class="properties">
+							<tr>
+								<td id="uploadingImageStatus" class="column1">{#cubephotogalery_dlg.statusnotready}</td>
+								<td id="uploadingImageInfo"></td>
+                        <td id="progressFile">
+                           <div id="progressFileWrap">
+                              <div id="progressFileMeter">
+                                 <div id="progressFileText">0 %</div>
+                              </div>
+                           </div>
+                        </td>
+							</tr>
+							<tr>
+                        <td colspan="3">
+                           <div id="progressQueueWrap">
+                              <div id="progressQueueMeter">
+                                 <div id="progressQueueText">0 %</div>
+                              </div>
+                           </div>
+                        </td>
+							</tr>
+						</table>
+				</fieldset>
+            <fieldset>
+					<legend>{#cubephotogalery_dlg.images_loaded}</legend>
+               <div id="imagesUploadedWrapper">
+                  <table role="presentation" class="properties" id="imagesUploaded"></table>
+               </div>
+				</fieldset>
+            
+			</div>
+			<div id="advanced_panel" class="panel">
+            <fieldset>
+						<legend>{#cubephotogalery_dlg.label}</legend>
+                  <table role="presentation" class="properties">
+                     <tr>
+                        <td><label id="addLabelLabel" for="addLabel">{#cubephotogalery_dlg.label_add}</label></td>
+                        <td colspan="2"><input id="addLabel" name="addLabel" type="checkbox" value="" /></td>
+                     </tr>
+							<tr>
+								<td><label for="imageLabel">{#cubephotogalery_dlg.label}</label></td>
+								<td colspan="2"><input id="imageLabel" name="imageLabel" type="text" value="---" /></td>
+							</tr>
+                  </table>
+				</fieldset>
+         </div>
+			<div id="html_panel" class="panel">
+            <fieldset>
+						<legend>{#cubephotogalery_dlg.general}</legend>
+                  <table role="presentation" class="properties">
+							<tr>
+								<td><label for="galeryStyle">{#cubephotogalery_dlg.wrapper}</label></td>
+								<td colspan="2">
+                           <select id="wrapperList" name="wrapperList">
+                              <option value="">{#not_set}</option>
+                              <option value="p" selected="selected">p</option>
+                              <option value="div">div</option>
+                           </select>
+                        </td>
+							</tr>
+							<tr>
+                        <td><label id="prewievInlabel" for="prewievIn">{#cubephotogalery_dlg.preview_in}</label></td>
+                        <td>
+                           <select id="previewIn" name="prewievIn">
+                              <option value="pirobox_gall" selected="selected">PiroBox</option>
+                              <option value="lightbox">LightBox</option>
+                           </select>
+                        </td>
+                     </tr>
+                  </table>
+				</fieldset>
+            <fieldset>
+						<legend>{#cubephotogalery_dlg.image_settings}</legend>
+                  <table role="presentation" class="properties">
+                     <tr>
+                        <td><label id="imageClassLabel" for="imageClassList">{#class_name}</label></td>
+                        <td>
+                           <select id="imageClassList" name="imageClassList">
+                              <option value="" selected="selected">{#not_set}</option>
+                           </select>
+                        </td>
+                     </tr>
+							<tr>
+								<td><label for="imageStyle">{#cubephotogalery_dlg.style}</label></td>
+								<td colspan="2"><input id="imageStyle" name="imageStyle" type="text" value="" /></td>
+							</tr>
+                  </table>
+				</fieldset>
+            <fieldset>
+						<legend>{#cubephotogalery_dlg.link_settings}</legend>
+                  <table role="presentation" class="properties">
+                     <tr>
+                        <td><label id="linkClassLabel" for="linkClassList">{#class_name}</label></td>
+                        <td>
+                           <select id="linkClassList" name="linkClassList">
+                              <option value="" selected="selected">{#not_set}</option>
+                           </select>
+                        </td>
+                     </tr>
+							<tr>
+								<td><label for="linkStyle">{#cubephotogalery_dlg.style}</label></td>
+								<td colspan="2"><input id="linkStyle" name="linkStyle" type="text" value="" /></td>
+							</tr>
+                  </table>
+				</fieldset>
+			</div>
+		</div>
+
+		<div class="mceActionPanel">
+			<input type="submit" id="insert" name="insert" value="{#insert}" />
+			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+		</div>
+	</form>
+   <script type="text/javascript">
+//      alert('doc ready');
+   </script>
+</body> 
+</html> 

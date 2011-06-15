@@ -15,6 +15,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'external_media_list_url' => null,
       'remove_script_host' => true,
       'content_css' => null,
+      'PHPSESSID' => null,
       'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|name|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
       'forced_root_block' => 'p',
       'theme_advanced_toolbar_location' => 'top',
@@ -32,7 +33,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
    protected $defaultPlugins = array('safari','style','table','save','advhr','advimage','advlink','emotions','iespell','tabfocus',
       'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality','autoresize',
       'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists',
-      'imgalign', 'imgpreview' // Cube-CMS plugins
+      'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins
       );
 
    protected $defaultButtons = array(
@@ -41,7 +42,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_buttons2' => array('cut','copy','paste','pastetext','pasteword','|','search','replace','|','bullist',
          'numlist','|','outdent','indent','blockquote','|','link','unlink','anchor','cleanup','code','|','forecolor','backcolor'),
       'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap','|', 'styleprops'),
-      'theme_advanced_buttons4' => array('image','imgmap','|','imgal','imgar', '|', 'imgpreview', '|', 'emotions','media','template') // Cube-CMS buttons
+      'theme_advanced_buttons4' => array('image','cubephotogalery','emotions','media','template','|','imgmap', 'imgpreview','|','imgal','imgar') // Cube-CMS buttons
    );
 
    private $fileBrowserFunction = 'function vveTinyMCEFileBrowser (field_name, url, type, win) {
@@ -74,7 +75,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       } else {
          $this->advSettings['content_css'] = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
       }
-
+      $this->advSettings['editorid'] = session_id();
       $this->settings = array_merge($this->settings, $this->advSettings);
    }
 
