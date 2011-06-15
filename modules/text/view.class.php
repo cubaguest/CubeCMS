@@ -7,7 +7,7 @@
 class Text_View extends View {
    public function mainView() {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'text.phtml'));
-      
+
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
@@ -48,7 +48,7 @@ class Text_View extends View {
             $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->text->{Text_Model::COLUMN_TEXT});
             $this->toolbox->addTool($toolLangLoader);
          }
-         
+
          if(isset ($_GET['l']) AND isset ($this->text[Text_Model::COLUMN_TEXT][$_GET['l']])){
             $l = $_GET['l'];
             $this->text->{Text_Model::COLUMN_TEXT} = $this->text[Text_Model::COLUMN_TEXT][$l];
@@ -61,7 +61,7 @@ class Text_View extends View {
             unset ($obj);
          }
       }
-      
+
       // text nebyl zadán
       if($this->text == false){
          $this->text = new Object();
@@ -70,9 +70,9 @@ class Text_View extends View {
             $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
          }
       } else {
-         $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','filesicons'));
+         $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors'));
       }
-      
+
       // private  text
       if($this->category()->getParam(Text_Controller::PARAM_ALLOW_PRIVATE, false) == true){
          if($this->textPrivate == false OR strip_tags((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}) == null){
