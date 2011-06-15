@@ -179,7 +179,8 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param mixed $value -- hodnota proměnné
     */
    public function  __set($name, $value) {
-      $this->elements[$name] = $value;
+//      $this->elements[$name] = $value;
+      $this->addElement($value);
    }
 
    /**

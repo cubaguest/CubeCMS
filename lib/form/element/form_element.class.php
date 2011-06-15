@@ -213,6 +213,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    public function setValues($values, $key = null) {
       $this->isFiltered = false;
+      $this->isPopulated = false;
       if($key === null) {
          $this->unfilteredValues = $values;
       } else {
@@ -357,6 +358,18 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    final public function setPrefix($prefix) {
       $this->formElementPrefix = $prefix.$this->formElementPrefix;
    }
+
+   /**
+    * Metoda nastavní počáteční id renderu
+    * @param int $id
+    * @return Form_Element 
+    */
+   final public function setRenderID($id)
+   {
+      $this->renderedId = $id;
+      return $this;
+   }
+
 
    /*
     * Metody pro vykreslení
