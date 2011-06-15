@@ -4,14 +4,16 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
 <a class="toolbox-button ui-state-default ui-corner-all" href="" title="<?$this->tr('Otevřít nástroje')?>"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
 <div class="toolbox">
-   <? foreach ($this->getTools() as $tool) {?>
+   <? foreach ($this->getTools() as $tool) {
+      $class = get_class($tool);
+      if($class == "Template_Toolbox2_Tool_LangLoader" AND !Locales::isMultilang()) continue;
+      ?>
       <div class="toolbox-tool ui-state-default">
       <?
          $formOnSubmit = null;
          if($tool->getConfirmMessage() != null){
             $formOnSubmit .= 'return confirm(\''.$tool->getConfirmMessage().'\');';
          }
-         $class = get_class($tool);
          $image = null;
          if($tool->getIcon() != null){
            $image = '<img src="'.$this->iconsDir . $tool->getIcon().'" alt="icon '.$tool->getIcon().'" />';
