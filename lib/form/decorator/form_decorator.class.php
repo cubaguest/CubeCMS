@@ -10,7 +10,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída dekorátoru pro formulář
  */
-class Form_Decorator {
+class Form_Decorator implements Form_Decorator_Interface {
 
    private $decoration = array('wrap' => 'table',
       'wrapclass' => 'form-table',

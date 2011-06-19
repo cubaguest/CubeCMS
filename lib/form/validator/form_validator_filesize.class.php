@@ -31,7 +31,11 @@ class Form_Validator_FileSize extends Form_Validator implements Form_Validator_I
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      $element->addValidationConditionLabel(sprintf($this->tr("soubor s maximální velikostí %s"),  vve_create_size_str($this->fileSize)));
+      if($element->isDimensional()){
+         $element->addValidationConditionLabel(sprintf($this->tr("soubory s celkovou maximální velikostí %s"),  vve_create_size_str($this->fileSize)));
+      } else {
+         $element->addValidationConditionLabel(sprintf($this->tr("soubor s maximální velikostí %s"),  vve_create_size_str($this->fileSize)));
+      }
    }
 
    public function validate(Form_Element $elemObj) {

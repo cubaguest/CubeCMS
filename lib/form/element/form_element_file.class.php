@@ -30,7 +30,7 @@ class Form_Element_File extends Form_Element {
    public function  __construct($name, $label = null, $prefix = null) {
       parent::__construct($name, $label,$prefix);
       $this->setUploadDir(AppCore::getAppCacheDir());
-      $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
+      $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE*1024*1024));
    }
 
    /**

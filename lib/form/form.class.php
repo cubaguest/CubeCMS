@@ -113,7 +113,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param Form_Decorator $decorator -- objekt dekorátoru
     * @return string -- formulář jako řetězec
     */
-   private function creatString(Form_Decorator $decorator = null) {
+   private function creatString(Form_Decorator_Interface $decorator = null) {
       if($decorator == null) {
          $decorator = new Form_Decorator();
       }
@@ -581,7 +581,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * Metoda vyrenderuje formulář podle zadaného typu
     * @param Form_Decorator $decorator -- objekt Form dekorátoru
     */
-   public function render(Form_Decorator $decorator = null) {
+   public function render(Form_Decorator_Interface $decorator = null) {
       echo ($this->creatString($decorator));
    }
 

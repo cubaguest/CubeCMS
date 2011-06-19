@@ -179,8 +179,6 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    final public function addValidation(Form_Validator_Interface $validator) {
       $this->validators[get_class($validator)] = $validator;
-      // doplnění popisků k validaci
-      $validator->addHtmlElementParams($this);
       $this->isPopulated = false;
    }
 
@@ -600,6 +598,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return string
     */
    public function labelValidations() {
+      // doplnění popisků k validaci
+      foreach ($this->validators as $validator) {
+         $validator->addHtmlElementParams($this);
+      }
       if(!empty($this->htmlValidationsLabels)) {
          $labels = "(";
          foreach ($this->htmlValidationsLabels as $lab) {
