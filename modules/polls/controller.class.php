@@ -20,7 +20,7 @@ class Polls_Controller extends Controller {
       $formVoteSingle = $this->createFormVoteSingle();
 
       $votedPolls = array();
-      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls'])){
+      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls']) AND VVE_DEBUG_LEVEL < 2){
          $votedPolls = explode('|', $_COOKIE[VVE_SESSION_NAME.'_polls']);
       }
       $cokieExpire = time()+60*60*24*$this->category()->getParam('cookiedays', self::DEFAULT_COOKIE_DAYS);

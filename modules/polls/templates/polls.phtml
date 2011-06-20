@@ -13,7 +13,7 @@ echo $this->toolbox;
    <div class="main-content-list-record">
    <h2><?=$poll->{Polls_Model::COLUMN_QUESTION}?></h2>
       <div style="position: relative" id="poll_<?=$poll->{Polls_Model::COLUMN_ID}?>">
-         <?if($poll->{Polls_Model::COLUMN_ACTIVE} == true AND !isset ($this->votedPolls[$poll->{Polls_Model::COLUMN_ID}])) {
+         <?if($poll->{Polls_Model::COLUMN_ACTIVE} == true AND !in_array($poll->{Polls_Model::COLUMN_ID}, $this->votedPolls)) {
             // více možností
             if ($poll->{Polls_Model::COLUMN_IS_MULTI} == true) {
                $this->formmulti->html()->addClass('pollVoteForm');
