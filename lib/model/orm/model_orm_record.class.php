@@ -65,22 +65,32 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             $this->columns[$collName]['value'] = $value;
          }
       } else {
-         // tady kontroly sloupců a přetypování na správné hodnoty
-
+         
+         // primary key (jazykové nejsou pk)
+         if (isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true) {
+            if($value === null){
+               $this->fromDb = false;
+               $this->pKeyValue = $value;
+               // changed all colls to new value
+               foreach ($this->columns as &$coll) {
+                  $coll['changed'] = 1;
+               }
+            } else {
+               $this->pKeyValue = $value;
+            }
+         }
+         
          if (isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL) {
             $value = (bool) $value;
          } else if (isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
             $value = (int) $value;
          }
-
          $this->columns[$collName]['value'] = $value;
-         if (isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true) {// primary key (jazykové nejsou pk)
-            $this->pKeyValue = $value;
-         }
-         if ($this->fromDb == true AND ($this->columns[$collName]['changed'] == 0)) {
-            $this->columns[$collName]['changed'] = -1;
+         
+         if ($this->fromDb == true AND $this->columns[$collName]['changed'] == 0) {
+            $this->columns[$collName]['changed'] = -1; // from db
          } else {
-            $this->columns[$collName]['changed'] = 1;
+            $this->columns[$collName]['changed'] = 1; // changed in app
          }
       }
    }
