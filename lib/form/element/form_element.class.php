@@ -430,6 +430,19 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return true;
    }
 
+   private function createValidationLabels(){
+      if(empty ($this->htmlValidationsLabels)) {
+         // doplnění popisků k validaci
+         foreach ($this->validators as $validator) {
+            $validator->addHtmlElementParams($this);
+         }
+      }
+   }
+
+   /**
+    * Metody pro naplěnní a validaci
+    */
+   
    /**
     * Metoda naplní element
     */
@@ -483,6 +496,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return string
     */
    public function label() {
+      $this->createValidationLabels();
       $elem = clone $this->htmlLabel();
       $elem->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
@@ -535,6 +549,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return string
     */
    public function controll() {
+      $this->createValidationLabels();
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass(self::$cssClasses['error']);
@@ -598,10 +613,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return string
     */
    public function labelValidations() {
-      // doplnění popisků k validaci
-      foreach ($this->validators as $validator) {
-         $validator->addHtmlElementParams($this);
-      }
+      $this->createValidationLabels();
       if(!empty($this->htmlValidationsLabels)) {
          $labels = "(";
          foreach ($this->htmlValidationsLabels as $lab) {
