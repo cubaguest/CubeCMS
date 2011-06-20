@@ -232,7 +232,7 @@ class Contact_Controller extends Controller {
       }
 
       $elemFormSubjects = new Form_Element_TextArea('formSub', 'Předměty zpráv');
-      $elemFormSubjects->setSubLabel(htmlspecialchars('Předdefinované předměty zprávy, odělené středníkem. Pokud je za zprávo email ve špičatých závorkách, je odeslán dotaz na něj. např.: dotaz na zboží<jmeno@email.cz>'));
+      $elemFormSubjects->setSubLabel(htmlspecialchars('Předdefinované předměty zprávy, odělené středníkem. Pokud je za předmětem email ve špičatých závorkách, je odeslán dotaz na uvedenou adresu, např. dotaz na zboží<jmeno@email.cz> .'));
       $elemFormSubjects->html()->setAttrib('cols', 50)->setAttrib('rows', 5);
       $form->addElement($elemFormSubjects, $grpForm);
       if(isset($settings[self::PARAM_FORM_SUBJECTS])) {
@@ -257,10 +257,16 @@ lze využít následující výběr již existujících uživatelů.');
       $elemAdmins = new Form_Element_Select('admins', 'Adresy uživatelů v systému');
       // načtení uživatelů
       $modelUsers = new Model_Users();
-      $users = $modelUsers->getUsersList();
+      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
+      $modelUsers->joinFK(Model_Users::COLUMN_GROUP_ID)
+         ->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
+         ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
+         ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
+      
+      $users = $modelUsers->records(PDO::FETCH_OBJ);
       $usersIds = array();
       foreach ($users as $user) {
-         $usersIds[$user[Model_Users::COLUMN_USERNAME]] = $user[Model_Users::COLUMN_ID];
+         $usersIds[$user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME}] = $user->{Model_Users::COLUMN_ID};
       }
       $elemAdmins->setOptions($usersIds);
       $elemAdmins->setMultiple();
