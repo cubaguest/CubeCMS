@@ -36,14 +36,14 @@ class Categories_Controller extends Controller {
          $categories = Category_Structure::getStructure(!$this->isMainStruct());
          // načtení kategorie (nutné pro vyčištění)
          $cM = new Model_Category();
-         $cat = $cM->getCategoryById($formDelete->id->getValues());
+         $cat = $cM->record($formDelete->id->getValues());
 
          // vymažeme práva
          $rModel = new Model_Rights();
          $rModel->deleteRightsByCatID($formDelete->id->getValues());
 
          // mažeme kategorii z DB
-         $cM->deleteCategory($formDelete->id->getValues());
+         $cM->delete($formDelete->id->getValues());
 
          // vyčištění kategorie
          $moduleCtrName = $cat->{Model_Category::COLUMN_MODULE} . '_Controller';
@@ -369,20 +369,11 @@ class Categories_Controller extends Controller {
    private function getGroups()
    {
       VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
-//      Debug::log($domain);
-      
       $groupsModel = new Model_Groups();
       $groupsModel->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
          ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
          ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
-      
-//      echo($domain);
-//      echo($groupsModel->getSQLQuery());
-      $groups = $groupsModel->records();
-//      foreach ($groups as $g){
-//         Debug::log($g->{Model_Groups::COLUMN_NAME});
-//      }
-      return $groups;
+      return $groupsModel->records();
    }
 
    private function assignRights($idc, $form)
