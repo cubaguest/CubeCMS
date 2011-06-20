@@ -104,9 +104,9 @@ class Session {
       session_name(VVE_SESSION_NAME);
       session_start();
       // cookie params
-      $cookieParams = session_get_cookie_params();
       if(isset ($_COOKIE[VVE_SESSION_NAME])){
-         setcookie(VVE_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path'], '.'.Url_Request::getDomain());
+         $cookieParams = session_get_cookie_params();
+         setcookie(VVE_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path'], $cookieParams['domain']);
       }
    }
 
