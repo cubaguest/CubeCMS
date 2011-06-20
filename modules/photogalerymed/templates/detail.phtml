@@ -14,7 +14,12 @@ echo $this->toolbox;
       echo '<p>'.$this->tr('Źádný text galerie nebyl vyplněn. (Tento text vidí pouze oprávněný uživatel.)').'</p><br />';
    }
    ?></div>
-   <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
+   <?
+   $this->includeTpl('privateText.phtml', false,null, 'articles');//private text
+   
+   $images = $this->images;
+   if(count($images) != 0){
+   ?>
    <!-- Start Advanced Gallery Html Containers -->
    <div class="main-content-images"><?
       $images = $this->images;
@@ -33,7 +38,16 @@ echo $this->toolbox;
          ?></div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
-   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route()));?>
+   <?
+   } else if($this->toolbox != null){?>
+   <div class="admin-info-text">
+      <?
+      echo $this->tr('Galerie neobsahuje žádný obrázek.');
+      echo $this->toolboxImages;
+      ?>
+   </div>
+   <?}
+   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route()));?>
    <?$this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
