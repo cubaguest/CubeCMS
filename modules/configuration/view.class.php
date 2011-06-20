@@ -11,8 +11,12 @@ class Configuration_View extends View {
    }
 
    public function editView() {
-      $this->template()->addTplFile('edit.phtml');
+      $this->template()->addFile('tpl://edit.phtml');
       Template_Module::setEdit(true);
+   }
+   public function editGlobalView() {
+      $this->editView();
+      $this->template()->editGlobalOption = true;
    }
 }
 

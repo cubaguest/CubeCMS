@@ -1,7 +1,11 @@
 <div>
 <?
 // do titulku
-$h = $this->tr('úprava volby').' '.$this->option->{Model_Config::COLUMN_KEY};
+if($this->editGlobalOption == true){
+   $h = $this->tr('úprava globální volby').' '.$this->option->{Model_Config::COLUMN_KEY};
+} else {
+   $h = $this->tr('úprava lokální volby').' '.$this->option->{Model_Config::COLUMN_KEY};
+}
 $this->addPageTitle($h);
 ?>
 <h1><?=$h?></h1>

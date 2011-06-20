@@ -5,38 +5,140 @@
  */
 
 class Configuration_Controller extends Controller {
-   private $categoriesArray = array();
-
    public function mainController() {
       $this->checkWritebleRights();
       // nastavení viewru
-      $modelCfg = new Model_Config();
+      $modelCfgLocal = new Model_Config();
+      $modelCfgGlobal = new Model_ConfigGlobal();
 
-      $modelCfg->joinFK(Model_Config::COLUMN_ID_GROUP, array('gname' => Model_ConfigGroups::COLUMN_NAME, 'gdesc' => Model_ConfigGroups::COLUMN_DESC))
+      $eId = new Form_Element_Hidden('id');
+      $eSubmit = new Form_Element_SubmitImage('send');
+      $eSubmit->setImage('/images/icons/edit.png');
+      
+      $formEditGlobal = new Form('gl_edit_');
+      $formEditGlobal->render(New Form_Decorator());
+      $formEditGlobal->addElement(clone $eId);
+      $formEditGlobal->addElement(clone $eSubmit);
+      
+      if($formEditGlobal->isValid()){
+         $this->link()->route('editGlobal', array('id' => $formEditGlobal->id->getValues()))->reload();
+      }
+      
+      $this->view()->formGlEdit = $formEditGlobal;
+      
+      $formCopyGlobal = new Form('gl_copy_');
+      $formCopyGlobal->addElement(clone $eId);
+      $formCopyGlobal->addElement(clone $eSubmit);
+      
+      if($formCopyGlobal->isValid()){
+         $recordGl = $modelCfgGlobal->record($formCopyGlobal->id->getValues());
+         // delete local config if exist
+         $modelCfgLocal->where(Model_Config::COLUMN_KEY.' = :k', array('k' => $recordGl->{Model_Config::COLUMN_KEY}))->delete();
+         
+         $recordGl->{Model_Config::COLUMN_ID} = null;
+         $modelCfgLocal->save($recordGl);
+         
+         $this->infoMsg()->addMessage($this->tr('Byla vytvořena lokální nastavení z globálního'));
+         $this->link()->reload();
+      }
+      
+      $this->view()->formGlCopy = $formCopyGlobal;
+      
+      
+      $formEditLocal = new Form('loc_edit_');
+      $formEditLocal->addElement(clone $eId);
+      $formEditLocal->addElement(clone $eSubmit);
+      
+      if($formEditLocal->isValid()){
+         $this->link()->route('edit', array('id' => $formEditLocal->id->getValues()))->reload();
+      }
+      
+      $this->view()->formLocEdit = $formEditLocal;
+      
+      $formDelLocal = new Form('loc_del_');
+      $formDelLocal->addElement(clone $eId);
+      $formDelLocal->addElement(clone $eSubmit);
+      
+      if($formDelLocal->isValid()){
+         $modelCfgLocal->delete($formDelLocal->id->getValues());
+         $this->infoMsg()->addMessage($this->tr('Lokální nastavení bylo odebráno'));
+         $this->link()->reload();
+      }
+      
+      $this->view()->formLocDelete = $formDelLocal;
+      
+      
+      
+      $modelCfgLocal->joinFK(Model_Config::COLUMN_ID_GROUP, array('gname' => Model_ConfigGroups::COLUMN_NAME, 'gdesc' => Model_ConfigGroups::COLUMN_DESC))
          ->where(Model_Config::COLUMN_PROTECTED.' != 1 AND '.Model_Config::COLUMN_ID_GROUP.' != 1', array())
          ->order(array(Model_Config::COLUMN_ID_GROUP, Model_Config::COLUMN_KEY));//, 'ISNULL('.Model_Config::COLUMN_LABEL.')'
 
-      $records = $modelCfg->records();
-      $sorted = array();
-      foreach ($records as $record) {
-         if(!isset ($sorted[$record->{Model_Config::COLUMN_ID_GROUP}])){
-            $sorted[$record->{Model_Config::COLUMN_ID_GROUP}] = array(
+      $configsRecordsLocal = $modelCfgLocal->records();
+      
+
+      $modelCfgGlobal->joinFK(Model_Config::COLUMN_ID_GROUP, array('gname' => Model_ConfigGroups::COLUMN_NAME, 'gdesc' => Model_ConfigGroups::COLUMN_DESC))
+         ->where(Model_Config::COLUMN_PROTECTED.' != 1 AND '.Model_Config::COLUMN_ID_GROUP.' != 1', array())
+         ->order(array(Model_Config::COLUMN_ID_GROUP, Model_Config::COLUMN_KEY));//, 'ISNULL('.Model_Config::COLUMN_LABEL.')'
+
+      $configsRecordsGlobal = $modelCfgGlobal->records();
+      
+      
+      // groups
+      $options = array();
+      $groups = array();
+      foreach (array_merge($configsRecordsGlobal, $configsRecordsLocal) as $record) {
+         if(!isset ($groups[$record->{Model_Config::COLUMN_ID_GROUP}])){
+            $groups[$record->{Model_Config::COLUMN_ID_GROUP}] = array(
                'name' => $record->{Model_ConfigGroups::COLUMN_NAME},
                'desc' => $record->{Model_ConfigGroups::COLUMN_DESC},
-               'options' => array(),
             );
+            $options[$record->{Model_Config::COLUMN_ID_GROUP}] = array();
          }
-         array_push($sorted[$record->{Model_Config::COLUMN_ID_GROUP}]['options'], $record);
       }
+      
+      $this->configAssign($configsRecordsGlobal, $options , 'global');
+      $this->configAssign($configsRecordsLocal, $options, 'local');
 
-      $this->view()->list = $sorted;
+      $this->view()->groups = $groups;
+      $this->view()->options = $options;
+      $this->view()->allowGlobalEdit = true;
+//      Debug::log($options);
+   }
+   
+   private function configAssign($records, &$optArr, $key)
+   {
+      foreach ($records as $record) {
+         if(!isset($optArr[$record->{Model_Config::COLUMN_ID_GROUP}][$record->{Model_Config::COLUMN_KEY}])){
+            $obj = new Object();
+            $obj->local = null;
+            $obj->global = null;
+            $obj->{Model_Config::COLUMN_KEY} = null;
+            $obj->{Model_Config::COLUMN_LABEL} = null;
+            
+            $optArr[$record->{Model_Config::COLUMN_ID_GROUP}][$record->{Model_Config::COLUMN_KEY}] = $obj;
+         }
+         $opt = &$optArr[$record->{Model_Config::COLUMN_ID_GROUP}][$record->{Model_Config::COLUMN_KEY}];
+         
+         $opt->{$key} = $record;
+         if($opt->{Model_Config::COLUMN_KEY} == null){
+            $opt->{Model_Config::COLUMN_KEY} = $record->{Model_Config::COLUMN_KEY};
+            $opt->{Model_Config::COLUMN_LABEL} = $record->{Model_Config::COLUMN_LABEL};
+         }
+         
+      }
    }
 
    public function editController() {
+      $this->eModel(new Model_Config());
+   }
+   
+   public function editGlobalController() {
+      $this->eModel(new Model_ConfigGlobal());
+   }
+   
+   private function eModel($model) {
       $form = new Form('option');
-
-      $m = new Model_Config();
-      $opt = $m->record($this->getRequest('id'));
+      $opt = $model->record($this->getRequest('id'));
 
       if($opt == false){
          return false;
@@ -109,10 +211,9 @@ class Configuration_Controller extends Controller {
             }
          }
 
-         $m->save($opt);
+         $model->save($opt);
          $this->infoMsg()->addMessage($this->tr('Volba byla uložena'));
          $this->link()->route()->reload();
-
       }
 
       $this->view()->template()->form = $form;

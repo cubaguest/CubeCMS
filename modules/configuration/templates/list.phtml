@@ -1,57 +1,121 @@
 <?
-$jqui = new JsPlugin_JQuery();
 //$jqui->addUIAccordion();
 
+$jqui = new JsPlugin_JQuery();
+$jqui->addUITabs();
+$jqui->addPluginCookie();
 $this->addJsPlugin($jqui);
-$jqcss = new JsPlugin_JQueryCSS();
-$this->addJsPlugin($jqcss);
 
 $this->addCssFile("style.css");
+
+
+$this->formGlEdit->send->setImage('/images/icons/cog_edit.png');
+$this->formGlCopy->send->setImage('/images/icons/page_copy.png');
+$this->formLocEdit->send->setImage('/images/icons/cog_edit.png');
+$this->formLocDelete->send->setImage('/images/icons/delete.png');
+$this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
 ?>
 <h1><?=$this->category()->getName();?></h1>
 <div class="main-content main-content-form-edit">
-   <div id="sections">
-      <?foreach ($this->list as $section) {?>
-      <h2 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all"><a class="head" href="<?=$this->link()?>#" title="Rozbalit"><img
-               src="<?= vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>" alt="toggle" /><?=$section['name'];?></a></h2>
-      <div class="section">
-         <p><?=$section['desc'];?></p>
-         <table class="valuesTable">
-            <?foreach ($section['options'] as $option) {?>
-            <tr>
-               <th class="header-cell" colspan="2"><?if($option->{Model_Config::COLUMN_LABEL} != null){echo $option->{Model_Config::COLUMN_LABEL};} else {echo '<em>('.$this->tr('Bez popisu').')</em>';}?>
-                  <form method="post" action="<?=$this->link()->route('edit', array('id' => $option->{Model_Config::COLUMN_ID}))?>">
-                     <p><input type="image" src="<?=vve_get_tpl_file('icons/wrench.png', VVE_TPL_FILE_IMAGE)?>"
-                         value="edit" name="category_edit" title="<?=$this->tr('Upravit')?>" /></p>
-                  </form>
-               </th>
+   <div id="groups-tabs">
+      <ul>
+         <?foreach ($this->groups as $id => $grp) {?>
+      	<li><a href="#grptab-<?=$id?>"><?=$grp['name']?></a></li>
+         <?}?>
+      </ul>
+      <?foreach ($this->groups as $id => $grp) {?>
+    	<div id="grptab-<?=$id?>">
+         <p><?=$grp['desc']?></p>
+            <?  foreach ($this->options[$id] as $option){
+               // doplnění id do formů
+               if($option->global != null){
+                  $this->formGlEdit->id->setValues($option->global->{Model_ConfigGlobal::COLUMN_ID});
+                  $this->formGlCopy->id->setValues($option->global->{Model_ConfigGlobal::COLUMN_ID});
+               }
+               if($option->local != null){
+                  $this->formLocEdit->id->setValues($option->local->{Model_Config::COLUMN_ID});
+                  $this->formLocDelete->id->setValues($option->local->{Model_Config::COLUMN_ID});
+               }
+               
+               ?>
+         <table class="ui-widget-content">
+            <tr class="ui-widget-header">
+               <th colspan="2" style="text-align: left;"><?=$option->{Model_Config::COLUMN_LABEL}?></th>
+               <th colspan="2" style="text-align: right;"><?=$option->{Model_Config::COLUMN_KEY}?></th>
             </tr>
-            <tr class="end-row">
-               <td width="200" class="key-cell"><?=$option->{Model_Config::COLUMN_KEY}?></td>
-               <td><?=$option->{Model_Config::COLUMN_VALUE}?></td>
+            <tr class="option-row <?if($option->local != null){ echo "ui-state-disabled";} else {echo "ui-state-active";}?>">
+               <td class="column-type"><?=$this->tr('Globální')?></td>
+               <td colspan="2">
+                  <?if($option->global != null){
+                     echo $option->global->{Model_Config::COLUMN_VALUE};
+                  } else {
+                     echo $this->tr('Není nastaven');
+                  }?>
+               </td>
+               <td class="column-action">
+                  <?
+                  if($this->allowGlobalEdit){
+                     $this->formGlEdit->id->setValues($option->global->{Model_ConfigGlobal::COLUMN_ID});
+                     echo $this->formGlEdit->render(new Form_Decorator_Clear());
+                  }
+                  echo $this->formGlCopy->render(new Form_Decorator_Clear());
+                  ?>
+               </td>
             </tr>
-            <?}?>
+            <tr class="option-row <?if($option->local == null){ echo "ui-state-disabled";} else {echo "ui-state-active";}?>">
+               <td><?=$this->tr('Lokální')?></td>
+               <td colspan="2">
+                  <?if($option->local != null){
+                     echo $option->local->{Model_Config::COLUMN_VALUE};
+                  } else {
+                     echo $this->tr('Není nastaven');
+                  }?>
+               </td>
+               <td class="column-action">
+                  <?
+                  if($option->local != null){
+                     $this->formLocEdit->id->setValues($option->local->{Model_Config::COLUMN_ID});
+                     echo $this->formLocEdit->render(new Form_Decorator_Clear());
+                     echo $this->formLocDelete->render(new Form_Decorator_Clear());
+                  }
+                  ?>
+               </td>
+            </tr>
          </table>
-      </div>
+            <?}?>
+     	</div>
       <?}?>
    </div>
    <br />
    <br />
    <script type="text/javascript">
       $(document).ready(function(){
-         $('.section').toggle();
-
-      	$('#sections a.head').click(function() {
-            var $cnt = $(this).parent().next();
-            if($cnt.is(':hidden')) {
-               $cnt.show();
-               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
-            } else {
-               $cnt.hide();
-               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
+         $( "#groups-tabs" ).tabs({
+            cookie: {
+				// store cookie for a day, without, it would be a session cookie
+               expires: 1
+            }  
+         });
+         
+         $('form[name=form-remove-value]').submit(function(){
+            if(!confirm('<?=$this->tr('Opravdu odstranit vybranou proměnnu?')?>')){
+               return false;
             }
-            return false;
-         });//.next().hide();
+         });
+         
+//         $('.section').toggle();
+//
+//      	$('#sections a.head').click(function() {
+//            var $cnt = $(this).parent().next();
+//            if($cnt.is(':hidden')) {
+//               $cnt.show();
+//               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
+//            } else {
+//               $cnt.hide();
+//               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
+//            }
+//            return false;
+//         });//.next().hide();
       });
    </script>
 </div>

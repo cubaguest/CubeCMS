@@ -1,3 +1,33 @@
+#groups-tabs ul li a {
+   font-size: 11px;
+   padding: 2px;
+}
+#groups-tabs .ui-tabs-panel {
+   padding: 10px 5px 5px 5px;
+}
+
+#groups-tabs table {
+   width: 100%;
+   margin-bottom: 5px;
+}
+#groups-tabs table form,
+#groups-tabs table p {
+   display: inline;
+}
+#groups-tabs table th,
+#groups-tabs table td {
+   padding: 2px;
+}
+#groups-tabs table .column-type,
+#groups-tabs table .column-action {
+   width: 100px;
+}
+#groups-tabs table .column-action {
+   text-align: right;
+}
+
+/* OLD */
+
 div.section {
 /*   padding: 10px;*/
 }
