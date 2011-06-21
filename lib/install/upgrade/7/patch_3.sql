@@ -129,12 +129,13 @@ INSERT INTO `{PREFIX}config` (`key`, `label`, `value`, `protected`, `type`, `id_
 DELETE FROM `{PREFIX}config` WHERE `key` = 'USE_SUBDOMAIN_HTACCESS_WORKAROUND' OR `key` = 'SMTP_SERVER_ENCRYPT' OR `key` = 'USE_IMAGEMAGICK';
 
 /* UPDATE_MAIN_SITE */
+DELETE FROM `cubecms_global_config` WHERE `key` = 'USE_IMAGEMAGICK';
 INSERT INTO `cubecms_global_config` (`key`, `label`, `value`, `protected`, `type`, `id_group`) VALUES
 ('FTP_HOST', 'Adresa ftp serveru, kde jsou stránky nahrány', 'localhost', false, 'string', 3),
-('USE_IMAGEMAGICK', 'Jeslti se má používat knihovna Imagick pro práci s obrázky', false, false, 'bool', 3),
 ('FTP_PORT', 'Port ftp serveru, kde jsou stránky nahrány', 22, false, 'number', 3),
 ('FTP_USER', 'Uživatel ftp serveru, kde jsou stránky nahrány', 'user', false, 'string', 3),
 ('FTP_PASSOWRD', 'Heslo uživatele ftp serveru, kde jsou stránky nahrány', NULL, false, 'string', 3),
+('USE_IMAGEMAGICK', 'Jeslti se má používat knihovna Imagick pro práci s obrázky', false, false, 'bool', 3),
 ('SUB_SITE_DOMAIN', 'Doména podstránek', NULL, false, 'string', 1),
 ('SUB_SITE_DIR', 'Adresár s podstránkami', NULL, false, 'string', 1),
 ('SUB_SITE_USE_HTACCESS', 'Jestli je pro subdomény použit htaccess', false, false, 'bool', 1),
