@@ -1223,8 +1223,10 @@ class Model_ORM extends Model_PDO {
                }
                // order
                $ordStr .= ' ' . strtoupper($order);
-               array_push($ords, $ordStr);
+            } else {
+               $ordStr .= ' ' . strtoupper($col);
             }
+            array_push($ords, $ordStr);
          }
          $sql .= ' ORDER BY ' . implode(',', $ords);
       }
