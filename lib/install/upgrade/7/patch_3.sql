@@ -126,7 +126,7 @@ INSERT INTO `{PREFIX}config` (`key`, `label`, `value`, `protected`, `type`, `id_
 /* END_UPDATE */
 
 /* remove old settings */
-DELETE FROM `{PREFIX}config` WHERE `key` = 'USE_SUBDOMAIN_HTACCESS_WORKAROUND' OR `key` = 'SMTP_SERVER_ENCRYPT';
+DELETE FROM `{PREFIX}config` WHERE `key` = 'USE_SUBDOMAIN_HTACCESS_WORKAROUND' OR `key` = 'SMTP_SERVER_ENCRYPT' OR `key` = 'USE_IMAGEMAGICK';
 
 /* UPDATE_MAIN_SITE */
 INSERT INTO `cubecms_global_config` (`key`, `label`, `value`, `protected`, `type`, `id_group`) VALUES
