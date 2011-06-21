@@ -1224,7 +1224,7 @@ class Model_ORM extends Model_PDO {
                // order
                $ordStr .= ' ' . strtoupper($order);
             } else {
-               $ordStr .= ' ' . strtoupper($col);
+               $ordStr .= ' ' . strtoupper($col).' ' . strtoupper($order);
             }
             array_push($ords, $ordStr);
          }
