@@ -12,8 +12,16 @@ class Redirect_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       $url = $this->category()->getParam('url', Url_Link::getMainWebDir());
-      header('Location: '.$url, true, $this->category()->getParam('code', self::DEFAULT_RESIRECT_CODE));
-      exit();
+      if($url != null){
+         if(!$this->category()->getRights()->isControll() || Category::getSelectedCategory() instanceof Category_Admin){
+            header('Location: '.$url, true, $this->category()->getParam('code', self::DEFAULT_RESIRECT_CODE));
+            exit();
+         } else {
+            $this->view()->url = $url;
+         }
+      } else {
+         $this->errMsg()->addMessage($this->tr('Zadanou kategorii nelze přeměrovat, protože není zadán odkaz přesměrování'));
+      } 
    }
 
    /**
@@ -21,7 +29,7 @@ class Redirect_Controller extends Controller {
     * @param <type> $settings
     * @param Form $form Metoda pro nastavení
     */
-   public static function settingsController(&$settings,Form &$form) {
+   protected function settings(&$settings, Form &$form) {
       $elemURL = new Form_Element_Text('url', 'Adresa pro přesměrování');
       $elemURL->addValidation(new Form_Validator_NotEmpty());
       $elemURL->addValidation(new Form_Validator_Url());

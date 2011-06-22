@@ -1,0 +1,33 @@
+<?
+echo $this->toolbox;
+?>
+<h1><?=$this->category()->getName()?></h1>
+<div class="main-content-text">
+   <p><?echo $this->tr('Přesměrování na stránku');?>:<br />
+      <a id="refirect-target-link" href="<?=$this->url?>" title="<?=$this->tr('Přejít ihned')?>" ><?=$this->url?></a><br />
+      <?printf($this->tr('Přesměrování proběhne za %s sekund.'),'<input type="text" id="redirect-countdown" value="5" size="2" style="width: 30px;" />' )?>
+      <a href="<?=$this->link()?>#" onclick="stopCountDown()" title="<?=$this->tr('zastavit odpočet');?>"><?=$this->tr('stop');?></a>
+   </p>
+   <p class="admin-info-text">
+      <?=$this->tr('Toto přesměrování vidí pouze administrátoři. Normální uživatel je přímo přesměrován.e');?>
+   </p>
+   <script type="text/javascript">
+   var timer;
+   function countDown(){
+      var curtime = document.getElementById('redirect-countdown').value;
+      if (curtime <= 1){ 
+         window.location = document.getElementById('refirect-target-link').href;
+      } else {
+         document.getElementById('redirect-countdown').value = curtime-1;
+         timer = setTimeout("countDown()",1000);
+      }
+   }
+   function stopCountDown(){
+      clearTimeout(timer);
+      return false;
+   }
+   
+   document.getElementById('redirect-countdown').value = 6;
+   countDown();
+</script>
+</div>
