@@ -38,7 +38,7 @@ class Category_Admin extends Category_Core {
       $this->loadRights();
 
       if($this->category->{Model_Category::COLUMN_PARAMS} != null){
-         $this->catParams = array_merge($this->catParams, unserialize());
+         $this->catParams = array_merge($this->catParams, unserialize($this->category->{Model_Category::COLUMN_PARAMS}));
       }
 
    }
