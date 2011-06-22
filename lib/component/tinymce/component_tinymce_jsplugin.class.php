@@ -102,6 +102,14 @@ class Component_TinyMCE_JsPlugin extends JsPlugin {
       $listType = isset($_GET['listtype']) ? $_GET['listtype'] : Component_TinyMCE_List::LIST_TYPE_LINK;
       
       $items = array();
+
+            
+      if(($type-Component_TinyMCE::LINK_LIST_CATEGORIES) >= 0) {
+         $type = $type-Component_TinyMCE::LINK_LIST_CATEGORIES;
+         
+         $cats = new Component_TinyMCE_List_Categories();
+         $items = array_merge($items, $cats->getItems());
+      }
       
       if(($type-Component_TinyMCE::LINK_LIST_MEDIA) >= 0) {
          $type = $type-Component_TinyMCE::LINK_LIST_MEDIA;
@@ -121,13 +129,6 @@ class Component_TinyMCE_JsPlugin extends JsPlugin {
          
          $files = new Component_TinyMCE_List_Files();
          $items = array_merge($items, $files->getItems());
-      }
-      
-      if(($type-Component_TinyMCE::LINK_LIST_CATEGORIES) >= 0) {
-         $type = $type-Component_TinyMCE::LINK_LIST_CATEGORIES;
-         
-         $cats = new Component_TinyMCE_List_Categories();
-         $items = array_merge($items, $cats->getItems());
       }
       
 //      echo $type;

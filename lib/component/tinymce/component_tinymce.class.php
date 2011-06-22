@@ -7,11 +7,11 @@ class Component_TinyMCE extends Component {
    const TPL_LIST_FILE = 'file';
    const TPL_LIST_SYSTEM_MAIL = 'systemmail';
    
-   const LINK_LIST_CATEGORIES = 1;
    const LINK_LIST_FILES = 2;
    const LINK_LIST_IMAGES = 4;
    const LINK_LIST_MEDIA = 8;
    const LINK_LIST_TEMPLATE = 16;
+   const LINK_LIST_CATEGORIES = 32;
    const LINK_LIST_ALL = 256;
 
    private $jsPlugin = null;
