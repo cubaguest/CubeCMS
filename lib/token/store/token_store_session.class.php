@@ -13,9 +13,13 @@
 class Token_Store_Session implements Token_Store {
    const TOKENS_SES_NAME = 'tokens';
    const TOKEN_EXPIRE = 3600; // 1hour
+   const MAX_TOKEN_IN_STACK = 40;
 
-      public function check($token)
+   public function check($token)
    {
+      if(isset($_SESSION[self::TOKENS_SES_NAME][$token]) && $_SESSION[self::TOKENS_SES_NAME][$token] <= time()){
+         return true;
+      }
       return isset ($_SESSION[self::TOKENS_SES_NAME][$token]);
    }
 
@@ -24,7 +28,11 @@ class Token_Store_Session implements Token_Store {
       if(!isset ($_SESSION[self::TOKENS_SES_NAME])){
          $_SESSION[self::TOKENS_SES_NAME] = array();
       }
-      $_SESSION[self::TOKENS_SES_NAME][$token] = time()+self::TOKEN_EXPIRE; // platnost 1h
+      $s = &$_SESSION[self::TOKENS_SES_NAME];
+      $s[$token] = time()+self::TOKEN_EXPIRE; // platnost 1h
+      if(count($s) > self::MAX_TOKEN_IN_STACK){
+         $s = array_slice($s, -self::MAX_TOKEN_IN_STACK+10);
+      }
    }
 
    public function delete($token)
@@ -37,9 +45,14 @@ class Token_Store_Session implements Token_Store {
    public function gc()
    {
       if(isset ($_SESSION[self::TOKENS_SES_NAME])){
-         foreach ($_SESSION[self::TOKENS_SES_NAME] as $token => $exp) {
+         $s = &$_SESSION[self::TOKENS_SES_NAME];
+         $tokens = count($s);
+         reset($s);
+         foreach ($s as $token => $exp) {
             if($exp < time()){
-               unset ($_SESSION[self::TOKENS_SES_NAME][$token]);
+               unset ($s[$token]);
+            } else {
+               break;
             }
          }
       }

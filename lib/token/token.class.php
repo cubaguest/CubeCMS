@@ -15,23 +15,24 @@ class Token {
     * Objekt s uloženými tokeny
     * @var Token_Store
     */
-   private static $tokenStore = null;
+   private static $tokenStore = false;
 
+   private static $token = false;
 
    public static function getToken()
    {
       $classStoreName = 'Token_Store_'.ucfirst(VVE_TOKENS_STORE);
-      if(self::$tokenStore == null){
-         self::$tokenStore = new $classStoreName();
+      if(!self::$token){
+         self::$token = self::generateToken();
       }
-      
-      $token = self::generateToken();
-      // náhodně provedem gc
-      if(rand(1, 10) == 1){
+      if(!self::$tokenStore){
+         self::$tokenStore = new $classStoreName();
+         self::$tokenStore->save(self::$token);
+      }
+      if(rand(1, 10) == 3){
          self::$tokenStore->gc();
       }
-      self::$tokenStore->save($token);
-      return $token;
+      return self::$token;
    }
 
    /**
@@ -42,7 +43,7 @@ class Token {
    public static function check($token, $delete = true)
    {
       $classStoreName = 'Token_Store_'.ucfirst(VVE_TOKENS_STORE);
-      if(self::$tokenStore == null){
+      if(!self::$tokenStore){
          self::$tokenStore = new $classStoreName();
       }
       
@@ -59,7 +60,7 @@ class Token {
     */
    private static function generateToken()
    {
-//      return 'de94wACtzqbpFybCPDTgOnXDpMqxPnyas'; // test
+//      return 'de94wACtzqbpFybCPDTgOnXDpMqxPnyas'; // testing
       $len = 32;
       $base='ABCDEFGHKLMNOPQRSTWXYZabcdefghjkmnpqrstwxyz123456789';
       $max=strlen($base)-1;
