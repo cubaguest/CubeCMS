@@ -32,6 +32,8 @@ class GuestBook_View extends View {
       if($this->category()->getParam(GuestBook_Controller::PARAM_WISIWIG_EDITOR, true) == true){
          $this->form->text->html()->addClass("mceEditor");
          $this->tinyMCE = new Component_TinyMCE();
+         $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_SOURCES, false);
+         $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_TPLS, false);
          $settings = new Component_TinyMCE_Settings_AdvSimple2();
          $settings->setSetting('editor_selector', 'mceEditor');
          $this->tinyMCE->setEditorSettings($settings);

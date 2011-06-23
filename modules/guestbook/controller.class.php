@@ -52,7 +52,7 @@ class GuestBook_Controller extends Controller {
               $this->category()->getParam('mintextchars', self::DEFAULT_MIN_TEXT_CHARS)));
       $elemText->addValidation(new Form_Validator_MaxLength(
               $this->category()->getParam('maxtextchars', self::DEFAULT_MAX_TEXT_CHARS)));
-      $elemText->addFilter(new Form_Filter_HTMLPurify('p[style],span[style],a[href|title],strong,em,img[src|alt],br'));
+      $elemText->addFilter(new Form_Filter_HTMLPurify('p[style],span[style],a[href|title],strong,em,img[src|alt],br,ul,li,ol'));
       $form->addElement($elemText);
 
       $elemCaptcha = new Form_Element_Hidden('captcha');
