@@ -197,6 +197,9 @@ class Component_Scroll extends Component {
       $this->template()->countAllPages = $this->countAllPages;
       $this->template()->addTplFile($this->getConfig('tpl_file'));
       $this->template()->ajaxBox = $this->getConfig('ajaxBox');
+      if($this->countAllPages > 1 && isset ($_GET[$this->getConfig('page_param')]) /*&& $this->selectPage > 1*/){
+         Template_Core::addToPageTitle(sprintf($this->tr('Strana %s'), $this->selectPage), -1);
+      }
    }
 
    /**
