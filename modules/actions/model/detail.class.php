@@ -117,10 +117,12 @@ class Actions_Model_Detail extends Model_PDO {
 //      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
 //              ." WHERE (".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey)"
 //              ." LIMIT 0, 1");
+      $modelUsers = new Model_Users();
+      $tbUsers = $modelUsers->getTableName();
 
       $dbst = $dbc->prepare("SELECT action.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON action.".self::COLUMN_ID_USER
+              ." JOIN ".$tbUsers." AS user ON action.".self::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE ((action.".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey) OR (action.".self::COLUMN_URLKEY."_".Locales::getDefaultLang()." = :urlkey))"
               ." AND (action.".self::COLUMN_ID_CAT." = :idcat)"

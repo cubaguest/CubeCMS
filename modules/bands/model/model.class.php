@@ -22,6 +22,15 @@ class Bands_Model extends Model_PDO {
    const COLUMN_ID = 'id_band';
    const COLUMN_SHOWED = 'viewed';
    const COLUMN_PUBLIC = 'public';
+   
+   private $usersTable = null;
+
+   public function __construct()
+   {
+      $modelUsers = new Model_Users();
+      $this->usersTable = $modelUsers->getTableName();
+      parent::__construct();
+   }
 
    /**
     * Metoda uloží novinku do db
@@ -157,7 +166,7 @@ class Bands_Model extends Model_PDO {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT tband.*, tuser.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(self::DB_TABLE)." AS tband"
-              ." JOIN ".Model_Users::getUsersTable()." AS tuser ON tband.".self::COLUMN_ID_USER_LAST_EDIT." = tuser.".Model_Users::COLUMN_ID
+              ." JOIN ".$this->usersTable." AS tuser ON tband.".self::COLUMN_ID_USER_LAST_EDIT." = tuser.".Model_Users::COLUMN_ID
               ." WHERE (tband.".self::COLUMN_URLKEY." = :urlkey)"
               ." LIMIT 0, 1");
 

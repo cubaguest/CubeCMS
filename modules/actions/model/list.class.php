@@ -3,6 +3,14 @@
  * Třída modelu s listem akcí
 */
 class Actions_Model_List extends Model_PDO {
+   private $usersTable = null;
+
+   public function __construct()
+   {
+      $modelUsers = new Model_Users();
+      $this->usersTable = $modelUsers->getTableName();
+      parent::__construct();
+   }
    /**
     * Metoda vrací vybrané akce podle času
     * @return PDOStatement -- pole akcí
@@ -18,7 +26,7 @@ class Actions_Model_List extends Model_PDO {
               ." ABS(DATEDIFF(".Actions_Model_Detail::COLUMN_DATE_START.",:dateStart)) AS delta_days,"
               ." IF(actions.`".Actions_Model_Detail::COLUMN_TIME."`,actions.`".Actions_Model_Detail::COLUMN_TIME."`, '23:59:59') AS timeord"
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
               . $whereP // public
@@ -75,7 +83,7 @@ class Actions_Model_List extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT actions.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
               . $whereP // public
@@ -136,7 +144,7 @@ class Actions_Model_List extends Model_PDO {
               ." ABS(DATEDIFF(".Actions_Model_Detail::COLUMN_DATE_START.",:dateStart)) AS delta_days,"
               ." IF(actions.`time`,actions.`time`, '23:59:59') AS timeord"
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON actions.".Actions_Model_Detail::COLUMN_ID_CAT
               ." = cat.".Model_Category::COLUMN_CAT_ID
@@ -235,7 +243,7 @@ class Actions_Model_List extends Model_PDO {
       $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey ,user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON actions.".Actions_Model_Detail::COLUMN_ID_CAT
               ." = cat.".Model_Category::COLUMN_CAT_ID

@@ -4,6 +4,16 @@
  * @deprecated -- není nutná stačí přistupovat pře orm record
 */
 class Articles_Model_List extends Model_PDO {
+   
+   private $usersTable = null;
+
+   public function __construct()
+   {
+      $modelUsers = new Model_Users();
+      $this->usersTable = $modelUsers->getTableName();
+      parent::__construct();
+   }
+   
    /**
     * Metoda vrací počet článků
     *
@@ -37,7 +47,7 @@ class Articles_Model_List extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
               . $wherePub // public
@@ -64,7 +74,7 @@ class Articles_Model_List extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
               . $wherePub // public
@@ -90,7 +100,7 @@ class Articles_Model_List extends Model_PDO {
       
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
               . $whereP
@@ -140,7 +150,7 @@ class Articles_Model_List extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME.", cats.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()." AS curlkey"
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cats ON article.".Articles_Model_Detail::COLUMN_ID_CATEGORY
               ." = cats.".Model_Category::COLUMN_CAT_ID

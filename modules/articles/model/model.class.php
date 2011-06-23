@@ -184,29 +184,6 @@ class Articles_Model extends Model_ORM {
    }
 
    /**
-    * Metoda vrací článek podle zadaného klíče
-    *
-    * @param string -- url klíč článku
-    * @return PDOStatement -- pole s článkem
-    */
-   public function getArticle($urlKey) {
-      $dbc = new Db_PDO();
-         $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
-         ." FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
-         ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".self::COLUMN_ID_USER
-         ." = user.".Model_Users::COLUMN_ID
-         ." WHERE (article.".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey"
-         ." OR article.".self::COLUMN_URLKEY."_".Locales::getDefaultLang()." = :urlkey2)".
-          " LIMIT 0, 1");
-       $dbst->bindParam(':urlkey', $urlKey, PDO::PARAM_STR);
-       $dbst->bindParam(':urlkey2', $urlKey, PDO::PARAM_STR);
-      $dbst->execute();
-
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      return $dbst->fetch();
-   }
-
-   /**
     * Metoda vrací článek podle zadaného ID
     *
     * @param int -- id článku
