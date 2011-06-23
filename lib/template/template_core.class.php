@@ -61,6 +61,19 @@ class Template_Core extends Template {
       self::setPageKeywords(Category::getSelectedCategory()
          ->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
       parent::__construct(new Url_Link());
+      // pokud je titulek nastavíme jej
+      $link = new Url_Link(true);
+      if(Url_Request::getCurrentUrl() == (string)$link->category()){
+         array_push(self::$pageTitle, VVE_MAIN_PAGE_TITLE);
+      } else {
+         //@todo možná dávat celou cestu ke kategorii
+         if(empty (self::$pageTitle)){
+            array_push(self::$pageTitle, VVE_WEB_NAME);
+            array_push(self::$pageTitle, Category::getSelectedCategory()->getName());
+         } else {
+            self::$pageTitle = array_merge(array(VVE_WEB_NAME), self::$pageTitle);
+         }
+      }
    }
 
    /**
@@ -110,17 +123,7 @@ class Template_Core extends Template {
       unset ($js);
 
       // doplníme titulek stránky
-      $arr = self::$pageTitle;
-      // pokud je titulek nastavíme jej
-      $link = new Url_Link(true);
-      if(Url_Request::getCurrentUrl() == (string)$link->category()){
-         array_push($arr, VVE_MAIN_PAGE_TITLE);
-      } else {
-         //@todo možná dávat celou cestu ke kategorii
-         array_push($arr, Category::getSelectedCategory()->getName());
-         array_push($arr, VVE_WEB_NAME);
-      }
-      $title = implode(' '.VVE_PAGE_TITLE_SEPARATOR.' ', $arr);
+      $title = implode(' '.VVE_PAGE_TITLE_SEPARATOR.' ', array_reverse (self::$pageTitle));
 
       // dovypsání CoreErrors
       $errCnt = null;
@@ -198,8 +201,12 @@ class Template_Core extends Template {
     * @param string $title -- titulek stránky
     * @param bool $merge -- jestli se má titulek připojit k již nasatvenému
     */
-   public static function addToPageTitle($title) {
-      array_push(self::$pageTitle, $title);
+   public static function addToPageTitle($title, $pos = null) {
+      if($pos === null){
+         array_push(self::$pageTitle, $title);
+      } else {
+         array_splice(self::$pageTitle, $pos, 0, $title);
+      }
    }
 
    /**
