@@ -18,14 +18,16 @@ class Module_ErrPage extends Module_Core {
             Template_Output::addHeader("HTTP/1.0 404 Not Found");
             break;
       }
-
-      Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
+      if(VVE_DEBUG_LEVEL > 0){
+         Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
+      }
    }
 
    public function runView() {
       switch ($this->getCode()) {
          case 404:
          default:
+            Template_Core::setPageTitle($this->tr('Chyba: stránka nenalezena'));
             Template_Output::addHeader("HTTP/1.0 404 Not Found");
             $this->template()->addTplFile('error/404.phtml');
             break;
