@@ -23,6 +23,7 @@ class Template_Toolbox2 extends Template {
    const ICON_ADD = 'add.png';
    const ICON_DELETE = 'delete.png';
 
+   private $templateCreated = false;
 
    /**
     * Pole s nástroji
@@ -112,11 +113,13 @@ class Template_Toolbox2 extends Template {
     * Metoda vytvoří šablonu
     */
    private function createTemplate() {
-      $this->toolboxIcon = $this->icon;
-      $this->addTplFile("toolbox/toolbox.phtml", true);
-      $this->addJsPlugin(new JsPlugin_JQuery());
-
-      $this->iconsDir = Url_Request::getBaseWebDir(true).Template::IMAGES_DIR.URL_SEPARATOR.self::ICONS_DIR.URL_SEPARATOR;
+      if(!$this->templateCreated){
+         $this->toolboxIcon = $this->icon;
+         $this->addTplFile("toolbox/toolbox.phtml", true);
+         $this->addJsPlugin(new JsPlugin_JQuery());
+         $this->iconsDir = Url_Request::getBaseWebDir(true).Template::IMAGES_DIR.URL_SEPARATOR.self::ICONS_DIR.URL_SEPARATOR;
+         $this->templateCreated = true;
+      }
    }
 
    public function  __toString() {
