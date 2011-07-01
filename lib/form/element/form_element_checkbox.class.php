@@ -51,23 +51,29 @@ class Form_Element_Checkbox extends Form_Element {
     * @return string
     */
    public function controll() {
+      $values = $this->getUnfilteredValues();
       if($this->isDimensional()) {
          $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
          $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
+         if($values === true || (isset ($values[$this->dimensional]) && $values[$this->dimensional] === true)) {
+            $this->html()->setAttrib('checked', 'checked');
+         } else {
+            $this->html()->removeAttrib('checked');
+         }
       } else {
          $this->html()->setAttrib('name', $this->getName());
          $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+         if($values == true) {
+            $this->html()->setAttrib('checked', 'checked');
+         }
       }
 
-      $values = $this->getUnfilteredValues();
 
       $this->html()->setAttrib('type', 'checkbox');
-      if(!empty ($values)) {
+      if(!is_array($values) AND !empty ($values)) {
          $this->html()->setAttrib('value', $values);
       }
-      if($values == true) {
-         $this->html()->setAttrib('checked', 'checked');
-      }
+      
 
       $l = new Html_Element('label', $this->getLabel());
       if($this->isDimensional()) {

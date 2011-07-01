@@ -59,7 +59,7 @@ class Form_Element_File extends Form_Element {
                      'type' => $this->getMimeType($dir . $saveFileName),
                      'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION));
                } else if ($_FILES[$this->getName()]['error'][$key] == UPLOAD_ERR_NO_FILE) {
-                  $files[] = false;
+//                  $files[] = false; // @TODO -- proč takhle???
                } else {
                   $this->creteUploadError($_FILES[$this->getName()]['error'][$key], $_FILES[$this->getName()]['name'][$key]);
                }

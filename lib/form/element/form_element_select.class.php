@@ -36,9 +36,14 @@ class Form_Element_Select extends Form_Element {
     * Metoda nastaví volby
     * @param $options -- volby v poli hodnota=>popis
     * @param $merge -- jestli se mají nové volby připojit ke stávajícím volbám
+    * @param $correctArray -- jestli se má provést korektura pole, pokud jsou prohozeny klíč x hodnota
     * @return Form_Element_Select -- sám sebe
     */
-   public function setOptions($options, $merge = false) {
+   public function setOptions($options, $merge = false, $correctArray = true) {
+      reset($options);
+      if($correctArray == true && is_string(reset($options)) && is_int(key($options))){
+         $options = array_flip($options);
+      }
       if($merge === true){
          $this->options = array_merge($this->options, $options);
          $this->options = array_unique($this->options);
@@ -88,7 +93,7 @@ class Form_Element_Select extends Form_Element {
          }
       }
       $this->renderedId++;
-      
+
       if($this->isMultiple) {
          $this->html()->setAttrib('multiple', 'multiple');
       }
