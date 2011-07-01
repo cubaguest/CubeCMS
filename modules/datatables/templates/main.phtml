@@ -1,0 +1,29 @@
+<?php 
+echo $this->toolbox;
+$this->addFile('css://style.css');
+?>
+<h1><?php echo $this->category()->getName()?></h1>
+<div class="main-content-text">
+<?
+if(!empty($this->rows)){?>
+   <table style="width: 100%;" class="ui-widget ui-widget-content datatable-main <?=('datatable-main-cols-').$this->colls?>">
+      <?foreach ($this->rows as $row) {?>      
+      <tr class="ui-state-default <?if($row['header'] == 1) echo "ui-state-highlight"?>">
+         <?
+         $rstr = '<td class="column-%s">%s</td>';
+         if($row['header'] == 1) $rstr = '<th class="column-%s">%s</th>';
+         for ($i = 0; $i < $this->colls; $i++) {
+            printf($rstr, $i+1, $row[$i]);
+         }
+         ?>
+      </tr>
+      <?}?>
+   </table>
+<?} else {?>
+   <p class="admin-info-text">
+      <?echo $this->tr('Žádná tabulka nebyla uložena')?>
+   </p>
+<?}?>
+   
+   
+</div>

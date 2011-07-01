@@ -1,0 +1,149 @@
+<?
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+
+<h1><?php printf($this->tr('Úprava dat - %s'), $this->category()->getName())?></h1>
+<div class="main-content-form-edit">
+<?php
+echo $this->form->renderStart();
+?>
+   <table id="dataTable">
+   <thead class="ui-widget-header">
+      <?//if(Locales::isMultilang()){?>
+      <?if(true){?>
+      <tr>
+         <th colspan="<?=$this->colls+2?>">
+            <?=$this->tr('Jazyk')?>:
+            <select name="datatable-lang">
+               <?foreach (Locales::getAppLangsNames() as $key => $lang) {?>
+               <option value="<?=$this->link()->param('lang', $key)?>" <?if(isset($_GET['lang']) && $_GET['lang'] == $key) echo 'selected="selected"'?>><?=$lang?></option>
+               <?}?>
+            </select>
+         </th>
+      </tr>
+      <?}?>
+      <tr>
+         <th><span title="<?echo $this->tr('Hlavička');?>"><?echo $this->tr('H');?></span></th>
+      <?for ($i = 1; $i <= $this->colls; $i++) {?>
+         <th><?echo $this->tr('Sloupec').' '.$i;?></th>
+      <?}?>
+      <th></th>
+      </tr>
+   </thead>
+   <tbody class="ui-widget-content">
+      <?foreach ($this->rows as $rowkey => $row) {?>
+      <tr class="ui-state-default <?if($row['header'] === true) echo "ui-state-highlight";?>" id="row-<?=$rowkey?>">
+            <td>
+               <?
+               $this->form->header->setValues((bool)$row['header']);
+               $this->form->header->setDimensional($rowkey);
+               $this->form->header->html()->setAttrib('title', $this->tr('Řádek je hlavička'))->addClass('datatable-header-switcher');
+               echo $this->form->header;
+               ?>
+            </td>
+            <?for ($i=1; $i <= $this->colls; $i++) {
+               $this->form->{'coll_'.$i}->setDimensional($rowkey);
+               if(isset ($row[$i-1])){
+                  $this->form->{'coll_'.$i}->setValues($row[$i-1]);
+               }
+               $this->form->{'coll_'.$i}->html()->setAttrib('rows', 1);
+               ?>
+            <td><?echo $this->form->{'coll_'.$i};?></td>
+            <?}?>
+            <td class="data-table-actions">
+               <img src="/images/icons/arrow_up_down.png" alt="move row" />
+               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/table_row_insert.png" alt="add row" /></a>
+               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="/images/icons/table_row_delete.png" alt="remove row" /></a>
+            </td>
+         </tr>
+      <?}?>
+   </tbody>
+   <tfoot class="ui-widget-header">
+      <tr>
+         <td colspan="2">
+         <?
+         echo $this->form->save;
+         echo $this->form->close->label();
+         echo $this->form->close;
+         ?>
+         </td>
+         <td colspan="<?=$this->colls?>" style="text-align: right;">
+            <a href="javascript:addRow()" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/table_row_insert.png" alt="add row" /><?=$this->tr('Přidat řádek');?></a>
+         </td>
+      </tr>
+      <tr id="dataTableRowTpl" class="ui-state-default">
+            <td>
+               <?
+               $this->form->header->setDimensional('{KEY}');
+               $this->form->header->setValues(false);
+               $this->form->header->html()->setAttrib('title', $this->tr('Řádek je hlavička'))->addClass('datatable-header-switcher');
+               echo $this->form->header;
+               ?>
+            </td>
+            <?for ($i=1 ; $i <= $this->colls; $i++) {
+               $this->form->{'coll_'.($i)}->setDimensional('{KEY}');
+               $this->form->{'coll_'.($i)}->setValues(null);
+               ?>
+               <td><?echo $this->form->{'coll_'.($i)};?></td>
+            <?}?>
+            <td class="data-table-actions">
+               <a href="" class="move" onclick="return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/arrow_up_down.png" alt="move row"  /></a>
+               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/table_row_insert.png" alt="add row" /></a>
+               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="/images/icons/table_row_delete.png" alt="remove row" /></a>
+            </td>
+         </tr>
+   </tfoot>   
+</table>
+<?php 
+echo $this->form->renderEnd();
+?>
+   <script type="text/javascript">
+   var dt = null;   
+   var rowTpl = null;
+   var lastRow = <?=$rowkey+1?>;
+   $(function() {
+      dt = $('#dataTable tbody');
+      rowTpl = $('#dataTableRowTpl');
+		$( "#dataTable tbody" ).sortable({
+			placeholder: "ui-state-highlight"
+		});
+      
+      $('.datatable-header-switcher').live('change', function(){
+         if($(this).is(':checked')){
+            $(this).parents('tr').addClass('ui-state-highlight');
+         } else {
+            $(this).parents('tr').removeClass('ui-state-highlight');
+         }
+      });
+      $('select[name=datatable-lang]').change(function(){
+         window.location = $(this).val();
+      });
+      
+	});
+   
+   // Přidá řádek do tabulky
+   function addRow(obj){
+      var rStr = $('<div>').append(rowTpl.clone(true).attr('id',  "row-"+lastRow).show()).html().replace(/{KEY}/g, lastRow);
+      lastRow++;
+      if(typeof(obj) == 'undefined'){
+         dt.append(rStr);
+      } else {
+         $(rStr).insertAfter($(obj).parents('tr'));
+      }
+   }
+   
+   function delRow(obj){
+      $(obj).parents('tr').remove();
+   }
+   
+   </script>
+   <p class="note">
+   <ul>
+      <li><?= $this->tr('Položky lze přesunovat uchopením myší a přesunutí na vybranou pozici.'); ?></li>
+      <li><?=$this->tr('Před změnou jazyka je nutné položky uložit, jinak dojde ke ztrátě dat.');?></li>
+   </ul>
+</p>
+</div>

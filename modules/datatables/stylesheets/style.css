@@ -1,0 +1,35 @@
+#dataTable { 
+   width: 100%;
+}
+#dataTable td, #dataTable th { 
+   padding: 3px;
+}
+#dataTable tr.ui-state-highlight{ 
+   height: 2em;
+}
+
+#dataTableRowTpl {
+   display: none;
+}
+
+.data-table-actions {
+   text-align: right;
+   width: 12%;
+   padding: 0;
+}
+
+.data-table-actions img {
+/*   float: right;*/
+   vertical-align: -3px;
+}
+
+#dataTable textarea {
+   width: 98%;
+}
+
+.datatable-main td, .datatable-main th {
+   padding: 1px 3px;
+}
+.datatable-main .column-2 {
+   width: 8%;
+}
