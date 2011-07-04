@@ -99,7 +99,7 @@ function tplCatTrRights(Translator $translator, $right)
    <?  foreach ($this->catRights as $right) {?>
    <tr class="single-row">
       <th scope="row" class="ui-widget-header"><?=$right->{Model_Groups::COLUMN_NAME};?></th>
-      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator, $right->{Model_Rights::COLUMN_RIGHT});?> </td>
+      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $right->{Model_Rights::COLUMN_RIGHT});?> </td>
    </tr>
    <?}?>
 </table>
