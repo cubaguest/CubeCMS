@@ -399,30 +399,33 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
                $var->mainController();
             }
          }
-
          $this->view()->{$viewName}();
-         // pokud je hlavní pohled přidáme toolboxy s nastavením (modí být vložen)
-         if($viewName == "mainView"
-            AND $this->getRights()->isControll()
-            AND $this->view()->toolbox instanceof Template_Toolbox2
-            AND (Category::getSelectedCategory() instanceof Category_Admin) == false){
-            // pokud není vložen nástroj pro nastavení
-            if($this->view()->toolbox->edit_view){
-               unset ($this->view()->toolbox->edit_view);
-            }
-            $this->view()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
-            $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
-            $this->view()->toolbox->addTool($toolEView);
-            $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
-               $this->link()->route(Routes::MODULE_METADATA));
-            $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
-            $this->view()->toolbox->addTool($toolEMetaData);
-         }
-         
+         $this->addToolBox($viewName);
       } else if($ctrlResult === false) {
          AppCore::setErrorPage(true);
+      }
+   }
+   
+   final private function addToolBox($view)
+   {
+      // pokud je hlavní pohled přidáme toolboxy s nastavením (modí být vložen)
+      if ($view == "mainView"
+         AND $this->getRights()->isControll()
+         AND $this->view()->toolbox instanceof Template_Toolbox2
+         AND (Category::getSelectedCategory() instanceof Category_Admin) == false) {
+         // pokud není vložen nástroj pro nastavení
+         if ($this->view()->toolbox->edit_view) {
+            unset($this->view()->toolbox->edit_view);
+         }
+         $this->view()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+               $this->link()->route(Routes::MODULE_SETTINGS));
+         $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
+         $this->view()->toolbox->addTool($toolEView);
+         $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
+               $this->link()->route(Routes::MODULE_METADATA));
+         $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
+         $this->view()->toolbox->addTool($toolEMetaData);
       }
    }
 
@@ -452,6 +455,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
       // pokud je kontrolel v pořádku spustíme view
       if($viewName != null){
          $this->view()->{$viewName}();
+         $this->addToolBox($viewName);
       }
       return true;
    }
