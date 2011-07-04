@@ -21,6 +21,7 @@ class Template_Toolbox2_Tool_LangLoader extends Template_Toolbox2_Tool implement
    public function  __construct($text = null) {
       $langs = Locales::getAppLangsNames();
       if($text instanceof Model_ORM_LangCell OR $text instanceof Model_LangContainer_LangColumn){
+         $this->langs[Locales::getDefaultLang()] = $langs[Locales::getDefaultLang()];
          foreach ($text as $lang => $val) {
             if($val == null) continue;
             $this->langs[$lang] = $langs[$lang];
