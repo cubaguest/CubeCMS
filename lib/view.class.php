@@ -185,6 +185,11 @@ abstract class View extends TrObject {
       $this->template()->addFile('tpl://engine:vsettings.phtml');
       Template_Module::setEdit(true);
    }
+   
+   final public function viewMetadataView() {
+      $this->template()->addFile('tpl://engine:vmetadata.phtml');
+      Template_Module::setEdit(true);
+   }
 
    /**
     * Metoda vrací objekt překladatele

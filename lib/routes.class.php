@@ -16,6 +16,7 @@ class Routes {
     * Routa pro nastavení kategorie
     */
    const MODULE_SETTINGS = 'settings';
+   const MODULE_METADATA = 'metadata';
 
    /**
     * Pole s cestami
@@ -47,6 +48,7 @@ class Routes {
    function __construct($urlRequest, Category_Core $category = null) {
       $this->urlRequest = $urlRequest;
       $this->addRoute(self::MODULE_SETTINGS, 'settings', 'viewSettings', 'settings/'); // nastavení vzhledu modulu
+      $this->addRoute(self::MODULE_METADATA, 'metadata', 'viewMetadata', 'metadata/'); // nastavení metadat modulu
       $this->initRoutes();
       if($category != null AND $category->haveFeed()){
          $this->addRoute('feed', null, 'main', '{type}.xml');

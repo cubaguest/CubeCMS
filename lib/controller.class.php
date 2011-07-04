@@ -401,6 +401,26 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
          }
 
          $this->view()->{$viewName}();
+         // pokud je hlavní pohled přidáme toolboxy s nastavením (modí být vložen)
+         if($viewName == "mainView"
+            AND $this->getRights()->isControll()
+            AND $this->view()->toolbox instanceof Template_Toolbox2
+            AND (Category::getSelectedCategory() instanceof Category_Admin) == false){
+            // pokud není vložen nástroj pro nastavení
+            if($this->view()->toolbox->edit_view){
+               unset ($this->view()->toolbox->edit_view);
+            }
+            $this->view()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+            $this->link()->route(Routes::MODULE_SETTINGS));
+            $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
+            $this->view()->toolbox->addTool($toolEView);
+            $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
+               $this->link()->route(Routes::MODULE_METADATA));
+            $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
+            $this->view()->toolbox->addTool($toolEMetaData);
+         }
+         
       } else if($ctrlResult === false) {
          AppCore::setErrorPage(true);
       }
@@ -586,6 +606,88 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
 
       $this->view()->form = $form;
 
+   }
+   
+   public function viewMetadataController() {
+      $this->checkControllRights();
+      
+      $catModel = new Model_Category();
+      $cat = $catModel->record($this->category()->getId());
+      
+      $form = new Form('metadata_');
+      $grpBasic = $form->addGroup('basic', $this->tr('Základní'), $this->tr('Základní nastavení'));
+      $grpSitemap = $form->addGroup('sitemap', $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
+      
+      $eName = new Form_Element_Text('name', $this->tr('Název kategorie'));
+      $eName->addValidation(new Form_Validator_NotEmpty());
+      $eName->setLangs();
+      $eName->setValues($cat->{Model_Category::COLUMN_NAME});
+      $form->addElement($eName, $grpBasic);
+      
+      $eKeywords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
+      $eKeywords->setLangs();
+      $eKeywords->setSubLabel($this->tr('Klíčová slova, které kategorii nejlépe vystihují oddělené mezerou nebo čárkou.'));
+      $eKeywords->setValues($cat->{Model_Category::COLUMN_KEYWORDS});
+//      $eKeywords->addValidation(new Form_Validator_NotEmpty());
+      $form->addElement($eKeywords, $grpBasic);
+      
+      $eDesc = new Form_Element_TextArea('desc', $this->tr('Popis kategorie'));
+      $eDesc->setLangs();
+      $eDesc->setSubLabel($this->tr('Krátký popisek kategorie. (Používá jej například Google u krátkého textu ve výsledcích hledání.)'));
+      $eDesc->setValues($cat->{Model_Category::COLUMN_DESCRIPTION});
+//      $eDesc->addValidation(new Form_Validator_NotEmpty());
+      $form->addElement($eDesc, $grpBasic);
+      
+      $ePrior = new Form_Element_Text('priority', $this->tr('Priorita'));
+      $ePrior->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $ePrior->setSubLabel('Čím větší tím bude větší šance, že kategorie bude vybrána jako výchozí.');
+      $ePrior->setValues($cat->{Model_Category::COLUMN_PRIORITY});
+      $form->addElement($ePrior, $grpBasic);
+      
+      
+//      frekvence změny
+      $freqOptions = array($this->tr('Vždy') => 'always', $this->tr('každou hodinu') => 'hourly',
+         $this->tr('Denně') => 'daily', $this->tr('Týdně') => 'weekly', $this->tr('Měsíčně') => 'monthly',
+         $this->tr('Ročně') => 'yearly', $this->tr('Nikdy') => 'never');
+      $catSitemapChangeFrequency = new Form_Element_Select('sitemap_frequency', $this->tr('Frekvence změn'));
+      $catSitemapChangeFrequency->setOptions($freqOptions);
+      $catSitemapChangeFrequency->setSubLabel($this->tr('Jak často se aktualizuje obsah kategorie.'));
+      
+      $catSitemapChangeFrequency->setValues($cat->{Model_Category::COLUMN_SITEMAP_CHANGE_FREQ});
+      $form->addElement($catSitemapChangeFrequency, $grpSitemap);
+      
+      $eSitemapPrior = new Form_Element_Text('sitemap_priority', $this->tr('Priorita'));
+      $eSitemapPrior->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
+      $eSitemapPrior->addValidation(new Form_Validator_NotEmpty());
+      $eSitemapPrior->setSubLabel('0 - 1, čím větší, tím bude kategorie označena jako důležitější.');
+      $eSitemapPrior->setValues($cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY});
+      $form->addElement($eSitemapPrior, $grpSitemap);
+
+      $eSave = new Form_Element_SaveCancel('save');
+      $form->addElement($eSave);
+      
+      if($form->isSend()){
+         if($form->save->getValues() == false){
+            $this->link()->route()->reload();
+         }
+         if((float)$form->sitemap_priority->getValues() < 0 || (float)$form->sitemap_priority->getValues() > 1){
+            $eSitemapPrior->setError($this->tr('Zadaná hodnota není v požadovaném rozsahu 0 až 1'));
+         }
+      }
+      
+      if($form->isValid()){
+         $cat->{Model_Category::COLUMN_NAME} = $form->name->getValues();
+         $cat->{Model_Category::COLUMN_KEYWORDS} = $form->keywords->getValues();
+         $cat->{Model_Category::COLUMN_DESCRIPTION} = $form->desc->getValues();
+         $cat->{Model_Category::COLUMN_PRIORITY} = $form->priority->getValues();
+         $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_FREQ} = $form->sitemap_frequency->getValues();
+         $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY} = $form->sitemap_priority->getValues();
+         
+         $catModel->save($cat);
+         $this->infoMsg()->addMessage($this->tr('Metadata byla uložena'));
+         $this->link()->route()->reload();
+      }
+      $this->view()->form = $form;
    }
 }
 ?>
