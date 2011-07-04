@@ -25,10 +25,10 @@ class Token {
       if(!self::$token){
          self::$token = self::generateToken();
       }
-      if(!self::$tokenStore){
+      if(self::$tokenStore instanceof Token_Store === false){
          self::$tokenStore = new $classStoreName();
-         self::$tokenStore->save(self::$token);
       }
+      self::$tokenStore->save(self::$token);
       if(rand(1, 10) == 3){
          self::$tokenStore->gc();
       }
