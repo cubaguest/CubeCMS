@@ -17,13 +17,14 @@ class Photogalery_View extends View {
          $toolEditText->setIcon('image_edit.png')->setTitle($this->tr('Upravit fotky'));
          $toolbox->addTool($toolEditText);
 
-         if($this->category()->getRights()->isControll()){
-            $this->toolboxText->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
-            $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
-            $this->toolboxText->addTool($toolEView);
-         }
+//         if($this->category()->getRights()->isControll()){
+//            $this->toolboxText->setIcon(Template_Toolbox2::ICON_WRENCH);
+//            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+//            $this->link()->route(Routes::MODULE_SETTINGS));
+//            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
+//            $this->toolboxText->addTool($toolEView);
+//         }
+         $this->toolbox = $this->toolboxText;
          
          if($this->text != false){
             $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->text->{Text_Model::COLUMN_TEXT});
