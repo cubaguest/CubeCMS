@@ -482,7 +482,7 @@ class Categories_Controller extends Controller {
 
       // priorita
       $catPriority = new Form_Element_Text('priority', $this->tr('Priorita kategorie'));
-      $catPriority->setSubLabel('Čím větší tím bude kategorie vybrána jako výchozí');
+      $catPriority->setSubLabel('Čím větší tím bude větší šance, že kategorie bude vybrána jako výchozí');
       $catPriority->addValidation(New Form_Validator_IsNumber());
       $catPriority->addValidation(New Form_Validator_Length(1, 4));
       $catPriority->setValues(0);
