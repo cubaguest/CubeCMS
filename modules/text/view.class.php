@@ -37,13 +37,6 @@ class Text_View extends View {
 
          $this->toolbox = $toolbox;
 
-         if($this->category()->getRights()->isControll()){
-            $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
-            $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
-            $this->toolbox->addTool($toolEView);
-         }
          if($this->text != false){
             $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->text->{Text_Model::COLUMN_TEXT});
             $this->toolbox->addTool($toolLangLoader);
