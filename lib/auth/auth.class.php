@@ -266,7 +266,7 @@ class Auth extends TrObject {
 			$return = true;
 			Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::$userName);
          AppCore::getInfoMessages()->addMessage($tr->tr('Byl jste úspěšně odhlášen'));
-         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/', '.cube.cz'); // remove permament cookie
+         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/', '.'.Url_Request::getDomain()); // remove permament cookie
 			$link = new Url_Link();
          $link->reload();
 		}
