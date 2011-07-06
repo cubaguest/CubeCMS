@@ -1,9 +1,11 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
+$rTime = rand(1, time());
 ?>
-<a class="toolbox-button ui-state-default ui-corner-all" href="" title="<?$this->tr('Otevřít nástroje')?>"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
-<div class="toolbox">
+<a class="toolbox-button ui-state-default ui-corner-all" id="toolbox-<?=$rTime?>-button"
+   href="" title="<?$this->tr('Otevřít nástroje')?>"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
+<div class="toolbox" id="toolbox-<?=$rTime?>-box">
    <? foreach ($this->getTools() as $tool) {
       $class = get_class($tool);
       if($class == "Template_Toolbox2_Tool_LangLoader" AND !Locales::isMultilang()) continue;

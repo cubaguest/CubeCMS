@@ -88,6 +88,8 @@ function initToolboxEvents(){
     * Initializa all button only once
     */
    var toolboxButtons = $('a.toolbox-button');
+   // remove all previous toolboxes
+   $('div.toolbox-temp').remove();
    
    $("div.toolbox").parent('div').css({position: 'relative'});
    $(".toolbox-tool").hover(function(){
@@ -97,38 +99,51 @@ function initToolboxEvents(){
       $(this).removeClass('ui-state-highlight');
       $(this).find('input').removeClass('ui-state-highlight');
    });
-   $("a.toolbox-button").mousemove(function(){
-      var $toolbox = $(this).next('div.toolbox').clone(true);
-      $('body').append($toolbox);
-      $toolbox.css({opacity: 1, top: $(this).offset().top-2,
-         left: $(this).offset().left-$toolbox.width()+22,
-         width : $toolbox.width()
-      }).show().mousemove();
-      return false;
-   });
-   $("a.toolbox-button").hover(function(){
-      $(this).css({'z-index': 3}).parent().addClass('toolbox-active-content');
-   }, function(){
-      if($('body>div.toolbox').length == 0){
-         $(this).css({'z-index': 1}).parent().removeClass('toolbox-active-content');
-      }
-   });
-   $("div.toolbox").hover(
-      function(){$(this).css({'z-index':10000, opacity:1}).show();},
+   
+   /* events */
+   toolboxButtons.hover(function(){
+         $(this).css({'z-index': 3});
+         $(this).next('div.toolbox').trigger('showToolbox', [$(this)]);
+      }, 
       function(){
-         $('.toolbox-active-content').removeClass('toolbox-active-content');
-         $(this).animate({opacity:0}, 500, function(){$(this).remove();});
+         $(this).css({'z-index': 1});
+   });
+   
+   $("div.toolbox").bind('showToolbox', function(event, $button){
+      // podklad pro editaci
+      $button.parent().addClass('toolbox-active-content');
+      // kontrola jestli není už vytvořen
+      var toolId = $(this).attr('id')+'-copy';
+      var $toolbox;
+      if($('#'+toolId).length == 0){
+         $toolbox = $(this).clone(true).attr('id', toolId).addClass('toolbox-temp');
+         $('body').append($toolbox);
+         $toolbox.bind('mouseleave', function(){
+            $('.toolbox-active-content').removeClass('toolbox-active-content');
+            $(this).animate({opacity:0}, 300, function(){
+               $(this).css({'z-index':-10000}).hide();
+            });
+         });
+      } else {
+         $toolbox = $('#'+toolId);
+      }
+      
+      $toolbox.css({
+         opacity     : 1, 
+         top         : $button.offset().top-2,
+         left        : $button.offset().left-$toolbox.width()+22,
+         width       : $toolbox.width(),
+         'z-index'   : 10000
+      }).show();
    });
    
    // move toolbox with document when scrolling
-   
+   $(document).unbind('scroll');
    $(document).scroll(function(){
       var top = $(this).scrollTop();
       toolboxButtons.each(function(){
-   //      $('#toolbox-pos').html($(this).offset().left);
          var $container = $(this).parent();
          if($container.offset().top < top+30 && top < $container.offset().top+$container.height()-30){
-            $('#toolbox-pos').html(top+"<br />"+$(this).offset().left);
             $(this).css({
                position : "fixed",
                top: 30,
@@ -139,9 +154,7 @@ function initToolboxEvents(){
                position : "absolute",
                top: 1,
                right: 1, left : "auto"
-            
             });
-            $('#toolbox-pos').html(top+"<br />moving stop");
          }
       });
    });
@@ -169,9 +182,7 @@ $(document).ready(function(){
       $('label[lang="'+lang+'"]', $container).show();
       return false;
    });
-
    initToolboxEvents();
-   
    // open external link in new window
    $("a.link-external").live('click',function(){
       window.open(this.href);
@@ -183,6 +194,7 @@ $(document).ready(function(){
       $('.main-content').load(this.href, function(){
          hideLoadBox();
          initToolboxEvents();
+         $(document).scroll();
       });
       return false;
    });   
