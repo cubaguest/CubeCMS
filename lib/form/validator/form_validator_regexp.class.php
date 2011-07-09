@@ -17,6 +17,8 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
    public function  __construct($regexp='//', $errMsg = null) {
       if($errMsg == null) {
          parent::__construct($this->tr('Položka "%s" nevyhovuje zadanému regulérnímu výrazu'));
+      } else if($regexp == self::REGEXP_PHONE_CZSK AND $errMsg == null) {
+         parent::__construct($this->tr('Položka "%s" neobsahuje platné telefonní číslo'));
       } else {
          parent::__construct($errMsg);
       }
@@ -28,6 +30,9 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
+      if($this->regexp == self::REGEXP_PHONE_CZSK) {
+         $element->addValidationConditionLabel($this->tr('např: +420 123 456 789'));
+      }
    }
 
    public function validate(Form_Element $elemObj) {
