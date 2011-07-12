@@ -24,13 +24,15 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_resizing' => 'true',
       'entity_encoding' => 'raw',
       'theme_advanced_blockformats' => "p,h2,h3,h4,h5,h6,address,blockquote,code",// not h1,div,dt,dd,samp
-      'valid_styles' => "{'*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align', 'table' : 'margin-left,margin-right'}",
+      'valid_styles' => "{'*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align', 'table' : 'margin-left,margin-right',
+         'ol' : 'list-style-type', 'ul' : 'list-style-type'}",
       'tab_focus' => ':prev,:next',
       'width' => 520,
 
    );
 
-   protected $defaultPlugins = array('safari','style','table','save','advhr','advimage','advlink','emotions','iespell','tabfocus',
+   protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','advimage','advlink',
+      'advlist','emotions','iespell','tabfocus',
       'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality','autoresize',
       'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists', 'autolink',
       'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins

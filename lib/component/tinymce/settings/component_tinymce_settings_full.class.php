@@ -4,7 +4,7 @@
  */
 class Component_TinyMCE_Settings_Full extends Component_TinyMCE_Settings_Advanced {
    protected $defaultPlugins = array('safari','spellchecker','pagebreak','style',
-       'layer','table','save','advhr','advimage','advlink','emotions','iespell',
+       'layer','table','save','advhr','advimage','advlink','advlist','emotions','iespell',
        'inlinepopups','insertdatetime','preview','media','searchreplace','print',
        'contextmenu','paste','directionality','fullscreen','noneditable','visualchars',
        'nonbreaking','xhtmlxtras','template','imgmap', 
