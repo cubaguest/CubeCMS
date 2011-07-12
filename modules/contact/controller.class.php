@@ -102,7 +102,7 @@ class Contact_Controller extends Controller {
             $usersId = $this->category()->getParam(self::PARAM_ADMIN_RECIPIENTS, array());
             $modelusers = new Model_Users();
             foreach ($usersId as $id) {
-               $user = $modelusers->getUserById($id);
+               $user = $modelusers->record($id);
                $adminMails = array_merge($adminMails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
             }
          }
