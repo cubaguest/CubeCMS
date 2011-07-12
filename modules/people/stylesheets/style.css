@@ -1,0 +1,9 @@
+#people-list li { 
+   margin: 0 5px 5px 5px; 
+   padding: 5px; 
+/*   font-size: 12px; */
+}
+#people-list .ui-state-highlight { 
+   height: 17px; 
+   line-height: 1.2em; 
+}
