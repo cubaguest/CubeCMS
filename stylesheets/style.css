@@ -421,10 +421,11 @@ textarea, form .form-table .form-element-long {
 /* EOF panel content NEW!!! */
 
 /* SOF Article tools */
-.article-tools {
-   border-top: 1px solid gray;
-   margin-top: 1em;
-}
+.article-tools { padding-top: 1em; }
+.facebook-button { float: left; }
+.share-button { float: left; padding-top: 4px; width: 110px; }
+.nav-button { text-align: right; }
+.link-back, .button-back {	text-align: left;	display: block; }
 /* EOF Article tools */
 
 /* SOF Sitemap Content */
