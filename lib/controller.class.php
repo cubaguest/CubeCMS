@@ -521,13 +521,13 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
 
       // ostatní nastavení
       /* IKONA */
-      $elemIcon = new  Form_Element_File('icon', _('Ikona'));
+      $elemIcon = new  Form_Element_File('icon', _('Titulní obrázek/ Ikona'));
       $elemIcon->setUploadDir(Category::getImageDir(Category::DIR_ICON, true));
       $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemIcon,$grpView);
 
       /* IKONA uploadnutá */
-      $elemIconImageSelect = new Form_Element_Select('iconUploaded', _('Přiřazená ikona'));
+      $elemIconImageSelect = new Form_Element_Select('iconUploaded', _('Přiřazený obrázek'));
       $elemIconImageSelect->setOptions(array( _('Žádná') => 'none'));
       if(file_exists(Category::getImageDir(Category::DIR_ICON, true))){
          $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_ICON, true));

@@ -17,6 +17,7 @@ class Category_Core extends TrObject {
     */
    const DIR_IMAGES = 'categories';
    const DIR_ICON = 'icons';
+   const DIR_IMAGE = 'icons';
    const DIR_BACKGROUND = 'backgrounds';
 
 
