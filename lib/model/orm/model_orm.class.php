@@ -496,6 +496,26 @@ class Model_ORM extends Model_PDO {
    }
 
    /**
+    * Metoda pro dotaz na model
+    * @param mixed $stmt (PDOStatement nebo string)
+    * @return type PDOStatement
+    * 
+    * Pokud je předán řetezec, je řetězec {THIS} nahrazen názvem tabulky
+    */
+   public function query($stmt)
+   {
+      if($stmt instanceof PDOStatement == false) {
+         if(is_string($stmt)){
+            $stmt = str_replace('{THIS}', '`'.$this->getTableName().'`', $stmt);
+            
+            $con = new Db_PDO();
+            $stmt = $con->prepare($stmt);
+         }
+      }
+      return $stmt;
+   }
+
+      /**
     * Varcí SQL dotaz pro výběr
     * @return string
     */
