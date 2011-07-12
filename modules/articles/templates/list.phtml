@@ -22,6 +22,11 @@ echo $this->toolbox;
             $public = $this->tr('Koncept').'&nbsp;';
          }
          $editTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
+         // find image
+         $doc = new DOMDocument();
+         @$doc->loadHTML($article->{Articles_Model::COLUMN_TEXT});
+         $xml = simplexml_import_dom($doc); // just to make xpath more simple
+         $image = $xml->xpath('//img');
          ?>
       <div class="main-content-list-record <?=$showClass?>">
          <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
@@ -35,10 +40,8 @@ echo $this->toolbox;
             ?>
          </h2>
          <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
-         $out = array();
-         preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model::COLUMN_TEXT}, $out);
-         if(!empty ($out) AND $out[1] != '0') {?>
-            <div class="main-content-list-record-image"><?=vve_tpl_image_tag($out[1], "article title image", 140, 100);?></div>
+         if(!empty ($image) && isset ($image[0])) {?>
+            <div class="main-content-list-record-image"><?=vve_tpl_image_tag($image[0]['src'], $image[0]['alt'] != null ? $image[0]['alt'] : "article title image", 140, 100);?></div>
          <?}?>
             <?if((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
                <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model::COLUMN_ANNOTATION};?></div>

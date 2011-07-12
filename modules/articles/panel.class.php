@@ -15,8 +15,7 @@ class Articles_Panel extends Panel {
             $artM->order(array(Articles_Model::COLUMN_SHOWED => Model_ORM::ORDER_ASC));
             break;
          case 'rand':
-//            $num = $artM->count();RAND (NOW())
-            $artM->order(array('RAND (NOW())' => Model_ORM::ORDER_ASC));
+            $artM->order(array('RAND(NOW())' => Model_ORM::ORDER_ASC));
             break;
          case 'list':
          default:
