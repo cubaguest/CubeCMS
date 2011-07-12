@@ -54,9 +54,9 @@ echo $this->form->renderStart();
             <td><?echo $this->form->{'coll_'.$i};?></td>
             <?}?>
             <td class="data-table-actions">
-               <img src="/images/icons/arrow_up_down.png" alt="move row" />
-               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/table_row_insert.png" alt="add row" /></a>
-               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="/images/icons/table_row_delete.png" alt="remove row" /></a>
+               <img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/arrow_up_down.png" alt="move row" />
+               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /></a>
+               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_delete.png" alt="remove row" /></a>
             </td>
          </tr>
       <?}?>
@@ -71,7 +71,7 @@ echo $this->form->renderStart();
          ?>
          </td>
          <td colspan="<?=$this->colls?>" style="text-align: right;">
-            <a href="javascript:addRow()" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/table_row_insert.png" alt="add row" /><?=$this->tr('Přidat řádek');?></a>
+            <a href="javascript:addRow()" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /><?=$this->tr('Přidat řádek');?></a>
          </td>
       </tr>
       <tr id="dataTableRowTpl" class="ui-state-default">
@@ -90,9 +90,9 @@ echo $this->form->renderStart();
                <td><?echo $this->form->{'coll_'.($i)};?></td>
             <?}?>
             <td class="data-table-actions">
-               <a href="" class="move" onclick="return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/arrow_up_down.png" alt="move row"  /></a>
-               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="/images/icons/table_row_insert.png" alt="add row" /></a>
-               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="/images/icons/table_row_delete.png" alt="remove row" /></a>
+               <a href="" class="move" onclick="return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/arrow_up_down.png" alt="move row"  /></a>
+               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /></a>
+               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_delete.png" alt="remove row" /></a>
             </td>
          </tr>
    </tfoot>   
