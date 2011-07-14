@@ -19,6 +19,7 @@ class People_View extends View {
          $this->toolbox = $toolbox;
 
          $toolboxEdit = new Template_Toolbox2();
+         $toolboxEdit->setIcon('user_edit.png');
 
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('person_edit', $this->_("Upravit osobu"));
          $toolEdit->setIcon('user_edit.png')->setTitle($this->_('Upravit osobu'));

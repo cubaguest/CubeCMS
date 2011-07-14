@@ -154,7 +154,8 @@ class People_Controller extends Controller {
          if ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true)) {
             // smaže se původní
             if(is_file($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE})){
-               @unlink($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE});
+               /* if upload file with same name it's overwrited and then deleted. This make error!!! */
+//               @unlink($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE});
             }
             $person->{People_Model::COLUMN_IMAGE} = null;
          }
@@ -328,7 +329,7 @@ class People_Controller extends Controller {
          $form->imgh->setValues($settings['imgh']);
       }
       if (isset($settings['cropimg'])) {
-         $form->imgh->setValues($settings['cropimg']);
+         $form->cropimg->setValues($settings['cropimg']);
       }
 
       if (isset($settings['recordsonpage'])) {
