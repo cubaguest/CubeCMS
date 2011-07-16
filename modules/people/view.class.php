@@ -66,7 +66,6 @@ class People_View extends View {
       }
       $this->tinyMCE = new Component_TinyMCE();
       $settings = new Component_TinyMCE_Settings_Advanced();
-      $settings = new Component_TinyMCE_Settings_AdvSimple2();
       $settings->setSetting('height', '600');
       $this->tinyMCE->setEditorSettings($settings);
       $this->tinyMCE->mainView();
