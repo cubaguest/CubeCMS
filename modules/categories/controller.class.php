@@ -89,6 +89,10 @@ class Categories_Controller extends Controller {
       $categoryModel = new Model_Category();
       $record = $categoryModel->record($this->getRequest('categoryid'));
 
+      if($record == false){
+         return false;
+      }
+      
       $form->name->setValues($record->{Model_Category::COLUMN_CAT_LABEL});
       $form->alt->setValues($record->{Model_Category::COLUMN_CAT_ALT});
       $form->keywords->setValues($record->{Model_Category::COLUMN_KEYWORDS});
@@ -97,7 +101,7 @@ class Categories_Controller extends Controller {
 
       $structure = Category_Structure::getStructure(!$this->isMainStruct());
       $structure->withHidden(true);
-      $structure->setCategories($categoryModel->getCategoryList());
+      $structure->setCategories($categoryModel->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
 
       $selCat = $structure->getCategory($this->getRequest('categoryid'));
       $structure->removeCat($this->getRequest('categoryid'));
@@ -168,6 +172,17 @@ class Categories_Controller extends Controller {
                $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($names[$lang]));
             } else {
                $urlkey[$lang] = vve_cr_url_key(strtolower($variable), false);
+            }
+         }
+         
+         // regenerace klíčů kategorií
+         if($form->regenerateUrls->getValues() === true){
+            // @TODO asi doplnit i hlavní kategorii, ale ta je předem daná
+            // potomci
+            if(!$selCat->isEmpty()){
+               foreach ($selCat->getChildrens() as $child) {
+                  $this->repairUrlKeys($categoryModel, $child, $urlkey);
+               }
             }
          }
 
@@ -748,20 +763,11 @@ class Categories_Controller extends Controller {
          $movedCat->setCategories($modelCat->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
 
          // generace polí
-         $newParentUrlKeys = $oldParentUrlKeys = array();
+         $newParentUrlKeys = array();
          foreach (Locales::getAppLangs() as $lang) {
-            $oldParentUrlKeys[$lang] = null;
             $newParentUrlKeys[$lang] = null;
          }
-
-         // url kíč staré nadřazené kategorie
-         if($oldParentCatId != 0){
-            $oldParentCat = $modelCat->where($oldParentCatId)->record();
-            if($oldParentCat != false){
-               $oldParentUrlKeys = $oldParentCat->{Model_Category::COLUMN_URLKEY};
-            }
-         }
-
+         
          // url kíč nové nadřazené kategorie
          if($idNewParentCat != 0){
             $newParentCat = $modelCat->where($idNewParentCat)->record();
@@ -769,29 +775,9 @@ class Categories_Controller extends Controller {
                $newParentUrlKeys = $newParentCat->{Model_Category::COLUMN_URLKEY};
             }
          }
-
-         // potomci kategorie (všechny i vnořené v další potomcích)
-         $childs = $this->getCategoryChildrens($movedCat);
-
-         if(!empty ($childs)){
-            $langs = Locales::getAppLangs();
-            foreach ($childs as $childCatRecord) {
-               foreach ($langs as $lang) {
-                  /* pokud se bude kontrolovat $newParentUrlKeys tak nebude změněn klíč pokud není překlad */
-                  if($childCatRecord[Model_Category::COLUMN_URLKEY][$lang] == null) {continue;}
-
-                  $childCatRecord[Model_Category::COLUMN_URLKEY][$lang] =
-                     preg_replace('/^'.  preg_quote($oldParentUrlKeys[$lang], '/').'/',
-                        $oldParentUrlKeys[$lang] == null ? $newParentUrlKeys[$lang].'/' : $newParentUrlKeys[$lang],
-                        $childCatRecord[Model_Category::COLUMN_URLKEY][$lang]);
-
-                  if($childCatRecord[Model_Category::COLUMN_URLKEY][$lang][0] == '/'){
-                     $childCatRecord[Model_Category::COLUMN_URLKEY][$lang] = substr($childCatRecord[Model_Category::COLUMN_URLKEY][$lang], 1);
-                  }
-               }
-               $modelCat->save($childCatRecord);
-            }
-         }
+         
+         $this->repairUrlKeys($modelCat, $movedCat, $newParentUrlKeys);
+         
          $this->view()->status = 'moving';
       }
    }
@@ -805,14 +791,59 @@ class Categories_Controller extends Controller {
    private function getCategoryChildrens(Category_Structure $category)
    {
       $returnArr = array();
-      array_push($returnArr, $category->getCatObj()->getCatDataObj());
       if(!$category->isEmpty()){
          foreach ($category->getChildrens() as $child) {
+            array_push($returnArr, $child->getCatObj()->getCatDataObj());
             $returnArr = array_merge($returnArr, $this->getCategoryChildrens($child));
          }
       }
       return $returnArr;
    }
+
+   /**
+    * Metoda opraví všechny url klíče kategorie a jejích potomků
+    * @param Model_Category $model
+    * @param Category_Structure $category
+    * @param type $parentUrlKeys 
+    */
+   private function repairUrlKeys(Model_Category $model, Category_Structure $category, $parentUrlKeys = array())
+   {
+      $record = $category->getCatObj()->getCatDataObj();
+//      var_dump($parentUrlKeys);
+//      echo 'old url keys<br />';
+//      var_dump($record[Model_Category::COLUMN_URLKEY]);
+      // jednotlivé jazyky
+      foreach ($parentUrlKeys as $lang => $parentKey) {
+         $lastpos = strrpos($record[Model_Category::COLUMN_URLKEY][$lang], '/');
+         if($lastpos !== false){
+            $urlpart = substr($record[Model_Category::COLUMN_URLKEY][$lang], $lastpos+1);
+         } else {
+            $urlpart = $record[Model_Category::COLUMN_URLKEY][$lang];
+         }
+         
+//         echo 'urlpart '.$lang.' '.$urlpart.'<br />';
+         // pokud nemá definovaný url klíč
+         if($urlpart == null && $record[Model_Category::COLUMN_URLKEY][$lang] != null){
+            $urlpart = vve_cr_url_key($record[Model_Category::COLUMN_URLKEY][$lang]);
+         }
+         // ????
+         if($urlpart == null){ continue; }
+         
+         $record[Model_Category::COLUMN_URLKEY][$lang] = $parentKey == null ? $urlpart : $parentKey.'/'.$urlpart;
+      }
+      // save
+//      var_dump($record[Model_Category::COLUMN_URLKEY]);
+      $model->save($record);
+      
+      // potomci
+      if(!$category->isEmpty()){
+         foreach ($category->getChildrens() as $chidl) {
+            $this->repairUrlKeys($model, $chidl, $record[Model_Category::COLUMN_URLKEY]);
+         }
+      }
+      
+   }
+
 
    private function getVisibilityTypes()
    {
