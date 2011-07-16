@@ -24,7 +24,7 @@ class JsPlugin_JsTree extends JsPlugin {
 //		Přidání css stylu
 		$this->addFile(new JsPlugin_CssFile('themes/'.$this->getCfgParam('theme').'/style.css'));
 		//		Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("jquery.jstree.js"));
+		$this->addFile(new JsPlugin_JsFile("jquery.jstree.min.js"));
 	}
 }
 ?>
