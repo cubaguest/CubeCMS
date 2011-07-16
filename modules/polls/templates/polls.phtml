@@ -44,6 +44,7 @@ echo $this->toolbox;
       </div>
       <?
       if($this->toolboxPoll instanceof Template_Toolbox2){
+         $this->formDelete->id->setValues($poll->{Polls_Model::COLUMN_ID}); /* This is not real good */
          $this->toolboxPoll->poll_edit->setAction($this->link()->route('edit', array('id' => $poll->{Polls_Model::COLUMN_ID})));
          echo $this->toolboxPoll;
       }
