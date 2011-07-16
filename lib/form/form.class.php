@@ -471,6 +471,17 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    }
 
    /**
+    * Metoda nasatví jestli má být formulář chráněn nebo ne
+    * @param bool $protect (option) true pro zapnutí
+    * @return Form
+    */
+   public function setProtected($protect = true)
+   {
+      $this->protectForm = $protect;
+      return $this;
+   }
+
+   /**
     * Metoda přidá element do formuláře
     * @param Form_Element $element -- objetk formulářového elementu
     * @param string $group -- řetězec označující skupinu (např. z metody addGroup())
