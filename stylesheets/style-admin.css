@@ -1,6 +1,10 @@
 /* jen pro pořádek */
 body, html {padding: 0; margin: 0; margin-top: 12px}
-
+/* fonty */
+.admin-font, .toolbox input, ul.dropdown li a {
+   font-family: "Tahoma", "Arial", sans-serif !important;
+   font-size: 12px;
+}
 /* BASIC ADMIN MENU wrapper */
 #adminMenuWrapper {
    background-color: #dadada;
@@ -33,7 +37,7 @@ ul.dropdown li {
 }
 ul.dropdown a:hover { color: #000; }
 ul.dropdown a:active { color: #ffa500; }
-ul.dropdown li a { display: block; padding: 3px 8px 2px; border-right: 1px solid #333; color: #222; font-size: 12px;}
+ul.dropdown li a { display: block; padding: 3px 8px 2px; border-right: 1px solid #333; color: #222;}
 ul.dropdown li:last-child a { border-right: none; } /* Doesn't work in IE */
 ul.dropdown li.adminmenu-user-item, ul.dropdown li.adminmenu-user-item ul li {background-color: #B9D3E6;}
 ul.dropdown li.adminmenu-user-item li.hover, ul.dropdown li.adminmenu-user-item li:hover,
