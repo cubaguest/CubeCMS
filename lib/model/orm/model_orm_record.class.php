@@ -52,20 +52,19 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             }
             if (!($this->columns[$collName]['value'] instanceof Model_ORM_LangCell)) {
                $this->columns[$collName]['value'] = new Model_ORM_LangCell();
-               if ($this->fromDb == true AND ($this->columns[$collName]['changed'] == 0)) {
-                  $this->columns[$collName]['changed'] = -1;
-               } else {
-                  $this->columns[$collName]['changed'] = 1;
-               }
             }
             $this->columns[$collName]['value']->addValue($lang, $value);
+            if ($this->fromDb == true AND ($this->columns[$collName]['changed'] == 0)) {
+               $this->columns[$collName]['changed'] = -1;
+            } else {
+               $this->columns[$collName]['changed'] = 1;
+            }
          } else {
             // externí sloupce, např. s joinů
             $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
             $this->columns[$collName]['value'] = $value;
          }
       } else {
-         
          // primary key (jazykové nejsou pk)
          if (isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true) {
             if($value === null){
@@ -165,6 +164,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     */
    public function offsetSet($offset, $value)
    {
+      var_dump('offsetset');
       $this->__set($offset, $value);
    }
 
