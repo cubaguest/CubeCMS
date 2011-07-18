@@ -326,7 +326,7 @@ class Auth extends TrObject {
     * @return string
     */
    private static function getBrowserIdent() {
-      return sha1($_SERVER['HTTP_USER_AGENT'].$_SERVER['HTTP_ACCEPT_CHARSET'].$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+      return sha1($_SERVER['HTTP_USER_AGENT'].$_SERVER['HTTP_ACCEPT']./*$_SERVER['HTTP_ACCEPT_CHARSET']. - IE not send this header sometimesm */$_SERVER['HTTP_ACCEPT_LANGUAGE']);
    }
 
 
