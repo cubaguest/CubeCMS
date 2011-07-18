@@ -32,9 +32,9 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
    );
 
    protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','advimage','advlink',
-      'advlist','emotions','iespell','tabfocus',
+      'advlist','emotions','iespell','tabfocus','noneditable','nondeletable',
       'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality','autoresize',
-      'fullscreen','noneditable','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists', 'autolink',
+      'fullscreen','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists', 'autolink',
       'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins
       );
 

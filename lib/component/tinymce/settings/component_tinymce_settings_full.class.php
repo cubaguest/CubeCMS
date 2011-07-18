@@ -3,13 +3,13 @@
  * Třída pro vytvoření požadavku pro naplnění jqgrid
  */
 class Component_TinyMCE_Settings_Full extends Component_TinyMCE_Settings_Advanced {
-   protected $defaultPlugins = array('safari','spellchecker','pagebreak','style',
-       'layer','table','save','advhr','advimage','advlink','advlist','emotions','iespell',
-       'inlinepopups','insertdatetime','preview','media','searchreplace','print',
-       'contextmenu','paste','directionality','fullscreen','noneditable','visualchars',
-       'nonbreaking','xhtmlxtras','template','imgmap', 
-      'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins
-      );
+//   protected $defaultPlugins = array('safari','spellchecker','pagebreak','style',
+//       'layer','table','save','advhr','advimage','advlink','advlist','emotions','iespell',
+//       'inlinepopups','insertdatetime','preview','media','searchreplace','print',
+//       'contextmenu','paste','directionality','fullscreen','noneditable','visualchars',
+//       'nonbreaking','xhtmlxtras','template','imgmap', 
+//      'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins
+//      );
 
    protected $defaultButtons = array(
      'theme_advanced_buttons1' => array("bold","italic","underline","strikethrough","|","justifyleft","justifycenter",
