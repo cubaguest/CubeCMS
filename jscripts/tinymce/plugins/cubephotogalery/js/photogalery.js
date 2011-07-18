@@ -223,7 +223,7 @@ var CubePhotogaleryDialog = {
          var wr = document.createElement(formObj.wrapperList.value);
          wr.setAttribute('class', 'photogalery');
 //         cnt += "<span class=\"reseter\">&nbsp;</span>";
-         cnt += "<hr class=\"reseter\" />";
+         cnt += "<hr class=\"reseter\" /><p>&nbsp;</p>";
          wr.innerHTML = cnt;
          tinyMCEPopup.execCommand('mceInsertContent', false, headline+tinymce.DOM.getOuterHTML(wr));
       } else {
@@ -232,10 +232,9 @@ var CubePhotogaleryDialog = {
 
 		tinyMCEPopup.restoreSelection();
 		// Fixes crash in Safari
-		if (tinymce.isWebKit)
+		if (tinymce.isWebKit){
 			ed.getWin().focus();
-      
-//      ed.execCommand('mceInsertContent', false, '<img id="__mce_tmp" />', {skip_undo : 1});
+      }
       
 		tinyMCEPopup.editor.execCommand('mceRepaint');
 		tinyMCEPopup.editor.focus();
