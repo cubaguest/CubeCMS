@@ -82,6 +82,9 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
     * @param string $image -- obrázek i s cestou
     */
    public function setImage($image) {
+      if(strpos($image, '/') === false){
+         $image = Url_Request::getBaseWebDir(true).'images/icons/'.$image;
+      }
       $this->imageFile = $image;
    }
 
