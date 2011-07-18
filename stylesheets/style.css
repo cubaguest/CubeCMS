@@ -137,6 +137,7 @@ span[title] {
 .ui-widget { /* ui-widgent má normálně 1.1em */
    font-size: 100% !important;
 }
+.full-width { width: 100%;}
 /* Hlášky */
 .message {
    font-size: small;
