@@ -274,4 +274,13 @@ function vve_remove_empty_tags($text)
    return preg_replace('/<(?!input|br|img|meta|hr|\/)[^>]*>\s*<\/[^>]*>/i', '', $text);
 }
 
+/**
+ * Metoda pro výpis řetězce se zakódovanými speciálními html znaky
+ * @param type $string 
+ */
+function ps($string)
+{
+   echo htmlspecialchars($string);
+}
+
 ?>

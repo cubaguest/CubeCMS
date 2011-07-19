@@ -98,6 +98,10 @@ class Template_Output {
          case "pdf":
             self::addHeader("Content-type: application/pdf");
             break;
+         case "jpg":
+         case "jpeg":
+            self::addHeader("Content-type: image/jpeg");
+            break;
          case "html":
          case "xhtml":
          case "php":
