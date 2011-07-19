@@ -9,15 +9,28 @@
  * @abstract 		Třída fitru pro ošetření html vstupu
  */
 class Form_Filter_HTMLPurify extends Form_Filter {
-   /**
-    * Povolené tagy
-    * @var string
-    */
-   private $allowedTags = 'p[style],span[style],a[href|title],strong,em,img[src|alt],br';
+   private $config = array('HTML.Allowed' => 'p[style],span[style],a[href|title],strong,em,img[src|alt],br');
 
-   public function  __construct($allowedTags = 'p[style],span[style],a[href|title],strong,em,img[src|alt],br')
+   public function  __construct($allowedTags = 'p[style],span[style],a[href|title],strong,em,img[src|alt],br', $config = array())
    {
-      $this->allowedTags = $allowedTags;
+      $this->config['HTML.Allowed'] = $allowedTags;
+      $this->config = array_merge($this->config, $config);
+   }
+   
+   /**
+    * Metoda pro nastavení konfigurace purifieru
+    * @param string $key -- název hodnoty
+    * @param mixed $value -- hodnota
+    * @return Form_Filter_HTMLPurify 
+    */
+   public function setConfig($key, $value = null)
+   {
+      if($value != null){
+         $this->config[$key] = $value;
+      } else {
+         unset($this->config[$key]);
+      }
+      return $this;
    }
 
    /**
@@ -27,7 +40,9 @@ class Form_Filter_HTMLPurify extends Form_Filter {
    public function filter(Form_Element &$elem, &$values)
    {
       $comPurify = new Component_HTMLPurifier();
-      $comPurify->setConfig('HTML.Allowed', $this->allowedTags);
+      foreach ($this->config as $key => $value) {
+         $comPurify->setConfig($key, $value);
+      }
 
       switch (get_class($elem)) {
          case "Form_Element_Text":
