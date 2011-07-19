@@ -147,7 +147,9 @@ class Component extends TrObject {
       } else {
          // výstup přes XHR respond api
          $respond = new XHR_Respond_VVEAPI();
-         $respond->setData($this->template()->getTemplateVars());
+         if($this->template() instanceof Template){
+            $respond->setData($this->template()->getTemplateVars());
+         }
          $respond->renderRespond();
       }
    }
