@@ -45,6 +45,7 @@ class Forum_Model_Topics extends Model_ORM {
       $this->addColumn(self::COLUMN_DATE_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_SOLVED, array('datatype' => 'tinyint', 'pdoparam' => PDO::PARAM_BOOL, 'default' => 0));
       $this->addColumn(self::COLUMN_CLOSED, array('datatype' => 'tinyint', 'pdoparam' => PDO::PARAM_BOOL, 'default' => 0));
+      $this->addColumn(self::COLUMN_VIEWS, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
 
       $this->setPk(self::COLUMN_ID);
 

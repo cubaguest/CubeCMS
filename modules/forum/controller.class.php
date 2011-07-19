@@ -382,6 +382,10 @@ class Forum_Controller extends Controller {
          }
          $this->view()->formTopicDelete = $formTopicDel;
          
+      } else {
+         // update pokud nemá právo kontroly
+         $topic->{Forum_Model_Topics::COLUMN_VIEWS} = $topic->{Forum_Model_Topics::COLUMN_VIEWS}+1;
+         $modelT->save($topic);
       }
       
       // načtení příspěvků
