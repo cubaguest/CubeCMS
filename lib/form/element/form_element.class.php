@@ -122,7 +122,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @var array
     */
    protected $htmlValidationsLabels = array();
+   protected $htmlValidationsLabelsAdded = false;
 
+   protected static $elementFocused = false;
+   
    /**
     * Id renderované část -- použito při vytváření id
     * @var integer
@@ -430,8 +433,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return true;
    }
 
-   private function createValidationLabels(){
-      if(empty ($this->htmlValidationsLabels)) {
+   protected function createValidationLabels(){
+      if(!$this->htmlValidationsLabelsAdded) {
+         $this->htmlValidationsLabelsAdded = true;
          // doplnění popisků k validaci
          foreach ($this->validators as $validator) {
             $validator->addHtmlElementParams($this);
@@ -553,6 +557,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass(self::$cssClasses['error']);
+         if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
       $values = $this->getUnfilteredValues();
       $this->html()->addClass($this->getName()."_class");

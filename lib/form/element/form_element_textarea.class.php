@@ -25,6 +25,7 @@ class Form_Element_TextArea extends Form_Element_Text {
    public function controll() {
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass(Form_Element::$cssClasses['error']);
+         if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
 
       $values = $this->getUnfilteredValues();

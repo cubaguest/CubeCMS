@@ -47,63 +47,51 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
    }
 
    public function validate(Form_Element $elemObj) {
-      switch (get_class($elemObj)) {
-      // input text
-         case 'Form_Element_Text':
-         case 'Form_Element_TextArea':
-         case 'Form_Element_Password':
-            if($elemObj->isMultiLang()) {
-               // pokud se kontrolují jen některé sloupce
-               if(!empty ($this->columsNotEmpty)){
-                  $retu = $this->checkEmptyValues($elemObj->getUnfilteredValues(), $this->columsNotEmpty);
-                  if($retu !== true){
-                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
-                     $this->isValid = false;
-                  }
+      if($elemObj instanceof Form_Element_Text){
+         if($elemObj->isMultiLang()) {
+            // pokud se kontrolují jen některé sloupce
+            if(!empty ($this->columsNotEmpty)){
+               $retu = $this->checkEmptyValues($elemObj->getUnfilteredValues(), $this->columsNotEmpty);
+               if($retu !== true){
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel().' '.$retu));
+                  $this->isValid = false;
                }
-               // pokud mají být vyplněny všechny sloupce
-               else {
-                  if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())){
-                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                     $this->isValid = false;
-                  }
+            }
+            // pokud mají být vyplněny všechny sloupce
+            else {
+               if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())){
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  $this->isValid = false;
+               }
+            }
+         } else {
+            if($elemObj->isDimensional()) {
+               if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  $this->isValid = false;
                }
             } else {
-               if($elemObj->isDimensional()) {
-                  if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())) {
-                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                     $this->isValid = false;
-                  }
-               } else {
-                  if($elemObj->getUnfilteredValues() == null OR $elemObj->getUnfilteredValues() == "") {
-                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                     $this->isValid = false;
-                  }
+               if($elemObj->getUnfilteredValues() == null OR $elemObj->getUnfilteredValues() == "") {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  $this->isValid = false;
                }
             }
-            break;
-         // input checkbox
-         case 'Form_Element_Checkbox':
-         case 'Form_Element_File':
-            if($elemObj->getUnfilteredValues() == false) {
-               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-               $this->isValid = false;
-            }
-            break;
-         case 'Form_Element_Select':
-            if(count($elemObj->getUnfilteredValues()) == 0){
-               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-               $this->isValid = false;
-            }
-            break;
-         case 'Form_Element_Radio':
-            if($elemObj->getUnfilteredValues() === false){
-               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-               $this->isValid = false;
-            }
-            break;
-         default:
-            break;
+         }
+      } else if($elemObj instanceof Form_Element_Checkbox || $elemObj instanceof Form_Element_File){
+         if($elemObj->getUnfilteredValues() == false) {
+            $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+            $this->isValid = false;
+         }
+      } else if($elemObj instanceof Form_Element_Radio){
+         if($elemObj->getUnfilteredValues() === false){
+            $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+            $this->isValid = false;
+         }
+      } else if($elemObj instanceof Form_Element_Select){
+         if(count($elemObj->getUnfilteredValues()) == 0){
+            $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+            $this->isValid = false;
+         }
       }
       return $this->isValid();
 
