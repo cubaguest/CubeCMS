@@ -1,0 +1,55 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+echo $this->toolbox;
+?>
+<h1><?=$this->category()->getName();?></h1>
+<div class="main-content-detail">
+<a href="#" title="<?=$this->_('Přidat příspěvek')?>" id="toggleForm"><?=$this->_('Přidat příspěvek')?></a>
+<div id="guestbookNewItemForm">
+   <?
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7);
+   echo ($this->form);
+   ?>
+</div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   var sendButt = document.getElementById("answer_send_1");
+   var sendButtText = sendButt.value;
+   var seconds = <?=$this->capchaTime?>;
+   // disable button and set timeout
+   sendButt.disabled = true;
+   sendButt.value = seconds;
+
+   var antiSpam = function() {
+      a = document.getElementById("answer_captcha_1");
+      a.value = parseInt(a.value) + 1;
+      // remove time
+      if(sendButt.disabled == true){
+         if(parseInt(sendButt.value) > 1){
+            sendButt.value = parseInt(sendButt.value)-1;
+         } else {
+            sendButt.value = sendButtText;
+            sendButt.disabled = false;
+         }
+      }
+      setTimeout("antiSpam()", 1000);
+   }
+   antiSpam();
+   $('#guestbookNewItemForm').hide();
+   $('#toggleForm').click(function(){
+      $('#guestbookNewItemForm').show();
+      $(this).hide();
+      return false;
+   });
+   <?if($this->showFrom === true){?>
+   $('#toggleForm').click();
+   <?} else {?>
+
+   <?}?>
+   /* ]]> */
+</script>
+</div>
+<hr class="reseter" />
+<br />
+<?=$this->includeFile('tpl://list.phtml');?>
+

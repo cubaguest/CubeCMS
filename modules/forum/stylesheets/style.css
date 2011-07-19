@@ -1,0 +1,22 @@
+@CHARSET "UTF-8";
+.forum-topic-name {width: 60%;}
+.forum-topic-author, .forum-topic-posts, .forum-topic-views { 
+   width: 13%;
+   text-align: center;
+}
+
+.forum-topic-item {
+   
+}
+.forum-post-item td {
+   vertical-align: top;
+}
+.forum-post-author {
+   width: 25%;
+}
+.forum-post-message {
+   width: 75%;
+}
+.forum-post-item.censored {
+   background-color: #DDDDDD;
+}

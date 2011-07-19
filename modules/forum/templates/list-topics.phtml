@@ -1,0 +1,58 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addFile('css://style.css');
+echo $this->toolbox;
+?>
+<h1><?=$this->category()->getName();?></h1>
+<div class="guestbook-items main-content-list">
+   <table class="forum-topics full-width">
+      <thead class="header">
+         <tr>
+            <th class="forum-topic-name"><?=$this->tr('Téma');?></th>
+            <th class="forum-topic-author"><?=$this->tr('Autor');?></th>
+            <th class="forum-topic-posts"><?=$this->tr('Příspěvků');?></th>
+            <th class="forum-topic-views"><?=$this->tr('Shlédnuto');?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?if(!empty ($this->topics)){ ?>
+         <?foreach ($this->topics as $topic) {?>
+         <tr class="forum-topic-item row">
+            <td class="forum-topic-name">
+               <a href="<?=$this->link()->route('showTopic', array('id' => $topic->{Forum_Model_Topics::COLUMN_ID}))?>"
+                  title="<?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?>"><?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?></a>
+               <?if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?>
+               <br/>
+                  <span class="font-small"><?
+                  printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($topic->{Forum_Model_Topics::COLUMN_DATE_ADD})));
+                  if($topic->last_post_date != null){
+                     printf('&nbsp;'.$this->tr('Poslední příspěvek přidán: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($topic->last_post_date)));
+                  }
+                  ?></span>
+            </td>
+            <td class="forum-topic-author"><?=ps($topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?></td>
+            <td class="forum-topic-posts"><?=ps((int)$topic->post_count)?></td>
+            <td class="forum-topic-views"><?=ps((int)$topic->{Forum_Model_Topics::COLUMN_VIEWS})?></td>
+         </tr>
+      <?}
+      } else {?>
+         <tr class="forum-topic-item row">
+            <td colspan="4"><?=$this->tr('Žádné téma není vytvořeno')?></td>
+         </tr>
+      <?}?>
+      </tbody>
+      <?if($this->category()->getRights()->isWritable()){?>
+      <tfoot>
+      <tr class="forum-topic-item row">
+         <td colspan="4">
+            <img src="/images/icons/comment_add.png" alt="add" />
+            <a href="<?=$this->link()->route('addTopic')?>" title="<?=$this->tr('Vytvořit nové téma')?>" ><?=$this->tr('Vytvořit téma')?></a>
+         </td>
+      </tr>
+      </tfoot>
+      <?}?>
+   </table>
+   
+   <?echo ($this->scrollComp);?>
+      
+</div>

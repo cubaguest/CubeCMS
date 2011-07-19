@@ -1,0 +1,27 @@
+<?
+$icon = null;
+if($this->panelObj()->getIcon() != null){
+   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+}
+$backImg = null;
+if($this->panelObj()->getBackImage() != null){
+   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+}
+?>
+<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
+   <?if($this->lastPosts != null){?>
+      <div class="panel-box-content-label"><?=$this->tr('Poslední příspěvek:', count($this->lastPosts));?></div>
+      <?foreach ($this->lastPosts as $post) {?>
+         <div class="panel-box-content">
+         <strong><?=$post->{GuestBook_Model::COLUMN_NICK}?></strong><br />
+         <?=$this->filter(vve_tpl_xhtml_cut(strip_tags($post->{GuestBook_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150), array('emoticons'))?>
+         </div>
+      <?}?>
+   <?}?>
+   <?
+   if($this->leaveMsg){?>
+   <div class="panel-box-content">
+      <a href="<?=$this->link()->param('s', true)?>" title="<?=htmlspecialchars($this->category()->getLabel().' - '.$this->tr('Zanechte nám vzkaz'))?>"><?=$this->tr('Zanechte nám vzkaz')?></a>
+   </div>
+   <?}?>
+<div class="panel-box-link-more"><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a></div>
