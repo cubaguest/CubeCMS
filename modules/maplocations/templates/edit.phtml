@@ -1,0 +1,42 @@
+<?
+Template::addJS('http://maps.google.com/maps/api/js?sensor=false');
+// do titulku
+if($this->edit) {
+   $h = $this->tr('úprava místa').' '.$this->locationName;
+} else {
+   $h = $this->tr('přidání místa');
+}
+$this->addPageTitle($h);
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="article-edit-form">
+   <?
+   $this->form->html()->setAttrib('name', 'form-address');
+   $this->form->address->setSubLabel('Slouží pouze pro vyhledání souřadnic. <a href="'.$this->link().'#" onclick="searchPlace();">HLEDAT</a>.<br /><span id="adr-result"></span>');
+   echo($this->form);
+   ?>
+   <script type="text/javascript">
+   /* <![CDATA[ */
+   var geocoder = new google.maps.Geocoder();
+   var form = document.forms['form-address'];
+
+   function searchPlace(){
+      this.event.preventDefault();
+      var address = form.elements["location_address"].value;
+      
+      if(address != null && address != ""){
+         geocoder.geocode( { 'address': address}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+               if(results.length == 1){
+                  document.getElementById('adr-result').innerHTML = 'Našel jsem: '+ results[0].formatted_address;
+                  form.elements["location_position"].value = results[0].geometry.location.Ka+':'+results[0].geometry.location.La;
+               } else {
+                  document.getElementById('adr-result').innerHTML = 'Nejdnoznačné zadání. Počet nalezených adres: '+ results.length;
+               }
+            }
+         });
+      }
+   }
+   /* ]]> */
+   </script>
+</div>
