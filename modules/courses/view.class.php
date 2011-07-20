@@ -75,6 +75,7 @@ class Courses_View extends View {
     * Viewer pro editaci novinky
     */
    public function editCourseView() {
+      $this->edit = true;
       $this->addCourseView();
       if ($this->courseImage != null){
          $this->courseImage = $this->category()->getModule()->getDataDir(true).$this->courseImage;

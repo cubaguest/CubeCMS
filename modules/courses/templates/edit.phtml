@@ -2,10 +2,10 @@
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
-   $h = $this->_('Úprava položky');
+   $h = sprintf($this->tr('Úprava položky "%s"'), $this->course->{Courses_Model_Courses::COLUMN_NAME});
    $this->addPageTitle($h);
 } else {
-   $h = $this->_('Přidání položky');
+   $h = $this->tr('Přidání položky');
    $this->addPageTitle($h);
 }
 // donastavení formuláře
@@ -29,7 +29,7 @@ $this->addJsPlugin($jQuery);
 
 // doplnění obrázku
 if($this->courseImage != null){
-   $this->form->deleteImg->setSubLabel($this->_('Uloženo').':<br /><img src="'.$this->courseImage.'" height="50" />');
+   $this->form->deleteImg->setSubLabel($this->tr('Uloženo').':<br /><img src="'.$this->courseImage.'" height="50" />');
 }
 ?>
 <h1><?=$h?></h1>

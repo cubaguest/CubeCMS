@@ -1,9 +1,8 @@
 <?
 // načtení detailu
-$this->addPageTitle($this->_('Registrace ke kurzu') . ' "' . $this->course->{Courses_Model_Courses::COLUMN_NAME} . '"');
-$this->addPageHeadline($this->_('Registrace ke kurzu') . ' "' . $this->course->{Courses_Model_Courses::COLUMN_NAME} . '"');
+$h = $this->_('Registrace ke kurzu') . ' "' . $this->course->{Courses_Model_Courses::COLUMN_NAME} . '"';
+$this->addPageTitle($h);
 ?>
-
 <style type="text/css">
    .module-courses-registration {
       border: 1px solid silver;
@@ -18,12 +17,12 @@ $this->addPageHeadline($this->_('Registrace ke kurzu') . ' "' . $this->course->{
    .registration-detail-tools {
       float: right;
    }
-
    .module-courses-registrations-list-controlls {
       margin-bottom: 5px;
    }
 </style>
-<div class="article-list module-courses-registrations-list">
+<h1><?=$h?></h1>
+<div class="main-content-detail module-courses-registrations-list">
    <? if (!empty($this->registrations)) {
  ?>
       <p class="module-courses-registrations-list-controlls">

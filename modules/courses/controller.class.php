@@ -277,7 +277,7 @@ class Courses_Controller extends Controller {
          $this->link()->route('detailCourse', array('urlkey' => $newCours->{Courses_Model_Courses::COLUMN_URLKEY}))->reload();
       }
       $this->view()->form = $editForm;
-      $this->view()->edit = true;
+      $this->view()->course = $course;
    }
 
    /**
@@ -384,8 +384,7 @@ class Courses_Controller extends Controller {
       $ePrivateUsers->setMultiple(true);
 
       $modelUsers = new Model_Users();
-      $usersList = $modelUsers->getUsersList();
-      while ($user = $usersList->fetchObject()) {
+      foreach ($modelUsers->records() as $user) {
          $ePrivateUsers->setOptions(
                  array($user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}
                  ." ".$user->{Model_Users::COLUMN_SURNAME}.' - '.$user->{Model_Users::COLUMN_GROUP_NAME}
@@ -505,8 +504,17 @@ class Courses_Controller extends Controller {
 
       $eSend = new Form_Element_Submit('send', $this->_('Odeslat'));
       $regForm->addElement($eSend);
-
+      
+      $eCheck = new Form_Element_Checkbox('check', $this->tr('Souhlas se zpracováním'));
+      $eCheck->setSubLabel($this->tr('Jsem srozuměn/a se všeobecnými podmínkami registrace a souhlasím se zpracováním svých osobných údajů podle zákona č. 101/2000 Sb.'));
+      $regForm->addElement($eCheck);
+         
+      
       if ($regForm->isSend()) {
+         if($regForm->check->getValues() == false){
+            $eCheck->setError($this->tr('S podmínkami musíte souhlasit, jinak nelze registraci dokončit.'));
+         }
+         
          if ($regForm->payType->getValues() == 'organisation') {
             $regForm->orgName->addValidation(new Form_Validator_NotEmpty());
             $regForm->orgAddress->addValidation(new Form_Validator_NotEmpty());
@@ -826,7 +834,7 @@ class Courses_Controller extends Controller {
                $mailXmlCnt->writeRaw('Způsob fakturace:');
                $mailXmlCnt->endElement(); // eof th
                $mailXmlCnt->startElement('td'); // sof td
-               $mailXmlCnt->writeRaw('Soukromně');
+               $mailXmlCnt->writeRaw('Soukromě');
                $mailXmlCnt->endElement(); // eof td
                $mailXmlCnt->endElement(); // eof tr
                // adresa
@@ -869,7 +877,7 @@ class Courses_Controller extends Controller {
             $mail->addAddress($this->getAdminAddreses());
          }
          $mail->sendMail();
-         $this->infoMsg()->addMessage($this->_('Registace byla uložena. Na Váš e-mail byly odeslány detail registrace. Pokud Vám nedojdou na uvedenou e-mailovou adresu žádné informace, prosím kontaktujte nás.'));
+         $this->infoMsg()->addMessage($this->tr('Registace byla uložena. E-mailem automaticky obdržíte generované potvrzení o přijetí Vaší přihlášky. Pokud potvrzovací email do 24 hodin neobdržíte, <a href="/kontakt/" title="kontakt">kontaktuje nás</a>'));
          $this->link()->param('registration', 'true')->reload();
       }
 

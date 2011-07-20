@@ -200,7 +200,12 @@ $this->addJsPlugin($jQuery);
       <div class="course-regform-item">
          <?
          echo $this->formReg->send->Controll();
+         echo $this->formReg->check->controll();
+         echo str_replace(':', null, $this->formReg->check->label());
          ?>
+      </div>
+      <div class="course-regform-item">
+         <?echo $this->formReg->check->subLabel();?>
       </div>
    </fieldset>
    <?// </form>
