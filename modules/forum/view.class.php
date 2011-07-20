@@ -26,6 +26,7 @@ class Forum_View extends View {
       if($this->category()->getRights()->isWritable()){
          // POSTY
          $this->toolboxPost = new Template_Toolbox2();
+         $this->toolboxPost->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
          $this->toolboxPost->setIcon(Template_Toolbox2::ICON_WRENCH);
          
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_post', $this->tr("Upravit"),
@@ -37,6 +38,7 @@ class Forum_View extends View {
             || $this->category()->getRights()->isControll()){
             // TOPIC
             $this->toolboxTopic = new Template_Toolbox2();
+            $this->toolboxTopic->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
             $this->toolboxTopic->setIcon(Template_Toolbox2::ICON_WRENCH);
          
             $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_topic', $this->tr("Upravit"),
