@@ -9,7 +9,7 @@
  *    'bold','italic','underline','strikethrough','|','bullist','numlist','|','link','unlink','|','undo','redo','|', 'emotions'
  */
 class Component_TinyMCE_Settings_AdvSimple2 extends Component_TinyMCE_Settings_Advanced {
-   protected $defaultPlugins = array('safari','emotions');
+   protected $defaultPlugins = array('safari','emotions','inlinepopups');
 
    protected $defaultButtons = array(
       'theme_advanced_buttons1' => array('bold','italic','underline','strikethrough','|',
