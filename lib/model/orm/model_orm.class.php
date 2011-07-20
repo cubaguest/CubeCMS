@@ -46,7 +46,7 @@ class Model_ORM extends Model_PDO {
       'ai' => false,
       'uq' => false,
       'pk' => false,
-//      'index' => false,
+      'index' => false,
       'comment' => null,
       'characterset' => 'utf8',
       'collate' => 'utf8_general_ci',
@@ -486,6 +486,7 @@ class Model_ORM extends Model_PDO {
       $sql = 'SELECT COUNT(*) AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName());
+      $this->createSQLGroupBy($sql);
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst);
       $dbst->execute();
@@ -528,6 +529,7 @@ class Model_ORM extends Model_PDO {
       }
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName()); // where
+      $this->createSQLGroupBy($sql); // group by
       $this->createSQLOrder($sql); // order
       $this->createSQLLimi($sql); // limit
       return $sql;
@@ -1020,7 +1022,12 @@ class Model_ORM extends Model_PDO {
                      $this->getTableShortName(), $columnName, $alias, $this->tableStructure[$columnName]['lang'], $this->tableStructure[$columnName]['aliasFor']));
                if($columnName == $this->pKey) $pkAdded = true;
             } else { // není colum z této tabulky nebo se jedná o funkci
-               if (is_int($alias)) {
+               if($columnName == '*'){
+                  foreach ($this->tableStructure as $columnName => $params) {
+                     array_push($columns, $this->createSelectColumnString(
+                        $this->getTableShortName(), $columnName, null, $params['lang'], $params['aliasFor']));
+                  }
+               } else if (is_int($alias)) {
                   array_push($columns, '' . $columnName . '');
                } else {
                   array_push($columns, '' . $columnName . ' AS ' . $alias);
