@@ -43,7 +43,7 @@ class Category extends Category_Core {
    // zjistíme jestli nemáme načtená data
       if($catDataObj === null) {
          $catModel = new Model_Category();
-         if(is_int($catKey)){
+         if(intval($catKey)){
             $catModel->setGroupPermissions()->where('AND '.Model_Category::COLUMN_ID .' = :id', array('id' => (int)$catKey), true);
          } else if($catKey != null) {
             $catModel->setGroupPermissions()->where('AND '.Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey), true);
