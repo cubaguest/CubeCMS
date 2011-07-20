@@ -22,6 +22,9 @@ class Template_Toolbox2 extends Template {
    const ICON_IMAGE_WRENCH = 'image_wrench.png';
    const ICON_ADD = 'add.png';
    const ICON_DELETE = 'delete.png';
+   
+   const TEMPLATE_NORMAL = "toolbox.phtml";
+   const TEMPLATE_INLINE = "toolbox_inline.phtml";
 
    private $templateCreated = false;
 
@@ -32,6 +35,8 @@ class Template_Toolbox2 extends Template {
    private $tools = array();
 
    private $icon = self::ICON_WRENCH;
+
+   private $template = self::TEMPLATE_NORMAL;
 
    /**
     * Konstruktor, vytvoří základní šablonu pro nástroje.
@@ -115,8 +120,7 @@ class Template_Toolbox2 extends Template {
    private function createTemplate() {
       if(!$this->templateCreated){
          $this->toolboxIcon = $this->icon;
-         $this->addTplFile("toolbox/toolbox.phtml", true);
-         $this->addJsPlugin(new JsPlugin_JQuery());
+         $this->addTplFile("toolbox/".$this->template, true);
          $this->iconsDir = Url_Request::getBaseWebDir(true).Template::IMAGES_DIR.URL_SEPARATOR.self::ICONS_DIR.URL_SEPARATOR;
          $this->templateCreated = true;
       }
@@ -142,6 +146,17 @@ class Template_Toolbox2 extends Template {
     */
    public function getTools() {
       return $this->tools;
+   }
+   
+   /**
+    * Metoda nastaví šablonu toolboxu
+    * @param string $tpl -- název šablony nebo konstanta třídy TEMPLATE_XXX
+    * @return Template_Toolbox2 
+    */
+   public function setTemplate($tpl = self::TEMPLATE_NORMAL)
+   {
+      $this->template = $tpl;
+      return $this;
    }
 }
 ?>

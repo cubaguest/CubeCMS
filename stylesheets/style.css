@@ -109,12 +109,13 @@ a {
 a:link {
    text-decoration: none;
    border-width: 0;
+   color: #0066cc;
 }
 
 a:visited {
    text-decoration: none;
    border-width: 0;
-   /* color: #003b70; */
+   color: #003b70; 
 }
 
 a:active {
@@ -344,10 +345,6 @@ textarea, form .form-table .form-element-long {
 .main-content-comments {} /* box s komentáři */
 .main-content-list-record {
    margin-bottom: 0.5em;
-   padding: 5px;
-   border-bottom-style: solid;
-   border-bottom-width: 1px;
-   border-bottom-color: #8ca1c2;
 } /* prvek v seznamu */
 .main-content-no-public, .main-content-concept, .comment-nopublic {
    background-color: #dddddd;
@@ -358,7 +355,7 @@ textarea, form .form-table .form-element-long {
    text-align: center;
 } /* obrázek v prvku v seznamu */
 .main-content-list-record-image img, .main-content-image img {
-   padding: 0 10px 0px 0;
+   padding: 0 10px 10px 0;
 }
 .main-content-list-record-images {} /* Obrázky v seznamu */
 .main-content-list-record-date {} /* datum u novinky atd */
@@ -391,6 +388,11 @@ textarea, form .form-table .form-element-long {
 }
 
 .main-content-form-edit {} /* Třída pro editační formulář */
+
+/* JQ ui */
+.main-content-list-record .ui-widget-header,
+.main-content-list-record .ui-widget-content { padding: 5px; }
+.main-content-list-record .ui-widget-header * { padding: 0; }
 
 /* archiv */
 .main-content-archive {}/* Hlavní obsah archivu */

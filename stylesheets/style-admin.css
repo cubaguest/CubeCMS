@@ -250,3 +250,18 @@ li.module-navigation-tab-selected a {
    border: 1px solid #999999;
    background: transparent url('/images/icons/error.png') 3px 3px no-repeat;
 }
+/* Toolbox pro editaci poloĹľek */
+.toolbox-inline {
+   float: right;
+   padding: 3px;
+}
+.toolbox-inline * {
+   display: inline;
+   padding: 0;
+   margin: 0;
+   line-height: 0;
+}
+.toolbox-inline form div {
+   float: left;
+   margin-left: 3px;
+}
