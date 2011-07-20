@@ -120,7 +120,7 @@ function initToolboxEvents(){
          $('body').append($toolbox);
          $toolbox.bind('mouseleave', function(){
             $('.toolbox-active-content').removeClass('toolbox-active-content');
-            $(this).animate({opacity:0}, 300, function(){
+            $(this).animate({opacity:0}, 0, function(){
                $(this).css({'z-index':-10000}).hide();
             });
          });
