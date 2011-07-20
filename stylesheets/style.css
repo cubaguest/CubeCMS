@@ -297,6 +297,8 @@ form .form-table p.form-sub-label, form .form-table p.form-box-validations {
 input[type="text"], input[type="password"], form .form-table .form-element-short {
    width: 200px;
 }
+input.captcha {width: 50px; vertical-align: top;}
+img.captcha {}
 textarea, form .form-table .form-element-long {
    width: 450px;
 }
@@ -377,12 +379,16 @@ textarea, form .form-table .form-element-long {
 .main-content-image {} /* obrázek v hlavním obsahu */
 .main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
 .main-content-text {} /* text v hlavním obsahu */
-.main-content-text p {
-   margin-bottom: 1em;
-}
-.main-content-text ul li ul {
+.main-content-text p {}
+.main-content-text ul, .main-content-text ol {
    margin-left: 30px;
 } /* text v hlavním obsahu */
+.main-content-text ul>li {
+   list-style: disc;
+} 
+.main-content-text ol>li {
+   list-style: decimal;
+}
 
 .main-content-form-edit {} /* Třída pro editační formulář */
 
@@ -399,6 +405,14 @@ textarea, form .form-table .form-element-long {
    background-color: #d4e3ff;
 }
 .record-odd {}
+/* styly pro tabulky atd */
+.header {
+   background-color: #FFE7A1;
+}
+.row td, .header th {
+   padding: 2px;
+   border: 1px solid #bbbbbb;
+}
 
 /* EOF main content NEW!!! */
 
