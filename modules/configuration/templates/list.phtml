@@ -54,7 +54,7 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                </td>
                <td class="column-action">
                   <?
-                  if($this->allowGlobalEdit){
+                  if($this->allowGlobalEdit && is_object($option->global)){
                      $this->formGlEdit->id->setValues($option->global->{Model_ConfigGlobal::COLUMN_ID});
                      echo $this->formGlEdit->render(new Form_Decorator_Clear());
                   }
