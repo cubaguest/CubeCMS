@@ -9,9 +9,9 @@
  * @abstract 		Třída fitru pro ošetření html vstupu
  */
 class Form_Filter_HTMLPurify extends Form_Filter {
-   private $config = array('HTML.Allowed' => 'p[style],span[style],a[href|title],strong,em,img[src|alt],br');
+   private $config = array('HTML.Allowed' => 'p[style],span[style],a[href|title],strong,em,img[src|alt],br,ul,li,ol');
 
-   public function  __construct($allowedTags = 'p[style],span[style],a[href|title],strong,em,img[src|alt],br', $config = array())
+   public function  __construct($allowedTags = 'p[style],span[style],a[href|title],strong,em,img[src|alt],br,ul,li,ol', $config = array())
    {
       $this->config['HTML.Allowed'] = $allowedTags;
       $this->config = array_merge($this->config, $config);
