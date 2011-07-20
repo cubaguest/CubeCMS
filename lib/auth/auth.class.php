@@ -148,7 +148,7 @@ class Auth extends TrObject {
 	 * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
 	 */
 	private static function setDefaultUserParams() {
-		self::$userGroupId = VVE_DEFAULT_ID_GROUP;
+		self::$userGroupId = self::$userId = (int)VVE_DEFAULT_ID_GROUP;
 		self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
 		self::$userName = VVE_DEFAULT_USER_NAME;
 		self::$userIsAdmin = false;
