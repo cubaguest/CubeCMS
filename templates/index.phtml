@@ -66,9 +66,9 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             contentsource: "markup"});
          /* ]]> */
       </script>
-      <?if(Auth::isAdmin()){?>
+      <?if(Category::getSelectedCategory()->getRights()->isWritable()){?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-admin.css')?>" />
-      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/admin/menu.js"></script>
+         <?if(Auth::isAdmin()){?><script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/admin/menu.js"></script><?}?>
       <?}
       if(VVE_DEBUG_LEVEL > 1){
          echo '<script type="text/javascript" src="'.Url_Request::getBaseWebDir(true).'jscripts/enginehelpers.js"></script>';
