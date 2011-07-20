@@ -84,12 +84,21 @@ class Component_Scroll extends Component {
            self::CONFIG_START_RECORD => null,
            self::CONFIG_START_PAGE => self::PAGE_FIRST,
            'tpl_file' => 'scroll.phtml',
-           'ajaxBox' => null);
+           'text_start' => null,
+           'text_end' => null,
+           'text_prev' => null,
+           'text_next' => null,
+           'ajaxBox' => null
+      );
 
    /**
     * Metoda inicializace, je spuštěna pří vytvoření objektu
     */
    protected function init() {
+      $this->setConfig('text_prev', $this->tr('Předchozí'));
+      $this->setConfig('text_next', $this->tr('Další'));
+      $this->setConfig('text_start', $this->tr('Začátek'));
+      $this->setConfig('text_end', $this->tr('Konec'));
    }
 
    /**
@@ -194,12 +203,17 @@ class Component_Scroll extends Component {
       $this->whichButtons();
       $this->whichNeighbourButtons();
       $this->template()->selectedPage = $this->selectPage;
+      $this->template()->pageParam = $this->getConfig('page_param');
       $this->template()->countAllPages = $this->countAllPages;
       $this->template()->addTplFile($this->getConfig('tpl_file'));
       $this->template()->ajaxBox = $this->getConfig('ajaxBox');
       if($this->countAllPages > 1 && isset ($_GET[$this->getConfig('page_param')]) /*&& $this->selectPage > 1*/){
          Template_Core::addToPageTitle(sprintf($this->tr('Strana %s'), $this->selectPage), -1);
       }
+      $this->template()->textPrev = $this->getConfig('text_prev');
+      $this->template()->textNext = $this->getConfig('text_next');
+      $this->template()->textStart = $this->getConfig('text_start');
+      $this->template()->textEnd = $this->getConfig('text_end');
    }
 
    /**

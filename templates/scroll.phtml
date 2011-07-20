@@ -7,7 +7,7 @@
 <? //Sipka na zacatek
    if($this->activeButtonBegin){
       ?>
-      <a href="<?=$this->pageLink()->rmParam('page')?>" title="<?=$this->tr("Začátek")?>">
+      <a href="<?=$this->pageLink()->rmParam($this->pageParam)?>" title="<?=$this->textStart?>">
       |&lt;
       </a>
    <?} else {?>
@@ -17,19 +17,19 @@
 
 <? //Sipka na předchozí
    if($this->activeButtonPrevious){?>
-      <a href="<?=$this->pageLink()->param('page', $this->selectedPage-1)?>" title="<?=$this->tr("Předchozí")?>">
-         <span>&lt;&nbsp;<?=$this->tr("Předchozí")?></span>
+      <a href="<?=$this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" title="<?=$this->textPrev?>">
+         <span>&lt;&nbsp;<?=$this->textPrev?></span>
       </a>
    <?} else {?>
-      <span>&lt;&nbsp;<?=$this->tr("Předchozí")?></span>
+      <span>&lt;&nbsp;<?=$this->textPrev?></span>
    <?}?>
 </td>
 <td align="center">
    <? foreach ($this->pagesLeftSideArray as $number) {
       if($number == 1){
-         $link = $this->pageLink()->rmParam('page');
+         $link = $this->pageLink()->rmParam($this->pageParam);
       } else {
-         $link = $this->pageLink()->param('page', $number);
+         $link = $this->pageLink()->param($this->pageParam, $number);
       }
       ?>
       &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
@@ -37,9 +37,9 @@
    [&nbsp;<?=$this->selectedPage.'/'.$this->countAllPages?>&nbsp;]
    <? foreach ($this->pagesRightSideArray as $number) {
       if($number == 1){
-         $link = $this->pageLink()->rmParam('page');
+         $link = $this->pageLink()->rmParam($this->pageParam);
       } else {
-         $link = $this->pageLink()->param('page', $number);
+         $link = $this->pageLink()->param($this->pageParam, $number);
       }
       ?>
       &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
@@ -48,17 +48,17 @@
 <td width="100" align="right">
 <? //Sipka na další
    if($this->activeButtonNext){?>
-      <a href="<?=$this->pageLink()->param('page', $this->selectedPage+1)?>" title="<?=$this->tr("Další")?>">
-         <span><?=$this->tr("Další")?>&nbsp;&gt;</span>
+      <a href="<?=$this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?=$this->textNext?>">
+         <span><?=$this->textNext?>&nbsp;&gt;</span>
       </a>
    <?} else {?>
       
-      <span><?=$this->tr("Další")?>&nbsp;&gt;</span>
+      <span><?=$this->textNext?>&nbsp;&gt;</span>
    <?}?>
    &#032;&#032;
 <? //Sipka na konec
    if($this->activeButtonEnd){?>
-      <a href="<?=$this->pageLink()->param('page', $this->countAllPages)?>" title="<?=$this->tr("Konec")?>">
+      <a href="<?=$this->pageLink()->param($this->pageParam, $this->countAllPages)?>" title="<?=$this->textEnd?>">
       &gt;|
       </a>
    <?} else {?>
