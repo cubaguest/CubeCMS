@@ -26,7 +26,7 @@ class Component_Captcha extends Component {
    function __construct($runOnly = false)
    {
       $this->componentName = str_ireplace(__CLASS__.'_', '', get_class($this));
-      $this->setConfig('baseimage', AppCore::getAppWebDir().'images'.DIRECTORY_SEPARATOR.'captcha.jpg');
+      $this->setConfig('baseimage', AppCore::getAppLibDir().'images'.DIRECTORY_SEPARATOR.'captcha.jpg');
    }
 
    /**
