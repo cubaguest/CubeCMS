@@ -64,6 +64,13 @@ class Contact_Controller extends Controller {
       $elemSubmit = new Form_Element_Submit('send', $this->tr('Odeslat'));
       $formQuestion->addElement($elemSubmit);
 
+      if(Auth::isLogin()){ // pokud je uživatel přihlášen doplníme jeho jméno
+         $modelUsers = new Model_Users();
+         $user = $modelUsers->record(Auth::getUserId());
+         $formQuestion->name->setValues($user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
+         $formQuestion->mail->setValues($user->{Model_Users::COLUMN_MAIL});
+      }
+      
       if($formQuestion->haveElement('subjectDef') AND $formQuestion->isSend()
          AND $formQuestion->subjectDef->getValues() == 0 AND $formQuestion->subject->getValues() == null){
           $formQuestion->subject->setError($this->tr('Musí být zadán předmět zprávy.'));
