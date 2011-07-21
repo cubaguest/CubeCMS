@@ -92,7 +92,7 @@ $grpsArr = array();
          // úpravy
          jQuery("#table-users").jqGrid('navGrid','#table-users-pager',
             {view:false}, //options
-            {height:220,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
+            {height:320,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
                bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
