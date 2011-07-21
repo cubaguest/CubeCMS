@@ -905,7 +905,7 @@ class Courses_Controller extends Controller {
       $modelusers = new Model_Users();
 
       foreach ($usersId as $id) {
-         $user = $modelusers->getUserById($id);
+         $user = $modelusers->record($id);
          $mails = array_merge($mails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
       }
       $mails = array_unique($mails);
