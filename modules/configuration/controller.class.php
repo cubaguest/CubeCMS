@@ -16,7 +16,6 @@ class Configuration_Controller extends Controller {
       $eSubmit->setImage('/images/icons/edit.png');
       
       $formEditGlobal = new Form('gl_edit_');
-      $formEditGlobal->render(New Form_Decorator());
       $formEditGlobal->addElement(clone $eId);
       $formEditGlobal->addElement(clone $eSubmit);
       
