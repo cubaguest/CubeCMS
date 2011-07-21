@@ -146,7 +146,8 @@ class Search {
             $endOfString = $textLen;
             $postStr = null;
             //znovu najdeme mezeru
-            $startOfString = mb_stripos($text, ' ', $textLen-self::$resultLen-15)+1;
+            $offset = $textLen-self::$resultLen-15;
+            $startOfString = mb_stripos($text, ' ', $offset < 0 ? 0 : $offset)+1;
          }
          $text = $preStr.mb_substr($text, $startOfString, $endOfString-$startOfString).$postStr;
       }
@@ -234,7 +235,12 @@ class Search {
        * @param array $b -- pole výsledku a
        */
       function cmpResult($a, $b) {
-         return strcmp($b[Search::R_I_RELEVATION], $a[Search::R_I_RELEVATION]);
+         if($a[Search::R_I_RELEVATION] < $b[Search::R_I_RELEVATION]){
+            return 1;
+         } else if($a[Search::R_I_RELEVATION] > $b[Search::R_I_RELEVATION]) {
+            return -1;
+         }
+         return 0;
       }
       usort($results, 'cmpResult');
       return $results;

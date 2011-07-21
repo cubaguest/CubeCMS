@@ -18,9 +18,9 @@ class Search_Controller extends Controller {
          // kvůli identifikaci webu - stejná session pro několik webů viz. global auth
          $sessionName = 'search_'.md5(VVE_WEB_NAME);
          // jetli je nové nebo staré hledání
-         if(isset ($_SESSION[$sessionName]) AND $_SESSION[$sessionName]['string'] == $searchStr
-//                 AND $_SESSION[$sessionName]['source'] == $source) {
-                 AND $_SESSION[$sessionName]['source'] == '$source') {
+         if(VVE_DEBUG_LEVEL == 0 // pouze pokud je vypnut debug režim používat cache
+            AND isset ($_SESSION[$sessionName]) AND $_SESSION[$sessionName]['string'] == $searchStr
+            AND $_SESSION[$sessionName]['source'] == '$source') {
             $results = $_SESSION[$sessionName]['results'];
          } else {
             if($source == 'all') {
