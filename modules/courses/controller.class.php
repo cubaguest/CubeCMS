@@ -973,7 +973,7 @@ class Courses_Controller extends Controller {
    /**
     * Metoda pro nastavení modulu
     */
-   public static function settingsController(&$settings, Form &$form) {
+   protected function settings(&$settings, Form &$form) {
       $formGrpUsers = $form->addGroup('users', 'Registrace');
 
       // odeslání upozornění
@@ -999,10 +999,14 @@ lze využít následující výběr již existujících uživatelů.');
       $elemAdmins = new Form_Element_Select('admins', 'Adresy uživatelů v systému');
       // načtení uživatelů
       $modelUsers = new Model_Users();
-      $users = $modelUsers->getUsersList();
+      $users = $modelUsers->usersForThisWeb(true)->records();
       $usersIds = array();
-      foreach ($users as $user) {
-         $usersIds[$user[Model_Users::COLUMN_USERNAME]] = $user[Model_Users::COLUMN_ID];
+      foreach ($users as $usr) {
+         if($usr->{Model_Users::COLUMN_MAIL} != null){
+            $usersIds[$usr->{Model_Users::COLUMN_NAME} ." ".$usr->{Model_Users::COLUMN_SURNAME}
+              .' ('.$usr->{Model_Users::COLUMN_USERNAME}.') - '.$usr->{Model_Users::COLUMN_GROUP_LABEL}
+              .' ('.$usr->{Model_Users::COLUMN_GROUP_NAME}.')'] = $usr->{Model_Users::COLUMN_ID};
+         }
       }
       $elemAdmins->setOptions($usersIds);
       $elemAdmins->setMultiple();
