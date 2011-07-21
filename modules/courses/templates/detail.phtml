@@ -51,7 +51,7 @@ switch ($this->course->{Courses_Model_Courses::COLUMN_TYPE}) {
          }
          ?>
       </li>
-      <?if($this->course->{Courses_Model_Courses::COLUMN_TIME_START} != null){?>
+      <?if($this->course->{Courses_Model_Courses::COLUMN_TIME_START} != null && $this->course->{Courses_Model_Courses::COLUMN_TIME_START} != "00:00:00"){?>
       <li><? echo '<span class="course-param">'.$this->_('Předpokládaný čas začátku') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TIME_START}; ?></li>
       <?}?>
       <li><?echo '<span class="course-param">'.$this->_('Místo konání') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_PLACE};?></li>
