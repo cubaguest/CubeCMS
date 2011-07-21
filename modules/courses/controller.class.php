@@ -383,12 +383,19 @@ class Courses_Controller extends Controller {
       $ePrivateUsers = new Form_Element_Select('privateUsers', $this->_('Uživatelé'));
       $ePrivateUsers->setMultiple(true);
 
-      $modelUsers = new Model_Users();
+      /*$modelUsers = new Model_Users();
       foreach ($modelUsers->records() as $user) {
          $ePrivateUsers->setOptions(
                  array($user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}
                  ." ".$user->{Model_Users::COLUMN_SURNAME}.' - '.$user->{Model_Users::COLUMN_GROUP_NAME}
                  => $user->{Model_Users::COLUMN_ID}), true);
+      }*/
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->usersForThisWeb()->records(PDO::FETCH_OBJ);
+      foreach ($users as $usr) {
+          $ePrivateUsers->setOptions(array($usr->{Model_Users::COLUMN_NAME} ." ".$usr->{Model_Users::COLUMN_SURNAME}
+              .' ('.$usr->{Model_Users::COLUMN_USERNAME}.') - '.$usr->{Model_Users::COLUMN_GROUP_LABEL}.' ('.$usr->{Model_Users::COLUMN_GROUP_NAME}.')'
+              => $usr->{Model_Users::COLUMN_ID}), true);
       }
       $form->addElement($ePrivateUsers, $fGrpPrivate);
 

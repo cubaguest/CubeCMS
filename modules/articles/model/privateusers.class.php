@@ -14,8 +14,8 @@ class Articles_Model_PrivateUsers extends Model_ORM {
       $this->addColumn(self::COLUMN_A_H_U_ID_ARTICLE, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_A_H_U_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
 
-      $this->addForeignKey('t_art', self::COLUMN_A_H_U_ID_ARTICLE, 'Articles_Model_Detail');
-      $this->addForeignKey('t_usr', self::COLUMN_A_H_U_ID_USER, 'Model_Users');
+      $this->addForeignKey(self::COLUMN_A_H_U_ID_ARTICLE, 'Articles_Model');
+      $this->addForeignKey(self::COLUMN_A_H_U_ID_USER, 'Model_Users');
    }
 }
 

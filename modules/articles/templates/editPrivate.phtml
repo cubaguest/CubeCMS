@@ -1,7 +1,7 @@
 <?
 $this->addCssFile("style.css");
 // do titulku
-$h = $this->tr('úprava privátního textu článku').' '.$this->article->{Articles_Model::COLUMN_NAME};
+$h = $this->tr('úprava privátního textu článku').' "'.$this->article->{Articles_Model::COLUMN_NAME}.'"';
 $this->addPageTitle($h);
 // donastavení formuláře
 $this->form->textPrivate->html()->setAttrib('cols', 80)->setAttrib('rows', 30)->addClass("mceEditor");
@@ -11,8 +11,7 @@ $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEM
 $tinymce->setCfgParam('editor_selector', 'mceEditor');
 $this->addJsPlugin($tinymce);
 ?>
-<h1><?=$h;?></h1>
+<h1><?=ps($h);?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
    <?echo($this->form);?>
 </div>
-<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detail')));?>

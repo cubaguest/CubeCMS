@@ -177,14 +177,11 @@ class Text_Controller extends Controller {
       $elemGroups = new Form_Element_Select('groups', $this->tr('Skupiny'));
       $elemGroups->setMultiple(true);
       
-      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
       $groupsModel = new Model_Groups();
-      $groupsModel->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
-         ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
-         ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
-      $groups = $groupsModel->records();
+      $groups = $groupsModel->groupsForThisWeb()->records();
       foreach ($groups as $grp) {
-          $elemGroups->setOptions(array($grp->{Model_Users::COLUMN_GROUP_NAME} => $grp->{Model_Users::COLUMN_GROUP_ID}), true);
+          $elemGroups->setOptions(array($grp->{Model_Users::COLUMN_GROUP_LABEL}.'('.$grp->{Model_Users::COLUMN_GROUP_NAME}.')' 
+          => $grp->{Model_Users::COLUMN_GROUP_ID}), true);
       }
       if($text != false){
          $selGrps = $modelPrivate->getGroupsConnect($text->{Text_Model::COLUMN_ID});
@@ -198,16 +195,11 @@ class Text_Controller extends Controller {
       $elemUsers->setMultiple(true);
       
       $modelUsers = new Model_Users();
-      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
-      $modelUsers->joinFK(Model_Users::COLUMN_GROUP_ID)
-         ->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
-         ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
-         ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
-      
-      $users = $modelUsers->records(PDO::FETCH_OBJ);
+      $users = $modelUsers->usersForThisWeb()->records(PDO::FETCH_OBJ);
       foreach ($users as $usr) {
-          $elemUsers->setOptions(array($usr->{Model_Users::COLUMN_USERNAME}.' ('.$usr->{Model_Users::COLUMN_NAME}
-          .' '.$usr->{Model_Users::COLUMN_SURNAME}.')' => $usr->{Model_Users::COLUMN_ID}), true);
+          $elemUsers->setOptions(array($usr->{Model_Users::COLUMN_NAME} ." ".$usr->{Model_Users::COLUMN_SURNAME}
+              .' ('.$usr->{Model_Users::COLUMN_USERNAME}.') - '.$usr->{Model_Users::COLUMN_GROUP_LABEL}.' ('.$usr->{Model_Users::COLUMN_GROUP_NAME}.')'
+              => $usr->{Model_Users::COLUMN_ID}), true);
       }
       if($text != false){
          $selUsrs = $modelPrivate->getUsersConnect($text->{Text_Model::COLUMN_ID});

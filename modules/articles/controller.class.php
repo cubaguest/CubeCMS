@@ -413,11 +413,12 @@ class Articles_Controller extends Controller {
       $ePrivateUsers->setMultiple(true);
 
       $modelUsers = new Model_Users();
-      $usersList = $modelUsers->getUsersList();
-      while ($user = $usersList->fetchObject()) {
+      $users = $modelUsers->usersForThisWeb()->records();
+      
+      foreach ($users as $user) {
          $ePrivateUsers->setOptions(
-              array($user->{Model_Users::COLUMN_USERNAME}.' - '.$user->{Model_Users::COLUMN_NAME}
-              ." ".$user->{Model_Users::COLUMN_SURNAME}.' - '.$user->{Model_Users::COLUMN_GROUP_NAME}
+              array($user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
+              .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Users::COLUMN_GROUP_LABEL}.' ('.$user->{Model_Users::COLUMN_GROUP_NAME}.')'
               => $user->{Model_Users::COLUMN_ID}), true);
       }
 
