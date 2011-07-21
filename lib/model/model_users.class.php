@@ -70,6 +70,22 @@ class Model_Users extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');
    }
+   
+   /**
+    * Metoday nastaví výběr na uživatele připojené k aktuálnímu webu
+    * @return Model_Groups
+    */
+   public function usersForThisWeb()
+   {
+      $model = $this->joinFK(Model_Users::COLUMN_ID_GROUP)
+         ->join(Model_Groups::COLUMN_ID, array('sitegrps' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
+         ->join(array('sitegrps' => Model_SitesGroups::COLUMN_ID_SITE), 'Model_Sites', Model_Sites::COLUMN_ID, array(Model_Sites::COLUMN_DOMAIN))
+         ->where(Model_Groups::COLUMN_IS_ADMIN.' = 0 AND ( `'.Model_Sites::COLUMN_DOMAIN.'` = NULL OR  `'.Model_Sites::COLUMN_DOMAIN.'` = :domain)', 
+            array('domain' => VVE_SUB_SITE_DOMAIN == null ? 'www' : VVE_SUB_SITE_DOMAIN)) //AND ('.Model_Groups.' )
+      ;
+      //Debug::log($model->getSQLQuery());
+      return $model;
+   }
 
    /**
     * Metoda načte uživatele podle uživatelského jména
