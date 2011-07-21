@@ -59,7 +59,6 @@ class Login_Controller extends Controller {
          }
 
          $user = $model->record(Auth::getUserId());
-         Debug::log($user);
          // kontrola starého hesla
          if(Auth::cryptPassword($form->current->getValues()) != $user->{Model_Users::COLUMN_PASSWORD}){
             $form->current->setError($this->tr('Špatně zadané aktuální heslo'));
