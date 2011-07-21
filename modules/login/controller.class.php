@@ -24,7 +24,8 @@ class Login_Controller extends Controller {
 	 * Metoda pro úpravu hesla
 	 */
 	public function changePasswdController() {
-		$this->checkWritebleRights();
+      if(!Auth::isLogin()){return false;}
+      
       $model = new Model_Users();
 
       $form = new Form('pass_');
@@ -81,8 +82,7 @@ class Login_Controller extends Controller {
 	}
 
    public function changeUserController() {
-      $this->checkWritebleRights();
-
+      if(!Auth::isLogin()){return false;}
       $model = new Model_Users();
       $user = $model->record(Auth::getUserId());
 
@@ -143,10 +143,9 @@ class Login_Controller extends Controller {
 
 
    public function newPasswordController() {
-      $this->checkReadableRights();
       // redirect to account if login
       if(Auth::isLogin() == true)
-         $this->link()->route()->reload ();
+         $this->link()->route()->reload();
       
       $modelUsr = new Model_Users();
 
