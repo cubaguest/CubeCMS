@@ -55,6 +55,7 @@ class Debug {
    }
 
    public static function printDebug(){
+      if(VVE_DEBUG_LEVEL > 0){
       if(!empty (self::$vars)){
          echo '<div class="debug-log">';// admin menu
          echo '<p><strong>DEBUG OUTPUT:</strong></p>';
@@ -78,6 +79,7 @@ class Debug {
             echo '</table>';
          }
          echo '</div>';
+      }
       }
    }
 
