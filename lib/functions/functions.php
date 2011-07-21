@@ -44,7 +44,8 @@ function vve_cr_url_key($string, $removeSlashes = true)
          $string[$key] = vve_cr_url_key($variable);
       }
    } else {
-      $string = vve_to_ascii(strip_tags($string));
+      $string = strip_tags($string);
+      $string = vve_to_ascii($string);
       $slashes = null;
       if ($removeSlashes) {
          $slashes = '\/';
