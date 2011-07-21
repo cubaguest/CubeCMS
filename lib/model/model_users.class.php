@@ -75,15 +75,18 @@ class Model_Users extends Model_ORM {
     * Metoday nastaví výběr na uživatele připojené k aktuálnímu webu
     * @return Model_Groups
     */
-   public function usersForThisWeb()
+   public function usersForThisWeb($withAdmins = false)
    {
       $model = $this->joinFK(Model_Users::COLUMN_ID_GROUP)
          ->join(Model_Groups::COLUMN_ID, array('sitegrps' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
-         ->join(array('sitegrps' => Model_SitesGroups::COLUMN_ID_SITE), 'Model_Sites', Model_Sites::COLUMN_ID, array(Model_Sites::COLUMN_DOMAIN))
-         ->where(Model_Groups::COLUMN_IS_ADMIN.' = 0 AND ( `'.Model_Sites::COLUMN_DOMAIN.'` = NULL OR  `'.Model_Sites::COLUMN_DOMAIN.'` = :domain)', 
-            array('domain' => VVE_SUB_SITE_DOMAIN == null ? 'www' : VVE_SUB_SITE_DOMAIN)) //AND ('.Model_Groups.' )
-      ;
-      //Debug::log($model->getSQLQuery());
+         ->join(array('sitegrps' => Model_SitesGroups::COLUMN_ID_SITE), 'Model_Sites', Model_Sites::COLUMN_ID, array(Model_Sites::COLUMN_DOMAIN));
+      if($withAdmins){
+         $model->where('( ISNULL(`'.Model_Sites::COLUMN_DOMAIN.'`) OR  `'.Model_Sites::COLUMN_DOMAIN.'` = :domain)', 
+            array('domain' => VVE_SUB_SITE_DOMAIN == null ? 'www' : VVE_SUB_SITE_DOMAIN));
+      } else {
+         $model->where(Model_Groups::COLUMN_IS_ADMIN.' = 0 AND ( ISNULL(`'.Model_Sites::COLUMN_DOMAIN.'`) OR  `'.Model_Sites::COLUMN_DOMAIN.'` = :domain)', 
+            array('domain' => VVE_SUB_SITE_DOMAIN == null ? 'www' : VVE_SUB_SITE_DOMAIN));
+      }
       return $model;
    }
 
