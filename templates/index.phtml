@@ -76,7 +76,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          echo '<script type="text/javascript" src="'.Url_Request::getBaseWebDir(true).'jscripts/enginehelpers.min.js"></script>';
       }?>
    </head>
-   <body id="pageTop" >
+   <body id="pageTop" <?if(Auth::isAdmin())echo 'class="with-admin-menu"';?> >
       <? // admin menu
       if(Auth::isAdmin() AND $this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) $this->includeTplObj($this->menuAdminObj);
       ?>
