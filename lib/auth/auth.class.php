@@ -68,16 +68,16 @@ class Auth extends TrObject {
 	private static $userMail = null;
 
 	/**
-	 * Uživatel je Admin pro aktuální web
+	 * Uživatel je v Admin skupině
 	 * @var string
 	 */
 	private static $userIsAdmin = false;
-
+   
 	/**
-	 * Uživatel je Admin skupina
+	 * Uživatel je Admin pro aktuální web
 	 * @var string
 	 */
-	private static $userIsAdminGroup = false;
+	private static $userIsSiteAdmin = false;
 
 	/**
 	 * Pole s podweby uživatele
@@ -131,12 +131,15 @@ class Auth extends TrObject {
 		self::$userId = $_SESSION[self::USER_ID];
 		self::$userGroupId = $_SESSION[self::USER_ID_GROUP];
 		self::$userGroupName = $_SESSION[self::USER_GROUP_NAME];
-		self::$userIsAdminGroup = $_SESSION[self::USER_ADMIN_GROUP];
 		self::$userSites = $_SESSION[self::USER_SITES];
-		self::$userIsAdmin = false;
-      if(self::$userIsAdminGroup AND (empty(self::$userSites) OR isset(self::$userSites[VVE_SUB_SITE_DOMAIN])
+		self::$userIsAdmin = $_SESSION[self::USER_ADMIN];
+		self::$userIsSiteAdmin = false;
+      
+      if(self::$userIsAdmin AND (
+         empty(self::$userSites) 
+         OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
          OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
-         self::$userIsAdmin = true;
+         self::$userIsSiteAdmin = true;
       }
 
       if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
@@ -152,7 +155,7 @@ class Auth extends TrObject {
 		self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
 		self::$userName = VVE_DEFAULT_USER_NAME;
 		self::$userIsAdmin = false;
-		self::$userIsAdminGroup = false;
+		self::$userIsSiteAdmin = false;
 		self::$userSites = array();
 	}
 
@@ -169,7 +172,6 @@ class Auth extends TrObject {
 		$_SESSION[self::USER_LOGIN_TIME] = time();
 		$_SESSION[self::USER_IS_LOGIN] = true;
 		$_SESSION[self::USER_ADMIN] = self::$userIsAdmin;
-		$_SESSION[self::USER_ADMIN_GROUP] = self::$userIsAdminGroup;
 		$_SESSION[self::USER_SITES] = self::$userSites;
 	}
 
@@ -198,8 +200,8 @@ class Auth extends TrObject {
 						self::$userGroupName = $user->gname;
 						self::$userId = $user->{Model_Users::COLUMN_ID};
 						self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-						self::$userIsAdmin = false;
-						self::$userIsAdminGroup = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+						self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+						self::$userIsSiteAdmin = false;
 
                   // mačteme všechny podweby, kde má uživatel přístup
                   $modelSites = new Model_SitesGroups();
@@ -214,10 +216,6 @@ class Auth extends TrObject {
                   }
                   unset($sites);
                   unset($modelSites);
-                  // Je admin                     nemá omezení                     je omezen na doménu
-//                   if(self::$userIsAdminGroup AND (empty(self::$userSites) OR isset(self::$userSites[VVE_SUB_SITE_DOMAIN])) ){
-//                      self::$userIsAdmin = true;
-//                   }
 
 						if($user->{Model_Users::COLUMN_FOTO_FILE} != null){
 							//TODO není dodělána práce s fotkou
@@ -240,7 +238,7 @@ class Auth extends TrObject {
                   }
                   self::saveUserDetailToSession();
                   $link = new Url_Link();
-                  $link->reload('http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+                  $link->reload($link->getTransferProtocol().'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
                   die(); // not needn't
                   return true;
 					} else {
@@ -289,8 +287,8 @@ class Auth extends TrObject {
       		self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
          	self::$userId = $user->{Model_Users::COLUMN_ID};
             self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-            self::$userIsAdminGroup = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
-            self::$userIsAdmin = false;
+            self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+				self::$userIsSiteAdmin = false;
 
             // mačteme všechny podweby, kde má uživatel přístup
             $modelSites = new Model_SitesGroups();
@@ -306,9 +304,11 @@ class Auth extends TrObject {
             unset($sites);
             unset($modelSites);
 
-            if(self::$userIsAdminGroup AND (empty(self::$userSites) OR isset(self::$userSites[VVE_SUB_SITE_DOMAIN])
+            if(self::$userIsAdmin AND (
+               empty(self::$userSites) 
+               OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
                OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
-                  self::$userIsAdmin = true;
+                  self::$userIsSiteAdmin = true;
             }
 
             self::saveUserDetailToSession();
@@ -400,7 +400,7 @@ class Auth extends TrObject {
 	 * @return bool -- true pokud je administrator
 	 */
 	public static function isAdmin() {
-		return self::$userIsAdmin;
+		return self::$userIsSiteAdmin;
 	}
 
 	/**
