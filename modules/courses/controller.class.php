@@ -85,8 +85,7 @@ class Courses_Controller extends Controller {
 
       // privátní zóna
       $this->view()->isPrivate = false;
-      if(Auth::getGroupName() == 'admin' OR
-              $courseModel->isPrivateUser(Auth::getUserId(),
+      if(Auth::isAdmin() OR $courseModel->isPrivateUser(Auth::getUserId(),
                       $this->view()->course->{Courses_Model_Courses::COLUMN_ID}) == true){
          $this->view()->isPrivate = true;
       }
