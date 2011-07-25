@@ -41,8 +41,8 @@ echo $this->form->renderStart();
       <tr>
          <td>
             <h2></h2>
-            <p id="preview" style="overflow:hidden; width:<?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH) ?>px;
-               height:<?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT) ?>px;">
+            <p id="preview" style="overflow:hidden; width:<?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W) ?>px;
+               height:<?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H) ?>px;">
                <img src="<?= $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
                     . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>"
                     alt="<?= $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" />
@@ -76,7 +76,7 @@ echo $this->form->renderStart();
          <th class="form-labels"></th>
          <td class="form-controlls">
             <?
-            $this->form->width->setValues($this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH));
+            $this->form->width->setValues($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W));
             print($this->form->width->controll())
             ?>
          </td>
@@ -85,7 +85,7 @@ echo $this->form->renderStart();
          <th class="form-labels"></th>
          <td class="form-controlls">
             <?
-            $this->form->height->setValues($this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT));
+            $this->form->height->setValues($this->category()->getParam('small_height', VVE_IMAGE_THUMB_H));
             echo ($this->form->height->controll());
             ?>
          </td>
@@ -105,8 +105,8 @@ echo $this->form->renderStart();
 <script type="text/javascript">
 /* <![CDATA[ */
    function showPreview(coords){
-      var rw = <?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH); ?>;
-      var rh = <?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT); ?>;
+      var rw = <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>;
+      var rh = <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?>;
       if (parseInt(coords.w) > 0){
          var rw = rw/coords.w;
          var rh = rh/coords.h;
@@ -129,11 +129,12 @@ echo $this->form->renderStart();
          trueSize: [<?= $sizes[0] ?>,<?= $sizes[1]; ?>],
          onChange: showPreview,
          onSelect: showPreview,
-         minSize: [ <?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH); ?>,
-            <?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT); ?> ],
-         setSelect: [ 0, 0, <?= $this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH); ?>,
-            <?= $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT); ?> ],
-         aspectRatio: <?= str_replace(',', '.', round($this->category()->getParam('small_width', Photogalery_Controller::SMALL_WIDTH) / $this->category()->getParam('small_height', Photogalery_Controller::SMALL_HEIGHT), 2)) ?>
+         minSize: [ <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
+            <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
+         setSelect: [ 0, 0, <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
+            <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
+         aspectRatio: <?= str_replace(',', '.', round($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W) 
+            / $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), 2)) ?>
       });
    });
 /* ]]> */
