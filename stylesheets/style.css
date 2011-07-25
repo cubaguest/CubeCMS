@@ -536,16 +536,12 @@ textarea, form .form-table .form-element-long {
    background-repeat: no-repeat;
 }
 .file-pdf {background-image: url('../images/files/pdf.gif');}
-.file-doc, .file-docx, .file-dot, .file-odt, .file-ott {background-image: url('../images/files/doc.gif');}
-.file-xls, .file-xlt, .file-ods, .file-ots {
-   background-image: url('../images/files/xls.gif');
-}
+.file-doc, .file-docx, .file-dot, .file-odt, .file-ott, .file-rtf {background-image: url('../images/files/doc.gif');}
+.file-xls, .file-xlt, .file-ods, .file-ots {background-image: url('../images/files/xls.gif');}
+.file-ppt, .file-pps {background-image: url('../images/files/ppt.gif');}
 .file-zip {background-image: url('../images/files/zip.gif');}
 .file-rar {background-image: url('../images/files/rar.gif');}
 .file-avi, .file-wmv, .file-mpg, .file-flv, .file-swf {background-image: url('../images/files/avi.gif');}
-.file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd
-{background-image: url('../images/files/jpg.gif');}
-.dir-icon {
-   background-image: url('../images/icons/folder.png');
-}
+.file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd, .file-tiff {background-image: url('../images/files/jpg.gif');}
+.dir-icon {background-image: url('../images/icons/folder.png');}
 /* EOF file extension */
