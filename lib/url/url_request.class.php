@@ -226,46 +226,44 @@ class Url_Request {
       // pokud není žádná adresa (jen jazyk)
       $return = false;
       // nastavení jazyku
-      $match = array('url' => null);
-      if(preg_match("/^(?:(?P<lang>[a-z]{2})\/)?(?P<url>.*)/", self::$fullUrl, $match) ){
+      $match = array(2 => null);
+      if(preg_match("/^(?:([a-z]{2})\/)?(.*)/", self::$fullUrl, $match) ){
          if(!empty ($match)) {
-            $this->lang = $match['lang'];
+            $this->lang = $match[1];
             Locales::setLang($this->lang);
             Url_Link::setLang(Locales::getLang());
             $return = true;
          }
       }
-      if(!empty ($match['url'])) {
+      if(!empty ($match[2])) {
          $return = false;
-         if(strpos($match['url'], 'admin') !== 0){ // pokud je obsaženo jako první slovo admin > jedná se o admin kategorii a není nutné procházen normální
+         if(strpos($match[2], 'admin') !== 0){ // pokud je obsaženo jako první slovo admin > jedná se o admin kategorii a není nutné procházen normální
             // načtení kategorií
             $modelCat = new Model_Category();
             $categories = $modelCat->getCategoryList();
             unset($modelCat);
             foreach ($categories as $cat) {
                if((string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue;
-//                Debug::log($match['url']);
-               if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
+               if (strpos($match[2], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
                   $matches = array();
-                  $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})
-                     ."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
+                  $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})."\/([^?]*)\/?\??(.*)/i";
 
-                  if(preg_match($regexp, $match['url'], $matches)) {
+                  if(preg_match($regexp, $match[2], $matches)) {
                      // pokud obsahuje soubor
                      $fileMatchs = array();
-                     if($matches['other'] == self::URL_FILE_RSS){
+                     if($matches[1] == self::URL_FILE_RSS){
                         $this->urlType = self::URL_TYPE_MODULE_RSS;
                         $this->name = 'rss';
                         $this->outputType = 'xml';
                         $this->pageFull = false;
-                     } else if($matches['other'] == self::URL_FILE_ATOM){
+                     } else if($matches[1] == self::URL_FILE_ATOM){
                         $this->urlType = self::URL_TYPE_MODULE_RSS;
                         $this->name = 'atom';
                         $this->outputType = 'xml';
                         $this->pageFull = false;
-                     } else if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
+                     } else if(preg_match('/([a-z0-9]+)\.([a-z0-9]+)/i', $matches[1], $fileMatchs)){
                         $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                        $this->outputType = $fileMatchs['ext'];
+                        $this->outputType = $fileMatchs[2];
                         $this->pageFull = false;
                      } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
                         $this->urlType = self::URL_TYPE_MODULE_REQUEST;
@@ -273,8 +271,8 @@ class Url_Request {
                      }
                      // jinak se jednná o kategorii
                      $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
-                     $this->moduleUrlPart = $matches['other'];
-                     $this->params = $matches['params'];
+                     $this->moduleUrlPart = $matches[1];
+                     $this->params = $matches[2];
                      $return = true;
                      break;
                   }
@@ -288,26 +286,15 @@ class Url_Request {
             $cats = $model->getCategoryList();
             unset($model);
             foreach ($cats as $cat) {
-               if (strpos($match['url'], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
+               if (strpos($match[2], (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
                   $matches = array();
-                  $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})."\/(?P<other>[^?]*)\/?\??(?P<params>.*)/i";
-                  if(preg_match($regexp, $match['url'], $matches)) {
+                  $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})."\/([^?]*)\/?\??(.*)/i";
+                  if(preg_match($regexp, $match[2], $matches)) {
                      // pokud obsahuje soubor
                      $fileMatchs = array();
-                     /*if($matches['other'] == self::URL_FILE_RSS){
-                        $this->urlType = self::URL_TYPE_MODULE_RSS;
-                        $this->name = 'rss';
-                        $this->outputType = 'xml';
-                        $this->pageFull = false;
-                     } else if($matches['other'] == self::URL_FILE_ATOM){
-                        $this->urlType = self::URL_TYPE_MODULE_RSS;
-                        $this->name = 'atom';
-                        $this->outputType = 'xml';
-                        $this->pageFull = false;
-                     } else*/
-                     if(preg_match('/(?P<file>[a-z0-9]+)\.(?P<ext>[a-z0-9]+)/i', $matches['other'], $fileMatchs)){
+                     if(preg_match('/([a-z0-9]+)\.([a-z0-9]+)/i', $matches[1], $fileMatchs)){
                         $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                        $this->outputType = $fileMatchs['ext'];
+                        $this->outputType = $fileMatchs[2];
                         $this->pageFull = false;
                      } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
                         $this->urlType = self::URL_TYPE_MODULE_REQUEST;
@@ -315,8 +302,8 @@ class Url_Request {
                      }
                      // jinak se jednná o kategorii
                      $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
-                     $this->moduleUrlPart = $matches['other'];
-                     $this->params = $matches['params'];
+                     $this->moduleUrlPart = $matches[1];
+                     $this->params = $matches[2];
                      $this->isAdminCat = true;
                      $return = true;
                      break;
@@ -334,22 +321,22 @@ class Url_Request {
     */
    private function parseCoreModuleUrl() {
       $return = false;
-      $match = array('url' => null);
-      if(preg_match("/^(?:(?P<lang>[a-z]{2})\/)?(?P<url>.*)/", self::$fullUrl, $match) ){
+      $match = array(2 => null);
+      if(preg_match("/^(?:([a-z]{2})\/)?(.*)/", self::$fullUrl, $match) ){
          if(!empty ($match)) {
-            $this->lang = $match['lang'];
+            $this->lang = $match[1];
             Locales::setLang($this->lang);
             Url_Link::setLang(Locales::getLang());
          }
       }
-      $regexp = '/^(?P<name>(?:sitemap|rss)).(?P<output>(xml|txt|html)+)/i';
+      $regexp = '/^((?:sitemap|rss)).((xml|txt|html)+)/i';
       $matches = array();
-      if(preg_match($regexp, $match['url'], $matches) != 0) {
+      if(preg_match($regexp, $match[2], $matches) != 0) {
          $this->pageFull = false;
          $this->urlType = self::URL_TYPE_CORE_MODULE;
-         $this->outputType = $matches['output'];
-         $this->category = $matches['name'];
-         if($matches['output'] == 'html' AND !self::isXHRRequest()){
+         $this->outputType = $matches[2];
+         $this->category = $matches[1];
+         if($matches[2] == 'html' AND !self::isXHRRequest()){
             $this->pageFull = true;
          }
          $return = true;
@@ -361,17 +348,18 @@ class Url_Request {
     * Metoda zkontroluje jesli se nejedná o url k statické akci modulu (např. při ajax requestu)
     */
    private function parseModuleStaticUrl() {
-      $matches = array();//(?:(?P<lang>[a-z]{2})\/)?
-      if(!preg_match("/module_s\/(?:(?P<lang>[a-z]{2})\/)?(?P<mname>[\/a-z]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+      $matches = array();
+      //                             1 lang        2 mname     3 action       4 output        5 params
+      if(!preg_match("/module_s\/(?:([a-z]{2})\/)?([\/a-z]+)\/([a-z0-9_-]+)\.([a-z0-9_-]+)\??([^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
       $this->category = null;
-      $this->name = $matches['mname'];
-      $this->action = $matches['action'];
-      $this->outputType = $matches['output'];
-      $this->lang = $matches['lang'];
-      if(isset ($matches['params'])) {
-         $this->params = $matches['params'];
+      $this->name = $matches[2];
+      $this->action = $matches[3];
+      $this->outputType = $matches[4];
+      $this->lang = $matches[1];
+      if(isset ($matches[5])) {
+         $this->params = $matches[5];
       }
       $this->urlType = self::URL_TYPE_MODULE_STATIC_REQUEST;
       $this->pageFull = false;
@@ -383,7 +371,19 @@ class Url_Request {
     */
    private function parseComponentUrl() {
       $matches = array();
-      if(!preg_match("/component\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+      //                           ?P<name>          ?P<lang>      ?P<category>   ?P<action>     ?P<output>      ?<params>
+      if(!preg_match("/component\/([a-z0-9_-]+)\/(?:([a-z]{2})\/)?([a-z0-9_-]+)\/([a-z0-9_-]+)\.([a-z0-9_-]+)\??([^?]+)?/i", self::$fullUrl, $matches)) {
+         return false;
+      }
+      $this->category = $matches[3];
+      $this->name = $matches[1];
+      $this->action = $matches[4];
+      $this->outputType = $matches[5];
+      $this->lang = $matches[2];
+      if(isset ($matches[6])) {
+         $this->params = $matches[6];
+      }
+/*      if(!preg_match("/component\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?<params>[^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
       $this->category = $matches['category'];
@@ -393,7 +393,7 @@ class Url_Request {
       $this->lang = $matches['lang'];
       if(isset ($matches['params'])) {
          $this->params = $matches['params'];
-      }
+      }*/
       $this->urlType = self::URL_TYPE_COMPONENT_REQUEST;
       $this->pageFull = false;
       return true;
@@ -405,16 +405,17 @@ class Url_Request {
     */
    private function parseJsPluginUrl() {
       $matches = array();
-      if(!preg_match("/jsplugin\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?cat-(?P<category>[0-9]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?P<params>[^?]+)?/i", self::$fullUrl, $matches)) {
+      if(!preg_match("/jsplugin\/([a-z0-9_-]+)\/(?:([a-z]{2})\/)?cat-([0-9]+)\/([a-z0-9_-]+)\.([a-z0-9_-]+)\??([^?]+)?/i", 
+         self::$fullUrl, $matches)) {
          return false;
       }
-      $this->category = $matches['category'];
-      $this->name = $matches['name'];
-      $this->action = $matches['action'];
-      $this->outputType = $matches['output'];
-      $this->lang = $matches['lang'];
-      if(isset ($matches['params'])) {
-         $this->params = $matches['params'];
+      $this->category = $matches[3];
+      $this->name = $matches[1];
+      $this->action = $matches[4];
+      $this->outputType = $matches[5];
+      $this->lang = $matches[2];
+      if(isset ($matches[6])) {
+         $this->params = $matches[6];
       }
       $this->urlType = self::URL_TYPE_JSPLUGIN_REQUEST;
       $this->pageFull = false;
