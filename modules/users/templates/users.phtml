@@ -33,7 +33,7 @@ $grpsArr = array();
       /* <![CDATA[ */
       var selectedGroupId = 0;
       $(document).ready(function() {
-         var addressGrid = $("#table-users").jqGrid({
+         var usersGrid = $("#table-users").jqGrid({
             ajaxGridOptions : {type:"POST"},
             url: '<?=$this->link()->route('usersList');?>?idgrp='+$('#select-group-id').val().toString(),
             datatype: "json",
@@ -70,13 +70,12 @@ $grpsArr = array();
             editurl:"<?=$this->link()->route('editUser')?>",
             toolbar: [true,"top"]
          });
-         addressGrid.jqGrid('navGrid','#table-users-toolbar',{edit:false,add:false,del:false});
          $("#t_table-users").append($('#table-users-toolbar'));
          /* změna skupiny */
          $("#select-group-id").change(function(){
             baseId = this.value;
-            addressGrid.jqGrid('setGridParam', { url: '<?=$this->link()->route('usersList');?>?idgrp='+this.value});
-            addressGrid.trigger("reloadGrid");
+            usersGrid.jqGrid('setGridParam', { url: '<?=$this->link()->route('usersList');?>?idgrp='+this.value});
+            usersGrid.trigger("reloadGrid");
          });
          /* změna statusu usera */
          $('#table-users input[type=checkbox]').live('change',function(){
@@ -89,10 +88,10 @@ $grpsArr = array();
             });
          });
 
-         // úpravy
-         jQuery("#table-users").jqGrid('navGrid','#table-users-pager',
-            {view:false}, //options
-            {height:320,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
+         usersGrid.jqGrid('navGrid','#table-users-pager',
+            {edit:true,add:true,del:true},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
                bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -103,7 +102,8 @@ $grpsArr = array();
                   return [res.allOk,msg];
                }
             },
-            {height:300,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
                bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -114,9 +114,10 @@ $grpsArr = array();
                   return [res.allOk,msg];
                },
                afterShowForm : function(){
-                  $('#gname').val($('#select-group-id').val());
+                  $('#id_group').val($('#select-group-id').val());
                }
-            },  // del options
+            },  
+            // del options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true,
                afterSubmit : function(respond, postdata){
                   var res = eval("("+respond.responseText+")");
@@ -127,8 +128,8 @@ $grpsArr = array();
                   return [res.allOk,msg];
                }
             },
-            {closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']}, // search options
-            {height:120,jqModal:true,closeOnEscape:true} // view options
+            {multipleSearch:false, closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
          );
       });
       /* ]]> */

@@ -34,9 +34,7 @@ $this->addJsPlugin($jQuery);
                {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
                   formoptions:{ rowpos:3, label: "<?=$this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'<?=Model_Groups::COLUMN_IS_ADMIN?>',index:'<?=Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
-//                   formatoptions:{disabled: false, 'class' : 'blockUser'},
                   width:60,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
-//                   ,dataEvents: [ {  type: 'change',fn: function(e) {if($(this).is(':checked')){$('#subsites').removeAttr('disabled');} else {$('#subsites').attr('disabled', true);}} } ]
                   },
                   formoptions:{ rowpos:4, label: "<?=$this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'sites',index:'sites', width:170, editable: true, edittype:"select", editoptions: {
@@ -54,11 +52,11 @@ $this->addJsPlugin($jQuery);
             width : 650,
             editurl:"<?=$this->link()->route('editGroup')?>"
          });
-         groupsGrid.jqGrid('navGrid','#table-groups-toolbar',{edit:false,add:false,del:false});
-         // úpravy
-         jQuery("#table-groups").jqGrid('navGrid','#table-groups-pager',
-            {view:false}, //options
-            {height:350,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
+         $.jgrid.del.msg = '<strong>'+$.jgrid.del.msg+"</strong><br /><?=$this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
+         groupsGrid.jqGrid('navGrid','#table-groups-pager',
+            {edit:true,add:true,del:true},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
                bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -71,8 +69,7 @@ $this->addJsPlugin($jQuery);
                afterShowForm : function(formid){
                   var data = groupsGrid.getCell(groupsGrid.jqGrid('getGridParam','selrow'), 'sites');
                   if(data != false || data != null){
-                     data = data.split(';');
-                     data.pop();
+                     data = data.split(',');
                      $('#sites option').each(function(){
                         if($.inArray($(this).text(),data) != -1){
                            $(this).attr('selected', 'selected');
@@ -81,9 +78,10 @@ $this->addJsPlugin($jQuery);
                         }
                      });
                   }
-               },
+               }
             },
-            {height:300,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
                bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -93,8 +91,9 @@ $this->addJsPlugin($jQuery);
                   }
                   return [res.allOk,msg];
                }
-            },  // del options
-            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true,
+            },  
+            // del options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true, width: 300,
                afterSubmit : function(respond, postdata){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -104,8 +103,8 @@ $this->addJsPlugin($jQuery);
                   return [res.allOk,msg];
                }
             },
-            {closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']}, // search options
-            {height:120,jqModal:true,closeOnEscape:true} // view options
+            {multipleSearch:false, closeAfterSearch: true, closeOnEscape:true,sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
          );
       });
       /* ]]> */

@@ -13,93 +13,22 @@ class Users_Controller extends Controller {
 
    public function mainController() {
       $this->checkControllRights();
-      $model = new Model_Groups();
 
-      $this->view()->groups = $model->records();
-
-//      /*
-//       * Odstranění uživatele
-//      */
-//      $formRemove = new Form('user_');
-//      $elemId = new Form_Element_Hidden('id');
-//      $formRemove->addElement($elemId);
-//      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
-//      $formRemove->addElement($elemSub);
-//
-//      if($formRemove->isValid()) {
-//         $user = $model->getUserById($formRemove->id->getValues());
-//         $model->deleteUser($formRemove->id->getValues());
-//         $this->infoMsg()->addMessage($this->_(sprintf('Uživatel "%s" byl smazán', $user->{Model_Users::COLUMN_USERNAME})));
-//         $this->link()->reload();
-//      }
-//
-//      /*
-//       * Odstranění skupiny
-//      */
-//      $formRemoveGr = new Form('group_');
-//      $elemId = new Form_Element_Hidden('id');
-//      $formRemoveGr->addElement($elemId);
-//      $elemSub = new Form_Element_SubmitImage('remove', $this->_('Odstranit'));
-//      $formRemoveGr->addElement($elemSub);
-//
-//      if($formRemoveGr->isValid()) {
-//         $group = $model->getGroupById($formRemoveGr->id->getValues());
-//         $model->deleteGroup($formRemoveGr->id->getValues());
-//         // smazání všech práv k dané skupině
-//         $rModel = new Model_Rights();
-//         $rModel->deleteRightsByGrID($formRemoveGr->id->getValues());
-//
-//         /**
-//          * Odstranění gloválních dat
-//          */
-//         if(VVE_USE_GLOBAL_ACCOUNTS === true) {
-//            $array = explode(';', VVE_USE_GLOBAL_ACCOUNTS_TB_PREFIXES);
-//            if(!empty ($array)) {
-//               foreach ($array as $tblPrefix) {
-//                  $rModel->deleteRightsByGrID($formRemoveGr->id->getValues(), $tblPrefix);
-//               }
-//            }
-//         }
-//
-//         $this->infoMsg()->addMessage($this->_(sprintf('Skupina "%s" byla smazána', $group->{Model_Users::COLUMN_GROUP_NAME})));
-//         $this->link()->reload();
-//      }
-//
-//      /*
-//       * Změna uživatelského statusu
-//      */
-//      $formEnable = new Form('userstatus_');
-//
-//      $elemId = new Form_Element_Hidden('id');
-//      $formEnable->addElement($elemId);
-//      $elemStat = new Form_Element_Hidden('status');
-//      $formEnable->addElement($elemStat);
-//
-//      $elemSub = new Form_Element_SubmitImage('change', $this->_('Změnit'));
-//      $formEnable->addElement($elemSub);
-//
-//      if($formEnable->isValid()) {
-//         if($formEnable->status->getValues() == 'enable') {
-//            $model->enableUser($formEnable->id->getValues());
-//            $this->infoMsg()->addMessage($this->_('Uživatel byl aktivován'));
-//         } else if($formEnable->status->getValues() == 'disable') {
-//            $model->disableUser($formEnable->id->getValues());
-//            $this->infoMsg()->addMessage($this->_('Uživatel byl deaktivován'));
-//         }
-//         $this->link()->reload();
-//      }
+      $this->view()->groups = $this->getAllowedGroups();
    }
 
    public function groupsController() {
       $this->checkControllRights();
       $model = new Model_Sites();
       $sites = array();
+      $allowedSite = Auth::getUserSites();
       foreach ($model->records() as $site) {
-         $sites[$site->{Model_Sites::COLUMN_ID}] = $site->{Model_Sites::COLUMN_DOMAIN};
+         if(isset ($allowedSite[$site->{Model_Sites::COLUMN_DOMAIN}]) OR empty ($allowedSite)){
+            $sites[$site->{Model_Sites::COLUMN_ID}] = $site->{Model_Sites::COLUMN_DOMAIN};
+         }
       }
       $this->view()->sites = $sites;
    }
-
 
    public function usersListController() {
       $this->checkReadableRights();
@@ -163,7 +92,6 @@ class Users_Controller extends Controller {
       // objekt komponenty JGrid
       $jqGrid = new Component_JqGrid();
       $jqGrid->request()->setDefaultOrderField(Model_Users::COLUMN_ID);
-      $modelGrps = new Model_Groups();
       // search
       if ($jqGrid->request()->isSearch()) {
 //         $count = $modelAddresBook->searchCount($jqGrid->request()->searchString(),
@@ -178,51 +106,66 @@ class Users_Controller extends Controller {
 //            $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
       } else {
       // list
-
-//          if(Auth::isSuperAdmin()){
-            // vidí všechny administrátory
-            $jqGrid->respond()->setRecords($modelGrps->count());
-            $modelGrps->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)
-               ->order(array($jqGrid->request()->orderField => $jqGrid->request()->order));
-//          } else {
-//             vidí pouze adminy, kteří jsou přiřazeni k této subdoméně
-
-//          }
-         // skupiny s připojeným modelem subsites
-//             ->join(Model_Groups::COLUMN_ID, array('t_ssag' => 'Model_SitesAdminGroups'), Model_SitesAdminGroups::COLUMN_ID_GROUP, array(Model_SitesAdminGroups::COLUMN_ID_SITE))
-//             ->join(array('t_ssag' => Model_SitesAdminGroups::COLUMN_ID_SITE), 'Model_SubSites', Model_SubSites::COLUMN_ID, array(Model_SubSites::COLUMN_DOMAIN))
-
-         $groups = $modelGrps->records();
+         $groups = $this->getAllowedGroups($jqGrid);
       }
-
-
 
       // out
       foreach ($groups as $grp) {
-         $substr = "";
-         $subIds = array();
-
-         $modelSubSites = new Model_Sites();
-         $subsites = $modelSubSites->join(Model_Sites::COLUMN_ID, 'Model_SitesGroups', Model_SitesGroups::COLUMN_ID_SITE, false)
-            ->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idgrp', array('idgrp' => $grp->{Model_Groups::COLUMN_ID}))
-            ->records();
-
-         if($subsites != false){
-            foreach($subsites as $site) {
-               $substr .= $site->{Model_Sites::COLUMN_DOMAIN}.';';
-               array_push($subIds, $site->{Model_Sites::COLUMN_DOMAIN});
-            }
-         }
          array_push($jqGrid->respond()->rows, array('id' => $grp->{Model_Groups::COLUMN_ID},
              'cell' => array(
                  $grp->{Model_Groups::COLUMN_ID},
                  $grp->{Model_Groups::COLUMN_NAME},
                  $grp->{Model_Groups::COLUMN_LABEL},
                  $grp->{Model_Groups::COLUMN_IS_ADMIN},
-                 $substr
+                 $grp->domains,
                  )));
       }
       $this->view()->respond = $jqGrid->respond();
+   }
+   
+   private function getAllowedGroups($jqGrid = null)
+   {
+      $userSites = Auth::getUserSites();
+
+      $modelSubSites = new Model_Sites();
+      $sites = $modelSubSites->join(Model_Sites::COLUMN_ID, 'Model_SitesGroups', Model_SitesGroups::COLUMN_ID_SITE)->records();
+      if($sites == false){
+         throw new UnexpectedValueException('Nebyly nalezeny poddomény');
+      }
+      
+      $allowedGroups = array();
+      foreach ($sites as $site) {
+         if(!isset($allowedGroups[$site->{Model_SitesGroups::COLUMN_ID_GROUP}])){
+            $allowedGroups[$site->{Model_SitesGroups::COLUMN_ID_GROUP}] = array();
+         }
+         if(empty ($userSites) OR in_array($site->{Model_Sites::COLUMN_ID}, $userSites)){
+            array_push($allowedGroups[$site->{Model_SitesGroups::COLUMN_ID_GROUP}], $site->{Model_Sites::COLUMN_DOMAIN});
+         } else {
+            unset($allowedGroups[$site->{Model_SitesGroups::COLUMN_ID_GROUP}]);
+         }
+      }
+      // skupiny s připojeným modelem subsites
+      $modelSG = new Model_Groups();
+      if(!empty ($userSites)){
+         $modelSG->where(Model_Groups::COLUMN_ID.' IN ('.implode(',', array_keys($allowedGroups)).')', array());
+      }
+/*      SELECT `t_grp`.`id_group`, `t_grp`.`name` AS `gname`, `t_grp`.`label`, `t_grp`.`admin`,
+GROUP_CONCAT(ts.domain) as domains
+FROM `cube_cms`.`vypecky_groups` AS t_grp
+LEFT JOIN `cube_cms`.`vypecky_sites_groups` AS tsg ON `tsg`.`id_group` = t_grp.id_group
+LEFT JOIN `cube_cms`.`vypecky_sites` AS ts ON `ts`.`id_site` = tsg.id_site
+GROUP BY `t_grp`.`id_group`*/
+      $modelSG->columns(array('*', 'domains' => 'GROUP_CONCAT('.Model_Sites::COLUMN_DOMAIN.')'))
+      ->join(Model_Groups::COLUMN_ID, array('tsg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, false)
+      ->join(array('tsg' => Model_SitesGroups::COLUMN_ID_SITE), 'Model_Sites', Model_Sites::COLUMN_ID, false)
+      ->groupBy(array(Model_Groups::COLUMN_ID));
+      
+      if($jqGrid instanceof Component_JqGrid ){
+         $jqGrid->respond()->setRecords($modelSG->count());
+         $modelSG->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)
+            ->order(array($jqGrid->request()->orderField => $jqGrid->request()->order));
+      }
+      return $modelSG->records();
    }
 
    public function editUserController() {
@@ -306,6 +249,7 @@ class Users_Controller extends Controller {
       $this->checkWritebleRights();
       $model = new Model_Groups();
       $modelR = new Model_Rights();
+      $modelSitesGroups = new Model_SitesGroups();
       $this->view()->allOk = false;
       // část komponenty jqgrid pro formy
       $jqGridReq = new Component_JqGrid_FormRequest();
@@ -325,57 +269,42 @@ class Users_Controller extends Controller {
             }
             $record = $model->record($jqGridReq->id);
             $record->mapArray($jqGridReq);
-
-            // uživatel je admin
-            if($jqGridReq->admin == true){
-
-            }
-
-            // namapování subdomén
-//             if(Auth::isSuperAdmin()){ // super admin má přístup ke všem doménaám a vytváří administrátory
-
-//             } else { // normální admin přidává administrátora pouze k aktuální subsite
-//             }
+            $grpId = $model->save($record);
 
             // smazání starých skupin <--> site
-            $modelSitesGroups = new Model_SitesGroups();
             $modelSitesGroups->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $jqGridReq->id))->delete(); // SECURITY ISSUE pokud vloží nesprávníé id vytvoří superadmin
 
+            $userSites = Auth::getUserSites();
+            
             if($jqGridReq->sites != null){
                $subdomainsIds = explode(',',$jqGridReq->sites);
 
                $recordSA = $modelSitesGroups->newRecord();
-               $recordSA->{Model_SitesGroups::COLUMN_ID_GROUP} = $jqGridReq->id;
+               $recordSA->{Model_SitesGroups::COLUMN_ID_GROUP} = $grpId;
                foreach($subdomainsIds as $sId) {
                   $recordSA->{Model_SitesGroups::COLUMN_ID_SITE} = $sId;
                   $modelSitesGroups->save($recordSA);
-                  $this->infoMsg()->addMessage('saved id '.$sId);
+//                  $this->infoMsg()->addMessage('saved id '.$sId);
                }
-            } else {
-               // domény zůstanou prázdné protože prázdné subdomény znamená superadmin
-            }
-
-
-            $grpId = $model->save($record);
-//             projití všech kategorií a vytvoření default práv pro danou skupinu
-            if($jqGridReq->id == null){ // vyloučíme editaci
-               $modelCats = new Model_Category();
-               $cats = $modelCats->getCategoryList(true);
-               foreach ($cats as $cat) {
-                  $rightRec = $modelR->newRecord();
-                  $rightRec->{Model_Rights::COLUMN_ID_CATEGORY} = $cat->{Model_Category::COLUMN_CAT_ID};
-                  $rightRec->{Model_Rights::COLUMN_ID_GROUP} = $grpId;
-                  $rightRec->{Model_Rights::COLUMN_RIGHT} = $cat->{Model_Category::COLUMN_DEF_RIGHT};
-//                   $modelR->save($rightRec);
+            } else if(!empty ($userSites)) {
+               $recordSA = $modelSitesGroups->newRecord();
+               $recordSA->{Model_SitesGroups::COLUMN_ID_GROUP} = $grpId;
+               foreach ($userSites as $domain => $ids) {
+                  $recordSA->{Model_SitesGroups::COLUMN_ID_SITE} = $ids;
+                  $modelSitesGroups->save($recordSA);
                }
             }
+            
             $this->infoMsg()->addMessage($this->_('Skpina byla uložena'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
-            $modelR;
+            $modelU = new Model_Users();
             foreach ($jqGridReq->getIds() as $id) {
                $model->delete($id);
                $modelR->where(Model_Rights::COLUMN_ID_GROUP, $id)->delete(); // delete all rights
+               $modelSitesGroups->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $id))->delete(); // smazání vazeb na subdomény a skupiny
+               // Smazání uživatelů
+               $modelU->where(Model_Users::COLUMN_GROUP_ID.' = :idg', array('idg' => $id))->delete();
             }
             $this->infoMsg()->addMessage($this->_('Vybrané skupiny byly smazány'));
             break;
