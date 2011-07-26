@@ -151,7 +151,7 @@ class Url_Request {
       $fullUrl = $_SERVER['REQUEST_URI'];
       $scriptName = $_SERVER["SCRIPT_NAME"];
       self::$serverName = $_SERVER["HTTP_HOST"];
-
+      
       if(self::$serverName != 'localhost'){
          $pos = strpos(self::$serverName, '.');
          self::$domain = substr(self::$serverName, $pos+1);
@@ -383,17 +383,6 @@ class Url_Request {
       if(isset ($matches[6])) {
          $this->params = $matches[6];
       }
-/*      if(!preg_match("/component\/(?P<name>[a-z0-9_-]+)\/(?:(?P<lang>[a-z]{2})\/)?(?P<category>[a-z0-9_-]+)\/(?P<action>[a-z0-9_-]+)\.(?P<output>[a-z0-9_-]+)\??(?<params>[^?]+)?/i", self::$fullUrl, $matches)) {
-         return false;
-      }
-      $this->category = $matches['category'];
-      $this->name = $matches['name'];
-      $this->action = $matches['action'];
-      $this->outputType = $matches['output'];
-      $this->lang = $matches['lang'];
-      if(isset ($matches['params'])) {
-         $this->params = $matches['params'];
-      }*/
       $this->urlType = self::URL_TYPE_COMPONENT_REQUEST;
       $this->pageFull = false;
       return true;
