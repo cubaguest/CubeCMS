@@ -146,7 +146,7 @@ class Url_Link {
     */
    public static function getTransferProtocol() {
       if(self::$user_transfer_protocol == null) {
-      //         return Url_Request::TRANSFER_PROTOCOL;
+         return 'http';
       } else {
          return self::$user_transfer_protocol;
       }
