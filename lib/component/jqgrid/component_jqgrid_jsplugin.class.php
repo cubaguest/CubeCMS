@@ -11,21 +11,27 @@
  * @see           http://www.trirand.com/
  */
 
-class Component_JqGrid_JsPlugin extends JsPlugin {
+class Component_JqGrid_JsPlugin extends JsPlugin_JQuery {
 	protected function initJsPlugin() {
+      parent::initJsPlugin();
+      $this->setJsFilesDir('jquery');
+      $this->addUICore();
+      $this->addCss('resizable');
+      
       $this->setJsFilesDir('jqgrid');
 	}
 	
 	protected function setFiles() {
-      $jquery = new JsPlugin_JQuery();
-      $jquery->addUICore();
-      $this->addDependJsPlugin($jquery);
+//      $jquery = new JsPlugin_JQuery();
+//      $jquery->addUICore();
+//      $this->addDependJsPlugin($jquery);
+//      $this->addDependJsPlugin(new JsPlugin_JQueryCSS());
+//      $jquery->addUICore();
 //		Přidání css stylu
 		$this->addFile(new JsPlugin_CssFile('css/ui.jqgrid.css'));
 		//		Přidání js soubrů pluginu
 		$this->addFile(new JsPlugin_JsFile("i18n/grid.locale-".Locales::getLang().".js"));
 		$this->addFile(new JsPlugin_JsFile("jquery.jqGrid.min.js"));
-//		$this->addFile(new JsPlugin_JsFile("jquery.jqgrid.loader.js"));
 	}
 
    public function setCellEdit() {

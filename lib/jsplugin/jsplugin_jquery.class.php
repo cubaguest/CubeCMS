@@ -14,7 +14,7 @@
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME = 'base';
    const JQUERY_VERSION = '1.5.2';
-   const JQUERY_UI_VERSION = '1.8.12';
+   const JQUERY_UI_VERSION = '1.8.14';
 
    const FACE_THEME_DIR = 'jqueryui';
 
@@ -65,7 +65,7 @@ class JsPlugin_JQuery extends JsPlugin {
       return Url_Request::getBaseWebDir(true).self::JSPLUGINS_BASE_DIR.'/jquery/ui/themes/'.$theme.'/';
    }
 
-   private function addCss($css) {
+   protected function addCss($css) {
       // NOT wok correctly
 //      if(defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1 AND in_array($this->getCfgParam('theme'), self::$GoogleCDNThemes)){
 //         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/themes/".$this->getCfgParam('theme')."/jquery-ui.css");
@@ -74,7 +74,7 @@ class JsPlugin_JQuery extends JsPlugin {
 //      }
    }
 
-   private function addJs($name) {
+   protected function addJs($name) {
       if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1) {
          $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
       } else {
