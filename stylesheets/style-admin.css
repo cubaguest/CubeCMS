@@ -194,45 +194,10 @@ a.form-link-lang-sel {
 .main-content-text, .main-content-images, .main-content-list {
    border-width: 0;
 } /* text v hlavním obsahu */
-
-ul.module-navigation {
-   border-bottom: 1px solid silver;
-   padding:4px 5px;
-   margin: 0;
-   margin-bottom: 5px;
-}
-ul.module-navigation li {
-   margin-left: 0;
-}
-li.module-navigation-tab {
-   display: inline;
-   font-weight: bold;
-   font-size: 10px;
-}
-li.module-navigation-tab a {
-   border-color: #989FA9;
-   border-style:solid solid none;
-   border-width:1px;
-   color:#000000;
-   padding-top:4px;
-   position:relative;
-   top:1px;
-   background-color:#e3e3e3;
-   color:#666666;
-   margin-right:0;
-   padding:3px 4px;
-   text-decoration:none;
-   overflow: hidden;
-}
 li.module-navigation-tab a img {
    top: 5px;
-/*   position: relative;*/
    vertical-align: -3px;
    padding-right: 4px;
-}
-li.module-navigation-tab-selected a {
-   border-bottom:1px solid #FFFFFF;
-   background-color:#FFFFFF;
 }
 .lang-image {padding-right: 2px; width: 18px; height: 12px;}
 
