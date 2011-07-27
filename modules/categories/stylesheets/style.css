@@ -68,3 +68,12 @@
 
 #category-info label { font-weight: bold;}
 #category-info p { margin-left: 10px;}
+
+div.moduleLabel table {
+   margin-top: 10px;
+   border: 1px solid silver;
+}
+div.moduleLabel table tr td, div.moduleLabel table tr th {
+   padding: 3px;
+   vertical-align: top;
+}
