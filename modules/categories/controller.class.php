@@ -528,8 +528,15 @@ class Categories_Controller extends Controller {
       $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii (r - čtení, w - zápis, c - úplná kontrola)'));
 
       // pole s typy práv
-      $rightsTypes = array('r--' => 'r--', '-w-' => '-w-', '--c' => '--c', 'rw-' => 'rw-',
-         'r-c' => 'r-c', '-wc' => '-wc', 'rwc' => 'rwc', '---' => '---');
+      $rightsTypes = array(
+         $this->tr('Pouze čtení (r--)') => 'r--', 
+         $this->tr('Pouze zápis (-w-)') => '-w-', 
+         $this->tr('Pouze kontrola (--c)') => '--c', 
+         $this->tr('Čtení a zápis (rw-)') => 'rw-',
+         $this->tr('Čtení a kontrola (r-c)') => 'r-c', 
+         $this->tr('Zápis a kontrola (-wc)') => '-wc', 
+         $this->tr('Všechna oprávnění (rwc)') => 'rwc', 
+         $this->tr('Žádná oprávnění (---)') => '---');
 
       // výchozí práva kategorie
       $catGrpRigths = new Form_Element_Select('rights_default', $this->tr('Výchozí práva'));
