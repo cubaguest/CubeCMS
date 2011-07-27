@@ -45,7 +45,9 @@ $this->addJsPlugin($jQuery);
 //      $this->formImport->separator->html()->setAttrib('size', 1);
       echo '<h3>'.$this->_('Odstranění duplicitních emailů z adresáře.').'</h3>';
       echo $this->formRemoveDuplicity;
+      echo $this->_('Odstraněny budou všechny duplicitní e-mailové adresy.');
       ?>
+      <hr class="reseter" />
 	</div>
 </div>
    <br />
@@ -71,25 +73,21 @@ $this->addJsPlugin($jQuery);
             sortname: '<?=Mails_Model_Groups::COLUMN_NAME?>',
             caption:"Skupiny",
             height: 120,
-            width : 550,
+            width : $('.main-content-detail').width(),
             editurl:"<?=$this->link()->route('editGroup')?>",
             loadComplete : function(){
-               jQuery("#table-addressbook-groups").jqGrid('setSelection', $('#table-addressbook-groups tr:first').attr('id'), true);
+               $("#table-addressbook-groups").setSelection($("#table-addressbook-groups").getDataIDs()[0],true);
             },
             onSelectRow: function(ids) {
                if(ids != null) {
-                  jQuery("#table-addressbook").jqGrid('setGridParam',{url:"<?=$this->link()->route('addressList');?>?idgrp="+ids,page:1});
+                  jQuery("#table-addressbook").jqGrid('setGridParam',{url:"<?=$this->link()->clear()->route('addressList');?>?idgrp="+ids,page:1});
                   jQuery("#table-addressbook").jqGrid('setCaption',"E-maily skupiny: "
                      +jQuery("#table-addressbook-groups").jqGrid('getRowData',ids).name).trigger('reloadGrid');
                }
-//               jQuery("#table-addressbook").searchGrid().clearSearch();
-//               jQuery("#table-addressbook").searchGrid().clearSearch().hide();
-               jQuery("#fbox_table-addressbook").searchFilter().reset();
-//               $("#table-addressbook").setGridParam({search:false,searchdata: {},page:1}).trigger("reloadGrid");
             }
          });
          // úpravy
-         jQuery("#table-addressbook-groups").jqGrid('navGrid','#table-addressbook-groups-pager',
+         groupsGrid.jqGrid('navGrid','#table-addressbook-groups-pager',
             {view:false}, //options
             {height:200,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
                bottominfo:"<?=$this->_('Položky označené (*) jsou povinné')?>",
@@ -153,11 +151,8 @@ $this->addJsPlugin($jQuery);
             sortname: '<?=Mails_Model_Addressbook::COLUMN_MAIL?>',
             caption:"E-maily skupiny",
             height: 350,
-            width : 550,
-            editurl:"<?=$this->link()->route('editMail')?>",
-//            loadComplete : function(){
-//               addressGrid.FilterForm.reset();
-//            }
+            width : $('.main-content-detail').width(),
+            editurl:"<?=$this->link()->route('editMail')?>"
          });
          // úpravy
          jQuery("#table-addressbook").jqGrid('navGrid','#table-addressbook-pager',
@@ -213,7 +208,7 @@ $this->addJsPlugin($jQuery);
             buttonicon:"ui-icon-mail-closed",
             onClickButton: function(){
                // serializace mailů do url adresy
-               var composeLink = '<?=$this->link()->clear()?>?mail='+escape(addressGrid.getRowData(addressGrid.getGridParam('selrow')).mail);
+               var composeLink = '<?=$this->link()->param('mail')?>?mail='+escape(addressGrid.getRowData(addressGrid.getGridParam('selrow')).mail);
                window.location.href = composeLink;
             },
             title: "<?=$this->_('Poslat e-mail označenému')?>",
