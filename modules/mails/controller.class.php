@@ -275,9 +275,7 @@ class Mails_Controller extends Controller {
          $this->errMsg()->addMessage($this->_('Odeslání neexistujícího mailu z fronty'));
       }
 
-//      if($sData['sendbatch'] == true){
       $mailObj->addAddress($mailData->{Mails_Model_SendQueue::COLUMN_MAIL}, $mailData->{Mails_Model_SendQueue::COLUMN_NAME});
-//      }
 
       $failures = array();
       if(!$mailObj->send($failures)){

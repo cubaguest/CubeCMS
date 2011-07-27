@@ -5,6 +5,7 @@ $this->addCssFile('style.css');
 <h1><?=$this->_('Fronta odesílání e-mailů')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div>
+<br />
 <div id="mails-queue-buttons">
 <?
 if($this->formSend != null){
@@ -21,14 +22,18 @@ if($this->formSend != null){
 }
 ?>
 </div>
-   <table id="mails-queue">
-   <tr id="mails-queue-table-header">
-      <th width="400">e-mail</th>
-      <th>status</th>
-   </tr>
+<br />
+<table id="mails-queue" class="ui-widget">
+   <thead class="ui-widget-header">
+      <tr id="mails-queue-table-header">
+         <th style="width: 80%">e-mail</th>
+         <th>status</th>
+      </tr>
+   </thead>
    <?
-   if(!empty ($this->queue)){
-      foreach ($this->queue as $mail) {?>
+   if(!empty ($this->queue)){?>
+      <tbody class="ui-widget-content">
+      <?foreach ($this->queue as $mail) {?>
    <tr class="mail-row">
       <td class="mail-row-data">
          <?
@@ -42,8 +47,9 @@ if($this->formSend != null){
       </td>
       <td class="mail-row-status"></td>
    </tr>
-      <?}
-   } else {?>
+      <?}?>
+      </tbody>
+   <?} else {?>
    <tr>
       <td colspan="2"><?=$this->_('Fronta je prázdná');?></td>
    </tr>

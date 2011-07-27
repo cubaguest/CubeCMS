@@ -4,7 +4,7 @@ $this->addCssFile('style.css');
 ?>
 <h1><?=$this->category()->getName().' - '.$this->_('vytvořit e-mail')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
-<div id="mails-send-mail-form">
+<div class="main-content-form-edit" id="mails-send-mail-form">
    <?
    $jQ = new JsPlugin_JQuery();
    $jQ->addUITabs();
@@ -14,28 +14,32 @@ $this->addCssFile('style.css');
    <?
    $this->form->html()->setAttrib('id', 'mail-send-form');
    echo $this->form->renderStart(); ?>
-   <table>
+      <fieldset>
+      <table class="form-table">
       <tr>
-         <td>
-            <? echo $this->form->recipients->label() ?><br />
+         <th class="form-labels">
+            <? echo $this->form->recipients->label() ?>
+         </th>
+         <td class="form-controlls">
             <? $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5);
             echo $this->form->recipients->controll(); ?>
             <? echo $this->form->recipients->sublabel() ?>
-            <br />
          </td>
       </tr>
       <tr>
+         <th class="form-labels">
+            <?=$this->_('Uložené Maily') ?>:
+         </th>
          <td>
-            <label><?=$this->_('Přidat e-mail z') ?>:</label>
             <div id="address-tabs">
                <ul>
-                  <li><a href="#tabs-mails-addressbook"><?=$this->_('Adresáře') ?></a></li>
-                  <li><a href="#tabs-mails-users"><?=$this->_('Uživatelů systému') ?></a></li>
+                  <li><a href="#tabs-mails-addressbook"><?=$this->_('Adresář') ?></a></li>
+                  <li><a href="#tabs-mails-users"><?=$this->_('Uživatelé systému') ?></a></li>
                   <?if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
-                     <li><a href="#tabs-mails-newsletter"><?=$this->_('NewsLetteru') ?></a></li>
+                     <li><a href="#tabs-mails-newsletter"><?=$this->_('NewsLetter') ?></a></li>
                   <?}?>
                   <?if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
-                     <li><a href="#tabs-mails-guestbook"><?=$this->_('Knihy návštěv') ?></a></li>
+                     <li><a href="#tabs-mails-guestbook"><?=$this->_('Kniha návštěv') ?></a></li>
                   <?}?>
                </ul>
                <div id="tabs-mails-addressbook">
@@ -53,8 +57,8 @@ $this->addCssFile('style.css');
                         ?><option value="<?=$str?>"><?=$str?></option><?
                      }?>
                   </select><br />
-                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
-                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" /><br />
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" data-select="mails-addressbook" />
+                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" data-select="mails-addressbook" /><br />
                   <br />
                   <label for="mails-addressbook-groups"><?=$this->_('Adresy ze skupiny')?>:</label><br />
                   <select name="mails-addressbook-groups" id="mails-addressbook-groups">
@@ -65,12 +69,16 @@ $this->addCssFile('style.css');
                   <input type="button" value="<?=$this->_('Přidat')?>" name="button-add-group" /><br />
                </div>
                <div id="tabs-mails-users">
+                  <table style="width: 100%;">
                   <?foreach ($this->mailsUsers as $gname => $grp) {
-                     $gnameAscii = vve_to_ascii($gname);
+                     $gnameAscii = md5($gname);
                      ?>
-                  <div>
-                  <label for="mails-users-grp-<?=$gnameAscii?>"><?=$this->_('Skupina').':&nbsp;'.$gname?></label><br />
-                  <select name="mails-users" class="mail-selected" id="mails-users-grp-<?=$gnameAscii?>">
+                     <tr>
+                        <td colspan="2"><label for="mails-users-grp-<?=$gnameAscii?>"><?=$this->_('Skupina').':&nbsp;'.$gname?></label></td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <select name="mails-users" class="mail-selected" id="mails-users-grp-<?=$gnameAscii?>">
                      <?foreach ($grp as $mail) {
                         if($mail->{Model_Users::COLUMN_MAIL} == null) continue;
                         $m = explode(';', $mail->{Model_Users::COLUMN_MAIL});
@@ -79,16 +87,19 @@ $this->addCssFile('style.css');
                            $str .= '"'.$mail->{Model_Users::COLUMN_NAME}
                            ." ".$mail->{Model_Users::COLUMN_SURNAME}.'" ';
                         } 
-//                           echo $mail->{Model_Users::COLUMN_USERNAME};
                         $str .= '<'.$m[0].'>';
                         $str = htmlspecialchars($str);
                         ?><option value="<?=$str;?>"><?=$str;?></option><?
                      }?>
-                  </select>
-                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
-                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
-                  </div>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" data-select="mails-users-grp-<?=$gnameAscii?>" />
+                           <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" data-select="mails-users-grp-<?=$gnameAscii?>"  />
+                        </td>
+                     </tr>
                   <?}?>
+                  </table>
                </div>
                   <?if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
                <div id="tabs-mails-newsletter">
@@ -99,8 +110,8 @@ $this->addCssFile('style.css');
                         ?><option value="<?=$str?>"><?=$str;?></option><?
                      }?>
                   </select>
-                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
-                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" data-select="mails-newsletters" />
+                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" data-select="mails-newsletters" />
                </div>
                   <?}?>
                   <?if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
@@ -113,8 +124,8 @@ $this->addCssFile('style.css');
                         ?><option value="<?=$str;?>"><?=$str;?></option>
                      <?}?>
                   </select>
-                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" />
-                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" />
+                  <input type="button" value="<?=$this->_('Přidat')?>" class="button-add" data-select="mails-guestbook" />
+                  <input type="button" value="<?=$this->_('Přidat všechny')?>" class="button-add-all" data-select="mails-guestbook" />
                </div>
                   <?}?>
             </div>
@@ -122,17 +133,20 @@ $this->addCssFile('style.css');
          </td>
       </tr>
       <tr>
-         <td>
-            <? echo $this->form->subject->label() ?><br />
-            <? $this->form->subject->html()->setAttrib('size', 60);
-                     echo $this->form->subject->controll(); ?><br />
-                     <br />
-                  </td>
-               </tr>
-               <tr>
-                  <td>
-            <? echo $this->form->text->label() ?>&nbsp;
-                  <?=$this->_('editor') ?>:&nbsp;<a href="<?=$this->link() ?>#disableEditor"
+         <th class="form-labels">
+            <? echo $this->form->subject->label() ?>
+         </th>
+         <td class="form-controlls">
+            <? 
+            $this->form->subject->html()->setAttrib('size', 60);
+            echo $this->form->subject->controll(); 
+            ?><br />
+         </td>
+      </tr>
+      <tr>
+         <th class="form-labels"><? echo $this->form->text->label() ?></th>
+         <td class="form-controlls">
+            <?=$this->_('editor') ?>:&nbsp;<a href="<?=$this->link() ?>#disableEditor"
                       onclick="toggleEditor('sendmail_text_1');"
                       title="<?=$this->_('vypnout/zapnout editor') ?>"><?=$this->_('OFF/ON') ?></a>
             <br />
@@ -143,33 +157,27 @@ $this->addCssFile('style.css');
          </td>
       </tr>
       <tr>
-         <td align="">
-            <? echo $this->form->send->controll() ?>
-         </td>
-      </tr>
-      <tr>
-         <td>
-            <?
-            echo $this->form->sendBatch->label();
-            echo $this->form->sendBatch->controll();
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <? 
+            echo $this->form->send->controll();
             ?>
-            <br />
-            <br />
          </td>
       </tr>
       <tr>
-         <td>
+         <th class="form-labels"></th>
+         <td class="form-controlls">
             <?
             echo $this->form->sendQueue->label();
             echo $this->form->sendQueue->controll();
             echo $this->form->sendQueue->subLabel();
             ?>
             <br />
-            <br />
          </td>
       </tr>
       <tr>
-         <td>
+         <th class="form-labels"></th>
+         <td class="form-controlls">
             <?
             echo $this->form->file->label();
             echo $this->form->file->controll();
@@ -177,7 +185,17 @@ $this->addCssFile('style.css');
             <br />
          </td>
       </tr>
+      <tr>
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <? 
+            echo $this->form->sendBatch->label();
+            echo $this->form->sendBatch->controll();
+            ?>
+         </td>
+      </tr>
    </table>
+   </fieldset>
    <? echo $this->form->renderEnd(); ?>
 </div>
 <script type="text/javascript">
@@ -211,16 +229,15 @@ $this->addCssFile('style.css');
    $(function() {
       $recBox = $('textarea[name=sendmail_recipients]'); // init of box
       $("#address-tabs").tabs({collapsible: true,selected: -1});
+      
       $('input.button-add-all').click(function(){
-         $(this).parent('div').children('select.mail-selected').children('option').each(function() {
-            addMail($(this).val());
-         });
+         $('#'+$(this).data('select')).children('option').each(function() {addMail($(this).val());});
       });
       $('input.button-add').click(function(){
-         $(this).parent('div').children('select#mails-addressbook').children('option:selected').each(function(){
-            addMail($(this).val());
-         });
+         $('#'+$(this).data('select')).children('option:selected').each(function(){addMail($(this).val());});
       });
+      
+      
       $('select.mail-selected option').dblclick(function(){
          addMail($(this).val());
       });
@@ -276,21 +293,6 @@ $this->addCssFile('style.css');
 				return false;
 			}
 		});
-
-      // Odeslání pomocí ajaxu
-//      $('#mail-send-form').submit(function(){
-//         var mailsStr = $('textarea[name=sendmail_recipients]').val();
-//         if(mailsStr.length == 0){
-//            alert('Nebyla zadána žádná e-mailová adresa');
-//         }
-//         // regexp pro výběr emailů
-//         var mailRegex = new RegExp(/(?:(?:"[\w-\s]+")|(?:[\w-]+(?:\.[\w-]+)*)|(?:"[\w-\s]+")(?:[\w-]+(?:\.[\w-]+)*))(?:@(?:(?:[\w-]+\.)*\w[\w-]{0,66})\.(?:[a-z]{2,6}(?:?:\.[a-z]{2})?))|(?:@\[?(?:(?:25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?)/gi);
-//
-//
-//         return false;
-//
-//      });
-
    });
    /* ]]> */
 </script>

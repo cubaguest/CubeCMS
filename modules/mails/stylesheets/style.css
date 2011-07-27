@@ -1,10 +1,18 @@
-#address-tabs .ui-tabs-nav a {
-   padding: 3px;
-   font-size: 80%;
+#tabs-mails-users table {
+   width: 100%;
 }
 
-#mails-import-form-table td, #mails-import-form-table th {
+
+#mails-import-form-table td, #mails-import-form-table th,
+#tabs-mails-users td,
+#mails-queue td, #mails-queue th
+
+{
    padding: 3px;
+}
+
+#address-tabs .ui-state-disabled {
+   opacity: 1;
 }
 
 .ui-autocomplete {
@@ -37,10 +45,10 @@ div.mail-recipients, div.mail-content {
 #mails-queue {
    width: 98%;
 }
-#mails-queue td {
+/*#mails-queue td {
    border-bottom: 1px solid gray;
    padding: 2px 0;
-}
+}*/
 
 #mails-queue-buttons form,
 #mails-queue-buttons p {
