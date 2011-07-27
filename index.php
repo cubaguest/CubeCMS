@@ -14,7 +14,8 @@ if(!file_exists('data/lock.tmp')){
       require_once ('./app.php');
       AppCore::setAppMainLibDir(realpath(dirname(__FILE__)));
       AppCore::setAppMainDir(realpath(dirname(__FILE__)));
-      AppCore::createApp();
+      $app = AppCore::createApp();
+      $app->runCore();
    } else {
       include 'templates/update.phtml';
    }

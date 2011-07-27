@@ -240,12 +240,6 @@ class AppCore extends TrObject {
 
       //načtení potřebných knihoven
       spl_autoload_register(array('AppCore', '_loadLibraries'));
-
-      // inicializace db konektoru
-      $this->_initDb();
-
-      //Spuštění jádra aplikace
-      $this->runCore();
    }
 
    /**
@@ -319,7 +313,7 @@ class AppCore extends TrObject {
     */
    public static function createApp()
    {
-      self::getInstance();
+      return self::getInstance();
    }
 
    /**
@@ -747,6 +741,7 @@ class AppCore extends TrObject {
    public function runModuleOnly()
    {
       if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_REQUEST) {
+         $ret = false;
          ob_start();
          // spuštění modulu
          try {
@@ -809,9 +804,6 @@ class AppCore extends TrObject {
             ob_flush();
          }
          ob_end_flush();
-//         if(VVE_DEBUG_LEVEL > 2 AND !CoreErrors::isEmpty()){
-//            var_dump(CoreErrors::getErrors());
-//         }
          return $ret;
       } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST) {
          // načtení a kontrola cest u modulu
@@ -995,6 +987,8 @@ class AppCore extends TrObject {
    {
       // načtení systémového konfiguračního souboru
       try {
+         // inicializace db konektoru
+         $this->_initDb();
          // config
          $this->_initConfig();
          // inicializace URL
