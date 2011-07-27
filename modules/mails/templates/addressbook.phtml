@@ -208,7 +208,7 @@ $this->addJsPlugin($jQuery);
             buttonicon:"ui-icon-mail-closed",
             onClickButton: function(){
                // serializace mailů do url adresy
-               var composeLink = '<?=$this->link()->param('mail')?>?mail='+escape(addressGrid.getRowData(addressGrid.getGridParam('selrow')).mail);
+               var composeLink = '<?=$this->link()->clear()?>?mail='+escape(addressGrid.getRowData(addressGrid.getGridParam('selrow')).mail);
                window.location.href = composeLink;
             },
             title: "<?=$this->_('Poslat e-mail označenému')?>",

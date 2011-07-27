@@ -20,10 +20,6 @@ class Mails_Routes extends Routes {
       $this->addRoute('searchMail', 'searchmail.php', 'searchMail', 'searchmail.php', 'XHR_Respond_VVEAPI');
       // ajax odeslání
       $this->addRoute('sendMail', 'sendmail.php', 'sendMail', 'sendmail.php', 'XHR_Respond_VVEAPI');
-
-//      $this->addRoute('mailsExport', 'mails.(?P<output>(?:xml)|(?:csv)|(?:txt)|(?:json))', 'mailsExport', 'mails.{output}');
-
-      $this->addRoute('normal', null, 'main', null);
 	}
 }
 
