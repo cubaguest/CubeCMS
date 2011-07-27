@@ -28,5 +28,8 @@ class JsPlugin_JQueryCSS extends JsPlugin_JQuery {
       $this->addFile(new JsPlugin_CssFile("jquery.ui.core.css",false,  JsPlugin_JQuery::getThemeDir($this->getCfgParam('theme'))));
       $this->addFile(new JsPlugin_CssFile("jquery.ui.theme.css",false, JsPlugin_JQuery::getThemeDir($this->getCfgParam('theme'))));
 	}
+   
+   protected function addJs($name) {
+   }
 }
 ?>
