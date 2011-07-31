@@ -919,6 +919,7 @@ class AppCore extends TrObject {
       // view metoda
       $viewM = 'run'.ucfirst(self::$urlRequest->getOutputType()).'View';
       if(method_exists($ctrl, $viewM) AND self::$urlRequest->getOutputType() != 'html'){
+         Template_Output::sendHeaders();
          $ctrl->{$viewM}();
       } else {
           $ctrl->runView();
