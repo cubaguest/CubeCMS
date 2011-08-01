@@ -623,7 +623,7 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
       $grpSitemap = $form->addGroup('sitemap', $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
       
       $eName = new Form_Element_Text('name', $this->tr('Název kategorie'));
-      $eName->addValidation(new Form_Validator_NotEmpty());
+      $eName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $eName->setLangs();
       $eName->setValues($cat->{Model_Category::COLUMN_NAME});
       $form->addElement($eName, $grpBasic);
