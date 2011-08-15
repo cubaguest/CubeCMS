@@ -1,0 +1,53 @@
+<?
+$h = $this->category()->getName().' - '.$this->days[$this->day];
+Template_Core::setPageTitle($h);
+?>
+<h1><?echo $h;?></h1>
+<div class="main-content-detail">
+   <div class="main-content-text">
+   <?
+   if($this->category()->getRights()->isWritable()){
+      $this->items = array();
+      for ($di = 1; $di <= 7; $di++) {
+         if(date('N') == $di){
+            $this->items[$this->days[$di]] = (string)$this->link()->param('day');
+         } else {
+            $this->items[$this->days[$di]] = (string)$this->link()->param('day', $di);
+         }
+      }
+      $this->includeTpl('module_navigation.phtml', true);
+   } else {
+      if(isset ($_GET['day'])){?>
+         <a href="<?=$this->link()->param('day');?>" 
+            title="<?echo $this->tr('Přejít na menu na dnešek')?>"
+            ><?echo $this->tr('Menu na dnešek');?></a>
+      <?} else {?>
+         <a href="<?=$this->link()->param('day', $this->day+1 > 7 ? $di = 1 : $this->day+1);?>" 
+            title="<?$this->tr('Přejít na menu na zítřek')?>"
+            ><?echo $this->tr('Menu na zítřek')?></a>
+      <?}
+   }
+    
+   echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolbox;?>
+   </div>
+   <?
+   if($this->text != false){
+         $this->includeTpl('articletools.phtml', true, array(
+            'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
+              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
+              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
+              'shares' => array('url' => $this->link(), 'title' => $this->category()->getName())));
+   }
+   ?>
+</div>
+<?
+if(($this->text != null AND strpos((string)$this->text->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)
+   OR ($this->textPrivate != null AND strpos((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)){
+$this->addJsPlugin(new JsPlugin_PiroBox())?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
+      /* ]]> */
+</script>
+<?}
+?>

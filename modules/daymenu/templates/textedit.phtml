@@ -1,0 +1,12 @@
+<?
+$h = sprintf($this->tr('úprava textu "%s" pro "%s"'), 
+   $this->category()->getName(), ucfirst($this->days[$this->day]));
+Template_Core::setPageTitle($h);
+?>
+<h1><?=$h?></h1>
+<div class="main-content-form-edit" id="text-edit-form">
+   <?
+   $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40);
+   echo ($this->form);
+   ?>
+</div>
