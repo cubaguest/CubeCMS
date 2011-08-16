@@ -1,0 +1,16 @@
+<?
+$step = $this->step == null ? 1 : $this->step;
+$steps = array(
+   1 => $this->tr('Krok 1. Košík'),
+   2 => $this->tr('Krok 2. Kontakt a odeslání'),
+   3 => $this->tr('Krok 3. Objednávka je dokončena'),
+);
+?>
+<div>
+   <ul class="shop-step-list">
+   <?foreach ($steps as $stepNum => $s) {?>
+      <li class="<?if($stepNum == $step){ echo 'selected';} ?>"><?=$s?></li>
+   <?}?>
+   </ul>
+   <hr class="reseter" />
+</div>

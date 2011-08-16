@@ -1,0 +1,107 @@
+<?
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+$this->addFile('css://style.css');
+?>
+<h1><?= $this->category()->getName() ?></h1>
+<div class="main-content-form-edit">
+   <table id="table-orders"></table>
+   <div id="table-orders-pager"></div>
+   <br />
+   <div id="order-detail"></div>
+   <hr class="reseter" />
+   <script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      var selectedGroupId = 0;
+      function showOrder(id){
+         var link = '<?=$this->link()->route('viewOrder')?>';
+         $.ajax({
+            url: link.replace('{id}', id),
+            cache: false,
+            success: function(html){
+               $("#order-detail").html(html);
+               // odstranění tučného
+               $("#table-orders").trigger("reloadGrid");
+            }
+         });
+      }
+      $(document).ready(function() {
+         $.extend($.fn.fmatter , {
+            showNewStatus : function(cellvalue, options, rowdata) {
+               var op = $.extend({type: null}, $.jgrid.formatter.currency);
+               if(typeof options.colModel.formatoptions !== 'undefined') {
+                  op = $.extend({}, op, options.colModel.formatoptions);
+               }
+               
+               if(op.type == 'currency'){
+                  cellvalue = $.fn.fmatter.currency(cellvalue, options);
+               }
+               
+               if(rowdata.neworder == true){
+                  return "<strong>"+cellvalue+"</strong>";
+               } 
+               return cellvalue;
+            }
+         });
+         $.extend($.fn.fmatter.showNewStatus , {
+            unformat : function(cellvalue, options) {
+               var op = $.extend({type: null}, $.jgrid.formatter.currency);
+               if(typeof options.colModel.formatoptions !== 'undefined') {
+                  op = $.extend({}, op, options.colModel.formatoptions);
+               }
+               
+               if(op.type == 'currency'){
+                  cellvalue = $.fn.fmatter.currency.unformat(cellvalue, options);
+               }
+            
+               return cellvalue.replace("<strong>","").replace("</strong>","");
+            }
+         });
+         
+         var ordersGrid = $("#table-orders").jqGrid({
+            datatype: 'json',
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('ordersList');?>',
+            colNames:['ID', '<?=$this->tr('Jméno a příjmení')?>', '<?=$this->tr('Datum')?>', '<?=$this->tr('Status')?>',
+            '<?=$this->tr('Cena')?>', '<?=$this->tr('Akce')?>'],
+            colModel:[
+               {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
+               {name:'name', index:'name', formatter: 'showNewStatus'},
+               {name:'time', index:'time', width:120, fixed :true, formatter: 'showNewStatus'},
+               {name:'status', index:'status', width:120, fixed :true, formatter: 'showNewStatus'},
+               {name:'price', index:'price', width:80, align:"right", fixed :true, formatter: 'showNewStatus', formatoptions: {type: "currency", decimalSeparator:",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"} },
+               {name:'act', index:'act', width:60, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
+            ],
+            rowNum:15,
+            autowidth : true,
+            rowList:[15,30,60,100],
+            pager: '#table-orders-pager',
+            sortname: 'time',
+            viewrecords: true,
+            sortorder: "desc",
+            jsonReader: {
+               repeatitems : false, root:"rows"
+            },
+            caption: "<?=$this->tr('Přehled objednávek')?>",
+            height: '100%',
+            editurl : '<?=$this->link()->route('view', array('id' => '{ID}'));?>',
+            gridComplete: function(){ 
+               var ids = $(this).jqGrid('getDataIDs'); 
+               var button;
+               for(var i=0; i < ids.length;i++){ 
+                  var cl = ids[i]; 
+                  button = "<input type='button' value='<?=$this->tr('Ukaž')?>' onclick=\"showOrder("+ids[i]+");\" />"; 
+                  $(this).jqGrid('setRowData',ids[i],{act:button}); 
+               } 
+            },
+            ondblClickRow: function(rowid) { showOrder(rowid); }
+         });
+         
+         ordersGrid.jqGrid('navGrid','#table-orders-pager', {edit: false, add: false, del:false, refresh: true});
+      });
+
+      /* ]]> */
+   </script>
+</div>

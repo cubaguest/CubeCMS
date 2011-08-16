@@ -1,0 +1,124 @@
+<?
+$this->addFile('css://style.css');
+$h = $this->tr('Objednávka byla dokončena');
+Template_Core::addPageTitle($h);
+//$this->addJsPlugin(new JsPlugin_JQuery());
+$this->step = 3;
+?>
+<h1><?=$h?></h1>
+<?//$this->includeFile('tpl://navigation.phtml')?>
+<div class="main-content-detail">
+   <p><?=$this->tr('Děkujeme za vaši objednávku. Na uvedený e-mail byly zaslány informace o obejdnávce.<br />O průběhu vyřizování 
+      objednávky Vás budeme informovat.<br />V případě jakáchkoliv dotazů nás kontaktujte.')?></p>
+   <table class="full-width">
+      <tr>
+         <th><h2><?=$this->tr('Fakturační adresa')?></h2></th>
+         <th><h2><?=$this->tr('Dodací adresa')?></h2></th>
+      </tr>
+      <tr>
+         <td>
+            <?
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}.'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET}.'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY}.
+               ' '.$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE}.'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY}.'<br /><br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}.'<br /><br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE}.'<br /><br />';
+            if($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null){
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY}.'<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC}.'<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC}.'<br />';
+            }
+            ?>
+         </td>
+         <td>
+            <?
+            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME}.'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET}.'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY}.
+               ' '.$this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE}.'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY}.'<br />';
+            ?>
+         </td>
+      </tr>
+   </table>
+   <br />
+   <h2><?=$this->tr('Souhrn položek');?></h2>
+   <table class="full-width">
+      <thead>
+         <tr>
+            <th><?=$this->tr('Název')?></th>
+            <th><?=$this->tr('Počet')?></th>
+            <th><?=$this->tr('Cena')?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?foreach ($this->items as $item){?>
+         <tr>
+            <td><?
+               echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
+               if($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null){
+                  echo '<div class="product-note">'; 
+                  echo $item->{Shop_Model_OrderItems::COLUMN_NOTE};
+                  echo '</div>'; 
+               }
+               ?></td>
+            <td><?
+               echo $item->{Shop_Model_OrderItems::COLUMN_QTY}.' '.$item->{Shop_Model_OrderItems::COLUMN_UNIT};
+               ?>
+            </td>
+            <td><?=$item->{Shop_Model_OrderItems::COLUMN_PRICE}.' '.VVE_SHOP_CURRENCY_NAME?></td>
+         </tr>
+      <?}?>
+         <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+         <tr>
+            <th><?
+               echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
+               if($this->shipping != false){
+                  echo '<br />';
+                  echo '<div class="ship2pay-info">';
+                  echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
+                  echo '</div>';
+                  // asi tady bude přesměrování na platební systémy 
+               }
+               ?></td>
+            <th></td>
+            <td><?
+            if($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0){
+               echo $this->tr('zdarma');
+            } else {
+               echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}.' '.VVE_SHOP_CURRENCY_NAME;
+            }
+            ?></td>
+         </tr>
+         <tr>
+            <th><?
+               echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
+               if($this->payment != false){
+                  echo '<br />';
+                  echo '<div class="ship2pay-info">';
+                  echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
+                  echo '</div>';
+                  // asi tady bude přesměrování na platební systémy 
+               }
+               ?></th>
+            <td></td>
+            <td><?
+            if($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0){
+               echo $this->tr('zdarma');
+            } else {
+               echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}.' '.VVE_SHOP_CURRENCY_NAME;
+            }
+            ?></td>
+         </tr>
+         <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+         <tr class="basket-full-price">
+            <td colspan="2"><?=$this->tr('Cena celkem')?></td>
+            <td><?=$this->order->{Shop_Model_Orders::COLUMN_TOTAL}.' '.VVE_SHOP_CURRENCY_NAME?></td>
+         </tr>
+      </tbody>
+   </table>
+   <script type="text/javascript">
+   </script>
+</div>

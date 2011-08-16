@@ -1,0 +1,77 @@
+<?
+$this->addFile('css://style.css');
+$piroBox = new JsPlugin_PiroBox();
+$this->addJsPlugin($piroBox);
+// do titulku
+$this->addPageTitle($this->product->{Shop_Model_Product::COLUMN_NAME});
+Template_Core::setPageKeywords($this->product->{Shop_Model_Product::COLUMN_KEYWORDS});
+Template_Core::setPageDescription(strip_tags($this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}));
+echo $this->toolbox;
+?>
+<h1><?=$this->product->{Shop_Model_Product::COLUMN_NAME};?></h1>
+<div class="main-content">
+   <div class="main-content-text">
+      <?=$this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
+   </div>
+   <?if($this->product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
+   <div class="main-content-image">
+      <a href="<?=Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}?>"
+         class="pirobox_gall" title="<?=$this->tr('Zvětšit náhled')?>"
+         ><img src="<?=Shop_Product_Controller::getImagesDir(true).'small/'.$this->product->{Shop_Model_Product::COLUMN_IMAGE}?>"
+            alt="<?=$this->product->{Shop_Model_Product::COLUMN_NAME}?>"/></a>
+   </div>
+   <?}?>
+   <div class="product-detail shop-product-attributes">
+      <div class="left"><?=$this->tr('Kód')?></div>
+      <div class="right"><?=$this->product->{Shop_Model_Product::COLUMN_CODE}?></div>
+      <div class="left"><?=$this->tr('Dostupnost')?></div>
+      <div class="right"><?
+         if($this->product->{Shop_Model_Product::COLUMN_QUANTITY} != 0){
+            echo $this->tr('Skladem');
+         } else {
+            echo $this->tr('Skladem');
+         }
+         ?>
+      </div>
+      <div class="left product-price"><?=$this->tr('Cena')?></div>
+      <div class="right product-price"><? 
+         echo round($this->product->{Shop_Model_Product::COLUMN_PRICE}*(1+$this->product->{Shop_Model_Tax::COLUMN_VALUE}/100))
+            .' '. VVE_SHOP_CURRENCY_NAME;
+         ?>
+      </div>
+      <?
+      if($this->formAddToCart instanceof Form){
+         echo $this->formAddToCart->renderStart();
+         $this->formAddToCart->productId->setValues($this->product->{Shop_Model_Product::COLUMN_ID});
+         $this->formAddToCart->qty->setValues($this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
+         $this->formAddToCart->qty->html()->addClass('quantity');
+         echo '<div class="left">';
+         echo $this->formAddToCart->qty->label();
+         echo $this->formAddToCart->qty->controll();
+         echo '&nbsp;'.$this->product->{Shop_Model_Product::COLUMN_UNIT}.'&nbsp;';
+         echo '</div><div class="right">';
+         
+         echo $this->formAddToCart->productId->controll();
+         echo $this->formAddToCart->add->controll();
+         echo '</div>';
+         echo $this->formAddToCart->renderEnd();
+      }
+      ?>
+   </div>
+   
+   
+   <hr class="reseter" />
+   <h2><?=$this->tr('Popis')?></h2>
+   <div class="main-content-text">
+      <?echo $this->product->{Shop_Model_Product::COLUMN_TEXT};?>
+   </div>
+   <br />
+<?
+   $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam zboží')));
+?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
+      /* ]]> */
+   </script>
+</div>

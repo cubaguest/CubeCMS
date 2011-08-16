@@ -1,0 +1,55 @@
+<?
+$this->addFile('css://style.css');
+echo $this->toolbox;
+?>
+<h1><?=$this->category()->getName();?></h1>
+<div class="main-content-list">
+   <?
+   if(!empty($this->products)){
+      $this->includeFile('tpl://sorting.phtml');
+      foreach ($this->products as $product) {?>
+   <div class="main-content-list-record shop-product">
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))?>" 
+             title="<?=$this->tr('Přejít na ').$product->{Shop_Model_Product::COLUMN_NAME}?>"><?=$product->{Shop_Model_Product::COLUMN_NAME}?></a></h2>
+      <?if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
+      <div class="main-content-list-record-image">
+         <img src="<?=Shop_Product_Controller::getImagesDir(true).'small/'.$product->{Shop_Model_Product::COLUMN_IMAGE}?>" 
+              alt="<?=$product->{Shop_Model_Product::COLUMN_NAME}?>" />
+      </div>
+      <?}?>
+      <div class="main-content-list-record-text">
+         <?=$product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
+      </div>
+      <div class="main-content-list-record-text shop-product-attributes">
+         <div class="product-price">
+            <?
+            echo $this->tr('Cena').': ';
+            echo round($product->{Shop_Model_Product::COLUMN_PRICE}*($product->{Shop_Model_Tax::COLUMN_VALUE}/100) + $product->{Shop_Model_Product::COLUMN_PRICE});
+            echo ' '.VVE_SHOP_CURRENCY_NAME;
+            ?>
+         </div>
+      <?
+      if($this->formAddToCart instanceof Form){
+         echo $this->formAddToCart->renderStart();
+         $this->formAddToCart->productId->setValues($product->{Shop_Model_Product::COLUMN_ID});
+         $this->formAddToCart->qty->setValues($product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
+         $this->formAddToCart->qty->html()->addClass('quantity');
+         
+         echo $this->formAddToCart->qty->label();
+         echo $this->formAddToCart->qty->controll();
+         echo '&nbsp;'.$product->{Shop_Model_Product::COLUMN_UNIT}.'&nbsp;';
+         echo $this->formAddToCart->productId->controll();
+         echo $this->formAddToCart->add->controll();
+         
+         echo $this->formAddToCart->renderEnd();
+      }
+      ?>
+      </div>
+   </div>
+   <hr class="reseter" />
+      <?}
+      echo $this->scrollComp;
+   } else {?>
+   <div class="main-content-text"><?=$this->tr('Žádné zboží nebylo nalezeno')?></div>
+   <?}?>
+</div>

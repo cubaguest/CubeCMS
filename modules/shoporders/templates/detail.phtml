@@ -1,0 +1,201 @@
+<? Debug::printDebug()?>
+<h2><? printf($this->tr('Objednávka %s'), $this->order->{Shop_Model_Orders::COLUMN_ID}) ?></h2>
+<table class="full-width order-detail ui-widget">
+   <tr class="ui-widget-header ui-corner-top">
+      <th><h3><?= $this->tr('Fakturační adresa') ?></h3></th>
+      <th><h3><?= $this->tr('Dodací adresa') ?></h3></th>
+   </tr>
+   <tr>
+      <td class="address">
+         <?
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} .
+            ' ' . $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} . '<br /><br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} . '<br /><br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} . '<br /><br />';
+         if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
+            echo $this->tr('Společnost').'<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . '<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . '<br />';
+         }
+         ?>
+      </td>
+      <td class="address">
+         <?
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} .
+         ' ' . $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} . '<br />';
+         ?>
+      </td>
+   </tr>
+</table>
+<br />
+<h3><?= $this->tr('Souhrn položek'); ?></h3>
+<table class="full-width" id="table-order-items">
+   <thead>
+      <tr class="ui-widget-header">
+         <th><?= $this->tr('Název') ?></th>
+         <th><?= $this->tr('Počet') ?></th>
+         <th><?= $this->tr('Cena') ?></th>
+      </tr>
+   </thead>
+   <tbody>
+      <? foreach ($this->items as $item) { ?>
+      <tr class="ui-widget-content">
+            <td><?
+         echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
+         if ($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null) {
+            echo '<div class="product-note">';
+            echo $item->{Shop_Model_OrderItems::COLUMN_NOTE};
+            echo '</div>';
+         }
+         ?></td>
+            <td><?
+            echo $item->{Shop_Model_OrderItems::COLUMN_QTY} . ' ' . $item->{Shop_Model_OrderItems::COLUMN_UNIT};
+         ?>
+            </td>
+            <td><?= $item->{Shop_Model_OrderItems::COLUMN_PRICE} . ' ' . VVE_SHOP_CURRENCY_NAME ?></td>
+         </tr>
+      <? } ?>
+      <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+      <tr class="ui-widget-content">
+         <th><?
+      echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
+      if ($this->shipping != false) {
+         echo '<br />';
+         echo '<div class="ship2pay-info">';
+         echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
+         echo '</div>';
+         // asi tady bude přesměrování na platební systémy 
+      }
+      ?></td>
+         <th></td>
+         <td><?
+            if ($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0) {
+               echo $this->tr('zdarma');
+            } else {
+               echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} . ' ' . VVE_SHOP_CURRENCY_NAME;
+            }
+      ?></td>
+      </tr>
+      <tr class="ui-widget-content">
+         <th><?
+            echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
+            if ($this->payment != false) {
+               echo '<br />';
+               echo '<div class="ship2pay-info">';
+               echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
+               echo '</div>';
+               // asi tady bude přesměrování na platební systémy 
+            }
+      ?></th>
+         <td></td>
+         <td><?
+            if ($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0) {
+               echo $this->tr('zdarma');
+            } else {
+               echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} . ' ' . VVE_SHOP_CURRENCY_NAME;
+            }
+      ?></td>
+      </tr>
+      <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+      <tr class="order-full-price ui-widget-content ui-state-highlight">
+         <td colspan="2"><?= $this->tr('Cena celkem') ?></td>
+         <td><?= $this->order->{Shop_Model_Orders::COLUMN_TOTAL} . ' ' . VVE_SHOP_CURRENCY_NAME ?></td>
+      </tr>
+   </tbody>
+</table>
+<br />
+<h3><?=$this->tr('Stavy')?></h3>
+<table class="ui-widget full-width" id="table-order-status">
+   <thead>
+      <tr class="ui-widget-header">
+         <th class="column-date"><?=$this->tr('Datum');?></th>
+         <th><?=$this->tr('Název');?></th>
+         <th><?=$this->tr('Poznámka');?></th>
+      </tr>
+   </thead>
+   <tbody>
+      <?if($this->statuses == false){?>
+      <tr id="order-no-status-msg" class="ui-widget-content">
+         <td colspan="3"><?=$this->tr('Źádné změny stavu nebyly provedeny');?></td>
+      </tr>
+      <?} else { foreach ($this->statuses as $status) {?>
+      <tr class="ui-widget-content">
+         <td><?=vve_date('%x %X', new DateTime($status->{Shop_Model_OrderStatus::COLUMN_TIME_ADD}))?></td>
+         <td><?=$status->{Shop_Model_OrderStatus::COLUMN_NAME}?></td>
+         <td><?=$status->{Shop_Model_OrderStatus::COLUMN_NOTE}?></td>
+      </tr>
+      <?}?>
+      <?}?>
+   </tbody>
+</table>
+<? 
+$this->formStatus->html()->setAttrib('name', 'form-order-status');
+echo $this->formStatus->renderStart();
+echo $this->formStatus->id->controll();
+?>
+<table class="ui-widget full-width" id="table-order-status-form">
+   <tbody>
+      <tr class="ui-widget-header">
+         <th colspan="2" class=""><?=$this->tr('Nový stav');?></th>
+      </tr>
+      <tr class="ui-widget-content">
+         <th><?=$this->formStatus->name->label();?></th>
+         <td><?echo $this->formStatus->nameSel->controll().' '.$this->tr('nebo').' '.$this->formStatus->name->controll();?></td>
+      </tr>
+      <tr class="ui-widget-content">
+         <th><?=$this->formStatus->note->label();?></th>
+         <td><?=$this->formStatus->note->controll();?></td>
+      </tr>
+      <tr class="ui-widget-content">
+         <th></th>
+         <td><?
+         echo $this->formStatus->infoCust->label();
+         echo $this->formStatus->infoCust->controll();
+         ?></td>
+      </tr>
+      <tr class="ui-widget-content">
+         <th></th>
+         <td><?=$this->formStatus->add->controll();?></td>
+      </tr>
+   </tbody>
+</table>
+<?=$this->formStatus->renderEnd()?>
+<script type="text/javascript" charset="utf-8">
+   /* <![CDATA[ */
+   // změna statusu
+   $('form[name="form-order-status"]').submit(function(event){
+      event.preventDefault();
+      var $form = $(this);
+      $.ajax({
+         url: $form.attr('action'),
+         type: "POST",
+         data: $form.serialize(),
+         async:false,
+         success: function(data){
+            var $tr;
+            if($('#table-order-status tr#order-no-status-msg').length == 0){
+               var $tr = $('#table-order-status tr:last').clone();
+            } else {
+               $('#table-order-status tr#order-no-status-msg').remove();
+               var td = $('<td></td>').addClass('ui-widget-content');
+               var $tr = $('<tr></tr>').append(td.clone()).append(td.clone()).append(td.clone());
+            }
+            
+            $('td:nth-child(1)',$tr).text(data.newStatus.date);
+            $('td:nth-child(2)',$tr).text(data.newStatus.name);
+            $('td:nth-child(3)',$tr).text(data.newStatus.note);
+            $('#table-order-status tbody').append($tr);
+            
+            $("#table-orders").trigger("reloadGrid");
+         }
+      });
+   });
+   /* ]]> */
+</script>

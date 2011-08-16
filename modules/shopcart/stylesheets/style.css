@@ -1,0 +1,41 @@
+#shop-basket table td, #shop-basket table th {
+   padding: 5px 0;
+}
+
+#shop-basket table .column-1 {}
+#shop-basket table .column-2 {}
+#shop-basket table .column-3 { width: 70px;}
+#shop-basket table .column-4 {}
+#shop-basket table .column-5 { width: 90px;}
+
+#shop-basket .price { font-weight: bold;}
+
+input.shop-basket-qty {
+   width: 40px;
+}
+
+table .basket-full-price {
+   font-weight: bold;
+   font-size: 120%;
+}
+
+.shop-step-list li {
+   float: left;
+   width: 33%;
+   padding: 5px 0;
+   text-align: center;
+}
+.shop-step-list li.selected {
+   background-color: #fdf5ce;
+   font-weight: bold;
+}
+
+.align-right {
+   text-align: right;
+}
+
+.ship2pay-info, .product-note {
+   padding: 5px;
+   background-color: #EFEFEF;
+   font-weight: normal;
+}

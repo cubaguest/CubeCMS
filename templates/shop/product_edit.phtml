@@ -1,0 +1,69 @@
+<?
+$jq = new JsPlugin_JQuery();
+//$jq->addUIDatepicker();
+$this->addJsPlugin($jq);
+// do titulku
+if($this->edit) {
+   $h = $this->tr('úprava produktu').' '.$this->product;
+} else {
+   $h = $this->tr('přidání produktu');
+}
+$this->addPageTitle($h);
+// donastavení formuláře
+$this->form->name->html()->setAttrib('size', 60)->addClass('form-element-long');
+$this->form->keywords->html()->setAttrib('size', 60)->addClass('form-element-long');
+$this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long');
+//$this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element-long');
+//$this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
+//$this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
+//$this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
+// datepickery
+//$this->form->created_date->html()->addClass('datepicker');
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="article-edit-form">
+   <?echo($this->form);
+   
+   $taxesPrint = array();
+   foreach($this->taxes as $tax){ 
+      $taxesPrint[(int)$tax->{Shop_Model_Tax::COLUMN_ID}] = (int)$tax->{Shop_Model_Tax::COLUMN_VALUE};
+   }
+   ?>
+   <script type="text/javascript">
+      var taxes = <?echo json_encode($taxesPrint)?>;
+   
+      $(document).ready(function(){
+         var $iPrice = $('input[name="price"]');
+         var $iPriceWTax = $('input[name="pricewtax"]');
+         var $iTax = $('select[name="tax"]');
+         
+         $iPrice.change(function(){
+            var tax = parseFloat(taxes[$iTax.val()]);
+            if($iPrice.val() != ""){
+               var price = parseFloat($iPrice.val());
+               if(tax != 0){ price = (1+tax/100)*price; }
+               $iPriceWTax.val(price.toFixed(1));
+            }
+         });
+         $iTax.change(function(){$iPrice.change();});
+         $iPriceWTax.change(function(){
+            var tax = parseFloat(taxes[$iTax.val()]);
+            if($iPriceWTax.val() != ""){
+               var price = parseFloat($iPriceWTax.val());
+               if(tax != 0){ price = price/(1+tax/100);}
+               $iPrice.val(price.toFixed(1) );
+            }
+         });
+         $iPrice.change();
+         
+         // generate url address
+         $('input.name_class').change(function(){
+            var lang = $(this).attr('name').match(/\[([a-z]+)\]/)[1];
+            var $url = $('input[name="urlkey['+lang+']"]');
+            $url.val(str2url($(this).val()));
+         });
+         
+      });
+   
+   </script>
+</div>

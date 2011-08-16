@@ -1,0 +1,62 @@
+<?
+$this->addFile('css://style.css');
+$h = $this->tr('Potvrzení objednávky');
+Template_Core::addPageTitle($h);
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->step = 3;
+?>
+<h1><?=$h?></h1>
+<?$this->includeFile('tpl://navigation.phtml')?>
+<div class="main-content-detail">
+   <h2><?=$this->tr('Souhrn položek');?></h2>
+   <table class="full-width">
+      <thead>
+         <tr>
+            <th><?=$this->tr('Název')?></th>
+            <th><?=$this->tr('Cena za položku')?></th>
+            <th><?=$this->tr('Počet')?></th>
+            <th><?=$this->tr('Cena celkem')?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?foreach ($this->basket as $item){?>
+         <tr>
+            <td><a href="<?=$item->getUrl()?>" title="<?=$item->getName()?>"><?=$item->getName()?></a></td>
+            <td><?
+               echo $item->getPrice(false).' '.VVE_SHOP_CURRENCY_NAME;
+               echo ' / '.$item->getUnitSize().' '.$item->getUnit();
+               ?>
+            </td>
+            <td><? echo $item->getQty().' '.$item->getUnit(); ?></td>
+            <td><?=$item->getPrice().' '.VVE_SHOP_CURRENCY_NAME?></td>
+         </tr>
+      <?}?>
+         <tr><td colspan="4" class="spacer">&nbsp;</td></tr>
+         <tr>
+            <td colspan="2"><?=$this->tr('Doprava')?></td>
+            <td><??></td>
+            <td><?
+            if($this->shipping == 0){
+               echo '0 '.VVE_SHOP_CURRENCY_NAME.' ('.$this->tr('zdarma').')';
+            }
+            ?></td>
+         </tr>
+         <tr>
+            <td colspan="2"><?=$this->tr('Platba')?></td>
+            <td><??></td>
+            <td><?
+            if($this->payment == 0){
+               echo '0 '.VVE_SHOP_CURRENCY_NAME.' ('.$this->tr('zdarma').')';
+            }
+            ?></td>
+         </tr>
+         <tr><td colspan="4" class="spacer">&nbsp;</td></tr>
+         <tr class="basket-full-price">
+            <td colspan="3"><?=$this->tr('Cena celkem')?></td>
+            <td><?=$this->basket->getPrice().' '.VVE_SHOP_CURRENCY_NAME?></td>
+         </tr>
+      </tbody>
+   </table>
+   <script type="text/javascript">
+   </script>
+</div>

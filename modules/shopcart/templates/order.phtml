@@ -1,0 +1,41 @@
+<?
+$this->addFile('css://style.css');
+$h = $this->tr('Platební a poštovní informace');
+Template_Core::addPageTitle($h);
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->step = 2;
+?>
+<h1><?=$h?></h1>
+<?$this->includeFile('tpl://navigation.phtml')?>
+<div class="main-content-detail">
+   
+   <?// echo $this->formItems->renderStart();
+   echo $this->formOrder;
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         // zkrytí dodací adresy
+         toggleAddress($('input[name="order_isDeliveryAddress"]'));
+         $('input[name="order_isDeliveryAddress"]').change(function(){toggleAddress($(this));});
+         
+         togglePassword($('input[name="order_createAcc"]'));
+         $('input[name="order_createAcc"]').change(function(){togglePassword($(this));});
+      
+      });
+      function toggleAddress($this){
+         var items = $this.parents('table').find( 'tr:not(:first)' );
+         if($this.is(':checked')){
+            items.show();
+         } else {
+            items.hide();
+         }
+      }
+      function togglePassword($this){
+         if($this.is(':checked')){
+            $this.parents('tr').next('tr').show();
+         } else {
+            $this.parents('tr').next('tr').hide();
+         }
+      }
+   </script>
+</div>

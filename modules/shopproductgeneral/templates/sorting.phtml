@@ -1,0 +1,25 @@
+<?
+$sorts = Shop_Product_Controller::getSortTypes();
+$nums = array($this->category()->getParam('scroll', 10),30,60,100);
+?>
+<div class="products-sorting">
+   <form action="<?=$this->link()?>" method="get">
+      <label><?=$this->tr('Řadit podle')?></label>: 
+      <select name="sort" onchange="this.form.submit();">
+         <option value="" <?if( !isset ($_GET['sort']) || $_GET['sort'] == null){ echo 'selected="selected"';}?>
+                 ><?=$this->tr('Výchozí');?></option>   
+         <?foreach ($sorts as $key => $sort) {?>
+         <option value="<?=$key?>" <?if( isset ($_GET['sort']) && $_GET['sort'] == $key ){ echo 'selected="selected"';}?>
+                 ><?=$sort['name']?></option>   
+         <?}?>
+      </select>
+      <label><?=$this->tr('Zobrazi')?></label>: 
+      <select name="num" onchange="this.form.submit();">
+         <?  foreach ($nums as $num) {?>
+         <option value="<?=$num?>" <?if( isset ($_GET['num']) && $_GET['num'] == $num ){ echo 'selected="selected"';}?>
+           ><?=$num?></option>   
+         <?}?>
+      </select>
+   </form>
+</div>
+<br />

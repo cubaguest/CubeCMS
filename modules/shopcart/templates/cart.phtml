@@ -1,0 +1,152 @@
+<?
+$this->addFile('css://style.css');
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->step = 1;
+?>
+<h1><?=$this->category()->getName();?></h1>
+<?$this->includeFile('tpl://navigation.phtml')?>
+<div class="main-content-list" id="shop-basket">
+   <?if(!$this->basket->isEmpty()){?>
+   <h2><?=$this->tr('Obsah košíku');?></h2>
+   <?echo $this->formItems->renderStart();?>
+   <table class="full-width">
+      <thead>
+         <tr>
+            <th class="column-1"><?=$this->tr('Název')?></th>
+            <th class="column-2"><?=$this->tr('Cena za položku')?></th>
+            <th class="column-3"><?=$this->tr('Počet')?></th>
+            <th class="column-4"><?=$this->tr('Odebrat')?></th>
+            <th class="column-5"><?=$this->tr('Cena celkem')?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?foreach ($this->basket as $key => $item) {
+         $this->formItems->del->setDimensional($key);
+         $this->formItems->qty->setDimensional($key);
+         $this->formItems->qty->html()->addClass('shop-basket-qty');
+         $this->formItems->qty->setValues($item->getQty());
+         ?>
+         <tr>
+            <td><a href="<?=$item->getUrl()?>" title="<?=$item->getName()?>"><?=$item->getName()?></a></td>
+            <td><?
+               echo $item->getPrice(false).' '.VVE_SHOP_CURRENCY_NAME;
+//               if($item->getUnitSize() != 1){
+                  echo ' / '.$item->getUnitSize().' '.$item->getUnit();
+//               }   
+               ?>
+            </td>
+            <td><?
+               echo $this->formItems->qty->controll().' '.$item->getUnit();
+            ?></td>
+            <td><? echo $this->formItems->del->controll();?></td>
+            <td><?=$item->getPrice().' '.VVE_SHOP_CURRENCY_NAME?></td>
+         </tr>
+      <?}?>
+      </tbody>
+      <tfoot>
+         <tr>
+            <td><? echo $this->formItems->set->controll();?></td>
+            <td></td>
+            <td></td>
+            <td class="price"><?=$this->tr('Cena celkem:')?></strong></td>
+            <td class="price"><?=$this->basket->getPrice().' '.VVE_SHOP_CURRENCY_NAME?> </strong></td>
+         </tr>
+      </tfoot>
+   </table>
+   <?echo $this->formItems->renderEnd();?>
+   
+   <h2><?=$this->tr('Doprava a platba');?></h2>
+   <?echo $this->formNext->renderStart();?>
+   <table class="full-width">
+      <tbody>
+         <tr>
+            <td><? echo $this->formNext->shipping->label();?></td>
+            <td><? echo $this->formNext->shipping->controll();?></td>
+            <td></td>
+            <td class="column-5" ><span id="shipping-price"></td>
+         </tr>
+         <tr>
+            <td><? echo $this->formNext->payment->label();?></td>
+            <td><? echo $this->formNext->payment->controll();?></td>
+            <td></td>
+            <td class="column-5" ><span id="payment-price"></span></td>
+         </tr>
+         <tr>
+            <th><? echo $this->tr('Cena celkem');?></th>
+            <td></td>
+            <td></td>
+            <td class="price"><span id="full-price"></span></td>
+         </tr>
+         <tr>
+            <td colspan="4" class="align-right"><? echo $this->formNext->send->controll();?></td>
+         </tr>
+      </tbody>
+   </table>
+   <?
+   echo $this->formNext->renderEnd();
+   
+   echo str_repeat('<br />', 5);
+   echo $this->formItems->renderEnd();   
+   ?>
+   <div>
+      <?
+      echo $this->formReset->renderStart();
+      echo $this->formReset->reset->controll();
+      echo $this->formReset->renderEnd();
+      ?>
+   </div>
+   <script type="text/javascript">
+      var shippings = <?=json_encode($this->shippings)?>;
+      var payments = <?=json_encode($this->payments)?>;
+      var priceBasket = <?=round($this->basket->getPrice())?>;
+      var priceShipping = 0;
+      var pricePayment = 0;
+      $(document).ready(function(){
+         // základní doplnění ceny
+         setShippingPrice($('select[name="goto_order_shipping"]').val());
+         $('select[name="goto_order_shipping"]').change(function(){ setShippingPrice($(this).val()); });
+         
+         setPaymentPrice($('select[name="goto_order_payment"]').val());
+         $('select[name="goto_order_payment"]').change(function(){ setPaymentPrice($(this).val()); });
+      });
+      
+      function updateFullPrice(){
+         var price = priceBasket;
+         $('#full-price').text(priceBasket+priceShipping+pricePayment+' <?=VVE_SHOP_CURRENCY_NAME?>');
+      }
+      
+      function setShippingPrice(idshipping){
+         if(shippings[idshipping] == 0){
+            $('#shipping-price').text('<?=$this->tr('Zdarma')?>');
+            priceShipping = 0;
+         } else {
+            if(shippings[idshipping].indexOf("%") != -1){
+               $('#shipping-price').text(shippings[idshipping]);
+            } else {
+               $('#shipping-price').text(shippings[idshipping]+' <?=VVE_SHOP_CURRENCY_NAME?>');
+               priceShipping = parseInt(shippings[idshipping]);
+            }
+         }
+         updateFullPrice();
+      }
+      function setPaymentPrice(idpayment){
+         if(payments[idpayment] == 0){
+            $('#payment-price').text('<?=$this->tr('Zdarma')?>');
+            pricePayment = 0;
+         } else {
+            if(payments[idpayment].indexOf("%") != -1){
+               pricePayment = Math.floor(priceBasket*(parseInt(payments[idpayment])/100) );
+               $('#payment-price').text(payments[idpayment]+' ('+pricePayment+' <?=VVE_SHOP_CURRENCY_NAME?>)');
+            } else {
+               $('#payment-price').text(payments[idpayment]+' <?=VVE_SHOP_CURRENCY_NAME?>');
+               pricePayment = parseInt(payments[idpayment]);
+            }
+         }
+         updateFullPrice()
+      }
+   </script>
+   
+   <?} else {?>
+   <div class="main-content-text"><?=$this->tr('Košík neobsahuje žádnou položku.')?></div>
+   <?}?>
+</div>
