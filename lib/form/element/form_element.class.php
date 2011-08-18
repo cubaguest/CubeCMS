@@ -277,6 +277,15 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    }
 
    /**
+    * Metoda vrcí subpopisek prvku
+    * @return string
+    */
+   public function getSubLabel()
+   {
+      return $this->formElementSubLabel;
+   }
+
+   /**
     * Metofda vrací jestli se jedná o vícerozměrný element
     * @param bool $multiple -- true pro nasatvení vícerozměrného elementu
     * @return bool -- true pokud je element vicerozměrný
@@ -379,7 +388,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda vrací jestli je element validní
     */
-   public function isValid() {
+   public function isValid($valid = null) {
+      if($valid !== null){
+         $this->isValid = $valid;
+      }
       return $this->isValid;
    }
 

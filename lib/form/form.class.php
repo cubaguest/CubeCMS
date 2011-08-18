@@ -535,9 +535,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    public function removeElement($name) {
       unset ($this->elements[$name]);
       unset ($this->elementsGroups[$name]);
-      foreach ($this->elementsGroups as $key => &$group) {
+      foreach ($this->elementsGroups as $key => $group) {
          if(!is_array($group)) continue;
-         unset ($group['elements'][$name]);
+         unset ($this->elementsGroups[$key]['elements'][$name]);
       }
    }
 
@@ -613,10 +613,44 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       return $this->elementCheckForm;
    }
 
-
    /*
-     * Podpůrné metody
+     * Metody pro exporty
    */
+   
+   /**
+    * metoda pro export dat ve formuláři
+    * @return Form_Data 
+    */
+   public function getData(Form_Data $object = null)
+   {
+      if($object == null){
+         $object = new Form_Data();
+      }
+      foreach ($this->elementsGroups as $key => $value) {
+         // je skupina
+         if(is_array($value)){
+            $object->{'grp_'.$key} = new Form_Data_Header($value['label']);
+            foreach ($value['elements'] as $ekey => $name) {
+               $this->dataAddItem($ekey, $object);
+            }            
+         } else {
+            $this->dataAddItem($key, $object);
+         }
+      }
+      return $object;
+   }
+   
+   private function dataAddItem($key, Form_Data $container)
+   {
+      $e = $this->{$key};
+      if($e instanceof Form_Element_Text || $e instanceof Form_Element_TextArea || $e instanceof Form_Element_Password){
+         $container->{$key} = new Form_Data_Item($e->getLabel(), $e->getValues(), $e->getSubLabel());
+      } else if($e instanceof Form_Element_Checkbox){
+         $container->{$key} = new Form_Data_Item($e->getLabel(), (bool)$e->getValues(), $e->getSubLabel());
+      } else if($e instanceof Form_Element_Select){
+         $container->{$key} = new Form_Data_Item($e->getLabel(), array_search($e->getValues(), $e->getOptions()), $e->getSubLabel());
+      }
+   }
 }
 
 ?>
