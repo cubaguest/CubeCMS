@@ -158,10 +158,6 @@ abstract class Shop_Product_Controller extends Controller {
                );
       
       $this->view()->product = $model->record();
-      
-      if($this->view()->product == false){
-         return false;
-      }
    }
 
    /**

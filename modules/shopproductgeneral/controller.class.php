@@ -35,8 +35,15 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       $this->loadProduct();
+      
+      if($this->view()->product == false){
+         return false;
+      }
+      
+      if($this->view()->product->{Shop_Model_Product::COLUMN_QUANTITY} != 0){
+         $this->createAddToCartForm();
+      }
       $this->deleteProduct();
-      $this->createAddToCartForm();
       $this->view()->linkBack = $this->link()->route();
    }
 

@@ -29,7 +29,7 @@ echo $this->toolbox;
             ?>
          </div>
       <?
-      if($this->formAddToCart instanceof Form){
+      if($product->{Shop_Model_Product::COLUMN_QUANTITY} != 0 && $this->formAddToCart instanceof Form){
          echo $this->formAddToCart->renderStart();
          $this->formAddToCart->productId->setValues($product->{Shop_Model_Product::COLUMN_ID});
          $this->formAddToCart->qty->setValues($product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
@@ -42,6 +42,8 @@ echo $this->toolbox;
          echo $this->formAddToCart->add->controll();
          
          echo $this->formAddToCart->renderEnd();
+      } else if($product->{Shop_Model_Product::COLUMN_QUANTITY} == 0) {
+         echo $this->tr('Zboží je vyprodáno.');
       }
       ?>
       </div>
