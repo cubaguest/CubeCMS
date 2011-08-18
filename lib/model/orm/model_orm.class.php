@@ -10,7 +10,7 @@
  * 						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro práci s modelem v databázi (ORM)
  */
-class Model_ORM extends Model_PDO {
+class Model_ORM extends Model {
    const DB_TABLE = null;
 
    const ORDER_ASC = 'ASC';
@@ -77,10 +77,15 @@ class Model_ORM extends Model_PDO {
     * @var string/PDOStatement
     */
    protected $currentSql = null;
+   protected $bindValues = array();
+
+   protected $dbconnector = null;
+
 
    public function __construct()
    {
       parent::__construct();
+      $this->dbconnector = new Db_PDO();
       $this->_initTable();
    }
 
@@ -383,21 +388,19 @@ class Model_ORM extends Model_PDO {
          $obj = $this;
 
       if($this->currentSql == null){
-         $dbc = new Db_PDO();
          $sql = 'SELECT ' . $obj->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $obj->getTableName() . '` AS ' . $this->getTableShortName();
          $obj->createSQLJoins($sql);
          $obj->createSQLWhere($sql, $this->getTableShortName());
          $obj->createSQLOrder($sql);
          $obj->createSQLLimi($sql);
-         $dbst = $dbc->prepare($sql);
+         $dbst = $this->getDb()->prepare($sql);
          $obj->bindSQLWhere($dbst);
          $obj->bindSQLLimit($dbst);
       } else if($this->currentSql instanceof PDOStatement) {
          $dbst = $this->currentSql;
          $this->currentSql = null;
       } else {
-         $dbc = new Db_PDO();
-         $dbst = $dbc->prepare($this->currentSql);
+         $dbst = $this->bindValues($this->getDb()->prepare($this->currentSql));
          $this->currentSql = null;
       }
       $r = false;
@@ -432,14 +435,13 @@ class Model_ORM extends Model_PDO {
    public function records($fetchParams = self::FETCH_LANG_CLASS)
    {
       if($this->currentSql == null){
-         $dbc = new Db_PDO();
          $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
          $this->createSQLJoins($sql);
          $this->createSQLWhere($sql, $this->getTableShortName()); // where
          $this->createSQLGroupBy($sql); // group by
          $this->createSQLOrder($sql); // order
          $this->createSQLLimi($sql); // limit
-         $dbst = $dbc->prepare($sql);
+         $dbst = $this->getDb()->prepare($sql);
 //      Debug::log($sql, $this->whereBindValues);
          $this->bindSQLWhere($dbst); // where values
          $this->bindSQLLimit($dbst); // limit values
@@ -447,8 +449,7 @@ class Model_ORM extends Model_PDO {
          $dbst = $this->currentSql;
          $this->currentSql = null;
       } else {
-         $dbc = new Db_PDO();
-         $dbst = $dbc->prepare($this->currentSql);
+         $dbst = $this->bindValues($this->getDb()->prepare($this->currentSql));
          $this->currentSql = null;
       }
       $r = false;
@@ -482,19 +483,47 @@ class Model_ORM extends Model_PDO {
 
    public function count()
    {
-      $dbc = new Db_PDO();
-      $sql = 'SELECT COUNT(*) AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
-      $this->createSQLJoins($sql);
-      $this->createSQLWhere($sql, $this->getTableShortName());
-      $this->createSQLGroupBy($sql);
-      $dbst = $dbc->prepare($sql);
-      $this->bindSQLWhere($dbst);
+      if($this->currentSql == null){
+         $pk = '*';
+         if($this->pKey != null){
+            $pk = $this->pKey;
+         }
+         $sql = 'SELECT COUNT('.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         $this->createSQLJoins($sql);
+         $this->createSQLWhere($sql, $this->getTableShortName());
+         $this->createSQLGroupBy($sql);
+         $dbst = $this->getDb()->prepare($sql);
+         $this->bindSQLWhere($dbst);
+      } else {
+         /* tady asi musí byt replace sloupců za count */
+         /* preg_replace('/SELECT * FROM/', 'COUNT(*)', $this->currentSql); */
+         $dbst = $this->bindValues($this->dbconnector->prepare($this->currentSql));/* TODO */
+      }
       $dbst->execute();
       $r = $dbst->fetchObject();
       if ($r == false)
          return 0;
       return (int) $r->cnt;
    }
+
+   /**
+    * Vytvoření zámku na modelu (tabulce)
+    * @param string $type -- typ zámku (READ/WRITE)
+    */
+   public function lock($type = "WRITE")
+   {
+//      $this->dbconnector->exec('LOCK TABLES '.$this->getTableName().' '.$this->getTableShortName().' '.$type.';');
+      $this->getDb()->exec('LOCK TABLES '.$this->getTableName().' '.$type.', '.$this->getTableName().' '.$this->getTableShortName().' '.$type.';');
+   }
+   
+   /**
+    * Zrušení zámku
+    */
+   public function unLock()
+   {
+      $this->getDb()->exec('UNLOCK TABLES;');
+   }
+
 
    /**
     * Metoda pro dotaz na model
@@ -508,15 +537,53 @@ class Model_ORM extends Model_PDO {
       if($stmt instanceof PDOStatement == false) {
          if(is_string($stmt)){
             $stmt = str_replace('{THIS}', '`'.$this->getTableName().'`', $stmt);
-            
-            $con = new Db_PDO();
-            $stmt = $con->prepare($stmt);
          }
+         $stmt = $this->dbcogetDb()->prepare($stmt);
       }
       return $stmt;
    }
+   
+   /**
+    * Metoda pro dotaz na model
+    * @param string $stmt dotaz
+    * @return Model_ORM
+    * 
+    * Pokud je předán řetezec, je řetězec {THIS} nahrazen názvem tabulky
+    */
+   public function setQuery($query)
+   {
+      if(is_string($query)) {
+         $this->currentSql = str_replace('{THIS}', '`'.$this->getTableName().'`', $query);
+      }
+      return $this;
+   }
+   
+   /**
+    * Metoda vrací db konektor k databázi
+    * @return Db_PDO
+    */
+   public function getDb()
+   {
+      return $this->dbconnector;
+   }
+   
+   /**
+    * Metoda přidá parametry do dotazu
+    * @param type $values
+    * @param type $merge
+    * @return Model_ORM 
+    */
+   public function setBindValues($values, $merge = false)
+   {
+      if($merge){
+         $this->bindValues = array_merge($values, $this->bindValues);
+      } else {
+         $this->bindValues = $values;
+      }
+      return $this;
+   }
 
-      /**
+   /**
     * Varcí SQL dotaz pro výběr
     * @return string
     */
@@ -537,7 +604,6 @@ class Model_ORM extends Model_PDO {
 
    public function save(Model_ORM_Record $record)
    {
-      $dbc = new Db_PDO();
       $returnPk = $record->getPK();
       if (!$record->isNew()) {
          // UPDATE
@@ -569,8 +635,9 @@ class Model_ORM extends Model_PDO {
          if (empty($colsStr)){
             return $returnPk; // žádné změny se neukládájí
          }
+         /** @todo tady asi přidělat where, protože pak by šli dělat updaty na různách sloupcích */
          $sqlStr = $sql . ' SET ' . implode(',', $colsStr) . ' WHERE `' . $this->pKey . '` = :pkey';
-         $dbst = $dbc->prepare($sqlStr);
+         $dbst = $this->getDb()->prepare($sqlStr);
          Log::msg($sqlStr, 'UPDATE', null, 'sql');
 
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
@@ -625,7 +692,7 @@ class Model_ORM extends Model_PDO {
             }
          }
          $sqlStr = $sql . ' (' . implode(',', $colsStr) . ') VALUES (' . implode(',', $bindParamStr) . ')';
-         $dbst = $dbc->prepare($sqlStr);
+         $dbst = $this->getDb()->prepare($sqlStr);
          Log::msg($sqlStr, 'INSERT', null, 'sql');
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
@@ -659,7 +726,7 @@ class Model_ORM extends Model_PDO {
             }
          }
          $dbst->execute();
-         $returnPk = $dbc->lastInsertId();
+         $returnPk = $this->dbconnector->lastInsertId();
       }
 
       return $returnPk;
@@ -830,9 +897,13 @@ class Model_ORM extends Model_PDO {
     * </p>
     * @return Model_ORM
     */
-   public function order($arrayOrders)
+   public function order($arrayOrders, $merge = false)
    {
-      $this->orders = $arrayOrders;
+      if($merge){
+         $this->orders = array_merge($this->orders, $arrayOrders);
+      } else {
+         $this->orders = $arrayOrders;
+      }
       return $this;
    }
 
@@ -1294,9 +1365,19 @@ class Model_ORM extends Model_PDO {
                } else {
                   $retWhere .= '`' . $coll . '` ';
                }
-            } else if (strpos($coll, '.')) {
+            } else if (strpos($coll, '.') !== false) {
                // doplnění uvozovek u cizích sloupců
                $retWhere .= preg_replace('/([a-z_-]+)\.([a-z_-]+)/i', '`\1`.`\2`', $coll);
+//            } else if (preg_match ('/\:([a-z]+)/', $coll, $paramm) != false) {
+//               // doplnění uvozovek u cizích sloupců
+//               if(is_array($this->whereBindValues[$paramm[1]])){
+//                  foreach ($this->whereBindValues[$paramm[1]] as $key => $param) {
+//                  }
+//                  $retWhere .= $coll . ' ';
+//                  Debug::log('is array param name: '.$paramm[1].' val: ',$paramm, $this->whereBindValues);
+//               } else {
+//                  $retWhere .= $coll . ' ';
+//               }
             } else {
                $retWhere .= $coll . ' ';
             }
@@ -1330,13 +1411,62 @@ class Model_ORM extends Model_PDO {
    /**
     * Metoda doplní hodnoty do where clause
     * @param PDOStatement $stmt
+    * @deprecated použít bindValues nebo bind params
     */
    protected function bindSQLWhere(PDOStatement &$stmt)
    {
       if ($this->where != null AND !empty($this->whereBindValues)) {
          // bind values
          foreach ($this->whereBindValues as $name => $val) {
-            switch (gettype($val)) {
+//            if(is_array($val)){
+//               Debug::log($stmt->queryString);
+               
+               
+//            } else {
+               switch (gettype($val)) {
+                  case 'boolean':
+                     $pdoParam = PDO::PARAM_BOOL;
+                     break;
+                  case 'integer':
+                     $pdoParam = PDO::PARAM_INT;
+                     break;
+                  case 'NULL':
+                     $pdoParam = PDO::PARAM_NULL;
+                     break;
+                  case 'array':
+                     $pdoParam = PDO::PARAM_STMT;
+                     $val = join(',', $val);
+                     break;
+                  case 'double':
+                  case 'string':
+                     $pdoParam = PDO::PARAM_STR;
+                     $pdoParam = PDO::PARAM_STR;
+                     break;
+                  default:
+                     throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), gettype($val)));
+                     break;
+               }
+               if ($stmt->bindParam(':' . $name, $this->whereBindValues[$name], $pdoParam) === false) { // nefunguje při některých where, ale proč??
+                  $stmt->bindValue(':' . $name, $val, $pdoParam);
+               }
+//            }
+         }
+      }
+   }
+
+   /**
+    * Metoda vloží hodnoty do dotazu
+    * @param PDOStatement $stmt
+    * @param array $values
+    * @return PDOStatement 
+    */
+   protected function bindValues(PDOStatement $stmt, $values = false)
+   {
+      if($values == false){
+         $values = $this->bindValues;
+      }
+      foreach ($values as $key => $value) {
+         switch (gettype($value)) {
                case 'boolean':
                   $pdoParam = PDO::PARAM_BOOL;
                   break;
@@ -1348,17 +1478,14 @@ class Model_ORM extends Model_PDO {
                   break;
                case 'double':
                case 'string':
+               default:
                   $pdoParam = PDO::PARAM_STR;
                   break;
-               default:
-                  throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), gettype($val)));
-                  break;
-            }
-            if ($stmt->bindParam(':' . $name, $this->whereBindValues[$name], $pdoParam) === false) { // nefunguje při některých where, ale proč??
-               $stmt->bindValue(':' . $name, $val, $pdoParam);
-            }
+            break;
          }
+         $stmt->bindValue(':' . $key, $value, $pdoParam);
       }
+      return $stmt;
    }
 
    /**
