@@ -47,7 +47,6 @@ class Email {
       $this->isHtmlMail = $htmlMail;
       if(VVE_SMTP_SERVER != null){
          if(defined("VVE_SMTP_SERVER_ENCRYPT") AND VVE_SMTP_SERVER_ENCRYPT != null){
-            Debug::log(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT, VVE_SMTP_SERVER_ENCRYPT, VVE_SMTP_SERVER_USERNAME, VVE_SMTP_SERVER_PASSWORD);
             $transport = Swift_SmtpTransport::newInstance(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT, VVE_SMTP_SERVER_ENCRYPT);
          } else {
             $transport = Swift_SmtpTransport::newInstance(VVE_SMTP_SERVER, VVE_SMTP_SERVER_PORT);
