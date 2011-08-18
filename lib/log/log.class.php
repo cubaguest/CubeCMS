@@ -21,7 +21,9 @@ class Log {
    }
    
    protected static function save($str, $log) {
-      file_put_contents(AppCore::getAppWebDir().self::LOG_DIR.DIRECTORY_SEPARATOR.strtolower($log).'-'.  date('Y-m').'.log', date('c').' '.$str."\n", FILE_APPEND);
+      if(VVE_DEBUG_LEVEL > 0){
+         file_put_contents(AppCore::getAppWebDir().self::LOG_DIR.DIRECTORY_SEPARATOR.strtolower($log).'-'.  date('Y-m').'.log', date('c').' '.$str."\n", FILE_APPEND);
+      }
    }
 }
 ?>
