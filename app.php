@@ -13,7 +13,7 @@
  * @internal   Last ErrorCode 22
  */
 include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'trobject.class.php';
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'debug.class.php';
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'debug'.DIRECTORY_SEPARATOR.'debug.class.php';
 class AppCore extends TrObject {
    /**
     * Název enginu

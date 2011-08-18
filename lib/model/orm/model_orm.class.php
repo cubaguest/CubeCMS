@@ -386,7 +386,7 @@ class Model_ORM extends Model {
    {
       if ($obj == null)
          $obj = $this;
-
+      $sql = null;
       if($this->currentSql == null){
          $sql = 'SELECT ' . $obj->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $obj->getTableName() . '` AS ' . $this->getTableShortName();
          $obj->createSQLJoins($sql);
@@ -406,6 +406,7 @@ class Model_ORM extends Model {
       $r = false;
       try {
          $r = false;
+//         $timer = Debug_Timer::getInstance()->timerStart('SQL_record');
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
             $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
             $dbst->execute();
@@ -415,6 +416,7 @@ class Model_ORM extends Model {
             $dbst->execute();
             $r = $dbst->fetch($fetchParams);
          }
+//         $timer->timerStop('SQL_record', $sql != null ? $sql : $this->currentSql);
       } catch (PDOException $exc) {
          CoreErrors::addException($exc);
          if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
@@ -434,6 +436,7 @@ class Model_ORM extends Model {
     */
    public function records($fetchParams = self::FETCH_LANG_CLASS)
    {
+      $sql = null;
       if($this->currentSql == null){
          $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
          $this->createSQLJoins($sql);
@@ -454,6 +457,7 @@ class Model_ORM extends Model {
       }
       $r = false;
       try {
+//         $timer = Debug_Timer::getInstance()->timerStart('SQL_records');
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
             $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
             $dbst->execute();
@@ -463,7 +467,7 @@ class Model_ORM extends Model {
             $dbst->execute();
             $r = $dbst->fetchAll($fetchParams);
          }
-
+//         $timer->timerStop('SQL_records', $sql != null ? $sql : $this->currentSql);
          if ($fetchParams == self::FETCH_PKEY_AS_ARR_KEY AND $r != false) {
             $newR = array();
             foreach ($r as $record) {
@@ -483,6 +487,7 @@ class Model_ORM extends Model {
 
    public function count()
    {
+      $sql = null;
       if($this->currentSql == null){
          $pk = '*';
          if($this->pKey != null){
@@ -499,7 +504,9 @@ class Model_ORM extends Model {
          /* preg_replace('/SELECT * FROM/', 'COUNT(*)', $this->currentSql); */
          $dbst = $this->bindValues($this->dbconnector->prepare($this->currentSql));/* TODO */
       }
+//      $timer = Debug_Timer::getInstance()->timerStart('SQL_count');
       $dbst->execute();
+//      $timer->timerStop('SQL_count', $sql != null ? $sql : $this->currentSql);
       $r = $dbst->fetchObject();
       if ($r == false)
          return 0;
@@ -660,7 +667,9 @@ class Model_ORM extends Model {
                $dbst->bindValue(':' . $colname, $value, $params['pdoparam']);
             }
          }
+//         $timer = Debug_Timer::getInstance()->timerStart('SQL_update');
          $dbst->execute();
+//         $timer->timerStop('SQL_update', $sqlStr);
          $returnPk = $record->getPK();
       } else {
          // INSERT
@@ -725,8 +734,10 @@ class Model_ORM extends Model {
                $dbst->bindValue(':' . $colname, $value, $params['pdoparam']);
             }
          }
+//         $timer = Debug_Timer::getInstance()->timerStart('SQL_insert');
          $dbst->execute();
-         $returnPk = $this->dbconnector->lastInsertId();
+//         $timer->timerStop('SQL_insert', $sqlStr);
+         $returnPk = $this->getDb()->lastInsertId();
       }
 
       return $returnPk;

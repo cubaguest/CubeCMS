@@ -21,6 +21,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <meta name="generator" content="<?=AppCore::ENGINE_NAME.' '.number_format(VVE_VERSION, 1,'.',null)?>" />
       <title>{*-PAGE_TITLE-*}</title>
       <base href="<?=Url_Link::getMainWebDir()?>" />
+      <link rel="canonical" href="<?=$this->link()->rmParam()?>" />
       <?//feedy RSS
       $model = new Model_Category();
       $cats = $model->getCategoryList();
@@ -104,6 +105,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                   $this->includeTpl("navigation.phtml", true);
                   if(VVE_DEBUG_LEVEL > 0){
                      Debug::printDebug();
+                     Debug_Timer::printTimers();
                   }
                   ?>
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
