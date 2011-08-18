@@ -293,4 +293,15 @@ function vve_create_size_str($size, $round = 1)
       return $size." B";
    }
 }
+
+/**
+ * Převede BR tagy na nl
+ *
+ * @param string - řetězec, který se má převést
+ * @return string - převedený řetězec
+ */
+function vve_br2nl($string)
+{
+    return preg_replace('/\<br(\s*)?\/?\>/i', "\n", $string);
+}
 ?>
