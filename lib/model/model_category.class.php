@@ -119,22 +119,10 @@ class Model_Category extends Model_ORM {
     */
    public function setGroupPermissions()
    {
-      /*
-       * SELECT `t_cats`.`id_category`, `t_cats`.`label_cs`, `t_cats`.`urlkey_cs`, LENGTH(`t_cats`.`urlkey_cs`) as len,  `t_cats`.`module`, `t_cats`.`default_right`,
-       * IFNULL(`t_r`.`id_group`, 20) AS id_group, IFNULL(`t_r`.`right`,  `t_cats`.`default_right`) AS `right`, IFNULL(`t_r`.`right`,  'non') AS `real`
-       *
-       * FROM `cube_cms`.`vypecky_sub_categories` AS t_cats
-       *
-       * LEFT OUTER JOIN vypecky_sub_rights AS t_r ON (`t_r`.`id_category` = `t_cats`.`id_category` AND `t_r`.`id_group` = 20 )
-       * WHERE ( IFNULL(`t_r`.`right`,  `t_cats`.`default_right`) LIKE 'r__' AND `t_cats`.`urlkey_cs` IS NOT NULL )
-       * ORDER BY LENGTH(`t_cats`.`urlkey_cs`) DESC
-       */
-
       $this->join(Model_Category::COLUMN_CAT_ID, array('t_r' => 'Model_Rights'), null,
-                  array(Model_Rights::COLUMN_ID_GROUP, 'right' => 'IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.')'), self::JOIN_LEFT,
+                  array(Model_Rights::COLUMN_ID_GROUP, 'right' => 'IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.')' ), self::JOIN_LEFT,
                   ' AND t_r.'.Model_Rights::COLUMN_ID_GROUP . ' = :idgrp', array('idgrp' => (int)Auth::getGroupId()));
-
-      $this->where("IFNULL( t_r.".Model_Rights::COLUMN_RIGHT." ,  ".Model_Category::COLUMN_DEF_RIGHT."  ) LIKE 'r__' AND ".Model_Category::COLUMN_URLKEY." IS NOT NULL", array());
+      $this->where(" LEFT(`right`, 1) = 'r' AND ".Model_Category::COLUMN_URLKEY." IS NOT NULL", array());
 
       return $this;
    }
@@ -146,7 +134,16 @@ class Model_Category extends Model_ORM {
    public function getCategoryList()
    {
       if(self::$allCatsRecords == null){
-         $this->setGroupPermissions()->order(array('LENGTH('.self::COLUMN_URLKEY.')' => 'DESC'));
+         $this->columns(array(
+            Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, /*Model_Category::COLUMN_DATADIR, */
+            Model_Category::COLUMN_DEF_RIGHT, /* Model_Category::COLUMN_FEEDS, */
+            Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
+            Model_Category::COLUMN_VISIBILITY
+            
+            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'));
+         $this->setSelectAllLangs(false)->setGroupPermissions()
+            ->order(array('uk_l' => 'DESC'))
+            ;
          self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
       }
       return self::$allCatsRecords;
