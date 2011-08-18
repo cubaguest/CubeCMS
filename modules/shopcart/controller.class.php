@@ -103,7 +103,9 @@ class ShopCart_Controller extends Controller {
          $shippingsArray[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = $shipping;   
       }
       $this->view()->shippings = $sh;
-      
+      if(isset ($_SESSION['shop_order']['shipping'])){
+         $eShipping->setValues($_SESSION['shop_order']['shipping']);
+      }
       $formGoNext->addElement($eShipping);
       
       $ePayment = new Form_Element_Select('payment', $this->tr('Platba'));
@@ -124,6 +126,9 @@ class ShopCart_Controller extends Controller {
          $paymentsArray[$payment->{Shop_Model_Payments::COLUMN_ID}] = $payment;
       }
       $this->view()->payments = $py;
+      if(isset ($_SESSION['shop_order']['payment'])){
+         $ePayment->setValues($_SESSION['shop_order']['payment']);
+      }
       $formGoNext->addElement($ePayment);
       
       $eSend = new Form_Element_Submit('send', $this->tr('Přejít k obědnávce'));
@@ -271,6 +276,9 @@ class ShopCart_Controller extends Controller {
       $eSend->setCancelConfirm(false);
       $formOrder->addElement($eSend);
       
+      // obnova dat pokud existují
+      $this->restoreOrderInfo($formOrder);
+      
       if($formOrder->isSend()){
          if($formOrder->send->getValues() == false){
             $this->link()->route()->reload();
@@ -285,6 +293,8 @@ class ShopCart_Controller extends Controller {
             $formOrder->deliveryCity->removeValidation('Form_Validator_NotEmpty');
             $formOrder->deliveryPostCode->removeValidation('Form_Validator_NotEmpty');
          }
+         // uložíme informace o zákazníkovi do session. Mohl by se totiž vrátit, nebo špatné položky v košíku, a určitě to nechce všechno vyplňovat znovu
+         $this->storeOrderInfo($formOrder);
       }
 
       if($formOrder->isValid()){
@@ -295,46 +305,62 @@ class ShopCart_Controller extends Controller {
          $modelPayments = new Shop_Model_Payments();
          $modelShippings = new Shop_Model_Shippings();
          $modelStatus = new Shop_Model_OrderStatus();
-         $basket = new Shop_Basket();
-         $basket->loadItems();
+         try {
+            $basket = new Shop_Basket();
+            $basket->loadItems();
          
-         /*
-          * Kontroly styvu zboží a odečty položek. 
-          * Pokud nelze odečíst, nelze vytvořit objednávku a redirect s chybou na košík.
-          * Rovnou odstranit objednávku
-          * V chybě: které položka a kolik zbývá
-          */
-         $arrOfKeys = array();
-         $arrOfBinds = array();
-         foreach ($basket->getItems() as $item) {
-            $k = $item->getId();
-            $arrOfKeys[] = ':id'.$k;
-            $arrOfBinds['id'.$k] = $k;
-         }
-         $modelProducts = new Shop_Model_Product();
-         $products = $modelProducts->setSelectAllLangs(false)
-         ->columns(array(Shop_Model_Product::COLUMN_QUANTITY, Shop_Model_Product::COLUMN_NAME))
-         ->where(Shop_Model_Product::COLUMN_ID.' IN ('.  implode(',', $arrOfKeys).')', $arrOfBinds)->records();
-         
-         foreach ($products as $product) {
-            /* @var $item Shop_Basket_Item */
-            $prQty = $product->{Shop_Model_Product::COLUMN_QUANTITY};
-            if($prQty == 0){ // zboží už je vyprodané
-               $this->errMsg()->addMessage(
-                  sprintf($this->tr('Omlouváme se, ale zboží "%s" je již vyprodané. Upravte prosím položky v košíku.'), 
-                     $product->{Shop_Model_Product::COLUMN_NAME}));
-               break;
-            } else if($prQty < $basket[$product->{Shop_Model_Basket::COLUMN_ID_PRODUCT}]->getQty()){ // zboží není v potřebném množství
-               $this->errMsg()->addMessage(
-                  sprintf($this->tr("Omlouváme se, ale zboží %s není již v požadovaném množství. Upravte prosím položky v košíku."), 
-                     $product->{Shop_Model_Product::COLUMN_NAME}));
-               break;
-            } else { // samotná odečet množství
-               
+            /*
+             * Kontroly styvu zboží a odečty položek. 
+             * Pokud nelze odečíst, nelze vytvořit objednávku a redirect s chybou na košík.
+             * Rovnou odstranit objednávku
+             * V chybě: které položka a kolik zbývá
+             */
+            $arrOfKeys = $arrOfBinds = array();
+            foreach ($basket->getItems() as $item) {
+               $k = $item->getId();
+               $arrOfKeys[] = ':id'.$k;
+               $arrOfBinds['id'.$k] = $k;
             }
-            
-         }
          
+            $modelProducts = new Shop_Model_Product();
+            $modelProducts->lock('WRITE');
+            
+            $products = $modelProducts->setSelectAllLangs(false)
+               ->columns(array(Shop_Model_Product::COLUMN_QUANTITY, Shop_Model_Product::COLUMN_NAME, Shop_Model_Product::COLUMN_UNIT))
+               ->where(Shop_Model_Product::COLUMN_ID.' IN ('.  implode(',', $arrOfKeys).')', $arrOfBinds)->records();
+            // kontrola dosupnosti zboží
+            foreach ($products as $product) {
+               /* @var $item Shop_Basket_Item */
+               $prQty = $product->{Shop_Model_Product::COLUMN_QUANTITY};
+               // zboží už je vyprodané
+               if ($prQty == 0) {
+                  throw new RangeException(
+                     sprintf($this->tr('Omlouváme se, ale zboží "%s" je již vyprodané. Upravte prosím položky v košíku.'), 
+                        $product->{Shop_Model_Product::COLUMN_NAME}));
+               } 
+               // zboží není v potřebném množství
+               else if ($prQty != -1 && $prQty < $basket[$product->{Shop_Model_Basket::COLUMN_ID_PRODUCT}]->getQty()) {
+                  throw new RangeException(
+                     sprintf($this->tr("Omlouváme se, ale zboží %s není již v požadovaném množství. 
+                        Upravte prosím položky v košíku. Aktuálně je dostupné %s %s."), 
+                        $product->{Shop_Model_Product::COLUMN_NAME}, $prQty, $product->{Shop_Model_Product::COLUMN_UNIT} ));
+               }
+            }
+//            $modelProducts->unLock();
+//            $modelProducts->lock('READ');
+            // samotný update zboží
+            foreach ($products as $product) {
+               $product->{Shop_Model_Product::COLUMN_QUANTITY} = $product->{Shop_Model_Product::COLUMN_QUANTITY}
+                  -$basket[$product->{Shop_Model_Basket::COLUMN_ID_PRODUCT}]->getQty();
+               $modelProducts->save($product);
+            }
+            $modelProducts->unLock();
+            
+         } catch (RangeException $exc) {
+            $modelProducts->unLock();
+            $this->errMsg()->addMessage($exc->getMessage(), true);
+            $this->link()->route()->reload();
+         }
          
          $order = $modelOrder->newRecord();
          
@@ -370,7 +396,6 @@ class ShopCart_Controller extends Controller {
          
          $productsPrice = $basket->getPrice();
          
-         $s = $this->getOrderStore();
          $payment = $modelPayments->record($_SESSION['shop_order']['payment']);
          $shipping = $modelShippings->record($_SESSION['shop_order']['shipping']);
          
@@ -593,6 +618,28 @@ class ShopCart_Controller extends Controller {
       }
    }
    
+   private function storeOrderInfo($form)
+   {
+      $_SESSION['shop_order']['orderinfo'] = array();
+      foreach ($form as $element) {
+         if( $element instanceof Form_Element_Text || $element instanceof Form_Element_TextArea
+            || $element instanceof Form_Element_Select || $element instanceof Form_Element_Checkbox ){
+            $_SESSION['shop_order']['orderinfo'][$element->getName()] = $element->getValues();
+         }
+      }
+   }
+   
+   private function restoreOrderInfo(Form $form)
+   {
+      if(isset ($_SESSION['shop_order']['orderinfo'])){
+         foreach ($_SESSION['shop_order']['orderinfo'] as $eName => $value) {
+            $eName = str_replace($form->getPrefix(), '', $eName);
+            $form->{$eName}->setValues($value);
+         }
+      }
+   }
+
+
    public function orderCompleteController()
    {
       if(!isset ($_SESSION['shop_order']) || !isset ($_SESSION['shop_order']['orderId']) || $_SESSION['shop_order']['orderId'] == null){
