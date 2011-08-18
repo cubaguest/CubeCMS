@@ -224,5 +224,16 @@ class Html_Element {
       }
       return false;
    }
+   
+   /**
+    * Metoda nastaví obsah prvku
+    * @param string $cnt -- řetězec obsahu
+    * @return Html_Element 
+    */
+   public function setContent($cnt)
+   {
+      $this->content = $cnt;
+      return $this;
+   }
 }
 ?>
