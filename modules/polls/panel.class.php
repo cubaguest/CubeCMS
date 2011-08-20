@@ -13,7 +13,7 @@ class Polls_Panel extends Panel {
 
       $this->template()->voted = false;
       $votedPolls = array();
-      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls'])){
+      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls']) AND !Auth::isAdmin()){
          $votedPolls = explode('|', $_COOKIE[VVE_SESSION_NAME.'_polls']);
          if(in_array($this->template()->poll->{Polls_Model::COLUMN_ID}, $votedPolls)
             OR $this->template()->poll->{Polls_Model::COLUMN_ACTIVE} != true){

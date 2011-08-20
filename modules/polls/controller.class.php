@@ -20,7 +20,7 @@ class Polls_Controller extends Controller {
       $formVoteSingle = $this->createFormVoteSingle();
 
       $votedPolls = array();
-      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls']) AND VVE_DEBUG_LEVEL < 2){
+      if(isset ($_COOKIE[VVE_SESSION_NAME.'_polls']) AND VVE_DEBUG_LEVEL < 2 AND !Auth::isAdmin()){
          $votedPolls = explode('|', $_COOKIE[VVE_SESSION_NAME.'_polls']);
       }
       $cokieExpire = time()+60*60*24*$this->category()->getParam('cookiedays', self::DEFAULT_COOKIE_DAYS);
@@ -34,7 +34,7 @@ class Polls_Controller extends Controller {
          } else if(in_array($formVoteSingle->id_poll->getValues(), $votedPolls)){
             $this->errMsg()->addMessage($this->_('V této anketě jste již hlasoval'));
          } else {
-            $votedPolls[$formVoteSingle->id_poll->getValues()] = true;
+            $votedPolls[] = $formVoteSingle->id_poll->getValues();
             if(VVE_DEBUG_LEVEL < 2){
                setcookie(VVE_SESSION_NAME.'_polls', implode('|', $votedPolls),$cokieExpire,'/');
             }
@@ -60,7 +60,7 @@ class Polls_Controller extends Controller {
          } else if($selected == null){
             $this->errMsg()->addMessage($this->_('Nebyla vybrána žádná volba'));
          } else {
-            $votedPolls[$formVoteMulti->id_poll->getValues()] = true;
+            $votedPolls[] = $formVoteMulti->id_poll->getValues();
             if(VVE_DEBUG_LEVEL < 2){
                setcookie(VVE_SESSION_NAME.'_polls', implode('|', $votedPolls),$cokieExpire,'/');
             }
