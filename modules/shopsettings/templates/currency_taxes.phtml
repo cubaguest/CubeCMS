@@ -1,0 +1,86 @@
+<? 
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+?>
+<h1><?= $this->tr('Měny a daně') ?></h1>
+<?
+$this->includeFile('tpl://nav.phtml');
+?>
+<div class="main-content-form-edit">
+   <? echo $this->form; ?>
+   <h2><?=$this->tr('Daně')?></h2>
+   <table id="table-taxes"></table>
+   <div id="table-taxes-pager"></div>
+   <hr class="reseter" />
+</div>
+
+<script type="text/javascript" charset="utf-8">
+   /* <![CDATA[ */
+   var selectedGroupId = 0;
+      $(document).ready(function() {
+         var taxesGrid = $("#table-taxes").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('taxesList');?>',
+            datatype: "json",
+            colNames:['<?=$this->tr('Název')?>', '<?=$this->tr('Hodnota v %')?>'],
+            colModel:[
+               {name:'<?=Shop_Model_Tax::COLUMN_NAME?>',
+                index:'<?=Shop_Model_Tax::COLUMN_NAME?>', width:130, editable:true, editoptions:{size:20},
+                formoptions:{ rowpos:1, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+               {name:'<?=Shop_Model_Tax::COLUMN_VALUE?>',
+                index:'<?=Shop_Model_Tax::COLUMN_VALUE?>', width:130,editable:true,editoptions:{size:20},
+                formoptions:{ rowpos:2, label: "<?=$this->tr('Hodnota')?>",elmprefix:"(*)"}},
+            ],
+            rowNum:5,
+            rowList:[5,10,20,50],
+            pager: '#table-taxes-pager',
+            sortname: '<?=Shop_Model_Tax::COLUMN_NAME?>',
+            caption:"Seznam daní",
+            jsonReader: {
+               repeatitems : false, root:"rows"
+            },
+            height: '100%',
+            autowidth : true,
+            editurl:"<?=$this->link()->route('editTax')?>"
+         });
+         taxesGrid.jqGrid('navGrid','#table-taxes-pager',
+            {edit:true,add:true,del:true,search:false},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },  
+            // del options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true, width: 300,
+               afterSubmit : function(respond, postdata){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            }
+         );
+      });
+   /* ]]> */
+</script>
