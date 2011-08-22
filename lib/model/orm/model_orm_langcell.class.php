@@ -22,6 +22,7 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * Konstruktor
     */
    function  __construct() {
+      $this->values = array_fill_keys(Locales::getAppLangs(), null);
    }
 
    /**
@@ -116,8 +117,8 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @return string -- řetězec
     */
    public function  __toString() {
-      if(gettype($this->values[Locales::getLang()]) == 'string'
-        AND $this->values[Locales::getLang()] != ''|null) {
+      if(isset ($this->values[Locales::getLang()]) && gettype($this->values[Locales::getLang()]) == 'string'
+        && $this->values[Locales::getLang()] != ''|null) {
          return $this->values[Locales::getLang()];
       }
       // vrací se výchozí jazyk -- není protože jazyk může být vybrán jenom jeden
