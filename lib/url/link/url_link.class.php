@@ -522,6 +522,7 @@ class Url_Link {
 
    /**
     * Metoda inicializuje zpětný odkaz, kde bude tato metoda volána je považován za kořenový kontroller
+    * @todo Tohle předělat !!!
     */
    public function backInit(Url_Link $link = null) {
       unset ($_SESSION['linkBack'][$this->category]);
@@ -540,7 +541,7 @@ class Url_Link {
     * @param int $appLevel (option) level (def: 0)
     */
    private function setBack(Url_Link $link, $appLevel = 0) {
-      $_SESSION['linkBack'][$this->category][$appLevel] = $link;
+      $_SESSION['linkBack'][$this->category][$appLevel] = (string)$link;
       ksort($_SESSION['linkBack'][$this->category]);
    }
 
