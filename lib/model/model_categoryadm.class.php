@@ -13,6 +13,7 @@
  */
 class Model_CategoryAdm extends Model_File {
    const STRUCTURE_FILE = 'admmenu.xml';
+   const STRUCTURE_SHOP_FILE = 'admshopmenu.xml';
    /**
     * Objekt s admin menu
     * @var SimpleXMLElement
@@ -22,7 +23,14 @@ class Model_CategoryAdm extends Model_File {
    public function __construct()
    {
       if(self::$structure === null){
-         self::$structure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.'menu'.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
+         self::$structure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
+            .'menu'.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
+         // shop struct
+         if(defined('VVE_SHOP') && VVE_SHOP == true){
+            $shopStructure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
+               .'menu'.DIRECTORY_SEPARATOR.self::STRUCTURE_SHOP_FILE, NULL, TRUE);
+            $this->appendSimplexml(self::$structure, $shopStructure);
+         }
          // user struct
          if(is_file(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE)){
             $userStructure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
