@@ -96,18 +96,18 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
 
    /**
     * Magic pro vybrání hodnoty slupce
-    * @param <type> $name
-    * @param <type> $value
+    * @param string $collName -- název sloupce
     */
-   public function __get($collName)
+   public function &__get($collName)
    {
       // tady kontroly sloupců
       if (isset($this->columns[$collName])) {
+         if($this->columns[$collName]['lang'] == true && !$this->columns[$collName]['value'] instanceof Model_ORM_LangCell){
+            $this->columns[$collName]['value'] = new Model_ORM_LangCell();
+            $this->columns[$collName]['changed'] = 1;
+         }
          return $this->columns[$collName]['value'];
       }
-//      else if(isset ($this->externColumns[$collName])){
-//         return $this->externColumns[$collName];
-//      }
       return null;
    }
 
