@@ -476,11 +476,29 @@ class ShopSettings_Controller extends Controller {
       }
       $form->addElement($eAdminMailText, $grpNotify);
       
+      $grpStatus = $form->addGroup('status', $this->tr('Stavy objednávek'));
+      
+      //VVE_SHOP_ORDER_DEFAULT_STATUS
+      $eDefaultStatus = new Form_Element_Text('statusDefault', $this->tr('Výchozí stav objednávky'));
+      $eDefaultStatus->addValidation(new Form_Validator_NotEmpty());
+      $eDefaultStatus->setSubLabel($this->tr('Počáteční stav při přijetí objednávky. Například "přijato".'));
+      $eDefaultStatus->setValues(VVE_SHOP_ORDER_DEFAULT_STATUS);
+      $form->addElement($eDefaultStatus, $grpStatus);
+      
+      $eStatus = new Form_Element_TextArea('status', $this->tr('Stavy objednávky'));
+      $eStatus->addValidation(new Form_Validator_NotEmpty());
+      $eStatus->setValues(VVE_SHOP_ORDER_STATUS);
+      $eStatus->setSubLabel($this->tr('Předdefinované stavy objednávek (např. přijato;odesláno;vráceno) oddělené středníkem.'));
+      $form->addElement($eStatus, $grpStatus);
+      
+      
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
       
       if($form->isValid()){
          $this->storeSystemCfg('VVE_SHOP_ORDER_MAIL', $form->notifyMail->getValues());
+         $this->storeSystemCfg('VVE_SHOP_ORDER_DEFAULT_STATUS', $form->statusDefault->getValues());
+         $this->storeSystemCfg('VVE_SHOP_ORDER_STATUS', $form->status->getValues());
          
          // uložení mailů
          $usersTexts = $form->notifyUserMail->getValues();
