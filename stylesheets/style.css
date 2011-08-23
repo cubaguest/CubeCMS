@@ -63,6 +63,7 @@ html,body {
    border: 0px none;
    margin: 0px;
    padding: 0px;
+   font-size: 12px;
    text-align: left;
    background: url('../images/backshadow.png') fixed top center white repeat-y;
 }
@@ -149,8 +150,8 @@ span[title] {
    /*font-weight: 600;*/
 }
 .message p {
-   margin-bottom:3px;
-   border-top: 1px solid gray;
+   border-top: 1px dotted gray;
+   padding: 3px 0;
 }
 .message p:first-child {
    border: none;
@@ -209,12 +210,8 @@ input.form-required, textarea.form-required {
    background-image: url('../images/form_required.png');
    background-repeat: no-repeat;
 }
-label.form-error {
-   color:red;
-}
-input.form-error, textarea.form-error {
-   background-color: #f4d0d0;
-}
+label.form-error { color:red; }
+input.form-error, textarea.form-error { background-color: #f4d0d0; }
 .button {
    padding: 2px 4px;
    margin-right: 4px;
@@ -229,69 +226,33 @@ input.form-error, textarea.form-error {
    font-size: 0.8em !important;
 }
 /* tabulka formuláře */
-form fieldset {
-   position: relative;
-   width: 100%;
-   float: left;
-   clear: both;
-   background-color: #eeeeee;
-   border: 1px solid #bbbbbb;
-}
-form fieldset p {
-   padding: 0; margin: 0;
-}
-form fieldset.fieldset-alt legend + table.form-table,
-form fieldset.fieldset-alt legend + p.form-legend-text {
-   margin-top: 26px;
-}
+form fieldset { width: 100%; margin: 5px 0;}
 form fieldset legend {
-   background: transparent url('../images/forms/legend_back.gif') top left repeat-x;
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-}
-*+html form fieldset legend { /* IE 7 hack */
-   left: -7px;
-}
-form fieldset legend span {
-   font-weight: bold;
-   float: left;
-   display: block;
-   padding: 5px 10px 5px 5px;
+/*   color: #666666;*/
    font-size: 14px;
+   font-weight: bold;
+   padding-bottom: 5px;
+   margin-left: 0;
+   padding-left: 10px;
 }
-form fieldset legend span.form-legend-text,
-form fieldset.fieldset-alt p.form-legend-text {
-   font-weight: normal;
-   font-size: 10px;
-   padding: 7px 0 0 0;
-}
-form fieldset.fieldset-alt p.form-legend-text {
-   padding: 5px 10px 5px 5px;
-}
-form fieldset .form-table {
-   table-layout:fixed;
+form table.form-table {
    width: 100%;
+   background-color: #e9edf0;
+   border-bottom: 10px solid #e9edf0;
+   border-top: 10px solid #e9edf0;
 }
-form .form-table td, form .form-table-group td, form .form-table th, form .form-table-group th {
-   padding: 3px;
+form table.form-table td, form table.form-table th {
+   padding: 5px 10px;
    vertical-align: top;
+   border-bottom: 1px dotted #bbbbbb;
 }
-form .form-table td table td { /* tinymce broken layout */
+form table.form-table th.form-labels {
+   width: 90px;
+}
+form table.form-table .mceEditor td, form table.form-table p { /*repair TinyMCE layout */
    padding: 0;
 }
 
-form th.form-labels {
-   width: 85px;
-   text-align:left;
-   font-size: 12px;
-   padding: 5px 0 5px 5px;
-   word-wrap: break-word;
-}
-form .form-table p.form-sub-label, form .form-table p.form-box-validations {
-   font-size: x-small;
-}
 .form-required {
    color:maroon;
 }
@@ -387,7 +348,10 @@ textarea, form .form-table .form-element-long {
    list-style: decimal;
 }
 
-.main-content-form-edit {} /* Třída pro editační formulář */
+.main-content-form-edit table.ui-widget td,
+.main-content-form-edit table.ui-widget th {
+   padding: 3px;
+} /* Třída pro editační formulář */
 
 /* JQ ui */
 .main-content-list-record .ui-widget-header,
