@@ -3,8 +3,10 @@
 function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
    echo ("<ul ".$ulParam.">\n");
    foreach ($menuArr as $key => $item) {
-      if($item['type']){
+      if(isset($item['type']) && $item['type'] == 'user'){
          echo ("<li class=\"adminmenu-user-item\">");
+      } else if(isset($item['type']) && $item['type'] == 'shop'){
+         echo ("<li class=\"adminmenu-shop-item\">");
       } else {
          echo ("<li>");
       }
