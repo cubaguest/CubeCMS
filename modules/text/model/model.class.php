@@ -23,6 +23,13 @@ class Text_Model extends Model_ORM {
 
    const DEFAULT_SUBKEY = 'nokey';
 
+   /**
+    * Pole s hodnotami pro převod z jazykového pole na řetězec
+    * @var array
+    * @todo odstranit
+    */
+   private $insUpdtValues = array();
+   
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_texts');
 
@@ -154,6 +161,49 @@ class Text_Model extends Model_ORM {
       } else {
          return $fetch->tm;
       }
+   }
+   
+   /* tohle odstranit */
+   
+   /**
+    * Metoda nastaví pole modelu pro vytvoření řetězců pro insert update
+    * @param array $columns -- pole s názvy sloupců a hodotami
+    * @param char $separator -- oddělovač mezi názvy sloupců pokud jsou v poli (option default: '_')
+    * @deprecated není nutný, je tu kvůli starým metodám
+    */
+   protected function setIUValues($columns, $separator = '_', $clPrefix = null) {
+      foreach ($columns as $clKey => $clVal) {
+         if(!is_null($clPrefix)) {
+            $prefix = $clPrefix.$separator;
+         } else {
+            $prefix = null;
+         }
+         if(is_array($clVal)) {
+            $this->setIUValues($clVal, $separator, $prefix.$clKey);
+         } else {
+            $this->insUpdtValues[$prefix.$clKey] = $clVal;
+         }
+      }
+   }
+   
+   /**
+    * Metoda vrací řetězec pro příkaz update
+    * @return string
+    */
+   public function getUpdateValues() {
+      $pdo = new Db_PDO();//`label_cs`= 'Saul Griffith's lofty',
+      $returnStr = null;
+      //      var_dump($this->insUpdtValues);
+      foreach ($this->insUpdtValues as $key => $variable) {
+         //         $returnStr .= '`'.$key.'` = '.$pdo->quote($variable).", ";
+         if($variable == null) {
+            $var = 'NULL';
+         } else {
+            $var = $pdo->quote($variable);
+         }
+         $returnStr .= $key.' = '.$var.", ";
+      };
+      return substr($returnStr, 0, strlen($returnStr)-2);
    }
 }
 
