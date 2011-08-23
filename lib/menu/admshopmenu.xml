@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- ID Start from 32900 -->
+<adminmenu>
+   <section type="shop">
+      <name lang="cs">Obchod</name>
+      <name lang="en">E-Shop</name>
+      <item id="32900">
+         <name lang="cs">Objednávky</name>
+         <name lang="en">Orders</name>
+         <urlkey lang="en">admin/eshop/objednavky</urlkey>
+         <urlkey lang="cs">admin/eshop/orders</urlkey>
+         <module>shoporders</module>
+      </item>
+      <item id="32901">
+         <name lang="cs">Nastavení</name>
+         <name lang="en">Settings</name>
+         <urlkey lang="en">admin/eshop/nasatveni</urlkey>
+         <urlkey lang="cs">admin/eshop/settings</urlkey>
+         <module>shopsettings</module>
+      </item>
+   </section>
+</adminmenu>
