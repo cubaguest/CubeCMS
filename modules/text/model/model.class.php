@@ -205,6 +205,40 @@ class Text_Model extends Model_ORM {
       };
       return substr($returnStr, 0, strlen($returnStr)-2);
    }
+   
+   /**
+    * Metoda vrací řetězec s názvy sloupců pro vložení do insertu
+    * @return string
+    */
+   public function getInsertLabels($separator = '_') {
+      $returnStr = "(";
+      foreach (array_keys($this->insUpdtValues) as $variable) {
+         //         $returnStr .= '´'.$variable.'´, ';
+         $returnStr .= $variable.', ';
+      };
+      return substr($returnStr, 0, strlen($returnStr)-2).")";
+   }
+   
+    /**
+    * Metoda vrací řetězec s názvy sloupců pro vložení do insertu
+    * @return string
+    */
+   public function getInsertValues() {
+      $pdo = new Db_PDO();
+      $returnStr = "(";
+      foreach (array_values($this->insUpdtValues) as $variable) {
+         if(is_bool($variable) AND $variable) {
+            $returnStr .= '1, ';
+         } else if(is_bool($variable) AND !$variable) {
+            $returnStr .= '0, ';
+         } else if($variable == null OR $variable == '') {
+            $returnStr .= "NULL, ";
+         } else {
+            $returnStr .= $pdo->quote($variable).", ";
+         }
+      };
+      return substr($returnStr, 0, strlen($returnStr)-2).")";
+   }
 }
 
 ?>
