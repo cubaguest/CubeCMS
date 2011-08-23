@@ -491,7 +491,7 @@ class Model_ORM extends Model {
       if($this->currentSql == null){
          $pk = '*';
          if($this->pKey != null){
-            $pk = $this->pKey;
+            $pk = '`'.$this->getTableShortName().'`.`'.$this->pKey.'`';
          }
          $sql = 'SELECT COUNT('.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
          $this->createSQLJoins($sql);
