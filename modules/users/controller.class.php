@@ -178,7 +178,7 @@ GROUP BY `t_grp`.`id_group`*/
          case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
             $jqGridReq->id = null;
             if($jqGridReq->{Model_Users::COLUMN_PASSWORD} == null){
-               $this->errMsg()->addMessage($this->_('Při přidání uživatele heslo musí být zadáno'));
+               $this->errMsg()->addMessage($this->tr('Při přidání uživatele heslo musí být zadáno'));
                return;
             }
          case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
@@ -186,24 +186,24 @@ GROUP BY `t_grp`.`id_group`*/
             if($jqGridReq->{Model_Users::COLUMN_USERNAME} == null
                OR $jqGridReq->{Model_Users::COLUMN_NAME} == null
                OR $jqGridReq->{Model_Users::COLUMN_SURNAME} == null){
-               $this->errMsg()->addMessage($this->_('Nebyly zadány všechny povinné údaje'));
+               $this->errMsg()->addMessage($this->tr('Nebyly zadány všechny povinné údaje'));
                return;
             }
             // validace názvu
             if(!preg_match('/^[a-zA-Z0-9@._-]+$/', $jqGridReq->{Model_Users::COLUMN_USERNAME})){
-               $this->errMsg()->addMessage($this->_('Už. jméno obsahuje nepovolené znaky<br /> (mezera, diakritika)'));
+               $this->errMsg()->addMessage($this->tr('Už. jméno obsahuje nepovolené znaky<br /> (mezera, diakritika)'));
                return;
             }
             // validace mailu
             $validatorMail = new Validator_EMail($jqGridReq->{Model_Users::COLUMN_MAIL});
             if ($jqGridReq->{Model_Users::COLUMN_MAIL} != null AND !$validatorMail->isValid()) {
-               $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
+               $this->errMsg()->addMessage($this->tr('Špatně zadaný e-mail'));
                return;
             }
             // validace username
             $record = $model->record($jqGridReq->id);
             if($record->{Model_Users::COLUMN_USERNAME} != $jqGridReq->{Model_Users::COLUMN_USERNAME} AND $this->userExist($jqGridReq->{Model_Users::COLUMN_USERNAME})){
-               $this->errMsg()->addMessage($this->_('Uživatelské jméno je již obsazeno'));
+               $this->errMsg()->addMessage($this->tr('Uživatelské jméno je již obsazeno'));
                return;
             }
             if($jqGridReq->{Model_Users::COLUMN_PASSWORD} == null){
@@ -213,16 +213,16 @@ GROUP BY `t_grp`.`id_group`*/
             }
             $record->mapArray($jqGridReq);
             $model->save($record);
-            $this->infoMsg()->addMessage($this->_('Uživatel byl uložen'));
+            $this->infoMsg()->addMessage($this->tr('Uživatel byl uložen'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
             foreach ($jqGridReq->getIds() as $id) {
                $model->delete($id);
             }
-            $this->infoMsg()->addMessage($this->_('Vybraní uživatelé byli smazáni'));
+            $this->infoMsg()->addMessage($this->tr('Vybraní uživatelé byli smazáni'));
             break;
          default:
-            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ operace'));
             break;
       }
       if ($this->errMsg()->isEmpty()) {
@@ -242,7 +242,7 @@ GROUP BY `t_grp`.`id_group`*/
          }
          $model->save($record);
       }
-      $this->infoMsg()->addMessage($this->_('Status byl změněn'));
+      $this->infoMsg()->addMessage($this->tr('Status byl změněn'));
    }
 
    public function editGroupController() {
@@ -259,12 +259,12 @@ GROUP BY `t_grp`.`id_group`*/
          case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
             // kontrola položek
             if($jqGridReq->{Model_Groups::COLUMN_NAME} == null){
-               $this->errMsg()->addMessage($this->_('Nebyly zadány všechny povinné údaje'));
+               $this->errMsg()->addMessage($this->tr('Nebyly zadány všechny povinné údaje'));
                return;
             }
             // validace názvu
             if(!preg_match('/^[a-zA-Z0-9_-]+$/', $jqGridReq->{Model_Groups::COLUMN_NAME})){
-               $this->errMsg()->addMessage($this->_('Název obsahuje nepovolené znaky<br /> (pouze: a-z; A-Z; 0-9; _; -)'));
+               $this->errMsg()->addMessage($this->tr('Název obsahuje nepovolené znaky<br /> (pouze: a-z; A-Z; 0-9; _; -)'));
                return;
             }
             $record = $model->record($jqGridReq->id);
@@ -295,7 +295,7 @@ GROUP BY `t_grp`.`id_group`*/
                }
             }
             
-            $this->infoMsg()->addMessage($this->_('Skpina byla uložena'));
+            $this->infoMsg()->addMessage($this->tr('Skpina byla uložena'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
             $modelU = new Model_Users();
@@ -306,10 +306,10 @@ GROUP BY `t_grp`.`id_group`*/
                // Smazání uživatelů
                $modelU->where(Model_Users::COLUMN_GROUP_ID.' = :idg', array('idg' => $id))->delete();
             }
-            $this->infoMsg()->addMessage($this->_('Vybrané skupiny byly smazány'));
+            $this->infoMsg()->addMessage($this->tr('Vybrané skupiny byly smazány'));
             break;
          default:
-            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ operace'));
             break;
       }
       if ($this->errMsg()->isEmpty()) {

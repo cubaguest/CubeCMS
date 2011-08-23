@@ -28,28 +28,31 @@ $this->addJsPlugin($jQuery);
             colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Popis')?>', '<?=$this->tr('Admin')?>', '<?=$this->tr('Omezení na domény')?>'],
             colModel:[
                {name:'<?=Model_Groups::COLUMN_ID?>',index:'<?=Model_Groups::COLUMN_ID?>',
-                  width:33,editable:false},
-               {name:'<?=Model_Groups::COLUMN_NAME?>',index:'<?=Model_Groups::COLUMN_NAME?>', width:130,editable:true,editoptions:{size:20},
+                  width:33,fixed: true,editable:false},
+               {name:'<?=Model_Groups::COLUMN_NAME?>',index:'<?=Model_Groups::COLUMN_NAME?>', 
+                  width:130,fixed: true, editable:true,editoptions:{size:20},
                   formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
+               {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', 
+                  width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
                   formoptions:{ rowpos:3, label: "<?=$this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'<?=Model_Groups::COLUMN_IS_ADMIN?>',index:'<?=Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
-                  width:60,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
+                  width:50,fixed:true, editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
                   },
                   formoptions:{ rowpos:4, label: "<?=$this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
-               {name:'sites',index:'sites', width:170, editable: true, edittype:"select", editoptions: {
+               {name:'sites',index:'sites', width:170, fixed : true, editable: true, edittype:"select", editoptions: {
                      value: <?=json_encode($this->sites)?>,
                      multiple: true, size: 3
                   },
-                  formoptions:{ rowpos:5, label: "<?=$this->_('Uživatel<br />pouze pro<br />domény')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:5, label: "<?=$this->tr('Uživatel<br />pouze pro<br />domény')?>",
+                     elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
             ],
             rowNum:20,
             rowList:[10,20,40,100],
             pager: '#table-groups-pager',
             sortname: '<?=Model_Groups::COLUMN_ID?>',
-            caption:"Skupiny v systému",
-            height: 350,
-            width : 650,
+            caption:"<?=$this->tr('Skupiny v systému')?>",
+            autowidth : true,
+            height: '100%',
             editurl:"<?=$this->link()->route('editGroup')?>"
          });
          $.jgrid.del.msg = '<strong>'+$.jgrid.del.msg+"</strong><br /><?=$this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
