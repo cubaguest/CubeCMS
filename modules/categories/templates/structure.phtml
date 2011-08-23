@@ -82,12 +82,12 @@ echo $this->toolbox;
 
       // načte informace o kategorii a vloží do boxu
       function loadCatinfo(idc){
-         showLoadBox('#category-info div');
+         showLoadBox($('#category-info').parent('div'));
          $.ajax({
                type: "GET", url: "<?=$this->link()->route("getCatInfo")?>", cache : false,
                data: {idc : idc},
                success: function(data){
-                  $('#category-info div').html(data);
+                  $('#category-info div').hide().html(data).show();
                   hideLoadBox();
                }
             });

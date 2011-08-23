@@ -1,66 +1,13 @@
 @CHARSET "UTF-8";
-.list-item td.cat-first-coll {
-   padding-left: 19px;
-}
-.list-item td {
-   border-bottom: 1px solid gray;
-   padding: 5px;
-}
-.list-item td table td {
-   border: none;
-   padding: 1px;
-}
-.list-item td table th {
-   width: 200px;
-}
-.list-item:hover {
-/*   background-color: #fdf5ce;*/
-}
-
-.moduleParamsTable thead {
-   border-bottom: 1px solid silver;
-}
-.moduleParamsTable .paramDefValue {
-   text-align: center;
-}
-.moduleLabel {
-   background-color: white;
-   border: 1px solid silver;
-   padding: 3px;
-}
-
-.category-params {
-   display: none;
-   margin-top: 1em;
-}
-.sec {cursor: pointer;}
-
-#admin-categories-table .ui-widget-header {
-   background-image: none;
-   background-color: #ff9999;
-}
-
-/* new */
-#category-structure-wrap {
-   float: left;
-   width: 60%;
-}
+#category-structure-wrap { float: left; width: 60%;}
 #category-structure {
-/*   width: 400px;*/
    border: 1px solid gray;
    overflow: auto;
    background-color: transparent;
 }
 
-#category-info {
-/*   width: 300px;*/
-   width: 40%;
-   overflow: auto;
-}
-#category-info div {
-   margin-left: 10px;
-}
-#category-info table { width: 100%; font-size: 70%;}
+#category-info { width: 40%; overflow: auto; }
+#category-info div { margin-left: 10px; }
 #category-info td, #category-info th {padding: 2px;}
 #category-info td.cell-lang {width: 30px; text-align: right;}
 #category-info tr.single-row th {width: 100px;}
@@ -69,10 +16,7 @@
 #category-info label { font-weight: bold;}
 #category-info p { margin-left: 10px;}
 
-div.moduleLabel table {
-   margin-top: 10px;
-   border: 1px solid silver;
-}
+div.moduleLabel table { margin-top: 10px; border: 1px solid silver; }
 div.moduleLabel table tr td, div.moduleLabel table tr th {
    padding: 3px;
    vertical-align: top;

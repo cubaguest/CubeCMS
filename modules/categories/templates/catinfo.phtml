@@ -20,7 +20,7 @@ function tplCatTrRights(Translator $translator, $right)
 
 ?>
 <input type="hidden" name="id_cat" value="<?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?>" />
-<table>
+<table class="full-width">
    <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Názvy (s jazyky)');?>:</th></tr>
    <?foreach ($this->catInfo[Model_Category::COLUMN_NAME] as $lang => $name) {
       if($name != null){?><tr class="ui-widget-content ui-state-default"><td><?=  htmlspecialchars($name);?></td><td class="cell-lang"><?=vve_tpl_lang_image($lang)?></td></tr><?}
@@ -35,7 +35,7 @@ function tplCatTrRights(Translator $translator, $right)
    }?>
 </table>
 <br />
-<table>
+<table class="full-width">
    <tr class="single-row">
       <th class="ui-widget-header"><?=$this->tr('Modul');?></th>
       <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_MODULE};?></td>
@@ -69,7 +69,7 @@ function tplCatTrRights(Translator $translator, $right)
    </tr>-->
 </table>
 <br />
-<table>
+<table class="full-width">
    <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Datový adresář');?>:</th></tr>
    <tr class="ui-widget-content ui-state-default"><td colspan="2"><?=VVE_DATA_DIR.'/'.$this->catInfo->{Model_Category::COLUMN_DATADIR}.'/'?></td></tr>
    <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Popis');?>:</th></tr>
@@ -94,7 +94,7 @@ function tplCatTrRights(Translator $translator, $right)
    ?></td></tr>
 </table>
 <br />
-<table>
+<table class="full-width">
    <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Práva skupin');?>:</th></tr>
    <?  foreach ($this->catRights as $right) {?>
    <tr class="single-row">

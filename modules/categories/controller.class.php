@@ -149,7 +149,13 @@ class Categories_Controller extends Controller {
       if ($form->isValid()) {
          // vygenerování url klíče
          $path = $structure->getPath($form->parent_cat->getValues());
-         $urlkey = $form->urlkey->getValues();
+         if($form->regenerateUrls->getValues() === true){
+            foreach (Locales::getAppLangs() as $lang) {
+               $urlkey[$lang] = null;
+            }
+         } else {
+            $urlkey = $form->urlkey->getValues();
+         }
          $names = $form->name->getValues();
          $p = end($path);
          $catObj = null;
@@ -212,7 +218,7 @@ class Categories_Controller extends Controller {
                unset($dir);
             }
          }
-
+         
          $record->{Model_Category::COLUMN_NAME} = $form->name->getValues();
          $record->{Model_Category::COLUMN_ALT} = $form->alt->getValues();
          $record->{Model_Category::COLUMN_MODULE} = $form->module->getValues();
@@ -514,13 +520,7 @@ class Categories_Controller extends Controller {
 //      $catShowOnlyWhenLogin = new Form_Element_Checkbox('show_when_login_only', $this->tr('Zobrazit pouze při přihlášení'));
 //      $form->addElement($catShowOnlyWhenLogin, 'settings');
       $catVisibility = new Form_Element_Select('visibility', $this->tr('Viditelnost'));
-      $catVisibility->setOptions(array(
-         $this->tr('Všem') => Model_Category::VISIBILITY_ALL,
-         $this->tr('Pouze přihlášeným') => Model_Category::VISIBILITY_WHEN_LOGIN,
-         $this->tr('Pouze nepřihlášeným') => Model_Category::VISIBILITY_WHEN_NOT_LOGIN,
-         $this->tr('Pouze administrátorům') => Model_Category::VISIBILITY_WHEN_ADMIN,
-         $this->tr('Nikomu') => Model_Category::VISIBILITY_HIDDEN,
-      ));
+      $catVisibility->setOptions(array_flip($this->getVisibilityTypes()));
       $form->addElement($catVisibility, 'settings');
 
 
@@ -857,6 +857,7 @@ class Categories_Controller extends Controller {
       return array(
          Model_Category::VISIBILITY_HIDDEN => $this->tr('Nikomu'),
          Model_Category::VISIBILITY_WHEN_ADMIN => $this->tr('Pouze administrátorům'),
+         Model_Category::VISIBILITY_WHEN_ADMIN_ALL => $this->tr('Pouze admin. (včetně subdomén)'),
          Model_Category::VISIBILITY_WHEN_LOGIN => $this->tr('Pouze přihlášeným'),
          Model_Category::VISIBILITY_WHEN_NOT_LOGIN => $this->tr('Pouze nepřihlášeným'),
          Model_Category::VISIBILITY_ALL => $this->tr('Všem')
