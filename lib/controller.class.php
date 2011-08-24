@@ -320,9 +320,10 @@ abstract class Controller extends TrObject {
     */
    final public function checkReadableRights() {
       if(!$this->rights()->isReadable()) {
-         $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
-kategorii nebo jste byl(a) odhlášen(a)"), true);
-         $this->link(true)->reload(null, 401);
+         $this->errMsg()->addMessage(sprintf(
+            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
+            $this->category()->getName()), true);
+         $this->link(true)->clear(true)->reload(null, 401);
       }
    }
    /**
@@ -330,9 +331,10 @@ kategorii nebo jste byl(a) odhlášen(a)"), true);
     */
    final public function checkWritebleRights() {
       if(!$this->rights()->isWritable()) {
-         $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
-kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
-         $this->link(true)->reload();
+         $this->errMsg()->addMessage(sprintf(
+            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
+            $this->category()->getName()), true);
+         $this->link(true)->clear(true)->reload();
       }
    }
    /**
@@ -340,9 +342,10 @@ kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
     */
    final public function checkControllRights() {
       if(!$this->rights()->isControll()) {
-         $this->errMsg()->addMessage(_("Nemáte dostatčná práva pro přístup ke
-kategorii nebo jste byl(a) odhlášen(a)"), true, 401);
-         $this->link(true)->reload();
+         $this->errMsg()->addMessage(sprintf(
+            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
+            $this->category()->getName()), true);
+         $this->link(true)->clear(true)->reload();
       }
    }
 
