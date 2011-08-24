@@ -121,10 +121,17 @@ class Categories_Controller extends Controller {
 
       // práva
       $form->rights_default->setValues($record->{Model_Category::COLUMN_DEF_RIGHT});
+      //nastavení výchozího práva pro všehny skupiny
+      foreach ($form as $ename => $element) {
+         if(strpos($ename, 'group_') !== false){
+            $element->setValues($record->{Model_Category::COLUMN_DEF_RIGHT});
+         }
+      }
+      
       $rModel = new Model_Rights();
       $rights = $rModel->joinFK(Model_Rights::COLUMN_ID_GROUP, array(Model_Groups::COLUMN_NAME))
-         ->where(Model_Rights::COLUMN_ID_CATEGORY.' = :idc AND '.Model_Groups::COLUMN_IS_ADMIN.' = 0', 
-            array('idc' => $this->getRequest('categoryid')))->records();
+         ->where(Model_Rights::COLUMN_ID_CATEGORY.' = :idc', 
+            array('idc' => $record->{Model_Category::COLUMN_ID}))->records();
       if ($rights !== false) {
          foreach ($rights as $right) {
             $grName = 'group_' . $right->{Model_Groups::COLUMN_NAME};
@@ -237,7 +244,7 @@ class Categories_Controller extends Controller {
          $categoryModel->save($record);
 
          // práva
-         $this->assignRights($this->getRequest('categoryid'), $form);
+         $this->assignRights($record->{Model_Category::COLUMN_ID}, $form);
 
          // uprava struktury
          if ($form->parent_cat->getValues() != $selCat->getParentId()) {
@@ -391,29 +398,64 @@ class Categories_Controller extends Controller {
    {
       VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
       $groupsModel = new Model_Groups();
-      $groupsModel->join(Model_Groups::COLUMN_ID, array('t_sg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, array())
-         ->join(array('t_sg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID)
-         ->where('t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain', array('domain' => $domain));
+      
+      $groupsModel->columns(array('*', 'domains' => 'GROUP_CONCAT(' . Model_Sites::COLUMN_DOMAIN . ')'))
+            ->join(Model_Groups::COLUMN_ID, array('tsg' => 'Model_SitesGroups'), Model_SitesGroups::COLUMN_ID_GROUP, false)
+            ->join(array('tsg' => Model_SitesGroups::COLUMN_ID_SITE), array('t_s' => 'Model_Sites'), Model_Sites::COLUMN_ID, false)
+            ->groupBy(array(Model_Groups::COLUMN_ID));
+
+      $adminSites = Auth::getUserSites();
+      if(!empty($adminSites)){
+         $groupsModel->where('('.Model_Groups::COLUMN_IS_ADMIN.' = 0 ) '
+            .'AND (t_s.'.Model_Sites::COLUMN_ID.' IS NULL OR t_s.'.Model_Sites::COLUMN_DOMAIN.' = :domain)', array('domain' => $domain));
+      } else {
+//         $groupsModel->where('('.Model_Groups::COLUMN_IS_ADMIN.' = 0)'
+//            .' OR ('.Model_Groups::COLUMN_IS_ADMIN.' = 1 AND t_s.'.Model_Sites::COLUMN_ID.' IS NOT NULL)', 
+//            array());
+         
+      }
       return $groupsModel->records();
    }
 
    private function assignRights($idc, $form)
    {
+      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
       $rModel = new Model_Rights();
       foreach ($this->getGroups() as $group) {
+         // admin nenní nutné vyplňovat má vždy rwc
+         $allowedDomains = explode(',', $group->domains);
+//         Debug::log($group->{Model_Groups::COLUMN_NAME}.' save', $group->{Model_Groups::COLUMN_IS_ADMIN},in_array($domain, $allowedDomains), $group->domains);
+         
          $grName = 'group_' . $group->{Model_Groups::COLUMN_NAME};
          if($form->haveElement($grName)){
             $right = $form->{$grName}->getValues();
-         } else if($group->{Model_Groups::COLUMN_IS_ADMIN}) {
+         } 
+         else if($group->{Model_Groups::COLUMN_IS_ADMIN}) {
             $right = 'rwc';
-         } else {
+         } 
+         else {
             $right = 'r--';
          }
-            
-//         var_dump("Assign $right to id: {$group->{Model_Groups::COLUMN_ID}} {$group->{Model_Groups::COLUMN_NAME}}");flush();
-         $rModel->saveRight($right, $group->{Model_Groups::COLUMN_ID}, $idc);
+         
+         $rModel->where(Model_Rights::COLUMN_ID_CATEGORY.' = :idc AND '.Model_Rights::COLUMN_ID_GROUP.' = :idg', 
+            array('idc' => $idc, 'idg' => $group->{Model_Groups::COLUMN_ID})
+         );
+         
+         if($right == $form->rights_default->getValues() AND !in_array($domain, $allowedDomains)// odstranění práv u skupiny, které nepatří k webu
+            OR ($group->{Model_Groups::COLUMN_IS_ADMIN} == true AND (in_array($domain, $allowedDomains) OR $group->domains == null))
+            ){
+            $rModel->delete(); // čištění
+         } else {
+            $rightRec = $rModel->record();
+            if($rightRec == false) $rightRec = $rModel->newRecord();
+            $rightRec->{Model_Rights::COLUMN_RIGHT} = $right;
+            if($rightRec->isNew()){
+               $rightRec->{Model_Rights::COLUMN_ID_CATEGORY} = $idc;
+               $rightRec->{Model_Rights::COLUMN_ID_GROUP} = $group->{Model_Groups::COLUMN_ID};
+            }
+            $rModel->save($rightRec);
+         }
       }
-//      die();
    }
 
    /**
@@ -544,9 +586,14 @@ class Categories_Controller extends Controller {
       $catGrpRigths->setSubLabel($this->tr('Výchozí práva pro nově přidané skupiny a všechny ostatní uživatele'));
       $form->addElement($catGrpRigths, 'rights');
 
+      VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
       foreach ($this->getGroups() as $group) {
          // admin nenní nutné vyplňovat má vždy rwc
-         if ($group->{Model_Groups::COLUMN_IS_ADMIN} == true) continue;
+         $allowedDomains = explode(',', $group->domains);
+         if ($group->{Model_Groups::COLUMN_IS_ADMIN} == true 
+            AND (in_array($domain, $allowedDomains) OR $group->domains == null)){
+            continue;
+         }
          
          $catGrpRigths = new Form_Element_Select('group_' . $group->{Model_Groups::COLUMN_NAME},
                sprintf($this->tr("Skupina\n \"%s\""), $group->{Model_Groups::COLUMN_NAME}));
@@ -857,7 +904,7 @@ class Categories_Controller extends Controller {
       return array(
          Model_Category::VISIBILITY_HIDDEN => $this->tr('Nikomu'),
          Model_Category::VISIBILITY_WHEN_ADMIN => $this->tr('Pouze administrátorům'),
-         Model_Category::VISIBILITY_WHEN_ADMIN_ALL => $this->tr('Pouze admin. (včetně subdomén)'),
+//         Model_Category::VISIBILITY_WHEN_ADMIN_ALL => $this->tr('Pouze admin. (včetně subdomén)'),
          Model_Category::VISIBILITY_WHEN_LOGIN => $this->tr('Pouze přihlášeným'),
          Model_Category::VISIBILITY_WHEN_NOT_LOGIN => $this->tr('Pouze nepřihlášeným'),
          Model_Category::VISIBILITY_ALL => $this->tr('Všem')

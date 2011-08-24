@@ -61,7 +61,7 @@ function tplCatTrRights(Translator $translator, $right)
    </tr>
    <tr>
       <th class="ui-widget-header"><?=$this->tr('Výchozí práva');?></th>
-      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_DEF_RIGHT};?></td>
+      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
    </tr>
 <!--   <tr>
       <th class="ui-widget-header"><?=$this->tr('');?></th>
@@ -102,6 +102,10 @@ function tplCatTrRights(Translator $translator, $right)
       <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $right->{Model_Rights::COLUMN_RIGHT});?> </td>
    </tr>
    <?}?>
+   <tr class="single-row">
+      <th scope="row" class="ui-widget-header"><?=$this->tr('Ostatní');?></th>
+      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
+   </tr>
 </table>
 <br />
 <?
