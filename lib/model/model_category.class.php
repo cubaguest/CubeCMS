@@ -65,6 +65,7 @@ class Model_Category extends Model_ORM {
    const VISIBILITY_WHEN_NOT_LOGIN = 3;
    const VISIBILITY_WHEN_ADMIN = 4;
    const VISIBILITY_HIDDEN = 5;
+   const VISIBILITY_WHEN_ADMIN_ALL = 6;
 
 
    /**
@@ -122,8 +123,7 @@ class Model_Category extends Model_ORM {
       $this->join(Model_Category::COLUMN_CAT_ID, array('t_r' => 'Model_Rights'), null,
                   array(Model_Rights::COLUMN_ID_GROUP, 'right' => 'IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.')' ), self::JOIN_LEFT,
                   ' AND t_r.'.Model_Rights::COLUMN_ID_GROUP . ' = :idgrp', array('idgrp' => (int)Auth::getGroupId()));
-      $this->where(" LEFT(`right`, 1) = 'r' AND ".Model_Category::COLUMN_URLKEY." IS NOT NULL", array());
-
+      $this->where(' LEFT(IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.'), 1) = "r" AND '.Model_Category::COLUMN_URLKEY.' IS NOT NULL', array());
       return $this;
    }
 
