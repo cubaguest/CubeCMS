@@ -396,11 +396,19 @@ class Auth extends TrObject {
 	}
 
 	/**
-	 * Metoda vrací jestli je uživatele administrátor
+	 * Metoda vrací jestli je uživatele administrátor pro dané stránky
 	 * @return bool -- true pokud je administrator
 	 */
 	public static function isAdmin() {
 		return self::$userIsSiteAdmin;
+	}
+   
+	/**
+	 * Metoda vrací jestli je uživatele administrátor pro některé stránky z domény
+	 * @return bool -- true pokud je administrator
+	 */
+	public static function isAdminGroup() {
+		return self::$userIsAdmin;
 	}
 
 	/**
