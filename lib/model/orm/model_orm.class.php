@@ -545,7 +545,7 @@ class Model_ORM extends Model {
          if(is_string($stmt)){
             $stmt = str_replace('{THIS}', '`'.$this->getTableName().'`', $stmt);
          }
-         $stmt = $this->dbcogetDb()->prepare($stmt);
+         $stmt = $this->getDb()->prepare($stmt);
       }
       return $stmt;
    }
