@@ -21,6 +21,11 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    public function __construct($columns, $fromDb = false)
    {
       $this->fromDb = $fromDb;
+      foreach ($columns as &$column) {
+         if($column['lang']){
+            $column['value'] = new Model_ORM_LangCell();
+         }
+      }
       $this->columns = $columns;
    }
 
@@ -84,7 +89,11 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          } else if (isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
             $value = (int) $value;
          }
-         $this->columns[$collName]['value'] = $value;
+         if ($this->columns[$collName]['lang'] == true && !is_array($value)){
+            $this->columns[$collName]['value']->addValue(Locales::getDefaultLang(), $value);
+         } else {
+            $this->columns[$collName]['value'] = $value;
+         }
          
          if ($this->fromDb == true AND $this->columns[$collName]['changed'] == 0) {
             $this->columns[$collName]['changed'] = -1; // from db
@@ -102,13 +111,13 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    {
       // tady kontroly sloupců
       if (isset($this->columns[$collName])) {
-         if($this->columns[$collName]['lang'] == true && !$this->columns[$collName]['value'] instanceof Model_ORM_LangCell){
-            $this->columns[$collName]['value'] = new Model_ORM_LangCell();
+         if($this->columns[$collName]['lang'] == true){
             $this->columns[$collName]['changed'] = 1;
          }
          return $this->columns[$collName]['value'];
       }
-      return null;
+      $var = null;
+      return $var;
    }
 
    /**
