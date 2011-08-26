@@ -642,7 +642,7 @@ class Categories_Controller extends Controller {
       // pokud je hlavní kategorie
       if ($categories->getLevel() != 0) {
          $this->categoriesArray[str_repeat('.', $categories->getLevel() * 3) .
-            (string) $categories->getCatObj()->getLabel() . ' - id: ' . $categories->getCatObj()->getId()]
+         vve_tpl_truncate((string)$categories->getCatObj()->getLabel(), 50) . ' - id: ' . $categories->getCatObj()->getId()]
             = (string) $categories->getCatObj()->getId();
       } else {
          $this->categoriesArray[$this->tr('Kořen')] = 0;
@@ -902,12 +902,12 @@ class Categories_Controller extends Controller {
    private function getVisibilityTypes()
    {
       return array(
+         Model_Category::VISIBILITY_ALL => $this->tr('Všem'),
          Model_Category::VISIBILITY_HIDDEN => $this->tr('Nikomu'),
          Model_Category::VISIBILITY_WHEN_ADMIN => $this->tr('Pouze administrátorům'),
 //         Model_Category::VISIBILITY_WHEN_ADMIN_ALL => $this->tr('Pouze admin. (včetně subdomén)'),
          Model_Category::VISIBILITY_WHEN_LOGIN => $this->tr('Pouze přihlášeným'),
          Model_Category::VISIBILITY_WHEN_NOT_LOGIN => $this->tr('Pouze nepřihlášeným'),
-         Model_Category::VISIBILITY_ALL => $this->tr('Všem')
       );
    }
 }
