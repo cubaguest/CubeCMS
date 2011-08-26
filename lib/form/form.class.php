@@ -90,6 +90,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
       $this->protectForm = $protectForm;
+      if($protectForm){
+         $this->createToken();
+      }
    }
 
    public function  __toString() {
@@ -101,9 +104,11 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    private function createToken()
    {
-      $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
-      $token = Token::getToken();
-      $this->elementToken->setValues($token);
+      if($this->elementToken == null){
+         $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
+         $token = Token::getToken();
+         $this->elementToken->setValues($token);
+      }
    }
 
    /**
@@ -480,6 +485,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    public function setProtected($protect = true)
    {
       $this->protectForm = $protect;
+      if($protect){
+         $this->createToken();
+      }
       return $this;
    }
 
