@@ -1,32 +1,31 @@
-<?
-$this->addCssFile("style.css");
-?>
 <h1><?= $this->category()->getName(); ?></h1>
 <div class="main-content-form-edit" id="login-form">
    <div>
       <form method="post" action="<?= $this->link(); ?>">
-         <p class="login_form_label">
-            <img src="<?= Template::getFileDir('icons/key.png', Template::IMAGES_DIR, false, true) ?>" width="16" height="16" alt="login key image" /><b><?= $this->tr('Přihlášení'); ?></b>
+         <p class="login-form-label">
+            <h2><?= $this->tr('Přihlášení'); ?></h2>
          </p>
-         <table>
-            <tr>
-               <td><?= $this->tr('Jméno'); ?>:</td>
-               <td align="right"><input class="login_input" type="text" name="login_username" maxlength="20" id="login_panel" size="22" value="<?= $this->post("login_username"); ?>" /></td>
-            </tr>
-            <tr>
-               <td><?= $this->tr('Heslo'); ?>:</td>
-               <td align="right"><input type="password" name="login_passwd" maxlength="20" id="passwd_panel" size="22" value="" /></td>
-            </tr>
-            <tr>
-               <td>
-                  <a href="<?= $this->link()->route('newPassword') ?>" title="<?= $this->tr('Obnovit zapomenuté heslo') ?>"><?= $this->tr('Zapomenuté heslo') ?></a>
-               </td>
-               <td colspan="2" align="right">
-                  <label><?=$this->tr('trvale')?></label>&nbsp;<input type="checkbox" name="login_permanent" />&nbsp;
-                  <input id="login_submit" type="submit" name="login_submit" value="<?= $this->tr('Přihlásit'); ?>" />
-               </td>
-            </tr>
-         </table>
+         <p>
+            <label for="login-user"><?= $this->tr('Jméno'); ?>:</label><br />
+            <input type="text" name="login_username" maxlength="20" id="login-user" size="22" 
+                   value="<?= $this->post("login_username"); ?>" class="login-input-text" />
+         </p>
+         <p>
+            <label for="login-password"><?= $this->tr('Heslo'); ?>:</label><br />
+            <input type="password" name="login_passwd" maxlength="20" id="login-password" size="22" 
+                   value="" class="login-input-text"/><br />
+         </p>
+         <p class="left-box login-permanent">
+            <input type="checkbox" name="login_permanent" id="login-permanent" />
+            <label for="login-permanent"><?=$this->tr('trvale')?></label>
+         </p>
+         <p class="right-box">
+            <input id="login_submit" type="submit" name="login_submit" value="<?= $this->tr('Přihlásit'); ?>" />
+         </p>
+         <hr class="reseter" />
       </form>
+      <p class="login-lost-password">
+         <a href="<?= $this->link()->route('newPassword') ?>" title="<?= $this->tr('Obnovit zapomenuté heslo') ?>"><?= $this->tr('Zapomenuté heslo') ?></a>
+      </p>
    </div>
 </div>
