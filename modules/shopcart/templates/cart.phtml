@@ -30,9 +30,7 @@ $this->step = 1;
             <td><a href="<?=$item->getUrl()?>" title="<?=$item->getName()?>"><?=$item->getName()?></a></td>
             <td><?
                echo $item->getPrice(false).' '.VVE_SHOP_CURRENCY_NAME;
-//               if($item->getUnitSize() != 1){
-                  echo ' / '.$item->getUnitSize().' '.$item->getUnit();
-//               }   
+               echo ' / '.$item->getUnitSize().' '.$item->getUnit();
                ?>
             </td>
             <td><?
@@ -54,6 +52,15 @@ $this->step = 1;
       </tfoot>
    </table>
    <?echo $this->formItems->renderEnd();?>
+   <?if(VVE_DEBUG_LEVEL > 1){?>
+   <div style="float: right;">
+      <?
+      echo $this->formReset->renderStart();
+      echo $this->formReset->reset->controll();
+      echo $this->formReset->renderEnd();
+      ?>
+   </div>
+   <?}?>
    
    <h2><?=$this->tr('Doprava a platba');?></h2>
    <?echo $this->formNext->renderStart();?>
@@ -82,19 +89,7 @@ $this->step = 1;
          </tr>
       </tbody>
    </table>
-   <?
-   echo $this->formNext->renderEnd();
-   
-   echo str_repeat('<br />', 5);
-   echo $this->formItems->renderEnd();   
-   ?>
-   <div>
-      <?
-      echo $this->formReset->renderStart();
-      echo $this->formReset->reset->controll();
-      echo $this->formReset->renderEnd();
-      ?>
-   </div>
+   <?echo $this->formNext->renderEnd();?>
    <script type="text/javascript">
       var shippings = <?=json_encode($this->shippings)?>;
       var payments = <?=json_encode($this->payments)?>;
@@ -121,7 +116,8 @@ $this->step = 1;
             priceShipping = 0;
          } else {
             if(shippings[idshipping].indexOf("%") != -1){
-               $('#shipping-price').text(shippings[idshipping]);
+               priceShipping = Math.floor(priceBasket*(parseInt(shippings[idshipping])/100) );
+               $('#shipping-price').text(shippings[idshipping]+' ('+priceShipping+' <?=VVE_SHOP_CURRENCY_NAME?>)');
             } else {
                $('#shipping-price').text(shippings[idshipping]+' <?=VVE_SHOP_CURRENCY_NAME?>');
                priceShipping = parseInt(shippings[idshipping]);
