@@ -1,7 +1,7 @@
 <table>
    <thead>
    <tr class="ui-widget-header ui-state-processing">
-      <th colspan="4" class="font-small">
+      <th colspan="<?=$this->controlls == true ? 4 : 3;?>" class="font-small">
          <?
       if(count($this->pathNav) > 1){
          echo $this->tr('Cesta:&nbsp;');
@@ -13,7 +13,7 @@
       </th>
    </tr>
    <tr class="ui-widget-header ui-state-processing">
-      <td class="file-selection"><input id="items-check-all" type="checkbox" /></td>
+      <?if($this->controlls == true){?><td class="file-selection"><input id="items-check-all" type="checkbox" /><?}?></td>
       <th scope="col" >
          <a href="<?=$this->link()->param('sort', $this->curSort == 'name_a' ? 'name_d' : 'name_a')?>"
             title="<?=$this->tr('Řadit podle názvu')?>"class="<?if($this->curSort == 'name_a') echo "sort-label-asc"; else if($this->curSort == 'name_d') echo "sort-label-desc";?>"
@@ -30,7 +30,7 @@
    <tbody>
    <?if($this->parentPath != null){?>
    <tr class="ui-widget-content ui-state-default">
-      <td></td>
+      <?if($this->controlls == true){?><td></td><?}?>
       <td><?
          $link = new Html_Element('a', '...');
          $link->setAttrib('title', $this->tr('přejít výše'))
@@ -44,7 +44,7 @@
    <?}?>
    <?foreach ($this->items as $item) {?>
    <tr class="ui-widget-content ui-state-default">
-      <td><input type="checkbox" name="names[]" value="<?=$item['name']?>" class="item-select" /></td>
+      <?if($this->controlls == true){?><td><input type="checkbox" name="names[]" value="<?=$item['name']?>" class="item-select" /></td><?}?>
       <td><?
          if($item['isdir']){
             $link = new Html_Element('a', $item['name']);
@@ -66,26 +66,25 @@
       <td class="font-small"><?=vve_date("%x %X", $item['mtime']);?></td>
       <td>
          <?
-         $this->formDeleteItem->html()->setAttrib('onSubmit', 'return confirm(\'Smazat položku '.$item['name'].' ?\')');
-         echo $this->formDeleteItem->renderStart();
-         $this->formDeleteItem->name->setValues($item['name']);
-         echo $this->formDeleteItem->name;
-         $this->formDeleteItem->submit->setImage('images/icons/cancel.png');
-         echo $this->formDeleteItem->submit;
-         echo $this->formDeleteItem->renderEnd();
-         ?>
-         <?
-         $this->formRenameItem->html()->addClass('formRenameItem');
-         echo $this->formRenameItem->renderStart();
-         $this->formRenameItem->oldname->setValues($item['name']);
-         $this->formRenameItem->newname->setValues(null);
-         echo $this->formRenameItem->oldname;
-         echo $this->formRenameItem->newname;
-         $this->formRenameItem->submit->setImage('images/icons/pencil.png');
-         echo $this->formRenameItem->submit;
-         echo $this->formRenameItem->renderEnd();
-         ?>
-         <?if(!$item['isdir']){?>
+         if($this->controlls == true){
+            $this->formDeleteItem->html()->setAttrib('onSubmit', 'return confirm(\'Smazat položku '.$item['name'].' ?\')');
+            echo $this->formDeleteItem->renderStart();
+            $this->formDeleteItem->name->setValues($item['name']);
+            echo $this->formDeleteItem->name;
+            $this->formDeleteItem->submit->setImage('images/icons/cancel.png');
+            echo $this->formDeleteItem->submit;
+            echo $this->formDeleteItem->renderEnd();
+            $this->formRenameItem->html()->addClass('formRenameItem');
+            echo $this->formRenameItem->renderStart();
+            $this->formRenameItem->oldname->setValues($item['name']);
+            $this->formRenameItem->newname->setValues(null);
+            echo $this->formRenameItem->oldname;
+            echo $this->formRenameItem->newname;
+            $this->formRenameItem->submit->setImage('images/icons/pencil.png');
+            echo $this->formRenameItem->submit;
+            echo $this->formRenameItem->renderEnd();
+         }
+         if(!$item['isdir']){?>
          <a href="<?=$item['dwurl']?>" title="<?=$this->tr('Stáhnout').' '.$item['name']?>"><img src="images/icons/download.png" alt="download" /></a>
          <?}?>
       </td>

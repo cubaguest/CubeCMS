@@ -5,11 +5,13 @@
  */
 
 class DataStore_View extends View {
-   public function mainView() {
+   public function mainView() 
+   {
       if($this->category()->getRights()->isWritable()) {
+         $this->controlls = true;
          $this->template()->addFile('tpl://main.phtml');
       } else {
-      
+         $this->template()->addFile('tpl://main-readonly.phtml');
       }
    }
 

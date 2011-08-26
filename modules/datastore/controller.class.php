@@ -19,19 +19,19 @@ class DataStore_Controller extends Controller {
       $this->view()->writable = $this->category()->getRights()->isWritable();
 
       $path = $this->getRequestParam('path', '/');
-      // vytváření adresáře
-      $this->createDir($path);
 
       // načtení položek v adresáři
       $this->loadDirItems($path);
-
-      // mazání položky/položek
-      $this->deleteItem($path);
-      $this->deleteItems($path);
-      $this->moveItems($path);
-
-      // přejmenování
-      $this->renameItem($path);
+      if($this->rights()->isWritable()){
+         // vytváření adresáře
+         $this->createDir($path);
+         // mazání položky/položek
+         $this->deleteItem($path);
+         $this->deleteItems($path);
+         $this->moveItems($path);
+         // přejmenování
+         $this->renameItem($path);
+      }
 //      $pathItems = explode('/', $path);
       $pathItems = array();
       preg_match_all('/[^\/]*\//', $path, $pathItems);
@@ -347,20 +347,6 @@ class DataStore_Controller extends Controller {
 
    private function sortMTimeDesc($a, $b){
       return ($a["mtime"] > $b["mtime"]) ? -1 : 1;
-   }
-
-   public function settings(&$settings, Form &$form) {
-      $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
-
-      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
-
-      // znovu protože mohl být už jednou validován bez těchto hodnot
-      if($form->isValid()) {
-//          $settings[self::PARAM_ALLOW_PRIVATE] = $form->allow_private_zone->getValues();
-//          $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
-//          $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
-//          $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
-      }
    }
 }
 
