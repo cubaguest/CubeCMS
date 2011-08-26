@@ -198,7 +198,7 @@ class Panels_Controller extends Controller {
       }
       ksort($catArr);//řazení
 
-      $form = new Form('panel_');
+      $form = new Form('panel_', true);
       $form->addGroup('settings', $this->tr('Základní'), $this->tr('Přiřazení panelu ke kategorii a jeho umístění'));
 
       $panelCategory = new Form_Element_Select('panel_cat', $this->tr('Panel kategorie'));
@@ -349,7 +349,7 @@ class Panels_Controller extends Controller {
 
       $func = array(ucfirst($panel->{Model_Category::COLUMN_MODULE}).'_Panel','settingsController');
 
-      $form = new Form('settings_');
+      $form = new Form('settings_', true);
       $form->addGroup('basic', 'Základní nasatvení');
       $md5FormEmpty = md5(serialize($form));
 

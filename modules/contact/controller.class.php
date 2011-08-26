@@ -134,7 +134,7 @@ class Contact_Controller extends Controller {
       $this->checkWritebleRights();
       $modelText = new Text_Model();
 
-      $formEdit = new Form('contact_edit');
+      $formEdit = new Form('contact_edit', true);
 
       $elemText = new Form_Element_TextArea('text', $this->tr('Text kontaktu'));
       $elemText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));

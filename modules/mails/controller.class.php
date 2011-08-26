@@ -27,7 +27,7 @@ class Mails_Controller extends Controller {
 
       $modelSMails = new Mails_Model_SendMails();
 
-      $formSendMail = new Form('sendmail_');
+      $formSendMail = new Form('sendmail_', true);
       $elemRecipients = new Form_Element_TextArea('recipients', $this->_('Příjemci'));
 
       $elemRecipients->addValidation(new Form_Validator_NotEmpty());

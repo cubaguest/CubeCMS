@@ -403,6 +403,55 @@ class Courses_Model_Courses extends Model_ORM {
       }
       return false;
    }
+   
+   /* smazat old */
+   /**
+    * Metoda provede genrování url klíčů
+    * @param array/string $urlKeys -- pole s předanými klíči
+    * @param string $table -- název tabulky
+    * @param array/string $alternative -- pole s alternativními klíči
+    * @param string $columnName -- název sloupce s url klíči
+    * @param string $columnId -- název sloupce s id
+    * @param int $id -- id uloženého záznamu
+    * @return array/string -- vygenerované klíče
+    */
+   protected function generateUrlKeys($urlKeys, $table, $alternative, $columnName = 'urlkey', $columnId = 'id',$id = null) {
+      // načteme všechny klíče z tabulky
+      $dbc = new Db_PDO();
+      if(is_array($urlKeys)) {
+         foreach ($urlKeys as $lang => $key) {
+            if($key == null AND $alternative[$lang] == null) continue;
+            $urlKeys[$lang] = $this->generateUrlKeys($key, $table, $alternative[$lang],
+                    $columnName.'_'.$lang, $columnId, $id);
+         }
+      } else {
+         $newKey = vve_cr_url_key($urlKeys);
+         if(empty ($urlKeys) AND empty ($alternative)) return null;
+         if($urlKeys == null) $newKey = vve_cr_url_key(str_replace('/', null, $alternative));
+         if($id !== null){
+                  $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table($table).
+                 ' WHERE '.$columnName.' = :newUrlKey AND '.$columnId.' != :idRow');
+            $dbst->bindValue(':idRow', (int)$id, PDO::PARAM_INT);
+         } else {
+                  $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table($table).
+                 ' WHERE '.$columnName.' = :newUrlKey');
+         }
+         $dbst->bindParam(':newUrlKey', $newKey, PDO::PARAM_STR);
+         $dbst->execute();
+         $fetch = $dbst->fetch();
+         $step = 1;
+         while ($fetch != false) {
+            $newKey = $this->createNewKey($newKey);
+            $dbst->execute();
+            $fetch = $dbst->fetch();
+            if($step == 1000) break; // jistota ukončení
+            $step++;
+         }
+         $urlKeys = $newKey;
+         if($step ==  1000) trigger_error($this->tr('Chyba při vytváření URL klíče'));
+      }
+      return $urlKeys;
+   }
 }
 
 ?>

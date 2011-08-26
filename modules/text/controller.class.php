@@ -55,7 +55,7 @@ class Text_Controller extends Controller {
    public function editController() {
       $this->checkWritebleRights();
 
-      $form = new Form("text_");
+      $form = new Form("text_", true);
       
       $label = new Form_Element_Text('label', $this->tr('Nadpis'));
       $label->addFilter(new Form_Filter_StripTags());
@@ -112,7 +112,7 @@ class Text_Controller extends Controller {
    public function editPanelController() {
       $this->checkWritebleRights();
 
-      $form = new Form("text_");
+      $form = new Form("text_", true);
 
       $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
@@ -159,7 +159,7 @@ class Text_Controller extends Controller {
       $model = new Text_Model();
       $modelPrivate = new Text_Model_Private();
       
-      $form = new Form("text_");
+      $form = new Form("text_", true);
 
       $grpText = $form->addGroup('text', $this->tr('Text'));
 

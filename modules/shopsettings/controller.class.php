@@ -16,7 +16,7 @@ class ShopSettings_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       
-      $form = new Form();
+      $form = new Form('base', true);
       
       $grpInfo = $form->addGroup('shop', $this->tr('Informace o obchod'));
 
@@ -46,7 +46,7 @@ class ShopSettings_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       
-      $form = new Form('currency_');
+      $form = new Form('currency_', true);
       
       $grpCurrencies = $form->addGroup('currencies', $this->tr('Měny'));
 
@@ -441,7 +441,7 @@ class ShopSettings_Controller extends Controller {
          '{POZNAMKA}' => $this->tr('Poznámka uživatele'),
       );
       
-      $form = new Form('orders_set_');
+      $form = new Form('orders_set_', true);
       
       $grpNotify = $form->addGroup('notifycations', $this->tr('Oznámení'));
 

@@ -8,7 +8,7 @@ class Templates_Controller extends Controller {
       //		Kontrola práv
       $this->checkWritebleRights();
       $model = new Templates_Model();
-      $formDel = new Form('tpl_del_');
+      $formDel = new Form('tpl_del_', true);
 
       $elemId = new Form_Element_Hidden('id');
       $elemId->addValidation(new Form_Validator_IsNumber());
@@ -110,7 +110,7 @@ class Templates_Controller extends Controller {
     * @return Form
     */
    protected function createForm() {
-      $form = new Form('template_');
+      $form = new Form('template_', true);
 
       $iName = new Form_Element_Text('name', $this->_('Název'));
       $iName->addValidation(New Form_Validator_NotEmpty());

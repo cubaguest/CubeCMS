@@ -101,8 +101,8 @@ class ArticlesWGal_Controller extends Articles_Controller {
    }
 
    public function editphotosController() {
-      $artModel = new Articles_Model_Detail();
-      $art = $artModel->getArticle($this->getRequest('urlkey'));
+      $artModel = new Articles_Model();
+      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($art == false) return false;
 
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
@@ -120,9 +120,8 @@ class ArticlesWGal_Controller extends Articles_Controller {
    }
 
    public function uploadFileController() {
-      $artModel = new Articles_Model_Detail();
-//      $art = $artModel->getArticleById((int)$this->getRequestParam('addimage_idArt'));
-      $art = $artModel->getArticle($this->getRequest('urlkey'));
+      $artModel = new Articles_Model();
+      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($art == false) return false;
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
 
@@ -135,8 +134,8 @@ class ArticlesWGal_Controller extends Articles_Controller {
    }
 
    public function editphotoController() {
-      $artModel = new Articles_Model_Detail();
-      $art = $artModel->getArticle($this->getRequest('urlkey'));
+      $artModel = new Articles_Model();
+      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($art == false) return false;
       $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
@@ -146,18 +145,19 @@ class ArticlesWGal_Controller extends Articles_Controller {
    public function settings(&$settings,Form &$form) {
       $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
       $phCtrl->settings($settings, $form);
-      
+      $form->removeElement('tplMain');
+
       parent::settings($settings, $form);
 
       $elemImgList = new Form_Element_Text('imagesinlist', $this->tr('Počet obrázků v seznamu'));
       $elemImgList->setSubLabel('Výchozí: '.self::DEFAULT_IMAGES_IN_LIST.' obrázků');
       $elemImgList->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemImgList,'basic');
+      $form->addElement($elemImgList,'view',2);
 
       if(isset($settings['imagesinlist'])) {
          $form->imagesinlist->setValues($settings['imagesinlist']);
       }
-      
+
       if($form->isValid()){
          $settings['imagesinlist'] = $form->imagesinlist->getValues();
       }

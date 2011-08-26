@@ -39,7 +39,7 @@ class Upgrade_Controller extends Controller {
          $this->view()->allowUpgrade = true;
       }
 
-      $upgradeForm = new Form('module_upgrade_');
+      $upgradeForm = new Form('module_upgrade_', true);
       $elemSubimt = new Form_Element_Submit('save', $this->_('Povýšit'));
       $upgradeForm->addElement($elemSubimt);
 

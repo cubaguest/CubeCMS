@@ -24,7 +24,7 @@ class Categories_Controller extends Controller {
 //          $this->setMainStruct(false);
 //       }
 
-      $formDelete = new Form('category_');
+      $formDelete = new Form('category_', true);
 
       $elemId = new Form_Element_Hidden('id');
       $formDelete->addElement($elemId);
@@ -464,7 +464,7 @@ class Categories_Controller extends Controller {
     */
    private function createForm()
    {
-      $form = new Form('category');
+      $form = new Form('category', true);
 
       $form->addGroup('labels', $this->tr('Popisky'), $this->tr('Název a popisek kategorie'));
       // název kategorie

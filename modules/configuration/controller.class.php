@@ -25,7 +25,7 @@ class Configuration_Controller extends Controller {
       
       $this->view()->formGlEdit = $formEditGlobal;
       
-      $formCopyGlobal = new Form('gl_copy_');
+      $formCopyGlobal = new Form('gl_copy_', true);
       $formCopyGlobal->addElement(clone $eId);
       $formCopyGlobal->addElement(clone $eSubmit);
       
@@ -54,7 +54,7 @@ class Configuration_Controller extends Controller {
       
       $this->view()->formLocEdit = $formEditLocal;
       
-      $formDelLocal = new Form('loc_del_');
+      $formDelLocal = new Form('loc_del_', true);
       $formDelLocal->addElement(clone $eId);
       $formDelLocal->addElement(clone $eSubmit);
       
@@ -136,7 +136,7 @@ class Configuration_Controller extends Controller {
    }
    
    private function eModel($model) {
-      $form = new Form('option');
+      $form = new Form('option', true);
       $opt = $model->record($this->getRequest('id'));
 
       if($opt == false){

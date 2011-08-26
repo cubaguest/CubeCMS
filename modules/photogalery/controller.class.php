@@ -51,7 +51,7 @@ class Photogalery_Controller extends Controller {
    public function edittextController() {
       $this->checkWritebleRights();
 
-      $form = new Form("text_");
+      $form = new Form("text_", true);
       $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
       $form->addElement($textarea);

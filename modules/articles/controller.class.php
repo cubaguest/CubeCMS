@@ -208,7 +208,7 @@ class Articles_Controller extends Controller {
       if($this->category()->getRights()->isWritable() OR
               ($this->category()->getRights()->isWritable() AND
                       $this->view()->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {
-         $deleteForm = new Form('article_');
+         $deleteForm = new Form('article_', true);
 
          $feId = new Form_Element_Hidden('id');
          $feId->addValidation(new Form_Validator_IsNumber());
@@ -404,7 +404,7 @@ class Articles_Controller extends Controller {
       $article = $modelArt->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
 
-      $form = new Form('art_priv_text_');
+      $form = new Form('art_priv_text_', true);
 
       $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'),
               $this->tr('Položky vyditelné pouze určitým uživatelům. Administrátorům jsou tyto informace vždy viditelné.'));
@@ -468,7 +468,7 @@ class Articles_Controller extends Controller {
 
    public function editTextController() {
       $this->checkControllRights();
-      $form = new Form('list_text_');
+      $form = new Form('list_text_', true);
 
       $elemText = new Form_Element_TextArea('text', $this->_('Text'));
       $elemText->setLangs();
@@ -600,7 +600,7 @@ class Articles_Controller extends Controller {
     * @return Form
     */
    protected function createForm() {
-      $form = new Form('ardicle_');
+      $form = new Form('ardicle_', true);
 
       $fGrpTexts = $form->addGroup('texts', $this->tr('Texty'));
 

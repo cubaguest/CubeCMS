@@ -28,7 +28,7 @@ class Login_Controller extends Controller {
       
       $model = new Model_Users();
 
-      $form = new Form('pass_');
+      $form = new Form('pass_', true);
       $form->html()->setAttrib('autocomplete', 'off');
 
       $elemPassCur = new Form_Element_Password('current', $this->tr('Staré heslo'));
@@ -105,7 +105,7 @@ class Login_Controller extends Controller {
    }
 
    protected function createEditUserForm() {
-      $this->form = new Form('user_');
+      $this->form = new Form('user_', true);
 
       $fGrpBase = $this->form->addGroup('base', $this->tr('Základní informace'));
 
@@ -148,7 +148,7 @@ class Login_Controller extends Controller {
       
       $modelUsr = new Model_Users();
 
-      $form = new Form('newpass_');
+      $form = new Form('newpass_', true);
 
       $eUsername = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
       $eUsername->addValidation(new Form_Validator_NotEmpty());

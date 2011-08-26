@@ -171,7 +171,7 @@ class Lecturers_Controller extends Controller {
     * @return Form
     */
    protected function createForm() {
-      $form = new Form('lecturer_');
+      $form = new Form('lecturer_', true);
 
       $form->addGroup('basic', $this->_('Základní informace o lektorovi'));
       $form->addGroup('image', $this->_('Obrázek'));

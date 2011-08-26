@@ -91,7 +91,7 @@ class Courses_Controller extends Controller {
       }
 
       if ($this->category()->getRights()->isWritable()) {
-         $formDelete = new Form('course_delete_');
+         $formDelete = new Form('course_delete_', true);
 
          $eId = new Form_Element_Hidden('id');
          $eId->setValues($this->view()->course->{Courses_Model_Courses::COLUMN_ID});
@@ -284,7 +284,7 @@ class Courses_Controller extends Controller {
     * @return Form
     */
    protected function createCourseForm() {
-      $form = new Form('course_');
+      $form = new Form('course_', true);
 
       $fGrpTexts = $form->addGroup('texts', $this->_('Texty'));
 
