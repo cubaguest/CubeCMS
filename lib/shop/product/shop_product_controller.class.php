@@ -167,7 +167,7 @@ abstract class Shop_Product_Controller extends Controller {
     */
    protected function createForm(Model_ORM_Record $product)
    {
-      $form = new Form();
+      $form = new Form('product', true);
       
       $fGrpInfo = $form->addGroup('info', $this->tr('Základní informace'));
       
@@ -353,7 +353,7 @@ abstract class Shop_Product_Controller extends Controller {
    
    public function deleteProduct($productId = null)
    {
-      $formDelete = new Form('product_delete_');
+      $formDelete = new Form('product_delete_', true);
       
       $eId = new Form_Element_Hidden('id');
       if($productId != null){
