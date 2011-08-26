@@ -71,7 +71,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    private $elementCheckForm = null;
 
-   private $protectForm = true;
+   private $protectForm = false;
    private $elementToken = null;
    private $tokenIsOk = false;
 
@@ -82,16 +82,13 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * Konstruktor vytváří objekt formuláře
     * @param string $prefix -- (option) prefix pro formulářové prvky
     */
-   function __construct($prefix = null, $protectForm = true) {
+   function __construct($prefix = null, $protectForm = false) {
       $this->formPrefix = $prefix;
       $this->htmlElement = new Html_Element('form');
       $this->setAction(new Url_Link_Module());
       $this->setSendMethod();
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
-      if($protectForm){
-         $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
-      }
       $this->protectForm = $protectForm;
    }
 
@@ -104,6 +101,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    private function createToken()
    {
+      $this->elementToken = new Form_Element_Hidden('_'.$this->formPrefix.'_token');
       $token = Token::getToken();
       $this->elementToken->setValues($token);
    }
@@ -118,8 +116,12 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $decorator = new Form_Decorator();
       }
       $html = clone $this->html();
-      $this->createToken();
-      $html->addContent(new Html_Element('p', $this->elementCheckForm->controll().(string)$this->elementToken->controll()));
+      $pHtml = new Html_Element('p', $this->elementCheckForm->controll());
+      if($this->protectForm){
+         $this->createToken();
+         $pHtml->addContent((string)$this->elementToken->controll());
+      }
+      $html->addContent($pHtml);
 
       $prevGrp = null;
       $d = clone $decorator;
