@@ -500,7 +500,7 @@ abstract class Controller extends TrObject {
    public function viewSettingsController() {
       $this->checkControllRights();
 
-      $form = new Form('settings_');
+      $form = new Form('settings_', true);
       $grpBasic = $form->addGroup('basic', _('Základní nastavení'));
       $grpView = $form->addGroup('view', _('Nastavení vzhledu'));
 
@@ -621,7 +621,7 @@ abstract class Controller extends TrObject {
       $catModel = new Model_Category();
       $cat = $catModel->record($this->category()->getId());
       
-      $form = new Form('metadata_');
+      $form = new Form('metadata_', true);
       $grpBasic = $form->addGroup('basic', $this->tr('Základní'), $this->tr('Základní nastavení'));
       $grpSitemap = $form->addGroup('sitemap', $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
       
