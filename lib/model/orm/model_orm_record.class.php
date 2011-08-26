@@ -90,7 +90,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             $value = (int) $value;
          }
          if ($this->columns[$collName]['lang'] == true && !is_array($value)){
-            $this->columns[$collName]['value']->addValue(Locales::getDefaultLang(), $value);
+            $this->columns[$collName]['value']->addValue(Locales::getLang(), $value);
          } else {
             $this->columns[$collName]['value'] = $value;
          }
