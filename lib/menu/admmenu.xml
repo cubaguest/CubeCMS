@@ -65,7 +65,7 @@
          <name lang="en">Translate statics texts</name>
          <urlkey lang="cs">admin/system/preklady</urlkey>
          <urlkey lang="en">admin/system/translation</urlkey>
-         <module>trstatictexts</module>
+         <module>trstaticstexts</module>
       </item>
    </section>
    <section>
