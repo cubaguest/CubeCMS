@@ -114,16 +114,14 @@ class Model_Category extends Model_ORM {
    }
 
    /**
-    * Metoda načte kategori, pokud je zadán klíč je načtena určitá, pokud ne je
-    * načtena kategorie s nejvyšší prioritou
-    * @param string $catKey -- (option) klíč kategorie
+    * Metoda přidá práva ke kategorii do dotazu
+    * @return Model_Category 
     */
-   public function setGroupPermissions()
+   public function withRights()
    {
       $this->join(Model_Category::COLUMN_CAT_ID, array('t_r' => 'Model_Rights'), null,
                   array(Model_Rights::COLUMN_ID_GROUP, 'right' => 'IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.')' ), self::JOIN_LEFT,
                   ' AND t_r.'.Model_Rights::COLUMN_ID_GROUP . ' = :idgrp', array('idgrp' => (int)Auth::getGroupId()));
-      $this->where(' LEFT(IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.'), 1) = "r" AND '.Model_Category::COLUMN_URLKEY.' IS NOT NULL', array());
       return $this;
    }
 
@@ -139,11 +137,11 @@ class Model_Category extends Model_ORM {
             Model_Category::COLUMN_DEF_RIGHT, /* Model_Category::COLUMN_FEEDS, */
             Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
             Model_Category::COLUMN_VISIBILITY
-            
             , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'));
-         $this->setSelectAllLangs(false)->setGroupPermissions()
-            ->order(array('uk_l' => 'DESC'))
-            ;
+         $this->setSelectAllLangs(false)
+            ->withRights()
+            ->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
+            ->order(array('uk_l' => 'DESC'));
          self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
       }
       return self::$allCatsRecords;

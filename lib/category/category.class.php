@@ -44,11 +44,11 @@ class Category extends Category_Core {
       if($catDataObj === null) {
          $catModel = new Model_Category();
          if(intval($catKey)){
-            $catModel->setGroupPermissions()->where('AND '.Model_Category::COLUMN_ID .' = :id', array('id' => (int)$catKey), true);
+            $catModel->withRights()->where(Model_Category::COLUMN_ID .' = :id', array('id' => (int)$catKey));
          } else if($catKey != null) {
-            $catModel->setGroupPermissions()->where('AND '.Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey), true);
+            $catModel->withRights()->where(Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey));
          } else {
-            $catModel->setGroupPermissions()->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
+            $catModel->withRights()->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
          }
          $this->category = $catModel->record();
       } else {
@@ -88,6 +88,9 @@ class Category extends Category_Core {
       if(Auth::isAdmin()){
          $this->categoryRights->addRight('rwc');
       } else {
+//         if($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT} == null){
+//            Debug::log($this->getCatDataObj());
+//         }
          $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});
       }
    }

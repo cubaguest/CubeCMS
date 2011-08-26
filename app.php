@@ -674,9 +674,14 @@ class AppCore extends TrObject {
          }
          //					Vytvoření objektu kontroleru
          $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart(), self::getCategory());
+         /**
+          * @param Routes
+          */
+//         $routes = new Routes($urlRequest);
          // kontola cest
          $routes->checkRoutes();
-         if(!$routes->getActionName()) {
+         if(!$routes->getActionName() 
+            OR ($routes->getRouteName() == 'normal' AND !self::$category->getRights()->isReadable()) ) {
             AppCore::setErrorPage();
             return false;
          }
@@ -836,14 +841,24 @@ class AppCore extends TrObject {
       foreach ($panelPositions as $panel) {
          $this->coreTpl->panels[$panel] = array();
       }
+      /**
+       *  @todo optimalizovat dotaz!! zabere 0.005 sekundy
+       */
       $panelsM = new Model_Panel();
-      $panelsM->setGroupPermissions()->order(array(Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC));
-
+      $panelsM
+            // slupce z kategorie
+         ->withRights()
+         ->columns(array('*',
+            // sloupce z panelu
+            Model_Category::COLUMN_ID => Model_Panel::COLUMN_ID_CAT,
+         ))
+         ->order(array(Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC))
+         ->setSelectAllLangs(false);
       // výběr jestli se zpracovávají individuální panely nebo globální
       if(self::$category->isIndividualPanels()) {
-         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = :idc", array('idc' => self::$category->getId()), true);
+         $panelsM->where(Model_Panel::COLUMN_ID_SHOW_CAT." = :idc AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array('idc' => self::$category->getId()), true);
       } else {
-         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = 0", array(), true);
+         $panelsM->where(Model_Panel::COLUMN_ID_SHOW_CAT." = 0 AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array(), true);
       }
       $panels = $panelsM->records();
 
@@ -854,8 +869,9 @@ class AppCore extends TrObject {
          }
          try {
             $panelCat = new Category(null, false, $panel);
-
-            if (!file_exists(AppCore::getAppLibDir() . self::MODULES_DIR . DIRECTORY_SEPARATOR
+            
+            if (!$panelCat->getRights()->isReadable() 
+               || !file_exists(AppCore::getAppLibDir() . self::MODULES_DIR . DIRECTORY_SEPARATOR
                   . $panelCat->getModule()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')) {
                continue;
             }
@@ -1028,17 +1044,8 @@ class AppCore extends TrObject {
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
 
-
       // zapnutí buferu podle výstupu
       Template_Output::factory(self::$urlRequest->getOutputType());
-//      if(!Template_Output::isBinaryOutput()){
-//         if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
-//            isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
-//            ob_start("ob_gzhandler");
-//         } else {
-//            ob_start();
-//         }
-//      }
       if(self::$urlRequest->getUrlLang() != null AND Locales::isLang(self::$urlRequest->getUrlLang())){
          $reqUrl = str_replace(self::$urlRequest->getUrlLang().URL_SEPARATOR, null, self::$urlRequest->getRequestUrl());
       } else {
@@ -1058,7 +1065,8 @@ class AppCore extends TrObject {
          }
          Url_Link::setCategory(self::$category->getUrlKey());
       } 
-      if((self::$category instanceof Category_Core == false) OR !self::$category->isValid()){ // Chyba stránky
+      if((self::$category instanceof Category_Core == false) OR !self::$category->isValid() 
+         /*OR !self::$category->getRights()->isReadable()*/){ // Chyba stránky
          self::$category = new Module_ErrPage_Category(self::$urlRequest->getCategory(),true);
          Url_Link::setCategory(self::$category->getUrlKey());
          AppCore::setErrorPage(true);
@@ -1108,10 +1116,6 @@ class AppCore extends TrObject {
          if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND !AppCore::isErrorPage()) {
             // zpracovávní modulu
             $this->runModule();
-            if(Menu_Main::getMenuObj() != null){ // kontrola prázdného menu
-               $this->getCoreTpl()->setPVar('CURRENT_CATEGORY_PATH',
-                    Menu_Main::getMenuObj()->getPath(Category::getSelectedCategory()->getId()));
-            }
          }
 
          if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE
