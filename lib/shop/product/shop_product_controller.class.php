@@ -339,8 +339,9 @@ abstract class Shop_Product_Controller extends Controller {
       
       if($form->isValid()){
          // mazání obrázku
+         $imgInfo = $form->image->getValues();
          if(($form->haveElement('imageDel') && $form->imageDel->getValues() == true)
-            || $form->image->getValues() != null){
+            || ($imgInfo != null && $imgInfo['name'] != $product->{Shop_Model_Product::COLUMN_IMAGE}) ){
             if(is_file(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
                @unlink(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
             }
