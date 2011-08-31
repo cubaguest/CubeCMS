@@ -65,7 +65,7 @@ abstract class Shop_Product_Controller extends Controller {
       if($formAdd->isValid()){
          $this->addToCart($formAdd->productId->getValues(), $formAdd->qty->getValues());
          $this->infoMsg()->addMessage($this->tr('Položka byla přidána do košíku'));
-//         $this->link()->reload();
+         $this->link()->reload();
       }
       
       $this->view()->formAddToCart = $formAdd;
