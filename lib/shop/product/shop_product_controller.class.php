@@ -338,8 +338,6 @@ abstract class Shop_Product_Controller extends Controller {
       }
       
       if($form->isValid()){
-         // generování url klíče
-         
          // mazání obrázku
          if(($form->haveElement('imageDel') && $form->imageDel->getValues() == true)
             || $form->image->getValues() != null){
@@ -376,7 +374,8 @@ abstract class Shop_Product_Controller extends Controller {
          $product->{Shop_Model_Product::COLUMN_TEXT} = $form->text->getValues();
          $product->{Shop_Model_Product::COLUMN_TEXT_SHORT} = $form->textShort->getValues();
          $product->{Shop_Model_Product::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues());
-         $product->{Shop_Model_Product::COLUMN_URLKEY} = $this->createUrlKeys($form->name->getValues(), $form->urlkey->getValues());
+         $product->{Shop_Model_Product::COLUMN_URLKEY} =
+            $this->createUrlKeys($form->name->getValues(), $form->urlkey->getValues(), $product->{Shop_Model_Product::COLUMN_URLKEY});
          $product->{Shop_Model_Product::COLUMN_KEYWORDS} = $form->keywords->getValues();
          $product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} = $form->isNewDate->getValues();
          $model->save($product);
@@ -432,12 +431,32 @@ abstract class Shop_Product_Controller extends Controller {
       }
    }
    
-   protected function createUrlKeys($names, $urlkeys)
+   protected function createUrlKeys($names, $urlkeys, $oldKeys)
    {
       foreach ($names as $lang => $value) {
          if($value != null && $urlkeys[$lang] == null){
             $urlkeys[$lang] = vve_cr_url_key($value);
          }
+      }
+      // vytvoření unikátních klíčů
+      $model = new Shop_Model_Product();
+      foreach ($urlkeys as $lang => $key) {
+         if($key == null){ continue; }
+         $testKey = $key;
+         $addIndex = 2;
+         do {
+            $keyOk = true;
+            $count = $model->where('('.$lang.')'.Shop_Model_Product::COLUMN_URLKEY.' = :uk AND ('.$lang.')'.Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL', 
+               array('uk' => $testKey))->count();
+            if( ($count == 0) ||
+                ($count == 1 && $oldKeys[$lang] == $testKey ) ){
+               $keyOk = true;
+            } else {
+               $testKey = $key.'_'.$addIndex;
+               $addIndex++;
+            }
+         } while ($keyOk == false);
+         $urlkeys[$lang] = $testKey;
       }
       return $urlkeys;
    }
