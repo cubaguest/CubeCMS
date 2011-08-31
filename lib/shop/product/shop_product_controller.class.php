@@ -467,7 +467,7 @@ abstract class Shop_Product_Controller extends Controller {
       if($url){
          return Url_Request::getBaseWebDir().VVE_DATA_DIR.'/shop/'.self::DIR_IMAGES.'/';
       } else {
-         return AppCore::getAppDataDir().DIRECTORY_SEPARATOR.'shop'.DIRECTORY_SEPARATOR
+         return AppCore::getAppDataDir().'shop'.DIRECTORY_SEPARATOR
             .self::DIR_IMAGES.DIRECTORY_SEPARATOR;
       }
       
