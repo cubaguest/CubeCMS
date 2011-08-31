@@ -123,11 +123,10 @@ abstract class Shop_Product_Controller extends Controller {
          $model->order(array($sortTypes[$sort]['column'] => $sortTypes[$sort]['sort']));
       }
       
+      $scrollComponent = null;
       if($productsOnPage != 0){
-         $scrollComponent = null;
          $scrollComponent = new Component_Scroll();
          $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->count());
-
          $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE, $productsOnPage);
       }
 
