@@ -1,10 +1,10 @@
 <?
 $jq = new JsPlugin_JQuery();
-//$jq->addUIDatepicker();
+$jq->addUIDatepicker();
 $this->addJsPlugin($jq);
 // do titulku
 if($this->edit) {
-   $h = $this->tr('úprava produktu').' '.$this->product;
+   $h = $this->tr('úprava produktu').' '.$this->product->{Shop_Model_Product::COLUMN_NAME};
 } else {
    $h = $this->tr('přidání produktu');
 }
@@ -33,9 +33,9 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
       var taxes = <?echo json_encode($taxesPrint)?>;
    
       $(document).ready(function(){
-         var $iPrice = $('input[name="price"]');
-         var $iPriceWTax = $('input[name="pricewtax"]');
-         var $iTax = $('select[name="tax"]');
+         var $iPrice = $('input[name="product_price"]');
+         var $iPriceWTax = $('input[name="product_pricewtax"]');
+         var $iTax = $('select[name="product_tax"]');
          
          $iPrice.change(function(){
             var tax = parseFloat(taxes[$iTax.val()]);
@@ -57,12 +57,13 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
          $iPrice.change();
          
          // generate url address
-         $('input.name_class').change(function(){
+         $('input.product_name_class').change(function(){
             var lang = $(this).attr('name').match(/\[([a-z]+)\]/)[1];
-            var $url = $('input[name="urlkey['+lang+']"]');
+            var $url = $('input[name="product_urlkey['+lang+']"]');
             $url.val(str2url($(this).val()));
          });
          
+         $('input[name="product_isNewDate"]').datepicker();
       });
    
    </script>

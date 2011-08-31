@@ -20,6 +20,9 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
    public function editController() {
       $this->checkWritebleRights();
       $this->editProduct($this->getRequest('urlkey'));
+      if($this->view()->product == false OR $this->view()->product == null){
+         return false;
+      }
    }
    /**
     * Kontroler pro editaci textu

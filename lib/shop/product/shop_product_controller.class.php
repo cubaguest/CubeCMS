@@ -16,6 +16,7 @@ abstract class Shop_Product_Controller extends Controller {
 
    protected function init()
    {
+      $this->category()->getModule()->setDataDir('shop');
       parent::init();
    }
 
@@ -167,7 +168,7 @@ abstract class Shop_Product_Controller extends Controller {
     */
    protected function createForm(Model_ORM_Record $product)
    {
-      $form = new Form('product', true);
+      $form = new Form('product_', true);
       
       $fGrpInfo = $form->addGroup('info', $this->tr('Základní informace'));
       
@@ -187,6 +188,13 @@ abstract class Shop_Product_Controller extends Controller {
       $eActive->setValues(true);
       $form->addElement($eActive, $fGrpInfo);
       
+      $eIsNewDate = new Form_Element_Text('isNewDate', $this->tr('Novinka do'));
+      $eIsNewDate->addValidation(new Form_Validator_Date());
+      $eIsNewDate->addFilter(new Form_Filter_DateTimeObj());
+      $eIsNewDate->setValues(vve_date("%x"));
+      $eIsNewDate->setSubLabel($this->tr('Zboží bude označeno jako novinka do zadaného data.'));
+      $form->addElement($eIsNewDate, $fGrpInfo);
+      
       $eQuantity = new Form_Element_Text('quantity', $this->tr('Položek na skladě'));
       $eQuantity->addValidation(new Form_Validator_NotEmpty());
       $eQuantity->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
@@ -199,6 +207,14 @@ abstract class Shop_Product_Controller extends Controller {
       $eImage->setUploadDir(self::getImagesDir());
       $form->addElement($eImage, $fGrpInfo);
       
+      if($product instanceof Model_ORM_Record AND $product->{Shop_Model_Product::COLUMN_IMAGE} != null){
+         $eImageDel = new Form_Element_Checkbox('imageDel', $this->tr('Smazat obrázek'));
+         $eImageDel->setSubLabel(sprintf($this->tr('Uložen obrázek: %s<br />%s')
+            ,$product->{Shop_Model_Product::COLUMN_IMAGE}
+            ,'<img src="'.$this->module()->getDataDir(true).self::DIR_IMAGES.'/small/'.$product->{Shop_Model_Product::COLUMN_IMAGE}.'" height="50" />'
+            ));
+         $form->addElement($eImageDel, $fGrpInfo);
+      }
       
       $fGrpPrice = $form->addGroup('price', $this->tr('Ceny'));
       
@@ -283,6 +299,10 @@ abstract class Shop_Product_Controller extends Controller {
          $form->textShort->setValues($product->{Shop_Model_Product::COLUMN_TEXT_SHORT});
          $form->urlkey->setValues($product->{Shop_Model_Product::COLUMN_URLKEY});
          $form->keywords->setValues($product->{Shop_Model_Product::COLUMN_KEYWORDS});
+         if($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} != '0000-00-00' AND 
+            $product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} != null){
+            $form->isNewDate->setValues(vve_date("%x", new DateTime($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})));
+         }
       }
       
       return $form;
@@ -307,6 +327,10 @@ abstract class Shop_Product_Controller extends Controller {
          $product = $model->newRecord();
       }
       
+      if($product == false){
+         return;
+      }
+      
       $form = $this->createForm($product);
       
       if($form->isSend() && $form->save->getValues() == false){
@@ -316,14 +340,24 @@ abstract class Shop_Product_Controller extends Controller {
       if($form->isValid()){
          // generování url klíče
          
-         // uložení obrázku
-//         $product->{Shop_Model_Product::COLUMN_IMAGE} = null;
+         // mazání obrázku
+         if(($form->haveElement('imageDel') && $form->imageDel->getValues() == true)
+            || $form->image->getValues() != null){
+            if(is_file(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
+               @unlink(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
+            }
+            if(is_file(self::getImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
+               @unlink(self::getImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
+            }
+            $product->{Shop_Model_Product::COLUMN_IMAGE} = null;
+         }
+         
+         // uložení nového obrázku
          if ($form->image->getValues() != null) {
             $image = $form->image->createFileObject('Filesystem_File_Image');
-//            $image = new Filesystem_File_Image();
+            $image->saveAs(self::getImagesDir().'small', VVE_IMAGE_THUMB_W, VVE_IMAGE_THUMB_H, (bool)VVE_IMAGE_THUMB_CROP);
             $image->resampleImage(VVE_DEFAULT_PHOTO_W, VVE_DEFAULT_PHOTO_H, false);
             $image->save();
-            $image->saveAs(self::getImagesDir().'small', VVE_IMAGE_THUMB_W, VVE_IMAGE_THUMB_H, VVE_IMAGE_THUMB_CROP);
             $product->{Shop_Model_Product::COLUMN_IMAGE} = $image->getName();
          }
          
@@ -344,11 +378,13 @@ abstract class Shop_Product_Controller extends Controller {
          $product->{Shop_Model_Product::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues());
          $product->{Shop_Model_Product::COLUMN_URLKEY} = $this->createUrlKeys($form->name->getValues(), $form->urlkey->getValues());
          $product->{Shop_Model_Product::COLUMN_KEYWORDS} = $form->keywords->getValues();
+         $product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} = $form->isNewDate->getValues();
          $model->save($product);
-         $this->editCompleteCallback(!$product->isNew());
+         $this->editCompleteCallback($product);
       }
       
       $this->view()->form = $form;
+      $this->view()->product = $product;
    }
    
    public function deleteProduct($productId = null)
@@ -374,14 +410,16 @@ abstract class Shop_Product_Controller extends Controller {
    }
 
 
-   protected function editCompleteCallback($isEdit = true)
+   protected function editCompleteCallback(Model_ORM_Record $product)
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));
-      if($isEdit){
-         $this->link()->route('detail')->reload();
-      } else {
-         $this->link()->route()->reload();
-      }
+//      if($isEdit->isNew()){
+      Debug::log($product->{Shop_Model_Product::COLUMN_URLKEY});
+//      
+      $this->link()->route('detail', array('urlkey' => (string)$product->{Shop_Model_Product::COLUMN_URLKEY}))->reload();
+//      } else {
+//         $this->link()->route()->reload();
+//      }
    }
    
    protected function editCancelCallback($isEdit = true)
@@ -407,9 +445,10 @@ abstract class Shop_Product_Controller extends Controller {
    public static function getImagesDir($url = false)
    {
       if($url){
-         return Url_Request::getBaseWebDir().VVE_DATA_DIR.'/'.self::DIR_IMAGES.'/';
+         return Url_Request::getBaseWebDir().VVE_DATA_DIR.'/shop/'.self::DIR_IMAGES.'/';
       } else {
-         return AppCore::getAppDataDir().self::DIR_IMAGES.DIRECTORY_SEPARATOR;
+         return AppCore::getAppDataDir().DIRECTORY_SEPARATOR.'shop'.DIRECTORY_SEPARATOR
+            .self::DIR_IMAGES.DIRECTORY_SEPARATOR;
       }
       
    }
