@@ -21,8 +21,12 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
    /**
     * Konstruktor
     */
-   function  __construct() {
-      $this->values = array_fill_keys(Locales::getAppLangs(), null);
+   function  __construct($values = false) {
+      if(is_array($values) && !empty ($values)){
+         $this->values = $values;
+      } else {
+         $this->values = array_fill_keys(Locales::getAppLangs(), null);
+      }
    }
 
    /**
