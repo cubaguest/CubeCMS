@@ -47,6 +47,7 @@ class Contact_Controller extends Controller {
          foreach ($subs as $key => $sub) {
             $elemSubjectDef->setOptions(array(preg_replace('/<.*>/', '', $sub) => $key+1), true); // +1 protože první je vlastní
          }
+         $elemSubjectDef->setValues($this->getRequestParam('s', 0));
          $formQuestion->addElement($elemSubjectDef);
       }
 
