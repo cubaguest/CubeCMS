@@ -37,15 +37,7 @@ function initDataStore(){
       return true;
    });
 
-//   initDataStoreEvents();
-//}
-//// init eventů pro úložiště
-//function initDataStoreEvents(){
-   $('a.store-directory').click(function(){
-//      loadDataStore(this.href);
-//      return false;
-   });
-
+   // init eventů pro úložiště
    // filtrace - input #items-filter
    $('#items-filter').keyup(function(event) {
       //if esc is pressed or nothing is entered
@@ -112,27 +104,6 @@ function initDataStore(){
    });
 }
 
-//function sendForm(form){
-//   if(typeof(form) != "string"){
-//      form = $(form).serialize();
-//   }
-//   $.ajax({
-//      type: "POST",
-//      url : currentUrl,
-//      cache : false,
-//      data: form
-//   });
-//}
-// načtení datového úložiště
-//function loadDataStore(url){
-//   if(typeof(url) == "undefined") {url = window.location.href;}
-//   showLoadBox('.main-content-text');
-//   $('#datastorage-structure').load(url+' #datastorage-structure table', null, function(){
-//      initDataStoreEvents();
-//      hideLoadBox();
-//      currentUrl = url;
-//   });
-//}
 // vytvořeni uploaderu
 function createUploader(){
    var uploader = new qq.FileUploader({
@@ -144,8 +115,8 @@ function createUploader(){
       dropElement : document.getElementById('drop-file-container'),
       texts : uploadMsgs,
       onSubmit : function(id, fileName){
-         document.getElementById('upload-queue').style.display = "block";
          $('.action-details').hide();
+         $('#upload-queue').show();
       },
       onComplete : function(id, fileName, responseJSON){
          document.getElementById("upload-list").scrollTop = document.getElementById("upload-list").scrollHeight;
@@ -160,13 +131,13 @@ function createUploader(){
 window.onload = createUploader;
 
 // function for remove items from queue
-//function clearUploadQueue(){
-//   // remove items from queue
-//   while (document.getElementById('upload-list').hasChildNodes()) {
-//      document.getElementById('upload-list').removeChild(document.getElementById('upload-list').firstChild);
-//   }
-//   document.getElementById('upload-queue').style.display = "none";
-//}
+function clearUploadQueue(){
+   // remove items from queue
+   while (document.getElementById('upload-list').hasChildNodes()) {
+      document.getElementById('upload-list').removeChild(document.getElementById('upload-list').firstChild);
+   }
+   document.getElementById('upload-queue').style.display = "none";
+}
 //filter results based on query
 function filter(selector, query) {
    query =   $.trim(query); //trim white space

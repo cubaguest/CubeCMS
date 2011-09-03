@@ -51,7 +51,7 @@
 }
 #upload-queue div {padding: 2px;}
 
-#upload-list {padding:2px; list-style:none; height: 100px; overflow: auto;}
+#upload-list {padding:2px; list-style:none; height: 100px; overflow: auto;margin: 0;}
 #upload-list li { margin:0; padding:0; line-height:15px; font-size:12px;}
 .qq-upload-file, .qq-upload-spinner, .qq-upload-size, .qq-upload-cancel, .qq-upload-failed-text {margin-right: 7px;}
 
@@ -61,4 +61,5 @@
 
 .qq-upload-success {background-color: #ddffdd;}
 .qq-upload-fail {background-color: #FF7171;}
+.qq-upload-failed-text {display:none;}
 .qq-upload-fail .qq-upload-failed-text {display:inline;}
