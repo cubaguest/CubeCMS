@@ -784,10 +784,14 @@ class AppCore extends TrObject {
             new CoreErrors($e);
 //            return false;
          }
-         if(AppCore::getUrlRequest()->isXHRRequest() AND $routes->getRespondClass() != null){
+         if(AppCore::getUrlRequest()->isXHRRequest() OR $routes->getRespondClass() != null){
             // render odpovědi pro XHR
-            $class = $routes->getRespondClass();
-            $respond = new $class();
+            if($routes->getRespondClass() != null){
+               $class = $routes->getRespondClass();
+               $respond = new $class();
+            } else {
+               $respond = new XHR_Respond_VVEAPI();
+            }
             // přenos dat z šablony do dat odeslaných v respond
             $respond->setData($controller->_getTemplateObj()->getTemplateVars());
             $respond->renderRespond();
