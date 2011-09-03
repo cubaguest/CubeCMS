@@ -17,7 +17,11 @@ class Component_Uploader_JsPlugin extends JsPlugin {
    }
 
    protected function setFiles() {
-      $this->addFile(new JsPlugin_JsFile("fileuploader.js"));
+      if(VVE_DEBUG_LEVEL == 0){
+         $this->addFile(new JsPlugin_JsFile("fileuploader.min.js"));
+      } else {
+         $this->addFile(new JsPlugin_JsFile("fileuploader.js"));
+      }
 //      $this->addFile(new JsPlugin_CssFile("fileuploader.css"));
    }
 }

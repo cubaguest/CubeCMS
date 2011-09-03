@@ -4,7 +4,7 @@
  * Multiple file upload component with progress-bar, drag-and-drop. 
  * © 2010 Andrew Valums ( andrew(at)valums.com ) 
  * 
- * Licensed under GNU GPL 2 or later, see license.txt.
+ * Licensed under GNU GPL 2 or later and GNU LGPL 2 or later, see license.txt.
  */    
 
 //
@@ -286,7 +286,7 @@ qq.FileUploaderBasic = function(o){
            cancel : 'Cancel',
            failed : 'Failed',
            from : 'from'
-        }
+        }               
     };
     qq.extend(this._options, o);
         
@@ -341,9 +341,6 @@ qq.FileUploaderBasic.prototype = {
                 self._onComplete(id, fileName, result);
                 self._options.onComplete(id, fileName, result);
             },
-//            onQueueComplete: function(){
-//                self._options.onQueueComplete();
-//            },
             onCancel: function(id, fileName){
                 self._onCancel(id, fileName);
                 self._options.onCancel(id, fileName);
@@ -374,7 +371,7 @@ qq.FileUploaderBasic.prototype = {
         this._filesInProgress--;                 
         if (result.error){
             this._options.showMessage(result.error);
-        }
+        }             
         if(this._filesInProgress < 1){
            this._onQueueComplete(result);
         }
@@ -541,7 +538,7 @@ qq.FileUploader = function(o){
     qq.extend(this._options, o);       
 
     this._element = this._options.element;
-    this._element.innerHTML = this._options.template;
+    this._element.innerHTML = this._options.template;        
     // if is not defined listElement apend to template
     if(!this._options.listElement){
        var tmpdiv = document.createElement('div');
@@ -977,7 +974,7 @@ qq.UploadHandlerAbstract.prototype = {
                 
         var max = this._options.maxConnections;
         
-        if (this._queue.length >= max){
+        if (this._queue.length >= max && i < max){
             var nextId = this._queue[max-1];
             this._upload(nextId, this._params[nextId]);
         }
