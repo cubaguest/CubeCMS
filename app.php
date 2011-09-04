@@ -784,7 +784,8 @@ class AppCore extends TrObject {
             new CoreErrors($e);
 //            return false;
          }
-         if(AppCore::getUrlRequest()->isXHRRequest() OR $routes->getRespondClass() != null){
+         if((AppCore::getUrlRequest()->isXHRRequest() AND $routes->getRespondClass() != null)
+            OR ($routes->getRespondClass() != null AND self::$urlRequest->getOutputType() == 'json')){
             // render odpovědi pro XHR
             if($routes->getRespondClass() != null){
                $class = $routes->getRespondClass();
