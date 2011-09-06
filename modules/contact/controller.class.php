@@ -23,7 +23,9 @@ class Contact_Controller extends Controller {
 
       // načtení textů
       $modelText = new Text_Model();
-      $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_MAIN);
+      $text = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_MAIN))
+         ->record();
       if($text != false){
          $this->view()->text = $text->{Text_Model::COLUMN_TEXT};
       }
@@ -135,16 +137,19 @@ class Contact_Controller extends Controller {
       $this->checkWritebleRights();
       $modelText = new Text_Model();
 
-      $formEdit = new Form('contact_edit', true);
+      $formEdit = new Form('contact_edit');
 
       $elemText = new Form_Element_TextArea('text', $this->tr('Text kontaktu'));
       $elemText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $elemText->setLangs();
 
       // naplníme pokud je čím
-      $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_MAIN);
-      if($text != false){
-         $elemText->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      $textRecord = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_MAIN))
+         ->record();
+         getText($this->category()->getId(), self::TEXT_KEY_MAIN);
+      if($textRecord != false){
+         $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
       }
       $formEdit->addElement($elemText);
 
@@ -152,9 +157,11 @@ class Contact_Controller extends Controller {
       $elemTextPanel->setLangs();
       $elemTextPanel->setSubLabel($this->tr('Pokud není vyplněn, zkusí se použít první odstavec typu adresa z hlavního textu.'));
       // naplníme pokud je čím
-      $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_PANEL);
-      if($text != false){
-         $elemTextPanel->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      $textRecordPanel = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_PANEL))
+         ->record();
+      if($textRecordPanel != false){
+         $elemTextPanel->setValues($textRecordPanel->{Text_Model::COLUMN_TEXT});
       }
       $formEdit->addElement($elemTextPanel);
 
@@ -167,22 +174,38 @@ class Contact_Controller extends Controller {
       }
 
       if($formEdit->isValid()){
-         $modelText->saveText($formEdit->text->getValues(), null, $this->category()->getId(), self::TEXT_KEY_MAIN);
          $matches = array();
-            $texts = $formEdit->text->getValues();
-            $textsPanels = $formEdit->textPanel->getValues();
-            $textsPSave = array();
-            foreach ($texts as $lang => $text) {
-               $matches = array();
-               if($textsPanels[$lang] != null){ // pokud je vyplněn panel
-                  $textsPSave[$lang] = $textsPanels[$lang];
-               } else if(preg_match('/<address>(.*?)<\/address>/',$text, $matches) == 1){
-                  $textsPSave[$lang] = $matches[1];
-               }
+         $texts = $formEdit->text->getValues();
+         $textsPanels = $formEdit->textPanel->getValues();
+         
+         if($textRecord == false){
+            $textRecord = $modelText->newRecord();
+            $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+            $textRecord->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_MAIN; 
+         }
+         $textRecord->{Text_Model::COLUMN_TEXT} = $texts; 
+         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($texts); 
+         $modelText->save($textRecord);
+         
+         $textsPSave = array();
+         foreach ($texts as $lang => $text) {
+            $matches = array();
+            if($textsPanels[$lang] != null){ // pokud je vyplněn panel
+               $textsPSave[$lang] = $textsPanels[$lang];
+            } else if(preg_match('/<address>(.*?)<\/address>/',$text, $matches) == 1){
+               $textsPSave[$lang] = $matches[1];
             }
-            if(!empty ($textsPSave)){
-               $modelText->saveText($textsPSave, null, $this->category()->getId(), self::TEXT_KEY_PANEL);
+         }
+         if(!empty ($textsPSave)){
+            if($textRecordPanel == false){
+               $textRecordPanel = $modelText->newRecord();
+               $textRecordPanel->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+               $textRecordPanel->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_PANEL; 
             }
+            $textRecordPanel->{Text_Model::COLUMN_TEXT} = $textsPSave; 
+            $textRecordPanel->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($textsPSave); 
+            $modelText->save($textRecordPanel);
+         }
          $this->infoMsg()->addMessage($this->tr('Text kontaktu byl uložen'));
          $this->link()->route()->reload();
       }
