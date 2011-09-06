@@ -73,7 +73,14 @@ class Photogalery_Controller extends Controller {
 
       if($form->isValid()) {
          try {
-            $model->saveText($form->text->getValues(), null, $this->category()->getId(), Text_Controller::TEXT_MAIN_KEY);
+            if($text == false){
+               $text = $model->newRecord();
+               $text->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+               $text->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
+            }
+            $text->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
+            $text->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues()); 
+            $model->save($text);
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {

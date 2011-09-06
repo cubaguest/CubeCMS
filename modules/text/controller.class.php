@@ -55,7 +55,7 @@ class Text_Controller extends Controller {
    public function editController() {
       $this->checkWritebleRights();
 
-      $form = new Form("text_", true);
+      $form = new Form("text_");
       
       $label = new Form_Element_Text('label', $this->tr('Nadpis'));
       $label->addFilter(new Form_Filter_StripTags());
@@ -68,11 +68,13 @@ class Text_Controller extends Controller {
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea);
 
-      $model = new Text_Model_Detail();
-      $text = $model->getText($this->category()->getId(), self::TEXT_MAIN_KEY);
-      if($text != false){
-         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
-         $form->label->setValues($text->{Text_Model_Detail::COLUMN_LABEL});
+      $model = new Text_Model();
+      $textRec = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY))
+         ->record();
+      if($textRec != false){
+         $form->text->setValues($textRec->{Text_Model::COLUMN_TEXT});
+         $form->label->setValues($textRec->{Text_Model::COLUMN_LABEL});
       }
 
       $submit = new Form_Element_SaveCancel('send');
@@ -92,14 +94,23 @@ class Text_Controller extends Controller {
                   $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
                }
             }
-
-            $model->saveText($text, $form->label->getValues(),
-                    $this->category()->getId(), self::TEXT_MAIN_KEY);
+            
+            if($textRec == false){
+               $textRec = $model->newRecord();
+               $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+               $textRec->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
+            }
+            $textRec->{Text_Model::COLUMN_TEXT} = $text; 
+            $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text); 
+            $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues(); 
+            $model->save($textRec);
+            
             $this->log('úprava textu');
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
-            new CoreErrors($e);
+            echo $e->getTraceAsString();
+//            new CoreErrors($e);
          }
       }
       // view
@@ -118,10 +129,12 @@ class Text_Controller extends Controller {
       $textarea->setLangs();
       $form->addElement($textarea);
 
-      $model = new Text_Model_Detail();
-      $text = $model->getText($this->category()->getId(), self::TEXT_PANEL_KEY);
-      if($text != false){
-         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      $model = new Text_Model();
+      $textRec = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_PANEL_KEY))
+         ->record();
+      if($textRec != false){
+         $form->text->setValues($textRec->{Text_Model::COLUMN_TEXT});
       }
 
       $submit = new Form_Element_SaveCancel('send');
@@ -141,6 +154,16 @@ class Text_Controller extends Controller {
                   $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
                }
             }
+            
+            if($textRec == false){
+               $textRec = $model->newRecord();
+               $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+               $textRec->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_PANEL_KEY; 
+            }
+            $textRec->{Text_Model::COLUMN_TEXT} = $text; 
+            $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text); 
+            $model->save($textRec);
+            
             $model->saveText($form->text->getValues(), null, $this->category()->getId(),self::TEXT_PANEL_KEY);
             $this->log('Úprava textu panelu');
             $this->infoMsg()->addMessage($this->tr('Text panelu byl uložen'));
@@ -167,9 +190,11 @@ class Text_Controller extends Controller {
       $textarea->setLangs();
       $form->addElement($textarea, $grpText);
 
-      $text = $model->getText($this->category()->getId(), self::TEXT_PRIVATE_KEY);
-      if($text != false){
-         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      $textRec = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_PRIVATE_KEY))
+         ->record();
+      if($textRec != false){
+         $form->text->setValues($textRec->{Text_Model::COLUMN_TEXT});
       }
 
       $grpAccess = $form->addGroup('access', $this->tr('Přístupy'), $this->tr('Uživatelé nebo skupiny které uvidí privátní text. Stačí vybrat skupinu.'));
@@ -183,8 +208,8 @@ class Text_Controller extends Controller {
           $elemGroups->setOptions(array($grp->{Model_Users::COLUMN_GROUP_LABEL}.'('.$grp->{Model_Users::COLUMN_GROUP_NAME}.')' 
           => $grp->{Model_Users::COLUMN_GROUP_ID}), true);
       }
-      if($text != false){
-         $selGrps = $modelPrivate->getGroupsConnect($text->{Text_Model::COLUMN_ID});
+      if($textRec != false){
+         $selGrps = $modelPrivate->getGroupsConnect($textRec->{Text_Model::COLUMN_ID});
          foreach ($selGrps as $grp) {
             $elemGroups->setValues($grp->{Text_Model_Private::COLUMN_T_H_G_ID_GROUP},$grp->{Text_Model_Private::COLUMN_T_H_G_ID_GROUP});
          }
@@ -201,8 +226,8 @@ class Text_Controller extends Controller {
               .' ('.$usr->{Model_Users::COLUMN_USERNAME}.') - '.$usr->{Model_Users::COLUMN_GROUP_LABEL}.' ('.$usr->{Model_Users::COLUMN_GROUP_NAME}.')'
               => $usr->{Model_Users::COLUMN_ID}), true);
       }
-      if($text != false){
-         $selUsrs = $modelPrivate->getUsersConnect($text->{Text_Model::COLUMN_ID});
+      if($textRec != false){
+         $selUsrs = $modelPrivate->getUsersConnect($textRec->{Text_Model::COLUMN_ID});
          foreach ($selUsrs as $usr) {
             $elemUsers->setValues($usr->{Text_Model_Private::COLUMN_T_H_U_ID_USER},$usr->{Text_Model_Private::COLUMN_T_H_U_ID_USER});
          }
@@ -227,8 +252,16 @@ class Text_Controller extends Controller {
                   $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
                }
             }
-            $id = $model->saveText($form->text->getValues(), null,
-                  $this->category()->getId(), self::TEXT_PRIVATE_KEY);
+            
+            if($textRec == false){
+               $textRec = $model->newRecord();
+               $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+               $textRec->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_PRIVATE_KEY; 
+            }
+            $textRec->{Text_Model::COLUMN_TEXT} = $text; 
+            $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text); 
+            $id = $model->save($textRec);
+            
             $this->log('Úprava privátního textu');
             // uložíme skupiny
             $modelPrivate->saveGroupsConnect($id, $form->groups->getValues());
