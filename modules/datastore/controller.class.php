@@ -234,16 +234,32 @@ class DataStore_Controller extends Controller {
 
    public function uploadFileController()
    {
-      $component = new Component_Uploader();
-
-      $path = $this->getRequestParam('path', '/');
-
-      $component->setConfig(Component_Uploader::CONFIG_SAVE_PATH, AppCore::getAppCacheDir());
-      $component->setConfig(Component_Uploader::CONFIG_SAVE_PATH, $this->category()->getModule()->getDataDir().$path);
-      $result = $component->handleFile();
-      foreach ($result as $key => $res) {
-         $this->view()->{$key} = $res;
+      $this->checkWritebleRights();
+      $this->view()->allOk = false;
+      $this->saveFileForm($this->getRequestParam('path', '/'));
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
       }
+   }
+   
+   private function saveFileForm($path = '/') {
+      $addForm = new Form('upload_');
+      $elemFile = new Form_Element_File('file', $this->tr('Soubor'));
+      $elemFile->setUploadDir($this->category()->getModule()->getDataDir().$path);
+      $addForm->addElement($elemFile);
+
+//      $elemPath = new Form_Element_Hidden('path');
+//      $elemPath->setValues($path);
+//      $addForm->addElement($elemPath);
+
+      $addSubmit = new Form_Element_Submit('send',$this->tr('Nahrát'));
+      $addForm->addElement($addSubmit);
+
+      if($addForm->isValid()) {
+         
+         $this->infoMsg()->addMessage($this->tr('Soubor byl nahrán'));
+      }
+      return $addForm;
    }
 
    public function itemsListController()

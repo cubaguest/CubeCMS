@@ -21,5 +21,8 @@ class DataStore_View extends View {
 
    }
 
+   public function uploadFileView()
+   {
+   }     
 }
 ?>

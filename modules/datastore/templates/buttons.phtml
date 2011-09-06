@@ -1,11 +1,13 @@
+<?
+$this->addJsPlugin(new JsPlugin_SWFUpload());
+$this->addJsPlugin(new JsPlugin_PiroBox());
+$this->addFile("css://photogalery:style.css");
+?>
 <div id="datastorage-buttons">
-   <div id="file-uploader" class="button">
-      <noscript>
-         <form action="" method="post" enctype="">
-            <input type="file" name="upload" />
-            <input type="submit" name="<?=$this->tr('Nahrát');?>" />
-         </form>
-		</noscript>
+   
+   <div class="swfupload-control">
+      <span id="swfUButtonPlaceholder"></span>
+      <button type="button" name="upload" id="uplaod-button"><?=$this->tr('Nahrát');?></button>
    </div>
    <?
    // new dir
@@ -25,7 +27,6 @@
    echo $this->formDeleteItems->renderEnd();
    ?>
    <input type="submit" name="open-move-items" value="Přesunout"/>
-   <div id="drop-file-container" class="ui-widget-content"><span><?=$this->tr('Zde upusťte soubor')?></span></div>
    <div id="upload-queue" class="ui-widget action-details">
       <div class="ui-widget-header">
          <strong><?=$this->tr("Fronta odesílání")?>:</strong>&nbsp;
@@ -43,4 +44,9 @@
       ?>
       <hr class="reseter" />
    </div>
+   <script type="text/javascript">
+      var uploadUrl = '<?=$this->link()->route('uploadFile')?>';
+      var sessionId = '<?=session_id();?>';
+//      alert('doc ready');
+   </script>
 </div>

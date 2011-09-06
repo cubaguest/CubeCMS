@@ -14,7 +14,7 @@
    </tr>
    <tr class="ui-widget-header ui-state-processing">
       <?if($this->controlls == true){?><td class="file-selection"><input id="items-check-all" type="checkbox" /><?}?></td>
-      <th scope="col" >
+      <th scope="col" class="file-name">
          <a href="<?=$this->link()->param('sort', $this->curSort == 'name_a' ? 'name_d' : 'name_a')?>"
             title="<?=$this->tr('Řadit podle názvu')?>"class="<?if($this->curSort == 'name_a') echo "sort-label-asc"; else if($this->curSort == 'name_d') echo "sort-label-desc";?>"
             ><?=$this->tr('název')?></a>&nbsp;

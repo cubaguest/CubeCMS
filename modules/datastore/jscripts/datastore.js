@@ -33,7 +33,9 @@ function initDataStore(){
       }).addClass('delete_items_items_class');
 
       $(this).find('input.delete_items_items_class').remove();
-      $items.each(function(){$form.append($input.clone().val($(this).val()));});
+      $items.each(function(){
+         $form.append($input.clone().val($(this).val()));
+      });
       return true;
    });
 
@@ -51,7 +53,7 @@ function initDataStore(){
    });
 
    // event pro označení
-   $('input.item-select').change(function(){
+   $('input.item-select').live('change', function(){
       if($(this).is(':checked')){
          $(this).parents('tr').addClass('ui-state-highlight');
       } else {
@@ -60,7 +62,7 @@ function initDataStore(){
    });
 
    // označení všech
-   $('#items-check-all').change(function(){
+   $('#items-check-all').live('change', function(){
       var checkAll = false;
       if($(this).is(':checked')) {
          checkAll = true;
@@ -77,7 +79,7 @@ function initDataStore(){
    });
    
    // přejmenování
-   $('form.formRenameItem').submit(function(){
+   $('form.formRenameItem').live('submit',function(){
       var newName = prompt(enterNameMsg, $('input[name='+formRenameItem_oldname+']', this).val());
       if(!newName || newName == "") return false;
       $('input[name='+formRenameItem_newname+']', this).val(newName);
@@ -93,7 +95,11 @@ function initDataStore(){
       var $form = $(this);
       var $items = $('#datastorage-structure input.item-select:checked');
       if($items.length == 0) return false;
-      var $input = $('<input />').attr({name : formMoveItems_items+'[]',type : 'hidden',value : ''})
+      var $input = $('<input />').attr({
+         name : formMoveItems_items+'[]',
+         type : 'hidden',
+         value : ''
+      })
       .addClass('move_items_items_class');
 
       $(this).find('input.move_items_items_class').remove();
@@ -106,24 +112,78 @@ function initDataStore(){
 
 // vytvořeni uploaderu
 function createUploader(){
-   var uploader = new qq.FileUploader({
-      element: document.getElementById('file-uploader'),
-      action: uploadLink,
-      debug: true,
-      params : {sessionid : sessionId},
-      listElement : document.getElementById('upload-list'),
-      dropElement : document.getElementById('drop-file-container'),
-      texts : uploadMsgs,
-      onSubmit : function(id, fileName){
-         $('.action-details').hide();
-         $('#upload-queue').show();
-      },
-      onComplete : function(id, fileName, responseJSON){
-         document.getElementById("upload-list").scrollTop = document.getElementById("upload-list").scrollHeight;
-      },
-      onQueueComplete : function(result){
-         vveShowMessages(result);
-         setTimeout("window.location.reload()", 500);
+   var settings = {
+				flash_url : "/jscripts/swfupload/swfupload.swf",
+				flash9_url : "/jscripts/swfupload/swfupload_fp9.swf",
+				upload_url: uploadUrl,
+				post_params: {"upload_send" : "send", 'sessionid' : sessionId},
+				file_size_limit : 0,
+            file_types : "*",
+            file_types_description : 'files',
+				file_upload_limit : 100,
+				file_queue_limit : 0,
+            file_post_name : 'upload_file',
+//				debug: true,
+				// Button settings
+				button_width: "60",
+				button_height: "22",
+				button_placeholder_id: 'swfUButtonPlaceholder',
+//            button_action : SWFUpload.BUTTON_ACTION.SELECT_FILES,
+            button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
+            button_cursor: SWFUpload.CURSOR.HAND
+			};
+   
+   $('.swfupload-control').swfupload(settings);
+
+   // assign our event handlers
+   $('.swfupload-control')
+   .bind('fileQueued', function(event, file){
+      $('#upload-queue').show();
+      
+      var listitem='<li id="'+file.id+'" >'+
+      '<em>'+file.name+'</em> ('+Math.round(file.size/1024)+' KB) '+
+      '<span class="progressvalue" ></span> <span class="status" >Čekám</span> <a href="#cancel" class="cancel">Zrušit</a>'+
+      '<p class="progressbar" ><span class="progress" ></span></p>'+'</li>';
+      $('#upload-list').append(listitem);
+      $('li#'+file.id+' .cancel').bind('click', function(){ //Remove from queue on cancel click
+         var swfu = $.swfupload.getInstance('.swfupload-control');
+         swfu.cancelUpload(file.id);
+         $('li#'+file.id).slideUp('fast');
+         return false;
+      });
+      // start the upload once a file is queued
+      $(this).swfupload('startUpload');
+   })
+   .bind('uploadComplete', function(event, file){
+         $(this).swfupload('startUpload');
+   })
+   .bind('fileQueueError', function(event, file, errorCode, message){
+      alert('Velikost souboru '+file.name+' je větší než povolený limit');
+   })
+   .bind('uploadError', function(event, file, error, message){
+      $('#upload-list li#'+file.id).find('span.status').text('Odeslání se nazdařilo');
+      $('#upload-list li#'+file.id).find('span.cancel').remove();
+   })
+   .bind('uploadStart', function(event, file){ // kvůli flash9
+      $('#upload-list li#'+file.id).find('span.status').text('Odesílám...');
+      $('#upload-list li#'+file.id).find('span.progressvalue').text('0%');
+//      $('#upload-list li#'+file.id).find('span.cancel').hide();
+   })
+   .bind('uploadProgress', function(event, file, bytesLoaded){//Show Progress
+      var percentage=Math.round((bytesLoaded/file.size)*100);
+      $('#upload-list li#'+file.id).find('.progress').css('width', percentage+'%');
+      $('#upload-list li#'+file.id).find('.progressvalue').text(percentage+'% ');
+   })
+   .bind('uploadSuccess', function(event, file, serverData){
+      $('#upload-list li#'+file.id).animate({ opacity:0 }, 300, function(){
+            $(this).remove(); if($('#upload-list li').length == 0){ $('#upload-queue').hide(); }
+         });
+      var stat = $.swfupload.getInstance('.swfupload-control').getStats();
+      if(stat.files_queued == 0){
+         
+         $('#datastorage-structure').load(location.href+" #datastorage-structure>*","",function(){
+//            initDataStore();
+         });
       }
    });
 }
@@ -136,7 +196,8 @@ function clearUploadQueue(){
    while (document.getElementById('upload-list').hasChildNodes()) {
       document.getElementById('upload-list').removeChild(document.getElementById('upload-list').firstChild);
    }
-   document.getElementById('upload-queue').style.display = "none";
+   $('#upload-queue').hide();
+//   document.getElementById('upload-queue').style.display = "none";
 }
 //filter results based on query
 function filter(selector, query) {
