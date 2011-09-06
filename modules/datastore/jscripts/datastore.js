@@ -78,35 +78,74 @@ function initDataStore(){
       });
    });
    
-   // přejmenování
-   $('form.formRenameItem').live('submit',function(){
-      var newName = prompt(enterNameMsg, $('input[name='+formRenameItem_oldname+']', this).val());
-      if(!newName || newName == "") return false;
-      $('input[name='+formRenameItem_newname+']', this).val(newName);
-      return true;
+   // rename dialog
+   $( "#rename-form" ).dialog({
+      autoOpen: false, modal: true,
+      buttons: {
+         Ok: function() {
+            // validace prázdného názvu
+            if(checkNotEmpty($('#rename_item_newname_1'))){
+               $("#rename-form #rename_item_submit_1").click();
+            }
+         },
+         'Zrušit': function() {
+            $(this).dialog("close");
+         }
+      }
+   });
+   $('#item-rename').live('click',function(){
+      $("#rename-form #rename_item_submit_1").hide();
+      $("#rename-form #rename_item_oldname_1").val($(this).parent('td').find('#form-file-name').val());
+      $("#rename-form #rename_item_newname_1").val($(this).parent('td').find('#form-file-name').val());
+      $("#rename-form").dialog("open");
+      return false;
    });
    
-   $('input[name=open-move-items]').click(function(){
-      $('.action-details').hide();
-      $('#move-items').show();
-   });
-   
-   $('form#move-items').submit(function(){
-      var $form = $(this);
-      var $items = $('#datastorage-structure input.item-select:checked');
-      if($items.length == 0) return false;
-      var $input = $('<input />').attr({
-         name : formMoveItems_items+'[]',
-         type : 'hidden',
-         value : ''
-      })
-      .addClass('move_items_items_class');
+   // move dialog
+   $( "#move-form" ).dialog({
+      autoOpen: false, modal: true,
+      buttons: {
+         Ok: function() {
+            var $form = $(this).find('form');
+            var $items = $('#datastorage-structure input.item-select:checked');
+            if($items.length == 0) return false;
 
-      $(this).find('input.move_items_items_class').remove();
-      $items.each(function(){
-         $form.append($input.clone().val($(this).val()));
-      });
-      return true;
+            var $input = $('input[name="move_items_items[]"]').clone();
+            $('input[name="move_items_items[]"]').remove();
+            $items.each(function(i){
+               $form.append($input.clone().attr('id', 'file_'+i).val($(this).val()));
+            });
+            $("#move-form #move_items_submit_1").click();
+         },
+         'Zrušit': function() {
+            $(this).dialog("close");
+         }
+      }
+   });
+   $('input[name=open-move-items]').click(function(){
+      if($('#datastorage-structure input.item-select:checked').length == 0){ return; }
+      $("#move-form #move_items_submit_1").hide();
+      $("#move-form").dialog("open");
+   });
+   
+   // new dir dialog
+   $( "#createdir-form" ).dialog({
+      autoOpen: false, modal: true,
+      buttons: {
+         Ok: function() {
+            // validace prázdného názvu
+            if(checkNotEmpty($('#create_dir_name_1'))){
+               $("#createdir-form #create_dir_submit_1").click();
+            }
+         },
+         'Zrušit': function() {
+            $(this).dialog("close");
+         }
+      }
+   });
+   $('#create-dir-button').click(function(){
+      $("#createdir-form #create_dir_submit_1").hide();
+      $("#createdir-form").dialog("open");
    });
 }
 
@@ -175,8 +214,8 @@ function createUploader(){
       $('#upload-list li#'+file.id).find('.progressvalue').text(percentage+'% ');
    })
    .bind('uploadSuccess', function(event, file, serverData){
-      $('#upload-list li#'+file.id).animate({ opacity:0 }, 300, function(){
-            $(this).remove(); if($('#upload-list li').length == 0){ $('#upload-queue').hide(); }
+      $('#upload-list li#'+file.id).animate({opacity:0}, 300, function(){
+            $(this).remove();if($('#upload-list li').length == 0){$('#upload-queue').hide();}
          });
       var stat = $.swfupload.getInstance('.swfupload-control').getStats();
       if(stat.files_queued == 0){
@@ -207,4 +246,16 @@ function filter(selector, query) {
       ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).addClass('hidden-item') : $(this).removeClass('hidden-item');
    });
 }
-
+// check empty value in object
+function checkNotEmpty($o) {
+      if ( $o.val() == null || $o.val() == "" ) {
+         $o.addClass("ui-state-error");
+         $(".validateTips").text('Položky nebyla vyplněna').addClass("ui-state-highlight");
+         setTimeout(function() {
+            $(".validateTips").removeClass("ui-state-highlight", 1500);
+         }, 500 );
+         return false;
+      } else {
+         return true;
+      }
+   }

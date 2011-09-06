@@ -32,7 +32,6 @@ class DataStore_Controller extends Controller {
          // přejmenování
          $this->renameItem($path);
       }
-//      $pathItems = explode('/', $path);
       $pathItems = array();
       preg_match_all('/[^\/]*\//', $path, $pathItems);
       $outNav = array();
@@ -51,12 +50,12 @@ class DataStore_Controller extends Controller {
    private function createDir($path)
    {
       $form = new Form('create_dir_');
-      $elemName = new Form_Element_Hidden('name', $this->tr('Název'));
+      $elemName = new Form_Element_Text('name', $this->tr('Název složky'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
 
       $form->addElement($elemName);
 
-      $elemSubmit = new Form_Element_Submit('submit', $this->tr('Vytvořit adresář'));
+      $elemSubmit = new Form_Element_Submit('submit', $this->tr('Vytvořit'));
       $form->addElement($elemSubmit);
 
       if($form->isValid()){
@@ -86,13 +85,12 @@ class DataStore_Controller extends Controller {
 
       if($form->isValid()){
          $name = $form->name->getValues();
-
          $itemPath = $this->category()->getModule()->getDataDir(false).$path.$name;
-
-         if (is_dir($itemPath) && !@rmdir($itemPath)) {
-            throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání adresáře %s'),$name));
-         } else if(is_file($itemPath) && !@unlink($itemPath)){
-            throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání souboru %s'),$name));
+         $dir = new Filesystem_Dir($itemPath);
+         if ($dir->exist() && !$dir->rmDir()) {
+            throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání adresáře %s'), $name));
+         } else if (is_file($itemPath) && !unlink($itemPath)) {
+            throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání souboru %s'), $name));
          }
          $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
          $this->link()->reload();
@@ -141,11 +139,11 @@ class DataStore_Controller extends Controller {
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemName);
 
-      $elemNewName = new Form_Element_Hidden('newname', $this->tr('Nový název'));
+      $elemNewName = new Form_Element_Text('newname', $this->tr('Nový název'));
       $elemNewName->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemNewName);
 
-      $elemSubmit = new Form_Element_SubmitImage('submit', $this->tr('Přejmenovat'));
+      $elemSubmit = new Form_Element_Submit('submit', $this->tr('Přejmenovat'));
       $form->addElement($elemSubmit);
 
       if($form->isValid()){
@@ -154,7 +152,7 @@ class DataStore_Controller extends Controller {
 
          $itemPath = $this->category()->getModule()->getDataDir(false).$path;
          if (!@rename($itemPath.$oldname, $itemPath.$newname)) {
-            throw new InvalidArgumentException(sprintf($this->tr('Chyba při přejmenování položky %s na položku %'),$oldname, $newname));
+            throw new InvalidArgumentException(sprintf($this->tr('Chyba při přejmenování položky %s na položku %s'),$oldname, $newname));
          }
          $this->infoMsg()->addMessage($this->tr('Položka byla přejmenována'));
          $this->link()->reload();

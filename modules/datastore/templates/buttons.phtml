@@ -2,6 +2,9 @@
 $this->addJsPlugin(new JsPlugin_SWFUpload());
 $this->addJsPlugin(new JsPlugin_PiroBox());
 $this->addFile("css://photogalery:style.css");
+$jq = new JsPlugin_JQuery();
+$jq->addUIDialog();
+$this->addJsPlugin($jq);
 ?>
 <div id="datastorage-buttons">
    
@@ -9,14 +12,7 @@ $this->addFile("css://photogalery:style.css");
       <span id="swfUButtonPlaceholder"></span>
       <button type="button" name="upload" id="uplaod-button"><?=$this->tr('Nahrát');?></button>
    </div>
-   <?
-   // new dir
-   echo $this->formCreateDir->html()->setAttrib('id', 'create-directory');
-   echo $this->formCreateDir->renderStart();
-   echo '<p>'.$this->formCreateDir->name;
-   echo $this->formCreateDir->submit.'</p>';
-   echo $this->formCreateDir->renderEnd();
-   ?>
+   <button type="button" name="create-dir" id="create-dir-button"><?=$this->tr('Vytvořit složku');?></button>
    <?
    // delete items
    echo $this->formDeleteItems->html()->setAttrib('id', 'delete-items');
@@ -34,15 +30,42 @@ $this->addFile("css://photogalery:style.css");
       </div>
       <ul id="upload-list" class="ui-widget-content"></ul>
    </div>
-   <div id="move-items" class="ui-widget action-details">
-      <div class="ui-widget-header">
-         <strong><?=$this->tr("Přesun položek")?>:</strong>&nbsp;
-      </div>
+   <div id="move-form" class="ui-widget action-details">
+      <p class="validateTips"></p>
       <?
       $this->formMoveItems->html()->setAttrib('id', 'move-items');
-      echo $this->formMoveItems;
+      echo $this->formMoveItems->renderStart();
+      echo $this->formMoveItems->items;
+      echo $this->formMoveItems->targetdir->label().'<br />';
+      echo $this->formMoveItems->targetdir->controll().'<br />';
+      echo $this->formMoveItems->newdir->label().'<br />';
+      echo $this->formMoveItems->newdir->controll().'<br />';
+      echo $this->formMoveItems->submit->controll();
+      echo $this->formMoveItems->renderEnd();
       ?>
-      <hr class="reseter" />
+   </div>
+   <div id="rename-form" class="ui-widget action-details">
+      <p class="validateTips"></p>
+      <?
+         echo $this->formRenameItem->renderStart();
+         $this->formRenameItem->oldname->setValues(null);
+         $this->formRenameItem->newname->setValues(null);
+         echo $this->formRenameItem->oldname;
+         echo $this->formRenameItem->newname->label();
+         echo $this->formRenameItem->newname;
+         echo $this->formRenameItem->submit;
+         echo $this->formRenameItem->renderEnd();
+      ?>
+   </div>
+   <div id="createdir-form" class="ui-widget action-details">
+      <p class="validateTips"></p>
+      <?
+         echo $this->formCreateDir->renderStart();
+         echo $this->formCreateDir->name->label().'<br />';
+         echo $this->formCreateDir->name->controll().'<br />';
+         echo $this->formCreateDir->submit;
+         echo $this->formCreateDir->renderEnd();
+      ?>
    </div>
    <script type="text/javascript">
       var uploadUrl = '<?=$this->link()->route('uploadFile')?>';

@@ -65,6 +65,7 @@
       </td>
       <td class="font-small"><?=vve_date("%x %X", $item['mtime']);?></td>
       <td>
+         <input id="form-file-name" name="file-name" value="<?=$item['name']?>" type="hidden" />
          <?
          if($this->controlls == true){
             $this->formDeleteItem->html()->setAttrib('onSubmit', 'return confirm(\'Smazat položku '.$item['name'].' ?\')');
@@ -74,17 +75,9 @@
             $this->formDeleteItem->submit->setImage('images/icons/cancel.png');
             echo $this->formDeleteItem->submit;
             echo $this->formDeleteItem->renderEnd();
-            $this->formRenameItem->html()->addClass('formRenameItem');
-            echo $this->formRenameItem->renderStart();
-            $this->formRenameItem->oldname->setValues($item['name']);
-            $this->formRenameItem->newname->setValues(null);
-            echo $this->formRenameItem->oldname;
-            echo $this->formRenameItem->newname;
-            $this->formRenameItem->submit->setImage('images/icons/pencil.png');
-            echo $this->formRenameItem->submit;
-            echo $this->formRenameItem->renderEnd();
          }
          if(!$item['isdir']){?>
+         <a id="item-rename" href="<?=$this->link()->anchor('rename')?>" title="<?=$this->tr('Přejmenovat').' '.$item['name']?>"><img src="images/icons/pencil.png" alt="rename" /></a>
          <a href="<?=$item['dwurl']?>" title="<?=$this->tr('Stáhnout').' '.$item['name']?>"><img src="images/icons/download.png" alt="download" /></a>
          <?}?>
       </td>
