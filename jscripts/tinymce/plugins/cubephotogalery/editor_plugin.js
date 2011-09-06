@@ -40,7 +40,7 @@
 				author : 'Cube Studio',
 				authorurl : 'http://www.cube-studio.cz',
 				infourl : 'http://www.cube-studio.cz',
-				version : "1.0"
+				version : "1.1"
 			};
 		}
 	});

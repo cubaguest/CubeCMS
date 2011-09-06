@@ -30,10 +30,25 @@ var CubePhotogaleryDialog = {
       this.initSwfUpload();
       
       // if is insert new images
-      if(ed.dom.getAttrib(ed.selection.getNode(), 'class').indexOf('photogalery') != -1){
+      if(dom.getAttrib(n, 'class').indexOf('photogalery') != -1){
          f.wrapperList.value = "";
       }
-      
+      var sel = n;
+      // if we are in reseer span
+      if(n.nodeName == 'SPAN' || n.nodeName == 'A'){
+         var parent = ed.selection.getNode().parentNode;
+         if(dom.getAttrib(parent, 'class').indexOf('photogalery') != -1){
+            // @todo vybrat reseter a zařadit místo něj
+//            var images = dom.select('a.image', parent);
+//            var tmpHolder = dom.create('span', {'class' : 'tmp_photo_holder'});
+            
+//            dom.insertAfter(tmpHolder, images[images.length-1]);
+//            ed.selection.select(images[images.length-1], false);
+//            ed.selection.collapse(false);
+            f.wrapperList.value = "";
+         }
+      }
+      sel = n;
       addClassesToList('imageClassList', 'advlink_styles');
       addClassesToList('linkClassList', 'advlink_styles');
 	},
@@ -80,10 +95,10 @@ var CubePhotogaleryDialog = {
    },
    
    fileQueued : function(file){
-     document.getElementById('filesSelected').textContent = this.getStats().files_queued;
+     CubePhotogaleryDialog._setText(document.getElementById('filesSelected'), this.getStats().files_queued);
      CubePhotogaleryDialog.updateProgressBarQueue(0);
      CubePhotogaleryDialog.updateProgressBarFile(0);
-     document.getElementById('uploadingImageStatus').textContent = tinyMCEPopup.getLang('cubephotogalery_dlg.statusready');
+     CubePhotogaleryDialog._setText(document.getElementById('uploadingImageStatus'), tinyMCEPopup.getLang('cubephotogalery_dlg.statusready'));
    },
    fileQueueError : function(file, errorcode, message){
       var msg = null;
@@ -105,12 +120,16 @@ var CubePhotogaleryDialog = {
    },
    uploadStart : function(file){
       // set upload info
-      document.getElementById('uploadingImageInfo').textContent = file.name+' ('+file.size+'B)';
+      CubePhotogaleryDialog._setText(document.getElementById('uploadingImageInfo'), file.name+' ('+file.size+'B)');
       CubePhotogaleryDialog.updateProgressBarFile(0);
 //      CubePhotogaleryDialog.updateProgressBarQueue();
    },
    uploadProgress : function(file, bytescomplete, totalbytes){
-      CubePhotogaleryDialog.updateProgressBarFile(totalbytes/bytescomplete*100);
+      var percent = 0;
+      if(bytescomplete != 0){
+         percent = totalbytes/bytescomplete*100;
+      }
+      CubePhotogaleryDialog.updateProgressBarFile(percent);
    },
    uploadError : function(file, errorcode, message){
       
@@ -176,7 +195,7 @@ var CubePhotogaleryDialog = {
          tinyMCEPopup.confirm(tinyMCEPopup.getLang('cubephotogalery_dlg.insert_with_error_upload'), function(s) {if (!s){return;}});
       }
       var formObj = document.forms[0];
-      var cnt = "";
+      var cnt;
       var elemLink = document.createElement('a');
       var elemImage = document.createElement('img');
       var elemLabel = document.createElement('span');
@@ -200,7 +219,14 @@ var CubePhotogaleryDialog = {
          elemLabel.innerHTML = formObj.imageLabel.value;
          elemLink.appendChild(elemLabel);
       }
-      
+
+      if(formObj.wrapperList.value != ""){
+         cnt = tinymce.DOM.create(formObj.wrapperList.value, {'class' : 'photogalery'});
+      } else {
+         cnt = tinymce.DOM.create("p", {'class' : 'photogalery'});
+      }
+      cnt.appendChild(document.createTextNode('\u00a0'));
+
       var arLen=CubePhotogaleryDialog.images.length;
       var image;
       for ( var i=0, len=arLen; image = CubePhotogaleryDialog.images[i], i<len; ++i ){
@@ -208,7 +234,7 @@ var CubePhotogaleryDialog = {
          elemImage.alt = image.file;
          elemLink.href = image.dir+image.file;
          elemLink.title = image.file;
-         cnt += tinymce.DOM.getOuterHTML(elemLink.cloneNode(true));
+         cnt.appendChild(elemLink.cloneNode(true));
       }
       
       // nadpis
@@ -219,15 +245,18 @@ var CubePhotogaleryDialog = {
          headline = tinymce.DOM.getOuterHTML(h);
       }
       
+      var reseter = tinymce.DOM.create("span", {'class' : 'reseter'}, '&nbsp;');
       if(formObj.wrapperList.value != ""){
-         var wr = document.createElement(formObj.wrapperList.value);
-         wr.setAttribute('class', 'photogalery');
-//         cnt += "<span class=\"reseter\">&nbsp;</span>";
-         cnt += "<hr class=\"reseter\" /><p>&nbsp;</p>";
-         wr.innerHTML = cnt;
-         tinyMCEPopup.execCommand('mceInsertContent', false, headline+tinymce.DOM.getOuterHTML(wr));
+         // reseter
+         cnt.appendChild(reseter);
+         tinyMCEPopup.execCommand('mceInsertContent', false, headline+tinymce.DOM.getOuterHTML(cnt)+'<p> </p>');
       } else {
-         tinyMCEPopup.execCommand('mceInsertContent', false, headline+cnt);
+         var selNode = tinyMCEPopup.editor.selection.getNode();
+         if(selNode.nodeName == 'SPAN' &&
+         dom.getAttrib(selNode, 'class').indexOf('reseter') != -1){
+            cnt.appendChild(reseter);
+         }
+         tinyMCEPopup.execCommand('mceInsertContent', false, headline+cnt.innerHTML);
       }
 
 		tinyMCEPopup.restoreSelection();
@@ -235,6 +264,8 @@ var CubePhotogaleryDialog = {
 		if (tinymce.isWebKit){
 			ed.getWin().focus();
       }
+      
+      //clear tmp holder
       
 		tinyMCEPopup.editor.execCommand('mceRepaint');
 		tinyMCEPopup.editor.focus();
@@ -248,13 +279,20 @@ var CubePhotogaleryDialog = {
          var uploaded = this.swfu.getStats().successful_uploads + this.swfu.getStats().upload_errors;
          value = Math.round((uploaded / all) * 100 );
       }
-      document.getElementById('progressQueueText').textContent = value+' %';
+      CubePhotogaleryDialog._setText(document.getElementById('progressQueueText'), value+' %');
       document.getElementById('progressQueueMeter').style.width = value+'%';
    },
    updateProgressBarFile : function(value){
       value = Math.round(value);
-      document.getElementById('progressFileText').textContent = value+' %';
+      CubePhotogaleryDialog._setText(document.getElementById('progressFileText'), value+' %');
       document.getElementById('progressFileMeter').style.width = value+'%';
+   },
+   _setText : function(elem, text){
+      if (document.all) { 
+         elem.innerText = text; 
+      } else { 
+         elem.textContent = text; 
+      }
    }
 };
 
