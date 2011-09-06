@@ -151,34 +151,16 @@ span[title] {
    padding: 5px 5px 5px 40px;
    background-repeat: no-repeat;
    background-position: 11px 50%;
+   border-bottom: 2px transparent solid;
+   border-top: 2px transparent solid;
    margin-bottom: 5px;
-   /*font-weight: 600;*/
 }
-.message p {
-   border-top: 1px dotted gray;
-   padding: 3px 0;
-}
-.message p:first-child {
-   border: none;
-}
+.message p { margin-bottom:3px; border-top: 1px solid gray;}
+.message p:first-child { border: none;}
+#infoMessages { border-color: #b7dcff; background-color: #cce6ff;}
+#errMessages { border-color: #ffc7c0; background-color: #ffe3e0;}
+#coreErrMessage { border-color: #ffa095; background-color: #ffb2a9;}
 
-#infoMessages {
-   border-bottom: 2px #b7dcff solid;
-   border-top: 2px #b7dcff solid;
-   background-color: #cce6ff;
-}
-
-#errMessages {
-   border-bottom: 2px #ffc7c0 solid;
-   border-top: 2px #ffc7c0 solid;
-   background-color: #ffe3e0;
-}
-
-#coreErrMessage {
-   border-bottom: 2px #ffa095 solid;
-   border-top: 2px #ffa095 solid;
-   background-color: #ffb2a9;
-}
 
 /* formulařové prvky */
 input, button, textarea, select, a.form-button, .button {
@@ -409,9 +391,9 @@ textarea, form .form-table .form-element-long {
 /* SOF Article tools */
 .article-tools { padding-top: 1em; }
 .facebook-button { float: left; }
-.share-button { float: left; padding-top: 4px; width: 110px; }
-.nav-button { text-align: right; }
-.link-back, .button-back {	text-align: left;	display: block; }
+.share-button { float: left; padding-top: 4px; width: 180px; }
+.share-button div {display: inline;}
+.nav-button { padding-top: 4px; text-align: right; }
 /* EOF Article tools */
 
 /* SOF Sitemap Content */
