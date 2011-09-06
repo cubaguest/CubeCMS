@@ -87,13 +87,17 @@ class DataStore_Controller extends Controller {
          $name = $form->name->getValues();
          $itemPath = $this->category()->getModule()->getDataDir(false).$path.$name;
          $dir = new Filesystem_Dir($itemPath);
-         if ($dir->exist() && !$dir->rmDir()) {
-            throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání adresáře %s'), $name));
-         } else if (is_file($itemPath) && !unlink($itemPath)) {
-            throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání souboru %s'), $name));
+         try {
+            if ($dir->exist() && !$dir->rmDir()) {
+               throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání adresáře %s'), $name));
+            } else if (is_file($itemPath) && !unlink($itemPath)) {
+               throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání souboru %s'), $name));
+            }
+            $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
+            $this->link()->reload();
+         } catch (InvalidArgumentException $exc) {
+            $this->errMsg()->addMessage(sprintf($this->tr('Položku %s se nepodařilo smazat'), $name));
          }
-         $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
-         $this->link()->reload();
       }
       $this->view()->formDeleteItem = $form;
    }
@@ -113,21 +117,26 @@ class DataStore_Controller extends Controller {
       if($form->isValid()){
          $names = $form->items->getValues();
          $itemPath = $this->category()->getModule()->getDataDir(false) . $path;
-
+         $allDeleted = true;
+         
          foreach ($names as $name) {
             if($name == "") continue;
             try {
-               if (is_dir($itemPath . $name) && !@rmdir($itemPath . $name)) {
+               $dir = new Filesystem_Dir($itemPath . $name);
+               if ($dir->exist() && !$dir->rmDir()) {
                   throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání adresáře %s'), $name));
                } else if (is_file($itemPath . $name) && !@unlink($itemPath . $name)) {
                   throw new InvalidArgumentException(sprintf($this->tr('Chyba při mazání souboru %s'), $name));
                }
             } catch (InvalidArgumentException $exc) {
+               $allDeleted = false;
                $this->errMsg()->addMessage(sprintf($this->tr('Položku %s se nepodařilo smazat'), $name));
             }
          }
-         $this->infoMsg()->addMessage($this->tr('Položky byly smazány'));
-         $this->link()->reload();
+         if($allDeleted){
+            $this->infoMsg()->addMessage($this->tr('Položky byly smazány'));
+            $this->link()->reload();
+         }
       }
       $this->view()->formDeleteItems = $form;
    }
