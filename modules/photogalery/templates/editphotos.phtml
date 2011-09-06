@@ -1,14 +1,16 @@
 <?
 $this->addJsPlugin(new JsPlugin_SWFUpload());
 $this->addJsPlugin(new JsPlugin_PiroBox());
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addFile("css://photogalery:style.css");
 ?>
 <h1><?= $this->tr('Úprava obrázků z').' '.$this->category()->getName();?></h1>
 <?$this->includeFile('tpl://photogalery:addimage.phtml')?>
+<div class="ui-widget ui-widget-imageslist">
+   <h2 class="ui-widget-header"><?=$this->tr('Seznam uložených obrázků')?></h2>
+   <div class="ui-widget-content">
       <form method="post" action="<?=$this->link()?>">
          <fieldset class="fieldset-alt">
-            <legend><span><?=$this->tr('Seznam uložených obrázků')?></span></legend>
-            <br />
          <div style="text-align: right; padding: 10px;">
             <input id="button-check-all-images" type="button" value="<?=$this->tr('Změnit označení')?>" title="<?=$this->tr('Změnit označení pro smazání')?>" />
             <?
@@ -20,13 +22,21 @@ $this->addFile("css://photogalery:style.css");
             <?$step = 0;
             foreach ($this->images as $image) {
                $step++;?>
-               <tr id="file-<?=  str_replace('.', '_', $image->{PhotoGalery_Model_Images::COLUMN_FILE})?>">
+               <tr id="file-<?=  str_replace('.', '_', $image->{PhotoGalery_Model_Images::COLUMN_FILE})?>"
+                   class="ui-state-default">
                <td style="width: 75px">
                   <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" class="pirobox_gall" title="<?=$this->tr('Zobrazit náhled')?>"><img
                         src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
                .$image->{PhotoGalery_Model_Images::COLUMN_FILE}.'?time='.time()?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" width="70"
                   /></a>
+                  <br />
+                  <?
+                     $this->editForm->delete->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->delete->setValues(false);
+                     echo ($this->editForm->delete->label());
+                     echo ($this->editForm->delete->controll()->addClass('button-check-delete-image'));//->setAttrib('onclick', "if(this.checked == true)return confirm('Smazat?')"));
+                     echo ($this->editForm->delete->scripts());?>
                </td>
                <td valign="top" style="padding-right:10px;">
                      <?
@@ -38,6 +48,7 @@ $this->addFile("css://photogalery:style.css");
                      echo ($this->editForm->name->controll());
                      echo ($this->editForm->name->scripts());
                      ?>
+                  <p>
                      <?
                      $this->editForm->ord->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      $this->editForm->ord->setValues($image->{PhotoGalery_Model_Images::COLUMN_ORDER});
@@ -50,7 +61,12 @@ $this->addFile("css://photogalery:style.css");
                      $this->editForm->rotate->setLabel('<img src="images/icons/arrow_rotate_anticlockwise.png" />');
                      $this->editForm->rotate->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      echo ($this->editForm->rotate->label());
-                     echo ($this->editForm->rotate->controll());?>                     
+                     echo ($this->editForm->rotate->controll());?>   
+                  </p>
+                  <p>
+                     <a href="<?=$this->link()->route('editphoto',array('id' => $image->{PhotoGalery_Model_Images::COLUMN_ID}))?>"
+                        title="<?=$this->tr('Upravit miniaturu')?>" class="form-button"><?=$this->tr('Upravit miniaturu')?></a>
+                  </p>
                </td>
                <td valign="top">
                      <?
@@ -68,28 +84,18 @@ $this->addFile("css://photogalery:style.css");
                      echo ($this->editForm->id->controll());?>
                </td>
             </tr>
-            <tr>
-               <td colspan="3" style="border-bottom: 1px solid gray">
-                  <a href="<?=$this->link()->route('editphoto',array('id' => $image->{PhotoGalery_Model_Images::COLUMN_ID}))?>"
-                     title="<?=$this->tr('Upravit miniaturu')?>" class="form-button"><?=$this->tr('Upravit miniaturu')?></a>
-                  <?
-                     $this->editForm->delete->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->delete->setValues(false);
-                     echo ($this->editForm->delete->label());
-                     echo ($this->editForm->delete->controll()->addClass('button-check-delete-image'));//->setAttrib('onclick', "if(this.checked == true)return confirm('Smazat?')"));
-                     echo ($this->editForm->delete->scripts());?>
-               </td>
-            </tr>
             <?}?>
          </table>
          </div>
          <div style="text-align: right; padding: 10px;">
             <?
-            echo $this->editForm->save->controll();
             echo ($this->editForm->goBack->label());
             echo ($this->editForm->goBack->controll());
+            echo $this->editForm->save->controll();
             ?>
          </div>
          <?=$this->editForm->scripts()?>
          </fieldset>
       </form>
+   </div>   
+</div>

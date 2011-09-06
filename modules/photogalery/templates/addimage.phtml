@@ -1,19 +1,18 @@
-<div class="main-content-form-edit">
-   <form action="<?=$this->link()?>" method="post">
-      <fieldset class="fieldset-alt">
-         <legend><span><?=$this->tr('Přidání obrázků')?></span></legend>
-         <br />
-         <br />
-         <div class="swfupload-control">
-         <p><strong><?=$this->tr('Obrázky')?>:</strong>&nbsp;<span id="spanButtonPlaceholder"></span>&nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /><br /></p>
+<div class="ui-widget ui-widget-upload">
+   <h2 class="ui-widget-header"><?=$this->tr('Přidání obrázků')?></h2>
+   <div class="swfupload-control ui-widget-content">
+      <form action="<?=$this->link()?>" method="post">
+         <p><strong><?=$this->tr('Obrázky')?>:</strong>
+            <span id="spanButtonPlaceholder"></span>
+            <button name="upload-button"><?=$this->tr('Vybrat obrázky')?></button>
+            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /><br /></p>
          <p class="note"><?= $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
          může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
          Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
-         <p><span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span></p>
-         <ol id="upload-files-log"></ol>
-      </div>
-      </fieldset>
-   </form>
+      </form>
+      <p><span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span></p>
+      <ol id="upload-files-log"></ol>
+   </div>
 </div>
 <br/>
 <script type="text/javascript">
@@ -29,11 +28,11 @@
          file_types_description : "<?=$this->tr('Obrázky');?>",
          file_upload_limit : 150,
          file_queue_limit : 0,
-         button_image_url : "<?=Url_Request::getBaseWebDir()?>/images/upload_cs.png", // Relative to the SWF file
          button_placeholder_id : "spanButtonPlaceholder",
-         button_width: 61,
+         button_width: 90,
          button_height: 22,
-         button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
+         button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
+         button_cursor: SWFUpload.CURSOR.HAND,
          debug: <?if(VVE_DEBUG_LEVEL > 1){echo "true";}else{echo "false";};?>,
          // Flash Settings
          flash_url : "<?=Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload.swf",
@@ -49,8 +48,9 @@
       $('.swfupload-control')
       .bind('fileQueued', function(event, file){
          var listitem='<li id="'+file.id+'" >'+
-         '<em>'+file.name+'</em> ('+Math.round(file.size/1024)+' KB) <span class="progressvalue" ></span><span class="status" > <?=$this->tr('Čekám')?></span>'+
-         '<div class="progressbar" ><div class="progress" ></div></div><span class="cancel" >&nbsp;</span>'+'</li>';
+         '<em>'+file.name+'</em> ('+Math.round(file.size/1024)+' KB) <span class="progressvalue" >'
+         +'</span><span class="status" > <?=$this->tr('Čekám')?></span>'
+         +'<p class="progressbar" ><span class="progress" ></span></p><span class="cancel" >&nbsp;</span>'+'</li>';
          $('#upload-files-log').append(listitem);
          $('li#'+file.id+' .cancel').bind('click', function(){ //Remove from queue on cancel click
             var swfu = $.swfupload.getInstance('.swfupload-control');
@@ -86,7 +86,7 @@
       })
       .bind('uploadProgress', function(event, file, bytesLoaded){//Show Progress
          var percentage=Math.round((bytesLoaded/file.size)*100);
-         $('#upload-files-log li#'+file.id).find('div.progress').css('width', percentage+'%');
+         $('#upload-files-log li#'+file.id).find('span.progress').css('width', percentage+'%');
          $('#upload-files-log li#'+file.id).find('span.progressvalue').text(percentage+'% ');
       })
       .bind('uploadSuccess', function(event, file, serverData){
@@ -97,6 +97,7 @@
             $('#edit-photos-list').load(location.href+" #edit-photos-list>*","",function(){
                $('#edit-photos-list p.form-link-lang-container a:first-child').trigger('click', false);
                $().piroBox({slideShow : true,slideSpeed : 3});
+               infoMsg('<?=$this->tr('Obrázky byly nahrány')?>');
             });
          }
       });
@@ -114,11 +115,9 @@
 
    function checkCheckbox(obj){
       if($(obj).is(':checked')){
-         $(obj).parents('tr').css({opacity : 0.3});
-         $(obj).parents('tr').prev('tr').css({opacity : 0.3});
+         $(obj).parents('tr').find('td').not(':first-child').css({opacity : 0.3});
       } else {
-         $(obj).parents('tr').css({opacity : 1});
-         $(obj).parents('tr').prev('tr').css({opacity : 1});
+         $(obj).parents('tr').find('td').css({opacity : 1});
       }
    }
    /* ]]> */
