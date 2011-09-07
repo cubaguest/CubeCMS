@@ -104,7 +104,7 @@ class Text_View extends View {
       Template_Core::setPageTitle($this->h1);
    }
 
-   private function addTinyMCE() {
+   protected function addTinyMCE() {
       $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
       if($type == 'none') return;
       $this->form->text->html()->addClass("mceEditor");
