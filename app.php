@@ -703,7 +703,7 @@ class AppCore extends TrObject {
          // přiřazení šablony do výstupu
          $this->getCoreTpl()->module = $controller->_getTemplateObj();
       } catch (Exception $e) {
-         new CoreErrors($e);
+         CoreErrors::addException($e);
       }
    }
 
