@@ -147,7 +147,6 @@ class Contact_Controller extends Controller {
       $textRecord = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
          array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_MAIN))
          ->record();
-         getText($this->category()->getId(), self::TEXT_KEY_MAIN);
       if($textRecord != false){
          $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
       }
