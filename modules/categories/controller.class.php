@@ -364,25 +364,28 @@ class Categories_Controller extends Controller {
          $record->{Model_Category::COLUMN_FEEDS} = $feeds;
          $record->{Model_Category::COLUMN_DATADIR} = $dataDir;
 
+         // instalace
+         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
+         if(!class_exists($mInsClass, true)){
+            throw new UnexpectedValueException($this->tr('Neexistuje třída pro instalaci tohoto modulu'));
+         }
+         
          $lastId = $categoryModel->save($record);
 
          // práva
          $this->assignRights($lastId, $form);
-         
+      
          // po uložení vložíme do struktury
          if ($lastId !== false) {
             $newStructure = Category_Structure::getStructure(!$this->isMainStruct());
             $newStructure->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
             $newStructure->saveStructure(!$this->isMainStruct());
          }
-
-         // instalace
-         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
+ 
          $mInstall = new $mInsClass();
          $mInstall->installModule();
          $this->log('Přidána nová kategorie "' . $names[Locales::getDefaultLang()] . '"');
          $this->infoMsg()->addMessage('Kategorie byla uložena');
-//         var_dump($form->gotoSettings->getValues());flush();
          if ($form->gotoSettings->getValues() == true) {
             $this->link()->param('id')->route('settings', array('categoryid' => $lastId))->reload();
          } else {
@@ -464,7 +467,7 @@ class Categories_Controller extends Controller {
     */
    private function createForm()
    {
-      $form = new Form('category', true);
+      $form = new Form('category');
 
       $form->addGroup('labels', $this->tr('Popisky'), $this->tr('Název a popisek kategorie'));
       // název kategorie
