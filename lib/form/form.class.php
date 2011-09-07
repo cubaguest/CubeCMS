@@ -507,7 +507,19 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       }
 
       if($group == null) {
-         $this->elementsGroups[$name] = $this->elements[$name]->getName();
+         if($position == -1){
+            $this->elementsGroups[$name] = $this->elements[$name]->getName();
+         } else {
+         /**
+          * Nejde pouze pomocí array_splice
+          * @see http://www.php.net/manual/en/function.array-splice.php#41118
+          */
+            $firstPart = array_slice($this->elementsGroups, 0, $position);
+            $secondPart = array_slice($this->elementsGroups, $position);
+            $insertPart = array($name => $this->elements[$name]->getName());
+            $this->elementsGroups = array_merge($firstPart, $insertPart, $secondPart);
+         }
+         
       } else {
          if(!isset ($this->elementsGroups[$group])) {
             $this->addGroup($group);
