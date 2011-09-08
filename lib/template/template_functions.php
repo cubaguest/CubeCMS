@@ -32,54 +32,63 @@ function vve_get_tpl_file($file, $type) {
  * @param int $limit -- požadovaný počet vrácených znaků
  * @param string $delimiter -- (option) oddělovač na konci (např. "...")
  * @return string -- zkrácený řetězec se správně uzavřenými značkami
- * @author Jakub Vrána
- * @link http://www.root.cz/clanky/php-zkraceni-textu-s-xhtml-znackami/
+ * @author Jakub Vrána & Mike
+ * @link http://php.vrana.cz/zkraceni-textu-s-xhtml-znackami.php#d-9638
  */
-function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...') {
-   $strLen = mb_strlen($s);
+function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...')
+{
+   $strLen = strlen(strip_tags($s));
+   $s = substr($s, 0, $limit + 1); // hlavní je, aby zde byl limit stejný jako ten globálně nastavený, což tedy nyní je...
+   $pos = strrpos($s, " "); // v PHP 5 by se dal použít parametr offset
+   $s = substr($s, 0, ($pos ? $pos : -1));
+
    $length = 0;
    $tags = array(); // dosud neuzavřené značky
-   for ($i=0; $i < mb_strlen($s) && $length < $limit; $i++) {
-      switch ($s{$i}) {
-
+   for ($i = 0; $i < strlen($s) && $length < $limit; $i++) {
+      switch ($s[$i]) {
          case '<':
-         // načtení značky
-            $start = $i+1;
-            while ($i < mb_strlen($s) && $s{$i} != '>' && !ctype_space($s{$i})) {
+            // načtení značky
+            $start = $i + 1;
+            while ($i < strlen($s) && $s[$i] != '>' && !ctype_space($s[$i])) {
                $i++;
             }
-            $tag = mb_substr($s, $start, $i - $start);
+            $tag = substr($s, $start, $i - $start);
             // přeskočení případných atributů
-            while ($i < mb_strlen($s) && $s{$i} != '>') {
+            $in_quote = '';
+            while ($i < strlen($s) && ($in_quote || $s[$i] != '>')) {
+               if (($s[$i] == '"' || $s[$i] == "'") && !$in_quote) {
+                  $in_quote = $s[$i];
+               } elseif ($in_quote == $s[$i]) {
+                  $in_quote = '';
+               }
                $i++;
             }
-            if ($s{$start} == '/') { // uzavírací značka
+            if ($s[$start] == '/') { // uzavírací značka
                array_shift($tags); // v XHTML dokumentu musí být vždy uzavřena poslední neuzavřená značka
-            } elseif ($s{$i-1} != '/') { // otevírací značka
+            } elseif ($s[$i - 1] != '/') { // otevírací značka
                array_unshift($tags, $tag);
             }
             break;
-
          case '&':
             $length++;
-            while ($i < mb_strlen($s) && $s{$i} != ';') {
+            while ($i < strlen($s) && $s[$i] != ';') {
                $i++;
             }
             break;
-
          default:
             $length++;
-
+            while ($i + 1 < strlen($s) && ord($s[$i + 1]) > 127 && ord($s[$i + 1]) < 192) {
+               $i++;
+            }
       }
    }
-   $s = mb_substr($s, 0, $i);
-   if($strLen > $limit) {
+   $s = substr($s, 0, $i);
+   if ($strLen > $limit) {
       $s .= $delimiter;
    }
    if ($tags) {
       $s .= "</" . implode("></", $tags) . ">";
    }
-
    return $s;
 }
 
