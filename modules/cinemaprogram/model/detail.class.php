@@ -251,7 +251,7 @@ class CinemaProgram_Model_Detail extends Model_PDO {
       return $dbst;
    }
 
-   public function getCurrentMovie(){
+   public function getCurrentMovie($from = 0){
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TIME)." AS times"
               ." JOIN ".Db_PDO::table(self::DB_TABLE)." AS movies ON movies.".self::COL_ID
@@ -259,12 +259,11 @@ class CinemaProgram_Model_Detail extends Model_PDO {
               ." WHERE (times.".self::COL_T_DATE." = :datefrom AND times.".self::COL_T_TIME." >= :timefrom)"
               ." OR times.".self::COL_T_DATE." > :datefrom"
               ." ORDER BY times.".self::COL_T_DATE." ASC, times.".self::COL_T_TIME." ASC"
-              ." LIMIT 0,1");
-
+              ." LIMIT :limitfrom,1");
       $dateFrom = new DateTime();
       $dbst->bindValue(':datefrom', $dateFrom->format('Y-m-d'), PDO::PARAM_STR);
       $dbst->bindValue(':timefrom', $dateFrom->format('H:m:s'), PDO::PARAM_STR);
-//      var_dump($dbst);
+      $dbst->bindValue(':limitfrom', $from, PDO::PARAM_INT);
       $dbst->execute();
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst->fetch();

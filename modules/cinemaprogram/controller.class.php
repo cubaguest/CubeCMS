@@ -356,9 +356,7 @@ class CinemaProgram_Controller extends Controller {
 
    public function currentMovieController() {
       $model = new CinemaProgram_Model_Detail();
-      $this->view()->movie = $model->getCurrentMovie();
-//      var_dump($this->view()->movie);
-//      if($this->view()->action === false) return false;
+      $this->view()->movie = $model->getCurrentMovie((int)$this->getRequestParam('from', 0));
    }
 }
 
