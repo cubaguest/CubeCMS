@@ -31,65 +31,103 @@ function vve_get_tpl_file($file, $type) {
  * @param string $s -- zkracovaný řetězec bez komentářů a bloků skriptu
  * @param int $limit -- požadovaný počet vrácených znaků
  * @param string $delimiter -- (option) oddělovač na konci (např. "...")
+ * @param string $link -- (option) odkaz na více za textem
+ * @param string $linkText -- (option) text textu pro více
  * @return string -- zkrácený řetězec se správně uzavřenými značkami
  * @author Jakub Vrána & Mike
  * @link http://php.vrana.cz/zkraceni-textu-s-xhtml-znackami.php#d-9638
  */
-function vve_tpl_xhtml_cut($s, $limit, $delimiter = '...')
+function vve_tpl_xhtml_cut($string, $length, $addstring = '...', $link = null, $link_text = null)
 {
-   $strLen = strlen(strip_tags($s));
-   $s = substr($s, 0, $limit + 1); // hlavní je, aby zde byl limit stejný jako ten globálně nastavený, což tedy nyní je...
-   $pos = strrpos($s, " "); // v PHP 5 by se dal použít parametr offset
-   $s = substr($s, 0, ($pos ? $pos : -1));
+   // only execute if text is longer than desired length
+   if (strlen(strip_tags($string)) > $length) {
+      $isText = true;
+      $ret = "";
+      $i = 0;
 
-   $length = 0;
-   $tags = array(); // dosud neuzavřené značky
-   for ($i = 0; $i < strlen($s) && $length < $limit; $i++) {
-      switch ($s[$i]) {
-         case '<':
-            // načtení značky
-            $start = $i + 1;
-            while ($i < strlen($s) && $s[$i] != '>' && !ctype_space($s[$i])) {
-               $i++;
+      $currentChar = "";
+      $lastSpacePosition = -1;
+      $lastChar = "";
+
+      $tagsArray = array();
+      $currentTag = "";
+      $tagLevel = 0;
+
+      $noTagLength = strlen(strip_tags($string));
+
+      // Parser loop
+      for ($j = 0; $j < strlen($string); $j++) {
+         $currentChar = substr($string, $j, 1);
+         $ret .= $currentChar;
+         // Lesser than event
+         if ($currentChar == "<")
+            $isText = false;
+         // Character handler
+         if ($isText) {
+            // Memorize last space position
+            if ($currentChar == " ") {
+               $lastSpacePosition = $j;
+            } else {
+               $lastChar = $currentChar;
             }
-            $tag = substr($s, $start, $i - $start);
-            // přeskočení případných atributů
-            $in_quote = '';
-            while ($i < strlen($s) && ($in_quote || $s[$i] != '>')) {
-               if (($s[$i] == '"' || $s[$i] == "'") && !$in_quote) {
-                  $in_quote = $s[$i];
-               } elseif ($in_quote == $s[$i]) {
-                  $in_quote = '';
+            $i++;
+         } else {
+            $currentTag .= $currentChar;
+         }
+
+         // Greater than event
+         if ($currentChar == ">") {
+            $isText = true;
+            // Opening tag handler
+            if (( strpos($currentTag, "<") !== FALSE ) &&
+               ( strpos($currentTag, "/>") === FALSE ) &&
+               ( strpos($currentTag, "</") === FALSE )) {
+               // Tag has attribute(s)
+               if (strpos($currentTag, " ") !== FALSE) {
+                  $currentTag = substr($currentTag, 1, strpos($currentTag, " ") - 1);
+               } else {
+                  // Tag doesn't have attribute(s)
+                  $currentTag = substr($currentTag, 1, -1);
                }
-               $i++;
+
+               array_push($tagsArray, $currentTag);
+            } else if (strpos($currentTag, "</") !== FALSE) {
+               array_pop($tagsArray);
             }
-            if ($s[$start] == '/') { // uzavírací značka
-               array_shift($tags); // v XHTML dokumentu musí být vždy uzavřena poslední neuzavřená značka
-            } elseif ($s[$i - 1] != '/') { // otevírací značka
-               array_unshift($tags, $tag);
-            }
+
+            $currentTag = "";
+         }
+         if ($i >= $length) {
             break;
-         case '&':
-            $length++;
-            while ($i < strlen($s) && $s[$i] != ';') {
-               $i++;
-            }
-            break;
-         default:
-            $length++;
-            while ($i + 1 < strlen($s) && ord($s[$i + 1]) > 127 && ord($s[$i + 1]) < 192) {
-               $i++;
-            }
+         }
       }
+      // Cut HTML string at last space position
+      if ($length < $noTagLength) {
+         if ($lastSpacePosition != -1) {
+            $ret = substr($string, 0, $lastSpacePosition);
+         } else {
+            $ret = substr($string, $j);
+         }
+      }
+      // Close broken XHTML elements
+      while (sizeof($tagsArray) != 0) {
+         if (sizeof($tagsArray) > 1) {
+            $aTag = array_pop($tagsArray);
+            $ret .= "</" . $aTag . ">\n";
+         }
+         // You may add more tags here to put the link and added text before the closing tag
+         elseif ($aTag = 'p' || 'div') {
+            $aTag = array_pop($tagsArray);
+            $ret .= $addstring . "<a href=\"" . $link . "\" alt=\"" . $link_text . "\">" . $link_text . "</a></" . $aTag . ">\n";
+         } else {
+            $aTag = array_pop($tagsArray);
+            $ret .= "</" . $aTag . ">" . $addstring . "<a href=\"" . $link . "\" alt=\"" . $link_text . "\">" . $link_text . "</a>\n";
+         }
+      }
+      return( $ret );
+   } else {
+      return ( $string );
    }
-   $s = substr($s, 0, $i);
-   if ($strLen > $limit) {
-      $s .= $delimiter;
-   }
-   if ($tags) {
-      $s .= "</" . implode("></", $tags) . ">";
-   }
-   return $s;
 }
 
 /**
