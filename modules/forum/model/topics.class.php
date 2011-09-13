@@ -27,6 +27,7 @@ class Forum_Model_Topics extends Model_ORM {
    const COLUMN_VIEWS = 'views';
    const COLUMN_SOLVED = 'solved';
    const COLUMN_CLOSED = 'closed';
+   const COLUMN_NOTIFICATION_EMAILS = 'notification_email';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_f_topics');
@@ -46,6 +47,7 @@ class Forum_Model_Topics extends Model_ORM {
       $this->addColumn(self::COLUMN_SOLVED, array('datatype' => 'tinyint', 'pdoparam' => PDO::PARAM_BOOL, 'default' => 0));
       $this->addColumn(self::COLUMN_CLOSED, array('datatype' => 'tinyint', 'pdoparam' => PDO::PARAM_BOOL, 'default' => 0));
       $this->addColumn(self::COLUMN_VIEWS, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_NOTIFICATION_EMAILS, array('datatype' => 'varchar(1000)','pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
 

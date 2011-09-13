@@ -7,8 +7,8 @@ if($this->topic->{Forum_Model_Topics::COLUMN_SOLVED}){
 }
 ?>
 <h1><?=$h?></h1>
-<div class="guestbook-items main-content-list">
-   <table class="forum-topics full-width">
+<div class="forum-items main-content-list">
+   <table class="forum-posts full-width">
       <thead class="header">
          <tr>
             <th class="forum-topic-author forum-post-author"><?=$this->tr('Autor');?></th>
@@ -34,7 +34,7 @@ if($this->topic->{Forum_Model_Topics::COLUMN_SOLVED}){
          <?}?>
       <?if(!empty ($this->posts)){ ?>
       <?foreach ($this->posts as $post) {?>
-         <tr class="forum-post-item row <?if($post->{Forum_Model_Posts::COLUMN_CENSORED})echo "censored";?>">
+         <tr id="post-<?=$post->{Forum_Model_Posts::COLUMN_ID}?>" class="forum-post-item row <?if($post->{Forum_Model_Posts::COLUMN_CENSORED})echo "censored";?>">
             <td class="forum-post-author">
                   <?echo ps($post->{Forum_Model_Posts::COLUMN_CREATED_BY}).'<br/>';?>
                   <div class="font-small forum-post-info">
@@ -89,12 +89,6 @@ if($this->topic->{Forum_Model_Topics::COLUMN_SOLVED}){
             </td>
          </tr>   
       <?}?>
-         <tr class="forum-post-item row">
-            <td colspan="2"><?
-               $this->includeTpl('articletools.phtml', true, array(
-              'shares' => array('url' => $this->link(), 'title' => $this->link())));
-            ?></td>
-         </tr>   
       </tfoot>
    </table>
    <?

@@ -5,8 +5,8 @@
    text-align: center;
 }
 
-.forum-topic-item {
-   
+.forum-items table {
+   margin-bottom: 1em;
 }
 .forum-post-item td {
    vertical-align: top;

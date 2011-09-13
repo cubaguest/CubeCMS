@@ -1,0 +1,1 @@
+ALTER TABLE `{PREFIX}forum_topics` ADD COLUMN `notification_email` VARCHAR( 1000 ) NULL DEFAULT NULL 

@@ -5,7 +5,8 @@
 
 class Forum_Controller extends Controller {
    const PARAM_CAPCHA_SEC = 'c_s';
-
+   const PARAM_NOTIFY_EMAILS = 'n_e';
+   const PARAM_NOTIFY_USERS = 'n_u';
 
    const DEFAULT_NUM_ON_PAGE = 20;
    const MIN_SEC_FOR_HUMAN = 15;
@@ -33,12 +34,12 @@ class Forum_Controller extends Controller {
          $elemId->addValidation(new Form_Validator_IsNumber());
          $delForm->addElement($elemId);
 
-         $elemSubDel = new Form_Element_SubmitImage('delete', $this->_('Smazat'));
+         $elemSubDel = new Form_Element_SubmitImage('delete', $this->tr('Smazat'));
          $delForm->addElement($elemSubDel);
 
          if($delForm->isValid()){
             $model->delete($delForm->id->getValues());
-            $this->infoMsg()->addMessage($this->_('Téma a všechny jeho příspěvky bylo smazáno'));
+            $this->infoMsg()->addMessage($this->tr('Téma a všechny jeho příspěvky bylo smazáno'));
             $this->link()->reload();
          }
          $this->view()->formDel = $delForm;
@@ -127,12 +128,14 @@ class Forum_Controller extends Controller {
          $record = $model->newRecord();
       }
       
-      $elemName = new Form_Element_Text('name', $this->_('Téma'));
+      $fGrpTopic = $form->addGroup('topic', $this->tr('Téma'));
+      
+      $elemName = new Form_Element_Text('name', $this->tr('Téma'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $elemName->addValidation(new Form_Validator_MaxLength(200));
-      $form->addElement($elemName);
+      $form->addElement($elemName, $fGrpTopic);
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $elemText->addValidation(new Form_Validator_MinLength(10));
       $elemText->addValidation(new Form_Validator_MaxLength(10000));
@@ -140,35 +143,44 @@ class Forum_Controller extends Controller {
       $purifier->setConfig('CSS.AllowedProperties', 'text-decoration');
       $purifier->setConfig('AutoFormat.RemoveSpansWithoutAttributes', true);
       $elemText->addFilter($purifier);
-      $form->addElement($elemText);
+      $form->addElement($elemText, $fGrpTopic);
       
       if($this->rights()->isControll()){
          $elemSolved = new Form_Element_Checkbox('solved', $this->tr('Vyřešeno'));
-         $form->addElement($elemSolved);   
+         $form->addElement($elemSolved, $fGrpTopic);   
          $elemClosed = new Form_Element_Checkbox('closed', $this->tr('Zavřeno'));
-         $form->addElement($elemClosed);   
+         $form->addElement($elemClosed, $fGrpTopic);   
       }
       
-      $elemNick = new Form_Element_Text('author', $this->_('Autor'));
+      $fGrpAuthor = $form->addGroup('author', $this->tr('Autor'));
+      
+      $elemNick = new Form_Element_Text('author', $this->tr('Autor'));
       $elemNick->addValidation(new Form_Validator_NotEmpty());
       $elemNick->addValidation(new Form_Validator_MaxLength(100));
-      $form->addElement($elemNick);
+      $form->addElement($elemNick, $fGrpAuthor);
 
-      $elemEmail = new Form_Element_Text('email', $this->_('E-mail'));
+      $elemEmail = new Form_Element_Text('email', $this->tr('E-mail'));
       $elemEmail->addValidation(new Form_Validator_NotEmpty());
       $elemEmail->addValidation(new Form_Validator_Email());
       $elemEmail->addValidation(new Form_Validator_MaxLength(50));
-      $form->addElement($elemEmail);
+      $form->addElement($elemEmail, $fGrpAuthor);
 
       if(!Auth::isLogin()){
          $elemCaptcha = new Form_Element_Captcha('captcha');
-         $form->addElement($elemCaptcha);
+         $form->addElement($elemCaptcha, $fGrpAuthor);
+      }
+      
+      if($this->rights()->isControll()){
+         $fGrpNotify = $form->addGroup('notification', $this->tr('Oznámení'));
+         $elemNotifyEmail = new Form_Element_TextArea('notificationEMails', $this->tr('E-maily'));
+         $elemNotifyEmail->setSubLabel($this->tr('E-mailové adresy oddělené středníkem, na které bude odesláno oznámení o novém příspěvku'));
+         $form->addElement($elemNotifyEmail, $fGrpNotify);
       }
       
       $elemSubmit = new Form_Element_SaveCancel('send');
       $elemSubmit->setCancelConfirm(false);
       $form->addElement($elemSubmit);
-
+      
       $capchaTime = $this->category()->getParam(self::PARAM_CAPCHA_SEC, self::MIN_SEC_FOR_HUMAN);
       // u přihlášených vypneme chapchu
       if(Auth::isLogin()){
@@ -187,6 +199,9 @@ class Forum_Controller extends Controller {
          }
          if($form->haveElement('closed')){
             $form->closed->setValues($record->{Forum_Model_Topics::COLUMN_CLOSED});
+         }
+         if($form->haveElement('notificationEMails')){
+            $form->notificationEMails->setValues($record->{Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS});
          }
       }
 
@@ -224,8 +239,20 @@ class Forum_Controller extends Controller {
             $record->{Forum_Model_Topics::COLUMN_CLOSED} = $form->closed->getValues();
          }
          
+         if($form->haveElement('notificationEMails')){ // čištění emailů a parsování
+            $tmp = explode(';', $form->notificationEMails->getValues());
+            $emails = array();
+            foreach ($tmp as $token) {
+               $email = filter_var(filter_var($token, FILTER_SANITIZE_EMAIL), FILTER_VALIDATE_EMAIL);
+               if ($email !== false) {
+                  $emails[] = $email;
+               }
+            }
+            $record->{Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS} = implode(';', $emails);
+         }
+         
          $model->save($record);
-         $this->infoMsg()->addMessage($this->_('Téma bylo uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Téma bylo uloženo'));
          if($record->isNew()){
             $this->link()->route()->reload();
          } else {
@@ -242,12 +269,11 @@ class Forum_Controller extends Controller {
       $model = new Forum_Model_Posts();
       $record = $model->newRecord();
       
-      $elemName = new Form_Element_Text('name', $this->_('Předmět'));
-//      $elemName->addValidation(new Form_Validator_NotEmpty());
+      $elemName = new Form_Element_Text('name', $this->tr('Předmět'));
       $elemName->addValidation(new Form_Validator_MaxLength(200));
       $form->addElement($elemName);
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $elemText->addValidation(new Form_Validator_MinLength(10));
       $elemText->addValidation(new Form_Validator_MaxLength(10000));
@@ -257,12 +283,12 @@ class Forum_Controller extends Controller {
       $elemText->addFilter($purifier);
       $form->addElement($elemText);
       
-      $elemNick = new Form_Element_Text('author', $this->_('Autor'));
+      $elemNick = new Form_Element_Text('author', $this->tr('Autor'));
       $elemNick->addValidation(new Form_Validator_NotEmpty());
       $elemNick->addValidation(new Form_Validator_MaxLength(100));
       $form->addElement($elemNick);
 
-      $elemEmail = new Form_Element_Text('email', $this->_('E-mail'));
+      $elemEmail = new Form_Element_Text('email', $this->tr('E-mail'));
       $elemEmail->addValidation(new Form_Validator_NotEmpty());
       $elemEmail->addValidation(new Form_Validator_Email());
       $elemEmail->addValidation(new Form_Validator_MaxLength(50));
@@ -316,11 +342,14 @@ class Forum_Controller extends Controller {
                $record->{Forum_Model_Posts::COLUMN_CREATED_BY_MODERATOR} = true;
             }
             $record->{Forum_Model_Posts::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
-            
          }
          
          $model->save($record);
-         $this->infoMsg()->addMessage($this->_('Příspěvek byl uložen'));
+         if($record->isNew()){
+            $this->sendNotifications($idTopic, $record);
+         }
+         
+         $this->infoMsg()->addMessage($this->tr('Příspěvek byl uložen'));
          $this->link()->route('showTopic')->reload();
       }
       $this->view()->form = $form;
@@ -398,12 +427,13 @@ class Forum_Controller extends Controller {
       $modelP->order(array(Forum_Model_Posts::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC));
       
       $scrollComponent = new Component_Scroll();
-      $scrollComponent->setConfig('page_param', 'p');
+      $scrollComponent->setConfig('page_param', 'p_p');
       $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $modelP->count());
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
               $this->category()->getParam('scroll', self::DEFAULT_NUM_ON_PAGE));
 
       $this->view()->topic = $topic;
+      $this->view()->linkBack = $this->link()->route()->rmParam('p_p');
       $this->view()->posts = $modelP->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
       $this->view()->scrollComp = $scrollComponent;
    }
@@ -424,6 +454,128 @@ class Forum_Controller extends Controller {
       $this->view()->posts = $modelP->limit(0, VVE_FEED_NUM)->records();
    }
 
+   public function sendNotifications($idTopic, $newPost)
+   {
+      $model = new Forum_Model_Topics();
+      $modelPosts = new Forum_Model_Posts();
+      $topic = $model->columns(array(
+         Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS, Forum_Model_Topics::COLUMN_EMAIL,
+         Forum_Model_Topics::COLUMN_DATE_ADD, Forum_Model_Topics::COLUMN_NAME,
+         Forum_Model_Topics::COLUMN_TEXT, Forum_Model_Topics::COLUMN_CREATED_BY,
+         ))->record($idTopic);
+      // pokud není téma nebo téma nemá nastavenu notifikaci, neodesílat
+      if($topic == false || $topic->{Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS} == null){
+         return;
+      }
+      $emails = explode(';', $topic->{Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS});
+      if(empty ($emails)){
+         return;
+      }
+      
+      try {
+         $mail = new Email(true);
+         $mail->setSubject(sprintf('Fórum: nový příspěvek k tématu %s', $topic->{Forum_Model_Topics::COLUMN_NAME}));
+         $mail->addAddress($emails);
+         
+         $tplFile = $this->module()->getLibDir().DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'mail_tpl.html';
+         if(!is_file($tplFile)){
+            return;
+         }
+         // tady ještě test z faces asi
+         $mailCnt = file_get_contents($tplFile) ; // mail content loaded from template
+         
+         // prepare posts
+         $matches = array();
+         if(preg_match('/{POST}(.*){\/POST}/s', $mailCnt, $matches) !== false){
+            $postTpl = $matches[1];
+            $postsStr = null;
+            $posts = $modelPosts->where(Forum_Model_Posts::COLUMN_ID_TOPIC.' = :idt', array('idt' => $idTopic))
+               ->limit(0, 100)
+               ->order(array(Forum_Model_Posts::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC))
+               ->records();
+            
+            if(!empty ($posts)){
+               foreach ($posts as $post) {
+                  $postsStr .= str_replace(array(
+                     '{POST_NAME}',
+                     '{POST_INFO}',
+                     '{POST_TEXT}'
+                  ), array(
+                     $post->{Forum_Model_Posts::COLUMN_NAME},
+                     $post->{Forum_Model_Posts::COLUMN_CREATED_BY}
+                        .' ('.vve_date('%x %X', new DateTime($post->{Forum_Model_Posts::COLUMN_DATE_ADD})).')'
+                        .' <'.$post->{Forum_Model_Posts::COLUMN_EMAIL}.'>',
+                     $post->{Forum_Model_Posts::COLUMN_TEXT},
+                  ), $postTpl);
+                  
+               }
+            } else {
+               $postsStr = 'Není vložen žádný příspěvek';
+            }
+            $mailCnt = preg_replace('/{POST}(.*){\/POST}/s', $postsStr, $mailCnt);
+         }
+         
+         /* přepis hodnot */
+         /* 
+          * {POST_NEW_NAME} - nový příspěvek
+          * {POST_NEW_LINK} - odkaz příspěvek
+          * {POST_NEW_INFO} - odkaz příspěvek
+          * {POST_NEW_TEXT} - odkaz příspěvek
+          * {WEB_LINK} - odkaz na stránky
+          * {TOPIC_LINK} - odkaz na téma ve fóru
+          * {TOPIC_NAME} - název tématu
+          * {TOPIC_TEXT} - text tématu
+          * {TOPIC_INFO} - autor a čas tématu
+          * 
+          * {POSTS} - seznam odpovědí (asi takhle ???)
+          */
+         $search = array(
+            // new post
+            '{POST_NEW_NAME}',
+            '{POST_NEW_LINK}',
+            '{POST_NEW_INFO}',
+            '{POST_NEW_TEXT}',
+            // topic
+            '{TOPIC_NAME}',
+            '{TOPIC_LINK}',
+            '{TOPIC_INFO}',
+            '{TOPIC_TEXT}',
+            // ostatní
+            '{WEB_NAME}',
+            '{WEB_LINK}',
+         );
+         
+         $replace = array(
+            // new post
+            $newPost->{Forum_Model_Posts::COLUMN_NAME},
+            $this->link()->route('showTopic')->rmParam()->anchor('post-'.$newPost->{Forum_Model_Posts::COLUMN_ID}),
+            $newPost->{Forum_Model_Posts::COLUMN_CREATED_BY}
+               .' ('.  vve_date('%x %X', new DateTime($newPost->{Forum_Model_Posts::COLUMN_DATE_ADD})).')'
+               .' <'.$newPost->{Forum_Model_Posts::COLUMN_EMAIL}.'>',
+            $newPost->{Forum_Model_Posts::COLUMN_TEXT},   
+            // topic
+            $topic->{Forum_Model_Topics::COLUMN_NAME},
+            $this->link()->route('showTopic')->rmParam(),
+            $topic->{Forum_Model_Topics::COLUMN_CREATED_BY}
+               .' ('.  vve_date('%x %X', new DateTime($topic->{Forum_Model_Topics::COLUMN_DATE_ADD})).')'
+               .' <'.$topic->{Forum_Model_Topics::COLUMN_EMAIL}.'>',
+            $topic->{Forum_Model_Topics::COLUMN_TEXT},
+            // ostatní
+            VVE_WEB_NAME,
+            $this->link()->clear(true),
+         );
+         
+         $mailCnt = str_replace($search, $replace, $mailCnt);
+         
+//         Debug::log($mailCnt);
+         $mail->setContent($mailCnt);
+         $mail->batchSend();
+         
+      } catch (Swift_SwiftException $exc) {
+         $this->log('Chyba při odesílání upozornění na nový příspěvek: '.$exc->getTraceAsString());
+      }
+         
+   }
 
    /**
     * Metoda pro nastavení modulu
@@ -451,14 +603,6 @@ class Forum_Controller extends Controller {
 
       $fGrpNewItem = $form->addGroup('newitem', $this->tr('Přidání příspěvku'));
 
-//      $elemWEditor = new Form_Element_Checkbox('weditor', $this->tr('Zapnout wisiwig editor'));
-//      $elemWEditor->setValues(true);
-//      $elemWEditor->setSubLabel($this->tr('Pokud je wisiwig editor vypnut, jsou automaticky odstraněnny všechny html tagy.'));
-//      $form->addElement($elemWEditor, $fGrpNewItem);
-//      if(isset($settings[self::PARAM_WISIWIG_EDITOR])) {
-//         $form->weditor->setValues($settings[self::PARAM_WISIWIG_EDITOR]);
-//      }
-
       $elemCapchaSec = new Form_Element_Text('capchatime', $this->tr('Po kolika sekundách lze formulář odeslat'));
       $elemCapchaSec->setSubLabel($this->tr(sprintf('Výchozí: %s sekund (obrana proti spamu). Pokud je 0, kontrola je vypnuta.', self::MIN_SEC_FOR_HUMAN)));
       $elemCapchaSec->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
@@ -466,15 +610,49 @@ class Forum_Controller extends Controller {
       if(isset($settings[self::PARAM_CAPCHA_SEC])) {
          $form->capchatime->setValues($settings[self::PARAM_CAPCHA_SEC]);
       }
+      
+      $grpNotify = $form->addGroup('notofocation', $this->tr('Nastavení oznamování'),
+              $this->tr('Nastavení oznamování nových témat a příspěvků'));
+
+      // maily správců
+      $elemNotifyEmails = new Form_Element_TextArea('notifyEMails', $this->tr('Adresy pro oznámení'));
+      $elemNotifyEmails->setSubLabel($this->tr('E-mailové adresy správců, kterým chodí oznámení o nových tématech a příspěvcích.'));
+      if (isset($settings[self::PARAM_NOTIFY_EMAILS])) {
+         $elemNotifyEmails->setValues($settings[self::PARAM_NOTIFY_EMAILS]);
+      }
+      $form->addElement($elemNotifyEmails, $grpNotify);
+      
+
+      $elemNotifyUsers = new Form_Element_Select('notifyUsers', $this->tr('Uživatelé v systému'));
+      $elemNotifyUsers->setSubLabel($this->tr('Uživatelé v systému, kterým chodí oznámení o nových tématech a odpovědích.'));
+      // načtení uživatelů
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->usersForThisWeb(true)->records(PDO::FETCH_OBJ);
+      $usersIds = array();
+      foreach ($users as $user) {
+         if($user->{Model_Users::COLUMN_MAIL} != null){
+            $usersIds[$user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
+              .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Users::COLUMN_MAIL}
+              ] = $user->{Model_Users::COLUMN_ID};
+         }
+      }
+      $elemNotifyUsers->setOptions($usersIds);
+      $elemNotifyUsers->setMultiple();
+      $elemNotifyUsers->html()->setAttrib('size', 4);
+      if (isset($settings[self::PARAM_NOTIFY_USERS])) {
+         $elemNotifyUsers->setValues($settings[self::PARAM_NOTIFY_USERS]);
+      }
+
+      $form->addElement($elemNotifyUsers, $grpNotify);
 
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scrollT'] = $form->scrollT->getValues();
          $settings['scroll'] = $form->scroll->getValues();
-//         $settings['maxtextchars'] = $form->maxtextchars->getValues();
-//         $settings['mintextchars'] = $form->mintextchars->getValues();
-//         $settings[self::PARAM_WISIWIG_EDITOR] = $form->weditor->getValues();
          $settings[self::PARAM_CAPCHA_SEC] = (int)$form->capchatime->getValues();
+         // oznámení
+         $settings[self::PARAM_NOTIFY_EMAILS] = $form->notifyEMails->getValues();
+         $settings[self::PARAM_NOTIFY_USERS] = $form->notifyUsers->getValues();
       }
    }
 }
