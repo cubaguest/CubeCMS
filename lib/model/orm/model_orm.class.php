@@ -738,6 +738,7 @@ class Model_ORM extends Model {
          $dbst->execute();
 //         $timer->timerStop('SQL_insert', $sqlStr);
          $returnPk = $this->getDb()->lastInsertId();
+         $record->_setPK($returnPk);
       }
 
       return $returnPk;

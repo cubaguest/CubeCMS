@@ -136,6 +136,21 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    {
       return $this->pKeyValue;
    }
+   
+   /**
+    * Metoda nastavi hodnotu primárního klíče (internal function) !!!
+    * @return int 
+    */
+   public function _setPK($val)
+   {
+      $this->pKeyValue = $val;
+      foreach ($this->columns as &$coll) {
+         if($coll['pk'] == true){
+            $coll['value'] = $val;
+            break;
+         }
+      }
+   }
 
    public function getColumns()
    {
