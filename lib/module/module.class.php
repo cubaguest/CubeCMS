@@ -65,5 +65,14 @@
          return (string)$dir;
       }
    }
+   
+   /**
+    * Metoda vrací adresář modulu (v knihovnách)
+    * @return string -- cesta do modulu
+    */
+   public function getLibDir()
+   {
+      return AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR;
+   }
  }
 ?>
