@@ -133,7 +133,7 @@ class Model_Category extends Model_ORM {
    {
       if(self::$allCatsRecords == null){
          $this->columns(array(
-            Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, /*Model_Category::COLUMN_DATADIR, */
+            Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, Model_Category::COLUMN_DESCRIPTION, /*Model_Category::COLUMN_DATADIR, */
             Model_Category::COLUMN_DEF_RIGHT, /* Model_Category::COLUMN_FEEDS, */
             Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
             Model_Category::COLUMN_VISIBILITY
