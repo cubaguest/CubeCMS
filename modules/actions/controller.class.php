@@ -450,7 +450,7 @@ class Actions_Controller extends Controller {
 
    public function currentActController() {
       $model = new Actions_Model_Detail();
-      $this->view()->action = $model->getCurrentAction($this->category()->getId());
+      $this->view()->action = $model->getCurrentAction($this->category()->getId(), (int)$this->getRequestParam('from', 0));
 //      if($this->view()->action === false) return false;
    }
 

@@ -62,7 +62,8 @@ class Actions_Model_List extends Model_PDO {
               ." AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)"
               ." AND ((".Actions_Model_Detail::COLUMN_DATE_START." >= CURDATE() AND ".Actions_Model_Detail::COLUMN_TIME." >= CURTIME())"
               ." OR (".Actions_Model_Detail::COLUMN_DATE_START." > CURDATE())"
-              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." >= DATE_ADD(CURDATE(), INTERVAL 1 DAY)))"
+              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." >= DATE_ADD(CURDATE(), INTERVAL 1 DAY))"
+              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." < CURDATE() AND ".Actions_Model_Detail::COLUMN_DATE_STOP." >= CURDATE() ))"
               ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindValue(':idcat', (int)$idCat, PDO::PARAM_INT);
