@@ -184,7 +184,8 @@ class Session {
 
    public static function gc($maxlifetime) {
       $model = new Model_Session();
-      $deleted = $model->where(' TIMESTAMPADD(SECOND, :lftime, '.Model_Session::COLUMN_UPDATED.') <= NOW()', array('lftime' => $maxlifetime))->delete();
+      //DELETE FROM vezeni_sessions WHERE ADDTIME(`updated`, SEC_TO_TIME(3600)) < NOW() 
+      $deleted = $model->where(' ADDTIME('.Model_Session::COLUMN_UPDATED.', SEC_TO_TIME(:lftime)) <= NOW()', array('lftime' => $maxlifetime))->delete();
       file_put_contents(AppCore::getAppCacheDir().'session.log', $maxlifetime.' > '.self::$sessionRecord->{Model_Session::COLUMN_KEY}.' del: '.$deleted);
       return true;
    }
