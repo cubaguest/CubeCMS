@@ -327,9 +327,13 @@ class Template extends TrObject {
 
    /**
     * Metoda vrací adresář zvoleného vhledu (absolutní)
+    * @param bool $parentFace -- (option) jestli se má vracet adresář k hlavnímu webu
     * @return string -- adresář vzhledu
     */
-   final public static function faceDir() {
+   final public static function faceDir($parentFace = false) {
+      if($parentFace){
+         return AppCore::getAppLibDir().self::FACES_DIR.DIRECTORY_SEPARATOR.self::face().DIRECTORY_SEPARATOR;
+      }
       return AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.self::face().DIRECTORY_SEPARATOR;
    }
 
