@@ -35,7 +35,7 @@ class Search_Model_Api extends Model_PDO {
 //         return $dbst->execute();
       } else {
          if($idCat == 0){
-            throw new InvalidArgumentException($this->_('Při ukládání nového api musí být zadáno id kategorie'), 1);
+            throw new InvalidArgumentException($this->tr('Při ukládání nového api musí být zadáno id kategorie'), 1);
          }
          $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)
              ." (`".self::COLUMN_ID_CATEGORY."`,`".self::COLUMN_API."`, `".self::COLUMN_URL."`, `".self::COLUMN_NAME."`)"

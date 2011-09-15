@@ -1,15 +1,15 @@
-<h1><?=$this->_('Nastavení hledání');?></h1>
+<h1><?=$this->tr('Nastavení hledání');?></h1>
 <div class="main-content-detail">
-   <p><?=$this->_('Zde lze přidávat další podstránky, ve kterých se má hledat.');?></p>
+   <p><?=$this->tr('Zde lze přidávat další podstránky, ve kterých se má hledat.');?></p>
    <br/>
    <div class="main-content-form-edit">
-   <h2><?=$this->_('Uložené API');?></h2>
+   <h2><?=$this->tr('Uložené API');?></h2>
    <table style="width: 95%" cellpadding="0" cellspacing="0">
       <tr>
-         <th style="width: 50%"><?=$this->_('Url')?></th>
-         <th style="width: 20%"><?=$this->_('Název')?></th>
-         <th style="width: 20%"><?=$this->_('API')?></th>
-         <th><?=$this->_('Akce')?></th>
+         <th style="width: 50%"><?=$this->tr('Url')?></th>
+         <th style="width: 20%"><?=$this->tr('Název')?></th>
+         <th style="width: 20%"><?=$this->tr('API')?></th>
+         <th><?=$this->tr('Akce')?></th>
       </tr>
       <?$someApi = false;
       foreach ($this->apis as $api) {
@@ -33,14 +33,14 @@
          <?}
          if($someApi === false){?>
       <tr>
-         <td colspan="3"><?=$this->_('Žádné API není přidáno')?></td>
+         <td colspan="3"><?=$this->tr('Žádné API není přidáno')?></td>
       </tr>
             <?}?>
    </table>
    <br />
-   <h2><?=$this->_('Přidání API');?></h2>
+   <h2><?=$this->tr('Přidání API');?></h2>
    <?print($this->formAdd);?>
-   <h2><?=$this->_('Popis API');?></h2>
+   <h2><?=$this->tr('Popis API');?></h2>
    <?print($this->apiLabels);?>
    </div>
    <br />

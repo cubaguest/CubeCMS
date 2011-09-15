@@ -1,17 +1,17 @@
 <br />
-<h2><?=$this->_('Výsledky hledání')?>:&nbsp;<span class="font-small"><?printf($this->_('Nalezeno %s výsledků'),count($this->results))?></span></h2>
+<h2><?=$this->tr('Výsledky hledání')?>:&nbsp;<span class="font-small"><?printf($this->tr('Nalezeno %s výsledků'),$this->countAllResults)?></span></h2>
 <div class="main-content-list">
 <?
-//foreach ($this->results as $result) {
-for ($i = (int)$this->start; $i < $this->stop; $i++) {
-if(!isset ($this->results[$i])) break;
-$result = $this->results[$i];
+$i = 1;
+foreach ($this->results as $result) {
 $class = 'record-odd';
 if($i % 2 != 0) $class = 'record-even';
 ?>
 <div class="main-content-list-record <?=$class?>">
 <h3>
-   <? // pokud se jedná o jiný web
+   <?
+   echo $i;
+// pokud se jedná o jiný web
    if($result[Search::R_I_WEB_NAME] != VVE_WEB_NAME){?>
    <a href="<?=$result[Search::R_I_WEB_LINK]?>" title="<?=htmlspecialchars($result[Search::R_I_WEB_NAME])?>"
       ><?=htmlspecialchars($result[Search::R_I_WEB_NAME])?></a>&nbsp;&raquo;&nbsp;
@@ -37,13 +37,16 @@ if($i % 2 != 0) $class = 'record-even';
 </div>
 <p><?
 if($result[Search::R_I_LINK] != null){?>
-   <a href="<?=$result[Search::R_I_LINK]?>" title="<?=$this->_('Přejít na adresu')?>"><?=$result[Search::R_I_LINK]?></a>
+   <a href="<?=$result[Search::R_I_LINK]?>" title="<?=$this->tr('Přejít na adresu')?>"><?=$result[Search::R_I_LINK]?></a>
 <?} else {?>
-   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=$this->_('Přejít na adresu')?>"><?=$result[Search::R_I_CAT_LINK]?></a>
+   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=$this->tr('Přejít na adresu')?>"><?=$result[Search::R_I_CAT_LINK]?></a>
 <?}
 ?></p>
+<hr />
 </div>
-<?}
+<?
+$i++;
+}
 print $this->scrollComp;
 ?>
 </div>

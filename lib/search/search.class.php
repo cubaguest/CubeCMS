@@ -47,6 +47,12 @@ class Search {
    protected static $searchResults = array();
    
    /**
+    * Pole s již prohledanými kategoriemi
+    * @var array 
+    */
+   protected static $catSearched = array();
+
+   /**
     * Systémový objekt modulu
     * @var Category
     */
@@ -96,18 +102,33 @@ class Search {
     * @param string $article -- (option) název článku
     */
    public function addResult($name, $url, $text, $relevance = 0.1, $catName = null, $catLink = null) {
-      if($catName === null) $catName = $this->getCategory()->getName();
+      if($catName === null) $catName = $this->category()->getName();
       if($catLink === null) $catLink = $this->link()->clear();
+
+      if((string)$url == (string)$catLink){
+         $key = md5((string)$catLink);
+      } else {
+         $key = md5((string)$catLink.(string)$url);
+      }
+      
+      if(isset (self::$searchResults[$key])){
+         if(self::$searchResults[$key][self::R_I_TEXT] == null){
+            self::$searchResults[$key][self::R_I_TEXT] = $this->createShortText((string)$text);
+         }
+         return;
+      }
+      
       $resultArr = array(
-              self::R_I_NAME => $name,
+              self::R_I_NAME => (string)$name,
               self::R_I_LINK => (string)$url,
               self::R_I_TEXT => $this->createShortText((string)$text),
-              self::R_I_RELEVATION => $relevance+$this->baseRelev,
-              self::R_I_CAT_NAME => $catName,
+              self::R_I_RELEVATION => (float)$relevance+$this->baseRelev,
+              self::R_I_CAT_NAME => (string)$catName,
               self::R_I_CAT_LINK => (string)$catLink,
               self::R_I_WEB_LINK => (string)$this->link()->clear(true),
               self::R_I_WEB_NAME => VVE_WEB_NAME);
-      array_push(self::$searchResults, $resultArr);
+      
+      self::$searchResults[$key] = $resultArr;
    }
 
    /**
@@ -242,7 +263,7 @@ class Search {
          }
          return 0;
       }
-      usort($results, 'cmpResult');
+      uasort($results, 'cmpResult');
       return $results;
    }
    

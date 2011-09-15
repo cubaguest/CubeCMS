@@ -39,17 +39,17 @@ class Search_Controller extends Controller {
             $results = Search::prepareResultsForView($results);
             $_SESSION[$sessionName] = array('string' => $searchStr, 'results' => $results, 'source' => $source);
          }
+         
+         $this->view()->countAllResults = count($results);
 
          $scrollComponent = new Component_Scroll();
-         $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,count($results));
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,$this->view()->countAllResults);
          $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
                  $this->category()->getModule()->getParam('scroll', 5));
 
-         $this->view()->start = $scrollComponent->getStartRecord();
-         $this->view()->stop = $this->view()->start + $scrollComponent->getRecordsOnPage();
          $this->view()->scrollComp = $scrollComponent;
          $this->view()->search = true;
-         $this->view()->results = $results;
+         $this->view()->results = array_slice($results, $scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
       $this->view()->searchString = htmlspecialchars($searchStr);
       $this->view()->searchTarget = $this->getRequestParam('s', 'all');
@@ -91,11 +91,8 @@ class Search_Controller extends Controller {
       $catM = new Model_Category();
 
       // hledání v kategoríích
-      $catResults = $catM->join(Model_Category::COLUMN_CAT_ID, array('right_tb'=> 'Model_Rights'), Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_RIGHT))
-         ->where('right_tb.'.Model_Rights::COLUMN_ID_GROUP." = :idgrp AND right_tb.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'", array('idgrp' => Auth::getGroupId()))
-         ->search($string);
-
-
+      $catResults = $catM->withRights()->search($string);
+      
       $searchMain = new Search();
       $catRelevantion = array();
       if($catResults != false){
@@ -111,19 +108,18 @@ class Search_Controller extends Controller {
 
       // načtení všech kategorií, ke kterým má uživatel práva
       $catM = new Model_Category();
-      $categories = $catM->join(Model_Category::COLUMN_CAT_ID, array('right_tb'=> 'Model_Rights'), Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_RIGHT))
-         ->where('right_tb.'.Model_Rights::COLUMN_ID_GROUP." = :idgrp AND right_tb.".Model_Rights::COLUMN_RIGHT." LIKE 'r__'", array('idgrp' => Auth::getGroupId()))
-         ->setSelectAllLangs(false)->records();
+      $categories = $catM->withRights()->records();
+      
       foreach ($categories as $cat) {
          // kontrola souboru (jestli modul má vyhledávání)
          if(!file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
          .$cat->{Model_Category::COLUMN_MODULE}.DIRECTORY_SEPARATOR.'search.class.php')) continue;
 
-         // objekt kategorie
-         $catObj = new Category(null, false, $cat);
-         // jméno třídy hledání
-         $sClassName = ucfirst($catObj->getModule()->getName())."_Search";
-
+            // objekt kategorie
+            $catObj = new Category(null, false, $cat);
+            // jméno třídy hledání
+            $sClassName = ucfirst($catObj->getModule()->getName())."_Search";
+            
          $baseRel = 0;
          if(isset ($catRelevantion[$catObj->getId()])){
             $baseRel = $catRelevantion[$catObj->getId()];
@@ -165,26 +161,26 @@ class Search_Controller extends Controller {
       $model = new Search_Model_Api();
 
       $formAdd = new Form('search_add_');
-      $elemUrl = new Form_Element_Text('url', $this->_('Url adresa'));
+      $elemUrl = new Form_Element_Text('url', $this->tr('Url adresa'));
       $elemUrl->addValidation(new Form_Validator_NotEmpty());
       $formAdd->addElement($elemUrl);
 
-      $elemName = new Form_Element_Text('name', $this->_('Název'));
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $formAdd->addElement($elemName);
 
-      $elemApi = new Form_Element_Select('api', $this->_('API'));
+      $elemApi = new Form_Element_Select('api', $this->tr('API'));
       $elemApi->setOptions(self::$apis);
       $formAdd->addElement($elemApi);
 
-      $elemsub = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemsub = new Form_Element_Submit('save', $this->tr('Uložit'));
       $formAdd->addElement($elemsub);
 
       if($formAdd->isValid()) {
          $model->saveApi($formAdd->url->getValues(), $formAdd->api->getValues(),
                  $formAdd->name->getValues(),$this->category()->getId());
 
-         $this->infoMsg()->addMessage($this->_('Api bylo uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Api bylo uloženo'));
          $this->link()->reload();
       }
 
@@ -192,18 +188,18 @@ class Search_Controller extends Controller {
       $elemId = new Form_Element_Hidden('id');
       $formDelete->addElement($elemId);
 
-      $elemDel = new Form_Element_SubmitImage('delete', $this->_('Smazat'));
+      $elemDel = new Form_Element_SubmitImage('delete', $this->tr('Smazat'));
       $formDelete->addElement($elemDel);
 
       if($formDelete->isValid()) {
          $model->deleteApi($formDelete->id->getValues());
 
-         $this->infoMsg()->addMessage($this->_('Api bylo smazáno'));
+         $this->infoMsg()->addMessage($this->tr('Api bylo smazáno'));
          $this->link()->reload();
       }
 
 
-      $this->view()->apiLabels = $this->_('<p>API, neboli rozhraní pro vyhledávání</p>
+      $this->view()->apiLabels = $this->tr('<p>API, neboli rozhraní pro vyhledávání</p>
          <h3>Zadávání</h3>
          <p>Do url se zadává cesta k API hledání a místo hledaného řetězce se zadá "{search}".
          Pouze u stránek postavených na frameworku VVE verze 6 stačí zadat pouze URL adresu kategorii. Viz příklady dále:<br /><br />

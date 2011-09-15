@@ -13,11 +13,11 @@ if($this->panelObj()->getBackImage() != null){
    <form method="get" action="<?=$this->link()?>">
       <p>
       <input id="search_string_panel" type="text" size="11" name="q" value="<?=$this->searchString?>" />
-      <input type="submit" value="<?=$this->_('Hledat')?>" />
+      <input type="submit" value="<?=$this->tr('Hledat')?>" />
       </p>
    </form>
 </div>
 <p class="panelLinkMore">
    <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Hledání')?></a>
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Hledání')?></a>
 </p>
