@@ -9,9 +9,7 @@ if($i % 2 != 0) $class = 'record-even';
 ?>
 <div class="main-content-list-record <?=$class?>">
 <h3>
-   <?
-   echo $i;
-// pokud se jedná o jiný web
+   <?// pokud se jedná o jiný web
    if($result[Search::R_I_WEB_NAME] != VVE_WEB_NAME){?>
    <a href="<?=$result[Search::R_I_WEB_LINK]?>" title="<?=htmlspecialchars($result[Search::R_I_WEB_NAME])?>"
       ><?=htmlspecialchars($result[Search::R_I_WEB_NAME])?></a>&nbsp;&raquo;&nbsp;
