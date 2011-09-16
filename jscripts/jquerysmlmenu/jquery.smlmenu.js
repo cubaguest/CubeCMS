@@ -18,20 +18,28 @@
    $.fn.smlMenu = function(inSettings) {
       var settings = $.extend({}, arguments.callee.defaults, inSettings);
       return this.each(function() {
-         var $ulroot = $(this).children('ul');
          this.$settings = $.extend({}, settings);
-         // position relative of container
-         $(this).css('position', 'relative').addClass('smlmenu_root');
-         $ulroot.addClass('smlmenu_ulroot').find('ul').hide();
-//         $(this).height($ulroot.height());
-         var $as = $('a[href=#]', $ulroot);
+         
+         var $ulroot = $(this).addClass(this.$settings.rootClass).children('ul').addClass(this.$settings.ulClass);
+         $ulroot.find('ul').hide(); // hide all menus except top
+         
+         var $a = $('a', $ulroot);
          if(this.$settings.image != null){
             var $img = $('<img />').attr({src: this.$settings.image, alt : ''});
-            $as.append($img);
+            $a.append($img);
          }
-         $as.bind(this.$settings.event, showSubMenu);
+         $a.each(function(){
+            var l = $(this).next('ul');
+            if($(this).next('ul').length != 0){
+               $(this).addClass('expandable')
+               if(getSettings(this).event != null){
+                  $(this).bind(getSettings(this).event, showSubMenu);
+               }
+            }
+         });
          $('a', $ulroot).bind('mouseover', mouseOverMenuItem);
          $('a', $ulroot).bind('mouseout', mouseOutMenuItem);
+         
          showVisible($ulroot);
       });
    };
@@ -45,8 +53,8 @@
       var $ul = $(this).next('ul');
       var $parent = $ul.parent('li').parent('ul');
       $parent.find('ul').hide();
-      $parent.find('a').removeClass(settings.selClass);
-      $(this).addClass(settings.selClass);
+      $parent.find('a').removeClass(settings.activeClass);
+      $(this).addClass(settings.activeClass);
       var h = $ul.height();
       $(this).parents('ul').each(function(){
          h += $(this).height();
@@ -70,20 +78,27 @@
 
    /**
     * funkce zobrazí vybrané menu
+    * @todo tady přidat zobrazení prvniho potomka
     */
-   function showVisible(menuBox){
-      var settings = getSettings(menuBox);
-      var $a = $(menuBox).find('a.'+settings.visibleClass);
-      $a.addClass(settings.actualClass);
+   function showVisible($ulRoot){
+      var $settings = getSettings($ulRoot);
+      var $a = $($ulRoot).find('a.'+$settings.selectedClass);
+      
+      // zobrazení nadřazených položek a výpočet výšky pro ně
       var $parents = $a.parents('ul');
       $parents.reverse();
       $parents.each(function(){
-         $(this).prev('a').addClass(settings.actualClass);
-         if(!$(this).hasClass('smlmenu_ulroot')) {
-         $('div.smlmenu_root').height($('div.smlmenu_root').height()+$(this).height());
-            $(this).setSubMenuPosition().show();
+         if(!$(this).hasClass($settings.ulClass)) {
+            $('div.smlmenu_root').height($('div.smlmenu_root').height()+$(this).height());
+            $(this).show();
          }
       });
+      // zobrazení potomka pokud je
+      var $child = $a.next('ul');
+      if($child.length != 0){
+         $('div.smlmenu_root').height($('div.smlmenu_root').height()+$child.height());
+         $child.show();
+      }
    }
 
    /**
@@ -98,11 +113,13 @@
       showDelay: 300,
       hideDelay: 0,
       event : 'click',
-      selClass : 'smlmenu_selected',
-      actualClass : 'smlmenu_actual',
-      visibleClass : 'smlmenu_visible',
+      rootClass : 'smlmenu_root',
+      ulClass : 'smlmenu_ul_root',
+      selectedClass : 'smlmenu_selected',
+      activeClass : 'smlmenu_active',
+      openClass : 'smlmenu_open',
       hoverClass : 'smlmenu_hover',
-      image : 'open.png'
+      image : null
    };
 
    /**
@@ -110,9 +127,9 @@
     */
    $.fn.setSubMenuPosition = function(){
       return $(this).css({
-            position : 'absolute',
-            top : $(this).parents('ul').height(),
-            left : 0
+//            position : 'absolute',
+//            top : $(this).parents('ul').height(),
+//            left : 0
       });
    };
    /**
