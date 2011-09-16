@@ -15,6 +15,18 @@ class Text_Controller extends Controller {
    const PARAM_TPL_PANEL = 'tplpanel';
 
    /**
+    *
+    * @var Text_Model
+    */
+   private $textModel = null;
+
+   protected function init()
+   {
+      parent::init();
+      $this->textModel = new Text_Model();
+   }
+
+   /**
  * Kontroler pro zobrazení textu
  */
    public function mainController() {
@@ -28,21 +40,19 @@ class Text_Controller extends Controller {
 
       $model = new Text_Model();
       $modelPrivate = new Text_Model_Private();
+      
       // text
-      $text = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
-         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_MAIN_KEY))
-         ->record();
+      $text = $this->loadData(self::TEXT_MAIN_KEY);
+      $this->view()->text = $text;
       
       if($text != false AND $this->category()->getParam(self::PARAM_ALLOW_PRIVATE, false)== true AND Auth::isLogin()){
-         $textPrivate = $model->getText($this->category()->getId(),self::TEXT_PRIVATE_KEY);
+         $textPrivate = $this->loadData(self::TEXT_PRIVATE_KEY);
 
          if($this->category()->getRights()->isControll() OR $modelPrivate->haveGroup($textPrivate->{Text_Model::COLUMN_ID}, Auth::getGroupId())
             OR $modelPrivate->haveUser($textPrivate->{Text_Model::COLUMN_ID}, Auth::getUserId())){
                $this->view()->textPrivate = $textPrivate;
          }
       }
-      $this->view()->text = $text;
-
    }
 
    public function contentController() {
@@ -55,30 +65,8 @@ class Text_Controller extends Controller {
    public function editController() {
       $this->checkWritebleRights();
 
-      $form = new Form("text_");
-      
-      $label = new Form_Element_Text('label', $this->tr('Nadpis'));
-      $label->addFilter(new Form_Filter_StripTags());
-      $label->setSubLabel($this->tr('Doplní se namísto nadpisu stránky'));
-      $label->setLangs();
-      $form->addElement($label);
-
-      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
-      $textarea->setLangs();
-      $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
-      $form->addElement($textarea);
-
-      $model = new Text_Model();
-      $textRec = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
-         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY))
-         ->record();
-      if($textRec != false){
-         $form->text->setValues($textRec->{Text_Model::COLUMN_TEXT});
-         $form->label->setValues($textRec->{Text_Model::COLUMN_LABEL});
-      }
-
-      $submit = new Form_Element_SaveCancel('send');
-      $form->addElement($submit);
+      $textRec = $this->loadData(self::TEXT_MAIN_KEY);
+      $form = $this->createEditForm($textRec);
 
       if($form->isSend() AND $form->send->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
@@ -88,33 +76,84 @@ class Text_Controller extends Controller {
       if($form->isValid()){
          try {
             // odtranění script, nebezpečných tagů a komentřů
-            $text = vve_strip_html_comment($form->text->getValues());
-            if($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false){
-               foreach ($text as $lang => $t) {
-                  $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
-               }
-            }
-            
-            if($textRec == false){
-               $textRec = $model->newRecord();
-               $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
-               $textRec->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
-            }
-            $textRec->{Text_Model::COLUMN_TEXT} = $text; 
-            $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text); 
-            $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues(); 
-            $model->save($textRec);
-            
+            $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY);
             $this->log('úprava textu');
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $e) {
-            echo $e->getTraceAsString();
-//            new CoreErrors($e);
+            CoreErrors::addException($e);
          }
       }
       // view
-      $this->view()->template()->form = $form;
+      $this->view()->form = $form;
+   }
+   
+   /**
+    * Metoda vrací objek záznamu
+    * @param const $subkey 
+    * @return Model_ORM_Record
+    */
+   private function loadData($subkey = self::TEXT_MAIN_KEY)
+   {
+      $textRecord = $this->textModel->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+         array('idc' => $this->category()->getId(), 'subkey' => $subkey))
+         ->record();
+      return $textRecord;
+   }
+
+   /**
+    *
+    * @param Model_ORM_Record $rec
+    * @return Form 
+    */
+   private function createEditForm(Model_ORM_Record $rec)
+   {
+      $form = new Form("text_");
+      
+      $grpText = $form->addGroup('text', $this->tr('Text'));
+      
+      $label = new Form_Element_Text('label', $this->tr('Nadpis'));
+      $label->addFilter(new Form_Filter_StripTags());
+      $label->setSubLabel($this->tr('Doplní se namísto nadpisu stránky'));
+      $label->setLangs();
+      $form->addElement($label, $grpText);
+
+      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
+      $textarea->setLangs();
+      $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
+      $form->addElement($textarea, $grpText);
+
+      if($rec != false){
+         $form->text->setValues($rec->{Text_Model::COLUMN_TEXT});
+         $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
+      }
+
+      $submit = new Form_Element_SaveCancel('send');
+      $form->addElement($submit);
+      
+      return $form;
+   }
+
+   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY)
+   {
+      $text = vve_strip_html_comment($form->text->getValues());
+      if ($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false) {
+         foreach ($text as $lang => $t) {
+            $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
+         }
+      }
+
+      if ($textRec == false) {
+         $textRec = $model->newRecord();
+         $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+         $textRec->{Text_Model::COLUMN_SUBKEY} = $subkey;
+      }
+      $textRec->{Text_Model::COLUMN_TEXT} = $text;
+      $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text);
+      if(isset($form->label)){
+         $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
+      }
+      $this->textModel->save($textRec);
    }
 
    /**
@@ -122,23 +161,10 @@ class Text_Controller extends Controller {
     */
    public function editPanelController() {
       $this->checkWritebleRights();
-
-      $form = new Form("text_", true);
-
-      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
-      $textarea->setLangs();
-      $form->addElement($textarea);
-
-      $model = new Text_Model();
-      $textRec = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
-         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_PANEL_KEY))
-         ->record();
-      if($textRec != false){
-         $form->text->setValues($textRec->{Text_Model::COLUMN_TEXT});
-      }
-
-      $submit = new Form_Element_SaveCancel('send');
-      $form->addElement($submit);
+      
+      $textRec = $this->loadData(self::TEXT_PANEL_KEY);
+      $form = $this->createEditForm($textRec);
+      unset ($form->label);
 
       if($form->isSend() AND $form->send->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
@@ -147,24 +173,7 @@ class Text_Controller extends Controller {
 
       if($form->isValid()){
          try {
-            // odtranění script, nebezpečných tagů a komentřů
-            $text = vve_strip_html_comment($form->text->getValues());
-            if($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false){
-               foreach ($text as $lang => $t) {
-                  $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
-               }
-            }
-            
-            if($textRec == false){
-               $textRec = $model->newRecord();
-               $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
-               $textRec->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_PANEL_KEY; 
-            }
-            $textRec->{Text_Model::COLUMN_TEXT} = $text; 
-            $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text); 
-            $model->save($textRec);
-            
-            $model->saveText($form->text->getValues(), null, $this->category()->getId(),self::TEXT_PANEL_KEY);
+            $this->processFormData($form, $textRec, self::TEXT_PANEL_KEY);
             $this->log('Úprava textu panelu');
             $this->infoMsg()->addMessage($this->tr('Text panelu byl uložen'));
             $this->link()->route()->reload();
@@ -179,25 +188,15 @@ class Text_Controller extends Controller {
    public function editPrivateController() {
       $this->checkWritebleRights();
       
-      $model = new Text_Model();
       $modelPrivate = new Text_Model_Private();
       
-      $form = new Form("text_", true);
-
-      $grpText = $form->addGroup('text', $this->tr('Text'));
-
-      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
-      $textarea->setLangs();
-      $form->addElement($textarea, $grpText);
-
-      $textRec = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
-         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_PRIVATE_KEY))
-         ->record();
-      if($textRec != false){
-         $form->text->setValues($textRec->{Text_Model::COLUMN_TEXT});
-      }
-
-      $grpAccess = $form->addGroup('access', $this->tr('Přístupy'), $this->tr('Uživatelé nebo skupiny které uvidí privátní text. Stačí vybrat skupinu.'));
+      $textRec = $this->loadData(Text_Controller::TEXT_PRIVATE_KEY);
+      
+      $form = $this->createEditForm($textRec);
+      unset ($form->label);
+      
+      $grpAccess = $form->addGroup('access', $this->tr('Přístupy'), 
+         $this->tr('Uživatelé nebo skupiny které uvidí privátní text. Stačí vybrat skupinu.'), 0);
       // groups
       $elemGroups = new Form_Element_Select('groups', $this->tr('Skupiny'));
       $elemGroups->setMultiple(true);
@@ -245,28 +244,13 @@ class Text_Controller extends Controller {
 
       if($form->isValid()){
          try {
-            // odtranění script, nebezpečných tagů a komentřů
-            $text = vve_strip_html_comment($form->text->getValues());
-            if ($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false) {
-               foreach ($text as $lang => $t) {
-                  $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
-               }
-            }
             
-            if($textRec == false){
-               $textRec = $model->newRecord();
-               $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
-               $textRec->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_PRIVATE_KEY; 
-            }
-            $textRec->{Text_Model::COLUMN_TEXT} = $text; 
-            $textRec->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($text); 
-            $id = $model->save($textRec);
-            
+            $this->processFormData($form, $textRec, self::TEXT_PRIVATE_KEY);
             $this->log('Úprava privátního textu');
             // uložíme skupiny
-            $modelPrivate->saveGroupsConnect($id, $form->groups->getValues());
+            $modelPrivate->saveGroupsConnect($textRec->{Text_Model::COLUMN_ID}, $form->groups->getValues());
             // uložíme uživatele
-            $modelPrivate->saveUsersConnect($id, $form->users->getValues());
+            $modelPrivate->saveUsersConnect($textRec->{Text_Model::COLUMN_ID}, $form->users->getValues());
             $this->infoMsg()->addMessage($this->tr('Privátní text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $exc) {

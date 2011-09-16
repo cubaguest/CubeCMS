@@ -88,7 +88,7 @@ class Text_View extends View {
       Template_Module::setEdit(true);
       $this->h1 = sprintf($this->tr('úprava textu "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
-      $this->addTinyMCE();
+      $this->addTinyMCE($this->form->text);
       $this->template()->addTplFile("textedit.phtml");
    }
 
@@ -104,26 +104,29 @@ class Text_View extends View {
       Template_Core::setPageTitle($this->h1);
    }
 
-   protected function addTinyMCE() {
-      $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
+   protected function addTinyMCE(Form_Element $element, $type = null) {
+      if($type == null){
+         $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
+      }
       if($type == 'none') return;
-      $this->form->text->html()->addClass("mceEditor");
+      $element->html()->addClass("mceEditor_".$type);
       $this->tinyMCE = new Component_TinyMCE();
       switch ($type) {
          case 'simple':
             $settings = new Component_TinyMCE_Settings_AdvSimple();
-            $settings->setSetting('editor_selector', 'mceEditor');
             break;
          case 'full':
             // TinyMCE
             $settings = new Component_TinyMCE_Settings_Full();
+            $settings->setSetting('height', '600');
             break;
          case 'advanced':
          default:
             $settings = new Component_TinyMCE_Settings_Advanced();
+            $settings->setSetting('height', '600');
             break;
       }
-      $settings->setSetting('height', '600');
+      $settings->setSetting('editor_selector', 'mceEditor_'.$type);
       $this->tinyMCE->setEditorSettings($settings);
       $this->tinyMCE->mainView();
    }
