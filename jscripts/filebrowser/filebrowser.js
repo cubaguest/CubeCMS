@@ -4,7 +4,7 @@ var FileBrowserDialogue = {
    category : 0,
    init : function () {
       // Here goes your code for setting your custom things onLoad.
-      FileBrowserDialogue.listType = tinyMCEPopup.getWindowArg("listType");
+      FileBrowser.listType = tinyMCEPopup.getWindowArg("listType");
       FileBrowserDialogue.win = tinyMCEPopup.getWindowArg("window");
       FileBrowserDialogue.category = tinyMCEPopup.getWindowArg("cat");
       var path = tinyMCEPopup.getWindowArg("url");
@@ -100,7 +100,7 @@ var FileBrowser = {
          sessionid: FileBrowser.sessionId,
          'upload_send' : 'send',
          path: FileBrowser.currentDir,
-         list : FileBrowser.listType
+         type : FileBrowser.listType
       };
 
       // SWF UPLOAD
@@ -119,7 +119,7 @@ var FileBrowser = {
          button_width: 61,
          button_height: 22,
          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-         //debug: true,
+         debug: true,
          // Flash Settings
          flash_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload.swf",
          flash9_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload_fp9.swf"
@@ -387,7 +387,24 @@ var FileBrowser = {
       $("#working").hide()
    },
    getFileTypes : function(){
-//      return "*.jpg;*.jpeg;*.png;*.JPG;*.JPEG;*.PNG";
+      var extensions = Array();
+      if(this.listType == 'image'){
+         extensions = Array('jpg','jpeg','png');
+      } else if(this.listType == 'media'){
+         extensions = Array('swf', // falsh
+            'mp4','m4v', 'ogv', 'mov' , 'flv', 'rm', 'qt', 'avi', // video
+            'mp3', 'ogg', 'wma', 'wav' // audio
+         );
+      }
+      
+      if(extensions.length != 0){
+         var len = extensions.length;
+         for ( var i = 0; i < len ; i++ ) {
+            extensions[i] = '*.'+extensions[i]; 
+            extensions[i+len] = extensions[i].toUpperCase(); 
+         }
+         return extensions.join(';');
+      }
       return "*.*";
    },
    request : function(action, postValues, sucessfunc, errfunc){
@@ -422,7 +439,7 @@ var FileBrowser = {
    load : function(path){
       if(typeof(path) == 'undefined') path = this.currentDir;
       FileBrowser.showWorking();
-      this.request('getitems', {path:path, type: FileBrowserDialogue.listType}, function(data){
+      this.request('getitems', {path:path, type: FileBrowser.listType}, function(data){
          FileBrowser.hideWorking();
          var selectedItemPath = FileBrowser.getSelected().data('realpath');
          // clear box

@@ -18,7 +18,11 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
 <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
-<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+<?if(VVE_DEBUG_LEVEL > 1){?>
+   <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+<?} else {?>
+   <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.min.js"></script>
+<?}?>
 {*-STYLESHEETS-*}
 {*-JAVASCRIPTS-*}
    </head>
@@ -29,7 +33,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       FileBrowser.uploadLink = '<?=$this->uploadLink?>';
       FileBrowser.baseUrl = '<?=Url_Request::getBaseWebDir();?>';
       FileBrowser.sessionId = '<?=session_id()?>';
-      FileBrowser.listType = '<?=Component_TinyMCE_Browser::LIST_TYPE_FILES?>';
+      FileBrowser.listType = '<?echo isset($_GET['t']) ? $_GET['t'] : Component_TinyMCE_Browser::LIST_TYPE_FILES;?>';
       tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
    });
    var imageBigSizeW = <?=VVE_DEFAULT_PHOTO_W?>;

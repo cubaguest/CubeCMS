@@ -16,16 +16,16 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
 
    const REQ_FILE = 'file';
    const REQ_NEWNAME = 'newname';
-   const REQ_LIST_TYPE = 'list';
+   const REQ_LIST_TYPE = 'type';
 
    const TYPE_DIR = 'dir';
    const TYPE_DOT = 'dot';
    const TYPE_FILE = 'file';
    const TYPE_IMAGE = 'flash';
 
-   const LIST_TYPE_IMAGES = 'img';
-   const LIST_TYPE_FILES = 'fil';
-   const LIST_TYPE_MEDIA = 'med';
+   const LIST_TYPE_IMAGES = 'image';
+   const LIST_TYPE_FILES = 'file';
+   const LIST_TYPE_MEDIA = 'media';
 
    const ACL_FILE = 'acl';
 
@@ -271,8 +271,6 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $this->checkRights();
       $dir = substr(AppCore::getAppDataDir(),0,-1).$this->getDir();
       $this->chekWritableDir($dir);
-      $listType = $_POST[self::REQ_LIST_TYPE];
-      
       $form = $this->createUploadForm($dir);
 
       if($form->isValid()) {
@@ -283,20 +281,26 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    /**
     * Metoda pro vytvoření formuláře pro upload
     * @return Form 
+    * @todo přidat validaci ostatních souborů? (spíše zakázat php, html, js, atd.)
     */
-   private function createUploadForm($datadir, $filesType = self::LIST_TYPE_FILES)
+   private function createUploadForm($datadir)
    {
       $form = new Form('upload_');
-
+      
       $file = new Form_Element_File('file');
       $file->addValidation(new Form_Validator_NotEmpty());
 
-      if($filesType == self::LIST_TYPE_IMAGES) {
-         $validOnlyImage = new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif'));
+      if($_POST[self::REQ_LIST_TYPE] == self::LIST_TYPE_IMAGES) {
+         $validOnlyImage = new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'tga', 'wmf'));
          $file->addValidation($validOnlyImage);
-      } else if($filesType == self::LIST_TYPE_MEDIA) {
-         $validOnlyImage = new Form_Validator_FileExtension(array('swf', 'qt', 'wmv', 'rm'));
+      } else if($_POST[self::REQ_LIST_TYPE] == self::LIST_TYPE_MEDIA) {
+         $validOnlyImage = new Form_Validator_FileExtension(array(
+            'swf', // falsh
+            'mp4','m4v', 'ogv', 'mov' , 'flv', 'rm', 'qt', 'avi', // video
+            'mp3', 'ogg', 'wma', 'wav' // audio
+            ));
          $file->addValidation($validOnlyImage);
+      } else {
       }
       $file->setUploadDir($datadir);
       $form->addElement($file);

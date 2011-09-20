@@ -50,7 +50,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
    private $fileBrowserFunction = 'function vveTinyMCEFileBrowser (field_name, url, type, win) {
    var cmsURL = location.toString();    // script URL - use an absolute path!
    tinyMCE.activeEditor.windowManager.open({
-      file : "./component/tinymce_browser/{CATID}/browser.php",
+      file : "./component/tinymce_browser/{CATID}/browser.php?t="+type,
       title : "Cube File Browser", width : 750, height : 500, resizable : "yes", inline : "yes",  close_previous : "no"
    }, { window : win,input : field_name,listType : type,cat : tinyMCE.activeEditor.getParam(\'category_id\'), url:url });
    return false;
