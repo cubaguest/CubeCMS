@@ -1,5 +1,6 @@
 <!--Sipky pro posun stranek-->
-<?if($this->countAllPages > 1){?>
+<?
+if($this->countAllPages > 1){?>
 <div class="scroll_main">
 <table>
 <tr>
@@ -7,9 +8,7 @@
 <? //Sipka na zacatek
    if($this->activeButtonBegin){
       ?>
-      <a href="<?=$this->pageLink()->rmParam($this->pageParam)?>" title="<?=$this->textStart?>">
-      |&lt;
-      </a>
+      <a href="<?=$this->pageLink()->rmParam($this->pageParam)?>" title="<?=$this->textStart?>">|&lt;</a>
    <?} else {?>
       |&lt;
    <?}?>
@@ -39,7 +38,7 @@
       if($number == 1){
          $link = $this->pageLink()->rmParam($this->pageParam);
       } else {
-         $link = $this->pageLink()->param($this->pageParam, $number);
+         $link = $this->pageLink()->param($this->pageParam, (int)$number);
       }
       ?>
       &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
@@ -58,9 +57,7 @@
    &#032;&#032;
 <? //Sipka na konec
    if($this->activeButtonEnd){?>
-      <a href="<?=$this->pageLink()->param($this->pageParam, $this->countAllPages)?>" title="<?=$this->textEnd?>">
-      &gt;|
-      </a>
+      <a href="<?=$this->pageLink()->param($this->pageParam, $this->countAllPages)?>" title="<?=$this->textEnd?>">&gt;|</a>
    <?} else {?>
       &gt;|
    <?}?>
