@@ -207,5 +207,47 @@ abstract class View extends TrObject {
    public function tr($str, $count = 0) {
       return $this->translator()->tr($str, $count);
    }
+   
+   /**
+    * Metody které se využívají často ve viewru
+    */
+   
+   /**
+    * Metoda přidá do požadovaného form elementu TinyMCE editor
+    * @param Form_Element $formElement -- element kterému se má přidat ditor
+    * @param string/Component_TinyMCE_Settings $theme -- typ editoru (none, simple, full, advanced) nebo nastavení editoru
+    */
+   protected function setTinyMCE($formElement, $theme = 'simple') {
+      if( ($formElement instanceof Form_Element) == false OR $theme == 'none'){
+         return;
+      }
+      
+      $formElement->html()->addClass("mceEditor_".$theme);
+      
+      $this->tinyMCE = new Component_TinyMCE();
+      if($theme instanceof Component_TinyMCE_Settings){
+         $this->tinyMCE->setEditorSettings($theme);
+      } else {
+         switch ($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, $theme)) {
+            case 'simple':
+               $settings = new Component_TinyMCE_Settings_AdvSimple2();
+               break;
+            case 'full':
+               // TinyMCE
+               $settings = new Component_TinyMCE_Settings_Full();
+               $settings->setSetting('height', '600');
+               break;
+            case 'advanced':
+            default:
+               $settings = new Component_TinyMCE_Settings_Advanced();
+               $settings->setSetting('height', '600');
+               break;
+         }
+         $settings->setSetting('editor_selector', 'mceEditor_'.$theme);
+         $this->tinyMCE->setEditorSettings($settings);
+      }
+      $this->tinyMCE->mainView();
+   }
+   
 }
 ?>
