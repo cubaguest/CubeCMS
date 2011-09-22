@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+.messagesboard .message-wrap {
+/*   width: 33%;*/
+   float: left;
+}
+.messagesboard .main-content-list-record {
+   padding: 2px;
+   margin: 2px;
+   border: 1px solid gray;
+   overflow: hidden;
+}
+

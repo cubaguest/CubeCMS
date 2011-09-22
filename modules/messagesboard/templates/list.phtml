@@ -1,0 +1,44 @@
+<?
+$this->addCssFile("style.css");
+$h1 = $this->category()->getName();
+echo $this->toolbox;
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<div class="main-content-list messagesboard">
+   <?if(!empty ($this->messages)) {?>
+      <div class="main-content-list-records">
+      <?
+      $i = 1;
+      foreach ($this->messages as $msg) {
+         $addTime = new DateTime($msg->{MessagesBoard_Model::COLUMN_TIME_ADD});
+         
+         $style = null;
+         if($msg->{MessagesBoard_Model::COLUMN_COLOR} != null){
+            $style = 'background-color: '.$msg->{MessagesBoard_Model::COLUMN_COLOR}.';';
+         }
+         
+         ?>
+         <div class="message-wrap" style="width: 33%;">
+         <div class="main-content-list-record" style="<?=$style;?>">
+            <span class="font-small"><?=vve_date("%X %x", $addTime);?></span>
+            <div class="main-content-list-record-text"><?echo $msg->{MessagesBoard_Model::COLUMN_TEXT};?></div>
+            <span class="font-small"><?=$msg->{Model_Users::COLUMN_USERNAME};?></span>
+            <?echo $msg->toolbox;?>
+         </div>
+      </div>
+      <?
+      if($i % 3 == 0){
+         echo '<hr class="reseter" />';
+      }
+      $i++;
+      }?>
+      <hr class="reseter" />
+   </div>
+   <?
+      echo $this->scrollComp;
+   } else {
+      echo ($this->tr('Není vložena žádná zpráva'));
+   }?>
+   <br />
+   <?if($this->form instanceof Form){$this->includeFile('tpl://form.phtml');}?>
+</div>

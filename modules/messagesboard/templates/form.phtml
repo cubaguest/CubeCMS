@@ -1,0 +1,23 @@
+<?
+if(isset($this->form->color)){
+   $this->addJsPlugin(new JsPlugin_JQueryColorPicker());
+   $colors = $this->category()->getParam(MessagesBoard_Controller::PARAM_COLORS, 
+      array(
+         '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff',
+         '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd',
+			'#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0',
+      ));
+}
+?>
+<div class="main-content-form-edit">
+   <?
+   echo($this->form);
+   
+   if(isset($this->form->color)){?>
+   <script type="text/javascript">
+      $('input#msg_color_1').colorPicker({ 
+         <?if(!empty ($colors)){ echo 'colors: '.json_encode($colors);}?> 
+      });
+   </script>
+   <?}?>
+</div>
