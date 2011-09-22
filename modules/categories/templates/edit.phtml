@@ -39,7 +39,13 @@ $this->addCssFile("style.css");
          });
       });
       $('select[name=categorymodule]').change(function(){loadDoc();$('input[name=categorygotoSettings]').attr('checked',true);});
-      function loadDoc(){$('#moduleNameDoc').load('<?=$this->link()->route('moduleDoc')?>?module='+$('select[name=categorymodule]').val()+' .moduleLabel');}
+      
+      function loadDoc(){
+         var url = '<?=$this->link()->route('moduleDoc')?>';
+         url.indexOf("?") >= 0 ? url += '&' : url += '?';
+         url += 'module='+$('select[name=categorymodule]').val();
+         $('#moduleNameDoc').load(url+' .moduleLabel');
+      }
       /* ]]> */
    </script>
 </div>
