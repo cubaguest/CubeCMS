@@ -217,9 +217,16 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       if(isset ($this->elements[$name])) {
          unset ($this->elements[$name]);
       }
+      if(isset ($this->elementsGroups[$name])) {
+         unset ($this->elementsGroups[$name]);
+      }
+      foreach ($this->elementsGroups as $key => $group) {
+         if(!is_array($group)) continue;
+         unset ($this->elementsGroups[$key]['elements'][$name]);
+      }
    }
 
-   /**
+      /**
     * Metoda vykreslí začáteční tag pro formulář (tag <form>)
     * @return string
     */
@@ -274,7 +281,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param string $name -- název formulářového elementu
     */
    function offsetExists($name) {
-      return isset ($this->elements[$name]);
+      return isset ($this->$name);
    }
 
    /**
@@ -282,7 +289,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param string $name -- název elemeentu
     */
    function offsetUnset($name) {
-      unset ($this->elements[$name]);
+      unset ($this->$name);
    }
 
    /**
@@ -556,12 +563,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param string $name -- název elementu
     */
    public function removeElement($name) {
-      unset ($this->elements[$name]);
-      unset ($this->elementsGroups[$name]);
-      foreach ($this->elementsGroups as $key => $group) {
-         if(!is_array($group)) continue;
-         unset ($this->elementsGroups[$key]['elements'][$name]);
-      }
+      unset ($this->$name);
    }
 
    /**
@@ -569,7 +571,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @return bool -- true pokud formulář obsahuje zadaný element
     */
    public function haveElement($name) {
-      return isset ($this->elements[$name]);
+      return isset ($this->$name);
    }
 
    /**
