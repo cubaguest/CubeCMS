@@ -10,7 +10,6 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'external_link_list_url' => null,
       'template_replace_values' => array(),
       'template_external_list_url' => null,
-      'external_link_list_url' => null,
       'external_image_list_url' => null,
       'external_media_list_url' => null,
       'remove_script_host' => true,
