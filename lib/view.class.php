@@ -217,7 +217,7 @@ abstract class View extends TrObject {
     * @param Form_Element $formElement -- element kterému se má přidat ditor
     * @param string/Component_TinyMCE_Settings $theme -- typ editoru (none, simple, full, advanced) nebo nastavení editoru
     */
-   protected function setTinyMCE($formElement, $theme = 'simple') {
+   protected function setTinyMCE($formElement, $theme = 'simple', $editorSettings = array()) {
       if( ($formElement instanceof Form_Element) == false OR $theme == 'none'){
          return;
       }
@@ -244,6 +244,16 @@ abstract class View extends TrObject {
                break;
          }
          $settings->setSetting('editor_selector', 'mceEditor_'.$theme);
+         if(!empty ($cfg)){
+            foreach ($cfg as $name => $value) {
+               $settings->setSetting($name, $value);
+            }
+         }
+         if(!$this->category()->getRights()->isControll() OR !Auth::isLogin()){
+            $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_SOURCES, false);
+            $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_TPLS, false);
+         }
+         
          $this->tinyMCE->setEditorSettings($settings);
       }
       $this->tinyMCE->mainView();
