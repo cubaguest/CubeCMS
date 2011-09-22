@@ -99,6 +99,14 @@ class Template_Toolbox2 extends Template {
    }
 
    /**
+    * Metoda pro klonování 
+    */
+   public function __clone()
+   {
+      $this->tools = unserialize(serialize($this->tools)); // deep clone
+   }
+   
+   /**
     * Metoda zjišťuje jestli se jedná o objekt nástroje (tool)
     * @param string $name -- název nástroje
     */

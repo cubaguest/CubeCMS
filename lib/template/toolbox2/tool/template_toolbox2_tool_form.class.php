@@ -31,6 +31,16 @@ class Template_Toolbox2_Tool_Form extends Template_Toolbox2_Tool implements Temp
    public function getForm() {
       return $this->form;
    }
+   
+   /**
+    * Metoda nastaví formulář podle kterého se generují data
+    * @param Form $form - formulář pro generování dat
+    * @return Template_Toolbox2_Tool_Form
+    */
+   public function setForm(Form $form) {
+      $this->form = $form;
+      return $this;
+   }
 
 }
 ?>
