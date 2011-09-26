@@ -29,8 +29,6 @@ class MessagesBoard_Controller extends Controller {
          
          if($pos > $this->category()->getParam('scroll', self::DEFAULT_MSGS_IN_PAGE)){
             // dopočet stránky
-            Debug::log($pos.' > '.$this->category()->getParam('scroll', self::DEFAULT_MSGS_IN_PAGE));
-            
             $p = ceil($pos/$this->category()->getParam('scroll', self::DEFAULT_MSGS_IN_PAGE));
             $this->link()->clear()->param(Component_Scroll::GET_PARAM, $p)->reload();
             return;
@@ -50,7 +48,7 @@ class MessagesBoard_Controller extends Controller {
       // načtení článků
       $model
          ->where(MessagesBoard_Model::COLUMN_ID_CATEGORY.' = :idc ', array('idc' => $this->category()->getId()))
-         ->joinFK(MessagesBoard_Model::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME))
+         ->joinFK(MessagesBoard_Model::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME, Model_Users::COLUMN_NAME, Model_Users::COLUMN_SURNAME))
          ->order(array(MessagesBoard_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC));
 
       $scrollComponent = null;
