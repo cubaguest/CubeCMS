@@ -2,7 +2,7 @@
 -- Struktura tabulky `{PREFIX}messagesboard`
 --
 CREATE TABLE IF NOT EXISTS `{PREFIX}messagesboard` (
-  `id_message` smallint(6) NOT NULL AUTO_INCREMENT,
+`id_message` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_category` smallint(6) NOT NULL,
   `id_user` smallint(6) NOT NULL,
   `text` varchar(1000) DEFAULT NULL,
@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}messagesboard` (
   `ip_address` varchar(15) DEFAULT NULL,
   `color` varchar(7) DEFAULT NULL,
   PRIMARY KEY (`id_message`),
-  KEY `id_category` (`id_category`,`id_user`)
+  KEY `id_category` (`id_category`,`id_user`),
+  FULLTEXT KEY `text_clear` (`text_clear`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
