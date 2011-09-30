@@ -45,17 +45,24 @@ class Routes {
    /**
     * Konstruktor třídy
     */
-   function __construct($urlRequest, Category_Core $category = null) {
+   function __construct($urlRequest, Category_Core $category = null, $routeVars = array()) {
       $this->urlRequest = $urlRequest;
+      if(!empty ($routeVars)){
+         foreach ($routeVars as $key => $value) {
+            $this->{$key} = $value;
+         }
+      }
+      
       $this->addRoute(self::MODULE_SETTINGS, 'settings', 'viewSettings', 'settings/'); // nastavení vzhledu modulu
       $this->addRoute(self::MODULE_METADATA, 'metadata', 'viewMetadata', 'metadata/'); // nastavení metadat modulu
       $this->initRoutes();
       if($category != null AND $category->haveFeed()){
          $this->addRoute('feed', null, 'main', '{type}.xml');
       }
-      if(!isset ($this->routes['normal'])){
-         $this->addRoute('normal', null, 'main', null); // základní cesta
+      if(isset ($this->routes['normal'])){ // některé moduly mají v sobě. Je nutné dostat tuto cestu vždy na konec
+         unset ($this->routes['normal']);
       }
+      $this->addRoute('normal', null, 'main', null); // základní cesta
    }
 
    /**
@@ -114,6 +121,28 @@ class Routes {
    }
 
    /**
+    * Metoda registruje cesty z daného modulu
+    * @param string $module -- název modulu
+    */
+   final protected function registerModule($module, $routeVars = array())
+   {
+      $className = ucfirst($module).'_Routes';
+      if(class_exists($className)){
+         $mr = new $className($this->urlRequest, null, $routeVars);
+         $this->routes = array_merge($this->routes, $mr->getRoutes());
+      }
+   }
+
+   /**
+    * metoda vrátí všechny cesty modulu
+    * @return array 
+    */
+   final public function getRoutes()
+   {
+      return $this->routes;
+   }
+
+      /**
     * Metoda vrací typ odpovědi nastavené pro danou cestu (konstanty RESPOND_)
     * @return const RESPOND_
     */

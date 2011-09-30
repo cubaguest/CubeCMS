@@ -779,7 +779,7 @@ class AppCore extends TrObject {
             }
             //					Vytvoření objektu kontroleru
             $controller = new $controllerClassName(self::getCategory(), $routes);
-            $ret =  $controller->runCtrlAction($routes->getActionName(), self::$urlRequest->getOutputType());
+            $ret =  $controller->runCtrl();
          } catch (Exception $e ) {
             new CoreErrors($e);
 //            return false;

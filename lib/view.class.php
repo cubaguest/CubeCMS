@@ -35,18 +35,29 @@ abstract class View extends TrObject {
     */
    private $category = null;
 
+   private $actionName = 'main';
+
    /**
     * Konstruktor Viewu
     *
-    * @param Url_Link_Module $link -- objekt odkazů modulu
-    * @param Category $category --  objekt kategorie
+    * @param Url_Link_Module/Controller $base -- objekt odkazů modulu nebo kontroler (pak již nění nutné předávat ostatní parametry)
+    * @param Category_Core $category --  objekt kategorie
+    * @param Translator $category --  objekt kategorie
     */
-   function __construct(Url_Link_Module $link, Category_Core $category, Translator $trs) {
-      $this->template = new Template_Module($link, $category);
-      $this->template->setTranslator($trs);
-      $this->link = $link;
-      $this->category = $category;
-      $this->locale = new Locales($category->getModule()->getName());
+   function __construct($base, Category_Core $category = null, Translator $trs = null) {
+      if($base instanceof Controller){
+         $this->link = $base->link();
+         $this->category = $base->category();
+         $trs = $base->translator();
+         $this->template = $base->view()->template();
+      } elseif ($base instanceof Url_Link_Module) {
+         $this->link = $base;
+         $this->category = $category;
+         $this->template = new Template_Module($this->link, $this->category);
+         $this->template->setTranslator($trs);
+      }
+      
+      $this->locale = new Locales($this->category->getModule()->getName());
       //		inicializace viewru
       $this->init();
    }
@@ -100,7 +111,31 @@ abstract class View extends TrObject {
     */
    public function init() {}
 
-   /**
+   final public function runView($actionName, $output)
+   {
+      $this->actionName = $actionName;
+      $viewName = null;
+      //	zvolení viewru modulu pokud existuje
+      if(method_exists($this, $actionName.ucfirst($output).'View')) {
+         $viewName = $actionName.ucfirst($output).'View';
+      } else if(method_exists($this, $actionName.'View')) {
+         $viewName = $actionName.'View';
+      } 
+      else {
+         return;
+      }
+      
+      $variables = $this->template()->getTemplateVars();
+      foreach ($variables as $var){
+         if($var instanceof Component){
+            $var->mainController();
+         }
+      }
+      $this->{$viewName}();
+      $this->addToolBox();
+   }
+
+/**
     * Hlavní abstraktní třída pro vytvoření pohledu
     */
    public function mainView(){}
@@ -257,6 +292,29 @@ abstract class View extends TrObject {
          $this->tinyMCE->setEditorSettings($settings);
       }
       $this->tinyMCE->mainView();
+   }
+ 
+   final private function addToolBox()
+   {
+      // pokud je hlavní pohled přidáme toolboxy s nastavením (modí být vložen)
+      if ($this->actionName == "main"
+         AND $this->category()->getRights()->isControll()
+         AND $this->toolbox instanceof Template_Toolbox2
+         AND (Category::getSelectedCategory() instanceof Category_Admin) == false) {
+         // pokud není vložen nástroj pro nastavení
+         if ($this->template()->toolbox->edit_view) {
+            unset($this->template()->toolbox->edit_view);
+         }
+         $this->template()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+               $this->link()->route(Routes::MODULE_SETTINGS));
+         $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
+         $this->template()->toolbox->addTool($toolEView);
+         $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
+               $this->link()->route(Routes::MODULE_METADATA));
+         $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
+         $this->template()->toolbox->addTool($toolEMetaData);
+      }
    }
    
 }

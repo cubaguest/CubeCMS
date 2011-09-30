@@ -59,7 +59,7 @@ abstract class Controller extends TrObject {
     * Natavení kontroleru
     * @var array
     */
-   private $options = array();
+   protected $options = array();
 
    /**
     * Název modulu -- lze použít pro načítání knihoven atd (např. Articles)
@@ -74,16 +74,33 @@ abstract class Controller extends TrObject {
    private $moduleRespond = null;
 
    /**
+    * Moduly, které se mají připojit ke stávajícímu modulu.
+    * @var array 
+    */
+   protected $registeredModules = array();
+   
+   /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
-    * @param Category $category -- obejkt kategorie
+    * @param Category_Core/Controller $base -- objekt kategorie nebo kontroleru
     * @param Routes $routes -- objekt cest pro daný modul
     */
-   public final function __construct(Category_Core $category, Routes $routes, View $view = null, Url_Link_Module $link = null) {
+   public final function __construct($base, Routes $routes = null, View $view = null, Url_Link_Module $link = null) 
+      {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
-      $this->category = $category;
+      if($base instanceof Controller) {
+         $link = $link == null ? $base->link() : $link;
+         $view = $view == null ? $base->view() : $view;
+         $routes = $routes == null ? $base->routes() : $routes;
+         // merge config
+         $this->options = array_merge($this->options, $base->getOptions());
+         $base = $base->category();
+      }
+      
+      $this->category = $base;
       $this->routes = $routes;
-
+      $this->actionViewer = $routes->getActionName();
+         
       // název modulu
       $className = get_class($this);
       $this->moduleName = substr($className, 0, strpos($className,'_'));
@@ -117,7 +134,8 @@ abstract class Controller extends TrObject {
       $this->init();
    }
 
-   private function initView() {
+   private function initView() 
+   {
       //	Načtení třídy View
       $viewClassName = ucfirst($this->moduleName).'_View';
       $this->viewObj = new $viewClassName(clone $this->link(), $this->category(), $this->translator());
@@ -130,10 +148,21 @@ abstract class Controller extends TrObject {
    protected function init() {}
 
    /**
+    * Metoda registruje modul, který se má použít pro obsluhu metod, které nemá modul registrovány a ani jej nelze dědit
+    * @param string $module -- název modulu
+    * @param string $params -- název metody, která provede test jestli má být použit daný modul
+    */
+   final public function registerModule($module, $testMetod = null)
+   {
+      $this->registeredModules[$module] = $testMetod;
+   }
+
+/**
     * Metoda vrací objekt viewru modulu
     * @return View
     */
-   final public function view() {
+   final public function view() 
+   {
       return $this->viewObj;
    }
 
@@ -143,11 +172,21 @@ abstract class Controller extends TrObject {
     * @param mixed $defaultValue -- výchozí hodnota
     * @return mixed -- obsah volby
     */
-   final public function getOption($name, $defaultValue = null) {
+   final public function getOption($name, $defaultValue = null) 
+      {
       if(isset ($this->options[$name])) {
          return $this->options[$name];
       }
       return $defaultValue;
+   }
+   
+   /**
+    * Metoda vrací konfigurační volby
+    * @return array -- obsah voleb
+    */
+   final public function getOptions() 
+   {
+      return $this->options;
    }
 
    /**
@@ -156,8 +195,20 @@ abstract class Controller extends TrObject {
     * @param mixed $value -- výchozí hodnota
     * @return mixed -- obsah volby
     */
-   final public function setOption($name, $value = null) {
+   final public function setOption($name, $value = null) 
+      {
       $this->options[$name] = $value;
+   }
+   
+   /**
+    * Metoda nasatvuje konfigurační volbu
+    * @param string $name -- název volby
+    * @param mixed $value -- výchozí hodnota
+    * @return mixed -- obsah volby
+    */
+   final public function setOptions($opts) 
+   {
+      $this->options = $opts;
    }
 
    /**
@@ -166,7 +217,8 @@ abstract class Controller extends TrObject {
     * @param boolean -- true pokud má byt link bez kategorie
     * @return Url_Link_Module -- objekt pro práci s odkazy
     */
-   final public function link($clear = false) {
+   final public function link($clear = false) 
+   {
       $link = clone $this->link;
       if($clear) {
          $link->clear();
@@ -179,7 +231,8 @@ abstract class Controller extends TrObject {
     * @return Module -- objekt modulu
     * @deprecated
     */
-   final public function getModule() {
+   final public function getModule() 
+   {
       return $this->category()->getModule();
    }
 
@@ -187,7 +240,8 @@ abstract class Controller extends TrObject {
     * Metody vrací objekt modulu
     * @return Module -- objekt modulu
     */
-   final public function module() {
+   final public function module() 
+   {
       return $this->category()->getModule();
    }
 
@@ -195,7 +249,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt kategorie
     * @return Category
     */
-   final public function category() {
+   final public function category() 
+   {
       return $this->category;
    }
 
@@ -203,7 +258,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt cest
     * @return Routes
     */
-   final public function routes() {
+   final public function routes()
+   {
       return $this->routes;
    }
 
@@ -213,7 +269,8 @@ abstract class Controller extends TrObject {
     * @param mixed $def -- výchozí hodnota vrácená pokud nebyl parametr přenesen
     * @return mixed -- hodnota parametru
     */
-   final public function getRequest($name, $def = null) {
+   final public function getRequest($name, $def = null) 
+   {
       return $this->routes()->getRouteParam($name, $def);
    }
 
@@ -224,7 +281,8 @@ abstract class Controller extends TrObject {
     * @return mixed -- hodnota parametru
     * @todo dodělat rekurzivní kontrolu
     */
-   final public function getRequestParam($name, $def = null) {
+   final public function getRequestParam($name, $def = null) 
+   {
       if(isset ($_REQUEST[$name]) AND !is_array($_REQUEST[$name])) {
          return rawurldecode($_REQUEST[$name]);
       } else if(isset ($_REQUEST[$name])) {
@@ -238,7 +296,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt lokalizace
     * @return Locales
     */
-   final public function locale() {
+   final public function locale() 
+   {
       return $this->locale;
    }
 
@@ -247,7 +306,8 @@ abstract class Controller extends TrObject {
     * @return string -- název domény
     * <p>Vhodné při dědění modulů, pro zadávání nových překladových textů</p>
     */
-   final public function getLocaleDomain(){
+   final public function getLocaleDomain()
+   {
       return $this->localeDomain;
    }
 
@@ -256,7 +316,8 @@ abstract class Controller extends TrObject {
     * @return Rights -- objekt práv
     * @deprecated
     */
-   final public function getRights() {
+   final public function getRights() 
+   {
       return $this->rights();
    }
 
@@ -264,7 +325,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt s právy na modul
     * @return Rights -- objekt práv
     */
-   final public function rights() {
+   final public function rights() 
+   {
       return $this->category()->getRights();
    }
 
@@ -272,7 +334,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt s informačními zprávami
     * @return Messages -- objekt zpráv
     */
-   final public function infoMsg() {
+   final public function infoMsg() 
+   {
       return AppCore::getInfoMessages();
    }
 
@@ -280,7 +343,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt s chybovými zprávami
     * @return Messages -- objekt zpráv
     */
-   final public function errMsg() {
+   final public function errMsg() 
+   {
       return AppCore::getUserErrors();
    }
 
@@ -288,14 +352,16 @@ abstract class Controller extends TrObject {
     * Metoda zaloguje událost
     * @param string  $msg -- Zpráva (nemusí mít překlad)
     */
-   final public function log($msg) {
+   final public function log($msg) 
+   {
       Log_Module::msg($msg, $this->module()->getName(), $this->category()->getLabel());
    }
 
       /**
     * Metoda volaná při destrukci objektu
     */
-   function __destruct() {
+   function __destruct() 
+   {
    }
 
    /**
@@ -303,7 +369,8 @@ abstract class Controller extends TrObject {
     * @param string -- název actionViewru
     * @deprecated používat setView()
     */
-   final public function changeActionView($newActionView) {
+   final public function changeActionView($newActionView) 
+   {
       $this->actionViewer = $newActionView;
    }
 
@@ -311,14 +378,16 @@ abstract class Controller extends TrObject {
     * Metoda vrací zvolený actionViewer nebo false pokud je nulový
     * @return string -- název nového actionViewru
     */
-   final public function getActionView() {
+   final public function getActionView() 
+   {
       return $this->actionViewer;
    }
 
    /**
     * Metoda kontroluje práva pro čtení modulu. v opačném případě vyvolá přesměrování
     */
-   final public function checkReadableRights() {
+   final public function checkReadableRights() 
+   {
       if(!$this->rights()->isReadable()) {
          $this->errMsg()->addMessage(sprintf(
             $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
@@ -329,7 +398,8 @@ abstract class Controller extends TrObject {
    /**
     * Metoda kontroluje práva pro zápis do modulu. v opačném případě vyvolá přesměrování
     */
-   final public function checkWritebleRights() {
+   final public function checkWritebleRights() 
+   {
       if(!$this->rights()->isWritable()) {
          $this->errMsg()->addMessage(sprintf(
             $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
@@ -340,7 +410,8 @@ abstract class Controller extends TrObject {
    /**
     * Metoda kontroluje práva pro plný přístup k modulu. v opačném případě vyvolá přesměrování
     */
-   final public function checkControllRights() {
+   final public function checkControllRights() 
+   {
       if(!$this->rights()->isControll()) {
          $this->errMsg()->addMessage(sprintf(
             $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
@@ -354,7 +425,8 @@ abstract class Controller extends TrObject {
     *
     * @param string -- název viewru
     */
-   final public function setView($view) {
+   final public function setView($view) 
+   {
       $this->actionViewer = $view;
    }
 
@@ -365,7 +437,8 @@ abstract class Controller extends TrObject {
     * Metoda vrací objekt šablony
     * @return Template
     */
-   final public function _getTemplateObj() {
+   final public function _getTemplateObj() 
+   {
       return $this->view()->template();
    }
 
@@ -373,101 +446,60 @@ abstract class Controller extends TrObject {
     * Metoda vrací pole s šablonami
     * @return array
     */
-   final public function _getTemplateObjs() {
+   final public function _getTemplateObjs() 
+   {
       return $this->view()->template();
    }
 
    /**
     * Metoda spustí metodu kontroleru a viewer modulu
     */
-   final public function runCtrl() {
-      if(!method_exists($this, $this->routes()->getActionName().'Controller')) {
-         throw new BadMethodCallException(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
-         $this->routes()->getActionName(), $this->module()->getName()), 1);
-      }
+   final public function runCtrl() 
+   {
+      $ctrlResult = true;
+      $ctrlAct = $this->actionViewer.'Controller';
       // spuštění kontroleru
-      $ctrlResult = $this->{$this->routes()->getActionName().'Controller'}();
-
-      if($this->actionViewer === null) {
-         $viewName = $this->routes()->getActionName().'View';
-      } else {
-         $viewName = $this->actionViewer.'View';
-      }
-
-      if(method_exists($this->view(), $viewName) AND $ctrlResult !== false) {
-         // spuštění všech kontrolerů komponent
-         $variables = $this->view()->template()->getTemplateVars();
-         foreach ($variables as $var){
-            if($var instanceof Component){
-               $var->mainController();
+      if(method_exists($this, $ctrlAct)) {
+         // kontroler obsahuje metodu pro obsluhu
+         $ctrlResult = $this->{$ctrlAct}();
+         if($ctrlResult !== false) {
+            $this->view()->runView($this->actionViewer, Template_Output::getOutputType());
+         } else if($ctrlResult === false) {
+            AppCore::setErrorPage(true);
+         }
+         
+      } else if(!empty ($this->registeredModules)) { // pokus spustit kontroller z jiného modulu
+         foreach ($this->registeredModules as $module => $params) {
+            $ctrlName = ucfirst($module).'_Controller';
+            $viewName = ucfirst($module).'_View';
+            if(method_exists($ctrlName, $ctrlAct)){
+               // new Crtl
+               $ctrl = new $ctrlName($this, $this->routes(), new $viewName($this));
+               // pre callback funkce pro spuštění před spuštění externího modulu
+               if($this->callRegisteredModule($ctrl, $module, $this->actionViewer) === false){
+                  AppCore::setErrorPage(true);
+                  return;
+               }
+               $ctrlResult = $ctrl->runCtrl();
+               $this->viewObj = $ctrl->view();
+               break;
             }
          }
-         $this->view()->{$viewName}();
-         $this->addToolBox($viewName);
-      } else if($ctrlResult === false) {
-         AppCore::setErrorPage(true);
+      } else {
+         throw new BadMethodCallException(sprintf($this->tr('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
+         $this->routes()->getActionName(), $this->module()->getName()), 1);
       }
    }
    
-   final private function addToolBox($view)
-   {
-      // pokud je hlavní pohled přidáme toolboxy s nastavením (modí být vložen)
-      if ($view == "mainView"
-         AND $this->getRights()->isControll()
-         AND $this->view()->toolbox instanceof Template_Toolbox2
-         AND (Category::getSelectedCategory() instanceof Category_Admin) == false) {
-         // pokud není vložen nástroj pro nastavení
-         if ($this->view()->toolbox->edit_view) {
-            unset($this->view()->toolbox->edit_view);
-         }
-         $this->view()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-         $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
-               $this->link()->route(Routes::MODULE_SETTINGS));
-         $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
-         $this->view()->toolbox->addTool($toolEView);
-         $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
-               $this->link()->route(Routes::MODULE_METADATA));
-         $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
-         $this->view()->toolbox->addTool($toolEMetaData);
-      }
-   }
-
-   /**
-    * Metoda spustí zadanou akci na daném kontroleru. Kontroluje, jestli existuje
-    * metoda viewru pro daný výstup, nebo ne
-    * @param string $actionName -- název akce
-    * @param string $outputType -- typ výstupu
-    */
-   final public function runCtrlAction($actionName, $outputType) {
-      if(!method_exists($this, $actionName.'Controller')) {
-         trigger_error(sprintf(_('neimplementovaná akce "%sController" v kontroleru modulu "%s"'),
-                 $actionName, $this->module()->getName()));
-      }
-
-      $viewName = null;
-      //	zvolení viewru modulu pokud existuje
-      if(method_exists($this->view(), $actionName.ucfirst($outputType).'View')) {
-         $viewName = $actionName.ucfirst($outputType).'View';
-      } else if(method_exists($this->view(), $actionName.'View')) {
-         $viewName = $actionName.'View';
-      }
-      // spuštění Viewru
-      if($this->{$actionName.'Controller'}() === false) {
-         return false;
-      }
-      // pokud je kontrolel v pořádku spustíme view
-      if($viewName != null){
-         $this->view()->{$viewName}();
-         $this->addToolBox($viewName);
-      }
-      return true;
-   }
+   protected function callRegisteredModule(Controller $ctrl, $module, $action) 
+   {}
 
    /**
     * Metoda vrací objekt požadavku (pouze pro ajax požadavky a požadavky na moduly)
     * @return Ajax_Data_Respond
     */
-   final public function respond(){
+   final public function respond()
+   {
       return $this->moduleRespond;
    }
 
@@ -475,8 +507,10 @@ abstract class Controller extends TrObject {
     * Metoda přeloží zadaný řetězec
     * @param string $message -- řetězec k přeložení
     * @return string -- přeložený řetězec
+    * @deprecated use $this->tr()
     */
-   final public function _($message, $domain = null) {
+   final public function _($message, $domain = null) 
+   {
       return $this->locale()->_($message, $domain = null);
    }
 
@@ -486,8 +520,10 @@ abstract class Controller extends TrObject {
     * @param string $message2 -- řetězec k přeložení - plurál
     * @param integer $int -- počet
     * @return string -- přeložený řetězec
+    * @deprecated use $this->tr()
     */
-   final public function ngettext($message1, $message2, $int, $domain = null) {
+   final public function ngettext($message1, $message2, $int, $domain = null) 
+   {
       return $this->locale()->ngettext($message1, $message2, $int, $domain);
    }
 
@@ -495,9 +531,11 @@ abstract class Controller extends TrObject {
     * Metoda implementující mazání při odstranění kategori. Je určena k vičištění.
     * @param Category $category -- objekt kategorie
     */
-   public static function clearOnRemove(Category $category) {}
+   public static function clearOnRemove(Category $category) 
+   {}
 
-   public function viewSettingsController() {
+   public function viewSettingsController() 
+   {
       $this->checkControllRights();
 
       $form = new Form('settings_', true);
@@ -615,7 +653,8 @@ abstract class Controller extends TrObject {
 
    }
    
-   public function viewMetadataController() {
+   public function viewMetadataController() 
+   {
       $this->checkControllRights();
       
       $catModel = new Model_Category();

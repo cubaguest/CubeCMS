@@ -15,7 +15,7 @@ class Template_Output {
     * Název typu výstupu
     * @var string
     */
-   private static $outputType = 'xhtml';
+   private static $outputType = 'html';
 
    /**
     * Pole s hlavičkami, připravenými k odeslání
@@ -53,7 +53,7 @@ class Template_Output {
     */
    public static function factory($outputType) {
       if(empty ($outputType)) {
-         self::$outputType = "xhtml";
+         self::$outputType = "html";
       } else {
          self::$outputType = $outputType;
       }
@@ -182,6 +182,14 @@ class Template_Output {
     */
    public static function setOutputType($type) {
       self::$outputType = $type;
+   }
+   
+   /**
+    * Metoda vrací typ výstupu
+    * @return string -- typ výstupu (xhtml, json, txt, atd.)
+    */
+   public static function getOutputType() {
+      return self::$outputType;
    }
 
    /**
