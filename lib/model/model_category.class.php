@@ -137,11 +137,13 @@ class Model_Category extends Model_ORM {
             Model_Category::COLUMN_DEF_RIGHT, /* Model_Category::COLUMN_FEEDS, */
             Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
             Model_Category::COLUMN_VISIBILITY
-            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'));
+//            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
+            ));
          $this->setSelectAllLangs(false)
             ->withRights()
             ->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
-            ->order(array('uk_l' => 'DESC'));
+            ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC'));
+//            ->order(array('urlkey_len_cs' => 'DESC'));
          self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
       }
       return self::$allCatsRecords;
