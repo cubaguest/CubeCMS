@@ -1,0 +1,66 @@
+<?
+if($this->text != false AND (string)$this->text->{Text_Model::COLUMN_LABEL} != null) {
+   $this->addPageTitle($this->text->{Text_Model::COLUMN_LABEL});
+   $h1 = $this->text->{Text_Model::COLUMN_LABEL};
+} else {
+   $h1 = $this->category()->getName();
+}
+if($this->toolboxPrivate == null){
+   echo $this->toolbox;
+   $this->toolbox = null;
+}
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?> <?=vve_tpl_show_text_langs($this->text->{Text_Model::COLUMN_TEXT});?></h1>
+<div class="main-content-detail">
+   <div class="main-content-text"><?echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolbox;?></div>
+   <?if($this->textPrivate != false AND (string)$this->textPrivate->{Text_Model::COLUMN_TEXT} != null){
+      ?><div class="main-content-text"><?echo ($this->filter($this->textPrivate->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolboxPrivate;?></div><?
+   }
+   
+   $images = $this->images;
+   if(count($images) != 0){
+   ?>
+      <div class="main-content-images">
+      <?
+      $images = $this->images;
+      if(count($images) == 1) {$class = 'pirobox';}
+      else {$class = 'pirobox_gall';}
+      foreach ($images as $image) {
+         ?><a class="<?echo $class;?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+                .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
+         ><img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                     .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
+                     /></a><?
+        }
+        echo $this->toolboxImages;
+        ?>
+      </div>
+    <?
+   } else if($this->toolboxImages != null){?>
+      <div class="admin-info-text"><? echo $this->tr('Galerie neobsahuje žádný obrázek.').$this->toolboxImages;?></div>
+   <?}?>
+   <hr class="reseter" />
+   <?
+   if($this->text != false){
+         $this->includeTpl('articletools.phtml', true, array(
+            'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
+//              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
+              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
+              'shares' => array('url' => $this->link(), 'title' => $this->category()->getName())));
+      echo '<hr class="reseter" />';
+   }
+   ?>
+</div>
+<?
+if(count($images) > 0 OR ($this->text != null AND strpos((string)$this->text->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)
+   OR ($this->textPrivate != null AND strpos((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)){
+$this->addJsPlugin(new JsPlugin_PiroBox())?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
+      /* ]]> */
+</script>
+<?}
+?>
