@@ -24,7 +24,6 @@ class Debug_Timer {
    }
    
    public static function printTimers() {
-//      $model = new Debug_ModelTimers();
       foreach (self::$timers as $point => $timer) {
          foreach ($timer['times'] as $value) {
             echo '<div><strong>'.$point.' - '.$value['time'].'</strong> - '.$value['msg'].'</div>';
