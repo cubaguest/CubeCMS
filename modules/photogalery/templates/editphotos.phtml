@@ -3,8 +3,12 @@ $this->addJsPlugin(new JsPlugin_SWFUpload());
 $this->addJsPlugin(new JsPlugin_PiroBox());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addFile("css://photogalery:style.css");
+
+
 ?>
-<h1><?= $this->tr('Úprava obrázků z').' '.$this->category()->getName();?></h1>
+<h1><?
+   printf($this->tr('Úprava obrázků přiřazených ke "%s"'), $this->name == null ? $this->category()->getName() : $this->name);
+?></h1>
 <?$this->includeFile('tpl://photogalery:addimage.phtml')?>
 <div class="ui-widget ui-widget-imageslist">
    <h2 class="ui-widget-header"><?=$this->tr('Seznam uložených obrázků')?></h2>
@@ -12,6 +16,8 @@ $this->addFile("css://photogalery:style.css");
       <form method="post" action="<?=$this->link()?>">
          <fieldset class="fieldset-alt">
          <div style="text-align: right; padding: 10px;">
+            <input id="button-sort-images" type="button" value="<?=$this->tr('Řadit obrázky')?>" 
+                   title="<?=$this->tr('upravit řazení obrázků')?>" onclick="window.location.href = '<?=$this->link()->route('sortphotos')->param('b','e')?>'" />
             <input id="button-check-all-images" type="button" value="<?=$this->tr('Změnit označení')?>" title="<?=$this->tr('Změnit označení pro smazání')?>" />
             <?
             echo $this->editForm->save->controll();

@@ -13,31 +13,22 @@ class Actions_View extends View {
 
    protected function createListToolbox() {
       if($this->rights()->isWritable()) {
-         if($this->rights()->isControll()) {
-            $toolbox = new Template_Toolbox2();
-            $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
-            $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit text"),
-            $this->link()->route('editlabel'));
-            $toolAdd->setIcon('page_edit.png')->setTitle($this->_('Upravit úvodní text'));
-            $toolbox->addTool($toolAdd);
-            $this->toolboxText = $toolbox;
-         }
-
          $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
+         $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->_("Přidat akci"),
          $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou akci'));
          $toolbox->addTool($toolAdd);
-         if($this->category()->getRights()->isControll()){
+         
+         if($this->rights()->isControll()) {
             $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolSet = new Template_Toolbox2_Tool_PostRedirect('settings', $this->_("Nastavení"),
-            $this->link()->route('settings'));
-            $toolSet->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->_('Upravit nastavení'));
-            $toolbox->addTool($toolSet);
+            $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit úvodní text"),
+            $this->link()->route('editlabel'));
+            $toolAdd->setIcon('page_edit.png')->setTitle($this->_('Upravit úvodní text'));
+            $toolbox->addTool($toolAdd);
          }
-         $this->toolbox = $toolbox;
 
+         $this->toolbox = $toolbox;
       }
    }
 

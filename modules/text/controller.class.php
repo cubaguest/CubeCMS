@@ -18,7 +18,7 @@ class Text_Controller extends Controller {
     *
     * @var Text_Model
     */
-   private $textModel = null;
+   protected $textModel = null;
 
    protected function init()
    {
@@ -106,7 +106,7 @@ class Text_Controller extends Controller {
     * @param Model_ORM_Record $rec
     * @return Form 
     */
-   private function createEditForm(Model_ORM_Record $rec)
+   private function createEditForm($rec)
    {
       $form = new Form("text_");
       
@@ -123,7 +123,7 @@ class Text_Controller extends Controller {
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea, $grpText);
 
-      if($rec != false){
+      if($rec instanceof Model_ORM_Record){
          $form->text->setValues($rec->{Text_Model::COLUMN_TEXT});
          $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
       }
@@ -144,7 +144,7 @@ class Text_Controller extends Controller {
       }
 
       if ($textRec == false) {
-         $textRec = $model->newRecord();
+         $textRec = $this->textModel->newRecord();
          $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
          $textRec->{Text_Model::COLUMN_SUBKEY} = $subkey;
       }

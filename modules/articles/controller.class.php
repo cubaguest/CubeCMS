@@ -19,6 +19,13 @@ class Articles_Controller extends Controller {
    const SORT_ALPHABET = 'alphabet';
 
    /**
+    * Jestli je povoleno zadávání prázdného textu
+    * @var bool
+    */
+   protected $allowEmptyText = false;
+
+
+   /**
     * Kontroler pro zobrazení novinek
     */
    public function mainController() {
@@ -220,7 +227,7 @@ class Articles_Controller extends Controller {
 
          if($deleteForm->isValid()) {
             $this->deleteArticle($deleteForm->id->getValues());
-            $this->infoMsg()->addMessage($this->getOption('deleteMsg', $this->tr('Položka byl smazán')));
+            $this->infoMsg()->addMessage($this->getOption('deleteMsg', $this->tr('Položka byla smazána')));
             $this->link()->route()->rmParam()->reload();
          }
          $this->view()->formDelete = $deleteForm;
@@ -615,7 +622,7 @@ class Articles_Controller extends Controller {
 
       $iText = new Form_Element_TextArea('text', $this->tr('Text'));
       $iText->setLangs();
-      if($this->getOption('textEmpty', false) == false) {
+      if($this->allowEmptyText == false) {
          $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       }
       $form->addElement($iText, $fGrpTexts);

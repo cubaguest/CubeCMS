@@ -12,37 +12,49 @@
 
 class ArticlesWGal_Controller extends Articles_Controller {
    const DEFAULT_IMAGES_IN_LIST = 0;
+   
+   protected function init()
+   {
+      parent::init();
+      // registrace modulu fotogalerie pro obsluhu galerie
+      $this->registerModule('photogalery');
+   }
+   
    /**
     * Kontroler pro zobrazení fotogalerii
     */
-   public function mainController() {
+   public function mainController() 
+   {
       parent::mainController();
    }
 
-   public function showController() {
+   public function showController() 
+   {
       $this->checkReadableRights();
       if(parent::showController() === false) return false;
 
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $this->view()->article->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $ctr->mainController();
+      // fotogalerie
+      $this->view()->pCtrl = new Photogalery_Controller($this);
+      $this->view()->pCtrl->loadText = false;
+      $this->view()->pCtrl->idItem = $this->view()->article->{Articles_Model_Detail::COLUMN_ID};
+      $this->view()->pCtrl->subDir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->pCtrl->mainController();
 
       // adresáře k fotkám
-      $this->view()->subdir = $ctr->getOption('subdir',null);
-      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $ctr->getOption('subdir', null));
-      unset ($ctr);
+      $this->view()->subdir = $this->view()->pCtrl->subDir;
+      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->view()->pCtrl->subDir);
    }
 
    /**
     * Metoda smaže článek z dat - overriding
     * @param int $idArticle
     */
-   protected function deleteArticle($idArticle) {
+   protected function deleteArticle($idArticle) 
+   {
       $artM = new Articles_Model_Detail();
       // smazání fotek
       $photogalCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $photogalCtrl->setOption('subdir', $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $photogalCtrl->subDir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
       $photogalCtrl->deleteImages($idArticle);
       unset ($photogalCtrl);
 
@@ -60,7 +72,8 @@ class ArticlesWGal_Controller extends Articles_Controller {
     * @param <type> $urlkeys
     * @param <type> $form
     */
-   protected function saveArticle($names, $urlkeys,Form $form, Model_ORM_Record $article=null) {
+   protected function saveArticle($names, $urlkeys,Form $form, Model_ORM_Record $article=null) 
+   {
       // přejmenování adresáře
       $id = parent::saveArticle($names, $urlkeys, $form, $article);
 
@@ -80,9 +93,9 @@ class ArticlesWGal_Controller extends Articles_Controller {
       return $id;
    }
 
-   public function exportArticleController(){
+   public function exportArticleController()
+   {
       parent::exportArticleController();
-//      $this->view()->article = $article;
       // načtení fotek z článku, první bude zobrazena
       $photosM = new PhotoGalery_Model_Images();
       $images = $photosM->getImages($this->category()->getId(), $this->view()->article->{Articles_Model_Detail::COLUMN_ID});
@@ -93,57 +106,37 @@ class ArticlesWGal_Controller extends Articles_Controller {
    /**
     * Poslední článek
     */
-   public function currentArticleController(){
+   public function currentArticleController()
+   {
       parent::currentArticleController();
       $photosM = new PhotoGalery_Model_Images();
       $images = $photosM->getImages($this->category()->getId(), $this->view()->article->{Articles_Model_Detail::COLUMN_ID}, 1);
       $this->view()->images = $images;
    }
 
-   public function editphotosController() {
+   /**
+    * Metoda pro přípravu spuštění registrovaného modulu
+    * @param Controller $ctrl -- kontroler modulu
+    * @param string $module -- název modulu
+    * @param string $action -- akce
+    * @return type 
+    */
+   protected function callRegisteredModule(Controller $ctrl, $module, $action)
+   {
       $artModel = new Articles_Model();
       $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
       if($art == false) return false;
-
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
-      $ctr->editphotosController($this->link()->route('detail', array('urlkey' => $art->{Articles_Model_Detail::COLUMN_URLKEY})));
-
-      $this->view()->template()->article = $art;
+      // base setup variables
+      $ctrl->idItem = $art->{Articles_Model_Detail::COLUMN_ID};
+      $ctrl->subDir = $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $ctrl->linkBack = $this->link()->route('detail');
+      
+      $ctrl->view()->name = $art->{Articles_Model_Detail::COLUMN_NAME};
    }
 
-   public function checkFileController() {
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->checkFileController();
-   }
-
-   public function uploadFileController() {
-      $artModel = new Articles_Model();
-      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
-      if($art == false) return false;
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-
-      if($art !== false) {
-         $ctr->setOption('idArt', $art->{Articles_Model_Detail::COLUMN_ID});
-         $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-         $artModel->setLastChange($art->{Articles_Model_Detail::COLUMN_ID});
-      }
-      $ctr->uploadFileController();
-   }
-
-   public function editphotoController() {
-      $artModel = new Articles_Model();
-      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
-      if($art == false) return false;
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('subdir', $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $ctr->editphotoController();
-   }
-
-   public function settings(&$settings,Form &$form) {
-      $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());
+   public function settings(&$settings,Form &$form) 
+   {
+      $phCtrl = new Photogalery_Controller($this);
       $phCtrl->settings($settings, $form);
       $form->removeElement('tplMain');
 

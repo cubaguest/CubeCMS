@@ -1,73 +1,63 @@
 <?php
-class Actionswgal_Controller extends Actions_Controller {
+class ActionsWGal_Controller extends Actions_Controller {
 
+   protected function init()
+   {
+      parent::init();
+      // registrace modulu fotogalerie pro obsluhu galerie
+      $this->registerModule('photogalery');
+   }
+   
    public function showController(){
       parent::showController();
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
       if($this->view()->action == false) return false;
-      $ctr->setOption('idArt', $this->view()->action->{Actions_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $ctr->mainController();
-   }
-
-   public function editphotosController() {
-      $this->checkWritebleRights();
-      $actModel = new Actions_Model_Detail();
-      $action = $actModel->getAction($this->getRequest('urlkey'), $this->category()->getId());
-
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('idArt', $action->{Actions_Model_Detail::COLUMN_ID});
-      $ctr->setOption('subdir', $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $ctr->editphotosController($this->link()->back($this->link()->route(), 1));
-      // odkaz zpět
-      $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
+      
+      // fotogalerie
+      $this->view()->pCtrl = new Photogalery_Controller($this);
+      $this->view()->pCtrl->loadText = false;
+      $this->view()->pCtrl->idItem = $this->view()->action->{Actions_Model_Detail::COLUMN_ID};
+      $this->view()->pCtrl->subDir = $this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->pCtrl->mainController();
+      // adresáře k fotkám
+      $this->view()->subdir = $this->view()->pCtrl->subDir;
+      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->view()->pCtrl->subDir);
    }
 
    protected function deleteAction($action) {
       // smazání galerie
       $photoCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $photoCtrl->setOption('idArt', $action->{Actions_Model_Detail::COLUMN_ID});
-      $photoCtrl->setOption('subdir', $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
+      $photoCtrl->iditem = $action->{Actions_Model_Detail::COLUMN_ID};
+      $photoCtrl->subDir = $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
       $photoCtrl->deleteImages($action->{Actions_Model_Detail::COLUMN_ID});
       unset ($photoCtrl);
       // smazání akce
       $this->deleteActionData($action);
               
-      $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána', $this->getLocaleDomain()), $action->{Actions_Model_Detail::COLUMN_NAME}));
+      $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána'), $action->{Actions_Model_Detail::COLUMN_NAME}));
       $this->view()->linkBack->reload();
    }
 
-   public function editphotoController() {
-      $this->checkWritebleRights();
-      $actModel = new Actions_Model_Detail();
-      $action = $actModel->getAction($this->getRequest('urlkey'), $this->category()->getId());
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->setOption('subdir', $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      $ctr->editphotoController();
+   /**
+    * Metoda pro přípravu spuštění registrovaného modulu
+    * @param Controller $ctrl -- kontroler modulu
+    * @param string $module -- název modulu
+    * @param string $action -- akce
+    * @return type 
+    */
+   protected function callRegisteredModule(Controller $ctrl, $module, $action)
+   {
+      $model = new Actions_Model_Detail();
+      $act = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
+      
+      if($act == false) return false;
+      // base setup variables
+      $ctrl->idItem = $act->{Actions_Model_Detail::COLUMN_ID};
+      $ctrl->subDir = $act[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $ctrl->linkBack = $this->link()->route('detail');
+      
+      $ctrl->view()->name = $act->{Actions_Model_Detail::COLUMN_NAME};
    }
-
-   public function checkFileController() {
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $ctr->checkFileController();
-   }
-
-   public function uploadFileController() {
-      $this->checkWritebleRights();
-      $actModel = new Actions_Model_Detail();
-      $action = $actModel->getAction($this->getRequest('urlkey'),$this->category()->getId());
-//      $action = $actModel->getActionById((int)$this->getRequestParam('addimage_idArt'));
-
-      $ctr = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-
-      if($action !== false) {
-         $ctr->setOption('idArt', $action->{Actions_Model_Detail::COLUMN_ID});
-         $ctr->setOption('subdir', $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR);
-      } else {
-         return false;
-      }
-      $ctr->uploadFileController();
-   }
-
+   
    protected function settings(&$settings,Form &$form) {
       parent::settings($settings, $form);
       $phCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view(), $this->link());

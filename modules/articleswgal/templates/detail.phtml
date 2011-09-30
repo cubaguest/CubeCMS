@@ -35,7 +35,7 @@ echo $this->toolbox;
    <!-- Start Advanced Gallery Html Containers -->
    <div class="main-content-images">
       <?
-      if(count($images) == 0) echo $this->_('Galerie neobsahuje žádný obrázek.');
+      if(count($images) == 0) echo $this->tr('Galerie neobsahuje žádný obrázek.');
       if(count($images) == 1) {$class = 'pirobox';}
       else {$class = 'pirobox_gall';}
       foreach ($images as $image) {

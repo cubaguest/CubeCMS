@@ -1,0 +1,67 @@
+<?
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile("css://photogalery:style.css");
+?>
+<h1><?= $this->tr('Úprava pořadí obrázků z').' '.$this->category()->getName();?></h1>
+<div class="main-content-form-edit ui-widget ui-widget-imageslist">
+   <div id="images-sorter" class="ui-widget-content">
+   <?echo $this->form->renderStart();?>
+   
+   <ul>
+      <?foreach($this->images as $image){?>
+      <li class="ui-state-default">
+         <img src="<?=$this->category()->getModule()->getDataDir(true)
+              .$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+              .$image->{PhotoGalery_Model_Images::COLUMN_FILE}.'?time='.time()?>" 
+              alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" width="70" />
+         <?
+         $this->form->id->setValues($image->{PhotoGalery_Model_Images::COLUMN_ID});
+         echo $this->form->id->controll();
+         ?>
+         <a class="button-delete-image" href="#"
+            title="<?=$this->tr('Smazat')?>"><img src="/images/icons/delete.png" /></a>
+      </li>
+      <?}?>
+   </ul>
+      <hr class="reseter" />   
+   <?
+   echo $this->form->save->controll();
+   
+   echo $this->form->renderEnd();
+   ?>
+      <br />
+      <p class="note"><?
+      echo $this->tr('Obrázky lze přesouvat myší. Po správném nastavení pořadí stačí pozice uložit.');
+      ?></p>
+   </div>
+   <script>
+	$(function() {
+		$( "#images-sorter ul" ).sortable({
+			placeholder: "ui-state-highlight"
+		});
+		$( "#images-sorter ul" ).disableSelection();
+      
+      // delete image
+      $('.button-delete-image').click(function(e){
+         e.preventDefault();
+         // get id
+         var id = $(this).parent('li').find('input.sort_image_id_class').val();
+         var $item = $(this).parent('li');
+         $item.fadeOut(500, function(){
+            // ajax request
+            $.ajax({
+               type: "POST",
+               url: "<?=$this->link()->route('deletephoto')?>",
+               data: {id : id},
+               success: function(msg){
+                  $item.remove();
+               }
+            });
+            
+         });
+      });
+	});
+	</script>
+</div>

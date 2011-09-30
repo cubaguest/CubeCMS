@@ -5,13 +5,20 @@ class Text_Panel extends Panel {
 
 
    public function panelController() {
+      $textM = new Text_Model();
+      $rec = $textM->setSelectAllLangs(false)
+         ->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :sk',
+         array('idc' => $this->category()->getId(), 'sk' => self::TEXT_PANEL_KEY))
+         ->record();
+      if($rec != false AND !$rec->isNew()){
+         $this->template()->text = $rec;
+      }
 	}
 	
 	public function panelView() {
-      $textM = new Text_Model_Detail();
-      $this->template()->text = $textM->getText($this->category()->getId(),self::TEXT_PANEL_KEY);
-      if($this->template()->text == false) return false;
-      $this->template()->addFile('tpl://'.$this->category()->getParam(self::PARAM_TPL_PANEL, "panel.phtml"));
+      if($this->template()->text != null){
+         $this->template()->addFile('tpl://'.$this->category()->getParam(self::PARAM_TPL_PANEL, "text:panel.phtml"));
+      }
 	}
 
    public static function settingsController(&$settings,Form &$form) {

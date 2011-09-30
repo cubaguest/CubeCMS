@@ -9,9 +9,7 @@ input.editimage_ord_class { width: 40px;}
 .ui-widget-upload input[type="checkbox"], .ui-widget-imageslist input[type="checkbox"] { vertical-align: middle;}
 
 
-#upload-files-log {
-   margin:0; padding:0;
-}
+#upload-files-log { margin:0; padding:0;}
 #upload-files-log li{ list-style-position:inside; margin:2px; border:1px solid #ccc; padding:10px; font-size:12px;
                       font-family:Arial, Helvetica, sans-serif; color:#333; background:#fff; position:relative;}
 #upload-files-log li .progressbar { border:1px solid #333; height:5px; background:#fff; overflow: hidden; padding: 0; }
@@ -25,14 +23,18 @@ input.editimage_ord_class { width: 40px;}
    overflow: auto;
    background-color: whitesmoke;
 }
-#edit-photos-list table {
-   table-layout: fixed;
-}
-#edit-photos-list table td {
-   vertical-align: top;
-   padding: 3px;
+#edit-photos-list table { table-layout: fixed;}
+#edit-photos-list table td { vertical-align: top; padding: 3px;}
+#edit-photos-list table textarea { width: 250px;}
+
+#images-sorter { padding: 5px; }
+#images-sorter li {
+   margin: 0px 5px 5px 0; 
+   padding: 5px; 
+   float: left; 
+   width: 70px;
+   height: 70px;
+   position: relative;
 }
 
-#edit-photos-list table textarea {
-   width: 250px;
-}
+.button-delete-image { position: absolute; top: 0; right: 0; }

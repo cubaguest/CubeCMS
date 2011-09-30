@@ -10,20 +10,6 @@ class Photogalery_View extends View {
          $toolEditText->setIcon('page_edit.png')->setTitle($this->tr('Upravit text galerie'));
          $this->toolboxText->addTool($toolEditText);
 
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
-         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit fotky"),
-         $this->link()->route('editphotos'));
-         $toolEditText->setIcon('image_edit.png')->setTitle($this->tr('Upravit fotky'));
-         $toolbox->addTool($toolEditText);
-
-//         if($this->category()->getRights()->isControll()){
-//            $this->toolboxText->setIcon(Template_Toolbox2::ICON_WRENCH);
-//            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
-//            $this->link()->route(Routes::MODULE_SETTINGS));
-//            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
-//            $this->toolboxText->addTool($toolEView);
-//         }
          $this->toolbox = $this->toolboxText;
          
          if($this->text != false){
@@ -42,8 +28,25 @@ class Photogalery_View extends View {
                unset ($obj);
             }
          }
-
-         $this->toolboxImages = $toolbox;
+      }
+      $this->addImagesToolbox();
+   }
+   
+   public function addImagesToolbox()
+   {
+      if($this->category()->getRights()->isWritable()){
+         $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
+         $toolEditImages = new Template_Toolbox2_Tool_PostRedirect('edit_images', $this->tr("Upravit obrázky"),
+         $this->link()->route('editphotos'));
+         $toolEditImages->setIcon('image_edit.png')->setTitle($this->tr('Upravit obrázky'));
+         $toolbox->addTool($toolEditImages);
+         
+         $toolSortImages = new Template_Toolbox2_Tool_PostRedirect('sort_images', $this->tr("Řadit obrázky"),
+         $this->link()->route('sortphotos'));
+         $toolSortImages->setIcon('images.png')->setTitle($this->tr('Řadit obrázky'));
+         $toolbox->addTool($toolSortImages);
+         $this->template()->toolboxImages = $toolbox;
       }
    }
 
@@ -51,48 +54,28 @@ class Photogalery_View extends View {
       Template_Module::setEdit(true);
       $this->template()->addPageTitle($this->tr('úprava obrázků'));
       $this->template()->addPageHeadline($this->tr('úprava obrázků'));
-      $this->template()->addTplFile("editphotos.phtml");
+      $this->template()->addFile("tpl://photogalery:editphotos.phtml");
    }
 
-   public function uploadFileView() {
-
+   public function sortphotosView() {
+      Template_Module::setEdit(true);
+      $this->template()->addPageTitle($this->tr('úprava pořadí obrázků'));
+      $this->template()->addPageHeadline($this->tr('úprava pořadí obrázků'));
+      $this->template()->addFile("tpl://photogalery:sortphotos.phtml");
    }
-   public function checkFileView() {
 
-   }
+   public function uploadFileView() {}
+   
+   public function checkFileView() {}
 
    public function editphotoView() {
       Template_Module::setEdit(true);
-      $this->template()->addTplFile("editphoto.phtml");
-   }
-
-   private function addTinyMCE() {
-      $type = $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced');
-      if($type == 'none') return;
-      $this->form->text->html()->addClass("mceEditor");
-      $this->tinyMCE = new Component_TinyMCE();
-      switch ($type) {
-         case 'simple':
-            $settings = new Component_TinyMCE_Settings_AdvSimple();
-            $settings->setSetting('editor_selector', 'mceEditor');
-            break;
-         case 'full':
-            // TinyMCE
-            $settings = new Component_TinyMCE_Settings_Full();
-            break;
-         case 'advanced':
-         default:
-            $settings = new Component_TinyMCE_Settings_Advanced();
-            break;
-      }
-      $settings->setSetting('height', '600');
-      $this->tinyMCE->setEditorSettings($settings);
-      $this->tinyMCE->mainView();
+      $this->template()->addFile("tpl://photogalery:editphoto.phtml");
    }
 
    public function edittextView() {
       Template_Module::setEdit(true);
-      $this->addTinyMCE();
+      $this->setTinyMCE($this->form->text, $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
       $this->template()->addFile("tpl://edittext.phtml");
    }
 }

@@ -86,10 +86,10 @@ class Text_View extends View {
 
    public function editView() {
       Template_Module::setEdit(true);
-      $this->h1 = sprintf($this->tr('úprava textu "%s"'), $this->category()->getName());
+      $this->h1 = sprintf($this->tr('úprava textu kategorie "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
       $this->addTinyMCE($this->form->text);
-      $this->template()->addTplFile("textedit.phtml");
+      $this->template()->addFile("tpl://text:textedit.phtml");
    }
 
    public function editPrivateView() {

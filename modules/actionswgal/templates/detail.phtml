@@ -5,8 +5,7 @@ $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addJsPlugin(new JsPlugin_PiroBox());
 
-$photosModel = new PhotoGalery_Model_Images();
-$countImages = $photosModel->getCountImages($this->category()->getId(), $this->action->{Actions_Model_Detail::COLUMN_ID});
+$images = $this->images;
 echo $this->toolbox;
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
@@ -55,28 +54,29 @@ echo $this->toolbox;
          ?>
          <hr class="reseter" />
    </div>
-      <?if($countImages > 0) {?>
    <br />
    <h2><?=$this->tr('Fotografie k akci')?></h2>
-   <div class="main-content-images" id="actionImages"><!-- SOF IMAGES -->
-            <?foreach ($this->images as $image) {?>
-         <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                          .URL_SEPARATOR.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-            title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-            <img src="<?=$this->category()->getModule()->getDataDir(true).$this->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-                 alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
-         </a>
-               <?}
-         echo $this->toolboxPhotos;
+   <div class="main-content-images">
+      <?
+      if(count($images) == 0) echo $this->tr('Galerie neobsahuje žádný obrázek.');
+      if(count($images) == 1) {$class = 'pirobox';}
+      else {$class = 'pirobox_gall';}
+      foreach ($images as $image) {
          ?>
-      </div>
+      <a class="<?=$class?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+                    .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+         <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+      </a>
+         <?}
+      echo $this->toolboxImages;?>
+   </div>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
-      <?}?>
    <hr class="reseter" />
    <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
    <?$this->includeTpl('articletools.phtml', true, array(

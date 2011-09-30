@@ -10,34 +10,12 @@ class ArticlesWGal_View extends Articles_View {
    public function showView() {
       $this->createDetailToolbox();
       if($this->toolbox instanceof Template_Toolbox2){
-         $this->toolbox->article_->setConfirmMeassage($this->_('Opravdu smazat galerii?'));
+         $this->toolbox->article_->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
 
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
-         $tool = new Template_Toolbox2_Tool_PostRedirect('edit_galery', $this->_("Upravit fotky"),
-         $this->link()->route('editphotos'));
-         $tool->setIcon('image_edit.png')->setTitle($this->_('Upravit fotky galerie'));
-         $toolbox->addTool($tool);
-         $this->toolboxImages = $toolbox;
+         $pView = new Photogalery_View($this->pCtrl);
+         $pView->addImagesToolbox();
       }
       $this->template()->addFile("tpl://detail.phtml");
-   }
-
-   public function editphotosView() {
-      $this->template()->addFile('tpl://photogalery:editphotos.phtml');
-      Template_Module::setEdit(true);
-   }
-
-   public function editphotoView() {
-      $this->template()->addFile("tpl://photogalery:editphoto.phtml");
-      Template_Module::setEdit(true);
-   }
-
-   public function checkFileView() {
-
-   }
-   public function uploadFileView() {
-
    }
 
    /**

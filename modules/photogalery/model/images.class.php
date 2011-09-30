@@ -118,6 +118,17 @@ class PhotoGalery_Model_Images extends Model_PDO {
       }
    }
 
+   public function setPosition($id, $pos){
+      $dbc = new Db_PDO();
+      // provádí se update
+      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
+                 ." SET ".self::COLUMN_ORDER.' = :pos'
+                 ." WHERE ".self::COLUMN_ID." = :id");
+      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
+      $dbst->bindParam(':pos', $pos, PDO::PARAM_INT);
+      return $dbst->execute();
+   }
+
    /**
     * Metoda smaže zadaný obrázek
     * @param integer $idImg
