@@ -133,7 +133,7 @@ span[title] {
    border-bottom: 1px dashed gray;
 }
 
-.font-small, .note {
+.font-small, .note, .form-legend-text {
    font-size: x-small;
 }
 .ui-widget { /* ui-widgent má normálně 1.1em */
