@@ -1013,10 +1013,10 @@ class AppCore extends TrObject {
          $this->_initDb();
          // config
          $this->_initConfig();
-         // inicializace URL
-         Url_Request::factory();
          // kontrola verze enginu
          $this->checkCoreVersion();
+         // inicializace URL
+         Url_Request::factory();
          //		inicializace sessions
          Session::factory();
          //		Inicializace chybových hlášek
