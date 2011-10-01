@@ -1,8 +1,8 @@
 <?
 if($this->item['name'] != null){?>
-<h2><a href="<?=$this->item['link']?>" title="<?=$this->_('Přejít na').' '.$this->item['name']?>"><?=$this->item['name'];?></a></h2>
+<h2><a href="<?=$this->item['link']?>" title="<?=$this->tr('Přejít na').' '.$this->item['name']?>"><?=$this->item['name'];?></a></h2>
 <?} else {?>
-<h2><a href="<?=$this->item['link']?>" title="<?=$this->_('Přejít na').' '.$this->item['title']?>"><?=vve_tpl_truncate($this->item['title'], 70);?></a></h2>
+<h2><a href="<?=$this->item['link']?>" title="<?=$this->tr('Přejít na').' '.$this->item['title']?>"><?=vve_tpl_truncate($this->item['title'], 70);?></a></h2>
 <?}
 if($this->item['image'] != null){?>
 <img src="<?=$this->item['image']?>" alt="<?=$this->item['imageAlt']?>"/>

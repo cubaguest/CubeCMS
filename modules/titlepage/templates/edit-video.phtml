@@ -1,7 +1,27 @@
-<h1><?=$this->_('Úprava položky s videem')?></h1>
+<?
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+?>
+<h1><?=$this->tr('Úprava položky s videem')?></h1>
 <?
 $this->form->videoObj->html()->setAttrib('rows', 6)->setAttrib('cols', 70);
 echo $this->form;
 ?>
+<!--text_item_videoObj-->
 
-<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('editList')));?>
+<script type="text/javascript">
+   $(document).ready(function(){
+      var container = $('<p></p>').attr('id', 'video-preview');
+      $('textarea[name=text_item_videoObj]').parent().append(container).append('<a href="#" id="test-video"><?=$this->tr('Otestovat')?></a>');
+      // event
+      $('#test-video').click(function(){
+         var videoTag = $('textarea[name=text_item_videoObj]').val().match(/<(?:iframe|object)[^>]*>.*?<\/(?:iframe|object)>/i);
+         if(videoTag.length != 0){
+            videoTag = videoTag[0];
+            container.html(videoTag.replace(/width="[0-9]+"/, 'width="200"').replace(/height="[0-9]+"/, 'height="150"'))
+         }
+         return false;
+      });
+      $('#test-video').click();
+   });
+</script>

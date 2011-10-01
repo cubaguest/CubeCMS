@@ -1,4 +1,4 @@
-<h1><?=$this->_('Úprava položky se článkem')?></h1>
+<h1><?=$this->tr('Úprava položky se článkem')?></h1>
 <?
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
@@ -23,4 +23,3 @@ echo $this->form;
       });
    });
 </script>
-<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('editList')));?>

@@ -21,13 +21,17 @@ class TitlePage_Controller extends Controller {
    public function editListController() {
       $this->checkWritebleRights();
       $this->loadItemsList();
+      
+      
+      // supported modules
+      $this->view()->itemsTypes = $this->getItemTypes();
    }
 
    private function loadItemsList() {
       $modelI = new TitlePage_Model_Items();
 
       $items = $modelI->getItems();
-
+      
       $itemsList = array();
       foreach ($items as $item) {
          $data = $link = $title = $image = $imageAlt = $nameCat = null;
@@ -135,7 +139,7 @@ class TitlePage_Controller extends Controller {
                $dataObj = $action;
 
                $modelCat = new Model_Category();
-               $cat = $modelCat->getCategoryById($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
+               $cat = $modelCat->record($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
 
                if($cat == false OR (string)$cat->{Model_Category::COLUMN_URLKEY} == null) continue; // nepřeložená kategorie nemá url
 
@@ -200,62 +204,61 @@ class TitlePage_Controller extends Controller {
       $this->view()->list = $itemsList;
    }
 
-   public function addSelectItemController() {
-      $this->checkWritebleRights();
-
-      $addItems = array(
+   private function getItemTypes()
+   {
+      return array(
          self::ITEM_TYPE_TEXT => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_TEXT)),
-            'name' => $this->_('Text'),
-            'title' => $this->_('Přidání textové položky'),
-            'desc' => $this->_('Přidání textové položky s obrázkem')
+            'name' => $this->tr('Text'),
+            'title' => $this->tr('Přidání textové položky'),
+            'desc' => $this->tr('Přidání textové položky s obrázkem')
          ),
          self::ITEM_TYPE_MENU => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_MENU)),
-            'name' => $this->_('Menu'),
-            'title' => $this->_('Přidání položky s menu'),
-            'desc' => $this->_('Přidání položky s menu. (např. podmenu nebo rychlá navigace)')
+            'name' => $this->tr('Menu'),
+            'title' => $this->tr('Přidání položky s menu'),
+            'desc' => $this->tr('Přidání položky s menu. (např. podmenu nebo rychlá navigace)')
          ),
          self::ITEM_TYPE_VIDEO => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_VIDEO)),
-            'name' => $this->_('Video'),
-            'title' => $this->_('Přidání položky s videem'),
-            'desc' => $this->_('Přidání položky s videem z některého z video serverů (např. Youtube)')
+            'name' => $this->tr('Video'),
+            'title' => $this->tr('Přidání položky s videem'),
+            'desc' => $this->tr('Přidání položky s videem z některého z video serverů (např. Youtube)')
          ),
          self::ITEM_TYPE_ARTICLE => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ARTICLE)),
-            'name' => $this->_('Článek'),
-            'title' => $this->_('Přidání položky s článkem'),
-            'desc' => $this->_('Přidání položky s existujícím článkem v systému')
+            'name' => $this->tr('Článek'),
+            'title' => $this->tr('Přidání položky s článkem'),
+            'desc' => $this->tr('Přidání položky s existujícím článkem v systému')
          ),
-         self::ITEM_TYPE_ARTICLEWGAL => array(
-            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ARTICLEWGAL)),
-            'name' => $this->_('Článek s galerií'),
-            'title' => $this->_('Přidání položky s článkem s galerií'),
-            'desc' => $this->_('Přidání položky s existujícím článkem s galerií v systému')
-         ),
+//         self::ITEM_TYPE_ARTICLEWGAL => array(
+//            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ARTICLEWGAL)),
+//            'name' => $this->tr('Článek s galerií'),
+//            'title' => $this->tr('Přidání položky s článkem s galerií'),
+//            'desc' => $this->tr('Přidání položky s existujícím článkem s galerií v systému')
+//         ),
+         
          self::ITEM_TYPE_NEWS => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_NEWS)),
-            'name' => $this->_('Novinka'),
-            'title' => $this->_('Přidání položky s novinkou'),
-            'desc' => $this->_('Přidání položky s existující novinkou v systému')
+            'name' => $this->tr('Novinku'),
+            'title' => $this->tr('Přidání položky s novinkou'),
+            'desc' => $this->tr('Přidání položky s existující novinkou v systému')
          ),
          self::ITEM_TYPE_ACTION => array(
             'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ACTION)),
-            'name' => $this->_('Akce'),
-            'title' => $this->_('Přidání položky s akcí'),
-            'desc' => $this->_('Přidání položky s existující akcí v systému')
+            'name' => $this->tr('Akci'),
+            'title' => $this->tr('Přidání položky s akcí'),
+            'desc' => $this->tr('Přidání položky s existující akcí v systému')
          ),
-         self::ITEM_TYPE_ACTIONWGAL => array(
-            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ACTIONWGAL)),
-            'name' => $this->_('Akce s galerií'),
-            'title' => $this->_('Přidání položky s akcí s galerií'),
-            'desc' => $this->_('Přidání položky s existující akcí s galerií v systému')
-         )
+//         self::ITEM_TYPE_ACTIONWGAL => array(
+//            'link' => $this->link()->route('addItem', array('type' => self::ITEM_TYPE_ACTIONWGAL)),
+//            'name' => $this->tr('Akce s galerií'),
+//            'title' => $this->tr('Přidání položky s akcí s galerií'),
+//            'desc' => $this->tr('Přidání položky s existující akcí s galerií v systému')
+//         )
       );
-
-      $this->view()->addItems = $addItems;
    }
+
    public function addItemController() {
       $this->checkWritebleRights();
       switch ($this->getRequest('type')) {
@@ -309,29 +312,31 @@ class TitlePage_Controller extends Controller {
 
    }
 
-   // kontroler pro editaci textu
+   /**
+    * kontroler pro editaci textu
+    * @param type $item 
+    */
    private function editItemTextCtrl($item = null){
       $form = new Form('text_item_');
 
       $this->view()->type = self::ITEM_TYPE_TEXT; // typ editace
 
-
-      $elemName = new Form_Element_Text('name', $this->_('Název'));
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->setLangs();
       $form->addElement($elemName);
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->setLangs();
       $elemText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $form->addElement($elemText);
 
-      $elemNumColumns = new Form_Element_Text('columns', $this->_('Počet sloupců'));
+      $elemNumColumns = new Form_Element_Text('columns', $this->tr('Počet sloupců'));
       $elemNumColumns->setValues(1);
       $elemNumColumns->addValidation(new Form_Validator_IsNumber());
       $elemNumColumns->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemNumColumns);
 
-      $elemImage = new Form_Element_File('image', $this->_('Obrázek'));
+      $elemImage = new Form_Element_File('image', $this->tr('Obrázek'));
       $elemImage->addValidation(New Form_Validator_FileExtension(array('jpg', 'png')));
       $elemImage->setUploadDir($this->category()->getModule()->getDataDir());
       $form->addElement($elemImage);
@@ -346,15 +351,19 @@ class TitlePage_Controller extends Controller {
          // pokud je obrázek přidáme element s checkboxem pro odstranění
          if($item->{TitlePage_Model_Items::COLUMN_IMAGE} != null){
             $image = $item->{TitlePage_Model_Items::COLUMN_IMAGE};
-            $elemDelImg = new Form_Element_Checkbox('delimg', $this->_('Smazat obrázek'));
-            $elemDelImg->setSubLabel(sprintf($this->_('Uložen obrázek: %s'),$item->{TitlePage_Model_Items::COLUMN_IMAGE}));
+            $elemDelImg = new Form_Element_Checkbox('delimg', $this->tr('Smazat obrázek'));
+            $elemDelImg->setSubLabel(sprintf($this->tr('Uložen obrázek: %s'),$item->{TitlePage_Model_Items::COLUMN_IMAGE}));
             $form->addElement($elemDelImg);
          }
       }
 
-      $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($elemSubmit);
 
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route('editList')->reload();
+      }
+      
       if($form->isValid()){
          // mazání
          if($form->image->getValues() != null OR ($form->haveElement('delimg') AND $form->delimg->getValues() == true)){
@@ -382,36 +391,43 @@ class TitlePage_Controller extends Controller {
                  $this->category()->getId(), serialize($form->name->getValues()),
                  $image, $form->columns->getValues(),$id);
 
-         $this->infoMsg()->addMessage($this->_('Položka byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
          $this->link()->route('editList')->reload();
       }
       $this->view()->form = $form;
    }
 
-   // kontroler pro editaci videa
+   /**
+    * kontroler pro editaci videa
+    * @param type $item 
+    */
    private function editItemVideoCtrl($item = null){
       $form = new Form('text_item_');
 
       $this->view()->type = self::ITEM_TYPE_VIDEO; // typ editace
       $modelItems = new TitlePage_Model_Items();
 
-      $elemName = new Form_Element_Text('name', $this->_('Název'));
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->setLangs();
       $form->addElement($elemName);
 
-      $elemVideoObj = new Form_Element_TextArea('videoObj', $this->_('Objekt videa'));
+      $elemVideoObj = new Form_Element_TextArea('videoObj', $this->tr('Objekt videa'));
       $elemVideoObj->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
-      $elemVideoObj->setSubLabel($this->_('Pouze element <object> a jeho obsah'));
+      $elemVideoObj->setSubLabel(htmlspecialchars($this->tr('Pouze element <object> a jeho obsah')));
       $form->addElement($elemVideoObj);
 
-      $elemNumColumns = new Form_Element_Text('columns', $this->_('Počet sloupců'));
+      $elemNumColumns = new Form_Element_Text('columns', $this->tr('Počet sloupců'));
       $elemNumColumns->setValues(1);
       $elemNumColumns->addValidation(new Form_Validator_IsNumber());
       $elemNumColumns->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemNumColumns);
 
-      $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($elemSubmit);
+
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route('editList')->reload();
+      }
 
       $id = null;
       if($item != null){
@@ -420,20 +436,50 @@ class TitlePage_Controller extends Controller {
          $form->name->setValues(unserialize($item->{TitlePage_Model_Items::COLUMN_NAME}));
          $form->columns->setValues($item->{TitlePage_Model_Items::COLUMN_COLUMNS});
       }
+      
+      $videoTag = null;
+      if($form->isSend()){
+//         // get html // háže chyby
+//         $dom_document = new DOMDocument();
+//         $dom_document->recover = true;
+//         $dom_document->strictErrorChecking = false;
+//         try {
+//            $dom_document->loadHTML((string) $form->videoObj->getValues());
+//         } catch (DOMException $exc) {
+//         }
+//
+//         $dom_xpath = new DOMXpath($dom_document);
+//         $videos = $dom_xpath->query("*/iframe|*/object");
+//         if ($videos !== false) {
+//            $videoTag = $dom_document->saveXML($videos->item(0));
+//            Debug::log( $videoTag);
+//         } else {
+//            $elemVideoObj->setError($this->tr('Zadaný kód pro vložení videa není správný nebo podporován'));
+//         }
+         
+         $videos = array();
+         if(preg_match('/<(iframe|object)[^>]*>.*?<\/(iframe|object)>/i', $form->videoObj->getValues(), $videos) !== false){
+            $videoTag = $videos[0];
+         } else {
+            $elemVideoObj->setError($this->tr('Zadaný kód pro vložení videa není správný nebo podporován'));
+         }
+      }
 
       if($form->isValid()){
          // ulož
-         $modelItems->saveItem(self::ITEM_TYPE_VIDEO, strip_tags($form->videoObj->getValues(),'<object><param><embed>'),
+         $modelItems->saveItem(self::ITEM_TYPE_VIDEO, $videoTag,
                  $this->category()->getId(), serialize($form->name->getValues()),
                  $image, $form->columns->getValues(),$id);
 
-         $this->infoMsg()->addMessage($this->_('Položka byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
          $this->link()->route('editList')->reload();
       }
       $this->view()->form = $form;
    }
 
-   // kontroler pro editaci menu
+   /**
+    *  kontroler pro editaci menu
+    */
    private function editItemMenuCtrl($item = null){
       $form = new Form('text_item_');
 
@@ -441,24 +487,28 @@ class TitlePage_Controller extends Controller {
 
       $modelItems = new TitlePage_Model_Items();
 
-      $elemName = new Form_Element_Text('name', $this->_('Název'));
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->setLangs();
       $form->addElement($elemName);
 
-      $elemText = new Form_Element_TextArea('menu', $this->_('Odkazy'));
-      $elemText->setSubLabel($this->_('Seznam odkazů. Může mít i více úrovní. (odkazy uzavřené v tagu "li")'));
+      $elemText = new Form_Element_TextArea('menu', $this->tr('Odkazy'));
+      $elemText->setSubLabel($this->tr('Seznam odkazů. Může mít i více úrovní. (odkazy uzavřené v tagu "li")'));
       $elemText->setLangs();
       $elemText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $form->addElement($elemText);
 
-      $elemNumColumns = new Form_Element_Text('columns', $this->_('Počet sloupců'));
+      $elemNumColumns = new Form_Element_Text('columns', $this->tr('Počet sloupců'));
       $elemNumColumns->setValues(1);
       $elemNumColumns->addValidation(new Form_Validator_IsNumber());
       $elemNumColumns->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemNumColumns);
 
-      $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($elemSubmit);
+
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route('editList')->reload();
+      }
 
       $id = null;
       if($item != null){
@@ -478,28 +528,11 @@ class TitlePage_Controller extends Controller {
 
       if($form->isValid()){
          // výběr odkazů
-//         $menus = $form->menu->getValues();
-
-//         $links = array();
-//         foreach (Locales::getAppLangs() as $key => $value) {
-//            $links[$value] = array();
-//         }
-
-//         foreach ($menus as $lang => $value) {
-//            $matches = array();
-//            preg_match_all('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $value, $matches);
-//            foreach ($matches[0] as $key => $match) {
-//               array_push($links[$lang], array('name' => $matches[2][$key], 'url' => $matches[1][$key]));
-//            }
-//         }
-//         var_dump($links);
-//         var_dump($matches);
-//         flush();
          $modelItems->saveItem(self::ITEM_TYPE_MENU, serialize($form->menu->getValues()),
                  $this->category()->getId(), serialize($form->name->getValues()),
                  $image, $form->columns->getValues(),$id);
 
-         $this->infoMsg()->addMessage($this->_('Položka byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
          $this->link()->route('editList')->reload();
 
          // ulož
@@ -507,57 +540,64 @@ class TitlePage_Controller extends Controller {
       $this->view()->form = $form;
    }
 
+   /**
+    * Kontroler pro editaci článku/novinky nebo akce
+    * @param type $item
+    * @param type $type
+    * @return type 
+    */
    private function editItemArticleCtrl($item = null, $type = self::ITEM_TYPE_ARTICLE) {
       $form = new Form('article_item_');
 
-      $catEmptyMsg = $this->_('Není vytvořena žádná kategorie pro požadovaný panel');
+      $catEmptyMsg = $this->tr('Není vytvořena žádná kategorie pro požadovaný panel');
       switch ($type) {
          case self::ITEM_TYPE_ACTION:
-            $module = 'actions';
-            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s akcí');
-            break;
          case self::ITEM_TYPE_ACTIONWGAL:
-            $module = 'actionswgal';
-            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s akcí s fotogalerií');
+            $modules = array('act' => 'actions', 'actg' => 'actionswgal');
+            $catEmptyMsg = $this->tr('Není vytvořena žádná kategorie s akcí');
             break;
          case self::ITEM_TYPE_NEWS:
-            $module = 'news';
-            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s novinkami');
-            break;
-         case self::ITEM_TYPE_ARTICLEWGAL:
-            $module = 'articleswgal';
-            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s články');
+            $modules = array('n' => 'news');
+            $catEmptyMsg = $this->tr('Není vytvořena žádná kategorie s novinkami');
             break;
          case self::ITEM_TYPE_ARTICLE:
+         case self::ITEM_TYPE_ARTICLEWGAL:
          default:
-            $catEmptyMsg = $this->_('Není vytvořena žádná kategorie s články');
-            $module = 'articles';
+            $modules = array('art' => 'articles', 'artg' => 'articleswgal');
+            $catEmptyMsg = $this->tr('Není vytvořena žádná kategorie s články');
             break;
       }
       $this->view()->type = $type; // typ editace
       $modelItems = new TitlePage_Model_Items();
 
-      $elemName = new Form_Element_Text('name', $this->_('Název'));
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->setLangs();
       $form->addElement($elemName);
 
-      $elemCategory = new Form_Element_Select('category_id', $this->_('Kategorie'));
+      $elemCategory = new Form_Element_Select('category_id', $this->tr('Kategorie'));
       $elemCategory->addValidation(new Form_Validator_IsNumber());
       $elemCategory->addValidation(new Form_Validator_NotEmpty());
       $modelCat = new Model_Category();
-      $cats = $modelCat->getCategoryListByModule($module)->fetchAll();
-      if(empty ($cats)){
+      
+      function createQueryParams($item) { return ':'.$item; }
+      $cats = $modelCat->where(Model_Category::COLUMN_MODULE.' IN ('.  
+         implode(',', array_map('createQueryParams', array_keys($modules))).')', $modules)->records();
+      
+      
+      if($cats == false || empty ($cats)){
          $this->errMsg()->addMessage($catEmptyMsg);
          return false;
       }
+      
       foreach ($cats as $cat) {
-         $elemCategory->setOptions(array(vve_tpl_truncate((string)$cat->{Model_Category::COLUMN_CAT_LABEL},100) => $cat->{Model_Category::COLUMN_CAT_ID}),true);
+         $elemCategory->setOptions(array(vve_tpl_truncate((string)$cat->{Model_Category::COLUMN_CAT_LABEL},100) 
+            => $cat->{Model_Category::COLUMN_CAT_ID}),true);
       }
       $form->addElement($elemCategory);
 
-      $elemArticle = new Form_Element_Select('article_id', $this->_('Článek'));
-      $elemArticle->addValidation(new Form_Validator_IsNumber());
-      $elemArticle->addValidation(new Form_Validator_NotEmpty());
+      $elemItem = new Form_Element_Select('item_id', $this->tr('Položka'));
+      $elemItem->addValidation(new Form_Validator_IsNumber());
+      $elemItem->addValidation(new Form_Validator_NotEmpty());
 
       if($item != null){
          $this->getListController($type, $item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
@@ -566,40 +606,45 @@ class TitlePage_Controller extends Controller {
          $this->getListController($type, reset($cats)->{Model_Category::COLUMN_CAT_ID});
          $arts = $this->view()->list;
       }
-      $elemArticle->setOptions(array($this->_('Aktuální - naposledy přidaný') => 0),true);
+      $elemItem->setOptions(array($this->tr('Aktuální - naposledy přidaný') => 0),true);
       foreach ($arts as $art) {
-         $elemArticle->setOptions(array((string)$art['text'] => $art['id']),true);
+         $elemItem->setOptions(array((string)$art['text'] => $art['id']),true);
       }
-      $form->addElement($elemArticle);
+      $form->addElement($elemItem);
 
-      $elemNumColumns = new Form_Element_Text('columns', $this->_('Počet sloupců'));
+      $elemNumColumns = new Form_Element_Text('columns', $this->tr('Počet sloupců'));
       $elemNumColumns->setValues(1);
       $elemNumColumns->addValidation(new Form_Validator_IsNumber());
       $elemNumColumns->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemNumColumns);
 
-      $elemSubmit = new Form_Element_Submit('save', $this->_('Uložit'));
+      $elemSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($elemSubmit);
+
+      if($form->isSend() && $form->save->getValues() == false){ $this->link()->route('editList')->reload(); }
 
       $id = null;
       if($item != null){
          $id = $item->{TitlePage_Model_Items::COLUMN_ID};
          $form->category_id->setValues($item->{TitlePage_Model_Items::COLUMN_ID_CATEGORY});
-         $form->article_id->setValues($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN});
+         $form->item_id->setValues($item->{TitlePage_Model_Items::COLUMN_ID_EXTERN});
+         $form->columns->setValues($item->{TitlePage_Model_Items::COLUMN_COLUMNS});
       }
 
       if($form->isValid()){
          // ulož
          $modelItems->saveItem($type, null,
                  $form->category_id->getValues(), serialize($form->name->getValues()),
-                 null, $form->columns->getValues(),$id, $form->article_id->getValues());
+                 null, $form->columns->getValues(),$id, $form->item_id->getValues());
 
-         $this->infoMsg()->addMessage($this->_('Položka byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
          $this->link()->route('editList')->reload();
       }
       $this->view()->form = $form;
    }
 
+   
+   
    public function getListController($type = self::ITEM_TYPE_ARTICLE, $idc = 0) {
       $this->checkWritebleRights();
       $idc = $this->getRequestParam('idc', $idc);
@@ -608,7 +653,7 @@ class TitlePage_Controller extends Controller {
          case self::ITEM_TYPE_ARTICLE:
          case self::ITEM_TYPE_ARTICLEWGAL:
          case self::ITEM_TYPE_NEWS:
-            array_push($result,array('id' => 0, 'text' => $this->_('Aktuální - naposledy přidaný')));
+            array_push($result,array('id' => 0, 'text' => $this->tr('Aktuální - naposledy přidaný')));
             $modelArticles = new Articles_Model_List();
             $articles = $modelArticles->getList($idc, 0, 100)->fetchAll();
             foreach ($articles as $art) {
@@ -618,7 +663,7 @@ class TitlePage_Controller extends Controller {
             break;
          case self::ITEM_TYPE_ACTION:
          case self::ITEM_TYPE_ACTIONWGAL:
-            array_push($result,array('id' => 0, 'text' => $this->_('Aktuální - naposledy přidaný')));
+            array_push($result,array('id' => 0, 'text' => $this->tr('Aktuální - naposledy přidaný')));
             $modelActions = new Actions_Model_List();
             $toTime = new DateTime();
             $toTime->modify('+ 1 year');
@@ -629,7 +674,7 @@ class TitlePage_Controller extends Controller {
             }
             break;
          default:
-            $this->errMsg()->addMessage($this->_('Nepodporovaný typ seznamu'));
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ seznamu'));
             break;
       }
 
@@ -642,14 +687,14 @@ class TitlePage_Controller extends Controller {
       $modelItems = new TitlePage_Model_Items();
 
       $modelItems->setPositions($this->getRequestParam('item'));
-      $this->infoMsg()->addMessage($this->_('Pozice byla uložena'));
+      $this->infoMsg()->addMessage($this->tr('Pozice byla uložena'));
    }
 
    public function deleteItemController() {
       $this->checkWritebleRights();
       $modelItems = new TitlePage_Model_Items();
       $modelItems->deleteItem($this->getRequestParam('delete_id'));
-      $this->infoMsg()->addMessage($this->_('Položka byla smazána'));
+      $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
       $this->link()->route('editList')->reload();
    }
 

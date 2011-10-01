@@ -1,19 +1,17 @@
 <?
 $this->addCssFile("style.css");
 // do titulku
-$this->addPageTitle($this->_('Úprava pořadí prvků'));
-$this->addPageHeadline($this->_('Úprava pořadí prvků'));
+$h = $this->tr('Úprava pořadí prvků');
+$this->addPageTitle($h);
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUISortable();
 
 $this->addJsPlugin($jQuery);
 
-?>
-
-<div id="items-editlist-form">
-      <br />
-      <br />
+echo $this->toolbox;?>
+<h1><?=$h?></h1>
+<div class="main-content-form-edit" id="items-editlist-form">
    <ul id="title-page-items">
       <?  foreach ($this->list as $item) {
          switch ($item['type']) {
@@ -40,21 +38,21 @@ $this->addJsPlugin($jQuery);
                }
          
          ?>
-      <li id="item_<?=$item['id']?>" class="ui-widget columns-<?=$item['cols']?>">
+      <li id="item_<?=$item['id']?>" class="ui-widget columns-<?=$item['cols']?> item-type-<?=$item['type']?>">
          <div class="ui-widget-header title-bar">
             <div class="title-bar-right">
                <form method="post" name="form-delete-item" action="<?=$this->link()?>">
                   <input type="submit" class="ui-icon ui-icon-close" name="delete" value="" />
                   <input type="hidden" name="delete_id" value="<?=$item['id']?>" />
                </form>
-               <a href="<?=$this->link()->route('editItem',array('id' => $item['id']));?>" title="<?=$this->_('Upravit');?>" class="ui-icon ui-icon-pencil"></a>
+               <a href="<?=$this->link()->route('editItem',array('id' => $item['id']));?>" title="<?=$this->tr('Upravit');?>" class="ui-icon ui-icon-pencil"></a>
             </div>
             <div class="title-bar-left">
                <?
                if($item['name'] != null){
                   echo $item['name'];
                } else {
-                  echo '<em>'.$this->_('Bez názvu').'</em>';
+                  echo '<em>'.$this->tr('Bez názvu').'</em>';
                }
                ?>
             </div>
@@ -63,9 +61,9 @@ $this->addJsPlugin($jQuery);
          <div class="ui-widget-content item-content">
             <?
             if((string)$item['nameCat'] != null){
-               echo $this->_('Kategorie').':&nbsp;'.'<a href="'.$item['linkCat'].'" title="'.$item['nameCat'].'">'.$item['nameCat'].'</a>';
+               echo $this->tr('Kategorie').':&nbsp;'.'<a href="'.$item['linkCat'].'" title="'.$item['nameCat'].'">'.$item['nameCat'].'</a>';
             } else {
-               echo $this->_('Kategorie').':&nbsp;'.$this->category()->getName();
+               echo $this->tr('Kategorie').':&nbsp;'.$this->category()->getName();
             }
             $this->item = $item;
             $this->includeTpl($tpl);
@@ -75,13 +73,12 @@ $this->addJsPlugin($jQuery);
       <?}?>
    </ul>
    <hr class="reseter" />
-   <?echo $this->toolbox;?>
-   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()));?>
    <script type="text/javascript">
       $(function() {
          $("#title-page-items").sortable({
             handle: 'div.ui-widget-header',
             placeholder: 'ui-state-highlight',
+            opacity: 0.6 ,
             start : function(event, ui){
                $("li.ui-state-highlight", this).height(ui.item.height());
                $("li.ui-state-highlight", this).width(ui.item.width());
@@ -91,11 +88,12 @@ $this->addJsPlugin($jQuery);
                   type: "POST", url: "<?=$this->link()->route('changePosition')?>",
                   data: $('#title-page-items').sortable('serialize').toString()
                });
-            }
+            }, 
+            stop : function(event, ui){}
          });
 
          $('form[name=form-delete-item]').submit(function(){
-            if(confirm('<?=$this->_('Opravdu smazat?');?>') != true) return false
+            if(confirm('<?=$this->tr('Opravdu smazat?');?>') != true) return false
             var $form = $(this);
             var $li = $(this).parents('li');
             $.ajax({

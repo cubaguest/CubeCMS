@@ -16,10 +16,16 @@ class TitlePage_Model_Items extends Model_PDO {
    const COLUMN_ID_CATEGORY = 'id-category';
    const COLUMN_ID_EXTERN = 'id-external';
 
+   private $usersTable = null;
 
-   
+   public function __construct()
+   {
+      $modelUsers = new Model_Users();
+      $this->usersTable = $modelUsers->getTableName();
+      parent::__construct();
+   }
 
-   /**
+      /**
     * Metoda uloží prvek do db
     *
     * @param string -- typ prvku (konstanta kontroleru)
@@ -83,6 +89,15 @@ class TitlePage_Model_Items extends Model_PDO {
               ." AND tbr.`".Model_Rights::COLUMN_RIGHT."` LIKE 'r__')"
               ." ORDER BY `".self::COLUMN_ORDER."` ASC"
               );
+//      echo "SELECT tbi.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tbi"
+//              ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS tbc"
+//              ." ON tbc.`".Model_Category::COLUMN_CAT_ID."` = tbi.`".self::COLUMN_ID_CATEGORY."`"
+//              ." JOIN ".Model_Rights::getRightsTable()." AS tbr "
+//              ."ON tbr.`".Model_Rights::COLUMN_ID_CATEGORY."` = tbc.`".Model_Category::COLUMN_CAT_ID."`"
+//              ." WHERE (tbr.`".Model_Rights::COLUMN_ID_GROUP."` = ".Auth::getGroupId()
+//              ." AND tbr.`".Model_Rights::COLUMN_RIGHT."` LIKE 'r__')"
+//              ." ORDER BY `".self::COLUMN_ORDER."` ASC";
+              
 //      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindValue(":idgrp", Auth::getGroupId(), PDO::PARAM_INT);
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -165,7 +180,7 @@ class TitlePage_Model_Items extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
               . $wherePub // public
@@ -192,7 +207,7 @@ class TitlePage_Model_Items extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
               . $wherePub // public
@@ -218,7 +233,7 @@ class TitlePage_Model_Items extends Model_PDO {
       
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." WHERE (article.".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat)"
               . $whereP
@@ -268,7 +283,7 @@ class TitlePage_Model_Items extends Model_PDO {
       }
       $dbst = $dbc->prepare("SELECT article.*, user.".Model_Users::COLUMN_USERNAME.", cats.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()." AS curlkey"
               ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
-              ." JOIN ".Model_Users::getUsersTable()." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
+              ." JOIN ".$this->usersTable." AS user ON article.".Articles_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cats ON article.".Articles_Model_Detail::COLUMN_ID_CATEGORY
               ." = cats.".Model_Category::COLUMN_CAT_ID

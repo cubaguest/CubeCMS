@@ -4,9 +4,9 @@ class TitlePage_View extends View {
       $this->template()->addTplFile('main.phtml');
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('item', $this->_('Upravit položky'),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('item', $this->tr('Upravit položky'),
                  $this->link()->route('editList'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_("upravit zobrazené položky"));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->tr("upravit zobrazené položky"));
          $toolbox->addTool($toolAdd);
          $this->template()->toolbox = $toolbox;
       }
@@ -16,19 +16,26 @@ class TitlePage_View extends View {
       $this->template()->addTplFile('editlist.phtml');
 
       if($this->category()->getRights()->isWritable()) {
-         $toolbox = new Template_Toolbox2();
+         $this->toolbox = new Template_Toolbox2();
+         $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
 
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('item', $this->_('Přidat položku'),
-                 $this->link()->route('addSelectItem'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_("Přidat novou položku"));
-         $toolbox->addTool($toolAdd);
-         $this->template()->toolbox = $toolbox;
+         
+//         $this->view()->itemsTypes
+         // položky
+         foreach ($this->itemsTypes as $type => $data) {
+            $toolAdd = new Template_Toolbox2_Tool_PostRedirect('item_'.$type, sprintf($this->tr('Přidat %s'), $data['name']),
+                 $data['link']);
+            $toolAdd->setIcon('page_add.png')->setTitle($data['title']);
+            $this->toolbox->addTool($toolAdd);
+         }
+         
+         $toolClose = new Template_Toolbox2_Tool_PostRedirect('close', $this->tr('Zavřít úpravu'),
+                 $this->link()->route());
+         $toolClose->setIcon('cancel.png')->setTitle($this->tr("Zavřít úpravu"));
+         $this->toolbox->addTool($toolClose);
       }
    }
 
-   public function addSelectItemView() {
-      $this->template()->addTplFile('addselect.phtml');
-   }
    public function addItemView() {
       switch ($this->type) {
          case TitlePage_Controller::ITEM_TYPE_TEXT:
@@ -53,6 +60,9 @@ class TitlePage_View extends View {
             break;
       }
       $this->edit = false;
+      
+      $this->setTinyMCE($this->form->text, 'simple');
+      
    }
 
    public function editItemView() {

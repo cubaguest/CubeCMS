@@ -4,11 +4,8 @@ if($this->item['name'] != null){
 }
 
 $width = (266)*$this->item['cols']+($this->item['cols']-1)*2;
-$height = 176;
-
-
+$height = 176*$this->item['cols'];
 //přepis rozměrů
-
 $video = preg_replace(array('/width="[0-9]+"/', '/height="[0-9]+"/'),
         array('width="'.$width.'"', 'height="'.$height.'"'), $this->item['data']);
 echo $video;
