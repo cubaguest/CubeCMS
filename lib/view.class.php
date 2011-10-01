@@ -265,6 +265,9 @@ abstract class View extends TrObject {
       } else {
          switch ($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, $theme)) {
             case 'simple':
+               $settings = new Component_TinyMCE_Settings_AdvSimple();
+               break;
+            case 'simple2':
                $settings = new Component_TinyMCE_Settings_AdvSimple2();
                break;
             case 'full':
