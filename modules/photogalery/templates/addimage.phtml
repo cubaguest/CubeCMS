@@ -5,7 +5,7 @@
          <p><strong><?=$this->tr('Obrázky')?>:</strong>
             <span id="spanButtonPlaceholder"></span>
             <button name="upload-button"><?=$this->tr('Vybrat obrázky')?></button>
-            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /><br /></p>
+            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /> (<?=$this->tr('Vypněte, pokud obrázky mají širokoúhlý poměr stran')?>)<br /></p>
          <p class="note"><?= $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
          může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
          Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
@@ -38,8 +38,8 @@
          flash_url : "<?=Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload.swf",
          flash9_url : "<?=Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload_fp9.swf",
          custom_settings : { // added setting for JQuery SWFUpload plugin
-            r_width: <?=$this->category()->getParam('medium_width',Photogalery_Controller::MEDIUM_WIDTH)?>,
-            r_height: <?=$this->category()->getParam('medium_height',Photogalery_Controller::MEDIUM_HEIGHT)?>,
+            r_width: <?=$this->category()->getParam('medium_width',Photogalery_Controller::MEDIUM_WIDTH)+200?>,
+            r_height: <?=$this->category()->getParam('medium_height',Photogalery_Controller::MEDIUM_HEIGHT)+200?>,
             r_quality: 100
          }
       });
