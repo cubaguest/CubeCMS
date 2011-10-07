@@ -5,8 +5,15 @@ class Photogalery_Routes extends Routes {
    function initRoutes() {
       $reg = $replace = null;
       if($this->itemKey != null){
-         $reg = '::'.$this->itemKey.'::/';
-         $replace = '{'.$this->itemKey.'}/';
+         if(is_string($this->itemKey)){
+            $reg = '::'.$this->itemKey.'::/';
+            $replace = '{'.$this->itemKey.'}/';
+         } else if(is_array($this->itemKey)){
+            foreach ($this->itemKey as $key) {
+               $reg .= '::'.$key.'::/';
+               $replace .= '{'.$key.'}/';
+            }
+         }
       }
       
       $this->addRoute('editphoto', $reg."editphotos/editphoto-::id::", 'editphoto', $replace."editphotos/editphoto-{id}/");
