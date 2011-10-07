@@ -93,11 +93,11 @@ class Text_Controller extends Controller {
     * @param const $subkey 
     * @return Model_ORM_Record
     */
-   private function loadData($subkey = self::TEXT_MAIN_KEY)
+   protected function loadData($subkey = self::TEXT_MAIN_KEY, $loadAllLangs = true)
    {
       $textRecord = $this->textModel->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
          array('idc' => $this->category()->getId(), 'subkey' => $subkey))
-         ->record();
+         ->setSelectAllLangs($loadAllLangs)->record();
       return $textRecord;
    }
 
@@ -106,7 +106,7 @@ class Text_Controller extends Controller {
     * @param Model_ORM_Record $rec
     * @return Form 
     */
-   private function createEditForm($rec)
+   protected function createEditForm($rec)
    {
       $form = new Form("text_");
       
@@ -134,9 +134,20 @@ class Text_Controller extends Controller {
       return $form;
    }
 
-   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY)
+   /**
+    * Metoda zpracuje data a uloží je do modelu
+    * @param Form $form -- objekt formuláře
+    * @param type $textRec -- objekt záznamu v db
+    * @param type $subkey -- subklíč dat
+    * @param type $elementName -- název elementu s daty
+    */
+   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text')
    {
-      $text = vve_strip_html_comment($form->text->getValues());
+      if(!isset ($form->{$elementName})){
+         throw new InvalidArgumentException($this->tr('Nebyl předán správný název formulářového prvku s daty'));
+      }
+      
+      $text = vve_strip_html_comment($form->{$elementName}->getValues());
       if ($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false) {
          foreach ($text as $lang => $t) {
             $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
@@ -244,7 +255,6 @@ class Text_Controller extends Controller {
 
       if($form->isValid()){
          try {
-            
             $this->processFormData($form, $textRec, self::TEXT_PRIVATE_KEY);
             $this->log('Úprava privátního textu');
             // uložíme skupiny

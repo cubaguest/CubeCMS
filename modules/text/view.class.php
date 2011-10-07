@@ -21,7 +21,7 @@ class Text_View extends View {
          if($modelP->havePanels($this->category()->getId()) == true){
             $toolEP = new Template_Toolbox2_Tool_PostRedirect('edit_textpanel', $this->tr('Upravit text panelu'),
                  $this->link()->route('editpanel'));
-            $toolEP->setIcon('page_edit.png')->setTitle($this->tr("Upravit text v panel"));
+            $toolEP->setIcon('page_edit.png')->setTitle($this->tr("Upravit text v panelu"));
             $toolbox->addTool($toolEP);
          }
 
@@ -88,7 +88,7 @@ class Text_View extends View {
       Template_Module::setEdit(true);
       $this->h1 = sprintf($this->tr('úprava textu kategorie "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
-      $this->addTinyMCE($this->form->text);
+      $this->setTinyMCE($this->form->text, $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced'));
       $this->template()->addFile("tpl://text:textedit.phtml");
    }
 
@@ -99,36 +99,11 @@ class Text_View extends View {
    }
 
    public function editPanelView() {
-      $this->editView();
-      $this->h1 = sprintf($this->tr('úprava textu panelu "%s"'), $this->category()->getName());
+      Template_Module::setEdit(true);
+      $this->h1 = sprintf($this->tr('úprava textu panelu kategorie "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
-   }
-
-   protected function addTinyMCE(Form_Element $element, $type = null) {
-      if($type == null){
-         $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
-      }
-      if($type == 'none') return;
-      $element->html()->addClass("mceEditor_".$type);
-      $this->tinyMCE = new Component_TinyMCE();
-      switch ($type) {
-         case 'simple':
-            $settings = new Component_TinyMCE_Settings_AdvSimple();
-            break;
-         case 'full':
-            // TinyMCE
-            $settings = new Component_TinyMCE_Settings_Full();
-            $settings->setSetting('height', '600');
-            break;
-         case 'advanced':
-         default:
-            $settings = new Component_TinyMCE_Settings_Advanced();
-            $settings->setSetting('height', '600');
-            break;
-      }
-      $settings->setSetting('editor_selector', 'mceEditor_'.$type);
-      $this->tinyMCE->setEditorSettings($settings);
-      $this->tinyMCE->mainView();
+      $this->setTinyMCE($this->form->text, 'simple');
+      $this->template()->addFile("tpl://text:textedit.phtml");
    }
 
    public function exportTextHtmlView() {
