@@ -44,7 +44,7 @@ function vve_cr_url_key($string, $removeSlashes = true)
       $replacements = array('', '-', URL_SEPARATOR);
       $string = preg_replace($regexp, $replacements, $string);
    }
-   return $string;
+   return strtolower($string);
 }
 
 /**
