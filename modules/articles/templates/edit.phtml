@@ -2,6 +2,8 @@
 $this->addCssFile("style.css");
 $jq = new JsPlugin_JQuery();
 $jq->addUIDatepicker();
+$jq->addUIResizable();
+$jq->addUIDialog();
 $this->addJsPlugin($jq);
 // do titulku
 if($this->edit) {
@@ -20,19 +22,43 @@ $this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
 if($this->form->haveElement('textPrivate')){
    $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 }
+if(isset ($this->form->titleImage)){
+   $this->form->titleImage->setSubLabel('<a href="'.$this->link().'#select-title-image" id="button-open-image-select" title="'
+      .$this->tr('Vybrat z již uložených obrázků').'">'.$this->tr('Vybrat z galerie').'</a>');
+}
 // datepickery
 $this->form->created_date->html()->addClass('datepicker');
 ?>
 <h1><?=$h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
    <?echo($this->form);?>
+   <?if(isset ($this->form->titleImage)){?>
+   <div id="dialog-title-image" title="<?=$this->tr('Výběr titulního obrázku')?>">
+      <?foreach ($this->form->titleImage->getOptions() as $key => $image) {
+         if($image == null){
+            echo '<a href="'.$this->link().'#" class="button-select-title-image" data-file="" >'.$key.'</a>';
+         } else {
+            echo '<a href="'.$this->link().'#'.$image.'" class="button-select-title-image" data-file="'.$image.'" title="'.$image.'">'
+               .vve_tpl_image_tag(vve_tpl_art_title_image($image), $image, 100, 100).'</a>';
+         }
+      }?>
+   </div>
+   <?}?>
+   </div>
    <script type="text/javascript">
    /* <![CDATA[ */
    $(document).ready(function(){
-         $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
-         //$.datepicker.regional['<?=Locales::getLang()?>']
-         //$.datepicker.regional['<?=Locales::getLang()?>']
-         $("input.datepicker").datepicker();
+      $.datepicker.setDefaults(['<?= Locales::getLang() ?>'] ) ;
+      $("input.datepicker").datepicker();
+      $('#button-open-image-select').click(function(e){
+         e.preventDefault();
+         $( "#dialog-title-image" ).dialog({width: 560, height: 365, resizable : true});          
+      });
+      $('.button-select-title-image').click(function(e){
+         e.preventDefault();
+         $('select[name="ardicle_titleImage"]').val($(this).data('file'));
+         $( "#dialog-title-image" ).dialog('close');
+      });
    });
    /* ]]> */
    </script>

@@ -25,6 +25,7 @@ class Articles_Model extends Model_ORM {
    const COLUMN_ID = 'id_article';
    const COLUMN_SHOWED = 'viewed';
    const COLUMN_CONCEPT = 'concept';
+   const COLUMN_TITLE_IMAGE = 'title_image';
 
    const COLUMN_A_H_U_ID_ARTICLE = 'id_article';
    const COLUMN_A_H_U_ID_USER = 'id_user';
@@ -51,6 +52,7 @@ class Articles_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_CONCEPT, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       $this->addColumn(self::COLUMN_SHOWED, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
 
+      $this->addColumn(self::COLUMN_TITLE_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
       

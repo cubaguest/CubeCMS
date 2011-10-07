@@ -376,6 +376,9 @@ class Articles_Controller extends Controller {
          $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          $editForm->created_date->setValues(vve_date('%x',$addTime));
          $editForm->created_time->setValues(vve_date('%X',$addTime));
+         if(isset ($editForm->titleImage)){
+            $editForm->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
+         }
       }
 
       if($editForm->isSend() AND $editForm->save->getValues() == false){
@@ -559,6 +562,16 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
       $artRecord->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
 
+      if(isset ($form->titleImage)){
+         $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $form->titleImage->getValues();
+      }
+      // title image
+      if(isset ($form->titleImageUpload) AND $form->titleImageUpload->getValues() != null){
+         $image = new Filesystem_File_Image($form->titleImageUpload);
+         $image->saveAs(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR, VVE_ARTICLE_TITLE_IMG_W, VVE_ARTICLE_TITLE_IMG_H, true);
+         $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $image->getName();
+      }
+      
       $lastId = $model->save($artRecord);
       $this->infoMsg()->addMessage($this->tr('Uloženo'));
       return $lastId;
@@ -629,11 +642,6 @@ class Articles_Controller extends Controller {
 
       $fGrpParams = $form->addGroup('params', $this->tr('Parametry'));
 
-//      $eImage = new Form_Element_File('image', $this->tr('Obrázek'));
-//      $eImage->addValidation(new Form_Validator_FileExtension('jpg'));
-//      $eImage->setUploadDir($this->category()->getModule()->getDataDir());
-//      $form->addElement($eImage, $fGrpParams);
-
       $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $iUrlKey->setLangs();
       $iUrlKey->setSubLabel($this->tr('Pokud není klíč zadán, je generován automaticky'));
@@ -647,6 +655,28 @@ class Articles_Controller extends Controller {
       $iDesc->setLangs();
       $iDesc->setSubLabel($this->tr('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
       $form->addElement($iDesc, $fGrpParams);
+      
+      $eImage = new Form_Element_File('titleImageUpload', $this->tr('Titulní obrázek'));
+      $eImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
+      $form->addElement($eImage, $fGrpParams);
+      
+      if(is_dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR)){
+         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png}", GLOB_BRACE);
+         //print each file name
+         if(!empty ($images)){
+            $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené obrázky'));
+            $elemImgSel->setOptions(array($this->tr('Žádný') => null));
+            
+            foreach($images as $image) {
+               $elemImgSel->setOptions(array(basename($image) => basename($image)), true);
+            }
+            
+            $form->addElement($elemImgSel, $fGrpParams);
+         }
+            
+      }
+      
+      $fGrpPublic = $form->addgroup('public', $this->tr('Paramtry zveřejnění a vytvoření'));
 
       // pokud jsou práva pro kontrolu, přidám položku s uživateli, kterí mohou daný článek vytvořit
       if($this->category()->getRights()->isControll()){
@@ -658,10 +688,8 @@ class Articles_Controller extends Controller {
             $eCreator->setOptions(array($name => $user->{Model_Users::COLUMN_ID}),true);
          }
          $eCreator->setValues(Auth::getUserId());
-         $form->addElement($eCreator, $fGrpParams);
+         $form->addElement($eCreator, $fGrpPublic);
       }
-
-      $fGrpPublic = $form->addgroup('public', $this->tr('Paramtry zveřejnění a vytvoření'));
 
       $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
       $iConcept->setSubLabel($this->tr('Pokud je položka koncept, je viditelná pouze autorovi a administrátorům.'));

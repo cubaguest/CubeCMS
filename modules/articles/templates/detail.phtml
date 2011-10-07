@@ -4,6 +4,12 @@ $h1 = $this->article->{Articles_Model::COLUMN_NAME};
 $piroBox = new JsPlugin_PiroBox();
 $this->addJsPlugin($piroBox);
 echo $this->toolbox;
+
+$image = null;
+if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
+   $image = vve_tpl_image_tag(
+      vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), $this->article->{Articles_Model::COLUMN_NAME}, 100, 100, array('image-left'));
+}
 ?>
 
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');
@@ -14,9 +20,17 @@ echo $this->toolbox;
 
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
-   <div class="main-content-annotation"><?=$this->filter((string)$this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));?></div>
+   <div class="main-content-annotation"><?
+      echo $image;$image = null;
+      echo $this->filter((string)$this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));
+      ?>
+   <hr class="reseter" />
+   </div>
    <?}?>
-   <div class="main-content-text"><?=$this->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'))?></div>
+   <div class="main-content-text"><?
+      echo $image;
+      echo $this->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'));
+    ?></div>
    <hr class="reseter" />
    <?$this->includeTpl('privateText.phtml', false,null,'articles');?>
    <br />

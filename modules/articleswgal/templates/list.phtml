@@ -18,8 +18,19 @@ echo $this->toolbox;
          }
          $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          // hlavní obrázek
-         $mainImage = $imagesM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID},1)->fetch();
-
+         $mainImage = false;
+         if($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null){
+            $mainImage = vve_tpl_image_tag(
+               vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}),$article->{Articles_Model::COLUMN_NAME}, 100, 100);
+         } else {
+            $img = $imagesM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID},1)->fetch();
+            if($img != false){
+               $mainImage = vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+                  .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+                  .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                  .$img->{PhotoGalery_Model_Images::COLUMN_FILE}, $img->{PhotoGalery_Model_Images::COLUMN_NAME}, 100, 100);
+            }
+         }
          ?>
    <div class="main-content-list-record <?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
@@ -28,17 +39,7 @@ echo $this->toolbox;
              <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a><?='<span class="font-small">'.$public.'</span>'?>
       </h2>
-            <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
-            if($mainImage != false) {
-               ?>
-      <div class="main-content-list-record-image"><?
-         echo vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
-                          .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                          .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                          .$mainImage->{PhotoGalery_Model_Images::COLUMN_FILE},
-                          $mainImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 140, 100);
-         ?></div><?
-         }?>
+      <?if($mainImage != false) {?><div class="main-content-list-record-image"><?echo $mainImage;?></div><?}?>
       <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
          <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
       <?} else if((string)$article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>

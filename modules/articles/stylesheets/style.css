@@ -28,3 +28,15 @@
 ul.archiveYear {
    margin-left: 18px;
 }
+
+.button-select-title-image {
+   width: 100px;
+   height: 100px;
+   margin: 2px;
+   padding: 1px;
+   border: 1px solid gray;
+   float: left;
+}
+#dialog-title-image {
+   display: none;
+}

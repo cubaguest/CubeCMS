@@ -15,6 +15,19 @@ echo $this->toolbox;
             $showClass = 'main-content-concept';
             $public = $this->tr('Koncept');
          }
+         $image = null;
+         if($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null){
+            $image = vve_tpl_image_tag(
+               vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}),$article->{Articles_Model::COLUMN_NAME}, 100, 100);
+         } else {
+            $doc = new DOMDocument();
+            @$doc->loadHTML($article->{Articles_Model::COLUMN_TEXT});
+            $xml = simplexml_import_dom($doc); // just to make xpath more simple
+            $images = $xml->xpath('//img');
+            if(!empty ($images) && isset ($images[0])){
+               $image = vve_tpl_image_tag($images[0]['src'], $images[0]['alt'] != null ? $images[0]['alt'] : "article title image", 100, 100);
+            }
+         }
          ?>
    <div class="main-content-list-record <?=$showClass?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
@@ -23,6 +36,7 @@ echo $this->toolbox;
              <?=  vve_date("%x %X", new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
          </a><?='<span class="font-small">'.$public.'</span>'?>
       </h2>
+      <? if($image != null) {?><div class="main-content-list-record-image"><?=$image?></div><?}?>
       <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
          <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
       <?} else {?>

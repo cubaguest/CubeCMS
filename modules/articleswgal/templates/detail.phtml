@@ -6,29 +6,32 @@ $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
 $this->addJsPlugin(new JsPlugin_PiroBox());
 $images = $this->images;
 echo $this->toolbox;
+
+$image = null;
+if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
+   $image = vve_tpl_image_tag(
+      vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), $this->article->{Articles_Model::COLUMN_NAME}, 100, 100, array('image-left'));
+} else if(!empty ($images) AND $images != false){
+   $randImage = reset($images);
+   $image = (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+      . $this->websubdir . Photogalery_Controller::DIR_SMALL . URL_SEPARATOR
+      . $randImage->{PhotoGalery_Model_Images::COLUMN_FILE}, $randImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 130, 100));
+}
+
 ?>
 <h1><?=$this->article->{Articles_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
    <?if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
-         <div class="main-content-annotation"><?echo $this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?>
-   </div>
-   <?}?>
-   <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
-   if(!empty ($images) AND $images != false) {?>
-   <div class="main-content-image">
-         <?
-         $randImage = reset($images);
-         print (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
-                 .$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                 .$randImage->{PhotoGalery_Model_Images::COLUMN_FILE},
-                 $randImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 130, 100));
-         ?>
+         <div class="main-content-annotation"><?
+         if($image != null) {?><div class="main-content-image"><?=$image?></div><? $image = null;}
+         echo $this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?>
+      <hr class="reseter" />
    </div>
    <?}?>
    <div class="main-content-text">
-      <?if((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT} != null){?>
-         <?=$this->article->{Articles_Model_Detail::COLUMN_TEXT}?>
-      <?}?>
+      <?
+      echo $this->article->{Articles_Model_Detail::COLUMN_TEXT};
+      ?>
       <hr class="reseter" />
    </div>
    <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
