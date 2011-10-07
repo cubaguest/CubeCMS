@@ -34,7 +34,7 @@ INSERT INTO `cubecms_global_config_groups` (`id_group`, `name_cs`, `name_sk`, `n
 
 
 INSERT INTO `cubecms_global_config` (`key`, `label`, `value`, `protected`, `type`, `id_group`) VALUES
-('ARTICLES_TITLE_IMG_W', 'Titulní obrázek článku - šířka', 100, false, 'number', 7),
-('ARTICLES_TITLE_IMG_H', 'Titulní obrázek článku - výška', 100, false, 'number', 7),
-('ARTICLES_TITLE_IMG_DIR', 'Titulní obrázek článku - adresář', 'title-images', false, 'text', 7);
+('ARTICLE_TITLE_IMG_W', 'Titulní obrázek článku - šířka', 100, false, 'number', 7),
+('ARTICLE_TITLE_IMG_H', 'Titulní obrázek článku - výška', 100, false, 'number', 7),
+('ARTICLE_TITLE_IMG_DIR', 'Titulní obrázek článku - adresář', 'title-images', false, 'text', 7);
 /* END_UPDATE */
