@@ -263,7 +263,7 @@ abstract class View extends TrObject {
       if($theme instanceof Component_TinyMCE_Settings){
          $this->tinyMCE->setEditorSettings($theme);
       } else {
-         switch ($this->category()->getParam(Articles_Controller::PARAM_EDITOR_TYPE, $theme)) {
+         switch ($theme) {
             case 'simple':
                $settings = new Component_TinyMCE_Settings_AdvSimple();
                break;
