@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.5
+-- version 3.4.0
 -- http://www.phpmyadmin.net
 --
 -- Počítač: localhost
--- Vygenerováno: Pát 07. říj 2011, 07:34
+-- Vygenerováno: Úte 21. čen 2011, 08:34
 -- Verze MySQL: 5.1.54
 -- Verze PHP: 5.3.5-1ubuntu7.2
 
@@ -11,8 +11,122 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
--- Databáze: `cabinet`
+-- Databáze: `hotelpraha`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `cubecms_global_config`
+--
+
+DROP TABLE IF EXISTS `cubecms_global_config`;
+CREATE TABLE IF NOT EXISTS `cubecms_global_config` (
+  `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(50) NOT NULL,
+  `label` varchar(1000) DEFAULT NULL,
+  `value` text,
+  `values` varchar(200) DEFAULT NULL,
+  `protected` tinyint(1) NOT NULL DEFAULT '0',
+  `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
+  `id_group` smallint(6) NOT NULL DEFAULT '0',
+  `callback_func` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id_config`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=107 ;
+
+--
+-- Vypisuji data pro tabulku `cubecms_global_config`
+--
+
+INSERT INTO `cubecms_global_config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
+(1, 'DEFAULT_ID_GROUP', NULL, '2', NULL, 0, 'number', 3, NULL),
+(2, 'DEFAULT_GROUP_NAME', NULL, 'guest', NULL, 0, 'string', 3, NULL),
+(3, 'DEFAULT_USER_NAME', NULL, 'anonym', NULL, 0, 'string', 3, NULL),
+(4, 'APP_LANGS', 'Všechny vybrané jazyky aplikace', 'cs', 'cs;en;de;ru;sk', 0, 'listmulti', 8, NULL),
+(5, 'DEFAULT_APP_LANG', 'Výchozí jazyk aplikace. Tento jazyk je potom u většiny položek povinný.', 'cs', 'cs;en;de;ru;sk', 0, 'list', 8, NULL),
+(6, 'IMAGES_DIR', NULL, 'images', NULL, 0, 'string', 3, NULL),
+(7, 'IMAGES_LANGS_DIR', NULL, 'langs', NULL, 0, 'string', 3, NULL),
+(8, 'DEBUG_LEVEL', 'Režim ladění stránek (0 pro vypnutí)', '2', NULL, 0, 'number', 3, NULL),
+(9, 'TEMPLATE_FACE', 'Název vzhledu stránek', 'default', NULL, 0, 'string', 4, NULL),
+(10, 'SITEMAP_PERIODE', 'Výchozí položka pro změnu mapy stránek pro vyhledávače', 'weekly', NULL, 0, 'string', 5, NULL),
+(11, 'SEARCH_RESULT_LENGHT', 'Délka řetězce s výsledkem hledání', '300', NULL, 0, 'number', 9, NULL),
+(12, 'SEARCH_HIGHLIGHT_TAG', 'Název tagu, který se užívá pro zvýraznění slova ve výsledcích hledání', 'strong', NULL, 0, 'string', 9, NULL),
+(13, 'SESSION_NAME', 'Název cookies s id session, která se ukládá u klienta', '{PREFIX}cookie', NULL, 0, 'string', 3, NULL),
+(14, 'WEB_NAME', 'Název stránek', 'VVE Engine', NULL, 0, 'string', 2, NULL),
+(61, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL),
+(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}', '', 0, 'string', 3, NULL),
+(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}navigation_panel', NULL, 0, 'string', 3, NULL),
+(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}shares', NULL, 0, 'string', 3, NULL),
+(21, 'PAGE_TITLE_SEPARATOR', 'Oddělovač položek v nadpisu stránky', '|', NULL, 0, 'string', 4, NULL),
+(16, 'NAVIGATION_SEPARATOR', 'Oddělovač položek v navigaci mezi kategoriemi', '::', NULL, 0, 'string', 4, NULL),
+(17, 'HEADLINE_SEPARATOR', 'Oddělovač slov v nadpisu H1', ' - ', NULL, 0, 'string', 4, NULL),
+(19, 'PANEL_TYPES', 'Jaké druhy panelů jsou zapnuty a povoleny (musí je implementovat šablona)', 'left;right;bottom', 'left;right;bottom;top', 0, 'listmulti', 4, NULL),
+(97, 'FTP_HOST', 'Adresa ftp serveru, kde jsou stránky nahrány', 'localhost', NULL, 0, 'string', 3, NULL),
+(98, 'FTP_PORT', 'Port ftp serveru, kde jsou stránky nahrány', '22', NULL, 0, 'number', 3, NULL),
+(20, 'DATA_DIR', NULL, 'data', NULL, 0, 'string', 3, NULL),
+(22, 'USE_GLOBAL_ACCOUNTS', 'Globální systém přihlašování', 'false', NULL, 0, 'bool', 3, NULL),
+(23, 'GLOBAL_TABLES_PREFIX', 'Prefix globálních tabulek', '{PREFIX}', NULL, 0, 'string', 3, NULL),
+(27, 'PDF_PAGE_FORMAT', 'Formát stránky pro pdf výstup', 'A4', NULL, 0, 'string', 5, NULL),
+(28, 'PDF_PAGE_ORIENTATION', 'Natočení stránky pro pdf výstup (P=portrait, L=landscape)', 'P', 'P;L', 0, 'list', 5, NULL),
+(29, 'PDF_CREATOR', 'Název pdf kreatoru', 'TCPDF', NULL, 0, 'string', 5, NULL),
+(30, 'PDF_AUTHOR', 'Autor pdf', 'TCPDF', NULL, 0, 'string', 5, NULL),
+(31, 'PDF_HEADER_LOGO', 'Název loga v hlavičce pdf', NULL, NULL, 0, 'string', 5, NULL),
+(32, 'PDF_HEADER_LOGO_WIDTH', 'Šířka loga v hlavičce', NULL, NULL, 0, 'string', 5, NULL),
+(33, 'PDF_UNIT', 'Jednotky použité u pdf (pt=point, mm=millimeter, cm=centimeter, in=inch)', 'mm', 'mm;pt;cm;in', 0, 'list', 5, NULL),
+(34, 'PDF_MARGIN_HEADER', 'Odsazení hlavičky', '5', NULL, 0, 'string', 5, NULL),
+(35, 'PDF_MARGIN_FOOTER', 'Odsazení zápatí', '10', NULL, 0, 'string', 5, NULL),
+(36, 'PDF_MARGIN_TOP', 'Odsazení stránky z vrchu', '20', NULL, 0, 'string', 5, NULL),
+(37, 'PDF_MARGIN_BOTTOM', 'Odsazení stránky od spodu', '25', NULL, 0, 'string', 5, NULL),
+(38, 'PDF_MARGIN_LEFT', 'Odsazení z leva', '15', NULL, 0, 'string', 5, NULL),
+(39, 'PDF_MARGIN_RIGHT', 'Odsazení z prava', '15', NULL, 0, 'string', 5, NULL),
+(40, 'PDF_FONT_NAME_MAIN', 'Název hlavního fontu', 'arial', NULL, 0, 'string', 5, NULL),
+(41, 'PDF_FONT_SIZE_MAIN', 'Velikost hlavního fontu', '10', NULL, 0, 'string', 5, NULL),
+(42, 'PDF_FONT_NAME_DATA', 'Font pro data', 'arial', NULL, 0, 'string', 5, NULL),
+(43, 'PDF_FONT_SIZE_DATA', 'Velikost fontu pro data', '6', NULL, 0, 'string', 5, NULL),
+(44, 'PDF_FONT_MONOSPACED', 'Název pevného fontu', 'courier', NULL, 0, 'string', 5, NULL),
+(45, 'PDF_IMAGE_SCALE_RATIO', 'Zvětšení obrázků ve výstupním pdf', '1', NULL, 0, 'string', 5, NULL),
+(46, 'HEAD_MAGNIFICATION', 'zvětšovací poměr nadpisů', '1.1', NULL, 0, 'string', 5, NULL),
+(51, 'WEB_DESCRIPTION', 'Popis stránek', 'Web Pages', NULL, 0, 'string', 2, NULL),
+(50, 'FEED_NUM', 'Poček generovaných rss/atom kanálů', '10', NULL, 0, 'number', 5, NULL),
+(52, 'WEB_MASTER_NAME', 'Jméno webmastera', 'Webmaster Name', NULL, 0, 'string', 2, NULL),
+(53, 'WEB_MASTER_EMAIL', 'E-mail webmastera', 'webmaster@web.com', NULL, 0, 'string', 6, NULL),
+(54, 'FEED_TTL', 'Počet minut kešování kanálu', '30', NULL, 0, 'number', 5, NULL),
+(55, 'WEB_COPYRIGHT', 'Copyright poznámka k webu ({Y} - nahrazeno rokem)', 'Obsah toho webu je licencován podle ... Žádná s jeho částí nesmí být použita bez vědomí webmastera. Copyrigth {Y}', NULL, 0, 'string', 2, NULL),
+(56, 'SEARCH_ARTICLE_REL_MULTIPLIER', 'Násobič pro relevanci nadpisu článku (1 - nekonečno)', '5', NULL, 0, 'number', 9, NULL),
+(57, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:6:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"5";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"6";s:28:"\0Category_Structure\0idParent";s:1:"5";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"103";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"105";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"166";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:3:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"125";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:2:"11";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"12";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"13";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:7;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object', 1, NULL),
+(62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Main Title Page', NULL, 0, 'string', 2, NULL),
+(63, 'ALLOW_EXTERNAL_JS', 'Povolení externích JavaScript souborů', 'true', NULL, 0, 'bool', 3, NULL),
+(74, 'CM_SITEMAP_MAX_ITEMS', 'Maximální počet položek v mapě stránek (pro vyhledávače)', '50', NULL, 0, 'number', 5, NULL),
+(73, 'CM_SITEMAP_MAX_ITEMS_PAGE', 'Maximální počet položek v mapě stránek', '20', NULL, 0, 'number', 4, NULL),
+(75, 'CM_SITEMAP_CAT_ICON', 'Název ikony pro sitemap', 'sitemap.png', NULL, 0, 'string', 4, NULL),
+(76, 'CM_ERR_CAT_ICON', 'Název ikony pro chybovou stránku', 'error.png', NULL, 0, 'string', 4, NULL),
+(77, 'CM_RSS_CAT_ICON', 'Název ikony pro stránku s rss kanály', 'rsslist.png', NULL, 0, 'string', 4, NULL),
+(78, 'LOGIN_TIME', 'Doba po které je uživatel automaticky odhlášen (s)', '3600', NULL, 0, 'number', 3, NULL),
+(79, 'IMAGE_THUMB_W', 'Výchozí šířka miniatury', '150', NULL, 0, 'number', 7, NULL),
+(80, 'IMAGE_THUMB_H', 'Výchozí výška miniatury', '150', NULL, 0, 'number', 7, NULL),
+(81, 'SMTP_SERVER', 'Adresa smtp serveru pro odesílání pošty', 'localhost', NULL, 0, 'string', 6, NULL),
+(82, 'SMTP_SERVER_PORT', 'Port smtp serveru pro odesílání pošty', NULL, NULL, 0, 'number', 6, NULL),
+(83, 'SMTP_SERVER_USERNAME', 'Uživatelské jméno smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL),
+(84, 'SMTP_SERVER_PASSWORD', 'Uživatelské heslo smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL),
+(85, 'SHORT_TEXT_TAGS', 'tagy, které jsou povoleny ve zkrácených výpisech', '<strong><a><em><span>', NULL, 0, 'string', 3, NULL),
+(86, 'NOREPLAY_MAIL', 'Název schránky odesílané pošty', 'noreplay@web.com', NULL, 0, 'string', 6, NULL),
+(94, 'TOKENS_STORE', 'Kde se mají ukládat bezpečnostní tokeny', 'session', 'session;db;file', 0, 'list', 3, NULL),
+(88, 'DEFAULT_PHOTO_W', 'Výchozí šířka fotky', '800', NULL, 0, 'number', 7, NULL),
+(89, 'DEFAULT_PHOTO_H', 'Výchozí výška fotky', '600', NULL, 0, 'number', 7, NULL),
+(90, 'STORE_ORIGINAl_FILES', 'Ukládání originálních souborů', '1', NULL, 0, 'bool', 7, NULL),
+(91, 'JQUERY_THEME', 'Téma JQuery UI', 'base', NULL, 0, 'string', 4, NULL),
+(93, 'IMAGE_THUMB_CROP', 'Ořezávat miniatury', '1', NULL, 0, 'bool', 7, NULL),
+(95, 'MAIN_TPL_VIEWS', 'Vzhledy hlavní šablony', NULL, NULL, 0, 'string', 4, NULL),
+(96, 'PIROBOX_THEME', 'Téma JsPluginu Pirobox', 'white', 'black;blackwhite;shadow;white;whiteblack', 0, 'list', 4, NULL),
+(99, 'FTP_USER', 'Uživatel ftp serveru, kde jsou stránky nahrány', 'user', NULL, 0, 'string', 3, NULL),
+(100, 'FTP_PASSOWRD', 'Heslo uživatele ftp serveru, kde jsou stránky nahrány', NULL, NULL, 0, 'string', 3, NULL),
+(101, 'USE_IMAGEMAGICK', 'Jeslti se má používat knihovna Imagick pro práci s obrázky', '0', NULL, 0, 'bool', 3, NULL),
+(102, 'SUB_SITE_DOMAIN', 'Doména podstránek', NULL, NULL, 0, 'string', 1, NULL),
+(103, 'SUB_SITE_DIR', 'Adresár s podstránkami', NULL, NULL, 0, 'string', 1, NULL),
+(104, 'SUB_SITE_USE_HTACCESS', 'Jestli je pro subdomény použit htaccess', '0', NULL, 0, 'bool', 1, NULL),
+(105, 'MAIN_SITE_TABLE_PREFIX', 'Prefix tabulek hlavních stránek (některé moduly využívají globální tabulky)', NULL, NULL, 0, 'string', 1, NULL),
+(106, 'SMTP_SERVER_ENCRYPT', 'Šifrování spojení k SMTP serveru (tls, ssl)', NULL, NULL, 0, 'string', 6, NULL);
 
 -- --------------------------------------------------------
 
@@ -134,7 +248,7 @@ INSERT INTO `{PREFIX}config` (`id_config`, `key`, `label`, `value`, `values`, `p
 (1, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"1";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL),
 (2, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:6:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"5";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"6";s:28:"\0Category_Structure\0idParent";s:1:"5";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"103";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"105";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"166";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:3:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"125";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:2:"11";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"12";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"13";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:7;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object', 1, NULL),
 (3, 'VERSION', 'Verze jádra', '7', NULL, 1, 'string', 1, NULL),
-(4, 'RELEASE', 'verze release', '4', NULL, 1, 'number', 1, NULL);
+(4, 'RELEASE', 'verze release', '3', NULL, 1, 'number', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -423,15 +537,14 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}sessions` (
   `id_user` int(11) DEFAULT '0',
   PRIMARY KEY (`session_key`),
   UNIQUE KEY `ssession_key_UNIQUE` (`session_key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}sessions`
 --
 
 INSERT INTO `{PREFIX}sessions` (`session_key`, `value`, `created`, `updated`, `ip`, `id_user`) VALUES
-('vhbje94c9r2dbgfpf7g85nqgn1', 0x6c616e677c733a323a226373223b757365726e616d657c733a353a2261646d696e223b6d61696c7c733a303a22223b69645f757365727c693a313b69645f67726f75707c693a313b67726f75705f6e616d657c733a353a2261646d696e223b69705f616464726573737c733a393a223132372e302e302e31223b6c6f67696e74696d657c693a313330383633383030353b6c6f67696e7c623a313b61646d696e7c623a303b61646d696e5f6772707c623a313b73697465737c613a303a7b7d, '2011-06-21 08:32:26', '2011-06-21 08:33:25', '127.0.0.1', 0),
-('75deun62a2psmgdr7bcj2c4br0', 0x6c616e677c733a323a226373223b, '2011-10-07 07:33:36', '2011-10-07 07:33:36', '127.0.0.1', 0);
+('vhbje94c9r2dbgfpf7g85nqgn1', 0x6c616e677c733a323a226373223b757365726e616d657c733a353a2261646d696e223b6d61696c7c733a303a22223b69645f757365727c693a313b69645f67726f75707c693a313b67726f75705f6e616d657c733a353a2261646d696e223b69705f616464726573737c733a393a223132372e302e302e31223b6c6f67696e74696d657c693a313330383633383030353b6c6f67696e7c623a313b61646d696e7c623a303b61646d696e5f6772707c623a313b73697465737c613a303a7b7d, '2011-06-21 08:32:26', '2011-06-21 08:33:25', '127.0.0.1', 0);
 
 -- --------------------------------------------------------
 
@@ -616,118 +729,3 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}users` (
 INSERT INTO `{PREFIX}users` (`id_user`, `username`, `password`, `password_restore`, `id_group`, `name`, `surname`, `mail`, `note`, `blocked`, `foto_file`, `deleted`, `created`, `last_login`) VALUES
 (2, 'guest', NULL, NULL, 2, 'test', 'tetasdhf', '', NULL, 0, NULL, 0, NULL, NULL),
 (1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', NULL, 1, 'admin', 'admin', '', NULL, 0, NULL, 0, NULL, NULL);
-
--- --------------------------------------------------------
-
---
--- Struktura tabulky `cubecms_global_config`
---
-
-DROP TABLE IF EXISTS `cubecms_global_config`;
-CREATE TABLE IF NOT EXISTS `cubecms_global_config` (
-  `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `key` varchar(50) NOT NULL,
-  `label` varchar(1000) DEFAULT NULL,
-  `value` text,
-  `values` varchar(200) DEFAULT NULL,
-  `protected` tinyint(1) NOT NULL DEFAULT '0',
-  `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
-  `id_group` smallint(6) NOT NULL DEFAULT '0',
-  `callback_func` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id_config`),
-  UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=108 ;
-
---
--- Vypisuji data pro tabulku `cubecms_global_config`
---
-
-INSERT INTO `cubecms_global_config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
-(1, 'DEFAULT_ID_GROUP', NULL, '2', NULL, 0, 'number', 3, NULL),
-(2, 'DEFAULT_GROUP_NAME', NULL, 'guest', NULL, 0, 'string', 3, NULL),
-(3, 'DEFAULT_USER_NAME', NULL, 'anonym', NULL, 0, 'string', 3, NULL),
-(4, 'APP_LANGS', 'Všechny vybrané jazyky aplikace', 'cs', 'cs;en;de;ru;sk', 0, 'listmulti', 8, NULL),
-(5, 'DEFAULT_APP_LANG', 'Výchozí jazyk aplikace. Tento jazyk je potom u většiny položek povinný.', 'cs', 'cs;en;de;ru;sk', 0, 'list', 8, NULL),
-(6, 'IMAGES_DIR', NULL, 'images', NULL, 0, 'string', 3, NULL),
-(7, 'IMAGES_LANGS_DIR', NULL, 'langs', NULL, 0, 'string', 3, NULL),
-(8, 'DEBUG_LEVEL', 'Režim ladění stránek (0 pro vypnutí)', '2', NULL, 0, 'number', 3, NULL),
-(9, 'TEMPLATE_FACE', 'Název vzhledu stránek', 'default', NULL, 0, 'string', 4, NULL),
-(10, 'SITEMAP_PERIODE', 'Výchozí položka pro změnu mapy stránek pro vyhledávače', 'weekly', NULL, 0, 'string', 5, NULL),
-(11, 'SEARCH_RESULT_LENGHT', 'Délka řetězce s výsledkem hledání', '300', NULL, 0, 'number', 9, NULL),
-(12, 'SEARCH_HIGHLIGHT_TAG', 'Název tagu, který se užívá pro zvýraznění slova ve výsledcích hledání', 'strong', NULL, 0, 'string', 9, NULL),
-(13, 'SESSION_NAME', 'Název cookies s id session, která se ukládá u klienta', '{PREFIX}cookie', NULL, 0, 'string', 3, NULL),
-(14, 'WEB_NAME', 'Název stránek', 'VVE Engine', NULL, 0, 'string', 2, NULL),
-(61, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL),
-(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}', '', 0, 'string', 3, NULL),
-(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}navigation_panel', NULL, 0, 'string', 3, NULL),
-(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}shares', NULL, 0, 'string', 3, NULL),
-(21, 'PAGE_TITLE_SEPARATOR', 'Oddělovač položek v nadpisu stránky', '|', NULL, 0, 'string', 4, NULL),
-(16, 'NAVIGATION_SEPARATOR', 'Oddělovač položek v navigaci mezi kategoriemi', '::', NULL, 0, 'string', 4, NULL),
-(17, 'HEADLINE_SEPARATOR', 'Oddělovač slov v nadpisu H1', ' - ', NULL, 0, 'string', 4, NULL),
-(19, 'PANEL_TYPES', 'Jaké druhy panelů jsou zapnuty a povoleny (musí je implementovat šablona)', 'left;right;bottom', 'left;right;bottom;top', 0, 'listmulti', 4, NULL),
-(97, 'FTP_HOST', 'Adresa ftp serveru, kde jsou stránky nahrány', 'localhost', NULL, 0, 'string', 3, NULL),
-(98, 'FTP_PORT', 'Port ftp serveru, kde jsou stránky nahrány', '22', NULL, 0, 'number', 3, NULL),
-(20, 'DATA_DIR', NULL, 'data', NULL, 0, 'string', 3, NULL),
-(22, 'USE_GLOBAL_ACCOUNTS', 'Globální systém přihlašování', 'false', NULL, 0, 'bool', 3, NULL),
-(23, 'GLOBAL_TABLES_PREFIX', 'Prefix globálních tabulek', '{PREFIX}', NULL, 0, 'string', 3, NULL),
-(27, 'PDF_PAGE_FORMAT', 'Formát stránky pro pdf výstup', 'A4', NULL, 0, 'string', 5, NULL),
-(28, 'PDF_PAGE_ORIENTATION', 'Natočení stránky pro pdf výstup (P=portrait, L=landscape)', 'P', 'P;L', 0, 'list', 5, NULL),
-(29, 'PDF_CREATOR', 'Název pdf kreatoru', 'TCPDF', NULL, 0, 'string', 5, NULL),
-(30, 'PDF_AUTHOR', 'Autor pdf', 'TCPDF', NULL, 0, 'string', 5, NULL),
-(31, 'PDF_HEADER_LOGO', 'Název loga v hlavičce pdf', NULL, NULL, 0, 'string', 5, NULL),
-(32, 'PDF_HEADER_LOGO_WIDTH', 'Šířka loga v hlavičce', NULL, NULL, 0, 'string', 5, NULL),
-(33, 'PDF_UNIT', 'Jednotky použité u pdf (pt=point, mm=millimeter, cm=centimeter, in=inch)', 'mm', 'mm;pt;cm;in', 0, 'list', 5, NULL),
-(34, 'PDF_MARGIN_HEADER', 'Odsazení hlavičky', '5', NULL, 0, 'string', 5, NULL),
-(35, 'PDF_MARGIN_FOOTER', 'Odsazení zápatí', '10', NULL, 0, 'string', 5, NULL),
-(36, 'PDF_MARGIN_TOP', 'Odsazení stránky z vrchu', '20', NULL, 0, 'string', 5, NULL),
-(37, 'PDF_MARGIN_BOTTOM', 'Odsazení stránky od spodu', '25', NULL, 0, 'string', 5, NULL),
-(38, 'PDF_MARGIN_LEFT', 'Odsazení z leva', '15', NULL, 0, 'string', 5, NULL),
-(39, 'PDF_MARGIN_RIGHT', 'Odsazení z prava', '15', NULL, 0, 'string', 5, NULL),
-(40, 'PDF_FONT_NAME_MAIN', 'Název hlavního fontu', 'arial', NULL, 0, 'string', 5, NULL),
-(41, 'PDF_FONT_SIZE_MAIN', 'Velikost hlavního fontu', '10', NULL, 0, 'string', 5, NULL),
-(42, 'PDF_FONT_NAME_DATA', 'Font pro data', 'arial', NULL, 0, 'string', 5, NULL),
-(43, 'PDF_FONT_SIZE_DATA', 'Velikost fontu pro data', '6', NULL, 0, 'string', 5, NULL),
-(44, 'PDF_FONT_MONOSPACED', 'Název pevného fontu', 'courier', NULL, 0, 'string', 5, NULL),
-(45, 'PDF_IMAGE_SCALE_RATIO', 'Zvětšení obrázků ve výstupním pdf', '1', NULL, 0, 'string', 5, NULL),
-(46, 'HEAD_MAGNIFICATION', 'zvětšovací poměr nadpisů', '1.1', NULL, 0, 'string', 5, NULL),
-(51, 'WEB_DESCRIPTION', 'Popis stránek', 'Web Pages', NULL, 0, 'string', 2, NULL),
-(50, 'FEED_NUM', 'Poček generovaných rss/atom kanálů', '10', NULL, 0, 'number', 5, NULL),
-(52, 'WEB_MASTER_NAME', 'Jméno webmastera', 'Webmaster Name', NULL, 0, 'string', 2, NULL),
-(53, 'WEB_MASTER_EMAIL', 'E-mail webmastera', 'webmaster@web.com', NULL, 0, 'string', 6, NULL),
-(54, 'FEED_TTL', 'Počet minut kešování kanálu', '30', NULL, 0, 'number', 5, NULL),
-(55, 'WEB_COPYRIGHT', 'Copyright poznámka k webu ({Y} - nahrazeno rokem)', 'Obsah toho webu je licencován podle ... Žádná s jeho částí nesmí být použita bez vědomí webmastera. Copyrigth {Y}', NULL, 0, 'string', 2, NULL),
-(56, 'SEARCH_ARTICLE_REL_MULTIPLIER', 'Násobič pro relevanci nadpisu článku (1 - nekonečno)', '5', NULL, 0, 'number', 9, NULL),
-(57, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:6:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"5";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"6";s:28:"\0Category_Structure\0idParent";s:1:"5";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"103";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"105";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"166";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:3:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"125";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:2:"11";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"12";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"13";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:7;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object', 1, NULL),
-(62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Main Title Page', NULL, 0, 'string', 2, NULL),
-(63, 'ALLOW_EXTERNAL_JS', 'Povolení externích JavaScript souborů', 'true', NULL, 0, 'bool', 3, NULL),
-(74, 'CM_SITEMAP_MAX_ITEMS', 'Maximální počet položek v mapě stránek (pro vyhledávače)', '50', NULL, 0, 'number', 5, NULL),
-(73, 'CM_SITEMAP_MAX_ITEMS_PAGE', 'Maximální počet položek v mapě stránek', '20', NULL, 0, 'number', 4, NULL),
-(75, 'CM_SITEMAP_CAT_ICON', 'Název ikony pro sitemap', 'sitemap.png', NULL, 0, 'string', 4, NULL),
-(76, 'CM_ERR_CAT_ICON', 'Název ikony pro chybovou stránku', 'error.png', NULL, 0, 'string', 4, NULL),
-(77, 'CM_RSS_CAT_ICON', 'Název ikony pro stránku s rss kanály', 'rsslist.png', NULL, 0, 'string', 4, NULL),
-(78, 'LOGIN_TIME', 'Doba po které je uživatel automaticky odhlášen (s)', '3600', NULL, 0, 'number', 3, NULL),
-(79, 'IMAGE_THUMB_W', 'Výchozí šířka miniatury', '150', NULL, 0, 'number', 7, NULL),
-(80, 'IMAGE_THUMB_H', 'Výchozí výška miniatury', '150', NULL, 0, 'number', 7, NULL),
-(81, 'SMTP_SERVER', 'Adresa smtp serveru pro odesílání pošty', 'localhost', NULL, 0, 'string', 6, NULL),
-(82, 'SMTP_SERVER_PORT', 'Port smtp serveru pro odesílání pošty', NULL, NULL, 0, 'number', 6, NULL),
-(83, 'SMTP_SERVER_USERNAME', 'Uživatelské jméno smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL),
-(84, 'SMTP_SERVER_PASSWORD', 'Uživatelské heslo smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL),
-(85, 'SHORT_TEXT_TAGS', 'tagy, které jsou povoleny ve zkrácených výpisech', '<strong><a><em><span>', NULL, 0, 'string', 3, NULL),
-(86, 'NOREPLAY_MAIL', 'Název schránky odesílané pošty', 'noreplay@web.com', NULL, 0, 'string', 6, NULL),
-(94, 'TOKENS_STORE', 'Kde se mají ukládat bezpečnostní tokeny', 'session', 'session;db;file', 0, 'list', 3, NULL),
-(88, 'DEFAULT_PHOTO_W', 'Výchozí šířka fotky', '800', NULL, 0, 'number', 7, NULL),
-(89, 'DEFAULT_PHOTO_H', 'Výchozí výška fotky', '600', NULL, 0, 'number', 7, NULL),
-(90, 'STORE_ORIGINAl_FILES', 'Ukládání originálních souborů', '1', NULL, 0, 'bool', 7, NULL),
-(91, 'JQUERY_THEME', 'Téma JQuery UI', 'base', NULL, 0, 'string', 4, NULL),
-(93, 'IMAGE_THUMB_CROP', 'Ořezávat miniatury', '1', NULL, 0, 'bool', 7, NULL),
-(95, 'MAIN_TPL_VIEWS', 'Vzhledy hlavní šablony', NULL, NULL, 0, 'string', 4, NULL),
-(96, 'PIROBOX_THEME', 'Téma JsPluginu Pirobox', 'white', 'black;blackwhite;shadow;white;whiteblack', 0, 'list', 4, NULL),
-(99, 'FTP_USER', 'Uživatel ftp serveru, kde jsou stránky nahrány', 'user', NULL, 0, 'string', 3, NULL),
-(100, 'FTP_PASSOWRD', 'Heslo uživatele ftp serveru, kde jsou stránky nahrány', NULL, NULL, 0, 'string', 3, NULL),
-(101, 'USE_IMAGEMAGICK', 'Jeslti se má používat knihovna Imagick pro práci s obrázky', '0', NULL, 0, 'bool', 3, NULL),
-(102, 'SUB_SITE_DOMAIN', 'Doména podstránek', NULL, NULL, 0, 'string', 1, NULL),
-(103, 'SUB_SITE_DIR', 'Adresár s podstránkami', NULL, NULL, 0, 'string', 1, NULL),
-(104, 'SUB_SITE_USE_HTACCESS', 'Jestli je pro subdomény použit htaccess', '0', NULL, 0, 'bool', 1, NULL),
-(105, 'MAIN_SITE_TABLE_PREFIX', 'Prefix tabulek hlavních stránek (některé moduly využívají globální tabulky)', NULL, NULL, 0, 'string', 1, NULL),
-(106, 'SMTP_SERVER_ENCRYPT', 'Šifrování spojení k SMTP serveru (tls, ssl)', NULL, NULL, 0, 'string', 6, NULL),
-(107, 'ARTICLES_IN_LIST', 'Výchozí počet článků na jednu stránku', '5', NULL, 0, 'number', 4, NULL);
