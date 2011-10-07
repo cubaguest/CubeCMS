@@ -14,7 +14,7 @@ class Model_ConfigGroups extends Model_ORM {
 /**
  * Tabulka s detaily
  */
-   const DB_TABLE = 'config_groups';
+   const DB_TABLE = 'cubecms_global_config';
 
    /**
     * slouce v db
@@ -24,7 +24,7 @@ class Model_ConfigGroups extends Model_ORM {
    const COLUMN_DESC = 'desc';
 
    protected function  _initTable() {
-      $this->setTableName(self::DB_TABLE, 't_cfg_grps');
+      $this->setTableName(self::DB_TABLE, 't_cfg_grps', false);
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(45)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -33,6 +33,7 @@ class Model_ConfigGroups extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
 
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Config', Model_Config::COLUMN_ID_GROUP);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_ConfigGlobal', Model_ConfigGlobal::COLUMN_ID_GROUP);
    }
 }
 ?>
