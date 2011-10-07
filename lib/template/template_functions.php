@@ -330,4 +330,14 @@ function ps($string)
    echo htmlspecialchars($string);
 }
 
+/**
+ * Funkce vrátí adresu titulního obrázku např. článku 
+ * @param string $img -- obrázek
+ * @return string -- adresa obrázku 
+ */
+function vve_tpl_art_title_image($img)
+{
+   return Url_Request::getBaseWebDir().VVE_DATA_DIR.'/'.VVE_ARTICLE_TITLE_IMG_DIR.'/'.$img;
+}
+
 ?>
