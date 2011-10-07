@@ -95,13 +95,14 @@ class Model_Users extends Model_ORM {
     * @param string $username -- uživatelské jméno
     */
    public function getUser($username, $blockedUsers = false) {
+      $mgrp = new Model_Groups();
       $where = null;
       if($blockedUsers === false){
          $where = ' AND user.'.self::COLUMN_BLOCKED.' = :blocked';
       }
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("SELECT *, grp.name AS gname FROM ".self::getUsersTable()." AS user
-             JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP
+      $dbst = $dbc->prepare("SELECT *, grp.name AS gname FROM ".$this->getTableName()." AS user
+             JOIN ".$mgrp->getTableName()." AS grp ON user.".self::COLUMN_ID_GROUP
           ." = grp.".self::COLUMN_ID_GROUP."
              WHERE (user.".self::COLUMN_USERNAME." = :username".$where.")");
 
@@ -124,10 +125,11 @@ class Model_Users extends Model_ORM {
     * @return Object
     */
    public function getUserById($id) {
+      $mgrp = new Model_Groups();
       $dbc = new Db_PDO();
       $dbst = $dbc->query("SELECT user.*, grp.".self::COLUMN_ID_GROUP.", grp.name AS ".self::COLUMN_GROUP_NAME
-          ." FROM ".self::getUsersTable()." AS user"
-          ." JOIN ".self::getGroupsTable()." AS grp ON user.".self::COLUMN_ID_GROUP." = grp.".self::COLUMN_ID_GROUP
+          ." FROM ".$this->getTableName()." AS user"
+          ." JOIN ".$mgrp->getTableName()." AS grp ON user.".self::COLUMN_ID_GROUP." = grp.".self::COLUMN_ID_GROUP
           ." WHERE (user.".self::COLUMN_ID." = ".$dbc->quote((int)$id).")");
       $dbst->execute();
 
@@ -140,9 +142,10 @@ class Model_Users extends Model_ORM {
     * @return PDOStatement
     */
    public function getUsersList() {
+      $mgrp = new Model_Groups();
       $dbc = new Db_PDO();
-      $dbst = $dbc->query("SELECT users.*, grps.name AS gname FROM ".self::getUsersTable()." AS users"
-          ." JOIN ".self::getGroupsTable()." AS grps ON users.".self::COLUMN_ID_GROUP." = grps.".self::COLUMN_ID_GROUP
+      $dbst = $dbc->query("SELECT users.*, grps.name AS gname FROM ".$this->getTableName()." AS users"
+          ." JOIN ".$mgrp->getTableName()." AS grps ON users.".self::COLUMN_ID_GROUP." = grps.".self::COLUMN_ID_GROUP
 //          ." WHERE users.".self::COLUMN_BLOCKED." = 0"
           ." ORDER BY users.".self::COLUMN_ID);
       $dbst->execute();
@@ -151,7 +154,7 @@ class Model_Users extends Model_ORM {
 
    public function getCount($idgrp = null){
       $dbc = new Db_PDO();
-      $sql = "SELECT COUNT(*) FROM ".$this->getUsersTable();
+      $sql = "SELECT COUNT(*) FROM ".$this->getTableName();
       if($idgrp !== null) $sql .= " WHERE ".self::COLUMN_ID_GROUP." = :idGrp";
       $dbst = $dbc->prepare($sql);
       $dbst->execute(array(':idGrp' => $idgrp));
@@ -187,7 +190,7 @@ class Model_Users extends Model_ORM {
       if($id === null) {
       // nový uživatel
          $password = Auth::cryptPassword($password);
-         $dbst = $dbc->prepare("INSERT INTO ".self::getUsersTable()
+         $dbst = $dbc->prepare("INSERT INTO ".$this->getTableName()
              ." (`".self::COLUMN_USERNAME."`, `".self::COLUMN_NAME."`, `".self::COLUMN_SURNAME."`,
         `".self::COLUMN_PASSWORD."`,`".self::COLUMN_ID_GROUP."`,`".self::COLUMN_MAIL."`,
          `".self::COLUMN_NOTE."`,`".self::COLUMN_BLOCKED."`)"
@@ -200,7 +203,7 @@ class Model_Users extends Model_ORM {
             $passSql = "`".self::COLUMN_PASSWORD."` = ".$dbc->quote(Auth::cryptPassword($password)).",";
          }
 
-         $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
+         $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_USERNAME."` = :username, `".self::COLUMN_NAME."` = :name,"
                 ." `".self::COLUMN_SURNAME."` = :surname, ".$passSql
                 ." `".self::COLUMN_ID_GROUP."` = :idgrp, `".self::COLUMN_MAIL."` = :mail,"
@@ -228,7 +231,7 @@ class Model_Users extends Model_ORM {
     */
    public function disableUser($id) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
+      $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_BLOCKED."` = 1"
                 ." WHERE (".self::COLUMN_ID." = :iduser)");
       $dbst->bindValue(':iduser', (int)$id, PDO::PARAM_INT);
@@ -242,7 +245,7 @@ class Model_Users extends Model_ORM {
     */
    public function enableUser($id) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
+      $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_BLOCKED."` = 0"
                 ." WHERE (".self::COLUMN_ID." = :iduser)");
       $dbst->bindValue(':iduser', (int)$id, PDO::PARAM_INT);
@@ -256,7 +259,7 @@ class Model_Users extends Model_ORM {
     */
    public function deleteUser($id) {
       $dbc = new Db_PDO();
-      return $dbc->query("DELETE FROM ".self::getUsersTable()
+      return $dbc->query("DELETE FROM ".$this->getTableName()
           . " WHERE ".self::COLUMN_ID." = ".$dbc->quote((int)$id));
    }
 
@@ -268,7 +271,7 @@ class Model_Users extends Model_ORM {
     */
    public function changeUserPassword($iduser, $newPass) {
       $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("UPDATE ".self::getUsersTable(). " SET"
+      $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_PASSWORD."` = :password"
                 ." WHERE (".self::COLUMN_ID." = :iduser)");
       $dbst->execute(array(':iduser' => $iduser, ':password' => Auth::cryptPassword($newPass)));
