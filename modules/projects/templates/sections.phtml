@@ -1,0 +1,43 @@
+<?
+$h = $this->category()->getName();
+$this->addCssFile("style.css");
+echo $this->toolbox;
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h;?></h1>
+<div class="main-content">
+   <?if(!empty ($this->sections)) {
+      foreach ($this->sections as $section) {
+         $link = $this->link()->route('section', array('seckey' => $section->data->{Projects_Model_Sections::COLUMN_URLKEY}));
+/*         <h2><a href="<?=$link?>" title="<?=$section->data->{Projects_Model_Sections::COLUMN_NAME}?>"><?=$section->data->{Projects_Model_Sections::COLUMN_NAME}?></a></h2>*/
+         ?>
+         <div class="main-content-text">
+         <h2><?=$section->data->{Projects_Model_Sections::COLUMN_NAME}?></h2>
+         <p><?=$section->data->{Projects_Model_Sections::COLUMN_TEXT}?></p>
+         <? // projekty
+         if(!empty ($section->projects)){
+         ?>
+         <p>
+         <ul>
+            <?foreach ($section->projects as $project){
+               $prlink = $this->link()->route('project', array('prkey' => $project->{Projects_Model_Projects::COLUMN_URLKEY},
+                                                               'seckey' => $project->{Projects_Model_Sections::COLUMN_URLKEY}));
+               ?>
+            <li><a href="<?=$prlink?>"><?=$project->{Projects_Model_Projects::COLUMN_NAME}?></a></li> 
+            <?}?>
+         </ul>
+         </p>
+         <?} else {
+            echo '<p>'.$this->tr('Žádný projekt nebyl přiřazen').'</p>';
+         }
+         echo $section->toolbox;
+         ?>
+         </div>
+         <hr class="reseter" />
+      <?}?>
+   <?
+      echo $this->scrollComp;
+   } else {
+      echo ($this->tr('Není vložena žádná sekce ani projekt'));
+   }
+   ?>
+</div>

@@ -1,0 +1,23 @@
+<?
+$this->addCssFile("style.css");
+// do titulku
+if($this->project != false) {
+   $h = sprintf($this->tr('Úprava projektu "%s"'), $this->project->{Projects_Model_Projects::COLUMN_NAME});
+   // donastavení formuláře
+   if(isset($this->form->delimg)){
+      $img = sprintf('<img src="%s" height="50" alt="%s" />', 
+         $this->dataDir.'main_thum.jpeg', 'main_thum.jpeg');
+      $this->form->delimg->setSubLabel($img);
+   }
+   
+} else {
+   $h = $this->tr('Přidání projektu');
+}
+$this->addPageTitle($h);
+
+
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="edit-form-project">
+   <?echo($this->form);?>
+</div>

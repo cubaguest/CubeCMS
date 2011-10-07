@@ -1,0 +1,60 @@
+<? // načtení detailu
+$this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
+$h1 = $this->article->{Articles_Model::COLUMN_NAME};
+$piroBox = new JsPlugin_PiroBox();
+$this->addJsPlugin($piroBox);
+echo $this->toolbox;
+?>
+
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');
+/*if($this->category()->getRights()->isControll()){
+   echo vve_tpl_show_text_langs($this->article->{Articles_Model::COLUMN_URLKEY});
+}*/?>
+</h1>
+
+<div class="main-content-detail">
+   <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
+   <div class="main-content-annotation"><?=$this->filter((string)$this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));?></div>
+   <?}?>
+   <div class="main-content-text"><?=$this->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'))?></div>
+   <hr class="reseter" />
+   <?$this->includeTpl('privateText.phtml', false,null,'articles');?>
+   <br />
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
+      /* ]]> */
+   </script>
+   <?if($this->articles != null){?>
+   <form name="gotoart" action="<?=$this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
+      <p>
+         <label><?=$this->tr('Přejít na')?></label>
+         <select id="gotoArtLinkSel">
+            <?foreach ($this->articles as $article) {?>
+            <option value="<?=$this->link()->route('detail', array('urlkey' => (string)$article->{Articles_Model::COLUMN_URLKEY}));?>">
+            <?=vve_tpl_truncate((string)$article->{Articles_Model::COLUMN_NAME}, 100)?>
+            </option>
+            <?}?>
+         </select>
+         <input type="submit" value="<?=$this->tr('Přejít')?>" />
+      </p>
+   </form>
+   <?} else {
+      $this->includeTpl("buttonback.phtml", true);
+   }
+   echo "<br />";
+   $this->includeTpl('articletools.phtml', true, array(
+      'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
+              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+              'createdByUser' => $this->article->usernameCreated,
+              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
+              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
+              'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
+//   echo $this->toolbox;
+   ?>
+<br />
+</div>
+<br />
+<?echo $this->comments;?>
+
+

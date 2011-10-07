@@ -1,0 +1,15 @@
+<?
+$this->addCssFile("style.css");
+// do titulku
+if($this->section != false) {
+   $h = sprintf($this->tr('Úprava sekce "%s"'), $this->section->{Projects_Model_Sections::COLUMN_NAME});
+} else {
+   $h = $this->tr('Přidání sekce');
+}
+$this->addPageTitle($h);
+// donastavení formuláře
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="edit-form-project-section">
+   <?echo($this->form);?>
+</div>

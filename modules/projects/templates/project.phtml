@@ -1,0 +1,67 @@
+<?
+/**
+ * Variables
+ * $this->project - objekt projektu
+ * $this->dataDir - adresář k obrázkům
+ * $this->toolbox - nástroje k projektu
+ * $this->toolboxImages - nástroje k obrázkům
+ * $this->projectsRelated - relevantní projekty
+ */
+
+$h = $this->project->{Projects_Model_Projects::COLUMN_NAME};
+$this->addPageTitle($h);
+$this->addJsPlugin(new JsPlugin_PiroBox());
+
+echo $this->toolbox;
+?>
+
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
+<div class="main-content-detail">
+   <div class="main-content-text">
+      <?if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != false){?>
+      <div class="main-content-image">
+         <img src="<?=$this->dataDir?>main_thum.jpeg" />
+      </div>
+      <?}?>
+      
+      <?=$this->filter((string)$this->project->{Projects_Model_Projects::COLUMN_TEXT}, array('emoticons'));?>
+   </div>
+   <hr class="reseter" />
+   <h2><?=$this->tr('Náhledy')?></h2>
+   <div class="main-content-images">
+      <?
+      $images = $this->images;
+      if(count($images) == 0) echo $this->tr('Galerie neobsahuje žádný obrázek.');
+      if(count($images) == 1) {$class = 'pirobox';}
+      else {$class = 'pirobox_gall';}
+      foreach ($images as $image) {
+         ?>
+      <a class="<?=$class?>" href="<?=$this->dataDir
+                    .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+         <img src="<?=$this->dataDir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+      </a>
+         <?}
+      echo $this->toolboxImages;?>
+   </div>
+   <?if($this->projectsRelated != null){?>
+   <h2><?=$this->tr('Související projekty')?></h2>
+   <div class="main-content-text">
+      <ul>
+         <?foreach ($this->projectsRelated as $project) {
+         $link = $this->link()->route('project', array('prkey' => $project->{Projects_Model_Projects::COLUMN_URLKEY},
+                                                               'seckey' => $project->{Projects_Model_Sections::COLUMN_URLKEY}));   
+         ?>
+         <li><a href="<?=$link?>" title="<?=$project->{Projects_Model_Projects::COLUMN_NAME}?>"><?=$project->{Projects_Model_Projects::COLUMN_NAME}?></a></li>            
+         <?}?>
+      </ul>
+   </div>
+   <?}?>
+   <script type="text/javascript">/* <![CDATA[ */$(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});/* ]]> */</script>
+<!-- relevantní projekty-->
+   <hr class="reseter" />
+   <?$this->includeTpl('articletools.phtml', true, array('shares' => array('url' => $this->link(), 'title' => $h)));?>
+</div>
+
+
