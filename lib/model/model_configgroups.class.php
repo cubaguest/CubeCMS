@@ -14,7 +14,7 @@ class Model_ConfigGroups extends Model_ORM {
 /**
  * Tabulka s detaily
  */
-   const DB_TABLE = 'cubecms_global_config';
+   const DB_TABLE = 'cubecms_global_config_groups';
 
    /**
     * slouce v db
