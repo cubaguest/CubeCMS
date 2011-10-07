@@ -84,7 +84,7 @@ class Routes {
          ), array(
             "(?P<$1>[a-z0-9_-]+)",
             "(?:(?P<$1>[a-z0-9_-]+)\/?)?",
-            "/?",
+            "/+",
          ), (string)$route['regexp']);
 
          if(preg_match("/^".$rege."\/?$/i", $this->urlRequest, $matches)) {
