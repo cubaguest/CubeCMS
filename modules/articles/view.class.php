@@ -32,6 +32,11 @@ class Articles_View extends View {
       } else if ((string) $this->article->{Articles_Model::COLUMN_ANNOTATION} != null) {
          Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_ANNOTATION});
       }
+      Template_Core::setMetaTag('author', $this->article->{Model_Users::COLUMN_USERNAME});
+      if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
+         Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}));
+      }
+   
       if($this->category()->getParam(Articles_Controller::PARAM_DISABLE_LIST, false)){ // pokud není list přidáme tlačítko pro přidání položky
          $this->createListToolbox();
       }

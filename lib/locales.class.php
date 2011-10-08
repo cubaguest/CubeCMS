@@ -230,11 +230,11 @@ class Locales extends TrObject {
    private static function _setLangTranslations(){
       $tr = new Translator();
       self::$localesNames = array("cs" => $tr->tr('Česky'),
-                                  "en" => $tr->tr('Anglicky'),
-                                  "de" => $tr->tr('Německy'),
-                                  "ru" => $tr->tr('Rusky'),
+                                  "en" => $tr->tr('English'),
+                                  "de" => $tr->tr('Deutsch'),
+                                  "ru" => $tr->tr('Pусский'),
                                   "sk" => $tr->tr('Slovensky'),
-                                  "pl" => $tr->tr('Polsky'));
+                                  "pl" => $tr->tr('Polski'));
    }
 
    /**

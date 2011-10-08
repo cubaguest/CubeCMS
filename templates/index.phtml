@@ -1,4 +1,7 @@
-<?// detekce IE
+<? // base metatags
+Template_Core::setMetaTag('Robots', 'index,follow');
+Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE);
+// detekce IE
 Template::setPVar('IE',false);
 $matches = array();
 if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
@@ -14,11 +17,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-      <meta name="author" content="Jakub Matas" />
-      <meta name="keywords" content="{*-PAGE_KEYWORDS-*}" />
-      <meta name="description" content="{*-PAGE_DESCRIPTION-*}" />
-      <meta name="Robots" content="index,follow" />
-      <meta name="generator" content="<?=AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE;?>" />
+      {*-PAGE_META_TAGS-*}
       <title>{*-PAGE_TITLE-*}</title>
       <base href="<?=Url_Link::getMainWebDir()?>" />
       <link rel="canonical" href="<?=$this->link()->rmParam()?>" />

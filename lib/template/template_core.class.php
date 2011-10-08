@@ -40,26 +40,16 @@ class Template_Core extends Template {
    private static $pageTitle = array();
 
    /**
-    * Popisek stránky
-    * @var string
+    * Pole s metatagy, které se doplní do hlavní šablony
+    * @var array
     */
-   private static $pageDescription = null;
-
-   /**
-    * Klíčová slova stránky
-    * @var string
-    */
-   private static $pageKeywords = null;
+   private static $metaTags = array();
 
    /**
     * Konstruktor
     */
    function  __construct() {
       ob_start();
-      self::setPageDescription(Category::getSelectedCategory()
-         ->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
-      self::setPageKeywords(Category::getSelectedCategory()
-         ->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
       parent::__construct(new Url_Link());
       // pokud je titulek nastavíme jej
       $link = new Url_Link(true);
@@ -136,12 +126,23 @@ class Template_Core extends Template {
          ob_end_clean();
       }
 
+//      var_dump('tady',self::$metaTags);ob_flush();
       // desc a keywords pokud nejsou zadány, vyberou se z kategorie
-      if(self::$pageDescription == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION} != null){
-         self::$pageDescription = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};
+      if(self::getMetaTag('description') == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION} != null){
+         self::setMetaTag('description', Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
       }
-      if(self::$pageKeywords == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS} != null){
-         self::$pageKeywords = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS};
+      if(self::getMetaTag('keywords') == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS} != null){
+         self::setMetaTag('keywords',Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
+      }
+      
+      $metaTags = null;
+      if(!empty (self::$metaTags)){
+         foreach (self::$metaTags as $key => $value) {
+            if((string)$value == null){
+               continue;
+            }
+            $metaTags .= '<meta property="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
+         }
       }
 
       // replacements vars
@@ -151,9 +152,9 @@ class Template_Core extends Template {
          '/\{\*-JAVASCRIPTS-\*\}/',
          // basic meta
          '/\{\*-PAGE_TITLE-\*\}/',
-         '/\{\*-PAGE_KEYWORDS-\*\}/',
-         '/\{\*-PAGE_DESCRIPTION-\*\}/',
          '/\{\*-PAGE_HEADLINE-\*\}/',
+         // user meta tags
+         '/\{\*-PAGE_META_TAGS-\*\}/',
          // CORE ERRORS
          '/\{\*-CORE_ERRORS-\*\}/',
          //  remove not used vars
@@ -166,9 +167,8 @@ class Template_Core extends Template {
          $jscripts,
          // basic meta
          $title,
-         htmlspecialchars(strip_tags(self::$pageKeywords)),
-         htmlspecialchars(strip_tags(self::$pageDescription)),
          htmlspecialchars(strip_tags(self::$pageHeadline)),
+         $metaTags,
          // CORE ERRORS
          $errCnt,
          //  remove not used vars
@@ -231,9 +231,7 @@ class Template_Core extends Template {
     * @param string $title -- klíčová slova stránky
     */
    public static function setPageKeywords($keywords) {
-      if((string)$keywords != null){
-         self::$pageKeywords = (string)$keywords;
-      }
+      self::setMetaTag('keywords', (string)$keywords);
    }
 
    /**
@@ -241,17 +239,15 @@ class Template_Core extends Template {
     * @return string
     */
    public static function getPageKeyword() {
-      return self::$pageKeywords;
+      return self::getMetaTag('keywords');
    }
 
-     /**
-    * Metoda nasatvuje popisek stránky
+   /**
+    * Metoda nastavuje popisek stránky
     * @param string $title -- popisek stránky
     */
    public static function setPageDescription($desc) {
-      if((string)$desc != null){
-         self::$pageDescription = (string)$desc;
-      }
+      self::setMetaTag('description', (string)$desc);
    }
 
    /**
@@ -259,7 +255,47 @@ class Template_Core extends Template {
     * @return string
     */
    public static function getPageDescription() {
-      return self::$pageDescription;
+      return self::getMetaTag('description');
+   }
+   
+   /**
+    * Metoda nastavuje meta tag stránky
+    * @param string $name -- název tagu
+    * @param string $value -- hodnota tagu
+    * 
+    * @example 
+    * <b>Facebook</b><br/>
+    * <meta property="og:title" content="Article title" /><br/>
+    * <meta property="og:type" content="movie"/><br/>
+    * <meta property="og:url" content="http://www.imdb.com/title/tt0117500/"/><br/>
+    * <meta property="og:image" content="http://ia.media-imdb.com/rock.jpg"/><br/>
+    * <meta property="og:site_name" content="IMDb"/><br/>
+    * <meta property="fb:admins" content="USER_ID"/><br/>
+    * <meta property="og:description" content="Article description" /><br/>
+    * <meta property="og:video:width" content="Article video width" /><br/>
+    * <meta property="og:video:height" content="Article video height" /><br/>
+    * @see http://developers.facebook.com/docs/opengraph/
+    */
+   public static function setMetaTag($name, $value = null) {
+      if($value == null){
+         unset (self::$metaTags[$name]);
+      } else {
+         self::$metaTags[$name] = (string)$value;
+      }
+   }
+
+   /**
+    * Metoda vrací zadaný meta tag stránky newbo všechny metatagy
+    * @return string
+    */
+   public static function getMetaTag($name = null) {
+      if($name != null){
+         if(isset (self::$metaTags[$name])){
+            return self::$metaTags[$name];
+         }
+         return null;
+      }
+      return self::$metaTags;
    }
 
 }
