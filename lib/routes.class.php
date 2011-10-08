@@ -59,10 +59,12 @@ class Routes {
       if($category != null AND $category->haveFeed()){
          $this->addRoute('feed', null, 'main', '{type}.xml');
       }
+      $normalRespClass = null;
       if(isset ($this->routes['normal'])){ // některé moduly mají v sobě. Je nutné dostat tuto cestu vždy na konec
+         $normalRespClass = $this->routes['normal']['respondClass'];
          unset ($this->routes['normal']);
       }
-      $this->addRoute('normal', null, 'main', null); // základní cesta
+      $this->addRoute('normal', null, 'main', null, $normalRespClass); // základní cesta
    }
 
    /**
