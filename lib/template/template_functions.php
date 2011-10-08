@@ -111,12 +111,12 @@ function vve_tpl_xhtml_cut($string, $length, $addstring = '...', $link = null, $
       }
       // Close broken XHTML elements
       while (sizeof($tagsArray) != 0) {
+         $aTag = array_pop($tagsArray);
          if (sizeof($tagsArray) > 1) {
-            $aTag = array_pop($tagsArray);
             $ret .= "</" . $aTag . ">\n";
          }
          // You may add more tags here to put the link and added text before the closing tag
-         elseif ($aTag = 'p' || 'div') {
+         elseif ($aTag == 'p' || 'div') {
             $aTag = array_pop($tagsArray);
             $ret .= $addstring . "<a href=\"" . $link . "\" alt=\"" . $link_text . "\">" . $link_text . "</a></" . $aTag . ">\n";
          } else {
