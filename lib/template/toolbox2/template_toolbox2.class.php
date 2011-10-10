@@ -166,5 +166,16 @@ class Template_Toolbox2 extends Template {
       $this->template = $tpl;
       return $this;
    }
+   
+   /**
+    * Metoda pro slučování nástrojů
+    * @param Template_Toolbox2 $toolbox -- panel nástrojů, který se má sloučit s aktuálním
+    */
+   public function mergeTools(Template_Toolbox2 $toolbox)
+   {
+      foreach ($toolbox->getTools() as $tool) {
+         $this->addTool($tool);
+      }
+   }
 }
 ?>
