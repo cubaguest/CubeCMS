@@ -36,7 +36,7 @@
    <?}?>   
    
 <div class="facebook-button">
-   <script src="http://connect.facebook.net/<?=Locales::getLangLocale()?>/all.js#xfbml=1"></script>
+   <?$this->addFile('https://connect.facebook.net/'.Locales::getLangLocale().'/all.js#xfbml=1');?>
    <fb:like href="" show_faces="false" layout="standard" width="380" action="recommend" font=""></fb:like>
 </div>
 <div class="share-button">
