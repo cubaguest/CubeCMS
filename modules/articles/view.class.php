@@ -24,23 +24,40 @@ class Articles_View extends View {
 
    public function showView() {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_DETAIL, 'articles:detail.phtml'));
-      if ((string) $this->article->{Articles_Model::COLUMN_KEYWORDS} != null) {
-         Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
-      }
-      if ((string) $this->article->{Articles_Model::COLUMN_DESCRIPTION} != null) {
-         Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_DESCRIPTION});
-      } else if ((string) $this->article->{Articles_Model::COLUMN_ANNOTATION} != null) {
-         Template_Core::setPageDescription($this->article->{Articles_Model::COLUMN_ANNOTATION});
-      }
-      Template_Core::setMetaTag('author', $this->article->{Model_Users::COLUMN_USERNAME});
-      if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
-         Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}));
-      }
-   
+      $this->addMetaTags($this->article);
       if($this->category()->getParam(Articles_Controller::PARAM_DISABLE_LIST, false)){ // pokud není list přidáme tlačítko pro přidání položky
          $this->createListToolbox();
       }
       $this->createDetailToolbox();
+   }
+   
+   protected function addMetaTags($article)
+   {
+      if ((string) $article->{Articles_Model::COLUMN_KEYWORDS} != null) {
+         Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
+      }
+      if ((string) $article->{Articles_Model::COLUMN_DESCRIPTION} != null) {
+         Template_Core::setPageDescription($article->{Articles_Model::COLUMN_DESCRIPTION});
+      } else if ((string) $article->{Articles_Model::COLUMN_ANNOTATION} != null) {
+         Template_Core::setPageDescription($article->{Articles_Model::COLUMN_ANNOTATION});
+      }
+      Template_Core::setMetaTag('author', $article->{Model_Users::COLUMN_USERNAME});
+      if ($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
+         Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}));
+      } else if((string)$this->article->{Articles_Model::COLUMN_TEXT} != null){
+         // zkusit načíst kvůli meta tagům
+         $doc = new DOMDocument();
+         @$doc->loadHTML((string)$this->article->{Articles_Model::COLUMN_TEXT});
+         $xml = simplexml_import_dom($doc); // just to make xpath more simple
+         $images = $xml->xpath('//img');
+         if(!empty ($images) && isset ($images[0])){
+            if(strpos($images[0]['src'], 'http') !== false ){
+               Template_Core::setMetaTag('og:image', $images[0]['src']);
+            } else {
+               Template_Core::setMetaTag('og:image', Url_Request::getBaseWebDir(false).$images[0]['src']);
+            }
+         }
+      }
    }
 
    /**

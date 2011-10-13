@@ -8,6 +8,12 @@ class ArticlesWGal_View extends Articles_View {
    }
 
    public function showView() {
+      $this->addMetaTags($this->article);
+      if(Template_Core::getMetaTag('og:image') == null && count($this->images) > 0 && isset ($this->images[0])){
+         Template_Core::setMetaTag('og:image', $this->category()->getModule()->getDataDir(true).
+            $this->websubdir.Photogalery_Controller::DIR_SMALL.'/'
+            .$this->images[0]->{PhotoGalery_Model_Images::COLUMN_FILE});
+      }
       $this->createDetailToolbox();
       if($this->toolbox instanceof Template_Toolbox2){
          $this->toolbox->article_->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
@@ -15,7 +21,7 @@ class ArticlesWGal_View extends Articles_View {
          $pView = new Photogalery_View($this->pCtrl);
          $pView->addImagesToolbox();
       }
-      $this->template()->addFile("tpl://detail.phtml");
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalerymed_Controller::PARAM_TPL_DETAIL, 'detail.phtml'));
    }
 
    /**
