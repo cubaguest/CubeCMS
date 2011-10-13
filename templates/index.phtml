@@ -11,7 +11,17 @@ if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
    }
    Template::setPVar('IE',true);
 }
-// $this->addFile('css://style.css');
+
+// base styles
+$this->addFile('css://normalize.css');
+$this->addFile('css://style.css');
+$this->addFile('css://style-content.css');
+//$this->addFile('css://style-handle.css');
+// DEBUG
+if(VVE_DEBUG_LEVEL > 0){ $this->addFile('css://style-debug.css');}
+Template::addJsPlugin(new JsPlugin_JQuery());
+if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
+} else { $this->addFile('js://enginehelpers.min.js');}
 echo ('<?xml version="1.0" encoding="utf-8"?>');
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
@@ -32,11 +42,6 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          ?><link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat->{Model_Category::COLUMN_CAT_LABEL}?>" href="<?=$link?>" />
       <?
       }?>
-<link rel="stylesheet" type="text/css" href="<?=$this->style('style.css')?>" />
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-content.css')?>" />
-<!--      <link type="text/css" rel="stylesheet" href="<?//=$this->style('style-handheldstyle.css')?>" media="handheld" /> MOBILY-->
-      <link rel="stylesheet" href="<?=$this->style('style_opera.css')?>" type="text/nesmysl" />
-      <?if(VVE_DEBUG_LEVEL > 0){ echo '<link rel="stylesheet" type="text/css" href="'.$this->style('style-debug.css').'" />'; }?>
       <!--[if lte IE 6]>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
@@ -48,6 +53,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          /* ]]> */
       </script>
       {*-STYLESHEETS-*}
+      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-print.css')?>" media="print" />
       {*-JAVASCRIPTS-*}
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
@@ -67,15 +73,6 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             contentsource: "markup"});
          /* ]]> */
       </script>
-      <?if(Category::getSelectedCategory()->getRights()->isWritable()){?>
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-admin.css')?>" />
-         <?if(Auth::isAdmin()){?><script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/admin/menu.js"></script><?}?>
-      <?}
-      if(VVE_DEBUG_LEVEL > 1){
-         echo '<script type="text/javascript" src="'.Url_Request::getBaseWebDir(true).'jscripts/enginehelpers.js"></script>';
-      } else {
-         echo '<script type="text/javascript" src="'.Url_Request::getBaseWebDir(true).'jscripts/enginehelpers.min.js"></script>';
-      }?>
    </head>
    <body id="pageTop" <?if(Auth::isAdmin())echo 'class="with-admin-menu"';?> >
       <? // admin menu
@@ -195,3 +192,9 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       </div>
    </body>
 </html>
+<?
+if(Category::getSelectedCategory()->getRights()->isWritable()){
+   $this->addFile('css://style-admin.css');
+   if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
+}
+?>
