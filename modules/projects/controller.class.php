@@ -61,7 +61,7 @@ class Projects_Controller extends Controller {
       }
       
       $this->view()->sections = $sectionsData;
-      
+      $this->view()->dataDir = $this->module()->getDataDir(true);
    }
 
    public function projectController() 
@@ -70,7 +70,7 @@ class Projects_Controller extends Controller {
 
       $model = new Projects_Model_Projects();
       
-      $pr = $model
+      $pr = $model->joinFK(Projects_Model_Projects::COLUMN_ID_SECTION)
          ->where(Projects_Model_Projects::COLUMN_URLKEY.' = :prkey',array('prkey' => $this->getRequest('prkey')))
          ->record();
       
@@ -102,6 +102,7 @@ class Projects_Controller extends Controller {
             ->records();
          if($relProjects != false){
             $this->view()->projectsRelated = $relProjects;
+            $this->view()->projectsRelatedDataDir = $this->module()->getDataDir(true);
          }
       }
       
@@ -277,12 +278,13 @@ class Projects_Controller extends Controller {
             
             $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
             
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H), 
-               $this->category()->getParam(self::PARAM_THUM_C, false), 'main_thum.jpeg', IMAGETYPE_JPEG);
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_MED_W, 300), $this->category()->getParam(self::PARAM_MED_H, 300), 
-               false, 'main_med.jpeg', IMAGETYPE_JPEG);
+            $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
+               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
+               $this->category()->getParam(self::PARAM_THUM_C, false), 'main_thum.jpg', IMAGETYPE_JPEG);
+//            $image->saveAs($dir, $this->category()->getParam(self::PARAM_MED_W, 300), $this->category()->getParam(self::PARAM_MED_H, 300), 
+//               false, 'main_med.jpg', IMAGETYPE_JPEG);
             $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), 
-               false, 'main.jpeg', IMAGETYPE_JPEG);
+               false, 'main.jpg', IMAGETYPE_JPEG);
             $imageName = 'main';
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = true;
             $image->remove();
@@ -345,12 +347,13 @@ class Projects_Controller extends Controller {
             
             $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
             
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H), 
-               $this->category()->getParam(self::PARAM_THUM_C, false), 'main_thum.jpeg', IMAGETYPE_JPEG);
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_MED_W, 300), $this->category()->getParam(self::PARAM_MED_H, 300), 
-               false, 'main_med.jpeg', IMAGETYPE_JPEG);
+            $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
+               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
+               $this->category()->getParam(self::PARAM_THUM_C, false), 'main_thum.jpg', IMAGETYPE_JPEG);
+//            $image->saveAs($dir, $this->category()->getParam(self::PARAM_MED_W, 300), $this->category()->getParam(self::PARAM_MED_H, 300), 
+//               false, 'main_med.jpg', IMAGETYPE_JPEG);
             $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), 
-               false, 'main.jpeg', IMAGETYPE_JPEG);
+               false, 'main.jpg', IMAGETYPE_JPEG);
             $imageName = 'main';
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = true;
             $image->remove();
@@ -529,20 +532,69 @@ class Projects_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    protected function settings(&$settings,Form &$form) {
-      $fGrpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
+      
+      $phCtrl = new Photogalery_Controller($this);
+      $phCtrl->settings($settings, $form);
+      $form->removeElement('tplMain');
 
-      $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet položek na stránku'));
-      $elemScroll->setSubLabel(sprintf($this->tr('Výchozí: %s položek. Pokud je zadána 0 budou vypsány všechny položky'),self::DEFAULT_ARTICLES_IN_PAGE));
-      $elemScroll->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemScroll, $fGrpView);
-
-      if(isset($settings['scroll'])) {
-         $form->scroll->setValues($settings['scroll']);
+      $elemSW = new Form_Element_Text('image_thumb_w', 'Šířka miniatury titulního obrázku (px)');
+      $elemSW->addValidation(new Form_Validator_IsNumber());
+      $elemSW->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_W.'px');
+      $form->addElement($elemSW, 'images');
+      if(isset($settings[self::PARAM_THUM_W])) {
+         $form->image_thumb_w->setValues($settings[self::PARAM_THUM_W]);
       }
 
+      $elemSH = new Form_Element_Text('image_thumb_h', 'Výška miniatury titulního obrázku (px)');
+      $elemSH->addValidation(new Form_Validator_IsNumber());
+      $elemSH->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_H.'px');
+      $form->addElement($elemSH, 'images');
+      if(isset($settings[self::PARAM_THUM_H])) {
+         $form->small_height->setValues($settings[self::PARAM_THUM_H]);
+      }
+
+      $elemSC = new Form_Element_Checkbox('image_thumb_c', 'Ořezávat miniatury');
+      $elemSC->setValues(true);
+      if(isset($settings[self::PARAM_THUM_C])) {
+         $elemSC->setValues($settings[self::PARAM_THUM_C]);
+      }
+      $form->addElement($elemSC, 'images');
+      
+      
+      $elemW = new Form_Element_Text('image_w', 'Šířka titulního obrázku (px)');
+      $elemW->addValidation(new Form_Validator_IsNumber());
+      $elemW->setSubLabel('Výchozí: '.VVE_DEFAULT_PHOTO_W.'px');
+      $form->addElement($elemW, 'images');
+      if(isset($settings[self::PARAM_BIG_W])) {
+         $form->image_w->setValues($settings[self::PARAM_BIG_W]);
+      }
+
+      $elemH = new Form_Element_Text('image_h', 'Výška titulního obrázku (px)');
+      $elemH->addValidation(new Form_Validator_IsNumber());
+      $elemH->setSubLabel('Výchozí: '.VVE_DEFAULT_PHOTO_H.'px');
+      $form->addElement($elemH, 'images');
+      if(isset($settings[self::PARAM_BIG_H])) {
+         $form->image_h->setValues($settings[self::PARAM_BIG_H]);
+      }
+
+//      $elemSC = new Form_Element_Checkbox('image_thumb_c', 'Ořezávat miniatury');
+//      $elemSC->setValues(true);
+//      if(isset($settings[self::PARAM_THUM_C])) {
+//         $elemSC->setValues($settings[self::PARAM_THUM_C]);
+//      }
+//      $form->addElement($elemSC, 'images');
+      
+      
+      
+      
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
-         $settings['scroll'] = (int)$form->scroll->getValues();
+         $settings[self::PARAM_THUM_W] = $form->image_thumb_w->getValues();
+         $settings[self::PARAM_THUM_H] = $form->image_thumb_h->getValues();
+         $settings[self::PARAM_THUM_C] = $form->image_thumb_c->getValues();
+         
+         $settings[self::PARAM_BIG_W] = $form->image_w->getValues();
+         $settings[self::PARAM_BIG_H] = $form->image_h->getValues();
       }
    }
 }

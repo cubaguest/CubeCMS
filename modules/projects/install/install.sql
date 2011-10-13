@@ -4,18 +4,20 @@
 -- Struktura tabulky `projects`
 --
 CREATE TABLE IF NOT EXISTS `{PREFIX}projects` (
-  `id_project` int(11) NOT NULL,
+  `id_project` int(11) NOT NULL AUTO_INCREMENT,
   `id_project_section` int(11) NOT NULL,
   `id_user` smallint(6) NOT NULL,
   `project_name` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
   `project_urlkey` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
   `project_text` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
-  `project_text_celar` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
+  `project_text_clear` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `project_time_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `project_image` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
+  `project_image` tinyint(1) NOT NULL DEFAULT '0',
+  `project_related` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id_project`),
   KEY `id_user` (`id_user`,`project_urlkey`),
-  FULLTEXT KEY `name` (`project_name`,`project_text_celar`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  FULLTEXT KEY `name` (`project_name`,`project_text_clear`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -33,4 +35,4 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}projects_sections` (
   `section_time_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_project_section`),
   KEY `id_category` (`id_category`,`section_urlkey`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
