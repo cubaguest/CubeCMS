@@ -169,12 +169,6 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    public function scripts() {
       $script = null;
-      if($this->formIsMultilang) {
-         Template::addJsPlugin(new JsPlugin_JQuery());
-         Template::addJS(Url_Request::getBaseWebDir().'jscripts/enginehelpers.js');
-//         $script = new Html_Element_Script('formShowOnlyLang(\''.Locales::getLang().'\');');
-//         $script = null;
-      }
       return $script;
    }
 
