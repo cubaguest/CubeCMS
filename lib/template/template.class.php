@@ -551,17 +551,17 @@ class Template extends TrObject {
                break;
             case 'css':
                if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
-                  $filePath = $this->getLinkPathFromEngine($matches['file'], self::STYLESHEETS_DIR, $original);
+                  $filePath = $this->getLinkPathFromEngine($matches['filepath'], self::STYLESHEETS_DIR, $original);
                } else {
-                  $filePath = $this->getLinkPathFromModule($matches['file'], $matches['module'], self::STYLESHEETS_DIR, $original);
+                  $filePath = $this->getLinkPathFromModule($matches['filepath'], $matches['module'], self::STYLESHEETS_DIR, $original);
                }
                Template::addCss($filePath);
                break;
             case 'js':
                if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
-                  $filePath = $this->getLinkPathFromEngine($matches['file'], self::JAVASCRIPTS_DIR, $original);
+                  $filePath = $this->getLinkPathFromEngine($matches['filepath'], self::JAVASCRIPTS_DIR, $original);
                } else {
-                  $filePath = $this->getLinkPathFromModule($matches['file'], $matches['module'], self::JAVASCRIPTS_DIR, $original);
+                  $filePath = $this->getLinkPathFromModule($matches['filepath'], $matches['module'], self::JAVASCRIPTS_DIR, $original);
                }
                Template::addJs($filePath);
                break;
