@@ -11,9 +11,9 @@ $maintenanceContact = 'jakubmatas@gmail.com';
 $maintenanceAllowAccess = array('127.0.0.2');
 if(!file_exists('data/lock.tmp')){
    if($maintenance == false OR in_array($_SERVER['REMOTE_ADDR'], $maintenanceAllowAccess)){
-      require_once ('./app.php');
+      require_once ( isset ($corePath) ? $corePath.'app.php' : './app.php');
       AppCore::setAppMainLibDir(realpath(dirname(__FILE__)));
-      AppCore::setAppMainDir(realpath(dirname(__FILE__)));
+      AppCore::setAppMainDir(realpath(dirname(isset ($siteFile) ? $siteFile : __FILE__)));
       $app = AppCore::createApp();
       $app->runCore();
    } else {

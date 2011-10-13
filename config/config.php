@@ -13,6 +13,8 @@ define('VVE_DB_SERVER', 'localhost');
 define('VVE_DB_NAME', 'cube_cms');
 define('VVE_DB_USER', 'cube_cms');
 define('VVE_DB_PASSWD', 'cube_cms');
-define('VVE_DB_PREFIX', 'vypecky_');
+if(!defined('VVE_DB_PREFIX')){
+   define('VVE_DB_PREFIX', 'vypecky_');
+}
 
 ?>

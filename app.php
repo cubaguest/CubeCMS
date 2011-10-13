@@ -232,6 +232,9 @@ class AppCore extends TrObject {
       }
       // base cfg file
       require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
+      if(defined('VVE_PARENT_CONFIG') && is_file(AppCore::getAppLibDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE)){
+         require_once AppCore::getAppLibDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
+      }
       // inicializace parametrů jádra a php
       $this->_initCore();
 
