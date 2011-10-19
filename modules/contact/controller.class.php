@@ -100,8 +100,12 @@ class Contact_Controller extends Controller {
          // odeslání emailu
          $mail = new Email();
          $mail->setSubject($subject);
-         $mail->setFrom($formQuestion->mail->getValues());
-         $mail->setContent($formQuestion->text->getValues());
+         // odesílatele mailu nastavit na adresu zadanou ve formu
+         //$mail->setFrom($formQuestion->mail->getValues());
+         $mail->message()->setSender(array($formQuestion->mail->getValues() => $mail->sanitize($formQuestion->name->getValues())));
+         $mail->message()->setFrom(array($formQuestion->mail->getValues() => $mail->sanitize($formQuestion->name->getValues())));
+         $mail->message()->setReplyTo($formQuestion->mail->getValues());
+         $mail->message()->setBody($mail->sanitize($formQuestion->text->getValues()));
          //$mail->addAddress($formQuestion->mail->getValues()); // odesílat?
 
          if(empty($adminMails)){ // pokud je prázdný výtahneme nasatvené maily
