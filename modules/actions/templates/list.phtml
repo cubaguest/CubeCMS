@@ -1,6 +1,5 @@
 <?
 $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
-//$this->addPageHeadline(strftime("%x", $this->dateFrom).' - '.strftime("%x", $this->dateTo));
 echo $this->toolbox; // tolbox pro přidání
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
@@ -16,7 +15,7 @@ echo $this->toolbox; // tolbox pro přidání
       <?}?>
 
    <div class="main-content-tools">
-      <a href="<?=$this->link()->route('archive')?>" title="<?=$this->_('Archiv')?>"><?=$this->_('Archiv')?></a>
+      <a href="<?=$this->link()->route('archive')?>" title="<?=$this->tr('Archiv')?>"><?=$this->tr('Archiv')?></a>
    </div>
 
    <div class="main-content-list-records">
@@ -58,10 +57,10 @@ echo $this->toolbox; // tolbox pro přidání
                echo ',&nbsp;'.$row->{Actions_Model_Detail::COLUMN_PLACE};
             }
             if((int)$row->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-               printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
+               printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
             }
             if((int)$row->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-               printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
+               printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
             }
             ?>
       </div>
@@ -72,15 +71,7 @@ echo $this->toolbox; // tolbox pro přidání
             <?}?>
       <?if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
          <div class="main-content-image">
-            <img src="<?=$this->category()->getModule()->getDataDir(true)
-               .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
-               .$row->{Actions_Model_Detail::COLUMN_IMAGE}?>" alt="<?=$row->{Actions_Model_Detail::COLUMN_IMAGE}?>" />
-         <?// Tady je výpis obrázku s rozměry
-         //echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
-//              .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
-//              .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image',
-//                 $this->category()->getParam('img_width',  Actions_Controller::MAIN_IMAGE_WIDTH),
-//                 $this->category()->getParam('img_height',Actions_Controller::MAIN_IMAGE_HEIGHT), 'actionImage'));?>
+            <img src="<?=vve_tpl_art_title_image($row->{Actions_Model_Detail::COLUMN_IMAGE})?>" alt="<?ps($row->{Actions_Model_Detail::COLUMN_NAME})?>" />
          </div>
       <?}?>
       <div class="main-content-text">
@@ -88,7 +79,7 @@ echo $this->toolbox; // tolbox pro přidání
       </div>
       <p class="main-content-link-more">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+            title="<?=$this->tr('Více')?>"><?=$this->tr('Více')?></a>
       </p>
       <hr class="reseter"/>
       </div>

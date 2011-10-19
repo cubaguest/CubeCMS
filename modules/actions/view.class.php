@@ -7,7 +7,7 @@ class Actions_View extends View {
 
       if($this->text == false AND $this->rights()->isControll()){
          $this->text = new stdClass();
-         $this->text->{Text_Model::COLUMN_TEXT} = $this->_('Žádný text nebyl vytvořen.');
+         $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Žádný text nebyl vytvořen.');
       }
    }
 
@@ -15,16 +15,16 @@ class Actions_View extends View {
       if($this->rights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->_("Přidat akci"),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->tr("Přidat akci"),
          $this->link()->route('add'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou akci'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou akci'));
          $toolbox->addTool($toolAdd);
          
          if($this->rights()->isControll()) {
             $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->_("Upravit úvodní text"),
+            $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit úvodní text"),
             $this->link()->route('editlabel'));
-            $toolAdd->setIcon('page_edit.png')->setTitle($this->_('Upravit úvodní text'));
+            $toolAdd->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text'));
             $toolbox->addTool($toolAdd);
          }
 
@@ -34,6 +34,7 @@ class Actions_View extends View {
 
    public function showView() {
       $this->createDetailToolbox();
+      $this->addMetaTags($this->action);
       $this->template()->addTplFile("detail.phtml");
    }
 
@@ -43,14 +44,14 @@ class Actions_View extends View {
                       $this->action->{Actions_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_action', $this->_("Upravit"),
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_action', $this->tr("Upravit"),
          $this->link()->route('edit'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->_('Upravit akci'));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit akci'));
          $toolbox->addTool($toolEdit);
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $tooldel->setIcon('page_delete.png')->setTitle($this->_('Smazat'))
-            ->setConfirmMeassage($this->_('Opravdu smazat akci?'));
+         $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat'))
+            ->setConfirmMeassage($this->tr('Opravdu smazat akci?'));
          $toolbox->addTool($tooldel);
 
          $this->toolbox = $toolbox;
@@ -72,6 +73,35 @@ class Actions_View extends View {
       $this->tinyMCE->mainView();
    }
 
+   protected function addMetaTags($action)
+   {
+//      if ((string) $action->{Actions_Model_Detail::COLUMN_KEYWORDS} != null) {
+//         Template_Core::setPageKeywords($action->{Articles_Model::COLUMN_KEYWORDS});
+//      }
+//      if ((string) $action->{Actions_Model_Detail::COLUMN_DESCRIPTION} != null) {
+//         Template_Core::setPageDescription($action->{Articles_Model::COLUMN_DESCRIPTION});
+//      } else if ((string) $action->{Articles_Model::COLUMN_ANNOTATION} != null) {
+//         Template_Core::setPageDescription($action->{Articles_Model::COLUMN_ANNOTATION});
+//      }
+      Template_Core::setMetaTag('author', $action->{Model_Users::COLUMN_USERNAME});
+      if ($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+         Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($action->{Actions_Model_Detail::COLUMN_IMAGE}));
+      } else if((string)$action->{Actions_Model_Detail::COLUMN_TEXT} != null){
+         // zkusit načíst kvůli meta tagům
+         $doc = new DOMDocument();
+         @$doc->loadHTML((string)$action->{Actions_Model_Detail::COLUMN_TEXT});
+         $xml = simplexml_import_dom($doc); // just to make xpath more simple
+         $images = $xml->xpath('//img');
+         if(!empty ($images) && isset ($images[0])){
+            if(strpos($images[0]['src'], 'http') !== false ){
+               Template_Core::setMetaTag('og:image', $images[0]['src']);
+            } else {
+               Template_Core::setMetaTag('og:image', Url_Request::getBaseWebDir(false).$images[0]['src']);
+            }
+         }
+      }
+   }
+   
    /**
     * Viewer pro přidání novinky
     */
@@ -139,11 +169,11 @@ class Actions_View extends View {
          $placePriceStr .= $action->{Actions_Model_Detail::COLUMN_PLACE}.', ';
       }
       if((int)$action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-         $placePriceStr .= sprintf(strtolower($this->_('Vstupné: %d Kč')),
+         $placePriceStr .= sprintf(strtolower($this->tr('Vstupné: %d Kč')),
                  $action->{Actions_Model_Detail::COLUMN_PRICE}).', ';
       }
       if((int)$action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-         $placePriceStr .= sprintf(strtolower($this->_('V předprodeji: %d Kč')),
+         $placePriceStr .= sprintf(strtolower($this->tr('V předprodeji: %d Kč')),
                  $action->{Actions_Model_Detail::COLUMN_PREPRICE}).' ';
       }
       if($placePriceStr != null) {

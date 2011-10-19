@@ -39,19 +39,19 @@ if(!empty ($this->actions)) {
             // cena
             if ($row->{Actions_Model_Detail::COLUMN_PRICE} != null
                     AND $row->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
-               printf('<p>'.$this->_('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč').'</p>',
+               printf('<p>'.$this->tr('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč').'</p>',
                        $row->{Actions_Model_Detail::COLUMN_PRICE},
                        $row->{Actions_Model_Detail::COLUMN_PREPRICE});
             } else if($row->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
-               printf('<p>'.$this->_('cena: <span title="V předporodeji">%s</span> Kč').'</p>',
+               printf('<p>'.$this->tr('cena: <span title="V předporodeji">%s</span> Kč').'</p>',
                        $row->{Actions_Model_Detail::COLUMN_PREPRICE});
             } else if($row->{Actions_Model_Detail::COLUMN_PRICE} != null) {
-               printf('<p>'.$this->_('cena: <span title="Na místě">%s</span> Kč').'</p>',
+               printf('<p>'.$this->tr('cena: <span title="Na místě">%s</span> Kč').'</p>',
                        $row->{Actions_Model_Detail::COLUMN_PRICE});
             }?>
             <div class="panel-box-content"><?=vve_tpl_truncate(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT}),150)?></div>
             <p class="panel-box-link-more"><a href="<?=$this->link()?>"
-               title="<?=$this->_('Více o ').$row->{Actions_Model_Detail::COLUMN_NAME}?>"><?=$this->_('Více')?></a>
+               title="<?=$this->tr('Více o ').$row->{Actions_Model_Detail::COLUMN_NAME}?>"><?=$this->tr('Více')?></a>
             </p>
             <?
             if($step == $this->count) {
@@ -62,6 +62,6 @@ if(!empty ($this->actions)) {
 </div>
 <p class="panel-box-link-more">
    <a href="<?=$this->link()?>"
-      title="<?=$this->_('Více akcí z ').htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více akcí')?></a>
+      title="<?=$this->tr('Více akcí z ').htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více akcí')?></a>
 </p>
    <?}?>

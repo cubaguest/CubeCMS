@@ -40,7 +40,7 @@ if($this->rssLink != null){?>
       <p class="image" style="width: 100%; overflow: hidden;">
          <img style="width: 100%;"
             src="<?=$this->datadir.$this->action->{Actions_Model_Detail::COLUMN_IMAGE}?>"
-              alt="<?=$this->_('titulní obrázek akce').' '
+              alt="<?=$this->tr('titulní obrázek akce').' '
                  .htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>"/>
       </p>
       <?}
@@ -51,14 +51,14 @@ if($this->rssLink != null){?>
 
       if ($this->action->{Actions_Model_Detail::COLUMN_PRICE} != null
          AND $this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
-         printf('<p>'.$this->_('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč').'</p>', 
+         printf('<p>'.$this->tr('cena: <span title="Na místě">%s</span>&nbsp;/&nbsp;<span title="V předprodeji">%s</span> Kč').'</p>', 
                  $this->action->{Actions_Model_Detail::COLUMN_PRICE},
                          $this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
       } else if($this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
-         printf('<p>'.$this->_('cena: <span title="V předporodeji">%s</span> Kč').'</p>', 
+         printf('<p>'.$this->tr('cena: <span title="V předporodeji">%s</span> Kč').'</p>', 
                  $this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
       } else if($this->action->{Actions_Model_Detail::COLUMN_PRICE} != null) {
-         printf('<p>'.$this->_('cena: <span title="Na místě">%s</span> Kč').'</p>', 
+         printf('<p>'.$this->tr('cena: <span title="Na místě">%s</span> Kč').'</p>', 
                  $this->action->{Actions_Model_Detail::COLUMN_PRICE});
       }
       ?>
@@ -66,6 +66,6 @@ if($this->rssLink != null){?>
 </div>
 <p class="panelLinkMore">
    <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
 </p>
 <?}?>

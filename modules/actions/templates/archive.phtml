@@ -1,5 +1,5 @@
 <?
-$this->addPageTitle($this->_('Archiv'));
+$this->addPageTitle($this->tr('Archiv'));
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
@@ -9,10 +9,10 @@ $model = new Actions_Model_List();
 $actions = $model->getAllActions($this->category()->getId(), !$this->category()->getRights()->isWritable());
 
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName().' - '.$this->_('Archiv');;?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName().' - '.$this->tr('Archiv');;?></h1>
 <div class="main-content-archive">
    <div class="main-content-tools">
-      <a href="<?=$this->link()->route()?>" title="<?=$this->_('Seznam')?>"><?=$this->_('Seznam')?></a>
+      <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Seznam')?>"><?=$this->tr('Seznam')?></a>
    </div>
    <div class="main-content-list" id="actionsArchiveList">
       <? $prevYear = null;
@@ -47,7 +47,7 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                      $prevMounth = $mounth;?>
             <tr>
                <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?=$mounthNum?>');"
-                                  title="<?=$this->_('zobraz')." ".$mounth?>">
+                                  title="<?=$this->tr('zobraz')." ".$mounth?>">
                      <img src="<?=vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
                           alt="expand" />&nbsp;<?=$mounth?></a></td>
             </tr>

@@ -3,6 +3,7 @@ class Actionswgal_View extends Actions_View {
    public function showView() {
       $this->template()->addFile("tpl://detail.phtml");
       $this->createDetailToolbox();
+      $this->addMetaTags($this->action);
       if($this->toolbox instanceof Template_Toolbox2){
          $pView = new Photogalery_View($this->pCtrl);
          $pView->addImagesToolbox();

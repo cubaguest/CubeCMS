@@ -2,12 +2,12 @@
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
-   $this->addPageTitle($this->_('úprava akce'));
+   $this->addPageTitle($this->tr('úprava akce'));
    $this->addPageTitle($this->catName);
-   $h1 = $this->_('úprava akce').' '.$this->catName;
+   $h1 = $this->tr('úprava akce').' '.$this->catName;
 } else {
-   $this->addPageTitle($this->_('přidání akce'));
-   $h1 = $this->_('přidání akce');
+   $this->addPageTitle($this->tr('přidání akce'));
+   $h1 = $this->tr('přidání akce');
 }
 // donastavení formuláře
 $this->form->name->html()->setAttrib('size', 60);
@@ -25,7 +25,10 @@ $this->addJsPlugin($jQuery);
 ?>
 <h1><?=$h1?></h1>
 <div class="main-content-form-edit" id="editArticleForm">
-   <?print($this->form);?>
+   <?
+   echo($this->form);
+   $this->includeFile('tpl://engine:parts/seltitleimage.phtml');
+   ?>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){

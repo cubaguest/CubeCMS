@@ -34,7 +34,7 @@ class Articles_View extends View {
    protected function addMetaTags($article)
    {
       if ((string) $article->{Articles_Model::COLUMN_KEYWORDS} != null) {
-         Template_Core::setPageKeywords($this->article->{Articles_Model::COLUMN_KEYWORDS});
+         Template_Core::setPageKeywords($article->{Articles_Model::COLUMN_KEYWORDS});
       }
       if ((string) $article->{Articles_Model::COLUMN_DESCRIPTION} != null) {
          Template_Core::setPageDescription($article->{Articles_Model::COLUMN_DESCRIPTION});
@@ -44,10 +44,10 @@ class Articles_View extends View {
       Template_Core::setMetaTag('author', $article->{Model_Users::COLUMN_USERNAME});
       if ($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
          Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}));
-      } else if((string)$this->article->{Articles_Model::COLUMN_TEXT} != null){
+      } else if((string)$article->{Articles_Model::COLUMN_TEXT} != null){
          // zkusit načíst kvůli meta tagům
          $doc = new DOMDocument();
-         @$doc->loadHTML((string)$this->article->{Articles_Model::COLUMN_TEXT});
+         @$doc->loadHTML((string)$article->{Articles_Model::COLUMN_TEXT});
          $xml = simplexml_import_dom($doc); // just to make xpath more simple
          $images = $xml->xpath('//img');
          if(!empty ($images) && isset ($images[0])){
