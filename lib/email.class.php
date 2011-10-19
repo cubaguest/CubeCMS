@@ -9,7 +9,9 @@
  * @version    	$Id$ VVE4.0.1 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
- * @abstract      Třída pro práci s emaily
+ * @abstract      Třída pro práci s emaily (používá SwiftMailer)
+ * @todo          Předělat převod zanové sady na plugin BeforeSendListener http://swiftmailer.org/wikidocs/v3/plugindev/beforesendevent
+ * @see           http://swiftmailer.org/wikidocs/
  */
 // jádro
 require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
@@ -34,6 +36,10 @@ class Email {
     */
    private $mailer = null;
 
+   /**
+    * Objekt zprávy
+    * @var Swift_Message
+    */
    private $message = null;
 
    private $iconvParams = array();
@@ -61,7 +67,7 @@ class Email {
       $this->setMessage(Swift_Message::newInstance());
    }
 
-   private function safeStr($str)
+   public function sanitize($str)
    {
       if(empty ($this->iconvParams)) return $str;
       return iconv($this->iconvParams[0], $this->iconvParams[1], $str);
@@ -73,8 +79,9 @@ class Email {
     * @return Email -- vrací sebe
     */
    public function setFrom($address, $name=null)
-      {
-      $this->message->setFrom($address, $name);
+   {
+      $this->message()->setSender($address, $name);
+      $this->message()->setFrom($address, $name);
       return $this;
    }
 
@@ -85,7 +92,7 @@ class Email {
     */
    public function setSubject($subject)
    {
-      $this->message->setSubject($this->safeStr($subject));
+      $this->message()->setSubject($this->sanitize($subject));
       return $this;
    }
 
@@ -102,9 +109,9 @@ class Email {
          $cntType = 'text/html';
       }
       if($merge){
-         $this->message->setBody($this->message->getBody().$this->safeStr($content), $cntType);
+         $this->message()->setBody($this->message()->getBody().$this->sanitize($content), $cntType);
       } else {
-         $this->message->setBody($this->safeStr($content), $cntType);
+         $this->message()->setBody($this->sanitize($content), $cntType);
       }
       return $this;
    }
@@ -155,9 +162,9 @@ class Email {
    public function addAttachment($file)
    {
       if($file instanceof Filesystem_File){
-         $this->message->attach(Swift_Attachment::fromPath($file->getName(true)));
+         $this->message()->attach(Swift_Attachment::fromPath($file->getName(true)));
       } else {
-         $this->message->attach(Swift_Attachment::fromPath($file));
+         $this->message()->attach(Swift_Attachment::fromPath($file));
       }
       return $this;
    }
@@ -172,13 +179,13 @@ class Email {
 
    public function send(&$failures = null)
    {
-      $this->message->setTo($this->mailsAddresses);
-      return $this->mailer->send($this->message, $failures);
+      $this->message()->setTo($this->mailsAddresses);
+      return $this->mailer->send($this->message(), $failures);
    }
    public function batchSend(&$failures = null)
    {
-      $this->message->setTo($this->mailsAddresses);
-      return $this->mailer->batchSend($this->message, $failures);
+      $this->message()->setTo($this->mailsAddresses);
+      return $this->mailer->batchSend($this->message(), $failures);
    }
 
    /**
@@ -186,6 +193,15 @@ class Email {
     * @return Swift_Message
     */
    public function getMessage()
+   {
+      return $this->message();
+   }
+   
+   /**
+    * metoda vrací objekt zprávy
+    * @return Swift_Message
+    */
+   public function message()
    {
       return $this->message;
    }
@@ -197,19 +213,19 @@ class Email {
    public function setMessage(Swift_Message $message)
    {
       $this->message = $message;
-      $this->message->setEncoder(Swift_Encoding::get8BitEncoding());
+      $this->message()->setEncoder(Swift_Encoding::get8BitEncoding());
       switch (Locales::getLang()) {
          case 'cs': // many czech people use very old mail interface
-            $this->message->setCharset('iso-8859-2');
+            $this->message()->setCharset('iso-8859-2');
             $this->iconvParams = array(0 => 'UTF-8', 1 => 'iso-8859-2//TRANSLIT');
             break;
          default:
             break;
       }
       if(VVE_NOREPLAY_MAIL != null) {
-         $this->message->setFrom(VVE_NOREPLAY_MAIL);
+         $this->message()->setFrom(VVE_NOREPLAY_MAIL);
       } else {
-         $this->message->setFrom('noreplay@'.$_SERVER['SERVER_NAME']);
+         $this->message()->setFrom('noreplay@'.$_SERVER['SERVER_NAME']);
       }
    }
 }
