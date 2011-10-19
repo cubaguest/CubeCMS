@@ -1,5 +1,5 @@
 <?
-$this->addCssFile("style.css");
+$this->addFile("css://style.css?original");
 $jq = new JsPlugin_JQuery();
 $jq->addUIDatepicker();
 $jq->addUIResizable();
@@ -62,4 +62,3 @@ $this->form->created_date->html()->addClass('datepicker');
    });
    /* ]]> */
    </script>
-</div>
