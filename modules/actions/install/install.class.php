@@ -5,15 +5,22 @@ class Actions_Install extends Module_Install {
       $this->runSQLCommand($this->replaceDBPrefix($this->getSQLFileContent('install.sql')));
    }
    
-   protected function moduleUpdate($toVersion)
+   protected function moduleUpdate($major, $minor)
    {
-      switch ($toVersion) {
-         case 1.2:
-            // přesun titulních obrázků do složky pro titulní obrázky
-
-            break;
-         default:
-            break;
+      if($major == 1 && $minor == 2){
+         // přesun titulních obrázků do složky pro titulní obrázky
+         $model = new Actions_Model_List();
+         $actions = $model->getAllActionsWithCats();
+         $tDir = new Filesystem_Dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR);
+         $tDir->checkDir();
+         foreach ($actions as $action) {
+            $path = AppCore::getAppDataDir().$action->catkey.DIRECTORY_SEPARATOR.$action->actkey.DIRECTORY_SEPARATOR;
+            if($action->img != null && is_file($path.$action->img)){
+               if(!@rename($path.$action->img, $tDir.$action->img)){
+                  @copy($path.$action->img, $tDir.$action->img);
+               }
+            }
+         }
       }
    }
 }

@@ -287,6 +287,24 @@ class Actions_Model_List extends Model_PDO {
       return $dbst;
    }
 
+   /**
+    * Metoda pro vybrání všech akcí včetně kategorie - INTERNÍ PRO UPDATE
+    * @return Array of objects (prop.: actkey, catkey, img)
+    */
+   public function getAllActionsWithCats()
+   {
+      $dbc = new Db_PDO();
+      $dbst = $dbc->prepare("SELECT "
+         ." act.".Actions_Model_Detail::COLUMN_URLKEY.'_'.Locales::getDefaultLang().' AS actkey,'
+         ." act.".Actions_Model_Detail::COLUMN_IMAGE.' AS img,'
+         ." cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getDefaultLang().' AS catkey'
+         
+         ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE).' AS act'
+         ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON act.".Actions_Model_Detail::COLUMN_ID_CAT." = cat.".Model_Category::COLUMN_CAT_ID);
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $dbst->execute();
+      return $dbst;
+   }
 }
 
 ?>

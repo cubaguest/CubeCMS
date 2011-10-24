@@ -12,8 +12,7 @@ echo $this->toolbox;
 <div class="main-content-detail">
    <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
    <div class="main-content-image"><!-- SOF TEXT -->
-      <?echo (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true).$this->imagesDir.DIRECTORY_SEPARATOR
-          .$this->action->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 300,null, 'actionImage'));?>
+      <?echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model_Detail::COLUMN_IMAGE}), 'image', 300,null, 'actionImage'));?>
    </div>
    <?}?>
    <div class="main-content-annotation">

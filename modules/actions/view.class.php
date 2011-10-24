@@ -4,11 +4,6 @@ class Actions_View extends View {
       $this->template()->addTplFile("list.phtml", 'actions');
 
       $this->createListToolbox();
-
-      if($this->text == false AND $this->rights()->isControll()){
-         $this->text = new stdClass();
-         $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Žádný text nebyl vytvořen.');
-      }
    }
 
    protected function createListToolbox() {
