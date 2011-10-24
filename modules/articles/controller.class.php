@@ -193,7 +193,8 @@ class Articles_Controller extends Controller {
       }
 
       $artM->joinFK(Articles_Model::COLUMN_ID_USER_LAST_EDIT, array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)
-         ->joinFK(Articles_Model::COLUMN_ID_USER, array('usernameCreated' => Model_Users::COLUMN_USERNAME));
+         ->joinFK(Articles_Model::COLUMN_ID_USER, array('usernameCreated' => Model_Users::COLUMN_USERNAME,
+            'usernameName' => Model_Users::COLUMN_NAME, 'usernameSurName' => Model_Users::COLUMN_SURNAME ));
       $article = $artM->record();
 
 
@@ -379,6 +380,7 @@ class Articles_Controller extends Controller {
          if(isset ($editForm->titleImage)){
             $editForm->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
          }
+         $editForm->creatorOther->setValues($article->{Articles_Model::COLUMN_AUTHOR});
       }
 
       if($editForm->isSend() AND $editForm->save->getValues() == false){
@@ -553,6 +555,7 @@ class Articles_Controller extends Controller {
          }
       }
       $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
+      $artRecord->{Articles_Model::COLUMN_AUTHOR} = $form->creatorOther->getValues();
 
       // add time
       $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
@@ -690,6 +693,10 @@ class Articles_Controller extends Controller {
          $eCreator->setValues(Auth::getUserId());
          $form->addElement($eCreator, $fGrpPublic);
       }
+         
+      $eCreatorOther = new Form_Element_Text('creatorOther', $this->tr('Autor'));
+      $eCreatorOther->setSubLabel($this->tr('Autor položky, pokud není zařazen v systému.'));
+      $form->addElement($eCreatorOther, $fGrpPublic);
 
       $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
       $iConcept->setSubLabel($this->tr('Pokud je položka koncept, je viditelná pouze autorovi a administrátorům.'));
