@@ -1,0 +1,28 @@
+<?
+$h1 = $this->category()->getName();
+$dwLink = new Url_DownloadLink($this->category()->getModule()->getDataDir());
+echo $this->toolbox;
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<div class="main-content-detail">
+   <div class="main-content-text">
+      <?if($this->files != false && !empty ($this->files)){?>
+         <?foreach ($this->files as $file) {?>
+            <div class="dwfile">
+               <h2 id="dwfile-<?=$file->{DownloadFiles_Model::COLUMN_FILE}?>"><?=$file->{DownloadFiles_Model::COLUMN_NAME}?></h2>
+               <?if($file->{DownloadFiles_Model::COLUMN_TEXT} != null){?><p><?=$file->{DownloadFiles_Model::COLUMN_TEXT}?></p><?}?>
+               <p>
+                  <?=$this->tr('Nahráno')?>: <?=vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?>
+                  <a href="<?=$this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>" title="<?=$this->tr('Zobrazit')?>"><?=$this->tr('Zobrazit')?></a>
+                  <a href="<?=$dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE})?>" title="<?=$this->tr('Stáhnout')?>"><?=$this->tr('Stáhnout')?></a>
+               </p>
+               <?echo $file->toolbox;?>
+            </div>
+         <?}?>
+     <?} else {
+         echo "<p>".$this->tr('Źádný soubor nebyl nahrán').'</p>';
+      }
+      ?>
+   </div>
+</div>
+
