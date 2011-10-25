@@ -5,10 +5,11 @@ class Articles_SiteMap extends SiteMap {
       $model = new Articles_Model();
       $this->setCategoryLink(new DateTime($model->getLastChange($this->category()->getId())));
       $records = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_CONCEPT.' = 0 '
-         .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL'
-         .' AND '.Articles_Model::COLUMN_ADD_TIME.' <= NOW()',
-         array('idc' => $this->category()->getId()))
-         ->limit(0, $this->getMaxItems())->records();
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL'.' AND '.Articles_Model::COLUMN_ADD_TIME.' <= NOW()',
+            array('idc' => $this->category()->getId()))
+         ->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC))
+         ->limit(0, $this->getMaxItems())
+         ->records();
 
       foreach ($records as $record) {
          $this->addItem($this->link()->route('detail', array('urlkey' => $record->{Articles_Model::COLUMN_URLKEY})),
