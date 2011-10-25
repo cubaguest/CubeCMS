@@ -25,6 +25,7 @@ class DownloadFiles_Controller extends Controller {
       
       $files = $model
             ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
+            ->order(array(DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC))
             ->records();
       
       $this->view()->files = $files;
