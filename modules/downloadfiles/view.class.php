@@ -7,12 +7,11 @@
 class DownloadFiles_View extends View {
    public function mainView() 
    {
+      $this->template()->addFile('tpl://main.phtml');
       if($this->category()->getRights()->isWritable()) {
          $this->controlls = true;
-         $this->template()->addFile('tpl://main.phtml');
          
          $toolbox = new Template_Toolbox2();
-
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('dwfile_add', $this->tr('Přidat soubor'), $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr("Přidat nový soubor"));
          $toolbox->addTool($toolAdd);
@@ -39,9 +38,6 @@ class DownloadFiles_View extends View {
          }
          
          $this->toolboxItem = $toolboxEdit;
-         
-      } else {
-         $this->template()->addFile('tpl://main-readonly.phtml');
       }
    }
 
