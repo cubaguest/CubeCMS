@@ -48,7 +48,9 @@ class Category extends Category_Core {
          } else if($catKey != null) {
             $catModel->withRights()->where(Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey));
          } else {
-            $catModel->withRights()->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
+            $catModel->withRights()
+               ->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
+               ->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
          }
          $this->category = $catModel->record();
       } else {
