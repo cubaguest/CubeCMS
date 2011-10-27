@@ -5,6 +5,10 @@
    overflow: auto;
    background-color: transparent;
 }
+#category-structure .no-original {
+   color: gray;
+   font-style: italic;
+}
 
 #category-info { width: 40%; overflow: auto; }
 #category-info div { margin-left: 10px; }

@@ -8,7 +8,9 @@ function vveCatsRenderFunc($menuArr) {
    echo '<ul>';
    foreach ($menuArr as $key => $item) {
       echo '<li id="cat-id-'.$item->getCatObj()->getId().'">';
-      echo '<a href="#">'.htmlspecialchars($item).'&nbsp;'.langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}).' - '.$item->getCatObj()->getId().'</a>';
+      
+      $name = (string)$item != null ? htmlspecialchars((string)$item) : '<span class="no-original">'.htmlspecialchars($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_NAME}[Locales::getDefaultLang()]).'</span>';
+      echo '<a href="#">'.$name.'&nbsp;'.langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}).' - '.$item->getCatObj()->getId().'</a>';
       if(!$item->isEmpty()) {
          vveCatsRenderFunc($item);
       }
@@ -67,7 +69,6 @@ echo $this->toolbox;
          <li><?=$this->tr('Při vybrání kategorie se napravo zobrazí její vlastnosti.')?></li>
          <li><?=$this->tr('Jednotlivé kategorie lze přesunovat pouze myší.')?></li>
          <li><?=$this->tr('Pořadí v menu se aplikuje až po znovunačtení stránky.')?></li>
-         <li><?=$this->tr('')?></li>
       </ul>
    </div>
    <br />
