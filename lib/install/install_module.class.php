@@ -88,9 +88,17 @@ class Install_Module {
          }
          $matches = array();
          preg_match('/([0-9]+)[.,]?([0-9]?)/', (float)$currentVer+0.1, $matches);
+         $this->moduleUpdate($matches[1], $matches[2]);
          $model->registerUpdatedModule($this->moduleName, $matches[1], $matches[2]);
       }
    }
+   
+   /**
+    * Metoda pro implementaci updatu v modulu (např. přesun souborů)
+    * @param int $major -- major verzen na kterou se updatuje
+    * @param int $minor -- minor verzen na kterou se updatuje
+    */
+   protected function moduleUpdate($major, $minor) {}
 
    /**
     * Metoda pro instalaci SQL patchů
