@@ -197,8 +197,6 @@ function str2url(str,encoding,ucfirst)
 }
 
 $(document).ready(function(){
-   // select first language
-   $('.form-link-lang-container a:first-child').trigger('click', [false]);
    // when language is changed
    $('.form-link-lang-container a.form-link-lang').live('click',function(event, focus){
       if(typeof focus == 'undefined') focus = true;
@@ -218,6 +216,9 @@ $(document).ready(function(){
       $('label[lang="'+lang+'"]', $container).show();
       return false;
    });
+   // select first language
+   $('.form-link-lang-container a:first-child').trigger('click', [false]);
+   // toolbox events
    initToolboxEvents();
    // open external link in new window
    $("a.link-external").live('click',function(){
