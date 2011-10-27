@@ -118,7 +118,7 @@ class Category_Admin extends Category_Core {
     */
    public function isIndividualPanels()
    {
-      return true;
+      return false;
    }
 
    /**

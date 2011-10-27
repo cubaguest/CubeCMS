@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- ID Start from 32900 -->
 <adminmenu>
-   <section type="shop">
+   <section type="shop" icon="cart.png">
       <name lang="cs">Obchod</name>
       <name lang="en">E-Shop</name>
       <item id="32900">

@@ -1,5 +1,5 @@
 /* jen pro pořádek */
-body.with-admin-menu {padding: 0; margin: 0; margin-top: 20px}
+body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 /* fonty */
 .admin-font, .toolbox input, ul.dropdown li a {
    font-family: "Tahoma", "Arial", sans-serif !important;
@@ -7,18 +7,17 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 20px}
 }
 /* BASIC ADMIN MENU wrapper */
 #adminMenuWrapper {
-   background-color: #dadada;
+   background-color: #666666;
    position: fixed;
    top: 0;
    left: 0;
    width: 100%;
    z-index: 10002;
    text-align: left;
-   border-bottom: 1px solid gray;
-   box-shadow:0px 0px 3px #000;
+   border-bottom: 1px solid #666666;
+   box-shadow:0px 0px 5px #000;
    -webkit-box-shadow:0px 0px 3px #000;
    -moz-box-shadow: 0px 0px 3px #000;
-   line-height: 1.2;
 }
 /* ADMIN MENU LEVEL ONE */
 ul.dropdown, ul.dropdown ul {
@@ -29,42 +28,52 @@ ul.dropdown, ul.dropdown ul {
    z-index: 1000;
 }
 ul.dropdown li {
-   font-weight: bold; float: left; zoom: 1; background-color: #dadada;
+   font-weight: bold; float: left; zoom: 1; background-color: #666666;
    padding: 0;
    margin: 0;
    font-size: small;
    text-decoration: none;
    list-style: none;
+   position: relative;
 }
-ul.dropdown a:hover { color: #000; }
-ul.dropdown a:active { color: #ffa500; }
-ul.dropdown li a { display: block; padding: 3px 8px 2px; border-right: 1px solid #333; color: #222;}
-ul.dropdown li:last-child a { border-right: none; } /* Doesn't work in IE */
-ul.dropdown li.adminmenu-user-item, ul.dropdown li.adminmenu-user-item ul li {background-color: #B9D3E6;}
-ul.dropdown li.adminmenu-shop-item, ul.dropdown li.adminmenu-shop-item ul li {background-color: #acdd4a;}
+ul.dropdown li a { 
+   display: block; padding: 0 8px; color: white; line-height: 24px;
+   -moz-border-radius: 10px 10px 0 0;
+   border-radius: 10px 10px 0 0;
+   overflow: hidden;
+}
+ul.dropdown li a:hover {background: #333333 !important;}
+ul.dropdown li a:active { color: #ffa500; }
+ul.dropdown li a img { vertical-align: text-bottom; margin-right: 2px;}
+ul.dropdown li.adminmenu-user-item, ul.dropdown li.adminmenu-user-item ul li {background-color: #006666;}
+ul.dropdown li.adminmenu-shop-item, ul.dropdown li.adminmenu-shop-item ul li {background-color: #660000;}
 ul.dropdown li.hover, ul.dropdown li:hover 
-{ background: #F3D673 !important; color: black; position: relative; }
-ul.dropdown li.hover a { color: black; }
+{  }
+ul.dropdown li.hover a { color: white; }
 
 /* ADMIN MENU LEVEL TWO */
 ul.dropdown ul {
    width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0;
-   border: 1px solid gray;
    box-shadow:0px 0px 3px #000;
    -webkit-box-shadow:0px 0px 3px #000;
    -moz-box-shadow: 0px 1px 3px #000;
+   -moz-border-radius: 0 0 10px 10px;
+   border-radius: 0 0 10px 10px;
+   overflow: hidden;
 }
 ul.dropdown ul li {
    font-weight: normal;
-   background: silver;
+   background: #666666;
    color: #000;
-   border-bottom: 1px solid silver;
    float: none;
+   opacity: 0.9;
    /* IE 7 */
 }
-
 /* IE 6 & 7 Needs Inline Block */
-ul.dropdown ul li a { border-right: none; width: 90%; display: inline-block; }
+ul.dropdown ul li a { border-right: none; width: 90%; display: inline-block; 
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
 /* LEVEL THREE */
 ul.dropdown ul ul { left: 100%; top: 0; }
 ul.dropdown li:hover > ul { visibility: visible; }

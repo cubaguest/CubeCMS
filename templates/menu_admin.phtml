@@ -12,16 +12,30 @@ function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
       }
       $name = $item->xpath('name[@lang="cs"]');
       $name = $name[0];
-
       $urlkey = $item->xpath('urlkey[@lang="cs"]');
       if($urlkey != false){
          $urlkey = $urlkey[0];
       }
+      
+      $t = $item->xpath('title[@lang="cs"]');
+      $title = null;
+      if(isset ($t[0])){
+         $title = $t[0];
+      }
+      
       if($key == 'section') {
-         echo ('<a href="#">'.$name.'</a>'."");
+         echo '<a href="#" title="'.$title.'">';
+         if((string)$item['icon'] != null){
+            echo "<img src=\"/images/icons/{$item['icon']}\" alt=\"\" />";
+         }
+         echo $name.'</a>';
          vveAdminMenuRenderFunc($item->item, $link, null);
       } else {
-         echo ('<a href="'.$link->clear()->category($urlkey).'">'.$name.'</a>'."");
+         echo '<a href="'.$link->clear()->category($urlkey).'" title="'.$title.'">';
+         if((string)$item['icon'] != null){
+            echo "<img src=\"/images/icons/{$item['icon']}\" alt=\"\" />";
+         }
+         echo $name.'</a>';
       }
       echo ("</li>\n");
    }
