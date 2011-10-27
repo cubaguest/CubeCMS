@@ -1,0 +1,156 @@
+<? // base metatags
+Template_Core::setMetaTag('Robots', 'index,follow');
+Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE);
+
+// base styles
+$this->addFile('css://style-mobile.css');
+echo ('<?xml version="1.0" encoding="utf-8"?>');
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      {*-PAGE_META_TAGS-*}
+      <title>{*-PAGE_TITLE-*}</title>
+      <base href="<?=Url_Link::getMainWebDir()?>" />
+      <link rel="canonical" href="<?=$this->link()->rmParam()?>" />
+      <?//feedy RSS
+      $model = new Model_Category();
+      $model->setSelectAllLangs(false);
+      $cats = $model->columns(array(Model_Category::COLUMN_NAME, Model_Category::COLUMN_URLKEY))
+         ->where(Model_Category::COLUMN_FEEDS.' = 1', array())->records();
+      $link = new Url_Link(true);
+      foreach ($cats as $cat){
+         $link->category($cat->{Model_Category::COLUMN_URLKEY})->file('rss.xml');
+         ?><link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat->{Model_Category::COLUMN_CAT_LABEL}?>" href="<?=$link?>" />
+      <?
+      }?>
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         document.domain = '<?=Url_Request::getDomain();?>';
+         document.lang = '<?=Locales::getLang()?>';
+         /* ]]> */
+      </script>
+      {*-STYLESHEETS-*}
+      {*-JAVASCRIPTS-*}
+   </head>
+   <body id="pageTop" <?if(Auth::isAdmin())echo 'class="with-admin-menu"';?> >
+      <div id="bodywrap" style="<?
+                    $back = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND};
+                    if($back != null){
+                       echo "background-image: url('".Category::getImageDir(Category::DIR_BACKGROUND).$back."')"; }
+                  ?>">
+                  <?echo 'jede mobil';?>
+         <div id="headwrap">
+            <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
+            <div id="menuBox">
+               <div id="menuMain">
+                  <? $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
+               </div>
+               <hr class="separator" />
+            </div>
+            <div id="pageHeader">
+            </div>
+         </div><!-- headwrap -->
+         <div id="colswrap">
+            <div id="col1wrap" class="column">
+               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit() AND !empty($this->panels['right'])) echo " col1pad_plusright";?>">
+                  <? $this->includeTpl("messages.phtml", true);
+                  $this->includeTpl("navigation.phtml", true);
+                  if(VVE_DEBUG_LEVEL > 0){
+                     Debug::printDebug();
+                     Debug_Timer::printTimers();
+                  }
+                  ?>
+                  <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
+                  <?if($this->pageNotFound) {
+                     $this->includeTpl("error404.phtml", true);
+                  } else if($this->specialPage) {
+                        $this->includeTplObj($this->specialPageTpl);
+                     } else {
+                        $this->includeTpl("modules.phtml", true);
+                     }
+                  ?>
+                  <hr class="reseter" />
+                  </div>
+               </div><!-- col1pad -->
+            </div><!-- col1wrap -->
+
+            <? // levy panel ?>
+            <div id="col2wrap" class="column">
+               <div id="col2pad">
+                  <?
+                  if(!empty($this->panels['left'])) {
+                     foreach ($this->panels['left'] as $panelL) {?>
+                  <div class="panel panel-left">
+                           <?$this->includeTplObj($panelL);?>
+                  </div>
+                     <?}
+                  }?>
+                  <hr class="reseter" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+
+            <? // pravy panel
+            if(!Template_Module::isEdit()){?>
+            <div id="col3wrap" class="column">
+               <div id="col3pad">
+                  <div id="langs">
+                     <?foreach (Template::pVar('appLangs') as $lang) {
+                        $class = null;
+                        if($lang['name'] == Locales::getLang()) $class = 'selected';
+                        ?><a href="<?=$lang['link'];?>" title="<?=$lang['label'];?>" class="<?=$class?>"><?=$lang['name'];?></a>&nbsp;<?
+                     }?>
+                  </div>
+                  <?
+                  if(!empty($this->panels['right'])) {
+                     foreach ($this->panels['right'] as $panelR) {?>
+                  <div class="panel panel-right">
+                           <?$this->includeTplObj($panelR);?>
+                  </div>
+                     <?}
+                  }?>
+                  <hr class="reseter" />
+               </div><!-- col2pad -->
+            </div><!-- col2wrap -->
+            <?}?>
+
+            <div class="reseter">&nbsp;</div>
+         </div><!-- colswrap -->
+
+         <div class="reseter">&nbsp;</div>
+         <div id="footwrap">
+            <?
+            if(!empty($this->panels['bottom'])) {
+               foreach ($this->panels['bottom'] as $panelB) {?>
+            <div class="panel" style="float:left; width: 200px;">
+                     <?$this->includeTplObj($panelB);?>
+            </div>
+               <?}
+            }?>
+            <hr class="reseter" />
+            <?//$this->includeTpl("login.phtml", true);//je v panelu?>
+            <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=$this->tr("Mapa stránek")?>"><?=$this->tr("Mapa stránek")?></a>&nbsp;
+            <a href="<?=$this->link()->clear(true)->file('rss.html');?>" title="<?=$this->tr("Přehled rss zdrojů")?>"><?=$this->tr("Rss kanály")?></a>
+            <hr class="reseter" />
+         </div><!-- footwrap -->
+      </div><!-- bodywrap /-->
+      <hr class="reseter" />
+      <div id="debug">
+         <?
+         if(VVE_DEBUG_LEVEL >= 2) {
+            print ("Run functions: ".xdebug_get_function_count()."<br />");
+            print ("Memory: ".xdebug_memory_usage()."<br />");
+            print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");
+            print ("Index time: ".xdebug_time_index()."<br />");
+            print ("Exec time: ".$this->execTime."s<br />");
+         }
+         ?>
+      </div>
+   </body>
+</html>
+<?
+if(Category::getSelectedCategory()->getRights()->isWritable()){
+   $this->addFile('css://style-admin.css');
+   if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
+}
+?>

@@ -16,6 +16,7 @@ require_once 'template_items.php';
 require_once 'template_functions.php';
 require_once 'template_postfilters.php';
 require_once 'template_outputfilters.php'; // filtry výstupu
+require_once 'nonvve/browser/Browser.php'; // browser detection library
 
 class Template extends TrObject {
    /**
@@ -111,6 +112,12 @@ class Template extends TrObject {
     * @var Url_Link
     */
    protected $link = null;
+
+   /**
+    * Objekt identifikace prohlížeče
+    * @var Browser
+    */
+   private static $browser;
 
    /*
     * ============= MAGICKÉ METODY
@@ -266,6 +273,15 @@ class Template extends TrObject {
       }
    }
 
+   /**
+    * Metoda vrací objat prohlížeče
+    * @return Browser
+    */
+   public static function browser()
+   {
+      return self::$browser;
+   }
+   
    /**
     * Metoda přidá požadovaný soubor šablony do výstupu
     * @param string $name -- název souboru
@@ -483,7 +499,7 @@ class Template extends TrObject {
    public static function factory() {
       self::setFace(VVE_TEMPLATE_FACE);
    }
-
+   
    /**
     * Metoda nastaví název vzhledu webu (faces)
     * @param string $face -- název vzhledu
