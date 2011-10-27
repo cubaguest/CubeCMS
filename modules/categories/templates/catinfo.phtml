@@ -63,10 +63,10 @@ function tplCatTrRights(Translator $translator, $right)
       <th class="ui-widget-header"><?=$this->tr('Výchozí práva');?></th>
       <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
    </tr>
-<!--   <tr>
-      <th class="ui-widget-header"><?=$this->tr('');?></th>
-      <td class="ui-widget-content ui-state-default"></td>
-   </tr>-->
+   <tr>
+      <th class="ui-widget-header"><?=$this->tr('Priorita');?></th>
+      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_PRIORITY};?></td>
+   </tr>
 </table>
 <br />
 <table class="full-width">
