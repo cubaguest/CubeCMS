@@ -403,23 +403,10 @@ textarea, form .form-table .form-element-long {
 /* EOF sitemap Content */
 
 /* scrolovátka */
-.scroll_main {
+.scroll {}
+.scroll .numbers {
+   margin: 0 150px;
    text-align: center;
-   background-color: white;
-}
-.scroll_main a {
-}
-.scroll_main table {
-   width: 98%;
-   padding-left: 10px;
-   padding-right: 10px;
-   margin: 0 auto;
-   background-color: white;
-}
-.scroll_main p {
-   vertical-align: 4px;
-   display: inline;
-   /* font-weight: bold;*/
 }
 
 /* SOF navigtion menu */
