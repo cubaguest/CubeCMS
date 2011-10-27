@@ -27,11 +27,22 @@ class Url_DownloadLink {
     * @param string $path -- cesta k souboru (absolutní) (může obsahovat název souboru)
     * @param string $file -- (option) název souboru
     */
-   function __construct($path, $file = null) {
+   public function __construct($path, $file = null) {
+      $this->path = $path;
       if($file != null){
-         $this->path = $path;
          $this->file = $file;
       }
+   }
+   
+   /**
+    * Metoda nastaví soubor
+    * @param string $file -- soubor
+    * @return Url_DownloadLink 
+    */
+   public function file($file)
+   {
+      $this->file = $file;
+      return $this;
    }
 
    /**
