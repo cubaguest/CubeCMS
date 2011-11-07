@@ -1,3 +1,18 @@
+<?
+$allowClientResize = true;
+$w = $this->category()->getParam('medium_width', Photogalery_Controller::MEDIUM_WIDTH);
+$h = $this->category()->getParam('medium_height', Photogalery_Controller::MEDIUM_HEIGHT);
+$c = $this->category()->getParam('medium_crop', false);
+$ratio = 5/3;
+if( ( $w/$h > $ratio)
+   || ($w/$h < 1/$ratio)
+   || $c == true ){
+   $allowClientResize = false;
+//   var_dump('test1: '.($w/$h).' > '.$ratio);
+//   var_dump('test1: '.($w/$h).' < '.(1/$ratio));
+}
+
+?>
 <div class="ui-widget ui-widget-upload">
    <h2 class="ui-widget-header"><?=$this->tr('Přidání obrázků')?></h2>
    <div class="swfupload-control ui-widget-content">
@@ -5,7 +20,7 @@
          <p><strong><?=$this->tr('Obrázky')?>:</strong>
             <span id="spanButtonPlaceholder"></span>
             <button name="upload-button"><?=$this->tr('Vybrat obrázky')?></button>
-            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" checked="checked" /> (<?=$this->tr('Vypněte, pokud obrázky mají širokoúhlý poměr stran')?>)<br /></p>
+            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" <?if($allowClientResize) echo 'checked="checked"';?> /> (<?=$this->tr('Vypněte, pokud obrázky mají širokoúhlý poměr stran')?>)<br /></p>
          <p class="note"><?= $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
          může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
          Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
