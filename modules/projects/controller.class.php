@@ -41,12 +41,17 @@ class Projects_Controller extends Controller {
          $this->view()->formDelete = $formDelete;
       }
       
-      $secs = $modelSec->join(Projects_Model_Sections::COLUMN_ID, 'Projects_Model_Projects', Projects_Model_Projects::COLUMN_ID_SECTION,
-         null, Model_ORM::JOIN_OUTER)
+      $secs = $modelSec->join(Projects_Model_Sections::COLUMN_ID, 'Projects_Model_Projects', 
+         Projects_Model_Projects::COLUMN_ID_SECTION, null, Model_ORM::JOIN_OUTER)
          ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
             // ordery atd
+         ->order(array(Projects_Model_Sections::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,
+            Projects_Model_Projects::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,
+            Projects_Model_Sections::COLUMN_NAME => Model_ORM::ORDER_ASC,
+            Projects_Model_Projects::COLUMN_NAME => Model_ORM::ORDER_ASC,
+            ))
          ->records();
-
+      
       $sectionsData = array();
       foreach ($secs as $sec) {
          $sid = $sec->{Projects_Model_Sections::COLUMN_ID};
@@ -166,6 +171,7 @@ class Projects_Controller extends Controller {
          } else {
             $rec->{Projects_Model_Sections::COLUMN_URLKEY} = $form->url->getValues();
          }
+         $rec->{Projects_Model_Sections::COLUMN_WEIGHT} = $form->weight->getValues();
          
          $model->save($rec);
          
@@ -200,6 +206,7 @@ class Projects_Controller extends Controller {
          } else {
             $sec->{Projects_Model_Sections::COLUMN_URLKEY} = $form->url->getValues();
          }
+         $sec->{Projects_Model_Sections::COLUMN_WEIGHT} = $form->weight->getValues();
          
          $model->save($sec);
          
@@ -227,6 +234,13 @@ class Projects_Controller extends Controller {
       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $form->addElement($elemText);
       
+      $elemWeight = new Form_Element_Text('weight', $this->tr('Váha'));
+      $elemWeight->setSubLabel($this->tr("Větší váha umístí sekci výše."));
+      $elemWeight->addValidation(new Form_Validator_NotEmpty());
+      $elemWeight->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $elemWeight->setValues(0);
+      $form->addElement($elemWeight);
+      
       $elemUrl = new Form_Element_Text('url', $this->tr('URL klíč'));
       $elemUrl->addFilter(new Form_Filter_UrlKey());
       $form->addElement($elemUrl);
@@ -238,6 +252,7 @@ class Projects_Controller extends Controller {
          $form->name->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_NAME});
          $form->text->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_TEXT});
          $form->url->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_URLKEY});
+         $form->weight->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_WEIGHT});
       }
       
       return $form;
@@ -262,9 +277,11 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_ID_SECTION} = $form->section->getValues();
          $rec->{Projects_Model_Projects::COLUMN_ID_USER} = Auth::getUserId();
          $rec->{Projects_Model_Projects::COLUMN_NAME} = $form->name->getValues();
+         $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
          $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
+         $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
          
          if($form->url->getValues() == null){
             $rec->{Projects_Model_Projects::COLUMN_URLKEY} = vve_cr_url_key($rec->{Projects_Model_Projects::COLUMN_NAME});
@@ -324,9 +341,11 @@ class Projects_Controller extends Controller {
       if($form->isValid()){
          $rec->{Projects_Model_Projects::COLUMN_ID_SECTION} = $form->section->getValues();
          $rec->{Projects_Model_Projects::COLUMN_NAME} = $form->name->getValues();
+         $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
          $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
+         $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
          
          $oldDirName = $rec->{Projects_Model_Projects::COLUMN_URLKEY};
          
@@ -392,6 +411,10 @@ class Projects_Controller extends Controller {
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemName);
       
+      $elemShortName = new Form_Element_Text('shortName', $this->tr('Zkrácený název'));
+      $elemShortName->setSubLabel($this->tr('Bývá využit při výpis seznamu projektů. Pokud není definován použije se celý název.'));
+      $form->addElement($elemShortName);
+      
       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $form->addElement($elemText);
       
@@ -414,6 +437,13 @@ class Projects_Controller extends Controller {
          }
       }
       $form->addElement($elemSec);
+      
+      $elemWeight = new Form_Element_Text('weight', $this->tr('Váha'));
+      $elemWeight->setSubLabel($this->tr("Větší váha umístí projekt výše."));
+      $elemWeight->addValidation(new Form_Validator_NotEmpty());
+      $elemWeight->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $elemWeight->setValues(0);
+      $form->addElement($elemWeight);
       
       $mProjects = new Projects_Model_Projects();
       $prs = $mProjects
@@ -438,9 +468,11 @@ class Projects_Controller extends Controller {
       if($prRecord != null){
          // add element for remove file
          $form->name->setValues($prRecord->{Projects_Model_Projects::COLUMN_NAME});
+         $form->shortName->setValues($prRecord->{Projects_Model_Projects::COLUMN_NAME_SHORT});
          $form->text->setValues($prRecord->{Projects_Model_Projects::COLUMN_TEXT});
          $form->url->setValues($prRecord->{Projects_Model_Projects::COLUMN_URLKEY});
          $form->section->setValues($prRecord->{Projects_Model_Projects::COLUMN_ID_SECTION});
+         $form->weight->setValues($prRecord->{Projects_Model_Projects::COLUMN_WEIGHT});
          if($prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != false){
             $elemDelImg = new Form_Element_Checkbox('delimg', $this->tr('Smazat přiřazený obrázek'));
             $form->addElement($elemDelImg, null, 3);

@@ -22,7 +22,11 @@ echo $this->toolbox;
                $prlink = $this->link()->route('project', array('prkey' => $project->{Projects_Model_Projects::COLUMN_URLKEY},
                                                                'seckey' => $project->{Projects_Model_Sections::COLUMN_URLKEY}));
                ?>
-            <li><a href="<?=$prlink?>"><?=$project->{Projects_Model_Projects::COLUMN_NAME}?></a></li> 
+            <li><a href="<?=$prlink?>" title="<?=$project->{Projects_Model_Projects::COLUMN_NAME}?>"><?
+               echo $project->{Projects_Model_Projects::COLUMN_NAME_SHORT} != null 
+                    ? $project->{Projects_Model_Projects::COLUMN_NAME_SHORT}
+                    : $project->{Projects_Model_Projects::COLUMN_NAME};
+               ?></a></li> 
             <?}?>
          </ul>
          </p>

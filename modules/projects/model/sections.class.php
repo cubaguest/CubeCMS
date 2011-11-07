@@ -12,6 +12,7 @@ class Projects_Model_Sections extends Model_ORM {
    const COLUMN_TEXT = 'section_text';
    const COLUMN_TEXT_CLEAR = 'section_text_clear';
    const COLUMN_TIME_ADD = 'section_time_add';
+   const COLUMN_WEIGHT = 'section_weight';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_pr_sec');
@@ -23,6 +24,7 @@ class Projects_Model_Sections extends Model_ORM {
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_WEIGHT, array('datatype' => 'smallint', 'default' => 0));
 
       $this->setPk(self::COLUMN_ID);
       
