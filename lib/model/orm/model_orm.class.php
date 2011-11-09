@@ -1183,7 +1183,7 @@ class Model_ORM extends Model {
 
             if ($join['columns'] === null) { // jen vybrané sloupce
                foreach ($modelCols as $name => $params) {
-                  if ($params['pk'] == true && $name == $this->pKey)// všechny sloupce z tabulky kromě pk
+                  if (isset($this->tableStructure[$name]) OR ($params['pk'] == true && $name == $this->pKey))// všechny sloupce z tabulky kromě pk
                      continue;
                   array_push($columns, $this->createSelectColumnString($join['table2Alias'], $name, null, $params['lang'], $params['aliasFor']));
                }
