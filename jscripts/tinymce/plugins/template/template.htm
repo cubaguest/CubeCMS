@@ -18,7 +18,22 @@
 			<span id="tmpldesc"></span></div>
 			<fieldset>
 				<legend>{#template_dlg.preview}</legend>
-				<iframe id="templatesrc" name="templatesrc" src="blank.htm" width="690" height="400" frameborder="0"></iframe>
+				<iframe id="templatesrc" name="templatesrc" width="690" height="400" frameborder="0">
+               <html xmlns="http://www.w3.org/1999/xhtml">
+                  <head>
+                     <title>blank_page</title>
+                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                     <script type="text/javascript">
+                        var d = window.location.href.match(/mce_rdomain=([^&]+)/);
+                        if(d != null) document.domain = d[1]
+                        parent.TemplateDialog.loadCSSFiles(document);
+                     </script>
+                  </head>
+                  <body id="mceTemplatePreview" class="mceContentBody">
+
+                  </body>
+               </html>
+				</iframe>
 			</fieldset>
 		</div>
 		
