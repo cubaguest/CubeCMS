@@ -539,8 +539,8 @@ abstract class Controller extends TrObject {
       $this->checkControllRights();
 
       $form = new Form('settings_', true);
-      $grpBasic = $form->addGroup('basic', _('Základní nastavení'));
-      $grpView = $form->addGroup('view', _('Nastavení vzhledu'));
+      $grpBasic = $form->addGroup('basic', $this->tr('Základní nastavení'));
+      $grpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
 
       if($this->category()->getCatDataObj()->{Model_Category::COLUMN_PARAMS}!= null){
@@ -562,14 +562,14 @@ abstract class Controller extends TrObject {
 
       // ostatní nastavení
       /* IKONA */
-      $elemIcon = new  Form_Element_File('icon', _('Titulní obrázek/ Ikona'));
+      $elemIcon = new  Form_Element_File('icon', $this->tr('Titulní obrázek/ Ikona'));
       $elemIcon->setUploadDir(Category::getImageDir(Category::DIR_ICON, true));
       $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemIcon,$grpView);
 
       /* IKONA uploadnutá */
-      $elemIconImageSelect = new Form_Element_Select('iconUploaded', _('Přiřazený obrázek'));
-      $elemIconImageSelect->setOptions(array( _('Žádná') => 'none'));
+      $elemIconImageSelect = new Form_Element_Select('iconUploaded', $this->tr('Přiřazený obrázek'));
+      $elemIconImageSelect->setOptions(array( $this->tr('Žádná') => 'none'));
       if(file_exists(Category::getImageDir(Category::DIR_ICON, true))){
          $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_ICON, true));
          foreach ($dirIterator as $item) {
@@ -582,13 +582,13 @@ abstract class Controller extends TrObject {
       }
       $form->addElement($elemIconImageSelect, $grpView);
       /* POZADÍ */
-      $elemBackImage = new  Form_Element_File('background', _('Pozadí'));
+      $elemBackImage = new  Form_Element_File('background', $this->tr('Pozadí'));
       $elemBackImage->setUploadDir(Category::getImageDir(Category::DIR_BACKGROUND, true));
       $elemBackImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemBackImage,$grpView);
       /* POZADÍ uploadnuté */
-      $elemBackImageSelect = new Form_Element_Select('backgroundUploaded', _('Přiřazené pozadí'));
-      $elemBackImageSelect->setOptions(array( _('Žádné') => 'none'));
+      $elemBackImageSelect = new Form_Element_Select('backgroundUploaded', $this->tr('Přiřazené pozadí'));
+      $elemBackImageSelect->setOptions(array( $this->tr('Žádné') => 'none'));
       if(file_exists(Category::getImageDir(Category::DIR_BACKGROUND, true))){
          $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_BACKGROUND, true));
          foreach ($dirIterator as $item) {
@@ -600,16 +600,27 @@ abstract class Controller extends TrObject {
          $elemBackImageSelect->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND});
       }
       $form->addElement($elemBackImageSelect, $grpView);
+      
+      $elemShareTools = new Form_Element_Checkbox('shareTools', $this->tr('Nastroje pro sdílení obsahu'));
+      $elemShareTools->setSubLabel($this->tr('Zapnutí nástrojů pro sdílení obsahu na sociálních sítích.'));
+      $elemShareTools->setValues(true);
+      if(isset($settings['shareTools'])){
+         $elemShareTools->setValues($settings['shareTools']);
+      }
+      $form->addElement($elemShareTools, $grpView);
+      
       /* BUTTONS SAVE AND CANCEL */
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
 
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage(_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
       
       if($form->isValid()){
+         $settings['shareTools'] = $form->shareTools->getValues();
+         
          // čištění nulových hodnot
          foreach ($settings as $key => $option){
             if($option === null OR $option === ''){
@@ -644,7 +655,7 @@ abstract class Controller extends TrObject {
          $catRec->{Model_Category::COLUMN_PARAMS} = serialize($settings);
 
          $categoryM->save($catRec);
-         $this->infoMsg()->addMessage(_('Nastavení bylo uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->log('Upraveno nastavení kategorie "'.$this->category()->getName().'"');
          $this->link()->route()->reload();
       }
