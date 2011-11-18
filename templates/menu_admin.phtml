@@ -1,6 +1,7 @@
 <?
 // funkce pro render menu
 function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
+   $l = Locales::getLang();
    echo ("<ul ".$ulParam.">\n");
    foreach ($menuArr as $key => $item) {
       if(isset($item['type']) && $item['type'] == 'user'){
@@ -10,14 +11,14 @@ function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
       } else {
          echo ("<li>");
       }
-      $name = $item->xpath('name[@lang="cs"]');
+      $name = $item->xpath('name[@lang="'.$l.'"]');
       $name = $name[0];
-      $urlkey = $item->xpath('urlkey[@lang="cs"]');
+      $urlkey = $item->xpath('urlkey[@lang="'.$l.'"]');
       if($urlkey != false){
          $urlkey = $urlkey[0];
       }
       
-      $t = $item->xpath('title[@lang="cs"]');
+      $t = $item->xpath('title[@lang="'.$l.'"]');
       $title = null;
       if(isset ($t[0])){
          $title = $t[0];
