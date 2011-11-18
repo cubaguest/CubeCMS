@@ -601,7 +601,7 @@ abstract class Controller extends TrObject {
       }
       $form->addElement($elemBackImageSelect, $grpView);
       
-      $elemShareTools = new Form_Element_Checkbox('shareTools', $this->tr('Nastroje pro sdílení obsahu'));
+      $elemShareTools = new Form_Element_Checkbox('shareTools', $this->tr('Nástroje pro sdílení obsahu'));
       $elemShareTools->setSubLabel($this->tr('Zapnutí nástrojů pro sdílení obsahu na sociálních sítích.'));
       $elemShareTools->setValues(true);
       if(isset($settings['shareTools'])){
