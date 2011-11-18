@@ -6,12 +6,7 @@
 /*   width: 500px;*/
 }
 
-#table-order-status td, #table-order-status th, 
-#table-order-status-form td, #table-order-status-form th,
-#table-order-items td, #table-order-items th
-{
-   padding: 3px;
-}
+#order-detail td, #order-detail th { padding: 3px; }
 
 .order-full-price {
    font-weight: bold;

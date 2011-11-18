@@ -28,7 +28,7 @@ class AppCore extends TrObject {
    /**
     * Revize Enginu
     */
-   const ENGINE_RELEASE = 5;
+   const ENGINE_RELEASE = 6;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -241,8 +241,11 @@ class AppCore extends TrObject {
       //	přidání adresáře pro načítání knihoven
       set_include_path(AppCore::getAppLibDir().self::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
 
-      //načtení potřebných knihoven
-      spl_autoload_register(array('AppCore', '_loadLibraries'));
+      // Autoloaders
+      spl_autoload_extensions('.class.php,.php');
+      spl_autoload_register();
+      spl_autoload_register(array('AppCore', 'libLoader'));
+      spl_autoload_register(array('AppCore', 'moduleLoader'));
    }
 
    /**
@@ -411,10 +414,12 @@ class AppCore extends TrObject {
          require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
             . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . $exFile.'.class.php');
       }
-      // soubor s globálními funkcemi, které nejsou součástí php, ale časem by mohly být
+      // logování
       require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'log.class.php'); // loger
+      // soubor s globálními funkcemi, které nejsou součástí php, ale časem by mohly být
       require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
                       . 'functions' . DIRECTORY_SEPARATOR . 'functions.php');
+      // ostatní často načítané třídy                
    }
 
    /**
@@ -480,54 +485,63 @@ class AppCore extends TrObject {
    }
 
    /**
-    * Metoda načte potřebné knihovny
+    * Metoda pro automatické načtení knihoven
     * @todo refaktoring nutný
     */
-   public static function _loadLibraries($classOrigName)
+   public static function libLoader($classOrigName)
    {
-      /**
-       * Funkce slouží pro automatické načítání potřebných tříd
-       * @param string -- název třídy
-       */
-//      function __autoload($classOrigName) {
-         $file = strtolower($classOrigName).'.class.php';
-         $classL = strtolower($classOrigName);
-         $pathDirs = explode('_', $classL);
-         $moduleFile = $pathDirs[count($pathDirs)-1].'.class.php';
-         $pathFull = implode('/', $pathDirs);
-         unset ($pathDirs[count($pathDirs)-1]);
-         $pathShort = implode('/', $pathDirs);
-         if(file_exists(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.$file)) {
-            require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.$file;
-         } else if(file_exists(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR
-         .DIRECTORY_SEPARATOR.$classL.DIRECTORY_SEPARATOR.$file)) {
-            require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
-                            .$classL.DIRECTORY_SEPARATOR.$file;
-         } else if(file_exists(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR
-         .DIRECTORY_SEPARATOR.$pathShort.DIRECTORY_SEPARATOR.$file)) {
-            require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR
-                            .DIRECTORY_SEPARATOR.$pathShort.DIRECTORY_SEPARATOR.$file;
-         } else if(file_exists(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR
-         .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$file)) {
-            require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR
-                            .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$file;
-         }
-
-         else if(file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR
-         .DIRECTORY_SEPARATOR.$pathShort.DIRECTORY_SEPARATOR.$moduleFile)) {
-            require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
-                            .DIRECTORY_SEPARATOR.$pathShort.DIRECTORY_SEPARATOR.$moduleFile;
-         } else if(file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR
-         .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile)) {
-            require_once AppCore::getAppLibDir().AppCore::MODULES_DIR
-                            .DIRECTORY_SEPARATOR.$pathFull.DIRECTORY_SEPARATOR.$moduleFile;
-         } else {
-            $tr = new Translator();
-            Log::msg(sprintf($tr->tr('Nelze nahrát třídu %s'), $classOrigName), $file);
-            return false;
-         }
-//      }
-      //		knihovny pro práci s chybami
+      $file = strtolower($classOrigName) . '.class.php';
+      $classL = strtolower($classOrigName);
+      $pathDirs = explode('_', $classL);
+      $pathFull = implode('/', $pathDirs);
+      array_pop($pathDirs); // remove last path item
+      $pathShort = implode('/', $pathDirs);
+      // short path
+      if (is_file(AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
+            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $file)) {
+         require_once AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
+            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $file;
+         return true;
+      }
+      // full path
+      if (is_file(AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
+            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file)) {
+         require_once AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
+            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file;
+         return true;
+      }
+      return false;
+   }
+   
+   /**
+    * Metoda pro automatické načtení knihoven
+    * @todo refaktoring nutný
+    */
+   public static function moduleLoader($classOrigName)
+   {
+      $file = strtolower($classOrigName) . '.class.php';
+      $classL = strtolower($classOrigName);
+      $pathDirs = explode('_', $classL);
+      $moduleFile = end($pathDirs) . '.class.php';
+      $pathFull = implode('/', $pathDirs);
+      array_pop($pathDirs);
+      $pathShort = implode('/', $pathDirs);
+      
+      // short path
+      if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR
+            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $moduleFile)) {
+         require_once AppCore::getAppLibDir() . AppCore::MODULES_DIR
+            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $moduleFile;
+         return true;
+      } 
+      // full path
+      if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR
+            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile)) {
+         require_once AppCore::getAppLibDir() . AppCore::MODULES_DIR
+            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile;
+         return true;
+      } 
+      return false;
    }
 
    /**

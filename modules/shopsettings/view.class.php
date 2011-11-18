@@ -37,6 +37,11 @@ class ShopSettings_View extends View {
       $this->template()->addFile('tpl://orders.phtml');
    }
    
+   public function customersView()
+   {
+      
+   }
+   
    private function addTinyMCE() {
       $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
       if($type == 'none') return;

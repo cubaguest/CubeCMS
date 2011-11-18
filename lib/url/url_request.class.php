@@ -159,13 +159,12 @@ class Url_Request {
       }
 
       if(VVE_SUB_SITE_DOMAIN != null AND VVE_SUB_SITE_USE_HTACCESS == true){ // Only if Htacces subdomain workarround
-         // @TODO Work corectly?
          $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
-         $scriptName = str_replace(VVE_SUB_SITE_DOMAIN, '', $scriptName);
+         $scriptName = str_replace('/'.VVE_SUB_SITE_DOMAIN, '', $scriptName);
       }
 
       //		Vytvoříme základní URL cestu k aplikaci
-      self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strrpos($scriptName, '/')).'/';
+      self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strpos($scriptName, '/')).'/';
       if(VVE_SUB_SITE_DOMAIN != null){
          self::$baseMainWebUrl = str_replace(self::$serverName, 'www.'.self::$domain, self::$baseWebUrl);
       }

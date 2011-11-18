@@ -14,6 +14,7 @@ class Shop_Model_Shippings extends Model_ORM {
    const COLUMN_TEXT = 'shipping_text';
    const COLUMN_VALUE = 'shipping_price';
    const COLUMN_DISALLOWED_PAYMENTS = 'payments_disallowed';
+   const COLUMN_PERSONAL_PICKUP = 'shipping_is_personal_pickup';
 
    protected function _initTable() {
       $this->setTableName(self::DB_TABLE, 't_ssh');
@@ -24,7 +25,8 @@ class Shop_Model_Shippings extends Model_ORM {
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'varchar(10)', 'default' => 0, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DISALLOWED_PAYMENTS, array('datatype' => 'varbinary(200)', 'default' => null, 'pdoparam' => PDO::PARAM_STR));
-
+      $this->addColumn(self::COLUMN_PERSONAL_PICKUP, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      
       $this->setPk(self::COLUMN_ID);
       
       $this->addForeignKey(self::COLUMN_ID_ZONE, 'Shop_Model_Zones', Shop_Model_Zones::COLUMN_ID);

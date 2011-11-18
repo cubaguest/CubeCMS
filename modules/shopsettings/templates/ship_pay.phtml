@@ -106,8 +106,8 @@ $this->includeFile('tpl://nav.phtml');
             ajaxGridOptions : {type:"POST"},
             url: '<?=$this->link()->route('shippingsList');?>',
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Hodnota v %')?>', 
-               '<?=$this->tr('Doplňující text pro uživatele')?>', '<?=$this->tr('ID zakázaných plateb')?>'],
+            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Cena')?>', 
+               '<?=$this->tr('Doplňující text pro uživatele')?>', '<?=$this->tr('ID zakázaných plateb')?>', '<?=$this->tr('Osobní <br />odběr')?>'],
             colModel:[
                {name:'<?=Shop_Model_Shippings::COLUMN_ID?>',index:'<?=Shop_Model_Shippings::COLUMN_ID?>', 
                   width:33, fixed : true, editable:false},
@@ -133,8 +133,13 @@ $this->includeFile('tpl://nav.phtml');
                   formoptions:{ rowpos:4, label: "<?=$this->tr('Text pro uživatele')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
                {name:'<?=Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS?>',index:'<?=Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS?>', 
-                  width:130, fixed : true, editable: true,editoptions:{size:20},
-                  formoptions:{ rowpos:5, label: "<?=$this->tr('ID zakázaných plateb <br />oddělených středníky')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
+                  width:100, fixed : true, editable: true,editoptions:{size:20},
+                  formoptions:{ rowpos:5, label: "<?=$this->tr('ID zakázaných plateb <br />oddělených středníky')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               
+               {name:'<?=Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP?>',index:'<?=Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP?>', formatter: 'checkbox', 
+                  formatoptions:{disabled: true, 'class' : 'bersonal-pickup'}, 
+                  width:50,fixed: true,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"},
+                  formoptions:{ rowpos:7, label: "<?=$this->tr('Osobní odběr')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
             ],
             rowNum:5,
             rowList:[5,10,20,50],

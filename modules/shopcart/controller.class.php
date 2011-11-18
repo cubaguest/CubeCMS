@@ -71,7 +71,6 @@ class ShopCart_Controller extends Controller {
       }
       $this->view()->formReset = $formReset;
       
-      
       // doprava a platba
       
       $modelShippings = new Shop_Model_Shippings();
@@ -260,17 +259,17 @@ class ShopCart_Controller extends Controller {
       $eNote = new Form_Element_TextArea('note', $this->tr('Poznámka'));
       $formOrder->addElement($eNote);
       
-      $eNewsletter = new Form_Element_Checkbox('newsletter', $this->tr('Novinky e-mailem'));
-      $eNewsletter->setValues(true);
-      $eNewsletter->setSubLabel($this->tr('Registrovat k se odběru novinek na zadaný e-mail'));
-      $formOrder->addElement($eNewsletter);
+//      $eNewsletter = new Form_Element_Checkbox('newsletter', $this->tr('Novinky e-mailem'));
+//      $eNewsletter->setValues(true);
+//      $eNewsletter->setSubLabel($this->tr('Registrovat k se odběru novinek na zadaný e-mail'));
+//      $formOrder->addElement($eNewsletter);
       
-      $eCreateAccount = new Form_Element_Checkbox('createAcc', $this->tr('Vytvořit účet'));
-      $eCreateAccount->setSubLabel($this->tr('Vytvořit uživatelský účet ze zadaných údajů pro příští nákup'));
-      $formOrder->addElement($eCreateAccount);
-      
-      $eCreateAccountPass = new Form_Element_Text('createAccPassword', $this->tr('Heslo'));
-      $formOrder->addElement($eCreateAccountPass);
+//      $eCreateAccount = new Form_Element_Checkbox('createAcc', $this->tr('Vytvořit účet'));
+//      $eCreateAccount->setSubLabel($this->tr('Vytvořit uživatelský účet ze zadaných údajů pro příští nákup'));
+//      $formOrder->addElement($eCreateAccount);
+//      
+//      $eCreateAccountPass = new Form_Element_Text('createAccPassword', $this->tr('Heslo'));
+//      $formOrder->addElement($eCreateAccountPass);
       
       $eSend = new Form_Element_SaveCancel('send', array($this->tr('Objednat'), $this->tr('Zpět do košíku')));
       $eSend->setCancelConfirm(false);
@@ -346,16 +345,15 @@ class ShopCart_Controller extends Controller {
                         $product->{Shop_Model_Product::COLUMN_NAME}, $prQty, $product->{Shop_Model_Product::COLUMN_UNIT} ));
                }
             }
-//            $modelProducts->unLock();
-//            $modelProducts->lock('READ');
             // samotný update zboží
             foreach ($products as $product) {
-               $product->{Shop_Model_Product::COLUMN_QUANTITY} = $product->{Shop_Model_Product::COLUMN_QUANTITY}
-                  -$basket[$product->{Shop_Model_Basket::COLUMN_ID_PRODUCT}]->getQty();
-               $modelProducts->save($product);
+               if($product->{Shop_Model_Product::COLUMN_QUANTITY} != -1){
+                  $product->{Shop_Model_Product::COLUMN_QUANTITY} = $product->{Shop_Model_Product::COLUMN_QUANTITY}
+                     -$basket[$product->{Shop_Model_Basket::COLUMN_ID_PRODUCT}]->getQty();
+                  $modelProducts->save($product);
+               }
             }
             $modelProducts->unLock();
-            
          } catch (RangeException $exc) {
             $modelProducts->unLock();
             $this->errMsg()->addMessage($exc->getMessage(), true);
@@ -428,14 +426,14 @@ class ShopCart_Controller extends Controller {
          $order->{Shop_Model_Orders::COLUMN_TOTAL} = $productsPrice + $paymentPrice + $shippingPrice;
          
          // registrace do newsletteru
-         if($formOrder->newsletter->getValues() == true){
-            
-         }
+//         if($formOrder->newsletter->getValues() == true){
+//            
+//         }
          
          // registrace uživatelského účtu
-         if($formOrder->createAcc->getValues() == true){
-            
-         }
+//         if($formOrder->createAcc->getValues() == true){
+//            
+//         }
          
          // ostatní položky objednávky
          $order->{Shop_Model_Orders::COLUMN_NOTE} = $formOrder->note->getValues();

@@ -24,6 +24,7 @@ class Install_Core {
    const SQL_MAIN_SITE_UPDATE = 'UPDATE_MAIN_SITE';
    const SQL_SUB_SITE_UPDATE = 'UPDATE_SUB_SITE';
    const SQL_SITE_END_UPDATE = 'END_UPDATE';
+   const SQL_SHOP_UPDATE = 'UPDATE_SHOP';
 
    protected $tablesPrefix = '{PREFIX}';
 
@@ -80,6 +81,9 @@ class Install_Core {
                         $sql .= $m.' UPDATING '. $update .' ' .$m ."\n";
                      } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SUB_SITE_UPDATE)){
                         $update = 'sub';
+                        $sql .= $m . ' UPDATING '. $update .' ' . $m ."\n";
+                     } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SHOP_UPDATE)){ // checking shop enabled
+                        $update = 'shop';
                         $sql .= $m . ' UPDATING '. $update .' ' . $m ."\n";
                      } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SITE_END_UPDATE)){
                         $sql .= $m.' ENDING '. $update .' '. $m ."\n";
@@ -175,6 +179,9 @@ class Install_Core {
                      } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SUB_SITE_UPDATE)){
                         $update = 'sub';
                         $sql .= $m . ' UPDATING '. $update."\n";
+                     } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SHOP_UPDATE)){ // musí být definová VVE_SHOP
+                        $update = 'shop';
+                        $sql .= $m . ' UPDATING SHOP '. $update."\n";
                      } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SITE_END_UPDATE)){
                         $sql .= $m.' ENDING '. $update."\n";
                         $update = 'all';
@@ -187,10 +194,13 @@ class Install_Core {
                                                                           || (VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null && $update == 'sub' )) )
                                                                           ){
                            $sql .= $buffer;
+                        } else if($update == 'shop' && defined('VVE_SHOP') && VVE_SHOP == true){
+                           $sql .= $buffer;
                         } else {
                            $sql .= $m.' SKIPING '. $update  ."\n";
 //                            $sql .= '-- '.$buffer;
                         }
+                        
                      }
                   }
 //                   echo nl2br("-- SQL Update :\n ".$sql);die();

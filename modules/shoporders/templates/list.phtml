@@ -6,7 +6,7 @@ $this->addJsPlugin($jQuery);
 $this->addFile('css://style.css');
 ?>
 <h1><?= $this->category()->getName() ?></h1>
-<div class="main-content-form-edit">
+<div class="main-content-admin-form">
    <table id="table-orders"></table>
    <div id="table-orders-pager"></div>
    <br />
@@ -14,8 +14,9 @@ $this->addFile('css://style.css');
    <hr class="reseter" />
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
-      var selectedGroupId = 0;
+      var selOrderId = 0;
       function showOrder(id){
+         selOrderId = id;
          var link = '<?=$this->link()->route('viewOrder')?>';
          $.ajax({
             url: link.replace('{id}', id),
@@ -92,9 +93,15 @@ $this->addFile('css://style.css');
                var button;
                for(var i=0; i < ids.length;i++){ 
                   var cl = ids[i]; 
-                  button = "<input type='button' value='<?=$this->tr('Ukaž')?>' onclick=\"showOrder("+ids[i]+");\" />"; 
+                  button = '<input type="image" src="images/icons/magnifier.png" value="<?=$this->tr('Ukaž')?>" onclick="showOrder(\''+ids[i]+'\');" />'
+                  +'<input type="image" src="images/icons/printer.png" value="<?=$this->tr('Tisk')?>" onclick="printOrder(\''+ids[i]+'\');\" />'
+                  +'<input type="image" src="images/icons/delete.png" value="<?=$this->tr('Smazat')?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
+                  ; 
                   $(this).jqGrid('setRowData',ids[i],{act:button}); 
-               } 
+               }
+               if(selOrderId != 0){
+                  $(this).jqGrid('setSelection', selOrderId);
+               }
             },
             ondblClickRow: function(rowid) { showOrder(rowid); }
          });

@@ -119,13 +119,13 @@ class ShopSettings_Controller extends Controller {
             $jqGridReq->id = null;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
             // kontrola položek
-            if($jqGridReq->{Shop_Model_Tax::COLUMN_NAME} == null || $jqGridReq->{Shop_Model_Tax::COLUMN_VALUE} == null){
-               $this->errMsg()->addMessage($this->_('Nebyly zadány všechny povinné údaje'));
+            if($jqGridReq->{Shop_Model_Tax::COLUMN_NAME} == null || $jqGridReq->{Shop_Model_Tax::COLUMN_VALUE} === null){
+               $this->errMsg()->addMessage($this->tr('Nebyly zadány všechny povinné údaje'));
                return;
             }
             // validace hodnoty
             if(!is_numeric($jqGridReq->{Shop_Model_Tax::COLUMN_VALUE})){
-               $this->errMsg()->addMessage($this->_('V hodnotě nebylo zadáno číslo'));
+               $this->errMsg()->addMessage($this->tr('V hodnotě nebylo zadáno číslo'));
                return;
             }
             
@@ -133,7 +133,7 @@ class ShopSettings_Controller extends Controller {
             $record->mapArray($jqGridReq);
             $model->save($record);
           
-            $this->infoMsg()->addMessage($this->_('Daň byla uložena'));
+            $this->infoMsg()->addMessage($this->tr('Daň byla uložena'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
             foreach ($jqGridReq->getIds() as $id) {
@@ -141,10 +141,10 @@ class ShopSettings_Controller extends Controller {
                   $model->delete($id);
                }
             }
-            $this->infoMsg()->addMessage($this->_('Vybrané daně byly smazány'));
+            $this->infoMsg()->addMessage($this->tr('Vybrané daně byly smazány'));
             break;
          default:
-            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ operace'));
             break;
       }
       if ($this->errMsg()->isEmpty()) {
@@ -360,6 +360,7 @@ class ShopSettings_Controller extends Controller {
                Shop_Model_Shippings::COLUMN_VALUE => $record->{Shop_Model_Shippings::COLUMN_VALUE},
                Shop_Model_Shippings::COLUMN_TEXT => $text,
                Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS => $record->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS},
+               Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP => $record->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP},
             ));
       }
       $this->view()->respond = $jqGrid->respond();
@@ -405,6 +406,7 @@ class ShopSettings_Controller extends Controller {
                $jqGridReq->{Shop_Model_Shippings::COLUMN_VALUE} = 0;
             }
             $record->{Shop_Model_Shippings::COLUMN_VALUE} = $jqGridReq->{Shop_Model_Shippings::COLUMN_VALUE};
+            $record->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP} = $jqGridReq->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP};
             $model->save($record);
           
             $this->infoMsg()->addMessage($this->tr('Doprava byla uložena'));
@@ -519,6 +521,35 @@ class ShopSettings_Controller extends Controller {
       $this->view()->form = $form;
    }
 
+   public function customersController()
+   {
+      //		Kontrola práv
+      $this->checkReadableRights();
+      
+      $form = new Form('base', true);
+      
+      $grpInfo = $form->addGroup('shop', $this->tr('Informace o obchod'));
+
+      $eStoreName = new Form_Element_Text('name', $this->tr('Název obchodu'));
+      $eStoreName->setValues(VVE_WEB_NAME);
+      $form->addElement($eStoreName, $grpInfo);
+      
+      $eStoreInfo = new Form_Element_TextArea('info', $this->tr('Adresa obchodu'));
+      $eStoreInfo->setValues(VVE_SHOP_STORE_ADDRESS);
+      $form->addElement($eStoreInfo, $grpInfo);
+      
+      $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $form->addElement($eSave);
+      
+      if($form->isValid()){
+         $this->storeSystemCfg('VVE_WEB_NAME', $form->name->getValues());
+         $this->storeSystemCfg('VVE_SHOP_STORE_ADDRESS', $form->info->getValues());
+         
+         $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
+//         $this->link()->reload();
+      }
+      $this->view()->form = $form;
+   }
 
    private function storeSystemCfg($constName, $value)
    {

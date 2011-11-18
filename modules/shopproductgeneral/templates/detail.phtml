@@ -25,8 +25,10 @@ echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*
    </div>
    <?}?>
    <div class="product-detail shop-product-attributes">
+      <?if($this->product->{Shop_Model_Product::COLUMN_CODE} != null){?>
       <div class="left"><?=$this->tr('Kód')?></div>
       <div class="right"><?=$this->product->{Shop_Model_Product::COLUMN_CODE}?></div>
+      <?}?>
       <div class="left"><?=$this->tr('Dostupnost')?></div>
       <div class="right"><?
          if($this->product->{Shop_Model_Product::COLUMN_QUANTITY} != 0){
@@ -36,6 +38,10 @@ echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*
          }
          ?>
       </div>
+      <?if($this->product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} == true){?>
+      <div class="left"><?=$this->tr('Odběr')?></div>
+      <div class="right"><? echo $this->tr('Pouze osobní'); ?></div>
+      <?}?>
       <div class="left product-price"><?=$this->tr('Cena')?></div>
       <div class="right product-price"><? 
          echo round($this->product->{Shop_Model_Product::COLUMN_PRICE}*(1+$this->product->{Shop_Model_Tax::COLUMN_VALUE}/100))

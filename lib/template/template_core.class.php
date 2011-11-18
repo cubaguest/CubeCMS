@@ -26,6 +26,11 @@ class Template_Core extends Template {
     * Šablona pro ajax requesty v iframe
     */
    const INDEX_AJAXIFRAME_TEMPLATE = 'index_ajax_iframe.phtml';
+   
+   /**
+    * Šablona pro mobilní zařízení
+    */
+   const INDEX_MOBILE_TEMPLATE = 'index_mobile.phtml';
 
    /**
     * Nastavená šablony systému
@@ -141,24 +146,31 @@ class Template_Core extends Template {
             if((string)$value == null){
                continue;
             }
-            $metaTags .= '<meta property="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
+            /**
+             * @todo tady asi přidat spíše hodnotu do metatagů o jaký se jedná
+             */
+            if(strpos($key, ':') === false){
+               $metaTags .= '<meta name="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
+            } else {
+               $metaTags .= '<meta property="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
+            }
          }
       }
 
       // replacements vars
       $contents = preg_replace(array(
          // basic
-         '/\{\*-STYLESHEETS-\*\}/',
-         '/\{\*-JAVASCRIPTS-\*\}/',
+         '/(<!-- *)?\{\*-STYLESHEETS-\*\}( *-->)?/',
+         '/(<!-- *)?\{\*-JAVASCRIPTS-\*\}( *-->)?/',
          // basic meta
-         '/\{\*-PAGE_TITLE-\*\}/',
-         '/\{\*-PAGE_HEADLINE-\*\}/',
+         '/(<!-- *)?\{\*-PAGE_TITLE-\*\}( *-->)?/',
+         '/(<!-- *)?\{\*-PAGE_HEADLINE-\*\}( *-->)?/',
          // user meta tags
-         '/\{\*-PAGE_META_TAGS-\*\}/',
+         '/(<!-- *)?\{\*-PAGE_META_TAGS-\*\}( *-->)?/',
          // CORE ERRORS
-         '/\{\*-CORE_ERRORS-\*\}/',
+         '/(<!-- *)?\{\*-CORE_ERRORS-\*\}( *-->)?/',
          //  remove not used vars
-         '/\{\*\-[A-Z0-9_-]+\-\*\}/',
+         '/(<!-- *)?\{\*\-[A-Z0-9_-]+\-\*\}( *-->)?/',
          // remove empty meta tags
          '/[ ]*<meta name="[a-z]+" content="" ?\/>\n/i'
          ), array(

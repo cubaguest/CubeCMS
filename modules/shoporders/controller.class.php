@@ -127,14 +127,25 @@ class ShopOrders_Controller extends Controller {
       $formChangeStatus->addElement($eName);
       
       $eNameSel = new Form_Element_Select('nameSel', $this->tr('Název'));
-      $eNameSel->setOptions(array(
-         $this->tr('přijato') => $this->tr('přijato'),
-         $this->tr('odesláno') => $this->tr('odesláno'),
-         $this->tr('zrušeno') => $this->tr('zrušeno'),
-         $this->tr('zaplaceno') => $this->tr('zaplaceno'),
-         $this->tr('zabaleno') => $this->tr('zabaleno'),
-         $this->tr('vráceno') => $this->tr('vráceno'),
+      
+      $status = explode(';', VVE_SHOP_ORDER_STATUS);
+      
+      if(empty ($status)){
+         $eNameSel->setOptions(
+            array(
+            $this->tr('přijato') => $this->tr('přijato'),
+            $this->tr('odesláno') => $this->tr('odesláno'),
+            $this->tr('zrušeno') => $this->tr('zrušeno'),
+            $this->tr('zaplaceno') => $this->tr('zaplaceno'),
+            $this->tr('zabaleno') => $this->tr('zabaleno'),
+            $this->tr('vráceno') => $this->tr('vráceno'),
          ));
+      } else {
+         foreach ($status as $value) {
+            $eNameSel->setOptions(array($value => $value), true);
+         }
+      }
+      
       $formChangeStatus->addElement($eNameSel);
       
       $eId = new Form_Element_Hidden('id');

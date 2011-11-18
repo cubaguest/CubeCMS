@@ -41,6 +41,8 @@ class Shop_Model_Product extends Model_ORM
    const COLUMN_IMAGE = 'image';
    const COLUMN_DATE_ADD = 'date_add';
    const COLUMN_IS_NEW_TO_DATE = 'is_new_to_date';
+   const COLUMN_PERSONAL_PICKUP_ONLY = 'personal_pickup_only';
+   const COLUMN_PICKUP_DATE = 'required_pickup_date';
    
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_sh_pr_gen');
@@ -71,6 +73,8 @@ class Shop_Model_Product extends Model_ORM
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DATE_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_IS_NEW_TO_DATE, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PERSONAL_PICKUP_ONLY, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_PICKUP_DATE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
       

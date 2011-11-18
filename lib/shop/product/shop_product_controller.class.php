@@ -215,11 +215,21 @@ abstract class Shop_Product_Controller extends Controller {
          $form->addElement($eImageDel, $fGrpInfo);
       }
       
+      $ePersonalPickupOnly = new Form_Element_Checkbox('personalPickupOnly', $this->tr('Pouze osobní odběr'));
+      $ePersonalPickupOnly->setSubLabel($this->tr('Zboží lze odebírat pouze osobně.'));
+      $ePersonalPickupOnly->setValues(false);
+      $form->addElement($ePersonalPickupOnly, $fGrpInfo);
+      
+      $eNeedPickupDate = new Form_Element_Checkbox('pickupDate', $this->tr('Povinné datum odběru'));
+      $eNeedPickupDate->setSubLabel($this->tr('Nakupující musí zadat datum odběru zboží.'));
+      $eNeedPickupDate->setValues(false);
+      $form->addElement($eNeedPickupDate, $fGrpInfo);
+      
       $fGrpPrice = $form->addGroup('price', $this->tr('Ceny'));
       
       $ePrice = new Form_Element_Text('price', $this->tr('Cena bez daně'));
       $ePrice->addValidation(new Form_Validator_NotEmpty());
-//      $ePrice->addValidation(new Form_Validator_IsNumber(null,Form_Validator_IsNumber::TYPE_INT));
+      $ePrice->addValidation(new Form_Validator_IsNumber(null,Form_Validator_IsNumber::TYPE_FLOAT));
       $form->addElement($ePrice, $fGrpPrice);
       
       $eTax = new Form_Element_Select('tax', $this->tr('Daň'));
@@ -234,7 +244,6 @@ abstract class Shop_Product_Controller extends Controller {
       $form->addElement($eTax, $fGrpPrice);
       
       $ePriceWTax = new Form_Element_Text('pricewtax', $this->tr('Cena s daní'));
-//      $ePriceWTax->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($ePriceWTax, $fGrpPrice);
       
       $eUnitSize = new Form_Element_Text('unitSize', $this->tr('Velikost jednotky'));
@@ -289,6 +298,8 @@ abstract class Shop_Product_Controller extends Controller {
          $form->weight->setValues($product->{Shop_Model_Product::COLUMN_WEIGHT});
          $form->active->setValues($product->{Shop_Model_Product::COLUMN_ACTIVE});
          $form->quantity->setValues($product->{Shop_Model_Product::COLUMN_QUANTITY});
+         $form->personalPickupOnly->setValues($product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY});
+         $form->pickupDate->setValues($product->{Shop_Model_Product::COLUMN_PICKUP_DATE});
          $form->price->setValues($product->{Shop_Model_Product::COLUMN_PRICE});
          $form->tax->setValues($product->{Shop_Model_Product::COLUMN_ID_TAX});
 //         $form->pricewtax->setValues($product->{Shop_Model_Product::COLUMN_});
@@ -366,6 +377,8 @@ abstract class Shop_Product_Controller extends Controller {
          $product->{Shop_Model_Product::COLUMN_NAME} = $form->name->getValues();
          $product->{Shop_Model_Product::COLUMN_WEIGHT} = $form->weight->getValues();
          $product->{Shop_Model_Product::COLUMN_ACTIVE} = $form->active->getValues();
+         $product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} = $form->personalPickupOnly->getValues();
+         $product->{Shop_Model_Product::COLUMN_PICKUP_DATE} = $form->pickupDate->getValues();
          $product->{Shop_Model_Product::COLUMN_QUANTITY} = $form->quantity->getValues();
          $product->{Shop_Model_Product::COLUMN_PRICE} = $form->price->getValues();
          $product->{Shop_Model_Product::COLUMN_ID_TAX} = $form->tax->getValues();
@@ -388,6 +401,7 @@ abstract class Shop_Product_Controller extends Controller {
    
    public function deleteProduct($productId = null)
    {
+      if(!$this->rights()->isWritable()){ return; }
       $formDelete = new Form('product_delete_', true);
       
       $eId = new Form_Element_Hidden('id');
@@ -403,19 +417,37 @@ abstract class Shop_Product_Controller extends Controller {
       $formDelete->addElement($eDel);
       
       if($formDelete->isValid()){
+         $model = new Shop_Model_Product();
+         $product = $model->record($formDelete->id->getValues());
          
+         if($product == false || $product->isNew()){
+            throw new UnexpectedValueException($this->tr('Mazaný produkt neexistuje. ID není korektní'));
+         }
+         
+         // image
+         if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){
+            if(is_file(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
+              && is_writable(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
+                  @unlink(self::getImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
+            }
+            if(is_file(self::getImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
+               && is_writable(self::getImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
+                  @unlink(self::getImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
+            }
+         }
+         $model->delete($product);   
+         $this->infoMsg()->addMessage($this->tr('Produkt byl smazán'));
+         $this->link()->route()->reload();
       }
+      
       $this->view()->formDelete = $formDelete;
    }
-
 
    protected function editCompleteCallback(Model_ORM_Record $product)
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));
-//      if($isEdit->isNew()){
-      Debug::log($product->{Shop_Model_Product::COLUMN_URLKEY});
-//      
-      $this->link()->route('detail', array('urlkey' => (string)$product->{Shop_Model_Product::COLUMN_URLKEY}))->reload();
+//      if($product->isNew()){
+         $this->link()->route('detail', array('urlkey' => (string)$product->{Shop_Model_Product::COLUMN_URLKEY}))->reload();
 //      } else {
 //         $this->link()->route()->reload();
 //      }
@@ -469,7 +501,6 @@ abstract class Shop_Product_Controller extends Controller {
          return AppCore::getAppDataDir().'shop'.DIRECTORY_SEPARATOR
             .self::DIR_IMAGES.DIRECTORY_SEPARATOR;
       }
-      
    }
 }
 ?>

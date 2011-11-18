@@ -31,3 +31,9 @@
 {
    color: red;
 }
+
+th.ui-th-column div{
+    white-space:normal !important;
+    height:auto !important;
+    padding:2px;
+}

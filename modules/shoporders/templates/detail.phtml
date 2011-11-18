@@ -1,11 +1,11 @@
 <? Debug::printDebug()?>
-<h2><? printf($this->tr('Objednávka %s'), $this->order->{Shop_Model_Orders::COLUMN_ID}) ?></h2>
-<table class="full-width order-detail ui-widget">
+<h2><? printf($this->tr('Objednávka č. %s'), $this->order->{Shop_Model_Orders::COLUMN_ID}) ?></h2>
+<table class="full-width ui-widget" id="table-order-detail">
    <tr class="ui-widget-header ui-corner-top">
-      <th><h3><?= $this->tr('Fakturační adresa') ?></h3></th>
-      <th><h3><?= $this->tr('Dodací adresa') ?></h3></th>
+      <th><?= $this->tr('Fakturační adresa') ?></th>
+      <th><?= $this->tr('Dodací adresa') ?></th>
    </tr>
-   <tr>
+   <tr class="ui-widget-content">
       <td class="address">
          <?
          echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '<br />';
