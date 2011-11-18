@@ -11,63 +11,76 @@ class DayMenu_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       
-      $dayKey = $this->getRequestParam('day', date('N'));
-      $this->view()->day = $dayKey;
+      $date = $this->getDate();
       
+      $model = new DayMenu_Model();
+      if($this->rights()->isWritable()){
+         $model->where(DayMenu_Model::COLUMN_DATE.' = :d', array('d' => $date->format("Y-m-d")));
+      } else {
+         $model->where(DayMenu_Model::COLUMN_DATE.' = :d AND '.DayMenu_Model::COLUMN_CONCEPT.' = 0', array('d' => $date->format("Y-m-d")));
+      }
       
-      $model = new Text_Model();
-      // text
-      $text = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
-         array('idc' => $this->category()->getId(), 'subkey' => $dayKey))
-         ->record();
+      $text = $model->record();
       
       $this->view()->text = $text;
+      $this->view()->date = $date;
    }
+
+   private function getDate()
+   {
+      $date = $this->getRequestParam('date');
+      
+      if($date == null){
+         $date = new DateTime();
+         if(date("H") > 14){
+            $date->modify("+1 day");
+         }
+      } else {
+         $date = new DateTime($date);
+      }
+      return $date;
+   }
+
 
    /**
     * Kontroler pro editaci textu
     */
    public function editController() {
       $this->checkWritebleRights();
-      $this->view()->day = $this->getRequest('day', 1);
+      $date = $this->getDate();
 
       $form = new Form("text_");
       
       $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
-      $textarea->setLangs();
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea);
       
       $textP = new Form_Element_TextArea('textPanel', $this->tr("Text v panelu"));
-      $textP->setLangs();
       $form->addElement($textP);
+      
+      $eDate = new Form_Element_Text('date', $this->tr('Datum'));
+      $eDate->setSubLabel($this->tr('POZOR: Změna data přepíše menu na zadaný den, pokud bylo zadáno.'));
+      $eDate->addValidation(new Form_Validator_NotEmpty());
+      $eDate->addValidation(new Form_Validator_Date());
+      $eDate->addFilter(new Form_Filter_DateTimeObj());
+      $eDate->setValues(vve_date("%x", $date));
+      $form->addElement($eDate);
+      
+      $eConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
+      $eConcept->setSubLabel($this->tr('Pokud je položka koncept, není zobrazena normálním uživatelům.'));
+      $form->addElement($eConcept);
 
-      $model = new Text_Model();
-      $textRecord = $model->where(Text_Model::COLUMN_ID_CATEGORY." = :idc AND ".Text_Model::COLUMN_SUBKEY.' = :sk',
-              array('idc' => $this->category()->getId(), 'sk' => $this->getRequest('day', 1)))
-              ->record();
+      $model = new DayMenu_Model();
       
-      $textRecordPanel = $model->where(Text_Model::COLUMN_ID_CATEGORY." = :idc AND ".Text_Model::COLUMN_SUBKEY.' = :sk',
-              array('idc' => $this->category()->getId(), 'sk' => 'p_'.$this->getRequest('day', 1)))
-              ->record();
+      $record = $model->where(DayMenu_Model::COLUMN_DATE.' = :d', array('d' => $date->format("Y-m-d")))->record();
       
-      
-      if($textRecord != false){
-         $form->text->setValues($textRecord->{Text_Model_Detail::COLUMN_TEXT});
+      if($record != false){
+         $form->text->setValues($record->{DayMenu_Model::COLUMN_TEXT});
+         $form->textPanel->setValues($record->{DayMenu_Model::COLUMN_TEXT_PANEL});
+         $form->concept->setValues($record->{DayMenu_Model::COLUMN_CONCEPT});
       } else {
-         $textRecord = $model->newRecord();
-         $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-         $textRecord->{Text_Model::COLUMN_SUBKEY} = $this->view()->day;
+         $record = $model->newRecord();
       }
-      
-      if($textRecordPanel != false){
-         $form->textPanel->setValues($textRecordPanel->{Text_Model_Detail::COLUMN_TEXT});
-      } else {
-         $textRecordPanel = $model->newRecord();
-         $textRecordPanel->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-         $textRecordPanel->{Text_Model::COLUMN_SUBKEY} = 'p_'.$this->view()->day;
-      }
-      
 
       $submit = new Form_Element_SaveCancel('send');
       $form->addElement($submit);
@@ -81,13 +94,21 @@ class DayMenu_Controller extends Controller {
          try {
             // odtranění script, nebezpečných tagů a komentřů
             $text = vve_strip_html_comment($form->text->getValues());
+            $textClear = strip_tags($form->text->getValues());
+            $textPanel = vve_strip_html_comment($form->text->getValues());
 
-            $textRecord->{Text_Model::COLUMN_TEXT} = $text;
-            $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = strip_tags($text);
-            $model->save($textRecord);
+            $record->{DayMenu_Model::COLUMN_TEXT} = $text;
+            $record->{DayMenu_Model::COLUMN_TEXT_CLEAR} = $textClear;
+            $record->{DayMenu_Model::COLUMN_TEXT_PANEL} = $textPanel;
+            $record->{DayMenu_Model::COLUMN_DATE} = $form->date->getValues();
+            $record->{DayMenu_Model::COLUMN_CONCEPT} = $form->concept->getValues();
             
-            $textRecordPanel->{Text_Model::COLUMN_TEXT} = $form->textPanel->getValues();
-            $model->save($textRecordPanel);
+            // kontrola data, pokud je již záznam v db, musí se smazat jinak jsou tam dva
+            if($form->date->getValues()->format('Y-m-d') != $date->format('Y-m-d')){
+               $model->where(DayMenu_Model::COLUMN_DATE.' = :d', array('d' => $form->date->getValues()->format('Y-m-d')))->delete();
+            }
+            // uložení
+            $model->save($record);
             
             $this->log('úprava textu');
             $this->infoMsg()->addMessage($this->tr('Menu bylo uloženo'));
@@ -98,6 +119,7 @@ class DayMenu_Controller extends Controller {
       }
       // view
       $this->view()->template()->form = $form;
+      $this->view()->date = $date;
    }
 
    public function settings(&$settings, Form &$form) {

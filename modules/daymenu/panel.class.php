@@ -3,16 +3,22 @@ class DayMenu_Panel extends Panel {
    private $text = null;
 
    public function panelController() {
-      $model = new Text_Model();
-      $this->text = $model
-         ->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :dk', 
-                 array('idc' => $this->category()->getId(), 'dk' => 'p_'.date('N')))
-         ->record();
+      $date = new DateTime();
+      if(date("H") > 14){
+         $date->modify("+1 day");
+      }
+      
+      $model = new DayMenu_Model();
+      $model->where(DayMenu_Model::COLUMN_DATE.' = :d AND '.DayMenu_Model::COLUMN_CONCEPT.' = 0', array('d' => $date->format("Y-m-d")));
+      
+      $this->text = $model->record();
 	}
 	
 	public function panelView() {
-      if($this->text == false || $this->text->{Text_Model::COLUMN_TEXT} == null) return false;
-      $this->template()->text = (string)$this->text->{Text_Model::COLUMN_TEXT};
+      if($this->text == false || ($this->text->{DayMenu_Model::COLUMN_TEXT_PANEL} == null && $this->text->{DayMenu_Model::COLUMN_TEXT} == null ) ) return false;
+      
+      $this->template()->text = (string)$this->text->{DayMenu_Model::COLUMN_TEXT_PANEL} != null 
+         ? $this->text->{DayMenu_Model::COLUMN_TEXT_PANEL} : $this->text->{DayMenu_Model::COLUMN_TEXT};
       $this->template()->addFile('tpl://panel.phtml');
 	}
 }

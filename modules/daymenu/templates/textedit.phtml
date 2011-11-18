@@ -1,7 +1,10 @@
 <?
-$h = sprintf($this->tr('úprava textu "%s" pro "%s"'), 
-   $this->category()->getName(), ucfirst($this->days[$this->day]));
+$h = sprintf($this->tr('úprava menu pro den %s'), vve_date("%L, %x", $this->date));
 Template_Core::setPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUIDatepicker();
+$this->addJsPlugin($jq);
 ?>
 <h1><?=$h?></h1>
 <div class="main-content-form-edit" id="text-edit-form">
@@ -9,4 +12,9 @@ Template_Core::setPageTitle($h);
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40);
    echo ($this->form);
    ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('input[name="text_date"]').datepicker();
+      });
+      </script>
 </div>

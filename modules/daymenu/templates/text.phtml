@@ -1,23 +1,45 @@
 <?
-$h = $this->category()->getName().' - '.$this->days[$this->day];
+$h = $this->category()->getName().' - '.  vve_date("%L, %x", $this->date);
+if($this->text->{DayMenu_Model::COLUMN_CONCEPT} == true){
+   $h .= ' - '.$this->tr('koncept');
+}
 Template_Core::setPageTitle($h);
+echo $this->toolbox;
 ?>
 <h1><?echo $h;?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
    <?
    if($this->category()->getRights()->isWritable()){
-      $this->items = array();
-      for ($di = 1; $di <= 7; $di++) {
-         if(date('N') == $di){
-            $this->items[$this->days[$di]] = (string)$this->link()->param('day');
-         } else {
-            $this->items[$this->days[$di]] = (string)$this->link()->param('day', $di);
-         }
-      }
-      $this->includeTpl('module_navigation.phtml', true);
+      // show day selector
+      
+      ?>
+      <div class="admin-info-text">
+      <form id="form-select-date" method="get" action="<?=$this->link()?>">
+         <div>
+            <label for="input-set-date"><?=$this->tr('Menu na datum')?></label>: 
+         <input id="input-set-date" name="date" value="<?=vve_date("%x", $this->date)?>" type="text" size="12" />
+         <input id="button-set-date" value="Zobrazit" type="submit"/>
+         </div>
+      </form>
+      </div>
+      <script type="text/javascript">
+      $('#button-set-date').hide();
+      $(document).ready(function(){
+         $('input[name="date"]')
+            .datepicker()
+            .change(function(){
+               $(this).val($(this).val().replace(/\./g, '-'));
+               $('#form-select-date').submit();
+         });
+      });
+      </script>
+      <?
+      $jq = new JsPlugin_JQuery();
+      $jq->addUIDatepicker();
+      $this->addJsPlugin($jq);
    } else {
-      if(isset ($_GET['day'])){?>
+     /* if(isset ($_GET['day'])){?>
          <a href="<?=$this->link()->param('day');?>" 
             title="<?echo $this->tr('Přejít na menu na dnešek')?>"
             ><?echo $this->tr('Menu na dnešek');?></a>
@@ -25,13 +47,12 @@ Template_Core::setPageTitle($h);
          <a href="<?=$this->link()->param('day', $this->day+1 > 7 ? $di = 1 : $this->day+1);?>" 
             title="<?$this->tr('Přejít na menu na zítřek')?>"
             ><?echo $this->tr('Menu na zítřek')?></a>
-      <?}
+      <?}*/
    }
-    
-   echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolbox;?>
+   echo ($this->filter($this->text->{DayMenu_Model::COLUMN_TEXT},'emoticons'));?>
    </div>
    <?
-   if($this->text != false){
+   if($this->text != false AND $this->category()->getParam('shareTools', true) == true){
          $this->includeTpl('articletools.phtml', true, array(
             'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
               'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
