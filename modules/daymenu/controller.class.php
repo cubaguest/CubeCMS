@@ -80,6 +80,20 @@ class DayMenu_Controller extends Controller {
          $form->concept->setValues($record->{DayMenu_Model::COLUMN_CONCEPT});
       } else {
          $record = $model->newRecord();
+         // použije se předdefinovaná šablona pokud je nastavena
+         $modelTpl = new Templates_Model();
+         if($this->category()->getParam('tplid', 0) != 0){
+            $tpl = $modelTpl->record($this->category()->getParam('tplid'));
+            if($tpl != false){
+               $form->text->setValues($tpl->{Templates_Model::COLUMN_CONTENT});
+            }
+         }
+         if($this->category()->getParam('tplpid', 0) != 0){
+            $tpl = $modelTpl->record($this->category()->getParam('tplpid'));
+            if($tpl != false){
+               $form->textPanel->setValues($tpl->{Templates_Model::COLUMN_CONTENT});
+            }
+         }
       }
 
       $submit = new Form_Element_SaveCancel('send');
@@ -95,7 +109,7 @@ class DayMenu_Controller extends Controller {
             // odtranění script, nebezpečných tagů a komentřů
             $text = vve_strip_html_comment($form->text->getValues());
             $textClear = strip_tags($form->text->getValues());
-            $textPanel = vve_strip_html_comment($form->text->getValues());
+            $textPanel = vve_strip_html_comment($form->textPanel->getValues());
 
             $record->{DayMenu_Model::COLUMN_TEXT} = $text;
             $record->{DayMenu_Model::COLUMN_TEXT_CLEAR} = $textClear;
@@ -124,10 +138,37 @@ class DayMenu_Controller extends Controller {
 
    public function settings(&$settings, Form &$form) {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
+      
       $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 
+      $eDefaultTplSelect = new Form_Element_Select('tplid', $this->tr('Šablona obsahu'));
+      $eDefaultPanelTplSelect = new Form_Element_Select('tplpid', $this->tr('Šablona obsahu panelu'));
+      
+      $modelTpls = new Templates_Model();
+      
+      $templates = $modelTpls->where(Templates_Model::COLUMN_TYPE.' = :type', array('type' => Templates_Model::TEMPLATE_TYPE_TEXT))->records();
+      
+      if($templates != false){
+         $eDefaultTplSelect->setOptions(array($this->tr('Žádná') => 0));
+         $eDefaultPanelTplSelect->setOptions(array($this->tr('Žádná') => 0));
+         foreach ($templates as $tpl) {
+            $eDefaultTplSelect->setOptions(array($tpl->{Templates_Model::COLUMN_NAME} => $tpl->{Templates_Model::COLUMN_ID}), true);
+            $eDefaultPanelTplSelect->setOptions(array($tpl->{Templates_Model::COLUMN_NAME} => $tpl->{Templates_Model::COLUMN_ID}), true);
+         }
+         if(isset ($settings['tplid'])){
+            $eDefaultTplSelect->setValues($settings['tplid']);
+         }
+         if(isset ($settings['tplpid'])){
+            $eDefaultPanelTplSelect->setValues($settings['tplpid']);
+         }
+         $form->addElement($eDefaultTplSelect, $fGrpEditSet);
+         $form->addElement($eDefaultPanelTplSelect, $fGrpEditSet);
+      }
+      
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
+         $settings['tplid'] = $form->tplid->getValues();
+         $settings['tplpid'] = $form->tplpid->getValues();
       }
    }
 }
