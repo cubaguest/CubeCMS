@@ -80,7 +80,12 @@ class ShopCart_Controller extends Controller {
       $formGoNext->setProtected(false);
       
       $eShipping = new Form_Element_Select('shipping', $this->tr('Doprava'));
+      
+      if($basket->personalPickUpOnly()){
+         $modelShippings->where(Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP.' = 1', array());
+      }
       $shippings = $modelShippings->records();
+      
       $shippingDisallowedPayments = array();
       $sh = $shippingsArray = array();
       foreach ($shippings as $shipping) {
@@ -106,6 +111,14 @@ class ShopCart_Controller extends Controller {
          $eShipping->setValues($_SESSION['shop_order']['shipping']);
       }
       $formGoNext->addElement($eShipping);
+      
+      if($basket->needPickUpDate()){
+         $ePickUpDate = new Form_Element_Text('pickupDate', $this->tr('Datum vyzvednutí'));
+         $ePickUpDate->addValidation(new Form_Validator_NotEmpty());
+         $ePickUpDate->addValidation(new Form_Validator_Date());
+         $ePickUpDate->addFilter(new Form_Filter_DateTimeObj());
+         $formGoNext->addElement($ePickUpDate);
+      }
       
       $ePayment = new Form_Element_Select('payment', $this->tr('Platba'));
       
@@ -144,9 +157,14 @@ class ShopCart_Controller extends Controller {
          $store = $this->getOrderStore();
          $pId = $formGoNext->payment->getValues();
          $sId = $formGoNext->shipping->getValues();
+         $pickUpDate = null;
+         if(isset ($formGoNext->pickupDate)){
+            $pickUpDate = $formGoNext->pickupDate->getValues();
+         }
          
          $_SESSION['shop_order']['payment'] = $pId;
          $_SESSION['shop_order']['shipping'] = $sId;
+         $_SESSION['shop_order']['pickupdate'] = $pickUpDate;
          
          $this->link()->route('order')->reload();
       }
@@ -283,7 +301,7 @@ class ShopCart_Controller extends Controller {
             $this->link()->route()->reload();
          }
          
-         if($formOrder->createAcc->getValues() == true){
+         if(isset($formOrder->createAcc) && $formOrder->createAcc->getValues() == true){
             $eCreateAccountPass->addValidation(new Form_Validator_NotEmpty());
          }
          if($formOrder->isDeliveryAddress->getValues() == false){
@@ -396,12 +414,14 @@ class ShopCart_Controller extends Controller {
          
          $payment = $modelPayments->record($_SESSION['shop_order']['payment']);
          $shipping = $modelShippings->record($_SESSION['shop_order']['shipping']);
+         $pickUpDate = $_SESSION['shop_order']['pickupdate'];
          
          // metoda platby
          $order->{Shop_Model_Orders::COLUMN_PAYMENT_ID} = $payment->{Shop_Model_Payments::COLUMN_ID};
          $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD} = $payment->{Shop_Model_Payments::COLUMN_NAME};
          $order->{Shop_Model_Orders::COLUMN_SHIPPING_ID} = $shipping->{Shop_Model_Shippings::COLUMN_ID};
          $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD} = $shipping->{Shop_Model_Shippings::COLUMN_NAME};
+         $order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} = $pickUpDate;
          
          if($productsPrice >= VVE_SHOP_FREE_SHIPPING){ // doprava a platba zdarma
             $shippingPrice = 0;
@@ -577,6 +597,7 @@ class ShopCart_Controller extends Controller {
          '{DATUM}',
          '{INFO}',
          '{ZBOZI}',
+         '{ADRESA_OBCHOD}',
          '{ADRESA_DODACI}',
          '{ADRESA_FAKTURACNI}',
          '{POZNAMKA}',
@@ -587,6 +608,7 @@ class ShopCart_Controller extends Controller {
          vve_date('%X %x'),
          $orderInfo,
          $orderItems,
+         VVE_SHOP_STORE_ADDRESS,
          $addressShip,
          $addressPayment,
          $note,

@@ -4,6 +4,12 @@
  */
 
 class ShopOrders_Controller extends Controller {
+   
+   protected function init()
+   {
+      $this->category()->getModule()->setDataDir('shop');
+   }
+   
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
@@ -61,6 +67,7 @@ class ShopOrders_Controller extends Controller {
       $modelSt = new Shop_Model_OrderStatus();
       $modelOrders->columns(array(Shop_Model_Orders::COLUMN_ID, Shop_Model_Orders::COLUMN_CUSTOMER_NAME, 
          Shop_Model_Orders::COLUMN_IS_NEW, Shop_Model_Orders::COLUMN_TIME_ADD, Shop_Model_Orders::COLUMN_TOTAL,
+         Shop_Model_Orders::COLUMN_PICKUP_DATE,
          'status' => 
          '(SELECT '.Shop_Model_OrderStatus::COLUMN_NAME.' FROM '.$modelSt->getTableName()
          .' WHERE '.Shop_Model_OrderStatus::COLUMN_ID_ORDER.' = '.$modelOrders->getTableShortName().'.'.Shop_Model_Orders::COLUMN_ID
@@ -75,11 +82,16 @@ class ShopOrders_Controller extends Controller {
       $orders = $modelOrders->limit($fromRow, $jqGrid->request()->rows)->records(PDO::FETCH_OBJ);
       // out
       foreach ($orders as $order) {
+         $pickupDate = "";
+         if($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
+            $pickupDate = vve_date("%x", new DateTime($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE}));
+         }
          array_push($jqGrid->respond()->rows, 
             array('id' => $order->{Shop_Model_Orders::COLUMN_ID},
                   'name' => $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME},
                   'neworder' => $order->{Shop_Model_Orders::COLUMN_IS_NEW},
                   'time' => vve_date('%x %X', new DateTime($order->{Shop_Model_Orders::COLUMN_TIME_ADD})),
+                  'pickupdate' => $pickupDate,
                   'status' => $order->status,
                   'price' => $order->{Shop_Model_Orders::COLUMN_TOTAL},
                      ));
@@ -178,6 +190,45 @@ class ShopOrders_Controller extends Controller {
          
          $modelStatus->save($status);
          
+         if($formChangeStatus->infoCust->getValues() == true){
+            $modelOrder = new Shop_Model_Orders();
+            $email = new Email();
+            $order = $modelOrder->record($status->{Shop_Model_OrderStatus::COLUMN_ID_ORDER});
+            
+            $email->setSubject(sprintf($this->tr('Změna stavu objednávky č. %s'), $order->{Shop_Model_Orders::COLUMN_ID}));
+            
+            $MailText = "Dobrý den\n\n"
+               ."Vaší objednávce číslo: {CISLO} v obchodě {STRANKY} byl upraven stav.\n\n"
+               ."Nový stav Vaší objednávky je: \"{STAV}\"\n\n"
+               ."Poznámmka: {POZN} ";
+            
+            $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.Locales::getLang().'.txt';
+            if (is_file($file)) {
+               $MailText = file_get_contents($file);
+            }
+            
+            $MailText = str_replace(array(
+               "{CISLO}",
+               "{STRANKY}",
+               "{ADRESA_OBCHOD}",
+               "{DATUM_ZMENY}",
+               "{STAV}",
+               "{POZN}",
+            ), array(
+               $order->{Shop_Model_Orders::COLUMN_ID},
+               VVE_WEB_NAME,
+               VVE_SHOP_STORE_ADDRESS,
+               vve_date("%x %X", new DateTime($status->{Shop_Model_OrderStatus::COLUMN_TIME_ADD})),
+               $status->{Shop_Model_OrderStatus::COLUMN_NAME},
+               $status->{Shop_Model_OrderStatus::COLUMN_NOTE},
+            ), $MailText);
+            
+            
+            $email->setContent($MailText);
+            $email->addAddress($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}, $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME});
+            $email->send();
+         }
+         
          $this->view()->newStatus = array(
             'date' => vve_date('%x %X'),
             'name' => $status->{Shop_Model_OrderStatus::COLUMN_NAME},
@@ -188,6 +239,20 @@ class ShopOrders_Controller extends Controller {
          $this->link()->route()->reload();
       }
       $this->view()->formStatus = $formChangeStatus;
+   }
+   
+   public function deleteOrderController()
+   {
+      $this->checkControllRights();
+      
+      if(!isset ($_POST['id'])){
+         throw new UnexpectedValueException($this->tr('Nebylo předáno ID objednávky pro mazání'));
+      }
+      $modelOrders = new Shop_Model_Orders();
+      
+      $modelOrders->delete($_POST['id']);
+      $this->infoMsg()->addMessage($this->tr('Objednávka byla smazána'));
+      
    }
 
    public function settings(&$settings, Form &$form) {

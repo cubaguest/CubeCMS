@@ -438,9 +438,19 @@ class ShopSettings_Controller extends Controller {
          '{IP}' => $this->tr('IP adresa uživatele'),
          '{INFO}' => $this->tr('Informace o uživateli'),
          '{ZBOZI}' => $this->tr('Výpis zboží'),
+         '{ADRESA_OBCHOD}' => $this->tr('Adresa obchodu'),
          '{ADRESA_DODACI}' => $this->tr('Adresa dodací'),
          '{ADRESA_FAKTURACNI}' => $this->tr('Adresa fakturační'),
          '{POZNAMKA}' => $this->tr('Poznámka uživatele'),
+      );
+      
+      $this->view()->replaceStatus = array(
+         "{CISLO}" => $this->tr('Číslo objednávky'),
+         '{STRANKY}' => $this->tr('Název stránek (obchodu)'),
+         '{ADRESA_OBCHOD}' => $this->tr('Adresa obchodu'),
+         "{DATUM_ZMENY}" => $this->tr('Datum objednávky (obsahuje i čas)'),
+         "{STAV}" => $this->tr('Nový stav'),
+         "{POZN}" => $this->tr('Poznámka ke změně stavu'),
       );
       
       $form = new Form('orders_set_', true);
@@ -468,6 +478,21 @@ class ShopSettings_Controller extends Controller {
       }
       $eUserMailText->setValues($values);
       $form->addElement($eUserMailText, $grpNotify);
+      
+      $eUserStatusText = new Form_Element_TextArea('userOrderStatusMail', $this->tr('Text e-mailu pro změnu stavu'));
+      $eUserStatusText->addFilter(new Form_Filter_StripTags());
+      $eUserStatusText->setLangs();
+      // načtení hodnot pokud existují
+      $values = array();
+      foreach (Locales::getAppLangs() as $lang) {
+         $values[$lang] = null;
+         $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.$lang.'.txt';
+         if(is_file($file)){
+            $values[$lang] = file_get_contents($file);
+         }
+      }
+      $eUserStatusText->setValues($values);
+      $form->addElement($eUserStatusText, $grpNotify);
       
       $eAdminMailText = new Form_Element_TextArea('notifyAdminMail', $this->tr('Text e-mailu pro administrátora'));
       $eAdminMailText->addFilter(new Form_Filter_StripTags());
@@ -505,9 +530,15 @@ class ShopSettings_Controller extends Controller {
          // uložení mailů
          $usersTexts = $form->notifyUserMail->getValues();
          foreach ($usersTexts as $lang => $text) {
-//            file_put_contents($this->module()->getDataDir().'mail_tpl_user_'.$lang.'.txt', $text);
             if($text != null && !file_put_contents($this->module()->getDataDir().'mail_tpl_user_'.$lang.'.txt', $text)){
                throw new UnexpectedValueException(sprintf($this->tr('Chyba při zápisu do souboru s mailem uživatele (jazyk: %s)'), $lang));
+            }
+         }
+         
+         $statusTexts = $form->userOrderStatusMail->getValues();
+         foreach ($statusTexts as $lang => $text) {
+            if($text != null && !file_put_contents($this->module()->getDataDir().'mail_tpl_orderstatus_'.$lang.'.txt', $text)){
+               throw new UnexpectedValueException(sprintf($this->tr('Chyba při zápisu do souboru s mailem změny stavu objednávky (jazyk: %s)'), $lang));
             }
          }
          

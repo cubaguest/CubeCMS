@@ -66,15 +66,18 @@
       <tr class="ui-widget-content">
          <th><?
       echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
-      if ($this->shipping != false) {
-         echo '<br />';
-         echo '<div class="ship2pay-info">';
-         echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
-         echo '</div>';
-         // asi tady bude přesměrování na platební systémy 
+      if($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
+         printf($this->tr(' - datum odběru: %s'), vve_date("%x", new DateTime($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
       }
-      ?></td>
-         <th></td>
+//      if ($this->shipping != false) {
+//         echo '<br />';
+//         echo '<div class="ship2pay-info">';
+//         echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
+//         echo '</div>';
+//         // asi tady bude přesměrování na platební systémy 
+//      }
+      ?></th>
+         <td></td>
          <td><?
             if ($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0) {
                echo $this->tr('zdarma');
@@ -86,13 +89,13 @@
       <tr class="ui-widget-content">
          <th><?
             echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
-            if ($this->payment != false) {
-               echo '<br />';
-               echo '<div class="ship2pay-info">';
-               echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
-               echo '</div>';
-               // asi tady bude přesměrování na platební systémy 
-            }
+//            if ($this->payment != false) {
+//               echo '<br />';
+//               echo '<div class="ship2pay-info">';
+//               echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
+//               echo '</div>';
+//               // asi tady bude přesměrování na platební systémy 
+//            }
       ?></th>
          <td></td>
          <td><?

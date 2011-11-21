@@ -88,6 +88,8 @@ class Shop_Model_Orders extends Model_ORM
    const COLUMN_DELIVERY_POST_CODE = 'order_delivery_post_code';
    const COLUMN_DELIVERY_COUNTRY = 'order_delivery_country';
    
+   const COLUMN_PICKUP_DATE = 'order_pickup_date';
+   
    const COLUMN_NOTE = 'order_note';
    
    protected function  _initTable() {
@@ -129,7 +131,8 @@ class Shop_Model_Orders extends Model_ORM
       $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
       $this->addColumn(self::COLUMN_IS_NEW, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
-      
+
+      $this->addColumn(self::COLUMN_PICKUP_DATE, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
       

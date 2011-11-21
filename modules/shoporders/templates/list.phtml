@@ -15,9 +15,11 @@ $this->addFile('css://style.css');
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
       var selOrderId = 0;
-      function showOrder(id){
+      var ordersGrid;
+   
+      function showOrder(id, callback){
          selOrderId = id;
-         var link = '<?=$this->link()->route('viewOrder')?>';
+         var link = '<?= $this->link()->route('viewOrder') ?>';
          $.ajax({
             url: link.replace('{id}', id),
             cache: false,
@@ -25,6 +27,25 @@ $this->addFile('css://style.css');
                $("#order-detail").html(html);
                // odstranění tučného
                $("#table-orders").trigger("reloadGrid");
+               if (callback && typeof(callback) === "function") { callback(); }
+            }
+         });
+      }
+      function printOrder(id){
+         showOrder(id, function(){
+            window.print();
+         });
+      }
+      function deleteOrder(id){
+         var link = '<?= $this->link()->route('deleteOrder') ?>';
+         if(!confirm('<?= $this->tr('Opravdu smazat objednávku?') ?>')){
+            return;
+         }
+         $.ajax({ url: link,type: "POST", cache: false,
+            data : {id : id},
+            success: function(data){
+               if(data.errmsg.length > 0 ){ errMsg(data.errmsg); } 
+               else { ordersGrid.trigger("reloadGrid"); }
             }
          });
       }
@@ -61,17 +82,18 @@ $this->addFile('css://style.css');
             }
          });
          
-         var ordersGrid = $("#table-orders").jqGrid({
+         ordersGrid = $("#table-orders").jqGrid({
             datatype: 'json',
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('ordersList');?>',
-            colNames:['ID', '<?=$this->tr('Jméno a příjmení')?>', '<?=$this->tr('Datum')?>', '<?=$this->tr('Status')?>',
-            '<?=$this->tr('Cena')?>', '<?=$this->tr('Akce')?>'],
+            url: '<?= $this->link()->route('ordersList'); ?>',
+            colNames:['ID', '<?= $this->tr('Jméno a příjmení') ?>', '<?= $this->tr('Přijato') ?>', '<?= $this->tr('Datum odběru') ?>', '<?= $this->tr('Status') ?>',
+               '<?= $this->tr('Cena') ?>', '<?= $this->tr('Akce') ?>'],
             colModel:[
                {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
                {name:'name', index:'name', formatter: 'showNewStatus'},
                {name:'time', index:'time', width:120, fixed :true, formatter: 'showNewStatus'},
-               {name:'status', index:'status', width:120, fixed :true, formatter: 'showNewStatus'},
+               {name:'pickupdate', index:'pickupdate', width:80, fixed :true, formatter: 'showNewStatus'},
+               {name:'status', index:'status', width:60, fixed :true, formatter: 'showNewStatus'},
                {name:'price', index:'price', width:80, align:"right", fixed :true, formatter: 'showNewStatus', formatoptions: {type: "currency", decimalSeparator:",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"} },
                {name:'act', index:'act', width:60, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
             ],
@@ -85,17 +107,17 @@ $this->addFile('css://style.css');
             jsonReader: {
                repeatitems : false, root:"rows"
             },
-            caption: "<?=$this->tr('Přehled objednávek')?>",
+            caption: "<?= $this->tr('Přehled objednávek') ?>",
             height: '100%',
-            editurl : '<?=$this->link()->route('view', array('id' => '{ID}'));?>',
+            editurl : '<?= $this->link()->route('view', array('id' => '{ID}')); ?>',
             gridComplete: function(){ 
                var ids = $(this).jqGrid('getDataIDs'); 
                var button;
                for(var i=0; i < ids.length;i++){ 
                   var cl = ids[i]; 
-                  button = '<input type="image" src="images/icons/magnifier.png" value="<?=$this->tr('Ukaž')?>" onclick="showOrder(\''+ids[i]+'\');" />'
-                  +'<input type="image" src="images/icons/printer.png" value="<?=$this->tr('Tisk')?>" onclick="printOrder(\''+ids[i]+'\');\" />'
-                  +'<input type="image" src="images/icons/delete.png" value="<?=$this->tr('Smazat')?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
+                  button = '<input type="image" src="images/icons/magnifier.png" value="<?= $this->tr('Ukaž') ?>" onclick="showOrder(\''+ids[i]+'\');" />'
+                     +'<input type="image" src="images/icons/printer.png" value="<?= $this->tr('Tisk') ?>" onclick="printOrder(\''+ids[i]+'\');\" />'
+                     +'<input type="image" src="images/icons/delete.png" value="<?= $this->tr('Smazat') ?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
                   ; 
                   $(this).jqGrid('setRowData',ids[i],{act:button}); 
                }
@@ -107,8 +129,8 @@ $this->addFile('css://style.css');
          });
          
          ordersGrid.jqGrid('navGrid','#table-orders-pager', {edit: false, add: false, del:false, refresh: true});
+      
       });
-
       /* ]]> */
    </script>
 </div>

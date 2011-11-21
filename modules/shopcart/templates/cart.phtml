@@ -1,6 +1,10 @@
 <?
 $this->addFile('css://style.css');
-$this->addJsPlugin(new JsPlugin_JQuery());
+$jQuery = new JsPlugin_JQuery();
+if(isset ($this->formNext->pickupDate)){
+   $jQuery->addUIDatepicker();
+}
+$this->addJsPlugin($jQuery);
 $this->step = 1;
 ?>
 <h1><?=$this->category()->getName();?></h1>
@@ -68,24 +72,28 @@ $this->step = 1;
       <tbody>
          <tr>
             <td><? echo $this->formNext->shipping->label();?></td>
-            <td><? echo $this->formNext->shipping->controll();?></td>
-            <td></td>
+            <td><? 
+            echo $this->formNext->shipping->controll();
+            if(isset ($this->formNext->pickupDate)){
+               echo $this->formNext->pickupDate->label();
+               echo $this->formNext->pickupDate->controll();
+            }
+            
+            ?></td>
             <td class="column-5" ><span id="shipping-price"></td>
          </tr>
          <tr>
             <td><? echo $this->formNext->payment->label();?></td>
             <td><? echo $this->formNext->payment->controll();?></td>
-            <td></td>
             <td class="column-5" ><span id="payment-price"></span></td>
          </tr>
          <tr>
             <th><? echo $this->tr('Cena celkem');?></th>
             <td></td>
-            <td></td>
             <td class="price"><span id="full-price"></span></td>
          </tr>
          <tr>
-            <td colspan="4" class="align-right"><? echo $this->formNext->send->controll();?></td>
+            <td colspan="3" class="align-right"><? echo $this->formNext->send->controll();?></td>
          </tr>
       </tbody>
    </table>
@@ -103,6 +111,9 @@ $this->step = 1;
          
          setPaymentPrice($('select[name="goto_order_payment"]').val());
          $('select[name="goto_order_payment"]').change(function(){ setPaymentPrice($(this).val()); });
+         <?if(isset ($this->formNext->pickupDate)){?>
+            $('input[name="goto_order_pickupDate"]').datepicker();
+         <?}?>
       });
       
       function updateFullPrice(){

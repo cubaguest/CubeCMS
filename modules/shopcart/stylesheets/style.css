@@ -39,3 +39,7 @@ table .basket-full-price {
    background-color: #EFEFEF;
    font-weight: normal;
 }
+
+input.goto_order_pickupDate_class {
+   width: 80px;
+}

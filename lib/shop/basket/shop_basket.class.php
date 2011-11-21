@@ -13,6 +13,10 @@
 class Shop_Basket implements Iterator, ArrayAccess {
    private static $items = false;
 
+   private static $personalPickUpOnly = false;
+
+   private static $needPickUpDate = false;
+
    public function __construct()
    {
    }
@@ -28,7 +32,8 @@ class Shop_Basket implements Iterator, ArrayAccess {
       $modelBasket->columns(array(Shop_Model_Basket::COLUMN_ID_PRODUCT, Shop_Model_Basket::COLUMN_QTY, Shop_Model_Basket::COLUMN_ID_USER));
       $modelBasket->join(Shop_Model_Basket::COLUMN_ID_PRODUCT,array('t_pr' => 'Shop_Model_Product'), Shop_Model_Product::COLUMN_ID,
          array(Shop_Model_Product::COLUMN_NAME, Shop_Model_Product::COLUMN_PRICE, Shop_Model_Product::COLUMN_IMAGE, Shop_Model_Product::COLUMN_URLKEY,
-            Shop_Model_Product::COLUMN_ID_TAX, Shop_Model_Product::COLUMN_ID_CATEGORY, Shop_Model_Product::COLUMN_UNIT, Shop_Model_Product::COLUMN_UNIT_SIZE));
+            Shop_Model_Product::COLUMN_ID_TAX, Shop_Model_Product::COLUMN_ID_CATEGORY, Shop_Model_Product::COLUMN_UNIT, 
+            Shop_Model_Product::COLUMN_UNIT_SIZE, Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY, Shop_Model_Product::COLUMN_PICKUP_DATE));
       // join daní
       $modelBasket->join(array('t_pr' => Shop_Model_Product::COLUMN_ID_TAX), 'Shop_Model_Tax', Shop_Model_Tax::COLUMN_ID, array(Shop_Model_Tax::COLUMN_VALUE));
       // join kategorií
@@ -57,6 +62,14 @@ class Shop_Basket implements Iterator, ArrayAccess {
                ->setImage($item->{Shop_Model_Product::COLUMN_IMAGE});
             $itemO->setUrl($url->clear()->category($item->curlkey.'/'.$item->{Shop_Model_Product::COLUMN_URLKEY}) );   
             self::$items[$item->{Shop_Model_Basket::COLUMN_ID_PRODUCT}] = $itemO;
+            
+            if($item->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} == true){
+               self::$personalPickUpOnly = true;
+            }
+            
+            if($item->{Shop_Model_Product::COLUMN_PICKUP_DATE} == true){
+               self::$needPickUpDate = true;
+            }
             
             // update pokud je login a položky byly vloženy bez přihlášení
             if(Auth::isLogin() && $item->{Shop_Model_Basket::COLUMN_ID_USER} == 0){
@@ -181,6 +194,24 @@ class Shop_Basket implements Iterator, ArrayAccess {
       return empty (self::$items);
    }
    
+   /**
+    * Metoda vrací jestli je zboží nuntné vyzvednout pouze osobně
+    * @return bool
+    */
+   public function personalPickUpOnly()
+   {
+      return self::$personalPickUpOnly;
+   }
+   
+   /**
+    * metoda vrcí jestli zboží potřebuje datum vyzvednutí
+    * @return bool
+    */
+   public function needPickUpDate()
+   {
+      return self::$needPickUpDate;
+   }
+
    /* Implements ITERATOR */
    function rewind()
    {
