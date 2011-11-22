@@ -52,6 +52,7 @@ class Form_Element_Checkbox extends Form_Element {
     */
    public function controll() {
       $values = $this->getUnfilteredValues();
+      $this->html()->addClass($this->getName()."_class");
       if($this->isDimensional()) {
          $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
          $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
