@@ -4,19 +4,26 @@
    <section type="shop" icon="cart.png">
       <name lang="cs">Obchod</name>
       <name lang="en">E-Shop</name>
-      <item id="32900">
+      <item id="32900"  icon="application_view_detail.png">
          <name lang="cs">Objednávky</name>
          <name lang="en">Orders</name>
          <urlkey lang="en">admin/eshop/objednavky</urlkey>
          <urlkey lang="cs">admin/eshop/orders</urlkey>
          <module>shoporders</module>
       </item>
-      <item id="32901">
+      <item id="32901" icon="wrench.png">
          <name lang="cs">Nastavení</name>
          <name lang="en">Settings</name>
-         <urlkey lang="en">admin/eshop/nasatveni</urlkey>
+         <urlkey lang="en">admin/eshop/nastaveni</urlkey>
          <urlkey lang="cs">admin/eshop/settings</urlkey>
          <module>shopsettings</module>
+      </item>
+      <item id="32902" icon="brick.png">
+         <name lang="cs">Atributy zboží</name>
+         <name lang="en">Products Attributes</name>
+         <urlkey lang="en">admin/eshop/atributy</urlkey>
+         <urlkey lang="cs">admin/eshop/attributes</urlkey>
+         <module>shopprattributes</module>
       </item>
    </section>
 </adminmenu>

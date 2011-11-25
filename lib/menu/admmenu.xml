@@ -113,7 +113,7 @@
          <params>a:2:{s:3:"url";s:95:"https://spreadsheets.google.com/spreadsheet/viewform?formkey=dG1VSFQ4Wm5Ja0VKbUNHTGpLMFZIVXc6MQ";s:4:"code";s:3:"301";}</params>
          <module>redirect</module>
       </item>
-      <item id="32782" icon="help">
+      <item id="32782" icon="help.png">
          <name lang="cs">Nápověda</name>
          <name lang="en">Help - only in Czech</name>
          <urlkey lang="cs">admin/info/napoveda</urlkey>
