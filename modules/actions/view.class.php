@@ -233,6 +233,7 @@ class Actions_View extends View {
    public function editView() {
       $this->addTinyMCE();
       $this->template()->addFile('tpl://actions:edit.phtml');
+      Template_Module::setEdit(true);
    }
 
    public function featuredListView() {

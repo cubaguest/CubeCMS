@@ -54,12 +54,16 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
    </div>
    <!-- End Gallery Html Containers -->
    <hr class="reseter" />
-   <?$this->includeTpl('articletools.phtml', true, array(
+   <?
+   if($this->category()->getParam('shareTools', true) == true){
+      $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
            'linkToHtml' => $this->link()->route('detailExport',array('output' => 'html')),
-           'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));?>
+           'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
+   }
+   ?>
 
    <script type="text/javascript">
       /* <![CDATA[ */
