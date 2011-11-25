@@ -396,11 +396,13 @@ class Model_ORM extends Model {
          $dbst = $this->getDb()->prepare($sql);
          $obj->bindSQLWhere($dbst);
          $obj->bindSQLLimit($dbst);
+         $obj->bindValues($dbst);
       } else if($this->currentSql instanceof PDOStatement) {
          $dbst = $this->currentSql;
          $this->currentSql = null;
       } else {
-         $dbst = $this->bindValues($this->getDb()->prepare($this->currentSql));
+         $dbst = $this->getDb()->prepare($this->currentSql);
+         $dbst = $this->bindValues($dbst);
          $this->currentSql = null;
       }
       $r = false;
@@ -448,11 +450,13 @@ class Model_ORM extends Model {
 //      Debug::log($sql, $this->whereBindValues);
          $this->bindSQLWhere($dbst); // where values
          $this->bindSQLLimit($dbst); // limit values
+         $this->bindValues($dbst); // limit values
       } else if($this->currentSql instanceof PDOStatement) {
          $dbst = $this->currentSql;
          $this->currentSql = null;
       } else {
-         $dbst = $this->bindValues($this->getDb()->prepare($this->currentSql));
+         $dbst = $this->getDb()->prepare($this->currentSql);
+         $dbst = $this->bindValues($dbst);
          $this->currentSql = null;
       }
       $r = false;
@@ -561,6 +565,8 @@ class Model_ORM extends Model {
    {
       if(is_string($query)) {
          $this->currentSql = str_replace('{THIS}', '`'.$this->getTableName().'`', $query);
+      } else if($query instanceof PDOStatement){
+         $this->currentSql = $query;
       }
       return $this;
    }
@@ -1472,7 +1478,7 @@ class Model_ORM extends Model {
     * @param array $values
     * @return PDOStatement 
     */
-   protected function bindValues(PDOStatement $stmt, $values = false)
+   protected function bindValues(PDOStatement &$stmt, $values = false)
    {
       if($values == false){
          $values = $this->bindValues;
