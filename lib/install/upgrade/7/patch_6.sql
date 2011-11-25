@@ -62,9 +62,9 @@ COLLATE = utf8_general_ci;
 
 -- propojení produktů s atributy
 CREATE  TABLE `{PREFIX}shop_products_variants` (
-  `id_variant` VARCHAR(45) NOT NULL ,
+  `id_variant` INT NOT NULL ,
   `id_product` INT NOT NULL ,
-  `id_attribute` VARCHAR(45) NOT NULL ,
+  `id_attribute` INT NOT NULL ,
   `variant_price_add` FLOAT NULL DEFAULT 0 ,
   `variant_product_code` VARCHAR(100) NULL DEFAULT NULL ,
   PRIMARY KEY (`id_variant`) ,
