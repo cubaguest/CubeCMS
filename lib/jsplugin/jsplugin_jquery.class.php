@@ -252,6 +252,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUICore();
       $this->addUIWidget();
       $this->addUIPosition();
+      $this->addUIResizable();
       $this->addJs("ui.dialog");
       $this->addCss('dialog');
       return $this;
