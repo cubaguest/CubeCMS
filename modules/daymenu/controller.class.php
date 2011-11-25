@@ -38,6 +38,12 @@ class DayMenu_Controller extends Controller {
       } else {
          $date = new DateTime($date);
       }
+      // pokud je sobota nebo neděle, přepni na pondělí
+      $day = $date->format("w");
+      if( $day == 0 || $day >= 6 ) {
+         $date->modify('+' . ((7-$day+1) % 7) . ' days');
+      }
+      
       return $date;
    }
 
