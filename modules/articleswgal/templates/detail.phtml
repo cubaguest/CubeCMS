@@ -2,17 +2,14 @@
 $this->addCssFile("style.css");
 
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
-// jquery galerka
-$this->addJsPlugin(new JsPlugin_PiroBox());
-$images = $this->images;
 echo $this->toolbox;
 
 $image = null;
 if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
    $image = vve_tpl_image_tag(
       vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), $this->article->{Articles_Model::COLUMN_NAME}, 100, 100, array('image-left'));
-} else if(!empty ($images) AND $images != false){
-   $randImage = reset($images);
+} else if(!empty ($this->images) AND $this->images != false){
+   $randImage = reset($this->images);
    $image = (vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
       . $this->websubdir . Photogalery_Controller::DIR_SMALL . URL_SEPARATOR
       . $randImage->{PhotoGalery_Model_Images::COLUMN_FILE}, $randImage->{PhotoGalery_Model_Images::COLUMN_NAME}, 130, 100));
@@ -35,24 +32,10 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
       <hr class="reseter" />
    </div>
    <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
-   <!-- Start Advanced Gallery Html Containers -->
-   <div class="main-content-images">
-      <?
-      if(count($images) == 0) echo $this->tr('Galerie neobsahuje žádný obrázek.');
-      if(count($images) == 1) {$class = 'pirobox';}
-      else {$class = 'pirobox_gall';}
-      foreach ($images as $image) {
-         ?>
-      <a class="<?=$class?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
-                    .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
-      </a>
-         <?}
-      echo $this->toolboxImages;?>
-   </div>
-   <!-- End Gallery Html Containers -->
+   <? // images gallery
+   $this->imagesBaseDir = $this->category()->getModule()->getDataDir(true).$this->websubdir;
+   $this->includeFile('tpl://engine:photogalery.phtml');
+   ?>
    <hr class="reseter" />
    <?
    if($this->category()->getParam('shareTools', true) == true){
@@ -65,12 +48,18 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
    }
    ?>
 
+   <?
+   if($this->article != null AND ( 
+      strpos((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false
+      OR strpos((string)$this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}, 'pirobox') !== false)){
+   
+      $this->addJsPlugin(new JsPlugin_PiroBox());
+   ?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){
-         $().piroBox({slideShow : true,slideSpeed : 3});
-      });
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
+<?}?>
 </div>
 <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>

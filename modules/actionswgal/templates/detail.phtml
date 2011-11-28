@@ -3,7 +3,6 @@ $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
 
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
-$this->addJsPlugin(new JsPlugin_PiroBox());
 
 $images = $this->images;
 echo $this->toolbox;
@@ -55,27 +54,10 @@ echo $this->toolbox;
    </div>
    <br />
    <h2><?=$this->tr('Fotografie k akci')?></h2>
-   <div class="main-content-images">
-      <?
-      if(count($images) == 0) echo $this->tr('Galerie neobsahuje žádný obrázek.');
-      if(count($images) == 1) {$class = 'pirobox';}
-      else {$class = 'pirobox_gall';}
-      foreach ($images as $image) {
-         ?>
-      <a class="<?=$class?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
-                    .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
-      </a>
-         <?}
-      echo $this->toolboxImages;?>
-   </div>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
-      /* ]]> */
-   </script>
+   <? // images gallery
+   $this->imagesBaseDir = $this->category()->getModule()->getDataDir(true).$this->websubdir;
+   $this->includeFile('tpl://engine:photogalery.phtml');
+   ?>
    <hr class="reseter" />
    <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
    <?$this->includeTpl('articletools.phtml', true, array(

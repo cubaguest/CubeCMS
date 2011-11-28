@@ -1,0 +1,54 @@
+<?
+/* 
+ * Šablona pro fotogalerie
+ */
+
+// jquery galerka
+$this->addJsPlugin(new JsPlugin_Galleria());
+
+$propName = $this->propName == null ? PhotoGalery_Model_Images::COLUMN_NAME : $this->propName;
+$propAlt = $this->propAlt == null ? PhotoGalery_Model_Images::COLUMN_DESC : $this->propAlt;
+$propFile = $this->propFile == null ? PhotoGalery_Model_Images::COLUMN_FILE : $this->propFile;
+
+$dirBase = $this->imagesBaseDir != null ? $this->imagesBaseDir : $this->category()->getModule()->getDataDir(true).$this->websubdir;
+
+$dirSmall = $this->imagesDirSmall != null ? $dirBase.$this->imagesDirSmall : $dirBase.Photogalery_Controller::DIR_SMALL.'/';
+$dirMedium = $this->imagesDirMedium != null ? $dirBase.$this->imagesDirMedium : $dirBase.Photogalery_Controller::DIR_MEDIUM.'/';
+$dirBig = $this->imagesDirBig != null ? $dirBase.$this->imagesDirBig : $dirBase.Photogalery_Controller::DIR_ORIGINAL.'/';
+
+
+if(!isset ($images)){
+   $images = $this->images;
+}
+
+$c = count($images);
+if($c != 0){?>
+   <div class="main-content-images">
+      <div class="galleria-images">
+      <?
+      foreach ($images as $image) {
+         $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
+         ?><a href="<?=$dirMedium.$imgFile?>" title="<?=$image->{$propAlt}?>" rel="<?=$dirBig.$imgFile?>"
+            ><img src="<?=$dirSmall.$imgFile?>" title="<?=$image->{$propAlt}?>" alt="<?=$image->{$propName}?>" /></a><?
+
+      }?>
+      </div>
+      <? echo $this->toolboxImages; ?>
+   </div>
+   <script type="text/javascript">
+      /* <![CDATA[ */ // theme is loaded in JsPlugin
+      $(".galleria-images").galleria({
+         width: "100%",
+         height: 700,
+         lightbox: true
+      });
+      /* ]]> */
+   </script>
+<?} else if($this->toolboxImages != null){?>
+   <div class="admin-info-text">
+      <?
+      echo $this->tr('Galerie neobsahuje žádný obrázek.');
+      echo $this->toolboxImages;
+      ?>
+   </div>
+<?}?>

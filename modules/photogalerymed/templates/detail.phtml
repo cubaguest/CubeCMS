@@ -1,8 +1,6 @@
 <?
 $this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
 $h1 = $this->article->{Articles_Model::COLUMN_NAME};
-// jquery galerka
-$this->addJsPlugin(new JsPlugin_PiroBox());
 echo $this->toolbox;
 ?>
 <h1><?=$h1?></h1>
@@ -17,46 +15,17 @@ echo $this->toolbox;
    <?
    $this->includeTpl('privateText.phtml', false,null, 'articles');//private text
    
-   $images = $this->images;
-   if(count($images) != 0){
-   ?>
-   <!-- Start Advanced Gallery Html Containers -->
-   <div class="main-content-images"><?
-      $images = $this->images;
-      if(count($images) == 0) echo $this->tr('Galerie neobsahuje žádný obrázek.');
-      if(count($images) == 1) {$class = 'pirobox';}
-      else {$class = 'pirobox_gall';}
-      foreach ($images as $image) {
-         ?><a class="<?=$class?>" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
-                    .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
-         ><img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>"
-                         /></a><?
-         }
-         echo $this->toolboxImages;
-         ?></div>
-   <!-- End Gallery Html Containers -->
-   <hr class="reseter" />
-   <?
-   } else if($this->toolbox != null){?>
-   <div class="admin-info-text">
-      <?
-      echo $this->tr('Galerie neobsahuje žádný obrázek.');
-      echo $this->toolboxImages;
-      ?>
-   </div>
-   <?}
-   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route()));?>
-   <?$this->includeTpl('articletools.phtml', true, array(
+   // images gallery
+   $this->imagesBaseDir = $this->category()->getModule()->getDataDir(true).$this->websubdir;
+   $this->includeFile('tpl://engine:photogalery.phtml');
+   // link back
+   $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route()));
+   // share tools
+   $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
-           'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));?>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
-      /* ]]> */
-   </script>
+           'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
+   ?>
 </div>
 <?echo $this->comments;?>

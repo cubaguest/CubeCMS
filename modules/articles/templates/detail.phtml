@@ -68,9 +68,20 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
    }
 //   echo $this->toolbox;
    ?>
-<br />
+   <?
+   if($this->article != null AND ( 
+      strpos((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false
+      OR strpos((string)$this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}, 'pirobox') !== false)){
+   
+      $this->addJsPlugin(new JsPlugin_PiroBox());
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
+      /* ]]> */
+   </script>
+<?}?>
 </div>
-<br />
 <?echo $this->comments;?>
 
 

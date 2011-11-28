@@ -1,0 +1,35 @@
+<?
+/* 
+ * Šablona pro fotogalerie
+ */
+
+// jquery galerka
+$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+
+$propName = $this->propName == null ? PhotoGalery_Model_Images::COLUMN_NAME : $this->propName;
+$propAlt = $this->propAlt == null ? PhotoGalery_Model_Images::COLUMN_DESC : $this->propAlt;
+$propFile = $this->propFile == null ? PhotoGalery_Model_Images::COLUMN_FILE : $this->propFile;
+
+$dirSmall = $this->imagesDirSmall;
+$dirMedium = $this->imagesDirMedium;
+
+
+$images = $this->images;
+$c = count($images);
+if($c != 0){?>
+   <div class="main-content-images">
+      <?
+      $class = null;
+      foreach ($images as $image) {
+         $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
+         ?><a class="<?echo $class;?>" rel="prettyPhoto[pp_gal]" href="<?=$dirMedium.$imgFile?>" title="<?=$image->{$propAlt}?>" ><img src="<?=$dirSmall.$imgFile?>" alt="<?=$image->{$propName}?>" /></a><?
+      }
+      echo $this->toolboxImages;
+      ?>
+   </div>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){ $("a[rel^='prettyPhoto']").prettyPhoto(); });
+      /* ]]> */
+   </script>
+<?}?>

@@ -23,7 +23,8 @@ class Projects_View extends View {
    public function addSectionView()
    {
       $this->template()->addFile('tpl://edit_section.phtml');
-      $this->setTinyMCE($this->form->text);
+      $this->setTinyMCE($this->form->text, 
+         $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
    }
    
    public function editSectionView()
@@ -34,7 +35,8 @@ class Projects_View extends View {
    public function addProjectView()
    {
       $this->template()->addFile('tpl://edit_project.phtml');
-      $this->setTinyMCE($this->form->text);
+      $this->setTinyMCE($this->form->text, 
+         $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
    }
    
    public function editProjectView()

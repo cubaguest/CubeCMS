@@ -582,7 +582,7 @@ class Projects_Controller extends Controller {
       $elemSH->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_H.'px');
       $form->addElement($elemSH, 'images');
       if(isset($settings[self::PARAM_THUM_H])) {
-         $form->small_height->setValues($settings[self::PARAM_THUM_H]);
+         $form->image_thumb_h->setValues($settings[self::PARAM_THUM_H]);
       }
 
       $elemSC = new Form_Element_Checkbox('image_thumb_c', 'Ořezávat miniatury');
