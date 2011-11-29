@@ -244,7 +244,9 @@ class Actions_Controller extends Controller {
       $form->preprice->setValues($action->{Actions_Model_Detail::COLUMN_PREPRICE});
       $form->author->setValues($action->{Actions_Model_Detail::COLUMN_AUTHOR});
       $form->subname->setValues($action->{Actions_Model_Detail::COLUMN_SUBANME});
-      $form->titleImage->setValues($action->{Actions_Model_Detail::COLUMN_IMAGE});
+      if(isset ($form->titleImage)){
+         $form->titleImage->setValues($action->{Actions_Model_Detail::COLUMN_IMAGE});
+      }
 
       if($action->{Actions_Model_Detail::COLUMN_IMAGE} == null) {
          $form->image->setSubLabel($this->tr('Źádný obrázek'));
