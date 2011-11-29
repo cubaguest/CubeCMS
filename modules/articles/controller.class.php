@@ -664,7 +664,7 @@ class Articles_Controller extends Controller {
       $form->addElement($eImage, $fGrpParams);
       
       if(is_dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR)){
-         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png}", GLOB_BRACE);
+         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png,JPG,GIF,PNG}", GLOB_BRACE);
          //print each file name
          if(!empty ($images)){
             $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené obrázky'));
