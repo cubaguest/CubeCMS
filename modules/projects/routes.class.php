@@ -5,7 +5,7 @@ class Projects_Routes extends Routes {
       
       $this->addRoute('addProject', "::seckey::/add-project/", 'addProject', "{seckey}/add-project/");
       $this->addRoute('editSection', "::seckey::/edit", 'editSection','{seckey}/edit/');
-      
+      $this->addRoute('editText', "edit-text/", 'editText','edit-text/');
       $this->addRoute('editProject', "::seckey::/::prkey::/edit/", 'editProject','{seckey}/{prkey}/edit/');
       
       $this->addRoute('project', "::seckey::/::prkey::/", 'project', '{seckey}/{prkey}/');

@@ -43,6 +43,11 @@ class Projects_View extends View {
    {
       $this->addProjectView();
    }
+   
+   public function editTextView() {
+      $this->setTinyMCE($this->form->text, 'advanced');
+      $this->template()->addFile('tpl://projects:edittext.phtml');
+   }
 
    /**
     * Vytvoření toolboxů v detailu

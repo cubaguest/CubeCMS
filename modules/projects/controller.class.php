@@ -67,6 +67,12 @@ class Projects_Controller extends Controller {
       
       $this->view()->sections = $sectionsData;
       $this->view()->dataDir = $this->module()->getDataDir(true);
+      
+      // načtení textu
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $this->view()->text = $textRecord;
    }
 
    public function projectController() 
@@ -399,6 +405,48 @@ class Projects_Controller extends Controller {
       $this->view()->form = $form;
       $this->view()->dataDir = $this->module()->getDataDir(true).$rec->{Projects_Model_Projects::COLUMN_URLKEY}.'/';
       
+   }
+   
+   public function editTextController() {
+      $this->checkControllRights();
+      $form = new Form('list_text_', true);
+      
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
+      $elemText->setLangs();
+      if($textRecord != false){
+         $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
+      }
+      $form->addElement($elemText);
+
+      $elemS = new Form_Element_SaveCancel('save');
+      $form->addElement($elemS);
+
+      if($form->isSend() AND $form->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Úpravy úvodního textu byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+
+      if($form->isValid()) {
+         if($textRecord == false){
+            $textRecord = $textM->newRecord();
+         }
+         
+         $textRecord->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
+         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues()); 
+         $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+         $textRecord->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
+         
+         $textM->save($textRecord);
+
+         $this->infoMsg()->addMessage($this->tr('Úvodní text byl uložen'));
+         $this->link()->route()->reload();
+      }
+
+      $this->view()->form = $form;
    }
    
    /**

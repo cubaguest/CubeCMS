@@ -46,6 +46,12 @@ class ProjectsSimple_Controller extends Projects_Controller {
             $this->link()->reload();
          }
       }
+      
+      // načtení textu
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $this->view()->text = $textRecord;
    }
 
    /**
@@ -67,7 +73,7 @@ class ProjectsSimple_Controller extends Projects_Controller {
       
       $ctrl->view()->name = $pr->{Projects_Model_Projects::COLUMN_NAME};
    }
-
+   
    /**
     * Smazání článků při odstranění kategorie
     * @param Category $category
