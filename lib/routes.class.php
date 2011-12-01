@@ -121,6 +121,17 @@ class Routes {
           'respondClass' =>  $respondClass
          );
    }
+   
+   /**
+    * Metoda odepere zadanou cestu
+    * @param string $name -- název cesty
+    * @return Routes 
+    */
+   final public function removeRoute($name)
+   {
+      unset ($this->routes[$name]);
+      return $this;
+   }
 
    /**
     * Metoda registruje cesty z daného modulu
