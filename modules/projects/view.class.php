@@ -47,7 +47,8 @@ class Projects_View extends View {
    /**
     * Vytvoření toolboxů v detailu
     */
-   protected function createDetailToolbox() {
+   protected function createDetailToolbox() 
+   {
       if($this->category()->getRights()->isControll() OR
               ($this->category()->getRights()->isWritable() AND
                       $this->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {

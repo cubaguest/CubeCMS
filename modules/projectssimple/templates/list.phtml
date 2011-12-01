@@ -1,0 +1,31 @@
+<?
+$h1 = $this->category()->getName();
+echo $this->toolbox;
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<div class="main-content-list">
+   <?if($this->text != false && (string)$this->text->{Text_Model::COLUMN_TEXT} != null){?>
+   <div class="main-content-text">
+      <?=$this->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','emoticons'))?>
+      <hr class="reseter" />
+   </div>   
+   <?} else if($this->category()->getRights()->isWritable()) {?>
+      <p class="admin-info-text"><?=$this->tr('Úvodní text projektů není definován.');?></p>
+   <?}?>
+   <?if(!empty ($this->projects)) {?>
+      <div class="main-content-list-records">
+      <ul>
+      <?foreach ($this->projects as $project) { ?>
+         <li>
+            <a href="<?=$this->link()->route('project', array('prkey' => $project->{Projects_Model_Projects::COLUMN_URLKEY}))?>"
+               title="<?=htmlspecialchars($project->{Projects_Model_Projects::COLUMN_NAME})?>"
+               ><?=htmlspecialchars($project->{Projects_Model_Projects::COLUMN_NAME})?></a>
+         </li>
+      <?}?>
+      </ul>
+      </div>
+   <?
+   } else {?>
+      <p class="admin-info-text"><?=$this->tr('Není vložen žádný projekt');?></p>
+   <?}?>
+</div>

@@ -280,7 +280,10 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
-         $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
+         if($form->related->getValues() != null){
+            $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
+         }
+         
          $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
          
          if($form->url->getValues() == null){
@@ -557,7 +560,8 @@ class Projects_Controller extends Controller {
     * Smazání článků při odstranění kategorie
     * @param Category $category
     */
-   public static function clearOnRemove(Category $category) {
+   public static function clearOnRemove(Category $category) 
+   {
    }
 
    /**
