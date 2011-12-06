@@ -140,6 +140,7 @@ class Categories_Controller extends Controller {
             }
          }
       }
+      $form->owner->setValues($record->{Model_Category::COLUMN_ID_USER_OWNER});
 
 //    Checkbox pro regeneraci url klíčů při přesunu  settings
       $elemRegenUrls = new Form_Element_Checkbox('regenerateUrls', $this->tr('Opravit URL'));
@@ -240,6 +241,7 @@ class Categories_Controller extends Controller {
          $record->{Model_Category::COLUMN_DEF_RIGHT} = $form->rights_default->getValues();
          $record->{Model_Category::COLUMN_FEEDS} = $feeds;
          $record->{Model_Category::COLUMN_DATADIR} = $datadir;
+         $record->{Model_Category::COLUMN_ID_USER_OWNER} = $form->owner->getValues();
 
          $categoryModel->save($record);
 
@@ -363,6 +365,7 @@ class Categories_Controller extends Controller {
          $record->{Model_Category::COLUMN_DEF_RIGHT} = $form->rights_default->getValues();
          $record->{Model_Category::COLUMN_FEEDS} = $feeds;
          $record->{Model_Category::COLUMN_DATADIR} = $dataDir;
+         $record->{Model_Category::COLUMN_ID_USER_OWNER} = $form->owner->getValues();
 
          // instalace
          $mInsClass = ucfirst($form->module->getValues()) . '_Install';
@@ -570,7 +573,7 @@ class Categories_Controller extends Controller {
 
 
       // práva
-      $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii (r - čtení, w - zápis, c - úplná kontrola)'));
+      $fGrpRights = $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii (r - čtení, w - zápis, c - úplná kontrola)'));
 
       // pole s typy práv
       $rightsTypes = array(
@@ -587,7 +590,7 @@ class Categories_Controller extends Controller {
       $catGrpRigths = new Form_Element_Select('rights_default', $this->tr('Výchozí práva'));
       $catGrpRigths->setOptions($rightsTypes);
       $catGrpRigths->setSubLabel($this->tr('Výchozí práva pro nově přidané skupiny a všechny ostatní uživatele'));
-      $form->addElement($catGrpRigths, 'rights');
+      $form->addElement($catGrpRigths, $fGrpRights);
 
       VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
       foreach ($this->getGroups() as $group) {
@@ -603,8 +606,22 @@ class Categories_Controller extends Controller {
          $catGrpRigths->setSubLabel(sprintf($this->tr("Skupina\n \"%s\""), $group->{Model_Groups::COLUMN_LABEL}));
          $catGrpRigths->setOptions($rightsTypes);
          $catGrpRigths->setValues(reset($rightsTypes));
-         $form->addElement($catGrpRigths, 'rights');
+         $form->addElement($catGrpRigths, $fGrpRights);
       }
+      
+      $elemOwner = new Form_Element_Select('owner', $this->tr('Vlastník'));
+      $elemOwner->setSubLabel($this->tr('Vlastník kategorie má všechny práva k úpravě a nemusí být zařazen ve skupině'));
+      $elemOwner->setOptions(array($this->tr('Žádný') => 0));
+      $elemOwner->setValues(0);
+      
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->order(array(Model_Users::COLUMN_SURNAME => Model_ORM::ORDER_ASC))->records();
+      
+      foreach ($users as $user) {
+         $name = $user->{Model_Users::COLUMN_SURNAME}.' '.$user->{Model_Users::COLUMN_NAME}.' ('.$user->{Model_Users::COLUMN_USERNAME}.')';
+         $elemOwner->setOptions(array($name => $user->{Model_Users::COLUMN_ID}), true);
+      }
+      $form->addElement($elemOwner, $fGrpRights);
 
       $form->addGroup('sitemap', $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
 
@@ -768,6 +785,7 @@ class Categories_Controller extends Controller {
 
       $model = new Model_Category();
       $modelR = new Model_Rights();
+      $modelU = new Model_Users();
 
       $cat = $model->record($idc);
       if ($cat == false) {
@@ -776,10 +794,18 @@ class Categories_Controller extends Controller {
 
       $this->view()->catInfo = $cat;
 
-
       $rights = $modelR->joinFK(Model_Rights::COLUMN_ID_GROUP, array(Model_Groups::COLUMN_NAME))->where(Model_Rights::COLUMN_ID_CATEGORY . ' = :idc', array('idc' => $idc))->records();
       $this->view()->catRights = $rights;
       $this->view()->visTypes = $this->getVisibilityTypes();
+      
+      $user = $modelU->record($cat->{Model_Category::COLUMN_ID_USER_OWNER});
+      
+      if($user != false && !$user->isNew()){
+         $this->view()->owner = $user;
+      } else {
+         $this->view()->owner = $modelU->newRecord();
+         $this->view()->owner->{Model_Users::COLUMN_USERNAME} = $this->tr('Žádný');
+      }
    }
 
    public function moveCatController()

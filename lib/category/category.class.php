@@ -87,12 +87,9 @@ class Category extends Category_Core {
     */
    public function loadRights() {
       // admin může vše
-      if(Auth::isAdmin()){
+      if(Auth::isAdmin() || $this->getIdOwner() == Auth::getUserId() ){
          $this->categoryRights->addRight('rwc');
       } else {
-//         if($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT} == null){
-//            Debug::log($this->getCatDataObj());
-//         }
          $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});
       }
    }

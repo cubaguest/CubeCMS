@@ -149,7 +149,7 @@ class Category_Core extends TrObject {
     */
    public function getName()
    {
-      return (string) $this->category->{Model_Category::COLUMN_CAT_LABEL};
+      return (string) $this->category->{Model_Category::COLUMN_NAME};
    }
 
    /**
@@ -158,7 +158,16 @@ class Category_Core extends TrObject {
     */
    public function getId()
    {
-      return (int) $this->category->{Model_Category::COLUMN_CAT_ID};
+      return (int) $this->category->{Model_Category::COLUMN_ID};
+   }
+   
+   /**
+    * Metoda vrací id vlastníka
+    * @return integer -- id vlastníka
+    */
+   public function getIdOwner()
+   {
+      return (int) $this->category->{Model_Category::COLUMN_ID_USER_OWNER};
    }
 
    /**

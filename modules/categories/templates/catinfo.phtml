@@ -64,6 +64,15 @@ function tplCatTrRights(Translator $translator, $right)
       <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
    </tr>
    <tr>
+      <th class="ui-widget-header"><?=$this->tr('Vlastník');?></th>
+      <td class="ui-widget-content ui-state-default"><?
+      if($this->owner->{Model_Users::COLUMN_NAME} != null){
+         echo $this->owner->{Model_Users::COLUMN_SURNAME}.' '.$this->owner->{Model_Users::COLUMN_NAME}." (".$this->owner->{Model_Users::COLUMN_USERNAME}.")";
+      } else {
+         echo $this->owner->{Model_Users::COLUMN_USERNAME};
+      }?></td>
+   </tr>
+   <tr>
       <th class="ui-widget-header"><?=$this->tr('Priorita');?></th>
       <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_PRIORITY};?></td>
    </tr>

@@ -23,6 +23,7 @@ class Model_Category extends Model_ORM {
     * @var string
     */
    const COLUMN_ID = 'id_category';
+   const COLUMN_ID_USER_OWNER = 'id_owner_user';
 //   const COLUMN_ID_GROUP	= 'id_group';
    const COLUMN_NAME = 'label';
    const COLUMN_ALT = 'alt';
@@ -79,6 +80,7 @@ class Model_Category extends Model_ORM {
       $this->setTableName($this->tableName, 't_cats');
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_USER_OWNER, array('datatype' => 'smallint', 'nn' => true, 'default' => 0));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1));
       $this->addColumn(self::COLUMN_ALT, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -134,7 +136,7 @@ class Model_Category extends Model_ORM {
       if(self::$allCatsRecords == null){
          $this->columns(array(
             Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, Model_Category::COLUMN_DESCRIPTION, /*Model_Category::COLUMN_DATADIR, */
-            Model_Category::COLUMN_DEF_RIGHT, /* Model_Category::COLUMN_FEEDS, */
+            Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, /* Model_Category::COLUMN_FEEDS, */
             Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
             Model_Category::COLUMN_VISIBILITY
 //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'

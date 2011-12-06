@@ -123,7 +123,7 @@ class Category_Structure implements Iterator, Countable {
       foreach ($this->childrens as $key => $child) {
          $child->withHidden($this->withHidden);
          if(isset ($catArray[$child->getId()])
-            AND (Auth::isAdmin() OR $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT][0] == 'r') // práva ke kategorii
+            AND (Auth::isAdmin() OR $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT][0] == 'r' OR Auth::getUserId() == $catArray[$child->getId()][Model_Category::COLUMN_ID_USER_OWNER]) // práva ke kategorii
             AND ($this->withHidden // všechny zkryté bez rozdílu
                OR ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL) // viditelné všem
                OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
