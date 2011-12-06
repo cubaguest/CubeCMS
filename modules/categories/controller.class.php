@@ -578,11 +578,11 @@ class Categories_Controller extends Controller {
       // pole s typy práv
       $rightsTypes = array(
          $this->tr('Pouze čtení (r--)') => 'r--', 
-         $this->tr('Pouze zápis (-w-)') => '-w-', 
-         $this->tr('Pouze kontrola (--c)') => '--c', 
+//         $this->tr('Pouze zápis (-w-)') => '-w-', 
+//         $this->tr('Pouze kontrola (--c)') => '--c', 
          $this->tr('Čtení a zápis (rw-)') => 'rw-',
-         $this->tr('Čtení a kontrola (r-c)') => 'r-c', 
-         $this->tr('Zápis a kontrola (-wc)') => '-wc', 
+//         $this->tr('Čtení a kontrola (r-c)') => 'r-c', 
+//         $this->tr('Zápis a kontrola (-wc)') => '-wc', 
          $this->tr('Všechna oprávnění (rwc)') => 'rwc', 
          $this->tr('Žádná oprávnění (---)') => '---');
 
