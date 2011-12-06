@@ -1,7 +1,7 @@
 /* jen pro pořádek */
 body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 /* fonty */
-.admin-font, .toolbox input, ul.dropdown li a {
+.admin-font, .toolbox input, #adminMenuWrapper ul.dropdown li a {
    font-family: "Tahoma", "Arial", sans-serif !important;
    font-size: 12px;
 }
@@ -20,14 +20,14 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
    -moz-box-shadow: 0px 0px 3px #000;
 }
 /* ADMIN MENU LEVEL ONE */
-ul.dropdown, ul.dropdown ul {
+#adminMenuWrapper ul.dropdown, #adminMenuWrapper ul.dropdown ul {
    position: relative;
    list-style: none;
    padding: 0;
    margin: 0;
    z-index: 1000;
 }
-ul.dropdown li {
+#adminMenuWrapper ul.dropdown li {
    font-weight: bold; float: left; zoom: 1; background-color: #666666;
    padding: 0;
    margin: 0;
@@ -36,32 +36,33 @@ ul.dropdown li {
    list-style: none;
    position: relative;
 }
-ul.dropdown li a { 
+#adminMenuWrapper ul.dropdown li a { 
    display: block; padding: 0 8px; color: white; line-height: 24px;
    -moz-border-radius: 10px 10px 0 0;
    border-radius: 10px 10px 0 0;
    overflow: hidden;
 }
-ul.dropdown li a:hover {background: #333333 !important;}
-ul.dropdown li a:active { color: #ffa500; }
-ul.dropdown li a img { vertical-align: text-bottom; margin-right: 2px;}
-ul.dropdown li.adminmenu-user-item, ul.dropdown li.adminmenu-user-item ul li {background-color: #006666;}
-ul.dropdown li.adminmenu-shop-item, ul.dropdown li.adminmenu-shop-item ul li {background-color: #660000;}
-ul.dropdown li.hover, ul.dropdown li:hover 
-{  }
-ul.dropdown li.hover a { color: white; }
+#adminMenuWrapper ul.dropdown li a:hover {background: #333333 !important;}
+#adminMenuWrapper ul.dropdown li a:active { color: #ffa500; }
+#adminMenuWrapper ul.dropdown li a img { vertical-align: text-bottom; margin-right: 2px;}
+#adminMenuWrapper ul.dropdown li.adminmenu-user-item, 
+#adminMenuWrapper ul.dropdown li.adminmenu-user-item ul li {background-color: #006666;}
+#adminMenuWrapper ul.dropdown li.adminmenu-shop-item, 
+#adminMenuWrapper ul.dropdown li.adminmenu-shop-item ul li {background-color: #660000;}
+#adminMenuWrapper ul.dropdown li.hover, #adminMenuWrapper ul.dropdown li:hover {  }
+#adminMenuWrapper ul.dropdown li.hover a { color: white; }
 
 /* ADMIN MENU LEVEL TWO */
-ul.dropdown ul {
+#adminMenuWrapper ul.dropdown ul {
    width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0;
    box-shadow:0px 0px 3px #000;
    -webkit-box-shadow:0px 0px 3px #000;
    -moz-box-shadow: 0px 1px 3px #000;
-   -moz-border-radius: 0 0 10px 10px;
-   border-radius: 0 0 10px 10px;
+   -moz-border-radius: 0 10px 10px 10px;
+   border-radius: 0 10px 10px 10px;
    overflow: hidden;
 }
-ul.dropdown ul li {
+#adminMenuWrapper ul.dropdown ul li {
    font-weight: normal;
    background: #666666;
    color: #000;
@@ -70,13 +71,13 @@ ul.dropdown ul li {
    /* IE 7 */
 }
 /* IE 6 & 7 Needs Inline Block */
-ul.dropdown ul li a { border-right: none; width: 90%; display: inline-block; 
+#adminMenuWrapper ul.dropdown ul li a { border-right: none; width: 90%; display: inline-block; 
    -moz-border-radius: 5px;
    border-radius: 5px;
 }
 /* LEVEL THREE */
-ul.dropdown ul ul { left: 100%; top: 0; }
-ul.dropdown li:hover > ul { visibility: visible; }
+#adminMenuWrapper ul.dropdown ul ul { left: 100%; top: 0; }
+#adminMenuWrapper ul.dropdown li:hover > ul { visibility: visible; }
 
 /* For tinyMCE - max width*/
 .textarea_tinymce {
@@ -252,3 +253,21 @@ a.button-select-title-image {
 }
 #dialog-title-image {display: none;}
 a.button-open-title-image-galery {margin-left: 10px;}
+
+#module-help-box {
+   position: fixed;
+   top: 30px;
+   right: 5px;
+   border: 1px solid #666666; 
+   opacity: 0.9;
+   width: 150px;
+   padding: 5px;
+   color: black;
+   background-color: #eeeeee;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+#module-help-box h2 {
+   font-size: 12px;
+}
+   
