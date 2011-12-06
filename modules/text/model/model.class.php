@@ -47,7 +47,7 @@ class Text_Model extends Model_ORM {
       
       $this->setPk(self::COLUMN_ID);
       
-      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Category', Model_Category::COLUMN_CAT_ID);
 //      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
 //      $this->addForeignKey(self::COLUMN_ID_USER_LAST_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
 //      $this->addRelatioOneToMany(self::COLUMN_ID, 'Text_Model_PrivateUsers', Text_Model_PrivateUsers::COLUMN_T_H_U_ID_TEXT);
