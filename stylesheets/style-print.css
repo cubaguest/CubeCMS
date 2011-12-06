@@ -92,3 +92,12 @@ h1, h2, h3, h4, h5 {
    float: left;
    padding: 0 10px 10px 0;
 }
+
+/* zkryté prvky */
+#adminMenuWrapper, #debug, #headwrap, #footwrap,
+/* shop */
+#gbox_table-orders, #table-order-status-form, .module-shoporders h1
+
+{
+   display: none;
+}
