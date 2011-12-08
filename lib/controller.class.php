@@ -695,11 +695,13 @@ abstract class Controller extends TrObject {
 //      $eDesc->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($eDesc, $grpBasic);
       
-      $ePrior = new Form_Element_Text('priority', $this->tr('Priorita'));
-      $ePrior->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
-      $ePrior->setSubLabel('Čím větší tím bude větší šance, že kategorie bude vybrána jako výchozí.');
-      $ePrior->setValues($cat->{Model_Category::COLUMN_PRIORITY});
-      $form->addElement($ePrior, $grpBasic);
+      if(Auth::isAdmin()){
+         $ePrior = new Form_Element_Text('priority', $this->tr('Priorita'));
+         $ePrior->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+         $ePrior->setSubLabel('Čím větší tím bude větší šance, že kategorie bude vybrána jako výchozí.');
+         $ePrior->setValues($cat->{Model_Category::COLUMN_PRIORITY});
+         $form->addElement($ePrior, $grpBasic);
+      }
       
       
 //      frekvence změny
@@ -736,7 +738,9 @@ abstract class Controller extends TrObject {
          $cat->{Model_Category::COLUMN_NAME} = $form->name->getValues();
          $cat->{Model_Category::COLUMN_KEYWORDS} = $form->keywords->getValues();
          $cat->{Model_Category::COLUMN_DESCRIPTION} = $form->desc->getValues();
-         $cat->{Model_Category::COLUMN_PRIORITY} = $form->priority->getValues();
+         if(Auth::isAdmin()){
+            $cat->{Model_Category::COLUMN_PRIORITY} = $form->priority->getValues();
+         }
          $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_FREQ} = $form->sitemap_frequency->getValues();
          $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY} = $form->sitemap_priority->getValues();
          
