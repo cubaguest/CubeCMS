@@ -73,7 +73,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $currDirRealPath = $dataDir . str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $reqDir);
 
       if(!file_exists($currDirRealPath) || !is_dir($currDirRealPath)){
-         throw new UnexpectedValueException(sprintf(_('Adresář %s neexistuje'), '/'.VVE_DATA_DIR.$reqDir));
+         throw new UnexpectedValueException(sprintf($this->tr('Adresář %s neexistuje'), '/'.VVE_DATA_DIR.$reqDir));
       }
       $dirIter = new DirectoryIterator($currDirRealPath);
 
@@ -227,14 +227,14 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    private function chekWritableDir($dir)
    {
       if(!$this->isWritable($dir))
-         throw new Auth_Exception (_('Nemáte dostatečná práva pro úpravu této položky'));
+         throw new Auth_Exception ($this->tr('Nemáte dostatečná práva pro úpravu této položky'));
    }
 
    private function checkRights()
    {
       if(!Auth::isLogin())
       {
-         throw new Auth_Exception(_('Nemáte dostatečná práva k zápisu. Asi jste byl odhlášen'));
+         throw new Auth_Exception($this->tr('Nemáte dostatečná práva k zápisu. Asi jste byl odhlášen'));
       }
    }
 
@@ -274,7 +274,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $form = $this->createUploadForm($dir);
 
       if($form->isValid()) {
-         $this->infoMsg()->addMessage(_('Soubor byl nahrán'));
+         $this->infoMsg()->addMessage($this->tr('Soubor byl nahrán'));
       }
    }
    
@@ -328,22 +328,22 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    {
       $this->checkRights();
       if(!isset ($_POST['items'])){
-         throw new UnexpectedValueException(_('Nebyl předán parametr se seznamem položek'));
+         throw new UnexpectedValueException($this->tr('Nebyl předán parametr se seznamem položek'));
       }
       foreach ($_POST['items'] as $item) {
          $path = substr(AppCore::getAppDataDir(),0,-1).str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $item[0]);
          try {
-            if($item[1] == '..') throw new UnexpectedValueException(_('Nadřazený adresář nelze smazat'));
+            if($item[1] == '..') throw new UnexpectedValueException($this->tr('Nadřazený adresář nelze smazat'));
             $this->chekWritableDir($path);
             // kontrola adresáře na zápis
             if (is_dir($path . $item[1])) {
                $dir = new Filesystem_Dir($path . $item[1]);
                $dir->rmDir();
-               $this->infoMsg()->addMessage(sprintf(_('Adresář "%s" byl smazán '), $item[1]));
+               $this->infoMsg()->addMessage(sprintf($this->tr('Adresář "%s" byl smazán '), $item[1]));
             } else {
                $file = new Filesystem_File($item[1], $path);
                $file->delete();
-               $this->infoMsg()->addMessage(sprintf(_('Soubor "%s" byl smazán '), $item[1]));
+               $this->infoMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl smazán '), $item[1]));
             }
          } catch (UnexpectedValueException $exc) {
             $this->errMsg()->addMessage($exc->getMessage());
@@ -356,19 +356,19 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    {
       $this->checkRights();
       if(!isset ($_POST['items'])){
-         throw new UnexpectedValueException(_('Nebyl předán parametr se seznamem položek'));
+         throw new UnexpectedValueException($this->tr('Nebyl předán parametr se seznamem položek'));
       }
       foreach ($_POST['items'] as $item) {
          $path = substr(AppCore::getAppDataDir(),0,-1).str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $item[0]);
          try {
-            if($item[1] == '..') throw new UnexpectedValueException(_('Nadřazený adresář nelze přejmenovat'));
+            if($item[1] == '..') throw new UnexpectedValueException($this->tr('Nadřazený adresář nelze přejmenovat'));
             $this->chekWritableDir($path);
             $newName = vve_cr_safe_file_name($item[2]);
 
             if(!rename($path.$item[1], $path.$newName)){
-               throw new UnexpectedValueException(sprintf(_('Položku %s se nepodařilo přejmenovat'), $item[1]));
+               throw new UnexpectedValueException(sprintf($this->tr('Položku %s se nepodařilo přejmenovat'), $item[1]));
             }
-            $this->infoMsg()->addMessage(sprintf(_('Položka %s byla přejmenována na %s '), $item[1], $newName));
+            $this->infoMsg()->addMessage(sprintf($this->tr('Položka %s byla přejmenována na %s '), $item[1], $newName));
          } catch (UnexpectedValueException $exc) {
             $this->errMsg()->addMessage($exc->getMessage());
          }
@@ -481,13 +481,13 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
          try {
             $this->chekWritableDir($targetDir);
             if (!@copy($path.$item[1], $targetDir . $item[1])) {
-               throw new UnexpectedValueException(sprintf(_('Položku "%s" se nepodařilo kopírovat.'), $item[1]));
+               throw new UnexpectedValueException(sprintf($this->tr('Položku "%s" se nepodařilo kopírovat.'), $item[1]));
             }
             if($_POST['move'] == 'true') {
                if(is_dir($path.$item[1]) AND !@rmdir($path.$item[1])){
-                  throw new UnexpectedValueException(sprintf(_('Položku "%s" se nepodařilo vymazat.'), $item[1]));
+                  throw new UnexpectedValueException(sprintf($this->tr('Položku "%s" se nepodařilo vymazat.'), $item[1]));
                } else if(is_file ($path.$item[1]) AND !@unlink($path.$item[1])) {
-                  throw new UnexpectedValueException(sprintf(_('Položku "%s" se nepodařilo vymazat.'), $item[1]));
+                  throw new UnexpectedValueException(sprintf($this->tr('Položku "%s" se nepodařilo vymazat.'), $item[1]));
                }
             }
             if($_POST['move'] == 'true') {
@@ -524,7 +524,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $dir = substr(AppCore::getAppDataDir(), 0,-1).$this->getDir().addslashes($_POST[self::REQ_NAME]);
       $this->chekWritableDir(substr(AppCore::getAppDataDir(), 0,-1).$this->getDir());
       if(!is_dir($dir))
-         throw new UnexpectedValueException(_('Nebyl zadán korektní adresář.'));
+         throw new UnexpectedValueException($this->tr('Nebyl zadán korektní adresář.'));
 
       if($_POST['users'] != 'null' && is_array($_POST['users'])){
          $user = implode(';', $_POST['users']);
@@ -533,7 +533,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
          $file = new Filesystem_File(self::ACL_FILE, $dir);
          if($file->exist()) $file->delete();
       }
-      $this->infoMsg()->addMessage(_('Práva byla nastavena'));
+      $this->infoMsg()->addMessage($this->tr('Práva byla nastavena'));
 
    }
 }

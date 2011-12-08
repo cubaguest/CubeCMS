@@ -119,7 +119,7 @@ var FileBrowser = {
          button_width: 61,
          button_height: 22,
          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-         debug: true,
+         //debug: true,
          // Flash Settings
          flash_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload.swf",
          flash9_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload_fp9.swf"
@@ -520,7 +520,8 @@ var FileBrowser = {
             return unescape(document.cookie.substring(c_start,c_end));
          }
       }
-      return '/public/';
+      alert(baseLoadPath);
+      return baseLoadPath;
    },
    // funkce pro obsluhu vytváření, mazání
    createDir : function(){
