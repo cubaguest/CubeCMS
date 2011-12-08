@@ -64,9 +64,12 @@ class Component_JqGrid_Request {
     * Metoda nastaví výchozí sloupec podle kterého se řadí
     * @param string $field -- název sloupce
     */
-   public function setDefaultOrderField($field) {
-      if($this->orderField == null){
+   public function setDefaultOrderField($field, $order = 'asc') {
+      if($this->orderField == null || !isset ($_POST[self::REQUEST_SORT_FIELD])){
          $this->orderField = $field;
+      }
+      if(!isset ($_POST[self::REQUEST_SORT_ORD])){
+         $this->order = $order;
       }
    }
 
