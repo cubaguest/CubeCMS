@@ -520,7 +520,6 @@ var FileBrowser = {
             return unescape(document.cookie.substring(c_start,c_end));
          }
       }
-      alert(baseLoadPath);
       return baseLoadPath;
    },
    // funkce pro obsluhu vytváření, mazání
