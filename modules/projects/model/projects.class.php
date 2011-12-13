@@ -15,8 +15,10 @@ class Projects_Model_Projects extends Model_ORM {
    const COLUMN_TEXT_CLEAR = 'project_text_clear';
    const COLUMN_TIME_ADD = 'project_time_add';
    const COLUMN_IMAGE = 'project_image';
+   const COLUMN_THUMB = 'project_thumb';
    const COLUMN_RELATED = 'project_related';
    const COLUMN_WEIGHT = 'project_weight';
+   const COLUMN_TPL_PARAMS = 'project_tpl_params';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_art');
@@ -31,10 +33,12 @@ class Projects_Model_Projects extends Model_ORM {
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       
-      $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'bool', 'pdoparam' => PDO::PARAM_BOOL));
+      $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_THUMB, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_RELATED, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_WEIGHT, array('datatype' => 'smallint', 'default' => 0));
+      $this->addColumn(self::COLUMN_TPL_PARAMS, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
       $this->setPk(self::COLUMN_ID);
       

@@ -16,9 +16,9 @@ echo $this->toolbox;
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-      <?if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != false){?>
+      <?if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != null){?>
       <div class="main-content-image">
-         <img src="<?=$this->dataDir?>main_thum.jpg" />
+         <img src="<?=$this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE}?>" />
       </div>
       <?}?>
       

@@ -5,9 +5,11 @@ if($this->project != false) {
    $h = sprintf($this->tr('Úprava projektu "%s"'), $this->project->{Projects_Model_Projects::COLUMN_NAME});
    // donastavení formuláře
    if(isset($this->form->delimg)){
-      $img = sprintf('<img src="%s" height="50" alt="%s" />', 
-         $this->dataDir.'main_thum.jpg', 'main_thum.jpg');
-      $this->form->delimg->setSubLabel($img);
+      $img = sprintf($this->tr('Titulní:').' <img src="%s" height="50" alt="%s" /> ', 
+         $this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE}, $this->tr('Titulní obrázek'));
+      $imgThumb = sprintf($this->tr('Miniatura:').' <img src="%s" height="50" alt="%s" /> ', 
+         $this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_THUMB}, $this->tr('Titulní obrázek - miniatura'));
+      $this->form->delimg->setSubLabel($img.$imgThumb);
    }
    
 } else {

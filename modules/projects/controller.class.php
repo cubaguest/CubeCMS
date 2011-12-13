@@ -286,6 +286,7 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
+         $rec->{Projects_Model_Projects::COLUMN_TPL_PARAMS} = htmlentities($form->tplParams->getValues());
          if($form->related->getValues() != null){
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
          }
@@ -299,22 +300,40 @@ class Projects_Controller extends Controller {
          }
          
          // zpracovánbí obrázku
+         $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
+         
+         // miniatura
+         if($form->imageThumb->getValues() != null){
+            // zadaná miniatura
+            $imageThumb = new Filesystem_File_Image($form->imageThumb);
+               
+            $imageThumb->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
+               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
+               $this->category()->getParam(self::PARAM_THUM_C));
+               
+            $rec->{Projects_Model_Projects::COLUMN_THUMB} = $imageThumb->getName();
+            $imageThumb->remove();
+         }
+            
          if($form->image->getValues() != null){
             $image = new Filesystem_File_Image($form->image);
             
-            $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
+            $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), 
+               $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), false);
+            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
             
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
-               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam(self::PARAM_THUM_C, false), 'main_thum.jpg', IMAGETYPE_JPEG);
-//            $image->saveAs($dir, $this->category()->getParam(self::PARAM_MED_W, 300), $this->category()->getParam(self::PARAM_MED_H, 300), 
-//               false, 'main_med.jpg', IMAGETYPE_JPEG);
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), 
-               false, 'main.jpg', IMAGETYPE_JPEG);
-            $imageName = 'main';
-            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = true;
+            // miniatura
+            if($form->imageThumb->getValues() == null){
+               // miniatura z titulního
+               $thumbParts = pathinfo($image->getName());
+               $thumbName = $thumbParts['filename'] . '_thumb.' . $thumbParts['extension'];
+               
+               $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
+                  $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
+                  $this->category()->getParam(self::PARAM_THUM_C, false), $thumbName);
+               $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumbName;
+            }
             $image->remove();
-            
          }
          
          $model->save($rec);
@@ -353,7 +372,14 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
-         $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
+         $rec->{Projects_Model_Projects::COLUMN_TPL_PARAMS} = htmlentities($form->tplParams->getValues());
+         $relProjects = $form->related->getValues();
+         if(is_array($relProjects) && !empty ($relProjects)){
+            $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $relProjects);
+         } else {
+            $rec->{Projects_Model_Projects::COLUMN_RELATED} = null;
+         }
+         
          $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
          
          $oldDirName = $rec->{Projects_Model_Projects::COLUMN_URLKEY};
@@ -366,26 +392,43 @@ class Projects_Controller extends Controller {
          
          // mazání obrázku
          if(isset ($form->delimg) AND $form->delimg->getValues() == true){
-            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = false;
+            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = null;
+            $rec->{Projects_Model_Projects::COLUMN_THUMB} = null;
+         }
+         // titulní obrázek
+         $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
+         // miniatura
+         if($form->imageThumb->getValues() != null){
+            // zadaná miniatura
+            $imageThumb = new Filesystem_File_Image($form->imageThumb);
+               
+            $imageThumb->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
+               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
+               $this->category()->getParam(self::PARAM_THUM_C));
+             
+            $rec->{Projects_Model_Projects::COLUMN_THUMB} = $imageThumb->getName();
+            $imageThumb->remove();
          }
          
-         // zpracovánbí obrázku
+         // titulní obrázek
          if($form->image->getValues() != null){
             $image = new Filesystem_File_Image($form->image);
             
-            $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
+            $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), 
+               $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), false);
+            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
             
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
-               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam(self::PARAM_THUM_C, false), 'main_thum.jpg', IMAGETYPE_JPEG);
-//            $image->saveAs($dir, $this->category()->getParam(self::PARAM_MED_W, 300), $this->category()->getParam(self::PARAM_MED_H, 300), 
-//               false, 'main_med.jpg', IMAGETYPE_JPEG);
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), 
-               false, 'main.jpg', IMAGETYPE_JPEG);
-            $imageName = 'main';
-            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = true;
+            // miniatura z titulního
+            if($form->imageThumb->getValues() == null){
+               $thumbParts = pathinfo($image->getName());
+               $thumbName = $thumbParts['filename'] . '_thumb.' . $thumbParts['extension'];
+               
+               $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
+                  $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
+                  $this->category()->getParam(self::PARAM_THUM_C, false), $thumbName);
+               $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumbName;
+            }
             $image->remove();
-            
          }
          $model->save($rec);
          
@@ -473,6 +516,11 @@ class Projects_Controller extends Controller {
       $elemImage->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $form->addElement($elemImage);
       
+      $elemImageThumb = new Form_Element_File('imageThumb', $this->tr('Titulní obrázek - miniatura'));
+      $elemImageThumb->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
+      $elemImageThumb->setSubLabel($this->tr('Pokud není zadán, je vytvořena miniatura z titulního.'));
+      $form->addElement($elemImageThumb);
+      
       $modelSec = new Projects_Model_Sections();
       $secs = $modelSec->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))->records();
       
@@ -516,6 +564,10 @@ class Projects_Controller extends Controller {
       $elemUrl->addFilter(new Form_Filter_UrlKey());
       $form->addElement($elemUrl);
       
+      $elemTplParams = new Form_Element_Text('tplParams', $this->tr('Parametry šablony'));
+      $elemTplParams->setSubLabel($this->tr('Parametry projektu pro šablonu (např barva, ...). Formát: "název:hodnota;název:hodnota". Parametry určuje kodér šablony.'));
+      $form->addElement($elemTplParams);
+      
       if($prRecord != null){
          // add element for remove file
          $form->name->setValues($prRecord->{Projects_Model_Projects::COLUMN_NAME});
@@ -524,9 +576,10 @@ class Projects_Controller extends Controller {
          $form->url->setValues($prRecord->{Projects_Model_Projects::COLUMN_URLKEY});
          $form->section->setValues($prRecord->{Projects_Model_Projects::COLUMN_ID_SECTION});
          $form->weight->setValues($prRecord->{Projects_Model_Projects::COLUMN_WEIGHT});
-         if($prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != false){
-            $elemDelImg = new Form_Element_Checkbox('delimg', $this->tr('Smazat přiřazený obrázek'));
-            $form->addElement($elemDelImg, null, 3);
+         $form->tplParams->setValues($prRecord->{Projects_Model_Projects::COLUMN_TPL_PARAMS});
+         if($prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null){
+            $elemDelImg = new Form_Element_Checkbox('delimg', $this->tr('Smazat přiřazené obrázky'));
+            $form->addElement($elemDelImg, null, 5);
          }
          if($prRecord->{Projects_Model_Projects::COLUMN_RELATED} != null){
             $relateds = explode(';', $prRecord->{Projects_Model_Projects::COLUMN_RELATED});

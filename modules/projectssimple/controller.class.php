@@ -12,15 +12,6 @@ class ProjectsSimple_Controller extends Projects_Controller {
       $modelProjects = new Projects_Model_Projects();
       
       // načteme sekci, pokud žádná sekce není, není ani projekt
-      
-//      $projects = $modelSec->join(Projects_Model_Sections::COLUMN_ID, 'Projects_Model_Projects', 
-//         Projects_Model_Projects::COLUMN_ID_SECTION)
-//         ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-//            // ordery atd
-//         ->order(array( Projects_Model_Projects::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,
-//                        Projects_Model_Projects::COLUMN_NAME => Model_ORM::ORDER_ASC ))
-//         ->records();
-      
       $projects = $modelProjects->joinFK(Projects_Model_Projects::COLUMN_ID_SECTION, array(Projects_Model_Sections::COLUMN_ID_CATEGORY))
          ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :ids', array( 'ids' => $this->category()->getId() ))
          ->order(array( Projects_Model_Projects::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,

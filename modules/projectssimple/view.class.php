@@ -44,6 +44,9 @@ class ProjectsSimple_View extends Projects_View {
 
    protected function createListToolbox()
    {
+      if(!$this->category()->getRights()->isWritable()){
+         return null;
+      }
       $toolbox = new Template_Toolbox2();
       $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
       // add project
