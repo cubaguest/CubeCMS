@@ -4,345 +4,356 @@
  * Třída poskytuje základní metody pro práci se soubory,
  * zjišťování mime typu, ukládání do filesystému, kopírování, mazání.
  *
- * @copyright  	Copyright (c) 2009 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
+ * @copyright  	Copyright (c) 2011 Jakub Matas
+ * @version    	$Id$ CubeCMS 7.7 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu souborů
- * @todo          Doimplementovat metody "move" a "rename"
  */
 
-class File {
-  /**
-   * Název výstupního souboru
-   * @var string
-   */
-   private $fileNameOutput = null;
-
+class File extends TrObject implements File_Interface {
    /**
-    * Název vstupního souboru
+    * Název souboru
     * @var string
     */
-   private $fileNameInput = null;
-
+   protected $name = null;
+   
    /**
-    * název nového souboru
-    * @var string
+    * Cesta souboru
+    * @var FS_Dir
     */
-   private $fileNewName = null;
-
-   /**
-    * Adresář souboru
-    * @var File_Dir
-    */
-   private $fileDir = null;
+   protected $path = null;
 
    /**
     * MIME typ soubou
     * @var string
     */
-   private $fileMimeType = null;
-
-   /**
-    * zadaný MIME typ soubou
-    * @var string
-    */
-   private $fileMimeTypeEntered = null;
-
-   /**
-    * Velikost souboru
-    * @var integer
-    */
-   private $fileSize = -1;
+   protected $mimeType = null;
 
    /**
     * Pole s MIME typy
     * @var array
     */
-   protected $mimeTypes = array(
+   protected static $mimeTypes = array(
 
-            'txt' => 'text/plain',
-            'htm' => 'text/html',
-            'html' => 'text/html',
-            'php' => 'text/html',
-            'css' => 'text/css',
-            'js' => 'application/javascript',
-            'json' => 'application/json',
-            'xml' => 'application/xml',
-            'swf' => 'application/x-shockwave-flash',
-            'flv' => 'video/x-flv',
+       'txt' => 'text/plain',
+       'htm' => 'text/html',
+       'html' => 'text/html',
+       'php' => 'text/html',
+       'css' => 'text/css',
+       'js' => 'application/javascript',
+       'json' => 'application/json',
+       'xml' => 'application/xml',
+       'swf' => 'application/x-shockwave-flash',
+       'flv' => 'video/x-flv',
 
-      // images
-            'png' => 'image/png',
-            'jpe' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'jpg' => 'image/jpeg',
-            'gif' => 'image/gif',
-            'bmp' => 'image/bmp',
-            'ico' => 'image/vnd.microsoft.icon',
-            'tiff' => 'image/tiff',
-            'tif' => 'image/tiff',
-            'svg' => 'image/svg+xml',
-            'svgz' => 'image/svg+xml',
+       // images
+       'png' => 'image/png',
+       'jpe' => 'image/jpeg',
+       'jpeg' => 'image/jpeg',
+       'jpg' => 'image/jpeg',
+       'gif' => 'image/gif',
+       'bmp' => 'image/bmp',
+       'ico' => 'image/vnd.microsoft.icon',
+       'tiff' => 'image/tiff',
+       'tif' => 'image/tiff',
+       'svg' => 'image/svg+xml',
+       'svgz' => 'image/svg+xml',
 
-      // archives
-            'zip' => 'application/zip',
-            'rar' => 'application/x-rar-compressed',
-            'exe' => 'application/x-msdownload',
-            'msi' => 'application/x-msdownload',
-            'cab' => 'application/vnd.ms-cab-compressed',
+       // archives
+       'zip' => 'application/zip',
+       'rar' => 'application/x-rar-compressed',
+       'exe' => 'application/x-msdownload',
+       'msi' => 'application/x-msdownload',
+       'cab' => 'application/vnd.ms-cab-compressed',
 
-      // audio/video
-            'mp3' => 'audio/mpeg',
-            'qt' => 'video/quicktime',
-            'mov' => 'video/quicktime',
+       // audio/video
+       'mp3' => 'audio/mpeg',
+       'qt' => 'video/quicktime',
+       'mov' => 'video/quicktime',
 
-      // adobe
-            'pdf' => 'application/pdf',
-            'psd' => 'image/vnd.adobe.photoshop',
-            'ai' => 'application/postscript',
-            'eps' => 'application/postscript',
-            'ps' => 'application/postscript',
+       // adobe
+       'pdf' => 'application/pdf',
+       'psd' => 'image/vnd.adobe.photoshop',
+       'ai' => 'application/postscript',
+       'eps' => 'application/postscript',
+       'ps' => 'application/postscript',
 
-      // ms office
-            'doc' => 'application/msword',
-            'rtf' => 'application/rtf',
-            'xls' => 'application/vnd.ms-excel',
-            'ppt' => 'application/vnd.ms-powerpoint',
+       // dokumenty
+       'csv' => 'text/plain',
+       'doc' => 'application/msword',
+       'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+       'rtf' => 'application/rtf',
+       'xls' => 'application/vnd.ms-excel',
+       'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+       'ppt' => 'application/vnd.ms-powerpoint',
 
-      // open office
-            'odt' => 'application/vnd.oasis.opendocument.text',
-            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+       // open office
+       'odt' => 'application/vnd.oasis.opendocument.text',
+       'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+      
+      // ostatní
+       'other' => 'application/octet-stream',
    );
 
    /**
     * Konstruktor třídy
     *
-    * @param string $file -- název souboru (může být i s cestou - sám si to rozparsuje)
-    * @param string $dir -- (option) cesta k souboru (pokud není zapsána, pokusí se cestu
-    * parsovat z názvu souboru)
-    * @param string $inputFile -- název vstupního souboru např. z $_FILES pokud
-    * je odlišný od výstupního
-    * @param string $mimeType -- mime typ souboru
-    * @param integer $size -- velikost souboru
-    */
-   function __construct($file, $dir = null, $inputFile = null, $mimeType = null, $size = null){
+    * @param string $file -- název souboru
+    * @param string $path -- (option) cesta k souboru (pokud není zapsána, pokusí se cestu parsovat z názvu souboru)
+    * @todo odestranit závislost na Filesystem_Dir
+    */   
+   public function __construct($name = null, $path = null)
+   {
       // Pokud je vložen objekt File
-      if($file instanceof File){
-         $this->fileDir = new File_Dir($file->getFileDir());
-         $this->fileNameOutput = $file->getName();
-         $this->fileNameInput = $file->getNameInput();
-         $this->fileMimeType = $file->getMimeType();
-         $this->fileSize = $file->getFileSize();
+      if($name instanceof File) {
+         $this->path = $name->getPath();
+         $this->name = $file->getName();
+      }
+      else if($name instanceof Form_Element_File){
+         $elem = $name->getValues();
+         $this->name = $elem['name'];
+         $this->path = new FS_Dir($elem['path']);
+         $this->mimeType = $elem['type'];
       } else {
-         // Pokud je zadán tmp name
-         if($inputFile != null){
+         if($path != null) {
+            $this->name = $file;
+            $this->path = new FS_Dir($path);
+         } else {
             // rozparsování cesty a soubou u tmp
-            $arr = $this->parsePathFile($inputFile);
-            if($arr != false){
-               $this->fileNameInput = $arr[2];
-               $this->fileDir = new File_Dir($arr[1]);
-            }
-            $this->fileNameOutput = $file;
-         }
-         // pokud je zadán název popřípadě cesta
-         else {
-            if($dir == null){
-               // rozparsování cesty a soubou u tmp
-               $arr = $this->parsePathFile($file);
-               if($arr != false){
-                  $this->fileNameOutput = $arr[2];
-                  $this->fileNameInput = $arr[2];
-                  $this->fileDir = new File_Dir($arr[1]);
-               }
-            } else {
-               $this->fileNameOutput = $file;
-               $this->fileNameInput = $file;
-               $this->fileDir = new File_Dir($dir);
-            }
-         }
-         $this->fileMimeTypeEntered = $mimeType;
-         $this->fileMimeType = $this->locateMimeType();
-
-         if($size != null){
-            $this->fileSize = $size;
+            $path_parts = pathinfo($name);
+            $this->name = $path_parts['basename'];
+            $this->path = new FS_Dir($path_parts['dirname']);
          }
       }
+//      $this->locateFileSize();
+      $this->locateMimeType();
+      $this->init();
    }
-
+   
    /**
-  * Metoda vrací objekt s informačními zprávami
-  * @return Messages -- objekt zpráv
-  */
-   final protected function infoMsg() {
-      return AppCore::getInfoMessages();
-   }
-
- /**
-  * Metoda vrací objekt s chybovými zprávami
-  * @return Messages -- objekt zpráv
-  */
-   final protected function errMsg() {
-      return AppCore::getUserErrors();
-   }
-
-   /**
-    * Metoda rozparsuje řetězec na název souboru a cestu
-    * @param string $string -- název souboru s cestou
+    * Interní metoda pro inicializaci knihoven pro soubory
     */
-   private function parsePathFile($string) {
-      $regep = array();
-      if(eregi('^(.*/)([^'.DIRECTORY_SEPARATOR.']*)$', $string, $regep)){
-         return $regep;
-      }
-      return false;
-   }
+   protected function init()
+   {}
+
+   /* info o souboru*/
 
    /**
-    * Metoda vrací název výstupního (OUTPUT) souboru, pokud existuje nový vrací ten
-    * @param boolean $withDir -- jestli má být vrácena i část s adresářem
-    *
-    * @return string -- název souboru
+    * Nastaví název souboru
+    * @param string $name -- název souboru
+    * @return File 
     */
-   public function getName($withDir = false) {
-      $return = null;
-      if($this->fileNewName == null){
-         $return = $this->fileNameOutput;
+   public function setName($name)
+   {
+      $this->name = $name;
+      return $this;
+   }
+   
+   /**
+    * vrací název souboru
+    * @return string 
+    */
+   public function getName()
+   {
+      return $this->name;
+   }
+   
+   /**
+    * Nastaví cestu k souboru
+    * @param string/FS_Dir $path 
+    * @return File
+    */
+   public function setPath($path)
+   {
+      if($path instanceof FS_Dir){
+         $this->path = $path;
       } else {
-         $return = $this->fileNewName;
+         $this->path = new FS_Dir($path);
       }
-      if($withDir){
-         $return = $this->getFileDir().$return;
+      return $this;
+   }
+   
+   /**
+    * Metoda vrací cestu k souboru
+    * @return FS_Dir
+    */
+   public function getPath()
+   {
+      return $this->path;
+   }
+   
+   /**
+    * metoda vrací veliskot souboru
+    * @return int
+    */
+   public function getSize()
+   {
+      if($this->exist()){
+         return @filesize((string)$this);
       }
-      return $return;
+      return -1;
    }
-
+   
    /**
-    * Metoda vrací název vstupního (INPUT) souboru
-    * @param boolean $withDir -- jestli má být vrácena i část s adresářem
-    *
-    * @return string -- název souboru
+    * Metoda vrací poslední změnu souboru (timestamp)
+    * @return int 
     */
-   public function getNameInput($withDir = false) {
-      $return = $this->fileNameInput;
-
-      if($withDir){
-         $return = $this->getFileDir().$return;
+   public function getChangeTime()
+   {
+      return (int)filectime((string)$this);
+   }
+   
+   /**
+    * metoda vrací MIME typ souboru
+    * @return type 
+    */
+   public function getMimeType()
+   {
+      return $this->mimeType;
+   }
+   
+   /**
+    * Metoda nastaví práva k souboru
+    * @param int $mode -- octal -- práva souboru např 0777
+    */
+   public function setRights($mode)
+   {
+      return @chmod((string)$this, $mode);
+   }
+   
+   public function __toString()
+   {
+      return (string)$this->getPath().$this->getName();
+   }
+   
+   /* Obsah souboru podle typu */
+   
+   /**
+    * metodfa nastaví obsah souboru
+    * @param type $cnt -- obsah
+    */
+   public function setContent($cnt){}
+   
+   /**
+    * Metoda vrací obsah souboru
+    * @return null
+    */
+   public function getContent(){
+      return null;
+   }
+   
+   /**
+    * Metoda uloží daný soubor
+    * @return File
+    */
+   public function save() {
+      return $this;
+   }
+   
+   /* Modoty pro práci se souborem */
+   
+   /**
+    * Metoda testuje jestli soubor existuje
+    * @return bool
+    */
+   public function exist()
+   {
+      if($this->getName() == null) return false; // protože pokud není soubor kontroluje adresář a ten může existovat
+      return file_exists((string)$this);
+   }
+   
+   /**
+    * metoda vytvoří kopii souboru
+    * @param type $path
+    * @return File 
+    */
+   public function copy($path)
+   {
+      if(!$this->exist()){
+         return $this;
       }
-
-      return $return;
-   }
-
-   /**
-    * Metoda vrací mime typ souboru
-    * @todo nutná portace na PECL rozšíření o informací o souboru
-    *
-    * @return string -- mime typ souboru
-    */
-   public function getMimeType() {
-      return $this->fileMimeType;
-   }
-
-   /**
-    * Metoda vrací velikost souboru
-    *
-    * @return integer -- velikost souboru
-    */
-   public function getFileSize() {
-      if($this->fileSize == -1){
-         $this->fileSize = $this->locateFileSize();
-      }
-      return $this->fileSize;
-   }
-
-   /**
-    * Metoda vrací adresář souboru
-    *
-    * @return string -- adresář souboru
-    */
-   public function getFileDir() {
-      return $this->fileDir;
-   }
-
-   /**
-    * Metoda kopíruje soubor do zadaného adresáře, kontroluje jméno a vytváří
-    * unikátní název
-    * @param string $dstDir -- cílový adresář
-    * @param string $fileName -- (option) název souboru
-    *
-    * @return boolean -- true pokud byl soubor zkopírován
-    */
-   public function copy($dstDir, $fileName = null) {
+      
       // Kontrola adresáře
-      $dirObj = new File_Dir();
-      $dirObj->checkDir($dstDir);
-      unset ($dirObj);
+      $path = new FS_Dir($path);
+      $path->check();
 
       // Kontrola jména
-      $newFile = $this->creatUniqueName($dstDir);
-      $this->fileNewName = $newFile;
+      $newFile = $this->creatUniqueName($path);
 
-      if(!$this->exist()){
-         throw new UnexpectedValueException(sprintf(_('Soubor %s pro kopírování neexistuje'), $this->getNameInput(true)), 1);
+      if(file_exists((string)$path.$newFile)) {
+         throw new UnexpectedValueException(sprintf($this->tr('Soubor %s pro kopírování neexistuje'), (string)$this), 1);
       }
-      if(!copy($this->getNameInput(true), $dstDir.$newFile)){
-         throw new UnexpectedValueException(sprintf(_('Chyba při kopírování souboru %s > %s'), $this->getNameInput(true), $dstDir.$newFile), 2);
+      if(!copy((string)$this, (string)$dirObj.$newFile)) {
+         throw new UnexpectedValueException(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
       }
-      if(!chmod($dstDir.$newFile, 0666)){
-         throw new UnexpectedValueException(sprintf(_('Chyba při úpravě práv souboru %s'),$this->getNameInput(true)), 3);
+      if(!chmod((string)$dirObj.$newFile, 0666)) {
+         throw new UnexpectedValueException(sprintf($this->tr('Chyba při úpravě oprávnění souboru %s'),(string)$this), 3);
       }
-      return true;
+      return $this;  
    }
-
+   
    /**
-    * Metoda přejmenuje soubor na nový název
+    * Přejmenování souboru
     * @param string $newName -- nový název souboru
-    *
-    * @return boolean -- true pokud byl soubor přejmenován
+    * @return File
     */
-   public function rename($newName) {
-      ;
-   }
-
-   /**
-    * Metoda přesune soubor do zadaného adresáře, vytvoří unikátní název nebo
-    * přejmenuje na zadaný název
-    * @param string $dstDir -- cílový adresář
-    * @param string $newName -- (option) nový název souboru
-    *
-    * @return boolean -- true pokud byl soubor přesunut
-    */
-   public function move($dstDir, $newName = null) {
-      ;
-   }
-
-   /**
-    * Metoda vymaže soubor z flesystému
-    *
-    * @return boolean -- true pokud byl soubor odstraněn
-    */
-   public function remove() {
-      if($this->exist() AND !is_dir($this->getNameInput(true))){
-         return unlink($this->getNameInput(true));
+   public function rename($newName)
+   {
+      if(!@rename((string)$this, $this->getPath().$newName)){
+         throw new UnexpectedValueException($this->tr('Soubor se nepodařilo přejmenovat'));
       }
-      throw new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getNameInput()));
+      return $this;
    }
-
+   
    /**
-    * Metoda zjišťuje jestli soubor existuje
-    *
-    * @return boolean -- true pokud soubor existuje
+    * metoda přesune soubor do jiného adresáře
+    * @param FS_Dir $dstDir
+    * @return File 
     */
-   public function exist() {
-      return file_exists($this->getNameInput(true));
+   public function move($dstDir)
+   {
+      $dstDir = new FS_Dir($dstDir);
+      $dstDir->check();
+      
+      if(!@rename((string)$this, $dstDir.$this->getName())){
+         throw new UnexpectedValueException($this->tr('Soubor se nepodařilo přesunout'));
+      }
+      $this->fileDir = $dstDir;
+      return $this;
    }
-
+   
    /**
-    * Metoda zjistí a nastaví velikost souboru
-    * @return integer -- velikost souboru
+    * Metoda odešle zadaný soubor ke klientu
     */
-   private function locateFileSize() {
-      return filesize($this->getNameInput(true));
+   public function send()
+   {
+      if ($this->exist()) {
+         header('Content-Description: File Transfer');
+         header('Content-Type: application/octet-stream');
+         header('Content-Disposition: attachment; filename='.$this->getName());
+         header('Content-Transfer-Encoding: binary');
+         header('Expires: 0');
+         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+         header('Pragma: public');
+         header('Content-Length: ' . $this->getSize());
+         ob_clean();
+         flush();
+         readfile($file);
+      } else {
+         header('Content-Description: File Transfer');
+         header('Content-Type: application/octet-stream');
+         header('Content-Disposition: attachment; filename='.$this->getName());
+         header('Content-Transfer-Encoding: binary');
+         header('Expires: 0');
+         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+         header('Pragma: public');
+         header('Content-Length: ' . strlen($this->getContent()) );
+         ob_clean();
+         flush();
+         echo $this->getContent();
+      }
+      exit;
    }
 
    /**
@@ -351,20 +362,32 @@ class File {
     * @return string -- mime type
     */
    private function locateMimeType() {
-      //      $file = $this->fileName;
-      $fileArray = explode('.',$this->getName());
-      $ext = strtolower(array_pop($fileArray));
-      if (array_key_exists($ext, $this->mimeTypes)) {
-         return $this->mimeTypes[$ext];
-      }
-      else if (function_exists('finfo_open')) {
-         $finfo = finfo_open(FILEINFO_MIME);
-         $mimetype = finfo_file($finfo, $this->getNameInput(true));
-         finfo_close($finfo);
-         return $mimetype;
-      }
-      else {
-         return 'application/octet-stream';
+      $path_parts = pathinfo($this->getName(true));
+      if($this->exist()) {
+         if($this->mimeType === null) {
+            //      $file = $this->fileName;
+            if (function_exists('finfo_open')) {
+               $finfo = finfo_open(FILEINFO_MIME);
+               $mimetype = finfo_file($finfo, $this->getName(true));
+               // odstranění utf-8 pokud existuje
+               $mime = explode(';', $mimetype);
+               $this->mimeType = $mime[0];
+               finfo_close($finfo);
+            }
+            else if (array_key_exists($path_parts['extension'], self::$mimeTypes)) {
+               $this->mimeType = self::$mimeTypes[$path_parts['extension']];
+            }
+            else {
+               $this->mimeType = 'application/octet-stream';
+            }
+         }
+      } else {
+         // tady ujištění typu podle přípony
+         if(isset (self::$mimeTypes[$path_parts['extension']])){
+            $this->mimeType = self::$mimeTypes[$path_parts['extension']];
+         } else {
+            $this->mimeType = 'application/octet-stream';
+         }
       }
    }
 
@@ -378,51 +401,49 @@ class File {
     * @return string -- nový název souboru
     * @todo -- dodělat při přijmu souboru se dvěmi příponami
     */
-   protected function creatUniqueName($destinationDir, $newName = null, $number = 0) {
+   protected function creatUniqueName($destinationDir, $newName = null, $number = 0) 
+   {
       // Pokud je zadáno pouze číslo
-      if(is_int($newName)){
+      if(is_int($newName)) {
          $newFileName = $this->getName() ;
          $addNumber = $newName;
-      } else if($newName != null) {
+      }
+      else if($newName != null) {
          $newFileName = $newName;
          $addNumber = $number;
-      } else {
+      }
+      else {
          $newFileName = $this->getName();
          $addNumber = $number;
       }
       //doplnění posledního lomítka za dest adresář
-      if($destinationDir[strlen($destinationDir)-1] != "/" AND $addNumber == 0){
+      if($destinationDir[strlen($destinationDir)-1] != "/" AND $addNumber == 0) {
          $destinationDir .= "/";
       }
       //rozdělení názvu souboru na název a příponu
       $file_ext = array();
-      eregi('^([^.]*).(.*)$', strtolower($newFileName), $file_ext);
+//      preg_match('/^([^.]*).([a-z0-9_]+)$/', strtolower($newFileName), $file_ext);
+      preg_match('/^[^.]*\.((?:tar\.)?[a-z0-9_]+)$/', strtolower($newFileName), $file_ext);
       $file_name_short = $file_ext[1];
       $file_name_extension = $file_ext[2];
       //odstraneni nepovolenych zanků a složení dohromady
-      $sFunction = new Helper_Text();
-      $file_name_short = $sFunction->utf2ascii($file_name_short);
+      $file_name_short = vve_cr_safe_file_name($file_name_short);
       unset($sFunction);
-      if($addNumber == 0){
+      if($addNumber == 0) {
          $createNewFileName=$file_name_short.'.'.$file_name_extension;
-      } else {
+      }
+      else {
          $createNewFileName=$file_name_short.$addNumber.'.'.$file_name_extension;
       }
       // kontrola existence
-      if(file_exists($destinationDir.$createNewFileName)){
+      if(file_exists($destinationDir.$createNewFileName)) {
          $createNewFileName = $this->creatUniqueName($destinationDir, (++$addNumber));
-      } else {
-         $this->fileNewName = $createNewFileName;
+      }
+      else {
+//         $this->fileName = $createNewFileName;
       }
       return $createNewFileName;
    }
 
-   /**
-    * Metoda nastaví práva k souboru
-    * @param int $mode -- octal -- práva souboru např 0777
-    */
-   public function setRights($mode) {
-      @chmod($this->fileDir.$this->fileNameOutput, $mode);
-   }
 }
 ?>
