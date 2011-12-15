@@ -56,7 +56,9 @@ $this->addPageTitle($h);
                $vals = array(0,1);
             };
             foreach ($vals as $i => $val) {
-               $this->form->answer->setDimensional($i);?>
+               $this->form->answer->setDimensional($i);
+               $this->form->answerCount->setDimensional($i);
+               ?>
             <tr id="pollAnswer_<?=$i?>" class="pollAnswer">
                <th class="form-labels">
                   <?echo($this->form->answer->label())?>
@@ -65,8 +67,12 @@ $this->addPageTitle($h);
                      <?
                      $this->form->answer->html()->setAttrib('size', 20);
                      echo($this->form->answer->controll());
+                     
+                     echo($this->form->answerCount->label());
+                     $this->form->answerCount->html()->setAttrib('size', 5)->addClass('mini');
+                     echo($this->form->answerCount->controll());
                   ?>
-                  <a href="<?=$this->link()?>#delete-row" onclick="return deleteAnswerRow(this);" title="<?=$this->_('Odstranit řádek')?>"
+                  <a href="<?=$this->link()?>#delete-row" onclick="return deleteAnswerRow(this);" title="<?=$this->tr('Odstranit řádek')?>"
                      class="form-row-action-icon"><img src="<?=vve_get_tpl_file('icons/delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" /></a>
                </td>
             </tr>
@@ -74,8 +80,8 @@ $this->addPageTitle($h);
             <tr>
                <td></td>
                <td>
-                  <a class="form-row-action-icon" href="<?=$this->link()?>#add-row" onclick="return addAnswerRow();" title="<?=$this->_('Přidat odpověď')?>">
-                     <img src="<?=vve_get_tpl_file('icons/add.png', VVE_TPL_FILE_IMAGE)?>" alt="add" />&nbsp;<?=$this->_('Přidat odpověď')?>
+                  <a class="form-row-action-icon" href="<?=$this->link()?>#add-row" onclick="return addAnswerRow();" title="<?=$this->tr('Přidat odpověď')?>">
+                     <img src="<?=vve_get_tpl_file('icons/add.png', VVE_TPL_FILE_IMAGE)?>" alt="add" />&nbsp;<?=$this->tr('Přidat odpověď')?>
                   </a>
                </td>
             </tr>
@@ -94,12 +100,18 @@ $this->addPageTitle($h);
       function addAnswerRow(){
          var row = $('#answerForm tr.pollAnswer:last').clone();
          row.show();
-         var id = parseInt(row.find('input.poll_answer_class').attr('id').match(/poll_answer_([0-9]+)/)[1])+1;
-         
+         var id = parseInt(row.attr('id').match(/pollAnswer_([0-9]+)/)[1])+1;
+         alert(id);
          row.attr('id', 'pollAnswer_'+id);
-         row.find('input.poll_answer_class').attr('name','poll_answer['+id+']');
-         row.find('input.poll_answer_class').attr('id','poll_answer_'+id);
-         row.find('label').removeClass('poll_answer_'+(id-1)+'_label_class').addClass('poll_answer_'+id+'_label_class').attr('for','poll_answer_'+id);
+         
+         row.find('input').each(function(){
+            $(this).attr('name', $(this).attr('name').toString().replace(id-1, id) );
+            $(this).attr('id', $(this).attr('id').toString().replace(id-1, id) );
+            $(this).val("");
+         });
+         row.find('label').each(function(){
+            $(this).attr('for', $(this).attr('for').toString().replace(id-1, id) );
+         });
          $('#answerForm tr.pollAnswer:last').after(row);
          return false;
       }

@@ -30,9 +30,9 @@ class Polls_Controller extends Controller {
          $poll = $model->record($formVoteSingle->id_poll->getValues());
          $this->view()->id = $formVoteSingle->id_poll->getValues();
          if($poll == false) {
-            $this->errMsg()->addMessage($this->_('Hlasování v neexistující anketě'));
+            $this->errMsg()->addMessage($this->tr('Hlasování v neexistující anketě'));
          } else if(in_array($formVoteSingle->id_poll->getValues(), $votedPolls)){
-            $this->errMsg()->addMessage($this->_('V této anketě jste již hlasoval'));
+            $this->errMsg()->addMessage($this->tr('V této anketě jste již hlasoval'));
          } else {
             $votedPolls[] = $formVoteSingle->id_poll->getValues();
             if(VVE_DEBUG_LEVEL < 2){
@@ -45,7 +45,7 @@ class Polls_Controller extends Controller {
             $poll->{Polls_Model::COLUMN_VOTES} = $poll->{Polls_Model::COLUMN_VOTES} + 1;
             $model->save($poll);
             
-            $this->infoMsg()->addMessage($this->_('Váš hlas byl přijat'));
+            $this->infoMsg()->addMessage($this->tr('Váš hlas byl přijat'));
             $this->link()->reload();
          }
       } else if($formVoteMulti->isValid()) {
@@ -54,11 +54,11 @@ class Polls_Controller extends Controller {
          $poll = $model->record($formVoteMulti->id_poll->getValues());
          $selected = $formVoteMulti->answer->getValues();
          if($poll == false) {
-            $this->errMsg()->addMessage($this->_('Hlasování v neexistující anketě'));
+            $this->errMsg()->addMessage($this->tr('Hlasování v neexistující anketě'));
          } else if(in_array ($formVoteMulti->id_poll->getValues(), $votedPolls)){
-            $this->errMsg()->addMessage($this->_('V této anketě jste již hlasoval'));
+            $this->errMsg()->addMessage($this->tr('V této anketě jste již hlasoval'));
          } else if($selected == null){
-            $this->errMsg()->addMessage($this->_('Nebyla vybrána žádná volba'));
+            $this->errMsg()->addMessage($this->tr('Nebyla vybrána žádná volba'));
          } else {
             $votedPolls[] = $formVoteMulti->id_poll->getValues();
             if(VVE_DEBUG_LEVEL < 2){
@@ -71,7 +71,7 @@ class Polls_Controller extends Controller {
             $poll->{Polls_Model::COLUMN_DATA} = serialize($data);
             $poll->{Polls_Model::COLUMN_VOTES} = $poll->{Polls_Model::COLUMN_VOTES} + 1;
             $model->save($poll);
-            $this->infoMsg()->addMessage($this->_('Váš hlas byl přijat'));
+            $this->infoMsg()->addMessage($this->tr('Váš hlas byl přijat'));
             $this->link()->reload();
          }
       }
@@ -86,7 +86,7 @@ class Polls_Controller extends Controller {
          if($formDelete->isValid()) {
             $model->delete($formDelete->id->getValues());
             
-            $this->infoMsg()->addMessage($this->_('Anketa byla smazána'));
+            $this->infoMsg()->addMessage($this->tr('Anketa byla smazána'));
             $this->link()->rmParam()->reload();
          }
          $this->view()->formDelete = $formDelete;
@@ -134,8 +134,13 @@ class Polls_Controller extends Controller {
          $data = array();
 
          $answers = $form->answer->getValues();
-         foreach ($answers as $answer) {
-            array_push($data, array('answer' => $answer, 'count' => 0));
+         $answersCount = $form->answerCount->getValues();
+         foreach ($answers as $key => $answer) {
+            $count = 0;
+            if(isset ($answersCount[$key]) && $answersCount[$key] != null){
+               $count = (int)$answersCount[$key];
+            }
+            array_push($data, array('answer' => $answer, 'count' => $count));
          }
 
          $model = new Polls_Model();
@@ -148,7 +153,7 @@ class Polls_Controller extends Controller {
          
          $model->save($poll);
          
-         $this->infoMsg()->addMessage($this->_('Anketa byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Anketa byla uložena'));
          $this->link()->route()->reload();
       }
 
@@ -169,17 +174,20 @@ class Polls_Controller extends Controller {
       $form->multianswer->setValues($poll->{Polls_Model::COLUMN_IS_MULTI});
       $form->active->setValues($poll->{Polls_Model::COLUMN_ACTIVE});
 
-      $tmpArr = array();
+      $tmpArr = $tmpCountArr = array();
       $data = unserialize($poll->{Polls_Model::COLUMN_DATA});
       foreach ($data as $key => $answer) {
          $tmpArr[] = $answer['answer'];
+         $tmpCountArr[] = $answer['count'];
       }
       $form->answer->setValues($tmpArr);
+      $form->answerCount->setValues($tmpCountArr);
       unset ($tmpArr);
 
       if($form->isValid()) {
          $clear = $form->clear->getValues();
          $answers = $form->answer->getValues();
+         $answersCount = $form->answerCount->getValues();
          $newData = array();
          $votes = 0;
          foreach ($answers as $key => $answer) {
@@ -187,8 +195,8 @@ class Polls_Controller extends Controller {
                $count = 0;
                $votes = 0;
             } else {
-               $count = $data[$key]['count'];
-               $votes += $data[$key]['count'];
+               $count = (int)$answersCount[$key];
+               $votes += (int)$answersCount[$key];
             }
             array_push($newData, array('answer' => $answer, 'count' => $count));
          }
@@ -200,7 +208,7 @@ class Polls_Controller extends Controller {
          
          $model->save($poll);
 
-         $this->infoMsg()->addMessage($this->_('Anketa byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Anketa byla uložena'));
          $this->link()->route()->reload();
       }
 
@@ -215,27 +223,33 @@ class Polls_Controller extends Controller {
    private function createForm($elemClear = false) {
       $form = new Form('poll_');
 
-      $elemQuestion = new Form_Element_Text('question',$this->_('Otázka'));
+      $elemQuestion = new Form_Element_Text('question',$this->tr('Otázka'));
 //      $elemQuestion->setLangs();
       $elemQuestion->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $form->addElement($elemQuestion);
 
-      $elemMulti = new Form_Element_Checkbox('multianswer',$this->_('Více odpovědí'));
+      $elemMulti = new Form_Element_Checkbox('multianswer',$this->tr('Více odpovědí'));
       $form->addElement($elemMulti);
 
-      $elemActive = new Form_Element_Checkbox('active',$this->_('Hlasování povoleno'));
+      $elemActive = new Form_Element_Checkbox('active',$this->tr('Hlasování povoleno'));
       $elemActive->setValues(true);
       $form->addElement($elemActive);
 
       if($elemClear === true) {
-         $elemAnswerClear = new Form_Element_Checkbox('clear', $this->_('Vynulovat'));
+         $elemAnswerClear = new Form_Element_Checkbox('clear', $this->tr('Vynulovat'));
          $form->addElement($elemAnswerClear);
       }
 
-      $elemAnswer = new Form_Element_Text('answer',$this->_('Odpověd'));
+      $elemAnswer = new Form_Element_Text('answer',$this->tr('Odpověd'));
       $elemAnswer->addValidation(new Form_Validator_NotEmpty());
       $elemAnswer->setDimensional();
       $form->addElement($elemAnswer);
+      
+      $elemAnswerCount = new Form_Element_Text('answerCount',$this->tr('počet odpovědí'));
+      $elemAnswerCount->addValidation(new Form_Validator_IsNumber());
+      $elemAnswerCount->setDimensional();
+      $elemAnswerCount->setValues(0);
+      $form->addElement($elemAnswerCount);
 
       $elemSubmit = new Form_Element_SaveCancel('send');
       $form->addElement($elemSubmit);
