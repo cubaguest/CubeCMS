@@ -33,6 +33,12 @@ class FS_Dir extends TrObject {
       $this->name = $name;
       $this->path = $path;
       
+      if($path == null){
+         $i = pathinfo($name);
+         $this->name = $i['basename'];
+         $this->path = $i['dirname'];
+      }
+      
       if($this->path == null){
          $this->path = AppCore::getAppCacheDir();
       }
@@ -169,7 +175,7 @@ class FS_Dir extends TrObject {
     * @return string -- adresář
     */
    public function  __toString() {
-      return $this->getPath().$this->getName();
+      return $this->getPath().DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR;
    }
 
    /**
