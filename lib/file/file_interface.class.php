@@ -29,15 +29,21 @@ interface File_Interface {
    
    public function getMimeType();
    
+   /**
+    * Metoda vrací příponu souboru
+    * @return string
+    */
+   public function getExtension();
+   
    public function setRights($mode);
    
    public function __toString();
    
    /* Obsah souboru podle typu */
    
-   public function setContent($cnt);
+   public function setData($data);
    
-   public function getContent();
+   public function getData();
    
    public function save();
 

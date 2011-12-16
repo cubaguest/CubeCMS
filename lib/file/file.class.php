@@ -108,7 +108,7 @@ class File extends TrObject implements File_Interface {
       // Pokud je vložen objekt File
       if($name instanceof File) {
          $this->path = $name->getPath();
-         $this->name = $file->getName();
+         $this->name = $name->getName();
       }
       else if($name instanceof Form_Element_File){
          $elem = $name->getValues();
@@ -117,13 +117,17 @@ class File extends TrObject implements File_Interface {
          $this->mimeType = $elem['type'];
       } else {
          if($path != null) {
-            $this->name = $file;
+            $this->name = $name;
             $this->path = new FS_Dir($path);
-         } else {
+         } else if($name != null) {
             // rozparsování cesty a soubou u tmp
             $path_parts = pathinfo($name);
             $this->name = $path_parts['basename'];
-            $this->path = new FS_Dir($path_parts['dirname']);
+            if($path_parts['dirname'] != '.'){
+               $this->path = new FS_Dir($path_parts['dirname']);
+            } else {
+               $this->path = new FS_Dir();
+            }
          }
       }
 //      $this->locateFileSize();
@@ -214,6 +218,17 @@ class File extends TrObject implements File_Interface {
    }
    
    /**
+    * Metoda vrací příponu souboru
+    * @return string
+    */
+   public function getExtension()
+   {
+      $fileParts = pathinfo((string)$this);
+      return isset ($fileParts['extension']) ? strtolower($fileParts['extension']) : null;
+   }
+
+
+   /**
     * Metoda nastaví práva k souboru
     * @param int $mode -- octal -- práva souboru např 0777
     */
@@ -222,6 +237,10 @@ class File extends TrObject implements File_Interface {
       return @chmod((string)$this, $mode);
    }
    
+   /**
+    * metoda vrací třídu jako řetězec. Tedy soubor i s cestou
+    * @return string 
+    */
    public function __toString()
    {
       return (string)$this->getPath().$this->getName();
@@ -231,15 +250,17 @@ class File extends TrObject implements File_Interface {
    
    /**
     * metodfa nastaví obsah souboru
-    * @param type $cnt -- obsah
+    * @param string $data -- obsah
     */
-   public function setContent($cnt){}
+   public function setData($data){
+      return $this;
+   }
    
    /**
     * Metoda vrací obsah souboru
     * @return null
     */
-   public function getContent(){
+   public function getData(){
       return null;
    }
    
@@ -265,32 +286,37 @@ class File extends TrObject implements File_Interface {
    
    /**
     * metoda vytvoří kopii souboru
-    * @param type $path
+    * @param string/Fs_Dir $path -- cesta pro kopii
+    * @param bool $returnNewObj -- jestli se má vrátit objekt nového souboru
     * @return File 
     */
-   public function copy($path)
+   public function copy($path, $returnNewObj = false)
    {
-      if(!$this->exist()){
-         return $this;
+      $obj = $this;
+      if($returnNewObj == true){
+//         $obj = unserialize(serialize($this)); // THIS IS SLOW !!!
+         $obj = clone($this);
       }
-      
+      if(!$this->exist()){
+         return $obj;
+      }
       // Kontrola adresáře
       $path = new FS_Dir($path);
       $path->check();
 
       // Kontrola jména
-      $newFile = $this->creatUniqueName($path);
-
-      if(file_exists((string)$path.$newFile)) {
-         throw new UnexpectedValueException(sprintf($this->tr('Soubor %s pro kopírování neexistuje'), (string)$this), 1);
+      $newFile = $obj->creatUniqueName((string)$path);
+      if(!@copy((string)$this, (string)$path.$newFile)) {
+         throw new File_Exception(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
       }
-      if(!copy((string)$this, (string)$dirObj.$newFile)) {
-         throw new UnexpectedValueException(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
+      if($returnNewObj == true){
+         $obj->setPath($path);
+         $obj->setName($newFile);
       }
-      if(!chmod((string)$dirObj.$newFile, 0666)) {
-         throw new UnexpectedValueException(sprintf($this->tr('Chyba při úpravě oprávnění souboru %s'),(string)$this), 3);
+      if(!chmod((string)$obj, 0666)) {
+         throw new File_Exception(sprintf($this->tr('Chyba při úpravě oprávnění souboru %s'),(string)$obj), 3);
       }
-      return $this;  
+      return $obj;  
    }
    
    /**
@@ -323,6 +349,16 @@ class File extends TrObject implements File_Interface {
       return $this;
    }
    
+   /**
+    * Meroda odstraní daný soubor ze serveru
+    */
+   public function delete()
+   {
+      if($this->exist() && !@unlink((string)$this)){
+         throw new File_Exception(sprintf( $this->tr('Soubor %s se nepodařilo smazat.'), (string)$this ) );
+      }
+   }
+
    /**
     * Metoda odešle zadaný soubor ke klientu
     */
@@ -362,13 +398,13 @@ class File extends TrObject implements File_Interface {
     * @return string -- mime type
     */
    private function locateMimeType() {
-      $path_parts = pathinfo($this->getName(true));
+      $path_parts = pathinfo((string)$this);
       if($this->exist()) {
          if($this->mimeType === null) {
             //      $file = $this->fileName;
             if (function_exists('finfo_open')) {
                $finfo = finfo_open(FILEINFO_MIME);
-               $mimetype = finfo_file($finfo, $this->getName(true));
+               $mimetype = finfo_file($finfo, (string)$this);
                // odstranění utf-8 pokud existuje
                $mime = explode(';', $mimetype);
                $this->mimeType = $mime[0];
@@ -383,7 +419,7 @@ class File extends TrObject implements File_Interface {
          }
       } else {
          // tady ujištění typu podle přípony
-         if(isset (self::$mimeTypes[$path_parts['extension']])){
+         if(isset ($path_parts['extension']) && isset (self::$mimeTypes[$path_parts['extension']])){
             $this->mimeType = self::$mimeTypes[$path_parts['extension']];
          } else {
             $this->mimeType = 'application/octet-stream';
@@ -401,48 +437,21 @@ class File extends TrObject implements File_Interface {
     * @return string -- nový název souboru
     * @todo -- dodělat při přijmu souboru se dvěmi příponami
     */
-   protected function creatUniqueName($destinationDir, $newName = null, $number = 0) 
+   protected function creatUniqueName($destinationDir) 
    {
-      // Pokud je zadáno pouze číslo
-      if(is_int($newName)) {
-         $newFileName = $this->getName() ;
-         $addNumber = $newName;
+      $fn = $this->getName();
+      if(file_exists($destinationDir.$fn)){
+         $file_suffix = substr($fn, (strrpos($fn, '.')+1));
+         if  (!preg_match('/_\d+\.(?:\w{3}\.)?\w{3,4}$/', $fn)) {
+            $fn = str_replace(".$file_suffix", "_1.$file_suffix", $fn);
+         }
+         if (preg_match('/_(\d+)\.((?:\w{3}\.)?\w{3,4})$/', $fn, $m)){
+            while (file_exists($destinationDir.$fn)){
+                  $fn = str_replace("$m[1].$m[2]", ++$m[1].".$m[2]", $fn);
+            }
+         }
       }
-      else if($newName != null) {
-         $newFileName = $newName;
-         $addNumber = $number;
-      }
-      else {
-         $newFileName = $this->getName();
-         $addNumber = $number;
-      }
-      //doplnění posledního lomítka za dest adresář
-      if($destinationDir[strlen($destinationDir)-1] != "/" AND $addNumber == 0) {
-         $destinationDir .= "/";
-      }
-      //rozdělení názvu souboru na název a příponu
-      $file_ext = array();
-//      preg_match('/^([^.]*).([a-z0-9_]+)$/', strtolower($newFileName), $file_ext);
-      preg_match('/^[^.]*\.((?:tar\.)?[a-z0-9_]+)$/', strtolower($newFileName), $file_ext);
-      $file_name_short = $file_ext[1];
-      $file_name_extension = $file_ext[2];
-      //odstraneni nepovolenych zanků a složení dohromady
-      $file_name_short = vve_cr_safe_file_name($file_name_short);
-      unset($sFunction);
-      if($addNumber == 0) {
-         $createNewFileName=$file_name_short.'.'.$file_name_extension;
-      }
-      else {
-         $createNewFileName=$file_name_short.$addNumber.'.'.$file_name_extension;
-      }
-      // kontrola existence
-      if(file_exists($destinationDir.$createNewFileName)) {
-         $createNewFileName = $this->creatUniqueName($destinationDir, (++$addNumber));
-      }
-      else {
-//         $this->fileName = $createNewFileName;
-      }
-      return $createNewFileName;
+      return $fn;
    }
 
 }

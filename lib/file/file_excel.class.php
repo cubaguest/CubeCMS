@@ -38,7 +38,7 @@ class File_Excel extends File {
 	 * Metoda vrací obsah souboru
 	 * @return PHPExcel -- objek dokumentu
 	 */
-	public function getContent() 
+	public function getData() 
    {
       if(!$this->exist()){
          $this->excelFile = new PHPExcel();
@@ -50,12 +50,12 @@ class File_Excel extends File {
 
    /**
     * Metoda nastaví obsah
-    * @param PHPExcel $cnt -- obsah
+    * @param PHPExcel $data -- obsah
     */
-   public function setContent($cnt)
+   public function setContent($data)
    {
-      if($cnt instanceof PHPExcel){
-         $this->excelFile = $xls;
+      if($data instanceof PHPExcel){
+         $this->excelFile = $data;
       } else {
          throw new UnexpectedValueException($this->tr('Do souboru excelu nebyl předán platný obsah'));
       }
