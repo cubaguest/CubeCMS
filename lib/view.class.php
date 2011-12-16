@@ -282,8 +282,8 @@ abstract class View extends TrObject {
                break;
          }
          $settings->setSetting('editor_selector', 'mceEditor_'.$theme);
-         if(!empty ($cfg)){
-            foreach ($cfg as $name => $value) {
+         if(!empty ($editorSettings)){
+            foreach ($editorSettings as $name => $value) {
                $settings->setSetting($name, $value);
             }
          }
