@@ -11,13 +11,16 @@
  * @abstract 		Třída pro práci s obrázky
  */
 
-class File_Image_Base extends TrObject {
+abstract class File_Image_Base extends TrObject {
    
    const RESIZE_AUTO       = 1;
    const RESIZE_EXACT      = 2;
    const RESIZE_PORTRAIT   = 3;
    const RESIZE_LANDSCAPE  = 4;
    const RESIZE_CROP       = 5;
+   
+   const FLIP_HORIZONTAL   = 1;
+   const FLIP_VERTICAL     = 2;
 
 
    /**
@@ -70,10 +73,17 @@ class File_Image_Base extends TrObject {
       IMAGETYPE_XBM         => 'xbm'        ### 16 = XBM
    );
 
+   protected $baseWaterMarkParams = array(
+         'valign' => 'bottom',
+         'halign' => 'right',
+         'xoffset' => 5,
+         'yoffset' => 5,
+         'opacity' => 50,
+      );
 
    /**
     * Konstruktor třídy
-    * @param file $file -- soubor
+    * @param File $file -- soubor
     */
    public function __construct(File $file)
    {
@@ -81,26 +91,56 @@ class File_Image_Base extends TrObject {
       $this->detectimageType();
    }
    
+   /**
+    * Metoda provede ořez obrázku
+    * @param int $x -- Pozice X ořezu
+    * @param int $y -- Pozice Y ořezu
+    * @param int $w -- Šířka ořezu
+    * @param int $h -- Výška ořezu
+    * @return File_Image_Base 
+    */
    public function crop($x, $y, $w, $h)
    {
       return $this;
    }
    
-   public function resize($w, $h, $crop = false)
+   /**
+    * Metoda pro změnu velikosti obrázku
+    * @param int $w -- Maximální šířka
+    * @param int $h -- Maximální Výška
+    * @param type $option -- Konstanta třídy RESIZE_XXX
+    * @return File_Image_Base 
+    */
+   public function resize($w, $h, $option = self::RESIZE_AUTO)
    {
       return $this;
    }
    
+   /**
+    * Metoda pro rotaci obrázku
+    * @param int $degree -- Stupňů otočení
+    * @return File_Image_Base 
+    */
    public function rotate($degree = 180)
    {
       return $this;
    }
    
-   public function flip($axis = 'x')
+   /**
+    * Metoda pro obrácení obrázku
+    * @param int $type -- konstanta třídy jak se má obrázek obrátit FLIP_XXX
+    * @return File_Image_Base 
+    */
+   public function flip($type = self::FLIP_HORIZONTAL)
    {
       return $this;
    }
    
+   /**
+    * Metoda nasatvuje kvalitu výstupního obrázku
+    * @param int $quality -- Kvalita 0 - 100
+    * @return File_Image_Base 
+    */
    public function setQuality($quality = 90)
    {
       $this->quality = $quality;
@@ -108,14 +148,52 @@ class File_Image_Base extends TrObject {
    }
    
    /**
-    * Uložení obrázku do jiného formátu (automaticky upraví příponu) nebo ho vypíše
+    * Metoda vrací šířku obrázku
+    * @return int
+    */
+   public function getWidth()
+   {
+      return $this->width;
+   }
+   
+   /**
+    * Metoda vrací výšku obrázku
+    * @return type 
+    */
+   public function getHeight()
+   {
+      return $this->height;
+   }
+
+
+   /**
+    * Metoda provede filtraci daného obrázku
+    * @param int $filter -- konstanta IMG_FILTER_XXX
+    * @return File_Image_Base 
+    */
+   public function filter($filter, $arg1 = null, $arg2 = null, $arg3 = null)
+   {
+      return $this;
+   }
+   
+   /**
+    * Metoda přidá ochranný obrázek
+    * @param File_Image $img -- obrázek
+    * @return File_Image_Base 
+    */
+   public function watermark(File_Image $img, $params = array())
+   {
+      
+      return $this;
+   }
+   
+   /**
+    * Mtoda pro uložení obrázku (automaticky upraví příponu) nebo ho vypíše
     * @param string/File $file -- objek souboru nebo název obrázku
     * @param const $format -- formát IMAGETYPE_XXX
     */
    public function write($file = null, $format = null)
    {
-      
-      
       return null;
    }
 

@@ -70,7 +70,7 @@ class File_Image extends File {
     */
    public function setData($data)
    {
-      if($cnt instanceof File_Image_Base){
+      if($data instanceof File_Image_Base){
          $this->imageObj = $data;
       } else {
          throw new UnexpectedValueException($this->tr('Předán špátný paramter s obsahem obrázku'));

@@ -119,6 +119,14 @@ class File extends TrObject implements File_Interface {
          if($path != null) {
             $this->name = $name;
             $this->path = new FS_Dir($path);
+         } else if(is_array ($name)) {
+            // rozparsování cesty a soubou u tmp
+            $this->name = $name['name'];
+            if($name['path'] instanceof FS_Dir){
+               $this->path = $name['path'];
+            } else {
+               $this->path = new FS_Dir((string)$name['path']);
+            }
          } else if($name != null) {
             // rozparsování cesty a soubou u tmp
             $path_parts = pathinfo($name);
