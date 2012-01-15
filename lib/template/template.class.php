@@ -411,6 +411,16 @@ class Template extends TrObject {
       return $this;
    }
 
+   /**
+    * metoda zkontroluje jestli je daná šablona už přidána
+    * @param string $name -- název šablony
+    * @return type 
+    */
+   public function haveTpl($name)
+   {
+      return isset ($this->templateFiles[$name]);
+   }
+
    /*
     * ========== STATICKÉ METODY
    */
@@ -562,7 +572,7 @@ class Template extends TrObject {
                if($directInclude == true){
                   include $filePath;
                } else {
-                  array_push($this->templateFiles, $filePath);
+                  $this->templateFiles[$matches['file']] = $filePath;
                }
                break;
             case 'css':
