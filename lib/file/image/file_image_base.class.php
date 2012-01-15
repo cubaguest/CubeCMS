@@ -45,7 +45,7 @@ abstract class File_Image_Base extends TrObject {
     * proměná s nastavenou kvalitou pro výstup JPEG
     * @var int
     */
-   protected $quality = 90;
+   protected $quality = 95;
 
    /**
     *

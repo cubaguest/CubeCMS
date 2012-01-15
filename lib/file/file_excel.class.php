@@ -52,7 +52,7 @@ class File_Excel extends File {
     * Metoda nastaví obsah
     * @param PHPExcel $data -- obsah
     */
-   public function setContent($data)
+   public function setData($data)
    {
       if($data instanceof PHPExcel){
          $this->excelFile = $data;

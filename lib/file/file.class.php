@@ -296,9 +296,10 @@ class File extends TrObject implements File_Interface {
     * metoda vytvoří kopii souboru
     * @param string/Fs_Dir $path -- cesta pro kopii
     * @param bool $returnNewObj -- jestli se má vrátit objekt nového souboru
+    * @param string $newFile -- (option) nový název souboru
     * @return File 
     */
-   public function copy($path, $returnNewObj = false)
+   public function copy($path, $returnNewObj = false, $newFile = null)
    {
       $obj = $this;
       if($returnNewObj == true){
@@ -313,7 +314,9 @@ class File extends TrObject implements File_Interface {
       $path->check();
 
       // Kontrola jména
-      $newFile = $obj->creatUniqueName((string)$path);
+      if($newFile == null){
+         $newFile = $obj->creatUniqueName((string)$path);
+      }
       if(!@copy((string)$this, (string)$path.$newFile)) {
          throw new File_Exception(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
       }
