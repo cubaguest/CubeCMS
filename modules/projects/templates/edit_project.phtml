@@ -25,8 +25,9 @@ $this->addPageTitle($h);
    <script type="text/javascript">
       // generate url address
       $('input[name="edit_projectname"]').change(function(){
-         var $url = $('input[name="edit_projecturl"]');
-         $url.val(str2url($(this).val()));
-      });
+         $url = $('input[name="edit_projecturl"]')
+            .val(str2url($(this).val()))
+            .change();
+      s});
    </script>
 </div>

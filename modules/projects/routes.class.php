@@ -1,6 +1,8 @@
 <?php
 class Projects_Routes extends Routes {
    function initRoutes() {
+      $this->addRoute('checkProjectUrlkey', 'c-url-pr.php', 'checkProjectUrlkey', 'c-url-pr.php', 'XHR_Respond_VVEAPI');
+   
       $this->addRoute('addSection', "add-section/", 'addSection', "add-section/");
       
       $this->addRoute('addProject', "::seckey::/add-project/", 'addProject', "{seckey}/add-project/");

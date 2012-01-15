@@ -81,9 +81,14 @@ class Projects_Controller extends Controller {
 
       $model = new Projects_Model_Projects();
       
-      $pr = $model->joinFK(Projects_Model_Projects::COLUMN_ID_SECTION)
-         ->where(Projects_Model_Projects::COLUMN_URLKEY.' = :prkey',array('prkey' => $this->getRequest('prkey')))
-         ->record();
+      $pr = $model->joinFk(Projects_Model_Projects::COLUMN_ID_SECTION)
+         ->where(
+            Projects_Model_Projects::COLUMN_URLKEY.' = :prkey '
+            .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat'
+            , array(
+            'prkey' => $this->getRequest('prkey'),
+            'idcat' => $this->category()->getId()
+         ))->record();
       
       if($pr == false){ return false; }
       
@@ -139,7 +144,13 @@ class Projects_Controller extends Controller {
       $this->checkReadableRights();
       $modelSec = new Projects_Model_Sections();
       
-      $sec = $modelSec->where(Projects_Model_Sections::COLUMN_URLKEY.' = :seckey', array('seckey' => $this->getRequest('seckey')))->record();
+      $sec = $modelSec->where(
+         Projects_Model_Sections::COLUMN_URLKEY.' = :seckey'
+         .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat', 
+         array(
+         'seckey' => $this->getRequest('seckey'),
+         'idcat' => $this->category()->getId()
+         ))->record();
       
       if($sec == false){ return false; }
       
@@ -194,7 +205,13 @@ class Projects_Controller extends Controller {
       $this->checkControllRights();
       
       $model = new Projects_Model_Sections();
-      $sec = $model->where(Projects_Model_Sections::COLUMN_URLKEY.' = :seckey', array('seckey' => $this->getRequest('seckey')))->record();
+      $sec = $modelSec->where(
+         Projects_Model_Sections::COLUMN_URLKEY.' = :seckey'
+         .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat', 
+         array(
+         'seckey' => $this->getRequest('seckey'),
+         'idcat' => $this->category()->getId()
+         ))->record();
       if($sec == false){ return false; }
 
       $form = $this->createEditSectionForm($sec);
@@ -309,7 +326,7 @@ class Projects_Controller extends Controller {
                
             $imageThumb->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
                $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam(self::PARAM_THUM_C));
+               $this->category()->getParam(self::PARAM_THUM_C, true));
                
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = $imageThumb->getName();
             $imageThumb->remove();
@@ -330,7 +347,7 @@ class Projects_Controller extends Controller {
                
                $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
                   $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-                  $this->category()->getParam(self::PARAM_THUM_C, false), $thumbName);
+                  $this->category()->getParam(self::PARAM_THUM_C, true), $thumbName);
                $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumbName;
             }
             $image->remove();
@@ -352,7 +369,14 @@ class Projects_Controller extends Controller {
       
       $model = new Projects_Model_Projects();
       
-      $rec = $model->where(Projects_Model_Projects::COLUMN_URLKEY.' = :prkey', array('prkey' => $this->getRequest('prkey')))->record();
+      $rec = $model->joinFk(Projects_Model_Projects::COLUMN_ID_SECTION)
+         ->where(
+            Projects_Model_Projects::COLUMN_URLKEY.' = :prkey '
+            .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat'
+            , array(
+            'prkey' => $this->getRequest('prkey'),
+            'idcat' => $this->category()->getId()
+         ))->record();
       
       if($rec == false OR (!$this->getRights()->isControll() AND $rec->{Projects_Model_Projects::COLUMN_ID_USER} != Auth::getUserId())){
          return false;
@@ -404,7 +428,7 @@ class Projects_Controller extends Controller {
                
             $imageThumb->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
                $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam(self::PARAM_THUM_C));
+               $this->category()->getParam(self::PARAM_THUM_C, true));
              
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = $imageThumb->getName();
             $imageThumb->remove();
@@ -425,7 +449,7 @@ class Projects_Controller extends Controller {
                
                $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
                   $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-                  $this->category()->getParam(self::PARAM_THUM_C, false), $thumbName);
+                  $this->category()->getParam(self::PARAM_THUM_C, true), $thumbName);
                $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumbName;
             }
             $image->remove();
@@ -560,8 +584,8 @@ class Projects_Controller extends Controller {
       $form->addElement($elemRealted);
       
       
-      $elemUrl = new Form_Element_Text('url', $this->tr('URL klíč'));
-      $elemUrl->addFilter(new Form_Filter_UrlKey());
+      $elemUrl = new Form_Element_UrlKey('url', $this->tr('URL klíč'));
+      $elemUrl->setCheckingUrl($this->link()->route('checkProjectUrlkey'));
       $form->addElement($elemUrl);
       
       $elemTplParams = new Form_Element_Text('tplParams', $this->tr('Parametry šablony'));
@@ -591,6 +615,29 @@ class Projects_Controller extends Controller {
       $form->addElement($elemSave);
       
       return $form;
+   }
+   
+   public function checkProjectUrlkeyController()
+   {
+      $this->checkReadableRights();
+      
+      $this->view()->empty = false;
+      
+      $model = new Projects_Model_Projects();
+      
+      $rec = $model->joinFk(Projects_Model_Projects::COLUMN_ID_SECTION)
+         ->where(
+            Projects_Model_Projects::COLUMN_URLKEY.' = :prkey '
+            .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat'
+            , array(
+            'prkey' => $_POST['key'],
+            'idcat' => $this->category()->getId()
+         ))->record();
+      
+      if($rec == false){
+         $this->view()->empty = true;
+      }
+      
    }
 
    /**
