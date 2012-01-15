@@ -58,7 +58,7 @@ class Filesystem_File_Image extends Filesystem_File {
     * proměná s nastavenou kvalitou pro výstup
     * @var int
     */
-   private $quality = 90;
+   private $quality = 95;
 
    /**
     * Pracovní obrázek, používá se při přesamplování
@@ -378,7 +378,7 @@ class Filesystem_File_Image extends Filesystem_File {
             case IMAGETYPE_PNG:
                imagealphablending($this->workingImage, false);
                imagesavealpha($this->workingImage, true);
-               $saved = @imagepng($this->workingImage,$newDir.$newImageName, round($this->quality/10,0));
+               $saved = @imagepng($this->workingImage,$newDir.$newImageName, round($this->quality/10,0)-1);
                break;
             case IMAGETYPE_WBMP:
                $saved = @imagewbmp($this->workingImage, $newDir.$newImageName);
