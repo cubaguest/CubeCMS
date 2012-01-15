@@ -77,7 +77,12 @@ class Form_Decorator implements Form_Decorator_Interface {
          $cellCtrl->addContent($element->{$type}());
       }
       // skripty pro práci s prvky
-      $cellCtrl->addContent($element->scripts());
+      $js = $element->scripts();
+      if($js != null){
+         $script = new Html_Element_Script($js);
+         // tady může být preproces scriptu
+         $cellCtrl->addContent($script);
+      }
       $cellCtrl->addClass($this->decoration['ctrlwrapclass']);
       $row->addContent($cellCtrl);
       $this->content .= $row;

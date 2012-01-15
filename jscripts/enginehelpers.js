@@ -196,6 +196,23 @@ function str2url(str,encoding,ucfirst)
 	return str;
 }
 
+function vveIsEmptykUrlKey(checkerUrl, urlkey, lang, callback){
+   $.ajax({
+      type: "POST",
+      url: checkerUrl,
+      data: {key : urlkey, lang : lang},
+      cache: false,
+      success: function(data){
+         if(typeof data.empty !== "undefined" ){
+            callback(data.empty);   
+         } else {
+            callback(false);
+         }
+         
+      }
+   });
+}
+
 $(document).ready(function(){
    // when language is changed
    $('.form-link-lang-container a.form-link-lang').live('click',function(event, focus){
@@ -221,7 +238,7 @@ $(document).ready(function(){
    // toolbox events
    initToolboxEvents();
    // open external link in new window
-   $("a.link-external").live('click',function(){
+   $(".link-external").live('click',function(){
       window.open(this.href);
       return false;
    });

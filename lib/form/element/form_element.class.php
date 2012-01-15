@@ -143,15 +143,21 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                                      'langLinkSel' => 'form-link-lang-sel',
                                      'elemContainer' => 'form-elem-container');
 
-      /**
+   /**
     * Konstruktor elemntu
-    * @param string $name -- název elemntu
+    * @param string/Form_Element $name -- název elemntu
     * @param string $label -- popis elemntu
     */
    public function  __construct($name, $label = null, $prefix = null) {
-      $this->formElementName = $name;
-      $this->formElementLabel = $label;
-      $this->formElementPrefix = $prefix;
+      if($name instanceof Form_Element){
+         $this->formElementName = str_replace($name->formElementPrefix, '', $name->getName());
+         $this->formElementLabel = $name->getLabel();
+         $this->formElementPrefix = $name->formElementPrefix;
+      } else {
+         $this->formElementName = $name;
+         $this->formElementLabel = $label;
+         $this->formElementPrefix = $prefix;
+      }
       $this->initHtmlElements();
       $this->init();
    }
