@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}forum_posts` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}forum_topics` (
-  `id_topic` smallint(6) NOT NULL AUTO_INCREMENT,
+ `id_topic` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_category` smallint(6) NOT NULL,
   `email` varchar(50) CHARACTER SET utf8 NOT NULL,
   `created_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}forum_topics` (
   `ip_address` varchar(15) NOT NULL,
   `date_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `views` int(11) NOT NULL DEFAULT '0',
+  `notification_email` text,
   PRIMARY KEY (`id_topic`),
   KEY `id_category` (`id_category`),
   KEY `id_user` (`id_user`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
