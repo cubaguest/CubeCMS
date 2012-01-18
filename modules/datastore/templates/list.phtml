@@ -76,8 +76,11 @@
             echo $this->formDeleteItem->submit;
             echo $this->formDeleteItem->renderEnd();
          }
-         if(!$item['isdir']){?>
-         <a id="item-rename" href="<?=$this->link()->anchor('rename')?>" title="<?=$this->tr('Přejmenovat').' '.$item['name']?>"><img src="images/icons/pencil.png" alt="rename" /></a>
+         if(!$item['isdir']){
+            if($this->controlls == true){
+            ?>
+            <a id="item-rename" href="<?=$this->link()->anchor('rename')?>" title="<?=$this->tr('Přejmenovat').' '.$item['name']?>"><img src="images/icons/pencil.png" alt="rename" /></a>
+            <?}?>
          <a href="<?=$item['dwurl']?>" title="<?=$this->tr('Stáhnout').' '.$item['name']?>"><img src="images/icons/download.png" alt="download" /></a>
          <?}?>
       </td>
