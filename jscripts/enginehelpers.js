@@ -196,19 +196,22 @@ function str2url(str,encoding,ucfirst)
 	return str;
 }
 
-function vveIsEmptykUrlKey(checkerUrl, urlkey, lang, callback){
+function vveCheckUrlKey(checkerUrl, element, callback, params){
+   var $e = $(element); var postParams = {key : $e.val(), lang : $e.attr("lang")};
+   if(typeof params != "undefined"){ $.extend(postParams, params); }
    $.ajax({
       type: "POST",
       url: checkerUrl,
-      data: {key : urlkey, lang : lang},
+      data: postParams,
       cache: false,
       success: function(data){
-         if(typeof data.empty !== "undefined" ){
-            callback(data.empty);   
-         } else {
-            callback(false);
+         if( (callback || callback != '' ) && (typeof callback !== 'undefined') ) {
+            if(typeof data.urlkey !== "undefined" ){
+               callback(data.urlkey);   
+            } else {
+               callback(null);
+            }
          }
-         
       }
    });
 }
