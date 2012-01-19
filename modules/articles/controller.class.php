@@ -355,16 +355,12 @@ class Articles_Controller extends Controller {
    public function editController() {
       $this->checkWritebleRights();
 
-      $editForm = $this->createForm();
-      // doplnění id
-      $iIdElem = new Form_Element_Hidden('art_id');
-      $iIdElem->addValidation(new Form_Validator_IsNumber());
-      $editForm->addElement($iIdElem);
-
       // načtení dat
       $model = new Articles_Model();
       $article = $model->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
+      
+      $editForm = $this->createForm($article->getPK());
 
       if($article !=false){
          $editForm->name->setValues($article->{Articles_Model::COLUMN_NAME});
@@ -586,34 +582,17 @@ class Articles_Controller extends Controller {
     * @param <type> $names
     * @return <type>
     */
-   protected function createUrlKey($urlkeys, $names, $id = null) {
-      // projití url klíčů a pokud není zadán doplní se podle názvu
-      $model = new Articles_Model();
+   protected function createUrlKey($urlkeys, $names, $id = 0) {
       foreach ($urlkeys as $lang => $key) {
          if($key == null AND $names[$lang] == null) {
             $urlkeys[$lang] = null;
          } else if($key == null) {
-            $urlkeys[$lang] = vve_cr_url_key($names[$lang]);
+            $urlkeys[$lang] = $names[$lang];
          } else {
-            $urlkeys[$lang] = vve_cr_url_key($key);
+            $urlkeys[$lang] = $key;
          }
          // kontrola unikátnosti
-         $uKey = $urlkeys[$lang];
-         $index = 1;
-
-         if($id != null){
-            $where = Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND ('.$lang.')'.Articles_Model::COLUMN_URLKEY.' = :ukey AND '.Articles_Model::COLUMN_ID.' != :ida';
-            $whereVal = array('idc' => $this->category()->getId(), 'ukey' => $uKey, 'ida' => $id);
-         } else {
-            $where = Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND ('.$lang.')'.Articles_Model::COLUMN_URLKEY.' = :ukey';
-            $whereVal = array('idc' => $this->category()->getId(), 'ukey' => $uKey);
-         }
-
-         while ($model->where($where,$whereVal)->record() != false){
-            $uKey = $urlkeys[$lang].'-'.$index++;
-            $whereVal['ukey'] = $uKey;
-         }
-         $urlkeys[$lang] = $uKey;
+         $urlkeys[$lang] = $this->createUniqueUrlKey($urlkeys[$lang], $lang, $id);
       }
       return $urlkeys;
    }
@@ -622,9 +601,16 @@ class Articles_Controller extends Controller {
     * Metoda  vytvoří element formuláře
     * @return Form
     */
-   protected function createForm() {
-      $form = new Form('ardicle_', true);
+   protected function createForm($artId = null) {
+      $form = new Form('article_', true);
 
+      // doplnění id
+      if($artId != null){
+         $iIdElem = new Form_Element_Hidden('art_id');
+         $iIdElem->addValidation(new Form_Validator_IsNumber());
+         $form->addElement($iIdElem);
+      }
+      
       $fGrpTexts = $form->addGroup('texts', $this->tr('Texty'));
 
       $iName = new Form_Element_Text('name', $this->tr('Nadpis'));
@@ -645,9 +631,14 @@ class Articles_Controller extends Controller {
 
       $fGrpParams = $form->addGroup('params', $this->tr('Parametry'));
 
-      $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
+      // $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
+      $iUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
+      $iUrlKey->setUpdateFromElement($iName)->setCheckingUrl($this->link()->route('checkUrlkey'));
+      if($artId != null){
+         $iUrlKey->setCheckParam('id', (int)$artId)->setAutoUpdate(false);
+      }
       $iUrlKey->setLangs();
-      $iUrlKey->setSubLabel($this->tr('Pokud není klíč zadán, je generován automaticky'));
+      $iUrlKey->setSubLabel($this->tr('Pokud není url klíč zadán, je generován automaticky'));
       $form->addElement($iUrlKey, $fGrpParams);
 
       $iKeywords = new Form_Element_Text('metaKeywords', $this->tr('Klíčová slova'));
@@ -673,10 +664,8 @@ class Articles_Controller extends Controller {
             foreach($images as $image) {
                $elemImgSel->setOptions(array(basename($image) => basename($image)), true);
             }
-            
             $form->addElement($elemImgSel, $fGrpParams);
          }
-            
       }
       
       $fGrpPublic = $form->addgroup('public', $this->tr('Paramtry zveřejnění a vytvoření'));
@@ -766,6 +755,39 @@ class Articles_Controller extends Controller {
       $articles = $model->where(Articles_Model::COLUMN_ID_CATEGORY, $this->category()->getId())->limit(0, 20)->records();
       if($articles === false) return false;
       $this->view()->articles = $articles;
+   }
+
+   public function checkUrlkeyController()
+   {
+      $this->checkReadableRights();
+      
+      $this->view()->urlkey = $this->createUniqueUrlKey(
+         $_POST['key'], 
+         isset($_POST['lang']) ? $_POST['lang'] : Locales::getLang(),
+         isset($_POST['id']) ? (int)$_POST['id'] : 0
+         );
+   }
+   
+   protected function createUniqueUrlKey($key, $lang, $id = 0)
+   {
+      if($key == null){
+         return null;
+      }
+      
+      $model = new Articles_Model();
+      $step = 1;
+      $key = vve_cr_url_key($key);
+      $origPart = $key;
+      
+      $where = '('.$lang.')'.Articles_Model::COLUMN_URLKEY.' = :ukey AND '.Articles_Model::COLUMN_ID.' != :id';
+      $keys = array('ukey' => $key, 'id' => (int)$id);// when is nul bad sql query is created
+      
+      while ($model->where($where, $keys)->count() != 0 ) {
+         $keys['ukey'] = $origPart.'-'.$step;
+         $step++;
+      }
+      
+      return $keys['ukey'];
    }
 
    /**
