@@ -22,12 +22,4 @@ $this->addPageTitle($h);
 <h1><?=$h;?></h1>
 <div class="main-content-form-edit" id="edit-form-project">
    <?echo($this->form);?>
-   <script type="text/javascript">
-      // generate url address
-      $('input[name="edit_projectname"]').change(function(){
-         $url = $('input[name="edit_projecturl"]')
-            .val(str2url($(this).val()))
-            .change();
-      s});
-   </script>
 </div>

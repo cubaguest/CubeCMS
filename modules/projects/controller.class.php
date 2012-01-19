@@ -311,9 +311,9 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
          
          if($form->url->getValues() == null){
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = vve_cr_url_key($rec->{Projects_Model_Projects::COLUMN_NAME});
+            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey( $rec->{Projects_Model_Projects::COLUMN_NAME} );
          } else {
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $form->url->getValues();
+            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey( $form->url->getValues() );
          }
          
          // zpracovánbí obrázku
@@ -362,7 +362,7 @@ class Projects_Controller extends Controller {
       
       $this->view()->form = $form;
    }
-
+   
    public function editProjectController()
    {
       $this->checkWritebleRights();
@@ -409,9 +409,9 @@ class Projects_Controller extends Controller {
          $oldDirName = $rec->{Projects_Model_Projects::COLUMN_URLKEY};
          
          if($form->url->getValues() == null){
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = vve_cr_url_key($rec->{Projects_Model_Projects::COLUMN_NAME});
+            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey($rec->{Projects_Model_Projects::COLUMN_NAME}, $rec->getPK());
          } else {
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $form->url->getValues();
+            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey($form->url->getValues(), $rec->getPK());
          }
          
          // mazání obrázku
@@ -585,7 +585,11 @@ class Projects_Controller extends Controller {
       
       
       $elemUrl = new Form_Element_UrlKey('url', $this->tr('URL klíč'));
-      $elemUrl->setCheckingUrl($this->link()->route('checkProjectUrlkey'));
+      $elemUrl->setCheckingUrl($this->link()->route('checkProjectUrlkey'))
+         ->setUpdateFromElement($elemName);
+      if($prRecord != null){
+         $elemUrl->setAutoUpdate(false);
+      }
       $form->addElement($elemUrl);
       
       $elemTplParams = new Form_Element_Text('tplParams', $this->tr('Parametry šablony'));
@@ -621,23 +625,7 @@ class Projects_Controller extends Controller {
    {
       $this->checkReadableRights();
       
-      $this->view()->empty = false;
-      
-      $model = new Projects_Model_Projects();
-      
-      $rec = $model->joinFk(Projects_Model_Projects::COLUMN_ID_SECTION)
-         ->where(
-            Projects_Model_Projects::COLUMN_URLKEY.' = :prkey '
-            .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat'
-            , array(
-            'prkey' => $_POST['key'],
-            'idcat' => $this->category()->getId()
-         ))->record();
-      
-      if($rec == false){
-         $this->view()->empty = true;
-      }
-      
+      $this->view()->urlkey = $this->createUniqueProjectUrlKey($_POST['key']);
    }
 
    /**
@@ -683,8 +671,24 @@ class Projects_Controller extends Controller {
       $modelSec->delete($ids); // model má nastavenu relaci, takže vymaže i projekty
    }
 
+   protected function createUniqueProjectUrlKey($key, $id = 0)
+   {
+      $model = new Projects_Model_Projects();
+      $step = 1;
+      $key = vve_cr_url_key($key);
+      $origPart = $key;
+      
+      $where = Projects_Model_Projects::COLUMN_URLKEY.' = :ukey AND '.Projects_Model_Projects::COLUMN_ID.' != :idp';
+      $keys = array('ukey' => $key, 'idp' => (int)$id);
+      
+      while ($model->where($where, $keys)->count() != 0 ) {
+         $keys['ukey'] = $origPart.'-'.$step;
+         $step++;
+      }
+      return $keys['ukey'];
+   }
 
-      /**
+         /**
     * Metoda pro přípravu spuštění registrovaného modulu
     * @param Controller $ctrl -- kontroler modulu
     * @param string $module -- název modulu
