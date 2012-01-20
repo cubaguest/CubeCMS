@@ -20,7 +20,7 @@ class Module_Sitemap extends Module_Core {
 
       // načtení kategorií a podle nich vytahání a vytvoření pododkazů
       $cats = new Model_Category();
-      $categories = $cats->getCategoryList();
+      $categories = $cats->setSelectAllLangs(false)->withRights()->records();
 
       SiteMap::addPage(Url_Link::getMainWebDir(), $this->tr('Hlavní stránka'));
       foreach ($categories as $category) {
