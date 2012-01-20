@@ -16,7 +16,7 @@ input.editimage_ord_class { width: 40px;}
 #upload-files-log li .progress { background:#999; width:0%; height:5px; display: block; }
 #upload-files-log li.success{ border:1px solid #339933; background:#ccf9b9; }
 #upload-files-log li span.cancel{ position:absolute; top:5px; right:5px; width:20px; height:20px;
-                                  background:url('images/icons/cancel.png') no-repeat; cursor:pointer; }
+                                  background:url('/images/icons/cancel.png') no-repeat; cursor:pointer; }
 
 #edit-photos-list {
    height: 500px;
