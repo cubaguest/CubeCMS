@@ -489,6 +489,11 @@ class Model_ORM extends Model {
       return $r;
    }
 
+   /**
+    * Metoda vrací počet záznamů z db podle daného nastavení modelu
+    * @return int
+    * @todo -- dořešit při "GROUP BY" 
+    */
    public function count()
    {
       $sql = null;
@@ -497,10 +502,14 @@ class Model_ORM extends Model {
          if($this->pKey != null){
             $pk = '`'.$this->getTableShortName().'`.`'.$this->pKey.'`';
          }
-         $sql = 'SELECT COUNT('.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         if(!empty ($this->groupby)){
+            $sql = 'SELECT COUNT(distinct '.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         } else {
+            $sql = 'SELECT COUNT('.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         }
          $this->createSQLJoins($sql);
          $this->createSQLWhere($sql, $this->getTableShortName());
-         $this->createSQLGroupBy($sql);
+//         $this->createSQLGroupBy($sql);
          $dbst = $this->getDb()->prepare($sql);
          $this->bindSQLWhere($dbst);
       } else {
@@ -1100,7 +1109,7 @@ class Model_ORM extends Model {
                   $this->getTableShortName(), $columnName, null, $params['lang'], $params['aliasFor']));
          }
       } else { // sloupce jsou vybrány
-         if(!in_array($this->pKey, $this->selectedColumns)){
+         if($this->pKey != null && !in_array($this->pKey, $this->selectedColumns)){
          // pokud není pk přidáme jej
             array_push($columns, $this->createSelectColumnString(
                      $this->getTableShortName(), $this->pKey, null, false, $this->tableStructure[$this->pKey]['aliasFor']));
