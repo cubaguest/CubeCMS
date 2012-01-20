@@ -12,6 +12,20 @@ class Projects_View extends View {
       $this->createProjectToolbox();
       $pView = new Photogalery_View($this->pCtrl);
       $pView->addImagesToolbox();
+      // metadata
+      if ((string) $this->project->{Projects_Model_Projects::COLUMN_KEYWORDS} != null) {
+         Template_Core::setPageKeywords($this->project->{Projects_Model_Projects::COLUMN_KEYWORDS});
+      }
+      if ((string) $this->project->{Projects_Model_Projects::COLUMN_DESCRIPTION} != null) {
+         Template_Core::setPageDescription($this->project->{Projects_Model_Projects::COLUMN_DESCRIPTION});
+      }
+      Template_Core::setMetaTag('author', $this->project->{Model_Users::COLUMN_NAME}.' '.$this->project->{Model_Users::COLUMN_SURNAME});
+      
+      if ($this->project->{Projects_Model_Projects::COLUMN_THUMB} != null) {
+         Template_Core::setMetaTag('og:image', $this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_THUMB} );
+      } else if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != null){
+         Template_Core::setMetaTag('og:image', $this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE} );
+      }
    }
    
    public function sectionView() 

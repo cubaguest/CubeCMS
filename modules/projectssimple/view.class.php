@@ -6,13 +6,13 @@ class ProjectsSimple_View extends Projects_View {
       $this->toolbox = $this->createListToolbox();
    }
 
-   public function projectView() 
-   {
-      $this->createProjectToolbox();
-      $pView = new Photogalery_View($this->pCtrl);
-      $pView->addImagesToolbox();
-      $this->template()->addFile('tpl://project.phtml');
-   }
+//   public function projectView() 
+//   {
+//      $this->createProjectToolbox();
+//      $pView = new Photogalery_View($this->pCtrl);
+//      $pView->addImagesToolbox();
+//      $this->template()->addFile('tpl://project.phtml');
+//   }
    
    public function addProjectView()
    {

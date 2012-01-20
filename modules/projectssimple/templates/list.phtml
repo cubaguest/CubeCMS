@@ -15,16 +15,19 @@ echo $this->toolbox;
    <?if(!empty ($this->projects)) {?>
       <div class="main-content-list-records">
       <ul>
-      <?foreach ($this->projects as $project) { 
-         $imageFile = $this->dataDir.$project->{Projects_Model_Projects::COLUMN_URLKEY}.'/'.$project->{Projects_Model_Projects::COLUMN_THUMB};
-         if($project->{Projects_Model_Projects::COLUMN_THUMB} == null){
-            $imageFile .= $project->{Projects_Model_Projects::COLUMN_IMAGE};
+      <?foreach ($this->projects as $project) {
+         $imageFile = null;
+         if($project->{Projects_Model_Projects::COLUMN_THUMB} != null){
+            $imageFile = $this->dataDir.$project->{Projects_Model_Projects::COLUMN_URLKEY}.'/'.$project->{Projects_Model_Projects::COLUMN_THUMB};
+         } else if($project->{Projects_Model_Projects::COLUMN_IMAGE} != null){
+            $imageFile = $this->dataDir.$project->{Projects_Model_Projects::COLUMN_URLKEY}.'/'.$project->{Projects_Model_Projects::COLUMN_IMAGE};
          }
          ?>
          <li>
             <a href="<?=$this->link()->route('project', array('prkey' => $project->{Projects_Model_Projects::COLUMN_URLKEY}))?>"
-               title="<?=htmlspecialchars($project->{Projects_Model_Projects::COLUMN_NAME})?>">
-               <img src="<?=$imageFile?>" alt="<?=$project->{Projects_Model_Projects::COLUMN_NAME}?>" width="50" />
+               title="<?=htmlspecialchars($project->{Projects_Model_Projects::COLUMN_NAME})?>"><?
+               if($imageFile != null){?><img src="<?=$imageFile?>" alt="<?=$project->{Projects_Model_Projects::COLUMN_NAME}?>" width="50" /><?}?>
+               
                <?=htmlspecialchars($project->{Projects_Model_Projects::COLUMN_NAME})?>
             </a>
          </li>

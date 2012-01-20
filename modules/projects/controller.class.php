@@ -81,7 +81,9 @@ class Projects_Controller extends Controller {
 
       $model = new Projects_Model_Projects();
       
-      $pr = $model->joinFk(Projects_Model_Projects::COLUMN_ID_SECTION)
+      $pr = $model
+         ->joinFk(Projects_Model_Projects::COLUMN_ID_SECTION)
+         ->joinFk(Projects_Model_Projects::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME, Model_Users::COLUMN_NAME, Model_Users::COLUMN_SURNAME))
          ->where(
             Projects_Model_Projects::COLUMN_URLKEY.' = :prkey '
             .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat'
@@ -299,6 +301,8 @@ class Projects_Controller extends Controller {
          
          $rec->{Projects_Model_Projects::COLUMN_ID_SECTION} = $form->section->getValues();
          $rec->{Projects_Model_Projects::COLUMN_ID_USER} = Auth::getUserId();
+         $rec->{Projects_Model_Projects::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
+         $rec->{Projects_Model_Projects::COLUMN_TIME_ADD} = new DateTime();
          $rec->{Projects_Model_Projects::COLUMN_NAME} = $form->name->getValues();
          $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
@@ -392,6 +396,7 @@ class Projects_Controller extends Controller {
       
       if($form->isValid()){
          $rec->{Projects_Model_Projects::COLUMN_ID_SECTION} = $form->section->getValues();
+         $rec->{Projects_Model_Projects::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
          $rec->{Projects_Model_Projects::COLUMN_NAME} = $form->name->getValues();
          $rec->{Projects_Model_Projects::COLUMN_NAME_SHORT} = $form->shortName->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
@@ -414,11 +419,17 @@ class Projects_Controller extends Controller {
             $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey($form->url->getValues(), $rec->getPK());
          }
          
+         $rec->{Projects_Model_Projects::COLUMN_KEYWORDS} = $form->keywords->getValues();
+         $rec->{Projects_Model_Projects::COLUMN_DESCRIPTION} = $form->desc->getValues();
+         
          // mazání obrázku
-         if(isset ($form->delimg) AND $form->delimg->getValues() == true){
+         if(isset ($form->delimgtitle) AND $form->delimgtitle->getValues() == true){
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = null;
+         }
+         if(isset ($form->delimgthumb) AND $form->delimgthumb->getValues() == true){
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = null;
          }
+         
          // titulní obrázek
          $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
          // miniatura
@@ -525,25 +536,30 @@ class Projects_Controller extends Controller {
    {
       $form = new Form('edit_project');
       
+      $fGrpBase = $form->addGroup('base', $this->tr('Základní informace'));
+      $fGrpInclusion = $form->addGroup('inclusion', $this->tr('Zařazení'));
+      $fGrpAppearance = $form->addGroup('appearance', $this->tr('Vzhled'));
+      $fGrpSEO = $form->addGroup('seo', $this->tr('SEO'));
+      
       $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($elemName);
+      $form->addElement($elemName, $fGrpBase);
       
       $elemShortName = new Form_Element_Text('shortName', $this->tr('Zkrácený název'));
       $elemShortName->setSubLabel($this->tr('Bývá využit při výpis seznamu projektů. Pokud není definován použije se celý název.'));
-      $form->addElement($elemShortName);
+      $form->addElement($elemShortName, $fGrpBase);
       
       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
-      $form->addElement($elemText);
+      $form->addElement($elemText, $fGrpBase);
       
       $elemImage = new Form_Element_File('image', $this->tr('Titulní obrázek'));
       $elemImage->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
-      $form->addElement($elemImage);
+      $form->addElement($elemImage, $fGrpAppearance);
       
       $elemImageThumb = new Form_Element_File('imageThumb', $this->tr('Titulní obrázek - miniatura'));
       $elemImageThumb->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $elemImageThumb->setSubLabel($this->tr('Pokud není zadán, je vytvořena miniatura z titulního.'));
-      $form->addElement($elemImageThumb);
+      $form->addElement($elemImageThumb, $fGrpAppearance);
       
       $modelSec = new Projects_Model_Sections();
       $secs = $modelSec->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))->records();
@@ -559,14 +575,14 @@ class Projects_Controller extends Controller {
             }
          }
       }
-      $form->addElement($elemSec);
+      $form->addElement($elemSec, $fGrpInclusion);
       
       $elemWeight = new Form_Element_Text('weight', $this->tr('Váha'));
       $elemWeight->setSubLabel($this->tr("Větší váha umístí projekt výše."));
       $elemWeight->addValidation(new Form_Validator_NotEmpty());
       $elemWeight->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
       $elemWeight->setValues(0);
-      $form->addElement($elemWeight);
+      $form->addElement($elemWeight, $fGrpInclusion);
       
       $mProjects = new Projects_Model_Projects();
       $prs = $mProjects
@@ -581,7 +597,7 @@ class Projects_Controller extends Controller {
          }
          $elemRealted->setOptions(array($project->{Projects_Model_Projects::COLUMN_ID} => $project->{Projects_Model_Projects::COLUMN_NAME}), true);
       }
-      $form->addElement($elemRealted);
+      $form->addElement($elemRealted, $fGrpInclusion);
       
       
       $elemUrl = new Form_Element_UrlKey('url', $this->tr('URL klíč'));
@@ -590,11 +606,17 @@ class Projects_Controller extends Controller {
       if($prRecord != null){
          $elemUrl->setAutoUpdate(false);
       }
-      $form->addElement($elemUrl);
+      $form->addElement($elemUrl, $fGrpSEO);
+      
+      $elemKeywords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
+      $form->addElement($elemKeywords, $fGrpSEO);
+      
+      $elemDesc = new Form_Element_TextArea('desc', $this->tr('Popis pro vyhledávače'));
+      $form->addElement($elemDesc, $fGrpSEO);
       
       $elemTplParams = new Form_Element_Text('tplParams', $this->tr('Parametry šablony'));
       $elemTplParams->setSubLabel($this->tr('Parametry projektu pro šablonu (např barva, ...). Formát: "název:hodnota;název:hodnota". Parametry určuje kodér šablony.'));
-      $form->addElement($elemTplParams);
+      $form->addElement($elemTplParams, $fGrpAppearance);
       
       if($prRecord != null){
          // add element for remove file
@@ -602,12 +624,19 @@ class Projects_Controller extends Controller {
          $form->shortName->setValues($prRecord->{Projects_Model_Projects::COLUMN_NAME_SHORT});
          $form->text->setValues($prRecord->{Projects_Model_Projects::COLUMN_TEXT});
          $form->url->setValues($prRecord->{Projects_Model_Projects::COLUMN_URLKEY});
+         $form->keywords->setValues($prRecord->{Projects_Model_Projects::COLUMN_KEYWORDS});
+         $form->desc->setValues($prRecord->{Projects_Model_Projects::COLUMN_DESCRIPTION});
          $form->section->setValues($prRecord->{Projects_Model_Projects::COLUMN_ID_SECTION});
          $form->weight->setValues($prRecord->{Projects_Model_Projects::COLUMN_WEIGHT});
          $form->tplParams->setValues($prRecord->{Projects_Model_Projects::COLUMN_TPL_PARAMS});
+         
          if($prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null){
-            $elemDelImg = new Form_Element_Checkbox('delimg', $this->tr('Smazat přiřazené obrázky'));
-            $form->addElement($elemDelImg, null, 5);
+            $elemDelImgTitle = new Form_Element_Checkbox('delimgtitle', $this->tr('Smazat titulní obrázek'));
+            $form->addElement($elemDelImgTitle, $fGrpAppearance, 1);
+         }
+         if($prRecord->{Projects_Model_Projects::COLUMN_THUMB} != null){
+            $elemDelImgTitleThumb = new Form_Element_Checkbox('delimgthumb', $this->tr('Smazat miniaturu titulního obrázeku'));
+            $form->addElement($elemDelImgTitleThumb, $fGrpAppearance, $prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null ? 3 : 2);
          }
          if($prRecord->{Projects_Model_Projects::COLUMN_RELATED} != null){
             $relateds = explode(';', $prRecord->{Projects_Model_Projects::COLUMN_RELATED});

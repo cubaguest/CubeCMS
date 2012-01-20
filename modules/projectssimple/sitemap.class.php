@@ -1,22 +1,26 @@
 <?php
-class ProjectsSimple_SiteMap extends SiteMap {
-	public function run() {
-//      // kategorie
-//      $model = new Articles_Model();
-//      $this->setCategoryLink(new DateTime($model->getLastChange($this->category()->getId())));
-//      $records = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_CONCEPT.' = 0 '
-//         .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL'
-//         .' AND '.Articles_Model::COLUMN_ADD_TIME.' <= NOW()',
-//         array('idc' => $this->category()->getId()))
-//         ->limit(0, $this->getMaxItems())->records();
-//
-//      foreach ($records as $record) {
-//         $this->addItem($this->link()->route('detail', array('urlkey' => $record->{Articles_Model::COLUMN_URLKEY})),
-//            $record->{Articles_Model::COLUMN_NAME},
-//            new DateTime($record->{Articles_Model::COLUMN_EDIT_TIME}));
-//      }
-//
-//      $this->setLinkMore($this->link()->route('archive'), $this->tr('Archiv'));
-	}
+class ProjectsSimple_SiteMap extends Projects_SiteMap {
+   public function run() {
+      $modelProjects = new Projects_Model_Projects();
+      
+      $projects = $modelProjects->joinFK(Projects_Model_Projects::COLUMN_ID_SECTION)
+         ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', 
+            array('idc' => $this->category()->getId()))
+         ->order(array(Projects_Model_Projects::COLUMN_TIME_EDIT))
+         ->limit(0, $this->getMaxItems())
+         ->records()
+         ;
+      
+      if($projects != false){
+         $this->setCategoryLink(new DateTime($projects[0]->{Projects_Model_Projects::COLUMN_TIME_EDIT} ));
+         
+         foreach ($projects as $record) {
+            $this->addItem($this->link()->route('project', array('prkey' => $record->{Projects_Model_Projects::COLUMN_URLKEY})),
+               $record->{Projects_Model_Projects::COLUMN_NAME},
+               new DateTime($record->{Projects_Model_Projects::COLUMN_TIME_EDIT}));
+         }
+      }
+      
+   }
 }
 ?>
