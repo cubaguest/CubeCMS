@@ -9,7 +9,7 @@ echo $this->toolbox;
    if((string)$this->article->{Articles_Model::COLUMN_TEXT} != null) {
       echo $this->article->{Articles_Model::COLUMN_TEXT};
    } else if($this->category()->getRights()->isWritable()) {
-      echo '<p>'.$this->tr('Źádný text galerie nebyl vyplněn. (Tento text vidí pouze oprávněný uživatel.)').'</p><br />';
+      ?><div class="admin-info-text"><?echo $this->tr('Źádný text galerie nebyl vyplněn.');?></div><?
    }
    ?></div>
    <?

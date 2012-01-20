@@ -7,7 +7,7 @@ $this->addCssFile("style.css");
    if($this->text != null AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
       echo $this->text->{Text_Model_Detail::COLUMN_TEXT};
    } else if($this->category()->getRights()->isWritable()) {
-      echo '<p class="admin-info-text">'.$this->tr('Text nebyl definován. (Tento text vidí pouze uživatelé s oprávněním zápisu)').'</p>';
+      ?><div class="admin-info-text"><?echo $this->tr('Źádný text galerie nebyl vyplněn.');?></div><?
    }
    //echo $this->toolboxText;
    ?></div>
