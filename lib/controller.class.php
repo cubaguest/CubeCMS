@@ -511,7 +511,8 @@ abstract class Controller extends TrObject {
     */
    final public function _($message, $domain = null) 
    {
-      return $this->locale()->_($message, $domain = null);
+      return $this->tr($message);
+//      return $this->locale()->_($message, $domain = null);
    }
 
    /**
@@ -524,7 +525,8 @@ abstract class Controller extends TrObject {
     */
    final public function ngettext($message1, $message2, $int, $domain = null) 
    {
-      return $this->locale()->ngettext($message1, $message2, $int, $domain);
+      return $this->tr(array($message1, $message2, $message2), $int);
+//      return $this->locale()->ngettext($message1, $message2, $int, $domain);
    }
 
    /**

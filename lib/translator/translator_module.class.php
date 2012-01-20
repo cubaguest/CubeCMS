@@ -11,7 +11,7 @@
  */
 
 class Translator_Module extends Translator {
-   public function  __construct($domain = 'engine') {
+   public function  __construct($domain = self::PRIMARY_DOMAIN) {
       $this->domain = strtolower($domain);
       parent::__construct();
    }

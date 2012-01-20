@@ -8,11 +8,14 @@
  * @author        cuba
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro překlady
+ * @todo          Dodělat načítání řetězců podle md5 hashe kíče
  */
 
 class Translator {
    const TYPE_SINGULAR = 1;
    const TYPE_PLURAL = 2;
+   
+   const PRIMARY_DOMAIN = '-';
 
    const LOAD_BOOTH = 0;
    const LOAD_LIB = 1;
@@ -36,7 +39,7 @@ class Translator {
     * Doména pro překlady
     * @var string
     */
-   protected  $domain = '-';
+   protected  $domain = self::PRIMARY_DOMAIN;
 
    protected $locale = null;
 
@@ -48,12 +51,12 @@ class Translator {
     */
    public function  __construct()
    {
-         if(!isset (self::$translators[$this->domain])){
+         if(!isset (self::$translators[self::PRIMARY_DOMAIN])){
             $this->loadTranslations();
-            self::$translators[$this->domain] = &$this;
+            self::$translators[self::PRIMARY_DOMAIN] = &$this;
          } else {
-            $this->translationsS = self::$translators[$this->domain]->getSigulars();
-            $this->translationsP = self::$translators[$this->domain]->getPlurals();
+            $this->translationsS = self::$translators[self::PRIMARY_DOMAIN]->getSigulars();
+            $this->translationsP = self::$translators[self::PRIMARY_DOMAIN]->getPlurals();
          }
    }
 
@@ -62,13 +65,26 @@ class Translator {
       if(is_array($str)){
          // Plural
          $key = $str[0];
+         $md5key = md5($key);
          if(isset ($this->translationsP[$key])){
             if(abs($count) == 1){
-               $str = ($this->translationsP[$key][0] != '') ? $this->translationsP[$key][0] : $str [0];
+               $str = ($this->translationsP[$key][0] != '') ? $this->translationsP[$key][0] : $str[0];
             } else if(abs ($count) > 1 AND abs ($count) < 5 OR !isset ($this->translationsP[$key][2])){
-               $str = ($this->translationsP[$key][1] != '') ? $this->translationsP[$key][1] : $str [1];
+               $str = ($this->translationsP[$key][1] != '') ? $this->translationsP[$key][1] : $str[1];
+            } else if(isset ($this->translationsP[$key][2])) {
+               $str = ($this->translationsP[$key][2] != '') ? $this->translationsP[$key][2] : $str[2];
             } else {
-               $str = ($this->translationsP[$key][2] != '') ? $this->translationsP[$key][2] : $str [2];
+               $str = $str[2];
+            } 
+         } else if(isset ($this->translationsP[$md5key])){
+            if(abs($count) == 1){
+               $str = ($this->translationsP[$md5key][0] != '') ? $this->translationsP[$md5key][0] : $str[0];
+            } else if(abs ($count) > 1 AND abs ($count) < 5 OR !isset ($this->translationsP[$md5key][2])){
+               $str = ($this->translationsP[$md5key][1] != '') ? $this->translationsP[$md5key][1] : $str[1];
+            } else if(isset ($this->translationsP[$md5key][2])) {
+               $str = ($this->translationsP[$md5key][2] != '') ? $this->translationsP[$md5key][2] : $str[2];
+            } else {
+               $str = $str[2];
             }
          } else {
             if(abs($count) == 1){
@@ -83,10 +99,13 @@ class Translator {
          return $str;
       } else {
          // Singular
+         $md5key = md5($str);
          if(isset ($this->translationsS[$str]) AND $this->translationsS[$str] != null){
             return $this->translationsS[$str];
-         }
-         if($this->domain != '-'){
+         } else if(isset ($this->translationsS[$md5key]) AND $this->translationsS[$md5key] != null){
+            return $this->translationsS[$md5key];
+         } 
+         if($this->domain != '-'){ // zkusit hlavní translator jestli nezná překlad
             return self::$translators['-']->tr($str);
          }
          return $str;
