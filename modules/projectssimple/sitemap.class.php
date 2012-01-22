@@ -13,12 +13,13 @@ class ProjectsSimple_SiteMap extends Projects_SiteMap {
       
       if($projects != false){
          $this->setCategoryLink(new DateTime($projects[0]->{Projects_Model_Projects::COLUMN_TIME_EDIT} ));
-         
          foreach ($projects as $record) {
             $this->addItem($this->link()->route('project', array('prkey' => $record->{Projects_Model_Projects::COLUMN_URLKEY})),
                $record->{Projects_Model_Projects::COLUMN_NAME},
                new DateTime($record->{Projects_Model_Projects::COLUMN_TIME_EDIT}));
          }
+      } else {
+         $this->setCategoryLink(new DateTime($this->category()->getCatDataObj()->{Model_Category::COLUMN_CHANGED} ));
       }
       
    }
