@@ -148,6 +148,7 @@
 
 		const BROWSER_OPERA = 'Opera';                            // http://www.opera.com/
 		const BROWSER_OPERA_MINI = 'Opera Mini';                  // http://www.opera.com/mini/
+		const BROWSER_OPERA_MOBI = 'Opera Mobi';                  // http://www.opera.com/mobi/
 		const BROWSER_WEBTV = 'WebTV';                            // http://www.webtv.net/pc/
 		const BROWSER_IE = 'Internet Explorer';                   // http://www.microsoft.com/ie/
 		const BROWSER_POCKET_IE = 'Pocket Internet Explorer';     // http://en.wikipedia.org/wiki/Internet_Explorer_Mobile
@@ -576,6 +577,20 @@
 				    $this->setVersion($aversion[1]);
 			    }
 			    $this->_browser_name = self::BROWSER_OPERA_MINI;
+				$this->setMobile(true);
+				return true;
+		    }
+		    else if( stripos($this->_agent,'opera mobi') !== false ) {
+			    $resultant = stristr($this->_agent, 'opera mobi');
+			    if( preg_match('/\//',$resultant) ) {
+				    $aresult = explode('/',$resultant);
+				    $aversion = explode(' ',$aresult[1]);
+				    $this->setVersion($aversion[0]);
+				} else {
+				    $aversion = explode(' ',stristr($resultant,'opera mobi'));
+				    $this->setVersion($aversion[1]);
+			   }
+			   $this->_browser_name = self::BROWSER_OPERA_MOBI;
 				$this->setMobile(true);
 				return true;
 		    }
