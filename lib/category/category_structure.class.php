@@ -4,7 +4,7 @@
  *
  * @author jakub
  */
-class Category_Structure implements Iterator, Countable {
+class Category_Structure implements Iterator, Countable, ArrayAccess {
    private $level = 0;
    private $id = null;
    private $idParent = null;
@@ -392,6 +392,28 @@ class Category_Structure implements Iterator, Countable {
       }
       $string = null;
       return (string)$string;
+   }
+   
+   /* ARRAY ACCESS */
+   public function offsetSet($offset, $value) 
+   {
+      if (is_null($offset)) {
+         $this->childrens[] = $value;
+      } else {
+         $this->childrens[$offset] = $value;
+      }
+   }
+   public function offsetExists($offset) 
+   {
+      return isset($this->childrens[$offset]);
+   }
+   public function offsetUnset($offset)
+   {
+      unset($this->childrens[$offset]);
+   }
+   public function offsetGet($offset) 
+   {
+      return isset($this->childrens[$offset]) ? $this->childrens[$offset] : null;
    }
 }
 ?>
