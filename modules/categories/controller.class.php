@@ -480,8 +480,9 @@ class Categories_Controller extends Controller {
       $form->addElement($catName, 'labels');
 
       // popisek kategorie
-      $catAlt = new Form_Element_Text('alt', $this->tr('Popisek'));
+      $catAlt = new Form_Element_Text('alt', $this->tr('Alternativní název'));
       $catAlt->setLangs();
+      $catAlt->setSubLabel($this->tr('Bývá využit u názvů obrázků kategorie či jako delší název kategorie.'));
       $form->addElement($catAlt, 'labels');
 
       // keywords

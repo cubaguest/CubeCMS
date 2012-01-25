@@ -683,6 +683,12 @@ abstract class Controller extends TrObject {
       $eName->setValues($cat->{Model_Category::COLUMN_NAME});
       $form->addElement($eName, $grpBasic);
       
+      // popisek kategorie
+      $catAlt = new Form_Element_Text('alt', $this->tr('Alternativní název'));
+      $catAlt->setLangs();
+      $catAlt->setSubLabel($this->tr('Bývá využit u názvů obrázků kategorie či jako delší název kategorie.'));
+      $form->addElement($catAlt, $grpBasic);
+      
       $eKeywords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
       $eKeywords->setLangs();
       $eKeywords->setSubLabel($this->tr('Klíčová slova, které kategorii nejlépe vystihují oddělené mezerou nebo čárkou.'));
@@ -738,6 +744,7 @@ abstract class Controller extends TrObject {
       
       if($form->isValid()){
          $cat->{Model_Category::COLUMN_NAME} = $form->name->getValues();
+         $cat->{Model_Category::COLUMN_ALT} = $form->alt->getValues();
          $cat->{Model_Category::COLUMN_KEYWORDS} = $form->keywords->getValues();
          $cat->{Model_Category::COLUMN_DESCRIPTION} = $form->desc->getValues();
          if(Auth::isAdmin()){
