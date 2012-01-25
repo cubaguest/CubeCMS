@@ -687,6 +687,7 @@ abstract class Controller extends TrObject {
       $catAlt = new Form_Element_Text('alt', $this->tr('Alternativní název'));
       $catAlt->setLangs();
       $catAlt->setSubLabel($this->tr('Bývá využit u názvů obrázků kategorie či jako delší název kategorie.'));
+      $catAlt->setValues($cat->{Model_Category::COLUMN_ALT});
       $form->addElement($catAlt, $grpBasic);
       
       $eKeywords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
