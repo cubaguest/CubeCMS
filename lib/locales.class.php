@@ -59,7 +59,7 @@ class Locales extends TrObject {
                                    "de" => "de_DE.UTF-8",
                                    "sk" => "sk_SK.UTF-8",
                                    "ru" => "ru_RU.UTF-8",
-                                   "pl" => "pl_PL.UTF-8 ");
+                                   "pl" => "pl_PL.UTF-8");
 
    /**
     * Pole s podobnými jazyky (je použito při výchozím nasatvení jazyku)
