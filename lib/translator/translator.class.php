@@ -51,13 +51,13 @@ class Translator {
     */
    public function  __construct()
    {
-         if(!isset (self::$translators[self::PRIMARY_DOMAIN])){
-            $this->loadTranslations();
-            self::$translators[self::PRIMARY_DOMAIN] = &$this;
-         } else {
-            $this->translationsS = self::$translators[self::PRIMARY_DOMAIN]->getSigulars();
-            $this->translationsP = self::$translators[self::PRIMARY_DOMAIN]->getPlurals();
-         }
+      if(!isset (self::$translators[$this->domain])){
+         $this->loadTranslations();
+         self::$translators[$this->domain] = &$this;
+      } else {
+         $this->translationsS = self::$translators[$this->domain]->getSigulars();
+         $this->translationsP = self::$translators[$this->domain]->getPlurals();
+      }
    }
 
    public function tr($str, $count = 0, $replaceCount = true)
