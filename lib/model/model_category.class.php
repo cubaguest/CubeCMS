@@ -44,6 +44,7 @@ class Model_Category extends Model_ORM {
    const COLUMN_FEEDS = 'feeds';
    const COLUMN_ICON = 'icon';
    const COLUMN_BACKGROUND = 'background';
+   const COLUMN_ALLOW_HANDLE_ACC = 'allow_handle_access';
 
    const COLUMN_SITEMAP_CHANGE_FREQ = 'sitemap_changefreq';
    const COLUMN_SITEMAP_CHANGE_PRIORITY = 'sitemap_priority';
@@ -138,7 +139,8 @@ class Model_Category extends Model_ORM {
             Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, Model_Category::COLUMN_DESCRIPTION, /*Model_Category::COLUMN_DATADIR, */
             Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, /* Model_Category::COLUMN_FEEDS, */
             Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
-            Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND
+            Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,  
+            Model_Category::COLUMN_PRIORITY
 //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
          $this->setSelectAllLangs(false)
