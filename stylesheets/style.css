@@ -246,7 +246,8 @@ form table.form-table .mceEditor td, form table.form-table p { /*repair TinyMCE 
 input[type="text"], input[type="password"], form .form-table .form-element-short {
    width: 200px;
 }
-input.captcha {width: 50px; vertical-align: top;}
+input.mini, input.captcha{ width: 50px;}
+input.captcha {vertical-align: top;}
 img.captcha {}
 textarea, form .form-table .form-element-long {
    width: 450px;

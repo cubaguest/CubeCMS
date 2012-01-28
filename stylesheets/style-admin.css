@@ -271,3 +271,6 @@ a.button-open-title-image-galery {margin-left: 10px;}
    font-size: 12px;
 }
    
+.module-tool-buttons { margin-bottom: 0.5em; }
+.module-row-tool-buttons { float: right; }
+.module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
