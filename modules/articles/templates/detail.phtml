@@ -39,6 +39,7 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
       $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
       /* ]]> */
    </script>
+   <hr class="reseter" />
    <?if($this->articles != null){?>
    <form name="gotoart" action="<?=$this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
       <p>

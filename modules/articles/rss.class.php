@@ -6,6 +6,7 @@ class Articles_Rss extends Rss {
          .' AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL'
          .' AND '.Articles_Model::COLUMN_ADD_TIME.' <= NOW()',
          array('idc' => $this->category()->getId()))
+         ->order( array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC) )
          ->limit(0, VVE_FEED_NUM)->records();
 
       foreach ($records as $record) {
