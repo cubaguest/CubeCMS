@@ -114,12 +114,12 @@ class Actions_Controller extends Controller {
    protected function deleteAction($action) {
       $this->deleteActionData($action);
       $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána'), $action->{Actions_Model_Detail::COLUMN_NAME}));
-      $this->view()->linkBack->reload();
+      $this->link()->reload($this->view()->linkBack);
    }
 
    protected function deleteActionData($action) {
       // obrázek akce
-      if($file->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+      if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
          $fileObj = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
                  $this->category()->getModule()->getDataDir()
                          .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
