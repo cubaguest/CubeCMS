@@ -468,6 +468,40 @@ class Photogalery_Controller extends Controller {
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->subDir);
    }
 
+   protected function resizeImages($w, $h, $crop, $dir = self::DIR_MEDIUM)
+   {
+       $reg = '#'.preg_quote(DIRECTORY_SEPARATOR).'([^'.preg_quote(DIRECTORY_SEPARATOR).']+)'.preg_quote(DIRECTORY_SEPARATOR).'original#';
+       $repl = '/$1/'.$dir;
+            
+      $path = $this->module()->getDataDir()."original".DIRECTORY_SEPARATOR."{*.gif,*.jpg,*.png,*.GIF,*.JPG,*.PNG}";
+      $results = glob($path, GLOB_NOSORT|GLOB_BRACE);
+      
+      if($results != false){
+         foreach ($results as $file) {
+            $pathInfo = pathinfo($file);
+            $imgFile = new File_Image($pathInfo['basename'], $pathInfo['dirname']);
+            $newPath = preg_replace($reg, $repl, $pathInfo['dirname']);
+            $newFile = $imgFile->copy($newPath, true, null, false);
+            $newFile->getData()->resize($w, $h, $crop == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO);
+            $newFile->save();
+         }
+      }
+      
+      $path = $this->module()->getDataDir()."*".DIRECTORY_SEPARATOR."original".DIRECTORY_SEPARATOR."{*.gif,*.jpg,*.png,*.GIF,*.JPG,*.PNG}";
+      $results = glob($path, GLOB_NOSORT|GLOB_BRACE);
+      
+      if($results != false){
+         foreach ($results as $file) {
+            $pathInfo = pathinfo($file);
+            $imgFile = new File_Image($pathInfo['basename'], $pathInfo['dirname']);
+            $newPath = preg_replace($reg, $repl, $pathInfo['dirname']);
+            $newFile = $imgFile->copy($newPath, true, null, false);
+            $newFile->getData()->resize($w, $h, $crop == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO);
+            $newFile->save();
+         }
+      }
+   }
+
    public function settings(&$settings,Form &$form) 
    {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
@@ -547,7 +581,46 @@ class Photogalery_Controller extends Controller {
       }
       $form->addElement($elemC, 'images');
 
+      $elemResize = new Form_Element_Checkbox('resizeImages', 'Změnit velikosti');
+      $elemResize->setSubLabel($this->tr('Změnit velikosti již uložených obrázků pokud se liší od původních. POZOR! Tato změna může trvat déle!'));
+      if(isset($settings['small_width']) || isset($settings['small_height']) || isset($settings['small_crop'])
+         || isset($settings['medium_width']) || isset($settings['medium_height']) || isset($settings['medium_crop']) ){
+         $elemResize->setValues(true);
+      }
+      
+      $form->addElement($elemResize, 'images');
+      
       if($form->isValid()){
+         // resize images if need
+         // small
+         if(!isset($settings['small_width'])){ $settings['small_width'] = null; }
+         if(!isset($settings['small_height'])){ $settings['small_height'] = null; }
+         if(!isset($settings['small_crop'])){ $settings['small_crop'] = null; }
+         
+         if( $settings['small_width'] != $form->small_width->getValues()
+            || $settings['small_height'] != $form->small_height->getValues() 
+            || $settings['small_crop'] != $form->small_crop->getValues() ){
+            $this->resizeImages(
+               $form->small_width->getValues(), 
+               $form->small_height->getValues(), 
+               $form->small_crop->getValues(), self::DIR_SMALL);
+         }
+         
+         // big
+         if(!isset($settings['medium_width'])){ $settings['medium_width'] = null; }
+         if(!isset($settings['medium_height'])){ $settings['medium_height'] = null; }
+         if(!isset($settings['medium_crop'])){ $settings['medium_crop'] = null; }
+
+         if($settings['medium_width'] != $form->medium_width->getValues()
+            || $settings['medium_height'] != $form->medium_height->getValues() 
+            || $settings['medium_crop'] != $form->medium_crop->getValues() ){
+            $this->resizeImages(
+               $form->medium_width->getValues(), 
+               $form->medium_height->getValues(), 
+               $form->medium_crop->getValues(), self::DIR_MEDIUM);
+         }
+         
+         // save options
          $settings['small_width'] = $form->small_width->getValues();
          $settings['small_height'] = $form->small_height->getValues();
          $settings['small_crop'] = $form->small_crop->getValues();
