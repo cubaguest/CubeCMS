@@ -58,8 +58,8 @@ class FS_Dir extends TrObject {
       if($directory[strlen($directory)-1] != "/"){
 			$directory .= "/";
 		}
-      if(!file_exists($directory) OR !is_dir($directory)){
-         return $this->createDir($directory);
+      if(!$this->exist() OR !is_dir((string)$this)){
+         return $this->create();
 		}
       return true;
 	}

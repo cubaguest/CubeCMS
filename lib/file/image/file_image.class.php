@@ -36,9 +36,9 @@ class File_Image extends File {
     * @param bool $returnNewObj -- retunr new obj
     * @return File_Image
     */
-   public function copy($path, $returnNewObj = false)
+   public function copy($path, $returnNewObj = false, $newFile = null, $createUniqueName = true)
    {
-      $fileObj = parent::copy($path, $returnNewObj);
+      $fileObj = parent::copy($path, $returnNewObj, $newFile, $createUniqueName);
       // need reinit image
       $fileObj->getData()->_setFileObj($fileObj);
       return $fileObj;

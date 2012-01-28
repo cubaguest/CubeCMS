@@ -95,7 +95,7 @@ class File extends TrObject implements File_Interface {
       // ostatní
        'other' => 'application/octet-stream',
    );
-
+   
    /**
     * Konstruktor třídy
     *
@@ -245,7 +245,7 @@ class File extends TrObject implements File_Interface {
       return @chmod((string)$this, $mode);
    }
    
-   /**
+      /**
     * metoda vrací třídu jako řetězec. Tedy soubor i s cestou
     * @return string 
     */
@@ -299,7 +299,7 @@ class File extends TrObject implements File_Interface {
     * @param string $newFile -- (option) nový název souboru
     * @return File 
     */
-   public function copy($path, $returnNewObj = false, $newFile = null)
+   public function copy($path, $returnNewObj = false, $newFile = null, $createUniqueName = true)
    {
       $obj = $this;
       if($returnNewObj == true){
@@ -315,8 +315,13 @@ class File extends TrObject implements File_Interface {
 
       // Kontrola jména
       if($newFile == null){
-         $newFile = $obj->creatUniqueName((string)$path);
+         $newFile = $obj->getName();
       }
+      
+      if($createUniqueName == true){
+         $newFile = $this->creatUniqueName($newFile, (string)$path);
+      }
+      
       if(!@copy((string)$this, (string)$path.$newFile)) {
          throw new File_Exception(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
       }
@@ -347,6 +352,7 @@ class File extends TrObject implements File_Interface {
     * metoda přesune soubor do jiného adresáře
     * @param FS_Dir $dstDir
     * @return File 
+    * @todo dodělat kontrolu unikátnosti jména v acílovém adresáři
     */
    public function move($dstDir)
    {
@@ -448,9 +454,9 @@ class File extends TrObject implements File_Interface {
     * @return string -- nový název souboru
     * @todo -- dodělat při přijmu souboru se dvěmi příponami
     */
-   protected function creatUniqueName($destinationDir) 
+   protected function creatUniqueName($fn, $destinationDir) 
    {
-      $fn = $this->getName();
+      $fn = $fn == null ? $this->getName() : $fn;
       if(file_exists($destinationDir.$fn)){
          $file_suffix = substr($fn, (strrpos($fn, '.')+1));
          if  (!preg_match('/_\d+\.(?:\w{3}\.)?\w{3,4}$/', $fn)) {
