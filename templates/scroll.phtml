@@ -25,7 +25,10 @@ if($this->countAllPages > 1){?>
    </div>
    
    <div class="numbers">
-      <? 
+      <? if($this->selectedPage > 1 && !isset ($this->pagesLeftSideArray[1])){
+         $link = $this->pageLink()->param($this->pageParam, 1);
+         echo "<a href=\"$link\" title=\"1\">1</a> ...";
+      }
       // left numbers
       foreach ($this->pagesLeftSideArray as $number) {
          if($number == 1){
@@ -33,11 +36,11 @@ if($this->countAllPages > 1){?>
          } else {
             $link = $this->pageLink()->param($this->pageParam, $number);
          }
-         echo "&nbsp;<a href=\"$link\" title=\"$number\">$number</a>&nbsp;";
+         echo "&nbsp;<a href=\"$link\" title=\"$number\">$number</a>";
       }
       
       // center numbers
-      echo "[{$this->selectedPage}/{$this->countAllPages}]";
+      echo "&nbsp;[{$this->selectedPage}/{$this->countAllPages}]";
    
       // right numbers
       foreach ($this->pagesRightSideArray as $number) {
@@ -46,7 +49,11 @@ if($this->countAllPages > 1){?>
          } else {
             $link = $this->pageLink()->param($this->pageParam, (int)$number);
          }
-         echo "&nbsp;<a href=\"$link\" title=\"$number\">$number</a>&nbsp;";
+         echo "&nbsp;<a href=\"$link\" title=\"$number\">$number</a>";
+      }
+      if($this->selectedPage < $this->countAllPages && !isset ($this->pagesRightSideArray[$this->countAllPages])){
+         $link = $this->pageLink()->param($this->pageParam, $this->countAllPages);
+         echo "... <a href=\"$link\" title=\"{$this->countAllPages}\">{$this->countAllPages}</a>";
       }
       ?>
    </div>

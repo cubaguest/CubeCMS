@@ -1,4 +1,10 @@
-<? // base metatags
+<?
+if(Template::browser()->isMobile()){
+   $this->includeFile("tpl://index_handle.phtml");
+   return;
+}
+
+// base metatags
 Template_Core::setMetaTag('Robots', 'index,follow');
 Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE);
 // detekce IE
@@ -16,7 +22,6 @@ if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
 $this->addFile('css://normalize.css');
 $this->addFile('css://style.css');
 $this->addFile('css://style-content.css');
-//$this->addFile('css://style-handle.css');
 // DEBUG
 if(VVE_DEBUG_LEVEL > 0){ $this->addFile('css://style-debug.css');}
 Template::addJsPlugin(new JsPlugin_JQuery());
@@ -27,8 +32,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-      {*-PAGE_META_TAGS-*}
-      <title>{*-PAGE_TITLE-*}</title>
+      <!-- {*-PAGE_META_TAGS-*}-->
+      <title><!-- {*-PAGE_TITLE-*}--></title>
       <base href="<?=Url_Link::getMainWebDir()?>" />
       <link rel="canonical" href="<?=$this->link()->rmParam()?>" />
       <?//feedy RSS
@@ -52,9 +57,9 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          document.lang = '<?=Locales::getLang()?>';
          /* ]]> */
       </script>
-      {*-STYLESHEETS-*}
+      <!-- {*-STYLESHEETS-*} -->
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style-print.css')?>" media="print" />
-      {*-JAVASCRIPTS-*}
+      <!-- {*-JAVASCRIPTS-*} -->
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/smoothmenu/ddsmoothmenu.js">
@@ -73,6 +78,12 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             contentsource: "markup"});
          /* ]]> */
       </script>
+      <? // admin nessesary files
+      if(Category::getSelectedCategory()->getRights()->isWritable()){
+         $this->addFile('css://style-admin.css');
+         if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
+      }
+      ?>
    </head>
    <body id="pageTop" <?if(Auth::isAdmin())echo 'class="with-admin-menu"';?> >
       <? // admin menu
@@ -98,22 +109,13 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          <div id="colswrap">
             <div id="col1wrap" class="column">
                <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit() AND !empty($this->panels['right'])) echo " col1pad_plusright";?>">
-                  <? $this->includeTpl("messages.phtml", true);
+                  <? 
+                  $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);
-                  if(VVE_DEBUG_LEVEL > 0){
-                     Debug::printDebug();
-                     Debug_Timer::printTimers();
-                  }
+                  if(VVE_DEBUG_LEVEL > 0){ Debug::printDebug(); Debug_Timer::printTimers(); }
                   ?>
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
-                  <?if($this->pageNotFound) {
-                     $this->includeTpl("error404.phtml", true);
-                  } else if($this->specialPage) {
-                        $this->includeTplObj($this->specialPageTpl);
-                     } else {
-                        $this->includeTpl("modules.phtml", true);
-                     }
-                  ?>
+                  <? $this->includeTpl("modules.phtml", true); ?>
                   <hr class="reseter" />
                   </div>
                </div><!-- col1pad -->
@@ -205,11 +207,14 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             /* ]]> */
          </script>
       <?}?>
+      <?/*if(Category::getSelectedCategory()->getRights()->isWritable()){?>
+      <div id="module-help-box">
+         <h2><?=$this->tr('Nápověda')?></h2>
+         <div id="module-help">
+            
+         </div>
+      </div>
+      <?}?>
+      <?var_dump($this->module);*/?>
    </body>
 </html>
-<?
-if(Category::getSelectedCategory()->getRights()->isWritable()){
-   $this->addFile('css://style-admin.css');
-   if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
-}
-?>
