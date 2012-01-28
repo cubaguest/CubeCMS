@@ -5,7 +5,7 @@
  * Umožňuje všechny základní operace při volbě a plnění šablony a jejímu zobrazení.
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
+ * @version    	$Id$ Cube CMS 7.7 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
  * @abstract 		Třída pro obsluhu šablony
@@ -30,7 +30,7 @@ class Template_Core extends Template {
    /**
     * Šablona pro mobilní zařízení
     */
-   const INDEX_MOBILE_TEMPLATE = 'index_mobile.phtml';
+   const INDEX_HANDLE_TEMPLATE = 'index_handle.phtml';
 
    /**
     * Nastavená šablony systému
@@ -49,7 +49,7 @@ class Template_Core extends Template {
     * @var array
     */
    private static $metaTags = array();
-
+   
    /**
     * Konstruktor
     */
@@ -310,5 +310,14 @@ class Template_Core extends Template {
       return self::$metaTags;
    }
 
+   /**
+    * Metoda vrací objekt detekce prohlížeče
+    * @return Browser
+    */
+   public static function getBrowser()
+   {
+      return self::$browser;
+   }
+   
 }
 ?>
