@@ -1,22 +1,45 @@
 <?
-// funkce pro render menu
-function vveMenuRenderFunc($menuArr, $link) {
-   print ("<ul>\n");
-   foreach ($menuArr as $key => $item) {
-      print ("<li>");
-      print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
+if(!Template::browser()->isMobile()){
+   // funkce pro render menu
+   function vveMenuRenderFunc($menuArr, $link) {
+      print ("<ul>\n");
+      foreach ($menuArr as $key => $item) {
+         print ("<li>");
+         print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
              .$item->getCatObj()->getLabel().'</a>'."");
-      if(!$item->isEmpty()){
-         vveMenuRenderFunc($item, $link);
+         if(!$item->isEmpty()){
+            vveMenuRenderFunc($item, $link);
+         }
+         print ("</li>\n");
       }
-      print ("</li>\n");
+      print ("</ul>\n");
    }
-   print ("</ul>\n");
-}
 ?>
-
 <!-- Halvni menu sekce v menu  -->
 <div id="smoothmenu1" class="ddsmoothmenu">
    <?=vveMenuRenderFunc($this->menu, $this->link())?>
    <br style="clear: left" />
 </div>
+
+<?} else {
+   function vveMenuMobileRenderFunc($menuArr, $link) {
+      foreach ($menuArr as $key => $item) {
+         echo ("<li>");
+         echo ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'.$item->getCatObj()->getLabel().'</a>'."");
+         if(!$item->isEmpty()){
+            vveMenuMobileRenderFunc($item, $link);
+         }
+         echo ("</li>\n");
+      }
+   }
+   
+   ?>
+<div id="menu-main">
+   <h4><?=$this->tr('Kategorie')?></h4>
+   <ul>
+      <?=vveMenuMobileRenderFunc($this->menu, $this->link()) ?>
+   </ul>
+</div>
+   <?
+}
+?>

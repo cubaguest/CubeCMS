@@ -1,3 +1,7 @@
+<?
+if(Template::browser()->isMobile()){ return; }
+?>
+
 <div class="article-tools">
    <?if(isset($vars['lastEditTime'])) {
       if(($vars['lastEditTime'] instanceof DateTime) == false) {
