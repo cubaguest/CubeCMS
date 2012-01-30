@@ -532,6 +532,14 @@ class Template extends TrObject {
          return Url_Request::getBaseWebDir().self::FACES_DIR.'/'.self::$face.'/';
       }
    }
+   
+   /**
+    * Metoda vrací jestli je aktuální stránka titulní
+    * @return bool -- true pokud se jedná o titulní stránku
+    */
+   final public static function isTitlePage() {
+      return AppCore::getUrlRequest()->getCategory() == null ? true : false;
+   }
 
    /**
     * Metoda pro přímé vložení souvboru do šablony
