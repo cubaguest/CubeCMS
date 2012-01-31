@@ -604,13 +604,6 @@ class Articles_Controller extends Controller {
    protected function createForm($artId = null) {
       $form = new Form('article_', true);
 
-      // doplnění id
-      if($artId != null){
-         $iIdElem = new Form_Element_Hidden('art_id');
-         $iIdElem->addValidation(new Form_Validator_IsNumber());
-         $form->addElement($iIdElem);
-      }
-      
       $fGrpTexts = $form->addGroup('texts', $this->tr('Texty'));
 
       $iName = new Form_Element_Text('name', $this->tr('Nadpis'));
@@ -703,6 +696,13 @@ class Articles_Controller extends Controller {
       $eCreatedTime->addValidation(new Form_Validator_NotEmpty());
       $eCreatedTime->addValidation(new Form_Validator_Time());
       $form->addElement($eCreatedTime, $fGrpPublic);
+      
+      // doplnění id
+      if($artId != null){
+         $iIdElem = new Form_Element_Hidden('art_id');
+         $iIdElem->addValidation(new Form_Validator_IsNumber());
+         $form->addElement($iIdElem, $fGrpPublic);
+      }
 
 
       $iSubmit = new Form_Element_SaveCancel('save');
