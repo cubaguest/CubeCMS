@@ -121,6 +121,9 @@ class Component_Scroll extends Component {
             break;
       }
       $this->selectPage = (int)$this->pageLink()->getParam($this->getConfig('page_param'), $defaulParam);
+      if($this->selectPage == null){
+         $this->selectPage = 0;
+      }
    }
 
    /**
@@ -200,6 +203,9 @@ class Component_Scroll extends Component {
     * @param integer -- id šablony (jakékoliv)
     */
    public function mainView() {
+      if($this->alreadyRendered){
+         return;
+      }
       $this->whichButtons();
       $this->whichNeighbourButtons();
       $this->template()->selectedPage = $this->selectPage;
