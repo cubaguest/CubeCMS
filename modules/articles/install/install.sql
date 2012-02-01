@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `description_de` varchar(300) DEFAULT NULL,
   `concept` tinyint(1) NOT NULL DEFAULT '0',
   `title_image` VARCHAR( 100 ) NULL DEFAULT NULL,
+  `author` VARCHAR( 100 ) NULL DEFAULT NULL,
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
