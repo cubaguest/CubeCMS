@@ -70,7 +70,7 @@ class Component_TinyMCE_JsPlugin extends JsPlugin {
 
    public function settingsView(){
       if(!isset ($_GET['set'])){
-         throw new UnexpectedValueException(_('Nedefinovaný typ nastavení pro TinyMCE'));
+         throw new UnexpectedValueException($this->tr('Nedefinovaný typ nastavení pro TinyMCE'));
       }
       $className = 'Component_TinyMCE_Settings_'.ucfirst($_GET['set']);
       $setObj = new $className();
