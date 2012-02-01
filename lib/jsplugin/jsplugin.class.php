@@ -12,7 +12,7 @@
  * @abstract 		Abstraktní třída pro práci s JsPluginy
  */
 
-abstract class JsPlugin {
+abstract class JsPlugin extends TrObject {
 	/**
 	 * Konstanta s název adresáře JsPluginů
 	 * @var string
@@ -124,7 +124,7 @@ abstract class JsPlugin {
          } else if (method_exists($this, $actionName . 'View')) {
             $this->{$actionName . 'View'} ();
          } else {
-            throw new UnexpectedValueException(_('Neimplementována metoda JsPluginu'));
+            throw new UnexpectedValueException($this->tr('Neimplementována metoda JsPluginu'));
          }
       } catch (Exception $exc) {
          echo $exc->getTraceAsString();

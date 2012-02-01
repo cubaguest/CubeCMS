@@ -44,7 +44,7 @@ class JsPlugin_File {
 		$this->file = $file;
       $this->virtualFile = $virtual;
       if($virtual){
-         $this->dir = Url_Request::getBaseWebDir()."jsplugin/JSPLUGINNAME/cat-".Category::getSelectedCategory()->getId()."/";
+         $this->dir = Url_Request::getBaseWebDir()."jsplugin/JSPLUGINNAME/".Locales::getLang()."/cat-".Category::getSelectedCategory()->getId()."/";
       } else {
          if(strncmp ($dir, 'http', 4) == 0){// celá adresa
             $this->dir = $dir;
