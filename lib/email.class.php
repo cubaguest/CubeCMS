@@ -117,17 +117,37 @@ class Email {
    }
 
    /**
-    * Metoda přidá adresu nebo pole adresa do příjemců
+    * Metoda přidá adresu nebo pole adres do příjemců
     * @param string/array $address -- adresa nebo pole adres pro příjem
     * @return Email -- vrací sebe
     */
    public function addAddress($address, $name = null)
-      {
+   {
       if(is_array($address)){
          $this->mailsAddresses = array_merge($this->mailsAddresses, $address);
       } else {
          if($name == null){
             array_push($this->mailsAddresses, $address);
+         } else {
+            $this->mailsAddresses[$address] = $name;
+         }
+      }
+      return $this;
+   }
+   
+   /**
+    * Metoda nastaví adresu nebo pole adres do příjemců
+    * @param string/array $address -- adresa nebo pole adres pro příjem
+    * @return Email -- vrací sebe
+    */
+   public function setAddress($address, $name = null)
+   {
+      if(is_array($address)){
+         $this->mailsAddresses = $address;
+      } else {
+         $this->mailsAddresses = array();
+         if($name == null){
+            $this->mailsAddresses[] = $address;
          } else {
             $this->mailsAddresses[$address] = $name;
          }
