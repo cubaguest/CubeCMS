@@ -34,6 +34,7 @@ class Category_Admin extends Category_Core {
 //       Debug::log($this->category);
 
       $this->module = new Module($this->category->{Model_Category::COLUMN_MODULE}, null);
+      $this->module->setDataDir($this->category->{Model_Category::COLUMN_DATADIR});
       $this->categoryRights = new Rights();
       $this->loadRights();
 

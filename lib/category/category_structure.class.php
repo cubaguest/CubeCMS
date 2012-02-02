@@ -85,7 +85,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    }
 
    public function getPath($idCat, $retArray = array(), $onlyId = false)
-      {
+   {
       if($this->getId() == $idCat){
          if($onlyId){
             array_push($retArray, (int)$this->getId());
@@ -111,6 +111,32 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       return false;
    }
    
+   /**
+    * metoda vrací pozici potomka
+    * @param int $idc -- id kategorie
+    */
+   public function getPosition($idc)
+   {
+      if(!$this->isEmpty()){
+         // nalezení v aktuálních potomcích
+         $pos = 1;
+         foreach ($this as $child) {
+            if($child->getId() == $idc){
+               return $pos;
+            }
+            $pos++;
+         }
+         // předání hledání potomkům
+         foreach ($this as $child) {
+            $pos = $child->getPosition($idc);
+            if($pos != 0){
+               return $pos;
+            }
+         }
+      }
+      return 0;
+   }
+
    /**
     * Metoda nastaví kategorie a odstraní nepoužité kategorie a sekce
     * @param array $catArray -- pole s kategoriemi
@@ -208,9 +234,9 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
     */
    public function removeCat($idCat)
    {
-      foreach ($this->childrens as $key => $child) {
+      foreach ($this as $key => $child) {
          if($child->getId() == $idCat){
-            unset ($this->childrens[$key]);
+            unset ($this[$key]);
             return true;
          }
          $child->removeCat($idCat);
@@ -228,7 +254,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
          return $this;
       }
       if(!$this->isEmpty()) {
-         foreach ($this->childrens as $child) {
+         foreach ($this as $child) {
             $obj = $child->getCategory($idCat);
             if($obj !== false) {
                return $obj;
@@ -236,6 +262,19 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
          }
       }
       return false;
+   }
+   
+   /**
+    * Metoda odstraní zadaného potomka ze struktury
+    * @param int $id -- id potomka
+    */
+   public function removeChild($id)
+   {
+      foreach ($this as $key => $child) {
+         if($child->getId() == $id){
+            unset ($this[$key]);
+         }
+      }
    }
 
    /**
@@ -356,11 +395,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    public function saveStructure()
    {
       $model = new Model_Config();
-      if($this->type == 'admin'){
-         $record = $model->where(Model_Config::COLUMN_KEY, 'ADMIN_MENU_STRUCTURE')->record();
-      } else {
-         $record = $model->where(Model_Config::COLUMN_KEY, 'CATEGORIES_STRUCTURE')->record();
-      }
+      $record = $model->where(Model_Config::COLUMN_KEY, 'CATEGORIES_STRUCTURE')->record();
       $record->{Model_Config::COLUMN_VALUE} = serialize($this);
       $model->save($record);
    }
@@ -372,13 +407,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
     */
    public static function getStructure($admin = false)
    {
-      if($admin === true){
-         $struct = unserialize(VVE_ADMIN_MENU_STRUCTURE);
-         $struct->type = 'admin';
-      } else {
-         $struct = unserialize(VVE_CATEGORIES_STRUCTURE);
-      }
-      return $struct;
+      return unserialize(VVE_CATEGORIES_STRUCTURE);
    }
 
    /**

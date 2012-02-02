@@ -71,7 +71,6 @@ class Categories_Controller extends Controller {
          $this->view()->structure = $structure;
       }
       $this->view()->isMainMenu = $this->isMainStruct();
-//      Debug::log($structure);
    }
 
    public function adminMenuController()
@@ -829,19 +828,28 @@ class Categories_Controller extends Controller {
 
    private function moveCategory($idMovedCat, $idNewParentCat, $regenerateUrls = false, $position = 0)
    {
-      $structure = Category_Structure::getStructure(!$this->isMainStruct());
+      $modelCat = new Model_Category();
+      $structure = Category_Structure::getStructure();
+      $this->repairStructure($structure, $modelCat);
       $movedCat = $structure->getCategory($idMovedCat);
       // definice ve struktuře pro přesun
       $oldParentCatId = $movedCat->getParentId();
 
+      
+      if ($oldParentCatId == $idNewParentCat){ // pokud je ve stejné urovní a naví se posunuje dopředu, je nutné odečíst jednu pozici (přesunovaný prvek)
+         $posCurrent = $structure->getPosition($idMovedCat);
+         if($posCurrent < $position){ 
+            $position--;
+         }
+      }
       // přesun do jiné kategorie
       $structure->removeCat($idMovedCat);
       $structure->addChild($movedCat, $idNewParentCat, $position);
+         
       $structure->saveStructure();
 
       // pokud se přesunuje ve struktuře
       if ($oldParentCatId != $idNewParentCat AND $regenerateUrls) {
-         $modelCat = new Model_Category();
          // dočtou se data o kategoriích
          $movedCat->withHidden(true);// (i zkryté)
          $movedCat->setCategories($modelCat->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
@@ -865,9 +873,23 @@ class Categories_Controller extends Controller {
          $this->view()->status = 'moving';
       }
    }
+   
+   private function repairStructure(Category_Structure $struct, Model_ORM $model)
+   {
+      if(!$struct->isEmpty()){
+         foreach ($struct->getChildrens() as $child) {
+            $count = $model->where(Model_Category::COLUMN_CAT_ID." = :idc", array('idc' => $child->getId()))->count();
+            if($count == 0){ // pokud není v db je odstraněna
+               $struct->removeChild($child->getId());
+            } else {
+               $this->repairStructure($child, $model);
+            }
+         }
+      }
+      
+   }
 
-
-      /**
+         /**
     * Meoda vrátí pole s kategoriema, které jsou potomky upravované kategorie (včetně upravované kategorie)
     * @param Category_Structure $category
     * @return <type>
