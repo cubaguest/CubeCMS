@@ -274,3 +274,7 @@ a.button-open-title-image-galery {margin-left: 10px;}
 .module-tool-buttons { margin-bottom: 0.5em; }
 .module-row-tool-buttons { float: right; }
 .module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
+
+@media print {
+   .toolbox, #adminMenuWrapper, a.toolbox-button, #debug, .lang-image { display: none; }
+}
