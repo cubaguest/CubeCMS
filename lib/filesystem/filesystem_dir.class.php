@@ -95,7 +95,7 @@ class Filesystem_Dir {
          return true;
 		} else if(file_exists($filepath)){
 			if (!@unlink($filepath)){
-            throw new CoreException(sprintf(_('Soubor "%s" se nepodařilo smazát.'),$filepath),6);
+            throw new CoreException(sprintf(_('Soubor "%s" se nepodařilo smazat.'),$filepath),6);
 			}
 		}
       return true;
