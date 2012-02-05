@@ -57,7 +57,7 @@ class File_Excel extends File {
       if($data instanceof PHPExcel){
          $this->excelFile = $data;
       } else {
-         throw new UnexpectedValueException($this->tr('Do souboru excelu nebyl předán platný obsah'));
+         throw new UnexpectedValueException($this->tr('Do souboru excelu byl předán neplatný obsah'));
       }
       return $this;
    }

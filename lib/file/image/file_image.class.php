@@ -73,7 +73,7 @@ class File_Image extends File {
       if($data instanceof File_Image_Base){
          $this->imageObj = $data;
       } else {
-         throw new UnexpectedValueException($this->tr('Předán špátný paramter s obsahem obrázku'));
+         throw new UnexpectedValueException($this->tr('Do souboru obrázku byl předán neplatný obsah'));
       }
       parent::setContent($data);
    }

@@ -205,7 +205,7 @@ class File_Image_Gd extends File_Image_Base {
       
 //      if(!@imagecopymerge($this->imageData, $wImgRes, $posX, $posY, 0, 0, $markW, $markH, $params['opacity'])){
       if(!@imagecopyresampled($this->imageData, $wImgRes, $posX, $posY, 0, 0, $markW, $markH, $markW, $markH)){
-         throw new File_Image_Exception($this->tr('Chyba při vytváření vodoznaku na obrázku'));
+         throw new File_Image_Exception($this->tr('Chyba při vytváření vodoznaku do obrázku'));
       }
       
       return $this;
