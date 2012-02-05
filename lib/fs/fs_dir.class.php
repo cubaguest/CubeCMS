@@ -111,7 +111,7 @@ class FS_Dir extends TrObject {
          return true;
 		} else if(file_exists($path)){
 			if (!@unlink($path)){
-            throw new UnexpectedValueException(sprintf($this->tr('Soubor "%s" se nepodařilo smazát.'),$path),6);
+            throw new UnexpectedValueException(sprintf($this->tr('Soubor "%s" se nepodařilo smazat.'),$path),6);
 			}
 		}
       return $this;

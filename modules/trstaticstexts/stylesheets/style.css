@@ -1,0 +1,10 @@
+
+#form_translation #text-plurals textarea {
+   width: 97%;
+   
+}
+
+#form_translation .ui-widget-content td,
+#form_translation .ui-widget-content th {
+   padding: 3px;
+}

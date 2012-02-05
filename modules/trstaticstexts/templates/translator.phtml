@@ -1,97 +1,90 @@
 <?
+$this->addFile("css://style.css");
 $this->addJsPlugin(New JsPlugin_JQuery());
+$this->addJsPlugin(New JsPlugin_JQueryCSS());
 ?>
-<h1><?=$this->tr('Překladač statických textů');?></h1>
+<h1><? echo $this->module != null ? sprintf($this->tr('Překladač statických textů modulu "%s"'), $this->module) : $this->tr('Překladač statických textů jádra');?></h1>
+<div class="ui-widget ">
 <?
 $this->formTr->html()->setAttrib('id', 'form_translation');
 echo $this->formTr->renderStart();
 ?>
 <fieldset>
-   <legend><?=$this->tr('Nastavení')?></legend>
-   <a id="button_tr_gl_all" href="#" title="<?=$this->tr('Přeložit vše přes google');?>"><?=$this->tr('Přeložit vše přes google');?></a>
-   <?
-
-//      echo $this->formTr->locale->label();
-//      echo $this->formTr->locale->controll();
-   ?>
-</fieldset>
-<fieldset>
    <legend><?=$this->tr('Jednotná čísla');?></legend>
    <table style="width: 100%;" cellpadding="0" cellspacing="0">
    <?
    $rowTrS = 1;
-   foreach ($this->singulars as $origStr => $translation) {?>
-   <tr><td>
-         <table id="tr_si_<?echo $rowTrS++?>" class="tr_row">
+   foreach ($this->singulars as $strHash => $translation) {?>
+      <tr class="ui-widget-content ui-state-default <?if($translation[0] == $translation[1]){echo "ui-state-highlight";}?>"><td>
+         <table id="tr_si_<?echo $rowTrS++?>" class="tr_row full-width">
       <tr><th><?echo $this->tr('Originál');?>:</th></tr>
-      <tr><td class="tr_str"><?echo htmlspecialchars($origStr);?></td></tr>
-      <tr><th><?echo $this->formTr->trsingular->label();?>&nbsp;<a href="#" title="<?=$this->tr('Překlad pomocí Google');?>" class="tr-by-google"><?=$this->tr('Překlad pomocí Google');?></a></th></tr>
+      <tr><td class="tr_str"><?echo $translation[0];?></td></tr>
+      <tr><th><?echo $this->formTr->trsingular->label();?></th></tr>
       <tr>
-         <td><?
+         <td class=""><?
       $this->formTr->trsingular->html()->setAttrib('rows', 1)->setAttrib('cols', 60)->addClass('tr_str_res');
-      $this->formTr->trsingular->setDimensional(md5($origStr));
-      $this->formTr->trsingular->setValues($translation);
+      $this->formTr->trsingular->setDimensional($strHash);
+      $this->formTr->trsingular->setValues($translation[1]);
       echo $this->formTr->trsingular->controll();
       ?></td>
       </tr>
-      <tr><td><hr /></td></tr>
    </table>
    </td></tr>
    <?}?>
    </table>
 </fieldset>
 
-<fieldset>
+<fieldset id="text-plurals">
    <legend><?=$this->tr('Množná čísla');?></legend>
-   <table style="width: 100%;" cellpadding="0" cellspacing="0">
+   <table cellpadding="0" cellspacing="0" class="full-width">
    <?
    $rowTrP = 1;
-   foreach ($this->plurals as $origStr => $translation) {
-   ?>
-   <tr><td>
-         <table id="tr_pl_<?echo $rowTrP++?>" class="tr_pl_row">
+   foreach ($this->plurals as $strHash => $translation) {?>
+   <tr class="ui-widget-content ui-state-default <?if($translation[0][0] == $translation[1][0]){echo "ui-state-highlight";}?>"><td>
+         <table id="tr_pl_<?echo $rowTrP++?>" class="tr_pl_row full-width">
          <tr><th colspan="3"><?echo $this->tr('Originál');?>:</th></tr>
          <tr>
-            <td class="tr_pl_str_1" style="width: 33%;"><?echo htmlspecialchars($translation[0]);?></td>
-            <td class="tr_pl_str_2" style="width: 33%;"><?echo htmlspecialchars($translation[1]);?></td>
-            <td class="tr_pl_str_3" style="width: 33%;"><?if(isset($translation[2])){echo htmlspecialchars($translation[2]);}?></td>
+            <td class="tr_pl_str_1" style="width: 33%;"><em><?echo htmlspecialchars($translation[0][0]);?></em></td>
+            <td class="tr_pl_str_2" style="width: 33%;"><em><?echo htmlspecialchars($translation[0][1]);?></em></td>
+            <td class="tr_pl_str_3" style="width: 33%;"><em><?if(isset($translation[0][2])){echo htmlspecialchars($translation[0][2]);}?></em></td>
          </tr>
          <!-- translations -->
          <tr>
-            <th colspan="3"><?echo $this->formTr->trplural1->label();?>&nbsp;<a href="#" title="<?=$this->tr('Překlad pomocí Google');?>" class="tr-pl-by-google"><?=$this->tr('Překlad pomocí Google');?></a></th>
+            <th><?echo $this->formTr->trplural1->label();?></th>
+            <th><?echo $this->formTr->trplural2->label();?></th>
+            <th><?echo $this->formTr->trplural3->label();?></th>
          </tr>
          <tr>
             <td><?
             $this->formTr->trplural1->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_1_res');
-            $this->formTr->trplural1->setDimensional(md5($origStr));
+            $this->formTr->trplural1->setDimensional($strHash);
             $this->formTr->trplural1->setValues(null);
-            if(isset ($this->pluralsTrs[$origStr])) {
-               $this->formTr->trplural1->setValues($this->pluralsTrs[$origStr][0]);
+            if(isset ($translation[1][0])) {
+               $this->formTr->trplural1->setValues($translation[1][0]);
             }
             echo $this->formTr->trplural1->controll();
             ?></td>
             <td><?
             $this->formTr->trplural2->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_2_res');
-            $this->formTr->trplural2->setDimensional(md5($origStr));
+            $this->formTr->trplural2->setDimensional($strHash);
             $this->formTr->trplural2->setValues(null);
-            if(isset ($this->pluralsTrs[$origStr])) {
-               $this->formTr->trplural2->setValues($this->pluralsTrs[$origStr][1]);
+            if(isset ($translation[1][1])) {
+               $this->formTr->trplural2->setValues($translation[1][1]);
             }
             echo $this->formTr->trplural2->controll();
             ?></td>
             <td><?
-            if(isset($translation[2])){
+            if(isset($translation[1][2])){
                $this->formTr->trplural3->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_3_res');
-               $this->formTr->trplural3->setDimensional(md5($origStr));
+               $this->formTr->trplural3->setDimensional($strHash);
                $this->formTr->trplural3->setValues(null);
-               if(isset ($this->pluralsTrs[$origStr])) {
-                  $this->formTr->trplural3->setValues($this->pluralsTrs[$origStr][2]);
+               if(isset ($translation[1][2])) {
+                  $this->formTr->trplural3->setValues($translation[1][2]);
                }
                echo $this->formTr->trplural3->controll();
             }
             ?></td>
          </tr>
-         <tr><td colspan="3"><hr /></td></tr>
       </table>
    </td></tr>
    <?}?>
@@ -105,43 +98,7 @@ echo $this->formTr->renderStart();
 
 
 <?echo $this->formTr->renderEnd();?>
-<script src="https://www.google.com/jsapi?key=ABQIAAAAsHf9LHrD4hQz3AMUm7rvMBQYMIoXqmbcjOeIjGpEAN4OBivy5BT4tH8wn_CuplLOlLtP0ULTvrGxyg" type="text/javascript"></script>
+</div>
 <script type="text/javascript">
-   google.load("language", "1");
-
-   $(document).ready(function(){
-      $('a.tr-by-google').click(function(){
-         var original = $(this).parents('table.tr_row').find('.tr_str').text();
-         translate(original, $(this).parents('table.tr_row').find('textarea.tr_str_res'));
-         return false;
-      });
-      $('a.tr-pl-by-google').click(function(){
-         var original = $(this).parent('th').parent('tr').prev('tr').find('td').text();
-         var $row = $(this).parents('table.tr_pl_row');
-
-         translate($row.find('.tr_pl_str_1').text(), $row.find('.tr_pl_str_1_res'));
-         translate($row.find('.tr_pl_str_2').text(), $row.find('.tr_pl_str_2_res'));
-         if($row.find('.tr_pl_str_3').text() != ""){
-            translate($row.find('.tr_pl_str_3').text(), $row.find('.tr_pl_str_3_res'));
-         }
-
-         return false;
-      });
-
-      $('#button_tr_gl_all').click(function(){
-         $('#form_translation').find('a.tr-by-google').click();
-         $('#form_translation').find('a.tr-pl-by-google').click();
-         return false;
-      });
-
-      function translate (text, $target) {
-         var tr = "";
-         google.language.translate(text, 'cs', '<?echo preg_replace('/_[a-z]{2}/i', '', $this->lang);?>', function(result) {
-            if (result.translation) {
-               $target.text(result.translation.replace('% s', ' %s').replace('&#39; %s&#39;', '"%s"').replace('&quot; %s&quot;', '"%s"'));
-            }
-         });
-      }
-
-   });
+   $(document).ready(function(){});
 </script>
