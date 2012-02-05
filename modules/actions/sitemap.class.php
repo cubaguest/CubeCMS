@@ -13,7 +13,7 @@ class Actions_SiteMap extends SiteMap {
             new DateTime($action->{Actions_Model_Detail::COLUMN_CHANGED}));
       }
 
-      $this->setLinkMore($this->link()->route('archive'),_('archiv'));
+      $this->setLinkMore($this->link()->route('archive'),$this->tr('archiv'));
 	}
 }
 ?>

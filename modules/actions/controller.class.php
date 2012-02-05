@@ -33,21 +33,21 @@ class Actions_Controller extends Controller {
          case 'year':
             $dateNext->modify("+".$time." year");
             $datePrev->modify("-".$time." year");
-            $linkNextLabel = sprintf($this->ngettext('+ %s year','+ %s years',(int)$time), $time);
-            $linkBackLabel = sprintf($this->ngettext('- %s year','- %s years',(int)$time), $time);
+            $linkNextLabel = "+ ".$this->tr(array('%s rok','%s roky','%s let') ,(int)$time);
+            $linkBackLabel = "- ".$this->tr(array('%s rok','%s roky','%s let') ,(int)$time);
             break;
          case 'month':
             $dateNext->modify("+".$time." month");
             $datePrev->modify("-".$time." month");
-            $linkNextLabel = sprintf($this->ngettext('+ %s month','+ %s months',(int)$time), $time);
-            $linkBackLabel = sprintf($this->ngettext('- %s month','- %s months',(int)$time), $time);
+            $linkNextLabel = "+ ".$this->tr(array('%s měsíc','%s měsíce','%s měsíců') ,(int)$time);
+            $linkBackLabel = "- ".$this->tr(array('%s měsíc','%s měsíce','%s měsíců') ,(int)$time);
             break;
          case 'day':
          default:
             $dateNext->modify("+".$time." day");
             $datePrev->modify("-".$time." day");
-            $linkNextLabel = sprintf($this->ngettext('+ %s day','+ %s days',(int)$time), $time);
-            $linkBackLabel = sprintf($this->ngettext('- %s day','- %s days',(int)$time), $time);
+            $linkNextLabel = "- ".$this->tr(array('%s den','%s dny','%s dnů') ,(int)$time);
+            $linkBackLabel = "- ".$this->tr(array('%s den','%s dny','%s dnů') ,(int)$time);
             break;
       }
 
@@ -162,7 +162,7 @@ class Actions_Controller extends Controller {
       // kontrola integrity data
       if($form->isSend() AND $form->date_stop->getValues() != null
               AND ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
-         $form->date_stop->setError($this->tr('Končné datum končí dříve než datum zčátku'));
+         $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
       }
 
       if($form->isSend() AND $form->save->getValues() == false){
@@ -257,7 +257,7 @@ class Actions_Controller extends Controller {
       // kontrola integrity data
       if($form->isSend() AND $form->date_stop->getValues() != null
               AND ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
-         $form->date_stop->setError($this->tr('Končné datum končí dříve než datum zčátku'));
+         $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
       }
 
       if($form->isSend() AND $form->save->getValues() == false){

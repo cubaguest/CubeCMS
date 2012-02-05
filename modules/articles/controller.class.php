@@ -100,7 +100,7 @@ class Articles_Controller extends Controller {
       if($this->routes()->getActionName() == 'main' AND $this->category()->getParam(self::PARAM_DISABLE_LIST, false) AND $this->view()->articles != false){
          $first = reset($this->view()->articles);
          $this->link()->route('detail', array('urlkey' => (string)$first->{Articles_Model::COLUMN_URLKEY}))->reload();
-}
+      }
 
       // odkaz zpět
       $this->link()->backInit();
@@ -241,7 +241,7 @@ class Articles_Controller extends Controller {
                $record = $artM->record($this->view()->article->{Articles_Model::COLUMN_ID});
                $record->{Articles_Model::COLUMN_CONCEPT} = false;
                $artM->save($record);
-               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->tr('U položky byl zrušek koncept')));
+               $this->infoMsg()->addMessage($this->getOption('publicMsg', $this->tr('U položky byl zrušen příznak konceptu')));
                $this->link()->reload();
             }
             $this->view()->formPublic = $formPublic;
@@ -661,7 +661,7 @@ class Articles_Controller extends Controller {
          }
       }
       
-      $fGrpPublic = $form->addgroup('public', $this->tr('Paramtry zveřejnění a vytvoření'));
+      $fGrpPublic = $form->addgroup('public', $this->tr('Parametry zveřejnění a vytvoření'));
 
       // pokud jsou práva pro kontrolu, přidám položku s uživateli, kterí mohou daný článek vytvořit
       if($this->category()->getRights()->isControll()){

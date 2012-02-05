@@ -1,4 +1,9 @@
 <?
+if(Template::browser()->isMobile()){
+   $this->includeFile("tpl://list_mobile.phtml");
+   return;
+}
+
 $this->addCssFile("style.css");
 $this->includeTpl('sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
