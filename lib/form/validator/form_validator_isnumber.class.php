@@ -51,11 +51,11 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
    public function addHtmlElementParams(Form_Element $element) {
       $addStr = null;
       if($this->numberType == FILTER_VALIDATE_INT AND $this->min !== null AND $this->max !== null){
-         $addStr = $this->tr(sprintf(' mezi %s a %s', $this->min, $this->max));
+         $addStr = sprintf($this->tr(' mezi %s a %s'), $this->min, $this->max);
       } else if($this->numberType == FILTER_VALIDATE_INT AND $this->min !== null){
-         $addStr = $this->tr(sprintf(' větší než %s', $this->min));
+         $addStr = sprintf($this->tr(' větší než %s'), $this->min);
       } else if($this->numberType == FILTER_VALIDATE_INT AND $this->max !== null){
-         $addStr = $this->tr(sprintf(' menší než %s', $this->max));
+         $addStr = sprintf($this->tr(' menší než %s'), $this->max);
       }
       // sublabel
       if($element instanceof Form_Element_Text OR $element instanceof Form_Element_TextArea){
