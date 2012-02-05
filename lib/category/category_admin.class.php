@@ -69,7 +69,7 @@ class Category_Admin extends Category_Core {
     */
    public function setParam($param, $value)
    {
-      throw new UnderflowException($this->tr("U administrační aktegorie nelze vložit parametry"));
+      throw new UnderflowException($this->tr("U administrační kategorie nelze vložit parametry"));
       return $param;
    }
 
