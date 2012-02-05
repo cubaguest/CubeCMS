@@ -525,7 +525,7 @@ abstract class Controller extends TrObject {
     */
    final public function ngettext($message1, $message2, $int, $domain = null) 
    {
-      return $this->tr(array($message1, $message2, $message2), $int);
+      return $this->tr(array($message1,$message2,$message2), $int);
 //      return $this->locale()->ngettext($message1, $message2, $int, $domain);
    }
 
