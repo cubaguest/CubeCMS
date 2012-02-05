@@ -106,7 +106,7 @@ function initToolboxEvents(){
          $(this).next('div.toolbox').trigger('showToolbox', [$(this)]);
       }, 
       function(){
-         $(this).css({'z-index': 1});
+         $(this).css({'z-index': 10000});
    });
    
    $("div.toolbox").bind('showToolbox', function(event, $button){
@@ -139,14 +139,18 @@ function initToolboxEvents(){
    
    // move toolbox with document when scrolling
    $(document).unbind('scroll');
+   
+   if(typeof document.toolboxTop == "undefined"){
+      document.toolboxTop = 30;
+   }
    $(document).scroll(function(){
       var top = $(this).scrollTop();
       toolboxButtons.each(function(){
          var $container = $(this).parent();
-         if($container.offset().top < top+30 && top < $container.offset().top+$container.height()-30){
+         if($container.offset().top < top+document.toolboxTop && top < $container.offset().top+$container.height()-document.toolboxTop){
             $(this).css({
                position : "fixed",
-               top: 30,
+               top: document.toolboxTop,
                left: $(this).offset().left
             });
          } else {
