@@ -2,12 +2,12 @@
 $h1 = $this->category()->getName()
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
-<div data-role="content" class="list">
+<div class="list-posts">
    <?if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model::COLUMN_CONCEPT} == true){
-            $showClass = 'main-content-concept';
+            $showClass = 'concept';
             $public = $this->tr('Koncept').'&nbsp;';
          }
          $editTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
@@ -26,16 +26,19 @@ $h1 = $this->category()->getName()
             }
          }
          ?>
-      <div class="item <?=$showClass?>">
+      <div class="post <?=$showClass?>">
          <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
                title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?></a>
          </h2>
-         <p class="date"><?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></p>
-         
-         <?echo vve_tpl_truncate(strip_tags((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null ? 
-            $article->{Articles_Model::COLUMN_ANNOTATION} : $article->{Articles_Model::COLUMN_TEXT}), 200);?>
-         <hr class="reseter" />
-         <div class="showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model::COLUMN_SHOWED}?>&times;</div>
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+               title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>">
+            <span class="date"><?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+            <span class="text"><?
+               echo vve_tpl_truncate(strip_tags((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null ? 
+               $article->{Articles_Model::COLUMN_ANNOTATION} : $article->{Articles_Model::COLUMN_TEXT}), 200);
+               ?></span>
+            <span class="showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model::COLUMN_SHOWED}?>&times;</span>
+         </a>
          <hr class="reseter" />
       </div>
       <?}?>

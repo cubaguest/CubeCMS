@@ -22,6 +22,7 @@ if(!Template::browser()->isMobile()){
 </div>
 
 <?} else {
+   // mobile version
    function vveMenuMobileRenderFunc($menuArr, $link) {
       foreach ($menuArr as $key => $item) {
          echo ("<li>");
@@ -39,6 +40,7 @@ if(!Template::browser()->isMobile()){
    <ul>
       <?=vveMenuMobileRenderFunc($this->menu, $this->link()) ?>
    </ul>
+   <hr class="reseter" />
 </div>
    <?
 }

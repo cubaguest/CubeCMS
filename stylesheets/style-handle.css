@@ -4,11 +4,11 @@ html,body {
    border: 0px none;
    margin: 0px;
    padding: 0px;
-   font-size: 12px;
    text-align: left;
 }
 
 body {
+   font-size: 82%;
    /*background-color: white;  purple tone for outer space */
 }
 
@@ -47,17 +47,94 @@ body {
 #errMessages { border-color: #ffc7c0; background-color: #ffe3e0;}
 #coreErrMessage { border-color: #ffa095; background-color: #ffb2a9;}
 
+/* base layout */
+#header {
+   background-color: #d19405;
+   color: white;
+   font-weight: bold;
+   padding: 5px;
+}
+#content {
+/*   padding: 0 5px;*/
+   
+}
 
-/* main Menu*/
+#footer {
+   background-color: #FFE7A1;
+}
+#footer h4 {
+   padding: 5px;
+}
+
 #menu-main ul {
+   padding: 5px;
    list-style: none;
-   padding-left: 0;
+   margin: 0;
 }
 #menu-main li {
    float: left;
+   padding-right: 5px;
+   border-right: 1px solid gray;
    margin-right: 5px;
 }
 
+
+h1 {
+   font-size: 110%;
+   padding: 5px;
+   margin: 0;
+   background-color: #FFE7A1;
+   border-bottom: 1px solid gray;
+}
+h2, h4 {
+   margin: 0;
+   padding: 0 0 5px 0;
+   font-size: 100%;
+}
+
+
+/* posts */
+.post {
+   border-bottom: 1px solid gray;
+   background-color: #fdf5ce;
+   padding: 5px;
+}
+
+.list-posts .post {
+   padding-right: 20px;
+   background: inherit url('../images/handle/arrow_right.png') center right no-repeat;
+}
+
+.list-posts .post a {
+   text-decoration: none;
+   color: black;
+   display: block;
+}
+
+.post .date,
+.post .showed {
+   display: block;
+   color: gray;
+   font-size: 82%;
+   padding-bottom: 3px;
+}
+
+
+
+/* special butons */
+.button, .buttonBack,
+#button-no-mobile
+{
+   display: block;
+   padding: 5px 0;
+   text-align: center;
+}
+
+#button-no-mobile {
+   display: block;
+   border-top: 1px solid gray;
+   margin-top: 5px;
+}
 
 /* EOF Modules */
 
@@ -79,3 +156,6 @@ body {
 .file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd, .file-tiff {background-image: url('../images/files/jpg.gif');}
 .dir-icon {background-image: url('../images/icons/folder.png');}
 /* EOF file extension */
+
+/* admin overwrite */
+.toolbox, .toolbox-button { display:  none;}

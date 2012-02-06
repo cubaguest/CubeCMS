@@ -1,5 +1,5 @@
 <?
-if(Template::browser()->isMobile()){
+if(Template::browser()->isMobile() && ( !isset($_COOKIE['mobile'] ) || $_COOKIE['mobile'] == false ) ){
    $this->includeFile("tpl://index_handle.phtml");
    return;
 }

@@ -9,7 +9,7 @@ $this->addFile('css://style-handle.css');
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1"> 
-      {*-PAGE_META_TAGS-*}
+      <!-- {*-PAGE_META_TAGS-*}-->
       <title>{*-PAGE_TITLE-*}</title>
       <base href="<?=Url_Link::getMainWebDir()?>" />
       <link rel="canonical" href="<?=$this->link()->rmParam()?>" />
@@ -19,21 +19,20 @@ $this->addFile('css://style-handle.css');
          document.lang = '<?=Locales::getLang()?>';
          /* ]]> */
       </script>
-      {*-STYLESHEETS-*}
-      {*-JAVASCRIPTS-*}
+      <!-- {*-STYLESHEETS-*}-->
+      <!-- {*-JAVASCRIPTS-*}-->
    </head>
    <body id="pageTop">
       <div data-role="page">
-         <div data-role="header" data-theme="b"><?=VVE_WEB_NAME;?></div>
-      
-      <? $this->includeTpl("messages.phtml", true);?>
-         <div class="content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
+         <div data-role="header" id="header"><?=VVE_WEB_NAME;?></div>
+         <? $this->includeTpl("messages.phtml", true);?>
+         <div data-role="content" id="content" class="module-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
             <? $this->includeTpl("modules.phtml", true); ?>
             <hr class="reseter" />
          </div>
-      <div data-role="footer" data-theme="b">
+         <div data-role="footer" id="footer">
          <? $this->includeTplObj($this->menuObj);?>
-<!--         <a href="<?=$this->link()->clear(true);?>" title="<?=$this->tr("Domů")?>"><?=$this->tr("Domů")?></a>&nbsp;-->
+         <a id="button-no-mobile" href="<?=$this->link()->clear(true);?>" title="<?=$this->tr("Normální zobrazení")?>"><?=$this->tr("Normální zobrazení")?></a>
       </div><!-- footwrap -->
       </div>
    </body>
