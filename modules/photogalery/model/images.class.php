@@ -52,7 +52,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
       }
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ID_ART." = :idart)"
-              ." ORDER BY ".self::COLUMN_ORDER
+              ." ORDER BY ".self::COLUMN_ORDER." ASC"
               .$limit);
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
       $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
