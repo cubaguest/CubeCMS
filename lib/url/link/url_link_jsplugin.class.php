@@ -79,10 +79,10 @@ class Url_Link_JsPlugin extends Url_Link {
     */
    public function __toString() {
       $returnString = Url_Request::getBaseWebDir().self::URL_REQUEST.URL_SEPARATOR;
+      $returnString.=$this->pluginname.URL_SEPARATOR;
       if($this->lang != null) {
          $returnString.=$this->getLang();
       }
-      $returnString.=$this->pluginname.URL_SEPARATOR;
       if($this->category != null) {
          $returnString.=$this->getCategory();
       }
