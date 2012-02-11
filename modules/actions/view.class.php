@@ -10,9 +10,9 @@ class Actions_View extends View {
       if($this->rights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->tr("Přidat akci"),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->tr("Přidat událost"),
          $this->link()->route('add'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou akci'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou událost'));
          $toolbox->addTool($toolAdd);
          
          if($this->rights()->isControll()) {

@@ -27,22 +27,34 @@ class Actions_Panel extends Panel {
             $this->template()->datadir = $this->category()->getModule()->getDataDir(true)
                     .$this->template()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()].URL_SEPARATOR;
             break;
+         case 'past':
+            $model = new Actions_Model;
+            $actions = $model
+               ->setPastOnly($this->category()->getId())
+               ->order( array(Actions_Model::COLUMN_DATE_START => Model_ORM::ORDER_DESC) )
+               ->records();
+            $this->template()->addFile('tpl://actions:panel.phtml');
+            
+            $this->template()->actions = $actions;
+            if ($this->template()->actions === false) return false;
+            $this->template()->datadir = $this->category()->getModule()->getDataDir(true);
+            break;
          case 'list':
          default:
             $model = new Actions_Model_List();
             $actions = $model->getFeaturedActions($this->category()->getId());
             $this->template()->addTplFile('panel.phtml', 'actions');
             $this->template()->actions = $actions->fetchAll();
-            if ($this->template()->action === false) return false;
+            if ($this->template()->actions === false) return false;
             $this->template()->count = $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS);
             break;
       }
       $this->template()->rssLink = $this->link()->route('feed', array('type' => 'rss'));
 	}
 
-   public static function settingsController(&$settings,Form &$form) {
+   protected function settings(&$settings, Form &$form) {
       $elemType = new Form_Element_Select('type', 'Typ panelu');
-      $types = array('Seznam' => 'list', 'Aktuální akce' => 'actual', 'Nadcházející akce' => 'featured');
+      $types = array('Seznam nadcházejících událostí' => 'list', 'Aktuální události' => 'actual', 'Nadcházející události' => 'featured', 'Uplynulé události' => 'past');
       $elemType->setOptions($types);
       $elemType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TYPE, $types).'');
       $form->addElement($elemType,'basic');
@@ -51,8 +63,8 @@ class Actions_Panel extends Panel {
          $form->type->setValues($settings['type']);
       }
 
-      $elemNum = new Form_Element_Text('num', 'Počet akcí v seznamu');
-      $elemNum->setSubLabel('Počet akcí při zapnutém stylu "Seznam".<br /> Výchozí: '.self::DEFAULT_NUM_ACTIONS.'');
+      $elemNum = new Form_Element_Text('num', 'Počet událostí v seznamu');
+      $elemNum->setSubLabel('Počet událostí při zapnutém stylu "Seznam".<br /> Výchozí: '.self::DEFAULT_NUM_ACTIONS.'');
       $elemNum->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemNum,'basic');
 

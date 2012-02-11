@@ -113,7 +113,7 @@ class Actions_Controller extends Controller {
 
    protected function deleteAction($action) {
       $this->deleteActionData($action);
-      $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána'), $action->{Actions_Model_Detail::COLUMN_NAME}));
+      $this->infoMsg()->addMessage(sprintf($this->tr('Událost "%s" byla smazána'), $action->{Actions_Model_Detail::COLUMN_NAME}));
       $this->link()->reload($this->view()->linkBack);
    }
 
@@ -202,7 +202,7 @@ class Actions_Controller extends Controller {
 
          $act = $model->getActionById($ids);
 
-         $this->infoMsg()->addMessage($this->tr('Akce byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
          $this->link()->route('detail', array('urlkey' => $act->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
@@ -305,7 +305,7 @@ class Actions_Controller extends Controller {
             $dir->rename($actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
          }
 
-         $this->infoMsg()->addMessage($this->tr('Akce byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
          $this->link()->route('detail', array('urlkey' => $actionNew->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
@@ -459,7 +459,7 @@ class Actions_Controller extends Controller {
 
    protected function settings(&$settings,Form &$form) {
       $elemTimeWindow = new Form_Element_Text('time', 'Délka časového okna');
-      $elemTimeWindow->setSubLabel('Udává délku časového okna, pomocí kterého se vybírají zobrazené akce.<br /> Výchozí: '.self::DEFAULT_TIMEWINDOW.'');
+      $elemTimeWindow->setSubLabel('Udává délku časového okna, pomocí kterého se vybírají zobrazené události.<br /> Výchozí: '.self::DEFAULT_TIMEWINDOW.'');
       $elemTimeWindow->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemTimeWindow,'view');
 

@@ -2,12 +2,12 @@
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
-   $this->addPageTitle($this->tr('úprava akce'));
+   $this->addPageTitle($this->tr('úprava události'));
    $this->addPageTitle($this->catName);
-   $h1 = $this->tr('úprava akce').' '.$this->catName;
+   $h1 = $this->tr('úprava události').' '.$this->catName;
 } else {
-   $this->addPageTitle($this->tr('přidání akce'));
-   $h1 = $this->tr('přidání akce');
+   $this->addPageTitle($this->tr('přidání události'));
+   $h1 = $this->tr('přidání události');
 }
 // donastavení formuláře
 $this->form->name->html()->setAttrib('size', 60);
