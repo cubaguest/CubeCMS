@@ -32,12 +32,14 @@ class Actions_Panel extends Panel {
             $actions = $model
                ->setPastOnly($this->category()->getId())
                ->order( array(Actions_Model::COLUMN_DATE_START => Model_ORM::ORDER_DESC) )
+               ->limit(0, $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS))
                ->records();
             $this->template()->addFile('tpl://actions:panel.phtml');
             
             $this->template()->actions = $actions;
             if ($this->template()->actions === false) return false;
             $this->template()->datadir = $this->category()->getModule()->getDataDir(true);
+            $this->template()->count = $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS);
             break;
          case 'list':
          default:
