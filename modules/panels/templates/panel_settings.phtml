@@ -1,5 +1,5 @@
 <?
-$h = $this->_('úprava parametrů panelu').' '.$this->catName;
+$h = $this->tr('úprava parametrů panelu').' '.$this->catName;
 $this->addPageTitle($h);
 ?>
 
@@ -8,10 +8,10 @@ $this->addPageTitle($h);
 <?
 if($this->includeTpl != null){
    $this->includeTplObj($this->includeTpl);
-} else if($this->form == null) {
-   print ($this->_('Panel nemá žádné nastavení'));
+} else if($this->form instanceof Form) {
+   echo ($this->form);
 } else {
-   print ($this->form);
+   echo ($this->tr('Panel nemá žádné nastavení'));
 }
 ?>
 </div>

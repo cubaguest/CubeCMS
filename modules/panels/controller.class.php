@@ -337,59 +337,27 @@ class Panels_Controller extends Controller {
    public function panelSettingsController(){
       $this->checkWritebleRights();
 
-      $panelM = new Model_Panel();
-      $panel = $panelM->getPanel($this->getRequest('id'));
-      if($panel === false) return false;
+      $modelPanel = new Model_Panel();
+      $panel = $modelPanel
+      ->joinFK(Model_Panel::COLUMN_ID_CAT)->record($this->getRequest('id'));
+      
+      if($panel == false){ return false; }
+      
       if((string)$panel->{Model_Panel::COLUMN_NAME} != null){
          $this->view()->panelName = $panel->{Model_Panel::COLUMN_NAME};
       } else {
          $this->view()->panelName = $panel->{Model_Category::COLUMN_CAT_LABEL};
       }
-      $this->view()->moduleName = $panel->{Model_Category::COLUMN_MODULE};
-
-      $func = array(ucfirst($panel->{Model_Category::COLUMN_MODULE}).'_Panel','settingsController');
-
-      $form = new Form('settings_', true);
-      $form->addGroup('basic', 'Základní nasatvení');
-      $md5FormEmpty = md5(serialize($form));
-
-      if($panel->{Model_Panel::COLUMN_PARAMS}!= null){
-         $settings = unserialize($panel->{Model_Panel::COLUMN_PARAMS});
-      } else {
-         $settings = array();
+      
+      $category = new Category($panel->{Model_Category::COLUMN_CAT_ID}, false, $panel);
+      $class = ucfirst($category->getModule()->getName()).'_Panel';
+      
+      if(class_exists($class, true)){
+//         $panelObj = new Panel($category, $this->routes());
+         $panelObj = new $class($category, $this->routes(), null, $this->link() );
+         $panelObj->viewSettingsController();
+         $this->view()->form = $panelObj->_getTemplateObj()->form;
       }
-      $settings['_module'] = $panel->{Model_Category::COLUMN_MODULE};
-      call_user_func_array($func, array(&$settings, &$form));
-      unset($settings['_module']);
-
-      // pokud je formulář prázdný
-      if($md5FormEmpty == md5(serialize($form))){
-         $form = null;
-      } else {
-         $form->addGroup('buttons');
-         $elemSend = new Form_Element_SaveCancel('send');
-         $form->addElement($elemSend, 'buttons');
-      }
-
-      if($form != null AND $form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-         $this->link()->route()->reload();
-      }
-
-      if($form != null AND $form->isValid()){
-         // čištění nulových hodnot
-         foreach ($settings as $key => $option){
-            if($option === null OR $option === ''){
-               unset($settings[$key]);
-            }
-         }
-         $panelM->saveParams($this->getRequest('id'), serialize($settings));
-
-         $this->infoMsg()->addMessage($this->tr('Uloženo'));
-         $this->link()->route()->reload();
-      }
-
-      $this->view()->form = $form;
    }
 
 }

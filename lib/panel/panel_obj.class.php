@@ -84,6 +84,29 @@ class Panel_Obj {
    }
 
    /**
+    * Metoda vrací všechny parametry panelu
+    * @return array
+    */
+   public function getParams()
+   {
+      return $this->panelParams;
+   }
+   
+   /**
+    * Metoda uloží všechny parametry panelu
+    * @param array
+    */
+   public function setParams($params)
+   {
+      $this->panelParams = $params;
+      $model = new Model_Panel();
+      $rec = $model->record($this->getId());
+      $rec->{Model_Panel::COLUMN_PARAMS} = serialize($this->panelParams);
+      $model->save($rec);
+   }
+
+   
+   /**
     * Metoda vrací požadovaný parametr
     * @param string $param -- index parametru
     * @param mixed $defaultParam -- výchozí hodnota
@@ -91,8 +114,6 @@ class Panel_Obj {
     */
    public function setParam($param, $value) {
       $this->panelParams[$param] = $value;
-//      $catModel = new Model_Category();
-//      $catModel->saveCatParams($this->getId(), serialize($this->panelParams));
    }
 
    /**

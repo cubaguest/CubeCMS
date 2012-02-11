@@ -55,20 +55,26 @@ abstract class Panel extends TrObject {
     * @param Category $category -- obejkt kategorie
     * @param Routes $routes -- objekt cest pro daný modul
     */
-   function __construct(Category $category, Routes $routes) {
+   function __construct(Category $category, Routes $routes, $template = null, Url_Link $link = null) {
       $this->category = $category;
       $this->panelObj = new Panel_Obj($category->getCatDataObj());
       $this->routes = $routes;
       // locales
       $this->setTranslator(new Translator_Module($category->getModule()->getName()));
 
-      $link = new Url_Link_Module();
-      $link->setModuleRoutes($routes);
-      $link->clear(true)->category($this->category()->getUrlKey());
+      if($link == null){
+         $link = new Url_Link_Module();
+         $link->setModuleRoutes($routes);
+         $link->clear(true)->category($this->category()->getUrlKey());
+      }
       $this->link = $link;
       // locales
       $this->locale = new Locales($category->getModule()->getName());
-      $this->template = new Template_Panel(clone $this->link, $this->category, $this->panelObj);
+      if($template instanceof Template_Panel) {
+         $this->template = $template;
+      } else {
+         $this->template = new Template_Panel(clone $this->link, $this->category, $this->panelObj);
+      }
       $this->template->setTranslator($this->translator());
    }
 
@@ -184,6 +190,44 @@ abstract class Panel extends TrObject {
     * @return array -- fomulár a pole s parametry
     */
    public static function settingsController(&$settings,Form &$form) {
+   }
+   
+   public function viewSettingsController(){
+      $form = new Form('settings_', true);
+      $grpBasic = $form->addGroup('basic', $this->tr('Základní nastavení'));
+      $grpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
+
+      $settings = $this->panelObj()->getParams();
+
+      $settings['_module'] = $this->category()->getModule()->getName();
+
+      if(method_exists($this, 'settings')){
+         $this->settings($settings, $form);
+      } else if(method_exists(ucfirst($this->category()->getModule()->getName()).'_Panel','settingsController')) {
+         Debug::log("settings - static");
+         $func = array(ucfirst($this->category()->getModule()->getName()).'_Panel','settingsController');
+         call_user_func_array($func, array(&$settings, &$form));
+      }
+
+      unset($settings['_module']);
+
+      
+      /* BUTTONS SAVE AND CANCEL */
+      $submitButton = new Form_Element_SaveCancel('send');
+      $form->addElement($submitButton);
+
+      if($form->isSend() AND $form->send->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+      
+      if($form->isValid()){
+         $this->panelObj()->setParams($settings);
+         $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
+         $this->link()->route()->reload();
+      }
+
+      $this->template()->form = $form;
    }
 }
 ?>
