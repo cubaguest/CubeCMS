@@ -65,8 +65,11 @@ class Model_CategoryAdm extends Model_File {
       $obj->{Model_Category::COLUMN_NAME} = (string)$name[0];
       $obj->{Model_Category::COLUMN_MODULE} = (string)$child->module;
       $obj->{Model_Category::COLUMN_PARAMS} = (string)$child->params;
-      $obj->{Model_Category::COLUMN_CAT_ID} = (int)$child['id'];
-
+      $obj->{Model_Category::COLUMN_ID} = (int)$child['id'];
+      $obj->{Model_Category::COLUMN_DATADIR} = null;
+      if(isset($child->datadir)){
+         $obj->{Model_Category::COLUMN_DATADIR} = (string)$child->datadir;
+      }
       return $obj;
    }
 
