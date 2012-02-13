@@ -8,11 +8,8 @@ class GuestBook_Controller extends Controller {
    const DEFAULT_MIN_TEXT_CHARS = 10;
    const DEFAULT_NUM_ON_PAGE = 15;
 
-   const MIN_SEC_FOR_HUMAN = 10;
-
-   const PARAM_CAPCHA_SEC = 'capchasec';
    const PARAM_WISIWIG_EDITOR = 'weditor';
-
+   const PARAM_USE_CAPTCHA = 'uc';
 
    /**
  * Kontroler pro zobrazení textu
@@ -29,24 +26,24 @@ class GuestBook_Controller extends Controller {
 
       $form = new Form('answer_');
 
-      $elemNick = new Form_Element_Text('nick', $this->_('Přezdívka'));
+      $elemNick = new Form_Element_Text('nick', $this->tr('Přezdívka'));
       $elemNick->addValidation(new Form_Validator_NotEmpty());
       $elemNick->addValidation(new Form_Validator_MaxLength(100));
       $form->addElement($elemNick);
 
-      $elemEmail = new Form_Element_Text('email', $this->_('E-mail'));
+      $elemEmail = new Form_Element_Text('email', $this->tr('E-mail'));
       $elemEmail->addValidation(new Form_Validator_NotEmpty());
       $elemEmail->addValidation(new Form_Validator_Email());
       $elemEmail->addValidation(new Form_Validator_MaxLength(50));
       $form->addElement($elemEmail);
 
-      $elemWWW = new Form_Element_Text('www', $this->_('www'));
+      $elemWWW = new Form_Element_Text('www', $this->tr('www'));
       $elemWWW->addValidation(new Form_Validator_Url());
       $elemWWW->addValidation(new Form_Validator_MaxLength(100));
       $elemWWW->addFilter(new Form_Filter_Url());
       $form->addElement($elemWWW);
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $elemText->addValidation(new Form_Validator_MinLength(
               $this->category()->getParam('mintextchars', self::DEFAULT_MIN_TEXT_CHARS)));
@@ -55,28 +52,22 @@ class GuestBook_Controller extends Controller {
       $elemText->addFilter(new Form_Filter_HTMLPurify('p[style],span[style],a[href|title],strong,em,img[src|alt],br,ul,li,ol'));
       $form->addElement($elemText);
 
-      $elemCaptcha = new Form_Element_Hidden('captcha');
-      $elemCaptcha->addValidation(new Form_Validator_NotEmpty());
-      $elemCaptcha->setValues(0);
-      $form->addElement($elemCaptcha);
+      if(!Auth::isLogin() && $this->category()->getParam(self::PARAM_USE_CAPTCHA, true)){
+         $elemCaptcha = new Form_Element_Captcha('captcha');
+         $form->addElement($elemCaptcha);
+      }
 
-      $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
+      $elemSubmit = new Form_Element_Submit('send', $this->tr('Odeslat'));
       $form->addElement($elemSubmit);
 
-      $capchaTime = $this->category()->getParam(self::PARAM_CAPCHA_SEC, self::MIN_SEC_FOR_HUMAN);
       // u přihlášených vypneme chapchu
       if(Auth::isLogin()){
          $form->nick->setValues(Auth::getUserName());
          $form->email->setValues(Auth::getUserMail());
-         $capchaTime = 0;
       }
 
       if($form->isSend()){
          $this->view()->showFrom = true;
-         if($form->captcha->getValues() < $capchaTime){
-            $elemCaptcha->setError($this->_('Příliš rychlé odeslání příspěvku, pravděpodobně SPAM!'));
-            $this->log('Guestbook SPAM from IP: '.$_SERVER['REMOTE_ADDR']);
-         }
       }
 
       if($form->isValid()){
@@ -93,7 +84,7 @@ class GuestBook_Controller extends Controller {
             $newItem->{GuestBook_Model::COLUMN_CLIENT} = $_SERVER['HTTP_USER_AGENT'];
          }
          $model->save($newItem);
-         $this->infoMsg()->addMessage($this->_('Příspěvek byl uložen'));
+         $this->infoMsg()->addMessage($this->tr('Příspěvek byl uložen'));
          $this->link()->param('s')->reload();
       }
       $this->view()->form = $form;
@@ -106,12 +97,12 @@ class GuestBook_Controller extends Controller {
          $elemId->addValidation(new Form_Validator_IsNumber());
          $delForm->addElement($elemId);
 
-         $elemSubDel = new Form_Element_Submit('delete', $this->_('Smazat'));
+         $elemSubDel = new Form_Element_Submit('delete', $this->tr('Smazat'));
          $delForm->addElement($elemSubDel);
 
          if($delForm->isValid()){
             $model->delete($delForm->id->getValues());
-            $this->infoMsg()->addMessage($this->_('Položka byla smazána'));
+            $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
             $this->link()->reload();
          }
          $this->view()->formDel = $delForm;
@@ -127,7 +118,6 @@ class GuestBook_Controller extends Controller {
 
       $this->view()->posts = $model->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
       $this->view()->scrollComp = $scrollComponent;
-      $this->view()->capchaTime = $capchaTime;
    }
 
    /**
@@ -172,14 +162,14 @@ class GuestBook_Controller extends Controller {
       if(isset($settings[self::PARAM_WISIWIG_EDITOR])) {
          $form->weditor->setValues($settings[self::PARAM_WISIWIG_EDITOR]);
       }
-
-      $elemCapchaSec = new Form_Element_Text('capchatime', $this->tr('Po kolika sekundách lze formulář odeslat'));
-      $elemCapchaSec->setSubLabel($this->tr(sprintf('Výchozí: %s sekund (obrana proti spamu). Pokud je 0, kontrola je vypnuta.', self::MIN_SEC_FOR_HUMAN)));
-      $elemCapchaSec->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
-      $form->addElement($elemCapchaSec, $fGrpNewItem);
-      if(isset($settings[self::PARAM_CAPCHA_SEC])) {
-         $form->capchatime->setValues($settings[self::PARAM_CAPCHA_SEC]);
+      
+      $elemCaptcha = new Form_Element_Checkbox('captcha', $this->tr('Ověření uživatele'));
+      $elemCaptcha->setValues(true);
+      $elemCaptcha->setSubLabel($this->tr('Přidá do formuláře ověření pomocí opsání znaků.'));
+      if(isset($settings[self::PARAM_USE_CAPTCHA])) {
+         $elemCaptcha->setValues($settings[self::PARAM_USE_CAPTCHA]);
       }
+      $form->addElement($elemCaptcha, $fGrpNewItem);
 
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
@@ -187,7 +177,7 @@ class GuestBook_Controller extends Controller {
          $settings['maxtextchars'] = $form->maxtextchars->getValues();
          $settings['mintextchars'] = $form->mintextchars->getValues();
          $settings[self::PARAM_WISIWIG_EDITOR] = $form->weditor->getValues();
-         $settings[self::PARAM_CAPCHA_SEC] = (int)$form->capchatime->getValues();
+         $settings[self::PARAM_USE_CAPTCHA] = $form->captcha->getValues();
       }
    }
 }

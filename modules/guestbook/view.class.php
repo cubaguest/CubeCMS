@@ -14,7 +14,7 @@ class GuestBook_View extends View {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_DELETE);
          $toolRemove = new Template_Toolbox2_Tool_Form($this->formDel);
-         $toolRemove->setIcon(Template_Toolbox2::ICON_DELETE)->setConfirmMeassage($this->_('Opravdu smazat příspěvek?'));
+         $toolRemove->setIcon(Template_Toolbox2::ICON_DELETE)->setConfirmMeassage($this->tr('Opravdu smazat příspěvek?'));
 //            $toolRemove->getForm()->id->setValues((int)$row->{GuestBook_Model_Detail::COL_ID});
          $toolbox->addTool($toolRemove);
          $this->toolboxItem = $toolbox;
