@@ -148,18 +148,23 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       }
       foreach ($this->childrens as $key => $child) {
          $child->withHidden($this->withHidden);
-         if(isset ($catArray[$child->getId()])
-            AND (Auth::isAdmin() OR $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT][0] == 'r' OR Auth::getUserId() == $catArray[$child->getId()][Model_Category::COLUMN_ID_USER_OWNER]) // práva ke kategorii
-            AND ($this->withHidden // všechny zkryté bez rozdílu
-               OR ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL) // viditelné všem
-               OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
-               OR (Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
-               OR (Auth::isAdmin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
-               OR (Auth::isAdminGroup() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN_ALL) // viditelné adminům ze všech domén
+         if(isset ($catArray[$child->getId()])) {
+            // načtení práva
+            $right = $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT] != null 
+               ? $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT] : $catArray[$child->getId()][Model_Category::COLUMN_DEF_RIGHT];
+
+            if( (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $catArray[$child->getId()][Model_Category::COLUMN_ID_USER_OWNER]) 
+               AND ($this->withHidden // všechny zkryté bez rozdílu
+                  OR ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL) // viditelné všem
+                  OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
+                  OR (Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
+                  OR (Auth::isAdmin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
+                  OR (Auth::isAdminGroup() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN_ALL) // viditelné adminům ze všech domén
                )) {
-               $child->setCategories($catArray);
-         } else {
-            unset ($this->childrens[$key]);
+                  $child->setCategories($catArray);
+            } else {
+               unset ($this->childrens[$key]);
+            }
          }
       }
    }

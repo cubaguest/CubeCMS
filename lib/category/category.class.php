@@ -90,7 +90,8 @@ class Category extends Category_Core {
       if(Auth::isAdmin() || $this->getIdOwner() == Auth::getUserId() ){
          $this->categoryRights->addRight('rwc');
       } else {
-         $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT});
+         $this->categoryRights->addRight($this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT} != null 
+            ? $this->getCatDataObj()->{Model_Rights::COLUMN_RIGHT} : $this->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT});
       }
    }
 
