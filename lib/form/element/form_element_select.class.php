@@ -54,6 +54,15 @@ class Form_Element_Select extends Form_Element {
    }
 
    /**
+    * metoda přidá hodnotu do voleb
+    * @param string/int $name -- název volby
+    * @param string/int $value -- hodnota volby
+    */
+   public function addOption($name, $value){
+      $this->options[$name] = $value;
+   }
+
+      /**
     * Metoda vrací volby
     * @return Array -- pole s volbami
     */
