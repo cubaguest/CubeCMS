@@ -98,13 +98,22 @@ class Model_Panel extends Model_ORM {
    public function withRights($catColumns = null, $rightColumns = array())
    {
       $rightColumns = array_merge(array(
-         Model_Rights::COLUMN_ID_GROUP, Model_Rights::COLUMN_RIGHT => 'IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cat.'
-            .Model_Category::COLUMN_DEF_RIGHT.')' ), $rightColumns);
+         Model_Rights::COLUMN_ID_GROUP, Model_Rights::COLUMN_RIGHT, 
+//         'right_assign' => 'IFNULL(`t_r`.`'.Model_Rights::COLUMN_RIGHT.'`,  `t_cat`.`'.Model_Category::COLUMN_DEF_RIGHT.'`)' 
+         ),
+         $rightColumns);
       
       $this->joinFK(array('t_cat' => self::COLUMN_ID_CAT), $catColumns)
          ->join(array('t_cat' => Model_Rights::COLUMN_ID_CATEGORY), array('t_r' => 'Model_Rights'), null,
             $rightColumns, self::JOIN_LEFT, ' AND t_r.'.Model_Rights::COLUMN_ID_GROUP . ' = :idgrp', array('idgrp' => (int)Auth::getGroupId()));
       return $this;
+   }
+   
+   public function onlyWithAccess()
+   {
+      return $this->withRights()->where(" ( SUBSTRING(`".Model_Rights::COLUMN_RIGHT."`, 1, 1) = 'r' OR "
+         ." ( `".Model_Rights::COLUMN_RIGHT."` IS NULL AND SUBSTRING(`".Model_Category::COLUMN_DEF_RIGHT."`, 1, 1) = 'r' )) ", 
+         array(), true);
    }
    
    public function setGroupPermissions() {

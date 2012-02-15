@@ -123,7 +123,7 @@ class Model_Category extends Model_ORM {
    public function withRights()
    {
       $this->join(Model_Category::COLUMN_CAT_ID, array('t_r' => 'Model_Rights'), null,
-                  array(Model_Rights::COLUMN_ID_GROUP, 'right' => 'IFNULL(t_r.'.Model_Rights::COLUMN_RIGHT.',  t_cats.'.self::COLUMN_DEF_RIGHT.')' ), self::JOIN_LEFT,
+                  array(Model_Rights::COLUMN_ID_GROUP, Model_Rights::COLUMN_RIGHT), self::JOIN_LEFT,
                   ' AND t_r.'.Model_Rights::COLUMN_ID_GROUP . ' = :idgrp', array('idgrp' => (int)Auth::getGroupId()));
       return $this;
    }
@@ -151,6 +151,13 @@ class Model_Category extends Model_ORM {
          self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
       }
       return self::$allCatsRecords;
+   }
+   
+   public function onlyWithAccess()
+   {
+      return $this->withRights()->where(" ( SUBSTRING(`".Model_Rights::COLUMN_RIGHT."`, 1, 1) = 'r' OR "
+         ." ( `".Model_Rights::COLUMN_RIGHT."` IS NULL AND SUBSTRING(`".Model_Category::COLUMN_DEF_RIGHT."`, 1, 1) = 'r' )) ", 
+         array(), true);
    }
 
    /**
