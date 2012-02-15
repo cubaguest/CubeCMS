@@ -868,19 +868,14 @@ class AppCore extends TrObject {
        */
       $panelsM = new Model_Panel();
       $panelsM
-            // slupce z kategorie
-         ->withRights()
-         ->columns(array('*',
-            // sloupce z panelu
-            Model_Category::COLUMN_ID => Model_Panel::COLUMN_ID_CAT,
-         ))
-         ->order(array(Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC))
-         ->setSelectAllLangs(false);
+         ->setSelectAllLangs(false)
+         ->onlyWithAccess()
+         ->order(array(Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC));
       // výběr jestli se zpracovávají individuální panely nebo globální
       if(self::$category->isIndividualPanels()) {
-         $panelsM->where(Model_Panel::COLUMN_ID_SHOW_CAT." = :idc AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array('idc' => self::$category->getId()), true);
+         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = :idc AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array('idc' => self::$category->getId()), true);
       } else {
-         $panelsM->where(Model_Panel::COLUMN_ID_SHOW_CAT." = 0 AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array(), true);
+         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = 0 AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array(), true);
       }
       $panels = $panelsM->records();
 
@@ -947,7 +942,12 @@ class AppCore extends TrObject {
     */
    public function runCoreModule()
    {
-      $className = 'Module_'.ucfirst(self::$category->getModule()->getName());
+      $module = 'Module_'.ucfirst(self::$category->getModule()->getName());
+      // forbiden access ?
+      if( !self::$category->getRights()->isReadable() && !self::$category->getRights()->isWritable() && !self::$category->getRights()->isControll() ){
+         $module = 'Module_DenyPage';
+      }
+      $className = $module;
       if(class_exists($className)){
          $ctrl = new $className(self::$category);
       } else {

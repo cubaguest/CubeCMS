@@ -9,22 +9,33 @@
  * @abstract 		Třída pro obsluhu chybové stránky
  */
 class Module_ErrPage extends Module_Core {
-   private static $code = 404;
+   protected static $code = 404;
 
    public function runController() {
       switch ($this->getCode()) {
+         case 403:
+            Template_Output::addHeader("HTTP/1.0 403 Forbidden");
+            if(VVE_DEBUG_LEVEL > 0){
+               Log::msg('Neoprávněný přístup na stránku: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
+            }
+            break;
          case 404:
          default:
             Template_Output::addHeader("HTTP/1.0 404 Not Found");
+            if(VVE_DEBUG_LEVEL > 0){
+               Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
+            }
             break;
-      }
-      if(VVE_DEBUG_LEVEL > 0){
-         Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
       }
    }
 
    public function runView() {
       switch ($this->getCode()) {
+         case 403:
+            Template_Core::setPageTitle($this->tr('K požadované stránce nemáte přístup'));
+            Template_Output::addHeader("HTTP/1.0 403 Forbidden");
+            $this->template()->addTplFile('error/403.phtml');
+            break;
          case 404:
          default:
             Template_Core::setPageTitle($this->tr('Chyba: stránka nenalezena'));
@@ -36,6 +47,9 @@ class Module_ErrPage extends Module_Core {
 
    public function runTxtView() {
       switch ($this->getCode()) {
+         case 403:
+            echo $this->tr('CHYBA: K požadované stránce nemáte přístup');
+            break;
          case 404:
          default :
             echo $this->tr('CHYBA: Stránka nenalezena');

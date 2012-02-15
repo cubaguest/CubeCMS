@@ -17,7 +17,8 @@ class Module_Core extends TrObject {
    private $category = null;
 
 
-   public function __construct(Category_Core $moduleCategory) {
+   public function __construct(Category_Core $moduleCategory) 
+   {
       $this->link = new Url_Link();
       $this->template = new Template($this->link);
       $this->category = $moduleCategory;
@@ -28,23 +29,23 @@ class Module_Core extends TrObject {
     * Metoda vrací název modulu
     * @return string
     */
-   public function getName() {
+   public function getName() 
+   {
       return $this->name;
    }
 
-   public function runController() {
+   public function runController() 
+   {}
 
-   }
-
-   public function runView() {
-
-   }
+   public function runView() 
+   {}
 
    /**
     * Metoda vrací aktuální odkaz
     * @return Url_Link 
     */
-   public function link() {
+   public function link() 
+   {
       return $this->link;
    }
 
@@ -52,7 +53,8 @@ class Module_Core extends TrObject {
     * Metoda vrací objekt šablony
     * @return Template
     */
-   public final function template() {
+   public final function template() 
+   {
       return $this->template;
    }
 }
