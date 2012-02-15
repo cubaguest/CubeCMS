@@ -15,6 +15,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'remove_script_host' => true,
       'content_css' => null,
       'PHPSESSID' => null,
+      'cid' => null,
       'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|name|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
       'forced_root_block' => 'p',
       'theme_advanced_toolbar_location' => 'top',
@@ -30,11 +31,11 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
 
    );
 
-   protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','advimage','advlink',
+   protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','advimage',/*'cubeadvimage', */'advlink',
       'advlist','emotions','iespell','tabfocus','noneditable','nondeletable',
       'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality','autoresize',
       'fullscreen','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists', 'autolink',
-      'imgalign', 'imgpreview', 'cubephotogalery' // Cube-CMS plugins
+      'imgalign', 'imgpreview', 'cubephotogalery', 'cubehelpers' // Cube-CMS plugins
       );
 
    protected $defaultButtons = array(
@@ -43,7 +44,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_buttons2' => array('cut','copy','paste','pastetext','pasteword','|','search','replace','|','bullist',
          'numlist','|','outdent','indent','blockquote','|','link','unlink','anchor','cleanup','code','|','forecolor','backcolor'),
       'theme_advanced_buttons3' => array('tablecontrols','|','hr','removeformat','visualaid','|','sub','sup','|','charmap','|', 'styleprops'),
-      'theme_advanced_buttons4' => array('image','cubephotogalery','emotions','media','template','|','imgmap', 'imgpreview','|','imgal','imgar') // Cube-CMS buttons
+      'theme_advanced_buttons4' => array('image','cubephotogalery','emotions','media','template','|','imgmap', 'imgpreview','|','imgal','imgar','|','insparbegin', 'insparend') // Cube-CMS buttons
    );
 
    private $fileBrowserFunction = 'function vveTinyMCEFileBrowser (field_name, url, type, win) {
@@ -54,6 +55,8 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
    }, { window : win,input : field_name,listType : type,cat : tinyMCE.activeEditor.getParam(\'category_id\'), url:url });
    return false;
    }';
+   
+   private $setupFunction = null;
 
 
    public function  __construct() {
@@ -77,6 +80,9 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
          $this->advSettings['content_css'] = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
       }
       $this->advSettings['editorid'] = session_id();
+      $this->advSettings['cid'] = Category::getSelectedCategory()->getId();
+      $this->createSetupFunction();
+      $this->advSettings['setup'] = $this->setupFunction;
       $this->settings = array_merge($this->settings, $this->advSettings);
    }
 
@@ -93,6 +99,23 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
 
          $this->advSettings['style_formats'] = file_get_contents(str_replace(VVE_SUB_SITE_DIR.DIRECTORY_SEPARATOR, null, Template::faceDir()).'jscripts'.DIRECTORY_SEPARATOR.'tinymce_styles_'.Locales::getLang().'.js');
       }
+   }
+   
+   private function createSetupFunction()
+   {
+      $setupFunc = 'function(ed) {';
+      
+      
+//      $setupFunc .= 
+//      'ed.onBeforeSetContent.add(function(ed, o) {
+//          if(o.content == ""){
+//            o.content = "<p>'.$this->tr('Zde vytvořte obsah stránky').'.</p>";
+//          }
+//      });';
+
+      
+      $setupFunc .= '}';
+      $this->setupFunction = $setupFunc;
    }
 }
 ?>

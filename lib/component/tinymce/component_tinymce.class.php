@@ -19,6 +19,7 @@ class Component_TinyMCE extends Component {
     */
    const CFG_ALLOW_INTERNAL_SOURCES = "allowintsources";
    const CFG_ALLOW_INTERNAL_TPLS = "allowtpls";
+   const CFG_ALLOW_UPLOAD = "allowupload";
 
    private $jsPlugin = null;
 

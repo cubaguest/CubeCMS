@@ -15,7 +15,7 @@ class Component_TinyMCE_Photogalery extends Component_TinyMCE {
       if(isset ($_POST['dir']) AND $_POST['dir'] != null){
          $dir = vve_cr_safe_file_name($_POST['dir']);
       } else {
-         $dir = date('Ymd-Hm');
+         $dir = date('Ymd-Hm').'-'.Auth::getUserName();
       }
       
       $uploadDir = AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
