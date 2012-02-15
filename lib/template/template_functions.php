@@ -37,7 +37,7 @@ function vve_get_tpl_file($file, $type) {
  * @author Gabi Solomon
  * @link http://www.gsdesign.ro/blog/cut-html-string-without-breaking-the-tags/
  */
-function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false, $considerHtml = false)
+function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false, $considerHtml = true)
 {
    // only execute if text is longer than desired length
    if (strlen(strip_tags($text)) > $length) {
@@ -113,13 +113,15 @@ function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false
          }
       }
       // if the words shouldn't be cut in the middle...
-      if (!$exact) {
+      if ($exact) {
          // ...search the last occurance of a space...
+         /* THIS NOT WORK CORECTLY. REmove ending tags and not add to opened
+          
          $spacepos = strrpos($truncate, ' ');
          if (isset($spacepos)) {
             // ...and cut the text in this position
             $truncate = substr($truncate, 0, $spacepos);
-         }
+         }*/
       }
       // add the defined ending to the text
       $truncate .= $ending;
