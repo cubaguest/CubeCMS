@@ -14,7 +14,7 @@
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME = 'base';
    const JQUERY_VERSION = '1.7.1';
-   const JQUERY_UI_VERSION = '1.8.14';
+   const JQUERY_UI_VERSION = '1.8.17';
 
    const FACE_THEME_DIR = 'jqueryui';
 
@@ -228,6 +228,7 @@ class JsPlugin_JQuery extends JsPlugin {
    public function addUIButton() {
       $this->addUICore();
       $this->addUIWidget();
+      $this->addCss("button");
       $this->addJs("ui.button");
       return $this;
    }
@@ -241,6 +242,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUIWidget();
       $this->addUIPosition();
       $this->addJs("ui.autocomplete");
+      $this->addCss("autocomplete");
       return $this;
    }
 
