@@ -165,6 +165,8 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
             } else {
                unset ($this->childrens[$key]);
             }
+         } else {
+            unset ($this->childrens[$key]);
          }
       }
    }
