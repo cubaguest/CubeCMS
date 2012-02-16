@@ -55,7 +55,7 @@ class Actions_Controller extends Controller {
       $actions = $acM->getActions($this->category()->getId(), $currentDateO, $dateNext,
               !$this->getRights()->isWritable());
 
-      $this->view()->actions = $actions;
+      $this->view()->actions = $actions->fetchAll();
       $this->view()->dateFrom = $currentDateO;
       $this->view()->dateTo = $dateNext;
 

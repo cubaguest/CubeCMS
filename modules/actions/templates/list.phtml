@@ -19,7 +19,7 @@ echo $this->toolbox; // tolbox pro přidání
    </div>
 
    <div class="main-content-list-records">
-   <?while ($row = $this->actions->fetch()) {
+   <?foreach ($this->actions as $row) {
       if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
       else $class = 'main-content-no-public';
       $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
