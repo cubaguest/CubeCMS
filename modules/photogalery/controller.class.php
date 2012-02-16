@@ -592,32 +592,30 @@ class Photogalery_Controller extends Controller {
       
       if($form->isValid()){
          // resize images if need
-         // small
-         if(!isset($settings['small_width'])){ $settings['small_width'] = null; }
-         if(!isset($settings['small_height'])){ $settings['small_height'] = null; }
-         if(!isset($settings['small_crop'])){ $settings['small_crop'] = null; }
+         if($form->resizeImages->getValues() == true){
+            // zjištění původsních a nových velikostí
+            $origSmallW = isset($settings['small_width']) ? $settings['small_width'] : VVE_IMAGE_THUMB_W;
+            $origSmallH = isset($settings['small_height']) ? $settings['small_height'] : VVE_IMAGE_THUMB_H;
+            $origSmallC = isset($settings['small_crop']) ? $settings['small_crop'] : VVE_IMAGE_THUMB_CROP;
+            $origMedW = isset($settings['medium_width']) ? $settings['medium_width'] : VVE_DEFAULT_PHOTO_W;
+            $origMedH = isset($settings['medium_height']) ? $settings['medium_height'] : VVE_DEFAULT_PHOTO_H;
+            $origMedC = isset($settings['medium_crop']) ? $settings['medium_crop'] : false;
+            
+            $newSmallW = $form->small_width->getValues() != null ? $form->small_width->getValues() : VVE_IMAGE_THUMB_W;
+            $newSmallH = $form->small_height->getValues() != null ? $form->small_height->getValues() : VVE_IMAGE_THUMB_H;
+            $newSmallC = $form->small_crop->getValues() != null ? $form->small_crop->getValues() : VVE_IMAGE_THUMB_CROP;
+            $newMedW = $form->medium_width->getValues() != null ? $form->medium_width->getValues() : VVE_DEFAULT_PHOTO_W;
+            $newMedH = $form->medium_height->getValues() != null ? $form->medium_height->getValues() : VVE_DEFAULT_PHOTO_H;
+            $newMedC = $form->medium_crop->getValues() != null ? $form->medium_crop->getValues() : false;
+            
+            // small
+            if( $origSmallW != $newSmallW || $origSmallH != $newSmallH || $origSmallC != $newSmallC ){
+               $this->resizeImages($newSmallW, $newSmallH, $newSmallC, self::DIR_SMALL);
+            }
          
-         if( $settings['small_width'] != $form->small_width->getValues()
-            || $settings['small_height'] != $form->small_height->getValues() 
-            || $settings['small_crop'] != $form->small_crop->getValues() ){
-            $this->resizeImages(
-               $form->small_width->getValues(), 
-               $form->small_height->getValues(), 
-               $form->small_crop->getValues(), self::DIR_SMALL);
-         }
-         
-         // big
-         if(!isset($settings['medium_width'])){ $settings['medium_width'] = null; }
-         if(!isset($settings['medium_height'])){ $settings['medium_height'] = null; }
-         if(!isset($settings['medium_crop'])){ $settings['medium_crop'] = null; }
-
-         if($settings['medium_width'] != $form->medium_width->getValues()
-            || $settings['medium_height'] != $form->medium_height->getValues() 
-            || $settings['medium_crop'] != $form->medium_crop->getValues() ){
-            $this->resizeImages(
-               $form->medium_width->getValues(), 
-               $form->medium_height->getValues(), 
-               $form->medium_crop->getValues(), self::DIR_MEDIUM);
+            if( $origMedW != $newMedW || $origMedH != $newMedH || $origMedC != $newMedC ){
+               $this->resizeImages($newMedW, $newMedH, $newMedC, self::DIR_MEDIUM);
+            }
          }
          
          // save options
