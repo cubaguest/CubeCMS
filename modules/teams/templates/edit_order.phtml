@@ -1,0 +1,91 @@
+<?
+// do titulku
+$h = $this->tr('úprava pořadí osob');
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+<h1><?= $h ?></h1>
+<div class="main-content-form-edit" id="orderform">
+   <? echo $this->form->renderStart(); ?>
+      <div id="teams-list">
+         <?
+         $curGroup = -1;
+         foreach ($this->teams as $id => $team) {
+            ?>
+            <div id="team-id-<?=$id?>" class="team ui-widget ui-widget-content">
+               <h2 class="ui-widget-header" title="<?ps($team['name'])?>"><?ps( $team['name'])?></h2>
+               <? // form 
+               $this->form->teamId->setDimensional($id);
+               $this->form->teamId->setValues($id);
+               echo $this->form->teamId;
+               
+               $this->form->teamOrder->setDimensional($id);
+               $this->form->teamOrder->setValues($team['order']);
+               echo $this->form->teamOrder;
+               ?>
+               
+               <div class="persons-list">
+            <?  foreach ($team['persons'] as $person){?>
+                  <div class="ui-state-default person">
+                     <img src="<?=$this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
+                          alt="<?ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" /><br />
+                     <?
+                     ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME});
+                     
+                     $this->form->personTeamId->setDimensional($person->{Teams_Model_Persons::COLUMN_ID});
+                     $this->form->personTeamId->setValues($person->{Teams_Model_Persons::COLUMN_ID_TEAM});
+                     echo $this->form->personTeamId;
+                     $this->form->personOrd->setDimensional($person->{Teams_Model_Persons::COLUMN_ID});
+                     $this->form->personOrd->setValues($person->{Teams_Model_Persons::COLUMN_ORDER});
+                     echo $this->form->personOrd;
+                     ?>
+                  </div>
+            <?}?>
+               </div>
+               <hr class="reseter" />
+            </div>
+         <?}?>
+      </div>
+      <p><?=$this->form->removeEmptyTeams->label()?><?=$this->form->removeEmptyTeams->controllAll()?></p>
+      <p><?=$this->form->save->label()?><?=$this->form->save->controllAll()?></p>
+   <? echo $this->form->renderEnd(); ?>
+      <ul class="text">
+         <li><?=$this->tr("Pro změnu pořadí stačí osobu uchopit a přesunout.")?></li>
+         <li><?=$this->tr("Pro přesun skupiny je nutné skupinu uchopit za její nadpis.")?></li>
+         <li><?=$this->tr("Pokud bude skupina při ukládání prázdná, dojde k jejímu smazání.")?></li>
+      </ul>
+   <script>
+	   $(function() {
+         $( "#teams-list" ).sortable({ 
+            placeholder: "ui-state-highlight", 
+            cursor: 'move', forcePlaceholderSize: true, 
+            handle: 'h2',
+            update: function(event, ui) {
+               $(this).find('.team').each(function(index){
+                  $(this).find('.person_order_teamOrder_class').val(index+1);
+               });
+            }
+         });
+         $( "#teams-list" ).disableSelection();
+         // persons
+         $( ".persons-list" ).sortable({
+            placeholder: "ui-state-highlight", cursor: 'move', forcePlaceholderSize: true,
+            connectWith: ".persons-list", items : "div.person",
+            update: function(event, ui) {
+               $(this).find('.person').each(function(index){
+                  $(this).find('.person_order_personOrd_class').val(index+1);
+               });
+            },
+            receive : function(){
+               var newGrp = $(this).parents(".team").find(".person_order_teamId_class").val();
+               $(this).find(".person_order_personTeamId_class").val(newGrp);
+            }
+         });
+         $( ".persons-list" ).disableSelection();
+   	});
+	</script>
+</div>

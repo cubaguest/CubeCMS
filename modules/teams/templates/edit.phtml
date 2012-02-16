@@ -1,0 +1,23 @@
+<?
+// do titulku
+if($this->edit) {
+   $h = sprintf($this->tr('úprava osoby "%s"'),$this->person->{Teams_Model_Persons::COLUMN_NAME}.' '.$this->person->{Teams_Model_Persons::COLUMN_SURNAME});
+} else {
+   $h = $this->tr('přidání osoby');
+}
+$this->addPageTitle($h);
+// donastavení formuláře
+$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
+$this->form->degree->html()->setAttrib('size', 5);
+
+if(isset ($this->form->imgdel)){
+   $this->form->imgdel->setSubLabel($this->tr('Uložen portrét:').'<br /><img src="'.$this->category()->getModule()->getDataDir(true).$this->person->{Teams_Model_Persons::COLUMN_IMAGE}
+   .'" alt="'.$this->person->{Teams_Model_Persons::COLUMN_IMAGE}.'" width="100" />');
+}
+?>
+<h1><?ps($h)?></h1>
+<div class="main-content-form-edit">
+   <?
+   echo($this->form);
+   ?>
+</div>

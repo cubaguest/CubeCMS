@@ -1,0 +1,91 @@
+<?
+/* VARS:
+ * $this->teams = array('name' => 'group name' , 'persons' => 'array of MODEL_ORM_RECORD with person obj')
+ * 
+ */
+
+$this->addFile('css://style.css');
+?>
+<h1><?ps($this->category()->getName())?></h1>
+<div class="list" id="people-list">
+   <div id="teams-list" class="item">
+      <?foreach ($this->teams as $team) {
+         if(empty ($team['persons']) ){
+            continue;
+         }
+         ?>
+      <h2><?ps($team['name'])?></h2>
+      <ul class="team">
+         <?foreach ($team['persons'] as $person){
+            $name = null;
+            if($person->{Teams_Model_Persons::COLUMN_DEGREE} != null){
+               $name .= $person->{Teams_Model_Persons::COLUMN_DEGREE}.' ';
+            }
+            $name .= $person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME}." ".$person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER};
+            
+            ?>
+         <li class="person">
+            <img src="<?=$this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
+                 alt="<?ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" class="person-image"/>
+            <h3 id="team-person-<?=$person->{Teams_Model_Persons::COLUMN_ID}?>"><?ps($name)?></h3>
+            <div class="text"><?=$person->{Teams_Model_Persons::COLUMN_TEXT}?></div>
+            
+            <?if($this->toolboxEdit != null){
+               $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
+               $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{Teams_Model_Persons::COLUMN_ID});
+               echo $this->toolboxEdit;
+            }?>
+            <hr class="reseter" />
+         </li>   
+         <?
+         } ?>
+      </ul>
+      <hr class="reseter" />
+      <?}?>
+            
+         <?/*   // create name
+            $name = null;
+            if($person->{Teams_Model_Persons::COLUMN_DEGREE} != null){
+               $name .= $person->{Teams_Model_Persons::COLUMN_DEGREE}.' ';
+            }
+            
+            $name .= $person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME}." ".$person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER};
+            
+            // start block
+            if($curGroup != $person->{Teams_Model_Persons::COLUMN_GROUP_NAME}){
+               $curGroup = $person->{Teams_Model_Persons::COLUMN_GROUP_NAME};
+            ?>
+            <div class="group">
+               <h2 class="" title="<?ps($person->{Teams_Model_Persons::COLUMN_GROUP_NAME})?>"
+                   ><?ps( $person->{Teams_Model_Persons::COLUMN_GROUP_NAME} != null ? $person->{Teams_Model_Persons::COLUMN_GROUP_NAME} : $this->tr('Nezařazeno'))?></h2>
+               <div class="persons-list">
+            <?}?>
+                  <div class="person">
+                     <img src="<?=$this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
+                          alt="<?ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>"
+                          class="person-image"/>
+                     <h3 id="person-<?=$person->{Teams_Model_Persons::COLUMN_ID}?>"><?ps($name." order: ".(string)$person->{Teams_Model_Persons::COLUMN_ORDER});?></h3>
+                     <div class="text">
+                        <?=$person->{Teams_Model_Persons::COLUMN_TEXT}?>
+                     </div>
+                     <hr class="reseter" />
+                     <?
+                     if($this->toolboxEdit != null){
+//                        $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
+//                        $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{Teams_Model_Persons::COLUMN_ID});
+//                        echo $this->toolboxEdit;
+                     }
+                     ?>
+                  </div>
+            <? // end of block
+            if(!isset ($this->people[$index+1]) || $this->people[$index+1]->{Teams_Model_Persons::COLUMN_GROUP_NAME} != $curGroup){?>
+               </div>
+               <hr class="reseter" />
+            </div>
+            <?}?>
+         <?}*/?>
+   </div>
+</div>
+<?
+   echo $this->toolbox;// TOOLBOXY
+?>

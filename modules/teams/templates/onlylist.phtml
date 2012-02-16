@@ -1,0 +1,44 @@
+<?
+function printDegree($degree) {
+   if ($degree != null) {
+      echo $degree;
+      if ($degree[strlen($degree) - 1] != '.') {
+         echo '.';
+      }
+      echo '&nbsp;';
+   }
+}
+?>
+<?
+   if(!empty ($vars['people'])) {
+      foreach ($vars['people'] as $preson) {
+         ?>
+   <div class="main-content-list-record module-people-preson" id="preson-<?=$preson->{People_Model::COLUMN_ID}?>"><?
+      echo '<'.$vars['hE'].' class="'.$vars['hEClass'].'" id="lecturer-'.$preson->{People_Model::COLUMN_ID}.'">';
+      printDegree($preson->{People_Model::COLUMN_DEGREE});
+      echo $preson->{People_Model::COLUMN_NAME}.'&nbsp;';
+      echo $preson->{People_Model::COLUMN_SURNAME}.'&nbsp;';
+      printDegree($preson->{People_Model::COLUMN_DEGREE_AFTER});
+      echo '</'.$vars['hE'].'>';
+      ?>
+      <div class="main-content-list-record-text">
+         <?if($preson->{People_Model::COLUMN_IMAGE} != null){?>
+         <div class="main-content-list-record-image module-people-person-image">
+                  <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir().$preson->{People_Model::COLUMN_IMAGE}, $preson->{People_Model::COLUMN_IMAGE}, 140);?>
+         </div>
+         <?}?>
+         <?echo $preson->{People_Model::COLUMN_TEXT};?>
+         <?
+         if($this->toolboxEdit != null){
+            $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $preson->{People_Model::COLUMN_ID})));
+            $this->toolboxEdit->person_del_->getForm()->id->setValues($preson->{People_Model::COLUMN_ID});
+            echo $this->toolboxEdit;
+         }
+         ?>
+      <hr class="reseter" />
+      </div>
+   </div>
+         <?}
+   } else {
+      echo ($this->tr('Není vložen žádný člověk'));
+   }?>

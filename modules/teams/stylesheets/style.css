@@ -1,0 +1,42 @@
+/* css for edit order */
+#orderform #teams-list .team  {
+   clear: both;
+   margin-bottom: 10px;
+   position: relative;
+}
+#orderform #teams-list .team h2 {
+   padding: 5px 3px;
+   cursor: move;
+}
+#orderform #teams-list .team .persons-list {
+   padding: 5px;
+}
+
+#orderform .persons-list {
+   min-height: 30px;
+}
+#orderform .persons-list div {
+   float: left;
+   width: 100px;
+   height: 100px;
+   margin: 0 5px 5px 0;
+   padding: 3px;
+   text-align: center;
+   cursor: move;
+}
+#orderform .persons-list div img {
+    height: 80%;
+}
+#orderform #group-box-new h2, #group-box-new .ui-widget-content {
+   padding: 5px;
+}
+
+/* css for list */
+#people-list .person-image { 
+   float: left;
+   margin-right: 10px;
+}
+#people-list .person {
+   margin-bottom: 10px;
+   position: relative;
+}
