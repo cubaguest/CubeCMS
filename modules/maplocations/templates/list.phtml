@@ -1,5 +1,6 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
+$this->addFile("css://style.css");
 $this->addPageTitle($this->tr('Seznam míst'));
 echo $this->toolbox;
 ?>
@@ -8,7 +9,7 @@ echo $this->toolbox;
    <?if(!empty ($this->locations)) {
    foreach ($this->locations as $loc) {?>
    <div class="main-content-list-record ui-widget">
-      <div class="ui-widget-header ui-corner-top">
+      <div class="ui-widget-header ui-corner-top ui-state-default ui-place-header">
          <?
          $this->toolboxItem->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
          $this->toolboxItem->edit_location->setAction($this->link()->route('edit', array('id' => $loc->{MapLocations_Model::COLUMN_ID})));
@@ -17,7 +18,7 @@ echo $this->toolbox;
          ?>
          <h2><?=$loc->{MapLocations_Model::COLUMN_NAME}?></h2>
       </div>
-      <div class="main-content-list-record-text ui-widget-content ui-corner-bottom">
+      <div class="main-content-list-record-text ui-widget-content ui-corner-bottom ui-place-content">
          <?if($loc->{MapLocations_Model::COLUMN_IMAGE} != null){?>
             <div class="main-content-list-record-image">
                <img src="<?=$this->category()->getModule()->getDataDir(true).$loc->{MapLocations_Model::COLUMN_IMAGE}?>"

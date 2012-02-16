@@ -12,7 +12,7 @@ $this->addPageTitle($h);
 <div class="main-content-form-edit" id="article-edit-form">
    <?
    $this->form->html()->setAttrib('name', 'form-address');
-   $this->form->address->setSubLabel('Slouží pouze pro vyhledání souřadnic. <a href="'.$this->link().'#" onclick="searchPlace();">HLEDAT</a>.<br /><span id="adr-result"></span>');
+   $this->form->address->setSubLabel('Slouží pouze pro vyhledání souřadnic. <a href="'.$this->link().'#location_address_1" onclick="searchPlace();">HLEDAT</a>.<br /><span id="adr-result"></span>');
    echo($this->form);
    ?>
    <script type="text/javascript">
@@ -21,7 +21,6 @@ $this->addPageTitle($h);
    var form = document.forms['form-address'];
 
    function searchPlace(){
-      this.event.preventDefault();
       var address = form.elements["location_address"].value;
       
       if(address != null && address != ""){
@@ -29,13 +28,14 @@ $this->addPageTitle($h);
             if (status == google.maps.GeocoderStatus.OK) {
                if(results.length == 1){
                   document.getElementById('adr-result').innerHTML = 'Našel jsem: '+ results[0].formatted_address;
-                  form.elements["location_position"].value = results[0].geometry.location.Ka+':'+results[0].geometry.location.La;
+                  form.elements["location_position"].value = results[0].geometry.location.lat()+':'+results[0].geometry.location.lng();
                } else {
                   document.getElementById('adr-result').innerHTML = 'Nejdnoznačné zadání. Počet nalezených adres: '+ results.length;
                }
             }
          });
       }
+      return false;
    }
    /* ]]> */
    </script>
