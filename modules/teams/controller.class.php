@@ -76,12 +76,19 @@ class Teams_Controller extends Controller {
          
          if ($addForm->image->getValues() != null) {
             $image = new File_Image($addForm->image);
-            $image->getData()->resize(
+            // store original
+            $name = vve_cr_safe_file_name($addForm->name->getValues()." ".$addForm->surname->getValues());
+            $image->copy($this->module()->getDataDir(), false, $name.".".$image->getExtension());
+            // store resized
+            $resized = $image->copy($this->module()->getDataDir(), true, $name."-resized.".$image->getExtension());
+            
+            $resized->getData()->resize(
                $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH), 
                $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), 
                $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO);
-            $image->save();
-            $record->{Teams_Model_Persons::COLUMN_IMAGE} = $image->getName();
+            $resized->save();
+            $record->{Teams_Model_Persons::COLUMN_IMAGE} = $resized->getName();
+            $image->delete();
          }
          
          $record->{Teams_Model_Persons::COLUMN_NAME} = $addForm->name->getValues();
@@ -160,12 +167,19 @@ class Teams_Controller extends Controller {
 
          if ($editForm->image->getValues() != null) {
             $image = new File_Image($editForm->image);
-            $image->getData()->resize(
+            // store original
+            $name = vve_cr_safe_file_name($editForm->name->getValues()." ".$editForm->surname->getValues());
+            $image->copy($this->module()->getDataDir(), false, $name.".".$image->getExtension());
+            // store resized
+            $resized = $image->copy($this->module()->getDataDir(), true, $name."-resized.".$image->getExtension());
+            
+            $resized->getData()->resize(
                $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH), 
                $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), 
                $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO);
-            $image->save();
-            $person->{Teams_Model_Persons::COLUMN_IMAGE} = $image->getName();
+            $resized->save();
+            $person->{Teams_Model_Persons::COLUMN_IMAGE} = $resized->getName();
+            $image->delete();
          }
          
          $person->{Teams_Model_Persons::COLUMN_NAME} = $editForm->name->getValues();
@@ -245,7 +259,7 @@ class Teams_Controller extends Controller {
       $iImage = new Form_Element_File('image', $this->tr('Portrét'));
       $iImage->setSubLabel($this->tr('Velikost obrázku je upravena automaticky'));
       $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
-      $iImage->setUploadDir($this->module()->getDataDir());
+      $iImage->setUploadDir(AppCore::getAppCacheDir());
       $form->addElement($iImage, $gothr);
 
       $iSubmit = new Form_Element_SaveCancel('save');
