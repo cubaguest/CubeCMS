@@ -85,6 +85,7 @@ class Text_Controller extends Controller {
          }
       }
       // view
+      $this->view()->text = $textRec;
       $this->view()->form = $form;
    }
    
