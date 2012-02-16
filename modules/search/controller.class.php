@@ -91,7 +91,7 @@ class Search_Controller extends Controller {
       $catM = new Model_Category();
 
       // hledání v kategoríích
-      $catResults = $catM->withRights()->search($string);
+      $catResults = $catM->onlyWithAccess()->search($string);
       
       $searchMain = new Search();
       $catRelevantion = array();
@@ -108,7 +108,7 @@ class Search_Controller extends Controller {
 
       // načtení všech kategorií, ke kterým má uživatel práva
       $catM = new Model_Category();
-      $categories = $catM->withRights()->records();
+      $categories = $catM->onlyWithAccess()->records();
       
       foreach ($categories as $cat) {
          // kontrola souboru (jestli modul má vyhledávání)
