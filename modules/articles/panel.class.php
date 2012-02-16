@@ -30,8 +30,8 @@ class Articles_Panel extends Panel {
       $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
 
-   public static function settingsController(&$settings,Form &$form) {
-      $elemNum = new Form_Element_Text('num', 'Počet článků v panelu');
+   protected function settings(&$settings,Form &$form) {
+      $elemNum = new Form_Element_Text('num', $this->tr('Počet článků v panelu'));
       $elemNum->setSubLabel('Výchozí: '.self::DEFAULT_NUM_ARTICLES.'');
       $elemNum->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemNum,'basic');
@@ -44,17 +44,17 @@ class Articles_Panel extends Panel {
       $componentTpls = new Component_ViewTpl();
       $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
 
-      $elemTplPanel = new Form_Element_Select('tplPanel', 'Šablona panelu');
+      $elemTplPanel = new Form_Element_Select('tplPanel', $this->tr('Šablona panelu'));
       $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
       if(isset($settings[self::PARAM_TPL_PANEL])) {
          $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
       }
       $form->addElement($elemTplPanel, 'basic');
 
-      $elemType = new Form_Element_Select('type', 'Řazení');
-      $types = array('Podle data' => 'list', 'Podle počtu přečtění' => 'top', 'Náhodně' => 'rand');
+      $elemType = new Form_Element_Select('type', $this->tr('Řazení'));
+      $types = array($this->tr('Podle data') => 'list', $this->tr('Podle počtu přečtění') => 'top', $this->tr('Náhodně') => 'rand');
       $elemType->setOptions($types);
-      $elemType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TYPE, $types).'');
+      $elemType->setSubLabel(sprintf($this->tr('Výchozí řazení: %s '), array_search(self::DEFAULT_TYPE, $types) ) );
       $form->addElement($elemType,'basic');
 
       if(isset($settings['type'])) {
