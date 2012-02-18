@@ -266,6 +266,9 @@ class Url_Request {
                         $this->pageFull = false;
                      } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
                         $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                        if(isset ($_GET['out'])){
+                           $this->outputType = $_GET['out'];
+                        }
                         $this->pageFull = false;
                      }
                      // jinak se jednná o kategorii
