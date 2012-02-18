@@ -56,6 +56,12 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @var boolean
     */
    protected $isPopulated = false;
+   
+   /**
+    * Jestli byl prvek validován
+    * @var boolean
+    */
+   protected $isValidated = false;
 
    /**
     * Jestli byl prvek filtrován
@@ -349,9 +355,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return mixed -- hodnota prvku
     */
    public function getValues($key = null) {
-      $this->filter();
-      if($key !== null AND isset($this->values[$key])) {
-         return $this->values[$key];
+      if(!$this->isValidated){
+         $this->validate();
+      } 
+      if($this->isValid()){
+         $this->filter();
+         if($key !== null AND isset($this->values[$key])) {
+            return $this->values[$key];
+         }
       }
       return $this->values;
    }
@@ -397,6 +408,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    public function isValid($valid = null) {
       if($valid !== null){
          $this->isValid = $valid;
+         $this->isValidated = true;
+      } else if(!$this->isValidated){
+         $this->validate();
       }
       return $this->isValid;
    }
@@ -489,6 +503,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             break;
          }
       }
+      $this->isValidated = true;
    }
 
    /**
@@ -496,7 +511,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param boolean $newFilter -- (option true) jestli se má znovu přefiltrovat
     */
    public function filter($newFilter = false) {
-      if($this->isFiltered == false OR $newFilter == true) {
+      if($this->isValidated == true && ($this->isFiltered == false OR $newFilter == true) ) {
          $this->values = $this->unfilteredValues;
          foreach ($this->filters as $filter) {
             $filter->filter($this, $this->values);

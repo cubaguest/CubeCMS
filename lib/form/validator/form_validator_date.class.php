@@ -37,10 +37,17 @@ class Form_Validator_Date extends Form_Validator implements Form_Validator_Inter
                if(empty ($values)) return true;
 
                $correctDate = false;
-               if(preg_match("/^([0-3]?[0-9]{1})\.([0-1]?[0-9]{1})\.([1-2]{1}[0-9]{3})$/", $values, $date) == 1 AND checkdate($date[2],$date[1],$date[3])){
+               if(preg_match("/^([0-3]?[0-9]{1})\.([0-1]?[0-9]{1})\.([1-2]{1}[0-9]{3})$/", $values, $date) == 1 
+                     AND checkdate($date[2],$date[1],$date[3])){
+                  // dd.mm.yyyy
                   $correctDate = true;
                } else if(preg_match('/^([1-2]{1}[0-9]{3}).([0-1]?[0-9]{1}).([0-3]?[0-9]{1})$/', $values, $date) == 1
                        AND checkdate($date[1], $date[2], $date[3])) {
+                  // yyyy.mm.dd
+                  $correctDate = true;
+               } else if(preg_match('/^([0-1]?[0-9]{1})\/([0-3]?[0-9]{1})\/([1-2]{1}[0-9]{3})$/', $values, $date) == 1
+                       AND checkdate($date[1], $date[2], $date[3])) {
+                  // mm/dd/yyyy
                   $correctDate = true;
                }
 
