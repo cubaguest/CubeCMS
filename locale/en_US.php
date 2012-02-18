@@ -54,7 +54,7 @@ array(
    '4205cd048b1ff447c60d596af42d6f1a' => 'The "%s" does not satisfy the regular expression', /* Položka "%s" nevyhovuje zadanému regulárnímu výrazu */ 
    '26dbadb114f62ab86f747f3517c7213a' => 'The "%s" does not include a valid phone number', /* Položka "%s" neobsahuje platné telefonní číslo */ 
    '152a9fdf104887b57d6bc7efb2c4c7c2' => 'for example: +420 123 456 789', /* např: +420 123 456 789 */ 
-   'fa49bb42e796791a30ef74bcc7788f40' => 'Correct date was completed in "%s"', /* Nebylo vyplněno korektní datum v položce "%s" */ 
+   'fa49bb42e796791a30ef74bcc7788f40' => 'Incorrect date was filled in the item "%s"', /* Nebylo vyplněno korektní datum v položce "%s" */ 
    'a769a33e93701b6ba9456160908857e5' => 'Wrong Data Validation', /* Neimplementovaná Validace Data */ 
    '59393d76704206b80b3589fccae01c66' => '"%s" is too long, max %s characters', /* "%s" je příliš dlouhý, maximálně %s znaků */ 
    'e85c23e364035ffac073811f086208bf' => 'max %s characters', /* max. %s znaků */ 
