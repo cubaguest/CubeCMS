@@ -160,13 +160,14 @@ class Actions_Controller extends Controller {
       $form = $this->createForm();
 
       // kontrola integrity data
-      if($form->isSend() AND $form->date_stop->getValues() != null
-              AND ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
-         $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
-      }
-
-      if($form->isSend() AND $form->save->getValues() == false){
-          $this->link()->route()->reload();
+      if($form->isSend()){
+         if($form->save->getValues() == false){
+            $this->link()->route()->reload();
+         }
+         if($form->date_stop->isValid() && $form->date_start->isValid()
+            && ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
+               $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
+         }
       }
 
       if($form->isValid()) {
@@ -255,13 +256,14 @@ class Actions_Controller extends Controller {
       }
 
       // kontrola integrity data
-      if($form->isSend() AND $form->date_stop->getValues() != null
-              AND ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
-         $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
-      }
-
-      if($form->isSend() AND $form->save->getValues() == false){
-          $this->link()->route('detail')->reload();
+      if($form->isSend()){
+         if($form->save->getValues() == false){
+            $this->link()->route('detail')->reload();
+         }
+         if($form->date_stop->isValid() && $form->date_start->isValid()
+            && ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
+               $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
+         }
       }
 
       if($form->isValid()) {
