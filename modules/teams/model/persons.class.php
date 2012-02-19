@@ -17,6 +17,7 @@ class Teams_Model_Persons extends Model_ORM {
    const COLUMN_TEXT = 'person_text';
    const COLUMN_TEXT_CLEAR = 'person_text_clear';
    const COLUMN_IMAGE = 'person_image';
+   const COLUMN_LINK = 'person_link';
    const COLUMN_ORDER = 'person_order';
    const COLUMN_DELETED = 'person_deleted';
 
@@ -32,6 +33,7 @@ class Teams_Model_Persons extends Model_ORM {
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(45)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_LINK, array('datatype' => 'varchar(300)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_DELETED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       $this->setPk(self::COLUMN_ID);

@@ -1,0 +1,1 @@
+ALTER TABLE `{PREFIX}teams_persons` ADD COLUMN `person_link` VARCHAR(300) NULL DEFAULT NULL  AFTER `person_image` ;

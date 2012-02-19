@@ -97,6 +97,7 @@ class Teams_Controller extends Controller {
          $record->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
          $record->{Teams_Model_Persons::COLUMN_TEXT} = $addForm->text->getValues();
          $record->{Teams_Model_Persons::COLUMN_TEXT_CLEAR} = strip_tags($addForm->text->getValues());
+         $record->{Teams_Model_Persons::COLUMN_LINK} = $addForm->link->getValues();
          
          // zařadit na konec kupiny
          $c = $model->columns(array('m' => 'MAX(`'.Teams_Model_Persons::COLUMN_ORDER.'`)'))
@@ -189,6 +190,7 @@ class Teams_Controller extends Controller {
          $person->{Teams_Model_Persons::COLUMN_TEXT} = $editForm->text->getValues();
          $person->{Teams_Model_Persons::COLUMN_TEXT_CLEAR} = strip_tags($editForm->text->getValues());
          $person->{Teams_Model_Persons::COLUMN_ID_TEAM} = $idTeam;
+         $person->{Teams_Model_Persons::COLUMN_LINK} = $editForm->link->getValues();
          
          // tohle zde není, protože není jak to řadit zde
 //         $person->{Teams_Model_Persons::COLUMN_ORDER} = $c + 1;
@@ -261,6 +263,11 @@ class Teams_Controller extends Controller {
       $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
       $iImage->setUploadDir(AppCore::getAppCacheDir());
       $form->addElement($iImage, $gothr);
+      
+      $iLink = new Form_Element_Text('link', $this->tr('Prolink'));
+      $iLink->addValidation(New Form_Validator_Url());
+      $iLink->setSubLabel($this->tr('Například odkaz na profil uživatele na stránkách či jinou externí službu (facebook)'));
+      $form->addElement($iLink, $gbase);
 
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
@@ -272,6 +279,7 @@ class Teams_Controller extends Controller {
          $form->degree->setValues($person->{Teams_Model_Persons::COLUMN_DEGREE});
          $form->degreeAfter->setValues($person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER});
          $form->text->setValues($person->{Teams_Model_Persons::COLUMN_TEXT});
+         $form->link->setValues($person->{Teams_Model_Persons::COLUMN_LINK});
 //         $form->order->setValues($person->{groupId::COLUMN_ORDER});
       }
       

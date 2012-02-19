@@ -14,7 +14,7 @@ $this->addFile('css://style.css');
             continue;
          }
          ?>
-      <h2><?ps($team['name'])?></h2>
+      <h2><?ps($team['name']);?></h2>
       <ul class="team">
          <?foreach ($team['persons'] as $person){
             $name = null;
@@ -27,7 +27,15 @@ $this->addFile('css://style.css');
          <li class="person">
             <img src="<?=$this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
                  alt="<?ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" class="person-image"/>
-            <h3 id="team-person-<?=$person->{Teams_Model_Persons::COLUMN_ID}?>"><?ps($name)?></h3>
+            <h3 id="team-person-<?=$person->{Teams_Model_Persons::COLUMN_ID}?>"><?
+               if($person->{Teams_Model_Persons::COLUMN_LINK} != null){
+                  echo '<a href="'.$person->{Teams_Model_Persons::COLUMN_LINK}.'" title="'.$person->{Teams_Model_Persons::COLUMN_NAME}.'" class="link-external">';
+               }
+               ps($name);
+               if($person->{Teams_Model_Persons::COLUMN_LINK} != null){
+                  echo '</a>';
+               }
+               ?></h3>
             <div class="text"><?=$person->{Teams_Model_Persons::COLUMN_TEXT}?></div>
             
             <?if($this->toolboxEdit != null){
