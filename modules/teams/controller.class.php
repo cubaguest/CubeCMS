@@ -267,7 +267,7 @@ class Teams_Controller extends Controller {
       $iLink = new Form_Element_Text('link', $this->tr('Prolink'));
       $iLink->addValidation(New Form_Validator_Url());
       $iLink->setSubLabel($this->tr('Například odkaz na profil uživatele na stránkách či jinou externí službu (facebook)'));
-      $form->addElement($iLink, $gbase);
+      $form->addElement($iLink, $gothr);
 
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
