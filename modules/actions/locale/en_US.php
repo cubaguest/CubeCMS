@@ -29,6 +29,8 @@ array(
    '1833267786da8c3ccb365ff908273798' => 'Add event', /* Přidat událost */ 
    'c53a811e25496bbbe46a99b54c434e66' => 'Add new event', /* Přidat novou událost */ 
    'ada39d6eb9938f732528ca605822a44a' => 'Edit introductory text', /* Upravit úvodní text */ 
+   '7e522302c6e73b65b5544ac3f73b7f43' => 'Show archive', /* Zobrazit archiv */ 
+   '29ac535920e19b7495cc80dc071b145e' => 'Show events archive', /* Zobrazit archiv událostí */ 
    'a69f9a863a00a55992c71610be3e0815' => 'Edit', /* Upravit */ 
    '14caca1ea91ee6ea11753cd97e5b7d12' => 'Edit event', /* Upravit akci */ 
    '77e9ef57ce5323d696103ec69abe6e16' => 'Really delete action?', /* Opravdu smazat akci? */ 
