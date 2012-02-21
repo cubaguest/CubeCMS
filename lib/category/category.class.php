@@ -126,6 +126,13 @@ class Category extends Category_Core {
       if(isset($this->catParams[$param])){
          return $this->catParams[$param];
       } else {
+         return $this->getDefaultParam($param, $defaultParam);
+      }
+   }
+   public function getDefaultParam($param, $defaultParam = null) {
+      if(defined('VVE_MODULE_'.  strtoupper($this->getModule()->getName()."_".$param))) {
+         return constant('VVE_MODULE_'.  strtoupper($this->getModule()->getName()."_".$param));
+      } else {
          return $defaultParam;
       }
    }

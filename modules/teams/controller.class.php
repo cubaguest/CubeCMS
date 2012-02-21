@@ -428,17 +428,17 @@ class Teams_Controller extends Controller {
       $form->addGroup('images', $this->tr('Nasatvení obrázků'));
 
       $elemImgW = new Form_Element_Text('imgw', $this->tr('Šířka portrétu'));
-      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
+      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getDefaultParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
       $elemImgW->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgW, 'images');
 
       $elemImgH = new Form_Element_Text('imgh', $this->tr('Výška portrétu'));
-      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
+      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getDefaultParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
       $elemImgH->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgH, 'images');
 
       $elemCropImage = new Form_Element_Checkbox('croping', $this->tr('Ořezávat portréty'));
-      if($this->category()->getParam('croping') == true){
+      if($this->category()->getDefaultParam('croping') == true){
          $elemCropImage->setValues(true);
       }
       $form->addElement($elemCropImage, 'images');
