@@ -48,8 +48,11 @@ class Search_Controller extends Controller {
                  $this->category()->getModule()->getParam('scroll', 5));
 
          $this->view()->scrollComp = $scrollComponent;
+         $this->view()->scrollCompGetParam = $scrollComponent->getConfig('page_param');
          $this->view()->search = true;
+         $this->view()->resultsOnPage = $this->category()->getModule()->getParam('scroll', 5);
          $this->view()->results = array_slice($results, $scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
+         $this->view()->page = $scrollComponent->getCurPageNumber();
       }
       $this->view()->searchString = htmlspecialchars($searchStr);
       $this->view()->searchTarget = $this->getRequestParam('s', 'all');
