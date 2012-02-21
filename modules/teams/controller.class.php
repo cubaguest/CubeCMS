@@ -428,16 +428,19 @@ class Teams_Controller extends Controller {
       $form->addGroup('images', $this->tr('Nasatvení obrázků'));
 
       $elemImgW = new Form_Element_Text('imgw', $this->tr('Šířka portrétu'));
-      $elemImgW->setSubLabel($this->tr('Výchozí: ') . self::DEFAULT_IMAGE_WIDTH . ' px');
+      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
       $elemImgW->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgW, 'images');
 
       $elemImgH = new Form_Element_Text('imgh', $this->tr('Výška portrétu'));
-      $elemImgH->setSubLabel($this->tr('Výchozí: ') . self::DEFAULT_IMAGE_HEIGHT . ' px');
+      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
       $elemImgH->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgH, 'images');
 
-      $elemCropImage = new Form_Element_Checkbox('cropimg', $this->tr('Ořezávat portréty'));
+      $elemCropImage = new Form_Element_Checkbox('croping', $this->tr('Ořezávat portréty'));
+      if($this->category()->getParam('croping') == true){
+         $elemCropImage->setValues(true);
+      }
       $form->addElement($elemCropImage, 'images');
 
       if (isset($settings['imgw'])) {
@@ -446,8 +449,8 @@ class Teams_Controller extends Controller {
       if (isset($settings['imgh'])) {
          $form->imgh->setValues($settings['imgh']);
       }
-      if (isset($settings['cropimg'])) {
-         $form->cropimg->setValues($settings['cropimg']);
+      if (isset($settings['croping'])) {
+         $form->cropimg->setValues($settings['croping']);
       }
 
       if (isset($settings['recordsonpage'])) {
@@ -457,7 +460,7 @@ class Teams_Controller extends Controller {
       if ($form->isValid()) {
          $settings['imgw'] = $form->imgw->getValues();
          $settings['imgh'] = $form->imgh->getValues();
-         $settings['cropimg'] = $form->cropimg->getValues();
+         $settings['croping'] = $form->cropimg->getValues();
          $settings['recordsonpage'] = $form->numOnPage->getValues();
       }
    }
