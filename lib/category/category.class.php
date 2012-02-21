@@ -126,7 +126,7 @@ class Category extends Category_Core {
       if(isset($this->catParams[$param])){
          return $this->catParams[$param];
       } else {
-         return $this->getDefaultParam($param, $defaultParam);
+         return $this->getGlobalParam($param, $defaultParam);
       }
    }
    
