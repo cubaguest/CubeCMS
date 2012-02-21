@@ -129,7 +129,14 @@ class Category extends Category_Core {
          return $this->getDefaultParam($param, $defaultParam);
       }
    }
-   public function getDefaultParam($param, $defaultParam = null) {
+   
+   /**
+    * Metoda vrací globální parametr kategorie
+    * @param string $param -- index parametru
+    * @param mixed $defaultParam -- výchozí hodnota
+    * @return string -- parametr
+    */
+   public function getGlobalParam($param, $defaultParam = null) {
       if(defined('VVE_MODULE_'.  strtoupper($this->getModule()->getName()."_".$param))) {
          return constant('VVE_MODULE_'.  strtoupper($this->getModule()->getName()."_".$param));
       } else {
