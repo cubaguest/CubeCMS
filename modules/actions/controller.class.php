@@ -6,6 +6,9 @@ class Actions_Controller extends Controller {
    const DEFAULT_TIMEWINDOW = 1;
    const DEFAULT_TIMEWINDOW_TYPE = 'month';
 
+   const PARAM_SHOW_EVENT_DIRECTLY = 'sed';
+
+
    protected $action = null;
    /**
     * Kontroler pro zobrazení novinek
@@ -13,7 +16,23 @@ class Actions_Controller extends Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-
+      if(!$this->category()->getParam(self::PARAM_SHOW_EVENT_DIRECTLY, false)){
+         $this->showEventsList();
+      } else {
+         // redirect to current event
+         $model = new Actions_Model();
+         $featured = $model->featuredOnly($this->category()->getId())->record();
+         
+         if($featured != false){
+            $this->link()->route('detail', array('urlkey' => $featured->{Actions_Model::COLUMN_URLKEY}))->reload();
+         } else {
+            $this->showEventsList();
+         }
+      }
+   }
+   
+   protected function showEventsList() 
+   {
       // uložení datumu do session pokud existuje - kvuli návratu
       // odkaz zpět
       $this->link()->backInit();
@@ -73,14 +92,12 @@ class Actions_Controller extends Controller {
       // načtení textu
       $this->view()->text = $this->loadActionsText();
    }
-
-   public function showController() {
-      $this->checkReadableRights();
-
+   
+   protected function showEvent($urlkey = null)
+   {
       $model = new Actions_Model_Detail();
       $this->view()->action = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
       if($this->view()->action == false) {
-         AppCore::setErrorPage(true);
          return false;
       }
 
@@ -109,6 +126,11 @@ class Actions_Controller extends Controller {
       $shares->setConfig('title', $this->view()->action->{Actions_Model_Detail::COLUMN_NAME});
       $this->view()->shares=$shares;
       $this->view()->imagesDir=$this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()];
+   }
+
+   public function showController() {
+      $this->checkReadableRights();
+      $this->showEvent($this->getRequest('urlkey'));
    }
 
    protected function deleteAction($action) {
@@ -165,6 +187,7 @@ class Actions_Controller extends Controller {
             $this->link()->route()->reload();
          }
          if($form->date_stop->isValid() && $form->date_start->isValid()
+            && $form->date_start->getValues() != null && $form->date_stop->getValues() != null
             && ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
                $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
          }
@@ -261,6 +284,7 @@ class Actions_Controller extends Controller {
             $this->link()->route('detail')->reload();
          }
          if($form->date_stop->isValid() && $form->date_start->isValid()
+            && $form->date_start->getValues() != null && $form->date_stop->getValues() != null
             && ($form->date_start->getValues()->format("U") > $form->date_stop->getValues()->format("U"))) {
                $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
          }
@@ -475,6 +499,12 @@ class Actions_Controller extends Controller {
       $elemTimeWindowType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TIMEWINDOW_TYPE, $types).'');
       $form->addElement($elemTimeWindowType,'view');
 
+      $elemShowEventDirectly = new Form_Element_Checkbox('show_event_directly', 'Zobrazit aktuální akci přímo');
+      $elemShowEventDirectly->setValues(false);
+      $form->addElement($elemShowEventDirectly, 'view');
+      if(isset($settings[self::PARAM_SHOW_EVENT_DIRECTLY])) {
+         $form->show_event_directly->setValues($settings[self::PARAM_SHOW_EVENT_DIRECTLY]);
+      }
 
       $form->addGroup('images', 'Nastavení obrázků');
 
@@ -507,9 +537,10 @@ class Actions_Controller extends Controller {
       } else {
          $form->type->setValues(self::DEFAULT_TIMEWINDOW_TYPE);
       }
-
+      
       if($form->isValid()) {
          $settings['time'] = $form->time->getValues();
+         $settings[self::PARAM_SHOW_EVENT_DIRECTLY] = $form->show_event_directly->getValues();
          $settings['img_width'] = $form->img_width->getValues();
          $settings['img_height'] = $form->img_height->getValues();
          $settings['img_crop'] = $form->img_crop->getValues();

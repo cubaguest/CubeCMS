@@ -71,25 +71,26 @@ class Actions_Model extends Model_ORM {
    
    public function setPastOnly($idc)
    {
-      return $this->where(self::COLUMN_ID_CAT." = :idc AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1) 
-         AND ( (".Locales::getLang().")".Actions_Model_Detail::COLUMN_URLKEY." IS NOT NULL)
+      return $this->where(self::COLUMN_ID_CAT." = :idc AND (".self::COLUMN_PUBLIC." = 1) 
+         AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
          AND 
          (
-            (".Actions_Model_Detail::COLUMN_DATE_START." <= CURDATE() AND ".Actions_Model_Detail::COLUMN_TIME." IS NOT NULL AND ".Actions_Model_Detail::COLUMN_TIME." < CURTIME() )
-            OR (".Actions_Model_Detail::COLUMN_DATE_START." < CURDATE() AND ".Actions_Model_Detail::COLUMN_TIME." IS NULL )
+            (".self::COLUMN_DATE_START." <= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL AND ".self::COLUMN_TIME." < CURTIME() )
+            OR (".self::COLUMN_DATE_START." < CURDATE() AND ".self::COLUMN_TIME." IS NULL )
          )", 
          array("idc" => $idc));
-      
-//      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
-//              ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
-//              ." AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)"
-//              ." AND (".Actions_Model_Detail::COLUMN_URLKEY.'_'.Locales::getLang()." IS NOT NULL)"
-//              ." AND ((".Actions_Model_Detail::COLUMN_DATE_START." >= CURDATE() AND ".Actions_Model_Detail::COLUMN_TIME." >= CURTIME())"
-//              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." > CURDATE())"
-//              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." >= DATE_ADD(CURDATE(), INTERVAL 1 DAY))"
-//              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." < CURDATE() AND ".Actions_Model_Detail::COLUMN_DATE_STOP." >= CURDATE() ))"
-//              ." ORDER BY ".Actions_Model_Detail::COLUMN_DATE_START." ASC");
-//      return $this;
+   }
+   
+   public function featuredOnly($idc)
+   {
+      return $this->where(self::COLUMN_ID_CAT." = :idc AND (".self::COLUMN_PUBLIC." = 1) 
+         AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
+         AND 
+         (
+            (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL AND ".self::COLUMN_TIME." >= CURTIME() )
+            OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_TIME." IS NULL )
+         )", 
+         array("idc" => $idc));
    }
 }
 

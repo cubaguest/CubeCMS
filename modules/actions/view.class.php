@@ -15,7 +15,7 @@ class Actions_View extends View {
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou událost'));
          $toolbox->addTool($toolAdd);
          
-         if($this->rights()->isControll()) {
+         if($this->rights()->isControll() && !$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false) ) {
             $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
             $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit úvodní text"),
             $this->link()->route('editlabel'));
@@ -28,6 +28,13 @@ class Actions_View extends View {
    }
 
    public function showView() {
+      if($this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
+         $this->createListToolbox();
+         $toolArchive = new Template_Toolbox2_Tool_PostRedirect('archive', $this->tr("Zobrazit archiv"),
+            $this->link()->route('archive'));
+         $toolArchive->setIcon('box.png')->setTitle($this->tr('Zobrazit archiv událostí'));
+         $this->toolbox->addTool($toolArchive);
+      }
       $this->createDetailToolbox();
       $this->addMetaTags($this->action);
       $this->template()->addTplFile("detail.phtml");
@@ -37,19 +44,21 @@ class Actions_View extends View {
       if($this->category()->getRights()->isControll() OR
               ($this->category()->getRights()->isWritable() AND
                       $this->action->{Actions_Model_Detail::COLUMN_ID_USER} == Auth::getUserId())) {
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         if( ($this->toolbox instanceof Template_Toolbox2 ) == false ){
+            $this->toolbox = new Template_Toolbox2();
+         }
+         $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_action', $this->tr("Upravit"),
          $this->link()->route('edit'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit akci'));
-         $toolbox->addTool($toolEdit);
+         $this->toolbox->addTool($toolEdit);
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat'))
             ->setConfirmMeassage($this->tr('Opravdu smazat akci?'));
-         $toolbox->addTool($tooldel);
+         $this->toolbox->addTool($tooldel);
 
-         $this->toolbox = $toolbox;
       }
    }
 

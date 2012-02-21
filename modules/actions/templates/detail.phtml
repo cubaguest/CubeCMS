@@ -45,7 +45,11 @@ $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
    <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
    </div>
    <hr class="reseter" />
-   <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
+   <?
+   if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
+      $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));
+   }
+   ?>
    <?$this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
