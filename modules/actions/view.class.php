@@ -8,32 +8,33 @@ class Actions_View extends View {
 
    protected function createListToolbox() {
       if($this->rights()->isWritable()) {
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
+         if( ($this->toolbox instanceof Template_Toolbox2 ) == false ){
+            $this->toolbox = new Template_Toolbox2();
+            $this->toolbox->setIcon(Template_Toolbox2::ICON_PEN);
+         }
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_action', $this->tr("Přidat událost"),
          $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou událost'));
-         $toolbox->addTool($toolAdd);
+         $this->toolbox->addTool($toolAdd);
+         
+         $toolArchive = new Template_Toolbox2_Tool_PostRedirect('archive', $this->tr("Zobrazit archiv"),
+            $this->link()->route('archive'));
+         $toolArchive->setIcon('box.png')->setTitle($this->tr('Zobrazit archiv událostí'));
+         $this->toolbox->addTool($toolArchive);
          
          if($this->rights()->isControll() && !$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false) ) {
-            $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+            $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
             $toolAdd = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit úvodní text"),
             $this->link()->route('editlabel'));
             $toolAdd->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text'));
-            $toolbox->addTool($toolAdd);
+            $this->toolbox->addTool($toolAdd);
          }
-
-         $this->toolbox = $toolbox;
       }
    }
 
    public function showView() {
       if($this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
          $this->createListToolbox();
-         $toolArchive = new Template_Toolbox2_Tool_PostRedirect('archive', $this->tr("Zobrazit archiv"),
-            $this->link()->route('archive'));
-         $toolArchive->setIcon('box.png')->setTitle($this->tr('Zobrazit archiv událostí'));
-         $this->toolbox->addTool($toolArchive);
       }
       $this->createDetailToolbox();
       $this->addMetaTags($this->action);
@@ -60,6 +61,7 @@ class Actions_View extends View {
          $this->toolbox->addTool($tooldel);
 
       }
+      
    }
 
    public function archiveView() {
