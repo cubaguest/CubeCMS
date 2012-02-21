@@ -450,7 +450,7 @@ class Teams_Controller extends Controller {
          $form->imgh->setValues($settings['imgh']);
       }
       if (isset($settings['croping'])) {
-         $form->cropimg->setValues($settings['croping']);
+         $form->croping->setValues($settings['croping']);
       }
 
       if (isset($settings['recordsonpage'])) {
@@ -460,7 +460,7 @@ class Teams_Controller extends Controller {
       if ($form->isValid()) {
          $settings['imgw'] = $form->imgw->getValues();
          $settings['imgh'] = $form->imgh->getValues();
-         $settings['croping'] = $form->cropimg->getValues();
+         $settings['croping'] = $form->croping->getValues();
          $settings['recordsonpage'] = $form->numOnPage->getValues();
       }
    }
