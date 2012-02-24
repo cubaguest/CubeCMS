@@ -55,6 +55,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          /* <![CDATA[ */
          document.domain = '<?=Url_Request::getDomain();?>';
          document.lang = '<?=Locales::getLang()?>';
+         document.primaryLang = '<?=Locales::getDefaultLang()?>';
          /* ]]> */
       </script>
       <!-- {*-STYLESHEETS-*} -->

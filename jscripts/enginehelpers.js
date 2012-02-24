@@ -240,8 +240,12 @@ $(document).ready(function(){
       $('label[lang="'+lang+'"]', $container).show();
       return false;
    });
-   // select first language
-   $('.form-link-lang-container a:first-child').trigger('click', [false]);
+   // select default language
+   if(typeof document.primaryLang !== "undefined"){
+      $('.form-link-lang-container a[lang="'+document.primaryLang+'"]').trigger('click', [false]);
+   } else {
+      $('.form-link-lang-container a[lang="'+document.lang+'"]').trigger('click', [false]);
+   }
    // toolbox events
    initToolboxEvents();
    // open external link in new window
