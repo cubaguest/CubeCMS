@@ -672,7 +672,9 @@ class Articles_Controller extends Controller {
             $name .= ' ('.$user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME}.')';
             $eCreator->setOptions(array($name => $user->{Model_Users::COLUMN_ID}),true);
          }
-         $eCreator->setValues(Auth::getUserId());
+         if($artId == null){
+            $eCreator->setValues(Auth::getUserId());
+         }
          $form->addElement($eCreator, $fGrpPublic);
       }
          
@@ -692,7 +694,7 @@ class Articles_Controller extends Controller {
       $form->addElement($eCreatedDate, $fGrpPublic);
 
       $eCreatedTime = new Form_Element_Text('created_time', $this->tr('Čas vytvoření'));
-      $eCreatedTime->setValues(vve_date("%X"));
+      $eCreatedTime->setValues(vve_date("%H:%i"));
       $eCreatedTime->addValidation(new Form_Validator_NotEmpty());
       $eCreatedTime->addValidation(new Form_Validator_Time());
       $form->addElement($eCreatedTime, $fGrpPublic);
