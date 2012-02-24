@@ -372,7 +372,7 @@ class Articles_Controller extends Controller {
          $editForm->art_id->setValues($article->{Articles_Model::COLUMN_ID});
          $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          $editForm->created_date->setValues(vve_date('%x',$addTime));
-         $editForm->created_time->setValues(vve_date('%X',$addTime));
+         $editForm->created_time->setValues(vve_date('%H:%i',$addTime));
          if(isset ($editForm->titleImage)){
             $editForm->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
          }
