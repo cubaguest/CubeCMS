@@ -243,7 +243,7 @@ class Email {
             break;
       }
       if(VVE_NOREPLAY_MAIL != null) {
-         $this->message()->setFrom(VVE_NOREPLAY_MAIL);
+         $this->message()->setFrom(VVE_NOREPLAY_MAIL, VVE_WEB_NAME);
       } else {
          $this->message()->setFrom('noreplay@'.$_SERVER['SERVER_NAME']);
       }
