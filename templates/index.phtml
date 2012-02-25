@@ -86,7 +86,11 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       }
       ?>
    </head>
-   <body id="pageTop" <?if(Auth::isAdmin())echo 'class="with-admin-menu"';?> >
+   <body id="pageTop" class="<?
+         echo " module-".Category::getSelectedCategory()->getModule()->getName();
+         echo " module-action-".$this->moduleAction;
+         if(Auth::isAdmin()) echo ' with-admin-menu';
+         ?>" >
       <? // admin menu
       if(Auth::isAdmin() AND $this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) $this->includeTplObj($this->menuAdminObj);
       ?>

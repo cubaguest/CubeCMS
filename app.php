@@ -702,7 +702,6 @@ class AppCore extends TrObject {
             AppCore::setErrorPage();
             return false;
          }
-
          // načtení kontroleru
          if($routes->getClassName() == null) {
             $controllerClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Controller';
@@ -719,6 +718,7 @@ class AppCore extends TrObject {
          $controller->runCtrl();
          // přiřazení šablony do výstupu
          $this->getCoreTpl()->module = $controller->_getTemplateObj();
+         $this->getCoreTpl()->moduleAction = $controller->routes()->getActionName();
       } catch (Exception $e) {
          CoreErrors::addException($e);
       }
