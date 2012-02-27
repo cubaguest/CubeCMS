@@ -132,7 +132,9 @@ abstract class View extends TrObject {
          }
       }
       $this->{$viewName}();
-      $this->addToolBox();
+      if ($this->actionName == "main" AND $this->category()->getRights()->isControll() ) {
+         $this->addBaseToolBox();
+      }
    }
 
 /**
@@ -297,26 +299,31 @@ abstract class View extends TrObject {
       $this->tinyMCE->mainView();
    }
  
-   final private function addToolBox()
+   final public function addBaseToolBox()
    {
       // pokud je hlavní pohled přidáme toolboxy s nastavením (modí být vložen)
-      if ($this->actionName == "main"
-         AND $this->category()->getRights()->isControll()
-         AND $this->toolbox instanceof Template_Toolbox2
-         AND (Category::getSelectedCategory() instanceof Category_Admin) == false) {
+      if ($this->category()->getRights()->isControll() AND (Category::getSelectedCategory() instanceof Category_Admin) == false) {
+         if(($this->template()->toolbox instanceof Template_Toolbox2) == false){
+            $this->template()->toolbox = new Template_Toolbox2();
+         }
+         
          // pokud není vložen nástroj pro nastavení
          if ($this->template()->toolbox->edit_view) {
             unset($this->template()->toolbox->edit_view);
          }
          $this->template()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-         $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+         if(!isset ($this->template()->toolbox->edit_view)){
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
                $this->link()->route(Routes::MODULE_SETTINGS));
-         $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
-         $this->template()->toolbox->addTool($toolEView);
-         $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
+            $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
+            $this->template()->toolbox->addTool($toolEView);
+         }
+         if(!isset ($this->template()->toolbox->edit_metadata)){
+            $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
                $this->link()->route(Routes::MODULE_METADATA));
-         $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
-         $this->template()->toolbox->addTool($toolEMetaData);
+            $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
+            $this->template()->toolbox->addTool($toolEMetaData);
+         }
       }
    }
    
