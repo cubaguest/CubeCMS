@@ -37,6 +37,9 @@ class Actions_View extends View {
          $this->createListToolbox();
       }
       $this->createDetailToolbox();
+      if($this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
+         $this->addBaseToolBox();
+      }
       $this->addMetaTags($this->action);
       $this->template()->addTplFile("detail.phtml");
    }
