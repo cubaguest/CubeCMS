@@ -471,4 +471,27 @@ function vve_convert_entity($string)
    // Entity not found? Destroy it.
    return isset($table[$matches[1]]) ? $table[$matches[1]] : '';
 }
+
+/**
+ * Funkce rozdělí řetězce na poloviny a jednu vrátí (první polovina je vždy větší)
+ * @param string $string -- řetězec
+ * @param bool $firstHalf -- jestli se má vrátit první půlka nebo druhá
+ */
+function vve_split_to_half($text, $firstHalf = true)
+{
+   $text = strip_tags($text);
+   $splitstring1 = substr($text, 0, floor(strlen($text) / 2));
+   $splitstring2 = substr($text, floor(strlen($text) / 2));
+
+   if (substr($splitstring1, 0, -1) != ' ' AND substr($splitstring2, 0, 1) != ' ') {
+      $middle = strlen($splitstring1) + strpos($splitstring2, ' ') + 1;
+   } else {
+      $middle = strrpos(substr($text, 0, floor(strlen($text) / 2)), ' ') + 1;
+   }
+
+   if($firstHalf){
+      return substr($text, 0, $middle);
+   }
+   return substr($text, $middle);
+}
 ?>
