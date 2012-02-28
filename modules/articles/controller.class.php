@@ -495,7 +495,7 @@ class Articles_Controller extends Controller {
          
          $text = $this->loadText();
          $text->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
-         $text->{Text_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues()); 
+         $text->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues()); 
          $text->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
          
          $textM->save($text);
