@@ -1,0 +1,118 @@
+<?
+echo $this->toolbox;
+$this->addFile('css://style.css');
+
+function renderQuestion($question, $tr, $link){
+   ?>
+   <div class="pradvice-item">
+      <?
+      if($question->{Advice_Model::COLUMN_NAME} != null){
+         echo "<h3>".$question->{Advice_Model::COLUMN_NAME}."</h3>";
+      }?>
+      <span class="font-small"><?=vve_date('%x', new DateTime($question->{Advice_Model::COLUMN_DATE_ADD}) )?></span>
+      <div class="question" id="questio-<?=$question->{Advice_Model::COLUMN_ID}?>">
+         <?
+         echo $question->{Advice_Model::COLUMN_QUESTION};
+         ?>
+         <p class="author"><?=$question->{Advice_Model::COLUMN_QUESTIONER_NAME}?></p>
+         <a class="button-show-answer" href="<?=$link?>#id-<?=$question->{Advice_Model::COLUMN_ID}?>" title="<?=$tr->tr('Zobrazit odpověď')?>"
+               ><?=$tr->tr('Zobrazit odpověď')?><br /><br /></a>
+      </div>
+      <div class="answer" id="answer-<?=$question->{Advice_Model::COLUMN_ID}?>"><?=$question->{Advice_Model::COLUMN_ANSWER};?></div>
+   </div>
+<?}
+
+?>
+<h1><?echo $this->category()->getName();?></h1>
+<div class="main-content-detail">
+   <a href="<?=$this->link()->route('addQuestion')?>" title="<?=$this->tr('Vložit dotaz')?>"><?=$this->tr('Vložit dotaz')?></a><br />
+   <?if(!isset($_GET['as']) && !isset($_GET['ad']) && !isset($_GET['ac'])){?>
+   <a class="button-show-search-box" href="<?=$this->link()?>#prad-search-box" title="<?=$this->tr('Zobrazit filtraci')?>"><?=$this->tr('Zobrazit filtraci')?><br /><br /></a>
+   <?}?>
+   <div id="prad-search-box">
+      <h2><?=$this->tr('Nastavení filtru')?></h2>
+      <form action="" method="get">
+         <p>
+            <label for="prad-search-cat"><?=$this->tr('Dle tématu')?>:</label>
+            <select id="prad-search-cat" name="ac">
+               <option value="0"><?=$this->tr('vše')?></option>
+               <? 
+               $cid = isset($_GET['ac']) ? $_GET['ac'] : 0;
+               foreach ($this->cats as $cat) {?>
+                  <option value="<?=$cat->{Advice_Model_Categories::COLUMN_ID}?>" 
+                     <?if($cid == $cat->{Advice_Model_Categories::COLUMN_ID}){ echo 'selected="selected"';}?>><?=$cat->{Advice_Model_Categories::COLUMN_NAME}?></option>
+               <?}?>
+            </select><br />
+            <?if($this->category()->getParam(Advice_Controller::PARAM_ALLOW_DRUGS, false)){?>
+            <label for="prad-search-drug"><?=$this->tr('Dle drogy')?>:</label>
+            <select id="prad-search-drug" name="ad">
+               <option value="0"><?=$this->tr('vše')?></option>
+               <?
+               $did = isset($_GET['ad']) ? $_GET['ad'] : 0;
+               foreach ($this->drugs as $cat) {?>
+                  <option value="<?=$cat->{Advice_Model_Categories::COLUMN_ID}?>" 
+                     <?if($did == $cat->{Advice_Model_Categories::COLUMN_ID}){ echo 'selected="selected"';}?>><?=$cat->{Advice_Model_Categories::COLUMN_NAME}?></option>
+               <?}?>
+            </select><br />
+            <?}?>
+            <label for="prad-search-text"><?=$this->tr('Obsahuje text')?>:</label>
+            <input id="prad-search-text" type="text" name="as" value="<?echo isset($_GET['as']) ? $_GET['as'] : null;?>" />
+            <input type="submit" value="<?=$this->tr('Filtrovat')?>" />
+            <br />
+         </p>
+      </form>
+      <br />
+   </div>
+   <?
+   if($this->questionsCommon != false){?>
+   <a href="<?=$this->link()?>#faq" id="button-pradvice-show-common"><?=$this->tr("Zobrazit často kladené dotazy")?><br /><br /></a>
+   <div id="pradvice-questions-common">
+      <h2><?=$this->tr('Často kladené dotazy')?></h2>
+      <?foreach ($this->questionsCommon as $question) {
+         renderQuestion($question, $this->translator, $this->link());
+      }?>
+   </div>
+   <?}?>
+   
+   <h2><?=$this->tr('Již zodpovězené dotazy poradny')?></h2>
+   <?foreach ($this->questions as $question) {
+      renderQuestion($question, $this->translator, $this->link());
+   }
+   
+   if(empty ($this->questions)){?>
+   <p><?=$this->tr('Žádný dotaz nebyl nalezen. Zkuste změnit parametry filtru.')?></p>
+   <?}?>
+   
+   <?echo $this->scrollComp;?>
+</div>
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+      $('.answer').hide();
+      $('#pradvice-questions-common').hide();
+      <?if(!isset($_GET['as']) && !isset($_GET['ad']) && !isset($_GET['ac'])){?>
+         $('#prad-search-box').hide();
+      <?}?>
+      
+      $('.pradvice-item').click(function(){
+         $('.button-show-answer',this).hide();
+         $('.answer',this).show();
+      });
+      
+      $('#button-pradvice-show-common').click(function(){
+         $(this).hide();
+         $('#pradvice-questions-common').show();
+      });
+      
+      $('.button-show-search-box').click(function(e){
+         e.preventDefault();
+         $(this).hide();
+         $('#prad-search-box').show();
+      });
+      
+   });
+   /* ]]> */
+</script>

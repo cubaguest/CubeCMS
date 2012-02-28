@@ -1,0 +1,217 @@
+<?
+$t = $this->category()->getName().' - '. $this->tr('seznam dotazů');
+Template::addPageTitle($t);
+
+$jq = new JsPlugin_JQuery();
+$this->addJsPlugin(new JsPlugin_JQuery());
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+
+?>
+<h1><?echo $t;?></h1>
+<div class="main-content-form-edit">
+   <table id="table-questions"></table>
+   <div id="table-questions-toolbar">
+      <!--<label for="select-drug-id"><?=$this->tr('Drogy')?>:</label>
+      <select id="select-drug-id" name="sel_drug">
+         <?
+         /*foreach ($this->groups as $grp) {
+            $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
+            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
+         }*/
+         ?>
+         <option value="0">kokain</option>
+      </select>
+      
+      <label for="select-group-id"><?=$this->tr('Skupina')?>:</label>
+      <select id="select-group-id" name="sel_group">
+         <?
+         /*foreach ($this->groups as $grp) {
+            $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
+            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
+         }*/
+         ?>
+         <option value="0">kokain</option>
+      </select>-->
+   </div>
+   <div id="table-questions-pager"></div>
+   <br />
+   <div id="question-info">
+      
+   </div>
+   <p>
+      <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Přejít zpět na úvodní stranu poradny')?>">&Lt; <?=$this->tr('Zpět na úvodní stranu')?></a>
+   </p>
+</div>
+
+<script type="text/javascript">
+   /* <![CDATA[ */
+   // base vars
+   var colors = <?=json_encode($this->answerColors)?>;
+   
+   /* JqGrid formaters */
+   function answerFormatter( cellvalue) 
+   {
+      // format the cellvalue to new format
+      
+      if(cellvalue.length == 0){
+         return '<span style="color: red; font-weight: bold;"><?=$this->tr('Ne')?></span>';
+      }
+      return '<span title="'+stripFormatter(cellvalue)+'"><?=$this->tr('Ano');?></span>';
+   }
+   
+   function stripFormatter(html) 
+   {
+      var tmp = document.createElement("DIV");
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText;
+   }
+   
+   function colorFormatter(cellvalue, options, rowObject ) 
+   {
+      var html = '<div style="background-color: #'+cellvalue+'; padding: 3px; margin:0;">'
+         +'<select name="row-color">';
+      $.each(colors, function(index, value) { 
+         html += '<option value="'+index+'"';
+         if(index == cellvalue){
+            html += 'selected="selected"';
+         }
+         html += '>'+value+'</option> ';
+      });
+      html += '</select></div>';
+      return html;
+   }
+   
+   function publicFormatter(cellvalue, options, rowObject ) 
+   {
+      var input = '<input type="checkbox" name="question_public" ';
+      if(rowObject.<?=Advice_Model::COLUMN_IS_PUBLIC?> == true){
+         input += 'checked="checked" '
+      }
+      if(rowObject.<?=Advice_Model::COLUMN_IS_PUBLIC_ALLOW?> != true){
+         input += 'disabled="disabled" '
+      }
+      return input+'/>';
+   }
+   
+   $(document).ready(function(){
+      var questionsGrid = $("#table-questions").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('questionsList');?>?idgrp=0'/*+$('#select-group-id').val().toString()*/,
+            datatype: "json",
+            colNames:[
+               'ID', 
+               '<?=$this->tr('Dotaz')?>', 
+               '<?=$this->tr('Veřejný')?>', 
+               '<?=$this->tr('Odpověď')?>', 
+               '<?=$this->tr('Vytvořeno')?>',
+               '<?=$this->tr('Štítek')?>', 
+               '<?=$this->tr('Akce')?>'
+            ],
+            colModel:[
+               {name:'<?=Advice_Model::COLUMN_ID?>',index:'<?=Advice_Model::COLUMN_ID?>',
+                  width:40,fixed: true, editable:false, searchtype:"integer"
+               },
+               
+               {name:'<?=Advice_Model::COLUMN_QUESTION?>',index:'<?=Advice_Model::COLUMN_QUESTION?>',
+                  formatter : stripFormatter
+               },
+               
+               {name:'<?=Advice_Model::COLUMN_IS_PUBLIC?>',index:'<?=Advice_Model::COLUMN_IS_PUBLIC?>', 
+                  width:33,fixed: true, formatter: publicFormatter 
+               },
+
+               {name:'<?=Advice_Model::COLUMN_ANSWER?>',index:'<?=Advice_Model::COLUMN_ANSWER?>',
+                  width:33,fixed:true, formatter : answerFormatter, title : false
+               },
+               
+               {name:'<?=Advice_Model::COLUMN_DATE_ADD?>', index:'<?=Advice_Model::COLUMN_DATE_ADD?>', 
+                  width:80,fixed: true, formatter:'date', formatoptions:{srcformat: "Y-m-d H:i:s", newformat: 'd.m.Y'}
+               },
+               
+               {name:'<?=Advice_Model::COLUMN_COLOR?>',index:'<?=Advice_Model::COLUMN_COLOR?>',
+                  width:82,fixed:true, formatter : colorFormatter, title : false
+               },
+               
+               {name:'actions',index:'actions', width:55, fixed: true,
+                  formatter:'actions', formatoptions:{ keys:true, 
+                     onEdit:function(rowid) {
+                        alert("in onEdit: rowid="+rowid+"\nWe don't need return anything");
+                     }
+                     
+                  }
+               }
+            ],
+            rowNum:20,
+            rowList:[10,20,40,100],
+            pager: '#table-questions-pager',
+            sortname: '<?=Advice_Model::COLUMN_DATE_ADD?>',
+            sortorder: 'desc',
+            caption:"<?=$this->tr('Dotazy poradny')?>",
+            jsonReader: {
+               repeatitems : false, root:"rows"
+            },
+            editurl : "<?=$this->link()->route("changeAttribute")?>",
+            autowidth : true,
+            height: '100%',
+            toolbar: [true,"top"]
+         });
+         // toolbar - výběry
+         $("#t_table-questions").append($('#table-questions-toolbar').html());
+         $('#table-questions-toolbar').remove();
+         
+         /* změna barvy */
+         $('select[name="row-color"]').live('change', function(){
+            var $obj = $(this); var newColor = $obj.val(); var rowId = $obj.parents('tr').attr('id');
+            $.ajax({
+               url: "<?=$this->link()->route("changeAttribute")?>",
+               type: "POST",
+               data: {id : rowId, oper : 'color', v : newColor},
+               success : function(){
+                  $obj.parent('div').css('background-color', '#'+newColor);
+               }
+            });
+         });
+         
+         /* změna public */
+         $('input[name="question_public"]').live('change', function(){
+            var $obj = $(this); var rowId = $obj.parents('tr').attr('id');
+            var val = false;
+            if($obj.is(':checked')){ val = true; }
+            $.ajax({
+               url: "<?=$this->link()->route("changeAttribute")?>",
+               type: "POST", data: {id : rowId, oper : 'public', v : val}
+            });
+         });
+         
+         $('.ui-inline-edit').live('click', function(){
+            window.location = ('<?=$this->link()->route('editQuestion')?>').replace('{id}', $(this).parents('tr').attr('id'));
+         });
+         
+         $('.jqgrow').live('dblclick', function(){
+            window.location = ('<?=$this->link()->route('editQuestion')?>').replace('{id}', $(this).attr('id'));
+         });
+         
+         $('.jqgrow').live('click', function(){
+            var $cell = $('td:nth-child(2)',this);
+            $('#question-info').html("").css("background-color","transparent")
+               .append($('<h2></h2>').text('<?=$this->tr('Informace o dotazu')?>'))
+               .append($('td:nth-child(2)',this).text())
+               .css("background-color", "#"+$('td:nth-child(6) option:selected',this).val() )   ;
+         });
+         
+         
+         questionsGrid.jqGrid('navGrid','#table-questions-pager', 
+            {edit:false,add:false,del:false}, 
+            {}, {}, {}, 
+            { // search opts
+               multipleSearch: false, 
+               multipleGroup:false, 
+               closeAfterSearch: true,
+               closeOnEscape:true,
+               sopt : ['eq','ne','cn','nc']
+            } 
+         );
+   });
+   /* ]]> */
+</script>

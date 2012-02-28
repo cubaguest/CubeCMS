@@ -1,0 +1,40 @@
+<?
+$t = $this->tr('Statistiky');
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+$jq = new JsPlugin_JQuery();
+$jq->addUIDatepicker();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+<h1><?echo $t;?></h1>
+<div class="main-content-form-edit">
+   <div class="ui-widget ui-stats">
+      <div class="ui-widget-header ui-corner-top"><?=$this->tr('Celkové statistiky');?></div>
+      <div class="ui-widget-content ui-corner-bottom">
+         <?
+         echo $this->formFull;
+         ?>
+      </div>
+   </div>
+   <br />
+   <div class="ui-widget ui-stats">
+      <div class="ui-widget-header ui-corner-top"><?=$this->tr('Statistiky za určité období');?></div>
+      <div class="ui-widget-content ui-corner-bottom">
+         <?
+         echo $this->formTime;
+         ?>
+      </div>
+   </div>
+   <br />
+   <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Přejít na hlavní stránku poradny')?>">&Lt; <?=$this->tr('Hlavní stránka')?></a>
+</div>
+<?
+?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(document).ready(function(){
+         $( "#time_stats_fromDate_1" ).datepicker({ maxDate: "-1M" });
+      });
+      /* ]]> */
+</script>

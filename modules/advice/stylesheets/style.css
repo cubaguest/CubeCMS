@@ -1,0 +1,56 @@
+.cats-sortable { 
+   list-style-type: none; 
+   margin: 0; 
+   padding: 0; 
+}
+.cats-sortable li { 
+   margin: 0 0 5px 0; 
+   padding: 2px; 
+   padding-left: 1.5em; 
+/*   font-size: 1.4em; */
+/*   height: 18px; */
+}
+.cats-sortable li span { 
+   position: absolute; 
+   margin-left: -1.3em;
+   margin-top: 2px;
+   cursor: move;
+}
+
+input.sort_drugs_name_class, input.sort_cats_name_class 
+{
+   width: 85%;
+}
+
+.sort-tools {
+   margin-bottom: 20px;
+   padding: 2px;
+   padding-left: 1.5em;
+}
+
+#row-tpl {
+   display: none;
+}
+
+.pradvice-item .question {
+   cursor: pointer;
+}
+
+.pradvice-item .answer {
+   padding: 5px;
+   margin-bottom: 1em;
+   margin-left: 2em;
+   background-color: #DFEDED;
+}
+
+.question .author {
+   text-align: right;
+   font-style: italic;
+   font-size: 90%;
+}
+
+/* stats */
+.ui-stats .ui-widget-header,
+.ui-stats .ui-widget-content {
+   padding: 3px;
+}
