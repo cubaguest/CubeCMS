@@ -310,12 +310,12 @@ class People_Controller extends Controller {
       $form->addGroup('images', $this->tr('Nasatvení obrázků'));
 
       $elemImgW = new Form_Element_Text('imgw', $this->tr('Šířka portrétu'));
-      $elemImgW->setSubLabel($this->tr('Výchozí: ') . self::DEFAULT_IMAGE_WIDTH . ' px');
+      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
       $elemImgW->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgW, 'images');
 
       $elemImgH = new Form_Element_Text('imgh', $this->tr('Výška portrétu'));
-      $elemImgH->setSubLabel($this->tr('Výchozí: ') . self::DEFAULT_IMAGE_HEIGHT . ' px');
+      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
       $elemImgH->addValidation(new Form_Validator_IsNumber());
       $form->addElement($elemImgH, 'images');
 
@@ -330,6 +330,8 @@ class People_Controller extends Controller {
       }
       if (isset($settings['cropimg'])) {
          $form->cropimg->setValues($settings['cropimg']);
+      } else {
+         $form->cropimg->setValues($this->category()->getGlobalParam('cropimg', self::DEFAULT_IMAGE_CROP));
       }
 
       if (isset($settings['recordsonpage'])) {
