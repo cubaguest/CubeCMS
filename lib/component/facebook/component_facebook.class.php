@@ -13,7 +13,6 @@ class Component_Facebook extends Component {
    protected $config = array(
            'appId' => null,
            'secret' => null,
-           'targetpage' => null
       );
 
    /**
@@ -31,6 +30,15 @@ class Component_Facebook extends Component {
       // jazykové nastavení
       require_once AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
                       .'nonvve'.DIRECTORY_SEPARATOR."facebook".DIRECTORY_SEPARATOR."facebook.php";
+      
+      // setup base config
+      $this->setConfig('appId', VVE_FCB_APP_ID);
+      $this->setConfig('secret', VVE_FCB_APP_SECRET_KEY);
+   }
+   
+   public static function currentPageId() 
+   {
+      return VVE_FCB_PAGE_ID;
    }
 
    /**
