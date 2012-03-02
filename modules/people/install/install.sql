@@ -16,3 +16,18 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}people` (
   FULLTEXT KEY `surname` (`surname`),
   FULLTEXT KEY `text_clear` (`text_clear`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci AUTO_INCREMENT=1 ;
+
+INSERT INTO `cubecms_global_config` 
+(`key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
+('MODULE_PEOPLE_IMGW', 'Modul people - šířka portrétu', 150, NULL, 0, 'number', 20, NULL)
+   ON DUPLICATE KEY UPDATE `value`= 150;
+
+INSERT INTO `cubecms_global_config` 
+(`key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
+('MODULE_PEOPLE_IMGH', 'Modul people - výška portrétu', 200, NULL, 0, 'number', 20, NULL)
+   ON DUPLICATE KEY UPDATE `value`= 200;
+
+INSERT INTO `cubecms_global_config` 
+(`key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
+('MODULE_PEOPLE_CROPING', 'Modul people - ořez portrétu', 'false', NULL, 0, 'bool', 20, NULL)
+   ON DUPLICATE KEY UPDATE `value`= 'false';
