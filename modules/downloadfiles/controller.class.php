@@ -5,6 +5,7 @@
 
 class DownloadFiles_Controller extends Controller {
    const PARAM_ALLOWED_TYPES = 'ft';
+   const PARAM_COLS = 'cols';
 
    /**
  * Kontroler pro zobrazení textu
@@ -25,7 +26,10 @@ class DownloadFiles_Controller extends Controller {
       
       $files = $model
             ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-            ->order(array(DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC))
+            ->order(array(
+               DownloadFiles_Model::COLUMN_COLUMN => Model_ORM::ORDER_ASC, 
+               DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC,
+               ))
             ->records();
       
       $this->view()->files = $files;
@@ -49,6 +53,9 @@ class DownloadFiles_Controller extends Controller {
          $fileRec->{DownloadFiles_Model::COLUMN_FILE} = $file['name'];
          $fileRec->{DownloadFiles_Model::COLUMN_NAME} = $form->name->getValues();
          $fileRec->{DownloadFiles_Model::COLUMN_TEXT} = $form->text->getValues();
+         if(isset ($form->column)){
+            $fileRec->{DownloadFiles_Model::COLUMN_COLUMN} = $form->column->getValues();
+         }
          
          $model->save($fileRec);
          $this->infoMsg()->addMessage($this->tr('Soubor byl uložen'));
@@ -87,6 +94,9 @@ class DownloadFiles_Controller extends Controller {
          
          $fileRec->{DownloadFiles_Model::COLUMN_NAME} = $form->name->getValues();
          $fileRec->{DownloadFiles_Model::COLUMN_TEXT} = $form->text->getValues();
+         if(isset ($form->column)){
+            $fileRec->{DownloadFiles_Model::COLUMN_COLUMN} = $form->column->getValues();
+         }
          
          $model->save($fileRec);
          $this->infoMsg()->addMessage($this->tr('Soubor byl uložen'));
@@ -119,6 +129,14 @@ class DownloadFiles_Controller extends Controller {
          $this->category()->getParam(self::PARAM_ALLOWED_TYPES, Form_Validator_FileExtension::ALL)));
       $form->addElement($elemFile);
       
+      if($this->category()->getParam(self::PARAM_COLS, 1) > 1){
+         $elemCol = new Form_Element_Select('column', $this->tr('Sloupec'));
+         for ($col = 1; $col <= $this->category()->getParam(self::PARAM_COLS, 1); $col++) {
+            $elemCol->setOptions(array($this->tr("Sloupec ").$col => (string)$col), true);
+         }
+         $form->addElement($elemCol);
+      }
+      
       $elemSave = new Form_Element_SaveCancel('save');
       $form->addElement($elemSave);
       
@@ -127,6 +145,9 @@ class DownloadFiles_Controller extends Controller {
          $form->text->setValues($fileObj->{DownloadFiles_Model::COLUMN_TEXT});
          $form->file->setSubLabel(sprintf($this->tr('Nahraný soubor: <strong>%s</strong>. Pokud nahrajete nový, dojde k přepsání.'), $fileObj->{DownloadFiles_Model::COLUMN_FILE}));
          $form->file->removeValidation('Form_Validator_NotEmpty');
+         if(isset ($form->column)){
+            $form->column->setValues($fileObj->{DownloadFiles_Model::COLUMN_COLUMN});
+         }
       }
       
       if($form->isSend() && $form->save->getValues() == false){
