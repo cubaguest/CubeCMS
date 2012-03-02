@@ -21,7 +21,7 @@ class Actions_Controller extends Controller {
       } else {
          // redirect to current event
          $model = new Actions_Model();
-         $featured = $model->featuredOnly($this->category()->getId())->record();
+         $featured = $model->actualOnly($this->category()->getId())->record();
          
          if($featured != false){
             $this->link()->route('detail', array('urlkey' => $featured->{Actions_Model::COLUMN_URLKEY}))->reload();

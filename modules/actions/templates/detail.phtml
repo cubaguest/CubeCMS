@@ -2,14 +2,14 @@
 $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model_Detail::COLUMN_NAME}?></h1>
-<div class="main-content-detail">
+<div class="post">
    <?if($this->action->{Actions_Model_Detail::COLUMN_SUBANME} != null) {?>
-   <div class="main-content-text"><?=$this->action->{Actions_Model_Detail::COLUMN_SUBANME}?></div>
+   <div class="text subname"><?=$this->action->{Actions_Model_Detail::COLUMN_SUBANME}?></div>
    <?}?>
    <?if($this->action->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
-   <div class="main-content-text"><?=$this->action->{Actions_Model_Detail::COLUMN_AUTHOR}?></div>
+   <div class="text author"><?=$this->action->{Actions_Model_Detail::COLUMN_AUTHOR}?></div>
       <?}?>
-   <div class="main-content-text">
+   <div class="text info">
       <?
       $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_START}));
       $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -34,14 +34,14 @@ $this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
       ?>
    </div>
    <?if($this->action->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-   <div class="main-content-text"><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></div>
+   <div class="text note"><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></div>
       <?}?>
    <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
-   <div class="main-content-image">
+   <div class="title-image">
       <?echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model_Detail::COLUMN_IMAGE}), 'image', null,null, 'post-image'));?>
    </div>
    <?}?>
-   <div class="main-content-text">
+   <div class="text">
    <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
    </div>
    <hr class="reseter" />

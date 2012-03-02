@@ -6,7 +6,7 @@ echo $this->toolbox; // tolbox pro přidání
 <div class="main-content-list">
    <?
    if($this->text != false) {?>
-   <div class="main-content-text">
+   <div class="text">
          <?
          echo $this->text->{Text_Model_Detail::COLUMN_TEXT};
          echo $this->toolboxText; // toolbox pro úpravu úvodního textu
@@ -14,12 +14,13 @@ echo $this->toolbox; // tolbox pro přidání
    </div>
       <?}?>
 
-   <div class="main-content-tools">
+   <div class="tools">
       <a href="<?=$this->link()->route('archive')?>" title="<?=$this->tr('Archiv')?>"><?=$this->tr('Archiv')?></a>
    </div>
-
-   <div class="main-content-list-records">
-   <?foreach ($this->actions as $row) {
+   <?if(!empty ($this->actions)){?>
+   <div class="post-list events-list">
+   <?
+   foreach ($this->actions as $row) {
       if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
       else $class = 'main-content-no-public';
       $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
@@ -27,7 +28,7 @@ echo $this->toolbox; // tolbox pro přidání
          $subLabel = '<span class="">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
       }
 
-      ?><div class="main-content-list-record <?=$class?>">
+      ?><div class="post event <?=$class?>">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
              title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
              ><?=$subLabel?></a><?
@@ -36,11 +37,11 @@ echo $this->toolbox; // tolbox pro přidání
             }
             ?></h2>
             <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
-      <div class="main-content-text">
+      <div class="text author">
                <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
       </div>
             <?}?>
-      <div class="main-content-text">
+      <div class="text info">
             <?
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -65,19 +66,19 @@ echo $this->toolbox; // tolbox pro přidání
             ?>
       </div>
          <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-      <div class="main-content-text">
+      <div class="text note">
           <?=$row->{Actions_Model_Detail::COLUMN_NOTE}?>
       </div>
             <?}?>
       <?if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
-         <div class="main-content-image">
+         <div class="title-image">
             <img src="<?=vve_tpl_art_title_image($row->{Actions_Model_Detail::COLUMN_IMAGE})?>" alt="<?ps($row->{Actions_Model_Detail::COLUMN_NAME})?>" />
          </div>
       <?}?>
-      <div class="main-content-text">
+      <div class="text">
             <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS), 600);?>
       </div>
-      <p class="main-content-link-more">
+      <p class="mlink-more">
          <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
             title="<?=$this->tr('Více')?>"><?=$this->tr('Více')?></a>
       </p>
@@ -86,12 +87,19 @@ echo $this->toolbox; // tolbox pro přidání
       <?}
       ?>
    </div>
-   &laquo;&nbsp;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"
-     ><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;<a
-     href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&nbsp;&raquo;
-   <br/>
-   <br/>
    <?
+   } else if($this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)) {?>
+      <div class="text"><?=$this->tr('Není žádná aktuální nebo nadcházející událost')?></div> 
+   <?} 
+   
+   if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){?>
+     &laquo;&nbsp;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"
+      ><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;<a
+      href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&nbsp;&raquo;
+      <br/>
+      <br/> 
+   <?}
+   
    // rss ikony
    $feeds = new Component_Feed();
    $feeds->setConfig('feedLink', $this->link()->clear());

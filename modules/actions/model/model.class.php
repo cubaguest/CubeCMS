@@ -92,6 +92,18 @@ class Actions_Model extends Model_ORM {
          )", 
          array("idc" => $idc));
    }
+   public function actualOnly($idc)
+   {
+      return $this->where(self::COLUMN_ID_CAT." = :idc AND (".self::COLUMN_PUBLIC." = 1) 
+         AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
+         AND 
+         (
+            (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL AND ".self::COLUMN_TIME." >= CURTIME() )
+            OR (".self::COLUMN_DATE_START." < CURDATE() AND ".self::COLUMN_DATE_STOP." IS NOT NULL AND ".self::COLUMN_DATE_STOP." >= CURDATE() )
+            OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_TIME." IS NULL )
+         )", 
+         array("idc" => $idc));
+   }
 }
 
 ?>
