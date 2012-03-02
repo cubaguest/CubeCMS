@@ -66,7 +66,14 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
                $cur -= self::IMG;
             }
             if(($cur-self::DOC) >= 0){
-               $extensions = array_merge($extensions, array("txt","doc","xls","rtf","ppt","pdf","csv","docx","odf"));
+               $extensions = array_merge($extensions, array(
+                  "txt", "csv",
+                  "doc", "rtf", "docx", 
+                  "xls", "xlt", "xlsx","",
+                  "ppt",
+                  "pdf",
+                  "odf", "odt", "ott", "ots"
+                  ));
                $cur -= self::DOC;
             }
          } else {
