@@ -64,7 +64,11 @@ class Template_Core extends Template {
          //@todo možná dávat celou cestu ke kategorii
          if(empty (self::$pageTitle)){
             array_push(self::$pageTitle, VVE_WEB_NAME);
-            array_push(self::$pageTitle, Category::getSelectedCategory()->getName());
+            if(defined('VVE_USE_CATEGORY_ALT_IN_TITLE') && VVE_USE_CATEGORY_ALT_IN_TITLE == true){
+               array_push(self::$pageTitle, Category::getSelectedCategory()->getName(true));
+            } else {
+               array_push(self::$pageTitle, Category::getSelectedCategory()->getName());
+            }
          } else {
             self::$pageTitle = array_merge(array(VVE_WEB_NAME), self::$pageTitle);
          }
