@@ -89,10 +89,10 @@ class GuestBook_Controller extends Controller {
          $model->save($newItem);
          $this->sendNotifications($newItem);
          $this->infoMsg()->addMessage($this->tr('Příspěvek byl uložen'));
-//         $this->link()
-//            ->param('s')
-//            ->param('question', 'complete')
-//            ->reload();
+         $this->link()
+            ->param('s')
+            ->param('question', 'complete')
+            ->reload();
       }
       $this->view()->form = $form;
 
