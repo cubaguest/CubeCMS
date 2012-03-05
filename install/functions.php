@@ -206,6 +206,20 @@ function checkPHPInstalation()
    }
    addMsg ($msgs, 'Podpora GIF', $status, $info);
 
+   
+   // suhosin
+   addMsg ($msgs, 'Zabezpečení', 'group');
+   ob_start();
+   phpinfo();
+   $phpinfo = ob_get_contents();
+   ob_end_clean();
+   
+   if(strpos($phpinfo, "Suhosin") !== false){
+      addMsg ($msgs, 'Suhosin', 'group');
+      // suhosin.session.cryptua
+      addMsg ($msgs, 'Volba <i>suhosin.session.cryptua</i>', 'warn', 'pokud je zapnuta, nelze použít přihlašování mezi doménami');
+      addMsg ($msgs, 'Volba <i>suhosin.session.cryptdocroot</i>', 'warn', 'pokud je zapnuta, nelze použít přihlašování mezi doménami');
+   }
 
    return $msgs;
 }
