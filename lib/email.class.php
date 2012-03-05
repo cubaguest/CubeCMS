@@ -80,8 +80,8 @@ class Email {
     */
    public function setFrom($address, $name=null)
    {
-      $this->message()->setSender($address, $name);
-      $this->message()->setFrom($address, $name);
+      $this->message()->setSender($address, $this->sanitize($name));
+      $this->message()->setFrom($address, $this->sanitize($name));
       return $this;
    }
 
