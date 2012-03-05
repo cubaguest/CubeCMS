@@ -104,6 +104,10 @@ class Form_Element_Select extends Form_Element {
       $this->renderedId++;
 
       if($this->isMultiple) {
+         $this->setSubLabel(
+            $this->tr('Více možností vyberete podržením klávesy ctrl při vybrěru možností.')."<br />"
+            .$this->getSubLabel()
+            );
          $this->html()->setAttrib('multiple', 'multiple');
       }
       $values = $this->getUnfilteredValues();
