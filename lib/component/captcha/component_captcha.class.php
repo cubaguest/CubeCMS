@@ -41,7 +41,10 @@ class Component_Captcha extends Component {
     */
    public function validate($str)
    {
-      return $_SESSION[$this->getConfig('session')] == $str;
+      if(isset ($_SESSION[$this->getConfig('session')])){
+         return $_SESSION[$this->getConfig('session')] == $str;
+      }
+      return false;
    }
 
    /**
