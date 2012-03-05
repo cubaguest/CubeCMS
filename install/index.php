@@ -1,4 +1,6 @@
 <?php
+/* base headers */
+header("Content-type: text/html; charset=utf-8");
 $errMsg = null;
 $buttonNextTitle = 'Pokračovat';
 $currentLink = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING'];
@@ -66,11 +68,19 @@ if (isset($_POST['next'])) {
                $dbc->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                $dbc->exec('SET CHARACTER SET utf8; SET character_set_connection = utf8;');
                $dbc->exec($sqlStr);
+
+               // install eshop
+               if(isset ($_POST['shop_install']) && $_POST['shop_install'] == "true"){
+                  $sqlStr = file_get_contents(INST_DIR.'sql'.DIRECTORY_SEPARATOR.'install_shop.sql');
+                  $sqlStr = str_replace('{PREFIX}', VVE_DB_PREFIX, $sqlStr);
+                  if($sqlStr != null){
+                     $dbc->exec($sqlStr);
+                  }
+               }
             } catch (Exception $exc) {
                $allowNextStep = false;
                $errMsg = $exc->getTraceAsString();
             }
-
 
             if($allowNextStep){
                redirectToStep($step+1);
