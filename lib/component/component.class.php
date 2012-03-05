@@ -60,6 +60,8 @@ class Component extends TrObject {
     * @var array
     */
    protected $config = array();
+   
+   protected $alreadyRendered = false;
 
    /**
     * Konstruktor třídy, spouští metodu init();
@@ -238,6 +240,7 @@ class Component extends TrObject {
 
    public function  __toString() {
       $this->mainView();
+      $this->alreadyRendered = true;
       return (string)$this->template();
    }
 }
