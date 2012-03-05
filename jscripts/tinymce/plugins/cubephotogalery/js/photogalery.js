@@ -24,7 +24,7 @@ var CubePhotogaleryDialog = {
 
 	init : function(ed) {
 		var f = document.forms[0], nl = f.elements, ed = tinyMCEPopup.editor, dom = ed.dom, n = ed.selection.getNode();
-
+      this.componentUrl = ed.settings.document_base_url+"component/tinymce_photogalery/0/upload.php";
 		tinyMCEPopup.resizeToInnerSize();
       // init swf upload
       this.initSwfUpload();
@@ -41,7 +41,6 @@ var CubePhotogaleryDialog = {
             // @todo vybrat reseter a zařadit místo něj
 //            var images = dom.select('a.image', parent);
 //            var tmpHolder = dom.create('span', {'class' : 'tmp_photo_holder'});
-            
 //            dom.insertAfter(tmpHolder, images[images.length-1]);
 //            ed.selection.select(images[images.length-1], false);
 //            ed.selection.collapse(false);
@@ -57,7 +56,7 @@ var CubePhotogaleryDialog = {
       var settings = {
 				flash_url : "/jscripts/swfupload/swfupload.swf",
 //				flash9_url : "/jscripts/swfupload/swfupload_fp9.swf",
-				upload_url: "/component/tinymce_photogalery/0/upload.php",
+				upload_url: this.componentUrl,
 				post_params: {"upload_send" : "send", 'sessionid' : tinyMCEPopup.editor.settings.editorid},
 				file_size_limit : "5 MB",
             file_types : "*.jpg;*.jpeg;*.png",

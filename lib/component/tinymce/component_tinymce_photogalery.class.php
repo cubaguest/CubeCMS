@@ -54,6 +54,7 @@ class Component_TinyMCE_Photogalery extends Component_TinyMCE {
       if(!Auth::isLogin())
       {
          $this->errMsg()->addMessage($this->tr('Nemáte dostatečná práva k zápisu. Asi jste byl odhlášen'));
+         throw new UnexpectedValueException('You are not logged.');
       }
    }
    
