@@ -10,11 +10,14 @@ class GuestBook_Controller extends Controller {
 
    const PARAM_WISIWIG_EDITOR = 'weditor';
    const PARAM_USE_CAPTCHA = 'uc';
+   const PARAM_NOTIFY_USERS = 'nu';
+   const PARAM_NOTIFY_MAILS = 'nm';
 
    /**
- * Kontroler pro zobrazení textu
- */
-   public function mainController() {
+    * Kontroler pro zobrazení textu
+    */
+   public function mainController() 
+   {
       //		Kontrola práv
       $this->checkReadableRights();
       // pokud je v url parametr s ukážeme rovnou editor (přechod z panelu)
@@ -84,8 +87,12 @@ class GuestBook_Controller extends Controller {
             $newItem->{GuestBook_Model::COLUMN_CLIENT} = $_SERVER['HTTP_USER_AGENT'];
          }
          $model->save($newItem);
+         $this->sendNotifications($newItem);
          $this->infoMsg()->addMessage($this->tr('Příspěvek byl uložen'));
-         $this->link()->param('s')->reload();
+//         $this->link()
+//            ->param('s')
+//            ->param('question', 'complete')
+//            ->reload();
       }
       $this->view()->form = $form;
 
@@ -120,10 +127,56 @@ class GuestBook_Controller extends Controller {
       $this->view()->scrollComp = $scrollComponent;
    }
 
+   protected function sendNotifications($record)
+   {
+      $sendToMails = array();
+      
+      $usersId = $this->category()->getParam(self::PARAM_NOTIFY_USERS, array());
+      $modelusers = new Model_Users();
+      foreach ($usersId as $id) {
+         $user = $modelusers->record($id);
+         if($user != false && $user->{Model_Users::COLUMN_MAIL} != null){
+            $mails = explode(';', $user->{Model_Users::COLUMN_MAIL});
+            $sendToMails[] = $mails[0];
+         }
+      }
+      if( $this->category()->getParam(self::PARAM_NOTIFY_MAILS) != null ){
+         $sendToMails = array_merge($sendToMails, explode(',', $this->category()->getParam(self::PARAM_NOTIFY_MAILS) ));
+      }
+      $sendToMails = array_unique($sendToMails); // remove duplicities   
+      
+      if(empty ($sendToMails)){
+         return;
+      }
+      
+      try {
+         $mail = new Email(true);
+
+         $mail->setSubject('Nový dotaz v knize návštěv na stránkách ' . VVE_WEB_NAME);
+         $mail->setAddress($sendToMails);
+         $mail->setFrom($record->{GuestBook_Model::COLUMN_EMAIL}, $record->{GuestBook_Model::COLUMN_NICK});
+
+         $body = "<html><head></head><body>";
+         $body .= "<p>Na stránkách <a href=\"" . Url_Request::getBaseWebDir() . "\">" . VVE_WEB_NAME . "</a> byl dne " . vve_date("%x") . " v " . vve_date("%X")
+            . " vložen nový dotaz do kategorie <a href=\"" . $this->link()->clear() . "\">" . $this->category()->getName() . "</a>.</p>";
+         $body .= $record->{GuestBook_Model::COLUMN_TEXT};
+         $body .= '</body>';
+         
+         $mail->setContent($body);
+
+         $mail->send();
+      } catch (Exception $exc) {
+         $this->log('Chyba při odesílání e-mailu z modulu guestbook');
+      }
+      
+   }
+
+
    /**
     * Metoda pro nastavení modulu
     */
-   public function settings(&$settings, Form &$form) {
+   public function settings(&$settings, Form &$form) 
+   {
       $form->addGroup('basic');
 
       $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet příspěvků na stránku'));
@@ -171,6 +224,37 @@ class GuestBook_Controller extends Controller {
       }
       $form->addElement($elemCaptcha, $fGrpNewItem);
 
+      $grpNotify = $form->addGroup('notifycation', 'Upozornění na nové příspěvky',
+              'Nastavení upozornění na nové příspěvky');
+
+      $elemNotifyUsers = new Form_Element_Select('notifyUsers', 'Adresy uživatelů v systému');
+      // načtení uživatelů
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->usersForThisWeb(true)->records(PDO::FETCH_OBJ);
+      $usersIds = array();
+      foreach ($users as $user) {
+         if($user->{Model_Users::COLUMN_MAIL} != null){
+            $usersIds[$user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
+              .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Groups::COLUMN_LABEL}
+              .' ('.$user->{Model_Users::COLUMN_MAIL}.')'] = $user->{Model_Users::COLUMN_ID};
+         }
+      }
+      $elemNotifyUsers->setOptions($usersIds);
+      $elemNotifyUsers->setMultiple();
+      $elemNotifyUsers->html()->setAttrib('size', 4);
+      if (isset($settings[self::PARAM_NOTIFY_USERS])) {
+         $elemNotifyUsers->setValues($settings[self::PARAM_NOTIFY_USERS]);
+      }
+      $form->addElement($elemNotifyUsers, $grpNotify);
+      
+      // maily správců
+      $elemNotifyMails = new Form_Element_TextArea('notifyMails', 'E-mailové adresy');
+      $elemNotifyMails->setSubLabel('E-mailové adresy, na které přijde upozornění na nový příspěvek. E-mailové adresy odělené čárkou.');
+      if (isset($settings[self::PARAM_NOTIFY_MAILS])) {
+         $elemNotifyMails->setValues($settings[self::PARAM_NOTIFY_MAILS]);
+      }
+      $form->addElement($elemNotifyMails, $grpNotify);
+      
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scroll'] = $form->scroll->getValues();
@@ -178,6 +262,9 @@ class GuestBook_Controller extends Controller {
          $settings['mintextchars'] = $form->mintextchars->getValues();
          $settings[self::PARAM_WISIWIG_EDITOR] = $form->weditor->getValues();
          $settings[self::PARAM_USE_CAPTCHA] = $form->captcha->getValues();
+         
+         $settings[self::PARAM_NOTIFY_USERS] = $form->notifyUsers->getValues();
+         $settings[self::PARAM_NOTIFY_MAILS] = $form->notifyMails->getValues();
       }
    }
 }
