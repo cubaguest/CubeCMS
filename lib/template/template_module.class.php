@@ -90,7 +90,9 @@ class Template_Module extends Template {
     * @return Template -- objekt sebe
     */
    public function addJsFile($jsfile, $engine = false) {
-      if($engine){
+      if(strncmp ($jsfile, 'http', 4) == 0){
+         parent::addJsFile($jsfile);
+      } else if($engine){
          parent::addJsFile('engine:'.$jsfile);
       } else {
          parent::addJsFile($this->category()->getModule()->getName().':'.$jsfile);
