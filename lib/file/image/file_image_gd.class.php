@@ -24,7 +24,6 @@ class File_Image_Gd extends File_Image_Base {
       
       $tempImg = imagecreatetruecolor($w, $h); 
       imagecopyresampled($tempImg, $this->imageData, 0, 0, $x, $y, $w, $h, $w, $h);
-      imagejpeg($tempImg, "/var/www/vve6/data/tym/test.jpg", $this->quality);  
       $this->imageData = $tempImg;
       
       // úprava rozměrů
