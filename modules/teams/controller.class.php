@@ -109,7 +109,11 @@ class Teams_Controller extends Controller {
          $model->save($record);
          
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
-         $this->link()->route()->reload();
+         if($editForm->gotoEdit->getValues() == true){
+            $this->link()->route("editPhoto", array('id' => $person->getPK()))->reload();
+         } else {
+            $this->link()->route()->reload();
+         }
       }
       $this->view()->form = $addForm;
    }
@@ -131,7 +135,7 @@ class Teams_Controller extends Controller {
       if($person->{Teams_Model_Persons::COLUMN_IMAGE} != null){
          $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
          $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{Teams_Model_Persons::COLUMN_IMAGE});
-         $editForm->addElement($elemRemImg, 'others');
+         $editForm->addElement($elemRemImg, 'others',3);
       }
 
       if ($editForm->isValid()) {
@@ -198,10 +202,75 @@ class Teams_Controller extends Controller {
          $model->save($person);
 
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
+         if($editForm->gotoEdit->getValues() == true){
+            $this->link()->route("editPhoto", array('id' => $person->getPK()))->reload();
+         } else {
+            $this->link()->route()->reload();
+         }
+      }
+      $this->view()->form = $editForm;
+      $this->view()->person = $person;
+   }
+   
+   public function editPhotoController() {
+      $this->checkWritebleRights();
+
+      // načtení dat
+      $model = new Teams_Model_Persons();
+      $person = $model->record($this->getRequest('id'));
+      if($person == false) return false;
+
+      $editForm = new Form('edit_photo_');
+
+      $elemX = new Form_Element_Hidden('start_x');
+      $editForm->addElement($elemX);
+      $elemY = new Form_Element_Hidden('start_y');
+      $editForm->addElement($elemY);
+
+      $elemW = new Form_Element_Hidden('width');
+      $editForm->addElement($elemW);
+
+      $elemH = new Form_Element_Hidden('height');
+      $editForm->addElement($elemH);
+
+      $elemSubmit = new Form_Element_SaveCancel('save');
+      $editForm->addElement($elemSubmit);
+      
+      if($editForm->isSend() && $editForm->save->getValues() == false){
+         $this->link()->route()->reload();
+      }
+      
+      if ($editForm->isValid()) {
+         $fileName = str_replace("-resized", "", $person->{Teams_Model_Persons::COLUMN_IMAGE});
+         $image = new File_Image($this->category()->getModule()->getDataDir().$fileName);
+          
+         $imgNew = $image->copy($this->module()->getDataDir(), true, $person->{Teams_Model_Persons::COLUMN_IMAGE},false);
+            
+         $imgNew->getData()
+            ->crop(
+               $editForm->start_x->getValues(), $editForm->start_y->getValues(), 
+               $editForm->width->getValues(), $editForm->height->getValues()
+               )
+            ->resize(
+               $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH), 
+               $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), 
+               $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+               )
+               ;
+         $imgNew->save();
+            
+//         $person->{Teams_Model_Persons::COLUMN_IMAGE} = $imgNew->getName();
+//         $model->save($person);
+
+         $this->infoMsg()->addMessage($this->tr('portrét byl uložen'));
          $this->link()->route()->reload();
       }
       $this->view()->form = $editForm;
       $this->view()->person = $person;
+      
+      $this->view()->imgW = $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH);
+      $this->view()->imgH = $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT);
+      $this->view()->imgC = $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP);
    }
 
    /**
@@ -263,6 +332,10 @@ class Teams_Controller extends Controller {
       $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
       $iImage->setUploadDir(AppCore::getAppCacheDir());
       $form->addElement($iImage, $gothr);
+      
+      $iImageGoToPhotoEdit = new Form_Element_Checkbox('gotoEdit', $this->tr('Upravit portrét'));
+      $iImageGoToPhotoEdit->setSubLabel($this->tr('Při zaškrtnutí přejde na stránku úpravy portrétu'));
+      $form->addElement($iImageGoToPhotoEdit, $gothr);
       
       $iLink = new Form_Element_Text('link', $this->tr('Prolink'));
       $iLink->addValidation(New Form_Validator_Url());

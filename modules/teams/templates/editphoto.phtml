@@ -1,0 +1,144 @@
+<?
+$this->addCssFile("style.css");
+$this->addJsPlugin(new JsPlugin_JCrop());
+
+// zjištění velikosti obrázku
+$imgName = $this->person->{Teams_Model_Persons::COLUMN_IMAGE};
+$imgOriginalName = str_replace('-resized', "", $imgName);
+$path = $this->category()->getModule()->getDataDir(true);
+$sizes = getimagesize($this->category()->getModule()->getDataDir(false) . $imgOriginalName);
+$sizesSmall = getimagesize($this->category()->getModule()->getDataDir(false) . $imgName);
+
+
+?>
+<h1><?= $this->tr('úprava portrétu'); ?></h1>
+<div class="main-content-form-edit">
+<?
+echo $this->form->renderStart();
+?>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?= $this->tr('Aktuální portrét') ?></span></legend>
+      <table class="form-table">
+         <tr>
+            <td>
+               <img src="<?=$path.$imgName?>" />
+            </td>
+         </tr>
+      </table>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?= $this->tr('Výběr') ?></span><span class="form-legend-text"><?= $this->tr('Myší vyberte oblast ze které se má vytvořit miniatura') ?></span></legend>
+   <table class="form-table">
+      <tr>
+         <td id="cropImage" style="width: 320px">
+            <img width="300" class="edit-image-preview" src="<?= $path.$imgOriginalName ?>" alt="image " />
+         </td>
+         <td>
+            <?= $this->tr('Náhled') ?>
+            <p id="preview" style="overflow:hidden; width:<?= $this->imgW?>px; height:<?=$this->imgH?>px;">
+               <img src="<?=$path.$imgOriginalName?>" />
+            </p>
+         </td>
+      </tr>
+   </table>
+   </fieldset>
+   <fieldset>
+   <table class="form-table">
+      <tbody>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->start_x->setValues(0);
+            print($this->form->start_x->controll());
+            ?>
+         </td>
+      </tr>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->start_y->setValues(0);
+            print($this->form->start_y->controll())
+            ?>
+         </td>
+      </tr>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->width->setValues($this->imgW);
+            print($this->form->width->controll())
+            ?>
+         </td>
+      </tr>
+      <tr class="hidden">
+         <th class="form-labels"></th>
+         <td class="form-controlls">
+            <?
+            $this->form->height->setValues($this->imgH);
+            echo ($this->form->height->controll());
+            ?>
+         </td>
+      </tr>
+      <tr>
+         <th class="form-labels"></th>
+         <td class="form-controlls"><?= $this->form->save->controll() ?></td>
+      </tr>
+      </tbody>
+   </table>
+</fieldset>
+<?echo $this->form->renderEnd();?>
+<script type="text/javascript">
+/* <![CDATA[ */
+   var croping = <?echo $this->imgC == true ? "true" : "false"?>;
+   var imgW = <?= $this->imgW; ?>;
+   var imgH = <?= $this->imgH; ?>;
+   var ratio = croping == true ? Math.round(imgW / imgH) : null;
+      
+   function showPreview(coords){
+      if (parseInt(coords.w) > 0){
+         var rw = imgW/coords.w;
+         var rh = imgH/coords.h;
+
+         if(croping){
+            $('#preview img').css({
+               width: Math.round(rw * <?= $sizes[0] ?>) + 'px',
+               height: Math.round(rh * <?= $sizes[1] ?>) + 'px',
+               marginLeft: '-' + Math.round(rw * coords.x) + 'px',
+               marginTop: '-' + Math.round(rh * coords.y) + 'px'
+            });
+         } else {
+            $('#preview').css({
+               width: Math.round(coords.w) + 'px',
+               height: Math.round(coords.h) + 'px'
+//               marginLeft: '-' + Math.round(rw * coords.x) + 'px',
+//               marginTop: '-' + Math.round(rh * coords.y) + 'px'
+            });
+            $('#preview img').css({
+//               width: Math.round(rw * <?= $sizes[0] ?>) + 'px',
+//               height: Math.round(rh * <?= $sizes[1] ?>) + 'px',
+               marginLeft: '-' + coords.x + 'px',
+               marginTop: '-' + coords.y + 'px'
+            });
+         }
+      }
+      $('input[name=edit_photo_start_x]').val(coords.x);
+      $('input[name=edit_photo_start_y]').val(coords.y);
+      $('input[name=edit_photo_width]').val(coords.w);
+      $('input[name=edit_photo_height]').val(coords.h);
+   };
+
+   $(document).ready(function() {
+      $('#cropImage img').Jcrop({
+         trueSize: [<?= $sizes[0] ?>,<?= $sizes[1]; ?>],
+         onChange: showPreview,
+         onSelect: showPreview,
+         minSize: [ imgW , imgH ],
+         setSelect: [ 0, 0, imgW, imgH ],
+         aspectRatio : ratio
+      });
+   });
+/* ]]> */
+   </script>
+</div>

@@ -31,6 +31,10 @@ class Teams_View extends View {
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('person_edit', $this->tr("Upravit osobu"));
          $toolEdit->setIcon('user_edit.png')->setTitle($this->tr('Upravit osobu'));
          $toolboxEdit->addTool($toolEdit);
+         
+         $toolEditPhoto = new Template_Toolbox2_Tool_PostRedirect('person_edit_photo', $this->tr("Upravit portrét"));
+         $toolEditPhoto->setIcon('image_edit.png')->setTitle($this->tr('Upravit portrét osoby'));
+         $toolboxEdit->addTool($toolEditPhoto);
 
          $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
          $toolDelete->setIcon('user_delete.png');
@@ -55,10 +59,17 @@ class Teams_View extends View {
    public function editView() {
       $this->edit = true;
       $this->addView();
+      Template_Module::setEdit(true);
+   }
+   
+   public function editPhotoView() {
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://editphoto.phtml');
    }
 
    public function editOrderView()
    {
+      Template_Module::setEdit(true);
       $this->template()->addFile('tpl://edit_order.phtml');
    }
 

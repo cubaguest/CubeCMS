@@ -40,6 +40,7 @@ $this->addFile('css://style.css');
             
             <?if($this->toolboxEdit != null){
                $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
+               $this->toolboxEdit->person_edit_photo->setAction($this->link()->route('editPhoto', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
                $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{Teams_Model_Persons::COLUMN_ID});
                echo $this->toolboxEdit;
             }?>
