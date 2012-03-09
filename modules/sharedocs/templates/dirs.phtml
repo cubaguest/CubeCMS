@@ -1,0 +1,161 @@
+<?
+$jq = new JsPlugin_JQuery();
+$jq->addUIDialog();
+
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+
+<h1><?ps($this->category()->getName())?></h1>
+<div id="sharedocs-edit-buttons" class="module-tool-buttons">
+<?if($this->controll == true && $this->formEditDir != null){?>
+   <button id="add-dir"><?=$this->tr('Nová složka')?></button>
+<?}?>
+   <?=$this->tr('Filtrace')?>: <input id="filter-dirs" name="filter-dirs" class="filter-list" value=""/>
+</div>
+<?if($this->controll == true && $this->formEditDir != null){?>
+<div id="edit-dir-form" title="">
+   <?
+   echo $this->formEditDir->renderStart();
+   
+   echo $this->formEditDir->name->label().'<br />';
+   echo $this->formEditDir->name->controll().'<br />';
+   
+   echo $this->formEditDir->title->label().'<br />';
+   echo $this->formEditDir->title->controll().'<br />';
+   echo $this->formEditDir->editRights->label();
+   echo $this->formEditDir->editRights->controll();
+   
+   echo $this->formEditDir->id->controll();
+   echo $this->formEditDir->send->controll();
+   
+   echo $this->formEditDir->renderEnd();
+   ?>
+</div>   
+<?}?>
+<script type="text/javascript">
+   $(document).ready(function(){
+      <?if($this->controll == true && $this->formEditDir != null){?>
+      var editDirDialog = $( "#edit-dir-form" );
+      $('input[type="submit"]', editDirDialog).hide();
+      
+      editDirDialog.dialog({
+         autoOpen: false, height: 250, width: 350, modal: true,
+         buttons: {
+            "<?= $this->tr('Uložit složku') ?>": function() {
+               var bValid = true;
+               var $name = $('input[name="edit_dirname"]', this);
+               
+               if($name.val() == ""){
+                  $name.addClass('ui-state-error').focus();
+                  return;
+               }
+               $('form', this).submit();   
+            },
+            "<?= $this->tr('Zrušit') ?>" : function() {
+               $( this ).dialog( "close" );
+            }
+         },
+         close: function() {
+//            allFields.val( "" ).removeClass( "ui-state-error" );
+         }
+      });
+
+      $( "#add-dir" ).click(function() {
+         resetEditForm();
+         editDirDialog.dialog( "option" , 'title', "<?=$this->tr('Vytvořit složku')?>" ).dialog( "open" );
+      });
+
+      $('form[name="form-delete-dir"]').submit(function(){
+         if(!confirm('<?=$this->tr('Smazat tuto složku včetně všech souborů ?')?>')){
+            return false;
+         }      
+         return true;
+      });
+      $('a.button-edit-dir').click(function(){
+         resetEditForm();
+         // donastavení vlastností
+         var $dialogForm = $('form', editDirDialog);
+         var $container = $(this).parents('.ui-sharedocs-item');
+         
+         $dialogForm.find('input[name="edit_dirid"]').val($container.attr('id').toString().replace('directory-', ""));
+         $dialogForm.find('input[name="edit_dirname"]').val($($container).find('.dir-name').text());
+         if($($container).find('.dir-title').length != 0){
+            $dialogForm.find('textarea[name="edit_dirtitle"]').val($($container).find('.dir-title').text());
+         }
+         // open dialog
+         editDirDialog.dialog( "option" , 'title', "<?=$this->tr('Úprava složky')?> "+$($container).find('.dir-name').text() ).dialog( "open" );
+      });
+      
+      function resetEditForm(){
+         $('form', editDirDialog).find('input[name="edit_dirid"]').val(null);
+         $('form', editDirDialog).find('input[name="edit_dirname"]').val(null);
+         $('form', editDirDialog).find('textarea[name="edit_dirtitle"]').val(null);
+      }
+      <?}?>
+         
+      // filter
+      $('#filter-dirs').keyup(function(){
+         var filter = $(this).val();
+         $('#sharedocs-list-dirs .ui-sharedocs-item').each(function(){
+            var regexp = new RegExp(filter, "i");
+            if( $(".item-name", this).text().search( regexp ) < 0 && $(".item-desc", this).text().search( regexp ) < 0 ) {
+               $(this).hide();
+            } else {
+               $(this).show();
+            }
+         });
+      });
+   });
+</script>   
+
+<div class="main-content-detail filter-items-list" id="sharedocs-list-dirs">
+   
+<?if (!empty($this->dirs)) {
+   foreach ($this->dirs as $file) {
+      ?>
+   <div class="ui-widget ui-sharedocs-item" id="directory-<?=$file->{ShareDocs_Model_Dirs::COLUMN_ID}?>">
+      <div class="ui-widget-header">
+         <a href="<?=$this->link()->route('dirList', array('iddir' => $file->{ShareDocs_Model_Dirs::COLUMN_ID} ))?>" 
+            title="<?=$file->{ShareDocs_Model_Dirs::COLUMN_NAME}?>" class="dir-name item-name"><?=$file->{ShareDocs_Model_Dirs::COLUMN_NAME}?></a>
+         <span class="font-small">
+            (<?
+            if($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD} != null){
+               echo $this->tr('poslední změna souborů').": ". vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD} != null ? 
+                  $file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD} : $file->{ShareDocs_Model_Dirs::COLUMN_DATE_LAST_CHANGE})).", ";
+            }
+            echo $this->tr('složka vytvořena').": ".vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Dirs::COLUMN_DATE_ADD}));
+          
+          ?>)</span>
+         <?if($this->controll){?>
+         <div class="module-row-tool-buttons">
+            <a href="<?=$this->link()?>#edit-dir-form"  class="button-edit-dir"
+               title="<?=$this->tr('Upravit složku')?>"><img src="images/icons/folder_edit.png" alt="folder edit" /></a>
+            <a href="<?=$this->link()->route('editDirAccess', array('iddir' => $file->{ShareDocs_Model_Dirs::COLUMN_ID}))?>" 
+               title="<?=$this->tr('Upravit oprávnění')?>"><img src="images/icons/key.png" alt="key" /></a>
+            <?
+            $this->formDelDir->html()->setAttrib('name', 'form-delete-dir');
+            echo $this->formDelDir->renderStart();
+            $this->formDelDir->id->setValues($file->{ShareDocs_Model_Dirs::COLUMN_ID});
+            echo $this->formDelDir->id->controll();
+            $elemImg = new Form_Element_SubmitImage($this->formDelDir->delete);
+            $elemImg->setImage('images/icons/delete.png');
+            echo $elemImg->controll();
+            echo $this->formDelDir->renderEnd();
+            ?>
+         </div>   
+         <?}?>
+         
+      </div>
+      <?if($file->{ShareDocs_Model_Dirs::COLUMN_TITLE} != null){?>
+      <div class="ui-widget-content dir-title item-desc"><?=$file->{ShareDocs_Model_Dirs::COLUMN_TITLE}?></div>
+      <?}?>
+   </div>
+   <?}
+} else {
+   ?>
+   <div class="ui-widget ui-state-error ui-sharedocs-item">
+      <div class="ui-widget-content ui-state-error-text"><?=$this->tr('Žádná složka nebyla definována')?></div>
+   </div>
+<? } ?>
+</div>

@@ -1,0 +1,75 @@
+<?
+$this->addJsPlugin(new JsPlugin_SWFUpload());
+$this->addJsPlugin(new JsPlugin_PiroBox());
+$this->addFile("css://style.css");
+$jq = new JsPlugin_JQuery();
+$jq->addUIDialog();
+$this->addJsPlugin($jq);
+?>
+<div id="datastorage-buttons">
+   
+   <div class="swfupload-control">
+      <span id="swfUButtonPlaceholder"></span>
+      <button type="button" name="upload" id="uplaod-button"><?=$this->tr('Nahrát');?></button>
+   </div>
+   <button type="button" name="create-dir" id="create-dir-button"><?=$this->tr('Vytvořit složku');?></button>
+   <?
+   // delete items
+   echo $this->formDeleteItems->html()->setAttrib('id', 'delete-items');
+   echo $this->formDeleteItems->renderStart();
+   echo '<p>'.$this->formDeleteItems->names;
+   $this->formDeleteItems->submit->html()->addClass('button-cancel');
+   echo $this->formDeleteItems->submit.'</p>';
+   echo $this->formDeleteItems->renderEnd();
+   ?>
+   <input type="submit" name="open-move-items" value="Přesunout"/>
+   <div id="upload-queue" class="ui-widget action-details">
+      <div class="ui-widget-header">
+         <strong><?=$this->tr("Fronta odesílání")?>:</strong>&nbsp;
+         <button onclick="clearUploadQueue();" title="<?=$this->tr('Vyčistit');?>" class="button-cancel"><?=$this->tr('Vyčistit');?></button>
+      </div>
+      <ul id="upload-list" class="ui-widget-content"></ul>
+   </div>
+   <div id="move-form" class="ui-widget action-details">
+      <p class="validateTips"></p>
+      <?
+      $this->formMoveItems->html()->setAttrib('id', 'move-items');
+      echo $this->formMoveItems->renderStart();
+      echo $this->formMoveItems->items;
+      echo $this->formMoveItems->targetdir->label().'<br />';
+      echo $this->formMoveItems->targetdir->controll().'<br />';
+      echo $this->formMoveItems->newdir->label().'<br />';
+      echo $this->formMoveItems->newdir->controll().'<br />';
+      echo $this->formMoveItems->submit->controll();
+      echo $this->formMoveItems->renderEnd();
+      ?>
+   </div>
+   <div id="rename-form" class="ui-widget action-details">
+      <p class="validateTips"></p>
+      <?
+         echo $this->formRenameItem->renderStart();
+         $this->formRenameItem->oldname->setValues(null);
+         $this->formRenameItem->newname->setValues(null);
+         echo $this->formRenameItem->oldname;
+         echo $this->formRenameItem->newname->label();
+         echo $this->formRenameItem->newname;
+         echo $this->formRenameItem->submit;
+         echo $this->formRenameItem->renderEnd();
+      ?>
+   </div>
+   <div id="createdir-form" class="ui-widget action-details">
+      <p class="validateTips"></p>
+      <?
+         echo $this->formCreateDir->renderStart();
+         echo $this->formCreateDir->name->label().'<br />';
+         echo $this->formCreateDir->name->controll().'<br />';
+         echo $this->formCreateDir->submit;
+         echo $this->formCreateDir->renderEnd();
+      ?>
+   </div>
+   <script type="text/javascript">
+      var uploadUrl = '<?=$this->link()->route('uploadFile')?>';
+      var sessionId = '<?=session_id();?>';
+//      alert('doc ready');
+   </script>
+</div>

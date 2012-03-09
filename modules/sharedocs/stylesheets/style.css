@@ -1,0 +1,46 @@
+@charset "UTF-8";
+
+.ui-sharedocs-item .ui-widget-header,
+.ui-sharedocs-item .ui-widget-content,
+.ui-file-warning {
+   padding: 5px;
+}
+
+.ui-sharedocs-item {
+   margin-bottom: 1em;
+}
+
+#edit-dir-form textarea {
+   width: 300px;
+}
+
+#form-change-filelock, #form-change-filelock * {display: inline;}
+
+.ui-file-info, .ui-file-revisions-info {
+   margin-bottom: 1em;
+}
+.ui-file-info input, .ui-file-info button, .ui-file-info textarea { font-size: 1em !important; }
+
+.ui-file-info td, .ui-file-info th,
+.ui-file-revisions-info td, .ui-file-revisions-info th
+{
+   vertical-align: top;
+   padding: 5px;
+}
+.ui-file-info th {
+   width: 125px;
+}
+
+.ui-file-number { width: 5%;}
+.ui-file-date { width: 18%;}
+.ui-file-user, 
+.ui-file-actions 
+{ width: 12%;}
+
+.ui-file-actions img, 
+#button-file-public-link-generate img 
+{ vertical-align:  -3px; }
+
+.module-tool-buttons { margin-bottom: 0.5em; }
+.module-row-tool-buttons { float: right; }
+.module-row-tool-buttons *, .module-tool-buttons * { display: inline; }

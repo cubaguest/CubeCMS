@@ -1,0 +1,298 @@
+<?
+$this->addFile('css://style.css');
+
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+// parsování velikosti
+if($this->fileSize > (1024 * 1024) ) {
+   $fsize = round($this->fileSize/ (1024 * 1024) ).' MB';
+} else if($this->fileSize > 1024) {
+   $fsize = round($this->fileSize/ (1024) ).' KB';
+} else {
+   $fsize = round($this->fileSize).' B';
+}
+
+$fileIsLockedByOtherUser = false;
+if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
+   $this->file->{ShareDocs_Model_Files::COLUMN_LOCKED_ID_USER} != Auth::getUserId() ){
+   $fileIsLockedByOtherUser = true;     
+}
+
+?>
+
+<h1><? ps(sprintf($this->tr('Dokument "%s"'), $this->file->{ShareDocs_Model_Files::COLUMN_NAME} ));
+?></h1>
+<div class="main-content-detail">
+   <? // titulek souboru
+   if($this->file->{ShareDocs_Model_Files::COLUMN_TITLE} != null){?>
+   <div class="main-content-text"><?=$this->file->{ShareDocs_Model_Files::COLUMN_TITLE}?></div>
+   <?}?>
+   <div id="sharedocs-edit-buttons" class="module-tool-buttons">
+      <form action="<?=$this->link()->route('dirList')?>" method="get">
+         <p><input type="submit" value="<?=$this->tr('Zpět do složky')?>" class="button-cancel" /></p>
+      </form>
+      <?if($this->right == ShareDocs_Controller::RIGHT_WRITE){?>
+      <form action="<?=$this->link()->route('editFile')?>" method="get">
+         <p><input type="submit" value="<?=$this->tr('Upravit informace')?>" /></p>
+      </form>
+      <?
+      $this->formDelete->html()
+         ->setAttrib('name', 'form-delete-file');
+      echo $this->formDelete->renderStart();
+      echo $this->formDelete->id->controll();
+      $this->formDelete->delete->html()
+         ->addClass('button-cancel')
+         ->setAttrib('onclick', 'return confirm(\''
+            .$this->tr('Opravdu smazat tento soubor a všechny jeho revize?').'\')');
+      echo $this->formDelete->delete->controll();
+      echo $this->formDelete->renderEnd();
+      ?>
+      <?}?>
+   </div>
+   <?
+   ?>
+   <h2><?=$this->tr('Informace')?></h2>
+   <table class="ui-widget ui-file-info full-width">
+      <tbody>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Soubor je zamknut')?>:</th>
+            <td class="ui-widget-content">
+               <?
+               if($this->fileLock != null){
+                  echo "<strong>".$this->tr('Ano')."</strong>";
+               } else {
+                  echo "<strong>".$this->tr('Ne')."</strong>";
+               }
+               if($this->formChangeLock != null){
+                  if($fileIsLockedByOtherUser && $this->formChangeLock->lock->getValues() == false){
+                     $this->formChangeLock->html()->setAttrib('onsubmit', 'return confirm(\''.$this->tr('Tento soubor je zamknut jiným uživatelem. Přesto ho odemknout?').'\')');
+                  }
+                  $this->formChangeLock->html()->setAttrib('id', "form-change-filelock");
+                  echo $this->formChangeLock->renderStart();
+                  echo $this->formChangeLock->lock->controll();
+                  echo $this->formChangeLock->chenge->controll();
+                  echo $this->formChangeLock->renderEnd();
+               }
+               ?>
+            </td>
+         </tr>
+         <?if($this->fileLock){?>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Soubor zamknul')?>:</th>
+            <td class="ui-widget-content">
+               <?
+                  echo "<strong>".$this->fileLock->{Model_Users::COLUMN_USERNAME}
+                     ." (".$this->fileLock->{Model_Users::COLUMN_NAME}." ".$this->fileLock->{Model_Users::COLUMN_SURNAME}.") "
+                     ."</strong>";
+               ?>
+            </td>
+         </tr>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('E-mail uživatele')?>:</th>
+            <td class="ui-widget-content">
+               <a href="mailto:<?=$this->fileLock->{Model_Users::COLUMN_MAIL}?>" title="<?=$this->tr('Napsat uživateli')?>"
+                  ><?=$this->fileLock->{Model_Users::COLUMN_MAIL}?></a>
+            </td>
+         </tr>
+         <?}?>
+         
+         
+         <tr><td class="" colspan="2"></td></tr>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Název souboru')?>:</th>
+            <td class="ui-widget-content"><?=$this->file->{ShareDocs_Model_Revs::COLUMN_ORIG_FILENAME}?></td>
+         </tr>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Velikost')?>:</th>
+            <td class="ui-widget-content"><?=$fsize?></td>
+         </tr>
+         <tr><td class="" colspan="2"></td></tr>
+         <tr>
+            <th class="ui-widget-header" colspan="2"><?=$this->tr('Poslední úprava')?></th>
+         </tr>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Datum')?>:</th>
+            <td class="ui-widget-content"><?=vve_date("%x %G:%i", new DateTime($this->file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?></td>
+         </tr>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Uživatel')?>:</th>
+            <td class="ui-widget-content"><?
+            echo $this->file->{Model_Users::COLUMN_USERNAME};
+            if($this->file->{Model_Users::COLUMN_NAME} != null){
+               echo " (".$this->file->{Model_Users::COLUMN_NAME}.' '.$this->file->{Model_Users::COLUMN_SURNAME}.")";
+            }
+            ?></td>
+         </tr>
+         <tr>
+            <th class="ui-widget-header"><?=$this->tr('Popis')?>:</th>
+            <td class="ui-widget-content">
+               <span title="<?ps($this->file->{ShareDocs_Model_Revs::COLUMN_NOTE})?>"><?=vve_tpl_truncate($this->file->{ShareDocs_Model_Revs::COLUMN_NOTE}, 200)?></span>
+            </td>
+         </tr>
+      </tbody>
+   </table>
+   
+   <h2><?=$this->tr('Operace s dokumentem')?></h2>
+   
+   <div class="">
+      <table class="ui-widget ui-file-info full-width">
+         <tr>
+            <th class="ui-widget-header">
+               <?=$this->tr('Stažení aktuální verze')?>
+            </th>
+         </tr>
+         <tr>
+            <td class="ui-widget-content">
+               <?
+               $this->formDownload->html()->addClass(isset ($this->formDownload->lock) ? "with-lock" : null);
+               echo $this->formDownload->renderStart();
+               $this->formDownload->rev->setValues(null);
+               echo $this->formDownload->rev->controll();
+               echo $this->formDownload->donwload->controll();
+               if(isset ($this->formDownload->lock)){
+                  echo $this->formDownload->lock->label();
+                  echo $this->formDownload->lock->controll();
+               }
+               echo $this->formDownload->renderEnd();
+               ?>
+               <?if($this->downloadFile){?><iframe src="<?=$this->link()->param('dw', 'true')?>" id="download_file" name="download_file" width="0" height="0" scrolling="no" frameborder="0"></iframe><?}?>
+            </td>
+         </tr>
+         <?if(isset ($this->formDownload->lock)){?>
+         <tr>
+            <td class="ui-widget-content note">
+               <?=$this->tr('Zamknutí souboru slouží pro jeho editaci. Pokud je editace hotova, stačí nahrát novou verzi a soubor se odemkne.')?>
+            </td>
+         </tr>
+         <?}?>
+         <tr><td></td></tr>
+         <tr>
+            <th class="ui-widget-header">
+               <?=$this->tr('odkaz pro stažení.')?>
+            </th>
+         </tr>
+         <tr>
+            <td class="ui-widget-content">
+               <a href="<?=$this->link()?>#file-public-link-download" id="button-file-public-link-generate">
+                  <img src="images/icons/add.png" alt="add-icon"/>
+                  <?=$this->tr('Vytvořit odkaz')?>
+               </a>
+            </td>
+         </tr>
+         <tr>
+            <td class="ui-widget-content note">
+               <?  printf($this->tr('Odkaz pro stažení umožňuje stáhnout soubor bez přihlášení v systému. Jeho platnost je %s hodin.'), ShareDocs_Controller::TOKEN_MAX_HOURS )?>
+            </td>
+         </tr>
+      </table>
+      
+      <?
+      if($this->formUpload != null){
+         if($fileIsLockedByOtherUser){
+            $this->formUpload->html()->setAttrib('onsubmit', 'return confirm(\''.$this->tr('Tento soubor je zamknut jiným uživatelem. Přesto nahrát novou verzi?').'\')');
+         }
+         echo $this->formUpload->renderStart();
+      ?>
+      <table class="ui-widget ui-file-info full-width">
+         <tr>
+            <th colspan="2" class="ui-widget-header"><?=$this->tr('Nahrání nové verze')?></th>
+         </tr>
+         <?if($fileIsLockedByOtherUser){?>
+         <tr>
+            <td colspan="2" class="ui-state-error">
+               <span class="ui-icon ui-icon-alert" style="float: left;"></span>
+               <span class="ui-state-error-text"><?=$this->tr('POZOR! Soubor je zamknut jiným uživatelem! Při nahrání již nebude uživatelův soubor aktuální!')?></span>
+            </td>
+         </tr>
+         <?}?>
+         <tr>
+            <th class="ui-widget-content">
+               <?
+               echo $this->formUpload->file->label();
+               ?>
+            </th>
+            <td class="ui-widget-content">
+               <?
+               echo $this->formUpload->file->controll();
+               ?>
+            </td>
+         </tr>
+         <tr>
+            <th class="ui-widget-content">
+               <?
+               echo $this->formUpload->note->label();
+               ?>
+            </th>
+            <td class="ui-widget-content">
+               <?
+               echo $this->formUpload->note->controll();
+               ?>
+            </td>
+         </tr>
+         <tr>
+            <td class="ui-widget-content"></td>
+            <td class="ui-widget-content">
+               <?
+               echo $this->formUpload->upload->controll();
+               ?>
+            </td>
+         </tr>
+      </table>
+         <?
+         echo $this->formUpload->renderEnd();
+      }?>
+   </div>
+   
+   <h2><?printf($this->tr('Historie úprav (%s)'),$this->revisionsCount )?></h2>
+   <table class="ui-file-revisions-info full-width">
+      <thead>
+         <tr>
+            <th scope="col" class="ui-widget-header ui-file-number"><?=$this->tr('Č.')?></th>
+            <th scope="col" class="ui-widget-header ui-file-date"><?=$this->tr('Datum')?></th>
+            <th scope="col" class="ui-widget-header ui-file-user"><?=$this->tr('Vložil')?></th>
+            <th scope="col" class="ui-widget-header ui-file-note"><?=$this->tr('Popis')?></th>
+            <th scope="col" class="ui-widget-header ui-file-actions"></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?
+         foreach ($this->revisions as $rev) {?>
+         <tr>
+            <td class="ui-widget-content ui-file-number"><?=$rev->{ShareDocs_Model_Revs::COLUMN_NUMBER}?></td>
+            <td class="ui-widget-content ui-file-date"><?=vve_date("%x %G:%i", new DateTime($rev->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?></td>
+            <td class="ui-widget-content ui-file-user"><?=$rev->{Model_Users::COLUMN_USERNAME}?></td>
+            <td class="ui-widget-content ui-file-note"><?=$rev->{ShareDocs_Model_Revs::COLUMN_NOTE}?></td>
+            <td class="ui-widget-content ui-file-actions">
+               <?
+               echo $this->formDownload->renderStart();
+               $this->formDownload->rev->setValues($rev->{ShareDocs_Model_Revs::COLUMN_ID});
+               echo $this->formDownload->rev->controll();
+               $this->formDownload->donwload->setLabel($this->tr('Stáhnout'));
+               echo $this->formDownload->donwload->controll();
+               echo $this->formDownload->renderEnd();
+               ?>
+            </td>
+         </tr>
+         <?}?>
+      </tbody>
+   </table>
+   <script type="text/javascript">
+   $(document).ready(function(){
+      $('#button-file-public-link-generate').click(function(){
+         var $link = $(this);
+         $.ajax({
+            url: "<?=$this->link()->route('generatePublicLink')?>",
+            success: function(data){
+               if(typeof data.link !== "undefined"){
+                  $link.attr('href', data.link).text(data.link).unbind('click');
+               } else {
+                  alert('ERR: '+data.errmsg.toString());
+               }
+            }
+         });
+         return false;
+      });
+   });
+   </script>
+</div>

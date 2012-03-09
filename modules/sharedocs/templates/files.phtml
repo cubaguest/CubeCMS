@@ -1,0 +1,103 @@
+<?
+$jq = new JsPlugin_JQuery();
+$jq->addUIDialog();
+
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+
+<h1><?ps($this->directory->{ShareDocs_Model_Dirs::COLUMN_NAME})?></h1>
+<p>
+   <?=$this->tr('Poslední změna provedena').': '.  vve_date('%x %G:%i', new DateTime($this->directory->{ShareDocs_Model_Dirs::COLUMN_DATE_LAST_CHANGE}))?>
+</p>
+
+<div id="sharedocs-edit-buttons" class="module-tool-buttons">
+   <form action="<?=$this->link()->route()?>" method="get">
+      <p><input type="submit" value="<?=$this->tr('Zpět na seznam')?>" class="button-cancel" /></p>
+   </form>
+   <?if($this->right == ShareDocs_Controller::RIGHT_WRITE){?>
+   <form action="<?=$this->link()->route('editFile', array('idfile' => 0))?>" method="get">
+      <p><input type="submit" value="<?=$this->tr('Nahrát soubor')?>" /></p>
+   </form>
+   <?}?>
+   <?if($this->controll == true){?>
+   <form action="<?=$this->link()->route('editDirAccess')?>" method="get">
+      <p>
+         <input type="submit" value="<?=$this->tr('Oprávnění ke složce')?>" title="<?=$this->tr('Upravit oprávnění ke složce')?>" class="button-warning" />
+      	<input type="hidden" name="back" value="detail" />
+      </p>
+   </form>
+   <?
+   $this->formDelDir->html()->setAttrib('name', 'form-delete-dir');
+   echo $this->formDelDir->renderStart();
+   $this->formDelDir->id->setValues($this->directory->{ShareDocs_Model_Dirs::COLUMN_ID});
+   echo $this->formDelDir->id->controll();
+   $this->formDelDir->delete->html()->addClass("button-cancel");
+   echo $this->formDelDir->delete->controll();
+   echo $this->formDelDir->renderEnd();
+   }?>
+   <?=$this->tr('Filtrace')?>: <input id="filter-dirs" name="filter-dirs" class="filter-list" value=""/>
+</div>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+      <?if($this->controll == true){?>
+      $('form[name="form-delete-dir"]').submit(function(){
+         if(!confirm('<?=$this->tr('Smazat tuto složku včetně všech souborů ?')?>')){
+            return false;
+         }      
+         return true;
+      });
+      <?}?>
+      // filter
+      $('.filter-list').keyup(function(){
+         var filter = $(this).val();
+         $('.filter-items-list .ui-sharedocs-item').each(function(){
+            var regexp = new RegExp(filter, "i");
+            if( $(".item-name", this).text().search( regexp ) < 0 && $(".item-desc", this).text().search( regexp ) < 0 ) {
+               $(this).hide();
+            } else {
+               $(this).show();
+            }
+         });
+      });
+   });
+</script>   
+<div class="main-content-detail filter-items-list" id="sharedocs-list-files">
+   
+<?if (!empty($this->files)) {
+   foreach ($this->files as $file) {?>
+   <div class="ui-widget ui-sharedocs-item" id="directory-<?=$file->{ShareDocs_Model_Files::COLUMN_ID}?>">
+      <div class="ui-widget-header">
+         <a href="<?=$this->link()->route('file', array('idfile' => $file->{ShareDocs_Model_Files::COLUMN_ID} ))?>" 
+            title="<?=$file->{ShareDocs_Model_Files::COLUMN_NAME}?>" class="file-name item-name">
+            <?=$file->{ShareDocs_Model_Files::COLUMN_NAME}?>
+         </a>
+         <span class="font-small">(<?=$this->tr('Poslední změna')?>: <?=vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?>)</span>
+         <?/* if($this->controll){?>
+         <div class="module-row-edit-buttons">
+            <?
+            $this->formDelFile->html()->setAttrib('name', 'form-delete-dir');
+            echo $this->formDelFile->renderStart();
+            echo $this->formDelFile->id->controll();
+            $elemImg = new Form_Element_SubmitImage($this->formDelFile->delete);
+            $elemImg->setImage('images/icons/delete.png');
+            echo $elemImg->controll();
+            echo $this->formDelFile->renderEnd();
+            ?>
+         </div>   
+         <?}*/?>
+         
+      </div>
+      <?if($file->{ShareDocs_Model_Files::COLUMN_TITLE} != null){?>
+      <div class="ui-widget-content dir-title item-desc"><?=$file->{ShareDocs_Model_Files::COLUMN_TITLE}?></div>
+      <?}?>
+   </div>
+   <?}
+} else {
+   ?>
+   <div class="ui-widget ui-state-error ui-sharedocs-item">
+      <div class="ui-widget-content ui-state-error-text"><?=$this->tr('Žádný soubor nebyl nahrán')?></div>
+   </div>
+<? } ?>
+</div>
