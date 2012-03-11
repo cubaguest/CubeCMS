@@ -147,8 +147,11 @@ class Category_Core extends TrObject {
     * Metoda vrací název kategorie
     * @return string -- název kategorie
     */
-   public function getName()
+   public function getName($tryAlt = false)
    {
+      if($tryAlt && (string) $this->category->{Model_Category::COLUMN_ALT} != null){
+         return (string) $this->category->{Model_Category::COLUMN_ALT};
+      }
       return (string) $this->category->{Model_Category::COLUMN_NAME};
    }
 
