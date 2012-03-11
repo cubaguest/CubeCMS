@@ -86,7 +86,7 @@ class Category_Admin extends Category_Core {
     * Metoda vrací název kategorie
     * @return string -- název kategorie
     */
-   public function getName()
+   public function getName($alt = false)
    {
       return (string) $this->category->{Model_Category::COLUMN_NAME};
    }
