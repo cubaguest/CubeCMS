@@ -852,8 +852,9 @@ class Categories_Controller extends Controller {
       if ($oldParentCatId != $idNewParentCat AND $regenerateUrls) {
          // dočtou se data o kategoriích
          $movedCat->withHidden(true);// (i zkryté)
-         $movedCat->setCategories($modelCat->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
-
+         $modelCat = new Model_Category();
+         $cats = $modelCat->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
+         $movedCat->setCategories($cats);
          // generace polí
          $newParentUrlKeys = array();
          foreach (Locales::getAppLangs() as $lang) {
