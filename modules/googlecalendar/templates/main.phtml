@@ -1,0 +1,277 @@
+<?
+$this->addFile("css://style.css");
+echo $this->toolbox;
+?>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName();?></h1>
+<div class="detail">
+   <div class="text">
+      <div><?=$this->tr('Aktuální datum:')?> <span id="current-date"></span></div>
+      <div id="calendar-buttons">
+         <a href="<?=$this->link()?>#prev" id="button-prev-week"><?=$this->tr('Předchozí')?></a>
+         <a href="<?=$this->link()?>#next" id="button-next-week"><?=$this->tr('Další')?></a>
+      </div>
+      <div id="calendar-table">
+      <table id="calendar" class="full-width">
+         <thead>
+            <tr>
+               <th><?=$this->tr('Den')?></th>
+               <th><?=$this->tr('Události')?></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr id="day-1" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Pondělí')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr id="day-2" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Úterý')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr id="day-3" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Středa')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr id="day-4" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Čtvrtek')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr id="day-5" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Pátek')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr id="day-6" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Sobota')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr id="day-0" class="day">
+               <td class="event-day"><span class="event-day-name"><?=$this->tr('Neděle')?></span><span class="event-date"></span></td>
+               <td class="events">
+                  <table>
+                     <tr>
+                        <td class="event-time"></td>
+                        <td class="event-name"></td>
+                        <td class="event-content"></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+      </div>
+   </div>
+</div>
+<?
+$jq = new JsPlugin_JQuery();
+$this->addJsPlugin($jq);
+$baseDate = new DateTime();
+$dayOfWeek = $baseDate->format("w");
+if($dayOfWeek == 0 ){ // Ne - přesun na Po
+   $dayOfWeek = 0;
+} else if($dayOfWeek == 6){ // So - přesun na Po
+   $dayOfWeek = -1;
+}
+$baseDate->modify((-$dayOfWeek+1)." day");
+?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   // extend date for RFC3339 format
+   Date.prototype.setRFC3339 = function(dString){
+      if (typeof dString != 'string') return;
+      var regexp = /(\d\d\d\d)(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)?(:)?(\d\d)?([\.,]\d+)?($|Z|([+-])(\d\d)(:)?(\d\d)?)/i;
+      var d = dString.match(new RegExp(regexp));
+      if (d) {
+         var year = parseInt(d[1],10);
+         var mon = parseInt(d[3],10) - 1;
+         var day = parseInt(d[5],10);
+         var hour = parseInt(d[7],10);
+         var mins = ( d[9] ? parseInt(d[9],10) : 0 );
+         var secs = ( d[11] ? parseInt(d[11],10) : 0 );
+         var millis = ( d[12] ? parseFloat(String(1.5).charAt(1) + d[12].slice(1)) * 1000 : 0 );
+         if (d[13]) {
+            this.setUTCFullYear(year);
+            this.setUTCMonth(mon);
+            this.setUTCDate(day);
+            this.setUTCHours(hour);
+            this.setUTCMinutes(mins);
+            this.setUTCSeconds(secs);
+            this.setUTCMilliseconds(millis);
+            if (d[13] && d[14]) {
+               var offset = (d[15] * 60)
+               if (d[17]) offset += parseInt(d[17],10);
+               offset *= ((d[14] == '-') ? -1 : 1);
+               this.setTime(this.getTime() - offset * 60 * 1000);
+            }
+         } else {
+            this.setFullYear(year, mon, day);
+            this.setHours(hour, mins, secs);
+         }
+      }
+      return this;
+   };
+
+   Date.prototype.getRFC3339 = function(){ 
+      function pad(n){return n<10 ? '0'+n : n;}
+      return this.getUTCFullYear()+'-'
+         + pad(this.getUTCMonth()+1)+'-'
+         + pad(this.getUTCDate())+'T'
+         + pad(this.getUTCHours())+':'
+         + pad(this.getUTCMinutes())+':'
+         + pad(this.getUTCSeconds())+'Z';
+   }
+   
+   /* BASE INIT */
+   var dateStart = new Date(<?=$baseDate->format("U")?>*1000);
+   var dateEnd = new Date(<?=$baseDate->format("U")?>*1000);
+   dateEnd.setDate(dateStart.getDate()+7);
+   
+   $(document).ready(function(){
+      var $calendar = $('#calendar');
+      $calendar.bind("loadData", function(){
+         var $c = $(this);
+         $.ajax({
+            url: '<?=$this->calendarUrl?>',
+            data : {
+               "start-min" : dateStart.getRFC3339(),
+               "start-max" : dateEnd.getRFC3339(),
+               "alt"       : "json",
+               "orderby"   : "starttime",
+               "sortorder" : "a",
+               "singleevents" : "true"
+            },
+            cache: false,
+            success: function(data){
+               $c.trigger("updateDateString");
+               $c.trigger("updateCalendar", data.feed);
+            }
+         });
+      });
+   
+      $calendar.bind("updateDateString", function(){ 
+         $('#current-date').text(
+            dateStart.getDate()+"."+(dateStart.getMonth()+1)+"."+dateStart.getFullYear()
+            +" - "+dateEnd.getDate()+"."+(dateEnd.getMonth()+1)+"."+dateEnd.getFullYear()
+         );
+      });
+   
+      $calendar.bind("updateCalendar", function(e, data){
+         var $c = $(this);
+         // clear all events
+         $(".events table", $c).removeClass("no-events").html("");
+         // assign dates
+         var tmpD = dateStart;
+         
+         
+         // append feed content with time
+         var items = data.entry;
+         $.each(items, function(indexInArray, element){
+            var dStart = ( new Date() ).setRFC3339(element.gd$when[0].startTime);
+            var dEnd = ( new Date() ).setRFC3339(element.gd$when[0].endTime);
+            
+            var time = dStart.getHours()+":"+ (dStart.getMinutes() < 10 ? "0"+dStart.getMinutes() : dStart.getMinutes()) 
+               +" - "+dEnd.getHours()+":"+( dEnd.getMinutes() < 10 ? "0"+dEnd.getMinutes() : dEnd.getMinutes() );
+            var content = element.title.$t;
+            
+            if(typeof element.content !== "undefined" && element.content.$t != "") {
+               content += " / "+element.content.$t;
+            }
+            if(typeof element.gd$where !== "undefined" && element.gd$where[0].valueString != "") {
+               content += " / "+element.gd$where[0].valueString;
+            }
+            
+            var $row = $('<tr></tr>')
+            .append($('<td></td>').addClass('event-time').text(time))
+            .append($('<td></td>').addClass('event-content').text(content));
+            
+            $('#day-'+dStart.getDay()+" .events table", $c ).append($row);
+         });
+         
+         // empty rows
+         $(".events table:empty", $c)
+            .addClass('no-events')
+            .append( $('<tr></tr>').append( $('<td></td>').text('<?=$this->tr('Žádná událost.')?>') ) );
+         
+      });
+   
+      $calendar.bind("showNextWeek", function(){
+         dateStart.setDate(dateStart.getDate()+7);
+         dateEnd.setDate(dateEnd.getDate()+7);
+         $(this).trigger("loadData");
+      });
+   
+      $calendar.bind("showPrevWeek", function(){
+         dateStart.setDate(dateStart.getDate()-7);
+         dateEnd.setDate(dateEnd.getDate()-7);
+         $(this).trigger("loadData");
+      });
+      
+      $calendar.trigger("loadData");
+   
+      // button load data again
+      $('#button-load').click(function(e){
+         e.preventDefault();
+         $calendar.trigger('loadData');
+      });
+      // prev week buttons
+      $('#button-prev-week').click(function(e){
+         e.preventDefault();
+         $calendar.trigger('showPrevWeek');
+      });
+      // next week buttons
+      $('#button-next-week').click(function(e){
+         e.preventDefault();
+         $calendar.trigger('showNextWeek');
+      });
+   
+   });
+   
+   /* ]]> */
+   </script>
+

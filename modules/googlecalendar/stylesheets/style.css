@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+.day .label {
+   width: 20%;
+}
+.day .events {
+   width: 80%;
+}
+
+.event-time {
+   width: 90px;
+   text-align: center;
+}
+
+.no-events {
+   color: gray;
+   font-size: x-small;
+}
+#calendar .no-events td {
+   border: 0px solid transparent;
+}
+
+#calendar td {
+   padding: 3px;
+   border: 1px solid gray;
+}
+
+#calendar table {
+   width: 100%;
+}
+
+.event-day {
+   font-weight: bold;
+}
