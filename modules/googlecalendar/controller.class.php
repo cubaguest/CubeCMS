@@ -4,7 +4,7 @@
  */
 
 class GoogleCalendar_Controller extends Controller {
-   const PARAM_URL = "url";
+   const PARAM_CALENDAR_ID = "url";
 
    /**
  * Kontroler pro zobrazení textu
@@ -12,24 +12,28 @@ class GoogleCalendar_Controller extends Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-      $this->view()->calendarUrl = $this->category()->getParam(self::PARAM_URL, null);
+      // https://www.google.com/calendar/feeds/ID/public/full
+      $this->view()->calendarUrl = 
+         'https://www.google.com/calendar/feeds/'
+         .urlencode($this->category()->getParam(self::PARAM_CALENDAR_ID, null))
+         .'/public/full'
+      ;
    }
 
    public function settings(&$settings, Form &$form) {
       $fGrpCalendar = $form->addGroup('calendar', $this->tr('Nastavení kalendáře'));
       
-      $eCalUrl = new Form_Element_Text('url', $this->tr('URL Adresa kalendáře v XML'));
-      $eCalUrl->setSubLabel($this->tr('Formát: https://www.google.com/calendar/feeds/<em>userID</em>/public/full'));
-      $eCalUrl->addValidation(new Form_Validator_Url());
+      $eCalID = new Form_Element_Text('idcal', $this->tr('ID kalendáře'));
+      $eCalID->setSubLabel($this->tr('ID google kalendáře. Kalendář musí mít veřejný přístup!'));
       
-      if(isset ($settings[self::PARAM_URL])){
-         $eCalUrl->setValues($settings[self::PARAM_URL]);
+      if(isset ($settings[self::PARAM_CALENDAR_ID])){
+         $eCalID->setValues($settings[self::PARAM_CALENDAR_ID]);
       }
-      $form->addElement($eCalUrl);
+      $form->addElement($eCalID);
       
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
-         $settings[self::PARAM_URL] = $form->url->getValues();
+         $settings[self::PARAM_CALENDAR_ID] = $form->idcal->getValues();
       }
    }
 }
