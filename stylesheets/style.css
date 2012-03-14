@@ -180,7 +180,7 @@ input[type="submit"], input[type="reset"], input[type="button"], button, input[t
    color: black;
    cursor: pointer;
 }
-input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, button:hover, a.form-button:hover, .button:hover {
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, button:hover, a.form-button:hover, .button:hover, input.button-warning:hover {
    background: #fff7d4 url('../images/forms/buttons_back.gif') 0 0 repeat-x;
    text-decoration: none;
 }
@@ -213,7 +213,7 @@ input.form-error, textarea.form-error { background-color: #f4d0d0; }
    font-size: 0.8em !important;
 }
 /* tabulka formuláře */
-form fieldset { width: 100%; margin: 5px 0;}
+form fieldset { width: 100%; margin: 5px 0; padding: 0;}
 form fieldset legend {
 /*   color: #666666;*/
    font-size: 14px;
@@ -505,3 +505,14 @@ textarea, form .form-table .form-element-long {
 .file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd, .file-tiff {background-image: url('../images/files/jpg.gif');}
 .dir-icon {background-image: url('../images/icons/folder.png');}
 /* EOF file extension */
+
+/* PRINT */
+@media print {
+   body { font-size: 80%; }
+   * { background: none!important;  background-color: white!important; }
+   #page { width: auto; } 
+   .image-box {
+      float: left;
+      margin-right: 10px;
+   }
+}
