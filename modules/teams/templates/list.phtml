@@ -36,7 +36,12 @@ $this->addFile('css://style.css');
                   echo '</a>';
                }
                ?></h3>
-            <div class="text"><?=$person->{Teams_Model_Persons::COLUMN_TEXT}?></div>
+            <div class="text">
+               <?if($person->{Teams_Model_Persons::COLUMN_WORK} != null){?>
+                  <h4><?ps($person->{Teams_Model_Persons::COLUMN_WORK})?></h4>
+               <?}?>
+               <?=$person->{Teams_Model_Persons::COLUMN_TEXT}?>
+            </div>
             
             <?if($this->toolboxEdit != null){
                $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));

@@ -93,6 +93,7 @@ class Teams_Controller extends Controller {
          
          $record->{Teams_Model_Persons::COLUMN_NAME} = $addForm->name->getValues();
          $record->{Teams_Model_Persons::COLUMN_SURNAME} = $addForm->surname->getValues();
+         $record->{Teams_Model_Persons::COLUMN_WORK} = $addForm->work->getValues();
          $record->{Teams_Model_Persons::COLUMN_DEGREE} = $addForm->degree->getValues();
          $record->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
          $record->{Teams_Model_Persons::COLUMN_TEXT} = $addForm->text->getValues();
@@ -189,6 +190,7 @@ class Teams_Controller extends Controller {
          
          $person->{Teams_Model_Persons::COLUMN_NAME} = $editForm->name->getValues();
          $person->{Teams_Model_Persons::COLUMN_SURNAME} = $editForm->surname->getValues();
+         $person->{Teams_Model_Persons::COLUMN_WORK} = $editForm->work->getValues();
          $person->{Teams_Model_Persons::COLUMN_DEGREE} = $editForm->degree->getValues();
          $person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $editForm->degreeAfter->getValues();
          $person->{Teams_Model_Persons::COLUMN_TEXT} = $editForm->text->getValues();
@@ -296,6 +298,10 @@ class Teams_Controller extends Controller {
 
       $iDegreeA = new Form_Element_Text('degreeAfter', $this->tr('Titul za jménem'));
       $form->addElement($iDegreeA, $gbase);
+      
+      $iWork = new Form_Element_Text('work', $this->tr('Činnost/práce'));
+      $iWork->setSubLabel($this->tr('Například co daná osoba dělá.'));
+      $form->addElement($iWork, $gbase);
 
       $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $iText->addValidation(New Form_Validator_NotEmpty());
@@ -348,6 +354,7 @@ class Teams_Controller extends Controller {
       if($person instanceof Model_ORM_Record){
          $form->name->setValues($person->{Teams_Model_Persons::COLUMN_NAME});
          $form->surname->setValues($person->{Teams_Model_Persons::COLUMN_SURNAME});
+         $form->work->setValues($person->{Teams_Model_Persons::COLUMN_WORK});
          $form->groupId->setValues($person->{Teams_Model_Persons::COLUMN_ID_TEAM});
          $form->degree->setValues($person->{Teams_Model_Persons::COLUMN_DEGREE});
          $form->degreeAfter->setValues($person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER});
