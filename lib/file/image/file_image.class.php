@@ -92,12 +92,11 @@ class File_Image extends File {
           *
           * Flash má typ obrázku 4 a 13 (IMAGETYPE_SWF a IMAGETYPE_SWC)
           */
-         if($this->imageType != null && $this->imageType != IMAGETYPE_SWF && $this->imageType != IMAGETYPE_SWC) {
+         if($imageProperty != false && $imageProperty[2] != IMAGETYPE_SWF && $imageProperty[2] != IMAGETYPE_SWC) {
             return true;
          }
-      } else {
-         return false;
-      }
+      } 
+      return false;
    }
    
    public function send()
