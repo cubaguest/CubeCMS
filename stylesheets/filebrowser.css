@@ -5,7 +5,7 @@ div,p,span,ul,ol,li,a,a:link,input,button, hr {
    padding: 0;
    outline: none;
 }
-
+input.button {float: right;}
 #itemsList, #fileActions, #infoBox, #log, #clipboard {
    background:white none repeat scroll 0 0;
    border:1px solid gray;
