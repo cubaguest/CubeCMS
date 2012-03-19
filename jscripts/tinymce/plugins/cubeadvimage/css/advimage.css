@@ -1,0 +1,68 @@
+#src_list, #over_list, #out_list {width:280px;}
+.mceActionPanel {margin-top:7px;}
+.alignPreview {border:1px solid #000; width:140px; height:140px; overflow:hidden; padding:5px;}
+.checkbox {border:0;}
+.panel_wrapper div.current {height:350px;}
+#prev {margin:0; border:1px solid #000; width:428px; height:190px; overflow:auto;}
+#align, #classlist {width:150px;}
+#width, #height, input.axis {vertical-align:middle; width:50px; text-align:center;}
+#vtspace, #vbspace,
+#hlspace, #hrspace, 
+#border {vertical-align:middle; width:30px; text-align:center;}
+#class_list {width:180px;}
+input {width: 280px;}
+input.checkbox {width: auto; margin: 0;}
+input.button {
+   float: none;
+/*   width: 50px;*/
+}
+#space-edit {
+   position: relative;
+   height: 60px;
+}
+#space-box {
+   border: 1px solid black;
+   width: 60px;
+   height: 40px;
+   position: relative;
+   top: 8px;
+   left: 15px;
+}
+.space { position: absolute; top: 0; left: 0; }
+#vtspace, #vbspace { left: 30px; }
+#vbspace { top: 40px; }
+#hlspace, #hrspace { top: 20px; }
+#hrspace { left: 60px; }
+
+#constrain, #onmousemovecheck {width:auto;}
+#id, #dir, #lang, #usemap, #longdesc {width:200px;}
+
+#progress {
+   float: left;
+   padding: 5px 0 0 5px;
+   display: none;
+}
+
+.info {
+   font-style: italic;
+   font-size: 92%;
+}
+
+#upload_warning {
+   font-weight: bold;
+   font-size: 110%;
+   margin: 0;
+   padding: 0;
+}
+#upload_status {
+   font-weight: bold;
+   color: green;
+}
+#upload_status.err { color: red; }
+
+#thumb_params, #resize_params {
+   display: none;
+}
+#dirName {
+   font-size: 9px;
+}
