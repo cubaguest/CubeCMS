@@ -331,11 +331,28 @@ function vve_remove_empty_tags($text)
 
 /**
  * Metoda pro výpis řetězce se zakódovanými speciálními html znaky
- * @param type $string 
+ * @param string $string 
+ * @param mixed - (optional) argumenty, jako u funkce sprintf
  */
 function ps($string)
 {
-   echo htmlspecialchars($string);
+   if(func_num_args() == 1){
+      echo htmlspecialchars($string);
+   } else {
+      $args = func_get_args();
+      array_shift($args);
+      echo htmlspecialchars(vsprintf($string, $args));
+   }
+}
+
+/**
+ * Metoda vrátí adresu adresáře ze šablony
+ * @param string $string -- adresa uvnitř adresáře šablony se souborem
+ * @return string
+ */
+function tp($path = null)
+{
+   return Template::face(false).$path;
 }
 
 /**
