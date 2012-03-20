@@ -366,6 +366,16 @@ class Form extends TrObject implements ArrayAccess, Iterator {
             }
          }
       }
+      if(empty($_POST) && isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) == 'post'){ //catch file overload error...
+         if(isset($_SERVER['CONTENT_LENGTH'])){
+            $sendSize = $_SERVER['CONTENT_LENGTH'];
+            AppCore::getUserErrors()->addMessage(
+               sprintf($this->tr("Bylo odesláno %s dat, což je více než je možné přijmout. Maximálně lze odeslat %s."), vve_create_size_str($sendSize), vve_create_size_str(VVE_MAX_UPLOAD_SIZE) ) );
+         } else {
+            AppCore::getUserErrors()->addMessage(
+               sprintf($this->tr("Bylo odesláno více dat než je možné přijmout. Maximálně lze odeslat %s."), vve_create_size_str(VVE_MAX_UPLOAD_SIZE) ) );
+         }
+      }
       if($this->isSend == true) $this->populate();
       return $this->isSend;
    }

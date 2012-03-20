@@ -30,7 +30,7 @@ class Form_Element_File extends Form_Element {
    public function  __construct($name, $label = null, $prefix = null) {
       parent::__construct($name, $label,$prefix);
       $this->setUploadDir(AppCore::getAppCacheDir());
-      $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE*1024*1024));
+      $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
    }
 
    /**
@@ -40,7 +40,6 @@ class Form_Element_File extends Form_Element {
     */
    public function populate() {
       if(isset ($_FILES[$this->getName()])) {
-      //         $this->values = $_FILES[$this->getName()];
          if($this->isMultiLang() OR $this->isDimensional()) {
             $dir = new Filesystem_Dir($this->uploadDir);
             $dir->checkDir();
@@ -62,6 +61,10 @@ class Form_Element_File extends Form_Element {
 //                  $files[] = false; // @TODO -- proč takhle???
                } else {
                   $this->creteUploadError($_FILES[$this->getName()]['error'][$key], $_FILES[$this->getName()]['name'][$key]);
+                  $files[] = array(
+                     'name' => $_FILES[$this->getName()]['name'],
+                     'size' => $_FILES[$this->getName()]["size"]
+                  );
                }
             }
             $this->values = $files;
@@ -83,6 +86,10 @@ class Form_Element_File extends Form_Element {
                $this->values = null;
             } else {
                $this->creteUploadError($_FILES[$this->getName()]['error'], $_FILES[$this->getName()]['name']);
+               $this->values = array(
+                  'name' => $_FILES[$this->getName()]['name'],
+                  'size' => $_FILES[$this->getName()]["size"]
+                  );
             }
          }
       } else {
@@ -99,26 +106,26 @@ class Form_Element_File extends Form_Element {
    private function creteUploadError($errNumber, $fileName) {
       switch($errNumber) {
          case 0: //no error; possible file attack!
-            $this->errMsg()->addMessage(sprintf(_('Problém s nahráním souboru "%s"'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Problém s nahráním souboru "%s"'),$fileName));
             break;
          case UPLOAD_ERR_INI_SIZE: //uploaded file exceeds the upload_max_filesize directive in php.ini
          case UPLOAD_ERR_FORM_SIZE: //uploaded file exceeds the upload_max_filesize directive in php.ini
-            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" je příliš velký maximálně %sB'), $fileName, ini_get('upload_max_filesize')));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" je příliš velký maximálně %s'), $fileName, vve_create_size_str(VVE_MAX_UPLOAD_SIZE)));
             break;
          case UPLOAD_ERR_PARTIAL: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" byl nahrán jen částečně'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl nahrán jen částečně'),$fileName));
             break;
          case UPLOAD_ERR_NO_TMP_DIR: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" se nepodařilo uložit do tmp adresáře'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" se nepodařilo uložit do tmp adresáře'),$fileName));
             break;
          case UPLOAD_ERR_EXTENSION: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf(_('Nahrání souboru "%s" bylo zastaveno'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Nahrání souboru "%s" bylo zastaveno'),$fileName));
             break;
          case UPLOAD_ERR_CANT_WRITE: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf(_('Soubor "%s" se nepodařilo zapsat na serveru'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" se nepodařilo zapsat na serveru'),$fileName));
             break;
          default: //a default error, just in case!  :)
-            $this->errMsg()->addMessage(sprintf(_('Problém s nahráním souboru "%s"'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Problém s nahráním souboru "%s"'),$fileName));
             break;
       }
    }
@@ -223,7 +230,7 @@ class Form_Element_File extends Form_Element {
       if($className === null){
          $className = "Filesystem_File";
       } else if(!class_exists($className)){
-         throw new UnexpectedValueException(sprintf(_('Třídu %s se nepodařilo načíst'),$className), 1);
+         throw new UnexpectedValueException(sprintf($this->tr('Třídu %s se nepodařilo načíst'),$className), 1);
       }
 
       if(isset($this->values['name'])){// pokud je jeden soubor
