@@ -363,7 +363,7 @@ class Model_ORM extends Model {
     */
    public function record($pk = null, $value = null, $fetchParams = self::FETCH_LANG_CLASS)
    {
-      if ($pk == null AND $this->where == null AND empty($this->orders)) { // pokud nejsou žádné podmínky je vytvořen nový
+      if ($pk == null AND $this->where == null AND empty($this->orders) AND empty($this->selectedColumns)) { // pokud nejsou žádné podmínky je vytvořen nový
          Log::msg('Using record for new row is deprecated!! Caller: '.  json_encode(debug_backtrace()));
          return new Model_ORM_Record($this->tableStructure);
       }
