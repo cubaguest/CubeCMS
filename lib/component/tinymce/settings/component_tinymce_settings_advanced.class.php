@@ -16,7 +16,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'content_css' => null,
       'PHPSESSID' => null,
       'cid' => null,
-      'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|name|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
+      'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
       'forced_root_block' => 'p',
       'theme_advanced_toolbar_location' => 'top',
       'theme_advanced_toolbar_align' => 'left',
@@ -24,14 +24,16 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'theme_advanced_resizing' => 'true',
       'entity_encoding' => 'raw',
       'theme_advanced_blockformats' => "p,h2,h3,h4,h5,h6,address,blockquote,code",// not h1,div,dt,dd,samp
-      'valid_styles' => "{'*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align', 'table' : 'margin-left,margin-right',
+      'valid_styles' => "{
+         '*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align, margin-left,margin-right,margin-top,margin-bottom,float,border-left,border-right,border-top,border-bottom', 
+         'table' : 'margin-left,margin-right',
          'ol' : 'list-style-type', 'ul' : 'list-style-type'}",
       'tab_focus' => ':prev,:next',
       'width' => 520,
 
    );
 
-   protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','advimage',/*'cubeadvimage', */'advlink',
+   protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','cubeadvimage', 'cubeadvlink',
       'advlist','emotions','iespell','tabfocus','noneditable','nondeletable',
       'inlinepopups','insertdatetime','preview','media','searchreplace','print','contextmenu','paste',//'directionality','autoresize',
       'fullscreen','visualchars','nonbreaking','xhtmlxtras','template','imgmap','autolink','lists', 'autolink',
@@ -64,7 +66,8 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       parent::__construct();
       $this->settingName = 'advanced';
       // fileBrowser
-      if(in_array('advimage', $this->plugins) || in_array('advlink', $this->plugins)){
+      if(in_array('advimage', $this->plugins) || in_array('advlink', $this->plugins)
+         || in_array('cubeadvimage', $this->plugins) || in_array('cubeadvlink', $this->plugins)){
          $this->advSettings['file_browser_callback'] = $this->fileBrowserFunction;
       }
       // css
