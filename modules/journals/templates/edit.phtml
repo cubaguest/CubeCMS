@@ -1,0 +1,139 @@
+<?
+// do titulku
+if ($this->edit) {
+   $t = sprintf($this->_('úprava deníku %s/%s'), 1, 2011);
+} else {
+   $t = $this->_('přidání deníku');
+}
+$this->addPageTitle($t);
+$this->addPageHeadline($t);
+$this->addJsPlugin(new JsPlugin_JQuery());
+// donastavení formuláře
+//$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
+//$this->form->degree->html()->setAttrib('size', 5);
+$this->form->html()->setAttrib('name', 'upload_journal_form');
+?>
+
+<div class="main-content-form-edit" id="upload_journal_form">
+   <? echo $this->form->renderStart(); ?>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name">Základní informace</span></legend>
+      <table class="form-table">
+         <tbody>
+            <tr>
+               <th class="form-labels">
+                  <?=$this->form->number->label();?>
+               </th>
+               <td class="form-controlls">
+                  <?=$this->form->number->controllAll()?>
+               </td>
+            </tr>
+
+            <tr>
+               <th class="form-labels">
+                  <?=$this->form->year->label()?>
+               </th>
+               <td class="form-controlls">
+                  <?=$this->form->year->controllAll()?>
+               </td>
+            </tr>
+            <tr>
+               <th class="form-labels">
+                  <?=$this->form->file->label()?>
+               </th>
+               <td class="form-controlls">
+                  <?=$this->form->file->controllAll()?>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name">Metadata</span></legend>
+      <table class="form-table">
+         <tbody>
+            <tr>
+               <th class="form-labels" style="width: 10%;">
+                  <?
+                  echo $this->form->label_page->label();
+                  ?>
+               </th>
+               <th class="form-labels">
+                  <?=$this->form->label->label();?>
+               </th>
+            </tr>
+            <?
+            foreach ($this->labels as $key => $label) {
+               $page = $this->labels_pages[$key];
+            ?>
+            <tr>
+               <td class="form-controlls" style="width: 10%;">
+                  <?
+                  $this->form->label_page->setValues($page);
+                  $this->form->label_page->html()->setAttrib('style','width: 30px;');
+                  echo $this->form->label_page->controll();
+                     ?>
+               </td>
+               <td class="form-controlls">
+                  <?
+                  $this->form->label->setValues($label);
+                  $this->form->label->html()->setAttrib('style','width: 450px;');
+                  echo $this->form->label->controll();
+                  ?>
+                  <p style="float: right;">
+                  <a href="#" onclick="rowAdd(this); return false;" title=""><img src="images/icons/add.png" /></a>
+                  <a href="#" onclick="rowDel(this); return false;" title=""><img src="images/icons/delete.png" /></a>
+                  </p>
+               </td>
+            </tr>
+            <?}?>
+         </tbody>
+      </table>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name">Fulltext</span></legend>
+      <table class="form-table">
+         <tbody>
+            <tr>
+               <th class="form-labels">
+                  <?=$this->form->text->label();?>
+               </th>
+               <td class="form-controlls">
+                  <?=$this->form->text->controllAll()?>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </fieldset>
+   <fieldset>
+      <table class="form-table">
+         <tbody>
+            <tr>
+               <th class="form-labels"></th>
+               <td class="form-controlls">
+                  <?=$this->form->save?>
+               </td>
+            </tr>
+         </tbody></table>
+   </fieldset>
+   <? echo $this->form->renderEnd(); ?>
+   <script type="text/javascript">
+      function rowAdd(linkobj){
+         var tr = $(linkobj).parents('tr').clone();
+         tr.find('input').val(null).removeAttr('id');
+         tr.find('label').removeAttr('for');
+         $(linkobj).parents('tr').after(tr);
+      }
+      function rowDel(linkobj){
+         if($('input[name="journal_label[]"]').length == 1){
+            return false;
+         }
+         $(linkobj).parents('tr').remove();
+      }
+      $(document).ready(function(){
+         $('form[name="upload_journal_form"]').submit(function(){
+            showLoadBox($('#upload_journal_form'), 20000);
+         });
+      });
+   </script>
+</div>

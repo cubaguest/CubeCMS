@@ -1,0 +1,30 @@
+<?
+// načtení detailu
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addFile(Url_Request::getBaseWebDir(true).'modules/journals/flexpaper/flexpaper_flash.js');
+$h = sprintf('číslo %s, ročník %s', $this->journal->{Journals_Model::COLUMN_NUMBER}, $this->journal->{Journals_Model::COLUMN_YEAR});
+$this->addPageTitle($h);
+
+echo $this->toolbox; // TOOLBOX  
+?>
+<h1><?= $h ?></h1>
+<div class="main-content-detail">
+   <div id="pdf-viewer" style="height: 500px;"></div>
+   <br />
+   <? $this->includeTpl("buttonback.phtml", true,array('text' => $this->tr('Přejít na seznam čísel'))); ?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   var fp = new FlexPaperViewer(	
+      '/modules/journals/flexpaper/FlexPaperViewer',
+		'pdf-viewer', { config : {
+		SwfFile : '<?=$this->dir.$this->journal->{Journals_Model::COLUMN_FILE}.'.swf'?>',
+		Scale : 0.6, ZoomTransition : 'easeOut', ZoomTime : 0.5,
+		ZoomInterval : 0.2, FitPageOnLoad : false, FitWidthOnLoad : true,
+		PrintEnabled : true, FullScreenAsMaxWindow : false, ProgressiveLoading : false,
+		MinZoomSize : 0.2, MaxZoomSize : 5, SearchMatchAll : false, InitViewMode : 'Portrait',
+		ViewModeToolsVisible : true, ZoomToolsVisible : true, NavToolsVisible : true,
+		CursorToolsVisible : true, SearchToolsVisible : true, localeChain: 'cz_CS'
+   }});
+   /* ]]> */
+</script>
+</div>
