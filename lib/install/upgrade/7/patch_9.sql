@@ -16,7 +16,7 @@ UPDATE `cubecms_global_config` SET `hidden_value`= 1 WHERE `key` = 'FCB_APP_SECR
 
 /* END_UPDATE */
 
-ALTER TABLE `{PREFIX}_config` ADD COLUMN `hidden_value` TINYINT(1) NULL DEFAULT 0  AFTER `callback_func` ;
+ALTER TABLE `{PREFIX}config` ADD COLUMN `hidden_value` TINYINT(1) NULL DEFAULT 0  AFTER `callback_func` ;
 
-UPDATE `{PREFIX}_config` SET `hidden_value`= 1 WHERE `key` = 'FTP_PASSOWRD';
-UPDATE `{PREFIX}_config` SET `hidden_value`= 1 WHERE `key` = 'SMTP_SERVER_PASSWORD';
+UPDATE `{PREFIX}config` SET `hidden_value`= 1 WHERE `key` = 'FTP_PASSOWRD';
+UPDATE `{PREFIX}config` SET `hidden_value`= 1 WHERE `key` = 'SMTP_SERVER_PASSWORD';
