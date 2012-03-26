@@ -147,9 +147,11 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       foreach ($this->columns as &$coll) {
          if($coll['pk'] == true){
             $coll['value'] = $val;
-            break;
          }
+         // change column is from db
+         $coll['changed'] = -1;
       }
+      $this->fromDb = true;
    }
 
    public function getColumns()
