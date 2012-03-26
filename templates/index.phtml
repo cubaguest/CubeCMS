@@ -19,9 +19,7 @@ if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
 }
 
 // base styles
-$this->addFile('css://normalize.css');
-$this->addFile('css://style.css');
-$this->addFile('css://style-content.css');
+$this->addFile('css://style.less');
 // DEBUG
 if(VVE_DEBUG_LEVEL > 0){ $this->addFile('css://style-debug.css');}
 Template::addJsPlugin(new JsPlugin_JQuery());

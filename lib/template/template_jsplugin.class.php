@@ -94,7 +94,7 @@ class Template_JsPlugin extends Template {
     */
    public function addCssFile($cssfile, $engine = false) {
       if(strncmp ($cssfile, 'http', 4) == 0){
-         self::addCss($jsfile);
+         self::addCss($cssfile);
       } else if(!$engine) {
          $filePath = self::getFileDir($cssfile, $this->jsPlugin()->getName(), false);
          if($filePath != null){
@@ -140,7 +140,7 @@ class Template_JsPlugin extends Template {
             $ret = null;
          }
       } else {
-         trigger_error(sprintf(_('Soubor "%s" s šablonou v JsPluginu "%s" nebyl nalezen'),
+         trigger_error(sprintf($this->tr('Soubor "%s" s šablonou v JsPluginu "%s" nebyl nalezen'),
                $file, $pluginName));
       }
       if($withFile == true){

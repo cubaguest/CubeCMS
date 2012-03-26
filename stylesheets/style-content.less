@@ -1,0 +1,86 @@
+/* písma a barvy */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, input, select, textarea,
+table, caption, tbody, tfoot, thead, tr, th, td, 
+body.mceContentBody {
+   font-family: "Tahoma", "Arial", sans-serif !important;
+}
+body.mceContentBody {
+   font-size: 100%;
+}
+
+/* resetovač */
+.reseter {
+   border: 0px none;
+   margin: 0px;
+   padding: 0px;
+   float: none;
+   display: block;
+   clear: both;
+   width: 0px;
+   height: 0px;
+   line-height: 0px;
+   font-size: 0px;
+}
+
+p,h2,h3,h4 {
+   margin: 0;
+   padding: 0;
+   padding-bottom: 5px;
+}
+h1 {
+   font-size: large;
+}
+h2, h2 a {
+   font-size: medium;
+}
+
+
+/* Styly pro boxy */
+.note {
+   font-size: x-small;
+   border-top: 1px solid silver;
+}
+
+/* Styly pro obrázky */
+.image-left {
+   float: left;
+   padding: 0 10px 10px 0;
+}
+.image-right {
+   float: right;
+   padding: 0 0 10px 10px;
+}
+
+a.image {
+    background-color: #D8D9DA;
+    border: 1px solid #B0A1A1;
+    display: block;
+    float: left;
+    width: 150px;
+    height: 180px;
+    margin-bottom: 22px;
+    margin-right: 24px;
+}
+
+a.image:hover {
+    text-decoration: none;
+}
+a.image span {
+   padding: 2px;
+   display: block;
+}
+
+.photogalery + p, .photogalery + div, .photogalery + hr, 
+a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + div 
+{clear: both;}
+
+body.mceContentBody .photogalery {
+   border: 1px dotted gray;
+}
