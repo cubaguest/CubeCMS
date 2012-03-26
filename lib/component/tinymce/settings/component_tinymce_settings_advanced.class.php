@@ -70,18 +70,28 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
          || in_array('cubeadvimage', $this->plugins) || in_array('cubeadvlink', $this->plugins)){
          $this->advSettings['file_browser_callback'] = $this->fileBrowserFunction;
       }
-      // css
-      if(is_file(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
-         Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
-
-         $this->advSettings['content_css'] = Template::face(false).Template::STYLESHEETS_DIR.'/style-content.css';
-      } else if(VVE_SUB_SITE_DIR != null AND is_file(AppCore::getAppLibDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.
-         Template::face().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
-
-         $this->advSettings['content_css'] = Url_Request::getBaseWebDir(true).Template::FACES_DIR.'/'.Template::face().'/'.Template::STYLESHEETS_DIR.'/style-content.css';
+      // css content
+      $contentCss = null;
+      if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style.less.css' ) ){
+         // check less css file form face
+         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR."/style.less.css";
+      } else if(is_file(Template::faceDir(true).Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style.less.css' ) ){
+         // check less css file form parent face
+         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR."/style.less.css";
+      } 
+      // old for normal content css file
+      else if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
+         // from face
+         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR.'/style-content.css';
+      } else if(VVE_SUB_SITE_DIR != null AND 
+         is_file(Template::faceDir(true) .Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
+         // from parent face
+         $contentCss = Template::faceUrl(true).Template::STYLESHEETS_DIR.'/style-content.css';
       } else {
-         $this->advSettings['content_css'] = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
+         // from core
+         $contentCss = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
       }
+      $this->advSettings['content_css'] = $contentCss;
       $this->advSettings['editorid'] = session_id();
       $this->advSettings['cid'] = Category::getSelectedCategory()->getId();
       $this->createSetupFunction();
