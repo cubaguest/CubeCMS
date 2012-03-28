@@ -255,15 +255,17 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       
       // interate over user dir
       $homeDirs = array("/".Component_TinyMCE_Browser::DIR_HOME."/");
-      $ite = new RecursiveDirectoryIterator($dirHome, FilesystemIterator::SKIP_DOTS );
-      foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
-         as $name => $item) {
-         // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
-         if($item->isDir() 
-            && ( strpos($item->getPathname(), "small") === false
-            && strpos($item->getPathname(), "medium") === false ) ){
+      if(is_dir($dirHome)){
+         $ite = new RecursiveDirectoryIterator($dirHome, FilesystemIterator::SKIP_DOTS );
+         foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
+            as $name => $item) {
+            // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
+            if($item->isDir() 
+               && ( strpos($item->getPathname(), "small") === false
+               && strpos($item->getPathname(), "medium") === false ) ){
             
-            array_push($homeDirs, $this->encodeDir($item->getPathname()));
+               array_push($homeDirs, $this->encodeDir($item->getPathname()));
+            }
          }
       }
       // assign to output
