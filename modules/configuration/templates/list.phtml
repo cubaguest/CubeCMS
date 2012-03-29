@@ -47,7 +47,11 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                <td class="column-type"><?=$this->tr('Globální')?></td>
                <td colspan="2">
                   <?if($option->global != null){
-                     echo $option->global->{Model_Config::COLUMN_VALUE};
+                     if($option->global->{Model_Config::COLUMN_HIDDEN} == true){
+                        echo $this->tr('Tajná hodnota.');
+                     } else {
+                        echo $option->global->{Model_Config::COLUMN_VALUE};
+                     }
                   } else {
                      echo $this->tr('Není nastaven');
                   }?>
@@ -66,7 +70,11 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                <td><?=$this->tr('Lokální')?></td>
                <td colspan="2">
                   <?if($option->local != null){
-                     echo $option->local->{Model_Config::COLUMN_VALUE};
+                     if($option->local->{Model_Config::COLUMN_HIDDEN} == true){
+                        echo $this->tr('Tajná hodnota.');
+                     } else {
+                        echo $option->local->{Model_Config::COLUMN_VALUE};
+                     }
                   } else {
                      echo $this->tr('Není nastaven');
                   }?>
