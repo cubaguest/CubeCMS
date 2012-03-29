@@ -338,11 +338,13 @@ class Articles_Controller extends Controller {
          $lasId = $this->saveArticle($names, $urlkeys, $addForm);
          $model = new Articles_Model();
          $art = $model->record($lasId);
+         if(isset($addForm->socNetPublish) && $addForm->socNetPublish->getValues() == true){
+            $this->sendToSocialNetworks($art, $addForm->socNetMessage->getValues());
+         }
 
-//         var_dump($art);flush();exit();
          $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
-                 array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY}))->reload();
+                 array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY}))->rmParam()->reload();
       }
 
       $this->view()->form = $addForm;
@@ -403,6 +405,29 @@ class Articles_Controller extends Controller {
          $this->link()->route('detail',array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
 
+   }
+   
+   protected function sendToSocialNetworks($article, $message = null, $caption = null)
+   {
+      $scPublisher = new Component_SocialNetwork_Publisher();
+      
+      $link = (string)$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))->rmParam();
+      
+      $params = array(
+         'name' => $article->{Articles_Model::COLUMN_NAME},
+         'link' => $link,
+         'description' => (string)$article->{Articles_Model::COLUMN_ANNOTATION} != null ? 
+             $article->{Articles_Model::COLUMN_ANNOTATION} : vve_tpl_truncate($article->{Articles_Model::COLUMN_TEXT_CLEAR}, 300),
+      );
+         
+      if($message != null ){
+         $params['message'] = $message;
+      }
+      if($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null){
+         $params['picture'] = vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE});
+      }
+      
+      $scPublisher->publishPost($params);
    }
 
    public function editPrivateController() {
@@ -689,6 +714,7 @@ class Articles_Controller extends Controller {
 
       $eCreatedDate = new Form_Element_Text('created_date', $this->tr('Datum vytvoření'));
       $eCreatedDate->setValues(vve_date("%x"));
+      $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budousnosti, dojde k zveřejnění až v toto datum.'));
       $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
       $eCreatedDate->addValidation(new Form_Validator_Date());
       $form->addElement($eCreatedDate, $fGrpPublic);
@@ -706,9 +732,24 @@ class Articles_Controller extends Controller {
          $form->addElement($iIdElem, $fGrpPublic);
       }
 
-
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
+      
+      $socialnetworks = new Component_SocialNetwork();
+      if($socialnetworks->isPublishAvailable()){
+         $fGrpSocNet = $form->addGroup('socialNetworks', $this->tr('Sociální sítě'));
+         
+         $elemSNPublish = new Form_Element_Checkbox('socNetPublish', $this->tr('Publikovat'));
+         $elemSNPublish->setSubLabel($this->tr('Zveřejnit tuto položku na sociálních sítích.'));
+         $form->addElement($elemSNPublish, $fGrpSocNet);
+         
+         $elemSNMessage = new Form_Element_Text('socNetMessage', $this->tr('Zpráva'));
+         $form->addElement($elemSNMessage, $fGrpSocNet);
+         
+         /** 
+          * @todo selektor, do kterých sítí publikovat 
+          */
+      }
 
       return $form;
    }
