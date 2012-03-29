@@ -2,22 +2,44 @@
 // načtení detailu
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addFile(Url_Request::getBaseWebDir(true).'modules/journals/flexpaper/flexpaper_flash.js');
-$h = sprintf('číslo %s, ročník %s', $this->journal->{Journals_Model::COLUMN_NUMBER}, $this->journal->{Journals_Model::COLUMN_YEAR});
+$h = sprintf('Číslo %s, ročník %s', $this->journal->{Journals_Model::COLUMN_NUMBER}, $this->journal->{Journals_Model::COLUMN_YEAR});
 $this->addPageTitle($h);
 
-echo $this->toolbox; // TOOLBOX  
+echo $this->toolbox; // TOOLBOX
 ?>
-<h1><?= $h ?></h1>
+<h1 class=""><?= $h ?></h1>
 <div class="main-content-detail">
-   <div id="pdf-viewer" style="height: 500px;"></div>
+   <?if(count($this->labels) > 0){ ?>
+      <div id="journal-labels">
+         <label for="journal-labels-select"><?=$this->tr('Články')?>:</label>
+         <select onchange="getDocViewer().gotoPage(this.value);" id="journal-labels-select">
+      <?foreach ($this->labels as $label) {?>
+            <option value="<?=$label->{Journals_Model_Labels::COLUMN_PAGE}?>"><?=$label->{Journals_Model_Labels::COLUMN_LABEL}?></option>
+      <?}?>
+         </select>
+      </div>
+   <?}?>
+   <div id="pdf-viewer" style="height: 600px;"></div>
    <br />
-   <? $this->includeTpl("buttonback.phtml", true,array('text' => $this->tr('Přejít na seznam čísel'))); ?>
+   <?
+   $this->optionalButtons[] = array(
+      'link' => $this->linkBack, 
+      'content' => $this->tr('Přejít na seznam čísel'), 
+      'class' => "icon icon-left"
+      );
+   $this->optionalButtons[] = array(
+      'link' => $this->dir.$this->journal->{Journals_Model::COLUMN_FILE}, 
+      'content' => $this->tr('Stáhnout pdf'), 
+      'class' => "file-icon file-pdf"
+      );
+   $this->printFunction = "javascript:getDocViewer().printPaper();";   
+   $this->includeTpl('articletools.phtml', true);?>
 <script type="text/javascript">
    /* <![CDATA[ */
-   var fp = new FlexPaperViewer(	
+   fp = new FlexPaperViewer(
       '/modules/journals/flexpaper/FlexPaperViewer',
 		'pdf-viewer', { config : {
-		SwfFile : '<?=$this->dir.$this->journal->{Journals_Model::COLUMN_FILE}.'.swf'?>',
+      SwfFile : escape('<?=$this->dir.$this->journal->{Journals_Model::COLUMN_FILE}.'.swf'.($this->category()->getRights()->isWritable() == true ? "?t=".time() : null ) ?>'),
 		Scale : 0.6, ZoomTransition : 'easeOut', ZoomTime : 0.5,
 		ZoomInterval : 0.2, FitPageOnLoad : false, FitWidthOnLoad : true,
 		PrintEnabled : true, FullScreenAsMaxWindow : false, ProgressiveLoading : false,

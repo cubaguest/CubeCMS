@@ -1,5 +1,5 @@
 ALTER TABLE `{PREFIX}journals` 
-ADD COLUMN `journal_viewed` VARCHAR(45) NULL AFTER `journal_text` , 
+ADD COLUMN `journal_viewed` INT NULL DEFAULT '0' AFTER `journal_text` , 
 CHANGE COLUMN `number` `journal_number` SMALLINT(6) NOT NULL  , 
 CHANGE COLUMN `year` `journal_year` SMALLINT(6) NOT NULL  , 
 CHANGE COLUMN `file` `journal_file` VARCHAR(100) CHARACTER SET 'utf8' NULL DEFAULT NULL  , 

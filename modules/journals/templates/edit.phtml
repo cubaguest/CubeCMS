@@ -50,7 +50,7 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
    </fieldset>
    <fieldset class="fieldset-alt">
       <legend><span class="form-legend-name">Metadata</span></legend>
-      <table class="form-table">
+      <table class="form-table full-width">
          <tbody>
             <tr>
                <th class="form-labels" style="width: 10%;">
@@ -77,7 +77,7 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
                <td class="form-controlls">
                   <?
                   $this->form->label->setValues($label);
-                  $this->form->label->html()->setAttrib('style','width: 450px;');
+                  $this->form->label->html()->setAttrib('style','width: 85%;');
                   echo $this->form->label->controll();
                   ?>
                   <p style="float: right;">
@@ -99,7 +99,11 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
                   <?=$this->form->text->label();?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->text->controllAll()?>
+                  <?
+                  $this->form->text->html()->setAttrib('style', 'width: 85%; height: 200px;');
+                  $this->form->text->htmlSubLabel()->addClass('font-small');
+                  echo $this->form->text->controllAll();
+                  ?>
                </td>
             </tr>
          </tbody>

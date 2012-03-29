@@ -1,42 +1,50 @@
 <?
 echo $this->toolbox;// TOOLBOXY
-
 ?>
-<h1><?=$this->category()->getName()?></h1>
+<h1 class="hidden"><?=$this->category()->getName()?></h1>
 <div class="main-content-list-records">
-   <?if(count($this->years > 1)){?>
+   <?if(count($this->years) > 1){?>
    <form action="<?=$this->link()?>" method="get">
       <p>
-         <label for="select-year"><?=$this->tr('Starší ročníky')?>:</label>
-         <select name="y" id="select-year" style="font-size: 80%;" onchange="this.form.submit()">
+         <label for="select-year"><?=$this->tr('Výběr ročníku')?>:</label>
+         <select id="select-year" style="font-size: 80%;" onchange="this.form.action = this.value; this.form.submit()">
             <?foreach ($this->years as $year => $numJournals) {?>
-            <option value="<?=$year?>" <?if($this->yearCurrent == $year){echo 'selected="selected"';}?> 
+            <option value="<?=$this->link()->route('showYear', array('year' => $year))?>" <?if($this->yearCurrent == $year){echo 'selected="selected"';}?> 
                     ><?=$this->tr("Ročník ").$year." &#8211; ".$this->tr(array('%s číslo', '%s čísla', '%s čísel'), $numJournals) ?></option>      
             <?}?>
          </select>
-         <input type="submit" value="<?=$this->tr('Zobrazit')?>" />
+<!--         <input type="submit" value="<?=$this->tr('Zobrazit')?>" />-->
       </p>
    </form>
    <?
    }
+   
    if(empty ($this->journals)){?>
    <div class="main-content-text">Žádné číslo nebylo nahráno</div>
    <?} else {
-      foreach ($this->journals as $journal) {?>
-      <div class="main-content-list-record">
-      <div class="main-content-list-record-image">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).$journal->{Journals_Model::COLUMN_FILE}?>.jpg" alt="<?=$this->tr('Titulní strana')?>"/>
-      </div>
-      <h2>
-         <a href="<?=$this->link()->route('show', array('year' => $journal->{Journals_Model::COLUMN_YEAR}, 
-            'number' => $journal->{Journals_Model::COLUMN_NUMBER} ))?>" title="<?  printf($this->tr('Otevřít číslo %s'), $journal->{Journals_Model::COLUMN_NUMBER})?>">
-            <?printf($this->tr('Ročník %s / číslo %s'), $journal->{Journals_Model::COLUMN_YEAR}, $journal->{Journals_Model::COLUMN_NUMBER})?>
-         </a>
-      </h2>
-      <div class="main-content-list-record-text"><? ps ($journal->labels);?></div>
-      <hr class="reseter" />
+   foreach ($this->journals as $journal) {?>
+   <div class="main-content-list-record journal">
+   <div class="main-content-list-record-image journal-image">
+      <img src="<?=$this->category()->getModule()->getDataDir(true).$journal->{Journals_Model::COLUMN_FILE}?>.jpg" alt="<?=$this->tr('Titulní strana')?>"/><br />
    </div>
-   <?}
-   }?>
+   <h2>
+      <a href="<?=$this->link()->route('show', array('year' => $journal->{Journals_Model::COLUMN_YEAR},
+         'number' => $journal->{Journals_Model::COLUMN_NUMBER} ))?>" title="<?  printf($this->tr('Otevřít číslo %s'), $journal->{Journals_Model::COLUMN_NUMBER})?>">
+         <?printf($this->tr('Ročník %s / číslo %s'), $journal->{Journals_Model::COLUMN_YEAR}, $journal->{Journals_Model::COLUMN_NUMBER})?>
+      </a>
+   </h2>
+      <div class="main-content-list-record-text">
+         <?=vve_tpl_truncate( strip_tags($journal->labels),130 );?>
+         <div class="journal-actions font-small">
+            <a class="file-icon file-pdf" href="<?=$this->dir.$journal->{Journals_Model::COLUMN_FILE}?>" title="stáhnout pdf">stáhnout pdf</a>
+            <?if($this->category()->getRights()->isWritable()){?>
+            <span><?printf($this->tr('Zobrazeno: %sx'), $journal->{Journals_Model::COLUMN_VIEWED})?></span>   
+            <?}?>
+         </div>
+      </div>
+      
+   <hr class="reseter" />
+   </div>
+   <?}}?>
 </div>
 

@@ -69,6 +69,7 @@ class Journals_View extends View {
     * Viewer pro přidání článku
     */
    public function addView() {
+    Template_Module::setEdit(true);
       $this->template()->addTplFile("edit.phtml");
    }
 
