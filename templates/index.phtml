@@ -7,6 +7,9 @@ if(Template::browser()->isMobile() && ( !isset($_COOKIE['mobile'] ) || $_COOKIE[
 // base metatags
 Template_Core::setMetaTag('Robots', 'index,follow');
 Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE);
+if(VVE_FCB_APP_ID != null){
+   Template_Core::setMetaTag('fb:app_id', VVE_FCB_APP_ID);
+}
 // detekce IE
 Template::setPVar('IE',false);
 $matches = array();
