@@ -23,7 +23,9 @@ class Component_SocialNetwork extends Component {
    
    protected function detectAllowedNewtworks()
    {
-      $this->publishToNetworks = array('facebook');
+      if(VVE_FCB_ACCESS_TOKEN != null && VVE_FCB_APP_ID != null && VVE_FCB_APP_SECRET_KEY != null){
+         $this->publishToNetworks = array('facebook');
+      }
    }
 
    public function getNetworks()
@@ -39,6 +41,11 @@ class Component_SocialNetwork extends Component {
    protected function isValidNetwork($name)
    {
       return in_array($name, $this->publishToNetworks);
+   }
+   
+   public function isPublishAvailable()
+   {
+      return !empty($this->publishToNetworks);
    }
 
    /* UNUSED */
