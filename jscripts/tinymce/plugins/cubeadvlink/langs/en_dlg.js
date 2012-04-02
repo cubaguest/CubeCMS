@@ -50,5 +50,16 @@ tinyMCE.addI18n('en.cubeadvlink_dlg',{
    langcode:"Language Code",
    "target_langcode":"Target Language",
    width:"Width",
-   height:"Height"
+   height:"Height",
+   /* Cube */
+   "tab_upload":"Uplaod from computer",
+   file:"Soubor",
+   "file_select" : "Select file"
+   ,"dir_name" : "Folder to store"
+   ,"dir_new_name" : "New folder"
+   ,"upload" : "Upload"
+   ,"file_uplaod" : "File upload"
+   ,"file_uplaod_warning" : "File must be uploaded before insert!"
+   ,"file_is_not_uploaded" : "Soubor nebyl nahr\u00e1n. Pokra\u010dovat bez nahr\u00e1n\u00ed?"
+   ,"target_dir" : "C\u00edlov\u00fd adres\u00e1\u0159"
 });
