@@ -26,7 +26,7 @@ class Articles_Panel extends Panel {
    }
 
    public function panelView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml'));
+      $this->template()->addFile('tpl://'.$this->panelObj()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml'));
       $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
 
