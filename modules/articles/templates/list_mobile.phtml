@@ -18,7 +18,7 @@ $h1 = $this->category()->getName()
                vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}),$article->{Articles_Model::COLUMN_NAME}, 100, 100);
          } else {
             $doc = new DOMDocument();
-            @$doc->loadHTML($article->{Articles_Model::COLUMN_TEXT});
+            @$doc->loadHTML('<?xml encoding="UTF-8">' .$article->{Articles_Model::COLUMN_TEXT});
             $xml = simplexml_import_dom($doc); // just to make xpath more simple
             $images = $xml->xpath('//img');
             if(!empty ($images) && isset ($images[0])){
