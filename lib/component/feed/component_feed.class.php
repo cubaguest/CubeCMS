@@ -77,7 +77,7 @@ class Component_Feed extends Component {
       }
       $feed->flush();
 //      flush();
-//      exit();
+      exit();
    }
 
    /**

@@ -16,7 +16,7 @@ class Module_Rss extends Module_Core {
          case 'xml':
             $this->links;
             $model = new Model_Category();
-            $cats = $model->getCategoryList();
+            $cats = $model->withRights()->where(Model_Category::COLUMN_FEEDS." = 1", array())->records();
             $rssComp = new Component_Feed();
             foreach ($cats as $cat) {
                if ($cat->{Model_Category::COLUMN_FEEDS} != true) continue;
@@ -40,7 +40,7 @@ class Module_Rss extends Module_Core {
             break;
          default:
             $model = new Model_Category();
-            $cats = $model->getCategoryList();
+            $cats = $model->withRights()->where(Model_Category::COLUMN_FEEDS." = 1", array())->records();
             $link = new Url_Link(true);
             $link->clear(true);
             foreach ($cats as $cat) {
