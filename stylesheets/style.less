@@ -4,6 +4,7 @@
 
 /* PATHS */
 @imgdir: "../images/";
+@stdBoxSpace: 20px;
 /* SOF RESET */
 /* v1.0 | 20080212 */
 
@@ -161,8 +162,8 @@ span[title] {
 }
 .message p { margin-bottom:3px; border-top: 1px solid gray;}
 .message p:first-child { border: none;}
-#infoMessages { border-color: #b7dcff; background-color: #cce6ff; background-image: url('@{imgdir}icons/accept.png');}
-#errMessages { border-color: #ffc7c0; background-color: #ffe3e0; background-image: url('@{imgdir}icons/error.png');}
+#infoMessages, .message-info { border-color: #b7dcff; background-color: #cce6ff; background-image: url('@{imgdir}icons/accept.png');}
+#errMessages, .message-err { border-color: #ffc7c0; background-color: #ffe3e0; background-image: url('@{imgdir}icons/error.png');}
 #coreErrMessage { border-color: #ffa095; background-color: #ffb2a9; background-image: url('@{imgdir}icons/error.png');}
 
 
