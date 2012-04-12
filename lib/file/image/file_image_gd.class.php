@@ -42,7 +42,7 @@ class File_Image_Gd extends File_Image_Base {
 
       $optimalWidth = $optionArray['optimalWidth'];
       $optimalHeight = $optionArray['optimalHeight'];
-
+      
       // *** Resample - create image canvas of x, y size  
       $imageResized = imagecreatetruecolor($optimalWidth, $optimalHeight);
       imagealphablending($imageResized, false);
@@ -69,7 +69,7 @@ class File_Image_Gd extends File_Image_Base {
       // úprava rozměrů
       $this->width  = imagesx($this->imageData);  
       $this->height = imagesy($this->imageData);
-      
+
       return $this;
    }
    
@@ -128,8 +128,7 @@ class File_Image_Gd extends File_Image_Base {
    {
       $this->loadImageData();
       
-      $type = $format == null ? $this->imageType : $format;
-      switch($type)  
+      switch($format == null ? $this->imageType : $format)  
       {  
         case IMAGETYPE_JPEG:  
             if (imagetypes() & IMG_JPG) {  
@@ -320,10 +319,10 @@ class File_Image_Gd extends File_Image_Base {
          $optimalHeight = $newHeight;
       } else {
       // *** Image to be resizerd is a square  
-         if ($newHeight < $newWidth) {
+         if ($newHeight > $newWidth) {
             $optimalWidth = $newWidth;
             $optimalHeight = $this->getSizeByFixedWidth($newWidth);
-         } else if ($newHeight > $newWidth) {
+         } else if ($newHeight < $newWidth) {
             $optimalWidth = $this->getSizeByFixedHeight($newHeight);
             $optimalHeight = $newHeight;
          } else {
@@ -332,7 +331,7 @@ class File_Image_Gd extends File_Image_Base {
             $optimalHeight = $newHeight;
          }
       }
-
+      
       return array('optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight);
    }
 

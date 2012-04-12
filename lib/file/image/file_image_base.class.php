@@ -188,7 +188,7 @@ abstract class File_Image_Base extends TrObject {
    }
    
    /**
-    * Mtoda pro uložení obrázku (automaticky upraví příponu) nebo ho vypíše
+    * Metoda pro uložení obrázku (automaticky upraví příponu) nebo ho vypíše
     * @param string/File $file -- objek souboru nebo název obrázku
     * @param const $format -- formát IMAGETYPE_XXX
     */
@@ -196,7 +196,15 @@ abstract class File_Image_Base extends TrObject {
    {
       return null;
    }
-
+   
+   /**
+    * Metoda pro uložení obrázku
+    */
+   public function save()
+   {
+      return $this->write((string)$this->file);
+   }
+   
    /**
     * Detekce typu obrázku konstanty IMAGE_XXX
     */
