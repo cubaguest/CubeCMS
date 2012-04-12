@@ -207,7 +207,9 @@ class Url_Request {
          }
          Url_Link_Module::setRoute($this->getModuleUrlPart());
          Url_Link::setParams($this->getUrlParams());
-         Locales::setLang($this->getUrlLang());
+         if($this->getUrlLang() != null){
+            Locales::setLang($this->getUrlLang());
+         }
          Url_Link::setLang($this->getUrlLang());
       }
    }
@@ -229,8 +231,8 @@ class Url_Request {
       if(preg_match("/^(?:([a-z]{2})\/)?(.*)/", self::$fullUrl, $match) ){
          if(!empty ($match)) {
             $this->lang = $match[1];
-            Locales::setLang($this->lang);
-            Url_Link::setLang(Locales::getLang());
+            // Locales::setLang($this->lang);
+            // Url_Link::setLang(Locales::getLang());
             $return = true;
          }
       }
@@ -327,8 +329,8 @@ class Url_Request {
       if(preg_match("/^(?:([a-z]{2})\/)?(.*)/", self::$fullUrl, $match) ){
          if(!empty ($match)) {
             $this->lang = $match[1];
-            Locales::setLang($this->lang);
-            Url_Link::setLang(Locales::getLang());
+            // Locales::setLang($this->lang);
+            // Url_Link::setLang(Locales::getLang());
          }
       }
       $regexp = '/^((?:sitemap|rss)).((xml|txt|html)+)/i';
