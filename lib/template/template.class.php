@@ -523,6 +523,7 @@ class Template extends TrObject {
    public static function factory() {
       self::setFace(VVE_TEMPLATE_FACE);
       self::$browser = new Browser();
+      Template_Face::factory();
    }
    
    /**
@@ -798,7 +799,11 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
          throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
       
-      lessc::ccompile($path . $rpFile, $path . $rpFile.".css");
+      try {
+         lessc::ccompile($path . $rpFile, $path . $rpFile . ".css");
+      } catch (Exception $exc) {
+         new CoreErrors($exc);
+      }
       return $url.self::STYLESHEETS_DIR."/".$file.".css";
    }
    
