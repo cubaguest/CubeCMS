@@ -81,11 +81,6 @@ class AppCore extends TrObject {
    const ENGINE_CONFIG_DIR = 'config';
 
    /**
-    * Název konfiguračního souboru
-    */
-   const ENGINE_CONFIG_FILE = "config.php";
-
-   /**
     * Adresář s ostatními pluginy
     */
    const ENGINE_PLUGINS_DIR = 'plugins';
@@ -206,7 +201,6 @@ class AppCore extends TrObject {
       $this->_startTime=((float)$sec + (float)$usec);
       //		Definice globálních konstant
       define('URL_SEPARATOR', '/');
-      define('VVE_APP_IS_RUN', true);
       // verze PHP
       if(!defined('PHP_VERSION_ID')){
          $version = explode('.',PHP_VERSION);
@@ -230,11 +224,6 @@ class AppCore extends TrObject {
       } else {
          define('SERVER_PLATFORM', 'WIN');
       }
-      // base cfg file
-      require_once AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
-      if(defined('VVE_PARENT_CONFIG') && is_file(AppCore::getAppLibDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE)){
-         require_once AppCore::getAppLibDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::ENGINE_CONFIG_FILE;
-      }
       // inicializace parametrů jádra a php
       $this->_initCore();
 
@@ -243,7 +232,7 @@ class AppCore extends TrObject {
 
       // Autoloaders
       spl_autoload_extensions('.class.php,.php');
-      spl_autoload_register();
+      // spl_autoload_register(); PHP 5.3.10 make warnings here
       spl_autoload_register(array('AppCore', 'libLoader'));
       spl_autoload_register(array('AppCore', 'moduleLoader'));
    }
@@ -575,7 +564,7 @@ class AppCore extends TrObject {
     */
    public static function setAppMainDir($appMainDir)
    {
-      self::$_appWebDir = $appMainDir.DIRECTORY_SEPARATOR;
+      self::$_appWebDir = $appMainDir;
    }
 
    /**
@@ -584,7 +573,7 @@ class AppCore extends TrObject {
     */
    public static function setAppMainLibDir($appMainLibDir)
    {
-      self::$_appLibDir = $appMainLibDir.DIRECTORY_SEPARATOR;
+      self::$_appLibDir = $appMainLibDir;
    }
 
    /**
