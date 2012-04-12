@@ -28,7 +28,7 @@ class AppCore extends TrObject {
    /**
     * Revize Enginu
     */
-   const ENGINE_RELEASE = 10;
+   const ENGINE_RELEASE = 11;
 
    /**
     * Obsahuje hlavní soubor aplikace

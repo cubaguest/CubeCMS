@@ -402,6 +402,9 @@ class Articles_Controller extends Controller {
          $this->saveArticle($names, $urlkeys, $editForm, $article);
          // nahrání nové verze článku (kvůli url klíči)
          $article = $model->getArticleById($editForm->art_id->getValues());
+         if(isset($editForm->socNetPublish) && $editForm->socNetPublish->getValues() == true){
+            $this->sendToSocialNetworks($article, $editForm->socNetMessage->getValues());
+         }
          $this->link()->route('detail',array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
 
@@ -592,7 +595,10 @@ class Articles_Controller extends Controller {
       // title image
       if(isset ($form->titleImageUpload) AND $form->titleImageUpload->getValues() != null){
          $image = new Filesystem_File_Image($form->titleImageUpload);
-         $image->saveAs(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR, VVE_ARTICLE_TITLE_IMG_W, VVE_ARTICLE_TITLE_IMG_H, true);
+         $image->saveAs(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR, 
+            $this->category()->getParam('TITLE_IMAGE_WIDTH', VVE_ARTICLE_TITLE_IMG_W), 
+            $this->category()->getParam('TITLE_IMAGE_HWIGHT', VVE_ARTICLE_TITLE_IMG_H), 
+            $this->category()->getParam('TITLE_IMAGE_CROP', VVE_ARTICLE_TITLE_IMG_C));
          $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $image->getName();
       }
       
