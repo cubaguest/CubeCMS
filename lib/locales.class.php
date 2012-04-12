@@ -346,7 +346,7 @@ class Locales extends TrObject {
       if(self::langExist($lang)){
          self::$selectLang = $lang;
       } else {
-         self::$selectLang = self::$defaultLang;
+         self::selectLang();
       }
       //self::setLocalesEnv(); // kvůli změně
    }
