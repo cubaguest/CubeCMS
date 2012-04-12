@@ -301,7 +301,7 @@ class File extends TrObject implements File_Interface {
     */
    public function copy($path, $returnNewObj = false, $newFile = null, $createUniqueName = true)
    {
-      $obj = $this;
+      $obj = &$this;
       if($returnNewObj == true){
 //         $obj = unserialize(serialize($this)); // THIS IS SLOW !!!
          $obj = clone($this);
@@ -329,9 +329,9 @@ class File extends TrObject implements File_Interface {
          $obj->setPath($path);
          $obj->setName($newFile);
       }
-      if(!chmod((string)$obj, 0666)) {
-         throw new File_Exception(sprintf($this->tr('Chyba při úpravě oprávnění souboru %s'),(string)$obj), 3);
-      }
+//      if(!chmod((string)$obj, 0666)) {
+//         throw new File_Exception(sprintf($this->tr('Chyba při úpravě oprávnění souboru %s'),(string)$obj), 3);
+//      }
       return $obj;  
    }
    
