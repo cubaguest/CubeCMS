@@ -342,6 +342,15 @@ function vve_generate_token($len = 32, $md5 = true)
 
       # Trim the token
       $token = substr($md5token, 0, $len);
-   } return $token;
+   } 
+   return $token;
+}
+
+function vve_image_cacher($path, $width = null, $height = null, $crop = false){
+   $sizes = $width.'x'.$height.($crop == false ? '' : 'c');
+   $path = str_replace(Url_Request::getBaseWebDir(), 
+      Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/', 
+      $path);
+   return $path."?hash=". urlencode(crypt($sizes,VVE_DB_PASSWD));
 }
 ?>

@@ -3,6 +3,11 @@
 RewriteEngine On
 RewriteRule ^config/config\.php$ / [R=permanent,L]
 
+# image cacher
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?)/(.+)$ index.php?internalApp=imagecacher&s=$3&tf=$1&is=$2 [L,QSA]
+
 # RewriteCond $1 ^jscripts/
 # RewriteCond %{REQUEST_FILENAME} !-f
 # Rewriterule ^jscripts/(.*) http://www.cube.cz/jscripts/$1 [R,L]
@@ -10,18 +15,17 @@ RewriteRule ^config/config\.php$ / [R=permanent,L]
 # RewriteCond %{REQUEST_FILENAME} !-f
 # Rewriterule (.*) http://www.cube.cz/$1 [R,L]
 RewriteCond %{REQUEST_FILENAME} !-f
-Rewriterule ^jscripts/(.*)$ http://www.cube.cz/jscripts/$1 [R=301,L,QSA]
+Rewriterule ^jscripts/(.*)$ http://www.cube-cms.com/jscripts/$1 [R=301,L,QSA]
 
 RewriteCond $1 ^images/
 RewriteCond %{REQUEST_FILENAME} !-f
-Rewriterule (.*) http://www.cube.cz/$1 [L]
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
 RewriteCond $1 ^data/
 RewriteCond %{REQUEST_FILENAME} !-f
-Rewriterule (.*) http://www.cube.cz/$1 [L]
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
 RewriteCond $1 ^stylesheets/
 RewriteCond %{REQUEST_FILENAME} !-f
-Rewriterule (.*) http://www.cube.cz/$1 [L]
-
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
 
 RewriteCond %{REQUEST_URI} !\.[[:alnum:]]+$
 RewriteRule ^(.+[^/])$ /$1/ [L,R=301,QSA]
