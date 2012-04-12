@@ -186,7 +186,8 @@ $baseDate->modify((-$dayOfWeek+1)." day");
                "sortorder" : "a",
                "singleevents" : "true"
             },
-            cache: false,
+            dataType: "json",
+            cache: <?echo VVE_DEBUG_LEVEL == 0 ? "true" : "false"?>,
             success: function(data){
                $c.trigger("updateDateString");
                $c.trigger("updateCalendar", data.feed);
