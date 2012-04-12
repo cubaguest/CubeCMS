@@ -12,8 +12,9 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
       if ($image == null) {
          echo '<a href="' . $this->link() . '#" class="button-select-title-image" data-file="" >' . $key . '</a>';
       } else {
+         $imgSrc = vve_image_cacher(vve_tpl_art_title_image($image), 100, 100, false );
          echo '<a href="' . $this->link() . '#' . $image . '" class="button-select-title-image" data-file="' . $image . '" title="' . $image . '">'
-         . vve_tpl_image_tag(vve_tpl_art_title_image($image), $image, 100, 100) . '</a>';
+         . '<img src="'.$imgSrc.'" alt="'.htmlspecialchars($imgSrc).'" /></a>';
       }
    }
    ?>
@@ -22,9 +23,7 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
    /* <![CDATA[ */
    $(document).ready(function(){
       $('select[name$="titleImage"]')
-         .after('<a href="<?=$this->link()?>#select-title-image" class="button-open-title-image-galery" \n\
-title="<?ps($this->tr('Vybrat z již uložených obrázků'))?>"><?=$this->tr('Vybrat z galerie')?></a>');
-      
+         .after('<a href="<?=$this->link()?>#select-title-image" class="button-open-title-image-galery" title="<?ps($this->tr('Vybrat z již uložených obrázků'))?>"><?=$this->tr('Vybrat z galerie')?></a>');
       var $select = null;
       
       // zobraz galerii
