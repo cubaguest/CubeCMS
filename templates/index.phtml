@@ -114,7 +114,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          <div id="colswrap">
             <div id="col1wrap" class="column">
                <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit() AND !empty($this->panels['right'])) echo " col1pad_plusright";?>">
-                  <? 
+                  <?
+                  
                   $this->includeTpl("messages.phtml", true);
                   $this->includeTpl("navigation.phtml", true);
                   if(VVE_DEBUG_LEVEL > 0){ Debug::printDebug(); Debug_Timer::printTimers(); }
@@ -129,6 +130,13 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             <? // levy panel ?>
             <div id="col2wrap" class="column">
                <div id="col2pad">
+                  <div id="langs">
+                     <?foreach (Template::pVar('appLangs') as $lang) {
+                        $class = null;
+                        if($lang['name'] == Locales::getLang()) $class = 'selected';
+                        ?><a href="<?=$lang['link'];?>" title="<?=$lang['label'];?>" class="<?=$class?>"><?=$lang['name'];?></a>&nbsp;<?
+                     }?>
+                  </div>
                   <?
                   if(!empty($this->panels['left'])) {
                      foreach ($this->panels['left'] as $panelL) {?>
@@ -145,13 +153,6 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             if(!Template_Module::isEdit()){?>
             <div id="col3wrap" class="column">
                <div id="col3pad">
-                  <div id="langs">
-                     <?foreach (Template::pVar('appLangs') as $lang) {
-                        $class = null;
-                        if($lang['name'] == Locales::getLang()) $class = 'selected';
-                        ?><a href="<?=$lang['link'];?>" title="<?=$lang['label'];?>" class="<?=$class?>"><?=$lang['name'];?></a>&nbsp;<?
-                     }?>
-                  </div>
                   <?
                   if(!empty($this->panels['right'])) {
                      foreach ($this->panels['right'] as $panelR) {?>
