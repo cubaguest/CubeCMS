@@ -239,11 +239,11 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
    
       // iterate over public dir
       $publicDirs = array("/".Component_TinyMCE_Browser::DIR_PUBLIC."/");
-      $ite = new RecursiveDirectoryIterator($dirPublic, FilesystemIterator::SKIP_DOTS );
+      $ite = new RecursiveDirectoryIterator($dirPublic );
       foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
          as $name => $item) {
          // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
-         if($item->isDir() && $item->isWritable() 
+         if($item->isDir() && $item->isWritable()
             && ( strpos($item->getPathname(), "small") === false
             && strpos($item->getPathname(), "medium") === false ) ){
             
@@ -256,7 +256,7 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       // interate over user dir
       $homeDirs = array("/".Component_TinyMCE_Browser::DIR_HOME."/");
       if(is_dir($dirHome)){
-         $ite = new RecursiveDirectoryIterator($dirHome, FilesystemIterator::SKIP_DOTS );
+         $ite = new RecursiveDirectoryIterator($dirHome );
          foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
             as $name => $item) {
             // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
