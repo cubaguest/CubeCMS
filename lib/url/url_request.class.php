@@ -151,6 +151,9 @@ class Url_Request {
       $fullUrl = $_SERVER['REQUEST_URI'];
       $scriptName = $_SERVER["SCRIPT_NAME"];
       self::$serverName = $_SERVER["HTTP_HOST"];
+      if(isset($_SERVER["HTTPS"])){
+         self::$transferProtocol = "https://";
+      }
       
       if(self::$serverName != 'localhost'){
          $pos = strpos(self::$serverName, '.');
