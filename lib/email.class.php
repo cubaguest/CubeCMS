@@ -204,8 +204,17 @@ class Email {
    }
    public function batchSend(&$failures = null)
    {
-      $this->message()->setTo($this->mailsAddresses);
-      return $this->mailer->batchSend($this->message(), $failures);
+      $numSent = 0;
+      foreach ($this->mailsAddresses as $address => $name)
+      {
+         if (is_int($address)) {
+            $this->message()->setTo($name);
+         } else {
+            $this->message()->setTo(array($address => $name));
+         }
+         $numSent += $this->mailer->send($this->message(), $failures);
+      }
+      return $numSent;
    }
 
    /**
