@@ -266,6 +266,7 @@ class JsPlugin_JQuery extends JsPlugin {
     */
    public function addUISlider() {
       $this->addUICore();
+      $this->addUIMouse();
       $this->addUIWidget();
       $this->addJs("ui.slider");
       $this->addCss('slider');
@@ -297,6 +298,22 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addJs("ui.datepicker");
       $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
       $this->addCss('datepicker');
+      return $this;
+   }
+   
+   /**
+    * Metoda přidá widgent UI - timepicker (box s výběrem času)
+    * @return JsPlugin_JQuery
+    */
+   public function addUITimepicker() {
+      $this->addUICore();
+      $this->addUISlider();
+      $this->addUIDatepicker();
+      $this->addJs("ui.timepicker");
+      if(Locales::getLang() != "en"){
+         $this->addFile(new JsPlugin_JsFile("jquery.ui.timepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
+      }
+      $this->addFile(new JsPlugin_CssFile("jquery.ui.timepicker.css", false, Url_Request::getBaseWebDir(true).self::JSPLUGINS_BASE_DIR.'/jquery/ui/themes/'));
       return $this;
    }
 
