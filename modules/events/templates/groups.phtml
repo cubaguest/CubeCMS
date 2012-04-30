@@ -1,0 +1,114 @@
+<?
+$this->addPageTitle($this->tr('Skupiny'));
+//$this->addCssFile('style.css');
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+?>
+<h1><?=$this->tr('Skupiny');?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+
+<div class="main-content-detail">
+   <table id="table-groups"></table>
+   <div id="table-groups-pager"></div>
+   <hr class="reseter" />
+   <br />
+</div>
+<?
+?>
+<script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      var selectedGroupId = 0;
+      $(document).ready(function() {
+         var groupsGrid = $("#table-groups").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('groupsList');?>',
+            datatype: "json",
+            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Popis')?>', '<?=$this->tr('Admin')?>', '<?=$this->tr('Omezení na domény')?>'],
+            colModel:[
+               {name:'<?=Model_Groups::COLUMN_ID?>',index:'<?=Model_Groups::COLUMN_ID?>',
+                  width:33,fixed: true,editable:false},
+               {name:'<?=Model_Groups::COLUMN_NAME?>',index:'<?=Model_Groups::COLUMN_NAME?>', 
+                  width:130,fixed: true, editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+               {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', 
+                  width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
+                  formoptions:{ rowpos:3, label: "<?=$this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?=Model_Groups::COLUMN_IS_ADMIN?>',index:'<?=Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
+                  width:50,fixed:true, editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
+                  },
+                  formoptions:{ rowpos:4, label: "<?=$this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'sites',index:'sites', width:170, fixed : true, editable: true, edittype:"select", editoptions: {
+                     value: <?=json_encode($this->sites)?>,
+                     multiple: true, size: 3
+                  },
+                  formoptions:{ rowpos:5, label: "<?=$this->tr('Uživatel<br />pouze pro<br />domény')?>",
+                     elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+            ],
+            rowNum:20,
+            rowList:[10,20,40,100],
+            pager: '#table-groups-pager',
+            sortname: '<?=Model_Groups::COLUMN_ID?>',
+            caption:"<?=$this->tr('Skupiny v systému')?>",
+            autowidth : true,
+            height: '100%',
+            editurl:"<?=$this->link()->route('editGroup')?>"
+         });
+         $.jgrid.del.msg = '<strong>'+$.jgrid.del.msg+"</strong><br /><?=$this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
+         groupsGrid.jqGrid('navGrid','#table-groups-pager',
+            {edit:true,add:true,del:true},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               },
+               afterShowForm : function(formid){
+                  var data = groupsGrid.getCell(groupsGrid.jqGrid('getGridParam','selrow'), 'sites');
+                  if(data != false || data != null){
+                     data = data.split(',');
+                     $('#sites option').each(function(){
+                        if($.inArray($(this).text(),data) != -1){
+                           $(this).attr('selected', 'selected');
+                        } else {
+                           $(this).removeAttr('selected');
+                        }
+                     });
+                  }
+               }
+            },
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },  
+            // del options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true, width: 300,
+               afterSubmit : function(respond, postdata){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {multipleSearch:false, closeAfterSearch: true, closeOnEscape:true,sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
+         );
+      });
+      /* ]]> */
+      </script>

@@ -1,0 +1,39 @@
+.event-cat-item, .event-event-item {
+   margin-bottom: 0.5em;
+}
+.events-list-in-cat h3 {
+   padding: 10px 0;
+   border-bottom: 1px solid gray;
+}
+.events-list-in-cat .event-name {
+   cursor: pointer;
+}
+
+.event-cat-item .param-name, .event-event-item .param-name {
+   width: 20%;
+}
+.event-cat-token { font-size: 82%;}
+
+.ui-tabs {
+   margin-bottom: 5px;
+}
+
+/* form */
+#dateFrom, #dateTo {width: 100px;}
+
+/* main - seznam */
+.events-list thead th {
+   border-bottom: 1px solid gray;
+}
+.events-list td {
+   vertical-align: top;
+}
+.events-list .row-end td {
+   border-bottom: 1px solid #DDDDDD;
+}
+.events-list .event-name {width: 25%; font-weight: bold;}
+.events-list .event-date {width: 23%; font-style: italic; }
+.events-list .event-time {width: 15%; font-style: italic;}
+.events-list .event-place {width: 20%;}
+.events-list .event-price {width: 10%;}
+.events-list .event-note { font-size: 82%; color: #666666;}

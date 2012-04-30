@@ -1,0 +1,147 @@
+<?
+$this->addPageTitle($this->tr('Uživatelé'));
+//$this->addCssFile('style.css');
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+
+$grpsArr = array();
+?>
+<h1><?=$this->tr('Uživatelé');?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+
+<div class="main-content-detail">
+   <table id="table-users"></table>
+   <div id="table-users-toolbar">
+      <label for="select-group-id"><?=$this->tr('Skupina')?>:</label>
+      <select id="select-group-id" name="sel_group">
+         <?foreach ($this->groups as $grp) {
+            $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
+            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
+         }
+         ?>
+      </select>
+   </div>
+   <div id="table-users-pager"></div>
+   <hr class="reseter" />
+   <br />
+</div>
+<?
+?>
+<script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      var selectedGroupId = 0;
+      $(document).ready(function() {
+         var usersGrid = $("#table-users").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('usersList');?>?idgrp='+$('#select-group-id').val().toString(),
+            datatype: "json",
+            colNames:['ID', '<?=$this->tr('Jméno')?>', '<?=$this->tr('Přijmení')?>', '<?=$this->tr('Už.jméno')?>',
+               '<?=$this->tr('heslo')?>', '<?=$this->tr('E-mail')?>', '<?=$this->tr('Blokace')?>', '<?=$this->tr('Poznámka')?>', '<?=$this->tr('Skupina')?>'],
+            colModel:[
+               {name:'<?=Model_Users::COLUMN_ID?>',index:'<?=Model_Users::COLUMN_ID?>',
+                  width:33,fixed: true,editable:false},
+               {name:'<?=Model_Users::COLUMN_NAME?>',index:'<?=Model_Users::COLUMN_NAME?>', 
+                  width:100,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:2, label: "<?=$this->tr('Jméno')?>",elmprefix:"(*)"}},
+               {name:'<?=Model_Users::COLUMN_SURNAME?>',index:'<?=Model_Users::COLUMN_SURNAME?>', 
+                  width:100,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:3, label: "<?=$this->tr('Přijmení')?>",elmprefix:"(*)"}},
+               {name:'<?=Model_Users::COLUMN_USERNAME?>',index:'<?=Model_Users::COLUMN_USERNAME?>', 
+                  width:100,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:4, label: "<?=$this->tr('Uživ. jméno')?>",elmprefix:"(*)"}},
+               {name:'<?=Model_Users::COLUMN_PASSWORD?>',index:'<?=Model_Users::COLUMN_PASSWORD?>',
+                  width:1,fixed:true,hidedlg:false, hidden:true, editable:true,edittype:'password',editoptions:{size:20},
+                  formoptions:{ rowpos:5, label: "<?=$this->tr('Heslo')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?=Model_Users::COLUMN_MAIL?>',index:'<?=Model_Users::COLUMN_MAIL?>', 
+                  width:260,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:6, label: "<?=$this->tr('E-mail')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?=Model_Users::COLUMN_BLOCKED?>',index:'<?=Model_Users::COLUMN_BLOCKED?>', formatter: 'checkbox', 
+                  formatoptions:{disabled: false, 'class' : 'blockUser'}, 
+                  width:50,fixed: true,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"},
+                  formoptions:{ rowpos:7, label: "<?=$this->tr('Blokace')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?=Model_Users::COLUMN_NOTE?>',index:'<?=Model_Users::COLUMN_NOTE?>', 
+                  editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"},
+                  formoptions:{ rowpos:8, label: "<?=$this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?=Model_Users::COLUMN_GROUP_ID?>',index:'<?=Model_Users::COLUMN_GROUP_ID?>', 
+                  width:90,fixed: true, editable: true,edittype:"select",
+                  editoptions:{value: <?=json_encode($grpsArr)?>},formoptions:{ rowpos:9, 
+                     label: "<?=$this->tr('Skupina')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
+            ],
+            rowNum:20,
+            rowList:[10,20,40,100],
+            pager: '#table-users-pager',
+            sortname: '<?=Model_Users::COLUMN_ID?>',
+            caption:"<?=$this->tr('Uživatelé v systému')?>",
+            autowidth : true,
+            height: '100%',
+            editurl:"<?=$this->link()->route('editUser')?>",
+            toolbar: [true,"top"]
+         });
+         $("#t_table-users").append($('#table-users-toolbar'));
+         /* změna skupiny */
+         $("#select-group-id").change(function(){
+            baseId = this.value;
+            usersGrid.jqGrid('setGridParam', { url: '<?=$this->link()->route('usersList');?>?idgrp='+this.value});
+            usersGrid.trigger("reloadGrid");
+         });
+         /* změna statusu usera */
+         $('#table-users input[type=checkbox]').live('change',function(){
+            var newStatus = false;
+            var idUser = $(this).parent('td').parent('tr').attr('id');
+            if($(this).is(':checked')){newStatus = true;}
+            $.ajax({
+               url: "<?=$this->link()->route('blockUser')?>", type: "POST",
+               data: ({id : idUser, blocked : newStatus})
+            });
+         });
+
+         usersGrid.jqGrid('navGrid','#table-users-pager',
+            {edit:true,add:true,del:true},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               },
+               beforeShowForm: function(form) { $("tr#tr_password",form[0]).show(); }
+            },
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               },
+               afterShowForm : function(){
+                  $('#id_group').val($('#select-group-id').val());
+               },
+               beforeShowForm: function(form) { $("tr#tr_password",form[0]).show(); }
+            },  
+            // del options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true,
+               afterSubmit : function(respond, postdata){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {multipleSearch:false, closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
+         );
+      });
+      /* ]]> */
+      </script>

@@ -1,0 +1,77 @@
+<?
+echo $this->toolbox;
+$this->addFile('css://style.css');
+$h1 = $this->tr('Seznam kategorií');
+
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+Template_Core::addPageTitle($this->tr('kategorie událostí'));
+?>
+<h1><?=$this->category()->getName()?></h1>
+<div class="form-edit">
+   <div>
+      <a href="<?=$this->link()->route('addCat')?>" title="<?=$this->tr('Přidat novou kategorii')?>"
+         ><img src="images/icons/add.png" alt="add" /> <?=$this->tr('Přidat kategorii')?></a>
+   </div>
+   <?
+   if(!empty($this->categories)){
+   foreach ($this->categories as $cat) {?>
+   <table class="ui-widget full-width event-cat-item">
+      <tr class="ui-widget-header <?if($cat->{Events_Model_Categories::COL_IS_PUBLIC}){?>ui-state-hover<?}?>">
+         <td class="event-name" colspan="2">
+            <?
+            echo $cat->{Events_Model_Categories::COL_NAME};
+            
+            $toolbox = clone $this->toolboxItem;
+            
+            $toolbox->cat_is_public_->getForm()->id->setValues($cat->{Events_Model_Categories::COL_ID});
+            $toolbox->editCat->setAction($this->link()->route('editCat', array('idcat' => $cat->{Events_Model_Categories::COL_ID})));
+            $toolbox->cat_delete_->getForm()->id->setValues($cat->{Events_Model_Categories::COL_ID});
+            $toolbox->cat_token_->getForm()->id->setValues($cat->{Events_Model_Categories::COL_ID});
+            $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+            
+            if($cat->{Events_Model_Categories::COL_IS_PUBLIC} == true){
+               echo ' <em>('.$this->tr('veřejná').')</em>';
+               $toolbox->cat_is_public_->setIcon("eye_delete.png");
+               unset($toolbox->cat_token_);
+            }
+            echo $toolbox;
+            ?>
+         </td>
+      </tr>
+      <?if($cat->{Events_Model_Categories::COL_CONTACT} != null){?>
+      <tr class="ui-widget-content">
+         <th scope="row" class="param-name"><?=$this->tr('Kontakt')?>:</th>
+         <td><?=$cat->{Events_Model_Categories::COL_CONTACT}?></td>
+      </tr>
+      <?}?>
+      <?if($cat->{Events_Model_Categories::COL_WWW} != null){?>
+      <tr class="ui-widget-content">
+         <th scope="row" class="param-name"><?=$this->tr('WWW')?>:</th>
+         <td><a href="<?=$cat->{Events_Model_Categories::COL_WWW}?>" class="link-external" title="<?=$this->tr('Otevřít v novém okně')?>"
+                ><?ps($cat->{Events_Model_Categories::COL_WWW});?></a></td>
+      </tr>
+      <?}?>
+      <?if($cat->{Events_Model_Categories::COL_NOTE} != null){?>
+      <tr class="ui-widget-content">
+         <th scope="row" class="param-name"><?=$this->tr('Poznámka')?>:</th>
+         <td><?=$cat->{Events_Model_Categories::COL_NOTE}?></td>
+      </tr>
+      <?}?>
+      <?if($cat->{Events_Model_Categories::COL_IS_PUBLIC} == false){?>
+      <tr class="ui-widget-content">
+         <th scope="row" class="param-name"><?=$this->tr('Přistupový odkaz')?>:</th>
+         <td class="event-cat-token"><?
+         if($cat->{Events_Model_Categories::COL_ACCESS_TOKEN} != null){
+            $link = $this->link()->route('listEvents')->param('token', $cat->{Events_Model_Categories::COL_ACCESS_TOKEN});
+            ?>
+            <a href="<?=$link?>" title="<?=$this->tr('Odkaz pro přístup z venku')?>"><?=$link;?></a> 
+         <?} else {
+            echo '<em>'.$this->tr('Není vytvořen. Klikněte na ikonku klíče v nastrojích položky.').'</em>';
+         }?>
+         </td>
+      </tr>
+      <?}?>
+   </table>
+   <?}
+   }?>
+</div>

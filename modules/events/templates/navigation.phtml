@@ -1,0 +1,10 @@
+<?
+$this->items = array(
+   $this->_('Úvodní strana') => array('link' => (string)$this->link()->route(), 'icon' => 'house.png'),
+   $this->_('Události') => array('link' => (string)$this->link()->route('listEvents'), 'icon' => 'date.png'),
+   $this->_('Kategorie') => array('link' => (string)$this->link()->route('listCats'), 'icon' => 'date_magnify.png'),
+//   $this->_('Veřejně přidané události') => array('link' => (string)$this->link()->route('listEventsPublicAdd'), 'icon' => 'group.png'),
+   $this->_('Exporty') => array('link' => (string)$this->link()->route('exports'), 'icon' => 'download.png'),
+   );
+$this->includeTpl('module_navigation.phtml', true);
+?>

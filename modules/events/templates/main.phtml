@@ -1,0 +1,167 @@
+<?
+echo $this->toolbox;
+$this->addFile('css://style.css');
+
+$showFFrom = false;
+if(isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) || isset($_GET['contain']) || isset($_GET['onlyPublicAdd'])){
+   $showFFrom = true;
+}
+?>
+<h1><?=$this->category()->getName()?></h1>
+<div>
+   <p id="eventFilterButtons">
+   Zobrazit: 
+   <a href="<?=$this->link()->route()->param('range');?>" title="<?=$this->tr('na dnešek')?>"
+      ><?=$this->tr('na dnešek')?></a>
+   | <a href="<?=$this->link()->route()->param('range', 'week')?>" title="<?=$this->tr('na tento týden')?>"
+      ><?=$this->tr('na tento týden')?></a>
+   | <a href="<?=$this->link()->route()->param('range', 'month')?>" title="<?=$this->tr('na tento měsíc')?>"
+      ><?=$this->tr('na tento měsíc')?></a>
+   | <a id="buttonShowFilter" href="<?=$this->link()->param('range')?>#formFilter" title="<?=$this->tr('vlasní rozsah')?>"
+      ><?=$this->tr('vlasní rozsah')?></a>
+   </p>
+   
+   <form id="formFilter" action="<?=$this->link()?>" method="get" style="<?if(!$showFFrom) echo 'display: none;';?>">
+      <fieldset>
+         <legend><?=$this->tr('Filtrace')?></legend>
+      <table class="form-table">
+         <tr>
+            <th class="form-labels"><label for="dateFrom"><?=$this->tr('Od')?>:</label></th>
+            <td class="form-controlls"><input name="dateFrom" value="<?=vve_date("%x", $this->dateFrom)?>" type="text" id="dateFrom" /></td>
+         </tr>
+         <tr>
+            <th class="form-labels"><label for="dateTo"><?=$this->tr('Do')?>:</label></th>
+            <td class="form-controlls"><input name="dateTo" value="<?=vve_date("%x", $this->dateTo)?>" type="text" id="dateTo" /></td>
+         </tr>
+         <tr>
+            <th class="form-labels"><label for="catSelect"><?=$this->tr('Kategorie')?>:</label></th>
+            <td class="form-controlls">
+               <select name="cat" id="catSelect">
+            <option value=""><?=$this->tr('vše')?></option>
+            <?foreach ($this->cats as $cat) {?>
+            <option <?if(isset($_GET['cat']) && $_GET['cat'] == $cat->{Events_Model_Categories::COL_ID} ){ echo 'selected="selected"';}?> 
+               value="<?=$cat->{Events_Model_Categories::COL_ID}?>"><?ps($cat->{Events_Model_Categories::COL_NAME})?></option>      
+            <?}?>
+               </select>
+            </td>
+         </tr>
+         <tr>
+            <td></td>
+            <td class="form-controlls">
+               <input value="<?=$this->tr('Filtrovat')?>" type="submit" />
+               <input value="<?=$this->tr('Zrušit filtraci')?>" type="button" id="buttonHideFilter" 
+                      onclick="window.location = '<?=$this->link()->rmParam(array('dateFrom', 'dateTo', 'cat'))?>';"/>
+            </td>
+         </tr>
+      </table>
+      <?if(isset($_GET['token'])){ ?><input type="hidden" name="token" value="<?=$_GET['token']?>" /><?}?>
+      </fieldset>
+   </form>
+   <?
+   $jq = new JsPlugin_JQuery();
+   $jq->addUIDatepicker();
+   $this->addJsPlugin($jq);
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('input#dateFrom').datepicker({ });
+         $('input#dateTo').datepicker({ });
+      <?if($showFFrom){?>
+         $('#eventFilterButtons').hide();
+      <?}?>
+         $('#buttonShowFilter').click(function(){
+            $('#formFilter').slideDown('fast');
+            $('#eventFilterButtons').hide();
+            return false;
+         });
+      });
+   </script>
+   
+</div>
+<div class="post">
+   <?
+   if(!empty($this->events)){?>
+   <?foreach ($this->events as $cat) {?>
+   <h2><?=$cat['cat']->{Events_Model_Categories::COL_NAME}?></h2>
+   <?if($cat['cat']->{Events_Model_Categories::COL_CONTACT} != null){?>
+   <p class="font-small"><?
+      ps($cat['cat']->{Events_Model_Categories::COL_CONTACT});
+   ?></p>   
+   <?}?>
+   <p>
+   <table class="events-list full-width">
+      <thead>
+         <tr>
+            <th><?=$this->tr('Název')?></th>
+            <th><?=$this->tr('Datum')?></th>
+            <th><?=$this->tr('Čas')?></th>
+            <th><?=$this->tr('Místo konání')?></th>
+            <th><?=$this->tr('Cena')?></th>
+         </tr>
+      </thead>
+      <tbody>
+      <?foreach ($cat['events'] as $event) {?>
+         <tr  class="row-begin">
+            <td class="event-name" >
+               <?
+               ps($event->{Events_Model::COL_NAME}." ");
+               if($event->{Events_Model::COL_IS_RECOMMENDED} == true){
+                  ?><img src="images/icons/star.png" alt="recomend" title="<?=$this->tr('Doporučujeme !')?>" /><?
+               }
+               ?>
+            </td>
+            <td class="event-date" >
+               <?
+               // datum a čas
+               $dateStr = null;
+               if($event->{Events_Model::COL_DATE_FROM} != null){
+                  $dateStr = vve_date("%x", new DateTime($event->{Events_Model::COL_DATE_FROM}));
+               }
+               if($event->{Events_Model::COL_DATE_TO} != null){
+                  $dateStr .= " - ".vve_date("%x", new DateTime($event->{Events_Model::COL_DATE_TO}));
+               }
+               echo $dateStr;
+               ?>
+            </td>
+            <td class="event-time">
+               <?
+               $timeStr = null;
+               if($event->{Events_Model::COL_TIME_FROM} != null){
+                  $timeStr = /*", ".*/vve_date("%G:%i", new DateTime($event->{Events_Model::COL_TIME_FROM}));
+               }
+               if($event->{Events_Model::COL_TIME_TO} != null){
+                  $timeStr .= " - ".vve_date("%G:%i", new DateTime($event->{Events_Model::COL_TIME_TO}));
+               }
+               echo $timeStr;
+               ?>
+            </td>
+            <td class="event-place">
+            <?if($event->{Events_Model::COL_PLACE} != null){?>
+               <?=$event->{Events_Model::COL_PLACE} ?>
+            <?}?>
+            </td>
+            <td class="event-price">
+            <?if($event->{Events_Model::COL_PRICE} != null){?>
+               <?=$event->{Events_Model::COL_PRICE}?> Kč
+            <?}?>
+            </td>
+         </tr>
+         <tr class="row-end">
+            <td></td>
+            <td class="event-note" colspan="4">
+            <?if($event->{Events_Model::COL_NOTE} != null){
+               ps ($event->{Events_Model::COL_NOTE});
+            }?>
+            </td>
+         </tr>
+      <?}?>
+      </tbody>
+   </table>
+   </p>
+ <?}?>
+ <?}?>
+   <div>
+      <a href="<?=$this->link()->route('addEvent')?>" title="<?=$this->tr('Přidat novou událost')?>"
+         ><img src="images/icons/add.png" alt="add" /> <?=$this->tr('Přidat událost')?></a>
+   </div>
+</div>

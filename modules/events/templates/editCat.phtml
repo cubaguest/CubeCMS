@@ -1,0 +1,15 @@
+<?
+echo $this->toolbox;
+$h1 = $this->tr('Přidání kategorie událostí');
+
+if($this->eventCat != null){
+   $h1 = sprintf($this->tr('Úprava kategorie %s'), $this->eventCat->{Events_Model_Categories::COL_NAME} );
+}
+Template_Core::setPageTitle($h1);
+?>
+<h1><?ps($h1)?></h1>
+<div class="form-edit">
+   <?
+   echo $this->form;
+   ?>
+</div>
