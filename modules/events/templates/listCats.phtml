@@ -5,6 +5,8 @@ $h1 = $this->tr('Seznam kategorií');
 
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 Template_Core::addPageTitle($this->tr('kategorie událostí'));
+
+$catImgDir = $this->category()->getModule()->getDataDir(true).Events_Controller::DIR_CAT_IMAGES."/";
 ?>
 <h1><?=$this->category()->getName()?></h1>
 <div class="form-edit">
@@ -19,6 +21,9 @@ Template_Core::addPageTitle($this->tr('kategorie událostí'));
       <tr class="ui-widget-header <?if($cat->{Events_Model_Categories::COL_IS_PUBLIC}){?>ui-state-hover<?}?>">
          <td class="event-name" colspan="2">
             <?
+            if($cat->{Events_Model_Categories::COL_IMAGE} != null){?>
+            <img src="<?=$catImgDir.$cat->{Events_Model_Categories::COL_IMAGE}?>" width="16" />
+            <?}
             echo $cat->{Events_Model_Categories::COL_NAME};
             
             $toolbox = clone $this->toolboxItem;

@@ -7,7 +7,7 @@ CREATE TABLE `{PREFIX}events_cats` (
   `event_cat_www` varchar(100) DEFAULT NULL,
   `event_cat_contact` varchar(200) DEFAULT NULL,
   `event_cat_is_public` tinyint(1) NOT NULL DEFAULT '0',
-  `event_access_token` varchar(45) DEFAULT NULL,
+  `event_cat_access_token` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_events_cat`),
   KEY `id_cat` (`id_category`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

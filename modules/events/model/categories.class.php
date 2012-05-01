@@ -16,7 +16,7 @@ class Events_Model_Categories extends Model_ORM {
    const COL_WWW           = 'event_cat_www';
    const COL_CONTACT       = 'event_cat_contact';
    const COL_IS_PUBLIC     = 'event_cat_is_public';
-   const COL_ACCESS_TOKEN  = 'event_access_token';
+   const COL_ACCESS_TOKEN  = 'event_cat_access_token';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_ev_cats');

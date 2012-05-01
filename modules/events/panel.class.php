@@ -44,7 +44,7 @@ class Events_Panel extends Panel {
          $modelBindValues['dateStart'] = $modelBindValues['dateStart2'] = $dateFrom;
          $modelBindValues['dateEnd2'] = $dateTo;
 
-         $this->events = $model
+         $records = $model
             ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
             ->order(array(
                Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
@@ -53,6 +53,7 @@ class Events_Panel extends Panel {
             ))
             ->where($modelWhere, $modelBindValues)
             ->records();
+         $this->events = $this->categorizeEvents($records);
       }
    }
 
@@ -64,6 +65,21 @@ class Events_Panel extends Panel {
       }
    }
 
+   protected function categorizeEvents($records)
+   {
+      $eventsSorted = array();
+      if (!empty($records)) {
+         foreach ($records as $event) {
+            $cId = $event->{Events_Model_Categories::COL_ID};
+            if (!isset($eventsSorted[$cId])) {
+               $eventsSorted[$cId] = array('cat' => $event, 'events' => array());
+            }
+            $eventsSorted[$cId]['events'][] = $event;
+         }
+      }
+      return $eventsSorted;
+   }
+   
    protected function settings(&$settings, Form &$form)
    {
 //      $elemType = new Form_Element_Select('type', 'Typ panelu');

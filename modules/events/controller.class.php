@@ -83,7 +83,12 @@ class Events_Controller extends Controller {
          $record->{Events_Model_Categories::COL_CONTACT} = $form->contact->getValues();
          $record->{Events_Model_Categories::COL_WWW} = $form->www->getValues();
          $record->{Events_Model_Categories::COL_NOTE} = $form->note->getValues();
-
+         if($form->image->getValues()){
+            $img = $form->image->getValues();
+            $record->{Events_Model_Categories::COL_IMAGE} = $img['name'];
+         } else if(isset ($form->imageSelect)){
+            $record->{Events_Model_Categories::COL_IMAGE} = $form->imageSelect->getValues();
+         }
          $model->save($record);
          $this->infoMsg()->addMessage($this->tr('Kategorie byla uložena'));
          $this->link()->route('listCats')->reload();
@@ -112,6 +117,13 @@ class Events_Controller extends Controller {
          $record->{Events_Model_Categories::COL_WWW} = $form->www->getValues();
          $record->{Events_Model_Categories::COL_NOTE} = $form->note->getValues();
 
+         if($form->image->getValues()){
+            $img = $form->image->getValues();
+            $record->{Events_Model_Categories::COL_IMAGE} = $img['name'];
+         } else if(isset ($form->imageSelect)){
+            $record->{Events_Model_Categories::COL_IMAGE} = $form->imageSelect->getValues();
+         }
+         
          $model->save($record);
          $this->infoMsg()->addMessage($this->tr('Kategorie byla uložena'));
          $this->link()->route('listCats')->reload();
@@ -136,11 +148,21 @@ class Events_Controller extends Controller {
       $eWww->addValidation(new Form_Validator_Url());
       $form->addElement($eWww);
 
-//      $eImage = new Form_Element_File('image', $this->tr('Obrázek / ikona'));
-//      $eImage->setUploadDir($this->module()->getDataDir().self::DIR_CAT_IMAGES.DIRECTORY_SEPARATOR);
-//      $eImage->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::IMG));
-//      $form->addElement($eImage);
+      $eImage = new Form_Element_File('image', $this->tr('Obrázek / ikona'));
+      $eImage->setUploadDir($this->module()->getDataDir().self::DIR_CAT_IMAGES.DIRECTORY_SEPARATOR);
+      $eImage->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::IMG));
+      $form->addElement($eImage);
 
+      $images = $this->getCatImages();
+      if(!empty($images)){
+         $eImgSelect = new Form_Element_Select('imageSelect', $this->tr('Uložené obrázky'));
+         $eImgSelect->setOptions(array($this->tr('Žádný') => null), true);
+         foreach ($images as $img) {
+            $eImgSelect->setOptions(array($img => $img), true);
+         }
+         $form->addElement($eImgSelect);
+      }
+      
       $eNote = new Form_Element_TextArea('note', $this->tr('Poznámka'));
       $form->addElement($eNote);
 
@@ -152,6 +174,9 @@ class Events_Controller extends Controller {
          $form->contact->setValues($cat->{Events_Model_Categories::COL_CONTACT});
          $form->www->setValues($cat->{Events_Model_Categories::COL_WWW});
          $form->note->setValues($cat->{Events_Model_Categories::COL_NOTE});
+         if(isset($form->imageSelect)){
+            $form->imageSelect->setValues($cat->{Events_Model_Categories::COL_IMAGE});
+         }
       }
 
       if ($form->isSend() && $form->save->getValues() == false) {
@@ -160,6 +185,17 @@ class Events_Controller extends Controller {
       }
 
       return $form;
+   }
+   
+   protected function getCatImages()
+   {
+      $images = array();
+      $path = $this->category()->getModule()->getDataDir().self::DIR_CAT_IMAGES.DIRECTORY_SEPARATOR;
+      foreach (glob ($path . '*.{jpg,jpeg,gif,png}', GLOB_BRACE) as $fileName) {
+         $fileName = basename($fileName);
+         $images[] = $fileName;
+      }
+      return $images;
    }
 
    public function listCatsController()

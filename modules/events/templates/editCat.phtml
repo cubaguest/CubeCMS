@@ -12,4 +12,20 @@ Template_Core::setPageTitle($h1);
    <?
    echo $this->form;
    ?>
+   <?
+   $this->addJsPlugin(new JsPlugin_JQueryDropDown());
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('select[name="editcat_imageSelect"] option').each(function(){
+            $(this).attr('title', '<?=$this->category()->getModule()->getDataDir(true)?>cats/'+$(this).attr('value'));
+         });
+         $('select[name="editcat_imageSelect"]').msDropDown({
+            visibleRows:5,rowHeight:23
+         });
+      });
+   </script>
+   <style type="text/css">
+      .dd .ddTitle span.ddTitleText img, .dd .ddChild a img { height:16px; }
+   </style>
 </div>
