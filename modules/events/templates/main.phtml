@@ -64,8 +64,20 @@ if(isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) || 
    ?>
    <script type="text/javascript">
       $(document).ready(function(){
-         $('input#dateFrom').datepicker({ });
-         $('input#dateTo').datepicker({ });
+         var dates = $('input#dateFrom, input#dateTo').datepicker({
+            showButtonPanel: true,
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            onSelect: function( selectedDate ) {
+               var option = this.id == "dateFrom" ? "minDate" : "maxDate",
+               instance = $( this ).data( "datepicker" ),
+               date = $.datepicker.parseDate(
+               instance.settings.dateFormat ||
+               $.datepicker._defaults.dateFormat,
+                  selectedDate, instance.settings );
+               dates.not( this ).datepicker( "option", option, date );
+            }
+         });
       <?if($showFFrom){?>
          $('#eventFilterButtons').hide();
       <?}?>

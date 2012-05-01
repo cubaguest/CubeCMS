@@ -265,10 +265,11 @@ class Events_Controller extends Controller {
       $this->view()->dateTo = $dateTo;
 
       // model settings
-      $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
-         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 )";
-      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $dateFrom;
-      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $dateTo;
+      $modelWhere .= " AND ( ( " . Events_Model::COL_DATE_TO . " IS NOT NULL AND :dateStart BETWEEN " . Events_Model::COL_DATE_FROM . " AND " . Events_Model::COL_DATE_TO . " )" 
+                        ." OR ( " . Events_Model::COL_DATE_TO . " IS NULL AND " . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart2 AND :dateEnd2 ) )";
+      
+      $modelBindValues['dateStart'] = $modelBindValues['dateStart2'] = $dateFrom;
+      $modelBindValues['dateEnd2'] = $dateTo;
 
       if ($this->getRequestParam('cat', null) != null) {
          $modelWhere .= " AND " . Events_Model::COL_ID_EVE_CATEGORY . " = :idevcat";
@@ -291,7 +292,7 @@ class Events_Controller extends Controller {
          ))
          ->where($modelWhere, $modelBindValues)
          ->records();
-      
+//      Debug::log($model->getSQLQuery());
       $this->view()->events = $this->getSortedEvents($events);
 
       $modelCats = new Events_Model_Categories();
