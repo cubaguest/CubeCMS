@@ -28,35 +28,35 @@ class Mails_Controller extends Controller {
       $modelSMails = new Mails_Model_SendMails();
 
       $formSendMail = new Form('sendmail_', true);
-      $elemRecipients = new Form_Element_TextArea('recipients', $this->_('Příjemci'));
+      $elemRecipients = new Form_Element_TextArea('recipients', $this->tr('Příjemci'));
 
       $elemRecipients->addValidation(new Form_Validator_NotEmpty());
 //      $elemRecipients->addFilter(new Form_Filter_RemoveWhiteChars());
-      $elemRecipients->setSubLabel($this->_('E-mailové adresy oddělené čárkou'));
+      $elemRecipients->setSubLabel($this->tr('E-mailové adresy oddělené čárkou'));
       $formSendMail->addElement($elemRecipients);
 
-      $elemSubject = new Form_Element_Text('subject', $this->_('Předmět'));
+      $elemSubject = new Form_Element_Text('subject', $this->tr('Předmět'));
       $elemSubject->addValidation(new Form_Validator_NotEmpty());
       $formSendMail->addElement($elemSubject);
 
-      $elemText = new Form_Element_TextArea('text', $this->_('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $formSendMail->addElement($elemText);
 
-      $elemFile = new Form_Element_File('file', $this->_('Příloha'));
+      $elemFile = new Form_Element_File('file', $this->tr('Příloha'));
       $elemFile->setUploadDir(AppCore::getAppCacheDir());
       $formSendMail->addElement($elemFile);
 
-      $elemSendBatch = new Form_Element_Checkbox('sendBatch', $this->_('Odeslat každému příjemci zvlášť'));
+      $elemSendBatch = new Form_Element_Checkbox('sendBatch', $this->tr('Odeslat každému příjemci zvlášť'));
       $elemSendBatch->setValues(true);
       $formSendMail->addElement($elemSendBatch);
 
-      $elemSendQueue = new Form_Element_Checkbox('sendQueue', $this->_('Zařadit odesílání do fronty'));
+      $elemSendQueue = new Form_Element_Checkbox('sendQueue', $this->tr('Zařadit odesílání do fronty'));
       $elemSendQueue->setValues(true);
-      $elemSendQueue->setSubLabel($this->_('Obchází vypršení doby zpracování stránky a umožní odeslání velkému počtu příjemcům. Mail je odesílán vždy jen jednomu příjemci.'));
+      $elemSendQueue->setSubLabel($this->tr('Obchází vypršení doby zpracování stránky a umožní odeslání velkému počtu příjemcům. Mail je odesílán vždy jen jednomu příjemci.'));
       $formSendMail->addElement($elemSendQueue);
 
-      $elemSubmit = new Form_Element_Submit('send', $this->_('Odeslat'));
+      $elemSubmit = new Form_Element_Submit('send', $this->tr('Odeslat'));
       $formSendMail->addElement($elemSubmit);
 
       if (isset($_SESSION[self::SESSION_MAIL_RECIPIENTS])) {
@@ -70,7 +70,7 @@ class Mails_Controller extends Controller {
          // z uložených emailů
          $mail = $modelSMails->getMail($this->getRequestParam('sendmail'));
          if ($mail == false) {
-            throw new CoreException($this->_('Špatně předané id mailu'));
+            throw new CoreException($this->tr('Špatně předané id mailu'));
          }
          $formSendMail->recipients->setValues($mail->{Mails_Model_SendMails::COLUMN_RECIPIENTS});
          $formSendMail->subject->setValues($mail->{Mails_Model_SendMails::COLUMN_SUBJECT});
@@ -115,29 +115,40 @@ class Mails_Controller extends Controller {
             $mailObj->addAttachment(AppCore::getAppCacheDir().$attachFile);
 
             if($formSendMail->sendBatch->getValues() == true){
-               $mailObj->batchSend();
+               $mailObj->batchSend(); // UNCOMMENT
             } else {
-               $mailObj->send();
+               $mailObj->send(); // UNCOMMENT
             }
-            $this->infoMsg()->addMessage($this->_('E-mail byl odeslán'));
+            $this->infoMsg()->addMessage($this->tr('E-mail byl odeslán'));
             $this->link()->route()->rmParam()->reload();
          } else {
-            // create tmp file with message
-            $_SESSION['mailsQueue'] = array(
+            $mailData = array(
                'message' => $formSendMail->text->getValues(),
                'subject' => $formSendMail->subject->getValues(),
                'ishtml' => $isHtmlMail,
                'attachment' => $attachFile,
                'sendbatch' => $formSendMail->sendBatch->getValues(),
-               'recipients' => $mailObj->getAddresses()
             );
-
+            $mailDataSer = serialize($mailData);
+            
             // uložení adrwes do fronty v db
             $modelQ = new Mails_Model_SendQueue();
-            $modelQ->truncateModel();
-            $modelQ->addMails($mailObj->getAddresses());
+            $modelQ->where(Mails_Model_SendQueue::COLUMN_ID_USER." = :idu", array('idu' => Auth::getUserId()))->delete() ;
+            
+            foreach ($mailObj->getAddresses() as $key => $value) {
+               $mailQR = $modelQ->newRecord();
+               $mailQR->{Mails_Model_SendQueue::COLUMN_ID_USER} = Auth::getUserId();
+               $mailQR->{Mails_Model_SendQueue::COLUMN_DATA} = $mailDataSer;
+               if(is_int($key)){
+                  $mailQR->{Mails_Model_SendQueue::COLUMN_MAIL} = $value;
+               } else {
+                  $mailQR->{Mails_Model_SendQueue::COLUMN_MAIL} = $key;
+                  $mailQR->{Mails_Model_SendQueue::COLUMN_NAME} = $value;
+               }
+               $modelQ->save($mailQR);
+            }
 
-            $this->infoMsg()->addMessage($this->_('E-mail byl zařazen do fronty pro odeslání'));
+            $this->infoMsg()->addMessage($this->tr('E-mail byl zařazen do fronty pro odeslání'));
             $this->link()->route('sendMailsQueue')->rmParam()->reload();
          }
       }
@@ -145,8 +156,8 @@ class Mails_Controller extends Controller {
 
       // adresář
       $modelAddress = new Mails_Model_Addressbook();
-      $this->view()->mailsAddressBook = $modelAddress->getMails();
-
+      $address = $modelAddress->records(PDO::FETCH_OBJ);
+      $this->view()->mailsAddressBook = $address;
       // newsletter
       $modelModules = new Model_Module();
       if ($modelModules->isModuleInstaled('newsletter') == true) {
@@ -164,7 +175,6 @@ class Mails_Controller extends Controller {
       $this->view()->mailsUsers = array();
       $modelUsers = new Model_Users();
       $users = array();
-//      $usrtTmp = $modelUsers->getUsersWithMails()->fetchAll(PDO::FETCH_OBJ);
       $usrtTmp = $modelUsers->joinFK(Model_Users::COLUMN_GROUP_ID)
          ->where(Model_Users::COLUMN_MAIL.' IS NOT NULL AND '.Model_Users::COLUMN_MAIL.' != \'\' ', array())
          ->records(PDO::FETCH_OBJ);
@@ -177,7 +187,7 @@ class Mails_Controller extends Controller {
       }
       unset ($usrtTmp);
       $this->view()->mailsUsers = $users;
-      unset ($users);
+//      unset ($users);
 
       // načteme skupiny z adresář
       $modelGrps = new Mails_Model_Groups();
@@ -190,74 +200,74 @@ class Mails_Controller extends Controller {
    {
       $this->checkReadableRights();
 
-      if(isset ($_SESSION['mailsQueue'])){
-         $qInfo = $_SESSION['mailsQueue'];
+//    if($sData['attachment'] != null AND file_exists(AppCore::getAppCacheDir().$sData['attachment'])){
+//       unlink(AppCore::getAppCacheDir().$sData['attachment']);
+//    }
 
-         $modelQ = new Mails_Model_SendQueue();
+      $modelQ = new Mails_Model_SendQueue();
 
-         $this->view()->queue = $modelQ->getMails();
+      $this->view()->queue = $modelQ
+         ->where(Mails_Model_SendQueue::COLUMN_ID_USER . " = :idu", array('idu' => Auth::getUserId()))
+         ->order(array(Mails_Model_SendQueue::COLUMN_MAIL => Model_ORM::ORDER_ASC))
+         ->records();
 
-         /* FORM odeslání fronty */
-         $formSend = new Form('send-queue');
-         $eSend = new Form_Element_Submit('send', $this->_('spustit odesílání'));
-         $formSend->addElement($eSend);
-         if($formSend->isValid()){
-            $mailObj = new Email(true);
-            // odeslání bez ajaxu
-         }
-         $this->view()->formSend = $formSend;
-         // data pro odeslání
-         $sData = $_SESSION['mailsQueue'];
-
-         /* FORM vyčištění fronty */
-         $formClear = new Form('clear-queue');
-         $eSend = new Form_Element_Submit('clear', $this->_('vyčistit'));
-         $formClear->addElement($eSend);
-         if($formClear->isValid()){
-            $modelQ->truncateModel();
-            if($_SESSION['mailsQueue']['attachment'] != null
-               AND file_exists(AppCore::getAppCacheDir().$_SESSION['mailsQueue']['attachment'])){
-               unlink(AppCore::getAppCacheDir().$_SESSION['mailsQueue']['attachment']);
-            }
-            unset ($_SESSION['mailsQueue']);
-            $this->infoMsg()->addMessage($this->_('Fronta byla vyčištěna'));
-            $this->link()->route()->rmParam()->reload();
-         }
-         $this->view()->formClear = $formClear;
-
-         /* FORM odstranění mailů na které se nedaří doručit */
-         $formRemoveUndeliverable = new Form('remove-ndeliverable');
-         $eRemove = new Form_Element_Submit('remove', $this->_('odstranit'));
-         $formRemoveUndeliverable->addElement($eRemove);
-         if($formRemoveUndeliverable->isValid()){
-            $mails = $modelQ->getUndeliverable();
-            
-            $modelA = new Mails_Model_Addressbook();
-            foreach ($mails as $umail) {
-               $modelA->deleteMail($umail->{Mails_Model_SendQueue::COLUMN_MAIL});
-            }
-
-            unset ($_SESSION['mailsQueue']);
-            $modelQ->truncateModel();
-            if($sData['attachment'] != null AND file_exists(AppCore::getAppCacheDir().$sData['attachment'])){
-               unlink(AppCore::getAppCacheDir().$sData['attachment']);
-            }
-            $this->infoMsg()->addMessage($this->_('Adresy na které se nepodařilo doručit byly odstraněny z adresáře.'));
-            $this->link()->reload();
-         }
-         $this->view()->formRemUnedlivered = $formRemoveUndeliverable;
+      /* FORM odeslání fronty */
+      $formSend = new Form('send-queue');
+      $eSend = new Form_Element_Submit('send', $this->tr('spustit odesílání'));
+      $formSend->addElement($eSend);
+      if ($formSend->isValid()) {
+         $mailObj = new Email(true);
+         // odeslání bez ajaxu
       }
+      $this->view()->formSend = $formSend;
+      // data pro odeslání
+
+      /* FORM vyčištění fronty */
+      $formClear = new Form('clear-queue');
+      $eSend = new Form_Element_Submit('clear', $this->tr('vyčistit'));
+      $formClear->addElement($eSend);
+      if ($formClear->isValid()) {
+         $modelQ->where(Mails_Model_SendQueue::COLUMN_ID_USER . " = :idu", array('idu' => Auth::getUserId()))->delete();
+         $this->infoMsg()->addMessage($this->tr('Fronta byla vyčištěna'));
+         $this->link()->route()->rmParam()->reload();
+      }
+      $this->view()->formClear = $formClear;
+
+      /* FORM odstranění mailů na které se nedaří doručit */
+      $formRemoveUndeliverable = new Form('remove-ndeliverable');
+      $eRemove = new Form_Element_Submit('remove', $this->tr('odstranit'));
+      $formRemoveUndeliverable->addElement($eRemove);
+      if ($formRemoveUndeliverable->isValid()) {
+         $mails = $modelQ
+            ->where(Mails_Model_SendQueue::COLUMN_ID_USER . " = :idu AND " . Mails_Model_SendQueue::COLUMN_UNDELIVERABLE . " = 1", array('idu' => Auth::getUserId()))
+            ->records();
+
+         $modelA = new Mails_Model_Addressbook();
+         foreach ($mails as $umail) {
+            $modelA->deleteMail($umail->{Mails_Model_SendQueue::COLUMN_MAIL});
+         }
+         $modelQ->where(Mails_Model_SendQueue::COLUMN_ID_USER . " = :idu", array('idu' => Auth::getUserId()))->delete();
+         $this->infoMsg()->addMessage($this->tr('Adresy na které se nepodařilo doručit byly odstraněny z adresáře.'));
+         $this->link()->reload();
+      }
+      $this->view()->formRemUnedlivered = $formRemoveUndeliverable;
    }
 
    public function sendMailController()
    {
       $this->checkReadableRights();
+      $modelQ = new Mails_Model_SendQueue();
 
-      if(!isset ($_SESSION['mailsQueue'])){
-         $this->errMsg()->addMessage($this->_('Pokus o odeslání prázdné fronty'));
-         return;
+      $mailItem = $modelQ->record($this->getRequestParam('id')); 
+      
+      if($mailItem == false || $mailItem->{Mails_Model_SendQueue::COLUMN_DATA} == null){
+         $this->view()->msg = $this->tr('Odeslání neexistujícího mailu z fronty');
+         $this->view()->status = 'ERR';
+         $this->errMsg()->addMessage($this->view()->msg);
+         return true;
       }
-      $sData = $_SESSION['mailsQueue'];
+      
+      $sData = unserialize($mailItem->{Mails_Model_SendQueue::COLUMN_DATA});
       $mailObj = new Email($sData['ishtml']);
       $mailObj->setContent($sData['message']);
       $mailObj->setSubject($sData['subject']);
@@ -266,29 +276,22 @@ class Mails_Controller extends Controller {
          $mailObj->addAttachment(AppCore::getAppCacheDir().$sData['attachment']);
       }
 
-      $modelQ = new Mails_Model_SendQueue();
-      $id = $this->getRequestParam('id');
-
-      $mailData = $modelQ->getMail($id);
-
-      if($mailData == null){
-         $this->errMsg()->addMessage($this->_('Odeslání neexistujícího mailu z fronty'));
-      }
-
-      $mailObj->addAddress($mailData->{Mails_Model_SendQueue::COLUMN_MAIL}, $mailData->{Mails_Model_SendQueue::COLUMN_NAME});
+      $mailObj->addAddress($mailItem->{Mails_Model_SendQueue::COLUMN_MAIL}, $mailItem->{Mails_Model_SendQueue::COLUMN_NAME});
 
       $failures = array();
-      if(!$mailObj->send($failures)){
-         $this->view()->status = 'ERR';
+      if(!$mailObj->send($failures)){ // UNCOMMENT
+//      if(true == false){
          $this->view()->msg = 'Nelze odeslat';
-         $modelQ->setUndeliverable($id);
-         $this->errMsg()->addMessage(sprintf($this->_('Zpráva s adresou %s byla odmítnuta.'), $failures[0]));
+         $this->view()->status = 'ERR';
+         $mailItem->{Mails_Model_SendQueue::COLUMN_UNDELIVERABLE} = true;
+         $modelQ->save($mailItem);
+         $this->errMsg()->addMessage(sprintf($this->tr('Zpráva s adresou %s byla odmítnuta.'), $failures[0]));
       } else {
          $this->view()->msg = 'Odesláno';
          $this->view()->status = 'OK';
          // odstranění mailu z fronty
-         $modelQ->deleteMail($id);
-         $this->infoMsg()->addMessage(sprintf($this->_('Zpráva s adresou %s byla odeslána.'), $mailData->{Mails_Model_SendQueue::COLUMN_MAIL}));
+         $modelQ->delete($mailItem);
+         $this->infoMsg()->addMessage(sprintf($this->tr('Zpráva s adresou %s byla odeslána.'), $mailItem->{Mails_Model_SendQueue::COLUMN_MAIL}));
       }
    }
 
@@ -321,7 +324,6 @@ class Mails_Controller extends Controller {
             $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
       }
       // out
-      
       foreach ($book as $mail) {
          array_push($jqGrid->respond()->rows, array('id' => $mail->{Mails_Model_Addressbook::COLUMN_ID},
              'cell' => array(
@@ -386,9 +388,9 @@ class Mails_Controller extends Controller {
             if ($validatorMail->isValid()) {
                $adrModel->saveMail($jqGridReq->mail, $jqGridReq->idg, $jqGridReq->name,
                   $jqGridReq->surname, $jqGridReq->note);
-               $this->infoMsg()->addMessage($this->_('Kontakt by uložen'));
+               $this->infoMsg()->addMessage($this->tr('Kontakt by uložen'));
             } else {
-               $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
+               $this->errMsg()->addMessage($this->tr('Špatně zadaný e-mail'));
             }
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
@@ -397,19 +399,19 @@ class Mails_Controller extends Controller {
             if ($validatorMail->isValid()) {
                $adrModel->saveMail($jqGridReq->mail, $jqGridReq->idg, $jqGridReq->name,
                   $jqGridReq->surname, $jqGridReq->note, $jqGridReq->id);
-               $this->infoMsg()->addMessage($this->_('Kontakt by uložen'));
+               $this->infoMsg()->addMessage($this->tr('Kontakt by uložen'));
             } else {
-               $this->errMsg()->addMessage($this->_('Špatně zadaný e-mail'));
+               $this->errMsg()->addMessage($this->tr('Špatně zadaný e-mail'));
             }
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
             foreach ($jqGridReq->getIds() as $id) {
                $adrModel->deleteMail((int)$id);
             }
-            $this->infoMsg()->addMessage($this->_('Vybrané kontakty byly smazány'));
+            $this->infoMsg()->addMessage($this->tr('Vybrané kontakty byly smazány'));
             break;
          default:
-            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ operace'));
             break;
       }
       if ($this->errMsg()->isEmpty()) {
@@ -428,14 +430,14 @@ class Mails_Controller extends Controller {
       switch ($jqGridReq->getRequest()) {
          case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
             $model->save($jqGridReq->name, $jqGridReq->note);
-            $this->infoMsg()->addMessage($this->_('Skupina byla uložena'));
+            $this->infoMsg()->addMessage($this->tr('Skupina byla uložena'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
             if((int)$jqGridReq->id != 0){
                $adrModel->save($jqGridReq->name, $jqGridReq->note, $jqGridReq->id);
-               $this->infoMsg()->addMessage($this->_('Skupina byla uložena'));
+               $this->infoMsg()->addMessage($this->tr('Skupina byla uložena'));
             } else {
-               $this->errMsg()->addMessage($this->_('Skupinu všechny nelze upravovat'));
+               $this->errMsg()->addMessage($this->tr('Skupinu všechny nelze upravovat'));
             }
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
@@ -443,13 +445,13 @@ class Mails_Controller extends Controller {
                foreach ($jqGridReq->getIds() as $id) {
                   $model->deleteGroup((int)$id);
                }
-               $this->infoMsg()->addMessage($this->_('Vybrané skupiny byly smazány'));
+               $this->infoMsg()->addMessage($this->tr('Vybrané skupiny byly smazány'));
             } else {
-               $this->errMsg()->addMessage($this->_('Skupinu všechny nelze smazat'));
+               $this->errMsg()->addMessage($this->tr('Skupinu všechny nelze smazat'));
             }
             break;
          default:
-            $this->errMsg()->addMessage($this->_('Nepodporovaný typ operace'));
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ operace'));
             break;
       }
       if ($this->errMsg()->isEmpty()) {
@@ -465,139 +467,6 @@ class Mails_Controller extends Controller {
       $modelGrps = new Mails_Model_Groups();
       $grps = $modelGrps->getGroups();
       $this->view()->idSelGrp = $grps[0]->{Mails_Model_Groups::COLUMN_ID}; // kvůli načtení mailů z první skupiny
-
-      /* IMPORT */
-      $formImport = new Form('mails_import_');
-      $formImportGrpBasic = $formImport->addGroup('basic', $this->_('Základní'));
-      $formImportGrpAdv = $formImport->addGroup('advanced', $this->_('Pokročilé'));
-
-      $eFile = new Form_Element_File('file', $this->_('Soubor (*.csv)'));
-      $eFile->addValidation(new Form_Validator_FileExtension('csv'));
-      $formImport->addElement($eFile, $formImportGrpBasic);
-
-
-      $eGroup = new Form_Element_Select('group', $this->_('Skupina'));
-      $formImport->addElement($eGroup, $formImportGrpBasic);
-
-      $eImport = new Form_Element_Submit('import', $this->_('Nahrát'));
-      $formImport->addElement($eImport, $formImportGrpBasic);
-
-//      $eSeparator = new Form_Element_Text('separator', $this->_('Oddělovač'));
-//      $eSeparator->addValidation(new Form_Validator_NotEmpty());
-//      $eSeparator->setValues(';');
-//      $formImport->addElement($eSeparator, $formImportGrpAdv);
-      
-//      $eSkipFirst = new Form_Element_Checkbox('skipfirst', $this->_('Přeskočit první řádek'));
-//      $formImport->addElement($eSkipFirst, $formImportGrpAdv);
-
-//      $eNumColls = new Form_Element_Text('cools', $this->_('počet sloupců'));
-//      $eNumColls->setValues(1);
-//      $formImport->addElement($eNumColls);
-      
-      foreach ($grps as $grp) {
-         $formImport->group->setOptions(array($grp->{Mails_Model_Groups::COLUMN_NAME} => $grp->{Mails_Model_Groups::COLUMN_ID}), true);
-      }
-
-      if ($formImport->isValid()) {
-         $modelMails = new Mails_Model_Addressbook();
-         $file = $formImport->file->createFileObject('Filesystem_File_Text');
-         $mails = $file->getContent();
-         
-         $mailsArr = explode("\n", $mails);
-         $numImports = 0;
-         foreach ($mailsArr as $mail) {
-            if(empty($mail)) continue;
-            $modelMails->saveMail($mail, $formImport->group->getValues());
-            $numImports++;
-         }
-         $this->infoMsg()->addMessage(sprintf($this->_('Adresy byly importovány. Celkem bylo importováno %s záznamů.'),$numImports));
-         $this->link()->reload();
-      }
-      $this->view()->formImport = $formImport;
-
-      /* EXPORT */
-      $formExport = new Form('mails_export_');
-      $formExportGrpBasic = $formExport->addGroup('basic',  $this->_('Základní'));
-      $formExportGrpAdv = $formExport->addGroup('advanced',  $this->_('Pokročilé'));
-
-      $eGroup = new Form_Element_Select('group', $this->_('Skupina'));
-
-      $eGroup->setOptions(array($this->_('Vše') => Mails_Model_Groups::GROUP_ID_ALL), true);
-      foreach ($grps as $grp) {
-         $eGroup->setOptions(array($grp->{Mails_Model_Groups::COLUMN_NAME} => $grp->{Mails_Model_Groups::COLUMN_ID}), true);
-      }
-      $formExport->addElement($eGroup, $formExportGrpBasic);
-
-
-      $eSubmit = new Form_Element_Submit('export', $this->_('Export'));
-      $formExport->addElement($eSubmit, $formExportGrpBasic);
-
-      $eAddHeaders = new Form_Element_Checkbox('addheader', $this->_('Přidat názvy sloupců'));
-      $eAddHeaders->setValues(true);
-      $formExport->addElement($eAddHeaders, $formExportGrpAdv);
-
-      $eExportType = new Form_Element_Select('type', $this->_('Typ'));
-      $eExportType->setOptions(array('csv' => 'csv', 'txt' => 'txt'));
-      $formExport->addElement($eExportType, $formExportGrpAdv);
-
-      $eCsvSep = new Form_Element_Text('csvsep', $this->_('Oddělovač hodnot'));
-      $eCsvSep->setValues(',');
-      $eCsvSep->addValidation(new Form_Validator_NotEmpty());
-      $formExport->addElement($eCsvSep, $formExportGrpAdv);
-
-      if($formExport->isValid()){
-         $modelMails = new Mails_Model_Addressbook();
-         $mails = $modelMails->getMails($formExport->group->getValues());
-         switch ($formExport->type->getValues()) {
-            case 'csv':
-               $comCsv = new Component_CSV();
-               $comCsv->setConfig(Component_CSV::CFG_CELL_SEPARATOR, $formExport->csvsep->getValues());
-               $comCsv->setConfig(Component_CSV::CFG_FLUSH_FILE, 'mails-'.date('Y-m-d').'.csv');
-               if($formExport->addheader->getValues() == true){
-                  $comCsv->setCellLabels(array($this->_('Jméno'),$this->_('Přijmení'),$this->_('E-mail'),$this->_('Poznámka')));
-               }
-               foreach ($mails as $mail) {
-                  $comCsv->addRow(array(
-                     $mail->{Mails_Model_Addressbook::COLUMN_NAME},
-                     $mail->{Mails_Model_Addressbook::COLUMN_SURNAME},
-                     $mail->{Mails_Model_Addressbook::COLUMN_MAIL},
-                     $mail->{Mails_Model_Addressbook::COLUMN_NOTE}
-                  ));
-               }
-               $comCsv->flush();
-               break;
-            case 'txt':
-               $buffer = null;
-               foreach ($mails as $mail) {
-                  $buffer .= $mail->{Mails_Model_Addressbook::COLUMN_MAIL}."\r\n";
-               }
-               Template_Output::factory('txt');
-               Template_Output::setDownload('mails-'.date('Y-m-d').'.txt');
-               Template_Output::sendHeaders();
-               echo $buffer;
-               flush();
-               exit();
-               break;
-            default:
-               $this->errMsg()->addMessage($this->_('Nepodporovaný typ exportu'));
-               break;
-         }
-
-         $compCsv = new Component_CSV();
-
-
-
-      }
-      $this->view()->formExport = $formExport;
-
-      $formRemoveDuplicity = new Form('remduplicity');
-      $eSubmit = new Form_Element_Submit('remove', $this->_('Odstranit'));
-      $formRemoveDuplicity->addElement($eSubmit);
-
-      if($formRemoveDuplicity->isValid()){
-
-      }
-      $this->view()->formRemoveDuplicity = $formRemoveDuplicity;
 
       $this->view()->linkBack = $this->link()->route()->rmParam();
    }
@@ -620,6 +489,170 @@ class Mails_Controller extends Controller {
       $model = new Mails_Model_Addressbook();
 
       $this->view()->mails = $model->searchMail($this->getRequestParam('q'));
+   }
+   
+   public function toolsController()
+   {
+      $this->checkWritebleRights();
+      
+      $modelGrps = new Mails_Model_Groups();
+      $grps = $modelGrps->getGroups();
+      
+      /* IMPORT */
+      $formImport = new Form('mails_import_');
+      $formImportGrpBasic = $formImport->addGroup('basic', $this->tr('Základní'));
+      $formImportGrpAdv = $formImport->addGroup('advanced', $this->tr('Pokročilé'));
+
+      $eFile = new Form_Element_File('file', $this->tr('Soubor (*.csv)'));
+      $eFile->addValidation(new Form_Validator_FileExtension('csv'));
+      $formImport->addElement($eFile, $formImportGrpBasic);
+
+
+      $eGroup = new Form_Element_Select('group', $this->tr('Skupina'));
+      $formImport->addElement($eGroup, $formImportGrpBasic);
+
+      $eImport = new Form_Element_Submit('import', $this->tr('Nahrát'));
+      $formImport->addElement($eImport, $formImportGrpBasic);
+
+      foreach ($grps as $grp) {
+         $formImport->group->setOptions(array($grp->{Mails_Model_Groups::COLUMN_NAME} => $grp->{Mails_Model_Groups::COLUMN_ID}), true);
+      }
+
+      if ($formImport->isValid()) {
+         $modelMails = new Mails_Model_Addressbook();
+         $file = $formImport->file->createFileObject('Filesystem_File_Text');
+         $mails = $file->getContent();
+         
+         $mailsArr = explode("\n", $mails);
+         $numImports = 0;
+         foreach ($mailsArr as $mail) {
+            if(empty($mail)) continue;
+            $modelMails->saveMail($mail, $formImport->group->getValues());
+            $numImports++;
+         }
+         $this->infoMsg()->addMessage(sprintf($this->tr('Adresy byly importovány. Celkem bylo importováno %s záznamů.'),$numImports));
+         $this->link()->reload();
+      }
+      $this->view()->formImport = $formImport;
+
+      /* EXPORT */
+      $formExport = new Form('mails_export_');
+      $formExportGrpBasic = $formExport->addGroup('basic',  $this->tr('Základní'));
+      $formExportGrpAdv = $formExport->addGroup('advanced',  $this->tr('Pokročilé'));
+
+      $eGroup = new Form_Element_Select('group', $this->tr('Skupina adresáře'));
+
+      $eGroup->setOptions(array($this->tr('Vše') => Mails_Model_Groups::GROUP_ID_ALL), true);
+      foreach ($grps as $grp) {
+         $eGroup->setOptions(array($grp->{Mails_Model_Groups::COLUMN_NAME} => $grp->{Mails_Model_Groups::COLUMN_ID}), true);
+      }
+      $formExport->addElement($eGroup, $formExportGrpBasic);
+
+
+      $eSubmit = new Form_Element_Submit('export', $this->tr('Export'));
+      $formExport->addElement($eSubmit);
+
+      $eAddHeaders = new Form_Element_Checkbox('addheader', $this->tr('Přidat názvy sloupců'));
+      $eAddHeaders->setValues(true);
+      $formExport->addElement($eAddHeaders, $formExportGrpAdv);
+
+      $eExportType = new Form_Element_Select('type', $this->tr('Typ'));
+      $eExportType->setOptions(array('Excel (xls)' => 'xls', 'Excel (csv)' => 'csv', 'Prostý text (txt)' => 'txt'));
+      $formExport->addElement($eExportType, $formExportGrpAdv);
+
+      $eCsvSep = new Form_Element_Text('csvsep', $this->tr('Oddělovač hodnot'));
+      $eCsvSep->setSubLabel($this->tr('Pouze csv formát'));
+      $eCsvSep->setValues(',');
+      $formExport->addElement($eCsvSep, $formExportGrpAdv);
+
+      if($formExport->isSend() && $formExport->type->getValues() == "csv"){
+         $formExport->csvsep->addValidation(new Form_Validator_NotEmpty());
+      }
+      if($formExport->isValid()){
+         $modelMails = new Mails_Model_Addressbook();
+         $mails = $modelMails->getMails($formExport->group->getValues());
+         switch ($formExport->type->getValues()) {
+            case 'csv':
+               $comCsv = new Component_CSV();
+               $comCsv->setConfig(Component_CSV::CFG_CELL_SEPARATOR, $formExport->csvsep->getValues());
+               $comCsv->setConfig(Component_CSV::CFG_FLUSH_FILE, 'mails-'.date('Y-m-d').'.csv');
+               if($formExport->addheader->getValues() == true){
+                  $comCsv->setCellLabels(array($this->tr('Jméno'),$this->tr('Přijmení'),$this->tr('E-mail'),$this->tr('Poznámka')));
+               }
+               foreach ($mails as $mail) {
+                  $comCsv->addRow(array(
+                     $mail->{Mails_Model_Addressbook::COLUMN_NAME},
+                     $mail->{Mails_Model_Addressbook::COLUMN_SURNAME},
+                     $mail->{Mails_Model_Addressbook::COLUMN_MAIL},
+                     $mail->{Mails_Model_Addressbook::COLUMN_NOTE}
+                  ));
+               }
+               $comCsv->flush();
+               break;
+            case 'xls':
+               include_once AppCore::getAppLibDir().'lib/nonvve/phpexcel/PHPExcel.php';
+               $excelDoc = new PHPExcel();
+               $excelDoc->setActiveSheetIndex(0);
+               $list = $excelDoc->getActiveSheet();
+               $currLine = 1;
+               
+               $list->getColumnDimension('A')->setWidth(10);
+               $list->getColumnDimension('B')->setWidth(10);
+               $list->getColumnDimension('C')->setWidth(45);
+               
+               if($formExport->addheader->getValues() == true){
+                  $list->getStyle('A1:D1')->getFont()->setBold(true);
+                  
+                  $list->setCellValueByColumnAndRow(0, $currLine, $this->tr('Jméno'));
+                  $list->setCellValueByColumnAndRow(1, $currLine, $this->tr('Přijmení'));
+                  $list->setCellValueByColumnAndRow(2, $currLine, $this->tr('E-mail'));
+                  $list->setCellValueByColumnAndRow(3, $currLine, $this->tr('Poznámka'));
+                  $currLine++;
+               }
+               
+               foreach ($mails as $mail) {
+                  $list->setCellValueByColumnAndRow(0, $currLine, $mail->{Mails_Model_Addressbook::COLUMN_NAME});
+                  $list->setCellValueByColumnAndRow(1, $currLine, $mail->{Mails_Model_Addressbook::COLUMN_SURNAME});
+                  $list->setCellValueByColumnAndRow(2, $currLine, $mail->{Mails_Model_Addressbook::COLUMN_MAIL});
+                  $list->setCellValueByColumnAndRow(3, $currLine, $mail->{Mails_Model_Addressbook::COLUMN_NOTE});
+                  $currLine++;
+               }
+               $newExcelWriter = new PHPExcel_Writer_Excel5($excelDoc);
+//               $newExcelWriter->save(AppCore::getAppCacheDir()."mail_export.xls");
+               Template_Output::factory('xls');
+               Template_Output::setDownload('mails-'.date('Y-m-d').'.xls');
+               Template_Output::sendHeaders();
+               header('Content-type: application/vnd.ms-excel');
+               $newExcelWriter->save('php://output');
+               exit();
+               break;
+            case 'txt':
+               $buffer = null;
+               foreach ($mails as $mail) {
+                  $buffer .= $mail->{Mails_Model_Addressbook::COLUMN_MAIL}."\r\n";
+               }
+               Template_Output::factory('txt');
+               Template_Output::setDownload('mails-'.date('Y-m-d').'.txt');
+               Template_Output::sendHeaders();
+               echo $buffer;
+               flush();
+               exit();
+               break;
+            default:
+               $this->errMsg()->addMessage($this->tr('Nepodporovaný typ exportu'));
+               break;
+         }
+      }
+      $this->view()->formExport = $formExport;
+
+      $formRemoveDuplicity = new Form('remduplicity');
+      $eSubmit = new Form_Element_Submit('remove', $this->tr('Odstranit'));
+      $formRemoveDuplicity->addElement($eSubmit);
+
+      if($formRemoveDuplicity->isValid()){
+
+      }
+      $this->view()->formRemoveDuplicity = $formRemoveDuplicity;
    }
 
    /**

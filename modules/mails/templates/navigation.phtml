@@ -1,9 +1,10 @@
 <?
 $this->items = array(
-   $this->_('Vytvořit e-mail') => array('link' => (string)$this->link()->route(), 'icon' => 'email_edit.png'),
-   $this->_('Fronta odesílání') => array('link' => (string)$this->link()->route('sendMailsQueue'), 'icon' => 'cog.png'),
-   $this->_('Adresář') => array('link' => (string)$this->link()->route('addressBook'), 'icon' => 'book_addresses.png'),
-   $this->_('Odesláné e-maily') => array('link' => (string)$this->link()->route('sendMailsList'), 'icon' => 'email_go.png')
+   $this->tr('Vytvořit e-mail') => array('link' => (string)$this->link()->route(), 'icon' => 'email_edit.png'),
+   $this->tr('Fronta odesílání') => array('link' => (string)$this->link()->route('sendMailsQueue'), 'icon' => 'cog.png'),
+   $this->tr('Adresář') => array('link' => (string)$this->link()->route('addressBook'), 'icon' => 'book_addresses.png'),
+   $this->tr('Odesláné e-maily') => array('link' => (string)$this->link()->route('sendMailsList'), 'icon' => 'email_go.png'),
+   $this->tr('Nástroje') => array('link' => (string)$this->link()->route('tools'), 'icon' => 'wrench.png')
    );
 $this->includeTpl('module_navigation.phtml', true);
 ?>

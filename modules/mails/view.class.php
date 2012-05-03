@@ -90,5 +90,11 @@ class Mails_View extends View {
    public function searchMailView(){
 //      echo json_encode($this->mails);
    }
+   
+   public function toolsView()
+   {
+      $this->template()->addTplFile('tools.phtml');
+      Template_Module::setEdit(true);
+   }
 }
 ?>

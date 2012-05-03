@@ -1,6 +1,6 @@
 <?
-$this->addPageTitle($this->_('odeslání e-mailu'));
-$this->addPageHeadline($this->_('odeslání e-mailu'));
+$this->addPageTitle($this->tr('odeslání e-mailu'));
+$this->addPageHeadline($this->tr('odeslání e-mailu'));
 ?>
 <div class="main-content-detail" id="sendMailForm">
    <?
@@ -32,19 +32,19 @@ $this->addPageHeadline($this->_('odeslání e-mailu'));
       <tr>
          <td>lkabel
          <?echo $this->form->text->label()?>
-            <strong><?=$this->_('Edotir')?>:&nbsp;</strong>
+            <strong><?=$this->tr('Edotir')?>:&nbsp;</strong>
             <a href="<?=$this->link()?>#disableEditor"
             onclick="toggleEditor('sendmail_text');"
-            title="<?=$this->_('vypnout/zapnout editor')?>"><?=$this->_('OFF/ON')?></a>
+            title="<?=$this->tr('vypnout/zapnout editor')?>"><?=$this->tr('OFF/ON')?></a>
             <br />
          <?
          $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40)->addClass('mceEditorSimple');
          echo $this->form->text->controll();?>
          <br />
-         <strong><?=$this->_('Edotir')?>:&nbsp;</strong>
+         <strong><?=$this->tr('Edotir')?>:&nbsp;</strong>
 <!--         <a href="<?=$this->link()?>#disableEditor"
             onclick="toggleEditor('sendmail_text');"
-            title="<?=$this->_('vypnout/zapnout editor')?>"><?=$this->_('OFF/ON')?></a>-->
+            title="<?=$this->tr('vypnout/zapnout editor')?>"><?=$this->tr('OFF/ON')?></a>-->
          <br />
          <br />
          </td>

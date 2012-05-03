@@ -1,0 +1,43 @@
+<h1><?=$this->tr('Nástroje pro príci s e-maily')?></h1>
+<?=$this->includeTpl('navigation.phtml');?>
+<div class="form-edit">
+   <div id="mails-tools" style="">
+	<ul>
+		<li><a href="#mails-export">Export</a></li>
+		<li><a href="#mails-import">Import</a></li>
+		<li><a href="#mails-utilities">Nástroje</a></li>
+	</ul>
+	<div id="mails-export">
+      <?
+      echo $this->formExport;
+      echo $this->tr('Podporován je momentálně export do souboru typu xlx, csv a txt. V txt exportu jsou pouze e-mailové adresy.');
+      ?>
+	</div>
+	<div id="mails-import">
+      <?
+//      $this->formImport->separator->html()->setAttrib('size', 1);
+      echo $this->formImport;
+      echo $this->tr('Podporován je momentálně soubor pouze s e-mailovými adresami.');
+      ?>
+	</div>
+	<div id="mails-utilities">
+      <?
+//      $this->formImport->separator->html()->setAttrib('size', 1);
+      echo '<h3>'.$this->tr('Odstranění duplicitních emailů z adresáře.').'</h3>';
+      echo $this->formRemoveDuplicity;
+      echo $this->tr('Odstraněny budou všechny duplicitní e-mailové adresy.');
+      ?>
+      <hr class="reseter" />
+	</div>
+   <?
+   $jQuery = new JsPlugin_JQuery();
+   $jQuery->addUITabs();
+   $this->addJsPlugin($jQuery);   
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('#mails-tools').tabs({});
+      });
+   </script>
+   </div>
+</div>

@@ -13,6 +13,8 @@ class Mails_Routes extends Routes {
       $this->addRoute('sendMailsQueue', 'sendmails/queue', 'sendMailsQueue', 'sendmails/queue/');
       // seznam odeslaných emailů
       $this->addRoute('sendMailsList', 'sendmails', 'sendMailsList', 'sendmails/');
+      // nástroje
+      $this->addRoute('tools', 'tools', 'tools', 'tools/');
       
       $this->addRoute('editMail', 'edit-mail.php', 'editMail', 'edit-mail.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('editGroup', 'edit-group.php', 'editGroup', 'edit-group.php', 'XHR_Respond_VVEAPI');

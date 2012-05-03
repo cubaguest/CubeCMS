@@ -1,13 +1,32 @@
 <?php
 
-class Mails_Model_SendQueue extends Model_PDO {
+class Mails_Model_SendQueue extends Model_ORM {
    const DB_TABLE = 'mails_send_queue';
 
    const COLUMN_ID = 'id_mail';
+   const COLUMN_ID_USER = 'id_user';
    const COLUMN_MAIL = 'mail';
    const COLUMN_NAME = 'name';
    const COLUMN_UNDELIVERABLE = 'undeliverable';
+   const COLUMN_DATA = 'mail_data';
 
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_m_queue');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT, 'index' => true));
+      
+      $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_UNDELIVERABLE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_DATA, array('datatype' => 'blob', 'pdoparam' => PDO::PARAM_STR));
+      
+      $this->setPk(self::COLUMN_ID);
+      
+      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
+//      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Mail_Model_Groups');
+   }
+   
    public function addMails($mailsArr) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("INSERT INTO " . Db_PDO::table(self::DB_TABLE) . " "

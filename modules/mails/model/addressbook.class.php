@@ -1,6 +1,6 @@
 <?php
 
-class Mails_Model_Addressbook extends Model_PDO {
+class Mails_Model_Addressbook extends Model_ORM {
    const DB_TABLE = 'mails_addressbook';
 
    const COLUMN_ID = 'id_mail';
@@ -12,6 +12,22 @@ class Mails_Model_Addressbook extends Model_PDO {
 
    const DEFAULT_GROUP_ID = 2;
 
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_m_adr');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GRP, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT, 'index' => true, 'default' => self::DEFAULT_GROUP_ID));
+      
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_SURNAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      
+      $this->setPk(self::COLUMN_ID);
+      
+//      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Mail_Model_Groups');
+   }
+   
    public function saveMail($mail, $idGrp = Mails_Model_Groups::GROUP_ID_DEFAULT,
       $name = null, $surname = null, $note = null, $id = null) {
       $dbc = new Db_PDO();

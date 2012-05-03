@@ -1,8 +1,8 @@
 <?
-$this->addPageTitle($this->_('Fronta odesílání e-mailů'));
+$this->addPageTitle($this->tr('Fronta odesílání e-mailů'));
 $this->addCssFile('style.css');
 ?>
-<h1><?=$this->_('Fronta odesílání e-mailů')?></h1>
+<h1><?=$this->tr('Fronta odesílání e-mailů')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div>
 <br />
@@ -51,7 +51,7 @@ if($this->formSend != null){
       </tbody>
    <?} else {?>
    <tr>
-      <td colspan="2"><?=$this->_('Fronta je prázdná');?></td>
+      <td colspan="2"><?=$this->tr('Fronta je prázdná');?></td>
    </tr>
    <?}?>
 </table>
@@ -75,7 +75,7 @@ if($this->formSend != null){
    <br />
 <?
 if($this->formRemUnedlivered != null){
-   echo '<label>'.$this->_('Odstranit z adresáře adresy, které se nepodařilo doručit').'</label>';
+   echo '<label>'.$this->tr('Odstranit z adresáře adresy, které se nepodařilo doručit').'</label>';
    $this->formRemUnedlivered->html()->setAttrib('name', 'form-remove-undelivered');
    echo $this->formRemUnedlivered->renderStart();
    $this->formRemUnedlivered->remove->html()->addClass('button-cancel');
@@ -126,7 +126,7 @@ if($this->formRemUnedlivered != null){
       });
 
       $('form[name=form-remove-undelivered]').submit(function(){
-         return confirm('<?=$this->_('Opravdu smazat ')?>');
+         return confirm('<?=$this->tr('Opravdu smazat ')?>');
       });
 
    });
