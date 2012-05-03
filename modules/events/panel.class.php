@@ -14,46 +14,10 @@ class Events_Panel extends Panel {
    public function panelController()
    {
       $this->panelType = $this->panelObj()->getParam(self::P_TYPE, self::DEFAULT_TYPE);
-      $model = new Events_Model();
       
       if ($this->panelType == self::DEFAULT_TYPE) {
-         $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc AND " . Events_Model::COL_PUBLIC . " = 1";
-         $modelBindValues = array('idc' => $this->category()->getId());
-
          $dateFrom = $dateTo = new DateTime(date("Y-m-d"));
-//         $dateTo = new DateTime(date("Y-m-d"));
-//         switch ($this->getRequestParam('range', 'day')) {
-//            case 'week':
-//               $dateTo->modify('+1 week');
-//               break;
-//            case 'month':
-//               $dateTo->modify('+1 month');
-//               break;
-//            case 'day':
-//            default:
-//               break;
-//         }
-
-//         $this->view()->dateFrom = $dateFrom;
-//         $this->view()->dateTo = $dateTo;
-
-         // model settings
-         $modelWhere .= " AND ( ( " . Events_Model::COL_DATE_TO . " IS NOT NULL AND :dateStart BETWEEN " . Events_Model::COL_DATE_FROM . " AND " . Events_Model::COL_DATE_TO . " )" 
-                        ." OR ( " . Events_Model::COL_DATE_TO . " IS NULL AND " . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart2 AND :dateEnd2 ) )";
-      
-         $modelBindValues['dateStart'] = $modelBindValues['dateStart2'] = $dateFrom;
-         $modelBindValues['dateEnd2'] = $dateTo;
-
-         $records = $model
-            ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
-            ->order(array(
-               Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
-               Events_Model::COL_DATE_FROM => Model_ORM::ORDER_ASC,
-               Events_Model::COL_TIME_FROM => Model_ORM::ORDER_ASC,
-            ))
-            ->where($modelWhere, $modelBindValues)
-            ->records();
-         $this->events = $this->categorizeEvents($records);
+         $this->events = $this->getSortedEvents($dateFrom, $dateTo);
       }
    }
 
@@ -65,11 +29,31 @@ class Events_Panel extends Panel {
       }
    }
 
-   protected function categorizeEvents($records)
+   protected function getSortedEvents($dateFrom, $dateTo)
    {
+      $model = new Events_Model();
+      $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc AND " . Events_Model::COL_PUBLIC . " = 1";
+      $modelBindValues = array('idc' => $this->category()->getId());
+      
+      // model settings
+      $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
+         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 )";
+      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $dateFrom;
+      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $dateTo;
+      
+      $events = $model
+         ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
+         ->order(array(
+            Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
+            Events_Model::COL_DATE_FROM => Model_ORM::ORDER_ASC,
+            Events_Model::COL_TIME_FROM => Model_ORM::ORDER_ASC,
+         ))
+         ->where($modelWhere, $modelBindValues)
+         ->records();
+      
       $eventsSorted = array();
-      if (!empty($records)) {
-         foreach ($records as $event) {
+      if (!empty($events)) {
+         foreach ($events as $event) {
             $cId = $event->{Events_Model_Categories::COL_ID};
             if (!isset($eventsSorted[$cId])) {
                $eventsSorted[$cId] = array('cat' => $event, 'events' => array());

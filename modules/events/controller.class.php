@@ -20,10 +20,6 @@ class Events_Controller extends Controller {
    {
       $this->checkReadableRights();
 
-      $model = new Events_Model();
-      $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc AND " . Events_Model::COL_PUBLIC . " = 1";
-      $modelBindValues = array('idc' => $this->category()->getId());
-
       $dateFrom = new DateTime($this->getRequestParam('dateFrom', date("Y-m-d")));
       $dateTo = new DateTime($this->getRequestParam('dateTo', date("Y-m-d")));
       switch ($this->getRequestParam('range', 'day')) {
@@ -41,31 +37,14 @@ class Events_Controller extends Controller {
       $this->view()->dateFrom = $dateFrom;
       $this->view()->dateTo = $dateTo;
 
-      // model settings
-      $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
-         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 )";
-      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $dateFrom;
-      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $dateTo;
-      
-      if ($this->getRequestParam('cat', null) != null) {
-         $modelWhere .= " AND " . Events_Model::COL_ID_EVE_CATEGORY . " = :idevcat";
-         $modelBindValues['idevcat'] = (int) $this->getRequestParam('cat');
-      }
-
-      $events = $model
-         ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
-         ->order(array(
-            Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
-            Events_Model::COL_DATE_FROM => Model_ORM::ORDER_ASC,
-            Events_Model::COL_TIME_FROM => Model_ORM::ORDER_ASC,
-         ))
-         ->where($modelWhere, $modelBindValues)
-         ->records();
-
-      $this->view()->events = $this->getSortedEvents($events);
+      // load events
+      $this->view()->events = $this->getSortedEvents($dateFrom, $dateTo, $this->getRequestParam('cat', null));
       
       $modelCats = new Events_Model_Categories();
-      $this->view()->cats = $modelCats->where(Events_Model_Categories::COL_ID_CATEGORY . " = :idc", array('idc' => $this->category()->getId()))->records();
+      $this->view()->cats = $modelCats
+         ->where(Events_Model_Categories::COL_ID_CATEGORY . " = :idc", array('idc' => $this->category()->getId()))
+         ->order(array(Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC))
+         ->records();
    }
 
    public function addCatController()
@@ -274,62 +253,28 @@ class Events_Controller extends Controller {
       $this->view()->isControll = false;
       if ($this->category()->getRights()->isControll()) {
          $this->view()->isControll = true;
+         $allowedCat = $this->getRequestParam('cat', null);
       } else if ($this->getRequestParam('token', false)) {
          $allowedCat = $this->getTokenCatAccess($this->getRequestParam('token'));
+         if ($allowedCat === false) {
+            return false;
+         }
+         $allowedCat = $allowedCat->{Events_Model_Categories::COL_ID};
       } else {
-         $allowedCat = false;
-      }
-
-      if ($allowedCat === false) {
-         return false;
+         $allowedCat = null;
       }
 
       $this->runEventsActions();
-
-      $model = new Events_Model();
-      $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc";
-      $modelBindValues = array('idc' => $this->category()->getId());
-
-      if ($allowedCat !== null) {
-         $modelWhere .= ' AND ' . Events_Model_Categories::COL_ID . " = :idec";
-         $modelBindValues['idec'] = $allowedCat->{Events_Model_Categories::COL_ID};
-      }
 
       $dateFrom = new DateTime($this->getRequestParam('dateFrom', date("Y-m-1")));
       $dateTo = new DateTime($this->getRequestParam('dateTo', date("Y-m-t")));
       $this->view()->dateFrom = $dateFrom;
       $this->view()->dateTo = $dateTo;
 
-      // model settings
-      $modelWhere .= " AND ( ( " . Events_Model::COL_DATE_TO . " IS NOT NULL AND :dateStart BETWEEN " . Events_Model::COL_DATE_FROM . " AND " . Events_Model::COL_DATE_TO . " )" 
-                        ." OR ( " . Events_Model::COL_DATE_TO . " IS NULL AND " . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart2 AND :dateEnd2 ) )";
-      
-      $modelBindValues['dateStart'] = $modelBindValues['dateStart2'] = $dateFrom;
-      $modelBindValues['dateEnd2'] = $dateTo;
-
-      if ($this->getRequestParam('cat', null) != null) {
-         $modelWhere .= " AND " . Events_Model::COL_ID_EVE_CATEGORY . " = :idevcat";
-         $modelBindValues['idevcat'] = (int) $this->getRequestParam('cat');
-      }
-      if ($this->getRequestParam('contain', null) != null) {
-         $modelWhere .= " AND " . Events_Model::COL_NAME . " LIKE :cnt";
-         $modelBindValues['cnt'] = "%" . (string) $this->getRequestParam('contain') . "%";
-      }
-      if ($this->getRequestParam('onlyPublicAdd', 'off') == 'on') {
-         $modelWhere .= " AND " . Events_Model::COL_PUBLIC_ADD . " = 1";
-      }
-
-      $events = $model
-         ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
-         ->order(array(
-            Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
-            Events_Model::COL_DATE_FROM => Model_ORM::ORDER_ASC,
-            Events_Model::COL_TIME_FROM => Model_ORM::ORDER_ASC,
-         ))
-         ->where($modelWhere, $modelBindValues)
-         ->records();
-//      Debug::log($model->getSQLQuery());
-      $this->view()->events = $this->getSortedEvents($events);
+      $this->view()->events = $this->getSortedEvents(
+         $dateFrom, $dateTo, $allowedCat, 
+         $this->getRequestParam('contain', null),
+         false, $this->getRequestParam('onlyPublicAdd', 'off') == 'on' );
 
       $modelCats = new Events_Model_Categories();
       $this->view()->cats = $modelCats->where(Events_Model_Categories::COL_ID_CATEGORY . " = :idc", array('idc' => $this->category()->getId()))->records();
@@ -441,11 +386,46 @@ class Events_Controller extends Controller {
       $this->view()->formDelete = $formDelete;
    }
 
-   protected function getSortedEvents($records)
+   protected function getSortedEvents($dateFrom, $dateTo, $cat = null, $contain = null, $onlyPublic = true, $onlyPublicAdd = false)
    {
+      $model = new Events_Model();
+      $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc";
+      $modelBindValues = array('idc' => $this->category()->getId());
+      
+      // model settings
+      $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
+         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 )";
+      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $dateFrom;
+      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $dateTo;
+      
+      if ($cat != null) {
+         $modelWhere .= " AND " . Events_Model::COL_ID_EVE_CATEGORY . " = :idevcat";
+         $modelBindValues['idevcat'] = (int) $cat;
+      }
+      if ($contain != null) {
+         $modelWhere .= " AND " . Events_Model::COL_NAME . " LIKE :cnt";
+         $modelBindValues['cnt'] = "%" . (string) $contain . "%";
+      }
+      if ($onlyPublic) {
+         $modelWhere .= " AND " . Events_Model::COL_PUBLIC . " = 1";
+      }
+      if ($onlyPublicAdd) {
+         $modelWhere .= " AND " . Events_Model::COL_PUBLIC_ADD . " = 1";
+      }
+      
+      $events = $model
+         ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
+         ->order(array(
+            Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
+            Events_Model::COL_DATE_FROM => Model_ORM::ORDER_ASC,
+            Events_Model::COL_TIME_FROM => Model_ORM::ORDER_ASC,
+         ))
+         ->where($modelWhere, $modelBindValues)
+         ->records();
+      
       $eventsSorted = array();
-      if (!empty($records)) {
-         foreach ($records as $event) {
+      if (!empty($events)) {
+         foreach ($events as $event) {
             $cId = $event->{Events_Model_Categories::COL_ID};
             if (!isset($eventsSorted[$cId])) {
                $eventsSorted[$cId] = array('cat' => $event, 'events' => array());
@@ -722,6 +702,48 @@ class Events_Controller extends Controller {
 
       return $form;
    }
+   
+   // EXPORTY
 
+   public function exportsController(){
+      $this->checkControllRights();
+      
+      $form = new Form('events_export_');
+      
+      $eType = new Form_Element_Select('type', $this->tr('Typ'));
+      $eType->setOptions(array($this->tr('Základní xls - pro sazbu') => 'basexls'));
+      $form->addElement($eType);
+      
+      $eDateFrom = new Form_Element_Text('datefrom', $this->tr('Od'));
+      $eDateFrom->addValidation(new Form_Validator_NotEmpty());
+      $eDateFrom->addValidation(new Form_Validator_Date());
+      $eDateFrom->addFilter(new Form_Filter_DateTimeObj());
+      $form->addElement($eDateFrom);
+      
+      $eDateTo = new Form_Element_Text('dateto', $this->tr('Do'));
+      $eDateTo->addValidation(new Form_Validator_NotEmpty());
+      $eDateTo->addValidation(new Form_Validator_Date());
+      $eDateTo->addFilter(new Form_Filter_DateTimeObj());
+      $form->addElement($eDateTo);
+      
+      $eExport = new Form_Element_Submit('export', $this->tr('Exportovat'));
+      $form->addElement($eExport);
+      
+      if ($form->isValid()) {
+         
+      }
+      
+      $this->view()->formExport = $form;
+   }
+   
+   protected function exportXLSPrint($dateFrom, $dateTo){
+      include_once AppCore::getAppLibDir().'lib/nonvve/phpexcel/PHPExcel.php';
+      
+      $doc = new PHPExcel();
+      $doc->setActiveSheetIndex(0);
+      $sheet = $doc->getActiveSheet();
+//      $sheet->setCellValue('A1', 'Ahoj');
+//      $sheet->setCellValue('A2', 'Světe');
+   }
 }
 ?>
