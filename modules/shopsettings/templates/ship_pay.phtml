@@ -66,7 +66,7 @@ $this->includeFile('tpl://nav.phtml');
          paymentsGrid.jqGrid('navGrid','#table-payments-pager',
             {edit:true,add:true,del:true,search:false},
             // edit options
-            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, width:400, 
                bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné').'<br />'.$this->tr('Jazykové verze se zadávají mezi značky [cs][/cs] (Anglicky [en][/en]).')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -79,7 +79,7 @@ $this->includeFile('tpl://nav.phtml');
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true, width:400, 
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -156,7 +156,7 @@ $this->includeFile('tpl://nav.phtml');
          shippingsGrid.jqGrid('navGrid','#table-shippings-pager',
             {edit:true,add:true,del:true,search:false},
             // edit options
-            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false,  width:400, 
                bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -169,7 +169,7 @@ $this->includeFile('tpl://nav.phtml');
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true, width:400, 
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();

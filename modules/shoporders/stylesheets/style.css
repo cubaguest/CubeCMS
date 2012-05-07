@@ -6,7 +6,14 @@
 /*   width: 500px;*/
 }
 
-#order-detail td, #order-detail th { padding: 3px; }
+#order-detail td, #order-detail th { 
+   padding: 3px; 
+   vertical-align: top;
+}
+#order-detail .address { 
+   padding: 3px; 
+}
+
 
 .order-full-price {
    font-weight: bold;
@@ -14,5 +21,15 @@
 }
 
 #table-order-status .column-date {
-   width: 120px;
+   width: 150px;
+}
+#table-order-status {
+   margin-bottom: 1em;
+}
+
+@media print { 
+   h1, #orderActionsButtons, #table-order-status-form,
+   #gbox_table-orders {
+      display: none;
+   }
 }

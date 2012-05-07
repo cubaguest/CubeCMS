@@ -107,6 +107,7 @@ class ShopCart_Controller extends Controller {
          $shippingsArray[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = $shipping;   
       }
       $this->view()->shippings = $sh;
+      $this->view()->disallowPayments = $shippingDisallowedPayments;
       if(isset ($_SESSION['shop_order']['shipping'])){
          $eShipping->setValues($_SESSION['shop_order']['shipping']);
       }
@@ -143,7 +144,7 @@ class ShopCart_Controller extends Controller {
       }
       $formGoNext->addElement($ePayment);
       
-      $eSend = new Form_Element_Submit('send', $this->tr('Přejít k obědnávce'));
+      $eSend = new Form_Element_Submit('send', $this->tr('Pokračovat'));
       $formGoNext->addElement($eSend);
       if($formGoNext->isSend()){
          // kontrola způsobu platby
@@ -507,7 +508,7 @@ class ShopCart_Controller extends Controller {
 
    private function generateMails($order, $basket)
    {
-      $userMailText = $adminMailText = "Objednávka z {STRANKY}\n\n{INFO}\n\n{ZBOZI}\n\n{ADRESA_DODACI}\n\n{ADRESA_FAKTUROVACI}";
+      $userMailText = $adminMailText = "Objednávka z {STRANKY}\n\n{INFO}\n\n{ZBOZI}\n\n{ADRESA_DODACI}\n\n{ADRESA_FAKTURACNI}";
       if (is_file($this->module()->getDataDir().'mail_tpl_user.txt')) {
          $userMailText = file_get_contents($this->module()->getDataDir().'mail_tpl_user.txt');
       }

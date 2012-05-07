@@ -1,5 +1,12 @@
-<? Debug::printDebug()?>
 <h2><? printf($this->tr('Objednávka č. %s'), $this->order->{Shop_Model_Orders::COLUMN_ID}) ?></h2>
+<p id="orderActionsButtons">
+   <a href="<?=$this->link()->route('exportOrder', array('output' => 'pdf'))?>" title="<?=$this->tr('stáhnout pdf')?>">
+      <img src="/images/files/pdf.gif" alt="pdf"/> <?=$this->tr('stáhnout')?>
+   </a>
+   <a href="javascript:window.print();" title="<?=$this->tr('tisknout objednávku')?>">
+      <img src="/images/icons/printer.png" alt="print"/> <?=$this->tr('tisknout')?>
+   </a>
+</p>
 <table class="full-width ui-widget" id="table-order-detail">
    <tr class="ui-widget-header ui-corner-top">
       <th><?= $this->tr('Fakturační adresa') ?></th>
@@ -8,24 +15,27 @@
    <tr class="ui-widget-content">
       <td class="address">
          <?
-         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '<br />';
+         if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
+            echo "<strong>".$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '</strong><br />';
+         }
+         echo "<strong>".$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '</strong><br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET} . '<br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} .
             ' ' . $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} . '<br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} . '<br /><br />';
+         if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} != null) {
+            echo 'IČ: '.$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . '<br />';
+         }
+         if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} != null) {
+            echo 'DIČ: '.$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . '<br />';
+         }
          echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} . '<br /><br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} . '<br /><br />';
-         if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
-            echo $this->tr('Společnost').'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . '<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . '<br />';
-         }
          ?>
       </td>
       <td class="address">
          <?
-         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '<br />';
+         echo "<strong>".$this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '</strong><br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . '<br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} .
          ' ' . $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} . '<br />';
@@ -40,7 +50,7 @@
    <thead>
       <tr class="ui-widget-header">
          <th><?= $this->tr('Název') ?></th>
-         <th><?= $this->tr('Počet') ?></th>
+         <th><?= $this->tr('Množství') ?></th>
          <th><?= $this->tr('Cena') ?></th>
       </tr>
    </thead>
@@ -118,7 +128,7 @@
 <table class="ui-widget full-width" id="table-order-status">
    <thead>
       <tr class="ui-widget-header">
-         <th class="column-date"><?=$this->tr('Datum');?></th>
+         <th class="column-date"><?=$this->tr('Datum a čas');?></th>
          <th><?=$this->tr('Název');?></th>
          <th><?=$this->tr('Poznámka');?></th>
       </tr>

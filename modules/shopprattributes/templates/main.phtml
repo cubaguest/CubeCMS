@@ -1,0 +1,156 @@
+<?
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+$this->addFile('css://style.css');
+?>
+<h1><?= $this->category()->getName() ?></h1>
+<div class="main-content-admin-form">
+   <table id="table-attributes"></table>
+   <div id="table-attributes-pager"></div>
+   <br />
+   <div id="order-detail"></div>
+   <hr class="reseter" />
+   <script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      $(document).ready(function() {
+         var ordersGrid = $("#table-attributes").jqGrid({
+            datatype: 'json',
+            ajaxGridOptions : {type:"POST"},
+            url: '<?= $this->link()->route('attrGroupsList'); ?>',
+            colNames:['ID', '<?= $this->tr('Skupina') ?>'],
+            colModel:[
+               {name:'<?=Shop_Model_AttrGroups::COLUMN_ID?>',index:'<?=Shop_Model_AttrGroups::COLUMN_ID?>',
+                  width:33,fixed: true,editable:false},
+               {name:'<?=Shop_Model_AttrGroups::COLUMN_NAME?>',index:'<?=Shop_Model_AttrGroups::COLUMN_NAME?>', 
+                  editable:true, editoptions:{size:20},
+                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}}
+            ],
+            rowNum:15,
+            autowidth : true,
+            rowList:[15,30,60,100],
+            pager: '#table-attributes-pager',
+            sortname: 'name',
+            viewrecords: true,
+            multiselect: false, 
+            subGrid: true,
+            sortorder: "asc",
+            jsonReader: {
+               repeatitems : false, root:"rows"
+            },
+            caption: "<?= $this->tr('Přehled skupin atributů') ?>",
+            height: '100%',
+            editurl : '<?= $this->link()->route('editAttrGroup'); ?>',
+            // define the icons in subgrid 
+            subGridOptions: { 
+               "plusicon" : "ui-icon-triangle-1-e", 
+               "minusicon" : "ui-icon-triangle-1-s", 
+               "openicon" : "ui-icon-arrowreturn-1-e" 
+            }, 
+            
+            subGridRowExpanded: function(subgrid_id, row_id) { 
+               var subgrid_table_id, pager_id; 
+               subgrid_table_id = subgrid_id+"_t"; 
+               pager_id = "p_"+subgrid_table_id; 
+               $("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>"); 
+               $("#"+subgrid_table_id).jqGrid({
+                  datatype: 'json',
+                  url: "<?=$this->link()->route('attrList');?>?gid="+row_id, 
+                  ajaxGridOptions : {type:"POST"},
+                  colNames: ['ID','<?=$this->tr('Název')?>'], 
+                  colModel: [ 
+                     {name:'<?=Shop_Model_Attributes::COLUMN_ID?>',index:'<?=Shop_Model_Attributes::COLUMN_ID?>',
+                        width:33, fixed: true, editable:false},
+                     {name:'<?=Shop_Model_Attributes::COLUMN_NAME?>',index:'<?=Shop_Model_Attributes::COLUMN_NAME?>', 
+                        editable:true, editoptions: {size:20},
+                        formoptions: { rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}
+                     }
+                  ], 
+                  rowNum:10, 
+                  pager: pager_id, 
+                  sortname: '<?=Shop_Model_Attributes::COLUMN_NAME?>', 
+                  sortorder: "asc",
+                  jsonReader: {
+                     repeatitems : false, root:"rows"
+                  },
+                  viewrecords: true,
+                  multiselect: false, 
+                  height: '100%',
+                  autowidth : true,
+                  editurl: "<?=$this->link()->route('editAttr');?>?gid="+row_id
+               }); 
+               jQuery("#"+subgrid_table_id).jqGrid('navGrid',"#"+pager_id,
+                  {edit:true, add:true, del:true},
+                  // edit options
+                  {
+                     reloadAfterSubmit:true, 
+                     jqModal:true, 
+                     closeOnEscape:true,
+                     viewPagerButtons:false, 
+                     bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",
+                     closeAfterEdit:true
+                  },
+                  // add options
+                  {
+                     reloadAfterSubmit:true,
+                     jqModal:true, 
+                     closeOnEscape:true, 
+                     bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", 
+                     closeAfterAdd: true
+                  },  
+                  // del options
+                  {
+                     reloadAfterSubmit:true, 
+                     jqModal:true, 
+                     closeOnEscape:true, 
+                     width: 300
+                  },
+                  {
+                     multipleSearch:false, 
+                     closeAfterSearch: true, 
+                     closeOnEscape:true,
+                     sopt : ['eq','ne','cn','nc']},
+                  {closeOnEscape:true}
+               );
+            }
+         });
+         
+         ordersGrid.jqGrid('navGrid','#table-attributes-pager', 
+            {edit:true, add:true, del:true},
+            // edit options
+            {
+               reloadAfterSubmit:true, 
+               jqModal:true, 
+               closeOnEscape:true,
+               viewPagerButtons:false, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",
+               closeAfterEdit:true
+            },
+            // add options
+            {
+               reloadAfterSubmit:true,
+               jqModal:true, 
+               closeOnEscape:true, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", 
+               closeAfterAdd: true
+            },  
+            // del options
+            {
+               reloadAfterSubmit:true, 
+               jqModal:true, 
+               closeOnEscape:true, 
+               width: 300
+            },
+            {
+               multipleSearch:false, 
+               closeAfterSearch: true, 
+               closeOnEscape:true,
+               sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
+         );
+      
+      });
+      /* ]]> */
+   </script>
+</div>

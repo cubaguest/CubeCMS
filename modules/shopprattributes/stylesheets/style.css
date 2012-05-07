@@ -1,0 +1,18 @@
+.order-detail .address {
+   width: 50%;
+}
+
+#table-order-status, #table-order-status-form {
+/*   width: 500px;*/
+}
+
+#order-detail td, #order-detail th { padding: 3px; }
+
+.order-full-price {
+   font-weight: bold;
+   font-size: 14px;
+}
+
+#table-order-status .column-date {
+   width: 120px;
+}

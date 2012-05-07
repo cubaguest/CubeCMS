@@ -157,7 +157,7 @@ class ShopSettings_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       
-      $form = new Form('ship_and pay');
+      $form = new Form('ship_and_pay');
       
       $grpShipping = $form->addGroup('payment', $this->tr('Platby'));
 
@@ -171,9 +171,8 @@ class ShopSettings_Controller extends Controller {
       
       if($form->isValid()){
          $this->storeSystemCfg('VVE_SHOP_FREE_SHIPPING', $form->freeShipping->getValues());
-         
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
-//         $this->link()->reload();
+         $this->link()->reload();
       }
       $this->view()->form = $form;
    }
@@ -407,6 +406,7 @@ class ShopSettings_Controller extends Controller {
             }
             $record->{Shop_Model_Shippings::COLUMN_VALUE} = $jqGridReq->{Shop_Model_Shippings::COLUMN_VALUE};
             $record->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP} = $jqGridReq->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP};
+            $record->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS} = $jqGridReq->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS};
             $model->save($record);
           
             $this->infoMsg()->addMessage($this->tr('Doprava byla uložena'));

@@ -254,62 +254,153 @@ class ShopOrders_Controller extends Controller {
       $this->infoMsg()->addMessage($this->tr('Objednávka byla smazána'));
       
    }
-
-   public function settings(&$settings, Form &$form) {
-      $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
-
-      $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'text');
-
-      $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
-      $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
-      if(isset($settings[self::PARAM_TPL_MAIN])) {
-         $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
+   
+   public function exportOrderController()
+   {
+//      $this->checkControllRights();
+      
+      $type = $this->getRequest('output', 'pdf');
+      
+      $id = $this->getRequest('id', 0);
+      $modelOrders = new Shop_Model_Orders();
+      $modelOrderItems = new Shop_Model_OrderItems();
+      $modelOrderStatuses = new Shop_Model_OrderStatus();
+      $order = $modelOrders->record($id);
+      
+      if($order == false){
+         return false;
       }
-      $form->addElement($elemTplMain, $fGrpViewSet);
-      unset ($componentTpls);
-
-      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
-
-      $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
-      $elemEditorType->setOptions(array(
-         $this->tr('žádný (pouze textová oblast)') => 'none',
-         $this->tr('jednoduchý (Wysiwyg)') => 'simple',
-         $this->tr('pokročilý (Wysiwyg)') => 'advanced',
-         $this->tr('kompletní (Wysiwyg)') => 'full'
-      ));
-      $elemEditorType->setValues('advanced');
-      if(isset($settings[self::PARAM_EDITOR_TYPE])) {
-         $elemEditorType->setValues($settings[self::PARAM_EDITOR_TYPE]);
+      
+      $orderItems = $modelOrderItems->where(Shop_Model_OrderItems::COLUMN_ID_ORDER." = :ido", array('ido' => $id))->records();
+      $orderStatuses = $modelOrderStatuses->where(Shop_Model_OrderStatus::COLUMN_ID_ORDER." = :ido", array('ido' => $id))->records();
+      
+      if($type == 'pdf'){
+         $this->exportOrderPDF($order, $orderItems, $orderStatuses);
       }
-
-      $form->addElement($elemEditorType, $fGrpEditSet);
-
-      $elemAllowScripts = new Form_Element_Checkbox('allow_script', $this->tr('Povolit scripty v textu'));
-      $elemAllowScripts->setSubLabel($this->tr('Umožňuje vkládání javascriptů přímo do textu. POZOR! Lze tak vložit útočníkův kód do stránek. (Filtrují se všechny javascripty.)'));
-      $elemAllowScripts->setValues(false);
-      if(isset($settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT])) {
-         $elemAllowScripts->setValues($settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT]);
+      
+   }
+   
+   protected function exportOrderPDF($order, $orderItems, $orderStatuses) 
+   {
+      $c = new Component_Tcpdf();
+      $fileName = 'order-'.$order->{Shop_Model_Orders::COLUMN_ID}.".pdf";
+      
+      $c->pdf()->AddPage();
+      $family = $c->pdf()->getFontFamily();
+      
+      $c->pdf()->SetFontSize(20);
+      $c->pdf()->Write(0, $this->tr('Objednávka č.').$order->{Shop_Model_Orders::COLUMN_ID}, "", false, "", true);
+      $c->pdf()->Ln();
+      
+      $wAddress1 = 90;
+      $wAddress2 = 90;
+      $c->pdf()->SetFont($family, 'B', 16);
+      $c->pdf()->Cell($wAddress1, 7, $this->tr('Fakturační adresa'), 0, 0, 'L');
+      $c->pdf()->Cell($wAddress2, 7, $this->tr('Dodací adresa'), 0, 1, 'L');
+      
+      $addr1 = null;
+      if($order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null){
+         $addr1 .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY}."\n";
       }
-      $form->addElement($elemAllowScripts, $fGrpEditSet);
-
-      $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
-         vložení textů, které jsou viditelné pouze vybraným uživatelům. U každého článku tak
-         vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům."));
-
-      $elemAllowPrivateZone = new Form_Element_Checkbox('allow_private_zone',
-              $this->tr('Povolit privátní zónu'));
-      $form->addElement($elemAllowPrivateZone, $fGrpPrivate);
-      if(isset($settings[self::PARAM_ALLOW_PRIVATE])) {
-         $form->allow_private_zone->setValues((bool)$settings[self::PARAM_ALLOW_PRIVATE]);
+      $addr1 .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}."\n";
+      $addr1 .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET}."\n";
+      $addr1 .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} . " ". $order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE}."\n";
+      $addr1 .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY}."\n";
+      $addr1 .= "\n";
+      if($order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} != null){
+         $addr1 .= "IČ: ".$order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC}."\n";
       }
-      // znovu protože mohl být už jednou validován bez těchto hodnot
-      if($form->isValid()) {
-         $settings[self::PARAM_ALLOW_PRIVATE] = $form->allow_private_zone->getValues();
-         $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
-         $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
-         $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
+      if($order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} != null){
+         $addr1 .= "DIČ: ".$order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC}."\n";
       }
+      if($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} != null){
+         $addr1 .= "E-mail: ".$order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}."\n";
+      }
+      if($order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} != null){
+         $addr1 .= "Tel.: ".$order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE}."\n";
+      }
+      
+      $addr2 = null;
+      $addr2 .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME}."\n";
+      $addr2 .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET}."\n";
+      $addr2 .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} . " ". $order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE}."\n";
+      $addr2 .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY}."\n";
+      $addr2 .= "\n";
+      
+      $c->pdf()->SetFont($family, '', 12);
+      $c->pdf()->MultiCell($wAddress1, 60, $addr1, 1, 'L', 0, 0);
+      $c->pdf()->MultiCell($wAddress2, 60, $addr2, 1, 'L', 0, 1);
+      $c->pdf()->Ln(5);
+
+      
+      $c->pdf()->SetFont($family, 'B', 14);
+      $c->pdf()->Write(0, $this->tr('Souhrn položek'), "", false, "", 1);
+      
+      
+      $wName = 100;
+      $wSum = 40;
+      $wPrice = 40;
+      
+      $c->pdf()->SetFont($family, 'B', 12);
+      $c->pdf()->Cell($wName, 5, $this->tr('Název'), 1, 0, 'L');
+      $c->pdf()->Cell($wSum, 5, $this->tr('Množství'), 1, 0, 'L');
+      $c->pdf()->Cell($wPrice, 5, $this->tr('Cena'), 1, 1, 'L');
+      
+      $c->pdf()->SetFont($family, '', 12);
+      foreach ($orderItems as $item) {
+         $c->pdf()->Cell($wName, 5, $item->{Shop_Model_OrderItems::COLUMN_NAME}, 1, 0, 'L');
+         $c->pdf()->Cell($wSum, 5, $item->{Shop_Model_OrderItems::COLUMN_QTY}. ' ' . $item->{Shop_Model_OrderItems::COLUMN_UNIT}, 1, 0, 'L');
+         $c->pdf()->Cell($wPrice, 5, $item->{Shop_Model_OrderItems::COLUMN_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      }
+      
+      $c->pdf()->Ln();
+      
+      $c->pdf()->SetFont($family, 'B', 14);
+      $c->pdf()->Write(0, $this->tr('Doručení a platba'), "", false, "", 1);
+      
+      $c->pdf()->SetFont($family, '', 12);
+      $c->pdf()->Cell($wName + $wSum, 5, $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD}, 1, 0, 'L');
+      $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      $c->pdf()->Cell($wName + $wSum, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}, 1, 0, 'L');
+      $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      
+      $c->pdf()->Ln();
+      
+      $c->pdf()->SetFont($family, 'B', 16);
+      $c->pdf()->Cell($wName + $wSum, 5, $this->tr('Cena celkem'), 1, 0, 'L');
+      $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_TOTAL}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      
+      
+      $c->pdf()->Ln();
+      
+      $c->pdf()->SetFont($family, 'B', 14);
+      $c->pdf()->Write(0, $this->tr('Stavy objednávky'), "", false, "", 1);
+      $wDate = 40;
+      $wName = 25;
+      $wNote = 115;
+      $c->pdf()->SetFont($family, 'B', 12);
+      $c->pdf()->Cell($wDate, 5, $this->tr('Datum a čas'), 1, 0, 'L');
+      $c->pdf()->Cell($wName, 5, $this->tr('Název'), 1, 0, 'L');
+      $c->pdf()->Cell($wNote, 5, $this->tr('Poznámka'), 1, 1, 'L');
+      
+      foreach ($orderStatuses as $item) {
+         $c->pdf()->SetFont($family, '', 10);
+         $c->pdf()->Cell($wDate, 5, vve_date('%X %x', new DateTime($item->{Shop_Model_OrderStatus::COLUMN_TIME_ADD})), 1, 0, 'L');
+         $c->pdf()->Cell($wName, 5, $item->{Shop_Model_OrderStatus::COLUMN_NAME}, 1, 0, 'L');
+         $c->pdf()->SetFont($family, 'I', 10);
+         $c->pdf()->Cell($wNote, 5, $item->{Shop_Model_OrderStatus::COLUMN_NOTE}, 1, 1, 'L');
+//         if($item->{Shop_Model_OrderStatus::COLUMN_NOTE} != null){
+//            $c->pdf()->SetFont($family, 'I', 10);
+//            $c->pdf()->Cell($wDate, 5, null, 0, 0, 'L');
+//            $c->pdf()->Cell($wName, 5, $item->{Shop_Model_OrderStatus::COLUMN_NOTE}, 1, 1, 'L');
+//         }
+//         $c->pdf()->Ln(5);
+      }
+      
+      
+      $c->pdf()->Output($fileName, 'D');
+      
+      exit();
    }
 }
 

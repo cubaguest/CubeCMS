@@ -26,7 +26,7 @@ $this->addFile('css://style.css');
             success: function(html){
                $("#order-detail").html(html);
                // odstranění tučného
-               $("#table-orders").trigger("reloadGrid");
+//               $("#table-orders").trigger("reloadGrid");
                if (callback && typeof(callback) === "function") { callback(); }
             }
          });
@@ -35,6 +35,9 @@ $this->addFile('css://style.css');
          showOrder(id, function(){
             window.print();
          });
+      }
+      function downloadOrder(type, id){
+         window.location.href = ('<?=$this->link()->route('exportOrder')?>').replace('{id}', id).replace('{output}', type);
       }
       function deleteOrder(id){
          var link = '<?= $this->link()->route('deleteOrder') ?>';
@@ -91,11 +94,11 @@ $this->addFile('css://style.css');
             colModel:[
                {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
                {name:'name', index:'name', formatter: 'showNewStatus'},
-               {name:'time', index:'time', width:120, fixed :true, formatter: 'showNewStatus'},
+               {name:'time', index:'time', width:140, fixed :true, formatter: 'showNewStatus'},
                {name:'pickupdate', index:'pickupdate', width:80, fixed :true, formatter: 'showNewStatus'},
-               {name:'status', index:'status', width:60, fixed :true, formatter: 'showNewStatus'},
-               {name:'price', index:'price', width:80, align:"right", fixed :true, formatter: 'showNewStatus', formatoptions: {type: "currency", decimalSeparator:",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"} },
-               {name:'act', index:'act', width:60, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
+               {name:'status', index:'status', width:70, fixed :true, formatter: 'showNewStatus'},
+               {name:'price', index:'price', width:100, align:"right", fixed :true, formatter: 'showNewStatus', formatoptions: {type: "currency", decimalSeparator:",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"} },
+               {name:'act', index:'act', width:70, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
             ],
             rowNum:15,
             autowidth : true,
@@ -118,6 +121,7 @@ $this->addFile('css://style.css');
                   button = '<input type="image" src="images/icons/magnifier.png" value="<?= $this->tr('Ukaž') ?>" onclick="showOrder(\''+ids[i]+'\');" />'
                      +'<input type="image" src="images/icons/printer.png" value="<?= $this->tr('Tisk') ?>" onclick="printOrder(\''+ids[i]+'\');\" />'
                      +'<input type="image" src="images/icons/delete.png" value="<?= $this->tr('Smazat') ?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
+                     +'<input type="image" src="images/files/pdf.gif" value="<?= $this->tr('Tisknout') ?>" onclick="downloadOrder(\'pdf\', \''+ids[i]+'\');" />'
                   ; 
                   $(this).jqGrid('setRowData',ids[i],{act:button}); 
                }
@@ -125,7 +129,12 @@ $this->addFile('css://style.css');
                   $(this).jqGrid('setSelection', selOrderId);
                }
             },
-            ondblClickRow: function(rowid) { showOrder(rowid); }
+            onSelectRow: function(rowid, status) { 
+               if(status){
+                  showOrder(rowid);
+               }
+               return false;
+            }
          });
          
          ordersGrid.jqGrid('navGrid','#table-orders-pager', {edit: false, add: false, del:false, refresh: true});

@@ -97,27 +97,38 @@ $this->step = 1;
          </tr>
       </tbody>
    </table>
-   <?echo $this->formNext->renderEnd();?>
+   <?echo $this->formNext->renderEnd();
+   ?>
    <script type="text/javascript">
       var shippings = <?=json_encode($this->shippings)?>;
       var payments = <?=json_encode($this->payments)?>;
+      var disallowPayments = <?=json_encode($this->disallowPayments)?>;
       var priceBasket = <?=round($this->basket->getPrice())?>;
       var priceShipping = 0;
       var pricePayment = 0;
       $(document).ready(function(){
          // základní doplnění ceny
-         setShippingPrice($('select[name="goto_order_shipping"]').val());
-         $('select[name="goto_order_shipping"]').change(function(){ setShippingPrice($(this).val()); });
+         $('select[name="goto_order_shipping"]').change(function(){ setShippingPrice($(this).val()); }).change();
          
-         setPaymentPrice($('select[name="goto_order_payment"]').val());
-         $('select[name="goto_order_payment"]').change(function(){ setPaymentPrice($(this).val()); });
+         $('select[name="goto_order_payment"]').change(function(){ setPaymentPrice($(this).val()); }).change();
          <?if(isset ($this->formNext->pickupDate)){?>
-            $('input[name="goto_order_pickupDate"]').datepicker();
+         $('input[name="goto_order_pickupDate"]').datepicker({
+            minDate : new Date(<?=date('Y')?>, <?=date('m')?>, <?=date('d')?>)
+         });
          <?}?>
+         $('select[name="goto_order_shipping"]').change(function(){
+            var $paySelect = $('select[name="goto_order_payment"]');
+            $('option', $paySelect).removeAttr('disabled');
+            var idShip = $(this).val();
+            $.each(disallowPayments[idShip], function(){
+               $('option[value="'+this+'"]', $paySelect).attr('disabled', 'disabled');
+            });
+            $('option:not(:disabled):first', $paySelect).prop('selected', true);
+            $paySelect.change(); // kvuli přepočtu ceny
+         });
       });
       
       function updateFullPrice(){
-         var price = priceBasket;
          $('#full-price').text(priceBasket+priceShipping+pricePayment+' <?=VVE_SHOP_CURRENCY_NAME?>');
       }
       
