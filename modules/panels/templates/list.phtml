@@ -10,7 +10,10 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    $linkajaxPanelInfo = new Url_Link_ModuleRequest();
    ?>
    <h2><?=$this->_('Seznam globálních panelů');?></h2>
-   <br />
+   <p>
+      <a href="<?=$this->link()->route('add')?>" title="<?=$this->tr('Přidat nový panel')?>"
+         ><img src="images/icons/add.png" alt="add" /> <?=$this->tr('Přidat panel')?></a>
+   </p>
    <table class="panels-list">
       <thead>
          <tr class="ui-widget-header">

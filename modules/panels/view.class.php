@@ -11,7 +11,7 @@ class Panels_View extends View {
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
          $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_panel', $this->_("Přidat panel"),
+         $toolAdd = new Template_Toolbox2_Tool_Redirect('add_panel', $this->_("Přidat panel"),
          $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat nový panel'));
          $toolbox->addTool($toolAdd);
