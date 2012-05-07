@@ -629,6 +629,7 @@ class Model_ORM extends Model {
    {
       $returnPk = $record->getPK();
       if (!$record->isNew()) {
+         // @TODO - použít metodu update !!!!
          // UPDATE
          $sql = 'UPDATE ' . $this->getTableName();
 
@@ -797,6 +798,121 @@ class Model_ORM extends Model {
    }
 
    /**
+    * Metoda provede update záznamů 
+    * @param array $updateValues -- pole s hodnotami které se mají upravit
+    * @todo Jazykové sloupce
+    * 
+    * array
+    *    'ColumnName' => value
+    * 
+    * array
+    *    'ColumnName' => array
+    *       'stmt' => string 'DATEADD(`ColumnName`, :dates)'
+    *       'values' => array
+    *          'dates' => string '2012-03-03'
+    */
+   public function update($updateValues)
+   {
+//      Debug::log($updateValues);
+      
+      $sql = 'UPDATE ' . $this->getTableName(). " SET ";
+      $colsStr = array();
+      $bindValues = array();
+      foreach ($updateValues as $columnName => $value) {
+         // UPDATE
+
+         if( !isset($this->tableStructure[$columnName]) ){
+            // není sloupec z tabubly -- přeskočit
+            continue;
+         }
+            
+         $params = $this->tableStructure[$columnName];
+            
+         if($this->tableStructure[$columnName]['lang'] == true){
+               // is multilang column
+//            foreach (Locales::getAppLangs() as $lang) {
+//               if ($params['aliasFor'] === null) {
+//                  array_push($colsStr, '`' . $colname . '_' . $lang . '` = :' . $colname . '_' . $lang . '');
+//               } else {
+//                  array_push($colsStr, '`' . $params['aliasFor'] . '_' . $lang . '` = :' . $colname . '_' . $lang . '');
+//               }
+//            }
+            throw new Exception('IMPLEMENTUJ!!!');
+         } else {
+            // is normal column
+               
+            if(is_array($value)){
+               // je předán dotaz
+               
+               if ($params['aliasFor'] === null) {
+                  array_push($colsStr, '`' . $columnName . '` = ' . $value['stmt'] . '');
+               } else {
+                  array_push($colsStr, '`' . $params['aliasFor'] . '` = ' . $value['stmt'] . '');
+               }
+               if(isset($value['values'])){
+                  $bindValues = array_merge($bindValues, $value['values']);
+               }
+               
+            } else {
+               // je jenom hodnota
+               if ($params['aliasFor'] === null) {
+                  array_push($colsStr, '`' . $columnName . '` = :' . $columnName . '');
+               } else {
+                  array_push($colsStr, '`' . $params['aliasFor'] . '` = :' . $columnName . '');
+               }
+               $bindValues[$columnName] = $value;
+            }
+         }
+      }
+      
+      // create base cols
+      $sql .= implode(', ', $colsStr);
+      
+      $this->createSQLWhere($sql);
+      $this->createSQLLimi($sql);
+      
+      $dbst = $this->getDb()->prepare($sql);
+      
+      foreach ($bindValues as $key => $value) {
+         
+         $varType = gettype($value);
+         
+         // detect value
+         if ($varType == 'boolean') {
+            $pdoParam = PDO::PARAM_BOOL;
+         } else if ($varType == 'integer') {
+            $pdoParam = PDO::PARAM_INT;
+         } else if ($varType == 'NULL') {
+            $pdoParam = PDO::PARAM_NULL;
+         } else if ($varType == 'array') {
+            $pdoParam = PDO::PARAM_STMT;
+            $val = join(',', $val);
+         } else if ($varType == 'double' || $varType == 'string') {
+            $pdoParam = PDO::PARAM_STR;
+         } else if ($varType == 'object') {
+            $pdoParam = PDO::PARAM_STR;
+            $className = get_class($val);
+            if ($val instanceof DateTime) {
+               $val = $val->format(DATE_ISO8601);
+            } else if (method_exists($val, '__toString')) {
+               $val = (string) $val;
+            } else {
+               throw new UnexpectedValueException(sprintf($this->tr('Nepovolený objekt "%s" v předanám paramteru'), $className));
+            }
+         } else {
+            throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), $varType));
+         }
+
+         $dbst->bindValue(':'.$key, $value, $pdoParam);
+      }
+      
+      $this->bindSQLWhere($dbst);
+      $this->bindSQLLimit($dbst);
+//      Debug::log($dbst, $sql, $bindValues, $this->whereBindValues);
+      return $dbst->execute();
+   }
+
+      /**
     * Metoda vrací záznamy z fulltext hledání v modelu
     * @param string $string -- řetězec, který se má hledat
     * @todo implementovat načítání pouze zvolených sloupců
@@ -1446,38 +1562,39 @@ class Model_ORM extends Model {
       if ($this->where != null AND !empty($this->whereBindValues)) {
          // bind values
          foreach ($this->whereBindValues as $name => $val) {
-//            if(is_array($val)){
-//               Debug::log($stmt->queryString);
-               
-               
-//            } else {
-               switch (gettype($val)) {
-                  case 'boolean':
-                     $pdoParam = PDO::PARAM_BOOL;
-                     break;
-                  case 'integer':
-                     $pdoParam = PDO::PARAM_INT;
-                     break;
-                  case 'NULL':
-                     $pdoParam = PDO::PARAM_NULL;
-                     break;
-                  case 'array':
-                     $pdoParam = PDO::PARAM_STMT;
-                     $val = join(',', $val);
-                     break;
-                  case 'double':
-                  case 'string':
-                     $pdoParam = PDO::PARAM_STR;
-                     $pdoParam = PDO::PARAM_STR;
-                     break;
-                  default:
-                     throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), gettype($val)));
-                     break;
+            $mustBeBindValue = false;
+            $varType = gettype($val);
+            if($varType == 'boolean'){
+               $pdoParam = PDO::PARAM_BOOL;
+            } else if($varType == 'integer'){
+               $pdoParam = PDO::PARAM_INT;
+            } else if($varType == 'NULL'){
+               $pdoParam = PDO::PARAM_NULL;
+            } else if($varType == 'array'){
+               $pdoParam = PDO::PARAM_STMT;
+               $val = join(',', $val);
+               $mustBeBindValue = true;
+            } else if($varType == 'double' || $varType == 'string'){
+               $pdoParam = PDO::PARAM_STR;
+            } else if($varType == 'object'){
+               $pdoParam = PDO::PARAM_STR;
+               $mustBeBindValue = true;
+               $className = get_class($val);
+               if($val instanceof DateTime){
+                  $val = $val->format(DATE_ISO8601);
+               } else if( method_exists($val , '__toString') ) {
+                  $val = (string)$val;
+               } else {
+                  throw new UnexpectedValueException(sprintf($this->tr('Nepovolený objekt "%s" v předanám paramteru'), $className));
                }
-               if ($stmt->bindParam(':' . $name, $this->whereBindValues[$name], $pdoParam) === false) { // nefunguje při některých where, ale proč??
-                  $stmt->bindValue(':' . $name, $val, $pdoParam);
-               }
-//            }
+            } else {
+               throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), $varType));
+            }
+            
+            if (!$mustBeBindValue && $stmt->bindParam(':' . $name, $this->whereBindValues[$name], $pdoParam) !== false) { // nefunguje při některých where, ale proč??
+            } else {
+               $stmt->bindValue(':' . $name, $val, $pdoParam);
+            }
          }
       }
    }
@@ -1549,6 +1666,28 @@ class Model_ORM extends Model {
       $this->whereBindValues = array();
       $this->limit(null, null);
    }
-
+   
+   /**
+    * Metoda vrací PDO::PRAMA_ datovy typ 
+    * @param $val mixed -- proměnná
+    * @return boolean 
+    */
+   private function getPdoParamType($val)
+   {
+      $varType = gettype($val);
+      if ($varType == 'boolean') {
+         return PDO::PARAM_BOOL;
+      } else if ($varType == 'integer') {
+         return PDO::PARAM_INT;
+      } else if ($varType == 'NULL') {
+         return PDO::PARAM_NULL;
+//      } else if ($varType == 'array') {
+//         return PDO::PARAM_STMT;
+      } else if ($varType == 'double' || $varType == 'string') {
+         return PDO::PARAM_STR;
+      }
+      return false;
+   }
+   
 }
 ?>
