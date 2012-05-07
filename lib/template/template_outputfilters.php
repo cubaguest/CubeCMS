@@ -88,4 +88,31 @@ function vve_filter_protectemails($cnt){
 function vve_filter_filesicons($cnt){
    return preg_replace('/(href="[^"]+\.)(pdf|txt|ods|ots|doc|rtf|dot|docx|xls|ods|ots|zip|rar|avi|mpg|wmv|jpg|jpeg|gif|png|tiff|bmp|psd|wmf)"/i','\\1\\2" class="file-icon file-\\2"',$cnt);
 }
+
+function vve_filter_cacheimages($cnt)
+{
+   return preg_replace_callback( "/<img [^>]+\/>/", "_vve_filter_cacheimages_replaceImgPath",  $cnt);
+}
+
+function _vve_filter_cacheimages_replaceImgPath($imgTag)
+{
+   $imgTag = $imgTag[0];
+   $doc = new DOMDocument();
+   $doc->loadHTML($imgTag);
+   $img = $doc->getElementsByTagName('img')->item(0);
+   
+   $src = $img->getAttribute('src');
+   if(strpos($src, 'data/') === 0){
+      // kontrola rozměrů, pokud nejsou zadány nedojde ke změně
+      if( defined('VVE_CACHE_TEXT_IMAGES_CROP') && VVE_CACHE_TEXT_IMAGES_CROP == true && $img->getAttribute('width') != null && $img->getAttribute('height') != null){
+         $img->setAttribute('src', vve_image_cacher($src, $img->getAttribute('width'), $img->getAttribute('height'), true) );
+         $imgTag = $doc->saveXML($img);
+      } else if($img->getAttribute('width') != null || $img->getAttribute('height') != null){
+         $img->setAttribute('src', vve_image_cacher($src, $img->getAttribute('width'), $img->getAttribute('height')) );
+         $imgTag = $doc->saveXML($img);
+      }
+   }
+   return $imgTag;
+}
+
 ?>
