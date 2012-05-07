@@ -134,7 +134,7 @@ class Component_Tcpdf extends Component {
 
       // PAGE META DESCRIPTORS --------------------------------------
       $tcpdfLangSet['a_meta_charset'] = 'UTF-8';
-      $tcpdfLangSet['w_page'] = _('strana');
+      $tcpdfLangSet['w_page'] = $this->tr('strana');
       switch (Locales::getLang()){
          case 'cs':
             $tcpdfLangSet['a_meta_language'] = 'cs';
@@ -146,7 +146,14 @@ class Component_Tcpdf extends Component {
             break;
       }
       $this->tcPDFObj->setLanguageArray($tcpdfLangSet);
-
+      
+      // load aditional Fonts
+//      $f1 = $this->tcPDFObj->addTTFfont(AppCore::getAppLibDir()."fonts/tcpdf/Arial.ttf", 'TrueTypeUnicode', "", 32);
+//      $f2 = $this->tcPDFObj->addTTFfont(AppCore::getAppLibDir()."fonts/tcpdf/ArialBold.ttf", 'TrueTypeUnicode', "", 32);
+//      $f3 = $this->tcPDFObj->addTTFfont(AppCore::getAppLibDir()."fonts/tcpdf/ArialBoldItalic.ttf", 'TrueTypeUnicode', "", 32);
+//      $f4 = $this->tcPDFObj->addTTFfont(AppCore::getAppLibDir()."fonts/tcpdf/ArialItalic.ttf", 'TrueTypeUnicode', "", 32);
+//      var_dump($f1, $f2, $f3, $f4);
+      
       /**
        * @todo TOHLE dodělat !! nebo jestli to stačí
        */
@@ -161,6 +168,7 @@ class Component_Tcpdf extends Component {
 
       $this->tcPDFObj->setHeaderFont(Array(VVE_PDF_FONT_NAME_MAIN, '', VVE_PDF_FONT_SIZE_MAIN));
       $this->tcPDFObj->SetHeaderMargin(VVE_PDF_MARGIN_HEADER);
+      $this->tcPDFObj->SetFont(VVE_PDF_FONT_NAME_MAIN);
 
       return $this->tcPDFObj;
    }
