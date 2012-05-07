@@ -359,7 +359,11 @@ class ShopOrders_Controller extends Controller {
       $c->pdf()->Write(0, $this->tr('Doručení a platba'), "", false, "", 1);
       
       $c->pdf()->SetFont($family, '', 12);
-      $c->pdf()->Cell($wName + $wSum, 5, $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD}, 1, 0, 'L');
+      $shippingText = $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
+      if($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
+         $shippingText .= sprintf($this->tr(' - datum odběru: %s'), vve_date("%x", new DateTime($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
+      }
+      $c->pdf()->Cell($wName + $wSum, 5, $shippingText, 1, 0, 'L');
       $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
       $c->pdf()->Cell($wName + $wSum, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}, 1, 0, 'L');
       $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
