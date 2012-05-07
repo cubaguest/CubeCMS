@@ -15,7 +15,7 @@ $libDir = realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR;
 $webDir = realpath(dirname(isset ($siteFile) ? $siteFile : __FILE__)).DIRECTORY_SEPARATOR;
 $allowedInternalApps = array('imagecacher');
 // include site config
-include '.'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
+include $libDir.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
 /*
  * Některé specifické součásti systému, např resizer
  */
