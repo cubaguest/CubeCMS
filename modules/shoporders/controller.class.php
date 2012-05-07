@@ -364,9 +364,12 @@ class ShopOrders_Controller extends Controller {
          $shippingText .= sprintf($this->tr(' - datum odběru: %s'), vve_date("%x", new DateTime($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
       }
       $c->pdf()->Cell($wName + $wSum, 5, $shippingText, 1, 0, 'L');
-      $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      $shippingPrice = $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} != 0 ? $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}." ".VVE_SHOP_CURRENCY_NAME : $this->tr('Zdarma') ;
+      $c->pdf()->Cell($wPrice, 5, $shippingPrice, 1, 1, 'L');
+      
+      $paymentPrice = $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} != 0 ? $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}." ".VVE_SHOP_CURRENCY_NAME : $this->tr('Zdarma') ;
       $c->pdf()->Cell($wName + $wSum, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}, 1, 0, 'L');
-      $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      $c->pdf()->Cell($wPrice, 5, $paymentPrice, 1, 1, 'L');
       
       $c->pdf()->Ln();
       
