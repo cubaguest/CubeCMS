@@ -379,6 +379,7 @@ class Articles_Controller extends Controller {
             $editForm->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
          }
          $editForm->creatorOther->setValues($article->{Articles_Model::COLUMN_AUTHOR});
+         $editForm->concept->setValues($article->{Articles_Model::COLUMN_CONCEPT});
       }
 
       if($editForm->isSend() AND $editForm->save->getValues() == false){

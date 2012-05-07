@@ -29,16 +29,22 @@ echo $this->toolbox;
          $editTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
          // find image
          $image = null;
+         $w = 150;
+         $h = 100;
+         $c = true;
          if($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null){
-            $image = vve_tpl_image_tag(
-               vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}),$article->{Articles_Model::COLUMN_NAME}, 100, 100);
+            $imgSrc = vve_image_cacher(vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}), $w, $h, $c );
+            $imgAlt = htmlspecialchars($article->{Articles_Model::COLUMN_NAME});
+            $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
          } else {
             $doc = new DOMDocument();
             @$doc->loadHTML('<?xml encoding="UTF-8">' .$article->{Articles_Model::COLUMN_TEXT});
             $xml = simplexml_import_dom($doc); // just to make xpath more simple
             $images = $xml->xpath('//img');
             if(!empty ($images) && isset ($images[0])){
-               $image = vve_tpl_image_tag($images[0]['src'], $images[0]['alt'] != null ? $images[0]['alt'] : "article title image", 100, 100);
+               $imgSrc = vve_image_cacher($images[0]['src'], $w, $h, $c );
+               $imgAlt = htmlspecialchars($images[0]['alt'] != null ? $images[0]['alt'] : $article->{Articles_Model::COLUMN_NAME});
+               $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
             }
          }
          ?>

@@ -7,8 +7,9 @@ echo $this->toolbox;
 
 $image = null;
 if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
-   $image = vve_tpl_image_tag(
-      vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), $this->article->{Articles_Model::COLUMN_NAME}, 100, 100, array('title-image'));
+   $imgSrc = vve_image_cacher(vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), 300, 225);
+   $imgAlt = htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME});
+   $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
 }
 
 $editTime = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
