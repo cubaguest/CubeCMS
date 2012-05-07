@@ -33,6 +33,12 @@ class JsPlugin_JQuery extends JsPlugin {
     */
    protected $config = array('theme' => self::BASE_THEME);
 
+   /**
+    * Seznam pluginů, které nejsou součástí jqUI, ale v systému jsou
+    * @var array 
+    */
+   protected $plugins = array('ui.timepicker');
+
    protected function initJsPlugin() {
       if(defined('VVE_JQUERY_THEME')){
          self::$globalTheme = VVE_JQUERY_THEME;
@@ -75,7 +81,7 @@ class JsPlugin_JQuery extends JsPlugin {
    }
 
    protected function addJs($name) {
-      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1) {
+      if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1 AND !in_array($name, $this->plugins)) {
          $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
       } else {
          $this->addFile(new JsPlugin_JsFile("jquery.$name.min.js"));
