@@ -1,11 +1,4 @@
--- phpMyAdmin SQL Dump
--- version 3.4.5deb1
--- http://www.phpmyadmin.net
---
--- Počítač: localhost
--- Vygenerováno: Stř 01. úno 2012, 10:25
--- Verze MySQL: 5.1.58
--- Verze PHP: 5.3.6-13ubuntu3.3
+-- Verze 7.7
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
