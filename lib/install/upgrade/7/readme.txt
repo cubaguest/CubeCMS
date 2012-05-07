@@ -22,13 +22,18 @@ blok:
 
 Hlavní web:
 
---UPDATE_MAIN_SITE--
+/* UPDATE_MAIN_SITE */
 ALTER TABLE `{PREFIX}users` ADD COLUMN `main_site_update`;
---END_UPDATE--
+/* END_UPDATE */
 
 Pod web:
 
---UPDATE_SUB_SITE--
+/* UPDATE_SUB_SITE */
 ALTER TABLE `{PREFIX}users` ADD COLUMN `sub_site_update`;
---END_UPDATE--
+/* END_UPDATE */
 
+Pouze pokud je instalován eshop
+
+/* UPDATE_SHOP */
+SQL pro eshop tabulky
+/* END_UPDATE */
