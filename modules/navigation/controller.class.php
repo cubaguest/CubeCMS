@@ -47,6 +47,7 @@ class Navigation_Controller extends Controller {
          $ar = array(
             'name' => $child->getCatObj()->getName(),
             'label' => $child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION},
+            'obj' => $child->getCatObj()->getCatDataObj(),
             'link' => $this->link(true)->category($child->getCatObj()->getUrlKey()),
             'childs' => array(),
          );
