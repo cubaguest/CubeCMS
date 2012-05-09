@@ -1,0 +1,34 @@
+<?
+echo $this->toolbox;
+$this->addFile('css://style.css');
+
+?>
+<h1><?=$this->tr('Exporty dat')?></h1>
+<div class="form-edit">
+   <?
+   echo $this->formExport;
+   ?>
+   <?
+   $jq = new JsPlugin_JQuery();
+   $jq->addUIDatepicker();
+   $this->addJsPlugin($jq);
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         var dates = $('input#events_export_datefrom_1, input#events_export_dateto_1').datepicker({
+            showButtonPanel: true,
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            onSelect: function( selectedDate ) {
+               var option = this.id == "events_export_datefrom_1" ? "minDate" : "maxDate",
+               instance = $( this ).data( "datepicker" ),
+               date = $.datepicker.parseDate(
+               instance.settings.dateFormat ||
+               $.datepicker._defaults.dateFormat,
+                  selectedDate, instance.settings );
+               dates.not( this ).datepicker( "option", option, date );
+            }
+         });
+      });
+   </script>
+</div>

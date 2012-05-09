@@ -127,5 +127,11 @@ class Events_View extends View {
       $this->addEventView();
    }
 
+   public function exportsView()
+   {
+      $this->createToolbox();
+      $this->template()->addFile('tpl://exports.phtml');
+      Template_Module::setEdit(true);
+   }
 }
 ?>

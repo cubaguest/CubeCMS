@@ -33,7 +33,7 @@ class Events_Model extends Model_ORM {
       $this->addColumn(self::COL_ID_EVE_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'index' => true, 'pdoparam' => PDO::PARAM_INT));
       
       $this->addColumn(self::COL_NAME, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COL_NOTE, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COL_NOTE, array('datatype' => 'varchar(600)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COL_TEXT, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COL_CONTACT, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COL_PLACE, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));

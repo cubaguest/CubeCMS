@@ -37,9 +37,11 @@ class Events_Panel extends Panel {
       
       // model settings
       $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
-         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 )";
-      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $dateFrom;
-      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $dateTo;
+         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 "
+         . " OR ( " . Events_Model::COL_DATE_FROM . " < :dateStart3 AND " . Events_Model::COL_DATE_TO . " > :dateEnd3 )"
+         .")";
+      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $modelBindValues['dateStart3'] = $dateFrom;
+      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $modelBindValues['dateEnd3'] = $dateTo;
       
       $events = $model
          ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)

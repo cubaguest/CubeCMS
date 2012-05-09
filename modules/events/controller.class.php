@@ -9,6 +9,8 @@ class Events_Controller extends Controller {
    const DIR_IMAGES = "events";
    const DIR_CAT_IMAGES = "cats";
    const DIR_EVENT_IMAGES = "events";
+   
+   const PARAM_ADMIN_RECIPIENTS = 'admin_rec';
 
    protected function init()
    {
@@ -61,7 +63,7 @@ class Events_Controller extends Controller {
          $record->{Events_Model_Categories::COL_NAME} = $form->name->getValues();
          $record->{Events_Model_Categories::COL_CONTACT} = $form->contact->getValues();
          $record->{Events_Model_Categories::COL_WWW} = $form->www->getValues();
-         $record->{Events_Model_Categories::COL_NOTE} = $form->note->getValues();
+         $record->{Events_Model_Categories::COL_NOTE} = $form->note->getValues();// COL_TEXT
          if($form->image->getValues()){
             $img = $form->image->getValues();
             $record->{Events_Model_Categories::COL_IMAGE} = $img['name'];
@@ -94,7 +96,7 @@ class Events_Controller extends Controller {
          $record->{Events_Model_Categories::COL_NAME} = $form->name->getValues();
          $record->{Events_Model_Categories::COL_CONTACT} = $form->contact->getValues();
          $record->{Events_Model_Categories::COL_WWW} = $form->www->getValues();
-         $record->{Events_Model_Categories::COL_NOTE} = $form->note->getValues();
+         $record->{Events_Model_Categories::COL_NOTE} = $form->note->getValues();// COL_TEXT
 
          if($form->image->getValues()){
             $img = $form->image->getValues();
@@ -152,7 +154,7 @@ class Events_Controller extends Controller {
          $form->name->setValues($cat->{Events_Model_Categories::COL_NAME});
          $form->contact->setValues($cat->{Events_Model_Categories::COL_CONTACT});
          $form->www->setValues($cat->{Events_Model_Categories::COL_WWW});
-         $form->note->setValues($cat->{Events_Model_Categories::COL_NOTE});
+         $form->note->setValues($cat->{Events_Model_Categories::COL_NOTE});// COL_TEXT
          if(isset($form->imageSelect)){
             $form->imageSelect->setValues($cat->{Events_Model_Categories::COL_IMAGE});
          }
@@ -277,7 +279,10 @@ class Events_Controller extends Controller {
          false, $this->getRequestParam('onlyPublicAdd', 'off') == 'on' );
 
       $modelCats = new Events_Model_Categories();
-      $this->view()->cats = $modelCats->where(Events_Model_Categories::COL_ID_CATEGORY . " = :idc", array('idc' => $this->category()->getId()))->records();
+      $this->view()->cats = $modelCats
+         ->where(Events_Model_Categories::COL_ID_CATEGORY . " = :idc", array('idc' => $this->category()->getId()))
+         ->order(array(Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC))
+         ->records();
    }
 
    protected function runEventsActions()
@@ -394,9 +399,11 @@ class Events_Controller extends Controller {
       
       // model settings
       $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
-         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 )";
-      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $dateFrom;
-      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $dateTo;
+         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 "
+         . " OR ( " . Events_Model::COL_DATE_FROM . " < :dateStart3 AND " . Events_Model::COL_DATE_TO . " > :dateEnd3 )"
+         .")";
+      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $modelBindValues['dateStart3'] = $dateFrom;
+      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $modelBindValues['dateEnd3'] = $dateTo;
       
       if ($cat != null) {
          $modelWhere .= " AND " . Events_Model::COL_ID_EVE_CATEGORY . " = :idevcat";
@@ -500,7 +507,7 @@ class Events_Controller extends Controller {
          $record->{Events_Model::COL_TIME_TO} = $form->timeto->getValues();
          $record->{Events_Model::COL_ID_EVE_CATEGORY} = $form->cat->getValues();
          $record->{Events_Model::COL_NAME} = $form->name->getValues();
-         $record->{Events_Model::COL_NOTE} = $form->note->getValues();
+         $record->{Events_Model::COL_NOTE} = $form->note->getValues();// COL_TEXT
          $record->{Events_Model::COL_PLACE} = $form->place->getValues();
          $record->{Events_Model::COL_PRICE} = $form->price->getValues();
          $record->{Events_Model::COL_PUBLIC} = true;
@@ -510,6 +517,10 @@ class Events_Controller extends Controller {
 
          $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
 
+         if($isPublicAdd){
+            $this->sendNewEventNotification($record);
+         }
+         
          // @TODO pokud bude anonym, redirect přímo na hlavní stránku
          if ($form->addAnother->getValues() == true) {
             $this->link()->reload();
@@ -579,7 +590,7 @@ class Events_Controller extends Controller {
          $event->{Events_Model::COL_TIME_TO} = $form->timeto->getValues();
          $event->{Events_Model::COL_ID_EVE_CATEGORY} = $form->cat->getValues();
          $event->{Events_Model::COL_NAME} = $form->name->getValues();
-         $event->{Events_Model::COL_NOTE} = $form->note->getValues();
+         $event->{Events_Model::COL_NOTE} = $form->note->getValues();// COL_TEXT
          $event->{Events_Model::COL_PLACE} = $form->place->getValues();
          $event->{Events_Model::COL_PRICE} = $form->price->getValues();
          $model->save($event);
@@ -636,6 +647,9 @@ class Events_Controller extends Controller {
 
       $elemCat = new Form_Element_Select('cat', $this->tr('Kategorie'));
       if (!empty($catsRecords)) {
+         if(count($catsRecords) > 1){
+            $elemCat->setOptions(array($this->tr('Vyberte') => null ));
+         }
          foreach ($catsRecords as $cat) {
             $elemCat->setOptions(array($cat->{Events_Model_Categories::COL_NAME} => $cat->{Events_Model_Categories::COL_ID}), true);
          }
@@ -681,7 +695,7 @@ class Events_Controller extends Controller {
          if(isset($form->contact)){
             $form->contact->setValues($event->{Events_Model::COL_CONTACT});
          }
-         $form->note->setValues($event->{Events_Model::COL_NOTE});
+         $form->note->setValues($event->{Events_Model::COL_NOTE});// COL_TEXT
          $form->cat->setValues($event->{Events_Model::COL_ID_EVE_CATEGORY});
          if ($event->{Events_Model::COL_DATE_FROM} != null) {
             $date = new DateTime($event->{Events_Model::COL_DATE_FROM});
@@ -695,6 +709,10 @@ class Events_Controller extends Controller {
          $form->timeto->setValues($event->{Events_Model::COL_TIME_TO});
       }
 
+      if($form->isSend() && $form->cat->getValues() == null && count($elemCat->getOptions()) > 1 ){
+         $elemCat->setError($this->tr('Musíte vybrat kategorii'));
+      }
+      
       if ($form->isSend() && $form->save->getValues() == false) {
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route('listEvents')->reload();
@@ -730,7 +748,9 @@ class Events_Controller extends Controller {
       $form->addElement($eExport);
       
       if ($form->isValid()) {
-         
+         if($form->type->getValues() == 'basexls'){
+            $this->exportXLSPrint($form->datefrom->getValues(), $form->dateto->getValues());
+         }
       }
       
       $this->view()->formExport = $form;
@@ -740,10 +760,180 @@ class Events_Controller extends Controller {
       include_once AppCore::getAppLibDir().'lib/nonvve/phpexcel/PHPExcel.php';
       
       $doc = new PHPExcel();
+      $defRowH = 18;
       $doc->setActiveSheetIndex(0);
       $sheet = $doc->getActiveSheet();
-//      $sheet->setCellValue('A1', 'Ahoj');
-//      $sheet->setCellValue('A2', 'Světe');
+      $sheet->setCellValue('A1', sprintf( $this->tr('Export událostí od %s do %s'), vve_date("%x", $dateFrom), vve_date("%x", $dateTo)) );
+      $sheet->getStyle('A1')->applyFromArray(array( 'font' => array( 'bold' => true, 'size' => 14 ) ));
+      $sheet->getRowDimension(1)->setRowHeight(30);
+      $sheet->mergeCells('A1:B1');
+      $sheet->getColumnDimension('A')->setWidth(20);
+      $sheet->getColumnDimension('B')->setWidth(60);
+      $sheet->setCellValue('A2', $this->tr('Datum a čas') );
+      $sheet->setCellValue('B2', $this->tr('Název a text') );
+      $sheet->getStyle('A2')->applyFromArray(array( 'font' => array( 'bold' => true ) ));
+      $sheet->getStyle('B2')->applyFromArray(array( 'font' => array( 'bold' => true ) ));
+      $sheet->getRowDimension(2)->setRowHeight($defRowH);
+      
+      
+      $events = $this->getSortedEvents($dateFrom, $dateTo);
+      $row = 3;
+      foreach ($events as $cat) {
+         $sheet->setCellValueByColumnAndRow(0, $row, $cat['cat']->{Events_Model_Categories::COL_NAME});
+         $sheet->setCellValueByColumnAndRow(1, $row, $cat['cat']->{Events_Model_Categories::COL_CONTACT});
+         $sheet->getStyleByColumnAndRow(0, $row)->applyFromArray(array( 'font' => array( 'bold' => true ) ));
+         $sheet->getStyleByColumnAndRow(1, $row)->applyFromArray(array( 'font' => array( 'italic' => true ) ));
+         $sheet->getRowDimension($row)->setRowHeight($defRowH+10);
+         $row++;
+         
+         foreach ($cat['events'] as $e) {
+            $dateStr = vve_date("%d.%m.", $dateFrom);
+            if($e->{Events_Model::COL_DATE_TO} != null){
+               $dateStr .= '‒'.vve_date("%d.%m.", $dateTo);
+            }
+            $sheet->setCellValueByColumnAndRow(0, $row, $dateStr);
+            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NAME});
+            $sheet->getStyleByColumnAndRow(1, $row)->applyFromArray(array( 'font' => array( 'bold' => true ) ));
+            $sheet->getRowDimension($row)->setRowHeight($defRowH);
+            $row++;
+            
+            if($e->{Events_Model::COL_TIME_FROM} != null && $e->{Events_Model::COL_TIME_TO} == null){
+               $time = new DateTime($e->{Events_Model::COL_TIME_FROM});
+               $sheet->setCellValueByColumnAndRow(0, $row, $time->format("H.i")." h");
+            } else if($e->{Events_Model::COL_TIME_FROM} != null && $e->{Events_Model::COL_TIME_TO} != null){
+               $timef = new DateTime($e->{Events_Model::COL_TIME_FROM});
+               $timet = new DateTime($e->{Events_Model::COL_TIME_TO});
+               $sheet->setCellValueByColumnAndRow(0, $row, $timef->format("H.i")."‒".$timet->format("H.i")." h");
+            }
+            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NOTE}); // COL_TEXT
+            
+            $sheet->getRowDimension($row)->setRowHeight($defRowH);
+            $row++;
+         }
+      }
+            
+      
+      Template_Output::factory('xls');
+      Template_Output::setDownload('events-'.vve_date("%x", $dateFrom)."-".vve_date("%x", $dateTo).'.xls');
+      Template_Output::sendHeaders();
+      header('Content-type: application/vnd.ms-excel');
+      $objWriter = new PHPExcel_Writer_Excel5($doc);
+      $objWriter->save('php://output');
+   }
+   
+   protected function sendNewEventNotification($event)
+   {
+      // maily adminů - z uživatelů
+      $adminMails = array();
+      $usersId = $this->category()->getParam(self::PARAM_ADMIN_RECIPIENTS, array());
+      $modelusers = new Model_Users();
+      foreach ($usersId as $id) {
+         $user = $modelusers->record($id);
+         if($user->{Model_Users::COLUMN_MAIL} == null){
+            continue;
+         }
+         $mails = explode(';', $user->{Model_Users::COLUMN_MAIL});
+         $adminMails[$mails[0]] = $user->{Model_Users::COLUMN_NAME}." ".$user->{Model_Users::COLUMN_SURNAME};
+      }
+      if(!empty($adminMails)){ // pokud je prázdný výtahneme nasatvené maily
+         try {
+            // odeslání emailu
+            $mail = new Email(true);
+            $mail->setSubject(sprintf($this->tr('Nové veřejné přidání události na stránkách %s'), VVE_WEB_NAME ));
+            
+            $text = "Do stránek ".VVE_WEB_NAME." byla přidána nová událost:<br /><br />";
+            
+            $text .= "Událost byla přidána ".vve_date("%X %x")." z IP adresy: ".  long2ip($event->{Events_Model::COL_IP_ADD})."<br /><br />";
+            
+            $text .= "<table>";
+            $text .= "<tr>";
+            $text .= "<th width=\"150\" style=\"text-align: left;\">".$this->tr('Název')."</th>";
+            $text .= "<td>".$event->{Events_Model::COL_NAME}."</td>";
+            $text .= "</tr>";
+            
+            $text .= "<tr>";
+            $text .= "<th style=\"text-align: left;\">".$this->tr('Místo konání')."</th>";
+            $text .= "<td>".$event->{Events_Model::COL_PLACE}."</td>";
+            $text .= "</tr>";
+            
+            $text .= "<tr>";
+            $text .= "<th style=\"text-align: left;\">".$this->tr('Text')."</th>";
+            $text .= "<td>".$event->{Events_Model::COL_NOTE}."</td>"; // COL_TEXT
+            $text .= "</tr>";
+            
+            $text .= "<tr>";
+            $text .= "<th style=\"text-align: left;\">".$this->tr('Datum začátku')."</th>";
+            $text .= "<td>".vve_date("%x", $event->{Events_Model::COL_DATE_FROM})."</td>";
+            $text .= "</tr>";
+            
+            if($event->{Events_Model::COL_TIME_FROM} != null){
+               $text .= "<tr>";
+               $text .= "<th style=\"text-align: left;\">".$this->tr('Čas začátku')."</th>";
+               $text .= "<td>".vve_date("%H:%i", $event->{Events_Model::COL_TIME_FROM})."</td>";
+               $text .= "</tr>";
+            }
+            if($event->{Events_Model::COL_DATE_TO} != null){
+               $text .= "<tr>";
+               $text .= "<th style=\"text-align: left;\">".$this->tr('Datum konce')."</th>";
+               $text .= "<td>".vve_date("%x", $event->{Events_Model::COL_DATE_TO})."</td>";
+               $text .= "</tr>";
+            }
+            if($event->{Events_Model::COL_TIME_TO} != null){
+               $text .= "<tr>";
+               $text .= "<th style=\"text-align: left;\">".$this->tr('Čas konce')."</th>";
+               $text .= "<td>".vve_date("%H:%i", $event->{Events_Model::COL_TIME_TO})."</td>";
+               $text .= "</tr>";
+            }
+            
+            $text .= "<tr>";
+            $text .= "<th style=\"text-align: left;\">".$this->tr('Konatkt')."</th>";
+            $text .= "<td>".$event->{Events_Model::COL_CONTACT}."</td>";
+            $text .= "</tr>";
+            
+            $text .= "</table>";
+            
+            $text .= "<br /><hr />".  $this->tr('Na tento e-mail neodpovídejte. Je generován automaticky systémem Cube CMS.');
+            
+            $mail->setContent($text);
+            $mail->addAddress($adminMails);
+            
+            $mail->sendMail();
+         } catch (Exception $e){
+            new CoreErrors($e);
+         }
+      }         
+   }
+
+
+   public function settings(&$settings,Form &$form) {
+      $grpAdmin = $form->addGroup('admins', 'Nastavení příjemců',
+              'Nastavení příjemců odeslaných dotazů z kontaktního formuláře');
+
+      $elemAdmins = new Form_Element_Select('admins', 'Adresy uživatelů v systému');
+      // načtení uživatelů
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->usersForThisWeb(true)->records(PDO::FETCH_OBJ);
+      $usersIds = array();
+      foreach ($users as $user) {
+         if($user->{Model_Users::COLUMN_MAIL} != null){
+            $usersIds[$user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
+              .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Users::COLUMN_GROUP_LABEL}
+              .' ('.$user->{Model_Users::COLUMN_GROUP_NAME}.')'] = $user->{Model_Users::COLUMN_ID};
+         }
+      }
+      $elemAdmins->setOptions($usersIds);
+      $elemAdmins->setMultiple();
+      $elemAdmins->html()->setAttrib('size', 4);
+      if (isset($settings[self::PARAM_ADMIN_RECIPIENTS])) {
+         $elemAdmins->setValues($settings[self::PARAM_ADMIN_RECIPIENTS]);
+      }
+
+      $form->addElement($elemAdmins, $grpAdmin);
+
+      // znovu protože mohl být už jednou validován bez těchto hodnot
+      if($form->isValid()) {
+         $settings[self::PARAM_ADMIN_RECIPIENTS] = $form->admins->getValues();
+      }
    }
 }
 ?>
