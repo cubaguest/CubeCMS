@@ -103,7 +103,7 @@ class Model_Module extends Model_PDO {
    public function getInstalledModules() {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." ORDER BY ".self::COLUMN_NAME." DESC");
+              ." ORDER BY ".self::COLUMN_NAME." ASC");
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       $dbst->execute();
 
