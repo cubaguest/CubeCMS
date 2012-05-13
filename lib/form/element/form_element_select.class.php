@@ -105,7 +105,7 @@ class Form_Element_Select extends Form_Element {
 
       if($this->isMultiple) {
          $this->setSubLabel(
-            $this->tr('Více možností vyberete podržením klávesy ctrl při vybrěru možností.')."<br />"
+            $this->tr('Více možností vyberete podržením klávesy "ctrl" při vybrěru.')."<br />"
             .$this->getSubLabel()
             );
          $this->html()->setAttrib('multiple', 'multiple');
