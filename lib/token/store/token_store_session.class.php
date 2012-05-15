@@ -46,7 +46,6 @@ class Token_Store_Session implements Token_Store {
    {
       if(isset ($_SESSION[self::TOKENS_SES_NAME])){
          $s = &$_SESSION[self::TOKENS_SES_NAME];
-         $tokens = count($s);
          reset($s);
          foreach ($s as $token => $exp) {
             if($exp < time()){
