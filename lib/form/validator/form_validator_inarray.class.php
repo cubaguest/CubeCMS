@@ -4,18 +4,18 @@
  *
  * @author jakub
  */
-class Form_Validator_NotInArray extends Form_Validator implements Form_Validator_Interface {
+class Form_Validator_InArray extends Form_Validator implements Form_Validator_Interface {
 
-/**
- * Pole s prvky
- * @var array
- */
-   private $array = 'int';
+   /**
+    * Pole s prvky
+    * @var array
+    */
+   private $array = array();
 
 
    public function  __construct($array, $errMsg = null) {
       if($errMsg == null) {
-         parent::__construct($this->tr('Položka "%s" s hodnotou "%s" je již obsazena'));
+         parent::__construct($this->tr('Položka "%s" s hodnotou "%s" není obsažena v povolených hodnotách. Povolené hodnoty: ')."(".  implode(", ", $array ).")");
       } else {
          parent::__construct($errMsg);
       }
@@ -38,7 +38,7 @@ class Form_Validator_NotInArray extends Form_Validator implements Form_Validator
             if($elemObj->isMultiLang()) {
                trigger_error('Not implemented validation !!');
             } else {
-               if(in_array($elemObj->getUnfilteredValues(), $this->array)) {
+               if(!in_array($elemObj->getUnfilteredValues(), $this->array)) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$elemObj->getUnfilteredValues()));
                   return false;
                }
@@ -46,7 +46,7 @@ class Form_Validator_NotInArray extends Form_Validator implements Form_Validator
             break;
          case 'Form_Element_Select':
          case 'Form_Element_Radio':
-            if(in_array($elemObj->getUnfilteredValues(), $this->array)) {
+            if(!in_array($elemObj->getUnfilteredValues(), $this->array)) {
                $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$elemObj->getUnfilteredValues()));
                return false;
             }
