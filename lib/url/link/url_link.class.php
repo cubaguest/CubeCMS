@@ -249,12 +249,20 @@ class Url_Link {
     * @return Links
     */
    public function rmParam($name = null) {
-      if($name != null) {
-         unset($this->paramsArray[$name]);
-      }
-      // Odstranění všch parametrů (normálových i obyčejných)
-      else {
-         $this->paramsArray = array();
+      if(is_array($name)){
+         foreach ($name as $n) {
+            if(array_key_exists($n, $this->paramsArray)){
+               unset($this->paramsArray[$n]);
+            }
+         }
+      } else {
+         if($name != null && array_key_exists($name, $this->paramsArray)) {
+            unset($this->paramsArray[$name]);
+         }
+         // Odstranění všch parametrů (normálových i obyčejných)
+         else {
+            $this->paramsArray = array();
+         }
       }
       return $this;
    }
