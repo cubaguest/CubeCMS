@@ -11,9 +11,11 @@ header('Content-Type: text/html; charset=utf-8');
 if(!isset($_GET['s']) || !isset($_GET['tf']) || !isset($_GET['is'])){
    sendError('Nejsou předány všechny parametry');
 }
-echo "LIB dir:".$libDir."<br />";
-echo "WEB dir:".$webDir."<br />";
-var_dump($_GET);
+if(isset($_GET['debug'])){
+   echo "LIB dir:".$libDir."<br />";
+   echo "WEB dir:".$webDir."<br />";
+   print_r($_GET);
+}
 
 
 // Base init urlencode atd here
@@ -31,8 +33,6 @@ $allowSizes = array(/* base ratio 4:3 */
    'h' => array(100, 75, 150, 225),
 );
 $expectedHash = crypt($strSize, VVE_DB_PASSWD);
-echo "Expected hash: ".$expectedHash." urlhash: ".$HASH;
-var_dump($HASH =! null, $expectedHash != $HASH);
 // parse sizes
 $m = array();
 if(preg_match('/^([0-9]+)?x([0-9]+)?(c?)$/', $sizesTMP, $m) === false){
