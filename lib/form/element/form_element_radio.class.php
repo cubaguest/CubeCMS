@@ -13,7 +13,7 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
-class Form_Element_Radio extends Form_Element {
+class Form_Element_Radio extends Form_Element_Select {
 
    /**
     * Pole s volbami hodnota=>popis
@@ -24,26 +24,6 @@ class Form_Element_Radio extends Form_Element {
    protected function init() {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
-   }
-
-   /**
-    * Metoda nastaví volby
-    * @param $options -- volby v poli hodnota=>popis
-    * @return Form_Element_Select -- sám sebe
-    */
-   public function setOptions($options) {
-      $this->options = $options;
-      return $this;
-   }
-
-   public function populate() {
-      if(isset ($_REQUEST[$this->getName()])) {
-         $this->values = $_REQUEST[$this->getName()];
-      } else {
-         $this->values = false;
-      }
-      $this->unfilteredValues = $this->values;
-      $this->isPopulated = true;
    }
 
    /**
