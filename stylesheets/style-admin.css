@@ -253,6 +253,12 @@ a.button-select-title-image {
 }
 #dialog-title-image {display: none;}
 a.button-open-title-image-galery {margin-left: 10px;}
+#dialog-title-image a.selected {
+   border-color: #83AD4F;
+   box-shadow: 0px 0px 5px 3px green;
+   -moz-box-shadow: 0px 0px 5px 1px green;
+   -webkit-box-shadow: 0px 0px 5px 1px green;
+}
 
 #module-help-box {
    position: fixed;

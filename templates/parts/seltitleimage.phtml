@@ -30,6 +30,9 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
       $('.button-open-title-image-galery').click(function(e){
          e.preventDefault();
          $select = $(this).prev('select');
+         $('#dialog-title-image a').removeClass('selected');
+         $('#dialog-title-image a[data-file="'+$select.val()+'"]').addClass('selected');
+         
          $( "#dialog-title-image" ).dialog({width: 560, height: 365, resizable : true});          
       });
       // výběr z galerie
