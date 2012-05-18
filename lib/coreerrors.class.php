@@ -91,44 +91,47 @@ class CoreErrors {
     * Metoda pro zachytávání normálních chyb v enginu a modulech
     */
    public static function errorHandler($errno, $errstr, $errfile, $errline) {
+      $error = array();
       switch ($errno) {
+         case E_ERROR:
          case E_USER_ERROR:
-            $array = array();
-            $array['name'] = "ERROR";
-            $array['code'] = $errno;
-            $array['message'] = $errstr;
-            $array['file'] = $errfile;
-            $array['line'] = $errline;
+            $error['name'] = "ERROR";
+            $error['code'] = $errno;
+            $error['message'] = $errstr;
+            $error['file'] = $errfile;
+            $error['line'] = $errline;
             break;
-
+         case E_WARNING:
          case E_USER_WARNING:
-            $array = array();
-            $array['name'] = "WARNING";
-            $array['code'] = $errno;
-            $array['message'] = $errstr;
-            $array['file'] = $errfile;
-            $array['line'] = $errline;
+            if(VVE_DEBUG_LEVEL > 0){
+               $error['name'] = "WARNING";
+               $error['code'] = $errno;
+               $error['message'] = $errstr;
+               $error['file'] = $errfile;
+               $error['line'] = $errline;
+            }
             break;
-
+         case E_NOTICE:
          case E_USER_NOTICE:
-            $array = array();
-            $array['name'] = "NOTICE";
-            $array['code'] = $errno;
-            $array['message'] = $errstr;
-            $array['file'] = $errfile;
-            $array['line'] = $errline;
+            if(VVE_DEBUG_LEVEL > 1){
+               $error['name'] = "NOTICE";
+               $error['code'] = $errno;
+               $error['message'] = $errstr;
+               $error['file'] = $errfile;
+               $error['line'] = $errline;
+            }
             break;
-
          default:
-            $array = array();
-            $array['name'] = "UNKNOWN ERROR";
-            $array['code'] = $errno;
-            $array['message'] = $errstr;
-            $array['file'] = $errfile;
-            $array['line'] = $errline;
+            $error['name'] = "UNKNOWN ERROR";
+            $error['code'] = $errno;
+            $error['message'] = $errstr;
+            $error['file'] = $errfile;
+            $error['line'] = $errline;
             break;
       }
-      array_push(self::$errorsArray, $array);
+      if(!empty($error)){
+         array_push(self::$errorsArray, $error);
+      }
       return true;
    }
 
