@@ -205,6 +205,16 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       unset ($this->validators[$validator]);
       $this->isPopulated = false;
    }
+   
+   /**
+    * Metoda zjistí jestli element má daný validátor
+    * @param string $name -- název validátoru
+    * @return bool -- true pokud je daný validátor registrovaný
+    */
+   final public function hasValidator($name)
+   {
+      return isset($this->validators[$name]);
+   }
 
    /**
     * Metoda přidá elemntu filtr, který upraví výstup elementu
@@ -329,8 +339,11 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací název elementu
     * @return string
     */
-   final public function getName() {
-      return $this->formElementPrefix.$this->formElementName;
+   final public function getName($withFormPrefix = true) {
+      if($withFormPrefix){
+         return $this->formElementPrefix.$this->formElementName;
+      }
+      return $this->formElementName;
    }
 
    /**

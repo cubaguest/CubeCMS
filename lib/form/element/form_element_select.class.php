@@ -55,6 +55,9 @@ class Form_Element_Select extends Form_Element {
    
    public function validate()
    {
+      if(!$this->isMultiple && !in_array("", $this->options)){
+         $this->addValidation(new Form_Validator_NotEmpty());
+      }
       // kontrola odeslaných hodnot jestli jsou v povolených volbách
       $this->addValidation(new Form_Validator_InArray($this->options, 
          $this->tr('Ve výběru "%s" byla odeslána hodnota "%s", která není v povolených hodnotách. Povolené hodnoty: ')."(".  implode(", ", array_keys($this->options) ).")"));

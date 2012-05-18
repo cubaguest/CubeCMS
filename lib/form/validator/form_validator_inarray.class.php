@@ -30,6 +30,8 @@ class Form_Validator_InArray extends Form_Validator implements Form_Validator_In
    }
 
    public function validate(Form_Element $elemObj) {
+      if($elemObj->getUnfilteredValues() == null) return true;// nekontrolujeme prázdý řetězec to je na validátoru notEmpty
+      $vals = $elemObj->getUnfilteredValues();
       switch (get_class($elemObj)) {
       // input text
          case 'Form_Element_Text':
@@ -38,17 +40,21 @@ class Form_Validator_InArray extends Form_Validator implements Form_Validator_In
             if($elemObj->isMultiLang()) {
                trigger_error('Not implemented validation !!');
             } else {
-               if(!in_array($elemObj->getUnfilteredValues(), $this->array)) {
-                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$elemObj->getUnfilteredValues()));
+               if(!in_array($vals, $this->array)) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$vals));
                   return false;
                }
             }
             break;
          case 'Form_Element_Select':
          case 'Form_Element_Radio':
-            if(!in_array($elemObj->getUnfilteredValues(), $this->array)) {
-               $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$elemObj->getUnfilteredValues()));
-               return false;
+            if(is_array($vals)){
+               
+            } else {
+               if(!in_array($vals, $this->array)) {
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel(),$vals));
+                  return false;
+               }
             }
          default:
             break;

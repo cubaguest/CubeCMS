@@ -21,7 +21,7 @@ class Form_Element_CountrySelect extends Form_Element_Select {
     * @var boolean
     */
    protected $isMultiple = false;
-   protected $countries = array(
+   protected static $countries = array(
       "AF" => "Afghanistan",
       "AL" => "Albania",
       "DZ" => "Algeria",
@@ -267,7 +267,7 @@ class Form_Element_CountrySelect extends Form_Element_Select {
    {
       parent::init();
 
-      foreach ($this->getCountries() as $code => $name) {
+      foreach (self::getCountries() as $code => $name) {
          $this->setOptions(array($name => $code), true);
       }
 
@@ -275,9 +275,9 @@ class Form_Element_CountrySelect extends Form_Element_Select {
       $this->setValues('CZ');
    }
 
-   public function getCountries()
+   public static function getCountries()
    {
-      return $this->countries;
+      return self::$countries;
    }
 
 }
