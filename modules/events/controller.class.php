@@ -805,9 +805,12 @@ class Events_Controller extends Controller {
                $timet = new DateTime($e->{Events_Model::COL_TIME_TO});
                $sheet->setCellValueByColumnAndRow(0, $row, $timef->format("H.i")."‒".$timet->format("H.i")." h");
             }
-            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NOTE}); // COL_TEXT
+            $sheet->getStyleByColumnAndRow(0, $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
             
-            $sheet->getRowDimension($row)->setRowHeight($defRowH);
+            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NOTE}); // COL_TEXT
+            $sheet->getStyleByColumnAndRow(1, $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+            
+            $sheet->getRowDimension($row)->setRowHeight($defRowH*3);
             $row++;
          }
       }
