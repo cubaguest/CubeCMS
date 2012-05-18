@@ -1,0 +1,52 @@
+<?
+$this->addFile("css://style.css");
+echo $this->toolbox;
+?>
+<h1><?ps($this->category()->getName());?></h1>
+<div id="forms-main" class="form-edit">
+   <div class="module-tool-buttons">
+      <a href="<?=$this->link()->route('createForm')?>" title="<?=$this->tr('Vytvořit nový formulář')?>"
+         ><img src="images/icons/application_form_add.png" alt="add" /> <?=$this->tr('Vytvořit formulář')?></a>
+   </div>
+   <?
+   if(!empty($this->forms)){
+   foreach ($this->forms as $form) {?>
+   <table class="ui-widget full-width form-item">
+      <tr class="ui-widget-header">
+         <td class="form-name" colspan="2">
+            <?
+            echo $form->{Forms_Model::COLUMN_NAME};
+            
+            $toolbox = clone $this->toolboxItem;
+            $toolbox->form_status_->setIcon(
+                     $form->{Forms_Model::COLUMN_ACTIVE} == true ? 'enable.png' : 'disable.png');
+            $toolbox->form_status_->getForm()->id->setValues($form->{Forms_Model::COLUMN_ID});
+            $toolbox->editForm->setAction($this->link()->route('editForm', array('id' => $form->{Forms_Model::COLUMN_ID})));
+            $toolbox->previewForm->setAction($this->link()->route('previewForm', array('id' => $form->{Forms_Model::COLUMN_ID})));
+            $toolbox->form_delete_->getForm()->id->setValues($form->{Forms_Model::COLUMN_ID});
+            $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+            echo $toolbox;
+            ?>
+         </td>
+      </tr>
+      <tr class="ui-widget-content">
+         <th scope="row" class="param-name"><?=$this->tr('Počet odeslání')?>:</th>
+         <td><?=$form->{Forms_Model::COLUMN_SENDED}?></td>
+      </tr>
+   </table>
+   <?}
+   }?>
+</div>
+<?
+$jq = new JsPlugin_JQuery();
+$this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+   });
+   /* ]]> */
+   </script>
+

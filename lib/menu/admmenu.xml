@@ -94,6 +94,13 @@
          <urlkey lang="en">admin/content/quicktools</urlkey>
          <module>quicktools</module>
       </item>
+      <item id="32784" icon="application_form.png">
+         <name lang="cs">Formuláře</name>
+         <name lang="en">Forms</name>
+         <urlkey lang="cs">admin/content/formulare</urlkey>
+         <urlkey lang="en">admin/content/forms</urlkey>
+         <module>forms</module>
+      </item>
    </section>
    <section icon="information.png">
       <name lang="cs">Informace</name>

@@ -1,0 +1,60 @@
+<?
+$h = sprintf($this->tr('Náhled formuláře "%s"'), $this->form->{Forms_Model::COLUMN_NAME} );
+Template_Core::setPageTitle($h);
+$this->addFile("css://style.css");
+echo $this->toolbox;
+?>
+<h1><?ps($h);?></h1>
+<div class="form-edit">
+   <div class="module-tool-buttons">
+      <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Zpět na seznam formulářů')?>"
+         ><img src="images/icons/resultset_previous.png" alt="back" /> <?=$this->tr('Zpět na seznam')?></a>
+      <a href="<?=$this->link()->route('editForm')->param('back', (string)$this->link())?>" title="<?=$this->tr('Upravit formulář')?>"
+         ><img src="images/icons/application_form_edit.png" alt="edit" /> <?=$this->tr('Upravit formulář')?></a>
+   </div>
+   <?if($this->sendData != null){?>
+   <h2><?ps($this->tr('Odeslaná data'))?></h2>
+   <div>
+      <table class="full-width ui-widget">
+         <tbody>
+         <?foreach ($this->sendData as $name => $value) {?>
+            <tr>
+               <th class="ui-widget-header"><?ps($name)?></th>
+               <td class="ui-widget-content"><?
+               if(is_bool($value)){
+                  ps( $value == true ? $this->tr('ANO') : $this->tr('NE') );
+               } else if($value == null){
+                  echo "<em>".($this->tr('Nevyplněno'))."</em>";
+               } else if(is_array($value)) {
+                  foreach ($value as $item) {
+                     echo htmlspecialchars($item).'<br />';
+                  }
+               } else {
+                  echo nl2br(htmlspecialchars($value));
+               }
+               ?></td>
+            </tr>
+         <?}?>
+         </tbody>
+      </table>
+      <br />
+   </div>
+   <h2><?=$this->tr('Náhled formuláře')?></h2>
+   <?}?>
+   <?
+   echo $this->formPreview;
+   ?>
+</div>
+<?
+$jq = new JsPlugin_JQuery();
+$this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+   });
+   /* ]]> */
+   </script>
+

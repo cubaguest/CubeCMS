@@ -1,0 +1,97 @@
+@charset "utf-8";
+
+/* list */
+.form-item {
+   margin-bottom: 0.5em;
+}
+.form-item .param-name {
+   width: 20%;
+}
+
+/* edit form */
+.ui-widget-header,
+.ui-widget-content {
+   padding: 5px;
+}
+
+.ui-widget-header * {padding: 0; margin: 0;}
+
+#form-wrap {
+   float: left;
+   width: 69%;
+}
+#form-wrap .element-tools {
+   float: right;
+   display: none;
+}
+#form-wrap .element-tools a {
+   float: left;
+}
+
+#form-wrap textarea { width: 60%;}
+#form-wrap ul { margin: 2px 0; }
+#form-wrap li {
+   list-style: none;
+}
+/* element styles */
+#form-wrap label {
+   width: 110px;
+   float: left;
+   min-height: 20px;
+   font-size: 92%;
+}
+
+#form-wrap .item {
+   padding: 5px;
+   clear: both;
+}
+
+#form-wrap .item-checkbox {
+   padding-left: 115px; /* plud padding 5px */
+}
+#form-wrap .item-checkbox label,
+#form-wrap .item-radio p label {
+   float: none;
+   padding-left: 5px;
+   width: auto;
+   clear: left;
+}
+#form-wrap .item-label {
+   font-weight: bold;
+}
+#form-wrap .item-radio p {
+   float: left;
+}
+
+#form-wrap .validator {font-size: 62%;}
+
+#form-settings p {
+   clear: both;
+   margin: 0;
+}
+#form-settings p.ui-state-default {
+   padding: 5px;
+}
+
+/* elem edit form */
+#form-tools-wrap {
+   float: right;
+   width: 30%;
+   position: relative;
+}
+#form-tools-wrap .ui-widget-content {
+   margin-bottom: 5px;
+}
+
+#form-elem-setup {
+   display: none;
+}
+#elem-optional-options-wrap textarea {width: 99%; height: 100px;}
+
+#form-wrap .item.ui-state-hover .element-tools {
+   display: block;
+}
+
+#form-tpls {
+   display: none;
+}

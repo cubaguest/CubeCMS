@@ -1,0 +1,170 @@
+<?
+$this->addFile("css://style.css?original");
+$this->addFile("js://engine:json2.js?original");
+$this->addFile("js://form-edit.js?original");
+// do titulku
+if($this->edit) {
+   $h = $this->tr('Úprava formuláře');
+} else {
+   $h = $this->tr('Vytvoření nového formuláře');
+}
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$jq->addUIAccordion();
+$this->addJsPlugin($jq);
+?>
+<h1><?=$h;?></h1>
+<div class="form-edit" id="movie-form-edit">
+   <div id="form-wrap" class="ui-widget">
+      <div class="ui-widget-header">
+         <h2 id="form-name">Název formuláře</h2>
+      </div>
+      <div class="message message-info">
+         <p id="form-message">Formulář byl odeslán</p>
+      </div>
+      <div>
+         <ul id="form" class="ui-widget-content">
+         </ul>
+      </div>
+      <div class="ui-widget-header">
+         <h2>Nastavení formuláře</h2>
+      </div>
+      <div id="form-settings" class="ui-widget-content">
+         <?
+         $this->form->html()->setAttrib('id','form-data');
+         echo $this->form;
+         
+         /*echo $this->form->renderStart();
+         ?>
+         <p class="ui-state-default">
+            <?
+            $this->form->name->html()->setAttrib('onkeyup', "FormEditor.changeFormName(this.value)");
+            echo $this->form->name->label();
+            echo $this->form->name->controll();
+            ?>
+            <br class="reseter" />
+         </p>
+         <p class="ui-state-default">
+            <?
+            $this->form->messageSend->html()->setAttrib('onkeyup', "FormEditor.changeFormMessage(this.value)");
+            echo $this->form->messageSend->label();
+            echo $this->form->messageSend->controll();
+            ?>
+            <br class="reseter" />
+         </p>
+         <?if($this->form->data instanceof Form_Element_Hidden){
+            echo $this->form->data->controll();
+         } else {?>
+         <p class="ui-state-default">
+            <?
+//            $this->form->data->html()->setAttrib('rows', 10);
+//            $this->form->data->html()->setAttrib("disabled", "disabled");
+            $this->form->data->setSubLabel($this->tr('Data nejsou ručně upravitelná.'));
+            echo $this->form->data->label();
+            echo $this->form->data->controll();
+            ?>
+            <br class="reseter" />
+         </p>
+         <?}?>
+         <p class="ui-state-default">
+            <?
+            echo $this->form->sysRecipients->label();
+            echo $this->form->sysRecipients->controll();
+            echo $this->form->sysRecipients->getSubLabel();
+            ?>
+            <br class="reseter" />
+         </p>
+         <p class="ui-state-default">
+            <?
+            echo $this->form->active->label();
+            echo $this->form->active->controll();
+            ?>
+            <br class="reseter" />
+         </p>
+         <?
+         echo $this->form->delete->label();
+         echo $this->form->delete->controll();
+         ?>
+         <p class="ui-state-default">
+            <label> </label>
+            <?
+            echo $this->form->save->label();
+            echo $this->form->save->controll();
+            ?>
+            <br class="reseter" />
+         </p>
+         <?
+         echo $this->form->renderEnd();*/
+         ?>
+         <hr class="reseter" />
+         <button id="button-serialize">Serializovat</button>
+      </div>
+   </div>
+   <div id="form-tools-wrap">
+      <div class="ui-widget-header"><?=$this->tr('Nástroje')?></div>
+      <div id="form-tools" class="ui-widget-content" >
+         
+         <h3 class="accordion ui-widget-header">Přidání elementu</h3>
+         <div class="ui-widget-content" id="form-element-create">
+            Nový element:
+            <select name="create-element" onchange="FormEditor.createFormItem($(this).val());$(this).val('');">
+               <optgroup label="<?=$this->tr('Základní')?>">
+                  <option value=""><?=$this->tr('Vyberte element...')?></option>
+                  <option value="text"><?=$this->tr('Textový řádek')?></option>
+                  <option value="textarea"><?=$this->tr('Textové pole')?></option>
+                  <option value="checkbox"><?=$this->tr('Checkbox')?></option>
+                  <option value="select"><?=$this->tr('Výběr')?></option>
+                  <option value="radio"><?=$this->tr('Výběr (radio)')?></option>
+                  <option value="label"><?=$this->tr('Napis')?></option>
+               </optgroup>
+               <optgroup label="<?=$this->tr('Pokročilé')?>">
+                  <option value="selectcountry"><?=$this->tr('Výběr státu')?></option>
+               </optgroup>
+            </select>
+         </div>
+         
+         <h3 class="accordion ui-widget-header">Nastavení elementu</h3>
+         <div class="ui-widget-content" id="form-elem-setup">
+            <form  id="form-elem-settings" onsubmit="return false;">
+               <label>Název:</label><br />
+               <input type="text" name="name" value="" onkeyup="FormEditor.$selectedItem.trigger('chengeLabel', $(this).val())" />
+               <div class="elem-optional" id="elem-optional-require-wrap">
+                  <label>Povinný:</label>
+                  <input type="checkbox" name="require" onchange="FormEditor.$selectedItem.trigger('chengeRequire', $(this).is(':checked'))"/>
+               </div>
+               <div class="elem-optional" id="elem-optional-options-wrap">
+                  <label>Položky:</label><br />
+                  <textarea name="optional-settings" onkeyup="FormEditor.$selectedItem.trigger('chengeOptions', $(this).val())"></textarea>
+                  <p class="note">Nový řádek je nová položka</p>
+               </div>
+               <div class="elem-optional" id="elem-optional-validators-wrap">
+                  <label>Validátor:</label><br />
+                  <select name="validator" onchange="FormEditor.$selectedItem.trigger('chengeValidator', [this])">
+                     <option value=""><?=$this->tr('Žádný')?></option>
+                     <option value="mail"><?=$this->tr('E-Mail')?></option>
+                     <option value="url"><?=$this->tr('URL adresa')?></option>
+                  </select>
+               </div>
+               <div class="elem-optional" id="elem-optional-is-multiple-wrap">
+                  <label>Více voleb:</label>
+                  <input type="checkbox" name="ismultiple" onchange="FormEditor.$selectedItem.trigger('chengeIsMultiple', $(this).is(':checked'))"/>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div id="form-tpls">
+      <div class="element-tools">
+         <a href="<?=$this->link()?>#" onclick="FormEditor.deleteFormItem(this);return false;"
+                     title="<?=$this->tr('Smazat prvek')?>"><span class="ui-icon ui-icon-closethick"></span></a>
+      </div>
+   </div>
+</div>
+<script type="text/javascript">
+   $(document).ready(function(){
+      FormEditor.init({
+         selectcountry : {label : '<?=$this->tr('Výběr země')?>', options : <?=json_encode(array_values( Form_Element_CountrySelect::getCountries()) ) ?>},
+         defaultlabel : '<?=$this->tr('Název')?>'
+      });
+   });
+</script>
