@@ -35,12 +35,12 @@ class Upgrade_Controller extends Controller {
       }
 
       if($isUpgradeAvailable === true) {
-         $this->infoMsg()->addMessage($this->_('Je k dispozici nová verze modulu. Doporučujeme provést povýšení na novou verzi, jinak systém nemusí pracovat správně'), false);
+         $this->infoMsg()->addMessage($this->tr('Je k dispozici nová verze modulu. Doporučujeme provést povýšení na novou verzi, jinak systém nemusí pracovat správně'), false);
          $this->view()->allowUpgrade = true;
       }
 
       $upgradeForm = new Form('module_upgrade_', true);
-      $elemSubimt = new Form_Element_Submit('save', $this->_('Povýšit'));
+      $elemSubimt = new Form_Element_Submit('save', $this->tr('Povýšit'));
       $upgradeForm->addElement($elemSubimt);
 
       if($upgradeForm->isValid()){
@@ -48,12 +48,10 @@ class Upgrade_Controller extends Controller {
             if($module['upgrade'] == true){
                $instObjName = ucfirst($module['name']).'_Install';
                $instObj = new $instObjName;
-//             $instObj = new Articles_Install();
                $instObj->update();
-//               $instObj->update($module['inst_ver'], $module['avail_ver']);
             }
          }
-         $this->infoMsg()->addMessage($this->_('Povýšení proběhlo úspěšně'));
+         $this->infoMsg()->addMessage($this->tr('Povýšení proběhlo úspěšně'));
          $this->link()->reload();
       }
 
