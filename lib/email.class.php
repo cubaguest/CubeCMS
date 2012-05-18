@@ -37,14 +37,31 @@ class Email {
    private $mailer = null;
 
    /**
+    * Řetězec zprávy
+    * @var string 
+    */
+   protected $msgContent = null;
+
+   /**
     * Objekt zprávy
     * @var Swift_Message
     */
    private $message = null;
 
    private $iconvParams = array();
+   
+   private $logger = null;
+   
+   protected $replacements = array();
+   
+   protected $decoratorVars = array();
 
-   /**
+   protected $sendFromAddress = null;
+   protected $sendFromName = null;
+   
+   protected $files = array();
+
+      /**
     * Konstruktor. Vytvoří objekt emailu
     * @param boolean $htmlMail -- (option) jestli se bude vytvářet html mail
     */
@@ -64,11 +81,18 @@ class Email {
          $transport = Swift_MailTransport::newInstance();
       }
       $this->mailer = Swift_Mailer::newInstance($transport);
-      $this->setMessage(Swift_Message::newInstance());
+      if(VVE_DEBUG_LEVEL > 0){
+         // To use the ArrayLogger
+         $this->logger = new Swift_Plugins_Loggers_ArrayLogger();
+         $this->mailer->registerPlugin(new Swift_Plugins_LoggerPlugin($this->logger));
+      }
    }
 
    public function sanitize($str)
    {
+      if($str == null){
+         return null;
+      }
       if(empty ($this->iconvParams)) return $str;
       return iconv($this->iconvParams[0], $this->iconvParams[1], $str);
    }
@@ -80,8 +104,8 @@ class Email {
     */
    public function setFrom($address, $name=null)
    {
-      $this->message()->setSender($address, $this->sanitize($name));
-      $this->message()->setFrom($address, $this->sanitize($name));
+      $this->sendFromAddress = $address;
+      $this->sendFromName = $name;
       return $this;
    }
 
@@ -103,15 +127,11 @@ class Email {
     * @return Email -- vrací sebe
     */
    public function setContent($content, $merge = false)
-      {
-      $cntType = 'text/plain';
-      if($this->isHtmlMail == true){
-         $cntType = 'text/html';
-      }
+   {
       if($merge){
-         $this->message()->setBody($this->message()->getBody().$this->sanitize($content), $cntType);
+         $this->msgContent .= $content;
       } else {
-         $this->message()->setBody($this->sanitize($content), $cntType);
+         $this->msgContent = $content;
       }
       return $this;
    }
@@ -182,10 +202,9 @@ class Email {
    public function addAttachment($file)
    {
       if($file instanceof Filesystem_File){
-         $this->message()->attach(Swift_Attachment::fromPath($file->getName(true)));
-      } else {
-         $this->message()->attach(Swift_Attachment::fromPath($file));
+         $file = $file->getName(true);
       }
+      $this->files[] = $file;
       return $this;
    }
 
@@ -199,11 +218,18 @@ class Email {
 
    public function send(&$failures = null)
    {
+      $this->prepareMessage();
+      
       $this->message()->setTo($this->mailsAddresses);
-      return $this->mailer->send($this->message(), $failures);
+      $ret = $this->mailer->send($this->message(), $failures);
+      if($this->logger instanceof Swift_Plugins_Loggers_ArrayLogger && !empty($failures)){
+         new CoreErrors(new Swift_SwiftException($this->logger->dump()));
+      }
+      return $ret;
    }
    public function batchSend(&$failures = null)
    {
+      $this->prepareMessage();
       $numSent = 0;
       foreach ($this->mailsAddresses as $address => $name)
       {
@@ -213,8 +239,36 @@ class Email {
             $this->message()->setTo(array($address => $name));
          }
          $numSent += $this->mailer->send($this->message(), $failures);
+         
+      }
+      if($this->logger instanceof Swift_Plugins_Loggers_ArrayLogger && !empty($failures)){
+         new CoreErrors(new Swift_SwiftException($this->logger->dump()));
       }
       return $numSent;
+   }
+   
+   protected function prepareMessage()
+   {
+      $cnt = $this->msgContent;
+      if(!empty($this->decoratorVars )){
+         $decorator = new Swift_Plugins_DecoratorPlugin($replacements);
+         $this->mailer->registerPlugin($decorator);
+      }
+      if(!empty($this->replacements )){
+         $cnt = str_replace(array_keys($this->replacements), array_values($this->replacements), $cnt);
+      }
+      if($this->sendFromAddress != null){
+         $this->message()->setSender($this->sendFromAddress, $this->sanitize($this->sendFromName));
+         $this->message()->setFrom($this->sendFromAddress, $this->sanitize($this->sendFromName));
+      }
+      
+      if(!empty($this->files)){
+         foreach ($this->files as $file) {
+            $this->message()->attach(Swift_Attachment::fromPath($file));
+         }
+      }
+      
+      $this->message()->setBody($this->sanitize($cnt), $this->isHtmlMail == true ? 'text/html' : 'text/plain');
    }
 
    /**
@@ -232,6 +286,9 @@ class Email {
     */
    public function message()
    {
+      if($this->message == null){
+         $this->setMessage(Swift_Message::newInstance());
+      }
       return $this->message;
    }
 
@@ -256,6 +313,24 @@ class Email {
       } else {
          $this->message()->setFrom('noreplay@'.$_SERVER['SERVER_NAME']);
       }
+   }
+   
+   /**
+    * Metoda nastaví proměnné emailu
+    * @param array $replacements -- pole s proměnnými ('název' => 'hodnota')
+    */
+   public function setReplacements($replacements)
+   {
+      $this->replacements = $replacements;
+   }
+   
+   /**
+    * Metoda nastaví proměnné emailu podle příjemců
+    * @param array $replacements -- pole s proměnnými array( 'mail@mail.cz' => array( 'název' => 'hodnota') )
+    */
+   public function setRecipientReplacements($replacements)
+   {
+      $this->decoratorVars = $replacements;
    }
 }
 ?>

@@ -22,7 +22,7 @@ Swift_Preferences::getInstance()->setCharset('utf-8');
 //}
 
 // better solution is using own cache dir
-Swift_Preferences::getInstance()
+  Swift_Preferences::getInstance()
     -> setTempDir(AppCore::getAppCacheDir())
     -> setCacheType('disk');
 
