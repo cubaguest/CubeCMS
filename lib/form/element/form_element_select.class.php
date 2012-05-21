@@ -26,6 +26,8 @@ class Form_Element_Select extends Form_Element {
     * @var boolean
     */
    protected $isMultiple = false;
+   
+   protected $checkAllowedOptions = true;
 
    protected function init() {
       $this->htmlElement = new Html_Element('select');
@@ -59,8 +61,10 @@ class Form_Element_Select extends Form_Element {
          $this->addValidation(new Form_Validator_NotEmpty());
       }
       // kontrola odeslaných hodnot jestli jsou v povolených volbách
-      $this->addValidation(new Form_Validator_InArray($this->options, 
-         $this->tr('Ve výběru "%s" byla odeslána hodnota "%s", která není v povolených hodnotách. Povolené hodnoty: ')."(".  implode(", ", array_keys($this->options) ).")"));
+      if($this->checkAllowedOptions){
+         $this->addValidation(new Form_Validator_InArray($this->options, 
+            $this->tr('Ve výběru "%s" byla odeslána hodnota "%s", která není v povolených hodnotách. Povolené hodnoty: ')."(".  implode(", ", array_keys($this->options) ).")"));
+      }
       parent::validate();
    }
 
@@ -88,6 +92,16 @@ class Form_Element_Select extends Form_Element {
     */
    public function setMultiple($multiple = true) {
       $this->isMultiple = $multiple;
+      return $this;
+   }
+   
+   /**
+    * Metoda nastaví kontrolu odeslaných hodnot
+    * @param $check -- true pro zapnutí kontroly
+    * @return Form_Element_Select -- sám sebe
+    */
+   public function setCheckOptions($check = true) {
+      $this->checkAllowedOptions = $check;
       return $this;
    }
 

@@ -33,6 +33,7 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       $form->addElement($eFile);
       
       $eDir = new Form_Element_Select('dirName');
+      $eDir->setCheckOptions(false);
       $form->addElement($eDir );
       
       $eDirNew = new Form_Element_Text('dirNewName');
@@ -172,6 +173,7 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       $form->addElement($eFile);
       
       $eDir = new Form_Element_Select('dirName');
+      $eDir->setCheckOptions(false);
       $form->addElement($eDir );
       
       $eDirNew = new Form_Element_Text('dirNewName');
