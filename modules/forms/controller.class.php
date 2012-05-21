@@ -61,12 +61,16 @@ class Forms_Controller extends Controller {
          $struct = json_decode($form->data->getValues());
          
          $modelForms = new Forms_Model();
-         $modelElements = new Forms_Model_Elements();
          
          $formRec = $modelForms->newRecord();
          $formRec->{Forms_Model::COLUMN_NAME} = $form->name->getValues();
          $formRec->{Forms_Model::COLUMN_MSG} = $form->messageSend->getValues();
          $formRec->{Forms_Model::COLUMN_ACTIVE} = $form->active->getValues();
+         $formRec->{Forms_Model::COLUMN_SEND_TO_USERS} = null;
+         if($form->sysRecipients->getValues() != null && is_array($form->sysRecipients->getValues())){
+            $formRec->{Forms_Model::COLUMN_SEND_TO_USERS} = implode(";", $form->sysRecipients->getValues());
+         }
+         $formRec->{Forms_Model::COLUMN_SEND_TO_MAILS} = $form->otherRecipients->getValues();
          
          $modelForms->save($formRec);
          
@@ -131,7 +135,10 @@ class Forms_Controller extends Controller {
          $formRec->{Forms_Model::COLUMN_NAME} = $form->name->getValues();
          $formRec->{Forms_Model::COLUMN_MSG} = $form->messageSend->getValues();
          $formRec->{Forms_Model::COLUMN_ACTIVE} = $form->active->getValues();
-         $formRec->{Forms_Model::COLUMN_SEND_TO_USERS} = implode(";", $form->sysRecipients->getValues());
+         $formRec->{Forms_Model::COLUMN_SEND_TO_USERS} = null;
+         if($form->sysRecipients->getValues() != null && is_array($form->sysRecipients->getValues())){
+            $formRec->{Forms_Model::COLUMN_SEND_TO_USERS} = implode(";", $form->sysRecipients->getValues());
+         }
          $formRec->{Forms_Model::COLUMN_SEND_TO_MAILS} = $form->otherRecipients->getValues();
          
          $modelForms->save($formRec);
@@ -467,6 +474,10 @@ class Forms_Controller extends Controller {
       }
       
       if($form->isValid()){
+         // update send counter
+         $fRec->{Forms_Model::COLUMN_SENDED} = $fRec->{Forms_Model::COLUMN_SENDED}+1;
+         $formModel->save($fRec);
+         
          // semd to mail
          $mail = true;
          if($mail){
@@ -520,18 +531,30 @@ class Forms_Controller extends Controller {
       if($msg == null){
          $msg = 
             '<html>'
-            . ' <head></head>'
+            . ' <head>'
+            .'<style>
+               body { font-family: Verdana, sans-serif; font-size: 0.8em; color:#484848; }
+               h1, h2, h3 { font-family: "Trebuchet MS", Verdana, sans-serif; margin: 0px; }
+               h1 { font-size: 1.2em; }
+               h2, h3 { font-size: 1.1em; }
+               a, a:link, a:visited { color: #2A5685;}
+               a:hover, a:active { color: #c61a1a; }
+               hr { width: 100%; height: 1px; background: #ccc; border: 0; }
+               .footer { font-size: 0.8em; font-style: italic; }
+               </style>'   
+            . '</head>'
             . ' <body>'
-            . '<p>'.$tr->tr('Ze stránek {WEB_LINK} byl odeslán formulář "{FORM_NAME}".').'</p>'
+            . '<h1>'.$tr->tr('Ze stránek {WEB_LINK} byl odeslán formulář "{FORM_NAME}"').'</h1>'
             . '<p>'.$tr->tr('Stránka: {PAGE_INFO}.').'</p>'
-            . '<p>'.$tr->tr('Odesláno: {DATE} {TIME}.').'</p>'
+            . '<p>'.$tr->tr('Odesláno: <strong>{DATE} {TIME}</strong>.').'</p>'
+            . '<hr />'
             . '<h2>'.$tr->tr('Odeslaná data').': </h2>'
             . '<p><table cellpadding="5" border="1">'
             . '{DATA}'
-            . ' </table></p><br />'
+            . ' </table></p>'
+            . '<hr />'
             . '<p>{FOOTER_INFO}</p>'
-            . '<p style="font-size: small;">'
-            . $tr->tr('Odesláno z IP adresy: {IP_ADDRESS}.').'<br />'
+            . '<p class="footer">'. $tr->tr('Odesláno z IP adresy: {IP_ADDRESS}.').'<br />'
             . '<strong><em>{GENERATE_WARNING}</em></strong></p>'
             . ' </body>'
             . '</html>';
@@ -572,7 +595,7 @@ class Forms_Controller extends Controller {
       }
 
       $pageInfo = '<a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a>';
-      if($replacements['{PAGE_NAME}'] != null){
+      if(isset($replacements['{PAGE_NAME}']) && $replacements['{PAGE_NAME}'] != null){
          $pageInfo .= ' / <a href="{PAGE_LINK}">{PAGE_NAME}</a>';
       }
       
@@ -580,7 +603,7 @@ class Forms_Controller extends Controller {
          '{PAGE_INFO}' => $pageInfo,
          '{PAGE_LINK}' => null,
          '{PAGE_NAME}' => null,
-         '{CATEGORY_LINK}' => '<a href="'.$link.'">{CATEGORY_NAME}</a>',
+         '{CATEGORY_LINK}' => (string)$link,
          '{CATEGORY_NAME}' => Category::getSelectedCategory()->getName(),
          '{WEB_LINK}' => '<a href="'.$link->clear(true).'">{WEB_NAME}</a>',
          '{WEB_NAME}' => VVE_WEB_NAME,
@@ -593,8 +616,6 @@ class Forms_Controller extends Controller {
          '{GENERATE_WARNING}' => $tr->tr('Tento e-mail je genrován automaticky. Neodpovídejte na něj!'),
       ), $replacements);
       
-         
-         
       $mail->setReplacements($replacements);   
       $mail->setContent($msg);
       

@@ -7,6 +7,9 @@
 .form-item .param-name {
    width: 20%;
 }
+.form-item td, .form-item th {
+   padding: 3px;
+}
 
 /* edit form */
 .ui-widget-header,

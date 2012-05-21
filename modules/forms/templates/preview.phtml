@@ -6,12 +6,24 @@ echo $this->toolbox;
 ?>
 <h1><?ps($h);?></h1>
 <div class="form-edit">
-   <div class="module-tool-buttons">
-      <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Zpět na seznam formulářů')?>"
-         ><img src="images/icons/resultset_previous.png" alt="back" /> <?=$this->tr('Zpět na seznam')?></a>
-      <a href="<?=$this->link()->route('editForm')->param('back', (string)$this->link())?>" title="<?=$this->tr('Upravit formulář')?>"
-         ><img src="images/icons/application_form_edit.png" alt="edit" /> <?=$this->tr('Upravit formulář')?></a>
-   </div>
+   <?
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route(),
+         'title' => $this->tr('Zpět na seznam formulářů'),
+         'icon' => 'resultset_previous.png',
+         'name' => $this->tr('Zpět na seznam'),
+      ),
+      array(
+         'link' => $this->link()->route('editForm')->param('back', (string)$this->link()),
+         'title' => $this->tr('Upravit formulář'),
+         'icon' => 'application_form_edit.png',
+         'name' => $this->tr('Upravit formulář'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <hr class="reseter" />
    <?if($this->sendData != null){?>
    <h2><?ps($this->tr('Odeslaná data'))?></h2>
    <div>

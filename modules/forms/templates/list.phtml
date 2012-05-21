@@ -4,11 +4,17 @@ echo $this->toolbox;
 ?>
 <h1><?ps($this->category()->getName());?></h1>
 <div id="forms-main" class="form-edit">
-   <div class="module-tool-buttons">
-      <a href="<?=$this->link()->route('createForm')?>" title="<?=$this->tr('Vytvořit nový formulář')?>"
-         ><img src="images/icons/application_form_add.png" alt="add" /> <?=$this->tr('Vytvořit formulář')?></a>
-   </div>
    <?
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('createForm'),
+         'title' => $this->tr('Vytvořit nový formulář'),
+         'icon' => 'application_form_add.png',
+         'name' => $this->tr('Vytvořit formulář'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   
    if(!empty($this->forms)){
    foreach ($this->forms as $form) {?>
    <table class="ui-widget full-width form-item">
@@ -30,8 +36,8 @@ echo $this->toolbox;
          </td>
       </tr>
       <tr class="ui-widget-content">
-         <th scope="row" class="param-name"><?=$this->tr('Počet odeslání')?>:</th>
-         <td><?=$form->{Forms_Model::COLUMN_SENDED}?></td>
+         <th scope="row" class="param-name"><?=$this->tr('Formulář odeslán')?>:</th>
+         <td><?=$form->{Forms_Model::COLUMN_SENDED}?>x</td>
       </tr>
    </table>
    <?}
