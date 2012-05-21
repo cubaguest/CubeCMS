@@ -48,7 +48,7 @@
 	}
 
 	function setVal(id, value, name) {
-		if (typeof(value) != 'undefined') {
+		if (typeof(value) != 'undefined' && value != null) {
 			var elm = get(id);
 
 			if (elm.nodeName == "SELECT")
@@ -176,14 +176,14 @@
 						formItemName = type == 'global' ? name : type + '_' + name;
 
 						if (type == 'global')
-							list = data;
-						else if (type == 'video' || type == 'audio') {
+						list = data;
+					else if (type == 'video' || type == 'audio') {
 							list = data.video.attrs;
 
 							if (!list && !to_form)
-								data.video.attrs = list = {};
+							data.video.attrs = list = {};
 						} else
-							list = data.params;
+						list = data.params;
 
 						if (list) {
 							if (to_form) {
@@ -295,12 +295,10 @@
 			} else {
 				src = getVal("src");
 
-            var width = 320;
-            var height = 240;
 				// YouTube *NEW*
 				if (src.match(/youtu.be\/[a-z1-9.-_]+/)) {
-					width = 425;
-					height = 350;
+					data.width = 425;
+					data.height = 350;
 					data.params.frameborder = '0';
 					data.type = 'iframe';
 					src = 'http://www.youtube.com/embed/' + src.match(/youtu.be\/([a-z1-9.-_]+)/)[1];
@@ -310,20 +308,19 @@
 
 				// YouTube
 				if (src.match(/youtube.com(.+)v=([^&]+)/)) {
-					width = 425;
-					height = 350;
+					data.width = 425;
+					data.height = 350;
 					data.params.frameborder = '0';
 					data.type = 'iframe';
 					src = 'http://www.youtube.com/embed/' + src.match(/v=([^&]+)/)[1];
 					setVal('src', src);
 					setVal('media_type', data.type);
-               
 				}
-            
+
 				// Vimeo
 				if (src.match(/vimeo.com\/([0-9]+)/)) {
-					width = 425;
-					height = 350;
+					data.width = 425;
+					data.height = 350;
 					data.params.frameborder = '0';
 					data.type = 'iframe';
 					src = 'http://player.vimeo.com/video/' + src.match(/vimeo.com\/([0-9]+)/)[1];
@@ -333,8 +330,8 @@
             
 				// stream.cz
 				if (src.match(/stream.cz\/((?!object).)*\/([0-9]+)/)) {
-					width = 425;
-					height = 350;
+					data.width = 425;
+					data.height = 350;
 					data.params.frameborder = '0';
 					data.type = 'iframe';
 					src = 'http://www.stream.cz/object/' + src.match(/stream.cz\/[^/]+\/([0-9]+)/)[1];
@@ -344,8 +341,8 @@
 				
 				// Google maps
 				if (src.match(/maps.google.[a-z]{2,3}\/maps(\/ms\?msid|\?q)=(.+)/)) {
-					width = 425;
-					height = 350;
+					data.width = 425;
+					data.height = 350;
 					data.params.frameborder = '0';
 					data.type = 'iframe';
                var mparams = src.match(/\/maps(\/ms\?msid|\?q)=(.+)/);
@@ -356,18 +353,13 @@
 
 				// Google video
 				if (src.match(/video.google.com(.+)docid=([^&]+)/)) {
-					width = 425;
-					height = 326;
+					data.width = 425;
+					data.height = 326;
 					data.type = 'flash';
 					src = 'http://video.google.com/googleplayer.swf?docId=' + src.match(/docid=([^&]+)/)[1] + '&hl=en';
 					setVal('src', src);
 					setVal('media_type', data.type);
 				}
-            
-            if (typeof data.width === "undefined" || typeof data.height === "undefined"){
-               data.width = width;
-               data.height = height;
-            }
 
 				if (data.type == 'video') {
 					if (!data.video.sources)
@@ -395,13 +387,12 @@
                     src = getVal("audio_altsource2");
                     if (src)
                         data.video.sources[2] = {src : src};
-				} else {
+				} else
 					data.params.src = src;
-            }
 
 				// Set default size
-            setVal('width', data.width || (data.type == 'audio' ? 300 : 320));
-            setVal('height', data.height || (data.type == 'audio' ? 32 : 240));
+                setVal('width', data.width || (data.type == 'audio' ? 300 : 320));
+                setVal('height', data.height || (data.type == 'audio' ? 32 : 240));
 			}
 		},
 
@@ -470,24 +461,30 @@
 		},
 
 		getMediaTypeHTML : function(editor) {
-			function option(media_type){
+			function option(media_type, element) {
+				if (!editor.schema.getElementRule(element || media_type)) {
+					return '';
+				}
+
 				return '<option value="'+media_type+'">'+tinyMCEPopup.editor.translate("media_dlg."+media_type)+'</option>'
 			}
+
 			var html = "";
+
 			html += '<select id="media_type" name="media_type" onchange="Media.formToData(\'type\');">';
 			html += option("video");
 			html += option("audio");
-			html += option("flash");
-			html += option("quicktime");
-			html += option("shockwave");
-			html += option("windowsmedia");
-			html += option("realmedia");
+			html += option("flash", "object");
+			html += option("quicktime", "object");
+			html += option("shockwave", "object");
+			html += option("windowsmedia", "object");
+			html += option("realmedia", "object");
 			html += option("iframe");
 
 			if (editor.getParam('media_embedded_audio', false)) {
-				html += option('embeddedaudio');
+				html += option('embeddedaudio', "object");
 			}
-			
+
 			html += '</select>';
 			return html;
 		},
