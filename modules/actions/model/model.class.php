@@ -32,9 +32,12 @@ class Actions_Model extends Model_ORM {
    const COLUMN_PLACE = 'place';
    const COLUMN_PRICE = 'price';
    const COLUMN_PREPRICE = 'preprice';
+   const COLUMN_FORM = 'id_form';
+   const COLUMN_FORM_SHOW_TO = 'form_show_to_date';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_act');
+      $this->setPk(self::COLUMN_ID);
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_CAT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
@@ -67,6 +70,9 @@ class Actions_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_PLACE, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR ));
       $this->addColumn(self::COLUMN_PRICE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_PREPRICE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      
+      $this->addColumn(self::COLUMN_FORM, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_FORM_SHOW_TO, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
    }
    
    public function setPastOnly($idc)
@@ -75,7 +81,7 @@ class Actions_Model extends Model_ORM {
          AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
          AND 
          (
-            (".self::COLUMN_DATE_START." <= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL AND ".self::COLUMN_TIME." < CURTIME() )
+            (".self::COLUMN_DATE_START." <= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL )
             OR (".self::COLUMN_DATE_START." < CURDATE() AND ".self::COLUMN_TIME." IS NULL )
          )", 
          array("idc" => $idc));
@@ -87,7 +93,7 @@ class Actions_Model extends Model_ORM {
          AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
          AND 
          (
-            (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL AND ".self::COLUMN_TIME." >= CURTIME() )
+            (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL )
             OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_TIME." IS NULL )
          )", 
          array("idc" => $idc));
@@ -98,7 +104,7 @@ class Actions_Model extends Model_ORM {
          AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
          AND 
          (
-            (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL AND ".self::COLUMN_TIME." >= CURTIME() )
+            (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL )
             OR (".self::COLUMN_DATE_START." < CURDATE() AND ".self::COLUMN_DATE_STOP." IS NOT NULL AND ".self::COLUMN_DATE_STOP." >= CURDATE() )
             OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_TIME." IS NULL )
          )", 

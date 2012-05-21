@@ -20,6 +20,7 @@ $this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIDatepicker();
+$jQuery->addUITimepicker();
 $this->addJsPlugin($jQuery);
 
 ?>
@@ -32,9 +33,23 @@ $this->addJsPlugin($jQuery);
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
-         $("input[name=action_date_start]").datepicker();
-         $("input[name=action_date_stop]").datepicker();
+         $.datepicker.setDefaults( $.datepicker.regional[ "<?=Locales::getLang()?>" ] );
+         var dates = $('input#action_date_start_1, input#action_date_stop_1').datepicker({
+            showButtonPanel: true, showOtherMonths: true, selectOtherMonths: true,
+            onSelect: function( selectedDate ) {
+               var option = this.id == "action_date_start_1" ? "minDate" : "maxDate",
+               instance = $( this ).data( "datepicker" ),
+               date = $.datepicker.parseDate(
+               instance.settings.dateFormat ||
+               $.datepicker._defaults.dateFormat,
+                  selectedDate, instance.settings );
+               dates.not( this ).datepicker( "option", option, date );
+            }
+         });
+         $('input#action_formShowToDate_1').datepicker({
+            showButtonPanel: true, showOtherMonths: true, selectOtherMonths: true
+         });
+         $('input#action_time_1').timepicker({ stepMinute: 5 });
       });
       /* ]]> */
    </script>

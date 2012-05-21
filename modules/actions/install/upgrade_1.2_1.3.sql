@@ -1,0 +1,4 @@
+ALTER TABLE `{PREFIX}actions` 
+ADD COLUMN `id_form` INT NULL DEFAULT NULL  AFTER `changed`
+ADD COLUMN `form_show_to_date` DATETIME NULL DEFAULT NULL AFTER `id_form` ;
+

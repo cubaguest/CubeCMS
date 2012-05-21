@@ -1,60 +1,65 @@
 <? // načtení detailu
-$this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
+$this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
+$image = null;
+if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
+   $imgSrc = vve_image_cacher(vve_tpl_art_title_image($this->action->{Actions_Model::COLUMN_IMAGE}), 300, 225);
+   $imgAlt = htmlspecialchars($this->action->{Actions_Model::COLUMN_NAME});
+   $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
+}
+
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model_Detail::COLUMN_NAME}?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model::COLUMN_NAME}?></h1>
 <div class="post">
-   <?if($this->action->{Actions_Model_Detail::COLUMN_SUBANME} != null) {?>
-   <div class="text subname"><?=$this->action->{Actions_Model_Detail::COLUMN_SUBANME}?></div>
+   <?if($this->action->{Actions_Model::COLUMN_SUBANME} != null) {?>
+   <div class="text subname"><?=$this->action->{Actions_Model::COLUMN_SUBANME}?></div>
    <?}?>
-   <?if($this->action->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
-   <div class="text author"><?=$this->action->{Actions_Model_Detail::COLUMN_AUTHOR}?></div>
+   <?if($this->action->{Actions_Model::COLUMN_AUTHOR} != null) {?>
+   <div class="text author"><?=$this->action->{Actions_Model::COLUMN_AUTHOR}?></div>
       <?}?>
    <div class="text info">
       <?
-      $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_START}));
-      $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+      $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_START}));
+      $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_STOP}));
       print ($startDate);
-      if($startDate != $stopDate AND $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+      if($startDate != $stopDate AND $this->action->{Actions_Model::COLUMN_DATE_STOP} != null) {
          echo ("&nbsp;&mdash;&nbsp;");
          echo ($stopDate);
       }
-      if($this->action->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00'|null) {
-         $time = new DateTime($this->action->{Actions_Model_Detail::COLUMN_TIME});
+      if($this->action->{Actions_Model::COLUMN_TIME} != '00:00:00'|null) {
+         $time = new DateTime($this->action->{Actions_Model::COLUMN_TIME});
          echo (",&nbsp;".$time->format("G:i"));
       }
-      if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null) {
-         echo ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
+      if($this->action->{Actions_Model::COLUMN_PLACE} != null) {
+         echo ',&nbsp;'.$this->action->{Actions_Model::COLUMN_PLACE};
       }
-      if((int)$this->action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-         printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PRICE});
+      if((int)$this->action->{Actions_Model::COLUMN_PRICE} != null|0) {
+         printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$this->action->{Actions_Model::COLUMN_PRICE});
       }
-      if((int)$this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-         printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
+      if((int)$this->action->{Actions_Model::COLUMN_PREPRICE} != null|0) {
+         printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$this->action->{Actions_Model::COLUMN_PREPRICE});
       }
       ?>
    </div>
-   <?if($this->action->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-   <div class="text note"><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></div>
+   <?if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
+   <div class="text note"><?=$this->action->{Actions_Model::COLUMN_NOTE}?></div>
       <?}?>
-   <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
-   <div class="title-image">
-      <?echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model_Detail::COLUMN_IMAGE}), 'image', null,null, 'post-image'));?>
-   </div>
-   <?}?>
+   <?if($image != null) {?><div class="title-image"><?echo $image;?></div><?}?>
    <div class="text">
-   <?=$this->action->{Actions_Model_Detail::COLUMN_TEXT}?>
+   <?=$this->action->{Actions_Model::COLUMN_TEXT}?>
    </div>
    <hr class="reseter" />
    <?
+   $this->includeFile("tpl://forms:snipshet.phtml");
+   
    if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
       $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));
    }
    ?>
    <?$this->includeTpl('articletools.phtml', true, array(
-           'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+           'lastEditTime' => $this->action->{Actions_Model::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
-           'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model_Detail::COLUMN_NAME})));?>
+           'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model::COLUMN_NAME})));?>
 
    <?
    echo $this->toolbox;

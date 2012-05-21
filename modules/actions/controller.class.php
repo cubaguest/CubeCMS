@@ -95,8 +95,11 @@ class Actions_Controller extends Controller {
    
    protected function showEvent($urlkey = null)
    {
-      $model = new Actions_Model_Detail();
-      $this->view()->action = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
+      $model = new Actions_Model();
+      $model = new Actions_Model();
+      $this->view()->action = $model->where(Actions_Model::COLUMN_ID_CAT." = :idc AND ".Actions_Model::COLUMN_URLKEY." = :urlkey", 
+         array( 'urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
+         ->record();
       if($this->view()->action == false) {
          return false;
       }
@@ -126,6 +129,19 @@ class Actions_Controller extends Controller {
       $shares->setConfig('title', $this->view()->action->{Actions_Model_Detail::COLUMN_NAME});
       $this->view()->shares=$shares;
       $this->view()->imagesDir=$this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()];
+      
+      if($this->view()->action->{Actions_Model::COLUMN_FORM} != null){
+         $date = new DateTime($this->view()->action->{Actions_Model::COLUMN_FORM_SHOW_TO});
+         $curDate = new DateTime();
+         $curDate->setTime(0, 0, 0);
+         if($this->view()->action->{Actions_Model::COLUMN_FORM_SHOW_TO} == null 
+            || $date >= $curDate){
+            Forms_Controller::dynamicForm($this->view()->action->{Actions_Model::COLUMN_FORM}, $this->view(), 
+               array( 
+                  'pagename'=> $this->view()->action->{Actions_Model::COLUMN_NAME},
+                  ));
+         }
+      }
    }
 
    public function showController() {
@@ -194,40 +210,56 @@ class Actions_Controller extends Controller {
       }
 
       if($form->isValid()) {
-         $model = new Actions_Model_Detail();
-
-         $file = null;
+         $model = new Actions_Model();
+         $action = $model->newRecord();
+         
          // vybrání exist. obrázku
          if(isset ($form->titleImage)){
-            $file = $form->titleImage->getValues();
+            $action->{Actions_Model::COLUMN_IMAGE} = $form->titleImage->getValues();
          }
-         
          // pokud je nový obr nahrajeme jej
          if($form->image->getValues() != null) {
-            $f = $form->image->getValues();
-            $image = new Filesystem_File_Image($form->image);
-            $image->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
-            $image->resampleImage($this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W),
-               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H),
-               $this->category()->getParam('img_crop', true));
-            $image->save();
-            $file = $image->getName();
-            unset ($fileObj);
+            $imageObj = new File_Image($form->image);
+            $imageObj->getData()->resize(
+               $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W), 
+               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H), 
+               $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C)
+               )->save();
+            $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
+            $action->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();
          }
-
-         $ids = $model->saveAction($form->name->getValues(), $form->subname->getValues(),
-                 $form->author->getValues(),
-                 $form->text->getValues(), $form->note->getValues(), $form->urlkey->getValues(),
-                 $form->date_start->getValues(), $form->date_stop->getValues(),
-                 $form->time->getValues(),$form->place->getValues(),
-                 $form->price->getValues(),$form->preprice->getValues(),
-                 $file, $this->category()->getId(), Auth::getUserId(),
-                 $form->public->getValues());
-
-         $act = $model->getActionById($ids);
+         
+         // generování url klíče
+         $urlkeys = $form->urlkey->getValues();
+         $names = $form->name->getValues();
+         $urlkeys = $this->createUrlKey($urlkeys, $names, $action->{Actions_Model::COLUMN_ID});
+         
+         $action->{Actions_Model::COLUMN_NAME} = $form->name->getValues();
+         $action->{Actions_Model::COLUMN_SUBANME} = $form->subname->getValues();
+         $action->{Actions_Model::COLUMN_AUTHOR} = $form->author->getValues();
+         $action->{Actions_Model::COLUMN_TEXT} = $form->text->getValues();
+         $action->{Actions_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues());
+         $action->{Actions_Model::COLUMN_NOTE} = $form->note->getValues();
+         $action->{Actions_Model::COLUMN_URLKEY} = $urlkeys;
+         $action->{Actions_Model::COLUMN_DATE_START} = $form->date_start->getValues();
+         $action->{Actions_Model::COLUMN_DATE_STOP} = $form->date_stop->getValues();
+         $action->{Actions_Model::COLUMN_TIME} = $form->time->getValues();
+         $action->{Actions_Model::COLUMN_PLACE} = $form->place->getValues();
+         $action->{Actions_Model::COLUMN_PRICE} = $form->price->getValues();
+         $action->{Actions_Model::COLUMN_PREPRICE} = $form->preprice->getValues();
+         $action->{Actions_Model::COLUMN_ADDED} = new DateTime();
+         
+         $action->{Actions_Model::COLUMN_ID_USER} = Auth::getUserId();
+         $action->{Actions_Model::COLUMN_PUBLIC} = $form->public->getValues();
+         if(isset($form->form)){
+            $action->{Actions_Model::COLUMN_FORM} = $form->form->getValues();
+            $action->{Actions_Model::COLUMN_FORM_SHOW_TO} = $form->formShowToDate->getValues();
+         }
+         
+         $model->save($action);
 
          $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
-         $this->link()->route('detail', array('urlkey' => $act->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
+         $this->link()->route('detail', array('urlkey' => $action->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
       }
 
       // odkaz zpět
@@ -244,38 +276,47 @@ class Actions_Controller extends Controller {
       $this->checkWritebleRights();
 
 
-      $model = new Actions_Model_Detail();
-      $action = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
+      $model = new Actions_Model();
+      $action = $model->where(Actions_Model::COLUMN_ID_CAT." = :idc AND ".Actions_Model::COLUMN_URLKEY." = :urlkey", 
+         array( 'urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
+         ->record();
+      
       if($action == false) return false;
-
+      
       $form = $this->createForm(true);
 
-      $form->name->setValues($action->{Actions_Model_Detail::COLUMN_NAME});
-      $form->text->setValues($action->{Actions_Model_Detail::COLUMN_TEXT});
-      $form->note->setValues($action->{Actions_Model_Detail::COLUMN_NOTE});
-      $dateS = new DateTime($action->{Actions_Model_Detail::COLUMN_DATE_START});
+      $form->name->setValues($action->{Actions_Model::COLUMN_NAME});
+      $form->text->setValues($action->{Actions_Model::COLUMN_TEXT});
+      $form->note->setValues($action->{Actions_Model::COLUMN_NOTE});
+      $dateS = new DateTime($action->{Actions_Model::COLUMN_DATE_START});
       $form->date_start->setValues(strftime("%x",$dateS->format("U")));
-      if($action->{Actions_Model_Detail::COLUMN_DATE_START} != $action->{Actions_Model_Detail::COLUMN_DATE_STOP}
-              AND $action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
-         $dateE = new DateTime($action->{Actions_Model_Detail::COLUMN_DATE_STOP});
+      if($action->{Actions_Model::COLUMN_DATE_START} != $action->{Actions_Model::COLUMN_DATE_STOP}
+              AND $action->{Actions_Model::COLUMN_DATE_STOP} != null) {
+         $dateE = new DateTime($action->{Actions_Model::COLUMN_DATE_STOP});
          $form->date_stop->setValues(strftime("%x",$dateE->format("U")));
       }
-      $form->urlkey->setValues($action->{Actions_Model_Detail::COLUMN_URLKEY});
-      $form->public->setValues($action->{Actions_Model_Detail::COLUMN_PUBLIC});
-      $form->time->setValues($action->{Actions_Model_Detail::COLUMN_TIME});
-      $form->place->setValues($action->{Actions_Model_Detail::COLUMN_PLACE});
-      $form->price->setValues($action->{Actions_Model_Detail::COLUMN_PRICE});
-      $form->preprice->setValues($action->{Actions_Model_Detail::COLUMN_PREPRICE});
-      $form->author->setValues($action->{Actions_Model_Detail::COLUMN_AUTHOR});
-      $form->subname->setValues($action->{Actions_Model_Detail::COLUMN_SUBANME});
+      $form->urlkey->setValues($action->{Actions_Model::COLUMN_URLKEY});
+      $form->public->setValues($action->{Actions_Model::COLUMN_PUBLIC});
+      $form->time->setValues($action->{Actions_Model::COLUMN_TIME});
+      $form->place->setValues($action->{Actions_Model::COLUMN_PLACE});
+      $form->price->setValues($action->{Actions_Model::COLUMN_PRICE});
+      $form->preprice->setValues($action->{Actions_Model::COLUMN_PREPRICE});
+      $form->author->setValues($action->{Actions_Model::COLUMN_AUTHOR});
+      $form->subname->setValues($action->{Actions_Model::COLUMN_SUBANME});
       if(isset ($form->titleImage)){
-         $form->titleImage->setValues($action->{Actions_Model_Detail::COLUMN_IMAGE});
+         $form->titleImage->setValues($action->{Actions_Model::COLUMN_IMAGE});
       }
-
-      if($action->{Actions_Model_Detail::COLUMN_IMAGE} == null) {
+      if($action->{Actions_Model::COLUMN_IMAGE} == null) {
          $form->image->setSubLabel($this->tr('Źádný obrázek'));
       } else {
-         $form->image->setSubLabel($action->{Actions_Model_Detail::COLUMN_IMAGE});
+         $form->image->setSubLabel($action->{Actions_Model::COLUMN_IMAGE});
+      }
+      
+      if(isset ($form->form)){
+         $form->form->setValues($action->{Actions_Model::COLUMN_FORM});
+         if($action->{Actions_Model::COLUMN_FORM_SHOW_TO} != null){
+            $form->formShowToDate->setValues(vve_date("%x", new DateTime($action->{Actions_Model::COLUMN_FORM_SHOW_TO})));
+         }
       }
 
       // kontrola integrity data
@@ -291,48 +332,59 @@ class Actions_Controller extends Controller {
       }
 
       if($form->isValid()) {
-         $file = $action->{Actions_Model_Detail::COLUMN_IMAGE};
-
          // vybrání exist. obrázku
          if(isset ($form->titleImage)){
-            $file = $form->titleImage->getValues();
+            $action->{Actions_Model::COLUMN_IMAGE} = $form->titleImage->getValues();
          }
          // pokud je nový obr nahrajeme jej
          if($form->image->getValues() != null) {
-            $f = $form->image->getValues();
-            $file = $f['name'];
-            $fileObj = new Filesystem_File($form->image);
-            $fileObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
-            $image = new Filesystem_File_Image($fileObj);
-            $image->resampleImage($this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W),
-               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H),
-               $this->category()->getParam('img_crop', true));
-            $image->save();
-            unset ($fileObj,$image);
+            $imageObj = new File_Image($form->image);
+            $imageObj->getData()->resize(
+               $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W), 
+               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H), 
+               $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C)
+               )->save();
+            $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
+            $action->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();
+         }
+         
+         // generování url klíče
+         $urlkeys = $form->urlkey->getValues();
+         $names = $form->name->getValues();
+         $urlkeys = $this->createUrlKey($urlkeys, $names, $action->{Actions_Model::COLUMN_ID});
+
+         $oldDir = $action->{Actions_Model::COLUMN_URLKEY}[Locales::getDefaultLang()];
+         $newDir = $urlkeys[Locales::getDefaultLang()];
+         // přesun adresáře pokud existuje
+         if($oldDir != $newDir AND is_dir($this->category()->getModule()->getDataDir().$oldDir)){
+            rename($this->category()->getModule()->getDataDir().$oldDir, $this->category()->getModule()->getDataDir().$newDir);
          }
 
-         // pokud není zadáno konečé datum
-         $model->saveAction($form->name->getValues(), $form->subname->getValues(), $form->author->getValues(),
-                 $form->text->getValues(), $form->note->getValues(), $form->urlkey->getValues(),
-                 $form->date_start->getValues(), $form->date_stop->getValues(),
-                 $form->time->getValues(),$form->place->getValues(),$form->price->getValues(),
-                 $form->preprice->getValues(), $file, $this->category()->getId(), Auth::getUserId(),
-                 $form->public->getValues(),$action->{Actions_Model_Detail::COLUMN_ID});
-
-         $actionNew = $model->getActionById($action->{Actions_Model_Detail::COLUMN_ID});
-
-         // přejmenování složky
-         if($action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                 != $actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-            AND file_exists($this->category()->getModule()->getDataDir()
-                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()])) {
-            $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir()
-                            .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
-            $dir->rename($actionNew[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
+         $action->{Actions_Model::COLUMN_NAME} = $form->name->getValues();
+         $action->{Actions_Model::COLUMN_SUBANME} = $form->subname->getValues();
+         $action->{Actions_Model::COLUMN_AUTHOR} = $form->author->getValues();
+         $action->{Actions_Model::COLUMN_TEXT} = $form->text->getValues();
+         $action->{Actions_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues());
+         $action->{Actions_Model::COLUMN_NOTE} = $form->note->getValues();
+         $action->{Actions_Model::COLUMN_URLKEY} = $urlkeys;
+         $action->{Actions_Model::COLUMN_DATE_START} = $form->date_start->getValues();
+         $action->{Actions_Model::COLUMN_DATE_STOP} = $form->date_stop->getValues();
+         $action->{Actions_Model::COLUMN_TIME} = $form->time->getValues();
+         $action->{Actions_Model::COLUMN_PLACE} = $form->place->getValues();
+         $action->{Actions_Model::COLUMN_PRICE} = $form->price->getValues();
+         $action->{Actions_Model::COLUMN_PREPRICE} = $form->preprice->getValues();
+         
+         $action->{Actions_Model::COLUMN_ID_USER} = Auth::getUserId();
+         $action->{Actions_Model::COLUMN_PUBLIC} = $form->public->getValues();
+         if(isset($form->form)){
+            $action->{Actions_Model::COLUMN_FORM} = $form->form->getValues();
+            $action->{Actions_Model::COLUMN_FORM_SHOW_TO} = $form->formShowToDate->getValues();
          }
-
+         
+         $model->save($action);
+         
          $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
-         $this->link()->route('detail', array('urlkey' => $actionNew->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
+         $this->link()->route('detail', array('urlkey' => $action->{Actions_Model::COLUMN_URLKEY}))->reload();
       }
 
       // odkaz zpět
@@ -341,67 +393,78 @@ class Actions_Controller extends Controller {
       $this->view()->form = $form;
       $this->view()->edit = true;
       $this->view()->action = $action;
-
    }
 
    /**
     * Vytvoří formulář pro úpravu akce
     * @return From
     */
-   public function createForm($delImg = false) {
+   protected function createForm($delImg = false) {
       $form = new Form('action_');
 
+      $fGrpBase = $form->addGroup('base', $this->tr('Základní informace'));
+      
       $eName = new Form_Element_Text('name', $this->tr('Název'));
       $eName->setLangs();
       $eName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
-      $form->addElement($eName);
+      $form->addElement($eName, $fGrpBase);
 
       $esName = new Form_Element_Text('subname', $this->tr('Pod název'));
       $esName->setLangs();
-      $form->addElement($esName);
+      $form->addElement($esName, $fGrpBase);
 
       $eAuthor = new Form_Element_Text('author', $this->tr('Autor/ účinkující'));
-      $form->addElement($eAuthor);
+      $form->addElement($eAuthor, $fGrpBase);
 
       $eText = new Form_Element_TextArea('text', $this->tr('Text'));
       $eText->setLangs();
       $eText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
-      $form->addElement($eText);
+      $form->addElement($eText, $fGrpBase);
 
       $eNote = new Form_Element_Text('note', $this->tr('Poznámka'));
       $eNote->setLangs();
       $eNote->html()->setAttrib('size', 50);
-      $form->addElement($eNote);
+      $form->addElement($eNote, $fGrpBase);
+      
+      $fGrpParams = $form->addGroup('params', $this->tr('Parametry konání'));
 
       $eDateS = new Form_Element_Text('date_start', $this->tr('Od'));
       $eDateS->addValidation(new Form_Validator_NotEmpty());
       $eDateS->addValidation(new Form_Validator_Date());
       $eDateS->addFilter(new Form_Filter_DateTimeObj());
-      $form->addElement($eDateS);
+      $form->addElement($eDateS, $fGrpParams);
 
       $eDateT = new Form_Element_Text('date_stop', $this->tr('Do'));
       $eDateT->addValidation(new Form_Validator_Date());
       $eDateT->addFilter(new Form_Filter_DateTimeObj());
-      $form->addElement($eDateT);
+      $form->addElement($eDateT, $fGrpParams);
 
       $eTime = new Form_Element_Text('time', $this->tr('Čas konání'));
+      $eTime->setSubLabel($this->tr('Pokud akce nemá čas začátku, nechte prázdné'));
       $eTime->addValidation(new Form_Validator_Time());
-      $form->addElement($eTime);
+      $form->addElement($eTime, $fGrpParams);
 
       $ePlace = new Form_Element_Text('place', $this->tr('Místo konání'));
-      $form->addElement($ePlace);
+      $form->addElement($ePlace, $fGrpParams);
 
       $ePrice = new Form_Element_Text('price', $this->tr('Cena'));
       $ePrice->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($ePrice);
+      $form->addElement($ePrice, $fGrpParams);
 
       $ePrePrice = new Form_Element_Text('preprice', $this->tr('Cena v předprodeji'));
       $ePrePrice->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($ePrePrice);
+      $form->addElement($ePrePrice, $fGrpParams);
 
+      $fGrpOther = $form->addGroup('other', $this->tr('Ostatní'));
+      
+      $ePub = new Form_Element_Checkbox('public', $this->tr('Veřejný'));
+      $ePub->setSubLabel($this->tr('Veřejný - viditelný všem návštěvníkům'));
+      $ePub->setValues(true);
+      $form->addElement($ePub, $fGrpOther);
+      
       $eFile = new Form_Element_File('image', $this->tr('Obrázek'));
       $eFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'png')));
-      $form->addElement($eFile);
+      $form->addElement($eFile, $fGrpOther);
 
       if(is_dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR)){
          $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png}", GLOB_BRACE);
@@ -413,19 +476,31 @@ class Actions_Controller extends Controller {
             foreach($images as $image) {
                $elemImgSel->setOptions(array(basename($image) => basename($image)), true);
             }
-            $form->addElement($elemImgSel);
+            $form->addElement($elemImgSel, $fGrpOther);
          }
       }
 
       $eUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $eUrlKey->setLangs();
       $eUrlKey->setSubLabel($this->tr('Pokud není klíč zadán, je generován automaticky'));
-      $form->addElement($eUrlKey);
-
-      $ePub = new Form_Element_Checkbox('public', $this->tr('Veřejný'));
-      $ePub->setSubLabel($this->tr('Veřejný - viditelný všem návštěvníkům'));
-      $ePub->setValues(true);
-      $form->addElement($ePub);
+      $form->addElement($eUrlKey, $fGrpOther);
+      
+      $fModel = new Forms_Model();
+      $forms = $fModel->getForms();
+      if(!empty($forms)){
+         $eForm = new Form_Element_Select('form', $this->tr('Přiřazený formulář'));
+         $eForm->setOptions(array('0' => $this->tr('Žádný')), true);
+         foreach ($forms as $f) {
+            $eForm->setOptions(array($f->{Forms_Model::COLUMN_ID} => $f->{Forms_Model::COLUMN_NAME}), true);
+         }
+         $form->addElement($eForm, $fGrpOther);
+         
+         $eFormShowTo = new Form_Element_Text('formShowToDate', $this->tr('Formulář zobrazit do'));
+         $eFormShowTo->setSubLabel($this->tr('Pro neomezené zobrazení formuláře nechte prázdné'));
+         $eFormShowTo->addValidation(new Form_Validator_Date());
+         $eFormShowTo->addFilter(new Form_Filter_DateTimeObj());
+         $form->addElement($eFormShowTo, $fGrpOther);
+      }
 
       $eSub = new Form_Element_SaveCancel('save');
       $form->addElement($eSub);
@@ -433,6 +508,49 @@ class Actions_Controller extends Controller {
       return $form;
    }
 
+   /**
+    * Metoda vygeneruje url klíče
+    * @param <type> $urlkeys
+    * @param <type> $names
+    * @return <type>
+    */
+   protected function createUrlKey($urlkeys, $names, $id = 0) {
+      foreach ($urlkeys as $lang => $key) {
+         if($key == null AND $names[$lang] == null) {
+            $urlkeys[$lang] = null;
+         } else if($key == null) {
+            $urlkeys[$lang] = $names[$lang];
+         } else {
+            $urlkeys[$lang] = $key;
+         }
+         // kontrola unikátnosti
+         $urlkeys[$lang] = $this->createUniqueUrlKey($urlkeys[$lang], $lang, $id);
+      }
+      return $urlkeys;
+   }
+   
+   protected function createUniqueUrlKey($key, $lang, $id = 0)
+   {
+      if($key == null){
+         return null;
+      }
+      
+      $model = new Actions_Model();
+      $step = 1;
+      $key = vve_cr_url_key($key);
+      $origPart = $key;
+      
+      $where = '('.$lang.')'.Actions_Model::COLUMN_URLKEY.' = :ukey AND '.Actions_Model::COLUMN_ID.' != :id';
+      $keys = array('ukey' => $key, 'id' => (int)$id);// when is nul bad sql query is created
+      
+      while ($model->where($where, $keys)->count() != 0 ) {
+         $keys['ukey'] = $origPart.'-'.$step;
+         $step++;
+      }
+      
+      return $keys['ukey'];
+   }
+   
    public function editLabelController() {
       $this->checkControllRights();
       $form = new Form('modlabel');
@@ -506,31 +624,31 @@ class Actions_Controller extends Controller {
          $form->show_event_directly->setValues($settings[self::PARAM_SHOW_EVENT_DIRECTLY]);
       }
 
-      $form->addGroup('images', 'Nastavení obrázků');
+//      $form->addGroup('images', 'Nastavení obrázků');
 
-      $elemIW = new Form_Element_Text('img_width', 'Šířka titulního obrázku (px)');
-      $elemIW->addValidation(new Form_Validator_IsNumber());
-      $elemIW->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_W.'px');
-      $form->addElement($elemIW, 'images');
-      if(isset($settings['img_width'])) {
-         $form->img_width->setValues($settings['img_width']);
-      }
-
-
-      $elemIH = new Form_Element_Text('img_height', 'Výška titulního obrázku (px)');
-      $elemIH->addValidation(new Form_Validator_IsNumber());
-      $elemIH->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_H.'px');
-      $form->addElement($elemIH, 'images');
-      if(isset($settings['img_height'])) {
-         $form->img_height->setValues($settings['img_height']);
-      }
-
-      $elemCropI = new Form_Element_Checkbox('img_crop', 'Ořezávat titulní obrázek');
-      $elemCropI->setValues(true);
-      $form->addElement($elemCropI, 'images');
-      if(isset($settings['img_crop'])) {
-         $form->img_crop->setValues($settings['img_crop']);
-      }
+//      $elemIW = new Form_Element_Text('img_width', 'Šířka titulního obrázku (px)');
+//      $elemIW->addValidation(new Form_Validator_IsNumber());
+//      $elemIW->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_W.'px');
+//      $form->addElement($elemIW, 'images');
+//      if(isset($settings['img_width'])) {
+//         $form->img_width->setValues($settings['img_width']);
+//      }
+//
+//
+//      $elemIH = new Form_Element_Text('img_height', 'Výška titulního obrázku (px)');
+//      $elemIH->addValidation(new Form_Validator_IsNumber());
+//      $elemIH->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_H.'px');
+//      $form->addElement($elemIH, 'images');
+//      if(isset($settings['img_height'])) {
+//         $form->img_height->setValues($settings['img_height']);
+//      }
+//
+//      $elemCropI = new Form_Element_Checkbox('img_crop', 'Ořezávat titulní obrázek');
+//      $elemCropI->setValues(true);
+//      $form->addElement($elemCropI, 'images');
+//      if(isset($settings['img_crop'])) {
+//         $form->img_crop->setValues($settings['img_crop']);
+//      }
 
       if(isset($settings['type'])) {
          $form->type->setValues($settings['type']);
@@ -541,9 +659,9 @@ class Actions_Controller extends Controller {
       if($form->isValid()) {
          $settings['time'] = $form->time->getValues();
          $settings[self::PARAM_SHOW_EVENT_DIRECTLY] = $form->show_event_directly->getValues();
-         $settings['img_width'] = $form->img_width->getValues();
-         $settings['img_height'] = $form->img_height->getValues();
-         $settings['img_crop'] = $form->img_crop->getValues();
+//         $settings['img_width'] = $form->img_width->getValues();
+//         $settings['img_height'] = $form->img_height->getValues();
+//         $settings['img_crop'] = $form->img_crop->getValues();
          // protože je vždy hodnota
          if($form->type->getValues() != self::DEFAULT_TIMEWINDOW_TYPE){
             $settings['type'] = $form->type->getValues();

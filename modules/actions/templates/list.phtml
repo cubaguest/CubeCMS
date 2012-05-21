@@ -21,65 +21,68 @@ echo $this->toolbox; // tolbox pro přidání
    <div class="post-list events-list">
    <?
    foreach ($this->actions as $row) {
-      if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
+      if($row->{Actions_Model::COLUMN_PUBLIC}) $class = "";
       else $class = 'main-content-no-public';
-      $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
-      if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
-         $subLabel = '<span class="">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
+      $subLabel = $row->{Actions_Model::COLUMN_NAME};
+      if($row->{Actions_Model::COLUMN_SUBANME} != null) {
+         $subLabel = '<span class="">'.$row->{Actions_Model::COLUMN_SUBANME}.'</span><br />'.$subLabel;
+      }
+      
+      $image = null;
+      if ($row->{Actions_Model::COLUMN_IMAGE} != null) {
+         $imgSrc = vve_image_cacher(vve_tpl_art_title_image($row->{Actions_Model::COLUMN_IMAGE}), 300, 225);
+         $imgAlt = htmlspecialchars($row->{Actions_Model::COLUMN_NAME});
+         $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
       }
 
       ?><div class="post event <?=$class?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
+      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}))?>"
+             title="<?=$row->{Actions_Model::COLUMN_NAME}?>"
              ><?=$subLabel?></a><?
             if($this->category()->getRights()->isControll()){
-               echo '&nbsp;'.langsImages($row->{Actions_Model_Detail::COLUMN_URLKEY});
+               echo '&nbsp;'.langsImages($row->{Actions_Model::COLUMN_URLKEY});
             }
             ?></h2>
-            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+            <?if($row->{Actions_Model::COLUMN_AUTHOR} != null) {?>
       <div class="text author">
-               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+               <?=$row->{Actions_Model::COLUMN_AUTHOR}?>
       </div>
             <?}?>
       <div class="text info">
             <?
-            $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
-            $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+            $startDate = vve_date("%x", new DateTime($row->{Actions_Model::COLUMN_DATE_START}));
+            $stopDate = vve_date("%x", new DateTime($row->{Actions_Model::COLUMN_DATE_STOP}));
             echo ($startDate);
-            if($startDate != $stopDate AND $row->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+            if($startDate != $stopDate AND $row->{Actions_Model::COLUMN_DATE_STOP} != null) {
                echo ("&nbsp;&mdash;&nbsp;");
                echo ($stopDate);
             }
-            if($row->{Actions_Model_Detail::COLUMN_TIME} != null) {
-               $time = new DateTime($row->{Actions_Model_Detail::COLUMN_TIME});
+            if($row->{Actions_Model::COLUMN_TIME} != null) {
+               $time = new DateTime($row->{Actions_Model::COLUMN_TIME});
                echo (",&nbsp;".$time->format("G:i"));
             }
-            if($row->{Actions_Model_Detail::COLUMN_PLACE} != null) {
-               echo ',&nbsp;'.$row->{Actions_Model_Detail::COLUMN_PLACE};
+            if($row->{Actions_Model::COLUMN_PLACE} != null) {
+               echo ',&nbsp;'.$row->{Actions_Model::COLUMN_PLACE};
             }
-            if((int)$row->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-               printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
+            if((int)$row->{Actions_Model::COLUMN_PRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$row->{Actions_Model::COLUMN_PRICE});
             }
-            if((int)$row->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-               printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
+            if((int)$row->{Actions_Model::COLUMN_PREPRICE} != null|0) {
+               printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$row->{Actions_Model::COLUMN_PREPRICE});
             }
             ?>
       </div>
-         <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
+         <?if($row->{Actions_Model::COLUMN_NOTE} != null) {?>
       <div class="text note">
-          <?=$row->{Actions_Model_Detail::COLUMN_NOTE}?>
+          <?=$row->{Actions_Model::COLUMN_NOTE}?>
       </div>
             <?}?>
-      <?if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
-         <div class="title-image">
-            <img src="<?=vve_tpl_art_title_image($row->{Actions_Model_Detail::COLUMN_IMAGE})?>" alt="<?ps($row->{Actions_Model_Detail::COLUMN_NAME})?>" />
-         </div>
-      <?}?>
+      <?if($image != null) {?><div class="title-image"><?=$image?></div><?}?>
       <div class="text">
-            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS), 600);?>
+            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS), 600);?>
       </div>
       <p class="mlink-more">
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}))?>"
             title="<?=$this->tr('Více')?>"><?=$this->tr('Více')?></a>
       </p>
       <hr class="reseter"/>
