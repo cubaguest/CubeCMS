@@ -277,7 +277,11 @@ a.button-open-title-image-galery {margin-left: 10px;}
    font-size: 12px;
 }
    
-.module-tool-buttons { margin-bottom: 0.5em; }
+ul.module-tool-buttons { margin: 0; padding: 0 0 10px 0; }
+ul.module-tool-buttons li a { float: left; margin-right: 5px; margin-bottom: 5px; }
+ul.module-tool-buttons li a img { vertical-align: -2px; }
+ul.module-tool-buttons li a .ui-button-text { padding: 5px; }
+
 .module-row-tool-buttons { float: right; }
 .module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
 

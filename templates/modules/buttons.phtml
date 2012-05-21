@@ -1,0 +1,23 @@
+<?
+if( !empty($this->moduleButtons) ){
+   $jq = new JsPlugin_JQuery();
+   $jq->addUIButton();
+   $this->addJsPlugin($jq);
+   ?>
+   <ul class="module-tool-buttons">
+   <?foreach ($this->moduleButtons as $button) {?>
+      <li><a class="ui-button" href="<?=$button['link']?>" title="<?=$button['title']?>"
+         ><img src="images/icons/<?=$button['icon']?>" alt="back" /><?=$button['name']?></a></li>
+   <?}?>
+   </ul>
+   <hr class="reseter" />
+   <?if(Template::pVar('_module-tool-buttons') == null){?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $(".module-tool-buttons a" ).button();
+      });
+   </script>
+   <?
+      Template::setPVar('_module-tool-buttons', true);
+   }?>
+<?}?>
