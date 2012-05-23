@@ -5,14 +5,27 @@ if($this->topic instanceof Model_ORM_Record){
    $h = sprintf($this->tr('Přidání témata'));
 }
 $this->addPageTitle($h);
+$this->addJsPlugin(new JsPlugin_JQuery());
 ?>
 <h1><?=$h?></h1>
 <div class="main-content-detail">
    <div class="main-content-form-edit">
    <?
    $this->form->text->html()->setAttrib('rows', 10);
+   if(isset($this->form->notificationEMails)){
+      $this->form->email->setSubLabel('<a id="buttonAddToNotify" href="#add-mail-notify" title="'.$this->tr('Zasílat nové příspěvky na e-mail').'">'.$this->tr('Přidat').'</a> '.$this->tr(' do upozornění na nové příspěvky'));
+   }
    echo $this->form;
    ?>
    </div>
+   <script type="text/javascript">
+      $('#buttonAddToNotify').click(function(e){
+         e.preventDefault();
+         var mail = $('#topic_email_1').val();
+         if($('#topic_notificationEMails_1').val().search(mail) == -1){
+            $('#topic_notificationEMails_1').val(mail+";"+$('#topic_notificationEMails_1').val() );
+         }
+      });
+   </script>
 </div>
 

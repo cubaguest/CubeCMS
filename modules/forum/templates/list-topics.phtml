@@ -1,50 +1,51 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addFile('css://style.css');
+$jq = new JsPlugin_JQuery();
+$jqcss = new JsPlugin_JQueryCSS();
+$this->addJsPlugin($jq);
+$this->addJsPlugin($jqcss);
 echo $this->toolbox;
 ?>
 <h1><?=$this->category()->getName();?></h1>
 <div class="forum-items main-content-list">
-   <table class="forum-topics full-width">
+   <table class="forum-topics full-width ui-widget">
       <thead class="header">
-         <tr>
-            <th class="forum-topic-name"><?=$this->tr('Téma');?></th>
-            <th class="forum-topic-author"><?=$this->tr('Autor');?></th>
-            <th class="forum-topic-posts"><?=$this->tr('Příspěvků');?></th>
-            <th class="forum-topic-views"><?=$this->tr('Shlédnuto');?></th>
+         <tr class="ui-widget-header">
+            <th class="name"><?=$this->tr('Téma');?></th>
+            <th class="author"><?=$this->tr('Autor');?></th>
+            <th class="count-messages"><?=$this->tr('Příspěvků');?></th>
+            <th class="views"><?=$this->tr('Shlédnuto');?></th>
+            <th class="last-message"><?=$this->tr('Poslední reakce');?></th>
          </tr>
       </thead>
       <tbody>
       <?if(!empty ($this->topics)){ ?>
-         <?foreach ($this->topics as $topic) {?>
-         <tr class="forum-topic-item row">
-            <td class="forum-topic-name">
+         <?foreach ($this->topics as $topic) {
+            $lastDate = new DateTime( $topic->last_message_date == null ? $topic->{Forum_Model_Topics::COLUMN_DATE_ADD} : $topic->last_message_date );
+            ?>
+         <tr class="item row ui-widget-content">
+            <td class="name">
                <a href="<?=$this->link()->route('showTopic', array('id' => $topic->{Forum_Model_Topics::COLUMN_ID}))?>"
                   title="<?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?>"><?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?></a>
-               <?if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?>
-               <br/>
-                  <span class="font-small"><?
-                  printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($topic->{Forum_Model_Topics::COLUMN_DATE_ADD})));
-                  if($topic->last_post_date != null){
-                     printf('&nbsp;'.$this->tr('Poslední příspěvek přidán: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($topic->last_post_date)));
-                  }
-                  ?></span>
+                  <?if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?>
             </td>
-            <td class="forum-topic-author"><?=ps($topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?></td>
-            <td class="forum-topic-posts"><?=ps((int)$topic->post_count)?></td>
-            <td class="forum-topic-views"><?=ps((int)$topic->{Forum_Model_Topics::COLUMN_VIEWS})?></td>
+            <td class="author"><?=ps($topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?></td>
+            <td class="count-messages"><?=ps((int)$topic->messages_count)?></td>
+            <td class="views"><?=ps((int)$topic->{Forum_Model_Topics::COLUMN_VIEWS})?></td>
+            <td class="last-message"><?=vve_date('%d.%m.%Y %G:%i', $lastDate)?></td>
          </tr>
       <?}
       } else {?>
-         <tr class="forum-topic-item row">
-            <td colspan="4"><?=$this->tr('Žádné téma není vytvořeno')?></td>
+         <tr class="item row">
+            <td colspan="6"><?=$this->tr('Žádné téma není vytvořeno')?></td>
          </tr>
       <?}?>
       </tbody>
       <?if($this->category()->getRights()->isWritable()){?>
       <tfoot>
-      <tr class="forum-topic-item row">
-         <td colspan="4">
+      <tr class="item row">
+         <td colspan="5">
             <img src="/images/icons/comment_add.png" alt="add" />
             <a href="<?=$this->link()->route('addTopic')?>" title="<?=$this->tr('Vytvořit nové téma')?>" ><?=$this->tr('Vytvořit téma')?></a>
          </td>
@@ -54,5 +55,4 @@ echo $this->toolbox;
    </table>
    
    <?echo ($this->scrollComp);?>
-      
 </div>

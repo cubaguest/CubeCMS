@@ -21,18 +21,18 @@ class Forum_View extends View {
    
    public function showTopicView()
    {
-      $this->template()->addFile('tpl://list-posts.phtml'); 
+      $this->template()->addFile('tpl://list-messages.phtml'); 
       
       if($this->category()->getRights()->isWritable()){
-         // POSTY
-         $this->toolboxPost = new Template_Toolbox2();
-         $this->toolboxPost->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
-         $this->toolboxPost->setIcon(Template_Toolbox2::ICON_WRENCH);
+         // příspěvky
+         $this->toolboxMessage = new Template_Toolbox2();
+         $this->toolboxMessage->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+         $this->toolboxMessage->setIcon(Template_Toolbox2::ICON_WRENCH);
          
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_post', $this->tr("Upravit"),
-         $this->link()->route('editPost'));
+         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_message', $this->tr("Upravit"),
+         $this->link()->route('editMessage'));
          $toolEdit->setIcon('comment_edit.png')->setTitle($this->tr('Upravit příspěvek'));
-         $this->toolboxPost->addTool($toolEdit);
+         $this->toolboxMessage->addTool($toolEdit);
          
          if($this->topic->{Forum_Model_Topics::COLUMN_ID_USER} == Auth::getUserId()
             || $this->category()->getRights()->isControll()){
@@ -50,14 +50,14 @@ class Forum_View extends View {
       
       if($this->category()->getRights()->isControll()){
          
-         $toolCensore = new Template_Toolbox2_Tool_Form($this->formPostCensore);
+         $toolCensore = new Template_Toolbox2_Tool_Form($this->formMessageCensore);
          $toolCensore->setIcon('comment_key.png')->setTitle($this->tr('Cenzurovat příspěvek'));
-         $this->toolboxPost->addTool($toolCensore);
+         $this->toolboxMessage->addTool($toolCensore);
          
-         $toolDelete = new Template_Toolbox2_Tool_Form($this->formPostDelete);
-         $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat příspěvek?'));
+         $toolDelete = new Template_Toolbox2_Tool_Form($this->formMessageDelete);
+         $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat příspěvek včetně reakcí?'));
          $toolDelete->setIcon('comment_delete.png')->setTitle($this->tr('Smazat příspěvek'));
-         $this->toolboxPost->addTool($toolDelete);
+         $this->toolboxMessage->addTool($toolDelete);
          
          $toolDelete = new Template_Toolbox2_Tool_Form($this->formTopicDelete);
          $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat téma i s příspěvky?'));
@@ -84,9 +84,9 @@ class Forum_View extends View {
       $this->addTopicView();
    }
 
-   public function addPostView()
+   public function addMessageView()
    {
-      $this->template()->addFile('tpl://edit-post.phtml');
+      $this->template()->addFile('tpl://edit-message.phtml');
       $this->form->text->html()->addClass("mceEditor");
       $this->tinyMCE = new Component_TinyMCE();
       $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_SOURCES, false);
@@ -98,14 +98,40 @@ class Forum_View extends View {
       $this->tinyMCE->mainView();
    }
    
-   public function editPostView()
+   public function editMessageView()
    {
-      $this->addPostView();
+      $this->addMessageView();
    }
    
-   public function rssTopicController()
+   public function rssTopicView()
    {
       $feed = new Component_Feed(true);
+      $feed ->setConfig('type', $this->type);
+      $feed ->setConfig('title', $this->topic->{Forum_Model_Topics::COLUMN_NAME}." - ".$this->category()->getName());
+      $feed ->setConfig('desc', $this->topic->{Forum_Model_Topics::COLUMN_TEXT_CLEAR});
+      $feed ->setConfig('link', $this->link()->route('showTopic'));
+      
+      foreach ($this->messages as $msg) {
+         $desc = null;
+         if($msg->{Forum_Model_Messages::COLUMN_NAME} != null){
+            $desc .= "<h2>".$msg->{Forum_Model_Messages::COLUMN_NAME}."</h2>";
+         }
+         $desc .= $msg->{Forum_Model_Messages::COLUMN_TEXT};
+         
+         $desc .= $this->tr("Přidal").": <i>".$msg->{Forum_Model_Messages::COLUMN_CREATED_BY}."</i>";
+
+         $feed->addItem($msg->{Forum_Model_Messages::COLUMN_NAME},$desc,
+                 $this->link()->route('showTopic')->anchor('message-'.$msg->{Forum_Model_Messages::COLUMN_ID}),
+                 new DateTime($msg->{Forum_Model_Messages::COLUMN_DATE_ADD}),
+                 $msg->{Forum_Model_Messages::COLUMN_CREATED_BY}, $msg->{Forum_Model_Messages::COLUMN_EMAIL});
+      }
+      $feed->flush();
    }
+   
+   public function cancelMessageNotifyView()
+   {
+      $this->template()->addFile('tpl://cancel-notify.phtml');
+   }
+
 }
 ?>

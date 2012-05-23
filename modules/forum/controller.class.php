@@ -56,19 +56,18 @@ class Forum_Controller extends Controller {
 
 //      if(!$this->rights()->isControll()){
 //         $model->where(Forum_Model_Topics::COLUMN_ID_CAT.' = :idc AND '
-//            .'(ISNULL(`'.Forum_Model_Posts::COLUMN_CENSORED.'`)  OR `'.Forum_Model_Posts::COLUMN_CENSORED.'` = 0 )', array('idc' => $this->category()->getId()));
+//            .'(ISNULL(`'.Forum_Model_Messages::COLUMN_CENSORED.'`)  OR `'.Forum_Model_Messages::COLUMN_CENSORED.'` = 0 )', array('idc' => $this->category()->getId()));
 //      }
-      $model->columns(array('*','post_count' => 'COUNT(`'.Forum_Model_Posts::COLUMN_ID.'`)'))
+      $model->columns(array('*','messages_count' => 'COUNT(`'.Forum_Model_Messages::COLUMN_ID.'`)'))
          ->groupBy(array(Forum_Model_Topics::COLUMN_ID))
-         ->join(Forum_Model_Topics::COLUMN_ID, 'Forum_Model_Posts', Forum_Model_Posts::COLUMN_ID_TOPIC, 
-            array(Forum_Model_Posts::COLUMN_CREATED_BY, 
-               'sort_date' => 'IFNULL(MAX(`'.Forum_Model_Posts::COLUMN_DATE_ADD.'`), `'.Forum_Model_Topics::COLUMN_DATE_ADD.'`)',
-               'last_post_date' => 'MAX(`'.Forum_Model_Posts::COLUMN_DATE_ADD.'`)' ))
+         ->join(Forum_Model_Topics::COLUMN_ID, 'Forum_Model_Messages', Forum_Model_Messages::COLUMN_ID_TOPIC, 
+            array(Forum_Model_Messages::COLUMN_CREATED_BY, 
+               'sort_date' => 'IFNULL(MAX(`'.Forum_Model_Messages::COLUMN_DATE_ADD.'`), `'.Forum_Model_Topics::COLUMN_DATE_ADD.'`)',
+               'last_message_date' => 'MAX(`'.Forum_Model_Messages::COLUMN_DATE_ADD.'`)' ))
          ->order(array(
             'sort_date' => Model_ORM::ORDER_DESC,
             Forum_Model_Topics::COLUMN_DATE_ADD => Model_ORM::ORDER_DESC,
             ));
-//      Debug::log($model->getSQLQuery());
 
       $this->view()->topics = $model->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
       $this->view()->scrollComp = $scrollComponent;
@@ -82,10 +81,19 @@ class Forum_Controller extends Controller {
       $this->editTopic();
    }
    
-   public function addPostController()
+   public function addMessageController()
    {
       $this->checkWritebleRights();
-      $this->editPost($this->getRequest('id'));
+      $model = new Forum_Model_Messages();
+      
+      $parentMsg = $model->record($this->getRequestParam('msg', null));
+      $pid = null;
+      if($parentMsg != false){
+         $this->view()->parentMessage = $parentMsg;
+         $pid = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
+      }
+      
+      $this->editMessage($this->getRequest('id'), null, $pid);
    }
    
    public function editTopicController()
@@ -103,20 +111,20 @@ class Forum_Controller extends Controller {
       $this->view()->topic = $topic;
    }
    
-   public function editPostController()
+   public function editMessageController()
    {
       $this->checkWritebleRights();
-      $modelP = new Forum_Model_Posts();
-      $post = $modelP->record($this->getRequest('idp'));
+      $model = new Forum_Model_Messages();
+      $message = $model->record($this->getRequest('idp'));
       
-      if($post != false && 
+      if($message != false && 
          ($this->rights()->isControll() 
-         || $this->rights()->isWritable() && $post->{Forum_Model_Posts::COLUMN_ID_USER} == Auth::getUserId() )){
-         $this->editPost($this->getRequest('id'), $post);
+         || $this->rights()->isWritable() && $message->{Forum_Model_Messages::COLUMN_ID_USER} == Auth::getUserId() )){
+         $this->editMessage($this->getRequest('id'), $message);
       } else {
          return false;
       }
-      $this->view()->post = $post;
+      $this->view()->message = $message;
    }
 
    private function editTopic(Model_ORM_Record $record = null)
@@ -256,17 +264,17 @@ class Forum_Controller extends Controller {
          if($record->isNew()){
             $this->link()->route()->reload();
          } else {
-            $this->link()->route('showTopic')->reload();
+            $this->link()->route('showTopic', array('id' => $record->getPK()))->reload();
          }
       }
       $this->view()->form = $form;
    }
    
-   private function editPost($idTopic, Model_ORM_Record $post = null)
+   private function editMessage($idTopic, Model_ORM_Record $message = null, $messageReactionId = false)
    {
-      $form = new Form('post_');
+      $form = new Form('message_');
 
-      $model = new Forum_Model_Posts();
+      $model = new Forum_Model_Messages();
       $record = $model->newRecord();
       
       $elemName = new Form_Element_Text('name', $this->tr('Předmět'));
@@ -294,29 +302,39 @@ class Forum_Controller extends Controller {
       $elemEmail->addValidation(new Form_Validator_MaxLength(50));
       $form->addElement($elemEmail);
       
+      $elemSendNotify = new Form_Element_Checkbox('sendNotify', $this->tr('Odeslat upozornění'));
+      $elemSendNotify->setSubLabel($this->tr('Při reakci na můj příspěvek odeslat upozornění na zadaný e-mail'));
+      $form->addElement($elemSendNotify);
+      
       if(!Auth::isLogin()){
          $elemCaptcha = new Form_Element_Captcha('captcha');
          $form->addElement($elemCaptcha);
       }
 
+      if($messageReactionId != null){
+         $eParentMsgId = new Form_Element_Hidden('parentMsgId');
+         $eParentMsgId->setValues($messageReactionId);
+         $form->addElement($eParentMsgId);
+      }
+      
       $elemSubmit = new Form_Element_SaveCancel('send');
       $elemSubmit->setCancelConfirm(false);
       $form->addElement($elemSubmit);
 
       // u přihlášených vypneme chapchu
-      if(Auth::isLogin() && $post == null){
+      if(Auth::isLogin() && $message == null){
          $form->author->setValues(Auth::getUserName());
          $form->email->setValues(Auth::getUserMail());
          $capchaTime = 0;
       }
       
-      if($post != null){
-         $record = $post;
+      if($message != null){
+         $record = $message;
          // add info to form
-         $form->name->setValues($post->{Forum_Model_Posts::COLUMN_NAME});
-         $form->text->setValues($post->{Forum_Model_Posts::COLUMN_TEXT});
-         $form->author->setValues($post->{Forum_Model_Posts::COLUMN_CREATED_BY});
-         $form->email->setValues($post->{Forum_Model_Posts::COLUMN_EMAIL});
+         $form->name->setValues($message->{Forum_Model_Messages::COLUMN_NAME});
+         $form->text->setValues($message->{Forum_Model_Messages::COLUMN_TEXT});
+         $form->author->setValues($message->{Forum_Model_Messages::COLUMN_CREATED_BY});
+         $form->email->setValues($message->{Forum_Model_Messages::COLUMN_EMAIL});
       }
 
       if($form->isSend()){
@@ -328,29 +346,37 @@ class Forum_Controller extends Controller {
       }
 
       if($form->isValid()){
-         $record->{Forum_Model_Posts::COLUMN_NAME} = $form->name->getValues();
-         $record->{Forum_Model_Posts::COLUMN_CREATED_BY} = $form->author->getValues();
-         $record->{Forum_Model_Posts::COLUMN_TEXT} = $form->text->getValues();
-         $record->{Forum_Model_Posts::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
-         $record->{Forum_Model_Posts::COLUMN_EMAIL} = $form->email->getValues();
+         $record->{Forum_Model_Messages::COLUMN_NAME} = $form->name->getValues();
+         $record->{Forum_Model_Messages::COLUMN_CREATED_BY} = $form->author->getValues();
+         $record->{Forum_Model_Messages::COLUMN_TEXT} = $form->text->getValues();
+         $record->{Forum_Model_Messages::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
+         $record->{Forum_Model_Messages::COLUMN_EMAIL} = $form->email->getValues();
+         $record->{Forum_Model_Messages::COLUMN_SEND_NOTIFY} = $form->sendNotify->getValues();
          if($record->isNew()){
-            $record->{Forum_Model_Posts::COLUMN_ID_TOPIC} = $idTopic;
+            $record->{Forum_Model_Messages::COLUMN_ID_TOPIC} = $idTopic;
             if(Auth::isLogin()){
-               $record->{Forum_Model_Posts::COLUMN_ID_USER} = Auth::getUserId();
+               $record->{Forum_Model_Messages::COLUMN_ID_USER} = Auth::getUserId();
             }
             if($this->category()->getRights()->isControll()){
-               $record->{Forum_Model_Posts::COLUMN_CREATED_BY_MODERATOR} = true;
+               $record->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} = true;
             }
-            $record->{Forum_Model_Posts::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
+            $record->{Forum_Model_Messages::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
          }
          
+         if(isset($form->parentMsgId)){
+            $parentMsg = $model->record($form->parentMsgId->getValues());
+            $record->{Forum_Model_Messages::COLUMN_ID_PARENT_MESSAGE} = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
+            if($parentMsg->{Forum_Model_Messages::COLUMN_SEND_NOTIFY}){
+               $this->sendMessageNotification($idTopic, $parentMsg, $record);
+            }
+         }
          $model->save($record);
          if($record->isNew()){
-            $this->sendNotifications($idTopic, $record);
+            $this->sendTopicNotification($idTopic, $record);
          }
          
          $this->infoMsg()->addMessage($this->tr('Příspěvek byl uložen'));
-         $this->link()->route('showTopic')->reload();
+         $this->link()->route('showTopic')->rmParam('msg')->reload();
       }
       $this->view()->form = $form;
    }
@@ -360,13 +386,13 @@ class Forum_Controller extends Controller {
       $this->checkReadableRights();
       
       $modelT = new Forum_Model_Topics();
-      $modelP = new Forum_Model_Posts();
+      $modelP = new Forum_Model_Messages();
       
       $topic = $modelT->record($this->getRequest('id'));
       if($topic == false){return false;}
       
       if($this->rights()->isControll()){
-         $formDel = new Form('post_delete');
+         $formDel = new Form('message_delete');
          $eId = new Form_Element_Hidden('id');
          $formDel->addElement($eId);
          
@@ -377,25 +403,25 @@ class Forum_Controller extends Controller {
             $this->infoMsg()->addMessage($this->tr('Příspěvek byl smazán'));
             $this->link()->reload();
          }
-         $this->view()->formPostDelete = $formDel;
+         $this->view()->formMessageDelete = $formDel;
          
-         $formCensore = new Form('post_censore');
+         $formCensore = new Form('message_censore');
          $eId = new Form_Element_Hidden('id');
          $formCensore->addElement($eId);
          
          $eCensore = new Form_Element_SubmitImage('change', $this->tr('Změnit cenzůru'));
          $formCensore->addElement($eCensore);
          if($formCensore->isValid()){
-            $post = $modelP->record($formCensore->id->getValues());
+            $message = $modelP->record($formCensore->id->getValues());
             
-            if($post != false){
-               $post->{Forum_Model_Posts::COLUMN_CENSORED} = (int)!(bool)$post->{Forum_Model_Posts::COLUMN_CENSORED};
-               $modelP->save($post);
+            if($message != false){
+               $message->{Forum_Model_Messages::COLUMN_CENSORED} = (int)!(bool)$message->{Forum_Model_Messages::COLUMN_CENSORED};
+               $modelP->save($message);
             }
             $this->infoMsg()->addMessage($this->tr('Cenzůra byla změněna'));
             $this->link()->reload();
          }
-         $this->view()->formPostCensore = $formCensore;
+         $this->view()->formMessageCensore = $formCensore;
          
          $formTopicDel = new Form('topic_delete');
          $eId = new Form_Element_Hidden('id');
@@ -419,45 +445,46 @@ class Forum_Controller extends Controller {
       
       // načtení příspěvků
 //      if($this->rights()->isControll()){
-         $modelP->where(Forum_Model_Posts::COLUMN_ID_TOPIC.' = :idt', array('idt' => $topic->{Forum_Model_Posts::COLUMN_ID_TOPIC}));
+         $modelP->where(Forum_Model_Messages::COLUMN_ID_TOPIC.' = :idt', array('idt' => $topic->{Forum_Model_Messages::COLUMN_ID_TOPIC}));
 //      } else {
-//         $modelP->where(Forum_Model_Posts::COLUMN_ID_TOPIC.' = :idt AND '.Forum_Model_Posts::COLUMN_CENSORED.' = 0', 
-//            array('idt' => $topic->{Forum_Model_Posts::COLUMN_ID_TOPIC}));
+//         $modelP->where(Forum_Model_Messages::COLUMN_ID_TOPIC.' = :idt AND '.Forum_Model_Messages::COLUMN_CENSORED.' = 0', 
+//            array('idt' => $topic->{Forum_Model_Messages::COLUMN_ID_TOPIC}));
 //      }
-      $modelP->order(array(Forum_Model_Posts::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC));
+      $modelP->order(array(Forum_Model_Messages::COLUMN_ORDER => Model_ORM::ORDER_ASC));
       
-      $scrollComponent = new Component_Scroll();
-      $scrollComponent->setConfig('page_param', 'p_p');
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $modelP->count());
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-              $this->category()->getParam('scroll', self::DEFAULT_NUM_ON_PAGE));
+//      $scrollComponent = new Component_Scroll();
+//      $scrollComponent->setConfig('page_param', 'p_p');
+//      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $modelP->count());
+//      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
+//              $this->category()->getParam('scroll', self::DEFAULT_NUM_ON_PAGE));
 
       $this->view()->topic = $topic;
       $this->view()->linkBack = $this->link()->route()->rmParam('p_p');
-      $this->view()->posts = $modelP->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
-      $this->view()->scrollComp = $scrollComponent;
+//      $this->view()->messages = $modelP->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
+      $this->view()->messages = $modelP->records();
+//      $this->view()->scrollComp = $scrollComponent;
    }
 
    public function rssTopicController()
    {
       $this->checkReadableRights();
       $modelT = new Forum_Model_Topics();
-      $modelP = new Forum_Model_Posts();
+      $modelM = new Forum_Model_Messages();
       
       $topic = $modelT->record($this->getRequest('id'));
       if($topic == false){return false;}
       
-      $modelP->where(Forum_Model_Posts::COLUMN_ID_TOPIC.' = :idt', array('idt' => $topic->{Forum_Model_Posts::COLUMN_ID_TOPIC}));
-      $modelP->order(array(Forum_Model_Posts::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC));
+      $modelM->where(Forum_Model_Messages::COLUMN_ID_TOPIC.' = :idt', array('idt' => $topic->{Forum_Model_Messages::COLUMN_ID_TOPIC}));
+      $modelM->order(array(Forum_Model_Messages::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC));
       
       $this->view()->topic = $topic;
-      $this->view()->posts = $modelP->limit(0, VVE_FEED_NUM)->records();
+      $this->view()->messages = $modelM->limit(0, VVE_FEED_NUM)->records();
    }
 
-   public function sendNotifications($idTopic, $newPost)
+   public function sendTopicNotification($idTopic, $newMessage)
    {
       $model = new Forum_Model_Topics();
-      $modelPosts = new Forum_Model_Posts();
+      $modelMessages = new Forum_Model_Messages();
       $topic = $model->columns(array(
          Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS, Forum_Model_Topics::COLUMN_EMAIL,
          Forum_Model_Topics::COLUMN_DATE_ADD, Forum_Model_Topics::COLUMN_NAME,
@@ -484,35 +511,35 @@ class Forum_Controller extends Controller {
          // tady ještě test z faces asi
          $mailCnt = file_get_contents($tplFile) ; // mail content loaded from template
          
-         // prepare posts
+         // prepare messages
          $matches = array();
-         if(preg_match('/{POST}(.*){\/POST}/s', $mailCnt, $matches) !== false){
-            $postTpl = $matches[1];
-            $postsStr = null;
-            $posts = $modelPosts->where(Forum_Model_Posts::COLUMN_ID_TOPIC.' = :idt', array('idt' => $idTopic))
+         if(preg_match('/{MESSAGE}(.*){\/MESSAGE}/s', $mailCnt, $matches) !== false){
+            $messageTpl = $matches[1];
+            $messagesStr = null;
+            $messages = $modelMessages->where(Forum_Model_Messages::COLUMN_ID_TOPIC.' = :idt', array('idt' => $idTopic))
                ->limit(0, 100)
-               ->order(array(Forum_Model_Posts::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC))
+               ->order(array(Forum_Model_Messages::COLUMN_DATE_ADD => Model_ORM::ORDER_ASC))
                ->records();
             
-            if(!empty ($posts)){
-               foreach ($posts as $post) {
-                  $postsStr .= str_replace(array(
-                     '{POST_NAME}',
-                     '{POST_INFO}',
-                     '{POST_TEXT}'
+            if(!empty ($messages)){
+               foreach ($messages as $message) {
+                  $messagesStr .= str_replace(array(
+                     '{MESSAGE_NAME}',
+                     '{MESSAGE_INFO}',
+                     '{MESSAGE_TEXT}'
                   ), array(
-                     $post->{Forum_Model_Posts::COLUMN_NAME},
-                     $post->{Forum_Model_Posts::COLUMN_CREATED_BY}
-                        .' ('.vve_date('%x %X', new DateTime($post->{Forum_Model_Posts::COLUMN_DATE_ADD})).')'
-                        .' <'.$post->{Forum_Model_Posts::COLUMN_EMAIL}.'>',
-                     $post->{Forum_Model_Posts::COLUMN_TEXT},
-                  ), $postTpl);
+                     $message->{Forum_Model_Messages::COLUMN_NAME},
+                     $message->{Forum_Model_Messages::COLUMN_CREATED_BY}
+                        .' ('.vve_date('%x %X', new DateTime($message->{Forum_Model_Messages::COLUMN_DATE_ADD})).')'
+                        .' <'.$message->{Forum_Model_Messages::COLUMN_EMAIL}.'>',
+                     $message->{Forum_Model_Messages::COLUMN_TEXT},
+                  ), $messageTpl);
                   
                }
             } else {
-               $postsStr = 'Není vložen žádný příspěvek';
+               $messagesStr = 'Není vložen žádný příspěvek';
             }
-            $mailCnt = preg_replace('/{POST}(.*){\/POST}/s', $postsStr, $mailCnt);
+            $mailCnt = preg_replace('/{MESSAGE}(.*){\/MESSAGE}/s', $messagesStr, $mailCnt);
          }
          
          /* přepis hodnot */
@@ -530,11 +557,11 @@ class Forum_Controller extends Controller {
           * {POSTS} - seznam odpovědí (asi takhle ???)
           */
          $search = array(
-            // new post
-            '{POST_NEW_NAME}',
-            '{POST_NEW_LINK}',
-            '{POST_NEW_INFO}',
-            '{POST_NEW_TEXT}',
+            // new msg
+            '{MESSAGE_NEW_NAME}',
+            '{MESSAGE_NEW_LINK}',
+            '{MESSAGE_NEW_INFO}',
+            '{MESSAGE_NEW_TEXT}',
             // topic
             '{TOPIC_NAME}',
             '{TOPIC_LINK}',
@@ -546,13 +573,13 @@ class Forum_Controller extends Controller {
          );
          
          $replace = array(
-            // new post
-            $newPost->{Forum_Model_Posts::COLUMN_NAME},
-            $this->link()->route('showTopic')->rmParam()->anchor('post-'.$newPost->{Forum_Model_Posts::COLUMN_ID}),
-            $newPost->{Forum_Model_Posts::COLUMN_CREATED_BY}
-               .' ('.  vve_date('%x %X', new DateTime($newPost->{Forum_Model_Posts::COLUMN_DATE_ADD})).')'
-               .' <'.$newPost->{Forum_Model_Posts::COLUMN_EMAIL}.'>',
-            $newPost->{Forum_Model_Posts::COLUMN_TEXT},   
+            // new msg
+            $newMessage->{Forum_Model_Messages::COLUMN_NAME},
+            $this->link()->route('showTopic')->rmParam()->anchor('message-'.$newMessage->{Forum_Model_Messages::COLUMN_ID}),
+            $newMessage->{Forum_Model_Messages::COLUMN_CREATED_BY}
+               .' ('.  vve_date('%x %X', new DateTime($newMessage->{Forum_Model_Messages::COLUMN_DATE_ADD})).')'
+               .' <'.$newMessage->{Forum_Model_Messages::COLUMN_EMAIL}.'>',
+            $newMessage->{Forum_Model_Messages::COLUMN_TEXT},   
             // topic
             $topic->{Forum_Model_Topics::COLUMN_NAME},
             $this->link()->route('showTopic')->rmParam(),
@@ -577,6 +604,132 @@ class Forum_Controller extends Controller {
          
    }
 
+   public function sendMessageNotification($idTopic, $parentMsg, $reaction)
+   {
+      $model = new Forum_Model_Topics();
+      $modelMessages = new Forum_Model_Messages();
+      $topic = $model->columns(array(
+         Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS, Forum_Model_Topics::COLUMN_EMAIL,
+         Forum_Model_Topics::COLUMN_DATE_ADD, Forum_Model_Topics::COLUMN_NAME,
+         Forum_Model_Topics::COLUMN_TEXT, Forum_Model_Topics::COLUMN_CREATED_BY,
+         ))->record($idTopic);
+      // pokud není téma nebo téma nemá nastavenu notifikaci, neodesílat
+      if($topic == false || $topic->{Forum_Model_Topics::COLUMN_NOTIFICATION_EMAILS} == null){
+         return;
+      }
+      
+      try {
+         $mail = new Email(true);
+         $mail->setSubject(sprintf('Fórum: reakce na Váš příspěvek k tématu %s', $topic->{Forum_Model_Topics::COLUMN_NAME}));
+         $mail->addAddress($parentMsg->{Forum_Model_Messages::COLUMN_EMAIL});
+         
+         $tplFile = $this->module()->getLibDir().DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.'mail_reaction_tpl.html';
+         if(!is_file($tplFile)){
+            return;
+         }
+         // tady ještě test z faces asi
+         $mailCnt = file_get_contents($tplFile) ; // mail content loaded from template
+         
+         /* přepis hodnot */
+         /* 
+          * {POST_NEW_NAME} - nový příspěvek
+          * {POST_NEW_LINK} - odkaz příspěvek
+          * {POST_NEW_INFO} - odkaz příspěvek
+          * {POST_NEW_TEXT} - odkaz příspěvek
+          * {WEB_LINK} - odkaz na stránky
+          * {TOPIC_LINK} - odkaz na téma ve fóru
+          * {TOPIC_NAME} - název tématu
+          * {TOPIC_TEXT} - text tématu
+          * {TOPIC_INFO} - autor a čas tématu
+          * 
+          * {POSTS} - seznam odpovědí (asi takhle ???)
+          */
+         $search = array(
+            // msg
+            '{MESSAGE_NAME}',
+            '{MESSAGE_LINK}',
+            '{MESSAGE_INFO}',
+            '{MESSAGE_TEXT}',
+            // topic
+            '{TOPIC_NAME}',
+            '{TOPIC_LINK}',
+            '{TOPIC_INFO}',
+            '{TOPIC_TEXT}',
+            // reakce
+            '{REACTION_NAME}',
+            '{REACTION_LINK}',
+            '{REACTION_INFO}',
+            '{REACTION_TEXT}',
+            // ostatní
+            '{WEB_NAME}',
+            '{WEB_LINK}',
+            '{CANCEL_LINK}',
+         );
+         
+         $linkClear = clone $this->link();
+            $replace = array(
+            // new msg
+            $parentMsg->{Forum_Model_Messages::COLUMN_NAME},
+            $this->link()->route('showTopic')->rmParam()->anchor('message-'.$parentMsg->{Forum_Model_Messages::COLUMN_ID}),
+            $parentMsg->{Forum_Model_Messages::COLUMN_CREATED_BY}
+               .' ('.  vve_date('%x %X', new DateTime($parentMsg->{Forum_Model_Messages::COLUMN_DATE_ADD})).')'
+               .' <'.$parentMsg->{Forum_Model_Messages::COLUMN_EMAIL}.'>',
+            $parentMsg->{Forum_Model_Messages::COLUMN_TEXT},   
+            // topic
+            $topic->{Forum_Model_Topics::COLUMN_NAME},
+            $this->link()->route('showTopic')->rmParam(),
+            $topic->{Forum_Model_Topics::COLUMN_CREATED_BY}
+               .' ('.  vve_date('%x %X', new DateTime($topic->{Forum_Model_Topics::COLUMN_DATE_ADD})).')'
+               .' <'.$topic->{Forum_Model_Topics::COLUMN_EMAIL}.'>',
+            $topic->{Forum_Model_Topics::COLUMN_TEXT},
+            // reakce
+            $reaction->{Forum_Model_Messages::COLUMN_NAME},
+            $this->link()->route('showTopic')->rmParam()->anchor('message-'.$reaction->{Forum_Model_Messages::COLUMN_ID}),
+            $reaction->{Forum_Model_Messages::COLUMN_CREATED_BY}
+               .' ('.  vve_date('%x %X', new DateTime($reaction->{Forum_Model_Messages::COLUMN_DATE_ADD})).')'
+               .' <'.$reaction->{Forum_Model_Messages::COLUMN_EMAIL}.'>',
+            $reaction->{Forum_Model_Messages::COLUMN_TEXT},   
+            // ostatní
+            VVE_WEB_NAME,
+            $linkClear->clear(true),
+            $this->link()->route('cancelMessageNotify', array('idm' => $parentMsg->{Forum_Model_Messages::COLUMN_ID})),
+         );
+         
+         $mailCnt = str_replace($search, $replace, $mailCnt);
+         
+//         Debug::log($mailCnt);
+         $mail->setContent($mailCnt);
+         $mail->batchSend();
+         
+      } catch (Swift_SwiftException $exc) {
+         $this->log('Chyba při odesílání upozornění na nový příspěvek: '.$exc->getTraceAsString());
+      }
+   }
+   
+   public function cancelMessageNotifyController()
+   {
+      $modelT = new Forum_Model_Topics();
+      $modelM = new Forum_Model_Messages();
+      
+      $msg = $modelM->record($this->getRequest('idm'));
+      
+      if(!$msg){
+         return false;
+      }
+      $topic = $modelT->record($msg->{Forum_Model_Messages::COLUMN_ID_TOPIC});
+      $this->view()->message = $msg;
+      $this->view()->topic = $topic;
+      
+      if($this->getRequestParam('confirm', false)){
+         $msg->{Forum_Model_Messages::COLUMN_SEND_NOTIFY} = false;
+         $modelM->save($msg);
+         
+         $this->infoMsg()->addMessage($this->tr('Upozornění na reakce bylo zrušeno'));
+         $this->link()->rmParam('confirm')->reload();
+      }
+      
+   }
+
    /**
     * Metoda pro nastavení modulu
     */
@@ -592,14 +745,14 @@ class Forum_Controller extends Controller {
          $form->scrollT->setValues($settings['scrollT']);
       }
       
-      $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet příspěvků na stránku'));
-      $elemScroll->setSubLabel($this->tr(sprintf('Výchozí: %s příspěvků', self::DEFAULT_NUM_ON_PAGE)));
-      $elemScroll->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemScroll,'basic');
-
-      if(isset($settings['scroll'])) {
-         $form->scroll->setValues($settings['scroll']);
-      }
+//      $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet příspěvků na stránku'));
+//      $elemScroll->setSubLabel($this->tr(sprintf('Výchozí: %s příspěvků', self::DEFAULT_NUM_ON_PAGE)));
+//      $elemScroll->addValidation(new Form_Validator_IsNumber());
+//      $form->addElement($elemScroll,'basic');
+//
+//      if(isset($settings['scroll'])) {
+//         $form->scroll->setValues($settings['scroll']);
+//      }
 
       $fGrpNewItem = $form->addGroup('newitem', $this->tr('Přidání příspěvku'));
 
@@ -648,13 +801,13 @@ class Forum_Controller extends Controller {
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings['scrollT'] = $form->scrollT->getValues();
-         $settings['scroll'] = $form->scroll->getValues();
+//         $settings['scroll'] = $form->scroll->getValues();
          $settings[self::PARAM_CAPCHA_SEC] = (int)$form->capchatime->getValues();
          // oznámení
          $settings[self::PARAM_NOTIFY_EMAILS] = $form->notifyEMails->getValues();
          $settings[self::PARAM_NOTIFY_USERS] = $form->notifyUsers->getValues();
       }
    }
+   
 }
-
 ?>

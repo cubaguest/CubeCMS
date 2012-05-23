@@ -1,0 +1,132 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addFile('css://style.css');
+$h = $this->topic->{Forum_Model_Topics::COLUMN_NAME};
+if($this->topic->{Forum_Model_Topics::COLUMN_SOLVED}){
+   $h .= ' - '.$this->tr('vyřešeno');
+}
+$jqcss = new JsPlugin_JQueryCSS();
+$this->addJsPlugin($jqcss);
+?>
+<h1><?=$h?></h1>
+<div class="forum-items main-content-list">
+   <ul class="forum-topic-messages">
+      <li class="topic-header ui-widget-header item">
+         <table class="full-width">
+            <tr class="">
+            <th class="message-author"><?=$this->tr('Autor');?></th>
+            <th class="message-text"><?=$this->tr('Zpráva');?></th>
+         </tr>
+         </table>
+      </li>
+      <li class="topic ui-widget-content item">
+         <table class="full-width">
+            <tr>
+               <td class="message-author">
+                  <?=ps($this->topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?>
+                  <div class="message-params">
+                     <?printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($this->topic->{Forum_Model_Topics::COLUMN_DATE_ADD})));?>
+                  </div>
+               </td>
+               <td class="message-text">
+                  <?echo $this->toolboxTopic;?>
+                  <div class="main-content-text">
+                     <?echo $this->topic->{Forum_Model_Topics::COLUMN_TEXT};?>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td></td>
+               <td class="message-tools">
+                  <?
+                  $linkToAdd = $this->link()
+                     ->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID})); 
+                  ?>
+                  <?if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+                  <a href="<?=$linkToAdd ?>" 
+                     title="<?=$this->tr('Reagovat na tento příspěvek')?>" 
+                     ><img src="/images/icons/comment_add.png" alt="add" /> <?=$this->tr('Reagovat')?></a>
+                  <?}?>
+               </td>
+            </tr>
+         </table>
+      </li>
+      <?if(!empty ($this->messages)){ ?>
+      <?foreach ($this->messages as $message) {?>
+      <li id="message-<?=$message->{Forum_Model_Messages::COLUMN_ID}?>"
+          style="margin-left: <?=(int)($message->{Forum_Model_Messages::COLUMN_DEPTH}*20+10)?>px"
+          class="item ui-widget-content <?if($message->{Forum_Model_Messages::COLUMN_CENSORED})echo "ui-state-disabled";?>">
+            <table class="full-width">
+               <tr>
+                  <td class="message-author">
+                     <?echo ps($message->{Forum_Model_Messages::COLUMN_CREATED_BY}).'<br/>';?>
+                     <div class="message-params">
+                     <?if($message->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} == true){
+                        echo $this->tr('Moderátor').'<br/>';
+                     } else if($message->{Forum_Model_Messages::COLUMN_ID_USER} == 0){
+                        echo $this->tr('Anonymní').'<br/>';
+                     }
+                     printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($message->{Forum_Model_Messages::COLUMN_DATE_ADD})));
+                     if($message->{Forum_Model_Messages::COLUMN_CENSORED}){
+                        echo '<p class="font-small">'.$this->tr('Příspěvek byl cenzurován').'</p>';
+                     }
+                     ?>
+                     </div>
+                  </td>
+                  <td class="message-text">
+                     <?
+                     if($this->toolboxMessage instanceof Template_Toolbox2 && ($this->category()->getRights()->isControll()
+                        || $message->{Forum_Model_Messages::COLUMN_ID_USER} == Auth::getUserId() )){
+                        $this->toolboxMessage->edit_message->setAction($this->link()->route('editMessage', array('idm' => $message->{Forum_Model_Messages::COLUMN_ID})));
+                        if(isset($this->toolboxMessage->message_delete)){
+                           $this->toolboxMessage->message_censore->getForm()->id->setValues($message->{Forum_Model_Messages::COLUMN_ID});
+                           $this->toolboxMessage->message_delete->getForm()->id->setValues($message->{Forum_Model_Messages::COLUMN_ID});
+                        }
+                        echo $this->toolboxMessage;
+                     }
+                     ?>
+                     <div class="main-content-text">
+                     <?
+                     if($this->category()->getRights()->isControll() || $message->{Forum_Model_Messages::COLUMN_CENSORED} == false){
+                        if($message->{Forum_Model_Messages::COLUMN_NAME} != null){
+                           echo '<h2>'.$message->{Forum_Model_Messages::COLUMN_NAME}.'</h2>';
+                        }
+                        echo $message->{Forum_Model_Messages::COLUMN_TEXT};
+                     } else {
+                        echo '<p>'.$this->tr('Příspěvek byl cenzurován.').'<p>';
+                     }?>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td></td>
+               <td class="message-tools">
+                  <?
+                  $linkToAdd = $this->link()
+                     ->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))
+                     ->param('msg', $message->{Forum_Model_Messages::COLUMN_ID}); 
+                  ?>
+                  <?if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+                  <a href="<?=$linkToAdd ?>" 
+                     title="<?=$this->tr('Reagovat na tento příspěvek')?>" 
+                     ><img src="/images/icons/comment_add.png" alt="add" /> <?=$this->tr('Reagovat')?></a>
+                  <?}?>
+               </td>
+            </tr>
+         </table>
+      </li>
+      <?}
+   }?>
+      <li class="topic-footer ui-widget-content item message-tools">
+         <a href="<?=$this->link()->route('rssTopic', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
+            title="<?=$this->tr('Sledovat diskusi pomocí rss')?>" 
+            ><img src="/images/icons/rss.png" alt="add" /> <?=$this->tr('Sledovat')?></a>
+         <?if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+         <a href="<?=$this->link()->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
+            title="<?=$this->tr('Přidat nový příspěvek')?>" 
+            ><img src="/images/icons/comment_add.png" alt="add" /> <?=$this->tr('Přidat příspěvek')?></a>
+         <?}?>
+      </li>
+   </ul>
+   <div class="link-back"><a href="<?=$this->link()->route()?>" title="<?=$this->tr('Zpět na seznam témat');?>">&Lt; <?=$this->tr('Zpět na seznam témat');?></a></div>
+</div>
