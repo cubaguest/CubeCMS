@@ -1,0 +1,22 @@
+<?
+// do titulku
+if($this->partner != null) {
+   $h = sprintf($this->tr('Úprava partnera "%s"'),$this->partner->{Partners_Model::COLUMN_NAME});
+} else {
+   $h = $this->tr('Přidání partnera');
+}
+$this->addPageTitle($h);
+// donastavení formuláře
+//$this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
+
+if(isset ($this->form->imgdel)){
+   $src = vve_image_cacher($this->category()->getModule()->getDataDir(true).$this->partner->{Partners_Model::COLUMN_IMAGE}, null, 60);
+   $this->form->imgdel->setSubLabel($this->tr('Uložen obrázek:').'<br /><img src="'.$src.'" alt="'.$this->partner->{Partners_Model::COLUMN_IMAGE}.'" height="60" />');
+}
+?>
+<h1><?=$h?></h1>
+<div class="main-content-form-edit">
+   <?
+   echo($this->form);
+   ?>
+</div>

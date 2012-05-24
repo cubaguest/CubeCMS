@@ -1,0 +1,43 @@
+/* tabulka partnerů */
+
+.partners-list .partner {
+   clear: both;
+   margin-bottom: 1em;
+}
+
+.partner-image {
+   float: left;
+   width: 110px;
+}
+.partner-image img {}
+.partner-text {
+   margin-left: 120px;
+}
+
+.partner-disabled {
+/*   background-color: #EFEFEF ;*/
+}
+.partner-disabled .partner-image,
+.partner-disabled .partner-text {
+   opacity: 0.3;
+}
+
+/* pořadí */
+#partners-list, #partners-list li {
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+
+#partners-list li {
+   padding: 3px;
+   cursor: move;
+   min-height: 1.2em;
+}
+#partners-list li .ui-icon {
+   float: left;
+}
+#partners-list li img {
+   float: right;
+}
+   

@@ -1,0 +1,41 @@
+<?
+$icon = null;
+if($this->panelObj()->getIcon() != null){
+   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+}
+$backImg = null;
+if($this->panelObj()->getBackImage() != null){
+   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+}
+?>
+<div class="label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
+   <?foreach ($this->partners as $partner) {?>
+   <div class="name">
+      <?
+      if($partner->{Partners_Model::COLUMN_URL} != null){
+         echo '<a href="'.$partner->{Partners_Model::COLUMN_URL}.'" title="'.  htmlspecialchars($partner->{Partners_Model::COLUMN_NAME}).'" class="link-external">';
+      }
+      ps($partner->{Partners_Model::COLUMN_NAME});
+      if($partner->{Partners_Model::COLUMN_URL} != null){
+         echo "</a>";
+      }
+      ?>
+   </div>
+   <?
+   if($partner->{Partners_Model::COLUMN_IMAGE} != null){
+      $imgsrc = vve_image_cacher($this->imagesDir.$partner->{Partners_Model::COLUMN_IMAGE}, 150);?>
+      <div class="image">
+         <?if($partner->{Partners_Model::COLUMN_URL} != null){
+            echo '<a href="'.$partner->{Partners_Model::COLUMN_URL}.'" title="'.  htmlspecialchars($partner->{Partners_Model::COLUMN_NAME}).'" class="link-external">';
+         }?>
+         <img src="<?=$imgsrc ?>" alt="<?ps($partner->{Partners_Model::COLUMN_NAME})?>" />
+         <?if($partner->{Partners_Model::COLUMN_URL} != null){
+            echo '</a>';
+         }?>
+      </div>   
+   <?}?>
+   <?}?>
+   <div class="link-more">
+      <a href="<?=$this->link()?>"
+         title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
+   </div>

@@ -1,0 +1,52 @@
+<?
+$this->addFile('css://style.css');
+
+?>
+<h1><?=$this->category()->getName()?></h1>
+<div class="main-content-list partners-list">
+   <?
+   if(!empty($this->partners)){?>
+   
+   <?
+      foreach ($this->partners as $partner) {
+         $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true).$partner->{Partners_Model::COLUMN_IMAGE}, 100, 100);
+         
+         // set Toolbox
+         if($this->toolboxEdit != null){
+            $this->toolboxEdit->partner_edit->setAction($this->link()->route('edit', array('id' => $partner->{Partners_Model::COLUMN_ID})));
+            $this->toolboxEdit->partner_del_->getForm()->id->setValues($partner->{Partners_Model::COLUMN_ID});
+            $this->toolboxEdit->partner_visibility_->getForm()->id->setValues($partner->{Partners_Model::COLUMN_ID});
+         }
+         $classes = array();
+         if($partner->{Partners_Model::COLUMN_DISABLED}){
+            $classes[] = "partner-disabled";
+         }
+         
+         ?>
+   <div id="partner-<?=$partner->{Partners_Model::COLUMN_ID}?>" class="partner <?=implode(" ",$classes)?>">
+      <div class="partner-image">
+         <?if($partner->{Partners_Model::COLUMN_IMAGE} != null){?>
+            <img src="<?=$imgsrc ?>" alt="<?ps($partner->{Partners_Model::COLUMN_NAME})?>" />
+         <?}?>
+      </div>
+      <div class="partner-text">
+         <div class="text">
+            <h2><?if($partner->{Partners_Model::COLUMN_URL} != null){?>
+               <a href="<?=$partner->{Partners_Model::COLUMN_URL}?>" title="<?ps($partner->{Partners_Model::COLUMN_NAME})?>"
+                  class="link-external" ><?ps($partner->{Partners_Model::COLUMN_NAME})?></a>
+            <?} else {?>
+               <?ps($partner->{Partners_Model::COLUMN_NAME})?>
+            <?}?></h2>
+            <p><?ps($partner->{Partners_Model::COLUMN_TEXT})?></p>
+         </div>
+         <hr class="reseter" />
+      </div>
+      <?echo $this->toolboxEdit;?>
+   </div>
+      <?}?>
+   <?}?>
+   
+</div>
+<?
+   echo $this->toolbox;// TOOLBOXY
+?>

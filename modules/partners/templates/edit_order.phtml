@@ -1,0 +1,65 @@
+<?
+// do titulku
+$h = $this->tr('úprava pořadí partnerů');
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+<h1><?= $h ?></h1>
+<div class="main-content-form-edit">
+   <? echo $this->form->renderStart(); ?>
+   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?=$this->tr('Pořadí partnerů v zobrazení')?></span>
+         <span class="form-legend-text"></span>
+      </legend>
+      <table class="form-table">
+         <tr>
+            <th class="form-labels"><label for="partner_degreeAfter_1" class="partner_degreeAfter_label_class"><?=$this->tr('Partneři')?>:</label></th>
+            <td class="form-controlls">
+            <ul id="partners-list">
+               <?
+               foreach ($this->partners as $partner) {
+                  ?>
+                  <li class="ui-state-default">
+                     <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                     <?
+                     echo $partner->{Partners_Model::COLUMN_NAME};
+                     $this->form->id->setValues($partner->{Partners_Model::COLUMN_ID});
+                     echo $this->form->id;
+                     if($partner->{Partners_Model::COLUMN_DISABLED}){
+                        echo "<em>(".$this->tr('vypnut').")</em>";
+                     }
+                     if($partner->{Partners_Model::COLUMN_IMAGE} != null){
+                        $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true).$partner->{Partners_Model::COLUMN_IMAGE}, null, 20);
+                     ?>
+                     <img src="<?=$imgsrc ?>" alt="<?ps($partner->{Partners_Model::COLUMN_NAME})?>" />
+                     <?}?>
+                  </li>
+               <?}?>
+            </ul>
+            </td>
+         </tr>
+         <tr>
+            <td class="form-labels"></td>
+            <td class="form-controlls font-small"><?=$this->tr('Pro změnu pořadí stačí partnera uchopit myší a přesunout.')?></td>
+         </tr>
+         <tr>
+            <th class="form-labels"><?=$this->form->save->label()?></th>
+            <td class="form-controlls"><?=$this->form->save->controllAll()?></td>
+         </tr>
+      </table>
+   </fieldset>   
+   <? echo $this->form->renderEnd(); ?>
+   <script>
+	$(function() {
+		$( "#partners-list" ).sortable({
+			placeholder: "ui-state-highlight",
+         cursor: 'move',
+         forceHelperSize: true
+		});
+		$( "#partners-list" ).disableSelection();
+	});
+	</script>
+</div>
