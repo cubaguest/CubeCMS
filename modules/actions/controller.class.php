@@ -220,10 +220,11 @@ class Actions_Controller extends Controller {
          // pokud je nový obr nahrajeme jej
          if($form->image->getValues() != null) {
             $imageObj = new File_Image($form->image);
+            $crop = $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
             $imageObj->getData()->resize(
                $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W), 
                $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C)
+               $crop
                )->save();
             $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
             $action->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();
@@ -234,6 +235,7 @@ class Actions_Controller extends Controller {
          $names = $form->name->getValues();
          $urlkeys = $this->createUrlKey($urlkeys, $names, $action->{Actions_Model::COLUMN_ID});
          
+         $action->{Actions_Model::COLUMN_ID_CAT} = $this->category()->getId();
          $action->{Actions_Model::COLUMN_NAME} = $form->name->getValues();
          $action->{Actions_Model::COLUMN_SUBANME} = $form->subname->getValues();
          $action->{Actions_Model::COLUMN_AUTHOR} = $form->author->getValues();
@@ -330,7 +332,6 @@ class Actions_Controller extends Controller {
                $form->date_stop->setError($this->tr('Konečné datum končí dříve než datum začátku'));
          }
       }
-
       if($form->isValid()) {
          // vybrání exist. obrázku
          if(isset ($form->titleImage)){
@@ -339,10 +340,11 @@ class Actions_Controller extends Controller {
          // pokud je nový obr nahrajeme jej
          if($form->image->getValues() != null) {
             $imageObj = new File_Image($form->image);
+            $crop = $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
             $imageObj->getData()->resize(
                $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W), 
                $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C)
+               $crop
                )->save();
             $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
             $action->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();

@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}actions` (
   `public` tinyint(1) NOT NULL DEFAULT '1',
   `time_add` datetime NOT NULL,
   `changed` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_form` int(11) DEFAULT NULL,
+  `form_show_to_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id_action`),
   UNIQUE KEY `urlkey_cs` (`urlkey_cs`),
   UNIQUE KEY `urlkey_de` (`urlkey_de`),

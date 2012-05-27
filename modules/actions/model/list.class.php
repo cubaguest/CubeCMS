@@ -36,7 +36,7 @@ class Actions_Model_List extends Model_PDO {
 //              ." OR (".Actions_Model_Detail::COLUMN_DATE_STOP." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_STOP." <= :dateStop) )"
               ." AND ( (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 0 AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_STOP." >= :dateStart)"
               ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 0 AND ".Actions_Model_Detail::COLUMN_DATE_START." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
-              ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 1 AND ".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND `time` >= CURTIME())"
+              ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 1 AND ".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND ".Actions_Model_Detail::COLUMN_TIME." >= CURTIME())"
               ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 1 AND ".Actions_Model_Detail::COLUMN_DATE_START." > :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." < :dateStop) )"
 //              ." ORDER BY delta_days ASC, ".Actions_Model_Detail::COLUMN_DATE_START." ASC, ".Actions_Model_Detail::COLUMN_DATE_STOP." ASC , timeord ASC"
               ." ORDER BY delta_days ASC, timeord ASC, ".Actions_Model_Detail::COLUMN_DATE_STOP." ASC");

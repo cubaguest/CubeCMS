@@ -12,26 +12,26 @@ class Actions_Model_Detail extends Model_PDO {
     * Názvy sloupců v databázi
     * @var string
     */
-   const COLUMN_NAME = 'name';
-   const COLUMN_AUTHOR = 'author';
-   const COLUMN_SUBANME = 'subname';
-   const COLUMN_TEXT = 'text';
-   const COLUMN_NOTE = 'note';
-   const COLUMN_TEXT_CLEAR = 'text_clear';
-   const COLUMN_URLKEY = 'urlkey';
+   const COLUMN_NAME = 'action_name';
+   const COLUMN_AUTHOR = 'action_author';
+   const COLUMN_SUBANME = 'action_subname';
+   const COLUMN_TEXT = 'action_text';
+   const COLUMN_NOTE = 'action_note';
+   const COLUMN_TEXT_CLEAR = 'action_text_clear';
+   const COLUMN_URLKEY = 'action_urlkey';
    const COLUMN_ID_USER = 'id_user';
    const COLUMN_ID_CAT = 'id_category';
-   const COLUMN_ID = 'id_action';
-   const COLUMN_PUBLIC = 'public';
-   const COLUMN_DATE_START = 'start_date';
-   const COLUMN_DATE_STOP = 'stop_date';
-   const COLUMN_IMAGE = 'image';
-   const COLUMN_CHANGED = 'changed';
-   const COLUMN_ADDED = 'time_add';
-   const COLUMN_TIME = 'time';
-   const COLUMN_PLACE = 'place';
-   const COLUMN_PRICE = 'price';
-   const COLUMN_PREPRICE = 'preprice';
+   const COLUMN_ID = 'action_id_action';
+   const COLUMN_PUBLIC = 'action_public';
+   const COLUMN_DATE_START = 'action_start_date';
+   const COLUMN_DATE_STOP = 'action_stop_date';
+   const COLUMN_IMAGE = 'action_image';
+   const COLUMN_CHANGED = 'action_changed';
+   const COLUMN_ADDED = 'action_time_add';
+   const COLUMN_TIME = 'action_time';
+   const COLUMN_PLACE = 'action_place';
+   const COLUMN_PRICE = 'action_price';
+   const COLUMN_PREPRICE = 'action_preprice';
 
    /**
     * Metoda uloží akci do db
