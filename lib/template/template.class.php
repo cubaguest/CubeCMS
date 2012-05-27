@@ -17,7 +17,8 @@ require_once 'template_functions.php';
 require_once 'template_postfilters.php';
 require_once 'template_outputfilters.php'; // filtry výstupu
 require_once 'nonvve/browser/Browser.php'; // browser detection library
-require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
+//require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
+require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
 
 class Template extends TrObject {
    /**
@@ -607,6 +608,12 @@ class Template extends TrObject {
                   } else {
                      $filePath = $this->getLesscCssFromModule($matches['filepath'], $matches['module'], $original);
                   }
+               } else if($matches['ext'] == "scss"){
+                  if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
+                     $filePath = $this->getScsscCssFromEngine($matches['filepath'], $original);
+                  } else {
+                     $filePath = $this->getScsscCssFromModule($matches['filepath'], $matches['module'], $original);
+                  }
                } else {
                   if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
                      $filePath = $this->getLinkPathFromEngine($matches['filepath'], self::STYLESHEETS_DIR, $original);
@@ -800,7 +807,12 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
       }
       
       try {
-         lessc::ccompile($path . $rpFile, $path . $rpFile . ".css");
+         if(VVE_DEBUG_LEVEL >= 2){
+            $cssStr = lessc::cexecute($path . $rpFile, true);
+            file_put_contents($path . $rpFile . ".css",  $cssStr['compiled']); // when debug > 2force recompile
+         } else {
+            lessc::ccompile($path . $rpFile, $path . $rpFile . ".css");
+         }
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
@@ -808,6 +820,68 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
    }
    
    protected function getLesscCssFromModule($file, $module, $original = false) {
+      
+//      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
+//      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+//      $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+//      
+//      if(VVE_SUB_SITE_DIR != null){
+//         $rpParentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $rpFaceDir);
+//      }
+//      $rpMainDir = AppCore::getAppLibDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+//      
+//      $path = $url = null;
+//      if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
+//         $path = $rpFaceDir;
+//         $url = Template::face(false);
+//      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+//         $path = $rpParentFaceDir;
+//         $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false));
+//      } else if(is_file($rpMainDir.$rpFile)) { // soubor v knihovnách
+//         $path = $rpMainDir;
+//         $url = Url_Request::getBaseWebDir(true);
+//      } else {
+//         throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
+//      }
+//      
+//      lessc::ccompile($path . $rpFile, $path . $rpFile.".css");
+//      return $url.self::STYLESHEETS_DIR."/".$file.".css";
+   }
+   
+   protected function getScsscCssFromEngine($file, $original = false) {
+      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
+      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      
+      if(VVE_SUB_SITE_DIR != null){
+         $rpParentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $rpFaceDir);
+      }
+      $rpMainDir = AppCore::getAppLibDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      
+      $path = $url = null;
+      if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
+         $path = $rpFaceDir;
+         $url = Template::face(false);
+      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+         $path = $rpParentFaceDir;
+         $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false));
+      } else if(is_file($rpMainDir.$rpFile)) { // soubor v knihovnách
+         $path = $rpMainDir;
+         $url = Url_Request::getBaseWebDir(true);
+      } else {
+         throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
+      }
+      
+      try {
+         $parser = new SassParser($options);
+         file_put_contents($path . $rpFile . ".css",  $parser->toCss($file)); // when debug > 2force recompile
+      } catch (Exception $exc) {
+         new CoreErrors($exc);
+      }
+      return $url.self::STYLESHEETS_DIR."/".$file.".css";
+   }
+   
+   protected function getScsscCssFromModule($file, $module, $original = false) {
       
 //      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
 //      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
