@@ -15,8 +15,8 @@ class ActionsWGal_Controller extends Actions_Controller {
       // fotogalerie
       $this->view()->pCtrl = new Photogalery_Controller($this);
       $this->view()->pCtrl->loadText = false;
-      $this->view()->pCtrl->idItem = $this->view()->action->{Actions_Model_Detail::COLUMN_ID};
-      $this->view()->pCtrl->subDir = $this->view()->action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->pCtrl->idItem = $this->view()->action->{Actions_Model::COLUMN_ID};
+      $this->view()->pCtrl->subDir = $this->view()->action[Actions_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
       $this->view()->pCtrl->mainController();
       // adresáře k fotkám
       $this->view()->subdir = $this->view()->pCtrl->subDir;
@@ -26,15 +26,15 @@ class ActionsWGal_Controller extends Actions_Controller {
    protected function deleteAction($action) {
       // smazání galerie
       $photoCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $photoCtrl->iditem = $action->{Actions_Model_Detail::COLUMN_ID};
-      $photoCtrl->subDir = $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
-      $photoCtrl->deleteImages($action->{Actions_Model_Detail::COLUMN_ID});
+      $photoCtrl->iditem = $action->{Actions_Model::COLUMN_ID};
+      $photoCtrl->subDir = $action[Actions_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $photoCtrl->deleteImages($action->{Actions_Model::COLUMN_ID});
       unset ($photoCtrl);
       // smazání akce
       $this->deleteActionData($action);
               
-      $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána'), $action->{Actions_Model_Detail::COLUMN_NAME}));
-      $this->view()->linkBack->reload();
+      $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána'), $action->{Actions_Model::COLUMN_NAME}));
+      $this->link()->reload($this->view()->linkBack);
    }
 
    /**
@@ -46,16 +46,18 @@ class ActionsWGal_Controller extends Actions_Controller {
     */
    protected function callRegisteredModule(Controller $ctrl, $module, $action)
    {
-      $model = new Actions_Model_Detail();
-      $act = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
+      $model = new Actions_Model();
+      $act = $model->where(Actions_Model::COLUMN_URLKEY." = :ukey && ".Actions_Model::COLUMN_ID_CAT." = :idc",
+         array('ukey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
+         ->record();
       
       if($act == false) return false;
       // base setup variables
-      $ctrl->idItem = $act->{Actions_Model_Detail::COLUMN_ID};
-      $ctrl->subDir = $act[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $ctrl->idItem = $act->{Actions_Model::COLUMN_ID};
+      $ctrl->subDir = $act[Actions_Model::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
       $ctrl->linkBack = $this->link()->route('detail');
       
-      $ctrl->view()->name = $act->{Actions_Model_Detail::COLUMN_NAME};
+      $ctrl->view()->name = $act->{Actions_Model::COLUMN_NAME};
    }
    
    protected function settings(&$settings,Form &$form) {

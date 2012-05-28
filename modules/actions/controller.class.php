@@ -96,8 +96,9 @@ class Actions_Controller extends Controller {
    protected function showEvent($urlkey = null)
    {
       $model = new Actions_Model();
-      $model = new Actions_Model();
-      $this->view()->action = $model->where(Actions_Model::COLUMN_ID_CAT." = :idc AND ".Actions_Model::COLUMN_URLKEY." = :urlkey", 
+      $this->view()->action = $model
+         ->joinFK(Actions_Model::COLUMN_ID_USER)
+         ->where(Actions_Model::COLUMN_ID_CAT." = :idc AND ".Actions_Model::COLUMN_URLKEY." = :urlkey", 
          array( 'urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
          ->record();
       if($this->view()->action == false) {

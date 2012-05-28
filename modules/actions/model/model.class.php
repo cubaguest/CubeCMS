@@ -73,6 +73,9 @@ class Actions_Model extends Model_ORM {
       
       $this->addColumn(self::COLUMN_FORM, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_FORM_SHOW_TO, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      
+      $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users', Model_Users::COLUMN_ID);
    }
    
    public function setPastOnly($idc)

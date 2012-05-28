@@ -1,25 +1,25 @@
 <? // načtení detailu
-$this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
-$this->addPageHeadline($this->action->{Actions_Model_Detail::COLUMN_NAME});
+$this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
+$this->addPageHeadline($this->action->{Actions_Model::COLUMN_NAME});
 
 $photosModel = new PhotoGalery_Model_Images();
 $this->addJsPlugin(new JsPlugin_PiroBox());
 ?>
 
 <div>
-   <!--<h2><?=htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>&nbsp;-->
+   <!--<h2><?=htmlspecialchars($this->action->{Actions_Model::COLUMN_NAME})?>&nbsp;-->
    <!--</h2>-->
    <p>
       <?
-      $startDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_START});
-      $stopDate = strftime("%x", $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP});
+      $startDate = strftime("%x", $this->action->{Actions_Model::COLUMN_DATE_START});
+      $stopDate = strftime("%x", $this->action->{Actions_Model::COLUMN_DATE_STOP});
       print ($startDate);
       if($startDate != $stopDate) {
          print ("&nbsp;&mdash;&nbsp;");
          print ($stopDate);
       }?>
       <br />
-      <?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $this->action->{Actions_Model_Detail::COLUMN_EDIT_TIME})?>
+      <?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $this->action->{Actions_Model::COLUMN_EDIT_TIME})?>
    </p>
    <p>
       <a href="<?=$this->link()->route('detail')?>"><?=$this->_('Text')?></a>

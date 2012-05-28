@@ -1,5 +1,5 @@
 <? // načtení detailu
-$this->addPageTitle($this->action->{Actions_Model_Detail::COLUMN_NAME});
+$this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
 
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
@@ -7,48 +7,48 @@ $this->addJsPlugin($jQuery);
 $images = $this->images;
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model_Detail::COLUMN_NAME};?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
-   <?if($this->action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {?>
+   <?if($this->action->{Actions_Model::COLUMN_IMAGE} != null) {?>
    <div class="main-content-image"><!-- SOF TEXT -->
-      <?echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model_Detail::COLUMN_IMAGE}), 'image', 300,null, 'actionImage'));?>
+      <?echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model::COLUMN_IMAGE}), 'image', 300,null, 'actionImage'));?>
    </div>
    <?}?>
    <div class="main-content-annotation">
       <p class="main-content-dates">
                <?
-               $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_START}));
-               $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model_Detail::COLUMN_DATE_STOP}));
+               $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_START}));
+               $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_STOP}));
                print ($startDate);
-               if($startDate != $stopDate AND $this->action->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
+               if($startDate != $stopDate AND $this->action->{Actions_Model::COLUMN_DATE_STOP} != null) {
                   echo ("&nbsp;&mdash;&nbsp;");
                   echo ($stopDate);
                }
-               if($this->action->{Actions_Model_Detail::COLUMN_TIME} != null) {
-                  $time = new DateTime($this->action->{Actions_Model_Detail::COLUMN_TIME});
+               if($this->action->{Actions_Model::COLUMN_TIME} != null) {
+                  $time = new DateTime($this->action->{Actions_Model::COLUMN_TIME});
                   echo (",&nbsp;".$time->format("G:i"));
                }?>
             </p>
             <p class="main-content-other">
                <?
-               if($this->action->{Actions_Model_Detail::COLUMN_PLACE} != null) {
-                  echo ',&nbsp;'.$this->action->{Actions_Model_Detail::COLUMN_PLACE};
+               if($this->action->{Actions_Model::COLUMN_PLACE} != null) {
+                  echo ',&nbsp;'.$this->action->{Actions_Model::COLUMN_PLACE};
                }
-               if((int)$this->action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-                  printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PRICE});
+               if((int)$this->action->{Actions_Model::COLUMN_PRICE} != null|0) {
+                  printf(',&nbsp;'.strtolower($this->tr('Vstupné: %d Kč')),$this->action->{Actions_Model::COLUMN_PRICE});
                }
-               if((int)$this->action->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-                  printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$this->action->{Actions_Model_Detail::COLUMN_PREPRICE});
+               if((int)$this->action->{Actions_Model::COLUMN_PREPRICE} != null|0) {
+                  printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$this->action->{Actions_Model::COLUMN_PREPRICE});
                }?>
             </p>
-         <?if($this->action->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-         <p class="action-note"><?=$this->action->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+         <?if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
+         <p class="action-note"><?=$this->action->{Actions_Model::COLUMN_NOTE}?></p>
             <?}?>
          <br />
    </div>
    <div class="main-content-text">
          <?
-         echo $this->action->{Actions_Model_Detail::COLUMN_TEXT};
+         echo $this->action->{Actions_Model::COLUMN_TEXT};
          ?>
          <hr class="reseter" />
    </div>
@@ -59,11 +59,14 @@ echo $this->toolbox;
    $this->includeFile('tpl://engine:photogalery.phtml');
    ?>
    <hr class="reseter" />
-   <?$this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
+   <?
+   $this->includeFile("tpl://forms:snipshet.phtml");
+   
+   $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
    <?$this->includeTpl('articletools.phtml', true, array(
-           'lastEditTime' => $this->action->{Actions_Model_Detail::COLUMN_CHANGED},
+           'lastEditTime' => $this->action->{Actions_Model::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
-           'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model_Detail::COLUMN_NAME})));
+           'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model::COLUMN_NAME})));
    ?>
 </div>
