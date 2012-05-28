@@ -165,7 +165,7 @@ class Text_Controller extends Controller {
       if(isset($form->label)){
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
-      $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::USER_ID;
+      $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
       $this->textModel->save($textRec);
    }
 
