@@ -55,6 +55,11 @@ class Text_View extends View {
          }
       }
 
+      $textFilters = array('anchors','filesicons');
+      if(defined('VVE_CACHE_TEXT_IMAGES') && VVE_CACHE_TEXT_IMAGES == true){
+         $textFilters[] = 'cacheimages';
+      }
+      
       // text nebyl zadán
       if($this->text == false){
          $this->text = new Object();
@@ -63,7 +68,7 @@ class Text_View extends View {
             $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
          }
       } else {
-         $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors'));
+         $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, $textFilters);
       }
 
       // private  text
@@ -75,8 +80,8 @@ class Text_View extends View {
                $this->textPrivate->{Text_Model::COLUMN_TEXT} = $this->tr('Privátní text nebyl vytvořen. Upravíte jej v administraci.');
             }
          }
-         $this->textPrivate->{Text_Model::COLUMN_TEXT} = $this->template()->filter(
-            (string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, array('anchors','filesicons'));
+         $this->textPrivate->{Text_Model::COLUMN_TEXT} = 
+            $this->template()->filter((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, $textFilters);
       }
    }
 

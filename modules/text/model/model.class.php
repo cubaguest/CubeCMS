@@ -15,6 +15,7 @@ class Text_Model extends Model_ORM {
     */
    const COLUMN_ID = 'id_text';
    const COLUMN_ID_CATEGORY = 'id_item';
+   const COLUMN_ID_USER_EDIT = 'id_user';
    const COLUMN_SUBKEY = 'subkey';
    const COLUMN_CHANGED_TIME = 'changed';
    const COLUMN_TEXT = 'text';
@@ -34,7 +35,7 @@ class Text_Model extends Model_ORM {
       $this->setTableName(self::DB_TABLE, 't_texts');
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-//      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID_USER_EDIT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
 //      $this->addColumn(self::COLUMN_ID_USER_LAST_EDIT, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
       $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_SUBKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => 'nokey'));
@@ -48,7 +49,7 @@ class Text_Model extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       
       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Category', Model_Category::COLUMN_CAT_ID);
-//      $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
+      $this->addForeignKey(self::COLUMN_ID_USER_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
 //      $this->addForeignKey(self::COLUMN_ID_USER_LAST_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
 //      $this->addRelatioOneToMany(self::COLUMN_ID, 'Text_Model_PrivateUsers', Text_Model_PrivateUsers::COLUMN_T_H_U_ID_TEXT);
    }

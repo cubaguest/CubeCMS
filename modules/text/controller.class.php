@@ -38,7 +38,6 @@ class Text_Controller extends Controller {
    public function exportTextController() {
       $this->checkReadableRights();
 
-      $model = new Text_Model();
       $modelPrivate = new Text_Model_Private();
       
       // text
@@ -98,6 +97,7 @@ class Text_Controller extends Controller {
    {
       $textRecord = $this->textModel->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
          array('idc' => $this->category()->getId(), 'subkey' => $subkey))
+         ->joinFK(Text_Model::COLUMN_ID_USER_EDIT)
          ->setSelectAllLangs($loadAllLangs)->record();
       return $textRecord;
    }
@@ -165,6 +165,7 @@ class Text_Controller extends Controller {
       if(isset($form->label)){
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
+      $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::USER_ID;
       $this->textModel->save($textRec);
    }
 
