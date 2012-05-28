@@ -17,8 +17,6 @@ require_once 'template_functions.php';
 require_once 'template_postfilters.php';
 require_once 'template_outputfilters.php'; // filtry výstupu
 require_once 'nonvve/browser/Browser.php'; // browser detection library
-//require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
-require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
 
 class Template extends TrObject {
    /**
@@ -610,9 +608,9 @@ class Template extends TrObject {
                   }
                } else if($matches['ext'] == "scss"){
                   if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
-                     $filePath = $this->getScsscCssFromEngine($matches['filepath'], $original);
+                     $filePath = $this->getSassCssFromEngine($matches['filepath'], $original, $matches['ext']);
                   } else {
-                     $filePath = $this->getScsscCssFromModule($matches['filepath'], $matches['module'], $original);
+                     $filePath = $this->getSassCssFromModule($matches['filepath'], $matches['module'], $original, $matches['ext']);
                   }
                } else {
                   if($matches['module'] == null OR $matches['module'] == 'engine'){ // jedná se soubor s aktuálního modulu nebo s enginu
@@ -783,6 +781,7 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
    }
 
    protected function getLesscCssFromEngine($file, $original = false) {
+      require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -820,6 +819,7 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
    }
    
    protected function getLesscCssFromModule($file, $module, $original = false) {
+      require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
       
 //      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
 //      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -848,7 +848,8 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
 //      return $url.self::STYLESHEETS_DIR."/".$file.".css";
    }
    
-   protected function getScsscCssFromEngine($file, $original = false) {
+   protected function getSassCssFromEngine($file, $original = false, $ext = 'scss') {
+      require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -873,15 +874,23 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
       }
       
       try {
+         $options = array(
+            'style' => SassRenderer::STYLE_NESTED,
+            'cache' => FALSE,
+            'syntax' => $ext == "sass" ? SassFile::SASS : SassFile::SCSS,
+            'debug' => false,
+            'debug_info' => false,
+         );
          $parser = new SassParser($options);
-         file_put_contents($path . $rpFile . ".css",  $parser->toCss($file)); // when debug > 2force recompile
+         file_put_contents($path . $rpFile . ".css",  $parser->toCss($path . $rpFile)); // when debug > 2force recompile
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
       return $url.self::STYLESHEETS_DIR."/".$file.".css";
    }
    
-   protected function getScsscCssFromModule($file, $module, $original = false) {
+   protected function getSassCssFromModule($file, $module, $original = false, $ext = 'scss') {
+      require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
       
 //      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
 //      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
