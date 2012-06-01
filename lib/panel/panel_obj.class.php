@@ -49,6 +49,12 @@ class Panel_Obj {
     * @var string
     */
    private $panelImg = null;
+   
+   /**
+    * Pozice panelu
+    * @var string
+    */
+   private $box = null;
 
    /**
     * Konstruktor
@@ -67,6 +73,7 @@ class Panel_Obj {
       $this->panelIcon = $panelData->{Model_Panel::COLUMN_ICON};
       $this->panelId = (int)$panelData->{Model_Panel::COLUMN_ID};
       $this->panelImg = $panelData->{Model_Panel::COLUMN_IMAGE};
+      $this->box = $panelData->{Model_Panel::COLUMN_POSITION};
    }
 
    /**
@@ -154,6 +161,14 @@ class Panel_Obj {
     */
    public function getImage() {
       return $this->panelImg;
+   }
+   
+   /**
+    * Metoda vrací pozici panelu
+    * @return string -- název pozice panelu
+    */
+   public function getPosition() {
+      return $this->box;
    }
 
    /**
