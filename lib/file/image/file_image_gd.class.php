@@ -36,10 +36,13 @@ class File_Image_Gd extends File_Image_Base {
    public function resize($w, $h, $option = self::RESIZE_AUTO)
    {
       $this->loadImageData();
-      
+      // obrázek je stejný
+      if($w == $this->width && $h == $this->height){
+         return $this;
+      }
       // *** Get optimal width and height - based on $option  
       $optionArray = $this->getDimensions($w, $h, $option);
-
+      
       $optimalWidth = $optionArray['optimalWidth'];
       $optimalHeight = $optionArray['optimalHeight'];
       
