@@ -21,6 +21,7 @@ class Text_Model extends Model_ORM {
    const COLUMN_TEXT = 'text';
    const COLUMN_TEXT_CLEAR = 'text_clear';
    const COLUMN_LABEL = 'label';
+   const COLUMN_DATA = 'data';
 
    const DEFAULT_SUBKEY = 'nokey';
 
@@ -43,6 +44,7 @@ class Text_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(300)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_CHANGED_TIME, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_DATA, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
 //      $this->addColumn(self::COLUMN_CHANGED_TIME, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR));
 //      $this->addColumn(self::COLUMN_SHOWED, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       

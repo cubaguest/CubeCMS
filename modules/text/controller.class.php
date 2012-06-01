@@ -29,13 +29,15 @@ class Text_Controller extends Controller {
    /**
  * Kontroler pro zobrazení textu
  */
-   public function mainController() {
+   public function mainController() 
+   {
       //		Kontrola práv
       $this->checkReadableRights();
       $this->exportTextController();
    }
 
-   public function exportTextController() {
+   public function exportTextController() 
+   {
       $this->checkReadableRights();
 
       $modelPrivate = new Text_Model_Private();
@@ -54,14 +56,16 @@ class Text_Controller extends Controller {
       }
    }
 
-   public function contentController() {
+   public function contentController() 
+   {
       $this->mainController();
    }
 
    /**
     * Kontroler pro editaci textu
     */
-   public function editController() {
+   public function editController() 
+   {
       $this->checkWritebleRights();
 
       $textRec = $this->loadData(self::TEXT_MAIN_KEY);
@@ -167,12 +171,14 @@ class Text_Controller extends Controller {
       }
       $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
       $this->textModel->save($textRec);
+      return $textRec;
    }
 
    /**
     * Kontroler pro editaci textu
     */
-   public function editPanelController() {
+   public function editPanelController() 
+   {
       $this->checkWritebleRights();
       
       $textRec = $this->loadData(self::TEXT_PANEL_KEY);
@@ -198,7 +204,8 @@ class Text_Controller extends Controller {
       $this->view()->template()->form = $form;
    }
 
-   public function editPrivateController() {
+   public function editPrivateController() 
+   {
       $this->checkWritebleRights();
       
       $modelPrivate = new Text_Model_Private();
@@ -273,7 +280,8 @@ class Text_Controller extends Controller {
       $this->view()->form = $form;
    }
 
-   public function settings(&$settings, Form &$form) {
+   public function settings(&$settings, Form &$form) 
+   {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
       $componentTpls = new Component_ViewTpl();
@@ -334,6 +342,20 @@ class Text_Controller extends Controller {
          $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
          $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
       }
+   }
+
+   protected static function setTextData(Model_ORM_Record $record, $data) 
+   {
+      $model = new Text_Model();
+      $record->{Text_Model::COLUMN_DATA} = serialize($data);
+   }
+   
+   protected static function getTextData(Model_ORM_Record $record) 
+   {
+      if($record->{Text_Model::COLUMN_DATA} != null){
+         return unserialize($record->{Text_Model::COLUMN_DATA});
+      }
+      return array();
    }
 }
 
