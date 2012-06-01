@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Třída pro obsluhu vlastností mmodulu
+ * Třída pro obsluhu vlastností mmodulu jádra
  *
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id: module.class.php 826 2010-01-18 13:17:32Z jakub $ VVE3.9.4 $Revision: 826 $
@@ -25,6 +25,11 @@ class Module_Core extends TrObject {
       $this->link->category($moduleCategory->getUrlKey());
    }
 
+   public function __toString() 
+   {
+      return (string)$this->name;
+   } 
+   
    /**
     * Metoda vrací název modulu
     * @return string

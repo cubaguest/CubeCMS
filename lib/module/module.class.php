@@ -21,6 +21,11 @@
        $this->dataDir = $name;
     }
 
+    public function __toString()
+    {
+       return (string)$this->name;
+    }
+    
     /**
      * Metoda vrací název modulu
      * @return string
