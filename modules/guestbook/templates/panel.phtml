@@ -11,10 +11,10 @@ if($this->panelObj()->getBackImage() != null){
 <div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
    <?if($this->lastPosts != null){?>
       <div class="panel-box-content-label"><?=$this->tr('Poslední příspěvek:', count($this->lastPosts));?></div>
-      <?foreach ($this->lastPosts as $post) {?>
+      <?foreach ($this->lastPosts as $message) {?>
          <div class="panel-box-content">
-         <strong><?=$post->{GuestBook_Model::COLUMN_NICK}?></strong><br />
-         <?=$this->filter(vve_tpl_xhtml_cut(strip_tags($post->{GuestBook_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150), array('emoticons'))?>
+         <strong><?=$message->{GuestBook_Model::COLUMN_NICK}?></strong><br />
+         <?=$this->filter(vve_tpl_xhtml_cut(strip_tags($message->{GuestBook_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150), array('emoticons'))?>
          </div>
       <?}?>
    <?}?>
