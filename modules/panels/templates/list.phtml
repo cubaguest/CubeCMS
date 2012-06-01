@@ -66,6 +66,10 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
+    	   var idc = decodeURIComponent((new RegExp('[?|&]idc=([0-9]+)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+    	   if(idc != null){
+    		   $('select#catsList').val(idc)
+        	}
          loadPanels();
          $('button[name=selectCatPanels]').click(function(){loadPanels();return false;});
          $('select[name=catsList]').change(function(){loadPanels();return false;});
@@ -73,7 +77,8 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       function loadPanels(){
          showLoadBox($('table#indCatPanelsList'));
          $.ajax({
-            url: '<?=$this->link()->route('getListPanels')?>?idc='+$('select#catsList').val(),
+        	   url: '<?=$this->link()->route('getListPanels')?>',
+            data: { idc : $('select#catsList').val()},
             success: function(data) {
                $('table#indCatPanelsList tbody').html(data);
                hideLoadBox();

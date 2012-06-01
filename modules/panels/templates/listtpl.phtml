@@ -11,7 +11,7 @@ foreach ($this->panels as $key => $panel) {
    <td>
          <?
          if((string)$panel->{Model_Panel::COLUMN_NAME} != null) {
-            print ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->_('Kategorie').'">'.$panel->{Model_Category::COLUMN_CAT_LABEL}.'</span>)');
+            print ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->tr('Kategorie').'">'.$panel->{Model_Category::COLUMN_CAT_LABEL}.'</span>)');
          } else {
             print ($panel->{Model_Category::COLUMN_CAT_LABEL});
          }
@@ -23,22 +23,22 @@ foreach ($this->panels as $key => $panel) {
          <input type="text" name="panel_position" value="<?=$panel->{Model_Panel::COLUMN_ORDER}?>" style="width: 30px" size="4" />
          <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
          <input type="image" src="<?=vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_changepos" title="<?=$this->_('Uložit')?>" />
+                value="edit" name="panel_changepos" title="<?=$this->tr('Uložit')?>" />
       </form>
    </td>
    <td>
       <form method="post" action="<?=$this->link()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
          <input type="image" src="<?=vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_edit" title="<?=$this->_('Nastavení panelu')?>" />
+                value="edit" name="panel_edit" title="<?=$this->tr('Nastavení panelu')?>" />
       </form>
       <form method="post" action="<?=$this->link()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
          <input type="image" src="<?=vve_get_tpl_file('icons/page_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_edit" title="<?=$this->_('Upravit')?>" />
+                value="edit" name="panel_edit" title="<?=$this->tr('Upravit')?>" />
       </form>
-      <form method="post" action="<?=$this->link()->clear()?>" style="display:inline;" onsubmit="return confirm('<?=$this->_('Smazat panel')?>?');">
+      <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return confirm('<?=$this->tr('Smazat panel')?>?');">
          <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
          <input type="image" src="<?=vve_get_tpl_file('icons/page_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_delete" title="<?=$this->_('Smazat')?>" />
+                value="edit" name="panel_delete" title="<?=$this->tr('Smazat')?>" />
       </form>
    </td>
 </tr>
@@ -47,7 +47,7 @@ foreach ($this->panels as $key => $panel) {
 }
 } else {?>
 <tr class="ui-widget-content ui-state-disabled">
-   <td colspan="4"><?=$this->_('Není uložen žádný panel');?></td>
+   <td colspan="4"><?=$this->tr('Není uložen žádný panel');?></td>
 </tr>
 
 
