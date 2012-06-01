@@ -81,6 +81,7 @@ class Model_ORM extends Model {
 
    protected $dbconnector = null;
 
+   protected $tableLocked = false;
 
    public function __construct()
    {
@@ -421,6 +422,7 @@ class Model_ORM extends Model {
          }
 //         $timer->timerStop('SQL_record', $sql != null ? $sql : $this->currentSql);
       } catch (PDOException $exc) {
+         $this->unLock();
          CoreErrors::addException($exc);
          if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
             AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
@@ -481,6 +483,7 @@ class Model_ORM extends Model {
             $r = $newR;
          }
       } catch (PDOException $exc) {
+         $this->unLock();
          CoreErrors::addException($exc);
          if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
             AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
@@ -518,9 +521,17 @@ class Model_ORM extends Model {
          /* preg_replace('/SELECT * FROM/', 'COUNT(*)', $this->currentSql); */
          $dbst = $this->bindValues($this->dbconnector->prepare($this->currentSql));/* TODO */
       }
-//      $timer = Debug_Timer::getInstance()->timerStart('SQL_count');
-      $dbst->execute();
-//      $timer->timerStop('SQL_count', $sql != null ? $sql : $this->currentSql);
+      
+      try {
+         $dbst->execute();
+      } catch (PDOException $exc) {
+         $this->unLock();
+         CoreErrors::addException($exc);
+         if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+            AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+         }
+      }
+
       $r = $dbst->fetchObject();
       if ($r == false)
          return 0;
@@ -533,8 +544,8 @@ class Model_ORM extends Model {
     */
    public function lock($type = "WRITE")
    {
-//      $this->dbconnector->exec('LOCK TABLES '.$this->getTableName().' '.$this->getTableShortName().' '.$type.';');
       $this->getDb()->exec('LOCK TABLES '.$this->getTableName().' '.$type.', '.$this->getTableName().' '.$this->getTableShortName().' '.$type.';');
+      $this->tableLocked = true;
    }
    
    /**
@@ -542,7 +553,9 @@ class Model_ORM extends Model {
     */
    public function unLock()
    {
-      $this->getDb()->exec('UNLOCK TABLES;');
+      if($this->tableLocked){
+         $this->getDb()->exec('UNLOCK TABLES;');
+      }
    }
 
 
@@ -685,7 +698,15 @@ class Model_ORM extends Model {
             }
          }
 //         $timer = Debug_Timer::getInstance()->timerStart('SQL_update');
-         $dbst->execute();
+         try {
+            $dbst->execute();
+         } catch (PDOException $exc) {
+            $this->unLock();
+            CoreErrors::addException($exc);
+            if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+               AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sqlStr);
+            }
+         }
 //         $timer->timerStop('SQL_update', $sqlStr);
          $returnPk = $record->getPK();
       } else {
@@ -752,7 +773,15 @@ class Model_ORM extends Model {
             }
          }
 //         $timer = Debug_Timer::getInstance()->timerStart('SQL_insert');
-         $dbst->execute();
+         try {
+            $dbst->execute();
+         } catch (PDOException $exc) {
+            $this->unLock();
+            CoreErrors::addException($exc);
+            if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+               AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sqlStr);
+            }
+         }
 //         $timer->timerStop('SQL_insert', $sqlStr);
          $returnPk = $this->getDb()->lastInsertId();
          $record->_setPK($returnPk);
@@ -790,7 +819,15 @@ class Model_ORM extends Model {
       $dbst = $dbc->prepare($sql);
       Log::msg($sql, 'DELETE', null, 'sql');
       $this->bindSQLWhere($dbst);
-      $ret = $dbst->execute();
+      try {
+         $dbst->execute();
+      } catch (PDOException $exc) {
+         $this->unLock();
+         CoreErrors::addException($exc);
+         if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+            AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+         }
+      }
       if (isset($pkValue)) { // if $pkey is not defined
          $this->deleteRelations($pkValue); // vymazat přidružení
       }
@@ -830,14 +867,19 @@ class Model_ORM extends Model {
             
          if($this->tableStructure[$columnName]['lang'] == true){
                // is multilang column
-//            foreach (Locales::getAppLangs() as $lang) {
-//               if ($params['aliasFor'] === null) {
-//                  array_push($colsStr, '`' . $colname . '_' . $lang . '` = :' . $colname . '_' . $lang . '');
-//               } else {
-//                  array_push($colsStr, '`' . $params['aliasFor'] . '_' . $lang . '` = :' . $colname . '_' . $lang . '');
-//               }
-//            }
-            throw new Exception('IMPLEMENTUJ!!!');
+           foreach (Locales::getAppLangs() as $lang) {
+              if ($params['aliasFor'] === null) {
+                 array_push($colsStr, '`' . $columnName . '_' . $lang . '` = :' . $columnName . '_' . $lang . '');
+              } else {
+                 array_push($colsStr, '`' . $params['aliasFor'] . '_' . $lang . '` = :' . $columnName . '_' . $lang . '');
+              }
+              if(is_array($value)){
+                 $bindValues[$columnName . '_' . $lang] = $value[$lang];
+              } else {
+                 $bindValues[$columnName . '_' . $lang] = $value;
+              }
+           }
+            
          } else {
             // is normal column
                
@@ -874,9 +916,7 @@ class Model_ORM extends Model {
       $dbst = $this->getDb()->prepare($sql);
       
       foreach ($bindValues as $key => $value) {
-         
          $varType = gettype($value);
-         
          // detect value
          if ($varType == 'boolean') {
             $pdoParam = PDO::PARAM_BOOL;
@@ -908,8 +948,16 @@ class Model_ORM extends Model {
       
       $this->bindSQLWhere($dbst);
       $this->bindSQLLimit($dbst);
-//      Debug::log($dbst, $sql, $bindValues, $this->whereBindValues);
-      return $dbst->execute();
+      
+      try {
+         return $dbst->execute();
+      } catch (PDOException $exc) {
+         $this->unLock();
+         CoreErrors::addException($exc);
+         if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+            AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+         }
+      }
    }
 
       /**
@@ -987,6 +1035,7 @@ class Model_ORM extends Model {
             $r = $newR;
          }
       } catch (PDOException $exc) {
+         $this->unLock();
          CoreErrors::addException($exc);
          if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
             AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
@@ -1555,7 +1604,7 @@ class Model_ORM extends Model {
    /**
     * Metoda doplní hodnoty do where clause
     * @param PDOStatement $stmt
-    * @deprecated použít bindValues nebo bind params
+    * @todo použít bindValues nebo bind params
     */
    protected function bindSQLWhere(PDOStatement &$stmt)
    {
