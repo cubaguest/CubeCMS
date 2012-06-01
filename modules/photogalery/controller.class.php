@@ -349,6 +349,7 @@ class Photogalery_Controller extends Controller {
       $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $addFile->setUploadDir($this->category()->getModule()->getDataDir()
               .$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
+      $addFile->setOverWrite(false);
       $addForm->addElement($addFile);
 
       $idItem = new Form_Element_Hidden('idItem');
@@ -359,18 +360,20 @@ class Photogalery_Controller extends Controller {
       $addForm->addElement($addSubmit);
 
       if($addForm->isValid()) {
-         $file = $addFile->getValues();
-         $image = new Filesystem_File_Image($file['name'], $this->category()->getModule()->getDataDir()
-            .$this->subDir.self::DIR_ORIGINAL);
-         $image->saveAs($this->category()->getModule()->getDataDir().$this->subDir.self::DIR_SMALL,
-            $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
-            $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), 
-            $this->category()->getParam('small_crop', true));
-         $image->saveAs($this->category()->getModule()->getDataDir().$this->subDir.self::DIR_MEDIUM,
-            $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
-            $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT), 
-            $this->category()->getParam('medium_crop', false));
-
+         $image = new File_Image($addFile);
+         $imgSmall = $image->copy($this->category()->getModule()->getDataDir().$this->subDir.self::DIR_SMALL, true);
+         $crop = $this->category()->getParam('small_crop', VVE_IMAGE_THUMB_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+         $imgSmall->getData()
+            ->resize($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
+                     $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), $crop)
+            ->save();
+         
+         $crop = $this->category()->getParam('medium_crop', false) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+         $imgMedium = $image->copy($this->category()->getModule()->getDataDir().$this->subDir.self::DIR_MEDIUM, true);
+         $imgMedium->getData()
+            ->resize($this->category()->getParam('medium_width', VVE_DEFAULT_PHOTO_W),
+                     $this->category()->getParam('medium_height', VVE_DEFAULT_PHOTO_H), $crop)
+            ->save();
          // zjistíme pořadí
          $imagesM = new PhotoGalery_Model_Images();
 
@@ -537,7 +540,7 @@ class Photogalery_Controller extends Controller {
 
       $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
       $elemSW->addValidation(new Form_Validator_IsNumber());
-      $elemSW->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_W.'px');
+      $elemSW->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_W.'</span>px');
       $form->addElement($elemSW, 'images');
       if(isset($settings['small_width'])) {
          $form->small_width->setValues($settings['small_width']);
@@ -545,7 +548,7 @@ class Photogalery_Controller extends Controller {
 
       $elemSH = new Form_Element_Text('small_height', 'Výška miniatury (px)');
       $elemSH->addValidation(new Form_Validator_IsNumber());
-      $elemSH->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_H.'px');
+      $elemSH->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_H.'</span>px');
       $form->addElement($elemSH, 'images');
       if(isset($settings['small_height'])) {
          $form->small_height->setValues($settings['small_height']);
@@ -560,7 +563,7 @@ class Photogalery_Controller extends Controller {
 
       $elemW = new Form_Element_Text('medium_width', 'Šířka obrázku (px)');
       $elemW->addValidation(new Form_Validator_IsNumber());
-      $elemW->setSubLabel('Výchozí: '.self::MEDIUM_WIDTH.'px');
+      $elemW->setSubLabel('Výchozí: <span class="param_small">'.self::MEDIUM_WIDTH.'</span>px');
       $form->addElement($elemW, 'images');
       if(isset($settings['medium_width'])) {
          $form->medium_width->setValues($settings['medium_width']);
@@ -568,7 +571,7 @@ class Photogalery_Controller extends Controller {
 
       $elemH = new Form_Element_Text('medium_height', 'Výška obrázku (px)');
       $elemH->addValidation(new Form_Validator_IsNumber());
-      $elemH->setSubLabel('Výchozí: '.self::MEDIUM_HEIGHT.'px');
+      $elemH->setSubLabel('Výchozí: <span class="param_small">'.self::MEDIUM_HEIGHT.'</span>px');
       $form->addElement($elemH, 'images');
       if(isset($settings['medium_height'])) {
          $form->medium_height->setValues($settings['medium_height']);
