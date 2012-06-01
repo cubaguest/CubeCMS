@@ -4,16 +4,23 @@ $this->addCssFile('style.css');
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?ps($this->category()->getName());?></h1>
 <div class="main-content-detail">
    <?
    $linkajaxPanelInfo = new Url_Link_ModuleRequest();
    ?>
-   <h2><?=$this->_('Seznam globálních panelů');?></h2>
-   <p>
-      <a href="<?=$this->link()->route('add')?>" title="<?=$this->tr('Přidat nový panel')?>"
-         ><img src="images/icons/add.png" alt="add" /> <?=$this->tr('Přidat panel')?></a>
-   </p>
+   <h2><?=$this->tr('Seznam globálních panelů');?></h2>
+   <?php 
+   $this->moduleButtons = array(
+         array(
+               'link' => $this->link()->route('add'),
+               'title' => $this->tr('Přidat nový panel'),
+               'icon' => 'add.png',
+               'name' => $this->tr('Přidat nový panel'),
+         ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
    <table class="panels-list">
       <thead>
          <tr class="ui-widget-header">
@@ -33,16 +40,16 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    <?
    // POKUD jsou individuální panely
    if(!empty ($this->individualPanelCats)) {?>
-   <h2><?=$this->_('Seznam individuálních panelů');?></h2>
-   <br />
-   <strong><?=$this->_('Kategorie pro zobrazení')?>:</strong>
+   <h2><?=$this->tr('Seznam individuálních panelů');?></h2>
+   <div class="ui-widget ui-widget-header" >
+   <strong><?=$this->tr('Kategorie pro zobrazení')?>:</strong>
    <select id="catsList" name="catsList">
          <?foreach ($this->individualPanelCats as $cat) {?>
-      <option value="<?=$cat->{Model_Category::COLUMN_CAT_ID}?>"><?=$cat->{Model_Category::COLUMN_CAT_LABEL}?></option>
+      <option value="<?=$cat->{Model_Category::COLUMN_CAT_ID}?>"><?=$cat->{Model_Category::COLUMN_CAT_LABEL}." (".$cat->numPanels.")"?></option>
             <? }?>
    </select>
-   <button name="selectCatPanels"><?=$this->_('Vybrat')?></button>
-   <br />
+   <button name="selectCatPanels"><?=$this->tr('Vybrat')?></button>
+   </div>
    <div><!-- kvuli loadboxu-->
       <table class="panels-list" id="indCatPanelsList">
          <thead class="ui-widget-header" id="indCatPanelsListHeader">

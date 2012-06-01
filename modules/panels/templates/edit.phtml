@@ -1,9 +1,13 @@
 <?
 if($this->edit == true){
-      $h = $this->_('Úprava panelu');
+   if((string)$this->panel->{Model_Panel::COLUMN_NAME} != null){
+      $h = sprintf($this->tr('Úprava panelu kategorie "%s"'), $this->panel->{Model_Panel::COLUMN_NAME} );
    } else {
-      $h = $this->_('Nový panel');
+      $h = sprintf($this->tr('Úprava panelu kategorie "%s"'), $this->panel->{Model_Category::COLUMN_NAME} );
    }
+} else {
+   $h = $this->tr('Nový panel');
+}
 ?>
 <h1><?=$h;?></h1>
 <div class="main-content-form-edit" >
