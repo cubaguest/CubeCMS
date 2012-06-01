@@ -204,7 +204,7 @@ class Template_Toolbox2_Tool implements Template_Toolbox2_Tool_Interface {
    public function  &__get($name) {
       if(isset ($this->aditionalSendValus[$name])) return $this->aditionalSendValus[$name];
       $null = null;
-      return $nu;
+      return $null;
    }
 }
 ?>
