@@ -862,9 +862,13 @@ class AppCore extends TrObject {
          ->order(array(Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC));
       // výběr jestli se zpracovávají individuální panely nebo globální
       if(self::$category->isIndividualPanels()) {
-         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = :idc AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array('idc' => self::$category->getId()), true);
+         $panelsM->where(" AND (".Model_Panel::COLUMN_ID_SHOW_CAT." = :idc OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1 )"
+               ." AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', 
+               array('idc' => self::$category->getId()), true);
       } else {
-         $panelsM->where(" AND ".Model_Panel::COLUMN_ID_SHOW_CAT." = 0 AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', array(), true);
+         $panelsM->where(" AND ( ".Model_Panel::COLUMN_ID_SHOW_CAT." = 0 OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1 )"
+               ." AND ".Model_Category::COLUMN_MODULE.' IS NOT NULL', 
+               array(), true);
       }
       $panels = $panelsM->records();
 

@@ -38,7 +38,7 @@ foreach ($this->panels as $key => $panel) {
          <input type="image" src="<?=vve_get_tpl_file('icons/page_edit.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="panel_edit" title="<?=$this->tr('Upravit')?>" />
       </form>
-      <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return confirm('<?=$this->tr('Smazat panel')?>?');">
+      <form method="post" action="<?=$this->link()->route()?>" style="display:inline;" onsubmit="return confirm('<?=$this->tr('Smazat panel')?>?');">
          <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
          <input type="image" src="<?=vve_get_tpl_file('icons/page_delete.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="panel_delete" title="<?=$this->tr('Smazat')?>" />
