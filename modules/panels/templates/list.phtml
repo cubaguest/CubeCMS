@@ -41,6 +41,18 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    // POKUD jsou individuální panely
    if(!empty ($this->individualPanelCats)) {?>
    <h2><?=$this->tr('Seznam individuálních panelů');?></h2>
+   <?php 
+   $this->moduleButtons = array(
+         array(
+               'link' => $this->link()->route('add')->rmParam(),
+               'title' => $this->tr('Přidat nový individuální panel'),
+               'icon' => 'add.png',
+               'name' => $this->tr('Přidat nový individuální panel'),
+               'id' => 'button-add-individual',
+         ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
    <div class="ui-widget ui-widget-header" >
    <strong><?=$this->tr('Kategorie pro zobrazení')?>:</strong>
    <select id="catsList" name="catsList">
@@ -73,6 +85,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          loadPanels();
          $('button[name=selectCatPanels]').click(function(){loadPanels();return false;});
          $('select[name=catsList]').change(function(){loadPanels();return false;});
+         $('#button-add-individual').click(function(){
+             $(this).prop('href', $(this).prop('href')+"?idcto="+$('select[name=catsList]').val());
+         });
       });
       function loadPanels(){
          showLoadBox($('table#indCatPanelsList'));

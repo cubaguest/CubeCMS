@@ -11,9 +11,12 @@ foreach ($this->panels as $key => $panel) {
    <td>
          <?
          if((string)$panel->{Model_Panel::COLUMN_NAME} != null) {
-            print ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->tr('Kategorie').'">'.$panel->{Model_Category::COLUMN_CAT_LABEL}.'</span>)');
+            echo ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->tr('Kategorie').'">'.$panel->{Model_Category::COLUMN_NAME}.'</span>)');
          } else {
-            print ($panel->{Model_Category::COLUMN_CAT_LABEL});
+            echo ($panel->{Model_Category::COLUMN_NAME});
+         }
+         if($panel->{Model_Panel::COLUMN_FORCE_GLOBAL}){
+            echo " (".$this->tr('vynucen globálně').")";
          }
          ?>
    </td>

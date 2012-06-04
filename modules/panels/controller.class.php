@@ -7,7 +7,8 @@
 class Panels_Controller extends Controller {
    private $editForm = null;
 
-   public function mainController() {
+   public function mainController() 
+   {
       $this->checkWritebleRights();
 
       $model = new Model_Panel();
@@ -65,15 +66,18 @@ class Panels_Controller extends Controller {
       // načtení individuálních panelů
       $modelCat = new Model_Category();
       
-      $panels = $modelCat
+      $modelCat
          ->columns(array('*', 'numPanels' => 
-               ' (SELECT count('.Model_Panel::COLUMN_ID.') FROM '.$model->getTableName().' WHERE '.Model_Panel::COLUMN_ID_SHOW_CAT." = ".$modelCat->getTableShortName().'.'.Model_Category::COLUMN_ID.")"))
-         ->where(Model_Category::COLUMN_INDIVIDUAL_PANELS." = 1", array())
-         ->records();
-      $this->view()->individualPanelCats = $panels;
+               ' (SELECT count('.Model_Panel::COLUMN_ID.') FROM '.$model->getTableName()
+               .' WHERE '.Model_Panel::COLUMN_ID_SHOW_CAT." = ".$modelCat->getTableShortName().'.'.Model_Category::COLUMN_ID
+              ." OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1 )"))
+         ->where(Model_Category::COLUMN_INDIVIDUAL_PANELS." = 1", array());
+      
+      $this->view()->individualPanelCats = $modelCat->records();
    }
 
-   public function addController() {
+   public function addController() 
+   {
       $this->checkWritebleRights();
 
       $this->createEditForm(true);
@@ -105,12 +109,12 @@ class Panels_Controller extends Controller {
          $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
          $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
          $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
+         $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
          
-         if($this->editForm->panel_show_cat->getValues() == null){
+         if($this->editForm->panel_show_cat->getValues() == null || $this->editForm->forceGlobal->getValues() == true){
             $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = 0;
             $model->save($panel);
          } else {
-            Debug::log($this->editForm->panel_show_cat->getValues());
             foreach ($this->editForm->panel_show_cat->getValues() as $id) {
                $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = $id;
                $pForSave = clone $panel;
@@ -125,7 +129,8 @@ class Panels_Controller extends Controller {
       $this->view()->form = $this->editForm;
    }
 
-   public function editController(){
+   public function editController()
+   {
       $this->checkWritebleRights();
       $model = new Model_Panel();
       $panel = $model
@@ -139,11 +144,17 @@ class Panels_Controller extends Controller {
       $elemUpdateAll->setSubLabel($this->tr('Aktualizovat všechny panely vybrané kategorie podle této úpravy.'));
       $this->editForm->addElement($elemUpdateAll, 'settings',1);
       
+      $elemUpdateAllInBox = new Form_Element_Checkbox('updateAllInBox', $this->tr('Pouze ve vybraném boxu'));
+      $elemUpdateAllInBox->setSubLabel($this->tr('Provede aktualizaci všech panelů pouze pro vybraný pox.'));
+      $this->editForm->addElement($elemUpdateAllInBox, 'settings',2);
+      
       $this->editForm->panel_cat->setValues($panel->{Model_Panel::COLUMN_ID_CAT});
       $this->editForm->panel_box->setValues($panel->{Model_Panel::COLUMN_POSITION});
       $this->editForm->panel_order->setValues($panel->{Model_Panel::COLUMN_ORDER});
       $this->editForm->panel_name->setValues($panel->{Model_Panel::COLUMN_NAME});
       $this->editForm->panel_show_cat->setValues($panel->{Model_Panel::COLUMN_ID_SHOW_CAT});
+      $this->editForm->forceGlobal->setValues($panel->{Model_Panel::COLUMN_FORCE_GLOBAL});
+      
       if($panel->{Model_Panel::COLUMN_ICON} == null){
          $this->editForm->removeElement('icon_delete');
       }
@@ -189,17 +200,27 @@ class Panels_Controller extends Controller {
          $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
          $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
          $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = $this->editForm->panel_show_cat->getValues();
+         $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
 
+         if($panel->{Model_Panel::COLUMN_FORCE_GLOBAL} == true){
+            $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = 0;
+         }
+         
          $model->save($panel);
          
          if($this->editForm->updateAll->getValues() == true){
-            $model->where(Model_Panel::COLUMN_ID_CAT." = :idc", array('idc' => $this->editForm->panel_cat->getValues()))
-            ->update(array(
+            if($this->editForm->updateAllInBox->getValues()){
+               $model->where(Model_Panel::COLUMN_ID_CAT." = :idc AND ".Model_Panel::COLUMN_POSITION." = :boxname", 
+                     array('idc' => $this->editForm->panel_cat->getValues(), 'boxname' => $this->editForm->panel_box->getValues()));
+            } else {
+               $model->where(Model_Panel::COLUMN_ID_CAT." = :idc", array('idc' => $this->editForm->panel_cat->getValues()));
+            }
+               $model->update(array(
                   Model_Panel::COLUMN_NAME => $this->editForm->panel_name->getValues(),
                   Model_Panel::COLUMN_IMAGE => $panel->{Model_Panel::COLUMN_IMAGE},
                   Model_Panel::COLUMN_ICON => $panel->{Model_Panel::COLUMN_ICON},
                   Model_Panel::COLUMN_ORDER => $panel->{Model_Panel::COLUMN_ORDER},
-            ));
+               ));
             $this->log(sprintf('Upraveny panely kategorie id:%s', $panel->{Model_Panel::COLUMN_ID_CAT}));
          }
 
@@ -214,7 +235,8 @@ class Panels_Controller extends Controller {
       $this->view()->form = $this->editForm;
    }
 
-   private function createEditForm($multipleCatSelect = false) {
+   private function createEditForm($multipleCatSelect = false) 
+   {
       // kategorie a šablony
       $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
 
@@ -245,7 +267,7 @@ class Panels_Controller extends Controller {
       
       $panelForCats = $this->createArray($struct, true);
 
-      $panelShowCategory = new Form_Element_Select('panel_show_cat', $this->tr('Určení pro'));
+      $panelShowCategory = new Form_Element_Select('panel_show_cat', $this->tr('Zobrazit v'));
       $panelShowCategory->setOptions(array($this->tr('Globálně') => 0));
       foreach ($panelForCats as $cat) {
          $panelShowCategory->setOptions(array($cat['structname'] => $cat['id']), true);
@@ -256,6 +278,14 @@ class Panels_Controller extends Controller {
       $panelShowCategory->setMultiple($multipleCatSelect);
       $form->addElement($panelShowCategory,'settings');
 
+      if($this->getRequestParam('idcto') != null){
+         $panelShowCategory->setValues($this->getRequestParam('idcto'));
+      }
+      
+      $elemForceGlobal = new Form_Element_Checkbox('forceGlobal', $this->tr('Vynutit globálně'));
+      $elemForceGlobal->setSubLabel($this->tr('Vynutí panelu zobrazení i v kategoriích s individuálními panely.'));
+      $form->addElement($elemForceGlobal, 'settings');
+      
       $panelType = new Form_Element_Select('panel_box', $this->tr('Box panelu'));
       $panelType->setOptions($panelPositions);
       $form->addElement($panelType,'settings');
@@ -294,7 +324,8 @@ class Panels_Controller extends Controller {
       $this->editForm = $form;
    }
 
-   protected function createArray(Category_Structure $struct, $onlyIndividual = false, $level = 0){
+   protected function createArray(Category_Structure $struct, $onlyIndividual = false, $level = 0)
+   {
       $a = array();
       foreach ($struct as $cat) {
          if($onlyIndividual == false || $cat->getCatObj()->isIndividualPanels() ){
@@ -313,7 +344,8 @@ class Panels_Controller extends Controller {
       return $a;
    } 
    
-   private function catsToArrayForForm($categories) {
+   private function catsToArrayForForm($categories) 
+   {
       // pokud je hlavní kategorie
       if($categories->getLevel() != 0) {
          $this->categoriesArray[str_repeat('&nbsp;', $categories->getLevel()*3).
@@ -329,7 +361,8 @@ class Panels_Controller extends Controller {
       }
    }
 
-   private function getPanelInfo($module, $panelName) {
+   private function getPanelInfo($module, $panelName) 
+   {
       $file = file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
               .$module.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.$panelName);
 
@@ -337,7 +370,8 @@ class Panels_Controller extends Controller {
 
    }
 
-   public function getPanelsController() {
+   public function getPanelsController() 
+   {
       $data = array('code' => true);
       //načtení panelů podel id Categorie
       $data['data'] = $this->getPanelsTemplates($this->getRequestParam('id'));
@@ -346,7 +380,8 @@ class Panels_Controller extends Controller {
       $this->view()->data = $data;
    }
 
-   private function getPanelsTemplates($catId) {
+   private function getPanelsTemplates($catId) 
+   {
       $catModel = new Model_Category();
       $cat = $catModel->getCategoryById($catId);
 
@@ -362,7 +397,8 @@ class Panels_Controller extends Controller {
       return $tpls;
    }
 
-   public function getPanelInfoController() {
+   public function getPanelInfoController() 
+   {
       $catModel = new Model_Category();
       $cat = $catModel->getCategoryById($this->getRequestParam('id'));
       $data = array('code' => true, 'data' => $this->tr('Žádné informace'));
@@ -377,16 +413,22 @@ class Panels_Controller extends Controller {
       $this->view()->data = $data;
    }
 
-   public function getListPanelsController(){
+   public function getListPanelsController()
+   {
       $this->checkWritebleRights();
 
       $model = new Model_Panel();
-
-      $this->view()->panels = $model->getPanelsList($this->getRequestParam('idc', 0));
-
+      $idc = $this->getRequestParam('idc', 0);
+      
+      $this->view()->panels = $model
+         ->joinFK(Model_Panel::COLUMN_ID_CAT)
+         ->where(Model_Panel::COLUMN_ID_SHOW_CAT." = :idc OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1", array('idc' => $idc))
+         ->records();
+      echo($model->getSQLQuery());
    }
 
-   public function panelSettingsController(){
+   public function panelSettingsController()
+   {
       $this->checkWritebleRights();
 
       $modelPanel = new Model_Panel();
