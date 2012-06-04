@@ -6,8 +6,9 @@ if( !empty($this->moduleButtons) ){
    ?>
    <ul class="module-tool-buttons">
    <?foreach ($this->moduleButtons as $button) {?>
-      <li><a class="ui-button" href="<?=$button['link']?>" title="<?=$button['title']?>"
-         ><img src="images/icons/<?=$button['icon']?>" alt="back" /><?=$button['name']?></a></li>
+      <li><a class="ui-button" href="<?=$button['link']?>" title="<?ps($button['title'])?>"
+         <?if(isset($button['id'])) echo "id=\"".$button['id']."\"";?>
+         ><img src="images/icons/<?=$button['icon']?>" alt="back" /><?ps($button['name'])?></a></li>
    <?}?>
    </ul>
    <hr class="reseter" />
