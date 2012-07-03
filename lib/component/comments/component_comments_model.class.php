@@ -53,13 +53,11 @@ class Component_Comments_Model extends Model_ORM {
    }
 
    public function  save(Model_ORM_Record $record) {
-      $dbc = new Db_PDO();
 //      $dbc->query("LOCK TABLES {$this->getTableName()} WRITE");
 //      $dbc->beginTransaction();
-
+      $this->lock();
       // posun pouze pokud je přidán nový
       if($record->isNew()){
-         $tbl = $dbc->table(self::DB_TABLE);
          // není rodič
          if((int)$record->{self::COL_ID_PARENT} == 0){
             $record->{self::COL_ID_PARENT} = 0;
@@ -73,6 +71,8 @@ class Component_Comments_Model extends Model_ORM {
          }
          // je rodič
          else {
+            $dbc = new Db_PDO();
+            $tbl = $dbc->table(self::DB_TABLE);
             // zjištění pořadí a hloubky příspěvku, na který se reaguje
             $parent = $this->where(self::COL_ID.' = :id', array('id' => $record->{self::COL_ID_PARENT}))->record();
             // zjištění pořadí příspěvku, na jehož místo se bude vkládat - první následující s menší nebo stejnou hloubkou jako rodič
@@ -98,9 +98,9 @@ class Component_Comments_Model extends Model_ORM {
          }
       }
       // uložíme komentář
-      parent::save($record);
-//      $dbc->query("UNLOCK TABLES");
-//      $dbc->commit();
+      $ret = parent::save($record);
+      $this->unLock();
+      return $ret;
    }
 
    public function changePublic($idComment) {
