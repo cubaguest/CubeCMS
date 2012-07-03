@@ -117,7 +117,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                   <?
                   
                   $this->includeTpl("messages.phtml", true);
-                  $this->includeTpl("navigation.phtml", true);
+                  $navTpl = new Template_Navigation();
+                  echo $navTpl;
                   if(VVE_DEBUG_LEVEL > 0){ Debug::printDebug(); Debug_Timer::printTimers(); }
                   ?>
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
@@ -189,7 +190,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <hr class="reseter" />
       <div id="debug">
          <?
-         if(VVE_DEBUG_LEVEL >= 2) {
+         if(VVE_DEBUG_LEVEL >= 1) {
             print ("Run functions: ".xdebug_get_function_count()."<br />");
             print ("Memory: ".xdebug_memory_usage()."<br />");
             print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");

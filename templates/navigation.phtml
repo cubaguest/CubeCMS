@@ -1,13 +1,19 @@
 <?
-$arr = $this->pVar('CURRENT_CATEGORY_PATH');
-if(count($arr) > 1) {
-   foreach ($arr as $path) {?>
-<a href="<?=$this->link(true)->category($path->getCatObj()->getUrlKey())?>">
-      <?=$path->getCatObj()->getLabel()?></a>
-      <?
-      if(next($arr) !== false) {
-         print ("&nbsp;".VVE_NAVIGATION_SEPARATOR."&nbsp;");
-      //   @prev();
-      }
+if(empty($this->baseParts) && empty($this->extendedParts)){
+   return;
+}
+
+$strArray = array( '<a href="'.$this->link(true)->clear(true).'">'.$this->tr('Domů').'</a>' );
+foreach ($this->baseParts as $item) {
+   $strArray[] = '<a href="'.$item['link'].'" title="'.htmlspecialchars($item['title']).'">'.htmlspecialchars($item['name']).'</a>';
+}
+if(!empty($this->extendedParts)){
+   foreach ($this->extendedParts as $item) {
+      $strArray[] = '<a href="'.$item['link'].'" title="'.htmlspecialchars($item['title']).'">'.htmlspecialchars($item['name']).'</a>';
    }
-}?>
+}
+?>
+<div id="breadcrumb">
+   <? echo $this->tr('Právě se nacházíte:')?>
+   <? echo implode(' > ', $strArray);?>
+</div>

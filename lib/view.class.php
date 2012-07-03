@@ -221,11 +221,13 @@ abstract class View extends TrObject {
    final public function viewSettingsView() {
       $this->template()->addFile('tpl://engine:vsettings.phtml');
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Nastavení'), $this->link());
    }
    
    final public function viewMetadataView() {
       $this->template()->addFile('tpl://engine:vmetadata.phtml');
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Úprava metadat'), $this->link());
    }
 
    /**
