@@ -771,6 +771,7 @@ class Events_Controller extends Controller {
       $sheet->getColumnDimension('B')->setWidth(60);
       $sheet->setCellValue('A2', $this->tr('Datum a čas') );
       $sheet->setCellValue('B2', $this->tr('Název a text') );
+      $sheet->getStyle("A2:B2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
       $sheet->getStyle('A2')->applyFromArray(array( 'font' => array( 'bold' => true ) ));
       $sheet->getStyle('B2')->applyFromArray(array( 'font' => array( 'bold' => true ) ));
       $sheet->getRowDimension(2)->setRowHeight($defRowH);
@@ -778,41 +779,71 @@ class Events_Controller extends Controller {
       
       $events = $this->getSortedEvents($dateFrom, $dateTo);
       $row = 3;
+      $days = array(
+         1 => 'Po',
+         'Út',
+         'St',
+         'Čt',
+         'Pá',
+         'So',
+         'Ne',
+      );
+      
       foreach ($events as $cat) {
          $sheet->setCellValueByColumnAndRow(0, $row, $cat['cat']->{Events_Model_Categories::COL_NAME});
          $sheet->setCellValueByColumnAndRow(1, $row, $cat['cat']->{Events_Model_Categories::COL_CONTACT});
          $sheet->getStyleByColumnAndRow(0, $row)->applyFromArray(array( 'font' => array( 'bold' => true ) ));
          $sheet->getStyleByColumnAndRow(1, $row)->applyFromArray(array( 'font' => array( 'italic' => true ) ));
          $sheet->getRowDimension($row)->setRowHeight($defRowH+10);
+         $sheet->getStyleByColumnAndRow(0, $row)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+         $sheet->getStyleByColumnAndRow(1, $row)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
          $row++;
          
          foreach ($cat['events'] as $e) {
-            $dateStr = vve_date("%d.%m.", $dateFrom);
+            $eDateFrom = new DateTime($e->{Events_Model::COL_DATE_FROM});
+            $dayName = $days[$eDateFrom->format("N")];
+            $dateStr = $dayName." ".vve_date("%d.%m.", $eDateFrom);
             if($e->{Events_Model::COL_DATE_TO} != null){
-               $dateStr .= '‒'.vve_date("%d.%m.", $dateTo);
+               $eDateTo = new DateTime($e->{Events_Model::COL_DATE_TO});
+//               $dateStr .= ' – '. $days[$dateTo->format("N")]." ".vve_date("%d.%m.", $dateTo);
+               $dateStr .= ' '.$this->tr('až').' '. $days[$eDateTo->format("N")]." ".vve_date("%d.%m.", $eDateTo);
             }
+            // ř1 s1
             $sheet->setCellValueByColumnAndRow(0, $row, $dateStr);
+            // ř2 s1
             $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NAME});
+            $sheet->getStyleByColumnAndRow(1, $row)->getAlignment()->setWrapText(true);
             $sheet->getStyleByColumnAndRow(1, $row)->applyFromArray(array( 'font' => array( 'bold' => true ) ));
-            $sheet->getRowDimension($row)->setRowHeight($defRowH);
+            $sheet->getRowDimension($row)->setRowHeight(-1);
             $row++;
             
+            // ř1 s2
             if($e->{Events_Model::COL_TIME_FROM} != null && $e->{Events_Model::COL_TIME_TO} == null){
                $time = new DateTime($e->{Events_Model::COL_TIME_FROM});
                $sheet->setCellValueByColumnAndRow(0, $row, $time->format("H.i")." h");
             } else if($e->{Events_Model::COL_TIME_FROM} != null && $e->{Events_Model::COL_TIME_TO} != null){
                $timef = new DateTime($e->{Events_Model::COL_TIME_FROM});
                $timet = new DateTime($e->{Events_Model::COL_TIME_TO});
-               $sheet->setCellValueByColumnAndRow(0, $row, $timef->format("H.i")."‒".$timet->format("H.i")." h");
+               $sheet->setCellValueByColumnAndRow(0, $row, $timef->format("H.i").' '.$this->tr('až').' '.$timet->format("H.i")." h");
             }
             $sheet->getStyleByColumnAndRow(0, $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+            // ř2 s2
+            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_PLACE});
+            $sheet->getRowDimension($row)->setRowHeight($defRowH);
+            $row++;
             
-            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NOTE}); // COL_TEXT
+            // ř2 s3
+            $sheet->getRowDimension($row)->setRowHeight(-1); // auto height
             $sheet->getStyleByColumnAndRow(1, $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-            
-            $sheet->getRowDimension($row)->setRowHeight($defRowH*3);
+            $sheet->getStyleByColumnAndRow(1, $row)->getAlignment()->setWrapText(true);
+            $sheet->setCellValueByColumnAndRow(1, $row, $e->{Events_Model::COL_NOTE}); // COL_TEXT
+//            $sheet->getRowDimension($row)->setRowHeight($defRowH*3);
+            // borders
+            $sheet->getStyleByColumnAndRow(0, $row)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+            $sheet->getStyleByColumnAndRow(1, $row)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
             $row++;
          }
+         $row++;
       }
             
       
