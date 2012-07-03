@@ -120,7 +120,7 @@ class Component_Feed extends Component {
       $feed->startElement("channel"); // SOF chanel
       //-------------------- SOF HEADER ---------------------------
       if($this->getConfig('title') != null){
-         $feed->writeElement('title',  VVE_WEB_NAME." - ".$this->getConfig('title'));
+         $feed->writeElement('title',  $this->getConfig('title') ." - ". VVE_WEB_NAME);
       } else {
          $feed->writeElement('title',  VVE_MAIN_PAGE_TITLE);
       }
