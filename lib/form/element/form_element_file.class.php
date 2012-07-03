@@ -20,7 +20,7 @@ class Form_Element_File extends Form_Element {
  */
    private $uploadDir = null;
 
-   private $overWrite = false;
+   private $overWrite = true;
 
    /**
     * Konstruktor elemntu
@@ -49,6 +49,11 @@ class Form_Element_File extends Form_Element {
                if ($_FILES[$this->getName()]['error'][$key] == UPLOAD_ERR_OK) {
                   $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"][$key]);
                   // kontrola adresáře
+                  $dir = new Filesystem_Dir($this->uploadDir);
+                  $dir->checkDir();
+                  if(!$this->overWrite){
+                     $saveFileName = File::creatUniqueName($saveFileName, $dir);
+                  }
                   move_uploaded_file($_FILES[$this->getName()]["tmp_name"][$key],
                      $dir . $saveFileName);
                   // vatvoření pole s informacemi o souboru
@@ -74,6 +79,9 @@ class Form_Element_File extends Form_Element {
                // kontrola adresáře
                $dir = new Filesystem_Dir($this->uploadDir);
                $dir->checkDir();
+               if(!$this->overWrite){
+                  $saveFileName = File::creatUniqueName($saveFileName, $dir);
+               }
                move_uploaded_file($_FILES[$this->getName()]["tmp_name"],
                    $dir . $saveFileName);
                // vatvoření pole s informacemi o souboru
@@ -214,7 +222,7 @@ class Form_Element_File extends Form_Element {
     * @param bool $overwrite -- true pro přepsání
     * @return Form_Element_File
     */
-   public function setOverWrite($overwrite = false)
+   public function setOverWrite($overwrite = true)
    {
       $this->overWrite = $overwrite;
       return $this;
@@ -228,7 +236,7 @@ class Form_Element_File extends Form_Element {
     */
    public function createFileObject($className = null) {
       if($className === null){
-         $className = "Filesystem_File";
+         $className = "File";
       } else if(!class_exists($className)){
          throw new UnexpectedValueException(sprintf($this->tr('Třídu %s se nepodařilo načíst'),$className), 1);
       }
