@@ -132,6 +132,7 @@ class ArticlesWGal_Controller extends Articles_Controller {
       $ctrl->linkBack = $this->link()->route('detail');
       
       $ctrl->view()->name = $art->{Articles_Model_Detail::COLUMN_NAME};
+      $ctrl->view()->link = $this->link()->route('detail');
    }
 
    public function settings(&$settings,Form &$form) 
