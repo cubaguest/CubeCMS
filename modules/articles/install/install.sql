@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `concept` tinyint(1) NOT NULL DEFAULT '0',
   `title_image` varchar(100) DEFAULT NULL,
   `author` varchar(100) DEFAULT NULL,
+  `article_priority` int(11) DEFAULT '0',
+  `article_priority_end_date` date DEFAULT NULL,
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
@@ -83,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles_tags` (
   `id_article_tag` INT NOT NULL  AUTO_INCREMENT,
   `article_tag_name` VARCHAR(20) NOT NULL ,
   `article_tag_counter` INT NULL DEFAULT 0 ,
-  PRIMARY KEY (`id_article_tag`) 
+  PRIMARY KEY (`id_article_tag`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 CREATE  TABLE IF NOT EXISTS `{PREFIX}articles_tags_has_articles` (
