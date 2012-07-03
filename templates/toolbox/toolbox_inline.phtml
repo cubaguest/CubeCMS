@@ -29,6 +29,19 @@
                </form>
                <?
                break;
+            case 'Template_Toolbox2_Tool_Redirect':
+               ?>
+         <form action="<?=$tool->getAction() ?>" method="get" onsubmit="<?=$formOnSubmit?>">
+            <div><input class="toolbox-tool-inline-button" type="image" src="<?=$image?>" value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
+                  <?
+                  $addVal = $tool->getSubmitValues();
+                  foreach ($addVal as $key => $value) {
+                     echo "<input type=\"hidden\" name=\"$key\" value=\"" . (string) $value . "\" />";
+                  }?>
+                  </div>
+               </form>
+               <?
+               break;
             case 'Template_Toolbox2_Tool_Form':
                ?>
                <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>">
