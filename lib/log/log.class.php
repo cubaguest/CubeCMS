@@ -22,7 +22,10 @@ class Log {
    
    protected static function save($str, $log) {
       if(VVE_DEBUG_LEVEL > 0){
-         file_put_contents(AppCore::getAppWebDir().self::LOG_DIR.DIRECTORY_SEPARATOR.strtolower($log).'-'.  date('Y-m').'.log', date('c').' '.$str."\n", FILE_APPEND);
+         $logFile = AppCore::getAppWebDir().self::LOG_DIR.DIRECTORY_SEPARATOR.strtolower($log).'-'.  date('Y-m').'.log';
+         file_put_contents($logFile, date('c').' '.$str."\n", FILE_APPEND);
+         // set chmnod
+         @chmod($logFile, 0664);
       }
    }
 }
