@@ -511,4 +511,20 @@ function vve_split_to_half($text, $firstHalf = true)
    }
    return substr($text, $middle);
 }
+
+/**
+ * Převede emaily v textu na klikací linky
+ * @param string $text
+ * @return string
+ */
+function vve_convert_emails_to_links($text)
+{
+   $regex = "/([a-z0-9_\-\.]+)". # name
+         "@". # at
+         "([a-z0-9-]{1,64})". # domain
+         "\.". # period
+         "([a-z]{2,10})/i"; # domain extension
+   $text = preg_replace($regex, '<a class="mail" href="mailto:\\1@\\2.\\3">\\1@\\2.\\3</a>', $text);
+   return $text;
+}
 ?>
