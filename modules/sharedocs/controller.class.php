@@ -179,7 +179,7 @@ class ShareDocs_Controller extends Controller {
       }
       foreach($revs as $rev){
          try {
-            $file = new File($rev->{ShareDocs_Model_Revs::COLUMN_FILENAME});
+            $file = new File($rev->{ShareDocs_Model_Revs::COLUMN_FILENAME}, $this->getModule()->getDataDir());
             $file->delete();
          } catch (Exception $e) {
             // tady asi logování
@@ -467,7 +467,7 @@ class ShareDocs_Controller extends Controller {
          if($formDelete->isValid() ){
             $this->deleteFile($formDelete->id->getValues() );
             $this->infoMsg()->addMessage($this->tr('Soubor byl smazán') );
-            $this->link()->route()->reload();
+            $this->link()->route("dirList")->reload();
          }
          $this->view()->formDelete = $formDelete;
          
