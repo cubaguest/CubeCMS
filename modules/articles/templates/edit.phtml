@@ -3,6 +3,7 @@ $this->addFile("css://articles:style.css?original");
 $jq = new JsPlugin_JQuery();
 $jq->addUIDatepicker();
 $this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_JQueryTagsInput());
 // do titulku
 if($this->edit) {
    $h = $this->tr('úprava položky').' '.$this->artName;
@@ -11,12 +12,14 @@ if($this->edit) {
 }
 $this->addPageTitle($h);
 // donastavení formuláře
+$this->form->html()->setAttrib('name', "form-article");
 $this->form->name->html()->setAttrib('size', 60)->addClass('form-element-long');
 $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long');
 $this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element-long');
 $this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
 $this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
 $this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
+$this->form->tags->html()->setAttrib('rows', 1);
 if($this->form->haveElement('textPrivate')){
    $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 }
@@ -36,13 +39,12 @@ $this->form->created_date->html()->addClass('datepicker');
    $(document).ready(function(){
       $.datepicker.setDefaults(['<?= Locales::getLang() ?>'] ) ;
       $("input.datepicker").datepicker();
-      // generate url address
-      <?if(!$this->edit) {?>
-//      $('input.article_name_class').change(function(){
-//         $('input.article_urlkey_class[lang="'+$(this).attr("lang")+'"]')
-//            .val(str2url($(this).val())).change();
-//      });
-      <?}?>
+      $('input[name="article_priorityEndDate"]').datepicker();
+
+      $('.article_tags_class').tagsInput({
+    	  'autocomplete_url': '<?echo $this->link()->route('getTags')?>',
+    	  'defaultText':'<?=$this->tr('přidat štítek') ?>'
+      });
    });
    /* ]]> */
 </script>

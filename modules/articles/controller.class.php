@@ -18,6 +18,8 @@ class Articles_Controller extends Controller {
    const SORT_DATE = 'date';
    const SORT_ALPHABET = 'alphabet';
 
+   const GET_TAG_PARAM = 'tag';
+   
    /**
     * Jestli je povoleno zadávání prázdného textu
     * @var bool
@@ -34,33 +36,51 @@ class Articles_Controller extends Controller {
 
       // načtení článků
       $artModel = new Articles_Model();
-      $query = $artModel;
+      $mWhereString = null;
+      $mWhereBinds = array();
+      
       if($this->category()->getRights()->isControll()){
          $artModel->setSelectAllLangs(true);
-         $query->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
-            ,array('idc' => $this->category()->getId()));
+         $mWhereString = "(".Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '.")";
+         $mWhereBinds = array('idc' => $this->category()->getId());
       } else if($this->category()->getRights()->isWritable()){
-         $query->where(
+         $mWhereString = 
             // články který nejsou koncepty nebo je napsal uživatel
-            '('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr) '
+            "("
+            .'('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr) '
             // články jsoupřidány po aktuálním času nebo je napsal uživatel
             .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
             // kategorie a vyplněný urlkey
             .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
-            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
-
-            array(
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
+            .")";
+         $mWhereBinds = array(
             'idusr' => Auth::getUserId(),
             'idusr2' => Auth::getUserId(),
-            'idc' => $this->category()->getId()));
+            'idc' => $this->category()->getId());
       } else {
-         $query->where(Articles_Model::COLUMN_CONCEPT.' = 0 '
+         $mWhereString = 
+            "("
+            .Articles_Model::COLUMN_CONCEPT.' = 0 '
             .'AND '.Articles_Model::COLUMN_ADD_TIME.' < NOW() '
             .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
-            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
-
-            array('idc' => $this->category()->getId()));
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
+            .")";
+         $mWhereBinds = array('idc' => $this->category()->getId());
       }
+      
+      /* pokud je vybrán tag */
+      if($this->getRequestParam('tag') != null){
+         $this->view()->selectedTag = $this->getRequestParam('tag');
+
+         $artModel
+            ->join(Articles_Model::COLUMN_ID, array( 'art_tags_conn' => "Articles_Model_TagsConnection"), Articles_Model_TagsConnection::COLUMN_ID_ARTICLE)
+            ->join(array( 'art_tags_conn' => Articles_Model_TagsConnection::COLUMN_ID_TAG), "Articles_Model_Tags", Articles_Model_Tags::COLUMN_ID)
+            ->groupBy(Articles_Model::COLUMN_ID);
+         $mWhereString .= " AND ".Articles_Model_Tags::COLUMN_NAME." = :tagname";
+         $mWhereBinds['tagname'] = $this->getRequestParam('tag'); 
+      }
+      $artModel->where($mWhereString, $mWhereBinds);
 
       $numRows = 0;
       $scrollComponent = null;
@@ -81,8 +101,12 @@ class Articles_Controller extends Controller {
             $artModel->order(array(Articles_Model::COLUMN_NAME => $this->getRequestParam('order','asc')));
             break;
          case self::SORT_DATE:
-         default:
             $artModel->order(array(Articles_Model::COLUMN_ADD_TIME => $this->getRequestParam('order','desc')));
+         default:
+            $artModel->order(array(
+                  Articles_Model::COLUMN_PRIORITY => Model_ORM::ORDER_DESC,
+                  Articles_Model::COLUMN_ADD_TIME => $this->getRequestParam('order','desc')
+               ));
             // remove url param
             $this->link()->rmParam(Articles_Routes::URL_PARAM_SORT);
             break;
@@ -92,9 +116,36 @@ class Articles_Controller extends Controller {
       if($scrollComponent instanceof Component_Scroll){
          $artModel->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
-
+      
       $this->view()->scrollComp = $scrollComponent;
-      $this->view()->articles = $artModel->records();
+      $articles = $artModel->records();
+      
+      /**
+       * priority -- projít články a kontrola prioritních
+       * @todo - přepočet priorit přeřadit do plánovače úloh
+       */
+      
+      $curDate = new DateTime();
+      $curDate->setTime(0, 0);
+      $isSomeEdit = false;
+      foreach ($articles as $art) {
+         $artTime = new DateTime($art->{Articles_Model::COLUMN_PRIORITY_END_DATE});
+         $artTime->setTime(23, 59, 59);
+         if($art->{Articles_Model::COLUMN_PRIORITY} != 0 &&
+            $curDate > $artTime ) {
+            $art->{Articles_Model::COLUMN_PRIORITY} = 0;
+            $art->{Articles_Model::COLUMN_PRIORITY_END_DATE} = null;
+            $artModel->save($art);
+            $isSomeEdit = true;
+         }
+      }
+      unset($curDate);
+      if($isSomeEdit){
+         $this->link()->reload();
+      }
+      
+      
+      $this->view()->articles = $articles;
 
       // pokud je seznam vypnut provede se redirect na detail prvního článku
       if($this->routes()->getActionName() == 'main' AND $this->category()->getParam(self::PARAM_DISABLE_LIST, false) AND $this->view()->articles != false){
@@ -102,6 +153,32 @@ class Articles_Controller extends Controller {
          $this->link()->route('detail', array('urlkey' => (string)$first->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
 
+      // načtení tagů
+      if($this->view()->articles != false){
+         $articlesTags = array();
+         $placeholders = array();
+         foreach ($this->view()->articles as $article) {
+            $placeholders[':pl_'.$article->{Articles_Model::COLUMN_ID}] = $article->{Articles_Model::COLUMN_ID};
+         }
+      
+         $modelTags = new Articles_Model_TagsConnection();
+         $tags = $modelTags
+            ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_TAG)
+            ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." IN (".implode(',', array_keys($placeholders) ).")", 
+               $placeholders )
+            ->order(array(Articles_Model_Tags::COLUMN_NAME => Model_ORM::ORDER_ASC ))
+            ->records();
+         
+         foreach ($tags as $tag) {
+            $id = $tag->{Articles_Model_TagsConnection::COLUMN_ID_ARTICLE};
+            if(!isset( $articlesTags[$id] )){
+               $articlesTags[$id] = array();
+            }
+            $articlesTags[$id][] = $tag->{Articles_Model_Tags::COLUMN_NAME};
+         }
+         $this->view()->articlesTags = $articlesTags ;
+      }
+      
       // odkaz zpět
       $this->link()->backInit();
       
@@ -117,34 +194,6 @@ class Articles_Controller extends Controller {
       $artModel = new Articles_Model_List();
       $articles = $artModel->getList($this->category()->getId(),0,100,!$this->rights()->isWritable());
       $this->view()->articles = $articles;
-   }
-
-   /**
-    * Kontroler pro zobrazení novinek
-    */
-   public function topController() {
-      //        Kontrola práv
-      $this->checkReadableRights();
-      // načtení článků
-      $artModel = new Articles_Model_List();
-      $scrollComponent = new Component_Scroll();
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS,
-              $artModel->getCountArticles($this->category()->getId()));
-
-      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-              $this->category()->getParam('scroll', self::DEFAULT_ARTICLES_IN_PAGE));
-
-      $scrollComponent->runCtrlPart();
-
-      $articles = $artModel->getListTop($this->category()->getId(),
-              $scrollComponent->getConfig(Component_Scroll::CONFIG_START_RECORD),
-              $scrollComponent->getConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE),!$this->rights()->isWritable());
-
-      $this->view()->articles = $articles;
-      $this->view()->scrollComp = $scrollComponent;
-      $this->view()->top = true;
-      // odkaz zpět
-      $this->link()->backInit();
    }
 
    public function archiveController() {
@@ -293,6 +342,21 @@ class Articles_Controller extends Controller {
       if($this->category()->getParam(self::PARAM_DISABLE_LIST, false)){
          $this->mainController();
       }
+      
+      /* TAGY */
+      $articlesTags = array();
+      $modelTags = new Articles_Model_TagsConnection();
+      $tagsRecs = $modelTags
+         ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_TAG)
+         ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." = :ida", array('ida' => $article->getPK() ) )
+         ->order(array(Articles_Model_Tags::COLUMN_NAME => Model_ORM::ORDER_ASC ))
+         ->records();
+      
+      $tags = array();
+      foreach ($tagsRecs as $tag) {
+         $tags[] = $tag->{Articles_Model_Tags::COLUMN_NAME};
+      }
+      $this->view()->tags = $tags;
    }
 
    /**
@@ -334,14 +398,14 @@ class Articles_Controller extends Controller {
          $urlkeys = $addForm->urlkey->getValues();
          $names = $addForm->name->getValues();
          $urlkeys = $this->createUrlKey($urlkeys, $names);
-
+         
          $lasId = $this->saveArticle($names, $urlkeys, $addForm);
          $model = new Articles_Model();
          $art = $model->record($lasId);
          if(isset($addForm->socNetPublish) && $addForm->socNetPublish->getValues() == true){
             $this->sendToSocialNetworks($art, $addForm->socNetMessage->getValues());
          }
-
+         
          $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
                  array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY}))->rmParam()->reload();
@@ -362,32 +426,16 @@ class Articles_Controller extends Controller {
       $article = $model->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
       
-      $editForm = $this->createForm($article->getPK());
-
-      if($article !=false){
-         $editForm->name->setValues($article->{Articles_Model::COLUMN_NAME});
-         $editForm->text->setValues($article->{Articles_Model::COLUMN_TEXT});
-         $editForm->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
-         $editForm->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
-         $editForm->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
-         $editForm->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
-         $editForm->art_id->setValues($article->{Articles_Model::COLUMN_ID});
-         $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
-         $editForm->created_date->setValues(vve_date('%x',$addTime));
-         $editForm->created_time->setValues(vve_date('%H:%i',$addTime));
-         if(isset ($editForm->titleImage)){
-            $editForm->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
-         }
-         $editForm->creatorOther->setValues($article->{Articles_Model::COLUMN_AUTHOR});
-         $editForm->concept->setValues($article->{Articles_Model::COLUMN_CONCEPT});
+      if($article == false){
+         return false;
       }
-
-      if($editForm->isSend() AND $editForm->save->getValues() == false){
-         $this->link()->route('detail')->reload();
-      }
+      $this->view()->article = $article;
+      
+      $editForm = $this->createForm($article);
+      
       $this->view()->form = $editForm;
       $this->view()->edit = true;
-
+      
       if($editForm->isValid()) {
          // generování url klíče
          $urlkeys = $editForm->urlkey->getValues();
@@ -408,7 +456,6 @@ class Articles_Controller extends Controller {
          }
          $this->link()->route('detail',array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
-
    }
    
    protected function sendToSocialNetworks($article, $message = null, $caption = null)
@@ -572,6 +619,7 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_KEYWORDS} = $form->metaKeywords->getValues();
       $artRecord->{Articles_Model::COLUMN_DESCRIPTION} = $form->metaDesc->getValues();
       $artRecord->{Articles_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+      
       if($artRecord->getPk() == null){
          if($form->haveElement('creatorId')){
             $artRecord->{Articles_Model::COLUMN_ID_USER} = $form->creatorId->getValues();
@@ -581,6 +629,10 @@ class Articles_Controller extends Controller {
       }
       $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
       $artRecord->{Articles_Model::COLUMN_AUTHOR} = $form->creatorOther->getValues();
+      $artRecord->{Articles_Model::COLUMN_PRIORITY} = $form->priority->getValues();
+      if((int)$form->priority->getValues() != 0){
+         $artRecord->{Articles_Model::COLUMN_PRIORITY_END_DATE} = $form->priorityEndDate->getValues();
+      }
 
       // add time
       $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
@@ -593,7 +645,7 @@ class Articles_Controller extends Controller {
       if(isset ($form->titleImage)){
          $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $form->titleImage->getValues();
       }
-      // title image
+      /* TITLE IMAGE */
       if(isset ($form->titleImageUpload) AND $form->titleImageUpload->getValues() != null){
          $image = new Filesystem_File_Image($form->titleImageUpload);
          $image->saveAs(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR, 
@@ -602,8 +654,40 @@ class Articles_Controller extends Controller {
             $this->category()->getParam('TITLE_IMAGE_CROP', VVE_ARTICLE_TITLE_IMG_C));
          $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $image->getName();
       }
-      
+      /* SAVE ARTICLE */
       $lastId = $model->save($artRecord);
+      
+      /* TAGS */
+      // smazání předchozích spojení
+      $modelTagsArtConn = new Articles_Model_TagsConnection();
+      $modelTagsArtConn
+         ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." = :ida", array('ida' => $artRecord->getPK()))
+         ->delete();
+      
+      $tags = array();
+      if($form->tags->getValues() != null){
+         $tags = explode(',', $form->tags->getValues());
+         // projít tagy jestli existují
+         $modelTags = new Articles_Model_Tags();
+         foreach ($tags as $tag) {
+            $tag = strtolower(htmlspecialchars( $tag ));
+            // je tag v db?
+            $tagRecord = $modelTags->where(Articles_Model_Tags::COLUMN_NAME." = :tagname", array('tagname' => $tag))->record();
+            if(!$tagRecord){
+               // tag není v db
+               $tagRecord = $modelTags->newRecord();
+               $tagRecord->{Articles_Model_Tags::COLUMN_NAME} = $tag;
+               $modelTags->save($tagRecord);
+            }
+            
+            // uložení spojení mezi tagem a článkem
+            $tagArtConnRec = $modelTagsArtConn->newRecord();
+            $tagArtConnRec->{Articles_Model_TagsConnection::COLUMN_ID_ARTICLE} = $artRecord->getPK();
+            $tagArtConnRec->{Articles_Model_TagsConnection::COLUMN_ID_TAG} = $tagRecord->getPK();
+            $modelTagsArtConn->save($tagArtConnRec);
+         }
+      }
+      
       $this->infoMsg()->addMessage($this->tr('Uloženo'));
       return $lastId;
    }
@@ -633,7 +717,7 @@ class Articles_Controller extends Controller {
     * Metoda  vytvoří element formuláře
     * @return Form
     */
-   protected function createForm($artId = null) {
+   protected function createForm(Model_ORM_Record $article = null) {
       $form = new Form('article_', true);
 
       $fGrpTexts = $form->addGroup('texts', $this->tr('Texty'));
@@ -653,13 +737,16 @@ class Articles_Controller extends Controller {
          $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       }
       $form->addElement($iText, $fGrpTexts);
+      
+      $iTags = new Form_Element_Text('tags', $this->tr('Štítky'));
+      $form->addElement($iTags, $fGrpTexts);
 
       $fGrpParams = $form->addGroup('params', $this->tr('Parametry'));
 
       // $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $iUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
       $iUrlKey->setUpdateFromElement($iName)->setCheckingUrl($this->link()->route('checkUrlkey'));
-      if($artId != null){
+      if($article != null){
          $iUrlKey->setCheckParam('id', (int)$artId)->setAutoUpdate(false);
       }
       $iUrlKey->setLangs();
@@ -683,7 +770,7 @@ class Articles_Controller extends Controller {
          $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png,JPG,GIF,PNG}", GLOB_BRACE);
          //print each file name
          if(!empty ($images)){
-            $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené obrázky'));
+            $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené titulní obrázky'));
             $elemImgSel->setOptions(array($this->tr('Žádný') => null));
             
             foreach($images as $image) {
@@ -695,6 +782,23 @@ class Articles_Controller extends Controller {
       
       $fGrpPublic = $form->addgroup('public', $this->tr('Parametry zveřejnění a vytvoření'));
 
+      $ePriority = new Form_Element_Select('priority', $this->tr('Priorita'));
+      $ePriority->setOptions(array(
+            $this->tr('Nízká (-1)') => -1,
+            $this->tr('Normální (0)') => 0,
+            $this->tr('Vysoká (1)') => 1,
+            $this->tr('Urgentní (2)') => 2,
+            $this->tr('Okamžitá (3)') => 3,
+            ));
+      $ePriority->setValues(0);
+      $form->addElement($ePriority, $fGrpPublic);
+      
+      $ePriorityEndDate = new Form_Element_Text('priorityEndDate', $this->tr('Konec priority'));
+      $ePriorityEndDate->addValidation(new Form_Validator_Date());
+      $ePriorityEndDate->addFilter(new Form_Filter_DateTimeObj());
+      $ePriorityEndDate->setSubLabel($this->tr('Do kdy bude položka označena prioritou'));
+      $form->addElement($ePriorityEndDate, $fGrpPublic);
+      
       // pokud jsou práva pro kontrolu, přidám položku s uživateli, kterí mohou daný článek vytvořit
       if($this->category()->getRights()->isControll()){
          $eCreator = new Form_Element_Select('creatorId', $this->tr('Položka vytvořena uživatelem'));
@@ -704,7 +808,7 @@ class Articles_Controller extends Controller {
             $name .= ' ('.$user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME}.')';
             $eCreator->setOptions(array($name => $user->{Model_Users::COLUMN_ID}),true);
          }
-         if($artId == null){
+         if($article == null){
             $eCreator->setValues(Auth::getUserId());
          }
          $form->addElement($eCreator, $fGrpPublic);
@@ -733,9 +837,10 @@ class Articles_Controller extends Controller {
       $form->addElement($eCreatedTime, $fGrpPublic);
       
       // doplnění id
-      if($artId != null){
+      if($article != null){
          $iIdElem = new Form_Element_Hidden('art_id');
          $iIdElem->addValidation(new Form_Validator_IsNumber());
+         $iIdElem->setValues($article->{Articles_Model::COLUMN_ID});
          $form->addElement($iIdElem, $fGrpPublic);
       }
 
@@ -758,6 +863,55 @@ class Articles_Controller extends Controller {
           */
       }
 
+      if($article != null){
+         $form->name->setValues($article->{Articles_Model::COLUMN_NAME});
+         $form->text->setValues($article->{Articles_Model::COLUMN_TEXT});
+         $form->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
+         $form->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
+         $form->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
+         $form->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
+         $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
+         $form->created_date->setValues(vve_date('%x',$addTime));
+         $form->created_time->setValues(vve_date('%H:%i',$addTime));
+         if(isset ($form->titleImage)){
+            $form->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
+         }
+         $form->creatorId->setValues($article->{Articles_Model::COLUMN_ID_USER});
+         $form->creatorOther->setValues($article->{Articles_Model::COLUMN_AUTHOR});
+         $form->concept->setValues($article->{Articles_Model::COLUMN_CONCEPT});
+         $form->priority->setValues($article->{Articles_Model::COLUMN_PRIORITY});
+//          if($article->{Articles_Model::COLUMN_PRIORITY_END_DATE} != null){
+         if($article->{Articles_Model::COLUMN_PRIORITY} != 0){
+            $form->priorityEndDate->setValues(
+                  vve_date('%x', new DateTime($article->{Articles_Model::COLUMN_PRIORITY_END_DATE})));
+         }
+          
+         // TAGY
+         $modelTagConnection = new Articles_Model_TagsConnection();
+         $tags = $modelTagConnection
+         ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_TAG)
+         ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." = :ida",
+               array('ida' => $article->getPK()) )
+               ->records();
+         if($tags){
+            $tagsStr = array();
+            foreach ($tags as $tag) {
+               $tagsStr[] = $tag->{Articles_Model_Tags::COLUMN_NAME};
+            }
+            $form->tags->setValues(implode(',', $tagsStr));
+         }
+      }
+      
+      if($form->isSend() ){
+         if($form->save->getValues() == false) {
+            $this->link()->route('detail')->reload();
+         }
+         if($form->priority->getValues() != 0){
+            $form->priorityEndDate->addValidation(new Form_Validator_NotEmpty(
+               $this->tr('Pokud je priorita nastavena, musí být zadáno také datum ukončení této priority')));
+         }
+      }
+      
       return $form;
    }
 
@@ -840,6 +994,156 @@ class Articles_Controller extends Controller {
       return $keys['ukey'];
    }
 
+   /**
+    * Metoda pro vrácení tagů pro autocomplete
+    */
+   public function getTagsController() 
+   {
+      // get parametr 'term' s písmeny tagu
+      $term = $this->getRequestParam('term');
+      $modelTags = new Articles_Model_Tags();
+      
+      if($term != null ){
+         $modelTags->where(Articles_Model_Tags::COLUMN_NAME." LIKE :term", array('term' => $term.'%'));
+      }
+      
+      $tags = $modelTags->records();
+      $respond = array();
+      if ($tags){
+         foreach ($tags as $tag) {
+            $respond[] = array(
+               'id' => $tag->{Articles_Model_Tags::COLUMN_ID}, 
+               'label' => $tag->{Articles_Model_Tags::COLUMN_NAME}." (id: ".$tag->{Articles_Model_Tags::COLUMN_ID}.")", 
+               'value' => $tag->{Articles_Model_Tags::COLUMN_NAME}
+            );
+         }
+      }
+      $this->view()->tags = $respond;
+   }
+   
+   /**
+    * Seznam tagů pro jqgrid
+    */
+   public function listTagsController() {
+      $this->checkReadableRights();
+      // objekt komponenty JGrid
+      $jqGrid = new Component_JqGrid();
+      $jqGrid->request()->setDefaultOrderField(Articles_Model_Tags::COLUMN_NAME);
+      // search
+      
+      $model = new Articles_Model_Tags();
+
+      $order = Model_ORM::ORDER_ASC;
+      if($jqGrid->request()->order == 'desc'){
+         $order = Model_ORM::ORDER_DESC;
+      }
+      
+      switch ($jqGrid->request()->orderField) {
+         case Articles_Model_Tags::COLUMN_ID:
+            $model->order(array(Articles_Model_Tags::COLUMN_ID => $order));
+            break;
+         case 'tag_used':
+            $model->order(array('tag_used' => $order));
+            break;
+         case Articles_Model_Tags::COLUMN_NAME:
+         default:
+            $model->order(array(Articles_Model_Tags::COLUMN_NAME => $order));
+            break;
+      }
+      
+      if ($jqGrid->request()->isSearch()) {
+//         $count = $modelAddresBook->searchCount($jqGrid->request()->searchString(),
+//            (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+//            $jqGrid->request()->searchField(),$jqGrid->request()->searchType());
+//         $jqGrid->respond()->setRecords($count);
+//
+//         $book = $modelAddresBook->search($jqGrid->request()->searchString(),
+//            (int)$this->getRequestParam('idgrp', Mails_Model_Groups::GROUP_ID_ALL),
+//            $jqGrid->request()->searchField(),$jqGrid->request()->searchType(),
+//            ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(),
+//            $jqGrid->request()->rows, $jqGrid->request()->orderField, $jqGrid->request()->order);
+      } else {
+      // list
+//         $groups = $this->getAllowedGroups($jqGrid);
+      }
+      
+      $jqGrid->respond()->setRecords($model->count());
+      
+      $fromRow = ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage();
+      
+      $model
+         ->columns(array('*', 'tag_used' => 'COUNT(ttagsc.'.Articles_Model_TagsConnection::COLUMN_ID_ARTICLE.')'))
+         ->join(Articles_Model_Tags::COLUMN_ID, array('ttagsc' => "Articles_Model_TagsConnection"), Articles_Model_TagsConnection::COLUMN_ID_TAG, array())
+         ->groupBy(array(Articles_Model_Tags::COLUMN_ID));
+      
+      $tags = $model->limit($fromRow, $jqGrid->request()->rows)->records(PDO::FETCH_OBJ);
+      // out
+      foreach ($tags as $tag) {
+         array_push($jqGrid->respond()->rows, 
+            array(
+                  'id' => $tag->{Articles_Model_Tags::COLUMN_ID},
+                  Articles_Model_Tags::COLUMN_ID => $tag->{Articles_Model_Tags::COLUMN_ID},
+                  Articles_Model_Tags::COLUMN_NAME => $tag->{Articles_Model_Tags::COLUMN_NAME},
+                  'tag_used' => $tag->tag_used
+                     ));
+      }
+      $this->view()->respond = $jqGrid->respond();
+   }
+   
+   /**
+    * Editační stránky tagů
+    */
+   public function editTagsController()
+   {
+      $this->checkControllRights();
+   } 
+   
+   /**
+    * Obsluhe aditace JQGrid 
+    */
+   public function editTagController() 
+   {
+      $this->checkWritebleRights();
+      $model = new Articles_Model_Tags();
+      $this->view()->allOk = false;
+      // část komponenty jqgrid pro formy
+      $jqGridReq = new Component_JqGrid_FormRequest();
+      $record = $model->newRecord();
+      
+      switch ($jqGridReq->getRequest()) {
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_ADD:
+            $jqGridReq->id = null;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_EDIT:
+            // kontrola položek
+            if($jqGridReq->{Articles_Model_Tags::COLUMN_NAME} == null){
+               $this->errMsg()->addMessage($this->tr('Nebyly zadány všechny povinné údaje'));
+               return;
+            }
+            if($jqGridReq->id != null){
+               $record = $model->record($jqGridReq->id);
+            }
+            
+            $record->{Articles_Model_Tags::COLUMN_NAME} = $jqGridReq->{Articles_Model_Tags::COLUMN_NAME};
+            
+            $model->save($record);
+            $this->infoMsg()->addMessage($this->tr('Štítek byl uložen'));
+            break;
+         case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
+            $model = new Articles_Model_Tags();
+            foreach ($jqGridReq->getIds() as $id) {
+               $model->delete($id);
+            }
+            $this->infoMsg()->addMessage($this->tr('Vybrané štítky byly smazány'));
+            break;
+         default:
+            $this->errMsg()->addMessage($this->tr('Nepodporovaný typ operace'));
+            break;
+      }
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
+      }
+   }
+   
    /**
     * Metoda pro nastavení modulu
     */

@@ -12,13 +12,18 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
    $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
 }
 
-$editTime = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
+$addTime = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
+$editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');?></h1>
 
 <div class="post">
-   <span class="date"><?=strftime("%x %X", $editTime->format("U"))?> - <?=$this->article->{Model_Users::COLUMN_USERNAME}?></span>
+   <div class="info info-top">
+      <?=$this->tr('Přidáno');?>: <span class="date"><?=vve_date("%x %X", $addTime)?></span>,
+      <?=$this->tr('aktualizováno');?>: <span class="date-edit"><?=vve_date("%x %X", $editTime)?></span>,
+      <?=$this->tr('uživatelem');?>: <span class="author"><?=$this->article->{Model_Users::COLUMN_USERNAME}?></span>
+   </div>
    <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
    <div class="annotation"><?
       echo $image;$image = null;
@@ -33,6 +38,21 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
     ?></div>
    <hr class="reseter" />
    <?$this->includeTpl('privateText.phtml', false,null,'articles');?>
+   
+   <?if( $this->tags ){?>
+   <div class="tags">
+      <? 
+      echo '<strong>'.$this->tr('Štítky').": </strong>";
+      $printArray = array();
+      foreach ($this->tags as $tag) {
+         $printArray[] = '<a href="'.($this->link()->clear()->param(Articles_Controller::GET_TAG_PARAM, $tag) )
+            .'" title="'.sprintf( $this->tr('zobraziz položky se štítkem %s'), $tag ).'">'.$tag.'</a>';
+      }
+      echo implode(', ', $printArray);
+      ?>
+   </div>
+   <?}?>
+   
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});

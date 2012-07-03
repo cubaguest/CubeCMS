@@ -1,0 +1,99 @@
+<?
+$this->addFile("css://articles:style.css?original");
+$this->addJsPlugin(new Component_JqGrid_JsPlugin());
+// do titulku
+$h = $this->tr('Správa štítků');
+$this->addPageTitle($h);
+?>
+<h1><?=$h;?></h1>
+<div class="main-content-form-edit" id="article-edit-form">
+   <?
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route(),
+         'title' => $this->tr('Zavřít správu štítků'),
+         'icon' => 'cross-circle.png',
+         'name' => $this->tr('Zavřít správu'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table id="table-tags"></table>
+   <div id="table-tags-pager"></div>
+   <hr class="reseter" />
+   <?
+   ?>
+</div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+      $(document).ready(function() {
+    	  function crossformatter ( cellvalue, options, rowObject ) {
+    		   return cellvalue+' <?=$this->tr('krát')?>';
+    	  }
+          
+         var tagsGrid = $("#table-tags").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('listTags');?>',
+            datatype: "json",
+            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Použito')?>'],
+            colModel:[
+               {name:'<?=Articles_Model_Tags::COLUMN_ID?>',index:'<?=Articles_Model_Tags::COLUMN_ID?>',
+                   width:33,fixed: true,editable:false},
+               {name:'<?=Articles_Model_Tags::COLUMN_NAME?>',index:'<?=Articles_Model_Tags::COLUMN_NAME?>', 
+                  editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+               {name:'tag_used',index:'tag_used', width:100,fixed: true,editable:false, formatter: crossformatter}
+            ],
+            rowNum:10,
+            rowList:[10,20,40,100],
+            pager: '#table-tags-pager',
+            sortname: '<?=Articles_Model_Tags::COLUMN_NAME?>',
+            caption:"<?=$this->tr('Štítky položek')?>",
+            autowidth : true,
+            height: '100%',
+            jsonReader: { repeatitems : false, root:"rows" },
+            editurl:"<?=$this->link()->route('editTag')?>"
+         });
+         tagsGrid.jqGrid('navGrid','#table-tags-pager',
+            {edit:true,add:true,del:true},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : function(respond){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },  
+            // del options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true, width: 300,
+               afterSubmit : function(respond, postdata){
+                  var res = eval("("+respond.responseText+")");
+                  var msg = res.errmsg.toString();
+                  if(res.infomsg.length > 0){
+                     msg = res.infomsg.toString();
+                  }
+                  return [res.allOk,msg];
+               }
+            },
+            {multipleSearch:false, closeAfterSearch: true, closeOnEscape:true,sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
+         );
+      });
+   /* ]]> */
+</script>

@@ -4,12 +4,19 @@ class Articles_View extends View {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'articles:list.phtml'));
       $this->createListToolbox();
       
+      if($this->selectedTag != null){
+         Template_Navigation::addItem( sprintf( $this->tr('štítek: %s'), $this->selectedTag), $this->link());
+      }
+      
 //      if($this->rights()->isControll() AND $this->text == false){
 //         $this->text = new Object();
 //         $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl definován. Vytvoříte jej pomocí nastrojů editace.');
 //      }
    }
 
+   /**
+    * @deprecated není potřeba, filtrování je přímo v jlavní metodě
+    */
    public function topView() {
       $this->mainView();
    }
@@ -29,6 +36,7 @@ class Articles_View extends View {
          $this->createListToolbox();
       }
       $this->createDetailToolbox();
+      Template_Navigation::addItem($this->article->{Articles_Model::COLUMN_NAME}, $this->link());
    }
    
    protected function addMetaTags($article)
@@ -126,6 +134,11 @@ class Articles_View extends View {
             $toolETView->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text'));
             $this->toolbox->addTool($toolETView);
             
+            $toolETags = new Template_Toolbox2_Tool_PostRedirect('edit_tags', $this->tr("Správa štítků"),
+            $this->link()->route('editTags'));
+            $toolETags->setIcon('flag_green.png')->setTitle($this->tr('Správa štítků položek'));
+            $this->toolbox->addTool($toolETags);
+            
             $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
             $this->link()->route(Routes::MODULE_SETTINGS));
             $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
@@ -136,6 +149,7 @@ class Articles_View extends View {
 
    public function archiveView() {
       $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_ARCHIVE, 'articles:archive.phtml'));
+      Template_Navigation::addItem($this->tr('Archiv'), $this->link());
    }
 
    /**
@@ -145,6 +159,9 @@ class Articles_View extends View {
       Template_Module::setEdit(true);
       $this->addTinyMCE();
       $this->template()->addFile('tpl://articles:edit.phtml');
+      if(!$this->edit){
+         Template_Navigation::addItem($this->tr('Přidání položky'), $this->link());
+      }
    }
 
    /**
@@ -152,11 +169,14 @@ class Articles_View extends View {
     */
    public function editView() {
       $this->addView();
+      Template_Navigation::addItem($this->article->{Articles_Model::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Úprava položky'), $this->link());
    }
 
    public function editTextView() {
       $this->addTinyMCE('simple');
       $this->template()->addFile('tpl://articles:edittext.phtml');
+      Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
    }
    
    private function addTinyMCE($theme = 'advanced') {
@@ -201,6 +221,8 @@ class Articles_View extends View {
       Template_Module::setEdit(true);
       $this->addTinyMCE();
       $this->template()->addFile('tpl://articles:editPrivate.phtml');
+      Template_Navigation::addItem($this->article->{Articles_Model::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Úprava privátní části'), $this->link());
    }
 
    public function exportArticlePdfView() {
@@ -325,6 +347,23 @@ class Articles_View extends View {
       $xml->flush();
    }
 
+   public function getTagsView()
+   {
+      echo json_encode($this->tags);
+      exit;
+   }
+   
+   public function listTagsView(){
+      echo json_encode($this->respond);
+   }
+   
+   public function editTagsView()
+   {
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://articles:edit_tags.phtml');
+      Template_Navigation::addItem($this->tr('Správa štítků'), $this->link());
+   }
+   
    /**
     * Metoda vytvoří xml s článkem a odešlě
     * @param Object $article

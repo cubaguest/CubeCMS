@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `id_cat` smallint(5) unsigned NOT NULL,
   `id_user` smallint(5) unsigned DEFAULT '1',
   `add_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `edit_time` datetime NULL,
+  `edit_time` datetime DEFAULT NULL,
   `is_user_last_edit` smallint(6) DEFAULT NULL,
   `viewed` smallint(6) NOT NULL DEFAULT '0',
   `name_cs` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -43,13 +43,17 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `keywords_de` varchar(200) DEFAULT NULL,
   `description_de` varchar(300) DEFAULT NULL,
   `concept` tinyint(1) NOT NULL DEFAULT '0',
-  `title_image` VARCHAR( 100 ) NULL DEFAULT NULL,
-  `author` VARCHAR( 100 ) NULL DEFAULT NULL,
+  `title_image` varchar(100) DEFAULT NULL,
+  `author` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
   KEY `urlkey_de` (`urlkey_de`),
   KEY `urlkey_sk` (`urlkey_sk`),
+  KEY `urlkey_cs_id_cat` (`id_cat`,`urlkey_cs`),
+  KEY `urlkey_en_id_cat` (`id_cat`,`urlkey_en`),
+  KEY `urlkey_de_id_cat` (`id_cat`,`urlkey_de`),
+  KEY `urlkey_sk_id_cat` (`id_cat`,`urlkey_sk`),
   FULLTEXT KEY `label_cs` (`name_cs`),
   FULLTEXT KEY `label_en` (`name_en`),
   FULLTEXT KEY `lebal_de` (`name_de`),
@@ -73,3 +77,20 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles_has_private_users` (
   KEY `fk_tb_users_id_user` (`id_user`),
   KEY `fk_tb_articles_id_article` (`id_article`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}articles_tags` (
+  `id_article_tag` INT NOT NULL  AUTO_INCREMENT,
+  `article_tag_name` VARCHAR(20) NOT NULL ,
+  `article_tag_counter` INT NULL DEFAULT 0 ,
+  PRIMARY KEY (`id_article_tag`) 
+) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `{PREFIX}articles_tags_has_articles` (
+  `articles_tags_id_article_tag` INT NOT NULL ,
+  `articles_id_article` SMALLINT(5) UNSIGNED NOT NULL ,
+  PRIMARY KEY (`articles_tags_id_article_tag`, `articles_id_article`) ,
+  INDEX `fk_articles_tags_has_articles_arti1` (`articles_id_article` ASC) ,
+  INDEX `fk_articles_tags_has_articles_arti` (`articles_tags_id_article_tag` ASC) 
+) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
+
