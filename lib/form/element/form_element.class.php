@@ -496,13 +496,16 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda naplní element
     */
    public function populate() {
-      if(isset ($_POST[$this->getName()]) && $_POST[$this->getName()] != "") {
-         $this->values = $_POST[$this->getName()];
-      } else {
-         $this->values = null;
+      if(!$this->isPopulated){
+         if(isset ($_POST[$this->getName()]) && $_POST[$this->getName()] != "") {
+            $this->values = $_POST[$this->getName()];
+         } else {
+            $this->values = null;
+         }
+         $this->unfilteredValues = $this->values;
+         $this->isPopulated = true;
+         $this->isFiltered = false;
       }
-      $this->unfilteredValues = $this->values;
-      $this->isPopulated = true;
    }
 
    /**
