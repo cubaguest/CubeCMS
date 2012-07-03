@@ -143,16 +143,28 @@ class Form_Element_Select extends Form_Element {
             foreach ($optVal as $optLabel2 => $optVal2) {
                $optChild = new Html_Element('option', str_replace(' ', '&nbsp;', htmlspecialchars($optLabel2, ENT_QUOTES)));
                $optChild->setAttrib('value', (string)$optVal2);
-               if($values == $optVal2 OR (is_array($values) AND in_array($optVal2, $values))) {
-                  $optChild->setAttrib('selected', 'selected');
+               if($this->isDimensional() ){
+                  if(is_array($values) AND isset($values[$this->dimensional]) AND $values[$this->dimensional] == $optVal2){
+                     $optChild->setAttrib('selected', 'selected');
+                  }
+               } else {
+                  if($values == $optVal2 OR (is_array($values) AND in_array($optVal2, $values))) {
+                     $optChild->setAttrib('selected', 'selected');
+                  }
                }
                $opt->addContent($optChild);
             }
          } else {
             $opt = new Html_Element('option', str_replace(' ', '&nbsp;', htmlspecialchars($optLabel, ENT_QUOTES)));
             $opt->setAttrib('value', (string)$optVal);
-            if($values == $optVal OR (is_array($values) AND in_array($optVal, $values))) {
-               $opt->setAttrib('selected', 'selected');
+            if($this->isDimensional() ){
+               if(is_array($values) AND isset($values[$this->dimensional]) AND $values[$this->dimensional] == $optVal){
+                  $opt->setAttrib('selected', 'selected');
+               }
+            } else {
+               if($values == $optVal OR (is_array($values) AND in_array($optVal, $values))) {
+                  $opt->setAttrib('selected', 'selected');
+               }
             }
          }
          $this->html()->addContent($opt);
