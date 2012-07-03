@@ -22,7 +22,7 @@ class Menu_Main {
     * Objekt s menu
     * @var Category_Structure
     */
-   public static $menu = null;
+   protected static $menu = null;
 
    /**
     * Konstruktor vytvoří objek menu
@@ -34,24 +34,9 @@ class Menu_Main {
       $this->init();
    }
 
-   /**
-    * Metoda provede inicializaci menu
-    */
-   public static function factory() {
-//      $newAdminMenu = new Category_Structure(0);
-//      $newAdminMenu->addChild(new Category_Structure(1));
-//      $newAdminMenu->saveStructure();
-//      var_dump($newAdminMenu);
-//      return;
-      // načtení menu z
-      if(self::$menu == null){
-         self::$menu = unserialize(VVE_CATEGORIES_STRUCTURE);
-         $catModel = new Model_Category();
-         self::$menu->setCategories($catModel->getCategoryList());
-      }
+   protected function init() {
+      self::$menu = Category_Structure::getStructure(Category_Structure::VISIBLE_ONLY);
    }
-
-   protected function init() {}
 
    public function controller() {
 

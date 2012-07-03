@@ -5,6 +5,9 @@
  * @author jakub
  */
 class Category_Structure implements Iterator, Countable, ArrayAccess {
+   const ALL = 1;
+   const VISIBLE_ONLY = 2;
+   
    private $level = 0;
    private $id = null;
    private $idParent = null;
@@ -13,6 +16,22 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
 
    private $withHidden = false;
    public $type = 'main';
+   
+   /**
+    * Viditelná struktura
+    * @var unknown_type
+    */
+   protected static $structureVisible = false; 
+   /**
+    * Kompletní struktura
+    * @var unknown_type
+    */
+   protected static $structure = false;
+   /**
+    * Cesta k aktuální kategorii
+    * @var array
+    */ 
+   protected static $path; 
 
    /**
     * Konstruktor pro vytvoření objektu se sekcemi
@@ -84,8 +103,17 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       return $this->idParent;
    }
 
-   public function getPath($idCat, $retArray = array(), $onlyId = false)
+   /**
+    * Metoda vrátí cestu k zadané kategorii. POkud kaegorie není zadána, použije se aktuální
+    * @param int $idCat
+    * @param array $retArray -- internal
+    * @param bool $onlyId
+    */
+   public function getPath($idCat = null, $retArray = array(), $onlyId = false)
    {
+      if($idCat == null){
+         $idCat = Category::getSelectedCategory()->getId();
+      }
       if($this->getId() == $idCat){
          if($onlyId){
             array_push($retArray, (int)$this->getId());
@@ -412,10 +440,70 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
     * @param bool $admin -- true pro vrácení struktury admin menu
     * @return Category_Structure
     */
-   public static function getStructure($admin = false)
+   public static function getStructure($type = self::VISIBLE_ONLY)
    {
-      return unserialize(VVE_CATEGORIES_STRUCTURE);
+      if(self::$structure == false){
+         self::$structure = self::$structureVisible = unserialize(VVE_CATEGORIES_STRUCTURE);
+         $modelCats = new Model_Category();
+         $cats = $modelCats->getCategoryList();
+         self::setCategoriesObjects($cats, self::$structure, self::$structureVisible);
+         self::clearVisibleStruture(self::$structureVisible);
+      }
+      
+      switch ($type) {
+         case self::ALL:
+            $rStruct = self::$strusture;
+            break;
+         case self::VISIBLE_ONLY:
+         default:
+            $rStruct = self::$structureVisible;
+            break;
+      }
+      return $rStruct;
    }
+   
+   
+   protected static function setCategoriesObjects($catArray, &$fullStruct, &$visibleStruct)
+   {
+      if(isset ($catArray[$fullStruct->getId()]) AND $fullStruct->level != 0) {
+         $fullStruct->catObj = new Category(null, false, $catArray[$fullStruct->getId()]);
+         $visibleStruct->catObj = &$fullStruct->catObj;
+      }
+//       var_dump($fullStruct);
+      foreach ($fullStruct as $key => $child) {
+         if(isset ($catArray[$child->getId()])) {
+            self::setCategoriesObjects($catArray, $fullStruct[$key], $visibleStruct[$key] );
+         } else {
+            unset ($fullStruct[$key]);
+            unset ($visibleStruct[$key]);
+         }
+      }
+   }
+   
+   protected static function clearVisibleStruture(&$visibleStruct){
+      
+      foreach ($visibleStruct as $key => $child) {
+         // načtení práva
+         $right = (string)$child->getCatObj()->getCatDataObj()->{Model_Rights::COLUMN_RIGHT};
+         $rightDefault = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT};
+         $visibility = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_VISIBILITY};
+         $ownerId = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_ID_USER_OWNER};
+         
+         $right = $right != null ? $right : $rightDefault;
+      
+         if( (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $ownerId)
+               AND ( ($visibility == Model_Category::VISIBILITY_ALL) // viditelné všem
+                     OR (!Auth::isLogin() AND $visibility == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
+                     OR (Auth::isLogin() AND $visibility == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
+                     OR (Auth::isAdmin() AND $visibility == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
+                     OR (Auth::isAdminGroup() AND $visibility == Model_Category::VISIBILITY_WHEN_ADMIN_ALL) // viditelné adminům ze všech domén
+               )) {
+            self::clearVisibleStruture($visibleStruct[$key]);
+         } else {
+            unset ($visibleStruct[$key]);
+         }
+      }
+   }  
 
    /**
     * Magická metoda pro výpis

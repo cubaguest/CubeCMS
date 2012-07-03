@@ -581,7 +581,6 @@ class AppCore extends TrObject {
     */
    public function createMenus()
    {
-      Menu_Main::factory();
       try {
          $menu = new Menu_Main();
          $menu->controller();
@@ -593,7 +592,6 @@ class AppCore extends TrObject {
       // inicializace admin menu
       if(Auth::isLogin() && Auth::isAdmin()){
          try {
-            Menu_Admin::factory();
             $menu = new Menu_Admin();
             $menu->controller();
             $menu->view();

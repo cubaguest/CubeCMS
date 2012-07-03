@@ -16,15 +16,14 @@ class Menu_Admin extends Menu_Main {
     * Objekt s admin menu
     * @var SimpleXMLElement
     */
-   public static $menu = array();
+   protected static $menu = array();
 
-   /**
-    * Metoda provede inicializaci menu
-    */
-   public static function factory() {
+   protected function init() 
+   {
       $model = new Model_CategoryAdm();
       self::$menu = $model->getStructure();
    }
+   
    public function view() {
       $this->template()->menu = self::$menu;
       $this->template()->addTplFile("menu_admin.phtml", true);
