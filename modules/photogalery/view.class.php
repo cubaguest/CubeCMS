@@ -52,16 +52,24 @@ class Photogalery_View extends View {
 
    public function editphotosView() {
       Template_Module::setEdit(true);
+      if((string)$this->name != null){
+         Template_Navigation::addItem($this->name, $this->link()->route('detail'));
+         $this->template()->addPageTitle($this->name);
+      }
       $this->template()->addPageTitle($this->tr('úprava obrázků'));
-      $this->template()->addPageHeadline($this->tr('úprava obrázků'));
       $this->template()->addFile("tpl://photogalery:editphotos.phtml");
+      Template_Navigation::addItem($this->tr('Úprava obrázků'), $this->link());
    }
 
    public function sortphotosView() {
       Template_Module::setEdit(true);
+      if((string)$this->name != null){
+         Template_Navigation::addItem($this->name, $this->link()->route('detail'));
+         $this->template()->addPageTitle($this->name);
+      }
       $this->template()->addPageTitle($this->tr('úprava pořadí obrázků'));
-      $this->template()->addPageHeadline($this->tr('úprava pořadí obrázků'));
       $this->template()->addFile("tpl://photogalery:sortphotos.phtml");
+      Template_Navigation::addItem($this->tr('Řazení obrázků'), $this->link());
    }
 
    public function uploadFileView() {}
@@ -77,6 +85,7 @@ class Photogalery_View extends View {
       Template_Module::setEdit(true);
       $this->setTinyMCE($this->form->text, $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
       $this->template()->addFile("tpl://edittext.phtml");
+      Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
    }
 }
 

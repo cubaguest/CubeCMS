@@ -95,12 +95,14 @@ class Text_View extends View {
       Template_Core::setPageTitle($this->h1);
       $this->setTinyMCE($this->form->text, $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced'));
       $this->template()->addFile("tpl://text:textedit.phtml");
+      Template_Navigation::addItem($this->tr('Úprava obsahu'), $this->link());
    }
 
    public function editPrivateView() {
       $this->editView();
       $this->h1 = sprintf($this->tr('úprava privátního textu "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
+      Template_Navigation::addItem($this->tr('Úprava privátního textu'), $this->link());
    }
 
    public function editPanelView() {
@@ -109,6 +111,7 @@ class Text_View extends View {
       Template_Core::setPageTitle($this->h1);
       $this->setTinyMCE($this->form->text, 'simple');
       $this->template()->addFile("tpl://text:textedit.phtml");
+      Template_Navigation::addItem($this->tr('Úprava obsahu panelu'), $this->link());
    }
 
    public function exportTextHtmlView() {
