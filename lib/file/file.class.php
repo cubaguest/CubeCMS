@@ -301,38 +301,28 @@ class File extends TrObject implements File_Interface {
     */
    public function copy($path, $returnNewObj = false, $newFile = null, $createUniqueName = true)
    {
-      $obj = &$this;
-      if($returnNewObj == true){
-//         $obj = unserialize(serialize($this)); // THIS IS SLOW !!!
-         $obj = clone($this);
-      }
-      if(!$this->exist()){
-         return $obj;
-      }
-      // Kontrola adresáře
       $path = new FS_Dir($path);
       $path->check();
 
       // Kontrola jména
       if($newFile == null){
-         $newFile = $obj->getName();
+         $newFile = $this->getName();
       }
       
       if($createUniqueName == true){
-         $newFile = $this->creatUniqueName($newFile, (string)$path);
+         $newFile = self::creatUniqueName($newFile, (string)$path);
       }
       
       if(!@copy((string)$this, (string)$path.$newFile)) {
          throw new File_Exception(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
       }
+      
       if($returnNewObj == true){
-         $obj->setPath($path);
-         $obj->setName($newFile);
+         $class = get_class($this);
+         return new $class($newFile, $path);
       }
-//      if(!chmod((string)$obj, 0666)) {
-//         throw new File_Exception(sprintf($this->tr('Chyba při úpravě oprávnění souboru %s'),(string)$obj), 3);
-//      }
-      return $obj;  
+      
+      return $this;  
    }
    
    /**
@@ -392,7 +382,7 @@ class File extends TrObject implements File_Interface {
          header('Content-Length: ' . $this->getSize());
          ob_clean();
          flush();
-         readfile($file);
+         readfile((string)$this);
       } else {
          header('Content-Description: File Transfer');
          header('Content-Type: application/octet-stream');
@@ -447,16 +437,12 @@ class File extends TrObject implements File_Interface {
    /**
     * Funkce vytvoří nový název souboru, který je v zadaném adresáři unikátní
     *
-    * @param string -- adresář, kde se bude soubor vytvářet
-    * @param string -- (option) nový název souboru
-    * @param integer -- (option) číslo které se přikládá za soubor
-    *
+    * @param string -- název souboru
+    * @param string -- adresář, kde bude soubor
     * @return string -- nový název souboru
-    * @todo -- dodělat při přijmu souboru se dvěmi příponami
     */
-   protected function creatUniqueName($fn, $destinationDir) 
+   public static function creatUniqueName($fn, $destinationDir) 
    {
-      $fn = $fn == null ? $this->getName() : $fn;
       if(file_exists($destinationDir.$fn)){
          $file_suffix = substr($fn, (strrpos($fn, '.')+1));
          if  (!preg_match('/_\d+\.(?:\w{3}\.)?\w{3,4}$/', $fn)) {
