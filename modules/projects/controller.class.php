@@ -207,7 +207,7 @@ class Projects_Controller extends Controller {
       $this->checkControllRights();
       
       $model = new Projects_Model_Sections();
-      $sec = $modelSec->where(
+      $sec = $model->where(
          Projects_Model_Sections::COLUMN_URLKEY.' = :seckey'
          .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat', 
          array(
@@ -326,35 +326,48 @@ class Projects_Controller extends Controller {
          // miniatura
          if($form->imageThumb->getValues() != null){
             // zadaná miniatura
-            $imageThumb = new Filesystem_File_Image($form->imageThumb);
-               
-            $imageThumb->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
-               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam(self::PARAM_THUM_C, true));
-               
-            $rec->{Projects_Model_Projects::COLUMN_THUMB} = $imageThumb->getName();
-            $imageThumb->remove();
+            $thumb = new File_Image($form->imageThumb);
+            $thumb->move($dir);
+            $thumb->getData()->resize(
+                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), 
+                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+                  $this->category()->getParam(self::PARAM_THUM_C, true) == true 
+                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+                  );
+            
+            $thumb->save();
+            $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
          }
             
          if($form->image->getValues() != null){
-            $image = new Filesystem_File_Image($form->image);
-            
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), 
-               $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), false);
-            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
+            $image = new File_Image($form->image);
+            $image->move($dir);
             
             // miniatura
-            if($form->imageThumb->getValues() == null){
+            if($rec->{Projects_Model_Projects::COLUMN_THUMB} == null){
                // miniatura z titulního
                $thumbParts = pathinfo($image->getName());
                $thumbName = $thumbParts['filename'] . '_thumb.' . $thumbParts['extension'];
                
-               $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
-                  $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-                  $this->category()->getParam(self::PARAM_THUM_C, true), $thumbName);
-               $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumbName;
+               $thumb = $image->copy($dir, true, $thumbName);
+               
+               $thumb->getData()->resize(
+                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
+                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
+                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+               );
+               
+               $thumb->save();
+               $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
             }
-            $image->remove();
+            
+            $image->getData()->resize(
+                  $this->category()->getParam(self::PARAM_BIG_W, VVE_ARTICLE_TITLE_IMG_W),
+                  $this->category()->getParam(self::PARAM_BIG_H, VVE_ARTICLE_TITLE_IMG_H), File_Image_Base::RESIZE_AUTO );
+            
+            $image->save();
+            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
          }
          
          $model->save($rec);
@@ -435,36 +448,51 @@ class Projects_Controller extends Controller {
          // miniatura
          if($form->imageThumb->getValues() != null){
             // zadaná miniatura
-            $imageThumb = new Filesystem_File_Image($form->imageThumb);
-               
-            $imageThumb->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
-               $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-               $this->category()->getParam(self::PARAM_THUM_C, true));
-             
-            $rec->{Projects_Model_Projects::COLUMN_THUMB} = $imageThumb->getName();
-            $imageThumb->remove();
+            $thumb = new File_Image($form->imageThumb);
+            $thumb->move($dir);
+            $thumb->getData()->resize(
+                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
+                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+                  $this->category()->getParam(self::PARAM_THUM_C, true) == true
+                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+            );
+            
+            $thumb->save();
+            $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
          }
          
          // titulní obrázek
          if($form->image->getValues() != null){
-            $image = new Filesystem_File_Image($form->image);
+            $image = new File_Image($form->image);
+            $image->move($dir);
             
-            $image->saveAs($dir, $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W), 
-               $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), false);
-            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
-            
-            // miniatura z titulního
+            // miniatura
             if($form->imageThumb->getValues() == null){
+               // miniatura z titulního
                $thumbParts = pathinfo($image->getName());
                $thumbName = $thumbParts['filename'] . '_thumb.' . $thumbParts['extension'];
                
-               $image->saveAs($dir, $this->category()->getParam(self::PARAM_THUM_W, VVE_ARTICLE_TITLE_IMG_W), 
-                  $this->category()->getParam(self::PARAM_THUM_H, VVE_ARTICLE_TITLE_IMG_H), 
-                  $this->category()->getParam(self::PARAM_THUM_C, true), $thumbName);
-               $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumbName;
+               $thumb = $image->copy($dir, true, $thumbName);
+               
+               $thumb->getData()->resize(
+                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
+                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
+                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+               );
+               $thumb->save();
+               
+               $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
             }
-            $image->remove();
+            
+            $image->getData()->resize(
+                  $this->category()->getParam(self::PARAM_BIG_W, VVE_ARTICLE_TITLE_IMG_W),
+                  $this->category()->getParam(self::PARAM_BIG_H, VVE_ARTICLE_TITLE_IMG_H), File_Image_Base::RESIZE_AUTO );
+            
+            $image->save();
+            $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
          }
+         
          $model->save($rec);
          
          // přejmenování adresáře
@@ -756,7 +784,7 @@ class Projects_Controller extends Controller {
 
       $elemSW = new Form_Element_Text('image_thumb_w', 'Šířka miniatury titulního obrázku (px)');
       $elemSW->addValidation(new Form_Validator_IsNumber());
-      $elemSW->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_W.'px');
+      $elemSW->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_W.'px');
       $form->addElement($elemSW, 'images');
       if(isset($settings[self::PARAM_THUM_W])) {
          $form->image_thumb_w->setValues($settings[self::PARAM_THUM_W]);
@@ -764,7 +792,7 @@ class Projects_Controller extends Controller {
 
       $elemSH = new Form_Element_Text('image_thumb_h', 'Výška miniatury titulního obrázku (px)');
       $elemSH->addValidation(new Form_Validator_IsNumber());
-      $elemSH->setSubLabel('Výchozí: '.VVE_ARTICLE_TITLE_IMG_H.'px');
+      $elemSH->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_H.'px');
       $form->addElement($elemSH, 'images');
       if(isset($settings[self::PARAM_THUM_H])) {
          $form->image_thumb_h->setValues($settings[self::PARAM_THUM_H]);

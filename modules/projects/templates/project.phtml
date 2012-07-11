@@ -16,13 +16,17 @@ echo $this->toolbox;
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
+      <?if($this->project->{Projects_Model_Projects::COLUMN_THUMB} != null){?>
+      <div class="main-content-image">
+         <img src="<?=$this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_THUMB}?>" />
+      </div>
+      <?}?>
+      <?=$this->filter((string)$this->project->{Projects_Model_Projects::COLUMN_TEXT}, array('emoticons'));?>
       <?if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != null){?>
       <div class="main-content-image">
          <img src="<?=$this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE}?>" />
       </div>
       <?}?>
-      
-      <?=$this->filter((string)$this->project->{Projects_Model_Projects::COLUMN_TEXT}, array('emoticons'));?>
    </div>
    <hr class="reseter" />
    <?if(count($this->images > 0)){?>

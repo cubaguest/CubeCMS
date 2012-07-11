@@ -26,6 +26,7 @@ class Projects_View extends View {
       } else if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != null){
          Template_Core::setMetaTag('og:image', $this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE} );
       }
+      Template_Navigation::addItem($this->project->{Projects_Model_Projects::COLUMN_NAME}, $this->link());
    }
    
    public function sectionView() 
@@ -34,16 +35,21 @@ class Projects_View extends View {
       $this->createSectionToolbox($this->template()->section);
    }
 
-   public function addSectionView()
+   public function addSectionView($isEdit = false)
    {
       $this->template()->addFile('tpl://edit_section.phtml');
       $this->setTinyMCE($this->form->text, 
          $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
+      if(!$isEdit){
+         Template_Navigation::addItem($this->tr('Přidání sekce'), $this->link());
+      }
    }
    
    public function editSectionView()
    {
-      $this->addSectionView();
+      $this->addSectionView(true);
+      Template_Navigation::addItem(sprintf( $this->tr('Úprava sekce %s'), $this->section->{Projects_Model_Sections::COLUMN_NAME}), 
+         $this->link()->route());
    }
 
    public function addProjectView()
