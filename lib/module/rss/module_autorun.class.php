@@ -18,8 +18,10 @@ class Module_AutoRun extends Module_Core {
    protected $model = null;
    
    public function runController() {
+      ob_start();
       $this->printMsg($this->tr('AutoRun spuštěn'), null, true);
       $this->printMsg();
+      $this->model = new Model_AutoRun();
       // parsování času
       $time = new DateTime();
       $minute = $time->format("i");
@@ -29,33 +31,33 @@ class Module_AutoRun extends Module_Core {
       $month = $time->format("n");
       
       // for testing
-      $minute = '00';
-      $hour = '01';
-      $day = '2';
-      $dayInWeek = '7';
-      $month = '1';
+//       $minute = '00';
+//       $hour = '01';
+//       $day = '2';
+//       $dayInWeek = '7';
+//       $month = '1';
       
       // testy, který časový úsek se provádí
-      
-      $this->model = new Model_AutoRun();
-      
       // hodinový vždy
       $this->runTasks(Model_AutoRun::PERIOD_HOURLY);
+      file_put_contents(AppCore::getAppCacheDir()."autorun.log", date("d.m.Y G:i").' - Proveden autorun hourly.'."\n", FILE_APPEND);   
       
       if($hour == "01"){ // denní v 1 ráno
          $this->runTasks(Model_AutoRun::PERIOD_DAILY);
+         file_put_contents(AppCore::getAppCacheDir()."autorun.log", date("d.m.Y G:i").' - Proveden autorun daily.'."\n", FILE_APPEND);   
       }
-      
       if($dayInWeek == "7" && $hour == "02"){ // týdenní v neděli ve 2 ráno
          $this->runTasks(Model_AutoRun::PERIOD_WEEKLY);
+         file_put_contents(AppCore::getAppCacheDir()."autorun.log", date("d.m.Y G:i").' - Proveden autorun weekly.'."\n", FILE_APPEND);   
       }
       if($day == "2" && $hour == "03"){ // měsíční prvního ve 3 ráno
          $this->runTasks(Model_AutoRun::PERIOD_MONTHLY);
+         file_put_contents(AppCore::getAppCacheDir()."autorun.log", date("d.m.Y G:i").' - Proveden autorun monthly.'."\n", FILE_APPEND);   
       }
-      if($day == "1" && $month == "1" && $hour == "03"){ // roční 1 měsíc a 2 den 3 ráno
+      if($day == "1" && $month == "1" && $hour == "03"){ // roční 1 měsíc a 1 den 3 ráno
          $this->runTasks(Model_AutoRun::PERIOD_YEARLY);
+         file_put_contents(AppCore::getAppCacheDir()."autorun.log", date("d.m.Y G:i").' - Proveden autorun yearly.'."\n", FILE_APPEND);   
       }
-         
    }
 
    public function runView() {

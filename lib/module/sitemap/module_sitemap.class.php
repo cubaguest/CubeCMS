@@ -10,7 +10,6 @@
  */
 class Module_Sitemap extends Module_Core {
    public function runController() {
-      Menu_Main::factory();
       // nastavení
       if(AppCore::getUrlRequest()->getOutputType() == 'html' AND defined('VVE_CM_SITEMAP_MAX_ITEMS_PAGE')){//tohle se může oddělat s verzí 6.2
          SiteMap::setMaxItems((int)VVE_CM_SITEMAP_MAX_ITEMS_PAGE);
@@ -46,7 +45,7 @@ class Module_Sitemap extends Module_Core {
 
    public function runView() {
       $this->template()->setPVar('CURRENT_CATEGORY_PATH', array($this->tr('mapa stránek')));
-      $this->template()->categories = Menu_Main::getMenuObj();
+      $this->template()->categories = Category_Structure::getStructure();
       $this->template()->catArr = SiteMap::getItems();
       $this->template()->addTplFile('sitemap.phtml');
    }
