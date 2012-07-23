@@ -20,7 +20,16 @@ class DisplayForm_Controller extends Controller {
    {
       //		Kontrola práv
       $this->checkReadableRights();
-      $this->view()->dFormTpl = Forms_Controller::dynamicForm($this->category()->getParam(self::PARAM_FORM_ID, 0));
+      $nav = new Template_Navigation();
+      $path = $nav->getNavigation();
+      $pageInfo = array();
+      foreach ($path as $item) {
+         $pageInfo[] = '<a href="'.$item['link'].'">'.$item['name'].'</a>';
+      }
+      
+      $this->view()->dFormTpl = Forms_Controller::dynamicForm($this->category()->getParam(self::PARAM_FORM_ID, 0), array(
+            'pageinfo' => implode(' &gt; ', $pageInfo)
+            ));
 
       $model = new Text_Model();
       $this->view()->text = $model->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
