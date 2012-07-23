@@ -1,0 +1,16 @@
+.press-messages-list {
+	list-style: none;
+	padding-left: 0;
+	margin: 0;
+}
+.press-messages-list li {
+	list-style: none;
+	margin-bottom: 5px;
+}
+
+.press-messages-list .date {
+	font-weight: bold;
+}
+.press-messages-list .author {
+	font-style: italic;
+}

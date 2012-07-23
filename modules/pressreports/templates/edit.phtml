@@ -1,0 +1,17 @@
+<?
+if($this->file != null){
+   $h = sprintf($this->tr('Úprava zprávy "%s"'), $this->report->{PressReports_Model::COLUMN_NAME});
+} else {
+   $h = sprintf($this->tr('Přidání zpravy do kategorie "%s"'), $this->category()->getName());
+}
+Template_Core::setPageTitle($h);
+
+?>
+<h1><?=$h?></h1>
+<div class="main-content-form-edit">
+   <?
+   // form
+   echo $this->form;
+   ?>
+   <script type="text/javascript"></script>
+</div>
