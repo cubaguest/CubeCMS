@@ -1,39 +1,16 @@
-@CHARSET "UTF-8";
-#datastorage-structure table { width: 100%;}
-#datastorage-structure table tr.hidden-item { display: none;}
-#datastorage-structure table td { padding: 2px; vertical-align: middle;}
-#datastorage-structure table .file-selection { width: 20px;}
-#datastorage-structure table .file-name {text-align: left;}
-#datastorage-structure table .file-actions {width: 65px;}
-#datastorage-structure table .file-mtime {width: 100px;}
-#datastorage-structure table .sort-label-asc,
-#datastorage-structure table .sort-label-desc { text-decoration: underline; padding-right: 10px;}
-#datastorage-structure table .sort-label-desc {
-   background: transparent url('../../../images/buttons/order_desc.png') center right no-repeat;
+.press-messages-list {
+	list-style: none;
+	padding-left: 0;
+	margin: 0;
 }
-#datastorage-structure table .sort-label-asc {
-   background: transparent url('../../../images/buttons/order_asc.png') center right no-repeat;
-   padding-right: 10px;
+.press-messages-list li {
+	list-style: none;
+	margin-bottom: 5px;
 }
-#datastorage-buttons form,
-#datastorage-buttons form p,
-#datastorage-structure form,
-#datastorage-structure form p,
-/*#datastorage-buttons object,*/
-#datastorage-buttons input 
-{ display: inline; }
-#datastorage-buttons .action-details { margin-top: 5px;}
-#upload-queue { padding: 5px 0; display: none;}
-#upload-queue div {padding: 2px;}
-#upload-list {padding:2px; list-style:none; height: 100px; overflow: auto;margin: 0;}
-#upload-list li { line-height:15px; font-size:12px; margin:2px; 
-                  border:1px solid #ccc; padding:3px; font-size:12px; position:relative;}
-#upload-list li p { margin:0; line-height:18px; }
-#upload-list li .progressbar{ border:1px solid #333; height:5px; background:#fff; padding: 0;}
-#upload-list li .progress { background:#999; width:0%; height:5px; display: block; padding: 0;}
-#upload-list li.success { border:1px solid #339933; background:#ccf9b9; }
-#upload-list li span.cancel{ position:absolute; top:5px; right:5px; width:20px; height:20px;
-                                  background:url('images/icons/cancel.png') no-repeat; cursor:pointer; }
 
-#SWFUpload_0 { position: absolute; z-index: 1;}
-.swfupload-control {display: inline;}
+.press-messages-list .date {
+	font-weight: bold;
+}
+.press-messages-list .author {
+	font-style: italic;
+}

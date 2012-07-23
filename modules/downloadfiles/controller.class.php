@@ -3,9 +3,7 @@
  * Třída pro obsluhu akcí a kontrolerů modulu
  */
 
-class DownloadFiles_Controller extends Controller {
-   const PARAM_ALLOWED_TYPES = 'ft';
-   const PARAM_COLS = 'cols';
+class PressReports_Controller extends Controller {
 
    /**
  * Kontroler pro zobrazení textu
@@ -22,17 +20,14 @@ class DownloadFiles_Controller extends Controller {
       $this->checkDeleteItem();
       
       // load items
-      $model = new DownloadFiles_Model();
+      $model = new PressReports_Model();
       
-      $files = $model
-            ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-            ->order(array(
-               DownloadFiles_Model::COLUMN_COLUMN => Model_ORM::ORDER_ASC, 
-               DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC,
-               ))
+      $reports = $model
+            ->where(PressReports_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
+            ->order(array( PressReports_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC ))
             ->records();
       
-      $this->view()->files = $files;
+      $this->view()->reports = $reports;
       $this->view()->dataDir = $this->module()->getDataDir(true);
    }
    
@@ -43,71 +38,63 @@ class DownloadFiles_Controller extends Controller {
       $form = $this->createForm();
       
       if($form->isValid()){
-         $model = new DownloadFiles_Model();
-         $fileRec = $model->newRecord();
+         $model = new PressReports_Model();
+         $report = $model->newRecord();
          
          $file = $form->file->getValues();
          
-         $fileRec->{DownloadFiles_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-         $fileRec->{DownloadFiles_Model::COLUMN_ID_USER} = Auth::getUserId();
-         $fileRec->{DownloadFiles_Model::COLUMN_FILE} = $file['name'];
-         $fileRec->{DownloadFiles_Model::COLUMN_NAME} = $form->name->getValues();
-         $fileRec->{DownloadFiles_Model::COLUMN_TEXT} = $form->text->getValues();
-         if(isset ($form->column)){
-            $fileRec->{DownloadFiles_Model::COLUMN_COLUMN} = $form->column->getValues();
-         }
+         $report->{PressReports_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+         $report->{PressReports_Model::COLUMN_ID_USER} = Auth::getUserId();
+         $report->{PressReports_Model::COLUMN_FILE} = $file['name'];
+         $report->{PressReports_Model::COLUMN_NAME} = $form->name->getValues();
+         $report->{PressReports_Model::COLUMN_AUTHOR} = $form->author->getValues();
          
-         $model->save($fileRec);
-         $this->infoMsg()->addMessage($this->tr('Soubor byl uložen'));
-         $this->log('nahran soubor ke stazeni: '. $file['name']);
+         $model->save($report);
+         $this->infoMsg()->addMessage($this->tr('Zpráva byla uložena'));
+         $this->log('nahrán soubor tiskove zprávy: '. $file['name']);
          $this->link()->route()->reload();
       }
-      
       $this->view()->form = $form;
-      
    }
    
    public function editController() {
       $this->checkWritebleRights();
       
-      $model = new DownloadFiles_Model();
+      $model = new PressReports_Model();
       
-      $fileRec = $model->record($this->getRequest('id'));
+      $report = $model->record($this->getRequest('id'));
       
-      if(!$this->checkValidEditFileRecord($fileRec) ){
+      if(!$this->checkValidEditFileRecord($report) ){
          return false;
       }
       
-      $form = $this->createForm($fileRec);
+      $form = $this->createForm($report);
       
       if($form->isValid()){
          $file = $form->file->getValues();
 
          if($file != null){
-            if($fileRec->{DownloadFiles_Model::COLUMN_FILE} != $file['name'] 
-               && is_file($this->module()->getDataDir().$fileRec->{DownloadFiles_Model::COLUMN_FILE})){
-               @unlink($this->module()->getDataDir().$fileRec->{DownloadFiles_Model::COLUMN_FILE});
+            if($report->{PressReports_Model::COLUMN_FILE} != $file['name'] 
+               && is_file($this->module()->getDataDir().$report->{PressReports_Model::COLUMN_FILE})){
+               @unlink($this->module()->getDataDir().$report->{PressReports_Model::COLUMN_FILE});
             }
-            $fileRec->{DownloadFiles_Model::COLUMN_FILE} = $file['name'];
+            $report->{PressReports_Model::COLUMN_FILE} = $file['name'];
             $this->log('nahran soubor ke stazeni: '. $file['name']);
          }
          
-         $fileRec->{DownloadFiles_Model::COLUMN_NAME} = $form->name->getValues();
-         $fileRec->{DownloadFiles_Model::COLUMN_TEXT} = $form->text->getValues();
-         if(isset ($form->column)){
-            $fileRec->{DownloadFiles_Model::COLUMN_COLUMN} = $form->column->getValues();
-         }
+         $report->{PressReports_Model::COLUMN_NAME} = $form->name->getValues();
+         $report->{PressReports_Model::COLUMN_AUTHOR} = $form->author->getValues();
          
-         $model->save($fileRec);
-         $this->infoMsg()->addMessage($this->tr('Soubor byl uložen'));
+         $model->save($report);
+         $this->infoMsg()->addMessage($this->tr('Tisková zpráva byla uložena'));
          $this->link()->route()->reload();
       }
       
       $this->view()->form = $form;
-      $this->view()->file = $fileRec;
+      $this->view()->message = $message;
    }
 
-   private function createForm(Model_ORM_Record $fileObj = null)
+   private function createForm(Model_ORM_Record $report = null)
    {
       $form = new Form('dwfile_');
       
@@ -117,37 +104,31 @@ class DownloadFiles_Controller extends Controller {
       $elemName->addFilter(new Form_Filter_StripTags());
       $form->addElement($elemName);
       
-      $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
-      $elemText->addFilter(new Form_Filter_StripTags());
-      $elemText->setLangs();
-      $form->addElement($elemText);
+      $elemAuthor = new Form_Element_Text('author', $this->tr('Autor'));
+      $elemAuthor->addFilter(new Form_Filter_StripTags());
+      $form->addElement($elemAuthor);
+      
+//       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
+//       $elemText->addFilter(new Form_Filter_StripTags());
+//       $elemText->setLangs();
+//       $form->addElement($elemText);
       
       $elemFile = new Form_Element_File('file', $this->tr('Soubor'));
       $elemFile->setUploadDir($this->module()->getDataDir());
       $elemFile->addValidation(new Form_Validator_NotEmpty());
-      $elemFile->addValidation(new Form_Validator_FileExtension(
-         $this->category()->getParam(self::PARAM_ALLOWED_TYPES, Form_Validator_FileExtension::ALL)));
+      $elemFile->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::DOC));
       $form->addElement($elemFile);
-      
-      if($this->category()->getParam(self::PARAM_COLS, 1) > 1){
-         $elemCol = new Form_Element_Select('column', $this->tr('Sloupec'));
-         for ($col = 1; $col <= $this->category()->getParam(self::PARAM_COLS, 1); $col++) {
-            $elemCol->setOptions(array($this->tr("Sloupec ").$col => (string)$col), true);
-         }
-         $form->addElement($elemCol);
-      }
       
       $elemSave = new Form_Element_SaveCancel('save');
       $form->addElement($elemSave);
       
-      if($fileObj != null){
-         $form->name->setValues($fileObj->{DownloadFiles_Model::COLUMN_NAME});
-         $form->text->setValues($fileObj->{DownloadFiles_Model::COLUMN_TEXT});
-         $form->file->setSubLabel(sprintf($this->tr('Nahraný soubor: <strong>%s</strong>. Pokud nahrajete nový, dojde k přepsání.'), $fileObj->{DownloadFiles_Model::COLUMN_FILE}));
+      if($report != null){
+         $form->name->setValues($report->{PressReports_Model::COLUMN_NAME});
+         $form->author->setValues($report->{PressReports_Model::COLUMN_AUTHOR});
+//          $form->text->setValues($report->{DownloadFiles_Model::COLUMN_TEXT});
+         $form->file->setSubLabel(sprintf($this->tr('Nahraný soubor: <strong>%s</strong>. Pokud nahrajete nový, dojde k přepsání.'), 
+               $report->{PressReports_Model::COLUMN_FILE}));
          $form->file->removeValidation('Form_Validator_NotEmpty');
-         if(isset ($form->column)){
-            $form->column->setValues($fileObj->{DownloadFiles_Model::COLUMN_COLUMN});
-         }
       }
       
       if($form->isSend() && $form->save->getValues() == false){
@@ -158,13 +139,12 @@ class DownloadFiles_Controller extends Controller {
       return $form;
    }
 
-
    protected function checkDeleteItem()
    {
       if(!$this->rights()->isWritable() && !$this->rights()->isControll()){
          return;
       }
-      $form = new Form('delete_dwfile_');
+      $form = new Form('delete_press_report_');
       $elemName = new Form_Element_Hidden('id');
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemName);
@@ -173,19 +153,19 @@ class DownloadFiles_Controller extends Controller {
       $form->addElement($elemSubmit);
 
       if($form->isValid()){
-         $model = new DownloadFiles_Model();
-         $fileRec = $model->record($form->id->getValues());
+         $model = new PressReports_Model();
+         $report = $model->record($form->id->getValues());
          
-         if(!$this->checkValidEditFileRecord($fileRec)){
-            $this->log(sprintf('pokus o smazání souboru "%s" z cizí kategorie', $fileRec->{DownloadFiles_Model::COLUMN_FILE}));
-            throw new InvalidArgumentException($this->tr('Tento soubor nelze smazat. nepatří do dané kategorie'));
+         if(!$this->checkValidEditFileRecord($report)){
+            $this->log(sprintf('pokus o smazání souboru "%s" z cizí kategorie', $report->{PressReports_Model::COLUMN_NAME}));
+            throw new InvalidArgumentException($this->tr('Tuto tiskovou zprávu nelze smazat, nepatří do dané kategorie'));
          }
          
-         if(is_file($this->module()->getDataDir().$fileRec->{DownloadFiles_Model::COLUMN_FILE})){
-            @unlink($this->module()->getDataDir().$fileRec->{DownloadFiles_Model::COLUMN_FILE});
+         if(is_file($this->module()->getDataDir().$report->{PressReports_Model::COLUMN_FILE})){
+            @unlink($this->module()->getDataDir().$report->{PressReports_Model::COLUMN_FILE});
          }
          $model->delete($fileRec);
-         $this->infoMsg()->addMessage($this->tr('Soubor byl smazán'));
+         $this->infoMsg()->addMessage($this->tr('Tisková zpráva byla smazána'));
          $this->link()->route()->reload();
       }
       $this->view()->formDelete = $form;
@@ -194,7 +174,7 @@ class DownloadFiles_Controller extends Controller {
    private function checkValidEditFileRecord(Model_ORM_Record $record)
    {
       if($record == false || ($record instanceof Model_ORM_Record && $record->isNew())
-            || $record->{DownloadFiles_Model::COLUMN_ID_CATEGORY} != $this->category()->getId()){
+            || $record->{PressReports_Model::COLUMN_ID_CATEGORY} != $this->category()->getId()){
          return false;
       }
       return true;
