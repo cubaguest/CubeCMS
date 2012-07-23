@@ -28,7 +28,7 @@ class AppCore extends TrObject {
    /**
     * Revize Enginu
     */
-   const ENGINE_RELEASE = 14;
+   const ENGINE_RELEASE = 15;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -659,6 +659,7 @@ class AppCore extends TrObject {
       List ($usec, $sec) = Explode(' ', microtime());
       $endTime = ((float) $sec + (float) $usec);
       $this->getCoreTpl()->execTime = round($endTime - $this->_startTime, 4);
+//       file_put_contents(AppCore::getAppCacheDir()."cache_test_enable.csv", $this->getCoreTpl()->execTime."\n", FILE_APPEND);
       $this->getCoreTpl()->countAllSqlQueries = Db_PDO::getCountQueries();
       $this->getCoreTpl()->addTplFile(Template_Core::getMainIndexTpl(), true);
       echo($this->getCoreTpl());

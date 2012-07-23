@@ -1,0 +1,162 @@
+<h1><?echo $this->category()->getName();?></h1>
+<div class="main-content-admin-form" id="banners-list">
+   <?
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('add'),
+         'title' => $this->tr('Přidat nevý banner do stránek'),
+         'icon' => 'image_add.png',
+         'name' => $this->tr('Nový banner'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   $this->addFile('css://style.css');
+   
+   $jq = new JsPlugin_JQuery();
+   $jq->addUISortable();
+   $jq->addUIButton();
+   $this->addJsPlugin($jq);
+   $this->addJsFile("https://www.google.com/jsapi");
+   
+   $this->addJsPlugin(new JsPlugin_PrettyPhoto());
+   ?>
+      <?foreach ($this->boxes as $key => $box) {?>
+      <h2 class=""><?ps($box['label'])?></h2>
+      <ul id="banners-box-<?=$key?>" class="banners-box">
+         <? foreach ($box['banners'] as $banner) {?>
+         <li class="banner" id="banner-<?=$banner->{Banners_Model::COLUMN_ID}?>">
+            <div class="base ui-state-default">
+               <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+               <a class="name" href="<?=$this->link()?>#" title="<?ps($this->tr('Ukázat detaily'))?>"
+                                     ><img src="<?=Url_Request::getBaseWebDir(true)?>images/buttons/expand.gif" alt="expand" /><? ps($banner->{Banners_Model::COLUMN_NAME})?></a>
+               <span class="clicks">(<? printf($this->tr('%s kliknutí za poslední měsíc'), $banner->clicks)?>)</span>
+               <span class="tools">
+               <? 
+                  $toolbox = clone $this->toolboxItem;
+                  $toolbox->banner_status_->setIcon($banner->{Banners_Model::COLUMN_ACTIVE} == true ? 'enable.png' : 'disable.png');
+                  $toolbox->banner_status_->getForm()->id->setValues($banner->{Banners_Model::COLUMN_ID});
+                  $toolbox->editBanner->setAction($this->link()->route('edit', array('id' => $banner->{Banners_Model::COLUMN_ID})));
+                  $toolbox->banner_delete_->getForm()->id->setValues($banner->{Banners_Model::COLUMN_ID});
+                  $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+                  echo $toolbox;
+               ?>
+               </span>
+            </div>
+            <div class="detail ui-state-active" id="banner-<?=$banner->{Banners_Model::COLUMN_ID}?>-detail">
+               <div class="target">
+                  <?=$this->tr('Cíl banneru:')?>
+                  <a href="<?=$banner->{Banners_Model::COLUMN_URL}?>" class="link-external"
+                  ><?ps($banner->{Banners_Model::COLUMN_URL})?></a>
+               </div>
+               <div class="chart">
+               <?=$this->tr('Nahrávám ...')?><img src="/images/progress_small.gif" />
+               </div>
+               <div class="buttons">
+                  <?
+                  $link = null;
+                  if(pathinfo($banner->{Banners_Model::COLUMN_FILE}, PATHINFO_EXTENSION) == 'swf'){
+                     $link = $this->category()->getModule()->getDataDir(true).$banner->{Banners_Model::COLUMN_FILE}
+                              ."?width=792&amp;height=294";
+                  } else {
+                     $link = $this->category()->getModule()->getDataDir(true).$banner->{Banners_Model::COLUMN_FILE};
+                  }?>
+                  <a href="<?=$link;?>" rel="prettyPhoto" class="banner-preview" title="<? ps($banner->{Banners_Model::COLUMN_NAME})?>" 
+                     ><?=$this->tr('Náhled')?></a>
+                  <a href="<?=$banner->{Banners_Model::COLUMN_URL}?>" class="banner-url link-external" 
+                     title="<? ps($banner->{Banners_Model::COLUMN_NAME})?>"><?=$this->tr('Otevřít cíl')?></a>
+               </div>
+            </div>
+         </li>   
+         <? }?>
+      </ul>
+      <?}?>
+   <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      function createChart($chart, idb) {
+         $.ajax({
+            url: "<?=$this->link()->route('clicksList')?>",
+            type: "GET",
+            data: {idb : idb},
+            success : function(data){
+               var dataArr = [ ['<?=$this->tr('Datum')?>', '<?=$this->tr('Kliknutí')?>'] ];
+               
+               $.each(data.days, function(day, clicks){
+                  dataArr.push([day, clicks]);
+               });
+               // initialize chart
+               var data = google.visualization.arrayToDataTable(dataArr);
+
+               var options = {
+                  height : 150,
+                  title: '<?=$this->tr('Přehled kliknutí na banner')?>',
+                  hAxis : { minValue : 0, format : "#x" }
+               };
+//               document.getElementById('chart_div')
+               var chart = new google.visualization.LineChart($chart[0] );
+               chart.draw(data, options);
+            }
+         });
+         $chart.addClass('loaded');
+      }
+   $(function() {
+	   $( ".banners-box" ).sortable({
+		   placeholder: "ui-state-highlight banner",
+		   connectWith: ".banners-box",
+		   forceHelperSize: true, forcePlaceholderSize: true,
+		   cursor: 'move',
+		   "axis": 'y',
+		   handle: '.base .ui-icon',
+		   update: function(event, ui) { 
+			   if (this === ui.item.parent()[0]) {
+               // banner - ui.item[0]
+               // přijemce - this
+				   //your code here
+				   var boxName = $(this).attr('id').replace('banners-box-', '');
+				   var bannerId = ui.item.attr('id').replace('banner-', '');
+				   var index = ui.item.index();
+			     // alert('moved new: '+boxName+ " id:"+bannerId+" pos:"+index);
+			      $.ajax({
+			    	   url : '<?=$this->link()->route('moveBanner')?>',
+			    	   data : {idb : bannerId, box : boxName, pos : index},
+			    	   type : 'POST',
+			    	   success : function(data){
+				    	   if(data.errmsg.lenght > 0){
+				    		   $( ".banners-box" ).sortable('cancel');
+				    	   }
+				    		   vveShowMessages(data);
+			         }
+				   });
+			   }
+			}
+	   });
+      
+      $('.banner .name').click(function(e){
+         e.preventDefault();
+         var $banner = $(this).parents('.banner');
+         var idb = $banner.attr('id').replace('banner-', '');
+         var $detail = $banner.find('.detail');
+         // load detail content if not loaded
+         if(!$detail.hasClass('loaded')){
+            createChart($detail.find('.chart'), idb);
+         }
+         $detail.toggle();
+         var $expander = $('img', this); 
+         if($detail.is(':visible')){
+             $expander.attr('src', $expander.attr('src').replace('expand', 'collapse') );
+         } else {
+             $expander.attr('src', $expander.attr('src').replace('collapse', 'expand') );
+         }    
+      });
+      
+	   //$( ".banners-box" ).disableSelection();
+	   // náhledy
+      $("a[rel^='prettyPhoto']").prettyPhoto({social_tools: ''});
+      $("a.banner-preview, a.banner-url" ).button();
+
+      $('form[name="previewBanner"]').submit(function(){
+    	   $(this).parents('.banner').find('a.banner-preview').click();
+         return false;
+      });
+	});
+	</script>
+</div>

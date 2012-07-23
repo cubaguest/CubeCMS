@@ -1,0 +1,16 @@
+<? 
+if($this->edit){
+   $h = sprintf( $this->tr('Úprava banneru "%s"'), $this->banner->{Banners_Model::COLUMN_NAME} );
+} else {
+   $h = $this->tr('Přidání banneru');
+}
+Template_Core::addPageTitle($h);
+?>
+
+<h1><?echo $h;?></h1>
+<div class="main-content-admin-form">
+   <?
+   // donastavení formuláře
+   echo $this->form;
+   ?>
+</div>
