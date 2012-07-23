@@ -5,7 +5,7 @@ if(Template::browser()->isMobile()){
 }
 
 $this->addCssFile("style.css");
-$this->includeTpl('sortLabel.phtml');
+$this->includeFile('tpl://articles:sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
 if($this->selectedTag != null) {
    $h1 = sprintf( $this->tr('Položky se štítkem "%s"'), $this->selectedTag ).$this->sortText;
@@ -21,7 +21,7 @@ echo $this->toolbox;
 <? }?>
 
 
-<?=$this->includeTpl('sort.phtml')?>
+<?=$this->includeFile('tpl://articles:sort.phtml')?>
 <?if(   (string)$this->text->{Text_Model::COLUMN_TEXT} != null 
         AND !isset($_GET[Component_Scroll::GET_PARAM]) 
          AND !isset($_GET[Articles_Controller::PARAM_SORT])
@@ -34,6 +34,7 @@ echo $this->toolbox;
 <?}?>
 <div class="posts-list">
 <?if(!empty ($this->articles)) {
+   $step = 1;
    foreach ($this->articles as $article) {
       $idA = $article->{Articles_Model::COLUMN_ID};
       $showClass = $public = null;
@@ -107,7 +108,13 @@ echo $this->toolbox;
       </div>
       <hr class="reseter" />
    </div>
-   <?}?>
+   <?
+   if($step == 2){
+      echo Banners_View::getBanners('in_articles');
+   }
+   
+   $step++;
+   }?>
 <?
    echo $this->scrollComp;
 } else {

@@ -95,6 +95,13 @@ class Articles_View extends View {
             ->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
          $this->toolbox->addTool($tooldel);
          
+         if($this->category()->getRights()->isControll()){
+            $toolMove = new Template_Toolbox2_Tool_PostRedirect('move_article', $this->tr("Přesunout položku"), 
+                  $this->link()->route('move'));
+            $toolMove->setIcon('folder_page.png')->setTitle($this->tr('Přesunout položku do jiné kategorie'));
+            $this->toolbox->addTool($toolMove);
+         }
+         
          if($this->article != false){
             $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->article->{Articles_Model::COLUMN_TEXT});
             $this->toolbox->addTool($toolLangLoader);
@@ -362,6 +369,14 @@ class Articles_View extends View {
       Template_Module::setEdit(true);
       $this->template()->addFile('tpl://articles:edit_tags.phtml');
       Template_Navigation::addItem($this->tr('Správa štítků'), $this->link());
+   }
+   
+   public function moveView()
+   {
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://articles:move.phtml');
+      Template_Navigation::addItem($this->article->{Articles_Model::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Přesun položky'), $this->link());
    }
    
    /**

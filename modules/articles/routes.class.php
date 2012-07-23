@@ -18,6 +18,7 @@ class Articles_Routes extends Routes {
       
       $this->addRoute('add', "add", 'add', "add/");
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
+      $this->addRoute('move', "::urlkey::/move", 'move','{urlkey}/move/');
       $this->addRoute('editPrivate', "::urlkey::/edit-private/", 'editPrivate','{urlkey}/edit-private/');
       $this->addRoute('edittext', "edit-text/", 'edittext','edit-text/');
       $this->addRoute('detail', "::urlkey::", 'show','{urlkey}/');

@@ -7,10 +7,12 @@ class Articles_Controller extends Controller {
    const PARAM_PRIVATE_ZONE = 'private';
    const PARAM_EDITOR_TYPE = 'editor';
    const PARAM_DISABLE_LIST = 'dislist';
+   const PARAM_SHOW_CATS = 'shc';
 
    const PARAM_TPL_LIST = 'tpllist';
    const PARAM_TPL_DETAIL = 'tpldet';
    const PARAM_TPL_ARCHIVE = 'tplarchive';
+   
 
    const DEFAULT_SORT = 'date';
 
@@ -36,37 +38,50 @@ class Articles_Controller extends Controller {
 
       // načtení článků
       $artModel = new Articles_Model();
-      $mWhereString = null;
-      $mWhereBinds = array();
+/*      
+      $showCats = array(
+            $this->category()->getId()
+            );
+      
+      $externalCats = $this->category()->getParam(self::PARAM_SHOW_CATS, array());
+      if(!empty($externalCats )) {
+         $showCats = array_merge($showCats, $externalCats);
+      }
+      
+      $catsPlaceholders = array();
+      foreach ($showCats as $id){
+         $catsPlaceholders[':cpl_'.$id] = (int)$id;
+      }
+      $mWhereString = Articles_Model::COLUMN_ID_CATEGORY." IN (".implode(',', array_keys($catsPlaceholders) ).")";
+      $mWhereBinds = $catsPlaceholders;
+*/
+      
+      $mWhereString = Articles_Model::COLUMN_ID_CATEGORY.' = :idc';
+      $mWhereBinds = array('idc' => $this->category()->getId());
       
       if($this->category()->getRights()->isControll()){
          $artModel->setSelectAllLangs(true);
-         $mWhereString = "(".Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '.")";
-         $mWhereBinds = array('idc' => $this->category()->getId());
+         $mWhereString .= ' AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ';
+         
       } else if($this->category()->getRights()->isWritable()){
-         $mWhereString = 
+         $mWhereString .= 
             // články který nejsou koncepty nebo je napsal uživatel
-            "("
+            " AND ("
             .'('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr) '
             // články jsoupřidány po aktuálním času nebo je napsal uživatel
             .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
             // kategorie a vyplněný urlkey
-            .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
             .")";
-         $mWhereBinds = array(
-            'idusr' => Auth::getUserId(),
-            'idusr2' => Auth::getUserId(),
-            'idc' => $this->category()->getId());
+         $mWhereBinds['idusr'] = Auth::getUserId();
+         $mWhereBinds['idusr2'] = Auth::getUserId();
       } else {
-         $mWhereString = 
-            "("
+         $mWhereString .= 
+            " AND ("
             .Articles_Model::COLUMN_CONCEPT.' = 0 '
             .'AND '.Articles_Model::COLUMN_ADD_TIME.' < NOW() '
-            .'AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
             .")";
-         $mWhereBinds = array('idc' => $this->category()->getId());
       }
       
       /* pokud je vybrán tag */
@@ -118,32 +133,19 @@ class Articles_Controller extends Controller {
       }
       
       $this->view()->scrollComp = $scrollComponent;
-      $articles = $artModel->records();
+      
+      $cacheKey = md5($mWhereString.serialize($mWhereBinds).Locales::getLang());
+      
+      $cache = new Cache();
+      if( ($articles = $cache->get($cacheKey)) == false ){
+         $articles = $artModel->records();
+         $cache->set($cacheKey, $articles);
+      }
       
       /**
        * priority -- projít články a kontrola prioritních
        * @todo - přepočet priorit přeřadit do plánovače úloh
        */
-      
-      $curDate = new DateTime();
-      $curDate->setTime(0, 0);
-      $isSomeEdit = false;
-      foreach ($articles as $art) {
-         $artTime = new DateTime($art->{Articles_Model::COLUMN_PRIORITY_END_DATE});
-         $artTime->setTime(23, 59, 59);
-         if($art->{Articles_Model::COLUMN_PRIORITY} != 0 &&
-            $curDate > $artTime ) {
-            $art->{Articles_Model::COLUMN_PRIORITY} = 0;
-            $art->{Articles_Model::COLUMN_PRIORITY_END_DATE} = null;
-            $artModel->save($art);
-            $isSomeEdit = true;
-         }
-      }
-      unset($curDate);
-      if($isSomeEdit){
-         $this->link()->reload();
-      }
-      
       
       $this->view()->articles = $articles;
 
@@ -155,27 +157,33 @@ class Articles_Controller extends Controller {
 
       // načtení tagů
       if($this->view()->articles != false){
-         $articlesTags = array();
-         $placeholders = array();
-         foreach ($this->view()->articles as $article) {
-            $placeholders[':pl_'.$article->{Articles_Model::COLUMN_ID}] = $article->{Articles_Model::COLUMN_ID};
-         }
-      
-         $modelTags = new Articles_Model_TagsConnection();
-         $tags = $modelTags
-            ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_TAG)
-            ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." IN (".implode(',', array_keys($placeholders) ).")", 
-               $placeholders )
-            ->order(array(Articles_Model_Tags::COLUMN_NAME => Model_ORM::ORDER_ASC ))
-            ->records();
          
-         foreach ($tags as $tag) {
-            $id = $tag->{Articles_Model_TagsConnection::COLUMN_ID_ARTICLE};
-            if(!isset( $articlesTags[$id] )){
-               $articlesTags[$id] = array();
+         if( ($articlesTags = $cache->get($cacheKey."_tags")) == false ){
+            $articlesTags = array();
+            $placeholders = array();
+            foreach ($this->view()->articles as $article) {
+               $placeholders[':pl_'.$article->{Articles_Model::COLUMN_ID}] = $article->{Articles_Model::COLUMN_ID};
             }
-            $articlesTags[$id][] = $tag->{Articles_Model_Tags::COLUMN_NAME};
+      
+            $modelTags = new Articles_Model_TagsConnection();
+            $tags = $modelTags
+               ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_TAG)
+               ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." IN (".implode(',', array_keys($placeholders) ).")", 
+                  $placeholders )
+               ->order(array(Articles_Model_Tags::COLUMN_NAME => Model_ORM::ORDER_ASC ))
+               ->records();
+         
+            foreach ($tags as $tag) {
+               $id = $tag->{Articles_Model_TagsConnection::COLUMN_ID_ARTICLE};
+               if(!isset( $articlesTags[$id] )){
+                  $articlesTags[$id] = array();
+               }
+               $articlesTags[$id][] = $tag->{Articles_Model_Tags::COLUMN_NAME};
+            }
+            $cache->set($cacheKey."_tags", $articlesTags);
          }
+//          $cache->delete($cacheKey."_tags");
+         
          $this->view()->articlesTags = $articlesTags ;
       }
       
@@ -186,6 +194,9 @@ class Articles_Controller extends Controller {
       $this->view()->text = $this->loadText();
    }
 
+   /**
+    * @deprecated - není potřeba
+    */
    public function contentController(){
       //        Kontrola práv
       $this->checkReadableRights();
@@ -747,7 +758,7 @@ class Articles_Controller extends Controller {
       $iUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
       $iUrlKey->setUpdateFromElement($iName)->setCheckingUrl($this->link()->route('checkUrlkey'));
       if($article != null){
-         $iUrlKey->setCheckParam('id', (int)$artId)->setAutoUpdate(false);
+         $iUrlKey->setCheckParam('id', (int)$article->{Articles_Model::COLUMN_ID})->setAutoUpdate(false);
       }
       $iUrlKey->setLangs();
       $iUrlKey->setSubLabel($this->tr('Pokud není url klíč zadán, je generován automaticky'));
@@ -1145,6 +1156,72 @@ class Articles_Controller extends Controller {
    }
    
    /**
+    * přesun článku
+    */
+   public function moveController(){
+      $this->checkWritebleRights();
+      $modelArt = new Articles_Model();      
+      $modelCats = new Model_Category();
+      
+      $article = $modelArt
+            ->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
+               array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))
+            ->record();
+      
+      if(!$article){
+         return false;
+      }
+      
+      $form = new Form('article_move_');
+      
+      $eNewCat = new Form_Element_Select('newcat', $this->tr('Přesunout do'));
+      $form->addElement($eNewCat);
+      
+      $eSubmit = new Form_Element_SaveCancel('save');
+      // načtení kategorií
+      $allowedCategories = array(
+            "'articles'",
+            "'articleswgal'",
+            "'photogalerymed'",
+            "'news'",
+            );
+      $cats = $modelCats
+         ->where(Model_Category::COLUMN_MODULE." IN (".implode(',', $allowedCategories).")", array())
+         ->order(array(Model_Category::COLUMN_NAME => Model_ORM::ORDER_ASC))
+         ->records();
+      
+      foreach ($cats as $cat) {
+         $eNewCat->setOptions(array(
+               $cat->{Model_Category::COLUMN_NAME}.' - '.$cat->{Model_Category::COLUMN_ID} => $cat->{Model_Category::COLUMN_ID}), 
+            true);
+      }
+      
+      $form->addElement($eSubmit);
+      
+      if($form->isValid()){
+         $cat = new Category((int)$form->newcat->getValues());
+         
+         // změna id kategorie
+         $article->{Articles_Model::COLUMN_ID_CATEGORY} = (int)$form->newcat->getValues();
+         $modelArt->save($article);
+         
+         // přesun datového adresáře
+         $dir = new FS_Dir($this->module()->getDataDir(false).$article->{Articles_Model::COLUMN_URLKEY}[Locales::getDefaultLang()]);
+         if($dir->exist()){
+            $dir->rename($cat->getModule()->getDataDir().$article->{Articles_Model::COLUMN_URLKEY}[Locales::getDefaultLang()]);
+         }
+         
+         // přesměrování do nové kategorie
+         $this->link(true)
+            ->category($cat->getUrlKey())->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))
+            ->reload();         
+      }
+      
+      $this->view()->article = $article;
+      $this->view()->form = $form;
+   }
+   
+   /**
     * Metoda pro nastavení modulu
     */
    protected function settings(&$settings,Form &$form) {
@@ -1246,8 +1323,28 @@ class Articles_Controller extends Controller {
               $this->tr('Zavřít diskuzi po dnech'));
       $elemCommentsClosed->addValidation(new Form_Validator_IsNumber());
       $elemCommentsClosed->setSubLabel($this->tr('Výchozí: diskuse nejsou uzavírány'));
-       $form->addElement($elemCommentsClosed, 'discussion');
+      $form->addElement($elemCommentsClosed, 'discussion');
 
+      /*
+      $fGrpCats = $form->addGroup('mergedCats', $this->tr('Připojené kategorie')); 
+      $elemShowCats = new Form_Element_Select('showCats', $this->tr('Zobrazit také položky z'));
+      $elemShowCats->setMultiple();
+      
+      $modelCats = new Model_Category();
+      $cats = $modelCats->where(Model_Category::COLUMN_MODULE." IN ('articles', 'news', 'articleswgal', 'photogalerymed')",
+            array())->records();
+      foreach ($cats as $cat) {
+         if($cat->{Model_Category::COLUMN_ID} == $this->category()->getId()) continue;
+         $elemShowCats->setOptions(array( 
+            $cat->{Model_Category::COLUMN_NAME}." - (ID: ".$cat->{Model_Category::COLUMN_ID}.")" => $cat->{Model_Category::COLUMN_ID}),
+            true);
+      }
+      if(isset($settings[self::PARAM_SHOW_CATS])) {
+         $elemShowCats->setValues($settings[self::PARAM_SHOW_CATS]);
+      }
+      $form->addElement($elemShowCats, $fGrpCats);
+      */ 
+      
       $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každé položky tak
          vznikne další textové okno s výběrem uživatelů majících přístup k těmto textům."));
@@ -1264,6 +1361,7 @@ class Articles_Controller extends Controller {
          $settings['scroll'] = (int)$form->scroll->getValues();
          $settings[self::PARAM_SORT] = $form->sort->getValues();
          $settings[self::PARAM_DISABLE_LIST] = $form->disableList->getValues();
+//          $settings[self::PARAM_SHOW_CATS] = $form->showCats->getValues();
          $settings['discussion_allow'] = $form->discussion_allow->getValues();
          $settings['discussion_fcb'] = $form->discussion_fcb->getValues();
          $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
@@ -1273,6 +1371,24 @@ class Articles_Controller extends Controller {
          $settings[self::PARAM_TPL_DETAIL] = $form->tplDetail->getValues();
          $settings[self::PARAM_TPL_ARCHIVE] = $form->tplArchive->getValues();
       }
+   }
+   
+   /* Autorun metody */
+   
+   public static function AutoRunDaily() 
+   {
+      $curDate = new DateTime();
+      $curDate->setTime(0, 0);
+      $isSomeEdit = false;
+      $model = new Articles_Model();
+      
+      $model
+         ->where(Articles_Model::COLUMN_PRIORITY.' != 0 '
+            .'AND '.Articles_Model::COLUMN_PRIORITY_END_DATE.' < CURDATE()', array())
+         ->update(array(
+               Articles_Model::COLUMN_PRIORITY => 0,
+               Articles_Model::COLUMN_PRIORITY_END_DATE => NULL,
+               ));
    }
 }
 ?>
