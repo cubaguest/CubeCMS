@@ -369,6 +369,7 @@ class Forms_Controller extends Controller {
       $modelElements = new Forms_Model_Elements();
       $elements = $modelElements
          ->where(Forms_Model_Elements::COLUMN_ID_FORM." = :idf", array('idf' => (int)$idForm))
+         ->order(array(Forms_Model_Elements::COLUMN_ORDER => Model_ORM::ORDER_ASC))
          ->records();
       
       $form = new Form('dnymic_form_'.$idForm);
@@ -423,6 +424,9 @@ class Forms_Controller extends Controller {
             case "mail":
                $formElement->addValidation(new Form_Validator_Email());
                break;
+            case "phone":
+               $formElement->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK));
+               break;
             case "url":
                $formElement->addValidation(new Form_Validator_Url());
                break;
@@ -447,14 +451,25 @@ class Forms_Controller extends Controller {
       return $form;
    }
    
-   public static function dynamicForm($idForm, $view = null, $params = array(), $onlyActive = true)
+   /**
+    * Metoda vytvoří šablonu pro formulář
+    * @param unknown_type $idForm
+    * @param unknown_type $view
+    * @param unknown_type $params
+    * @param unknown_type $onlyActive
+    * @return Forms_Template
+    */
+   public static function dynamicForm($idForm, $params = array(), $onlyActive = true)
    {
       $link = new Url_Link();
+      $tpl = new Forms_Template();
+      
       $params = array_merge(array(
          'pagename' => null,
          'pagelink' => (string)$link,
          'categoryname' => Category::getSelectedCategory()->getName(),
          'categorylink' => (string)$link->clear(),
+         'redirectlink' => $link->clear(),
       ), $params);
       
       $formModel = new Forms_Model();
@@ -465,13 +480,11 @@ class Forms_Controller extends Controller {
          $fRec = $formModel->record($idForm);
       }
       if($fRec == false){
-         return;
+         return null;
       }
       $form = self::createDynamicForm($fRec->{Forms_Model::COLUMN_ID});
-      if($view instanceof View){
-         $view->dynamicFormRecord = $fRec;
-         $view->dynamicForm = $form;
-      }
+      $tpl->dynamicFormRecord = $fRec;
+      $tpl->dynamicForm = $form;
       
       if($form->isValid()){
          // update send counter
@@ -490,11 +503,10 @@ class Forms_Controller extends Controller {
          }
          
          AppCore::getInfoMessages()->addMessage($fRec->{Forms_Model::COLUMN_MSG});
-         $link = new Url_Link();
-         $link->reload();
+         $params['redirectlink']->reload();
       }
       
-      return $form;
+      return $tpl;
    }
    
    /**

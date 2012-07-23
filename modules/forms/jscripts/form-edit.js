@@ -184,8 +184,8 @@ var FormEditor = {
          FormEditor.createData();
       });
       
-      if($('textarea[name="form_cr_data"]').val() != ""){
-         this.createForm($('textarea[name="form_cr_data"]').val());
+      if($('[name="form_cr_data"]').val() != ""){
+         this.createForm($('[name="form_cr_data"]').val());
       }
    },
    
@@ -480,7 +480,7 @@ var FormEditor = {
          serializedData.push(itemDesc);
       });
       
-      $('textarea[name="form_cr_data"]').val( JSON.stringify(serializedData, null, 2 ) ); // need compatibility
+      $('[name="form_cr_data"]').val( JSON.stringify(serializedData, null, 2 ) ); // need compatibility
    },
    createForm : function(data){
       data = $.parseJSON(data);

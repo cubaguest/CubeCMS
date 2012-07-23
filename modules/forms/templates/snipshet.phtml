@@ -1,4 +1,6 @@
 <?if($this->dynamicForm != null){?>
-<h2><?ps($this->dynamicFormRecord->{Forms_Model::COLUMN_NAME})?></h2>
-<?=$this->dynamicForm;?>
+   <?if($this->disableTitle !== true){ ?>
+   <h2><?ps($this->dynamicFormRecord->{Forms_Model::COLUMN_NAME})?></h2>
+   <?}?>
+   <?=$this->dynamicForm;?>
 <?}?>
