@@ -21,7 +21,7 @@ class Cache {
    
    public function set($key, $value, $expire = 3600, $compress = true) 
    {
-      $this->cacher->set($key, $value, $expire, $compress);
+      $this->cacher->set($_SERVER['SERVER_NAME'].'_'.$key, $value, $expire, $compress);
    }
    
    public function delete($key) 
