@@ -352,7 +352,7 @@ class File extends TrObject implements File_Interface {
       if(!@rename((string)$this, $dstDir.$this->getName())){
          throw new UnexpectedValueException($this->tr('Soubor se nepodařilo přesunout'));
       }
-      $this->fileDir = $dstDir;
+      $this->path = $dstDir;
       return $this;
    }
    
