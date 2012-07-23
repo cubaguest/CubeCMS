@@ -8,6 +8,7 @@ class Actionswgal_View extends Actions_View {
          $pView = new Photogalery_View($this->pCtrl);
          $pView->addImagesToolbox();
       }
+      Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link());
    }
 
    public function showPhotosView() {
