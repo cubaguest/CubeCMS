@@ -597,7 +597,13 @@ class Forms_Controller extends Controller {
          }
          $data .= '<tr>';
          $data .= '<th style="text-align: left;">'.$element->getLabel().'</th>';
-         $data .= '<td>'.nl2br($val).'</td>';
+         if(filter_var($val, FILTER_VALIDATE_EMAIL)){
+            $data .= '<td><a href="mailto:'.$val.'">'.nl2br($val).'</a></td>';
+         } else if(filter_var($val, FILTER_VALIDATE_URL)){
+            $data .= '<td><a href="'.$val.'">'.nl2br($val).'</a></td>';
+         } else {
+            $data .= '<td>'.nl2br($val).'</td>';
+         }
          $data .= '</tr>';
          
          if($element instanceof Form_Element_Text
@@ -605,16 +611,9 @@ class Forms_Controller extends Controller {
             $sendFromEmail = $element->getValues();
          }
       }
-
-      if(!isset($replacements['{PAGE_INFO}']) || $replacements['{PAGE_INFO}'] == null){
-         $pageInfo = '<a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a>';
-         if(isset($replacements['{PAGE_NAME}']) && $replacements['{PAGE_NAME}'] != null){
-            $pageInfo .= ' / <a href="{PAGE_LINK}">{PAGE_NAME}</a>';
-         }
-      }
       
       $replacements = array_merge(array(
-         '{PAGE_INFO}' => $pageInfo,
+         '{PAGE_INFO}' => null,
          '{PAGE_LINK}' => null,
          '{PAGE_NAME}' => null,
          '{CATEGORY_LINK}' => (string)$link,
@@ -630,6 +629,14 @@ class Forms_Controller extends Controller {
          '{FOOTER_INFO}' => null,
          '{GENERATE_WARNING}' => $tr->tr('Tento e-mail je genrován automaticky. Neodpovídejte na něj!'),
       ), $replacements);
+      
+      $pageInfo = null;
+      if(!isset($replacements['{PAGE_INFO}']) || $replacements['{PAGE_INFO}'] == null){
+         $replacements['{PAGE_INFO}'] = '<a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a>';
+         if(isset($replacements['{PAGE_NAME}']) && $replacements['{PAGE_NAME}'] != null){
+            $replacements['{PAGE_INFO}'] .= ' / <a href="{PAGE_LINK}">{PAGE_NAME}</a>';
+         }
+      }
       
       $mail->setReplacements($replacements);   
       $mail->setContent($msg);
