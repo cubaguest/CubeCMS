@@ -30,7 +30,9 @@ class Template_Navigation extends Template {
       parent::__construct(new Url_Link());
       $this->addFile('tpl://'.self::$template);
       // příprava navigace
-      self::prepareNavigation();
+      if(empty(self::$baseParts)){
+         self::prepareNavigation();
+      }
    }
 
    public function __toString() 
@@ -66,7 +68,8 @@ class Template_Navigation extends Template {
     */
    public static function getNavigation() 
    {
-      return array_merge(self::$extendedParts, self::$extendedParts);
+      $merged = array_merge(self::$baseParts, self::$extendedParts);
+      return $merged;
    }
    
    /**
