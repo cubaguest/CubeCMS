@@ -7,6 +7,7 @@
 class Category_Structure implements Iterator, Countable, ArrayAccess {
    const ALL = 1;
    const VISIBLE_ONLY = 2;
+   const CACHE_KEY_NAME = 'struct';
    
    private $level = 0;
    private $id = null;
@@ -14,7 +15,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    private $catObj = null;
    private $childrens = array();
 
-   private $withHidden = false;
+   private $withHidden = false; // odstranit
    public $type = 'main';
    
    /**
@@ -166,8 +167,29 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    }
 
    /**
+    * Meoda vrací maximáolní hloubku stromu
+    * @return int
+    */
+   public function getMaxDepth()
+   {
+      $d = 0;
+   
+      if(!$this->isEmpty()){
+         $d = 1;
+         $childd = 0;
+         foreach ($this->getChildrens() as $child) {
+            $maxd = $child->getMaxDepth();
+            $childd = $maxd > $childd ? $maxd : $childd;
+         }
+         $d += $childd;
+      }
+      return $d;
+   }
+   
+   /**
     * Metoda nastaví kategorie a odstraní nepoužité kategorie a sekce
     * @param array $catArray -- pole s kategoriemi
+    * @deprecated -- nepoužívat. Stačí použít getStructure()
     */
    public function setCategories($catArray)
    {
@@ -431,8 +453,13 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    {
       $model = new Model_Config();
       $record = $model->where(Model_Config::COLUMN_KEY, 'CATEGORIES_STRUCTURE')->record();
-      $record->{Model_Config::COLUMN_VALUE} = serialize($this);
+      file_put_contents(AppCore::getAppCacheDir()."struct_before".date("Y-m-d_G:i").".tmp", $record->{Model_Config::COLUMN_VALUE});
+      // tady cleanup protože v db není třeba objektů kategorií
+      $data = serialize(self::$structure);
+      $record->{Model_Config::COLUMN_VALUE} = $data;
       $model->save($record);
+      $cache = new Cache();
+      $cache->delete(self::getCacheKey());
    }
 
    /**
@@ -443,16 +470,11 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    public static function getStructure($type = self::VISIBLE_ONLY)
    {
       if(self::$structure == false){
-         self::$structure = self::$structureVisible = unserialize(VVE_CATEGORIES_STRUCTURE);
-         $modelCats = new Model_Category();
-         $cats = $modelCats->getCategoryList();
-         self::setCategoriesObjects($cats, self::$structure, self::$structureVisible);
-         self::clearVisibleStruture(self::$structureVisible);
+         self::loadStruct();
       }
-      
       switch ($type) {
          case self::ALL:
-            $rStruct = self::$strusture;
+            $rStruct = self::$structure;
             break;
          case self::VISIBLE_ONLY:
          default:
@@ -462,45 +484,68 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       return $rStruct;
    }
    
-   
-   protected static function setCategoriesObjects($catArray, &$fullStruct, &$visibleStruct)
+   /**
+    * Metoda načte strukturu a doplní objekty kategorií
+    */
+   protected static function loadStruct()
    {
-      if(isset ($catArray[$fullStruct->getId()]) AND $fullStruct->level != 0) {
-         $fullStruct->catObj = new Category(null, false, $catArray[$fullStruct->getId()]);
-         $visibleStruct->catObj = &$fullStruct->catObj;
+      $cache = new Cache();
+      if( $st = $cache->get(self::getCacheKey()) ){
+         self::$structure = $st['base'];
+         self::$structureVisible = $st['vis'];
+      } else {
+         self::$structure = unserialize(VVE_CATEGORIES_STRUCTURE);
+         // tohle by se mělo řešit přes __wakeUp
+         $modelCats = new Model_Category();
+         $cats = $modelCats->getCategoryList();
+         
+         self::$structure->setCategoriesObjects($cats);
+         
+         self::$structureVisible = clone self::$structure;
+         self::$structureVisible->clearNonVisible();
+         
+         $cache->set(self::getCacheKey(), array( 'base' => self::$structure, 'vis' => self::$structureVisible ));
       }
-//       var_dump($fullStruct);
-      foreach ($fullStruct as $key => $child) {
+   }
+   
+   protected function setCategoriesObjects($catArray, $level = 0)
+   {
+      $childs = $this->getChildrens();
+      foreach ($childs as $key => $child) {
          if(isset ($catArray[$child->getId()])) {
-            self::setCategoriesObjects($catArray, $fullStruct[$key], $visibleStruct[$key] );
+            $child->catObj = new Category(null, false, $catArray[$child->getId()]);
+            $child->setCategoriesObjects($catArray, $level+1);
          } else {
-            unset ($fullStruct[$key]);
-            unset ($visibleStruct[$key]);
+            unset ($this[$key]);
          }
       }
    }
    
-   protected static function clearVisibleStruture(&$visibleStruct){
-      
-      foreach ($visibleStruct as $key => $child) {
-         // načtení práva
+   protected function clearNonVisible(){
+      $childs = $this->getChildrens(); // kvůli referencím tohle musí být přenesené
+      foreach ($childs as $key => $child) {
          $right = (string)$child->getCatObj()->getCatDataObj()->{Model_Rights::COLUMN_RIGHT};
          $rightDefault = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT};
          $visibility = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_VISIBILITY};
          $ownerId = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_ID_USER_OWNER};
-         
+          
          $right = $right != null ? $right : $rightDefault;
-      
-         if( (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $ownerId)
-               AND ( ($visibility == Model_Category::VISIBILITY_ALL) // viditelné všem
+          
+         if( ( (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY} != null) // musí být URL klíč, jinak je neplatná
+               AND (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $ownerId)
+               AND (
+                     ($visibility == Model_Category::VISIBILITY_ALL) // viditelné všem
                      OR (!Auth::isLogin() AND $visibility == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
                      OR (Auth::isLogin() AND $visibility == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
                      OR (Auth::isAdmin() AND $visibility == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
                      OR (Auth::isAdminGroup() AND $visibility == Model_Category::VISIBILITY_WHEN_ADMIN_ALL) // viditelné adminům ze všech domén
-               )) {
-            self::clearVisibleStruture($visibleStruct[$key]);
+               )
+         ) {
+            if(!$child->isEmpty()){
+               $this[$key]->clearNonVisible();
+            }
          } else {
-            unset ($visibleStruct[$key]);
+            unset($this[$key]);
          }
       }
    }  
@@ -517,6 +562,25 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       $string = null;
       return (string)$string;
    }
+   
+   public function __sleep() 
+   {
+      $this->cleanUpCategory();
+      return array('level', 'id', 'idParent', 'catObj', 'childrens');
+   }
+
+   protected function cleanUpCategory() 
+   {
+      $this->catObj = null;
+      foreach ($this->getChildrens() as $child) {
+         $child->cleanUpCategory();
+      }
+   }
+   
+   private static function getCacheKey()
+   {
+      return '_struct_user_'.Auth::getUserId()."_".Locales::getLang();
+   } 
    
    /* ARRAY ACCESS */
    public function offsetSet($offset, $value) 

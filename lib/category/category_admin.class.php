@@ -11,7 +11,7 @@
  *                $LastChangedBy: jakub $ $LastChangedDate: 2010-08-09 08:40:37 +0200 (Po, 09 srp 2010) $
  * @abstract 		Třída pro obsluhu zvolené kategorie
  */
-class Category_Admin extends Category_Core {
+class Category_Admin extends Category {
    /**
     * Konstruktor načte informace o kategorii
     * @string/int $catKey --  klíč nebo id kategorie
@@ -44,7 +44,7 @@ class Category_Admin extends Category_Core {
 
    }
 
-   private function loadCat(){
+   private function loadCat($catKey = null, $catDataObj = null){
 
    }
 
