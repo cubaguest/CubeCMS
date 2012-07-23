@@ -454,7 +454,6 @@ class Forms_Controller extends Controller {
    /**
     * Metoda vytvoří šablonu pro formulář
     * @param unknown_type $idForm
-    * @param unknown_type $view
     * @param unknown_type $params
     * @param unknown_type $onlyActive
     * @return Forms_Template
@@ -499,6 +498,7 @@ class Forms_Controller extends Controller {
                '{PAGE_LINK}' => $params['pagelink'],
                '{CATEGORY_NAME}' => $params['categoryname'],
                '{CATEGORY_LINK}' => $params['categorylink'],
+               '{PAGE_INFO}' => $params['pageinfo'],
             ));
          }
          
@@ -606,9 +606,11 @@ class Forms_Controller extends Controller {
          }
       }
 
-      $pageInfo = '<a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a>';
-      if(isset($replacements['{PAGE_NAME}']) && $replacements['{PAGE_NAME}'] != null){
-         $pageInfo .= ' / <a href="{PAGE_LINK}">{PAGE_NAME}</a>';
+      if(!isset($replacements['{PAGE_INFO}']) || $replacements['{PAGE_INFO}'] == null){
+         $pageInfo = '<a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a>';
+         if(isset($replacements['{PAGE_NAME}']) && $replacements['{PAGE_NAME}'] != null){
+            $pageInfo .= ' / <a href="{PAGE_LINK}">{PAGE_NAME}</a>';
+         }
       }
       
       $replacements = array_merge(array(
@@ -617,6 +619,7 @@ class Forms_Controller extends Controller {
          '{PAGE_NAME}' => null,
          '{CATEGORY_LINK}' => (string)$link,
          '{CATEGORY_NAME}' => Category::getSelectedCategory()->getName(),
+         '{PAGE_INFO}' => null,
          '{WEB_LINK}' => '<a href="'.$link->clear(true).'">{WEB_NAME}</a>',
          '{WEB_NAME}' => VVE_WEB_NAME,
          '{FORM_NAME}' => $formRec->{Forms_Model::COLUMN_NAME},
