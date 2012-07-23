@@ -18,6 +18,7 @@ class PhotogaleryMed_View extends ArticlesWGal_View {
          $this->toolbox->article_->setConfirmMeassage($this->tr('Opravdu smazat galerii?'));
          $this->toolbox->edit_article->setTitle($this->tr('Upravit galerii'))->setLabel($this->tr('Upravit galerii'));
       }
+      Template_Navigation::addItem($this->article->{Articles_Model::COLUMN_NAME}, $this->link());
    }
    
    public function exportArticleHtmlView() {
