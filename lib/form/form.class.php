@@ -678,6 +678,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $container->{$key} = new Form_Data_Item($e->getLabel(), (bool)$e->getValues(), $e->getSubLabel());
       } else if($e instanceof Form_Element_Select){
          $container->{$key} = new Form_Data_Item($e->getLabel(), array_search($e->getValues(), $e->getOptions()), $e->getSubLabel());
+      } else if($e instanceof Form_Element_File){
+         $f = $e->getValues();
+         $container->{$key} = new Form_Data_Item($e->getLabel(), $f['name'], $e->getSubLabel());
       }
    }
 }

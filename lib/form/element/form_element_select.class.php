@@ -144,7 +144,7 @@ class Form_Element_Select extends Form_Element {
                $optChild = new Html_Element('option', str_replace(' ', '&nbsp;', htmlspecialchars($optLabel2, ENT_QUOTES)));
                $optChild->setAttrib('value', (string)$optVal2);
                if($this->isDimensional() ){
-                  if(is_array($values) AND isset($values[$this->dimensional]) AND $values[$this->dimensional] == $optVal2){
+                  if($values == $optVal2 OR (is_array($values) AND isset($values[$this->dimensional]) AND $values[$this->dimensional] == $optVal2)){
                      $optChild->setAttrib('selected', 'selected');
                   }
                } else {
@@ -158,9 +158,9 @@ class Form_Element_Select extends Form_Element {
             $opt = new Html_Element('option', str_replace(' ', '&nbsp;', htmlspecialchars($optLabel, ENT_QUOTES)));
             $opt->setAttrib('value', (string)$optVal);
             if($this->isDimensional() ){
-               if(is_array($values) AND isset($values[$this->dimensional]) AND $values[$this->dimensional] == $optVal){
+               if($values === $optVal OR (is_array($values) AND isset($values[$this->dimensional]) AND $values[$this->dimensional] == $optVal)){
                   $opt->setAttrib('selected', 'selected');
-               }
+               } 
             } else {
                if($values == $optVal OR (is_array($values) AND in_array($optVal, $values))) {
                   $opt->setAttrib('selected', 'selected');
