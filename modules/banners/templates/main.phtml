@@ -1,4 +1,9 @@
 <h1><?echo $this->category()->getName();?></h1>
+<? 
+if(empty($this->boxes)){
+   return;
+}
+?>
 <div class="main-content-admin-form" id="banners-list">
    <?
    $this->moduleButtons = array(

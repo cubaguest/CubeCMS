@@ -52,6 +52,11 @@ class Banners_Controller extends Controller {
       // načtení abnerů a boxů
       $boxes = self::getBoxes();
       
+      if(empty($boxes)){
+         $this->errMsg()->addMessage($this->tr('Tato šablona nepodporuje zobrazení bannerů. Kontaktujte svého webmastera.'), false);
+         return;
+      }
+      
       $banners = $model
       ->columns(array('*', 'clicks' => 
           '(SELECT COUNT(*) FROM '.$modelClicks->getTableName().' AS tbc '
@@ -202,8 +207,10 @@ class Banners_Controller extends Controller {
    protected static function getBoxes() 
    {
       $positions = Template_Face::moduleParam('banners', 'positions', array()); 
-      foreach ($positions as &$box) {
-         $box = array_merge(array('random' => false, 'limit' => 0, 'banners' => array()), $box );
+      if(!empty($positions)){
+         foreach ($positions as &$box) {
+            $box = array_merge(array('random' => false, 'limit' => 0, 'banners' => array()), $box );
+         }
       }
       return $positions;
    }
