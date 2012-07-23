@@ -6,7 +6,7 @@ $rTime = rand(1, time());
 <a class="toolbox-button ui-state-default ui-corner-all" id="toolbox-<?=$rTime?>-button"
    href="" title="<?$this->tr('Otevřít nástroje')?>"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
 <div class="toolbox" id="toolbox-<?=$rTime?>-box">
-   <? foreach ($this->getTools() as $tool) {
+   <? foreach ($this->getTools() as $name => $tool) {
       $class = get_class($tool);
       if($class == "Template_Toolbox2_Tool_LangLoader" AND !Locales::isMultilang()) continue;
       ?>
@@ -24,7 +24,7 @@ $rTime = rand(1, time());
          switch ($class) {
             case 'Template_Toolbox2_Tool_PostRedirect':
                ?>
-         <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>">
+         <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
             <div><?=$image;?><input class="toolbox-tool-button ui-state-default" type="submit" name="<?=$tool->getName() ?>_button"
                      value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
                   <?
@@ -38,7 +38,7 @@ $rTime = rand(1, time());
                break;
             case 'Template_Toolbox2_Tool_Redirect':
                ?>
-         <form action="<?=$tool->getAction()?>" method="get" onsubmit="<?=$formOnSubmit?>">
+         <form action="<?=$tool->getAction()?>" method="get" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
             <div><?=$image;?><input class="toolbox-tool-button ui-state-default" type="submit"
                      value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
                   <?
@@ -52,7 +52,7 @@ $rTime = rand(1, time());
                break;
             case 'Template_Toolbox2_Tool_Form':
                ?>
-               <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>">
+               <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" name="<?=$name?>" onsubmit="<?=$formOnSubmit?>">
                   <div><?=$image;?><?
 
                foreach ($tool->getForm() as $element) {
