@@ -239,16 +239,8 @@ class Panels_Controller extends Controller {
    {
       // kategorie a šablony
       $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
-
-      $catModel = new Model_Category();
-      $categories = $catModel->getCategoryList(true);
-      
-      $struct = Category_Structure::getStructure();
-      $struct->withHidden(true);
-      $struct->setCategories($categories);
-      
+      $struct = Category_Structure::getStructure(Category_Structure::ALL);
       $panelCats = $this->createArray($struct);
-      
 
       $form = new Form('panel_'/*, true*/);
       $form->addGroup('settings', $this->tr('Základní'), $this->tr('Přiřazení panelu ke kategorii a jeho umístění'));
@@ -423,6 +415,7 @@ class Panels_Controller extends Controller {
       $this->view()->panels = $model
          ->joinFK(Model_Panel::COLUMN_ID_CAT)
          ->where(Model_Panel::COLUMN_ID_SHOW_CAT." = :idc OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1", array('idc' => $idc))
+         ->order(array(Model_Panel::COLUMN_POSITION => Model_ORM::ORDER_ASC, Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC))
          ->records();
       echo($model->getSQLQuery());
    }
