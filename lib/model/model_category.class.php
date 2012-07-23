@@ -28,6 +28,7 @@ class Model_Category extends Model_ORM {
    const COLUMN_NAME = 'label';
    const COLUMN_ALT = 'alt';
    const COLUMN_URLKEY = 'urlkey';
+   const COLUMN_DISABLE = 'disable';
    const COLUMN_MODULE = 'module';
    const COLUMN_DATADIR = 'data_dir';
    const COLUMN_INDIVIDUAL_PANELS = 'individual_panels';
@@ -85,6 +86,7 @@ class Model_Category extends Model_ORM {
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1));
       $this->addColumn(self::COLUMN_ALT, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DISABLE, array('datatype' => 'tinyint(1)', 'lang' => true, 'pdoparam' => PDO::PARAM_BOOL, 'nn' => true, 'default' => 0));
       $this->addColumn(self::COLUMN_MODULE, array('datatype' => 'varchar(30)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DATADIR, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
 
@@ -116,6 +118,13 @@ class Model_Category extends Model_ORM {
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Panel', Model_Panel::COLUMN_ID_CAT);
    }
 
+   protected function beforeSave(Model_ORM_Record $record, $type = 'I')
+   {
+      foreach ($record->{self::COLUMN_URLKEY} as $url) {
+         $record->{self::COLUMN_DISABLE} = $record->{self::COLUMN_URLKEY} == null ? true : false;
+      }
+   } 
+   
    /**
     * Metoda přidá práva ke kategorii do dotazu
     * @return Model_Category 
@@ -145,9 +154,11 @@ class Model_Category extends Model_ORM {
             ));
          $this->setSelectAllLangs(false)
             ->withRights()
-            ->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
-            ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC'));
+            ->where(Model_Category::COLUMN_DISABLE.' = 0', array());
+//             ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC')); // filesort
+            // new length optimization - make filesort         
 //            ->order(array('urlkey_len_cs' => 'DESC'));
+         //; // end of query 
          self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
       }
       return self::$allCatsRecords;

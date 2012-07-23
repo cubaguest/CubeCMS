@@ -31,6 +31,7 @@ class Model_Panel extends Model_ORM {
    const COLUMN_ICON    = 'picon';
    const COLUMN_BACK_IMAGE    = 'pbackground';
    const COLUMN_IMAGE    = 'pbackground';
+   const COLUMN_FORCE_GLOBAL    = 'panel_force_global';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_panels');
@@ -44,6 +45,7 @@ class Model_Panel extends Model_ORM {
       $this->addColumn(self::COLUMN_PARAMS, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_ICON, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'aliasFor' => 'icon'));
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'aliasFor' => 'background'));
+      $this->addColumn(self::COLUMN_FORCE_GLOBAL, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_ID);

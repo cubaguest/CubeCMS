@@ -28,7 +28,6 @@ class Model_ORM extends Model {
    const FETCH_LANG_CLASS = 16384;
    const FETCH_PKEY_AS_ARR_KEY = 32768;
 
-
    protected $tableName = null;
    protected $tableShortName = null;
    protected $dbName = VVE_DB_NAME;
@@ -642,6 +641,7 @@ class Model_ORM extends Model {
    {
       $returnPk = $record->getPK();
       if (!$record->isNew()) {
+         $this->beforeSave($record, 'U');
          // @TODO - použít metodu update !!!!
          // UPDATE
          $sql = 'UPDATE ' . $this->getTableName();
@@ -694,6 +694,9 @@ class Model_ORM extends Model {
                if ($value instanceof DateTime) {
                   $value = $this->createDateTimeStr($value, $params['datatype']);
                }
+               if(is_array($value) || is_object($value) ){
+                  $value = serialize($value);
+               }
                $dbst->bindValue(':' . $colname, $value, $params['pdoparam']);
             }
          }
@@ -711,6 +714,7 @@ class Model_ORM extends Model {
          $returnPk = $record->getPK();
       } else {
          // INSERT
+         $this->beforeSave($record, 'I');
          $sql = "INSERT INTO " . $this->getTableName();
          $colsStr = array();
          $bindParamStr = array();
@@ -760,14 +764,23 @@ class Model_ORM extends Model {
             $value = $params['value'];
             if ($params['lang'] == true) {
                foreach (Locales::getAppLangs() as $lang) {
+                  if ($params['nn'] AND isset($params['default']) AND $params['value'][$lang] == null ) {
+                     if(is_bool($params['default']) || is_int($params['default'])){ 
+                        // bool vždy na int jinak false je prázdné, ne 0
+                        $value[$lang] = (int)$params['default'];
+                     } else {
+                        $value[$lang] = $params['default'];
+                     }
+                  }
                   $dbst->bindValue(':' . $colname . '_' . $lang, $value[$lang], $params['pdoparam']);
                }
             } else {
                // date clumns
                if ($value instanceof DateTime) {
-                  if ($value instanceof DateTime) {
-                     $value = $this->createDateTimeStr($value, $params['datatype']);
-                  }
+                  $value = $this->createDateTimeStr($value, $params['datatype']);
+               }
+               if(is_array($value) || is_object($value) ){
+                  $value = serialize($value);
                }
                $dbst->bindValue(':' . $colname, $value, $params['pdoparam']);
             }
@@ -1051,20 +1064,104 @@ class Model_ORM extends Model {
 
    public function createTable()
    {
-//      $dbc = new Db_PDO();
-//
-//      $clomunsDef = array();
-//      foreach ($this->tableStructure as $column => $params) {
-//         //`id_article` smallint(5) unsigned NOT NULL AUTO_INCREMENT
-//         $str = '`'.$column.'` '.$params['datatype'];
-//
-//
-//         array_push($clomunsDef, $str);
-//      }
-//
-//      $sql = 'CREATE TABLE IF NOT EXISTS `'.$this->getTableName().'` ()';
+     $dbc = new Db_PDO();
+
+     $parts = array();
+     $indexes = $fulltexts = array();
+     foreach ($this->tableStructure as $column => $params) {
+        $str = null;
+//         `id_article` smallint(5) unsigned NOT NULL AUTO_INCREMENT
+
+        if($params['lang']){
+           $langs = array(
+                 'cs' => 'utf8_czech_ci', 
+                 'sk' => 'utf8_slovak_ci', 
+                 'en' => 'utf8_general_ci', 
+                 'de' => 'utf8_general_ci', 
+                 'pl' => 'utf8_polish_ci');
+           foreach ($langs as $lang => $colation) {
+              array_push($parts, $this->createColumnString($column."_".$lang, $params, $colation));
+              if($params['index'] == true){
+                 if(is_bool($params['index'])){
+                    $indexes[] = 'KEY `index_'.$column."_".$lang.'` (`'.$column."_".$lang.'`)';
+                 } else {
+                    // tady sloupce na více indexů
+                 }
+              }   
+              
+              if($params['fulltext'] == true){
+                 $fulltexts[] = 'FULLTEXT KEY `fulltext_'.$column."_".$lang.'` (`'.$column."_".$lang.'`)';
+              }
+           }
+           
+        } else {
+           array_push($parts, $this->createColumnString($column, $params));
+           
+           if($params['pk'] == true){
+              $indexes[] = 'PRIMARY KEY (`'.$column.'`)';
+           }
+           if($params['index'] == true){
+              if(is_bool($params['index'])){
+                 $indexes[] = 'KEY `index_'.$column.'` (`'.$column.'`)';
+              } else if(is_array($params['index'])) {
+                 // tady sloupce na více indexů
+                 $i = array();
+                 foreach ($params['index'] as $indexColumn) {
+                    $i[] = '`'.$indexColumn.'`';
+                 }
+                 $indexes[] = 'KEY `index_'.$column.'` ('.implode(',', $i).')';
+              } else {
+                 $indexes[] = 'KEY `index_'.$column.'` ('.$params['index'].')';
+              }
+           }
+           // fulltext   
+           if($params['fulltext'] == true){
+              $fulltexts[] = 'FULLTEXT KEY `fulltext_'.$column.'` (`'.$column.'`)';
+           }   
+        }
+        
+     }
+     
+     $colsStr = implode(",\n", array_merge($parts, $indexes, $fulltexts ) ); 
+     
+     $sql = 'CREATE TABLE IF NOT EXISTS `'.$this->getTableName()."`\n"
+     ." (".$colsStr.")\n"
+     ." ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;";
+     return $dbc->exec($sql);
    }
 
+   private function createColumnString($name ,$params, $colation = 'utf8_general_ci') 
+   {
+      $pdo = new Db_PDO();
+      
+      $str = '`'.$name.'` '.$params['datatype'];
+      // colation
+      if(preg_match("/(varchar)|(text)/", $params['datatype']) ){
+         $str .= ' CHARACTER SET utf8 COLLATE '.$colation;
+      }
+//       if(preg_match("/(date)|(text)/", $params['datatype']) ){
+//          $str .= ' CHARACTER SET utf8 COLLATE '.$colation;
+//       }
+      // not null
+      if($params['nn']){
+         $str .= ' NOT NULL';
+      }
+      // AI
+      if($params['ai']){
+         $str .= ' AUTO_INCREMENT';
+      }
+      
+      if(!$params['nn'] && $params['default'] === null){
+         $str .= ' DEFAULT NULL';
+      } else if($params['default'] !== null && 
+            ( $params['datatype'] == 'timestamp' ) ){
+         $str .= ' DEFAULT '.$params['default'];
+      } else if($params['default'] !== null){
+         $str .= ' DEFAULT '.$pdo->quote($params['default'], $params['pdoparam']);
+      }
+      return $str;
+   }
+   
    /*
     * Metody pro úpravu parametrů modelu
     */
@@ -1238,10 +1335,17 @@ class Model_ORM extends Model {
     * Metoda nastaví, které sloupce se budou vybírat
     * @param array $columnsArr -- pole se sloupci
     * @return Model_ORM -- sám sebe
+    * @example:
+    * array(
+    *    'alias' => 'colum',
+    *    'alias' => 'statement', 
+    *    'alias' => array('stmt' => 'statement', 'values' => array() ), 
+    * )
     */
-   public function columns($columnsArr)
+   public function columns($columnsArr, $bindValues = array(), $mergeValues = false)
    {
       $this->selectedColumns = $columnsArr;
+      $this->setBindValues($bindValues, $mergeValues);
       return $this;
    }
 
@@ -1639,8 +1743,8 @@ class Model_ORM extends Model {
             } else {
                throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), $varType));
             }
-            
-            if (!$mustBeBindValue && $stmt->bindParam(':' . $name, $this->whereBindValues[$name], $pdoParam) !== false) { // nefunguje při některých where, ale proč??
+            $nameParam = $name[0] != ":" ? ':'.$name : $name;
+            if (!$mustBeBindValue && $stmt->bindParam($nameParam, $this->whereBindValues[$name], $pdoParam) !== false) { // nefunguje při některých where, ale proč??
             } else {
                $stmt->bindValue(':' . $name, $val, $pdoParam);
             }
@@ -1738,5 +1842,14 @@ class Model_ORM extends Model {
       return false;
    }
    
+   /* callback */
+   
+   /**
+    * Metoda, která se provede před uložením záznamu do db
+    * @param Model_ORM_Record $record
+    * @param string $type -- typ uložení (U,I)
+    */
+   protected function beforeSave(Model_ORM_Record $record, $type = 'U') 
+   {}
 }
 ?>

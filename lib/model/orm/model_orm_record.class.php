@@ -12,7 +12,10 @@
  * @abstract 		Abstraktní třída pro vytvoření modelu pro práci s databází
  */
 class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
-
+   const COLUMN_IS_NEW = 0;
+   const COLUMN_IS_FROM_DB = 1;
+   const COLUMN_IS_CHANGED = 2;
+   
    protected $columns = array();
    protected $externColumns = array();
    protected $pKeyValue = null;
@@ -38,19 +41,19 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    {
       // kontrola jestli byla provedena změna
       if (isset($this->columns[$collName]) AND $this->columns[$collName]['changed'] != 0) {
-         if ((is_object($value) AND is_object($this->columns[$collName]['value']) AND spl_object_hash($value) == spl_object_hash($this->columns[$collName]['value']))
-            OR $value == $this->columns[$collName]['value']) {
+         if ((is_object($value) AND is_object($this->columns[$collName]['value']) 
+               AND spl_object_hash($value) == spl_object_hash($this->columns[$collName]['value']))
+               OR $value == $this->columns[$collName]['value']) {
             return;
          }
       }
-
       if (!isset($this->columns[$collName])) {
          // tady detekce jazyka
          $collLen = strlen($collName);
-         if (isset($collName[$collLen - 3]) && $collName[$collLen - 3] == '_') {
-            $pos = strrpos($collName, '_');
-            $lang = substr($collName, $pos + 1,$collLen-1-$pos);
-            $collName = substr($collName, 0, $pos);
+         if ($collLen > 3 && $collName[$collLen - 3] == '_') {
+            $lang = substr($collName, -2);
+            $collName = substr($collName, 0, $collLen-3);
+            
             if(!isset ($this->columns[$collName])){ // není sloupce z této tabulky
                $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
                $this->columns[$collName]['extern'] = true;
@@ -58,8 +61,10 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             if (!($this->columns[$collName]['value'] instanceof Model_ORM_LangCell)) {
                $this->columns[$collName]['value'] = new Model_ORM_LangCell();
             }
+            
             $this->columns[$collName]['value']->addValue($lang, $value);
-            if ($this->fromDb == true AND ($this->columns[$collName]['changed'] == 0)) {
+            
+            if ($this->fromDb == true AND $this->columns[$collName]['changed'] == 0) {
                $this->columns[$collName]['changed'] = -1;
             } else {
                $this->columns[$collName]['changed'] = 1;
@@ -84,15 +89,20 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             }
          }
          
-         if (isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL) {
-            $value = (bool) $value;
-         } else if (isset($this->columns[$collName]['pdoparam']) AND $this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
-            $value = (int) $value;
+         if(isset($this->columns[$collName]['pdoparam'])){
+            if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL) {
+               $value = (bool) $value;
+            } else if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
+               $value = (int) $value;
+            }
          }
-         if ($this->columns[$collName]['lang'] == true && !is_array($value)){
-            $this->columns[$collName]['value']->addValue(Locales::getLang(), $value);
-         } else if($this->columns[$collName]['lang'] == true && is_array($value)) {
-            $this->columns[$collName]['value'] = new Model_ORM_LangCell($value);
+         
+         if($this->columns[$collName]['lang'] == true){
+            if (!is_array($value)){
+               $this->columns[$collName]['value']->addValue(Locales::getLang(), $value);
+            } else if($this->columns[$collName]['lang'] == true && is_array($value)) {
+               $this->columns[$collName]['value'] = new Model_ORM_LangCell($value);
+            }
          } else {
             $this->columns[$collName]['value'] = $value;
          }
@@ -192,7 +202,6 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     */
    public function offsetSet($offset, $value)
    {
-      var_dump('offsetset');
       $this->__set($offset, $value);
    }
 
