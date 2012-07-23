@@ -58,7 +58,7 @@ class Filesystem_File_Image extends Filesystem_File {
     * proměná s nastavenou kvalitou pro výstup
     * @var int
     */
-   private $quality = 95;
+   private $quality = VVE_IMAGE_COMPRESS_QUALITY;
 
    /**
     * Pracovní obrázek, používá se při přesamplování
