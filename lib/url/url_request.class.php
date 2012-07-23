@@ -239,9 +239,12 @@ class Url_Request {
       $return = false;
       if(strpos($urlPart, 'admin') !== 0){ // pokud je obsaženo jako první slovo admin > jedná se o admin kategorii a není nutné procházen normální
          // načtení kategorií
-         $modelCat = new Model_Category();
+         $cache = new Cache();
+         $cacheKey = md5('_cats_'.Auth::getGroupId().Locales::getLang()."_".$urlPart);
          
-         $cat = $modelCat
+         if( ($cat = $cache->get($cacheKey)) == false){
+            $modelCat = new Model_Category();
+            $cat = $modelCat
                ->columns(
                      array(Model_Category::COLUMN_URLKEY,
                         'urlpart' => 'REPLACE(:urlpartfull, '.Model_Category::COLUMN_URLKEY.'_'.Locales::getLang().', \'\')'), 
@@ -250,6 +253,9 @@ class Url_Request {
                      array( 'url' => $urlPart ))
                ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => Model_ORM::ORDER_DESC))
                ->record();
+            $cache->set($cacheKey, $cat);
+         } 
+         
          if($cat != false && !$cat->isNew()){
             $matches = array();
             $regexp = "/\/([^?]*)\/?\??(.*)/i";
