@@ -1,8 +1,8 @@
 <?
 if($this->file != null){
-   $h = sprintf($this->tr('Úprava zprávy "%s"'), $this->report->{PressReports_Model::COLUMN_NAME});
+   $h = sprintf($this->tr('Úprava souboru "%s"'), $this->file->{DownloadFiles_Model::COLUMN_NAME});
 } else {
-   $h = sprintf($this->tr('Přidání zpravy do kategorie "%s"'), $this->category()->getName());
+   $h = sprintf($this->tr('Přidání souboru do kategorie "%s"'), $this->category()->getName());
 }
 Template_Core::setPageTitle($h);
 
@@ -11,6 +11,7 @@ Template_Core::setPageTitle($h);
 <div class="main-content-form-edit">
    <?
    // form
+   $this->form->text->html()->setAttrib('rows', 7);
    echo $this->form;
    ?>
    <script type="text/javascript"></script>

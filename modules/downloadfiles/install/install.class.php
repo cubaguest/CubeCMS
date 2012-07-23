@@ -1,8 +1,7 @@
 <?php
-class PressReports_Install extends Install_Module {
+class DownloadFiles_Install extends Install_Module {
    public function install() {
-       $model = new PressReports_Model();
-       $model->createTable();
+       $this->runSQLCommand($this->replaceDBPrefix($this->getSQLFileContent('install.sql')));
    }
 }
 

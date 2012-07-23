@@ -2,33 +2,27 @@
 $h1 = $this->category()->getName();
 $dwLink = new Url_DownloadLink($this->category()->getModule()->getDataDir());
 echo $this->toolbox;
-$this->addFile("css://style.css");
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
-<div class="posts-list">
-   <?if($this->reports != false && !empty ($this->reports)){?>
-      <ul class="press-messages-list">
-      <?foreach ($this->reports as $report) {?>
-            <li class="press-message" id="press-message-<?=$report->{PressReports_Model::COLUMN_ID}?>">
-               <div>
-               <span class="date"><?=vve_date("%x", new DateTime($report->{PressReports_Model::COLUMN_TIME_ADD}))?></span> /
-               <a href="<?=$this->dataDir.$report->{PressReports_Model::COLUMN_FILE}?>" title="<?=$this->tr('Zobrazit')?>">
-               <?ps($report->{PressReports_Model::COLUMN_NAME})?>
-               </a>
-               <?if($report->{PressReports_Model::COLUMN_AUTHOR} != null){?>
-               <span class="author">(<?ps($report->{PressReports_Model::COLUMN_AUTHOR})?>)</span>   
-               <?}?>
-               <? echo $report->toolbox?>
-               </div>
-            </li>
+<div class="posts-list files-list">
+   <?if($this->files != false && !empty ($this->files)){?>
+      <?foreach ($this->files as $file) {?>
+         <div class="text dwfile file">
+            <h2 id="dwfile-<?=$file->{DownloadFiles_Model::COLUMN_FILE}?>"><?=$file->{DownloadFiles_Model::COLUMN_NAME}?></h2>
+            <?if($file->{DownloadFiles_Model::COLUMN_TEXT} != null){?><p><?=$file->{DownloadFiles_Model::COLUMN_TEXT}?></p><?}?>
+            <p>
+               <?=$this->tr('Nahráno')?>: <?=vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?>
+               <a href="<?=$this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>" title="<?=$this->tr('Zobrazit')?>"><?=$this->tr('Zobrazit')?></a>
+               <a href="<?=$dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE})?>" title="<?=$this->tr('Stáhnout')?>"><?=$this->tr('Stáhnout')?></a>
+            </p>
             <?echo $file->toolbox;?>
+         </div>
       <?}?>
-      </ul>
    <?} else if($this->category()->getRights()->isWritable()) {?>
-      <div class="admin-info-text"><? echo $this->tr('Žádná tisková zpráva nebyla vložena. Zprávu nahrajete pomocí nástrojů.'); ?></div>
+      <div class="admin-info-text"><? echo $this->tr('Žádný soubor nebyl vložen. Soubor nahrajete pomocí nástrojů.'); ?></div>
    <?} else {?>
       <div class="post text">
-         <?echo $this->tr('Žádná tisková zpráva nebyla vložena.'); ?>
+         <?echo $this->tr('Žádný soubor nebyl vložen.'); ?>
       </div>
    <?}?>
 </div>
