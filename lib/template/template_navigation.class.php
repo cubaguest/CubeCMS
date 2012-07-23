@@ -44,9 +44,9 @@ class Template_Navigation extends Template {
     * Metoda přidá položku do navigace (drobečkové menu)
     * @param array $item -- polžka do navigace ( array('name' => null, 'title' => null, 'link' => null, 'image' => null, ) )
     */
-   public static function addItem($name, $link = null, $title = null, $image = null, $key = null) 
+   public static function addItem($name, $link = null, $title = null, $image = null, $key = null, $admin = false) 
    {
-      $arr = array('name' => $name, 'title' => $title, 'link' => $link, 'image' => $image);
+      $arr = array('name' => $name, 'title' => $title, 'link' => $link, 'image' => $image, 'admin' => $admin);
       if((string)$arr['title'] == null){
          $arr['title'] = $arr['name'];
       }
@@ -75,23 +75,33 @@ class Template_Navigation extends Template {
    protected static function prepareNavigation() 
    {
       $link = new Url_Link(true);
-      if(Category::getSelectedCategory() instanceof Category){
+      if(Category::getSelectedCategory() instanceof Category_Admin){
+         $img = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON};
+         self::$baseParts[] = array(
+               'name' => (string)Category::getSelectedCategory()->getName(),
+               'title' => (string)Category::getSelectedCategory()->getName(true),
+               'link' => (string)$link->clear(true)->category(Category::getSelectedCategory()->getUrlKey()),
+               'image' => ( $img != null ? Category::getImageDir().$img : null),
+               'admin' => true,
+         );
+      } else if(Category::getSelectedCategory() instanceof Category){
          $struct = Category_Structure::getStructure();
          $path = $struct->getPath();
-         foreach ($path as $item) {
-            if($item->getId() == 0){
-               continue;
+         if(!empty($path)){
+            foreach ($path as $item) {
+               if($item->getId() == 0){
+                  continue;
+               }
+               $img = $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_ICON};
+               self::$baseParts[] = array(
+                  'name' => (string)$item->getCatobj()->getName(),      
+                  'title' => (string)$item->getCatObj()->getName(true),      
+                  'link' => (string)$link->clear(true)->category($item->getCatObj()->getUrlKey()),      
+                  'image' => ( $img != null ? Category::getImageDir().$img : null),      
+                  'admin' => false,      
+               );
             }
-            $img = $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_ICON};
-            self::$baseParts[] = array(
-               'name' => (string)$item->getCatobj()->getName(),      
-               'title' => (string)$item->getCatObj()->getName(true),      
-               'link' => (string)$link->clear(true)->category($item->getCatObj()->getUrlKey()),      
-               'image' => ( $img != null ? Category::getImageDir().$img : null),      
-            );
          }
-      } else if(Category::getSelectedCategory() instanceof Category_Admin){
-         
       } else {
          $img = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON};
          self::$baseParts[] = array(
@@ -99,6 +109,7 @@ class Template_Navigation extends Template {
                'title' => (string)Category::getSelectedCategory()->getName(true),
                'link' => (string)$link->clear(true),
                'image' => ( $img != null ? Category::getImageDir().$img : null),
+               'admin' => false,      
          );
       }
    }

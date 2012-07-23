@@ -41,6 +41,14 @@ class Template_Module extends Template {
       parent::__construct($link);
       $this->category = $category;
       $this->locale = new Locales($category->getModule()->getName());
+//       $url = 'tpl://module@parts/index.phtml?original&base';
+//       Debug::log($url, parse_url($url));
+//       $url = 'tpl://engine@parts/index.phtml?original';
+//       Debug::log($url, parse_url($url));
+//       $url = 'tpl://parts/index.phtml?original';
+//       Debug::log($url, parse_url($url));
+//       $url = 'tpl://index.phtml';
+//       Debug::log($url, parse_url($url));
    }
 
    /**
