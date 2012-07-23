@@ -1,0 +1,20 @@
+<?
+?>
+<h1><?ps($this->category()->getName());?></h1>
+<div class="post">
+   <?
+   if($this->text != null AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
+      echo '<div class="main-content-text">'.$this->text->{Text_Model_Detail::COLUMN_TEXT}.'</div>';
+   } else if($this->category()->getRights()->isWritable()) {
+      ?><div class="admin-info-text"><?echo $this->tr('Źádný text nebyl vytvořen.');?></div><?
+   }
+   if($this->dFormTpl != null){
+      $this->dFormTpl->disableTitle = true;
+      echo $this->dFormTpl;
+   }
+   ?>
+   <hr class="reseter" />
+   <?
+   echo $this->toolbox;
+   ?>
+</div>
