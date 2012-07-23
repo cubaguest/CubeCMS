@@ -19,7 +19,7 @@ class Categories_Controller extends Controller {
    {
       $this->checkWritebleRights();
 
-      $this->setMainStruct(true);
+      $this->setMainStruct();
 //       if ($this->routes()->getActionName() != 'main') {
 //          $this->setMainStruct(false);
 //       }
@@ -59,18 +59,8 @@ class Categories_Controller extends Controller {
          $this->gotoBack();
       }
 
-      $structure = Category_Structure::getStructure(!$this->isMainStruct());
-      $structure->withHidden(true);
-      if ($structure != false) {
-         $catModel = new Model_Category();
-         $structure->setCategories($catModel
-            ->join(Model_Category::COLUMN_CAT_ID, "Model_Rights", Model_Rights::COLUMN_ID_CATEGORY, array(Model_Rights::COLUMN_RIGHT))
-            ->groupBy(array(Model_Category::COLUMN_CAT_ID))
-            ->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
-//         $structure->setCategories($catModel->getCategoryList());
-         $this->view()->structure = $structure;
-      }
-      $this->view()->isMainMenu = $this->isMainStruct();
+      $structure = Category_Structure::getStructure(Category_Structure::ALL);
+      $this->view()->structure = $structure;
    }
 
    public function adminMenuController()
@@ -98,9 +88,7 @@ class Categories_Controller extends Controller {
       $form->description->setValues($record->{Model_Category::COLUMN_DESCRIPTION});
       // nadřazená kategorie
 
-      $structure = Category_Structure::getStructure(!$this->isMainStruct());
-      $structure->withHidden(true);
-      $structure->setCategories($categoryModel->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY));
+      $structure = Category_Structure::getStructure(Category_Structure::ALL);
 
       $selCat = $structure->getCategory($this->getRequest('categoryid'));
       $structure->removeCat($this->getRequest('categoryid'));
@@ -285,11 +273,8 @@ class Categories_Controller extends Controller {
       $form->gotoSettings->setValues(true);
 
       // kategorie
-      $structure = Category_Structure::getStructure(!$this->isMainStruct());
-      $structure->withHidden(true);
-      if ($structure != false) {
-         $structure->setCategories($categoryModel->getCategoryList());
-      }
+      $structure = Category_Structure::getStructure(Category_Structure::ALL);
+      
       $this->catsToArrayForForm($structure);
       $form->parent_cat->setOptions($this->categoriesArray);
 
@@ -371,17 +356,15 @@ class Categories_Controller extends Controller {
          if(!class_exists($mInsClass, true)){
             throw new UnexpectedValueException($this->tr('Neexistuje třída pro instalaci tohoto modulu'));
          }
-         
          $lastId = $categoryModel->save($record);
-
          // práva
          $this->assignRights($lastId, $form);
       
          // po uložení vložíme do struktury
          if ($lastId !== false) {
-            $newStructure = Category_Structure::getStructure(!$this->isMainStruct());
+            $newStructure = Category_Structure::getStructure(Category_Structure::ALL);
             $newStructure->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
-            $newStructure->saveStructure(!$this->isMainStruct());
+            $newStructure->saveStructure();
          }
  
          $mInstall = new $mInsClass();
@@ -709,7 +692,7 @@ class Categories_Controller extends Controller {
       return true;
    }
 
-   private function setMainStruct($main = true)
+   private function setMainStruct()
    {
 //       if ($main === true) {
 //          $_SESSION['structAdmin'] = false;
@@ -829,7 +812,7 @@ class Categories_Controller extends Controller {
    private function moveCategory($idMovedCat, $idNewParentCat, $regenerateUrls = false, $position = 0)
    {
       $modelCat = new Model_Category();
-      $structure = Category_Structure::getStructure();
+      $structure = Category_Structure::getStructure(Category_Structure::ALL);
       $this->repairStructure($structure, $modelCat);
       $movedCat = $structure->getCategory($idMovedCat);
       // definice ve struktuře pro přesun
@@ -851,10 +834,8 @@ class Categories_Controller extends Controller {
       // pokud se přesunuje ve struktuře
       if ($oldParentCatId != $idNewParentCat AND $regenerateUrls) {
          // dočtou se data o kategoriích
-         $movedCat->withHidden(true);// (i zkryté)
          $modelCat = new Model_Category();
          $cats = $modelCat->setSelectAllLangs(true)->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
-         $movedCat->setCategories($cats);
          // generace polí
          $newParentUrlKeys = array();
          foreach (Locales::getAppLangs() as $lang) {
