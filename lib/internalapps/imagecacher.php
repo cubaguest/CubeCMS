@@ -16,7 +16,7 @@ if(isset($_GET['debug'])){
    echo "WEB dir:".$webDir."<br />";
    print_r($_GET);
 }
-
+define('VVE_IMAGE_COMPRESS_QUALITY', 97);
 
 // Base init urlencode atd here
 $SOURCE = $strSource = $_GET['s'];
