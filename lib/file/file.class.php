@@ -344,15 +344,18 @@ class File extends TrObject implements File_Interface {
     * @return File 
     * @todo dodělat kontrolu unikátnosti jména v acílovém adresáři
     */
-   public function move($dstDir)
+   public function move($dstDir, $createUniqueName = true)
    {
       $dstDir = new FS_Dir($dstDir);
       $dstDir->check();
       
-      if(!@rename((string)$this, $dstDir.$this->getName())){
+      $newName = $createUniqueName == true ? $this->creatUniqueName($this->getName(), $dstDir) : $this->getName();
+      
+      if(!@rename((string)$this, $dstDir.$newName)){
          throw new UnexpectedValueException($this->tr('Soubor se nepodařilo přesunout'));
       }
       $this->path = $dstDir;
+      $this->setName($newName);
       return $this;
    }
    
