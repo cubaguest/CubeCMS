@@ -21,6 +21,13 @@ class Form_Element_File extends Form_Element {
    private $uploadDir = null;
 
    private $overWrite = true;
+   
+   /**
+    * Jestli nemá zpracovávat nebezpečné soubory
+    * @var 
+    */
+   private $onlySecureFiles = true;
+   private $insecureFiles = array('php', 'phtml', 'php5', 'php3', 'php4', 'asp', 'aspx', 'sh');
 
    /**
     * Konstruktor elemntu
@@ -40,71 +47,83 @@ class Form_Element_File extends Form_Element {
     */
    public function populate() {
       if(isset ($_FILES[$this->getName()])) {
-         if($this->isMultiLang() OR $this->isDimensional()) {
-            $dir = new Filesystem_Dir($this->uploadDir);
-            $dir->checkDir();
-
-            $files = array();
+         if($this->isDimensional()) {
             foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
-               if ($_FILES[$this->getName()]['error'][$key] == UPLOAD_ERR_OK) {
-                  $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"][$key]);
-                  // kontrola adresáře
-                  $dir = new Filesystem_Dir($this->uploadDir);
-                  $dir->checkDir();
-                  if(!$this->overWrite){
-                     $saveFileName = File::creatUniqueName($saveFileName, $dir);
-                  }
-                  move_uploaded_file($_FILES[$this->getName()]["tmp_name"][$key],
-                     $dir . $saveFileName);
-                  // vatvoření pole s informacemi o souboru
-                  $files[] = array('name' => $saveFileName,
-                     'path' => $dir,
-                     'size' => $_FILES[$this->getName()]["size"][$key],
-                     'type' => $this->getMimeType($dir . $saveFileName),
-                     'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION));
-               } else if ($_FILES[$this->getName()]['error'][$key] == UPLOAD_ERR_NO_FILE) {
-//                  $files[] = false; // @TODO -- proč takhle???
-               } else {
-                  $this->creteUploadError($_FILES[$this->getName()]['error'][$key], $_FILES[$this->getName()]['name'][$key]);
-                  $files[] = array(
-                     'name' => $_FILES[$this->getName()]['name'],
-                     'size' => $_FILES[$this->getName()]["size"]
-                  );
-               }
+               $this->uploadFile(
+                     $_FILES[$this->getName()]["name"][$key],
+                     $_FILES[$this->getName()]["tmp_name"][$key],
+                     $_FILES[$this->getName()]["error"][$key],
+                     $_FILES[$this->getName()]["type"][$key],
+                     $_FILES[$this->getName()]["size"][$key], $key );
             }
-            $this->values = $files;
+         } else if($this->isMultiLang()){
+            foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
+               $this->uploadFile(
+                     $_FILES[$this->getName()]["name"][$key],
+                     $_FILES[$this->getName()]["tmp_name"][$key],
+                     $_FILES[$this->getName()]["error"][$key],
+                     $_FILES[$this->getName()]["type"][$key],
+                     $_FILES[$this->getName()]["size"][$key], $key );
+            }
          } else {
-            if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_OK) {
-               $saveFileName = vve_cr_safe_file_name($_FILES[$this->getName()]["name"]);
-               // kontrola adresáře
-               $dir = new Filesystem_Dir($this->uploadDir);
-               $dir->checkDir();
-               if(!$this->overWrite){
-                  $saveFileName = File::creatUniqueName($saveFileName, $dir);
-               }
-               move_uploaded_file($_FILES[$this->getName()]["tmp_name"],
-                   $dir . $saveFileName);
-               // vatvoření pole s informacemi o souboru
-               $this->values = array('name' => $saveFileName,
-                   'path' => $dir,
-                   'size' => $_FILES[$this->getName()]["size"],
-                   'type' => $this->getMimeType($dir.$saveFileName),
-                   'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION));
-            } else if($_FILES[$this->getName()]['error'] == UPLOAD_ERR_NO_FILE) {
-               $this->values = null;
-            } else {
-               $this->creteUploadError($_FILES[$this->getName()]['error'], $_FILES[$this->getName()]['name']);
-               $this->values = array(
-                  'name' => $_FILES[$this->getName()]['name'],
-                  'size' => $_FILES[$this->getName()]["size"]
-                  );
-            }
+            $this->uploadFile(
+                  $_FILES[$this->getName()]["name"], 
+                  $_FILES[$this->getName()]["tmp_name"], 
+                  $_FILES[$this->getName()]["error"], 
+                  $_FILES[$this->getName()]["type"], 
+                  $_FILES[$this->getName()]["size"] );
          }
       } else {
          $this->values = null;
       }
       $this->unfilteredValues = $this->values;
       $this->isPopulated = true;
+   }
+    
+   private function uploadFile($name, $tmpName, $error, $mime, $size, $key = null)
+   {
+      if($error == UPLOAD_ERR_OK) {
+         $saveFileName = vve_cr_safe_file_name($name);
+          
+         if($this->onlySecureFiles && in_array(pathinfo($saveFileName, PATHINFO_EXTENSION), $this->insecureFiles)){
+            $this->creteUploadError(0, $name);
+            $this->isValid(false);
+         } else {
+            // kontrola adresáře
+            $dir = new Filesystem_Dir($this->uploadDir);
+            $dir->checkDir();
+            if(!$this->overWrite){
+               $saveFileName = File::creatUniqueName($saveFileName, $dir);
+            }
+            move_uploaded_file($tmpName, $dir . $saveFileName);
+            // vatvoření pole s informacemi o souboru
+            $this->_setFileValue( 
+                  array('name' => $saveFileName,
+                         'path' => $dir,
+                         'size' => $size,
+                         'mime' => $mime,
+                         'type' => $this->getMimeType($dir.$saveFileName),
+                         'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION)), $key
+                  );
+         }
+      } else if($error == UPLOAD_ERR_NO_FILE) {
+         
+      } else {
+         $this->creteUploadError($error, $name);
+         $this->_setFileValue( array( 'name' => $name, 'size' => $size ) );
+      };
+   }
+
+   private function _setFileValue($data, $key = null) 
+   {
+      if($this->isDimensional() || $this->isMultiLang()){
+         if(!is_array($this->values)){
+            $this->values = array();
+         }
+         $key == null ? $this->values[] = $data : $this->values[$key] = $data;
+      } else {
+         $this->values = $data;
+      }
    }
 
    /**
@@ -114,7 +133,7 @@ class Form_Element_File extends Form_Element {
    private function creteUploadError($errNumber, $fileName) {
       switch($errNumber) {
          case 0: //no error; possible file attack!
-            $this->errMsg()->addMessage(sprintf($this->tr('Problém s nahráním souboru "%s"'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Nahrávání spustitelných souborů je zakázáno ("%s")'),$fileName));
             break;
          case UPLOAD_ERR_INI_SIZE: //uploaded file exceeds the upload_max_filesize directive in php.ini
          case UPLOAD_ERR_FORM_SIZE: //uploaded file exceeds the upload_max_filesize directive in php.ini
@@ -212,9 +231,11 @@ class Form_Element_File extends Form_Element {
    /**
     * Metoda nastaví adresář pro nahrání souboru
     * @param string $dir -- adresář
+    * @return Form_Element_File
     */
    public function setUploadDir($dir) {
       $this->uploadDir = $dir;
+      return $this;
    }
 
    /**
@@ -225,6 +246,17 @@ class Form_Element_File extends Form_Element {
    public function setOverWrite($overwrite = true)
    {
       $this->overWrite = $overwrite;
+      return $this;
+   }
+   
+   /**
+    * Metoda nastaví jestli je povoleno i nahrávání nebezpečných souborů
+    * @param bool $onlySecure -- false pro vypnutí omezení
+    * @return Form_Element_File
+    */
+   public function setOnlySecureFiles($onlySecure = true)
+   {
+      $this->onlySecureFiles = $onlySecure;
       return $this;
    }
 
