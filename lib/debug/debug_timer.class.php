@@ -15,18 +15,30 @@ class Debug_Timer {
     */
    private static $timers = array();
 
+   private $point = null;
+   
+   public function __construct($point, $startImmediately = true) 
+   {
+      $this->point = $point;
+      if($startImmediately){
+         $this->start();
+      }
+   } 
+   
    /**
     * metoda pro vytvoření instance
     * @return Debug_Timer 
     */
    public static function getInstance() {
-      return new self;
+      $debug = debug_backtrace();
+      $point = pathinfo($debug[0]['file'], PATHINFO_FILENAME)." - line: ".$debug[0]['line'];
+      return new self($point);
    }
    
    public static function printTimers() {
       foreach (self::$timers as $point => $timer) {
          foreach ($timer['times'] as $value) {
-            echo '<div><strong>'.$point.' - '.$value['time'].'</strong> - '.$value['msg'].'</div>';
+            echo '<div><strong>'.$point.' - '. ($value['time'] > 0.0001 ? $value['time'] : 0) .'</strong> - '.$value['msg'].'</div>';
          }
       }
    }
@@ -36,9 +48,9 @@ class Debug_Timer {
     * @param string $point
     * @return Debug_Timer 
     */
-   public function timerStart($point)
+   public function timerStart($point = null)
    {
-      self::$timers[$point]['start'] = microtime();
+      self::$timers[$point == null ? $this->point : $point]['start'] = microtime();
       return $this;
    }
 
@@ -46,6 +58,29 @@ class Debug_Timer {
    {
       $t = microtime() - self::$timers[$point]['start'];
       self::$timers[$point]['times'][] = array('time' => $t, 'msg' => $msg);
+   }
+   
+   public function start()
+   {
+      self::$timers[$this->point]['start'] = microtime();
+      self::$timers[$this->point]['times'][] = array('time' => 0, 'msg' => 'TIMER START');
+      return $this;
+   }
+   
+   public function stop($msg = null)
+   {
+      $t = microtime() - self::$timers[$this->point]['start'];
+      self::$timers[$this->point]['times'][] = array('time' => $t, 'msg' => $msg);
+      return $this;
+   }
+   
+   public function getTime($point = null) 
+   {
+      $point = $point == null ? $this->point : $point;
+      if(isset(self::$timers[$point])){
+         return self::$timers[$point]['times'];
+      }
+      return -1;
    }
 }
 ?>
