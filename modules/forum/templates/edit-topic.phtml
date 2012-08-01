@@ -14,6 +14,9 @@ $this->addJsPlugin(new JsPlugin_JQuery());
    $this->form->text->html()->setAttrib('rows', 10);
    if(isset($this->form->notificationEMails)){
       $this->form->email->setSubLabel('<a id="buttonAddToNotify" href="#add-mail-notify" title="'.$this->tr('Zasílat nové příspěvky na e-mail').'">'.$this->tr('Přidat').'</a> '.$this->tr(' do upozornění na nové příspěvky'));
+      if(isset($this->form->attachments)){
+         $this->form->attachments->setSubLabel('<a id="buttonAddAttachment" href="#add-attachment" title="'.$this->tr('Přida další přílohu').'">'.$this->tr('Přida další přílohu').'</a>');
+      }
    }
    echo $this->form;
    ?>
@@ -26,6 +29,21 @@ $this->addJsPlugin(new JsPlugin_JQuery());
             $('#topic_notificationEMails_1').val(mail+";"+$('#topic_notificationEMails_1').val() );
          }
       });
+      <?if(isset($this->form->attachments)){?>
+      $('#buttonAddAttachment').click(function(e){
+         e.preventDefault();
+         var $rowOrig = $(this).parents('tr:last');
+         var $tbl = $rowOrig.parents('table');
+         var lastId = $tbl.find('tr').length+1; 
+         var $row = $rowOrig.clone(true);
+         $rowOrig.find('a').remove();
+         // replace id
+         var newID = $('label', $row).attr('for').replace(/[0-9]+/, lastId);
+         $('label', $row).attr('for', newID);
+         $('input', $row).attr('id', newID).val(null);
+         $tbl.append($row);
+      });
+      <?}?>
    </script>
 </div>
 

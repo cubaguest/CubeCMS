@@ -57,7 +57,7 @@ class Forum_Model_Messages extends Model_ORM {
 
       $this->addForeignKey(self::COLUMN_ID_TOPIC, 'Forum_Model_Topics', Forum_Model_Topics::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users', Model_Users::COLUMN_ID);
-//      $this->addRelatioOneToOne(self::COLUMN_ID_PARENT_MESSAGE, __CLASS__, self::COLUMN_ID);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Forum_Model_Attachments', Forum_Model_Attachments::COLUMN_ID_MESSAGE);
    }
 
    public function  save(Model_ORM_Record $record) {

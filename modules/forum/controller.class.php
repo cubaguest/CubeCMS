@@ -115,7 +115,7 @@ class Forum_Controller extends Controller {
    {
       $this->checkWritebleRights();
       $model = new Forum_Model_Messages();
-      $message = $model->record($this->getRequest('idp'));
+      $message = $model->record($this->getRequest('idm'));
       
       if($message != false && 
          ($this->rights()->isControll() 
@@ -132,6 +132,7 @@ class Forum_Controller extends Controller {
       $form = new Form('topic_');
 
       $model = new Forum_Model_Topics();
+      $modelAttachments = new Forum_Model_Attachments();
       if($record == null){
          $record = $model->newRecord();
       }
@@ -176,25 +177,47 @@ class Forum_Controller extends Controller {
       if(!Auth::isLogin()){
          $elemCaptcha = new Form_Element_Captcha('captcha');
          $form->addElement($elemCaptcha, $fGrpAuthor);
+//       $capchaTime = $this->category()->getParam(self::PARAM_CAPCHA_SEC, self::MIN_SEC_FOR_HUMAN);
+         $form->author->setValues(Auth::getUserName());
+         $form->email->setValues(Auth::getUserMail());
       }
       
-      if($this->rights()->isControll()){
+//       if($this->rights()->isControll()){
          $fGrpNotify = $form->addGroup('notification', $this->tr('Oznámení'));
          $elemNotifyEmail = new Form_Element_TextArea('notificationEMails', $this->tr('E-maily'));
          $elemNotifyEmail->setSubLabel($this->tr('E-mailové adresy oddělené středníkem, na které bude odesláno oznámení o novém příspěvku'));
          $form->addElement($elemNotifyEmail, $fGrpNotify);
+//       }
+      
+      if(Auth::isLogin()){
+         $fGrpAttachments = $form->addGroup('attachments', $this->tr('Přílohy'));
+         
+         if(!$record->isNew()){
+            $attachments = $modelAttachments
+            ->where(Forum_Model_Attachments::COLUMN_ID_TOPIC." = :idt AND ".Forum_Model_Attachments::COLUMN_ID_MESSAGE." = 0", array('idt' => $record->getPK()))
+            ->records();
+         
+            if($attachments){
+               $elemDelAtt = new Form_Element_Select('delete_attachment', $this->tr('Smazat přílohy'));
+               $elemDelAtt->setMultiple(true);
+               foreach ($attachments as $att) {
+                  $elemDelAtt->setOptions(array($att->{Forum_Model_Attachments::COLUMN_FILENAME} => $att->{Forum_Model_Attachments::COLUMN_ID}), true);
+               }
+               $form->addElement($elemDelAtt, $fGrpAttachments);
+            }
+         }
+         
+         $elemAttachments = new Form_Element_File('attachments', $this->tr('Příloha'));
+         $elemAttachments->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::ALL));
+         $elemAttachments->setDimensional();
+//          $elemAttachments->setSubLabel($this->tr('Soubory, které budou připojeny k příspěvku'));
+         $form->addElement($elemAttachments, $fGrpAttachments);
       }
       
       $elemSubmit = new Form_Element_SaveCancel('send');
       $elemSubmit->setCancelConfirm(false);
       $form->addElement($elemSubmit);
       
-      $capchaTime = $this->category()->getParam(self::PARAM_CAPCHA_SEC, self::MIN_SEC_FOR_HUMAN);
-      // u přihlášených vypneme chapchu
-      if(Auth::isLogin()){
-         $form->author->setValues(Auth::getUserName());
-         $form->email->setValues(Auth::getUserMail());
-      } 
       
       if(!$record->isNew()){
          // add info to form
@@ -260,6 +283,50 @@ class Forum_Controller extends Controller {
          }
          
          $model->save($record);
+         
+         if($form->haveElement('delete_attachment') ){
+            $delAtt = $form->delete_attachment->getValues();
+            if(!empty($delAtt)){
+               foreach ($delAtt as $aID) {
+                  try {
+                     $attRec = $modelAttachments->record($aID);
+                     if(!$attRec){
+                        continue;
+                     }
+         
+                     $file = new File($attRec->{Forum_Model_Attachments::COLUMN_FILENAME}, $this->getTopicDataDir($record->getPK()));
+                     $file->delete();
+                      
+                     $modelAttachments->delete($attRec);
+                  } catch (Exception $e) {
+                     $this->infoMsg()->addMessage( sprintf(
+                           $this->tr('Přílohu %s se nepodařilo smazat. Kontaktujte webmastera'),
+                           $attRec->{Forum_Model_Attachments::COLUMN_FILENAME} ), true );
+                  }
+               }
+            }
+         }
+         
+         if($form->haveElement('attachments')){
+            $files = $form->attachments->getValues();
+            $dataDir = new FS_Dir($this->getTopicDataDir($record->getPK()));
+            $dataDir->check();
+            
+            foreach ($files as $f) {
+               if(empty($f)){
+                  continue;
+               }
+               $file = new File($f);
+               $file->move($dataDir);
+               
+               $fileRec = $modelAttachments->newRecord();
+               $fileRec->{Forum_Model_Attachments::COLUMN_ID_TOPIC} = $record->getPK();
+               $fileRec->{Forum_Model_Attachments::COLUMN_ID_USER} = Auth::getUserId();
+               $fileRec->{Forum_Model_Attachments::COLUMN_FILENAME} = $file->getName();
+               $modelAttachments->save($fileRec);
+            }
+         }
+         
          $this->infoMsg()->addMessage($this->tr('Téma bylo uloženo'));
          if($record->isNew()){
             $this->link()->route()->reload();
@@ -273,9 +340,12 @@ class Forum_Controller extends Controller {
    private function editMessage($idTopic, Model_ORM_Record $message = null, $messageReactionId = false)
    {
       $form = new Form('message_');
-
+      
       $model = new Forum_Model_Messages();
-      $record = $model->newRecord();
+      $modelAttachments = new Forum_Model_Attachments();
+      if($message == null){
+         $message = $model->newRecord();
+      }
       
       $elemName = new Form_Element_Text('name', $this->tr('Předmět'));
       $elemName->addValidation(new Form_Validator_MaxLength(200));
@@ -310,6 +380,32 @@ class Forum_Controller extends Controller {
          $elemCaptcha = new Form_Element_Captcha('captcha');
          $form->addElement($elemCaptcha);
       }
+      
+      if(Auth::isLogin()){
+         $fGrpAttachments = $form->addGroup('attachments', $this->tr('Přílohy'));
+         
+         if(!$message->isNew()){
+            $attachments = $modelAttachments
+            ->where(Forum_Model_Attachments::COLUMN_ID_TOPIC." = :idt AND ".Forum_Model_Attachments::COLUMN_ID_MESSAGE." = :idm", 
+                  array('idt' => $idTopic, 'idm' => $message->getPK() ))
+            ->records();
+            
+            if($attachments){
+               $elemDelAtt = new Form_Element_Select('delete_attachment', $this->tr('Smazat přílohy'));
+               $elemDelAtt->setMultiple(true);
+               foreach ($attachments as $att) {
+                  $elemDelAtt->setOptions(array($att->{Forum_Model_Attachments::COLUMN_FILENAME} => $att->{Forum_Model_Attachments::COLUMN_ID}), true);
+               }
+               $form->addElement($elemDelAtt, $fGrpAttachments);
+            }
+         }
+         
+         $elemAttachments = new Form_Element_File('attachments', $this->tr('Příloha'));
+         $elemAttachments->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::ALL));
+         $elemAttachments->setDimensional();
+         //          $elemAttachments->setSubLabel($this->tr('Soubory, které budou připojeny k příspěvku'));
+         $form->addElement($elemAttachments, $fGrpAttachments);
+      }
 
       if($messageReactionId != null){
          $eParentMsgId = new Form_Element_Hidden('parentMsgId');
@@ -322,14 +418,12 @@ class Forum_Controller extends Controller {
       $form->addElement($elemSubmit);
 
       // u přihlášených vypneme chapchu
-      if(Auth::isLogin() && $message == null){
+      if(Auth::isLogin() && $message->isNew()){
          $form->author->setValues(Auth::getUserName());
          $form->email->setValues(Auth::getUserMail());
-         $capchaTime = 0;
       }
       
-      if($message != null){
-         $record = $message;
+      if(!$message->isNew()){
          // add info to form
          $form->name->setValues($message->{Forum_Model_Messages::COLUMN_NAME});
          $form->text->setValues($message->{Forum_Model_Messages::COLUMN_TEXT});
@@ -346,37 +440,85 @@ class Forum_Controller extends Controller {
       }
 
       if($form->isValid()){
-         $record->{Forum_Model_Messages::COLUMN_NAME} = $form->name->getValues();
-         $record->{Forum_Model_Messages::COLUMN_CREATED_BY} = $form->author->getValues();
-         $record->{Forum_Model_Messages::COLUMN_TEXT} = $form->text->getValues();
-         $record->{Forum_Model_Messages::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
-         $record->{Forum_Model_Messages::COLUMN_EMAIL} = $form->email->getValues();
-         $record->{Forum_Model_Messages::COLUMN_SEND_NOTIFY} = $form->sendNotify->getValues();
-         if($record->isNew()){
-            $record->{Forum_Model_Messages::COLUMN_ID_TOPIC} = $idTopic;
+         $message->{Forum_Model_Messages::COLUMN_NAME} = $form->name->getValues();
+         $message->{Forum_Model_Messages::COLUMN_CREATED_BY} = $form->author->getValues();
+         $message->{Forum_Model_Messages::COLUMN_TEXT} = $form->text->getValues();
+         $message->{Forum_Model_Messages::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
+         $message->{Forum_Model_Messages::COLUMN_EMAIL} = $form->email->getValues();
+         $message->{Forum_Model_Messages::COLUMN_SEND_NOTIFY} = $form->sendNotify->getValues();
+         if($message->isNew()){
+            $message->{Forum_Model_Messages::COLUMN_ID_TOPIC} = $idTopic;
             if(Auth::isLogin()){
-               $record->{Forum_Model_Messages::COLUMN_ID_USER} = Auth::getUserId();
+               $message->{Forum_Model_Messages::COLUMN_ID_USER} = Auth::getUserId();
             }
             if($this->category()->getRights()->isControll()){
-               $record->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} = true;
+               $message->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} = true;
             }
-            $record->{Forum_Model_Messages::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
+            $message->{Forum_Model_Messages::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
          }
          
          if(isset($form->parentMsgId)){
             $parentMsg = $model->record($form->parentMsgId->getValues());
-            $record->{Forum_Model_Messages::COLUMN_ID_PARENT_MESSAGE} = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
+            $message->{Forum_Model_Messages::COLUMN_ID_PARENT_MESSAGE} = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
             if($parentMsg->{Forum_Model_Messages::COLUMN_SEND_NOTIFY}){
-               $this->sendMessageNotification($idTopic, $parentMsg, $record);
+               $this->sendMessageNotification($idTopic, $parentMsg, $message);
             }
          }
-         $model->save($record);
-         if($record->isNew()){
-            $this->sendTopicNotification($idTopic, $record);
+         $model->save($message);
+         
+         if($form->haveElement('delete_attachment') ){
+            $delAtt = $form->delete_attachment->getValues();
+            if(!empty($delAtt)){
+               foreach ($delAtt as $aID) {
+                  try {
+                     $attRec = $modelAttachments->record($aID);
+                     if(!$attRec){
+                        continue;
+                     }
+                     $file = new File($attRec->{Forum_Model_Attachments::COLUMN_FILENAME}, $this->getTopicDataDir($idTopic));
+                     $file->delete();
+                     $modelAttachments->delete($attRec);
+                  } catch (Exception $e) {
+                     $this->errMsg()->addMessage( sprintf(
+                           $this->tr('Přílohu %s se nepodařilo smazat. Kontaktujte webmastera.'),
+                           $attRec->{Forum_Model_Attachments::COLUMN_FILENAME} ) );
+                  }
+               }
+            }
+         }
+         
+         if($form->haveElement('attachments')){
+            $files = $form->attachments->getValues();
+            $dataDir = new FS_Dir($this->getTopicDataDir($idTopic));
+            $dataDir->check();
+         
+            foreach ($files as $f) {
+               if(empty($f)){
+                  continue;
+               }
+               $file = new File($f);
+               $file->move($dataDir);
+                
+               $fileRec = $modelAttachments->newRecord();
+               $fileRec->{Forum_Model_Attachments::COLUMN_ID_TOPIC} = $idTopic;
+               $fileRec->{Forum_Model_Attachments::COLUMN_ID_MESSAGE} = $message->getPK();
+               $fileRec->{Forum_Model_Attachments::COLUMN_ID_USER} = Auth::getUserId();
+               $fileRec->{Forum_Model_Attachments::COLUMN_FILENAME} = $file->getName();
+               $modelAttachments->save($fileRec);
+            }
+         }
+         
+         if($message->isNew()){
+            $this->sendTopicNotification($idTopic, $message);
          }
          
          $this->infoMsg()->addMessage($this->tr('Příspěvek byl uložen'));
-         $this->link()->route('showTopic')->rmParam('msg')->reload();
+         if($messageReactionId){
+            $anchor = 'message-'.$messageReactionId;
+         } else {
+            $anchor = 'message-'.$message->getPK();
+         }
+         $this->link()->route('showTopic')->rmParam('msg')->anchor($anchor)->reload();
       }
       $this->view()->form = $form;
    }
@@ -387,6 +529,7 @@ class Forum_Controller extends Controller {
       
       $modelT = new Forum_Model_Topics();
       $modelP = new Forum_Model_Messages();
+      $modelAttachments = new Forum_Model_Attachments();
       
       $topic = $modelT->record($this->getRequest('id'));
       if($topic == false){return false;}
@@ -400,6 +543,23 @@ class Forum_Controller extends Controller {
          $formDel->addElement($eDel);
          if($formDel->isValid()){
             $modelP->delete($formDel->id->getValues());
+            $msg = $modelP->record($formDel->id->getValues());
+            
+            // check user rights ?
+            
+            // delete all files
+            $files = $modelAttachments
+               ->where(Forum_Model_Attachments::COLUMN_ID_MESSAGE." = :idm", array('idm' => $formDel->id->getValues()))
+               ->records();
+            
+            if($files){
+               foreach ($files as $file) {
+                  $f = new File($file->{Forum_Model_Attachments::COLUMN_FILENAME}, $this->getTopicDataDir($topic->{Forum_Model_Topics::COLUMN_ID} ));
+                  $f->delete();
+               }
+               $modelAttachments->where(Forum_Model_Attachments::COLUMN_ID_MESSAGE." = :idm", array('idm' => $formDel->id->getValues()))->delete();
+            }
+            
             $this->infoMsg()->addMessage($this->tr('Příspěvek byl smazán'));
             $this->link()->reload();
          }
@@ -431,8 +591,20 @@ class Forum_Controller extends Controller {
          $eDel = new Form_Element_SubmitImage('delete', $this->tr('Smazat'));
          $formTopicDel->addElement($eDel);
          if($formTopicDel->isValid()){
+            // delete all files
+            $files = $modelAttachments
+            ->where(Forum_Model_Attachments::COLUMN_ID_TOPIC." = :idt", array('idt' => $formTopicDel->id->getValues()))
+            ->records();
+            
+            if($files){
+               foreach ($files as $file) {
+                  $f = new File($file->{Forum_Model_Attachments::COLUMN_FILENAME}, $this->getTopicDataDir($topic->{Forum_Model_Topics::COLUMN_ID} ));
+                  $f->delete();
+               }
+            }
+            
             $modelT->delete($formTopicDel->id->getValues());
-            $this->infoMsg()->addMessage($this->tr('Téma bylo smazáno'));
+            $this->infoMsg()->addMessage($this->tr('Téma i s příspěvky bylo smazáno'));
             $this->link()->route()->reload();
          }
          $this->view()->formTopicDelete = $formTopicDel;
@@ -463,6 +635,21 @@ class Forum_Controller extends Controller {
 //      $this->view()->messages = $modelP->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
       $this->view()->messages = $modelP->records();
 //      $this->view()->scrollComp = $scrollComponent;
+
+      /* attachments */
+      $attTMP = $modelAttachments->where(Forum_Model_Attachments::COLUMN_ID_TOPIC." = :idt", array('idt' => $topic->getPK()))
+         ->records();
+      
+      $attachments = array();
+      foreach ($attTMP as $file) {
+         $fid = $file->{Forum_Model_Attachments::COLUMN_ID_MESSAGE};
+         if(!isset($attachments[$fid])){
+            $attachments[$fid] = array();
+         }
+         $attachments[$fid][] = $file;
+      }
+      $this->view()->attachments = $attachments;
+      $this->view()->attachmentsPath = $this->getTopicDataDir($topic->getPK(), true);
    }
 
    public function rssTopicController()
@@ -730,6 +917,10 @@ class Forum_Controller extends Controller {
       
    }
 
+   private function getTopicDataDir( $tid, $webPath = false){
+      return $this->getModule()->getDataDir($webPath)."topic-".$tid.( $webPath ? "/" : DIRECTORY_SEPARATOR );
+   }
+   
    /**
     * Metoda pro nastavení modulu
     */

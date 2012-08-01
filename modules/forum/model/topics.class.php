@@ -54,6 +54,7 @@ class Forum_Model_Topics extends Model_ORM {
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users', Model_Users::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Forum_Model_Messages', Forum_Model_Messages::COLUMN_ID_TOPIC);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Forum_Model_Attachments', Forum_Model_Attachments::COLUMN_ID_TOPIC);
    }
 
 }

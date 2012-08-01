@@ -30,9 +30,25 @@ $this->addJsPlugin($jqcss);
                </td>
                <td class="message-text">
                   <?echo $this->toolboxTopic;?>
-                  <div class="main-content-text">
+                  <div class="text">
                      <?echo $this->topic->{Forum_Model_Topics::COLUMN_TEXT};?>
                   </div>
+                  <?if(isset($this->attachments[0]) && !empty($this->attachments[0])){ 
+                     $str = null;
+                     foreach ($this->attachments[0] as $file) {
+                        $imgTag = new Html_Element('a', htmlspecialchars($file->{Forum_Model_Attachments::COLUMN_FILENAME}));
+                        $imgTag->setAttrib('href', $this->attachmentsPath.$file->{Forum_Model_Attachments::COLUMN_FILENAME});
+                        $imgTag->setAttrib('title', $file->{Forum_Model_Attachments::COLUMN_FILENAME});
+                        if(in_array( strtolower( pathinfo($file->{Forum_Model_Attachments::COLUMN_FILENAME}, PATHINFO_EXTENSION) ), array('jpg', 'jpeg', 'png', 'gif'))){
+                           $imgTag->setAttrib('rel', 'prettyPhoto');
+                        }
+                        $str .= '<li>'.$imgTag.'</li>';
+                     }?>
+                  <div class="attachments">
+                     <strong><?=$this->tr('Přílohy')?></strong>
+                     <ul><?=$this->filter($str, 'filesicons');?></ul>
+                  </div>
+                  <?} ?>
                </td>
             </tr>
             <tr>
@@ -85,7 +101,7 @@ $this->addJsPlugin($jqcss);
                         echo $this->toolboxMessage;
                      }
                      ?>
-                     <div class="main-content-text">
+                     <div class="text">
                      <?
                      if($this->category()->getRights()->isControll() || $message->{Forum_Model_Messages::COLUMN_CENSORED} == false){
                         if($message->{Forum_Model_Messages::COLUMN_NAME} != null){
@@ -95,7 +111,23 @@ $this->addJsPlugin($jqcss);
                      } else {
                         echo '<p>'.$this->tr('Příspěvek byl cenzurován.').'<p>';
                      }?>
-                  </div>
+                     </div>
+                     <?if(isset($this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}]) && !empty($this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}])){ 
+                        $str = null;
+                        foreach ($this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}] as $file) {
+                           $imgTag = new Html_Element('a', htmlspecialchars($file->{Forum_Model_Attachments::COLUMN_FILENAME}));
+                           $imgTag->setAttrib('href', $this->attachmentsPath.$file->{Forum_Model_Attachments::COLUMN_FILENAME});
+                           $imgTag->setAttrib('title', $file->{Forum_Model_Attachments::COLUMN_FILENAME});
+                           if(in_array( strtolower( pathinfo($file->{Forum_Model_Attachments::COLUMN_FILENAME}, PATHINFO_EXTENSION) ), array('jpg', 'jpeg', 'png', 'gif'))){
+                              $imgTag->setAttrib('rel', 'prettyPhoto');
+                           }
+                           $str .= '<li>'.$imgTag.'</li>';
+                        }?>
+                     <div class="attachments">
+                        <strong><?=$this->tr('Přílohy')?></strong>
+                        <ul><?=$this->filter($str, 'filesicons');?></ul>
+                     </div>
+                     <?} ?>
                </td>
             </tr>
             <tr>
@@ -130,3 +162,11 @@ $this->addJsPlugin($jqcss);
    </ul>
    <div class="link-back"><a href="<?=$this->link()->route()?>" title="<?=$this->tr('Zpět na seznam témat');?>">&Lt; <?=$this->tr('Zpět na seznam témat');?></a></div>
 </div>
+<? 
+$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+?>
+<script type="text/javascript">
+   $(document).ready(function(){
+	   $("a[rel^='prettyPhoto']").prettyPhoto({social_tools: ''});
+	});
+</script>
