@@ -40,6 +40,7 @@ class People_View extends View {
     * Viewer pro přidání článku
     */
    public function addView() {
+      Template_Module::setEdit(true);
       $this->template()->addFile("tpl://edit.phtml");
       $this->addTinyMCE();
    }
@@ -48,6 +49,7 @@ class People_View extends View {
     * Viewer pro editaci novinky
     */
    public function editView() {
+      Template_Module::setEdit(true);
       $this->edit = true;
       $this->addView();
       // cestak obrázků
@@ -56,6 +58,7 @@ class People_View extends View {
 
    public function editOrderView()
    {
+      Template_Module::setEdit(true);
       $this->template()->addFile('tpl://edit_order.phtml');
    }
 
