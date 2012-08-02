@@ -328,6 +328,7 @@ class Projects_Controller extends Controller {
             // zadaná miniatura
             $thumb = new File_Image($form->imageThumb);
             $thumb->move($dir);
+            
             $thumb->getData()->resize(
                   $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), 
                   $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
@@ -363,8 +364,8 @@ class Projects_Controller extends Controller {
             }
             
             $image->getData()->resize(
-                  $this->category()->getParam(self::PARAM_BIG_W, VVE_ARTICLE_TITLE_IMG_W),
-                  $this->category()->getParam(self::PARAM_BIG_H, VVE_ARTICLE_TITLE_IMG_H), File_Image_Base::RESIZE_AUTO );
+                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
+                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
             
             $image->save();
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
@@ -484,10 +485,9 @@ class Projects_Controller extends Controller {
                
                $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
             }
-            
             $image->getData()->resize(
-                  $this->category()->getParam(self::PARAM_BIG_W, VVE_ARTICLE_TITLE_IMG_W),
-                  $this->category()->getParam(self::PARAM_BIG_H, VVE_ARTICLE_TITLE_IMG_H), File_Image_Base::RESIZE_AUTO );
+                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
+                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
             
             $image->save();
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
@@ -777,15 +777,12 @@ class Projects_Controller extends Controller {
     * Metoda pro nastavení modulu
     */
    protected function settings(&$settings,Form &$form) {
+      $projectImagesGrp = $form->addGroup('titleImg',$this->tr('Nastavení titulního obrázku'));
       
-      $phCtrl = new Photogalery_Controller($this);
-      $phCtrl->settings($settings, $form);
-      $form->removeElement('tplMain');
-
       $elemSW = new Form_Element_Text('image_thumb_w', 'Šířka miniatury titulního obrázku (px)');
       $elemSW->addValidation(new Form_Validator_IsNumber());
       $elemSW->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_W.'px');
-      $form->addElement($elemSW, 'images');
+      $form->addElement($elemSW, $projectImagesGrp);
       if(isset($settings[self::PARAM_THUM_W])) {
          $form->image_thumb_w->setValues($settings[self::PARAM_THUM_W]);
       }
@@ -793,23 +790,23 @@ class Projects_Controller extends Controller {
       $elemSH = new Form_Element_Text('image_thumb_h', 'Výška miniatury titulního obrázku (px)');
       $elemSH->addValidation(new Form_Validator_IsNumber());
       $elemSH->setSubLabel('Výchozí: '.VVE_IMAGE_THUMB_H.'px');
-      $form->addElement($elemSH, 'images');
+      $form->addElement($elemSH, $projectImagesGrp);
       if(isset($settings[self::PARAM_THUM_H])) {
          $form->image_thumb_h->setValues($settings[self::PARAM_THUM_H]);
       }
 
-      $elemSC = new Form_Element_Checkbox('image_thumb_c', 'Ořezávat miniatury');
+      $elemSC = new Form_Element_Checkbox('image_thumb_c', 'Ořezávat miniaturu titulního obrázku');
       $elemSC->setValues(true);
       if(isset($settings[self::PARAM_THUM_C])) {
          $elemSC->setValues($settings[self::PARAM_THUM_C]);
       }
-      $form->addElement($elemSC, 'images');
+      $form->addElement($elemSC, $projectImagesGrp);
       
       
       $elemW = new Form_Element_Text('image_w', 'Šířka titulního obrázku (px)');
       $elemW->addValidation(new Form_Validator_IsNumber());
       $elemW->setSubLabel('Výchozí: '.VVE_DEFAULT_PHOTO_W.'px');
-      $form->addElement($elemW, 'images');
+      $form->addElement($elemW, $projectImagesGrp);
       if(isset($settings[self::PARAM_BIG_W])) {
          $form->image_w->setValues($settings[self::PARAM_BIG_W]);
       }
@@ -817,19 +814,14 @@ class Projects_Controller extends Controller {
       $elemH = new Form_Element_Text('image_h', 'Výška titulního obrázku (px)');
       $elemH->addValidation(new Form_Validator_IsNumber());
       $elemH->setSubLabel('Výchozí: '.VVE_DEFAULT_PHOTO_H.'px');
-      $form->addElement($elemH, 'images');
+      $form->addElement($elemH, $projectImagesGrp);
       if(isset($settings[self::PARAM_BIG_H])) {
          $form->image_h->setValues($settings[self::PARAM_BIG_H]);
       }
 
-//      $elemSC = new Form_Element_Checkbox('image_thumb_c', 'Ořezávat miniatury');
-//      $elemSC->setValues(true);
-//      if(isset($settings[self::PARAM_THUM_C])) {
-//         $elemSC->setValues($settings[self::PARAM_THUM_C]);
-//      }
-//      $form->addElement($elemSC, 'images');
-      
-      
+      $phCtrl = new Photogalery_Controller($this);
+      $phCtrl->settings($settings, $form);
+      $form->removeElement('tplMain');
       
       
       // znovu protože mohl být už jednou validován bez těchto hodnot
