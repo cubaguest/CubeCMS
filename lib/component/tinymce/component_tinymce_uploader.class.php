@@ -239,35 +239,39 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       $dirPublic = AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC.DIRECTORY_SEPARATOR;
       $dirHome = AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_HOME.DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR;
    
-      // iterate over public dir
-      $publicDirs = array("/".Component_TinyMCE_Browser::DIR_PUBLIC."/");
-      $ite = new RecursiveDirectoryIterator($dirPublic );
-      foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
-         as $name => $item) {
-         // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
-         if($item->isDir() && $item->isWritable()
-            && ( strpos($item->getPathname(), "small") === false
-            && strpos($item->getPathname(), "medium") === false ) ){
-            
-            array_push($publicDirs, $this->encodeDir($item->getPathname()));
+      // iterate over public dir only if admin
+      if(Auth::isAdmin()){
+         $publicDirs = array("/".Component_TinyMCE_Browser::DIR_PUBLIC."/");
+         if(!is_dir($publicDirs)){// create dir if not exist;
+            @mkdir( reset($homeDirs) );
          }
-      }
-      // assign to output
-      $this->template()->dirsPublic = $publicDirs ;
-      
-      // interate over user dir
-      $homeDirs = array("/".Component_TinyMCE_Browser::DIR_HOME."/");
-      if(is_dir($dirHome)){
-         $ite = new RecursiveDirectoryIterator($dirHome );
+         $ite = new RecursiveDirectoryIterator($dirPublic );
          foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
             as $name => $item) {
             // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
-            if($item->isDir() 
+            if($item->isDir() && $item->isWritable()
                && ( strpos($item->getPathname(), "small") === false
                && strpos($item->getPathname(), "medium") === false ) ){
-            
-               array_push($homeDirs, $this->encodeDir($item->getPathname()));
+               array_push($publicDirs, $this->encodeDir($item->getPathname()));
             }
+         }
+         // assign to output
+         $this->template()->dirsPublic = $publicDirs ;
+      }
+      
+      // interate over user dir
+      $homeDirs = array("/".Component_TinyMCE_Browser::DIR_HOME."/".Auth::getUserName()."/");
+      if(!is_dir($dirHome)){// create dir if not exist;
+         @mkdir( reset($homeDirs) ); 
+      }
+      $ite = new RecursiveDirectoryIterator($dirHome );
+      foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
+         as $name => $item) {
+         // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
+         if($item->isDir()
+              && ( strpos($item->getPathname(), "small") === false
+            && strpos($item->getPathname(), "medium") === false ) ){
+            array_push($homeDirs, $this->encodeDir($item->getPathname()));
          }
       }
       // assign to output

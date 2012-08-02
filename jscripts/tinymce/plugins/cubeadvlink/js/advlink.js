@@ -562,7 +562,7 @@ var TinyMCEFileUploader = {
                alert("Error: Cannot load directories");
             }
             // public
-            if(data.dirsPublic.length > 0 ){
+            if(data.dirsPublic && data.dirsPublic.length > 0 ){
                for (var i = 0; i < data.dirsPublic.length; i++) {
                   tinyMCEPopup.dom.add('dirs-list-public',
                      'option', {

@@ -84,7 +84,9 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             <div style="float: left" class="swfupload-control"><span id="spanButtonPlaceholder"></span></div>
             <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=vve_create_size_str(VVE_MAX_UPLOAD_SIZE)?>
             <div style="float: right">
+               <? if(Auth::isAdmin()){?>
                <input id="buttonGoPublic" type="image" src="../../../images/icons/folder_star.png" title="Přejít do veřejné složky" onclick="FileBrowser.goPublic()" />
+               <?}?>
                <input id="buttonGoHome" type="image" src="../../../images/icons/house.png" title="Přejít do osobní složky" onclick="FileBrowser.goHome()" />
                <span class="buttons-separator">&nbsp;</span>
                <input id="buttonCreateDir" class="buttons" type="image" src="../../../images/icons/folder_add.png"

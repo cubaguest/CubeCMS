@@ -215,7 +215,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    {
       $aclf = pathinfo($item, PATHINFO_DIRNAME).DIRECTORY_SEPARATOR.self::ACL_FILE;
       if((preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_HOME.DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR,'/').'/', $item) // in home dir
-         OR preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_PUBLIC.DIRECTORY_SEPARATOR,'/').'/', $item) // in public dir
+         OR (Auth::isAdmin() && preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_PUBLIC.DIRECTORY_SEPARATOR,'/').'/', $item) ) // in public dir
          OR (is_dir($item) AND file_exists($aclf) AND in_array(Auth::getUserId(), explode(';',file_get_contents($aclf)))) )// in dir with ACL
          AND is_writable($item)){
          return true;

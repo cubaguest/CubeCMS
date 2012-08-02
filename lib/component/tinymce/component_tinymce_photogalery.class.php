@@ -1,6 +1,6 @@
 <?php
 /**
- * Třída príce s fotogalerií v TinyMCE editoru
+ * Třída práce s fotogalerií v TinyMCE editoru
  * @author cuba
  */
 class Component_TinyMCE_Photogalery extends Component_TinyMCE {
@@ -79,9 +79,6 @@ class Component_TinyMCE_Photogalery extends Component_TinyMCE {
       return $form;
    }
    
-   
-   
-
    public function photogaleryController()
    {
       // inicializace adresářů
@@ -273,10 +270,8 @@ class Component_TinyMCE_Photogalery extends Component_TinyMCE {
    private function chekWritableDir($dir)
    {
       if(!$this->isWritable($dir))
-         throw new Auth_Exception (_('Nemáte dostatečná práva pro úpravu této položky'));
+         throw new Auth_Exception ($this->tr('Nemáte dostatečná práva pro úpravu této položky'));
    }
-
-   
 
    private function sort($items)
    {
@@ -305,8 +300,6 @@ class Component_TinyMCE_Photogalery extends Component_TinyMCE {
 
       return $items;
    }
-
-   
    
    public function createDirController()
    {

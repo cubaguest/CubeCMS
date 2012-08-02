@@ -21,7 +21,7 @@ class Component_TinyMCE_List_Files extends Component_TinyMCE_List {
          }
       }
 
-      if(is_dir(AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC)){
+      if(Auth::isAdmin() && is_dir(AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC)){
          $dirIter = new RecursiveDirectoryIterator(AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC);
          $iterator = new RecursiveIteratorIterator($dirIter);
          $files = new RegexIterator($iterator, '/^.+\.'.$this->filesFilter.'$/i',RecursiveRegexIterator::GET_MATCH);
