@@ -1,10 +1,9 @@
 <?
 $this->addFile("css://articles:style.css?original");
 $jq = new JsPlugin_JQuery();
-$jq->addUIDatepicker();
 $jq->addUIDialog();
-$this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryTagsInput());
+
 // do titulku
 if($this->edit) {
    $h = $this->tr('úprava položky').' '.$this->artName;
@@ -12,6 +11,7 @@ if($this->edit) {
    $h = $this->tr('přidání položky');
 }
 $this->addPageTitle($h);
+
 // donastavení formuláře
 $this->form->html()->setAttrib('name', "form-article");
 $this->form->name->html()->setAttrib('size', 60)->addClass('form-element-long');
@@ -21,12 +21,21 @@ $this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
 $this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
 $this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
 $this->form->tags->html()->setAttrib('rows', 1);
-if($this->form->haveElement('textPrivate')){
+if( isset( $this->form->textPrivate) ){
    $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 }
+if( isset( $this->form->created_date) ){
+   // datepickery
+   $this->form->created_date->html()->addClass('datepicker');
+   $jq->addUIDatepicker();
+}
+if( isset( $this->form->priorityEndDate) ){
+   // datepickery
+   $this->form->priorityEndDate->html()->addClass('datepicker');
+   $jq->addUIDatepicker();
+}
 
-// datepickery
-$this->form->created_date->html()->addClass('datepicker');
+$this->addJsPlugin($jq);
 ?>
 <h1><?=$h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
@@ -38,13 +47,21 @@ $this->form->created_date->html()->addClass('datepicker');
 <script type="text/javascript">
    /* <![CDATA[ */
    $(document).ready(function(){
+	   <?if( isset( $this->form->created_date) || isset($this->form->priorityEndDate)){?>
       $.datepicker.setDefaults(['<?= Locales::getLang() ?>'] ) ;
       $("input.datepicker").datepicker();
-      $('input[name="article_priorityEndDate"]').datepicker();
+	   <?}?>
 
       $('.article_tags_class').tagsInput({
     	  'autocomplete_url': '<?echo $this->link()->route('getTags')?>',
     	  'defaultText':'<?=$this->tr('přidat štítek') ?>'
+      });
+      
+      $(window).bind('beforeunload', function(){
+    	    return ("<?=$this->tr('Neuložené změny budou ztraceny!')?>");
+    	});
+      $('form[name="form-article"]').submit(function(){
+          $(window).unbind('beforeunload');
       });
    });
    /* ]]> */

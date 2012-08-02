@@ -1,0 +1,5 @@
+TODO list:
+
+- renam all db colums to prefix "article_"
+- better cache support
+- add select only specific category (exclude merged)

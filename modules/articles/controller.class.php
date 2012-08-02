@@ -12,7 +12,7 @@ class Articles_Controller extends Controller {
    const PARAM_TPL_LIST = 'tpllist';
    const PARAM_TPL_DETAIL = 'tpldet';
    const PARAM_TPL_ARCHIVE = 'tplarchive';
-   
+   const PARAM_MOUNTED_CATS = 'moc';
 
    const DEFAULT_SORT = 'date';
 
@@ -38,26 +38,42 @@ class Articles_Controller extends Controller {
 
       // načtení článků
       $artModel = new Articles_Model();
-/*      
-      $showCats = array(
-            $this->category()->getId()
-            );
       
-      $externalCats = $this->category()->getParam(self::PARAM_SHOW_CATS, array());
+      
+      $externalCats = explode(';', $this->category()->getParam(self::PARAM_MOUNTED_CATS, "") );
       if(!empty($externalCats )) {
-         $showCats = array_merge($showCats, $externalCats);
+         $wCatPl = array(':pl_'.$this->category()->getId() => $this->category()->getId() );
+         foreach ($externalCats as $externalCatID) {
+            $wCatPl[':pl_'.$externalCatID] = $externalCatID;
+         }
+         
+         // načtení oprávnění k připojeným kategoriím
+         $modelCat = new Model_Category();
+         if(Auth::isAdmin()){
+            $cats = $modelCat->where(Model_Category::COLUMN_ID." IN (".implode(',', array_keys($wCatPl) ).")", $wCatPl, true)
+               ->records();
+         } else {
+            $cats = $modelCat->onlyWithAccess()
+               ->where(" AND ". Model_Category::COLUMN_ID." IN (".implode(',', array_keys($wCatPl) ).")", $wCatPl, true)
+               ->records();
+         }
+         
+         $allowedCatsIDSPL = array();
+         foreach ($cats as $c) {
+            $allowedCatsIDSPL[':pl_'.$c->{Model_Category::COLUMN_ID}] = $c->{Model_Category::COLUMN_ID};
+         }
+         
+         $mWhereString = Articles_Model::COLUMN_ID_CATEGORY.' IN ('.implode(',',array_keys($allowedCatsIDSPL)).')';
+         $mWhereBinds = $allowedCatsIDSPL;
+         
+         $artModel->joinFK(Articles_Model::COLUMN_ID_CATEGORY, array(
+               'curlkey' => Model_Category::COLUMN_URLKEY, Model_Category::COLUMN_ID, Model_Category::COLUMN_NAME 
+               ), Model_ORM::JOIN_OUTER);
+         
+      } else {
+         $mWhereString = Articles_Model::COLUMN_ID_CATEGORY.' = :idc';
+         $mWhereBinds = array('idc' => $this->category()->getId());
       }
-      
-      $catsPlaceholders = array();
-      foreach ($showCats as $id){
-         $catsPlaceholders[':cpl_'.$id] = (int)$id;
-      }
-      $mWhereString = Articles_Model::COLUMN_ID_CATEGORY." IN (".implode(',', array_keys($catsPlaceholders) ).")";
-      $mWhereBinds = $catsPlaceholders;
-*/
-      
-      $mWhereString = Articles_Model::COLUMN_ID_CATEGORY.' = :idc';
-      $mWhereBinds = array('idc' => $this->category()->getId());
       
       if($this->category()->getRights()->isControll()){
          $artModel->setSelectAllLangs(true);
@@ -236,22 +252,27 @@ class Articles_Controller extends Controller {
 
       $artM = new Articles_Model();
 
+      $whereStr = null;
+      $whereBind = array();
+      
       if($this->rights()->isControll()){
-         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc',
-            array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()));
+          $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc';
+          $whereBind = array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId());
       } else if($this->rights()->isWritable()){
-         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+         $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
-            .'AND ('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr )',
-            array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey'),
-            'idusr' => Auth::getUserId(), 'idusr2' => Auth::getUserId()));
+            .'AND ('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr )';
+         $whereBind = array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey'),
+            'idusr' => Auth::getUserId(), 'idusr2' => Auth::getUserId());
       } else {
-         $artM->where(Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+         $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND ('.Articles_Model::COLUMN_CONCEPT.' = 0 ) '
-            .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW())',
-            array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey')));
+            .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW())';
+         $whereBind = array('idc' => $this->category()->getId(),'urlkey' => $this->getRequest('urlkey'));
       }
+      $artM->where($whereStr, $whereBind);
 
+      
       $artM->joinFK(Articles_Model::COLUMN_ID_USER_LAST_EDIT, array(Model_Users::COLUMN_USERNAME), Model_ORM::JOIN_OUTER)
          ->joinFK(Articles_Model::COLUMN_ID_USER, array('usernameCreated' => Model_Users::COLUMN_USERNAME,
             'usernameName' => Model_Users::COLUMN_NAME, 'usernameSurName' => Model_Users::COLUMN_SURNAME ));
@@ -259,6 +280,32 @@ class Articles_Controller extends Controller {
 
 
       if($article == false) {
+         // try mounted cats and redirect to article
+         if( $this->category()->getParam(self::PARAM_MOUNTED_CATS, null) != null ){
+            $externalCats = explode(';', $this->category()->getParam(self::PARAM_MOUNTED_CATS, "") );
+            $eCatPl = array();
+            foreach ($externalCats as $externalCatID) {
+               $eCatPl[':pl_'.$externalCatID] = $externalCatID;
+            }
+            
+            $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey '
+               .' AND '.Articles_Model::COLUMN_ID_CATEGORY." IN(".implode(',', array_keys($eCatPl)).")";
+            $whereBind = array_merge( array('urlkey' => $this->getRequest('urlkey')) , $eCatPl );
+            
+            $artM->joinFK(Articles_Model::COLUMN_ID_CATEGORY, array(Model_Category::COLUMN_URLKEY));
+            $externalArt = $artM->where($whereStr, $whereBind)
+               ->record();
+            
+            if($externalArt != false AND !$externalArt->isNew()){
+               $this->link(true)
+                  ->category($externalArt->{Model_Category::COLUMN_URLKEY})
+                  ->route('detail')
+                  ->reload();
+               die;// :-)
+            }
+            
+         }
+         
          return false;
       }
 
@@ -640,13 +687,18 @@ class Articles_Controller extends Controller {
       }
       $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
       $artRecord->{Articles_Model::COLUMN_AUTHOR} = $form->creatorOther->getValues();
-      $artRecord->{Articles_Model::COLUMN_PRIORITY} = $form->priority->getValues();
-      if((int)$form->priority->getValues() != 0){
-         $artRecord->{Articles_Model::COLUMN_PRIORITY_END_DATE} = $form->priorityEndDate->getValues();
+      if(isset($form->priority)){
+         $artRecord->{Articles_Model::COLUMN_PRIORITY} = $form->priority->getValues();
+         if((int)$form->priority->getValues() != 0){
+            $artRecord->{Articles_Model::COLUMN_PRIORITY_END_DATE} = $form->priorityEndDate->getValues();
+         }
       }
 
       // add time
-      $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
+      $addDateTime = new DateTime();
+      if(isset($form->created_date)){
+         $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
+      } 
       $artRecord->{Articles_Model::COLUMN_ADD_TIME} = $addDateTime;
 
 
@@ -792,23 +844,25 @@ class Articles_Controller extends Controller {
       }
       
       $fGrpPublic = $form->addgroup('public', $this->tr('Parametry zveřejnění a vytvoření'));
-
-      $ePriority = new Form_Element_Select('priority', $this->tr('Priorita'));
-      $ePriority->setOptions(array(
-            $this->tr('Nízká (-1)') => -1,
-            $this->tr('Normální (0)') => 0,
-            $this->tr('Vysoká (1)') => 1,
-            $this->tr('Urgentní (2)') => 2,
-            $this->tr('Okamžitá (3)') => 3,
-            ));
-      $ePriority->setValues(0);
-      $form->addElement($ePriority, $fGrpPublic);
       
-      $ePriorityEndDate = new Form_Element_Text('priorityEndDate', $this->tr('Konec priority'));
-      $ePriorityEndDate->addValidation(new Form_Validator_Date());
-      $ePriorityEndDate->addFilter(new Form_Filter_DateTimeObj());
-      $ePriorityEndDate->setSubLabel($this->tr('Do kdy bude položka označena prioritou'));
-      $form->addElement($ePriorityEndDate, $fGrpPublic);
+      if($this->getRights()->isControll()){
+         $ePriority = new Form_Element_Select('priority', $this->tr('Priorita'));
+         $ePriority->setOptions(array(
+               $this->tr('Nízká (-1)') => -1,
+               $this->tr('Normální (0)') => 0,
+               $this->tr('Vysoká (1)') => 1,
+               $this->tr('Urgentní (2)') => 2,
+               $this->tr('Okamžitá (3)') => 3,
+               ));
+         $ePriority->setValues(0);
+         $form->addElement($ePriority, $fGrpPublic);
+      
+         $ePriorityEndDate = new Form_Element_Text('priorityEndDate', $this->tr('Konec priority'));
+         $ePriorityEndDate->addValidation(new Form_Validator_Date());
+         $ePriorityEndDate->addFilter(new Form_Filter_DateTimeObj());
+         $ePriorityEndDate->setSubLabel($this->tr('Do kdy bude položka označena prioritou'));
+         $form->addElement($ePriorityEndDate, $fGrpPublic);
+      }
       
       // pokud jsou práva pro kontrolu, přidám položku s uživateli, kterí mohou daný článek vytvořit
       if($this->category()->getRights()->isControll()){
@@ -834,18 +888,20 @@ class Articles_Controller extends Controller {
       $iConcept->setValues(false);
       $form->addElement($iConcept, $fGrpPublic);
 
-      $eCreatedDate = new Form_Element_Text('created_date', $this->tr('Datum vytvoření'));
-      $eCreatedDate->setValues(vve_date("%x"));
-      $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budousnosti, dojde k zveřejnění až v toto datum.'));
-      $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
-      $eCreatedDate->addValidation(new Form_Validator_Date());
-      $form->addElement($eCreatedDate, $fGrpPublic);
+      if($this->getRights()->isControll()){
+         $eCreatedDate = new Form_Element_Text('created_date', $this->tr('Datum vytvoření'));
+         $eCreatedDate->setValues(vve_date("%x"));
+         $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budousnosti, dojde k zveřejnění až v toto datum.'));
+         $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
+         $eCreatedDate->addValidation(new Form_Validator_Date());
+         $form->addElement($eCreatedDate, $fGrpPublic);
 
-      $eCreatedTime = new Form_Element_Text('created_time', $this->tr('Čas vytvoření'));
-      $eCreatedTime->setValues(vve_date("%H:%i"));
-      $eCreatedTime->addValidation(new Form_Validator_NotEmpty());
-      $eCreatedTime->addValidation(new Form_Validator_Time());
-      $form->addElement($eCreatedTime, $fGrpPublic);
+         $eCreatedTime = new Form_Element_Text('created_time', $this->tr('Čas vytvoření'));
+         $eCreatedTime->setValues(vve_date("%H:%i"));
+         $eCreatedTime->addValidation(new Form_Validator_NotEmpty());
+         $eCreatedTime->addValidation(new Form_Validator_Time());
+         $form->addElement($eCreatedTime, $fGrpPublic);
+      }
       
       // doplnění id
       if($article != null){
@@ -881,20 +937,25 @@ class Articles_Controller extends Controller {
          $form->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
          $form->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
          $form->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
-         $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
-         $form->created_date->setValues(vve_date('%x',$addTime));
-         $form->created_time->setValues(vve_date('%H:%i',$addTime));
+         if( isset($form->created_date) ){
+            $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
+            $form->created_date->setValues(vve_date('%x',$addTime));
+            $form->created_time->setValues(vve_date('%H:%i',$addTime));
+         }
          if(isset ($form->titleImage)){
             $form->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
          }
-         $form->creatorId->setValues($article->{Articles_Model::COLUMN_ID_USER});
+         if(isset($form->creatorId)){
+            $form->creatorId->setValues($article->{Articles_Model::COLUMN_ID_USER});
+         }
          $form->creatorOther->setValues($article->{Articles_Model::COLUMN_AUTHOR});
          $form->concept->setValues($article->{Articles_Model::COLUMN_CONCEPT});
-         $form->priority->setValues($article->{Articles_Model::COLUMN_PRIORITY});
-//          if($article->{Articles_Model::COLUMN_PRIORITY_END_DATE} != null){
-         if($article->{Articles_Model::COLUMN_PRIORITY} != 0){
-            $form->priorityEndDate->setValues(
-                  vve_date('%x', new DateTime($article->{Articles_Model::COLUMN_PRIORITY_END_DATE})));
+         if(isset($form->priority)){
+            $form->priority->setValues($article->{Articles_Model::COLUMN_PRIORITY});
+            if($article->{Articles_Model::COLUMN_PRIORITY} != 0){
+               $form->priorityEndDate->setValues(
+                     vve_date('%x', new DateTime($article->{Articles_Model::COLUMN_PRIORITY_END_DATE})));
+            }
          }
           
          // TAGY
@@ -917,7 +978,7 @@ class Articles_Controller extends Controller {
          if($form->save->getValues() == false) {
             $this->link()->route('detail')->reload();
          }
-         if($form->priority->getValues() != 0){
+         if(isset($form->priorit) && $form->priority->getValues() != 0){
             $form->priorityEndDate->addValidation(new Form_Validator_NotEmpty(
                $this->tr('Pokud je priorita nastavena, musí být zadáno také datum ukončení této priority')));
          }
@@ -1325,25 +1386,27 @@ class Articles_Controller extends Controller {
       $elemCommentsClosed->setSubLabel($this->tr('Výchozí: diskuse nejsou uzavírány'));
       $form->addElement($elemCommentsClosed, 'discussion');
 
-      /*
-      $fGrpCats = $form->addGroup('mergedCats', $this->tr('Připojené kategorie')); 
-      $elemShowCats = new Form_Element_Select('showCats', $this->tr('Zobrazit také položky z'));
-      $elemShowCats->setMultiple();
+      
+      $fGrpAdv = $form->addGroup('advanced', $this->tr('Pokročilé')); 
+      $elemMountCats = new Form_Element_Select('mountedCats', $this->tr('Připojit kategorie'));
+      $elemMountCats->setMultiple();
       
       $modelCats = new Model_Category();
-      $cats = $modelCats->where(Model_Category::COLUMN_MODULE." IN ('articles', 'news', 'articleswgal', 'photogalerymed')",
-            array())->records();
+      $cats = $modelCats
+         ->where(Model_Category::COLUMN_MODULE." IN ('articles', 'news', 'articleswgal', 'photogalerymed')", array())->records();
+      
       foreach ($cats as $cat) {
          if($cat->{Model_Category::COLUMN_ID} == $this->category()->getId()) continue;
-         $elemShowCats->setOptions(array( 
+         
+         $elemMountCats->setOptions(array( 
             $cat->{Model_Category::COLUMN_NAME}." - (ID: ".$cat->{Model_Category::COLUMN_ID}.")" => $cat->{Model_Category::COLUMN_ID}),
             true);
       }
-      if(isset($settings[self::PARAM_SHOW_CATS])) {
-         $elemShowCats->setValues($settings[self::PARAM_SHOW_CATS]);
+      if(isset($settings[self::PARAM_MOUNTED_CATS])) {
+         $elemMountCats->setValues(explode(';', $settings[self::PARAM_MOUNTED_CATS]));
       }
-      $form->addElement($elemShowCats, $fGrpCats);
-      */ 
+      $form->addElement($elemMountCats, $fGrpAdv);
+      
       
       $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každé položky tak
@@ -1370,6 +1433,9 @@ class Articles_Controller extends Controller {
          $settings[self::PARAM_TPL_LIST] = $form->tplList->getValues();
          $settings[self::PARAM_TPL_DETAIL] = $form->tplDetail->getValues();
          $settings[self::PARAM_TPL_ARCHIVE] = $form->tplArchive->getValues();
+         
+         $mCats = $form->mountedCats->getValues() == null ? array() : $form->mountedCats->getValues();
+         $settings[self::PARAM_MOUNTED_CATS] = implode(';', $mCats);
       }
    }
    

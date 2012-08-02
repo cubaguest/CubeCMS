@@ -62,7 +62,7 @@ class Articles_Model extends Model_ORM {
 
       $this->setPk(self::COLUMN_ID);
       
-      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Category', Model_Category::COLUMN_CAT_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
       $this->addForeignKey(self::COLUMN_ID_USER_LAST_EDIT, 'Model_Users', Model_Users::COLUMN_ID);
       

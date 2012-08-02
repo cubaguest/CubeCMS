@@ -64,20 +64,28 @@ echo $this->toolbox;
             $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
          }
       }
+      
+      $link = $this->link()->category($article->curlkey)
+               ->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}));
       ?>
-   <div class="main-content-list-record <?=$showClass?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+   <div class="post <?=$showClass?>">
+      <h2><a href="<?=$link?>"
             title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>&nbsp;
-         </a><span class="font-small"><?=$public?></span><?
+         </a><?
+         if($public != null){echo '<span class="font-small">'.$public.'</span>';}
          if($this->category()->getRights()->isControll()){
-            echo langsImages($article->{Articles_Model::COLUMN_URLKEY});
+            echo vve_tpl_show_text_langs($article->{Articles_Model::COLUMN_URLKEY});
          }
          ?>
       </h2>
       <div class="info info-top">
-         <?=$this->tr('Přidáno');?>: <span class="date"><?=vve_date("%x %X", $addTime)?></span>,
-         <?=$this->tr('aktualizováno');?>: <span class="date-edit"><?=vve_date("%x %X", $editTime)?></span>,
-         <?=$this->tr('uživatelem');?>: <span class="author"><?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+         <span class="name"><?=$this->tr('Přidáno');?>:</span> <span class="date"><?=vve_date("%x %X", $addTime)?></span>,
+         <span class="name"><?=$this->tr('aktualizováno');?>:</span> <span class="date-edit"><?=vve_date("%x %X", $editTime)?></span>,
+         <span class="name"><?=$this->tr('uživatelem');?>:</span> <span class="author"><?=$article->{Model_Users::COLUMN_USERNAME}?></span><?
+         if($article->{Articles_Model::COLUMN_ID_CATEGORY} != $this->category()->getId()){
+            ?>, <span class="name"><?=$this->tr('kategorie');?>:</span> <a href="<?=$this->link(true)->category($article->curlkey)?>"
+               title="<?ps($article->{Model_Category::COLUMN_NAME})?>"><?ps($article->{Model_Category::COLUMN_NAME})?></a><?
+         }?>
       </div>
       <? if($image != null) {?><div class="title-image"><?=$image?></div><?}?>
       <div class="text">
@@ -103,8 +111,7 @@ echo $this->toolbox;
       <?}?>
       <div class="showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model::COLUMN_SHOWED}?>&times;</div>
       <div class="link-more">
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-            title="<?=$this->tr("více o").' '.$article->{Articles_Model::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
+         <a href="<?=$link?>" title="<?=$this->tr("více o").' '.$article->{Articles_Model::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
       </div>
       <hr class="reseter" />
    </div>
@@ -118,7 +125,7 @@ echo $this->toolbox;
 <?
    echo $this->scrollComp;
 } else {
-   echo ($this->tr('Není vložen žádný článek'));
+   echo '<div class="text">'.$this->tr('Není vložen žádný článek').'</div>';
 }
 ?>
 </div>
