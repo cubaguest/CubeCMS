@@ -17,11 +17,11 @@ class Text_Panel extends Panel {
 	
 	public function panelView() {
       if($this->template()->text != null){
-         $this->template()->addFile('tpl://'.$this->category()->getParam(self::PARAM_TPL_PANEL, "text:panel.phtml"));
+         $this->template()->addFile('tpl://'.$this->panelObj()->getParam(self::PARAM_TPL_PANEL, "text:panel.phtml"));
       }
 	}
 
-   public static function settingsController(&$settings,Form &$form) {
+   public function settings(&$settings,Form &$form) {
       // šablony
       $componentTpls = new Component_ViewTpl();
       $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);

@@ -109,7 +109,7 @@ class Text_View extends View {
       Template_Module::setEdit(true);
       $this->h1 = sprintf($this->tr('úprava textu panelu kategorie "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
-      $this->setTinyMCE($this->form->text, 'simple');
+      $this->setTinyMCE($this->form->text, $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced'));
       $this->template()->addFile("tpl://text:textedit.phtml");
       Template_Navigation::addItem($this->tr('Úprava obsahu panelu'), $this->link());
    }
