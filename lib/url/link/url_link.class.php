@@ -168,7 +168,7 @@ class Url_Link {
     * Metoda nastavuje název a id kategorie
     * @param string -- klíč kategorie
     *
-    * @return Links -- objket Links
+    * @return Url_Link -- objket Url_Link
     */
    public function category($catKey = null) {
       if($catKey != null) {
@@ -193,7 +193,7 @@ class Url_Link {
     * @param string -- název cesty
     * @param array -- pole s parametry pojmenovanými podle cesty
     *
-    * @return Links -- objket Links
+    * @return Url_Link -- objket Url_Link
     */
 //   public function route($name = null, $params = array()) {
 //      return $this;
@@ -203,7 +203,7 @@ class Url_Link {
     * Metoda nastavuje typ media
     * @param string -- jméno media
     *
-    * @return Links -- objket Links
+    * @return Url_Link -- objket Url_Link
     */
    public function media($media = null) {
       $this->mediaType = $media;
@@ -214,7 +214,7 @@ class Url_Link {
     * Metoda nastavuje název lokalizace
     * @param string -- jméno jazyka (action např. cs, en, de atd.)
     *
-    * @return Links -- objket Links
+    * @return Url_Link -- objket Url_Link
     */
    public function lang($lang = null) {
       $this->lang = $lang;
@@ -246,7 +246,7 @@ class Url_Link {
     * @param mixed $name -- (option) název parametru, který se má odstranit nebo
     * objekt UrlParam. Pokud zůstane nezadán, odstraní se všechny parametry
     *
-    * @return Links
+    * @return Url_Link
     */
    public function rmParam($name = null) {
       if(is_array($name)){
@@ -356,7 +356,7 @@ class Url_Link {
 
    /**
     * Metoda odstraní všechny parametry v odkazu
-    * @return Links -- sám sebe
+    * @return Url_Link -- sám sebe
     */
    public function clear($withOutCategory = false) {
       $this->rmParam();
