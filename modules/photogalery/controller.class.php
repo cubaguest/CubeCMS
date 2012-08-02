@@ -563,7 +563,7 @@ class Photogalery_Controller extends Controller {
 
       $elemW = new Form_Element_Text('medium_width', 'Šířka obrázku (px)');
       $elemW->addValidation(new Form_Validator_IsNumber());
-      $elemW->setSubLabel('Výchozí: <span class="param_small">'.self::MEDIUM_WIDTH.'</span>px');
+      $elemW->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_W.'</span>px');
       $form->addElement($elemW, 'images');
       if(isset($settings['medium_width'])) {
          $form->medium_width->setValues($settings['medium_width']);
@@ -571,7 +571,7 @@ class Photogalery_Controller extends Controller {
 
       $elemH = new Form_Element_Text('medium_height', 'Výška obrázku (px)');
       $elemH->addValidation(new Form_Validator_IsNumber());
-      $elemH->setSubLabel('Výchozí: <span class="param_small">'.self::MEDIUM_HEIGHT.'</span>px');
+      $elemH->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_H.'</span>px');
       $form->addElement($elemH, 'images');
       if(isset($settings['medium_height'])) {
          $form->medium_height->setValues($settings['medium_height']);
