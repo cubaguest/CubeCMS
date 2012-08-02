@@ -1519,11 +1519,7 @@ class Model_ORM extends Model {
       } else if ($this->getAllLangs == true) { // více jazyčné sloupce
          $cols = array();
          foreach (Locales::getAppLangs() as $lang) {
-            if($alias != null){
-               array_push($cols, '`' . $tbPrefix . '`.`' . $columnName . '_' . $lang . '` AS '.$alias.'_'.$lang);
-            } else {
-               array_push($cols, '`' . $tbPrefix . '`.`' . $columnName . '_' . $lang . '`');
-            }
+            array_push($cols, '`' . $tbPrefix . '`.`' . $columnName . '_' . $lang . '` '.($alias != null ? 'AS '.$alias.'_'.$lang : null));
          }
          $colString = implode(',', $cols);
       } else { // pouze aktuální jazykový sloupec
