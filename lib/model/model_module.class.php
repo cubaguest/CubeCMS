@@ -10,13 +10,27 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s moduly
  */
 
-class Model_Module extends Model_PDO {
+class Model_Module extends Model_ORM {
    const DB_TABLE = 'modules_instaled';
 
+   const COLUMN_ID = 'id_module';
    const COLUMN_NAME = 'name';
    const COLUMN_VERSION_MAJOR = 'version_major';
    const COLUMN_VERSION_MINOR = 'version_minor';
 
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_mods');
+   
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(30)', 'nn' => true, 'index' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_VERSION_MAJOR, array('datatype' => 'tinyint(3)', 'nn' => true, 
+            'pdoparam' => PDO::PARAM_INT,'default' => 1));
+      $this->addColumn(self::COLUMN_VERSION_MINOR, array('datatype' => 'tinyint(3)', 'nn' => true, 
+            'pdoparam' => PDO::PARAM_INT,'default' => 0));
+   
+      $this->setPk(self::COLUMN_ID);
+   }
+   
 /**
  * Metoda načte moduly
  * @return array -- pole s moduly
