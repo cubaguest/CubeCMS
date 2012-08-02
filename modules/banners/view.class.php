@@ -51,7 +51,7 @@ class Banners_View extends View {
       $tpl->dir = Url_Request::getBaseWebDir()."data/".Banners_Controller::DATA_DIR."/";
 
       // parametry boxu
-      $boxes = Template_Face::moduleParam('banners', 'positions');
+      $boxes = Face::getParamStatic('positions', 'banners', array());
       if(!isset($boxes[$boxName])){
          return null;
       }

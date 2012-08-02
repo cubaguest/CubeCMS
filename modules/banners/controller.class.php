@@ -206,7 +206,7 @@ class Banners_Controller extends Controller {
    
    protected static function getBoxes() 
    {
-      $positions = Template_Face::moduleParam('banners', 'positions', array()); 
+      $positions = Face::getParamStatic('positions', 'banners', array()); 
       if(!empty($positions)){
          foreach ($positions as &$box) {
             $box = array_merge(array('random' => false, 'limit' => 0, 'banners' => array()), $box );

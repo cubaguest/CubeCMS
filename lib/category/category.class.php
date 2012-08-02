@@ -137,8 +137,8 @@ class Category extends Category_Core {
     * @return string -- parametr
     */
    public function getGlobalParam($param, $defaultParam = null) {
-      if(Template_Face::moduleParam($this->getModule()->getName(), $param) ){
-         return Template_Face::moduleParam($this->getModule()->getName(), $param);
+      if(Face::getParamStatic($param, $this->getModule()->getName()) != null ){
+         return Face::getParamStatic($param, $this->getModule()->getName());
       } else if(defined('VVE_MODULE_'.  strtoupper($this->getModule()->getName()."_".$param))) {
          return constant('VVE_MODULE_'.  strtoupper($this->getModule()->getName()."_".$param));
       } else {

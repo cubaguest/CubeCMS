@@ -522,7 +522,6 @@ class Template extends TrObject {
    public static function factory() {
       self::setFace(VVE_TEMPLATE_FACE);
       self::$browser = new Browser();
-      Template_Face::factory();
    }
    
    /**
