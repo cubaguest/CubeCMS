@@ -88,8 +88,8 @@ class Configuration_Controller extends Controller {
       foreach (array_merge($configsRecordsGlobal, $configsRecordsLocal) as $record) {
          if(!isset ($groups[$record->{Model_Config::COLUMN_ID_GROUP}])){
             $groups[$record->{Model_Config::COLUMN_ID_GROUP}] = array(
-               'name' => $record->{Model_ConfigGroups::COLUMN_NAME},
-               'desc' => $record->{Model_ConfigGroups::COLUMN_DESC},
+               'name' => $record->gname,
+               'desc' => $record->gdesc,
             );
             $options[$record->{Model_Config::COLUMN_ID_GROUP}] = array();
          }
