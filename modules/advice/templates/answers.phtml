@@ -6,6 +6,7 @@ $jq = new JsPlugin_JQuery();
 $this->addJsPlugin(new JsPlugin_JQuery());
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
+$this->addFile("css://style.css");
 
 ?>
 <h1><?echo $t;?></h1>
@@ -36,12 +37,12 @@ $this->addJsPlugin($jsJqGrid);
    </div>
    <div id="table-questions-pager"></div>
    <br />
-   <div id="question-info">
-      
-   </div>
    <p>
       <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Přejít zpět na úvodní stranu poradny')?>">&Lt; <?=$this->tr('Zpět na úvodní stranu')?></a>
    </p>
+   <div id="question-info">
+      
+   </div>
 </div>
 
 <script type="text/javascript">
@@ -92,6 +93,20 @@ $this->addJsPlugin($jsJqGrid);
          input += 'disabled="disabled" '
       }
       return input+'/>';
+   }
+   
+   function detectColor(color){
+      var d = 0;
+      // Counting the perceptive luminance - human eye favors green color... 
+      var a = 1 - ( 
+         0.299 * parseInt((color).substring(0,2),16) 
+         + 0.587 * parseInt((color).substring(2,4),16) 
+         + 0.114 * parseInt((color).substring(4,6),16) )/255;
+      if (a < 0.5){
+         return "#000000"; // bright colors - black font
+      } else{
+         return "#ffffff"; // dark colors - white font
+      }  
    }
    
    $(document).ready(function(){
@@ -193,11 +208,26 @@ $this->addJsPlugin($jsJqGrid);
          });
          
          $('.jqgrow').live('click', function(){
-            var $cell = $('td:nth-child(2)',this);
-            $('#question-info').html("").css("background-color","transparent")
+            var $info = $('#question-info');
+            var id = $(this).attr('id');
+            $info
+               .html("").css({ "background-color" : "transparent", color : "black" }) // reset colors
                .append($('<h2></h2>').text('<?=$this->tr('Informace o dotazu')?>'))
-               .append($('td:nth-child(2)',this).text())
-               .css("background-color", "#"+$('td:nth-child(6) option:selected',this).val() )   ;
+               .append($('<h3></h3>').text('<?=$this->tr('Dotaz')?>'))
+               .append($('<p></p>').html( $('td:nth-child(2)',this).text()) );
+             
+            var color = $('td:nth-child(6) option:selected',this).val();
+            if(color != "0"){
+               $info.css({
+                  "background-color" : "#"+color,
+                  color : detectColor(color)
+               });
+            }
+             
+            if($('td:nth-child(4) span',this).attr("title") != null){
+               $info.append($('<h3></h3>').text('<?=$this->tr('Odpověď')?>'))
+               .append($('<p></p>').html( $('td:nth-child(4) span',this).attr("title")));
+            }   
          });
          
          

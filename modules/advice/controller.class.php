@@ -295,7 +295,9 @@ class Advice_Controller extends Controller {
       }
       
       $form->addElement($elemCats, $fGrpCats);
-      $form->addElement($elemDrugs, $fGrpCats);
+      if($this->category()->getParam(self::PARAM_ALLOW_DRUGS, false)){
+         $form->addElement($elemDrugs, $fGrpCats);
+      }
       
       $fGrpOther = $form->addGroup('info_a_public', $this->tr('Zveřejnění a upozornění'));
       
@@ -371,14 +373,15 @@ class Advice_Controller extends Controller {
                $modelConn->save($record);
             }
          }
-         
-         $selDrugs = $form->drugs->getValues();
-         if(!empty ($selDrugs)){
-            foreach ($selDrugs as $value) {
-               $record = $modelConn->newRecord();
-               $record->{Advice_Model_Connections::COLUMN_ID_QUESTION} = $question->{Advice_Model::COLUMN_ID};
-               $record->{Advice_Model_Connections::COLUMN_ID_CAT} = $value;
-               $modelConn->save($record);
+         if(isset ($form->drugs)){
+            $selDrugs = $form->drugs->getValues();
+            if(!empty ($selDrugs)){
+               foreach ($selDrugs as $value) {
+                  $record = $modelConn->newRecord();
+                  $record->{Advice_Model_Connections::COLUMN_ID_QUESTION} = $question->{Advice_Model::COLUMN_ID};
+                  $record->{Advice_Model_Connections::COLUMN_ID_CAT} = $value;
+                  $modelConn->save($record);
+               }
             }
          }
          

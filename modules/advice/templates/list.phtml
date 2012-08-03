@@ -25,47 +25,64 @@ function renderQuestion($question, $tr, $link){
 ?>
 <h1><?echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
-   <a href="<?=$this->link()->route('addQuestion')?>" title="<?=$this->tr('Vložit dotaz')?>"><?=$this->tr('Vložit dotaz')?></a><br />
-   <?if(!isset($_GET['as']) && !isset($_GET['ad']) && !isset($_GET['ac'])){?>
-   <a class="button-show-search-box" href="<?=$this->link()?>#prad-search-box" title="<?=$this->tr('Zobrazit filtraci')?>"><?=$this->tr('Zobrazit filtraci')?><br /><br /></a>
-   <?}?>
+   <div class="main-content-text">
+      <ul>
+         <li><a href="<?=$this->link()->route('addQuestion')?>" title="<?=$this->tr('Vložit dotaz')?>"><?=$this->tr('Vložit dotaz')?></a></li>
+         <?if(!isset($_GET['as']) && !isset($_GET['ad']) && !isset($_GET['ac'])){?>
+         <li><a class="button-show-search-box" href="<?=$this->link()?>#prad-search-box" title="<?=$this->tr('Zobrazit filtraci')?>"><?=$this->tr('Zobrazit filtraci')?></a></li>
+         <?}?>
+         <li><a href="<?=$this->link()?>#faq" id="button-pradvice-show-common"><?=$this->tr("Zobrazit často kladené dotazy")?></a></li>
+      </ul>
+   </div>
+   
    <div id="prad-search-box">
       <h2><?=$this->tr('Nastavení filtru')?></h2>
       <form action="" method="get">
-         <p>
-            <label for="prad-search-cat"><?=$this->tr('Dle tématu')?>:</label>
-            <select id="prad-search-cat" name="ac">
-               <option value="0"><?=$this->tr('vše')?></option>
-               <? 
-               $cid = isset($_GET['ac']) ? $_GET['ac'] : 0;
-               foreach ($this->cats as $cat) {?>
-                  <option value="<?=$cat->{Advice_Model_Categories::COLUMN_ID}?>" 
-                     <?if($cid == $cat->{Advice_Model_Categories::COLUMN_ID}){ echo 'selected="selected"';}?>><?=$cat->{Advice_Model_Categories::COLUMN_NAME}?></option>
-               <?}?>
-            </select><br />
+         <table>
+            <tr>
+               <th><label for="prad-search-cat"><?=$this->tr('Dle tématu')?>:</label></th>
+               <td>
+                  <select id="prad-search-cat" name="ac">
+                     <option value="0"><?=$this->tr('vše')?></option>
+                     <? 
+                     $cid = isset($_GET['ac']) ? $_GET['ac'] : 0;
+                     foreach ($this->cats as $cat) {?>
+                     <option value="<?=$cat->{Advice_Model_Categories::COLUMN_ID}?>" 
+                        <?if($cid == $cat->{Advice_Model_Categories::COLUMN_ID}){ echo 'selected="selected"';}?>><?=$cat->{Advice_Model_Categories::COLUMN_NAME}?></option>
+                     <?}?>
+                  </select>
+               </td>
+            </tr>
             <?if($this->category()->getParam(Advice_Controller::PARAM_ALLOW_DRUGS, false)){?>
-            <label for="prad-search-drug"><?=$this->tr('Dle drogy')?>:</label>
-            <select id="prad-search-drug" name="ad">
-               <option value="0"><?=$this->tr('vše')?></option>
-               <?
-               $did = isset($_GET['ad']) ? $_GET['ad'] : 0;
-               foreach ($this->drugs as $cat) {?>
-                  <option value="<?=$cat->{Advice_Model_Categories::COLUMN_ID}?>" 
-                     <?if($did == $cat->{Advice_Model_Categories::COLUMN_ID}){ echo 'selected="selected"';}?>><?=$cat->{Advice_Model_Categories::COLUMN_NAME}?></option>
-               <?}?>
-            </select><br />
+            <tr>
+               <th><label for="prad-search-drug"><?=$this->tr('Dle drogy')?>:</label></th>
+               <td>
+                  <select id="prad-search-drug" name="ad">
+                     <option value="0"><?=$this->tr('vše')?></option>
+                     <?
+                     $did = isset($_GET['ad']) ? $_GET['ad'] : 0;
+                     foreach ($this->drugs as $cat) {?>
+                        <option value="<?=$cat->{Advice_Model_Categories::COLUMN_ID}?>" 
+                           <?if($did == $cat->{Advice_Model_Categories::COLUMN_ID}){ echo 'selected="selected"';}?>><?=$cat->{Advice_Model_Categories::COLUMN_NAME}?></option>
+                     <?}?>
+                  </select>
+               </td>
+            </tr>
             <?}?>
-            <label for="prad-search-text"><?=$this->tr('Obsahuje text')?>:</label>
-            <input id="prad-search-text" type="text" name="as" value="<?echo isset($_GET['as']) ? $_GET['as'] : null;?>" />
-            <input type="submit" value="<?=$this->tr('Filtrovat')?>" />
-            <br />
-         </p>
+            <tr>
+               <th><label for="prad-search-text"><?=$this->tr('Obsahuje text')?>:</label></th>
+               <td><input id="prad-search-text" type="text" name="as" value="<?echo isset($_GET['as']) ? $_GET['as'] : null;?>" /></td>
+            </tr>
+            <tr>
+               <td></td>
+               <td><input type="submit" value="<?=$this->tr('Filtrovat')?>" /></td>
+            </tr>
+         </table>
       </form>
-      <br />
    </div>
+   <br />
    <?
    if($this->questionsCommon != false){?>
-   <a href="<?=$this->link()?>#faq" id="button-pradvice-show-common"><?=$this->tr("Zobrazit často kladené dotazy")?><br /><br /></a>
    <div id="pradvice-questions-common">
       <h2><?=$this->tr('Často kladené dotazy')?></h2>
       <?foreach ($this->questionsCommon as $question) {
@@ -95,6 +112,27 @@ $this->addJsPlugin(new JsPlugin_JQuery());
       $('#pradvice-questions-common').hide();
       <?if(!isset($_GET['as']) && !isset($_GET['ad']) && !isset($_GET['ac'])){?>
          $('#prad-search-box').hide();
+      <?} else if(isset($_GET['as']) && strlen($_GET['as']) >= 3) {?>
+         //create a search string
+         var phrase = ('<?=$_GET['as']?>').replace(/^\s+|\s+$/g, "");          
+         phrase = phrase.replace(/\s+/g, "|");
+         //append the rest of the expression
+         phrase = ["\\b(", phrase, ")"].join("");
+         $(".pradvice-item p").each(function(i, v) {
+            //replace any matches
+            var block = $(v);
+            block.html(
+               block.text().replace(
+                  new RegExp(phrase, "gi"), 
+                  function(match) {
+                     return ["<span class='highlight'>", match, "</span>"].join("");
+               })
+            );
+         });
+         $(".pradvice-item .answer:has(span.highlight)").each(function(){
+            $('.button-show-answer', $(this).parent() ).hide();
+            $(this).show();
+         });
       <?}?>
       
       $('.pradvice-item').click(function(){
@@ -103,13 +141,13 @@ $this->addJsPlugin(new JsPlugin_JQuery());
       });
       
       $('#button-pradvice-show-common').click(function(){
-         $(this).hide();
+         $(this).parent().hide();
          $('#pradvice-questions-common').show();
       });
       
       $('.button-show-search-box').click(function(e){
          e.preventDefault();
-         $(this).hide();
+         $(this).parent().hide();
          $('#prad-search-box').show();
       });
       

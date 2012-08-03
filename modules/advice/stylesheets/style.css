@@ -48,7 +48,19 @@ input.sort_drugs_name_class, input.sort_cats_name_class
    font-style: italic;
    font-size: 90%;
 }
-
+.pradvice-item .highlight {
+   font-weight: bold;
+   color: red;
+}
+/* answers*/
+#question-info {
+   margin-top: 1em;
+   padding: 5px;
+}
+#prad-search-box th,
+#prad-search-box td {
+   padding-right: 5px;
+}
 /* stats */
 .ui-stats .ui-widget-header,
 .ui-stats .ui-widget-content {
