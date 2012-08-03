@@ -541,22 +541,7 @@ class Forms_Controller extends Controller {
       $mail->setSubject($formRec->{Forms_Model::COLUMN_NAME});
       
       if($msg == null){
-         $msg = 
-            '<html>'
-            . ' <head>'
-            .'<style>
-               body { font-family: Verdana, sans-serif; font-size: 0.8em; color:#484848; }
-               h1, h2, h3 { font-family: "Trebuchet MS", Verdana, sans-serif; margin: 0px; }
-               h1 { font-size: 1.2em; }
-               h2, h3 { font-size: 1.1em; }
-               a, a:link, a:visited { color: #2A5685;}
-               a:hover, a:active { color: #c61a1a; }
-               hr { width: 100%; height: 1px; background: #ccc; border: 0; }
-               .footer { font-size: 0.8em; font-style: italic; }
-               </style>'   
-            . '</head>'
-            . ' <body>'
-            . '<h1>'.$tr->tr('Ze stránek {WEB_LINK} byl odeslán formulář "{FORM_NAME}"').'</h1>'
+         $msg = '<h1>'.$tr->tr('Ze stránek {WEB_LINK} byl odeslán formulář "{FORM_NAME}"').'</h1>'
             . '<p>'.$tr->tr('Stránka: {PAGE_INFO}.').'</p>'
             . '<p>'.$tr->tr('Odesláno: <strong>{DATE} {TIME}</strong>.').'</p>'
             . '<hr />'
@@ -565,11 +550,7 @@ class Forms_Controller extends Controller {
             . '{DATA}'
             . ' </table></p>'
             . '<hr />'
-            . '<p>{FOOTER_INFO}</p>'
-            . '<p class="footer">'. $tr->tr('Odesláno z IP adresy: {IP_ADDRESS}.').'<br />'
-            . '<strong><em>{GENERATE_WARNING}</em></strong></p>'
-            . ' </body>'
-            . '</html>';
+            . '<p>{FOOTER_INFO}</p>';
       }
       
       $data = null;
@@ -639,7 +620,7 @@ class Forms_Controller extends Controller {
       }
       
       $mail->setReplacements($replacements);   
-      $mail->setContent($msg);
+      $mail->setContent( Email::getBaseHtmlMail($msg) );
       
       if($sendFromEmail != null){
          $mail->setFrom($sendFromEmail);
