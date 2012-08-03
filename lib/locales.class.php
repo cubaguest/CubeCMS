@@ -408,7 +408,7 @@ class Locales extends TrObject {
    }
 
    private function bindTextDomain($moduleDomain) {
-      if(!in_array($moduleDomain, self::$bindedDomains)){
+      if($moduleDomain != null && !in_array($moduleDomain, self::$bindedDomains)){
          bindtextdomain($moduleDomain, AppCore::getAppLibDir() . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
          . DIRECTORY_SEPARATOR . $moduleDomain . DIRECTORY_SEPARATOR. self::LOCALES_DIR);
          array_push(self::$bindedDomains, $moduleDomain);
