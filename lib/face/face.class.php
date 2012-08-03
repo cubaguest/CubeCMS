@@ -1,5 +1,6 @@
 <?php
 class Face {
+   const BASE_DIR = "faces";
    
    protected static $current = null;
 
@@ -105,5 +106,22 @@ class Face {
       return self::$current;
    }
    
+   /**
+    * Metoda vrací URL adresu vzhledu
+    * @return string
+    */
+   public function getURL()
+   {
+      return Url_Request::getBaseWebDir().self::BASE_DIR."/".$this->getName()."/";
+   }
+   
+   /**
+    * Matoda vací adresář ke vzhledu
+    * @return string
+    */
+   public function getDir() 
+   {
+      return AppCore::getAppWebDir().self::BASE_DIR.DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR;
+   }
    
 }
