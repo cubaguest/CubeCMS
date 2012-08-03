@@ -16,8 +16,11 @@ class Users_Routes extends Routes {
       $this->addRoute('editUser', 'edit-user.php', 'editUser', 'edit-user.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('blockUser', 'block-user.php', 'blockUser', 'block-user.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('editGroup', 'edit-group.php', 'editGroup', 'edit-group.php', 'XHR_Respond_VVEAPI');
+      $this->addRoute('checkUserName', 'check-username.php', 'checkUserName', 'check-username.php', 'XHR_Respond_VVEAPI');
 
       $this->addRoute('groups', "groups", 'groups','groups/');
+      $this->addRoute('users', "users", 'users','users/');
+      $this->addRoute('createUser', "create-user", 'createUser','create-user/');
 	}
 }
 

@@ -11,7 +11,7 @@ class Users_Controller extends Controller {
     */
    const PASSWORD_MIN_LENGHT = 5;
 
-   public function mainController() {
+   public function usersController() {
       $this->checkControllRights();
 
       $this->view()->groups = $this->getAllowedGroups();
@@ -112,11 +112,11 @@ class Users_Controller extends Controller {
       // out
       foreach ($groups as $grp) {
          array_push($jqGrid->respond()->rows, array('id' => $grp->{Model_Groups::COLUMN_ID},
-             'cell' => array(
-                 $grp->{Model_Groups::COLUMN_ID},
-                 $grp->{Model_Groups::COLUMN_NAME},
-                 $grp->{Model_Groups::COLUMN_LABEL},
-                 $grp->{Model_Groups::COLUMN_IS_ADMIN},
+         'cell' => array(
+               $grp->{Model_Groups::COLUMN_ID},
+               $grp->{Model_Groups::COLUMN_NAME},
+               $grp->{Model_Groups::COLUMN_LABEL},
+               $grp->{Model_Groups::COLUMN_IS_ADMIN},
                  $grp->domains,
                  )));
       }
@@ -317,6 +317,189 @@ GROUP BY `t_grp`.`id_group`*/
       }
    }
 
+   public function mainController() 
+   {
+      $this->checkControllRights();
+      $mUsers = new Model_Users();
+      
+      $form = new Form('create_user_');
+      
+      $fGrp = $form->addGroup('base', $this->tr('Základní informace o uživateli'));
+      
+      $eName = new Form_Element_Text('name', $this->tr('Jméno'));
+      $form->addElement($eName, $fGrp);
+      
+      $eSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
+      $eSurName->addValidation(new Form_Validator_NotEmpty());
+      $form->addElement($eSurName, $fGrp);
+      
+      $eMail = new Form_Element_Text('mail', $this->tr('E-mail'));
+      $eMail->addValidation(new Form_Validator_NotEmpty());
+      $eMail->addValidation(new Form_Validator_Email());
+      $form->addElement($eMail, $fGrp);
+      
+      $eUserName = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
+      $eUserName->setSubLabel($this->tr('Pokud není zadáno, je generováno automaticky z přijmění.'));
+      $form->addElement($eUserName, $fGrp);
+      $eUserPassword = new Form_Element_Text('password', $this->tr('Heslo'));
+      $eUserPassword->addValidation(new Form_Validator_Length(self::PASSWORD_MIN_LENGHT));
+      $eUserPassword->setSubLabel($this->tr('Pokud není zadáno, je generováno automaticky.'));
+      $form->addElement($eUserPassword, $fGrp);
+      
+      $eGroup = new Form_Element_Select('group', $this->tr('Skupina'));
+      $mGroups = new Model_Groups();
+      $groups = $mGroups->groupsForThisWeb(true)->records();
+      foreach ($groups as $grp) {
+         $name = ( $grp->{Model_Groups::COLUMN_LABEL} == null ? $grp->{Model_Groups::COLUMN_NAME} : 
+            $grp->{Model_Groups::COLUMN_LABEL}." (".$grp->{Model_Groups::COLUMN_NAME}.")" )
+            ." (ID:".$grp->{Model_Groups::COLUMN_ID}.")";
+         $grp->{Model_Groups::COLUMN_IS_ADMIN} ? $name .= " - admin" : null;
+         
+         $eGroup->setOptions(array( $name => $grp->{Model_Groups::COLUMN_ID} ), true);
+      }
+      $form->addElement($eGroup, $fGrp);
+
+      $fGrpNotify = $form->addGroup('notify', $this->tr('Upozornění'));
+      
+      $eSendMail = new Form_Element_Checkbox('sendmail', $this->tr('Odeslat informace'));
+      $eSendMail->setSubLabel($this->tr('Odeslat uživateli informace o účtu na zadaný e-mail?'));
+      $eSendMail->setValues(true);
+      $form->addElement($eSendMail, $fGrpNotify);
+      
+      $eNotifiMessage = new Form_Element_TextArea('notifyMessage', $this->tr('Zpráva pro uživatele'));
+      $form->addElement($eNotifiMessage, $fGrpNotify);
+      
+      $eSave = new Form_Element_Submit('save', $this->tr('Vytvořit'));
+      $form->addElement($eSave);
+      
+      // kontrola username
+      if($form->isSend() && $form->username->getValues() != null){
+         $user = $mUsers
+            ->where(Model_Users::COLUMN_USERNAME." = :uname", array('uname' => $form->username->getValues()))
+            ->record();
+         
+         if($user != false){
+            $form->username->setError($this->tr('Toto uživatelské jméno je již obsazeno.'));
+         }
+      }
+      
+      if($form->isValid()){
+         $newUser = $mUsers->newRecord();
+         
+         $newUser->{Model_Users::COLUMN_NAME} = $form->name->getValues();
+         $newUser->{Model_Users::COLUMN_SURNAME} = $form->surname->getValues();
+         
+         $username = $form->username->getValues();
+         if($username == null){
+            $username = $this->generateUserName($newUser->{Model_Users::COLUMN_SURNAME});
+         }
+         $newUser->{Model_Users::COLUMN_USERNAME} = $username;
+         $newUser->{Model_Users::COLUMN_MAIL} = $form->mail->getValues();
+         
+         $pass = $form->password->getValues();
+         if($pass == null){
+            $pass = $this->generatePassword(self::PASSWORD_MIN_LENGHT);
+         }
+         $newUser->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($pass);
+         
+         $newUser->{Model_Users::COLUMN_GROUP_ID} = $form->group->getValues();
+         
+         $mUsers->save($newUser);
+         
+         if($form->sendmail->getValues() == true){
+            $this->sendNewUserMail($newUser, $pass, $form->notifyMessage->getValues());
+         }
+         
+         $this->infoMsg()->addMessage($this->tr('Uživatel byl vytvořen'));
+         $this->link()->reload();
+      }
+      
+      $this->view()->form = $form;
+   }
+   
+   public function checkUserNameController()
+   {
+      $this->view()->ok = false;
+      
+      $modelU = new Model_Users();
+      $user = $modelU->where(Model_Users::COLUMN_USERNAME." = :uname", array('uname' => $this->getRequestParam('uname')))->record();
+      
+      if($user == false || $user->isNew()){
+         $this->view()->ok = true;
+      }
+   }
+   
+   private function generateUserName($surname) 
+   {
+      $username = vve_to_ascii($surname);
+      $m = new Model_Users();
+      
+      $step = null;
+      do {
+         $c = $m->where(Model_Users::COLUMN_USERNAME." = :uname", array('uname' => $username.$step))->count();
+         $step++;
+      } while ($c > 0);
+      
+      return $username;
+   }
+   
+   private function sendNewUserMail($userRecord, $pass, $msg) 
+   {
+      $link = new Url_Link();
+      $mail = new Email(true);
+      $tr = new Translator_Module('forms');
+      
+      $mail->setSubject( sprintf( $this->tr('Založení nového uživatelského účtu na %s'), VVE_WEB_NAME ) );
+      
+      $data = null;
+      
+      function _getMailTbRow($col1, $col2) {
+         $r = '<tr>';
+         $r .= '<th style="text-align: left;">'.$col1.'</th>';
+         $r .= '<td>'.nl2br($col2).'</td>';
+         $r .= '</tr>';
+         return $r;
+      }
+      
+      $data .= _getMailTbRow($this->tr('Jméno a přijmení'), $userRecord->{Model_Users::COLUMN_NAME}." ".$userRecord->{Model_Users::COLUMN_SURNAME});
+      $data .= _getMailTbRow($this->tr('Uživatelské jméno'), $userRecord->{Model_Users::COLUMN_USERNAME});
+      $data .= _getMailTbRow($this->tr('E-mail'), $userRecord->{Model_Users::COLUMN_MAIL});
+      $data .= _getMailTbRow($this->tr('Heslo'), $pass);
+      
+      $replacements = array(
+         '{WEB_LINK}' => '<a href="'.$link->clear(true).'">{WEB_NAME}</a>',
+         '{WEB_NAME}' => VVE_WEB_NAME,
+         '{DATA}' => $data,
+         '{MSG}' => $msg,
+      );
+      
+      $mail->setReplacements($replacements);   
+      
+      $msg =
+         '<h1>'.$tr->tr('Byl Vám zřízen nový uživatelský přístup do stránek {WEB_LINK}').'</h1>'
+         . '<h2>'.$tr->tr('Informace o Vašem novém účtu').': </h2>'
+         . '<p><table cellpadding="5" border="1">'
+         . '{DATA}'
+         . ' </table></p>'
+         . '<hr />'
+         . '<p>{MSG}</p>';
+      
+      $mail->setContent( Email::getBaseHtmlMail($msg) );
+      
+      $mail->addAddress($userRecord->{Model_Users::COLUMN_MAIL});
+      $mail->send();
+   }
+   
+   private function generatePassword($length = 8) {
+      $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      $count = mb_strlen($chars);
+      for ($i = 0, $result = ''; $i < $length; $i++) {
+         $index = rand(0, $count - 1);
+         $result .= mb_substr($chars, $index, 1);
+      }
+      return $result;
+   }
+   
    public static function userExist($username) {
       $modelU = new Model_Users();
 

@@ -5,8 +5,13 @@
  */
 
 class Users_View extends View {
-	public function mainView() {
+	public function usersView() {
       $this->template()->addTplFile('users.phtml');
+      Template_Module::setEdit(true);
+   }
+   
+	public function mainView() {
+      $this->template()->addTplFile('create_user.phtml');
       Template_Module::setEdit(true);
    }
 

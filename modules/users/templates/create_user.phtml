@@ -1,0 +1,86 @@
+<?
+// do titulku
+$h = $this->tr('Vytvoření nového uživatelského účtu');
+$this->addPageTitle($h);
+$this->addJsPlugin(New JsPlugin_JQuery());
+// donastavení formuláře
+// $this->form->password->html()->addContent('test');
+?>
+<h1><?=$h?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+<div class="main-content-form-edit">
+   <?
+   echo($this->form);
+   ?>
+   <script type="text/javascript">
+   function password(length) {
+	   var iteration = 0;
+	   var password = "";
+	   var randomNumber;
+	   while(iteration < length){
+	     randomNumber = (Math.floor((Math.random() * 100)) % 94) + 33;
+        if ((randomNumber >=33) && (randomNumber <=47)) { continue; }
+	     if ((randomNumber >=58) && (randomNumber <=64)) { continue; }
+	     if ((randomNumber >=91) && (randomNumber <=96)) { continue; }
+	     if ((randomNumber >=123) && (randomNumber <=126)) { continue; }
+	     iteration++;
+	     password += String.fromCharCode(randomNumber);
+	   }
+	   return password;
+	 }
+   
+   $(document).ready(function(){
+	   var $usernameStatus = $('<span></span>').attr('id', 'usernameStatus') ;
+	   // create buttons
+	   $('input[name="create_user_password"]').after(
+			   $(' <a></a>').attr({ href : '<?=$this->link()?>#', id : 'buttonGeneratePasswd'})
+			   .append(' ').append($('<img />').attr('src', 'images/icons/arrow_refresh.png') ) 
+		);
+		
+	   $('input[name="create_user_username"]').after($usernameStatus);
+
+	   // create password
+	   $('#buttonGeneratePasswd').click(function(e){
+		   e.preventDefault();
+		   var $i = $(this).prev();
+		   $i.val(password(<?=Users_Controller::PASSWORD_MIN_LENGHT?>) );
+		});
+	   // generate username
+	   if( $('input[name="create_user_username"]').val() == "") {
+		   $('input[name="create_user_surname"]').change();
+	   }
+
+	   $('input[name="create_user_surname"]').change(function(e){
+		   var uName = str2url($(this).val());
+		   $('input[name="create_user_username"]').val(uName);
+		   $('input[name="create_user_username"]').keyup();
+		});
+
+		// check username
+		$('input[name="create_user_username"]').keyup(function(){
+			var cur = $(this).val();
+			$.ajax({
+				url : '<?=$this->link()->route('checkUserName')?>',
+				data : { uname : cur},
+				type: "POST",
+				success : function(data){
+					if(data.ok && data.ok == true) {
+						$usernameStatus.html(
+								$('<img />').attr('src', 'images/icons/accept.png')
+						);
+						$('input[name="create_user_username"]').removeClass('form-error');
+					} else if(data.ok == false) {
+						$usernameStatus.html(null);
+						$usernameStatus.append(' ');
+						$usernameStatus.append($('<img />').attr('src', 'images/icons/exclamation.png'));
+						$usernameStatus.append(' <?=$this->tr('Obsazeno')?>');
+						$('input[name="create_user_username"]').addClass('form-error');
+					} else {
+						vveShowMessages(data);
+					}
+				}
+			});
+		});
+	});
+   </script>
+</div>
