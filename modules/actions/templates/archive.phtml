@@ -17,7 +17,7 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
    <div class="main-content-list" id="actionsArchiveList">
       <? $prevYear = null;
       while ($row = $actions->fetch()) {
-         $date = new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START});
+         $date = new DateTime($row->{Actions_Model::COLUMN_DATE_START});
          $year = $date->format("Y");
          if($year == $prevYear) continue;
          $prevYear = $year;?>
@@ -31,13 +31,13 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                $prevMounth = null;
                while ($rowY = $curAct->fetch()) {
                   $class = null;
-                  if(!$rowY->{Actions_Model_Detail::COLUMN_PUBLIC}) {
+                  if(!$rowY->{Actions_Model::COLUMN_PUBLIC}) {
                      $class = 'nonPublicAction';
                   }
-                  $dateStartO = new DateTime($rowY->{Actions_Model_Detail::COLUMN_DATE_START});
+                  $dateStartO = new DateTime($rowY->{Actions_Model::COLUMN_DATE_START});
                   $dateStop = null;
                   if($rowY->{Actions_Model_Detail::COLUMN_DATE_STOP} != null){
-                     $dateStopO = new DateTime($rowY->{Actions_Model_Detail::COLUMN_DATE_STOP});
+                     $dateStopO = new DateTime($rowY->{Actions_Model::COLUMN_DATE_STOP});
                      $dateStop = vve_date("%x", $dateStopO);
                   }
                   $startDate = vve_date("%x", $dateStartO);
@@ -63,9 +63,9 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                <td>
                   &nbsp;&nbsp;
                   <a href="<?=$this->link()->route('detail',
-                                   array('urlkey' => $rowY->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-                     title="<?=$rowY->{Articles_Model_Detail::COLUMN_NAME}?>"
-                     ><?print ($rowY->{Articles_Model_Detail::COLUMN_NAME});?></a>
+                                   array('urlkey' => $rowY->{Articles_Model::COLUMN_URLKEY}))?>"
+                     title="<?=$rowY->{Articles_Model::COLUMN_NAME}?>"
+                     ><?print ($rowY->{Articles_Model::COLUMN_NAME});?></a>
                </td>
             </tr>
                   <?}?>

@@ -99,13 +99,10 @@ echo $this->toolbox; // tolbox pro přidání
      &laquo;&nbsp;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"
       ><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;<a
       href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&nbsp;&raquo;
-      <br/>
-      <br/> 
    <?}
-   
    // rss ikony
-   $feeds = new Component_Feed();
-   $feeds->setConfig('feedLink', $this->link()->clear());
-   echo $feeds;
+//    $feeds = new Component_Feed();
+//    $feeds->setConfig('feedLink', $this->link()->clear());
+//    echo $feeds;
    ?>
 </div>

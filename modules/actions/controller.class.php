@@ -137,7 +137,7 @@ class Actions_Controller extends Controller {
          $curDate->setTime(0, 0, 0);
          if($this->view()->action->{Actions_Model::COLUMN_FORM_SHOW_TO} == null 
             || $date >= $curDate){
-            Forms_Controller::dynamicForm($this->view()->action->{Actions_Model::COLUMN_FORM}, $this->view(), 
+            $this->view()->dForm = Forms_Controller::dynamicForm($this->view()->action->{Actions_Model::COLUMN_FORM}, 
                array( 
                   'pagename'=> $this->view()->action->{Actions_Model::COLUMN_NAME},
                   ));
@@ -158,12 +158,16 @@ class Actions_Controller extends Controller {
 
    protected function deleteActionData($action) {
       // obrázek akce
-      if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-         $fileObj = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
-                 $this->category()->getModule()->getDataDir()
-                         .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
-         $fileObj->delete();
-      }
+//       if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
+//          $fileObj = new Filesystem_File($action->{Actions_Model_Detail::COLUMN_IMAGE},
+//                  $this->category()->getModule()->getDataDir()
+//                          .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
+//          try {
+//             $fileObj->delete();
+//          } catch (Exception $e) {
+//             $this->log('Soubor '.$fileObj->getName(true)." se nepodařilo smazat.");
+//          }
+//       }
       // smazání adresáře
       $dir = $this->category()->getModule()->getDataDir().$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()];
       if(file_exists($dir) AND is_dir($dir)) {
@@ -470,7 +474,7 @@ class Actions_Controller extends Controller {
       $form->addElement($eFile, $fGrpOther);
 
       if(is_dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR)){
-         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png}", GLOB_BRACE);
+         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png,JPG,GIF,PNG}", GLOB_BRACE);
          //print each file name
          if(!empty ($images)){
             $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené obrázky'));

@@ -42,12 +42,28 @@ class Actions_Panel extends Panel {
             $this->template()->count = $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS);
             break;
          case 'list':
-         default:
+         case 'listfeatured':
             $model = new Actions_Model_List();
             $actions = $model->getFeaturedActions($this->category()->getId());
             $this->template()->addTplFile('panel.phtml', 'actions');
             $this->template()->actions = $actions->fetchAll();
             if ($this->template()->actions === false) return false;
+            $this->template()->count = $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS);
+            break;
+         case 'listactual':
+         default:
+            $model = new Actions_Model();
+            $actions = $model
+               ->actualOnly($this->category()->getId())
+               /* Tady asi zakomponovat řazení podle deltadays nebo do modelu přidat metodu na sloupec */
+               ->order(array(
+                     Actions_Model::COLUMN_DATE_START => Model_ORM::ORDER_ASC,
+                     Actions_Model::COLUMN_TIME => Model_ORM::ORDER_ASC,
+                     ))
+               ->records();
+            $this->template()->addFile('tpl://actions:panel.phtml');
+            if ($actions === false) return false;
+            $this->template()->actions = $actions;
             $this->template()->count = $this->panelObj()->getParam('num', self::DEFAULT_NUM_ACTIONS);
             break;
       }
@@ -56,7 +72,12 @@ class Actions_Panel extends Panel {
 
    protected function settings(&$settings, Form &$form) {
       $elemType = new Form_Element_Select('type', 'Typ panelu');
-      $types = array('Seznam nadcházejících událostí' => 'list', 'Aktuální události' => 'actual', 'Nadcházející události' => 'featured', 'Uplynulé události' => 'past');
+      $types = array(
+            'Seznam aktuálních událostí' => 'listactual', 
+            'Seznam nadcházejících událostí' => 'listfeatured', 
+            'Aktuální událost' => 'actual', 
+            'Nadcházející událost' => 'featured', 
+            'Seznam uplynulých událostí' => 'past');
       $elemType->setOptions($types);
       $elemType->setSubLabel('Výchozí: '.array_search(self::DEFAULT_TYPE, $types).'');
       $form->addElement($elemType,'basic');

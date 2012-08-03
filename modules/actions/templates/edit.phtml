@@ -3,8 +3,8 @@ $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
    $this->addPageTitle($this->tr('úprava události'));
-   $this->addPageTitle($this->catName);
-   $h1 = $this->tr('úprava události').' '.$this->catName;
+   $this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
+   $h1 = sprintf( $this->tr('úprava události "%s"'), $this->action->{Actions_Model::COLUMN_NAME});
 } else {
    $this->addPageTitle($this->tr('přidání události'));
    $h1 = $this->tr('přidání události');

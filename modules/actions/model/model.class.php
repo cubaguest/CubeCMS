@@ -109,7 +109,7 @@ class Actions_Model extends Model_ORM {
          (
             (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL )
             OR (".self::COLUMN_DATE_START." < CURDATE() AND ".self::COLUMN_DATE_STOP." IS NOT NULL AND ".self::COLUMN_DATE_STOP." >= CURDATE() )
-            OR (".self::COLUMN_DATE_START." > CURDATE() AND ".self::COLUMN_TIME." IS NULL )
+            OR (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NULL )
          )", 
          array("idc" => $idc));
    }

@@ -49,7 +49,7 @@ if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
    </div>
    <hr class="reseter" />
    <?
-   $this->includeFile("tpl://forms:snipshet.phtml");
+   echo $this->dForm;
    
    if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
       $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));

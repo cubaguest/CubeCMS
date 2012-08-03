@@ -21,7 +21,7 @@ class Actions_Model_Detail extends Model_PDO {
    const COLUMN_URLKEY = 'action_urlkey';
    const COLUMN_ID_USER = 'id_user';
    const COLUMN_ID_CAT = 'id_category';
-   const COLUMN_ID = 'action_id_action';
+   const COLUMN_ID = 'id_action';
    const COLUMN_PUBLIC = 'action_public';
    const COLUMN_DATE_START = 'action_start_date';
    const COLUMN_DATE_STOP = 'action_stop_date';

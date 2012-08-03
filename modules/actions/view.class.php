@@ -42,6 +42,7 @@ class Actions_View extends View {
       }
       $this->addMetaTags($this->action);
       $this->template()->addTplFile("detail.phtml");
+      Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link());
    }
 
    protected function createDetailToolbox() {
@@ -69,6 +70,7 @@ class Actions_View extends View {
 
    public function archiveView() {
       $this->template()->addTplFile("archive.phtml");
+      Template_Navigation::addItem($this->tr('Archiv'), $this->link());
    }
 
    private function addTinyMCE() {
@@ -116,6 +118,7 @@ class Actions_View extends View {
     */
    public function addView() {
       $this->editView();
+      Template_Navigation::addItem($this->tr('Přidání události'), $this->link());
    }
 
    public function showDataView() {
@@ -248,6 +251,10 @@ class Actions_View extends View {
       $this->addTinyMCE();
       $this->template()->addFile('tpl://actions:edit.phtml');
       Template_Module::setEdit(true);
+      if($this->action != null){
+         Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link()->route('detail'));
+         Template_Navigation::addItem($this->tr('Úprava události'), $this->link());
+      }
    }
 
    public function featuredListView() {
