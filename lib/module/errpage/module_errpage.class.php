@@ -12,18 +12,19 @@ class Module_ErrPage extends Module_Core {
    protected static $code = 404;
 
    public function runController() {
+      $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'neznámá';
       switch ($this->getCode()) {
          case 403:
             Template_Output::addHeader("HTTP/1.0 403 Forbidden");
             if(VVE_DEBUG_LEVEL > 0){
-               Log::msg('Neoprávněný přístup na stránku: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
+               Log::msg('Neoprávněný přístup na stránku: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']." ze stránky: ".$referer, __CLASS__);
             }
             break;
          case 404:
          default:
             Template_Output::addHeader("HTTP/1.0 404 Not Found");
             if(VVE_DEBUG_LEVEL > 0){
-               Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], __CLASS__);
+               Log::msg('Nenalezení stránky: '.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].", přístup ze stránky: ".$referer, __CLASS__);
             }
             break;
       }
