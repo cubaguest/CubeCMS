@@ -36,7 +36,7 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                   }
                   $dateStartO = new DateTime($rowY->{Actions_Model::COLUMN_DATE_START});
                   $dateStop = null;
-                  if($rowY->{Actions_Model_Detail::COLUMN_DATE_STOP} != null){
+                  if($rowY->{Actions_Model::COLUMN_DATE_STOP} != null){
                      $dateStopO = new DateTime($rowY->{Actions_Model::COLUMN_DATE_STOP});
                      $dateStop = vve_date("%x", $dateStopO);
                   }
@@ -54,18 +54,15 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                      <?}?>
             <tr class="mounth_<?=$mounthNum?>" style="display: none;">
                <td><span style="padding-left: 1em;"><?=$startDate?></span></td>
-               <td>
-                        <?if($dateStop !== null) {
-                           print ("&nbsp;&mdash;&nbsp;");
-                           print ($dateStop);
-                        }?>
+               <td><?if($dateStop !== null) {
+                           print ("&nbsp;&mdash;&nbsp;".$dateStop);
+                }?>
                </td>
                <td>
                   &nbsp;&nbsp;
-                  <a href="<?=$this->link()->route('detail',
-                                   array('urlkey' => $rowY->{Articles_Model::COLUMN_URLKEY}))?>"
-                     title="<?=$rowY->{Articles_Model::COLUMN_NAME}?>"
-                     ><?print ($rowY->{Articles_Model::COLUMN_NAME});?></a>
+                  <a href="<?=$this->link()->route('detail', array('urlkey' => $rowY->{Actions_Model::COLUMN_URLKEY}))?>"
+                     title="<?=$rowY->{Actions_Model::COLUMN_NAME}?>"
+                     ><?ps($rowY->{Actions_Model::COLUMN_NAME});?></a>
                </td>
             </tr>
                   <?}?>
