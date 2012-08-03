@@ -164,7 +164,7 @@ class PressReports_Controller extends Controller {
          if(is_file($this->module()->getDataDir().$report->{PressReports_Model::COLUMN_FILE})){
             @unlink($this->module()->getDataDir().$report->{PressReports_Model::COLUMN_FILE});
          }
-         $model->delete($fileRec);
+         $model->delete($report);
          $this->infoMsg()->addMessage($this->tr('Tisková zpráva byla smazána'));
          $this->link()->route()->reload();
       }
