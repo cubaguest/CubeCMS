@@ -332,5 +332,62 @@ class Email {
    {
       $this->decoratorVars = $replacements;
    }
+
+   /**
+    * Metoda vrací aktuální podobu HTML mailu. Ovnitř je přepsána konstanta {CONTENT} na zadaný kontent
+    * @param string $content -- obsah e-mailu
+    * @return string
+    */
+   public static function getBaseHtmlMail($content) 
+   {
+      $fileLang = Face::getCurrent()->getDir()."mail".DIRECTORY_SEPARATOR."mail_base_".Locales::getLang().".html";
+      $file = Face::getCurrent()->getDir()."mail".DIRECTORY_SEPARATOR."mail_base.html";
+      $fileCore = AppCore::getAppLibDir().AppCore::ENGINE_TEMPLATE_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base.html";
+      
+      if(is_file($fileLang)){
+         $cnt = file_get_contents($fileLang);
+      } else if(is_file($file)){
+         $cnt = file_get_contents($file);
+      } else if(is_file($fileCore)){
+         $cnt = file_get_contents($fileCore);
+      } else {
+         $cnt =
+         '<html>'
+         . ' <head>'
+         .'<style>
+         body { font-family: Verdana, sans-serif; font-size: 0.8em; color:#484848; }
+         h1, h2, h3 { font-family: "Trebuchet MS", Verdana, sans-serif; margin: 0px; }
+         h1 { font-size: 1.2em; }
+         h2, h3 { font-size: 1.1em; }
+         a, a:link, a:visited { color: #2A5685;}
+         a:hover, a:active { color: #c61a1a; }
+         hr { width: 100%; height: 1px; background: #ccc; border: 0; }
+         .footer { font-size: 0.8em; font-style: italic; }
+         </style>'
+         . '</head>'
+         . ' <body>{CONTENT}'
+         . '<p class="footer">Odesláno {DATETIME} ze stránek {WEBSITE}, odeslal klient: {CLIENTINFO}.</p>'
+         . '<p class="footer"><strong><em>Tento e-mail je generován automaticky.</em></strong></p>'
+         . ' </body>'
+         . '</html>';
+      }
+      
+      $cnt = str_replace(
+            array(
+                  '{CONTENT}',
+                  '{DATETIME}',
+                  '{WEBSITE}',
+                  '{CLIENTINFO}',
+                  ), 
+            array(
+                  $content,
+                  vve_date("%X %x"),
+                  '<a href="'.Url_Link::getMainWebDir().'" title="'.VVE_WEB_NAME.'">'.VVE_WEB_NAME.'</a>',
+                  ( ( isset( $_SERVER['REMOTE_HOST']) && $_SERVER['REMOTE_HOST'] != $_SERVER['REMOTE_ADDRESS'] ) ? 
+                        $_SERVER['REMOTE_HOST']." (".$_SERVER['REMOTE_ADDR'].")" : $_SERVER['REMOTE_ADDR']),
+                  ), $cnt);
+      
+      return $cnt;
+   }
 }
 ?>
