@@ -72,15 +72,15 @@ class Banners_View extends View {
       $banners = $model->records();
       $tpl->banners = $banners;
       
-      $tplFile = Template::faceDir().'modules'.DIRECTORY_SEPARATOR.'banners'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$boxName.'.phtml';
+      $tplPath = Template::faceDir().'modules'.DIRECTORY_SEPARATOR.'banners'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
       // kontrola jestli exituje šablona pro daný box, jinak se použije výchozí
-      if(is_file($tplFile)){
+      if(isset($boxes[$boxName]['tpl']) && is_file($tplPath.$boxes[$boxName]['tpl'])){
+         $tpl->addFile('tpl://banners:'.$boxes[$boxName]['tpl']);
+      } else if(is_file($tplPath.$boxName.'.phtml')){
          $tpl->addFile('tpl://banners:'.$boxName.'.phtml');
       } else {
          $tpl->addFile('tpl://banners:banners.phtml');
       }
-      
-      
       return $tpl;
    }
 }

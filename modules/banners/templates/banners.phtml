@@ -6,7 +6,7 @@ foreach ($this->banners as $banner) {
    // co je to za soubor ?
    if(pathinfo($banner->{Banners_Model::COLUMN_FILE}, PATHINFO_EXTENSION) == 'swf'){
       $flashUrl = $this->dir.$banner->{Banners_Model::COLUMN_FILE}."?"
-              .http_build_query( array( 'clickthru' => $linkClick, 'clicktag' => $linkClick ));
+              .http_build_query( array( 'clickthru' => $linkClick, 'clickTAG' => $linkClick ));
       echo vve_tpl_flash($flashUrl, 200, 100);
    } else {
       ?>
