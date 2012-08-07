@@ -111,18 +111,26 @@ abstract class Controller extends TrObject {
          $link->category($this->category()->getUrlKey());
       }
       $this->link = $link;
-      // locales
-      $this->setTranslator(new Translator_Module($this->moduleName));
-      // pokud se jedná o zděděný kontroler tak nasatvíme na locales děděného kontroleru
-      if(get_parent_class($this) != 'Controller'){
-         $this->translator()->apppendDomain(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
-         $this->locale = new Locales(strtolower(substr(get_parent_class($this), 0, strpos(get_parent_class($this),'_'))));
-         $this->localeDomain = strtolower($this->moduleName);
-      } else {
-         $this->locale = new Locales(strtolower($this->moduleName));
-         $this->localeDomain = strtolower($this->moduleName);
+      // pokud se jedná o zděděný kontroler tak načíst všechny překlady děděných modulů
+      $class = get_class($this);
+      $modulesTrs = array();
+      while ($class != 'Controller') {
+         $modulesTrs[] = strtolower( substr($class, 0, -11)); // remove _Controller word
+         $class = get_parent_class($class);
       }
-
+      $modulesTrs = array_reverse($modulesTrs);
+      
+      foreach ($modulesTrs as $m) {
+         if($this->translator instanceof Translator_Module){
+            $this->translator()->apppendDomain($m);
+         } else {
+            $this->setTranslator(new Translator_Module($m));
+         }
+      }
+            
+      $this->localeDomain = strtolower($this->moduleName);
+      $this->locale = new Locales(strtolower($this->moduleName));
+      
       //	Vytvoření objektu pohledu
       if($view !== null){
          $this->viewObj = $view;

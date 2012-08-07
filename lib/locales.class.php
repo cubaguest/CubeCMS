@@ -101,12 +101,14 @@ class Locales extends TrObject {
    /**
     * Doména modulu
     * @var string
+    * @deprecated
     */
    private $moduleDomain = null;
 
    /**
     * Pole s importovanými doménami překladu
     * @var array
+    * @deprecated
     */
    private static $bindedDomains = array();
 
@@ -251,6 +253,7 @@ class Locales extends TrObject {
 //         throw new DomainException(sprintf($tr->tr('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
          trigger_error(sprintf($tr->tr('Nepodporované Locales %s.'), self::getLocale(self::getLang())));
       }
+      /* DEPRECATED */
       bindtextdomain(self::GETTEXT_DEFAULT_DOMAIN, AppCore::getAppLibDir().self::GETTEXT_DEFAULT_LOCALES_DIR);
       textdomain(self::GETTEXT_DEFAULT_DOMAIN);
    }
@@ -381,15 +384,30 @@ class Locales extends TrObject {
       $this->bindTextDomain($moduleDomain);
    }
 
+   /**
+    * 
+    * @param unknown_type $domain
+    * @deprecated - používat Translator
+    */
    public function setDomain($domain){
       $this->bindTextDomain($domain);
       $this->moduleDomain = $domain;
    }
 
+   /**
+    *
+    * @param unknown_type $domain
+    * @deprecated - používat Translator
+    */
    public function _($message, $domain = null) {
       return $this->gettext($message, $domain);
    }
 
+   /**
+    *
+    * @param unknown_type $domain
+    * @deprecated - používat Translator
+    */
    public function gettext($message, $domain = null) {
       if($domain === null){
          return dgettext($this->moduleDomain, $message);
@@ -398,7 +416,11 @@ class Locales extends TrObject {
       }
    }
 
-
+   /**
+    *
+    * @param unknown_type $domain
+    * @deprecated - používat Translator
+    */
    public function ngettext($message1, $message2, $int, $domain = null) {
       if($domain === null){
          return dngettext($this->moduleDomain, $message1, $message2, $int);
@@ -407,6 +429,11 @@ class Locales extends TrObject {
       }
    }
 
+   /**
+    *
+    * @param unknown_type $domain
+    * @deprecated - používat Translator
+    */
    private function bindTextDomain($moduleDomain) {
       if($moduleDomain != null && !in_array($moduleDomain, self::$bindedDomains)){
          bindtextdomain($moduleDomain, AppCore::getAppLibDir() . DIRECTORY_SEPARATOR . AppCore::MODULES_DIR
