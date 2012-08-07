@@ -103,7 +103,7 @@ echo $this->toolbox;
          $printArray = array();
          foreach ($this->articlesTags[$idA] as $tag) {
             $printArray[] = '<a href="'.($this->link()->clear()->param(Articles_Controller::GET_TAG_PARAM, $tag) )
-               .'" title="'.sprintf( $this->tr('zobraziz položky se štítkem %s'), $tag ).'">'.$tag.'</a>';
+               .'" title="'.sprintf( $this->tr('zobrazit položky se štítkem %s'), $tag ).'">'.$tag.'</a>';
          }
          echo implode(', ', $printArray);
          ?>

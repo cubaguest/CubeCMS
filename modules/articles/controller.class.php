@@ -143,7 +143,8 @@ class Articles_Controller extends Controller {
             break;
       }
 
-      $artModel->joinFK(Articles_Model::COLUMN_ID_USER, array(Model_Users::COLUMN_USERNAME));
+      $artModel->joinFK(Articles_Model::COLUMN_ID_USER, array(
+            Model_Users::COLUMN_USERNAME, 'usernameName' => Model_Users::COLUMN_NAME, 'usernameSurName' => Model_Users::COLUMN_SURNAME));
       if($scrollComponent instanceof Component_Scroll){
          $artModel->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
@@ -313,7 +314,7 @@ class Articles_Controller extends Controller {
          $article->{Model_Users::COLUMN_USERNAME} = $article->usernameCreated;
       }
 
-      $this->view()->article=$article;
+      $this->view()->article = $article;
       // přičtení zobrazení pokud není admin
       if($this->rights()->isControll() == false AND $article->{Articles_Model::COLUMN_ID_USER} != Auth::getUserId()){
          $article->{Articles_Model::COLUMN_SHOWED} = $article->{Articles_Model::COLUMN_SHOWED}+1;
@@ -415,6 +416,14 @@ class Articles_Controller extends Controller {
          $tags[] = $tag->{Articles_Model_Tags::COLUMN_NAME};
       }
       $this->view()->tags = $tags;
+      
+      $modelUsers = new Model_Users();
+      $this->view()->creator = $modelUsers->record($article->{Articles_Model::COLUMN_ID_USER});
+      if($article->{Articles_Model::COLUMN_ID_USER} == $article->{Articles_Model::COLUMN_ID_USER_LAST_EDIT}){
+         $this->view()->editor = $this->view()->creator;
+      } else {
+         $this->view()->editor = $modelUsers->record($article->{Articles_Model::COLUMN_ID_USER_LAST_EDIT});
+      }
    }
 
    /**
@@ -678,13 +687,12 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_DESCRIPTION} = $form->metaDesc->getValues();
       $artRecord->{Articles_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
       
-      if($artRecord->getPk() == null){
-         if($form->haveElement('creatorId')){
-            $artRecord->{Articles_Model::COLUMN_ID_USER} = $form->creatorId->getValues();
-         } else {
-            $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
-         }
+      if($form->haveElement('creatorId')){
+         $artRecord->{Articles_Model::COLUMN_ID_USER} = $form->creatorId->getValues();
+      } else {
+         $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
       }
+      
       $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
       $artRecord->{Articles_Model::COLUMN_AUTHOR} = $form->creatorOther->getValues();
       if(isset($form->priority)){
@@ -891,7 +899,7 @@ class Articles_Controller extends Controller {
       if($this->getRights()->isControll()){
          $eCreatedDate = new Form_Element_Text('created_date', $this->tr('Datum vytvoření'));
          $eCreatedDate->setValues(vve_date("%x"));
-         $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budousnosti, dojde k zveřejnění až v toto datum.'));
+         $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budoucnosti, dojde k zveřejnění až v toto datum.'));
          $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
          $eCreatedDate->addValidation(new Form_Validator_Date());
          $form->addElement($eCreatedDate, $fGrpPublic);
