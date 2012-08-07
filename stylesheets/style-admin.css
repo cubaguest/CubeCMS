@@ -271,9 +271,9 @@ a.button-open-title-image-galery {margin-left: 10px;}
    background-color: white;
    -moz-border-radius: 3px;
    border-radius: 3px;
-   -moz-box-shadow:    0px 0px 5px #ccc;
-   -webkit-box-shadow: 0px 0px 5px #ccc;
-   box-shadow:         0px 0px 5px #ccc;
+   -moz-box-shadow:    0px 0px 5px #666666;
+   -webkit-box-shadow: 0px 0px 5px #666666;
+   box-shadow:         0px 0px 5px #666666;
    height: 90%;
 	overflow: auto;
 }
@@ -291,7 +291,8 @@ a.button-open-title-image-galery {margin-left: 10px;}
    font-weight: bold;
    border-bottom: 1px solid #666666;
    line-height: 18px;
-   background: transparent url('../images/icons/help.png') 3px 5px no-repeat ;
+   background: #666666 url('../images/icons/help.png') 3px 5px no-repeat ;
+   color: white;
 }
 #module-help-box .content {
    padding: 5px;
