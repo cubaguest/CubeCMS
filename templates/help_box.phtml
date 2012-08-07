@@ -1,0 +1,47 @@
+<? 
+$thin = (isset($_COOKIE['cube_cms_helpbox']) && $_COOKIE['cube_cms_helpbox'] == 0) ? true : false;
+
+?>
+<div id="module-help-box" class="<?echo $thin ? "thin" : null ?>">
+<div class="label"><?=$this->tr('Nápověda')?></div>
+<a href="<?=$this->link()?>#hide-help" title="<? echo $thin ? $this->tr('Otevřít') : $this->tr('Schovat')?>" id="button-toggle-helpbox"
+   ><img src="<? echo $thin ? 'images/icons/help.png' : 'images/icons/collapse.gif'?>" alt="-"/></a>
+<div class="content"><?=$this->content?></div>
+<? 
+$jq = new JsPlugin_JQuery();
+$this->addJsPlugin($jq);
+?>
+<script type="text/javascript">
+   $(document).ready(function(){
+	   var $hbox = $('#module-help-box');
+	   var baseW = 150;
+
+      $hbox.mouseenter(function(){
+    	      $(this).width(baseW+150);
+    	   }).mouseleave(function(){
+    		   $(this).width(baseW);
+         }); 
+	   
+	   
+	   $('#button-toggle-helpbox').click(function(e){
+		   e.preventDefault();
+		   if($hbox.hasClass('thin')){
+			   $hbox.removeClass('thin');
+			   $('img', this).attr('src', 'images/icons/collapse.gif');
+			   document.cookie="cube_cms_helpbox=-1"; 
+		   } else {
+			   document.cookie="cube_cms_helpbox=0"; 
+			   $hbox.addClass('thin');
+			   $('img', this).attr('src', 'images/icons/help.png');
+		   }
+	   });
+
+	   function readWidth() {
+		   var re = new RegExp('[; ]cube_cms_helpbox=([^\\s;]*)');
+		   var sMatch = (' '+document.cookie).match(re);
+		   if (sMatch) return parseInt( unescape(sMatch[1]) );
+		   return -1;
+		}
+	});
+</script>
+</div>

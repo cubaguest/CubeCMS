@@ -262,19 +262,46 @@ a.button-open-title-image-galery {margin-left: 10px;}
 
 #module-help-box {
    position: fixed;
+   color: black;
    top: 30px;
    right: 5px;
    border: 1px solid #666666; 
-   opacity: 0.9;
    width: 150px;
-   padding: 5px;
    color: black;
-   background-color: #eeeeee;
-   -moz-border-radius: 5px;
-   border-radius: 5px;
+   background-color: white;
+   -moz-border-radius: 3px;
+   border-radius: 3px;
+   -moz-box-shadow:    0px 0px 5px #ccc;
+   -webkit-box-shadow: 0px 0px 5px #ccc;
+   box-shadow:         0px 0px 5px #ccc;
+   height: 90%;
+	overflow: auto;
 }
-#module-help-box h2 {
-   font-size: 12px;
+#module-help-box.thin {
+	width: 22px !important;
+	height: 22px !important;
+}
+#module-help-box.thin .label,
+#module-help-box.thin .content {
+	display: none;
+}
+#module-help-box .label {
+   padding: 5px 5px 5px 22px;
+   font-size: 14px;
+   font-weight: bold;
+   border-bottom: 1px solid #666666;
+   line-height: 18px;
+   background: transparent url('../images/icons/help.png') 3px 5px no-repeat ;
+}
+#module-help-box .content {
+   padding: 5px;
+   font-size: 80%;
+}
+#module-help-box #button-toggle-helpbox {
+	position: absolute;
+	right: 3px;
+	top: 3px;
+	line-height: 0;
 }
    
 ul.module-tool-buttons { margin: 0; padding: 0 0 10px 0; }

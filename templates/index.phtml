@@ -113,7 +113,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          </div><!-- headwrap -->
          <div id="colswrap">
             <div id="col1wrap" class="column">
-               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit() AND !empty($this->panels['right'])) echo " col1pad_plusright";?>">
+               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit()) echo " col1pad_plusright";?>">
                   <?
                   
                   $this->includeTpl("messages.phtml", true);
@@ -154,6 +154,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             if(!Template_Module::isEdit()){?>
             <div id="col3wrap" class="column">
                <div id="col3pad">
+                  <?echo Banners_View::getBanners('right')?>
                   <?
                   if(!empty($this->panels['right'])) {
                      foreach ($this->panels['right'] as $panelR) {?>
@@ -171,6 +172,9 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          </div><!-- colswrap -->
 
          <div class="reseter">&nbsp;</div>
+         <div>
+            <?echo Banners_View::getBanners('bottom')?>
+         </div>
          <div id="footwrap">
             <?
             if(!empty($this->panels['bottom'])) {
@@ -214,14 +218,9 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
             /* ]]> */
          </script>
       <?}?>
-      <?/*if(Category::getSelectedCategory()->getRights()->isWritable()){?>
-      <div id="module-help-box">
-         <h2><?=$this->tr('Nápověda')?></h2>
-         <div id="module-help">
-            
-         </div>
-      </div>
-      <?}?>
-      <?var_dump($this->module);*/?>
+      <?if(Category::getSelectedCategory()->getRights()->isWritable()){
+         $help = new Template_Help($this->moduleAction, Category::getSelectedCategory()->getModule());
+         echo $help;      
+      }?>
    </body>
 </html>
