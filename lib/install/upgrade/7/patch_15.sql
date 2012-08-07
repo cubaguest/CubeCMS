@@ -7,6 +7,7 @@ VALUES
 /* END_UPDATE */
 
 -- tabulky banneru
+INSERT INTO `{PREFIX}modules_instaled` (`name`, `version_major`, `version_minor`) VALUES ('banners', 1, 0);
 CREATE TABLE IF NOT EXISTS `{PREFIX}banners` (
   `id_banner` int(11) NOT NULL AUTO_INCREMENT,
   `banner_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
