@@ -8,6 +8,7 @@ class Users_View extends View {
 	public function usersView() {
       $this->template()->addTplFile('users.phtml');
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Uživatelé'), $this->link(), null, null, null, true);
    }
    
 	public function mainView() {
@@ -18,6 +19,7 @@ class Users_View extends View {
 	public function groupsView() {
       $this->template()->addTplFile('groups.phtml');
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Skupiny'), $this->link(), null, null, null, true);
    }
    
    public function usersListView(){
