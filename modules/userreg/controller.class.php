@@ -5,6 +5,7 @@ class UserReg_Controller extends Controller {
    const PARAM_TARGET_ID_GROUP = 'target_id_grp';
    const PARAM_CREATE_USER_NOW = 'create_now';
    const PARAM_REG_LINK_EXPIRE = 'reg_link_expire';
+   const PARAM_PASSWORD_MIN_LEN = 'pml';
 
    const DEFAULT_REG_LINK_EXPIRE = 24;
 
@@ -15,16 +16,10 @@ class UserReg_Controller extends Controller {
    const TEXT_KEY_MAIL_REG = 'mail_reg';
    const TEXT_KEY_WELCOME = 'welcome';
 
-   /**
-    * Kontroler pro zobrazení novinek
-    */
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
       $modelUsers = new Model_Users();
-
-      $model = new UserReg_Model_Queue();
-      $model->clearExpired($this->category()->getId(), $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE));
 
       // načtení textů
       $modelText = new Text_Model();
@@ -61,21 +56,17 @@ class UserReg_Controller extends Controller {
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $formReg->addElement($elemName, $formGrpContact);
 
-      $elemName = new Form_Element_Text('surname', $this->tr('Přijmení'));
-      $elemName->addValidation(new Form_Validator_NotEmpty());
-      $formReg->addElement($elemName, $formGrpContact);
+      $elemSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
+      $elemSurName->addValidation(new Form_Validator_NotEmpty());
+      $formReg->addElement($elemSurName, $formGrpContact);
 
       $elemMail = new Form_Element_Text('mail', $this->tr('E-mail'));
       $elemMail->addValidation(new Form_Validator_NotEmpty());
       $elemMail->addValidation(new Form_Validator_Email());
       $formReg->addElement($elemMail, $formGrpContact);
 
-      $elemPhone = new Form_Element_Text('phone', $this->tr('Telefon'));
-      $elemPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK, $this->tr('Špatně zadané telefonní číslo')));
-      $formReg->addElement($elemPhone, $formGrpContact);
-
       $elemCondAgree = new Form_Element_Checkbox('condAgree', $this->category()->getParam(self::PARAM_COND_AGREE, $this->tr('Souhlasím se zpracováním údajů')));
-      $elemCondAgree->addValidation(new Form_Validator_Match(true, $this->tr('Musíte souhlasit s podmínkami')));
+      $elemCondAgree->addValidation(new Form_Validator_NotEmpty($this->tr('Musíte souhlasit s podmínkami')));
       $elemCondAgree->setValues(true);
       $formReg->addElement($elemCondAgree);
 
@@ -88,8 +79,7 @@ class UserReg_Controller extends Controller {
             $elemPassControll->setError($this->tr('Hesla se neshodují'));
          }
 
-         $this->checkUserNameController($formReg->username->getValues());
-         if ($this->view()->isFree == false) {
+         if ($this->checkUserNameController($formReg->username->getValues()) && $this->view()->isFree == false) {
             $elemUsername->setError($this->tr('Zvolené uživatelské jméno je již obsazeno.'));
          }
       }
@@ -97,44 +87,68 @@ class UserReg_Controller extends Controller {
       if ($formReg->isValid()) {
          // vytvoření uživatele okamžitě
          if ($this->category()->getParam(self::PARAM_CREATE_USER_NOW, false) === true) {
-            $modelUsers->saveUser($formReg->username->getValues(),
-               $formReg->name->getValues(), $formReg->surname->getValues(),
-               $formReg->pass->getValues(), $this->category()->getParam(self::PARAM_TARGET_ID_GROUP),
-               $formReg->mail->getValues(), $formReg->phone->getValues(), false);
+            $newUser = $modelUsers->newRecord();
+            $newUser->{Model_Users::COLUMN_USERNAME} = $formReg->username->getValues(); 
+            $newUser->{Model_Users::COLUMN_NAME} = $formReg->name->getValues(); 
+            $newUser->{Model_Users::COLUMN_SURNAME} = $formReg->surname->getValues(); 
+            $newUser->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($formReg->pass->getValues()); 
+            $newUser->{Model_Users::COLUMN_GROUP_ID} = $this->category()->getParam(self::PARAM_TARGET_ID_GROUP, VVE_DEFAULT_ID_GROUP); 
+            $newUser->{Model_Users::COLUMN_MAIL} = $formReg->mail->getValues(); 
+            
+            $modelUsers->save($newUser);
 
+            // ===================== NEW 
             $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_MAIL_REG);
+            $note = null;
             if ($text != false) {
-               $text = $text->{Text_Model::COLUMN_TEXT};
-            } else {
-               $text = 'Registraci je možné dokončit na adrese {REG_COMPLETE_LINK}';
+               $note = $text->{Text_Model::COLUMN_TEXT};
             }
-
-            $userData = null;
-            $userData .= $this->tr('Login') . ': ' . $formReg->username->getValues() . '<br/>';
-            $userData .= $this->tr('Jméno') . ': ' . $formReg->name->getValues() . '<br/>';
-            $userData .= $this->tr('Přijmení') . ': ' . $formReg->surname->getValues() . '<br/>';
-            $userData .= $this->tr('Mail') . ': ' . $formReg->mail->getValues() . '<br/>';
-
-            $text = str_replace(
-                  array('{REG_COMPLETE_LINK}',
-                     '{REG_LINK_EXPIRE}',
-                     '{WEB_NAME}',
-                     '{USER_DATA}',
-                     '{USER_USERNAME}',
-                     '{DATE}',
-                     '{WEB_LINK}'),
-                  array(null,null,
-                     VVE_WEB_NAME,
-                     $userData,
-                     $formReg->username->getValues(),
-                     vve_date('%x %X'),
-                     '<a href="' . Url_Link::getMainWebDir() . '" title="' . VVE_WEB_NAME . '">' . VVE_WEB_NAME . '</a>'),
-                  $text);
-
+            
+            $expire = new DateTime();
+            $expire->modify('+' . $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE) . ' hours');
+            
             $mail = new Email(true);
             $mail->setSubject($this->tr('Registrace na stránkách') . ' ' . VVE_WEB_NAME);
             $mail->addAddress($formReg->mail->getValues());
-            $mail->setContent($text);
+            
+            
+            $data = null;
+            
+            function _getMailTbRow($col1, $col2) {
+               $r = '<tr>';
+               $r .= '<th style="text-align: left;">'.$col1.'</th>';
+               $r .= '<td>'.nl2br($col2).'</td>';
+               $r .= '</tr>';
+               return $r;
+            }
+            
+            $data .= _getMailTbRow($this->tr('Jméno a přijmení'), $formReg->name->getValues()." ".$formReg->surname->getValues());
+            $data .= _getMailTbRow($this->tr('Uživatelské jméno'), $formReg->username->getValues());
+            $data .= _getMailTbRow($this->tr('E-mail'), $formReg->mail->getValues());
+            $data .= _getMailTbRow($this->tr('Heslo'), $formReg->pass->getValues());
+            
+            $replacements = array(
+                  '{NOTE}' => $note,
+                  '{WEB_LINK}' => '<a href="'.$this->link()->clear(true).'">{WEB_NAME}</a>',
+                  '{WEB_NAME}' => VVE_WEB_NAME,
+                  '{REG_COMPLETE_LINK}' => null,
+                  '{REG_LINK_EXPIRE}' => null,
+                  '{USER_NAME}' => $formReg->username->getValues(),
+                  '{DATA}' => $data,
+                  '{DATE_TIME}' => vve_date('%x %X'),
+            );
+            
+            $mail->setReplacements($replacements);
+            
+            $msg =
+               '<h1>'.$this->tr('Na stránkách {WEB_LINK} byla provedena nová registrace uživatelského účtu "{USER_NAME}"').'</h1>'
+               . '<h2>'.$this->tr('Informace o registraci účtu').': </h2>'
+               . '<p><table cellpadding="5" border="1">'
+               . '{DATA}'
+               . ' </table></p>'
+               . '<hr />'
+               .'<div>{NOTE}</div>';
+            $mail->setContent(Email::getBaseHtmlMail($msg));
             $mail->send();
 
             $this->infoMsg()->addMessage($this->tr('Registrace proběhla úspěšně.'));
@@ -148,50 +162,73 @@ class UserReg_Controller extends Controller {
 
             $model = new UserReg_Model_Queue();
 
-            $id = $model->save($this->category()->getId(),
-                  $formReg->username->getValues(), $formReg->pass->getValues(), $hash,
-                  $formReg->mail->getValues(), $formReg->name->getValues(), $formReg->surname->getValues(),
-                  $formReg->phone->getValues());
+            $newUserQ = $model->newRecord();
+            
+            $newUserQ->{UserReg_Model_Queue::COLUMN_ID_CAT} = $this->category()->getId(); 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_USERNAME} = $formReg->username->getValues(); 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_PASS} = $formReg->pass->getValues(); 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_MAIL} = $formReg->mail->getValues(); 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_NAME} = $formReg->name->getValues(); 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_SURNAME} = $formReg->surname->getValues(); 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_HASH} = $hash; 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_IP} = $_SERVER['REMOTE_ADDR']; 
+            
+            $model->save($newUserQ);
 
             $text = $modelText->getText($this->category()->getId(), self::TEXT_KEY_MAIL_REG);
+            $note = null;
             if ($text != false) {
-               $text = $text->{Text_Model::COLUMN_TEXT};
-            } else {
-               $text = 'Registraci je možné dokončit na adrese {REG_COMPLETE_LINK}';
+               $note = $text->{Text_Model::COLUMN_TEXT};
             }
-
-            $userData = null;
-            $userData .= $this->tr('Login') . ': ' . $formReg->username->getValues() . '<br/>';
-            $userData .= $this->tr('Jméno') . ': ' . $formReg->name->getValues() . '<br/>';
-            $userData .= $this->tr('Přijmení') . ': ' . $formReg->surname->getValues() . '<br/>';
-            $userData .= $this->tr('Mail') . ': ' . $formReg->mail->getValues() . '<br/>';
-
+            
             $expire = new DateTime();
             $expire->modify('+' . $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE) . ' hours');
-
-            $text = str_replace(
-                  array('{REG_COMPLETE_LINK}',
-                     '{REG_LINK_EXPIRE}',
-                     '{WEB_NAME}',
-                     '{USER_DATA}',
-                     '{USER_USERNAME}',
-                     '{DATE}',
-                     '{WEB_LINK}'),
-                  array('<a href="' . $this->link()->route('completeReg')->param('id', $hash)
-                     . '" title="' . $this->tr('Dokončení registrace') . '">'
-                     . $this->link()->route('completeReg')->param('id', $hash) . '</a>',
-                     vve_date('%x %X', $expire),
-                     VVE_WEB_NAME,
-                     $userData,
-                     $formReg->username->getValues(),
-                     vve_date('%x %X'),
-                     '<a href="' . Url_Link::getMainWebDir() . '" title="' . VVE_WEB_NAME . '">' . VVE_WEB_NAME . '</a>'),
-                  $text);
 
             $mail = new Email(true);
             $mail->setSubject($this->tr('Registrace na stránkách') . ' ' . VVE_WEB_NAME);
             $mail->addAddress($formReg->mail->getValues());
-            $mail->setContent($text);
+            
+            
+            $data = null;
+            
+            function _getMailTbRow($col1, $col2) {
+               $r = '<tr>';
+               $r .= '<th style="text-align: left;">'.$col1.'</th>';
+               $r .= '<td>'.nl2br($col2).'</td>';
+               $r .= '</tr>';
+               return $r;
+            }
+            
+            $data .= _getMailTbRow($this->tr('Jméno a přijmení'), $formReg->name->getValues()." ".$formReg->surname->getValues());
+            $data .= _getMailTbRow($this->tr('Uživatelské jméno'), $formReg->username->getValues());
+            $data .= _getMailTbRow($this->tr('E-mail'), $formReg->mail->getValues());
+            $data .= _getMailTbRow($this->tr('Heslo'), $formReg->pass->getValues());
+            
+            $replacements = array(
+                  '{NOTE}' => $note,
+                  '{WEB_LINK}' => '<a href="'.$this->link()->clear(true).'">{WEB_NAME}</a>',
+                  '{WEB_NAME}' => VVE_WEB_NAME,
+                  '{REG_COMPLETE_LINK}' => '<a href="' . $this->link()->route('completeReg')->param('id', $hash)
+                     . '" title="' . $this->tr('Dokončení registrace') . '">'.$this->tr('dokončení registrace').'</a>',
+                  '{REG_LINK_EXPIRE}' => vve_date('%x %X', $expire),
+                  '{USER_NAME}' => $formReg->username->getValues(),
+                  '{DATA}' => $data,
+                  '{DATE_TIME}' => vve_date('%x %X'),
+            );
+            
+            $mail->setReplacements($replacements);
+            
+            $msg =
+               '<h1>'.$this->tr('Na stránkách {WEB_LINK} byla provedena nová registrace uživatelského účtu "{USER_NAME}"').'</h1>'
+               . '<p>'.$this->tr('Pro potvrzení registrace je nutné kliknout na následující odkaz <strong>{REG_COMPLETE_LINK}</strong>. Tento odkaz vyprší {REG_LINK_EXPIRE}.').': </p>'
+               . '<h2>'.$this->tr('Informace o registraci účtu').': </h2>'
+               . '<p><table cellpadding="5" border="1">'
+               . '{DATA}'
+               . ' </table></p>'
+               . '<hr />'
+               .'<div>{NOTE}</div>';
+            
+            $mail->setContent(Email::getBaseHtmlMail($msg));
             $mail->send();
 
             $this->infoMsg()->addMessage(sprintf($this->tr('Registrace byla zařazena. Na zadané emailové adrese "%s" nalezenete informace pro dokončení registrace.'), $formReg->mail->getValues()));
@@ -202,36 +239,51 @@ class UserReg_Controller extends Controller {
       $this->view()->formReg = $formReg;
    }
 
+   /**
+    * Dokončení registrace
+    */
    public function completeRegController() {
       $this->checkReadableRights();
 
       $model = new UserReg_Model_Queue();
-      $model->clearExpired($this->category()->getId(), $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE));
+      
+      self::removeExpired($this->category()->getId(),
+             $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE));
 
-      $data = $model->getRegistration($this->getRequestParam('id'));
+      $registration = $model->where(UserReg_Model_Queue::COLUMN_HASH." = :uhash", 
+            array('uhash' => $this->getRequestParam('id')))
+         ->record();
 
-      if ($data == false) {
-         $this->errMsg()->addMessage($this->tr('Požadované registraci již vypršela platnost nebo nebyla vytvořena. Pokuste se zaregistrovat znovu.'));
+      if ($registration == false) {
+         $this->errMsg()->addMessage(
+               $this->tr('Požadované registraci již vypršela platnost nebo nebyla vytvořena. Pokuste se zaregistrovat znovu.'));
       } else {
          $modelUsers = new Model_Users();
 
-         $username = $data->{UserReg_Model_Queue::COLUMN_USERNAME};
+         $username = $registration->{UserReg_Model_Queue::COLUMN_USERNAME};
          $count = 1;
          while ($modelUsers->getUser($username) != false){
-            $username = (string)$data->{UserReg_Model_Queue::COLUMN_USERNAME}.$count;
+            $username = (string)$registration->{UserReg_Model_Queue::COLUMN_USERNAME}.$count;
             $count++;
-            if($count > 100){
-               $this->errMsg()->addMessage($this->tr('Toto uživatelské jméno a všech jeho 100 podob je již obsazeno. Vyplňte prosím znovu registraci s jiným uživatelským jménem.'));
+            if($count > 100){
+               $this->errMsg()->addMessage(
+                     $this->tr('Toto uživatelské jméno a všech jeho 100 podob je již obsazeno. Vyplňte prosím znovu registraci s jiným uživatelským jménem.'));
                return;
             }
          }
 
-         $modelUsers->saveUser($username,
-            $data->{UserReg_Model_Queue::COLUMN_NAME}, $data->{UserReg_Model_Queue::COLUMN_SURNAME},
-            $data->{UserReg_Model_Queue::COLUMN_PASS}, $this->category()->getParam(self::PARAM_TARGET_ID_GROUP),
-            $data->{UserReg_Model_Queue::COLUMN_MAIL}, $data->{UserReg_Model_Queue::COLUMN_PHONE_NUMBER}, false);
-
-         $model->remove($this->getRequestParam('id'));
+         $newUser = $modelUsers->newRecord();
+         
+         $newUser->{Model_Users::COLUMN_USERNAME} = $registration->{UserReg_Model_Queue::COLUMN_USERNAME}; 
+         $newUser->{Model_Users::COLUMN_NAME} = $registration->{UserReg_Model_Queue::COLUMN_NAME}; 
+         $newUser->{Model_Users::COLUMN_SURNAME} = $registration->{UserReg_Model_Queue::COLUMN_SURNAME}; 
+         $newUser->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($registration->{UserReg_Model_Queue::COLUMN_PASS}); 
+         $newUser->{Model_Users::COLUMN_GROUP_ID} = $this->category()->getParam(self::PARAM_TARGET_ID_GROUP, VVE_DEFAULT_ID_GROUP); 
+         $newUser->{Model_Users::COLUMN_MAIL} = $registration->{UserReg_Model_Queue::COLUMN_MAIL}; 
+         
+         $modelUsers->save($newUser);
+         
+         $model->delete($registration);
 
          $this->infoMsg()->addMessage($this->tr('Registrace proběhla úspěšně.'));
          $this->link()->clear()->route('welcome')->reload();
@@ -355,16 +407,21 @@ class UserReg_Controller extends Controller {
 
    public function checkUserNameController($username = null) {
       $this->checkReadableRights();
+      $this->view()->isFree = false;
 
-      if($username === null) $username = $_POST['username'];
-
+      if($username === null) $username = isset($_POST['username']) ? $_POST['username'] : null;
+      
+      if($username == null){
+         return false; 
+      }
+      
+      
       $modelUsers = new Model_Users();
       $modelQueue = new UserReg_Model_Queue();
 
       $user = $modelUsers->getUser($username, true);
       $userQ = $modelQueue->getUser($username);
 
-      $this->view()->isFree = false;
          $this->view()->msg = $this->tr('obsazené');
       if($user === false AND $userQ === false){
          $this->view()->isFree = true;
@@ -375,20 +432,20 @@ class UserReg_Controller extends Controller {
    /**
     * Metoda pro nastavení modulu
     */
-   public static function settingsController(&$settings, Form &$form) {
+   public function settings(&$settings, Form &$form) {
 
-      $grpForm = $form->addGroup('form', 'Nastavení formuláře');
+      $grpForm = $form->addGroup('form', $this->tr('Nastavení formuláře'));
 
-      $elemCreateNow = new Form_Element_Checkbox('createNow', 'Vytvořit účet okamžitě');
+      $elemCreateNow = new Form_Element_Checkbox('createNow', $this->tr('Vytvořit účet okamžitě'));
       $elemCreateNow->setValues(false);
-      $elemCreateNow->setSubLabel('Pokud je vytvářen účet okamžitě, není generován odkaz na dokončení účtu. Proto není potřebná volba pro vypršení odkazu dokončení registrace.');
+      $elemCreateNow->setSubLabel($this->tr('Pokud je vytvářen účet okamžitě, není generován odkaz na dokončení účtu. Proto není potřebná volba pro vypršení odkazu dokončení registrace.'));
       $form->addElement($elemCreateNow, $grpForm);
       if (isset($settings[self::PARAM_CREATE_USER_NOW])) {
          $form->createNow->setValues($settings[self::PARAM_CREATE_USER_NOW]);
       }
 
       // maily správců
-      $elemTGroups = new Form_Element_Select('groupId', 'Cílová skupina');
+      $elemTGroups = new Form_Element_Select('groupId', $this->tr('Cílová skupina'));
       // načtení uživatelů
       VVE_SUB_SITE_DOMAIN == null ? $domain = 'www' : $domain = VVE_SUB_SITE_DOMAIN;
       $groupsModel = new Model_Groups();
@@ -410,27 +467,58 @@ class UserReg_Controller extends Controller {
 
       $form->addElement($elemTGroups, $grpForm);
 
-      $elemRegExpire = new Form_Element_Text('expire', 'Za kolik hodin vyprší odkaz pro dokončení registrace');
-
+      $elemRegExpire = new Form_Element_Text('expire', $this->tr('Platnost dokončení'));
+      $elemRegExpire->setSubLabel($this->tr('Za kolik hodin vyprší odkaz pro dokončení registrace'));
       if (isset($settings[self::PARAM_REG_LINK_EXPIRE])) {
          $elemRegExpire->setValues($settings[self::PARAM_REG_LINK_EXPIRE]);
       }
       $elemRegExpire->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
-//      $elemRegExpire->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemRegExpire, $grpForm);
 
+      $elemPassMinL = new Form_Element_Text('passMinL', $this->tr('Minimální délka hesla'));
+      $elemPassMinL->setValues(5);
+      if (isset($settings[self::PARAM_PASSWORD_MIN_LEN])) {
+         $elemPassMinL->setValues($settings[self::PARAM_PASSWORD_MIN_LEN]);
+      }
+      $elemPassMinL->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $form->addElement($elemPassMinL, $grpForm);
+
       if ($form->isSend() AND $form->createNow->getValues() != true) {
-//         $form->expire->removeValidation('Form_Validator_NotEmpty');
          $form->expire->addValidation(new Form_Validator_NotEmpty());
       }
-
+      
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
          $settings[self::PARAM_CREATE_USER_NOW] = $form->createNow->getValues();
          $settings[self::PARAM_TARGET_ID_GROUP] = $form->groupId->getValues();
          $settings[self::PARAM_REG_LINK_EXPIRE] = $form->expire->getValues();
+         $settings[self::PARAM_PASSWORD_MIN_LEN] = $form->passMinL->getValues();
       }
    }
 
+   /* Autorun metody */
+    
+   public static function AutoRunDaily()
+   {
+      $modelCats = new Model_Category();
+      $model = new UserReg_Model_Queue();
+      $cats = $modelCats->where(Model_Category::COLUMN_MODULE." = :module", array('module' => 'userreg'));
+
+      foreach ($cats as $cObj) {
+         $cat = new Category($cObj->{Model_Category::COLUMN_ID}, false, $cObj);
+         self::removeExpired($cat->getId(), $cat->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE));
+         
+      }
+   }
+   
+   protected static function removeExpired($idCat, $hours)
+   {
+      $model = new UserReg_Model_Queue();
+      $model
+      ->where(UserReg_Model_Queue::COLUMN_ID_CAT." = :idc AND TIMESTAMPDIFF(HOUR,".UserReg_Model_Queue::COLUMN_TIME_ADD.",NOW()) > :inter",
+            array('idc' => $idCat, 'inter' => $hours))
+            ->delete();
+   }
+   
 }
 ?>

@@ -1,4 +1,4 @@
-CREATE  TABLE `{PREFIX}userreg_queue` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}userreg_queue` (
   `id_request` smallint(6) NOT NULL AUTO_INCREMENT ,
   `id_category` smallint(6) NOT NULL ,
   `hash` VARCHAR(45) NULL ,
@@ -14,3 +14,7 @@ CREATE  TABLE `{PREFIX}userreg_queue` (
   UNIQUE INDEX `hash_UNIQUE` (`hash` ASC) )
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
+
+-- autorun
+INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
+VALUES ('userreg', 'daily', NULL);

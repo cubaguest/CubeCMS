@@ -3,7 +3,7 @@
 /*
  * Třída modelu s listem Novinek
  */
-class UserReg_Model_Queue extends Model_PDO {
+class UserReg_Model_Queue extends Model_ORM {
    const DB_TABLE = "userreg_queue";
    /**
     * Názvy sloupců v databázi
@@ -21,28 +21,26 @@ class UserReg_Model_Queue extends Model_PDO {
    const COLUMN_TIME_ADD = 'timeadd';
    const COLUMN_IP = 'ipaddress';
 
-   public function save($idc, $username, $pass, $hash, $mail, $name, $surname, $phone, $id = null) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("INSERT INTO " . Db_PDO::table(self::DB_TABLE) . " "
-            . "(" . self::COLUMN_ID_CAT . "," . self::COLUMN_USERNAME . "," . self::COLUMN_PASS .
-            "," . self::COLUMN_MAIL . "," . self::COLUMN_NAME . "," . self::COLUMN_HASH .
-            "," . self::COLUMN_SURNAME . "," . self::COLUMN_PHONE_NUMBER . "," . self::COLUMN_IP . ")"
-            . " VALUES (:idc, :username, :pass, :mail, :name, :hash, :surname, :phone, :ip)");
+   protected function  _initTable() {
+      $this->setTableName(self::DB_TABLE, 't_userreg_queue');
+       
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_CAT, array('datatype' => 'smallint', 'nn' => true, 'index' => true));
+      $this->addColumn(self::COLUMN_HASH, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'uq' => true));
+      $this->addColumn(self::COLUMN_USERNAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PASS, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_SURNAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PHONE_NUMBER, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_IP, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
 
-      $dbst->bindValue(':idc', $idc, PDO::PARAM_INT);
-      $dbst->bindValue(':username', $username, PDO::PARAM_STR);
-      $dbst->bindValue(':pass', $pass, PDO::PARAM_STR);
-      $dbst->bindValue(':mail', $mail, PDO::PARAM_STR);
-      $dbst->bindValue(':name', $name, PDO::PARAM_STR);
-      $dbst->bindValue(':hash', $hash, PDO::PARAM_STR);
-      $dbst->bindValue(':surname', $surname, PDO::PARAM_STR);
-      $dbst->bindValue(':phone', $phone, PDO::PARAM_STR | PDO::PARAM_NULL);
-      $dbst->bindValue(':ip', $_SERVER['REMOTE_ADDR'], PDO::PARAM_STR | PDO::PARAM_NULL);
-
-      $dbst->execute();
-      return $dbc->lastInsertId();
+      $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+   
+      $this->setPk(self::COLUMN_ID);
+      $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_ID);
    }
-
+   
    public function getRegistration($hash) {
       $dbc = new Db_PDO();
       $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE)
@@ -51,14 +49,6 @@ class UserReg_Model_Queue extends Model_PDO {
       $dbst->execute();
 
       return $dbst->fetch(PDO::FETCH_OBJ);
-   }
-
-   public function remove($hash) {
-      $dbc = new Db_PDO();
-      $dbst = $dbc->prepare("DELETE FROM " . Db_PDO::table(self::DB_TABLE)
-            . " WHERE (" . self::COLUMN_HASH . " = :hash)");
-      $dbst->bindParam(':hash', $hash, PDO::PARAM_STR);
-      return $dbst->execute();
    }
 
    public function clearExpired($idc, $hours) {

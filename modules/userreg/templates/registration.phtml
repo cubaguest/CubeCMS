@@ -1,7 +1,7 @@
 <?
 $jQ = new JsPlugin_JQuery();
 $this->addJsPlugin($jQ);
-echo $this->toolboxText;
+echo $this->toolbox;
 ?>
 <h1><?= $this->category()->getName() ?></h1>
 <div class="main-content-text"><?
@@ -12,59 +12,57 @@ echo $this->toolboxText;
 <div class="main-content-form-edit" id="userreg-reg-form">
    <?
    echo $this->formReg;
-   echo $this->toolboxForm;
    ?>
 </div>
 <script type="text/javascript">
+   
    $(document).ready(function(){
+	   
+   function checkUserName() {
+	   var $input = $('.regusername_class');
+	   var userName = $input.val();
+	   $loader.css('display' ,'inline');
+	   $input.removeClass('form-error');
+	   $.ajax({
+		   type: "POST", url: "<?= $this->link()->route('checkUserName') ?>", cache: false,
+		   data: {username: userName},
+		   success: function(data){
+            $status.html('&nbsp;');
+            if(data.isFree == true){
+               $status.append($('<img />').attr('src', 'images/icons/accept.png'));
+            } else {
+               $status.append($('<img />').attr('src', 'images/icons/exclamation.png'));
+               $input.addClass('form-error');
+            }
+            $status.append('&nbsp;'+data.msg);
+            $loader.css('display' ,'none');
+         }
+     });
+  }
       var $loader = $('<span />').addClass('imput-loader').append('&nbsp;').css('display' ,'none');
       $loader.append($('<img />').attr('src', 'images/progress_small.gif'));
       var $status = $('<span />').addClass('username-status');
       $('.regusername_class').after($status).after($loader);
 
-      $('.regusername_class').keydown(function(event){
-//         alert(event.keyCode);
-         if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 116 || event.keyCode == 27 || event.keyCode == 16
-            || event.keyCode == 37 || event.keyCode == 39 || event.keyCode == 109  ) {
-         } else {
-               if (event.keyCode < 48 || (event.keyCode > 90 && event.keyCode < 96)
-                  || event.keyCode > 105) {
-                  event.preventDefault();
-               }
-         }
-      });
-
       $('.regusername_class').keyup(function(event){
-         var $input = $(this);
-         var userName = $(this).val();
+    	  var userName = $(this).val();
          if(userName.length >= 5 && ((event.keyCode >= 48 && event.keyCode <= 90)
             || event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 116 || event.keyCode == 27 || event.keyCode == 16
             || event.keyCode == 37 || event.keyCode == 39 || event.keyCode == 109)
             || (event.keyCode < 48 || (event.keyCode > 90 && event.keyCode < 96) || event.keyCode > 105)){
             
-            $loader.css('display' ,'inline');
-            $input.removeClass('form-error');
-
-            $.ajax({
-               type: "POST", url: "<?= $this->link()->route('checkUserName') ?>", cache: false,
-               data: {username: userName},
-               success: function(data){
-                  $status.html('&nbsp;');
-                  if(data.isFree == true){
-                     $status.append($('<img />').attr('src', 'images/icons/accept.png'));
-                  } else {
-                     $status.append($('<img />').attr('src', 'images/icons/exclamation.png'));
-                     $input.addClass('form-error');
-                  }
-                  $status.append('&nbsp;'+data.msg);
-                  $loader.css('display' ,'none');
-                  //                  alert( "Data Saved: " + msg );
-               }
-            });
+        	   checkUserName();
          } else {
-            //event.preventDefault();
             return false;
          }
       });
+      $('.regusername_class').change(function(){
+    	  checkUserName();
+      });
+
+      if($('.regusername_class').val() != ""){
+    	   checkUserName();
+      }
+      
    });
 </script>

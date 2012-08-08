@@ -10,17 +10,7 @@ class UserReg_View extends View {
                $this->link()->route('editText'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text'));
          $toolbox->addTool($toolEdit);
-         $this->toolboxText = $toolbox;
          
-         if($this->category()->getRights()->isControll()){
-            $this->toolboxText->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
-            $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon('wrench.png')->setTitle($this->tr('Upravit nastavení kategorie'));
-            $this->toolboxText->addTool($toolEView);
-         }
-
-         $toolbox = new Template_Toolbox2();
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('welcome_edit', $this->tr("Upravit uvítací text"),
                $this->link()->route('editWelcome'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit text po úspěšné registraci'));
@@ -31,7 +21,7 @@ class UserReg_View extends View {
          $toolEditM->setIcon('page_edit.png')->setTitle($this->tr('Upravit registrační e-mail'));
          $toolbox->addTool($toolEditM);
 
-         $this->toolboxForm = $toolbox;
+         $this->toolbox = $toolbox;
       }
       $this->template()->addTplFile("registration.phtml");
    }
@@ -42,6 +32,7 @@ class UserReg_View extends View {
 
    public function welcomeView() {
       $this->template()->addTplFile("welcome.phtml");
+      Template_Navigation::addItem($this->tr('Uvítání'), $this->link());
    }
 
    /**
@@ -50,15 +41,17 @@ class UserReg_View extends View {
    public function editTextView() {
       $this->headline = $this->tr('Úprava úvodního textu');
       $this->template()->addTplFile('edit_text.phtml');
-      $this->addTinyMCE($this->formEdit);
+      $this->setTinyMCE($this->formEdit->text, 'advanced');
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
    }
 
    public function editWelcomeView() {
       $this->headline = $this->tr('Úprava uvítacího textu');
       $this->template()->addTplFile('edit_text.phtml');
-      $this->addTinyMCE($this->formEdit);
+      $this->setTinyMCE($this->formEdit->text, 'advanced');
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Úprava uvítacího textu'), $this->link());
    }
 
    public function editRegMailView() {
@@ -73,6 +66,7 @@ class UserReg_View extends View {
       $this->tinyMCE->mainView();
       $this->form->text_mail->html()->addClass("mceEditor");
       Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Úprava textu v e-mailu'), $this->link());
    }
 
    public function varListView() {

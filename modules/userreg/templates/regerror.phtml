@@ -4,6 +4,8 @@ $this->addPageTitle($this->tr('Chyba registrace'));
 <h1><?=$this->tr('Chyba registrace')?></h1>
 <div class="main-content-text" id="userreg-reg-form">
    <?
-   echo $this->tr('Omlouvám se, ale Vaši registraci nelze dokončit. Kontaktujte nás abychom sjednali nápravu, nebo se pokuste o novou registraci.');
+   printf( $this->tr('Omlouvám se, ale Vaši registraci nelze dokončit. '
+         .'Kontaktujte nás abychom sjednali nápravu, nebo se pokuste o novou <a href="%s">registraci</a>.'), 
+         $this->link()->clear()->route() );
    ?>
 </div>
