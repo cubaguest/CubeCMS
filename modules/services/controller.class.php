@@ -50,7 +50,7 @@ class Services_Controller extends Controller {
             .'('.Model_Tables::COL_TABLE_NAME.' LIKE :prefix OR '.Model_Tables::COL_TABLE_NAME.' LIKE :prefixGlobal )',
             array('dbname' => VVE_DB_NAME,'prefix' => VVE_DB_PREFIX.'%','prefixGlobal' => 'global%'));
 
-         $dbc = new Db_PDO();
+         $dbc = Db_PDO::getInstance();
          $prevBuff = $dbc->getAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY);
          $dbc->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
          foreach ($modelTables->records() as $table) {
@@ -80,7 +80,7 @@ class Services_Controller extends Controller {
             .'('.Model_Tables::COL_TABLE_NAME.' LIKE :prefix OR '.Model_Tables::COL_TABLE_NAME.' LIKE :prefixGlobal )',
             array('dbname' => VVE_DB_NAME,'prefix' => VVE_DB_PREFIX.'%','prefixGlobal' => 'global%'));
 
-         $dbc = new Db_PDO();
+         $dbc = Db_PDO::getInstance();
          $prevBuff = $dbc->getAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY);
          $dbc->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
          foreach ($modelTables->records() as $table) {
@@ -141,7 +141,7 @@ class Services_Controller extends Controller {
       $jqGrid->respond()->setRecords($modelTables->count());
       $tables = $modelTables->limit(($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage(), $jqGrid->request()->rows)->records();
       // out
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       foreach ($tables as $id => $table) {
          // kontrola tebulky
          $data = $dbc->query('CHECK TABLE '.$table->{Model_Tables::COL_TABLE_NAME}.' FAST QUICK')->fetchObject();

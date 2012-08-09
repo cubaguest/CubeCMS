@@ -42,7 +42,7 @@ class UserReg_Model_Queue extends Model_ORM {
    }
    
    public function getRegistration($hash) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE)
             . " WHERE (" . self::COLUMN_HASH . " = :hash)");
       $dbst->bindValue(':hash', $hash, PDO::PARAM_STR);
@@ -52,7 +52,7 @@ class UserReg_Model_Queue extends Model_ORM {
    }
 
    public function clearExpired($idc, $hours) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM " . Db_PDO::table(self::DB_TABLE)
             . " WHERE TIMESTAMPDIFF(HOUR,".self::COLUMN_TIME_ADD.",NOW()) > :inter"
             ." AND ".self::COLUMN_ID_CAT." = :idc");
@@ -62,7 +62,7 @@ class UserReg_Model_Queue extends Model_ORM {
    }
 
    public function getUser($username) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
              ." WHERE (".self::COLUMN_USERNAME." = :username)");
 

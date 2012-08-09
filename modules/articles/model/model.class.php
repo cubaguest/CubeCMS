@@ -96,7 +96,7 @@ class Articles_Model extends Model_ORM {
          self::COLUMN_URLKEY => $urlKey, self::COLUMN_CONCEPT => $public,
          self::COLUMN_TEXT_CLEAR => vve_strip_tags($text)));
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($id !== null) {
          $this->setIUValues(array(self::COLUMN_ID_USER_LAST_EDIT => $idUser));
@@ -134,7 +134,7 @@ class Articles_Model extends Model_ORM {
 
    public function saveArticlePrivateUsersConnect($idArticle, $idUser) {
       // smažeme předchozí spojení
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)." "
                  ."(".self::COLUMN_A_H_U_ID_ARTICLE.",". self::COLUMN_A_H_U_ID_USER.")"
                  ." VALUES (:idArticle, :idUser)");
@@ -142,7 +142,7 @@ class Articles_Model extends Model_ORM {
    }
 
    public function deleteArticlePrivateUsersConnections($idArticle) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)
           ." WHERE (".self::COLUMN_A_H_U_ID_ARTICLE ." = :idArticle)");
       $dbst->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
@@ -156,7 +156,7 @@ class Articles_Model extends Model_ORM {
     * @return PDOStatement -- pole s kurzem
     */
    public function getArticlePrivateUsers($ida) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)
          ." WHERE (".self::COLUMN_A_H_U_ID_ARTICLE." = :ida)");
       $dbst->execute(array(':ida' => (int)$ida));
@@ -165,7 +165,7 @@ class Articles_Model extends Model_ORM {
    }
 
    public function isPrivateUser($idUser, $idArticle) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE_ART_HAS_PRIVATE_USERS)
                  ." WHERE (".self::COLUMN_A_H_U_ID_ARTICLE ." = :idUser)"
               ." AND (".self::COLUMN_A_H_U_ID_USER ." = :idArticle)");
@@ -182,7 +182,7 @@ class Articles_Model extends Model_ORM {
     * @return string $urlkey -- url klíč článku
     */
    public function addShowCount($urlKey) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET ".self::COLUMN_SHOWED." = ".self::COLUMN_SHOWED."+1"
           ." WHERE (".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey"
@@ -199,7 +199,7 @@ class Articles_Model extends Model_ORM {
     * @return PDOStatement -- pole s článkem
     */
    public function getArticleById($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS article"
          ." WHERE (".self::COLUMN_ID." = :id)".
           " LIMIT 0, 1");
@@ -216,7 +216,7 @@ class Articles_Model extends Model_ORM {
     * @return bool
     */
    public function deleteArticle($idArticle) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
           ." WHERE (".Articles_Model_Detail::COLUMN_ID ." = :id)");
       $dbst->bindParam(':id', $idArticle, PDO::PARAM_INT);
@@ -237,7 +237,7 @@ class Articles_Model extends Model_ORM {
       while ($article = $articles->fetch()) {
          $this->deleteArticlePrivateUsersConnections($article->{self::COLUMN_ID});
       }
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
           ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY ." = :idcat )");
       $dbst->bindValue(':idcat', (int)$id, PDO::PARAM_INT);
@@ -250,7 +250,7 @@ class Articles_Model extends Model_ORM {
     * @param int $id -- id článku
     */
    public function setLastChange($idArt) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
           ." WHERE (".self::COLUMN_ID." = :idart)");
@@ -264,7 +264,7 @@ class Articles_Model extends Model_ORM {
     * @return int -- timestamp
     */
    public function getLastChange($id, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".Articles_Model_Detail::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
               ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_CONCEPT." = :onlyPublic)"
               ." ORDER BY ".Articles_Model_Detail::COLUMN_EDIT_TIME." DESC"

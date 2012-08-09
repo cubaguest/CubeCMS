@@ -23,7 +23,7 @@ class Search_Model_Api extends Model_PDO {
     */
    public function saveApi($url, $api, $name, $idCat = 0, $idApi = null) {
       // globalní prvky
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($id !== null) {
 //         $this->setIUValues(array(self::COLUMN_ID_USER_LAST_EDIT => $idUser));
@@ -56,7 +56,7 @@ class Search_Model_Api extends Model_PDO {
     * @return array of PDOStatement -- pole s api
     */
    public function getApis($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE (`".self::COLUMN_ID_CATEGORY."` = :idCat)");
       $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
@@ -73,7 +73,7 @@ class Search_Model_Api extends Model_PDO {
     * @return integer -- počet článků
     */
    public function getCountApis($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
              ." WHERE (".self::COLUMN_ID_CATEGORY ." = '".$idCat."')");
       $count = $dbst->fetch();
@@ -87,7 +87,7 @@ class Search_Model_Api extends Model_PDO {
     * @return PDOStatement -- pole s api
     */
    public function getApi($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE (`".self::COLUMN_ID."` = :idApi)");
       $dbst->bindParam(':idApi', $id, PDO::PARAM_INT);
@@ -103,7 +103,7 @@ class Search_Model_Api extends Model_PDO {
     * @return bool
     */
    public function deleteApi($idApi) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           ." WHERE (".self::COLUMN_ID ." = :id)");
       $dbst->bindParam(':id', $idApi, PDO::PARAM_INT);

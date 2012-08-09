@@ -43,7 +43,7 @@ class Actions_Model_Detail extends Model_PDO {
    public function saveAction($name, $subname, $author, $text, $note, $urlkey, DateTime $dateFrom, $dateTo,
            $time = null, $place = null, $price = null, $preprice = null, $image = null, $idCat = 0,
            $idUser = 1, $public = true, $id = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbc->beginTransaction();
 
       $urlkey = $this->generateUrlKeys($urlkey, self::DB_TABLE, $name,
@@ -95,7 +95,7 @@ class Actions_Model_Detail extends Model_PDO {
     * @return Model_langContainer -- objekt s akcí
     */
    public function getActionById($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS action"
               ." WHERE (".self::COLUMN_ID." = :id)".
               " LIMIT 0, 1");
@@ -113,7 +113,7 @@ class Actions_Model_Detail extends Model_PDO {
     * @return PDOStatement -- pole s článkem
     */
    public function getAction($urlKey, $idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 //      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
 //              ." WHERE (".self::COLUMN_URLKEY."_".Locales::getLang()." = :urlkey)"
 //              ." LIMIT 0, 1");
@@ -142,7 +142,7 @@ class Actions_Model_Detail extends Model_PDO {
     * @return PDOStatement -- pole s článkem
     */
    public function getCurrentAction($idCat, $from = 0) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT *, ABS(DATEDIFF(".self::COLUMN_DATE_START.",CURDATE())) AS delta_days  FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_PUBLIC." = 1)"
               ." AND ((ISNULL(".self::COLUMN_DATE_STOP.") AND ".self::COLUMN_DATE_START." >= CURDATE())"
@@ -156,7 +156,7 @@ class Actions_Model_Detail extends Model_PDO {
    }
 
    public function deleteAction($idAction) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           ." WHERE (".self::COLUMN_ID ." = :id)");
       $dbst->bindParam(':id', $idAction, PDO::PARAM_INT);
@@ -171,7 +171,7 @@ class Actions_Model_Detail extends Model_PDO {
     * @return PDOStatement
     */
    public function search($idCat, $string, $publicOnly = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $clabel = self::COLUMN_NAME.'_'.Locales::getLang();
       $sublabel = self::COLUMN_SUBANME.'_'.Locales::getLang();
       $author = self::COLUMN_AUTHOR;

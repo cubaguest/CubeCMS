@@ -28,7 +28,7 @@ class Mails_Model_SendQueue extends Model_ORM {
    }
    
    public function addMails($mailsArr) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO " . Db_PDO::table(self::DB_TABLE) . " "
             . "(" . self::COLUMN_MAIL . "," . self::COLUMN_NAME . ") VALUES (:mail, :name)");
 
@@ -51,7 +51,7 @@ class Mails_Model_SendQueue extends Model_ORM {
     * @return <type>
     */
    public function getMails($fromRow = 0, $rows = 10000) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM ' . Db_PDO::table(self::DB_TABLE)
             . " LIMIT :fromRow, :rows");
       $dbst->bindParam(':fromRow', $fromRow, PDO::PARAM_INT);
@@ -66,7 +66,7 @@ class Mails_Model_SendQueue extends Model_ORM {
     * @return Object
     */
    public function getMail($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM ' . Db_PDO::table(self::DB_TABLE)
             . ' WHERE ' . self::COLUMN_ID . " = :idm");
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -79,7 +79,7 @@ class Mails_Model_SendQueue extends Model_ORM {
     * @param int/string $id -- id mailu nebo mail
     */
    public function deleteMail($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('DELETE FROM ' . Db_PDO::table(self::DB_TABLE). " WHERE " . self::COLUMN_ID . " = :id");
       $dbst->bindValue(':id', $id, PDO::PARAM_INT);
       return $dbst->execute();
@@ -90,13 +90,13 @@ class Mails_Model_SendQueue extends Model_ORM {
     */
    public function truncateModel()
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       return $dbc->exec('TRUNCATE TABLE ' . Db_PDO::table(self::DB_TABLE));
    }
 
    public function setUndeliverable($idm)
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
               ." SET ".self::COLUMN_UNDELIVERABLE." = 1"
               ." WHERE ".self::COLUMN_ID." = :idm");
@@ -106,7 +106,7 @@ class Mails_Model_SendQueue extends Model_ORM {
 
    public function getUndeliverable()
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM ' . Db_PDO::table(self::DB_TABLE)
          ." WHERE ".self::COLUMN_UNDELIVERABLE." = 1");
       $dbst->execute();
@@ -119,7 +119,7 @@ class Mails_Model_SendQueue extends Model_ORM {
     * @return integer -- počet mailů
     */
    public function getCount() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM " . Db_PDO::table(self::DB_TABLE));
       $count = $dbst->fetch();
       return $count[0];

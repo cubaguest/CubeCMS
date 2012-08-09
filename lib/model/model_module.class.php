@@ -53,7 +53,7 @@ class Model_Module extends Model_ORM {
    }
 
    public function getModule($name) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_NAME." = :name");
       $dbst->execute(array(':name' => $name));
@@ -71,7 +71,7 @@ class Model_Module extends Model_ORM {
               .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'install.sql');
          // přepsání prefixu
          $sqlQuery = str_replace('{PREFIX}', VVE_DB_PREFIX, $sqlQuery);
-         $dbc = new Db_PDO();
+         $dbc = Db_PDO::getInstance();
          return $dbc->exec($sqlQuery);
       }
    }
@@ -82,7 +82,7 @@ class Model_Module extends Model_ORM {
     * @return bool -- true pokud je již modul instalován
     */
    public function isModuleInstaled($name) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       // kontrola jestli místo již neexistuje
       $dbst = $dbc->prepare("SELECT COUNT(*) AS count FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_NAME." = :name");
@@ -97,7 +97,7 @@ class Model_Module extends Model_ORM {
 
 
    public function registerInstaledModule($name, $vMajor = 1, $vMinor = 0) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare('INSERT INTO '.Db_PDO::table(self::DB_TABLE)." "
                  ."(".self::COLUMN_NAME.", ".self::COLUMN_VERSION_MAJOR.", ".self::COLUMN_VERSION_MINOR.")"
@@ -107,7 +107,7 @@ class Model_Module extends Model_ORM {
    }
 
    public function registerUpdatedModule($name, $vMajor = 1, $vMinor = 0) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('UPDATE '.Db_PDO::table(self::DB_TABLE)." "
                  ." SET ".self::COLUMN_VERSION_MAJOR." = :vmajor, ".self::COLUMN_VERSION_MINOR." = :vminor"
                  ." WHERE ".self::COLUMN_NAME." = :name");
@@ -115,7 +115,7 @@ class Model_Module extends Model_ORM {
    }
 
    public function getInstalledModules() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." ORDER BY ".self::COLUMN_NAME." ASC");
       $dbst->setFetchMode(PDO::FETCH_OBJ);

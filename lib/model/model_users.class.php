@@ -100,7 +100,7 @@ class Model_Users extends Model_ORM {
       if($blockedUsers === false){
          $where = ' AND user.'.self::COLUMN_BLOCKED.' = :blocked';
       }
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT *, grp.name AS gname FROM ".$this->getTableName()." AS user
              JOIN ".$mgrp->getTableName()." AS grp ON user.".self::COLUMN_ID_GROUP
           ." = grp.".self::COLUMN_ID_GROUP."
@@ -126,7 +126,7 @@ class Model_Users extends Model_ORM {
     */
    public function getUserById($id) {
       $mgrp = new Model_Groups();
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT user.*, grp.".self::COLUMN_ID_GROUP.", grp.name AS ".self::COLUMN_GROUP_NAME
           ." FROM ".$this->getTableName()." AS user"
           ." JOIN ".$mgrp->getTableName()." AS grp ON user.".self::COLUMN_ID_GROUP." = grp.".self::COLUMN_ID_GROUP
@@ -143,7 +143,7 @@ class Model_Users extends Model_ORM {
     */
    public function getUsersList() {
       $mgrp = new Model_Groups();
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT users.*, grps.name AS gname FROM ".$this->getTableName()." AS users"
           ." JOIN ".$mgrp->getTableName()." AS grps ON users.".self::COLUMN_ID_GROUP." = grps.".self::COLUMN_ID_GROUP
 //          ." WHERE users.".self::COLUMN_BLOCKED." = 0"
@@ -153,7 +153,7 @@ class Model_Users extends Model_ORM {
    }
 
    public function getCount($idgrp = null){
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $sql = "SELECT COUNT(*) FROM ".$this->getTableName();
       if($idgrp !== null) $sql .= " WHERE ".self::COLUMN_ID_GROUP." = :idGrp";
       $dbst = $dbc->prepare($sql);
@@ -167,7 +167,7 @@ class Model_Users extends Model_ORM {
          self::COLUMN_MAIL, self::COLUMN_NOTE, self::COLUMN_BLOCKED));
       $this->isValidOrder($order);
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $sql = "SELECT tu.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tu";
       if($idgrp !== null) $sql .=" WHERE ".self::COLUMN_ID_GROUP." = :idGrp"; // GRP
@@ -186,7 +186,7 @@ class Model_Users extends Model_ORM {
    }
 
    public function saveUser($username,$name,$surname, $password,$group, $email,$note,$blocked = false, $id = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($id === null) {
       // nový uživatel
          $password = Auth::cryptPassword($password);
@@ -230,7 +230,7 @@ class Model_Users extends Model_ORM {
     * @param int $id -- id uživatele
     */
    public function disableUser($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_BLOCKED."` = 1"
                 ." WHERE (".self::COLUMN_ID." = :iduser)");
@@ -244,7 +244,7 @@ class Model_Users extends Model_ORM {
     * @param int $id -- id uživatele
     */
    public function enableUser($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_BLOCKED."` = 0"
                 ." WHERE (".self::COLUMN_ID." = :iduser)");
@@ -258,7 +258,7 @@ class Model_Users extends Model_ORM {
     * @param int $id -- id uživatele
     */
    public function deleteUser($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       return $dbc->query("DELETE FROM ".$this->getTableName()
           . " WHERE ".self::COLUMN_ID." = ".$dbc->quote((int)$id));
    }
@@ -270,7 +270,7 @@ class Model_Users extends Model_ORM {
     * @return PDOStatement
     */
    public function changeUserPassword($iduser, $newPass) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".$this->getTableName(). " SET"
                 ." `".self::COLUMN_PASSWORD."` = :password"
                 ." WHERE (".self::COLUMN_ID." = :iduser)");

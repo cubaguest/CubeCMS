@@ -16,7 +16,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getActions($idCat,DateTime $fromTime, DateTime $toTime, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $whereP = " AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)";
       } else {
@@ -55,7 +55,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getFeaturedActions($idCat, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." WHERE (actions.".Actions_Model_Detail::COLUMN_ID_CAT ." = :idcat)"
@@ -77,7 +77,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getActionsByAdded($idCat, $num = 100, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $whereP = " AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)";
       } else {
@@ -107,7 +107,7 @@ class Actions_Model_List extends Model_PDO {
     * @return array -- pole akcí
     */
    public function getAllActions($idCat, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $wherePub = " AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)";
       } else {
@@ -133,7 +133,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getActionsByCatIds(DateTime $fromTime, DateTime $toTime, $idCats, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $whereP = " AND (".Actions_Model_Detail::COLUMN_PUBLIC." = 1)";
       } else {
@@ -179,7 +179,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getActionsListByCatIds($fromDate, $idCats, $fromRow = 0, $numRows = 100, $past = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $sql = "SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
@@ -215,7 +215,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getCountActionsListByCatIds($fromDate, $idCats, $past = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $sql = "SELECT COUNT(".Actions_Model_Detail::COLUMN_ID.") FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)
               ." WHERE (".Actions_Model_Detail::COLUMN_ID_CAT ." IN (".$this->generateSQLIN($idCats)."))";
@@ -241,7 +241,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getActionsByAddedByCatIds($idCats, $num = 10) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey ,user.".Model_Users::COLUMN_USERNAME
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
@@ -266,7 +266,7 @@ class Actions_Model_List extends Model_PDO {
     * @return PDOStatement -- pole akcí
     */
    public function getFeaturedActionsByCatIds($idCats) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $in = null;
       foreach ($idCats as $idC) {
          $in .= $dbc->quote($idC, PDO::PARAM_INT).',';
@@ -294,7 +294,7 @@ class Actions_Model_List extends Model_PDO {
     */
    public function getAllActionsWithCats()
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT "
          ." act.".Actions_Model_Detail::COLUMN_URLKEY.'_'.Locales::getDefaultLang().' AS actkey,'
          ." act.".Actions_Model_Detail::COLUMN_IMAGE.' AS img,'

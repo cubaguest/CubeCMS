@@ -62,7 +62,7 @@ class Text_Model extends Model_ORM {
     * @return string -- načtený text
     */
    public function getText($idCat, $subkey = self::DEFAULT_SUBKEY) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
              WHERE (text.".self::COLUMN_ID_CATEGORY." = :idc AND text.".self::COLUMN_SUBKEY." = :subkey)");
       $dbst->bindValue(':subkey', $subkey, PDO::PARAM_STR);
@@ -80,7 +80,7 @@ class Text_Model extends Model_ORM {
     * @return string -- načtený text
     */
    public function getTextId($id, $subkey = self::DEFAULT_SUBKEY) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
              WHERE (text.".self::COLUMN_ID." = :id AND text.".self::COLUMN_SUBKEY." = :subkey)");
       $dbst->bindValue(':subkey', $subkey, PDO::PARAM_STR);
@@ -104,7 +104,7 @@ class Text_Model extends Model_ORM {
    public function saveText($texts, $label, $idCat, $subKey = self::DEFAULT_SUBKEY, $id = null) {
       // zjištění jestli existuje záznam
       // globalní prvky
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $this->setIUValues(array(self::COLUMN_TEXT => $texts,
           self::COLUMN_TEXT_CLEAR => vve_strip_tags($texts)));
       if ($label !== null) {
@@ -153,7 +153,7 @@ class Text_Model extends Model_ORM {
    }
 
    public function getLastChange($idCat, $subKey = self::DEFAULT_SUBKEY) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CATEGORY." = :idcategory AND ".self::COLUMN_SUBKEY." = :subkey)");
 //      $dbst->bindParam(':idcategory', $idCat);
@@ -194,7 +194,7 @@ class Text_Model extends Model_ORM {
     * @return string
     */
    public function getUpdateValues() {
-      $pdo = new Db_PDO();//`label_cs`= 'Saul Griffith's lofty',
+      $pdo = Db_PDO::getInstance();//`label_cs`= 'Saul Griffith's lofty',
       $returnStr = null;
       //      var_dump($this->insUpdtValues);
       foreach ($this->insUpdtValues as $key => $variable) {
@@ -227,7 +227,7 @@ class Text_Model extends Model_ORM {
     * @return string
     */
    public function getInsertValues() {
-      $pdo = new Db_PDO();
+      $pdo = Db_PDO::getInstance();
       $returnStr = "(";
       foreach (array_values($this->insUpdtValues) as $variable) {
          if(is_bool($variable) AND $variable) {

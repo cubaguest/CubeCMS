@@ -29,7 +29,7 @@ class Text_Model extends Model_PDO {
     * @return string -- načtený text
     */
    public function getText($idCat, $subkey = self::DEFAULT_SUBKEY) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
              WHERE (text.".self::COLUMN_ID_CATEGORY." = :idc AND text.".self::COLUMN_SUBKEY." = :subkey)");
       $dbst->bindValue(':subkey', $subkey, PDO::PARAM_STR);
@@ -47,7 +47,7 @@ class Text_Model extends Model_PDO {
     * @return string -- načtený text
     */
    public function getTextId($id, $subkey = self::DEFAULT_SUBKEY) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
              WHERE (text.".self::COLUMN_ID." = :id AND text.".self::COLUMN_SUBKEY." = :subkey)");
       $dbst->bindValue(':subkey', $subkey, PDO::PARAM_STR);
@@ -71,7 +71,7 @@ class Text_Model extends Model_PDO {
    public function saveText($texts, $label, $idCat, $subKey = self::DEFAULT_SUBKEY, $id = null) {
       // zjištění jestli existuje záznam
       // globalní prvky
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $this->setIUValues(array(self::COLUMN_TEXT => $texts,
           self::COLUMN_TEXT_CLEAR => vve_strip_tags($texts)));
       if ($label !== null) {
@@ -120,7 +120,7 @@ class Text_Model extends Model_PDO {
    }
 
    public function getLastChange($idCat, $subKey = self::DEFAULT_SUBKEY) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CATEGORY." = :idcategory AND ".self::COLUMN_SUBKEY." = :subkey)");
 //      $dbst->bindParam(':idcategory', $idCat);
@@ -140,7 +140,7 @@ class Text_Model extends Model_PDO {
     * @return PDOStatement
     */
    public function search($idCat, $string) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $clabel = self::COLUMN_LABEL.'_'.Locales::getLang();
       $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
 

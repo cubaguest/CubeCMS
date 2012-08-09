@@ -16,7 +16,7 @@ class Db_PDO_Statement extends PDOStatement {
    
    public function execute($input_parameters = null)
    {
-      Db_PDO::addQueryCount();
+      Db_PDO::increaseQueryCount();
       return parent::execute($input_parameters);
    }
 }

@@ -45,7 +45,7 @@ class Model_Rights extends Model_ORM {
     */
    public function getRights($idCat) {
    //      $idCat = 2;
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       //      var_dump("SELECT * FROM ".self::getRightsTable()." AS rights"
       //             ." JOIN ".Model_Users::getGroupsTable()." AS grps ON rights.".self::COLUMN_ID_GROUP." = grps.".Model_Users::COLUMN_ID_GROUP
       //             ." WHERE (rights.".self::COLUMN_ID_CATEGORY." = ".$idCat.") GROUP BY grps.".Model_Users::COLUMN_ID_GROUP);
@@ -69,7 +69,7 @@ class Model_Rights extends Model_ORM {
       if($tablePrefix === null) $table = self::getRightsTable();
       else $table = $tablePrefix.self::DB_TABLE;
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".$table." AS rights"
           ." WHERE (rights.".self::COLUMN_ID_CATEGORY." = ".$dbc->quote($idCat)." AND rights.".self::COLUMN_ID_GROUP." = ".$dbc->quote($idGroup).")");
       if ($dbst) {
@@ -108,7 +108,7 @@ class Model_Rights extends Model_ORM {
     * @param int $idCat -- id kategorie
     */
    public function deleteRightsByCatID($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $st = $dbc->prepare("DELETE FROM ".self::getRightsTable()
           . " WHERE ".self::COLUMN_ID_CATEGORY." = :idcat ");
       return $st->execute(array(':idcat' => $idCat));
@@ -122,7 +122,7 @@ class Model_Rights extends Model_ORM {
       if($tablePrefix === null) $table = self::getRightsTable();
       else $table = $tablePrefix.self::DB_TABLE;
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $st = $dbc->prepare("DELETE FROM ".$table
           . " WHERE ".self::COLUMN_ID_GROUP." = :idgrp ");
       return $st->execute(array(':idgrp' => $idGrp));

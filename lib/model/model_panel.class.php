@@ -53,7 +53,7 @@ class Model_Panel extends Model_ORM {
    }
 
    public function savePanelPos($idPanel, $newPos) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
               ." SET ".self::COLUMN_ORDER." = :newpos"
               ." WHERE ".self::COLUMN_ID." = :id");
@@ -68,7 +68,7 @@ class Model_Panel extends Model_ORM {
     * @return PDOStatement -- objekt s daty
     */
    public function getPanelsList($idCat = 0, $withRights = false) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($withRights) {
          $dbst = $dbc->prepare("SELECT *, panel.icon AS picon FROM ".Db_PDO::table(self::DB_TABLE)." AS panel"
@@ -133,7 +133,7 @@ class Model_Panel extends Model_ORM {
    }
 
    public function getPanel($idPanel) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT *, panel.icon AS picon FROM ".Db_PDO::table(self::DB_TABLE)." AS panel"
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat."
                  .Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
@@ -145,7 +145,7 @@ class Model_Panel extends Model_ORM {
    }
 
    public function deletePanel($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $st = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
               . " WHERE ".self::COLUMN_ID." = :id");
       return $st->execute(array(':id' => $id));
@@ -159,7 +159,7 @@ class Model_Panel extends Model_ORM {
    public function saveParams($panelId, $params){
       // pokud je pole serializujeme
       if(is_array($params)) $params = serialize($params);
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET ".self::COLUMN_PARAMS." = :params WHERE ".self::COLUMN_ID." = :idpanel");
       $dbst->bindValue(':params', $params, PDO::PARAM_STR);
@@ -173,7 +173,7 @@ class Model_Panel extends Model_ORM {
     * @return bool -- true pokud má panely
     */
    public function havePanels($idc) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_CAT." = :idc)");
       $dbst->execute(array(':idc'=> (int)$idc));

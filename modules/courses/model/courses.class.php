@@ -105,7 +105,7 @@ class Courses_Model_Courses extends Model_ORM {
       $urlKey = $this->generateUrlKeys($urlKey, self::DB_TABLE, $name,
               self::COLUMN_URLKEY, self::COLUMN_ID ,$id);
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_NAME."= :name, ".self::COLUMN_TEXT_SHORT."= :textShort, "
@@ -198,7 +198,7 @@ class Courses_Model_Courses extends Model_ORM {
 
    public function saveCourseLecturerConnect($idCourse, $idLecturer) {
       // smažeme předchozí spojení
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_LECTURERS_HAS_COURSES)." "
                  ."(".self::COLUMN_L_H_C_ID_COURSE.",". self::COLUMN_L_H_C_ID_LECTURER.")"
                  ." VALUES (:idCourse, :idLecturer)");
@@ -206,7 +206,7 @@ class Courses_Model_Courses extends Model_ORM {
    }
 
    public function deleteCourseLecturersConnections($idCourse) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_LECTURERS_HAS_COURSES)
           ." WHERE (".self::COLUMN_L_H_C_ID_COURSE ." = :idCourse)");
       $dbst->bindParam(':idCourse', $idCourse, PDO::PARAM_INT);
@@ -215,7 +215,7 @@ class Courses_Model_Courses extends Model_ORM {
 
    public function saveCourseUserConnect($idCourse, $idUser) {
       // smažeme předchozí spojení
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_COURSES_HAS_USERS)." "
                  ."(".self::COLUMN_C_H_U_ID_COURSE.",". self::COLUMN_C_H_U_ID_USER.")"
                  ." VALUES (:idCourse, :idUser)");
@@ -223,7 +223,7 @@ class Courses_Model_Courses extends Model_ORM {
    }
 
    public function deleteCourseUsersConnections($idCourse) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_COURSES_HAS_USERS)
           ." WHERE (".self::COLUMN_C_H_U_ID_COURSE ." = :idCourse)");
       $dbst->bindParam(':idCourse', $idCourse, PDO::PARAM_INT);
@@ -237,7 +237,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return PDOStatement -- pole s kurzem
     */
    public function getCourseUsers($idc) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_COURSES_HAS_USERS)
          ." WHERE (".self::COLUMN_C_H_U_ID_COURSE." = :idc)");
       $dbst->execute(array(':idc' => (int)$idc));
@@ -246,7 +246,7 @@ class Courses_Model_Courses extends Model_ORM {
    }
 
    public function isPrivateUser($idUser, $idCourse) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE_COURSES_HAS_USERS)
                  ." WHERE (".self::COLUMN_C_H_U_ID_USER ." = :idUser)"
               ." AND (".self::COLUMN_C_H_U_ID_COURSE ." = :idCourse)");
@@ -265,7 +265,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return PDOStatement -- pole s kurzem
     */
    public function getCourse($urlKey) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE (".self::COLUMN_URLKEY." = :urlkey)".
           " LIMIT 0, 1");
@@ -280,7 +280,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return PDOStatement -- pole s kurzy
     */
    public function getCourses($onlyVisible = true, $fromRow = 0, $numRows = 500, $type = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $where = null;
       if($onlyVisible == true) $where .= " AND ".self::COLUMN_IN_LIST." = 1";
@@ -306,7 +306,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return PDOStatement -- pole s kurzy
     */
    public function getCoursesForFeed($numRows = 20) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT tc.*, tu.".Model_Users::COLUMN_USERNAME." FROM ".Db_PDO::table(self::DB_TABLE)." AS tc"
               ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS tu ON tu.".Model_Users::COLUMN_ID." = tc.".self::COLUMN_ID_USER
               ." WHERE tc.".self::COLUMN_DELETED." = 0 AND tc.".self::COLUMN_FEED." = 1 AND ".self::COLUMN_IN_LIST." = 1"
@@ -324,7 +324,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return PDOStatement -- pole s kurzy
     */
    public function getCoursesFromDate(DateTime $date, $onlyVisible = true, $fromRow = 0, $numRows = 500, $type = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $where = null;
       if($onlyVisible == true) $where .= " AND ".self::COLUMN_IN_LIST." = 1";
@@ -351,7 +351,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return PDOStatement -- pole s kurzem
     */
    public function getCourseById($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE)
                       . " WHERE (" . self::COLUMN_ID . " = :id)"
                       . " LIMIT 0, 1");
@@ -366,14 +366,14 @@ class Courses_Model_Courses extends Model_ORM {
     * @return bool
     */
    public function deleteCourse($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_DELETED." = 1 WHERE ".self::COLUMN_ID." = :idc");
       return $dbst->execute(array(':idc' => $id));
    }
 
    public function getLecturers($idc) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE_LECTURERS_HAS_COURSES)." AS l_has_c"
               ." JOIN ".Db_PDO::table(Lecturers_Model::DB_TABLE)." AS tb_l ON tb_l.".Lecturers_Model::COLUMN_ID." = l_has_c.".self::COLUMN_L_H_C_ID_LECTURER
               ." WHERE tb_l.".Lecturers_Model::COLUMN_DELETED." = 0 AND l_has_c.".self::COLUMN_L_H_C_ID_COURSE." = :idc"
@@ -390,7 +390,7 @@ class Courses_Model_Courses extends Model_ORM {
     * @return DateTime -- timestamp
     */
    public function getLastChange() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_TIME_EDIT." AS et"
               ." FROM ".Db_PDO::table(self::DB_TABLE)." AS tbcourse"
               ." ORDER BY ".self::COLUMN_TIME_EDIT." DESC"
@@ -417,7 +417,7 @@ class Courses_Model_Courses extends Model_ORM {
     */
    protected function generateUrlKeys($urlKeys, $table, $alternative, $columnName = 'urlkey', $columnId = 'id',$id = null) {
       // načteme všechny klíče z tabulky
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if(is_array($urlKeys)) {
          foreach ($urlKeys as $lang => $key) {
             if($key == null AND $alternative[$lang] == null) continue;

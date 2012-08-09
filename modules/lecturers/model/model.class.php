@@ -43,7 +43,7 @@ class Lecturers_Model extends Model_ORM {
     */
    public function saveLecturer($name, $surname, $degree, $degreeAfter, $text, $image, $id = null) {
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_NAME."= :name, ".self::COLUMN_SURNAME."= :surname, "
@@ -80,7 +80,7 @@ class Lecturers_Model extends Model_ORM {
     * @return integer -- počet
     */
    public function getCount() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(".self::COLUMN_ID.")"." FROM ".Db_PDO::table(self::DB_TABLE)." WHERE (".self::COLUMN_DELETED." = 0)");
       $count = $dbst->fetch();
       return $count[0];
@@ -91,7 +91,7 @@ class Lecturers_Model extends Model_ORM {
     * @return array -- pole skupin
     */
    public function getList($fromRow = 0, $rowsCount = 100) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_DELETED." = 0"
@@ -113,7 +113,7 @@ class Lecturers_Model extends Model_ORM {
     * @return PDOStatement -- pole s skupinou
     */
    public function getLecturer($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID." = :idl)"
               ." LIMIT 0, 1");
@@ -131,7 +131,7 @@ class Lecturers_Model extends Model_ORM {
     * @return bool
     */
    public function deleteLecturer($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_DELETED."= 1"
                  ." WHERE ".self::COLUMN_ID." = :id");
@@ -148,7 +148,7 @@ class Lecturers_Model extends Model_ORM {
    public function getRandomCLip() {
       $retClip = null;
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (ISNULL(".self::COLUMN_CLIPS.") = 0)"
               ." ORDER BY RAND() LIMIT 0, 1");
@@ -168,7 +168,7 @@ class Lecturers_Model extends Model_ORM {
     */
    public function getRandomBand() {
       $retBand = null;
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." ORDER BY RAND() LIMIT 0, 1");
       $dbst->execute();
@@ -180,7 +180,7 @@ class Lecturers_Model extends Model_ORM {
     * @param int $id -- id článku
     */
    public function setLastChange($idArt) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
               ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
               ." WHERE (".self::COLUMN_ID." = :idart)");

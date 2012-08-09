@@ -12,7 +12,7 @@ class Courses_Model_Places extends Model_PDO {
    const COLUMN_NAME = 'place';
 
    public function getPlaces($searched = null){
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($searched == null){
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
@@ -29,7 +29,7 @@ class Courses_Model_Places extends Model_PDO {
    }
 
    public function savePlace($place) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       // kontrola jestli místo již neexistuje
       $dbst = $dbc->prepare("SELECT COUNT(*) AS count FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_NAME." = :place");

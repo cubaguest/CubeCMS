@@ -14,51 +14,48 @@ include_once dirname(__FILE__).DIRECTORY_SEPARATOR."db_pdo_statement.class.php" 
 
 class Db_PDO extends PDO {
    /**
-    * Název sekce v konf. souboru s konfigurací databáze
-    */
-   const CONFIG_DB_SECTION = "db";
-   /**
     * statické proměné určující připojení k db
     * @var string
     */
-   private static $serverName = null;
-   private static $userName = null;
-   private static $userPassword = null;
-   private static $dbName = null;
-   private static $tablePrefix = null;
-   private static $connectorType = null;
+   private static $serverName;
+   private static $userName;
+   private static $userPassword;
+   private static $dbName;
+   private static $tablePrefix;
+   private static $connectorType;
 
    /**
-    * Interní počítadlo příkazů
+    * Interní počítadlo dotazů
     * @var integer
     */
-   static $numberOfSqlQueries = 0;
+   protected static $numberOfSqlQueries = 0;
 
-
+   protected static $instance;
+   
    public function  __construct() {
       try {
-         if(func_num_args() == 0) {
+         if(func_num_args() == 0) { // default connector
             switch (self::$connectorType) {
                case 'mysqli':
                   parent::__construct("mysql:host=".self::$serverName.";dbname=".self::$dbName,
-                          self::$userName, self::$userPassword, array(
-                             //PDO::ATTR_PERSISTENT => true,  vytváří zacyklení db
-                             PDO::ATTR_PERSISTENT => false,
-                             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-                             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                     self::$userName, self::$userPassword, array(
+                        PDO::ATTR_PERSISTENT => false,
+                        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+                        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
                   ));
                   break;
                case 'pgsql':
                   parent::__construct("pgsql:dbname=".self::$dbName.";host=".self::$serverName,
-                          self::$userName,self::$userPassword);
+                     self::$userName,self::$userPassword);
                   break;
                case 'sqllite':
                   parent::__construct("sqlite:".self::$dbName);
                   break;
                default:
-                  throw new PDOException(sprintf(_('Databázový engine "%s" není v PDO podporován'),self::$connectorType), 101);
+                  throw new PDOException(sprintf('Databázový engine "%s" není v PDO podporován',self::$connectorType), 101);
                   break;
             }
+            self::$instance = $this;
          } else {
             call_user_func_array(array($this, "__construct"), func_get_args());
          }
@@ -92,12 +89,16 @@ class Db_PDO extends PDO {
       self::$dbName = VVE_DB_NAME;
       self::$tablePrefix = VVE_DB_PREFIX;
       self::$connectorType = VVE_DB_TYPE;
+      if (!isset(self::$instance) || self::$instance == null)
+      {
+         self::$instance = new Db_PDO();
+      }
    }
 
    /**
     * Metoda přičte k internímu počítadlu jedna
     */
-   public static function addQueryCount() {
+   public static function increaseQueryCount() {
       Db_PDO::$numberOfSqlQueries++;
    }
 
@@ -116,6 +117,19 @@ class Db_PDO extends PDO {
     */
    public static function table($name) {
       return self::$tablePrefix.$name;
+   }
+   
+   /**
+    * Vrací aktuální instanci DB konektoru
+    * @return Db_PDO
+    */
+   public static function getInstance()
+   {
+      if (!isset(self::$instance) || self::$instance == null)
+      {
+         self::$instance = new self();
+      }
+      return self::$instance;
    }
 }
 ?>

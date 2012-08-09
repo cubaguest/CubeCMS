@@ -33,7 +33,7 @@ class Courses_Model_Registrations extends Model_PDO {
     * @param int $idc
     */
    public function getCountRegistrations($idc) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       // kontrola jestli místo již neexistuje
       $dbst = $dbc->prepare("SELECT COUNT(*) AS count FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_ID_COURSE." = :idc AND ".self::COLUMN_CANCELED." = 0");
@@ -45,7 +45,7 @@ class Courses_Model_Registrations extends Model_PDO {
    public function saveRegistration($idCourse, $name, $surname, $degree, $grade, $practiceLength,
            $phone, $mail, $note, $payType, $orgName, $orgAddr, $orgICO, $orgPhone, $privateAdsr) {
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)." "
                  ."(".self::COLUMN_ID_COURSE.",".self::COLUMN_NAME.",". self::COLUMN_SURNAME.","
@@ -82,7 +82,7 @@ class Courses_Model_Registrations extends Model_PDO {
    }
 
    public function getRegistrations($idC) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE '.self::COLUMN_ID_COURSE." = :idc AND ".self::COLUMN_CANCELED." = 0");
       $dbst->execute(array(':idc' => $idC));
@@ -90,7 +90,7 @@ class Courses_Model_Registrations extends Model_PDO {
    }
 
    public function getRegistration($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE '.self::COLUMN_ID." = :idr");
       $dbst->execute(array(':idr' => $id));
@@ -98,7 +98,7 @@ class Courses_Model_Registrations extends Model_PDO {
    }
 
    public function cancelRegistration($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_CANCELED." = 1 WHERE ".self::COLUMN_ID." = :idr");
       return $dbst->execute(array(':idr' => $id));

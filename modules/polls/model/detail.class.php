@@ -5,7 +5,7 @@
 */
 class Polls_Model_Detail extends Polls_Model {
    public function getPoll($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE `".self::COL_ID."` = :idpoll");
 
@@ -16,7 +16,7 @@ class Polls_Model_Detail extends Polls_Model {
    }
 
    public function getTimesWithMovies($idCat, $from, $num) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TIME)." AS times"
               ." JOIN ".Db_PDO::table(self::DB_TABLE)." AS movies ON movies.".self::COL_ID
               ." = times.".self::COL_T_ID_M
@@ -34,7 +34,7 @@ class Polls_Model_Detail extends Polls_Model {
    }
 
    public function getPolls($idCat, $from, $num = 100) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COL_ID_CAT." = :idcat"
               ." ORDER BY ".self::COL_DATE." DESC"
@@ -49,7 +49,7 @@ class Polls_Model_Detail extends Polls_Model {
    }
 
    public function savePoll($idCat, $question, $multianswer, $serData, $votes = 0, $id = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
@@ -83,7 +83,7 @@ class Polls_Model_Detail extends Polls_Model {
    }
 
    public function savePollData($idPoll, $data) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
               ." SET `".self::COL_DATA."` = :data, `".self::COL_VOTES."` = `".self::COL_VOTES."`+1"
               ." WHERE ".self::COL_ID." = :idpoll");
@@ -96,7 +96,7 @@ class Polls_Model_Detail extends Polls_Model {
    public function deletePoll($id) {
       // tady bude ještě přidání mazání uložených klientů
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COL_ID ." = :idpoll)");
       $dbst->bindParam(':idpoll', $id, PDO::PARAM_INT);
@@ -104,7 +104,7 @@ class Polls_Model_Detail extends Polls_Model {
    }
 
    public function deleteTime($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_TIME)
               ." WHERE (".self::COL_T_ID ." = :idtime)");
       $dbst->bindParam(':idtime', $id, PDO::PARAM_INT);
@@ -112,7 +112,7 @@ class Polls_Model_Detail extends Polls_Model {
    }
 
    public function deleteTimes($idMovie) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_TIME)
               ." WHERE (".self::COL_T_ID_M ." = :idmovie)");
       $dbst->bindParam(':idmovie', $idMovie, PDO::PARAM_INT);
@@ -121,7 +121,7 @@ class Polls_Model_Detail extends Polls_Model {
 
 
    public function getLastChange($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_ID_CATEGORY." = :idcategory");
       $dbst->bindParam(':idcategory', $idCat);
@@ -143,7 +143,7 @@ class Polls_Model_Detail extends Polls_Model {
     * @return PDOStatement
     */
    public function search($idCat, $string) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COL_NAME.') AGAINST (:sstring)'
               .' +'.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COL_NAME_ORIG.') AGAINST (:sstring)'
@@ -168,7 +168,7 @@ class Polls_Model_Detail extends Polls_Model {
     * @return integer -- počet anket v kategorii
     */
    public function getCountPolls($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
                  ." WHERE (".self::COL_ID_CAT." = ".(int)$idCat.")");
       $count = $dbst->fetch();

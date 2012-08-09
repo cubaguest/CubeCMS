@@ -20,7 +20,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * Metoda uloží mail do db
     */
    public function saveMail($mail, $id = null, $blocked = false) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
@@ -49,7 +49,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @return PDOStatement -- statement s maily
     */
    public function getMails($fromRow = null, $numRows = 100) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($fromRow === null){
          $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE));
       } else {
@@ -70,7 +70,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @return PDOStatement -- pole s článkem
     */
    public function isSavedMails($mail) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT COUNT(".self::COLUMN_ID.") AS count FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE (".self::COLUMN_MAIL." = :mail)");
       $dbst->bindParam(':mail', $mail, PDO::PARAM_STR);
@@ -87,7 +87,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @param array $ids -- pole s id mailů
     */
    public function deleteMails($ids) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           ." WHERE (".self::COLUMN_ID ." = :id)");
       foreach ($ids as $id) {
@@ -102,7 +102,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @param string $email -- email
     */
    public function deleteMail($email) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           ." WHERE (".self::COLUMN_MAIL ." = :mail)");
       return $dbst->execute(array(':mail' => $email));
@@ -113,7 +113,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @param string/int $email -- email nebo id
     */
    public function changeMailStatus($email) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if(is_numeric($email)){
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
             ." SET ".self::COLUMN_BLOCKED." = ".self::COLUMN_BLOCKED."+1"
@@ -125,7 +125,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
    }
 
    public function getMailsByIds($ids) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE (".self::COLUMN_ID." IN (".$this->generateSQLIN($ids)."))");
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -139,7 +139,7 @@ class NewsLetter_Model_Mails extends Model_PDO {
     * @return integer -- počet článků
     */
    public function getCount() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE));
       $count = $dbst->fetch();
       return $count[0];

@@ -20,7 +20,7 @@ class Text_Model_Private extends Model_PDO {
       // smažeme předchozí spojení
       $this->deleteUsersConnections($idText);
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_USERS)." "
                  ."(".self::COLUMN_T_H_U_ID_TEXT.",". self::COLUMN_T_H_U_ID_USER.")"
                  ." VALUES (:idText, :idUser)");
@@ -31,7 +31,7 @@ class Text_Model_Private extends Model_PDO {
    }
 
    private function deleteUsersConnections($idText) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_USERS)
           ." WHERE (".self::COLUMN_T_H_U_ID_TEXT ." = :idText)");
       $dbst->bindParam(':idText', $idText, PDO::PARAM_INT);
@@ -42,7 +42,7 @@ class Text_Model_Private extends Model_PDO {
       // smažeme předchozí spojení
       $this->deleteGroupsConnections($idText);
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_GROUPS)." "
                  ."(".self::COLUMN_T_H_G_ID_TEXT.",". self::COLUMN_T_H_G_ID_GROUP.")"
                  ." VALUES (:idText, :idGroup)");
@@ -53,7 +53,7 @@ class Text_Model_Private extends Model_PDO {
    }
 
    private function deleteGroupsConnections($idText) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_GROUPS)
           ." WHERE (".self::COLUMN_T_H_G_ID_TEXT ." = :idText)");
       $dbst->bindParam(':idText', $idText, PDO::PARAM_INT);
@@ -61,7 +61,7 @@ class Text_Model_Private extends Model_PDO {
    }
 
    public function getGroupsConnect($idText) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_T_H_G_ID_GROUP." FROM ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_GROUPS)
          ." WHERE ".self::COLUMN_T_H_G_ID_TEXT." = :idt");
       $dbst->bindValue(':idt', $idText, PDO::PARAM_INT);
@@ -70,7 +70,7 @@ class Text_Model_Private extends Model_PDO {
    }
 
    public function getUsersConnect($idText) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_T_H_U_ID_USER." FROM ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_USERS)
          ." WHERE ".self::COLUMN_T_H_U_ID_TEXT." = :idt");
       $dbst->bindValue(':idt', $idText, PDO::PARAM_INT);
@@ -79,7 +79,7 @@ class Text_Model_Private extends Model_PDO {
    }
 
    public function haveGroup($idt, $idg) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_GROUPS)
               ." WHERE (".self::COLUMN_T_H_G_ID_TEXT." = :idt AND ".self::COLUMN_T_H_G_ID_GROUP." = :idg)");
       $dbst->execute(array(':idt'=> (int)$idt,':idg'=> (int)$idg));
@@ -88,7 +88,7 @@ class Text_Model_Private extends Model_PDO {
    }
 
    public function haveUser($idt, $idu) {
-       $dbc = new Db_PDO();
+       $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE_TEXT_HAS_PRIVATE_USERS)
               ." WHERE (".self::COLUMN_T_H_U_ID_TEXT." = :idt AND ".self::COLUMN_T_H_U_ID_USER." = :idu)");
       $dbst->execute(array(':idt'=> (int)$idt,':idu'=> (int)$idu));

@@ -30,7 +30,7 @@ class Mails_Model_Addressbook extends Model_ORM {
    
    public function saveMail($mail, $idGrp = Mails_Model_Groups::GROUP_ID_DEFAULT,
       $name = null, $surname = null, $note = null, $id = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($id != null){
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_NAME." = :name ,". self::COLUMN_SURNAME." = :surname,"
@@ -58,7 +58,7 @@ class Mails_Model_Addressbook extends Model_ORM {
     * @return array
     */
    public function getMails($idGrp = Mails_Model_Groups::GROUP_ID_DEFAULT, $fromRow = 0, $rows = 10000, $orderBy = self::COLUMN_SURNAME, $order = 'ASC') {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($idGrp == Mails_Model_Groups::GROUP_ID_ALL){
          $dbst = $dbc->prepare("SELECT tm.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tm"
               ." ORDER BY `".strtoupper($orderBy)."` ".strtoupper($order).", ".self::COLUMN_MAIL." ASC" // TOHLE je sice prasárna, ale nevím jak předat parametr bez uvozovek
@@ -82,7 +82,7 @@ class Mails_Model_Addressbook extends Model_ORM {
     * @return Object
     */
    public function getMail($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE '.self::COLUMN_ID." = :idm");
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -95,7 +95,7 @@ class Mails_Model_Addressbook extends Model_ORM {
     * @return Object
     */
    public function searchMail($search) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE '.self::COLUMN_NAME." LIKE :str"
               .' OR '.self::COLUMN_SURNAME." LIKE :str"
@@ -111,7 +111,7 @@ class Mails_Model_Addressbook extends Model_ORM {
     * @param int/string $id -- id mailu nebo mail
     */
    public function deleteMail($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if(is_integer($id)){
          $dbst = $dbc->prepare('DELETE FROM '.Db_PDO::table(self::DB_TABLE)
                  ." WHERE ".self::COLUMN_ID." = :mail");
@@ -128,7 +128,7 @@ class Mails_Model_Addressbook extends Model_ORM {
     * @param int $id -- id skupiny
     */
    public function deleteMailByGrp($idGrp) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('DELETE FROM '.Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_ID." = :idgrp");
       $dbst->bindValue(':idgrp', $idGrp, PDO::PARAM_INT);
@@ -141,7 +141,7 @@ class Mails_Model_Addressbook extends Model_ORM {
     * @return integer -- počet článků
     */
    public function getCount($idGrp = Mails_Model_Groups::GROUP_ID_ALL) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE ".self::COLUMN_ID_GRP." = :idGrp");
       $dbst->execute(array(':idGrp' => $idGrp));
@@ -160,7 +160,7 @@ class Mails_Model_Addressbook extends Model_ORM {
    public function searchCount($str, $idGrp = Mails_Model_Groups::GROUP_ID_ALL, $column = self::COLUMN_MAIL, $oper = 'cn') {
       $this->isValidColumn($column, array(self::COLUMN_MAIL, self::COLUMN_NAME, self::COLUMN_SURNAME, self::COLUMN_NOTE));
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $where = null;
       $where .= self::COLUMN_ID_GRP." = :idGrp";
       switch ($oper) {
@@ -193,7 +193,7 @@ class Mails_Model_Addressbook extends Model_ORM {
       $this->isValidColumn($column, array(self::COLUMN_MAIL, self::COLUMN_NAME, self::COLUMN_SURNAME, self::COLUMN_NOTE));
       $this->isValidOrder($ord);
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $where = null;
       $where .= self::COLUMN_ID_GRP." = :idGrp";
       switch ($oper) {

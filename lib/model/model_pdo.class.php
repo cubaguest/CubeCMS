@@ -56,7 +56,7 @@ class Model_PDO extends Model {
     * @return string
     */
    public function getInsertValues() {
-      $pdo = new Db_PDO();
+      $pdo = Db_PDO::getInstance();
       $returnStr = "(";
       foreach (array_values($this->insUpdtValues) as $variable) {
          if(is_bool($variable) AND $variable) {
@@ -77,7 +77,7 @@ class Model_PDO extends Model {
     * @return string
     */
    public function getUpdateValues() {
-      $pdo = new Db_PDO();//`label_cs`= 'Saul Griffith's lofty',
+      $pdo = Db_PDO::getInstance();//`label_cs`= 'Saul Griffith's lofty',
       $returnStr = null;
       //      var_dump($this->insUpdtValues);
       foreach ($this->insUpdtValues as $key => $variable) {
@@ -104,7 +104,7 @@ class Model_PDO extends Model {
     */
    protected function generateUrlKeys($urlKeys, $table, $alternative, $columnName = 'urlkey', $columnId = 'id',$id = null) {
       // načteme všechny klíče z tabulky
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if(is_array($urlKeys)) {
          foreach ($urlKeys as $lang => $key) {
             if($key == null AND $alternative[$lang] == null) continue;
@@ -157,7 +157,7 @@ class Model_PDO extends Model {
     * @return string -- vygenerovaný řetězec
     */
    protected function generateSQLIN($array){
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $in = null;
       foreach ($array as $item) {
          if(is_int($item)){

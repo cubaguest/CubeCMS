@@ -11,7 +11,7 @@ class Mails_Model_Groups extends Model_PDO {
    const GROUP_ID_ALL = 0; // NEPOUŽÍVAT
 
    public function save($name, $note = null, $id = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($id != null){
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_NAME." = :name ,".self::COLUMN_NOTE." = :note"
@@ -35,7 +35,7 @@ class Mails_Model_Groups extends Model_PDO {
     * @return array
     */
    public function getGroups($fromRow = 0, $rows = 100, $orderBy = self::COLUMN_NAME, $order = 'ASC') {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." ORDER BY `".strtoupper($orderBy)."` ".strtoupper($order) // TOHLE je sice prasárna, ale nevím jak předat parametr bez uvozovek
               ." LIMIT :fromRow, :rows"
@@ -52,7 +52,7 @@ class Mails_Model_Groups extends Model_PDO {
     * @return Object
     */
    public function getGrp($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE '.self::COLUMN_ID." = :idg");
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -65,7 +65,7 @@ class Mails_Model_Groups extends Model_PDO {
     * @param int/string $id -- id mailu nebo mail
     */
    public function deleteGroup($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $modelM = new Mails_Model_Addressbook();
       $modelM->deleteMailByGrp($id);
@@ -84,7 +84,7 @@ class Mails_Model_Groups extends Model_PDO {
     * @return integer -- počet článků
     */
    public function getCount() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE));
       $count = $dbst->fetch();
       return $count[0];

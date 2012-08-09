@@ -14,7 +14,7 @@ class Mails_Model_SendMails extends Model_PDO {
    const COLUMN_ATTACHMENTS = 'attachments';
 
    public function saveMail($subject, $content, $recipients = array(), $idUsqer = 1, $attachments = array() ) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO ".Db_PDO::table(self::DB_TABLE)." "
                  ."(".self::COLUMN_SUBJECT.",". self::COLUMN_CONTENT.","
               .self::COLUMN_RECIPIENTS.",".self::COLUMN_ID_USER.",".self::COLUMN_ATTACHMENTS.")"
@@ -32,7 +32,7 @@ class Mails_Model_SendMails extends Model_PDO {
     * @return <type>
     */
    public function getMails($fromRow = 0, $rows = 100) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               ." ORDER BY ".self::COLUMN_DATE." DESC"
               ." LIMIT :fromRow, :rows");
@@ -48,7 +48,7 @@ class Mails_Model_SendMails extends Model_PDO {
     * @return Object
     */
    public function getMail($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
               .' WHERE '.self::COLUMN_ID." = :idm");
       $dbst->setFetchMode(PDO::FETCH_OBJ);
@@ -61,7 +61,7 @@ class Mails_Model_SendMails extends Model_PDO {
     * @param int/string $id -- id mailu nebo mail
     */
    public function deleteMail($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if(is_integer($id)){
          $dbst = $dbc->prepare('DELETE FROM '.Db_PDO::table(self::DB_TABLE)
@@ -79,7 +79,7 @@ class Mails_Model_SendMails extends Model_PDO {
     * @return integer -- počet mailů
     */
    public function getCount() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE));
       $count = $dbst->fetch();
       return $count[0];

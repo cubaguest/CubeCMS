@@ -10,7 +10,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
     * @return string -- načtený text
     */
    public function getText($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
              WHERE (text.".self::COLUMN_ID_CATEGORY." = :idCat)");
       $dbst->bindParam(':idCat', $idCat, PDO::PARAM_INT);
@@ -27,7 +27,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
     * @return string -- načtený text
     */
    public function getList($idCat, $fromRow, $rowsCount = 100, $deleted = false) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($deleted === false) {
          $whereDel = " AND (".self::COL_DELETED." = 0)";
       } else {
@@ -53,7 +53,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
     * @return string -- načtený text
     */
    public function getListAll($fromRow, $rowsCount = 100, $deleted = false) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($deleted === false) {
          $whereDel = " WHERE (".self::COL_DELETED." = 0)";
       } else {
@@ -72,7 +72,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
    }
 
    public function saveBook($idCat, $email, $text, $nick, $www = null, $idBook = null) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       
       $client = NULL;
       if(isset ($_SERVER['HTTP_USER_AGENT'])){
@@ -122,7 +122,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
    }
 
    public function getLastChange($idCat) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".self::COLUMN_CHANGED_TIME." AS tm FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_ID_CATEGORY." = :idcategory");
       $dbst->bindParam(':idcategory', $idCat);
@@ -141,7 +141,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
     * @return PDOStatement
     */
    public function deleteItem($idBook) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET `".self::COL_DELETED."` = 1"
@@ -156,7 +156,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
     * @return int
     */
    public function getCount($idCat, $deleted = false){
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($deleted === false) {
          $dbst = $dbc->query("SELECT COUNT(".self::COL_ID.") FROM ".Db_PDO::table(self::DB_TABLE)
                  ." WHERE (".self::COL_ID_CAT ." = '".$idCat."') AND (".self::COL_DELETED." = 0)");
@@ -175,7 +175,7 @@ class GuestBook_Model_Detail extends GuestBook_Model {
     * @return PDOStatement
     */
 //   public function search($idCat, $string) {
-//      $dbc = new Db_PDO();
+//      $dbc = Db_PDO::getInstance();
 //      $clabel = self::COLUMN_LABEL.'_'.Locales::getLang();
 //      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
 //

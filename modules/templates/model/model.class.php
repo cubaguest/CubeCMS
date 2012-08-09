@@ -49,7 +49,7 @@ class Templates_Model extends Model_ORM {
     * @deprecated - Use ORM!
     */
    public function getTemplate($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE ".self::COLUMN_ID." = :idt");
 

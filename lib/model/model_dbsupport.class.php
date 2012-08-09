@@ -23,7 +23,7 @@ class Model_DbSupport extends Model_PDO {
     * @return PDOStatement -- objekt s daty
     */
    public function getTables($tableName) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare('SELECT '.self::COL_TB_TABLE_NAMES.' FROM '.self::DB_NAME_WITH_SCHEMAS.'.'.self::DB_TABLE_TABLES
          .' WHERE '.self::COL_TB_TABLE_SCHEMA.' = :dbname AND '.self::COL_TB_TABLE_NAMES.' LIKE :tblname');// AND table_name != :thistabel');
@@ -42,7 +42,7 @@ class Model_DbSupport extends Model_PDO {
     * @return PDOStatement
     */
    public function getTableContent($tableName) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare('SELECT * FROM '.$tableName);// AND table_name != :thistabel');
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       $dbst->execute();
@@ -55,7 +55,7 @@ class Model_DbSupport extends Model_PDO {
     * @return PDOStatement
     */
    public function runSQL($sql) {
-      $pdo = new Db_PDO();
+      $pdo = Db_PDO::getInstance();
       return $pdo->query($sql);
    }
 }

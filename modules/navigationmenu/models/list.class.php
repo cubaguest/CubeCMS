@@ -20,7 +20,7 @@ class NavigationMenu_Models_List extends Model_PDO {
    const COL_NEW_WIN = 'newwin';
 
    public function getList() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT * FROM ".$this->getDbTable()
           ." ORDER BY ".self::COL_TYPE.",".self::COL_ORDER." DESC");
 
@@ -31,7 +31,7 @@ class NavigationMenu_Models_List extends Model_PDO {
    }
 
    public function getSubdomainsList() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT * FROM ".$this->getDbTable()
           ." WHERE ".self::COL_TYPE." = 'subdomain'"
           ." ORDER BY ".self::COL_TYPE.",".self::COL_ORDER." DESC");
@@ -43,7 +43,7 @@ class NavigationMenu_Models_List extends Model_PDO {
    }
 
    public function getProjectsList() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT * FROM ".$this->getDbTable()
           ." WHERE ".self::COL_TYPE." = 'project'"
           ." ORDER BY ".self::COL_TYPE.",".self::COL_ORDER." DESC");
@@ -55,7 +55,7 @@ class NavigationMenu_Models_List extends Model_PDO {
    }
 
    public function getGroupsList() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT * FROM ".$this->getDbTable()
           ." WHERE ".self::COL_TYPE." = 'group'"
           ." ORDER BY ".self::COL_TYPE.",".self::COL_ORDER." DESC");
@@ -67,7 +67,7 @@ class NavigationMenu_Models_List extends Model_PDO {
    }
 
    public function getPartnersList() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT * FROM ".$this->getDbTable()
           ." WHERE ".self::COL_TYPE." = 'partner'"
           ." ORDER BY ".self::COL_TYPE.",".self::COL_ORDER." DESC");
@@ -80,7 +80,7 @@ class NavigationMenu_Models_List extends Model_PDO {
 
    public function saveLink($name,$url,$icon = null,$type = 'subdomain', $order = 100, 
            $params = null, $newWindow = 0, $follow = 1, $id = null){
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($id === null) {
       // nový záznam
          $dbst = $dbc->prepare("INSERT INTO ".$this->getDbTable()
@@ -119,7 +119,7 @@ class NavigationMenu_Models_List extends Model_PDO {
    }
 
    public function getItem($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".$this->getDbTable()
              ." WHERE (".self::COL_ID." = :iditem)");
 
@@ -134,7 +134,7 @@ class NavigationMenu_Models_List extends Model_PDO {
     * @param int $id -- id odkazu
     */
    public function deleteItem($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       return $dbc->query("DELETE FROM ".$this->getDbTable()
           . " WHERE ".self::COL_ID." = ".$dbc->quote((int)$id));
    }

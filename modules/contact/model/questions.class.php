@@ -18,7 +18,7 @@ class Contact_Model_Questions extends Model_PDO {
    const COLUMN_TIME_ADD = 'time_add';
 
    public function saveQuestion($name, $mail, $subject, $text) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("INSERT INTO " . Db_PDO::table(self::DB_TABLE) . " "
                       . "(" . self::COLUMN_NAME . "," . self::COLUMN_MAIL. ","
                       . self::COLUMN_SUBJECT . "," . self::COLUMN_TEXT. ")"

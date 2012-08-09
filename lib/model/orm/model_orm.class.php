@@ -78,14 +78,11 @@ class Model_ORM extends Model {
    protected $currentSql = null;
    protected $bindValues = array();
 
-   protected $dbconnector = null;
-
    protected $tableLocked = false;
 
    public function __construct()
    {
       parent::__construct();
-      $this->dbconnector = new Db_PDO();
       $this->_initTable();
    }
 
@@ -599,7 +596,7 @@ class Model_ORM extends Model {
     */
    public function getDb()
    {
-      return $this->dbconnector;
+      return Db_PDO::getInstance();
    }
    
    /**
@@ -812,7 +809,7 @@ class Model_ORM extends Model {
     */
    public function delete($pk = null)
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $sql = 'DELETE FROM ' . $this->getTableName();
       if ($pk instanceof Model_ORM_Record) {
          $this->where($this->pKey, $pk->getPK());
@@ -1023,7 +1020,7 @@ class Model_ORM extends Model {
       $this->createSQLGroupBy($sql); // group by
       $this->createSQLOrder($sql); // order
       $this->createSQLLimi($sql); // limit
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare($sql);
       $this->bindSQLWhere($dbst); // where values
       $this->bindSQLLimit($dbst); // limit values
@@ -1064,7 +1061,7 @@ class Model_ORM extends Model {
 
    public function createTable()
    {
-     $dbc = new Db_PDO();
+     $dbc = Db_PDO::getInstance();
 
      $parts = array();
      $indexes = $fulltexts = array();
@@ -1132,7 +1129,7 @@ class Model_ORM extends Model {
 
    private function createColumnString($name ,$params, $colation = 'utf8_general_ci') 
    {
-      $pdo = new Db_PDO();
+      $pdo = Db_PDO::getInstance();
       
       $str = '`'.$name.'` '.$params['datatype'];
       // colation
@@ -1450,7 +1447,7 @@ class Model_ORM extends Model {
             if($join['with'] != null){ // další parametry v joinu
                $add = $join['with'];
                if(!empty($join['withValues'])){
-                  $pdodriver = new Db_PDO();
+                  $pdodriver = Db_PDO::getInstance();
                   foreach($join['withValues'] as $key => $value) {
 //                      if(is_int($value)){
                         $add = str_replace(':'.$key, $pdodriver->quote($value), $add);

@@ -179,7 +179,7 @@ class Model_Category extends Model_ORM {
     */
    public function getCategoriesWithIndPanels()
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $whereMenu = null;
 
       $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE) . " AS cat"
@@ -198,7 +198,7 @@ class Model_Category extends Model_ORM {
     */
    public static function setLastChange($idCategory)
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE " . Db_PDO::table(self::DB_TABLE)
             . " SET `" . self::COLUMN_CHANGED . "` = NOW()"
             . " WHERE (" . self::COLUMN_CAT_ID . " = :idcat)");
@@ -216,7 +216,7 @@ class Model_Category extends Model_ORM {
       // pokud je pole serializujeme
       if (is_array($params))
          $params = serialize($params);
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE " . Db_PDO::table(self::DB_TABLE)
             . " SET " . self::COLUMN_PARAMS . " = :params WHERE " . self::COLUMN_CAT_ID . " = :idcat");
       $dbst->bindValue(':params', $params, PDO::PARAM_STR);
@@ -226,7 +226,7 @@ class Model_Category extends Model_ORM {
 
    public function getCategoryListByModule($module)
    {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE) . " AS cat"
             . " WHERE (cat." . Model_Category::COLUMN_MODULE . " = :module)");
       $dbst->bindValue(":module", $module, PDO::PARAM_STR);

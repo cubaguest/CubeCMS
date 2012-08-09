@@ -36,6 +36,17 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
       } else {
          $type = 'Připravujeme';
       }
+      
+      // hlavní obrázek
+      if($row->{Model_Category::COLUMN_DATADIR} != null) {
+         $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
+                 .$row->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR
+                 .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].URL_SEPARATOR;
+      } else {
+         $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
+                 .$row->curlkey.URL_SEPARATOR
+                 .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].URL_SEPARATOR;
+      }
       ?>
    <div>
          <?if($printType) {?>
@@ -89,9 +100,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
             <p>
                   <?
                   if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-                     print (vve_tpl_image_tag($this->category()->getModule()->getDataDir()
-                             .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
-                             .$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
+                     print (vve_tpl_image_tag($datadir.$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
                   }
                   ?>
                   <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
@@ -101,15 +110,6 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
                $someImages = true;
                $images = $photosModel->getImages($row->{Actions_Model_Detail::COLUMN_ID_CAT},
                        $row->{Actions_Model_Detail::COLUMN_ID});
-               if($row->{Model_Category::COLUMN_DATADIR} != null) {
-                  $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
-                          .$row->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR
-                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].URL_SEPARATOR;
-               } else {
-                  $datadir = Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
-                          .$row->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR
-                          .$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].URL_SEPARATOR;
-               }
                ?>
          <div id="actionImages_<?=$step?>">
                   <?while ($image = $images->fetch()) {?>

@@ -37,7 +37,7 @@ class TitlePage_Model_Items extends Model_PDO {
     */
    public function saveItem($type, $data, $idCat, $name = null, $image = null, $columns = 1,
            $id = null, $idExt = 0) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($id !== null) {
          $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
@@ -79,7 +79,7 @@ class TitlePage_Model_Items extends Model_PDO {
    }
 
    public function getItems() {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT tbi.* FROM ".Db_PDO::table(self::DB_TABLE)." AS tbi"
               ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS tbc"
               ." ON tbc.`".Model_Category::COLUMN_CAT_ID."` = tbi.`".self::COLUMN_ID_CATEGORY."`"
@@ -109,7 +109,7 @@ class TitlePage_Model_Items extends Model_PDO {
    }
 
    public function setPositions($positions) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
           ." SET `".self::COLUMN_ORDER."` = :pos"
@@ -125,7 +125,7 @@ class TitlePage_Model_Items extends Model_PDO {
 
 
    public function deleteItem($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
           ." WHERE `".self::COLUMN_ID."` = :id");
@@ -136,7 +136,7 @@ class TitlePage_Model_Items extends Model_PDO {
    }
 
    public function getItem($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE (`".self::COLUMN_ID."` = :id)");
       $dbst->execute(array(':id' => (int)$id));
@@ -153,7 +153,7 @@ class TitlePage_Model_Items extends Model_PDO {
     * @return integer -- počet článků
     */
    public function getCountArticles($idCat, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $dbst = $dbc->query("SELECT COUNT(".Articles_Model_Detail::COLUMN_ID.")"
                  ." FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)
@@ -172,7 +172,7 @@ class TitlePage_Model_Items extends Model_PDO {
     * @return array -- pole článků
     */
    public function getList($idCat, $fromRow = 0, $rowsCount = 100, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
@@ -199,7 +199,7 @@ class TitlePage_Model_Items extends Model_PDO {
     * @return array -- pole článků
     */
    public function getListAll($idCat, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
@@ -224,7 +224,7 @@ class TitlePage_Model_Items extends Model_PDO {
     * @return array -- pole článků
     */
    public function getListTop($idCat, $fromRow = 0, $rowsCount = 100, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $whereP = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {
@@ -254,7 +254,7 @@ class TitlePage_Model_Items extends Model_PDO {
     * @return int -- timestamp
     */
    public function getLastChange($id, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT ".Articles_Model_Detail::COLUMN_EDIT_TIME." AS et FROM ".Db_PDO::table(Articles_Model_Detail::DB_TABLE)." AS article"
               ." WHERE (".Articles_Model_Detail::COLUMN_ID_CATEGORY." = :id) AND (".Articles_Model_Detail::COLUMN_CONCEPT." = :onlyPublic)"
               ." ORDER BY ".Articles_Model_Detail::COLUMN_EDIT_TIME." DESC"
@@ -275,7 +275,7 @@ class TitlePage_Model_Items extends Model_PDO {
     * @return array -- pole článků
     */
    public function getListByCats($idCats, $num = 10, $onlyPublic = true) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       if($onlyPublic) {
          $wherePub = " AND (article.".Articles_Model_Detail::COLUMN_CONCEPT." = 0)";
       } else {

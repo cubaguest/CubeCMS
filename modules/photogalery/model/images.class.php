@@ -45,7 +45,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @return PDOStatement
     */
    public function getImages($idCat, $idArt, $num = 0) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $limit = null;
       if($num != 0) {
          $limit = " LIMIT 0,".(int)$num;
@@ -63,7 +63,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
    }
 
    public function getImage($id) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID." = :idimage)");
 
@@ -81,7 +81,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @return <type>
     */
    public function getRandImage($idCat, $idArt) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID_ART." = :idart) AND (".self::COLUMN_ID_CAT." = :idcat)"
               ." ORDER BY RAND() LIMIT 1");
@@ -121,7 +121,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
          $this->setIUValues(array(self::COLUMN_DESC => $desc));
       }
 
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
       if($idImage === null) {
          // provádí se insert
@@ -139,7 +139,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
    }
 
    public function setPosition($id, $pos){
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       // provádí se update
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
                  ." SET ".self::COLUMN_ORDER.' = :pos'
@@ -155,7 +155,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @return bool
     */
    public function deleteImage($idImg) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
               ." WHERE (".self::COLUMN_ID ." = :id)");
       $dbst->bindParam(':id', $idImg, PDO::PARAM_INT);
@@ -163,7 +163,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
    }
 
    public function getCountImages($idCat, $idArt) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(PhotoGalery_Model_Images::DB_TABLE)
               ." WHERE (".PhotoGalery_Model_Images::COLUMN_ID_CAT ." = '".$idCat."')"
               ." AND (".PhotoGalery_Model_Images::COLUMN_ID_ART." = '".$idArt."')");
@@ -177,7 +177,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @todo nepoužito (ověřit jak to dělat lépe)
     */
    public function setLastChange($idImage) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
               ." SET `".self::COLUMN_EDIT_TIME."` = NOW()"
               ." WHERE (".self::COLUMN_ID." = :idimage)");
@@ -223,7 +223,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @return string
     */
    public function getUpdateValues() {
-      $pdo = new Db_PDO();//`label_cs`= 'Saul Griffith's lofty',
+      $pdo = Db_PDO::getInstance();//`label_cs`= 'Saul Griffith's lofty',
       $returnStr = null;
       //      var_dump($this->insUpdtValues);
       foreach ($this->insUpdtValues as $key => $variable) {
@@ -242,7 +242,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @return string
     */
    public function getInsertValues() {
-      $pdo = new Db_PDO();
+      $pdo = Db_PDO::getInstance();
       $returnStr = "(";
       foreach (array_values($this->insUpdtValues) as $variable) {
          if(is_bool($variable) AND $variable) {
