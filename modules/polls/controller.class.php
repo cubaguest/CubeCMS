@@ -135,10 +135,12 @@ class Polls_Controller extends Controller {
 
          $answers = $form->answer->getValues();
          $answersCount = $form->answerCount->getValues();
+         $votes = 0; 
          foreach ($answers as $key => $answer) {
             $count = 0;
             if(isset ($answersCount[$key]) && $answersCount[$key] != null){
                $count = (int)$answersCount[$key];
+               $votes += (int)$answersCount[$key];
             }
             array_push($data, array('answer' => $answer, 'count' => $count));
          }
@@ -150,6 +152,7 @@ class Polls_Controller extends Controller {
          $poll->{Polls_Model::COLUMN_IS_MULTI} = $form->multianswer->getValues();
          $poll->{Polls_Model::COLUMN_ACTIVE} = (bool)$form->active->getValues();
          $poll->{Polls_Model::COLUMN_DATA} = serialize($data);
+         $poll->{Polls_Model::COLUMN_VOTES} = $votes;
          
          $model->save($poll);
          
@@ -267,6 +270,7 @@ class Polls_Controller extends Controller {
       $formVoteSingle = new Form('vote_');
 
       $elemAnswer = new Form_Element_Radio('answer');
+      $elemAnswer->setCheckOptions(false);
       $formVoteSingle->addElement($elemAnswer);
 
       $elemId = new Form_Element_Hidden('id_poll');
