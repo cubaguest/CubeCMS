@@ -108,8 +108,16 @@ class Template_Core extends Template {
       } else {
          ob_start();
       }
-      echo(parent::__toString());
-      $contents = ob_get_contents();
+      echo parent::__toString();
+      $contents = ob_get_clean();
+      
+      if($contents == null){
+         $errorTpl = new Template(new Url_Link(true));
+         $errorTpl->addFile('tpl://error/coreerrorbody.phtml');
+         $errorTpl->renderTemplate();
+         $contents = ob_get_clean();
+      }
+      
       // css
       $css = Template::getStylesheets();
       array_walk($css, create_function('&$i,$k','$i = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$i\" />\n";'));
@@ -128,10 +136,10 @@ class Template_Core extends Template {
       $errCnt = null;
       if(!CoreErrors::isEmpty() AND VVE_DEBUG_LEVEL > 0){
          $tpl = new Template(new Url_Link(true));
-         $tpl->addTplFile('coreerrors.phtml');
+         $tpl->addFile('tpl://error/coreerrors.phtml');
          ob_start();
          $tpl->renderTemplate();
-         $errCnt = ob_get_contents();
+         $errCnt = ob_get_clean();
          ob_end_clean();
       }
 
@@ -192,7 +200,7 @@ class Template_Core extends Template {
          // remove empty meta tags
          ''
          ), $contents);
-      ob_clean();
+      ob_end_clean();
       return ((string)$contents);
    }
 

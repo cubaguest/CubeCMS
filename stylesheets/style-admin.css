@@ -313,6 +313,27 @@ ul.module-tool-buttons li a .ui-button-text { padding: 5px; }
 .module-row-tool-buttons { float: right; }
 .module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
 
+#core-error-page {
+	background-color: white;
+	text-align: center;
+}
+
+#core-error-wrap {
+	text-align: left;
+	width: 800px;
+	margin: 50px auto;
+}
+#core-error-cnt {
+	border: 3px solid #990000;
+	background-color:#FFAAAC;
+	padding: 10px;
+	-moz-border-radius: 10px;
+   border-radius: 10px;
+	-moz-box-shadow:    0px 0px 5px #990000;
+   -webkit-box-shadow: 0px 0px 5px #990000;
+   box-shadow:         0px 0px 5px #990000;
+}
+
 @media print {
    .toolbox, #adminMenuWrapper, a.toolbox-button, #debug, .lang-image { display: none; }
 }

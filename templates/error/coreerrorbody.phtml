@@ -1,0 +1,29 @@
+<? 
+$this->addFile('css://style-admin.css');
+?>
+<!DOCTYPE html>
+<html lang="<?=Locales::getLang()?>">
+<head>
+   <meta charset="utf-8" />
+   <title><?=$this->tr('Chyba ')?></title>
+   <!-- {*-STYLESHEETS-*} -->
+</head>
+ 
+<body id="core-error-page">
+   <div id="core-error-wrap">
+      <div id="core-error-cnt">
+         <h1><?=$this->tr('Chyba aplikace')?></h1>
+         <p><?
+         printf($this->tr('Omlouvám se, ale nastala závažná chyba při vykreslování stránky aplikace %s.'
+               .' Zkuste stránku obnovi (klávesa F5). '
+               .'Pokud ani obnovní nepomůže, kontaktujte správce stránek na adrese <strong>%s</strong>.'),
+               VVE_WEB_NAME, VVE_WEB_MASTER_EMAIL
+               );
+         ?></p>
+         <code>
+         <!--{*-CORE_ERRORS-*}-->
+         </code>
+      </div>
+   </div>
+</body>
+</html>
