@@ -60,7 +60,7 @@ class Db_PDO extends PDO {
                   break;
             }
          } else {
-            call_user_func_array(array($this, "__construct"), unc_get_args());
+            call_user_func_array(array($this, "__construct"), func_get_args());
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
          $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
@@ -72,15 +72,13 @@ class Db_PDO extends PDO {
    }
 
    public function query($statement, $pdoFetch = PDO::FETCH_OBJ , $classname = null , $ctorargs = array()){
-      Debug::log('PDO query');
       self::$numberOfSqlQueries++;
-      return parent::query($statement, $pdoFetch, $classname, $ctorargs);
+      return call_user_func_array(array($this, "parent::query"), func_get_args());
    }
 
    public function exec($statement){
-      Debug::log('PDO exec');
       self::$numberOfSqlQueries++;
-      return parent::query($statement);
+      return call_user_func_array(array($this, "parent::exec"), func_get_args());
    }
 
    /**
