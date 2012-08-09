@@ -156,7 +156,7 @@ class Template_Output {
             header("Pragma: no-cache");
          }
       } else {
-         throw new BadMethodCallException(_('Hlavičky již byly odeslány'));
+//          throw new BadMethodCallException(_('Hlavičky již byly odeslány'));
       }
    }
    
