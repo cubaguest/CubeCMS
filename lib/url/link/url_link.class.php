@@ -344,9 +344,9 @@ class Url_Link {
    public function reload($link = null, $code = 302) {
       if(!Url_Request::isXHRRequest() && CoreErrors::isEmpty()){ // u XHR není nutný reload
          if ($link == null) {
-            Template_Output::addHeader("Location: " . (string)$this, true);
+            Template_Output::addHeader("Location: " . (string)$this, true, $code);
          } else {
-            Template_Output::addHeader("Location: " . (string)$link, true);
+            Template_Output::addHeader("Location: " . (string)$link, true, $code);
          }
          Template_Output::sendHeaders();
          session_commit(); // při více přesměrování se ztrácí info a err messages
