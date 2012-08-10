@@ -9,8 +9,8 @@ class UserReg_Controller extends Controller {
 
    const DEFAULT_REG_LINK_EXPIRE = 24;
 
-   const PARAM_ADMIN_RECIPIENTS = 'admin_rec';
-   const PARAM_OTHER_RECIPIENTS = 'other_rec';
+   const PARAM_ADMIN_RECIPIENTS = 'a_rec';
+   const PARAM_OTHER_RECIPIENTS = 'o_rec';
 
    const TEXT_KEY_MAIN = 'main';
    const TEXT_KEY_MAIL_REG = 'mail_reg';
@@ -64,6 +64,12 @@ class UserReg_Controller extends Controller {
       $elemMail->addValidation(new Form_Validator_NotEmpty());
       $elemMail->addValidation(new Form_Validator_Email());
       $formReg->addElement($elemMail, $formGrpContact);
+      
+      $elemNote = new Form_Element_TextArea('note', $this->tr('Váš popis'));
+      $elemNote->setSubLabel($this->tr('Charakteristika Vaší osoby, čím se zabýváte, kde pracujete, co je pro vás důležité, politická příslušnost atd.'
+            .' <em>Text je zobrazen u Vaše uživatelského účtu a můžete jej kdykoliv změnit.</em>'));
+      $elemNote->addFilter(new Form_Filter_StripTags());
+      $formReg->addElement($elemNote, $formGrpContact);
 
       $elemCondAgree = new Form_Element_Checkbox('condAgree', $this->category()->getParam(self::PARAM_COND_AGREE, $this->tr('Souhlasím se zpracováním údajů')));
       $elemCondAgree->addValidation(new Form_Validator_NotEmpty($this->tr('Musíte souhlasit s podmínkami')));
@@ -78,8 +84,8 @@ class UserReg_Controller extends Controller {
          if ($formReg->pass->getValues() != $formReg->passctrl->getValues()) {
             $elemPassControll->setError($this->tr('Hesla se neshodují'));
          }
-
-         if ($this->checkUserNameController($formReg->username->getValues()) && $this->view()->isFree == false) {
+         $this->checkUserNameController($formReg->username->getValues());
+         if ($this->view()->isFree == false) {
             $elemUsername->setError($this->tr('Zvolené uživatelské jméno je již obsazeno.'));
          }
       }
@@ -94,6 +100,7 @@ class UserReg_Controller extends Controller {
             $newUser->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($formReg->pass->getValues()); 
             $newUser->{Model_Users::COLUMN_GROUP_ID} = $this->category()->getParam(self::PARAM_TARGET_ID_GROUP, VVE_DEFAULT_ID_GROUP); 
             $newUser->{Model_Users::COLUMN_MAIL} = $formReg->mail->getValues(); 
+            $newUser->{Model_Users::COLUMN_NOTE} = $formReg->note->getValues(); 
             
             $modelUsers->save($newUser);
 
@@ -114,18 +121,10 @@ class UserReg_Controller extends Controller {
             
             $data = null;
             
-            function _getMailTbRow($col1, $col2) {
-               $r = '<tr>';
-               $r .= '<th style="text-align: left;">'.$col1.'</th>';
-               $r .= '<td>'.nl2br($col2).'</td>';
-               $r .= '</tr>';
-               return $r;
-            }
-            
-            $data .= _getMailTbRow($this->tr('Jméno a přijmení'), $formReg->name->getValues()." ".$formReg->surname->getValues());
-            $data .= _getMailTbRow($this->tr('Uživatelské jméno'), $formReg->username->getValues());
-            $data .= _getMailTbRow($this->tr('E-mail'), $formReg->mail->getValues());
-            $data .= _getMailTbRow($this->tr('Heslo'), $formReg->pass->getValues());
+            $data .= $this->_getMailTbRow($this->tr('Jméno a přijmení'), $formReg->name->getValues()." ".$formReg->surname->getValues());
+            $data .= $this->_getMailTbRow($this->tr('Uživatelské jméno'), $formReg->username->getValues());
+            $data .= $this->_getMailTbRow($this->tr('E-mail'), $formReg->mail->getValues());
+            $data .= $this->_getMailTbRow($this->tr('Heslo'), $formReg->pass->getValues());
             
             $replacements = array(
                   '{NOTE}' => $note,
@@ -151,6 +150,8 @@ class UserReg_Controller extends Controller {
             $mail->setContent(Email::getBaseHtmlMail($msg));
             $mail->send();
 
+            $this->sendAdminNotification($newUser);
+            
             $this->infoMsg()->addMessage($this->tr('Registrace proběhla úspěšně.'));
             $this->link()->clear()->route('welcome')->reload();
          } else {
@@ -172,6 +173,7 @@ class UserReg_Controller extends Controller {
             $newUserQ->{UserReg_Model_Queue::COLUMN_SURNAME} = $formReg->surname->getValues(); 
             $newUserQ->{UserReg_Model_Queue::COLUMN_HASH} = $hash; 
             $newUserQ->{UserReg_Model_Queue::COLUMN_IP} = $_SERVER['REMOTE_ADDR']; 
+            $newUserQ->{UserReg_Model_Queue::COLUMN_NOTE} = $formReg->note->getValues(); 
             
             $model->save($newUserQ);
 
@@ -191,18 +193,10 @@ class UserReg_Controller extends Controller {
             
             $data = null;
             
-            function _getMailTbRow($col1, $col2) {
-               $r = '<tr>';
-               $r .= '<th style="text-align: left;">'.$col1.'</th>';
-               $r .= '<td>'.nl2br($col2).'</td>';
-               $r .= '</tr>';
-               return $r;
-            }
-            
-            $data .= _getMailTbRow($this->tr('Jméno a přijmení'), $formReg->name->getValues()." ".$formReg->surname->getValues());
-            $data .= _getMailTbRow($this->tr('Uživatelské jméno'), $formReg->username->getValues());
-            $data .= _getMailTbRow($this->tr('E-mail'), $formReg->mail->getValues());
-            $data .= _getMailTbRow($this->tr('Heslo'), $formReg->pass->getValues());
+            $data .= $this->_getMailTbRow($this->tr('Jméno a přijmení'), $formReg->name->getValues()." ".$formReg->surname->getValues());
+            $data .= $this->_getMailTbRow($this->tr('Uživatelské jméno'), $formReg->username->getValues());
+            $data .= $this->_getMailTbRow($this->tr('E-mail'), $formReg->mail->getValues());
+            $data .= $this->_getMailTbRow($this->tr('Heslo'), $formReg->pass->getValues());
             
             $replacements = array(
                   '{NOTE}' => $note,
@@ -246,13 +240,13 @@ class UserReg_Controller extends Controller {
       $this->checkReadableRights();
 
       $model = new UserReg_Model_Queue();
-      
-      self::removeExpired($this->category()->getId(),
-             $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE));
 
-      $registration = $model->where(UserReg_Model_Queue::COLUMN_HASH." = :uhash", 
+      self::removeExpired($this->category()->getId(),
+            $this->category()->getParam(self::PARAM_REG_LINK_EXPIRE, self::DEFAULT_REG_LINK_EXPIRE));
+
+      $registration = $model->where(UserReg_Model_Queue::COLUMN_HASH." = :uhash",
             array('uhash' => $this->getRequestParam('id')))
-         ->record();
+            ->record();
 
       if ($registration == false) {
          $this->errMsg()->addMessage(
@@ -273,15 +267,18 @@ class UserReg_Controller extends Controller {
          }
 
          $newUser = $modelUsers->newRecord();
-         
-         $newUser->{Model_Users::COLUMN_USERNAME} = $registration->{UserReg_Model_Queue::COLUMN_USERNAME}; 
-         $newUser->{Model_Users::COLUMN_NAME} = $registration->{UserReg_Model_Queue::COLUMN_NAME}; 
-         $newUser->{Model_Users::COLUMN_SURNAME} = $registration->{UserReg_Model_Queue::COLUMN_SURNAME}; 
-         $newUser->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($registration->{UserReg_Model_Queue::COLUMN_PASS}); 
-         $newUser->{Model_Users::COLUMN_GROUP_ID} = $this->category()->getParam(self::PARAM_TARGET_ID_GROUP, VVE_DEFAULT_ID_GROUP); 
-         $newUser->{Model_Users::COLUMN_MAIL} = $registration->{UserReg_Model_Queue::COLUMN_MAIL}; 
+
+         $newUser->{Model_Users::COLUMN_USERNAME} = $registration->{UserReg_Model_Queue::COLUMN_USERNAME};
+         $newUser->{Model_Users::COLUMN_NAME} = $registration->{UserReg_Model_Queue::COLUMN_NAME};
+         $newUser->{Model_Users::COLUMN_SURNAME} = $registration->{UserReg_Model_Queue::COLUMN_SURNAME};
+         $newUser->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($registration->{UserReg_Model_Queue::COLUMN_PASS});
+         $newUser->{Model_Users::COLUMN_GROUP_ID} = $this->category()->getParam(self::PARAM_TARGET_ID_GROUP, VVE_DEFAULT_ID_GROUP);
+         $newUser->{Model_Users::COLUMN_MAIL} = $registration->{UserReg_Model_Queue::COLUMN_MAIL};
+         $newUser->{Model_Users::COLUMN_NOTE} = $registration->{UserReg_Model_Queue::COLUMN_NOTE};
          
          $modelUsers->save($newUser);
+         
+         $this->sendAdminNotification($newUser);
          
          $model->delete($registration);
 
@@ -405,16 +402,16 @@ class UserReg_Controller extends Controller {
       $this->view()->formEdit = $formEdit;
    }
 
-   public function checkUserNameController($username = null) {
+   public function checkUserNameController($username = null) 
+   {
       $this->checkReadableRights();
       $this->view()->isFree = false;
 
       if($username === null) $username = isset($_POST['username']) ? $_POST['username'] : null;
       
       if($username == null){
-         return false; 
+         return; 
       }
-      
       
       $modelUsers = new Model_Users();
       $modelQueue = new UserReg_Model_Queue();
@@ -422,18 +419,75 @@ class UserReg_Controller extends Controller {
       $user = $modelUsers->getUser($username, true);
       $userQ = $modelQueue->getUser($username);
 
-         $this->view()->msg = $this->tr('obsazené');
+      $this->view()->msg = $this->tr('obsazené');
       if($user === false AND $userQ === false){
          $this->view()->isFree = true;
          $this->view()->msg = $this->tr('volné');
       }
    }
 
+   protected function sendAdminNotification($userRecord) 
+   {
+      // maily adminů - z uživatelů
+      $usersId = $this->category()->getParam(self::PARAM_ADMIN_RECIPIENTS, array());
+      if(empty($usersId)){
+         return;
+      }
+      
+      $mail = new Email(true);
+      
+      $adminMails = array();
+      $modelusers = new Model_Users();
+      foreach ($usersId as $id) {
+         $user = $modelusers->record($id);
+         $adminMails = array_merge($adminMails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
+      }
+      $mail->addAddress($adminMails);
+      $name = $userRecord->{Model_Users::COLUMN_NAME}." ".$userRecord->{Model_Users::COLUMN_SURNAME};
+      $mail->setSubject( sprintf($this->tr('Registrace nového uživatele %s na stránkách'), $name ) . ' ' . VVE_WEB_NAME);
+      
+      $data = null;
+            
+      $data .= $this->_getMailTbRow($this->tr('Jméno a přijmení'), $name);
+      $data .= $this->_getMailTbRow($this->tr('Uživatelské jméno'), $userRecord->{Model_Users::COLUMN_USERNAME});
+      $data .= $this->_getMailTbRow($this->tr('E-mail'), $userRecord->{Model_Users::COLUMN_MAIL});
+      $data .= $this->_getMailTbRow($this->tr('ID skupiny'), $userRecord->{Model_Users::COLUMN_GROUP_ID});
+            
+      $replacements = array(
+         '{WEB_LINK}' => '<a href="'.$this->link()->clear(true).'">{WEB_NAME}</a>',
+         '{WEB_NAME}' => VVE_WEB_NAME,
+         '{USER_NAME}' => $userRecord->{Model_Users::COLUMN_USERNAME},
+         '{DATA}' => $data,
+         '{DATE_TIME}' => vve_date('%x %X'),
+      );
+            
+      $mail->setReplacements($replacements);
+            
+      $msg =
+         '<h1>'.$this->tr('Na stránkách {WEB_LINK} byla provedena nová registrace uživatelského účtu "{USER_NAME}"').'</h1>'
+         . '<h2>'.$this->tr('Informace o registraci účtu').': </h2>'
+         . '<p><table cellpadding="5" border="1">'
+         . '{DATA}'
+         . ' </table></p>'
+         . '<hr />';
+      $mail->setContent(Email::getBaseHtmlMail($msg));
+      $mail->send();
+   } 
+   
+   private function _getMailTbRow($col1, $col2) {
+      $r = '<tr>';
+      $r .= '<th style="text-align: left;">'.$col1.'</th>';
+      $r .= '<td>'.nl2br($col2).'</td>';
+      $r .= '</tr>';
+      return $r;
+   }
+   
    /**
     * Metoda pro nastavení modulu
     */
    public function settings(&$settings, Form &$form) {
 
+      /* Nastavení formuláře */
       $grpForm = $form->addGroup('form', $this->tr('Nastavení formuláře'));
 
       $elemCreateNow = new Form_Element_Checkbox('createNow', $this->tr('Vytvořit účet okamžitě'));
@@ -464,9 +518,8 @@ class UserReg_Controller extends Controller {
       if (isset($settings[self::PARAM_TARGET_ID_GROUP])) {
          $elemTGroups->setValues($settings[self::PARAM_TARGET_ID_GROUP]);
       }
-
       $form->addElement($elemTGroups, $grpForm);
-
+      
       $elemRegExpire = new Form_Element_Text('expire', $this->tr('Platnost dokončení'));
       $elemRegExpire->setSubLabel($this->tr('Za kolik hodin vyprší odkaz pro dokončení registrace'));
       if (isset($settings[self::PARAM_REG_LINK_EXPIRE])) {
@@ -483,6 +536,28 @@ class UserReg_Controller extends Controller {
       $elemPassMinL->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
       $form->addElement($elemPassMinL, $grpForm);
 
+      /* Nootifikace */
+      $grpNotify = $form->addGroup('notify', $this->tr('Oznámení o registraci'));
+      $elemAdmins = new Form_Element_Select('notifyAdmins', 'Adresy uživatelů v systému');
+      // načtení uživatelů
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->usersForThisWeb(true)->records(PDO::FETCH_OBJ);
+      $usersIds = array();
+      foreach ($users as $user) {
+         if($user->{Model_Users::COLUMN_MAIL} != null){
+            $usersIds[$user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
+            .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Users::COLUMN_GROUP_LABEL}
+            .' ('.$user->{Model_Users::COLUMN_GROUP_NAME}.')'] = $user->{Model_Users::COLUMN_ID};
+         }
+      }
+      $elemAdmins->setOptions($usersIds);
+      $elemAdmins->setMultiple();
+      $elemAdmins->html()->setAttrib('size', 4);
+      if (isset($settings[self::PARAM_ADMIN_RECIPIENTS])) {
+         $elemAdmins->setValues($settings[self::PARAM_ADMIN_RECIPIENTS]);
+      }
+      $form->addElement($elemAdmins, $grpNotify);
+      
       if ($form->isSend() AND $form->createNow->getValues() != true) {
          $form->expire->addValidation(new Form_Validator_NotEmpty());
       }
@@ -493,6 +568,7 @@ class UserReg_Controller extends Controller {
          $settings[self::PARAM_TARGET_ID_GROUP] = $form->groupId->getValues();
          $settings[self::PARAM_REG_LINK_EXPIRE] = $form->expire->getValues();
          $settings[self::PARAM_PASSWORD_MIN_LEN] = $form->passMinL->getValues();
+         $settings[self::PARAM_ADMIN_RECIPIENTS] = $form->notifyAdmins->getValues();
       }
    }
 

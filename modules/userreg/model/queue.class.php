@@ -20,6 +20,7 @@ class UserReg_Model_Queue extends Model_ORM {
    const COLUMN_PHONE_NUMBER = 'phone';
    const COLUMN_TIME_ADD = 'timeadd';
    const COLUMN_IP = 'ipaddress';
+   const COLUMN_NOTE = 'note';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_userreg_queue');
@@ -34,6 +35,7 @@ class UserReg_Model_Queue extends Model_ORM {
       $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_PHONE_NUMBER, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_IP, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
 
       $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
    
