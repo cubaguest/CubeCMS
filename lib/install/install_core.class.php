@@ -229,7 +229,10 @@ class Install_Core {
          $currentRelease++;
       }
 //       die();
-      $this->installComplete(sprintf('Jádro bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
+      Install_Module::updateAllModules();
+      $this->installComplete(sprintf('Jádro a moduly bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
+      
+      // update dubdomain with CURL
    }
 
    /**

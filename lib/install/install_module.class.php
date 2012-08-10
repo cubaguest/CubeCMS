@@ -78,6 +78,9 @@ class Install_Module {
                  .$module->{Model_Module::COLUMN_NAME}.DIRECTORY_SEPARATOR
                  .AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.self::VERSION_FILE);;
 
+      /**
+       * @todo tohle je blbě, musí být parsování verze
+       */ 
       for ($currentVer = (float)$fromVersion; round($currentVer,1) < round((float)$toVersion,1); $currentVer+=0.1) {
          $fileName = preg_replace(array('/{from}/', '/{to}/'),
                  array(number_format($currentVer, 1, '.', ''), number_format($currentVer+0.1, 1, '.', '')),
@@ -141,5 +144,41 @@ class Install_Module {
       return str_replace($this->moduleTablesPrefix, VVE_DB_PREFIX, $cnt);
    }
 
+   public static function updateAllModules() 
+   {
+      // načtení instalovaných modulů
+      $model = new Model_Module();
+      $modules = $model->records();
+      
+      $modulesForUpgrade = array();
+      
+      foreach ($modules as $module) {
+         $vers = explode('.', file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$module->{Model_Module::COLUMN_NAME}.DIRECTORY_SEPARATOR
+               .AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.self::VERSION_FILE));
+         
+         if($vers[0] > $module->{Model_Module::COLUMN_VERSION_MAJOR}
+            || $vers[1] > $module->{Model_Module::COLUMN_VERSION_MINOR}){
+            $modulesForUpgrade[] = $module->{Model_Module::COLUMN_NAME};
+         }
+      }
+      
+      if(!empty($modulesForUpgrade)) {
+         foreach ($modulesForUpgrade as $module) {
+            try {
+               $instObjName = ucfirst($module).'_Install';
+               $instObj = new $instObjName;
+               $instObj->update();
+            } catch (Exception $e) {
+               echo 'ERROR: Chyba při aktualizaci modulu: '.$module.'<br />';
+               echo $e->getMessage().'<br />';
+               echo "DEBUG: <br/ >";
+               echo $e->getTraceAsString();
+               die ();
+            }
+         }
+      }
+      
+   }
 }
 ?>
