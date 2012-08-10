@@ -16,8 +16,15 @@ class Login_Controller extends Controller {
    
    public function mainController() {
       $model = new Model_Users();
+      $modelLogins = new Model_UsersLogins;
 
       $this->view()->user = $model->joinFK(Model_Users::COLUMN_GROUP_ID)->record(Auth::getUserId());
+      
+      $this->view()->lastLogin = $modelLogins
+         ->where(Model_UsersLogins::COLUMN_ID_USER." = :idu", array('idu' => Auth::getUserId()))
+         ->order(array( Model_UsersLogins::COLUMN_TIME => Model_ORM::ORDER_DESC ) )
+         ->limit(1, 1)
+         ->record(); 
 	}
 	
 	/**
@@ -86,14 +93,24 @@ class Login_Controller extends Controller {
       $user = $model->record(Auth::getUserId());
 
       $this->createEditUserForm(); // vytvoříme instanci formu
+      $this->form->username->setValues($user->{Model_Users::COLUMN_USERNAME});
       $this->form->name->setValues($user->{Model_Users::COLUMN_NAME});
       $this->form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
       $this->form->email->setValues($user->{Model_Users::COLUMN_MAIL});
       $this->form->note->setValues($user->{Model_Users::COLUMN_NOTE});
-      unset ($model);
 
-      if($this->form->isSend() AND $this->form->save->getValues() == false){
-         $this->link()->route()->reload();
+      if($this->form->isSend() ){
+         if(!$this->form->save->getValues()){
+            $this->link()->route()->reload();
+         }
+         
+         $reserver = $model->where(Model_Users::COLUMN_USERNAME." = :uname AND ".Model_Users::COLUMN_ID." != :uid",
+               array('uname' => $this->form->username->getValues(), 'uid' => Auth::getUserId()))
+            ->count();
+         
+         if((bool)$reserver){
+            $this->form->username->setError($this->tr('Vybrané uživatelské jméno je obsazeno'));
+         }
       }
 
       if($this->form->isValid()){
@@ -109,6 +126,10 @@ class Login_Controller extends Controller {
 
       $fGrpBase = $this->form->addGroup('base', $this->tr('Základní informace'));
 
+      $elemUserName = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
+      $elemUserName->addValidation(new Form_Validator_NotEmpty());
+      $this->form->addElement($elemUserName, $fGrpBase);
+      
       $elemName = new Form_Element_Text('name', $this->tr('Jméno'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $this->form->addElement($elemName, $fGrpBase);
@@ -133,6 +154,7 @@ class Login_Controller extends Controller {
    protected function saveUser() {
       $modelUser = new Model_Users();
       $user = $modelUser->record(Auth::getUserId());
+      $user->{Model_Users::COLUMN_USERNAME} = $this->form->username->getValues();
       $user->{Model_Users::COLUMN_NAME} = $this->form->name->getValues();
       $user->{Model_Users::COLUMN_SURNAME} = $this->form->surname->getValues();
       $user->{Model_Users::COLUMN_MAIL} = $this->form->email->getValues();

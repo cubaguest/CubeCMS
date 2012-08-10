@@ -6,13 +6,13 @@
             <h2><?= $this->tr('Přihlášení'); ?></h2>
          </p>
          <p>
-            <label for="login-user"><?= $this->tr('Jméno'); ?>:</label><br />
-            <input type="text" name="login_username" maxlength="20" id="login-user" size="22" 
+            <label for="login-user"><?= $this->tr('Jméno / e-mail'); ?>:</label><br />
+            <input type="text" name="login_username" id="login-user" size="22" 
                    value="<?= $this->post("login_username"); ?>" class="login-input-text" />
          </p>
          <p>
             <label for="login-password"><?= $this->tr('Heslo'); ?>:</label><br />
-            <input type="password" name="login_passwd" maxlength="20" id="login-password" size="22" 
+            <input type="password" name="login_passwd" id="login-password" size="22" 
                    value="" class="login-input-text"/><br />
          </p>
          <p class="left-box login-permanent">
