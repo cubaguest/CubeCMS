@@ -366,7 +366,7 @@ class Model_ORM extends Model {
       }
 
       $obj = clone $this;
-      $obj = $obj->limit(0, 1);
+      $obj = $obj->limit( $this->limit['from'] == null ? 0 : $this->limit['from'], 1);
       if ($pk != null AND $value == null) { // je zadána hodnota pk
          $obj = $obj->where($pk);
       } else if ($pk != null AND $value != null) { // je zadán sloupce a jeho jeho hodnota
