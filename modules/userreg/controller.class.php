@@ -71,7 +71,8 @@ class UserReg_Controller extends Controller {
       $elemNote->addFilter(new Form_Filter_StripTags());
       $formReg->addElement($elemNote, $formGrpContact);
 
-      $elemCondAgree = new Form_Element_Checkbox('condAgree', $this->category()->getParam(self::PARAM_COND_AGREE, $this->tr('Souhlasím se zpracováním údajů')));
+      $elemCondAgree = new Form_Element_Checkbox('condAgree', $this->category()->getParam(self::PARAM_COND_AGREE, $this->tr('Potvrzení')));
+      $elemCondAgree->setSubLabel( sprintf( $this->tr('Potvrzením souhlasíte se zpracováním Vašich osobních údajů pro potřeby stránek %s.'), VVE_WEB_NAME ));
       $elemCondAgree->addValidation(new Form_Validator_NotEmpty($this->tr('Musíte souhlasit s podmínkami')));
       $elemCondAgree->setValues(true);
       $formReg->addElement($elemCondAgree);
