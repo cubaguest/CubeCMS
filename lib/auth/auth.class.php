@@ -89,22 +89,22 @@ class Auth extends TrObject {
 	 * Konstruktor, provádí autorizaci
 	 */
    public static function authenticate() {
-		//Zakladni proměne
+      //Zakladni proměne
 		self::$login = false;
-   	//Jestli uzivatel prihlasen, je zvolena skupina uzivatele, v opacnem pripade vychozi skupina
-		if(!self::userIslogIn()){
-			if(!self::permanentLogin() AND !self::logInNow()){
-				//přihlášení výchozího uživatele
-				self::setDefaultUserParams();
-			}
-		} else {
-			//Uživatel se odhlásil
-			if(self::logOutNow()){
-				self::setDefaultUserParams();
-			} else {
-				self::setUserDetailFromSession();
-			}
-		}
+     	//Jestli uzivatel prihlasen, je zvolena skupina uzivatele, v opacnem pripade vychozi skupina
+	   if(!self::userIslogIn()){
+   		if(!self::permanentLogin() AND !self::logInNow()){
+  				//přihlášení výchozího uživatele
+			   self::setDefaultUserParams();
+		   }
+      } else {
+   		//Uživatel se odhlásil
+  			if(self::logOutNow()){
+			   self::setDefaultUserParams();
+		   } else {
+	   		self::setUserDetailFromSession();
+   		}
+ 		}
 	}
 
 	/**
@@ -231,6 +231,16 @@ class Auth extends TrObject {
                      AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
                      Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
                   }
+                  // uložení přihlášení
+                  
+                  $modelUserLogins = new Model_UsersLogins();
+                  $newLogin = $modelUserLogins->newRecord();
+                  $newLogin->{Model_UsersLogins::COLUMN_ID_USER} = self::$userId;
+                  $newLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS} = $_SERVER['REMOTE_ADDR'];
+                  $newLogin->{Model_UsersLogins::COLUMN_BROWSER} = $_SERVER['HTTP_USER_AGENT'];
+                  $modelUserLogins->save($newLogin);
+                  
+                  
                   Log::msg($tr->tr('Uživatel byl přihlášen'), null, self::$userName);
                   // permanent login
                   if(isset ($_POST['login_permanent']) AND $_POST['login_permanent'] == 'on'){
@@ -239,7 +249,6 @@ class Auth extends TrObject {
                   self::saveUserDetailToSession();
                   $link = new Url_Link();
                   $link->reload($link->getTransferProtocol().'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
-                  die(); // not needn't
                   return true;
 					} else {
                   AppCore::getUserErrors()->addMessage($tr->tr("Bylo zadáno špatné heslo."));
@@ -332,8 +341,10 @@ class Auth extends TrObject {
 
    private static function getUser($username) {
       $model = new Model_Users();
-      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID, array('gname' => Model_Groups::COLUMN_NAME, Model_Groups::COLUMN_IS_ADMIN))
-         ->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))->record();
+      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID, 
+            array('gname' => Model_Groups::COLUMN_NAME, Model_Groups::COLUMN_IS_ADMIN))
+         ->where(Model_Users::COLUMN_USERNAME.' = :username OR '.Model_Users::COLUMN_MAIL.' = :mail',
+                array('username' => $username, 'mail' => $username))->record();
       return $rec;
    }
 
