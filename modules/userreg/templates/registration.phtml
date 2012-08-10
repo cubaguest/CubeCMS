@@ -57,7 +57,13 @@ echo $this->toolbox;
          }
       });
       $('.regusername_class').change(function(){
-    	  checkUserName();
+    	   checkUserName();
+    	   // pokud je e-mail přeřadit do mailu
+    	   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    	   var val = $('#regusername_1').val();
+    	   if($('#regmail_1').val() == "" && re.test(val)){
+    		   $('#regmail_1').val(val);
+    	   }
       });
 
       if($('.regusername_class').val() != ""){

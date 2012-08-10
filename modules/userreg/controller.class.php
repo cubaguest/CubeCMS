@@ -31,11 +31,11 @@ class UserReg_Controller extends Controller {
       $formReg = new Form('reg');
       $formGrpAccount = $formReg->addGroup('account', $this->tr('Účet'));
 
-      $elemUsername = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
+      $elemUsername = new Form_Element_Text('username', $this->tr('Uživatelské jméno / e-mail'));
       $elemUsername->addValidation(new Form_Validator_NotEmpty());
       $elemUsername->addValidation(new Form_Validator_MinLength(5));
-      $elemUsername->addValidation(new Form_Validator_Regexp('/^[a-zA-Z0-9_-]+$/', $this->tr('Uživatelské jméno obsahuje nepovolené znaky.')));
-      $elemUsername->setSubLabel($this->tr('pouze písmena, číslice a znaky: "_-"'));
+      $elemUsername->addValidation(new Form_Validator_Regexp('/^[a-zA-Z0-9@._-]+$/', $this->tr('Uživatelské jméno obsahuje nepovolené znaky.')));
+      $elemUsername->setSubLabel($this->tr('Pouze písmena bez diakritiky, číslice a znaky: "@._-" (např. Váš e-mail)'));
 
 
       $formReg->addElement($elemUsername, $formGrpAccount);
