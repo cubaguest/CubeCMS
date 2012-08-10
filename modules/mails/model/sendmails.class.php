@@ -80,9 +80,9 @@ class Mails_Model_SendMails extends Model_PDO {
     */
    public function getCount() {
       $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE));
+      $dbst = $dbc->query("SELECT COUNT(*) AS sendcount FROM ".Db_PDO::table(self::DB_TABLE));
       $count = $dbst->fetch();
-      return $count[0];
+      return $count->sendcount;
    }
 }
 ?>

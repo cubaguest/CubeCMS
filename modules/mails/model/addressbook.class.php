@@ -142,11 +142,11 @@ class Mails_Model_Addressbook extends Model_ORM {
     */
    public function getCount($idGrp = Mails_Model_Groups::GROUP_ID_ALL) {
       $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
+      $dbst = $dbc->prepare("SELECT COUNT(*) AS addresscount FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE ".self::COLUMN_ID_GRP." = :idGrp");
       $dbst->execute(array(':idGrp' => $idGrp));
       $count = $dbst->fetch();
-      return $count[0];
+      return $count->addresscount;
    }
 
    /**
@@ -181,11 +181,11 @@ class Mails_Model_Addressbook extends Model_ORM {
             break;
       }
 
-      $dbst = $dbc->prepare("SELECT COUNT(*) FROM ".Db_PDO::table(self::DB_TABLE)
+      $dbst = $dbc->prepare("SELECT COUNT(*) AS scount FROM ".Db_PDO::table(self::DB_TABLE)
          ." WHERE ".$where);
       $dbst->execute(array(':idGrp' => (int)$idGrp, ':str' => $str));
       $count = $dbst->fetch();
-      return $count[0];
+      return $count->scount;
    }
 
    public function search($str, $idGrp = Mails_Model_Groups::GROUP_ID_ALL, $column = self::COLUMN_MAIL, $oper = 'cn',

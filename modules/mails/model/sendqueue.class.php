@@ -120,9 +120,9 @@ class Mails_Model_SendQueue extends Model_ORM {
     */
    public function getCount() {
       $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->query("SELECT COUNT(*) FROM " . Db_PDO::table(self::DB_TABLE));
+      $dbst = $dbc->query("SELECT COUNT(*) AS c FROM " . Db_PDO::table(self::DB_TABLE));
       $count = $dbst->fetch();
-      return $count[0];
+      return $count->c;
    }
 
 }
