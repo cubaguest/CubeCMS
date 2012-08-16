@@ -141,18 +141,19 @@ class Model_Category extends Model_ORM {
     * Metoda načte všechny kategorie
     * @return array of Model_ORM_Records -- pole s objekty
     */
-   public function getCategoryList()
+   public function getCategoryList($allLangs = false)
    {
       if(self::$allCatsRecords == null){
          $this->columns(array(
-            Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, Model_Category::COLUMN_DESCRIPTION, /*Model_Category::COLUMN_DATADIR, */
-            Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, /* Model_Category::COLUMN_FEEDS, */
+            Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, 
+            Model_Category::COLUMN_DESCRIPTION, Model_Category::COLUMN_KEYWORDS,
+            Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, Model_Category::COLUMN_FEEDS,
             Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
             Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,  
             Model_Category::COLUMN_PRIORITY
 //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
-         $this->setSelectAllLangs(false)
+         $this->setSelectAllLangs($allLangs)
             ->withRights()
             ->where(Model_Category::COLUMN_DISABLE.' = 0', array());
 //             ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC')); // filesort
