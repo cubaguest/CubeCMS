@@ -1,0 +1,63 @@
+<?
+$this->addFile('css://style.css');
+// do titulku
+$h = sprintf( $this->tr('Úprava parametru "%s"'), $this->paramName );
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+
+$this->addJsPlugin( new JsPlugin_JQueryCSS());
+
+
+function renderCatsList($childs, $form, $link, $param) 
+{
+   foreach ($childs as $child) {
+      
+      $obj = $child->getCatObj()->getDataObj();
+      $form->param->setDimensional($obj->{Model_Category::COLUMN_ID});
+      $value = $obj->{$param};
+      $form->param->setValues($value);
+   ?>
+      <li>
+         <div class="name ui-widget-header">
+            <?ps($obj->{Model_Category::COLUMN_NAME}); ?> 
+            <a href="<?=$link->category($obj->{Model_Category::COLUMN_URLKEY})?>"
+               title="<?ps($obj->{Model_Category::COLUMN_ALT})?>"
+               class="link-external"><em>(URL: <?ps($obj->{Model_Category::COLUMN_URLKEY})?>)</em></a>
+         </div>
+         <div class="form ui-widget-content">
+            <? 
+//             echo $form->param->label();
+            echo $form->param->labelLangs();
+            echo $form->param->controllAll();
+            ?>
+         </div>
+         <? if(!$child->isEmpty()){?>
+         <ul>
+            <?renderCatsList($child, $form, $link, $param) ?>
+         </ul>      
+         <?}?>
+      </li>   
+   <?
+   }
+}
+?>
+<h1><?ps($h) ?></h1>
+<div class="main-content-detail main-content-form-edit">
+   <?=$this->form->renderStart();?>
+   <fieldset>
+   <ul id="categories-list" class="ui-widget form-table">
+      <? 
+      renderCatsList($this->struct, $this->form, $this->link()->clear(), $this->param);
+      ?>
+      <li><?echo $this->form->save->controllAll();?></li>
+   </ul>
+   </fieldset>
+   <?=$this->form->renderEnd();?>
+   <? 
+   ?>
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      /* ]]> */
+   </script>
+</div>

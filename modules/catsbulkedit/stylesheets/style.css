@@ -1,0 +1,17 @@
+@CHARSET "UTF-8";
+#categories-list {
+	margin: 5px 0;
+	padding: 0 5px;
+}
+#categories-list ul {
+	padding-left: 20px;
+	margin: 5px 0 0 0;
+}
+#categories-list li {
+	list-style: none;
+	list-style-image: none;
+	margin-bottom: 5px;
+}
+#categories-list li div {
+	padding: 5px;
+}

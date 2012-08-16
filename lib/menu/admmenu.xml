@@ -1,4 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- last ID: 32786 -->
 <adminmenu>
    <section icon="application_side_tree.png">
       <name lang="cs">Struktura</name>
@@ -12,7 +13,14 @@
          <urlkey lang="en">admin/structure/categories</urlkey>
          <module>categories</module>
       </item>
-      <item id="32770" icon="application_side_contract.png">
+      <item id="33002" icon="table_edit.png">
+         <name lang="cs">Hromadná úprava kategorií</name>
+         <name lang="en">Bulk Edit of categories</name>
+         <urlkey lang="en">admin/struktura/kategorie-hromadna-editace</urlkey>
+         <urlkey lang="cs">admin/structure/categories-bulk-edit</urlkey>
+         <module>catsbulkedit</module>
+      </item>
+      <item id="32786" icon="application_side_contract.png">
          <name lang="cs">Panely</name>
          <name lang="en">Panels</name>
          <urlkey lang="cs">admin/struktura/panely</urlkey>
