@@ -237,8 +237,17 @@ class Category_Core extends TrObject {
    /**
     * Metoda vrací objekt data kategorie (nejčastěji načtené přes model)
     * @return Object
+    * @deprecated -- používat getDataObj 
     */
    public function getCatDataObj()
+   {
+      return $this->getDataObj();
+   }
+   /*
+    * Metoda vrací datový objek kategorie
+    * @return Model_ORM_Record
+    */
+   public function getDataObj()
    {
       return $this->category;
    }

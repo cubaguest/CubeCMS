@@ -497,7 +497,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
          self::$structure = unserialize(VVE_CATEGORIES_STRUCTURE);
          // tohle by se mělo řešit přes __wakeUp
          $modelCats = new Model_Category();
-         $cats = $modelCats->getCategoryList();
+         $cats = $modelCats->getCategoryList(true);
          
          self::$structure->setCategoriesObjects($cats);
          
@@ -524,14 +524,14 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    protected function clearNonVisible(){
       $childs = $this->getChildrens(); // kvůli referencím tohle musí být přenesené
       foreach ($childs as $key => $child) {
-         $right = (string)$child->getCatObj()->getCatDataObj()->{Model_Rights::COLUMN_RIGHT};
-         $rightDefault = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT};
-         $visibility = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_VISIBILITY};
-         $ownerId = (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_ID_USER_OWNER};
+         $right = (string)$child->getCatObj()->getDataObj()->{Model_Rights::COLUMN_RIGHT};
+         $rightDefault = (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_DEF_RIGHT};
+         $visibility = (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_VISIBILITY};
+         $ownerId = (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_ID_USER_OWNER};
           
          $right = $right != null ? $right : $rightDefault;
           
-         if( ( (string)$child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY} != null) // musí být URL klíč, jinak je neplatná
+         if( ( (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_URLKEY} != null) // musí být URL klíč, jinak je neplatná
                AND (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $ownerId)
                AND (
                      ($visibility == Model_Category::VISIBILITY_ALL) // viditelné všem
