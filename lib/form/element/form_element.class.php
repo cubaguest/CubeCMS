@@ -593,7 +593,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return string -- řetězec z html elementu
     */
    public function subLabel() {
-      $this->htmlSubLabel()->addContent($this->formElementSubLabel);
+      $this->htmlSubLabel()->setContent($this->formElementSubLabel);
       return $this->htmlSubLabel();
    }
 
@@ -614,11 +614,16 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          $cnt = null;
          $first = true;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            $container = new Html_Element('p', $this->html());
+            $container = new Html_Element('p');
             if($this->isDimensional()) {
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_'.$langKey);
-               $this->html()->setAttrib('value', htmlspecialchars($values[$this->dimensional][$langKey]));
+               if(isset($values[$this->dimensional][$langKey])){
+                  $this->html()->setAttrib('value', htmlspecialchars($values[$this->dimensional][$langKey]));
+               } else if (isset($values[$langKey])){
+                  $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
+               }
+               
                $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
@@ -627,8 +632,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             }
             $this->html()->setAttrib('lang', $langKey);
-            $container->addClass(self::$cssClasses['elemContainer']);
+            $container->addClass(self::$cssClasses['elemContainer'])->addClass('form-input-lang-'.$langKey);
             $container->setAttrib('lang', $langKey);
+            $container->setContent($this->html());
             $cnt .= $container;
          }
          return $cnt;
@@ -674,7 +680,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             $labels .= $lab.", ";
          }
          $labels = substr($labels, 0, strlen($labels)-2).")";
-         $this->htmlValidLabel()->addContent($labels);
+         $this->htmlValidLabel()->setContent($labels);
          $this->htmlValidLabel()->addClass(self::$cssClasses['validations']);
          return $this->htmlValidLabel();
       }
