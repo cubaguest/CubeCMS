@@ -12,136 +12,127 @@
 class Model_ORM_Db {
 
    private $defaultCollate = 'utf8_general_ci';
+   
    private $defaultCharset = 'utf8';
-
+   
+   /**
+    * kolace sloupců
+    * @var array
+    */
+   private $langsColations = array(
+                 'cs' => 'utf8_czech_ci', 
+                 'sk' => 'utf8_slovak_ci', 
+                 'en' => 'utf8_general_ci', 
+                 'de' => 'utf8_general_ci', 
+                 'pl' => 'utf8_polish_ci');
+   
+   /**
+    * model
+    * @var Model_ORM
+    */
    private $model = null;
-
-
 
    public function  __construct(Model_ORM $model) {
       $this->model = $model;
    }
 
    public function create() {
-      $pdo = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
 
-      $columns = $this->model->getColumns();
+     $parts = array();
+     $indexes = $fulltexts = array();
+     foreach ($this->model->getColumns() as $column => $params) {
+        $str = null;
+//         `id_article` smallint(5) unsigned NOT NULL AUTO_INCREMENT
 
-      $colsArr = $pKeys = $uqKeys = $fullTextKeys = array();
-      $haveAI = false;
-      foreach ($columns as $colName => $params) {
-         if($params['lang'] == true){ // vícejazyčný má více sloupců
-            foreach (Locales::getAppLangs() as $lang) {
-               switch ($lang) {
-                  case 'cs':
-                     $params['collate'] = 'utf8_czech_ci';
-                     break;
-                  case 'sk':
-                     $params['collate'] = 'utf8_slovak_ci';
-                     break;
-                  default:
-                     $params['collate'] = 'utf8_general_ci';
-                     break;
-               }
-               $colsArr[] = $this->createColStr($colName.'_'.$lang, $params);
-               // fulltext keys
-               if($params['fulltext'] == true) {
-                  $fullTextKeys[] = 'FULLTEXT KEY `'.$colName.'_'.$lang.'` (`'.$colName.'_'.$lang.'`)';
-               }
-               // unique keys
-               if($params['uq'] == true) {
-                  $uqKeys[] = 'UNIQUE KEY `'.$colName.'_'.$lang.'` (`'.$colName.'_'.$lang.'`)';
-               }
-            }
-         } else {
-            $colsArr[] = $this->createColStr($colName, $params);
-            // fulltext keys
-            if($params['fulltext'] == true) {
-               $fullTextKeys[] = 'FULLTEXT KEY `'.$colName.'` (`'.$colName.'`)';
-            }
-            // unique keys
-            if($params['uq'] == true) {
-               $uqKeys[] = 'UNIQUE KEY `'.$colName.'` (`'.$colName.'`)';
-            }
-         }
-         // ai
-         if($params['ai'] == true) {
-            $haveAI = true;
-         }
-         // primary keys
-         if($params['pk'] == true) {
-            $pKeys[] = 'PRIMARY KEY (`'.$colName.'`)';
-         }
-      }
-
-      $sql = 'CREATE TABLE IF NOT EXISTS `'.  $this->model->getTableName().'`'
-         .'('."\n". implode(",\n", array_merge($colsArr, $pKeys, $uqKeys, $fullTextKeys)) ."\n".')'."\n"
-         .'ENGINE = '.  $this->model->getDbEngine()."\n"
-         .'DEFAULT CHARACTER SET = '.  $this->defaultCharset."\n";
-
-      if($haveAI){
-         $sql .='AUTO_INCREMENT = 1'."\n";
-      }
-      $sql .= 'COLLATE = '.$this->defaultCollate.';';
-      Debug::log($sql);
-//      $pdo->query($sql);
+        if($params['lang']){
+           foreach ($this->langsColations as $lang => $colation) {
+              array_push($parts, $this->createColumnString($column."_".$lang, $params, $colation));
+              if($params['index'] == true){
+                 if(is_bool($params['index'])){
+                    $indexes[] = 'KEY `index_'.$column."_".$lang.'` (`'.$column."_".$lang.'`)';
+                 } else {
+                    // tady sloupce na více indexů
+                 }
+              }   
+              
+              if($params['fulltext'] == true){
+                 $fulltexts[] = 'FULLTEXT KEY `fulltext_'.$column."_".$lang.'` (`'.$column."_".$lang.'`)';
+              }
+           }
+           
+        } else {
+           array_push($parts, $this->createColumnString($column, $params));
+           
+           if($params['pk'] == true){
+              $indexes[] = 'PRIMARY KEY (`'.$column.'`)';
+           }
+           if($params['index'] == true){
+              if(is_bool($params['index'])){
+                 $indexes[] = 'KEY `index_'.$column.'` (`'.$column.'`)';
+              } else if(is_array($params['index'])) {
+                 // tady sloupce na více indexů
+                 $i = array();
+                 foreach ($params['index'] as $indexColumn) {
+                    $i[] = '`'.$indexColumn.'`';
+                 }
+                 $indexes[] = 'KEY `index_'.$column.'` ('.implode(',', $i).')';
+              } else {
+                 $indexes[] = 'KEY `index_'.$column.'` ('.$params['index'].')';
+              }
+           }
+           // fulltext   
+           if($params['fulltext'] == true){
+              $fulltexts[] = 'FULLTEXT KEY `fulltext_'.$column.'` (`'.$column.'`)';
+           }   
+        }
+        
+     }
+     
+     $colsStr = implode(",\n", array_merge($parts, $indexes, $fulltexts ) ); 
+     
+     $sql = 'CREATE TABLE IF NOT EXISTS `'.$this->model->getTableName()."`\n"
+     ." (".$colsStr.")\n"
+     ." ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;";
+     return $dbc->exec($sql);
    }
-
+   
    /**
-    *
-    * @param <type> $colName
-    * @param <type> $colParams
-    * @return string
-    *
-    * column_definition:
-    *  data_type [NOT NULL | NULL] [DEFAULT default_value]
-    *  [AUTO_INCREMENT] [UNIQUE [KEY] | [PRIMARY] KEY]
-    *  [COMMENT 'string']
-    *  [COLUMN_FORMAT {FIXED|DYNAMIC|DEFAULT}]
-    *  [STORAGE {DISK|MEMORY|DEFAULT}]
-    *  [reference_definition]
-    *
-    */
-   private function createColStr($colName, $colParams) {
-      $c = '`'.$colName.'` '.  strtoupper($colParams['datatype']);
-
-      if($colParams['pdoparam'] == PDO::PARAM_STR){// je text přidáme collate či charset
-         if($colParams['characterset'] != $this->defaultCharset){
-            $c .= ' CHARACTER SET '.$colParams['characterset'];
-         }
-         if($colParams['collate'] != $this->defaultCollate){
-            $c .= ' COLLATE '.$colParams['collate'];
-         }
+    * Vytvoří řetězec pro vytvoření sloupce
+    * @param string $name -- název
+    * @param string $params -- parametry
+    * @param string $colation -- kolace
+    */   
+   private function createColumnString($name ,$params, $colation = 'utf8_general_ci')
+   {
+      $pdo = Db_PDO::getInstance();
+   
+      $str = '`'.$name.'` '.$params['datatype'];
+      // colation
+      if(preg_match("/(varchar)|(text)/", $params['datatype']) ){
+         $str .= ' CHARACTER SET utf8 COLLATE '.$colation;
       }
-
-      // is null
-      if($colParams['nn'] == true){
-         $c .= ' NOT NULL';
-      } else {
-         $c .= ' NULL';
+      //       if(preg_match("/(date)|(text)/", $params['datatype']) ){
+      //          $str .= ' CHARACTER SET utf8 COLLATE '.$colation;
+      //       }
+      // not null
+      if($params['nn']){
+         $str .= ' NOT NULL';
       }
-
-      $info = $this->parseDataType($colParams['datatype']);
-
-      if(isset ($colParams['default'])){ // default param is set
-         // default type
-         if(in_array($colParams['default'], array('CURRENT_TIMESTAMP'))){
-            $c .= ' DEFAULT '.(string)$colParams['default'];
-         } else if($colParams['pdoparam'] == PDO::PARAM_BOOL OR $colParams['pdoparam'] == PDO::PARAM_INT){
-            $c .= ' DEFAULT '.(int)$colParams['default'];
-         } else if($colParams['default'] == null OR strtolower ($colParams['default']) == 'null') {
-            $c .= ' DEFAULT NULL';
-         } else {
-            $c .= ' DEFAULT \''.(string)$colParams['default'].'\'';
-         }
+      // AI
+      if($params['ai']){
+         $str .= ' AUTO_INCREMENT';
       }
-
-      // autoincrement
-      if($colParams['ai'] == true){
-         $c .= ' AUTO_INCREMENT';
+   
+      if(!$params['nn'] && $params['default'] === null){
+         $str .= ' DEFAULT NULL';
+      } else if($params['default'] !== null &&
+            ( $params['datatype'] == 'timestamp' ) ){
+         $str .= ' DEFAULT '.$params['default'];
+      } else if($params['default'] !== null){
+         $str .= ' DEFAULT '.$pdo->quote($params['default'], $params['pdoparam']);
       }
-
-      return $c;
+      return $str;
    }
 
    private function parseDataType($dataType) {
@@ -150,6 +141,21 @@ class Model_ORM_Db {
       return $matches;
    }
 
+   public function removeColumn($name) 
+   {
+      ;
+   }
+    
+   public function addColumn($name, $params = array()) 
+   {
+      ;
+   }
+    
+   public function alterColumn($name, $params = array()) 
+   {
+      ;
+   } 
+   
    public function checkModel() {
       $dbc = new Db_PDO();
       $columnsInModel = $this->model->getColumns();

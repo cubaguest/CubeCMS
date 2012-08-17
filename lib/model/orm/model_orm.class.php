@@ -1061,104 +1061,10 @@ class Model_ORM extends Model {
 
    public function createTable()
    {
-     $dbc = Db_PDO::getInstance();
-
-     $parts = array();
-     $indexes = $fulltexts = array();
-     foreach ($this->tableStructure as $column => $params) {
-        $str = null;
-//         `id_article` smallint(5) unsigned NOT NULL AUTO_INCREMENT
-
-        if($params['lang']){
-           $langs = array(
-                 'cs' => 'utf8_czech_ci', 
-                 'sk' => 'utf8_slovak_ci', 
-                 'en' => 'utf8_general_ci', 
-                 'de' => 'utf8_general_ci', 
-                 'pl' => 'utf8_polish_ci');
-           foreach ($langs as $lang => $colation) {
-              array_push($parts, $this->createColumnString($column."_".$lang, $params, $colation));
-              if($params['index'] == true){
-                 if(is_bool($params['index'])){
-                    $indexes[] = 'KEY `index_'.$column."_".$lang.'` (`'.$column."_".$lang.'`)';
-                 } else {
-                    // tady sloupce na více indexů
-                 }
-              }   
-              
-              if($params['fulltext'] == true){
-                 $fulltexts[] = 'FULLTEXT KEY `fulltext_'.$column."_".$lang.'` (`'.$column."_".$lang.'`)';
-              }
-           }
-           
-        } else {
-           array_push($parts, $this->createColumnString($column, $params));
-           
-           if($params['pk'] == true){
-              $indexes[] = 'PRIMARY KEY (`'.$column.'`)';
-           }
-           if($params['index'] == true){
-              if(is_bool($params['index'])){
-                 $indexes[] = 'KEY `index_'.$column.'` (`'.$column.'`)';
-              } else if(is_array($params['index'])) {
-                 // tady sloupce na více indexů
-                 $i = array();
-                 foreach ($params['index'] as $indexColumn) {
-                    $i[] = '`'.$indexColumn.'`';
-                 }
-                 $indexes[] = 'KEY `index_'.$column.'` ('.implode(',', $i).')';
-              } else {
-                 $indexes[] = 'KEY `index_'.$column.'` ('.$params['index'].')';
-              }
-           }
-           // fulltext   
-           if($params['fulltext'] == true){
-              $fulltexts[] = 'FULLTEXT KEY `fulltext_'.$column.'` (`'.$column.'`)';
-           }   
-        }
-        
-     }
-     
-     $colsStr = implode(",\n", array_merge($parts, $indexes, $fulltexts ) ); 
-     
-     $sql = 'CREATE TABLE IF NOT EXISTS `'.$this->getTableName()."`\n"
-     ." (".$colsStr.")\n"
-     ." ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;";
-     return $dbc->exec($sql);
+     $db = new Model_ORM_Db($this);
+     return $db->create();
    }
 
-   private function createColumnString($name ,$params, $colation = 'utf8_general_ci') 
-   {
-      $pdo = Db_PDO::getInstance();
-      
-      $str = '`'.$name.'` '.$params['datatype'];
-      // colation
-      if(preg_match("/(varchar)|(text)/", $params['datatype']) ){
-         $str .= ' CHARACTER SET utf8 COLLATE '.$colation;
-      }
-//       if(preg_match("/(date)|(text)/", $params['datatype']) ){
-//          $str .= ' CHARACTER SET utf8 COLLATE '.$colation;
-//       }
-      // not null
-      if($params['nn']){
-         $str .= ' NOT NULL';
-      }
-      // AI
-      if($params['ai']){
-         $str .= ' AUTO_INCREMENT';
-      }
-      
-      if(!$params['nn'] && $params['default'] === null){
-         $str .= ' DEFAULT NULL';
-      } else if($params['default'] !== null && 
-            ( $params['datatype'] == 'timestamp' ) ){
-         $str .= ' DEFAULT '.$params['default'];
-      } else if($params['default'] !== null){
-         $str .= ' DEFAULT '.$pdo->quote($params['default'], $params['pdoparam']);
-      }
-      return $str;
-   }
-   
    /*
     * Metody pro úpravu parametrů modelu
     */
