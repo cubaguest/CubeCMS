@@ -28,7 +28,7 @@ $text = $this->text->{Text_Model::COLUMN_TEXT};*/
       echo $this->toolboxPrivate;
    ?></div><?
    }
-   if($this->text != false && $this->category()->getParam('shareTools', true) == true){
+   if($this->text != false && $this->category()->getParam('shareTools', true) == true && $this->articleTools !== false){
          $this->includeTpl('articletools.phtml', true, array(
             'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
 //              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},

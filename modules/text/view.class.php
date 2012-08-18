@@ -84,6 +84,21 @@ class Text_View extends View {
             $this->template()->filter((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, $textFilters);
       }
    }
+   
+   public function previewView() {
+      $this->mainView();
+      $this->template()->addFile('tpl://previewform.phtml');
+      // remove not necessary items
+      if($this->toolbox instanceof Template_Toolbox2){
+         unset($this->toolbox->edit_text);            
+         unset($this->toolbox->edit_textpanel); 
+         $this->toolbox->setIcon('eye.png');           
+      }
+      $this->textPrivate = null;
+      $this->toolboxPrivate = null;
+      $this->articleTools = false;
+      Template_Navigation::addItem($this->tr('Náhled'), $this->link());
+   }
 
    public function contentView() {
       echo (string)$this->text->{Text_Model::COLUMN_TEXT};

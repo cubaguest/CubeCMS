@@ -35,15 +35,49 @@ class Text_Controller extends Controller {
       $this->checkReadableRights();
       $this->exportTextController();
    }
+   
+   public function previewController() 
+   {
+      //		Kontrola práv
+      $this->checkWritebleRights();
+      
+      $rec = $this->loadTempRecord();
+      if(!$rec){
+         $this->link()->route()->reload();
+      }
+      $this->exportTextController($rec);
+      
+      $formPreview = new Form('text_preview_');
+      $grp = $formPreview->addGroup('preview', $this->tr('Co s textem?'));
+      $elemSubmit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zpět k úpravě')) );
+      $elemSubmit->setCancelConfirm(false);
+      $formPreview->addElement($elemSubmit, $grp);
+      
+      if($formPreview->isSend()){
+         if($formPreview->save->getValues() == false){
+            // rediret to edit
+            $this->link()->route('edit')->param('tmp', true)->reload();
+         } else {
+            // store and show new text
+            $this->textModel->save($rec);
+            $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
+            $this->link()->route()->param('tmp')->reload();
+         }
+      }
+      
+      $this->view()->formPreview = $formPreview;
+   }
 
-   public function exportTextController() 
+   public function exportTextController(Model_ORM_Record $text = null) 
    {
       $this->checkReadableRights();
 
       $modelPrivate = new Text_Model_Private();
       
-      // text
-      $text = $this->loadData(self::TEXT_MAIN_KEY);
+      if($text == null){
+         // text
+         $text = $this->loadData(self::TEXT_MAIN_KEY);
+      }
       $this->view()->text = $text;
       
       if($text != false AND $this->category()->getParam(self::PARAM_ALLOW_PRIVATE, false)== true AND Auth::isLogin()){
@@ -67,24 +101,33 @@ class Text_Controller extends Controller {
    public function editController() 
    {
       $this->checkWritebleRights();
-
-      $textRec = $this->loadData(self::TEXT_MAIN_KEY);
+      
+      if(!$this->getRequestParam('tmp', false)){
+         $textRec = $this->loadData(self::TEXT_MAIN_KEY);
+      } else {
+         $textRec = $this->loadTempRecord();
+      }
       $form = $this->createEditForm($textRec);
 
-      if($form->isSend() AND $form->send->getValues() == false){
+      if($form->isSend() AND $form->send->getValues() == 'cancel'){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
       if($form->isValid()){
-         try {
-            // odtranění script, nebezpečných tagů a komentřů
-            $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY);
-            $this->log('úprava textu');
-            $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
-            $this->link()->route()->reload();
-         } catch (PDOException $e) {
-            CoreErrors::addException($e);
+         if($form->send->getValues() == 'preview'){
+            $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY, $elementName = 'text', true);
+            $this->link()->route('preview')->reload();
+         } else {
+            try {
+               // odtranění script, nebezpečných tagů a komentřů
+               $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY);
+               $this->log('úprava textu');
+               $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
+               $this->link()->route()->reload();
+            } catch (PDOException $e) {
+               CoreErrors::addException($e);
+            }
          }
       }
       // view
@@ -133,8 +176,14 @@ class Text_Controller extends Controller {
          $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
       }
 
-      $submit = new Form_Element_SaveCancel('send');
-      $form->addElement($submit);
+//       $submit = new Form_Element_SaveCancel('send');
+//       $form->addElement($submit);
+      
+      $submits = new Form_Element_Multi_Submit('send');
+      $submits->addElement(new Form_Element_Submit('cancel', $this->tr('Zrušit')));
+      $submits->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
+      $submits->addElement(new Form_Element_Submit('preview', $this->tr('Náhled')));
+      $form->addElement($submits);
       
       return $form;
    }
@@ -146,7 +195,7 @@ class Text_Controller extends Controller {
     * @param type $subkey -- subklíč dat
     * @param type $elementName -- název elementu s daty
     */
-   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text')
+   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
    {
       if(!isset ($form->{$elementName})){
          throw new InvalidArgumentException($this->tr('Nebyl předán správný název formulářového prvku s daty'));
@@ -170,10 +219,34 @@ class Text_Controller extends Controller {
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
       $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
-      $this->textModel->save($textRec);
+      if($toTemp){
+         $this->seveTempRecord($textRec);
+      } else {
+         $this->textModel->save($textRec);
+      }
       return $textRec;
    }
 
+   protected function processTempData() 
+   {
+      
+   }
+   
+   protected function loadTempRecord($key = 'text') 
+   {
+      $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
+      if(is_file($f) && filesize($f) > 0){
+         return unserialize(file_get_contents($f));
+      }
+      return false;
+   }
+   
+   protected function seveTempRecord($record, $key = 'text') 
+   {
+      $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
+      file_put_contents($f, serialize($record));
+   }
+   
    /**
     * Kontroler pro editaci textu
     */

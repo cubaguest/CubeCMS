@@ -2,6 +2,9 @@
 <div class="main-content-form-edit" id="text-edit-form">
    <?
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40);
+   $this->form->send->cancel->html()->addClass('cancel');
+   $this->form->send->cancel->html()->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
+   $this->form->send->preview->html()->addClass('exclusive');
    echo ($this->form);
    ?>
 </div>

@@ -24,6 +24,10 @@ class Text_Model extends Model_ORM {
    const COLUMN_DATA = 'data';
 
    const DEFAULT_SUBKEY = 'nokey';
+   
+   const TEXT_MAIN_KEY = 'main';
+   const TEXT_PANEL_KEY = 'panel';
+   const TEXT_PRIVATE_KEY = 'private';
 
    /**
     * Pole s hodnotami pro převod z jazykového pole na řetězec
