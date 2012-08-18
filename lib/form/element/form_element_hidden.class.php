@@ -18,16 +18,16 @@ class Form_Element_Hidden extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
       $this->html()->setAttrib('type', 'hidden');
-      return parent::controll();
+      return parent::controll($renderKey);
    }
 
    /**
     * Metoda vrací popisek k prvku (html element label)
     * @return string
     */
-   public function label() {
+   public function label($renderKey = null, $after = false) {
       return (string)null;
    }
 
@@ -35,11 +35,11 @@ class Form_Element_Hidden extends Form_Element {
     * Metoda vrací subpopisek
     * @return string -- řetězec z html elementu
     */
-   public function subLabel() {
+   public function subLabel($renderKey = null) {
       return (string)null;
    }
    
-   public function labelValidations() {
+   public function labelValidations($renderKey = null) {
       return (string)null;
    }
 }

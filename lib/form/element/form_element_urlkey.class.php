@@ -37,7 +37,8 @@ class Form_Element_UrlKey extends Form_Element_Text {
  * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
  * @return string
  */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->setAttrib('type', 'text');
       $this->createValidationLabels();
       $this->html()->clearContent();
@@ -60,7 +61,7 @@ class Form_Element_UrlKey extends Form_Element_Text {
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $container = new Html_Element('p');
             $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId.'_'.$langKey);
+            $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
             $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
             $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             $this->html()->setAttrib('lang', $langKey);
@@ -68,17 +69,18 @@ class Form_Element_UrlKey extends Form_Element_Text {
             $container->setAttrib('lang', $langKey);
             $cnt .= $container->setContent($this->html().$updateButton);
          }
-         
-         return $cnt;
       } else {
          $this->html()->setAttrib('name', $this->getName());
-         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+         $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
          $this->html()->setAttrib('lang', Locales::getDefaultLang());
          $this->html()->setAttrib('value', htmlspecialchars((string)$values));
-         $this->renderedId++;
          
-         return $this->html().$updateButton;
+         $cnt = $this->html().$updateButton;
       }
+      if($renderKey == null){
+         $this->renderedId++;
+      }
+      return $cnt;
    }
    
    public function setCheckingUrl($url)

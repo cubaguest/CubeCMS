@@ -93,7 +93,7 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
     * @return string
     * @todo upravit podle submitu    
     */
-   public function controll() {
+   public function controll($renderKey = null) {
       $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('type', 'image');
       $this->html()->setAttrib('value', $this->getLabel());

@@ -37,7 +37,8 @@ class Form_Element_Captcha extends Form_Element_Text {
  * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
  * @return string
  */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->setAttrib('type', 'text');
       $this->createValidationLabels();
       $this->html()->clearContent();
@@ -47,7 +48,7 @@ class Form_Element_Captcha extends Form_Element_Text {
       }
       $this->html()->addClass($this->getName()."_class")->addClass('captcha');
       $this->html()->setAttrib('name', $this->getName());
-      $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+      $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
       $this->html()->setAttrib('value', null);
       
       // image
@@ -56,7 +57,9 @@ class Form_Element_Captcha extends Form_Element_Text {
          ->setAttrib('alt', 'captcha')
          ->addClass('captcha');
       
-      $this->renderedId++;
+      if($renderKey == null){
+         $this->renderedId++;
+      }
       return $this->html().$image;
    }
 }

@@ -18,9 +18,9 @@ class Form_Element_Text extends Form_Element {
  * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
  * @return string
  */
-   public function controll() {
+   public function controll($renderKey = null) {
       $this->html()->setAttrib('type', 'text');
-      return parent::controll();
+      return parent::controll($renderKey = null);
    }
 }
 ?>

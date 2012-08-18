@@ -42,19 +42,19 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
       
 //      $this->html()->setAttrib('name', $this->getName());
       $this->setValues($this->getLabel());
 //      return $this->html();
-      return parent::controll();
+      return parent::controll($renderKey);
    }
 
    /**
     * Metoda vrací label
     * @return string
     */
-   public function label() {
+   public function label($renderKey = null, $after = false) {
       return null;
    }
 

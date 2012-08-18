@@ -204,7 +204,8 @@ class Form_Element_File extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass('formError');
@@ -214,16 +215,18 @@ class Form_Element_File extends Form_Element {
       if($this->isDimensional()){
          $this->html()->setAttrib('multiple', 'multiple');
          if($this->dimensional == null){
-            $this->html()->setAttrib('id', $this->getName()."_".$this->renderedId);
+            $this->html()->setAttrib('id', $this->getName()."_".$rKey);
          } else {
-            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
+            $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
          }
          $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']');
       } else {
          $this->html()->setAttrib('name', $this->getName());
-         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+         $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
       }
-      $this->renderedId++;
+      if($renderKey == null){
+         $this->renderedId++;
+      }
       $this->html()->setAttrib('value', $this->getUnfilteredValues());
       return $this->html();
    }

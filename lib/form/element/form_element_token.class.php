@@ -25,7 +25,7 @@ class Form_Element_Token extends Form_Element_Hidden {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
       $this->setValues($this->token);
       return parent::controll();
    }

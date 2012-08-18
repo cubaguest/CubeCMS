@@ -50,12 +50,13 @@ class Form_Element_Checkbox extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $values = $this->getUnfilteredValues();
       $this->html()->addClass($this->getName()."_class");
       if($this->isDimensional()) {
          $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
+         $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
          if($values === true || (isset ($values[$this->dimensional]) && $values[$this->dimensional] === true)) {
             $this->html()->setAttrib('checked', 'checked');
          } else {
@@ -63,7 +64,7 @@ class Form_Element_Checkbox extends Form_Element {
          }
       } else {
          $this->html()->setAttrib('name', $this->getName());
-         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+         $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
          if($values == true) {
             $this->html()->setAttrib('checked', 'checked');
          }
@@ -78,11 +79,13 @@ class Form_Element_Checkbox extends Form_Element {
 
       $l = new Html_Element('label', $this->getLabel());
       if($this->isDimensional()) {
-         $l->setAttrib('for', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
+         $l->setAttrib('for', $this->getName().'_'.$rKey."_".$this->dimensional);
       } else {
-         $l->setAttrib('for', $this->getName().'_'.$this->renderedId);
+         $l->setAttrib('for', $this->getName().'_'.$rKey);
       }
-      $this->renderedId++;
+      if($renderKey == null){
+         $this->renderedId++;
+      }
       return $this->html();
    }
 }

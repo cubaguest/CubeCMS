@@ -39,43 +39,43 @@ interface Form_Element_Interface {
     * Metoda vrací popisek k prvku (html element label)
     * @return string
     */
-   public function label();
+   public function label($renderKey = null, $after = false);
 
    /**
     * Metoda vrací subpopisek
     * @return string -- řetězec z html elementu
     */
-   public function subLabel();
+   public function subLabel($renderKey = null);
 
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll();
+   public function controll($renderKey = null);
 
    /**
     * Metoda vrací všechny prvky, keré patří ke kontrolu, tj controll, labelValidations, subLabel
     * @return string -- včechny prvky vyrenderované
     */
-   public function controllAll();
+   public function controllAll($renderKey = null);
 
    /**
     * Metoda vrací popisek k validacím
     * @return string
     */
-   public function labelValidations();
+   public function labelValidations($renderKey = null);
 
    /**
     * Funkce vygeneruje přepínač pro volbu jazyku
     * @return string
     */
-   public function labelLangs();
+   public function labelLangs($renderKey = null);
 
    /**
     * Metoda pro generování scriptů. potřebných pro práci s formulářem
     * @return string
     */
-   public function scripts();
+   public function scripts($renderKey = null);
 
    /**
     * Metoda vrací jestli je element prázdný

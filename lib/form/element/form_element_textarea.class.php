@@ -22,7 +22,8 @@ class Form_Element_TextArea extends Form_Element_Text {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass(Form_Element::$cssClasses['error']);
          if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
@@ -30,22 +31,22 @@ class Form_Element_TextArea extends Form_Element_Text {
 
       $values = $this->getUnfilteredValues();
       $this->html()->addClass($this->getName()."_class");
+      $cnt = null;
       if($this->isMultiLang()) {
-         $cnt = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $container = new Html_Element('p', $this->html());
             $this->html()->clearContent();
             $this->html()->setAttrib('lang', $langKey);
             if($this->isDimensional()){
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_'.$langKey);
-               $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
+               $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
+               $container->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_container_'.$langKey);
 //               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
                $this->html()->addContent(htmlspecialchars($values[$this->dimensional][$langKey]));
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId.'_'.$langKey);
-               $container->setAttrib('id', $this->getName().'_'.$this->renderedId.'_container_'.$langKey);
+               $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
+               $container->setAttrib('id', $this->getName().'_'.$rKey.'_container_'.$langKey);
                $this->html()->addContent(htmlspecialchars($values[$langKey]));
             }
             $container->addClass(Form_Element::$cssClasses['elemContainer']);
@@ -53,14 +54,13 @@ class Form_Element_TextArea extends Form_Element_Text {
 
             $cnt .= $container;
          }
-         return $cnt;
       } else {
          if($this->isDimensional()){
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
+            $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
          } else {
             $this->html()->setAttrib('name', $this->getName());
-            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+            $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
             $this->renderedId++;
          }
          $this->html()->clearContent(); // vymazání obsahu elementu jinak se duplikuje
@@ -69,8 +69,12 @@ class Form_Element_TextArea extends Form_Element_Text {
          } else {
             $this->html()->addContent((string)$values);
          }
+         $cnt = $this->html();
       }
-      return $this->html();
+      if($renderKey == null){
+         $this->renderedId++;
+      }
+      return $cnt;
    }
 }
 ?>

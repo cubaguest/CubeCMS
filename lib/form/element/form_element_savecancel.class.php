@@ -56,7 +56,8 @@ class Form_Element_SaveCancel extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->setValues($this->formElementLabel[0]);
       $this->html()->clearClasses();
       $this->html()->removeAttrib('onclick');
@@ -64,7 +65,7 @@ class Form_Element_SaveCancel extends Form_Element {
       $ctrlSave = clone parent::controll();
       $this->renderedId--;
       $ctrlSave->setAttrib('name', $this->getName().'_ok');
-      $ctrlSave->setAttrib('id', $this->getName().'_ok_'.$this->renderedId);
+      $ctrlSave->setAttrib('id', $this->getName().'_ok_'.$rKey);
 
       $this->setValues($this->formElementLabel[1]);
       $this->html()->clearClasses();
@@ -75,8 +76,10 @@ class Form_Element_SaveCancel extends Form_Element {
       $ctrlCancel = clone parent::controll();
       $this->renderedId--;
       $ctrlCancel->setAttrib('name', $this->getName().'_cancel');
-      $ctrlCancel->setAttrib('id', $this->getName().'_cancel_'.$this->renderedId);
-      $this->renderedId++;
+      $ctrlCancel->setAttrib('id', $this->getName().'_cancel_'.$rKey);
+      if($renderKey == null){
+         $this->renderedId++;
+      }
       return (string)$ctrlSave.(string)$ctrlCancel;
    }
 
@@ -84,7 +87,7 @@ class Form_Element_SaveCancel extends Form_Element {
     * Metoda vrací label
     * @return string
     */
-   public function label() {
+   public function label($renderKey = null, $after = false) {
       return null;
    }
 

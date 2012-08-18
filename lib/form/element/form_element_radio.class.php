@@ -30,7 +30,8 @@ class Form_Element_Radio extends Form_Element_Select {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $group = null;
       $this->html()->setAttrib('type', 'radio');
 
@@ -40,10 +41,10 @@ class Form_Element_Radio extends Form_Element_Select {
          $opt = clone $this->html();
          if($this->isDimensional()) {
             $opt->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-            $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$this->renderedId.'_'.$this->dimensional);
+            $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$rKey.'_'.$this->dimensional);
          } else {
             $opt->setAttrib('name', $this->getName());
-            $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$this->renderedId);
+            $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$rKey);
          }
          if($optVal == false) $optVal = 0;
          $opt->setAttrib('value', (string)$optVal);
@@ -55,15 +56,17 @@ class Form_Element_Radio extends Form_Element_Select {
          $group .= (string)$opt;
          $l = new Html_Element('label', $optLabel);
          if($this->isDimensional()) {
-            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$this->renderedId.'_'.$this->dimensional);
+            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey.'_'.$this->dimensional);
          } else {
-            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$this->renderedId);
+            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey);
          }
          $group .= $l;
          $group .= new Html_Element('br');
          $i++;
       }
-      $this->renderedId++;
+      if($renderKey == null){
+         $this->renderedId++;
+      }
       return $group;
    }
 

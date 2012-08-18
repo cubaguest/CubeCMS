@@ -109,7 +109,8 @@ class Form_Element_Select extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return Html_Element
     */
-   public function controll() {
+   public function controll($renderKey = null) {
+      $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->clearContent();
       if($this->isDimensional()){
          if($this->isMultiple) {
@@ -117,16 +118,18 @@ class Form_Element_Select extends Form_Element {
          } else {
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
          }
-         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional);
+         $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
       } else {
-         $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+         $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
          if($this->isMultiple) {
             $this->html()->setAttrib('name', $this->getName().'[]');
          } else {
             $this->html()->setAttrib('name', $this->getName());
          }
       }
-      $this->renderedId++;
+      if($renderKey == null){
+         $this->renderedId++;
+      }
 
       if($this->isMultiple) {
          $this->setSubLabel(
