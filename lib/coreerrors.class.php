@@ -90,7 +90,7 @@ class CoreErrors {
    /**
     * Metoda pro zachytávání normálních chyb v enginu a modulech
     */
-   public static function errorHandler($errno, $errstr, $errfile, $errline) {
+   public static function errorHandler($errno, $errstr, $errfile, $errline, $errcontext) {
       $error = array();
       switch ($errno) {
          case E_ERROR:
@@ -134,7 +134,16 @@ class CoreErrors {
       }
       return true;
    }
-
+   
+   /**
+    * Handler na neodchycené vyjímky
+    * @param Exception $exception
+    */
+   public static function exceptionHandler($exception) {
+      self::addException($exception);
+      return true;
+   }
+   
    public static function printErrors() {
       foreach (self::$exceptionsArray as $exception) {
          printf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",get_class($exception),$exception->getCode(),

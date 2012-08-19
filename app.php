@@ -533,6 +533,10 @@ class AppCore extends TrObject {
       return false;
    }
 
+   public static function shutDownHandler() 
+   {
+      // @todo dodělat vypisování chyb při špatném ukončení skriptu
+   }
    /**
     * Metoda inicializuje objekty pro práci s hláškami
     */
@@ -545,7 +549,9 @@ class AppCore extends TrObject {
          error_reporting(E_ERROR|E_WARNING|E_PARSE);
          ini_set('display_errors', 0);
       }
-      set_error_handler('CoreErrors::errorHandler');
+      set_error_handler(array('CoreErrors', 'errorHandler') );
+      set_exception_handler( array( 'CoreErrors', 'exceptionHandler' ) );
+      register_shutdown_function( array( 'AppCore', 'shutDownHandler' ) );
       //		Vytvoření objektu pro práci se zprávami
       self::$messages = new Messages('session', 'messages', true);
       self::$userErrors = new Messages('session', 'errors');
