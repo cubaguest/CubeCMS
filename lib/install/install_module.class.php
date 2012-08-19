@@ -19,18 +19,21 @@ class Install_Module {
    protected $depModules = array();
    protected $moduleName = null;
    protected $moduleTablesPrefix = '{PREFIX}';
-   protected $version = array('major' => 1, 'minor' => 0);
+   protected $version = array('major' => 0, 'minor' => 0);
 
    public function __construct() {
       $tmp = explode('_', get_class($this));
       $this->moduleName = strtolower($tmp[0]);
 
-      // načtení verze
-      $verStr = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
-                      . $this->moduleName . DIRECTORY_SEPARATOR . AppCore::DOCS_DIR . DIRECTORY_SEPARATOR . self::VERSION_FILE);
-      $versionArr = explode('.', $verStr);
-      $this->version['major'] = $versionArr[0];
-      $this->version['minor'] = $versionArr[1];
+      // načtení verze pokud není v install class
+      if( $this->version['major'] == 0 && $this->version['minor'] == 0){
+         // old version system
+         $verStr = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+            . $this->moduleName . DIRECTORY_SEPARATOR . AppCore::DOCS_DIR . DIRECTORY_SEPARATOR . self::VERSION_FILE);
+         $versionArr = explode('.', $verStr);
+         $this->version['major'] = $versionArr[0];
+         $this->version['minor'] = $versionArr[1];
+      }
    }
 
    /**
