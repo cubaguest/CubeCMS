@@ -59,7 +59,7 @@ class Text_Controller extends Controller {
             $this->link()->route('edit')->param('tmp', true)->reload();
          } else {
             // store and show new text
-            $this->textModel->save($rec);
+            $this->processTempData($rec);
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->param('tmp')->reload();
          }
@@ -101,9 +101,18 @@ class Text_Controller extends Controller {
    public function editController() 
    {
       $this->checkWritebleRights();
+      if($this->getRequestParam('tmpclear', false)){
+         $this->clearTempRecord();
+         $this->infoMsg()->addMessage($this->tr('Náhled byl zrušen'));
+         $this->link()->param('tmpclear')->reload();
+      }
       
       if(!$this->getRequestParam('tmp', false)){
          $textRec = $this->loadData(self::TEXT_MAIN_KEY);
+         if($this->isTempRecord()){
+            $this->view()->previewLink = $this->link()->param('tmp', true);
+            $this->view()->previewLinkCancel = $this->link()->param('tmpclear', true);
+         }
       } else {
          $textRec = $this->loadTempRecord();
       }
@@ -111,7 +120,8 @@ class Text_Controller extends Controller {
 
       if($form->isSend() AND $form->send->getValues() == 'cancel'){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-         $this->link()->route()->reload();
+         $this->clearTempRecord();
+         $this->link()->route()->param('tmp')->reload();
       }
 
       if($form->isValid()){
@@ -122,9 +132,10 @@ class Text_Controller extends Controller {
             try {
                // odtranění script, nebezpečných tagů a komentřů
                $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY);
+               $this->clearTempRecord();
                $this->log('úprava textu');
                $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
-               $this->link()->route()->reload();
+               $this->link()->route()->param('tmp')->reload();
             } catch (PDOException $e) {
                CoreErrors::addException($e);
             }
@@ -227,9 +238,10 @@ class Text_Controller extends Controller {
       return $textRec;
    }
 
-   protected function processTempData() 
+   protected function processTempData($record) 
    {
-      
+      $this->textModel->save($record);
+      $this->clearTempRecord();
    }
    
    protected function loadTempRecord($key = 'text') 
@@ -245,6 +257,20 @@ class Text_Controller extends Controller {
    {
       $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
       file_put_contents($f, serialize($record));
+   }
+   
+   protected function clearTempRecord($key = 'text') 
+   {
+      $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
+      if(is_file($f)){
+         @unlink($f);
+      }
+   }
+   
+   protected function isTempRecord($key = 'text') 
+   {
+      $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
+      return ( is_file($f) && filesize($f) > 0 );
    }
    
    /**
