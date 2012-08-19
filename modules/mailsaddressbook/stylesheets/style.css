@@ -1,0 +1,65 @@
+#tabs-mails-users table {
+   width: 100%;
+}
+
+#mails-import-form-table td, #mails-import-form-table th,
+#tabs-mails-users td,
+#mails-queue td, #mails-queue th
+
+{
+   padding: 3px;
+}
+
+#address-tabs .ui-state-disabled {
+   opacity: 1;
+}
+
+.ui-autocomplete {
+   width: 300px;
+   max-height: 200px;
+   overflow: auto;
+}
+#module-mail-list .ui-accordion-header a {
+   padding-top: 2px;
+   padding-bottom: 2px;
+}
+
+* html div.mail-recipients, * html div.mail-content {
+   height: expression( this.scrollHeight > 250 ? "250px" : "auto" ); /* sets max-height for IE */
+}
+div.mail-recipients, div.mail-content {
+   max-height: 250px; /* sets max-height value for all standards-compliant browsers */
+   overflow: auto;
+   background-color: #e9e8e8;
+   padding: 3px;
+}
+.mail-tools {
+   margin: 0.3em 0;
+}
+.mail-detail.ui-accordion-content {
+   padding-top: 0px;
+
+}
+
+#mails-queue {
+   width: 98%;
+}
+/*#mails-queue td {
+   border-bottom: 1px solid gray;
+   padding: 2px 0;
+}*/
+
+#mails-queue-buttons form,
+#mails-queue-buttons p {
+   display: inline;
+}
+
+.mail-send-result {
+   font-weight: bold;
+}
+.mail-send-result-ok {
+   color: #006600;
+}
+.mail-send-result-err {
+   color: #EE0000;
+}

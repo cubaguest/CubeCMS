@@ -1,0 +1,8 @@
+<?
+$this->items = array(
+   $this->tr('Adresář') => array('link' => (string)$this->link()->route('addressBook'), 'icon' => 'book_addresses.png'),
+   $this->tr('Skupiny') => array('link' => (string)$this->link()->route('groups'), 'icon' => 'group.png'),
+   $this->tr('Nástroje') => array('link' => (string)$this->link()->route('tools'), 'icon' => 'wrench.png')
+   );
+$this->includeTpl('module_navigation.phtml', true);
+?>

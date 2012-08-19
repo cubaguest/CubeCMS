@@ -1,0 +1,144 @@
+<?
+$this->addPageTitle($this->tr('Adresář e-mailů'));
+
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+
+$grpsArr = array();
+?>
+<h1><?=$this->tr('Adresář e-mailů');?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+
+<div class="main-content-detail">
+   <table id="table-addressbook"></table>
+   <div id="table-addressbook-toolbar">
+      <label for="select-group-id"><?=$this->tr('Skupina')?>:</label>
+      <select id="select-group-id" name="sel_group">
+         <option value="0" title="<?=$this->tr('Všechny adresy')?>"><?=$this->tr('Všechny adresy')?></option>
+         <?foreach ($this->groups as $grp) {
+            $grpsArr[(int)$grp->{MailsAddressBook_Model_Groups::COLUMN_ID}] = $grp->{MailsAddressBook_Model_Groups::COLUMN_NAME};
+            ?><option value="<?=$grp->{MailsAddressBook_Model_Groups::COLUMN_ID}?>" title="<?=$grp->{MailsAddressBook_Model_Groups::COLUMN_NAME}?>"><?=$grp->{MailsAddressBook_Model_Groups::COLUMN_NAME}.' - '.$grp->{MailsAddressBook_Model_Groups::COLUMN_NOTE}?></option><?
+         }
+         ?>
+      </select>
+   </div>
+   <div id="table-addressbook-pager"></div>
+   <hr class="reseter" />
+   <br />
+</div>
+<?
+?>
+<script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      var selectedGroupId = 0;
+      var groups = <?=json_encode($grpsArr)?>;
+
+      var respondFunction = function(respond){
+          var res = eval("("+respond.responseText+")");
+          var msg = res.errmsg.toString();
+          if(res.infomsg.length > 0){
+             msg = res.infomsg.toString();
+          }
+          return [res.allOk,msg];
+       }
+      
+      $(document).ready(function() {
+         var usersGrid = $("#table-addressbook").jqGrid({
+            ajaxGridOptions : {type:"POST"},
+            url: '<?=$this->link()->route('addressList');?>?idgrp='+$('#select-group-id').val().toString(),
+            datatype: "json",
+            colNames:[
+                      'ID', 
+                      '<?=$this->tr('Jméno')?>', 
+                      '<?=$this->tr('Přijmení')?>', 
+                      '<?=$this->tr('E-mail')?>', 
+                      '<?=$this->tr('Poznámka')?>',
+                      '<?=$this->tr('Skupina')?>'],
+            colModel:[
+                      // id
+               {name:'<?=MailsAddressBook_Model_Addressbook::COLUMN_ID?>',
+                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_ID?>',
+                  width:45,fixed: true,editable:false},
+                  // name
+               {name:'<?=MailsAddressBook_Model_Addressbook::COLUMN_NAME?>',
+                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_NAME?>', 
+                  width:120,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:2, label: "<?=$this->tr('Jméno')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  // surname
+               {name:'<?=MailsAddressBook_Model_Addressbook::COLUMN_SURNAME?>', 
+                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_SURNAME?>', 
+                  width:120,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:3, label: "<?=$this->tr('Přijmení')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  // mail
+               {name:'<?=MailsAddressBook_Model_Addressbook::COLUMN_MAIL?>',
+                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_MAIL?>', 
+                  editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:4, label: "<?=$this->tr('E-mail')?>",elmprefix:"(*)"}},
+                  // note
+               {name:'<?=MailsAddressBook_Model_Addressbook::COLUMN_NOTE?>',
+                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_NOTE?>',
+                  width:200, fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:5, label: "<?=$this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  // group
+               {name:'<?=MailsAddressBook_Model_Groups::COLUMN_NAME?>',
+                  index:'<?=MailsAddressBook_Model_Groups::COLUMN_NAME?>', 
+                  width:90,fixed: true, editable: true,edittype:"select",
+                  editoptions:{value: groups},formoptions:{ rowpos:9, 
+                     label: "<?=$this->tr('Skupina')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
+            ],
+            rowNum:30,
+            rowList:[10,30,60,100],
+            pager: '#table-addressbook-pager',
+            sortname: '<?=MailsAddressBook_Model_Addressbook::COLUMN_ID?>',
+            caption:"<?=$this->tr('Lidé v adresáři')?>",
+            autowidth : true,
+            height: '100%',
+            editurl:"<?=$this->link()->route('editMail')?>",
+            toolbar: [true,"top"],
+            jsonReader: { repeatitems : false, root: "rows" }
+         });
+         $("#t_table-addressbook").append($('#table-addressbook-toolbar'));
+         /* změna skupiny */
+         $("#select-group-id").change(function(){
+            baseId = this.value;
+            usersGrid.jqGrid('setGridParam', { url: '<?=$this->link()->route('addressList');?>?idgrp='+this.value});
+            usersGrid.trigger("reloadGrid");
+         });
+
+         usersGrid.jqGrid('navGrid','#table-addressbook-pager',
+            {edit:true,add:true,del:true},
+            // edit options
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               afterSubmit : respondFunction,
+               beforeSubmit: function(postdata, formid){
+            	   // repair id grp
+            	   postdata.<?=MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP?> = postdata.<?=MailsAddressBook_Model_Groups::COLUMN_NAME?>;
+            	   return [true, '']; 
+            	} 
+            },
+            // add options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               afterSubmit : respondFunction,
+               afterShowForm : function(){
+                  $('#id_group').val($('#select-group-id').val());
+               },
+               beforeSubmit: function(postdata, formid){
+            	   // repair id grp
+            	   postdata.<?=MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP?> = postdata.<?=MailsAddressBook_Model_Groups::COLUMN_NAME?>;
+            	   return [true, '']; 
+            	} 
+            },  
+            // del options
+            {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true,
+            	afterSubmit : respondFunction,
+            },
+            {multipleSearch:false, closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']},
+            {closeOnEscape:true}
+         );
+      });
+      /* ]]> */
+      </script>
