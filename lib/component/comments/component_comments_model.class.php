@@ -71,7 +71,7 @@ class Component_Comments_Model extends Model_ORM {
          }
          // je rodič
          else {
-            $dbc = new Db_PDO();
+            $dbc = Db_PDO::getInstance();
             $tbl = $dbc->table(self::DB_TABLE);
             // zjištění pořadí a hloubky příspěvku, na který se reaguje
             $parent = $this->where(self::COL_ID.' = :id', array('id' => $record->{self::COL_ID_PARENT}))->record();
@@ -104,14 +104,14 @@ class Component_Comments_Model extends Model_ORM {
    }
 
    public function changePublic($idComment) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".$dbc->table(self::DB_TABLE)." SET ".self::COL_PUBLIC." = IF(".self::COL_PUBLIC."=1,0,1) WHERE ".self::COL_ID." = :idc");
       $dbst->execute(array(':idc' => $idComment));
 
    }
 
    public function changeCensored($idComment) {
-      $dbc = new Db_PDO();
+      $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE ".$dbc->table(self::DB_TABLE)." SET ".self::COL_CENSORED." = IF(".self::COL_CENSORED."=1,0,1) WHERE ".self::COL_ID." = :idc");
       $dbst->execute(array(':idc' => $idComment));
 
