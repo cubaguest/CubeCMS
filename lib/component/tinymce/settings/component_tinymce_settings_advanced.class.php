@@ -29,7 +29,8 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
          'table' : 'margin-left,margin-right',
          'ol' : 'list-style-type', 'ul' : 'list-style-type'}",
       'tab_focus' => ':prev,:next',
-      'width' => 520,
+//       'width' => 520,
+      'width' => "100%",
 
    );
 

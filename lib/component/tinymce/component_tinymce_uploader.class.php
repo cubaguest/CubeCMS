@@ -242,8 +242,8 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       // iterate over public dir only if admin
       if(Auth::isAdmin()){
          $publicDirs = array("/".Component_TinyMCE_Browser::DIR_PUBLIC."/");
-         if(!is_dir($publicDirs)){// create dir if not exist;
-            @mkdir( reset($homeDirs) );
+         if(!is_dir($dirPublic)){// create dir if not exist;
+            @mkdir( $dirPublic );
          }
          $ite = new RecursiveDirectoryIterator($dirPublic );
          foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
@@ -262,7 +262,7 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       // interate over user dir
       $homeDirs = array("/".Component_TinyMCE_Browser::DIR_HOME."/".Auth::getUserName()."/");
       if(!is_dir($dirHome)){// create dir if not exist;
-         @mkdir( reset($homeDirs) ); 
+         @mkdir( $dirHome ); 
       }
       $ite = new RecursiveDirectoryIterator($dirHome );
       foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
