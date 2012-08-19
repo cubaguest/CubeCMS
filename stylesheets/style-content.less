@@ -27,12 +27,15 @@
 
 a.image {
     border: 1px solid #B0A1A1;
-    display: block;
-    float: left;
-    width: 150px;
-    height: 180px;
-    margin-bottom: 22px;
-    margin-right: 24px;
+    display: inline-block;
+    /*width: 150px;
+    height: 180px;*/
+    margin-bottom: 10px;
+    margin-right: 10px;
+    line-height: 0;
+}
+a.image img {
+   display: block;
 }
 
 a.image:hover {
@@ -46,5 +49,3 @@ a.image span {
 .photogalery + p, .photogalery + div, .photogalery + hr, 
 a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + div 
 {clear: both;}
-
-

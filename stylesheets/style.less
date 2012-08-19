@@ -2,6 +2,9 @@
 @import "normalize.css";
 @import "style-layout.css";
 
+/* COLORS */
+@color-text-light: #A0A0A0;
+
 /* PATHS */
 @imgdir: "../../../images";
 
@@ -109,11 +112,12 @@ td, th {font-size: 100%; text-align: left; }
    border-bottom: 2px transparent solid;
    border-top: 2px transparent solid;
    margin-bottom: 5px;
+   p { margin-bottom:3px; border-top: 1px solid gray;}
+   p:first-child { border: none;}
 }
-.message p { margin-bottom:3px; border-top: 1px solid gray;}
-.message p:first-child { border: none;}
 #infoMessages, .message-info { border-color: #b7dcff; background-color: #cce6ff; background-image: url('@{imgdir}/icons/accept.png');}
 #errMessages, .message-err { border-color: #ffc7c0; background-color: #ffe3e0; background-image: url('@{imgdir}/icons/error.png');}
+.message-warning { border-color: #AFAB23; background-color: #f0ea30; background-image: url('@{imgdir}/icons/error.png');}
 #coreErrMessage { border-color: #ffa095; background-color: #ffb2a9; background-image: url('@{imgdir}/icons/error.png');}
 
 
@@ -133,7 +137,9 @@ input[type="submit"], input[type="reset"], input[type="button"], button, input[t
    color: black;
    cursor: pointer;
 }
-input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, button:hover, a.form-button:hover, .button:hover, input.button-warning:hover {
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, 
+button:hover, a.form-button:hover, .button:hover, input.button-warning:hover,
+input[type="submit"].exclusive:hover, button[type="submit"].exclusive:hover {
    background: #fff7d4 url('@{imgdir}/forms/buttons_back.gif') 0 0 repeat-x;
    text-decoration: none;
 }
@@ -141,7 +147,9 @@ input[type="submit"]:hover, button[type="submit"]:hover {
    background-color: #a7fead;
    background-position: 0 -20px;
 }
-input.button-cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover, .button-cancel:hover {
+input.button-cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover, .button-cancel:hover,
+input.cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover
+ {
    background-color: #f57676;
    background-position: 0 -40px;
 }
@@ -218,6 +226,7 @@ textarea, form .form-table .form-element-long {
    height: 16px;
 }
 .form-sub-label { font-size: 82%; }
+.placeholder { color: #aaa; }
 #loadingBox {
 /*   background-color: white;*/
    text-align:center;
@@ -327,6 +336,12 @@ textarea, form .form-table .form-element-long {
 /* SOF main content NEW!!! */
 .post {
    margin-bottom: 0.5em;
+   
+   .info {
+      font-size: 80%;
+      margin-bottom: 0.5em;
+      color: @color-text-light;
+   }
 }
 .posts-list .post p {
    margin-bottom: 0;
@@ -417,7 +432,7 @@ textarea, form .form-table .form-element-long {
    background-color: silver;
    font-size: xx-small;
 }
-.comment-notviewed {
+.comment-notviewed{
    box-shadow: 0px 0px 5px #000000;
    -webkit-box-shadow: 0px 0px 5px #000000;
    -moz-box-shadow: 0px 0px 5px #000000;
