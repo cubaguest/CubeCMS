@@ -181,6 +181,7 @@ class Articles_View extends View {
    }
 
    public function editTextView() {
+      Template_Module::setEdit(true);
       $this->addTinyMCE('simple');
       $this->template()->addFile('tpl://articles:edittext.phtml');
       Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
