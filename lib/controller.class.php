@@ -111,6 +111,10 @@ abstract class Controller extends TrObject {
          $link->category($this->category()->getUrlKey());
       }
       $this->link = $link;
+      
+      // kontrola instalace a verze modulu
+      $this->checkModule();
+      
       // pokud se jedná o zděděný kontroler tak načíst všechny překlady děděných modulů
       $class = get_class($this);
       $modulesTrs = array();
@@ -142,6 +146,29 @@ abstract class Controller extends TrObject {
       $this->init();
    }
 
+   /**
+    * Metoda kontrolu modul a jeho aktuální verzi
+    */
+   private function checkModule() 
+   {
+      if($this->category() instanceof Category_Admin){
+         // zatím pouze administrační moduly
+         $m = new Model_Module();
+         $module = $m->where(Model_Module::COLUMN_NAME." = :module", array('module' => $this->module()->getName()))->record();
+         if(!$module){
+            $cls = $this->moduleName."_Install";
+            $installer = new $cls();
+            try {
+               $installer->installModule();
+               $this->infoMsg()->addMessage($this->tr('Modul byl instalován'));
+               $this->link()->reload();
+            } catch (Exception $e) {
+               new CoreErrors($e);
+            }
+         }
+      }
+   }
+   
    private function initView() 
    {
       //	Načtení třídy View
