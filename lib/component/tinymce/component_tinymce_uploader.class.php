@@ -1,13 +1,19 @@
 <?php
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
  * Description of component_tinymce_rowser
  * @author cuba
  */
 class Component_TinyMCE_Uploader extends Component_TinyMCE {
+   private $allowedDirs = array();
+   
+   public function __construct($runOnly = false) 
+   {
+      parent::__construct($runOnly);
+      if(isset($_GET['allowDirs']) && is_array($_GET['allowDirs'])){
+         $this->allowedDirs = $_GET['allowDirs'];
+      }
+   }
+   
    public function imageUploadController()
    {
       if(!Auth::isLogin())
@@ -241,6 +247,26 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
    
       // iterate over public dir only if admin
       if(Auth::isAdmin()){
+         if(!empty($this->allowedDirs)){
+            
+            $allowedDirs = array();
+            
+            foreach ($this->allowedDirs as $dir) {
+               $allowedDirs[] = $dir;
+               $dir = realpath( AppCore::getAppDataDir().str_replace('/', DIRECTORY_SEPARATOR, $dir));
+               $ite = new RecursiveDirectoryIterator($dir );
+               foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST)
+                     as $name => $item) {
+                  if($item->isDir() && $item->isWritable()
+                        && ( strpos($item->getPathname(), "small") === false
+                              && strpos($item->getPathname(), "medium") === false ) ){
+                     array_push($allowedDirs, $this->encodeDir($item->getPathname()));
+                  }
+               }
+            }
+            $this->template()->dirsAllowed = $allowedDirs;
+         }
+         
          $publicDirs = array("/".Component_TinyMCE_Browser::DIR_PUBLIC."/");
          if(!is_dir($dirPublic)){// create dir if not exist;
             @mkdir( $dirPublic );

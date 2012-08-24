@@ -244,24 +244,24 @@ var CubePhotogaleryDialog = {
          headline = tinymce.DOM.getOuterHTML(h);
       }
       
-      var reseter = tinymce.DOM.create("span", {'class' : 'reseter'}, '&nbsp;');
+      //var reseter = tinymce.DOM.create("span", {'class' : 'reseter'}, '&nbsp;');
       if(formObj.wrapperList.value != ""){
          // reseter
-         cnt.appendChild(reseter);
+         //cnt.appendChild(reseter);
          tinyMCEPopup.execCommand('mceInsertContent', false, headline+tinymce.DOM.getOuterHTML(cnt)+'<p> </p>');
       } else {
          var selNode = tinyMCEPopup.editor.selection.getNode();
-         if(selNode.nodeName == 'SPAN' &&
-         dom.getAttrib(selNode, 'class').indexOf('reseter') != -1){
-            cnt.appendChild(reseter);
-         }
+//         if(selNode.nodeName == 'SPAN' &&
+//         dom.getAttrib(selNode, 'class').indexOf('reseter') != -1){
+//            cnt.appendChild(reseter);
+//         }
          tinyMCEPopup.execCommand('mceInsertContent', false, headline+cnt.innerHTML);
       }
 
 		tinyMCEPopup.restoreSelection();
 		// Fixes crash in Safari
 		if (tinymce.isWebKit){
-			ed.getWin().focus();
+			tinyMCEPopup.editor.getWin().focus();
       }
       
       //clear tmp holder

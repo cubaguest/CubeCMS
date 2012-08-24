@@ -545,6 +545,17 @@ var TinyMCEFileUploader = {
    dirListUrl : "/component/tinymce_uploader/0/dirsList.json",
 
    init : function(){
+      var aDirs = tinyMCE.activeEditor.getParam('alloweddirs');
+      if(aDirs && aDirs.length > 0){
+         var dirsStr = '?';
+         for (var i = 0; i < aDirs.length; i++){
+            dirsStr+= 'allowDirs[]='+escape(aDirs[i]);
+            if(i+1 < aDirs.length){ dirsStr+="&"; }
+         }
+         this.uploadUrl+=dirsStr;
+         this.dirListUrl+=dirsStr;
+      }
+
       document.getElementById("uploading_progress").style.visibility = "hidden";
       this.loadUploadDirs();
    },
@@ -561,22 +572,41 @@ var TinyMCEFileUploader = {
             if(data.errmsg.length > 0 ){
                alert("Error: Cannot load directories");
             }
+            var forceDir = tinyMCE.activeEditor.getParam('forcedir');
+            // allowed
+            if(data.dirsAllowed && data.dirsAllowed.length > 0 ){
+               for (var i = 0; i < data.dirsAllowed.length; i++) {
+                 var attribs = {value : data.dirsAllowed[i]};
+                 if(forceDir == data.dirsAllowed[i]){
+                    attribs.selected = "selected";
+                 }
+                 tinyMCEPopup.dom.add('dirs-list-allowed', 'option', attribs, data.dirsAllowed[i]);
+               }
+            } else {
+               tinyMCEPopup.dom.remove('dirs-list-allowed');
+            }
+            
             // public
             if(data.dirsPublic && data.dirsPublic.length > 0 ){
                for (var i = 0; i < data.dirsPublic.length; i++) {
-                  tinyMCEPopup.dom.add('dirs-list-public',
-                     'option', {
-                        value : data.dirsPublic[i]
-                     }, data.dirsPublic[i]);
+                  var attribs = {value : data.dirsPublic[i]};
+                  if(forceDir == data.dirsPublic[i]){
+                     attribs.selected = "selected";
+                  }
+                  tinyMCEPopup.dom.add('dirs-list-public', 'option', attribs, data.dirsPublic[i]);
                }
+            } else {
+               tinyMCEPopup.dom.remove('dirs-list-public');
             }
+            
             // home
             if(data.dirsHome.length > 0 ){
                for (var i = 0; i < data.dirsHome.length; i++) {
-                  tinyMCEPopup.dom.add('dirs-list-home',
-                     'option', {
-                        value : data.dirsHome[i]
-                     }, data.dirsHome[i]);
+                 var attribs = {value : data.dirsHome[i]};
+                 if(forceDir == data.dirsHome[i]){
+                    attribs.selected = "selected";
+                 }
+                  tinyMCEPopup.dom.add('dirs-list-home','option', attribs, data.dirsHome[i]);
                }
             }
          }

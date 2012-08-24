@@ -80,7 +80,7 @@ var FileBrowser = {
             var size = parseFloat(size);
             if(size > 1048576){ // MB
                return Number(size/1048576).toFixed(2).toString()+' MB';
-            } else if(size > 1024) { // KB
+            } else if(size > 1024) { // KB
                return Number(size/1024).toFixed(2).toString()+' KB';
             } else { // B
                return size.toString()+' B';
@@ -92,8 +92,12 @@ var FileBrowser = {
       this.extendJQ();
       this.cmsPluginUrl = window.location.toString().replace('browser.php', 'jscripts/tinymce/');
       if(this.currentDir == null){
-         // load previous path
-         this.currentDir = this.loadPath();
+    	  if(openDir){
+    		 this.currentDir = openDir;
+    	  } else {
+    		 // load previous path
+    		 this.currentDir = this.loadPath();
+    	  }
       }
       // UPLOAD POST PARAMS
       this.uploadFilesPosParams = {
@@ -119,7 +123,7 @@ var FileBrowser = {
          button_width: 61,
          button_height: 22,
          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-         //debug: true,
+//         debug: true,
          // Flash Settings
          flash_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload.swf",
          flash9_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload_fp9.swf"
@@ -389,7 +393,7 @@ var FileBrowser = {
    getFileTypes : function(){
       var extensions = Array();
       if(this.listType == 'image'){
-         extensions = Array('jpg','jpeg','png');
+         extensions = Array('jpg','jpeg','png','gif','bmp','wmf');
       } else if(this.listType == 'media'){
          extensions = Array('swf', // falsh
             'mp4','m4v', 'ogv', 'mov' , 'flv', 'rm', 'qt', 'avi', // video
@@ -416,7 +420,7 @@ var FileBrowser = {
             if(typeof (sucessfunc)== 'function') {
                sucessfunc.call(this, data);
             }
-            if(data.infomsg.length > 0 || data.errmsg.length > 0){
+            if(data.infomsg.length > 0 || data.errmsg.length > 0){
                FileBrowser.showResult(data.infomsg, data.errmsg)
             }
          },

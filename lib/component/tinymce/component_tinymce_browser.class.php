@@ -31,7 +31,16 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
 
    private static $mediaExtensions = array('swf','swc','qt','avi','mpg','mpeg','mp2','mp3','ogg','wav');
 
+   private $allowdDirs = array();
 
+   public function __construct($runOnly = false)
+   {
+      parent::__construct($runOnly);
+      if(isset($_GET['allowDirs']) && is_array($_GET['allowDirs'])){
+         $this->allowdDirs = $_GET['allowDirs'];
+      }
+   }
+   
    public function browserController()
    {
       // inicializace adresářů
@@ -50,6 +59,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    {
       $this->template = new Template_Core();
       $this->template()->uploadLink = $this->link()->onlyAction('upload', 'php');
+      
       $this->template()->linkC = $this->link();
       
       $this->template()->addTplFile('filebrowser/filebrowser.phtml');
@@ -57,6 +67,28 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
 //      exit();
    }
 
+   public static function getUploaderFunction(Component_TinyMCE_Settings_Advanced $settings)
+   {
+      $browserUrl = Url_Request::getBaseWebDir().'/component/tinymce_browser/{CATID}/browser.php?t="+type+"'
+      .'&allowDirs[]=' . implode('&allowDirs[]=', array_map('urlencode', $settings->getAllowedDirs())).
+      '&forcedir='.urlencode($settings->getForceDir());
+      
+      $func = 'function vveTinyMCEFileBrowser (field_name, url, type, win) {
+      var cmsURL = location.toString();    // script URL - use an absolute path!
+      tinyMCE.activeEditor.windowManager.open({
+      file : "'.$browserUrl.'",
+      title : "Cube File Browser", width : 750, height : 500, resizable : "yes", inline : "yes",  close_previous : "no"
+      }, {
+      window : win,
+      input : field_name,
+      listType : type,
+      cat : tinyMCE.activeEditor.getParam(\'cid\'),
+      url:url });
+      return false;
+      }';
+      return $func;
+   }
+   
    /*
     * Metody pro obsluhu filebrowseru
     */
@@ -213,11 +245,32 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
     */
    private function isWritable($item)
    {
+      $w = is_writable($item);
+      // kontrola home directory
+      if($w && preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_HOME.DIRECTORY_SEPARATOR
+            .Auth::getUserName().DIRECTORY_SEPARATOR,'/')."/",$item)){
+         return true; 
+      }
+      
+      if(Auth::isAdmin()){
+         // kontrola public
+         if($w && preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_PUBLIC.DIRECTORY_SEPARATOR,'/')
+               ."/", $item)){
+            return true;
+         } 
+         // allowed dirs
+         foreach ($this->allowdDirs as $aDir) {
+            $aDir = str_replace('/', DIRECTORY_SEPARATOR, $aDir);
+            if($w && preg_match('/^'.preg_quote(realpath(AppCore::getAppDataDir().$aDir),'/')."/", $item)){
+               return true;
+            } 
+         }
+      }
+      
+      // kontrola podle práv
       $aclf = pathinfo($item, PATHINFO_DIRNAME).DIRECTORY_SEPARATOR.self::ACL_FILE;
-      if((preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_HOME.DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR,'/').'/', $item) // in home dir
-         OR (Auth::isAdmin() && preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_PUBLIC.DIRECTORY_SEPARATOR,'/').'/', $item) ) // in public dir
-         OR (is_dir($item) AND file_exists($aclf) AND in_array(Auth::getUserId(), explode(';',file_get_contents($aclf)))) )// in dir with ACL
-         AND is_writable($item)){
+      // in dir with ACL
+      if(is_dir($item) && file_exists($aclf) && in_array(Auth::getUserId(), explode(';',file_get_contents($aclf))) ){
          return true;
       }
       return false;
