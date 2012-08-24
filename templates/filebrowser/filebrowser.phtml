@@ -19,7 +19,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
 <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
 <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
 <?if(VVE_DEBUG_LEVEL > 1){?>
-   <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.min.js"></script>
+   <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
 <?} else {?>
    <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.min.js"></script>
 <?}?>
@@ -47,11 +47,10 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
                         'Přesun a kopírování položek lze pomocí chránky.',
                         'Při nahrávání obrázků z fotoaparátu je nutné obrázek zmenšit.'
                         );
-   <?if(Auth::isAdmin()){?>
-      var baseLoadPath = '/public/';                        
-   <?} else {?>
-      var baseLoadPath = '/home/<?=Auth::getUserName()?>/';                        
-   <?}?>
+
+   var baseLoadPath = '<? echo Auth::isAdmin() ? '/public/' : '/home/'.Auth::getUserName().'/'; ?>';
+   var openDir = <?
+      echo (isset($_GET['forcedir']) && $_GET['forcedir'] != null ) ? "'".urldecode($_GET['forcedir'])."'" : 'false';?>;                        
    </script>
       <table style="" id="mainTable" cellpadding="0" cellspacing="3">
    <tr>

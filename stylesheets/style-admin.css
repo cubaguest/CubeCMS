@@ -205,9 +205,15 @@ a.form-link-lang-sel {
 .main-content-text, .main-content-images, .main-content-list {
    border-width: 0;
 } /* text v hlavním obsahu */
+.module-navigation-container {
+	margin-bottom: 5px;
+}
+.module-navigation {
+ 	margin-bottom: 5px;
+}
 li.module-navigation-tab a img {
    top: 5px;
-   vertical-align: -3px;
+   vertical-align: -2px;
    padding-right: 4px;
 }
 .lang-image {padding-right: 2px; width: 18px; height: 12px;}
