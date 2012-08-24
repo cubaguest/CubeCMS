@@ -25,7 +25,7 @@ class Log {
          $logFile = AppCore::getAppWebDir().self::LOG_DIR.DIRECTORY_SEPARATOR.strtolower($log).'-'.  date('Y-m').'.log';
          file_put_contents($logFile, date('c').' '.$str."\n", FILE_APPEND);
          // set chmnod
-         @chmod($logFile, 0664);
+//          @chmod($logFile, 0664);
       }
    }
 }
