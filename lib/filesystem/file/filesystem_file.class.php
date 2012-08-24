@@ -11,7 +11,7 @@
  * @abstract 		Třída pro obsluhu souborů
  */
 
-class Filesystem_File {
+class Filesystem_File extends TrObject {
    /**
     * Název souboru
     * @var string
@@ -267,13 +267,13 @@ class Filesystem_File {
       $this->fileName = $newFile;
 
       if(!$this->exist()) {
-         throw new UnexpectedValueException(sprintf(_('Soubor %s pro kopírování neexistuje'), $this->getName(true)), 1);
+         throw new File_Exception(sprintf($this->tr('Soubor %s pro kopírování neexistuje'), $this->getName(true)), 1);
       }
       if(!copy($this->getName(true), $dstDir.$newFile)) {
-         throw new UnexpectedValueException(sprintf(_('Chyba při kopírování souboru %s > %s'), $this->getName(true), $dstDir.$newFile), 2);
+         throw new File_Exception(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), $this->getName(true), $dstDir.$newFile), 2);
       }
       if(!chmod($dstDir.$newFile, 0666)) {
-         throw new UnexpectedValueException(sprintf(_('Chyba při úpravě práv souboru %s'),$this->getName(true)), 3);
+         throw new File_Exception(sprintf($this->tr('Chyba při úpravě práv souboru %s'),$this->getName(true)), 3);
       }
       return true;
    }
@@ -301,7 +301,7 @@ class Filesystem_File {
       $dstDir->checkDir();
       if($newName === null) $newName = $this->getName();
       if(!@rename($this->getName(true), $dstDir.$newName)){
-         throw new UnexpectedValueException(_('Soubor se nepodařilo přesunout'));
+         throw new File_Exception($this->tr('Soubor se nepodařilo přesunout'));
          return false;
       }
       $this->fileDir = $dstDir;
@@ -325,8 +325,8 @@ class Filesystem_File {
     */
    public function delete() {
       if(!$this->exist() OR is_dir($this->getName(true)) OR !unlink($this->getName(true))) {
-            new CoreErrors(new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému'), $this->getName())));
-//            throw new UnexpectedValueException(sprintf(_('Soubor %s se nepodařilo smazat z Filesystému dir: "%s"'), $this->getName(), $this->getDir()));
+//             new CoreErrors(new File_Exception(sprintf($this->tr('Soubor %s se nepodařilo smazat z Filesystému'), $this->getName())));
+           throw new File_Exception(sprintf($this->tr('Soubor %s se nepodařilo smazat z Filesystému dir: "%s"'), $this->getName(), $this->getDir()));
       }
    }
 
