@@ -90,7 +90,7 @@ class Url_Link_Component extends Url_Link {
    public function  __toString() {
       if($this->isOnlyComponentAction) {
          return Url_Request::getBaseWebDir().self::URL_PART.'/'.strtolower($this->componentName).'/'.Locales::getLang()
-         .'/'.Category::getSelectedCategory()->getId().'/'.$this->actionName.'.'.$this->outputType;
+         .'/'.Category::getSelectedCategory()->getId().'/'.$this->actionName.'.'.$this->outputType.$this->getParams();
       } else {
          return parent::__toString();
       }

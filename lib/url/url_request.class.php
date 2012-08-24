@@ -410,6 +410,7 @@ class Url_Request {
       }
       $this->urlType = self::URL_TYPE_JSPLUGIN_REQUEST;
       $this->pageFull = false;
+      $this->isAdminCat = false;
       return true;
    }
 
