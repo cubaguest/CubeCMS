@@ -377,7 +377,7 @@ class Model_ORM extends Model {
 
    public function newRecord()
    {
-      return new Model_ORM_Record($this->tableStructure);
+      return new Model_ORM_Record($this->tableStructure, false, $this);
    }
 
    protected function getRow(Model_ORM $obj = null, $fetchParams = self::FETCH_LANG_CLASS)
@@ -408,7 +408,7 @@ class Model_ORM extends Model {
          $r = false;
 //         $timer = Debug_Timer::getInstance()->timerStart('SQL_record');
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true));
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true, $this));
             $dbst->execute();
             $r = $dbst->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
          } else {
@@ -462,9 +462,9 @@ class Model_ORM extends Model {
       try {
 //         $timer = Debug_Timer::getInstance()->timerStart('SQL_records');
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
             $dbst->execute();
-            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
          } else {
             $dbst->setFetchMode($fetchParams);
             $dbst->execute();
@@ -1028,9 +1028,9 @@ class Model_ORM extends Model {
       $r = false;
       try {
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
             $dbst->execute();
-            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true));
+            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
          } else {
             $dbst->setFetchMode($fetchParams);
             $dbst->execute();

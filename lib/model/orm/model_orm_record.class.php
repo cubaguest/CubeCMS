@@ -21,7 +21,13 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    protected $pKeyValue = null;
    protected $fromDb = false;
 
-   public function __construct($columns, $fromDb = false)
+   /**
+    * Model záznamu
+    * @var Model_ORM  
+    */
+   protected $model; 
+   
+   public function __construct($columns, $fromDb = false, $model = null)
    {
       $this->fromDb = $fromDb;
       foreach ($columns as &$column) {
@@ -30,6 +36,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          }
       }
       $this->columns = $columns;
+      $this->model = $model;
    }
 
    /**
@@ -271,5 +278,15 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       return!is_null(key($this->columns));
    }
 
+   /**
+    * Metoda uloží data daného záznamu
+    */
+   public function save()
+   {
+      if($this->model != null){
+         return $this->model->save($this);
+      }
+      return false;
+   }
 }
 ?>
