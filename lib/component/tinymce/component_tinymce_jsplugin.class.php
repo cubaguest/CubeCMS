@@ -74,7 +74,8 @@ class Component_TinyMCE_JsPlugin extends JsPlugin {
       }
       $className = 'Component_TinyMCE_Settings_'.ucfirst($_GET['set']);
       $setObj = new $className();
-      echo $setObj;
+      $setObj->prepareSettingsFromUrl();
+      echo $setObj->settingsAsString();
    }
 
    /**

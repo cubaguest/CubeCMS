@@ -8,10 +8,9 @@ abstract class Component_TinyMCE_Settings extends TrObject {
    const SETTING_EXTERNAL_IMAGE_LIST = 'external_image_list_url';
    const SETTING_EXTERNAL_MEDIA_LIST = 'external_media_list_url';
 
+   protected $settingName = 'simple';
 
-   protected $settingName = null;
-
-   protected $settings = array(
+   protected $defaultSettings = array(
       'theme' => 'simple',
       'mode' => "specific_textareas",
       'skin' => "o2k7",
@@ -21,9 +20,11 @@ abstract class Component_TinyMCE_Settings extends TrObject {
       'relative_urls' => true,
       'height' => 'auto',
       'language' => 'en',
-      'width' => 500,
+      'width' => "100%",
+      'content_css' => null,
       'document_base_url' => null
    );
+   protected $settings = array();
 
    protected $defaultPlugins = array();
    protected $plugins = array();
@@ -31,16 +32,14 @@ abstract class Component_TinyMCE_Settings extends TrObject {
    protected $defaultButtons = array();
    protected $buttons = array();
 
-   /**
-    * Pole s upravenými hodnotami (jen ty se budou přenášet v url adrese)
-    * @var array
-    */
-   protected $userSettings = array();
-
    public function  __construct() {
+      $this->setDefaultValues();
       $this->settings['language'] = Locales::getLang();
-      $this->settings['document_base_url'] = Url_Request::getBaseWebDir();
-      $this->settings['content_css'] = Url_Request::getBaseWebDir();
+   }
+   
+   protected function setDefaultValues()
+   {
+      $this->settings = $this->defaultSettings;
       $this->buttons = $this->defaultButtons;
       $this->plugins = $this->defaultPlugins;
    }
@@ -50,13 +49,21 @@ abstract class Component_TinyMCE_Settings extends TrObject {
    }
 
    /**
+    * Metoda vrací název theme
+    * @return string
+    */
+   final public function getThemeName() 
+   {
+      return $this->settingName;
+   }
+   
+   /**
     * Metoda nasatvuje parametr editoru
     * @param string $name -- název parametru
     * @param mixed $value -- hodnota parametru
     * @return Component_TinyMCE_Settings
     */
    final public function setSetting($name, $value) {
-      $this->userSettings[$name] = $value;
       $this->settings[$name] = $value;
       return $this;
    }
@@ -79,7 +86,15 @@ abstract class Component_TinyMCE_Settings extends TrObject {
             }
          }
       }
-      return array_merge($urlParams, $this->userSettings, $additional);
+      
+      // create diferents
+      $tmp = array();
+      foreach ($this->defaultSettings as $key => $value) {
+         if(isset($this->settings[$key]) && $this->defaultSettings[$key] != $this->settings[$key]){
+            $tmp[$key] = $this->settings[$key];
+         }
+      }
+      return array_merge($urlParams, $tmp, $additional);
    }
 
    /**
@@ -115,21 +130,44 @@ abstract class Component_TinyMCE_Settings extends TrObject {
       $this->buttons['theme_advanced_buttons'.$row] = $buttons;
    }
 
-   public function  __toString() {
-      $cnt = "tinyMCE.init({\n";
-      // uživ změny
-      $this->mergeUserSettings();
+   public function prepareSettingsFromUrl()
+   {
+      $settings = $_GET;
+      unset($settings['set']);
+      unset($settings['buttons']);
+      unset($settings['plugins']);
+      unset($settings['tplslist']);
+      
+      foreach ($settings as $key => $value) {
+         if($value == '0' OR $value == '1'){
+            $settings[$key] = (bool)$value;
+         } 
+      }
+      
+      $this->settings = array_merge($this->settings, $settings);
+      
       // remove empty and null values
       foreach ($this->settings as $key => $value) {
          if($value === null) unset ($this->settings[$key]);
       }
       // plugins
-      $this->mergeUserPlugins(); // spojení uživatelksých buttonu
+      if(isset ($_GET['plugins'])){
+         $this->plugins = $_GET['plugins'];
+      }
+      // buttons
+      if(isset ($_GET['buttons'])){
+         foreach ($_GET['buttons'] as $row => $buttons) {
+            $this->buttons[$row] = $buttons;
+         }
+      }
+   }
+   
+   public function  settingsAsString() {
+      $this->settings['document_base_url'] = Url_Request::getBaseWebDir();
+      
       if(!empty ($this->plugins)){
          $this->settings['plugins'] = implode(',', $this->plugins);
       }
-      // buttons
-      $this->mergeUserButtons(); // spojení uživatelksých tlačítek
       if(!empty ($this->buttons)){
          foreach ($this->buttons as $row => $buttons) {
             if($buttons != 'null'){
@@ -137,49 +175,20 @@ abstract class Component_TinyMCE_Settings extends TrObject {
             }
          }
       }
+      // css content
+      if($this->settings['content_css'] == null){
+         $this->settings['content_css'] = $this->getContentCssFile();
+         if($this->settings['content_css'] == null){
+            unset($this->settings['content_css']);
+         }
+      }
+      
+      $cnt = "tinyMCE.init({\n";
+      // uživ změny
+      
       $cnt .= $this->generateJsSettings($this->settings);
       $cnt .= "});\n";
       return $cnt;
-   }
-
-   /**
-    * Metoda spojí pole s předanými buttony
-    */
-   private function mergeUserButtons() {
-      if(isset ($_GET['buttons'])){
-         foreach ($_GET['buttons'] as $row => $buttons) {
-            $this->buttons[$row] = $buttons;
-         }
-      }
-   }
-
-   /**
-    * Metoda spojí pole s předanými pluginy
-    */
-   private function mergeUserPlugins() {
-      if(isset ($_GET['plugins'])){
-         $this->plugins = $buttons;
-      }
-   }
-
-   /**
-    * Sloučí uživatelské změny s výchozími
-    */
-   private function mergeUserSettings(){
-      $settings = $_GET;
-      foreach ($settings as $key => $value) {
-         if($value == '0' OR $value == '1'){
-            $settings[$key] = (bool)$value;
-         }
-      }
-      unset($settings['set']);
-      unset($settings['buttons']);
-      unset($settings['plugins']);
-      unset($settings['tplslist']);
-      /*
-       * @todo kontrola settings na specifické vlastnosti
-       */
-      $this->settings = array_merge($this->settings, $settings);
    }
 
    /**
@@ -192,8 +201,23 @@ abstract class Component_TinyMCE_Settings extends TrObject {
    private function generateJsSettings($params) {
       $content = null;
       foreach ($params as $paramName => $paramValue) {
-         if(is_array($paramValue)) {
-            $content .= $this->generateJsSettings($paramValue);
+         if(is_string($paramValue) && strpos ($paramValue, "function") !== false) { // je vložena funkce
+            $v = str_replace(
+                  array('{CATID}'),
+                  array(Category::getSelectedCategory()->getId())
+                  ,(string)$paramValue);
+         } else if(is_string($paramValue) && ($paramValue[0] == '[' OR strpos ($paramValue, "{") !== false)) {
+            $v = $paramValue;
+         } else {
+            $v = str_replace('\/', '/', json_encode($paramValue));
+         }
+         $content .= $paramName." : ".$v.",\n";
+                  
+         continue;
+         /* ================== END ======================= */
+         
+         /*if(is_array($paramValue)) {
+            $content .= $paramName." = ".json_encode($paramValue).",\n";
          } else {
 //            if($paramValue == null) continue;
             if(is_bool($paramValue)) {
@@ -205,19 +229,47 @@ abstract class Component_TinyMCE_Settings extends TrObject {
             } else if(is_int($paramValue) ){
                $v = $paramValue;
             } else if(strpos ($paramValue, "function") !== false) { // je vložena funkce
-               $v = str_replace('{CATID}', Category::getSelectedCategory()->getId(),(string)$paramValue);
+               $v = str_replace(
+                     array('{CATID}'), 
+                     array(Category::getSelectedCategory()->getId())
+                     ,(string)$paramValue);
             } else if($paramValue[0] == '[' OR strpos ($paramValue, "{") !== false) {
                $v = $paramValue;
             } else {
                $v = "\"".$paramValue."\"";
             }
             $content .= $paramName." : ".$v.",\n";
-         }
+         }*/
       }
       // odstraní poslední čárku
       $content = substr($content, 0, strlen($content)-2);
       $content .= "\n";
       return $content;
+   }
+   
+   protected function getContentCssFile()
+   {
+      $contentCss = null;
+      if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style.less.css' ) ){
+         // check less css file form face
+         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR."/style.less.css";
+      } else if(is_file(Template::faceDir(true).Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style.less.css' ) ){
+         // check less css file form parent face
+         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR."/style.less.css";
+      }
+      // old for normal content css file
+      else if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
+         // from face
+         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR.'/style-content.css';
+      } else if(VVE_SUB_SITE_DIR != null AND
+            is_file(Template::faceDir(true) .Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
+         // from parent face
+         $contentCss = Template::faceUrl(true).Template::STYLESHEETS_DIR.'/style-content.css';
+      } else {
+         // from core
+         $contentCss = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
+      }
+      return $contentCss;
    }
 }
 ?>
