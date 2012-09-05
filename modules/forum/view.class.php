@@ -64,6 +64,8 @@ class Forum_View extends View {
          $toolDelete->setIcon('comment_delete.png')->setTitle($this->tr('Smazat téma'));
          $this->toolboxTopic->addTool($toolDelete);
       }
+      
+      Template_Navigation::addItem($this->topic->{Forum_Model_Topics::COLUMN_NAME}, $this->link());
    }
    
    public function addTopicView()
@@ -77,6 +79,13 @@ class Forum_View extends View {
       $settings->setSetting('editor_selector', 'mceEditor');
       $this->tinyMCE->setEditorSettings($settings);
       $this->tinyMCE->mainView();
+      
+      if($this->topic != null){
+         Template_Navigation::addItem( $this->topic->{Forum_Model_Topics::COLUMN_NAME}, $this->link()->route('showTopic'));
+         Template_Navigation::addItem( $this->tr('Úprava'), $this->link());
+      } else {
+         Template_Navigation::addItem($this->tr('Přidání témata'), $this->link());
+      }
    }
    
    public function editTopicView()
@@ -96,6 +105,13 @@ class Forum_View extends View {
       $settings->setSetting('editor_selector', 'mceEditor');
       $this->tinyMCE->setEditorSettings($settings);
       $this->tinyMCE->mainView();
+      if($this->message != null){
+         Template_Navigation::addItem($this->message->{Forum_Model_Topics::COLUMN_NAME}, $this->link()->route('showTopic'));
+         Template_Navigation::addItem(sprintf( $this->tr('ǔprava "%s"'), $this->message->{Forum_Model_Messages::COLUMN_NAME}), $this->link());
+      } else {
+         Template_Navigation::addItem($this->topic->{Forum_Model_Topics::COLUMN_NAME}, $this->link()->route('showTopic'));
+         Template_Navigation::addItem($this->tr('Přidání příspěvku'), $this->link());
+      }
    }
    
    public function editMessageView()

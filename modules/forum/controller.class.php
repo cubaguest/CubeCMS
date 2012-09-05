@@ -85,6 +85,8 @@ class Forum_Controller extends Controller {
    {
       $this->checkWritebleRights();
       $model = new Forum_Model_Messages();
+      $modelTopic = new Forum_Model_Topics();
+      
       
       $parentMsg = $model->record($this->getRequestParam('msg', null));
       $pid = null;
@@ -93,6 +95,7 @@ class Forum_Controller extends Controller {
          $pid = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
       }
       
+      $this->view()->topic = $modelTopic->record($this->getRequest('id'));
       $this->editMessage($this->getRequest('id'), null, $pid);
    }
    
@@ -115,7 +118,9 @@ class Forum_Controller extends Controller {
    {
       $this->checkWritebleRights();
       $model = new Forum_Model_Messages();
-      $message = $model->record($this->getRequest('idm'));
+      $message = $model
+         ->joinFK(Forum_Model_Messages::COLUMN_ID_TOPIC)
+         ->record($this->getRequest('idm'));
       
       if($message != false && 
          ($this->rights()->isControll() 
