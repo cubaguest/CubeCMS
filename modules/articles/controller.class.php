@@ -8,6 +8,7 @@ class Articles_Controller extends Controller {
    const PARAM_EDITOR_TYPE = 'editor';
    const PARAM_DISABLE_LIST = 'dislist';
    const PARAM_SHOW_CATS = 'shc';
+   const PARAM_NOTIFY_RECIPIENTS = 'nfrecid';
 
    const PARAM_TPL_LIST = 'tpllist';
    const PARAM_TPL_DETAIL = 'tpldet';
@@ -473,6 +474,10 @@ class Articles_Controller extends Controller {
             $this->sendToSocialNetworks($art, $addForm->socNetMessage->getValues());
          }
          
+         if(!$this->category()->getRights()->isControll()){
+            $this->sendNotify($art);
+         }
+         
          $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
                  array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY}))->rmParam()->reload();
@@ -481,7 +486,7 @@ class Articles_Controller extends Controller {
       $this->view()->form = $addForm;
       $this->view()->edit = false;
    }
-
+   
    /**
     * controller pro úpravu novinky
     */
@@ -1291,6 +1296,58 @@ class Articles_Controller extends Controller {
    }
    
    /**
+    * Metoda odešle upozornění na přidaný článek
+    * @param Model_ORM_Record $article
+    */
+   protected function sendNotify(Model_ORM_Record $article) 
+   {
+      $email = new Email(true);
+      $email->setSubject( sprintf( $this->tr('Přidána nová položka do stránek %s'), VVE_WEB_NAME ) );
+      $cnt = '<p>'
+            .sprintf( $this->tr('Byla přidána nová položka do stránek %1$s do kategorie %2$s'), VVE_WEB_NAME, 
+                  '<a href="'.$this->link(true).'">'.$this->category()->getName().'</a>' )
+            ."</p>";
+      
+      $cnt .= '<p>'.sprintf( $this->tr('Autor: %1$s, datum přidání: %2$s'), Auth::getUserName(), vve_date("%x, %X") )."</p>";
+      
+      $cnt .= '<h1><a href="'.$this->link(true)->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY})).'">'
+              .htmlspecialchars($article->{Articles_Model::COLUMN_NAME})."</a></h1>";
+      
+      $cnt .= '<div style="margin-bottom: 10px;">'.$article->{Articles_Model::COLUMN_ANNOTATION}.'</div>';
+      $cnt .= '<div style="margin-bottom: 10px;">'.$article->{Articles_Model::COLUMN_TEXT}.'</div>';
+      
+      $email->setContent( Email::getBaseHtmlMail($cnt) );
+      
+      $str = $this->category()->getParam(self::PARAM_NOTIFY_RECIPIENTS, null);
+      
+      if(empty($str)) {
+         return;         
+      }
+      $ids = explode(';', $str);
+      
+      // maily adminů - z uživatelů
+      $modelusers = new Model_Users();
+      
+      $notifyMails = array(); 
+      foreach ($ids as $id) {
+         $user = $modelusers->record($id);
+         if($user->{Model_Users::COLUMN_NAME} != null){
+            $notifyMails[$user->{Model_Users::COLUMN_MAIL}] = $user->{Model_Users::COLUMN_NAME}." ".$user->{Model_Users::COLUMN_SURNAME};
+         } else {
+            $notifyMails[] = $user->{Model_Users::COLUMN_MAIL};
+         }
+      }
+      if(empty($notifyMails)){
+         return;
+      }
+      
+      $email->addAddress($notifyMails);
+      $failures = array();
+      $email->send($failures);
+      // log failures
+   }
+   
+   /**
     * Metoda pro nastavení modulu
     */
    protected function settings(&$settings,Form &$form) {
@@ -1415,6 +1472,28 @@ class Articles_Controller extends Controller {
       }
       $form->addElement($elemMountCats, $fGrpAdv);
       
+      $elemNotify = new Form_Element_Select('sendNotify', 'Odeslat upozornění při přidání položky');
+      $elemNotify->setSubLabel($this->tr('Odešle zadaným uživatelům upozornění na nově přidanou položku <strong>obyčejným</strong> uživatelem'));
+      // načtení uživatelů
+      $modelUsers = new Model_Users();
+      $users = $modelUsers->usersForThisWeb(true)->records(PDO::FETCH_OBJ);
+      $usersIds = array();
+      foreach ($users as $user) {
+         if($user->{Model_Users::COLUMN_MAIL} != null){
+            $usersIds[$user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
+              .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Users::COLUMN_GROUP_LABEL}
+              .' ('.$user->{Model_Users::COLUMN_GROUP_NAME}.')'] = $user->{Model_Users::COLUMN_ID};
+         }
+      }
+      $elemNotify->setOptions($usersIds);
+      $elemNotify->setMultiple();
+      $elemNotify->html()->setAttrib('size', 4);
+      if (isset($settings[self::PARAM_NOTIFY_RECIPIENTS])) {
+         $elemNotify->setValues(explode(';', $settings[self::PARAM_NOTIFY_RECIPIENTS]));
+      }
+
+      $form->addElement($elemNotify, $fGrpAdv);
+      
       
       $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každé položky tak
@@ -1444,6 +1523,7 @@ class Articles_Controller extends Controller {
          
          $mCats = $form->mountedCats->getValues() == null ? array() : $form->mountedCats->getValues();
          $settings[self::PARAM_MOUNTED_CATS] = implode(';', $mCats);
+         $settings[self::PARAM_NOTIFY_RECIPIENTS] = implode(';', $form->sendNotify->getValues());
       }
    }
    
