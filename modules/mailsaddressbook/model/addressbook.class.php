@@ -97,5 +97,31 @@ class MailsAddressBook_Model_Addressbook extends Model_ORM {
       $dbst->bindValue(':idgrp', $idGrp, PDO::PARAM_INT);
       return $dbst->execute();
    }
+
+   /**
+    * Metoda přidá nový mail do adresáře
+    * @param string $mail
+    * @param int $idGrp
+    * @param string $name
+    * @param string $surname
+    */
+   public static function addUniqueMail($mail, $idGrp = self::DEFAULT_GROUP_ID, $name = null, $surname = null)
+   {
+      $model = new self();
+      $exist = $model->where(self::COLUMN_MAIL." = :mail AND ".self::COLUMN_ID_GRP." = :idgrp", array(
+            'mail' => $mail, 'idgrp' => $idGrp
+      ))->count();
+   
+      if($exist == 0){
+         $newMail = $model->newRecord();
+         $newMail->{self::COLUMN_ID_GRP} = $idGrp;
+         $newMail->{self::COLUMN_MAIL} = $mail;
+         $newMail->{self::COLUMN_NAME} = $name;
+         $newMail->{self::COLUMN_SURNAME} = $surname;
+         $newMail->save();
+         return true;
+      }
+      return false;
+   }
 }
 ?>

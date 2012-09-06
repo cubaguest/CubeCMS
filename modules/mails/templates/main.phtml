@@ -21,9 +21,10 @@ $this->addCssFile('style.css');
             <? echo $this->form->recipients->label() ?>
          </th>
          <td class="form-controlls">
-            <? $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5);
-            echo $this->form->recipients->controll(); ?>
-            <? echo $this->form->recipients->sublabel() ?>
+            <? 
+            $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5)->addClass('full-width');
+            echo $this->form->recipients->controll();
+            echo $this->form->recipients->sublabel() ?>
          </td>
       </tr>
       <tr>
@@ -151,7 +152,8 @@ $this->addCssFile('style.css');
                       title="<?=$this->tr('vypnout/zapnout editor') ?>"><?=$this->tr('OFF/ON') ?></a>
             <br />
             <?
-            $this->form->text->html()->setAttrib('cols', 90)->setAttrib('rows', 40)->addClass('mceEditorSimple');
+            $this->form->text->html()
+               ->setAttrib('cols', 90)->setAttrib('rows', 40)->addClass('full-width');
             echo $this->form->text->controll(); ?>
             <br />
          </td>
@@ -228,19 +230,20 @@ $this->addCssFile('style.css');
 
    $(function() {
       $recBox = $('textarea[name=sendmail_recipients]'); // init of box
+      // tabs
       $("#address-tabs").tabs({collapsible: true,selected: -1});
-      
+      // buttons
       $('input.button-add-all').click(function(){
          $('#'+$(this).data('select')).children('option').each(function() {addMail($(this).val());});
       });
       $('input.button-add').click(function(){
          $('#'+$(this).data('select')).children('option:selected').each(function(){addMail($(this).val());});
       });
-      
-      
+      // double click on select
       $('select.mail-selected option').dblclick(function(){
          addMail($(this).val());
       });
+      // add grp
       $('input[name=button-add-group]').click(function(){
          $.ajax({
             type: "POST",
@@ -250,15 +253,16 @@ $this->addCssFile('style.css');
             success: function(data){
                $.each(data.rows, function(index, value) {
                   var str = '';
-                  if(value.cell[2] != null && value.cell[2] != ''){
-                     str += '"'+value.cell[1]+' '+value.cell[2]+'" ';
+                  if(value.addressbook_name != null && value.addressbook_surname != ''){
+                     str += '"'+value.addressbook_name+' '+value.addressbook_surname+'" ';
                   }
-                  str += '<'+value.cell[0]+'>';
+                  str += '<'+value.addressbook_mail+'>';
                   addMail(str);
                });
             }
          });
       });
+      // autocomplete
       var sterm = '';
       $recBox.autocomplete({
 			minLength: 1,
@@ -296,7 +300,6 @@ $this->addCssFile('style.css');
    });
    /* ]]> */
 </script>
-<br />
 
 
 

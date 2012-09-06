@@ -10,6 +10,7 @@ class Mails_Controller extends Controller {
    const RECIPIENTS_MAILS_SEPARATOR = ',';
 
    const MSG_FILE_NAME = 'mmails_msg.cache';
+   const NUM_MAIL_IN_LIST = 20;
 
    public function mainController()
    {
@@ -316,6 +317,33 @@ class Mails_Controller extends Controller {
    public function searchMailController() {
       $model = new Mails_Model_Addressbook();
       $this->view()->mails = $model->searchMail($this->getRequestParam('q'));
+   }
+   
+   public function addressListController() {
+      // objekt komponenty JGrid
+      $modelAddresBook = new MailsAddressBook_Model_Addressbook();
+   
+      $idGrp = (int)$this->getRequestParam('idgrp', MailsAddressBook_Model_Groups::GROUP_ID_ALL);
+   
+      // search
+      if($idGrp != 0){
+         $modelAddresBook->where(MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP, $idGrp);
+      }
+   
+      $items = $modelAddresBook->records();
+   
+      // out
+      $rows = array();
+      foreach ($items as $mail) {
+         array_push($rows,
+               array(
+                     'id' => $mail->{MailsAddressBook_Model_Addressbook::COLUMN_ID},
+                     MailsAddressBook_Model_Addressbook::COLUMN_MAIL => $mail->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL},
+                     MailsAddressBook_Model_Addressbook::COLUMN_NAME => $mail->{MailsAddressBook_Model_Addressbook::COLUMN_NAME},
+                     MailsAddressBook_Model_Addressbook::COLUMN_SURNAME => $mail->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME},
+                     ));
+      }
+      $this->view()->rows = $rows;
    }
    
 }

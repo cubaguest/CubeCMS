@@ -1,0 +1,41 @@
+<?
+$h = $this->tr('Nahrání šablony');
+$this->addPageTitle($h);
+$this->addCssFile('style.css');
+?>
+<h1><?ps($h)?></h1>
+<?=$this->includeTpl('navigation.phtml');?>
+<div class="main-content-form-edit" id="mails-send-mail-form">
+   <p>
+      <?=$this->tr('Nahrávejte html soubor s obrázky. Všechny obrázky musí mít ve zdroji buď '
+            .'absolutní cestu, nebo pouze název souboru (cesta je doplněna automaticky). V souboru s šablonou patří pouze obsah mezi tagy BODY. Tagy html, meta a body jsou zakázány.')?>
+   </p>
+   <?
+   $this->form->files->setSubLabel('<a id="buttonAddFile" href="#add-file" title="'.$this->tr('Přida další přílohu').'">'.$this->tr('Přida další soubor').'</a>');
+   echo $this->form;
+    ?>
+</div>
+<? 
+   $this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<script type="text/javascript">
+/* <![CDATA[ */
+   $('#buttonAddFile').click(function(e){
+      e.preventDefault();
+      var $input = $(this).parents('td').find('input:last');
+      var re = new RegExp("([_a-z]+)([0-9]+)", "gi");
+      var idParts = re.exec($input.attr('id'));
+      
+      var newID = idParts[1]+(parseInt(idParts[2])+1);
+      var $newI = $input.clone(true).attr('id', newID).val("");
+      if($input.next()[0].nodeName != "BR"){
+         $input.after('<br />').after($newI);
+      } else {
+         $input.next().after($newI);
+      }
+   });
+/* ]]> */
+</script>
+
+
+

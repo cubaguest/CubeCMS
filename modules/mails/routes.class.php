@@ -9,7 +9,8 @@ class Mails_Routes extends Routes {
       $this->addRoute('sendMailsQueue', 'sendmails/queue', 'sendMailsQueue', 'sendmails/queue/');
       // seznam odeslaných emailů
       $this->addRoute('sendMailsList', 'sendmails', 'sendMailsList', 'sendmails/');
-      
+      // seznam emailů ze skupiny
+      $this->addRoute('addressList', 'address-list.json', 'addressList', 'address-list.json');
       // ajax úpravy
       $this->addRoute('searchMail', 'searchmail.php', 'searchMail', 'searchmail.php', 'XHR_Respond_VVEAPI');
       // ajax odeslání
