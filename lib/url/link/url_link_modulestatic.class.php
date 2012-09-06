@@ -26,8 +26,8 @@ class Url_Link_ModuleStatic extends Url_Link {
      * @param string $output -- typ výstupu (koncovka souboru)
      * @return Url_Link_ModuleStatic
      */
-    public function action($request, $output) {
-       $this->file($request.".".$output);
+    public function action($request, $output = null) {
+       $output == null ? $this->file($request."/") : $this->file($request.".".$output);
        return $this;
     }
 

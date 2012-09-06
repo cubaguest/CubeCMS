@@ -251,7 +251,13 @@ class Email {
    {
       $cnt = $this->msgContent;
       if(!empty($this->decoratorVars )){
-         $decorator = new Swift_Plugins_DecoratorPlugin($replacements);
+         //sanitize decorators
+         foreach ($this->decoratorVars as $mail => $values) {
+            foreach ($values as $k => $v) {
+               $this->decoratorVars[$mail][$k] = $this->sanitize($v);
+            }
+         }
+         $decorator = new Swift_Plugins_DecoratorPlugin($this->decoratorVars);
          $this->mailer->registerPlugin($decorator);
       }
       if(!empty($this->replacements )){
@@ -318,10 +324,17 @@ class Email {
    /**
     * Metoda nastaví proměnné emailu
     * @param array $replacements -- pole s proměnnými ('název' => 'hodnota')
+    * @param bool $merge -- jestli se ma sloučit s nastavenými
+    * @return Email
     */
-   public function setReplacements($replacements)
+   public function setReplacements($replacements, $merge = true)
    {
-      $this->replacements = $replacements;
+      if($merge){
+         $this->replacements = array_merge($this->replacements, $replacements);
+      } else {
+         $this->replacements = $replacements;
+      }
+      return $this;
    }
    
    /**

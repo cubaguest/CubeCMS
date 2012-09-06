@@ -257,16 +257,17 @@ abstract class View extends TrObject {
     * @param string/Component_TinyMCE_Settings $theme -- typ editoru (none, simple, full, advanced) nebo nastavení editoru
     */
    protected function setTinyMCE($formElement, $theme = 'simple', $editorSettings = array()) {
-      if( ($formElement instanceof Form_Element) == false OR $theme == 'none'){
+      if( ($formElement instanceof Form_Element) == false OR (is_string($theme) && $theme == 'none' ) ){
          return;
       }
       
-      $formElement->html()->addClass("mceEditor_".$theme);
-      
       $this->tinyMCE = new Component_TinyMCE();
       if($theme instanceof Component_TinyMCE_Settings){
+         $formElement->html()->addClass("mceEditor_".$theme->getThemeName());
+         $theme->setSetting('editor_selector', 'mceEditor_'.$theme->getThemeName());
          $this->tinyMCE->setEditorSettings($theme);
       } else {
+         $formElement->html()->addClass("mceEditor_".$theme);
          switch ($theme) {
             case 'simple':
                $settings = new Component_TinyMCE_Settings_AdvSimple();

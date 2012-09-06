@@ -322,6 +322,16 @@ class Template extends TrObject {
       return $cnt;
    }
 
+   /**
+    * Metoda přidá proměnné do interních položek šablony
+    * @param array $vars -- proměnné ve formátu ('název' => 'hodnota')
+    */
+   public function setVars($vars) 
+   {
+      foreach ($vars as $name => $var) {
+         $this->$name = $var;
+      }      
+   }
 
    /**
     * Metoda vykreslí danou šablonu a její výsledek odešle na výstup

@@ -119,7 +119,7 @@ class Form_Element_UrlKey extends Form_Element_Text {
       return $this;
    }
 
-   public function scripts() {
+   public function scripts($renderKey = null) {
       if($this->checkUrl == null) {return null;}
       
       $script = '$(document).ready(function(){';

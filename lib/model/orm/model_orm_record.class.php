@@ -30,12 +30,15 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    public function __construct($columns, $fromDb = false, $model = null)
    {
       $this->fromDb = $fromDb;
-      foreach ($columns as &$column) {
-         if($column['lang']){
-            $column['value'] = new Model_ORM_LangCell();
+      $this->columns = $columns;
+      foreach ($this->columns as $name => $params) {
+         if($params['lang']){
+            $this->columns[$name]['value'] = new Model_ORM_LangCell();
+         }
+         if(!$fromDb && isset($this->columns[$name]['default'])){
+            $this->columns[$name]['value'] = $this->columns[$name]['default']; 
          }
       }
-      $this->columns = $columns;
       $this->model = $model;
    }
 

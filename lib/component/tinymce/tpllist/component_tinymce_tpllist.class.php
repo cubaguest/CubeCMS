@@ -2,7 +2,7 @@
 /**
  * Třída pro komnponenty Wysiwing editoru TinyMCE
  */
-abstract class Component_TinyMCE_TPLList {
+class Component_TinyMCE_TPLList {
    protected $tpls = array();
 
    public function addTpl($name, $link, $label = null) {

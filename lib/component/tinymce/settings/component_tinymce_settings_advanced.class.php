@@ -37,7 +37,8 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'tab_focus' => ':prev,:next',
       'width' => "100%",
       'alloweddirs' => array(),
-      'forcedir' => null
+      'forcedir' => null,
+      'document_base_url' => null
    );
 
    protected $defaultPlugins = array('autolink','pagebreak','layer','safari','lists','style','table','save','advhr','cubeadvimage', 'cubeadvlink',
@@ -113,7 +114,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
             $link = $urlOrType;
             break;
       }
-      $this->setSetting(Component_TinyMCE_Settings::SETTING_EXTERNAL_TPL_LIST, (string)$link);
+      $this->setSetting('template_external_list_url', (string)$link);
    } 
    
    private function addStyleFormats()

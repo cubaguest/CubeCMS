@@ -2,7 +2,7 @@
 /**
  * Třída pro vytvoření požadavku pro naplnění jqgrid
  */
-abstract class Component_TinyMCE_Settings extends TrObject {
+abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAccess {
    const SETTING_EXTERNAL_TPL_LIST = 'template_external_list_url';
    const SETTING_EXTERNAL_LINK_LIST = 'external_link_list_url';
    const SETTING_EXTERNAL_IMAGE_LIST = 'external_image_list_url';
@@ -44,7 +44,8 @@ abstract class Component_TinyMCE_Settings extends TrObject {
       $this->plugins = $this->defaultPlugins;
    }
 
-   final public function getSetting($name) {
+   final public function getSetting($name) 
+   {
       return $this->settings[$name];
    }
 
@@ -63,12 +64,14 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     * @param mixed $value -- hodnota parametru
     * @return Component_TinyMCE_Settings
     */
-   final public function setSetting($name, $value) {
+   final public function setSetting($name, $value) 
+   {
       $this->settings[$name] = $value;
       return $this;
    }
 
-   final public function getParamsForUrl() {
+   final public function getParamsForUrl() 
+   {
       $urlParams = array();
       $urlParams['set'] = $this->settingName;
 
@@ -101,7 +104,8 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     * metoda vrací vybrané pluginy
     * @return array -- pol epluginů
     */
-   public function getPlugins() {
+   public function getPlugins() 
+   {
       return $this->plugins;
    }
 
@@ -109,7 +113,8 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     * Metoda nastavuje pluginy
     * @param array $pluginsarr -- pole pluginů
     */
-   public function setPlugins($pluginsarr) {
+   public function setPlugins($pluginsarr) 
+   {
       $this->plugins = $pluginsarr;
    }
 
@@ -117,7 +122,8 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     * Metoda vrací tlačítka v zadanám řádku
     * @param int $row -- číslo řádku
     */
-   public function getButtons($row = 1) {
+   public function getButtons($row = 1) 
+   {
       return $this->buttons['theme_advanced_buttons'.$row];
    }
 
@@ -126,7 +132,8 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     * @param int $row -- číslo řádku
     * @param array $buttons -- tlačítka
     */
-   public function setButtons($buttons, $row = 1) {
+   public function setButtons($buttons, $row = 1) 
+   {
       $this->buttons['theme_advanced_buttons'.$row] = $buttons;
    }
 
@@ -162,8 +169,11 @@ abstract class Component_TinyMCE_Settings extends TrObject {
       }
    }
    
-   public function  settingsAsString() {
-      $this->settings['document_base_url'] = Url_Request::getBaseWebDir();
+   public function  settingsAsString() 
+   {
+      if($this->settings['document_base_url'] == null){
+         $this->settings['document_base_url'] = Url_Request::getBaseWebDir();
+      }
       
       if(!empty ($this->plugins)){
          $this->settings['plugins'] = implode(',', $this->plugins);
@@ -198,7 +208,8 @@ abstract class Component_TinyMCE_Settings extends TrObject {
     * @return string -- řetězec s generovaným souborem
     * @todo Kompletně přepsat systém generace konfigu, tohle stojí za hovno
     */
-   private function generateJsSettings($params) {
+   private function generateJsSettings($params) 
+   {
       $content = null;
       foreach ($params as $paramName => $paramValue) {
          if(is_string($paramValue) && strpos ($paramValue, "function") !== false) { // je vložena funkce
@@ -270,6 +281,39 @@ abstract class Component_TinyMCE_Settings extends TrObject {
          $contentCss = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
       }
       return $contentCss;
+   }
+
+   /* ArrayAccess */
+   public function offsetSet($offset, $value) 
+   {
+      if (is_null($offset)) {
+         $this->settings[] = $value;
+      } else {
+         $this->settings[$offset] = $value;
+      }
+   }
+   public function offsetExists($offset) 
+   {
+      return isset($this->settings[$offset]);
+   }
+   public function offsetUnset($offset) 
+   {
+      unset($this->settings[$offset]);
+   }
+   public function offsetGet($offset) 
+   {
+      return isset($this->settings[$offset]) ? $this->settings[$offset] : null;
+   }
+   
+   /* MAGIC */
+   public function __set($name, $value)
+   {
+      $this->settings[$name] = $value;
+   }
+   
+   public function __get($name)
+   {
+      return $this->settings[$name];
    }
 }
 ?>

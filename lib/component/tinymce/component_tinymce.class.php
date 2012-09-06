@@ -21,6 +21,10 @@ class Component_TinyMCE extends Component {
    const CFG_ALLOW_INTERNAL_TPLS = "allowtpls";
    const CFG_ALLOW_UPLOAD = "allowupload";
 
+   /**
+    * Objekt nastavení
+    * @var Component_TinyMCE_JsPlugin
+    */
    private $jsPlugin = null;
 
    private $templateList = self::TPL_LIST_SYSTEM;
@@ -73,21 +77,20 @@ class Component_TinyMCE extends Component {
       if($this->jsPlugin->getSettings() instanceof Component_TinyMCE_Settings_Advanced){
          if($this->getConfig(self::CFG_ALLOW_INTERNAL_TPLS)){
             // která tpl list se používá
-            switch ($this->templateList) {
-               case self::TPL_LIST_SYSTEM:
-                  $linkJsPlugin = new Url_Link_JsPlugin('Component_TinyMCE_JsPlugin');
-                  $link = (string)$linkJsPlugin->action('tplsSystem', 'js');
-                  break;
-               case self::TPL_LIST_SYSTEM_MAIL:
-                  $linkJsPlugin = new Url_Link_JsPlugin('Component_TinyMCE_JsPlugin');
-                  $link = (string)$linkJsPlugin->action('tplsSystemMail', 'js');
-                  break;
-               case self::TPL_LIST_FILE:
-               default:
-                  $link = $this->templateList;
-                  break;
+            if($this->jsPlugin->getSettings()->template_external_list_url == null){
+               switch ($this->templateList) {
+                  case self::TPL_LIST_SYSTEM:
+                     $this->jsPlugin->getSettings()->template_external_list_url = Component_TinyMCE_Settings_Advanced::TPL_LIST_SYSTEM;
+                     break;
+                  case self::TPL_LIST_SYSTEM_MAIL:
+                     $this->jsPlugin->getSettings()->template_external_list_url = Component_TinyMCE_Settings_Advanced::TPL_LIST_SYSTEM_MAIL;
+                     break;
+                  case self::TPL_LIST_FILE:
+                  default:
+                     $this->jsPlugin->getSettings()->template_external_list_url = $this->templateList;
+                     break;
+               }
             }
-            $this->jsPlugin->getSettingFile()->setParam(Component_TinyMCE_Settings::SETTING_EXTERNAL_TPL_LIST, (string)$link);
          }
          if($this->getConfig(self::CFG_ALLOW_INTERNAL_SOURCES)){
             // externí odkazy

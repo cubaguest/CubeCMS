@@ -177,7 +177,8 @@ class Url_Request {
       self::$fullUrl = preg_replace('/[\/]{2,}/', '/', self::$fullUrl);
 
       self::$webUrl = str_replace(self::$baseWebUrl, '', self::$fullUrl);
-      if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+      if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+          || isset($_GET['SIMULATE_XHR'])) {
           self::$isXHRRequest = true;
       }
    }
@@ -351,8 +352,8 @@ class Url_Request {
     */
    private function parseModuleStaticUrl() {
       $matches = array();
-      //                             1 lang        2 mname     3 action       4 output        5 params
-      if(!preg_match("/module_s\/(?:([a-z]{2})\/)?([\/a-z]+)\/([a-z0-9_-]+)\.([a-z0-9_-]+)\??([^?]+)?/i", self::$fullUrl, $matches)) {
+      //                             1 lang        2 mname     3 action       4 output              5 params
+      if(!preg_match("/module_s\/(?:([a-z]{2})\/)?([\/a-z]+)\/([a-z0-9_-]+)(?:\.([a-z0-9_-]+))?\/?\??([^?]+)?/i", self::$fullUrl, $matches)) {
          return false;
       }
       $this->category = null;
@@ -364,7 +365,7 @@ class Url_Request {
          $this->params = $matches[5];
       }
       $this->urlType = self::URL_TYPE_MODULE_STATIC_REQUEST;
-      $this->pageFull = false;
+      $this->outputType == null ? $this->pageFull = true : $this->pageFull = false;
       return true;
    }
 
