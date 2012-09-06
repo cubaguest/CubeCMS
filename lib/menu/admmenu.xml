@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- last ID: 32786 -->
+<!-- last ID: 32788 -->
 <adminmenu>
    <section icon="application_side_tree.png">
       <name lang="cs">Struktura</name>
@@ -39,45 +39,6 @@
          <module>users</module>
       </item>
    </section>
-   <section icon="cog.png">
-      <name lang="cs">Systém</name>
-      <name lang="en">System</name>
-      <item id="32772" icon="wrench.png">
-         <name lang="cs">Nastavení systému</name>
-         <name lang="en">System settings</name>
-         <urlkey lang="cs">admin/system/nastaveni-systemu</urlkey>
-         <urlkey lang="en">admin/system/system-settings</urlkey>
-         <module>configuration</module>
-      </item>
-      <item id="32773" icon="cog.png">
-         <name lang="cs">Služby</name>
-         <name lang="en">Services</name>
-         <urlkey lang="cs">admin/system/sprava</urlkey>
-         <urlkey lang="en">admin/system/management</urlkey>
-         <module>services</module>
-      </item>
-      <item id="32774" icon="go-up.png">
-         <name lang="cs">Upgrade</name>
-         <name lang="en">Upgrade</name>
-         <urlkey lang="cs">admin/system/upgrade</urlkey>
-         <urlkey lang="en">admin/system/upgrade</urlkey>
-         <module>upgrade</module>
-      </item>
-      <item id="32775" disabled="true" icon="time.png">
-         <name lang="cs">Plánování úloh</name>
-         <name lang="en">Cron tab</name>
-         <urlkey lang="cs">admin/system/cron-tab</urlkey>
-         <urlkey lang="en">admin/system/cron-tab</urlkey>
-         <module>crontab</module>
-      </item>
-      <item id="32776" disabled="true" icon="translate.png">
-         <name lang="cs">Překlad statických textů</name>
-         <name lang="en">Translate statics texts</name>
-         <urlkey lang="cs">admin/system/preklady</urlkey>
-         <urlkey lang="en">admin/system/translation</urlkey>
-         <module>trstaticstexts</module>
-      </item>
-   </section>
    <section icon="page_gear.png">
       <name lang="cs">Obsah</name>
       <name lang="en">Content</name>
@@ -115,6 +76,70 @@
          <urlkey lang="cs">admin/content/formulare</urlkey>
          <urlkey lang="en">admin/content/forms</urlkey>
          <module>forms</module>
+      </item>
+   </section>
+   <section icon="email.png">
+      <name lang="cs">E-maily</name>
+      <name lang="en">E-mails</name>
+      <item id="32771" icon="email_edit.png">
+         <name lang="cs">E-maily</name>
+         <name lang="en">E-mails</name>
+         <urlkey lang="cs">admin/e-maily/e-maily</urlkey>
+         <urlkey lang="en">admin/e-mails/e-mails</urlkey>
+         <module>mails</module>
+      </item>
+      <item id="32788" icon="email.png">
+         <name lang="cs">Newslettery</name>
+         <name lang="en">Newsletters</name>
+         <urlkey lang="cs">admin/e-maily/newslettery</urlkey>
+         <urlkey lang="en">admin/e-mails/newsletters</urlkey>
+         <module>mailsnewsletters</module>
+      </item>
+      <item id="32787" icon="book_addresses.png">
+         <name lang="cs">Adresář a skupiny</name>
+         <name lang="en">Address Book and Groups</name>
+         <urlkey lang="cs">admin/e-maily/adresar-skupiny</urlkey>
+         <urlkey lang="en">admin/e-mails/addressbook-groups</urlkey>
+         <module>mailsaddressbook</module>
+      </item>
+   </section>
+   <section icon="cog.png">
+      <name lang="cs">Systém</name>
+      <name lang="en">System</name>
+      <item id="32772" icon="wrench.png">
+         <name lang="cs">Nastavení systému</name>
+         <name lang="en">System settings</name>
+         <urlkey lang="cs">admin/system/nastaveni-systemu</urlkey>
+         <urlkey lang="en">admin/system/system-settings</urlkey>
+         <module>configuration</module>
+      </item>
+      <item id="32773" icon="cog.png">
+         <name lang="cs">Služby</name>
+         <name lang="en">Services</name>
+         <urlkey lang="cs">admin/system/sprava</urlkey>
+         <urlkey lang="en">admin/system/management</urlkey>
+         <module>services</module>
+      </item>
+      <item id="32774" icon="go-up.png">
+         <name lang="cs">Upgrade</name>
+         <name lang="en">Upgrade</name>
+         <urlkey lang="cs">admin/system/upgrade</urlkey>
+         <urlkey lang="en">admin/system/upgrade</urlkey>
+         <module>upgrade</module>
+      </item>
+      <item id="32775" disabled="true" icon="time.png">
+         <name lang="cs">Plánování úloh</name>
+         <name lang="en">Cron tab</name>
+         <urlkey lang="cs">admin/system/cron-tab</urlkey>
+         <urlkey lang="en">admin/system/cron-tab</urlkey>
+         <module>crontab</module>
+      </item>
+      <item id="32776" disabled="true" icon="translate.png">
+         <name lang="cs">Překlad statických textů</name>
+         <name lang="en">Translate statics texts</name>
+         <urlkey lang="cs">admin/system/preklady</urlkey>
+         <urlkey lang="en">admin/system/translation</urlkey>
+         <module>trstaticstexts</module>
       </item>
    </section>
    <section icon="information.png">
