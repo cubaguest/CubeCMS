@@ -23,12 +23,36 @@ class MailsNewsletters_View extends View {
 // 	   $settings->setForceDir($this->newsletterDataDir );
 	   $settings->setVariablesURL($this->link()->route('replacements'));
 	   $settings->setTemplatesList((string)$this->link()->route('tpls')->param('export', 'jsmce'));
+	   $settings->setForceDir($this->newsletterDataDir );
 	   $this->setTinyMCE($this->form->content, $settings);
 	}
 
 	public function listView()
 	{
 	   $this->template()->addFile('tpl://newsleters_list.phtml');
+	   
+	   Template_Navigation::addItem($this->tr('Přehled newsletterů'), $this->link(), null, null, null, true);
+	   
+	   $toolbox = new Template_Toolbox2();
+	   
+	   $toolStatus = new Template_Toolbox2_Tool_Form($this->formStatus);
+	   $toolStatus->setIcon('enable.png');
+	   $toolbox->addTool($toolStatus);
+	   
+	   $toolPreview = new Template_Toolbox2_Tool_Redirect('previewNewsletter', $this->tr('Náhled newsletteru'));
+	   $toolPreview->setIcon('eye.png')->setAction($this->link()->route('previewNewsletter'));
+	   $toolbox->addTool($toolPreview);
+	   
+	   $toolEdit = new Template_Toolbox2_Tool_Redirect('editForm', $this->tr('Upravit newsletter'));
+	   $toolEdit->setIcon('page_edit.png')->setAction($this->link()->route("compose"));
+	   $toolbox->addTool($toolEdit);
+	   
+	   
+	   $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
+	   $toolDelete->setIcon('delete.png')->setConfirmMeassage($this->tr('Opravdu smazat newsletter?'));
+	   $toolbox->addTool($toolDelete);
+	   
+	   $this->toolboxItem = $toolbox;
 	}
 	
 	public function tplsView()
@@ -79,6 +103,7 @@ class MailsNewsletters_View extends View {
       $settings->setForceDir($this->newsletterDataDir );
       
       $settings->setVariablesURL($this->link()->route('replacements'));
+      $settings->setTemplatesList((string)$this->link()->route('tpls')->param('export', 'jsmce'));
       
       $this->setTinyMCE($this->form->content, $settings);
 	}
@@ -98,28 +123,12 @@ class MailsNewsletters_View extends View {
    {
       $this->template()->addFile('tpl://tpl_preview.phtml');
    }
-	
-   public function sendMailsQueueView()
-   {
-      $this->template()->addTplFile('mailsqueue.phtml');
-      Template_Module::setEdit(true);
-   }
-
-   public function listMailsView() {
-      $this->template()->addTplFile('main.phtml');
-      Template_Module::setEdit(true);
-   }
-
-   public function sendMailsListView() {
-      $this->template()->addTplFile('list_mails.phtml');
-      $this->page = 'sendMailsList';
-      Template_Module::setEdit(true);
-   }
-
-   public function searchMailView(){
-//      echo json_encode($this->mails);
-   }
    
+   public function newsletterPreviewView() 
+   {
+      $this->tplPreviewView();
+   }
+	
    public static function unscribeView($data)
    {
       $tpl = new Template_ModuleStatic(new Url_Link_ModuleRequest(), 'mailsnewsletters');

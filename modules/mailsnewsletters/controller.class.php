@@ -69,6 +69,25 @@ class MailsNewsletters_Controller extends Controller {
       $eButtons->addElement(new Form_Element_Submit('sendtest', $this->tr('Odeslat testovací')), 'sendtest'  );
       $form->addElement($eButtons);
 
+      $modelNewsletter = new MailsNewsletters_Model_Newsletter();
+      
+      $tempDirName = "newsletter-".Auth::getUserId()."-tmp";
+      $this->view()->newsletterDataDir = "/newsletters/".$tempDirName;
+      if(!is_dir($this->module()->getDataDir().$tempDirName)){
+         mkdir($this->module()->getDataDir().$tempDirName);
+      }
+      
+      if($this->getRequestParam('idn', null) != null){
+         $record = $modelNewsletter->record($this->getRequestParam('idn'));
+         $form->name->setValues($record->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT});
+         $form->content->setValues($record->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT});
+         $sendDate = new DateTime($record->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND});
+         $form->senddate->setValues(vve_date('%x', $sendDate));
+         $form->groups->setValues( unserialize( $record->{MailsNewsletters_Model_Newsletter::COLUMN_GROUPS_IDS}) );
+         $form->active->setValues($record->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE});
+         $this->view()->newsletterDataDir = "/newsletters/newsletter-".$record->{MailsNewsletters_Model_Newsletter::COLUMN_ID};
+      }
+      
       if($form->isSend()){
          $button = $form->send->getValues();
          if( $button == 'sendtest' ){
@@ -84,27 +103,67 @@ class MailsNewsletters_Controller extends Controller {
             $this->sendTest($form->sendtestmail->getValues(), $form->name->getValues(), $form->content->getValues());
          } else if($button == 'save') {
             // save            
-            $modelNewsletter = new MailsNewsletters_Model_Newsletter();
-            
-            if(true){ // nový
+            if( !isset($record) ){ // nový
                $record = $modelNewsletter->newRecord();
             }
             
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} = $form->active->getValues();
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT} = $form->name->getValues();
-            $record->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT} = $form->content->getValues();
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND} = $form->senddate->getValues();
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_GROUPS_IDS} = serialize($form->groups->getValues());
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_ID_USER} = Auth::getUserId();
+            $record->save();
+            $idn = $record->{MailsNewsletters_Model_Newsletter::COLUMN_ID};
+            $cnt = $form->content->getValues();
             
+            // create new data dir for newsletter and move files
+            $newDirName = 'newsletter-'.$idn;
+            if (!is_dir($this->module()->getDataDir().$newDirName)) {
+               mkdir($this->module()->getDataDir().$newDirName);
+               rename($this->module()->getDataDir().$tempDirName, $this->module()->getDataDir().$newDirName);
+               $cnt = str_replace('/'.$tempDirName.'/', '/'.$newDirName.'/', $cnt );
+            }
+            
+            $record->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT} = $cnt;
             $record->save();
             
-            $this->infoMsg()->addMessage($this->tr('Newsletter byl uložen'));
-            $this->link()->route('list')->reload();
-//             $this->link()->reload();
+            $modelAB = new MailsAddressBook_Model_Addressbook();
+            $modelQueue = new MailsNewsletters_Model_Queue();
+            // odstranění mailů z fronty
+            $modelQueue->where(MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER." = :idn", array('idn' => $idn))->delete();
+            if($record->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} == true){
+               // uložení mailů do fronty
+               $idgrps = $form->groups->getValues();
+               // načtení emailů ze skupiny
+               $grpIDSPL = array();
+               foreach ($idgrps as $id) {
+                  $grpIDSPL[':pl_'.$id] = $id;
+               }
+               $mWhereString = MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP.' IN ('.implode(',',array_keys($grpIDSPL)).')';
+               $mWhereBinds = $grpIDSPL;
+               $mails = $modelAB->where($mWhereString, $mWhereBinds)->records();
+
+               foreach ($mails as $mail){
+                  $qRec = $modelQueue->newRecord();
+                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER} = $idn;
+                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_MAIL} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL};
+                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_NAME} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_NAME};
+                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_SURNAME} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME};
+                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_DATE_SEND} = $form->senddate->getValues();
+                  $qRec->save();
+               }
+               $this->infoMsg()->addMessage($this->tr('Newsletter byl uložen, aktivován a e-maily byly zařazeny do fronty odesílání. K odeslání dojde během zadaného dne.'));
+            } else {
+               $this->infoMsg()->addMessage($this->tr('Newsletter byl uložen a vyřazen z fronty pokud v ní byl.'));
+            }
+            $this->link()->route('list')->param('idn')->reload();
+//             $this->link()->param('idn', $idn)->reload();
          } else {
             $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-            $this->link(true)->reload;
+            if($this->getRequestParam('idn') != null){
+               $this->link()->route('list')->param('idn')->reload();
+            }
+            $this->link(true)->reload();
          } 
             
       }
@@ -114,7 +173,63 @@ class MailsNewsletters_Controller extends Controller {
 
    public function listController() 
    {
-//       $this->AutoRunDaily();
+      $model = new MailsNewsletters_Model_Newsletter();
+      
+      $formDelete = new Form('newsletter_delete_');
+      $eId = new Form_Element_Hidden('id');
+      $formDelete->addElement($eId);
+      $eSubmit = new Form_Element_Submit('delete', $this->tr('Smazat'));
+      $formDelete->addElement($eSubmit);
+      
+      if($formDelete->isValid()){
+         $n = $model->record($formDelete->id->getValues());
+         if($n){
+            $modelQ = new MailsNewsletters_Model_Queue();
+            $modelQ
+               ->where(MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER." = :idn", array('idn' => $n->{MailsNewsletters_Model_Newsletter::COLUMN_ID}) )
+               ->delete();
+            
+            $n->{MailsNewsletters_Model_Newsletter::COLUMN_DELETED} = 1;
+            $n->save();
+            $this->infoMsg()->addMessage($this->tr('Newsletter byl smazán'));
+            $this->link()->reload();
+         } else {
+            $this->errMsg()->addMessage($this->tr('Newsletter neexistuje'));
+         }
+      }
+      
+      $this->view()->formDelete = $formDelete;
+      
+      $formStatus = new Form('newsletter_status_');
+      $eId = new Form_Element_Hidden('id');
+      $formStatus->addElement($eId);
+      $eSubmit = new Form_Element_Submit('change', $this->tr('Změnit stav'));
+      $formStatus->addElement($eSubmit);
+      
+      if($formStatus->isValid()){
+         $n = $model->record($formStatus->id->getValues());
+         if($n){
+            $n->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} = !$n->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE};
+            $n->save();
+         }
+         $this->link()->reload();
+      }
+      
+      $this->view()->formStatus = $formStatus;
+      
+      // výběr newsletterů
+      $model = new MailsNewsletters_Model_Newsletter();
+      $model->where(MailsNewsletters_Model_Newsletter::COLUMN_DELETED." = 0", array());
+      
+      $scrollComponent = new Component_Scroll();
+      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE, 20);
+      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->count());
+      $this->view()->scrollComp = $scrollComponent;
+      
+      $this->view()->newsletters = $model
+         ->order(array(MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND => Model_ORM::ORDER_DESC))
+         ->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())
+         ->records();
    }
    
    public function tplsController() 
@@ -139,21 +254,29 @@ class MailsNewsletters_Controller extends Controller {
       }
       $this->view()->formDelete = $formDelete;
       
-      $this->view()->templates = $model->records(PDO::FETCH_OBJ);
+      $this->view()->templates = $model->where(MailsNewsletters_Model_Templates::COLUMN_DELETED." = 0", array())->records(PDO::FETCH_OBJ);
       
    }
    
-   protected function getTemplateDir($id, $onlyName = false) 
+   protected function getTemplateDir($id, $onlyName = false, $webAddress = false) 
    {
       
-      return $onlyName ? 'template-'.$id : $this->category()->getModule()->getDataDir().'template-'.$id.DIRECTORY_SEPARATOR;
+      return $onlyName ? 'template-'.$id : $this->category()->getModule()->getDataDir($webAddress).'template-'.$id
+               . ( $webAddress ? "/" : DIRECTORY_SEPARATOR );
+   } 
+   
+   protected function getNewsletterDir($id, $onlyName = false, $webAddress = false) 
+   {
+      
+      return $onlyName ? 'newsletter-'.$id : $this->category()->getModule()->getDataDir($webAddress).'newsletter-'.$id
+               . ( $webAddress ? "/" : DIRECTORY_SEPARATOR );
    } 
    
    public function tplAddController() 
    {
       $model = new MailsNewsletters_Model_Templates();
 
-      $tempTplName = "newsletter-".Auth::getUserId()."-tmp";
+      $tempTplName = "tpl-".Auth::getUserId()."-tmp";
       
       $form = $this->createTplEditForm();
       $dir = $this->module()->getDataDir().$tempTplName;
@@ -260,9 +383,18 @@ class MailsNewsletters_Controller extends Controller {
       if(!$tpl){
          return false;
       }
-      
       $this->view()->template = file_get_contents($this->getTemplateDir($tpl->{MailsNewsletters_Model_Templates::COLUMN_ID}).self::TEMPLATE_NAME);
-//       echo $this->view()->template; 
+   }
+   
+   public function newsletterPreviewController() 
+   {
+      $model = new MailsNewsletters_Model_Newsletter();
+      $newsletter = $model->record($this->getRequest('id', 0));
+      
+      if(!$newsletter){
+         return false;
+      }
+      $this->view()->template = $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT};
    }
    
    public function replacementsController() 
@@ -270,7 +402,8 @@ class MailsNewsletters_Controller extends Controller {
       $this->view()->variables = array(
             '{WEB_NAME}' => $this->tr('Název stránek'),
             '{WEB_LINK}' => $this->tr('Odkaz na stránky'),
-            '{UNSCRIBE}' => $this->tr('Odkaz pro odhlášení odběru'),
+            '{UNSCRIBE}' => $this->tr('Odkaz s textem pro odhlášení odběru'),
+            '{UNSCRIBE_LINK}' => $this->tr('Odkaz pro odhlášení odběru'),
             '{NAME}' => $this->tr('Jméno příjemce'),
             '{MAIL}' => $this->tr('Odesílaný e-mail'),
       );
@@ -305,8 +438,6 @@ class MailsNewsletters_Controller extends Controller {
       if($formUpload->isValid()){
          $files = $formUpload->files->getValues();
          $model = new MailsNewsletters_Model_Templates();
-//          Debug::log($files);
-         
          // vatvoření db záznamu a uložení
          $record = $model->newRecord();
          $record->{MailsNewsletters_Model_Templates::COLUMN_NAME} = $formUpload->name->getValues();
@@ -329,6 +460,18 @@ class MailsNewsletters_Controller extends Controller {
                   $rawHtml = mb_convert_encoding($rawHtml, 'utf-8', 
                         mb_detect_encoding($rawHtml, mb_list_encodings() ));
                
+                  /**
+                   * @todo if sometime using PHP Simple HTML DOM Parser replace wit this function
+                   */ 
+//                   $html = str_get_html($rawHtml); // what you have done
+//                   foreach ($html->find("img") as $element) {
+//                      if(strpos($element->src, 'http') != 0){
+//                         $element->src = $element->src;
+//                      }
+//                   }
+                  
+//                   echo $html;
+                  $rawHtml = preg_replace('/src="(?!http)([^"]+)"/i', 'src="'.$this->getTemplateDir($id, false, true).'/\1"', $rawHtml);
                   // uložení html souboru na povolený název šablony
                   file_put_contents($dir.self::TEMPLATE_NAME, $rawHtml);
 
@@ -341,7 +484,7 @@ class MailsNewsletters_Controller extends Controller {
             }
          }
          $this->infoMsg()->addMessage($this->tr('Šablona byla nahrána'));
-//          $this->link()->route('tpls')->reload();
+         $this->link()->route('tpls')->reload();
       }
       
       $this->view()->form = $formUpload;
@@ -351,49 +494,51 @@ class MailsNewsletters_Controller extends Controller {
    {
       $um = new Model_Users();
       $user = $um->record(Auth::getUserId());
-
-      self::sendMails($subject, $content, array( array(
-               'mail' => $recipient, 
-               'name' => $user->{Model_Users::COLUMN_NAME}." ".$user->{Model_Users::COLUMN_SURNAME}) 
-      ));
+      $mailObj = self::createMail($subject, $content);
+      self::sendMail($mailObj, $recipient, $user->{Model_Users::COLUMN_NAME}." ".$user->{Model_Users::COLUMN_SURNAME});
       $this->infoMsg()->addMessage($this->tr('Testovací newsletter byl odeslán.'), false);
    }
    
    /**
-    * Metoda vytvoí objek e-mailu
+    * Metoda vytvoří objekt emailu
     * @param string $cnt
     * @param string $subject
-    * @param string $mails
     */
-   protected static function sendMails($subject, $cnt, $mails) 
+   protected static function createMail($subject, $cnt) 
    {
-      $tr = new Translator_Module('mailsnewsletters');
       $mailObj = new Email(true);
       $mailObj->setSubject($subject);
       $mailObj->setContent('<html><body>' .$cnt .'</body></html>');
-         
-      $decorators = array();
-      foreach ($mails as $mail) {
-         $unscribeLinkObj = new Url_Link_ModuleStatic();
-         $unscribeLink = (string)$unscribeLinkObj->module('mailsnewsletters')->action('unscribe')
-            ->param('mail', $mail['mail']);
-            
-         $decorators[ $mail['mail'] ] = array(
-               '{WEB_LINK}' => '<a href="'.Url_Request::getBaseWebDir().'" title="{WEB_NAME}">{WEB_NAME}</a>',
-               '{UNSCRIBE}' => '<a href="{UNSCRIBE_LINK}">'.$tr->tr('Odhlášení odběru').'</a>',
-               // base
-               '{WEB_NAME}' => VVE_WEB_NAME,
-               '{NAME}' => $mail['name'],
-               '{MAIL}' => $mail['mail'],
-               '{UNSCRIBE_LINK}' => $unscribeLink,
-               );
-         $mailObj->addAddress($mail['mail'], $mail['name']);
-      }
-         
-      $mailObj->setRecipientReplacements($decorators);
-      $failures = array();
-      $mailObj->batchSend($failures);
+      return $mailObj;       
    }
+
+   /**
+    * Metoda provede nahrazení proměných a odeslání emailu 
+    * @param Email $emailObj
+    * @param string $mail
+    * @param string $name
+    */
+   protected static function sendMail(Email $emailObj, $mail, $name = null) 
+   {
+      $tr = new Translator_Module('mailsnewsletters');
+      $unscribeLinkObj = new Url_Link_ModuleStatic(true);
+      $unscribeLink = (string)$unscribeLinkObj->module('mailsnewsletters')->action('unscribe')->param('mail', $mail);
+      
+      $emailObj->setReplacements( array(
+            // complex
+            '{WEB_LINK}' => '<a href="'.Url_Request::getBaseWebDir().'" title="{WEB_NAME}">{WEB_NAME}</a>',
+            '{UNSCRIBE}' => '<a href="{UNSCRIBE_LINK}">'.$tr->tr('odhlášení odběru').'</a>',
+            // base
+            '{WEB_NAME}' => VVE_WEB_NAME,
+            '{NAME}' => $name,
+            '{MAIL}' => $mail,
+            '{UNSCRIBE_LINK}' => $unscribeLink,
+         ), false);
+      $emailObj->setAddress($mail, $name);
+      $failures = array();
+      $emailObj->send($failures);
+      return $failures;
+   } 
    
    /**
     * Kontroler pro odhlášení newsletteru
@@ -411,47 +556,45 @@ class MailsNewsletters_Controller extends Controller {
    }
 
    /* Autorun metody */
-   public static function AutoRunDaily()
+   public static function AutoRunHourly()
    {
+      // nastavení maximálního time limitu scriptu
+      set_time_limit(0);
+      
       $tr = new Translator_Module('mailsnewsletters');
       $model = new MailsNewsletters_Model_Newsletter();
-      $modelAB = new MailsAddressBook_Model_Addressbook();
+      $modelQueue = new MailsNewsletters_Model_Queue();
    
-      $newsletters = $model->where(MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE.' = 1 '
-            .'AND '.MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND.' = CURDATE()', array())->records();
-      if(!$newsletters){
+      $mails = $modelQueue
+         ->where(MailsNewsletters_Model_Queue::COLUMN_DATE_SEND.' <= CURDATE()', array())
+         ->order( MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER )
+         ->records(PDO::FETCH_OBJ);
+      
+      if(!$mails){
          return;
       }
-      
-      foreach ($newsletters as $newsletter) {
-//          Debug::log('Odesílam: '.$newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT});
-         
-         $idgrps = unserialize($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_GROUPS_IDS});
-         // načtení emailů ze skupiny
-         $grpIDSPL = array();
-         foreach ($idgrps as $id) {
-            $grpIDSPL[':pl_'.$id] = $id;
+
+      $mailObj = null;
+      $curIdN = 0;
+      foreach ($mails as $mail) {
+         if($curIdN != $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER}){
+            $curIdN = $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER};
+            // pokud se nejdná o stejný newsletter, načteme jej
+            $newsLetter = $model->record($curIdN);
+            
+            $mailObj = self::createMail($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}, 
+                                        $newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT});
+            
          }
-         $mWhereString = MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP.' IN ('.implode(',',array_keys($grpIDSPL)).')';
-         $mWhereBinds = $grpIDSPL;
-         
-         $mails = $modelAB->where($mWhereString, $mWhereBinds)->records();
-         
-         if (!$mails) {
-            continue;
+   
+         $name = null;
+         if($mail->{MailsNewsletters_Model_Queue::COLUMN_NAME} != null){
+            $name = $mail->{MailsNewsletters_Model_Queue::COLUMN_NAME}." ".$mail->{MailsNewsletters_Model_Queue::COLUMN_SURNAME};
          }
          
-         $mailsForSend = array();
-         foreach ($mails as $mail) {
-            $name = null;
-            if($mail->{MailsAddressBook_Model_Addressbook::COLUMN_NAME} != null){
-               $name = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_NAME}." ".$mail->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME};
-            }
-            $mailsForSend[] = array('mail' => $mail->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL}, 'name' => $name);
-         }
-         self::sendMails($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}, 
-                          $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT}, 
-                          $mailsForSend);
+         // odstranění mailu s frony je méně náročnější než jeho odeslání, protodříve
+         $modelQueue->delete($mail->{MailsNewsletters_Model_Queue::COLUMN_ID});
+         self::sendMail($mailObj, $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, $name);
       }
    }
 }

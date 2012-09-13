@@ -1,14 +1,14 @@
 <?
 $h = $this->tr('Nahrání šablony');
 $this->addPageTitle($h);
-$this->addCssFile('style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?ps($h)?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-form-edit" id="mails-send-mail-form">
    <p>
       <?=$this->tr('Nahrávejte html soubor s obrázky. Všechny obrázky musí mít ve zdroji buď '
-            .'absolutní cestu, nebo pouze název souboru (cesta je doplněna automaticky). V souboru s šablonou patří pouze obsah mezi tagy BODY. Tagy html, meta a body jsou zakázány.')?>
+            .'absolutní cestu, nebo pouze název souboru (cesta je doplněna automaticky). V souboru s šablonou je pouze obsah mezi tagy BODY. Tagy html, meta a body jsou zakázány. V opačném případě může dojít k nečekanému ukončení stránky newsletteru.')?>
    </p>
    <?
    $this->form->files->setSubLabel('<a id="buttonAddFile" href="#add-file" title="'.$this->tr('Přida další přílohu').'">'.$this->tr('Přida další soubor').'</a>');

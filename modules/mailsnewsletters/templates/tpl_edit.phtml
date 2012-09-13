@@ -1,7 +1,7 @@
 <?
 $h = $this->template == null ? $this->tr('Vytvořit šablonu') : sprintf($this->tr('Úprava šablony %s'), $this->template->{MailsNewsletters_Model_Templates::COLUMN_NAME}) ;
 $this->addPageTitle($h);
-$this->addCssFile('style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?ps($h)?></h1>
 <?=$this->includeTpl('navigation.phtml');?>

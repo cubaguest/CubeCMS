@@ -1,32 +1,35 @@
-CREATE  TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_templates` (
-  `id_newsletter_template` INT NOT NULL ,
-  `newsletter_template_name` VARCHAR(100) NOT NULL ,
-  `newsletter_template_deleted` TINYINT NULL DEFAULT 0 ,
-  `newsletter_template_text` TEXT NULL DEFAULT NULL ,
-  `newsletter_template_html` TEXT NULL DEFAULT NULL ,
-  PRIMARY KEY (`id_newsletter_template`) 
+CREATE TABLE `{PREFIX}mails_newsletters` (
+  `id_newsletter` int(11) NOT NULL AUTO_INCREMENT,
+  `id_newsletter_template` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `newsletter_subject` varchar(100) DEFAULT NULL,
+  `newsletter_date_send` date DEFAULT NULL,
+  `newsletter_deleted` tinyint(4) DEFAULT '0',
+  `newsletter_active` tinyint(4) DEFAULT '0',
+  `newsletter_content` text,
+  `newsletter_groups_ids` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id_newsletter`),
+  KEY `fk_users` (`id_user`),
+  KEY `fk_newsletters_templates` (`id_newsletter_template`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
-CREATE  TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_queue` (
-  `id_newsletter_queue` INT NOT NULL ,
-  `id_newsletter` INT NOT NULL ,
-  `newsletter_queue_mail` VARCHAR(45) NULL ,
-  `newsletter_queue_sended` VARCHAR(45) NULL ,
-  PRIMARY KEY (`id_newsletter_queue`, `id_newsletter`) ,
-  INDEX `fk_newsletter` (`id_newsletter` ASC) 
+CREATE TABLE `{PREFIX}mails_newsletters_queue` (
+  `id_newsletter_queue` int(11) NOT NULL AUTO_INCREMENT,
+  `id_newsletter` int(11) NOT NULL,
+  `newsletter_queue_mail` varchar(100) NOT NULL,
+  `newsletter_queue_name` varchar(100) DEFAULT NULL,
+  `newsletter_queue_surname` varchar(100) DEFAULT NULL,
+  `newsletter_queue_date_send` date NOT NULL,
+  PRIMARY KEY (`id_newsletter_queue`,`id_newsletter`),
+  KEY `fk_newsletter` (`id_newsletter`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
-CREATE  TABLE IF NOT EXISTS `{PREFIX}mails_newsletters` (
-  `id_newsletter` INT NOT NULL ,
-  `id_newsletter_template` INT NOT NULL ,
-  `id_user` INT NOT NULL ,
-  `newsletter_subject` VARCHAR(100) NULL ,
-  `newsletter_date_send` DATE NULL ,
-  `newsletter_deleted` TINYINT NULL DEFAULT 0 ,
-  `newsletter_active` TINYINT NULL DEFAULT 0 ,
-  `newsletter_content_text` TEXT NULL ,
-  `newsletter_content_html` TEXT NULL ,
-  PRIMARY KEY (`id_newsletter`) ,
-  INDEX `fk_users` (`id_user` ASC) ,
-  INDEX `fk_newsletters_templates` (`id_newsletter_template` ASC) 
+CREATE TABLE `{PREFIX}mails_newsletters_templates` (
+  `id_newsletter_template` int(11) NOT NULL AUTO_INCREMENT,
+  `newsletter_template_name` varchar(100) NOT NULL,
+  `newsletter_template_deleted` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`id_newsletter_template`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
+
+INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
+VALUES ('mailsnewsletters', 'hourly', NULL);

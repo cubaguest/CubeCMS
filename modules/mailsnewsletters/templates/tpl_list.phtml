@@ -4,7 +4,7 @@ $this->addPageTitle($h);
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
-$this->addCssFile('style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?=$h?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
@@ -68,8 +68,8 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
       // init prettyphoto
       $("a[rel^='prettyPhoto']").prettyPhoto({ social_tools: '' }); 
       
-      $('form[name="previewTpl"]').submit(function(){
-         var url = $(this).attr('action')+"&iframe=true&width=1000&height=500";
+      $('a.toolbox-button-previewTpl').click(function(){
+         var url = $(this).attr('href')+"&iframe=true&width=1000&height=500";
          //$('#test-prw').load(url);
          $.prettyPhoto.open(url,$(this).parents('tr.ui-widget-content').find('td.template-tb-name').text());
          return false;

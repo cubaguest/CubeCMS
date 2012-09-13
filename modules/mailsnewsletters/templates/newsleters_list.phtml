@@ -3,37 +3,52 @@ $h = $this->tr('Seznam newsleterů');
 $this->addPageTitle($h);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
-$this->addCssFile('style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?=$h?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-list module-newsleters-list">
-   <?if(!empty ($this->newsleters)) {?>
-   <table class="templates-list full-width">
+   <?if(!empty ($this->newsletters)) {?>
+   <table class="newsletters-list full-width">
       <thead>
          <tr class="ui-widget-header">
-            <th class="template-tb-name"><?=$this->tr('Název')?></th>
-            <th class="template-tb-actions"></th>
+            <th class="newsletter-tb-name"><?=$this->tr('Název')?></th>
+            <th class="newsletter-tb-date"><?=$this->tr('Datum odeslání')?></th>
+            <th class="newsletter-tb-actions"></th>
          </tr>
       </thead>
    <?
-      foreach ($this->templates as $template) {?>
-      <tr class="ui-widget-content">
-         <td class="template-tb-name"><?=$template->{MailsNewsletters_Model_Templates::COLUMN_NAME}?></td>
-         <td class="template-tb-actions">
+      foreach ($this->newsletters as $newsletter) {
+         $dateSend = new DateTime($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND});
+         $curDate = new DateTime();
+         $curDate->setTime(0, 0);
+      ?>
+      <tr class="ui-widget-content <?if($dateSend < $curDate) echo "newsletter-sended";?>">
+         <td class="newsletter-tb-name <?if($dateSend < $curDate) echo "ui-state-disabled";?>"
+            ><?=$newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}?></td>
+         <td class="newsletter-tb-date"><?=vve_date("%x", $dateSend)?></td>
+         <td class="newsletter-tb-actions">
             <?
             $toolbox = clone $this->toolboxItem;
+            $toolbox->newsletter_status_->getForm()->id->setValues( $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID} );
+            $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} 
+               ? $toolbox->newsletter_status_->setIcon('enable.png') : $toolbox->newsletter_status_->setIcon('disable.png');
             $toolbox->editForm->setAction(
-                  $this->link()->route('tplEdit', array('id' => $template->{MailsNewsletters_Model_Templates::COLUMN_ID}))->param('ajax', true)
-                );
-            $toolbox->previewTpl->setAction( $this->link()->route('tplPreview', array('id' => $template->{MailsNewsletters_Model_Templates::COLUMN_ID})) );
-            $toolbox->form_delete_->getForm()->id->setValues( $template->{MailsNewsletters_Model_Templates::COLUMN_ID} );
+                  $this->link()->route('main')->param('idn', $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID})
+                  );
+            $toolbox->previewNewsletter->setAction( $this->link()->route('newsletterPreview', array('id' => $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID})) );
+            $toolbox->newsletter_delete_->getForm()->id->setValues( $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID} );
             $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
             echo $toolbox;
             ?>
          </td>
       </tr>
      <?}?>
+     <tfoot>
+     	<tr class="ui-widget-header">
+     		<td colspan="3"><? echo $this->scrollComp;?></td>
+     	</tr>
+     </tfoot>
    </table>
    <?} else {?>
       <div class="admin-info-text"><? ps($this->tr('Není uložen žádný newsletter')); ?> </div>
@@ -50,10 +65,10 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
       // init prettyphoto
       $("a[rel^='prettyPhoto']").prettyPhoto({ social_tools: '' }); 
       
-      $('form[name="previewTpl"]').submit(function(){
-         var url = $(this).attr('action')+"&iframe=true&width=1000&height=500";
+      $('a.toolbox-button-previewNewsletter').click(function(){
+         var url = $(this).attr('href')+"&iframe=true&width=1000&height=500";
          //$('#test-prw').load(url);
-         $.prettyPhoto.open(url,$(this).parents('tr.ui-widget-content').find('td.template-tb-name').text());
+         $.prettyPhoto.open(url,$(this).parents('tr.ui-widget-content').find('td.newsletter-tb-name').text());
          return false;
       });
    });

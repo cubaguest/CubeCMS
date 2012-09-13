@@ -21,6 +21,7 @@ class MailsNewsletters_Model_Newsletter extends Model_ORM {
       $this->addColumn(self::COLUMN_SUBJECT, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_CONTENT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_ACTIVE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+      $this->addColumn(self::COLUMN_DELETED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       $this->addColumn(self::COLUMN_DATE_SEND, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_GROUPS_IDS, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
       
