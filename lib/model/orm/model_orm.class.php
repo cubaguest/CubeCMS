@@ -1092,6 +1092,9 @@ class Model_ORM extends Model {
     */
    public function order($arrayOrders, $merge = false)
    {
+      if(!is_array($arrayOrders)){
+         $arrayOrders = array($arrayOrders => Model_ORM::ORDER_ASC);
+      }
       if($merge){
          $this->orders = array_merge($this->orders, $arrayOrders);
       } else {
