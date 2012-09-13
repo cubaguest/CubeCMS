@@ -58,6 +58,10 @@ class Module_AutoRun extends Module_Core {
          $this->runTasks(Model_AutoRun::PERIOD_YEARLY);
          file_put_contents(AppCore::getAppCacheDir()."autorun.log", date("d.m.Y G:i").' - Proveden autorun yearly.'."\n", FILE_APPEND);   
       }
+      
+      if(VVE_SUB_SITE_DOMAIN == null){
+         $this->runSubdomainTasks();
+      }
    }
 
    public function runView() {
@@ -82,7 +86,7 @@ class Module_AutoRun extends Module_Core {
                         $className."::".$method), 'blue' );
                   if(method_exists($className, $method)){
                      call_user_func(array($className, $method));
-                     $this->printMsg($this->tr('Modul spuštěn'), 'Green');
+                     $this->printMsg($this->tr('Modul spuštěn'), 'green');
                   } else {
                      $this->printMsg($this->tr('Chybí metoda: ').$className.'::'.$method, 'red');
                   }
@@ -97,9 +101,9 @@ class Module_AutoRun extends Module_Core {
                   // grab URL and pass it to the browser
                   $result = curl_exec($ch);
                   if($result === false){
-                     $this->printMsg($this->tr('Chyba při načítání stránky'), 'Red');
+                     $this->printMsg($this->tr('Chyba při načítání stránky'), 'red');
                   } else {
-                     $this->printMsg($this->tr('Stránka načtena'), 'Green');
+                     $this->printMsg($this->tr('Stránka načtena'), 'green');
                   }
                   // close cURL resource, and free up system resources
                   curl_close($ch);
@@ -115,6 +119,36 @@ class Module_AutoRun extends Module_Core {
       $this->printMsg();
    }
    
+   private function runSubdomainTasks() 
+   {
+      $this->printMsg($this->tr('Spouštění subdomén'), 'green', true );
+      
+      $modelSites = new Model_Sites();
+      $sites = $modelSites->where(Model_Sites::COLUMN_IS_MAIN." = 0", array())->records();
+
+      if($sites){
+         foreach ($sites as $site) {
+            $domain = $site->{Model_Sites::COLUMN_DOMAIN}.'.'.Url_Request::getDomain();
+            $this->printMsg(sprintf($this->tr('Spouštím úlohy v pro subdoménu "%s"'),$domain ), 'coral', true );
+         
+            $ch = curl_init();
+            // set URL and other appropriate options
+            curl_setopt($ch, CURLOPT_URL, 'http://'.$domain.'/autorun.php');
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // grab URL and pass it to the browser
+            $result = curl_exec($ch);
+            if($result === false){
+               $this->printMsg($this->tr('Chyba při načítání stránky'), 'red');
+            } else {
+               $this->printMsgSub($result, 'margin-left: 30px;');
+            }
+            // close cURL resource, and free up system resources
+            curl_close($ch);
+         }
+      }
+   } 
+   
    private function printMsg($msg = null, $color = null, $strong = false){
       if($msg == null){
          $msg = str_repeat('=', 50);
@@ -126,6 +160,14 @@ class Module_AutoRun extends Module_Core {
       if($color != null){
          $msg = '<span style="color: '.$color.'">'.$msg.'</span>';
       }
+      echo $msg ."<br />";
+   }
+   
+   private function printMsgSub($msg = null, $style = null){
+      if($msg == null){
+         $msg = str_repeat('=', 50);
+      }
+      $msg = '<p style="'.$style.'">'.$msg.'</p>';
       echo $msg ."<br />";
    }
 }

@@ -7,6 +7,11 @@ $this->addJsPlugin(new JsPlugin_JQuery());
 <div class="main-content-list">
    <table id="table-tasks"></table>
    <div id="table-tasks-pager"></div>
+   <h2><?=$this->tr('Adresa pro automatické spouštění')?></h2>
+   <div>
+      <p><?=$this->tr('Tuto adresu zařaďte do automatického spouštění')?></p>
+      <em>/usr/bin/wget <?=Url_Request::getBaseWebDir(true)?>autorun.php > /dev/null 2>&1</em>
+   </div>
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
       $(document).ready(function() {
