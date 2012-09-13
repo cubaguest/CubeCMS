@@ -40,7 +40,7 @@ function vve_get_tpl_file($file, $type) {
 function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false, $considerHtml = true)
 {
    // only execute if text is longer than desired length
-   if (strlen(strip_tags($text)) > $length) {
+   if (mb_strlen(strip_tags($text)) > $length) {
       if ($considerHtml) {
          // if the plain text is shorter than the maximum length, return the whole text
          if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
@@ -49,7 +49,7 @@ function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false
          // splits all html-tags to scanable lines
          preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
 
-         $total_length = strlen($ending);
+         $total_length = mb_strlen($ending);
          $open_tags = array();
          $truncate = '';
 
@@ -75,7 +75,7 @@ function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false
                $truncate .= $line_matchings[1];
             }
             // calculate the length of the plain text part of the line; handle entities as one character
-            $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
+            $content_length = mb_strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
             if ($total_length + $content_length > $length) {
                // the number of characters which are left
                $left = $length - $total_length;
@@ -86,14 +86,14 @@ function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false
                   foreach ($entities[0] as $entity) {
                      if ($entity[1] + 1 - $entities_length <= $left) {
                         $left--;
-                        $entities_length += strlen($entity[0]);
+                        $entities_length += mb_strlen($entity[0]);
                      } else {
                         // no more characters left
                         break;
                      }
                   }
                }
-               $truncate .= substr($line_matchings[2], 0, $left + $entities_length);
+               $truncate .= mb_substr($line_matchings[2], 0, $left + $entities_length);
                // maximum lenght is reached, so get off the loop
                break;
             } else {
@@ -106,17 +106,17 @@ function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false
             }
          }
       } else {
-         if (strlen($text) <= $length) {
+         if (mb_strlen($text) <= $length) {
             return $text;
          } else {
-            $truncate = substr($text, 0, $length - strlen($ending));
+            $truncate = mb_substr($text, 0, $length - mb_strlen($ending));
          }
       }
       // if the words shouldn't be cut in the middle...
       if ($exact) {
          // ...search the last occurance of a space...
          /* THIS NOT WORK CORECTLY. REmove ending tags and not add to opened
-          
+
          $spacepos = strrpos($truncate, ' ');
          if (isset($spacepos)) {
             // ...and cut the text in this position
