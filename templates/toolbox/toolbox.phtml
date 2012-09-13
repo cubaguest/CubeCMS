@@ -37,7 +37,18 @@ $rTime = rand(1, time());
                <?
                break;
             case 'Template_Toolbox2_Tool_Redirect':
-               ?>
+               // tohle má být odkaz
+               $addVal = $tool->getSubmitValues();
+               $link = $tool->getAction();
+               foreach ($addVal as $key => $value) {
+                  $link->param($key, $value);
+               }
+               ?><a href="<?=$link ?>" title="<?=$tool->getTitle() ?>"
+                    id="toolbox-button-<?=substr(md5($link), 0,8)?>" onclick="<?=$formOnSubmit?>" 
+                    class="toolbox-tool-button toolbox-button-<?=$name?>"
+                    ><?=$image." ".htmlspecialchars($tool->getLabel())?></a>
+                <?
+               /*?>
          <form action="<?=$tool->getAction()?>" method="get" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
             <div><?=$image;?><input class="toolbox-tool-button ui-state-default" type="submit"
                      value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
@@ -48,7 +59,7 @@ $rTime = rand(1, time());
                   }?>
                   </div>
                </form>
-               <?
+               <?*/
                break;
             case 'Template_Toolbox2_Tool_Form':
                ?>

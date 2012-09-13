@@ -1,7 +1,7 @@
 /* jen pro pořádek */
 body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 /* fonty */
-.admin-font, .toolbox input, #adminMenuWrapper ul.dropdown li a {
+.admin-font, .toolbox input, .toolbox .toolbox-tool-button, #adminMenuWrapper ul.dropdown li a {
    font-family: "Tahoma", "Arial", sans-serif !important;
    font-size: 12px;
 }
@@ -132,6 +132,8 @@ a.toolbox-button {
    padding: 0;
    z-index: 10000;
 }
+a.toolbox-tool-button {
+}
 a.toolbox-button img {
    padding: 2px;
    margin: 0;
@@ -146,6 +148,25 @@ a.toolbox-button img {
 .toolbox-active-content {
    background-color: #e3e3e3;
 }
+/* Toolbox pro editaci poloĹľek */
+.toolbox-inline {
+   float: right;
+   padding: 3px;
+}
+.toolbox-inline * {
+   display: inline;
+   padding: 0;
+   margin: 0;
+   line-height: 0;
+}
+.toolbox-inline form div, .toolbox-inline a.toolbox-tool-inline-button {
+   float: left;
+   margin-left: 3px;
+}
+.toolbox-inline a, .toolbox-inline a:hover {
+	text-decoration: none;
+}
+
 /* EOF ToolBox Panel s editací */
 
 /* Jazykové taby */
@@ -231,21 +252,6 @@ li.module-navigation-tab a img {
    padding-left: 26px;
    border: 1px solid #999999;
    background: transparent url('/images/icons/error.png') 3px 3px no-repeat;
-}
-/* Toolbox pro editaci poloĹľek */
-.toolbox-inline {
-   float: right;
-   padding: 3px;
-}
-.toolbox-inline * {
-   display: inline;
-   padding: 0;
-   margin: 0;
-   line-height: 0;
-}
-.toolbox-inline form div {
-   float: left;
-   margin-left: 3px;
 }
 
 /* titulní obrázky u článků */
