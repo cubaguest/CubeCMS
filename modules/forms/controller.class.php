@@ -27,7 +27,7 @@ class Forms_Controller extends Controller {
       $formDelete->addElement($eDelete);
       
       if($formDelete->isValid()){
-         $model->delete($formChangeStatus->id->getValues());
+         $model->delete($formDelete->id->getValues());
          $this->infoMsg()->addMessage($this->tr('Formulář byl smazán'));
          $this->link()->reload();
       }
