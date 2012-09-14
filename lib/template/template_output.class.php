@@ -198,6 +198,8 @@ class Template_Output {
     */
    public static function setDownload($fileName) {
       self::addHeader('Content-Disposition: attachment; filename="'.$fileName.'"');
+      self::addHeader('Content-Transfer-Encoding: binary');
+      self::addHeader('Content-Description: File Transfer');
    }
 }
 ?>
