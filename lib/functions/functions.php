@@ -119,8 +119,8 @@ function vve_strip_tags($value)
  * @param int $timestamp -- (option) timestamp
  * @return string -- formátované datum
  * <p>%d - Day of the month without leading zeros - 1 to 31</p>
- * <p>%D - A textual representation of a day, three letters - Mon through Sun</p>
- * <p>%l - Hour in 12-hour format, with a space preceeding single digits - 1 through 12</p>
+ * <p>%D - Day of the month, 2 digits with leading zeros</p>
+ * <p>%l - An abbreviated textual representation of the day</p>
  * <p>%L - A full textual representation of the day - Sunday through Saturday</p>
  * <p>%m - Numeric representation of a month, without leading zeros - 1 through 12</p>
  * <p>%M - Numeric representation of a month, with leading zeros - 01 through 12</p>
@@ -348,9 +348,16 @@ function vve_generate_token($len = 32, $md5 = true)
 
 function vve_image_cacher($path, $width = null, $height = null, $crop = false){
    $sizes = $width.'x'.$height.($crop == false ? '' : 'c');
-   $path = str_replace(Url_Request::getBaseWebDir(), 
-      Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/', 
-      $path);
-   return $path."?hash=". urlencode(crypt($sizes,VVE_DB_PASSWD));
+   // pokud má obrázek url adresu ze současného webu
+   if(strpos($path, Url_Request::getBaseWebDir()) !== false){
+      $path = str_replace(Url_Request::getBaseWebDir(), 
+         Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/', $path);
+      $path .= "?hash=". urlencode(crypt($sizes,VVE_DB_PASSWD));
+   } 
+   // pokud je obrázek přímo z data
+   else if(strpos($path, VVE_DATA_DIR."/") === 0){
+      $path = Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/'.$path."?hash=". urlencode(crypt($sizes,VVE_DB_PASSWD));
+   }
+   return $path;
 }
 ?>
