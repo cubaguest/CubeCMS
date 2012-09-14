@@ -1,4 +1,64 @@
-<h1><?=$this->_('Záloha')?></h1>
-<div class="main-content-detail">
-   <h2>Není implementována</h2>
+<? 
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+?>
+<h1><?=$this->tr('Záloha')?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+<div class="post content">
+   <h2><?=$this->tr('Vytvoření zálohy')?></h2>
+   <? 
+   echo $this->form->renderStart();
+   echo $this->form->backup->controll();
+   echo $this->form->renderEnd();
+   ?>
+   <br />
+   <h2><?=$this->tr('Provedené zálohy')?></h2>
+   <table class="full-width ui-widget">
+   	<thead class="ui-widget-header">
+      	<tr>
+      		<th><?=$this->tr('Název')?></th>
+   	   	<th><?=$this->tr('Velikost')?></th>
+   	   	<th></th>
+      	</tr>
+   	</thead>
+      <tbody>
+   	   <?foreach ($this->backupFiles as $file) {
+   	      $filename = pathinfo($file, PATHINFO_BASENAME);
+   	      ?>
+      	<tr class="ui-widget-content <?if(filemtime($file) <= (time()-60*60*24*31) ) echo "ui-state-disabled" ?>">
+      		<td><?=$filename?></td>
+   	   	<td><?
+   	   	   $s = filesize($file);
+   	   	   if($s > 1024*1024){
+   	   	      echo round($s/1024/1024, 2)." MB";
+   	   	   } else if($s > 1024) {
+   	   	      echo round($s/1024, 2 )." KB";
+   	   	   } else {
+   	   	      echo $s." B";
+   	   	   }
+   	   	?></td>
+   	   	<td style="text-align: right;">
+   	   	   <a href="<?=$this->link()->route('fileAction')->param('a', 'dw')
+   	   	      ->param('file', $filename)?>"
+   	   	      ><img src="/images/icons/download.png" /></a>
+   	   	</td>
+   	   </tr>
+   	   <?}?>
+      </tbody>
+      <tfoot class="ui-widget-header">
+         <tr>
+            <td colspan="3">
+            <? 
+            $this->formClean->html()->setAttrib('onsubmit', 'return confirm(\''.$this->tr('Smazat zálohy?').'\');');
+            echo $this->formClean->renderStart();
+            echo $this->formClean->oldest->label();
+            echo $this->formClean->oldest->controll();
+            $this->formClean->clean->html()->addClass('cancel');
+            echo $this->formClean->clean->controll();
+            echo $this->formClean->renderEnd();
+            ?>
+            </td>
+         </tr>
+      </tfoot>	
+   </table>
 </div>

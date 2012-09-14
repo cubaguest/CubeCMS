@@ -11,6 +11,7 @@ class Services_Routes extends Routes {
 //      $this->addRoute('blockUser', 'block-user.php', 'blockUser', 'block-user.php', 'XHR_Respond_VVEAPI');
 //      $this->addRoute('editGroup', 'edit-group.php', 'editGroup', 'edit-group.php', 'XHR_Respond_VVEAPI');
 
+      $this->addRoute('fileAction', "fileact/", 'fileAction','fileact/');
       $this->addRoute('database', "database", 'database','database/');
       $this->addRoute('backup', "backup", 'backup','backup/');
 	}
