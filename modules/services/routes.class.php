@@ -14,6 +14,7 @@ class Services_Routes extends Routes {
       $this->addRoute('fileAction', "fileact/", 'fileAction','fileact/');
       $this->addRoute('database', "database", 'database','database/');
       $this->addRoute('backup', "backup", 'backup','backup/');
+      $this->addRoute('dbadmin', "dbadmin", 'dbadmin','dbadmin/');
 	}
 }
 

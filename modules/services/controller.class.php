@@ -5,6 +5,10 @@
  */
 class Services_Controller extends Controller {
 
+   protected function init() 
+   {
+      $this->checkControllRights();
+   } 
    /**
     * Kontroler pro zobrazení textu
     */
@@ -328,6 +332,11 @@ class Services_Controller extends Controller {
    {
       return AppCore::getAppWebDir().'backup'.DIRECTORY_SEPARATOR;
    }
+   
+   public function dbadminController() 
+   {
+      ;
+   } 
    
    /* Autorun metody */
    public static function AutoRunWeekly()
