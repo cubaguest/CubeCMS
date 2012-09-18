@@ -228,22 +228,23 @@ class Template extends TrObject {
     * Metoda vrátí objekt odkazu na aktuální kategorii a modul
     * @param boolean $clear -- jestli má být odkaz prázdný
     * @return Url_Link
+    * @deprecated
     */
    public function l($clear = false) {
-      $link = clone $this->link;
-      if($clear) {
-         $link->clear();
-      }
-      return $link;
+      return $this->link($clear);
    }
 
    /**
     * Metoda vrátí objekt odkazu na aktuální kategorii a modul (alias na l())
     * @param boolean $clear -- jestli má být odkaz prázdný
-    * @return Links
+    * @return Url_Link
     */
    public function link($clear = false) {
-      return $this->l($clear);
+      $link = clone $this->link;
+      if($clear) {
+         $link->clear();
+      }
+      return $link;
    }
 
    /**
@@ -842,35 +843,37 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
 
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = $rpFaceDir;
-         $url = Template::face(false).AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
+//          $url = Template::face(false).AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
       } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
          $path = $rpParentFaceDir;
-         $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true),Template::face(false))
-            .AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
+//          $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true),Template::face(false))
+//             .AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
 
       } else if(is_file($rpMainDir.$file)) { // soubor v knihovnách
          $path = $rpMainDir;
-         if(VVE_SUB_SITE_DOMAIN == null){
-            $url = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
-         } else {
-            $url = Url_Request::getBaseWebDir(true).AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
-         }
+//          if(VVE_SUB_SITE_DOMAIN == null){
+//             $url = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
+//          } else {
+//             $url = Url_Request::getBaseWebDir(true).AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
+//          }
       } else {
          throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
-      
+
+      $cachePath = AppCore::getAppCacheDir(); 
       try {
          if(VVE_DEBUG_LEVEL >= 2){
             $cssStr = lessc::cexecute($path . $rpFile, true);
-            file_put_contents($path . $rpFile . ".css",  $cssStr['compiled']); // when debug > 2force recompile
+            // put to cache dir
+            file_put_contents($cachePath . $rpFile . '-'.$module.".css",  $cssStr['compiled']); // when debug > 2 force recompile
          } else {
-            lessc::ccompile($path . $rpFile, $path . $rpFile . ".css");
+            // put to cache dir
+            lessc::ccompile($path . $rpFile, $cachePath . $rpFile .'-'.$module. ".css");
          }
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
-      
-      return $url.$file.".css";
+      return Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR.'/'.$file.'-'.$module.".css";
    }
    
    protected function getSassCssFromEngine($file, $original = false, $ext = 'scss') {
