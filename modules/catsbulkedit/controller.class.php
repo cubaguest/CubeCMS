@@ -8,6 +8,13 @@ class CatsBulkEdit_Controller extends Controller {
 
    private $categories = array();
    
+   private $modelCat;
+   
+   protected function init() 
+   {
+      $this->modelCat = new Model_Category();   
+   }
+   
    public function mainController()
    {
       $this->checkControllRights();
@@ -22,7 +29,7 @@ class CatsBulkEdit_Controller extends Controller {
                $this->tr('Popisek') => 'description',
                $this->tr('Klíčová slova') => 'keywords',
             ),
-            $this->tr('Ostatní') => array(
+            $this->tr('Základní') => array(
                $this->tr('Název') => 'name',
                $this->tr('Alternativní název') => 'altname',
                $this->tr('URL klíč') => 'urlkey',
@@ -191,13 +198,19 @@ class CatsBulkEdit_Controller extends Controller {
       if($form->isValid()){
          $params = $form->param->getValues();
          foreach ($params as $id => $value) {
-            if($paramReq == 'urlkey'){
-               $value = vve_cr_url_key($value);
-            }
-            $model
-               ->where(Model_Category::COLUMN_ID." = :idc", array('idc' => $id))
-               ->update(array($param => $value));
+            $cat = $model->record($id);
             
+            if($param == Model_Category::COLUMN_URLKEY){
+               $value = vve_cr_url_key($value, false);
+            }
+            // assign value
+            $cat->$param = $value;
+            $cat->save();
+            
+         }
+         if($param == Model_Category::COLUMN_NAME || $param == Model_Category::COLUMN_URLKEY){
+            // create URL keys for empty
+            $this->generateNewUrlkeys(Category_Structure::getStructure(Category_Structure::ALL));
          }
          $this->infoMsg()->addMessage($this->tr('Parametry byly uloženy'));
          $this->link(true)->reload();
@@ -207,5 +220,34 @@ class CatsBulkEdit_Controller extends Controller {
       $this->view()->struct = Category_Structure::getStructure(Category_Structure::ALL);;
       
    }
+   
+   protected function generateNewUrlkeys(Category_Structure $structure, $parentKeys = null) 
+   {
+      foreach ($structure as $child){
+         $cat = $this->modelCat->record($child->getId());
+         $changed = false;
+         $urlKeys = $cat->{Model_Category::COLUMN_URLKEY};
+         foreach ($cat[Model_Category::COLUMN_NAME] as $lang => $name) {
+            if($name != null && $urlKeys[$lang] == null ){
+               $urlKeys[$lang] = 
+                  ( $parentKeys != null ? $parentKeys[$lang]."/" : null ) . vve_cr_url_key($name);
+               $changed = true;
+            } 
+            // remove url key if name is empty
+            else if($name == null){ 
+               $urlKeys[$lang] = null;
+            }
+         }
+         $cat->{Model_Category::COLUMN_URLKEY} = $urlKeys;
+         if($changed){
+            $cat->save();
+         }
+         
+         if(!$child->isEmpty()){
+            $this->generateNewUrlkeys($child, $cat->{Model_Category::COLUMN_URLKEY});
+         }
+      }
+   }
+   
 }
 ?>
