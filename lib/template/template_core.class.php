@@ -51,6 +51,12 @@ class Template_Core extends Template {
    private static $metaTags = array();
    
    /**
+    * Cesta ke Cover obrázku
+    * @var string
+    */
+   private static $coverImagePath = null;
+   
+   /**
     * Konstruktor
     */
    function  __construct() {
@@ -72,6 +78,15 @@ class Template_Core extends Template {
          } else {
             self::$pageTitle = array_merge(array(VVE_WEB_NAME), self::$pageTitle);
          }
+      }
+      
+      // prepare base Tags
+      self::setMetaTag('generator', 'Cube-CMS '.AppCore::ENGINE_VERSION);
+      self::setMetaTag('canonical', $this->link()->rmParam()); // drop every page params
+      // base image
+      if(Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
+         self::setCoverImage(Category::getImageDir(Category::DIR_IMAGE)
+               .Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} );
       }
    }
 
@@ -153,6 +168,14 @@ class Template_Core extends Template {
       }
       
       $metaTags = null;
+      
+      if(self::$coverImagePath != null ){
+         $metaTags .= '<link rel="image_src" href="'.self::$coverImagePath.'"/>'."\n";
+         self::setMetaTag('og:image', self::$coverImagePath);
+      } else if(isset(self::$metaTags['og:image']) && self::$coverImagePath == null){
+         $metaTags .= '<link rel="image_src" href="'.self::$metaTags['og:image'].'"/>'."\n";
+      }
+      
       if(!empty (self::$metaTags)){
          foreach (self::$metaTags as $key => $value) {
             if((string)$value == null){
@@ -162,9 +185,9 @@ class Template_Core extends Template {
              * @todo tady asi přidat spíše hodnotu do metatagů o jaký se jedná
              */
             if(strpos($key, ':') === false){
-               $metaTags .= '<meta name="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
+               $metaTags .= str_repeat(' ', 6).'<meta name="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
             } else {
-               $metaTags .= '<meta property="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
+               $metaTags .= str_repeat(' ', 6).'<meta property="'.htmlspecialchars(strip_tags($key)).'" content="'.htmlspecialchars(strip_tags($value)).'" />'."\n";
             }
          }
       }
@@ -322,6 +345,24 @@ class Template_Core extends Template {
       return self::$metaTags;
    }
 
+   /**
+    * Metoda nastaví titulní obrázek stránky
+    * @param string $path - URL obrázku 
+    */
+   public static function setCoverImage($path) 
+   {
+      self::$coverImagePath = $path;
+   }
+   
+   /**
+    * Metoda vrací adresu titulního obrázku
+    * @return string $path 
+    */
+   public static function getCoverImage() 
+   {
+      return self::$coverImagePath;
+   }
+   
    /**
     * Metoda vrací objekt detekce prohlížeče
     * @return Browser
