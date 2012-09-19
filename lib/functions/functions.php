@@ -42,9 +42,9 @@ function vve_cr_url_key($string, $removeSlashes = true)
       }
       $regexp = array('/[^a-z0-9\/ _-]+/i', '/[ ' . $slashes . '-]+/', '/[\/]+/');
       $replacements = array('', '-', URL_SEPARATOR);
-      $string = preg_replace($regexp, $replacements, $string);
+      $string = strtolower(preg_replace($regexp, $replacements, $string) );
    }
-   return strtolower($string);
+   return $string;
 }
 
 /**
