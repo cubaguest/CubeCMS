@@ -14,10 +14,6 @@ class Form_Filter_HTMLSpecialChars extends Form_Filter {
     * @param Form_Element $elem
     */
    public function filter(Form_Element &$elem, &$values) {
-      // vytvoříme řetězec pro strip tags
-      foreach ($this->allowedTags as $tag) {
-         $this->allowedTagsStr .= '<'.$tag.'>';
-      }
       switch (get_class($elem)) {
          case "Form_Element_Text":
          case "Form_Element_TextArea":
