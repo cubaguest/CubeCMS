@@ -10,7 +10,7 @@ function vveCatsRenderFunc($menuArr) {
       echo '<li id="cat-id-'.$item->getCatObj()->getId().'">';
       
       $name = (string)$item != null ? htmlspecialchars((string)$item) : '<span class="no-original">'.htmlspecialchars($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_NAME}[Locales::getDefaultLang()]).'</span>';
-      echo '<a href="#">'.$name.'&nbsp;'.langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}).' - '.$item->getCatObj()->getId().'</a>';
+      echo '<a href="#">'.$name.'&nbsp;'.vve_tpl_show_text_langs($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}).' - '.$item->getCatObj()->getId().'</a>';
       if(!$item->isEmpty()) {
          vveCatsRenderFunc($item);
       }
