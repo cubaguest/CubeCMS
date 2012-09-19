@@ -256,7 +256,12 @@ $(document).ready(function(){
    // načítání jazykových mutací
    $('a.toolbox-changelang-button').live('click', function(){
       showLoadBox('.main-content');
-      $('.main-content').load(this.href, function(){
+      var cntUrl = this.href;
+      $('.main-content').load(cntUrl, function(cnt){
+    	  var lang = cntUrl.match(/(l=[a-z]{2})/g);
+    	  if(lang != null){
+    	     $('.main-content').html(cnt.replace(lang[0], "") );
+    	  }
          hideLoadBox();
          initToolboxEvents();
          $(document).scroll();
