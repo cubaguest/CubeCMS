@@ -31,7 +31,7 @@ function vve_cr_url_key($string, $removeSlashes = true)
       return $string;
    } else if (is_array($string)) {
       foreach ($string as $key => $variable) {
-         $string[$key] = vve_cr_url_key($variable);
+         $string[$key] = vve_cr_url_key($variable, $removeSlashes);
       }
    } else {
       $string = strip_tags($string);
