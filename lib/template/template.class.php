@@ -119,6 +119,8 @@ class Template extends TrObject {
     */
    private static $browser;
 
+   protected static $currentFace;
+   
    /*
     * ============= MAGICKÉ METODY
    */
@@ -533,6 +535,7 @@ class Template extends TrObject {
    public static function factory() {
       self::setFace(VVE_TEMPLATE_FACE);
       self::$browser = new Browser();
+      self::$currentFace = new Face();
    }
    
    /**
