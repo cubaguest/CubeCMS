@@ -49,13 +49,6 @@
          <urlkey lang="en">admin/content/templates</urlkey>
          <module>templates</module>
       </item>
-      <item id="32778" icon="email.png">
-         <name lang="cs">Maily</name>
-         <name lang="en">Mails</name>
-         <urlkey lang="cs">admin/content/maily</urlkey>
-         <urlkey lang="en">admin/content/mails</urlkey>
-         <module>mails</module>
-      </item>
       <item id="32779" icon="star.png">
          <name lang="cs">Panel rychlých nástrojů</name>
          <name lang="en">Quick-Tools panel</name>
