@@ -31,7 +31,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
     * @param int/float $min -- minimální velikost čísla (pouze INT)
     * @param int/float $max -- maximální velikost čísla (pouze INT)
     */
-   public function  __construct($numberType = self::TYPE_INT, $min = null, $max = null ,$errMsg = null ) {
+   public function  __construct($errMsg = null, $numberType = self::TYPE_INT, $min = null, $max = null ) {
       if($numberType == 'float') {$numberType = FILTER_VALIDATE_FLOAT;}
       else if($numberType == 'int') {$numberType = FILTER_VALIDATE_INT;}
       if($errMsg == null) {

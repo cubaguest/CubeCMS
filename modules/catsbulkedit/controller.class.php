@@ -93,7 +93,7 @@ class CatsBulkEdit_Controller extends Controller {
             $param = Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY;
             $elem = new Form_Element_Text('param', $paramName);
             $elem->addValidation(new Form_Validator_NotEmpty());
-            $elem->addValidation(new Form_Validator_IsNumber(Form_Validator_IsNumber::TYPE_FLOAT));
+            $elem->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
             $elem->addValidation(new Form_Validator_Range(0, 1));
             $elem->setDimensional();
             break;
@@ -102,7 +102,7 @@ class CatsBulkEdit_Controller extends Controller {
             $param = Model_Category::COLUMN_PRIORITY;
             $elem = new Form_Element_Text('param', $paramName);
             $elem->addValidation(new Form_Validator_NotEmpty());
-            $elem->addValidation(new Form_Validator_IsNumber(Form_Validator_IsNumber::TYPE_INT));
+            $elem->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
             $elem->addValidation(new Form_Validator_Range(0, 1000));
             $elem->setDimensional();
             break;
