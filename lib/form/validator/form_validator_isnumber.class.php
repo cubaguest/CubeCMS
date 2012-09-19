@@ -31,7 +31,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
     * @param int/float $min -- minimální velikost čísla (pouze INT)
     * @param int/float $max -- maximální velikost čísla (pouze INT)
     */
-   public function  __construct($errMsg = null, $numberType = self::TYPE_INT, $min = null, $max = null) {
+   public function  __construct($numberType = self::TYPE_INT, $min = null, $max = null ,$errMsg = null ) {
       if($numberType == 'float') {$numberType = FILTER_VALIDATE_FLOAT;}
       else if($numberType == 'int') {$numberType = FILTER_VALIDATE_INT;}
       if($errMsg == null) {
@@ -60,7 +60,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
       // sublabel
       if($element instanceof Form_Element_Text OR $element instanceof Form_Element_TextArea){
          if($this->numberType == FILTER_VALIDATE_FLOAT) {
-            $element->addValidationConditionLabel($this->tr("desetiné číslo"));
+            $element->addValidationConditionLabel($this->tr("desetiné číslo").$addStr);
          } else {
             $element->addValidationConditionLabel($this->tr("celé číslo").$addStr);
          }
