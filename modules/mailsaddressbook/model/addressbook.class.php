@@ -55,18 +55,12 @@ class MailsAddressBook_Model_Addressbook extends Model_ORM {
 
    /**
     * Metoda vrací objekt s maily podle hledaného řetězce
-    * @return Object
+    * @return Model_ORM_Record
     */
    public function searchMail($search) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare('SELECT * FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE '.self::COLUMN_NAME." LIKE :str"
-              .' OR '.self::COLUMN_SURNAME." LIKE :str"
-              .' OR '.self::COLUMN_MAIL." LIKE :str"
-              );
-      $dbst->setFetchMode(PDO::FETCH_OBJ);
-      $dbst->execute(array(':str' => '%'.$search.'%'));
-      return $dbst->fetchAll();
+      return $this->where(
+            self::COLUMN_MAIL." LIKE :q1 OR ".self::COLUMN_NAME." LIKE :q2 OR ".self::COLUMN_SURNAME." LIKE :q3",
+            array('q1' => '%'.$search.'%', 'q2' => '%'.$search.'%', 'q3' => '%'.$search.'%'))->records(PDO::FETCH_OBJ);
    }
 
    /**
