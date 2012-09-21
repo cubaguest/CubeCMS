@@ -494,22 +494,24 @@ class Forum_Controller extends Controller {
          
          if($form->haveElement('attachments')){
             $files = $form->attachments->getValues();
-            $dataDir = new FS_Dir($this->getTopicDataDir($idTopic));
-            $dataDir->check();
-         
-            foreach ($files as $f) {
-               if(empty($f)){
-                  continue;
-               }
-               $file = new File($f);
-               $file->move($dataDir);
+            
+            if($files != null){
+               $dataDir = new FS_Dir($this->getTopicDataDir($idTopic));
+               $dataDir->check();
+               foreach ($files as $f) {
+                  if(empty($f)){
+                     continue;
+                  }
+                  $file = new File($f);
+                  $file->move($dataDir);
                 
-               $fileRec = $modelAttachments->newRecord();
-               $fileRec->{Forum_Model_Attachments::COLUMN_ID_TOPIC} = $idTopic;
-               $fileRec->{Forum_Model_Attachments::COLUMN_ID_MESSAGE} = $message->getPK();
-               $fileRec->{Forum_Model_Attachments::COLUMN_ID_USER} = Auth::getUserId();
-               $fileRec->{Forum_Model_Attachments::COLUMN_FILENAME} = $file->getName();
-               $modelAttachments->save($fileRec);
+                  $fileRec = $modelAttachments->newRecord();
+                  $fileRec->{Forum_Model_Attachments::COLUMN_ID_TOPIC} = $idTopic;
+                  $fileRec->{Forum_Model_Attachments::COLUMN_ID_MESSAGE} = $message->getPK();
+                  $fileRec->{Forum_Model_Attachments::COLUMN_ID_USER} = Auth::getUserId();
+                  $fileRec->{Forum_Model_Attachments::COLUMN_FILENAME} = $file->getName();
+                  $modelAttachments->save($fileRec);
+               }
             }
          }
          
@@ -878,7 +880,7 @@ class Forum_Controller extends Controller {
             $reaction->{Forum_Model_Messages::COLUMN_NAME},
             $this->link()->route('showTopic')->rmParam()->anchor('message-'.$reaction->{Forum_Model_Messages::COLUMN_ID}),
             $reaction->{Forum_Model_Messages::COLUMN_CREATED_BY}
-               .' ('.  vve_date('%x %X', new DateTime($reaction->{Forum_Model_Messages::COLUMN_DATE_ADD})).')'
+               .' ('.  vve_date('%x %X', new DateTime()).')'
                .' <'.$reaction->{Forum_Model_Messages::COLUMN_EMAIL}.'>',
             $reaction->{Forum_Model_Messages::COLUMN_TEXT},   
             // ostatní
