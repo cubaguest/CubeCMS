@@ -1,6 +1,11 @@
 <?
 $this->addPageTitle($this->tr('Vytvořit e-mail'));
 $this->addCssFile('style.css');
+
+$fillterSnipshet = '<label class="font-small">'.$this->tr('filtr').':</label>
+                  <input type="text" value="" class="input-filter-select"  />
+                  <span class="font-small"><em>('.$this->tr('Dvojklik vloží adresu do příjemců.').')</em></span>';
+
 ?>
 <h1><?=$this->category()->getName().' - '.$this->tr('vytvořit e-mail')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
@@ -24,7 +29,9 @@ $this->addCssFile('style.css');
             <? 
             $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5)->addClass('full-width');
             echo $this->form->recipients->controll();
-            echo $this->form->recipients->sublabel() ?>
+            $this->form->recipients->setSubLabel($this->form->recipients->getSubLabel().'. <a href="'.$this->link().'#delrec" id="recipients-reset">'.$this->tr('Vymazat příjemce').'</a>');
+            echo $this->form->recipients->sublabel() 
+            ?>
          </td>
       </tr>
       <tr>
@@ -42,10 +49,14 @@ $this->addCssFile('style.css');
                   <?if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
                      <li><a href="#tabs-mails-guestbook"><?=$this->tr('Kniha návštěv') ?></a></li>
                   <?}?>
+                  <?if($this->mailsForum !== null AND !empty ($this->mailsForum)){?>
+                     <li><a href="#tabs-mails-forum"><?=$this->tr('Fórum') ?></a></li>
+                  <?}?>
                </ul>
                <div id="tabs-mails-addressbook">
-                  <label for="mails-addressbook"><?=$this->tr('Všechny adresy v adresáři')?>:</label><br />
-                  <select name="mails-addressbook" class="mail-selected" id="mails-addressbook"
+                  <label for="mails-addressbook"><?=$this->tr('Všechny adresy v adresáři')?>
+                     (<span class="counter"><?=count($this->mailsAddressBook)?></span>):</label><br />
+                  <select name="mails-addressbook" class="mail-selected full-width" id="mails-addressbook"
                           size="6" multiple="multiple">
                      <? foreach ($this->mailsAddressBook as $mail) {
                         $str = null;
@@ -59,7 +70,9 @@ $this->addCssFile('style.css');
                      }?>
                   </select><br />
                   <input type="button" value="<?=$this->tr('Přidat')?>" class="button-add" data-select="mails-addressbook" />
-                  <input type="button" value="<?=$this->tr('Přidat všechny')?>" class="button-add-all" data-select="mails-addressbook" /><br />
+                  <input type="button" value="<?=$this->tr('Přidat všechny')?>" class="button-add-all" data-select="mails-addressbook" />
+                  <?=$fillterSnipshet?>
+                  <br />
                   <br />
                   <label for="mails-addressbook-groups"><?=$this->tr('Adresy ze skupiny')?>:</label><br />
                   <select name="mails-addressbook-groups" id="mails-addressbook-groups">
@@ -102,9 +115,11 @@ $this->addCssFile('style.css');
                   <?}?>
                   </table>
                </div>
-                  <?if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
+               <?
+               // Newsletter - OLD !!!! DEPRECATED
+               if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
                <div id="tabs-mails-newsletter">
-                  <select name="mails-newsletters" class="mail-selected" id="mails-newsletters"
+                  <select name="mails-newsletters" class="mail-selected full-width" id="mails-newsletters"
                           size="6" multiple="multiple">
                      <?foreach ($this->mailsNewsLetter as $mail) {
                         $str = htmlspecialchars('<'.$mail->{NewsLetter_Model_Mails::COLUMN_MAIL}.'>');
@@ -113,11 +128,14 @@ $this->addCssFile('style.css');
                   </select><br />
                   <input type="button" value="<?=$this->tr('Přidat')?>" class="button-add" data-select="mails-newsletters" />
                   <input type="button" value="<?=$this->tr('Přidat všechny')?>" class="button-add-all" data-select="mails-newsletters" />
+                  <?=$fillterSnipshet?>
                </div>
-                  <?}?>
-                  <?if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
+               <?}?>
+               <?
+               // guestbook mails
+               if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
                <div id="tabs-mails-guestbook">
-                  <select name="mails-guestbook" class="mail-selected" id="mails-guestbook"
+                  <select name="mails-guestbook" class="mail-selected full-width" id="mails-guestbook"
                           size="6" multiple="multiple">
                      <?foreach ($this->mailsGuestbook as $mail) {
                         $str = htmlspecialchars('"'.$mail->{GuestBook_Model_Detail::COL_NICK}.'" '
@@ -127,8 +145,25 @@ $this->addCssFile('style.css');
                   </select><br />
                   <input type="button" value="<?=$this->tr('Přidat')?>" class="button-add" data-select="mails-guestbook" />
                   <input type="button" value="<?=$this->tr('Přidat všechny')?>" class="button-add-all" data-select="mails-guestbook" />
+                  <?=$fillterSnipshet?>
                </div>
-                  <?}?>
+               <?}?>
+               <?
+               // forum mails
+               if($this->mailsForum !== null AND !empty ($this->mailsForum)){?>
+               <div id="tabs-mails-forum">
+                  <select name="mails-forum" class="mail-selected full-width" id="mails-forum" size="6" multiple="multiple">
+                     <?foreach ($this->mailsForum as $mail) {
+                        $str = htmlspecialchars('"'.$mail->{Forum_Model_Messages::COLUMN_CREATED_BY}.'" '
+                        .'<'.$mail->{Forum_Model_Messages::COLUMN_EMAIL}.'>');
+                        ?><option value="<?=$str;?>"><?=$str;?></option>
+                     <?}?>
+                  </select><br />
+                  <input type="button" value="<?=$this->tr('Přidat')?>" class="button-add" data-select="mails-forum" />
+                  <input type="button" value="<?=$this->tr('Přidat všechny')?>" class="button-add-all" data-select="mails-forum" />
+                  <?=$fillterSnipshet?>
+               </div>
+               <?}?>
             </div>
             <br />
          </td>
@@ -296,6 +331,29 @@ $this->addCssFile('style.css');
 				return false;
 			}
 		});
+
+		// addressbook filter
+      $('.input-filter-select').bind('change keyup', function() {
+         var regex = new RegExp($.trim($(this).val()),"gi");
+         var $select = $(this).parent().find('select.mail-selected');
+         $('option', $select).each(function(){
+            if($(this).val().match(regex)) {
+               $(this).show();
+            } else {
+               $(this).hide();
+            }
+         });
+         var $counter = $(this).parent().find('.counter');
+         if($counter){
+            $counter.text( $select.find('option:visible').length );
+         }
+      });
+
+      // reset příjemců
+      $('#recipients-reset').click(function(e){
+         e.preventDefault();
+         $('textarea.sendmail_recipients_class').val('');
+      });
    });
    /* ]]> */
 </script>

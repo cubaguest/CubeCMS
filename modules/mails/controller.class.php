@@ -164,6 +164,12 @@ class Mails_Controller extends Controller {
          $modelGuestBook = new GuestBook_Model();
          $this->view()->mailsGuestbook = $modelGuestBook->groupBy(GuestBook_Model::COLUMN_EMAIL)->records(PDO::FETCH_OBJ);
       }
+      
+      // forum
+      if ($modelModules->isModuleInstaled('forum') == true) {
+         $modelForumMsg = new Forum_Model_Messages();
+         $this->view()->mailsForum = $modelForumMsg->groupBy(Forum_Model_Messages::COLUMN_EMAIL)->records(PDO::FETCH_OBJ);
+      }
 
       // uživatelé systému
       $this->view()->mailsUsers = array();

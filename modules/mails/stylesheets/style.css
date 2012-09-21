@@ -38,16 +38,12 @@ div.mail-recipients, div.mail-content {
 }
 .mail-detail.ui-accordion-content {
    padding-top: 0px;
-
 }
 
+/* FRONTA */
 #mails-queue {
    width: 98%;
 }
-/*#mails-queue td {
-   border-bottom: 1px solid gray;
-   padding: 2px 0;
-}*/
 
 #mails-queue-buttons form,
 #mails-queue-buttons p {
