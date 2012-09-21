@@ -1422,7 +1422,7 @@ class Model_ORM extends Model {
          if ($alias != null) {
             $colString .= ' AS `' . $alias.'`';
          }
-      } else if ($this->getAllLangs == true) { // více jazyčné sloupce
+      } else if ($this->getAllLangs == true || VVE_DEFAULT_LANG_SUBSTITUTION) { // více jazyčné sloupce
          $cols = array();
          foreach (Locales::getAppLangs() as $lang) {
             array_push($cols, '`' . $tbPrefix . '`.`' . $columnName . '_' . $lang . '` '.($alias != null ? 'AS '.$alias.'_'.$lang : null));

@@ -36,7 +36,11 @@ class Model_LangContainer_LangColumn implements ArrayAccess, Countable, Iterator
     * @return mixed
     */
    public function  &__get($name) {
-      return stripcslashes($this->values[$name]);
+      if(isset($this->values[$name])){
+         return $this->values[$name];
+      }
+      $n = null;
+      return $n;
    }
 
    /**

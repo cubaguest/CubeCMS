@@ -108,6 +108,9 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          }
          
          if($this->columns[$collName]['lang'] == true){
+            if(! $this->columns[$collName]['value'] instanceof Model_ORM_LangCell){
+               $this->columns[$collName]['value'] = new Model_ORM_LangCell();
+            }
             if (!is_array($value)){
                $this->columns[$collName]['value']->addValue(Locales::getLang(), $value);
             } else if($this->columns[$collName]['lang'] == true && is_array($value)) {
