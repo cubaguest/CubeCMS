@@ -273,11 +273,10 @@ $this->addCssFile('style.css');
                var list = new Array();
                $.each(data.mails, function(){
                   var str = '';
-                  if( this.name != null && this.name != '' ){
-                     str += '"'+this.name+' '+this.surname+'" ';
+                  if( this.<?=MailsAddressBook_Model_Addressbook::COLUMN_NAME?> != null && this.<?=MailsAddressBook_Model_Addressbook::COLUMN_NAME?> != '' ){
+                     str += '"'+this.<?=MailsAddressBook_Model_Addressbook::COLUMN_NAME?>+' '+this.<?=MailsAddressBook_Model_Addressbook::COLUMN_SURNAME?>+'" ';
                   }
-//                  str += '&lt;'+this.mail+'&gt;';
-                  str += '<'+this.mail+'>';
+                  str += '<'+this.<?=MailsAddressBook_Model_Addressbook::COLUMN_MAIL?>+'>';
                   list.push(str)
                });
                response(list);

@@ -153,8 +153,10 @@ class Mails_Controller extends Controller {
       // newsletter
       $modelModules = new Model_Module();
       if ($modelModules->isModuleInstaled('newsletter') == true) {
-         $modelNewsLetters = new NewsLetter_Model_Mails();
-         $this->view()->mailsNewsLetter = $modelNewsLetters->getMails();
+         if(class_exists('NewsLetter_Model_Mails')){
+            $modelNewsLetters = new NewsLetter_Model_Mails();
+            $this->view()->mailsNewsLetter = $modelNewsLetters->getMails();
+         }
       }
 
       // guestbook
@@ -287,19 +289,6 @@ class Mails_Controller extends Controller {
       }
    }
 
-//    public function listMailsController() {
-//       $this->checkWritebleRights();
-//       $model = new NewsLetter_Model_Mails();
-//       $this->view()->mails = $model->getMails();
-//    }
-
-//    public function listMailsExportController() {
-//       $this->checkWritebleRights();
-//       $model = new Mails_Model_Addressbook();
-//       $this->view()->mails = $model->getMails();
-//       $this->view()->type = $this->getRequest('output', 'txt');
-//    }
-
    public function sendMailsListController() {
       $this->checkControllRights();
       $model = new Mails_Model_SendMails();
@@ -315,7 +304,7 @@ class Mails_Controller extends Controller {
    }
 
    public function searchMailController() {
-      $model = new Mails_Model_Addressbook();
+      $model = new MailsAddressBook_Model_Addressbook();
       $this->view()->mails = $model->searchMail($this->getRequestParam('q'));
    }
    
