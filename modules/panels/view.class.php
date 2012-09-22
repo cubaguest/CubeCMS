@@ -9,24 +9,27 @@ class Panels_View extends View {
       $this->template()->addTplFile('list.phtml');
 
       if($this->category()->getRights()->isWritable()) {
-         $toolbox = new Template_Toolbox2();
-         $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
-         $toolAdd = new Template_Toolbox2_Tool_Redirect('add_panel', $this->tr("Přidat panel"),
-         $this->link()->route('add'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový panel'));
-         $toolbox->addTool($toolAdd);
-         $this->toolbox = $toolbox;
+//          $toolbox = new Template_Toolbox2();
+//          $toolbox->setIcon(Template_Toolbox2::ICON_ADD);
+//          $toolAdd = new Template_Toolbox2_Tool_Redirect('add_panel', $this->tr("Přidat panel"),
+//          $this->link()->route('add'));
+//          $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový panel'));
+//          $toolbox->addTool($toolAdd);
+//          $this->toolbox = $toolbox;
       }
       Template_Module::setEdit(true);
    }
 
    public function addView() {
+      Template_Navigation::addItem($this->tr('Přidání panelu'), $this->link(), null, null, null, true);
       $this->template()->addTplFile('edit.phtml');
       Template_Module::setEdit(true);
    }
 
    public function editView() {
-      $this->addView();
+      Template_Navigation::addItem($this->tr('Úprava panelu'), $this->link(), null, null, null, true);
+      $this->template()->addTplFile('edit.phtml');
+      Template_Module::setEdit(true);
       $this->edit=true;
    }
 
@@ -47,6 +50,7 @@ class Panels_View extends View {
          $tpl->addTplFile('panel_settings.phtml', $this->moduleName);
          $this->includeTpl = $tpl;
       }
+      Template_Navigation::addItem($this->tr('Nastavení panelu'), $this->link(), null, null, null, true);
       Template_Module::setEdit(true);
    }
 
