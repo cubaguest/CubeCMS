@@ -23,6 +23,10 @@ class Text_Model extends Model_ORM {
    const COLUMN_LABEL = 'label';
    const COLUMN_DATA = 'data';
 
+   /**
+    * @deprecated -- používat pro kompatibilitu TEXT_MAIN_KEY 
+    * @var string
+    */
    const DEFAULT_SUBKEY = 'nokey';
    
    const TEXT_MAIN_KEY = 'main';
@@ -43,7 +47,7 @@ class Text_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_ID_USER_EDIT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
 //      $this->addColumn(self::COLUMN_ID_USER_LAST_EDIT, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
       $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
-      $this->addColumn(self::COLUMN_SUBKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => 'nokey'));
+      $this->addColumn(self::COLUMN_SUBKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => self::TEXT_MAIN_KEY));
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(300)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -66,16 +70,8 @@ class Text_Model extends Model_ORM {
     * @return string -- načtený text
     */
    public function getText($idCat, $subkey = self::DEFAULT_SUBKEY) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS text
-             WHERE (text.".self::COLUMN_ID_CATEGORY." = :idc AND text.".self::COLUMN_SUBKEY." = :subkey)");
-      $dbst->bindValue(':subkey', $subkey, PDO::PARAM_STR);
-      $dbst->bindValue(':idc', $idCat, PDO::PARAM_INT);
-      $dbst->execute();
-
-      $cl = new Model_LangContainer();
-      $dbst->setFetchMode(PDO::FETCH_INTO, $cl);
-      return $dbst->fetch();
+      return $this->where(self::COLUMN_ID_CATEGORY." = :idc AND ".self::COLUMN_SUBKEY." = :subkey", 
+            array('idc' => $idCat, 'subkey' => $subkey) )->record();
    }
 
    /**

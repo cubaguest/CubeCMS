@@ -87,7 +87,7 @@ class Text_View extends View {
    
    public function previewView() {
       $this->mainView();
-      $this->template()->addFile('tpl://previewform.phtml');
+      $this->template()->addFile('tpl://text:previewform.phtml');
       // remove not necessary items
       if($this->toolbox instanceof Template_Toolbox2){
          unset($this->toolbox->edit_text);            
