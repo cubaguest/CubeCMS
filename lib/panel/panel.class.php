@@ -204,7 +204,6 @@ abstract class Panel extends TrObject {
       if(method_exists($this, 'settings')){
          $this->settings($settings, $form);
       } else if(method_exists(ucfirst($this->category()->getModule()->getName()).'_Panel','settingsController')) {
-         Debug::log("settings - static");
          $func = array(ucfirst($this->category()->getModule()->getName()).'_Panel','settingsController');
          call_user_func_array($func, array(&$settings, &$form));
       }
