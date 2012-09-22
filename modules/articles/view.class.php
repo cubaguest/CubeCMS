@@ -43,6 +43,8 @@ class Articles_View extends View {
    {
       if ((string) $article->{Articles_Model::COLUMN_KEYWORDS} != null) {
          Template_Core::setPageKeywords($article->{Articles_Model::COLUMN_KEYWORDS});
+      } else if(!empty($this->tags)){
+         Template_Core::setPageKeywords(implode(',', $this->tags));
       }
       if ((string) $article->{Articles_Model::COLUMN_DESCRIPTION} != null) {
          Template_Core::setPageDescription($article->{Articles_Model::COLUMN_DESCRIPTION});
@@ -50,7 +52,7 @@ class Articles_View extends View {
          Template_Core::setPageDescription($article->{Articles_Model::COLUMN_ANNOTATION});
       }
       Template_Core::setMetaTag('author', $article->{Model_Users::COLUMN_USERNAME});
-      if ($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
+      /* if ($article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
          Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}));
       } else if((string)$article->{Articles_Model::COLUMN_TEXT} != null){
          // zkusit načíst kvůli meta tagům
@@ -65,6 +67,11 @@ class Articles_View extends View {
                Template_Core::setMetaTag('og:image', Url_Request::getBaseWebDir(false).$images[0]['src']);
             }
          }
+      }*/
+      // define canonical url
+      Template_Core::setMetaTag('canonical', $this->link()->rmParam());
+      if($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null){
+         Template_Core::setCoverImage(vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}));
       }
    }
 

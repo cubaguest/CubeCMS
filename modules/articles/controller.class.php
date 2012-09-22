@@ -804,6 +804,7 @@ class Articles_Controller extends Controller {
       $form->addElement($iName, $fGrpTexts);
 
       $iAnnot = new Form_Element_TextArea('annotation', $this->tr('Anotace'));
+      $iAnnot->setSubLabel($this->tr('Krátký popis položky. Nejlépe tři věty.'));
       $iAnnot->setLangs();
       $form->addElement($iAnnot, $fGrpTexts);
 
@@ -830,6 +831,7 @@ class Articles_Controller extends Controller {
       $form->addElement($iUrlKey, $fGrpParams);
 
       $iKeywords = new Form_Element_Text('metaKeywords', $this->tr('Klíčová slova'));
+      $iKeywords->setSubLabel($this->tr('Pokud nejsou zadána, pokusí se generovat ze štítků.'));
       $iKeywords->setLangs();
       $form->addElement($iKeywords, $fGrpParams);
 
