@@ -32,6 +32,55 @@ class Debug {
 //      }
    }
 
+   private static function prepareJsStringLiteral( $stringLiteral, $mode = 2 )
+   {
+      switch ( $mode )
+      {
+         case 2:
+            $searches = array( '"', "\n" );
+            $replacements = array( '\\"', "\\n\"\n\t+\"" );
+            break;
+         case 1:
+            $searches = array( "'", "\n" );
+            $replacements = array( "\\'", "\\n'\n\t+'" );
+            break;
+      }
+      return str_replace( $searches, $replacements, $stringLiteral );
+   }
+   
+   /**
+    * Vypíše předané proměnné do popup js okna. Vhodné pro debug v šabloně.
+    */
+   public static function printVar() 
+   {
+      $args = func_get_args();
+      echo '<script type="text/javascript">';
+      echo '
+         OpenWindow = window.open("", "Cube CMS Debugger", "height=800,width=800,modal=yes,scrollbars=yes");
+         OpenWindow.document.write("<html>");
+         OpenWindow.document.write("<head>");
+         OpenWindow.document.write("<title>Cube CMS Debugger</title>");
+         OpenWindow.document.write("</head>");
+         OpenWindow.document.write("<body style=\"background-color: #FFCACB\">");
+         OpenWindow.document.write("<h1 style=\"font-size: 110%;\">Cube CMS Debugger output</h1>");';
+         
+         $vardump = null;
+         ob_start();
+         foreach ($args as $arg) {
+            var_dump($arg);
+         }
+         $cnt = ob_get_clean();
+         $cnt = self::prepareJsStringLiteral($cnt);
+//          $cnt = str_replace("\n", "" , $cnt);
+         echo 'OpenWindow.document.write("'.$cnt.'");';
+         echo 'OpenWindow.document.write("<br />");';
+         
+      echo 'OpenWindow.document.write("DEBUG END");
+         OpenWindow.document.write("</body>");
+         OpenWindow.document.write("</html>");';
+      echo '</script>';
+   } 
+   
    public static function printImmediately() {
       echo '<div class="debug-log" style="margin-top: 30px;">';// admin menu
       $args = func_get_args();
