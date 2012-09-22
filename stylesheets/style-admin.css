@@ -288,6 +288,7 @@ a.button-open-title-image-galery {margin-left: 10px;}
    box-shadow:         0px 0px 5px #666666;
    height: 90%;
 	overflow: auto;
+	text-align: left;
 }
 #module-help-box.thin {
 	width: 22px !important;
