@@ -1,29 +1,30 @@
 <?
+$h = $this->tr('Zrušení registrace e-mailu');
+Template_Core::addPageTitle($h);
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
-<div>
-   <strong><?=$this->_('Zrušení registrace e-mailu')?></strong><br />
+<h1><?ps($h)?></h1>
+<div class="content-form-edit">
    <?
    $this->unregMailForm->html()->setAttrib('id', 'unregisterMail');
-   echo($this->unregMailForm->renderStart());
-   echo($this->unregMailForm->mail->controll());
-   echo($this->unregMailForm->send->controll());
-   echo($this->unregMailForm->renderEnd());
+   echo $this->unregMailForm;
    ?>
-   <br />
-   <?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->route(null), 'text' => $this->_('Zpět na registraci')));?>
 </div>
 <script type="text/javascript">
    /* <![CDATA[ */
    $('form#unregisterMail').submit(function(){
       $.ajax({type: "POST",
-         url: "<?=$this->link()->route('unregistration')?>",
+         url: "<?=$this->link()?>",
          data: $(this).serialize(),
          success: function(data){
             vveShowMessages(data);
          }
       });
       return false;
+   });
+   $('input[name="unregmail_send_cancel"]').click(function(e){
+      e.preventDefault();
+      window.location.href = '<?=$this->link()->route()?>';
    });
    /* ]]> */
 </script>

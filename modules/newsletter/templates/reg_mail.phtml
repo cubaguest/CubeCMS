@@ -1,23 +1,21 @@
 <?
+$h = $this->category()->getName();
 if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABEL} != null){
-   $this->addPageHeadline($this->text->{Text_Model_Detail::COLUMN_LABEL});
+   $h = ($this->text->{Text_Model_Detail::COLUMN_LABEL});
+   Template_Core::setPageTitle($h);
 }
 $this->addJsPlugin(new JsPlugin_JQuery());
+
+echo $this->toolbox;
 ?>
+<h1><?ps($h)?></h1>
 <div>
    <?if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null){?>
    <div class=""><?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
    <?}?>
-   <br />
-   <strong><?=$this->_('Registrace e-mailu')?></strong><br />
    <?
    $this->newMailForm->html()->setAttrib('id', 'registerNewMail');
-   print($this->newMailForm->renderStart());
-   print($this->newMailForm->mail->controll());
-   print($this->newMailForm->send->controll());
-   print($this->newMailForm->renderEnd());
-
-   if($this->toolbox != null) $this->includeTplObj($this->toolbox);
+   echo $this->newMailForm;
    ?>
       <br />
       <a href="<?=$this->link()->route('unregistration');?>"
@@ -28,11 +26,9 @@ $this->addJsPlugin(new JsPlugin_JQuery());
    /* <![CDATA[ */
    $('form#registerNewMail').submit(function(){
       $.ajax({type: "POST",
-         url: "<?=$this->link()->route('normal')?>",
+         url: "<?=$this->link()?>",
          data: $(this).serialize(),
-         success: function(data){
-            vveShowMessages(data);
-         }
+         success: function(data){ vveShowMessages(data); }
       });
       return false;
    });

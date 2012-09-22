@@ -1,7 +1,8 @@
 <?php
-class NewsLetter_Install extends Module_Install {
+class NewsLetter_Install extends Install_Module {
+   protected $version = array('major' => 2, 'minor' => 0);
+    
    public function install() {
-      $this->runSQLCommand($this->replaceDBPrefix($this->getSQLFileContent('install.sql')));
    }
 }
 
