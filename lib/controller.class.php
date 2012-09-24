@@ -100,7 +100,7 @@ abstract class Controller extends TrObject {
       $this->category = $base;
       $this->routes = $routes;
       $this->actionViewer = $routes->getActionName();
-         
+      
       // název modulu
       $className = get_class($this);
       $this->moduleName = substr($className, 0, strpos($className,'_'));
@@ -111,6 +111,9 @@ abstract class Controller extends TrObject {
          $link->category($this->category()->getUrlKey());
       }
       $this->link = $link;
+      
+      // kontrola oprávnění
+      $this->checkReadableRights();
       
       // kontrola instalace a verze modulu
       $this->checkModule();
@@ -496,10 +499,12 @@ abstract class Controller extends TrObject {
       // spuštění kontroleru
       if(method_exists($this, $ctrlAct)) {
          // kontroler obsahuje metodu pro obsluhu
-         $ctrlResult = $this->{$ctrlAct}();
-         if($ctrlResult !== false) {
+         try {
+            if($this->{$ctrlAct}() === false){
+               throw UnexpectedPageException();
+            }
             $this->view()->runView($this->actionViewer, Template_Output::getOutputType());
-         } else if($ctrlResult === false) {
+         } catch (UnexpectedPageException $e) {
             AppCore::setErrorPage(true);
          }
          

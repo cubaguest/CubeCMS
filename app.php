@@ -27,6 +27,7 @@ class AppCore extends TrObject {
 
    /**
     * Revize Enginu
+    * @internal before change release move new config values from _initConfig method
     */
    const ENGINE_RELEASE = 16;
 
@@ -401,7 +402,7 @@ class AppCore extends TrObject {
    {
       // exceptions
       $exFiles = array('coreException','dbException','badClassException','badFileException',
-         'imageException','badRequestException', 'controllerException');
+         'imageException','badRequestException', 'controllerException', 'UnexpectedPageException');
       foreach ($exFiles as $exFile) {
          require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
             . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . $exFile.'.class.php');
@@ -449,6 +450,10 @@ class AppCore extends TrObject {
             }
          }
       }
+      
+      // THIS IS FOR UPDATE - move this configs after release is ready to update sql script
+      define('VVE_DEFAULT_LANG_SUBSTITUTION', true);
+      define('VVE_ANALYTICS_DISABLED_HOSTS', '127.0.0.1');
    }
 
    /**
