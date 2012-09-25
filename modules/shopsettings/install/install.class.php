@@ -1,5 +1,5 @@
 <?php
-class ShopProductGeneral_Install extends Module_Install {
+class ShopSettings_Install extends Module_Install {
    public function install() {
      $this->runSQLCommand($this->replaceDBPrefix($this->getSQLFileContent('install.sql')));
    }

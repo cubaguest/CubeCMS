@@ -5,7 +5,8 @@
  */
 
 class ShopProductGeneral_View extends Shop_Product_View {
-   public function mainView() {
+   public function mainView() 
+   {
       $this->template()->addFile('tpl://list.phtml');
 
       if($this->category()->getRights()->isWritable()) {
@@ -33,7 +34,8 @@ class ShopProductGeneral_View extends Shop_Product_View {
       }
    }
 
-   public function detailView() {
+   public function detailView() 
+   {
       $this->template()->addFile('tpl://detail.phtml');
 
       if($this->category()->getRights()->isWritable()) {
@@ -42,8 +44,13 @@ class ShopProductGeneral_View extends Shop_Product_View {
 
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_product', $this->tr('Upravit zboží'),
                  $this->link()->route('edit'));
-         $toolEdit->setIcon('page_add.png')->setTitle($this->tr("Upravit vybrané zboží"));
+         $toolEdit->setIcon('page_edit.png')->setTitle($this->tr("Upravit vybrané zboží"));
          $toolbox->addTool($toolEdit);
+         
+         $toolEditVariants = new Template_Toolbox2_Tool_PostRedirect('edit_product_variants', $this->tr('Upravit varianty'),
+                 $this->link()->route('editVariants'));
+         $toolEditVariants->setIcon('page_attach.png')->setTitle($this->tr("Upravit varianty vybraného zboží"));
+         $toolbox->addTool($toolEditVariants);
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat zboží'))
@@ -54,11 +61,18 @@ class ShopProductGeneral_View extends Shop_Product_View {
       }
    }
    
-   public function editView() {
+   public function editView() 
+   {
       $this->editProduct(true);
    }
    
-   public function addView() {
+   public function editVariantsView() 
+   {
+      $this->editProductVariants();
+   }
+   
+   public function addView() 
+   {
       $this->editProduct(false);
    }
    

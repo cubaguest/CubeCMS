@@ -50,6 +50,14 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
       $this->view()->linkBack = $this->link()->route();
    }
 
+   public function editVariantsController()
+   {
+      $this->checkWritebleRights();
+      $this->editProductVariants($this->getRequest('urlkey'));
+      if($this->view()->product == false OR $this->view()->product == null){
+         return false;
+      }
+   }
 
    /**
     * Kontroler pro editaci textu

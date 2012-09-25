@@ -9,6 +9,7 @@ class ShopProductGeneral_Routes extends Routes {
    function initRoutes() {
       $this->addRoute('add', "add", 'add', "add/");
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
+      $this->addRoute('editVariants', "::urlkey::/edit-variants", 'editVariants','{urlkey}/edit-variants/');
       $this->addRoute('edittext', "edit-text/", 'edittext','edit-text/');
       $this->addRoute('detail', "::urlkey::", 'detail','{urlkey}/');
 	}
