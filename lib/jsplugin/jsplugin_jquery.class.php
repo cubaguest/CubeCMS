@@ -13,7 +13,7 @@
  */
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME = 'base';
-   const JQUERY_VERSION = '1.8.2';
+   const JQUERY_VERSION = '1.7.2';
    const JQUERY_UI_VERSION = '1.8.23';
 
    const FACE_THEME_DIR = 'jqueryui';
@@ -157,8 +157,9 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addUIDraggable() {
-      $this->addUIWidget();
+      $this->addUICore();
       $this->addUIMouse();
+      $this->addUIWidget();
       $this->addJs("ui.draggable");
       return $this;
    }
@@ -169,6 +170,8 @@ class JsPlugin_JQuery extends JsPlugin {
     */
    public function addUIDroppable() {
       $this->addUICore();
+      $this->addUIWidget();
+      $this->addUIMouse();
       $this->addUIDraggable();
       $this->addJs("ui.droppable");
       return $this;
@@ -259,6 +262,9 @@ class JsPlugin_JQuery extends JsPlugin {
    public function addUIDialog() {
       $this->addUICore();
       $this->addUIWidget();
+      $this->addUIButton();
+      $this->addUIDraggable();
+      $this->addUIMouse();
       $this->addUIPosition();
       $this->addUIResizable();
       $this->addJs("ui.dialog");
