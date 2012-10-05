@@ -116,7 +116,7 @@ function vve_strip_tags($value)
 /**
  * Metoda podobná date a strftime, umožňuje jednodušší vypsání data a to i podle locales
  * @param string $format -- formát viz. dále
- * @param int $timestamp -- (option) timestamp
+ * @param int/string/DateTime $timestamp -- (option) čas
  * @return string -- formátované datum
  * <p>%d - Day of the month without leading zeros - 1 to 31</p>
  * <p>%D - Day of the month, 2 digits with leading zeros</p>
@@ -143,6 +143,9 @@ function vve_date($format, $timestamp = null)
       $timestamp = $timestamp->format("U");
    } else if ($timestamp === null) {
       $timestamp = time();
+   } else if(is_string($timestamp)){
+      $timestamp = new DateTime($timestamp);
+      $timestamp = $timestamp->format("U");
    }
 
    $replacementArray = array(
@@ -359,5 +362,19 @@ function vve_image_cacher($path, $width = null, $height = null, $crop = false){
       $path = Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/'.$path."?hash=". urlencode(crypt($sizes,VVE_DB_PASSWD));
    }
    return $path;
+}
+
+/**
+ * Metoda vrací řetězec v daném jazyce, nebo pokud je prázdný tak ve výchoím
+ * @param array $string
+ */
+function vve_get_lang_string($string)
+{
+   if(isset($string[Locales::getLang()]) && $string[Locales::getLang()] != null){
+      return $string[Locales::getLang()];
+   } else if(isset($string[Locales::getDefaultLang()]) && $string[Locales::getDefaultLang()] != null){
+      return $string[Locales::getDefaultLang()];
+   }
+   return $string;
 }
 ?>

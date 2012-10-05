@@ -82,6 +82,11 @@ abstract class File_Image_Base extends TrObject {
       );
 
    /**
+    * Data s obrázkem
+    */
+   protected $imageData = null;
+   
+   /**
     * Konstruktor třídy
     * @param File $file -- soubor
     */
@@ -232,6 +237,15 @@ abstract class File_Image_Base extends TrObject {
    public function _setFileObj(File $file)
    {
       $this->file = $file;
+   }
+   
+   /**
+    * Vrací interní objekt obrázku podle použité knihovny. Může vracet: gd objekt, imagick
+    * @return mixed
+    */
+   public function getImageDataObj()
+   {
+      return $this->imageData;
    }
 }
 ?>

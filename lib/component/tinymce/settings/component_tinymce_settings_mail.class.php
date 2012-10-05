@@ -29,10 +29,12 @@ class Component_TinyMCE_Settings_Mail extends Component_TinyMCE_Settings_Advance
       $this->settings['relative_urls'] = false;
       $this->settings['remove_script_host'] = false;
       $this->settings['height'] = 600;
-      $this->settings['forced_root_block'] = 'div';
+      $this->settings['forced_root_block'] = 'p';
       $this->settings['theme_advanced_blockformats'] = "p,div,h1,h2,h3,h4,h5,h6,blockquote,code,samp,address";
       $this->settings['theme_advanced_font_sizes'] = "10px,12px,13px,14px,16px,18px,20px,30px,40px";
       $this->settings['style_formats'] = null;
+      $this->settings['extended_valid_elements'] .= ',style[type]';
+      $this->settings['valid_children'] = '+body[style]';
       unset($this->settings['valid_styles']);
    }
    

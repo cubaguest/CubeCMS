@@ -460,6 +460,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       $model->save($record);
       $cache = new Cache();
       $cache->delete(self::getCacheKey());
+      self::loadStruct();
    }
 
    /**

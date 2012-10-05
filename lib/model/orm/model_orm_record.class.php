@@ -190,6 +190,23 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
    {
       return!$this->fromDb;
    }
+   
+   /**
+    * Metoda nastaví že záznam je nový
+    * @return bool
+    */
+   public function setNew()
+   {
+      $this->fromDb = false;
+      foreach ($this->columns as &$col) {
+         $col['changed'] = 1;
+         if($col['pk'] == true){
+            $col['value'] = null;
+         }
+      }
+   }
+   
+   
 
    public function mapArray($array)
    {
@@ -293,6 +310,27 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          return $this->model->save($this);
       }
       return false;
+   }
+
+   /**
+    * Metoda pro serializaci
+    */
+   public function __sleep()
+   {
+      // remove DateTime obj
+      foreach ($this->columns as &$col) {
+         if($col['value'] instanceof DateTime){
+            $col['value'] = $col['value']->format(DATE_ISO8601); 
+         }
+      }
+      // remove DateTime obj
+      foreach ($this->externColumns as &$col) {
+         if($col['value'] instanceof DateTime){
+            $col['value'] = $col['value']->format(DATE_ISO8601); 
+         }
+      }
+      
+      return array('columns', 'externColumns', 'pKeyValue', 'fromDb');
    }
 }
 ?>

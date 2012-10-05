@@ -2,8 +2,8 @@
 /**
  * Soubor se specielními funkcemi, určenými do šablon
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE6.0.0 $Revision: $
+ * @copyright  	Copyright (c) 2008-2012 Jakub Matas
+ * @version    	$Id: $ Cube CMS 7.16 $Revision: $
  * @author        $Author: $ $Date: $
  *                $LastChangedBy: $ $LastChangedDate:  $
  * @abstract 		Funkce
@@ -343,6 +343,38 @@ function ps($string)
       array_shift($args);
       echo htmlspecialchars(vsprintf($string, $args));
    }
+}
+
+/**
+ * Metoda pro výpis řetězce se zakódovanými speciálními html znaky a v jazykové mutaci. 
+ * Pokud je povolena suptituce a daný jazyk je prázdný, vrátí se výchozí jazky položky 
+ * @param string $string 
+ * @param bool - (optional) jesli vypsat výchozí jazyk při neexistenci
+ */
+function ps_lang($string, $allowDefault = VVE_DEFAULT_LANG_SUBSTITUTION) 
+{
+   if(isset($string[Locales::getLang()]) && $string[Locales::getLang()] != null){
+      ps($string[Locales::getLang()]);return;
+   } else if(isset($string[Locales::getDefaultLang()]) && $string[Locales::getDefaultLang()] != null ){
+      ps($string[Locales::getDefaultLang()]);return;
+   }
+   ps($string);
+}
+
+/**
+ * Metoda pro výpis řetězce v jazykové mutaci. 
+ * Pokud je povolena suptituce a daný jazyk je prázdný, vrátí se výchozí jazky položky 
+ * @param string $string 
+ * @param bool - (optional) jesli vypsat výchozí jazyk při neexistenci
+ */
+function p_lang($string, $allowDefault = VVE_DEFAULT_LANG_SUBSTITUTION) 
+{
+   if(isset($string[Locales::getLang()]) && $string[Locales::getLang()] != null){
+      echo ($string[Locales::getLang()]);return;
+   } else if(isset($string[Locales::getDefaultLang()]) && $string[Locales::getDefaultLang()] != null ){
+      echo ($string[Locales::getDefaultLang()]);return;
+   }
+   echo ($string);
 }
 
 /**

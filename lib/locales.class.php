@@ -196,7 +196,7 @@ class Locales extends TrObject {
     */
    public static function getLangsByClient() {
       $retLang = self::getDefaultLang();
-      if(isset ($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
+      if(VVE_ENABLE_LANG_AUTODETECTION && isset ($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
          $clientString = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
          // odstraníme mezery KHTML, webkit
          $clientString = str_replace(" ", "", $clientString);

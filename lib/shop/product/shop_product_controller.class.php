@@ -399,6 +399,30 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->product = $product;
    }
    
+   /**
+    * Meoda pro úpravu produktu
+    * @param $product Model_ORM_Record/urlkey
+    */
+   public function editProductVariants($product)
+   {
+       $model = new Shop_Model_Product();
+      if($product instanceof Model_ORM_Record){
+         $product = $model->newRecord();
+      } else if(is_string($product)){
+         $model->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
+            ->where(Shop_Model_Product::COLUMN_ACTIVE.' = 1 '
+               .'AND '.Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product)
+         );
+         $product = $model->record();
+      } else {
+         $product = $model->newRecord();
+      }
+      
+      if($product == false){
+         return;
+      }
+   }
+
    public function deleteProduct($productId = null)
    {
       if(!$this->rights()->isWritable()){ return; }

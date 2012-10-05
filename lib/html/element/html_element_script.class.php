@@ -26,12 +26,11 @@ class Html_Element_Script extends Html_Element {
 
    /**
     * Metoda vrátí obsah elementu
+    * @todo minifi js
     */
    public function __toStringContent() {
-      $content = "/* <![CDATA[ */\n";
-      $content .= $this->content;
-      $content .= "\n/* ]]> */\n";
-      return $content;
+      return "\n/* <![CDATA[ */\n ".  $this->content." \n/* ]]> */\n"; // html encoded
+      return $this->content;
    }
 }
 ?>

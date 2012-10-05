@@ -499,14 +499,14 @@ abstract class Controller extends TrObject {
       // spuštění kontroleru
       if(method_exists($this, $ctrlAct)) {
          // kontroler obsahuje metodu pro obsluhu
-         try {
+//          try {
             if($this->{$ctrlAct}() === false){
-               throw UnexpectedPageException();
+               throw new UnexpectedPageException();
             }
             $this->view()->runView($this->actionViewer, Template_Output::getOutputType());
-         } catch (UnexpectedPageException $e) {
-            AppCore::setErrorPage(true);
-         }
+//          } catch (UnexpectedPageException $e) {
+//             AppCore::setErrorPage(true);
+//          }
          
       } else if(!empty ($this->registeredModules)) { // pokus spustit kontroller z jiného modulu
          foreach ($this->registeredModules as $module => $params) {
@@ -800,5 +800,7 @@ abstract class Controller extends TrObject {
       }
       $this->view()->form = $form;
    }
+
+   public static function categoryDuplicate(Category_Core $oldCat, Category_Core $newCat) {}
 }
 ?>

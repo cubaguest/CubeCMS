@@ -25,6 +25,18 @@ class Shop_Product_View extends View {
       Template_Module::setEdit(true);
    }
    
+   /**
+    * Metoda vytvoří formulář variant produktu
+    * @param type $product
+    * @return Form 
+    */
+   protected function editProductVariants()
+   {
+      $this->addTinyMCE();
+      $this->template()->addFile("tpl://engine:shop/product_edit_variants.phtml");
+      Template_Module::setEdit(true);
+   }
+   
    private function addTinyMCE() {
       $this->form->text->html()->addClass("mceEditor");
       $this->form->textShort->html()->addClass("mceEditor");
