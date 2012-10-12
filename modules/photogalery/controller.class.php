@@ -153,7 +153,7 @@ class Photogalery_Controller extends Controller {
       $imgId = new Form_Element_Hidden('id');
       $editForm->addElement($imgId);
 
-      $eGoBack = new Form_Element_Checkbox('goBack', $this->tr('Zavřít'));
+      $eGoBack = new Form_Element_Checkbox('goBack', $this->tr('Zavřít po uložení'));
       $eGoBack->setValues(false);
       $editForm->addElement($eGoBack);
 
@@ -302,7 +302,6 @@ class Photogalery_Controller extends Controller {
    public function deletephotoController()
    {
       $this->checkWritebleRights();
-      
       if(isset ($_POST['id'])){
          $this->deleteImage((int)$_POST['id']);
          $this->infoMsg()->addMessage($this->tr('Obrázek byl smazán'));
@@ -315,19 +314,23 @@ class Photogalery_Controller extends Controller {
    private function deleteImage($idImage) 
    {
       $imagesM = new PhotoGalery_Model_Images();
-      $img = $imagesM->getImage($idImage);
+      $img = $imagesM->record($idImage);
+      if(!$img){
+         throw new BadRequestException($this->tr('Tento obrázek neexistuje'));
+      }
+
       // smazání souborů
       $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
               $this->category()->getModule()->getDataDir().$this->subDir.self::DIR_SMALL.DIRECTORY_SEPARATOR);
-      $file->remove();
+      $file->delete();
       $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
               $this->category()->getModule()->getDataDir().$this->subDir.self::DIR_MEDIUM.DIRECTORY_SEPARATOR);
-      $file->remove();
+      $file->delete();
       $file = new Filesystem_File($img->{PhotoGalery_Model_Images::COLUMN_FILE},
               $this->category()->getModule()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
-      $file->remove();
+      $file->delete();
       // remove z db
-      $imagesM->deleteImage($idImage);
+      $imagesM->delete($img);
    }
 
    /**
@@ -336,9 +339,14 @@ class Photogalery_Controller extends Controller {
    public function deleteImages($idArt) 
    {
       $imagesM = new PhotoGalery_Model_Images();
-      $images = $imagesM->getImages($this->category()->getId(), $idArt);
-      while ($image = $images->fetch()) {
-         $this->deleteImage($image->{PhotoGalery_Model_Images::COLUMN_ID});
+      $images = $imagesM->where(PhotoGalery_Model_Images::COLUMN_ID_CAT." = :idc AND ".PhotoGalery_Model_Images::COLUMN_ID_ART." = :ida",
+         array('idc' => $this->category()->getId(), 'ida' => $idArt))->records();
+      foreach ($images as $image) {
+         try {
+            $this->deleteImage($image->{PhotoGalery_Model_Images::COLUMN_ID});
+         } catch (Exception $e) {
+            $this->errMsg()->addMessage($e->getMessage(), true);
+         }
       }
    }
 

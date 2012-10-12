@@ -1,5 +1,5 @@
 <?
-$this->addCssFile("style.css");
+$this->addFile("css://photogalery:style.less");
 
 $model = new Text_Model_Detail();
 $text = $model->getText(Category::getSelectedCategory()->getId());

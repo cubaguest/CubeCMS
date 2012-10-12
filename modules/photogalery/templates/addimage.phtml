@@ -8,8 +8,6 @@ if( ( $w/$h > $ratio)
    || ($w/$h < 1/$ratio)
    || $c == true ){
    $allowClientResize = false;
-//   var_dump('test1: '.($w/$h).' > '.$ratio);
-//   var_dump('test1: '.($w/$h).' < '.(1/$ratio));
 }
 
 ?>
@@ -17,7 +15,7 @@ if( ( $w/$h > $ratio)
    <h2 class="ui-widget-header"><?=$this->tr('Přidání obrázků')?></h2>
    <div class="swfupload-control ui-widget-content">
       <form action="<?=$this->link()?>" method="post">
-         <p><strong><?=$this->tr('Obrázky')?>:</strong>
+         <p class="upload-controll"><strong><?=$this->tr('Nahrát')?>:</strong>
             <span id="spanButtonPlaceholder"></span>
             <button name="upload-button"><?=$this->tr('Vybrat obrázky')?></button>
             &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" <?if($allowClientResize) echo 'checked="checked"';?> /> (<?=$this->tr('Vypněte, pokud obrázky mají širokoúhlý poměr stran')?>)<br /></p>
@@ -25,11 +23,10 @@ if( ( $w/$h > $ratio)
          může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
          Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
       </form>
-      <p><span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span></p>
+      <p class="upload-images-selected"><span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span></p>
       <ol id="upload-files-log"></ol>
    </div>
 </div>
-<br/>
 <script type="text/javascript">
    /* <![CDATA[ */
    $(document).ready(function() {
@@ -112,7 +109,7 @@ if( ( $w/$h > $ratio)
             $('#edit-photos-list').load(location.href+" #edit-photos-list>*","",function(){
                $('#edit-photos-list p.form-link-lang-container a:first-child').trigger('click', false);
                $().piroBox({slideShow : true,slideSpeed : 3});
-               infoMsg('<?=$this->tr('Obrázky byly nahrány')?>');
+               CubeCMS.Msg.info('<?=$this->tr('Obrázky byly nahrány')?>', true);
             });
          }
       });

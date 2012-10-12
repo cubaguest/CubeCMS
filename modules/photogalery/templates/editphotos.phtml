@@ -2,9 +2,7 @@
 $this->addJsPlugin(new JsPlugin_SWFUpload());
 $this->addJsPlugin(new JsPlugin_PiroBox());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
-$this->addFile("css://photogalery:style.css");
-
-
+$this->addFile("css://photogalery:style.less");
 ?>
 <h1><?
    printf($this->tr('Úprava obrázků přiřazených ke "%s"'), $this->name == null ? $this->category()->getName() : $this->name);
@@ -12,25 +10,29 @@ $this->addFile("css://photogalery:style.css");
 <?$this->includeFile('tpl://photogalery:addimage.phtml')?>
 <div class="ui-widget ui-widget-imageslist">
    <h2 class="ui-widget-header"><?=$this->tr('Seznam uložených obrázků')?></h2>
-   <div class="ui-widget-content">
+   <div class="">
       <form method="post" action="<?=$this->link()?>">
          <fieldset class="fieldset-alt">
-         <div style="text-align: right; padding: 10px;">
-            <input id="button-sort-images" type="button" value="<?=$this->tr('Řadit obrázky')?>" 
+         <div class="list-controlls ui-widget-header">
+            <p class="images-counter-wrap">
+               <?=$this->tr('Celkem obrázků:')?>
+               <span class="images-counter"><?=count($this->images)?></span>
+            </p>
+            <input id="button-sort-images" type="button" value="<?=$this->tr('Řadit obrázky')?>"
                    title="<?=$this->tr('upravit řazení obrázků')?>" onclick="window.location.href = '<?=$this->link()->route('sortphotos')->param('b','e')?>'" />
             <input id="button-check-all-images" type="button" value="<?=$this->tr('Změnit označení')?>" title="<?=$this->tr('Změnit označení pro smazání')?>" />
             <?
             echo $this->editForm->save->controll();
             ?>
          </div>
-         <div id="edit-photos-list">
-            <table style="width:100%;">
+         <div id="edit-photos-list" class="ui-widget-content">
+            <table class="full-width">
             <?$step = 0;
             foreach ($this->images as $image) {
                $step++;?>
                <tr id="file-<?=  str_replace('.', '_', $image->{PhotoGalery_Model_Images::COLUMN_FILE})?>"
                    class="ui-state-default">
-               <td style="width: 75px">
+               <td class="photo-preview" style="width: 75px">
                   <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
                .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" class="pirobox_gall" title="<?=$this->tr('Zobrazit náhled')?>"><img
                         src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
@@ -88,12 +90,15 @@ $this->addFile("css://photogalery:style.css");
                      $this->editForm->id->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      $this->editForm->id->setValues($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      echo ($this->editForm->id->controll());?>
+                  <a href="<?=$this->link()?>#delete-image" title="<?=$this->tr('Smazat obrázek')?>"
+                     class="button-delete-image" data-id="<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
+                          ><span class="ui-icon ui-icon-closethick"> </span></a>
                </td>
             </tr>
             <?}?>
          </table>
          </div>
-         <div style="text-align: right; padding: 10px;">
+         <div class="list-controlls ui-widget-header">
             <?
             echo ($this->editForm->goBack->label());
             echo ($this->editForm->goBack->controll());
@@ -103,5 +108,29 @@ $this->addFile("css://photogalery:style.css");
          <?=$this->editForm->scripts()?>
          </fieldset>
       </form>
-   </div>   
+   </div>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('a.button-delete-image').live("click",function(e){
+            var $link = $(this);
+            e.preventDefault();
+            if(confirm('<?=$this->tr('Smazat obrázek?')?>')){
+               $.ajax({
+                  type: "POST",
+                  data : {id : $link.data("id")},
+                  url: '<?=$this->link()->route('deletephoto')?>',
+                  success: function(data) {
+                     if(data.errmsg && data.errmsg.length > 0){
+                        CubeCMS.Msg.show(data);
+                     } else if(data.infomsg && data.infomsg.length > 0){
+                        $link.parents('tr').animate({opacity : 0}, 600, function(){
+                           $(this).remove();
+                        });
+                     }
+                  }
+               });
+            }
+         });
+      });
+   </script>
 </div>

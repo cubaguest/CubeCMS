@@ -2,7 +2,7 @@
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $this->addJsPlugin($jq);
-$this->addFile("css://photogalery:style.css");
+$this->addFile("css://photogalery:style.less");
 ?>
 <h1><?= $this->tr('Úprava pořadí obrázků z').' '.$this->category()->getName();?></h1>
 <div class="main-content-form-edit ui-widget ui-widget-imageslist">
@@ -25,43 +25,42 @@ $this->addFile("css://photogalery:style.css");
       </li>
       <?}?>
    </ul>
-      <hr class="reseter" />   
-   <?
-   echo $this->form->save->controll();
-   
+      <hr class="reseter" />
+      <div class="form-controlls ui-widget ui-widget-header">
+         <? echo $this->form->save->controll(); ?>
+      </div>
+      <?
    echo $this->form->renderEnd();
    ?>
-      <br />
-      <p class="note"><?
-      echo $this->tr('Obrázky lze přesouvat myší. Po správném nastavení pořadí stačí pozice uložit.');
-      ?></p>
+
    </div>
    <script>
-	$(function() {
+      $(function() {
 		$( "#images-sorter ul" ).sortable({
 			placeholder: "ui-state-highlight"
 		});
 		$( "#images-sorter ul" ).disableSelection();
-      
+
       // delete image
       $('.button-delete-image').click(function(e){
          e.preventDefault();
-         // get id
-         var id = $(this).parent('li').find('input.sort_image_id_class').val();
-         var $item = $(this).parent('li');
-         $item.fadeOut(500, function(){
-            // ajax request
-            $.ajax({
-               type: "POST",
-               url: "<?=$this->link()->route('deletephoto')?>",
-               data: {id : id},
-               success: function(msg){
-                  $item.remove();
-               }
+         if(confirm('<?=$this->tr('Smazat obrázek?')?>')){
+            // get id
+            var id = $(this).parent('li').find('input.sort_image_id_class').val();
+            var $item = $(this).parent('li');
+            $item.fadeOut(500, function(){
+               // ajax request
+               $.ajax({
+                  type: "POST",
+                  url: "<?=$this->link()->route('deletephoto')?>",
+                  data: {id : id},
+                  success: function(msg){
+                     $item.remove();
+                  }
+               });
             });
-            
-         });
+         }
       });
-	});
-	</script>
+   });
+   </script>
 </div>

@@ -1,0 +1,103 @@
+/* seznam fotek mazani */
+input.editimage_ord_class { width: 40px;}
+.swfupload-control p { }
+/*.swfupload-control object { z-index: 10 !important; vertical-align: bottom; }*/
+
+#SWFUpload_0 { position: absolute; z-index: 1;}
+.swfupload-control {padding: 5px; margin-bottom: 10px;}
+.ui-widget-upload h2, .ui-widget-imageslist h2 { padding: 2px 5px; }
+.ui-widget-upload {
+   .upload-controll {
+      margin: 10px 0;
+   }
+   .upload-images-selected {
+      font-size: 80%;
+      margin-top: 5px;
+   }
+}
+.ui-widget-upload input[type="checkbox"], .ui-widget-imageslist input[type="checkbox"] { vertical-align: middle;}
+
+
+#upload-files-log {
+   margin:0; padding:0;
+
+   li{
+      list-style-position:inside;
+      margin:2px;
+      border:1px solid #ccc;
+      padding:10px;
+      font-size:12px;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#333;
+      background:#fff;
+      position:relative;
+
+      &.success{ border:1px solid #339933; background:#ccf9b9; }
+      .progressbar { border:1px solid #333; height:5px; background:#fff; overflow: hidden; padding: 0; }
+      .progress { background:#999; width:0%; height:5px; display: block; }
+      span.cancel{ position:absolute; top:5px; right:5px; width:20px; height:20px;
+      background:url('/images/icons/cancel.png') no-repeat; cursor:pointer; }
+   }
+}
+#edit-photos-list {
+   height: 500px;
+   overflow: auto;
+   background-color: whitesmoke;
+
+   table {
+      table-layout: fixed;
+      td {
+         vertical-align: top;
+         padding: 3px;
+         position: relative;
+
+         &.photo-preview { width: 75px; }
+         .button-delete-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+         }
+      }
+      textarea { width: 250px;}
+   }
+}
+ .ui-widget-imageslist {
+    .list-controlls {
+       text-align: right;
+       padding: 5px;
+       .images-counter-wrap {
+          float: left;
+          font-size: 90%;
+          padding-top: 2px;
+       }
+    }
+ }
+
+#images-sorter {
+   padding: 5px;
+
+   ul {
+      list-style: none;
+      list-style-image: none;
+      margin: 0;
+      padding: 0;
+   }
+   li {
+      list-style-image: none;
+      list-style: none;
+      margin: 0px 5px 5px 0;
+      padding: 5px;
+      float: left;
+      width: 70px;
+      height: 70px;
+      position: relative;
+      cursor: move;
+   }
+   .form-controlls {
+      margin-top: 1em;
+      padding: 5px;
+      text-align: right;
+   }
+}
+
+.button-delete-image { position: absolute; top: 0; right: 0; }

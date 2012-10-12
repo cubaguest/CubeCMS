@@ -139,14 +139,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
    }
 
    public function setPosition($id, $pos){
-      $dbc = Db_PDO::getInstance();
-      // provádí se update
-      $dbst = $dbc->prepare("UPDATE ".Db_PDO::table(self::DB_TABLE)
-                 ." SET ".self::COLUMN_ORDER.' = :pos'
-                 ." WHERE ".self::COLUMN_ID." = :id");
-      $dbst->bindParam(':id', $id, PDO::PARAM_INT);
-      $dbst->bindParam(':pos', $pos, PDO::PARAM_INT);
-      return $dbst->execute();
+      return $this->where(self::COLUMN_ID." = :id", array('id' => $id))->update(array(self::COLUMN_ORDER => $pos));
    }
 
    /**
@@ -155,20 +148,12 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @return bool
     */
    public function deleteImage($idImg) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("DELETE FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE (".self::COLUMN_ID ." = :id)");
-      $dbst->bindParam(':id', $idImg, PDO::PARAM_INT);
-      return $dbst->execute();
+      return $this->delete($idImg);
    }
 
    public function getCountImages($idCat, $idArt) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->query("SELECT COUNT(*) FROM ".Db_PDO::table(PhotoGalery_Model_Images::DB_TABLE)
-              ." WHERE (".PhotoGalery_Model_Images::COLUMN_ID_CAT ." = '".$idCat."')"
-              ." AND (".PhotoGalery_Model_Images::COLUMN_ID_ART." = '".$idArt."')");
-      $count = $dbst->fetch();
-      return $count[0];
+      return $this->where(PhotoGalery_Model_Images::COLUMN_ID_CAT ." = :idc AND ".PhotoGalery_Model_Images::COLUMN_ID_ART." = :ida",
+         array('idc' => $idCat, 'ida' => $idArt) )->count();
    }
 
    /**
