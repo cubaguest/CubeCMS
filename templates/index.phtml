@@ -27,9 +27,10 @@ if(VVE_DEBUG_LEVEL > 0){ $this->addFile('css://style-debug.css');}
 Template::addJsPlugin(new JsPlugin_JQuery());
 if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
 } else { $this->addFile('js://enginehelpers.min.js');}
-echo ('<?xml version="1.0" encoding="utf-8"?>');
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
+
+/* START PAGE */ 
+?><!DOCTYPE>
+<html>
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <!-- {*-PAGE_META_TAGS-*}-->
@@ -51,15 +52,17 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
-      <script type="text/javascript">
-         /* <![CDATA[ */
-         document.domain = '<?=Url_Request::getDomain();?>';
-         document.lang = '<?=Locales::getLang()?>';
-         document.primaryLang = '<?=Locales::getDefaultLang()?>';
-         /* ]]> */
-      </script>
       <!-- {*-STYLESHEETS-*} -->
       <!-- {*-JAVASCRIPTS-*} -->
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         CubeCMS.init({
+            domain : '<?=Url_Request::getDomain();?>',
+            lang : '<?=Locales::getDefaultLang()?>',
+            primaryLang : '<?=Locales::getDefaultLang()?>'
+         });
+         /* ]]> */
+      </script>
       <?//Menu styly tady protože se přidává JsPlugin Jquery?>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/smoothmenu/ddsmoothmenu.js">
@@ -205,7 +208,8 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
          }
          ?>
       </div>
-      <?if(defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null){?>
+      <?if(defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null 
+            && !in_array($_SERVER['REMOTE_ADDR'], explode(',', VVE_ANALYTICS_DISABLED_HOSTS))){?>
           <script type="text/javascript">
              /* <![CDATA[ */
              var _gaq = _gaq || [];
