@@ -402,7 +402,7 @@ class AppCore extends TrObject {
    {
       // exceptions
       $exFiles = array('coreException','dbException','badClassException','badFileException',
-         'imageException','badRequestException', 'controllerException', 'UnexpectedPageException');
+         'imageException','badRequestException', 'controllerException', 'UnexpectedPageException', 'ModuleException');
       foreach ($exFiles as $exFile) {
          require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
             . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . $exFile.'.class.php');
@@ -454,6 +454,7 @@ class AppCore extends TrObject {
       // THIS IS FOR UPDATE - move this configs after release is ready to update sql script
       define('VVE_DEFAULT_LANG_SUBSTITUTION', true);
       define('VVE_ANALYTICS_DISABLED_HOSTS', '127.0.0.1');
+      define('VVE_ENABLE_LANG_AUTODETECTION', false);
    }
 
    /**
@@ -721,7 +722,7 @@ class AppCore extends TrObject {
          // přiřazení šablony do výstupu
          $this->getCoreTpl()->module = $controller->_getTemplateObj();
          $this->getCoreTpl()->moduleAction = $controller->routes()->getActionName();
-      } catch (Exception $e) {
+      } catch (ModuleException $e) {
          CoreErrors::addException($e);
       }
    }
@@ -1183,19 +1184,27 @@ class AppCore extends TrObject {
          // Globální inicializace proměných do šablony
          $this->initialWebSettings();
          
-         if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND !AppCore::isErrorPage()) {
-            // zpracovávní modulu
-            $this->runModule();
-         } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST AND !AppCore::isErrorPage()) {
-            // zpracovávní modulu ve static
-            $this->runModuleStatic(true);
+         try {
+            if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND !AppCore::isErrorPage()) {
+               // zpracovávní modulu
+               $this->runModule();
+            } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST AND !AppCore::isErrorPage()) {
+               // zpracovávní modulu ve static
+               $this->runModuleStatic(true);
+            }
+            
+            if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE
+                 OR AppCore::isErrorPage()) {
+               // zpracování stránky enginu (sitemap, rss, error, atd.)
+               $this->runCoreModule();
+            }
+         } catch (UnexpectedPageException $e) {
+            AppCore::setErrorPage(true);
+            $this->runCoreModule();
+         } catch (Exception $e) {
+            CoreErrors::addException($e);
          }
 
-         if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE
-                 OR AppCore::isErrorPage()) {
-            // zpracování stránky enginu (sitemap, rss, error, atd.)
-            $this->runCoreModule();
-         }
          //vytvoření hlavního menu
          $this->createMenus();
          try {
@@ -1204,7 +1213,6 @@ class AppCore extends TrObject {
          } catch (Exception $exc) {
             CoreErrors::addException($exc);
          }
-
 
          //	Přiřazení hlášek do šablony
          $this->assignMessagesToTpl();
