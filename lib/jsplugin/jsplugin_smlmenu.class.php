@@ -12,7 +12,8 @@
 
 class JsPlugin_SMLMenu extends JsPlugin {
 	protected function initJsPlugin() {
-      $this->setJsPluginName('jquerysmlmenu');
+//      $this->setJsPluginName('jquerysmlmenu');
+      $this->setJsFilesDir('jquerysmlmenu');
 	}
 	
 	protected function setFiles() {

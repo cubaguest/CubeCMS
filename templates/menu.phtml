@@ -1,25 +1,40 @@
 <?
 if(!Template::browser()->isMobile()){
+   // add js
+   $js = new JsPlugin_SuperfishMenu();
+   $this->addJsPlugin($js);
+
    // funkce pro render menu
    function vveMenuRenderFunc($menuArr, $link) {
-      print ("<ul>\n");
       foreach ($menuArr as $key => $item) {
-         print ("<li>");
-         print ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
+         echo ("<li>");
+         echo ('<a href="'.$link->clear()->category($item->getCatObj()->getUrlKey()).'">'
              .$item->getCatObj()->getLabel().'</a>'."");
          if(!$item->isEmpty()){
+            echo ("<ul>\n");
             vveMenuRenderFunc($item, $link);
+            echo ("</ul>\n");
          }
-         print ("</li>\n");
+         echo ("</li>\n");
       }
-      print ("</ul>\n");
    }
 ?>
 <!-- Halvni menu sekce v menu  -->
-<div id="smoothmenu1" class="ddsmoothmenu">
+<ul class="sf-menu clearfix">
    <?=vveMenuRenderFunc($this->menu, $this->link())?>
-   <br style="clear: left" />
-</div>
+</ul>
+<script type="text/javascript">
+   $(document).ready(function(){
+      $('ul.sf-menu').supersubs({
+         minWidth: 12, maxWidth: 27, extraWidth: 1
+      }).superfish({
+         delay: 500,
+         speed: 200,
+         animation:   {height:'show'}
+      });
+   });
+
+</script>
 
 <?} else {
    // mobile version

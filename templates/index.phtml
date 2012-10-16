@@ -54,33 +54,6 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
       <![endif]-->
       <!-- {*-STYLESHEETS-*} -->
       <!-- {*-JAVASCRIPTS-*} -->
-      <script type="text/javascript">
-         /* <![CDATA[ */
-         CubeCMS.init({
-            domain : '<?=Url_Request::getDomain();?>',
-            lang : '<?=Locales::getDefaultLang()?>',
-            primaryLang : '<?=Locales::getDefaultLang()?>'
-         });
-         /* ]]> */
-      </script>
-      <?//Menu styly tady protože se přidává JsPlugin Jquery?>
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('ddsmoothmenu.css')?>" />
-      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir(true)?>jscripts/smoothmenu/ddsmoothmenu.js">
-         /***********************************************
-          * Smooth Navigational Menu- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
-          * This notice MUST stay intact for legal use
-          * Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
-          ***********************************************/
-      </script>
-      <script type="text/javascript">
-         /* <![CDATA[ */
-         ddsmoothmenu.init({
-            mainmenuid: "smoothmenu1",
-            orientation: "h",
-            classname: "ddsmoothmenu",
-            contentsource: "markup"});
-         /* ]]> */
-      </script>
       <? // admin nessesary files
       if(Category::getSelectedCategory()->getRights()->isWritable()){
          $this->addFile('css://style-admin.css');

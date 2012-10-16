@@ -405,5 +405,17 @@ class JsPlugin_JQuery extends JsPlugin {
       return $this;
    }
 
+   /**
+    * Metoda přidá plugin ()
+    * @param string -- název pluginu
+    * @param string -- cesta pluginu
+    * @return JsPlugin_JQuery
+    * @todo -- dodělat načítání podle cesty
+    */
+   public function addJQPlugin($name, $path = null) {
+      $this->addFile(new JsPlugin_JsFile("plugins/jquery.".$name.".min.js"));
+      return $this;
+   }
+
 }
 ?>
