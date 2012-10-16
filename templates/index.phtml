@@ -60,6 +60,15 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
          if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
       }
       ?>
+      <script type="text/javascript">
+         /* <![CDATA[ */
+         CubeCMS.init({
+            domain : '<?=Url_Request::getDomain();?>',
+            lang : '<?=Locales::getDefaultLang()?>',
+            primaryLang : '<?=Locales::getDefaultLang()?>'
+         });
+         /* ]]> */
+      </script>
    </head>
    <body id="pageTop" class="<?
          echo " module-".Category::getSelectedCategory()->getModule()->getName();
