@@ -1,0 +1,46 @@
+<?
+$this->addJsPlugin(new JsPlugin_JQuery());
+$css = new JsPlugin_JQueryCSS();
+$css->addUITabs();
+$this->addJsPlugin($css);
+?>
+<div class="module-navigation-container ui-tabs ui-widget ui-widget-content ui-corner-all">
+<ul class="module-navigation ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+<?
+$curLink = new Url_Link();
+$curLink = (string)$curLink;
+foreach ($this->items as $name => $link) {
+   $icon = null;
+   $hidden = false;
+   if(is_array($link)){
+      $hidden = true;
+      $icon = $link['icon'];
+      $link = $link['link'];
+   }
+   ?>
+   <li class="module-navigation-tab ui-state-default ui-corner-top <?
+   if($hidden) echo "module-navigation-tab-hidden"; 
+   if($curLink == (string)$link) echo 'module-navigation-tab-selected ui-tabs-selected ui-state-active';?>"
+       ><a href="<?=$link?>" title="<?=$this->tr('Přejít na').' '.$name?>"><?
+   if($icon != null){?><img src="<?=vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>"
+               alt="icon <?=$icon?>" /><?}?><span><?=$name?></span></a></li>
+<?
+}
+?>
+</ul>
+</div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $('.module-navigation-tab-hidden').not('.module-navigation-tab-selected').find('span').css('display', 'none');
+   $(document).ready(function(){
+      $('.module-navigation-tab-hidden').hover(function(){
+         if($(this).hasClass('module-navigation-tab-selected')) return;
+         $(this).find('span').css('display', 'inline');
+
+      }, function(){
+         if($(this).hasClass('module-navigation-tab-selected')) return;
+         $(this).find('span').css('display', 'none');
+      });
+   });
+   /* ]]> */
+</script>
