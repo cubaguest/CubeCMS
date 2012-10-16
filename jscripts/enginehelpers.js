@@ -55,6 +55,7 @@ CubeCMS.Msg = {
          this.clear('info');
       }
       this.infoBox.prepend("<p>"+msg+"</p>").slideDown();
+      $("body").scrollTop(this.infoBox.offset().top-50);
       return this;
    },
    err : function(msg, clear){
@@ -64,6 +65,7 @@ CubeCMS.Msg = {
          this.clear('err');
       }
       this.errBox.prepend("<p>"+msg+"</p>").slideDown();
+      $("body").scrollTop(this.errBox.offset().top-50);
       return this;
    },
    /**
@@ -86,7 +88,6 @@ CubeCMS.Msg = {
       } else if(typeof(dataObj.infomsg) == 'string'){
          this.err(dataObj.errmsg);
       }
-      
    },
    /**
     * Vymaže info zprávy
@@ -205,12 +206,12 @@ CubeCMS.Images = {
             }
          };
          cacheImage.src = src;
-      },
+      }
 };
 
 CubeCMS.Loader = {
    timeout : 10000,
-   loaderCnt : '<div id="loadingBox" class="loadingBox"><div class="loader-w"><span class="loader-text">loading...</span></div>',
+   loaderCnt : '<div id="loadingBox" class="loadingBox"><div class="loader-w"><span class="loader-text">{MSG}</span></div>',
    loadBoxClass : "loadingBox",
    
    init : function(){
@@ -221,10 +222,13 @@ CubeCMS.Loader = {
       
    },
    
-   showLoadBox : function(box){
+   showLoadBox : function(box, msg){
+      if(typeof(msg) == "undefined" ){
+         msg = "loading...";
+      }
       var rId = 'loadingBox-'+ (Math.floor( Math.random(0)*10000 ) );
       var parentBox = $(box).parent('div,p');
-      var overBox = $(this.loaderCnt)
+      var overBox = $(this.loaderCnt.replace('{MSG}', msg))
       .addClass(this.loadBoxClass)
       .attr('id', rId)
       .css({
@@ -237,7 +241,10 @@ CubeCMS.Loader = {
          height : parentBox.height()+parseInt(parentBox.css('padding-top'))+parseInt(parentBox.css('padding-bottom'))
          +parseInt(parentBox.css('margin-top'))+parseInt(parentBox.css('margin-bottom'))
       });
-      parentBox.css('position', 'relative').prepend(overBox.hide());
+      if(parentBox.css('position') != "absolute" && parentBox.css('position') != "relative"){
+         parentBox.css('position', 'relative');
+      }
+      parentBox.prepend(overBox.hide());
       overBox.fadeTo(500, 1);
       var _loader = this;
       setTimeout(function() { _loader.hideLoadBox(rId); }, this.timeout); // zavření
@@ -245,6 +252,8 @@ CubeCMS.Loader = {
    hideLoadBox : function(id){
       if(typeof(id) == "undefined"){
          $('.'+this.loadBoxClass).remove();
+      } else if(id instanceof jQuery){
+         id.parent('div,p').find('.'+this.loadBoxClass).remove();
       } else {
          $('#'+id).remove();
       }
