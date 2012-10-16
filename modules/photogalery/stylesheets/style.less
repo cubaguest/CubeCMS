@@ -40,9 +40,12 @@ input.editimage_ord_class { width: 40px;}
    }
 }
 #edit-photos-list {
-   height: 500px;
    overflow: auto;
    background-color: whitesmoke;
+
+   &.edit-photos-list-short {
+      height: 500px;
+   }
 
    table {
       table-layout: fixed;
@@ -51,11 +54,28 @@ input.editimage_ord_class { width: 40px;}
          padding: 3px;
          position: relative;
 
-         &.photo-preview { width: 75px; }
+         &.photo-preview {
+            width: 75px;
+            img {
+               display: block;
+               margin-bottom: 5px;
+            }
+         }
+
+         &.photo-select {
+            width: 20px;
+            vertical-align: middle;
+            text-align: center;
+         }
+
          .button-delete-image {
             position: absolute;
             top: 5px;
             right: 5px;
+         }
+
+         .photo-name-controll {
+            margin-bottom: 10px;
          }
       }
       textarea { width: 250px;}
@@ -71,6 +91,13 @@ input.editimage_ord_class { width: 40px;}
           padding-top: 2px;
        }
     }
+    .button-toggle-all {
+       float: left;
+    }
+ }
+
+ .ui-dialog-rotate {
+    margin: 10px 5px;
  }
 
 #images-sorter {

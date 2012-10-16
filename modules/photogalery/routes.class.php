@@ -17,13 +17,15 @@ class Photogalery_Routes extends Routes {
       }
       
       $this->addRoute('editphoto', $reg."editphotos/editphoto-::id::", 'editphoto', $replace."editphotos/editphoto-{id}/");
-      
+
       $this->addRoute('editphotos', $reg."editphotos/", 'editphotos', $replace."editphotos/");
       $this->addRoute('sortphotos', $reg."sortphotos/", 'sortphotos', $replace."sortphotos/");
       $this->addRoute('deletephoto', "deletephoto.php", 'deletephoto', "deletephoto.php", 'XHR_Respond_VVEAPI');
 
       $this->addRoute('uploadFile', $reg."uploadFile.php", 'uploadFile', $replace.'uploadFile.php', "XHR_Respond_VVEAPI");
       $this->addRoute('checkFile', $reg."checkFile.php", 'checkFile', $replace.'checkFile.php', "XHR_Respond_VVEAPI");
+      $this->addRoute('cropThumb', $reg."cropThumb.php", 'cropThumb', $replace.'cropThumb.php', "XHR_Respond_VVEAPI");
+      $this->addRoute('imageRotate', $reg."imageRotate.php", 'imageRotate', $replace.'imageRotate.php', "XHR_Respond_VVEAPI");
 
       // tohle odstranit!!!
       $this->addRoute('edittext', "edittext", 'edittext','edittext/');

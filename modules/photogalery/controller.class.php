@@ -140,7 +140,7 @@ class Photogalery_Controller extends Controller {
       $editForm->addElement($imgName);
       $imgOrd = new Form_Element_Text('ord', $this->tr('Pořadí'));
       $editForm->addElement($imgOrd);
-      $imgRotation = new Form_Element_Select('rotate', $this->tr('Otočit do leva'));
+      $imgRotation = new Form_Element_Select('rotate', $this->tr('Otočit'));
       $imgRotation->setOptions(array('0°' => 0, '90°' => 90, '180°' => 180, '270°' => 270));
       $imgRotation->setValues(0);
       $editForm->addElement($imgRotation);
@@ -477,6 +477,86 @@ class Photogalery_Controller extends Controller {
        // adresáře k fotkám
       $this->view()->subdir = $this->subDir;
       $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->subDir);
+   }
+
+   public function cropThumbController()
+   {
+      $this->checkWritebleRights();
+
+      if(!isset($_POST['id']) || !isset($_POST['x']) || !isset($_POST['y']) || !isset($_POST['w']) || !isset($_POST['h']) ){
+         throw new BadRequestException($this->tr('Nebyly předány všechny potřebné parametry'));
+      }
+
+      $id = (int)$this->getRequestParam('id');
+      $x = (int)$this->getRequestParam('x');
+      $y = (int)$this->getRequestParam('y');
+      $w = (int)$this->getRequestParam('w');
+      $h = (int)$this->getRequestParam('h');
+
+      $m = new PhotoGalery_Model_Images();
+      $imageRec = $m->record( $id );
+
+      if(!$imageRec){
+         throw new BadRequestException($this->tr('Zadaný obrázek neexistuje'));
+      }
+
+      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
+         $this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM.DIRECTORY_SEPARATOR );
+
+      $image
+         ->copy($this->module()->getDataDir().$this->subDir.self::DIR_SMALL.DIRECTORY_SEPARATOR, true, null, false)
+         ->getData()
+         ->crop($x, $y, $w, $h)
+         ->resize(
+            $this->category()->getParam('small_width',VVE_IMAGE_THUMB_W),
+            $this->category()->getParam('small_height',VVE_IMAGE_THUMB_H),
+            File_Image_Base::RESIZE_EXACT
+      )->save();
+      $this->infoMsg()->addMessage($this->tr('Miniatura byla vytvořena'));
+   }
+
+   public function imageRotateController()
+   {
+      $this->checkWritebleRights();
+
+      if(!isset($_POST['id']) || !isset($_POST['degree']) ){
+         throw new BadRequestException($this->tr('Nebyly předány všechny potřebné parametry'));
+      }
+
+
+      $id = (int)$this->getRequestParam('id');
+      $degree = (int)$this->getRequestParam('degree');
+
+      if($degree == 0){
+         throw new BadRequestException($this->tr('Nelze otáčet o 0 stupňů'));
+         return;
+      }
+      $m = new PhotoGalery_Model_Images();
+      $imageRec = $m->record( $id );
+
+      if(!$imageRec){
+         throw new BadRequestException($this->tr('Zadaný obrázek neexistuje'));
+      }
+      // rotate original
+      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
+         $this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR );
+
+      // rotate medium
+      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
+         $this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM.DIRECTORY_SEPARATOR );
+      $image->getData()->rotate($degree)->save();
+
+      // create thumbnail
+      $thumb = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_SMALL.DIRECTORY_SEPARATOR, true, null, false);
+      $crop = $this->category()->getParam('small_crop', VVE_IMAGE_THUMB_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+
+      $thumb->getData()->resize(
+         $this->category()->getParam('small_width',VVE_IMAGE_THUMB_W),
+         $this->category()->getParam('small_height',VVE_IMAGE_THUMB_H),
+         $crop
+      )->save();
+
+      $this->infoMsg()->addMessage($this->tr('Obrázek byl otočen'));
    }
 
    protected function resizeImages($w, $h, $crop, $dir = self::DIR_MEDIUM)
