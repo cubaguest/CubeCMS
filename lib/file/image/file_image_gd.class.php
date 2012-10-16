@@ -14,7 +14,7 @@
 class File_Image_Gd extends File_Image_Base {
    /**
     * Data s obrázkem
-    * @var type 
+    * @var resource
     */
    protected $imageData = null;
 
@@ -22,7 +22,10 @@ class File_Image_Gd extends File_Image_Base {
    {
       $this->loadImageData();
       
-      $tempImg = imagecreatetruecolor($w, $h); 
+      $tempImg = imagecreatetruecolor($w, $h);
+      imagealphablending($tempImg, false);
+      imagesavealpha($tempImg, true);
+
       imagecopyresampled($tempImg, $this->imageData, 0, 0, $x, $y, $w, $h, $w, $h);
       $this->imageData = $tempImg;
       

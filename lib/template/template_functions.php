@@ -17,10 +17,10 @@ function vve_get_tpl_file($file, $type) {
       default:
          if(file_exists(AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR
          .Template::face().DIRECTORY_SEPARATOR.Template::IMAGES_DIR.DIRECTORY_SEPARATOR.$file)) {
-            return Template::FACES_DIR.URL_SEPARATOR.Template::face().URL_SEPARATOR
+            return '/'.Template::FACES_DIR.URL_SEPARATOR.Template::face().URL_SEPARATOR
                     .Template::IMAGES_DIR.URL_SEPARATOR.$file;
          } else {
-            return Template::IMAGES_DIR.URL_SEPARATOR.$file;
+            return '/'.Template::IMAGES_DIR.URL_SEPARATOR.$file;
          }
          break;
    }
