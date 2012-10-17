@@ -10,6 +10,8 @@ if($this->edit) {
    $h1 = $this->tr('přidání události');
 }
 // donastavení formuláře
+$this->form->send->cancel->html()->addClass('cancel')->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
+$this->form->send->preview->html()->addClass('exclusive');
 $this->form->name->html()->setAttrib('size', 60);
 $this->form->subname->html()->setAttrib('size', 60);
 $this->form->author->html()->setAttrib('size', 60);
@@ -26,7 +28,12 @@ $this->addJsPlugin($jQuery);
 ?>
 <h1><?=$h1?></h1>
 <div class="main-content-form-edit" id="editArticleForm">
-   <?
+   <?if($this->previewLink){?>
+   <div class="message message-info message-warning"><?
+      printf($this->tr('Máte již vytvořenu starší verzi dokumentu. Chcete ji <a href="%s"><strong>otevřít</strong></a> nebo <a href="%s"><strong>zrušit</strong></a>?'),
+         $this->previewLink, $this->previewLinkCancel);
+      ?></div>
+   <?}
    echo($this->form);
    $this->includeFile('tpl://engine:parts/seltitleimage.phtml');
    ?>

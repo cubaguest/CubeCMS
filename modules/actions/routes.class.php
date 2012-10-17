@@ -5,6 +5,8 @@ class Actions_Routes extends Routes {
       $this->addRoute('add', "add", 'add', "add/");
       // archiv akcí
       $this->addRoute('archive', "archive", 'archive', "archive/");
+      // preview
+      $this->addRoute('preview', "(?P<id>[0-9]+)/preview", 'preview', "{id}/preview/");
       // akce podle datumů
       $this->addRoute('normaldate',  "(?:(?P<day>[0-3]?[0-9]{1})/(?P<month>[0-1]?[0-9]{1})/(?P<year>[0-9]{4}))?", 'main','{day}/{month}/{year}/');
       // editace akce
@@ -20,8 +22,7 @@ class Actions_Routes extends Routes {
       $this->addRoute('detail', "::urlkey::", 'show','{urlkey}/');
       // export článku
       $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml))", 'showData','{urlkey}.{output}');
-      // list akcí
-      $this->addRoute('normal', null, 'main', null);
+      
    }
 }
 

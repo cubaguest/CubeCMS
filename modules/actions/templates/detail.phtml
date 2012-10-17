@@ -8,13 +8,13 @@ if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
 }
 
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model::COLUMN_NAME}?></h1>
+<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); ps_lang($this->action->{Actions_Model::COLUMN_NAME})?></h1>
 <div class="post">
    <?if($this->action->{Actions_Model::COLUMN_SUBANME} != null) {?>
-   <div class="text subname"><?=$this->action->{Actions_Model::COLUMN_SUBANME}?></div>
+   <div class="text subname"><?p_lang($this->action->{Actions_Model::COLUMN_SUBANME})?></div>
    <?}?>
    <?if($this->action->{Actions_Model::COLUMN_AUTHOR} != null) {?>
-   <div class="text author"><?=$this->action->{Actions_Model::COLUMN_AUTHOR}?></div>
+   <div class="text author"><?p_lang($this->action->{Actions_Model::COLUMN_AUTHOR})?></div>
       <?}?>
    <div class="text info">
       <?
@@ -41,21 +41,22 @@ if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
       ?>
    </div>
    <?if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
-   <div class="text note"><?=$this->action->{Actions_Model::COLUMN_NOTE}?></div>
+   <div class="text note"><?p_lang($this->action->{Actions_Model::COLUMN_NOTE})?></div>
       <?}?>
    <?if($image != null) {?><div class="title-image"><?echo $image;?></div><?}?>
    <div class="text">
-   <?=$this->action->{Actions_Model::COLUMN_TEXT}?>
+   <?p_lang($this->action->{Actions_Model::COLUMN_TEXT})?>
    </div>
    <hr class="reseter" />
    <?
    echo $this->dForm;
    
-   if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){
+   if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false) && $this->isPreview == null){
       $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));
    }
    ?>
-   <?$this->includeTpl('articletools.phtml', true, array(
+   <?
+   $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),

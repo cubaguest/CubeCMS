@@ -41,10 +41,30 @@ class Actions_View extends View {
          $this->addBaseToolBox();
       }
       $this->addMetaTags($this->action);
-      $this->template()->addTplFile("detail.phtml");
+      $this->template()->addFile("tpl://detail.phtml");
       Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link());
    }
 
+   public function previewView() {
+      $this->addMetaTags($this->action);
+      $this->template()->addFile("tpl://detail.phtml");
+      $this->template()->addFile('tpl://actions:previewform.phtml');
+      // remove not necessary items
+      $this->toolbox = new Template_Toolbox2();
+      $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->action->{Actions_Model::COLUMN_URLKEY});
+      $this->toolbox->addTool($toolLangLoader);
+      
+      $this->articleTools = false;
+      $this->isPreview = true;
+      if($this->action->isNew()){
+         Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link()->route('add')->param('tmp', true));
+      } else {
+         Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link()
+            ->route('detail', array('urlkey' => $this->action->{Actions_Model::COLUMN_URLKEY})) );
+      }
+      Template_Navigation::addItem($this->tr('Náhled'), $this->link());
+   }
+   
    protected function createDetailToolbox() {
       if($this->category()->getRights()->isControll() OR
               ($this->category()->getRights()->isWritable() AND
@@ -96,7 +116,7 @@ class Actions_View extends View {
 //      }
       Template_Core::setMetaTag('author', $action->{Model_Users::COLUMN_USERNAME});
       if ($action->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-         Template_Core::setMetaTag('og:image', vve_tpl_art_title_image($action->{Actions_Model_Detail::COLUMN_IMAGE}));
+         Template_Core::setCoverImage(vve_tpl_art_title_image($action->{Actions_Model_Detail::COLUMN_IMAGE}));
       } else if((string)$action->{Actions_Model_Detail::COLUMN_TEXT} != null){
          // zkusit načíst kvůli meta tagům
          $doc = new DOMDocument();
@@ -105,9 +125,9 @@ class Actions_View extends View {
          $images = $xml->xpath('//img');
          if(!empty ($images) && isset ($images[0])){
             if(strpos($images[0]['src'], 'http') !== false ){
-               Template_Core::setMetaTag('og:image', $images[0]['src']);
+               Template_Core::setCoverImage($images[0]['src']);
             } else {
-               Template_Core::setMetaTag('og:image', Url_Request::getBaseWebDir(false).$images[0]['src']);
+               Template_Core::setCoverImage(Url_Request::getBaseWebDir(false).$images[0]['src']);
             }
          }
       }
@@ -245,10 +265,10 @@ class Actions_View extends View {
       $api->flush();
    }
    /**
-    * Viewer pro editaci novinky
+    * Viewer pro editaci 
     */
    public function editView() {
-      $this->addTinyMCE();
+      $this->setTinyMCE($this->form->text, 'advanced');
       $this->template()->addFile('tpl://actions:edit.phtml');
       Template_Module::setEdit(true);
       if($this->action != null){
@@ -298,7 +318,7 @@ class Actions_View extends View {
    }
 
    public function editLabelView() {
-      $this->addTinyMCE();
+      $this->setTinyMCE($this->form->text, 'advanced');
       $this->template()->addFile('tpl://actions:editlabel.phtml');
    }
 }

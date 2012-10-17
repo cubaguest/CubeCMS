@@ -1,0 +1,17 @@
+<? 
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<div class="content-edit-form">
+   <?
+   $this->formPreview->action->back->html()->addClass('button-cancel');
+   echo $this->formPreview;
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('select[name="lang"]').change(function(){
+            var url = '<?=$this->link()?>?l='+$(this).val()+' #main-content>*';
+            $('#main-content').load(url);
+         });
+      });
+   </script>
+</div>

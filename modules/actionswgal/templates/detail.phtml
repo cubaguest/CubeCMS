@@ -61,9 +61,10 @@ echo $this->toolbox;
    <hr class="reseter" />
    <?
    $this->includeFile("tpl://forms:snipshet.phtml");
-   
-   $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));?>
-   <?$this->includeTpl('articletools.phtml', true, array(
+   if($this->isPreview == false){
+      $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));
+   }
+   $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),

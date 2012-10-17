@@ -92,8 +92,8 @@ class Actions_Model extends Model_ORM {
    
    public function featuredOnly($idc)
    {
+      // AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
       return $this->where(self::COLUMN_ID_CAT." = :idc AND (".self::COLUMN_PUBLIC." = 1) 
-         AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)
          AND 
          (
             (".self::COLUMN_DATE_START." >= CURDATE() AND ".self::COLUMN_TIME." IS NOT NULL )
