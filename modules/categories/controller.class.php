@@ -58,8 +58,40 @@ class Categories_Controller extends Controller {
          $this->log('Smazána kategorie :"' . $cat->{Model_Category::COLUMN_CAT_LABEL} . '"');
          $this->gotoBack();
       }
-
+      // načtení struktury
       $structure = Category_Structure::getStructure(Category_Structure::ALL);
+      
+      $formCopy = new Form('cat_copy_');
+      $elemIdCat = new Form_Element_Hidden('id');
+      $elemIdCat->addValidation(new Form_Validator_NotEmpty());
+      $formCopy->addElement($elemIdCat);
+      
+      $elemTarget = new Form_Element_Select('target_id', $this->tr('Kopírovat do'));
+      $this->catsToArrayForForm($structure);
+      $elemTarget->setOptions($this->categoriesArray);
+      $formCopy->addElement($elemTarget);
+      
+      $elemName = new Form_Element_Text('name', $this->tr('Nový název'));
+      $elemName->setLangs();
+      $elemName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
+      $formCopy->addElement($elemName);
+      
+      $formSubmit = new Form_Element_Submit('copy', $this->tr('Kopírovat'));
+      $formCopy->addElement($formSubmit);
+      
+      if($formCopy->isValid()){
+         $this->copyCategory(
+               $formCopy->id->getValues(), 
+               $formCopy->target_id->getValues(), 
+               $formCopy->name->getValues());
+         $this->infoMsg()->addMessage($this->tr('Kategorie byla kopírována'));
+         $this->link()->reload();
+         $structure = Category_Structure::getStructure(Category_Structure::ALL);
+      } else if($formCopy->isSend()){
+         $this->view()->showCopyDialog = true;
+      }
+      
+      $this->view()->formCopy = $formCopy;
       $this->view()->structure = $structure;
    }
 
@@ -174,6 +206,7 @@ class Categories_Controller extends Controller {
             } else {
                $urlkey[$lang] = vve_cr_url_key(strtolower($variable), false);
             }
+            $urlkey[$lang] = self::createUniqueUrlKey($urlkey[$lang], $lang, $record->{Model_Category::COLUMN_ID});
          }
          
          // regenerace klíčů kategorií
@@ -312,6 +345,7 @@ class Categories_Controller extends Controller {
             } else {
                $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($variable), false);
             }
+            $urlkey[$lang] = self::createUniqueUrlKey($urlkey[$lang], $lang);
          }
 
          // zjištění jestli je možné vytvoři feedy
@@ -871,7 +905,7 @@ class Categories_Controller extends Controller {
       
    }
 
-         /**
+   /**
     * Meoda vrátí pole s kategoriema, které jsou potomky upravované kategorie (včetně upravované kategorie)
     * @param Category_Structure $category
     * @return <type>
@@ -897,9 +931,6 @@ class Categories_Controller extends Controller {
    private function repairUrlKeys(Model_Category $model, Category_Structure $category, $parentUrlKeys = array())
    {
       $record = $category->getCatObj()->getCatDataObj();
-//      var_dump($parentUrlKeys);
-//      echo 'old url keys<br />';
-//      var_dump($record[Model_Category::COLUMN_URLKEY]);
       // jednotlivé jazyky
       foreach ($parentUrlKeys as $lang => $parentKey) {
          $lastpos = strrpos($record[Model_Category::COLUMN_URLKEY][$lang], '/');
@@ -932,7 +963,6 @@ class Categories_Controller extends Controller {
       
    }
 
-
    private function getVisibilityTypes()
    {
       return array(
@@ -943,6 +973,87 @@ class Categories_Controller extends Controller {
          Model_Category::VISIBILITY_WHEN_LOGIN => $this->tr('Pouze přihlášeným'),
          Model_Category::VISIBILITY_WHEN_NOT_LOGIN => $this->tr('Pouze nepřihlášeným'),
       );
+   }
+   
+   /**
+    * Metoda pro kopírování kategorie
+    * @param int $idCat
+    * @param int $idParent
+    * @param array $names -- pole řetězců s jazyky
+    */
+   protected function copyCategory($idCat, $idParent, $names)
+   {
+      // načteme původní kategorii a duplikace
+      $model = new Model_Category();
+      $cat = $model->record($idCat);
+      $originalCat = clone $cat;
+      $cat->setNew();
+      $structure = Category_Structure::getStructure(Category_Structure::ALL);
+   
+      // cesta k rodiči
+      $path = $structure->getPath($idParent);
+      // poslední potomek
+      $p = end($path);
+   
+      // nastavení nového jména
+      $cat->{Model_Category::COLUMN_NAME} = $names;
+   
+      // generování nového url klíče
+      $urlkey = array();
+      foreach ($names as $lang => $name) {
+         // klíč podkategorií
+         $urlPath = null;
+         // pokud se vkládá do kořenu. Kořen nemá kategorii
+         if ($idParent != 0 && $p != null && $p->getCatObj() !== null) {
+            $catObj = $p->getCatObj()->getCatDataObj();
+            $urlPath = $catObj[Model_Category::COLUMN_URLKEY][$lang];
+         }
+         if ($urlPath != null)
+            $urlPath .= URL_SEPARATOR;
+   
+         if ($name == null) {
+            $urlkey[$lang] = null;
+         } else {
+            $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($name), true);
+         }
+         $urlkey[$lang] = self::createUniqueUrlKey($urlkey[$lang], $lang);
+      }
+      $cat->{Model_Category::COLUMN_DATADIR} = vve_cr_safe_file_name($names[Locales::getDefaultLang()]);
+      $cat->{Model_Category::COLUMN_URLKEY} = $urlkey;
+   
+      // uložení kategorie a zažazení do stromu
+      $cat->save();
+      $structure->addChild(new Category_Structure($cat->getPK()), $idParent );
+      $structure->saveStructure();
+   
+      // duplikace práv
+      $modelRights = new Model_Rights();
+      $curRights = $modelRights->where(Model_Rights::COLUMN_ID_CATEGORY." = :idc", array('idc' => $idCat))->records();
+      if($curRights){
+         foreach ($curRights as $right) {
+            $right->setNew();
+            $right->{Model_Rights::COLUMN_ID_CATEGORY} = $cat->getPK();
+            $right->save();
+         }
+      }
+   
+      // spuštění metody kontroleru pro duplikování kategorie Controller::categoryDuplicate
+      $class = ucfirst($cat->{Model_Category::COLUMN_MODULE})."_Controller";
+      $class::categoryDuplicate(new Category(null, false, $originalCat), new Category(null, false, $cat));
+   }
+    
+   /**
+    * Metoda pro generování unikátního url klíče v db
+    * @param string $urlkey
+    * @param string $lang
+    * @param mixed $sufix
+    * @return string
+    *
+    * @todo implementovat a zařadit k použití
+    */
+   protected static function createUniqueUrlKey($urlkey, $lang, $excludeID = false, $sufix = null)
+   {
+      return $urlkey;
    }
 }
 ?>

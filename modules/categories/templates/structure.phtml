@@ -1,6 +1,8 @@
 <?
 $this->addCssFile("style.css");
-$this->addJsPlugin(new JsPlugin_JQuery());
+$jq = new JsPlugin_JQuery();
+$jq->addUIDialog();
+$this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addJsPlugin(new JsPlugin_JsTree());
 
@@ -18,7 +20,6 @@ function vveCatsRenderFunc($menuArr) {
    }
    echo '</ul>';
 }
-
 
 // funkce pro render menu
 echo $this->toolbox;
@@ -48,6 +49,7 @@ echo $this->toolbox;
       <form name="form-settings" method="post" action="<?=$this->link()->route('settings',array('categoryid' => '{ID}'))?>" style="display:inline;">
          <input type="submit" value="<?=$this->tr('Nastavit')?>" name="category_settings"  />
       </form>
+      <button id="button-copy-cat"><?=$this->tr('Kopírovat')?></button>
       <form name="form-delete" method="post" action="<?=$this->link()?>" style="display:inline;">
          <input class="button-cancel" type="submit" value="<?=$this->tr('Smazat')?>" name="category_delete"  />
          <input type="hidden" value="" name="category_id" />
@@ -61,20 +63,10 @@ echo $this->toolbox;
    <div id="category-structure-wrap">
       <div id="category-structure" class="<?=$typeClass?>"><?if($this->structure != null){echo vveCatsRenderFunc($this->structure);}?></div>
    </div>
+   
    <div id="category-info"><div></div></div>
    <hr class="reseter" />
-   <div class="note">
-      <?=$this->tr('Nápověda');?>
-      <ul>
-         <li><?=$this->tr('Při vybrání kategorie se napravo zobrazí její vlastnosti.')?></li>
-         <li><?=$this->tr('Jednotlivé kategorie lze přesunovat pouze myší.')?></li>
-         <li><?=$this->tr('Pořadí v menu se aplikuje až po znovunačtení stránky.')?></li>
-      </ul>
-   </div>
-   <br />
-   <br />
-   <?
-   ?>
+   <div id="copy-cat-dialog" title="<?=$this->tr('Kopírování kategorie')?>"><? echo $this->formCopy;?></div>
    <script type="text/javascript">
       /* <![CDATA[ */
       function getIdCat(str){
@@ -99,6 +91,10 @@ echo $this->toolbox;
          .bind('select_node.jstree', function(e, node){
             var idc = getIdCat($(node.rslt.obj).attr('id'));
             loadCatinfo(idc);
+            $('#button-copy-cat').removeClass('disabled').removeAttr('disabled');
+         })
+         .bind('deselect_node.jstree', function(e, node){
+            $('#button-copy-cat').addClass('disabled').attr('disabled', 'disabled');
          })
          .bind('move_node.jstree', function(e, node){
             var newPos = {
@@ -183,6 +179,20 @@ echo $this->toolbox;
             $(this).remove();
       });
 
+      // kopírování
+      var $copyDialog = $('#copy-cat-dialog').dialog({
+         autoOpen: <?echo $this->showCopyDialog == true ? "true" : "false" ?>,
+			height: 220,
+			width: 500,
+			// position: "top",
+			resizable: false
+      });
+      $('#button-copy-cat').click(function(){
+         $copyDialog.dialog( "open" );
+         // add id to form
+         $copyDialog.find('input[name="cat_copy_id"]')
+            .val( getIdCat( $('#category-structure').jstree("get_selected").attr('id') ) );
+      });
       /* ]]> */
    </script>
 </div>
