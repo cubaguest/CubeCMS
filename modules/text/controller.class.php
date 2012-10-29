@@ -443,6 +443,23 @@ class Text_Controller extends Controller {
       }
    }
 
+   public static function categoryDuplicate(Category_Core $oldCat, Category_Core $newCat) 
+   {
+      $model = new Text_Model();
+      $subkeys = array(Text_Model::TEXT_MAIN_KEY, Text_Model::TEXT_PRIVATE_KEY, Text_Model::TEXT_PANEL_KEY);
+      foreach ($subkeys as $subkey) {
+         $record = $model->where(Text_Model::COLUMN_ID_CATEGORY." = :idc AND ".Text_Model::COLUMN_SUBKEY." = :subkey",
+               array('idc' => $oldCat->getId(), 'subkey' => $subkey))->record();
+         if($record && !$record->isNew()){ // @todo record() vrací i nový záznam
+            $record->setNew();
+            $record->{Text_Model::COLUMN_ID_CATEGORY} = $newCat->getId();
+            $record->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
+            $record->save();
+         }
+      }
+   }
+   
+   /* TOHEL JE NAPROSTÁ KRAVINA. VYMAZAT!! */
    protected static function setTextData(Model_ORM_Record $record, $data) 
    {
       $model = new Text_Model();
