@@ -22,7 +22,7 @@ class Form_Element_TextArea extends Form_Element_Text {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       if(!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass(Form_Element::$cssClasses['error']);

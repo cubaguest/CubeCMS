@@ -204,7 +204,7 @@ class Form_Element_File extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
@@ -227,7 +227,7 @@ class Form_Element_File extends Form_Element {
       if($renderKey == null){
          $this->renderedId++;
       }
-      $this->html()->setAttrib('value', $this->getUnfilteredValues());
+//      $this->html()->setAttrib('value', $this->getUnfilteredValues());
       return $this->html();
    }
 

@@ -23,10 +23,10 @@ class Form_Element_Button extends Form_Element_Submit implements Form_Element_In
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $this->html()->setAttrib('type', 'button');
       $this->setValues($this->getLabel());
-      return parent::controll($renderKey);
+      return parent::control($renderKey);
    }
 }
 ?>

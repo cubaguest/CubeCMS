@@ -109,7 +109,7 @@ class Form_Element_Select extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return Html_Element
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->clearContent();
       if($this->isDimensional()){

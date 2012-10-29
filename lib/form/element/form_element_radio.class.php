@@ -30,7 +30,7 @@ class Form_Element_Radio extends Form_Element_Select {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $group = null;
       $this->html()->setAttrib('type', 'radio');
@@ -73,7 +73,7 @@ class Form_Element_Radio extends Form_Element_Select {
    public function  __toString() {
       $str = $this->label();
       $str .= new Html_Element('br');
-      $str .= $this->controll();
+      $str .= $this->control();
       return $str;
    }
 

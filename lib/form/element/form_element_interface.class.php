@@ -51,12 +51,14 @@ interface Form_Element_Interface {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
+   public function control($renderKey = null);
    public function controll($renderKey = null);
 
    /**
     * Metoda vrací všechny prvky, keré patří ke kontrolu, tj controll, labelValidations, subLabel
     * @return string -- včechny prvky vyrenderované
     */
+   public function controlAll($renderKey = null);
    public function controllAll($renderKey = null);
 
    /**

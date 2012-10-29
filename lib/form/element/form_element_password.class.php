@@ -18,9 +18,9 @@ class Form_Element_Password extends Form_Element_Text {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $this->html()->setAttrib('type', 'password');
-      return Form_Element::controll($renderKey);
+      return Form_Element::control($renderKey);
    }
 }
 ?>

@@ -598,11 +598,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return $this->htmlSubLabel();
    }
 
-   /**
-    * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
-    * @return string
-    */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->createValidationLabels();
       $this->html()->clearContent();
@@ -625,7 +621,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                } else if (isset($values[$langKey])){
                   $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
                }
-               
+
                $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
@@ -662,14 +658,27 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    }
 
    /**
+    * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
+    * @return string
+    * @deprecated -- používat control
+    */
+   public function controll($renderKey = null) {
+      return $this->control($renderKey);
+   }
+
+   /**
     * Metoda vrací všechny prvky, keré patří ke kontrolu, tj controll, labelValidations, subLabel
     * @return string -- včechny prvky vyrenderované
     */
-   public function controllAll($renderKey = null) {
-      $ret = $this->controll($renderKey);
+   public function controlAll($renderKey = null) {
+      $ret = $this->labelLangs($renderKey);
+      $ret .= $this->control($renderKey);
       $ret .= $this->labelValidations($renderKey);
       $ret .= $this->subLabel($renderKey);
       return $ret;
+   }
+   public function controllAll($renderKey = null) {
+      return $this->control($renderKey);
    }
 
    /**

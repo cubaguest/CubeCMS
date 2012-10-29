@@ -50,7 +50,7 @@ class Form_Element_Checkbox extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $values = $this->getUnfilteredValues();
       $this->html()->addClass($this->getName()."_class");

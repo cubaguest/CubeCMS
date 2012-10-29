@@ -20,7 +20,7 @@ class Form_Element_RemoveImage extends Form_Element_Checkbox implements Form_Ele
       $this->imagePath = $path;
    }
 
-   public function subLabel() {
+   public function subLabel($renderKey = null) {
       return "tady bude obr";
    }
 }

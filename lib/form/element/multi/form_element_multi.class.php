@@ -64,7 +64,7 @@ class Form_Element_Multi extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $str = null;
       foreach ($this->elements as $name => $element){
@@ -78,7 +78,7 @@ class Form_Element_Multi extends Form_Element {
 //             $this->$act->setAttrib('onclick', 'return confirm(\''.$this->confirmMessages[$act].'\')');
 //          }
          
-         $str .= $element->controll($rKey);
+         $str .= $element->control($rKey);
          if($element instanceof Form_Element_Checkbox){
             $str .= $element->label($rKey, true);
          }

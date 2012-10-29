@@ -56,13 +56,13 @@ class Form_Element_SaveCancel extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->setValues($this->formElementLabel[0]);
       $this->html()->clearClasses();
       $this->html()->removeAttrib('onclick');
       $this->html()->addClass('button-save');
-      $ctrlSave = clone parent::controll();
+      $ctrlSave = clone parent::control();
       $this->renderedId--;
       $ctrlSave->setAttrib('name', $this->getName().'_ok');
       $ctrlSave->setAttrib('id', $this->getName().'_ok_'.$rKey);
@@ -73,7 +73,7 @@ class Form_Element_SaveCancel extends Form_Element {
          $this->html()->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
       }
       $this->html()->addClass('button-cancel');
-      $ctrlCancel = clone parent::controll();
+      $ctrlCancel = clone parent::control();
       $this->renderedId--;
       $ctrlCancel->setAttrib('name', $this->getName().'_cancel');
       $ctrlCancel->setAttrib('id', $this->getName().'_cancel_'.$rKey);
@@ -92,7 +92,7 @@ class Form_Element_SaveCancel extends Form_Element {
    }
 
    public function  __toString() {
-      return (string)$this->controll();
+      return (string)$this->control();
    }
 }
 ?>

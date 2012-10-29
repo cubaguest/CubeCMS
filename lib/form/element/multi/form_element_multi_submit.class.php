@@ -18,7 +18,7 @@ class Form_Element_Multi_Submit extends Form_Element_Multi {
    }
 
    public function populate() {
-      foreach ($this->elements as $name => $element) {
+      foreach ($this->elements as $element) {
          if(isset ($_REQUEST[$element->getName()])) {
             $this->values = $element->getName();
          }
@@ -31,10 +31,10 @@ class Form_Element_Multi_Submit extends Form_Element_Multi {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function controll($renderKey = null) {
+   public function control($renderKey = null) {
       $str = null;
-      foreach ($this->elements as $name => $element){
-         $str .= $element->controll($renderKey);
+      foreach ($this->elements as $element){
+         $str .= $element->control($renderKey);
       }
       if($renderKey == null){
          $this->renderedId++;
