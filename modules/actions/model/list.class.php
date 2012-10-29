@@ -23,7 +23,7 @@ class Actions_Model_List extends Model_PDO {
          $whereP = null;
       }
       $dbst = $dbc->prepare("SELECT actions.*, user.".Model_Users::COLUMN_USERNAME.","
-              ." ABS(DATEDIFF(".Actions_Model_Detail::COLUMN_DATE_START.",:dateStart)) AS delta_days,"
+         ." ABS(DATEDIFF( IF(".Actions_Model_Detail::COLUMN_DATE_STOP." = NULL, ".Actions_Model_Detail::COLUMN_DATE_START.", ".Actions_Model_Detail::COLUMN_DATE_STOP."), :dateStart)) AS delta_days,"
               ." IF(actions.`".Actions_Model_Detail::COLUMN_TIME."`,actions.`".Actions_Model_Detail::COLUMN_TIME."`, '23:59:59') AS timeord"
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".Db_PDO::table(Model_Users::DB_TABLE)." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
@@ -143,7 +143,7 @@ class Actions_Model_List extends Model_PDO {
       $dbst = $dbc->prepare("SELECT actions.*, cat.".Model_Category::COLUMN_URLKEY.'_'.Locales::getLang()
               ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE.","
               ." user.".Model_Users::COLUMN_USERNAME.","
-              ." ABS(DATEDIFF(".Actions_Model_Detail::COLUMN_DATE_START.",:dateStart)) AS delta_days,"
+              ." ABS(DATEDIFF( IF(".Actions_Model_Detail::COLUMN_DATE_STOP." = NULL, ".Actions_Model_Detail::COLUMN_DATE_START.", ".Actions_Model_Detail::COLUMN_DATE_STOP."), :dateStart)) AS delta_days,"
               ." IF(actions.`time`,actions.`time`, '23:59:59') AS timeord"
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".$this->usersTable." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
