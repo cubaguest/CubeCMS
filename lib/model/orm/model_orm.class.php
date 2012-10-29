@@ -10,7 +10,7 @@
  * 						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro práci s modelem v databázi (ORM)
  */
-class Model_ORM extends Model {
+class Model_ORM extends Model implements ArrayAccess {
    const DB_TABLE = null;
 
    const ORDER_ASC = 'ASC';
@@ -936,16 +936,16 @@ class Model_ORM extends Model {
             $pdoParam = PDO::PARAM_NULL;
          } else if ($varType == 'array') {
             $pdoParam = PDO::PARAM_STMT;
-            $val = join(',', $val);
+            $val = join(',', $value);
          } else if ($varType == 'double' || $varType == 'string') {
             $pdoParam = PDO::PARAM_STR;
          } else if ($varType == 'object') {
             $pdoParam = PDO::PARAM_STR;
-            $className = get_class($val);
-            if ($val instanceof DateTime) {
-               $val = $val->format(DATE_ISO8601);
-            } else if (method_exists($val, '__toString')) {
-               $val = (string) $val;
+            $className = get_class($value);
+            if ($value instanceof DateTime) {
+               $value = $value->format(DATE_ISO8601);
+            } else if (method_exists($value, '__toString')) {
+               $value = (string) $value;
             } else {
                throw new UnexpectedValueException(sprintf($this->tr('Nepovolený objekt "%s" v předanám paramteru'), $className));
             }
@@ -1204,10 +1204,11 @@ class Model_ORM extends Model {
          $model1Column = current($model1Column);
       }
 
-      $model2Alias = $model2Name . '_' . $newIndex;
       if (is_array($model2Name)) {
          $model2Alias = key($model2Name);
          $model2Name = current($model2Name);
+      } else {
+         $model2Alias = $model2Name . '_' . $newIndex;
       }
       if ($model2Column == null)
          $model2Column = $model1Column;
@@ -1511,7 +1512,33 @@ class Model_ORM extends Model {
                      }
                   }
                } else {
-                  $column = $matches[3];
+                  $columnAssigned = false;
+                  if(!empty($this->joins)){
+                    // jsou připojeny další modely. Projdou se a pokud model daný sloupce obsahuje, nastavíme jej
+                    foreach ($this->joins as $join) {
+                       $mName = $join['model2'];
+                       $coll = $matches[3];
+                       $model = new $mName();
+                       // model má tento sloupec
+                       if(isset($model[$coll])){
+                          // alias sloupce
+                          if($model[$coll]['aliasFor'] != null){
+                             $column = $model[$coll]['aliasFor'];
+                          } else {
+                             $column = $matches[3];
+                          }
+
+                          // jazykový sloupce a jazyk není zadán
+                          if ($model[$coll]['lang'] == true) {
+                             $column .= '_' . Locales::getLang();
+                          }
+                          $columnAssigned = true;
+                       }
+                    }
+                  }
+                  if(!$columnAssigned){
+                     $column = $matches[3];
+                  }
                }
                $ordStr .= '`' . $column . '`';
                // dopočty
@@ -1757,5 +1784,23 @@ class Model_ORM extends Model {
     */
    protected function beforeSave(Model_ORM_Record $record, $type = 'U') 
    {}
+
+   /* ARRAY ACCESS */
+   public function offsetSet($offset, $value) {
+      if (is_null($offset)) {
+         $this->tableStructure[] = $value;
+      } else {
+         $this->tableStructure[$offset] = $value;
+      }
+   }
+   public function offsetExists($offset) {
+      return isset($this->tableStructure[$offset]);
+   }
+   public function offsetUnset($offset) {
+      unset($this->tableStructure[$offset]);
+   }
+   public function offsetGet($offset) {
+      return isset($this->tableStructure[$offset]) ? $this->tableStructure[$offset] : null;
+   }
 }
 ?>
