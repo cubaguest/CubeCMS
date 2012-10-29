@@ -4,7 +4,7 @@
  */
 
 // jquery galerka
-$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+$this->addJsPlugin(new JsPlugin_PiroBox());
 
 $propName = $this->propName == null ? PhotoGalery_Model_Images::COLUMN_NAME : $this->propName;
 $propAlt = $this->propAlt == null ? PhotoGalery_Model_Images::COLUMN_DESC : $this->propAlt;
@@ -22,17 +22,21 @@ $c = count($images);
 if($c != 0){?>
    <div class="main-content-images">
       <?
-      $class = 'image';
       foreach ($images as $image) {
          $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
-         ?><a class="<?echo $class;?>" rel="prettyPhoto[pp_gal]" href="<?=$dirMedium.$imgFile?>" title="<?=$image->{$propAlt}?>" ><img src="<?=$dirSmall.$imgFile?>" alt="<?=$image->{$propName}?>" /></a><?
+         ?>
+         <a class="pirobox_gall image" rel="prettyPhoto[pp_gal]" href="<?=$dirMedium.$imgFile?>" title="<?=$image->{$propAlt}?>" >
+            <img src="<?=$dirSmall.$imgFile?>" alt="<?=$image->{$propName}?>" />
+         </a>
+         <?
       }
       echo $this->toolboxImages;
       ?>
+      <hr class="reseter" />
    </div>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){ $("a[rel^='prettyPhoto']").prettyPhoto(); });
+      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
 <?} else if($this->toolboxImages != null){?>
