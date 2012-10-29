@@ -16,7 +16,7 @@ class NewsLetter_Controller extends Controller {
          // kontrola jestli tam už mail není
          if($model->where(MailsAddressBook_Model_Addressbook::COLUMN_MAIL." = :mail", 
                array('mail' => $newMailForm->mail->getValues()) )->count() > 0) {
-            $newMailForm->mail->setError($this->tr('Váš e-mail je již regostrován. Pokud Vám přesto nechodí e-maily, kontaktujte nás!'));
+            $newMailForm->mail->setError($this->tr('Váš e-mail je již registrován. Pokud Vám přesto nechodí e-maily, kontaktujte nás!'));
          }         
       }
       
@@ -146,7 +146,7 @@ class NewsLetter_Controller extends Controller {
          $eSelectGroup->setOptions(array($group->{MailsAddressBook_Model_Groups::COLUMN_NAME} => $group->{MailsAddressBook_Model_Groups::COLUMN_ID}), true);
       }
       if(isset($settings[self::PARAM_ID_MAIL_GRP])){
-         $form->groupid->setValues($settings[self::PARAM_ID_MAIL_GRP]);
+         $eSelectGroup->setValues($settings[self::PARAM_ID_MAIL_GRP]);
       }
       $form->addElement($eSelectGroup, $grpMails);
       

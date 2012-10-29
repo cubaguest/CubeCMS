@@ -4,7 +4,7 @@ Template_Core::addPageTitle($h);
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
 <h1><?ps($h)?></h1>
-<div class="content-form-edit">
+<div class="content content-form-edit">
    <?
    $this->unregMailForm->html()->setAttrib('id', 'unregisterMail');
    echo $this->unregMailForm;
