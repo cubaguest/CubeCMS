@@ -260,7 +260,7 @@ class Url_Link {
             unset($this->paramsArray[$name]);
          }
          // Odstranění všch parametrů (normálových i obyčejných)
-         else {
+         else if( is_null($name) ) {
             $this->paramsArray = array();
          }
       }
