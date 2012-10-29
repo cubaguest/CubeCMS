@@ -4,6 +4,10 @@
  * Třída pro obsluhu akcí a kontrolerů modulu
  */
 class Services_Controller extends Controller {
+   const BACKUP_NONE = 0;
+   const BACKUP_DB = 1;
+   const BACKUP_DATA = 2;
+   const BACKUP_ALL = 4;
 
    protected function init() 
    {
@@ -175,7 +179,7 @@ class Services_Controller extends Controller {
       if($form->isValid()){
          $file = self::createBackup();
          $this->infoMsg()->addMessage( sprintf( $this->tr('Záloha DB byla uložena do souboru %s.'),$file ) );
-         $this->link()->reload();
+//         $this->link()->reload();
       }
       $this->view()->form = $form;
       
@@ -206,7 +210,7 @@ class Services_Controller extends Controller {
                break;
          }
          
-         foreach (glob(self::getBackupPath()."*.sql") as $file) {
+         foreach (glob(self::getBackupPath()."*.{sql,zip}", GLOB_BRACE) as $file) {
             if( filemtime($file) <= $compareTime ){
                unlink($file);
             }
@@ -218,7 +222,7 @@ class Services_Controller extends Controller {
       $this->view()->formClean = $formClean;
       
       // load all backup files
-      $files = glob(self::getBackupPath()."*.sql"); 
+      $files = glob(self::getBackupPath()."*.{sql,zip}", GLOB_BRACE);
       usort($files, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
       $this->view()->backupFiles = $files;
    }
@@ -242,66 +246,98 @@ class Services_Controller extends Controller {
       return $size;
    }
 
-   protected static function createBackup() 
+   protected static function createBackup($type = self::BACKUP_ALL)
    {
       $backupPath = self::getBackupPath();
       
-      if(!is_dir(AppCore::getAppDataDir().'backup' )){
-         mkdir(AppCore::getAppDataDir().'backup');
-      }
-         
       $dbc = Db_PDO::getInstance();
-      $file = $backupPath.'db-backup-'.vve_date("%Y-%M-%D_%G%i").'.sql';
-         
-      if(is_file($file)){
-         unlink($file);
+      $filePrefix = $backupPath.'db-backup-'.vve_date("%Y-%M-%D_%H-%i");
+      $fileDb = $filePrefix.'.sql';
+      $fileData = $filePrefix.'.zip';
+
+      if(is_file($fileDb)){
+         unlink($fileDb);
       }
-         
-      //get all of the tables
-      $tables = array();
-      $stmt = $dbc->prepare('SHOW TABLES');
-      $stmt->execute();
-      $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-      //cycle through table
-      foreach($tables as $table) {
-         file_put_contents($file, '-- TABLE: '.$table."\n", FILE_APPEND);
-         file_put_contents($file, 'DROP TABLE IF EXISTS '.$table.';', FILE_APPEND);
-         
-         $stmt = $dbc->prepare('SHOW CREATE TABLE '.$table);
+
+      if($type == self::BACKUP_DB || $type == self::BACKUP_ALL){
+         //get all of the tables
+         $tables = array();
+         $stmt = $dbc->prepare('SHOW TABLES');
          $stmt->execute();
-         $createSQL = $stmt->fetch(PDO::FETCH_NUM);
-         file_put_contents($file, "\n\n".$createSQL[1].";\n\n", FILE_APPEND);
-            
-         $stmt = $dbc->prepare('SELECT * FROM '.$table);
-         $stmt->execute();
-         $c = $stmt->fetch(PDO::FETCH_NUM);
-            
-         // empty tables ckip
-         if(!$c){ continue; }
-            
-         $num_fields = count($c);
-         
-         $stmt = $dbc->prepare('SELECT * FROM '.$table);
-         $stmt->execute();
-         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            file_put_contents($file, 'INSERT INTO '.$table.' VALUES(', FILE_APPEND);
-            $return = null;
-            for($j=0; $j<$num_fields; $j++) {
-               $row[$j] = addslashes($row[$j]);
-               $row[$j] = str_replace("\n","\\n",$row[$j]);
-                  
-               $return .= '"'.$row[$j].'"' ;
-               if ($j < ($num_fields-1)) {
-                  $return .= ',';
+         $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+         //cycle through table
+         foreach($tables as $table) {
+            file_put_contents($fileDb, '-- TABLE: '.$table."\n", FILE_APPEND);
+            file_put_contents($fileDb, 'DROP TABLE IF EXISTS '.$table.';', FILE_APPEND);
+
+            $stmt = $dbc->prepare('SHOW CREATE TABLE '.$table);
+            $stmt->execute();
+            $createSQL = $stmt->fetch(PDO::FETCH_NUM);
+            file_put_contents($fileDb, "\n\n".$createSQL[1].";\n\n", FILE_APPEND);
+
+            $stmt = $dbc->prepare('SELECT * FROM '.$table);
+            $stmt->execute();
+            $c = $stmt->fetch(PDO::FETCH_NUM);
+
+            // empty tables ckip
+            if(!$c){ continue; }
+
+            $num_fields = count($c);
+
+            $stmt = $dbc->prepare('SELECT * FROM '.$table);
+            $stmt->execute();
+            while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+               file_put_contents($fileDb, 'INSERT INTO '.$table.' VALUES(', FILE_APPEND);
+               $return = null;
+               for($j=0; $j<$num_fields; $j++) {
+                  $row[$j] = addslashes($row[$j]);
+                  $row[$j] = str_replace("\n","\\n",$row[$j]);
+
+                  $return .= '"'.$row[$j].'"' ;
+                  if ($j < ($num_fields-1)) {
+                     $return .= ',';
+                  }
+               }
+               $return .= ");\n";
+               file_put_contents($fileDb, $return, FILE_APPEND);
+            }
+            file_put_contents($fileDb, "\n\n\n", FILE_APPEND);
+         }
+      }
+
+      // backup data dir to zip
+      if ( ($type == self::BACKUP_DATA || $type == self::BACKUP_ALL) && extension_loaded('zip')) {
+         $zip = new ZipArchive();
+
+         if ($zip->open($fileData, ZIPARCHIVE::CREATE) && is_dir(AppCore::getAppDataDir())) {
+
+            $source = str_replace('\\', '/', realpath(AppCore::getAppDataDir()));
+
+            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator( $source ), RecursiveIteratorIterator::SELF_FIRST);
+
+            foreach ($files as $file) {
+               $file = str_replace('\\', '/', $file);
+               // Ignore "." and ".." folders
+               if( in_array(substr($file, strrpos($file, '/')+1), array('.', '..')) )
+                  continue;
+
+               $file = realpath($file);
+
+               if (is_dir($file) === true)
+               {
+                  $zip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
+               }
+               else if (is_file($file) === true)
+               {
+                  $zip->addFromString(str_replace($source . '/', '', $file), file_get_contents($file));
                }
             }
-            $return .= ");\n";
-            file_put_contents($file, $return, FILE_APPEND);
+
+            $zip->close();
          }
-         file_put_contents($file, "\n\n\n", FILE_APPEND);
       }
-      
-      return $file;
+
+      return $fileDb;
    }
    
    public function fileActionController( ) 
@@ -330,6 +366,11 @@ class Services_Controller extends Controller {
    
    protected static function getBackupPath() 
    {
+      if(!is_dir(AppCore::getAppWebDir().'backup' )){
+         // mkdir by ftp account
+         // mkdir(AppCore::getAppWebDir().'backup');
+         new CoreErrors(new CoreException( 'Neexistuje adresář pro zálohy. Vytvořte adresář "backup" v kořenu stránek.') ) ;
+      }
       return AppCore::getAppWebDir().'backup'.DIRECTORY_SEPARATOR;
    }
    
@@ -343,8 +384,8 @@ class Services_Controller extends Controller {
    {
       // backup only main site
       if(VVE_SUB_SITE_DOMAIN == null){
-         self::createBackup();
-         Log::msg('Provedena záíloha db');
+         self::createBackup(self::BACKUP_DB);
+         Log::msg('Provedena záloha db');
       }
    }
 }
