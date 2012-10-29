@@ -67,13 +67,18 @@ class QuickTools_Controller extends Controller {
       $form->addElement($elemUrl);
       
       $elemIcon = new Form_Element_Select('icon', $this->tr('Ikona'));
-      
+
+      $icons = array();
       foreach (new DirectoryIterator(AppCore::getAppWebDir().'images'.DIRECTORY_SEPARATOR.'icons') as $fileInfo) {
          if($fileInfo->isFile() AND preg_match('#^(.+?)(_t)?\.(jpg|gif|png)#i', $fileInfo->getFilename()) ){
-            $elemIcon->setOptions(array($fileInfo->getFilename() => 'images/icons/'.$fileInfo->getFilename()), true);
+            $icons[$fileInfo->getFilename()] = 'images/icons/'.$fileInfo->getFilename();
          }
       }
-      
+
+      ksort($icons);
+
+      $elemIcon->setOptions($icons, true);
+
       // pokud existuje složka s ikonama ve face tak projít i tu
       $dirFace = Template::faceDir().'images'.DIRECTORY_SEPARATOR.'icons';
       if(file_exists($dirFace) AND is_dir($dirFace)){
