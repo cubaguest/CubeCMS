@@ -41,16 +41,16 @@ $fillterSnipshet = '<label class="font-small">'.$this->tr('filtr').':</label>
          <td>
             <div id="address-tabs">
                <ul>
-                  <li><a href="#tabs-mails-addressbook"><?=$this->tr('Adresář') ?></a></li>
-                  <li><a href="#tabs-mails-users"><?=$this->tr('Uživatelé systému') ?></a></li>
+                  <li><a href="<?=$this->link()?>#tabs-mails-addressbook"><?=$this->tr('Adresář') ?></a></li>
+                  <li><a href="<?=$this->link()?>#tabs-mails-users"><?=$this->tr('Uživatelé systému') ?></a></li>
                   <?if($this->mailsNewsLetter !== null AND !empty ($this->mailsNewsLetter)){?>
-                     <li><a href="#tabs-mails-newsletter"><?=$this->tr('NewsLetter') ?></a></li>
+                     <li><a href="<?=$this->link()?>#tabs-mails-newsletter"><?=$this->tr('NewsLetter') ?></a></li>
                   <?}?>
                   <?if($this->mailsGuestbook !== null AND !empty ($this->mailsGuestbook)){?>
-                     <li><a href="#tabs-mails-guestbook"><?=$this->tr('Kniha návštěv') ?></a></li>
+                     <li><a href="<?=$this->link()?>#tabs-mails-guestbook"><?=$this->tr('Kniha návštěv') ?></a></li>
                   <?}?>
                   <?if($this->mailsForum !== null AND !empty ($this->mailsForum)){?>
-                     <li><a href="#tabs-mails-forum"><?=$this->tr('Fórum') ?></a></li>
+                     <li><a href="<?=$this->link()?>#tabs-mails-forum"><?=$this->tr('Fórum') ?></a></li>
                   <?}?>
                </ul>
                <div id="tabs-mails-addressbook">

@@ -20,7 +20,7 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
    <div id="groups-tabs">
       <ul>
          <?foreach ($this->groups as $id => $grp) {?>
-      	<li><a href="#grptab-<?=$id?>"><?=$grp['name']?></a></li>
+      	<li><a href="<?=$this->link()?>#grptab-<?=$id?>"><?=$grp['name']?></a></li>
          <?}?>
       </ul>
       <?foreach ($this->groups as $id => $grp) {?>

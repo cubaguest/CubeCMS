@@ -1,4 +1,4 @@
-CREATE TABLE `{PREFIX}mails_addressbook` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_addressbook` (
   `id_mail` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_group` smallint(6) NOT NULL DEFAULT '1',
   `name` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE `{PREFIX}mails_addressbook` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `{PREFIX}mails_groups` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_groups` (
   `id_group` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
   `note` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -24,7 +24,7 @@ INSERT INTO `{PREFIX}mails_groups` (`name`, `note`)
 VALUES ('Newsletter','Skupina newsletteru');
 
 
-CREATE TABLE `{PREFIX}mails_sends` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_sends` (
   `id_mail` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_user` smallint(6) NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

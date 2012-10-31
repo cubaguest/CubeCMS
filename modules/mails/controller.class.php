@@ -152,12 +152,13 @@ class Mails_Controller extends Controller {
       $this->view()->mailsAddressBook = $address;
       // newsletter
       $modelModules = new Model_Module();
+      /* deprecated - module newsletter use global mails addressbook
       if ($modelModules->isModuleInstaled('newsletter') == true) {
          if(class_exists('NewsLetter_Model_Mails')){
             $modelNewsLetters = new NewsLetter_Model_Mails();
             $this->view()->mailsNewsLetter = $modelNewsLetters->getMails();
          }
-      }
+      }*/
 
       // guestbook
       if ($modelModules->isModuleInstaled('guestbook') == true) {
