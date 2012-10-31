@@ -13,8 +13,8 @@
  */
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME = 'base';
-   const JQUERY_VERSION = '1.7.2';
-   const JQUERY_UI_VERSION = '1.8.23';
+   const JQUERY_VERSION = '1.8.2';
+   const JQUERY_UI_VERSION = '1.9.1';
 
    const FACE_THEME_DIR = 'jqueryui';
 
@@ -243,6 +243,19 @@ class JsPlugin_JQuery extends JsPlugin {
    }
 
    /**
+    * Metoda přidá widgent UI - menu
+    * @return JsPlugin_JQuery
+    */
+   public function addUIMenu() {
+      $this->addUICore();
+      $this->addUIWidget();
+      $this->addUIPosition();
+      $this->addCss("menu");
+      $this->addJs("ui.menu");
+      return $this;
+   }
+
+   /**
     * Metoda přidá widgent UI - autocomplete
     * @return JsPlugin_JQuery
     */
@@ -250,6 +263,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUICore();
       $this->addUIWidget();
       $this->addUIPosition();
+      $this->addUIMenu();
       $this->addJs("ui.autocomplete");
       $this->addCss("autocomplete");
       return $this;
@@ -286,6 +300,19 @@ class JsPlugin_JQuery extends JsPlugin {
    }
 
    /**
+    * Metoda přidá widget UI - spinner input se šipkami pro čísla
+    * @return JsPlugin_JQuery
+    */
+   public function addUISpinner() {
+      $this->addUICore();
+      $this->addUIWidget();
+      $this->addUIButton();
+      $this->addJs("ui.spinner");
+      $this->addCss('spinner');
+      return $this;
+   }
+
+   /**
     * Metoda přidá widgent UI - tabs (tabulka boxů - záložky)
     * @return JsPlugin_JQuery
     */
@@ -294,6 +321,19 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUIWidget();
       $this->addJs("ui.tabs");
       $this->addCss('tabs');
+      return $this;
+   }
+
+   /**
+    * Metoda přidá widgent UI - tooltip (nápověda)
+    * @return JsPlugin_JQuery
+    */
+   public function addUITooltip() {
+      $this->addUICore();
+      $this->addUIWidget();
+      $this->addUIPosition();
+      $this->addJs("ui.tooltip");
+      $this->addCss('tooltip');
       return $this;
    }
 
