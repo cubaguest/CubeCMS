@@ -144,7 +144,12 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
       unset($settings['buttons']);
       unset($settings['plugins']);
       unset($settings['tplslist']);
-      
+
+      // create tpl list url
+      if($this instanceof Component_TinyMCE_Settings_Advanced){
+         $this->setTemplatesList($settings['template_external_list_url']);
+         unset($settings['template_external_list_url']);
+      }
       foreach ($settings as $key => $value) {
          if($value == '0' OR $value == '1'){
             $settings[$key] = (bool)$value;
