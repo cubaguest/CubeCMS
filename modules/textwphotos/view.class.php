@@ -7,7 +7,7 @@
 class TextWPhotos_View extends Text_View {
    public function mainView() {
       parent::mainView();
-      $pView = new Photogalery_View($this->pCtrl);
+      $pView = new Photogalery_View($this);
       $pView->addImagesToolbox();
    }
 }
