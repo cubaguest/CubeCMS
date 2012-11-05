@@ -40,7 +40,7 @@ abstract class View extends TrObject {
    /**
     * Konstruktor Viewu
     *
-    * @param Url_Link_Module/Controller $base -- objekt odkazů modulu nebo kontroler (pak již nění nutné předávat ostatní parametry)
+    * @param Url_Link_Module/Controller/View $base -- objekt odkazů modulu nebo kontroler (pak již nění nutné předávat ostatní parametry)
     * @param Category_Core $category --  objekt kategorie
     * @param Translator $category --  objekt kategorie
     */
@@ -48,15 +48,18 @@ abstract class View extends TrObject {
       if($base instanceof Controller){
          $this->link = $base->link();
          $this->category = $base->category();
-         $trs = $base->translator();
          $this->template = $base->view()->template();
+      } elseif ($base instanceof View) {
+         $this->link = $base->link();
+         $this->category = $base->category();
+         $this->template = $base->template();
       } elseif ($base instanceof Url_Link_Module) {
          $this->link = $base;
          $this->category = $category;
          $this->template = new Template_Module($this->link, $this->category);
          $this->template->setTranslator($trs);
       }
-      
+
       $this->locale = new Locales($this->category->getModule()->getName());
       //		inicializace viewru
       $this->init();
