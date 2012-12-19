@@ -62,19 +62,19 @@ class Component_ViewTpl extends Component {
       if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)})
          AND file_exists(Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
          .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor z faces
-         include_once Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+         include Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
             .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
       }
       if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)})
          AND file_exists(Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
          .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor z faces parent
-         include_once Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+         include Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
             .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
       }
       if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)}) AND empty ($this->tpls)
          AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
          .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor s modulu
-         include_once AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+         include AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
          .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
       }
    }
