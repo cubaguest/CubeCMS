@@ -384,13 +384,7 @@ class Text_Controller extends Controller {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
       $componentTpls = new Component_ViewTpl();
-      $module = 'text';
-      // pokud modul podporuje šablony
-      if(is_file(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$this->category()->getModule()->getName()
-         .DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.Component_ViewTpl::TPLS_LIST_FILE)){
-         $module = $this->category()->getModule()->getName();
-      }
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $module);
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $this->module()->getName());
 
       $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
       $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));

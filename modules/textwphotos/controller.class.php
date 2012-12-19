@@ -26,7 +26,6 @@ class TextWPhotos_Controller extends Text_Controller {
    public function settings(&$settings, Form &$form) {
       $phCtrl = new Photogalery_Controller($this);
       $phCtrl->settings($settings, $form);
-      $form->removeElement('tplMain');
 
       parent::settings($settings, $form);
    }

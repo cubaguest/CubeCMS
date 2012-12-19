@@ -17,6 +17,12 @@ class Photogalery_Controller extends Controller {
 
    const PARAM_TPL_MAIN = 'tplmain';
    const PARAM_EDITOR_TYPE = 'editor';
+   const PARAM_SMALL_W = 'small_width';
+   const PARAM_SMALL_H = 'small_height';
+   const PARAM_SMALL_C = 'small_crop';
+   const PARAM_MEDIUM_W = 'medium_width';
+   const PARAM_MEDIUM_H = 'medium_height';
+   const PARAM_MEDIUM_C = 'medium_crop';
 
    const SMALL_WIDTH = 140;
    const SMALL_HEIGHT = 140;
@@ -598,9 +604,10 @@ class Photogalery_Controller extends Controller {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
       $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, 'photogalery');
+      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $this->module()->getName());
 
       $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
+
       $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
       if(isset($settings[self::PARAM_TPL_MAIN])) {
          $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
@@ -630,22 +637,22 @@ class Photogalery_Controller extends Controller {
       $elemSW->addValidation(new Form_Validator_IsNumber());
       $elemSW->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_W.'</span>px');
       $form->addElement($elemSW, 'images');
-      if(isset($settings['small_width'])) {
-         $form->small_width->setValues($settings['small_width']);
+      if(isset($settings[self::PARAM_SMALL_W])) {
+         $form->small_width->setValues($settings[self::PARAM_SMALL_W]);
       }
 
       $elemSH = new Form_Element_Text('small_height', 'Výška miniatury (px)');
       $elemSH->addValidation(new Form_Validator_IsNumber());
       $elemSH->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_H.'</span>px');
       $form->addElement($elemSH, 'images');
-      if(isset($settings['small_height'])) {
-         $form->small_height->setValues($settings['small_height']);
+      if(isset($settings[self::PARAM_SMALL_H])) {
+         $form->small_height->setValues($settings[self::PARAM_SMALL_H]);
       }
 
       $elemSC = new Form_Element_Checkbox('small_crop', 'Ořezávat miniatury');
       $elemSC->setValues(true);
-      if(isset($settings['small_crop'])) {
-         $elemSC->setValues($settings['small_crop']);
+      if(isset($settings[self::PARAM_SMALL_C])) {
+         $elemSC->setValues($settings[self::PARAM_SMALL_C]);
       }
       $form->addElement($elemSC, 'images');
 
@@ -653,44 +660,43 @@ class Photogalery_Controller extends Controller {
       $elemW->addValidation(new Form_Validator_IsNumber());
       $elemW->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_W.'</span>px');
       $form->addElement($elemW, 'images');
-      if(isset($settings['medium_width'])) {
-         $form->medium_width->setValues($settings['medium_width']);
+      if(isset($settings[self::PARAM_MEDIUM_W])) {
+         $form->medium_width->setValues($settings[self::PARAM_MEDIUM_W]);
       }
 
       $elemH = new Form_Element_Text('medium_height', 'Výška obrázku (px)');
       $elemH->addValidation(new Form_Validator_IsNumber());
       $elemH->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_H.'</span>px');
       $form->addElement($elemH, 'images');
-      if(isset($settings['medium_height'])) {
-         $form->medium_height->setValues($settings['medium_height']);
+      if(isset($settings[self::PARAM_MEDIUM_H])) {
+         $form->medium_height->setValues($settings[self::PARAM_MEDIUM_H]);
       }
 
       $elemC = new Form_Element_Checkbox('medium_crop', 'Ořezávat obrázky');
       $elemC->setValues(false);
-      if(isset($settings['medium_crop'])) {
-         $elemC->setValues($settings['medium_crop']);
+      if(isset($settings[self::PARAM_MEDIUM_C])) {
+         $elemC->setValues($settings[self::PARAM_MEDIUM_C]);
       }
       $form->addElement($elemC, 'images');
 
       $elemResize = new Form_Element_Checkbox('resizeImages', 'Změnit velikosti');
       $elemResize->setSubLabel($this->tr('Změnit velikosti již uložených obrázků pokud se liší od původních. POZOR! Tato změna může trvat déle!'));
-      if(isset($settings['small_width']) || isset($settings['small_height']) || isset($settings['small_crop'])
-         || isset($settings['medium_width']) || isset($settings['medium_height']) || isset($settings['medium_crop']) ){
+      if(isset($settings[self::PARAM_SMALL_W]) || isset($settings[self::PARAM_SMALL_H]) || isset($settings[self::PARAM_SMALL_C])
+         || isset($settings[self::PARAM_MEDIUM_W]) || isset($settings[self::PARAM_MEDIUM_H]) || isset($settings[self::PARAM_MEDIUM_C]) ){
          $elemResize->setValues(true);
       }
       
       $form->addElement($elemResize, 'images');
-      
       if($form->isValid()){
          // resize images if need
          if($form->resizeImages->getValues() == true){
             // zjištění původsních a nových velikostí
-            $origSmallW = isset($settings['small_width']) ? $settings['small_width'] : VVE_IMAGE_THUMB_W;
-            $origSmallH = isset($settings['small_height']) ? $settings['small_height'] : VVE_IMAGE_THUMB_H;
-            $origSmallC = isset($settings['small_crop']) ? $settings['small_crop'] : VVE_IMAGE_THUMB_CROP;
-            $origMedW = isset($settings['medium_width']) ? $settings['medium_width'] : VVE_DEFAULT_PHOTO_W;
-            $origMedH = isset($settings['medium_height']) ? $settings['medium_height'] : VVE_DEFAULT_PHOTO_H;
-            $origMedC = isset($settings['medium_crop']) ? $settings['medium_crop'] : false;
+            $origSmallW = isset($settings[self::PARAM_SMALL_W]) ? $settings[self::PARAM_SMALL_W] : VVE_IMAGE_THUMB_W;
+            $origSmallH = isset($settings[self::PARAM_SMALL_H]) ? $settings[self::PARAM_SMALL_H] : VVE_IMAGE_THUMB_H;
+            $origSmallC = isset($settings[self::PARAM_SMALL_C]) ? $settings[self::PARAM_SMALL_C] : VVE_IMAGE_THUMB_CROP;
+            $origMedW = isset($settings[self::PARAM_MEDIUM_W]) ? $settings[self::PARAM_MEDIUM_W] : VVE_DEFAULT_PHOTO_W;
+            $origMedH = isset($settings[self::PARAM_MEDIUM_H]) ? $settings[self::PARAM_MEDIUM_H] : VVE_DEFAULT_PHOTO_H;
+            $origMedC = isset($settings[self::PARAM_MEDIUM_C]) ? $settings[self::PARAM_MEDIUM_C] : false;
             
             $newSmallW = $form->small_width->getValues() != null ? $form->small_width->getValues() : VVE_IMAGE_THUMB_W;
             $newSmallH = $form->small_height->getValues() != null ? $form->small_height->getValues() : VVE_IMAGE_THUMB_H;
@@ -710,12 +716,12 @@ class Photogalery_Controller extends Controller {
          }
          
          // save options
-         $settings['small_width'] = $form->small_width->getValues();
-         $settings['small_height'] = $form->small_height->getValues();
-         $settings['small_crop'] = $form->small_crop->getValues();
-         $settings['medium_width'] = $form->medium_width->getValues();
-         $settings['medium_height'] = $form->medium_height->getValues();
-         $settings['medium_crop'] = $form->medium_crop->getValues();
+         $settings[self::PARAM_SMALL_W] = $form->small_width->getValues();
+         $settings[self::PARAM_SMALL_H] = $form->small_height->getValues();
+         $settings[self::PARAM_SMALL_C] = $form->small_crop->getValues();
+         $settings[self::PARAM_MEDIUM_W] = $form->medium_width->getValues();
+         $settings[self::PARAM_MEDIUM_H] = $form->medium_height->getValues();
+         $settings[self::PARAM_MEDIUM_C] = $form->medium_crop->getValues();
          $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
          $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
       }
