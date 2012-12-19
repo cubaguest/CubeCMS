@@ -68,8 +68,8 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
             if(($cur-self::DOC) >= 0){
                $extensions = array_merge($extensions, array(
                   "txt", "csv",
-                  "doc", "rtf", "docx", 
-                  "xls", "xlt", "xlsx","",
+                  "doc", "rtf", "docx", "dotx", "dot",
+                  "xls", "xlt", "xlsx", "xltx",
                   "ppt",
                   "pdf",
                   "odf", "odt", "ott", "ots"

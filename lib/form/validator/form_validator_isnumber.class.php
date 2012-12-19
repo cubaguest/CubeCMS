@@ -78,8 +78,11 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
             if($this->min !== null) $filterOptions['options']['min_range'] = $this->min;
             if($this->max !== null) $filterOptions['options']['max_range'] = $this->max;
 
-            if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
-
+            if($elemObj->isMultiple() OR $elemObj->isMultiLang()) {
+               if($this->filterArray($elemObj->getUnfilteredValues(), $filterOptions) === false){
+                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  return false;
+               }
             } else {
                if (filter_var($elemObj->getUnfilteredValues(), $this->numberType, $filterOptions) === false) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
@@ -91,7 +94,17 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
             break;
       }
       return true;
-
    }
+
+   private function filterArray($array, $filterOptions)
+   {
+      foreach($array as $v){
+         if (filter_var($v, $this->numberType, $filterOptions) === false) {
+            return false;
+         }
+      }
+      return true;
+   }
+
 }
 ?>

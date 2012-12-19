@@ -212,14 +212,32 @@ class Form_Element_File extends Form_Element {
       }
    // tady bude if při multilang
       $this->html()->setAttrib('type', 'file');
-      if($this->isDimensional()){
+      if($this->isMultiple()){
          $this->html()->setAttrib('multiple', 'multiple');
-         if($this->dimensional == null){
-            $this->html()->setAttrib('id', $this->getName()."_".$rKey);
+         if($this->dimensional === true){
+            $container = new Html_Element('p');
+            $container->addClass('form-input-multiple')->addClass('form-input-multiple-last');
+
+            $this->html()->setAttrib('name', $this->getName()."[]");
+            $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
+
+            $container->setContent($this->html());
+            $container->addContent($this->getMultipleButtons(true, true), true);
+
+            if($renderKey == null){
+               $this->renderedId++;
+            }
+
+            return $container;
          } else {
-            $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
+            if($this->dimensional == null){
+               $this->html()->setAttrib('id', $this->getName()."_".$rKey);
+            } else {
+               $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
+            }
+            $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']');
          }
-         $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']');
+
       } else {
          $this->html()->setAttrib('name', $this->getName());
          $this->html()->setAttrib('id', $this->getName().'_'.$rKey);

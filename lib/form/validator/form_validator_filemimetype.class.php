@@ -9,7 +9,7 @@
  * @abstract      Třída validátoru souboru podle mime typu
  * @todo          Dořešit co se správně uploadovanými soubory
  */
-class Form_Validator_FileMimeType extends Form_Validator implements Form_Validator_Interface {
+class Form_Validator_FileMimeType extends Form_Validator {
    /**
     * Pole s povolenými typ souborů
     * @var array

@@ -677,7 +677,12 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       } else if($e instanceof Form_Element_Checkbox){
          $container->{$key} = new Form_Data_Item($e->getLabel(), (bool)$e->getValues(), $e->getSubLabel());
       } else if($e instanceof Form_Element_Select){
-         $container->{$key} = new Form_Data_Item($e->getLabel(), array_search($e->getValues(), $e->getOptions()), $e->getSubLabel());
+//         if(is_array($e->getValues())){
+               // tohle se chová naprosto blbě. Validace prvku v poli je již v selectu takže asi není proč to tu mít
+//            $container->{$key} = new Form_Data_Item($e->getLabel(), array_search($e->getValues(), $e->getOptions()), $e->getSubLabel());
+//         } else {
+            $container->{$key} = new Form_Data_Item($e->getLabel(), $e->getValues(), $e->getSubLabel());
+//         }
       } else if($e instanceof Form_Element_File){
          $f = $e->getValues();
          $container->{$key} = new Form_Data_Item($e->getLabel(), $f['name'], $e->getSubLabel());

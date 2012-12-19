@@ -15,6 +15,8 @@
  */
 class Form_Element_Radio extends Form_Element_Select {
 
+   protected $renderLabel = true;
+
    /**
     * Pole s volbami hodnota=>popis
     * @var array
@@ -24,6 +26,34 @@ class Form_Element_Radio extends Form_Element_Select {
    protected function init() {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
+   }
+
+   /**
+    * Metoda nastaví volbu že se dají vybírat více prvků
+    * @param $multiple -- true pro povolení více voleb
+    * @return Form_Element_Select -- sám sebe
+    */
+   public function setMultiple($multiple = true) {
+      $this->dimensional = $multiple;
+      return $this;
+   }
+
+   /**
+    * Metoda nastaví jestli se má vykreslit label u input prvku
+    * @param bool $render
+    */
+   public function setRenderlabelInControl($render = true)
+   {
+      $this->renderLabel = $render;
+   }
+
+   /**
+    * Metoda nastaví jestli se má vykreslit label u input prvku
+    * @param bool $render
+    */
+   public function controlInRow()
+   {
+
    }
 
    /**
@@ -39,7 +69,7 @@ class Form_Element_Radio extends Form_Element_Select {
       $i = 1;
       foreach ($this->options as $optLabel => $optVal) {
          $opt = clone $this->html();
-         if($this->isDimensional()) {
+         if($this->isMultiple()) {
             $opt->setAttrib('name', $this->getName()."[".$this->dimensional."]");
             $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$rKey.'_'.$this->dimensional);
          } else {
@@ -51,17 +81,22 @@ class Form_Element_Radio extends Form_Element_Select {
          if(($this->unfilteredValues !== false AND $this->unfilteredValues !== null AND $this->unfilteredValues == $optVal)
             OR ($this->unfilteredValues === null AND $first == true) ) {
             $opt->setAttrib('checked', 'checked');
+         } else if(is_array($this->unfilteredValues) && in_array($optVal, $this->unfilteredValues)){
+            $opt->setAttrib('checked', 'checked');
          }
          $first = false;
          $group .= (string)$opt;
-         $l = new Html_Element('label', $optLabel);
-         if($this->isDimensional()) {
-            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey.'_'.$this->dimensional);
-         } else {
-            $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey);
+         if($this->renderLabel){
+            $l = new Html_Element('label', $optLabel);
+            if($this->isMultiple()) {
+               $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey.'_'.$this->dimensional);
+            } else {
+               $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey);
+            }
+            $group .= $l;
+            $group .= new Html_Element('br');
          }
-         $group .= $l;
-         $group .= new Html_Element('br');
+
          $i++;
       }
       if($renderKey == null){

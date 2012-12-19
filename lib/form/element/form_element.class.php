@@ -7,6 +7,8 @@
  * @author        $Author: jakub $ $Date: 2009-06-14 15:52:19 +0000 (Sun, 14 Jun 2009) $
  *                $LastChangedBy: jakub $ $LastChangedDate: 2009-06-14 15:52:19 +0000 (Sun, 14 Jun 2009) $
  * @abstract      Třída pro obsluhu formulářů
+ * @todo          Dodělat multiple při jazykové mutaci
+ * @todo          Přepsat dimesional na multiple
  */
 class Form_Element extends TrObject implements Form_Element_Interface {
    /**
@@ -56,7 +58,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @var boolean
     */
    protected $isPopulated = false;
-   
+
    /**
     * Jestli byl prvek validován
     * @var boolean
@@ -80,6 +82,12 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @var boolean
     */
    protected $dimensional = false;
+
+   /**
+    * Jestli uživatel může přidat další položky
+    * @var boolean
+    */
+   protected $multipleAllowAdd = true;
 
    /**
     * Pole s odeslanými hodnotami
@@ -131,7 +139,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    protected $htmlValidationsLabelsAdded = false;
 
    protected static $elementFocused = false;
-   
+
    /**
     * Id renderované část -- použito při vytváření id
     * @var integer
@@ -143,11 +151,11 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @var array
     */
    public static $cssClasses = array('error' => 'form-error',
-                                     'validations' => 'form-box-validations',
-                                     'langLinkContainer' => 'form-link-lang-container',
-                                     'langLink' => 'form-link-lang',
-                                     'langLinkSel' => 'form-link-lang-sel',
-                                     'elemContainer' => 'form-elem-container');
+      'validations' => 'form-box-validations',
+      'langLinkContainer' => 'form-link-lang-container',
+      'langLink' => 'form-link-lang',
+      'langLinkSel' => 'form-link-lang-sel',
+      'elemContainer' => 'form-elem-container');
 
    /**
     * Konstruktor elemntu
@@ -205,7 +213,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       unset ($this->validators[$validator]);
       $this->isPopulated = false;
    }
-   
+
    /**
     * Metoda zjistí jestli element má daný validátor
     * @param string $name -- název validátoru
@@ -266,6 +274,26 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    }
 
    /**
+    * Metoda nastaví jestli je prvek vícerozměrný
+    * @param string $name -- (option) název prvku pro pole
+    * @@return Form_Element
+    */
+   public function setMultiple($key = true) {
+      $this->dimensional = $key;
+      return $this;
+   }
+
+   /**
+    * Metoda nastaví jestli uživatel může přidat další prvky
+    * @param bool $allow -- (option) název prvku pro pole
+    * @@return Form_Element
+    */
+   public function setMultipleAllowAdd($allow = true) {
+      $this->multipleAllowAdd = $allow;
+      return $this;
+   }
+
+   /**
     * Metoda přidá popisek k validaci
     * @param string $text -- popisek
     */
@@ -309,14 +337,19 @@ class Form_Element extends TrObject implements Form_Element_Interface {
 
    /**
     * Metofda vrací jestli se jedná o vícerozměrný element
-    * @param bool $multiple -- true pro nasatvení vícerozměrného elementu
     * @return bool -- true pokud je element vicerozměrný
+    * @deprecated -- používat isMultiple
     */
    public function isDimensional() {
-      if($this->dimensional === false) {
-         return false;
-      }
-      return true;
+      return $this->dimensional === false ? false : true;
+   }
+
+   /**
+    * Metofda vrací jestli se jedná o vícerozměrný element
+    * @return bool -- true pokud je element vicerozměrný
+    */
+   public function isMultiple() {
+      return $this->dimensional === false ? false : true;
    }
 
    /**
@@ -370,7 +403,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    public function getValues($key = null) {
       if(!$this->isValidated){
          $this->validate();
-      } 
+      }
       if($this->isValid()){
          $this->filter();
          if($key !== null AND isset($this->values[$key])) {
@@ -402,7 +435,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda nastavní počáteční id renderu
     * @param int $id
-    * @return Form_Element 
+    * @return Form_Element
     */
    final public function setRenderID($id)
    {
@@ -491,7 +524,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metody pro naplěnní a validaci
     */
-   
+
    /**
     * Metoda naplní element
     */
@@ -499,6 +532,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if(!$this->isPopulated){
          if(isset ($_POST[$this->getName()]) && $_POST[$this->getName()] != "") {
             $this->values = $_POST[$this->getName()];
+            if($this->isMultiple()){
+               $this->addFilter(new Form_Filter_RemoveEmptyValues());
+            }
          } else {
             $this->values = null;
          }
@@ -598,6 +634,39 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return $this->htmlSubLabel();
    }
 
+   /**
+    * vrací tlačítka pro multiple
+    * @return string
+    */
+   protected function getMultipleButtons($first = false, $last = false)
+   {
+      $cnt = null;
+      $link = new Url_Link();
+
+      // button remove row
+//      $a = new Html_Element('a', $this->tr('odebrat'));
+      $a = new Html_Element('a', '<img src="/images/icons/delete.png" alt="'.$this->tr('odebrat').'" />');
+      $a->setAttrib('href', $link."#add".$this->getName());
+      $a->setAttrib('onclick', "return CubeCMS.Form.removeRow(this)");
+      $a->addClass('button-remove-multiple-line');
+      if($first){
+         $a->addClass('hidden');
+      }
+      $cnt .= $a;
+      // button add new row
+//      $a = new Html_Element('a', $this->tr('přidat'));
+      $a = new Html_Element('a', '<img src="/images/icons/add.png" alt="'.$this->tr('přidat').'" />');
+      $a->setAttrib('href', $link."#add".$this->getName());
+      $a->setAttrib('onclick', "return CubeCMS.Form.addRow(this)");
+      $a->addClass('button-add-multiple-line');
+      if(!$last){
+         $a->addClass('hidden');
+      }
+      $cnt .= $a;
+
+      return $cnt;
+   }
+
    public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->createValidationLabels();
@@ -607,19 +676,20 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
       $values = $this->getUnfilteredValues();
+      $cnt = null;
+
       $this->html()->addClass($this->getName()."_class");
       if($this->isMultiLang()) {
          $cnt = null;
-         $first = true;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $container = new Html_Element('p');
-            if($this->isDimensional()) {
+            if($this->isMultiple()) {
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
                if(isset($values[$this->dimensional][$langKey])){
-                  $this->html()->setAttrib('value', htmlspecialchars($values[$this->dimensional][$langKey]));
+                  $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional][$langKey]));
                } else if (isset($values[$langKey])){
-                  $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
+                  $this->html()->setAttrib('value', htmlspecialchars((string)$values[$langKey]));
                }
 
                $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
@@ -632,29 +702,64 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             $this->html()->setAttrib('lang', $langKey);
             $container->addClass(self::$cssClasses['elemContainer'])->addClass('form-input-lang-'.$langKey);
             $container->setAttrib('lang', $langKey);
-            $container->setContent($this->html());
+            $container->setContent((string)$this->html());
             $cnt .= $container;
          }
-         return $cnt;
       } else {
-         if($this->isDimensional()) {
-            $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-            $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
-            if(is_array($values) AND isset($values[$this->dimensional])) {
-               $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
+         if($this->isMultiple()) {
+            if(is_array($values) && $this->dimensional === true){
+               $container = new Html_Element('p');
+               $container->addClass('form-input-multiple');
+               $cnt = null;
+               end($values);
+               $lastKey = key($values);
+               $numVals = count($values);
+               foreach ($values as $key => $val) {
+                  $container->clearContent();
+                  $this->html()->setAttrib('name', $this->getName()."[".$key."]");
+                  $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$key);
+                  $this->html()->setAttrib('value', htmlspecialchars((string)$val));
+                  $container->setContent($this->html());
+                  if($lastKey != $key){
+                     $container->addContent($this->getMultipleButtons(false, false), true);
+                  } else {
+                     $container->addClass('form-input-multiple-last');
+                     $container->addContent($this->getMultipleButtons($numVals == 1, true), true);
+
+                  }
+                  $cnt .= $container;
+               }
+            } else if($values == null && $this->dimensional === true){
+               $container = new Html_Element('p');
+               $container->addClass('form-input-multiple');
+               $this->html()->setAttrib('name', $this->getName()."[]");
+               $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
+               $container->setContent($this->html());
+               $container->addClass('form-input-multiple-last');
+               $container->addContent($this->getMultipleButtons(true, true), true);
+               $cnt = (string)$container;
             } else {
-               $this->html()->setAttrib('value', htmlspecialchars((string)$values));
+               /*
+                * @todo odstranit nebo přepsat
+                */
+               $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
+               $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
+               if(is_array($values) AND isset($values[$this->dimensional])) {
+                  $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
+               } else {
+                  $this->html()->setAttrib('value', htmlspecialchars((string)$values));
+               }
             }
          } else {
             $this->html()->setAttrib('name', $this->getName());
             $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
             $this->html()->setAttrib('value', htmlspecialchars((string)$values));
          }
-         if($renderKey == null){
-            $this->renderedId++;
-         }
-         return $this->html();
       }
+      if($renderKey == null){
+         $this->renderedId++;
+      }
+      return $cnt == null ? $this->html() : $cnt;
    }
 
    /**

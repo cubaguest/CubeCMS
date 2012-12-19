@@ -65,8 +65,8 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                }
             }
          } else {
-            if($elemObj->isDimensional()) {
-               if(!$this->checkEmptyAllValues($elemObj->getUnfilteredValues())) {
+            if($elemObj->isMultiple()) {
+               if(!$this->checkIsOneValue($elemObj->getUnfilteredValues())) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   $this->isValid = false;
                }
@@ -139,6 +139,20 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
          }
       }
       return true;
+   }
+
+   /**
+    * Metoda zkontroluje jestli prvek má alespoň jednu hodnotu
+    * @param array/string $values
+    * @return boolean -- pokud je jeden prvek prázný vrací false
+    */
+   private function checkIsOneValue($values) {
+      foreach ($values as $val) {
+         if($val != null){
+            return true;
+         }
+      }
+      return false;
    }
 }
 ?>

@@ -9,7 +9,7 @@
  *
  * @author jakub
  */
-class Form_Validator_FileSize extends Form_Validator implements Form_Validator_Interface {
+class Form_Validator_FileSize extends Form_Validator {
    /**
     * Maximální velikost souboru v bajtech
     * @var int
@@ -32,7 +32,7 @@ class Form_Validator_FileSize extends Form_Validator implements Form_Validator_I
     */
    public function addHtmlElementParams(Form_Element $element) {
       if($element->isDimensional()){
-         $element->addValidationConditionLabel(sprintf($this->tr("soubory s celkovou maximální velikostí %s"),  vve_create_size_str($this->fileSize)));
+         $element->addValidationConditionLabel(sprintf($this->tr("soubory s maximální velikostí %s"),  vve_create_size_str($this->fileSize)));
       } else {
          $element->addValidationConditionLabel(sprintf($this->tr("soubor s maximální velikostí %s"),  vve_create_size_str($this->fileSize)));
       }
