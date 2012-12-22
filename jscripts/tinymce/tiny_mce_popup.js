@@ -1,6 +1,5 @@
 
 // Uncomment and change this document.domain value if you are loading the script cross subdomains
-// document.domain = 'moxiecode.com';
 var d = window.location.href.match(/mce_rdomain=([^&]+)/);
 if(d != null) document.domain = d[1]
 
