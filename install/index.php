@@ -11,6 +11,7 @@ define('CMS_DIR', str_replace('install'.DIRECTORY_SEPARATOR, '', INST_DIR));
 define('CMS_DATA_DIR_NAME', 'data');
 define('CMS_CACHE_DIR_NAME', 'cache');
 define('CMS_LOG_DIR_NAME', 'logs');
+define('CMS_BACKUP_DIR_NAME', 'backup');
 
 if(isset ($_GET['step'])){
    $step = (int)$_GET['step'];
@@ -27,6 +28,7 @@ switch ($step) {
       $infoItems = checkDir(CMS_DATA_DIR_NAME);
       $infoItems = array_merge($infoItems, checkDir(CMS_CACHE_DIR_NAME, 'Odkládací adresář'));
       $infoItems = array_merge($infoItems, checkDir(CMS_LOG_DIR_NAME, 'Logovací adresář'));
+      $infoItems = array_merge($infoItems, checkDir(CMS_BACKUP_DIR_NAME, 'Zálohovací adresář'));
       break;
    case 3: // databáze
       break;

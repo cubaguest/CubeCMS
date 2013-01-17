@@ -7,6 +7,31 @@ if(!defined('PHP_VERSION_ID')){
    define('PHP_RELEASE_VERSION', $version[2]);
 }
 
+function vve_parse_size($str)
+{
+   $val = trim($str);
+   $last = strtolower($str[strlen($str) - 1]);
+   switch ($last) {
+      case 'g': $val *= 1024;
+      case 'm': $val *= 1024;
+      case 'k': $val *= 1024;
+   }
+   return $val;
+}
+function vve_create_size_str($size, $round = 1)
+{
+   if($size > 1073741824){
+      return round($size/1073741824,$round)." GB";
+   } else if($size > 1048576){
+      return round($size/1048576,$round)." MB";
+   } else if($size > 1024) {
+      return round($size/1024,$round)." KB";
+   } else {
+      return $size." B";
+   }
+}
+
+
 // funkce pro kontrolu php
 function checkPHPInstalation()
 {
@@ -43,15 +68,15 @@ function checkPHPInstalation()
 
    // max upload size
    $status = 'ok'; $info = null;
-   $max_upload = (int)(ini_get('upload_max_filesize'));
-   $max_post = (int)(ini_get('post_max_size'));
-   $memory_limit = (int)(ini_get('memory_limit'));
+   $max_upload = (int)vve_parse_size(ini_get('upload_max_filesize'));
+   $max_post = (int)vve_parse_size(ini_get('post_max_size'));
+   $memory_limit = (int)vve_parse_size(ini_get('memory_limit'));
    $upload_mb = min($max_upload, $max_post, $memory_limit);
    if($upload_mb < 8){
       $status = 'warn';
-      $info = 'Maximální velikost nahraného souboru je příliš malá. Doporučeno je alespoň 8 MB.';
+      $info = 'Maximální velikost nahraného souboru je příliš malá. Doporučeno je alespoň 8 MB. ';
    }
-   addMsg ($msgs, 'Maximální velikost nahraného souboru: '.$upload_mb.' MB', $status, $info);
+   addMsg ($msgs, 'Maximální velikost nahraného souboru: '.vve_create_size_str($upload_mb).'', $status, $info);
    // SPL
    $status = 'ok'; $info = null;
    if(!class_exists('Exception')) {
