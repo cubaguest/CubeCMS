@@ -36,6 +36,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
          'ol' : 'list-style-type', 'ul' : 'list-style-type'}",
       'tab_focus' => ':prev,:next',
       'width' => "100%",
+      'height' => "400",
       'alloweddirs' => array(),
       'forcedir' => null,
       'document_base_url' => null
