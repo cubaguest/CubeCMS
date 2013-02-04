@@ -100,7 +100,16 @@ class MailsNewsletters_Controller extends Controller {
          $button = $form->send->getValues();
           
          if($button == 'sendtest'){
-            $this->sendTest($form->sendtestmail->getValues(), $form->name->getValues(), $form->content->getValues());
+            $cnt = $form->content->getValues();
+            if( isset($record) ){ // nový
+                $cnt .= self::createAlternateLink($record->{MailsNewsletters_Model_Newsletter::COLUMN_ID});
+            }
+            $idgrps = null;
+            if($form->groups->getValues() != null){
+               $idgrps = implode('|', $form->groups->getValues());
+            }
+            $cnt .= self::createUnscribeText($form->sendtestmail->getValues(), $idgrps);
+            $this->sendTest($form->sendtestmail->getValues(), $form->name->getValues(), $cnt);
          } else if($button == 'save') {
             // save            
             if( !isset($record) ){ // nový
@@ -126,7 +135,7 @@ class MailsNewsletters_Controller extends Controller {
             
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT} = $cnt;
             $record->save();
-            
+
             $modelAB = new MailsAddressBook_Model_Addressbook();
             $modelQueue = new MailsNewsletters_Model_Queue();
             // odstranění mailů z fronty
@@ -171,7 +180,7 @@ class MailsNewsletters_Controller extends Controller {
       $this->view()->form = $form;
    }
 
-   public function listController() 
+   public function listController()
    {
       $model = new MailsNewsletters_Model_Newsletter();
       
@@ -225,8 +234,11 @@ class MailsNewsletters_Controller extends Controller {
       $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE, 20);
       $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->count());
       $this->view()->scrollComp = $scrollComponent;
-      
+
+      $modelQ = new MailsNewsletters_Model_Queue();
       $this->view()->newsletters = $model
+         ->columns(array('*', 'mails' => '(SELECT COUNT(*) FROM '.$modelQ->getTableName()
+            .' WHERE '.MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER.' = '.$model->getTableShortName().'.'.MailsNewsletters_Model_Newsletter::COLUMN_ID.')'))
          ->order(array(MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND => Model_ORM::ORDER_DESC))
          ->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())
          ->records();
@@ -513,6 +525,73 @@ class MailsNewsletters_Controller extends Controller {
    }
 
    /**
+    * Metoda vytvoí text pro alternativní zobrazení
+    * @param $idn
+    * @return string
+    */
+   protected static function createAlternateLink($idn, $mail = null, $source = 'mail', $idGroups = null){
+      $linkPreview = new Url_Link_ModuleStatic(true);
+      $linkPreview
+         ->module('mailsnewsletters')
+         ->action('showNewsletter')
+         ->param('newsletter', $idn)
+         ->param('source', $source);
+      if($mail != null){
+         $linkPreview->param('mail', $mail);
+      }
+      if($idGroups != null){
+         $linkPreview->param('idg', $idGroups);
+      }
+      $cnt = '<div style="text-align: center; margin: 5px auto; font-size: 9px;">';
+
+      foreach (Locales::getAppLangs() as $lang){
+         switch ($lang) {
+            case 'en':
+               $cnt .= 'E-mail not displaying correctly? Click <a href="'.$linkPreview.'" style="font-size: 9px;">here</a>. ';
+               break;
+            case 'cs':
+            default:
+               $cnt .= 'Nezobrazuje se Vám e-mail korektně? Klikněte <a href="'.$linkPreview.'" style="font-size: 9px;">zde</a>. ';
+               break;
+         }
+      }
+      $cnt .= "</div>";
+      return $cnt;
+   }
+
+   /**
+    * Metoda vytvoí text pro odhlášení
+    * @param $idn
+    * @return string
+    */
+   protected static function createUnscribeText($mail, $idGroups = null){
+      $cnt = null;
+      $unscribeLinkObj = new Url_Link_ModuleStatic(true);
+      $unscribeLinkObj
+         ->module('mailsnewsletters')
+         ->action('unscribe')
+         ->param('mail', $mail);
+      if($idGroups != null){
+         $unscribeLinkObj->param('idg', $idGroups);
+      }
+      $cnt = '<div style="text-align: center; margin: 5px auto; font-size: 9px;">';
+
+      foreach (Locales::getAppLangs() as $lang){
+         switch ($lang) {
+            case 'en':
+               $cnt .= 'To unsubscribe, click <a href="'.$unscribeLinkObj.'" style="font-size: 9px;">here</a>. ';
+               break;
+            case 'cs':
+            default:
+               $cnt .= 'Pro odhlášení odběru klikněte <a href="'.$unscribeLinkObj.'" style="font-size: 9px;">zde</a>. ';
+               break;
+         }
+      }
+      $cnt .= "</div>";
+      return $cnt;
+   }
+
+   /**
     * Metoda provede nahrazení proměných a odeslání emailu 
     * @param Email $emailObj
     * @param string $mail
@@ -522,8 +601,7 @@ class MailsNewsletters_Controller extends Controller {
    {
       $tr = new Translator_Module('mailsnewsletters');
       $unscribeLinkObj = new Url_Link_ModuleStatic(true);
-      $unscribeLink = (string)$unscribeLinkObj->module('mailsnewsletters')->action('unscribe')->param('mail', $mail);
-      
+
       $emailObj->setReplacements( array(
             // complex
             '{WEB_LINK}' => '<a href="'.Url_Request::getBaseWebDir().'" title="{WEB_NAME}">{WEB_NAME}</a>',
@@ -532,7 +610,7 @@ class MailsNewsletters_Controller extends Controller {
             '{WEB_NAME}' => VVE_WEB_NAME,
             '{NAME}' => $name,
             '{MAIL}' => $mail,
-            '{UNSCRIBE_LINK}' => $unscribeLink,
+            '{UNSCRIBE_LINK}' => (string)$unscribeLinkObj->module('mailsnewsletters')->action('unscribe')->param('mail', $mail),
          ), false);
       $emailObj->setAddress($mail, $name);
       $failures = array();
@@ -549,9 +627,75 @@ class MailsNewsletters_Controller extends Controller {
       $data = new Object();
       if(isset($_GET['mail'])){
          $data->mail = $_GET['mail'];
+         $model = new MailsAddressBook_Model_Addressbook();
+
+         // remove from model
+         if(isset($_GET['idg'])){
+            $idgs = explode('|', $_GET['idg']);
+            $idgStatement = array();
+            foreach($idgs as $idg){
+               $idgStatement[':idgrp_'.(int)$idg] = (int)$idg;
+            }
+
+            $model->where(MailsAddressBook_Model_Addressbook::COLUMN_MAIL." = :mail"
+               ." AND ".MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP." IN ( ".implode(',', array_keys($idgStatement) )." )",
+               array_merge(array('mail' => $data->mail), $idgStatement ))
+               ->delete();
+         } else {
+            $model->where(MailsAddressBook_Model_Addressbook::COLUMN_MAIL." = :mail", array('mail' => $data->mail) )
+               ->delete();
+         }
       } else {
          AppCore::getUserErrors()->addMessage($tr->tr('Nebyla zadána korektní e-mailová adresa'));
       }
+      return $data;
+   }
+
+   /**
+    * Kontroler pro zobrazení newsletter
+    */
+   public static function showNewsletterController()
+   {
+      $tr = new Translator_Module('mailsnewsletter');
+      $data = new Object();
+      $data->cnt = null;
+      $data->title = null;
+
+      if(!isset($_GET['newsletter'])){
+         return $data;
+      }
+
+      $model = new MailsNewsletters_Model_Newsletter();
+
+      $newsletter = $model->record((int)$_GET['newsletter']);
+
+      if(!$newsletter){
+         return $data;
+      }
+      $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED}
+         = $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED} + 1;
+      $newsletter->save();
+
+      $data->title = $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT};
+      $data->cnt = $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT};
+      if(isset($_GET['mail'])){
+         $data->cnt .= self::createUnscribeText($_GET['mail'], isset($_GET['idg']) ? $_GET['idg'] : null ); // XSS ??
+      }
+
+      // get mail from addressbook
+
+      $replacements = array(
+         // complex
+         '{WEB_LINK}' => '<a href="'.Url_Request::getBaseWebDir().'" title="{WEB_NAME}">{WEB_NAME}</a>',
+         '{UNSCRIBE}' => '<a href="{UNSCRIBE_LINK}">'.$tr->tr('odhlášení odběru').'</a>',
+         // base
+         '{WEB_NAME}' => VVE_WEB_NAME,
+         '{NAME}' => null,
+         '{MAIL}' => null,
+         '{UNSCRIBE_LINK}' => null,
+      );
+      $data->cnt = str_replace( array_keys($replacements), array_values($replacements), $data->cnt);
+
       return $data;
    }
 
@@ -581,20 +725,35 @@ class MailsNewsletters_Controller extends Controller {
             $curIdN = $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER};
             // pokud se nejdná o stejný newsletter, načteme jej
             $newsLetter = $model->record($curIdN);
-            
-            $mailObj = self::createMail($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}, 
-                                        $newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT});
-            
+            // přiřazení skupin u kterých se bude odhlašovat
+            $idgs = null;
+            if($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_GROUPS_IDS} != null){
+               $idgs = implode('|', unserialize($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_GROUPS_IDS}));
+            }
          }
-   
+
+         $cnt = $newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_CONTENT};
+         $cnt .= self::createAlternateLink(
+            $newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_ID},
+            $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, 'mail', $idgs );
+         $cnt .= self::createUnscribeText(
+            $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, $idgs);
+         $mailObj = self::createMail($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}, $cnt);
+
          $name = null;
          if($mail->{MailsNewsletters_Model_Queue::COLUMN_NAME} != null){
             $name = $mail->{MailsNewsletters_Model_Queue::COLUMN_NAME}." ".$mail->{MailsNewsletters_Model_Queue::COLUMN_SURNAME};
          }
          
-         // odstranění mailu s frony je méně náročnější než jeho odeslání, protodříve
-         $modelQueue->delete($mail->{MailsNewsletters_Model_Queue::COLUMN_ID});
-         self::sendMail($mailObj, $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, $name);
+         // odstranění mailu s frony je méně náročnější než jeho odeslání, proto dříve
+         try {
+            self::sendMail($mailObj, $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, $name);
+            $modelQueue->delete($mail->{MailsNewsletters_Model_Queue::COLUMN_ID});
+            file_put_contents(AppCore::getAppCacheDir()."newsletter.log", "SEND:".$mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}."\n\n", FILE_APPEND);
+         } catch (Exception $e) {
+            // log
+            file_put_contents(AppCore::getAppCacheDir()."newsletter.log", "ERROR:".$e->getTraceAsString()."\n\n", FILE_APPEND);
+         }
       }
    }
 }

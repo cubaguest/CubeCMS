@@ -11,6 +11,7 @@ class MailsNewsletters_Model_Newsletter extends Model_ORM {
    const COLUMN_ACTIVE = 'newsletter_active';
    const COLUMN_DATE_SEND = 'newsletter_date_send';
    const COLUMN_GROUPS_IDS = 'newsletter_groups_ids';
+   const COLUMN_VIEWED = 'newsletter_viewed';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_newsletters');
@@ -24,7 +25,8 @@ class MailsNewsletters_Model_Newsletter extends Model_ORM {
       $this->addColumn(self::COLUMN_DELETED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       $this->addColumn(self::COLUMN_DATE_SEND, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_GROUPS_IDS, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
-      
+      $this->addColumn(self::COLUMN_VIEWED, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+
       $this->setPk(self::COLUMN_ID);
       
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');

@@ -1,4 +1,4 @@
-CREATE TABLE `{PREFIX}mails_newsletters` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters` (
   `id_newsletter` int(11) NOT NULL AUTO_INCREMENT,
   `id_newsletter_template` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
@@ -8,12 +8,13 @@ CREATE TABLE `{PREFIX}mails_newsletters` (
   `newsletter_active` tinyint(4) DEFAULT '0',
   `newsletter_content` text,
   `newsletter_groups_ids` varchar(200) DEFAULT NULL,
+  `newsletter_viewed` INT NULL DEFAULT 0,
   PRIMARY KEY (`id_newsletter`),
   KEY `fk_users` (`id_user`),
   KEY `fk_newsletters_templates` (`id_newsletter_template`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
-CREATE TABLE `{PREFIX}mails_newsletters_queue` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_queue` (
   `id_newsletter_queue` int(11) NOT NULL AUTO_INCREMENT,
   `id_newsletter` int(11) NOT NULL,
   `newsletter_queue_mail` varchar(100) NOT NULL,
@@ -24,7 +25,7 @@ CREATE TABLE `{PREFIX}mails_newsletters_queue` (
   KEY `fk_newsletter` (`id_newsletter`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
-CREATE TABLE `{PREFIX}mails_newsletters_templates` (
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_templates` (
   `id_newsletter_template` int(11) NOT NULL AUTO_INCREMENT,
   `newsletter_template_name` varchar(100) NOT NULL,
   `newsletter_template_deleted` tinyint(4) DEFAULT '0',

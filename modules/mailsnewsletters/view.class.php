@@ -136,5 +136,15 @@ class MailsNewsletters_View extends View {
       $tpl->setVars($data);
       return $tpl;
    }
+
+   public static function showNewsletterView($data)
+   {
+      $tpl = new Template_ModuleStatic(new Url_Link_ModuleRequest(), 'mailsnewsletters');
+      $tpl->addFile('tpl://newsletter.phtml');
+      $tpl->setVars($data);
+      Template_Output::sendHeaders();
+      echo $tpl;
+      die;
+   }
 }
 ?>

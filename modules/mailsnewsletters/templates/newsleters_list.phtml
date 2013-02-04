@@ -13,6 +13,8 @@ $this->addFile('css://style.less');
       <thead>
          <tr class="ui-widget-header">
             <th class="newsletter-tb-name"><?=$this->tr('Název')?></th>
+            <th class="newsletter-tb-num-mails"><?=$this->tr('Mailů')?></th>
+            <th class="newsletter-tb-viewed"><?=$this->tr('Zobrazeno')?></th>
             <th class="newsletter-tb-date"><?=$this->tr('Datum odeslání')?></th>
             <th class="newsletter-tb-actions"></th>
          </tr>
@@ -22,11 +24,15 @@ $this->addFile('css://style.less');
          $dateSend = new DateTime($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND});
          $curDate = new DateTime();
          $curDate->setTime(0, 0);
+         $cellClass = null;
+         if($dateSend < $curDate) $cellClass = "ui-state-disabled";
       ?>
       <tr class="ui-widget-content <?if($dateSend < $curDate) echo "newsletter-sended";?>">
-         <td class="newsletter-tb-name <?if($dateSend < $curDate) echo "ui-state-disabled";?>"
+         <td class="newsletter-tb-name <?=$cellClass?>"
             ><?=$newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}?></td>
-         <td class="newsletter-tb-date"><?=vve_date("%x", $dateSend)?></td>
+         <td class="newsletter-tb-num-mails <?=$cellClass?>"><?=$newsletter->mails?></td>
+         <td class="newsletter-tb-viewed <?=$cellClass?>"><?=$newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED}."x"?></td>
+         <td class="newsletter-tb-date <?=$cellClass?>"><?=vve_date("%x", $dateSend)?></td>
          <td class="newsletter-tb-actions">
             <?
             $toolbox = clone $this->toolboxItem;
@@ -46,7 +52,7 @@ $this->addFile('css://style.less');
      <?}?>
      <tfoot>
      	<tr class="ui-widget-header">
-     		<td colspan="3"><? echo $this->scrollComp;?></td>
+     		<td colspan="5"><? echo $this->scrollComp;?></td>
      	</tr>
      </tfoot>
    </table>
