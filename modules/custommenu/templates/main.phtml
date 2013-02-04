@@ -1,0 +1,91 @@
+<? // načtení detailu
+$this->addFile("css://style.less");
+$this->addFile("js://custommenu.js");
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$jq->addUIDialog();
+$this->addJsPlugin($jq);
+
+?>
+<h1><?ps($this->category()->getName());?></h1>
+<div class="content-admin clearfix" id="custom-menu-list">
+   <?
+   if(!empty($this->boxes)){
+      foreach ($this->boxes as $key => $box) {?>
+      <div class="menu-box">
+         <h2><?ps($box['name'])?></h2>
+         <table class="full-width ui-cube ui-cube-widget ui-table-widget">
+            <thead>
+               <tr class="ui-widget-header">
+                  <td></td>
+                  <th><?ps($this->tr('Název'))?></th>
+                  <th><?ps($this->tr('Odkaz'))?></th>
+                  <td></td>
+               </tr>
+            </thead>
+            <tfoot>
+               <tr class="ui-widget-content">
+                  <td colspan="4">
+                     <button onclick="CustomMenu.addCustomMenuItem();"><?ps($this->tr('Přidat'))?></button>
+                  </td>
+               </tr>
+            </tfoot>
+            <tbody>
+               <?
+               if(!empty($box['items'])){
+                  foreach ($box['items'] as $item) {?>
+                  <tr id="menu-item-<?=$item->getPK()?>" class="ui-widget-content"
+                      data-id="<?=$item->getPK()?>"
+                      data-name='<?=json_encode($item->{CustomMenu_Model_Items::COLUMN_NAME}->getArray())?>'
+                      data-box='<?=$item->{CustomMenu_Model_Items::COLUMN_BOX}?>'
+                      data-active="<?=$item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? "true" : "false" ?>"
+                      data-link="<?=$item->{CustomMenu_Model_Items::COLUMN_LINK}?>"
+                      data-idcat="<?=$item->{CustomMenu_Model_Items::COLUMN_ID_CATEGORY}?>"
+                      data-newwin="<?=$item->{CustomMenu_Model_Items::COLUMN_NEW_WINDOW} ? "true" : "false" ?>"
+                          >
+                     <td class="move"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></td>
+                     <td class="name"><?ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?></td>
+                     <td class="link">
+                        <?
+                        $href = $item->{CustomMenu_Model_Items::COLUMN_LINK} != null ? $item->{CustomMenu_Model_Items::COLUMN_LINK} : $item->catLink;
+                        ?>
+                        <a href="<?=$href?>"><?ps(vve_tpl_truncate($href, 30))?></a>
+                     </td>
+                     <td class="actions">
+                        <?$src = $item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? 'enable.png' : "disable.png";?>
+                        <a href="<?=$this->link()->route('edit')->param('action', 'changeState')->param('id', $item->getPK())?>"><img src="images/icons/<?=$src?>" /></a>
+                        <a href="<?=$this->link()->param('action', 'edit')->param('id', $item->getPK())?>"
+                           onclick="CustomMenu.editCustomMenuItem(<?=$item->getPK()?>); return false;"
+                           class="button-edit-param"><img src="images/icons/pencil.png" /></a>
+                        <a href="<?=$this->link()->route('edit')->param('action', 'delete')->param('id', $item->getPK())?>"
+                           onclick="CustomMenu.deleteCustomMenuItem(<?=$item->getPK()?>);"
+                           class="button-delete-param"><img src="images/icons/delete.png" /></a>
+                     </td>
+                  </tr>
+                  <?
+                  }
+               } else {?>
+                  <tr class="ui-widget-content"><td colspan="4"><?ps($this->tr('Žádná položka není přidána'))?></td></tr>
+               <?}?>
+            </tbody>
+         </table>
+      </div>
+      <?}
+   } else {?>
+      <div class="message message-warning">
+         <?ps($this->tr('Pro tuto šablonu není definováno žádné menu'))?>
+      </div>
+   <?}?>
+   <div id="form-edit-menu-item">
+      <?echo $this->form;?>
+   </div>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         CustomMenu.init({
+            editUrl : '<?=$this->link()->route('edit')?>',
+            dialogTitle : {  add : '<?ps($this->tr('Přidání položky'))?>', edit: '<?ps($this->tr('Úprava položky'))?>'}
+         });
+      });
+   </script>
+</div>
+

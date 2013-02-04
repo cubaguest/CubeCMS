@@ -1,0 +1,17 @@
+<div class="<?if($this->box == 'left'){echo 'panel ';}?>custom-menu custom-menu-<?=$this->box?> clearfix">
+   <?
+   if($this->box == 'left'){?>
+      <div class="name"><?ps($this->tr('Kam dále?'))?></div>
+   <?}?>
+   <ul class="nav">
+   <?foreach ($this->items as $item) {
+      ?>
+      <li>
+         <a href="<?=$item->{CustomMenu_Model_Items::COLUMN_LINK}?>"
+            class="<? if($item->{CustomMenu_Model_Items::COLUMN_NEW_WINDOW}){ echo "link-external";}?>"
+            title="<?ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?>"
+                 ><?ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?></a>
+      </li>
+   <?}?>
+   </ul>
+</div>
