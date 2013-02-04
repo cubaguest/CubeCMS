@@ -1,0 +1,7 @@
+<?
+$this->items = array();
+$this->items[$this->tr('Zákazníci')] = (string) $this->link()->route();
+$this->items[$this->tr('Skupiny')] = (string) $this->link()->route('customersGroups');
+
+$this->includeTpl('module_navigation.phtml', true);
+?>

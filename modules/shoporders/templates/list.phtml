@@ -28,6 +28,7 @@ $this->addFile('css://style.css');
                // odstranění tučného
 //               $("#table-orders").trigger("reloadGrid");
                if (callback && typeof(callback) === "function") { callback(); }
+               $('html,body').animate({scrollTop: $("#order-detail").offset().top-40},'slow');
             }
          });
       }
@@ -98,7 +99,7 @@ $this->addFile('css://style.css');
                {name:'pickupdate', index:'pickupdate', width:80, fixed :true, formatter: 'showNewStatus'},
                {name:'status', index:'status', width:70, fixed :true, formatter: 'showNewStatus'},
                {name:'price', index:'price', width:100, align:"right", fixed :true, formatter: 'showNewStatus', formatoptions: {type: "currency", decimalSeparator:",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"} },
-               {name:'act', index:'act', width:70, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
+               {name:'act', index:'act', width:80, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
             ],
             rowNum:15,
             autowidth : true,
@@ -132,6 +133,9 @@ $this->addFile('css://style.css');
             onSelectRow: function(rowid, status) { 
                if(status){
                   showOrder(rowid);
+                  $('#'+rowid+' td', this).each(function(){ // unmark new
+                     $(this).html( $(this).html().replace('<strong>', "").replace('</strong>', "") );
+                  });
                }
                return false;
             }

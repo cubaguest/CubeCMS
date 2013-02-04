@@ -1,5 +1,9 @@
 <?
 $this->addFile('css://style.css');
+//$jQuery = new JsPlugin_JQuery();
+//$jQuery->addUISpinner();
+//$this->addJsPlugin($jQuery);
+
 echo $this->toolbox;
 ?>
 <h1><?
@@ -10,12 +14,14 @@ echo $this->category()->getName();
    if(!empty($this->products)){
       $this->includeFile('tpl://sorting.phtml');
       foreach ($this->products as $product) {?>
-   <div class="main-content-list-record shop-product">
+   <div class="main-content-list-record shop-product <?if(!$product->{Shop_Model_Product::COLUMN_ACTIVE}) echo "concept";?> clearfix">
       <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))?>" 
              title="<?=$this->tr('Přejít na ').$product->{Shop_Model_Product::COLUMN_NAME}?>"><?
              echo $product->{Shop_Model_Product::COLUMN_NAME};
              echo strtotime($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*60*60) >= time() ? ' - '.$this->tr('Novinka!') : null;
-             ?></a></h2>
+             ?></a>
+      <?echo $product->{Shop_Model_Product::COLUMN_ACTIVE} ? null : ' - '.$this->tr('neaktivní')?>
+      </h2>
       <?if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
       <div class="main-content-list-record-image">
          <img src="<?=Shop_Product_Controller::getImagesDir(true).'small/'.$product->{Shop_Model_Product::COLUMN_IMAGE}?>" 
@@ -29,12 +35,17 @@ echo $this->category()->getName();
          <div class="product-price">
             <?
             echo $this->tr('Cena').': ';
-            echo round($product->{Shop_Model_Product::COLUMN_PRICE}*($product->{Shop_Model_Tax::COLUMN_VALUE}/100) + $product->{Shop_Model_Product::COLUMN_PRICE});
-            echo ' '.VVE_SHOP_CURRENCY_NAME;
+            echo Shop_Tools::getFormatedPrice($product->{Shop_Model_Product::COLUMN_PRICE}, $product->{Shop_Model_Tax::COLUMN_VALUE});
             ?>
          </div>
       <?
-      if($product->{Shop_Model_Product::COLUMN_QUANTITY} != 0 && $this->formAddToCart instanceof Form){
+      $qty = $product->{Shop_Model_ProductCombinations::COLUMN_QTY} != null ?
+         (int)$product->{Shop_Model_ProductCombinations::COLUMN_QTY} : (int)$product->{Shop_Model_Product::COLUMN_QUANTITY};
+      if($this->formAddToCart instanceof Form
+         && ( ($product->{Shop_Model_Product::COLUMN_STOCK} && $qty > 0)
+               || (!$product->{Shop_Model_Product::COLUMN_STOCK})
+               || VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK)
+      ){
          echo $this->formAddToCart->renderStart();
          $this->formAddToCart->productId->setValues($product->{Shop_Model_Product::COLUMN_ID});
          $this->formAddToCart->qty->setValues($product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
@@ -47,12 +58,16 @@ echo $this->category()->getName();
          echo $this->formAddToCart->add->controll();
          
          echo $this->formAddToCart->renderEnd();
-      } else if($product->{Shop_Model_Product::COLUMN_QUANTITY} == 0) {
+      } else if($product->{Shop_Model_ProductCombinations::COLUMN_ID} != null) {
+         echo $this->tr('Zboží v této variantě je vyprodáno. Zkuste vybrat jinout variantu.');
+      } else {
          echo $this->tr('Zboží je vyprodáno.');
       }
       ?>
       </div>
    </div>
+   <script type="text/javascript">
+   </script>
    <hr class="reseter" />
       <?}
       echo $this->scrollComp;

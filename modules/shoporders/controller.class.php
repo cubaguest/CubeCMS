@@ -65,7 +65,7 @@ class ShopOrders_Controller extends Controller {
       }
       
       $modelSt = new Shop_Model_OrderStatus();
-      $modelOrders->columns(array(Shop_Model_Orders::COLUMN_ID, Shop_Model_Orders::COLUMN_CUSTOMER_NAME, 
+      $modelOrders->columns(array(Shop_Model_Orders::COLUMN_ID, Shop_Model_Orders::COLUMN_CUSTOMER_NAME, Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY,
          Shop_Model_Orders::COLUMN_IS_NEW, Shop_Model_Orders::COLUMN_TIME_ADD, Shop_Model_Orders::COLUMN_TOTAL,
          Shop_Model_Orders::COLUMN_PICKUP_DATE,
          'status' => 
@@ -86,9 +86,11 @@ class ShopOrders_Controller extends Controller {
          if($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
             $pickupDate = vve_date("%x", new DateTime($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE}));
          }
+         $name = $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}
+            . ( $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null ? " (". $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} .')' : null );
          array_push($jqGrid->respond()->rows, 
             array('id' => $order->{Shop_Model_Orders::COLUMN_ID},
-                  'name' => $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME},
+                  'name' => $name,
                   'neworder' => $order->{Shop_Model_Orders::COLUMN_IS_NEW},
                   'time' => vve_date('%x %X', new DateTime($order->{Shop_Model_Orders::COLUMN_TIME_ADD})),
                   'pickupdate' => $pickupDate,
@@ -192,17 +194,17 @@ class ShopOrders_Controller extends Controller {
          
          if($formChangeStatus->infoCust->getValues() == true){
             $modelOrder = new Shop_Model_Orders();
-            $email = new Email();
+            $email = new Email(true);
             $order = $modelOrder->record($status->{Shop_Model_OrderStatus::COLUMN_ID_ORDER});
             
             $email->setSubject(sprintf($this->tr('Změna stavu objednávky č. %s'), $order->{Shop_Model_Orders::COLUMN_ID}));
             
-            $MailText = "Dobrý den\n\n"
-               ."Vaší objednávce číslo: {CISLO} v obchodě {STRANKY} byl upraven stav.\n\n"
-               ."Nový stav Vaší objednávky je: \"{STAV}\"\n\n"
-               ."Poznámmka: {POZN} ";
+            $MailText = "<p>Dobrý den</p>"
+               ."<p>Vaší objednávce číslo: {CISLO} v obchodě {STRANKY} byl upraven stav.</p>"
+               ."<p>Nový stav Vaší objednávky je: <strong>\"{STAV}\"</strong></p>"
+               ."<p>Poznámmka: {POZN}</p>";
             
-            $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.Locales::getLang().'.txt';
+            $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.Locales::getLang().'.html';
             if (is_file($file)) {
                $MailText = file_get_contents($file);
             }
@@ -218,13 +220,13 @@ class ShopOrders_Controller extends Controller {
                $order->{Shop_Model_Orders::COLUMN_ID},
                VVE_WEB_NAME,
                VVE_SHOP_STORE_ADDRESS,
-               vve_date("%x %X", new DateTime($status->{Shop_Model_OrderStatus::COLUMN_TIME_ADD})),
+               vve_date("%x %X", new DateTime()),
                $status->{Shop_Model_OrderStatus::COLUMN_NAME},
-               $status->{Shop_Model_OrderStatus::COLUMN_NOTE},
+               $status->{Shop_Model_OrderStatus::COLUMN_NOTE} != null ? $status->{Shop_Model_OrderStatus::COLUMN_NOTE} : '<em>'.$this->tr('není').'</em>',
             ), $MailText);
             
             
-            $email->setContent($MailText);
+            $email->setContent(Email::getBaseHtmlMail($MailText));
             $email->addAddress($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}, $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME});
             $email->send();
          }
@@ -350,7 +352,7 @@ class ShopOrders_Controller extends Controller {
       foreach ($orderItems as $item) {
          $c->pdf()->Cell($wName, 5, $item->{Shop_Model_OrderItems::COLUMN_NAME}, 1, 0, 'L');
          $c->pdf()->Cell($wSum, 5, $item->{Shop_Model_OrderItems::COLUMN_QTY}. ' ' . $item->{Shop_Model_OrderItems::COLUMN_UNIT}, 1, 0, 'L');
-         $c->pdf()->Cell($wPrice, 5, $item->{Shop_Model_OrderItems::COLUMN_PRICE}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+         $c->pdf()->Cell($wPrice, 5, Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE}), 1, 1, 'L');
       }
       
       $c->pdf()->Ln();
@@ -364,10 +366,12 @@ class ShopOrders_Controller extends Controller {
          $shippingText .= sprintf($this->tr(' - datum odběru: %s'), vve_date("%x", new DateTime($order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
       }
       $c->pdf()->Cell($wName + $wSum, 5, $shippingText, 1, 0, 'L');
-      $shippingPrice = $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} != 0 ? $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}." ".VVE_SHOP_CURRENCY_NAME : $this->tr('Zdarma') ;
+      $shippingPrice = $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} != 0 ?
+         Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}) : $this->tr('Zdarma') ;
       $c->pdf()->Cell($wPrice, 5, $shippingPrice, 1, 1, 'L');
       
-      $paymentPrice = $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} != 0 ? $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}." ".VVE_SHOP_CURRENCY_NAME : $this->tr('Zdarma') ;
+      $paymentPrice = $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} != 0 ?
+         Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}) : $this->tr('Zdarma') ;
       $c->pdf()->Cell($wName + $wSum, 5, $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}, 1, 0, 'L');
       $c->pdf()->Cell($wPrice, 5, $paymentPrice, 1, 1, 'L');
       
@@ -375,7 +379,7 @@ class ShopOrders_Controller extends Controller {
       
       $c->pdf()->SetFont($family, 'B', 16);
       $c->pdf()->Cell($wName + $wSum, 5, $this->tr('Cena celkem'), 1, 0, 'L');
-      $c->pdf()->Cell($wPrice, 5, $order->{Shop_Model_Orders::COLUMN_TOTAL}." ".VVE_SHOP_CURRENCY_NAME, 1, 1, 'L');
+      $c->pdf()->Cell($wPrice, 5, Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_TOTAL}), 1, 1, 'L');
       
       
       $c->pdf()->Ln();

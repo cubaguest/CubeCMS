@@ -19,6 +19,7 @@ class ShopSettings_Controller extends Controller {
       $form = new Form('base', true);
       
       $grpInfo = $form->addGroup('shop', $this->tr('Informace o obchod'));
+      $grpStock = $form->addGroup('shop_stock', $this->tr('Nastavení skladu'));
 
       $eStoreName = new Form_Element_Text('name', $this->tr('Název obchodu'));
       $eStoreName->setValues(VVE_WEB_NAME);
@@ -27,16 +28,22 @@ class ShopSettings_Controller extends Controller {
       $eStoreInfo = new Form_Element_TextArea('info', $this->tr('Adresa obchodu'));
       $eStoreInfo->setValues(VVE_SHOP_STORE_ADDRESS);
       $form->addElement($eStoreInfo, $grpInfo);
-      
+
+      $elemAllowBuyNotInStock = new Form_Element_Checkbox('buyNotInStock', $this->tr('Řízení skladu'));
+      $elemAllowBuyNotInStock->setSubLabel($this->tr('Při zapnutí omezí nákup produktů pouze na produkty které jsou skladem. Zboží, které není skladem nelze zakoupit.'));
+      $elemAllowBuyNotInStock->setValues(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK);
+      $form->addElement($elemAllowBuyNotInStock, $grpStock);
+
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
       
       if($form->isValid()){
          $this->storeSystemCfg('VVE_WEB_NAME', $form->name->getValues());
          $this->storeSystemCfg('VVE_SHOP_STORE_ADDRESS', $form->info->getValues());
-         
+         $this->storeSystemCfg('VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK', $form->buyNotInStock->getValues() ?  "false" : "true");
+
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
-//         $this->link()->reload();
+         $this->link()->reload();
       }
       $this->view()->form = $form;
    }
@@ -163,7 +170,7 @@ class ShopSettings_Controller extends Controller {
 
       $eFreeShipping = new Form_Element_Text('freeShipping', $this->tr('Doprava zdarma od'));
       $eFreeShipping->setValues(VVE_SHOP_FREE_SHIPPING);
-      $eFreeShipping->setSubLabel($this->tr('Například od 2000 Kč, tedy zadat 2000'));
+      $eFreeShipping->setSubLabel($this->tr('Například od 2000 Kč zadat 2000. -1 pro vypnutí.'));
       $form->addElement($eFreeShipping, $grpShipping);
       
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
@@ -406,9 +413,8 @@ class ShopSettings_Controller extends Controller {
             }
             $record->{Shop_Model_Shippings::COLUMN_VALUE} = $jqGridReq->{Shop_Model_Shippings::COLUMN_VALUE};
             $record->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP} = $jqGridReq->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP};
-            $record->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS} = $jqGridReq->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS};
-            $model->save($record);
-          
+            $record->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS} = (string)$jqGridReq->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS};
+            $record->save();
             $this->infoMsg()->addMessage($this->tr('Doprava byla uložena'));
             break;
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
@@ -465,13 +471,12 @@ class ShopSettings_Controller extends Controller {
       $form->addElement($eNotifyMail, $grpNotify);
 
       $eUserMailText = new Form_Element_TextArea('notifyUserMail', $this->tr('Text e-mailu pro uživatele'));
-      $eUserMailText->addFilter(new Form_Filter_StripTags());
       $eUserMailText->setLangs();
       // načtení hodnot pokud existují
       $values = array();
       foreach (Locales::getAppLangs() as $lang) {
          $values[$lang] = null;
-         $file = $this->module()->getDataDir().'mail_tpl_user_'.$lang.'.txt';
+         $file = $this->module()->getDataDir().'mail_tpl_user_'.$lang.'.html';
          if(is_file($file)){
             $values[$lang] = file_get_contents($file);
          }
@@ -480,13 +485,12 @@ class ShopSettings_Controller extends Controller {
       $form->addElement($eUserMailText, $grpNotify);
       
       $eUserStatusText = new Form_Element_TextArea('userOrderStatusMail', $this->tr('Text e-mailu pro změnu stavu'));
-      $eUserStatusText->addFilter(new Form_Filter_StripTags());
       $eUserStatusText->setLangs();
       // načtení hodnot pokud existují
       $values = array();
       foreach (Locales::getAppLangs() as $lang) {
          $values[$lang] = null;
-         $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.$lang.'.txt';
+         $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.$lang.'.html';
          if(is_file($file)){
             $values[$lang] = file_get_contents($file);
          }
@@ -495,9 +499,8 @@ class ShopSettings_Controller extends Controller {
       $form->addElement($eUserStatusText, $grpNotify);
       
       $eAdminMailText = new Form_Element_TextArea('notifyAdminMail', $this->tr('Text e-mailu pro administrátora'));
-      $eAdminMailText->addFilter(new Form_Filter_StripTags());
-      
-      $file = $this->module()->getDataDir().'mail_tpl_admin.txt';
+
+      $file = $this->module()->getDataDir().'mail_tpl_admin.html';
       if(is_file($file)){
          $eAdminMailText->setValues(file_get_contents($file));
       }
@@ -530,19 +533,19 @@ class ShopSettings_Controller extends Controller {
          // uložení mailů
          $usersTexts = $form->notifyUserMail->getValues();
          foreach ($usersTexts as $lang => $text) {
-            if($text != null && !file_put_contents($this->module()->getDataDir().'mail_tpl_user_'.$lang.'.txt', $text)){
+            if($text != null && !file_put_contents($this->module()->getDataDir().'mail_tpl_user_'.$lang.'.html', $text)){
                throw new UnexpectedValueException(sprintf($this->tr('Chyba při zápisu do souboru s mailem uživatele (jazyk: %s)'), $lang));
             }
          }
          
          $statusTexts = $form->userOrderStatusMail->getValues();
          foreach ($statusTexts as $lang => $text) {
-            if($text != null && !file_put_contents($this->module()->getDataDir().'mail_tpl_orderstatus_'.$lang.'.txt', $text)){
+            if($text != null && !file_put_contents($this->module()->getDataDir().'mail_tpl_orderstatus_'.$lang.'.html', $text)){
                throw new UnexpectedValueException(sprintf($this->tr('Chyba při zápisu do souboru s mailem změny stavu objednávky (jazyk: %s)'), $lang));
             }
          }
          
-         if(!file_put_contents($this->module()->getDataDir().'mail_tpl_admin.txt', $form->notifyAdminMail->getValues())){
+         if(!file_put_contents($this->module()->getDataDir().'mail_tpl_admin.html', $form->notifyAdminMail->getValues())){
             throw new UnexpectedValueException($this->tr('Chyba při zápisu do souboru s mailem administrátora'));
          }
          
@@ -597,6 +600,36 @@ class ShopSettings_Controller extends Controller {
          
       }
    }
-}
 
-?>
+   public function mailVariablesController()
+   {
+      switch($this->getRequestParam('type', null)) {
+         case "userMail":
+         case "adminMail":
+            $this->view()->variables = array(
+               '{STRANKY}' => $this->tr('Název stránek (obchodu)'),
+               '{DATUM}' => $this->tr('Datum objednávky s časem'),
+               '{IP}' => $this->tr('IP adresa uživatele'),
+               '{INFO}' => $this->tr('Informace o objednávce'),
+               '{ZBOZI}' => $this->tr('Výpis zboží, dopravy a platby i s cenami'),
+               '{ADRESA_OBCHOD}' => $this->tr('Adresa obchodu'),
+               '{ADRESA_DODACI}' => $this->tr('Adresa dodací'),
+               '{ADRESA_FAKTURACNI}' => $this->tr('Adresa fakturační'),
+               '{POZNAMKA}' => $this->tr('Poznámka uživatele'),
+            );
+            break;
+         case "orderStatus":
+            $this->view()->variables = array(
+               '{STRANKY}' => $this->tr('Název stránek (obchodu)'),
+               '{CISLO}' => $this->tr('Číslo objednávky'),
+               '{ADRESA_OBCHOD}' => $this->tr('Adresa obchodu'),
+               '{DATUM_ZMENY}' => $this->tr('Datum změny stavu'),
+               '{STAV}' => $this->tr('Nový stav'),
+               '{POZN}' => $this->tr('Poznámka stavu'),
+            );
+            break;
+      }
+
+
+   }
+}

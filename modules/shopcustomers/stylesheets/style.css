@@ -1,0 +1,39 @@
+.order-detail .address {
+   width: 50%;
+}
+
+#table-order-status, #table-order-status-form {
+/*   width: 500px;*/
+}
+
+#table-order-status td, #table-order-status th, 
+#table-order-status-form td, #table-order-status-form th,
+#table-order-items td, #table-order-items th
+{
+   padding: 3px;
+}
+
+.order-full-price {
+   font-weight: bold;
+   font-size: 14px;
+}
+
+#table-order-status .column-date {
+   width: 120px;
+}
+
+#table-shippings td span.lang-cell,
+#table-payments td span.lang-cell {
+   color: silver;
+}
+#table-shippings .ui-state-hover td span.lang-cell,
+#table-payments .ui-state-hover td span.lang-cell
+{
+   color: red;
+}
+
+th.ui-th-column div{
+    white-space:normal !important;
+    height:auto !important;
+    padding:2px;
+}

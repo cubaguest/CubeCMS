@@ -1,16 +1,16 @@
 <?php
 class ShopCart_Panel extends Panel {
-   private $basket = array();
+   private $cart = array();
 
 
    public function panelController() {
-      $this->basket = new Shop_Basket();
-      $this->basket->loadItems();
+      $this->cart = new Shop_Cart();
+      $this->cart->loadItems();
 	}
 	
 	public function panelView() {
       
-      $this->template()->basket = $this->basket;
+      $this->template()->cart = $this->cart;
       $this->template()->addFile('tpl://panel.phtml');
 	}
 

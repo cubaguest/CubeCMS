@@ -1,57 +1,113 @@
 <?
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
+$this->addFile('js://cart.js');
 $jQuery = new JsPlugin_JQuery();
+$jQuery->addUISpinner();
+$datepicker = false;
 if(isset ($this->formNext->pickupDate)){
+   $datepicker = true;
    $jQuery->addUIDatepicker();
 }
 $this->addJsPlugin($jQuery);
 $this->step = 1;
 ?>
 <h1><?=$this->category()->getName();?></h1>
-<?$this->includeFile('tpl://navigation.phtml')?>
-<div class="main-content-list" id="shop-basket">
-   <?if(!$this->basket->isEmpty()){?>
+<?if(!$this->cart->isEmpty()){
+   $this->includeFile('tpl://navigation.phtml');
+}
+?>
+<script type="text/javascript">
+   $(document).ready(function(){
+      <?if(!$this->cart->isEmpty()){?>
+      Cart.init({
+         shippings : <?=json_encode($this->shippings)?>,
+         freeShipAndPayFrom : <?=(int)$this->freeShipAndPayFrom?>,
+         payments : <?=json_encode($this->payments)?>,
+         disallowPayments : <?=json_encode($this->disallowPayments)?>,
+         priceCart : <?=str_replace(',', '.',$this->cart->getPrice())?>,
+         priceShipping : <?=$this->shippingPrice?>,
+         pricePayment : <?=$this->paymentPrice?>,
+         updateUrl : '<?=$this->link()->route('cartUpdate')?>',
+         currency : '<?=VVE_SHOP_CURRENCY_NAME?>',
+         datepicker : <?echo $datepicker ? "true" : "false";?>,
+         roundDecimals : <?=(int)VVE_SHOP_PRICE_ROUND_DECIMAL?>,
+         decimals : <?=(int)VVE_SHOP_PRICE_DECIMALS?>,
+         msg : {
+            free : '<?=$this->tr('Zdarma')?>',
+            deleteItem : '<?=$this->tr('Smazat tuto položku?')?>'
+         }
+      });
+      <?}?>
+   });
+</script>
+
+<div class="main-content-list" id="shop-cart">
+   <?if(!$this->cart->isEmpty()){?>
    <h2><?=$this->tr('Obsah košíku');?></h2>
-   <?echo $this->formItems->renderStart();?>
-   <table class="full-width">
+   <?
+   $this->formItems->html()->setAttrib('id', 'form-items-qty');
+   echo $this->formItems->renderStart();
+   ?>
+   <table class="full-width" id="table-cart-items">
       <thead>
          <tr>
             <th class="column-1"><?=$this->tr('Název')?></th>
-            <th class="column-2"><?=$this->tr('Cena za položku')?></th>
+            <th class="column-2"><?=$this->tr('Cena/ks')?></th>
             <th class="column-3"><?=$this->tr('Počet')?></th>
-            <th class="column-4"><?=$this->tr('Odebrat')?></th>
-            <th class="column-5"><?=$this->tr('Cena celkem')?></th>
+            <th class="column-4"><?=$this->tr('Cena')?></th>
+            <th class="column-5"></th>
          </tr>
       </thead>
       <tbody>
-      <?foreach ($this->basket as $key => $item) {
-         $this->formItems->del->setDimensional($key);
-         $this->formItems->qty->setDimensional($key);
-         $this->formItems->qty->html()->addClass('shop-basket-qty');
+      <?foreach ($this->cart as $item) {
+         $this->formItems->qty->setMultiple($item->getId());
+         $this->formItems->qty->html()->addClass('shop-cart-qty');
          $this->formItems->qty->setValues($item->getQty());
          ?>
-         <tr>
-            <td><a href="<?=$item->getUrl()?>" title="<?=$item->getName()?>"><?=$item->getName()?></a></td>
-            <td><?
-               echo $item->getPrice(false).' '.VVE_SHOP_CURRENCY_NAME;
+         <tr id="cart-item-<?=$item->getId()?>" class="cart-item">
+            <td class="column-1 product-name">
+               <a href="<?=$item->getUrl()?>" title="<?=$item->getName()?>"><?=$item->getName()?></a>
+               <?if($item->getNote() != null){
+                  echo '<p class="font-small">';
+                  ps($item->getNote());
+                  echo '</p>';
+               }?>
+               <?if ($item->getCode() != null){?>
+               <p><? ps($item->getCode())?></p>
+               <?}?>
+            </td>
+            <td class="product-price-by-piece no-wrap"><?
+               echo Shop_Tools::getFormatedPrice($item->getPrice(false));
                echo ' / '.$item->getUnitSize().' '.$item->getUnit();
                ?>
+               <input class="unit-size" type="hidden" value="<?=$item->getUnitSize()?>" />
+               <?if($item->getProductQty() >= 0 ){ // @todo kontrola jestli je pro zboží povolen sklad (z produktu)  ?>
+               <input class="max-qty" type="hidden" value="<?=$item->getProductQty()?>" />
+               <?}?>
             </td>
             <td><?
                echo $this->formItems->qty->controll().' '.$item->getUnit();
             ?></td>
-            <td><? echo $this->formItems->del->controll();?></td>
-            <td><?=$item->getPrice().' '.VVE_SHOP_CURRENCY_NAME?></td>
+            <td class="column-4 column-price">
+               <span class="price product-price"><?=Shop_Tools::getFormatedPrice($item->getPrice())?></span>
+               <input class="product-price-input" type="hidden" value="<?=str_replace(",", '.', $item->getPrice())?>" />
+            </td>
+            <td class="column-5">
+               <a class="button-delete-item" href="<?=$this->link()->param('dp', $item->getId())?>" title="<?=$this->tr('Odtsranit z košíku')?>">
+                  <img src="/images/icons/delete.png" alt="del" />
+               </a>
+            </td>
          </tr>
       <?}?>
       </tbody>
       <tfoot>
          <tr>
             <td><? echo $this->formItems->set->controll();?></td>
+            <td colspan="2" class="price column-price"><?=$this->tr('Cena za zboží:')?></strong></td>
+            <td colspan="" class="price column-price products-price">
+               <?=Shop_Tools::getFormatedPrice($this->cart->getPrice())?> </strong>
+            </td>
             <td></td>
-            <td></td>
-            <td class="price"><?=$this->tr('Cena celkem:')?></strong></td>
-            <td class="price"><?=$this->basket->getPrice().' '.VVE_SHOP_CURRENCY_NAME?> </strong></td>
          </tr>
       </tfoot>
    </table>
@@ -78,93 +134,35 @@ $this->step = 1;
                echo $this->formNext->pickupDate->label();
                echo $this->formNext->pickupDate->controll();
             }
-            
             ?></td>
-            <td class="column-5" ><span id="shipping-price"></td>
+            <td class="column-4 column-price" >
+               <span id="shipping-price"><?echo $this->shippingPrice > 0 ? Shop_Tools::getFormatedPrice($this->shippingPrice) : $this->tr('Zdarma')?></span>
+            </td>
          </tr>
          <tr>
             <td><? echo $this->formNext->payment->label();?></td>
             <td><? echo $this->formNext->payment->controll();?></td>
-            <td class="column-5" ><span id="payment-price"></span></td>
+            <td class="column-4 column-price" >
+               <span id="payment-price"><?echo $this->paymentPrice > 0 ? Shop_Tools::getFormatedPrice($this->paymentPrice) : $this->tr('Zdarma')?></span>
+            </td>
          </tr>
          <tr>
             <th><? echo $this->tr('Cena celkem');?></th>
             <td></td>
-            <td class="price"><span id="full-price"></span></td>
+            <td class="price column-price">
+               <span id="full-price">
+                  <? echo Shop_Tools::getFormatedPrice($this->cart->getPrice()+$this->shippingPrice+$this->paymentPrice);?>
+               </span>
+            </td>
          </tr>
          <tr>
             <td colspan="3" class="align-right"><? echo $this->formNext->send->controll();?></td>
          </tr>
       </tbody>
    </table>
-   <?echo $this->formNext->renderEnd();
-   ?>
-   <script type="text/javascript">
-      var shippings = <?=json_encode($this->shippings)?>;
-      var payments = <?=json_encode($this->payments)?>;
-      var disallowPayments = <?=json_encode($this->disallowPayments)?>;
-      var priceBasket = <?=round($this->basket->getPrice())?>;
-      var priceShipping = 0;
-      var pricePayment = 0;
-      $(document).ready(function(){
-         // základní doplnění ceny
-         $('select[name="goto_order_shipping"]').change(function(){ setShippingPrice($(this).val()); }).change();
-         
-         $('select[name="goto_order_payment"]').change(function(){ setPaymentPrice($(this).val()); }).change();
-         <?if(isset ($this->formNext->pickupDate)){?>
-         $('input[name="goto_order_pickupDate"]').datepicker({
-            minDate : new Date(<?=date('Y')?>, <?=date('m')?>, <?=date('d')?>)
-         });
-         <?}?>
-         $('select[name="goto_order_shipping"]').change(function(){
-            var $paySelect = $('select[name="goto_order_payment"]');
-            $('option', $paySelect).removeAttr('disabled');
-            var idShip = $(this).val();
-            $.each(disallowPayments[idShip], function(){
-               $('option[value="'+this+'"]', $paySelect).attr('disabled', 'disabled');
-            });
-            $('option:not(:disabled):first', $paySelect).prop('selected', true);
-            $paySelect.change(); // kvuli přepočtu ceny
-         });
-      });
-      
-      function updateFullPrice(){
-         $('#full-price').text(priceBasket+priceShipping+pricePayment+' <?=VVE_SHOP_CURRENCY_NAME?>');
-      }
-      
-      function setShippingPrice(idshipping){
-         if(shippings[idshipping] == 0){
-            $('#shipping-price').text('<?=$this->tr('Zdarma')?>');
-            priceShipping = 0;
-         } else {
-            if(shippings[idshipping].indexOf("%") != -1){
-               priceShipping = Math.floor(priceBasket*(parseInt(shippings[idshipping])/100) );
-               $('#shipping-price').text(shippings[idshipping]+' ('+priceShipping+' <?=VVE_SHOP_CURRENCY_NAME?>)');
-            } else {
-               $('#shipping-price').text(shippings[idshipping]+' <?=VVE_SHOP_CURRENCY_NAME?>');
-               priceShipping = parseInt(shippings[idshipping]);
-            }
-         }
-         updateFullPrice();
-      }
-      function setPaymentPrice(idpayment){
-         if(payments[idpayment] == 0){
-            $('#payment-price').text('<?=$this->tr('Zdarma')?>');
-            pricePayment = 0;
-         } else {
-            if(payments[idpayment].indexOf("%") != -1){
-               pricePayment = Math.floor(priceBasket*(parseInt(payments[idpayment])/100) );
-               $('#payment-price').text(payments[idpayment]+' ('+pricePayment+' <?=VVE_SHOP_CURRENCY_NAME?>)');
-            } else {
-               $('#payment-price').text(payments[idpayment]+' <?=VVE_SHOP_CURRENCY_NAME?>');
-               pricePayment = parseInt(payments[idpayment]);
-            }
-         }
-         updateFullPrice()
-      }
-   </script>
-   
+   <?echo $this->formNext->renderEnd();?>
    <?} else {?>
-   <div class="main-content-text"><?=$this->tr('Košík neobsahuje žádnou položku.')?></div>
+   <div class="text"><p><?=$this->tr('Košík neobsahuje žádnou položku.')?></p></div>
    <?}?>
 </div>
+

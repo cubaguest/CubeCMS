@@ -52,28 +52,42 @@ class ShopProductGeneral_View extends Shop_Product_View {
          $toolEditVariants->setIcon('page_attach.png')->setTitle($this->tr("Upravit varianty vybraného zboží"));
          $toolbox->addTool($toolEditVariants);
 
+         $toolState = new Template_Toolbox2_Tool_Form($this->formState);
+         $toolState->setIcon($this->formState->state->getValues() ? "enable.png" : "disable.png")->setTitle($this->formState->change->getLabel());
+         $toolbox->addTool($toolState);
+
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat zboží'))
             ->setConfirmMeassage($this->tr('Opravdu smazat toto zboží?'));
          $toolbox->addTool($tooldel);
-         
+
+         $toolDuplicate = new Template_Toolbox2_Tool_Form($this->formDuplicate);
+         $toolDuplicate->setIcon('page_copy.png')->setTitle($this->tr('Duplikovat zboží'));
+         $toolbox->addTool($toolDuplicate);
+
          $this->toolbox = $toolbox;
       }
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link());
    }
    
    public function editView() 
    {
       $this->editProduct(true);
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Úprava'), $this->link());
    }
    
    public function editVariantsView() 
    {
       $this->editProductVariants();
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Úprava variant'), $this->link());
    }
    
    public function addView() 
    {
       $this->editProduct(false);
+      Template_Navigation::addItem($this->tr('Přidání produktu'), $this->link());
    }
    
 }

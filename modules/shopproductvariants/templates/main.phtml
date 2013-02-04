@@ -1,0 +1,115 @@
+<?
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addUICore();
+$this->addJsPlugin($jQuery);
+$this->addFile('css://style.less');
+$buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearForm(this); return false;" >'
+   .$this->tr('Vyčistit').'</button> ';
+?>
+<h1><?= $this->category()->getName() ?></h1>
+<div class="main-content-admin-form">
+   <div id="variants-groups">
+      <h2 class="ui-widget ui-widget-header"><?=$this->tr('Skupiny')?></h2>
+      <?if(!empty($this->groups)){?>
+      <ul id="variants-groups-list" class="ui-widget ui-widget-content">
+         <?foreach( $this->groups as $group ) {?>
+         <li id="attrgroup-<?=$group->{Shop_Model_AttributesGroups::COLUMN_ID}?>"
+             class="ui-state-default <?
+                if($this->group && $group->{Shop_Model_AttributesGroups::COLUMN_ID} == $this->group->{Shop_Model_AttributesGroups::COLUMN_ID}){
+                  echo "ui-state-highlight";
+                };
+                ?> clearfix"
+             data-id="<?=$group->{Shop_Model_AttributesGroups::COLUMN_ID}?>">
+            <a href="<?=$this->link()->param('g', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+               class="name"><?ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?></a>
+            <span class="controls">
+               <a href="<?=$this->link()->param('g', $group->{Shop_Model_AttributesGroups::COLUMN_ID})
+                  ->param('editg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+                  class="button-edit-group"><img src="/images/icons/pencil.png" /></a>
+               <a href="<?=$this->link()->param('deleteg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+                  class="button-delete-group"><img src="/images/icons/delete.png" /></a>
+            </span>
+         </li>
+         <?}?>
+      </ul>
+      <?} else {?>
+      <div class="ui-widget ui-widget-content ui-state-disabled empty-list">
+         <?=$this->tr('Není vytvořena žádná skupina')?>
+      </div>
+      <?}?>
+      <div id="groups-control" class="ui-widget ui-widget-content ui-widget-controls">
+         <?
+         echo $this->formAddGroup->renderStart();
+         echo $this->formAddGroup->id->control();
+         echo '<div class="name-label">'.$this->formAddGroup->name->label().'</div>';
+         echo $this->formAddGroup->name->controlAll();
+         echo '<div class="button-save">'.$buttonCancelEdit.$this->formAddGroup->save->control().'</div>';
+         echo $this->formAddGroup->renderEnd();
+         ?>
+      </div>
+   </div>
+   <div id="variants-values">
+      <h2 class="ui-widget ui-widget-header"><?
+         if($this->group){
+            echo $this->tr('Varianty skupiny:')." ";
+            ps_lang($this->group->{Shop_Model_AttributesGroups::COLUMN_NAME});
+         } else {
+            echo $this->tr('Varianty');
+         }
+         ?></h2>
+      <?if(!empty($this->attributes)){?>
+      <ul id="variants-values-list" class="ui-widget ui-widget-content">
+         <?foreach( $this->attributes as $attr ) {?>
+         <li id="attr-<?=$attr->{Shop_Model_Attributes::COLUMN_ID}?>"
+             class="ui-state-default clearfix" data-id="<?=$attr->{Shop_Model_Attributes::COLUMN_ID}?>">
+            <span class="name"><?p_lang($attr->{Shop_Model_Attributes::COLUMN_NAME})?></span>
+            <span class="controls">
+               <a href="<?=$this->link()->param('editv', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
+                  class="button-edit-value"><img src="/images/icons/pencil.png" /></a>
+               <a href="<?=$this->link()->param('deletev', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
+                  class="button-delete-value"><img src="/images/icons/delete.png" /></a>
+            </span>
+         </li>
+         <?}?>
+      </ul>
+      <?} else {?>
+      <div class="ui-widget ui-widget-content ui-state-disabled empty-list">
+         <?=$this->tr('Není vytvořena žádná hodnota nebo vybrána skupina')?>
+      </div>
+      <?}?>
+      <?if($this->group){?>
+      <div id="values-control" class="ui-widget ui-widget-content ui-widget-controls">
+         <?
+         echo $this->formAddAttr->renderStart();
+         echo $this->formAddAttr->id->control();
+         echo $this->formAddAttr->idg->control();
+         echo '<div class="name-label">'.$this->formAddAttr->name->label().'</div>';
+         echo $this->formAddAttr->name->controlAll();
+         echo '<div class="button-save">'.$buttonCancelEdit.$this->formAddAttr->save->control().'</div>';
+         echo $this->formAddAttr->renderEnd();
+         ?>
+      </div>
+      <?}?>
+   </div>
+   <hr class="reseter" />
+
+   <script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      function clearForm(button){
+         var $this = $(button);
+         $this.parents('form').find('input[type="text"],input[type="hidden"]').val("");
+      }
+      $(document).ready(function() {
+          $('.button-delete-group,.button-delete-value').click(function(){
+             return confirm('<?=$this->tr('Opravdu zmazat tuto skupinu/hodnotu?')?>');
+          });
+          $('a.button-edit-group').click(function(){
+
+          });
+          $('a.button-edit-value').click(function(){
+
+          });
+      });
+      /* ]]> */
+   </script>
+</div>

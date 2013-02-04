@@ -1,33 +1,30 @@
 .order-detail .address {
    width: 50%;
 }
-
 #table-order-status, #table-order-status-form {
 /*   width: 500px;*/
 }
-
-#order-detail td, #order-detail th { 
+#order-detail td, #order-detail th {
    padding: 3px; 
    vertical-align: top;
 }
 #order-detail .address { 
    padding: 3px; 
 }
-
-
+.column-price {
+   text-align: right;
+}
 .order-full-price {
    font-weight: bold;
-   font-size: 14px;
+   font-size: 120%;
 }
-
 #table-order-status .column-date {
    width: 150px;
 }
 #table-order-status {
    margin-bottom: 1em;
 }
-
-@media print { 
+@media print {
    h1, #orderActionsButtons, #table-order-status-form,
    #gbox_table-orders {
       display: none;

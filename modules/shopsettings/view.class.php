@@ -35,35 +35,26 @@ class ShopSettings_View extends View {
    public function ordersView()
    {
       $this->template()->addFile('tpl://orders.phtml');
+      Template_Module::setEdit(true);
+
+      // assign tinymce editor
+      $themeAdvMail = new Component_TinyMCE_Settings_Mail();
+      $themeAdvMail->setSetting('height', '300');
+      $themeAdvMail->setVariablesURL($this->link()->route('mailVariables')->param('type', 'userMail'));
+
+      $this->setTinyMCE($this->form->notifyUserMail, $themeAdvMail);
+
+      $themeAdvMail->setVariablesURL($this->link()->route('mailVariables')->param('type', 'orderStatus'));
+      $this->setTinyMCE($this->form->userOrderStatusMail, $themeAdvMail);
+
+      $themeAdvMail->setVariablesURL($this->link()->route('mailVariables')->param('type', 'adminMail'));
+      $this->setTinyMCE($this->form->notifyAdminMail, $themeAdvMail);
+
    }
    
    public function customersView()
    {
       
-   }
-   
-   private function addTinyMCE() {
-      $type = $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced');
-      if($type == 'none') return;
-      $this->form->text->html()->addClass("mceEditor");
-      $this->tinyMCE = new Component_TinyMCE();
-      switch ($type) {
-         case 'simple':
-            $settings = new Component_TinyMCE_Settings_AdvSimple();
-            $settings->setSetting('editor_selector', 'mceEditor');
-            break;
-         case 'full':
-            // TinyMCE
-            $settings = new Component_TinyMCE_Settings_Full();
-            break;
-         case 'advanced':
-         default:
-            $settings = new Component_TinyMCE_Settings_Advanced();
-            break;
-      }
-      $settings->setSetting('height', '600');
-      $this->tinyMCE->setEditorSettings($settings);
-      $this->tinyMCE->mainView();
    }
 }
 

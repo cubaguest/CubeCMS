@@ -1,0 +1,129 @@
+<?
+$jqCss = new JsPlugin_JQueryCSS();
+$this->addJsPlugin($jqCss);
+?>
+<h1><?=$this->tr('Zákazníci')?></h1>
+<?
+$this->includeFile('tpl://nav.phtml');
+?>
+<div class="content-admin">
+   <?
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('addCustomer'),
+         'name' => $this->tr('Nová zákazník'),
+         'title' => $this->tr('Přidat nového zákazníka'),
+         'icon' => 'user_add.png',
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <div class="ui-widget ui-cube-widget ui-table-widget">
+      <table class="full-width">
+         <thead>
+         <tr class="ui-widget-header">
+            <td>ID</td>
+            <th>
+               <?
+               echo $this->tr('Jméno');
+               $this->orderParam = 'nord';
+               echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+               ?>
+            </th>
+            <th>
+               <?
+               echo $this->tr('Přijmení');
+               $this->orderParam = 'snord';
+               echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+               ?>
+            </th>
+            <th>
+               <?
+               echo $this->tr('E-mail');
+               $this->orderParam = 'emord';
+               echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+               ?>
+            </th>
+            <th>
+               <?
+               echo $this->tr('Skupina');
+               $this->orderParam = 'gord';
+               echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+               ?>
+            </th>
+            <th><?
+               ps($this->tr('Utratil'));
+               $this->orderParam = 'ptord';
+               echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+               ?></th>
+            <th></th>
+         </tr>
+         </thead>
+         <tbody>
+         <?
+         if(!empty($this->customers)){
+            foreach ($this->customers as $customer) {?>
+            <tr class="ui-widget-content ui-state-default">
+               <td class=""><?ps($customer->{Shop_Model_Customers::COLUMN_ID})?></td>
+               <td class=""><?ps($customer->{Model_Users::COLUMN_NAME})?></td>
+               <td class=""><?ps($customer->{Model_Users::COLUMN_USERNAME})?></td>
+               <td class=""><?ps($customer->{Model_Users::COLUMN_MAIL})?></td>
+               <td>
+                  <form name="form-set-group" action="<?=$this->link()?>" method="post">
+                     <select name="customer-group-select">
+                     <? foreach($this->customersGroups as $grp) {
+                        $selected = $grp->{Shop_Model_CustomersGroups::COLUMN_ID} == $customer->{Shop_Model_Customers::COLUMN_ID_GROUP}
+                           ? 'selected="selected"' : null;
+                        $name = $grp->{Shop_Model_CustomersGroups::COLUMN_NAME};
+                        if($grp->{Shop_Model_CustomersGroups::COLUMN_REDUCTION} != 0){
+                           $name .= ' - '.$grp->{Shop_Model_CustomersGroups::COLUMN_REDUCTION}.'%';
+                        }
+                        ?>
+                        <option value="<?echo (int)$grp->{Shop_Model_CustomersGroups::COLUMN_ID}?>"
+                             <?=$selected?> ><?ps($name)?></option>
+                     <?}?>
+                     </select>
+                     <input type="hidden" name="cust-id" value="<?=$customer->{Shop_Model_Customers::COLUMN_ID}?>" />
+                  </form>
+               </td>
+               <td><?=Shop_Tools::getFormatedPrice($customer->totalPaid)?></td>
+               <td>
+                  <?
+                  $toolbox = clone $this->toolboxItem;
+                  $toolbox->cust_del_->getForm()->id->setValues( $customer->{Shop_Model_Customers::COLUMN_ID});
+
+                  $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+                  echo $toolbox;
+                  ?>
+               </td>
+            </tr>
+               <?
+            }
+         } else {
+            ?>
+         <tr class="ui-widget-content ui-state-disabled">
+            <td colspan="2"><?=$this->tr('Není definována žádná značka')?></td>
+         </tr>
+            <?}?>
+         </tbody>
+      </table>
+   </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+      $('select[name="customer-group-select"]').change(function(){
+         var idc = $(this).parent().find('input[name="cust-id"]').val();
+         var idg = $(this).val();
+         $.ajax({
+            url: '<?=$this->link()->route('changeCustomer')?>', type : 'POST',
+            data : {action : 'changegrp', id : idc, idg : idg},
+            success: function(data) {
+
+            }
+         });
+      });
+   });
+   /* ]]> */
+</script>

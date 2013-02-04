@@ -10,7 +10,10 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
-      $this->loadProducts($this->getRequestParam('num', $this->category()->getParam('scroll', 20)), $this->getRequestParam('sort'));
+      $this->loadProducts(
+         $this->getRequestParam('num', $this->category()->getParam('scroll', 20)),
+         $this->getRequestParam('sort'),
+         $this->category()->getId());
       $this->createAddToCartForm();
    }
 
@@ -37,17 +40,23 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
    {
       //		Kontrola práv
       $this->checkReadableRights();
-      $this->loadProduct();
+      $product = $this->loadCategoryProduct();
       
-      if($this->view()->product == false){
+      if($product == false){
          return false;
       }
-      
-      if($this->view()->product->{Shop_Model_Product::COLUMN_QUANTITY} != 0){
-         $this->createAddToCartForm();
+
+      if( VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK ||
+         ($product->{Shop_Model_Product::COLUMN_QUANTITY} > 0 && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK )
+         || !$product->{Shop_Model_Product::COLUMN_STOCK}){
+         $this->createAddToCartForm($product->getPK(), true);
       }
-      $this->deleteProduct();
+      $this->processDeleteProduct($product);
+      $this->processDuplicateProduct($product);
+      $this->processChangeProductState($product);
       $this->view()->linkBack = $this->link()->route();
+
+      $this->view()->product = $product;
    }
 
    public function editVariantsController()
@@ -77,6 +86,14 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
       if($form->isValid()) {
          $settings['scroll'] = (int)$form->scroll->getValues();
       }
+   }
+
+   public static function clearOnRemove(Category $category)
+   {
+      $model = new Shop_Model_Product();
+      // delete product, combinations and variants
+      $model->where(Shop_Model_Product::COLUMN_ID_CATEGORY." = :idc", array('idc' => $category->getId()))->delete();
+
    }
 }
 

@@ -55,7 +55,11 @@
       </tr>
    </thead>
    <tbody>
-      <? foreach ($this->items as $item) { ?>
+      <?
+      $fullPrice = 0;
+      foreach ($this->items as $item) {
+         $fullPrice += $item->{Shop_Model_OrderItems::COLUMN_PRICE};
+         ?>
       <tr class="ui-widget-content">
             <td><?
          echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
@@ -69,57 +73,48 @@
             echo $item->{Shop_Model_OrderItems::COLUMN_QTY} . ' ' . $item->{Shop_Model_OrderItems::COLUMN_UNIT};
          ?>
             </td>
-            <td><?= $item->{Shop_Model_OrderItems::COLUMN_PRICE} . ' ' . VVE_SHOP_CURRENCY_NAME ?></td>
+            <td class="column-price"><?=Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
          </tr>
       <? } ?>
       <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
       <tr class="ui-widget-content">
+         <td colspan="2"><?=$this->tr('Mezisoučet')?></td>
+         <td class="column-price"><?=Shop_Tools::getFormatedPrice($fullPrice)?></td>
+      </tr>
+      <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+      <tr class="ui-widget-content">
          <th><?
-      echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
+      echo $this->tr("Doprava").': '.$this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
       if($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
          printf($this->tr(' - datum odběru: %s'), vve_date("%x", new DateTime($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
       }
-//      if ($this->shipping != false) {
-//         echo '<br />';
-//         echo '<div class="ship2pay-info">';
-//         echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
-//         echo '</div>';
-//         // asi tady bude přesměrování na platební systémy 
-//      }
       ?></th>
          <td></td>
-         <td><?
+         <td class="column-price"><?
             if ($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0) {
                echo $this->tr('zdarma');
             } else {
-               echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} . ' ' . VVE_SHOP_CURRENCY_NAME;
+               echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE});
             }
       ?></td>
       </tr>
       <tr class="ui-widget-content">
          <th><?
-            echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
-//            if ($this->payment != false) {
-//               echo '<br />';
-//               echo '<div class="ship2pay-info">';
-//               echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
-//               echo '</div>';
-//               // asi tady bude přesměrování na platební systémy 
-//            }
+            echo $this->tr("Platba").': '.$this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
       ?></th>
          <td></td>
-         <td><?
+         <td class="column-price"><?
             if ($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0) {
                echo $this->tr('zdarma');
             } else {
-               echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} . ' ' . VVE_SHOP_CURRENCY_NAME;
+               echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE});
             }
       ?></td>
       </tr>
       <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
       <tr class="order-full-price ui-widget-content ui-state-highlight">
          <td colspan="2"><?= $this->tr('Cena celkem') ?></td>
-         <td><?= $this->order->{Shop_Model_Orders::COLUMN_TOTAL} . ' ' . VVE_SHOP_CURRENCY_NAME ?></td>
+         <td class="column-price"><?= Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL})?></td>
       </tr>
    </tbody>
 </table>

@@ -1,16 +1,52 @@
 <?
-$this->addFile('css://style.css');
-$piroBox = new JsPlugin_PiroBox();
+$this->addFile('css://style.less');
+$this->addFile('js://engine:shop.js');
+$piroBox = new JsPlugin_PrettyPhoto();
 $this->addJsPlugin($piroBox);
+
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addUISpinner();
+$this->addJsPlugin($jQuery);
+
 // do titulku
 $this->addPageTitle($this->product->{Shop_Model_Product::COLUMN_NAME});
 Template_Core::setPageKeywords($this->product->{Shop_Model_Product::COLUMN_KEYWORDS});
 Template_Core::setPageDescription(strip_tags($this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}));
 echo $this->toolbox;
+
+// setup combinations
+$combJS = null;
+$productPrice = number_format($this->product->{Shop_Model_Product::COLUMN_PRICE}, 2, '.', '' );
+$productCode = $this->product->{Shop_Model_Product::COLUMN_CODE};
+$productQty = $this->product->{Shop_Model_Product::COLUMN_QUANTITY};
+$productWight = number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT}, 3, '.', '' );
+if($this->productCombinations){
+   foreach ($this->productCombinations as $comb) {
+      $combJS .= "CubeCMS.Shop.addCombination("
+         . $comb->{Shop_Model_ProductCombinations::COLUMN_ID}
+         .", [".$comb->comb_variant_ids."], "
+         .$comb->{Shop_Model_ProductCombinations::COLUMN_PRICE}.", ".number_format( $comb->weight, 3, '.', '' ).", "
+         .($comb->comb_codes_json != null ? $comb->comb_codes_json : "''").", ".$comb->{Shop_Model_ProductCombinations::COLUMN_QTY}.");\n";
+
+      $diff = false;
+      if($this->selectedVariants != null){
+         $diff = array_diff( explode(',', $comb->comb_variant_ids), $this->selectedVariants );
+      }
+      if( (is_array($diff) && empty($diff) )
+         || ( $this->selectedVariants == null && $comb->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT} ) ) {
+         $productPrice = $productPrice+$comb->{Shop_Model_ProductCombinations::COLUMN_PRICE};
+         $productCode = Shop_Tools::getProductCode($productCode, json_decode($comb->comb_codes_json));
+         $productQty = $comb->{Shop_Model_ProductCombinations::COLUMN_QTY};
+         $productWight = $productWight+$comb->weight;
+      }
+   }
+}
+
 ?>
 <h1><?
 echo $this->product->{Shop_Model_Product::COLUMN_NAME};
 echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*60*60) >= time() ? ' - '.$this->tr('Novinka!') : null;
+echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('neaktivní') : null;
 ?></h1>
 <div class="main-content">
    <div class="main-content-text">
@@ -18,54 +54,92 @@ echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*
    </div>
    <?if($this->product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
    <div class="main-content-image">
+      <?
+      $imgSmall = Shop_Product_Controller::getImagesDir(true).'small/'.$this->product->{Shop_Model_Product::COLUMN_IMAGE};
+      $imgSmall = vve_image_cacher(Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}, 300);
+      ?>
       <a href="<?=Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}?>"
-         class="pirobox_gall" title="<?=$this->tr('Zvětšit náhled')?>"
-         ><img src="<?=Shop_Product_Controller::getImagesDir(true).'small/'.$this->product->{Shop_Model_Product::COLUMN_IMAGE}?>"
-            alt="<?=$this->product->{Shop_Model_Product::COLUMN_NAME}?>"/></a>
+         rel="prettyPhoto" title="<?ps($this->product->{Shop_Model_Product::COLUMN_NAME})?>"
+         ><img src="<?=$imgSmall?>" alt="<?=$this->product->{Shop_Model_Product::COLUMN_NAME}?>"/></a>
    </div>
    <?}?>
    <div class="product-detail shop-product-attributes">
       <?if($this->product->{Shop_Model_Product::COLUMN_CODE} != null){?>
-      <div class="left"><?=$this->tr('Kód')?></div>
-      <div class="right"><?=$this->product->{Shop_Model_Product::COLUMN_CODE}?></div>
+      <div class="attr-line clearfix">
+         <div class="left"><?=$this->tr('Kód')?></div>
+         <div class="right product-code"><?=$productCode?></div>
+      </div>
       <?}?>
-      <div class="left"><?=$this->tr('Dostupnost')?></div>
-      <div class="right"><?
-         if($this->product->{Shop_Model_Product::COLUMN_QUANTITY} != 0){
-            echo $this->tr('Skladem');
-         } else {
-            echo $this->tr('Vyprodáno');
-         }
-         ?>
+      <div class="attr-line clearfix">
+         <div class="left"><?=$this->tr('Dostupnost')?></div>
+         <div class="right product-qty"><?
+            if($productQty > 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK}){
+               printf($this->tr('Skladem %s %s'), $productQty, $this->product->{Shop_Model_Product::COLUMN_UNIT});
+            } else if($productQty < 0 || !$this->product->{Shop_Model_Product::COLUMN_STOCK}){
+               echo $this->tr('Skladem');
+            } else {
+               echo $this->tr('Vyprodáno (do 14 dní)');
+            }
+            ?>
+         </div>
+      </div>
+      <div class="attr-line clearfix">
+         <div class="left"><?=$this->tr('Váha')?></div>
+         <div class="right product-weight"><?
+            echo round($productWight, 3)." Kg";
+          ?></div>
       </div>
       <?if($this->product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} == true){?>
-      <div class="left"><?=$this->tr('Odběr')?></div>
-      <div class="right"><? echo $this->tr('Pouze osobní'); ?></div>
-      <?}?>
-      <div class="left product-price"><?=$this->tr('Cena')?></div>
-      <div class="right product-price"><? 
-         echo round($this->product->{Shop_Model_Product::COLUMN_PRICE}*(1+$this->product->{Shop_Model_Tax::COLUMN_VALUE}/100))
-            .' '. VVE_SHOP_CURRENCY_NAME;
-         ?>
+      <div class="attr-line clearfix">
+         <div class="left"><?=$this->tr('Odběr')?></div>
+         <div class="right"><? echo $this->tr('Pouze osobní'); ?></div>
       </div>
+      <?}?>
       <?
-      if($this->formAddToCart instanceof Form){
+      // render Combinations
+      ?>
+      <div class="attr-line clearfix">
+         <div class="left product-price-label"><?=$this->tr('Cena s daní')?></div>
+         <div class="right product-price"><? echo Shop_Tools::getFormatedPrice($productPrice, $this->product->{Shop_Model_Tax::COLUMN_VALUE}); ?></div>
+      </div>
+      <div class="attr-line clearfix">
+         <div class="left product-price-label"><?=$this->tr('Cena bez daně')?></div>
+         <div class="right product-price-wout-tax"><? echo Shop_Tools::getFormatedPrice($productPrice); ?></div>
+      </div>
+      <div id="product-buy-form">
+      <?
+      if($this->formAddToCart instanceof Form ){
          echo $this->formAddToCart->renderStart();
          $this->formAddToCart->productId->setValues($this->product->{Shop_Model_Product::COLUMN_ID});
          $this->formAddToCart->qty->setValues($this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
          $this->formAddToCart->qty->html()->addClass('quantity');
+         // varianty
+         if($this->productVariantsSelects){
+            foreach ($this->productVariantsSelects as $name) {
+               echo '<div class="attr-line clearfix">';
+               $this->formAddToCart->$name->html()->addClass('select-variant');
+               echo $this->formAddToCart->$name->label()."<br />";
+               echo $this->formAddToCart->$name->control();
+               echo '</div>';
+            }
+         }
+
+         echo '<div class="attr-line product-to-cart clearfix'
+            .(($productQty <= 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) ? " hidden" : null).'">';
          echo '<div class="left">';
          echo $this->formAddToCart->qty->label();
-         echo $this->formAddToCart->qty->controll();
+         echo $this->formAddToCart->qty->control();
          echo '&nbsp;'.$this->product->{Shop_Model_Product::COLUMN_UNIT}.'&nbsp;';
          echo '</div><div class="right">';
          
-         echo $this->formAddToCart->productId->controll();
-         echo $this->formAddToCart->add->controll();
+         echo $this->formAddToCart->productId->control();
+         echo $this->formAddToCart->add->control();
+         echo '</div>';
          echo '</div>';
          echo $this->formAddToCart->renderEnd();
       }
       ?>
+      </div>
    </div>
    
    
@@ -80,7 +154,95 @@ echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*
 ?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
+      CubeCMS.Shop.currency = '<?=Shop_Tools::getCurrency()?>';
+      CubeCMS.Shop.roundDecimals = <?=(int)VVE_SHOP_PRICE_ROUND_DECIMAL?>;
+      CubeCMS.Shop.decimals = <?=(int)VVE_SHOP_PRICE_DECIMALS?>;
+      var defaultCombinationId = <?echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_ProductCombinations::COLUMN_ID} : 0 )?>;
+
+      CubeCMS.Shop.setProduct({
+         code: '<?=$this->product->{Shop_Model_Product::COLUMN_CODE}?>',
+         price: <?=$this->product->{Shop_Model_Product::COLUMN_PRICE}?>,
+         tax: <?=number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE}/100, 2, '.', '' )?>,
+         weight: <?=number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT}, 2, '.', '' )?>,
+         qty: <?=$this->product->{Shop_Model_Product::COLUMN_QUANTITY}?>,
+         unit: '<?=$this->product->{Shop_Model_Product::COLUMN_UNIT}?>'
+      });
+
+      $(document).ready(function(){
+         // init spinner
+         var spinner = $('input[name="product_add_qty"]').spinner({
+            min : <?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>,
+            step : <?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>
+         <?if($this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){ echo ",max : ".$productQty;}?>
+         });
+
+         function changeCombination(varArr){
+            $.each(CubeCMS.Shop.combinations, function(key, value){
+               if($(varArr).not(this.variants).length == 0 && $(this.variants).not(varArr).length == 0){
+                  var multipler = parseInt( $('input[name="product_add_qty"]').val() )/<?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>;
+                  // update price
+                  var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price+this.price, CubeCMS.Shop.product.tax);
+                  var priceWoutTax = multipler * ( CubeCMS.Shop.product.price + this.price );
+                  $('.product-price').text( CubeCMS.Shop.getFormattedPrice(price) );
+                  $('.product-price-wout-tax').text( CubeCMS.Shop.getFormattedPrice(priceWoutTax));
+
+                  <?if($this->product->{Shop_Model_Product::COLUMN_STOCK}){?>
+                  // update qty
+                  var str = '<?=$this->tr('Vyprodáno')?>';
+                  $('.product-to-cart').show();
+                  if(this.qty > 0){
+                     str = '<?=$this->tr('Skladem {0} {1}')?>'.format(this.qty, CubeCMS.Shop.product.unit);
+                  } else if(this.qty < 0){
+                     str = '<?=$this->tr('Skladem')?>';
+                  } else {
+                     // hide buy box
+                     <?if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
+                        echo "$('.product-to-cart').hide();\n";
+                     }?>
+                  }
+                  <?if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
+                     echo "spinner.spinner( \"option\", \"max\", this.qty);";
+                  }?>
+                  $('.product-qty').text(str);
+                  <?}?>
+
+                  // update code
+                  $('.product-code').text(CubeCMS.Shop.getProductCode(this.codes));
+                  // update weight
+                  $('.product-weight').text( multipler * (CubeCMS.Shop.product.weight+this.weight) + " Kg");
+               }
+            });
+   //         console.log(varArr);
+         }
+
+         <?echo $combJS;?>
+
+         $("a[rel^='prettyPhoto']").prettyPhoto();
+
+         $('select.select-variant').change(function(){
+            var selArray = new Array();
+            $('select.select-variant').each(function(){
+               selArray.push( parseInt($(this).val()) );
+            });
+            changeCombination(selArray);
+         });
+         $('input[name="product_add_qty"]').change(function(){
+            if($(this).val() == ""){
+               $(this).val(<?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>);
+            }
+            if($('select.select-variant').length > 0){
+               $('select.select-variant').first().change();
+            } else {
+               // přepočítat zboží podle množství
+               var multipler = parseInt( $('input[name="product_add_qty"]').val() )/<?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>;
+               $('.product-weight').text( multipler * (CubeCMS.Shop.product.weight) + " Kg");
+               var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price, CubeCMS.Shop.product.tax);
+               var priceWoutTax = multipler * CubeCMS.Shop.roundPrice( CubeCMS.Shop.product.price);
+               $('.product-price').text( CubeCMS.Shop.getFormattedPrice(price));
+               $('.product-price-wout-tax').text( CubeCMS.Shop.getFormattedPrice(priceWoutTax));
+            }
+         });
+      });
       /* ]]> */
    </script>
 </div>

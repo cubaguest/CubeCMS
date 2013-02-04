@@ -1,5 +1,5 @@
 <?
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
 $h = $this->tr('Objednávka byla dokončena');
 Template_Core::addPageTitle($h);
 //$this->addJsPlugin(new JsPlugin_JQuery());
@@ -68,7 +68,7 @@ $this->step = 3;
                echo $item->{Shop_Model_OrderItems::COLUMN_QTY}.' '.$item->{Shop_Model_OrderItems::COLUMN_UNIT};
                ?>
             </td>
-            <td><?=$item->{Shop_Model_OrderItems::COLUMN_PRICE}.' '.VVE_SHOP_CURRENCY_NAME?></td>
+            <td><?=Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
          </tr>
       <?}?>
          <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
@@ -95,7 +95,7 @@ $this->step = 3;
             if($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0){
                echo $this->tr('zdarma');
             } else {
-               echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}.' '.VVE_SHOP_CURRENCY_NAME;
+               echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE});
             }
             ?></td>
          </tr>
@@ -116,14 +116,14 @@ $this->step = 3;
             if($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0){
                echo $this->tr('zdarma');
             } else {
-               echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}.' '.VVE_SHOP_CURRENCY_NAME;
+               echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE});
             }
             ?></td>
          </tr>
          <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
          <tr class="basket-full-price">
             <td colspan="2"><?=$this->tr('Cena celkem')?></td>
-            <td><?=$this->order->{Shop_Model_Orders::COLUMN_TOTAL}.' '.VVE_SHOP_CURRENCY_NAME?></td>
+            <td><?=Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL}) ?></td>
          </tr>
       </tbody>
    </table>
