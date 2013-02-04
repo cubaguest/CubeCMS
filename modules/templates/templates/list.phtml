@@ -1,10 +1,20 @@
 <?
 $this->addCssFile('style.css');
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
-echo $this->toolbox;
 ?>
 <h1><?=$this->category()->getName();?></h1>
 <div class="main-content-list module-templates-list">
+   <?php
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('add'),
+         'title' => $this->tr('Vytvořit novou šablonu'),
+         'icon' => 'add.png',
+         'name' => $this->tr('Vytvořit šablonu'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
    <?if(!empty ($this->templates)) {?>
    <table class="templates-list">
       <thead>
