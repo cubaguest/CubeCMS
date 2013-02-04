@@ -21,6 +21,10 @@ class Model_ORM extends Model implements ArrayAccess {
    const JOIN_OUTER = 3;
    const JOIN_CROSS = 4;
    const JOIN_INNER = 5;
+   const JOIN = 6;
+
+   const LOCK_WRITE = 'WRITE';
+   const LOCK_READ = 'READ';
 
    /**
     * FETCH konstanty
@@ -67,6 +71,8 @@ class Model_ORM extends Model implements ArrayAccess {
    protected $groupby = array();
    protected $where = null;
    protected $whereBindValues = array();
+   protected $having = array();
+   protected $havingBindValues = array();
    protected $joins = array();
    private $joinString = null;
    protected $relations = array();
@@ -78,11 +84,23 @@ class Model_ORM extends Model implements ArrayAccess {
    protected $currentSql = null;
    protected $bindValues = array();
 
-   protected $tableLocked = false;
+   protected static $tablesLocked = array();
 
    public function __construct()
    {
       parent::__construct();
+      $this->selectedColumns = array();
+      $this->orders = array();
+      $this->joins = array();
+      $this->joinString = null;
+      $this->where = null;
+      $this->whereBindValues = array();
+      $this->limit(null, null);
+      $this->groupby = array();
+      $this->having = array();
+      $this->havingBindValues = array();
+      $this->bindValues = array();
+
       $this->_initTable();
    }
 
@@ -121,7 +139,11 @@ class Model_ORM extends Model implements ArrayAccess {
          // detekce typu sloupce
          $typeLen = 0;
          $typePdo = PDO::PARAM_STR;
-         switch (strtolower($params['datatype'])) {
+         $paramType = $params['datatype'];
+         if($pos = strpos($paramType,'(')){
+            $paramType = substr($paramType, 0, $pos);
+         }
+         switch (strtolower($paramType)) {
             case 'int':
             case 'smallint':
             case 'bigint':
@@ -156,7 +178,7 @@ class Model_ORM extends Model implements ArrayAccess {
                $params['pdoparam'] = PDO::PARAM_STMT;
                break;
             default:
-               throw new UnexpectedValueException(sprintf($this->tr('Nepodporovaný datový typ sloupce "%s"'), $name));
+               throw new UnexpectedValueException(sprintf($this->tr('Nepodporovaný datový typ %s sloupce "%s"'), $paramType, $name));
                break;
          }
       }
@@ -167,27 +189,18 @@ class Model_ORM extends Model implements ArrayAccess {
    }
 
    /**
-    * Metodav rací pole s výchozími parametry sloupce
-    * @return array
-    */
-   public static function getDefaultColumnParams()
-   {
-      return self::$defaultColumnParams;
-   }
-
-   /**
     * Metoda přidá napojení na jinou tabulku přes klíč
     * @param string $tbName - název tabulky (pro identifikaci klíče)
     * @param string $column - název sloupce
     * @param string $modelName - název modelu připojené tabulky
     * @param string $externColumn - název sloupce připojené tabulky
     */
-   protected function addForeignKey($column, $modelName, $externColumn = null)
+   protected function addForeignKey($column, $modelName, $externColumn = null, $columnsPrefix = null)
    {
       // pokud má sloupce alias
       $columnReal = $column;
       if($this->tableStructure[$column]['aliasFor'] != null) $columnReal = $this->tableStructure[$column]['aliasFor'];
-      $this->foreignKeys[$column] = array('column' => $columnReal, 'modelName' => $modelName, 'modelColumn' => $externColumn);
+      $this->foreignKeys[$column] = array('column' => $columnReal, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'prefix' => $columnsPrefix);
    }
 
    /**
@@ -315,6 +328,15 @@ class Model_ORM extends Model implements ArrayAccess {
    }
 
    /**
+    * Metoda vrací pole s joiny
+    * @return string
+    */
+   public function getJoins()
+   {
+      return $this->joins;
+   }
+
+   /**
     * Metoda vrací všechny sloupce v tabulce i s nastavením
     * @return array
     */
@@ -389,10 +411,13 @@ class Model_ORM extends Model implements ArrayAccess {
          $sql = 'SELECT ' . $obj->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $obj->getTableName() . '` AS ' . $this->getTableShortName();
          $obj->createSQLJoins($sql);
          $obj->createSQLWhere($sql, $this->getTableShortName());
+         $obj->createSQLGroupBy($sql); // group by
+         $obj->createSQLHaving($sql);
          $obj->createSQLOrder($sql);
          $obj->createSQLLimi($sql);
          $dbst = $this->getDb()->prepare($sql);
          $obj->bindSQLWhere($dbst);
+         $obj->bindSQLHaving($dbst);
          $obj->bindSQLLimit($dbst);
          $obj->bindValues($dbst);
       } else if($this->currentSql instanceof PDOStatement) {
@@ -443,11 +468,12 @@ class Model_ORM extends Model implements ArrayAccess {
          $this->createSQLJoins($sql);
          $this->createSQLWhere($sql, $this->getTableShortName()); // where
          $this->createSQLGroupBy($sql); // group by
+         $this->createSQLHaving($sql); // having
          $this->createSQLOrder($sql); // order
          $this->createSQLLimi($sql); // limit
          $dbst = $this->getDb()->prepare($sql);
-//      Debug::log($sql, $this->whereBindValues);
          $this->bindSQLWhere($dbst); // where values
+         $this->bindSQLHaving($dbst); // having values
          $this->bindSQLLimit($dbst); // limit values
          $this->bindValues($dbst); // limit values
       } else if($this->currentSql instanceof PDOStatement) {
@@ -492,7 +518,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda vrací počet záznamů z db podle daného nastavení modelu
     * @return int
-    * @todo -- dořešit při "GROUP BY" 
+    * @todo -- dořešit při "GROUP BY"
     */
    public function count()
    {
@@ -517,7 +543,7 @@ class Model_ORM extends Model implements ArrayAccess {
          /* preg_replace('/SELECT * FROM/', 'COUNT(*)', $this->currentSql); */
          $dbst = $this->bindValues($this->dbconnector->prepare($this->currentSql));/* TODO */
       }
-      
+
       try {
          $dbst->execute();
       } catch (PDOException $exc) {
@@ -536,21 +562,121 @@ class Model_ORM extends Model implements ArrayAccess {
 
    /**
     * Vytvoření zámku na modelu (tabulce)
-    * @param string $type -- typ zámku (READ/WRITE)
+    * @param string $type -- typ zámku (READ/WRITE) Model_ORM::LOCK_XXX
     */
-   public function lock($type = "WRITE")
+   public function lock($mode = self::LOCK_READ)
    {
-      $this->getDb()->exec('LOCK TABLES '.$this->getTableName().' '.$type.', '.$this->getTableName().' '.$this->getTableShortName().' '.$type.';');
-      $this->tableLocked = true;
+      self::lockModels(array($this, $mode));
    }
-   
+
+   /**
+    * Vytvoření zámku na modelu (tabulce)
+    * @param array $model -- pole s modely nebo tabulkami  array($model, 'WRITE', 'alias'), array($model, 'READ', 'alias'),
+    */
+   public static function lockModels($models)
+   {
+      $models = func_get_args();
+
+      foreach ($models as $model){
+         if(!is_array($model)){
+            $model = array($model);
+         }
+
+         $model[1] = isset($model[1]) ? $model[1] : self::LOCK_READ; // mode
+         $model[1] = isset($model['mode']) ? $model['mode'] : $model[1]; // mode
+         $model[2] = isset($model[2]) ? $model[2] : null; // alias
+         $model[2] = isset($model['alias']) ? $model['alias'] : $model[2]; // alias
+
+         if($model[0] instanceof Model_ORM){ // pokud je Model_ORM model
+            // full table name
+            $baseArr = array(
+               'table' => $model[0]->getTableName(),
+               'mode' => $model[1],
+               'alias' => null );
+            self::$tablesLocked[$baseArr['table'].'_'.$baseArr['alias']] = $baseArr;
+
+            // table alias
+            $baseArr = array(
+               'table' => $model[0]->getTableName(),
+               'mode' => $model[1],
+               'alias' => $model[0]->getTableShortName() );
+            self::$tablesLocked[$baseArr['table'].'_'.$baseArr['alias']] = $baseArr;
+
+            // assign join tables
+            foreach($model[0]->getJoins() as $join) {
+               $joinModel = new $join['model2']();
+
+               // full table name
+               $baseArr = array(
+                  'table' => $joinModel->getTableName(),
+                  'mode' => $model[1],
+                  'alias' => null );
+               self::$tablesLocked[$baseArr['table'].'_'.$baseArr['alias']] = $baseArr;
+
+               // table alias
+               $baseArr = array(
+                  'table' => $joinModel->getTableName(),
+                  'mode' => $model[1],
+                  'alias' => $joinModel->getTableShortName() );
+               self::$tablesLocked[$baseArr['table'].'_'.$baseArr['alias']] = $baseArr;
+
+               // table alias
+               $baseArr = array(
+                  'table' => $join['table2Alias'],
+                  'mode' => $model[1],
+                  'alias' => null );
+               self::$tablesLocked[$baseArr['table'].'_'.$baseArr['alias']] = $baseArr;
+            }
+         } else if(is_string($model[0])){ // pokud je zadán název tabulky
+            $baseArr = array(
+               'table' => $model[0],
+               'mode' => $model[1],
+               'alias' => $model[2] );
+
+            self::$tablesLocked[$baseArr['table'].'_'.$baseArr['alias']] = $baseArr;
+         }
+      }
+
+      // struktura self::$tablesLocked
+      /*
+       * array(
+       *    array('table' => 'table_name', 'mode' => 'read' )
+       *    array( array('table' => 'table_name', 'mode' => 'write' 'alias' => 't_alias' )
+       * )
+       */
+      if(!empty(self::$tablesLocked)){
+         // create SQL
+         $parts = array();
+         foreach (self::$tablesLocked as $table){
+            if(!isset($table['alias']) || $table['alias'] == null){
+               $parts[] = $table['table'].' '.$table['mode'];
+            } else {
+               $parts[] = $table['table'].' AS '.$table['alias'].' '.$table['mode'];
+            }
+         }
+         // merge with locked tables
+         $db = Db_PDO::getInstance();
+         $db->exec('LOCK TABLES '.implode(', ', $parts).';');
+      }
+   }
+
    /**
     * Zrušení zámku
     */
    public function unLock()
    {
-      if($this->tableLocked){
-         $this->getDb()->exec('UNLOCK TABLES;');
+       self::unLockTables();
+   }
+
+   /**
+    * Zrušení zámku
+    */
+   public static function unLockTables()
+   {
+      if(!empty(self::$tablesLocked)){
+         self::$tablesLocked = array();
+         $db = Db_PDO::getInstance();
+         $db->exec('UNLOCK TABLES;');
       }
    }
 
@@ -559,7 +685,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda pro dotaz na model
     * @param mixed $stmt (PDOStatement nebo string)
     * @return type PDOStatement
-    * 
+    *
     * Pokud je předán řetezec, je řetězec {THIS} nahrazen názvem tabulky
     */
    public function query($stmt)
@@ -572,12 +698,12 @@ class Model_ORM extends Model implements ArrayAccess {
       }
       return $stmt;
    }
-   
+
    /**
     * Metoda pro dotaz na model
     * @param string $stmt dotaz
     * @return Model_ORM
-    * 
+    *
     * Pokud je předán řetezec, je řetězec {THIS} nahrazen názvem tabulky
     */
    public function setQuery($query)
@@ -589,7 +715,7 @@ class Model_ORM extends Model implements ArrayAccess {
       }
       return $this;
    }
-   
+
    /**
     * Metoda vrací db konektor k databázi
     * @return Db_PDO
@@ -598,12 +724,12 @@ class Model_ORM extends Model implements ArrayAccess {
    {
       return Db_PDO::getInstance();
    }
-   
+
    /**
     * Metoda přidá parametry do dotazu
     * @param type $values
     * @param type $merge
-    * @return Model_ORM 
+    * @return Model_ORM
     */
    public function setBindValues($values, $merge = false)
    {
@@ -622,16 +748,20 @@ class Model_ORM extends Model implements ArrayAccess {
    public function getSQLQuery()
    {
       if($this->currentSql == null){
-         $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         $sql = 'SELECT ' . $this->createSQLSelectColumns()."\n" . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName()."\n";
       } else {
          $sql = $this->currentSql;
       }
       $this->createSQLJoins($sql);
       $this->createSQLWhere($sql, $this->getTableShortName()); // where
       $this->createSQLGroupBy($sql); // group by
+      $this->createSQLHaving($sql); // group by
       $this->createSQLOrder($sql); // order
       $this->createSQLLimi($sql); // limit
-      return $sql;
+      return array(
+         'sql' => $sql,
+         'values' => array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues)
+      );
    }
 
    public function save(Model_ORM_Record $record)
@@ -762,7 +892,7 @@ class Model_ORM extends Model implements ArrayAccess {
             if ($params['lang'] == true) {
                foreach (Locales::getAppLangs() as $lang) {
                   if ($params['nn'] AND isset($params['default']) AND $params['value'][$lang] == null ) {
-                     if(is_bool($params['default']) || is_int($params['default'])){ 
+                     if(is_bool($params['default']) || is_int($params['default'])){
                         // bool vždy na int jinak false je prázdné, ne 0
                         $value[$lang] = (int)$params['default'];
                      } else {
@@ -810,7 +940,7 @@ class Model_ORM extends Model implements ArrayAccess {
    public function delete($pk = null)
    {
       $dbc = Db_PDO::getInstance();
-      $sql = 'DELETE FROM ' . $this->getTableName();
+      $sql = 'DELETE '.$this->getTableShortName().'.* FROM ' . $this->getTableName().' AS '.$this->getTableShortName();
       if ($pk instanceof Model_ORM_Record) {
          $this->where($this->pKey, $pk->getPK());
          // asi vytáhnout pk (bude muset být uloženo v rekordu)
@@ -824,12 +954,17 @@ class Model_ORM extends Model implements ArrayAccess {
       if ($pk == null AND $this->where == null) {
          return 0;
       } // pokud není podmínka nemažeme, na smazání kompletní tabulky bude flush()
-
+      $this->createSQLJoins($sql);
       $this->createSQLWhere($sql);
+//      $this->createSQLGroupBy($sql); // group by
+//      $this->createSQLHaving($sql); // having
       $dbst = $dbc->prepare($sql);
+//      Debug::log($sql);
       Log::msg($sql, 'DELETE', null, 'sql');
       $this->bindSQLWhere($dbst);
+//      $this->bindSQLHaving($dbst); // having values
       try {
+         $this->beforeDelete($pkValue);
          $dbst->execute();
       } catch (PDOException $exc) {
          $this->unLock();
@@ -845,13 +980,13 @@ class Model_ORM extends Model implements ArrayAccess {
    }
 
    /**
-    * Metoda provede update záznamů 
+    * Metoda provede update záznamů
     * @param array $updateValues -- pole s hodnotami které se mají upravit
     * @todo Jazykové sloupce
-    * 
+    *
     * array
     *    'ColumnName' => value
-    * 
+    *
     * array
     *    'ColumnName' => array
     *       'stmt' => string 'DATEADD(`ColumnName`, :dates)'
@@ -861,7 +996,7 @@ class Model_ORM extends Model implements ArrayAccess {
    public function update($updateValues)
    {
 //      Debug::log($updateValues);
-      
+
       $sql = 'UPDATE ' . $this->getTableName(). " SET ";
       $colsStr = array();
       $bindValues = array();
@@ -872,30 +1007,30 @@ class Model_ORM extends Model implements ArrayAccess {
             // není sloupec z tabubly -- přeskočit
             continue;
          }
-            
+
          $params = $this->tableStructure[$columnName];
-            
+
          if($this->tableStructure[$columnName]['lang'] == true){
-               // is multilang column
-           foreach (Locales::getAppLangs() as $lang) {
-              if ($params['aliasFor'] === null) {
-                 array_push($colsStr, '`' . $columnName . '_' . $lang . '` = :' . $columnName . '_' . $lang . '');
-              } else {
-                 array_push($colsStr, '`' . $params['aliasFor'] . '_' . $lang . '` = :' . $columnName . '_' . $lang . '');
-              }
-              if(is_array($value)){
-                 $bindValues[$columnName . '_' . $lang] = $value[$lang];
-              } else {
-                 $bindValues[$columnName . '_' . $lang] = $value;
-              }
-           }
-            
+            // is multilang column
+            foreach (Locales::getAppLangs() as $lang) {
+               if ($params['aliasFor'] === null) {
+                  array_push($colsStr, '`' . $columnName . '_' . $lang . '` = :' . $columnName . '_' . $lang . '');
+               } else {
+                  array_push($colsStr, '`' . $params['aliasFor'] . '_' . $lang . '` = :' . $columnName . '_' . $lang . '');
+               }
+               if(is_array($value)){
+                  $bindValues[$columnName . '_' . $lang] = $value[$lang];
+               } else {
+                  $bindValues[$columnName . '_' . $lang] = $value;
+               }
+            }
+
          } else {
             // is normal column
-               
+
             if(is_array($value)){
                // je předán dotaz
-               
+
                if ($params['aliasFor'] === null) {
                   array_push($colsStr, '`' . $columnName . '` = ' . $value['stmt'] . '');
                } else {
@@ -904,7 +1039,7 @@ class Model_ORM extends Model implements ArrayAccess {
                if(isset($value['values'])){
                   $bindValues = array_merge($bindValues, $value['values']);
                }
-               
+
             } else {
                // je jenom hodnota
                if ($params['aliasFor'] === null) {
@@ -916,15 +1051,15 @@ class Model_ORM extends Model implements ArrayAccess {
             }
          }
       }
-      
+
       // create base cols
       $sql .= implode(', ', $colsStr);
-      
+
       $this->createSQLWhere($sql);
       $this->createSQLLimi($sql);
-      
+
       $dbst = $this->getDb()->prepare($sql);
-      
+
       foreach ($bindValues as $key => $value) {
          $varType = gettype($value);
          // detect value
@@ -955,10 +1090,10 @@ class Model_ORM extends Model implements ArrayAccess {
 
          $dbst->bindValue(':'.$key, $value, $pdoParam);
       }
-      
+
       $this->bindSQLWhere($dbst);
       $this->bindSQLLimit($dbst);
-      
+
       try {
          return $dbst->execute();
       } catch (PDOException $exc) {
@@ -970,7 +1105,7 @@ class Model_ORM extends Model implements ArrayAccess {
       }
    }
 
-      /**
+   /**
     * Metoda vrací záznamy z fulltext hledání v modelu
     * @param string $string -- řetězec, který se má hledat
     * @todo implementovat načítání pouze zvolených sloupců
@@ -1061,8 +1196,8 @@ class Model_ORM extends Model implements ArrayAccess {
 
    public function createTable()
    {
-     $db = new Model_ORM_Db($this);
-     return $db->create();
+      $db = new Model_ORM_Db($this);
+      return $db->create();
    }
 
    /*
@@ -1136,6 +1271,24 @@ class Model_ORM extends Model implements ArrayAccess {
       return $this;
    }
 
+   /**
+    * Metoda přidá podmínku HAVING do dotazu
+    * @param null $cond
+    * @param null $bindValues
+    * @return Model_ORM
+    */
+   public function having($cond = null, $bindValues = null)
+   {
+      if($cond == null){
+         $this->having = null;
+         $this->havingBindValues = array();
+      } else {
+         $this->having = $cond;
+         $this->havingBindValues = $bindValues;
+      }
+      return $this;
+   }
+
 //   public function join($tbName, $columns = null, $joinType = self::JOIN_LEFT) {
 //      'column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'columns' => null
 //      $joinParams = array('column' => $column, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'columns' => null);
@@ -1178,7 +1331,7 @@ class Model_ORM extends Model implements ArrayAccess {
       $joinParams = array(
          'column1' => $fk['column'], 'table1Alias' => $tAlias, // tento model
          'model2' => $fk['modelName'], 'column2' => $fk['modelColumn'], 'table2Alias' => $t2Alias, // připojený model
-         'columns' => $columns, 'type' => $joinType, 'with' => $with);
+         'columns' => $columns, 'type' => $joinType, 'with' => $with, 'prefix' => $fk['prefix']);
       $this->joins[$newIndex] = $joinParams;
       return $this;
    }
@@ -1194,7 +1347,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * @param array $withValues -- (optional) hodnoty přidaných parametrů připojených k joinu (název > hodnota)
     * @return Model_ORM
     */
-   public function join($model1Column, $model2Name, $model2Column = null, $columns = null, $joinType = self::JOIN_LEFT, $with = null, $withValues = array())
+   public function join($model1Column, $model2Name, $model2Column = null, $columns = null, $joinType = self::JOIN_LEFT, $with = null, $withValues = array(), $columnsPrefix = null)
    {
       $newIndex = count($this->joins);
       $model1Alias = $this->getTableShortName();
@@ -1216,7 +1369,7 @@ class Model_ORM extends Model implements ArrayAccess {
       $joinParams = array(
          'column1' => $model1Column, 'table1Alias' => $model1Alias,
          'model2' => $model2Name, 'column2' => $model2Column, 'table2Alias' => $model2Alias,
-         'columns' => $columns, 'type' => $joinType, 'with' => $with, 'withValues' => $withValues);
+         'columns' => $columns, 'type' => $joinType, 'with' => $with, 'withValues' => $withValues, 'prefix' => $columnsPrefix);
       array_push($this->joins, $joinParams);
       return $this;
    }
@@ -1245,8 +1398,8 @@ class Model_ORM extends Model implements ArrayAccess {
     * @example:
     * array(
     *    'alias' => 'colum',
-    *    'alias' => 'statement', 
-    *    'alias' => array('stmt' => 'statement', 'values' => array() ), 
+    *    'alias' => 'statement',
+    *    'alias' => array('stmt' => 'statement', 'values' => array() ),
     * )
     */
    public function columns($columnsArr, $bindValues = array(), $mergeValues = false)
@@ -1282,19 +1435,19 @@ class Model_ORM extends Model implements ArrayAccess {
       $columns = array();
       if (empty($this->selectedColumns)) { // není vybrán žádný sloupec, tedy všechny
          foreach ($this->tableStructure as $columnName => $params) {
-               array_push($columns, $this->createSelectColumnString(
-                  $this->getTableShortName(), $columnName, null, $params['lang'], $params['aliasFor']));
+            array_push($columns, $this->createSelectColumnString(
+               $this->getTableShortName(), $columnName, null, $params['lang'], $params['aliasFor']));
          }
       } else { // sloupce jsou vybrány
          if($this->pKey != null && !in_array($this->pKey, $this->selectedColumns)){
-         // pokud není pk přidáme jej
+            // pokud není pk přidáme jej
             array_push($columns, $this->createSelectColumnString(
-                     $this->getTableShortName(), $this->pKey, null, false, $this->tableStructure[$this->pKey]['aliasFor']));
+               $this->getTableShortName(), $this->pKey, null, false, $this->tableStructure[$this->pKey]['aliasFor']));
          }
          foreach ($this->selectedColumns as $alias => $columnName) {
             if (isset($this->tableStructure[$columnName])) {
                array_push($columns, $this->createSelectColumnString(
-                     $this->getTableShortName(), $columnName, $alias, $this->tableStructure[$columnName]['lang'], $this->tableStructure[$columnName]['aliasFor']));
+                  $this->getTableShortName(), $columnName, $alias, $this->tableStructure[$columnName]['lang'], $this->tableStructure[$columnName]['aliasFor']));
                if($columnName == $this->pKey) $pkAdded = true;
             } else { // není colum z této tabulky nebo se jedná o funkci
                if($columnName == '*'){
@@ -1329,7 +1482,7 @@ class Model_ORM extends Model implements ArrayAccess {
              * $joinParams = array(
              * 'model1' => $model1Name, 'column1' => $model1Column, 'table1Alias' => $model1Alias,
              * 'model2' => $model2Name, 'column2' => $model2Column, 'table2Alias' => $model2Alias,
-             * 'columns' => $columns, 'type' => $joinType, 'with' => $with);
+             * 'columns' => $columns, 'type' => $joinType, 'with' => $with, 'prefix' => string);
              */
             if (!class_exists($join['model2']))
                throw new Exception($this->tr('Neplatný parametr s modelem'));
@@ -1347,6 +1500,9 @@ class Model_ORM extends Model implements ArrayAccess {
                case self::JOIN_RIGHT:
                   $part .= ' RIGHT ';
                   break;
+               case self::JOIN:
+                  $part .= ' ';
+                  break;
                case self::JOIN_LEFT:
                default:
                   $part .= ' LEFT ';
@@ -1360,7 +1516,7 @@ class Model_ORM extends Model implements ArrayAccess {
                   $pdodriver = Db_PDO::getInstance();
                   foreach($join['withValues'] as $key => $value) {
 //                      if(is_int($value)){
-                        $add = str_replace(':'.$key, $pdodriver->quote($value), $add);
+                     $add = str_replace(':'.$key, $pdodriver->quote($value), $add);
 //                      } else {
 //                         str_replace(':'.$key, PDO::quote($value));
 //                      }
@@ -1370,19 +1526,23 @@ class Model_ORM extends Model implements ArrayAccess {
             }
 
             $part .= ')';
-            $this->joinString .= $part; // uložení do joinstring
+            $this->joinString .= $part."\n"; // uložení do joinstring
             // samotné vytvoření sloupců
 
-            if ($join['columns'] === null) { // jen vybrané sloupce
+            if ($join['columns'] === null) { // všechny sloupce z modelu
                foreach ($modelCols as $name => $params) {
                   if (isset($this->tableStructure[$name]) OR ($params['pk'] == true && $name == $this->pKey))// všechny sloupce z tabulky kromě pk
                      continue;
-                  array_push($columns, $this->createSelectColumnString($join['table2Alias'], $name, null, $params['lang'], $params['aliasFor']));
+                  array_push($columns, $this->createSelectColumnString($join['table2Alias'], $name, $join['prefix'].$name, $params['lang'], $params['aliasFor']));
                }
             } else if(is_array($join['columns']) AND !empty ($join['columns'])) {
                foreach ($join['columns'] as $alias => $coll) {
-                  array_push($columns, $this->createSelectColumnString($join['table2Alias'], $coll, $alias,
-                  isset($modelCols[$coll]) ? $modelCols[$coll]['lang'] : false, isset($modelCols[$coll]) ? $modelCols[$coll]['aliasFor'] : null));
+                  if($coll == "*"){
+                     array_push($columns, '`'.$join['table2Alias'].'`.*');
+                  } else {
+                     array_push($columns, $this->createSelectColumnString($join['table2Alias'], $coll, $join['prefix'].$alias,
+                        isset($modelCols[$coll]) ? $modelCols[$coll]['lang'] : false, isset($modelCols[$coll]) ? $modelCols[$coll]['aliasFor'] : null));
+                  }
                }
             }
             unset($model2);
@@ -1408,7 +1568,7 @@ class Model_ORM extends Model implements ArrayAccess {
 //  2 => null
 //  3 => boolean false
 //  4 => string 'name' (length=4)
-      $alias = is_int($alias) ? null : $alias;
+      $alias = is_numeric($alias) ? null : $alias; // numbers as alias not allowed
       if ($isLang == false) {// není jazyk
          if ($columnOrigName != null){
             $alias = $alias == null ? $columnName : $alias;
@@ -1451,7 +1611,7 @@ class Model_ORM extends Model implements ArrayAccess {
                array_push($cols, '`'.$tbAlias.'`.`'.$column.'`');
             }
          }
-         $sql .= ' GROUP BY '.  implode(',', $cols);
+         $sql .= ' GROUP BY '.  implode(',', $cols)."\n";
       }
    }
 
@@ -1462,7 +1622,7 @@ class Model_ORM extends Model implements ArrayAccess {
    protected function createSQLLimi(&$sql)
    {
       if ($this->limit['from'] !== null) {
-         $sql .= ' LIMIT :fromRow, :rows';
+         $sql .= ' LIMIT :fromRow, :rows'."\n";
       }
    }
 
@@ -1514,27 +1674,27 @@ class Model_ORM extends Model implements ArrayAccess {
                } else {
                   $columnAssigned = false;
                   if(!empty($this->joins)){
-                    // jsou připojeny další modely. Projdou se a pokud model daný sloupce obsahuje, nastavíme jej
-                    foreach ($this->joins as $join) {
-                       $mName = $join['model2'];
-                       $coll = $matches[3];
-                       $model = new $mName();
-                       // model má tento sloupec
-                       if(isset($model[$coll])){
-                          // alias sloupce
-                          if($model[$coll]['aliasFor'] != null){
-                             $column = $model[$coll]['aliasFor'];
-                          } else {
-                             $column = $matches[3];
-                          }
+                     // jsou připojeny další modely. Projdou se a pokud model daný sloupce obsahuje, nastavíme jej
+                     foreach ($this->joins as $join) {
+                        $mName = $join['model2'];
+                        $coll = $matches[3];
+                        $model = new $mName();
+                        // model má tento sloupec
+                        if(isset($model[$coll])){
+                           // alias sloupce
+                           if($model[$coll]['aliasFor'] != null){
+                              $column = $model[$coll]['aliasFor'];
+                           } else {
+                              $column = $matches[3];
+                           }
 
-                          // jazykový sloupce a jazyk není zadán
-                          if ($model[$coll]['lang'] == true) {
-                             $column .= '_' . Locales::getLang();
-                          }
-                          $columnAssigned = true;
-                       }
-                    }
+                           // jazykový sloupce a jazyk není zadán
+                           if ($model[$coll]['lang'] == true) {
+                              $column .= '_' . Locales::getLang();
+                           }
+                           $columnAssigned = true;
+                        }
+                     }
                   }
                   if(!$columnAssigned){
                      $column = $matches[3];
@@ -1556,7 +1716,7 @@ class Model_ORM extends Model implements ArrayAccess {
             }
             array_push($ords, $ordStr);
          }
-         $sql .= ' ORDER BY ' . implode(',', $ords);
+         $sql .= ' ORDER BY ' . implode(',', $ords)."\n";
       }
    }
 
@@ -1613,15 +1773,23 @@ class Model_ORM extends Model implements ArrayAccess {
             }
          }
          $retWhere .= ')';
-         $sql .= $retWhere;
+         $sql .= $retWhere."\n";
       }
+   }
+
+   protected function createSQLHaving(&$sql)
+   {
+       if($this->having != null){
+          $retHaving = ' HAVING '.$this->having;
+          $sql .= $retHaving."\n";
+       }
    }
 
    protected function createSQLJoins(&$sql)
    {
       if ($this->joinString == null)
          $this->createSQLSelectJoinColumns(array()); // provede vytvoření sloupců
-         $sql .= $this->joinString; // je vytvořen v přípravě sloupců
+      $sql .= $this->joinString; // je vytvořen v přípravě sloupců
    }
 
    /* vložení hodnot so sql částí */
@@ -1685,11 +1853,54 @@ class Model_ORM extends Model implements ArrayAccess {
       }
    }
 
+
+   protected function bindSQLHaving(PDOStatement &$stmt)
+   {
+      if ($this->having != null AND !empty($this->havingBindValues)) {
+         // bind values
+         foreach ($this->havingBindValues as $name => $val) {
+            $mustBeBindValue = false;
+            $varType = gettype($val);
+            if($varType == 'boolean'){
+               $pdoParam = PDO::PARAM_BOOL;
+            } else if($varType == 'integer'){
+               $pdoParam = PDO::PARAM_INT;
+            } else if($varType == 'NULL'){
+               $pdoParam = PDO::PARAM_NULL;
+            } else if($varType == 'array'){
+               $pdoParam = PDO::PARAM_STMT;
+               $val = join(',', $val);
+               $mustBeBindValue = true;
+            } else if($varType == 'double' || $varType == 'string'){
+               $pdoParam = PDO::PARAM_STR;
+            } else if($varType == 'object'){
+               $pdoParam = PDO::PARAM_STR;
+               $mustBeBindValue = true;
+               $className = get_class($val);
+               if($val instanceof DateTime){
+                  $val = $val->format(DATE_ISO8601);
+               } else if( method_exists($val , '__toString') ) {
+                  $val = (string)$val;
+               } else {
+                  throw new UnexpectedValueException(sprintf($this->tr('Nepovolený objekt "%s" v předanám paramteru'), $className));
+               }
+            } else {
+               throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), $varType));
+            }
+            $nameParam = $name[0] != ":" ? ':'.$name : $name;
+            if (!$mustBeBindValue && $stmt->bindParam($nameParam, $val, $pdoParam) !== false) { // nefunguje při některých where, ale proč??
+            } else {
+               $stmt->bindValue(':' . $name, $val, $pdoParam);
+            }
+         }
+      }
+   }
+
    /**
     * Metoda vloží hodnoty do dotazu
     * @param PDOStatement $stmt
     * @param array $values
-    * @return PDOStatement 
+    * @return PDOStatement
     */
    protected function bindValues(PDOStatement &$stmt, $values = false)
    {
@@ -1698,21 +1909,21 @@ class Model_ORM extends Model implements ArrayAccess {
       }
       foreach ($values as $key => $value) {
          switch (gettype($value)) {
-               case 'boolean':
-                  $pdoParam = PDO::PARAM_BOOL;
-                  break;
-               case 'integer':
-                  $pdoParam = PDO::PARAM_INT;
-                  break;
-               case 'NULL':
-                  $pdoParam = PDO::PARAM_NULL;
-                  break;
-               case 'double':
-               case 'string':
-               default:
-                  $pdoParam = PDO::PARAM_STR;
-                  break;
-            break;
+            case 'boolean':
+               $pdoParam = PDO::PARAM_BOOL;
+               break;
+            case 'integer':
+               $pdoParam = PDO::PARAM_INT;
+               break;
+            case 'NULL':
+               $pdoParam = PDO::PARAM_NULL;
+               break;
+            case 'double':
+            case 'string':
+            default:
+               $pdoParam = PDO::PARAM_STR;
+               break;
+               break;
          }
          $stmt->bindValue(':' . $key, $value, $pdoParam);
       }
@@ -1752,11 +1963,22 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->whereBindValues = array();
       $this->limit(null, null);
    }
-   
+
+   public function reset()
+   {
+      $this->__construct();
+   }
+
+   public static function resetModel(Model_ORM &$model)
+   {
+      $class = get_class($model);
+      $model = new $class();
+   }
+
    /**
-    * Metoda vrací PDO::PRAMA_ datovy typ 
+    * Metoda vrací PDO::PRAMA_ datovy typ
     * @param $val mixed -- proměnná
-    * @return boolean 
+    * @return boolean
     */
    private function getPdoParamType($val)
    {
@@ -1774,15 +1996,22 @@ class Model_ORM extends Model implements ArrayAccess {
       }
       return false;
    }
-   
+
    /* callback */
-   
+
    /**
     * Metoda, která se provede před uložením záznamu do db
     * @param Model_ORM_Record $record
     * @param string $type -- typ uložení (U,I)
     */
-   protected function beforeSave(Model_ORM_Record $record, $type = 'U') 
+   protected function beforeSave(Model_ORM_Record $record, $type = 'U')
+   {}
+
+   /**
+    * Metoda, která se provede před smazáním záznamu z db
+    * @param int $pk -- primary key záznamu
+    */
+   protected function beforeDelete($pk)
    {}
 
    /* ARRAY ACCESS */
@@ -1802,5 +2031,28 @@ class Model_ORM extends Model implements ArrayAccess {
    public function offsetGet($offset) {
       return isset($this->tableStructure[$offset]) ? $this->tableStructure[$offset] : null;
    }
+
+   /* STATIC */
+   /**
+    * Metodav rací pole s výchozími parametry sloupce
+    * @return array
+    */
+   public static function getDefaultColumnParams()
+   {
+      return self::$defaultColumnParams;
+   }
+
+   /**
+    * Meoda vrací jazykový sloupec
+    * @param $column -- název sloupce
+    * @param string $lang -- název jazyka
+    * @return string
+    */
+   public static function getLangColumn($column, $lang = null)
+   {
+      return $lang == null ? $column.'_'.Locales::getLang() : $column.'_'.$lang;
+   }
+
+
 }
 ?>

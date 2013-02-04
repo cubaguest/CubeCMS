@@ -669,25 +669,25 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       return $object;
    }
    
+   /**
+    * @param $key
+    * @param Form_Data $container
+    * @todo - tohle přesunout přímo do From_Data_Item
+    */
    private function dataAddItem($key, Form_Data $container)
    {
       $e = $this->{$key};
       if($e instanceof Form_Element_Text || $e instanceof Form_Element_TextArea || $e instanceof Form_Element_Password){
-         $container->{$key} = new Form_Data_Item($e->getLabel(), $e->getValues(), $e->getSubLabel());
+         $container->{$key} = new Form_Data_Item(get_class($e), $e->getLabel(), $e->getValues(), $e->getSubLabel());
+      } else if($e instanceof Form_Element_Multi_Checkbox){
+         $container->{$key} = new Form_Data_Item(get_class($e), $e->getLabel(), $e->getValues(), $e->getSubLabel());
       } else if($e instanceof Form_Element_Checkbox){
-         $container->{$key} = new Form_Data_Item($e->getLabel(), (bool)$e->getValues(), $e->getSubLabel());
+         $container->{$key} = new Form_Data_Item(get_class($e), $e->getLabel(), (bool)$e->getValues(), $e->getSubLabel());
       } else if($e instanceof Form_Element_Select){
-//         if(is_array($e->getValues())){
-               // tohle se chová naprosto blbě. Validace prvku v poli je již v selectu takže asi není proč to tu mít
-//            $container->{$key} = new Form_Data_Item($e->getLabel(), array_search($e->getValues(), $e->getOptions()), $e->getSubLabel());
-//         } else {
-            $container->{$key} = new Form_Data_Item($e->getLabel(), $e->getValues(), $e->getSubLabel());
-//         }
+         $container->{$key} = new Form_Data_Item(get_class($e), $e->getLabel(), $e->getValues(), $e->getSubLabel());
       } else if($e instanceof Form_Element_File){
          $f = $e->getValues();
-         $container->{$key} = new Form_Data_Item($e->getLabel(), $f['name'], $e->getSubLabel());
+         $container->{$key} = new Form_Data_Item(get_class($e), $e->getLabel(), $f['name'], $e->getSubLabel());
       }
    }
 }
-
-?>

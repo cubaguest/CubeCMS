@@ -11,6 +11,13 @@
          <urlkey lang="cs">admin/eshop/orders</urlkey>
          <module>shoporders</module>
       </item>
+      <item id="32903" icon="group.png">
+         <name lang="cs">Zákazníci</name>
+         <name lang="en">Customers</name>
+         <urlkey lang="en">admin/eshop/zakaznici</urlkey>
+         <urlkey lang="cs">admin/eshop/customers</urlkey>
+         <module>shopcustomers</module>
+      </item>
       <item id="32902" icon="brick.png">
          <name lang="cs">Varianty zboží</name>
          <name lang="en">Products Variants</name>

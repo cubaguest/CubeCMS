@@ -348,7 +348,7 @@ class JsPlugin_JQuery extends JsPlugin {
        * @todo zkontrolovat závislos s obrázky umístěnými ve složce pluginu
        */
       $this->addJs("ui.datepicker");
-      $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
+      $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".min.js", false, 'ui/i18n/'));
       $this->addCss('datepicker');
       return $this;
    }

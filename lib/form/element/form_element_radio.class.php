@@ -7,8 +7,8 @@
  * chyby.
  *
  *
- * @copyright  	Copyright (c) 2008 Jakub Matas
- * @version    	$Id: $ VVE 6.0 $Revision: $
+ * @copyright     Copyright (c) 2008 Jakub Matas
+ * @version       $Id: $ VVE 6.0 $Revision: $
  * @author        $Author: $ $Date: $
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
@@ -67,6 +67,7 @@ class Form_Element_Radio extends Form_Element_Select {
 
       $first = true;
       $i = 1;
+      $numOpts = count($this->options);
       foreach ($this->options as $optLabel => $optVal) {
          $opt = clone $this->html();
          if($this->isMultiple()) {
@@ -93,10 +94,8 @@ class Form_Element_Radio extends Form_Element_Select {
             } else {
                $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey);
             }
-            $group .= $l;
-            $group .= new Html_Element('br');
+            $group .= $l.($numOpts > 2 ? '<br />' : null);
          }
-
          $i++;
       }
       if($renderKey == null){
@@ -127,4 +126,3 @@ class Form_Element_Radio extends Form_Element_Select {
       }
    }
 }
-?>

@@ -104,7 +104,7 @@ class File_Excel extends File {
    /**
     * metoda odešle soubor ke klientovi a ukončí běh
     */
-   public function send()
+   public function send($forceDownload = false)
    {
       $hCntType = self::$mimeTypes['other'];
       ob_end_clean();
@@ -135,7 +135,9 @@ class File_Excel extends File {
       header('Content-Type: '.$hCntType);
       header("Cache-Control: post-check=0, pre-check=0", false);
       header("Pragma: no-cache");
-      header('Content-Disposition: attachment;filename="'.$this->getName().'"');
+      if($forceDownload){
+         header('Content-Disposition: attachment; filename='.$this->getName());
+      }
       
       ob_end_clean();
       $objWriter->save('php://output');

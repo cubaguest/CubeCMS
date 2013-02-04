@@ -20,7 +20,7 @@ class Component_ViewTpl extends Component {
     */
    const PARAM_MODULE = 'module';
    const PARAM_LIST_TYPE = 'list';
-
+   const PARAM_PARENT_MODULE = 'pmodule';
 
    /**
     * Pole s prvky kanálu
@@ -59,23 +59,35 @@ class Component_ViewTpl extends Component {
    private function loadTpls() {
       if(is_array($this->tpls)) return; // pokud je pole došlo k načtení
       $this->tpls = array();
-      if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)})
-         AND file_exists(Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-         .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor z faces
-         include Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+      if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)})){
+         // soubor z faces
+         if(file_exists(Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+            include Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+         }
+         // soubor z faces parent
+         if(file_exists(Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+            include Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+         }
+         // soubor s modulu
+         if(empty ($this->tpls)
+            AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+            include AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
             .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
-      }
-      if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)})
-         AND file_exists(Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-         .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor z faces parent
-         include Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-            .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
-      }
-      if(!isset ($this->{$this->getConfig(self::PARAM_LIST_TYPE)}) AND empty ($this->tpls)
-         AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-         .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){ // soubor s modulu
-         include AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-         .$this->getConfig(self::PARAM_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+         }
+         // pokud ani modul nemá potřebyný soubor s šablonami, použije se s rodiče
+         // soubor s kořenového modulu
+         if(empty ($this->tpls) AND $this->getConfig(self::PARAM_PARENT_MODULE) != null
+            AND file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$this->getConfig(self::PARAM_PARENT_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+
+            include AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$this->getConfig(self::PARAM_PARENT_MODULE).DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+         }
       }
    }
 

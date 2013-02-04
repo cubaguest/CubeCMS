@@ -13,21 +13,8 @@
 
 abstract class Model extends TrObject {
    /**
-    * KOnstruktor vytvoří objekt modelu
-    * @param Module_Sys $sys -- systémové informace
+    * Konstruktor vytvoří objekt modelu
     */
-   public function  __construct() {
-//      if($sys != null){
-//      $this->sys = $sys;
-//      } else {
-//         $this->sys = new Module_Sys();
-//      }
-      $this->init();
-   }
-
-	/**
-	 * Abstraktní metoda pro inicializaci modelu pokud je třeba
-	 */
-	protected function init(){}	
+   public function  __construct() {}
 }
 ?>

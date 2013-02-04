@@ -41,7 +41,7 @@ class File_Flash extends File {
     * @param string $dir -- (option) název adresáře se souborem může být uveden
     * v názvu souboru
     */
-   function __construct($file, $dir = null){
+   function __construct($file = null, $dir = null){
       if($file instanceof File){
          parent::__construct($file);
       } else {

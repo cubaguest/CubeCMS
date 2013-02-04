@@ -17,7 +17,7 @@ class File extends TrObject implements File_Interface {
     * @var string
     */
    protected $name = null;
-   
+
    /**
     * Cesta souboru
     * @var FS_Dir
@@ -36,73 +36,73 @@ class File extends TrObject implements File_Interface {
     */
    protected static $mimeTypes = array(
 
-       'txt' => 'text/plain',
-       'htm' => 'text/html',
-       'html' => 'text/html',
-       'php' => 'text/html',
-       'css' => 'text/css',
-       'js' => 'application/javascript',
-       'json' => 'application/json',
-       'xml' => 'application/xml',
-       'swf' => 'application/x-shockwave-flash',
-       'flv' => 'video/x-flv',
+      'txt' => 'text/plain',
+      'htm' => 'text/html',
+      'html' => 'text/html',
+      'php' => 'text/html',
+      'css' => 'text/css',
+      'js' => 'application/javascript',
+      'json' => 'application/json',
+      'xml' => 'application/xml',
+      'swf' => 'application/x-shockwave-flash',
+      'flv' => 'video/x-flv',
 
-       // images
-       'png' => 'image/png',
-       'jpe' => 'image/jpeg',
-       'jpeg' => 'image/jpeg',
-       'jpg' => 'image/jpeg',
-       'gif' => 'image/gif',
-       'bmp' => 'image/bmp',
-       'ico' => 'image/vnd.microsoft.icon',
-       'tiff' => 'image/tiff',
-       'tif' => 'image/tiff',
-       'svg' => 'image/svg+xml',
-       'svgz' => 'image/svg+xml',
+      // images
+      'png' => 'image/png',
+      'jpe' => 'image/jpeg',
+      'jpeg' => 'image/jpeg',
+      'jpg' => 'image/jpeg',
+      'gif' => 'image/gif',
+      'bmp' => 'image/bmp',
+      'ico' => 'image/vnd.microsoft.icon',
+      'tiff' => 'image/tiff',
+      'tif' => 'image/tiff',
+      'svg' => 'image/svg+xml',
+      'svgz' => 'image/svg+xml',
 
-       // archives
-       'zip' => 'application/zip',
-       'rar' => 'application/x-rar-compressed',
-       'exe' => 'application/x-msdownload',
-       'msi' => 'application/x-msdownload',
-       'cab' => 'application/vnd.ms-cab-compressed',
+      // archives
+      'zip' => 'application/zip',
+      'rar' => 'application/x-rar-compressed',
+      'exe' => 'application/x-msdownload',
+      'msi' => 'application/x-msdownload',
+      'cab' => 'application/vnd.ms-cab-compressed',
 
-       // audio/video
-       'mp3' => 'audio/mpeg',
-       'qt' => 'video/quicktime',
-       'mov' => 'video/quicktime',
+      // audio/video
+      'mp3' => 'audio/mpeg',
+      'qt' => 'video/quicktime',
+      'mov' => 'video/quicktime',
 
-       // adobe
-       'pdf' => 'application/pdf',
-       'psd' => 'image/vnd.adobe.photoshop',
-       'ai' => 'application/postscript',
-       'eps' => 'application/postscript',
-       'ps' => 'application/postscript',
+      // adobe
+      'pdf' => 'application/pdf',
+      'psd' => 'image/vnd.adobe.photoshop',
+      'ai' => 'application/postscript',
+      'eps' => 'application/postscript',
+      'ps' => 'application/postscript',
 
-       // dokumenty
-       'csv' => 'text/plain',
-       'doc' => 'application/msword',
-       'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-       'rtf' => 'application/rtf',
-       'xls' => 'application/vnd.ms-excel',
-       'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-       'ppt' => 'application/vnd.ms-powerpoint',
+      // dokumenty
+      'csv' => 'text/plain',
+      'doc' => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'rtf' => 'application/rtf',
+      'xls' => 'application/vnd.ms-excel',
+      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'ppt' => 'application/vnd.ms-powerpoint',
 
-       // open office
-       'odt' => 'application/vnd.oasis.opendocument.text',
-       'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-      
+      // open office
+      'odt' => 'application/vnd.oasis.opendocument.text',
+      'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+
       // ostatní
-       'other' => 'application/octet-stream',
+      'other' => 'application/octet-stream',
    );
-   
+
    /**
     * Konstruktor třídy
     *
     * @param string $file -- název souboru
     * @param string $path -- (option) cesta k souboru (pokud není zapsána, pokusí se cestu parsovat z názvu souboru)
     * @todo odestranit závislost na Filesystem_Dir
-    */   
+    */
    public function __construct($name = null, $path = null)
    {
       // Pokud je vložen objekt File
@@ -142,7 +142,7 @@ class File extends TrObject implements File_Interface {
       $this->locateMimeType();
       $this->init();
    }
-   
+
    /**
     * Interní metoda pro inicializaci knihoven pro soubory
     */
@@ -154,26 +154,26 @@ class File extends TrObject implements File_Interface {
    /**
     * Nastaví název souboru
     * @param string $name -- název souboru
-    * @return File 
+    * @return File
     */
    public function setName($name)
    {
       $this->name = $name;
       return $this;
    }
-   
+
    /**
     * vrací název souboru
-    * @return string 
+    * @return string
     */
    public function getName()
    {
       return $this->name;
    }
-   
+
    /**
     * Nastaví cestu k souboru
-    * @param string/FS_Dir $path 
+    * @param string/FS_Dir $path
     * @return File
     */
    public function setPath($path)
@@ -185,7 +185,7 @@ class File extends TrObject implements File_Interface {
       }
       return $this;
    }
-   
+
    /**
     * Metoda vrací cestu k souboru
     * @return FS_Dir
@@ -194,7 +194,7 @@ class File extends TrObject implements File_Interface {
    {
       return $this->path;
    }
-   
+
    /**
     * metoda vrací veliskot souboru
     * @return int
@@ -206,25 +206,25 @@ class File extends TrObject implements File_Interface {
       }
       return -1;
    }
-   
+
    /**
     * Metoda vrací poslední změnu souboru (timestamp)
-    * @return int 
+    * @return int
     */
    public function getChangeTime()
    {
       return (int)filectime((string)$this);
    }
-   
+
    /**
     * metoda vrací MIME typ souboru
-    * @return type 
+    * @return type
     */
    public function getMimeType()
    {
       return $this->mimeType;
    }
-   
+
    /**
     * Metoda vrací příponu souboru
     * @return string
@@ -244,18 +244,18 @@ class File extends TrObject implements File_Interface {
    {
       return @chmod((string)$this, $mode);
    }
-   
-      /**
+
+   /**
     * metoda vrací třídu jako řetězec. Tedy soubor i s cestou
-    * @return string 
+    * @return string
     */
    public function __toString()
    {
       return (string)$this->getPath().$this->getName();
    }
-   
+
    /* Obsah souboru podle typu */
-   
+
    /**
     * metodfa nastaví obsah souboru
     * @param string $data -- obsah
@@ -263,7 +263,7 @@ class File extends TrObject implements File_Interface {
    public function setData($data){
       return $this;
    }
-   
+
    /**
     * Metoda vrací obsah souboru
     * @return null
@@ -271,7 +271,7 @@ class File extends TrObject implements File_Interface {
    public function getData(){
       return null;
    }
-   
+
    /**
     * Metoda uloží daný soubor
     * @return File
@@ -279,9 +279,9 @@ class File extends TrObject implements File_Interface {
    public function save() {
       return $this;
    }
-   
+
    /* Modoty pro práci se souborem */
-   
+
    /**
     * Metoda testuje jestli soubor existuje
     * @return bool
@@ -291,13 +291,13 @@ class File extends TrObject implements File_Interface {
       if($this->getName() == null) return false; // protože pokud není soubor kontroluje adresář a ten může existovat
       return file_exists((string)$this);
    }
-   
+
    /**
     * metoda vytvoří kopii souboru
     * @param string/Fs_Dir $path -- cesta pro kopii
     * @param bool $returnNewObj -- jestli se má vrátit objekt nového souboru
     * @param string $newFile -- (option) nový název souboru
-    * @return File 
+    * @return File
     */
    public function copy($path, $returnNewObj = false, $newFile = null, $createUniqueName = true)
    {
@@ -308,57 +308,61 @@ class File extends TrObject implements File_Interface {
       if($newFile == null){
          $newFile = $this->getName();
       }
-      
+
       if($createUniqueName == true){
          $newFile = self::creatUniqueName($newFile, (string)$path);
       }
-      
+
       if(!@copy((string)$this, (string)$path.$newFile)) {
          throw new File_Exception(sprintf($this->tr('Chyba při kopírování souboru %s > %s'), (string)$this, (string)$path.$newFile), 2);
       }
-      
+
       if($returnNewObj == true){
          $class = get_class($this);
          return new $class($newFile, $path);
       }
-      
-      return $this;  
+
+      return $this;
    }
-   
+
    /**
     * Přejmenování souboru
     * @param string $newName -- nový název souboru
+    * @param bool $createUniqueName -- vytvoři unikátní název souboru v adresáři
     * @return File
     */
-   public function rename($newName)
+   public function rename($newName, $createUniqueName = true)
    {
-      if(!@rename((string)$this, $this->getPath().$newName)){
-         throw new UnexpectedValueException($this->tr('Soubor se nepodařilo přejmenovat'));
+      $newName = $createUniqueName == true ? $this->creatUniqueName($newName, $this->getPath()) : $newName;
+
+      if(!@rename($this->getPath().$this->getName(), $this->getPath().$newName)){
+         throw new UnexpectedValueException( sprintf( $this->tr('Soubor "%s" se nepodařilo přejmenovat'), $this->getPath().$this->getName() ));
       }
+      $this->setName($newName);
       return $this;
    }
-   
+
    /**
     * metoda přesune soubor do jiného adresáře
-    * @param FS_Dir $dstDir
-    * @return File 
-    * @todo dodělat kontrolu unikátnosti jména v acílovém adresáři
+    * @param FS_Dir/string $dstDir -- cílový adresář
+    * @param bool $createUniqueName -- vytvoři unikátní název souboru v adresáři
+    * @return File
     */
    public function move($dstDir, $createUniqueName = true)
    {
       $dstDir = new FS_Dir($dstDir);
       $dstDir->check();
-      
+
       $newName = $createUniqueName == true ? $this->creatUniqueName($this->getName(), $dstDir) : $this->getName();
-      
-      if(!@rename((string)$this, $dstDir.$newName)){
-         throw new UnexpectedValueException($this->tr('Soubor se nepodařilo přesunout'));
+
+      if(!@rename($this->getPath().$this->getName(), $dstDir.$newName)){
+         throw new UnexpectedValueException(sprintf( $this->tr('Soubor "%s" se nepodařilo přesunout'), $this->getPath().$this->getName() ));
       }
       $this->path = $dstDir;
       $this->setName($newName);
       return $this;
    }
-   
+
    /**
     * Meroda odstraní daný soubor ze serveru
     */
@@ -372,12 +376,15 @@ class File extends TrObject implements File_Interface {
    /**
     * Metoda odešle zadaný soubor ke klientu
     */
-   public function send()
+   public function send($forceDownload = false)
    {
       if ($this->exist()) {
          header('Content-Description: File Transfer');
          header('Content-Type: application/octet-stream');
-         header('Content-Disposition: attachment; filename='.$this->getName());
+         if($forceDownload){
+            header('Content-Disposition: attachment; filename='.$this->getName());
+         }
+
          header('Content-Transfer-Encoding: binary');
          header('Expires: 0');
          header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -389,7 +396,9 @@ class File extends TrObject implements File_Interface {
       } else {
          header('Content-Description: File Transfer');
          header('Content-Type: application/octet-stream');
-         header('Content-Disposition: attachment; filename='.$this->getName());
+         if($forceDownload){
+            header('Content-Disposition: attachment; filename='.$this->getName());
+         }
          header('Content-Transfer-Encoding: binary');
          header('Expires: 0');
          header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -444,7 +453,7 @@ class File extends TrObject implements File_Interface {
     * @param string -- adresář, kde bude soubor
     * @return string -- nový název souboru
     */
-   public static function creatUniqueName($fn, $destinationDir) 
+   public static function creatUniqueName($fn, $destinationDir)
    {
       if(file_exists($destinationDir.$fn)){
          $file_suffix = substr($fn, (strrpos($fn, '.')+1));
@@ -453,7 +462,7 @@ class File extends TrObject implements File_Interface {
          }
          if (preg_match('/_(\d+)\.((?:\w{3}\.)?\w{3,4})$/', $fn, $m)){
             while (file_exists($destinationDir.$fn)){
-                  $fn = str_replace("$m[1].$m[2]", ++$m[1].".$m[2]", $fn);
+               $fn = str_replace("$m[1].$m[2]", ++$m[1].".$m[2]", $fn);
             }
          }
       }

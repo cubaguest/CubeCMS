@@ -120,7 +120,7 @@ class Template extends TrObject {
    private static $browser;
 
    protected static $currentFace;
-   
+
    /*
     * ============= MAGICKÉ METODY
    */
@@ -285,7 +285,7 @@ class Template extends TrObject {
    {
       return self::$browser;
    }
-   
+
    /**
     * Metoda přidá požadovaný soubor šablony do výstupu
     * @param string $name -- název souboru
@@ -307,7 +307,7 @@ class Template extends TrObject {
     */
    public function  __toString() {
       if (defined('VVE_USE_GZIP') AND VVE_USE_GZIP == true AND
-        isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
+         isset ($_SERVER['HTTP_ACCEPT_ENCODING']) AND substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')){
          ob_start("ob_gzhandler");
       } else {
          ob_start();
@@ -329,11 +329,11 @@ class Template extends TrObject {
     * Metoda přidá proměnné do interních položek šablony
     * @param array $vars -- proměnné ve formátu ('název' => 'hodnota')
     */
-   public function setVars($vars) 
+   public function setVars($vars)
    {
       foreach ($vars as $name => $var) {
          $this->$name = $var;
-      }      
+      }
    }
 
    /**
@@ -366,7 +366,7 @@ class Template extends TrObject {
       }
       return AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR.self::face().DIRECTORY_SEPARATOR;
    }
-   
+
    /**
     * Metoda vrací URL adresu ke zvoleného vhledu
     * @param bool $parentFace -- (option) jestli se má vracet cesta k hlavnímu webu
@@ -440,7 +440,7 @@ class Template extends TrObject {
    /**
     * metoda zkontroluje jestli je daná šablona už přidána
     * @param string $name -- název šablony
-    * @return type 
+    * @return type
     */
    public function haveTpl($name)
    {
@@ -501,7 +501,7 @@ class Template extends TrObject {
     */
    public static function getFileDir($file, $dir = self::TEMPLATES_DIR, $realpath = false, $withFile = false) {
       $faceDir =  AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR
-              .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
+         .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
       $mainDir = AppCore::getAppLibDir().$dir.DIRECTORY_SEPARATOR;
       $return = null;
       // pokud existuje soubor ve vzhledu
@@ -513,7 +513,7 @@ class Template extends TrObject {
          }
       } // pokud se šablona loaduje z jiného faces (např nadřazeného webu)
       else if(VVE_SUB_SITE_DIR != null AND $dir == self::TEMPLATES_DIR AND is_file(str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir).$file)) {
-            $return = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
+         $return = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
       } else if(is_file($mainDir.$file)) {
          if($realpath) {
             $return = $mainDir;
@@ -521,7 +521,7 @@ class Template extends TrObject {
             $return = Url_Request::getBaseWebDir().$dir.URL_SEPARATOR;
          }
       } else {
-         trigger_error(sprintf($this->tr('Soubor "%s %s" nebyl nalezen'), $dir, $file));
+         trigger_error(sprintf('File "%s %s" not found', $dir, $file));
       }
       if($withFile == true){
          $return .= $file;
@@ -537,7 +537,7 @@ class Template extends TrObject {
       self::$browser = new Browser();
       self::$currentFace = new Face();
    }
-   
+
    /**
     * Metoda nastaví název vzhledu webu (faces)
     * @param string $face -- název vzhledu
@@ -558,7 +558,7 @@ class Template extends TrObject {
          return Url_Request::getBaseWebDir().self::FACES_DIR.'/'.self::$face.'/';
       }
    }
-   
+
    /**
     * Metoda vrací jestli je aktuální stránka titulní
     * @return bool -- true pokud se jedná o titulní stránku
@@ -657,6 +657,38 @@ class Template extends TrObject {
    }
 
    /**
+    * Metoda zkontroluje jestli zadaný soubor existuje
+    * @param $file
+    * @return bool
+    */
+   public function existTpl($file, $module = null)
+   {
+      if($module == null){
+         $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
+         $faceDir = $parentFaceDir = Template::faceDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+         if(VVE_SUB_SITE_DIR != null){
+            $parentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
+         }
+         $mainDir = AppCore::getAppLibDir().self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      } else {
+         $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
+         $faceDir = $parentFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+         if(VVE_SUB_SITE_DIR != null){
+            $parentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
+         }
+         $mainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
+      }
+
+      if( (is_file($faceDir.$file))
+         || (VVE_SUB_SITE_DIR != null AND is_file($parentFaceDir.$file))
+         || (is_file($mainDir.$file))
+         ){ // soubor z face webu
+         return true;
+      }
+      return false;
+   }
+
+   /**
     * Metoda přidá šablonu z enginu
     * @param <type> $file
     * @param <type> $original
@@ -696,23 +728,23 @@ class Template extends TrObject {
          $parentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir);
       }
       $mainDir = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR.self::TEMPLATES_DIR.DIRECTORY_SEPARATOR;
-/*
-$file:
-string 'main.phtml' (length=10)
-string 'panel.phtml' (length=10)
+      /*
+      $file:
+      string 'main.phtml' (length=10)
+      string 'panel.phtml' (length=10)
 
-$faceDir:
-string '/var/www/vve6/faces/default/modules/text/templates/' (length=56)
-/var/www/vve6/subdomain/faces/default/modules/text/templates/
+      $faceDir:
+      string '/var/www/vve6/faces/default/modules/text/templates/' (length=56)
+      /var/www/vve6/subdomain/faces/default/modules/text/templates/
 
-$parentFaceDir:
-string '/var/www/vve6/faces/default/modules/text/templates/' (length=56)
-/var/www/vve6/subdomain/faces/default/modules/text/templates/
+      $parentFaceDir:
+      string '/var/www/vve6/faces/default/modules/text/templates/' (length=56)
+      /var/www/vve6/subdomain/faces/default/modules/text/templates/
 
-$mainDir:
-string '/var/www/vve6/modules/text/templates/' (length=42)
-/var/www/vve6/modules/text/templates/
-*/
+      $mainDir:
+      string '/var/www/vve6/modules/text/templates/' (length=42)
+      /var/www/vve6/modules/text/templates/
+      */
 //       Debug::log($file, $faceDir, $parentFaceDir, $mainDir);
 
       $path = null;
@@ -798,42 +830,73 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      
+
       if(VVE_SUB_SITE_DIR != null){
          $rpParentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $rpFaceDir);
       }
       $rpMainDir = AppCore::getAppLibDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      
+
       $path = $url = null;
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = $rpFaceDir;
-         $url = Template::face(false);
+         $url = Template::face(false).self::STYLESHEETS_DIR."/";
       } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
          $path = $rpParentFaceDir;
-         $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false));
+         $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false)).self::STYLESHEETS_DIR."/";
       } else if(is_file($rpMainDir.$rpFile)) { // soubor v knihovnách
          $path = $rpMainDir;
-         $url = Url_Request::getBaseWebDir(true);
+         $url = Url_Request::getBaseWebDir(true).self::STYLESHEETS_DIR."/";
       } else {
          throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
-      
-      try {
-         if(VVE_DEBUG_LEVEL >= 2){
-            $cssStr = lessc::cexecute($path . $rpFile, true);
-            file_put_contents($path . $rpFile . ".css",  $cssStr['compiled']); // when debug > 2force recompile
-         } else {
-            lessc::ccompile($path . $rpFile, $path . $rpFile . ".css");
+      $targetPath = $path;
+      $createNewFile = false;
+      $cachePath = AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      if(!is_dir($cachePath) || !is_writable($cachePath)){
+         @mkdir($cachePath);
+      }
+      if(!is_file($targetPath . $rpFile . ".css") || !is_writable($targetPath . $rpFile . ".css")){
+         $targetPath = $cachePath;
+         if(!is_dir($targetPath)){
+            @mkdir($targetPath);
          }
+         $url = Url_Request::getBaseWebDir()."cache/".self::STYLESHEETS_DIR."/";
+         $createNewFile = true;
+      }
+
+
+      try {
+         $less = new lessc();
+         $less->setVariables($this->getLessVariables());
+         $less->setImportDir(array($rpFaceDir, Url_Request::getBaseWebDir(true).self::STYLESHEETS_DIR."/", ));
+         if(VVE_DEBUG_LEVEL == 0){
+            $less->setFormatter("compressed");
+         }
+
+         $cacheFile = AppCore::getAppCacheDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$rpFile.".cache";
+         if (file_exists($cacheFile)) {
+            $cache = unserialize(file_get_contents($cacheFile));
+         } else {
+            $cache = $path . $rpFile;
+         }
+
+         $newCache = $less->cachedCompile($cache);
+
+         if (!is_array($cache) || $newCache["updated"] > $cache["updated"] || $createNewFile) {
+            file_put_contents($cacheFile, serialize($newCache));
+            file_put_contents($targetPath . $rpFile . ".css", $newCache['compiled']);
+         }
+//         $less->checkedCompile($path . $rpFile, $path . $rpFile . ".css");
+
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
-      return $url.self::STYLESHEETS_DIR."/".$file.".css";
+      return $url.$file.".css";
    }
-   
+
    protected function getLesscCssFromModule($file, $module, $original = false) {
       require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
-      
+
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = $rpParentFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
          .DIRECTORY_SEPARATOR.self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -846,50 +909,76 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
 
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = $rpFaceDir;
-//          $url = Template::face(false).AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
       } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
          $path = $rpParentFaceDir;
-//          $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true),Template::face(false))
-//             .AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
-
       } else if(is_file($rpMainDir.$file)) { // soubor v knihovnách
          $path = $rpMainDir;
-//          if(VVE_SUB_SITE_DOMAIN == null){
-//             $url = Url_Request::getBaseWebDir().AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
-//          } else {
-//             $url = Url_Request::getBaseWebDir(true).AppCore::MODULES_DIR.'/'.$module.'/'.self::STYLESHEETS_DIR.'/';
-//          }
       } else {
          throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
 
-      $cachePath = AppCore::getAppCacheDir(); 
+      $cachePath = AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      if(!is_dir($cachePath) || !is_writable($cachePath)){
+         @mkdir($cachePath);
+      }
+
       try {
-         if(VVE_DEBUG_LEVEL >= 2){
-            $cssStr = lessc::cexecute($path . $rpFile, true);
-            // put to cache dir
-            file_put_contents($cachePath . $rpFile . '-'.$module.".css",  $cssStr['compiled']); // when debug > 2 force recompile
-         } else {
-            // put to cache dir
-            lessc::ccompile($path . $rpFile, $cachePath . $rpFile .'-'.$module. ".css");
+         $less = new lessc();
+         $less->setVariables($this->getLessVariables());
+         if(VVE_DEBUG_LEVEL == 0){
+            $less->setFormatter("compressed");
          }
+
+         $cacheFile =$cachePath.$rpFile.'-'.$module.".cache";
+         if (file_exists($cacheFile)) {
+            $cache = unserialize(file_get_contents($cacheFile));
+         } else {
+            $cache = $path.$rpFile;
+         }
+
+         $newCache = $less->cachedCompile($cache);
+
+         if (!is_array($cache) || $newCache["updated"] > $cache["updated"]) {
+            file_put_contents($cacheFile, serialize($newCache));
+            file_put_contents($cachePath.$rpFile.'-'.$module.".css", $newCache['compiled']);
+         }
+
+         $less = new lessc();
+         $less->checkedCompile($path.$rpFile, $cachePath.$rpFile.'-'.$module.".css");
+
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
-      return Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR.'/'.$file.'-'.$module.".css";
+      return Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR.'/'.Template::STYLESHEETS_DIR."/".$file.'-'.$module.".css";
    }
-   
+
+   /**
+    * Připraví pole s proměnými pro šablonu
+    * @return array
+    */
+   private function getLessVariables()
+   {
+      return array(
+         'dirFace' => "'".Template::faceUrl(false)."'",
+         'dirFaceParent' => "'".Template::faceUrl(true)."'",
+         'dirCore' => "'".Url_Request::getBaseWebDir()."'",
+         'dirCoreImages' => "'".Url_Request::getBaseWebDir()."images/'",
+         'dirFaceCss' => "'".Template::faceUrl(true).self::STYLESHEETS_DIR."/'",
+         'dirCoreCss' => "'".Url_Request::getBaseWebDir().self::STYLESHEETS_DIR."/'",
+      );
+   }
+
    protected function getSassCssFromEngine($file, $original = false, $ext = 'scss') {
       require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      
+
       if(VVE_SUB_SITE_DIR != null){
          $rpParentFaceDir = str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $rpFaceDir);
       }
       $rpMainDir = AppCore::getAppLibDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      
+
       $path = $url = null;
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = $rpFaceDir;
@@ -903,11 +992,11 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
       } else {
          throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
-      
+
       try {
          $options = array(
             'style' => SassRenderer::STYLE_NESTED,
-            'cache' => FALSE,
+            'cache' => false,
             'syntax' => $ext == "sass" ? SassFile::SASS : SassFile::SCSS,
             'debug' => false,
             'debug_info' => false,
@@ -919,10 +1008,10 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
       }
       return $url.self::STYLESHEETS_DIR."/".$file.".css";
    }
-   
+
    protected function getSassCssFromModule($file, $module, $original = false, $ext = 'scss') {
       require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
-      
+
 //      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
 //      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
 //      $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -973,7 +1062,7 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
          } else {
             throw new BadFunctionCallException($this->tr('Volán nedefinovaný výstupní filtr.'));
          }
-          if(is_array($filter)){
+         if(is_array($filter)){
             $text = $filter[0]($text, $this->link, $this, $filter[1]);
          } else {
             $text = $filter($text, $this->link, $this);
@@ -983,4 +1072,3 @@ string '/var/www/vve6/modules/text/templates/' (length=42)
       return $text;
    }
 }
-?>

@@ -12,31 +12,7 @@
  * @abstract 		Třída pro práci s odkazy
  */
 
-class Url_Link {
-/**
- * Oddělovač prametrů odkazu
- * @var string
- */
-   const URL_PARAMETRES_SEPARATOR = '&amp;';
-
-   /**
-    * Oddělovač prametrů odkazu a samotného odkazu
-    * @var string
-    */
-   const URL_SEPARATOR_LINK_PARAMS = '?';
-
-   /**
-    * Oddělovač parametrů v url
-    * @var string
-    */
-   const URL_PARAMETRES_SEPARATOR_IN_URL = '&';
-
-   /**
-    * Oddělovač parametr/hodnota
-    * @var string
-    */
-   const URL_SEP_PARAM_VALUE = '=';
-
+class Url_Link extends Url {
    /**
     * Proměná s typem přenosového protokolu
     * @var string
@@ -80,12 +56,6 @@ class Url_Link {
    protected static $currentRoute = null;
 
    /**
-    * Pole s parsovatelnými parametry v url
-    * @var array
-    */
-   protected $paramsArray = array();
-
-   /**
     * Pole s pparametry v aktuální URL
     * @var array
     */
@@ -95,19 +65,7 @@ class Url_Link {
     * Soubor který se má zobrazit
     * @var string
     */
-   protected $file = null;
-
-   /**
-    * Soubor který se má zobrazit
-    * @var string
-    */
    protected static $currentFile = null;
-
-   /**
-    * Kotva který se má zobrazit
-    * @var string
-    */
-   protected $anchor = null;
 
    /**
     * Kotva který se má zobrazit
@@ -121,34 +79,10 @@ class Url_Link {
     * @param boolean $onlyWebRoot -- (option) true pokud má být vráce naprosto čistý link (web root)
     */
    function __construct($clear = false) {
-   //      $this->onlyWebRoot = $onlyWebRoot;
+      //      $this->onlyWebRoot = $onlyWebRoot;
       $this->_init();
       if($clear) {
          $this->clear();
-      }
-   }
-
-   /*
-    * STATICKÉ METODY
-    */
-
-   /**
-    * Metoda nastavuje transportní protokol
-    * @param string -- přenosový protokol (např. http://)
-    */
-   public static function setTransferProtocol($protocol) {
-      self::$user_transfer_protocol = $protocol;
-   }
-
-   /**
-    * Metoda vrací přenosový protokol
-    * @return string -- přenosový protokol
-    */
-   public static function getTransferProtocol() {
-      if(self::$user_transfer_protocol == null) {
-         return 'http';
-      } else {
-         return self::$user_transfer_protocol;
       }
    }
 
@@ -189,17 +123,6 @@ class Url_Link {
    }
 
    /**
-    * Metoda nastavuje název a id routy
-    * @param string -- název cesty
-    * @param array -- pole s parametry pojmenovanými podle cesty
-    *
-    * @return Url_Link -- objket Url_Link
-    */
-//   public function route($name = null, $params = array()) {
-//      return $this;
-//   }
-
-   /**
     * Metoda nastavuje typ media
     * @param string -- jméno media
     *
@@ -222,104 +145,6 @@ class Url_Link {
    }
 
    /**
-    * Metoda přidá nebo změní daný parametr v URL
-    * @param string $name -- objekt UrlParam nebo string
-    * @param string $value -- (option) hodnota parametru, pokud je null bude parametr odstraněn
-    */
-   public function param($name, $value = null) {
-      if($value !== null) {
-         if(!is_array($name)) {
-            $this->paramsArray[$name] = $value;
-         } else {
-            foreach ($name as $key => $val) {
-               $this->paramsArray[$key] = $val;
-            }
-         }
-      } else {
-         $this->rmParam($name);
-      }
-      return $this;
-   }
-
-   /**
-    * Metoda odstraní daný parametr z url
-    * @param mixed $name -- (option) název parametru, který se má odstranit nebo
-    * objekt UrlParam. Pokud zůstane nezadán, odstraní se všechny parametry
-    *
-    * @return Url_Link
-    */
-   public function rmParam($name = null) {
-      if(is_array($name)){
-         foreach ($name as $n) {
-            if(array_key_exists($n, $this->paramsArray)){
-               unset($this->paramsArray[$n]);
-            }
-         }
-      } else {
-         if($name != null && array_key_exists($name, $this->paramsArray)) {
-            unset($this->paramsArray[$name]);
-         }
-         // Odstranění všch parametrů (normálových i obyčejných)
-         else if( is_null($name) ) {
-            $this->paramsArray = array();
-         }
-      }
-      return $this;
-   }
-
-   /**
-    * Metoda vrací parametr z url adresy
-    * @param string $name -- název parametru
-    * @param mixed $defValue -- výchozí hodnota parametru
-    * @return mixed -- hodnota parametru
-    */
-   public function getParam($name, $defValue = null) {
-      if(isset ($_GET[$name])){
-         return urldecode($_GET[$name]);
-      } else {
-         return $defValue;
-      }
-   }
-
-   /**
-    * Metoda nastaví aktuální soubor
-    * @param string $file -- název souboru
-    */
-   public function file($file = null) {
-      $this->file = $file;
-      return $this;
-   }
-
-   /**
-    * Metoda nastaví aktuální soubor (alias pro file($file))
-    * @param string $file -- název souboru
-    */
-   public function setFile($file = null) {
-      return $this->file($file);
-   }
-
-   /**
-    * Metoda nastaví aktuální kotvu
-    * @param string $anchor -- název kotvy
-    */
-   public function anchor($anchor = null) {
-      $this->anchor = $anchor;
-      return $this;
-   }
-
-   /**
-    * Metoda nastaví parametry (přepíše původní)
-    * @param string/array $params -- pole nebo řetězec parametrů
-    */
-   public static function setParams($params) {
-      if(is_array($params)) {
-         self::$currentParams = $params;
-      } else {
-         self::$currentParams = self::parseParams($params);
-      }
-   }
-
-   /**
     * Metoda nastaví aktuální kategorii
     * @param string $catKey -- název kategorie
     */
@@ -338,19 +163,14 @@ class Url_Link {
    }
 
    /**
-    * Metoda nastavuje znovunahrání stránky
-    * @param string -- externí odkaz na který se má přesměrovat (option)
+    * Metoda nastaví parametry (přepíše původní)
+    * @param string/array $params -- pole nebo řetězec parametrů
     */
-   public function reload($link = null, $code = 302) {
-      if(!Url_Request::isXHRRequest() && CoreErrors::isEmpty()){ // u XHR není nutný reload
-         if ($link == null) {
-            Template_Output::addHeader("Location: " . (string)$this, true, $code);
-         } else {
-            Template_Output::addHeader("Location: " . (string)$link, true, $code);
-         }
-         Template_Output::sendHeaders();
-         session_commit(); // při více přesměrování se ztrácí info a err messages
-         die;
+   public static function setParams($params) {
+      if(is_array($params)) {
+         self::$currentParams = $params;
+      } else {
+         self::$currentParams = self::parseParams($params);
       }
    }
 
@@ -367,23 +187,6 @@ class Url_Link {
          $this->category();
       }
       return $this;
-   }
-
-   /*
-    * PRIVÁTNÍ METODY
-    */
-
-   /**
-    * Metoda inicializuje odkazy
-    *
-    */
-   protected function _init() {
-      $this->lang = self::$currentlang;
-      $this->category = self::$currentCategory;
-      $this->route = self::$currentRoute;
-      $this->file = self::$currentFile;
-      $this->paramsArray = self::$currentParams;
-      $this->anchor = self::$currentAnchor;
    }
 
    /*
@@ -420,38 +223,10 @@ class Url_Link {
       return $returnString;
    }
 
-   /**
-    * Metoda parsuje normálové parametry a vrací je jako pole, kde klíč je název
-    * a hodnota parametru je hodnota
-    * @param string $params -- řetězec s parametry
-    * @return array -- pole s parametry
-    */
-   protected static function parseParams($params) {
-      $paramsArr= array();
-      // odstrannění otazníku na začátku
-      if($params != null) {
-         $paramsArr = $_GET;
-         if(!function_exists('urlDecodeParam')){
-            function urlDecodeParam(&$param, $key) {
-               $param = urldecode($param);
-            }
-         }
-         array_walk_recursive($paramsArr, 'urlDecodeParam');
-      }
-      return $paramsArr;
-   }
 
    /**
-    * Metoda vrací část s parametry pro url (parsovatelné)
-    * @param string -- řetězec s parametry
+    * Vnitřní metody
     */
-   protected function getParams() {
-      $return = null;
-      if(!empty ($this->paramsArray)) {
-         $return = self::URL_SEPARATOR_LINK_PARAMS.http_build_query($this->paramsArray);
-      }
-      return $return;
-   }
 
    /**
     * Metoda vrací část lang pro url
@@ -493,44 +268,27 @@ class Url_Link {
    }
 
    /**
-    * Metoda vrací část se souborem pro url
-    * @param string -- soubor
+    * Metoda inicializuje odkazy
+    *
     */
-   protected function getFile() {
-      if($this->file != null) {
-         return $this->file;
-      } else {
-         return null;
-      }
+   protected function _init() {
+      $this->lang = self::$currentlang;
+      $this->category = self::$currentCategory;
+      $this->route = self::$currentRoute;
+      $this->file = self::$currentFile;
+      $this->paramsArray = self::$currentParams;
+      $this->anchor = self::$currentAnchor;
    }
 
-   /**
-    * Metoda vrací část s kotvou v url
-    * @param string -- kotva
-    */
-   protected function getAnchor() {
-      if($this->anchor != null) {
-         return '#'.$this->anchor;
-      } else {
-         return null;
-      }
-   }
 
    /**
-    * Metoda odtraní z url špatné znaky a opakování
-    * @param string $url -- url adresa
-    * @todo ověřit nutnost, popřípadě vyřešit jinak protože na začátku adresy jsou
-    * vždy dvě lomítka viz. http://
+    * Deprecated
     */
-   protected function repairUrl($url) {
-//      $url = vve_cr_url_key($url);
-//      $url = preg_replace("/\/{2,}/", "/", $url); // TODO ověřit nutnost
-      return $url;
-   }
 
    /**
     * Metoda inicializuje zpětný odkaz, kde bude tato metoda volána je považován za kořenový kontroller
     * @todo Tohle předělat !!!
+    * @deprecated
     */
    public function backInit(Url_Link $link = null) {
       unset ($_SESSION['linkBack'][$this->category]);
@@ -547,38 +305,84 @@ class Url_Link {
     * Metoda uloží daný odkaz pod daný level
     * @param Url_LInk $link -- objekt odkazu
     * @param int $appLevel (option) level (def: 0)
+    * @deprecated
     */
    private function setBack(Url_Link $link, $appLevel = 0) {
       $_SESSION['linkBack'][$this->category][$appLevel] = (string)$link;
       ksort($_SESSION['linkBack'][$this->category]);
    }
 
-   /**
-    * Metoda vytvoří nový zpětný odkaz a vrátí předešlý odkaz s menším levelem
-    * @param Url_Link $noBackLink -- objekt odkazu pokud neexistuje zpětný
-    * @param int $maxLevel -- maximální level zpětného odkazu
-    * @param int $curLevel -- (option) aktuální level (def: $maxLevel+1)
-    * @param Url_Link $curLink -- (option) nový zpětný odkaz
-    * @return Url_Link
-    */
-   public function back(Url_Link $noBackLink, $maxLevel, $curLevel = null, Url_Link $curLink = null) {
-      if($curLink === null) $curLink = $this;
-      if($curLevel === null) $curLevel = $maxLevel+1;
-      // init pokud není
-      if(!isset ($_SESSION['linkBack'][$this->category])) {
-         $this->backInit($this->clear());
-      }
+   /*
+   * STATICKÉ METODY
+   */
 
-      // vrázení odkazu
-      for ($level = $maxLevel; $level >= 0; $level--) {
-         if(isset ($_SESSION['linkBack'][$this->category][$level])) {
-            $noBackLink = $_SESSION['linkBack'][$this->category][$level];
-            break;
-         }
+   /**
+    * Metoda nastavuje transportní protokol
+    * @param string -- přenosový protokol (např. http://)
+    */
+   public static function setTransferProtocol($protocol) {
+      self::$user_transfer_protocol = $protocol;
+   }
+
+   /**
+    * Metoda vrací přenosový protokol
+    * @return string -- přenosový protokol
+    */
+   public static function getTransferProtocol() {
+      if(self::$user_transfer_protocol == null) {
+         return 'http';
+      } else {
+         return self::$user_transfer_protocol;
       }
-      // vytvoření aktuálního odkazu
-      $this->setBack($curLink,$curLevel);
-      return $noBackLink;
+   }
+
+   /**
+    * Metoda vytvoří objekt odkazu aplikace na Admin kategorii podle ID
+    * @return Url_Link_Module
+    */
+   public static function getCategoryAdminLink($idc){
+      $link = new Url_Link_Module(true);
+      $cat = Model_CategoryAdm::getCategoryByID($idc);
+      return $link->clear(true)->category( is_object($cat) ? $cat->{Model_Category::COLUMN_URLKEY} : null);
+   }
+
+   /**
+    * Metoda vytvoří objekt odkazu aplikace na kategorii podle ID
+    * @return Url_Link_Module
+    */
+   public static function getCategoryLink($idc){
+      $link = new Url_Link_Module(true);
+      $cat = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($idc);
+      return $link->clear(true)->category( is_object($cat) ? $cat->getCatObj()->getUrlKey() : null);
+   }
+
+   /**
+    * Metoda vytvoří objekt odkazu aplikace na Admin kategorii podle modulu
+    * @return Url_Link_Module
+    */
+   public static function getCategoryAdminLinkByModule($module){
+      $link = new Url_Link_Module(true);
+      $cat = Model_CategoryAdm::getCategoryByModule($module);
+      return $link->clear(true)->category(is_object($cat) ? $cat->{Model_Category::COLUMN_URLKEY} : null);
+
+   }
+
+   /**
+    * Metoda vytvoří pole objektů s odkazy aplikace na kategorie podle modulu
+    * @return array of Url_Link_Module
+    */
+   public static function getCategoryLinkByModule($module){
+      /*
+       * jednodušší je udělat sql dotaz na kategorie
+       */
+      $cModel = new Model_Category();
+      $cats = $cModel->getCategoryListByModule($module);
+      $linksArr = array();
+      foreach($cats as $cat) {
+         $link = new self(true);
+         $linksArr[$cat->{Model_Category::COLUMN_ID}] = $link->clear(true)->category((string)$cat->{Model_Category::COLUMN_URLKEY});
+      }
+      return $linksArr;
    }
 }
 //echo("PHP_SELF: ".$_SERVER["PHP_SELF"]."<br>");

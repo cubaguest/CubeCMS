@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- last ID: 32788 -->
+<!-- last ID: 32789 -->
 <adminmenu>
    <section icon="application_side_tree.png">
       <name lang="cs">Struktura</name>
@@ -26,6 +26,13 @@
          <urlkey lang="cs">admin/struktura/panely</urlkey>
          <urlkey lang="en">admin/structure/panels</urlkey>
          <module>panels</module>
+      </item>
+      <item id="32789" icon="application_side_contract.png">
+         <name lang="cs">Volitelná menu</name>
+         <name lang="en">Custom menus</name>
+         <urlkey lang="cs">admin/struktura/volitelna-menu</urlkey>
+         <urlkey lang="en">admin/structure/custom-menu</urlkey>
+         <module>custommenu</module>
       </item>
    </section>
    <section icon="group.png">

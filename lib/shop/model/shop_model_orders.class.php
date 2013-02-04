@@ -136,8 +136,8 @@ class Shop_Model_Orders extends Model_ORM
 
       $this->setPk(self::COLUMN_ID);
       
-//      $this->addForeignKey(self::COLUMN_ID_CUSTOMER, "Shop_Model_Customers", Shop_Model_Tax::COLUMN_ID);
-      
+      $this->addForeignKey(self::COLUMN_ID_CUSTOMER, "Shop_Model_Customers", Shop_Model_Customers::COLUMN_ID);
+
    }
 }
 ?>

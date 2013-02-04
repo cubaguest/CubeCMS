@@ -58,7 +58,7 @@ interface File_Interface {
    
    public function move($dstDir);
    
-   public function send();
+   public function send($forceDownload = false);
    
 
 }

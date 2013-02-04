@@ -4,136 +4,136 @@
  * Třída obsluhuje přihlášení/odhlášení uživatele a práci s vlastnostmi (jméno, email,
  * id, skupinu, atd.) přihlášeného uživatele.
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
+ * @copyright     Copyright (c) 2008-2009 Jakub Matas
+ * @version       $Id$ VVE3.9.4 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
- * @abstract 		Třída pro obsluhu autorizace uživatele
+ * @abstract      Třída pro obsluhu autorizace uživatele
  * @todo          Dodělat načítání z modelu a převést taknázvy sloupců do modelu
  */
 
 class Auth extends TrObject {
-	/**
-	 * Konstanty označující informace o uživateli
-	 * @var string
-	 */
-	const USER_NAME			= 'username';
-	const USER_MAIL			= 'mail';
-	const USER_ID			   = 'id_user';
-	const USER_ID_GROUP		= 'id_group';
-	const USER_GROUP_NAME	= 'group_name';
-	const USER_LOGIN_TIME	= 'logintime';
-	const USER_IS_LOGIN		= 'login';
-	const USER_LOGIN_ADDRESS= 'ip_address';
-	const USER_ADMIN_GROUP  = 'admin_grp';
-	const USER_ADMIN        = 'admin';
-	const USER_SITES        = 'sites';
+   /**
+    * Konstanty označující informace o uživateli
+    * @var string
+    */
+   const USER_NAME         = 'username';
+   const USER_MAIL         = 'mail';
+   const USER_ID           = 'id_user';
+   const USER_ID_GROUP     = 'id_group';
+   const USER_GROUP_NAME   = 'group_name';
+   const USER_LOGIN_TIME   = 'logintime';
+   const USER_IS_LOGIN     = 'login';
+   const USER_LOGIN_ADDRESS= 'ip_address';
+   const USER_ADMIN_GROUP  = 'admin_grp';
+   const USER_ADMIN        = 'admin';
+   const USER_SITES        = 'sites';
 
    const PERMANENT_COOKIE_EXPIRE = 2678400; // 31*24*60*60
 
    /**
-	 * Je-li uživatel přihlášen
-	 * @var boolean
-	 */
-	private static $login = false;
+    * Je-li uživatel přihlášen
+    * @var boolean
+    */
+   private static $login = false;
 
-	/**
-	 * Skupina uživatele
-	 * @var string
-	 */
-	private static $userGroupName = null;
+   /**
+    * Skupina uživatele
+    * @var string
+    */
+   private static $userGroupName = null;
 
-	/**
-	 * Skupina uživatele
-	 * @var integer
-	 */
-	private static $userGroupId = null;
+   /**
+    * Skupina uživatele
+    * @var integer
+    */
+   private static $userGroupId = null;
 
-	/**
-	 * Id uživatele
-	 * @var integer
-	 */
-	private static $userId = null;
+   /**
+    * Id uživatele
+    * @var integer
+    */
+   private static $userId = null;
 
-	/**
-	 * Uživatelské jméno uživatele
-	 * @var string
-	 */
-	private static $userName = null;
+   /**
+    * Uživatelské jméno uživatele
+    * @var string
+    */
+   private static $userName = null;
 
-	/**
-	 * Mail uživatele
-	 * @var string
-	 */
-	private static $userMail = null;
+   /**
+    * Mail uživatele
+    * @var string
+    */
+   private static $userMail = null;
 
-	/**
-	 * Uživatel je v Admin skupině
-	 * @var string
-	 */
-	private static $userIsAdmin = false;
+   /**
+    * Uživatel je v Admin skupině
+    * @var string
+    */
+   private static $userIsAdmin = false;
    
-	/**
-	 * Uživatel je Admin pro aktuální web
-	 * @var string
-	 */
-	private static $userIsSiteAdmin = false;
+   /**
+    * Uživatel je Admin pro aktuální web
+    * @var string
+    */
+   private static $userIsSiteAdmin = false;
 
-	/**
-	 * Pole s podweby uživatele
-	 * @var string
-	 */
-	private static $userSites = array();
+   /**
+    * Pole s podweby uživatele
+    * @var string
+    */
+   private static $userSites = array();
 
-	/**
-	 * Konstruktor, provádí autorizaci
-	 */
+   /**
+    * Konstruktor, provádí autorizaci
+    */
    public static function authenticate() {
       //Zakladni proměne
-		self::$login = false;
-     	//Jestli uzivatel prihlasen, je zvolena skupina uzivatele, v opacnem pripade vychozi skupina
-	   if(!self::userIslogIn()){
-   		if(!self::permanentLogin() AND !self::logInNow()){
-  				//přihlášení výchozího uživatele
-			   self::setDefaultUserParams();
-		   }
+      self::$login = false;
+      //Jestli uzivatel prihlasen, je zvolena skupina uzivatele, v opacnem pripade vychozi skupina
+      if(!self::userIslogIn()){
+         if(!self::permanentLogin() AND !self::logInNow()){
+            //přihlášení výchozího uživatele
+            self::setDefaultUserParams();
+         }
       } else {
-   		//Uživatel se odhlásil
-  			if(self::logOutNow()){
-			   self::setDefaultUserParams();
-		   } else {
-	   		self::setUserDetailFromSession();
-   		}
- 		}
-	}
+         //Uživatel se odhlásil
+         if(self::logOutNow()){
+            self::setDefaultUserParams();
+         } else {
+            self::setUserDetailFromSession();
+         }
+      }
+   }
 
-	/**
-	 * Metoda zjistí jesli je uživatel již přihlášen
-	 * @return boolean -- true pokud je uživatel přihlášen
+   /**
+    * Metoda zjistí jesli je uživatel již přihlášen
+    * @return boolean -- true pokud je uživatel přihlášen
     * @todo přidání kontroly IP adresy proti zneužití
-	 */
-	private static function userIslogIn() {
-		if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
-			self::$login = true;
-		} else {
-			self::$login = false;
-		}
-		return self::$login;
-	}
+    */
+   private static function userIslogIn() {
+      if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
+         self::$login = true;
+      } else {
+         self::$login = false;
+      }
+      return self::$login;
+   }
 
-	/**
-	 * metoda nastavuje parametry pro přihlášeného uživatele
-	 */
-	private static function setUserDetailFromSession() {
-		$_SESSION[self::USER_LOGIN_TIME] = time();
-		self::$userName = $_SESSION[self::USER_NAME];
-		self::$userMail = $_SESSION[self::USER_MAIL];
-		self::$userId = $_SESSION[self::USER_ID];
-		self::$userGroupId = $_SESSION[self::USER_ID_GROUP];
-		self::$userGroupName = $_SESSION[self::USER_GROUP_NAME];
-		self::$userSites = $_SESSION[self::USER_SITES];
-		self::$userIsAdmin = $_SESSION[self::USER_ADMIN];
-		self::$userIsSiteAdmin = false;
+   /**
+    * metoda nastavuje parametry pro přihlášeného uživatele
+    */
+   private static function setUserDetailFromSession() {
+      $_SESSION[self::USER_LOGIN_TIME] = time();
+      self::$userName = $_SESSION[self::USER_NAME];
+      self::$userMail = $_SESSION[self::USER_MAIL];
+      self::$userId = $_SESSION[self::USER_ID];
+      self::$userGroupId = $_SESSION[self::USER_ID_GROUP];
+      self::$userGroupName = $_SESSION[self::USER_GROUP_NAME];
+      self::$userSites = $_SESSION[self::USER_SITES];
+      self::$userIsAdmin = $_SESSION[self::USER_ADMIN];
+      self::$userIsSiteAdmin = false;
       
       if(self::$userIsAdmin AND (
          empty(self::$userSites) 
@@ -145,63 +145,63 @@ class Auth extends TrObject {
       if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
          setcookie(VVE_SESSION_NAME.'_pl', $_COOKIE[VVE_SESSION_NAME.'_pl'], time()+self::PERMANENT_COOKIE_EXPIRE,'/', Url_Request::getDomain());
       }
-	}
+   }
 
-	/**
-	 * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
-	 */
-	private static function setDefaultUserParams() {
-		self::$userGroupId = self::$userId = (int)VVE_DEFAULT_ID_GROUP;
-		self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
-		self::$userName = VVE_DEFAULT_USER_NAME;
-		self::$userIsAdmin = false;
-		self::$userIsSiteAdmin = false;
-		self::$userSites = array();
-	}
+   /**
+    * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
+    */
+   private static function setDefaultUserParams() {
+      self::$userGroupId = self::$userId = (int)VVE_DEFAULT_ID_GROUP;
+      self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
+      self::$userName = VVE_DEFAULT_USER_NAME;
+      self::$userIsAdmin = false;
+      self::$userIsSiteAdmin = false;
+      self::$userSites = array();
+   }
 
-	/**
-	 * metoda ukládá parametry uživatele do session
-	 */
-	private static function saveUserDetailToSession() {
-		$_SESSION[self::USER_NAME] = self::$userName;
-		$_SESSION[self::USER_MAIL] = self::$userMail;
-		$_SESSION[self::USER_ID]= self::$userId;
-		$_SESSION[self::USER_ID_GROUP] = self::$userGroupId;
-		$_SESSION[self::USER_GROUP_NAME] = self::$userGroupName;
-		$_SESSION[self::USER_LOGIN_ADDRESS] = $_SERVER['REMOTE_ADDR'];
-		$_SESSION[self::USER_LOGIN_TIME] = time();
-		$_SESSION[self::USER_IS_LOGIN] = true;
-		$_SESSION[self::USER_ADMIN] = self::$userIsAdmin;
-		$_SESSION[self::USER_SITES] = self::$userSites;
-	}
+   /**
+    * metoda ukládá parametry uživatele do session
+    */
+   private static function saveUserDetailToSession() {
+      $_SESSION[self::USER_NAME] = self::$userName;
+      $_SESSION[self::USER_MAIL] = self::$userMail;
+      $_SESSION[self::USER_ID]= self::$userId;
+      $_SESSION[self::USER_ID_GROUP] = self::$userGroupId;
+      $_SESSION[self::USER_GROUP_NAME] = self::$userGroupName;
+      $_SESSION[self::USER_LOGIN_ADDRESS] = $_SERVER['REMOTE_ADDR'];
+      $_SESSION[self::USER_LOGIN_TIME] = time();
+      $_SESSION[self::USER_IS_LOGIN] = true;
+      $_SESSION[self::USER_ADMIN] = self::$userIsAdmin;
+      $_SESSION[self::USER_SITES] = self::$userSites;
+   }
 
-	/**
-	 * Metoda ověří přihlašovací údaje a přihlásí uživatele do aplikace
-	 * @return boolean -- true pokud se uživatele podařilo přihlásit
-	 */
-	private static function logInNow() {
-		$return = false;
-		if (isset($_POST["login_submit"]) OR isset ($_POST['login_submit_x'])){
+   /**
+    * Metoda ověří přihlašovací údaje a přihlásí uživatele do aplikace
+    * @return boolean -- true pokud se uživatele podařilo přihlásit
+    */
+   private static function logInNow() {
+      $return = false;
+      if (isset($_POST["login_submit"]) OR isset ($_POST['login_submit_x'])){
          $tr = new Translator();
-			if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
-				AppCore::getUserErrors()->addMessage($tr->tr("Byly zadány prázdné údaje"));
-			} else {
+         if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
+            AppCore::getUserErrors()->addMessage($tr->tr("Byly zadány prázdné údaje"));
+         } else {
             $user = self::getUser(htmlentities($_POST["login_username"],ENT_QUOTES));
-				if (!$user){
-					AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
-				} else {
-					if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD}
+            if (!$user){
+               AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
+            } else {
+               if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD}
                OR ($user->{Model_Users::COLUMN_PASSWORD_RESTORE} != null
                   AND Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE})){
-						//	Uspesne prihlaseni do systemu
-						self::$login = true;
-						self::$userName = $user->{Model_Users::COLUMN_USERNAME};
-						self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
-						self::$userGroupName = $user->gname;
-						self::$userId = $user->{Model_Users::COLUMN_ID};
-						self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-						self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
-						self::$userIsSiteAdmin = false;
+                  // Uspesne prihlaseni do systemu
+                  self::$login = true;
+                  self::$userName = $user->{Model_Users::COLUMN_USERNAME};
+                  self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
+                  self::$userGroupName = $user->gname;
+                  self::$userId = $user->{Model_Users::COLUMN_ID};
+                  self::$userMail = $user->{Model_Users::COLUMN_MAIL};
+                  self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+                  self::$userIsSiteAdmin = false;
 
                   // mačteme všechny podweby, kde má uživatel přístup
                   $modelSites = new Model_SitesGroups();
@@ -217,10 +217,10 @@ class Auth extends TrObject {
                   unset($sites);
                   unset($modelSites);
 
-						if($user->{Model_Users::COLUMN_FOTO_FILE} != null){
-							//TODO není dodělána práce s fotkou
-//							$_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
-						}
+                  if($user->{Model_Users::COLUMN_FOTO_FILE} != null){
+                     //TODO není dodělána práce s fotkou
+//                   $_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
+                  }
                   // pokud je použito obnovné heslo uožíme jej
                   if(Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE}){
                      $user->{Model_Users::COLUMN_PASSWORD} = $user->{Model_Users::COLUMN_PASSWORD_RESTORE};
@@ -250,35 +250,35 @@ class Auth extends TrObject {
                   $link = new Url_Link();
                   $link->reload($link->getTransferProtocol().'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
                   return true;
-					} else {
+               } else {
                   AppCore::getUserErrors()->addMessage($tr->tr("Bylo zadáno špatné heslo."));
-					}
-				}
-			}
-		}
-		return false;
-	}
+               }
+            }
+         }
+      }
+      return false;
+   }
 
-	/**
-	 * Metoda provede odhlášení z aplikace
-	 * @return boolean -- true pokud se uživatel odhlásil
-	 */
-	private static function logOutNow() {
-		$return = false;
-		if(isset($_POST["logout_submit"]) OR isset ($_POST['logout_submit_x'])){
+   /**
+    * Metoda provede odhlášení z aplikace
+    * @return boolean -- true pokud se uživatel odhlásil
+    */
+   private static function logOutNow() {
+      $return = false;
+      if(isset($_POST["logout_submit"]) OR isset ($_POST['logout_submit_x'])){
          $tr = new Translator();
-			$_SESSION[self::USER_IS_LOGIN] = false;
-			self::$login = false;
-			session_destroy();
-			$return = true;
-			Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::$userName);
+         $_SESSION[self::USER_IS_LOGIN] = false;
+         self::$login = false;
+         session_destroy();
+         $return = true;
+         Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::$userName);
          AppCore::getInfoMessages()->addMessage($tr->tr('Byl jste úspěšně odhlášen'));
          setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/', '.'.Url_Request::getDomain()); // remove permament cookie
-			$link = new Url_Link();
+         $link = new Url_Link();
          $link->reload();
-		}
-		return $return;
-	}
+      }
+      return $return;
+   }
 
    /**
     * Metoda provade trvalé přihlášení do systému
@@ -289,15 +289,15 @@ class Auth extends TrObject {
          $data = explode('|', $_COOKIE[VVE_SESSION_NAME.'_pl']);
          $user = self::getUser($data[0]);
          if($user != false AND $data[1] == self::getBrowserIdent()){
-            //	Uspesne prihlaseni do systemu
-         	self::$login = true;
+            // Uspesne prihlaseni do systemu
+            self::$login = true;
             self::$userName = $user->{Model_Users::COLUMN_USERNAME};
-   			self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
-      		self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
-         	self::$userId = $user->{Model_Users::COLUMN_ID};
+            self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
+            self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
+            self::$userId = $user->{Model_Users::COLUMN_ID};
             self::$userMail = $user->{Model_Users::COLUMN_MAIL};
             self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
-				self::$userIsSiteAdmin = false;
+            self::$userIsSiteAdmin = false;
 
             // mačteme všechny podweby, kde má uživatel přístup
             $modelSites = new Model_SitesGroups();
@@ -349,86 +349,86 @@ class Auth extends TrObject {
    }
 
    /**
-	 * Metoda vrací je-li uživatel přihlášen
-	 *
-	 * @return boolean -- je li uživatel přihlášen
-	 */
-	public static function isLogin() {
-		return self::$login;
-	}
+    * Metoda vrací je-li uživatel přihlášen
+    *
+    * @return boolean -- je li uživatel přihlášen
+    */
+   public static function isLogin() {
+      return self::$login;
+   }
 
-	/**
-	 * Metoda vrací jestli je uživatel přihlášen
-	 * @return boolean -- true pokud je uživatel přihlášen
+   /**
+    * Metoda vrací jestli je uživatel přihlášen
+    * @return boolean -- true pokud je uživatel přihlášen
     * @deprecated
-	 */
-	public static function isLoginStatic() {
-		return self::$login;
-	}
+    */
+   public static function isLoginStatic() {
+      return self::$login;
+   }
 
-	/**
-	 * Metoda vrací název skupiny ve které je uživatel
-	 * @return string -- název skupiny
-	 */
-	public static function getGroupName() {
-		return self::$userGroupName;
-	}
+   /**
+    * Metoda vrací název skupiny ve které je uživatel
+    * @return string -- název skupiny
+    */
+   public static function getGroupName() {
+      return self::$userGroupName;
+   }
 
-	/**
-	 * Metoda vrací id skupiny ve které je uživatel
-	 * @return integer -- id skupiny
-	 */
-	public static function getGroupId() {
-		return self::$userGroupId;
-	}
+   /**
+    * Metoda vrací id skupiny ve které je uživatel
+    * @return integer -- id skupiny
+    */
+   public static function getGroupId() {
+      return self::$userGroupId;
+   }
 
-	/**
-	 * Metoda vrací id uživatele
-	 * @return integer -- id uživatele
-	 */
-	public static function getUserId() {
-		return self::$userId;
-	}
+   /**
+    * Metoda vrací id uživatele
+    * @return integer -- id uživatele
+    */
+   public static function getUserId() {
+      return self::$userId;
+   }
 
-	/**
-	 * Metoda vrací název uživatele
-	 * @return string -- název uživatele
-	 */
-	public static function getUserName() {
-		return self::$userName;
-	}
+   /**
+    * Metoda vrací název uživatele
+    * @return string -- název uživatele
+    */
+   public static function getUserName() {
+      return self::$userName;
+   }
 
-	/**
-	 * Metoda vrací mail uživatele
-	 * @return string -- mail uživatele
-	 */
-	public static function getUserMail() {
-		return self::$userMail;
-	}
+   /**
+    * Metoda vrací mail uživatele
+    * @return string -- mail uživatele
+    */
+   public static function getUserMail() {
+      return self::$userMail;
+   }
 
-	/**
-	 * Metoda vrací jestli je uživatele administrátor pro dané stránky
-	 * @return bool -- true pokud je administrator
-	 */
-	public static function isAdmin() {
-		return self::$userIsSiteAdmin;
-	}
+   /**
+    * Metoda vrací jestli je uživatele administrátor pro dané stránky
+    * @return bool -- true pokud je administrator
+    */
+   public static function isAdmin() {
+      return self::$userIsSiteAdmin;
+   }
    
-	/**
-	 * Metoda vrací jestli je uživatele administrátor pro některé stránky z domény
-	 * @return bool -- true pokud je administrator
-	 */
-	public static function isAdminGroup() {
-		return self::$userIsAdmin;
-	}
+   /**
+    * Metoda vrací jestli je uživatele administrátor pro některé stránky z domény
+    * @return bool -- true pokud je administrator
+    */
+   public static function isAdminGroup() {
+      return self::$userIsAdmin;
+   }
 
-	/**
-	 * Metoda vrací pole s weby, kde je uživatel platný
-	 * @return array -- pole s doménami
-	 */
-	public static function getUserSites() {
-		return self::$userSites;
-	}
+   /**
+    * Metoda vrací pole s weby, kde je uživatel platný
+    * @return array -- pole s doménami
+    */
+   public static function getUserSites() {
+      return self::$userSites;
+   }
 
    /**
     * Metoda provede zašifrování hesla
@@ -437,6 +437,17 @@ class Auth extends TrObject {
     */
    public static function cryptPassword($pass) {
       return sha1($pass);
+   }
+
+   /**
+    * Metoda vygeneruje náhodné heslo
+    * @param int $len - délka hesla
+    * @return string - heslo
+    */
+   public static function generatePassword($len = 8)
+   {
+      $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      return substr( str_shuffle( $chars ), 0, $len );
    }
 }
 ?>

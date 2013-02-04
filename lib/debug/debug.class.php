@@ -106,10 +106,15 @@ class Debug {
    public static function printDebug(){
       if(VVE_DEBUG_LEVEL > 0){
       if(!empty (self::$vars)){
+         ini_set('xdebug.var_display_max_data', 16384 );
          echo '<div class="debug-log">';// admin menu
          echo '<p><strong>DEBUG OUTPUT:</strong></p>';
          foreach (self::$vars as $arg) {
-            var_dump($arg);
+            if(function_exists('xdebug_var_dump')){
+               xdebug_var_dump($arg);
+            } else {
+               var_dump($arg);
+            }
          }
          echo '</div>';
       }

@@ -31,7 +31,7 @@ class Db_PDO extends PDO {
    protected static $numberOfSqlQueries = 0;
 
    protected static $instance;
-   
+
    public function  __construct() {
       try {
          if(func_num_args() == 0) { // default connector
@@ -42,7 +42,7 @@ class Db_PDO extends PDO {
                         PDO::ATTR_PERSISTENT => false,
                         PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
-                  ));
+                     ));
                   break;
                case 'pgsql':
                   parent::__construct("pgsql:dbname=".self::$dbName.";host=".self::$serverName,
@@ -57,7 +57,8 @@ class Db_PDO extends PDO {
             }
             self::$instance = $this;
          } else {
-            call_user_func_array(array($this, "__construct"), func_get_args());
+            $args = func_get_args();
+            call_user_func_array(array($this, "__construct"), $args);
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
          $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
@@ -70,12 +71,14 @@ class Db_PDO extends PDO {
 
    public function query($statement, $pdoFetch = PDO::FETCH_OBJ , $classname = null , $ctorargs = array()){
       self::$numberOfSqlQueries++;
-      return call_user_func_array(array($this, "parent::query"), func_get_args());
+      $args = func_get_args();
+      return call_user_func_array(array($this, "parent::query"), $args);
    }
 
    public function exec($statement){
       self::$numberOfSqlQueries++;
-      return call_user_func_array(array($this, "parent::exec"), func_get_args());
+      $args = func_get_args();
+      return call_user_func_array(array($this, "parent::exec"), $args);
    }
 
    /**
@@ -118,7 +121,7 @@ class Db_PDO extends PDO {
    public static function table($name) {
       return self::$tablePrefix.$name;
    }
-   
+
    /**
     * Vrací aktuální instanci DB konektoru
     * @return Db_PDO

@@ -54,10 +54,20 @@ class Model_CategoryAdm extends Model_File {
 
    public function getCategory($urlkey){
       $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
-      return $this->createCatObject($child[0]);
+      return empty($child) ? false : self::createCatObject($child[0]);
    }
 
-   private function createCatObject($child){
+   public static function getCategoryByID($id){
+      $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      return empty($child) ? false : self::createCatObject($child[0]);
+   }
+
+   public static function getCategoryByModule($module){
+      $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      return empty($child) ? false : self::createCatObject($child[0]);
+   }
+
+   private static function createCatObject($child){
       $obj = new Object();
       $urlkey = $child->xpath('urlkey[@lang="'.Locales::getLang().'"]');
       $obj->{Model_Category::COLUMN_URLKEY} = (string)$urlkey[0];
@@ -81,7 +91,7 @@ class Model_CategoryAdm extends Model_File {
    {
       $retArray = array();
       foreach(self::$structure->xpath("//item") as $child) {
-         array_push($retArray, $this->createCatObject($child));
+         array_push($retArray, self::createCatObject($child));
       }
       return $retArray;
    }

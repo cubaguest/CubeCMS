@@ -4,11 +4,11 @@
  * Třída pro základní práci s obrázky. Umožňuje jejich ukládání, ořezávání,
  * změnu velikost a změnu formátu obrázku.
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
+ * @copyright     Copyright (c) 2008-2009 Jakub Matas
+ * @version       $Id$ VVE3.9.4 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
- * @abstract 		Třída pro práci s obrázky
+ * @abstract      Třída pro práci s obrázky
  */
 
 class File_Image_Gd extends File_Image_Base {
@@ -21,21 +21,21 @@ class File_Image_Gd extends File_Image_Base {
    public function crop($x, $y, $w, $h)
    {
       $this->loadImageData();
-      
+
       $tempImg = imagecreatetruecolor($w, $h);
       imagealphablending($tempImg, false);
       imagesavealpha($tempImg, true);
 
       imagecopyresampled($tempImg, $this->imageData, 0, 0, $x, $y, $w, $h, $w, $h);
       $this->imageData = $tempImg;
-      
+
       // úprava rozměrů
-      $this->width  = imagesx($this->imageData);  
+      $this->width  = imagesx($this->imageData);
       $this->height = imagesy($this->imageData);
-      
+
       return $this;
    }
-   
+
    public function resize($w, $h, $option = self::RESIZE_AUTO)
    {
       $this->loadImageData();
@@ -43,63 +43,63 @@ class File_Image_Gd extends File_Image_Base {
       if($w == $this->width && $h == $this->height){
          return $this;
       }
-      // *** Get optimal width and height - based on $option  
+      // *** Get optimal width and height - based on $option
       $optionArray = $this->getDimensions($w, $h, $option);
-      
+      var_dump($w, $h, $optionArray);
       $optimalWidth = $optionArray['optimalWidth'];
       $optimalHeight = $optionArray['optimalHeight'];
-      
-      // *** Resample - create image canvas of x, y size  
+
+      // *** Resample - create image canvas of x, y size
       $imageResized = imagecreatetruecolor($optimalWidth, $optimalHeight);
       imagealphablending($imageResized, false);
       imagesavealpha($imageResized, true);
-      
+
       imagecopyresampled($imageResized, $this->imageData, 0, 0, 0, 0, $optimalWidth, $optimalHeight, $this->width, $this->height);
-      
+
       $this->imageData = $imageResized;
-      
-      // *** if option is 'crop', then crop too  
+
+      // *** if option is 'crop', then crop too
       if ($option == self::RESIZE_CROP) {
-         // *** Find center - this will be used for the crop  
-         $cropStartX = ( $optimalWidth  / 2) - ( $w / 2 );  
-         $cropStartY = ( $optimalHeight / 2) - ( $h / 2 );  
-  
-         // *** Now crop from center to exact requested size  
-         $imageCroped = imagecreatetruecolor($w , $h);  
+         // *** Find center - this will be used for the crop
+         $cropStartX = ( $optimalWidth  / 2) - ( $w / 2 );
+         $cropStartY = ( $optimalHeight / 2) - ( $h / 2 );
+
+         // *** Now crop from center to exact requested size
+         $imageCroped = imagecreatetruecolor($w , $h);
          imagealphablending($imageCroped, false);
          imagesavealpha($imageCroped, true);//
-         
+
          imagecopyresampled($imageCroped, $this->imageData , 0, 0, $cropStartX, $cropStartY, $w, $h , $w, $h);
          $this->imageData = $imageCroped;
       }
       // úprava rozměrů
-      $this->width  = imagesx($this->imageData);  
+      $this->width  = imagesx($this->imageData);
       $this->height = imagesy($this->imageData);
 
       return $this;
    }
-   
+
    public function rotate($degree = 180, $bgColor = 0, $ignoreTransparent = 0)
    {
       $this->loadImageData();
-      
+
       if(function_exists("imagerotate")) {
          $this->imageData = imagerotate($this->imageData, $degree, $bgColor, $ignoreTransparent);
       } else {
          $this->imageRotateEquivalent($degree, $bgColor, $ignoreTransparent);
       }
-      
+
       // úprava rozměrů
-      $this->width  = imagesx($this->imageData);  
+      $this->width  = imagesx($this->imageData);
       $this->height = imagesy($this->imageData);
-      
+
       return $this;
    }
-   
+
    public function flip($type = self::FLIP_HORIZONTAL)
    {
       $this->loadImageData();
-      
+
       if($type == self::FLIP_VERTICAL){
          $size_x = imagesx($this->imageData);
          $size_y = imagesy($this->imageData);
@@ -109,7 +109,7 @@ class File_Image_Gd extends File_Image_Base {
             $this->imageData = $temp;
          } else {
             die("Unable to flip image");
-         } 
+         }
       } else {
          $size_x = imagesx($this->imageData);
          $size_y = imagesy($this->imageData);
@@ -121,10 +121,10 @@ class File_Image_Gd extends File_Image_Base {
             die("Unable to flip image");
          }
       }
-      
+
       return $this;
    }
-   
+
    /**
     * Uložení obrázku do jiného formátu (automaticky upraví příponu) nebo ho vypíše
     * @param string/File $file -- objek souboru nebo název obrázku
@@ -133,32 +133,32 @@ class File_Image_Gd extends File_Image_Base {
    public function write($file = null, $format = null)
    {
       $this->loadImageData();
-      
-      switch($format == null ? $this->imageType : $format)  
-      {  
-        case IMAGETYPE_JPEG:  
-            if (imagetypes() & IMG_JPG) {  
-               imagejpeg($this->imageData, $file, $this->quality);  
-            }  
-            break;  
-        case IMAGETYPE_GIF:  
-            if (imagetypes() & IMG_GIF) {  
-               imagegif($this->imageData, $file);  
-            }  
-            break;  
-        case IMAGETYPE_PNG:  
-            // *** Scale quality from 0-100 to 0-9  
-            $scaleQuality = round(($this->quality/100) * 9);  
-            if (imagetypes() & IMG_PNG) {  
+
+      switch($format == null ? $this->imageType : $format)
+      {
+        case IMAGETYPE_JPEG:
+            if (imagetypes() & IMG_JPG) {
+               imagejpeg($this->imageData, $file, $this->quality);
+            }
+            break;
+        case IMAGETYPE_GIF:
+            if (imagetypes() & IMG_GIF) {
+               imagegif($this->imageData, $file);
+            }
+            break;
+        case IMAGETYPE_PNG:
+            // *** Scale quality from 0-100 to 0-9
+            $scaleQuality = round(($this->quality/100) * 9);
+            if (imagetypes() & IMG_PNG) {
                imagepng($this->imageData, $file, 9-$scaleQuality);  // need inver 0 for best
             }
-            break;  
-        case IMAGETYPE_BMP:  
-            if (imagetypes() & IMG_WBMP) {  
-               imagewbmp($this->imageData, $file);  
-            }  
-            break;  
-      }  
+            break;
+        case IMAGETYPE_BMP:
+            if (imagetypes() & IMG_WBMP) {
+               imagewbmp($this->imageData, $file);
+            }
+            break;
+      }
    }
 
    public function filter($filter, $arg1 = null, $arg2 = null, $arg3 = null)
@@ -167,21 +167,21 @@ class File_Image_Gd extends File_Image_Base {
       imagefilter($this->imageData, $filter, $arg1, $arg2, $arg3);
       return $this;
    }
-   
+
    public function watermark(File_Image $img, $params = array())
    {
       $this->loadImageData();
-      
+
       $params = array_merge($this->baseWaterMarkParams, $params);
-      
+
       $posX = $posY = 0;
-      
+
       $wImgRes = $this->createImageResource((string)$img);
       $markW = imagesx($wImgRes);
       $markH = imagesy($wImgRes);
 
       $waterMarkImage = null;
-      
+
       switch ($params['valign']) {
          case 'top':
             $posY = 0 + $params['yoffset'];
@@ -206,18 +206,18 @@ class File_Image_Gd extends File_Image_Base {
             $posX = $this->getWidth() - $markW - $params['xoffset'];
             break;
       }
-      
+
 //      if(!@imagecopymerge($this->imageData, $wImgRes, $posX, $posY, 0, 0, $markW, $markH, $params['opacity'])){
       if(!@imagecopyresampled($this->imageData, $wImgRes, $posX, $posY, 0, 0, $markW, $markH, $markW, $markH)){
          throw new File_Image_Exception($this->tr('Chyba při vytváření vodoznaku do obrázku'));
       }
-      
+
       return $this;
    }
-   
-   
+
+
    /*** PRIVATE METHODS  ***/
-   
+
    /**
     * Načte data obrázku pro práci s ním
     */
@@ -227,10 +227,10 @@ class File_Image_Gd extends File_Image_Base {
          return;
       }
       $this->imageData = $this->createImageResource((string)$this->file, $this->imageType);
-      $this->width  = imagesx($this->imageData);  
+      $this->width  = imagesx($this->imageData);
       $this->height = imagesy($this->imageData);
    }
-   
+
    /**
     * načte obrázek a vytvoří zdroj pro další zpracování
     * @param string $file -- cesta k souboru
@@ -242,7 +242,7 @@ class File_Image_Gd extends File_Image_Base {
       if($type == null){
          list($width, $height, $type, $attr) = getimagesize($file);
       }
-      
+
       switch ($type) {
          case IMAGETYPE_GIF:
             $imageData = @imagecreatefromgif($file);
@@ -298,7 +298,7 @@ class File_Image_Gd extends File_Image_Base {
       }
       return array('optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight);
    }
-   
+
    private function getSizeByFixedHeight($newHeight)
    {
       $ratio = $this->width / $this->height;
@@ -315,16 +315,18 @@ class File_Image_Gd extends File_Image_Base {
 
    private function getSizeByAuto($newWidth, $newHeight)
    {
-      if ($this->height < $this->width) {
-      // *** Image to be resized is wider (landscape)  
+      $hRatio = $newHeight/$this->height;
+      $wRatio = $newWidth/$this->width;
+      if ($wRatio < $hRatio) {
+      // *** Image to be resized is wider (landscape)
          $optimalWidth = $newWidth;
          $optimalHeight = $this->getSizeByFixedWidth($newWidth);
-      } elseif ($this->height > $this->width) {
-      // *** Image to be resized is taller (portrait)  
+      } elseif ($wRatio > $hRatio) {
+      // *** Image to be resized is taller (portrait)
          $optimalWidth = $this->getSizeByFixedHeight($newHeight);
          $optimalHeight = $newHeight;
       } else {
-      // *** Image to be resizerd is a square  
+      // *** Image to be resizerd is a square
          if ($newHeight > $newWidth) {
             $optimalWidth = $newWidth;
             $optimalHeight = $this->getSizeByFixedWidth($newWidth);
@@ -332,12 +334,12 @@ class File_Image_Gd extends File_Image_Base {
             $optimalWidth = $this->getSizeByFixedHeight($newHeight);
             $optimalHeight = $newHeight;
          } else {
-            // *** Sqaure being resized to a square  
+            // *** Sqaure being resized to a square
             $optimalWidth = $newWidth;
             $optimalHeight = $newHeight;
          }
       }
-      
+
       return array('optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight);
    }
 
@@ -358,7 +360,7 @@ class File_Image_Gd extends File_Image_Base {
 
       return array('optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight);
    }
-   
+
    /**
     * Metoda pro rotaci obrázků, je tu protože né všechny php mají podporu pro rotate
     * @param <type> $srcImg
@@ -368,11 +370,11 @@ class File_Image_Gd extends File_Image_Base {
     * @return <type>
     */
    private function imageRotateEquivalent($angle, $bgcolor, $ignore_transparent = 0) {
-      function rotateX($x, $y, $theta) 
+      function rotateX($x, $y, $theta)
       {
          return $x * cos($theta) - $y * sin($theta);
       }
-      function rotateY($x, $y, $theta) 
+      function rotateY($x, $y, $theta)
       {
          return $x * sin($theta) + $y * cos($theta);
       }
@@ -461,4 +463,3 @@ class File_Image_Gd extends File_Image_Base {
       $this->imageData = $destimg;
    }
 }
-?>

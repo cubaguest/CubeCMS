@@ -402,5 +402,15 @@ class Email {
       
       return $cnt;
    }
+
+   /**
+    * Metoda vrátí všechny emailové adresy z řetězce
+    * @param $string
+    * @return array/false
+    */
+   public static function getEmailsFromString($string){
+      preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $string, $matches);
+      return $matches[0];
+   }
 }
 ?>

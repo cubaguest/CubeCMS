@@ -99,7 +99,7 @@ class File_Image extends File {
       return false;
    }
    
-   public function send()
+   public function send($forceDownload = false)
    {
       ob_end_clean();
       header("Pragma: public"); // required
@@ -107,7 +107,9 @@ class File_Image extends File {
       header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
       header("Cache-Control: private",false); // required for certain browsers
       header("Content-Type: ".$this->getMimeType());
-      header("Content-Disposition: attachment; filename=\"".$this->getName()."\";" );
+      if($forceDownload){
+         header("Content-Disposition: attachment; filename=\"".$this->getName()."\";" );
+      }
       header("Content-Transfer-Encoding: binary");
 //      header("Content-Length: ".$this->getSize()); // not work. images are corrupted
       flush();

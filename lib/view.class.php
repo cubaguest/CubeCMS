@@ -266,8 +266,8 @@ abstract class View extends TrObject {
       
       $this->tinyMCE = new Component_TinyMCE();
       if($theme instanceof Component_TinyMCE_Settings){
-         $formElement->html()->addClass("mceEditor_".$theme->getThemeName());
-         $theme->setSetting('editor_selector', 'mceEditor_'.$theme->getThemeName());
+         $formElement->html()->addClass("mceEditor_".$theme->getThemeName().'_'.$formElement->getName());
+         $theme->setSetting('editor_selector', 'mceEditor_'.$theme->getThemeName().'_'.$formElement->getName());
          $this->tinyMCE->setEditorSettings($theme);
       } else {
          $formElement->html()->addClass("mceEditor_".$theme);

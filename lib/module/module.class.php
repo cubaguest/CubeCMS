@@ -2,11 +2,11 @@
 /**
  * Třída pro obsluhu vlastností mmodulu
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ VVE3.9.4 $Revision$
+ * @copyright     Copyright (c) 2008-2009 Jakub Matas
+ * @version       $Id$ VVE3.9.4 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
- * @abstract 		Třída pro obsluhu vlastností modulu
+ * @abstract      Třída pro obsluhu vlastností modulu
  */
 
  class Module {
@@ -40,6 +40,14 @@
      */
     public function setDataDir($name) {
        $this->dataDir = $name;
+    }
+
+    /**
+     * Metoda vrací absolutní cestu k adresáři modulu
+     * @return string
+     */
+    public function getModuleDir() {
+       return AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR;
     }
 
     /**

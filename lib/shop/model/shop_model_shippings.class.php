@@ -22,9 +22,9 @@ class Shop_Model_Shippings extends Model_ORM {
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_ZONE, array('datatype' => 'smallint', 'nn' => true));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'lang' => true, 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'varchar(10)', 'default' => 0, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_DISALLOWED_PAYMENTS, array('datatype' => 'varbinary(200)', 'default' => null, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DISALLOWED_PAYMENTS, array('datatype' => 'varchar(50)', 'default' => null, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_PERSONAL_PICKUP, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       
       $this->setPk(self::COLUMN_ID);

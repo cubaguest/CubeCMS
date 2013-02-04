@@ -57,7 +57,48 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             return;
          }
       }
-      if (!isset($this->columns[$collName])) {
+      if (isset($this->columns[$collName])) {
+         // primary key (jazykové nejsou pk)
+         if (isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true) {
+            if($value === null){
+               $this->fromDb = false;
+               $this->pKeyValue = $value;
+               // changed all colls to new value
+               foreach ($this->columns as &$coll) {
+                  $coll['changed'] = 1;
+               }
+            } else {
+               $this->pKeyValue = $value;
+            }
+         }
+
+         if(isset($this->columns[$collName]['pdoparam'])){
+            if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL) {
+               $value = (bool) $value;
+            } else if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
+               $value = (int) $value;
+            }
+         }
+
+         if($this->columns[$collName]['lang'] == true){
+            if(! $this->columns[$collName]['value'] instanceof Model_ORM_LangCell){
+               $this->columns[$collName]['value'] = new Model_ORM_LangCell();
+            }
+            if (is_array($value)){
+               $this->columns[$collName]['value'] = new Model_ORM_LangCell($value);
+            } else {
+               $this->columns[$collName]['value']->addValue(Locales::getLang(), $value);
+            }
+         } else {
+            $this->columns[$collName]['value'] = $value;
+         }
+
+         if ($this->fromDb == true AND $this->columns[$collName]['changed'] == 0) {
+            $this->columns[$collName]['changed'] = -1; // from db
+         } else {
+            $this->columns[$collName]['changed'] = 1; // changed in app
+         }
+      } else {
          // tady detekce jazyka
          $collLen = strlen($collName);
          if ($collLen > 3 && $collName[$collLen - 3] == '_') {
@@ -83,47 +124,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             // externí sloupce, např. s joinů
             $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
             $this->columns[$collName]['value'] = $value;
-         }
-      } else {
-         // primary key (jazykové nejsou pk)
-         if (isset($this->columns[$collName]['pk']) AND $this->columns[$collName]['pk'] == true) {
-            if($value === null){
-               $this->fromDb = false;
-               $this->pKeyValue = $value;
-               // changed all colls to new value
-               foreach ($this->columns as &$coll) {
-                  $coll['changed'] = 1;
-               }
-            } else {
-               $this->pKeyValue = $value;
-            }
-         }
-         
-         if(isset($this->columns[$collName]['pdoparam'])){
-            if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL) {
-               $value = (bool) $value;
-            } else if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
-               $value = (int) $value;
-            }
-         }
-         
-         if($this->columns[$collName]['lang'] == true){
-            if(! $this->columns[$collName]['value'] instanceof Model_ORM_LangCell){
-               $this->columns[$collName]['value'] = new Model_ORM_LangCell();
-            }
-            if (!is_array($value)){
-               $this->columns[$collName]['value']->addValue(Locales::getLang(), $value);
-            } else if($this->columns[$collName]['lang'] == true && is_array($value)) {
-               $this->columns[$collName]['value'] = new Model_ORM_LangCell($value);
-            }
-         } else {
-            $this->columns[$collName]['value'] = $value;
-         }
-         
-         if ($this->fromDb == true AND $this->columns[$collName]['changed'] == 0) {
-            $this->columns[$collName]['changed'] = -1; // from db
-         } else {
-            $this->columns[$collName]['changed'] = 1; // changed in app
+            $this->columns[$collName]['extern'] = true;
          }
       }
    }
