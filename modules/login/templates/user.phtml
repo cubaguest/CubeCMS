@@ -6,10 +6,10 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
 <div class="main-content-detail" id="user-dateil">
    <div class="text"><? 
    if($this->lastLogin){
-      printf('<p>'.$this->tr('Poslední přihlášení proběhlo %1$s z IP adresy %2$s.'.'</p>'),
-            vve_date("%x %X", new DateTime($this->lastLogin->{Model_UsersLogins::COLUMN_TIME})),
-            $this->lastLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS}
-      );   
+      printf('<p>'.$this->tr('Poslední přihlášení proběhlo %1$s z IP adresy %2$s.').'</p>',
+         vve_date("%x %X", new DateTime($this->lastLogin->{Model_UsersLogins::COLUMN_TIME})),
+         $this->lastLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS}
+      );
    }
    ?></div>
    <table>
