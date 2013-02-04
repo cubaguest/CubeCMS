@@ -49,17 +49,17 @@ $this->addCssFile('style.css');
    <?
 }
 ?>
-   <script type="text/javascript">
-   /* <![CDATA[ */
-      $(function() {
-         $(".module-mails-list-mails").accordion({
-            active : false,
-            autoHeight: false
-         });
-      });
-   /* ]]> */
-	</script>
 </div>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   $(function() {
+      $(".module-mails-list-mails").accordion({
+         active : false,
+         autoHeight: false
+      });
+   });
+   /* ]]> */
+</script>
 <?
 echo $this->scrollComp;
 ?>
