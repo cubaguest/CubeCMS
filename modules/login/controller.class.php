@@ -42,12 +42,12 @@ class Login_Controller extends Controller {
       $elemPassCur->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemPassCur);
 
-      $elemPassN1 = new Form_Element_Text('new1', $this->tr('Nové heslo'));
+      $elemPassN1 = new Form_Element_Password('new1', $this->tr('Nové heslo'));
       $elemPassN1->addValidation(new Form_Validator_NotEmpty());
       $elemPassN1->addValidation(new Form_Validator_MinLength(5));
       $form->addElement($elemPassN1);
 
-      $elemPassN2 = new Form_Element_Text('new2', $this->tr('Nové heslo'));
+      $elemPassN2 = new Form_Element_Password('new2', $this->tr('Nové heslo'));
       $elemPassN2->addValidation(new Form_Validator_NotEmpty());
       $elemPassN2->addValidation(new Form_Validator_MinLength(5));
       $elemPassN2->setSubLabel($this->tr('Potvrzení hesla'));
@@ -92,73 +92,78 @@ class Login_Controller extends Controller {
       $model = new Model_Users();
       $user = $model->record(Auth::getUserId());
 
-      $this->createEditUserForm(); // vytvoříme instanci formu
-      $this->form->username->setValues($user->{Model_Users::COLUMN_USERNAME});
-      $this->form->name->setValues($user->{Model_Users::COLUMN_NAME});
-      $this->form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
-      $this->form->email->setValues($user->{Model_Users::COLUMN_MAIL});
-      $this->form->note->setValues($user->{Model_Users::COLUMN_NOTE});
+      $form = $this->createEditUserForm($user); // vytvoříme instanci formu
 
-      if($this->form->isSend() ){
-         if(!$this->form->save->getValues()){
-            $this->link()->route()->reload();
+      if($form->isSend() ){
+         if(!$form->save->getValues()){
+            $this->link()->route()->redirect();
          }
          
-         $reserver = $model->where(Model_Users::COLUMN_USERNAME." = :uname AND ".Model_Users::COLUMN_ID." != :uid",
-               array('uname' => $this->form->username->getValues(), 'uid' => Auth::getUserId()))
-            ->count();
-         
-         if((bool)$reserver){
-            $this->form->username->setError($this->tr('Vybrané uživatelské jméno je obsazeno'));
-         }
+//         $reserver = $model->where(Model_Users::COLUMN_USERNAME." = :uname AND ".Model_Users::COLUMN_ID." != :uid",
+//               array('uname' => $form->username->getValues(), 'uid' => Auth::getUserId()))
+//            ->count();
+//
+//         if((bool)$reserver){
+//            $form->username->setError($this->tr('Vybrané uživatelské jméno je obsazeno'));
+//         }
       }
 
-      if($this->form->isValid()){
-         $this->saveUser();
+      if($form->isValid()){
+         $this->saveUser($form);
          $this->infoMsg()->addMessage($this->tr('Změny byly uloženy'));
-         $this->link()->route()->reload();
+         $this->link()->route()->redirect();
       }
-      $this->view()->form = $this->form;
+      $this->view()->form = $form;
    }
 
-   protected function createEditUserForm() {
-      $this->form = new Form('user_', true);
+   /**
+    * @return Form
+    */
+   protected function createEditUserForm(Model_ORM_Record $user) {
+      $form = new Form('user_', true);
 
-      $fGrpBase = $this->form->addGroup('base', $this->tr('Základní informace'));
+      $fGrpBase = $form->addGroup('base', $this->tr('Základní informace'));
 
-      $elemUserName = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
-      $elemUserName->addValidation(new Form_Validator_NotEmpty());
-      $this->form->addElement($elemUserName, $fGrpBase);
+//      $elemUserName = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
+//      $elemUserName->addValidation(new Form_Validator_NotEmpty());
+//      $form->addElement($elemUserName, $fGrpBase);
       
       $elemName = new Form_Element_Text('name', $this->tr('Jméno'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
-      $this->form->addElement($elemName, $fGrpBase);
+      $form->addElement($elemName, $fGrpBase);
 
       $elemSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
       $elemSurName->addValidation(new Form_Validator_NotEmpty());
-      $this->form->addElement($elemSurName, $fGrpBase);
+      $form->addElement($elemSurName, $fGrpBase);
 
       $elemEmails = new Form_Element_Text('email', $this->tr('Email'));
       $elemEmails->addValidation(new Form_Validator_NotEmpty());
       $elemEmails->addValidation(new Form_Validator_Email());
-      $this->form->addElement($elemEmails, $fGrpBase);
+      $form->addElement($elemEmails, $fGrpBase);
 
-      $fGrpOther = $this->form->addGroup('other', $this->tr('Ostatní'));
+      $fGrpOther = $form->addGroup('other', $this->tr('Ostatní'));
       $elemNote = new Form_Element_TextArea('note', $this->tr('Poznámky'));
-      $this->form->addElement($elemNote, $fGrpOther);
+      $form->addElement($elemNote, $fGrpOther);
 
       $elemSubmit = new Form_Element_SaveCancel('save');
-      $this->form->addElement($elemSubmit);
+      $form->addElement($elemSubmit);
+
+      $form->name->setValues($user->{Model_Users::COLUMN_NAME});
+      $form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
+      $form->email->setValues($user->{Model_Users::COLUMN_MAIL});
+      $form->note->setValues($user->{Model_Users::COLUMN_NOTE});
+
+      return $form;
    }
 
-   protected function saveUser() {
+   protected function saveUser(Form $form) {
       $modelUser = new Model_Users();
       $user = $modelUser->record(Auth::getUserId());
-      $user->{Model_Users::COLUMN_USERNAME} = $this->form->username->getValues();
-      $user->{Model_Users::COLUMN_NAME} = $this->form->name->getValues();
-      $user->{Model_Users::COLUMN_SURNAME} = $this->form->surname->getValues();
-      $user->{Model_Users::COLUMN_MAIL} = $this->form->email->getValues();
-      $user->{Model_Users::COLUMN_NOTE} = $this->form->note->getValues();
+//      $user->{Model_Users::COLUMN_USERNAME} = $form->username->getValues();
+      $user->{Model_Users::COLUMN_NAME} = $form->name->getValues();
+      $user->{Model_Users::COLUMN_SURNAME} = $form->surname->getValues();
+      $user->{Model_Users::COLUMN_MAIL} = $form->email->getValues();
+      $user->{Model_Users::COLUMN_NOTE} = $form->note->getValues();
       $modelUser->save($user);
    }
 
