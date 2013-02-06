@@ -349,15 +349,15 @@ class Advice_Controller extends Controller {
             $question->{Advice_Model::COLUMN_IS_PUBLIC} = $form->public->getValues();
             $question->{Advice_Model::COLUMN_IS_COMMON} = $form->faq->getValues();
          }
-         
+
+         $model->save($question);
+
          if(isset ($form->sendMail)){
             $question->{Advice_Model::COLUMN_QUESTIONER_EMAIL} = $form->sendMail->getValues();
             if($form->sendAnswer->getValues() == true){
                $this->createMailAnswerComplete($question);
             }
          }
-         
-         $model->save($question);
          
          // výmaz starých propojení s daným dotazem
          $modelConn->where(Advice_Model_Connections::COLUMN_ID_QUESTION.' = :idq', array('idq' => $question->{Advice_Model::COLUMN_ID}))
@@ -803,7 +803,7 @@ class Advice_Controller extends Controller {
       $mail = new Email(true);
       
       // odeslání emailu
-      $mail->message()->setSubject($subject);
+      $mail->message()->setSubject($mail->sanitize($subject));
       // odesílatele mailu nastavit na adresu zadanou ve formu
       if($question->{Advice_Model::COLUMN_QUESTIONER_EMAIL} != null){
          //$mail->setFrom($formQuestion->mail->getValues());
@@ -811,16 +811,13 @@ class Advice_Controller extends Controller {
          $mail->message()->setFrom(array($question->{Advice_Model::COLUMN_QUESTIONER_EMAIL} => $mail->sanitize($question->{Advice_Model::COLUMN_QUESTIONER_NAME}) ));
          $mail->message()->setReplyTo($question->{Advice_Model::COLUMN_QUESTIONER_EMAIL});
       }
-      
-      $body = "<html><head></head><body>";
-      $body .= "<p>Na stránkách <a href=\"".Url_Request::getBaseWebDir()."\">".VVE_WEB_NAME."</a> byl dne ".  vve_date("%x") ." v ".vve_date("%X")
+
+      $body = "<p>Na stránkách <a href=\"".Url_Request::getBaseWebDir()."\">".VVE_WEB_NAME."</a> byl dne ".  vve_date("%x") ." v ".vve_date("%X")
          . " vložen nový dotaz do kategorie <a href=\"".$this->link()->clear()."\">".$this->category()->getName()."</a>.</p>";
       
       $body .= $this->createQuestionHtmlTable($question);
-      
-      $body .= '</body>';
-      
-      $mail->message()->setBody($body, 'text/html', 'utf-8' );
+
+      $mail->setContent(Email::getBaseHtmlMail($body), 'text/html', 'utf-8' );
       //$mail->addAddress($formQuestion->mail->getValues()); // odesílat?
 
       $adminMails = array(); // pokud je prázdný výtahneme nastavené maily
@@ -851,7 +848,7 @@ class Advice_Controller extends Controller {
       $mail = new Email(true);
       
       // odeslání emailu
-      $mail->message()->setSubject($subject);
+      $mail->message()->setSubject($mail->sanitize($subject));
       // odesílatele mailu nastavit na adresu zadanou ve formu
 //      if($question->{Advice_Model::COLUMN_QUESTIONER_EMAIL} != null){
 //         //$mail->setFrom($formQuestion->mail->getValues());
@@ -860,8 +857,7 @@ class Advice_Controller extends Controller {
 //         $mail->message()->setReplyTo($question->{Advice_Model::COLUMN_QUESTIONER_EMAIL});
 //      }
       
-      $body = "<html><head></head><body>";
-      $body .= "<p>Zasíláme Vám e-mail s odpovědí na Váš dotaz položený na stránkách <a href=\"".Url_Request::getBaseWebDir()."\">".VVE_WEB_NAME."</a>"
+      $body = "<p>Zasíláme Vám e-mail s odpovědí na Váš dotaz položený na stránkách <a href=\"".Url_Request::getBaseWebDir()."\">".VVE_WEB_NAME."</a>"
          ." dne ".  vve_date("%x")." v ".  vve_date("%X").".<br />"
          ."Dotaz byl vložen do kategorie <a href=\"".$this->link()->clear()."\">".$this->category()->getName()."</a>.</p>";
       
@@ -874,9 +870,7 @@ class Advice_Controller extends Controller {
       
       $body .= '<p style="font-size: small;">Tento e-mail je generován automaticky systémem. Prosíme neodpovídejte na něj.</p>';
       
-      $body .= '</body>';
-      
-      $mail->message()->setBody($body, 'text/html', 'utf-8' );
+      $mail->setContent(Email::getBaseHtmlMail($body));
 
       $mail->addAddress($question->{Advice_Model::COLUMN_QUESTIONER_EMAIL});
       $mail->sendMail();
@@ -1611,7 +1605,7 @@ lze využít následující výběr již existujících uživatelů.');
    private function createQuestionHtmlTable($question)
    {
       $str = '<h2>Dotaz</h2>'
-         .'<table cellspacing="0" cellpadding="4" border="1">';
+         .'<table cellspacing="0" cellpadding="4" border="1" style="width: 600px">';
       
       $str .= $this->createHtmlTableRow('Datum vložení', vve_date("%x %X", new DateTime($question->{Advice_Model::COLUMN_DATE_ADD})) )
          .$this->createHtmlTableRow('Jméno (přezdívka)', $question->{Advice_Model::COLUMN_QUESTIONER_NAME})
@@ -1621,23 +1615,26 @@ lze využít následující výběr již existujících uživatelů.');
          .$this->createHtmlTableRow('E-mail', $question->{Advice_Model::COLUMN_QUESTIONER_EMAIL})
          .$this->createHtmlTableRow('Souhlas se zveřejněním?', $question->{Advice_Model::COLUMN_IS_PUBLIC_ALLOW} == true ? "Ano" : "Ne")
          .$this->createHtmlTableRow('Dotaz', $question->{Advice_Model::COLUMN_QUESTION}, false);
-         
       $str .= '</table>';
+
+//      $str .= '<h3>Text dotazu:</h3>';
+//      $str .= '<p>'.$question->{Advice_Model::COLUMN_QUESTION}.'</p>';
+
       return $str;
    }
    
    private function createAnswerHtmlTable($question)
    {
       $str = '<h2>Odpověď</h2>'
-         .'<table cellspacing="0" cellpadding="4" border="1">';
+         .'<table cellspacing="0" cellpadding="4" border="1" style="width: 600px">';
       
       $str .= $this->createHtmlTableRow('Datum odpovědi', vve_date("%x %X") )
          .$this->createHtmlTableRow('Název', $question->{Advice_Model::COLUMN_NAME})
          .$this->createHtmlTableRow('Odpověď', $question->{Advice_Model::COLUMN_ANSWER}, false);
-         
       $str .= '</table>';
+//      $str .= '<h3>Text Odpovědi:</h3>';
+//      $str .= '<p>'.$question->{Advice_Model::COLUMN_ANSWER}.'</p>';
+
       return $str;
    }
 }
-
-?>
