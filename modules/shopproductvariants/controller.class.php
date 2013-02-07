@@ -7,121 +7,262 @@ class ShopProductVariants_Controller extends Controller {
    
    protected function init()
    {
+      $this->checkControllRights();
       $this->category()->getModule()->setDataDir('shop');
    }
    
    public function mainController() 
    {
       //		Kontrola práv
-      $this->checkReadableRights();
       $modelGroups = new Shop_Model_AttributesGroups();
       $modelAttributes = new Shop_Model_Attributes();
 
 
       // form přidání skupiny
-      $formAddGroup = new Form("attrgroup_add_");
-      $elemGroupId = new Form_Element_Hidden('id');
-      $formAddGroup->addElement($elemGroupId);
+      $this->view()->formEditGroup = $this->formEditGroup();
+//      $formAddGroup = new Form("attrgroup_add_");
+//      $elemGroupId = new Form_Element_Hidden('id');
+//      $formAddGroup->addElement($elemGroupId);
+//
+//      $elemGroupName = new Form_Element_Text('name', $this->tr('Název skupiny'));
+//      $elemGroupName->setLangs();
+//      $elemGroupName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
+//      $elemGroupName->addFilter(new Form_Filter_StripTags());
+//      $formAddGroup->addElement($elemGroupName);
+//
+//      $elemGroupSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+//      $formAddGroup->addElement($elemGroupSave);
+//
+//      if($this->getRequestParam('editg') != null
+//         && ($group = $modelGroups->record($this->getRequestParam('editg'))) ){
+//         $formAddGroup->id->setValues($group->getPK());
+//         $formAddGroup->name->setValues($group->{Shop_Model_AttributesGroups::COLUMN_NAME});
+//      }
 
-      $elemGroupName = new Form_Element_Text('name', $this->tr('Název skupiny'));
-      $elemGroupName->setLangs();
-      $elemGroupName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
-      $elemGroupName->addFilter(new Form_Filter_StripTags());
-      $formAddGroup->addElement($elemGroupName);
-
-      $elemGroupSave = new Form_Element_Submit('save', $this->tr('Uložit'));
-      $formAddGroup->addElement($elemGroupSave);
-
-      if($this->getRequestParam('editg') != null
-         && ($group = $modelGroups->record($this->getRequestParam('editg'))) ){
-         $formAddGroup->id->setValues($group->getPK());
-         $formAddGroup->name->setValues($group->{Shop_Model_AttributesGroups::COLUMN_NAME});
-      }
-
-      if($formAddGroup->isValid()){
-         if($formAddGroup->id->getValues() == null){
-            // je nová skupina
-            $group = $modelGroups->newRecord();
-         } else {
-            // úprava skupiny
-            $group = $modelGroups->record($formAddGroup->id->getValues());
-         }
-         $group->{Shop_Model_AttributesGroups::COLUMN_NAME} = $formAddGroup->name->getValues();
-         $group->save();
-         $this->infoMsg()->addMessage($this->tr('Skupiny byla uložena'));
-         $this->link()->rmParam('editg')->reload();
-      }
-      $this->view()->formAddGroup = $formAddGroup;
+//      if($formAddGroup->isValid()){
+//         if($formAddGroup->id->getValues() == null){
+//            // je nová skupina
+//            $group = $modelGroups->newRecord();
+//         } else {
+//            // úprava skupiny
+//            $group = $modelGroups->record($formAddGroup->id->getValues());
+//         }
+//         $group->{Shop_Model_AttributesGroups::COLUMN_NAME} = $formAddGroup->name->getValues();
+//         $group->save();
+//         $this->infoMsg()->addMessage($this->tr('Skupiny byla uložena'));
+//         $this->link()->rmParam('editg')->reload();
+//      }
+//      $this->view()->formAddGroup = $formAddGroup;
 
       // form přidání atributu
-      $formAddAttr = new Form("attr_add_");
-      $elemAttrId = new Form_Element_Hidden('id');
-      $formAddAttr->addElement($elemAttrId);
+      $this->view()->formEditVariant = $this->formEditVariant();
+//      $formAddAttr = new Form("attr_add_");
+//      $elemAttrId = new Form_Element_Hidden('id');
+//      $formAddAttr->addElement($elemAttrId);
+//
+//      $elemAttrIdGroup = new Form_Element_Hidden('idg');
+//      $elemAttrIdGroup->setValues($this->getRequestParam('g'));
+//      $formAddAttr->addElement($elemAttrIdGroup);
+//
+//      $elemAttrName = new Form_Element_Text('name', $this->tr('Hodnota'));
+//      $elemAttrName->setLangs();
+//      $elemAttrName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
+//      $elemAttrName->addFilter(new Form_Filter_StripTags());
+//      $formAddAttr->addElement($elemAttrName);
+//
+//      $elemAttrSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+//      $formAddAttr->addElement($elemAttrSave);
 
-      $elemAttrIdGroup = new Form_Element_Hidden('idg');
-      $elemAttrIdGroup->setValues($this->getRequestParam('g'));
-      $formAddAttr->addElement($elemAttrIdGroup);
+//      if($this->getRequestParam('editv') != null
+//         && ($attr = $modelAttributes->record((int)$this->getRequestParam('editv'))) ){
+//         $formAddAttr->id->setValues($attr->getPK());
+//         $formAddAttr->name->setValues($attr->{Shop_Model_Attributes::COLUMN_NAME});
+//      }
 
-      $elemAttrName = new Form_Element_Text('name', $this->tr('Hodnota'));
-      $elemAttrName->setLangs();
-      $elemAttrName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
-      $elemAttrName->addFilter(new Form_Filter_StripTags());
-      $formAddAttr->addElement($elemAttrName);
-
-      $elemAttrSave = new Form_Element_Submit('save', $this->tr('Uložit'));
-      $formAddAttr->addElement($elemAttrSave);
-
-      if($this->getRequestParam('editv') != null
-         && ($attr = $modelAttributes->record((int)$this->getRequestParam('editv'))) ){
-         $formAddAttr->id->setValues($attr->getPK());
-         $formAddAttr->name->setValues($attr->{Shop_Model_Attributes::COLUMN_NAME});
-      }
-
-      if($formAddAttr->isValid()){
-         if($formAddAttr->id->getValues() == null){
-            // je nová skupina
-            $value = $modelAttributes->newRecord();
-         } else {
-            // úprava skupiny
-            $value = $modelAttributes->record($formAddAttr->id->getValues());
-         }
-         $value->{Shop_Model_Attributes::COLUMN_NAME} = $formAddAttr->name->getValues();
-         if($formAddAttr->idg->getValues() != 0 ) {
-            $value->{Shop_Model_Attributes::COLUMN_ID_GROUP} = $formAddAttr->idg->getValues();
-            $value->save();
-            $this->infoMsg()->addMessage($this->tr('Hodnota byla uložena'));
-            $this->link()->rmParam('editv')->reload();
-         } else {
-            $this->errMsg()->addMessage($this->tr('Nebylo předáno validní id skupiny'));
-         }
-      }
-      $this->view()->formAddAttr = $formAddAttr;
-
-      // mazání
-      if($this->getRequestParam('deletev') != null){
-         $modelAttributes->delete((int)$this->getRequestParam('deletev', 0));
-         $this->infoMsg()->addMessage($this->tr('Hodnota byla smazána'));
-         $this->link()->param('deletev')->reload();
-      }
-
-      if($this->getRequestParam('deleteg') != null){
-         $modelGroups->delete((int)$this->getRequestParam('deleteg', 0));
-         $this->infoMsg()->addMessage($this->tr('Skupiny se všemi hodnotami a všechny varianty zboží byly smazány'));
-         $this->link()->param('deleteg')->reload();
-      }
-
-      // načtení skupin a hodnot
-      $this->view()->groups = $modelGroups->order(Shop_Model_AttributesGroups::COLUMN_NAME)->records();
-      $this->view()->attributes = $modelAttributes
-         ->where(Shop_Model_Attributes::COLUMN_ID_GROUP." = :idg", array('idg' => $this->getRequestParam('g', 0)))
-         ->order(Shop_Model_Attributes::COLUMN_NAME)
-         ->records();
-
-      // load selected group
-      $this->view()->group = $modelGroups->record((int)$this->getRequestParam('g', -1));
+//      // mazání
+//      if($this->getRequestParam('deletev') != null){
+//         $modelAttributes->delete((int)$this->getRequestParam('deletev', 0));
+//         $this->infoMsg()->addMessage($this->tr('Hodnota byla smazána'));
+//         $this->link()->param('deletev')->reload();
+//      }
+//
+//      if($this->getRequestParam('deleteg') != null){
+//         $modelGroups->delete((int)$this->getRequestParam('deleteg', 0));
+//         $this->infoMsg()->addMessage($this->tr('Skupiny se všemi hodnotami a všechny varianty zboží byly smazány'));
+//         $this->link()->param('deleteg')->reload();
+//      }
    }
-   
-   public function attrGroupsListController() 
+
+   /**
+    * Upravuje parametr
+    * Parametr: action - (edit;delete;move)
+    */
+   public function editGroupController()
+   {
+      // mazání
+      if($this->getRequestParam('action', false) == 'delete'
+         && $this->getRequestParam('id', false) != null){
+         (new Shop_Model_AttributesGroups())->delete($this->getRequestParam('id'));
+         $this->infoMsg()->addMessage($this->tr('Skupina byla smazána'));
+         $this->link()->rmParam('action')->rmParam('id')->redirect();
+      }
+      // přesun
+      else if($this->getRequestParam('action', false) == 'changepos'
+         && $this->getRequestParam('id', false) != null
+         && $this->getRequestParam('pos', false) != null
+      ){
+         Shop_Model_AttributesGroups::changeOrder(
+            $this->getRequestParam('id'),
+            $this->getRequestParam('pos')
+         );
+
+         $this->infoMsg()->addMessage($this->tr('Skupina byla přesunuta na novou pozici'));
+         $this->link()
+            ->rmParam('action')
+            ->rmParam('id')
+            ->rmParam('pos')
+            ->redirect();
+      }
+
+      // úprava a přidání
+      $this->formEditGroup();
+   }
+
+   /**
+    * Upravuje hodnotu parametru
+    * Parametr: action - (edit;delete;move)
+    */
+   public function editVariantController()
+   {
+      // mazání
+      if($this->getRequestParam('action', false) == 'delete'
+         && $this->getRequestParam('id', false) != null){
+         (new Shop_Model_Attributes())->delete($this->getRequestParam('id'));
+         $this->infoMsg()->addMessage($this->tr('Vyrianta byla smazána'));
+         $this->link()->rmParam('action')->rmParam('id')->redirect();
+      }
+      // přesun
+      else if($this->getRequestParam('action', false) == 'changepos'
+         && $this->getRequestParam('id', false) != null
+         && $this->getRequestParam('pos', false) != null
+      ){
+         Shop_Model_Attributes::changeOrder(
+            $this->getRequestParam('id'),
+            $this->getRequestParam('pos')
+         );
+
+         $this->infoMsg()->addMessage($this->tr('Varianta byla přesunuta na novou pozici'));
+         $this->link()
+            ->rmParam('action')
+            ->rmParam('id')
+            ->rmParam('pos')
+            ->redirect();
+      }
+      // úprava a přidání
+      $this->formEditVariant();
+   }
+
+   /**
+    * Varcí seznam skupin
+    */
+   public function groupsListController()
+   {
+      $this->view()->groups = (new Shop_Model_AttributesGroups())
+         ->order(Shop_Model_AttributesGroups::COLUMN_ORDER)
+         ->records();
+   }
+
+   /**
+    * Vrací seznam hodnot dané skupiny
+    */
+   public function variantsListController()
+   {
+      $idg = $this->getRequest('idg');
+
+      $this->view()->variants = (new Shop_Model_Attributes())
+         ->where(Shop_Model_Attributes::COLUMN_ID_GROUP." = :id",
+         array('id' => $idg))
+         ->order(Shop_Model_Attributes::COLUMN_ORDER)
+         ->records();
+   }
+
+   /**
+    * @param null $param
+    * @return Form
+    */
+   protected function formEditGroup($group = null)
+   {
+      $form = new Form('group_edit_');
+
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
+      $elemName->addValidation(new Form_Validator_NotEmpty());
+      $elemName->addFilter(new Form_Filter_HTMLSpecialChars());
+      $form->addElement($elemName);
+
+      $elemIdParam = new Form_Element_Hidden('id');
+      $form->addElement($elemIdParam);
+
+      $elemSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $form->addElement($elemSave);
+
+      if($form->isValid()){
+         $model = new Shop_Model_AttributesGroups();
+         if($form->id->getValues() == null || !($group = $model->record($form->id->getValues()))){
+            $group = $model->newRecord();
+         }
+
+         $group->{Shop_Model_AttributesGroups::COLUMN_NAME} = $form->name->getValues();
+         $group->save();
+
+         $this->infoMsg()->addMessage($this->tr('Skupiny byla uložena'));
+         $this->link()->redirect();
+      }
+      return $form;
+   }
+
+   /**
+    * @param null $value
+    * @return Form
+    */
+   protected function formEditVariant($attr = null)
+   {
+      $form = new Form('variant_edit_');
+
+      $elemName = new Form_Element_Text('name', $this->tr('Název'));
+      $elemName->addValidation(new Form_Validator_NotEmpty());
+      $elemName->addFilter(new Form_Filter_HTMLSpecialChars());
+      $form->addElement($elemName);
+
+      $elemIdGroup = new Form_Element_Hidden('idGroup');
+      $form->addElement($elemIdGroup);
+
+      $elemIdValue = new Form_Element_Hidden('id');
+      $form->addElement($elemIdValue);
+
+      $elemSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $form->addElement($elemSave);
+
+      if($form->isValid()){
+         $model = new Shop_Model_Attributes();
+
+         $attr = $model->newRecord();
+
+         if($form->id->getValues() != null){
+            $attr = $model->record($form->id->getValues());
+         }
+         $attr->{Shop_Model_Attributes::COLUMN_ID_GROUP} = $form->idGroup->getValues();
+         $attr->{Shop_Model_Attributes::COLUMN_NAME} = $form->name->getValues();
+
+         $attr->save();
+
+         $this->infoMsg()->addMessage($this->tr('Atribut byl uložen'));
+         $this->link()->redirect();
+      }
+
+      return $form;
+   }
+
+   /*public function attrGroupsListController()
    {
       $this->checkReadableRights();
       // objekt komponenty JGrid
@@ -179,9 +320,9 @@ class ShopProductVariants_Controller extends Controller {
             ));
       }
       $this->view()->respond = $jqGrid->respond();
-   }
+   }  */
 
-   public function editAttrGroupController()
+   /*public function editAttrGroupController()
    {
       $this->checkWritebleRights();
       $model = new Shop_Model_AttrGroups();
@@ -217,9 +358,9 @@ class ShopProductVariants_Controller extends Controller {
       if ($this->errMsg()->isEmpty()) {
          $this->view()->allOk = true;
       }
-   }
+   } */
    
-   public function attrListController() 
+   /*public function attrListController()
    {
       $this->checkReadableRights();
       
@@ -283,9 +424,9 @@ class ShopProductVariants_Controller extends Controller {
             ));
       }
       $this->view()->respond = $jqGrid->respond();
-   }
+   }      */
 
-   public function editAttrController()
+   /*public function editAttrController()
    {
       $this->checkWritebleRights();
       $model = new Shop_Model_Attributes;
@@ -328,12 +469,5 @@ class ShopProductVariants_Controller extends Controller {
       if ($this->errMsg()->isEmpty()) {
          $this->view()->allOk = true;
       }
-   }
-
-
-   public function settings(&$settings, Form &$form) {
-      $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
-   }
+   }*/
 }
-
-?>

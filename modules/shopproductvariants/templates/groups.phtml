@@ -1,0 +1,27 @@
+<?
+if(!empty($this->groups)){
+   foreach( $this->groups as $group ) {?>
+   <li id="attrgroup-<?=$group->getPK()?>"
+       class="ui-state-default clearfix"
+       data-id="<?=$group->getPK()?>"
+       data-name="<?=$group->{Shop_Model_AttributesGroups::COLUMN_NAME}?>"
+       >
+
+      <span class="move ui-icon ui-icon-arrowthick-2-n-s"></span>
+      <a href="<?=$this->link()->route('variantsList', array('idg' => $group->getPK()))?>"
+         onclick="ShopVariants.selectGroup(this); return false;"
+         class="name"><?ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?></a>
+            <span class="controls">
+               <a href="<?=$this->link()->param('g', $group->{Shop_Model_AttributesGroups::COLUMN_ID})
+                  ->param('editg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+                  onclick="ShopVariants.editGroup(<?=$group->getPK()?>); return false;"
+                  class="button-edit-group"><img src="/images/icons/pencil.png" /></a>
+               <a href="<?=$this->link()->param('deleteg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+                  onclick="ShopVariants.deleteGroup(<?=$group->getPK()?>); return false;"
+                  class="button-delete-group"><img src="/images/icons/delete.png" /></a>
+            </span>
+   </li>
+   <?}
+} else {?>
+   <li><?ps($this->tr('Není vytvořen žádný parametr'))?></li>
+<?}?>

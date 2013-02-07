@@ -11,15 +11,23 @@ class ShopProductVariants_View extends View {
       Template_Module::setEdit(true);
    }
    
-   public function attrGroupsListView()
+   public function editGroupController()
    {
-      echo json_encode($this->respond);
+      // nemí nic protože se vrací jako xhr třídou XHR_Respond_VVEAPI
    }
-   
-   public function attrListView()
+
+   public function editAttributeController()
    {
-      echo json_encode($this->respond);
+      // nemí nic protože se vrací jako xhr třídou XHR_Respond_VVEAPI
+   }
+
+   public function groupsListView()
+   {
+      $this->template()->addFile('tpl://groups.phtml');
+   }
+
+   public function variantsListView()
+   {
+      $this->template()->addFile('tpl://variants.phtml');
    }
 }
-
-?>
