@@ -45,7 +45,6 @@ class File_Image_Gd extends File_Image_Base {
       }
       // *** Get optimal width and height - based on $option
       $optionArray = $this->getDimensions($w, $h, $option);
-      var_dump($w, $h, $optionArray);
       $optimalWidth = $optionArray['optimalWidth'];
       $optimalHeight = $optionArray['optimalHeight'];
 
