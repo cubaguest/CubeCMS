@@ -8,6 +8,11 @@ class Lecturers_Controller extends Controller {
 
    const DATA_DIR = 'lecturers';
 
+   protected function init()
+   {
+      parent::init();
+      $this->module()->setDataDir(self::DATA_DIR);
+   }
 
    /**
     * Kontroler pro zobrazení novinek
@@ -83,11 +88,13 @@ class Lecturers_Controller extends Controller {
       if ($addForm->isValid()) {
          $imgName = null;
          if ($addForm->image->getValues() != null) {
-            $image = $addForm->image->createFileObject('Filesystem_File_Image');
-            $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
-                    $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
-                    $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP));
-            $image->save();
+            $image = new File_Image($addForm->image);
+            $image->getData()->resize(
+               $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
+               $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
+               $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+            )->save();
+            $image->move($this->module()->getDataDir());
             $imgName = $image->getName();
          }
 
@@ -134,22 +141,22 @@ class Lecturers_Controller extends Controller {
 
       if ($editForm->isValid()) {
          $imgName = $lecturer->{Lecturers_Model::COLUMN_IMAGE};
-         if ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true)) {
-            // smaže se původní
-            $oldImg = new Filesystem_File($lecturer->{Lecturers_Model::COLUMN_IMAGE}, $this->category()->getModule()->getDataDir());
-            $oldImg->remove();
-            unset ($oldImg);
+         $oldFile = new File($imgName, $this->module()->getDataDir());
+         if( ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true) )
+            AND $oldFile->exist()){
+            $oldFile->delete();
             $imgName = null;
          }
 
          if ($editForm->image->getValues() != null) {
-            $image = $editForm->image->createFileObject('Filesystem_File_Image');
-            $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
-                    $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
-                    $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP));
-            $image->save();
+            $image = new File_Image($editForm->image);
+            $image->getData()->resize(
+               $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
+               $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
+               $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+            )->save();
+            $image->move($this->module()->getDataDir());
             $imgName = $image->getName();
-            unset ($image);
          }
 
          $model->saveLecturer($editForm->name->getValues(),
@@ -196,7 +203,7 @@ class Lecturers_Controller extends Controller {
 
       $iImage = new Form_Element_File('image', $this->_('Portrét'));
       $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
-      $iImage->setUploadDir(AppCore::getAppDataDir().self::DATA_DIR.DIRECTORY_SEPARATOR);
+//      $iImage->setUploadDir($this->module()->getDataDir());
       $form->addElement($iImage, 'image');
 
       $iSubmit = new Form_Element_SaveCancel('save');
