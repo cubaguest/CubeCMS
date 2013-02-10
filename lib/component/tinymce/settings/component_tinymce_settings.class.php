@@ -318,7 +318,6 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
    
    public function __get($name)
    {
-      return $this->settings[$name];
+      return isset($this->settings[$name]) ? $this->settings[$name] : null;
    }
 }
-?>
