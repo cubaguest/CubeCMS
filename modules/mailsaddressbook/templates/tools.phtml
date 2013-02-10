@@ -17,7 +17,12 @@
       <?
 //      $this->formImport->separator->html()->setAttrib('size', 1);
       echo $this->formImport;
-      echo $this->tr('Podporován je momentálně soubor pouze s e-mailovými adresami.');
+      ?>
+      <p class="note"><?=$this->tr('Podporován je momentálně soubor pouze s e-mailovými adresami.')?></p>
+      <br />
+      <?
+//      $this->formImport->separator->html()->setAttrib('size', 1);
+      echo $this->formImportUsers;
       ?>
 	</div>
 	<div id="mails-utilities">

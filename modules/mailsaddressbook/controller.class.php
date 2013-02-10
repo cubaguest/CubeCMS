@@ -280,6 +280,10 @@ class MailsAddressBook_Controller extends Controller {
       
       $modelGrps = new MailsAddressBook_Model_Groups();
       $grps = $modelGrps->getGroups();
+      $groupSelectValues = array();
+      foreach ($grps as $grp) {
+         $groupSelectValues[$grp->{MailsAddressBook_Model_Groups::COLUMN_NAME}] = $grp->{MailsAddressBook_Model_Groups::COLUMN_ID};
+      }
       
       /* IMPORT */
       $formImport = new Form('mails_import_');
@@ -290,16 +294,13 @@ class MailsAddressBook_Controller extends Controller {
       $eFile->addValidation(new Form_Validator_FileExtension('csv'));
       $formImport->addElement($eFile, $formImportGrpBasic);
 
-
       $eGroup = new Form_Element_Select('group', $this->tr('Skupina'));
+      $eGroup->setOptions($groupSelectValues);
       $formImport->addElement($eGroup, $formImportGrpBasic);
 
       $eImport = new Form_Element_Submit('import', $this->tr('Nahrát'));
       $formImport->addElement($eImport, $formImportGrpBasic);
 
-      foreach ($grps as $grp) {
-         $formImport->group->setOptions(array($grp->{MailsAddressBook_Model_Groups::COLUMN_NAME} => $grp->{MailsAddressBook_Model_Groups::COLUMN_ID}), true);
-      }
 
       if ($formImport->isValid()) {
          $modelMails = new MailsAddressBook_Model_Addressbook();
@@ -322,6 +323,43 @@ class MailsAddressBook_Controller extends Controller {
          $this->link()->reload();
       }
       $this->view()->formImport = $formImport;
+
+      /* IMPORT Z UŽIVATELŮ */
+      $formImportUsers = new Form('import_users_');
+      $grpImportUsers = $formImportUsers->addGroup($this->tr('Import uživatelů'), $this->tr('Import uživatelských účtů a registrací'));
+
+      $elemUserGroup = new Form_Element_Select('usrGroup', $this->tr('Skupina uživatelů'));
+      $modelUserGroups = new Model_Groups();
+      $groups = $modelUserGroups->records();
+      foreach ($groups as $g) {
+         $elemUserGroup->addOption($g->{Model_Groups::COLUMN_NAME}.' - '.$g->{Model_Groups::COLUMN_LABEL}, $g->getPK());
+      }
+      $formImportUsers->addElement($elemUserGroup, $grpImportUsers);
+
+      $eGroup = new Form_Element_Select('group', $this->tr('Do skupiny'));
+      $eGroup->setOptions($groupSelectValues);
+      $formImportUsers->addElement($eGroup, $grpImportUsers);
+
+      $eImport = new Form_Element_Submit('import', $this->tr('Importovat'));
+      $formImportUsers->addElement($eImport, $grpImportUsers);
+
+      if($formImportUsers->isValid()){
+         // načtení všech uživatelů
+         $users = (new Model_Users())
+            ->where(Model_Users::COLUMN_ID_GROUP." = :idg", array('idg' => $formImportUsers->usrGroup->getValues()))
+            ->records();
+
+         // automatické přidávání do adresáře
+         foreach ($users as $u) {
+            Mails_Model_Addressbook::addUniqueMail(
+               $u->{Model_Users::COLUMN_MAIL}, $formImportUsers->group->getValues(),
+               $u->{Model_Users::COLUMN_NAME}, $u->{Model_Users::COLUMN_SURNAME});
+         }
+
+         $this->infoMsg()->addMessage($this->tr('Uživatelé byly importováni'));
+         $this->link()->redirect();
+      }
+      $this->view()->formImportUsers = $formImportUsers;
 
       /* EXPORT */
       $formExport = new Form('mails_export_');
