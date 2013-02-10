@@ -1,6 +1,10 @@
 #php_value memory_limit 48M
 
 RewriteEngine On
+# www redirect
+RewriteCond %{HTTP_HOST} !^www\.
+RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+
 RewriteRule ^config/config\.php$ / [R=permanent,L]
 RewriteCond %{REQUEST_URI} !\.[[:alnum:]]+$
 RewriteRule ^(.+[^/])$ /$1/ [L,R=301,QSA]
@@ -8,7 +12,7 @@ RewriteRule ^(.+[^/])$ /$1/ [L,R=301,QSA]
 # image cacher
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?)/(.+)$ index.php?internalApp=imagecacher&s=$3&tf=$1&is=$2 [L,QSA]
+RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?)/(.+)$ index.php?internalApp=imagecacher&s=$3&tf=$1&is=$2 [L,R=302,QSA]
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]

@@ -879,14 +879,14 @@ class Model_ORM extends Model implements ArrayAccess {
             if ($params['extern'] == true OR $params['changed'] != 1)
                continue;
             if (isset($params['default']) AND $params['value'] === false AND $params['changed'] != 1) {
-               switch ((string) $params['default']) {
-                  case 'CURRENT_TIMESTAMP':
-                     $params['value'] = new DateTime();
-                     break;
-                  default:
+//               switch ((string) $params['default']) {
+//                  case 'CURRENT_TIMESTAMP':
+//                     $params['value'] = new DateTime();
+//                     break;
+//                  default:
                      $params['value'] = $params['default'];
-                     break;
-               }
+//                     break;
+//               }
             }
             $value = $params['value'];
             if ($params['lang'] == true) {
@@ -941,6 +941,7 @@ class Model_ORM extends Model implements ArrayAccess {
    {
       $dbc = Db_PDO::getInstance();
       $sql = 'DELETE '.$this->getTableShortName().'.* FROM ' . $this->getTableName().' AS '.$this->getTableShortName();
+      $pkValue = false;
       if ($pk instanceof Model_ORM_Record) {
          $this->where($this->pKey, $pk->getPK());
          // asi vytáhnout pk (bude muset být uloženo v rekordu)
@@ -964,7 +965,9 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->bindSQLWhere($dbst);
 //      $this->bindSQLHaving($dbst); // having values
       try {
-         $this->beforeDelete($pkValue);
+         if($pkValue){
+            $this->beforeDelete($pkValue);
+         }
          $dbst->execute();
       } catch (PDOException $exc) {
          $this->unLock();
@@ -973,7 +976,7 @@ class Model_ORM extends Model implements ArrayAccess {
             AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
          }
       }
-      if (isset($pkValue)) { // if $pkey is not defined
+      if ($pkValue) { // if $pkey is not defined
          $this->deleteRelations($pkValue); // vymazat přidružení
       }
       return $dbst->rowCount();

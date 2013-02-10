@@ -183,13 +183,17 @@ abstract class Shop_Product_Controller extends Controller {
       $cart->addItem($idProduct, $qty, $idCombination, $label);
    }
 
-   protected function loadProducts($productsOnPage = 0, $sort = 'p', $idCategory = 0)
+   protected function loadProducts($productsOnPage = 0, $sort = 'p', $idCategory = 0, $joinCategory = false)
    {
       $model = new Shop_Model_Product();
       $model->setSelectAllLangs(false);
       $model
          ->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
          ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_ProductCombinations', Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT);
+
+      if($joinCategory){
+         $model->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY);
+      }
 
       if($idCategory != 0){
          $model->where( ($this->category()->getRights()->isWritable() ? null : Shop_Model_Product::COLUMN_ACTIVE.' = 1 AND ' ).
@@ -291,7 +295,15 @@ abstract class Shop_Product_Controller extends Controller {
       
       $eCode = new Form_Element_Text('code', $this->tr('Kód zboží'));
       $form->addElement($eCode, $fGrpInfo);
-      
+
+      $eCat = new Form_Element_Select('cat', $this->tr('Kategorie'));
+      $cats = Model_Category::getCategoryListByModule('shopproductgeneral');
+      foreach ($cats as $c) {
+        $eCat->setOptions(array((string)$c->{Model_Category::COLUMN_NAME} => $c->getPK()), true);
+      }
+      $eCat->setValues($this->category()->getId());
+      $form->addElement($eCat, $fGrpInfo);
+
       $eWeight = new Form_Element_Text('weight', $this->tr('Hmotnost'));
       $eWeight->setSubLabel($this->tr('Váha v Kg'));
       $eWeight->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
@@ -412,6 +424,7 @@ abstract class Shop_Product_Controller extends Controller {
       if(!$product->isNew()){
          $form->name->setValues($product->{Shop_Model_Product::COLUMN_NAME});
          $form->code->setValues($product->{Shop_Model_Product::COLUMN_CODE});
+         $form->cat->setValues($product->{Shop_Model_Product::COLUMN_ID_CATEGORY});
          $form->weight->setValues($product->{Shop_Model_Product::COLUMN_WEIGHT});
          $form->active->setValues($product->{Shop_Model_Product::COLUMN_ACTIVE});
          $form->quantity->setValues($product->{Shop_Model_Product::COLUMN_QUANTITY});
@@ -488,7 +501,7 @@ abstract class Shop_Product_Controller extends Controller {
          }
          
          // uložení dat
-         $product->{Shop_Model_Product::COLUMN_ID_CATEGORY} = $this->category()->getId();
+         $product->{Shop_Model_Product::COLUMN_ID_CATEGORY} = $form->cat->getValues();
          
          $product->{Shop_Model_Product::COLUMN_CODE} = $form->code->getValues();
          $product->{Shop_Model_Product::COLUMN_NAME} = $form->name->getValues();
@@ -1026,7 +1039,14 @@ abstract class Shop_Product_Controller extends Controller {
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));
 //      if($product->isNew()){
-         $this->link()->route('detail', array('urlkey' => (string)$product->{Shop_Model_Product::COLUMN_URLKEY}))->reload();
+      $pr = (new Shop_Model_Product())
+         ->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY, array('curlkey' => Model_Category::COLUMN_URLKEY))
+         ->record($product->getPK());
+
+      $this->link()
+         ->category($pr->curlkey)
+         ->route('detail', array('urlkey' => (string)$product->{Shop_Model_Product::COLUMN_URLKEY}))
+         ->redirect();
 //      } else {
 //         $this->link()->route()->reload();
 //      }

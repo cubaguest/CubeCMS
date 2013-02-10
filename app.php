@@ -29,7 +29,7 @@ class AppCore extends TrObject {
     * Revize Enginu
     * @internal before change release move new config values from _initConfig method
     */
-   const ENGINE_RELEASE = 16;
+   const ENGINE_RELEASE = 18;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -261,7 +261,7 @@ class AppCore extends TrObject {
       if (null === self::$_coreInstance) {
          self::$_coreInstance = new self();
       } else {
-         throw new BadMethodCallException($this->tr('Objekt aplikace byl již vytvořen'));
+         throw new BadMethodCallException('Objekt aplikace byl již vytvořen');
       }
       return self::$_coreInstance;
    }
@@ -452,9 +452,11 @@ class AppCore extends TrObject {
       }
       
       // THIS IS FOR UPDATE - move this configs after release is ready to update sql script
-      define('VVE_DEFAULT_LANG_SUBSTITUTION', true);
-      define('VVE_ANALYTICS_DISABLED_HOSTS', '127.0.0.1');
-      define('VVE_ENABLE_LANG_AUTODETECTION', false);
+      if(self::ENGINE_VERSION <= 7 && self::ENGINE_RELEASE < 19 ){
+         // remove in 7.19 version
+
+         // shop
+      }
    }
 
    /**
@@ -676,7 +678,7 @@ class AppCore extends TrObject {
       $this->getCoreTpl()->execTime = round($endTime - $this->_startTime, 4);
 //       file_put_contents(AppCore::getAppCacheDir()."cache_test_enable.csv", $this->getCoreTpl()->execTime."\n", FILE_APPEND);
       $this->getCoreTpl()->countAllSqlQueries = Db_PDO::getCountQueries();
-      $this->getCoreTpl()->addTplFile(Template_Core::getMainIndexTpl(), true);
+      $this->getCoreTpl()->addFile("tpl://".Template_Core::getMainIndexTpl());
       echo($this->getCoreTpl());
    }
 
@@ -689,8 +691,9 @@ class AppCore extends TrObject {
          // načtení a kontrola cest u modulu
          $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
          if(!class_exists($routesClassName)) {
-            throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" cest (routes) modulu.'),
-            self::getCategory()->getModule()->getName()), 10);
+            throw new UnexpectedPageException();
+//            throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" cest (routes) modulu.'),
+//            self::getCategory()->getModule()->getName()), 10);
          }
          //					Vytvoření objektu kontroleru
          $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart(), self::getCategory());

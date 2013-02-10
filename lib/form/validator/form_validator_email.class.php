@@ -30,11 +30,11 @@ class Form_Validator_Email extends Form_Validator implements Form_Validator_Inte
          // input text
          case 'Form_Element_Text':
          case 'Form_Element_Password':
-            if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
+            if($elemObj->isMultiple() OR $elemObj->isMultiLang()) {
 
             } else {
-               $mailValidatro = new Validator_EMail($elemObj->getUnfilteredValues());
-               if($elemObj->getUnfilteredValues() != null AND !$mailValidatro->isValid()){
+               $mailValidator = new Validator_EMail($elemObj->getUnfilteredValues());
+               if($elemObj->getUnfilteredValues() != null AND !$mailValidator->isValid()){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }

@@ -29,7 +29,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
 } else { $this->addFile('js://enginehelpers.min.js');}
 
 /* START PAGE */ 
-?><!DOCTYPE>
+?><!DOCTYPE html>
 <html>
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -56,7 +56,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
       <!-- {*-JAVASCRIPTS-*} -->
       <? // admin nessesary files
       if(Category::getSelectedCategory()->getRights()->isWritable()){
-         $this->addFile('css://style-admin.css');
+         $this->addFile('css://style-admin.less');
          if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
       }
       ?>
@@ -103,7 +103,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
                   $this->includeTpl("messages.phtml", true);
                   $navTpl = new Template_Navigation();
                   echo $navTpl;
-                  if(VVE_DEBUG_LEVEL > 0){ Debug::printDebug(); Debug_Timer::printTimers(); }
+                  if(VVE_DEBUG_LEVEL > 0){ echo "<pre>";Debug::printDebug(); echo "</pre>";Debug_Timer::printTimers(); }
                   ?>
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
                   <? $this->includeTpl("modules.phtml", true); ?>
@@ -122,10 +122,11 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
                         ?><a href="<?=$lang['link'];?>" title="<?=$lang['label'];?>" class="<?=$class?>"><?=$lang['name'];?></a>&nbsp;<?
                      }?>
                   </div>
+                  <?echo CustomMenu_View::getMenu('left');?>
                   <?
                   if(!empty($this->panels['left'])) {
                      foreach ($this->panels['left'] as $panelL) {?>
-                  <div class="panel panel-left">
+                  <div class="panel panel-left panel-<?=$panelL->category()->getModule()->getName()?>">
                            <?$this->includeTplObj($panelL);?>
                   </div>
                      <?}
@@ -142,7 +143,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
                   <?
                   if(!empty($this->panels['right'])) {
                      foreach ($this->panels['right'] as $panelR) {?>
-                  <div class="panel panel-right">
+                  <div class="panel panel-right panel-<?=$panelR->category()->getModule()->getName()?>">
                            <?$this->includeTplObj($panelR);?>
                   </div>
                      <?}
@@ -169,6 +170,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
                <?}
             }?>
             <hr class="reseter" />
+            <?echo CustomMenu_View::getMenu('bottom');?>
             <?//$this->includeTpl("login.phtml", true);//je v panelu?>
             <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=$this->tr("Mapa stránek")?>"><?=$this->tr("Mapa stránek")?></a>&nbsp;
             <a href="<?=$this->link()->clear(true)->file('rss.html');?>" title="<?=$this->tr("Přehled rss zdrojů")?>"><?=$this->tr("Rss kanály")?></a>
@@ -179,6 +181,9 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
       <div id="debug">
          <?
          if(VVE_DEBUG_LEVEL > 1) {
+            echo "<pre>";
+            $this->getCombineCssFile();
+            echo "</pre>";
             if(function_exists('xdebug_get_function_count')){
                print ("Run functions: ".xdebug_get_function_count()."<br />");
                print ("Memory: ".xdebug_memory_usage()."<br />");
@@ -187,6 +192,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
             }
             print ("Exec time: ".$this->execTime."s<br />");
             print ("SQL Queries: ".Db_PDO::getCountQueries()."<br />");
+            print ("Current user: ".Auth::getUserName()." - ".Auth::getUserId()."<br />");
          }
          ?>
       </div>

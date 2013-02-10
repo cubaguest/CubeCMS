@@ -17,9 +17,11 @@ class Install_Core {
 
    const FILE_SQL_UPGRADE = 'upgrade_{from}_to_{to}.sql';
    const FILE_PHP_UPGRADE = 'upgrade_{from}_to_{to}.php';
+   const FILE_PHP_PREPARE_UPGRADE = 'upgrade_prepare_{from}_to_{to}.php';
 
    const FILE_SQL_PATCH = 'patch_{to}.sql';
    const FILE_PHP_PATCH = 'patch_{to}.php';
+   const FILE_PHP_PREPARE_UPDATE = 'prepare_{to}.php';
 
    const SQL_MAIN_SITE_UPDATE = 'UPDATE_MAIN_SITE';
    const SQL_SUB_SITE_UPDATE = 'UPDATE_SUB_SITE';
@@ -56,9 +58,8 @@ class Install_Core {
       $currentVer = (int)VVE_VERSION;
       try {
          while ($currentVer != AppCore::ENGINE_VERSION) {
-            /* php update */
-            $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_PHP_UPGRADE);
-
+            /* php prepare update */
+            $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_PHP_PREPARE_UPGRADE);
 
             if (is_file($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName)) {
                include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName;
@@ -107,7 +108,12 @@ class Install_Core {
                   fclose($handle);
                }
             }
+            // post upgrade
+            $phpFileName = preg_replace(array('/{from}/', '/{to}/'), array($currentVer, $currentVer + 1), self::FILE_PHP_UPGRADE);
 
+            if (is_file($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName)) {
+               include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $phpFileName;
+            }
 
             $record->{Model_Config::COLUMN_VALUE} = $currentVer + 1;
             $modelCfg->save($record);
@@ -155,8 +161,8 @@ class Install_Core {
       $currentRelease = VVE_RELEASE;
       while ($currentRelease != AppCore::ENGINE_RELEASE) {
          try {
-            /* php update */
-            $phpFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_PHP_PATCH);
+            /* php prepare update */
+            $phpFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_PHP_PREPARE_UPDATE);
             if (is_file($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName)) {
                include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName;
             }
@@ -216,6 +222,12 @@ class Install_Core {
                }
             }
 
+            /* php update */
+            $phpFileName = preg_replace('/{to}/', $currentRelease + 1, self::FILE_PHP_PATCH);
+            if (is_file($this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName)) {
+               include $this->getInstallDir() . self::CORE_UPGRADE_DIR . DIRECTORY_SEPARATOR . $versionDir . DIRECTORY_SEPARATOR . $phpFileName;
+            }
+
             $record->{Model_Config::COLUMN_VALUE} = $currentRelease + 1;
             $modelCfg->save($record);
          } catch (Exception $exc) {
@@ -232,7 +244,33 @@ class Install_Core {
       Install_Module::updateAllModules();
       $this->installComplete(sprintf('Jádro a moduly bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
       
-      // update dubdomain with CURL
+      // update subdomains
+      $this->updateSubdomains();
+   }
+
+   private function updateSubdomains()
+   {
+      $modelDomains = new Model_Sites();
+      $subDomains = $modelDomains->where(Model_Sites::COLUMN_IS_MAIN." = 0", array())->records();
+      if(!empty($subDomains)){
+         foreach($subDomains as $domain){
+            // build link
+            $site = str_replace('www', $domain->{Model_Sites::COLUMN_DOMAIN}, Url_Request::getBaseWebDir(true))."sitemap.html?sessionid=".session_id();
+            $ch = curl_init($site);
+            curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/xml; charset=UTF-8"));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+            if(curl_exec($ch) === false)
+            {
+               Log::msg('Nelze updatovat subdoménu: '.$domain->{Model_Sites::COLUMN_DOMAIN}." CURL_ERRNO: ".curl_errno($ch)." CURL_ERROR: ".curl_error($ch));
+            }
+            curl_close($ch);
+         }
+      }
    }
 
    /**

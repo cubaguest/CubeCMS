@@ -90,9 +90,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
       $this->protectForm = $protectForm;
-      if($protectForm){
-         $this->createToken();
-      }
+      $this->setProtected($protectForm);
    }
 
    public function  __toString() {
@@ -104,9 +102,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    private function createToken()
    {
-      if($this->elementToken == null){
+//      if($this->elementToken == null){
          $this->elementToken = new Form_Element_Token('_'.$this->formPrefix.'_token');
-      }
+//      }
    }
 
    /**
@@ -119,9 +117,8 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $decorator = new Form_Decorator();
       }
       $html = clone $this->html();
-      $pHtml = new Html_Element('p', $this->elementCheckForm->controll());
-      if($this->protectForm){
-         $this->createToken();
+      $pHtml = new Html_Element('div', $this->elementCheckForm->control());
+      if($this->protectForm && $this->elementToken instanceof Form_Element_Token){
          $pHtml->addContent((string)$this->elementToken->controll());
       }
       $html->addContent($pHtml);
@@ -226,7 +223,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    public function renderStart() {
       $cnt = $this->html()->__toStringBegin();
-      $this->createToken();
+//      $this->createToken();
       $p = new Html_Element('p', (string)$this->elementCheckForm->controll());
       if($this->elementToken !== null){
          $p->addContent((string)$this->elementToken->controll());

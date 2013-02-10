@@ -174,5 +174,9 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
    public function valid() {
       return key($this->values) !== null;
    }
+
+   public function getArray()
+   {
+      return $this->values;
+   }
 }
-?>

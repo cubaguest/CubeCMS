@@ -266,6 +266,9 @@ class Email {
       if($this->sendFromAddress != null){
          $this->message()->setSender($this->sendFromAddress, $this->sanitize($this->sendFromName));
          $this->message()->setFrom($this->sendFromAddress, $this->sanitize($this->sendFromName));
+      } else {
+         $this->message()->setSender(VVE_NOREPLAY_MAIL, $this->sanitize(VVE_WEB_NAME));
+         $this->message()->setFrom(VVE_NOREPLAY_MAIL, $this->sanitize(VVE_WEB_NAME));
       }
       
       if(!empty($this->files)){

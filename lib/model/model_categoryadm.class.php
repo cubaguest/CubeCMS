@@ -105,7 +105,7 @@ class Model_CategoryAdm extends Model_File {
       return self::$structure;
    }
 
-   public function getCategoryListByModule($module)
+   public static function getCategoryListByModule($module, $onlyWithRights = true)
    {
 
    }

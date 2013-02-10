@@ -46,7 +46,7 @@ class Model_Users extends Model_ORM {
    const COLUMN_GROUP_LABEL    = 'label';
 
    protected function  _initTable() {
-   if(VVE_USE_GLOBAL_ACCOUNTS === true) {
+      if(VVE_USE_GLOBAL_ACCOUNTS === true) {
          $this->setTableName(VVE_GLOBAL_TABLES_PREFIX.self::DB_TABLE, 't_us', false);
       } else {
          $this->setTableName(self::DB_TABLE, 't_us');

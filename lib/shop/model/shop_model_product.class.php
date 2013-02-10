@@ -21,30 +21,31 @@ class Shop_Model_Product extends Model_ORM
    const COLUMN_ID_CATEGORY = 'id_category';
    const COLUMN_ID_TAX = 'id_tax';
    
-   const COLUMN_CODE = 'code';
-   const COLUMN_NAME = 'name';
-   const COLUMN_URLKEY = 'urlkey';
-   const COLUMN_TEXT_SHORT = 'text_short';
-   const COLUMN_TEXT = 'text';
-   const COLUMN_TEXT_CLEAR = 'text_clear';
-   const COLUMN_KEYWORDS = 'keywords';
+   const COLUMN_CODE = 'product_code';
+   const COLUMN_NAME = 'product_name';
+   const COLUMN_URLKEY = 'product_urlkey';
+   const COLUMN_TEXT_SHORT = 'product_text_short';
+   const COLUMN_TEXT = 'product_text';
+   const COLUMN_TEXT_CLEAR = 'product_text_clear';
+   const COLUMN_KEYWORDS = 'product_keywords';
    
-   const COLUMN_PRICE = 'price';
-   const COLUMN_UNIT = 'unit';
-   const COLUMN_UNIT_SIZE = 'unit_size';
-   const COLUMN_QUANTITY = 'quantity';
+   const COLUMN_PRICE = 'product_price';
+   const COLUMN_UNIT = 'product_unit';
+   const COLUMN_UNIT_SIZE = 'product_unit_size';
+   const COLUMN_QUANTITY = 'product_quantity';
    const COLUMN_STOCK = 'product_stock';
-   const COLUMN_WEIGHT = 'weight';
-   const COLUMN_DISCOUNT = 'discount';
-   const COLUMN_DELETED = 'deleted';
-   const COLUMN_SHOWED = 'showed';
-   const COLUMN_ACTIVE = 'active';
-   const COLUMN_IMAGE = 'image';
-   const COLUMN_DATE_ADD = 'date_add';
-   const COLUMN_IS_NEW_TO_DATE = 'is_new_to_date';
-   const COLUMN_PERSONAL_PICKUP_ONLY = 'personal_pickup_only';
-   const COLUMN_PICKUP_DATE = 'required_pickup_date';
-   
+   const COLUMN_WEIGHT = 'product_weight';
+   const COLUMN_DISCOUNT = 'product_discount';
+   const COLUMN_DELETED = 'product_deleted';
+   const COLUMN_SHOWED = 'product_showed';
+   const COLUMN_ACTIVE = 'product_active';
+   const COLUMN_IMAGE = 'product_image';
+   const COLUMN_DATE_ADD = 'product_date_add';
+   const COLUMN_IS_NEW_TO_DATE = 'product_is_new_to_date';
+   const COLUMN_PERSONAL_PICKUP_ONLY = 'product_personal_pickup_only';
+   const COLUMN_PICKUP_DATE = 'product_required_pickup_date';
+   const COLUMN_ORDER = 'product_order';
+
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_sh_pr_gen');
 
@@ -77,6 +78,7 @@ class Shop_Model_Product extends Model_ORM
       $this->addColumn(self::COLUMN_IS_NEW_TO_DATE, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_PERSONAL_PICKUP_ONLY, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       $this->addColumn(self::COLUMN_PICKUP_DATE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
 
       $this->setPk(self::COLUMN_ID);
       
@@ -122,6 +124,44 @@ class Shop_Model_Product extends Model_ORM
          }
       }
       $record->{self::COLUMN_URLKEY} = $urlkeys;
+
+      // kontrola jestli je zadána pozice
+      if($record->{self::COLUMN_ORDER} == 0){
+         $counter = $this->where( self::COLUMN_ID_CATEGORY." = :id", array('id' => $record->{self::COLUMN_ID_CATEGORY}))->count();
+         $record->{self::COLUMN_ORDER} = $counter+1;
+      }
+   }
+
+   protected function beforeDelete($pk)
+   {
+      $m = new self();
+      $record = $m->record($pk);
+
+      // reorganizovat pořadí
+      $m->where(self::COLUMN_ID_CATEGORY." = :id AND ".self::COLUMN_ID_CATEGORY." > :ord",
+         array( 'id' => $record->{self::COLUMN_ID_CATEGORY}, 'ord' => $record->{self::COLUMN_ORDER}, ))
+         ->update(array( self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER." - 1" )) );
+   }
+
+   public static function changeOrder($id, $newPos)
+   {
+      $m = new self();
+      $rec = $m->record($id);
+
+      if($newPos > $rec->{self::COLUMN_ORDER}){
+         // move down
+         $m->where(self::COLUMN_ORDER." > :oldOrder AND ".self::COLUMN_ORDER." <= :newOrder AND ".self::COLUMN_ID_CATEGORY." = :id",
+            array('oldOrder' => $rec->{self::COLUMN_ORDER}, 'newOrder' => $newPos, 'id' => $rec->{self::COLUMN_ID_CATEGORY}))
+            ->update(array(self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER.' - 1')));
+      } else {
+         // move up
+         $m->where(self::COLUMN_ORDER." < :oldOrder AND ".self::COLUMN_ORDER." >= :newOrder AND ".self::COLUMN_ID_CATEGORY." = :id",
+            array('oldOrder' => $rec->{self::COLUMN_ORDER}, 'newOrder' => $newPos, 'id' => $rec->{self::COLUMN_ID_CATEGORY}))
+            ->update(array(self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER.' + 1')));
+      }
+      // update row
+      $rec->{self::COLUMN_ORDER} = $newPos;
+      $rec->save();
    }
 
    public static function getProductWithCombination()

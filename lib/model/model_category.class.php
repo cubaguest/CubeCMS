@@ -225,16 +225,16 @@ class Model_Category extends Model_ORM {
       return $dbst->execute();
    }
 
-   public function getCategoryListByModule($module)
+   public static function getCategoryListByModule($module, $onlyWithRights = true)
    {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE) . " AS cat"
-            . " WHERE (cat." . Model_Category::COLUMN_MODULE . " = :module)");
-      $dbst->bindValue(":module", $module, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
-   }
+      $model = new self();
 
+      if($onlyWithRights){
+         $model->onlyWithAccess();
+         $model->where(" AND ".self::COLUMN_MODULE." = :module", array('module' => $module), true);
+      } else {
+         $model->where(self::COLUMN_MODULE." = :module", array('module' => $module));
+      }
+      return $model->records();
+   }
 }
-?>

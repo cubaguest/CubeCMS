@@ -21,7 +21,7 @@ class Token {
 
    public static function getToken()
    {
-      $classStoreName = 'Token_Store_'.ucfirst(VVE_TOKENS_STORE);
+      $classStoreName = 'Token_Store_'.ucfirst(strtolower(VVE_TOKENS_STORE));
       if(!self::$token){
          self::$token = self::generateToken();
       }
