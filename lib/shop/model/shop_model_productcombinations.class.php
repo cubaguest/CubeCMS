@@ -188,7 +188,9 @@ class Shop_Model_ProductCombinations extends Model_ORM {
    public static function getCombinations($idProduct)
    {
       $model = new self();
-      return $model->prepareForProductCombinations($idProduct)->records();
+       $model->prepareForProductCombinations($idProduct);
+//      Debug::log($model->getSQLQuery());
+      return $model->records();
    }
 
    public static function generateCombinations($groupsVariants, $defaultVariants, $idProduct, $qty, $updatePrice = false, $onlyUpdate = false)
@@ -304,14 +306,14 @@ class Shop_Model_ProductCombinations extends Model_ORM {
          Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT,
          'comb_name' =>
          'GROUP_CONCAT( attr_g.'.Model_ORM::getLangColumn(Shop_Model_AttributesGroups::COLUMN_NAME)
-            .',": ", attr.'.Model_ORM::getLangColumn(Shop_Model_Attributes::COLUMN_NAME).' SEPARATOR ", ")',
+            .',": ", attr.'.Model_ORM::getLangColumn(Shop_Model_Attributes::COLUMN_NAME).' ORDER BY '.Shop_Model_AttributesGroups::COLUMN_ORDER.' SEPARATOR ", ")',
 //         'price' =>
 //         'SUM(vari.'.Shop_Model_ProductVariants::COLUMN_PRICE_ADD.')',
          'weight' =>
          'SUM(vari.'.Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD.')',
          'comb_codes_json' =>
          "CONCAT('{', GROUP_CONCAT( '\"', attr.".Shop_Model_Attributes::COLUMN_ID_GROUP.", '\"', \" : \","
-            ." '\"', vari.".Shop_Model_ProductVariants::COLUMN_CODE_ADD.", '\"' SEPARATOR ', '),'}')",
+            ." '\"', vari.".Shop_Model_ProductVariants::COLUMN_CODE_ADD.", '\"' ORDER BY ".Shop_Model_Attributes::COLUMN_ORDER." SEPARATOR ', '),'}')",
          'comb_variant_ids' =>
          "GROUP_CONCAT( vari.".Shop_Model_ProductVariants::COLUMN_ID." SEPARATOR ',')",
       ))
@@ -336,6 +338,7 @@ class Shop_Model_ProductCombinations extends Model_ORM {
             array( 'attr_g' => "Shop_Model_AttributesGroups"),
             Shop_Model_AttributesGroups::COLUMN_ID, array(Shop_Model_AttributesGroups::COLUMN_NAME)
       )
+         ->order(array(Shop_Model_AttributesGroups::COLUMN_ORDER, Shop_Model_Attributes::COLUMN_ORDER))
          ->where(Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT." = :idp", array('idp' => $idProduct))
          ->groupBy(array(Shop_Model_ProductCombinations::COLUMN_ID));
 

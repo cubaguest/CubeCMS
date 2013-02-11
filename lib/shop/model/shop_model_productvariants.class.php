@@ -41,8 +41,8 @@ class Shop_Model_ProductVariants extends Model_ORM {
          ->join(array('attributes' => Shop_Model_Attributes::COLUMN_ID_GROUP), 'Shop_Model_AttributesGroups', Shop_Model_AttributesGroups::COLUMN_ID)
          ->where(self::COLUMN_ID_PRODUCT." = :idp", array('idp' => $idProduct))
          ->order(array(
-            Shop_Model_AttributesGroups::COLUMN_NAME => Model_ORM::ORDER_ASC,
-            Shop_Model_Attributes::COLUMN_NAME => Model_ORM::ORDER_ASC
+            Shop_Model_AttributesGroups::COLUMN_ORDER => Model_ORM::ORDER_ASC,
+            Shop_Model_Attributes::COLUMN_ORDER => Model_ORM::ORDER_ASC
          ))
          ->records();
    }

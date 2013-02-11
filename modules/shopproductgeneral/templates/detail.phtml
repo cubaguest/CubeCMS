@@ -48,12 +48,12 @@ echo $this->product->{Shop_Model_Product::COLUMN_NAME};
 echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*60*60) >= time() ? ' - '.$this->tr('Novinka!') : null;
 echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('neaktivní') : null;
 ?></h1>
-<div class="main-content">
-   <div class="main-content-text">
+<div class="content">
+   <div class="text">
       <?=$this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
    </div>
    <?if($this->product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
-   <div class="main-content-image">
+   <div class="title-image">
       <?
       $imgSmall = Shop_Product_Controller::getImagesDir(true).'small/'.$this->product->{Shop_Model_Product::COLUMN_IMAGE};
       $imgSmall = vve_image_cacher(Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}, 300);
